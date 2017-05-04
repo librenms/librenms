@@ -1,0 +1,3353 @@
+
+-- Radio Bridge MIB
+
+
+RADIO-BRIDGE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises
+		FROM RFC1155-SMI
+	TruthValue, DisplayString, RowStatus
+		FROM SNMPv2-TC
+	OBJECT-TYPE, Integer32, Gauge32, Counter64, IpAddress, TimeTicks, Unsigned32
+		FROM SNMPv2-SMI
+	ifIndex
+        FROM IF-MIB
+	InterfaceIndex
+        FROM IF-MIB
+	dot1agCfmMepEntry
+		FROM  IEEE8021-CFM-MIB
+	ieee8021QBridgeTpFdbEntry
+		FROM  IEEE8021-Q-BRIDGE-MIB
+
+	OBJECT-GROUP
+		FROM SNMPv2-CONF;
+
+
+-- Siklu Root
+radioBridgeRoot  	OBJECT IDENTIFIER ::= { enterprises 31926 }
+
+
+radioBridgeSystem  	OBJECT IDENTIFIER ::= { radioBridgeRoot 1 }
+radioBridgeRf       OBJECT IDENTIFIER ::= { radioBridgeRoot 2 }
+radioBridgeTraps    OBJECT IDENTIFIER ::= { radioBridgeRoot 3 }
+radioBridgeRefClock	OBJECT IDENTIFIER ::= { radioBridgeRoot 4 }
+radioBridgeEthernet			OBJECT IDENTIFIER ::= { radioBridgeRoot 5 }
+radioBridgeQosClassifier 	OBJECT IDENTIFIER ::= { radioBridgeRoot 6 }
+radioBridgeQosIngressQueue	OBJECT IDENTIFIER ::= { radioBridgeRoot 7 }
+radioBridgeQosEgressQueue	OBJECT IDENTIFIER ::= { radioBridgeRoot 8 }
+radioBridgeIp		OBJECT IDENTIFIER ::= { radioBridgeRoot 9 }
+radioBridgeCfm		OBJECT IDENTIFIER ::= { radioBridgeRoot 10 }
+radioBridgeAlarms 	OBJECT IDENTIFIER ::= { radioBridgeRoot 11 }
+radioBridgeScheduler 	OBJECT IDENTIFIER ::= { radioBridgeRoot 12 }
+radioBridgeEncryption	OBJECT IDENTIFIER ::= { radioBridgeRoot 13 }
+radioBridgeMeter		OBJECT IDENTIFIER ::= { radioBridgeRoot 14 }
+radioBridgeEventConfig	OBJECT IDENTIFIER ::= { radioBridgeRoot 15 }
+radioBridgeSnmp			OBJECT IDENTIFIER ::= { radioBridgeRoot 17 }
+--   rbSysFileOperationTable  ::= { radioBridgeRoot 18 }  see below
+radioBridgeLldp			OBJECT IDENTIFIER ::= { radioBridgeRoot 19 }
+radioBridgeWred			OBJECT IDENTIFIER ::= { radioBridgeRoot 20 }
+radioBridgeAuthentication	OBJECT IDENTIFIER ::= { radioBridgeRoot 21 }
+radioBridgeQuota		OBJECT IDENTIFIER ::= { radioBridgeRoot 22 }
+radioBridgePcpProfile	OBJECT IDENTIFIER ::= { radioBridgeRoot 23 }
+radioBridgeSyslog		OBJECT IDENTIFIER ::= { radioBridgeRoot 24 }
+radioBridgeNtp			OBJECT IDENTIFIER ::= { radioBridgeRoot 25 }
+radioBridgeLicense		OBJECT IDENTIFIER ::= { radioBridgeRoot 26 }
+
+-- ===========================================================
+-- Radio Bridge system extension
+-- ===========================================================
+
+rbSysVoltage OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               ""
+       ::= { radioBridgeSystem 1 }
+
+rbSysTemperature OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               ""
+       ::= { radioBridgeSystem 2 }
+       
+rbSysSaveConfiguration OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               ""
+       ::= { radioBridgeSystem 3 }
+
+rbSysReset OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "Read the variable value and then write this value for reset"
+       ::= { radioBridgeSystem 4 }
+
+rbSwBank1Version OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               ""
+       ::= { radioBridgeSystem 5 }
+
+rbSwBank2Version OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               ""
+       ::= { radioBridgeSystem 6 }
+
+rbSwBank1Running OBJECT-TYPE
+		SYNTAX      INTEGER
+		{
+			noRunning(1),
+			running(2),
+			running-wait-accept(3)
+		}
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               ""
+       ::= { radioBridgeSystem 7 }
+
+rbSwBank2Running OBJECT-TYPE
+		SYNTAX      INTEGER
+		{
+			noRunning(1),
+			running(2),
+			running-wait-accept(3)
+		}
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               ""
+       ::= { radioBridgeSystem 8 }
+
+rbSwBank1ScheduledToRunNextReset OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               ""
+       ::= { radioBridgeSystem 9 }
+
+rbSwBank2ScheduledToRunNextReset OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               ""
+       ::= { radioBridgeSystem 10 }
+
+rbSystemUpAbsoluteTime OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "since the Epoch (00:00:00 UTC, January 1, 1970), measured in seconds."
+       ::= { radioBridgeSystem 11 }
+
+rbSystemAuthenticationMode OBJECT-TYPE
+		SYNTAX      INTEGER
+		{
+			local(1),
+			radius(2),
+			tacacs(3)
+		}
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               ""
+       ::= { radioBridgeSystem 12 }
+
+rbSystemAuthenticationSecret OBJECT-TYPE
+	   SYNTAX DisplayString
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               ""
+       ::= { radioBridgeSystem 13 }
+
+	   
+rbSystemCapabilities OBJECT-TYPE
+	   SYNTAX BITS
+	   {
+			nmsFtp(0)
+	   }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               ""
+       ::= { radioBridgeSystem 14 }
+
+rbDate OBJECT-TYPE
+	   SYNTAX DisplayString
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               ""
+       ::= { radioBridgeSystem 15 }
+
+rbTime OBJECT-TYPE
+	   SYNTAX DisplayString
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               ""
+       ::= { radioBridgeSystem 16 }
+
+-- ===========================================================
+-- Radio Bridge RF table
+-- ===========================================================
+
+rbRfTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RbRfEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { radioBridgeRf  1 }
+
+rbRfEntry OBJECT-TYPE
+	SYNTAX      RbRfEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	INDEX { rfIndex }
+	::= { rbRfTable 1 }
+
+RbRfEntry ::= SEQUENCE {
+	rfIndex			Integer32,
+	rfNumOfChannels		Integer32,
+	rfChannelWidth		INTEGER,
+	rfOperationalFrequency	Integer32,
+	rfRole			INTEGER,
+	rfModeSelector		INTEGER,
+	rfModulationType		INTEGER,
+	rfNumOfSubchannels	Integer32,
+	rfNumOfRepetitions		Integer32,
+	rfFecRate			INTEGER,
+	rfOperationalState		TruthValue,
+	rfAverageCinr		Integer32,
+	rfAverageRssi		Integer32,
+	rfTxSynthLock		INTEGER,
+	rfRxSynthLock		INTEGER,
+	rfRxLinkId			Integer32,
+	rfTxLinkId			Integer32,
+	rfTxState			INTEGER,
+	rfRxState			INTEGER,
+	rfTemperature		Integer32,
+	rfAsymmetry			INTEGER,
+
+	rfLowestModulationType		INTEGER,
+	rfLowestNumOfSubchannels	Integer32,
+	rfLowestNumOfRepetitions	Integer32,
+	rfLowestFecRate				INTEGER,
+
+	rfTxMute		TruthValue,
+	rfRoleStatus	INTEGER,
+
+	rfLoopModeSelector		INTEGER,
+	rfLoopDirection			INTEGER,
+	rfLoopModulationType		INTEGER,
+	rfLoopNumOfSubchannels	Integer32,
+	rfLoopNumOfRepetitions		Integer32,
+	rfLoopFecRate			INTEGER,
+	rfLoopTimeout			Integer32,
+
+	rfTxPower				Integer32,
+	rfTxMuteTimeout			Integer32,
+	rfAlignmentStatus		INTEGER
+}
+
+
+rfIndex OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 1 }
+
+rfNumOfChannels  OBJECT-TYPE
+	SYNTAX      Integer32(1 | 2)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 2 }
+
+rfChannelWidth OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		rfWidth250(1),
+		rfWidth500(2)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 3 }
+
+rfOperationalFrequency OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 4 }
+
+rfRole OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		rfMaster(1),
+		rfSlave(2),
+		rfAuto(3)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 5 }
+
+rfModeSelector OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		rfModeAdaptive(1),
+		rfModeStatic(2),
+		rfModeAlign(3)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 6 }
+
+rfModulationType OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		rfModulationQPSK(1),
+		rfModulationQAM-16(2),
+		rfModulationQAM-64(3)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 7 }
+
+rfNumOfSubchannels OBJECT-TYPE
+	SYNTAX      Integer32 (1..4)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 8 }
+
+rfNumOfRepetitions OBJECT-TYPE
+	SYNTAX      Integer32 (1 | 2 | 4)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 9 }
+
+rfFecRate OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		rfFEC-05(1),
+		rfFEC-067(2),
+		rfFEC-08(3)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 10 }
+
+rfOperationalState OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 17 }
+
+rfAverageCinr OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 18 }
+
+rfAverageRssi OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 19 }
+
+rfTxSynthLock OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		txSynthUnlock(0),
+		txSynthLock(1)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 20 }
+
+rfRxSynthLock OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		rxSynthUnlock(0),
+		rxSynthLock(1)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 21 }
+
+rfRxLinkId OBJECT-TYPE
+	SYNTAX      Integer32 (0..127)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 22 }
+
+rfTxLinkId OBJECT-TYPE
+	SYNTAX      Integer32 (0..127)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 23 }
+
+rfTxState OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		rf-sync(1),
+		rf-searchCountdown(2),
+		rf-foundCountdown(3),
+		rf-normal(4)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 24 }
+
+rfRxState OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		rf-sync(1),
+		rf-searchCountdown(2),
+		rf-foundCountdown(3),
+		rf-normal(4)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 25 }
+
+rfTemperature OBJECT-TYPE
+	SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+	::= {  rbRfEntry 26 }
+	
+rfAsymmetry OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		rf-asymmetry-25tx-75rx(1),
+		rf-asymmetry-50tx-50rx(2),
+		rf-asymmetry-75tx-25rx(3)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 27 }
+
+
+rfLowestModulationType OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		rfModulationQPSK(1),
+		rfModulationQAM-16(2),
+		rfModulationQAM-64(3)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 30 }
+
+rfLowestNumOfSubchannels OBJECT-TYPE
+	SYNTAX      Integer32 (1..4)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 31}
+
+rfLowestNumOfRepetitions OBJECT-TYPE
+	SYNTAX      Integer32 (1 | 2 | 4)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 32 }
+
+rfLowestFecRate OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		rfFEC-05(1),
+		rfFEC-067(2),
+		rfFEC-08(3)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 33 }
+	
+rfTxMute OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 34 }
+
+rfRoleStatus OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		rfMaster(1),
+		rfSlave(2),
+		rfAuto(3)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 35 }
+
+rfLoopModeSelector OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		rfLoopDisabled(1),
+		rfLoopInternalMacSwap(2)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 36 }
+
+rfLoopModulationType OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		rfModulationQPSK(1),
+		rfModulationQAM-16(2),
+		rfModulationQAM-64(3)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 37 }
+
+rfLoopNumOfSubchannels OBJECT-TYPE
+	SYNTAX      Integer32 (1..4)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 38 }
+
+rfLoopNumOfRepetitions OBJECT-TYPE
+	SYNTAX      Integer32 (1 | 2 | 4)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 39 }
+
+rfLoopFecRate OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		rfFEC-05(1),
+		rfFEC-067(2),
+		rfFEC-08(3)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 40 }
+
+rfLoopTimeout OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 41 }
+
+rfTxPower OBJECT-TYPE
+	SYNTAX      Integer32 (-35 .. 8)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 42 }
+
+rfTxMuteTimeout OBJECT-TYPE
+	SYNTAX      Integer32 (0 .. 86400)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 43 }
+
+rfAlignmentStatus OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		rfAlignmentInactive(0),
+		rfAlignmentActive(1)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 44 }
+
+rfLoopDirection OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		rfLoop-tx(1),
+		rfLoop-rx(2)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfEntry 45 }
+
+	
+-- ===========================================================
+-- Radio Bridge RF statistics table
+-- ===========================================================
+
+
+rbRfStatisticsTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RbRfStatisticsEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { radioBridgeRf  2 }
+
+rbRfStatisticsEntry OBJECT-TYPE
+	SYNTAX      RbRfStatisticsEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	INDEX { rfIndex }
+	::= { rbRfStatisticsTable 1 }
+
+RbRfStatisticsEntry ::= SEQUENCE {
+	rfInOctets			Counter64,
+	rfInIdleOctets		Counter64,
+	rfInGoodOctets		Counter64,
+	rfInErroredOctets	Counter64,
+	rfOutOctets			Counter64,
+	rfOutIdleOctets		Counter64,
+	rfInPkts			Counter64,
+	rfInGoodPkts		Counter64,
+	rfInErroredPkts		Counter64,
+	rfInLostPkts		Counter64,
+	rfOutPkts			Counter64,
+	rfMinCinr			Counter64,
+	rfMaxCinr			Counter64,
+	rfMinRssi			Counter64,
+	rfMaxRssi			Counter64,
+	rfMinModulation		Counter64,
+	rfMaxModulation		Counter64,
+
+	rfValid				TruthValue,
+
+	rfArqInLoss			Counter64,
+	rfArqOutLoss		Counter64
+}
+
+
+rfInOctets OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 1 }
+
+rfInIdleOctets OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 2 }
+
+rfInGoodOctets OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 3 }
+
+rfInErroredOctets OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 4 }
+
+rfOutOctets OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 5 }
+
+rfOutIdleOctets OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 6 }
+
+rfInPkts OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 7 }
+
+rfInGoodPkts OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 8 }
+
+rfInErroredPkts OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 9 }
+
+rfInLostPkts OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 10 }
+
+rfOutPkts OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 11 }
+
+rfMinCinr OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 15 }
+
+rfMaxCinr OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 16 }
+
+rfMinRssi OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 17 }
+
+rfMaxRssi OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 18 }
+
+rfMinModulation OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"
+		byte # 3: see rfModulationType;
+		byte # 2: see rfNumOfSubchannels;
+		byte # 1: see rfNumOfRepetitions;
+		byte # 0: see rfFecRate;
+	"
+	::= {  rbRfStatisticsEntry 19 }
+
+rfMaxModulation OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"
+		byte # 3: see rfModulationType;
+		byte # 2: see rfNumOfSubchannels;
+		byte # 1: see rfNumOfRepetitions;
+		byte # 0: see rfFecRate;
+	"
+	::= {  rbRfStatisticsEntry 20 }
+
+rfValid OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 21 }
+
+rfArqInLoss OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 22 }
+
+
+rfArqOutLoss OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsEntry 23 }
+
+-- ===========================================================
+	
+rbRfStatisticsDaysTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RbRfStatisticsDaysEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { radioBridgeRf  3 }
+
+rbRfStatisticsDaysEntry OBJECT-TYPE
+	SYNTAX      RbRfStatisticsDaysEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	INDEX { rfIndex, rfDayIndex }
+	::= { rbRfStatisticsDaysTable 1 }
+
+RbRfStatisticsDaysEntry ::= SEQUENCE {
+	rfDayIndex			Integer32,
+	rfDaysStart 			TimeTicks,
+
+	rfDaysInOctets			Counter64,
+	rfDaysInIdleOctets		Counter64,
+	rfDaysInGoodOctets		Counter64,
+	rfDaysInErroredOctets	Counter64,
+	rfDaysOutOctets			Counter64,
+	rfDaysOutIdleOctets		Counter64,
+	rfDaysInPkts			Counter64,
+	rfDaysInGoodPkts		Counter64,
+	rfDaysInErroredPkts		Counter64,
+	rfDaysInLostPkts		Counter64,
+	rfDaysOutPkts			Counter64,
+	rfDaysMinCinr			Counter64,
+	rfDaysMaxCinr			Counter64,
+	rfDaysMinRssi			Counter64,
+	rfDaysMaxRssi			Counter64,
+	rfDaysMinModulation		Counter64,
+	rfDaysMaxModulation		Counter64,
+
+	rfDaysValid				TruthValue,
+
+	rfDaysArqInLoss			Counter64,
+	rfDaysArqOutLoss		Counter64
+}
+
+rfDayIndex OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 50 }
+
+rfDaysStart OBJECT-TYPE
+	SYNTAX      TimeTicks
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 51 }
+	
+
+rfDaysInOctets OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 1 }
+
+rfDaysInIdleOctets OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 2 }
+
+rfDaysInGoodOctets OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 3 }
+
+rfDaysInErroredOctets OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 4 }
+
+rfDaysOutOctets OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 5 }
+
+rfDaysOutIdleOctets OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 6 }
+
+rfDaysInPkts OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 7 }
+
+rfDaysInGoodPkts OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 8 }
+
+rfDaysInErroredPkts OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 9 }
+
+rfDaysInLostPkts OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 10 }
+
+rfDaysOutPkts OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 11 }
+
+rfDaysMinCinr OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 15 }
+
+rfDaysMaxCinr OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 16 }
+
+rfDaysMinRssi OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 17 }
+
+rfDaysMaxRssi OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 18 }
+
+rfDaysMinModulation OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"
+		byte # 3: see rfModulationType;
+		byte # 2: see rfNumOfSubchannels;
+		byte # 1: see rfNumOfRepetitions;
+		byte # 0: see rfFecRate;
+	"
+	::= {  rbRfStatisticsDaysEntry 19 }
+
+rfDaysMaxModulation OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"
+		byte # 3: see rfModulationType;
+		byte # 2: see rfNumOfSubchannels;
+		byte # 1: see rfNumOfRepetitions;
+		byte # 0: see rfFecRate;
+	"
+	::= {  rbRfStatisticsDaysEntry 20 }
+
+rfDaysValid OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 21 }
+
+rfDaysArqInLoss OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 22 }
+
+
+rfDaysArqOutLoss OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRfStatisticsDaysEntry 23 }
+
+-- ===========================================================
+-- Radio Bridge reference clock table
+-- ===========================================================
+	
+rbRefClockTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RbRefClockEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { radioBridgeRefClock  1 }
+
+
+rbRefClockEntry OBJECT-TYPE
+	SYNTAX      RbRefClockEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	INDEX { ifIndex }
+	::= { rbRefClockTable 1 }
+
+RbRefClockEntry ::= SEQUENCE {
+	refClockPrio			Integer32,
+	refClockStatus			INTEGER,
+	refClockQualityLevelActual	Integer32,
+	refClockQualityLevelConfig	Integer32,
+	refClockQualityLevelMode	TruthValue,
+	refClockSsmCvid				Integer32,
+	refClockRowStatus			RowStatus
+}
+
+refClockPrio OBJECT-TYPE
+	SYNTAX      Integer32 (1..255)
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRefClockEntry 1 }
+
+refClockStatus OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		down(0),
+		active(1),
+		backup-1(2),
+		backup-2(3),
+		backup-3(4)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRefClockEntry 2 }
+
+refClockQualityLevelActual OBJECT-TYPE
+	SYNTAX      Integer32 (0..15)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRefClockEntry 3 }
+
+refClockQualityLevelConfig OBJECT-TYPE
+	SYNTAX      Integer32 (0..15)
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRefClockEntry 4 }
+
+refClockQualityLevelMode OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRefClockEntry 5 }
+
+refClockSsmCvid OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbRefClockEntry 6 }
+
+refClockRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+	::= {  rbRefClockEntry 7 }
+
+-- ===========================================================
+-- Radio Bridge ethernet table
+-- ===========================================================
+	
+rbEthernetTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RbEthernetEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { radioBridgeEthernet  1 }
+
+
+rbEthernetEntry OBJECT-TYPE
+	SYNTAX      RbEthernetEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	INDEX { ifIndex }
+	::= { rbEthernetTable 1 }
+
+RbEthernetEntry ::= SEQUENCE {
+	ethernetAlarmPropagation	INTEGER,
+	ethernetLoopMode			INTEGER,
+	ethernetLoopTimeout			INTEGER,
+	ethernetNetworkType			INTEGER,
+	ethernetPcpWriteProfileId	Integer32,
+	ethernetClassifierMode		INTEGER
+}
+
+ethernetAlarmPropagation OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		disabled(0),
+		backward(1),
+		forward(2),
+		both-direct(3)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbEthernetEntry 2 }
+
+ethernetLoopMode OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		disabled(0),
+		external(1),
+		external-mac-swap(2),
+		internal(3),
+		internal-mac-swap(4)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbEthernetEntry 3 }
+
+ethernetLoopTimeout OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbEthernetEntry 4 }
+
+ethernetNetworkType OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		provider-nni(1),
+		customer-uni(2),
+		customer-nni(3)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbEthernetEntry 5 }
+
+
+ethernetPcpWriteProfileId OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	"id of pcp write profile or none (0)"
+	::= {  rbEthernetEntry 6 }
+
+ethernetClassifierMode OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		classifier-mode-dscp(1),
+		classifier-mode-pcp-dscp(2)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbEthernetEntry 7 }
+
+-- ===========================================================
+-- Radio Bridge classifier cos table
+-- ===========================================================
+	
+rbClassifierCosTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RbClassifierCosEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { radioBridgeQosClassifier  1 }
+
+
+rbClassifierCosEntry OBJECT-TYPE
+	SYNTAX      RbClassifierCosEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	INDEX { classifierCosId }
+	::= { rbClassifierCosTable 1 }
+
+RbClassifierCosEntry ::= SEQUENCE {
+	classifierCosId			Integer32,
+	classifierCosPortList	OCTET STRING,
+	classifierCosPrecedence	Integer32,
+	classifierCosVidList	OCTET STRING,
+	classifierCosPcpList	OCTET STRING,
+	classifierCosCos		Integer32,
+	classifierCosIpCosType	INTEGER,
+	classifierCosIpCosList	OCTET STRING,
+	classifierCosPacketType	INTEGER,
+	classifierCosRowStatus	RowStatus
+}
+
+classifierCosId OBJECT-TYPE
+	SYNTAX      Integer32 (1..248)
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierCosEntry 1 }
+
+classifierCosPortList OBJECT-TYPE
+	SYNTAX      OCTET STRING
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierCosEntry 2 }
+
+classifierCosPrecedence OBJECT-TYPE
+	SYNTAX      Integer32 (1..8)
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierCosEntry 3 }
+
+classifierCosVidList OBJECT-TYPE
+	SYNTAX      OCTET STRING
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierCosEntry 4 }
+
+classifierCosPcpList  OBJECT-TYPE
+	SYNTAX      OCTET STRING
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierCosEntry 5 }
+
+classifierCosCos OBJECT-TYPE
+	SYNTAX      Integer32 (0..7)
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierCosEntry 6 }
+
+
+classifierCosIpCosType OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		ip-cos-dscp(1),
+		ip-cos-mpls(2),
+		ip-cos-dont-care(3)
+	}
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierCosEntry 7 }
+
+
+classifierCosIpCosList OBJECT-TYPE
+	SYNTAX      OCTET STRING
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierCosEntry 8 }
+
+
+classifierCosRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+	::= {  rbClassifierCosEntry 9 }
+
+
+classifierCosPacketType OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		unicast(1),
+		non-unicast(2),
+		all(3)
+	}
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierCosEntry 10 }
+	
+-- ===========================================================
+-- Radio Bridge classifier evc table
+-- ===========================================================
+	
+rbClassifierEvcTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RbClassifierEvcEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { radioBridgeQosClassifier  2 }
+
+
+rbClassifierEvcEntry OBJECT-TYPE
+	SYNTAX      RbClassifierEvcEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	INDEX { classifierEvcId }
+	::= { rbClassifierEvcTable 1 }
+
+RbClassifierEvcEntry ::= SEQUENCE {
+	classifierEvcId			Integer32,
+	classifierEvcPortList	OCTET STRING,
+	classifierEvcPrecedence	Integer32,
+	classifierEvcVidList	OCTET STRING,
+	classifierEvcPcpList	OCTET STRING,
+	classifierEvcEvc		Integer32,
+	classifierEvcIpCosType	INTEGER,
+	classifierEvcIpCosList	OCTET STRING,
+	classifierEvcPacketType	INTEGER,
+	classifierEvcRowStatus	RowStatus
+}
+
+
+classifierEvcId OBJECT-TYPE
+	SYNTAX      Integer32 (1..248)
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierEvcEntry 1 }
+
+classifierEvcPortList OBJECT-TYPE
+	SYNTAX      OCTET STRING
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierEvcEntry 2 }
+
+classifierEvcPrecedence OBJECT-TYPE
+	SYNTAX      Integer32 (1..8)
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierEvcEntry 3 }
+
+classifierEvcVidList OBJECT-TYPE
+	SYNTAX      OCTET STRING
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierEvcEntry 4 }
+
+classifierEvcPcpList  OBJECT-TYPE
+	SYNTAX      OCTET STRING
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierEvcEntry 5 }
+
+classifierEvcEvc OBJECT-TYPE
+	SYNTAX      Integer32 (1..4095)
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierEvcEntry 6 }
+
+classifierEvcIpCosType OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		ip-cos-dscp(1),
+		ip-cos-mpls(2),
+		ip-cos-dont-care(3)
+	}
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierEvcEntry 7 }
+
+classifierEvcIpCosList OBJECT-TYPE
+	SYNTAX      OCTET STRING
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierEvcEntry 8 }
+
+
+classifierEvcRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+	::= {  rbClassifierEvcEntry 9 }
+	
+classifierEvcPacketType OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		unicast(1),
+		non-unicast(2),
+		all(3)
+	}
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbClassifierEvcEntry 10 }
+
+-- ===========================================================
+-- Radio Bridge qos ingress queue table
+-- ===========================================================
+	
+rbQosIngressQueueTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RbQosIngressQueueEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { radioBridgeQosIngressQueue  1 }
+
+rbQosIngressQueueEntry OBJECT-TYPE
+	SYNTAX      RbQosIngressQueueEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	INDEX { qosIngressQueueEvcId, qosIngressQueueCosId }
+	::= { rbQosIngressQueueTable 1 }
+
+RbQosIngressQueueEntry ::= SEQUENCE {
+	qosIngressQueueEvcId		Integer32,
+	qosIngressQueueCosId		Integer32,
+
+	qosIngressQueueMeterId		Integer32,
+	qosIngressQueueMarking		TruthValue,
+	qosIngressQueueRowStatus	RowStatus
+}
+
+qosIngressQueueEvcId OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbQosIngressQueueEntry 1 }
+
+qosIngressQueueCosId OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbQosIngressQueueEntry 2 }
+
+qosIngressQueueMeterId OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbQosIngressQueueEntry 3 }
+
+qosIngressQueueMarking OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbQosIngressQueueEntry 4 }
+
+qosIngressQueueRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+	::= {  rbQosIngressQueueEntry 6 }
+	
+-- ===========================================================
+-- Radio Bridge qos egress queue table
+-- ===========================================================
+	
+rbQosEgressQueueTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RbQosEgressQueueEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { radioBridgeQosEgressQueue  1 }
+
+rbQosEgressQueueEntry OBJECT-TYPE
+	SYNTAX      RbQosEgressQueueEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	INDEX { qosEgressQueuePortNum, qosEgressQueueCosId }
+	::= { rbQosEgressQueueTable 1 }
+
+RbQosEgressQueueEntry ::= SEQUENCE {
+	qosEgressQueuePortNum	Integer32,
+	qosEgressQueueCosId		Integer32,
+	qosEgressQueueWfqWeight	Integer32,
+	qosEgressQueueCir		Integer32,
+	qosEgressQueueMode		INTEGER,
+	qosEgressQueueColorDrop	INTEGER,
+	qosEgressDropMode		Integer32
+}
+
+qosEgressQueuePortNum OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbQosEgressQueueEntry 1 }
+
+qosEgressQueueCosId OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbQosEgressQueueEntry 2 }
+	
+qosEgressQueueWfqWeight OBJECT-TYPE
+	SYNTAX      Integer32 (0..8)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbQosEgressQueueEntry 4 }
+
+qosEgressQueueCir OBJECT-TYPE
+	SYNTAX      Integer32 (0..1000)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbQosEgressQueueEntry 5 }
+
+qosEgressQueueMode OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		strictPriority(1),
+		wfg(2),
+		priority-shaper(3),
+		wfq-shaper(4)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbQosEgressQueueEntry 6 }
+
+qosEgressQueueColorDrop OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		color-aware(1),
+		color-drop(2)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbQosEgressQueueEntry 7 }
+
+qosEgressDropMode OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	"if negative then wred id, else queue length in microseconds"
+	::= {  rbQosEgressQueueEntry 8 }
+
+-- ===========================================================
+-- Radio Bridge IP
+-- ===========================================================
+
+rbIpTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RbIpEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { radioBridgeIp  1 }
+
+rbIpEntry OBJECT-TYPE
+	SYNTAX      RbIpEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	INDEX { rbIpIndex }
+	::= { rbIpTable 1 }
+
+RbIpEntry ::= SEQUENCE {
+	rbIpIndex		Integer32,
+	rbIpType		INTEGER,
+	rbIpAddress		IpAddress,
+	rbIpPrefixLen	Integer32,	
+	rbIpVlanId		Integer32,
+	rbIpGateway		IpAddress,
+	rbIpRowStatus	RowStatus
+}
+
+rbIpIndex OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbIpEntry 1 }
+	
+rbIpAddress OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbIpEntry 2 }
+
+rbIpPrefixLen OBJECT-TYPE
+	SYNTAX      Integer32 (0..32)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbIpEntry 3 }
+
+
+rbIpVlanId OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbIpEntry 4 }
+
+rbIpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+	::= {  rbIpEntry 5 }
+
+rbIpType OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		ip-static(1),
+		ip-dhcp(2)
+	}
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbIpEntry 6 }
+
+rbIpGateway OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbIpEntry 7 }
+	
+-- ===========================================================
+-- Radio Bridge CFM
+-- ===========================================================
+
+rbPeerMep OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RbPeerMepEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { radioBridgeCfm  1 }
+
+rbPeerMepEntry OBJECT-TYPE
+	SYNTAX      RbPeerMepEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	INDEX { rbMdIndex, rbMaIndex, rbMepId, rbPeerMepId }
+	::= { rbPeerMep 1 }
+
+	
+RbPeerMepEntry ::= SEQUENCE {
+	rbMdIndex		Integer32,
+	rbMaIndex		Integer32,
+	rbMepId			Integer32,
+	rbPeerMepId		Integer32,
+
+	rbPeerMepFarEndLoss	Counter64,
+	rbPeerMepNearEndLoss	Counter64,
+	rbPeerMepTotalTxFarEnd	Counter64,
+	rbPeerMepTotalTxNearEnd	Counter64,
+	rbPeerMepFrameDelay			Counter64,
+	rbPeerMepFrameDelayVariation	Counter64
+}
+	
+rbMdIndex OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbPeerMepEntry 1 }
+	
+rbMaIndex OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbPeerMepEntry 2 }
+
+rbMepId OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbPeerMepEntry 3 }
+
+rbPeerMepId OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbPeerMepEntry 4 }
+
+rbPeerMepFarEndLoss OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbPeerMepEntry 5 }
+	
+rbPeerMepNearEndLoss OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbPeerMepEntry 6 }
+
+rbPeerMepTotalTxFarEnd OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbPeerMepEntry 7 }
+
+rbPeerMepTotalTxNearEnd OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbPeerMepEntry 8 }
+
+rbPeerMepFrameDelay OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbPeerMepEntry 9 }
+
+rbPeerMepFrameDelayVariation OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbPeerMepEntry 10 }
+
+-- ===========================================================
+
+rbMep OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RbMepEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { radioBridgeCfm  2 }
+
+rbMepEntry OBJECT-TYPE
+	SYNTAX      RbMepEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	AUGMENTS { dot1agCfmMepEntry }
+	::= { rbMep 1 }
+
+	
+RbMepEntry ::= SEQUENCE {
+	rbMepAisEnable   TruthValue,
+	rbMepAisPeriod   INTEGER,
+	rbMepAisSuppress TruthValue,
+	rbMepAisLevel    Integer32,
+	rbMepAisDefects  TruthValue
+}
+
+rbMepAisEnable OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { rbMepEntry 1 }
+
+rbMepAisPeriod OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		aisPeriod-1-sec(4),
+		aisPeriod-1-min(6)
+	}
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { rbMepEntry 2 }
+	
+rbMepAisSuppress OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { rbMepEntry 3 }
+
+rbMepAisLevel OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { rbMepEntry 4 }
+
+rbMepAisDefects OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { rbMepEntry 5 }
+
+
+-- ===========================================================
+-- Radio Bridge alarms
+-- ===========================================================
+	
+AlarmSeverity ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		""
+	SYNTAX  INTEGER 
+	{
+		critical(1),
+		major(2),
+		minor(3),
+		warning(4), 
+		no-alarm(5) -- used for scalar rbCurrentAlarmMostSevere only
+	}
+
+AlarmType ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		""
+	SYNTAX  INTEGER
+	{
+		link-down(1),
+		temperature-out-of-range(2),
+		synthesizer-unlock(3),
+		pow-low(4),
+		cfm-mep-defect(5),
+		loopback-active(6),
+		tx-mute(7),
+		ql-eec1-or-worse(8),
+		poe-incompatible(9),
+		rssi-out-of-range(10),
+		cinr-out-of-range(11),
+		lowest-modulation(12)
+	}
+
+rbAlarmsCommon 	OBJECT IDENTIFIER ::= { radioBridgeAlarms 1 }
+
+		
+rbCurrentAlarmChangeCounter OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The counter is initialized by random number on power-up and incremented on each change
+		in the current alarms table: alarm addition or deletion."
+        ::= { rbAlarmsCommon 1 }
+
+rbCurrentAlarmMostSevere OBJECT-TYPE
+        SYNTAX  AlarmSeverity
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The severity of the most severe alarm in the system" 
+        ::= { rbAlarmsCommon 2 }
+
+rbCurrentAlarmLastIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The counter is initialized by random number on power-up and incremented when alarm is added to the alarms table.
+		It is used as alarm index in current alarms table."
+        ::= { rbAlarmsCommon 3 }
+
+rbCurrentAlarmLastTrapType OBJECT-TYPE
+	SYNTAX  INTEGER
+	{
+		alarm-up(1),
+		alarm-down(2)
+	}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Type of last alarm trap."
+        ::= { rbAlarmsCommon 4 }
+        
+rbCurrentAlarmSourceAddr OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Alarm source IP Address."
+        ::= { rbAlarmsCommon 10 }
+
+rbCurrentAlarmTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF RbCurrentAlarmEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+        "Current alarms table."
+        ::= { radioBridgeAlarms 2 }
+
+rbCurrentAlarmEntry OBJECT-TYPE
+        SYNTAX RbCurrentAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+          DESCRIPTION
+          ""
+        INDEX { rbCurrentAlarmIndex }
+        ::= { rbCurrentAlarmTable 1 }
+
+RbCurrentAlarmEntry ::=
+	SEQUENCE
+	{
+		rbCurrentAlarmIndex		INTEGER,
+		rbCurrentAlarmType		AlarmType,
+		rbCurrentAlarmTypeName		DisplayString,
+		rbCurrentAlarmSource		DisplayString,
+		rbCurrentAlarmSeverity		AlarmSeverity,
+		rbCurrentAlarmRaisedTime	TimeTicks,
+		rbCurrentAlarmDesc		DisplayString,
+		rbCurrentAlarmCause		DisplayString,
+		rbCurrentAlarmAction		DisplayString,
+		rbCurrentAlarmIfIndex		INTEGER
+	}
+
+rbCurrentAlarmIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Value of the rbCurrentAlarmLastIndex when alarm is inserted to the table."
+        ::= { rbCurrentAlarmEntry 1 }
+
+rbCurrentAlarmType OBJECT-TYPE
+        SYNTAX AlarmType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "see AlarmType definition"
+        ::= { rbCurrentAlarmEntry 2 }
+		
+rbCurrentAlarmTypeName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "string presentation of the rbCurrentAlarmType"
+        ::= { rbCurrentAlarmEntry 3 }
+		
+rbCurrentAlarmSource OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "name of the managed object originating the alarm: eth host, system, vlan s1 5   etc."
+        ::= { rbCurrentAlarmEntry 4 }
+		
+rbCurrentAlarmSeverity OBJECT-TYPE
+        SYNTAX AlarmSeverity
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "see AlarmSeverity definition"
+        ::= { rbCurrentAlarmEntry 5 }
+		
+rbCurrentAlarmRaisedTime OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        ""
+        ::= { rbCurrentAlarmEntry 6 }
+		
+rbCurrentAlarmDesc OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "alarm description"
+        ::= { rbCurrentAlarmEntry 7 }
+		
+rbCurrentAlarmCause OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "alarm probably cause"
+        ::= { rbCurrentAlarmEntry 8 }
+
+rbCurrentAlarmAction OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "alarm corrective actions"
+        ::= { rbCurrentAlarmEntry 9 }
+
+rbCurrentAlarmIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "port ifIndex if port is the alarm source, -1 otherwise"
+        ::= { rbCurrentAlarmEntry 10 }
+		
+-- ===========================================================
+-- Radio Bridge Traps
+-- ===========================================================
+
+trapModulationChange NOTIFICATION-TYPE
+    OBJECTS { rfModulationType, rfNumOfSubchannels, rfNumOfRepetitions, rfFecRate }
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeTraps 1 }
+
+trapTemperatureOutOfRange NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeTraps 2 }
+	
+trapTemperatureInRange NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeTraps 3 }
+
+trapSfpIn NOTIFICATION-TYPE
+    OBJECTS { ifIndex }
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeTraps 4 }
+
+trapSfpOut NOTIFICATION-TYPE
+    OBJECTS { ifIndex }
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeTraps 5 }
+
+trapRefClockChanged NOTIFICATION-TYPE
+    OBJECTS { ifIndex, refClockQualityLevelActual }
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeTraps 6 }
+
+trapCurrentAlarm NOTIFICATION-TYPE
+	OBJECTS 
+	{	
+		rbCurrentAlarmChangeCounter, 
+		rbCurrentAlarmMostSevere, 
+		rbCurrentAlarmType, 
+		rbCurrentAlarmTypeName,
+		rbCurrentAlarmSourceAddr,
+		rbCurrentAlarmSource, 
+		rbCurrentAlarmSeverity, 
+		rbCurrentAlarmRaisedTime, 
+		rbCurrentAlarmIfIndex, 
+		rbCurrentAlarmLastTrapType
+	}
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeTraps 11 }
+
+trapLoopEnabled NOTIFICATION-TYPE
+    OBJECTS { ifIndex }
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeTraps 12 }
+
+trapLoopDisabled NOTIFICATION-TYPE
+    OBJECTS { ifIndex }
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeTraps 13 }
+
+trapTxMuteEnabled NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeTraps 14 }
+
+trapTxMuteDisabled NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeTraps 15 }
+
+	
+trapCinrOutOfRange NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeTraps 19 }
+
+trapCinrInRange NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeTraps 20 }
+	
+trapRssiOutOfRange NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeTraps 21 }
+
+trapRssiInRange NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeTraps 22 }
+	
+trapLowestModulation NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeTraps 23 }
+
+trapNoLowestModulation NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeTraps 24 }
+	
+-- ===========================================================
+-- Radio Bridge scheduler
+-- ===========================================================
+
+rbSchedulerMode OBJECT-TYPE
+		SYNTAX      INTEGER
+		{
+			strictPriority(1),
+			wfg(2),
+			priority-shaper(3),
+			wfq-shaper(4)
+		}
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               ""
+       ::= { radioBridgeScheduler 1 }
+
+-- ===========================================================
+-- Radio Bridge meter
+-- ===========================================================
+
+rbMeterTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RbMeterEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { radioBridgeMeter  1 }
+
+rbMeterEntry OBJECT-TYPE
+	SYNTAX      RbMeterEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	INDEX { rbMeterId }
+	::= { rbMeterTable 1 }
+
+RbMeterEntry ::= SEQUENCE {
+	rbMeterId		Integer32,
+	rbMeterCir		Integer32,
+	rbMeterCbs		Integer32,
+	rbMeterEir		Integer32,
+	rbMeterEbs		Integer32,
+	rbMeterColorMode	INTEGER,
+	rbMeterRowStatus	RowStatus
+}
+
+rbMeterId OBJECT-TYPE
+	SYNTAX      Integer32 (1..248)
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbMeterEntry 1 }
+
+rbMeterCir OBJECT-TYPE
+	SYNTAX      Integer32 (0..1000)
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbMeterEntry 2 }
+
+rbMeterCbs OBJECT-TYPE
+	SYNTAX      Integer32 (9216..50000)
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbMeterEntry 3 }
+
+rbMeterEir OBJECT-TYPE
+	SYNTAX      Integer32 (0..1000)
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbMeterEntry 4 }
+
+rbMeterEbs OBJECT-TYPE
+	SYNTAX      Integer32 (9216..100000)
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbMeterEntry 5 }
+
+
+rbMeterColorMode OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		color-aware(1),
+		color-blind(2)
+	}
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbMeterEntry 6 }
+
+rbMeterRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+	::= {  rbMeterEntry 7 }
+
+-- ===========================================================
+-- Radio Bridge  event config
+-- ===========================================================
+
+rbEventConfigTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RbEventConfigEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= { radioBridgeEventConfig  1 }
+
+rbEventConfigEntry OBJECT-TYPE
+	SYNTAX      RbEventConfigEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	INDEX { rbEventConfigIndex }
+	::= { rbEventConfigTable 1 }
+
+RbEventConfigEntry ::= SEQUENCE {
+	rbEventConfigIndex	Integer32,
+	rbEventConfigId		OCTET STRING,
+	rbEventConfigMask	TruthValue
+}
+
+rbEventConfigIndex OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbEventConfigEntry 1 }
+
+rbEventConfigId OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	""
+       ::= { rbEventConfigEntry 2 }
+
+rbEventConfigMask OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+       ::= { rbEventConfigEntry 3 }
+
+-- ===========================================================
+-- Radio Bridge system extension
+-- ===========================================================
+
+rbRfEncryption OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+       ::= { radioBridgeEncryption 1 }
+
+
+rbRfStaticKey OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+       ::= { radioBridgeEncryption 2 }
+
+
+rbRfAuthenticationString OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	""
+       ::= { radioBridgeEncryption 3 }
+
+-- ===========================================================
+-- ===========================================================
+
+rbAgentReadCommunity OBJECT-TYPE
+	SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        ""
+	::= {  radioBridgeSnmp 1 }
+
+
+rbAgentWriteCommunity OBJECT-TYPE
+	SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        ""
+	::= {  radioBridgeSnmp 2 }
+
+rbAgentSnmpVersion OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		v2c(2),
+		v3(3)
+	}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        ""
+	::= {  radioBridgeSnmp 3 }
+
+
+-- ===========================================================
+-- ===========================================================
+
+rbSysFileOperationTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RbSysFileOperationEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"This table has a permanent row with index 1. It is not creatable, the fileSessionRowStatus
+	is used to activate the file operation process if necessary variables are assigned."
+	::= { radioBridgeRoot 18 }
+
+rbSysFileOperationEntry OBJECT-TYPE
+	SYNTAX      RbSysFileOperationEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	INDEX { fileSessionIndex }
+	::= { rbSysFileOperationTable 1 }
+
+RbSysFileOperationEntry ::= SEQUENCE {
+	fileSessionIndex		Integer32,
+	fileSessionCommand		INTEGER,
+	fileSessionLocalParams	DisplayString,
+	fileSessionRemotePath	DisplayString,
+
+	fileSessionProtocol		INTEGER,
+	fileSessionServer		DisplayString,
+	fileSessionUser			DisplayString,
+	fileSessionPassword		DisplayString,
+
+	fileSessionResult		DisplayString,
+	fileSessionState  		INTEGER,
+	fileSessionRowStatus	RowStatus
+}
+
+fileSessionIndex OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbSysFileOperationEntry 1 }
+
+fileSessionCommand OBJECT-TYPE
+	SYNTAX      INTEGER
+	{
+		copySwFromRemote(1),
+		copyLicenseFromRemote(2),
+		copyFileFromRemoteToLocal(3),
+		copyFileFromLocalToRemote(4),
+		acceptSw(5),
+		runSw(6),
+		copyDirToRemote(7),
+		copyEventLog(9),
+		copyUserActivityLog(10),
+		runScript(11),
+		copyInventory(12),
+		copyStatsHistory(13)
+	}
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbSysFileOperationEntry 2 }
+
+fileSessionLocalParams OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS  read-create
+	STATUS current
+	DESCRIPTION
+	""
+	::= {  rbSysFileOperationEntry 3 }
+	
+fileSessionRemotePath OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS  read-create
+	STATUS current
+	DESCRIPTION
+	""
+	::= {  rbSysFileOperationEntry 4 }
+
+fileSessionServer OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS  read-create
+	STATUS current
+	DESCRIPTION
+	""
+	::= {  rbSysFileOperationEntry 5 }
+	
+fileSessionUser OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS  read-create
+	STATUS current
+	DESCRIPTION
+	""
+	::= {  rbSysFileOperationEntry 6 }
+	
+fileSessionPassword OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS  read-create
+	STATUS current
+	DESCRIPTION
+	""
+	::= {  rbSysFileOperationEntry 7 }
+
+fileSessionResult OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+	""
+	::= {  rbSysFileOperationEntry 8 }
+
+fileSessionState OBJECT-TYPE
+	SYNTAX INTEGER { running(1), terminated-ok(2), terminated-error(3) }
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+	""
+	::= {  rbSysFileOperationEntry 9 }
+
+fileSessionRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "see rbSysFileOperationTable description"
+	::= {  rbSysFileOperationEntry 10 }
+	
+fileSessionProtocol OBJECT-TYPE
+	SYNTAX INTEGER { ftp(1), sftp(2) }
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+	""
+	::= {  rbSysFileOperationEntry 13 }
+	
+
+-- ===========================================================
+-- Radio Bridge files operation
+-- ===========================================================
+	
+	
+rbLldpPortExtensionTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbLldpPortExtensionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "extends lldpV2PortConfigTable"
+    ::= { radioBridgeLldp 1 }
+
+rbLldpPortExtensionEntry   OBJECT-TYPE
+    SYNTAX      RbLldpPortExtensionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX  { rbLldpPortIfIndex, rbLldpPortDestAddressIndex  }
+    ::= { rbLldpPortExtensionTable 1 }
+
+RbLldpPortExtensionEntry ::= SEQUENCE
+	{
+		rbLldpPortIfIndex             	InterfaceIndex,
+		rbLldpPortDestAddressIndex		Unsigned32,
+		rbLldpPortVid					Unsigned32
+	}
+
+rbLldpPortIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndex 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "equal to lldpV2PortConfigIfIndex from RbLldpPortExtensionEntry"
+    ::= { rbLldpPortExtensionEntry 1 } 	
+ 	
+rbLldpPortDestAddressIndex   OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "equal to lldpV2PortConfigDestAddressIndex from RbLldpPortExtensionEntry"
+    ::= { rbLldpPortExtensionEntry 2 } 	
+
+
+rbLldpPortVid   OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbLldpPortExtensionEntry 3 } 	
+
+
+-- ===========================================================
+-- Radio Bridge WRED
+-- ===========================================================
+	
+rbWredTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbWredEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeWred 1 }
+
+rbWredEntry   OBJECT-TYPE
+    SYNTAX      RbWredEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX  { rbWredId }
+    ::= { rbWredTable 1 }
+
+RbWredEntry ::= SEQUENCE
+	{
+		rbWredId					Integer32,
+		rbWredNfactor				Integer32,
+		rbWredMinThreshold			Integer32,
+		rbWredMaxThreshold			Integer32,
+		rbWredProbability			Integer32,
+		rbWredMinThresholdYellow	Integer32,
+		rbWredMaxThresholdYellow	Integer32,
+		rbWredProbabilityYellow		Integer32,
+
+		rbWredRowStatus				RowStatus
+	}
+
+rbWredId   OBJECT-TYPE
+	SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbWredEntry 1 } 	
+
+rbWredNfactor   OBJECT-TYPE
+	SYNTAX      Integer32 (1..32)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbWredEntry 2 } 	
+
+rbWredMinThreshold   OBJECT-TYPE
+	SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbWredEntry 3 } 	
+
+rbWredMaxThreshold   OBJECT-TYPE
+	SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbWredEntry 4 } 	
+
+rbWredProbability   OBJECT-TYPE
+	SYNTAX      Integer32 (1..1000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbWredEntry 5 } 	
+
+rbWredMinThresholdYellow   OBJECT-TYPE
+	SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbWredEntry 6 } 	
+
+rbWredMaxThresholdYellow   OBJECT-TYPE
+	SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbWredEntry 7 } 	
+
+rbWredProbabilityYellow   OBJECT-TYPE
+	SYNTAX      Integer32 (1..1000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbWredEntry 8 } 	
+
+rbWredRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+	::= {  rbWredEntry 9 }
+
+-- ===========================================================
+-- Radio Bridge authentication
+-- ===========================================================
+
+rbAuthServersTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbAuthServersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeAuthentication 1 }
+
+rbAuthServersEntry   OBJECT-TYPE
+    SYNTAX      RbAuthServersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX  { rbAuthServerId }
+    ::= { rbAuthServersTable 1 }
+
+RbAuthServersEntry ::= SEQUENCE
+	{
+		rbAuthServerId			Integer32,
+		rbAuthServerIpAddress	IpAddress,
+		rbAuthServerPort		Integer32,
+		rbAuthServerRowStatus	RowStatus
+	}
+
+rbAuthServerId   OBJECT-TYPE
+	SYNTAX      Integer32 (1..5)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbAuthServersEntry 1 } 	
+
+rbAuthServerIpAddress   OBJECT-TYPE
+	SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbAuthServersEntry 2 } 	
+
+rbAuthServerPort   OBJECT-TYPE
+	SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbAuthServersEntry 3 } 	
+
+rbAuthServerRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { rbAuthServersEntry 4 } 	
+
+-- ===========================================================
+-- Radio Bridge Quota
+-- ===========================================================
+
+rbFdbQuotaTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbFdbQuotaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeQuota 1 }
+
+rbFdbQuotaEntry   OBJECT-TYPE
+    SYNTAX      RbFdbQuotaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX  { rbFdbQuotaId }
+    ::= { rbFdbQuotaTable 1 }
+
+RbFdbQuotaEntry ::= SEQUENCE
+	{
+		rbFdbQuotaId		Integer32,
+		rbFdbQuotaSize		Integer32,
+		rbFdbQuotaRowStatus	RowStatus,
+
+		rbFdbQuotaMaxSize			Counter64,
+		rbFdbQuotaUsedEntries		Counter64,
+		rbFdbQuotaStaticEntries		Counter64,
+		rbFdbQuotaDynamicEntries	Counter64,
+		rbFdbQuotaUnusedEntries		Counter64
+	}
+
+
+rbFdbQuotaId   OBJECT-TYPE
+	SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbFdbQuotaEntry 1 } 	
+
+
+rbFdbQuotaSize   OBJECT-TYPE
+	SYNTAX      Integer32 (1..4000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbFdbQuotaEntry 2 } 	
+
+rbFdbQuotaRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { rbFdbQuotaEntry 3 } 	
+
+
+rbFdbQuotaMaxSize   OBJECT-TYPE
+	SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbFdbQuotaEntry 11 } 	
+
+rbFdbQuotaUsedEntries   OBJECT-TYPE
+	SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbFdbQuotaEntry 12 } 	
+
+rbFdbQuotaStaticEntries   OBJECT-TYPE
+	SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbFdbQuotaEntry 13 } 	
+
+rbFdbQuotaDynamicEntries   OBJECT-TYPE
+	SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbFdbQuotaEntry 14 } 	
+
+rbFdbQuotaUnusedEntries   OBJECT-TYPE
+	SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbFdbQuotaEntry 15 } 	
+
+
+
+rbFdbEvcQuotaTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbFdbEvcQuotaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeQuota 2 }
+
+rbFdbEvcQuotaEntry   OBJECT-TYPE
+    SYNTAX      RbFdbEvcQuotaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX  { rbFdbEvcQuotaId }
+    ::= { rbFdbEvcQuotaTable 1 }
+
+
+RbFdbEvcQuotaEntry ::= SEQUENCE
+	{
+		rbFdbEvcQuotaId			Integer32,
+		rbRefEvcId				Integer32,
+		rbRefFdbQuotaId			Integer32,
+		rbFdbEvcQuotaRowStatus	RowStatus
+	}
+
+rbFdbEvcQuotaId   OBJECT-TYPE
+	SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbFdbEvcQuotaEntry 1 } 	
+
+rbRefEvcId   OBJECT-TYPE
+	SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbFdbEvcQuotaEntry 2 } 	
+
+rbRefFdbQuotaId   OBJECT-TYPE
+	SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbFdbEvcQuotaEntry 3 } 	
+
+rbFdbEvcQuotaRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { rbFdbEvcQuotaEntry 4 } 	
+
+
+
+rbFdbExtensionTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbFdbExtensionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "extends the ieee8021QBridgeTpFdbTable"
+    ::= { radioBridgeQuota 3 }
+
+rbFdbExtensionEntry        OBJECT-TYPE
+    SYNTAX      RbFdbExtensionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing additional management information applicable to a fdb entry."
+    AUGMENTS    { ieee8021QBridgeTpFdbEntry }
+    ::= { rbFdbExtensionTable 1 }
+
+RbFdbExtensionEntry ::= SEQUENCE
+	{
+		rbRefExtFdbQuotaId			Integer32
+	}
+
+rbRefExtFdbQuotaId   OBJECT-TYPE
+	SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbFdbExtensionEntry 1 } 	
+
+
+-- ===========================================================
+-- Radio Bridge PCP profile
+-- ===========================================================
+
+rbPcpWriteProfileTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbPcpWriteProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { radioBridgePcpProfile 1 }
+
+rbPcpWriteProfileEntry   OBJECT-TYPE
+    SYNTAX      RbPcpWriteProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX  { rbPcpWriteProfileId }
+    ::= { rbPcpWriteProfileTable 1 }
+
+
+RbPcpWriteProfileEntry ::= SEQUENCE
+	{
+		rbPcpWriteProfileId			Integer32,
+		rbPcpWriteProfilePcp		OCTET STRING,
+		rbPcpWriteProfileRowStatus	RowStatus
+	}
+
+
+rbPcpWriteProfileId   OBJECT-TYPE
+	SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbPcpWriteProfileEntry 1 } 	
+
+
+rbPcpWriteProfilePcp   OBJECT-TYPE
+	SYNTAX      OCTET STRING (SIZE (8))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbPcpWriteProfileEntry 2 } 	
+
+
+rbPcpWriteProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { rbPcpWriteProfileEntry 3 } 	
+
+-- ===========================================================
+-- Radio Bridge SysLog
+-- ===========================================================
+	
+rbSyslogTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbSyslogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeSyslog 1 }
+
+rbSyslogEntry   OBJECT-TYPE
+    SYNTAX      RbSyslogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX  { rbSyslogId }
+    ::= { rbSyslogTable 1 }
+
+
+RbSyslogEntry ::= SEQUENCE
+	{
+		rbSyslogId			Integer32,
+		rbSyslogServerIp	IpAddress,
+		rbSyslogRowStatus	RowStatus
+	}
+
+rbSyslogId   OBJECT-TYPE
+	SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbSyslogEntry 1 } 	
+	
+rbSyslogServerIp OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbSyslogEntry 2 }
+
+rbSyslogRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+	::= {  rbSyslogEntry 3 }
+
+-- ===========================================================
+-- Radio Bridge NTP
+-- ===========================================================
+	
+rbNtpTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbNtpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeNtp 1 }
+
+rbNtpEntry   OBJECT-TYPE
+    SYNTAX      RbNtpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX  { rbNtpId }
+    ::= { rbNtpTable 1 }
+
+
+RbNtpEntry ::= SEQUENCE
+	{
+		rbNtpId			Integer32,
+		rbNtpServerIp	IpAddress,
+		rbNtpSecondaryServerIp	IpAddress,
+		rbNtpTmz			Integer32,
+		rbNtpRowStatus	RowStatus
+	}
+
+rbNtpId   OBJECT-TYPE
+	SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbNtpEntry 1 } 	
+	
+rbNtpServerIp OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbNtpEntry 2 }
+
+rbNtpSecondaryServerIp OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbNtpEntry 3 }
+
+rbNtpTmz OBJECT-TYPE
+	SYNTAX      Integer32 (-12..14)
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+	""
+	::= {  rbNtpEntry 4 }
+
+rbNtpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+	::= {  rbNtpEntry 5 }
+
+-- ===========================================================
+-- Radio Bridge license
+-- ===========================================================
+
+rbLicenseTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbLicenseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { radioBridgeLicense 1 }
+
+rbLicenseEntry   OBJECT-TYPE
+    SYNTAX      RbLicenseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX  { IMPLIED rbLicenseId }
+    ::= { rbLicenseTable 1 }
+
+
+RbLicenseEntry ::= SEQUENCE
+	{
+		rbLicenseId				DisplayString,
+		rbLicenseCurrentValue	INTEGER,
+		rbLicenseMaxValue		INTEGER
+	}
+
+rbLicenseId   OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbLicenseEntry 1 } 	
+	
+rbLicenseCurrentValue   OBJECT-TYPE
+	SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "for data-rate means data rate value, for enable similar to TruthValue"
+    ::= { rbLicenseEntry 2 } 	
+	
+rbLicenseMaxValue   OBJECT-TYPE
+	SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rbLicenseEntry 3 } 	
+	
+	
+END
+
