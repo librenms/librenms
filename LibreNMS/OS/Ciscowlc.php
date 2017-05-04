@@ -91,7 +91,7 @@ class Ciscowlc extends OS implements WirelessClientsDiscovery, WirelessApCountDi
         );
         $data = snmp_get_multi($this->getDevice(), $oids);
 
-        if (!empty($data)) {
+        if (isset($data[0]['clsSysApConnectCount'])) {
             return array(
                 new WirelessSensor(
                     'ap-count',
