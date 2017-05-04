@@ -226,6 +226,7 @@ $graphs['fbsd-nfs-client'] = array(
 
 $graphs['unbound'] = array(
     'queries',
+    'cache',
 );
 
 $graphs['bind']      = array(
