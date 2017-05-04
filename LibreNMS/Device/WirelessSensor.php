@@ -127,6 +127,12 @@ class WirelessSensor extends Sensor
         // Add new types here
         // FIXME I'm really bad with icons, someone please help!
         static $types = array(
+            'ap-count' => array(
+                'short' => 'APs',
+                'long' => 'AP Count',
+                'unit' => '',
+                'icon' => 'wifi',
+            ),
             'clients' => array(
                 'short' => 'Clients',
                 'long' => 'Client Count',
