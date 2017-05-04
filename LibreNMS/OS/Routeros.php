@@ -49,11 +49,27 @@ class Routeros extends OS implements
      */
     public function discoverWirelessCcq()
     {
-        return $this->discoverSensor(
-            'ccq',
-            'mtxrWlApOverallTxCCQ',
-            '.1.3.6.1.4.1.14988.1.1.1.3.1.10.'
-        );
+        $data = $this->fetchData();
+
+        $sensors = array();
+        foreach ($data as $index => $entry) {
+            // skip sensors with no data (nv2 should report 1 client, but doesn't report ccq)
+            if ($entry['mtxrWlApClientCount'] > 0 && $entry['mtxrWlApOverallTxCCQ'] == 0) {
+                continue;
+            }
+
+            $sensors[] = new WirelessSensor(
+                'ccq',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.14988.1.1.1.3.1.10.' . $index,
+                'mikrotik',
+                $index,
+                'SSID: ' . $entry['mtxrWlApSsid'],
+                $entry['mtxrWlApOverallTxCCQ']
+            );
+        }
+
+        return $sensors;
     }
 
     /**
