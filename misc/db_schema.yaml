@@ -1615,7 +1615,7 @@ wireless_sensors:
     sensor_limit_low_warn: { Field: sensor_limit_low_warn, Type: float, 'Null': true, Default: null, Extra: '' }
     sensor_limit_warn: { Field: sensor_limit_warn, Type: float, 'Null': true, Default: null, Extra: '' }
     sensor_multiplier: { Field: sensor_multiplier, Type: int(11), 'Null': false, Default: '1', Extra: '' }
-    sensor_oids: { Field: sensor_oids, Type: varchar(255), 'Null': false, Default: null, Extra: '' }
+    sensor_oids: { Field: sensor_oids, Type: text, 'Null': false, Default: null, Extra: '' }
     sensor_prev: { Field: sensor_prev, Type: float, 'Null': true, Default: null, Extra: '' }
     sensor_type: { Field: sensor_type, Type: varchar(255), 'Null': false, Default: null, Extra: '' }
   Indexes:
