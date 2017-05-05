@@ -95,12 +95,13 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     $sensor['sensor_descr'] = substr($sensor['sensor_descr'], 0, 48);
 
     $response[] = array(
-        'hostname'       => generate_device_link($sensor),
-        'sensor_descr'   => overlib_link($link, $sensor['sensor_descr'], $overlib_content, null),
-        'graph'          => overlib_link($link_graph, $sensor_minigraph, $overlib_content, null),
-        'alert'          => $alert,
-        'sensor_current' => $sensor['sensor_current'].$unit,
-        'sensor_range'   => round($sensor['sensor_limit_low'], 2).$unit.' - '.round($sensor['sensor_limit'], 2).$unit,
+        'hostname'         => generate_device_link($sensor),
+        'sensor_descr'     => overlib_link($link, $sensor['sensor_descr'], $overlib_content, null),
+        'graph'            => overlib_link($link_graph, $sensor_minigraph, $overlib_content, null),
+        'alert'            => $alert,
+        'sensor_current'   => $sensor['sensor_current'].$unit,
+        'sensor_limit_low' => is_null($sensor['sensor_limit_low']) ? '-' : round($sensor['sensor_limit_low'], 2).$unit,
+        'sensor_limit'     => is_null($sensor['sensor_limit']) ? '-' : round($sensor['sensor_limit'], 2).$unit,
     );
 
     if ($_POST['view'] == 'graphs') {
