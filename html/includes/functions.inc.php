@@ -264,7 +264,7 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
         $text = $device['hostname'];
     }
 
-    $text = ip_to_sysname($device, $text);
+    $text = format_hostname($device, $text);
 
     if (isset($config['os'][$device['os']]['over'])) {
         $graphs = $config['os'][$device['os']]['over'];
