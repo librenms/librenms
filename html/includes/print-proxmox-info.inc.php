@@ -50,7 +50,7 @@ if ($vm['vmstatus'] == 'running') {
     }
     echo '</td>';
     echo '<td class="list">';
-    if (isset($vm['vmmemuse'])) {
+    if (!empty($vm['vmmemuse'])) {
         echo $vm['vmmemuse'];
         echo " %";
     }

@@ -12,7 +12,7 @@
  * @param  array   $pmxcache Reference to the Proxmox VM Cache
  * @return boolean true if the VM exists, false if it doesn't
  */
-function proxmox_lxc_vm_exists($i, $c, &$pmxcache)
+function proxmox_info_vm_exists($i, $c, &$pmxcache)
 {
 
     if (isset($pmxcache[$c][$i]) && $pmxcache[$c][$i] > 0) {
@@ -26,14 +26,12 @@ function proxmox_lxc_vm_exists($i, $c, &$pmxcache)
     return false;
 }
 
-$name = 'proxmox-lxc';
+$name = 'proxmox-info';
 $app_id = $app['app_id'];
-//if (isset($config['enable_proxmox']) && $config['enable_proxmox'] && !empty($agent_data['app'][$name])) {
-//    $proxmox = $agent_data['app'][$name];
-//}
-if (isset($config['enable_proxmox']) && $config['enable_proxmox']) {
-    $options = '-O qv -t 360000000000';
-//    $oid     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.11.112.114.111.120.109.111.120.45.108.120.99';
+if (isset($config['enable_proxmox']) && $config['enable_proxmox'] && !empty($agent_data['app'][$name])) {
+    $proxmox = $agent_data['app'][$name];
+} elseif (isset($config['enable_proxmox']) && $config['enable_proxmox']) {
+    $options = '-O qv';
     $oid     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.12.112.114.111.120.109.111.120.45.105.110.102.111';
     $proxmox = snmp_get($device, $oid, $options);
     $proxmox = preg_replace('/^.+\n/', '', $proxmox);
@@ -50,6 +48,8 @@ if ($proxmox) {
         '`device_id` = ? AND `app_type` = ?',
         array($device['device_id'], "proxmox")
     );
+    $vmsInDatabase = dbFetchRows("SELECT vmid FROM proxmox WHERE cluster = ?", array($pmxcluster));
+    print_r($vmsInDatabase);
 
     if (count($pmxlines) > 0) {
         $pmxcache = array();
@@ -60,8 +60,16 @@ if ($proxmox) {
             list($vmid, $vmstatus, $vmdesc, $vmtype, $vmcpus, $vmuptime, $vmpid, $vmmem, $vmmaxmem, $vmdisk, $vmmaxdisk) = explode(' ', $vm, 11);
             print "Proxmox ($pmxcluster): $vmdesc: $vmstatus/$vmmem/$vmcpu/$vmstorage\n";
 
-            $tags = compact('name', 'app_id', 'pmxcluster', 'vmid', 'vmport', 'rrd_proxmox_name', 'rrd_def');
-            data_update($device, 'app', $tags, $fields);
+            foreach ($vmsInDatabase as $key => $vmInDB)
+            {
+               if ($vmInDB['vmid'] == $vmid) {
+ print "UNSET KEY: $key";
+                  unset($vmsInDatabase[$key]);
+               }
+            }
+
+            //$tags = compact('name', 'app_id', 'pmxcluster', 'vmid', 'vmport', 'rrd_proxmox_name', 'rrd_def');
+            //data_update($device, 'app', $tags, $fields);
 
             $vmmem = intval($vmmem);
             $vmmaxmem = intval($vmmaxmem);
@@ -73,7 +81,7 @@ if ($proxmox) {
 
             print "VMUSE: $vmmemuse $vmdiskuse";
 
-            if (proxmox_lxc_vm_exists($vmid, $pmxcluster, $pmxcache) === true) {
+            if (proxmox_info_vm_exists($vmid, $pmxcluster, $pmxcache) === true) {
                 dbUpdate(
                     array(
                     'device_id' => $device['device_id'],
@@ -115,6 +123,15 @@ if ($proxmox) {
                 );
             }
         }
+print_r($vmsInDatabase);
+        if (count($vmsInDatabase) > 0) {
+           foreach ($vmsInDatabase as $key => $vmInDB)
+            {
+               print "DELETE KEY: $key";
+               dbDelete('proxmox', 'vmid = ?', array($vmInDB['vmid']));
+            }
+        }
+
     }
 }
 
