@@ -34,7 +34,7 @@ print_optionbar_start();
                                     if ($data['device_id'] == $vars['device']) {
                                         echo ' selected';
                                     }
-                                    echo '>' . process_hostname($data, $data['hostname']) . '</option>';
+                                    echo '>' . format_hostname($data) . '</option>';
                                 }
                             }
                             ?>

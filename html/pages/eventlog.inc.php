@@ -30,7 +30,7 @@ print_optionbar_start();
                     echo 'selected';
                 }
 
-                echo '>'.process_hostname($data, $data['hostname']).'</option>';
+                echo '>'.format_hostname($data).'</option>';
             }
         }
         ?>

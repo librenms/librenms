@@ -43,7 +43,7 @@ foreach (dbFetchRows($sql, $param) as $data) {
         echo '" selected "+';
     }
 
-    echo '">'.process_hostname($data, $data['hostname']).'</option>"+';
+    echo '">'.format_hostname($data, $data['hostname']).'</option>"+';
 }
 ?>
                  "</select>"+

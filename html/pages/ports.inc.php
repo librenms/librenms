@@ -96,7 +96,7 @@ foreach ($results as $data) {
     if ($data['device_id'] == $vars['device_id']) {
         echo("selected");
     }
-    echo(">".process_hostname($data, $data['hostname'])."</option>");
+    echo(">".format_hostname($data)."</option>");
 }
 
 if ($_SESSION['userlevel'] < 5) {
@@ -109,7 +109,7 @@ foreach ($results as $data) {
     if ($data['device_id'] == $vars['device_id']) {
         echo("selected");
     }
-    echo(">".process_hostname($data, $data['hostname'])."</option>");
+    echo(">".format_hostname($data)."</option>");
 }
 
 ?>
