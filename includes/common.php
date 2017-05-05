@@ -206,11 +206,9 @@ function get_all_devices()
     // FIXME respect $type (server, network, etc) -- needs an array fill in topnav.
 
     if (isset($cache['devices']['hostname'])) {
-        $devices = array_keys($cache['devices']['hostname']);
+        $devices = array_keys($cache['devices']);
     } else {
-        foreach (dbFetchRows("SELECT `hostname` FROM `devices`") as $data) {
-            $devices[] = $data['hostname'];
-        }
+        $devices = dbFetchRows("SELECT * FROM `devices`");
     }
 
     return $devices;
@@ -1128,21 +1126,24 @@ function inet6_ntop($ip)
 }
 
 /**
- * Convert IP to use sysName
+ * If hostname is an ip, use return sysName
  * @param array device
- * @param string ip address
+ * @param string hostname
  * @return string
 **/
-function ip_to_sysname($device, $ip)
+function format_hostname($device, $hostname = '')
 {
     global $config;
-    if ($config['force_ip_to_sysname'] === true) {
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
-            $ip = $device['sysName'];
+    if (empty($hostname)) {
+        $hostname = $device['hostname'];
+    }
+    if ($config['force_ip_to_sysname'] === true && !empty($device['sysName'])) {
+        if (filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
+            $hostname = $device['sysName'];
         }
     }
-    return $ip;
-}//end ip_to_sysname
+    return $hostname;
+}//end format_hostname
 
 /**
  * Return valid port association modes

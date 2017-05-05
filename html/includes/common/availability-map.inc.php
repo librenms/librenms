@@ -226,7 +226,7 @@ if (defined('SHOW_SETTINGS')) {
                 $deviceLabelOld = 'availability-map-oldview-box-down';
                 $host_down_count++;
             }
-            $device_system_name = ip_to_sysname($device, $device['hostname']);
+            $device_system_name = format_hostname($device);
 
             if ($config['webui']['availability_map_compact'] == 0) {
                 if ($directpage == "yes") {
@@ -276,7 +276,7 @@ if (defined('SHOW_SETTINGS')) {
                     $serviceState = "down";
                     $service_down_count++;
                 }
-                $service_system_name = ip_to_sysname($service, $service['hostname']);
+                $service_system_name = format_hostname($service);
 
                 if ($config['webui']['availability_map_compact'] == 0) {
                     if ($directpage == "yes") {

@@ -98,7 +98,7 @@ if ($_SESSION['userlevel'] != '10') {
             }
 
             if (!$done) {
-                echo "<option value='".$device['device_id']."'>".$device['hostname'].'</option>';
+                echo "<option value='".$device['device_id']."'>".format_hostname($device, $device['hostname']).'</option>';
             }
         }
 
@@ -159,7 +159,7 @@ if ($_SESSION['userlevel'] != '10') {
             }
 
             if (!$done) {
-                echo "<option value='".$device['device_id']."'>".$device['hostname'].'</option>';
+                echo "<option value='".$device['device_id']."'>".format_hostname($device, $device['hostname']).'</option>';
             }
         }
 

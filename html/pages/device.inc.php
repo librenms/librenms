@@ -22,7 +22,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
     $entity_state = get_dev_entity_state($device['device_id']);
 
     // print_r($entity_state);
-    $pagetitle[] = ip_to_sysname($device, $device['hostname']);
+    $pagetitle[] = format_hostname($device, $device['hostname']);
 
     $component = new LibreNMS\Component();
     $component_count = $component->getComponentCount($device['device_id']);
