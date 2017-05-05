@@ -54,7 +54,7 @@ if (!$auth) {
     echo $title;
 
     // FIXME allow switching between types for sensor and wireless also restrict types to ones that have data
-    if ($type != 'sensor' && $type != 'wireless') {
+    if ($type != 'sensor') {
         echo '<div style="float: right;"><form action="">';
         echo "<select name='type' id='type' onchange=\"window.open(this.options[this.selectedIndex].value,'_top')\" >";
 
