@@ -22,6 +22,8 @@
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 echo 'coolingUnitStatusAnalogEntry ';
 $pre_cache['cooling_unit_analog'] = snmpwalk_cache_oid($device, 'coolingUnitStatusAnalogEntry', array(), 'PowerNet-MIB');
+
+echo 'upsPhaseNumInputPhases';
+$pre_cache['apcups_phase_count'] = snmp_get($device, 'upsPhaseNumInputPhases.1', '-OQv', 'PowerNet-MIB');

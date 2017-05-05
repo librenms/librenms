@@ -3,6 +3,8 @@ text: 'APC Management Module'
 type: power
 over:
     - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_runtime, text: Runtime }
 discovery:
     - sysDescr:
         - APC Web/SNMP Management Card
