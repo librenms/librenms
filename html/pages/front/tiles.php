@@ -531,7 +531,12 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
               '<header class="widget_header"><span id="widget_title_'+data.user_widget_id+'">'+data.title+
               '</span>'+
               '<span class="fade-edit pull-right">'+
-              '<i class="fa fa-pencil-square-o edit-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Settings" data-toggle="tooltip" data-placement="top" title="Settings">&nbsp;</i>&nbsp;'+
+                <?php
+                if (($vars['dashboard']['access'] == 1 && $_SESSION['user_id'] === $vars['dashboard']['user_id']) ||
+                        ($vars['dashboard']['access'] == 0 || $vars['dashboard']['access'] == 2)) {
+                        echo "'<i class=\"fa fa-pencil-square-o edit-widget\" data-widget-id=\"'+data.user_widget_id+'\" aria-label=\"Settings\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Settings\">&nbsp;</i>&nbsp;'+";
+                }
+                ?>
               '<i class="text-danger fa fa-times close-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Close" data-toggle="tooltip" data-placement="top" title="Remove">&nbsp;</i>&nbsp;'+
               '</span>'+
               '</header>'+
