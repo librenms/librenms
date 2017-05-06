@@ -4,7 +4,7 @@ This document will guide you through adding wireless sensors for your new wirele
  
 Currently we have support for the following wireless metrics along with the values we expect to see the data in:
 
-| Type             | Measurement   | Interface                     | Descrtiption                                                 |
+| Type             | Measurement   | Interface                     | Description                                                  |
 | ---------------- | ------------- | ----------------------------- | ------------------------------------------------------------ |
 | ap-count         | %             | WirelessApCountDiscovery      | The number of APs attached to this controller                |
 | capacity         | %             | WirelessCapacityDiscovery     | The % of operating rate vs theoretical max                   |
