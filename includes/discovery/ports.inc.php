@@ -1,14 +1,21 @@
 <?php
 
 // Build SNMP Cache Array
+$port_oids = array('ifDescr', 'ifName', 'ifAlias', 'ifType');
 $port_stats = array();
-$port_stats = snmpwalk_cache_oid($device, 'ifDescr', $port_stats, 'IF-MIB');
-$port_stats = snmpwalk_cache_oid($device, 'ifName', $port_stats, 'IF-MIB');
-$port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
-$port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB');
+foreach ($port_oids as $oid) {
+    $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB');
+}
 
 // End Building SNMP Cache Array
-d_echo($port_stats);
+$header = array(
+    0 => 'ifIndex',
+    'ifDescr' => 'ifDescr',
+    'ifName'  => 'ifName',
+    'ifAlias' => 'ifAlias',
+    'ifType'  => 'ifType'
+    );
+t_echo($header, $port_stats, true);
 
 
 // By default libreNMS uses the ifIndex to associate ports on devices with ports discoverd/polled

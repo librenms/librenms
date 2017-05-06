@@ -647,6 +647,17 @@ function d_echo($text, $no_debug_text = null)
     }
 } // d_echo
 
+function t_echo($headers, $data, $use_index = false)
+{
+    $table = new \cli\Table();
+    if ($use_index === true) {
+        $table->useIndex();
+    }
+    $table->setHeaders($headers);
+    $table->setRows($data);
+    $table->display();
+}
+
 /**
  * Output using console color if possible
  * https://github.com/pear/Console_Color2/blob/master/examples/documentation
