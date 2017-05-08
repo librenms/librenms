@@ -31,6 +31,10 @@ if ($device['os_group'] == "cisco") {
         $active = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.10.19.1.1.4.0", null);
         $active = $active['1.3.6.1.4.1.9.10.19.1.1.4.0'];
 
+        if (is_array($active)) {
+            $active = $active[''];
+        }
+
         if (isset($active) && $active > 0) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('total', 'GAUGE', 0)
