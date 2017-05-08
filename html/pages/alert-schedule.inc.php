@@ -54,8 +54,11 @@ var grid = $("#alert-schedule").bootgrid({
         "commands": function(column, row)
         {
             if (row.status == 1) {
-                return '<button type="button" class="btn btn-xs btn-danger" disabled>Lapsed</button>';
-            } else {
+                var response = '<button type="button" class="btn btn-xs btn-danger" disabled>Lapsed</button>';
+                response = response + " <button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#schedule-maintenance' data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-pencil\"></span></button> ";
+                response = response +   " <button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-trash-o\"></span></button>";
+           return response;
+        } else {
                 var response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#schedule-maintenance' data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-pencil\"></span></button> " +
                     "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-trash-o\"></span></button>";
                 if (row.status == 2) {
