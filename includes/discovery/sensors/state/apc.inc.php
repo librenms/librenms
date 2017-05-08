@@ -131,8 +131,8 @@ foreach ($relays as $index => $data) {
     }
     $current = apc_relay_state($data['emsOutputRelayControlOutputRelayCommand']);
     if (is_numeric($current)) {
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, '1', '1', null, null, null, null, $current);
-        create_sensor_to_state_index($device, $state_name, $index);
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, $state_name, $state_name, '1', '1', null, null, null, null, $current);
+        create_sensor_to_state_index($device, $state_name, $cur_oid);
     }
 }
 unset(
@@ -165,8 +165,8 @@ foreach ($switched as $index => $data) {
     }
     $current = apc_relay_state($data['emsOutletControlOutletCommand']);
     if (is_numeric($current)) {
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, '1', '1', null, null, null, null, $current);
-        create_sensor_to_state_index($device, $state_name, $index);
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, $state_name, $state_name, '1', '1', null, null, null, null, $current);
+        create_sensor_to_state_index($device, $state_name, $cur_oid);
     }
 }
 unset(
