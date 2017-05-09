@@ -1,0 +1,288 @@
+September 1st, 2009
+-------------------
+  1)fsp150cm-facility.mib :
+       a)Added cmEthernetAccPortSfpLaserWaveLength, 
+               cmEthernetNetPortSfpLaserWaveLength
+       b)Changed cmEthernetAccPortSfpLinkLength and 
+                 cmEthernetNetPortSfpLinkLength 
+                 to cmEthernetAccPortSfpReach and 
+                 cmEthernetNetPortSfpReach respectively
+       c)cmEthernetAccPortRxPauseDisposition, 
+              cmEthernetAccPortOamAdminDisposition are now deprecated
+       d)cmEthernetAccPortRxPauseEnabled, 
+              cmEthernetAccPortOamEnabled are the new attributes for Rx Pause 
+         and EFM-OAM Management
+       e)cmEthernetNetPortOamAdminDisposition is now deprecated
+       f)cmEthernetNetPortOamEnabled is the new attribute for EFM-OAM Management
+  2)fsp150cm-sa.mib : Added esaProbeScheduleGroupDescr
+  3)fsp150cm-perf.mib : 
+            Added cmEthernetAccPortStatsUAS, cmEthernetAccPortHistoryUAS,
+                  cmEthernetNetPortStatsUAS, cmEthernetNetPortHistoryUAS
+  4)fsp150cm-common.mib : 
+        SecondaryState has 'not-applicable' enumeration in fsp150cm-common.mib
+  5)fsp150cm-sec.mib :
+       a)cmSecurityUserTable changes :
+          (i)cmSecurityUserPassword column to modify security user password
+          (ii)cmSecurityUserStorageType and 
+              cmSecurityUserRowStatus columns added
+                   thereby allowing creation/deletion of Security Users
+         (iii)cmSecurityUserComment, cmSecurityUserPrivLevel,
+              cmSecurityUserLoginTimeout, cmSecurityUserNumFailedLoginAttempts,
+              cmSecurityUserCliPagingEnable columns are now read-write
+              to allow write access.
+
+September 10, 2009
+-----------------
+  1)fsp150cm-system.mib :
+       (a) Added 'sftp' Textual Convention to CmFileTransferMethod
+
+  2)fsp150cm-sec.mib :
+       (a) cmSecurityUserName, cmSecurityUserComment, 
+           cmSecurityUserPrivLevel, cmSecurityUserLoginTimeout,
+           cmSecurityUserNumFailedLoginAttempts, 
+           cmSecurityUserCliPagingEnable, cmSecurityUserPassword
+           are read-create 
+
+
+September 17, 2009 (a)
+-----------------
+  1)fsp150cm-cfm.mib :
+        (a)Removed cfmAccPortQosShaperEIR, cfmNetPortQosShaperEIR since
+            EIR on these Shapers is not managed 
+
+  2)fsp150cm-ip.mib :
+        (a)Added cmIpInterfaceRIPv2Enabled 
+
+September 17, 2009 (b)
+------------------
+  1)fsp150cm-ip.mib :
+        (a)Added attribute cmARPEntryType (CM2441) - static vs dynamic
+        (b)Added attributes cmStaticRouteInterface, cmStaticRouteAdvertise (CM3293)
+
+  2)fsp150cm-entity.mib :
+        (b)Added attribute slotCardPhysicalAddress (CM2456)
+
+  3)fsp150cm-system.mib :
+        (a)Added enumeration literal web(4) to CmFileTransferMethod.
+           This is a read-only enumeration. 
+
+  4)fsp150cm-facility.mib :
+        (a) Updated cmEthernetAccPortClbDescr with size of 0..256
+
+September 18, 2009
+------------------
+  1)fsp150cm-ip.mib :
+        (a)Changed INDEX of cmARPTable to INDEX 
+              {cmARPInterface, cmARPIPAddress}; cmARPIndex is deprecated
+        (b)Changed object name cmStaticRouteStatus to cmStaticRouteRowStatus
+        (c)Added object cmIpFlushARPCacheAction
+        (d)Changed INDEX of cmProxyARPTable to INDEX 
+             {cmProxyARPInterface, cmProxyARPIPAddress, cmProxyARPSubnetMask};
+                   cmProxyARPIndex is deprecated
+
+  2)fsp150cm-system.mib :
+        (a)CmNtpServerType has enumeration not-applicable(0)
+
+  3)fsp150cm-facility.mib :
+        (a)cmEthernetAccPortClbLength is read-write instead of read-only
+
+
+September 21, 2009(a)
+------------------
+  1)fsp150cm-alarm.mib :
+        (a)Added condition type avghldovrfrqnotrdy
+
+  2)fsp150cm-prot.mib :
+        (a)CmProtSwitchMode has new protection switch mode dualactiverx
+
+  3)fsp150cm-ip.mib :
+        (a)Added object ipManagementTunnelMTU (read-only) 
+                        to ipManagementTunnelTable
+        (b)cmIpFlushARPCacheAction is read-write
+
+  4)fsp150cm-facility.mib :
+        (a)Added object cmFlowHCOSMgmtEnabled
+        (b)Added object cmFlowCpdV2ActiveControlProtocols
+        (c)Added objects cmEthernetAccPortCpdV2SSMDispType,
+           cmEthernetAccPortCpdV2BridgeReservedDispType,
+           cmFlowCpdV2SSMDispType,
+           cmFlowV2BridgeReservedDispType,
+           cmEthernetNetPortCpdV2SSMDispType,
+           cmEthernetNetPortCpdV2BridgeReservedDispType,
+
+  5)fsp150cm-cfm.mib :
+         (a)RDI as MEP LLF trigger type
+
+September 21, 2009(b)
+--------------------
+  1)fsp150cm-facility.mib :
+      (a)Removed swaptag from FlowTagControl since it is no 
+            longer applicable  
+  2)fsp150cm-ip.mib :
+      (a) Added the following objects cmIpProxyARPEnabled,
+          cmIpPingDestination, cmIpInitiatePingAction, cmIpPingResult, 
+          cmIpTraceRouteDestination, cmIpInitiateTraceRouteAction, 
+          cmIpTraceRouteResult, 
+          cmIpSNMPv1InterfaceName,
+          cmIpSourceAddressType, cmIpSourceAddressInterfaceName,
+
+September 22, 2009
+------------------
+  1)fsp150cm-system.mib :
+      (a)Added enumerations 
+               get-sys-database, put-sys-database, 
+               get-defaultsvalue-file, put-defaultsvalue-file 
+         to object fileServicesAction
+      (b)Added enumerations
+               save-sysdefaults, new-sysdefaults, restore-sysdefaults,
+               restore-factorydefaults
+         to object databaseAction 
+      (c)Added object fileServicesMode
+
+October 8, 2009
+---------------
+  1)fsp150cm-alarm.mib :
+      (a)TC CmAlarmEntry includes dcnport
+
+  2)fsp150cm-sync.mib :
+      (a)Removed objects f3SyncRevertive, f3SyncRevertTime
+      (a)TC CmAlarmEntry includes dcnport
+
+October 12, 2009
+----------------
+  1)fsp150cm-sec.mib :
+      (a)cmSecurityUserNumFailedLoginAttempts is now read-only (from read-write)
+
+  2)fsp150cm-esa.mib :
+      (a)esaProbeName is 15  max size
+      (b)esaReflectorName is 15 max size 
+
+  3)fsp150cm-ip.mib : (CM3730)
+      (a)cmIpSNMPv2InterfaceName is 15 max size 
+      (b)cmIpSourceAddressInterfaceName is 15 max size 
+      (c)cmIpInterfaceName is 15 max size 
+      (d)cmStaticRouteInterface is 15 max size 
+      (e)cmARPInterface is 15 max size 
+      (f)cmProxyARPInterface is 15 max size 
+      (g)ipManagementTunnelName is 15 max size 
+
+  4)fsp150cm-cfm.mib :
+      (a)Added objects cfmAccPortQosShaperAdminState and cfmNetPortQosShaperAdminState (CM3568)
+      (b)Removed object cfmMepLmDualEndedPriority (CM3472)
+
+  5)fsp150cm-system.mib :
+      (a)cliSecurityPromptEnabled object is added
+
+
+October 19, 2009
+----------------
+  1)fsp150cm-perf.mib :
+      (a)cmFlowStatsFTDA2N, cmFlowHistoryFTDA2N added
+  2)fsp150cm-system.mib :
+      (a)CmFileServicesStatus TC has new literals badarchive, incompatarchive
+      (b)sftpEnabled object is supported
+  3)fsp150cm-common.mib :
+      (a)EthernetPortSpeed TC has new literal speed-none
+
+October 21, 2009
+----------------
+  1)fsp150cm-alarm.mib :
+      (a)Added objects cmSysAlmObject, cmSysAlmObjectName, cmSysCondObject, cmSysCondObjectName
+      (b)Updated cmSysAlmTrap and CmSysEvent NOTIFICATIONs to contain the new objects
+
+October 23, 2009
+---------------
+  1)fsp150cm-alarm.mib :
+      (a)CmAlarmEntityType TC enumeration literals changed,
+                oneru-h1-shelf changed to oneru-ge101-shelf
+                oneru-f1-shelf changed to oneru-ge206-shelf
+
+  2)fsp150cm-entity.mib :
+      (a)ShelfType TC enumeration literals changed,
+                onerackunit-h1 changed to onerackunit-ge101
+                onerackunit-f1 changed to onerackunit-ge206
+
+November 4, 2009
+----------------
+  1)fsp150cm-sync.mib :
+      (a)f3SyncTable and f3SyncRefTable have slotIndex as additional INDEX
+
+November 5, 2009
+----------------
+  1)fsp150cm-system.mib :
+      (a)Removed the put-defaultsvalue-file from fileServicesAction (CM4125)
+
+  2)fsp150cm-sa.mib :
+      (a)Added esaProbeDistHistoryAction and esaProbeDistStatsAction (CM4107)
+      (b)Added the following to make it applicable when we add 
+         point-2-multi-point SLAs
+        (i)esaProbeStatsEntry has additional variables : 
+            (INDEX)esaProbeStatsDestinationIndex, esaProbeStatsCOSIndex
+            (NON-INDEX)esaProbeStatsCOS
+        (ii)esaProbeHistoryEntry has additional variables : 
+            (INDEX)esaProbeHistoryDestinationIndex, esaProbeHistoryCOSIndex
+            (NON-INDEX)esaProbeHistoryTime, esaProbeHistoryCOS
+        (iii)esaProbeDistStatsEntry has additional variables :
+            (INDEX)esaProbeDistStatsDestinationIndex, esaProbeDistStatsCOSIndex
+            (NON-INDEX)esaProbeDistStatsCOS
+        (iv)esaProbeDistStatsBinEntry has additional INDEX variables :
+            (INDEX)esaProbeDistStatsDestinationIndex, esaProbeDistStatsCOSIndex
+        (v)esaProbeDistHistoryEntry has additional variables :
+            (INDEX)esaProbeDistHistoryDestinationIndex, 
+                    esaProbeDistHistoryCOSIndex
+            (NON-INDEX)esaProbeDistHistoryCOS 
+        (vi)esaProbeDistStatsConfigNumSamples renamed to 
+            esaProbeDistStatsConfigNumBins (CM4108)
+
+  3)fsp150cm-common.mib :
+      (a)Added ClassOfServiceType TC
+      (b)Added ge201 product 
+
+  4)fsp150cm-perf.mib :
+      (a)Updated description for AUFD, APFD for NetworkPort Stats (CM3679)
+
+December 17, 2009
+-----------------
+  1)fsp150cm-sa.mib : 
+           a)TC EsaProbeY1731IntervalType renamed to EsaProbeIntervalType
+           b)Columns esaProbeY1731SrcMep, esaProbeY1731DestMepType, 
+                     esaProbeY1731DestMepMacAddr, esaProbeY1731DestMepId
+             renamed to esaProbeSrcMep, esaProbeDestMepType, esaProbeDestMepMacAddr,
+                     and esaProbeDestMepId respectively
+             - since these will be reused for MEF based SOAM
+  2)fsp150cm-facility.mib :
+           a)Removed cmEthernetAccPortPriorityVlanId (CM3556)
+           b)Added cmEthernetAccPortOamAdminState, cmEthernetNetPortOamAdminState (CM4007)
+
+January 11/12, 2010
+-------------------
+  1)fsp150cm-sa.mib :
+      a)esaProbeScheduleGroupDescr is read-create (instead of read-write) (CM4459)
+           
+  2)fsp150cm-facility.mib :
+      a)updated description of cmFlowVlanMemberList to remove X-Y member type (doc review)
+      b)updated description of cmFlowActionVlan to remove X-Y member type (doc review)
+      c)updated description of bitsPortFrameFormat to indicate e1-unframed not supported (CM5255)
+
+  3)fsp150cm-system.mib :
+      a)f3SnmpEngineID is new read-write object (standard snmpEngineID is read-only) (CM4806)
+      b)TC CmVersionType has new literal (staging) (CM3821)
+         -This will provide database and software version in the staging area
+
+  4)fsp150cm-alarm.mib:
+      a)TC CmConditionType has new enumeration literals
+            pwrnoinputunitfault, ipaddrconflict (CM4804, CM5034)
+
+  5)fsp150cm-prot.mib :
+      a)updated description of cmFacProtGroupRevertive, cmFacProtGroupWaitToRestore,
+        cmFacProtGroupDirection for dualactiverx Protection Mode (CM4868). 
+
+Feb 4, 2010
+-----------
+  1)fsp150cm-facility.mib :
+      a)Updated description of cmEthernetAccPortJumboFramesEnabled and 
+           cmEthernetNetPortJumboFramesEnabled 
+      b)cmEthernetAccPortSfpSerialNumber and cmEthernetNetPortSfpSerialNumber 
+          changed to size 32 (CM5702)
+  2)fsp150cm-alarm.mib:
+      a)Added condition type nomoreresources (CM5438)

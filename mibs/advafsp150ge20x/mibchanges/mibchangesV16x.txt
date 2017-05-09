@@ -1,0 +1,310 @@
+23th May 2013
+------------
+   1) fsp150cm-facility.mib
+   
+      (i) Added new objects to cmEthernetAccPortTable:
+      
+           - cmEthernetAccPortLoopbackSourceMacControlEnabled,
+           - cmEthernetAccPortLoopbackDestMacControlEnabled,
+           - cmEthernetAccPortLoopbackSourceMacAddress,
+           - cmEthernetAccPortLoopbackDestMacAddress,
+           - cmEthernetAccPortLoopbackBlockingEnabled
+           
+      (ii) Added new objects to cmEthernetNetPortTable:
+      
+           - cmEthernetNetPortLoopbackSourceMacControlEnabled,
+           - cmEthernetNetPortLoopbackDestMacControlEnabled,
+           - cmEthernetNetPortLoopbackSourceMacAddress,
+           - cmEthernetNetPortLoopbackDestMacAddress,
+           - cmEthernetNetPortLoopbackBlockingEnabled
+
+10th Jun 2013
+------------
+   1) fsp150cm-facility.mib
+   
+      (i) Added table: 
+           - networkElementTMParamsTable
+      (ii) Added TEXTUAL-CONVENTION 
+           - BandwidthProfileMode
+      (iii) Added group:
+           - networkElementTMParamsGroup
+
+27th Jun 2013
+------------
+   1) fsp150cm-cap.mib
+   
+      (i) Added neInfoGroup as supported in f3CommonVendorSpecificCapabilities
+      (ii) Marked neMibVariant, neManufacturer, neDateAndTime,
+           neMemorySizeTotal, neMemorySizeFree, neStorageIndex,
+           neStorageDescr, neStorageCapacity, neStorageAvailable
+           as not-implemented
+   2) fsp150cm-perf.mib
+      (i) Added table cmFlowBWExtTable
+   3) fsp150cm-alarm.mib
+      (i) Added literals to CmConditionType:
+          ampProvSuccess(278),
+          ampCfgSuccess(279)
+
+8th Jul 2013
+-----------
+    1) fsp150cm-system.mib
+       (i) Fixed typo in OID definitions - changed cmLldpV2DetAdressADVAExtObjects to 
+           cmLldpV2DestAdressADVAExtObjects
+           
+    2) fsp150cm-facility.mib
+       (i) Changed description of CmEthernetDiagAction - "all" doesn't include efm-oam-lpbk
+
+    3) fsp150cm-ptp.mib
+       (i) Change PortIdentity length to 10
+       
+24th Jul 2013
+------------
+    1) fsp150cm-perf.mib
+    
+       (i) Added IBR feature objects:
+       
+           cmEthernetAccPortStatsTable:
+           - cmEthernetAccPortStatsIBRMaxRx,
+           - cmEthernetAccPortStatsIBRMaxTx,
+           - cmEthernetAccPortStatsIBRMinRx,
+           - cmEthernetAccPortStatsIBRMinTx,
+           - cmEthernetAccPortStatsIBRRx,
+           - cmEthernetAccPortStatsIBRTx 
+           
+           cmEthernetAccPortHistoryTable:
+           - cmEthernetAccPortHistoryIBRMaxRx,
+           - cmEthernetAccPortHistoryIBRMaxTx,
+           - cmEthernetAccPortHistoryIBRMinRx,
+           - cmEthernetAccPortHistoryIBRMinTx,
+           - cmEthernetAccPortHistoryIBRRx,
+           - cmEthernetAccPortHistoryIBRTx
+           
+           cmEthernetNetPortStatsTable:
+           - cmEthernetNetPortStatsIBRMaxRx,
+           - cmEthernetNetPortStatsIBRMaxTx,
+           - cmEthernetNetPortStatsIBRMinRx,
+           - cmEthernetNetPortStatsIBRMinTx,
+           - cmEthernetNetPortStatsIBRRx,
+           - cmEthernetNetPortStatsIBRTx
+           
+           cmEthernetNetPortHistoryTable:
+           - cmEthernetNetPortHistoryIBRMaxRx,
+           - cmEthernetNetPortHistoryIBRMaxTx,
+           - cmEthernetNetPortHistoryIBRMinRx,
+           - cmEthernetNetPortHistoryIBRMinTx,
+           - cmEthernetNetPortHistoryIBRRx,
+           - cmEthernetNetPortHistoryIBRTx
+           
+           cmFlowStatsTable:
+           - cmFlowStatsIBRA2NMax,
+           - cmFlowStatsIBRRlA2NMax,
+           - cmFlowStatsIBRA2NMin,
+           - cmFlowStatsIBRRlA2NMin,
+           - cmFlowStatsIBRA2N,
+           - cmFlowStatsIBRRlA2N,
+           - cmFlowStatsIBRN2AMax,
+           - cmFlowStatsIBRRlN2AMax,
+           - cmFlowStatsIBRN2AMin,
+           - cmFlowStatsIBRRlN2AMin,
+           - cmFlowStatsIBRN2A,
+           - cmFlowStatsIBRRlN2A
+           
+           cmFlowHistoryTable:
+           - cmFlowHistoryIBRA2NMax,
+           - cmFlowHistoryIBRRlA2NMax,
+           - cmFlowHistoryIBRA2NMin,
+           - cmFlowHistoryIBRRlA2NMin,
+           - cmFlowHistoryIBRA2N,
+           - cmFlowHistoryIBRRlA2N,
+           - cmFlowHistoryIBRN2AMax,
+           - cmFlowHistoryIBRRlN2AMax,
+           - cmFlowHistoryIBRN2AMin,
+           - cmFlowHistoryIBRRlN2AMin,
+           - cmFlowHistoryIBRN2A,
+           - cmFlowHistoryIBRRlN2A
+           
+30th Jul 2013 (merge from trunk)
+------------
+    1) fsp150cm-shg.mib
+       (i) Added table f3ShgMemberFlowPointTable
+    
+    2) fsp150cm-alarm.mib
+       (i) Added literals to CmConditionType TEXTUAL-CONVENTION
+         - ipv6addr-conflict(260),
+         - macAddrlearntblFull(261),
+       (ii)Added literals to CmAlarmEntityType TEXTUAL-CONVENTION
+         - eth-fe-36e-card(103),
+         - mpflow(104)
+
+    3) fsp150cm-sec.mib
+       (i) Added scalar f3NasIpv6Addr
+       (ii)Added columns to cmRemoteAuthServerTable
+         - cmRemoteAuthServerIpVersion          IpVersion,
+         - cmRemoteAuthServerIpv6Addr           Ipv6Address
+
+    4) fsp150cm-perf.mib
+       (i) Added columns to cmFlowPointStatsTable
+         - cmFlowPointStatsFMYD                  PerfCounter64,
+         - cmFlowPointStatsFMGD                  PerfCounter64,
+         - cmFlowPointStatsFD                    PerfCounter64,
+         - cmFlowPointStatsFMCD                  PerfCounter64,
+         - cmFlowPointStatsFBCD                  PerfCounter64 
+       (ii) Added columns to cmFlowPointHistoryTable
+         - cmFlowPointHistoryFMYD                PerfCounter64,
+         - cmFlowPointHistoryFMGD                PerfCounter64,
+         - cmFlowPointHistoryFD                  PerfCounter64,
+         - cmFlowPointHistoryFMCD                PerfCounter64,
+         - cmFlowPointHistoryFBCD                PerfCounter64
+
+    5) fsp150cm-sa.mib
+       (i) Added literals to EsaProbeControl TEXTUAL-CONVENTION
+        - y1731-slm-dmm(6)
+       (ii) Added columns to EsaProbeCOSConfigTable
+         - esaProbeCOSConfigslmInterval EsaProbePktIntervalType,
+         - esaProbeCOSConfigslmPktSize  Integer32
+
+    6) fsp150cm-cfm.mib
+       (i) Added TEXTUAL-CONVENTION CfmSlmEnabledTypes
+       (ii)Added columns to cfmMepTable
+         - cfmMepSlmEnabled                         CfmSlmEnabledTypes
+       (iii)Added table columns to cfmMepTable
+
+    7) fsp150cm-system.mib
+       (i) Added TEXTUAL-CONVENTION FileTransferServerType
+       (ii)Added columns to aclTable
+         - aclEntryIpVersion               IpVersion,
+         - aclEntryNetworkIpv6Addr         Ipv6Address,
+         - aclEntryPrefixLength            Integer32
+       (iii)Added scalars
+         - fileServicesServerType
+         - fileServicesServerIpv6Addr
+       (iv)Added columns to sysLogServerTable
+         - sysLogIpVersion     IpVersion,
+         - sysLogIpv6Addr      Ipv6Address
+         - ntpPrimaryServerIpVersion
+         - ntpPrimaryServerIpv6Addr
+         - ntpBackupServerIpVersion
+         - ntpBackupServerIpv6Addr
+
+    8) fsp150cm-erp.mib
+       (i)Added columns to f3ErpTable
+        - f3ErpGroupInterconnectionErp              VariablePointer,
+        - f3ErpGroupInterconnectPropagateTc         TruthValue,
+        - f3ErpGroupRapsVirtualChannelMep           VariablePointer,
+        - f3ErpGroupMaxFpNum                        Integer32
+
+    9) fsp150cm-common.mib
+       (i) Added TEXTUAL-CONVENTION F3DisplayString
+
+    10) fsp150cm-bridge.mib
+       (i) Added table f3MPFlowStaticFwdTable
+
+    11) fsp150cm-facility.mib
+       (i) Added TEXTUAL-CONVENTION LearningAction
+       (ii)Added TEXTUAL-CONVENTION SfpChannelIdentifier
+      (iii)Added TEXTUAL-CONVENTION TrafficPortDeleteEntitiesAction
+       (iv)Added columns to cmEthernetTrafficPortTable
+          - cmEthernetTrafficPortLaserWDMChannel                 SfpChannelIdentifier,
+          - cmEthernetTrafficPortLaserIsTunable                  TruthValue,
+          - cmEthernetTrafficPortLaserFrequency                  Unsigned32,
+          - cmEthernetTrafficPortDeiEnable                       TruthValue,
+          - cmEthernetTrafficPortPcpDEEncType                    PcpDEEncType,
+          - cmEthernetTrafficPortPcpDEPairsAction                PcpDEPairsAction,
+          - cmEthernetTrafficPortInitiateDiag                    CmEthernetDiagAction,
+          - cmEthernetTrafficPortDiagnosePair1Cond               CmDiagCableCondType,
+          - cmEthernetTrafficPortDiagnosePair2Cond               CmDiagCableCondType,
+          - cmEthernetTrafficPortDiagnosePair3Cond               CmDiagCableCondType,
+          - cmEthernetTrafficPortDiagnosePair4Cond               CmDiagCableCondType,
+          - cmEthernetTrafficPortDiagnoseAutoNegCond             CmDiagAutoNegCondType,
+          - cmEthernetTrafficPortDiagnoseLpbkCond                CmDiagLpbkCondType,
+          - cmEthernetTrafficPortDiagnoseEfmLpbkCond             CmDiagEfmOamLpbkCondType,
+          - cmEthernetTrafficPortDiagnoseResult                  DisplayString,
+          - cmEthernetTrafficPortDiagnoseTestStatus              CmDiagTestStatus,
+          - cmEthernetTrafficPortDiagnoseTestTime                DateAndTime,
+          - cmEthernetTrafficPortAutoDiagEnabled                 TruthValue,
+          - cmEthernetTrafficPortDeleteEntitiesAction            TrafficPortDeleteEntitiesAction,
+          - cmEthernetTrafficPortMaxMpFpNum                      Integer32
+       (v)Added columns to cmFlowPointTable
+          - cmFlowPointDefaultMemberEnabled            TruthValue,
+          - cmFlowPointMcastRateLimitEnabled           TruthValue,
+          - cmFlowPointMcastRateLimitSpeedLo           Unsigned32,
+          - cmFlowPointMcastRateLimitSpeedHi           Unsigned32,
+          - cmFlowPointBcastRateLimitEnabled           TruthValue,
+          - cmFlowPointBcastRateLimitSpeedLo           Unsigned32,
+          - cmFlowPointBcastRateLimitSpeedHi           Unsigned32,
+          - cmFlowPointSplitHorizonGroupOID            VariablePointer,
+          - cmFlowPointLoopAvoidance                   VariablePointer,
+          - cmFlowPointHierarchicalCosEnabled          TruthValue,
+          - cmFlowPointWfqQid                          Integer32,
+          - cmFlowPointWfqOutPriority                  Integer32,
+          - cmFlowPointMaximumBWLo                     Unsigned32,
+          - cmFlowPointMaximumBWHi                     Unsigned32,
+          - cmFlowPointGuaranteedBWLo                  Unsigned32,
+          - cmFlowPointGuaranteedBWHi                  Unsigned32
+       (vi)Change range of cmFlowPointSESFramesLossThresholdRatio to (0..100)
+       (vii)Change MAX-ACCESS of tcmTrafficAclFilterActiono read-write
+       (viii)Added columns to cmQosPolicerV2Table
+         - cmQosPolicerV2PolicingEnabled     TruthValue
+       (ix)Added columns to cmQosShaperV2Table
+        - cmQosShaperV2WFQWeight       Integer32
+       (x)Change MAX-ACCESS to read-write
+         - cmQosShaperV2CIRLo
+         - cmQosShaperV2CIRHi
+         - cmQosShaperV2EIRLo
+         - cmQosShaperV2EIRHi
+       (xi)Added table cmMPFlowTable
+       (xii) Changed OID of networkElementTMParamsTable to 66
+       (xii) Added column to networkElementTMParamsTable
+         - neTMParamsAgingtime
+
+    12) fsp150cm-ip.mib
+       (i) Added TEXTUAL-CONVENTION Ipv6OverIpv4TunnelType
+       (ii) Added TEXTUAL-CONVENTION IpMode
+       (iii)Added scalars
+         - cmIpv6PingInterface
+         - cmIpv6PingDestination
+         - cmIpv6InitiatePingAction
+         - cmIpv6TraceRouteDestination
+         - cmIpv6InitiateTraceRouteAction
+         - cmIpv6ProxyNDPEnabled
+         - cmIpv6FwdEnabled
+         - cmIpFlushNDPCacheAction
+       (iv)Added columns to cmIpInterfaceTable
+         - cmIpInterfaceIpMode                IpMode
+       (v)Added columns to ipManagementTunnelTable
+         - ipManagementTunnelIpMode              IpMode
+       (vi)Added table ipv6ManagementTunnelTable
+
+    2) fsp150cm-entity.mib
+       (i) Added literals to CardType TEXTUAL-CONVENTION
+         -  eth-fe-36e(40)
+       (ii)Added table ethernetFE36ECardTable
+
+6th Aug 2013 (merge from trunk)
+------------
+    1) fsp150cm-ip.mib
+       (i)Added columns to ipManagementTunnelTable
+         ipManagementTunnelDHCPv6Enabled       TruthValue,
+         ipManagementTunnelIpv6Address         Ipv6Address,
+         ipManagementTunnelIpv6AddrPrefixLen   Integer32,
+         ipManagementTunnelIpv6StateAddrAutoConfigEnabled  TruthValue,
+         ipManagementTunnellinkLocIpv6Addr                 Ipv6Address,
+         ipManagementTunnellinkLocIpv6AddrPrefixLen        Integer32,
+         ipManagementTunnelIpv6PrefixAdvertiseEnabled      TruthValue,
+         ipManagementTunnelIpv6Prefix                      Ipv6Address,
+         ipManagementTunnelIpv6PrefixLen                   Integer32,
+         ipManagementTunnelIpv6RipngEnabled                TruthValue
+      (ii) Removed table ipv6ManagementTunnelTable
+
+
+7th Aug 2013 (WIP - 6.1CC only)
+------------
+    1) fsp150cm-entity.mib
+       (i) Added literals to CardType TEXTUAL-CONVENTION
+         - eth-ge-8s-cc(41)
+       (ii)Added table ethernetGE8ECCCardTable  
+      (iii)Added group ge8ECCCardGroup 
+    2) fsp150cm-alarm.mib
+       (i)Added literals to CmAlarmEntityType TEXTUAL-CONVENTION
+           - ge-8e-cc(105)
+         

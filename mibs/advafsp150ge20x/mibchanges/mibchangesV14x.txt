@@ -1,0 +1,19 @@
+17th Jan 2013
+   1) fsp150cm-ptp.mib 
+      (i) Added tables:
+            f3PtpBCTable, f3PtpMCITable, f3PtpMasterVirtualPortTable,
+            f3PtpRemoteSlaveTable,
+            f3PtpMCIStatsTable, f3PtpMCIHistoryTable, 
+            f3PtpMCIThresholdTable,
+            f3PtpRemoteSlaveStatsTable, f3PtpRemoteSlaveHistoryTable
+            f3PtpRemoteSlaveThresholdTable
+      (ii) Added notifications: 
+            f3PtpMCICrossingAlert, f3PtpRemoteSlaveCrossingAlert
+
+25th Feb 2013
+   1) fsp150cm-ptp.mib 
+      (i) Split f3PtpRemoteSlaveTable into 2 tables: 
+         f3PtpRemoteStaticSlaveTables and f3PtpRemoteStaticSlaveTables 
+      (ii) Split f3PtpRemoteSlaveIndext into 2 indices:
+         f3PtpRemoteSlaveStatsSlaveType and f3PtpRemoteSlaveStatsSlaveIndex 
+   

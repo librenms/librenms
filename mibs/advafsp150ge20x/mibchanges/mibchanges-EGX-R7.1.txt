@@ -1,0 +1,351 @@
+1. fsp150cm-alarm.mib
+   For CmConditionType, add  ipv6addr-conflict(260), macAddrlearntblFull(261)
+   
+   For CmAlarmEntityType, add eth-fe-36e-card(103), mpflow(104)
+   
+2. fsp150cm-bridge.mib
+   add F3MPFlowStaticFwdEntry with:
+           f3MPFlowStaticFwdMacAddress                 MacAddress,
+           f3MPFlowStaticFwdFP                         VariablePointer,
+           f3MPFlowStaticFwdControlAction              LearningAction,
+           f3MPFlowStaticFwdValid                      TruthValue,
+           f3MPFlowStaticFwdStorageType                StorageType,
+           f3MPFlowStaticFwdRowStatus                  RowStatus  
+           
+   add F3MPFlowFDBEntry with:
+           f3MPFlowFDBMacAddress                 MacAddress,
+           f3MPFlowFDBFP                         VariablePointer,
+           f3MPFlowFDBType                       LearningEntryType,
+           f3MPFlowFDBControlAction              LearningAction       
+           
+   add  F3FwdTSizeProfileEntry  with:
+           f3FwdTSizeProfileIndex                Integer32,        
+           f3FwdTSizeProfileName                 DisplayString,
+           f3FwdTSizeProfileTableSize            Integer32    
+        
+   add  F3MultiGroupRegistrationEntry with:
+           f3MGRMulticastAddress    MacAddress,
+           f3MGRFPList              DisplayString,
+           f3MGRGroupAction         LearningAction,
+           f3MGRGroupType           LearningEntryType,
+           f3MGRGroupValid          TruthValue,
+           f3MGRGroupStorageType    StorageType,
+           f3MGRGroupRowStatus      RowStatus     
+           
+   add F3MGRFPMemberEntry with:
+           f3MGRFPIndex               VariablePointer,
+           f3MGRFPIndexRowStatus      RowStatus   
+           
+   add f3MPFlowStaticFwdGroup, f3MPFlowFDBGroup, f3FwdTSizeProfileGroup, f3MGGroupFPGroup
+
+3. fsp150cm-cfm.mib
+   add CfmSlmEnabledTypes ::= TEXTUAL-CONVENTION with 
+                cos0(0),
+                cos1(1),
+                cos2(2),
+                cos3(3),
+                cos4(4),
+                cos5(5),
+                cos6(6),
+                cos7(7)
+
+   add cfmMepSlmEnabled CfmSlmEnabledTypes; for CfmMepEntry
+   
+   add CfmMepExcludedMepListEntry with 
+          cfmMepExcludedMepListIdentifier        Unsigned32,
+          cfmMepExcludedMepListRowStatus         RowStatus
+      
+   add CfmMepLbrEntry with
+          cfmMepLbrMacAddress        MacAddress,
+          cfmMepLbrMepId             Integer32,
+          cfmMepLbrInOrder           PerfCounter64,
+          cfmMepLbrOutOfOder         PerfCounter64
+
+4. fsp150cm-common.mib    
+   add F3DisplayString ::= TEXTUAL-CONVENTION                          
+           SYNTAX       OCTET STRING (SIZE (0..2047))    
+ 
+5. fsp150cm-entity.mib
+   add CardType:
+                  eth-fe-36e(40)
+   
+   add EthernetFE36ECardEntry with:
+          ethernetFE36ECardEntityIndex             PhysicalIndex,
+          ethernetFE36ECardAdminState              AdminState,
+          ethernetFE36ECardOperationalState        OperationalState,
+          ethernetFE36ECardSecondaryState          SecondaryState,
+          ethernetFE36ECardTemperature             Integer32,
+          ethernetFE36ECardRestartAction           RestartType,
+          ethernetFE36ECardStorageType             StorageType,
+          ethernetFE36ECardRowStatus               RowStatus,
+          ethernetFE36ECardForceOffLineAction      TruthValue
+    
+   add neCardGroup.
+
+6. fsp150cm-erp.mib
+   add F3ErpGroupEntry with:
+          f3ErpGroupInterconnectionErp              VariablePointer,
+          f3ErpGroupInterconnectPropagateTc         TruthValue,
+          f3ErpGroupRapsVirtualChannelMep           VariablePointer,
+          f3ErpGroupMaxFpNum                        Integer32
+    
+   modify f3ErpGroupCompatibleVersion as read-write
+
+7. fsp150cm-facility.mib
+   add TEXTUAL-CONVENTION:
+              LearningAction,
+              SfpChannelIdentifier,
+              NeBandwidthProfileMode,
+              LearningConfigAction,
+              TrafficPortDeleteEntitiesAction
+   
+   modify TEXTUAL-CONVENTION CmEthernetDiagAction 's item all 's description
+   
+   add cmEthernetTrafficPortEntry with:
+                                 cmEthernetTrafficPortLaserWDMChannel                 SfpChannelIdentifier,
+                                 cmEthernetTrafficPortLaserIsTunable                  TruthValue,
+                                 cmEthernetTrafficPortLaserFrequency                  Unsigned32,
+                                 cmEthernetTrafficPortDeiEnable                       TruthValue,
+                                 cmEthernetTrafficPortPcpDEEncType                    PcpDEEncType,
+                                 cmEthernetTrafficPortPcpDEPairsAction                PcpDEPairsAction,
+                                 cmEthernetTrafficPortInitiateDiag                    CmEthernetDiagAction,
+                                 cmEthernetTrafficPortDiagnosePair1Cond               CmDiagCableCondType,
+                                 cmEthernetTrafficPortDiagnosePair2Cond               CmDiagCableCondType,
+                                 cmEthernetTrafficPortDiagnosePair3Cond               CmDiagCableCondType,
+                                 cmEthernetTrafficPortDiagnosePair4Cond               CmDiagCableCondType,
+                                 cmEthernetTrafficPortDiagnoseAutoNegCond             CmDiagAutoNegCondType,
+                                 cmEthernetTrafficPortDiagnoseLpbkCond                CmDiagLpbkCondType,
+                                 cmEthernetTrafficPortDiagnoseEfmLpbkCond             CmDiagEfmOamLpbkCondType,
+                                 cmEthernetTrafficPortDiagnoseResult                  DisplayString,
+                                 cmEthernetTrafficPortDiagnoseTestStatus              CmDiagTestStatus,
+                                 cmEthernetTrafficPortDiagnoseTestTime                DateAndTime,
+                                 cmEthernetTrafficPortAutoDiagEnabled                 TruthValue,
+                                 cmEthernetTrafficPortDeleteEntitiesAction            TrafficPortDeleteEntitiesAction,
+                                 cmEthernetTrafficPortMaxMpFpNum                      Integer 
+              
+   add CmFlowPointEntry with:                                                               
+                                 cmFlowPointDefaultMemberEnabled            TruthValue,     
+                                 cmFlowPointMcastRateLimitEnabled           TruthValue,     
+                                 cmFlowPointMcastRateLimitSpeedLo           Unsigned32,     
+                                 cmFlowPointMcastRateLimitSpeedHi           Unsigned32,     
+                                 cmFlowPointBcastRateLimitEnabled           TruthValue,     
+                                 cmFlowPointBcastRateLimitSpeedLo           Unsigned32,     
+                                 cmFlowPointBcastRateLimitSpeedHi           Unsigned32,     
+                                 cmFlowPointSplitHorizonGroupOID            VariablePointer,
+                                 cmFlowPointLoopAvoidance                   VariablePointer,
+                                 cmFlowPointHierarchicalCosEnabled          TruthValue,     
+                                 cmFlowPointWfqQid                          Integer32,      
+                                 cmFlowPointWfqOutPriority                  Integer32,      
+                                 cmFlowPointMaximumBWLo                     Unsigned32,     
+                                 cmFlowPointMaximumBWHi                     Unsigned32,     
+                                 cmFlowPointGuaranteedBWLo                  Unsigned32,     
+                                 cmFlowPointGuaranteedBWHi                  Unsigned32    
+                                 
+   modify cmFlowPointSESFramesLossThresholdRatio  range from (1-100) to (0-100)
+   
+   modify cmTrafficAclFilterAction as read-write and support deny and permit
+   
+   add CmQosPolicerV2Entry with cmQosPolicerV2PolicingEnabled
+   
+   add CmQosShaperV2Entry with cmQosShaperV2WFQWeight
+   
+   modify cmQosShaperV2CIRLo,  cmQosShaperV2CIRHi, cmQosShaperV2EIRLo, cmQosShaperV2EIRHi as read-write
+   
+   add CmMPFlowEntry with: 
+                         cmMPFlowIndex                      Integer32,
+                         cmMPFlowCircuitName                F3DisplayString,
+                         cmMPFlowAdminState                 AdminState,
+                         cmMPFlowOperationalState           OperationalState,
+                         cmMPFlowSecondaryState             SecondaryState,
+                         cmMPFlowLearningEnabled            TruthValue,
+                         cmMPFlowAgingTimer                 Integer32,
+                         cmMPFlowFwdTableSizeProfileID      VariablePointer,
+                         cmMPFlowtableFullAction            LearningAction,
+                         cmMPFlowStorageType                StorageType,
+                         cmMPFlowRowStatus                  RowStatus,
+                         cmMPFlowLearningConfigAction       LearningConfigAction,
+                         cmMPFlowFPList                     F3DisplayString
+   
+   add CmMPFlowMemberEntry with:                                                     
+                         cmMPFlowMemberFPIndex            VariablePointer, 
+                         cmMPFlowPointRowStatus           RowStatus        
+   
+   add  CmEthernetTrafficPortPcpDEEncEntry with:                                                               
+                         cmEthernetTrafficPortPcpDEEncIndex              Integer32,   
+                         cmEthernetTrafficPortPcpDEEncInPriority         VlanPriority,
+                         cmEthernetTrafficPortPcpDEEncDropIneligiblePrio VlanPriority,
+                         cmEthernetTrafficPortPcpDEEncDropEligiblePrio   VlanPriority      
+                         
+   add CmEthernetTrafficPortPcpDEDecEntry with:                                                           
+                        cmEthernetTrafficPortPcpDEDecIndex        Integer32,   
+                        cmEthernetTrafficPortPcpDEDecInPriority   VlanPriority,
+                        cmEthernetTrafficPortPcpDEDecOutPriority  VlanPriority,
+                        cmEthernetTrafficPortPcpDEDecDropEligible TruthValue  
+   
+   add CmEthernetTrafficPortPcpDEPairEntry with:                                                              
+                        cmEthernetTrafficPortPcpDEPairIndex          Integer32,   
+                        cmEthernetTrafficPortPcpDEDropIneligiblePrio VlanPriority,
+                        cmEthernetTrafficPortPcpDEDropEligiblePrio   VlanPriority
+   
+   add CmEthernetTrafficPortClbEntry with:                                                         
+                        cmEthernetTrafficPortClbIndex          Integer32,    
+                        cmEthernetTrafficPortClbEnabled        TruthValue,   
+                        cmEthernetTrafficPortClbLength         DisplayString,
+                        cmEthernetTrafficPortClbDescr          DisplayString        
+                        
+    add  NetworkElementTMParamsEntry  with:                                                                     
+                        neTMParamsBandwidthProfileMode            NeBandwidthProfileMode,
+                        neTMParamsAgingtime                       Integer32              
+      
+   add cmMPFlowGroup, cmMPFlowMemberGroup, cmEthernetTrafficPortPcpGroup, neTMParamsGroup, cmEthernetTrafficPortGroup, cmFlowPointGroup
+ 
+8. fsp150cm-ip.mib
+   add Ipv6OverIpv4TunnelType ::= TEXTUAL-CONVENTION
+       IpMode ::= TEXTUAL-CONVENTION
+   
+   add cmIpSystemScalars with:
+               cmIpv6PingInterface
+               cmIpv6PingDestination
+               cmIpv6InitiatePingAction
+               cmIpv6TraceRouteDestination
+               cmIpv6InitiateTraceRouteAction
+               cmIpv6ProxyNDPEnabled
+               cmIpv6FwdEnabled
+               cmIpFlushNDPCacheAction
+   
+   add CmIpInterfaceEntry with:
+               cmIpInterfaceIpMode                IpMode
+    
+   add  IpManagementTunnelEntry with:
+               ipManagementTunnelDHCPv6Enabled                   TruthValue,
+               ipManagementTunnelIpv6Address                     Ipv6Address,
+               ipManagementTunnelIpv6AddrPrefixLen               Integer32,
+               ipManagementTunnelIpv6StateAddrAutoConfigEnabled  TruthValue,
+               ipManagementTunnellinkLocIpv6Addr                 Ipv6Address,
+               ipManagementTunnellinkLocIpv6AddrPrefixLen        Integer32,
+               ipManagementTunnelIpv6PrefixAdvertiseEnabled      TruthValue,
+               ipManagementTunnelIpv6Prefix                      Ipv6Address,
+               ipManagementTunnelIpv6PrefixLen                   Integer32,
+               ipManagementTunnelIpMode                          IpMode,
+               ipManagementTunnelIpv6RipngEnabled                TruthValue
+     
+   add CmIpv6InterfaceEntry with:
+               cmIpv6InterfaceMTU                 Integer32,
+               cmIpv6UnicastAddr                  Ipv6Address,
+               cmIpv6UnicastAddrPrefixLen         Integer32,
+               cmIpv6PrefixAdvertiseEnabled       TruthValue,
+               cmIpv6RAPrefix                     Ipv6Address,
+               cmIpv6RAPrefixLength               Integer32,
+               cmIpv6StateAddrAutoConfigEnabled   TruthValue,
+               cmIpv6DhcpEnabled                  TruthValue,
+               cmIpv6DhcpRole                     CmDhcpRole,
+               cmIpv6RIPngEnabled                 TruthValue,
+               cmIpv6LinkLocAddr                  Ipv6Address,
+               cmIpv6LinkLocAddrPrefixLen         Integer32      
+               
+    add CmIpv6StaticRouteEntry with:                                                   
+               cmIpv6StaticRouteDest        Ipv6Address,  
+               cmIpv6StaticRoutePrefixLen   Integer32,    
+               cmIpv6StaticRouteNextHop     Ipv6Address,  
+               cmIpv6StaticRouteMetric      Integer32,    
+               cmIpv6StaticRouteRowStatus   RowStatus,    
+               cmIpv6StaticRouteInterface   DisplayString,
+               cmIpv6StaticRouteAdvertise   TruthValue
+    add  CmNDPEntry  with:                                      
+               cmNDPIpv6Address    Ipv6Address,  
+               cmNDPMacAddress     MacAddress,   
+               cmNDPInterface      DisplayString,
+               cmNDPStorageType    StorageType,  
+               cmNDPRowStatus      RowStatus,    
+               cmNDPEntryType      IpEntryType   
+    
+    add    CmProxyNDPEntry with:                                          
+               cmProxyNDPIpv6Address   Ipv6Address,  
+               cmProxyNDPIpv6PrefixLen    Integer32, 
+               cmProxyNDPInterface     DisplayString,
+               cmProxyNDPStorageType   StorageType,  
+               cmProxyNDPRowStatus     RowStatus     
+               
+    add    CmIpv6OverIpv4TunnelEntry with:                                                                         
+                cmIpv6OverIpv4TunnelIndex                     Integer32,             
+                cmIpv6OverIpv4TunnelName                      DisplayString,         
+                cmIpv6OverIpv4TunnelType                      Ipv6OverIpv4TunnelType,
+                cmIpv6OverIpv4TunnelDestIpv4Addr              IpAddress,             
+                cmIpv6OverIpv4TunnelIpv6UnicastAddress        Ipv6Address,           
+                cmIpv6OverIpv4TunnelIpv6UnicastAddrPrefixLen  Integer32,             
+                cmIpv6OverIpv4TunnelLinkLocalAddress          Ipv6Address,           
+                cmIpv60verIpv4TunnelLinkLocalAddrPrefixLen    Integer32,             
+                cmIpv6OverIpv4TunnelAssociatedIpv4Interface   VariablePointer,       
+                cmIpv6OverIpv4TunnelStorageType               StorageType,           
+                cmIpv6OverIpv4TunnelRowStatus                 RowStatus,             
+                cmIpv6OverIpv4PotentialRouterList             DisplayString          
+     
+     add  ipGroup with new added items
+
+9. fsp150cm-perf.mib
+    add   CmFlowPointStatsEntry with:                                                        
+               cmFlowPointStatsFMYD                  PerfCounter64,
+               cmFlowPointStatsFMGD                  PerfCounter64,
+               cmFlowPointStatsFD                    PerfCounter64,
+               cmFlowPointStatsFMCD                  PerfCounter64,
+               cmFlowPointStatsFBCD                  PerfCounter64   
+    
+    add  CmFlowPointHistoryEntry  with:                                                        
+               cmFlowPointHistoryFMYD                PerfCounter64,
+               cmFlowPointHistoryFMGD                PerfCounter64,
+               cmFlowPointHistoryFD                  PerfCounter64,
+               cmFlowPointHistoryFMCD                PerfCounter64,
+               cmFlowPointHistoryFBCD                PerfCounter64 
+    
+    add flowPointPmGroup.         
+
+10. fsp150cm-sa.mib  
+    add EsaProbeProtocol with: 
+                         y1731-slm-dmm(6)
+
+    add  EsaProbeCOSConfigEntry with:                                                         
+                         esaProbeCOSConfigslmInterval EsaProbePktIntervalType,
+                         esaProbeCOSConfigslmPktSize  Integer32               
+
+11. fsp150cm-sec.mib                
+    add cmSecurityObjects with:   
+                         f3NasIpv6Addr
+    
+    add CmRemoteAuthServerEntry with:                                                   
+                         cmRemoteAuthServerIpVersion          IpVersion,
+                         cmRemoteAuthServerIpv6Addr           Ipv6Address
+    add them into group
+
+12. fsp150cm-shg.mib
+    add F3ShgMemberFlowPointEntry with: 
+                         f3ShgMemberFlowPoint                   VariablePointer
+    add f3ShgMemberFlowPointGroup
+
+13. fsp150cm-system.mib
+    add   snmpIPv6UDPDomain            OBJECT IDENTIFIER ::= {cmSystemObjects 18}
+    
+    add   FileTransferServerType ::= TEXTUAL-CONVENTION 
+    
+    add ACLEntry with:                                                
+                    aclEntryIpVersion               IpVersion,  
+                    aclEntryNetworkIpv6Addr         Ipv6Address,
+                    aclEntryPrefixLength            Integer32   
+    
+    add cmFileServicesObjects with: fileServicesServerType, fileServicesServerIpv6Addr
+    
+    add  SysLogServerEntry with:                                      
+                    sysLogIpVersion     IpVersion,
+                    sysLogIpv6Addr      Ipv6Address
+    
+    add cmTimeObjects with:   
+                    ntpPrimaryServerIpVersion,
+                    ntpPrimaryServerIpv6Addr
+                    ntpBackupServerIpVersion
+                    ntpBackupServerIpv6Addr
+                    
+    add them into cmSystemObjectGroupCmHub.
+
+14 add   standard mib file: IPV6-MIB.mib
+    
+    
+                

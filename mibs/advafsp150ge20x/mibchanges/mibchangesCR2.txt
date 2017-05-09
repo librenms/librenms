@@ -1,0 +1,160 @@
+October 12th
+------------
+  1)Added fsp150cm-lag.mib from R5.1CM-AGG branch
+  2)fsp150cm-facility.mib :
+      -Added cmFlowN2AOuterTagPrioEnabled, cmEthernetNetPortPrioMapMode
+      -Added cmNetPortPrioMapTable
+      -
+  3)fsp150cm-ip.mib :
+      -Added cmIpInterfaceDHCPCLientIdEnabled, cmIpInterfaceDHCPClientId
+      -Added ipManagementTunnelDHCPClientIdEnabled, 
+             ipManagementTunnelDHCPClientId
+
+  4)fsp150cm-system.mib :
+      -Added ntpPollingInterval
+
+October 14th
+------------
+  1)fsp150cm-facility.mib :
+      FlowTagControl Textual Convention now has option pop(5)
+  2)fsp150cm-system.mib :
+    (i)Added the following literal to CmFileServicesMode 
+             securitylogfileupload,
+             alarmlogfileupload,   
+             auditlogfileupload,
+   (ii)Added the following literals to fileServicesAction
+             put-securitylog-file,
+             put-alarmlog-file,
+             put-auditlog-file
+
+October 24th
+------------
+  1)fsp150cm-facility.mib :
+     (i)New textual conventions PcpDEEncType, PcpDEPairsAction
+    (ii)New objects cmEthernetAccPortTxDeiEnable, 
+                    cmEthernetAccPortPcpDEEncType, 
+                    cmEthernetAccPortPcpDEPairsAction
+   (iii)New objects cmEthernetNetPortTxDeiEnable, 
+                    cmEthernetNetPortPcpDEEncType, 
+                    cmEthernetNetPortPcpDEPairsAction
+   (iv)New tables cmAccPortPcpDEEncTable, cmAccPortPcpDEDecTable,
+                  cmAccPortPcpDEPairTable
+   (v)New tables cmNetPortPcpDEEncTable, cmNetPortPcpDEDecTable,
+                  cmNetPortPcpDEPairTable
+
+  2)fsp150cm-ip.mib :
+     (i)New scalar cmIpManagementTrafficBridgingEnabled
+
+
+
+November 3rd
+------------
+  1)fsp150cm-lag.mib :
+    (a)AggMode TC changed
+           -Updated DESCRIPTION
+           -Enumeration literals are now 
+               -active-standby(1) instead of activebackup(1) - Aligns with Information Model
+               -loadsharing(2) instead of loadshaing (2) - TYPO
+    (b)AggPortStatus TC name changed to AggPortState
+           -Aligns with the Information Model
+    (c)Updated DESCRIPTION of f3LagPortTable - current description mentions security users which
+             is totally incorrect
+    (d)f3LagDescription - removed from MIB (currently it is commented out)
+    (e)Added f3LagIfIndex column to f3LagEntry - this gives the ifIndex of the MIB
+            -In F3, each of our vendor specific tables that have interface index (i.e. port tables)
+             have this back pointer to the ifIndex : Please add it to the MIB 
+    (f)f3LagLacpProtocols renamed to f3LagProtocols - Aligns with Information Model attribute
+            -Behavior is not only limited to LACP, i.e. also includes LAMP
+    (g)Updated DESCRIPTION of f3LagProtocols, f3LagLacpControl, f3LagMode
+    (h)Updated DESCRIPTION of f3LagStatsTable - current description mentions security users which
+             is totally incorrect
+    (i)Updated DESCRIPTION of f3LagStatsEntry - Same as (f)
+    (j)Changed type of f3LagStatsIndex from InterfaceIndex to Integer32
+             -There is no entry in the ifTable for f3LagStatsIndex; infact the only value of this
+              index is 1
+    (k)Updated DESCRIPTION of f3LagStatsIndex
+    (l)Renamed f3LagOctetsTxOK, f3LagOctetsRxOK...f3LagUnknownProtocolFrames to
+           have f3LagStats prefix instead of f3Lag - consistency with F3 tables
+    (m)Updated DESCRIPTION of f3LagPortTable
+    (n)f3LagPortIndex should not be of  type InterfaceIndex
+    (o)Renamed f3LagPortLacpControl to f3LagPortLacpForceOutofSync - Aligns with Information Model 
+    (p)Renamed f3LagPortStatus to f3LagPortState - Aligns with Information Model
+
+  2)fsp150cm-ip.mib :
+    (a)cmIpManagementTrafficBridgingEnabled is now a cmIpSystemScalar 
+            instead of cmIpSourceAddrScalar
+
+  3)fsp150cm-alarm.mib :
+    (a)Added objects cmSysAlmAdditionalInfoObject,  cmSysAlmAdditionalInfoName,
+                     cmSysCondAdditionalInfoObject,  cmSysCondAdditionalInfoName
+    (b)Added objects cmNetworkElementAlmAdditionalInfoObject,  
+                     cmNetworkElementAlmAdditionalInfoName,
+                     cmNetworkElementCondAdditionalInfoObject,  
+                     cmNetworkElementCondAdditionalInfoName
+
+November 30th
+-------------
+  1)fsp150cm-alarm.mib :
+      (a)Added CmAlarmEntityType TC literal for lag(28) (CM10492)
+      (b)Added CmConditionType TC literal for dbdowngrade(105) (CM10939)
+
+  2)SNMP-COMMUNITY.mib updated to more recent version RFC3584 (CM6432)
+
+  3)SNMPv2-MIB.mib updated to more recent version RFC3418 (CM6432)
+
+  4)fsp150cm-sa.mib : 
+      (i)esaProbePktSize : range includes value of 0 (CM4026)
+               
+
+December 8th
+------------
+  1)fsp150cm-ip.mib :
+       (a)Added new scalar cmIpManagementTrafficBridgingSecurityEnabled
+
+December 14th
+-------------
+  1)fsp150cm-lag.mib :
+       (i)Added new objects f3LagCcmDefectDetectionEnabled,
+                f3LagStatsAction, f3LagPortStatsAction
+       (ii)Updated description of f3LagRowStatus, f3LagPortRowStatus(CM11219)
+  2)fsp150cm-cfm.mib :
+       (i)Added new object cfmMepStatsAction
+
+December 16th
+-------------
+  1)fsp150cm-cfm.mib :
+       (i)Updated description of cfmAccPortQosShaperIndex
+
+January 5th
+------------
+  1)fsp150cm-sync.mib : (CM11046)
+       (i)Added not-applicable to SyncRefStatus and SyncRefState
+  2)fsp150cm-sec.mib : (CM7871)
+       (i)Added f3UsmUserTable as an AUGMENT of usmUserTable
+
+January 25th
+------------
+  1)fsp150cm-facility.mib :
+       (i)Added enc-custom to PcpDEEncType
+  2)fsp150cm-perf.mib :
+       (i)FMYD is now deprecated from Flow and Policer PM
+       (ii)ESUP description indicates Undersize Packets
+       (iii)Added the following MIB objects,  (CM12308)
+             cmQosShaperStatsBREDD, cmQosShaperStatsFREDD,
+             cmQosShaperHistoryBREDD, cmQosShaperHistoryFREDD,
+             cmAccPortQosShaperStatsBREDD, cmAccPortQosShaperStatsFREDD,
+             cmAccPortQosShaperHistoryBREDD, cmAccPortQosShaperHistoryFREDD,
+
+January 31st
+------------
+  1)fsp150cm-entity.mib :
+       (i)Added lag to SlotType Textual Convention 
+  2)fsp150cm-prot.mib :
+       (i)Added 0 as a range to cmFacProtGroupWaitToRestore 
+  3)fsp150cm-facility.mib :
+       (i)Added lag as SlotType
+
+Feb. 10th
+---------
+  1)fsp150cm-facility.mib :
+       (i)Added object bitsPortLineBuildOut (CM9358)

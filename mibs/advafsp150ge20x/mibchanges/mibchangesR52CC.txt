@@ -1,0 +1,79 @@
+April 8th
+---------
+  1)fsp150cm-ptp.mib : New 1588 PTP MIB 
+  2)fsp150cm-system.mib : Added f3SystemFeatureTable
+
+
+April 14th
+----------
+  1)fsp150cm-sec.mib : Added object cmSecurityUserAction
+
+May 6th
+-------
+  1)fsp150cm-ptp.mib :
+      (i)f3PtpAccPortFlowPointService and f3PtpNetPortFlowPointService are
+                    read-create instead of read-only
+      (ii)Threshold Crossing Notifications are now defined
+                f3PtpAccPortFlowPointThresholdCrossingAlert,
+                f3PtpNetPortFlowPointThresholdCrossingAlert,
+                f3PtpSOOCCrossingAlert
+
+May 20th
+--------
+  1)Removed fsp150cm-ptp.mib from distribution
+  2)Undid the changes for fsp150cm-system.mib for f3SystemFeatureTable
+  3)Added the following condition types to fsp150cm-alarm.mib
+         gen-filexfer-ip(107),       -- generic file transfer in progress
+         gen-filexfer-fail(108),     -- generic file transfer failed 
+         gen-filexfer-pass(109),     -- generic file transfer pass 
+         gen-oper-ip(110),           -- generic operation in progress
+         gen-oper-fail(111),         -- generic operation fail
+         gen-oper-pass(112)          -- generic operation pass
+
+May 26th
+--------
+   1)ADVA-MIB : formalized the compliance groups
+   2)fsp150cm-sa.mib : formalized the compliance groups
+   3)fsp150cm-cfm.mib : formalized the compliance groups
+   4)fsp150cm-cap.mib : Agent capabilities MIB definition
+
+June 7th
+--------
+   1)fsp150cm-sa.mib : 
+           (i)Added not-applicable(0) to EcpaControlAction 
+          (ii)Added not-applicable(0) to EsaAction 
+   2)fsp150cm-facility.mib:
+           (i)Added not-applicable(0) to CmEthernetDiagAction
+   3)fsp150cm-ip.mib:
+           (i)Added not-applicable(0) to IpActionType
+   4)fsp150cm-cap.mib:
+           (i)Fixes to address SimpleTester issues
+
+June 15th
+---------
+   1)Added f3DatabaseSyncTrapObject and f3DatabaseSyncTrap for
+           NMS database sync facility in the case of bulk changes
+
+June 27th
+---------
+   1)Added 
+      f3TacacsPrivLevelControlEnabled, 
+      f3TacacsDefaultPrivLevel to fsp150cm-sec.mib
+
+June 30th
+---------
+   1)Added not-applicable(0) to SSMQualityLevel (CM15504)
+
+
+July 8th
+--------
+   1)Added ethernetNTEGE206CardFineGrainedPmInterval, 
+           ethernetNTEGE201SyncECardFineGrainedPmInterval,
+           ethernetNTEGE201CardFineGrainedPmInterval,
+           ethernetNTEGE206FCardFineGrainedPmInterval to fsp150cm-entity.mib
+   2)Updated fsp150cm-cap.mib with capabilities of
+           ethernetNTEGE206CardFineGrainedPmInterval,
+           ethernetNTEGE201SyncECardFineGrainedPmInterval,
+           ethernetNTEGE201CardFineGrainedPmInterval,
+           ethernetNTEGE206FCardFineGrainedPmInterval
+   3)Moved CmPmIntervalType from fsp150cm-perf.mib to fsp150cm-common.mib

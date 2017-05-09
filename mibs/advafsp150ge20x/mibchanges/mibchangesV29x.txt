@@ -1,0 +1,108 @@
+1. fsp150cm-ptp.mib
+   For ClockRecoveryState add  
+               holdoverOutOfSpec(8),
+               holdoverInSpec(9)
+               
+   For PhaseRecoveryState add  
+               holdoverOutOfSpec(8),
+               holdoverInSpec(9)
+               
+   For PTPClockType add  
+               boundaryClock(4)
+
+   For f3PtpPTPClockEntry add
+    f3PtpPTPClockCurrentOffsetFromMaster            PerfCounter64,
+    f3PtpPTPClockRecentMeanPathDelay                PerfCounter64,
+    f3PtpPTPClockRecentSyncPDV                      PerfCounter64,
+    f3PtpPTPClockClockClass                         Unsigned32
+
+   For f3PtpTrafficPortFlowPointStatsEntry add:
+       f3PtpTrafficPortFlowPointStatsTagNoMatchDiscards     PerfCounter64
+
+   For f3PtpTrafficPortFlowPointHistoryEntry , add:
+       f3PtpTrafficPortFlowPointHistoryTagNoMatchDiscards     PerfCounter64
+
+   For f3PtpPTPPortStatsEntry add:
+       f3PtpPTPPortStatsMsgMiscDiscards              PerfCounter64
+
+   For f3PtpPTPPortHistoryEntry add:
+    f3PtpPTPPortHistoryMsgMiscDiscards              PerfCounter64
+
+   add F3PtpPTPClockStatsEntry with:
+       f3PtpPTPClockStatsIndex                        Integer32,
+       f3PtpPTPClockStatsIntervalType                 CmPmIntervalType,
+       f3PtpPTPClockStatsValid                        TruthValue,
+       f3PtpPTPClockStatsAction                       CmPmBinAction,
+       f3PtpPTPClockStatsMinOffsetFromMaster          ScaledNanoseconds,
+       f3PtpPTPClockStatsMaxOffsetFromMaster          ScaledNanoseconds,
+       f3PtpPTPClockStatsAvgOffsetFromMaster          ScaledNanoseconds,
+       f3PtpPTPClockStatsMinSyncPathDelay             ScaledNanoseconds,
+       f3PtpPTPClockStatsMaxSyncPathDelay             ScaledNanoseconds,
+       f3PtpPTPClockStatsAvgSyncPathDelay             ScaledNanoseconds,
+       f3PtpPTPClockStatsMinMeanPathDelay             ScaledNanoseconds,
+       f3PtpPTPClockStatsMaxMeanPathDelay             ScaledNanoseconds,
+       f3PtpPTPClockStatsAvgMeanPathDelay             ScaledNanoseconds
+    
+    add F3PtpPTPClockHistoryEntry with:
+        f3PtpPTPClockHistoryIndex                        Integer32,
+        f3PtpPTPClockHistoryTime                         DateAndTime,
+        f3PtpPTPClockHistoryValid                        TruthValue,
+        f3PtpPTPClockHistoryAction                       CmPmBinAction,
+        f3PtpPTPClockHistoryMinOffsetFromMaster          ScaledNanoseconds,
+        f3PtpPTPClockHistoryMaxOffsetFromMaster          ScaledNanoseconds,
+        f3PtpPTPClockHistoryAvgOffsetFromMaster          ScaledNanoseconds,
+        f3PtpPTPClockHistoryMinSyncPathDelay             ScaledNanoseconds,
+        f3PtpPTPClockHistoryMaxSyncPathDelay             ScaledNanoseconds,
+        f3PtpPTPClockHistoryAvgSyncPathDelay             ScaledNanoseconds,
+        f3PtpPTPClockHistoryMinMeanPathDelay             ScaledNanoseconds,
+        f3PtpPTPClockHistoryMaxMeanPathDelay             ScaledNanoseconds,
+        f3PtpPTPClockHistoryAvgMeanPathDelay             ScaledNanoseconds
+    add F3PtpPTPClockThresholdEntry with:
+        f3PtpPTPClockThresholdIndex       Integer32,
+        f3PtpPTPClockThresholdInterval    CmPmIntervalType,
+        f3PtpPTPClockThresholdVariable    VariablePointer,
+        f3PtpPTPClockThresholdValueLo     Unsigned32,
+        f3PtpPTPClockThresholdValueHi     Unsigned32,
+        f3PtpPTPClockThresholdMonValue    PerfCounter64
+
+   
+2. fsp150cm-sa.mib
+   add EsaAction  with:
+                           addEsaProbe(3),  
+                           removeEsaProbe(4)
+   add EsaProbeScheduleGroupEntry  with:        
+       esaProbeScheduleGroupActionProbeList          
+    
+3. fsp150cm-perf.mib
+    add cmPerQueryGenTrap
+    add cmPerQueryGenControl
+                          
+    
+4. fsp150cm-ip.mib           
+    
+    add cmIpSystemScalars with:
+        cmIpManagementTrafficDscpEnabled 
+        cmIpManagementTrafficDscp 
+        
+   
+6. fsp150cm-facility.mib
+   add PPSPhyInterfaceType with:
+               none(0),
+               pps(1),
+               tod(2)
+   add cmQosShaperV2Entry with:
+       cmQosShaperV2LowLatencyControl  TruthValue
+
+   add f3PulsePerSecondPortEntry with:
+       f3PulsePerSecondPortPhyInterfaceType       
+   
+7. fsp150cm-common.mib
+   add CmTrafficACLPriorityType with notApplicable(0)
+   
+   add CmTrafficAclProtocolType with notApplicable(0)
+   
+   add TDMFrequencySourceType with notApplicable(0) 
+   
+   
+8. fsp150cm-cfm.mib
+   add cfmMepEntry  with cfmMepAssociatedObject 

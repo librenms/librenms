@@ -1,0 +1,204 @@
+26th January 2016
+-----------------
+a) fsm150cm-connectguard.mib
+   (i) add f3ConnectGuardFlowAlias to f3ConnectGuardFlowTable
+20th January 2016
+-----------------
+a) fsp150cm-facility.mib
+   (i) add f3GPSReceiverPortGnssSystemsBitMap to f3GPSReceiverPortTable (not used in 8.1) 
+        -- align with ge11x
+   (ii) add f3GPSReceiverPortAlias to f3GPSReceiverPortTable
+
+b) fsp150cm-ptp.mib
+   (i) remove f3PtpPTPPortPTPPortType
+
+15th January 2016
+-----------------
+a) fspcm-system.mib
+   (i) add f3SnmpLongIfAlias scalar variable
+4th January 2016
+----------------
+1) fspcm-connectguard.mib
+   (i) add f3ConnectGuardFlowAssociatedMep to f3ConnectGuardFlowTable
+
+18th December 2015
+------------------
+ 1) fspcm-ptp.mib
+    (i) add f3PtpDynamicRemoteSlavePortIdentity and f3PtpDynamicRemoteSlavePeerMacAddress
+    (ii) remove f3PtpMediationL2DynamicRemoteSlaveTable
+
+29th July 2015
+-------------
+
+    1) fsp150cm-common.mib
+
+       (i) Added new SecondaryState literals:
+            - cema,
+            - lkdo.
+
+6th August 2015
+---------------
+
+    1) fsp150cm-fpm.mib
+
+       (i) Added new tables:
+            - f3NetFlowPointTable,
+            - f3NetFpQosShaperTable,
+            - f3NetFpQosPolicerTable,
+            - f3NetFlowPointCpdV2Table,
+            - f3NetFlowPointLearningConfigTable.
+
+11th August 2015
+----------------
+
+    (i) Added new textual convention EthernetPortTrafficModel
+    (ii) Added new columns cmEthernetAccPortIngressCOSPriority,
+    cmEthernetAccPortDefaultCOS, cmEthernetAccPortTrafficModel,
+    cmEthernetNetPortIngressCOSPriority, cmEthernetNetPortDefaultCOS,
+    cmEthernetNetPortTrafficModel
+
+7th September 2015
+------------------
+
+    1) fsp150cm-system.mib
+
+       (i) Added new notifications:
+            - f3BulkStateChangeTrap,
+            - f3BulkDbChangeTrap.
+
+18th September 2015
+------------------
+
+    1) fsp150cm-bridge.mib
+       (i) Changed MAX-ACCESS for f3MPFlowStaticFwdControlAction from
+       read-only to read-create.
+
+23rd September 2015
+------------------
+
+    1) fsp150cm-ip.mib
+
+       (i) Added new cmIpSystemScalars:
+            - cmIpManagementTrafficDscpEnabled,
+            - cmIpManagementTrafficDscp.
+
+24th September 2015
+-------------------
+
+    1) fsp150cm-fpm.mib
+       (i) Added tables:
+           - f3AccFlowPointStatsTable,
+           - f3NetFlowPointStatsTable,
+           - f3AccFlowPointHistoryTable,
+           - f3NetFlowPointHistoryTable.
+
+25th September 2015
+-------------------
+
+    1) fsp150cm-fpm.mib
+       (i) Added tables:
+           - f3AccFlowPointThresholdTable,
+           - f3NetFlowPointThresholdTable.
+
+29th September 2015
+-------------------
+
+    1) fsp150cm-fpm.mib
+       (i) Added tables:
+           - f3MPFlowStatsTable,
+           - f3MPFlowHistoryTable,
+           - f3MPFlowThresholdTable.
+
+29th September 2015
+-------------------
+
+    1) fsp150cm-system.mib
+       (i) Added new column to f3SnmpTargetAddrExtTable:
+            - f3SnmpTargetAddrExtBulkTrapsEnabled.
+
+1st October 2015
+----------------
+
+    1) fsp150cm-fpm.mib
+       (i) Added tables:
+           - f3AccFpQosShaperStatsTable,
+           - f3NetFpQosShaperStatsTable,
+           - f3AccFpQosShaperHistoryTable,
+           - f3NetFpQosShaperHistoryTable,
+           - f3AccFpQosShaperThresholdTable,
+           - f3NetFpQosShaperThresholdTable,
+           - f3AccFpQosPolicerStatsTable,
+           - f3NetFpQosPolicerStatsTable,
+           - f3AccFpQosPolicerHistoryTable,
+           - f3NetFpQosPolicerHistoryTable,
+           - f3AccFpQosPolicerThresholdTable,
+           - f3NetFpQosPolicerThresholdTable.
+           
+6th October 2015
+----------------
+
+    1) fsp150cm-erp.mib
+       (i) Added new objects to f3ErpGroup:
+           - f3ErpGroupRapsInterconnectionNode, 
+           - f3ErpGroupRapsMultipleFailure
+
+28th October 2015
+-----------------
+
+    1) fsp150cm-erp.mib
+       (i) Added new object to f3ErpUnit:
+           - f3ErpUnitPortRapsFp
+
+13th November 2015
+------------------
+
+    1) fsp150cm-system.mib
+       (i) Added new notification type:
+           - f3BulkTrap
+       (ii) Added new objects to f3NotifObjects:
+           - f3StartNeEventLogIndex
+           - f3EndNeEventLogIndex
+
+
+16th November 2015
+------------------
+
+   1) fsp150cm-ptp.mib
+         (i) added f3PtpMCIPtpRemoteSlaveAgingTimeout to f3PtpMCITable
+
+
+29th October 2015
+-----------------
+
+1) fsp150cm-ptp.mib
+        (i) added f3PtpMediationL2DynamicRemoteSlaveTable
+
+
+25th November 2015
+------------------
+
+    1) fsp150cm-system.mib
+       (i) Added new objects:
+           - f3BulkNotifObjects
+           - f3SystemBulkNotifications
+ 
+09th December 2015
+------------------
+
+1) fsp150cm-ptp.mib
+   (i)   add holdoverOutOfSpec, holdoverInSpec to ClockRecoveryState and PhaseRecoveryState
+   (ii)  add f3PtpPTPClockClockClass to F3PtpPTPClockEntry
+   (iii) add PTPClockStats tables for PM on PTPClock
+
+21st December 2015
+------------------
+
+1) fsp150cm-alarm.mib
+   (i) Added new literal erpRingSegmentation to CmConditionType
+
+8th January 2016
+------------------
+
+1) fsp150cm-sec.mib
+   (i) Added new literal netconf to CmSecurityPrivLevel
+

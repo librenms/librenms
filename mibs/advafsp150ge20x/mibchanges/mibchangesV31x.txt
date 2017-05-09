@@ -1,0 +1,183 @@
+1. fsp150cm-alarm.mib
+   
+   add CmConditionType with:                
+                 bfdSessionDown(352),
+                 destinationUnresolved(353),
+                 sjmaxtethrshld(354),
+                 trafficArpTableFull(355)
+
+
+  add CmAlarmEntityType with:
+                 bfdSession(149),
+                 eomplsPw(150),
+                 oneru-ge114g-shelf(151),
+                 eth-ge-114g-card(152),
+                 wifidongleport(153)
+
+
+
+2. fsp150cm-common.mib
+
+-- GE114G NID product (GE114G with 2 Access Ports with SFPs)
+ge114G            OBJECT IDENTIFIER ::= { subproducts 29 }
+
+add VlanTagType ::= TEXTUAL-CONVENTION with:
+                 mplsLabel(4),
+                 vcLabel(5),
+                 encapOuterVlanTag(6)
+
+3. fsp150cm-connectguard.mib
+   add f3ConnectGuardFlowEntry  with:
+       f3ConnectGuardFlowAssociatedMep                           VariablePointer,
+       f3ConnectGuardFlowAlias                                   DisplayString
+
+
+4. fsp150cm-dataexport.mib
+   add DataExportType ::= TEXTUAL-CONVENTION with:
+                            flowbyteratepm(3)
+
+   add F3DataExportConfigObjectEntry  with:
+           f3DataExportConfigObjectEntity             VariablePointer,
+           f3DataExportConfigObjectStorageType        StorageType,
+           f3DataExportConfigObjectRowStatus          RowStatus
+
+
+5. fsp150cm-entity.mib
+   add NetworkElementType with
+                  ccge114g(35)
+
+
+  add ShelfType with:
+                  onerackunit-ge114g(35)
+
+
+  add CardType with:
+                  eth-ge-114g(61)
+
+               
+  add new table EthernetNTEGE114GCardEntry  with:
+    ethernetNTEGE114GCardEntityIndex             PhysicalIndex,
+    ethernetNTEGE114GCardAdminState              AdminState,
+    ethernetNTEGE114GCardOperationalState        OperationalState,
+    ethernetNTEGE114GCardSecondaryState          SecondaryState,
+    ethernetNTEGE114GCardVoltage                 Integer32,
+    ethernetNTEGE114GCardTemperature             Integer32,
+    ethernetNTEGE114GCardSnmpDyingGaspEnabled    TruthValue,
+    ethernetNTEGE114GCardRestartAction           RestartType,
+    ethernetNTEGE114GCardFineGrainedPmInterval   CmPmIntervalType,
+    ethernetNTEGE114GCardSwitchPortActionPort    VariablePointer,
+    ethernetNTEGE114GCardSwitchPortAction        SwitchPortAction
+
+  add nteGe114GCardGroup 
+  
+6. fsp150cm-facility.mib
+  add CmActiveControlProtocolsType  with:
+                 ptpNonfwdUntagged(47),
+                 ptpNonfwdTagged(48)
+
+  
+  add WIFIEncryptionType ::= TEXTUAL-CONVENTION with:
+                   notApplicable(0),
+                   wpa-psk(1),
+                   wpa2-psk(2),
+                   wpa-wpa2-psk(3)
+
+
+  add DHCPType ::= TEXTUAL-CONVENTION with:
+                   client(1),
+                   server(2)
+
+  add CosMappingMode ::= TEXTUAL-CONVENTION with:
+                   ethernet (1),
+                   eompls (2)
+
+
+  add cmFlowEntry with:
+          cmFlowRefEoMplsPwObject               VariablePointer
+
+
+  add cmEthernetAccPortCpdV2Entry  with:
+        cmEthernetAccPortCpdV2PtpUntaggedDispType       CmControlProtocolDispType,
+        cmEthernetAccPortCpdV2PtpTaggedDispType         CmControlProtocolDispType
+
+  
+  add cmEthernetNetPortCpdV2Entry  with:
+        cmEthernetNetPortCpdV2PtpUntaggedDispType     CmControlProtocolDispType,
+        cmEthernetNetPortCpdV2PtpTaggedDispType       CmControlProtocolDispType
+
+
+  add cmPrioMapV2ProfileEntry  with:
+          cmPrioMapV2ProfileCosMapModeType        CosMappingMode
+
+
+  add cmPrioMapV2PrioMappingCOSEntry  with:
+        cmPrioMapV2PrioMappingEncapOuterTagPriority  Integer32
+
+  add F3UsbWIFIDonglePortEntry  with:
+       f3UsbWIFIDonglePortIndex                    Integer32,
+       f3UsbWIFIDonglePortIfIndex                  InterfaceIndex,
+       f3UsbWIFIDonglePortEntityIndex              PhysicalIndex,
+       f3UsbWIFIDonglePortAdminState               AdminState,
+       f3UsbWIFIDonglePortOperationalState         OperationalState,
+       f3UsbWIFIDonglePortSecondaryState           SecondaryState,
+       f3UsbWIFIDonglePortSSID                     DisplayString,
+       f3UsbWIFIDonglePortPassword                 DisplayString,
+       f3UsbWIFIDonglePortEncryption               WIFIEncryptionType,
+       f3UsbWIFIDonglePortIPAddress                IpAddress,
+       f3UsbWIFIDonglePortwWIFIIPNetMask           IpAddress,
+       f3UsbWIFIDonglePortWIFIDHCPRole             DHCPType,
+       f3UsbWIFIDonglePortWIFIAllocatedIPFrom      IpAddress,
+       f3UsbWIFIDonglePortWIFIAllocatedIPEnd       IpAddress,
+       f3UsbWIFIDonglePortStorageType              StorageType,
+       f3UsbWIFIDonglePortRowStatus                RowStatus,
+       f3UsbWIFIDonglePortAccessdUsers             DisplayString
+
+  
+  
+  
+7. fsp150cm-ip.mib
+
+  add DHCPCIDType   with:
+                       serialNumber(5)
+
+8. fsp150cm-ptp.mib
+   add F3PtpAccPortFlowPointEntry with:
+       f3PtpAccPortFlowPointLoopAvoidance         VariablePointer
+
+   add f3PtpNetPortFlowPointEntry with:
+       f3PtpNetPortFlowPointLoopAvoidance         VariablePointer
+
+
+    add f3PtpPTPPortEntry with:
+            f3PtpPTPPortLastRcvdAnnounceMsg                F3DisplayString,
+            f3PtpPTPPortLastRcvdSyncMsg                    F3DisplayString,
+            f3PtpPTPPortLastRcvdDelayReqMsg                F3DisplayString,
+            f3PtpPTPPortLastRcvdDelayRspMsg                F3DisplayString
+
+    add f3PtpAccPortFlowPointStatsEntry with:
+            f3PtpAccPortFlowPointStatsTagNoMatchDiscards     PerfCounter64
+
+   add f3PtpAccPortFlowPointHistoryEntry  with:
+       f3PtpAccPortFlowPointHistoryTagNoMatchDiscards     PerfCounter64
+
+   add f3PtpNetPortFlowPointStatsEntry with:
+       f3PtpNetPortFlowPointStatsTagNoMatchDiscards     PerfCounter64
+
+   add f3PtpNetPortFlowPointHistoryEntry with:
+       f3PtpNetPortFlowPointHistoryTagNoMatchDiscards     PerfCounter64
+
+9. fsp150cm-sec.mib
+     add CmSecurityPrivLevel ::= TEXTUAL-CONVENTION with:
+                        netconf(7)
+
+10. fsp150cm-timezone.mib
+        update the f3TimeZoneDstUtcOffset's description as:
+           This object provides the ability to set DST Offset which is
+          the Daylight Savings Time offset from Local Time.
+
+11. add BFD-TC-STD-MIB.mib, DIFFSERV-DSCP-TC.mib, DIFFSERV-MIB.mib, IANA-BFD-TC-STD-MIB.mib, INTEGRATED-SERVICES-MIB.mib, RFC7331mib.mib
+
+12. add fsp150cm-bfd.mib and fsp150cm-eompls.mib
+
+13. fsp150cm-system.mib
+    add f3SnmpLongIfAlias 

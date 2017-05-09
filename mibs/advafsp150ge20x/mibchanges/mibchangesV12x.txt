@@ -1,0 +1,369 @@
+18th Sept 2012
+------------
+  1)Added fsp150cm-erp.mib
+  2)fsp150cm-entity.mib
+      (i) Added table:
+            ethernetGE8SCCCardTable
+      (ii)Added literal to CardType:
+            eth-ge-8s-cc
+      (iii)Added groups:
+            ge4ECCCardGroup
+            ge4SCCCardGroup
+            xg1XCCCardGroup
+            xg1SCCCardGroup
+            ge8SCCCardGroup
+  3)fsp150cm-cap.mib
+      (i) delete restriction 
+          for ipForwarding
+
+25th Sept 2012
+------------
+  1)fsp150cm-erp.mib 
+      (i) Change access from 
+          read-create to read-only
+          for:
+           f3ErpUnitPortRxRapsNodeId 
+
+29th Sept 2012
+------------
+   1)fsp150cm-alarm.mib 
+      (i) Added literals to CmConditionType:
+         erpFoPPM
+         erpFoPTO
+         erpBlockPort1RPL
+         erpBlockPort1SF
+         erpBlockPort1MS
+         erpBlockPort1WTR
+         erpBlockPort2RPL
+         erpBlockPort2SF
+         erpBlockPort2MS
+         erpBlockPort2WTR
+         --
+         ltpFailure
+         ltpInprogress
+         ampNoPeer
+         ampProvFail
+         ampCfgFail
+      (ii) CmAlarmEntityType
+         ge-8s-cc
+         erpGroup
+         ampConfig
+   2)fsp150cm-system.mib 
+      (i) Added scalar
+         tftpEnabled
+   3)fsp150cm-erp.mib
+   	  (i) Change f3ErpGroupRapsVlanEtherType
+   	  	  SYNTAX field to Unsigned32
+   	  (ii) Change OBJECT-TYPE names 
+   	  	   in ERP Group Table. 
+   	      
+
+1st Oct 2012
+------------
+   1) Added fsp150cm-amp.mib
+   
+2nd Oct 2012
+------------
+   1) fsp150cm-alarm.mib
+      (i) Change numeration for erpBlockPort
+   2) fsp150cm-cap.mib
+      (i) Add ge4ECCCardGroup, ge4SCCCardGroup 
+          to f3Nid206VCapabilities
+      (ii) Add xg1XCCCardGroup, xg1SCCCardGroup, 
+          ge8SCCCardGroup to f3NidXG210Capabilities
+      (iii) Add f3ERPCapabilities
+
+3rd Oct 2012
+------------
+   1) Added fsp150cm-esm.mib
+
+9th Oct 2012
+------------
+   1) Added fsp150cm-bridge.mib
+   2) Added fsp150cm-shg.mib
+   
+10th Oct 2012
+------------
+   1) fsp150cm-cap.mib
+      (i) Add f3AMPClientCapabilities, f3AMPServerCapabilities
+
+15th Oct 2012
+------------
+   1) fsp150cm-facility.mib
+      (i) Added new objects to cmFlowTable:
+           cmFlowPort1 
+           cmFlowPort2
+           cmFlowPolicingControl
+           cmFlowAutoCIRPercentage
+           cmFlowNetworkProtectionObject
+
+19th Oct 2012
+------------
+    1) fsp150cm-alarm.mib
+       (i) Added literals to CmConditionType:
+            erpBlockPort0FS
+            erpBlockPort1FS
+
+24th Oct 2012
+------------
+    1) fsp150cm-amp.mib
+      (i) Added TEXTUAL-CONVENTION AMPConfigStatus
+      (ii) Added columns to f3AmpStatsTable:
+            f3AmpStatsLastRxStatus
+            f3AmpStatsRxTimeStamp
+            f3AmpStatsLastTxStatus
+            f3AmpStatsTxTimeStamp
+      (iii) Change invalid object name f3AmpStatsSpuriousTimeoutRx to f3AmpStatsTimeoutRx
+    2) fsp150cm-bridge.mib
+      (i) Remove noAction from LearningAction TEXTUAL-CONVENTION
+      (ii) Rename FlowConfigLearningAction to FlowLearningConfigAction 
+      (iii) Added new literals to FlowLearningConfigAction TEXTUAL-CONVENTION:
+            clearBlock
+            resetAgingTimer
+    3) fsp150cm-facility.mib
+      (i) Added new TEXTUAL-CONVENTION FlowConfigType
+      (ii) Added new column to cmFlowTable:
+            cmFlowConfigTable
+
+30th Oct 2012
+------------
+	1) fsp150cm-bridge.mib
+	(i) Change invalid object names:
+		f3FlowLearningConfigMutlicastRateLimitEnabled,
+		f3FlowLearningConfigMutlicastRateLimitLo, 
+		f3FlowLearningConfigMutlicastRateLimitHi to
+		f3FlowLearningConfigMulticastRateLimitEnabled, 
+		f3FlowLearningConfigMulticastRateLimitLo,
+		f3FlowLearningConfigMulticastRateLimitHi
+		
+2nd Nov 2012
+------------
+	1) fsp150cm-facility.mib
+	   (i) Change range of cmEthernetAccPortIndex to (0|1..65535)
+      (ii)Change range of cmQosShaperTypeIndex to (1..4)
+     (iii)Change range of cmQosShaperIndex to (1..16)
+      (iv)Change range of cmQosFlowPolierTypeIndex to (1..4)
+      (v) Change range of cmQosFlowPolierIndex to (1..16)
+
+7th Nov 2012
+------------
+	1) fsp150cm-system.mib
+		(i) Added tftpEnabled to cmSystemObjectGroup
+	2) fsp150cm-cap.mib
+		(i) Added read-only restriction for tftpEnabled
+
+9th Nov 2012
+------------
+	1) fsp150cm-esm.mib
+		(i) Changed SYNTAX of esmConfigAssociatedEntity from OBJECT IDENTIFIER to VariablePointer
+		
+15th Nov 2012
+-------------
+	1) fsp150-amp.mib
+		(i) Remove columns:
+			f3AmpConfigRemSysMgmtTraffBridgingEnabled,
+			f3AmpConfigRemSysMgmtTraffBridgingSecEnabled,
+    		f3AmpConfigRemTunnelDhcpEnabled,
+    		f3AmpConfigRemTunnelDhcpCIDEnabled,
+    		f3AmpConfigRemTunnelDhcpCID
+			from f3AmpConfigTable
+			
+21th Nov 2012
+-------------
+	1) fsp150-facility.mib
+		(i) Rename columns:
+         cmFlowNetworkProtectionObject to cmFlowLoopAvoidanceObject
+
+23th Nov 2012
+-------------
+    1) fsp150-facility.mib
+        (i) Change description for cmFlowN2ACOSPriorityTagType
+        
+4th Dec 2012
+-------------
+    1) fsp150-esm.mib
+        (i) esmNameValuePairTable: 
+            rename column esmConfigStorageType to esmNameValuePairStorageType
+    2) fsp150cm-shg.mib
+    	(i) Added f3ShgAlias column
+    	(ii) Removed tabs
+    3) fsp150cm-cap.mib
+        (i) Added f3ShgCapabilities
+
+10th Dec 2012
+-------------
+    1) fsp150-esm.mib
+        (i) Change MIB OID from 25 to 23
+    2) fsp150-erp.mib
+        (i) Change MIB OID from 23 to 25
+    3) fsp150-lag.mib
+        (i) Add column f3LagIgnorePartnerColMaxDelay
+        
+20th Dec 2012
+-------------
+	1) fsp150cm-common.mib
+		(i) Added literal n2n to TrafficDirection
+		
+3rd Jan 2013
+------------
+	1) fsp150cm-amp.mib
+		(i) Change MAX-ACCESS for columns f3AmpConfigRemSysSNMPV1IfName
+			and f3AmpConfigRemSysSrcIpAddrIfName from read-create 
+			to read-only
+		
+11th Jan 2013
+-------------
+	1) fsp150cm-amp.mib
+		(i) Change MAX-ACCESS for column f3AmpConfigRemSysSrcIpAddrType
+			from read-create to read-only
+			
+12th Jan 2013
+	1) fsp150cm-facility.mib
+		(i) Change MAX-ACCESS for column cmFlowSTagMatchRxPrio
+			from read-only to read-create
+			
+24th Jan 2013
+	1) fsp150cm-cap.mib
+		(i) Change access to read-only for cmTopologyLinkId
+		
+6th Feb 2013
+    1) fsp150cm-common.mib
+        (i) Add new secondary state : Blocked
+        
+8th Feb 2013
+	1) fsp150cm-cap.mib
+		(i) Changed ACCESS for sonetMediumLineCoding and sonetMediumLineType 
+			from read-only to not-implemented
+
+13th Feb 2013
+	1) fsp150cm-sa.mib
+		(i) Added objects:
+            - esaProbeAlias                     
+            - esaReflectorAlias
+   2) fsp150cm-cfm.mib
+      (i)Added TEXTUAL-CONVENTION CfmSignalFailDefects 
+      (ii)Added scalar cfmSignalFailDefects 
+      
+18th Feb 2013
+    1) fsp150cm-bridge.mib
+        (i) Removed objects:
+            - f3FlowLearningConfigMulticastRateLimitEnabled
+            - f3FlowLearningConfigMulticastRateLimitLo
+            - f3FlowLearningConfigMulticastRateLimitHi
+            - f3FlowLearningConfigBroadcastRateLimitEnabled
+            - f3FlowLearningConfigBroadcastRateLimitLo
+            - f3FlowLearningConfigBroadcastRateLimitHi
+
+25th Feb 2013
+    1) fsp150cm-cfm.mib
+        (i) Added cfmMepExclMepTable
+
+26th Feb 2013
+    1) fsp150cm-erp.mib
+        (i) Update descriptions and value range:
+            - f3ErpGroupGuardTime
+            - f3ErpGroupWaitToRestore
+            - f3ErpGroupHoldOffTime
+            - f3ErpGroupWTRRemainingTime
+14th Mar 2013
+	1) fsp150cm-fac.mib
+	    (i) Added new column to cmFlowTable:
+            - cmFlowN2NForwardingEnabled
+
+15th Mar 2013
+	1) fsp150cm-bridge.mib
+	    (i) Added new table f3FlowFdbTable
+
+20th Mar 2013
+    1) fsp150cm-cfm.mib
+        (i) Removed table cfmMepExclMepTable
+
+26th Mar 2013
+    1) fsp150cm-bridge.mib
+        (i) Changed f3FlowStaticFwdEntDestMac and f3FlowFdbDestMac indexes to IMPLIED
+        
+27th Mar 2013
+    1) fsp150cm-facility.mib
+        (i) Changed value range for CmRemoteLinkIds
+
+28th Mar 2013
+    1) fsp150cm-erp.mib
+        (i) Changed f3ERPMIB to f3ErpMIB
+        (ii) Removed objects:
+            - f3ErpUnitType
+            - f3ErpUnitState
+
+12th Apr 2013 (merge from trunk)
+    1) fsp150cm-alarm.mib
+        (i) Added literals to CmConditionType
+           - pse-power-threshold-exceeded(241),
+           - pse-power-fail(242),
+           - pse-poweroff-overcurrent(243),
+           - pse-poweroff-overvoltage(244),
+           - pse-poweroff-overload(245),
+           - pse-poweroff-overtemp(246),
+           - pse-poweroff-short(247)
+        (ii) Added literals to CmAlarmEntityType
+           - oneru-ge114h-shelf(96),
+           - eth-ge-114h-card(97),
+           - oneru-ge114ph-shelf(98),
+           - eth-ge-114ph-card(99),
+           - psegroup(100),
+           - pseport(101)
+        (ii) Changed literals in CmAlarmEntityType
+            - erpGroup from 96 to 102
+    2) fsp150cm-cap.mib
+         (i) Removed cmTopologyLink read-only VARIATION
+         (ii)Changed sonetMediumLineCoding VARIATION from not-implemented to read-only
+         (iii)Changed sonetMediumLineType VARIATION from not-implemented to read-only
+         (iv)Added capabilities
+            - f3Nid114HCapabilities (OID 41)
+            - f3Nid114PHCapabilities (OID 42)
+         (v) Changed capabilities OIDs
+            - f3ERPCapabilities from 41 to 43
+            - f3ShgCapabilities from 42 to 44
+    3) fsp150cm-cap.mib
+         (i) Added TEXTUAL-CONVENTION lldpV2ConfigurationADVAExtMaxNeighborsAction
+         (ii) Added tables
+            - f3SystemLldpV2DestAddressADVAExtTable
+         (iii)Added scalars
+            - f3LldpMaxNeighborsAction
+    4) fsp150cm-common.mib
+      (i) Added sysOIDs
+         - ge114H (15)
+         - ge114PH(16)
+    5) fsp150cm-facility.mib
+      (i) Added TEXTUAL-CONVENTIONS
+         - G3AuthStatus
+         - PsePowerLevel
+         - PSENonStandardPD
+      (ii) Add columns in f3Usb3GDCNPortTable:
+         - f3Usb3GDCNPortIMSI
+         - f3Usb3GDCNPortPINStatus
+      (iii)Added tables
+         - cmPethPsePortExtTable
+    6) fsp150cm-entity.mib
+      (i) Added literals to NetworkElementType TEXTUAL-CONVENTION
+         - ccge114h
+         - ccge114ph
+      (ii) Added literals to ShelfType TEXTUAL-CONVENTION
+         - onerackunit-ge114h
+         - onerackunit-ge114ph
+      (iii) Added literals to ShelfType TEXTUAL-CONVENTION
+         - eth-ge-114h
+         - eth-ge-114ph
+      (iv) Added tables
+         - ethernetNTEGE114HCardTable
+         - ethernetNTEGE114PHCardTable
+     7) fsp150cm-erp.mib
+       (i) Changes SYNTAX for f3ErpUnitPortRxRapsBPR object
+
+23th Apr 2013
+     1) Change object name from f3ErpGroupSecondaryStates to f3ErpGroupSecondaryState
+
+13th May 2013
+     1) fsp150cm-erp.mib
+         (i) Add notApplicable (6) to RAPSRequest TEXTUAL-CONVENTION
+     2) fsp150cm-cfm.mib
+         (i) Change CfmSignalFailDefects name to CfmSignalFailTriggers
+         (ii) Change cfmSignalFailDefects name to cfmSignalFailTriggers
