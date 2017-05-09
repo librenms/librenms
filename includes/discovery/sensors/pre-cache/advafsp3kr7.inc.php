@@ -25,26 +25,26 @@ if ($device['os'] == 'advafsp3kr7') {
 
     echo 'Caching OIDs:'."\n";
 
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'pmSnapshotCurrentEntry',    $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityFacilityOneIndex',    $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityDcnOneIndex',         $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityOpticalMuxOneIndex',  $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityFacilityAidString',   $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityEqptAidString',       $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityDcnAidString',        $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'pmSnapshotCurrentEntry', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityFacilityOneIndex', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityDcnOneIndex', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityOpticalMuxOneIndex', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityFacilityAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityEqptAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityDcnAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
     $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityOpticalMuxAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugMaxDataRate',           $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugAdmin',                 $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'physicalPortFrequency',     $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugTransmitChannel',       $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugFiberType',             $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugReach',                 $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugMaxDataRate', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugAdmin', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'physicalPortFrequency', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugTransmitChannel', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugFiberType', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugReach', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
 
-    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'entityEqptAidString',       $fsp3kr7_Card, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'eqptPhysInstValueEntry',    $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '', '-OQUbs');
-    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'optMuxPhysInstValueTable',  $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '', '-OQUbs');
+    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'entityEqptAidString', $fsp3kr7_Card, 'ADVA-FSPR7-MIB', '', '-OQUbs');
+    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'eqptPhysInstValueEntry', $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '', '-OQUbs');
+    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'optMuxPhysInstValueTable', $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '', '-OQUbs');
     $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'entityMtosiSlotsAidString', $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '', '-OQUbs');
-    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'eqptPhysThresholdEntry',    $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '', '-OQUbs');
+    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'eqptPhysThresholdEntry', $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '', '-OQUbs');
 
 
 
@@ -57,13 +57,11 @@ if ($device['os'] == 'advafsp3kr7') {
     $test = $advafsp3kr7_oids;
 
 
-    foreach (array_keys($test) as $index => $entity ) {
-
+    foreach (array_keys($test) as $index => $entity) {
         //$test[$index] = implode('.', explode('.' , $test[$entity] , -2));
         $aaa = array();
 
         foreach (array_keys($test) as $entity => $content) {
-
             $aaa[$index] = implode('.', explode('.', array_keys($test[$entity]), -2));
 
             if ($test[$content]['entityFacilityAidString']) {
@@ -78,15 +76,11 @@ if ($device['os'] == 'advafsp3kr7') {
                 $test[$content]['AidString'] = $test[$content]['entityOpticalMuxAidString'];
                 $test[$content]['OneIndex']  = $test[$content]['entityOpticalMuxOneIndex'];
             }
-
         }
         //   $content[$entity] = str_replace($replace, "", $content[$entity][$replace]);
         //        $entity = implode('.', explode('.', $entity, -2);
-
-    }//end test
-
+    } //end test
     //unset($advafsp3kr7_oids);
     $advafsp3kr7_oids = $test;
     //var_dump($aaa);
-
-} // end of OS condition
+}   // end of OS condition

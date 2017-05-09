@@ -16,16 +16,15 @@
  **/
 
 if ($device['os'] == 'advafsp150ge20x') {
-
     echo 'Caching OIDs:'."\n";
     $ge20x_oids = array();
-    $ge20x_oids = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', $ge20x_oids,   'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150ge20x', '-OQUbs');
+    $ge20x_oids = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', $ge20x_oids, 'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150ge20x', '-OQUbs');
 
 
     $multiplier = 1;
     $divisor    = 1;
 
-    $ge20x_temp_sensors = array('ethernetNTEXG210CardTemperature'  => '.1.3.6.1.4.1.2544.1.12.3.1.30.1.6' , 
+    $ge20x_temp_sensors = array('ethernetNTEXG210CardTemperature'  => '.1.3.6.1.4.1.2544.1.12.3.1.30.1.6' ,
                                 'ethernetXG1XCCCardTemperature'    => '.1.3.6.1.4.1.2544.1.12.3.1.31.1.6');
     if (is_array($ge20x_oids)) {
         echo "Temperature Sensors:\n";
@@ -33,7 +32,6 @@ if ($device['os'] == 'advafsp150ge20x') {
         foreach (array_keys($ge20x_oids) as $index1) {
             foreach (array_keys($ge20x_temp_sensors) as $index2 => $entry) {
                 if ($ge20x_oids[$index1][$entry]) {
-
                     $low_limit       = 10;
                     $low_warn_limit  = 15;
                     $high_warn_limit = 50;
@@ -52,10 +50,21 @@ if ($device['os'] == 'advafsp150ge20x') {
                     echo "current : ".$current."\n";
 
                     discover_sensor(
-                        $valid['sensor'], 'temperature', $device, $oid, $index1, $sensorType, $descr,
-                        $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current
+                        $valid['sensor'],
+                        'temperature',
+                        $device,
+                        $oid,
+                        $index1,
+                        $sensorType,
+                        $descr,
+                        $divisor,
+                        $multiplier,
+                        $low_limit,
+                        $low_warn_limit,
+                        $high_warn_limit,
+                        $high_limit,
+                        $current
                     );
-
                 }//End if sensor exists
             }//End foreach $entry
         }//End foreach $index

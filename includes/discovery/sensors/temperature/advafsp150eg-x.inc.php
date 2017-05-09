@@ -16,15 +16,14 @@
  **/
 
 if ($device['os'] == 'advafsp150eg-x') {
-
     $egx_oids = array();
     $egxPSU   = array();
     $egxSWF   = array();
 
     echo 'Caching OIDs:'."\n";
 
-    $egxPSU   = snmpwalk_cache_multi_oid($device, 'psuTable', $egxPSU,   'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150eg-x', '-OQUbs');
-    $egxSWF   = snmpwalk_cache_multi_oid($device, 'ethernetSWFCardTable', $egxSWF,   'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150eg-x', '-OQUbs');
+    $egxPSU   = snmpwalk_cache_multi_oid($device, 'psuTable', $egxPSU, 'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150eg-x', '-OQUbs');
+    $egxSWF   = snmpwalk_cache_multi_oid($device, 'ethernetSWFCardTable', $egxSWF, 'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150eg-x', '-OQUbs');
     $egx_oids = snmpwalk_cache_multi_oid($device, 'ethernetSWFCardTable', $egx_oids, 'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150eg-x', '-OQUbs');
     $egx_oids = snmpwalk_cache_multi_oid($device, 'ethernet1x10GHighPerCardTable', $egx_oids, 'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150eg-x', '-OQUbs');
     $egx_oids = snmpwalk_cache_multi_oid($device, 'ethernet10x1GHighPerCardTable', $egx_oids, 'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150eg-x', '-OQUbs');
@@ -38,7 +37,6 @@ if ($device['os'] == 'advafsp150eg-x') {
         echo "psuEntry: ";
 
         foreach (array_keys($egxPSU) as $index) {
-
             $low_limit       = 10;
             $low_warn_limit  = 15;
             $high_warn_limit = 40;
@@ -52,8 +50,20 @@ if ($device['os'] == 'advafsp150eg-x') {
             $oid        = '.1.3.6.1.4.1.2544.1.12.3.1.4.1.7.'.$index;
 
             discover_sensor(
-                $valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, 
-                $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current
+                $valid['sensor'],
+                'temperature',
+                $device,
+                $oid,
+                $index,
+                $sensorType,
+                $descr,
+                $divisor,
+                $multiplier,
+                $low_limit,
+                $low_warn_limit,
+                $high_warn_limit,
+                $high_limit,
+                $current
             );
         }
     }
@@ -65,7 +75,6 @@ if ($device['os'] == 'advafsp150eg-x') {
         $divisor    = 1;
 
         foreach (array_keys($egxSWF) as $index) {
-
             $low_limit       = 10;
             $low_warn_limit  = 15;
             $high_warn_limit = 60;
@@ -79,8 +88,20 @@ if ($device['os'] == 'advafsp150eg-x') {
             $oid        = '.1.3.6.1.4.1.2544.1.12.3.1.20.1.5.'.$index;
 
             discover_sensor(
-                $valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, 
-                $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current
+                $valid['sensor'],
+                'temperature',
+                $device,
+                $oid,
+                $index,
+                $sensorType,
+                $descr,
+                $divisor,
+                $multiplier,
+                $low_limit,
+                $low_warn_limit,
+                $high_warn_limit,
+                $high_limit,
+                $current
             );
         }
     }

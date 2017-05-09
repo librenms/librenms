@@ -5,7 +5,7 @@
  * @category Network_Management
  * @package  LibreNMS
  * @author   Christoph Zilian <czilian@hotmail.com>
- * @license  http://gnu.org/copyleft/gpl.html GNU GPL  
+ * @license  http://gnu.org/copyleft/gpl.html GNU GPL
  * @link     https://github.com/librenms/librenms/
 
  * This program is free software: you can redistribute it and/or modify it
@@ -16,7 +16,6 @@
  **/
 
 if ($device['os'] == 'advafsp3kr7') {
-
     $multiplier = 1;
     $divisor    = 10;
 
@@ -24,9 +23,7 @@ if ($device['os'] == 'advafsp3kr7') {
         echo "psuEntry: ";
 
         foreach (array_keys($fsp3kr7_Card) as $index) {
-
-            if ($fsp3kr7_Card[$index]['eqptPhysInstValueTemp'] AND $fsp3kr7_Card[$index]['eqptPhysInstValuePsuVoltInp']) {
-
+            if ($fsp3kr7_Card[$index]['eqptPhysInstValueTemp'] and $fsp3kr7_Card[$index]['eqptPhysInstValuePsuVoltInp']) {
                 $low_limit = 1;
                 $low_warn_limit = 2;
                 $high_warn_limit = 30;
@@ -40,11 +37,22 @@ if ($device['os'] == 'advafsp3kr7') {
                 $oid        = '.1.3.6.1.4.1.2544.1.11.11.1.2.1.1.1.5.'.$index;
 
                 discover_sensor(
-                    $valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, 
-                    $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current
+                    $valid['sensor'],
+                    'temperature',
+                    $device,
+                    $oid,
+                    $index,
+                    $sensorType,
+                    $descr,
+                    $divisor,
+                    $multiplier,
+                    $low_limit,
+                    $low_warn_limit,
+                    $high_warn_limit,
+                    $high_limit,
+                    $current
                 );
             }
         }
     }
 }//end if
-

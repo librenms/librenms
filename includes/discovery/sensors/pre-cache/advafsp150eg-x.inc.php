@@ -26,8 +26,8 @@ if ($device['os'] == 'advafsp150eg-x') {
 
     echo 'Caching OIDs:'."\n";
 
-    $egxPSU   = snmpwalk_cache_multi_oid($device, 'psuTable', $egxPSU,   'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150eg-x', '-OQUbs');
-    $egxSWF   = snmpwalk_cache_multi_oid($device, 'ethernetSWFCardTable', $egxSWF,   'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150eg-x', '-OQUbs');
+    $egxPSU   = snmpwalk_cache_multi_oid($device, 'psuTable', $egxPSU, 'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150eg-x', '-OQUbs');
+    $egxSWF   = snmpwalk_cache_multi_oid($device, 'ethernetSWFCardTable', $egxSWF, 'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150eg-x', '-OQUbs');
     $egx_oids = snmpwalk_cache_multi_oid($device, 'ethernetSWFCardTable', $egx_oids, 'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150eg-x', '-OQUbs');
     $egx_oids = snmpwalk_cache_multi_oid($device, 'ethernet1x10GHighPerCardTable', $egx_oids, 'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150eg-x', '-OQUbs');
     $egx_oids = snmpwalk_cache_multi_oid($device, 'ethernet10x1GHighPerCardTable', $egx_oids, 'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150eg-x', '-OQUbs');
@@ -37,5 +37,4 @@ if ($device['os'] == 'advafsp150eg-x') {
     //var_dump($egx_oids);
     //$results = print_r($egxSWF, true); // $results now contains output from print_r
     //file_put_contents('/opt/librenms/adva-precache.txt', $results);
-
 } // end of OS condition

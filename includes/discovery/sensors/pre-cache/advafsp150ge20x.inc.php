@@ -23,14 +23,13 @@ if ($device['os'] == 'advafsp150ge20x') {
 
     echo 'Caching OIDs:'."\n";
 
-    $ge20x_oids   = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', $ge20x_oids,   'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150ge20x', '-OQUbs');
+    $ge20x_oids   = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', $ge20x_oids, 'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150ge20x', '-OQUbs');
 
     echo 'OIDs:'."\n";
 
     //var_dump($egx_oids);
     //$results = print_r($ge20x_oids, true); // $results now contains output from print_r
     //file_put_contents('/opt/librenms/adva-precache.txt', $results);
-
 }
 
 // end of OS condition

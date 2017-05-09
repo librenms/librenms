@@ -22,7 +22,7 @@
 
     echo 'Caching OIDs:'."\n";
 
-    $ge11x_oids   = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', $ge11x_oids,   'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150ge11x', '-OQUbs');
+    $ge11x_oids   = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', $ge11x_oids, 'CM-ENTITY-MIB', '/opt/librenms/mibs/advafsp150ge11x', '-OQUbs');
 
     echo 'OIDs:'."\n";
 
