@@ -188,11 +188,42 @@ This will check your install to verify it is set up correctly.
 
     php addhost.php localhost public v2c
 
-This assumes you haven't made community changes--if you have, replace `public` with your community.  It also assumes SNMP v2c.  If you're using v3, there are additional steps (NOTE: instructions for SNMPv3 to come).
+This assumes you haven't made community changes--if you have, replace `public` with your community.  It also assumes SNMP v2c.   
 
 Discover localhost::
 
     php discovery.php -h all
+
+#### SNMPv3 ####
+
+For SNMPv3 there are additional steps required to get up and running, you can display the list of paramaters by the running the following command inside the LibreNMS installation directory: 
+
+    ./addhost.php 
+    
+Running this command will echo out the list of paramaters inside your terminal window:
+
+    LibreNMS Add Host Tool
+
+    Usage (SNMPv1/2c): ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <hostname> [community] [v1|v2c] [port] [udp|udp6|tcp|tcp6]
+    Usage (SNMPv3)   :  Config Defaults : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <hostname> any v3 [user] [port] [udp|udp6|tcp|tcp6]
+    No Auth, No Priv : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <hostname> nanp v3 [user] [port] [udp|udp6|tcp|tcp6]
+       Auth, No Priv : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <hostname> anp v3 <user> <password> [md5|sha] [port] [udp|udp6|tcp|tcp6]
+       Auth,    Priv : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <hostname> ap v3 <user> <password> <enckey> [md5|sha] [aes|dsa] [port] [udp|udp6|tcp|tcp6]
+
+        -g <poller group> allows you to add a device to be pinned to a specific poller when using distributed polling. X can be any number associated with a poller group
+        -f forces the device to be added by skipping the icmp and snmp check against the host.
+        -p <port assoc mode> allow you to set a port association mode for this device. By default ports are associated by 'ifIndex'.
+                             For Linux/Unix based devices 'ifName' or 'ifDescr' might be useful for a stable iface mapping.
+                             The default for this installation is 'ifIndex'
+                             Valid port assoc modes are: ifIndex, ifName, ifDescr, ifAlias
+
+    Remember to run discovery for the host afterwards.
+
+Below is an example of host discovery in SNMPv3 for AuthPriv (this could be different depending on your SNMPv3 configurations, follow the options below to match your configuration requirements) :
+
+    sudo php addhost.php -p ifIndex hostname ap v3 librenmsUser password enckey md5 des 161 udp
+
+This command can be easily incorporated into a shell script to loop through and discover a list of hostnames from a text file or a database.
 
 ### Create cronjob ###
 
