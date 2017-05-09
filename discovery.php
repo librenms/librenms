@@ -33,6 +33,7 @@ if (isset($options['h'])) {
         $where = ' ';
         $doing = 'all';
     } elseif ($options['h'] == 'new') {
+        set_lock('new-discovery');
         $where = 'AND `last_discovered` IS NULL';
         $doing = 'new';
     } elseif ($options['h']) {
@@ -113,7 +114,9 @@ if (!$where) {
     exit;
 }
 
-require 'includes/sql-schema/update.php';
+if (get_lock('schema') === false) {
+    require 'includes/sql-schema/update.php';
+}
 
 $discovered_devices = 0;
 
@@ -121,6 +124,7 @@ if (!empty($config['distributed_poller_group'])) {
     $where .= ' AND poller_group IN('.$config['distributed_poller_group'].')';
 }
 
+global $device;
 foreach (dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
     discover_device($device, $options);
 }
@@ -131,6 +135,11 @@ $proctime = substr($run, 0, 5);
 
 if ($discovered_devices) {
     dbInsert(array('type' => 'discover', 'doing' => $doing, 'start' => $start, 'duration' => $proctime, 'devices' => $discovered_devices, 'poller' => $config['distributed_poller_name']), 'perf_times');
+    if ($doing === 'new') {
+        // We have added a new device by this point so we might want to do some other work
+        oxidized_reload_nodes();
+        release_lock('new-discovery');
+    }
 }
 
 $string = $argv[0]." $doing ".date($config['dateformat']['compact'])." - $discovered_devices devices discovered in $proctime secs";

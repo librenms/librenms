@@ -39,40 +39,35 @@ if (!$auth) {
     require 'includes/error-no-perm.inc.php';
 } else {
     if (isset($config['graph_types'][$type][$subtype]['descr'])) {
-        $title .= " :: ".$config['graph_types'][$type][$subtype]['descr'];
+        $title .= " :: " . $config['graph_types'][$type][$subtype]['descr'];
     } else {
-        $title .= " :: ".ucfirst($subtype);
+        $title .= " :: " . ucfirst($subtype);
     }
 
     $graph_array = $vars;
     $graph_array['height'] = "60";
-    $graph_array['width']  = $thumb_width;
+    $graph_array['width'] = $thumb_width;
     $graph_array['legend'] = "no";
-    $graph_array['to']     = $config['time']['now'];
+    $graph_array['to'] = $config['time']['now'];
 
     print_optionbar_start();
-    echo($title);
+    echo $title;
 
-    echo('<div style="float: right;">');
-?>
-  <form action="">
-  <select name='type' id='type'
-    onchange="window.open(this.options[this.selectedIndex].value,'_top')" >
-<?php
+    // FIXME allow switching between types for sensor and wireless also restrict types to ones that have data
+    if ($type != 'sensor') {
+        echo '<div style="float: right;"><form action="">';
+        echo "<select name='type' id='type' onchange=\"window.open(this.options[this.selectedIndex].value,'_top')\" >";
 
-foreach (get_graph_subtypes($type, $device) as $avail_type) {
-    echo("<option value='".generate_url($vars, array('type' => $type."_".$avail_type, 'page' => "graphs"))."'");
-    if ($avail_type == $subtype) {
-        echo(" selected");
+        foreach (get_graph_subtypes($type, $device) as $avail_type) {
+            echo "<option value='" . generate_url($vars, array('type' => $type . "_" . $avail_type, 'page' => "graphs")) . "'";
+            if ($avail_type == $subtype) {
+                echo(" selected");
+            }
+            $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
+            echo ">$display_type</option>";
+        }
+        echo '</select></form></div>';
     }
-    $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
-    echo(">$display_type</option>");
-}
-?>
-    </select>
-  </form>
-<?php
-    echo('</div>');
 
     print_optionbar_end();
 
@@ -81,7 +76,7 @@ foreach (get_graph_subtypes($type, $device) as $avail_type) {
     $thumb_array = array('sixhour' => '6 Hours', 'day' => '24 Hours', 'twoday' => '48 Hours', 'week' => 'One Week', 'twoweek' => 'Two Weeks',
         'month' => 'One Month', 'twomonth' => 'Two Months','year' => 'One Year', 'twoyear' => 'Two Years');
 
-     echo('<table width=100% class="thumbnail_graph_table"><tr>');
+    echo '<table width=100% class="thumbnail_graph_table"><tr>';
 
     foreach ($thumb_array as $period => $text) {
         $graph_array['from']   = $config['time'][$period];

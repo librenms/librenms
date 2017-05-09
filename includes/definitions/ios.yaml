@@ -23,7 +23,6 @@ bad_ifXEntry:
     - cisco886Va
     - cisco2811
 poller_modules:
-    wifi: 1
     cisco-ace-serverfarms: 1
     cisco-ace-loadbalancer: 1
     cisco-cbqos: 1

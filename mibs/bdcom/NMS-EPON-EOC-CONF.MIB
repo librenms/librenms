@@ -1,0 +1,125 @@
+-- *****************************************************************
+-- NMS-EPON-EOC-CONF.MIB:  NMS EOC COMM MIB file
+-- SEP 2011
+-- *****************************************************************
+--
+
+               NMS-EPON-EOC-CONF DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+		    TruthValue,RowStatus,PhysAddress,DisplayString,MacAddress
+		    	FROM SNMPv2-TC
+		    IpAddress
+		        FROM SNMPv2-SMI;
+          
+               nmsEponEocConfig         OBJECT IDENTIFIER ::= { nmsEPONGroup 32 }
+               
+               nmsEponEocTftpOper         OBJECT IDENTIFIER ::= { nmsEponEocConfig 1 }
+               
+
+          tftpServerIpAddr OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Remot TFTP server IP address. This value only effects after tftpAction is set."
+              ::= { nmsEponEocTftpOper 1 }
+
+          tftpServerSourceFileName OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "TFTP server source file name. This value only effects after tftpAction is set."
+              ::= { nmsEponEocTftpOper 2 }
+
+          tftpServerDestFileName OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "TFTP server destination file name. This value only effects after tftpAction is set."
+              ::= { nmsEponEocTftpOper 3 }
+
+          tftpServerOper OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              no_operation(0),
+                              upload_to_onu(1),
+                              download_from_onu(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "TFTP server operation. When the value is set, ths tftpServerIpAddr, tftpServerSourceFileName and tftpServerDestFileName effects at ths same time."
+              ::= { nmsEponEocTftpOper 4 }
+
+               nmsEponEocBlackWhiteListTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponEocBlackWhiteListEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon EoC Black White List table."
+                   ::= { nmsEponEocConfig 2 }
+
+               nmsEponEocBlackWhiteListEntry OBJECT-TYPE
+                   SYNTAX NMSEponEocBlackWhiteListEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of Eoc Black White List property."
+                   INDEX { authMode, macAddr }
+               ::= { nmsEponEocBlackWhiteListTable 1 }
+
+               NMSEponEocBlackWhiteListEntry ::=
+                   SEQUENCE {
+                       authMode
+                           INTEGER,
+                       macAddr
+                           MacAddress,
+                       isActive
+                       	   INTEGER
+                       	   }
+                       	   
+               authMode OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   black_list(1),
+                                   white_list(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EPON EoC authentication mode. black_list(1), white_list(2). "
+                   ::= { nmsEponEocBlackWhiteListEntry 1 } 
+
+               macAddr OBJECT-TYPE
+                   SYNTAX  MacAddress
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EPON EoC master MAC address."
+                   ::= { nmsEponEocBlackWhiteListEntry 2 } 
+                 
+               listOper OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   		   no_action(0)
+                                   add_list(1),
+                                   delete_list(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EPON EoC white and black list operation. no_action(0), add_list(1),delete_list(2). "
+                   ::= { nmsEponEocBlackWhiteListEntry 3 } 
+
+
+
+
+END

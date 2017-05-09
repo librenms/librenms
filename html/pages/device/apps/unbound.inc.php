@@ -3,7 +3,8 @@
 global $config;
 
 $graphs = array(
-    'unbound_queries' => 'Unbound - Queries'
+    'unbound_queries' => 'Unbound - Queries',
+    'unbound_cache'   => 'Unbound - Cache'
     );
 foreach ($graphs as $key => $text) {
     $graph_type            = $key;

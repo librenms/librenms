@@ -1,9 +1,10 @@
--- ArubaOS 3.2.0.0_16376
+--- ArubaOS 6.5.2.0_59123
 -- vim:set ts=4 sw=4:
 WLSX-VOICE-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
-       TEXTUAL-CONVENTION,
+       TEXTUAL-CONVENTION FROM SNMPv2-TC 
+       
        MODULE-IDENTITY,
        OBJECT-TYPE,
        snmpModules,
@@ -46,7 +47,7 @@ WLSX-VOICE-MIB DEFINITIONS ::= BEGIN
 			FROM ARUBA-MIB;
 
    wlsxVoiceMIB MODULE-IDENTITY 
-       LAST-UPDATED "0701102156Z"
+       LAST-UPDATED "0804160206Z"
        ORGANIZATION "Aruba Wireless Networks"
        CONTACT-INFO
             "Postal:    1322 Crossman Avenue
@@ -57,7 +58,7 @@ WLSX-VOICE-MIB DEFINITIONS ::= BEGIN
            "This MIB module defines MIB objects which provide
             information about Voice call status and call detail reporting
 		in the Aruba controller."
-       REVISION        "0701102156Z"
+       REVISION        "0804160206Z"
        DESCRIPTION
            "The initial revision."
        ::= { wlsxEnterpriseMibModules 12 }
@@ -68,6 +69,7 @@ WLSX-VOICE-MIB DEFINITIONS ::= BEGIN
    wlsxVoiceCallCtrsGroup		OBJECT IDENTIFIER ::= { wlsxVoiceStatsGroup 2 }
    wlsxVoiceClientInfoGroup     OBJECT IDENTIFIER ::= { wlsxVoiceStatsGroup 3 }
    wlsxVoiceAPBssidInfoGroup	OBJECT IDENTIFIER ::= { wlsxVoiceStatsGroup 4 }
+   wlsxVoiceClientLocationInfoGroup     OBJECT IDENTIFIER ::= { wlsxVoiceStatsGroup 5 }
 
    wlsxVoiceCdrTotal  OBJECT-TYPE 
          SYNTAX       Unsigned32
@@ -208,7 +210,7 @@ WLSX-VOICE-MIB DEFINITIONS ::= BEGIN
    	voiceCdrTeardownTime OBJECT-TYPE
          SYNTAX       Unsigned32
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			Voice CDR teardown number
@@ -329,7 +331,7 @@ WLSX-VOICE-MIB DEFINITIONS ::= BEGIN
    	voiceCdrMOS OBJECT-TYPE
          SYNTAX       Integer32
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			Voice CDR MOS
@@ -428,7 +430,7 @@ WLSX-VOICE-MIB DEFINITIONS ::= BEGIN
    voiceCallCtrsNotFnd  OBJECT-TYPE 
          SYNTAX       Unsigned32
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			Total number of not found calls.
@@ -438,7 +440,7 @@ WLSX-VOICE-MIB DEFINITIONS ::= BEGIN
    voiceCallCtrsBusy  OBJECT-TYPE 
          SYNTAX       Unsigned32
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			Total number of busy calls.
@@ -448,7 +450,7 @@ WLSX-VOICE-MIB DEFINITIONS ::= BEGIN
    voiceCallCtrsSvc  OBJECT-TYPE 
          SYNTAX       Unsigned32
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			Total number of service unavailable calls.
@@ -458,7 +460,7 @@ WLSX-VOICE-MIB DEFINITIONS ::= BEGIN
    voiceCallCtrsReqTerm  OBJECT-TYPE 
          SYNTAX       Unsigned32
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			Total number of request terminated calls.
@@ -468,7 +470,7 @@ WLSX-VOICE-MIB DEFINITIONS ::= BEGIN
    voiceCallCtrsDecline  OBJECT-TYPE 
          SYNTAX       Unsigned32
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			Total number of declined calls.
@@ -478,7 +480,7 @@ WLSX-VOICE-MIB DEFINITIONS ::= BEGIN
    voiceCallCtrsUnauth  OBJECT-TYPE 
          SYNTAX       Unsigned32
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			Total number of unauthorized calls.
@@ -488,7 +490,7 @@ WLSX-VOICE-MIB DEFINITIONS ::= BEGIN
    voiceCallCtrsMisc  OBJECT-TYPE 
          SYNTAX       Unsigned32
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			Total number of miscellaneous calls.
@@ -681,6 +683,7 @@ WLSX-VOICE-MIB DEFINITIONS ::= BEGIN
 	voiceAPBssidTotVoiceClients   Unsigned32,
 	voiceAPBssidCallsSCCP			Unsigned32,
 	voiceAPBssidCallsSIP			Unsigned32,
+    voiceAPBssidCallsSIPS           Unsigned32,
 	voiceAPBssidCallsSVP			Unsigned32,
 	voiceAPBssidCallsVocera		Unsigned32,
 	voiceAPBssidCallsNoe		    Unsigned32,
@@ -713,7 +716,7 @@ WLSX-VOICE-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			Voice AP IP addresss
+			Voice AP IP address
             "
         ::= { wlsxVoiceAPBssidEntry 3 }
 
@@ -798,7 +801,7 @@ WLSX-VOICE-MIB DEFINITIONS ::= BEGIN
    	voiceAPBssidKickedOff OBJECT-TYPE
          SYNTAX       Counter32
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			Voice AP kicked off
@@ -895,8 +898,136 @@ WLSX-VOICE-MIB DEFINITIONS ::= BEGIN
             "
         ::= { wlsxVoiceAPBssidEntry 20 }
 
+   	voiceAPBssidCallsSIPS OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Voice AP Total SIPS calls
+            "
+        ::= { wlsxVoiceAPBssidEntry 21 }
+
 --
 -- end VoiceApEntry
+--
+
+--
+-- begin voice client location entry
+--
+
+   wlsxVoiceClientLocationTotal  OBJECT-TYPE 
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total Number of Active voice clients in the controller.
+            "
+        ::= { wlsxVoiceClientLocationInfoGroup 1 }
+
+   wlsxVoiceClientLocationTable  OBJECT-TYPE
+		SYNTAX       SEQUENCE OF VoiceClientLocationEntry 
+        MAX-ACCESS   not-accessible		
+        STATUS       current 
+        DESCRIPTION 
+	  	"
+			This table lists all voice client Location Info
+		"
+      ::= { wlsxVoiceClientLocationInfoGroup 2 } 
+      
+   wlsxVoiceClientLocationEntry OBJECT-TYPE 
+	  SYNTAX       VoiceClientLocationEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             ""
+	  INDEX { wlanStaPhyAddress }
+      ::= { wlsxVoiceClientLocationTable 1 } 
+
+
+   VoiceClientLocationEntry ::=
+	SEQUENCE {
+		vcLocationIp          IpAddress,
+		vcLocationMac	      MacAddress,  
+		vcLocationSwitchIp	  IpAddress,
+		vcLocationApName	  DisplayString,
+		vcLocationApMac  	  MacAddress,
+		vcLocationApMode	  Integer32,
+		vcLocationApLoc	      DisplayString
+    }
+
+   	vcLocationIp OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Voice client IP Address 
+            "
+        ::= { wlsxVoiceClientLocationEntry 1 }
+
+   	vcLocationMac OBJECT-TYPE
+         SYNTAX       MacAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Voice client Mac Address 
+            "
+        ::= { wlsxVoiceClientLocationEntry 2 }
+
+   	vcLocationSwitchIp OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Voice Client Switch IP Address 
+            "
+        ::= { wlsxVoiceClientLocationEntry 3 }
+
+   	vcLocationApName OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Voice Client AP Name
+            "
+        ::= { wlsxVoiceClientLocationEntry 4 }
+
+   	vcLocationApMac OBJECT-TYPE
+         SYNTAX       MacAddress 
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Voice client AP Mac Address 
+            "
+        ::= { wlsxVoiceClientLocationEntry 5 }
+
+   	vcLocationApMode OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Voice client AP Mode
+            "
+        ::= { wlsxVoiceClientLocationEntry 6 }
+
+   	vcLocationApLoc OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Voice client Ap Location 
+            "
+        ::= { wlsxVoiceClientLocationEntry 7 }
+--
+-- end voice client location entry 
 --
         
 END        

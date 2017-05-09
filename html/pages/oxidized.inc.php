@@ -77,8 +77,8 @@ $pagetitle[] = 'Oxidized';
                 $("#search-output").show();
                 if (data.output)
                     $('#search-output').append('Config appears on the folllowing device(s):<br />');
-                $.each(data.output, function (row, value) {
-                    $('#search-output').append(value['full_name'] + '<br />');
+                    $.each(data.output, function (row, value) {
+                        $('#search-output').append(value['full_name'] + '<br />');
                 });
             },
             error: function () {

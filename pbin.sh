@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Pastes from STDIN or file from commandline argument to Stikked pastebin
 # Default server: paste.mate-desktop.org

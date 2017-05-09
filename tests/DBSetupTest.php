@@ -27,29 +27,8 @@ namespace LibreNMS\Tests;
 
 use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
-class DBSetupTest extends \PHPUnit_Framework_TestCase
+class DBSetupTest extends DBTestCase
 {
-    public static function tearDownAfterClass()
-    {
-        if (getenv('DBTEST')) {
-            global $config, $empty_db;
-
-
-            if ($empty_db) {
-                dbQuery("DROP DATABASE " . $config['db_name']);
-            }
-        }
-    }
-
-    public function setUp()
-    {
-        if (getenv('DBTEST')) {
-            dbConnect();
-        } else {
-            $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
-        }
-    }
-
     public function testSetupDB()
     {
         global $schema;
@@ -60,17 +39,39 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testSchema()
+    public function testSchemaFiles()
     {
         global $config;
+        $files = glob($config['install_dir'].'/sql-schema/*.sql');
 
-        $schema = (int)@dbFetchCell('SELECT `version` FROM `dbSchema` LIMIT 1');
+        foreach ($files as $file) {
+            $content = file_get_contents($file);
+
+            foreach (explode("\n", $content) as $line) {
+                // skip comments and empty lines
+                if (empty($line) || starts_with($line, array('#', '--'))) {
+                    continue;
+                }
+
+                // each line must end with ;, prevents multiline and makes sql easy to run by hand
+                // Warning may include whitespace such as space and \r
+                if (!ends_with($line, ';')) {
+                    throw new PHPUnitException("Each line must end with a semicolin (;)\n$file: $line");
+                }
+
+                // cannot assume user use the librenms database name
+                if (str_contains($line, 'librenms')) {
+                    throw new PHPUnitException("Do not include the database name in schema files\n$file: $line");
+                }
+            }
+        }
+    }
+
+    public function testSchema()
+    {
+        $schema = get_db_schema();
         $this->assertGreaterThan(0, $schema, "Database has no schema!");
-
-        $files = glob($config['install_dir'] . '/sql-schema/*.sql');
-        end($files);
-        $expected = (int)basename(current($files), '.sql');
-        $this->assertEquals($expected, $schema, 'Schema not fully up-to-date');
+        $this->assertTrue(db_schema_is_current(), "Schema not fully up-to-date, at $schema");
     }
 
     public function testCheckDBCollation()
@@ -114,6 +115,19 @@ class DBSetupTest extends \PHPUnit_Framework_TestCase
     {
         global $sql_mode;
         $this->assertNotNull($sql_mode, 'Query to save SQL Mode in bootstrap.php failed');
+
+        // sql_mode can only be set by users with access
+        $access = array(
+            'GRANT ALL PRIVILEGES ON *.*',
+            'SUPER'
+        );
+
+        if (str_contains(join(PHP_EOL, dbFetchColumn('SHOW GRANTS')), $access)) {
+            $this->assertEquals(
+                array('ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'),
+                dbFetchColumn("SELECT @@global.sql_mode")
+            );
+        }
     }
 
     public function testValidateSchema()

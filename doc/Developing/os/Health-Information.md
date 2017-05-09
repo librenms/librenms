@@ -35,7 +35,7 @@ exception of state which requires additional code.
   Typically it's the index from the table being walked or it could be the name of the OID if it's a single value.
   - $type = Required. This should be the OS name, i.e pulse.
   - $descr = Required. This is a descriptive value for the sensor. Some devices will provide names to use.
-  - $divisor = Defaults to 1. This is used to divied the returned value.
+  - $divisor = Defaults to 1. This is used to divided the returned value.
   - $multiplier = Defaults to 1. This is used to multiply the returned value.
   - $low_limit = Defaults to null. Sets the low threshold limit for the sensor, used in alerting to report out range sensors.
   - $low_warn_limit = Defaults to null. Sets the low warning limit for the sensor, used in alerting to report near out of range sensors.

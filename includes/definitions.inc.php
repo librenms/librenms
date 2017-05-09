@@ -720,6 +720,8 @@ $config['ipmi_unit']['Volts']     = 'voltage';
 $config['ipmi_unit']['degrees C'] = 'temperature';
 $config['ipmi_unit']['RPM']       = 'fanspeed';
 $config['ipmi_unit']['Watts']     = 'power';
+$config['ipmi_unit']['Amps']      = 'current';
+$config['ipmi_unit']['percent']   = 'load';
 $config['ipmi_unit']['discrete']  = '';
 
 // Define some variables if they aren't set by user definition in config.php

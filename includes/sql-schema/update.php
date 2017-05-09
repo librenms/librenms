@@ -24,8 +24,13 @@ if (!isset($debug)  && php_sapi_name() == 'cli') {
     $debug = isset($options['d']);
 }
 
+set_lock('schema');
+
+d_echo("DB Schema update started....\n");
+
 if (db_schema_is_current()) {
     d_echo("DB Schema already up to date.\n");
+    release_lock('schema');
     return;
 }
 
@@ -91,3 +96,5 @@ if ($updating) {
         $_SESSION['build-ok'] = true;
     }
 }
+
+release_lock('schema');

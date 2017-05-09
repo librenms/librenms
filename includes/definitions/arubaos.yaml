@@ -1,7 +1,7 @@
 os: arubaos
 text: ArubaOS
 type: wireless
-icon: arubaos
+icon: aruba
 over:
     - { graph: device_arubacontroller_numaps, text: 'Number of APs' }
     - { graph: device_arubacontroller_numclients, text: 'Number of Clients' }

@@ -22,18 +22,18 @@ if (!$_SESSION['authenticated']) {
 
 set_debug($_REQUEST['debug']);
 
-$current = $_POST['current'];
+$current = $_REQUEST['current'];
 settype($current, 'integer');
-$rowCount = $_POST['rowCount'];
+$rowCount = $_REQUEST['rowCount'];
 settype($rowCount, 'integer');
-if (isset($_POST['sort']) && is_array($_POST['sort'])) {
-    foreach ($_POST['sort'] as $k => $v) {
+if (isset($_REQUEST['sort']) && is_array($_POST['sort'])) {
+    foreach ($_REQUEST['sort'] as $k => $v) {
         $sort .= " $k $v";
     }
 }
 
-$searchPhrase = mres($_POST['searchPhrase']);
-$id           = mres($_POST['id']);
+$searchPhrase = mres($_REQUEST['searchPhrase']);
+$id           = mres($_REQUEST['id']);
 $response     = array();
 
 if (isset($id)) {

@@ -338,7 +338,6 @@ $config['graph_colours']['mega']=array_merge(
     $config['graph_colours']['mixed']
 );
 
-
 // Map colors
 $config['network_map_legend'] = array(
     '0'   => '#aeaeae',
@@ -517,6 +516,7 @@ $config['bad_if'][] = 'span rp';
 $config['bad_if'][] = 'span sp';
 $config['bad_if'][] = 'sslvpn';
 $config['bad_if'][] = 'pppoe-';
+$config['bad_if'][] = 'irtual';
 // $config['bad_if'][] = "control plane";  // Example for cisco control plane
 // Ignore ports based on ifType. Case-sensitive.
 $config['bad_iftype'][] = 'voiceEncap';
@@ -714,6 +714,7 @@ $config['poller_modules']['junose-atm-vp']               = 0;
 $config['poller_modules']['toner']                       = 0;
 $config['poller_modules']['ucd-diskio']                  = 1;
 $config['poller_modules']['wifi']                        = 0;
+$config['poller_modules']['wireless']                    = 1;
 $config['poller_modules']['ospf']                        = 1;
 $config['poller_modules']['cisco-ipsec-flow-monitor']    = 0;
 $config['poller_modules']['cisco-remote-access-monitor'] = 0;
@@ -778,8 +779,8 @@ $config['discovery_modules']['stp']                  = 1;
 $config['discovery_modules']['ntp']                  = 1;
 $config['discovery_modules']['loadbalancers']        = 0;
 $config['discovery_modules']['mef']                  = 0;
+$config['discovery_modules']['wireless']             = 1;
 $config['discovery_modules']['fdb-table']            = 1;
-
 // Enable daily updates
 $config['update'] = 1;
 

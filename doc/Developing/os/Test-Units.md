@@ -2,28 +2,15 @@ source: Developing/os/Test-Units.md
 
 We have a testing unit for new OS', please ensure you add a test for any new OS' or updates to existing OS discovery.
 
-The OS test unit file is located `tests/OSDiscoveryTest.php`. An example of this is as follows:
-
-```php
-    public function testPulse()
-    {
-        $this->checkOS('pulse');
-        $this->checkOS('pulse', 'pulse-mag2600');
-        $this->checkOS('pulse', 'pulse-sa2500');
-        $this->checkOS('pulse', 'pulse-sa6500');
-        $this->checkOS('pulse', 'pulse-vaspe');
-        $this->checkOS('pulse', 'pulse-sa');
-    }
-```
-
-The above example has multiple test files, the first argument in the function call is the os name we expect the test 
-to pass as, the second argument is the filename to use for the test. If not filename is passed then the os name is used 
-for the file.
+All that you need to do is create an snmprec file in tests/snmpsim with the proper name. If adding the first test for
+this os, simply use the os name `pulse.snmprec` for example.  If you need to add multiple test files, you can add an
+underscore after the os name followed by a description, typically a model name.  For example: `pulse_mag2600.snmprec`.
+You can copy `skel.snmprec` to your intended name and fill in the data to make things a little easier.
 
 We utilise [snmpsim](http://snmpsim.sourceforge.net/) to do unit testing for OS discovery. For this to work you need
 to supply an snmprec file. This is pretty simple and using pulse as the example again this would look like:
 
-`tests/snmpsim/pulse-mag2600.snmprec`
+`tests/snmpsim/pulse_mag2600.snmprec`
 ```
 1.3.6.1.2.1.1.1.0|4|Pulse Secure,LLC,MAG-2600,8.0R14 (build 41869)
 1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.12532.254.1.1
@@ -46,7 +33,6 @@ Common OIDs used in discovery:
 | SNMPv2-MIB::sysObjectID.0           | 1.3.6.1.2.1.1.2.0           |
 | ENTITY-MIB::entPhysicalDescr.1      | 1.3.6.1.2.1.47.1.1.1.1.2.1  |
 | ENTITY-MIB::entPhysicalMfgName.1    | 1.3.6.1.2.1.47.1.1.1.1.12.1 |
-| SML-MIB::product-Name.0             | 1.3.6.1.4.1.2.6.182.3.3.1.0 |
 
 List of SNMP data types:
 
