@@ -24,8 +24,7 @@ if ($device['os'] == 'ios') {
             $device_vlan['fdb_vlan'] = $vlan;
             $device_vlan['snmp_retries]'] = 0;
             $FdbPort_table = snmp_walk($device_vlan, 'dot1dTpFdbPort', '-OqsX', 'BRIDGE-MIB');
-
-            if (! $FdbPort_table) {
+            if (empty($FdbPort_table)) {
                 // If there are no entries for the vlan, continue
                 unset($device_vlan);
                 continue;
@@ -42,7 +41,7 @@ if ($device['os'] == 'ios') {
 
             foreach (explode("\n", $FdbPort_table) as $FdbPort_entry) {
                 preg_match('~(?P<oid>\w+)\[(?P<mac>[\w:-]+)]\s(?P<result>\w.*)~', $FdbPort_entry, $matches);
-                if ($matches) {
+                if (! empty($matches)) {
                     list($oct_1, $oct_2, $oct_3, $oct_4, $oct_5, $oct_6) = explode(':', $matches['mac']);
                     $mac_address = zeropad($oct_1) . zeropad($oct_2) . zeropad($oct_3) . zeropad($oct_4) . zeropad($oct_5) . zeropad($oct_6);
                     if (strlen($mac_address) != 12) {
@@ -66,7 +65,7 @@ if ($device['os'] == 'ios') {
     $mac_to_port = array();
     foreach (explode("\n", $portids) as $portid) {
         preg_match('~(?P<oid>\w+)\[\d+]\[(?P<mac>[\w:-]+)]\s(?P<result>\d+)~', $portid, $matches);
-        if ($matches) {
+        if (! empty($matches)) {
             $mac_to_port[$matches['mac']] = $matches['result'];
         }
     }
@@ -74,7 +73,7 @@ if ($device['os'] == 'ios') {
     $vlans = snmp_walk($device, 'tlsFdbEncapValue', '-OqsX', 'TIMETRA-SERV-MIB');
     foreach (explode("\n", $vlans) as $vlan) {
         preg_match('~(?P<oid>\w+)\[\d+]\[(?P<mac>[\w:-]+)]\s(?P<result>\d+)~', $vlan, $matches);
-        if ($matches) {
+        if (! empty($matches)) {
             list($oct_1, $oct_2, $oct_3, $oct_4, $oct_5, $oct_6) = explode(':', $matches['mac']);
             $mac_address = zeropad($oct_1) . zeropad($oct_2) . zeropad($oct_3) . zeropad($oct_4) . zeropad($oct_5) . zeropad($oct_6);
             if (strlen($mac_address) != 12) {
@@ -114,7 +113,7 @@ if ($continue) {
                     $update_entry['port_id'] = $new_port;
                 }
 
-                if ($update_entry) {
+                if (! empty($update_entry)) {
                     dbUpdate($update_entry, 'ports_fdb', '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?', array($device['device_id'], $vlan, $mac_address));
                 }
                 unset($existing_fdbs[$vlan][$mac_address_entry]);
