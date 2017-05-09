@@ -30,4 +30,3 @@ rrd
 /vendor
 composer.phar
 librenms_theme
-/cache/
