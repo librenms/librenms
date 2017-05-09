@@ -17,11 +17,12 @@ if ($device['os'] == 'ios') {
 
     $vlans = snmpwalk_cache_oid($device, 'vtpVlanState', array(), 'CISCO-VTP-MIB');
     foreach ($vlans as $vlan_oid => $state) {
+        echo $state . "\n";
         if ($state['vtpVlanState'] == 'operational') {
-            $vlan = explode('.', $vlan_oid)[1];
+            $vlan = explode('.', $vlan_oid);
 
             $device_vlan = $device;
-            $device_vlan['fdb_vlan'] = $vlan;
+            $device_vlan['fdb_vlan'] = $vlan[1];
             $device_vlan['snmp_retries]'] = 0;
             $FdbPort_table = snmp_walk($device_vlan, 'dot1dTpFdbPort', '-OqsX', 'BRIDGE-MIB');
             if (empty($FdbPort_table)) {
