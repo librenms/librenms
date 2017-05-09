@@ -187,7 +187,7 @@ function discover_device(&$device, $options = null)
 // Discover sensors
 
 
-function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null)
+function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null)
 {
 
     $low_limit      = set_null($low_limit);
@@ -241,6 +241,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             'sensor_current' => $current,
             'entPhysicalIndex' => $entPhysicalIndex,
             'entPhysicalIndex_measured' => $entPhysicalIndex_measured,
+            'user_func' => $user_func,
         );
 
         foreach ($insert as $key => $val_check) {
@@ -324,7 +325,8 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             $multiplier == $sensor_entry['sensor_multiplier'] &&
             $divisor == $sensor_entry['sensor_divisor'] &&
             $entPhysicalIndex_measured == $sensor_entry['entPhysicalIndex_measured'] &&
-            $entPhysicalIndex == $sensor_entry['entPhysicalIndex']
+            $entPhysicalIndex == $sensor_entry['entPhysicalIndex'] &&
+            $user_func == $sensor_entry['user_func']
         ) {
             echo '.';
         } else {
@@ -335,6 +337,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
                 'sensor_divisor' => $divisor,
                 'entPhysicalIndex' => $entPhysicalIndex,
                 'entPhysicalIndex_measured' => $entPhysicalIndex_measured,
+                'user_func' => $user_func,
             );
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
             echo 'U';

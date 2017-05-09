@@ -174,3 +174,67 @@ unset(
     $index,
     $data
 );
+
+foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
+    if ($data['memSensorsCommStatus']) {
+        $cur_oid        = '.1.3.6.1.4.1.318.1.1.10.4.2.3.1.7.' . $index;
+        $state_name     = 'memSensorsCommStatus';
+        $state_index_id = create_state_index($state_name);
+        if ($state_index_id !== null) {
+            $states = array(
+                array($state_index_id,'notInstalled',0,1,1),
+                array($state_index_id,'commsOK',0,2,0),
+                array($state_index_id,'commsLost',0,3,2),
+            );
+            foreach ($states as $value) {
+                $insert = array(
+                    'state_index_id' => $value[0],
+                    'state_descr' => $value[1],
+                    'state_draw_graph' => $value[2],
+                    'state_value' => $value[3],
+                    'state_generic_value' => $value[4]
+                );
+                dbInsert($insert, 'state_translations');
+            }
+        }
+        $current = $data['memSensorsCommStatus'];
+    }
+    $descr      = $data['memSensorsStatusSensorName'] . ' - ' . $data['memSensorsStatusSensorLocation'];
+    $divisor    = 1;
+    $multiplier = 1;
+    if (is_numeric($current)) {
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, '1', '1', null, null, null, null, $current);
+        create_sensor_to_state_index($device, $state_name, $state_name . '.' . $index);
+    }
+
+    if ($data['memSensorsAlarmStatus']) {
+        $cur_oid        = '.1.3.6.1.4.1.318.1.1.10.4.2.3.1.8.' . $index;
+        $state_name     = 'memSensorsAlarmStatus';
+        $state_index_id = create_state_index($state_name);
+        if ($state_index_id !== null) {
+            $states = array(
+                array($state_index_id,'memNormal',0,1,0),
+                array($state_index_id,'memWarning',0,2,1),
+                array($state_index_id,'memCritical',0,3,2),
+            );
+            foreach ($states as $value) {
+                $insert = array(
+                    'state_index_id' => $value[0],
+                    'state_descr' => $value[1],
+                    'state_draw_graph' => $value[2],
+                    'state_value' => $value[3],
+                    'state_generic_value' => $value[4]
+                );
+                dbInsert($insert, 'state_translations');
+            }
+        }
+        $current = $data['memSensorsAlarmStatus'];
+    }
+    $descr      = $data['memSensorsStatusSensorName'] . ' - ' . $data['memSensorsStatusSensorLocation'];
+    $divisor    = 1;
+    $multiplier = 1;
+    if (is_numeric($current)) {
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, '1', '1', null, null, null, null, $current);
+        create_sensor_to_state_index($device, $state_name, $state_name . '.' . $index);
+    }
+}
