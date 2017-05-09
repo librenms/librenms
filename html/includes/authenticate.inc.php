@@ -4,8 +4,8 @@ use Phpass\PasswordHash;
 
 @ini_set('session.use_only_cookies', 1);
 @ini_set('session.cookie_httponly', 1);
-
-session_start();
+@ini_set('session.use_strict_mode', 1); // php >= 5.5.2
+@ini_set('session.use_trans_sid', 0);   // insecure feature, be sure it is disabled
 
 // Preflight checks
 if (!is_dir($config['rrd_dir'])) {
@@ -23,10 +23,12 @@ if (!is_writable($config['temp_dir'])) {
 // Clear up any old sessions
 dbDelete('session', '`session_expiry` <  ?', array(time()));
 
+session_start();
+
 if ($vars['page'] == 'logout' && $_SESSION['authenticated']) {
     dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Logged Out'), 'authlog');
     dbDelete('session', '`session_username` =  ? AND session_value = ?', array($_SESSION['username'], $_COOKIE['sess_id']));
-    unset($_SESSION);
+    unset($_SESSION['authenticated']);
     unset($_COOKIE);
     setcookie('sess_id', '', (time() - 60 * 60 * 24 * $config['auth_remember']), '/');
     setcookie('token', '', (time() - 60 * 60 * 24 * $config['auth_remember']), '/');
@@ -37,27 +39,26 @@ if ($vars['page'] == 'logout' && $_SESSION['authenticated']) {
     exit;
 }
 
-// We are only interested in login details passed via POST.
-if (isset($_POST['username']) && isset($_POST['password'])) {
-    $_SESSION['username'] = clean($_POST['username']);
-    $_SESSION['password'] = $_POST['password'];
-} elseif (isset($_GET['username']) && isset($_GET['password'])) {
-    $_SESSION['username'] = clean($_GET['username']);
-    $_SESSION['password'] = $_GET['password'];
+if (isset($_REQUEST['username']) && isset($_REQUEST['password'])) {
+    $username = clean($_REQUEST['username']);
+    $password = $_REQUEST['password'];
 } elseif (isset($_SERVER['REMOTE_USER'])) {
-    $_SESSION['username'] = $_SERVER['REMOTE_USER'];
+    $username = $_SERVER['REMOTE_USER'];
 } elseif (isset($_SERVER['PHP_AUTH_USER']) && $config['auth_mechanism'] === 'http-auth') {
-    $_SESSION['username'] = $_SERVER['PHP_AUTH_USER'];
+    $username = $_SERVER['PHP_AUTH_USER'];
 }
 
-if (!isset($config['auth_mechanism'])) {
-    $config['auth_mechanism'] = 'mysql';
-}
+if ((isset($username)) || (isset($_COOKIE['sess_id'], $_COOKIE['token']))) {
+    if ((isset($_SESSION['authenticated']) && $_SESSION['authenticated']) ||
+        (isset($_COOKIE['sess_id'], $_COOKIE['token']) && reauthenticate($_COOKIE['sess_id'], $_COOKIE['token'])) ||
+        (isset($username, $password) && authenticate($username, $password))
+    ) {
+        $authenticated = $_SESSION['authenticated'];
+        session_regenerate_id(true); // prevent session fixation
+        $_SESSION['username'] = $username;
+        $_SESSION['authenticated'] = $authenticated;
+        unset($authenticated, $username, $password);
 
-$auth_success = 0;
-
-if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token']))) {
-    if (reauthenticate($_COOKIE['sess_id'], $_COOKIE['token']) || authenticate($_SESSION['username'], $_SESSION['password'])) {
         $_SESSION['userlevel'] = get_userlevel($_SESSION['username']);
         $_SESSION['user_id']   = get_userid($_SESSION['username']);
         if (!$_SESSION['authenticated']) {
@@ -85,7 +86,7 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
             dbInsert(array('session_username' => $_SESSION['username'], 'session_value' => $sess_id, 'session_token' => $token, 'session_auth' => $auth, 'session_expiry' => time() + 60 * 60 * 24 * $config['auth_remember']), 'session');
         }
 
-        if (isset($_COOKIE['sess_id'],$_COOKIE['token'],$_COOKIE['auth'])) {
+        if (isset($_COOKIE['sess_id'], $_COOKIE['token'], $_COOKIE['auth'])) {
             // If we have the remember me cookies set then update session expiry times to keep us logged in.
             $sess_id = session_id();
             dbUpdate(array('session_value' => $sess_id, 'session_expiry' => time() + 60 * 60 * 24 * $config['auth_remember']), 'session', 'session_auth=?', array($_COOKIE['auth']));
@@ -111,3 +112,5 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
         dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Authentication Failure'), 'authlog');
     }
 }
+
+session_write_close();
