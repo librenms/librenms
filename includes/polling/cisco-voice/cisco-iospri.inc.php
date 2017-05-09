@@ -35,7 +35,7 @@ if ($device['os_group'] == "cisco") {
             $active = $active[''];
         }
 
-        if (isset($active) && $active > 0) {
+        if (isset($total) && $total > 0) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('total', 'GAUGE', 0)
                 ->addDataset('active', 'GAUGE', 0);
