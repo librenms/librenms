@@ -62,7 +62,7 @@ class DateScale extends LinearScale
         assert($aMin <= $aMax);
 
         $this->type = $aType;
-        $this->scale = [$aMin, $aMax];
+        $this->scale = array($aMin, $aMax);
         $this->world_size = $aMax - $aMin;
         $this->ticks = new LinearTicks();
         $this->intscale = true;
@@ -83,7 +83,7 @@ class DateScale extends LinearScale
         $i = 0;
         $s = 0;
         if ($aYearType !== false) {
-            $yearAdj = [0 => 1, 1 => 2, 2 => 5];
+            $yearAdj = array(0 => 1, 1 => 2, 2 => 5);
             if ($aRound == 0) {
                 $y = floor($y / $yearAdj[$aYearType]) * $yearAdj[$aYearType];
             } else {
@@ -93,7 +93,7 @@ class DateScale extends LinearScale
             $m = 1;
             $d = 1;
         } elseif ($aMonthType !== false) {
-            $monthAdj = [0 => 1, 1 => 6];
+            $monthAdj = array(0 => 1, 1 => 6);
             if ($aRound == 0) {
                 $m = floor($m / $monthAdj[$aMonthType]) * $monthAdj[$aMonthType];
                 $d = 1;
@@ -170,7 +170,7 @@ class DateScale extends LinearScale
         $s = (int) date('s', $aTime);
         if ($aHourType !== false) {
             $aHourType %= 6;
-            $hourAdj = [0 => 1, 1 => 2, 2 => 3, 3 => 4, 4 => 6, 5 => 12];
+            $hourAdj = array(0 => 1, 1 => 2, 2 => 3, 3 => 4, 4 => 6, 5 => 12);
             if ($aRound == 0) {
                 $h = floor($h / $hourAdj[$aHourType]) * $hourAdj[$aHourType];
             } else {
@@ -190,7 +190,7 @@ class DateScale extends LinearScale
             $s = 0;
         } elseif ($aMinType !== false) {
             $aMinType %= 5;
-            $minAdj = [0 => 1, 1 => 5, 2 => 10, 3 => 15, 4 => 30];
+            $minAdj = array(0 => 1, 1 => 5, 2 => 10, 3 => 15, 4 => 30);
             if ($aRound == 0) {
                 $i = floor($i / $minAdj[$aMinType]) * $minAdj[$aMinType];
             } else {
@@ -210,7 +210,7 @@ class DateScale extends LinearScale
             $s = 0;
         } elseif ($aSecType !== false) {
             $aSecType %= 5;
-            $secAdj = [0 => 1, 1 => 5, 2 => 10, 3 => 15, 4 => 30];
+            $secAdj = array(0 => 1, 1 => 5, 2 => 10, 3 => 15, 4 => 30);
             if ($aRound == 0) {
                 $s = floor($s / $secAdj[$aSecType]) * $secAdj[$aSecType];
             } else {
@@ -262,70 +262,70 @@ class DateScale extends LinearScale
         //       array( 0=date-adjust, 1=time-adjust, adjustment-alignment) )
         //
         $scalePoints =
-        [
+        array(
             /* Intervall larger than 10 years */
-            SECPERYEAR * 10, [[SECPERYEAR * 5, SECPERYEAR * 2],
-                [SECPERYEAR],
-                [0, YEARADJ_1, 0, YEARADJ_1]],
+            SECPERYEAR * 10, array(array(SECPERYEAR * 5, SECPERYEAR * 2),
+                array(SECPERYEAR),
+                array(0, YEARADJ_1, 0, YEARADJ_1)),
 
             /* Intervall larger than 2 years */
-            SECPERYEAR * 2, [[SECPERYEAR], [SECPERYEAR],
-                [0, YEARADJ_1]],
+            SECPERYEAR * 2, array(array(SECPERYEAR), array(SECPERYEAR),
+                array(0, YEARADJ_1)),
 
             /* Intervall larger than 90 days (approx 3 month) */
-            SECPERDAY * 90, [[SECPERDAY * 30, SECPERDAY * 14, SECPERDAY * 7, SECPERDAY],
-                [SECPERDAY * 5, SECPERDAY * 7, SECPERDAY, SECPERDAY],
-                [0, MONTHADJ_1, 0, DAYADJ_WEEK, 0, DAYADJ_1, 0, DAYADJ_1]],
+            SECPERDAY * 90, array(array(SECPERDAY * 30, SECPERDAY * 14, SECPERDAY * 7, SECPERDAY),
+                array(SECPERDAY * 5, SECPERDAY * 7, SECPERDAY, SECPERDAY),
+                array(0, MONTHADJ_1, 0, DAYADJ_WEEK, 0, DAYADJ_1, 0, DAYADJ_1)),
 
             /* Intervall larger than 30 days (approx 1 month) */
-            SECPERDAY * 30, [[SECPERDAY * 14, SECPERDAY * 7, SECPERDAY * 2, SECPERDAY],
-                [SECPERDAY, SECPERDAY, SECPERDAY, SECPERDAY],
-                [0, DAYADJ_WEEK, 0, DAYADJ_1, 0, DAYADJ_1, 0, DAYADJ_1]],
+            SECPERDAY * 30, array(array(SECPERDAY * 14, SECPERDAY * 7, SECPERDAY * 2, SECPERDAY),
+                array(SECPERDAY, SECPERDAY, SECPERDAY, SECPERDAY),
+                array(0, DAYADJ_WEEK, 0, DAYADJ_1, 0, DAYADJ_1, 0, DAYADJ_1)),
 
             /* Intervall larger than 7 days */
-            SECPERDAY * 7, [[SECPERDAY, SECPERHOUR * 12, SECPERHOUR * 6, SECPERHOUR * 2],
-                [SECPERHOUR * 6, SECPERHOUR * 3, SECPERHOUR, SECPERHOUR],
-                [0, DAYADJ_1, 1, HOURADJ_12, 1, HOURADJ_6, 1, HOURADJ_1]],
+            SECPERDAY * 7, array(array(SECPERDAY, SECPERHOUR * 12, SECPERHOUR * 6, SECPERHOUR * 2),
+                array(SECPERHOUR * 6, SECPERHOUR * 3, SECPERHOUR, SECPERHOUR),
+                array(0, DAYADJ_1, 1, HOURADJ_12, 1, HOURADJ_6, 1, HOURADJ_1)),
 
             /* Intervall larger than 1 day */
-            SECPERDAY, [[SECPERDAY, SECPERHOUR * 12, SECPERHOUR * 6, SECPERHOUR * 2, SECPERHOUR],
-                [SECPERHOUR * 6, SECPERHOUR * 2, SECPERHOUR, SECPERHOUR, SECPERHOUR],
-                [1, HOURADJ_12, 1, HOURADJ_6, 1, HOURADJ_1, 1, HOURADJ_1]],
+            SECPERDAY, array(array(SECPERDAY, SECPERHOUR * 12, SECPERHOUR * 6, SECPERHOUR * 2, SECPERHOUR),
+                array(SECPERHOUR * 6, SECPERHOUR * 2, SECPERHOUR, SECPERHOUR, SECPERHOUR),
+                array(1, HOURADJ_12, 1, HOURADJ_6, 1, HOURADJ_1, 1, HOURADJ_1)),
 
             /* Intervall larger than 12 hours */
-            SECPERHOUR * 12, [[SECPERHOUR * 2, SECPERHOUR, SECPERMIN * 30, 900, 600],
-                [1800, 1800, 900, 300, 300],
-                [1, HOURADJ_1, 1, MINADJ_30, 1, MINADJ_15, 1, MINADJ_10, 1, MINADJ_5]],
+            SECPERHOUR * 12, array(array(SECPERHOUR * 2, SECPERHOUR, SECPERMIN * 30, 900, 600),
+                array(1800, 1800, 900, 300, 300),
+                array(1, HOURADJ_1, 1, MINADJ_30, 1, MINADJ_15, 1, MINADJ_10, 1, MINADJ_5)),
 
             /* Intervall larger than 2 hours */
-            SECPERHOUR * 2, [[SECPERHOUR, SECPERMIN * 30, 900, 600, 300],
-                [1800, 900, 300, 120, 60],
-                [1, HOURADJ_1, 1, MINADJ_30, 1, MINADJ_15, 1, MINADJ_10, 1, MINADJ_5]],
+            SECPERHOUR * 2, array(array(SECPERHOUR, SECPERMIN * 30, 900, 600, 300),
+                array(1800, 900, 300, 120, 60),
+                array(1, HOURADJ_1, 1, MINADJ_30, 1, MINADJ_15, 1, MINADJ_10, 1, MINADJ_5)),
 
             /* Intervall larger than 1 hours */
-            SECPERHOUR, [[SECPERMIN * 30, 900, 600, 300], [900, 300, 120, 60],
-                [1, MINADJ_30, 1, MINADJ_15, 1, MINADJ_10, 1, MINADJ_5]],
+            SECPERHOUR, array(array(SECPERMIN * 30, 900, 600, 300), array(900, 300, 120, 60),
+                array(1, MINADJ_30, 1, MINADJ_15, 1, MINADJ_10, 1, MINADJ_5)),
 
             /* Intervall larger than 30 min */
-            SECPERMIN * 30, [[SECPERMIN * 15, SECPERMIN * 10, SECPERMIN * 5, SECPERMIN],
-                [300, 300, 60, 10],
-                [1, MINADJ_15, 1, MINADJ_10, 1, MINADJ_5, 1, MINADJ_1]],
+            SECPERMIN * 30, array(array(SECPERMIN * 15, SECPERMIN * 10, SECPERMIN * 5, SECPERMIN),
+                array(300, 300, 60, 10),
+                array(1, MINADJ_15, 1, MINADJ_10, 1, MINADJ_5, 1, MINADJ_1)),
 
             /* Intervall larger than 1 min */
-            SECPERMIN, [[SECPERMIN, 15, 10, 5],
-                [15, 5, 2, 1],
-                [1, MINADJ_1, 1, SECADJ_15, 1, SECADJ_10, 1, SECADJ_5]],
+            SECPERMIN, array(array(SECPERMIN, 15, 10, 5),
+                array(15, 5, 2, 1),
+                array(1, MINADJ_1, 1, SECADJ_15, 1, SECADJ_10, 1, SECADJ_5)),
 
             /* Intervall larger than 10 sec */
-            10, [[5, 2],
-                [1, 1],
-                [1, SECADJ_5, 1, SECADJ_1]],
+            10, array(array(5, 2),
+                array(1, 1),
+                array(1, SECADJ_5, 1, SECADJ_1)),
 
             /* Intervall larger than 1 sec */
-            1, [[1],
-                [1],
-                [1, SECADJ_1]],
-        ];
+            1, array(array(1),
+                array(1),
+                array(1, SECADJ_1)),
+        );
 
         $ns = count($scalePoints);
         // Establish major and minor scale units for the date scale
@@ -395,7 +395,7 @@ class DateScale extends LinearScale
             }
             ++$i;
         }
-        return [$start, $end, $major, $minor, $format];
+        return array($start, $end, $major, $minor, $format);
     }
 
     // Overrides the automatic determined date format. Must be a valid date() format string
