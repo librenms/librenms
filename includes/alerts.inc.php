@@ -312,3 +312,247 @@ function GetContacts($results)
 
     return $tmp_contacts;
 }
+
+
+/**
+ * Format Alert
+ * @param array  $obj Alert-Array
+ * @return string
+ */
+function FormatAlertTpl($obj)
+{
+    $tpl    = $obj["template"];
+    $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), str_replace("'", "\'", $tpl)).'";';
+    $parsed = $msg;
+    $s      = strlen($msg);
+    $x      = $pos = -1;
+    $buff   = '';
+    $if     = $for = $calc = false;
+    while (++$x < $s) {
+        if ($msg[$x] == '{' && $buff == '') {
+            $buff .= $msg[$x];
+        } elseif ($buff == '{ ') {
+            $buff = '';
+        } elseif ($buff != '') {
+            $buff .= $msg[$x];
+        }
+
+        if ($buff == '{if') {
+            $pos = $x;
+            $if  = true;
+        } elseif ($buff == '{foreach') {
+            $pos = $x;
+            $for = true;
+        } elseif ($buff == '{calc') {
+            $pos  = $x;
+            $calc = true;
+        }
+
+        if ($pos != -1 && $msg[$x] == '}') {
+            $orig = $buff;
+            $buff = '';
+            $pos  = -1;
+            if ($if) {
+                $if     = false;
+                $o      = 3;
+                $native = array(
+                    '"; if( ',
+                    ' ) { $ret .= "',
+                );
+            } elseif ($for) {
+                $for    = false;
+                $o      = 8;
+                $native = array(
+                    '"; foreach( ',
+                    ' as $key=>$value) { $ret .= "',
+                );
+            } elseif ($calc) {
+                $calc   = false;
+                $o      = 5;
+                $native = array(
+                    '"; $ret .= (float) (0+(',
+                    ')); $ret .= "',
+                );
+            } else {
+                continue;
+            }
+
+            $cond   = trim(populate(substr($orig, $o, -1), false));
+            $native = $native[0].$cond.$native[1];
+            $parsed = str_replace($orig, $native, $parsed);
+            unset($cond, $o, $orig, $native);
+        }//end if
+    }//end while
+    $parsed = populate($parsed);
+    return RunJail($parsed, $obj);
+}//end FormatAlertTpl()
+
+/**
+ * Populate variables
+ * @param string  $txt  Text with variables
+ * @param boolean $wrap Wrap variable for text-usage (default: true)
+ * @return string
+ */
+function populate($txt, $wrap = true)
+{
+    preg_match_all('/%([\w\.]+)/', $txt, $m);
+    foreach ($m[1] as $tmp) {
+        $orig = $tmp;
+        $rep  = false;
+        if ($tmp == 'key' || $tmp == 'value') {
+            $rep = '$'.$tmp;
+        } else {
+            if (strstr($tmp, '.')) {
+                $tmp = explode('.', $tmp, 2);
+                $pre = '$'.$tmp[0];
+                $tmp = $tmp[1];
+            } else {
+                $pre = '$obj';
+            }
+
+            $rep = $pre."['".str_replace('.', "']['", $tmp)."']";
+            if ($wrap) {
+                $rep = '{'.$rep.'}';
+            }
+        }
+
+        $txt = str_replace('%'.$orig, $rep, $txt);
+    }//end foreach
+    return $txt;
+}//end populate()
+
+/**
+ * "Safely" run eval
+ * @param string $code Code to run
+ * @param array  $obj  Object with variables
+ * @return string|mixed
+ */
+function RunJail($code, $obj)
+{
+    $ret = '';
+    eval($code);
+    return $ret;
+}//end RunJail()
+
+
+/**
+ * Describe Alert
+ * @param array $alert Alert-Result from DB
+ * @return array
+ */
+function DescribeAlert($alert)
+{
+    $obj         = array();
+    $i           = 0;
+    $device      = dbFetchRow('SELECT hostname, sysName, location, purpose, notes, uptime FROM devices WHERE device_id = ?', array($alert['device_id']));
+    $tpl         = dbFetchRow('SELECT `template`,`title`,`title_rec` FROM `alert_templates` JOIN `alert_template_map` ON `alert_template_map`.`alert_templates_id`=`alert_templates`.`id` WHERE `alert_template_map`.`alert_rule_id`=?', array($alert['rule_id']));
+    $default_tpl = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}";
+    $obj['hostname']     = $device['hostname'];
+    $obj['sysName']      = $device['sysName'];
+    $obj['location']     = $device['location'];
+    $obj['uptime']       = $device['uptime'];
+    $obj['uptime_short'] = formatUptime($device['uptime'], 'short');
+    $obj['uptime_long']  = formatUptime($device['uptime']);
+    $obj['description']  = $device['purpose'];
+    $obj['notes']        = $device['notes'];
+    $obj['device_id']    = $alert['device_id'];
+    $extra               = $alert['details'];
+    if (!isset($tpl['template'])) {
+        $obj['template'] = $default_tpl;
+    } else {
+        $obj['template'] = $tpl['template'];
+    }
+    if ($alert['state'] >= 1) {
+        if (!empty($tpl['title'])) {
+            $obj['title'] = $tpl['title'];
+        } else {
+            $obj['title'] = 'Alert for device '.$device['hostname'].' - '.($alert['name'] ? $alert['name'] : $alert['rule']);
+        }
+        if ($alert['state'] == 2) {
+            $obj['title'] .= ' got acknowledged';
+        } elseif ($alert['state'] == 3) {
+            $obj['title'] .= ' got worse';
+        } elseif ($alert['state'] == 4) {
+            $obj['title'] .= ' got better';
+        }
+
+        foreach ($extra['rule'] as $incident) {
+            $i++;
+            $obj['faults'][$i] = $incident;
+            foreach ($incident as $k => $v) {
+                if (!empty($v) && $k != 'device_id' && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg')) && substr_count($k, '_') <= 1) {
+                    $obj['faults'][$i]['string'] .= $k.' => '.$v.'; ';
+                }
+            }
+        }
+        $obj['elapsed'] = TimeFormat(time() - strtotime($alert['time_logged']));
+        if (!empty($extra['diff'])) {
+            $obj['diff'] = $extra['diff'];
+        }
+    } elseif ($alert['state'] == 0) {
+        $id = dbFetchRow('SELECT alert_log.id,alert_log.time_logged,alert_log.details FROM alert_log WHERE alert_log.state != 2 && alert_log.state != 0 && alert_log.rule_id = ? && alert_log.device_id = ? && alert_log.id < ? ORDER BY id DESC LIMIT 1', array($alert['rule_id'], $alert['device_id'], $alert['id']));
+        if (empty($id['id'])) {
+            return false;
+        }
+
+        $extra          = json_decode(gzuncompress($id['details']), true);
+        if (!empty($tpl['title_rec'])) {
+            $obj['title'] = $tpl['title_rec'];
+        } else {
+            $obj['title']   = 'Device '.$device['hostname'].' recovered from '.($alert['name'] ? $alert['name'] : $alert['rule']);
+        }
+        $obj['elapsed'] = TimeFormat(strtotime($alert['time_logged']) - strtotime($id['time_logged']));
+        $obj['id']      = $id['id'];
+        foreach ($extra['rule'] as $incident) {
+            $i++;
+            $obj['faults'][$i] = $incident;
+            foreach ($incident as $k => $v) {
+                if (!empty($v) && $k != 'device_id' && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg')) && substr_count($k, '_') <= 1) {
+                    $obj['faults'][$i]['string'] .= $k.' => '.$v.'; ';
+                }
+            }
+        }
+    } else {
+        return 'Unknown State';
+    }//end if
+    $obj['uid']       = $alert['id'];
+    $obj['severity']  = $alert['severity'];
+    $obj['rule']      = $alert['rule'];
+    $obj['name']      = $alert['name'];
+    $obj['timestamp'] = $alert['time_logged'];
+    $obj['contacts']  = $extra['contacts'];
+    $obj['state']     = $alert['state'];
+    if (strstr($obj['title'], '%')) {
+        $obj['title'] = RunJail('$ret = "'.populate(addslashes($obj['title'])).'";', $obj);
+    }
+    return $obj;
+}//end DescribeAlert()
+
+/**
+ * Format Elapsed Time
+ * @param integer $secs Seconds elapsed
+ * @return string
+ */
+function TimeFormat($secs)
+{
+    $bit = array(
+        'y' => $secs / 31556926 % 12,
+        'w' => $secs / 604800 % 52,
+        'd' => $secs / 86400 % 7,
+        'h' => $secs / 3600 % 24,
+        'm' => $secs / 60 % 60,
+        's' => $secs % 60,
+    );
+    $ret = array();
+    foreach ($bit as $k => $v) {
+        if ($v > 0) {
+            $ret[] = $v.$k;
+        }
+    }
+
+    if (empty($ret)) {
+        return 'none';
+    }
+
+    return join(' ', $ret);
+}//end TimeFormat()
