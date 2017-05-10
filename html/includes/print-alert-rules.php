@@ -22,7 +22,7 @@ if (isset($_POST['create-default'])) {
             'device_id' => -1,
             'query'     => GenSQL($add_rule['rule']),
             'severity'  => 'critical',
-            'extra'     => '{"mute":false,"count":"1","delay":"300"}',
+            'extra'     => '{"mute":false,"count":"1","delay":"300","invert":false,"interval":300}',
             'disabled'  => 0,
             'name'      => $add_rule['name']
         );
