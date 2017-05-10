@@ -152,12 +152,8 @@ if (module_selected('web', $init_modules)) {
         $config['title_image'] = 'images/librenms_logo_'.$config['site_style'].'.svg';
     }
     require $install_dir . '/html/includes/vars.inc.php';
-    $tmp_list = dbFetchRows('SELECT DISTINCT(`os`) FROM `devices`');
-    $os_list = array();
-    foreach ($tmp_list as $k => $v) {
-        $os_list[] = $config['install_dir'].'/includes/definitions/'. $v['os'] . '.yaml';
-    }
-    load_all_os($os_list);
+
+    load_all_os(true);
 }
 
 $console_color = new Console_Color2();
