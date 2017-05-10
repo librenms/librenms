@@ -1576,30 +1576,63 @@ function load_os(&$device)
 }
 
 /**
- * @param array $restricted
+ * Load all OS, optionally load just the OS used by existing devices
+ * Default cache time is 1 day. Controlled by os_def_cache_time.
+ *
+ * @param bool $existing Only load OS that have existing OS in the database
+ * @param bool $cached Load os definitions from the cache file
  */
-function load_all_os($restricted = array())
+function load_all_os($existing = false, $cached = true)
 {
     global $config;
-    if (!empty($restricted)) {
-        $list = $restricted;
+    $cache_file = $config['install_dir'] . '/cache/os_defs.cache';
+
+    if ($cached && is_file($cache_file) && (time() - filemtime($cache_file) < $config['os_def_cache_time'])) {
+        // Cached
+        $os_defs = unserialize(file_get_contents($cache_file));
+
+        if ($existing) {
+            // remove unneeded os
+            $os_defs = array_diff_key($os_defs, dbFetchColumn('SELECT DISTINCT(`os`) FROM `devices`'));
+        }
+
+        $config['os'] = array_replace_recursive($os_defs, $config['os']);
     } else {
-        $list = glob($config['install_dir'].'/includes/definitions/*.yaml');
-        if (count($list) == count($config['os'])) {
-            // already fully loaded
-            return;
+        // load from yaml
+        if ($existing) {
+            $os_list = array_map(function ($os) use ($config) {
+                return $config['install_dir'] . '/includes/definitions/'. $os . '.yaml';
+            }, dbFetchColumn('SELECT DISTINCT(`os`) FROM `devices`'));
+        } else {
+            $os_list = glob($config['install_dir'].'/includes/definitions/*.yaml');
+        }
+
+        foreach ($os_list as $file) {
+            $tmp = Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+
+            if (isset($config['os'][$tmp['os']])) {
+                $config['os'][$tmp['os']] = array_replace_recursive($tmp, $config['os'][$tmp['os']]);
+            } else {
+                $config['os'][$tmp['os']] = $tmp;
+            }
         }
     }
+}
 
-    foreach ($list as $file) {
-        $tmp = Symfony\Component\Yaml\Yaml::parse(
-            file_get_contents($file)
-        );
-        if (isset($config['os'][$tmp['os']])) {
-            $config['os'][$tmp['os']] = array_replace_recursive($tmp, $config['os'][$tmp['os']]);
-        } else {
-            $config['os'][$tmp['os']] = $tmp;
-        }
+/**
+ * Update the OS cache file cache/os_defs.cache
+ */
+function update_os_cache()
+{
+    global $config;
+    $cache_file = $config['install_dir'] . '/cache/os_defs.cache';
+    $cache_keep_time = $config['os_def_cache_time'] - 7200; // 2hr buffer
+
+    if (!is_file($cache_file) || time() - filemtime($cache_file) > $cache_keep_time) {
+        d_echo('Updating os_def.cache... ');
+        load_all_os(false, false);
+        file_put_contents($cache_file, serialize($config['os']));
+        d_echo("Done\n");
     }
 }
 
@@ -1704,7 +1737,7 @@ function get_user_pref($name, $default = null, $user_id = null)
 {
     global $user_prefs;
 
-    if (array_key_exists($name, $user_prefs)) {
+    if (is_array($user_prefs) && array_key_exists($name, $user_prefs)) {
         return $user_prefs[$name];
     }
 

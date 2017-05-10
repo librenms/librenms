@@ -13,7 +13,7 @@ function authenticate($username, $password)
         return 0;
     } else {
         if ($debug) {
-            $radius->SetDebugMode(true);
+            $radius->SetDebug(true);
         }
         $rad = $radius->AccessRequest($username, $password);
         if ($rad === true) {
