@@ -143,7 +143,10 @@ class OSDiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         global $config;
 
-        load_all_os(); // make sure all OS are loaded
+        // make sure all OS are loaded
+        if (count($config['os']) < count(glob($config['install_dir'].'/includes/definitions/*.yaml'))) {
+            load_all_os();
+        }
 
         $excluded_os = array(
             'default',
