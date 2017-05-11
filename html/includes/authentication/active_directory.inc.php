@@ -1,7 +1,5 @@
 <?php
 
-use Phpass\PasswordHash;
-
 // easier to rewrite for Active Directory than to bash it into existing LDAP implementation
 
 // disable certificate checking before connect if required
@@ -99,19 +97,7 @@ function reauthenticate($sess_id, $token)
             return 0;
         }
 
-        $session = dbFetchRow(
-            "SELECT * FROM `session` WHERE `session_username`=? AND session_value=?",
-            array($username, $sess_id),
-            true
-        );
-        $hasher = new PasswordHash(8, false);
-        if ($hasher->CheckPassword($username . $session['session_token'], $hash)) {
-            $_SESSION['username'] = $username;
-            return 1;
-        } else {
-            d_echo("Reauthenticate token check failed\n");
-            return 0;
-        }
+        return check_remember_me($sess_id, $token);
     }
 
     return 0;
