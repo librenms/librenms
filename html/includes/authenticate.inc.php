@@ -53,7 +53,6 @@ if ((isset($username)) || (isset($_COOKIE['sess_id'], $_COOKIE['token']))) {
         (isset($_COOKIE['sess_id'], $_COOKIE['token']) && reauthenticate($_COOKIE['sess_id'], $_COOKIE['token'])) ||
         (isset($username, $password) && authenticate($username, $password))
     ) {
-        session_regenerate_id(true); // prevent session fixation
         if (isset($username)) {
             $_SESSION['username'] = $username;
         }
