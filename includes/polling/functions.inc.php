@@ -548,6 +548,7 @@ function location_to_latlng($device)
  *
  * @param array $app app from the db, including app_id
  * @param string $response This should be the full output
+ * @param string $current This is the current value we store in rrd for graphing
  */
 function update_application($app, $response, $current = '')
 {
