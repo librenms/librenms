@@ -1,6 +1,6 @@
 <?php
 /**
- * LibreNMS - ADVA FSP150-XG210 (MetroE Subaggregation) device support
+ * LibreNMS - ADVA FSP150 device support
  *
  * @category Network_Management
  * @package  LibreNMS
@@ -15,9 +15,25 @@
  * the source code distribution for details.
  **/
 
+// FSP150
+
 $version  = 'SW V'.trim(snmp_get($device, "entPhysicalSoftwareRev.1", "-OQv", "ADVA-MIB"), '"');
 
-$hardware = 'ADVA '.trim(snmp_get($device, "sysDescr.0", "-OQv", "ADVA-MIB"), '"')
+$hardware = trim(snmp_get($device, "entPhysicalName.1", "-OQv", "ADVA-MIB"), '"')
             .' V'.trim(snmp_get($device, "entPhysicalHardwareRev.1", "-OQv", "ADVA-MIB"), '"');
 
 $serial = trim(snmp_get($device, "entPhysicalSerialNum.1", "-OQv", "ADVA-MIB"), '"');
+
+$features = ''; //search for PTP info in MIB
+
+/* // FSP3KR7
+
+$version  = 'SW V'.trim(snmp_get($device, "swVersionActiveApplSw.100737280", "-OQv", "ADVA-MIB"), '"');
+
+$hardware = 'ADVA FSP3000R7 '.trim(snmp_get($device, "inventoryUnitName.33619968", "-OQv", "ADVA-MIB"), '"')
+            .' V'.trim(snmp_get($device, "inventoryHardwareRev.33619968", "-OQv", "ADVA-MIB"), '"');
+
+$serial = trim(snmp_get($device, "inventorySerialNum.33619968", "-OQv", "ADVA-MIB"), '"');
+
+*/
+
