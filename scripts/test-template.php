@@ -1,8 +1,8 @@
 #!/usr/bin/env php
 <?php
 
-$init_modules = ['alerts'];
-include '/opt/librenms/includes/init.php';
+$init_modules = array('alerts');
+require __DIR__ . '/../includes/init.php';
 
 $options = getopt('t:h:r:d::');
 
