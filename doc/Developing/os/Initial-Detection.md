@@ -47,7 +47,7 @@ called cisco.
 `bad_ifXEntry`: This is a list of models for which to tell LibreNMS that the device doesn't support ifXEntry and to 
  ignore it:
  
- ```yaml
+```yaml
  bad_ifXEntry:
      - cisco1941
      - cisco886Va
