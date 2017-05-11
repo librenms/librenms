@@ -1,10 +1,14 @@
+[![Scrutinizer Status](https://scrutinizer-ci.com/g/librenms/librenms/badges/build.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/librenms/librenms/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/?branch=master) [![Travis Status](https://travis-ci.org/librenms/librenms.svg?branch=master)](https://travis-ci.org/librenms/librenms)
+
 Introduction
 ------------
+
+[![Join the chat at https://gitter.im/librenms/general](https://badges.gitter.im/librenms/general.svg)](https://gitter.im/librenms/general?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 LibreNMS is an autodiscovering PHP/MySQL/SNMP based network monitoring
 which includes support for a wide range of network hardware and operating
 systems including Cisco, Linux, FreeBSD, Juniper, Brocade, Foundry, HP and
-many more.  LibreNMS is a community-based fork of [Observium][9].
+many more.
 
 We intend LibreNMS to be a viable project and community that:
 - encourages contribution,
@@ -29,52 +33,28 @@ Participating
 -------------
 
 You can participate in the project by:
-- Joining the [librenms-project][1] mailing list to post questions and
-  suggestions.
-- Talking to us on [Twitter][3] or [IRC][4].
+- Talking to us on IRC ([##librenms on Freenode][4]) or [Twitter][3].
+- Joining the [LibreNMS Community](https://community.librenms.org)
 - Improving the [documentation][5].
-- Cloning the [repo][2] and filing bug reports and pull requests on github.
+- Cloning the [repo][2] and filing [bug reports][18] and [pull requests][19] on github.
   See [CONTRIBUTING][15] for more details.
 
 
-Try It
-------
+VM image
+--------
 
 You can try LibreNMS by downloading a VM image.  Currently, a Ubuntu-based
 image is supplied and has been tested with [VirtualBox][8].
 
-Download the [VirtualBox / VMWare image][11] and open it then log in with credentials provided. 
-Enter the following commands:
-
-    cd /opt/librenms
-    git pull
-    php discover.php -h all
-    php poller.php -h all
-
-You'll then need to find out the IP of your VM (`ifconfig | grep add`) and
-create a DNS entry for `librenms.example.com` to point to that IP.  You can
-also edit your `/etc/hosts` file with the following line:
-
-    $ip librenms.example.com
-
-where `$ip` is the IP of your VM.
-
-Add a new user by entering:
-
-    ./adduser.php <username> <password> 10 <email>
-
-replace <username>, <password> and <email> with a username, password and your email address.
-
-From there, just point your web browser
-to `http://librenms.example.com/` and login with your new username and password.
-
+Download one of the [VirtualBox images][11] we have available, documentation is provided which details 
+login credentials and setup details.
 
 License
 -------
 
 Copyright (C) 2006-2012 Adam Armstrong <adama@memetic.org>
 
-Copyright (C) 2013-2014 by individual LibreNMS contributors
+Copyright (C) 2013-2017 by individual LibreNMS contributors
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -107,15 +87,16 @@ exception):
 [3]: https://twitter.com/librenms "@LibreNMS on Twitter"
 [4]: irc://irc.freenode.net/##librenms "LibreNMS IRC channel"
 [5]: https://github.com/librenms/librenms/tree/master/doc/
-[6]: http://freenode.net/channel_guidelines.shtml "Freenode channel guidelines"
-[7]: http://freenode.net/catalysts.shtml "Freenode community catalysts"
+[6]: http://freenode.net/changuide "Freenode channel guidelines"
+[7]: http://freenode.net/catalysts "Freenode community catalysts"
 [8]: https://www.virtualbox.org/ "VirtualBox"
-[9]: http://observium.org/ "Observium web site"
 [10]: http://www.debian.org/social_contract "Debian project social contract"
 [11]: http://www.librenms.org/#downloads
-[12]: https://github.com/librenms/librenms/tree/master/doc/Observium_Welcome.md
+[12]: http://docs.librenms.org/General/Welcome-to-Observium-users/
 [13]: http://freenode.net/philosophy.shtml "Freenode philosophy"
 [14]: https://github.com/librenms/librenms/tree/master/LICENSE.txt
 [15]: http://docs.librenms.org/General/Contributing/
 [16]: http://docs.librenms.org/
 [17]: http://docs.librenms.org/General/Acknowledgement/
+[18]: https://github.com/librenms/librenms/issues
+[19]: https://github.com/librenms/librenms/pulls
