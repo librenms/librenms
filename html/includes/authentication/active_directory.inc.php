@@ -79,7 +79,7 @@ function authenticate($username, $password)
 
 function reauthenticate($sess_id, $token)
 {
-    global $ldap_connection;
+    global $config, $ldap_connection;
 
     if (ad_bind($ldap_connection, false, true)) {
         $sess_id = clean($sess_id);

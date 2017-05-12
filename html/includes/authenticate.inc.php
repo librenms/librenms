@@ -2,10 +2,10 @@
 
 use LibreNMS\Exceptions\AuthenticationException;
 
-@ini_set('session.use_only_cookies', 1);
-@ini_set('session.cookie_httponly', 1);
-@ini_set('session.use_strict_mode', 1); // php >= 5.5.2
-@ini_set('session.use_trans_sid', 0);   // insecure feature, be sure it is disabled
+ini_set('session.use_only_cookies', 1);
+ini_set('session.cookie_httponly', 1);
+ini_set('session.use_strict_mode', 1); // php >= 5.5.2
+ini_set('session.use_trans_sid', 0);   // insecure feature, be sure it is disabled
 
 // Preflight checks
 if (!is_dir($config['rrd_dir'])) {
