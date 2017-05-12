@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Exceptions\AuthenticationException;
+
 if (! isset($_SESSION['username'])) {
     $_SESSION['username'] = '';
 }
@@ -47,17 +49,16 @@ function authenticate($username, $password)
         }
 
         $_SESSION['username'] = $config['http_auth_guest'];
-        return 1;
+        return true;
     }
 
-    return 0;
+    throw new AuthenticationException();
 }
 
 
 function reauthenticate($sess_id, $token)
 {
-    // not supported so return 0
-    return 0;
+    return false;
 }
 
 

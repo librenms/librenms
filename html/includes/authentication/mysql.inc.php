@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Exceptions\AuthenticationException;
 use Phpass\PasswordHash;
 
 function authenticate($username, $password)
@@ -14,7 +15,7 @@ function authenticate($username, $password)
                 changepassword($username, $password);
             }
 
-            return 1;
+            return true;
         } elseif (substr($row['password'], 0, 3) == '$1$') {
             $row_type = dbFetchRow('DESCRIBE users password');
             if ($row_type['Type'] == 'varchar(60)') {
@@ -26,11 +27,11 @@ function authenticate($username, $password)
 
         $hasher = new PasswordHash(8, false);
         if ($hasher->CheckPassword($password, $row['password'])) {
-            return 1;
+            return true;
         }
     }//end if
 
-    return 0;
+    throw new AuthenticationException();
 }//end authenticate()
 
 

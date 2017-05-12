@@ -23,30 +23,26 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Exceptions\AuthenticationException;
 use Phpass\PasswordHash;
 
 /**
- * Log out the user, unset cookies, destroy the session, and redirect to the base_url
+ * Log out the user, unset cookies, destroy the session
  *
  * @param string $message The logout message.
  */
 function log_out_user($message = 'Logged Out')
 {
-    global $config, $auth_message;
+    global $auth_message;
 
     dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Logged Out'), 'authlog');
-    dbDelete('session', '`session_username` =  ? AND `session_value` = ?', array($_SESSION['username'], $_COOKIE['sess_id']));
+
+    clear_remember_me($_SESSION['username']);
+
     unset($_SESSION['authenticated']);
-    unset($_COOKIE);
-
-    $time = time() - 60 * 60 * 24 * $config['auth_remember']; // time in the past to make sure
-    setcookie('sess_id', '', $time, '/');
-    setcookie('token', '', $time, '/');
-    setcookie('auth', '', $time, '/');
-
     session_destroy();
+
     $auth_message = $message; // global variable used to display a message to the user
-    header('Location: ' . $config['base_url']);
 }
 
 /**
@@ -56,19 +52,24 @@ function log_out_user($message = 'Logged Out')
  *
  * If everything goes well, $_SESSION['authenticated'] will be true after this function completes.
  * @return bool If the user was successfully logged in.
+ * @throws AuthenticationException if anything failed why trying to log in
  */
 function log_in_user()
 {
-    global $config, $auth_error, $permissions;
+    global $config, $permissions;
 
-    // set up variables
-    $_SESSION['userlevel'] = get_userlevel($_SESSION['username']);
-    $_SESSION['user_id'] = get_userid($_SESSION['username']);
+    // set up variables, but don't override existing ones (ad anonymous bind can only get user_id at login)
+    if (!isset($_SESSION['userlevel'])) {
+        $_SESSION['userlevel'] = get_userlevel($_SESSION['username']);
+    }
+
+    if (!isset($_SESSION['user_id'])) {
+        $_SESSION['user_id'] = get_userid($_SESSION['username']);
+    }
 
     // check for valid user_id
     if ($_SESSION['user_id'] === false || $_SESSION['user_id'] < 0) {
-        $auth_error = 'Invalid Credentials';
-        return false;
+        throw new AuthenticationException('Invalid Credentials');
     }
 
     // check twofactor
@@ -82,7 +83,7 @@ function log_in_user()
         $_SESSION['authenticated'] = true;
         dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Logged In'), 'authlog');
     } else {
-        return false;
+        throw new AuthenticationException('Two-Factor Auth Failed');
     }
 
     // populate the permissions cache
@@ -133,13 +134,14 @@ function set_remember_me()
  * @param string $sess_id sess_id cookie value
  * @param string $token token cookie value
  * @return bool is the remember me token valid
+ * @throws AuthenticationException thrown if the cookie is invalid
  */
 function check_remember_me($sess_id, $token)
 {
     list($uname, $hash) = explode('|', $token);
     $session = dbFetchRow(
-        "SELECT * FROM `session` WHERE `session_username` = '$uname' AND session_value='$sess_id'",
-        array(),
+        "SELECT * FROM `session` WHERE `session_username`=? AND `session_value`=?",
+        array($uname, $sess_id),
         true
     );
 
@@ -149,5 +151,29 @@ function check_remember_me($sess_id, $token)
         return true;
     }
 
-    return false;
+    clear_remember_me($uname);
+    throw new AuthenticationException('Cookie invalid, please log in.');
+}
+
+/**
+ * Clear remember cookie and remove our database record
+ *
+ * @param $username
+ */
+function clear_remember_me($username)
+{
+    global $config;
+
+    dbDelete(
+        'session',
+        '`session_username` =  ? AND `session_value` = ?',
+        array($username, $_COOKIE['sess_id'])
+    );
+
+    unset($_COOKIE);
+
+    $time = time() - 60 * 60 * 24 * $config['auth_remember']; // time in the past to make sure
+    setcookie('sess_id', '', $time, '/');
+    setcookie('token', '', $time, '/');
+    setcookie('auth', '', $time, '/');
 }
