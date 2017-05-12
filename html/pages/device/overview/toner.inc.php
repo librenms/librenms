@@ -58,7 +58,6 @@ if (count($toners)) {
     echo '</div>';
     echo '</div>';
     echo '</div>';
-    echo '</div>';
 }//end if
 
 unset($toner_rows);
