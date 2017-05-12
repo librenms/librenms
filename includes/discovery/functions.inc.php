@@ -969,6 +969,10 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         if ($sensor_type == 'load') {
             return 1;
         }
+    } elseif ($device['os'] == 'hpe-rtups') {
+        if ($sensor_type == 'load') {
+            return 1;
+        }
     }
 
     return 10; //default
