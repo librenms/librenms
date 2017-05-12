@@ -15,14 +15,28 @@ if (isset($_POST['create-default'])) {
         return isset($rule['default']) && $rule['default'];
     });
 
+    $default_extra = array(
+        'mute' => false,
+        'count' => -1,
+        'delay' => 300,
+        'invert' => false,
+        'interval' => 300,
+    );
+
     require_once '../includes/alerts.inc.php';
 
     foreach ($default_rules as $add_rule) {
+        $extra = $default_extra;
+        if (isset($add_rule['extra'])) {
+            $extra = array_replace($extra, json_decode($add_rule['extra'], true));
+        }
+
         $insert = array(
             'device_id' => -1,
+            'rule'      => $add_rule['rule'],
             'query'     => GenSQL($add_rule['rule']),
             'severity'  => 'critical',
-            'extra'     => '{"mute":false,"count":"1","delay":"300","invert":false,"interval":300}',
+            'extra'     => json_encode($extra),
             'disabled'  => 0,
             'name'      => $add_rule['name']
         );

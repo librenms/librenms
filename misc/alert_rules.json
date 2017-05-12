@@ -7,20 +7,25 @@
   {
     "rule": "%devices.uptime < \"300\" && %macros.device = \"1\"",
     "name": "Device rebooted",
+    "extra": "{\"count\": 1}",
     "default": true
   },
   {
     "rule": "%bgpPeers.bgpPeerState != \"established\" && %macros.device_up = \"1\"",
     "name": "BGP Session down",
+    "extra": "{\"count\": 1}",
     "default": true
   },
   {
     "rule": "%bgpPeers.bgpPeerFsmEstablishedTime < \"300\" && %bgpPeers.bgpPeerState = \"established\" && %macros.device_up = \"1\"",
-    "name": "BGP Session established"
+    "name": "BGP Session established",
+    "extra": "{\"count\": 1}",
+    "default": true
   },
   {
     "rule": "%macros.port_down = \"1\"",
     "name": "Port status up/down",
+    "extra": "{\"count\": 1}",
     "default": true
   },
   {
