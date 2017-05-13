@@ -4,10 +4,12 @@ Table of Content:
 - [About](#about)
 - [Rules](#rules)
     - [Syntax](#rules-syntax)
+    - [Options](#extra)
     - [Examples](#rules-examples)
     - [Procedure](#rules-procedure)
 - [Templates](#templates)
     - [Syntax](#templates-syntax)
+    - [Testing](#templates-testing)
     - [Examples](#templates-examples)
     - [Included](#templates-included)
 - [Transports](#transports)
@@ -46,7 +48,6 @@ Table of Content:
     - [Time](#macros-time)
     - [Sensors](#macros-sensors)
     - [Misc](#macros-misc)
-- [Additional Options](#extra)
 
 
 # <a name="about">About</a>
@@ -85,6 +86,18 @@ __Glues__ can be either `&&` for `AND` or `||` for `OR`.
 
 __Note__: The difference between `Equals` and `Like` (and its negation) is that `Equals` does a strict comparison and `Like` allows the usage of RegExp.
 Arithmetics are allowed as well.
+
+# <a name="extra">Options</a>
+
+Here are some of the other options available when adding an alerting rule:
+
+- Rule name: The name associated with the rule.
+- Severity: How "important" the rule is.
+- Max alerts: The maximum number of alerts sent for the event.  `-1` means unlimited.
+- Delay: The amount of time in seconds to wait after a rule is matched before sending an alert.
+- Interval: The interval of time in seconds between alerts for an event until Max is reached.
+- Mute alerts: Disable sending alerts for this rule.
+- Invert match: Invert the matching rule (ie. alert on items that _don't_ match the rule).
 
 ## <a name="rules-examples">Examples</a>
 
@@ -158,6 +171,18 @@ Limit: %value.sensor_limit_low / %value.sensor_limit
 
 The Default Template is a 'one-size-fit-all'. We highly recommend defining own templates for your rules to include more specific information.
 Templates can be matched against several rules.
+
+## <a name="templates-testing">Testing</a>
+
+It's possible to test your new template before assigning it to a rule. To do so you can run `./scripts/est-template.php`. The script will provide the help 
+info when ran without any paramaters.
+
+As an example, if you wanted to test template ID 10 against localhost running rule ID 2 then you would run:
+
+`./scripts/test-template.php -t 10 -d localhost -r 2`
+
+If the rule is currently alerting for localhost then you will get the full template as expected to see on email, if it's not then you will just see the 
+template without any fault information.
 
 ## <a name="templates-examples">Examples</a>
 
@@ -919,15 +944,3 @@ Entity: `%sensors.sensor_class = "current" && %sensors.sensor_descr = "Bank Tota
 Description: APC PDU over amperage
 
 Example: `%macros.pdu_over_amperage_apc = "1"`
-
-# <a name="extra">Additional Options</a>
-
-Here are some of the other options available when adding an alerting rule:
-
-- Rule name: The name associated with the rule.
-- Severity: How "important" the rule is.
-- Max alerts: The maximum number of alerts sent for the event.  `-1` means unlimited.
-- Delay: The amount of time in seconds to wait after a rule is matched before sending an alert.
-- Interval: The interval of time in seconds between alerts for an event until Max is reached.
-- Mute alerts: Disable sending alerts for this rule.
-- Invert match: Invert the matching rule (ie. alert on items that _don't_ match the rule).
