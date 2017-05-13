@@ -29,7 +29,7 @@ function authenticate($username, $password)
 
 function reauthenticate($sess_id, $token)
 {
-    throw new AuthenticationException('Cookie auth unsupported.');
+    return false;
 }
 
 
