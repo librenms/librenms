@@ -1,12 +1,13 @@
 <?php
 /**
- * LibreNMS - ADVA FSP150 device support
+ * LibreNMS - ADVA device support
  *
- * @category Network_Management
- * @package  LibreNMS
- * @author   Christoph Zilian <czilian@hotmail.com>
- * @license  http://gnu.org/copyleft/gpl.html GNU GPL
- * @link     https://github.com/librenms/librenms/
+ * @category   Network_Monitoring
+ * @package    LibreNMS
+ * @subpackage ADVA device support
+ * @author     Christoph Zilian <czilian@hotmail.com>
+ * @license    http://gnu.org/copyleft/gpl.html GNU GPL
+ * @link       https://github.com/librenms/librenms/
 
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -14,7 +15,6 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  **/
-//   $sysObjectId = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
 
 
 // ******************************************
@@ -182,33 +182,32 @@ if ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.7') {
 
 if (($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.17') xor ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.9') xor ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.11')) {
     echo 'Caching OIDs:'."\n";
-    $ge11x_oids   = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', $ge11x_oids, 'CM-ENTITY-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $sensor_oids   = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', $sensor_oids, 'CM-ENTITY-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
 
     $multiplier = 1;
     $divisor    = 1;
 
-    $ge11x_temp_sensors = array('ethernetNTEGE114CardTemperature'  => '.1.3.6.1.4.1.2544.1.12.3.1.26.1.6' ,
+    $temp_sensors = array('ethernetNTEGE114CardTemperature'  => '.1.3.6.1.4.1.2544.1.12.3.1.26.1.6' ,
                                 'ethernetNTEGE114SCardTemperature' => '.1.3.6.1.4.1.2544.1.12.3.1.46.1.6' ,
  				'ethernetNTEXG210CardTemperature'  => '.1.3.6.1.4.1.2544.1.12.3.1.30.1.6' ,
                                 'ethernetXG1XCCCardTemperature'    => '.1.3.6.1.4.1.2544.1.12.3.1.31.1.6');
 
-     if (is_array($ge11x_oids)) {
+     if (is_array($sensor_oids)) {
         echo "Temperature Sensors:\n";
-
-        foreach (array_keys($ge11x_oids) as $index1) {
-            foreach (array_keys($ge11x_temp_sensors) as $index2 => $entry) {
-                if ($ge11x_oids[$index1][$entry]) {
+        foreach (array_keys($sensor_oids) as $index1) {
+            foreach (array_keys($temp_sensors) as $index2 => $entry) {
+                if ($sensor_oids[$index1][$entry]) {
                     $low_limit       = 10;
                     $low_warn_limit  = 15;
                     $high_warn_limit = 50;
                     $high_limit      = 60;
 
-                    $slotnum    = $ge11x_oids[$index1]['slotIndex'];
-                    $name       = $ge11x_oids[$index1]['slotCardUnitName'];
+                    $slotnum    = $sensor_oids[$index1]['slotIndex'];
+                    $name       = $sensor_oids[$index1]['slotCardUnitName'];
                     $descr      = $name." [Slot ".$slotnum."]";
-                    $current    = $ge11x_oids[$index1][$entry];
-                    $sensorType = 'advafsp150ge11x';
-                    $oid        = $ge11x_temp_sensors[$entry].".".$index1;
+                    $current    = $sensor_oids[$index1][$entry];
+                    $sensorType = 'fsp150temp';
+                    $oid        = $temp_sensors[$entry].".".$index1;
 
                     discover_sensor(
                         $valid['sensor'],
@@ -230,4 +229,94 @@ if (($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.17') xor ($device['sys
             }//End foreach $entry
         }//End foreach $index
     } //End if  oids exist
-}// ************** End of Sensors for ADVA FSP150 GE11x 
+}// ************** End of Sensors for ADVA FSP150 GE11x **********
+
+
+// *************************************************************
+// ***** Sensors for ADVA FSP3000 R7
+// *************************************************************
+
+if ($device['sysObjectID'] == 'enterprises.2544.1.11.1.1') {
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'pmSnapshotCurrentEntry', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityFacilityOneIndex', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityDcnOneIndex', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityOpticalMuxOneIndex', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityFacilityAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityEqptAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityDcnAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityOpticalMuxAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugMaxDataRate', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugAdmin', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'physicalPortFrequency', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugTransmitChannel', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugFiberType', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugReach', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+
+    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'entityEqptAidString', $fsp3kr7_Card, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'eqptPhysInstValueEntry', $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'optMuxPhysInstValueTable', $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'entityMtosiSlotsAidString', $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'eqptPhysThresholdEntry', $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+
+//    $results = print_r($fsp3kr7_Card, true); // $results now contains output from print_r
+//    file_put_contents('/opt/librenms/adva-precache.txt', $results);
+//    var_dump($results);
+
+    foreach (array_keys($fsp3kr7_Card) as $index => $entity) {
+        foreach (array_keys($advafsp3kr7_oids) as $entity => $content) {
+            $fsp3kr7_Card[$index] = implode('.', explode('.', array_keys($advafsp3kr7_oids[$entity]), -2));
+
+            if ($advafsp3kr7_oids[$content]['entityFacilityAidString']) {
+                $advafsp3kr7_oids[$content]['AidString'] = $advafsp3kr7_oids[$content]['entityFacilityAidString'];
+                $advafsp3kr7_oids[$content]['OneIndex']  = $advafsp3kr7_oids[$content]['entityFacilityOneIndex'];
+            }
+            if ($advafsp3kr7_oids[$content]['entityDcnAidString']) {
+                $advafsp3kr7_oids[$content]['AidString'] = $advafsp3kr7_oids[$content]['entityDcnAidString'];
+                $advafsp3kr7_oids[$content]['OneIndex']  = $advafsp3kr7_oids[$content]['entityDcnOneIndex'];
+            }
+            if ($advafsp3kr7_oids[$content]['entityOpticalMuxAidString']) {
+                $advafsp3kr7_oids[$content]['AidString'] = $advafsp3kr7_oids[$content]['entityOpticalMuxAidString'];
+                $advafsp3kr7_oids[$content]['OneIndex']  = $advafsp3kr7_oids[$content]['entityOpticalMuxOneIndex'];
+            }
+        }
+        //   $content[$entity] = str_replace($replace, "", $content[$entity][$replace]);
+        //        $entity = implode('.', explode('.', $entity, -2);
+    } //end test
+
+    $multiplier = 1;
+    $divisor    = 10;
+
+    if (is_array($fsp3kr7_Card)) {
+        foreach (array_keys($fsp3kr7_Card) as $index) {
+            if ($fsp3kr7_Card[$index]['eqptPhysInstValueTemp']){ 
+                $low_limit = 10;
+                $low_warn_limit = 15;
+                $high_warn_limit = 35;
+                $high_limit = $fsp3kr7_Card[$index]['eqptPhysThresholdTempHigh']/$divisor;
+
+                $slotnum    = $index;
+                $descr      = strtoupper($fsp3kr7_Card[$index]['entityEqptAidString']);
+                $current    = $fsp3kr7_Card[$index]['eqptPhysInstValueTemp'];
+                $sensorType = 'fsp3kr7temp';
+                $oid        = '.1.3.6.1.4.1.2544.1.11.11.1.2.1.1.1.5.'.$index;
+
+                discover_sensor(
+                    $valid['sensor'],
+                    'temperature',
+                    $device,
+                    $oid,
+                    $index,
+                    $sensorType,
+                    $descr,
+                    $divisor,
+                    $multiplier,
+                    $low_limit,
+                    $low_warn_limit,
+                    $high_warn_limit,
+                    $high_limit,
+                    $current
+                );
+            }
+        }
+    }
+}//  ************** End of Sensors for ADVA FSP3000 R7 **********
