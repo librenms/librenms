@@ -11,82 +11,37 @@ $no_refresh = true;
 </div>
 <?php
 if (isset($_POST['create-default'])) {
-    $default_rules[] = array(
-        'device_id' => '-1',
-        'rule'      => '%macros.device_down = "1"',
-        'severity'  => 'critical',
-        'extra'     => '{"mute":false,"count":"-1","delay":"300"}',
-        'disabled'  => 0,
-        'name'      => 'Devices up/down',
+    $default_rules = array_filter(get_rules_from_json(), function ($rule) {
+        return isset($rule['default']) && $rule['default'];
+    });
+
+    $default_extra = array(
+        'mute' => false,
+        'count' => -1,
+        'delay' => 300,
+        'invert' => false,
+        'interval' => 300,
     );
-    $default_rules[] = array(
-        'device_id' => '-1',
-        'rule'      => '%devices.uptime < "300" && %macros.device = "1"',
-        'severity'  => 'critical',
-        'extra'     => '{"mute":false,"count":"1","delay":"300"}',
-        'disabled'  => 0,
-        'name'      => 'Device rebooted',
-    );
-    $default_rules[] = array(
-        'device_id' => '-1',
-        'rule'      => '%bgpPeers.bgpPeerState != "established" && %macros.device_up = "1"',
-        'severity'  => 'critical',
-        'extra'     => '{"mute":false,"count":"1","delay":"300"}',
-        'disabled'  => 0,
-        'name'      => 'BGP Session down',
-    );
-    $default_rules[] = array(
-        'device_id' => '-1',
-        'rule'      => '%bgpPeers.bgpPeerFsmEstablishedTime < "300" && %bgpPeers.bgpPeerState = "established" && %macros.device_up = "1"',
-        'severity'  => 'critical',
-        'extra'     => '{"mute":false,"count":"1","delay":"300"}',
-        'disabled'  => 0,
-        'name'      => 'BGP Session established',
-    );
-    $default_rules[] = array(
-        'device_id' => '-1',
-        'rule'      => '%macros.port_down = "1"',
-        'severity'  => 'critical',
-        'extra'     => '{"mute":false,"count":"1","delay":"300"}',
-        'disabled'  => 0,
-        'name'      => 'Port status up/down',
-    );
-    $default_rules[] = array(
-        'device_id' => '-1',
-        'rule'      => '%macros.port_usage_perc >= "80" && %macros.port_up = "1" && %macros.port = "1"',
-        'severity'  => 'critical',
-        'extra'     => '{"mute":false,"count":"-1","delay":"300"}',
-        'disabled'  => 0,
-        'name'      => 'Port utilisation over threshold',
-    );
-    $default_rules[] = array(
-        'device_id' => '-1',
-        'rule'      => '%sensors.sensor_current > %sensors.sensor_limit && %sensors.sensor_alert = "1" && %macros.device_up = "1"',
-        'severity'  => 'critical',
-        'extra'     => '{"mute":false,"count":"-1","delay":"300"}',
-        'disabled'  => 0,
-        'name'      => 'Sensor over limit',
-    );
-    $default_rules[] = array(
-        'device_id' => '-1',
-        'rule'      => '%sensors.sensor_current < %sensors.sensor_limit_low && %sensors.sensor_alert = "1" && %macros.device_up = "1"',
-        'severity'  => 'critical',
-        'extra'     => '{"mute":false,"count":"-1","delay":"300"}',
-        'disabled'  => 0,
-        'name'      => 'Sensor under limit',
-    );
-    $default_rules[] = array(
-        'device_id' => '-1',
-        'rule'      => '%services.service_status != "0" && %macros.device_up = "1"',
-        'severity'  => 'critical',
-        'extra'     => '{"mute":false,"count":"-1","delay":"300"}',
-        'disabled'  => 0,
-        'name'      => 'Service up/down',
-    );
+
     require_once '../includes/alerts.inc.php';
+
     foreach ($default_rules as $add_rule) {
-        $add_rule['query'] = GenSQL($add_rule['rule']);
-        dbInsert($add_rule, 'alert_rules');
+        $extra = $default_extra;
+        if (isset($add_rule['extra'])) {
+            $extra = array_replace($extra, json_decode($add_rule['extra'], true));
+        }
+
+        $insert = array(
+            'device_id' => -1,
+            'rule'      => $add_rule['rule'],
+            'query'     => GenSQL($add_rule['rule']),
+            'severity'  => 'critical',
+            'extra'     => json_encode($extra),
+            'disabled'  => 0,
+            'name'      => $add_rule['name']
+        );
+
+        dbInsert($insert, 'alert_rules');
     }
 }//end if
 
