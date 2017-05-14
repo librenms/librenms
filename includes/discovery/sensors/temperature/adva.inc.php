@@ -104,7 +104,7 @@ if ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.7') {
         }
     } //end of egxSWF
 
-   if (is_array($egxIFtemp10G)) {
+    if (is_array($egxIFtemp10G)) {
         echo "IFtempEntry: ";
 
         foreach (array_keys($egxIFtemp10G) as $index) {
@@ -139,7 +139,7 @@ if ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.7') {
         }
     } //end of egxIFtemp10G
 
-  if (is_array($egxIFtemp1G)) {
+    if (is_array($egxIFtemp1G)) {
         echo "IFtempEntry: ";
 
         foreach (array_keys($egxIFtemp1G) as $index) {
@@ -189,10 +189,10 @@ if (($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.17') xor ($device['sys
 
     $temp_sensors = array('ethernetNTEGE114CardTemperature'  => '.1.3.6.1.4.1.2544.1.12.3.1.26.1.6' ,
                                 'ethernetNTEGE114SCardTemperature' => '.1.3.6.1.4.1.2544.1.12.3.1.46.1.6' ,
- 				'ethernetNTEXG210CardTemperature'  => '.1.3.6.1.4.1.2544.1.12.3.1.30.1.6' ,
+                'ethernetNTEXG210CardTemperature'  => '.1.3.6.1.4.1.2544.1.12.3.1.30.1.6' ,
                                 'ethernetXG1XCCCardTemperature'    => '.1.3.6.1.4.1.2544.1.12.3.1.31.1.6');
 
-     if (is_array($sensor_oids)) {
+    if (is_array($sensor_oids)) {
         echo "Temperature Sensors:\n";
         foreach (array_keys($sensor_oids) as $index1) {
             foreach (array_keys($temp_sensors) as $index2 => $entry) {
@@ -288,7 +288,7 @@ if ($device['sysObjectID'] == 'enterprises.2544.1.11.1.1') {
 
     if (is_array($fsp3kr7_Card)) {
         foreach (array_keys($fsp3kr7_Card) as $index) {
-            if ($fsp3kr7_Card[$index]['eqptPhysInstValueTemp']){ 
+            if ($fsp3kr7_Card[$index]['eqptPhysInstValueTemp']) {
                 $low_limit = 10;
                 $low_warn_limit = 15;
                 $high_warn_limit = 35;

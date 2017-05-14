@@ -22,7 +22,7 @@
 
 if ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.7') {
     $egxPSU       = snmpwalk_cache_multi_oid($device, 'psuTable', $egxPSU, 'CM-ENTITY-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-var_dump($egxPSU);
+    var_dump($egxPSU);
 
     $multiplier = 1;
     $divisor    = 1000;
@@ -42,7 +42,8 @@ var_dump($egxPSU);
             $sensorType = 'fsp150egxOutputVoltage';
             $oid        = '.1.3.6.1.4.1.2544.1.12.3.1.4.1.6.'.$index;
 
-            discover_sensor($valid['sensor'],
+            discover_sensor(
+                $valid['sensor'],
                 'voltage',
                 $device,
                 $oid,
@@ -54,8 +55,9 @@ var_dump($egxPSU);
                 $low_limit,
                 $low_warn_limit,
                 $high_warn_limit,
-                $high_limit, 
-		$current);
+                $high_limit,
+                $current
+            );
         }
     }
 }// *****  End If of FSP150EG-X
@@ -77,7 +79,7 @@ if (($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.17') xor ($device['sys
                                 'ethernetNTEXG210CardVoltage'  => '.1.3.6.1.4.1.2544.1.12.3.1.30.1.5');
 // Laser Voltage                'ethernetXG1XCCCardVoltage'    => '.1.3.6.1.4.1.2544.1.12.3.1.31.1.5');
 
-     if (is_array($sensor_oids)) {
+    if (is_array($sensor_oids)) {
         echo "Temperature Sensors:\n";
         foreach (array_keys($sensor_oids) as $index1) {
             foreach (array_keys($temp_sensors) as $index2 => $entry) {
@@ -131,29 +133,43 @@ if ($device['sysObjectID'] == 'enterprises.2544.1.11.1.1') {
         echo "psuEntry: ";
 
         foreach (array_keys($fsp3kr7_Card) as $index) {
-	    //AC PSU Limits
+        //AC PSU Limits
             if ($fsp3kr7_Card[$index]['eqptPhysInstValuePsuVoltInp']) {
-               if ($fsp3kr7_Card[$index]['eqptPhysInstValuePsuVoltInp'] > 1000) {
-                  $low_limit = 210;
-                  $low_warn_limit = 220;
-                  $high_warn_limit = 245;
-                  $high_limit = 260;
-		}
-	    //DC PSU Limits
-            $low_limit = 35;
-            $low_warn_limit = 40;
-            $high_warn_limit = 55;
-            $high_limit = 60;
+                if ($fsp3kr7_Card[$index]['eqptPhysInstValuePsuVoltInp'] > 1000) {
+                    $low_limit = 210;
+                    $low_warn_limit = 220;
+                    $high_warn_limit = 245;
+                    $high_limit = 260;
+                }
+        //DC PSU Limits
+                $low_limit = 35;
+                $low_warn_limit = 40;
+                $high_warn_limit = 55;
+                $high_limit = 60;
 
-            $slotnum    = $index;
-            $descr      = strtoupper($fsp3kr7_Card[$index]['entityEqptAidString'])." Input";
-            $current    = $fsp3kr7_Card[$index]['eqptPhysInstValuePsuVoltInp'];
-            $sensorType = 'fsp3kr7psuInputV';
-            $oid        = '.1.3.6.1.4.1.2544.1.11.11.1.2.1.1.1.7.'.$index;
+                $slotnum    = $index;
+                $descr      = strtoupper($fsp3kr7_Card[$index]['entityEqptAidString'])." Input";
+                $current    = $fsp3kr7_Card[$index]['eqptPhysInstValuePsuVoltInp'];
+                $sensorType = 'fsp3kr7psuInputV';
+                $oid        = '.1.3.6.1.4.1.2544.1.11.11.1.2.1.1.1.7.'.$index;
 
-            discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $sensorType, $descr,
-                            $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
-         }
-       }
+                discover_sensor(
+                    $valid['sensor'],
+                    'voltage',
+                    $device,
+                    $oid,
+                    $index,
+                    $sensorType,
+                    $descr,
+                    $divisor,
+                    $multiplier,
+                    $low_limit,
+                    $low_warn_limit,
+                    $high_warn_limit,
+                    $high_limit,
+                    $current
+                );
+            }
+        }
     }
 }// ******** End If of FSP3000 R7

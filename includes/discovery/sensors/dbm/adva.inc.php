@@ -43,12 +43,12 @@ if ($device['sysObjectID'] == 'enterprises.2544.1.11.1.1') {
 
 
     foreach ($advafsp3kr7_oids as $index => $entry) {
-echo "\n-------------------- foreach ENTRY -----------------------------\n";
+        echo "\n-------------------- foreach ENTRY -----------------------------\n";
 
 
         if ($entry['pmSnapshotCurrentInputPower']) {
             $oid = '.1.3.6.1.4.1.2544.1.11.7.7.2.3.1.2.' . $index;
-echo "---- Input Power ----\n";
+            echo "---- Input Power ----\n";
 
             $port = get_port_by_index_cache($device['device_id'], $entry['OneIndex']);
 
@@ -67,13 +67,30 @@ echo "---- Input Power ----\n";
             $descr                     = $port['ifDescr'].' RX Pwr';
             echo "Descr:   ".$descr." dBm ".$current."\n";
 
-            discover_sensor($valid['sensor'], 'dbm', $device, $oid, $entry['AidString'].'-RX', 'advafsp3kr7', $descr, $divisor, $multiplier, 
-                            $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+            discover_sensor(
+                $valid['sensor'],
+                'dbm',
+                $device,
+                $oid,
+                $entry['AidString'].'-RX',
+                'advafsp3kr7',
+                $descr,
+                $divisor,
+                $multiplier,
+                $limit_low,
+                $warn_limit_low,
+                $warn_limit,
+                $limit,
+                $current,
+                'snmp',
+                $entPhysicalIndex,
+                $entPhysicalIndex_measured
+            );
         }//End if Input Power
 
         if (is_numeric(str_replace('dBm', '', $entry['pmSnapshotCurrentOutputPower']))) {
             $oid = '.1.3.6.1.4.1.2544.1.11.7.7.2.3.1.1.' . $index;
-echo "\n---- Output Power ----\n";
+            echo "\n---- Output Power ----\n";
 
             $port = get_port_by_index_cache($device['device_id'], $entry['OneIndex']);
 
@@ -88,8 +105,25 @@ echo "\n---- Output Power ----\n";
             $descr                     = $port['ifDescr'].' TX Pwr []';
             echo "Descr:   ".$descr." dBm ".$current."\n";
 
-            discover_sensor($valid['sensor'], 'dbm', $device, $oid, $entry['AidString'].'-TX', 'advafsp3kr7', $descr, $divisor, $multiplier, 
-                            $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+            discover_sensor(
+                $valid['sensor'],
+                'dbm',
+                $device,
+                $oid,
+                $entry['AidString'].'-TX',
+                'advafsp3kr7',
+                $descr,
+                $divisor,
+                $multiplier,
+                $limit_low,
+                $warn_limit_low,
+                $warn_limit,
+                $limit,
+                $current,
+                'snmp',
+                $entPhysicalIndex,
+                $entPhysicalIndex_measured
+            );
 
         }//End if Output Power
     }//End foreach entry

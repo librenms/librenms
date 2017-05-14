@@ -41,7 +41,8 @@ if ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.7') {
             $sensorType = 'fsp150egxOutputCurrent';
             $oid        = '.1.3.6.1.4.1.2544.1.12.3.1.4.1.8.'.$index;
 
-            discover_sensor($valid['sensor'],
+            discover_sensor(
+                $valid['sensor'],
                 'current',
                 $device,
                 $oid,
@@ -53,8 +54,9 @@ if ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.7') {
                 $low_limit,
                 $low_warn_limit,
                 $high_warn_limit,
-                $high_limit, 
-		$current);
+                $high_limit,
+                $current
+            );
         }
     }
 }// *****  End If of FSP150EG-X
@@ -74,29 +76,43 @@ if ($device['sysObjectID'] == 'enterprises.2544.1.11.1.1') {
         echo "psuEntry: ";
 
         foreach (array_keys($fsp3kr7_Card) as $index) {
-	    //AC PSU Limits
+        //AC PSU Limits
             if ($fsp3kr7_Card[$index]['eqptPhysInstValuePsuAmpere']) {
-               if ($fsp3kr7_Card[$index]['eqptPhysInstValuePsuAmpere'] > 1000) {
-                  $low_limit = 210;
-                  $low_warn_limit = 220;
-                  $high_warn_limit = 245;
-                  $high_limit = 260;
-		}
-	    //DC PSU Limits
-            $low_limit = 35;
-            $low_warn_limit = 40;
-            $high_warn_limit = 55;
-            $high_limit = 60;
+                if ($fsp3kr7_Card[$index]['eqptPhysInstValuePsuAmpere'] > 1000) {
+                    $low_limit = 210;
+                    $low_warn_limit = 220;
+                    $high_warn_limit = 245;
+                    $high_limit = 260;
+                }
+        //DC PSU Limits
+                $low_limit = 35;
+                $low_warn_limit = 40;
+                $high_warn_limit = 55;
+                $high_limit = 60;
 
-            $slotnum    = $index;
-            $descr      = strtoupper($fsp3kr7_Card[$index]['entityEqptAidString'])." Input";
-            $current    = $fsp3kr7_Card[$index]['eqptPhysInstValuePsuAmpere'];
-            $sensorType = 'fsp3kr7psuInputA';
-            $oid        = '.1.3.6.1.4.1.2544.1.11.11.1.2.1.1.1.6.'.$index;
+                $slotnum    = $index;
+                $descr      = strtoupper($fsp3kr7_Card[$index]['entityEqptAidString'])." Input";
+                $current    = $fsp3kr7_Card[$index]['eqptPhysInstValuePsuAmpere'];
+                $sensorType = 'fsp3kr7psuInputA';
+                $oid        = '.1.3.6.1.4.1.2544.1.11.11.1.2.1.1.1.6.'.$index;
 
-            discover_sensor($valid['sensor'], 'current', $device, $oid, $index, $sensorType, $descr,
-                            $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
-         }
-       }
+                discover_sensor(
+                    $valid['sensor'],
+                    'current',
+                    $device,
+                    $oid,
+                    $index,
+                    $sensorType,
+                    $descr,
+                    $divisor,
+                    $multiplier,
+                    $low_limit,
+                    $low_warn_limit,
+                    $high_warn_limit,
+                    $high_limit,
+                    $current
+                );
+            }
+        }
     }
 }// ******** End If of FSP3000 R7

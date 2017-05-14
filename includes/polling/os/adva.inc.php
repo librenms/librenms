@@ -16,22 +16,22 @@
  **/
 
 // ***********  FSP150 Devices
-if (($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.17')       // GE114s 
+if (($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.17')       // GE114s
    xor ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.9')     // GE114
    xor ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.7')     // EG-X
    xor ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.11')) { // XG210
-	$version  = 'FSP150 SW V'.trim(snmp_get($device, "entPhysicalSoftwareRev.1", "-OQv", "ADVA-MIB"), '"');
-	$hardware = 'ADVA '.trim(snmp_get($device, "entPhysicalName.1", "-OQv", "ADVA-MIB"), '"')
-	            .' V'.trim(snmp_get($device, "entPhysicalHardwareRev.1", "-OQv", "ADVA-MIB"), '"');
-	$serial = trim(snmp_get($device, "entPhysicalSerialNum.1", "-OQv", "ADVA-MIB"), '"');
-	$features = ''; //search for PTP info in MIB
+    $version  = 'FSP150 SW V'.trim(snmp_get($device, "entPhysicalSoftwareRev.1", "-OQv", "ADVA-MIB"), '"');
+    $hardware = 'ADVA '.trim(snmp_get($device, "entPhysicalName.1", "-OQv", "ADVA-MIB"), '"')
+                .' V'.trim(snmp_get($device, "entPhysicalHardwareRev.1", "-OQv", "ADVA-MIB"), '"');
+    $serial = trim(snmp_get($device, "entPhysicalSerialNum.1", "-OQv", "ADVA-MIB"), '"');
+    $features = ''; //search for PTP info in MIB
 }// End If FSP150 Devices
 
 
 // **********  FSP3000 R7 Devices
 if ($device['sysObjectID'] == 'enterprises.2544.1.11.1.1') {
-	$version  = 'FSP3000R7 SW V'.trim(snmp_get($device, "swVersionActiveApplSw.100737280", "-OQv", "ADVA-MIB"), '"');
-	$hardware = 'ADVA FSP3000R7 '.trim(snmp_get($device, "inventoryUnitName.33619968", "-OQv", "ADVA-MIB"), '"')
-        	    .' V'.trim(snmp_get($device, "inventoryHardwareRev.33619968", "-OQv", "ADVA-MIB"), '"');
-	$serial = trim(snmp_get($device, "inventorySerialNum.33619968", "-OQv", "ADVA-MIB"), '"');
+    $version  = 'FSP3000R7 SW V'.trim(snmp_get($device, "swVersionActiveApplSw.100737280", "-OQv", "ADVA-MIB"), '"');
+    $hardware = 'ADVA FSP3000R7 '.trim(snmp_get($device, "inventoryUnitName.33619968", "-OQv", "ADVA-MIB"), '"')
+                .' V'.trim(snmp_get($device, "inventoryHardwareRev.33619968", "-OQv", "ADVA-MIB"), '"');
+    $serial = trim(snmp_get($device, "inventorySerialNum.33619968", "-OQv", "ADVA-MIB"), '"');
 }// *********  End FSP3000 Devices
