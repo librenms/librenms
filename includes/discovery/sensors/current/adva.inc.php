@@ -39,7 +39,7 @@ if ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.7') {
             $descr      = $psuname." #".$slotnum.' DC Output';
             $current    = $egxPSU[$index]['psuOutputCurrent'];
             $sensorType = 'fsp150egxOutputCurrent';
-            $oid        = '.1.3.6.1.4.1.2544.1.12.3.1.4.1.8'.$index;
+            $oid        = '.1.3.6.1.4.1.2544.1.12.3.1.4.1.8.'.$index;
 
             discover_sensor($valid['sensor'],
                 'current',
