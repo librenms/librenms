@@ -328,9 +328,11 @@ foreach ($bins as $bin) {
     if (!$cmd) {
         print_fail("$bin location is incorrect or bin not installed. \n\tYou can also manually set the path to $bin by placing the following in config.php: \n\t\$config['$bin'] = \"/path/to/$bin\";");
     } elseif (in_array($bin, array('fping', 'fping6'))) {
-        if (shell_exec("which getcap 2>/dev/null") && !str_contains(shell_exec("getcap $cmd"), "$cmd = cap_net_raw+ep")) {
-            print_fail("$bin should have CAP_NET_RAW!", "setcap cap_net_raw+ep $cmd");
-        } elseif (!fileperms($cmd) & 2048) {
+        if (trim(shell_exec("which getcap 2>/dev/null"))) {
+            if (!str_contains(shell_exec("getcap $cmd"), "$cmd = cap_net_raw+ep")) {
+                print_fail("$bin should have CAP_NET_RAW!", "setcap cap_net_raw+ep $cmd");
+            }
+        } elseif (!(fileperms($cmd) & 2048)) {
             print_fail("$bin should be suid!", "chmod u+s $cmd");
         }
     }
