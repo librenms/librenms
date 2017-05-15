@@ -1,12 +1,4 @@
 <?php
-function varDumpToString($var) {
-    ob_start();
-    var_dump($var);
-    $result = ob_get_clean();
-    return $result;
-}
-
-
 $continue = true;
 
 // Build ifIndex to port_id dictionary
