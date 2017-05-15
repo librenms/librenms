@@ -1,8 +1,8 @@
 <?php
 /**
- * geist-watchdog.inc.php
+ * geist-pdu.inc.php
  *
- * LibreNMS OS poller module for Geist Watchdog
+ * LibreNMS OS poller module for Geist PDU
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,5 +23,5 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$serial  = snmp_get($device, 'climateSerial', '-Oqv', 'GEIST-MIB-V3');
-$version = snmp_get($device, 'productVersion.0', '-Oqv', 'GEIST-MIB-V3');
+$version  = snmp_get($device, 'productVersion.0', '-Oqv', 'GEIST-MIB-V3');
+$hardware = snmp_get($device, 'productHardware.0', '-Oqv', 'GEIST-MIB-V3');
