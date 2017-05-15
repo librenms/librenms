@@ -22,7 +22,7 @@ if ($stage > 3) {
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 // List of php modules we expect to see
-$modules = array('gd','mysqli','snmp','mcrypt');
+$modules = array('gd','mysqli','mcrypt');
 
 $dbhost = @$_POST['dbhost'] ?: 'localhost';
 $dbuser = @$_POST['dbuser'] ?: 'librenms';

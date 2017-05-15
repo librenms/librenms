@@ -2106,18 +2106,18 @@ label {
     background-color: #f5f5f5;
 }
 
-.device-table-header-status {
-    width: 100px;
-    text-align: center;
+.device-table-metrics span {
+  display: inline-block;
+  white-space: nowrap;
 }
 
-.device-table-header-vendor {
-    width: 100px;
-    text-align: center;
+.device-table-metrics>a {
+  color:#000;
+  text-decoration:none;
 }
 
 .device-table-header-actions {
-  min-width: 120px;
+  min-width: 110px;
   text-align: center;
 }
 

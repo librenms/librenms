@@ -104,6 +104,19 @@ if ($config['memcached']['enable'] === true) {
 }
 
 if (!module_selected('nodb', $init_modules)) {
+    // Check for testing database
+    if (getenv('DBTEST')) {
+        if (isset($config['test_db_name'])) {
+            $config['db_name'] = $config['test_db_name'];
+        }
+        if (isset($config['test_db_user'])) {
+            $config['db_user'] = $config['test_db_user'];
+        }
+        if (isset($config['test_db_pass'])) {
+            $config['db_pass'] = $config['test_db_pass'];
+        }
+    }
+
     // Connect to database
     try {
         dbConnect();
@@ -139,12 +152,8 @@ if (module_selected('web', $init_modules)) {
         $config['title_image'] = 'images/librenms_logo_'.$config['site_style'].'.svg';
     }
     require $install_dir . '/html/includes/vars.inc.php';
-    $tmp_list = dbFetchRows('SELECT DISTINCT(`os`) FROM `devices`');
-    $os_list = array();
-    foreach ($tmp_list as $k => $v) {
-        $os_list[] = $config['install_dir'].'/includes/definitions/'. $v['os'] . '.yaml';
-    }
-    load_all_os($os_list);
+
+    load_all_os(true);
 }
 
 $console_color = new Console_Color2();

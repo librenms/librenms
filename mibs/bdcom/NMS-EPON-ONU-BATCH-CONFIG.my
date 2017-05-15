@@ -1,0 +1,123 @@
+-- *****************************************************************
+-- NMS-EPON-ONU-BATCH-CONFIG.MIB:  NMS LLID ONU BATCH CONFIG MIB file
+-- APRIL 2010
+-- *****************************************************************
+--
+
+               NMS-EPON-ONU-BATCH-CONFIG DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+	            PortList
+	                FROM Q-BRIDGE-MIB
+		    TruthValue,RowStatus,PhysAddress,DisplayString,MacAddress
+		    	FROM SNMPv2-TC;
+          
+               nmsEponOnuBatchConfig         OBJECT IDENTIFIER ::= { nmsEPONGroup 22 }
+               
+                
+               nmsEponOnuConfigIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU index, just LLID the same value as llidIfIndex in NMS-EPON-LLID.MIB. While setting, the buffer will be written into the 
+                           corresponding ONU config information, you can read nmsEponOnuBatchConfigTable to get this configuration. After setting, the newly 
+                           updating configuration of this ONU won't be upated to the buffer. When you set this value to 0, the buffer will be cleared, 
+                           and nmsEponOnuConfigTable will be null."
+                   ::= { nmsEponOnuBatchConfig 1 } 
+               
+               
+
+               nmsEponOnuConfigTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOnuConfigEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of the ONU config table entries. The corresponding onu id will read/write to nmsEponOnuConfigIndex. Get-next and get-bulk operation is only supported"
+                   ::= { nmsEponOnuBatchConfig 2 }
+
+               nmsEponOnuConfigEntry OBJECT-TYPE
+                   SYNTAX NMSEponOnuConfigEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of certain ONU configuration. The ONU id can be read or set by nmsEponOnuConfigIndex."
+                   INDEX { onuConfigSequenceNo }
+               ::= { nmsEponOnuConfigTable 1 }
+
+               NMSEponOnuConfigEntry ::=
+                   SEQUENCE {
+                       onuConfigSequenceNo
+                           INTEGER,
+                       onuConfigCommand
+                           OCTET STRING
+                   }
+                   
+               onuConfigSequenceNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU configuration command sequence number."
+                   ::= { nmsEponOnuConfigEntry 1 } 
+
+               onuConfigCommand OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU configuration command value."
+                   ::= { nmsEponOnuConfigEntry 2 } 
+
+
+
+               onuConfigurationAdd OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU configuration command set value. After this operation, buffer will be added, but the configuration won't work."
+                   ::= { nmsEponOnuBatchConfig 3 } 
+
+               onuCfgApplyLLIDs OBJECT-TYPE
+                   SYNTAX  PortList
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU LLID list, which defines the ONU to be applied."
+                   ::= { nmsEponOnuBatchConfig 4 } 
+
+               onuCfgApplyAction OBJECT-TYPE
+                   SYNTAX  INTEGER{no_action(0),
+                                   apply(1)
+                                   }
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "While set to 1, all the configuration command in buffer will apply to device and the configuration works."
+                   ::= { nmsEponOnuBatchConfig 5 } 
+
+               ounCfgApplyResult OBJECT-TYPE
+                   SYNTAX  INTEGER{success(0),
+                                   processing(1),
+                                   other(2),
+                                   reserved(3)
+                                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU configuraton appling result."
+                   ::= { nmsEponOnuBatchConfig 6 } 
+
+               
+
+
+END      

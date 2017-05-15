@@ -1,0 +1,1400 @@
+-- *****************************************************************
+-- NMS-INTERFACES.my:  NMS Interfaces MIB file
+-- Jun 2000
+-- *****************************************************************
+--
+
+               NMS-INTERFACES DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString, ifIndex
+			FROM RFC1213-MIB
+		    nmslocal
+			FROM NMS-SMI;
+          
+               nmslinterfaces         OBJECT IDENTIFIER ::= { nmslocal 2 }
+
+
+               -- Local Interface Group
+
+          -- This group is present in all products.
+
+
+          -- Local Interface Table
+
+          -- This group provides additional objects to the table
+          -- defined by RFC1156.
+
+               nmslifTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSlifEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of interface entries."
+                   ::= { nmslinterfaces 1 }
+
+               nmslifEntry OBJECT-TYPE
+                   SYNTAX NMSlifEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            NMS interface."
+                   INDEX { ifIndex }
+               ::= { nmslifTable 1 }
+
+               NMSlifEntry ::=
+                   SEQUENCE {
+                       nmslocIfHardType
+                           DisplayString,
+                       nmslocIfLineProt
+                           INTEGER,
+                       nmslocIfLastIn
+                           INTEGER,
+                       nmslocIfLastOut
+                           INTEGER,
+                       nmslocIfLastOutHang
+                           INTEGER,
+                       nmslocIfInBitsSec
+                           INTEGER,
+                       nmslocIfInPktsSec
+                           INTEGER,
+                       nmslocIfOutBitsSec
+                           INTEGER,
+                       nmslocIfOutPktsSec
+                           INTEGER,
+                       nmslocIfInRunts
+                           INTEGER,
+                       nmslocIfInGiants
+                           INTEGER,
+                       nmslocIfInCRC
+                           INTEGER,
+                       nmslocIfInFrame
+                           INTEGER,
+                       nmslocIfInOverrun
+                           INTEGER,
+                       nmslocIfInIgnored
+                           INTEGER,
+                       nmslocIfInAbort
+                           INTEGER,
+                       nmslocIfResets
+                           INTEGER,
+                       nmslocIfRestarts
+                           INTEGER,
+                       nmslocIfKeep
+                           INTEGER,
+                       nmslocIfReason
+                           DisplayString,
+                       nmslocIfCarTrans
+                           INTEGER,
+                       nmslocIfReliab
+                           INTEGER,
+                       nmslocIfDelay
+                           INTEGER,
+                       nmslocIfLoad
+                           INTEGER,
+                       nmslocIfCollisions
+                           INTEGER,
+                       nmslocIfInputQueueDrops
+                           INTEGER,
+                       nmslocIfOutputQueueDrops
+                           INTEGER,
+                       nmslocIfDescr
+                           DisplayString,
+                       nmslocIfSlowInPkts
+                           Counter,
+                       nmslocIfSlowOutPkts
+                           Counter,
+                       nmslocIfSlowInOctets
+                           Counter,
+                       nmslocIfSlowOutOctets
+                           Counter,
+                       nmslocIfFastInPkts
+                           Counter,
+                       nmslocIfFastOutPkts
+                           Counter,
+                       nmslocIfFastInOctets
+                           Counter,
+                       nmslocIfFastOutOctets
+                           Counter,
+                       nmslocIfotherInPkts
+                           Counter,
+                       nmslocIfotherOutPkts
+                           Counter,
+                       nmslocIfotherInOctets
+                           Counter,
+                       nmslocIfotherOutOctets
+                           Counter,
+                       nmslocIfipInPkts
+                           Counter,
+                       nmslocIfipOutPkts
+                           Counter,
+                       nmslocIfipInOctets
+                           Counter,
+                       nmslocIfipOutOctets
+                           Counter,
+                       nmslocIfdecnetInPkts
+                           Counter,
+                       nmslocIfdecnetOutPkts
+                           Counter,
+                       nmslocIfdecnetInOctets
+                           Counter,
+                       nmslocIfdecnetOutOctets
+                           Counter,
+                       nmslocIfxnsInPkts
+                           Counter,
+                       nmslocIfxnsOutPkts
+                           Counter,
+                       nmslocIfxnsInOctets
+                           Counter,
+                       nmslocIfxnsOutOctets
+                           Counter,
+                       nmslocIfclnsInPkts
+                           Counter,
+                       nmslocIfclnsOutPkts
+                           Counter,
+                       nmslocIfclnsInOctets
+                           Counter,
+                       nmslocIfclnsOutOctets
+                           Counter,
+                       nmslocIfappletalkInPkts
+                           Counter,
+                       nmslocIfappletalkOutPkts
+                           Counter,
+                       nmslocIfappletalkInOctets
+                           Counter,
+                       nmslocIfappletalkOutOctets
+                           Counter,
+                       nmslocIfnovellInPkts
+                           Counter,
+                       nmslocIfnovellOutPkts
+                           Counter,
+                       nmslocIfnovellInOctets
+                           Counter,
+                       nmslocIfnovellOutOctets
+                           Counter,
+                       nmslocIfapolloInPkts
+                           Counter,
+                       nmslocIfapolloOutPkts
+                           Counter,
+                       nmslocIfapolloInOctets
+                           Counter,
+                       nmslocIfapolloOutOctets
+                           Counter,
+                       nmslocIfvinesInPkts
+                           Counter,
+                       nmslocIfvinesOutPkts
+                           Counter,
+                       nmslocIfvinesInOctets
+                           Counter,
+                       nmslocIfvinesOutOctets
+                           Counter,
+                       nmslocIfbridgedInPkts
+                           Counter,
+                       nmslocIfbridgedOutPkts
+                           Counter,
+                       nmslocIfbridgedInOctets
+                           Counter,
+                       nmslocIfbridgedOutOctets
+                           Counter,
+                       nmslocIfsrbInPkts
+                           Counter,
+                       nmslocIfsrbOutPkts
+                           Counter,
+                       nmslocIfsrbInOctets
+                           Counter,
+                       nmslocIfsrbOutOctets
+                           Counter,
+                       nmslocIfchaosInPkts
+                           Counter,
+                       nmslocIfchaosOutPkts
+                           Counter,
+                       nmslocIfchaosInOctets
+                           Counter,
+                       nmslocIfchaosOutOctets
+                           Counter,
+                       nmslocIfpupInPkts
+                           Counter,
+                       nmslocIfpupOutPkts
+                           Counter,
+                       nmslocIfpupInOctets
+                           Counter,
+                       nmslocIfpupOutOctets
+                           Counter,
+                       nmslocIfmopInPkts
+                           Counter,
+                       nmslocIfmopOutPkts
+                           Counter,
+                       nmslocIfmopInOctets
+                           Counter,
+                       nmslocIfmopOutOctets
+                           Counter,
+                       nmslocIflanmanInPkts
+                           Counter,
+                       nmslocIflanmanOutPkts
+                           Counter,
+                       nmslocIflanmanInOctets
+                           Counter,
+                       nmslocIflanmanOutOctets
+                           Counter,
+                       nmslocIfstunInPkts
+                           Counter,
+                       nmslocIfstunOutPkts
+                           Counter,
+                       nmslocIfstunInOctets
+                           Counter,
+                       nmslocIfstunOutOctets
+                           Counter,
+                       nmslocIfspanInPkts
+                           Counter,
+                       nmslocIfspanOutPkts
+                           Counter,
+                       nmslocIfspanInOctets
+                           Counter,
+                       nmslocIfspanOutOctets
+                           Counter,
+                       nmslocIfarpInPkts
+                           Counter,
+                       nmslocIfarpOutPkts
+                           Counter,
+                       nmslocIfarpInOctets
+                           Counter,
+                       nmslocIfarpOutOctets
+                           Counter,
+                       nmslocIfprobeInPkts
+                           Counter,
+                       nmslocIfprobeOutPkts
+                           Counter,
+                       nmslocIfprobeInOctets
+                           Counter,
+                       nmslocIfprobeOutOctets
+                           Counter,
+                       nmslocIfDribbleInputs
+                           Counter
+                   }
+
+
+          -- The following section describes the components of the
+          -- table.
+
+               nmslocIfHardType OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Returns the type of interface."
+                   ::= { nmslifEntry 1 }
+
+               nmslocIfLineProt OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Boolean whether interface line protocol is
+                           up or not."
+                   ::= { nmslifEntry 2 }
+
+               nmslocIfLastIn OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Elapsed time in milliseconds since last line
+                           protocol input packet was received."
+                   ::= { nmslifEntry 3 }
+
+               nmslocIfLastOut OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Elapsed time in milliseconds since last line
+                           protocol output packet was transmitted."
+                   ::= { nmslifEntry 4 }
+
+               nmslocIfLastOutHang OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Elapsed time in milliseconds since last line
+                           protocol output packet could not be
+                           successfully transmitted."
+                   ::= { nmslifEntry 5 }
+
+               nmslocIfInBitsSec OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Five minute exponentially-decayed moving
+                           average of input bits per second."
+                   ::= { nmslifEntry 6 }
+
+               nmslocIfInPktsSec OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Five minute exponentially-decayed moving
+                           average of input packets per second."
+                   ::= { nmslifEntry 7 }
+
+               nmslocIfOutBitsSec OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Five minute exponentially-decayed moving
+                           average of output bits per second."
+                   ::= { nmslifEntry 8 }
+
+               nmslocIfOutPktsSec OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Five minute exponentially-decayed moving
+                           average of output packets per second."
+                   ::= { nmslifEntry 9 }
+
+               nmslocIfInRunts OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of packets input which were smaller
+                           then the allowable physical media permitted."
+                   ::= { nmslifEntry 10 }
+
+               nmslocIfInGiants OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of input packets which were larger
+                           then the physical media permitted."
+                   ::= { nmslifEntry 11 }
+
+               nmslocIfInCRC OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of input packets which had cyclic
+                           redundancy checksum errors."
+                   ::= { nmslifEntry 12 }
+
+               nmslocIfInFrame OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of input packet which were
+                           misaligned."
+                   ::= { nmslifEntry 13 }
+
+               nmslocIfInOverrun OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Count of input which arrived too quickly for
+                           the to hardware receive."
+                   ::= { nmslifEntry 14 }
+
+               nmslocIfInIgnored OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of input packets which were simply
+                           ignored by this interface."
+                   ::= { nmslifEntry 15 }
+
+               nmslocIfInAbort OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of input packets which were aborted."
+                   ::= { nmslifEntry 16 }
+
+               nmslocIfResets OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of times the interface internally
+                           reset."
+                   ::= { nmslifEntry 17 }
+
+               nmslocIfRestarts OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of times interface needed to be
+                           completely restarted."
+                   ::= { nmslifEntry 18 }
+
+               nmslocIfKeep OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Boolean whether keepalives are enabled on
+                           this interface."
+                   ::= { nmslifEntry 19 }
+
+               nmslocIfReason OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Reason for interface last status change."
+                   ::= { nmslifEntry 20 }
+
+               nmslocIfCarTrans OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of times interface saw the carrier
+                           signal transition."
+                   ::= { nmslifEntry 21 }
+
+               nmslocIfReliab OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The reliability of the interface. Used by
+                           IGRP."
+                   ::= { nmslifEntry 22 }
+
+               nmslocIfDelay OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The amount of delay in microseconds of the
+                           interface. Used by IGRP."
+                   ::= { nmslifEntry 23 }
+
+               nmslocIfLoad OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The loading factor of the interface. Used by
+                           IGRP."
+                   ::= { nmslifEntry 24 }
+
+               nmslocIfCollisions OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The number of output collisions detected on
+                           this interface."
+                   ::= { nmslifEntry 25 }
+
+               nmslocIfInputQueueDrops OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The number of packets dropped because the
+                           input queue was full."
+                   ::= { nmslifEntry 26 }
+
+               nmslocIfOutputQueueDrops OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The number of packets dropped because the
+                           output queue was full."
+                   ::= { nmslifEntry 27 }
+
+               nmslocIfDescr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "User configurable interface description."
+                   ::= { nmslifEntry 28 }
+
+               nmslocIfSlowInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Packet count for Inbound traffic routed with
+                           slow switching"
+                   ::= { nmslifEntry 30 }
+
+               nmslocIfSlowOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Packet count for Outbound traffic routed
+                           with slow switching"
+                   ::= { nmslifEntry 31 }
+
+               nmslocIfSlowInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Octet count for Inbound traffic routed with
+                           slow switching"
+                   ::= { nmslifEntry 32 }
+
+               nmslocIfSlowOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Octet count for Outbound traffic routed with
+                           slow switching"
+                   ::= { nmslifEntry 33 }
+
+               nmslocIfFastInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Packet count for Inbound traffic routed with
+                           fast switching"
+                   ::= { nmslifEntry 34 }
+
+               nmslocIfFastOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Packet count for Outbound traffic routed
+                           with fast switching"
+                   ::= { nmslifEntry 35 }
+
+               nmslocIfFastInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Octet count for Inbound traffic routed with
+                           fast switching"
+                   ::= { nmslifEntry 36 }
+
+               nmslocIfFastOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Octet count for Outbound traffic routed with
+                           fast switching"
+                   ::= { nmslifEntry 37 }
+
+               nmslocIfotherInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Other protocol input packet count"
+                   ::= { nmslifEntry 38 }
+
+               nmslocIfotherOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Other protocol output packet count"
+                   ::= { nmslifEntry 39 }
+
+               nmslocIfotherInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Other protocol input octet count"
+                   ::= { nmslifEntry 40 }
+
+               nmslocIfotherOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Other protocol output octet count"
+                   ::= { nmslifEntry 41 }
+
+               nmslocIfipInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ip protocol input packet count"
+                   ::= { nmslifEntry 42 }
+
+               nmslocIfipOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ip protocol output packet count"
+                   ::= { nmslifEntry 43 }
+
+               nmslocIfipInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ip protocol input octet count"
+                   ::= { nmslifEntry 44 }
+
+               nmslocIfipOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ip protocol output octet count"
+                   ::= { nmslifEntry 45 }
+
+               nmslocIfdecnetInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Decnet protocol input packet count"
+                   ::= { nmslifEntry 46 }
+
+               nmslocIfdecnetOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Decnet protocol output packet count"
+                   ::= { nmslifEntry 47 }
+
+               nmslocIfdecnetInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Decnet protocol input byte count"
+                   ::= { nmslifEntry 48 }
+
+               nmslocIfdecnetOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Decnet protocol output byte count"
+                   ::= { nmslifEntry 49 }
+
+               nmslocIfxnsInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "XNS protocol input packet count"
+                   ::= { nmslifEntry 50 }
+
+               nmslocIfxnsOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "XNS protocol output packet count"
+                   ::= { nmslifEntry 51 }
+
+               nmslocIfxnsInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "XNS protocol input byte count"
+                   ::= { nmslifEntry 52 }
+
+               nmslocIfxnsOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "XNS protocol output byte count"
+                   ::= { nmslifEntry 53 }
+
+               nmslocIfclnsInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "CLNS protocol input packet count"
+                   ::= { nmslifEntry 54 }
+
+               nmslocIfclnsOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "CLNS protocol output packet count"
+                   ::= { nmslifEntry 55 }
+
+               nmslocIfclnsInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "CLNS protocol input byte count"
+                   ::= { nmslifEntry 56 }
+
+               nmslocIfclnsOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "CLNS protocol output byte count"
+                   ::= { nmslifEntry 57 }
+
+               nmslocIfappletalkInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Appletalk protocol input packet count"
+                   ::= { nmslifEntry 58 }
+
+               nmslocIfappletalkOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Appletalk protocol output packet count"
+                   ::= { nmslifEntry 59 }
+
+               nmslocIfappletalkInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Appletalk protocol input octet count"
+                   ::= { nmslifEntry 60 }
+
+               nmslocIfappletalkOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Appletalk protocol output octet count"
+                   ::= { nmslifEntry 61 }
+
+               nmslocIfnovellInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Novell protocol input packet count"
+                   ::= { nmslifEntry 62 }
+
+               nmslocIfnovellOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Novell protocol output packet count"
+                   ::= { nmslifEntry 63 }
+
+               nmslocIfnovellInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Novell protocol input octet count"
+                   ::= { nmslifEntry 64 }
+
+               nmslocIfnovellOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Novell protocol output octet count"
+                   ::= { nmslifEntry 65 }
+
+               nmslocIfapolloInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Apollo protocol input packet count"
+                   ::= { nmslifEntry 66 }
+
+               nmslocIfapolloOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Apollo protocol output packet count"
+                   ::= { nmslifEntry 67 }
+
+               nmslocIfapolloInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Apollo protocol input octet count"
+                   ::= { nmslifEntry 68 }
+
+               nmslocIfapolloOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Apollo protocol output octet count"
+                   ::= { nmslifEntry 69 }
+
+               nmslocIfvinesInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Vines protocol input packet count"
+                   ::= { nmslifEntry 70 }
+
+               nmslocIfvinesOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Vines protocol output packet count"
+                   ::= { nmslifEntry 71 }
+
+               nmslocIfvinesInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Vines protocol input octet count"
+                   ::= { nmslifEntry 72 }
+
+               nmslocIfvinesOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Vines protocol output octet count"
+                   ::= { nmslifEntry 73 }
+
+               nmslocIfbridgedInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Bridged protocol input packet count"
+                   ::= { nmslifEntry 74 }
+
+               nmslocIfbridgedOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Bridged protocol output packet count"
+                   ::= { nmslifEntry 75 }
+
+               nmslocIfbridgedInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Bridged protocol input octet count"
+                   ::= { nmslifEntry 76 }
+
+               nmslocIfbridgedOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Bridged protocol output octet count"
+                   ::= { nmslifEntry 77 }
+
+               nmslocIfsrbInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "SRB protocol input packet count"
+                   ::= { nmslifEntry 78 }
+
+               nmslocIfsrbOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "SRB protocol output packet count"
+                   ::= { nmslifEntry 79 }
+
+               nmslocIfsrbInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "SRB protocol input octet count"
+                   ::= { nmslifEntry 80 }
+
+               nmslocIfsrbOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "SRB protocol output octet count"
+                   ::= { nmslifEntry 81 }
+
+               nmslocIfchaosInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Choas protocol input packet count"
+                   ::= { nmslifEntry 82 }
+
+               nmslocIfchaosOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Choas protocol output packet count"
+                   ::= { nmslifEntry 83 }
+
+               nmslocIfchaosInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Choas protocol input octet count"
+                   ::= { nmslifEntry 84 }
+
+               nmslocIfchaosOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Choas protocol output octet count"
+                   ::= { nmslifEntry 85 }
+
+               nmslocIfpupInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PUP protocol input packet count"
+                   ::= { nmslifEntry 86 }
+
+               nmslocIfpupOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PUP protocol output packet count"
+                   ::= { nmslifEntry 87 }
+
+               nmslocIfpupInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PUP protocol input octet count"
+                   ::= { nmslifEntry 88 }
+
+               nmslocIfpupOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PUP protocol output octet count"
+                   ::= { nmslifEntry 89 }
+
+               nmslocIfmopInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "MOP protocol input packet count"
+                   ::= { nmslifEntry 90 }
+
+               nmslocIfmopOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "MOP protocol output packet count"
+                   ::= { nmslifEntry 91 }
+
+               nmslocIfmopInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "MOP protocol input octet count"
+                   ::= { nmslifEntry 92 }
+
+               nmslocIfmopOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "MOP protocol output octet count"
+                   ::= { nmslifEntry 93 }
+
+               nmslocIflanmanInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LanMan protocol input packet count"
+                   ::= { nmslifEntry 94 }
+
+               nmslocIflanmanOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LanMan protocol output packet count"
+                   ::= { nmslifEntry 95 }
+
+               nmslocIflanmanInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LanMan protocol input octet count"
+                   ::= { nmslifEntry 96 }
+
+               nmslocIflanmanOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LanMan protocol output octet count"
+                   ::= { nmslifEntry 97 }
+
+               nmslocIfstunInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "STUN protocol input packet count"
+                   ::= { nmslifEntry 98 }
+
+               nmslocIfstunOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "STUN protocol output packet count"
+                   ::= { nmslifEntry 99 }
+
+               nmslocIfstunInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "STUN protocol input octet count"
+                   ::= { nmslifEntry 100 }
+
+               nmslocIfstunOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "STUN protocol output octet count"
+                   ::= { nmslifEntry 101 }
+
+               nmslocIfspanInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Spanning tree input protocol packet count"
+                   ::= { nmslifEntry 102 }
+
+               nmslocIfspanOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Spanning tree output protocol packet count"
+                   ::= { nmslifEntry 103 }
+
+               nmslocIfspanInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Spanning tree input octet packet count"
+                   ::= { nmslifEntry 104 }
+
+               nmslocIfspanOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Spanning tree output octet packet count"
+                   ::= { nmslifEntry 105 }
+
+               nmslocIfarpInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Arp protocol input packet count"
+                   ::= { nmslifEntry 106 }
+
+               nmslocIfarpOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Arp protocol output packet count"
+                   ::= { nmslifEntry 107 }
+
+               nmslocIfarpInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Arp protocol input octet count"
+                   ::= { nmslifEntry 108 }
+
+               nmslocIfarpOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Arp protocol output octet count"
+                   ::= { nmslifEntry 109 }
+
+               nmslocIfprobeInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Probe protocol input packet count"
+                   ::= { nmslifEntry 110 }
+
+               nmslocIfprobeOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Probe protocol output packet count"
+                   ::= { nmslifEntry 111 }
+
+               nmslocIfprobeInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Probe protocol input octet count"
+                   ::= { nmslifEntry 112 }
+
+               nmslocIfprobeOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Probe protocol output octet count"
+                   ::= { nmslifEntry 113 }
+
+               nmslocIfDribbleInputs OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The number of good packets received with the
+                           dribble condition present"
+                   ::= { nmslifEntry 114 }
+
+               -- End of table
+
+
+
+          -- nmslocal FSIP card Table, also used for 4T, HSSI, Mx serial
+
+          -- This group provides additional objects to the table
+          -- defined by RFC1156.
+
+               nmslFSIPTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSLFSIPEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of card entries for 4T, HSSI,
+		             Mx serial or FSIP."
+                   ::= { nmslinterfaces 2 }
+
+               nmslFSIPEntry OBJECT-TYPE
+                   SYNTAX NMSLFSIPEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of objects specific to 4T,
+			     HSSI, Mx serial or FSIP."
+                   INDEX { nmslocIfFSIPIndex }
+               ::= { nmslFSIPTable 1 }
+
+               NMSLFSIPEntry ::=
+                   SEQUENCE {
+                       nmslocIfFSIPIndex
+                           INTEGER,
+                       nmslocIfFSIPtype
+                           INTEGER,
+                       nmslocIfFSIPrts
+                           INTEGER,
+                       nmslocIfFSIPcts
+                           INTEGER,
+                       nmslocIfFSIPdtr
+                           INTEGER,
+                       nmslocIfFSIPdcd
+                           INTEGER,
+                       nmslocIfFSIPdsr
+                           INTEGER,
+                       nmslocIfFSIPrxClockrate
+                           INTEGER,
+                       nmslocIfFSIPrxClockrateHi
+                           INTEGER,
+                       nmslocIfFSIPportType
+                           INTEGER
+                   }
+
+
+          -- The following section describes the components of the
+          -- table.
+
+               nmslocIfFSIPIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Interface index of this card corresponding
+                           to its ifIndex"
+                   ::= { nmslFSIPEntry 1 }
+
+               nmslocIfFSIPtype OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        notAvailable(1),
+                        dte(2),
+                        dce(3)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is this FSIP line DCE or DTE"
+                   ::= { nmslFSIPEntry 2 }
+
+               nmslocIfFSIPrts OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        notAvailable(1),
+                        up(2),
+                        down(3)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is the RTS signal up or down"
+                   ::= { nmslFSIPEntry 3 }
+
+               nmslocIfFSIPcts OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        notAvailable(1),
+                        up(2),
+                        down(3)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is the CTS signal up or down"
+                   ::= { nmslFSIPEntry 4 }
+
+               nmslocIfFSIPdtr OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        notAvailable(1),
+                        up(2),
+                        down(3)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is the DTR signal up or down"
+                   ::= { nmslFSIPEntry 5 }
+
+               nmslocIfFSIPdcd OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        notAvailable(1),
+                        up(2),
+                        down(3)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is the DCD signal up or down"
+                   ::= { nmslFSIPEntry 6 }
+
+               nmslocIfFSIPdsr OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        notAvailable(1),
+                        up(2),
+                        down(3)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is the DSR signal up or down"
+                   ::= { nmslFSIPEntry 7 }
+
+               nmslocIfFSIPrxClockrate OBJECT-TYPE
+                   SYNTAX INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                       "Received clock rate"
+                   ::= { nmslFSIPEntry 8 }
+
+               nmslocIfFSIPrxClockrateHi OBJECT-TYPE
+                   SYNTAX INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                       "Use when received clock rate 
+			is greater than 2^32 (gigabits)."
+                   ::= { nmslFSIPEntry 9 }
+
+	       -- PortType is modeled after rs232PortType 
+	       -- in RS-232-MIB.my
+
+               nmslocIfFSIPportType OBJECT-TYPE
+                   SYNTAX  INTEGER {
+			 noCable(1),
+                         rs232(2),
+			 rs422(3),
+			 rs423(4),
+			 v35(5),
+			 x21(6),
+			 rs449(7),
+			 rs530(8),
+		         hssi(9)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Cable Type of 4T, HSSI, Mx serial or FSIP"
+                   ::= { nmslFSIPEntry 10 }
+
+               -- End of table
+
+
+END

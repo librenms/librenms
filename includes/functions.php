@@ -100,9 +100,14 @@ function getHostOS($device)
     // check yaml files
     $pattern = $config['install_dir'] . '/includes/definitions/*.yaml';
     foreach (glob($pattern) as $file) {
-        $tmp = Symfony\Component\Yaml\Yaml::parse(
-            file_get_contents($file)
-        );
+        $os = basename($file, '.yaml');
+        if (isset($config['os'][$os])) {
+            $tmp = $config['os'][$os];
+        } else {
+            $tmp = Symfony\Component\Yaml\Yaml::parse(
+                file_get_contents($file)
+            );
+        }
         if (isset($tmp['discovery']) && is_array($tmp['discovery'])) {
             foreach ($tmp['discovery'] as $item) {
                 // check each item individually, if all the conditions in that item are true, we have a match
@@ -371,6 +376,7 @@ function delete_device($id)
 
     $ret .= "Removed device $host\n";
     log_event("Device $host has been removed", 0, 'system', 3);
+    oxidized_reload_nodes();
     return $ret;
 }
 
@@ -718,7 +724,6 @@ function createHost(
 
     $device_id = dbInsert($device, 'devices');
     if ($device_id) {
-        oxidized_reload_nodes();
         return $device_id;
     }
 
@@ -1004,8 +1009,6 @@ function is_port_valid($port, $device)
     if (empty($port['ifDescr']) && empty($port['ifAlias']) && empty($port['ifName'])) {
         // If these are all empty, we are just going to show blank names in the ui
         $valid = 0;
-    } elseif (strstr($port['ifDescr'], "irtual") && strpos($port['ifDescr'], "Virtual Services Platform") === false) {
-        $valid = 0;
     } else {
         $valid = 1;
         $if = strtolower($port['ifDescr']);
@@ -1015,10 +1018,16 @@ function is_port_valid($port, $device)
         if (is_array($config['os'][$device['os']]['bad_if'])) {
             $fringe = array_merge($config['bad_if'], $config['os'][$device['os']]['bad_if']);
         }
+        $config['good_if'] = $config['good_if'] ?: array();
+        if (is_array($config['os'][$device['os']]['good_if'])) {
+            $good_if = array_merge($config['good_if'], $config['os'][$device['os']]['good_if']);
+        }
         foreach ($fringe as $bi) {
             if (stristr($if, $bi)) {
-                $valid = 0;
-                d_echo("ignored : $bi : $if");
+                if (!str_contains($good_if, $if)) {
+                    $valid = 0;
+                    d_echo("ignored : $bi : $if");
+                }
             }
         }
         if (is_array($config['bad_if_regexp'])) {
@@ -1029,7 +1038,7 @@ function is_port_valid($port, $device)
             foreach ($fringe as $bi) {
                 if (preg_match($bi ."i", $if)) {
                     $valid = 0;
-                    d_echo("ignored : $bi : ".$if);
+                    d_echo("ignored : $bi : " . $if);
                 }
             }
         }
@@ -1559,7 +1568,7 @@ function oxidized_reload_nodes()
     global $config;
 
     if ($config['oxidized']['enabled'] === true && $config['oxidized']['reload_nodes'] === true && isset($config['oxidized']['url'])) {
-        $oxidized_reload_url = $config['oxidized']['url'] . '/reload?format=json';
+        $oxidized_reload_url = $config['oxidized']['url'] . '/reload.json';
         $ch = curl_init($oxidized_reload_url);
 
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
@@ -1650,9 +1659,16 @@ function rrdtest($path, &$stdOutput, &$stdError)
 
 function create_state_index($state_name)
 {
-    if (dbFetchRow('SELECT * FROM state_indexes WHERE state_name = ?', array($state_name)) != true) {
+    $state_index_id = dbFetchCell('SELECT `state_index_id` FROM state_indexes WHERE state_name = ? LIMIT 1', array($state_name));
+    if (!is_numeric($state_index_id)) {
         $insert = array('state_name' => $state_name);
         return dbInsert($insert, 'state_indexes');
+    } else {
+        $translations = dbFetchRows('SELECT * FROM `state_translations` WHERE `state_index_id` = ?', array($state_index_id));
+        if (count($translations) == 0) {
+            // If we don't have any translations something has gone wrong so return the state_index_id so they get created.
+            return $state_index_id;
+        }
     }
 }
 
@@ -1966,10 +1982,12 @@ function initStats()
             'insert_sec' => 0.0,
             'update' => 0,
             'update_sec' => 0.0,
+            'delete' => 0,
+            'delete_sec' => 0.0,
             'fetchcell' => 0,
             'fetchcell_sec' => 0.0,
-            'fetchcol' => 0,
-            'fetchcol_sec' => 0.0,
+            'fetchcolumn' => 0,
+            'fetchcolumn_sec' => 0.0,
             'fetchrow' => 0,
             'fetchrow_sec' => 0.0,
             'fetchrows' => 0,
@@ -2316,4 +2334,70 @@ function db_schema_is_current()
     $latest = key($schemas);
 
     return $current >= $latest;
+}
+
+/**
+ * Get the lock status for a given name
+ * @param $name
+ * @return bool
+ */
+function get_lock($name)
+{
+    global $config;
+    $lock_file = $config['install_dir']."/.$name.lock";
+    if (file_exists($lock_file)) {
+        $pids = explode("\n", trim(`ps -e | grep php | awk '{print $1}'`));
+        $lpid = trim(file_get_contents($lock_file));
+        if (in_array($lpid, $pids)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Set the lock status for a given name
+ * @param $name
+ */
+function set_lock($name)
+{
+    global $config;
+    $lock_file = $config['install_dir']."/.$name.lock";
+    $lock = get_lock($name);
+
+    if ($lock === true) {
+        echo "$lock_file exists, exiting\n";
+        exit(1);
+    } else {
+        file_put_contents($lock_file, getmypid());
+    }
+}
+
+/**
+ * Release lock file for a given name
+ * @param $name
+ */
+function release_lock($name)
+{
+    global $config;
+    unlink($config['install_dir']."/.$name.lock");
+}
+
+/**
+ * @param $device
+ * @return int|null
+ */
+function get_device_oid_limit($device)
+{
+    global $config;
+
+    $max_oid = $device['snmp_max_oid'];
+
+    if (isset($max_oid) && $max_oid > 0) {
+        return $max_oid;
+    } elseif (isset($config['snmp']['max_oid']) && $config['snmp']['max_oid'] > 0) {
+        return $config['snmp']['max_oid'];
+    } else {
+        return 10;
+    }
 }

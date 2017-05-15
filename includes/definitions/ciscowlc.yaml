@@ -6,8 +6,8 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
-    - { graph: device_ciscowlc_numaps, text: 'Number of APs' }
-    - { graph: device_ciscowlc_numclients, text: 'Number of Clients' }
+    - { graph: device_wireless_ap-count, text: 'Connected APs' }
+    - { graph: device_wireless_clients, text: 'Number of Clients' }
 icon: cisco
 poller_modules:
     cisco-cbqos: 1

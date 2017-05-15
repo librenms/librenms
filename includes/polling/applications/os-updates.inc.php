@@ -11,7 +11,7 @@ $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()->addDataset('packages', 'GAUGE', 0);
 
 $osupdates = snmp_get($device, $oid, $options, $mib);
-update_application($app, $osupdates);
+update_application($app, $osupdates, $osupdates);
 
 $fields = array('packages' => $osupdates,);
 

@@ -206,11 +206,9 @@ function get_all_devices()
     // FIXME respect $type (server, network, etc) -- needs an array fill in topnav.
 
     if (isset($cache['devices']['hostname'])) {
-        $devices = array_keys($cache['devices']['hostname']);
+        $devices = array_keys($cache['devices']);
     } else {
-        foreach (dbFetchRows("SELECT `hostname` FROM `devices`") as $data) {
-            $devices[] = $data['hostname'];
-        }
+        $devices = dbFetchRows("SELECT * FROM `devices`");
     }
 
     return $devices;
@@ -1128,21 +1126,24 @@ function inet6_ntop($ip)
 }
 
 /**
- * Convert IP to use sysName
+ * If hostname is an ip, use return sysName
  * @param array device
- * @param string ip address
+ * @param string hostname
  * @return string
 **/
-function ip_to_sysname($device, $ip)
+function format_hostname($device, $hostname = '')
 {
     global $config;
-    if ($config['force_ip_to_sysname'] === true) {
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
-            $ip = $device['sysName'];
+    if (empty($hostname)) {
+        $hostname = $device['hostname'];
+    }
+    if ($config['force_ip_to_sysname'] === true && !empty($device['sysName'])) {
+        if (filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
+            $hostname = $device['sysName'];
         }
     }
-    return $ip;
-}//end ip_to_sysname
+    return $hostname;
+}//end format_hostname
 
 /**
  * Return valid port association modes
@@ -1575,25 +1576,63 @@ function load_os(&$device)
 }
 
 /**
- * @param array $restricted
+ * Load all OS, optionally load just the OS used by existing devices
+ * Default cache time is 1 day. Controlled by os_def_cache_time.
+ *
+ * @param bool $existing Only load OS that have existing OS in the database
+ * @param bool $cached Load os definitions from the cache file
  */
-function load_all_os($restricted = array())
+function load_all_os($existing = false, $cached = true)
 {
     global $config;
-    if (!empty($restricted)) {
-        $list = $restricted;
-    } else {
-        $list = glob($config['install_dir'].'/includes/definitions/*.yaml');
-    }
-    foreach ($list as $file) {
-        $tmp = Symfony\Component\Yaml\Yaml::parse(
-            file_get_contents($file)
-        );
-        if (isset($config['os'][$tmp['os']])) {
-            $config['os'][$tmp['os']] = array_replace_recursive($tmp, $config['os'][$tmp['os']]);
-        } else {
-            $config['os'][$tmp['os']] = $tmp;
+    $cache_file = $config['install_dir'] . '/cache/os_defs.cache';
+
+    if ($cached && is_file($cache_file) && (time() - filemtime($cache_file) < $config['os_def_cache_time'])) {
+        // Cached
+        $os_defs = unserialize(file_get_contents($cache_file));
+
+        if ($existing) {
+            // remove unneeded os
+            $os_defs = array_diff_key($os_defs, dbFetchColumn('SELECT DISTINCT(`os`) FROM `devices`'));
         }
+
+        $config['os'] = array_replace_recursive($os_defs, $config['os']);
+    } else {
+        // load from yaml
+        if ($existing) {
+            $os_list = array_map(function ($os) use ($config) {
+                return $config['install_dir'] . '/includes/definitions/'. $os . '.yaml';
+            }, dbFetchColumn('SELECT DISTINCT(`os`) FROM `devices`'));
+        } else {
+            $os_list = glob($config['install_dir'].'/includes/definitions/*.yaml');
+        }
+
+        foreach ($os_list as $file) {
+            $tmp = Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+
+            if (isset($config['os'][$tmp['os']])) {
+                $config['os'][$tmp['os']] = array_replace_recursive($tmp, $config['os'][$tmp['os']]);
+            } else {
+                $config['os'][$tmp['os']] = $tmp;
+            }
+        }
+    }
+}
+
+/**
+ * Update the OS cache file cache/os_defs.cache
+ */
+function update_os_cache()
+{
+    global $config;
+    $cache_file = $config['install_dir'] . '/cache/os_defs.cache';
+    $cache_keep_time = $config['os_def_cache_time'] - 7200; // 2hr buffer
+
+    if (!is_file($cache_file) || time() - filemtime($cache_file) > $cache_keep_time) {
+        d_echo('Updating os_def.cache... ');
+        load_all_os(false, false);
+        file_put_contents($cache_file, serialize($config['os']));
+        d_echo("Done\n");
     }
 }
 
@@ -1643,7 +1682,8 @@ function set_numeric($value, $default = 0)
 
 function check_git_exists()
 {
-    if (`which git`) {
+    exec('git > /dev/null 2>&1', $response, $exit_code);
+    if ($exit_code === 1) {
         return true;
     } else {
         return false;
@@ -1697,7 +1737,7 @@ function get_user_pref($name, $default = null, $user_id = null)
 {
     global $user_prefs;
 
-    if (array_key_exists($name, $user_prefs)) {
+    if (is_array($user_prefs) && array_key_exists($name, $user_prefs)) {
         return $user_prefs[$name];
     }
 
@@ -1754,4 +1794,19 @@ function set_user_pref($name, $value, $user_id = null)
     }
 
     return $result;
+}
+
+/**
+ * Generate a class name from a lowercase string containing - or _
+ * Remove - and _ and camel case words
+ *
+ * @param string $name The string to convert to a class name
+ * @param string $namespace namespace to prepend to the name for example: LibreNMS\
+ * @return string  Class name
+ */
+function str_to_class($name, $namespace = null)
+{
+    $pre_format = str_replace(array('-', '_'), ' ', $name);
+    $class = str_replace(' ', '', ucwords(strtolower($pre_format)));
+    return $namespace . $class;
 }

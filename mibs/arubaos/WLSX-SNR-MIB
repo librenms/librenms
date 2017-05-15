@@ -1,9 +1,10 @@
--- ArubaOS 3.2.0.0_16376
+--- ArubaOS 6.5.2.0_59123
 -- vim: set ts=4 sw=4:
 WLSX-SNR-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
-       TEXTUAL-CONVENTION,
+       TEXTUAL-CONVENTION FROM SNMPv2-TC 
+       
        MODULE-IDENTITY,
        OBJECT-TYPE,
        snmpModules,
@@ -36,7 +37,7 @@ WLSX-SNR-MIB DEFINITIONS ::= BEGIN
 			FROM ARUBA-MIB;
 
    wlsxSNRMIB MODULE-IDENTITY 
-       LAST-UPDATED "0601221834Z"
+       LAST-UPDATED "0611272030Z"
        ORGANIZATION "Aruba Wireless Networks"
        CONTACT-INFO
             "Postal:    1322 Crossman Avenue
@@ -49,7 +50,7 @@ WLSX-SNR-MIB DEFINITIONS ::= BEGIN
            information about the Wireless Management System (WMS) in the 
 		   Aruba controller.
 		   "
-       REVISION        "0601221834Z"
+       REVISION        "0611272030Z"
        DESCRIPTION
            "The initial revision."
        ::= { wlsxEnterpriseMibModules 7 }

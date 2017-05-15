@@ -1,0 +1,89 @@
+VLAN DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, Integer32
+        FROM SNMPv2-SMI
+
+    VlanStatusT, VlanGroupT
+       FROM ExaltComm
+
+    interface
+       FROM ExaltComProducts
+
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    DisplayString
+        FROM SNMPv2-TC;
+
+    
+vlan OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION         "VLAN interfaces."
+        ::= { interface 3 }
+
+    vlanStatus OBJECT-TYPE
+        SYNTAX              VlanStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This setting enables or disables VLAN support."
+        ::= { vlan 1 }
+
+    vlanDefaultMgmtId OBJECT-TYPE
+        SYNTAX              Integer32 (1..4095)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This is the Default management VLAN ID for all Ethernet
+                            Interface."
+        ::= { vlan 5 }
+
+    vlanInterfaces OBJECT-TYPE
+        SYNTAX              SEQUENCE OF VlanInterfacesEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "This is a table of Vlan interface configurations."
+        ::= { vlan 6 }
+
+    vlanInterfacesEntry OBJECT-TYPE
+        SYNTAX              VlanInterfacesEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "This is a Vlan table entry."
+        INDEX               {
+                                vlanDefaultId 
+                            }
+        ::= { vlanInterfaces 1 }
+
+    VlanInterfacesEntry ::= SEQUENCE {
+        vlanDefaultId
+            Integer32,
+        vlanID
+            DisplayString
+    }
+
+    vlanDefaultId OBJECT-TYPE
+        SYNTAX              Integer32 (1..4095)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This is the default VLAN ID for the ETH2 Ethernet
+                            Interface."
+        ::= { vlanInterfacesEntry 1 }
+
+    vlanID OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..1024))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This is the list of Vlan ID in comma seperated format. For
+                             example, 2,10-20,2000."
+        ::= { vlanInterfacesEntry 2 }
+
+    commitVlanSettings OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(4..200))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This command allows saving, or resetting Vlan
+                            parameters to factory original. Options are:
+                            save, clear, reset; where clear will abandon
+                            unsaved changes."
+        ::= { vlan 1000 }
+
+END

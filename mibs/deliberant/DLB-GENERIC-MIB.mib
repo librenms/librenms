@@ -1,0 +1,54 @@
+--
+--  Deliberant Generic MIB
+--
+
+DLB-GENERIC-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    sysLocation
+        FROM SNMPv2-MIB
+    dlbMgmt
+        FROM DELIBERANT-MIB;
+
+dlbGenericMIB MODULE-IDENTITY
+    LAST-UPDATED    "200902130000Z"
+    ORGANIZATION    "Deliberant"
+    CONTACT-INFO    "
+        Deliberant Customer Support
+        E-mail: support@deliberant.com"
+    DESCRIPTION
+        "The Deliberant Generic MIB."
+    REVISION    "200902130000Z"
+    DESCRIPTION
+        "First revision."
+    ::= { dlbMgmt 1 }
+
+dlbGenericMIBObjects
+        OBJECT IDENTIFIER ::= { dlbGenericMIB 1 }
+
+dlbGenericNotifs
+        OBJECT IDENTIFIER ::= { dlbGenericMIBObjects 0 }
+dlbGenericInfo
+        OBJECT IDENTIFIER ::= { dlbGenericMIBObjects 1 }
+
+
+--
+-- Notifications
+--
+
+dlbPowerLoss NOTIFICATION-TYPE
+    OBJECTS { sysLocation }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent on device boot after power loss or device crash."
+    ::= { dlbGenericNotifs 1 }
+
+dlbAdministrativeReboot NOTIFICATION-TYPE
+    OBJECTS { sysLocation }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent on device boot after administrator rebooted device."
+    ::= { dlbGenericNotifs 2 }
+
+END

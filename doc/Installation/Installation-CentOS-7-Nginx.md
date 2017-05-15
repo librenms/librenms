@@ -102,7 +102,7 @@ server {
  access_log  /opt/librenms/logs/access_log;
  error_log   /opt/librenms/logs/error_log;
  gzip on;
- gzip_types text/css application/x-javascript text/richtext image/svg+xml text/plain    text/xsd text/xsl text/xml image/x-icon;
+ gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
  location / {
   try_files $uri $uri/ @librenms;
  }
@@ -129,6 +129,13 @@ server {
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/logs(/.*)?'
     restorecon -RFvv /opt/librenms/logs/
     setsebool -P httpd_can_sendmail=1
+```
+
+#### Allow access through firewall
+
+```bash
+firewall-cmd --zone public --add-service http
+firewall-cmd --permanent --zone public --add-service http
 ```
 
 #### Restart Web server

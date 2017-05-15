@@ -1,4 +1,4 @@
--- ArubaOS 3.2.0.0_16376
+--- ArubaOS 6.5.2.0_59123
 -- vim:set ts=4 sw=4:
 ARUBA-TC DEFINITIONS ::= BEGIN
 
@@ -33,10 +33,11 @@ ArubaFrameType ::= TEXTUAL-CONVENTION
 						auth(11),
 						deauth(12)
 				 }
+
 ArubaPhyType ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-  		" Represents the PHY-type of the access point.  Wired clients will
+  		" Represents the PHY-type of the access point or client.  Wired clients will
 		  show 'wired' in user MIB entries.
 		"
 	SYNTAX       INTEGER {
@@ -47,6 +48,69 @@ ArubaPhyType ::= TEXTUAL-CONVENTION
 						wired(5)
 					  }
         
+ArubaHTMode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the HT status of the access point or client.
+		"
+	SYNTAX       INTEGER {
+		 				none(1),
+						ht20(2),
+						ht40(3),
+						vht20(4),
+						vht40(5),
+						vht80(6),
+						vht160(7),
+						vht80plus80(8)
+					  }
+        
+ArubaHTExtChannel ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the extension channel offset relative to the current channel."
+	SYNTAX       INTEGER {
+		 				none(1),
+						above(2),
+						below(3),
+						eighty(4),
+                        onesixty(5)
+					  }
+        
+ArubaMonEncryptionType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the encryption type supported by the access point."
+	SYNTAX       INTEGER {
+		 				open(0),
+						wep(1),
+						wpa(2),
+						wpa2(3)
+					  }
+
+ArubaMonEncryptionCipher ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the WPA encryption cipher supported by the access point."
+	SYNTAX       INTEGER {
+		 				none(0),
+						wep40(1),
+						wep104(2),
+						tkip(3),
+                        aesccmp(4),
+                        other(5)
+					  }
+
+ArubaMonAuthAlgorithm ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the WPA authentication algorithm supported by the access point."
+	SYNTAX       INTEGER {
+		 				none(0),
+						psk(1),
+						dot1x(2),
+                        other(3)
+					  }
+                      
 ArubaSwitchRole ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
@@ -142,6 +206,7 @@ ArubaAuthenticationMethods ::= TEXTUAL-CONVENTION
 						pubcookie(15),
 						xSec(16),
 						xSecMachine(17),
+						via-vpn(28),
 						other(255)
 					  }
      
@@ -157,9 +222,44 @@ ArubaSubAuthenticationMethods ::= TEXTUAL-CONVENTION
 						eapTLS(5),
 						eapTTLS(6),
 						eapLEAP(7),
-						eapMD5(8)
+						eapMD5(8),
+						eapPEAP(9)
+					  }
+
+ArubaEncryptionType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Encryption Method."
+	SYNTAX       INTEGER {
+		 				none(0),
+		 				static-wep(1),
+					    dynamic-wep(2),
+						wpa-psk-tkip(3),
+						wpa-tkip(4),
+						wpa-psk-aes(5),
+						wpa-aes(6),
+						wpa2-psk-tkip(7),
+						wpa2-tkip(8),
+						wpa2-psk-aes(9),
+						wpa2-aes(10),
+                        xSec(11),
+                        bSec-128(12),
+                        bSec-256(13),
+                        aes-128-cmac(14),
+                        unknown(15)
 					  }
      
+ArubaUserForwardMode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" User Forwarding Mode."
+	SYNTAX       INTEGER {
+		 				tunnel-encrypted(0),
+                        bridge(1),
+		 				tunnel-decrypted(2),
+					    split-tunnel(3)
+					  }
+
 ArubaRogueApType ::= TEXTUAL-CONVENTION
    STATUS	  current
    DESCRIPTION
@@ -187,7 +287,13 @@ ArubaAPMatchType ::= TEXTUAL-CONVENTION
 						manual(5),
 						baseBSSIDOverride(6),
 						mms(7),
-						ethernetGatewayWiredMac(8)
+						ethernetGatewayWiredMac(8),
+						classificationDisabled(9),
+						apBSSID(10),
+						propagatedEthernetWiredMac(11),
+						apRule(12),
+						systemWiredMac(13),
+						systemGatewayMac(14)
 					 }
 
 ArubaAPMatchMethod ::= TEXTUAL-CONVENTION
@@ -198,7 +304,8 @@ ArubaAPMatchMethod ::= TEXTUAL-CONVENTION
 						notApplicable(0),
 						exactMatch(1),
 						plusOneMatch(2),
-						minusOneMatch(3)
+						minusOneMatch(3),
+						ouiMatch(4)
 					 }
 
 ArubaStationType ::= TEXTUAL-CONVENTION
@@ -206,6 +313,7 @@ ArubaStationType ::= TEXTUAL-CONVENTION
    DESCRIPTION
    		"Represents the station type. "
    SYNTAX      INTEGER {
+						unknown(0),
 						valid(1),
 						interfering(2),
 		 				dos(3)
@@ -267,6 +375,20 @@ ArubaDot1dState ::= TEXTUAL-CONVENTION
 					forwarding(5)
 				}
   
+ArubaAPDot1dState ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Represents the AP port spanning tree state."
+	SYNTAX		INTEGER {
+					notAvailable(1),
+					off(2),
+					disabled(3),
+					listening(4),
+					learning(5),
+					forwarding(6),
+					blocking(7)
+				}
+  
 ArubaPoeState ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
@@ -274,7 +396,8 @@ ArubaPoeState ::= TEXTUAL-CONVENTION
 	SYNTAX		INTEGER {
 					disabled(1),
 					enabled(2),
-					enabledCisco(3)
+					enabledCisco(3),
+                                        notAvailable(4)
 				}
  
 ArubaCardType ::= TEXTUAL-CONVENTION
@@ -294,7 +417,25 @@ ArubaCardType ::= TEXTUAL-CONVENTION
 					m3mk1(8),
 					sw3200(9),
 					sw3400(10),
-					sw3600(11)
+					sw3600(11),
+					sw650(12),
+					sw651(13),
+					reserved1(14),
+					reserved2(15),
+					sw620(16),
+					sw7210(17),
+					sw7220(18),
+					sw7240(19),
+					sw3500(20),
+					sw2500(21),
+					sw1500(22),
+					sw7010(23),
+					sw7005(24),
+					sw7030(25),
+					sw7205(26),
+					sw7024(27),
+					sw7240xm(28),
+					sw7008(29)
 				}
  
 ArubaESIServerMode ::= TEXTUAL-CONVENTION
@@ -343,8 +484,10 @@ ArubaVoipProtocolType ::= TEXTUAL-CONVENTION
 		 				sccp(1),
 						svp(2),
 						vocera(3),
-						sip(4),
-						unknown(10)
+						sip(9),
+						ua(11),
+						h323(13),
+						unknown(15)
 		 		 }
 
 ArubaAccessPointMode ::= TEXTUAL-CONVENTION
@@ -358,7 +501,9 @@ ArubaAccessPointMode ::= TEXTUAL-CONVENTION
 						accessPoint(2),
 						accessPointAndMonitor(3),
 						meshPortal(4),
-						meshPoint(5)
+						meshPoint(5),
+						rfprotectSensor(6),
+						spectrumSensor(7)
 		 		 }
 
 ArubaAuthServerType ::= TEXTUAL-CONVENTION
@@ -463,7 +608,9 @@ ArubaPortSpeed ::= TEXTUAL-CONVENTION
 						  speed100Mbps(2), 
 						  speed1000Mbps(3), 
 						  speedAuto(4),
-						  speed10Gbps(5)
+						  speed10Gbps(5),
+						  speed2Gbps(6),
+						  speed5Gbps(7)
 						}
 
 ArubaPortDuplex ::= TEXTUAL-CONVENTION
@@ -485,7 +632,9 @@ ArubaPortType ::= TEXTUAL-CONVENTION
 		"
 	SYNTAX		INTEGER { fastethernet(1), 
 						  gigabitethernet(2),
-						  xgigabitethernet(3) 
+						  xgigabitethernet(3),
+						  twogigabitethernet(4), 
+						  fivegigabitethernet(5) 
 						}
 
 ArubaEnet1Mode ::= TEXTUAL-CONVENTION
@@ -496,7 +645,8 @@ ArubaEnet1Mode ::= TEXTUAL-CONVENTION
 		 				activeStandby(1),
 						tunnel(2),
 						bridge(3),
-						notApplicable(4)
+						notApplicable(4),
+						split(5)
 					  }
  
 ArubaUnprovisionedStatus ::= TEXTUAL-CONVENTION
@@ -554,12 +704,13 @@ ArubaCallStates ::= TEXTUAL-CONVENTION
 				alerting(6),
 				releasing(7),
 				cancelling(8),
-				transient(9),
-				dummy503(10),
-				succ(11),
-				fail(12),
-				aborted(13),
-				blocked(14)
+				challenging(9),
+				transient(10),
+				blockwait(11),
+				succ(12),
+				fail(13),
+				aborted(14),
+				blocked(15)
 			}
    
 ArubaVoipProtocol ::= TEXTUAL-CONVENTION
@@ -572,7 +723,9 @@ ArubaVoipProtocol ::= TEXTUAL-CONVENTION
 			sccp(1), 
 			svp(2), 
 			vocera(3), 
-			sip(9), ua(11) 
+			sip(9), 
+			ua(11), 
+			h323(13)
 	}
 
 ArubaVoipRegState ::= TEXTUAL-CONVENTION
@@ -582,7 +735,7 @@ ArubaVoipRegState ::= TEXTUAL-CONVENTION
 		  VoIP registered state
 		"
 	SYNTAX		INTEGER {
-			unkown(0), 
+			unknown(0), 
 			registering(1), 
 			unregistering(2), 
 			challenge(3), 
@@ -626,6 +779,316 @@ ArubaMeshRole ::= TEXTUAL-CONVENTION
 			portal(2)
 	}
 
+ArubaHTRate ::= TEXTUAL-CONVENTION
+   	STATUS       current
+   	DESCRIPTION
+           "Represents HT rate"
+    SYNTAX       INTEGER {
+					unknown(0),
+					ht6dot5(1),
+					ht13(2),
+					ht13dot5(3),
+					ht15(4),
+					ht19dot5(5),
+					ht26(6),
+					ht27(7),
+					ht30(8),
+					ht39(9),
+					ht40dot5(10),
+					ht45(11),
+					ht52(12),
+					ht54(13),
+					ht58dot5(14),
+					ht60(15),
+					ht65(16),
+					ht78(17),
+					ht81(18),
+					ht90(19),
+					ht104(20),
+					ht108(21),
+					ht117(22),
+					ht120(23),
+					ht121dot5(24),
+					ht130(25),
+					ht135(26),
+					ht150(27),
+					ht162(28),
+					ht180(29),
+					ht216(30),
+					ht240(31),
+					ht243(32),
+					ht270(33),
+					ht300(34)
+				 }
 
+
+ArubaARMChangeReason ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The reason for ARM or AirMatch based change.
+		"
+	SYNTAX       INTEGER {
+                       radarDetected(1),
+                       radarCleared(2),
+                       txHang(3),
+                       txHangClear(4),
+                       fortyMhzIntol(5),
+                       cancel40mhzIntol(6),
+                       fortyMhzAlign(7),
+                       armInterference(8),
+                       armInvalidCh(9),
+                       armErrorThresh(10),
+                       armNoiseThresh(11),
+                       armEmptyCh(12),
+                       armRogueCont(13),
+                       armDecreasePower(14),
+                       armIncreasePower(15),
+                       armTurnOffRadio(16),
+                       armTurnOnRadio(17),
+                       armChannelQualityThresh(18),
+                       armDynamicBW(19),
+                       armInterferenceCCA(20),
+                       airmatchNoise(21),
+                       airmatchSolver(22),
+                       airmatchFreeze(23),
+                       airmatchUnfreeze(24),
+                       random(25),
+                       airmatchInit(26),
+                       unknown(27),
+                       airmatchNoiseCleared(28),
+                       airmatchRogueCont(29)
+   }
+
+ArubaAPMasterStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		  AP status as seen by the master controller
+          (used to indicate a status change).
+		"
+	SYNTAX		INTEGER {
+			up(1),
+			down(2), 
+			move(3)
+	}
+
+ArubaDot3azStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the state of Energy Efficient Ethernet (802.3az)."
+    SYNTAX      BITS {
+						disabled(0),
+						unsupported(1),
+						eee100BaseTX(2),
+						eee1000BaseT(3),
+						eee10GBaseT(4),
+						eee1000BaseKX(5),
+						eee10GBaseKX4(6),
+						eee10GBaseKR(7)
+					 }
+		
+ArubaThresholdResourceType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the Threshold Resource Types"
+    SYNTAX      INTEGER {
+					dataPathCpu(0),
+					controlPathCpu(1),
+					controlPathMemory(2),
+					totalTunnelCapacity(3),
+					userCapacity(4),
+					noofAps(5) ,
+					noofLocals(6)
+				}
+
+ArubaStackState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The state of the stack element in the stack.
+
+        primary   - the stack element is in primary state.
+        secondary - the stack element is in secondary state.
+        linecard  - the stack element is in linecard state.
+        away      - the stack element is in inactive state.
+
+        primary, secondary and linecard implies active state of the stack
+        element."
+    SYNTAX      INTEGER {
+                   primary(1),
+                   secondary(2),
+                   linecard(3),
+                   away(4)
+    }
+
+ArubaStackChangeEvent  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Used to specify the event which caused change in topology in stack."
+    SYNTAX      INTEGER {
+                      other(1),
+                      primarySlotChanged(2),
+                      secondarySlotChanged(3),
+                      lineCardSlotChanged(4),
+                      roleChanged(5),
+                      priorityChanged(6),
+                      versionMismatch(7),
+                      slotExceeded(8)
+    }
+
+ArubaStackIfTopoJoined ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Used to specify whether an interface has joined the stacking
+        topology or left the topology."
+    SYNTAX      INTEGER {
+        connected(1),   -- An interface has joined stacking topology.
+        disconnected(2) -- An interface has left stacking topology.
+    }
+
+InterfaceIndex ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "A unique value, greater than zero, for each interface or
+            interface sub-layer in the managed system.  It is
+            recommended that values are assigned contiguously starting
+            from 1.  The value for each interface sub-layer must remain
+            constant at least from one re-initialization of the entity's
+            network management system to the next re-initialization."
+    SYNTAX       Integer32 (1..2147483647)
+
+ArubaIfState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Used to specify the state of an interface.
+
+        linkUp   - Operational state of this interface is up.
+        linkDown - Operational state of this interface is down."
+    SYNTAX  INTEGER {
+        linkUp(1),
+        linkDown(2)
+    }
+
+ArubaIfStateChangeReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Used to specify the reason for interface state change.
+
+        admin       - User has explicitly issued 'shutdown' or 'no shutdown'
+                      configuration from CLI on this interface.
+        loopProtect - If ifState of an interface changes to linkDown, then
+                      it is used to specify that a loop has been detected on
+                      this interface by loop protect mechanism.
+                      If ifState of an interface changes to linkUp, then
+                      it is used to specify that loop-protect error has been
+                      cleared out on this interface through port auto-recovery
+                      mechanism or through explicit clear error-recovery
+                      command.
+        macLimit    - If ifState of an interface changes to linkDown, then
+                      it is used to specify that number of learnt MACs on this
+                      interface exceeds the limit configured.
+                      If ifState of an interface changes to linkUp, then it is
+                      used to specify that mac-limit error has been cleared out
+                      on this interface through port auto-recovery mechanism or
+                      through explicit clear error-recovery command.
+        raGuard     - If ifState of an interface changes to linkDown, then it
+                      is used to specify that invalid router advertisement has
+                      been identified on this interface, resulting shutting
+                      down of this interface.
+                      If ifState of an interface changes to linkUp, then it is
+                      used to specify that raGuard error has been cleared out on
+                      this interface through port auto-recovery mechanism or
+                      through explicit clear error-recovery command.
+        bpduGuard   - If ifState of an interface changes to linkDown, then it
+                      is used to specify that BPDU is received on this interface
+                      resulting shutting down of this interface.
+                      If ifState of an interface changes to linkUp, then it is
+                      used to specify that BPDU Guard error has been cleared out
+                      on this interface through port auto-recovery mechanism or
+                      through explicit clear error-recovery command."
+    SYNTAX  INTEGER {
+        admin(1),
+        loopProtect(2),
+        macLimit(3),
+        raGuard(4),
+        bpduGuard(5)
+    }
+
+ArubaAPUplinkType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "
+          AP uplink type
+        "
+    SYNTAX       INTEGER {
+            ethernet(1),
+            usb(2),
+            pppoe(3),
+            wifi(4)
+    }
+
+ArubaAPUplinkChangeReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Used to specify the reason for AP uplink change.
+
+        linkFailure - The uplink went down
+        vpnFailure  - VPN tunnel could not be sustained using the uplink
+        preemption  - The uplink was pre-empted by a higher-priority uplink"
+    SYNTAX  INTEGER {
+        linkFailure(1),
+        vpnFailure(2),
+        preemption(3)
+    }
+
+ArubaPortalServerDownReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Used to specify the reason for Portal server down.
+
+        connectFail - Connect Portal server fail"
+    SYNTAX  INTEGER {
+        connectFail(1)
+    }
+
+ArubaHaRole ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the HA role of the Aruba controller"
+	SYNTAX       INTEGER {
+                             dual(0),
+                             active(1),
+                             standby(2),
+                             disabled(3)
+                         }
+
+ArubaHaConnectivityStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the HA standby connectivity status of the Access Point"
+	SYNTAX      INTEGER {
+                            haSuccess(0),
+                            haNetUnreach(1),
+                            haCpUnreach(2),
+                            haImageMissMatch(3),
+                            haApDenied(4),
+                            haHbtFailure(5),
+                            haInvalidHelloResponse(6),
+                            haStandbyTunnelDown(7)
+					    }
+
+ArubaFlexRadioMode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		  Flex Radio Operating Mode
+		"
+	SYNTAX		INTEGER {
+                            single2GHzBand(0),
+                            single5GHzBand(1),
+                            dual2GHzplus5GHzBand(2), 
+                            unknown(3),
+                            notApplicable(4)
+                       }
 
 END

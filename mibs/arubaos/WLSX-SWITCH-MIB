@@ -1,9 +1,10 @@
--- ArubaOS 3.2.0.0_16376
+--- ArubaOS 6.5.2.0_59123
 -- vim:set ts=4 sw=4:
    WLSX-SWITCH-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
-       TEXTUAL-CONVENTION,
+       TEXTUAL-CONVENTION FROM SNMPv2-TC 
+       
        MODULE-IDENTITY,
        OBJECT-TYPE,
        snmpModules,
@@ -31,7 +32,7 @@
 			FROM ARUBA-MIB;
 
    wlsxSwitchMIB MODULE-IDENTITY 
-       LAST-UPDATED "0602222204Z"
+       LAST-UPDATED "0804160206Z"
        ORGANIZATION "Aruba Wireless Networks"
        CONTACT-INFO
             "Postal:    1322 Crossman Avenue
@@ -41,7 +42,7 @@
        DESCRIPTION
            "This MIB module defines MIB objects which provide
             System level information about the Aruba switches."
-       REVISION        "0602222204Z"
+       REVISION        "0804160206Z"
        DESCRIPTION
            "The initial revision."
        ::= { wlsxEnterpriseMibModules 1 }
@@ -82,7 +83,8 @@
         SYNTAX      INTEGER {
 						master(1),
 						local(2),
-						standbymaster(3)
+						standbymaster(3),
+						branch(4)
 						}
         MAX-ACCESS   read-only
         STATUS       current
@@ -145,7 +147,8 @@
         SYNTAX      INTEGER {
 						master(1),
 						local(2),
-						standbymaster(3)
+						standbymaster(3),
+						branch(4)
 					}
          MAX-ACCESS   read-only
          STATUS       current
@@ -305,7 +308,7 @@
         STATUS       current
         DESCRIPTION
             "
-			desription of the processor.
+			description of the processor.
             "
         ::= { wlsxSysXProcessorEntry 2 }
 
@@ -528,7 +531,8 @@
 		 userConnectedSlot			Integer32,
 		 userConnectedPort			Integer32,
 		 userBWContractName			DisplayString,
-		 userBWContractUsage		INTEGER
+		 userBWContractUsage		INTEGER,
+		 userConnectedModule		INTEGER
 
      }
 
@@ -675,6 +679,17 @@
 			Indicates how the Bandwidth Contract is used.
             "
         ::= { wlsxSwitchUserEntry 13 }
+
+     userConnectedModule OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            The module to which the user is connected, if wired.
+            "
+        ::= { wlsxSwitchUserEntry 14 }
+
 
   -- StationMgmt Table
   --Station Management Table contains all the station associated with this AP.
@@ -1237,7 +1252,7 @@
    wlsxSwitchGlobalAPTable  OBJECT-TYPE 
 	  SYNTAX       SEQUENCE OF MxSwitchGlobalAPEntry 
 	  MAX-ACCESS   not-accessible		
-      STATUS       current 
+      STATUS       deprecated 
       DESCRIPTION 
 	  	"
 			This Table lists all the Access Points Connected in the 
@@ -1249,7 +1264,7 @@
    wlsxSwitchGlobalAPEntry OBJECT-TYPE 
 	  SYNTAX       MxSwitchGlobalAPEntry 
 	  MAX-ACCESS   not-accessible		
-      STATUS       current 
+      STATUS       deprecated 
       DESCRIPTION 
              "Station Management Entry"
 	  INDEX {globalAPLocation, globalAPAddress}
@@ -1269,7 +1284,7 @@
    	globalAPLocation OBJECT-TYPE
          SYNTAX       DisplayString(SIZE(0..32))
          MAX-ACCESS   not-accessible
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			Physical Location of the AP, defined in Building.Floor.Location
@@ -1280,7 +1295,7 @@
    	globalAPAddress OBJECT-TYPE
          SYNTAX       IpAddress
          MAX-ACCESS   not-accessible
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			Address of the Access Point.
@@ -1290,7 +1305,7 @@
    	globalAPLocalSwitch OBJECT-TYPE
          SYNTAX       IpAddress
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			IP Address of the Local Switch this Access Point is connected to.
@@ -1300,7 +1315,7 @@
    	globalAPdot11aPhyAddr OBJECT-TYPE
          SYNTAX       MacAddress
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			Physical Mac address of the module supporting dot11a in the
@@ -1312,7 +1327,7 @@
    	globalAPdot11bPhyAddr OBJECT-TYPE
          SYNTAX       MacAddress
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			Physical Mac address of the module supporting dot11b in the
@@ -1324,7 +1339,7 @@
    	globalAPState OBJECT-TYPE
          SYNTAX       INTEGER(1..7)
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			State of the AP.
@@ -1337,7 +1352,7 @@
    	globalAPdot11gPhyAddr OBJECT-TYPE
          SYNTAX       MacAddress
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			Physical Mac address of the module supporting dot11g in the
@@ -2135,7 +2150,7 @@ wlsxPowerSupplyMissing NOTIFICATION-TYPE
 
 wlsxAccessPointIsUp NOTIFICATION-TYPE        
 	OBJECTS {apLocation, apIpAddress}
-    STATUS  current
+    STATUS  deprecated
     DESCRIPTION
 			"
 			A trap which indicates that an Access point at Location 
@@ -2145,7 +2160,7 @@ wlsxAccessPointIsUp NOTIFICATION-TYPE
 
 wlsxAccessPointIsDown NOTIFICATION-TYPE        
 	OBJECTS {apLocation, apIpAddress}
-    STATUS  current
+    STATUS  deprecated
     DESCRIPTION
 			"
 			A trap which indicates that an Access point at Location 
@@ -2265,6 +2280,5 @@ wlsxLicenseExpiry NOTIFICATION-TYPE
 			switch will expire in <wlsxLicenseDaysRemaining> days
 			"
     ::= { wlsxSwitchTraps 1042}
-
 END
 

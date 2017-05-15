@@ -1,0 +1,172 @@
+-- *****************************************************************
+-- NMS-CARD-SYS-MIB.my: NMS Card SYSTEM MIB
+--
+-- January 2010
+-- Edit by LIUQIANG
+-- Copyright (c) 2010 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+
+NMS-CARD-SYS-MIB DEFINITIONS ::= BEGIN 
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+                                                FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TimeStamp
+                                                FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsMgmt, nmslocal                             FROM NMS-SMI
+    DisplayString				FROM RFC1213-MIB
+    nmscardIndex,nmscardDescr,nmscardType          FROM NMS-CHASSIS;
+
+--definition of NMS device card related operations and trap related values
+
+               cardSys         OBJECT IDENTIFIER ::= { nmsMgmt 181 }
+
+	        
+
+               cardSystemSetTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF CardSystemSetEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of cards system related set value entries."
+                   ::= { cardSys 1 }
+
+               cardSystemSetEntry OBJECT-TYPE
+                   SYNTAX  CardSystemSetEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of cards to be reset."
+                   INDEX { cardIndex }
+               ::= { cardSystemSetTable 1 }
+
+               CardSystemSetEntry ::=
+                   SEQUENCE {
+                       cardSysIndex
+                           INTEGER,
+                       cardSysDescr
+                           DisplayString,
+                       cardSysType
+                       	   INTEGER,
+                       cardCPUUtilThreshold
+                       	   INTEGER,
+                       cardMemUtilThreshold
+                       	   INTEGER,
+                       cardCPUTempThreshold
+                       	   INTEGER,
+                       cardCPUTempCurr
+                       	   INTEGER
+                  }
+
+
+               cardSysIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Index into cardTable (not physical chassis
+                           slot number), the same with the nmscardIndex of nmscardTable in NMS-CHASSIS-MIB."
+                   ::= { cardSystemSetEntry 1 }
+
+               cardSysDescr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "the same with the nmscardDescr of nmscardTable in NMS-CHASSIS-MIB."
+                   ::= { cardSystemSetEntry 2 }
+
+               cardSysType OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "the same with the nmscardType of nmscardTable in NMS-CHASSIS-MIB."
+                   ::= { cardSystemSetEntry 3 }
+
+               cardCPUUtilThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Card CPU utilization upper limit value."
+                   ::= { cardSystemSetEntry 4 }
+
+               cardMemUtilThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Card memory utilization upper limit value."
+                   ::= { cardSystemSetEntry 5 }
+
+
+               cardCPUTempThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Card CPU temperature upper limit value."
+                   ::= { cardSystemSetEntry 6 }
+
+               cardCPUTempCurr OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Card CPU current temperature."
+                   ::= { cardSystemSetEntry 7 }
+
+
+	        
+               cardElementStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   		normal(1),
+                   		warning(2)
+                   }
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Card element status, only use for variable binding in card system notifications."
+                   ::= { cardSys 2 }
+
+               cardElementType OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   		cpu(1),
+                   		memory(2),
+                   		cpu-temperature(3)
+                   }
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Card element status, only use for variable binding in card system notifications."
+                   ::= { cardSys 3 }
+
+
+-- Notifications   --cardCPUUtil
+	cardSysNotifications OBJECT IDENTIFIER
+                                ::= { cardSys 4 }
+
+
+	cardSysNotification NOTIFICATION-TYPE
+    		OBJECTS {
+        		nmscardIndex,
+        		nmscardType,
+        		nmscardDescr,
+        		cardElementStatus,
+        		cardElementType
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when certain card element value exceeds upper limit defined above. "
+    		::= { cardSysNotifications 1 }
+
+
+
+
+
+END
