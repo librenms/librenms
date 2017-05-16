@@ -56,7 +56,7 @@ function log_out_user($message = 'Logged Out')
  */
 function log_in_user()
 {
-    global $config, $permissions;
+    global $config;
 
     // set up variables, but don't override existing ones (ad anonymous bind can only get user_id at login)
     if (!isset($_SESSION['userlevel'])) {
@@ -72,22 +72,22 @@ function log_in_user()
         throw new AuthenticationException('Invalid Credentials');
     }
 
-    // check twofactor
-    if ($config['twofactor'] === true && !isset($_SESSION['twofactor'])) {
-        include_once $config['install_dir'].'/html/includes/authentication/twofactor.lib.php';
-        twofactor_auth();
+    if (!(isset($_SESSION['authenticated']) && $_SESSION['authenticated'])) {
+        // check twofactor
+        if ($config['twofactor'] === true && !isset($_SESSION['twofactor'])) {
+            include_once $config['install_dir'].'/html/includes/authentication/twofactor.lib.php';
+            twofactor_auth();
+        }
+
+        // if two factor isn't enabled or it has passed already ware are logged in
+        if (!$config['twofactor'] || $_SESSION['twofactor']) {
+            $_SESSION['authenticated'] = true;
+            dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Logged In'), 'authlog');
+        } else {
+            throw new AuthenticationException('Two-Factor Auth Failed');
+        }
     }
 
-    // if two factor isn't enabled or it has passed already ware are logged in
-    if (!$config['twofactor'] || $_SESSION['twofactor']) {
-        $_SESSION['authenticated'] = true;
-        dbInsert(array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => 'Logged In'), 'authlog');
-    } else {
-        throw new AuthenticationException('Two-Factor Auth Failed');
-    }
-
-    // populate the permissions cache
-    $permissions = permissions_cache($_SESSION['user_id']);
     return true;
 }
 
