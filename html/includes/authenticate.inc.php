@@ -7,7 +7,7 @@ ini_set('session.cookie_httponly', 1);
 ini_set('session.use_strict_mode', 1); // php >= 5.5.2
 ini_set('session.use_trans_sid', 0);   // insecure feature, be sure it is disabled
 
-// Preflight checks
+// Pre-flight checks
 if (!is_dir($config['rrd_dir'])) {
     echo "<div class='errorbox'>RRD Log Directory is missing ({$config['rrd_dir']}).  Graphing may fail.</div>";
 }
@@ -87,4 +87,10 @@ try {
 }
 
 session_write_close();
+
+// populate the permissions cache
+if (isset($_SESSION['user_id'])) {
+    $permissions = permissions_cache($_SESSION['user_id']);
+}
+
 unset($username, $password);
