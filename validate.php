@@ -323,13 +323,18 @@ if ($space_check < 1) {
 
 // Check programs
 $bins = array('fping','fping6','rrdtool','snmpwalk','snmpget','snmpbulkwalk');
-$suid_bins = array('fping', 'fping6');
 foreach ($bins as $bin) {
     $cmd = rtrim(shell_exec("which {$config[$bin]} 2>/dev/null"));
     if (!$cmd) {
         print_fail("$bin location is incorrect or bin not installed. \n\tYou can also manually set the path to $bin by placing the following in config.php: \n\t\$config['$bin'] = \"/path/to/$bin\";");
-    } elseif (in_array($bin, $suid_bins) && !(fileperms($cmd) & 2048)) {
-        print_fail("$bin should be suid!", "chmod u+s $cmd");
+    } elseif (in_array($bin, array('fping', 'fping6'))) {
+        if (trim(shell_exec("which getcap 2>/dev/null"))) {
+            if (!str_contains(shell_exec("getcap $cmd"), "$cmd = cap_net_raw+ep")) {
+                print_fail("$bin should have CAP_NET_RAW!", "setcap cap_net_raw+ep $cmd");
+            }
+        } elseif (!(fileperms($cmd) & 2048)) {
+            print_fail("$bin should be suid!", "chmod u+s $cmd");
+        }
     }
 }
 
