@@ -11,6 +11,9 @@
  */
 
 d_echo('Juniper MSS : ');
-$mempool['used'] = snmp_get($device, '.1.3.6.1.4.1.14525.4.8.1.1.12.1.0', '-OvQ');
-$mempool['total'] = snmp_get($device, '.1.3.6.1.4.1.14525.4.8.1.1.6.0', '-OvQ');
+
+$memory_pool = snmp_get_multi_oid($device, 'trpzSysCpuMemoryInstantUsage.0 trpzSysCpuMemorySize.0', '-OQUs', 'TRAPEZE-NETWORKS-SYSTEM-MIB');
+
+$mempool['used'] = $memory_pool['trpzSysCpuMemoryInstantUsage.0'];
+$mempool['total'] = $memory_pool['trpzSysCpuMemorySize.0'];
 $mempool['free'] = ($mempool['total'] - $mempool['used']);

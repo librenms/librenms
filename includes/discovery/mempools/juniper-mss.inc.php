@@ -12,8 +12,11 @@
 
 if ($device['os'] == "juniper-mss") {
     d_echo('Juniper MSS : ');
-    $used = snmp_get($device, "1.3.6.1.4.1.14525.4.8.1.1.12.1.0", "-Ovq");
-    $total = snmp_get($device, "1.3.6.1.4.1.14525.4.8.1.1.6.0", "-Ovq");
+
+    $memory_pool = snmp_get_multi_oid($device, 'trpzSysCpuMemoryInstantUsage.0 trpzSysCpuMemorySize.0', '-OQUs', 'TRAPEZE-NETWORKS-SYSTEM-MIB');
+
+    $used = $memory_pool['trpzSysCpuMemoryInstantUsage.0'];
+    $total = $memory_pool['trpzSysCpuMemorySize.0'];
     $free = ($total - $used);
     $percent = (($used / $total) * 100);
     $descr = 'Memory';
@@ -23,6 +26,7 @@ if ($device['os'] == "juniper-mss") {
 }
 
 unset(
+    $memory_pool,
     $used,
     $total,
     $free,
