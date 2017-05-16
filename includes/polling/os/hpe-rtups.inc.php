@@ -1,8 +1,7 @@
 <?php
+$rtups_data = snmp_get_multi_oid($device, 'deviceSerialNumber.0 deviceFirmwareVersion.0', '-OQs', 'CPQPOWER-MIB');
 
-$version = trim(snmp_get($device, 'upsmgIdentFirmwareVersion.0', '-OQv', 'MG-SNMP-UPS-MIB'), '" ');
+$serial  = $rtups_data['deviceSerialNumber.0'];
+$version = $rtups_data['deviceFirmwareVersion.0'];
 
-$hardware  = trim(snmp_get($device, 'upsmgIdentFamilyName.0', '-OQv', 'MG-SNMP-UPS-MIB'), '" ');
-$hardware .= ' '.trim(snmp_get($device, 'upsmgIdentModelName.0', '-OQv', 'MG-SNMP-UPS-MIB'), '" ');
-
-$serial = trim(snmp_get($device, 'upsmgIdentSerialNumber.0', '-OQv', 'MG-SNMP-UPS-MIB'), '" ');
+unset($rtups_data);

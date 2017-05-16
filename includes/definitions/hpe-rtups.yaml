@@ -5,7 +5,7 @@ type: power
 icon: hpe
 rfc1628_compat: 1
 mib_dir:
-    - mge
+    - hp
 over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }
