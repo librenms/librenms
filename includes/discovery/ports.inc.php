@@ -15,7 +15,7 @@ $header = array(
     'ifAlias' => 'ifAlias',
     'ifType'  => 'ifType'
     );
-t_echo($header, $port_stats, true);
+t_echo($port_stats, $header);
 
 
 // By default libreNMS uses the ifIndex to associate ports on devices with ports discoverd/polled

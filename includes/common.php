@@ -647,13 +647,33 @@ function d_echo($text, $no_debug_text = null)
     }
 } // d_echo
 
-function t_echo($headers, $data, $use_index = false)
+/**
+ * Output a table representation of the array.
+ * If you don't specify headers, the indexes from the first row will be used.
+ *
+ * @param array $data a multi-dimensional array to print as a table
+ * @param array $headers set custom table headers. The index specifies the columns.
+ * @param bool $use_index Output the index as the first column.
+ */
+function t_echo($data, $headers = null, $use_index = true)
 {
     $table = new \cli\Table();
-    if ($use_index === true) {
+    if ($use_index) {
         $table->useIndex();
     }
-    $table->setHeaders($headers);
+
+    if (is_null($headers)) {
+        $keys = array_keys(current($data));
+        $headers = array_combine($keys, $keys);
+        if ($use_index) {
+            array_unshift($headers, 'index');
+        }
+
+        $table->setHeaders($headers);
+    } else {
+        $table->setHeaders($headers);
+    }
+
     $table->setRows($data);
     $table->display();
 }
