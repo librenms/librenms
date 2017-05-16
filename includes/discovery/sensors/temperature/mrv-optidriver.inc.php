@@ -21,7 +21,7 @@ if ($device['os'] == 'mrv-optidriver') {
     $low_warn_limit     = 5;
     $low_limit          = 0;
     $descr   =  "Chassis Temperature";
-    $valueoid     = ".1.3.6.1.4.1.629.200.6.1.1.15.1";
+    $valueoid    = ".1.3.6.1.4.1.629.200.6.1.1.15.1";
     $value   = snmp_get($device, 'nbsCmmcChassisTemperature.1', '-Ovqs', 'NBS-CMMC-MIB', $config['install_dir'].'/mibs/mrv');
     //$value = str_replace('"', '', $value);
     if (is_numeric($value)) {
