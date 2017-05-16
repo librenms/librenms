@@ -345,7 +345,7 @@ if (defined('SHOW_SETTINGS')) {
             }
 
             $temp_header[] = '
-            <span class="page-availability-title">Device group</span>
+            <span class="page-availability-title">Dynamic Device Group</span>
             <select id="group" class="page-availability-report-select" name="group">
                 <option value="0" ' . $selected . '>show all devices</option>';
 

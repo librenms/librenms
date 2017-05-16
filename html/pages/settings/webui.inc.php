@@ -36,7 +36,7 @@ $availability_map_conf = array(
           'type'               => 'checkbox',
     ),
     array('name'               => 'webui.availability_map_use_device_groups',
-          'descr'              => 'Use device groups filter',
+          'descr'              => 'Use dynamic device groups filter',
           'type'               => 'checkbox',
     ),
     array('name'               => 'webui.availability_map_box_size',

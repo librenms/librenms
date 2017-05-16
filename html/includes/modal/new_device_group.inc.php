@@ -19,7 +19,7 @@ if (is_admin() !== false) {
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h5 class="modal-title" id="Create">Device Groups</h5>
+          <h5 class="modal-title" id="Create">Dynamic Device Groups</h5>
         </div>
         <div class="modal-body">
             <form method="post" role="form" id="devices-group" class="form-horizontal group-form">

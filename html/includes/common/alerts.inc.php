@@ -79,7 +79,7 @@ if (defined('SHOW_SETTINGS')) {
   </div>
   <div class="form-group row">
     <div class="col-sm-4">
-      <label for="group" class="control-label">Device Group:</label>
+      <label for="group" class="control-label">Dynamic Device Group:</label>
     </div>
     <div class="col-sm-8">
       <select class="form-control" name="group">';

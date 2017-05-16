@@ -1372,11 +1372,11 @@ function get_device_groups()
         $groups = GetDeviceGroups();
     }
     if (empty($groups)) {
-        $message = 'No device groups found';
+        $message = 'No dynamic device groups found';
     } else {
         $status = 'ok';
         $code = 200;
-        $message = 'Found ' . count($groups) . ' device groups';
+        $message = 'Found ' . count($groups) . ' dynamic device groups';
     }
 
     $output = array(
@@ -1401,7 +1401,7 @@ function get_devices_by_group()
     $devices  = array();
     $full     = $_GET['full'];
     if (empty($name)) {
-        $message = 'No device group name provided';
+        $message = 'No dynamic device group name provided';
     } else {
         $group_id = dbFetchCell("SELECT `id` FROM `device_groups` WHERE `name`=?", array($name));
         $devices = GetDevicesFromGroup($group_id, true, $full);

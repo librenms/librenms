@@ -930,11 +930,11 @@ Output:
 ]
 ```
 
-## <a name="api-devicegroups">`Device Groups`</a> [`top`](#top)
+## <a name="api-devicegroups">`Dynamic Device Groups`</a> [`top`](#top)
 
 ### <a name="api-route-get_devicegroups">Function `get_devicegroups`</a> [`top`](#top)
 
-List all device groups.
+List all dynamic device groups.
 
 Route: /api/v0/devicegroups
 
@@ -952,7 +952,7 @@ Output:
 [
     {
         "status": "ok",
-        "message": "Found 1 device groups",
+        "message": "Found 1 dynamic device groups",
         "count": 1,
         "groups": [
         {
@@ -1155,7 +1155,7 @@ List all devices matching the group provided.
 
 Route: /api/v0/devicegroups/:name
 
-  - name Is the name of the device group which can be obtained using [`get_devicegroups`](#api-route-get_devicegroups). Please ensure that the name is urlencoded if it needs to be (i.e Linux Servers would need to be urlencoded.
+  - name Is the name of the dynamic device group which can be obtained using [`get_devicegroups`](#api-route-get_devicegroups). Please ensure that the name is urlencoded if it needs to be (i.e Linux Servers would need to be urlencoded.
 
 Input (JSON):
 

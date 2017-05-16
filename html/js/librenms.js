@@ -236,7 +236,7 @@ $(document).on("change", '#mode', function() {
     );
 });
 
-//availability-map device group
+//availability-map dynamic device group
 $(document).on("change", '#group', function() {
     $.post('ajax_mapview.php',
         {
