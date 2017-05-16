@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'cli' => array($vendorDir . '/wp-cli/php-cli-tools/lib'),
     'Slim' => array($vendorDir . '/slim/slim'),
     'Requests' => array($vendorDir . '/rmccue/requests/library'),
     'Phpass' => array($vendorDir . '/xjtuwangke/passwordhash/src'),
