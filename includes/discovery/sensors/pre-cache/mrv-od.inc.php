@@ -12,5 +12,6 @@
  * the source code distribution for details.
  */
 
-echo 'nbsCmmcPortTable ';
-$pre_cache['mrv-optidriver_oids'] = snmpwalk_cache_multi_oid($device, 'nbsCmmcPortTable', array(), 'NBS-CMMC-MIB');
+echo 'Caching nbsCmmcPorTable and NbsCmmcChassisEntry for MRV OptiDriver ';
+$pre_cache['mrv-od_port-table'] = snmpwalk_cache_multi_oid($device, 'nbsCmmcPortTable', array(), 'NBS-CMMC-MIB');
+$pre_cache['mrv-od_chassis-entry'] = snmpwalk_cache_multi_oid($device, 'NbsCmmcChassisEntry', array(), 'NBS-CMMC-MIB');
