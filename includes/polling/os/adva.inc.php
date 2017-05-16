@@ -16,10 +16,7 @@
  **/
 
 // ***********  FSP150 Devices
-if (($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.17')       // GE114s
-   xor ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.9')     // GE114
-   xor ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.7')     // EG-X
-   xor ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.11')) { // XG210
+if (starts_with($device['sysObjectID'], 'enterprises.2544.1.12.1.1')) {
     $version  = 'FSP150 SW V'.trim(snmp_get($device, "entPhysicalSoftwareRev.1", "-OQv", "ADVA-MIB"), '"');
     $hardware = 'ADVA '.trim(snmp_get($device, "entPhysicalName.1", "-OQv", "ADVA-MIB"), '"')
                 .' V'.trim(snmp_get($device, "entPhysicalHardwareRev.1", "-OQv", "ADVA-MIB"), '"');
@@ -29,7 +26,7 @@ if (($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.17')       // GE114s
 
 
 // **********  FSP3000 R7 Devices
-if ($device['sysObjectID'] == 'enterprises.2544.1.11.1.1') {
+if (starts_with($device['sysObjectID'], 'enterprises.2544.1.12.1.1')) {
     $version  = 'FSP3000R7 SW V'.trim(snmp_get($device, "swVersionActiveApplSw.100737280", "-OQv", "ADVA-MIB"), '"');
     $hardware = 'ADVA FSP3000R7 '.trim(snmp_get($device, "inventoryUnitName.33619968", "-OQv", "ADVA-MIB"), '"')
                 .' V'.trim(snmp_get($device, "inventoryHardwareRev.33619968", "-OQv", "ADVA-MIB"), '"');
