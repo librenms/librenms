@@ -20,79 +20,90 @@
 // ***** Sensors for ADVA FSP150EG-X Chassis
 // ******************************************
 
-if ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.7') {
+if (starts_with($device['sysObjectID'], 'enterprises.2544.1.12.1.1')) {
+	// Define Sensors and Limits
+	$sensors = array
+                (
+                array(
+                        'sensor_name'     => 'psuOutputVoltage',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.4.1.6',
+                        'multiplier'      => 1,
+                        'divisor'         => 1000,
+                        'low_limit'       => 6,
+                        'low_warn_limit'  => 9,
+                        'high_warn_limit' => 14,
+                        'high_limit'      => 18),
+             array(
+                        'sensor_name'     => 'nemiVoltage',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.7.1.5',
+                        'multiplier'      => 1,
+                        'divisor'         => 1000,
+                        'low_limit'       => 6,
+                        'low_warn_limit'  => 9,
+                        'high_warn_limit' => 14,
+                        'high_limit'      => 18),
+		array(
+                        'sensor_name'     => 'ethernetNTEGE114CardVoltage',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.26.1.5',
+                        'multiplier'      => 1,
+                        'divisor'         => 1000,
+                        'low_limit'       => 6,
+                        'low_warn_limit'  => 9,
+                        'high_warn_limit' => 14,
+                        'high_limit'      => 18),
+		array(
+                        'sensor_name'     => 'ethernetNTEGE114SCardVoltage',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.46.1.5',
+                        'multiplier'      => 1,
+                        'divisor'         => 1000,
+                        'low_limit'       => 6,
+                        'low_warn_limit'  => 9,
+                        'high_warn_limit' => 14,
+                        'high_limit'      => 18),
+		array(
+                        'sensor_name'     => 'ethernetNTEXG210CardVoltage',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.30.1.5',
+                        'multiplier'      => 1,
+                        'divisor'         => 1000,
+                        'low_limit'       => 6,
+                        'low_warn_limit'  => 9,
+                        'high_warn_limit' => 14,
+                        'high_limit'      => 18),
+                array(
+                        'sensor_name'     => 'ethernetGE8SCCCardVoltage',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.41.1.5',
+                        'multiplier'      => 1,
+                        'divisor'         => 1000,
+                        'low_limit'       => 4,
+                        'low_warn_limit'  => 5.5,
+                        'high_warn_limit' => 7,
+                        'high_limit'      => 8),
+		array(
+                        'sensor_name'     => 'ethernetXG1XCCCardVoltage',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.31.1.5',
+                        'multiplier'      => 1,
+                        'divisor'         => 1000,
+                        'low_limit'       => 4,
+                        'low_warn_limit'  => 5.5,
+                        'high_warn_limit' => 7,
+                        'high_limit'      => 8));
+	
+foreach (array_keys($pre_cache['fsp150']) as $index1) {
+            foreach ($sensors as $entry) {
+	        $sensor_name = $entry['sensor_name'];
+                if ($pre_cache['fsp150'][$index1][$sensor_name]) {
 
-    $multiplier = 1;
-    $divisor    = 1000;
+		    $multiplier      = $entry['multiplier'];
+		    $divisor         = $entry['divisor'];
+                    $low_limit       = $entry['low_limit'];
+                    $low_warn_limit  = $entry['low_warn_limit'];
+                    $high_warn_limit = $entry['high_warn_limit'];
+                    $high_limit      = $entry['high_limit'];
 
-    if (is_array($pre_cache['egxPSU'])) {
-        foreach (array_keys($pre_cache['egxPSU']) as $index) {
-
-            $low_limit = 6;
-            $low_warn_limit = 9;
-            $high_warn_limit = 14;
-            $high_limit = 20;
-
-            $slotnum    = substr($index, 4);
-            $psuname    = "PSU[".strtoupper($pre_cache['egxPSU'][$index]['psuType'])."]";
-            $descr      = $psuname." #".$slotnum.' DC Output';
-            $current    = $pre_cache['egxPSU'][$index]['psuOutputVoltage'];
-            $sensorType = 'fsp150egxOutputVoltage';
-            $oid        = '.1.3.6.1.4.1.2544.1.12.3.1.4.1.6.'.$index;
-
-            discover_sensor(
-                $valid['sensor'],
-                'voltage',
-                $device,
-                $oid,
-                $index,
-                $sensorType,
-                $descr,
-                $divisor,
-                $multiplier,
-                $low_limit,
-                $low_warn_limit,
-                $high_warn_limit,
-                $high_limit,
-                $current
-            );
-        }
-    }
-}// *****  End If of FSP150EG-X
-
-
-// *************************************************************
-// ***** Sensors for ADVA FSP150 GE11x 114s(17) 114(9) XG210(11)
-// *************************************************************
-
-if (($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.17') xor ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.9') xor ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.11')) {
-    echo 'Caching OIDs:'."\n";
-    $sensor_oids   = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', $sensor_oids, 'CM-ENTITY-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-
-    $multiplier = 1;
-    $divisor    = 1000;
-
-    $temp_sensors = array('ethernetNTEGE114CardVoltage'  => '.1.3.6.1.4.1.2544.1.12.3.1.26.1.5' ,
-                                'ethernetNTEGE114SCardVoltage' => '.1.3.6.1.4.1.2544.1.12.3.1.46.1.5' ,
-                                'ethernetNTEXG210CardVoltage'  => '.1.3.6.1.4.1.2544.1.12.3.1.30.1.5');
-// Laser Voltage                'ethernetXG1XCCCardVoltage'    => '.1.3.6.1.4.1.2544.1.12.3.1.31.1.5');
-
-    if (is_array($sensor_oids)) {
-        echo "Temperature Sensors:\n";
-        foreach (array_keys($sensor_oids) as $index1) {
-            foreach (array_keys($temp_sensors) as $index2 => $entry) {
-                if ($sensor_oids[$index1][$entry]) {
-                    $low_limit       = 9;
-                    $low_warn_limit  = 10;
-                    $high_warn_limit = 14;
-                    $high_limit      = 15;
-
-                    $slotnum    = $sensor_oids[$index1]['slotIndex'];
-                    $name       = $sensor_oids[$index1]['slotCardUnitName'];
-                    $descr      = $name." [Slot ".$slotnum."]";
-                    $current    = $sensor_oids[$index1][$entry];
-                    $sensorType = 'fsp150voltage';
-                    $oid        = $temp_sensors[$entry].".".$index1;
+                    $descr       = $pre_cache['fsp150'][$index1]['slotCardUnitName']." [#".$pre_cache['fsp150'][$index1]['slotIndex']."]";
+                    $current     = $pre_cache['fsp150'][$index1][$entry];
+                    $sensorType  = 'advafsp150';
+                    $oid         = $entry['sensor_oid'].".".$index1;
 
                     discover_sensor(
                         $valid['sensor'],
@@ -113,8 +124,10 @@ if (($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.17') xor ($device['sys
                 }//End if sensor exists
             }//End foreach $entry
         }//End foreach $index
-    } //End if  oids exist
-}// ************** End of Sensors for ADVA FSP150 GE11x **********
+	unset($sensors);
+	unset($entry);
+}// ************** End of Sensors for ADVA FSP150CC Series **********
+
 
 // *************************************************************
 // ***** Sensors for ADVA FSP3000 R7

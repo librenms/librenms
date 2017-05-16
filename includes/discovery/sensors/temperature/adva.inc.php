@@ -196,6 +196,8 @@ if (starts_with($device['sysObjectID'], 'enterprises.2544.1.12.1.1')) {
                 }//End if sensor exists
             }//End foreach $entry
         }//End foreach $index
+	unset($sensors);
+	unset($entry);
 }// ************** End of Sensors for ADVA FSP150CC Series **********
 
 

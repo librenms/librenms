@@ -20,46 +20,59 @@
 // ***** Sensors for ADVA FSP150EG-X Chassis
 // ******************************************
 
-if ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.7') {
-//    $egxPSU       = snmpwalk_cache_multi_oid($device, 'psuTable', $egxPSU, 'CM-ENTITY-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+if (starts_with($device['sysObjectID'], 'enterprises.2544.1.12.1.1')) {
+	// Define Sensors and Limits
+	$sensors = array
+                (
+                array(
+                        'sensor_name'     => 'psuOutputCurrent',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.4.1.8',
+                        'multiplier'      => 1,
+                        'divisor'         => 1000,
+                        'low_limit'       => 1,
+                        'low_warn_limit'  => 1,
+                        'high_warn_limit' => 25,
+                        'high_limit'      => 30));
+	
+foreach (array_keys($pre_cache['fsp150']) as $index1) {
+            foreach ($sensors as $entry) {
+	        $sensor_name = $entry['sensor_name'];
+                if ($pre_cache['fsp150'][$index1][$sensor_name]) {
 
-    $multiplier = 1;
-    $divisor    = 1000;
+		    $multiplier      = $entry['multiplier'];
+		    $divisor         = $entry['divisor'];
+                    $low_limit       = $entry['low_limit'];
+                    $low_warn_limit  = $entry['low_warn_limit'];
+                    $high_warn_limit = $entry['high_warn_limit'];
+                    $high_limit      = $entry['high_limit'];
 
-    if (is_array($pre_cache['egxPSU'])) {
-        foreach (array_keys($pre_cache['egxPSU']) as $index) {
+                    $descr       = $pre_cache['fsp150'][$index1]['slotCardUnitName']." [#".$pre_cache['fsp150'][$index1]['slotIndex']."]";
+                    $current     = $pre_cache['fsp150'][$index1][$entry];
+                    $sensorType  = 'advafsp150';
+                    $oid         = $entry['sensor_oid'].".".$index1;
 
-            $low_limit = 1;
-            $low_warn_limit = 2;
-            $high_warn_limit = 25;
-            $high_limit = 30;
-
-            $slotnum    = substr($index, 4);
-            $psuname    = "PSU[".strtoupper($pre_cache['egxPSU'][$index]['psuType'])."]";
-            $descr      = $psuname." #".$slotnum.' DC Output';
-            $current    = $pre_cache['egxPSU'][$index]['psuOutputCurrent'];
-            $sensorType = 'fsp150egxOutputCurrent';
-            $oid        = '.1.3.6.1.4.1.2544.1.12.3.1.4.1.8.'.$index;
-
-            discover_sensor(
-                $valid['sensor'],
-                'current',
-                $device,
-                $oid,
-                $index,
-                $sensorType,
-                $descr,
-                $divisor,
-                $multiplier,
-                $low_limit,
-                $low_warn_limit,
-                $high_warn_limit,
-                $high_limit,
-                $current
-            );
-        }
-    }
-}// *****  End If of FSP150EG-X
+                    discover_sensor(
+                        $valid['sensor'],
+                        'current',
+                        $device,
+                        $oid,
+                        $index1,
+                        $sensorType,
+                        $descr,
+                        $divisor,
+                        $multiplier,
+                        $low_limit,
+                        $low_warn_limit,
+                        $high_warn_limit,
+                        $high_limit,
+                        $current
+                    );
+                }//End if sensor exists
+            }//End foreach $entry
+        }//End foreach $index
+	unset($sensors);
+	unset($entry);
+}// ************** End of Sensors for ADVA FSP150CC Series **********
 
 // *************************************************************
 // ***** Sensors for ADVA FSP3000 R7
