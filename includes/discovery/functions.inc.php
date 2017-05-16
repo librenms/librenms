@@ -975,7 +975,6 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         } elseif ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.') && !starts_with($oid, '.1.3.6.1.2.1.33.1.3.3.1.3')) {
             return 1;
         }
-
     }
 
     return 10; //default
