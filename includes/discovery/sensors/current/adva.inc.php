@@ -1,6 +1,6 @@
 <?php
 /**
- * LibreNMS - ADVA device support
+ * LibreNMS - ADVA device support - Current
  *
  * @category   Network_Monitoring
  * @package    LibreNMS
@@ -21,13 +21,13 @@
 // ******************************************
 
 if ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.7') {
-    $egxPSU       = snmpwalk_cache_multi_oid($device, 'psuTable', $egxPSU, 'CM-ENTITY-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+//    $egxPSU       = snmpwalk_cache_multi_oid($device, 'psuTable', $egxPSU, 'CM-ENTITY-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
 
     $multiplier = 1;
     $divisor    = 1000;
 
-    if (is_array($egxPSU)) {
-        foreach (array_keys($egxPSU) as $index) {
+    if (is_array($pre_cache['egxPSU'])) {
+        foreach (array_keys($pre_cache['egxPSU']) as $index) {
 
             $low_limit = 1;
             $low_warn_limit = 2;
@@ -35,9 +35,9 @@ if ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.7') {
             $high_limit = 30;
 
             $slotnum    = substr($index, 4);
-            $psuname    = "PSU[".strtoupper($egxPSU[$index]['psuType'])."]";
+            $psuname    = "PSU[".strtoupper($pre_cache['egxPSU'][$index]['psuType'])."]";
             $descr      = $psuname." #".$slotnum.' DC Output';
-            $current    = $egxPSU[$index]['psuOutputCurrent'];
+            $current    = $pre_cache['egxPSU'][$index]['psuOutputCurrent'];
             $sensorType = 'fsp150egxOutputCurrent';
             $oid        = '.1.3.6.1.4.1.2544.1.12.3.1.4.1.8.'.$index;
 

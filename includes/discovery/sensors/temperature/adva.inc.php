@@ -1,6 +1,6 @@
 <?php
 /**
- * LibreNMS - ADVA device support
+ * LibreNMS - ADVA device support - Temperature Sensors
  *
  * @category   Network_Monitoring
  * @package    LibreNMS
@@ -16,198 +16,166 @@
  * the source code distribution for details.
  **/
 
-
-// ******************************************
-// ***** Sensors for ADVA FSP150EG-X Chassis
-// ******************************************
-
-if ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.7') {
-    echo 'Caching OIDs:'."\n";
-    $egxPSU       = snmpwalk_cache_multi_oid($device, 'psuTable', $egxPSU, 'CM-ENTITY-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $egxSWF       = snmpwalk_cache_multi_oid($device, 'ethernetSWFCardTable', $egxSWF, 'CM-ENTITY-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $egxIFtemp10G = snmpwalk_cache_multi_oid($device, 'ethernet1x10GHighPerCardTable', $egxIFtemp10G, 'CM-ENTITY-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $egxIFtemp1G  = snmpwalk_cache_multi_oid($device, 'ethernet10x1GHighPerCardTable', $egxIFtemp1G, 'CM-ENTITY-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-
-    $multiplier = 1;
-    $divisor    = 1;
-
-    if (is_array($egxPSU)) {
-        echo "psuEntry: ";
-
-        foreach (array_keys($egxPSU) as $index) {
-            $low_limit       = 10;
-            $low_warn_limit  = 15;
-            $high_warn_limit = 40;
-            $high_limit      = 60;
-
-            $slotnum    = $index;
-            $psuname    = "PSU [".strtoupper($egxPSU[$index]['psuType'])."]";
-            $descr      = $psuname." #".substr($slotnum, 4);
-            $current    = $egxPSU[$index]['psuTemperature'];
-            $sensorType = 'fsp150egx-psu-temp';
-            $oid        = '.1.3.6.1.4.1.2544.1.12.3.1.4.1.7.'.$index;
-
-            discover_sensor(
-                $valid['sensor'],
-                'temperature',
-                $device,
-                $oid,
-                $index,
-                $sensorType,
-                $descr,
-                $divisor,
-                $multiplier,
-                $low_limit,
-                $low_warn_limit,
-                $high_warn_limit,
-                $high_limit,
-                $current
-            );
-        }
-    } //end of egxPSU
-   
-    if (is_array($egxSWF)) {
-        echo "swfEntry: ";
-
-        $multiplier = 1;
-        $divisor    = 1;
-
-        foreach (array_keys($egxSWF) as $index) {
-            $low_limit       = 10;
-            $low_warn_limit  = 15;
-            $high_warn_limit = 60;
-            $high_limit      = 80;
-
-            $slotnum    = $index;
-            $swfname    = "SWF [".$egxSWF[$index]['ethernetSWFCardOperationalState']."]";
-            $descr      = $swfname." #".substr($slotnum, 4);
-            $current    = $egxSWF[$index]['ethernetSWFCardTemperature'];
-            $sensorType = 'fsp150egx-swf-temp';
-            $oid        = '.1.3.6.1.4.1.2544.1.12.3.1.20.1.5.'.$index;
-
-            discover_sensor(
-                $valid['sensor'],
-                'temperature',
-                $device,
-                $oid,
-                $index,
-                $sensorType,
-                $descr,
-                $divisor,
-                $multiplier,
-                $low_limit,
-                $low_warn_limit,
-                $high_warn_limit,
-                $high_limit,
-                $current
-            );
-        }
-    } //end of egxSWF
-
-    if (is_array($egxIFtemp10G)) {
-        echo "IFtempEntry: ";
-
-        foreach (array_keys($egxIFtemp10G) as $index) {
-            $low_limit       = 10;
-            $low_warn_limit  = 15;
-            $high_warn_limit = 40;
-            $high_limit      = 60;
-
-            $slotnum    = $index;
-            $IFname     = "IF 10G [".$egxIFtemp10G[$index]['ethernet1x10GHighPerCardOperationalState']."]";
-            $descr      = $IFname." #".substr($slotnum, 4);
-            $current    = $egxIFtemp10G[$index]['ethernet1x10GHighPerCardTemperature'];
-            $sensorType = 'fsp150egx-if10g-temp';
-            $oid        = '.1.3.6.1.4.1.2544.1.12.3.1.36.1.5.'.$index;
-
-            discover_sensor(
-                $valid['sensor'],
-                'temperature',
-                $device,
-                $oid,
-                $index,
-                $sensorType,
-                $descr,
-                $divisor,
-                $multiplier,
-                $low_limit,
-                $low_warn_limit,
-                $high_warn_limit,
-                $high_limit,
-                $current
-            );
-        }
-    } //end of egxIFtemp10G
-
-    if (is_array($egxIFtemp1G)) {
-        echo "IFtempEntry: ";
-
-        foreach (array_keys($egxIFtemp1G) as $index) {
-            $low_limit       = 10;
-            $low_warn_limit  = 15;
-            $high_warn_limit = 40;
-            $high_limit      = 60;
-
-            $slotnum    = $index;
-            $IFname     = "IF 1G [".$egxIFtemp1G[$index]['ethernet10x1GHighPerCardOperationalState']."]";
-            $descr      = $IFname." #".substr($slotnum, 4);
-            $current    = $egxIFtemp1G[$index]['ethernet10x1GHighPerCardTemperature'];
-            $sensorType = 'fsp150egx-if1g-temp';
-            $oid        = '.1.3.6.1.4.1.2544.1.12.3.1.37.1.5.'.$index;
-
-            discover_sensor(
-                $valid['sensor'],
-                'temperature',
-                $device,
-                $oid,
-                $index,
-                $sensorType,
-                $descr,
-                $divisor,
-                $multiplier,
-                $low_limit,
-                $low_warn_limit,
-                $high_warn_limit,
-                $high_limit,
-                $current
-            );
-        }
-    } //end of egxIFtemp1G
-}// *** End of ADVA FSP150EG-X Chassis
-
-
 // *************************************************************
-// ***** Sensors for ADVA FSP150 GE11x 114s(17) 114(9) XG210(11)
+// ***** Temperature Sensors for ADVA FSP150CC Series
 // *************************************************************
 
-if (($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.17') xor ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.9') xor ($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.11')) {
-    echo 'Caching OIDs:'."\n";
-    $sensor_oids   = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', $sensor_oids, 'CM-ENTITY-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+if (starts_with($device['sysObjectID'], 'enterprises.2544.1.12.1.1')) {
+	// Define Sensors and Limits
+	$sensors = array
+                (
+                array(
+                        'sensor_name'     => 'ethernetNTEGE114CardTemperature',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.26.1.6',
+                        'multiplier'      => 1,
+                        'divisor'         => 1,
+                        'low_limit'       => 15,
+                        'low_warn_limit'  => 20,
+                        'high_warn_limit' => 50,
+                        'high_limit'      => 60),
+                array(
+                        'sensor_name'     => 'ethernetNTEGE114SCardTemperature',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.46.1.6',
+                        'multiplier'      => 1,
+                        'divisor'         => 1,
+                        'low_limit'       => 15,
+                        'low_warn_limit'  => 20,
+                        'high_warn_limit' => 50,
+                        'high_limit'      => 60),
+                array(
+                        'sensor_name'     => 'ethernetNTEXG210CardTemperature',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.30.1.6',
+                        'multiplier'      => 1,
+                        'divisor'         => 1,
+                        'low_limit'       => 15,
+                        'low_warn_limit'  => 20,
+                        'high_warn_limit' => 50,
+                        'high_limit'      => 60),
+                array(
+                        'sensor_name'     => 'ethernetXG1XCCCardTemperature',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.31.1.6',
+                        'multiplier'      => 1,
+                        'divisor'         => 1,
+                        'low_limit'       => 15,
+                        'low_warn_limit'  => 20,
+                        'high_warn_limit' => 50,
+                        'high_limit'      => 60),
+                array(
+                        'sensor_name'     => 'ethernet10x1GHighPerCardTemperature',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.37.1.5',
+                        'multiplier'      => 1,
+                        'divisor'         => 1,
+                        'low_limit'       => 15,
+                        'low_warn_limit'  => 20,
+                        'high_warn_limit' => 50,
+                        'high_limit'      => 60),
+                array(
+                        'sensor_name'     => 'ethernet1x10GHighPerCardTemperature',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.36.1.5',
+                        'multiplier'      => 1,
+                        'divisor'         => 1,
+                        'low_limit'       => 15,
+                        'low_warn_limit'  => 20,
+                        'high_warn_limit' => 50,
+                        'high_limit'      => 60),
+                array(
+                        'sensor_name'     => 'ethernetSWFCardTemperature',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.20.1.5',
+                        'multiplier'      => 1,
+                        'divisor'         => 1,
+                        'low_limit'       => 15,
+                        'low_warn_limit'  => 20,
+                        'high_warn_limit' => 50,
+                        'high_limit'      => 60),
+                array(
+                        'sensor_name'     => 'psuTemperature',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.4.1.7',
+                        'multiplier'      => 1,
+                        'divisor'         => 1,
+                        'low_limit'       => 15,
+                        'low_warn_limit'  => 20,
+                        'high_warn_limit' => 50,
+                        'high_limit'      => 60),
+                array(
+                        'sensor_name'     => 'scuTemperature',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.6.1.6',
+                        'multiplier'      => 1,
+                        'divisor'         => 1,
+                        'low_limit'       => 15,
+                        'low_warn_limit'  => 20,
+                        'high_warn_limit' => 50,
+                        'high_limit'      => 60),
+                array(
+                        'sensor_name'     => 'nemiTemperature',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.7.1.6',
+                        'multiplier'      => 1,
+                        'divisor'         => 1,
+                        'low_limit'       => 15,
+                        'low_warn_limit'  => 20,
+                        'high_warn_limit' => 50,
+                        'high_limit'      => 60),
+                array(
+                        'sensor_name'     => 'amiTemperature',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.22.1.5',
+                        'multiplier'      => 1,
+                        'divisor'         => 1,
+                        'low_limit'       => 15,
+                        'low_warn_limit'  => 20,
+                        'high_warn_limit' => 50,
+                        'high_limit'      => 60),
+                array(
+                        'sensor_name'     => 'ethernetGE8SCCCardTemperature',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.41.1.6',
+                        'multiplier'      => 1,
+                        'divisor'         => 1,
+                        'low_limit'       => 15,
+                        'low_warn_limit'  => 20,
+                        'high_warn_limit' => 50,
+                        'high_limit'      => 60),
+                array(
+                        'sensor_name'     => 'stuHighPerCardTemperature',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.47.1.5',
+                        'multiplier'      => 1,
+                        'divisor'         => 1,
+                        'low_limit'       => 15,
+                        'low_warn_limit'  => 20,
+                        'high_warn_limit' => 50,
+                        'high_limit'      => 60),
+                array(
+                        'sensor_name'     => 'stiHighPerTemperature',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.48.1.5',
+                        'multiplier'      => 1,
+                        'divisor'         => 1,
+                        'low_limit'       => 15,
+                        'low_warn_limit'  => 20,
+                        'high_warn_limit' => 50,
+                        'high_limit'      => 60),
+                array(
+                        'sensor_name'     => 'ethernetGE8ECCCardTemperature',
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.49.1.6',
+                        'multiplier'      => 1,
+                        'divisor'         => 1,
+                        'low_limit'       => 15,
+                        'low_warn_limit'  => 20,
+                        'high_warn_limit' => 50,
+                        'high_limit'      => 60));
 
-    $multiplier = 1;
-    $divisor    = 1;
+        foreach (array_keys($pre_cache['fsp150']) as $index1) {
+            foreach ($sensors as $entry) {
+	        $sensor_name = $entry['sensor_name'];
+                if ($pre_cache['fsp150'][$index1][$sensor_name]) {
 
-    $temp_sensors = array('ethernetNTEGE114CardTemperature'  => '.1.3.6.1.4.1.2544.1.12.3.1.26.1.6' ,
-                                'ethernetNTEGE114SCardTemperature' => '.1.3.6.1.4.1.2544.1.12.3.1.46.1.6' ,
-                'ethernetNTEXG210CardTemperature'  => '.1.3.6.1.4.1.2544.1.12.3.1.30.1.6' ,
-                                'ethernetXG1XCCCardTemperature'    => '.1.3.6.1.4.1.2544.1.12.3.1.31.1.6');
+		    $multiplier      = $entry['multiplier'];
+		    $divisor         = $entry['divisor'];
+                    $low_limit       = $entry['low_limit'];
+                    $low_warn_limit  = $entry['low_warn_limit'];
+                    $high_warn_limit = $entry['high_warn_limit'];
+                    $high_limit      = $entry['high_limit'];
 
-    if (is_array($sensor_oids)) {
-        echo "Temperature Sensors:\n";
-        foreach (array_keys($sensor_oids) as $index1) {
-            foreach (array_keys($temp_sensors) as $index2 => $entry) {
-                if ($sensor_oids[$index1][$entry]) {
-                    $low_limit       = 10;
-                    $low_warn_limit  = 15;
-                    $high_warn_limit = 50;
-                    $high_limit      = 60;
-
-                    $slotnum    = $sensor_oids[$index1]['slotIndex'];
-                    $name       = $sensor_oids[$index1]['slotCardUnitName'];
-                    $descr      = $name." [Slot ".$slotnum."]";
-                    $current    = $sensor_oids[$index1][$entry];
-                    $sensorType = 'fsp150temp';
-                    $oid        = $temp_sensors[$entry].".".$index1;
+                    $descr       = $pre_cache['fsp150'][$index1]['slotCardUnitName']." [#".$pre_cache['fsp150'][$index1]['slotIndex']."]";
+                    $current     = $pre_cache['fsp150'][$index1][$entry];
+                    $sensorType  = 'advafsp150';
+                    $oid         = $entry['sensor_oid'].".".$index1;
 
                     discover_sensor(
                         $valid['sensor'],
@@ -228,39 +196,14 @@ if (($device['sysObjectID'] == 'enterprises.2544.1.12.1.1.17') xor ($device['sys
                 }//End if sensor exists
             }//End foreach $entry
         }//End foreach $index
-    } //End if  oids exist
-}// ************** End of Sensors for ADVA FSP150 GE11x **********
+}// ************** End of Sensors for ADVA FSP150CC Series **********
 
 
 // *************************************************************
-// ***** Sensors for ADVA FSP3000 R7
+// ***** Temperature Sensors for ADVA FSP3000 R7
 // *************************************************************
 
-if ($device['sysObjectID'] == 'enterprises.2544.1.11.1.1') {
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'pmSnapshotCurrentEntry', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityFacilityOneIndex', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityDcnOneIndex', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityOpticalMuxOneIndex', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityFacilityAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityEqptAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityDcnAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityOpticalMuxAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugMaxDataRate', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugAdmin', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'physicalPortFrequency', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugTransmitChannel', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugFiberType', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugReach', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-
-    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'entityEqptAidString', $fsp3kr7_Card, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'eqptPhysInstValueEntry', $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'optMuxPhysInstValueTable', $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'entityMtosiSlotsAidString', $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'eqptPhysThresholdEntry', $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-
-//    $results = print_r($fsp3kr7_Card, true); // $results now contains output from print_r
-//    file_put_contents('/opt/librenms/adva-precache.txt', $results);
-//    var_dump($results);
+if (starts_with($device['sysObjectID'], 'enterprises.2544.1.11.1.1')) {
 
     foreach (array_keys($fsp3kr7_Card) as $index => $entity) {
         foreach (array_keys($advafsp3kr7_oids) as $entity => $content) {
