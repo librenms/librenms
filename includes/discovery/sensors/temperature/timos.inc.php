@@ -7,7 +7,7 @@ if ($device['os'] === 'timos') {
         $data = trim($data);
         if ($data) {
             list($oid)                = explode(' ', $data);
-            $oid                      = implode('.', array_slice(explode('.',$oid), -2, 2));
+            $oid                      = implode('.', array_slice(explode('.', $oid), -2, 2));
             $temperature_oid          = ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.18.$oid";
             $descr_oid                = ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.8.$oid";
             $temp_present_oid         = ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.17.$oid";
