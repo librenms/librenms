@@ -6,5 +6,4 @@ over:
     - { graph: device_processor, text: CPU }
     - { graph: device_mempool, text: Memory }
 discovery:
-    - sysDescr:
-        - SonicWALL
+    - sysDescr_regex: '/^SonicWALL/i'
