@@ -1821,4 +1821,3 @@ function get_client_ip()
 
     return $client_ip;
 }//end get_client_ip()
-
