@@ -1,9 +1,7 @@
 <?php
-
 $oids = snmp_walk($device, ".1.3.6.1.4.1.4998.1.1.10.1.4.2.1.29", "-Osqn", "");
 $oids = trim($oids);
 $oids = explode("\n", $oids);
-print_r($oids);
 
 foreach ($oids as $data) {
     $data = trim($data);
