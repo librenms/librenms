@@ -98,6 +98,56 @@ if ($device['os'] == 'ios') {
             }
         }
     } //end vlan loop for timos
+} elseif ($device['os'] == 'comware') {
+    echo 'FDB table : ';
+    echo("\n");
+
+    // find vlans
+    $tmpVlans = snmp_walk($device, 'iso.3.6.1.2.1.17.7.1.4.3.1.1', '-OqsX', '');
+    $arrayVlans = explode(PHP_EOL, $tmpVlans);
+    $vlans = array();
+    foreach ($arrayVlans as $a) {
+	array_push($vlans, explode(' ', explode('.', $a)[13])[0]);
+    }
+    //var_dump($vlans); exit;
+
+    //find fdb entries
+    $FdbPort_table = snmp_walk($device, 'dot1dTpFdbPort', '-Cc -OqsX', 'Q-BRIDGE-MIB');
+    //var_dump($FdbPort_table); exit;
+
+    //find port ids
+    $dot1dBasePortIfIndex = snmp_walk($device, 'dot1dBasePortIfIndex', '-OqsX', 'BRIDGE-MIB'); 
+    //var_dump($dot1dBasePortIfIndex); exit;
+
+            foreach (explode("\n", $dot1dBasePortIfIndex) as $dot1dBasePortIfIndex_entry) {
+                #echo "port ".$dot1dBasePortIfIndex_entry."\n";
+                if (!empty($dot1dBasePortIfIndex_entry)) {
+                    $port = explode(' ', $dot1dBasePortIfIndex_entry);
+                    $strTemp = explode('[', $port[0]);
+                    $portLocal = rtrim($strTemp[1],']');
+                    $portid_dict[$portLocal] = $ifIndex_dict[$port[1]];
+                }
+            }
+
+            foreach (explode("\n", $FdbPort_table) as $FdbPort_entry) {
+                #echo $FdbPort_entry."\n";
+                $port = explode(' ', $FdbPort_entry);
+                $macTemp = explode('[', $port[0]);
+                $mac = rtrim($macTemp[1],']');
+                if (! empty($mac)) {
+                    list($oct_1, $oct_2, $oct_3, $oct_4, $oct_5, $oct_6) = explode(':', $mac);
+                    $mac_address = zeropad($oct_1) . zeropad($oct_2) . zeropad($oct_3) . zeropad($oct_4) . zeropad($oct_5) . zeropad($oct_6);
+                    if (strlen($mac_address) != 12) {
+                        echo 'Mac Address padding failed';
+                        continue;
+                    } else {
+                        $dot1dBasePort = $port[1];
+                        $insert[$vlan[1]][$mac_address]['port_id'] = $portid_dict[$dot1dBasePort];
+                        #echo "vlan $vlan[1] - mac $mac_address - port ".$portid_dict[$dot1dBasePort]."\n";
+                    }
+                }
+            }
+    var_dump($insert); 
 } else {
     echo "OS not yet implemented \n";
     $continue = false;
@@ -106,6 +156,7 @@ if ($device['os'] == 'ios') {
 #var_dump($insert); exit;
 
 if ($continue) {
+    echo "Number of FDB entries: ".count($insert)."\n";
     // Build table of existing vlan/mac table
     $existing_fdbs = array();
     $sql_result = dbFetchRows("SELECT * FROM `ports_fdb` WHERE `device_id` = ?", array($device['device_id']));
@@ -114,7 +165,9 @@ if ($continue) {
     }
 
     // Insert to database
+    echo "INSERT:\n";
     foreach ($insert as $vlan => $mac_address_table) {
+	echo "vlan: $vlan\n";
         foreach ($mac_address_table as $mac_address_entry => $value) {
             // If existing entry
             if ($existing_fdbs[$vlan][$mac_address_entry]) {
@@ -129,6 +182,7 @@ if ($continue) {
 
                 if (! empty($update_entry)) {
                     dbUpdate($update_entry, 'ports_fdb', '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?', array($device['device_id'], $vlan, $mac_address));
+	            echo "update mac $mac_address\n";
                 }
                 unset($existing_fdbs[$vlan][$mac_address_entry]);
             } else {
@@ -139,6 +193,7 @@ if ($continue) {
                 $new_entry['device_id'] = $device['device_id'];
 
                 dbInsert($new_entry, 'ports_fdb');
+	        echo "insert mac $mac_address_entry\n";
             }
         }
     }
