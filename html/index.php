@@ -84,14 +84,10 @@ if (strstr($_SERVER['REQUEST_URI'], 'widescreen=no')) {
 
 # Load the settings for Multi-Tenancy.
 if (isset($config['branding']) && is_array($config['branding'])) {
-    if ($config['branding'][$_SERVER['SERVER_NAME']]) {
-        foreach ($config['branding'][$_SERVER['SERVER_NAME']] as $confitem => $confval) {
-            eval("\$config['" . $confitem . "'] = \$confval;");
-        }
+    if (isset($config['branding'][$_SERVER['SERVER_NAME']])) {
+        $config = array_replace_recursive($config, $config['branding'][$_SERVER['SERVER_NAME']]);
     } else {
-        foreach ($config['branding']['default'] as $confitem => $confval) {
-            eval("\$config['" . $confitem . "'] = \$confval;");
-        }
+        $config = array_replace_recursive($config, $config['branding']['default']);
     }
 }
 
