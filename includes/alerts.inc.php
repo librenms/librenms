@@ -322,7 +322,7 @@ function GetContacts($results)
 function FormatAlertTpl($obj)
 {
     $tpl    = $obj["template"];
-    $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), str_replace("'", "\'", $tpl)).'";';
+    $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), addslashes($tpl)).'";';
     $parsed = $msg;
     $s      = strlen($msg);
     $x      = $pos = -1;
