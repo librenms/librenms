@@ -157,3 +157,18 @@ foreach ($cooling_unit_analog as $index => $data) {
         discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid, $cur_oid, 'apc', $descr, $scale, 1, null, null, null, null, $value);
     }
 }
+
+foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
+    $cur_oid    = '.1.3.6.1.4.1.318.1.1.10.4.2.3.1.5.' . $index;
+    $descr      = $data['memSensorsStatusSensorName'] . ' - ' . $data['memSensorsStatusSensorLocation'];
+    $divisor    = 1;
+    $multiplier = 1;
+    $value      = $data['memSensorsTemperature'];
+    if (is_numeric($value)) {
+        $user_func = null;
+        if ($pre_cache['memSensorsStatusSysTempUnits'] === 'fahrenheit') {
+            $user_func = 'convert_to_celsius';
+        }
+        discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid, 'memSensorsTemperature.' . $index, 'apc', $descr, $divisor, $multiplier, null, null, null, null, $value, 'snmp', null, null, $user_func);
+    }
+}
