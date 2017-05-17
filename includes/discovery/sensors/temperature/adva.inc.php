@@ -196,8 +196,7 @@ if (starts_with($device['sysObjectID'], 'enterprises.2544.1.12.1.1')) {
                 }//End if sensor exists
             }//End foreach $entry
         }//End foreach $index
-	unset($sensors);
-	unset($entry);
+	unset($sensors, $entry);
 }// ************** End of Sensors for ADVA FSP150CC Series **********
 
 
@@ -207,42 +206,21 @@ if (starts_with($device['sysObjectID'], 'enterprises.2544.1.12.1.1')) {
 
 if (starts_with($device['sysObjectID'], 'enterprises.2544.1.11.1.1')) {
 
-    foreach (array_keys($fsp3kr7_Card) as $index => $entity) {
-        foreach (array_keys($advafsp3kr7_oids) as $entity => $content) {
-            $fsp3kr7_Card[$index] = implode('.', explode('.', array_keys($advafsp3kr7_oids[$entity]), -2));
-
-            if ($advafsp3kr7_oids[$content]['entityFacilityAidString']) {
-                $advafsp3kr7_oids[$content]['AidString'] = $advafsp3kr7_oids[$content]['entityFacilityAidString'];
-                $advafsp3kr7_oids[$content]['OneIndex']  = $advafsp3kr7_oids[$content]['entityFacilityOneIndex'];
-            }
-            if ($advafsp3kr7_oids[$content]['entityDcnAidString']) {
-                $advafsp3kr7_oids[$content]['AidString'] = $advafsp3kr7_oids[$content]['entityDcnAidString'];
-                $advafsp3kr7_oids[$content]['OneIndex']  = $advafsp3kr7_oids[$content]['entityDcnOneIndex'];
-            }
-            if ($advafsp3kr7_oids[$content]['entityOpticalMuxAidString']) {
-                $advafsp3kr7_oids[$content]['AidString'] = $advafsp3kr7_oids[$content]['entityOpticalMuxAidString'];
-                $advafsp3kr7_oids[$content]['OneIndex']  = $advafsp3kr7_oids[$content]['entityOpticalMuxOneIndex'];
-            }
-        }
-        //   $content[$entity] = str_replace($replace, "", $content[$entity][$replace]);
-        //        $entity = implode('.', explode('.', $entity, -2);
-    } //end test
-
     $multiplier = 1;
     $divisor    = 10;
 
-    if (is_array($fsp3kr7_Card)) {
-        foreach (array_keys($fsp3kr7_Card) as $index) {
-            if ($fsp3kr7_Card[$index]['eqptPhysInstValueTemp']) {
+    if (is_array($pre_cache['fsp3kr7_Card'])) {
+        foreach (array_keys($pre_cache['fsp3kr7_Card']) as $index) {
+            if ($pre_cache['fsp3kr7_Card'][$index]['eqptPhysInstValueTemp']) {
                 $low_limit = 10;
                 $low_warn_limit = 15;
                 $high_warn_limit = 35;
-                $high_limit = $fsp3kr7_Card[$index]['eqptPhysThresholdTempHigh']/$divisor;
+                $high_limit = $pre_cache['fsp3kr7_Card'][$index]['eqptPhysThresholdTempHigh']/$divisor;
 
                 $slotnum    = $index;
-                $descr      = strtoupper($fsp3kr7_Card[$index]['entityEqptAidString']);
-                $current    = $fsp3kr7_Card[$index]['eqptPhysInstValueTemp'];
-                $sensorType = 'fsp3kr7temp';
+                $descr      = $pre_cache['fsp3kr7_Card'][$index]['entityEqptAidString'];
+                $current    = $pre_cache['fsp3kr7_Card'][$index]['eqptPhysInstValueTemp'];
+                $sensorType = 'advafsp3kr7';
                 $oid        = '.1.3.6.1.4.1.2544.1.11.11.1.2.1.1.1.5.'.$index;
 
                 discover_sensor(

@@ -2,7 +2,7 @@
 /**
  * LibreNMS - ADVA FSP150 device support
  *
- * @category Network_Management
+ * @category Network_Monitoring
  * @package  LibreNMS
  * @author   Christoph Zilian <czilian@hotmail.com>
  * @license  http://gnu.org/copyleft/gpl.html GNU GPL
@@ -26,7 +26,7 @@ if (starts_with($device['sysObjectID'], 'enterprises.2544.1.12.1.1')) {
 
 
 // **********  FSP3000 R7 Devices
-if (starts_with($device['sysObjectID'], 'enterprises.2544.1.12.1.1')) {
+if (starts_with($device['sysObjectID'], 'enterprises.2544.1.11.1.1')) {
     $version  = 'FSP3000R7 SW V'.trim(snmp_get($device, "swVersionActiveApplSw.100737280", "-OQv", "ADVA-MIB"), '"');
     $hardware = 'ADVA FSP3000R7 '.trim(snmp_get($device, "inventoryUnitName.33619968", "-OQv", "ADVA-MIB"), '"')
                 .' V'.trim(snmp_get($device, "inventoryHardwareRev.33619968", "-OQv", "ADVA-MIB"), '"');

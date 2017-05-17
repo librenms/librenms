@@ -19,31 +19,31 @@
 // FSP150CC Series
 if (starts_with($device['sysObjectID'], 'enterprises.2544.1.12.1.1')) {
 	$pre_cache['fsp150'] = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', array(), 'CM-ENTITY-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-}// FSP3000 R7 Series
+}// End of FSP150CC R7 Series
 
 
 // FSP3000 R7 Series
 if (starts_with($device['sysObjectID'], 'enterprises.2544.1.11.1.1')) {
 
-$pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'pmSnapshotCurrentEntry', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityFacilityOneIndex', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityDcnOneIndex', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityOpticalMuxOneIndex', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityFacilityAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityEqptAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityDcnAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityOpticalMuxAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugMaxDataRate', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugAdmin', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'physicalPortFrequency', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugTransmitChannel', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugFiberType', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'plugReach', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '', '-OQUbs');
+    $pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'pmSnapshotCurrentEntry', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'entityFacilityOneIndex', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'entityDcnOneIndex', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'entityOpticalMuxOneIndex', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'entityFacilityAidString', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'entityEqptAidString', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'entityDcnAidString', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'entityOpticalMuxAidString', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'plugMaxDataRate', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'plugAdmin', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'physicalPortFrequency', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'plugTransmitChannel', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'plugFiberType', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'plugReach', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '', '-OQUbs');
 
-    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'entityEqptAidString', $fsp3kr7_Card, 'ADVA-FSPR7-MIB', '', '-OQUbs');
-    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'eqptPhysInstValueEntry', $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '', '-OQUbs');
-    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'optMuxPhysInstValueTable', $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '', '-OQUbs');
-    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'entityMtosiSlotsAidString', $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '', '-OQUbs');
-    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'eqptPhysThresholdEntry', $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '', '-OQUbs');
+    $pre_cache['fsp3kr7_Card'] = snmpwalk_cache_multi_oid($device, 'entityEqptAidString', $pre_cache['fsp3kr7_Card'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp3kr7_Card'] = snmpwalk_cache_multi_oid($device, 'eqptPhysInstValueEntry', $pre_cache['fsp3kr7_Card'], 'ADVA-FSPR7-PM-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp3kr7_Card'] = snmpwalk_cache_multi_oid($device, 'optMuxPhysInstValueTable', $pre_cache['fsp3kr7_Card'], 'ADVA-FSPR7-PM-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp3kr7_Card'] = snmpwalk_cache_multi_oid($device, 'entityMtosiSlotsAidString', $pre_cache['fsp3kr7_Card'], 'ADVA-FSPR7-PM-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp3kr7_Card'] = snmpwalk_cache_multi_oid($device, 'eqptPhysThresholdEntry', $pre_cache['fsp3kr7_Card'], 'ADVA-FSPR7-PM-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
 
 } // End of FSP3000 R7 Series

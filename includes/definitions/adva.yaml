@@ -31,7 +31,7 @@ poller_modules:
    - entity-physical: 1
    - hr-mib: 1
    - ipSystemStats: 1
-   - ipmi: 1
+   - ipmi: 0
    - junose-atm-vp: 0
    - loadbalancers: 0
    - mef: 0

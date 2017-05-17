@@ -124,8 +124,7 @@ foreach (array_keys($pre_cache['fsp150']) as $index1) {
                 }//End if sensor exists
             }//End foreach $entry
         }//End foreach $index
-	unset($sensors);
-	unset($entry);
+	unset($sensors, $entry);
 }// ************** End of Sensors for ADVA FSP150CC Series **********
 
 
@@ -133,20 +132,18 @@ foreach (array_keys($pre_cache['fsp150']) as $index1) {
 // ***** Sensors for ADVA FSP3000 R7
 // *************************************************************
 
-if ($device['sysObjectID'] == 'enterprises.2544.1.11.1.1') {
-    echo 'Caching OIDs:'."\n";
-    $fsp3kr7_Card = snmpwalk_cache_multi_oid($device, 'eqptPhysInstValueEntry', $fsp3kr7_Card, 'ADVA-FSPR7-PM-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+if (starts_with($device['sysObjectID'], 'enterprises.2544.1.11.1.1')) {
 
     $multiplier = 1;
     $divisor    = 1000;
 
-    if (is_array($fsp3kr7_Card)) {
+    if (is_array($pre_cache['fsp3kr7_Card'])) {
         echo "psuEntry: ";
 
-        foreach (array_keys($fsp3kr7_Card) as $index) {
+        foreach (array_keys($pre_cache['fsp3kr7_Card']) as $index) {
         //AC PSU Limits
-            if ($fsp3kr7_Card[$index]['eqptPhysInstValuePsuVoltInp']) {
-                if ($fsp3kr7_Card[$index]['eqptPhysInstValuePsuVoltInp'] > 1000) {
+            if ($pre_cache['fsp3kr7_Card'][$index]['eqptPhysInstValuePsuVoltInp']) {
+                if ($pre_cache['fsp3kr7_Card'][$index]['eqptPhysInstValuePsuVoltInp'] > 1000) {
                     $low_limit = 210;
                     $low_warn_limit = 220;
                     $high_warn_limit = 245;
@@ -159,9 +156,9 @@ if ($device['sysObjectID'] == 'enterprises.2544.1.11.1.1') {
                 $high_limit = 60;
 
                 $slotnum    = $index;
-                $descr      = strtoupper($fsp3kr7_Card[$index]['entityEqptAidString'])." Input";
-                $current    = $fsp3kr7_Card[$index]['eqptPhysInstValuePsuVoltInp'];
-                $sensorType = 'fsp3kr7psuInputV';
+                $descr      = strtoupper($pre_cache['fsp3kr7_Card'][$index]['entityEqptAidString'])." Input";
+                $current    = $pre_cache['fsp3kr7_Card'][$index]['eqptPhysInstValuePsuVoltInp'];
+                $sensorType = 'advafsp3kr7';
                 $oid        = '.1.3.6.1.4.1.2544.1.11.11.1.2.1.1.1.7.'.$index;
 
                 discover_sensor(

@@ -1,78 +1,49 @@
 <?php
+<?php
+/**
+ * LibreNMS - ADVA device support - Pre-Cache for Sensors
+ *
+ * @category   Network_Monitoring
+ * @package    LibreNMS
+ * @subpackage ADVA device support
+ * @author     Christoph Zilian <czilian@hotmail.com>
+ * @license    http://gnu.org/copyleft/gpl.html GNU GPL
+ * @link       https://github.com/librenms/librenms/
 
-if ($device['sysObjectID'] == 'enterprises.2544.1.11.1.1') {
-    echo 'ADVA FSP3000 R7 - interface dBm sensor readings';
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ **/
 
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'pmSnapshotCurrentEntry', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityFacilityOneIndex', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityDcnOneIndex', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityOpticalMuxOneIndex', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityFacilityAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityEqptAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityDcnAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-    $advafsp3kr7_oids = snmpwalk_cache_multi_oid($device, 'entityOpticalMuxAidString', $advafsp3kr7_oids, 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+//********* ADVA FSP3000 R7 Series
 
-    foreach (array_keys($fsp3kr7_Card) as $index => $entity) {
-        foreach (array_keys($advafsp3kr7_oids) as $entity => $content) {
-            $fsp3kr7_Card[$index] = implode('.', explode('.', array_keys($advafsp3kr7_oids[$entity]), -2));
 
-            if ($advafsp3kr7_oids[$content]['entityFacilityAidString']) {
-                $advafsp3kr7_oids[$content]['AidString'] = $advafsp3kr7_oids[$content]['entityFacilityAidString'];
-                $advafsp3kr7_oids[$content]['OneIndex']  = $advafsp3kr7_oids[$content]['entityFacilityOneIndex'];
-            }
-            if ($advafsp3kr7_oids[$content]['entityDcnAidString']) {
-                $advafsp3kr7_oids[$content]['AidString'] = $advafsp3kr7_oids[$content]['entityDcnAidString'];
-                $advafsp3kr7_oids[$content]['OneIndex']  = $advafsp3kr7_oids[$content]['entityDcnOneIndex'];
-            }
-            if ($advafsp3kr7_oids[$content]['entityOpticalMuxAidString']) {
-                $advafsp3kr7_oids[$content]['AidString'] = $advafsp3kr7_oids[$content]['entityOpticalMuxAidString'];
-                $advafsp3kr7_oids[$content]['OneIndex']  = $advafsp3kr7_oids[$content]['entityOpticalMuxOneIndex'];
-            }
-        }
-        //   $content[$entity] = str_replace($replace, "", $content[$entity][$replace]);
-        //        $entity = implode('.', explode('.', $entity, -2);
-    } //end test
+if (starts_with($device['sysObjectID'], 'enterprises.2544.1.11.1.1')) {
 
     $multiplier = 1;
     $divisor = 10;
 
-//    $InputPower  = array('pmSnapshotCurrentInputPower'  => '.1.3.6.1.4.1.2544.1.11.7.7.2.3.1.2.');
-//    $OutputPower = array('pmSnapshotCurrentOutputPower' => '.1.3.6.1.4.1.2544.1.11.7.7.2.3.1.1.');
-//    $TxLineAtten = array('pmSnapshotCurrentTxLineAtten' => 'x';
-//    $RxLineAtten = array('pmSnapshotCurrentRxLineAtten' => 'x';
+    foreach ($pre_cache['fsp3kr7'] as $index => $entry) {
 
+// other AidStrings to be inclued.
 
-    foreach ($advafsp3kr7_oids as $index => $entry) {
-        echo "\n-------------------- foreach ENTRY -----------------------------\n";
-
-
-        if ($entry['pmSnapshotCurrentInputPower']) {
-            $oid = '.1.3.6.1.4.1.2544.1.11.7.7.2.3.1.2.' . $index;
-            echo "---- Input Power ----\n";
-
-            $port = get_port_by_index_cache($device['device_id'], $entry['OneIndex']);
-
-            echo "Device:  ".$device['device_id']."\n";
-            echo "Port:    ".$port['ifIndex']."\n";
-
+      if ($entry['entityFacilityAidString'] and $entry['pmSnapshotCurrentInputPower']) {
+            $oidRX = '.1.3.6.1.4.1.2544.1.11.7.7.2.3.1.2.' . $index;
             $limit_low                 = -20;
             $warn_limit_low            = -18;
             $limit                     = 7;
             $warn_limit                = 5;
-
-            $current                   = $entry['pmSnapshotCurrentInputPower'];
-            $descr                     = $port['ifDescr'].' RX Pwr';
-            $entPhysicalIndex          = 'ports';
-            $entPhysicalIndex_measured = $port['ifIndex'];
-            $descr                     = $port['ifDescr'].' RX Pwr';
-            echo "Descr:   ".$descr." dBm ".$current."\n";
+            $currentRX                   = $entry['pmSnapshotCurrentInputPower'];
+            $descr                       = $entry['entityFacilityAidString'].' RX';
 
             discover_sensor(
                 $valid['sensor'],
                 'dbm',
                 $device,
-                $oid,
-                $entry['AidString'].'-RX',
+                $oidRX,
+                $descr,
                 'advafsp3kr7',
                 $descr,
                 $divisor,
@@ -81,36 +52,26 @@ if ($device['sysObjectID'] == 'enterprises.2544.1.11.1.1') {
                 $warn_limit_low,
                 $warn_limit,
                 $limit,
-                $current,
-                'snmp',
-                $entPhysicalIndex,
-                $entPhysicalIndex_measured
+                $currentRX
             );
         }//End if Input Power
 
-        if (is_numeric(str_replace('dBm', '', $entry['pmSnapshotCurrentOutputPower']))) {
-            $oid = '.1.3.6.1.4.1.2544.1.11.7.7.2.3.1.1.' . $index;
-            echo "\n---- Output Power ----\n";
-
-            $port = get_port_by_index_cache($device['device_id'], $entry['OneIndex']);
+        if ($entry['entityFacilityAidString'] and $entry['pmSnapshotCurrentOutputPower']) {
+            $oidTX = '.1.3.6.1.4.1.2544.1.11.7.7.2.3.1.1.' . $index;
 
             $limit_low                 = -20;
             $warn_limit_low            = -18;
             $limit                     = 7;
             $warn_limit                = 5;
-
-            $current                   = $entry['pmSnapshotCurrentOutputPower'];
-            $entPhysicalIndex          = 'ports';
-            $entPhysicalIndex_measured = $port['ifIndex'];
-            $descr                     = $port['ifDescr'].' TX Pwr []';
-            echo "Descr:   ".$descr." dBm ".$current."\n";
+            $currentTX                   = $entry['pmSnapshotCurrentOutputPower'];
+            $descr                       = $entry['entityFacilityAidString'].' TX';
 
             discover_sensor(
                 $valid['sensor'],
                 'dbm',
                 $device,
-                $oid,
-                $entry['AidString'].'-TX',
+                $oidTX,
+                $descr,
                 'advafsp3kr7',
                 $descr,
                 $divisor,
@@ -119,12 +80,13 @@ if ($device['sysObjectID'] == 'enterprises.2544.1.11.1.1') {
                 $warn_limit_low,
                 $warn_limit,
                 $limit,
-                $current,
-                'snmp',
-                $entPhysicalIndex,
-                $entPhysicalIndex_measured
+                $currentTX
             );
 
         }//End if Output Power
     }//End foreach entry
-}//End IF os
+}//End IF Equipment Model
+unset($entry);
+
+//********* End of ADVA FSP3000 R7 Series
+
