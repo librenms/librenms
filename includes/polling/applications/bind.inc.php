@@ -14,6 +14,8 @@ if (!empty($agent_data['app'][$name])) {
 }
 update_application($app, $bind);
 
+echo " $name";
+
 list ($incoming, $outgoing, $server, $resolver, $cache, $rrsets, $adb, $sockets) = explode("\n", $bind);
 
 //
