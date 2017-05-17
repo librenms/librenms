@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Exceptions\AuthenticationException;
 use Phpass\PasswordHash;
 
 if (!isset($_SESSION['username'])) {
@@ -16,19 +17,19 @@ function authenticate($username, $password)
 
         $row = @dbFetchRow('SELECT username FROM `users` WHERE `username`=?', array($_SESSION['username']));
         if (isset($row['username']) && $row['username'] == $_SESSION['username']) {
-            return 1;
+            return true;
         } else {
             $_SESSION['username'] = $config['http_auth_guest'];
-            return 1;
+            return true;
         }
     }
-    return 0;
+    throw new AuthenticationException();
 }
 
 
-function reauthenticate($sess_id = '', $token = '')
+function reauthenticate($sess_id, $token)
 {
-    return 0;
+    return false;
 }
 
 

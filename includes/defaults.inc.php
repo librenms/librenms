@@ -191,6 +191,9 @@ $config['snmp']['v3'][0]['cryptoalgo'] = 'AES';
 // Devices must respond to icmp by default
 $config['icmp_check'] = true;
 
+// The amount of time to keep the OS cache
+$config['os_def_cache_time'] = 86400;
+
 // Autodiscovery Settings
 $config['autodiscovery']['xdp'] = true;
 $config['autodiscovery']['xdp_exclude']['sysdesc_regexp'][] = '/-K9W8-/'; // Cisco Lightweight Access Point
@@ -516,6 +519,7 @@ $config['bad_if'][] = 'span rp';
 $config['bad_if'][] = 'span sp';
 $config['bad_if'][] = 'sslvpn';
 $config['bad_if'][] = 'pppoe-';
+$config['bad_if'][] = 'irtual';
 // $config['bad_if'][] = "control plane";  // Example for cisco control plane
 // Ignore ports based on ifType. Case-sensitive.
 $config['bad_iftype'][] = 'voiceEncap';

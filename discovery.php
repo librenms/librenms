@@ -118,6 +118,8 @@ if (get_lock('schema') === false) {
     require 'includes/sql-schema/update.php';
 }
 
+update_os_cache(); // will only update if needed
+
 $discovered_devices = 0;
 
 if (!empty($config['distributed_poller_group'])) {

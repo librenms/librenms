@@ -38,6 +38,8 @@
  */
 
 
+use LibreNMS\Exceptions\AuthenticationException;
+
 if (! isset($_SESSION['username'])) {
     $_SESSION['username'] = '';
 }
@@ -71,21 +73,20 @@ function authenticate($username, $password)
         $_SESSION['username'] = mres($_SERVER['REMOTE_USER']);
 
         if (user_exists($_SESSION['username'])) {
-            return 1;
+            return true;
         }
 
         $_SESSION['username'] = $config['http_auth_guest'];
-        return 1;
+        return true;
     }
 
-    return 0;
+    throw new AuthenticationException();
 }
 
 
-function reauthenticate($sess_id = '', $token = '')
+function reauthenticate($sess_id, $token)
 {
-    // Not supported
-    return 0;
+    return false;
 }
 
 

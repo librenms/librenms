@@ -199,7 +199,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
         $os = $device['os_text'] . '<br>' . $device['version'];
         $device['ip'] = inet6_ntop($device['ip']);
         $uptime = formatUptime($device['uptime'], 'short');
-        if (ip_to_sysname($device, $device['hostname']) !== $device['sysName']) {
+        if (format_hostname($device) !== $device['sysName']) {
             $hostname .= '<br />' . $device['sysName'];
         } elseif ($device['hostname'] !== $device['ip']) {
             $hostname .= '<br />' . $device['hostname'];

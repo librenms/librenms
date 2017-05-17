@@ -65,6 +65,9 @@ function poll_sensor($device, $class)
                 require 'includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php';
             }
 
+            if (isset($sensor['user_func']) && function_exists($sensor['user_func'])) {
+                $sensor_value = $sensor['user_func']($sensor_value);
+            }
 
             if ($class == 'temperature') {
                 preg_match('/[\d\.\-]+/', $sensor_value, $temp_response);
@@ -548,8 +551,9 @@ function location_to_latlng($device)
  *
  * @param array $app app from the db, including app_id
  * @param string $response This should be the full output
+ * @param string $current This is the current value we store in rrd for graphing
  */
-function update_application($app, $response)
+function update_application($app, $response, $current = '')
 {
     if (!is_numeric($app['app_id'])) {
         d_echo('$app does not contain app_id, could not update');
@@ -557,8 +561,9 @@ function update_application($app, $response)
     }
 
     $data = array(
-        'app_state' => 'UNKNOWN',
-        'timestamp' => array('NOW()'),
+        'app_state'  => 'UNKNOWN',
+        'app_status' => $current,
+        'timestamp'  => array('NOW()'),
     );
 
     if ($response != '' && $response !== false) {
@@ -575,4 +580,10 @@ function update_application($app, $response)
         $data['app_state_prev'] = $app['app_state'];
     }
     dbUpdate($data, 'applications', '`app_id` = ?', array($app['app_id']));
+}
+
+function convert_to_celsius($value)
+{
+    $value = ($value - 32) / 1.8;
+    return sprintf('%.02f', $value);
 }
