@@ -57,7 +57,8 @@ $power_supply_oids = array(
 );
 
 
-$power_supply_table = end(snmpwalk_cache_numerical_oid($device, 'tmnxChassisPowerSupplyTable', $power_supply_table = array(), 'TIMETRA-CHASSIS-MIB', 'aos', '-OQUsn'));
+$pst = snmpwalk_cache_numerical_oid($device, 'tmnxChassisPowerSupplyTable', $power_supply_table = array(), 'TIMETRA-CHASSIS-MIB', 'aos', '-OQUsn')
+$power_supply_table = end($pst);
 
 foreach ($power_supply_oids as $data) {
     $full_oid = $base_oid . $data['sub_oid'];
