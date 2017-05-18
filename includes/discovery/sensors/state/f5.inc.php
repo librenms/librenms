@@ -100,6 +100,88 @@ if (is_array($temp1)) {
 } // End if (is_array($temp1))
 
 
+// Real Sync State:
+/*
+sysCmSyncStatusId OBJECT-TYPE
+        SYNTAX INTEGER {
+                unknown(0),
+                syncing(1),
+                needManualSync(2),
+                inSync(3),
+                syncFailed(4),
+                syncDisconnected(5),
+                standalone(6),
+                awaitingInitialSync(7),
+                incompatibleVersion(8),
+                partialSync(9)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The sync status ID on the system.
+                unknown - the device is disconnected from the device group;
+                syncing - the device is joining the device group or has requested changes
+                from device group or inconsistent with the group;
+                needManualSync - changes have been made on the device not syncd to
+                the device group;
+                inSync - the device is consistent with the device group;
+                syncFailed - the device is inconsistent with the device group, requires
+                user intervention;
+                syncDisconnected - the device is not connected to any peers;
+                standalone - the device is in a standalone configuration;
+                awaitingInitialSync - the device is waiting for initial sync;
+                incompatibleVersion - the device's version is incompatible with rest of
+                the devices in the device group;
+                partialSync - some but not all devices successfully received the last sync."
+        ::= { sysCmSyncStatus 1 }
+*/
+$temp1 = snmpwalk_cache_multi_oid($device, 'sysCmSyncStatusId', array(), 'F5-BIGIP-SYSTEM-MIB');
+
+if (is_array($temp1)) {
+    echo 'F5 Sync State: ';
+    //Create State Index
+    $state_name = 'sysCmSyncStatusId';
+    $state_index_id = create_state_index($state_name);
+
+    //Create State Translation
+    if ($state_index_id) {
+        $states = array(
+            array($state_index_id,'unknown',0,0,3),
+            array($state_index_id,'syncing',0,1,0),
+            array($state_index_id,'needManualSync',0,2,1),
+            array($state_index_id,'inSync',0,3,0),
+            array($state_index_id,'syncFailed',0,4,1),
+            array($state_index_id,'syncDisconnected',0,5,2),
+            array($state_index_id,'standalone',0,6,0),
+            array($state_index_id,'awaitingInitialSync',0,7,1),
+            array($state_index_id,'incompatibleVersion',0,8,2),
+            array($state_index_id,'partialSync',0,8,2),
+        );
+        foreach ($states as $value) {
+            $insert = array(
+                'state_index_id' => $value[0],
+                'state_descr' => $value[1],
+                'state_draw_graph' => $value[2],
+                'state_value' => $value[3],         // Value polled from device
+                'state_generic_value' => $value[4],  // Set value based on the Nagios standard 0=OK, 1=Warning, 2=Critical, 3=Unknown
+            );
+            dbInsert($insert, 'state_translations');
+        }
+    }
+
+    foreach (array_keys($temp1) as $index) {
+        $descr      = "sysCmSyncStatusId.".$index;
+        $current    = $temp1[$index]['sysCmSyncStatusId'];
+        $sensorType = 'f5';
+        $oid        = '.1.3.6.1.4.1.3375.2.1.14.1.1.'.$index;
+        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $current, 'snmp', $index);
+
+        //Create Sensor To State Index
+        create_sensor_to_state_index($device, $state_name, $index);
+    } // End foreach (array_keys($temp1) as $index)
+} // End if (is_array($temp1))
+
+
 // Color State:
 /*
 sysCmFailoverStatusColor OBJECT-TYPE
