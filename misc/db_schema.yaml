@@ -1134,7 +1134,6 @@ ports_fdb:
     vlan_id: { Field: vlan_id, Type: int(11), 'Null': false, Default: null, Extra: '' }
   Indexes:
     mac_address: { Name: mac_address, Columns: [mac_address], Unique: false, Type: BTREE }
-    mac_address_2: { Name: mac_address_2, Columns: [mac_address], Unique: false, Type: BTREE }
 ports_perms:
   Columns:
     access_level: { Field: access_level, Type: int(11), 'Null': false, Default: null, Extra: '' }
@@ -1513,7 +1512,7 @@ users:
     password: { Field: password, Type: varchar(60), 'Null': true, Default: null, Extra: '' }
     realname: { Field: realname, Type: varchar(64), 'Null': false, Default: null, Extra: '' }
     remember_token: { Field: remember_token, Type: varchar(100), 'Null': true, Default: null, Extra: '' }
-    updated_at: { Field: updated_at, Type: timestamp, 'Null': false, Default: '0000-00-00 00:00:00', Extra: '' }
+    updated_at: { Field: updated_at, Type: timestamp, 'Null': false, Default: CURRENT_TIMESTAMP, Extra: '' }
     username: { Field: username, Type: char(30), 'Null': false, Default: null, Extra: '' }
     user_id: { Field: user_id, Type: int(11), 'Null': false, Default: null, Extra: auto_increment }
   Indexes:
