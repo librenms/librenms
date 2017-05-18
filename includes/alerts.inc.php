@@ -282,11 +282,11 @@ function GetContacts($results)
         if (empty($user['level'])) {
             $user['level'] = get_userlevel($user['username']);
         }
-        if ($config["alert"]["globals"] && ( $user['level'] >= 5 && $user['level'] < 10 )) {
+        if ($config['alert']['globals'] && ( $user['level'] >= 5 && $user['level'] < 10 )) {
             $contacts[$user['email']] = $user['realname'];
-        } elseif ($config["alert"]["admins"] && $user['level'] == 10) {
+        } elseif ($config['alert']['admins'] && $user['level'] == 10) {
             $contacts[$user['email']] = $user['realname'];
-        } elseif (in_array($user['user_id'], $uids)) {
+        } elseif ($config['alert']['users'] == true && in_array($user['user_id'], $uids)) {
             $contacts[$user['email']] = $user['realname'];
         }
     }
@@ -322,7 +322,7 @@ function GetContacts($results)
 function FormatAlertTpl($obj)
 {
     $tpl    = $obj["template"];
-    $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), str_replace("'", "\'", $tpl)).'";';
+    $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), addslashes($tpl)).'";';
     $parsed = $msg;
     $s      = strlen($msg);
     $x      = $pos = -1;

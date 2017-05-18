@@ -430,7 +430,7 @@ Examples:
 
 ```php
 $config['good_if'][] = 'FastEthernet';
-$config['os']['ios']['good_id'][] = 'FastEthernet';
+$config['os']['ios']['good_if'][] = 'FastEthernet';
 ```
 
 `good_if` is matched against ifDescr value. This can be a bad_if value as well which would stop that port from being ignored. 

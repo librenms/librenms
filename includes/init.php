@@ -165,6 +165,7 @@ if (module_selected('auth', $init_modules) ||
         $config['allow_unauth_graphs'] != true
     )
 ) {
+    require $install_dir . '/html/includes/authentication/functions.php';
     require $install_dir . '/html/includes/authenticate.inc.php';
 }
 
