@@ -1,7 +1,5 @@
 <?php
 
-$power_supply_table = end(snmpwalk_cache_numerical_oid($device, 'tmnxChassisPowerSupplyTable', $power_supply_table = array(), 'TIMETRA-CHASSIS-MIB', 'aos', '-OQUsn'));
-
 $nokia_device_state_name  = 'tmnxDeviceState';
 $nokia_device_state_index = create_state_index($nokia_device_state_name);
 if ($nokia_device_state_index !== null) {
@@ -47,7 +45,7 @@ if ($nokia_device_ps_assigned_types_index !== null) {
     }
 }
 
-$base_oid          = '.1.3.6.1.4.1.6527.3.1.2.2.1.5.1';
+$base_oid          = '.1.3.6.1.4.1.6527.3.1.2.2.1.5.1.';
 $power_supply_oids = array(
     array('sub_oid' => '2.1.1', 'desc' => 'AC Status', 'type' => $nokia_device_state_name),
     array('sub_oid' => '3.1.1', 'desc' => 'DC Status', 'type' => $nokia_device_state_name),
@@ -58,8 +56,11 @@ $power_supply_oids = array(
     array('sub_oid' => '10.1.1', 'desc' => 'Power Out', 'type' => $nokia_device_state_name),
 );
 
+
+$power_supply_table = end(snmpwalk_cache_numerical_oid($device, 'tmnxChassisPowerSupplyTable', $power_supply_table = array(), 'TIMETRA-CHASSIS-MIB', 'aos', '-OQUsn'));
+
 foreach ($power_supply_oids as $data) {
-    $full_oid = $base_oid . "." . $data['sub_oid'];
+    $full_oid = $base_oid . $data['sub_oid'];
     $index = "tmnxChassisPowerSupplyTable." . $data['sub_oid'];
     discover_sensor($valid['sensor'], 'state', $device, $full_oid, $index, $data['type'], $data['desc'], 1, 1, null, null, null, null, $power_supply_table[$full_oid], 'snmp', $index);
     create_sensor_to_state_index($device, $data['type'], $index);

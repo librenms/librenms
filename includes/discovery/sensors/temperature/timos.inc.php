@@ -1,30 +1,35 @@
 <?php
 
-if ($device['os'] === 'timos') {
-    $oids = snmp_walk($device, 'tmnxHwID', '-Osqn', 'TIMETRA-CHASSIS-MIB', 'aos');
-    $oids = trim($oids);
-    foreach (explode("\n", $oids) as $data) {
-        $data = trim($data);
-        if ($data) {
-            list($oid)                = explode(' ', $data);
-            $oid                      = implode('.', array_slice(explode('.', $oid), -2, 2));
-            $temperature_oid          = ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.18.$oid";
-            $descr_oid                = ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.8.$oid";
-            $temp_present_oid         = ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.17.$oid";
-            $temp_high_threshold_oid  = ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.19.$oid";
-            $descr                    = snmp_get($device, $descr_oid, '-Oqv', 'TIMETRA-CHASSIS-MIB', 'nokia');
-            $temp_present             = snmp_get($device, $temp_present_oid, '-Oqv', 'TIMETRA-CHASSIS-MIB', 'nokia');
-            $temperature              = snmp_get($device, $temperature_oid, '-OUqv', 'TIMETRA-CHASSIS-MIB', 'nokia');
-            $temp_thresh              = snmp_get($device, $temp_high_threshold_oid, '-OUqv', 'TIMETRA-CHASSIS-MIB', 'nokia');
-            if ($temp_present == true && $descr != '' && $temperature != -1) {
-                $descr = str_replace('"', '', $descr);
-                $descr = str_replace('temperature', '', $descr);
-                $descr = str_replace('temperature', '', $descr);
-                $descr = str_replace('sensor', '', $descr);
-                $descr = ucfirst(trim($descr));
+$description_root_oid       = '.1.3.6.1.4.1.6527.3.1.2.2.1.8.1.8';
+$sensor_present_root_oid    = '.1.3.6.1.4.1.6527.3.1.2.2.1.8.1.17';
+$temperature_root_oid       = '.1.3.6.1.4.1.6527.3.1.2.2.1.8.1.18';
+$threshold_root_oid         = '.1.3.6.1.4.1.6527.3.1.2.2.1.8.1.19';
 
-                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'nokia', $descr, '1', '1', null, null, null, $temp_thresh, $temperature);
-            }
-        }
+$temp_sensors = snmpwalk_cache_oid($device, 'tmnxHwID', $temp_sensors = array(), 'TIMETRA-CHASSIS-MIB', 'aos');
+$temp_sensors = snmpwalk_cache_oid($device, $description_root_oid, $temp_sensors, 'TIMETRA-CHASSIS-MIB', 'aos');
+$temp_sensors = snmpwalk_cache_oid($device, $sensor_present_root_oid, $temp_sensors, 'TIMETRA-CHASSIS-MIB', 'aos');
+$temp_sensors = snmpwalk_cache_oid($device, $temperature_root_oid, $temp_sensors, 'TIMETRA-CHASSIS-MIB', 'aos');
+$temp_sensors = snmpwalk_cache_oid($device, $threshold_root_oid, $temp_sensors, 'TIMETRA-CHASSIS-MIB', 'aos');
+
+foreach ($temp_sensors as $sub_oid => $component) {
+    $descr             = $component['tmnxHwName'];
+    $temp_present      = $component['tmnxHwTempSensor'];
+    $temperature       = $component['tmnxHwTemperature'];
+    $temp_thresh       = $component['tmnxHwTempThreshold'];
+    if ($temp_present == true && $descr != '' && $temperature != -1) {
+        $temperature_oid = $temperature_root_oid . '.' . $sub_oid;
+        discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, "tmnxHwTemperature.$sub_oid", 'nokia', $descr, '1', '1', null, null, null, $temp_thresh, $temperature);
     }
 }
+
+unset(
+    $descr,
+    $temp_present,
+    $temperature,
+    $temp_thresh,
+    $temp_sensors,
+    $description_root_oid,
+    $sensor_present_root_oid,
+    $temperature_root_oid,
+    $threshold_root_oid
+);
