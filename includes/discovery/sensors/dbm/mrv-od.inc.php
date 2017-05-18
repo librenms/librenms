@@ -17,8 +17,8 @@ echo 'MRV OptiDriver ';
 $multiplier = 1;
 $divisor = 1000;
 
-foreach ($pre_cache['mrv-od_oids'] as $index => $entry) {
-    if (is_numeric($entry['nbsCmmcPortRxPower'])) {
+foreach ($pre_cache['mrv-od_port-table'] as $index => $entry) {
+    if ($entry['nbsCmmcPortRxPower']) {
         $oid = '.1.3.6.1.4.1.629.200.8.1.1.32.' . $index;
         $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifName`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' Rx Power';
         $currentrx = $entry['nbsCmmcPortRxPower'];
@@ -41,7 +41,7 @@ foreach ($pre_cache['mrv-od_oids'] as $index => $entry) {
         );
     }
 
-    if (is_numeric($entry['nbsCmmcPortTxPower'])) {
+    if ($entry['nbsCmmcPortTxPower']) {
         $oid = '.1.3.6.1.4.1.629.200.8.1.1.31.' . $index;
         $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifName`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' Tx Power';
         $currenttx = $entry['nbsCmmcPortTxPower'];
