@@ -17,3 +17,4 @@ $hardware = $multi_get_array[1]['NBS-CMMC-MIB::nbsCmmcChassisModel'];
 $version = $multi_get_array[0]['NBS-CMMC-MIB::nbsCmmcSysFwVers'];
 $serial = $multi_get_array[1]['NBS-CMMC-MIB::nbsCmmcChassisSerialNum'];
 $features       = '';
+unset($multi_get_array);

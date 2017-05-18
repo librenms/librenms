@@ -29,7 +29,7 @@ foreach ($pre_cache['mrv-od_port-table'] as $index => $entry) {
                  array($state_index_id,'highWarning',0,5,1) ,
                  array($state_index_id,'highAlarm',0,6,2)
              );
-            foreach($states as $value){
+            foreach ($states as $value) {
                 $insert = array(
                     'state_index_id' => $value[0],
                     'state_descr' => $value[1],
@@ -64,7 +64,7 @@ foreach ($pre_cache['mrv-od_port-table'] as $index => $entry) {
                  array($state_index_id,'highWarning',0,5,1) ,
                  array($state_index_id,'highAlarm',0,6,2)
              );
-            foreach($states as $value){
+            foreach ($states as $value) {
                 $insert = array(
                     'state_index_id' => $value[0],
                     'state_descr' => $value[1],
@@ -104,7 +104,7 @@ foreach ($pre_cache['mrv-od_chassis-entry'] as $index => $entry) {
                  array($state_index_id,'good',0,7,0) ,
                  array($state_index_id,'bad',0,8,2)
              );
-            foreach($states as $value){
+            foreach ($states as $value) {
                 $insert = array(
                     'state_index_id' => $value[0],
                     'state_descr' => $value[1],
@@ -138,7 +138,7 @@ foreach ($pre_cache['mrv-od_chassis-entry'] as $index => $entry) {
                  array($state_index_id,'good',0,7,0) ,
                  array($state_index_id,'bad',0,8,2)
              );
-            foreach($states as $value){
+            foreach ($states as $value) {
                 $insert = array(
                     'state_index_id' => $value[0],
                     'state_descr' => $value[1],
@@ -172,7 +172,7 @@ foreach ($pre_cache['mrv-od_chassis-entry'] as $index => $entry) {
                  array($state_index_id,'good',0,7,0) ,
                  array($state_index_id,'bad',0,8,2)
              );
-            foreach($states as $value){
+            foreach ($states as $value) {
                 $insert = array(
                     'state_index_id' => $value[0],
                     'state_descr' => $value[1],
@@ -206,7 +206,7 @@ foreach ($pre_cache['mrv-od_chassis-entry'] as $index => $entry) {
                  array($state_index_id,'good',0,7,0) ,
                  array($state_index_id,'bad',0,8,2)
              );
-            foreach($states as $value){
+            foreach ($states as $value) {
                 $insert = array(
                     'state_index_id' => $value[0],
                     'state_descr' => $value[1],
@@ -236,7 +236,7 @@ foreach ($pre_cache['mrv-od_chassis-entry'] as $index => $entry) {
                  array($state_index_id,'good',0,3,0) ,
                  array($state_index_id,'notInstalled',0,4,1)
              );
-            foreach($states as $value){
+            foreach ($states as $value) {
                 $insert = array(
                     'state_index_id' => $value[0],
                     'state_descr' => $value[1],
@@ -266,7 +266,7 @@ foreach ($pre_cache['mrv-od_chassis-entry'] as $index => $entry) {
                  array($state_index_id,'good',0,3,0) ,
                  array($state_index_id,'notInstalled',0,4,1)
              );
-            foreach($states as $value){
+            foreach ($states as $value) {
                 $insert = array(
                     'state_index_id' => $value[0],
                     'state_descr' => $value[1],
@@ -296,7 +296,7 @@ foreach ($pre_cache['mrv-od_chassis-entry'] as $index => $entry) {
                  array($state_index_id,'good',0,3,0) ,
                  array($state_index_id,'notInstalled',0,4,1)
              );
-            foreach($states as $value){
+            foreach ($states as $value) {
                 $insert = array(
                     'state_index_id' => $value[0],
                     'state_descr' => $value[1],
@@ -326,7 +326,7 @@ foreach ($pre_cache['mrv-od_chassis-entry'] as $index => $entry) {
                  array($state_index_id,'good',0,3,0) ,
                  array($state_index_id,'notInstalled',0,4,1)
              );
-            foreach($states as $value){
+            foreach ($states as $value) {
                 $insert = array(
                     'state_index_id' => $value[0],
                     'state_descr' => $value[1],

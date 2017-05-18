@@ -17,7 +17,7 @@ echo("MRV OptiDriver:");
 // Chassis temperature
 $descr   =  "Chassis Temperature";
 $valueoid    = ".1.3.6.1.4.1.629.200.6.1.1.15.1";
-$value   = snmp_get($device, 'nbsCmmcChassisTemperature.1', '-Ovqs', 'NBS-CMMC-MIB', $config['install_dir'].'/mibs/mrv');
+$value   = snmp_get($device, 'nbsCmmcChassisTemperature.1', '-Ovqs', 'NBS-CMMC-MIB');
 if (is_numeric($value)) {
     discover_sensor($valid['sensor'], 'temperature', $device, $valueoid, 'nbsCmmcChassisTemperature.1', 'mrv-od', $descr, '1', '1', null, null, null, null, $value);
 }
