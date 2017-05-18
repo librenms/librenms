@@ -1,5 +1,4 @@
 <?php
-<?php
 /**
  * LibreNMS - ADVA device support - Pre-Cache for Sensors
  *
@@ -21,15 +20,12 @@
 
 
 if (starts_with($device['sysObjectID'], 'enterprises.2544.1.11.1.1')) {
-
     $multiplier = 1;
     $divisor = 10;
 
     foreach ($pre_cache['fsp3kr7'] as $index => $entry) {
-
 // other AidStrings to be inclued.
-
-      if ($entry['entityFacilityAidString'] and $entry['pmSnapshotCurrentInputPower']) {
+        if ($entry['entityFacilityAidString'] and $entry['pmSnapshotCurrentInputPower']) {
             $oidRX = '.1.3.6.1.4.1.2544.1.11.7.7.2.3.1.2.' . $index;
             $limit_low                 = -20;
             $warn_limit_low            = -18;
@@ -58,7 +54,6 @@ if (starts_with($device['sysObjectID'], 'enterprises.2544.1.11.1.1')) {
 
         if ($entry['entityFacilityAidString'] and $entry['pmSnapshotCurrentOutputPower']) {
             $oidTX = '.1.3.6.1.4.1.2544.1.11.7.7.2.3.1.1.' . $index;
-
             $limit_low                 = -20;
             $warn_limit_low            = -18;
             $limit                     = 7;
@@ -82,11 +77,9 @@ if (starts_with($device['sysObjectID'], 'enterprises.2544.1.11.1.1')) {
                 $limit,
                 $currentTX
             );
-
         }//End if Output Power
     }//End foreach entry
 }//End IF Equipment Model
 unset($entry);
 
 //********* End of ADVA FSP3000 R7 Series
-

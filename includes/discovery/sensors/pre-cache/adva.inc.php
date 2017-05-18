@@ -18,13 +18,12 @@
 
 // FSP150CC Series
 if (starts_with($device['sysObjectID'], 'enterprises.2544.1.12.1.1')) {
-	$pre_cache['fsp150'] = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', array(), 'CM-ENTITY-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
+    $pre_cache['fsp150'] = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', array(), 'CM-ENTITY-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
 }// End of FSP150CC R7 Series
 
 
 // FSP3000 R7 Series
 if (starts_with($device['sysObjectID'], 'enterprises.2544.1.11.1.1')) {
-
     $pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'pmSnapshotCurrentEntry', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
     $pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'entityFacilityOneIndex', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
     $pre_cache['fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'entityDcnOneIndex', $pre_cache['fsp3kr7'], 'ADVA-FSPR7-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
@@ -45,5 +44,4 @@ if (starts_with($device['sysObjectID'], 'enterprises.2544.1.11.1.1')) {
     $pre_cache['fsp3kr7_Card'] = snmpwalk_cache_multi_oid($device, 'optMuxPhysInstValueTable', $pre_cache['fsp3kr7_Card'], 'ADVA-FSPR7-PM-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
     $pre_cache['fsp3kr7_Card'] = snmpwalk_cache_multi_oid($device, 'entityMtosiSlotsAidString', $pre_cache['fsp3kr7_Card'], 'ADVA-FSPR7-PM-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
     $pre_cache['fsp3kr7_Card'] = snmpwalk_cache_multi_oid($device, 'eqptPhysThresholdEntry', $pre_cache['fsp3kr7_Card'], 'ADVA-FSPR7-PM-MIB', '/opt/librenms/mibs/adva', '-OQUbs');
-
 } // End of FSP3000 R7 Series
