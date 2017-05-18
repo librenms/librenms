@@ -1,15 +1,32 @@
 <?php
+<<<<<<< HEAD
 $features = explode(' ', $device[features]);
 $num_radios = $features[0];
 $mib_oids = array();
+=======
+
+$features = explode(' ', $device[features]);
+$num_radios = $features[0];
+
+$mib_oids = array();
+
+>>>>>>> 400d8ca205c5d285dc183a2e845597638ffc5fd1
 $radioNumber = 0;
 $ifIndex = 0;
 $ifIndex_array = array();
 $ifIndex_array = explode("\n", snmp_walk($device, "ifIndex", "-Oqv", "IF-MIB"));
+<<<<<<< HEAD
+=======
+
+>>>>>>> 400d8ca205c5d285dc183a2e845597638ffc5fd1
 $snmp_get_oids = "";
 foreach ($ifIndex_array as $ifIndex) {
     $snmp_get_oids .= "ifDescr.$ifIndex ifName.$ifIndex ";
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 400d8ca205c5d285dc183a2e845597638ffc5fd1
 $ifDescr_array = array();
 $ifDescr_array = snmp_get_multi($device, $snmp_get_oids, '-OQU', 'IF-MIB');
 d_echo($ifDescr_array);
@@ -20,6 +37,10 @@ foreach ($ifIndex_array as $ifIndex) {
     $ifName = $ifDescr_array[$ifIndex]['IF-MIB::ifName'];
     if (stristr($ifDescr, "Radio")) {
         $radioNumber = $radioNumber+1;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 400d8ca205c5d285dc183a2e845597638ffc5fd1
         $mib_oids["fibeAir4800OduAirRxPower.$ifIndex"] = array(
             "",
             "radio".$radioNumber."RxLevel",
@@ -86,5 +107,9 @@ if ($num_radios > 1) {
 /*        "ceragon_RxBitrate",*/
     );
 }
+<<<<<<< HEAD
 poll_mib_def($device, " CERAGON-NET-MIB-FIBEAIR-4800:ceragon-radio", "ceragon", $mib_oids, $mib_graphs, $graphs);
+=======
+poll_mib_def($device, "CeragonNet:ceragon-radio", "ceragon", $mib_oids, $mib_graphs, $graphs);
+>>>>>>> 400d8ca205c5d285dc183a2e845597638ffc5fd1
 unset($feature, $num_radios, $radioNumber, $ifIndex, $ifIndex_array, $ifName, $ifDescr,  $mib_graphs, $mib_oids, $snmp_get_oids);
