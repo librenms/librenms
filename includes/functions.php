@@ -440,7 +440,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         $snmpvers = array($snmp_version);
     }
 
-    $host_unreachable_exception = new HostUnreachableException("Could not connect, please check the snmp details and snmp reachability");
+    $host_unreachable_exception = new HostUnreachableException("Could not connect to $host, please check the snmp details and snmp reachability");
     // try different snmp variables to add the device
     foreach ($snmpvers as $snmpver) {
         if ($snmpver === "v3") {
