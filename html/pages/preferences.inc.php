@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Authentication\TwoFactor;
+
 $no_refresh = true;
 
 $pagetitle[] = 'Preferences';
@@ -73,11 +75,10 @@ if ($_SESSION['userlevel'] == 11) {
 
     if ($config['twofactor'] === true) {
         if ($_POST['twofactorremove'] == 1) {
-            include_once $config['install_dir'].'/html/includes/authentication/twofactor.lib.php';
             if (!isset($_POST['twofactor'])) {
                 echo '<div class="well"><form class="form-horizontal" role="form" action="" method="post" name="twofactorform">';
                 echo '<input type="hidden" name="twofactorremove" value="1" />';
-                echo twofactor_form(false);
+                echo TwoFactor::getForm(false);
                 echo '</form></div>';
             } else {
                 $twofactor = get_user_pref('twofactor');
@@ -85,7 +86,7 @@ if ($_SESSION['userlevel'] == 11) {
                     echo '<div class="alert alert-danger">Error: How did you even get here?!</div><script>window.location = "preferences/";</script>';
                 }
 
-                if (verify_hotp($twofactor['key'], $_POST['twofactor'], $twofactor['counter'])) {
+                if (TwoFactor::verifyHOTP($twofactor['key'], $_POST['twofactor'], $twofactor['counter'])) {
                     if (!set_user_pref('twofactor', array())) {
                         echo '<div class="alert alert-danger">Error while disabling TwoFactor.</div>';
                     } else {
@@ -134,10 +135,9 @@ if ($_SESSION['userlevel'] == 11) {
 </form>';
             } else {
                 if (isset($_POST['gentwofactorkey']) && isset($_POST['twofactortype'])) {
-                    include_once $config['install_dir'].'/html/includes/authentication/twofactor.lib.php';
                     $chk = get_user_pref('twofactor');
                     if (empty($chk)) {
-                        $twofactor = array('key' => twofactor_genkey());
+                        $twofactor = array('key' => TwoFactor::genKey());
                         if ($_POST['twofactortype'] == 'counter') {
                             $twofactor['counter'] = 1;
                         } else {
