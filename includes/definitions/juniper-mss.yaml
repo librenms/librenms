@@ -2,6 +2,8 @@ os: juniper-mss
 text: 'Juniper MSS'
 type: appliance
 icon: junos
+mib_dir:
+    - juniper
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:
