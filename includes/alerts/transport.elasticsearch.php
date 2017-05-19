@@ -148,7 +148,7 @@ if( !empty( $obj['faults'] ) ) {
     $curl = curl_init();
     $alert_message = json_encode($data);
     curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-	'Content-Type: application/json')
+        'Content-Type: application/json')
     );
     if ($opts['es_proxy'] === true) {
         set_curl_proxy($curl);
