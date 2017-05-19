@@ -54,6 +54,12 @@ case 1:
 case 2:
     $state = "acknowledged";
     break;
+case 3:
+    $state = "worse";
+    break;
+case 4:
+    $state = "better";
+    break;
 }
 
 $data = array(
