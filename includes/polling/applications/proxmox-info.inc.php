@@ -60,12 +60,11 @@ if ($proxmox) {
             list($vmid, $vmstatus, $vmdesc, $vmtype, $vmcpus, $vmuptime, $vmpid, $vmmem, $vmmaxmem, $vmdisk, $vmmaxdisk) = explode(' ', $vm, 11);
             print "Proxmox ($pmxcluster): $vmdesc: $vmstatus/$vmmem/$vmcpu/$vmstorage\n";
 
-            foreach ($vmsInDatabase as $key => $vmInDB)
-            {
-               if ($vmInDB['vmid'] == $vmid) {
- print "UNSET KEY: $key";
-                  unset($vmsInDatabase[$key]);
-               }
+            foreach ($vmsInDatabase as $key => $vmInDB) {
+                if ($vmInDB['vmid'] == $vmid) {
+                    print "UNSET KEY: $key";
+                    unset($vmsInDatabase[$key]);
+                }
             }
 
             //$tags = compact('name', 'app_id', 'pmxcluster', 'vmid', 'vmport', 'rrd_proxmox_name', 'rrd_def');
@@ -99,7 +98,10 @@ if ($proxmox) {
                     'vmmaxdisk' => $vmmaxdisk,
                     'vmmemuse' => $vmmemuse,
                     'vmdiskuse' => $vmdiskuse,
-                    ), "proxmox", '`vmid` = ? AND `cluster` = ?', array($vmid, $pmxcluster)
+                    ),
+                    "proxmox",
+                    '`vmid` = ? AND `cluster` = ?',
+                    array($vmid, $pmxcluster)
                 );
             } else {
                 $pmxcache[$pmxcluster][$vmid] = dbInsert(
@@ -119,19 +121,18 @@ if ($proxmox) {
                     'vmmaxdisk' => $vmmaxdisk,
                     'vmmemuse' => $vmmemuse,
                     'vmdiskuse' => $vmdiskuse,
-                    ), "proxmox"
+                    ),
+                    "proxmox"
                 );
             }
         }
-print_r($vmsInDatabase);
+        print_r($vmsInDatabase);
         if (count($vmsInDatabase) > 0) {
-           foreach ($vmsInDatabase as $key => $vmInDB)
-            {
-               print "DELETE KEY: $key";
-               dbDelete('proxmox', 'vmid = ?', array($vmInDB['vmid']));
+            foreach ($vmsInDatabase as $key => $vmInDB) {
+                print "DELETE KEY: $key";
+                dbDelete('proxmox', 'vmid = ?', array($vmInDB['vmid']));
             }
         }
-
     }
 }
 
