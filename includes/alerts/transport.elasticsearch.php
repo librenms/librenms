@@ -90,7 +90,7 @@ if( !empty( $obj['faults'] ) ) {
                 $data['entity_type'] = 'port';
                 $data['entity_id'] = $v['port_id'];
                 $data['entity_name'] = $v['ifName'];
-                $data['entity_descr'] = $v['ifDescr'];
+                $data['entity_descr'] = $v['ifAlias'];
                 break;
             case (array_key_exists('sensor_id', $v)):
                 $data['entity_type'] = 'sensor';
