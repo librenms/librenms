@@ -2,15 +2,16 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-echo ' bind ';
+$name = 'bind';
+$app_id = $app['app_id'];
+
+echo " $name";
 
 if (!empty($agent_data['app'][$name])) {
     $bind = $agent_data['app'][$name];
 } else {
-    $name = 'bind';
-    $app_id = $app['app_id'];
     $options = '-O qv';
-    $mib          = 'NET-SNMP-EXTEND-MIB';
+    $mib     = 'NET-SNMP-EXTEND-MIB';
     $oid     = 'nsExtendOutputFull.4.98.105.110.100';
     $bind    = snmp_get($device, $oid, $options, $mib);
 }
