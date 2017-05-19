@@ -1,5 +1,64 @@
 [
   {
+    "rule": "%macros.device_down = \"1\"",
+    "name": "Devices up/down",
+    "default": true
+  },
+  {
+    "rule": "%devices.uptime < \"300\" && %macros.device = \"1\"",
+    "name": "Device rebooted",
+    "extra": "{\"count\": 1}",
+    "default": true
+  },
+  {
+    "rule": "%bgpPeers.bgpPeerState != \"established\" && %macros.device_up = \"1\"",
+    "name": "BGP Session down",
+    "extra": "{\"count\": 1}",
+    "default": true
+  },
+  {
+    "rule": "%bgpPeers.bgpPeerFsmEstablishedTime < \"300\" && %bgpPeers.bgpPeerState = \"established\" && %macros.device_up = \"1\"",
+    "name": "BGP Session established",
+    "extra": "{\"count\": 1}",
+    "default": true
+  },
+  {
+    "rule": "%macros.port_down = \"1\"",
+    "name": "Port status up/down",
+    "extra": "{\"count\": 1}",
+    "default": true
+  },
+  {
+    "rule": "%macros.port_usage_perc >= \"80\" && %macros.port_up = \"1\" && %macros.port = \"1\"",
+    "name": "Port utilisation over threshold",
+    "default": true
+  },
+  {
+    "rule": "%sensors.sensor_current > %sensors.sensor_limit && %sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
+    "name": "Sensor over limit",
+    "default": true
+  },
+  {
+    "rule": "%sensors.sensor_current < %sensors.sensor_limit_low && %sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
+    "name": "Sensor under limit",
+    "default": true
+  },
+  {
+    "rule": "%services.service_status != \"0\" && %macros.device_up = \"1\"",
+    "name": "Service up/down",
+    "default": true
+  },
+  {
+    "rule": "%wireless_sensors.sensor_current >= %wireless_sensors.sensor_limit && %wireless_sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
+    "name": "Wireless Sensor over limit",
+    "default": true
+  },
+  {
+    "rule": "%wireless_sensors.sensor_current <= %wireless_sensors.sensor_limit_low && %wireless_sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
+    "name": "Wireless Sensor under limit",
+    "default": true
+  },
+  {
     "rule": "%macros.bill_quota_over_quota >= \"75\"",
     "name": "Quota bills over 75% used"
   },
@@ -38,5 +97,9 @@
   {
     "rule": "%eventlog.type = \"discovery\" && %eventlog.message ~ \"@autodiscovered@\" && %eventlog.datetime >= %macros.past_60m",
     "name": "Device discovered within the last 60 minutes"
+  },
+  {
+    "rule": "%wireless_sensors.sensor_class = 'clients' && %wireless_sensors.sensor_current >= %wireless_sensors.sensor_limit && %wireless_sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
+    "name": "Too many wireless clients"
   }
 ]

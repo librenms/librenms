@@ -14,7 +14,7 @@ if (isset($options['h']) || !isset($options['u'])) {
     exit;
 }
 
-$username = $options['u'];
+$test_username = $options['u'];
 
 if (isset($options['d'])) {
     $debug = true;
@@ -25,7 +25,7 @@ if (isset($options['v'])) {
     $config['auth_ad_debug'] = 1; // active_directory
 }
 
-$init_modules = array('auth');
+$init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 echo "Authentication Method: {$config['auth_mechanism']}\n";
@@ -69,7 +69,7 @@ $auth = false;
 if (isset($options['r'])) {
     echo "Reauthenticate Test\n";
 
-    $session = dbFetchRow('SELECT * FROM `session` WHERE `session_username`=? ORDER BY `session_id` DESC LIMIT 1', array($username));
+    $session = dbFetchRow('SELECT * FROM `session` WHERE `session_username`=? ORDER BY `session_id` DESC LIMIT 1', array($test_username));
     d_echo($session);
     if (empty($session)) {
         print_error('Requires previous login with \'Remember me\' box checked on the webui');
@@ -88,13 +88,13 @@ if (isset($options['r'])) {
 } else {
     echo 'Password: ';
     `stty -echo`;
-    $password = trim(fgets(STDIN));
+    $test_password = trim(fgets(STDIN));
     `stty echo`;
     echo PHP_EOL;
 
-    echo "Authenticate user $username: \n";
-    $auth = authenticate($username, $password);
-    unset($password);
+    echo "Authenticate user $test_username: \n";
+    $auth = authenticate($test_username, $test_password);
+    unset($test_password);
 
     if ($auth) {
         print_message("AUTH SUCCESS\n");
@@ -107,7 +107,7 @@ if (isset($options['r'])) {
 }
 
 if ($auth) {
-    $user_id = get_userid($username);
+    $user_id = get_userid($test_username);
 
     echo "User:\n";
     if (function_exists('get_user')) {

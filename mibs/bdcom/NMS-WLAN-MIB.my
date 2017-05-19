@@ -1,0 +1,131 @@
+-- *****************************************************************
+-- NMS-WLAN-MIB.my: NMS WLAN MIB
+--
+-- March 2010
+-- Edit by LIUQIANG
+-- Copyright (c) 2010 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+
+NMS-WLAN-MIB DEFINITIONS ::= BEGIN 
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+                                                FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                          FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP             FROM SNMPv2-CONF
+    ifIndex                            FROM RFC1213-MIB
+    nmsMgmt                             FROM NMS-SMI;
+
+--definition of NMS device card related operations and trap related values
+
+               	wlan         OBJECT IDENTIFIER ::= { nmsMgmt 352 }
+
+               nmsDot11Table OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSDot11Entry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS dot11 table."
+                   ::= { wlan 1 }
+        
+               nmsDot11Entry OBJECT-TYPE
+                   SYNTAX  NMSDot11Entry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS dot11 table entry."
+                   INDEX   { ifIndex }
+                   ::= { nmsDot11Table 1 }
+        
+               NMSDot11Entry ::=
+                   SEQUENCE {
+                       nmsDot11DesiredSSID
+                           OCTET STRING,
+                       nmsDot11SSIDHide
+                           INTEGER
+                   }
+
+               
+                nmsDot11DesiredSSID OBJECT-TYPE
+                    SYNTAX  OCTET STRING
+                    ACCESS  read-write
+                    STATUS  mandatory
+                    DESCRIPTION
+                            "NMS dot11 desired SSID."
+                    ::= { nmsDot11Entry 1 }
+
+               nmsDot11SSIDHide OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                              disable(0),
+                              enable(1)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS dot11 SSID hide status."
+                   ::= { nmsDot11Entry 2 }
+               
+               nmsDot11RadioTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSDot11RadioEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS dot11 radio table."
+                   ::= { wlan 2 }
+        
+               nmsDot11RadioEntry OBJECT-TYPE
+                   SYNTAX  NMSDot11RadioEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS dot11 radio table entry."
+                   INDEX   { nmsDot11RadioIndex }
+                   ::= { nmsDot11RadioTable 1 }
+        
+               NMSDot11RadioEntry ::=
+                   SEQUENCE {
+                       nmsDot11RadioIndex
+                           INTEGER,
+                       nmsDot11RadioEnabled
+                           INTEGER,
+                       nmsDot11RadioMode
+                           INTEGER
+                   }
+
+                nmsDot11RadioIndex OBJECT-TYPE
+                    SYNTAX  INTEGER
+                    ACCESS  read-only
+                    STATUS  mandatory
+                    DESCRIPTION
+                            "A unique value for each dot11 radio table entry."
+                    ::= { nmsDot11RadioEntry 1 }
+               
+                nmsDot11RadioEnabled OBJECT-TYPE
+                    SYNTAX  INTEGER{
+                                    enable(0),
+                                    disable(1)
+                                    }
+                    ACCESS  read-write
+                    STATUS  mandatory
+                    DESCRIPTION
+                            "dot11 radio enable status. 0-enable,1-disable."
+                    ::= { nmsDot11RadioEntry 2 }
+               
+                nmsDot11RadioMode OBJECT-TYPE
+                    SYNTAX  INTEGER{
+                                    a(0),
+                                    b(1),
+                                    g(2),
+                                    bg(3)
+                                    }
+                    ACCESS  read-write
+                    STATUS  mandatory
+                    DESCRIPTION
+                            "dot11 radio mode. 0-a ,1-b, 2-g, 3-bg."
+                    ::= { nmsDot11RadioEntry 3 }
+               
+               
+END               
+               

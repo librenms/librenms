@@ -39,6 +39,34 @@ class DBSetupTest extends DBTestCase
         }
     }
 
+    public function testSchemaFiles()
+    {
+        global $config;
+        $files = glob($config['install_dir'].'/sql-schema/*.sql');
+
+        foreach ($files as $file) {
+            $content = file_get_contents($file);
+
+            foreach (explode("\n", $content) as $line) {
+                // skip comments and empty lines
+                if (empty($line) || starts_with($line, array('#', '--'))) {
+                    continue;
+                }
+
+                // each line must end with ;, prevents multiline and makes sql easy to run by hand
+                // Warning may include whitespace such as space and \r
+                if (!ends_with($line, ';')) {
+                    throw new PHPUnitException("Each line must end with a semicolin (;)\n$file: $line");
+                }
+
+                // cannot assume user use the librenms database name
+                if (str_contains($line, 'librenms')) {
+                    throw new PHPUnitException("Do not include the database name in schema files\n$file: $line");
+                }
+            }
+        }
+    }
+
     public function testSchema()
     {
         $schema = get_db_schema();

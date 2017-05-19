@@ -59,20 +59,6 @@ $fields = array(
 $tags = compact('rrd_def');
 data_update($device, 'ciscowlc', $tags, $fields);
 
-// also save the info about how many clients in the same place as the wireless module
-$radio = 1;
-$rrd_name = 'wificlients-radio'.$radio;
-$rrd_def = RrdDefinition::make()->addDataset('wificlients', 'GAUGE', -273, 10000);
-
-$fields = array(
-    'wificlients' => $numClients
-);
-
-$tags = compact('radio', 'rrd_name', 'rrd_def');
-data_update($device, 'wificlients', $tags, $fields);
-
-$graphs['wifi_clients'] = true;
-
 
 $ap_db = dbFetchRows('SELECT * FROM `access_points` WHERE `device_id` = ?', array($device['device_id']));
 

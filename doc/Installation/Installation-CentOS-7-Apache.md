@@ -106,6 +106,13 @@ Add the following config:
     setsebool -P httpd_can_network_connect=1
 ```
 
+#### Allow access through firewall
+
+```bash
+firewall-cmd --zone public --add-service http
+firewall-cmd --permanent --zone public --add-service http
+```
+
 #### Restart Web server
 
 ```bash

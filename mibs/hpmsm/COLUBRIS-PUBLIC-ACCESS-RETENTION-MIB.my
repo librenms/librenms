@@ -1,0 +1,367 @@
+-- ****************************************************************************
+--  COLUBRIS-PUBLIC-ACCESS-RETENTION-MIB definitions
+--
+--  Copyright (c) 2004, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Networks Public Access Retention MIB file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-PUBLIC-ACCESS-RETENTION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    IpAddress, Integer32, Unsigned32, Counter32, Counter64
+        FROM    SNMPv2-SMI
+    DateAndTime
+        FROM    SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM    SNMPv2-CONF
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+    ColubrisSSIDOrNone
+        FROM    COLUBRIS-TC
+;
+
+colubrisPublicAccessRetentionMIB  MODULE-IDENTITY
+    LAST-UPDATED    "200410280000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris Networks Public Access MIB."
+
+    ::= { colubrisMgmtV2 15 }
+
+-- colubrisPublicAccessRetentionMIB definition
+colubrisPublicAccessRetentionMIBObjects OBJECT IDENTIFIER ::= { colubrisPublicAccessRetentionMIB 1 }
+
+-- public access retention groups
+publicAccessRetentionSessionsGroup      OBJECT IDENTIFIER ::= { colubrisPublicAccessRetentionMIBObjects 1 }
+publicAccessRetentionPeriodicStatsGroup OBJECT IDENTIFIER ::= { colubrisPublicAccessRetentionMIBObjects 2 }
+
+--              Public Access Retention Sessions Group
+
+publicAccessRetentionSessionsMaxCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The maximum number of entries inside the publicAccessRetentionSessionTable.
+                 The maximum value for this is 250% the maximum number of users configured inside the product."
+    DEFVAL      { 0 }
+    ::= {  publicAccessRetentionSessionsGroup 1 }
+
+publicAccessRetentionSessionsMaxTime OBJECT-TYPE
+    SYNTAX      Integer32 (300..1200)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The maximum number of seconds for an entry to remain in the table.  When expired the
+                 session's state changes to Unassigned."
+    DEFVAL      { 300 }
+    ::= {  publicAccessRetentionSessionsGroup 2 }
+
+-- public access retention user table
+publicAccessRetentionSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PublicAccessRetentionSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table containing information about existing or past authenticated
+                 user sessions."
+    ::= {  publicAccessRetentionSessionsGroup 3 }
+
+publicAccessRetentionSessionEntry OBJECT-TYPE
+    SYNTAX      PublicAccessRetentionSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Information about a particular authenticated user session.
+                 publicAccessRetentionSessionIndex - Uniquely identifies a session in the
+                                                     table."
+    INDEX       { publicAccessRetentionSessionIndex }
+    ::= { publicAccessRetentionSessionTable 1 }
+
+PublicAccessRetentionSessionEntry ::= SEQUENCE
+{
+    publicAccessRetentionSessionIndex                      Integer32,
+    publicAccessRetentionSessionState                      INTEGER,
+    publicAccessRetentionSessionUserName                   OCTET STRING,
+    publicAccessRetentionSessionStartTime                  DateAndTime,
+    publicAccessRetentionSessionDuration                   Counter32,
+    publicAccessRetentionSessionStationIpAddress           IpAddress,
+    publicAccessRetentionSessionPacketsSent                Counter32,
+    publicAccessRetentionSessionPacketsReceived            Counter32,
+    publicAccessRetentionSessionBytesSent                  Counter64,
+    publicAccessRetentionSessionBytesReceived              Counter64,
+    publicAccessRetentionSessionSSID                       ColubrisSSIDOrNone
+}
+
+publicAccessRetentionSessionIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Index of a session in the publicAccessRetentionSessionTable."
+    ::= { publicAccessRetentionSessionEntry 1 }
+
+publicAccessRetentionSessionState OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    unassigned(0),
+                    connected(2),
+                    reconnecting(3),
+                    disconnecting(4),
+                    disconnected(5),
+                    disconnectingAdministrative(6),
+                    disconnectedAdministrative(7)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the current state of the user's session."
+    ::= { publicAccessRetentionSessionEntry 2 }
+
+publicAccessRetentionSessionUserName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..253))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the last user's name used for RADIUS authentication."
+    ::= { publicAccessRetentionSessionEntry 3 }
+
+publicAccessRetentionSessionStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates when this user session was started."
+    ::= { publicAccessRetentionSessionEntry 4 }
+
+publicAccessRetentionSessionDuration OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates how long the user's session has been active.
+                 When this counter reaches its maximum value, it wraps
+                 around and starts increasing again from zero."
+    ::= { publicAccessRetentionSessionEntry 5 }
+
+publicAccessRetentionSessionStationIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the user's IP address."
+    ::= { publicAccessRetentionSessionEntry 6 }
+
+publicAccessRetentionSessionPacketsSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the total number of IP packets sent by the user.
+                 When this counter reaches its maximum value, it wraps
+                 around and starts increasing again from zero."
+    ::= { publicAccessRetentionSessionEntry 7 }
+
+publicAccessRetentionSessionPacketsReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the total number of IP packets received by the user.
+                 When this counter reaches its maximum value, it wraps
+                 around and starts increasing again from zero."
+    ::= { publicAccessRetentionSessionEntry 8 }
+
+publicAccessRetentionSessionBytesSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the total number of bytes sent by the user.
+                 When this counter reaches its maximum value, it wraps
+                 around and starts increasing again from zero."
+    ::= { publicAccessRetentionSessionEntry 9 }
+
+publicAccessRetentionSessionBytesReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the total number of bytes received by the user.
+                 When this counter reaches its maximum value, it wraps
+                 around and starts increasing again from zero."
+    ::= { publicAccessRetentionSessionEntry 10 }
+
+publicAccessRetentionSessionSSID OBJECT-TYPE
+    SYNTAX      ColubrisSSIDOrNone
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the user's Access Point SSID (ONLY when
+                 Location-aware is enabled and properly configured).
+                 If this information is not available, a zero-length
+                 string will be returned."
+    ::= { publicAccessRetentionSessionEntry 11 }
+
+--              Public Access Retention Periodic Stats Group
+
+publicAccessRetentionPeriodicStatsMaxCount OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the maximum number of periods to keep inside the table."
+    DEFVAL      { 0 }
+    ::= { publicAccessRetentionPeriodicStatsGroup 1 }
+
+publicAccessRetentionPeriodicStatsDuration OBJECT-TYPE
+    SYNTAX      Integer32 (300..1200)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the amount of time for a period of an entry inside the table.
+                 Changing the value will erase the table contents."
+    DEFVAL      { 300 }
+    ::= { publicAccessRetentionPeriodicStatsGroup 2 }
+
+-- public access retention authentication table
+publicAccessRetentionPeriodTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PublicAccessRetentionPeriodEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table containing statistics information about number of
+                 authentication user's sessions pending and terminated."
+    ::= {  publicAccessRetentionPeriodicStatsGroup 3 }
+
+publicAccessRetentionPeriodEntry OBJECT-TYPE
+    SYNTAX      PublicAccessRetentionPeriodEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Statistics information about the number of authenticated user sessions
+                 in a given period of time."
+    INDEX       { publicAccessRetentionPeriodIndex }
+    ::= { publicAccessRetentionPeriodTable 1 }
+
+PublicAccessRetentionPeriodEntry ::= SEQUENCE
+{
+    publicAccessRetentionPeriodIndex                   Integer32,
+    publicAccessRetentionPeriodStartTime               DateAndTime,
+    publicAccessRetentionPeriodStopTime                DateAndTime,
+    publicAccessRetentionPeriodHighestSessionCount     Counter32,
+    publicAccessRetentionPeriodTotalSessionCount       Counter32
+}
+
+publicAccessRetentionPeriodIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..9999)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Index of a statistics period."
+    ::= {  publicAccessRetentionPeriodEntry 1 }
+
+publicAccessRetentionPeriodStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the start time for the statistical period.
+                 If zero, then the period doesn't contains valid information."
+    ::= {  publicAccessRetentionPeriodEntry 2 }
+
+publicAccessRetentionPeriodStopTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the stop time for the statistical period.
+                 If zero, the period is not terminated yet."
+    ::= {  publicAccessRetentionPeriodEntry 3 }
+
+publicAccessRetentionPeriodHighestSessionCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the highest number of simultaneous authenticated user sessions within
+                 this time period."
+    ::= {  publicAccessRetentionPeriodEntry 4 }
+
+publicAccessRetentionPeriodTotalSessionCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the total number of authenticated user's session within this time period."
+    ::= {  publicAccessRetentionPeriodEntry 5 }
+
+-- public access retention notifications
+publicAccessRetentionMIBNotificationPrefix OBJECT IDENTIFIER ::= { colubrisPublicAccessRetentionMIB 2 }
+publicAccessRetentionMIBNotifications OBJECT IDENTIFIER ::= { publicAccessRetentionMIBNotificationPrefix 0 }
+
+publicAccessRetentionSessionMaxCountReachedTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    publicAccessRetentionSessionsMaxCount,
+                    publicAccessRetentionSessionsMaxTime
+                }
+    STATUS      current
+    DESCRIPTION "This notification is sent whenever the number of session exceed the
+                 value of publicAccessRetentionSessionsMaxCount."
+    ::= { publicAccessRetentionMIBNotifications 1 }
+
+-- conformance information
+colubrisPublicAccessRetentionMIBConformance OBJECT IDENTIFIER ::= { colubrisPublicAccessRetentionMIB 3 }
+colubrisPublicAccessRetentionMIBCompliances OBJECT IDENTIFIER ::= { colubrisPublicAccessRetentionMIBConformance 1 }
+colubrisPublicAccessRetentionMIBGroups      OBJECT IDENTIFIER ::= { colubrisPublicAccessRetentionMIBConformance 2 }
+
+-- compliance statements
+colubrisPublicAccessRetentionMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for entities which implement
+                 the Colubris Public Access Retention MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisPublicAccessRetentionSessionsMIBGroup,
+                        colubrisPublicAccessRetentionPeriodicStatsMIBGroup,
+                        colubrisPublicAccessRetentionNotificationGroup
+                    }
+    ::= { colubrisPublicAccessRetentionMIBCompliances 1 }
+
+-- units of conformance
+colubrisPublicAccessRetentionSessionsMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    publicAccessRetentionSessionsMaxCount,
+                    publicAccessRetentionSessionsMaxTime,
+                    publicAccessRetentionSessionState,
+                    publicAccessRetentionSessionUserName,
+                    publicAccessRetentionSessionStartTime,
+                    publicAccessRetentionSessionDuration,
+                    publicAccessRetentionSessionStationIpAddress,
+                    publicAccessRetentionSessionPacketsSent,
+                    publicAccessRetentionSessionPacketsReceived,
+                    publicAccessRetentionSessionBytesSent,
+                    publicAccessRetentionSessionBytesReceived,
+                    publicAccessRetentionSessionSSID
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing the Public Access Retention Sessions MIB
+                 capability."
+    ::= { colubrisPublicAccessRetentionMIBGroups 1 }
+
+-- units of conformance
+colubrisPublicAccessRetentionPeriodicStatsMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    publicAccessRetentionPeriodicStatsDuration,
+                    publicAccessRetentionPeriodicStatsMaxCount,
+                    publicAccessRetentionPeriodStartTime,
+                    publicAccessRetentionPeriodStopTime,
+                    publicAccessRetentionPeriodHighestSessionCount,
+                    publicAccessRetentionPeriodTotalSessionCount
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing the Public Access Retention PeriodicStats MIB
+                 capability."
+    ::= { colubrisPublicAccessRetentionMIBGroups 2 }
+
+-- units of conformance
+colubrisPublicAccessRetentionNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        publicAccessRetentionSessionMaxCountReachedTrap
+                    }
+    STATUS      current
+    DESCRIPTION "A collection of supported notifications."
+    ::= { colubrisPublicAccessRetentionMIBGroups 3 }
+
+END

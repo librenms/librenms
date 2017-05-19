@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Yaml\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Parser;
 
-class ParserTest extends \PHPUnit_Framework_TestCase
+class ParserTest extends TestCase
 {
+    /** @var Parser */
     protected $parser;
 
     protected function setUp()
@@ -188,6 +190,22 @@ EOF;
             'bar' => "one\ntwo\n",
         );
         $tests['Literal block chomping clip with multiple trailing newlines'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo:
+- bar: |
+    one
+
+    two
+EOF;
+        $expected = array(
+            'foo' => array(
+                array(
+                    'bar' => "one\n\ntwo",
+                ),
+            ),
+        );
+        $tests['Literal block chomping clip with embedded blank line inside unindented collection'] = array($expected, $yaml);
 
         $yaml = <<<'EOF'
 foo: |
@@ -1140,10 +1158,12 @@ EOT
      */
     public function testParserThrowsExceptionWithCorrectLineNumber($lineNumber, $yaml)
     {
-        $this->setExpectedException(
-            '\Symfony\Component\Yaml\Exception\ParseException',
-            sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber)
-        );
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('\Symfony\Component\Yaml\Exception\ParseException');
+            $this->expectExceptionMessage(sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber));
+        } else {
+            $this->setExpectedException('\Symfony\Component\Yaml\Exception\ParseException', sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber));
+        }
 
         $this->parser->parse($yaml);
     }
@@ -1199,6 +1219,38 @@ bar:
 YAML
             ),
         );
+    }
+
+    public function testCanParseVeryLongValue()
+    {
+        $longStringWithSpaces = str_repeat('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx ', 20000);
+        $trickyVal = array('x' => $longStringWithSpaces);
+
+        $yamlString = Yaml::dump($trickyVal);
+        $arrayFromYaml = $this->parser->parse($yamlString);
+
+        $this->assertEquals($trickyVal, $arrayFromYaml);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Reference "foo" does not exist at line 2
+     */
+    public function testParserCleansUpReferencesBetweenRuns()
+    {
+        $yaml = <<<YAML
+foo: &foo
+    baz: foobar
+bar:
+    <<: *foo
+YAML;
+        $this->parser->parse($yaml);
+
+        $yaml = <<<YAML
+bar:
+    <<: *foo
+YAML;
+        $this->parser->parse($yaml);
     }
 }
 

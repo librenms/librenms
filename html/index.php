@@ -57,7 +57,7 @@ $msg_box = array();
 // Check for install.inc.php
 if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php') {
     // no config.php does so let's redirect to the install
-    header('Location: install.php');
+    header("Location: {$config['base_url']}/install.php");
     exit;
 }
 
@@ -84,14 +84,10 @@ if (strstr($_SERVER['REQUEST_URI'], 'widescreen=no')) {
 
 # Load the settings for Multi-Tenancy.
 if (isset($config['branding']) && is_array($config['branding'])) {
-    if ($config['branding'][$_SERVER['SERVER_NAME']]) {
-        foreach ($config['branding'][$_SERVER['SERVER_NAME']] as $confitem => $confval) {
-            eval("\$config['" . $confitem . "'] = \$confval;");
-        }
+    if (isset($config['branding'][$_SERVER['SERVER_NAME']])) {
+        $config = array_replace_recursive($config, $config['branding'][$_SERVER['SERVER_NAME']]);
     } else {
-        foreach ($config['branding']['default'] as $confitem => $confval) {
-            eval("\$config['" . $confitem . "'] = \$confval;");
-        }
+        $config = array_replace_recursive($config, $config['branding']['default']);
     }
 }
 
@@ -308,7 +304,7 @@ echo('<h5>Powered by <a href="' . $config['project_home'] . '" target="_blank" r
 <?php
 }
 
-if (dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` <= DATE_ADD(NOW(), INTERVAL - 15 minute) AND `ignore` = 0 AND `disabled` = 0 AND status = 1", array()) > 0) {
+if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_polled` <= DATE_ADD(NOW(), INTERVAL - 15 minute) AND `ignore` = 0 AND `disabled` = 0 AND status = 1", array()) > 0) {
     $msg_box[] = array('type' => 'warning', 'message' => "<a href=\"poll-log/filter=unpolled/\">It appears as though you have some devices that haven't completed polling within the last 15 minutes, you may want to check that out :)</a>",'title' => 'Devices unpolled');
 }
 

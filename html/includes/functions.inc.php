@@ -264,7 +264,7 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
         $text = $device['hostname'];
     }
 
-    $text = ip_to_sysname($device, $text);
+    $text = format_hostname($device, $text);
 
     if (isset($config['os'][$device['os']]['over'])) {
         $graphs = $config['os'][$device['os']]['over'];
@@ -1603,4 +1603,28 @@ function get_dashboards($user_id = null)
     }
 
     return $result;
+}
+
+/**
+ * Generate javascript to fill in a select box from an ajax list
+ *
+ * @param string $list_type type of list look in html/includes/list/
+ * @param string $selector jquery selector for the target select element
+ * @param int $selected the id of the item to mark as selected
+ * @return string the javascript (not including <script> tags)
+ */
+function generate_fill_select_js($list_type, $selector, $selected = null)
+{
+    return '$(document).ready(function() {
+    $select = $("' . $selector . '")
+    $.getJSON(\'ajax_list.php?id=' . $list_type . '\', function(data){
+        $.each(data, function(index,item) {
+            if (item.id == "' . $selected . '") {
+                $select.append("<option value=" + item.id + " selected>" + item.value + "</option>");
+            } else {
+                $select.append("<option value=" + item.id + ">" + item.value + "</option>");
+            }
+        });
+    });
+});';
 }

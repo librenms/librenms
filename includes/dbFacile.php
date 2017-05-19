@@ -560,3 +560,15 @@ function dbRollbackTransaction()
     global $database_link;
     mysqli_query($database_link, 'rollback');
 }//end dbRollbackTransaction()
+
+/**
+ * Generate a string of placeholders to pass to fill in a list
+ * result will look like this: (?, ?, ?, ?)
+ *
+ * @param $count
+ * @return string placholder list
+ */
+function dbGenPlaceholders($count)
+{
+    return '(' . implode(',', array_fill(0, $count, '?')) . ')';
+}

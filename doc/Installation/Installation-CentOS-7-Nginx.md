@@ -131,6 +131,13 @@ server {
     setsebool -P httpd_can_sendmail=1
 ```
 
+#### Allow access through firewall
+
+```bash
+firewall-cmd --zone public --add-service http
+firewall-cmd --permanent --zone public --add-service http
+```
+
 #### Restart Web server
 
 ```bash

@@ -1,33 +1,35 @@
 <?php
 
 use Dapphp\Radius\Radius;
+use LibreNMS\Exceptions\AuthenticationException;
 use Phpass\PasswordHash;
 
+/** @var Radius $radius */
 $radius = new Radius($config['radius']['hostname'], $config['radius']['secret'], $config['radius']['suffix'], $config['radius']['timeout'], $config['radius']['port']);
 
 function authenticate($username, $password)
 {
-    global $config, $radius, $debug;
+    global $radius, $debug;
 
     if (empty($username)) {
-        return 0;
-    } else {
-        if ($debug) {
-            $radius->SetDebugMode(true);
-        }
-        $rad = $radius->AccessRequest($username, $password);
-        if ($rad === true) {
-            adduser($username);
-            return 1;
-        } else {
-            return 0;
-        }
+        throw new AuthenticationException('Username is required');
     }
+
+    if ($debug) {
+        $radius->setDebug(true);
+    }
+
+    if ($radius->accessRequest($username, $password) === true) {
+        adduser($username, $password);
+        return true;
+    }
+
+    throw new AuthenticationException();
 }
 
 function reauthenticate($sess_id, $token)
 {
-    return 0;
+    return false;
 }
 
 
