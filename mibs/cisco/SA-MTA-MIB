@@ -1,0 +1,144 @@
+--**************************************************************************
+--                                                                          
+--    Copyright 2010 Scientific Atlanta, A Cisco Company                                   
+--    All Rights Reserved                                                   
+--    No portions of this material may be reproduced in any
+--    form without the written permission of:                                                
+--             Scientific Atlanta, A Cisco Company                                          
+--             5030 Sugarloaf Pkwy                                     
+--             Lawrenceville, Georgia 30044                                    
+--                                                                          
+--**************************************************************************
+
+SA-MTA-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        MODULE-IDENTITY, 
+        OBJECT-TYPE,
+        enterprises, 
+        Integer32,
+        Unsigned32
+                FROM SNMPv2-SMI
+        ifIndex
+                FROM IF-MIB
+        SnmpAdminString 
+                FROM SNMP-FRAMEWORK-MIB
+        TruthValue,
+        DateAndTime
+                FROM SNMPv2-TC ;
+                
+sa           OBJECT IDENTIFIER ::= { enterprises 1429 }
+saVoip       OBJECT IDENTIFIER ::= { sa 78 }
+
+saMta   MODULE-IDENTITY
+        LAST-UPDATED    "201611100000Z"
+        ORGANIZATION    "Cisco Inc."
+        CONTACT-INFO    "vveeraga@cisco.com"
+        DESCRIPTION
+            "saMtaDevLCSSignalingSupport controls the LCS Signaling."
+
+        -- History
+        REVISION "201611100000Z"
+        DESCRIPTION
+            "Initial release of reduced-set module for releases based on BFC 5.7.x."
+
+        ::= { saVoip 3 }
+        
+        
+-- MTA Device
+saMtaDevice   OBJECT IDENTIFIER ::=  { saMta 1 }
+saMtaDevOffHookWarnTOBusy OBJECT-TYPE
+    SYNTAX INTEGER {
+        disabled(0),
+        enabled(1)       
+        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object configures whether an endpoint should ring off-hook warning tone. 
+		 When this feature is disabled(0), Endpoint should ring off-hook warning tone.
+		 When this feature is enabled(1),  Endpoint should ring busy tone instead of off-hook warning tone.
+		 The default value of this object is disabled(0)."
+    DEFVAL { 0 }
+    ::= { saMtaDevice 61 }
+
+-- ==========================
+-- ENDPOINT TABLE STARTS HERE
+-- ==========================
+
+saMtaEndPointTable   OBJECT-TYPE
+    SYNTAX        SEQUENCE OF SaMtaEndPointEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+       "This table describes the MTA EndPoint
+        Volume configuration. "
+   ::=  { saMta 2 }
+
+saMtaEndPointEntry  OBJECT-TYPE
+    SYNTAX        SaMtaEndPointEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        " List of attributes for a single MTA endpoint interface."
+    INDEX { ifIndex }
+    ::= { saMtaEndPointTable 1 }
+
+SaMtaEndPointEntry  ::= SEQUENCE {
+    saMtaEndPntHookFlashMinTime         INTEGER,
+    saMtaEndPntHookFlashMaxTime         INTEGER,
+    saMtaEndPntStatePhysical            INTEGER,
+    saMtaEndPntStateLogical             INTEGER
+    }
+
+saMtaEndPntHookFlashMinTime OBJECT-TYPE
+    SYNTAX INTEGER (40..2000)
+    UNITS         "milliseconds"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Shortest onhook time at which hook-flash event will be detected, in miliseconds.
+         Breaks in loop current with shorter duration are assumed to be noise and are ignored."
+    ::= { saMtaEndPointEntry 1 }
+
+saMtaEndPntHookFlashMaxTime OBJECT-TYPE
+    SYNTAX INTEGER (100..2000)
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Longest onhook time at which hook-flash event will be detected, 
+         in miliseconds. If onhook time is longer then saMtaHookFlashMaxTime, 
+         hang up event will be detected."
+    ::= { saMtaEndPointEntry 2 }
+
+saMtaEndPntStatePhysical OBJECT-TYPE
+    SYNTAX INTEGER {
+        onHook(1),
+        offHook(2)
+    }
+    MAX-ACCESS 	  read-only
+    STATUS        current
+    DESCRIPTION	
+        "Returns the physical state of the end point. 
+         1: No phones attached or one or more phones are attached and 
+            on-hook 
+         2: One or more phones are attached and off-hook" 
+    ::= { saMtaEndPointEntry 6 }
+
+saMtaEndPntStateLogical  OBJECT-TYPE 
+    SYNTAX INTEGER { 
+        connectedIdle(1), 
+        disconnected(2),
+        inCallVoice(3),
+        inCallData(4)
+    } 
+    MAX-ACCESS read-only 
+    STATUS current 
+    DESCRIPTION 
+        "Returns the logical state of the end point. 
+         1: endpoint is connected to CMS and not in call
+         2: endpoint is not connected to CMS
+         3: endpoint is in voice mode call
+         4: endpoint is in data mode (fax/modem) call"
+    ::= {  saMtaEndPointEntry 7 } 
+END
