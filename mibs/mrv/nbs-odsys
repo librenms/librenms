@@ -1,0 +1,961 @@
+NBS-ODSYS-MIB   DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    nbs, NbsTcTemperature, NbsTcMilliVolt, NbsTcMilliAmp,
+    NbsTcStatusSimple, NbsTcStatusLevel, NbsTcPartIndex
+        FROM NBS-MIB
+    ;
+
+nbsOdsysMib  MODULE-IDENTITY
+    LAST-UPDATED "201308200000Z"  -- Aug 20, 2013
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+    DESCRIPTION
+      "For managing Opti-Driver systems."
+    ::= { nbs 228 }
+
+
+
+
+-- *******************************************************************
+-- Groups in NBS-ODSYS-MIB
+-- *******************************************************************
+
+nbsOdsysChasGrp
+ OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Chassis component overview"
+    ::= { nbsOdsysMib 2 }
+
+nbsOdsysCcGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Chassis control card information"
+    ::= { nbsOdsysMib 3 }
+
+nbsOdsysFtGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Chassis cooling system"
+    ::= { nbsOdsysMib 4 }
+
+nbsOdsysPsGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Chassis power supplies"
+    ::= { nbsOdsysMib 5 }
+
+
+nbsOdsysEventsGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       ""
+    ::= { nbsOdsysMib 100 }
+
+nbsOdsysEvents OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Event NOTIFICATIONS"
+    ::= { nbsOdsysEventsGrp 0 }
+
+
+
+
+-- ********************************************************************
+--
+-- Objects for the nbsOdsysChasGrp group
+--
+-- ********************************************************************
+
+nbsOdsysChasTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsOdsysChasEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       ""
+    ::= { nbsOdsysChasGrp 1 }
+
+nbsOdsysChasEntry      OBJECT-TYPE
+    SYNTAX      NbsOdsysChasEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Information about a particular OptiDriver chassis."
+    INDEX { nbsOdsysChasIndex }
+    ::= { nbsOdsysChasTable 1 }
+
+NbsOdsysChasEntry ::= SEQUENCE {
+    nbsOdsysChasIndex         INTEGER,
+    nbsOdsysChasCcMaxCount    INTEGER,
+    nbsOdsysChasPsMaxCount    INTEGER,
+    nbsOdsysChasFtMaxCount    INTEGER
+}
+
+nbsOdsysChasIndex        OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The nbsCmmcChassisIndex of this chassis"
+    ::= { nbsOdsysChasEntry 1 }
+
+nbsOdsysChasCcMaxCount        OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The maximum number of control cards that can be installed in this chassis"
+    ::= { nbsOdsysChasEntry 10 }
+
+nbsOdsysChasPsMaxCount        OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of power supply bays/slots in this chassis"
+    ::= { nbsOdsysChasEntry 20 }
+
+nbsOdsysChasFtMaxCount        OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of fan tray bays/slots in this chassis"
+    ::= { nbsOdsysChasEntry 30 }
+
+
+
+-- ********************************************************************
+--
+-- Objects for the nbsOdsysCcGrp group
+--
+-- ********************************************************************
+
+nbsOdsysCcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsOdsysCcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Information about OptiDriver chassis control/fpga cards"
+    ::= { nbsOdsysCcGrp 1 }
+
+nbsOdsysCcEntry      OBJECT-TYPE
+    SYNTAX      NbsOdsysCcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Status information for a particular control card slot/bay.
+        When a control card is present, it will also have entries
+        in nbsPartHardTable, nbsPartFirmTable, and nbsPartProgTable.
+
+        The events nbsOdsysTrapCcFailed, nbsOdsysTrapCcRestored,
+        nbsOdsysTrapCcRemoved and nbsOdsysTrapCcInserted indicate
+        changes in nbsOdsysCcOperationalStatus."
+    INDEX { nbsOdsysCcChasIndex, nbsOdsysCcBayIndex }
+    ::= { nbsOdsysCcTable 1 }
+
+NbsOdsysCcEntry ::= SEQUENCE {
+    nbsOdsysCcChasIndex         INTEGER,
+    nbsOdsysCcBayIndex          INTEGER,
+    nbsOdsysCcChIfIndex         InterfaceIndex,
+    nbsOdsysCcPartIndex         NbsTcPartIndex,
+    nbsOdsysCcThermActual       NbsTcTemperature,
+    nbsOdsysCcThermLevel        NbsTcStatusLevel,
+    nbsOdsysCcThermThreshLoErr  NbsTcTemperature,
+    nbsOdsysCcThermThreshLoWarn NbsTcTemperature,
+    nbsOdsysCcThermThreshHiWarn NbsTcTemperature,
+    nbsOdsysCcThermThreshHiErr  NbsTcTemperature,
+    nbsOdsysCcOperationalStatus NbsTcStatusSimple
+}
+
+nbsOdsysCcChasIndex        OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The nbsCmmcChassisIndex of this control card's chassis"
+    ::= { nbsOdsysCcEntry 1 }
+
+nbsOdsysCcBayIndex        OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The control card slot/bay #"
+    ::= { nbsOdsysCcEntry 2 }
+
+nbsOdsysCcChIfIndex    OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The nbsPartHardIfIndex of this Cc daughtercard's chassis"
+    ::= { nbsOdsysCcEntry 10 }
+
+nbsOdsysCcPartIndex    OBJECT-TYPE
+    SYNTAX      NbsTcPartIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The nbsPartHardPartIndex of this Cc daughtercard"
+    ::= { nbsOdsysCcEntry 11 }
+
+nbsOdsysCcThermActual   OBJECT-TYPE
+    SYNTAX      NbsTcTemperature
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the current temperature reading,
+        in degrees celsius"
+    ::= { nbsOdsysCcEntry 30}
+
+nbsOdsysCcThermLevel   OBJECT-TYPE
+    SYNTAX      NbsTcStatusLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates level of current temperature reading with respect
+        to the CcTherm threshold objects below"
+    ::= { nbsOdsysCcEntry 40 }
+
+nbsOdsysCcThermThreshLoErr   OBJECT-TYPE
+    SYNTAX      NbsTcTemperature
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the minimum functional operating temperature,
+        in degrees celsius"
+    ::= { nbsOdsysCcEntry 41 }
+
+nbsOdsysCcThermThreshLoWarn   OBJECT-TYPE
+    SYNTAX      NbsTcTemperature
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the minimum safe operating temperature,
+        in degrees celsius"
+    ::= { nbsOdsysCcEntry 42 }
+
+nbsOdsysCcThermThreshHiWarn   OBJECT-TYPE
+    SYNTAX      NbsTcTemperature
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the maximum safe operating temperature,
+        in degrees celsius"
+    ::= { nbsOdsysCcEntry 43 }
+
+nbsOdsysCcThermThreshHiErr   OBJECT-TYPE
+    SYNTAX      NbsTcTemperature
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the maximum functional operating temperature,
+        in degrees celsius"
+    ::= { nbsOdsysCcEntry 44 }
+
+nbsOdsysCcOperationalStatus   OBJECT-TYPE
+    SYNTAX      NbsTcStatusSimple
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Operational status of this daughtercard"
+    ::= { nbsOdsysCcEntry 50 }
+
+
+
+-- ********************************************************************
+--
+-- Objects for the nbsOdsysFtGrp group
+--
+-- ********************************************************************
+
+nbsOdsysFtTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsOdsysFtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       ""
+    ::= { nbsOdsysFtGrp 1 }
+
+nbsOdsysFtEntry      OBJECT-TYPE
+    SYNTAX      NbsOdsysFtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A particular chassis cooling assembly slot/bay.
+
+        Each installed fan tray also has entries in nbsPartHardTable.
+
+        The events nbsCmmcTrapFanFailure, nbsCmmcTrapFanRestored,
+        nbsCmmcTrapFanRemoved and nbsCmmcTrapFanInserted indicate
+        changes in nbsOdsysFtOperationalStatus."
+    INDEX { nbsOdsysFtChasIndex, nbsOdsysFtBayIndex }
+    ::= { nbsOdsysFtTable 1 }
+
+NbsOdsysFtEntry ::= SEQUENCE {
+    nbsOdsysFtChasIndex         INTEGER,
+    nbsOdsysFtBayIndex          INTEGER,
+    nbsOdsysFtOperationalStatus NbsTcStatusSimple,
+    nbsOdsysFtChIfIndex         InterfaceIndex,
+    nbsOdsysFtPartIndex         NbsTcPartIndex,
+    nbsOdsysFtFanCount          INTEGER,
+    nbsOdsysFtThermActual       NbsTcTemperature,
+    nbsOdsysFtThermLevel        NbsTcStatusLevel,
+    nbsOdsysFtThermThreshLoErr  NbsTcTemperature,
+    nbsOdsysFtThermThreshLoWarn NbsTcTemperature,
+    nbsOdsysFtThermThreshHiWarn NbsTcTemperature,
+    nbsOdsysFtThermThreshHiErr  NbsTcTemperature
+}
+
+nbsOdsysFtChasIndex        OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "nbsCmmcChassisIndex of this fan tray's chassis"
+    ::= { nbsOdsysFtEntry 1 }
+
+nbsOdsysFtBayIndex        OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Fan tray bay/slot number, unique within this chassis"
+    ::= { nbsOdsysFtEntry 2 }
+
+nbsOdsysFtOperationalStatus   OBJECT-TYPE
+    SYNTAX      NbsTcStatusSimple
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value notSupported(1) indicates the fan tray is absent."
+    ::= { nbsOdsysFtEntry 3 }
+
+nbsOdsysFtChIfIndex    OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The nbsPartHardIfIndex of this fan tray's chassis"
+    ::= { nbsOdsysFtEntry 10 }
+
+nbsOdsysFtPartIndex    OBJECT-TYPE
+    SYNTAX      NbsTcPartIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The nbsPartHardPartIndex of this fan tray"
+    ::= { nbsOdsysFtEntry 11 }
+
+nbsOdsysFtFanCount   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of fans in this tray"
+    ::= { nbsOdsysFtEntry 20 }
+
+nbsOdsysFtThermActual   OBJECT-TYPE
+    SYNTAX      NbsTcTemperature
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the current temperature reading,
+        in degrees celsius"
+    ::= { nbsOdsysFtEntry 30}
+
+nbsOdsysFtThermLevel   OBJECT-TYPE
+    SYNTAX      NbsTcStatusLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates level of current temperature reading with respect
+        to the FtTherm threshold objects below"
+    ::= { nbsOdsysFtEntry 40 }
+
+nbsOdsysFtThermThreshLoErr   OBJECT-TYPE
+    SYNTAX      NbsTcTemperature
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the minimum functional operating temperature,
+        in degrees celsius"
+    ::= { nbsOdsysFtEntry 41 }
+
+nbsOdsysFtThermThreshLoWarn   OBJECT-TYPE
+    SYNTAX      NbsTcTemperature
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the minimum safe operating temperature,
+        in degrees celsius"
+    ::= { nbsOdsysFtEntry 42 }
+
+nbsOdsysFtThermThreshHiWarn   OBJECT-TYPE
+    SYNTAX      NbsTcTemperature
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the maximum safe operating temperature,
+        in degrees celsius"
+    ::= { nbsOdsysFtEntry 43 }
+
+nbsOdsysFtThermThreshHiErr   OBJECT-TYPE
+    SYNTAX      NbsTcTemperature
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the maximum functional operating temperature,
+        in degrees celsius"
+    ::= { nbsOdsysFtEntry 44 }
+
+
+
+-- ********************************************************************
+--
+-- Objects for the nbsOdsysPsGrp group
+--
+-- ********************************************************************
+
+--
+-- PSTable (Power Supply Info)
+--
+
+nbsOdsysPsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsOdsysPsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Information about OptiDriver chassis' power supplies"
+    ::= { nbsOdsysPsGrp 2 }
+
+nbsOdsysPsEntry      OBJECT-TYPE
+    SYNTAX      NbsOdsysPsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A particular power supply slot/bay.
+
+        Each installed power supply also has entries in
+        nbsPartHardTable.
+
+        The events nbsCmmcTrapPowerSupplyFailure,
+        nbsCmmcTrapPowerSupplyRestored, nbsCmmcTrapPowerSupplyRemoved,
+        and nbsCmmcTrapPowerSupplyInserted indicate changes in
+        nbsOdsysFtOperationalStatus."
+    INDEX { nbsOdsysPsChasIndex, nbsOdsysPsBayIndex }
+    ::= { nbsOdsysPsTable 1 }
+
+NbsOdsysPsEntry ::= SEQUENCE {
+    nbsOdsysPsChasIndex         INTEGER,
+    nbsOdsysPsBayIndex          INTEGER,
+    nbsOdsysPsOperationalStatus NbsTcStatusSimple,
+    nbsOdsysPsChIfIndex         InterfaceIndex,
+    nbsOdsysPsPartIndex         NbsTcPartIndex,
+    nbsOdsysPsFanCount          INTEGER,
+    nbsOdsysPsThermActual       NbsTcTemperature,
+    nbsOdsysPsThermLevel        NbsTcStatusLevel,
+    nbsOdsysPsThermThreshLoErr  NbsTcTemperature,
+    nbsOdsysPsThermThreshLoWarn NbsTcTemperature,
+    nbsOdsysPsThermThreshHiWarn NbsTcTemperature,
+    nbsOdsysPsThermThreshHiErr  NbsTcTemperature,
+    nbsOdsysPsVInActual         NbsTcMilliVolt,
+    nbsOdsysPsVInLevel          NbsTcStatusLevel,
+    nbsOdsysPsVInThreshLoErr    NbsTcMilliVolt,
+    nbsOdsysPsVInThreshLoWarn   NbsTcMilliVolt,
+    nbsOdsysPsVInThreshHiWarn   NbsTcMilliVolt,
+    nbsOdsysPsVInThreshHiErr    NbsTcMilliVolt,
+    nbsOdsysPsVOutActual        NbsTcMilliVolt,
+    nbsOdsysPsVOutLevel         NbsTcStatusLevel,
+    nbsOdsysPsVOutThreshLoErr   NbsTcMilliVolt,
+    nbsOdsysPsVOutThreshLoWarn  NbsTcMilliVolt,
+    nbsOdsysPsVOutThreshHiWarn  NbsTcMilliVolt,
+    nbsOdsysPsVOutThreshHiErr   NbsTcMilliVolt,
+    nbsOdsysPsIInActual         NbsTcMilliAmp,
+    nbsOdsysPsIInLevel          NbsTcStatusLevel,
+    nbsOdsysPsIInThreshLoErr    NbsTcMilliAmp,
+    nbsOdsysPsIInThreshLoWarn   NbsTcMilliAmp,
+    nbsOdsysPsIInThreshHiWarn   NbsTcMilliAmp,
+    nbsOdsysPsIInThreshHiErr    NbsTcMilliAmp,
+    nbsOdsysPsIOutActual        NbsTcMilliAmp,
+    nbsOdsysPsIOutLevel         NbsTcStatusLevel,
+    nbsOdsysPsIOutThreshLoErr   NbsTcMilliAmp,
+    nbsOdsysPsIOutThreshLoWarn  NbsTcMilliAmp,
+    nbsOdsysPsIOutThreshHiWarn  NbsTcMilliAmp,
+    nbsOdsysPsIOutThreshHiErr   NbsTcMilliAmp
+}
+
+nbsOdsysPsChasIndex        OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The nbsCmmcChassisIndex of this power supply's chassis"
+    ::= { nbsOdsysPsEntry 1 }
+
+nbsOdsysPsBayIndex        OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Number of this power supply slot/bay"
+    ::= { nbsOdsysPsEntry 2 }
+
+nbsOdsysPsOperationalStatus   OBJECT-TYPE
+    SYNTAX      NbsTcStatusSimple
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value notSupported(1) indicates power supply is absent."
+    ::= { nbsOdsysPsEntry 3 }
+
+nbsOdsysPsChIfIndex    OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The nbsPartHardIfIndex of this power supply's chassis"
+    ::= { nbsOdsysPsEntry 10 }
+
+nbsOdsysPsPartIndex    OBJECT-TYPE
+    SYNTAX      NbsTcPartIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The nbsPartHardPartIndex of this power supply"
+    ::= { nbsOdsysPsEntry 11 }
+
+nbsOdsysPsFanCount   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates how many internal fans this power supply has."
+    ::= { nbsOdsysPsEntry 30 }
+
+nbsOdsysPsThermActual   OBJECT-TYPE
+    SYNTAX      NbsTcTemperature
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the current temperature reading,
+        in degrees celsius"
+    ::= { nbsOdsysPsEntry 40}
+
+nbsOdsysPsThermLevel   OBJECT-TYPE
+    SYNTAX      NbsTcStatusLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates level of current temperature reading with respect
+        to the PsTherm threshold objects below"
+    ::= { nbsOdsysPsEntry 41 }
+
+nbsOdsysPsThermThreshLoErr   OBJECT-TYPE
+    SYNTAX      NbsTcTemperature
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the minimum functional operating temperature,
+        in degrees celsius"
+    ::= { nbsOdsysPsEntry 42 }
+
+nbsOdsysPsThermThreshLoWarn   OBJECT-TYPE
+    SYNTAX      NbsTcTemperature
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the minimum safe operating temperature,
+        in degrees celsius"
+    ::= { nbsOdsysPsEntry 43 }
+
+nbsOdsysPsThermThreshHiWarn   OBJECT-TYPE
+    SYNTAX      NbsTcTemperature
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the maximum safe operating temperature,
+        in degrees celsius"
+    ::= { nbsOdsysPsEntry 44 }
+
+nbsOdsysPsThermThreshHiErr   OBJECT-TYPE
+    SYNTAX      NbsTcTemperature
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the maximum functional operating temperature,
+        in degrees celsius"
+    ::= { nbsOdsysPsEntry 45 }
+
+nbsOdsysPsVInActual   OBJECT-TYPE
+    SYNTAX      NbsTcMilliVolt
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the input voltage reading, in millivolts"
+    ::= { nbsOdsysPsEntry 50}
+
+nbsOdsysPsVInLevel   OBJECT-TYPE
+    SYNTAX      NbsTcStatusLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates level of input voltage reading with respect
+        to the PsVIn threshold objects below"
+    ::= { nbsOdsysPsEntry 51 }
+
+nbsOdsysPsVInThreshLoErr   OBJECT-TYPE
+    SYNTAX      NbsTcMilliVolt
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the minimum functional input voltage, in millivolts"
+    ::= { nbsOdsysPsEntry 52 }
+
+nbsOdsysPsVInThreshLoWarn   OBJECT-TYPE
+    SYNTAX      NbsTcMilliVolt
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the minimum safe input voltage, in millivolts"
+    ::= { nbsOdsysPsEntry 53 }
+
+nbsOdsysPsVInThreshHiWarn   OBJECT-TYPE
+    SYNTAX      NbsTcMilliVolt
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the maximum safe input voltage, in millivolts"
+    ::= { nbsOdsysPsEntry 54 }
+
+nbsOdsysPsVInThreshHiErr   OBJECT-TYPE
+    SYNTAX      NbsTcMilliVolt
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the maximum functional input voltage, in millivolts"
+    ::= { nbsOdsysPsEntry 55 }
+
+nbsOdsysPsVOutActual   OBJECT-TYPE
+    SYNTAX      NbsTcMilliVolt
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the output voltage reading, in millivolts"
+    ::= { nbsOdsysPsEntry 60}
+
+nbsOdsysPsVOutLevel   OBJECT-TYPE
+    SYNTAX      NbsTcStatusLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates level of output voltage reading with respect
+        to the PsVOut threshold objects below"
+    ::= { nbsOdsysPsEntry 61 }
+
+nbsOdsysPsVOutThreshLoErr   OBJECT-TYPE
+    SYNTAX      NbsTcMilliVolt
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the minimum functional output voltage, in millivolts"
+    ::= { nbsOdsysPsEntry 62}
+
+nbsOdsysPsVOutThreshLoWarn   OBJECT-TYPE
+    SYNTAX      NbsTcMilliVolt
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the minimum safe output voltage, in millivolts"
+    ::= { nbsOdsysPsEntry 63 }
+
+nbsOdsysPsVOutThreshHiWarn   OBJECT-TYPE
+    SYNTAX      NbsTcMilliVolt
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the maximum safe output voltage, in millivolts"
+    ::= { nbsOdsysPsEntry 64 }
+
+nbsOdsysPsVOutThreshHiErr   OBJECT-TYPE
+    SYNTAX      NbsTcMilliVolt
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the maximum functional output voltage, in millivolts"
+    ::= { nbsOdsysPsEntry 65 }
+
+nbsOdsysPsIInActual   OBJECT-TYPE
+    SYNTAX      NbsTcMilliAmp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the input current reading, in milliamps"
+    ::= { nbsOdsysPsEntry 70}
+
+nbsOdsysPsIInLevel   OBJECT-TYPE
+    SYNTAX      NbsTcStatusLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates level of input current reading with respect
+        to the PsIIn threshold objects below"
+    ::= { nbsOdsysPsEntry 71 }
+
+nbsOdsysPsIInThreshLoErr   OBJECT-TYPE
+    SYNTAX      NbsTcMilliAmp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the minimum functional input current, in milliamps"
+    ::= { nbsOdsysPsEntry 72 }
+
+nbsOdsysPsIInThreshLoWarn   OBJECT-TYPE
+    SYNTAX      NbsTcMilliAmp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the minimum safe input current, in milliamps"
+    ::= { nbsOdsysPsEntry 73 }
+
+nbsOdsysPsIInThreshHiWarn   OBJECT-TYPE
+    SYNTAX      NbsTcMilliAmp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the maximum safe input current, in milliamps"
+    ::= { nbsOdsysPsEntry 74 }
+
+nbsOdsysPsIInThreshHiErr   OBJECT-TYPE
+    SYNTAX      NbsTcMilliAmp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the maximum functional input current, in milliamps"
+    ::= { nbsOdsysPsEntry 75 }
+
+nbsOdsysPsIOutActual   OBJECT-TYPE
+    SYNTAX      NbsTcMilliAmp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the output current, in milliamps"
+    ::= { nbsOdsysPsEntry 80}
+
+nbsOdsysPsIOutLevel   OBJECT-TYPE
+    SYNTAX      NbsTcStatusLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates level of output current reading with respect
+        to the PsIOut threshold objects below"
+    ::= { nbsOdsysPsEntry 81 }
+
+nbsOdsysPsIOutThreshLoErr   OBJECT-TYPE
+    SYNTAX      NbsTcMilliAmp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the minimum functional output current, in milliamps"
+    ::= { nbsOdsysPsEntry 82 }
+
+nbsOdsysPsIOutThreshLoWarn   OBJECT-TYPE
+    SYNTAX      NbsTcMilliAmp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the minimum safe output current, in milliamps"
+    ::= { nbsOdsysPsEntry 83 }
+
+nbsOdsysPsIOutThreshHiWarn   OBJECT-TYPE
+    SYNTAX      NbsTcMilliAmp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the maximum safe output current, in milliamps"
+    ::= { nbsOdsysPsEntry 84 }
+
+nbsOdsysPsIOutThreshHiErr   OBJECT-TYPE
+    SYNTAX      NbsTcMilliAmp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Indicates the maximum functional output current, in milliamps"
+    ::= { nbsOdsysPsEntry 85 }
+
+
+
+
+-- ********************************************************************
+--
+-- Notifications in nbsOdsysEvents
+--
+-- ********************************************************************
+
+
+nbsOdsysTrapCcThermLevelBad  NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysCcChasIndex, nbsOdsysCcBayIndex,
+                  nbsOdsysCcThermActual, nbsOdsysCcThermLevel }
+    STATUS      current
+    DESCRIPTION
+       "Sent when nbsOdsysCcThermLevel changes to anything but
+        statusGood (4)"
+    ::= { nbsOdsysEvents 30 }
+
+nbsOdsysTrapCcThermLevelOk  NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysCcChasIndex, nbsOdsysCcBayIndex,
+                  nbsOdsysCcThermActual, nbsOdsysCcThermLevel }
+    STATUS      current
+    DESCRIPTION
+       "Sent when nbsOdsysCcThermLevel changes to statusGood (4)"
+    ::= { nbsOdsysEvents 31 }
+
+nbsOdsysTrapFtThermLevelBad  NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysFtChasIndex, nbsOdsysFtBayIndex,
+                  nbsOdsysFtThermActual, nbsOdsysFtThermLevel }
+    STATUS      current
+    DESCRIPTION
+       "Sent when fan tray's nbsOdsysFtThermLevel changes to
+        anything but statusGood (4)"
+    ::= { nbsOdsysEvents 40 }
+
+nbsOdsysTrapFtThermLevelOk  NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysFtChasIndex, nbsOdsysFtBayIndex,
+                  nbsOdsysFtThermActual, nbsOdsysFtThermLevel }
+    STATUS      current
+    DESCRIPTION
+       "Sent when fan tray's nbsOdsysFtThermLevel changes to
+        statusGood (4)"
+    ::= { nbsOdsysEvents 41 }
+
+nbsOdsysTrapPsThermLevelBad  NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysPsChasIndex, nbsOdsysPsBayIndex,
+                  nbsOdsysPsThermActual, nbsOdsysPsThermLevel }
+    STATUS      current
+    DESCRIPTION
+       "Sent when power supply's nbsOdsysPsThermLevel changes to
+        anything but statusGood (4)"
+    ::= { nbsOdsysEvents 50 }
+
+nbsOdsysTrapPsThermLevelOk  NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysPsChasIndex, nbsOdsysPsBayIndex,
+                  nbsOdsysPsThermActual, nbsOdsysPsThermLevel }
+    STATUS      current
+    DESCRIPTION
+       "Sent when power supply's nbsOdsysPsThermLevel changes to
+        statusGood (4)"
+    ::= { nbsOdsysEvents 51 }
+
+nbsOdsysTrapPsVInLevelBad  NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysPsChasIndex, nbsOdsysPsBayIndex,
+                  nbsOdsysPsVInActual, nbsOdsysPsVInLevel }
+    STATUS      current
+    DESCRIPTION
+       "Sent when power supply's nbsOdsysPsVInLevel changes to
+        anything but statusGood (4)"
+    ::= { nbsOdsysEvents 60 }
+
+nbsOdsysTrapPsVInLevelOk  NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysPsChasIndex, nbsOdsysPsBayIndex,
+                  nbsOdsysPsVInActual, nbsOdsysPsVInLevel }
+    STATUS      current
+    DESCRIPTION
+       "Sent when power supply's nbsOdsysPsVInLevel changes to
+        statusGood (4)"
+    ::= { nbsOdsysEvents 61 }
+
+nbsOdsysTrapPsVOutLevelBad  NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysPsChasIndex, nbsOdsysPsBayIndex,
+                  nbsOdsysPsVOutActual, nbsOdsysPsVOutLevel }
+    STATUS      current
+    DESCRIPTION
+       "Sent when power supply's nbsOdsysPsVOutLevel changes to
+        anything but statusGood (4)"
+    ::= { nbsOdsysEvents 70 }
+
+nbsOdsysTrapPsVOutLevelOk  NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysPsChasIndex, nbsOdsysPsBayIndex,
+                  nbsOdsysPsVOutActual, nbsOdsysPsVOutLevel }
+    STATUS      current
+    DESCRIPTION
+       "Sent when power supply's nbsOdsysPsVOutLevel changes to
+        statusGood (4)"
+    ::= { nbsOdsysEvents 71 }
+
+nbsOdsysTrapPsIInLevelBad  NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysPsChasIndex, nbsOdsysPsBayIndex,
+                  nbsOdsysPsIInActual, nbsOdsysPsIInLevel }
+    STATUS      current
+    DESCRIPTION
+       "Sent when power supply's nbsOdsysPsIInLevel changes to
+        anything but statusGood (4)"
+    ::= { nbsOdsysEvents 80 }
+
+nbsOdsysTrapPsIInLevelOk  NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysPsChasIndex, nbsOdsysPsBayIndex,
+                  nbsOdsysPsIInActual, nbsOdsysPsIInLevel }
+    STATUS      current
+    DESCRIPTION
+       "Sent when power supply's nbsOdsysPsIInLevel changes to
+        statusGood (4)"
+    ::= { nbsOdsysEvents 81 }
+
+nbsOdsysTrapPsIOutLevelBad  NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysPsChasIndex, nbsOdsysPsBayIndex,
+                  nbsOdsysPsIOutActual, nbsOdsysPsIOutLevel }
+    STATUS      current
+    DESCRIPTION
+       "Sent when power supply's nbsOdsysPsIOutLevel changes to
+        anything but statusGood (4)"
+    ::= { nbsOdsysEvents 90 }
+
+nbsOdsysTrapPsIOutLevelOk  NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysPsChasIndex, nbsOdsysPsBayIndex,
+                  nbsOdsysPsIOutActual, nbsOdsysPsIOutLevel }
+    STATUS      current
+    DESCRIPTION
+       "Sent when power supply's nbsOdsysPsIOutLevel changes to
+        statusGood (4)"
+    ::= { nbsOdsysEvents 91 }
+
+nbsOdsysTrapCcFailed NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysCcChasIndex, nbsOdsysCcBayIndex }
+    STATUS      current
+    DESCRIPTION
+       "Triggered when nbsOdsysCcOperationalStatus transitions to
+        bad (2)"
+    ::= { nbsOdsysEvents 131 }
+
+nbsOdsysTrapCcRestored NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysCcChasIndex, nbsOdsysCcBayIndex }
+    STATUS      current
+    DESCRIPTION
+       "Triggered when nbsOdsysCcOperationalStatus transitions to
+        good (3)"
+    ::= { nbsOdsysEvents 132 }
+
+nbsOdsysTrapCcRemoved NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysCcChasIndex, nbsOdsysCcBayIndex }
+    STATUS      current
+    DESCRIPTION
+       "Triggered when control card is removed from chassis"
+    ::= { nbsOdsysEvents 133 }
+
+nbsOdsysTrapCcInserted NOTIFICATION-TYPE
+    OBJECTS     { nbsOdsysCcChasIndex, nbsOdsysCcBayIndex }
+    STATUS      current
+    DESCRIPTION
+       "Triggered when control card is inserted into chassis"
+    ::= { nbsOdsysEvents 134 }
+
+END

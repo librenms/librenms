@@ -1,6 +1,6 @@
 <?php
 if ($config['twofactor'] && isset($twofactorform)) {
-    echo twofactor_form();
+    echo \LibreNMS\Authentication\TwoFactor::getForm();
 } else {
 ?>
       <div class="row">
