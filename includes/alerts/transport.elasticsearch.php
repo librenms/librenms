@@ -151,7 +151,7 @@ if( !empty( $obj['faults'] ) ) {
 	'Content-Type: application/json')
     );
     if ($opts['es_proxy'] === true) {
-	set_curl_proxy($curl);
+        set_curl_proxy($curl);
     }
     curl_setopt($curl, CURLOPT_URL, $host);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -161,7 +161,7 @@ if( !empty( $obj['faults'] ) ) {
     $ret = curl_exec($curl);
     $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     if( $code != 200 && $code != 201 ) {
-	return $host.' returned HTTP Status code '.$code.' for '.$alert_message;
+        return $host.' returned HTTP Status code '.$code.' for '.$alert_message;
     }
 }
 return true;
