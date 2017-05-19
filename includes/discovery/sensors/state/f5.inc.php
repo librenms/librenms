@@ -40,24 +40,6 @@ if (is_array($temp)) {
     } // End foreach (array_keys($temp) as $index)
 } // End if (is_array($temp))
 
-// FailOver State
-/*  From the MIB file:
-sysCmFailoverStatusId OBJECT-TYPE
-    SYNTAX INTEGER {
-        unknown(0), offline(1), forcedOffline(2), standby(3), active(4)
-    }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        "The failover status ID on the system.
-        unknown - the failover status of the device is unknown;
-        offline - the device is offline;
-        forcedOffline - the device is forced offline;
-        standby - the device is standby;
-        active - the device  is active."
-        ::= { sysCmFailoverStatus 1 }
-*/
-
 $temp1 = snmpwalk_cache_multi_oid($device, 'sysCmFailoverStatus', array(), 'F5-BIGIP-SYSTEM-MIB');
 
 if (is_array($temp1)) {
@@ -99,42 +81,6 @@ if (is_array($temp1)) {
     } // End foreach (array_keys($temp1) as $index)
 } // End if (is_array($temp1))
 
-
-// Real Sync State:
-/*
-sysCmSyncStatusId OBJECT-TYPE
-        SYNTAX INTEGER {
-                unknown(0),
-                syncing(1),
-                needManualSync(2),
-                inSync(3),
-                syncFailed(4),
-                syncDisconnected(5),
-                standalone(6),
-                awaitingInitialSync(7),
-                incompatibleVersion(8),
-                partialSync(9)
-        }
-        MAX-ACCESS read-only
-        STATUS current
-        DESCRIPTION
-                "The sync status ID on the system.
-                unknown - the device is disconnected from the device group;
-                syncing - the device is joining the device group or has requested changes
-                from device group or inconsistent with the group;
-                needManualSync - changes have been made on the device not syncd to
-                the device group;
-                inSync - the device is consistent with the device group;
-                syncFailed - the device is inconsistent with the device group, requires
-                user intervention;
-                syncDisconnected - the device is not connected to any peers;
-                standalone - the device is in a standalone configuration;
-                awaitingInitialSync - the device is waiting for initial sync;
-                incompatibleVersion - the device's version is incompatible with rest of
-                the devices in the device group;
-                partialSync - some but not all devices successfully received the last sync."
-        ::= { sysCmSyncStatus 1 }
-*/
 $temp1 = snmpwalk_cache_multi_oid($device, 'sysCmSyncStatusId', array(), 'F5-BIGIP-SYSTEM-MIB');
 
 if (is_array($temp1)) {
@@ -180,31 +126,6 @@ if (is_array($temp1)) {
         create_sensor_to_state_index($device, $state_name, $index);
     } // End foreach (array_keys($temp1) as $index)
 } // End if (is_array($temp1))
-
-
-// Color State:
-/*
-sysCmFailoverStatusColor OBJECT-TYPE
-    SYNTAX INTEGER {
-        green(0),
-        yellow(1),
-        red(2),
-        blue(3),
-        gray(4),
-        black(5)
-    }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        "The color of the failover status on the system.
-        green - the system is functioning correctly;
-        yellow - the system may be functioning suboptimally;
-        red - the system requires attention to function correctly;
-        blue - the system's status is unknown or incomplete;
-        gray - the system is intentionally not functioning (offline);
-        black - the system is not connected to any peers."
-        ::= { sysCmFailoverStatus 3 }
-*/
 
 $temp1 = snmpwalk_cache_multi_oid($device, 'sysCmFailoverStatusColor', array(), 'F5-BIGIP-SYSTEM-MIB');
 
