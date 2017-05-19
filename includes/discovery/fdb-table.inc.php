@@ -54,8 +54,9 @@ if ($device['os'] == 'ios') {
                         echo 'Mac Address padding failed';
                         continue;
                     } else {
+                        $vlan_id = $vlans_dict[$vlan];
                         $dot1dBasePort = $matches['result'];
-                        $insert[$vlan][$mac_address]['port_id'] = $portid_dict[$dot1dBasePort];
+                        $insert[$vlan_id][$mac_address]['port_id'] = $portid_dict[$dot1dBasePort];
                     }
                 }
             }
@@ -63,35 +64,6 @@ if ($device['os'] == 'ios') {
             unset($device_vlan);
         } //end if operational
     }// end vlan for ios
-} elseif ($device['os'] == 'timos') {
-    echo 'FDB table : ';
-    echo("\n");
-
-    $portids = snmp_walk($device, 'tlsFdbPortId', '-OqsX', 'TIMETRA-SERV-MIB');
-    $mac_to_port = array();
-    foreach (explode("\n", $portids) as $portid) {
-        preg_match('~(?P<oid>\w+)\[\d+]\[(?P<mac>[\w:-]+)]\s(?P<result>\d+)~', $portid, $matches);
-        if (! empty($matches)) {
-            $mac_to_port[$matches['mac']] = $matches['result'];
-        }
-    }
-
-    $vlans = snmp_walk($device, 'tlsFdbEncapValue', '-OqsX', 'TIMETRA-SERV-MIB');
-    foreach (explode("\n", $vlans) as $vlan) {
-        preg_match('~(?P<oid>\w+)\[\d+]\[(?P<mac>[\w:-]+)]\s(?P<result>\d+)~', $vlan, $matches);
-        if (! empty($matches)) {
-            list($oct_1, $oct_2, $oct_3, $oct_4, $oct_5, $oct_6) = explode(':', $matches['mac']);
-            $mac_address = zeropad($oct_1) . zeropad($oct_2) . zeropad($oct_3) . zeropad($oct_4) . zeropad($oct_5) . zeropad($oct_6);
-            if (strlen($mac_address) != 12) {
-                echo 'Mac Address padding failed';
-                continue;
-            } else {
-                $vlan = $matches['result'];
-                $ifIndex = $mac_to_port[$matches['mac']];
-                $insert[$vlan][$mac_address]['port_id'] = $ifIndex_dict[$ifIndex];
-            }
-        }
-    } //end vlan loop for timos
 } else {
     echo "OS not yet implemented \n";
     $continue = false;
@@ -105,28 +77,28 @@ if ($continue) {
         $existing_fdbs[$entry['vlan_id']][$entry['mac_address']] = $entry;
     }
     // Insert to database
-    foreach ($insert as $vlan => $mac_address_table) {
+    foreach ($insert as $vlan_id => $mac_address_table) {
         foreach ($mac_address_table as $mac_address_entry => $value) {
             // If existing entry
-            if ($existing_fdbs[$vlan][$mac_address_entry]) {
+            if ($existing_fdbs[$vlan_id][$mac_address_entry]) {
                 unset($update_entry);
 
                 // Look for columns that need to be updated
-                $new_port = $insert[$vlan][$mac_address_entry]['port_id'];
+                $new_port = $insert[$vlan_id][$mac_address_entry]['port_id'];
 
-                if ($existing_fdbs[$vlan][$mac_address_entry]['port_id'] != $new_port) {
+                if ($existing_fdbs[$vlan_id][$mac_address_entry]['port_id'] != $new_port) {
                     $update_entry['port_id'] = $new_port;
                 }
 
                 if (! empty($update_entry)) {
-                    dbUpdate($update_entry, 'ports_fdb', '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?', array($device['device_id'], $vlan, $mac_address));
+                    dbUpdate($update_entry, 'ports_fdb', '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?', array($device['device_id'], $vlan_id, $mac_address));
                 }
-                unset($existing_fdbs[$vlan][$mac_address_entry]);
+                unset($existing_fdbs[$vlan_id][$mac_address_entry]);
             } else {
                 $new_entry = array(
                     'port_id' => $value['port_id'],
                     'mac_address' => $mac_address_entry,
-                    'vlan_id' => $vlan,
+                    'vlan_id' => $vlan_id,
                     'device_id' => $device['device_id'],
                 );
 
