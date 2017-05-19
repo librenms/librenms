@@ -1,3 +1,5 @@
+<?php
+
 /*
  * Sensor State discovery module for the MRV® OptiDriver® Optical Transport Platform
  *
@@ -10,10 +12,10 @@
  * the source code distribution for details.
  */
 
-<?php
+echo "MRV OptiDriver";
 
 foreach ($pre_cache['mrv-od_port-table'] as $index => $entry) {
-    // RX Interface Power
+    // RX Interface Power State
     if ($entry['nbsCmmcPortRxPowerLevel']) {
         $cur_oid = '.1.3.6.1.4.1.629.200.8.1.1.66.';
         //Create State Index
@@ -40,15 +42,13 @@ foreach ($pre_cache['mrv-od_port-table'] as $index => $entry) {
                 dbInsert($insert, 'state_translations');
             }
         }
-        foreach ($oids as $index => $entry) {
-            $descr = $oids[$index]['nbsCmmcPortName'] . ' Rx Power State';
-            //Discover Sensors
-            discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, '1', '1', null, null, null, null, $entry['nbsCmmcPortRxPowerLevel'], 'snmp', $index);
-            //Create Sensor To State Index
-            create_sensor_to_state_index($device, $state_name, $index);
-        }
+        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifName`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' Rx Power State';
+        //Discover Sensors
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, '1', '1', null, null, null, null, $entry['nbsCmmcPortRxPowerLevel'], 'snmp', $index);
+        //Create Sensor To State Index
+        create_sensor_to_state_index($device, $state_name, $index);
     }
-    // RX Interface Power State
+    // TX Interface Power State
     if ($entry['nbsCmmcPortTxPowerLevel']) {
         $cur_oid = '.1.3.6.1.4.1.629.200.8.1.1.65.';
         //Create State Index
@@ -75,13 +75,11 @@ foreach ($pre_cache['mrv-od_port-table'] as $index => $entry) {
                 dbInsert($insert, 'state_translations');
             }
         }
-        foreach ($oids as $index => $entry) {
-            $descr = $oids[$index]['nbsCmmcPortName'] . ' Tx Power State';
-            //Discover Sensors
-            discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, '1', '1', null, null, null, null, $entry['nbsCmmcPortTxPowerLevel'], 'snmp', $index);
-            //Create Sensor To State Index
-            create_sensor_to_state_index($device, $state_name, $index);
-        }
+        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifName`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' Tx Power State';
+        //Discover Sensors
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, '1', '1', null, null, null, null, $entry['nbsCmmcPortTxPowerLevel'], 'snmp', $index);
+        //Create Sensor To State Index
+        create_sensor_to_state_index($device, $state_name, $index);
     }
 }
 
