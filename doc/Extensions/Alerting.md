@@ -188,14 +188,14 @@ template without any fault information.
 
 Default Template:
 ```text
-%title\r\n
-Severity: %severity\r\n
-{if %state == 0}Time elapsed: %elapsed\r\n{/if}
-Timestamp: %timestamp\r\n
-Unique-ID: %uid\r\n
-Rule: {if %name}%name{else}%rule{/if}\r\n
-{if %faults}Faults:\r\n
-{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}
+%title
+Severity: %severity
+{if %state == 0}Time elapsed: %elapsed{/if}
+Timestamp: %timestamp
+Unique-ID: %uid
+Rule: {if %name}%name{else}%rule{/if}
+{if %faults}Faults:
+{foreach %faults}  #%key: %value.string{/foreach}{/if}
 Alert sent to: {foreach %contacts}%value <%key> {/foreach}
 ```
 
