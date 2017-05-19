@@ -145,7 +145,6 @@ if ($continue) {
     foreach ($sql_result as $entry) {
         $existing_fdbs[$entry['vlan_id']][$entry['mac_address']] = $entry;
     }
-
     // Insert to database
     foreach ($insert as $vlan => $mac_address_table) {
         foreach ($mac_address_table as $mac_address_entry => $value) {
