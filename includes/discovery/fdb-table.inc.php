@@ -10,7 +10,12 @@ foreach (dbFetchRows("SELECT `ifIndex`,`port_id` FROM `ports` WHERE `device_id` 
 // Build dot1dBasePort to port_id dictionary
 $portid_dict = array();
 
-$insert = array();
+// Build a dictionary of vlans in database
+$vlans_dict = array();
+foreach (dbFetchRows("SELECT `vlan_id`, `vlan_vlan` from `vlans` WHERE `device_id` = ?", array($device['device_id'])) as $vlan_entry) {
+    $vlans_dict[$vlan_entry['vlan_vlan']] = $vlan_entry['vlan_id'];
+}
+
 // Discover FDB entries
 if ($device['os'] == 'ios') {
     echo 'FDB table : ';
@@ -18,14 +23,12 @@ if ($device['os'] == 'ios') {
 
     $vlans = snmpwalk_cache_oid($device, 'vtpVlanState', array(), 'CISCO-VTP-MIB');
     foreach ($vlans as $vlan_oid => $state) {
-        echo $state . "\n";
         if ($state['vtpVlanState'] == 'operational') {
             $vlan = explode('.', $vlan_oid);
             $vlan = $vlan[1];
 
             $device_vlan = $device;
             $device_vlan['fdb_vlan'] = $vlan;
-            $device_vlan['snmp_retries]'] = 0;
             $FdbPort_table = snmp_walk($device_vlan, 'dot1dTpFdbPort', '-OqsX', 'BRIDGE-MIB');
             if (empty($FdbPort_table)) {
                 // If there are no entries for the vlan, continue
@@ -37,7 +40,7 @@ if ($device['os'] == 'ios') {
 
             foreach (explode("\n", $dot1dBasePortIfIndex) as $dot1dBasePortIfIndex_entry) {
                 if (!empty($dot1dBasePortIfIndex_entry)) {
-                    preg_match('~dot1dBasePortIfIndex\[(\d)]\s(\d.*)~', $dot1dBasePortIfIndex_entry, $matches);
+                    preg_match('~dot1dBasePortIfIndex\[(\d+)]\s(\d+)~', $dot1dBasePortIfIndex_entry, $matches);
                     $portid_dict[$matches[1]] = $ifIndex_dict[$matches[2]];
                 }
             }
@@ -120,11 +123,12 @@ if ($continue) {
                 }
                 unset($existing_fdbs[$vlan][$mac_address_entry]);
             } else {
-                $new_entry = array();
-                $new_entry['port_id'] = $value['port_id'];
-                $new_entry['mac_address'] = $mac_address_entry;
-                $new_entry['vlan_id'] = $vlan;
-                $new_entry['device_id'] = $device['device_id'];
+                $new_entry = array(
+                    'port_id' => $value['port_id'],
+                    'mac_address' => $mac_address_entry,
+                    'vlan_id' => $vlan,
+                    'device_id' => $device['device_id'],
+                );
 
                 dbInsert($new_entry, 'ports_fdb');
             }
