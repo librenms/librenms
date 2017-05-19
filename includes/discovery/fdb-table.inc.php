@@ -158,9 +158,7 @@ if ($continue) {
     }
 
     // Insert to database
-    echo "INSERT:\n";
     foreach ($insert as $vlan => $mac_address_table) {
-	echo "vlan: $vlan\n";
         foreach ($mac_address_table as $mac_address_entry => $value) {
             // If existing entry
             if ($existing_fdbs[$vlan][$mac_address_entry]) {
@@ -175,7 +173,6 @@ if ($continue) {
 
                 if (! empty($update_entry)) {
                     dbUpdate($update_entry, 'ports_fdb', '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?', array($device['device_id'], $vlan, $mac_address));
-	            echo "update mac $mac_address\n";
                 }
                 unset($existing_fdbs[$vlan][$mac_address_entry]);
             } else {
@@ -186,7 +183,6 @@ if ($continue) {
                 $new_entry['device_id'] = $device['device_id'];
 
                 dbInsert($new_entry, 'ports_fdb');
-	        echo "insert mac $mac_address_entry\n";
             }
         }
     }
