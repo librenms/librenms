@@ -392,6 +392,7 @@ function sensor_low_limit($class, $current)
             break;
         case 'airflow':
         case 'dbm':
+        case 'snr':
             $limit = ($current * 0.95);
             break;
     }//end switch
@@ -447,6 +448,7 @@ function sensor_limit($class, $current)
             break;
         case 'airflow':
         case 'dbm':
+        case 'snr':
             $limit = ($current * 1.05);
             break;
     }//end switch

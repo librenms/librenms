@@ -2,7 +2,7 @@
 /**
  * ciscoepc.inc.php
  *
- * LibreNMS os sensor pre-cache module for Cisco EPC
+ * LibreNMS snr discovery module for Cisco EPC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,12 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-echo 'docsIfDownstreamChannelTable ';
-$pre_cache['ciscoepc_docsIfDownstreamChannelTable'] = snmpwalk_cache_oid($device, 'docsIfDownstreamChannelTable', array(), 'DOCS-IF-MIB');
-
-echo 'docsIfSignalQualityTable ';
-$pre_cache['ciscoepc_docsIfSignalQualityTable'] = snmpwalk_cache_oid($device, 'docsIfSignalQualityTable', array(), 'DOCS-IF-MIB');
+foreach ($pre_cache['ciscoepc_docsIfSignalQualityTable'] as $index => $data) {
+    if (is_numeric($data['docsIfSigQSignalNoise'])) {
+        $descr   = "Channel {$pre_cache['ciscoepc_docsIfDownstreamChannelTable'][$index]['docsIfDownChannelId']}";
+        $oid     = '.1.3.6.1.2.1.10.127.1.1.4.1.5.' . $index;
+        $divisor = 10;
+        $value   = $data['docsIfSigQSignalNoise'];
+        discover_sensor($valid['sensor'], 'snr', $device, $oid, 'docsIfSigQSignalNoise.'.$index, 'ciscoepc', $descr, $divisor, '1', null, null, null, null, $value);
+    }
+}

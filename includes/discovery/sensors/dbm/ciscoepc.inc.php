@@ -2,7 +2,7 @@
 /**
  * ciscoepc.inc.php
  *
- * LibreNMS power discovery module for Cisco EPC
+ * LibreNMS dbm discovery module for Cisco EPC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-
 
 foreach ($pre_cache['ciscoepc_docsIfDownstreamChannelTable'] as $index => $data) {
     if (is_numeric($data['docsIfDownChannelPower'])) {
