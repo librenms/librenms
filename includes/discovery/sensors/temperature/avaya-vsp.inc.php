@@ -22,38 +22,38 @@ foreach (explode("\n", $tempsfan) as $i => $t) {
     $oid = $t[0];
     $val = $t[1];
     if (is_numeric($val) && $val > 0) {
-       discover_sensor($valid['sensor'], 'temperature', $device, $oid, zeropad($i + 100), 'avaya-vsp', 'Fan '.($i + 1).' temperature', '1', '1', null, null, $high_limit, $high_limit, $val);
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, zeropad($i + 100), 'avaya-vsp', 'Fan '.($i + 1).' temperature', '1', '1', null, null, $high_limit, $high_limit, $val);
     }
 }
 
 // rcSingleCpSystem
 $tempsystem = snmp_walk($device, '.1.3.6.1.4.1.2272.1.212', '-Osqn');
 foreach (explode("\n", $tempsystem) as $i => $t) {
-     $t   = explode(' ', $t);
-     $oid = $t[0];
-     $val = $t[1];
-     switch ($oid) {
-         //rcSingleCpSystemCpuTemperature
-         case '.1.3.6.1.4.1.2272.1.212.1.0':
-             $var1 = "CPU ";
-             discover_sensor($valid['sensor'], 'temperature', $device, $oid, zeropad($i + 200), 'avaya-vsp', $var1.' temperature', '1', '1', null, null, $high_limit, $high_limit, $val);
-             break;
-         //rcSingleCpSystemMacTemperature
-         case '.1.3.6.1.4.1.2272.1.212.2.0':
-             $var1 = "MAC ";
-             discover_sensor($valid['sensor'], 'temperature', $device, $oid, zeropad($i + 200), 'avaya-vsp', $var1.' temperature', '1', '1', null, null, $high_limit, $high_limit, $val);
-             break;
-         //rcSingleCpSystemPhy2Temperature
-         case '.1.3.6.1.4.1.2272.1.212.3.0':
-             $var1 = "Phy1 ";
-             discover_sensor($valid['sensor'], 'temperature', $device, $oid, zeropad($i + 200), 'avaya-vsp', $var1.' temperature', '1', '1', null, null, $high_limit, $high_limit, $val);
-             break;
-         //rcSingleCpSystemPhy1Temperature
-         case '.1.3.6.1.4.1.2272.1.212.4.0':
-             $var1 = "Phy2 ";
-             discover_sensor($valid['sensor'], 'temperature', $device, $oid, zeropad($i + 200), 'avaya-vsp', $var1.' temperature', '1', '1', null, null, $high_limit, $high_limit, $val);
-             break;
-         default:
-             $var1 = "Unknown ";
-     }
+    $t   = explode(' ', $t);
+    $oid = $t[0];
+    $val = $t[1];
+    switch ($oid) {
+    //rcSingleCpSystemCpuTemperature
+    case '.1.3.6.1.4.1.2272.1.212.1.0':
+        $var1 = "CPU ";
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, zeropad($i + 200), 'avaya-vsp', $var1.' temperature', '1', '1', null, null, $high_limit, $high_limit, $val);
+        break;
+    //rcSingleCpSystemMacTemperature
+    case '.1.3.6.1.4.1.2272.1.212.2.0':
+        $var1 = "MAC ";
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, zeropad($i + 200), 'avaya-vsp', $var1.' temperature', '1', '1', null, null, $high_limit, $high_limit, $val);
+        break;
+    //rcSingleCpSystemPhy2Temperature
+    case '.1.3.6.1.4.1.2272.1.212.3.0':
+        $var1 = "Phy1 ";
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, zeropad($i + 200), 'avaya-vsp', $var1.' temperature', '1', '1', null, null, $high_limit, $high_limit, $val);
+        break;
+    //rcSingleCpSystemPhy1Temperature
+    case '.1.3.6.1.4.1.2272.1.212.4.0':
+        $var1 = "Phy2 ";
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, zeropad($i + 200), 'avaya-vsp', $var1.' temperature', '1', '1', null, null, $high_limit, $high_limit, $val);
+        break;
+    default:
+        $var1 = "Unknown ";
+    }
 }
