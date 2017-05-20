@@ -53,6 +53,11 @@ foreach (explode("\n", $tempsystem) as $i => $t) {
             $var1 = "Phy2 ";
             discover_sensor($valid['sensor'], 'temperature', $device, $oid, zeropad($i + 200), 'avaya-vsp', $var1.' temperature', '1', '1', null, null, $high_limit, $high_limit, $val);
             break;
+             //rcSingleCpSystemPhy1Temperature
+        case '.1.3.6.1.4.1.2272.1.212.5.0':
+            $var1 = "MAC2 ";
+            discover_sensor($valid['sensor'], 'temperature', $device, $oid, zeropad($i + 200), 'avaya-vsp', $var1.' temperature', '1', '1', null, null, $high_limit, $high_limit, $val);
+            break;
         default:
             $var1 = "Unknown ";
     }
