@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Sensor State discovery module for the MRV® OptiDriver® Optical Transport Platform
+ * Sensor State discovery module for the CradlePoint WiPipe Platform
  *
  * © 2017 Chris A. Evans <thecityofguanyu@outlook.com>
  *
@@ -15,7 +15,7 @@
 echo "CradlePoint WiPipe";
 
 foreach ($pre_cache['wipipe_oids'] as $index => $entry) {
-    // RX Interface Power State
+    // Modem Connection Status
     if ($entry['mdmStatus']) {
         $cur_oid = '.1.3.6.1.4.1.20992.1.2.2.1.5.';
         //Create State Index
@@ -46,6 +46,7 @@ foreach ($pre_cache['wipipe_oids'] as $index => $entry) {
                 dbInsert($insert, 'state_translations');
             }
         }
+        // Get Modem Model & Phone Number for description
         $modemdesc = $entry['mdmDescr'];
         $modemmdn = $entry['mdmMDN'];
         $descr = "mdmStatus - " . $modemdesc . " - " . $modemmdn;
@@ -54,6 +55,7 @@ foreach ($pre_cache['wipipe_oids'] as $index => $entry) {
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
     }
+    // Device Firmware Upgrade Status
     if ($entry['devFWUpgradeStatus']) {
         $cur_oid = '.1.3.6.1.4.1.20992.1.1.4.';
         //Create State Index

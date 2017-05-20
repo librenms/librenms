@@ -1,7 +1,7 @@
 <?php
 
 /*
- * LibreNMS Interface Power dBm module for the MRV® OptiDriver® Optical Transport Platform
+ * LibreNMS Interface Modem Signal Strength dBm module for the CradlePoint WiPipe Platform
  *
  * © 2017 Chris A. Evans <thecityofguanyu@outlook.com>
  *
@@ -15,16 +15,18 @@
 echo 'CradlePoint WiPipe';
 
 $multiplier = 1;
-$divisor = 1000;
+$divisor = 1;
 
 foreach ($pre_cache['wipipe_oids'] as $index => $entry) {
+    // Modem Signal Strength
     if ($entry['mdmSignalStrength']) {
         $oid = '.1.3.6.1.4.1.20992.1.2.2.1.4.' . $index;
+        // Get Modem Model & Phone Number for description
         $modemdesc = $entry['mdmDescr'];
         $modemmdn = $entry['mdmMDN'];
         $descr = "Signal Strength - " . $modemdesc . " - " . $modemmdn;
-        //$descr = "Signal Strength - Modem " . $index;
         $currentsignal = $entry['mdmSignalStrength'];
+        // Discover Sensor
         discover_sensor(
             $valid['sensor'],
             'dbm',

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * LibreNMS OS Polling module for the MRV® OptiDriver® Optical Transport Platform
+ * LibreNMS OS Polling module for the CradlePoint WiPipe Platform
  *
  * © 2017 Chris A. Evans <thecityofguanyu@outlook.com>
  *
