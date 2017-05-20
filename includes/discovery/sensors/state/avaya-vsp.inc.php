@@ -2,7 +2,7 @@
 /**
  * avaya-vsp.inc.php
  *
- * LibreNMS Fan and Power Supply state Discovery module for Avaya 
+ * LibreNMS Fan and Power Supply state Discovery module for Avaya
  * VOSS(VSP Operating System Software)
  *
  * Copyright (c) 2017 Daniel Cox <danielcoxman@gmail.com>
