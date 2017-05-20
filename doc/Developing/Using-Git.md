@@ -38,6 +38,13 @@ cd /opt/
 git clone git@github.com:/yourusername/librenms.git
 ```
 
+If you are starting with an existing LibreNMS install either from our Virtual machine or install docs then you 
+will need to update the remote url. Be aware that daily.sh will not work properly after changing your origin. To do that run:
+
+```bash
+git remote set-url origin git@github.com:/yourusername/librenms.git
+```
+
 #### Add Upstream repo
 To be able to pull in changes from the master LibreNMS repo you need to have it setup on your system.
 
