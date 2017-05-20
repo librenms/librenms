@@ -140,7 +140,7 @@ if (!empty($argv[1])) {
                 }
             }//end while
 
-            array_push($config['snmp']['v3'], $v3);
+            array_unshift($config['snmp']['v3'], $v3);
         }
     } else {
         // v2c or v1
