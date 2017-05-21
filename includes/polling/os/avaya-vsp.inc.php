@@ -20,8 +20,3 @@ $version = str_replace('"', '', $version);
 // rcChasSerialNumber
 $serial   = snmp_get($device, 'rcChasSerialNumber.0', '-Osqv', 'RAPID-CITY');
 $serial = str_replace('"', '', $serial);
-
-// Appended Hard revision to serial number
-$hwrevision = snmp_get($device, 'rcChasHardwareRevision.0', '-Osqv', 'RAPID-CITY');
-$hwrevision = str_replace('"', '', $hwrevision);
-$serial = $serial . " HW:$hwrevision";
