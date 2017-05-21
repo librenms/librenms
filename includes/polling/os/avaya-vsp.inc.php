@@ -20,3 +20,10 @@ $version = str_replace('"', '', $version);
 // rcChasSerialNumber
 $serial   = snmp_get($device, 'rcChasSerialNumber.0', '-Osqv', 'RAPID-CITY');
 $serial = str_replace('"', '', $serial);
+
+// rcChasHardwareRevision
+$sysDescr = $poll_device['sysDescr'];
+$sysDescr = explode(' ', $sysDescr);
+$sysDescr = $sysDescr[0];
+$hardware = $sysDescr; 
+$hardware = str_replace('"', '', $hardware);
