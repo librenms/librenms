@@ -80,7 +80,12 @@ function user_exists($username)
 
 function get_userlevel($username)
 {
-    return dbFetchCell('SELECT `level` FROM `users` WHERE `username`= ?', array($username));
+    global $config;
+    $level = dbFetchCell('SELECT `level` FROM `users` WHERE `username`= ?', array($username));
+    if (empty($level)) {
+        $level = dbFetchCell('SELECT `level` FROM `users` WHERE `username`= ?', array($config['http_auth_guest']));
+    }
+    return $level;
 }
 
 
