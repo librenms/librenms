@@ -27,7 +27,7 @@
 
 /**
  * merge the database config with the global config
- * Global config overrides db
+ * DB Config overwrites the files (to fully implement web settings)
  */
 function mergedb()
 {
@@ -37,7 +37,7 @@ function mergedb()
     foreach (dbFetchRows('SELECT `config_name`,`config_value` FROM `config`') as $obj) {
         assign_array_by_path($db_config, $obj['config_name'], $obj['config_value']);
     }
-    $config = array_replace_recursive($db_config, $config);
+    $config = array_replace_recursive($config, $db_config);
 }
 
 /**
