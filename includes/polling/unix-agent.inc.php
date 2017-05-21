@@ -62,6 +62,7 @@ if ($device['os_group'] == 'unix') {
             "powerdns",
             "powerdns-recursor",
             "proxmox",
+            "proxmox-info",
             "rrdcached",
             "tinydns",
             "gpsd",
