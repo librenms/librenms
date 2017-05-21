@@ -27,7 +27,7 @@
 
 /**
  * merge the database config with the global config
- * DB Config overwrites the files (to fully implement web settings)
+ * Global config overrides db
  */
 function mergedb()
 {
