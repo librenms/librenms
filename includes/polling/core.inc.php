@@ -27,18 +27,10 @@ if (!empty($agent_data['uptime'])) {
 } else {
     $uptime_data = snmp_get_multi($device, 'snmpEngineTime.0 hrSystemUptime.0', '-OQnUst', 'HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
 
-    if ($config['os'][$device['os']]['bad_snmpEngineTime'] === true) {
-        $uptime_data[0]['snmpEngineTime'] = 0;
-    }
-
-    if ($config['os'][$device['os']]['bad_hrSystemUptime'] === true) {
-        $uptime_data[0]['hrSystemUptime'] = 0;
-    }
-
     $uptime = max(
         round($poll_device['sysUpTime'] / 100),
-        $uptime_data[0]['snmpEngineTime'],
-        round($uptime_data[0]['hrSystemUptime'] / 100)
+        $config['os'][$device['os']]['bad_snmpEngineTime'] ? 0 : $uptime_data[0]['snmpEngineTime'],
+        $config['os'][$device['os']]['bad_hrSystemUptime'] ? 0 : round($uptime_data[0]['hrSystemUptime'] / 100)
     );
     d_echo("Uptime seconds: $uptime\n");
 }
