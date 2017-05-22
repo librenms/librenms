@@ -13,4 +13,4 @@
  */
 
 echo 'Caching WIPIPE-MIB';
-$pre_cache['wipipe_oids'] = snmpwalk_cache_multi_oid($device, 'enterprises.20992', array(), 'SNMPv2-SMI');
+$pre_cache['wipipe_oids'] = snmpwalk_cache_multi_oid($device, 'mdmEntry', array(), 'WIPIPE-MIB');

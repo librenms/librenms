@@ -13,11 +13,6 @@
  */
 
 // Rip hardware and firmware version from sysDescr string -- example: Cradlepoint CBA850, Firmware Version 6.2.0.dd92f49
-$getsysdescr = $poll_device['sysDescr'];
-$getsysdescr = explode(",", $getsysdescr);
-$hardware = $getsysdescr[0];
-$hardware = explode(" ", $hardware);
-$hardware = $hardware[1];
-$version = $getsysdescr[1];
-$version = explode(" ", $version);
-$version = $version[2];
+preg_match($poll_device['sysDescr'], '/(.*) ([\w\d]+), (.*) ([\w\d/.]+)/', $wipipe_data);
+$hardware = $wipipe_data[2];
+$version    = $wipipe_data[4];

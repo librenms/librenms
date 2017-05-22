@@ -33,7 +33,7 @@ foreach ($pre_cache['wipipe_oids'] as $index => $entry) {
             $device,
             $oid,
             'mdmSignalStrength.'.$index,
-            'mrv-od',
+            'wipipe',
             $descr,
             $divisor,
             $multiplier,
