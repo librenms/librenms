@@ -21,6 +21,9 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         include 'includes/polling/mib/sub10-mib.inc.php';
     } elseif ($device['os'] == 'unifi') {
         include 'includes/polling/mib/ubnt-unifi-mib.inc.php';
+    } elseif ($device['os'] == 'fibeair') {
+        echo 'It is Ceragon FibeAir' . PHP_EOL;
+        include 'includes/polling/mib/fibeair-mib.inc.php';
     }
 } else {
     echo 'Unsupported type: ' . $device['type'] . PHP_EOL;
