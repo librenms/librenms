@@ -13,7 +13,7 @@
  */
 
 // Rip hardware and firmware version from sysDescr string -- example: Cradlepoint CBA850, Firmware Version 6.2.0.dd92f49
-$getsysdescr = snmp_get($device, 'sysDescr.0', '-Ovqs', 'SNMPv2-MIB');
+$getsysdescr = $poll_device['sysDescr'];
 $getsysdescr = explode(",", $getsysdescr);
 $hardware = $getsysdescr[0];
 $hardware = explode(" ", $hardware);
@@ -21,5 +21,3 @@ $hardware = $hardware[1];
 $version = $getsysdescr[1];
 $version = explode(" ", $version);
 $version = $version[2];
-$serial = '';
-$features = '';
