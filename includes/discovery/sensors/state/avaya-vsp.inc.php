@@ -52,8 +52,8 @@ if (is_array($fan)) {
             }
         }
 
-        discover_sensor($valid['sensor'], 'state', $device, $current_oid, rcChasFanOperStatus.$index, $state_name, $descr, '1', '1', null, null, '3', '3', $state);
-        create_sensor_to_state_index($device, $state_name, rcChasFanOperStatus.$index);
+        discover_sensor($valid['sensor'], 'state', $device, $current_oid, "rcChasFanOperStatus.$index", $state_name, $descr, '1', '1', null, null, '3', '3', $state);
+        create_sensor_to_state_index($device, $state_name, "rcChasFanOperStatus.$index");
     }
 }
 
@@ -97,7 +97,7 @@ if (is_array($power_supply)) {
             }
         }
 
-        discover_sensor($valid['sensor'], 'state', $device, $current_oid, rcChasPowerSupplyOperStatus.$index, $state_name, $descr, '1', '1', null, null, '4', '4', $state);
-        create_sensor_to_state_index($device, $state_name, rcChasPowerSupplyOperStatus.$index);
+        discover_sensor($valid['sensor'], 'state', $device, $current_oid, "rcChasPowerSupplyOperStatus.$index", $state_name, $descr, '1', '1', null, null, '4', '4', $state);
+        create_sensor_to_state_index($device, $state_name, "rcChasPowerSupplyOperStatus.$index");
     }
 }
