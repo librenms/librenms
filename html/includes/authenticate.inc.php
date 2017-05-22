@@ -60,8 +60,6 @@ try {
             } elseif ($config['auth_mechanism'] === 'http-auth') {
                 if (isset($_SERVER['PHP_AUTH_USER']) && $_SERVER['PHP_AUTH_USER']) {
                     $username = clean($_SERVER['PHP_AUTH_USER']);
-                } elseif (isset($config['http_auth_guest'])) {
-                    $username = $config['http_auth_guest'];
                 }
             }
 
