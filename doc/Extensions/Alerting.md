@@ -34,6 +34,7 @@ Table of Content:
     - [Cisco Spark](#transports-ciscospark)
     - [SMSEagle](#transports-smseagle)
     - [Syslog](#transports-syslog)
+    - [Elasticsearch](#transports-elasticsearch)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
