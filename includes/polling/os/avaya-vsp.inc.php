@@ -25,5 +25,5 @@ $serial = str_replace('"', '', $serial);
 $sysDescr = $poll_device['sysDescr'];
 $sysDescr = explode(' ', $sysDescr);
 $sysDescr = $sysDescr[0];
-$hardware = $sysDescr; 
+$hardware = $sysDescr;
 $hardware = str_replace('"', '', $hardware);
