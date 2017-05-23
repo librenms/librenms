@@ -51,10 +51,10 @@
                     $descr,
                     $divisor,
                     $multiplier,
-                    NULL,
-                    NULL,
-                    NULL,
-                    NULL,
+                    null,
+                    null,
+                    null,
+                    null,
                     $current
                 );
             }//End if sensor exists

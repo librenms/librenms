@@ -42,10 +42,10 @@ if (is_array($pre_cache['adva_fsp3kr7_Card'])) {
                 $descr,
                 $divisor,
                 $multiplier,
-                NULL,
-                NULL,
-                NULL,
-                NULL,
+                null,
+                null,
+                null,
+                null,
                 $current
             );
         }

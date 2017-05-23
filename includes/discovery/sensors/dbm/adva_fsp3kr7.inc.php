@@ -40,10 +40,10 @@ foreach ($pre_cache['adva_fsp3kr7'] as $index => $entry) {
             $descr,
             $divisor,
             $multiplier,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
+            null,
+            null,
+            null,
+            null,
             $currentRX
         );
     }//End if Input Power
@@ -64,10 +64,10 @@ foreach ($pre_cache['adva_fsp3kr7'] as $index => $entry) {
             $descr,
             $divisor,
             $multiplier,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
+            null,
+            null,
+            null,
+            null,
             $currentTX
         );
     }//End if Output Power

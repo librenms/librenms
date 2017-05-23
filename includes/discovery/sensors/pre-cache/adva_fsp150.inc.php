@@ -17,4 +17,4 @@
  **/
 
 // FSP150CC Series
-$pre_cache['adva_fsp150'] = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', array(), 'CM-ENTITY-MIB', NULL, '-OQUbs');
+$pre_cache['adva_fsp150'] = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', array(), 'CM-ENTITY-MIB', null, '-OQUbs');
