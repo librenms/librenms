@@ -19,6 +19,7 @@ $states       = dbFetchCell("select count(*) from sensors WHERE sensor_class='st
 $load         = dbFetchCell("select count(*) from sensors WHERE sensor_class='load' AND device_id = ?", array($device['device_id']));
 $signal       = dbFetchCell("select count(*) from sensors WHERE sensor_class='signal' AND device_id = ?", array($device['device_id']));
 $airflow      = dbFetchCell("select count(*) from sensors WHERE sensor_class='airflow' AND device_id = ?", array($device['device_id']));
+$snr          = dbFetchCell("select count(*) from sensors WHERE sensor_class='snr' AND device_id = ?", array($device['device_id']));
 
 unset($datas);
 $datas[] = 'overview';
@@ -94,6 +95,10 @@ if ($airflow) {
     $datas[] = 'airflow';
 }
 
+if ($snr) {
+    $datas[] = 'snr';
+}
+
 $type_text['overview']    = 'Overview';
 $type_text['charge']      = 'Battery Charge';
 $type_text['temperature'] = 'Temperature';
@@ -113,6 +118,7 @@ $type_text['state']       = 'State';
 $type_text['load']        = 'Load';
 $type_text['signal']      = 'Signal';
 $type_text['airflow']     = 'Airflow';
+$type_text['snr']         = 'SNR';
 
 $link_array = array(
     'page'   => 'device',
