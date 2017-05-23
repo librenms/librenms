@@ -21,41 +21,44 @@
 // ******************************************
 
     // Define Sensors and Limits
-    $sensors = array
+    $sensors_adva = array
                 (
                 array(
                         'sensor_name'     => 'psuOutputCurrent',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.4.1.8'));
+                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.4.1.8')
+                );
+
     $multiplier = 1;
     $divisor    = 1000;
+    $sensorType = 'adva_fsp150';
     
-    foreach (array_keys($pre_cache['fsp150']) as $index1) {
-        foreach ($sensors as $entry) {
+    foreach (array_keys($pre_cache['adva_fsp150']) as $index) {
+        foreach ($sensors_adva as $entry) {
             $sensor_name = $entry['sensor_name'];
-            if ($pre_cache['fsp150'][$index1][$sensor_name]) {
-                $descr       = $pre_cache['fsp150'][$index1]['slotCardUnitName']." [#".$pre_cache['fsp150'][$index1]['slotIndex']."]";
-                $current     = $pre_cache['fsp150'][$index1][$entry];
-                $sensorType  = 'advafsp150';
-                $oid         = $entry['sensor_oid'].".".$index1;
+            if ($pre_cache['adva_fsp150'][$index][$sensor_name]) {
+                $oid          = $entry['sensor_oid'].".".$index;
+                $rrd_filename = $pre_cache['adva_fsp150'][$index]['slotCardUnitName']."-".$pre_cache['adva_fsp150'][$index]['slotIndex'];
+                $descr        = $pre_cache['adva_fsp150'][$index]['slotCardUnitName']." [#".$pre_cache['adva_fsp150'][$index]['slotIndex']."]";
+                $current      = $pre_cache['adva_fsp150'][$index][$entry];
 
                 discover_sensor(
                     $valid['sensor'],
                     'current',
                     $device,
                     $oid,
-                    $index1,
+                    $rrd_filename,
                     $sensorType,
                     $descr,
                     $divisor,
                     $multiplier,
-                    $low_limit,
-                    $low_warn_limit,
-                    $high_warn_limit,
-                    $high_limit,
+                    NULL,
+                    NULL,
+                    NULL,
+                    NULL,
                     $current
                 );
             }//End if sensor exists
         }//End foreach $entry
     }//End foreach $index
-    unset($sensors, $entry);
+    unset($sensors_adva, $entry);
 // ************** End of Sensors for ADVA FSP150CC Series **********

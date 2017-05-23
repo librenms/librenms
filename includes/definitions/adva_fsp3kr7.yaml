@@ -1,10 +1,10 @@
 os: adva_fsp3kr7
-text: ADVA_FSP3000_R7
+text: ADVA FSP3000 R7
 type: network
 icon: adva
 group: ADVA
 over:
-   - { graph: device_bits, text: Traffic }
+   - { graph: device_dbm, text: dbm }
    - { graph: device_temperature, text: Temperature }
 discovery:
    - sysObjectId: 

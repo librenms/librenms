@@ -19,56 +19,55 @@
 //********* ADVA FSP3000 R7 Series
 
     $multiplier = 1;
-    $divisor = 10;
+    $divisor    = 10;
+    $sensorType = 'adva_fsp3kr7';
 
-foreach ($pre_cache['fsp3kr7'] as $index => $entry) {
-// other AidStrings to be inclued.
+foreach ($pre_cache['adva_fsp3kr7'] as $index => $entry) {
     if ($entry['entityFacilityAidString'] and $entry['pmSnapshotCurrentInputPower']) {
-        $oidRX = '.1.3.6.1.4.1.2544.1.11.7.7.2.3.1.2.' . $index;
-        $currentRX                   = $entry['pmSnapshotCurrentInputPower'];
-        $descr                       = $entry['entityFacilityAidString'].' RX';
+        $oidRX        = '.1.3.6.1.4.1.2544.1.11.7.7.2.3.1.2.' . $index;
+        $descr        = $entry['entityFacilityAidString'].' RX';
+        $rrd_filename = $descr;
+        $currentRX    = $entry['pmSnapshotCurrentInputPower'];
+        $descr        = $entry['entityFacilityAidString'].' RX';
 
         discover_sensor(
             $valid['sensor'],
             'dbm',
             $device,
             $oidRX,
-            $descr,
-            'advafsp3kr7',
+            $rrd_filename,
+            $sensorType,
             $descr,
             $divisor,
             $multiplier,
-            $limit_low,
-            $warn_limit_low,
-            $warn_limit,
-            $limit,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
             $currentRX
         );
     }//End if Input Power
 
     if ($entry['entityFacilityAidString'] and $entry['pmSnapshotCurrentOutputPower']) {
-        $oidTX = '.1.3.6.1.4.1.2544.1.11.7.7.2.3.1.1.' . $index;
-        $limit_low                 = -20;
-        $warn_limit_low            = -18;
-        $limit                     = 7;
-        $warn_limit                = 5;
-        $currentTX                   = $entry['pmSnapshotCurrentOutputPower'];
-        $descr                       = $entry['entityFacilityAidString'].' TX';
+        $oidTX     = '.1.3.6.1.4.1.2544.1.11.7.7.2.3.1.1.' . $index;
+        $descr     = $entry['entityFacilityAidString'].' TX';
+        $rrd_filename = $descr;
+        $currentTX = $entry['pmSnapshotCurrentOutputPower'];
 
         discover_sensor(
             $valid['sensor'],
             'dbm',
             $device,
             $oidTX,
-            $descr,
-            'advafsp3kr7',
+            $rrd_filename,
+            $sensorType,
             $descr,
             $divisor,
             $multiplier,
-            $limit_low,
-            $warn_limit_low,
-            $warn_limit,
-            $limit,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
             $currentTX
         );
     }//End if Output Power
