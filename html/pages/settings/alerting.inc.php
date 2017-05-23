@@ -1354,7 +1354,6 @@ echo '
                 </div>
             </div>
         </div>';
-$es_enabled     = get_config_by_name('alert.transports.elasticsearch.es_enabled');
 $es_host     = get_config_by_name('alert.transports.elasticsearch.es_host');
 $es_port    = get_config_by_name('alert.transports.elasticsearch.es_port');
 $es_index    = get_config_by_name('alert.transports.elasticsearch.es_index');
