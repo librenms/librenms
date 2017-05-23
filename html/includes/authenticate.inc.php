@@ -57,10 +57,8 @@ try {
                 $password = $_REQUEST['password'];
             } elseif (isset($_SERVER['REMOTE_USER'])) {
                 $username = clean($_SERVER['REMOTE_USER']);
-            } elseif ($config['auth_mechanism'] === 'http-auth') {
-                if (isset($_SERVER['PHP_AUTH_USER']) && $_SERVER['PHP_AUTH_USER']) {
-                    $username = clean($_SERVER['PHP_AUTH_USER']);
-                }
+            } elseif (isset($_SERVER['PHP_AUTH_USER']) && $config['auth_mechanism'] === 'http-auth') {
+                $username = clean($_SERVER['PHP_AUTH_USER']);
             }
 
             // form authentication
