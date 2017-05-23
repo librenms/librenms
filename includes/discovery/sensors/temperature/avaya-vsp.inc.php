@@ -1,3 +1,4 @@
+<?php
 /**
  * avaya-vsp.inc.php
  *
@@ -11,61 +12,79 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-     
-$high_limit = 55;
-$low_limit = 0;
-     
-// rcChasFanAmbientTemperature
-$tempsfan = snmp_walk($device, '.1.3.6.1.4.1.2272.1.4.7.1.1.3', '-Osqn');
-foreach (explode("\n", $tempsfan) as $i => $t) {
-    $t   = explode(' ', $t);
-    $oid = $t[0];
-    $val = $t[1];
-    $var1 = "rcChasFanAmbientTemperature";
-    $var2 =   'Fan '.($i + 1).' temperature';
-    if (is_numeric($val) && $val > 0) {
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $var1.$i, $var1, $var2, '1', '1', $low_limit, $low_limit, $high_limit, $high_limit, $val);
+
+//rcChasFanAmbientTemperature
+$rcChasFan = snmpwalk_cache_multi_oid($device, 'rcChasFanAmbientTemperature', array(), 'RAPID-CITY');
+
+if (is_array($rcChasFan)) {
+
+    foreach (array_keys($rcChasFan) as $index) {
+        $descr = "Fan ".$index." temperature";
+        $value = $rcChasFan[$index]['rcChasFanAmbientTemperature'];
+        $var1 = 'rcChasFanAmbientTemperature';
+        $oid = '.1.3.6.1.4.1.2272.1.4.7.1.1.3.'.$index;
+        d_echo("VOSS $var1.$index: $value\n");
+
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
     }
 }
-     
-// rcSingleCpSystem
-$tempsystem = snmp_walk($device, '.1.3.6.1.4.1.2272.1.212', '-Osqn');
-foreach (explode("\n", $tempsystem) as $i => $t) {
-    $t   = explode(' ', $t);
-    $oid = $t[0];
-    $val = $t[1];
-    switch ($oid) {
-        //rcSingleCpSystemCpuTemperature
-        case ($oid == '.1.3.6.1.4.1.2272.1.212.1.0' && $t[1] !=0):
-            $var1 = "rcSingleCpSystemCpuTemperature";
-            $var2 = "CPU temperature";
-            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $var1.$i, $var1, $var2, '1', '1', $low_limit, $low_limit, $high_limit, $high_limit, $val);
-            break;
-        //rcSingleCpSystemMacTemperature
-        case ($oid == '.1.3.6.1.4.1.2272.1.212.2.0' && $t[1] !=0):
-            $var1 = "rcSingleCpSystemMacTemperature";
-            $var2 = "MAC temperature";
-            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $var1.$i, $var1, $var2, '1', '1', $low_limit, $low_limit, $high_limit, $high_limit, $val);
-            break;
-        //rcSingleCpSystemPhy2Temperature
-        case ($oid == '.1.3.6.1.4.1.2272.1.212.3.0' && $t[1] !=0):
-            $var1 = "rcSingleCpSystemPhy2Temperature";
-            $var2 = "Phy1 temperature";
-            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $var1.$i, $var1, $var2, '1', '1', $low_limit, $low_limit, $high_limit, $high_limit, $val);
-            break;
-        //rcSingleCpSystemPhy1Temperature
-        case ($oid == '.1.3.6.1.4.1.2272.1.212.4.0' && $t[1] !=0):
-            $var1 = "rcSingleCpSystemPhy1Temperature";
-            $var2 = "Phy2 temperature";
-            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $var1.$i, $var1, $var2, '1', '1', $low_limit, $low_limit, $high_limit, $high_limit, $val);
-            break;
-        //rcSingleCpSystemMac2Temperature
-        case ($oid == '.1.3.6.1.4.1.2272.1.212.5.0' && $t[1] !=0):
-            $var1 = "rcSingleCpSystemMac2Temperature";
-            $var2 = "MAC2 temperature";
-            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $var1.$i, $var1, $var2, '1', '1', $low_limit, $low_limit, $high_limit, $high_limit, $val);
-            break;
-        default:
-            $var1 = "Unknown";
-    }
+
+//rcSingleCpSystemCpuTemperature
+$var1 = "rcSingleCpSystemCpuTemperature";
+$oid = ".1.3.6.1.4.1.2272.1.212.1.0";
+$descr = "CPU temperature";
+$value = snmp_get($device, "$var1.0", '-OvqU', 'RAPID-CITY');
+d_echo("VOSS $var1: $value\n");
+if ((is_numeric($value) && $value != 0)) {
+
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
+
+}
+
+//rcSingleCpSystemMacTemperature
+$var1 = "rcSingleCpSystemMacTemperature";
+$oid = ".1.3.6.1.4.1.2272.1.212.2.0";
+$descr = "MAC temperature";
+$value = snmp_get($device, "$var1.0", '-OvqU', 'RAPID-CITY');
+d_echo("VOSS $var1: $value\n");
+if ((is_numeric($value) && $value != 0)) {
+
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
+
+}
+
+//rcSingleCpSystemPhy1Temperature
+$var1 = "rcSingleCpSystemPhy1Temperature";
+$oid = ".1.3.6.1.4.1.2272.1.212.3.0";
+$descr = "PHY1 temperature";
+$value = snmp_get($device, "$var1.0", '-OvqU', 'RAPID-CITY');
+d_echo("VOSS $var1: $value\n");
+if ((is_numeric($value) && $value != 0)) {
+
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
+
+}
+
+//rcSingleCpSystemPhy2Temperature
+$var1 = "rcSingleCpSystemPhy2Temperature";
+$oid = ".1.3.6.1.4.1.2272.1.212.4.0";
+$descr = "PHY2 temperature";
+$value = snmp_get($device, "$var1.0", '-OvqU', 'RAPID-CITY');
+d_echo("VOSS $var1: $value\n");
+if ((is_numeric($value) && $value != 0)) {
+
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
+
+}
+
+//rcSingleCpSystemMac2Temperature
+$var1 = "rcSingleCpSystemMac2Temperature";
+$oid = ".1.3.6.1.4.1.2272.1.212.5.0";
+$descr = "MAC2 temperature";
+$value = snmp_get($device, "$var1.0", '-OvqU', 'RAPID-CITY');
+d_echo("VOSS $var1: $value\n");
+if ((is_numeric($value) && $value != 0)) {
+
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
+
 }
