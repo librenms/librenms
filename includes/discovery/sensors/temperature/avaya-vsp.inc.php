@@ -15,16 +15,13 @@
 
 //rcChasFanAmbientTemperature
 $rcChasFan = snmpwalk_cache_multi_oid($device, 'rcChasFanAmbientTemperature', array(), 'RAPID-CITY');
-
 if (is_array($rcChasFan)) {
-
     foreach (array_keys($rcChasFan) as $index) {
         $descr = "Fan ".$index." temperature";
         $value = $rcChasFan[$index]['rcChasFanAmbientTemperature'];
         $var1 = 'rcChasFanAmbientTemperature';
         $oid = '.1.3.6.1.4.1.2272.1.4.7.1.1.3.'.$index;
         d_echo("VOSS $var1.$index: $value\n");
-
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
     }
 }
@@ -36,9 +33,7 @@ $descr = "CPU temperature";
 $value = snmp_get($device, "$var1.0", '-OvqU', 'RAPID-CITY');
 d_echo("VOSS $var1: $value\n");
 if ((is_numeric($value) && $value != 0)) {
-
     discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
-
 }
 
 //rcSingleCpSystemMacTemperature
@@ -48,9 +43,7 @@ $descr = "MAC temperature";
 $value = snmp_get($device, "$var1.0", '-OvqU', 'RAPID-CITY');
 d_echo("VOSS $var1: $value\n");
 if ((is_numeric($value) && $value != 0)) {
-
     discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
-
 }
 
 //rcSingleCpSystemPhy1Temperature
@@ -60,9 +53,7 @@ $descr = "PHY1 temperature";
 $value = snmp_get($device, "$var1.0", '-OvqU', 'RAPID-CITY');
 d_echo("VOSS $var1: $value\n");
 if ((is_numeric($value) && $value != 0)) {
-
     discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
-
 }
 
 //rcSingleCpSystemPhy2Temperature
@@ -72,9 +63,7 @@ $descr = "PHY2 temperature";
 $value = snmp_get($device, "$var1.0", '-OvqU', 'RAPID-CITY');
 d_echo("VOSS $var1: $value\n");
 if ((is_numeric($value) && $value != 0)) {
-
     discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
-
 }
 
 //rcSingleCpSystemMac2Temperature
@@ -84,7 +73,5 @@ $descr = "MAC2 temperature";
 $value = snmp_get($device, "$var1.0", '-OvqU', 'RAPID-CITY');
 d_echo("VOSS $var1: $value\n");
 if ((is_numeric($value) && $value != 0)) {
-
     discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
-
 }
