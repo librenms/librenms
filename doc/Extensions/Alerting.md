@@ -174,7 +174,7 @@ Templates can be matched against several rules.
 
 ## <a name="templates-testing">Testing</a>
 
-It's possible to test your new template before assigning it to a rule. To do so you can run `./scripts/est-template.php`. The script will provide the help 
+It's possible to test your new template before assigning it to a rule. To do so you can run `./scripts/test-template.php`. The script will provide the help 
 info when ran without any paramaters.
 
 As an example, if you wanted to test template ID 10 against localhost running rule ID 2 then you would run:
