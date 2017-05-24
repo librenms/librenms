@@ -26,3 +26,11 @@
 if (empty($config['email_from'])) {
     $config['email_from'] = '"' . $config['project_name'] . '" <' . $config['email_user'] . '@' . php_uname('n') . '>';
 }
+
+// We need rrdtool so ensure it's set
+if (empty($config['rrdtool'])) {
+    $config['rrdtool'] = '/usr/bin/rrdtool';
+}
+if (empty($config['rrdtool_verion'])) {
+    $config['rrdtool_version'] = 1.4;
+}
