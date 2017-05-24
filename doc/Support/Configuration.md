@@ -141,7 +141,14 @@ LibreNMS will attempt to detect the URL you are using but you can override that 
 ```php
 $config['site_style']       = "light";
 ```
-Currently we have a number of styles which can be set which will alter the navigation bar look. dark, light and mono with light being the default.
+Currently we have a number of styles which can be set to alter the navigation bar look. Currently these themes include 'dark', 'light' and 'mono' with 'light' being the default theme. 
+Additional to setting the site style, you are able to change the the colour of your Icon Theme by adjusting the colour in the theme style sheet under .icon-theme such as within dark.css. 
+This changes the colour of the icons throughout the interface except for the navigation bar and key icons such as port count and errors. Colours can be specified either as HEX RBG (#000000) 
+or as a name. (black)
+
+.icon-theme {
+    color: <COLOUR>;
+}
 
 ```php
 $config['webui']['custom_css'][]       = "css/custom/styles.css";
