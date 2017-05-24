@@ -26,6 +26,8 @@ if (is_array($rcChasFan)) {
     }
 }
 
+unset($rcChasFan);
+
 //rcSingleCpSystemCpuTemperature
 $var1 = "rcSingleCpSystemCpuTemperature";
 $oid = ".1.3.6.1.4.1.2272.1.212.1.0";
