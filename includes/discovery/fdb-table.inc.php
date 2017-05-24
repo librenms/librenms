@@ -75,13 +75,13 @@ if ($device['os'] == 'ios') {
 
     // find port ids, output like
     // dot1dBasePortIfIndex[1] 1
-    $dot1dBasePortIfIndex = snmp_walk($device, 'dot1dBasePortIfIndex', '-Cc -OqsX', 'BRIDGE-MIB'); 
+    $dot1dBasePortIfIndex = snmp_walk($device, 'dot1dBasePortIfIndex', '-Cc -OqsX', 'BRIDGE-MIB');
 
     foreach (explode("\n", $dot1dBasePortIfIndex) as $dot1dBasePortIfIndex_entry) {
         if (!empty($dot1dBasePortIfIndex_entry)) {
             $port = explode(' ', $dot1dBasePortIfIndex_entry);
             $strTemp = explode('[', $port[0]);
-            $portLocal = rtrim($strTemp[1],']');
+            $portLocal = rtrim($strTemp[1], ']');
             $portid_dict[$portLocal] = $ifIndex_dict[$port[1]];
         }
     }
