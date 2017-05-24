@@ -16,7 +16,7 @@ if ($config['twofactor'] && isset($twofactorform)) {
                 <form class="form-horizontal" role="form" action="" method="post" name="logonform">
                     <div class="form-group">
                         <div class="col-md-12">
-                            <input type="text" name="username" id="username" class="form-control" placeholder="Username" required autofocus />
+                            <input type="text" name="username" id="username" class="form-control" placeholder="Username" required autofocus autocorrect="off" autocapitalize="off" spellcheck="false" />
                         </div>
                     </div>
                     <div class="form-group">
