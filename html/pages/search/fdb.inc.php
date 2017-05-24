@@ -8,7 +8,7 @@
                 <th data-column-id="hostname" data-order="asc">Device</th>
                 <th data-column-id="os" data-width="15%">Device OS</th>
                 <th data-column-id="mac_address">MAC Address</th>
-                <th data-column-id="ipv4_address" data-sortable="false">IP Address</th>
+                <th data-column-id="ipv4_address" data-sortable="false">IPv4 Address</th>
                 <th data-column-id="interface">Port</th>
                 <th data-column-id="vlan">Vlan</th>
             </tr>

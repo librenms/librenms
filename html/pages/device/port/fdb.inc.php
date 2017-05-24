@@ -5,7 +5,7 @@ $no_refresh = true;
     <thead>
         <tr>
             <th data-column-id="mac_address">MAC address</th>
-            <th data-column-id="ipv4_address">IPv4 address</th>
+            <th data-column-id="ipv4_address">IPv4 Address</th>
             <th data-column-id="interface" data-sortable="false">Port</th>
             <th data-column-id="vlan" data-sortable="false">Vlan</th>
         </tr>
