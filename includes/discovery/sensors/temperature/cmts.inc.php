@@ -1,20 +1,17 @@
 <?php
-$oids = snmpwalk_cache_oid_num($device, ".1.3.6.1.4.1.4998.1.1.10.1.4.2.1.29");
+$oids = snmpwalk_cache_oid($device, 'cardTemperature', array(), 'CADANT-CMTS-EQUIPMENT-MIB');
+$oids = snmpwalk_cache_oid($device, 'cardName', $oids, 'CADANT-CMTS-EQUIPMENT-MIB');
+$oids = snmpwalk_cache_oid($device, 'cardTemperatureHighWarn', $oids, 'CADANT-CMTS-EQUIPMENT-MIB');
+$oids = snmpwalk_cache_oid($device, 'cardTemperatureHighError', $oids, 'CADANT-CMTS-EQUIPMENT-MIB');
 
-foreach ($oids as $index => $data) {
-    $tempCurr = implode("", $data);
+foreach ($oids as $index => $entry) {
+    $tempCurr = $entry['cardTemperature'];
     if ($tempCurr !== "999") {
-        $split_oid        = explode('.', $index);
-        $temperature_id   = $split_oid[(count($split_oid) - 1)];
-        $temperature_oid  = ".1.3.6.1.4.1.4998.1.1.10.1.4.2.1.29.1.$temperature_id";
-        $descr_oid        = ".1.3.6.1.4.1.4998.1.1.10.1.4.2.1.3.1.$temperature_id";
-        $warnlimit_oid    = ".1.3.6.1.4.1.4998.1.1.10.1.4.2.1.44.1.$temperature_id";
-        $limit_oid        = ".1.3.6.1.4.1.4998.1.1.10.1.4.2.1.45.1.$temperature_id";
+        $temperature_oid  = ".1.3.6.1.4.1.4998.1.1.10.1.4.2.1.29.$index";
+        $descr = $entry['cardName'];
+        $warnlimit = $entry['cardTemperatureHighWarn'];
+        $limit = $entry['cardTemperatureHighError'];
 
-        $descr            = trim(snmp_get($device, $descr_oid, '-Oqv', ''), '"');
-        $warnlimit        = snmp_get($device, $warnlimit_oid, '-Oqv', '');
-        $limit            = snmp_get($device, $limit_oid, '-Oqv', '');
-
-        discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_id, 'cmts', $descr, '1', '1', null, null, $warnlimit, $limit, $tempCurr);
+        discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $index, 'cmts', $descr, '1', '1', null, null, $warnlimit, $limit, $tempCurr);
     }
 }
