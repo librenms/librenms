@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Authentication\TwoFactor;
 use LibreNMS\Exceptions\AuthenticationException;
 
 ini_set('session.use_only_cookies', 1);
@@ -25,27 +26,29 @@ dbDelete('session', '`session_expiry` <  ?', array(time()));
 
 session_start();
 
-if ($vars['page'] == 'logout' && $_SESSION['authenticated']) {
+if ($vars['page'] == 'logout' && session_authenticated()) {
     log_out_user();
     header('Location: ' . $config['base_url']);
     exit;
 }
 
 try {
-    if (isset($_SESSION['authenticated']) && $_SESSION['authenticated']) {
+    if (session_authenticated()) {
         // session authenticated already
         log_in_user();
     } else {
         // try authentication methods
 
-        // cookie authentication
-        if (isset($_COOKIE['sess_id'], $_COOKIE['token']) &&
+        if (isset($_POST['twofactor']) && TwoFactor::authenticate($_POST['twofactor'])) {
+            // process two-factor auth tokens
+            log_in_user();
+        } elseif (isset($_COOKIE['sess_id'], $_COOKIE['token']) &&
             reauthenticate(clean($_COOKIE['sess_id']), clean($_COOKIE['token']))
         ) {
+            $_SESSION['remember'] = true;
+            $_SESSION['twofactor'] = true; // trust cookie
+            // cookie authentication
             log_in_user();
-
-            // update cookie expiry times
-            set_remember_me();
         } else {
             // collect username and password
             $password = null;
@@ -53,23 +56,23 @@ try {
                 $username = clean($_REQUEST['username']);
                 $password = $_REQUEST['password'];
             } elseif (isset($_SERVER['REMOTE_USER'])) {
-                $username = $_SERVER['REMOTE_USER'];
+                $username = clean($_SERVER['REMOTE_USER']);
             } elseif (isset($_SERVER['PHP_AUTH_USER']) && $config['auth_mechanism'] === 'http-auth') {
-                $username = $_SERVER['PHP_AUTH_USER'];
+                $username = clean($_SERVER['PHP_AUTH_USER']);
             }
 
             // form authentication
             if (isset($username) && authenticate($username, $password)) {
                 $_SESSION['username'] = $username;
-                log_in_user();
 
-                // set cookie if requested
                 if (isset($_POST['remember'])) {
-                    set_remember_me();
+                    $_SESSION['remember'] = $_POST['remember'];
                 }
 
-                // redirect to original uri or home page.
-                header('Location: '.rtrim($config['base_url'], '/').$_SERVER['REQUEST_URI'], true, 303);
+                if (log_in_user()) {
+                    // redirect to original uri or home page.
+                    header('Location: '.rtrim($config['base_url'], '/').$_SERVER['REQUEST_URI'], true, 303);
+                }
             }
         }
     }

@@ -174,7 +174,7 @@ Templates can be matched against several rules.
 
 ## <a name="templates-testing">Testing</a>
 
-It's possible to test your new template before assigning it to a rule. To do so you can run `./scripts/est-template.php`. The script will provide the help 
+It's possible to test your new template before assigning it to a rule. To do so you can run `./scripts/test-template.php`. The script will provide the help 
 info when ran without any paramaters.
 
 As an example, if you wanted to test template ID 10 against localhost running rule ID 2 then you would run:
@@ -188,14 +188,14 @@ template without any fault information.
 
 Default Template:
 ```text
-%title\r\n
-Severity: %severity\r\n
-{if %state == 0}Time elapsed: %elapsed\r\n{/if}
-Timestamp: %timestamp\r\n
-Unique-ID: %uid\r\n
-Rule: {if %name}%name{else}%rule{/if}\r\n
-{if %faults}Faults:\r\n
-{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}
+%title
+Severity: %severity
+{if %state == 0}Time elapsed: %elapsed{/if}
+Timestamp: %timestamp
+Unique-ID: %uid
+Rule: {if %name}%name{else}%rule{/if}
+{if %faults}Faults:
+{foreach %faults}  #%key: %value.string{/foreach}{/if}
 Alert sent to: {foreach %contacts}%value <%key> {/foreach}
 ```
 
