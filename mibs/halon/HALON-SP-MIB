@@ -1,0 +1,128 @@
+HALON-SP-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, enterprises,
+    Counter64, Integer32
+        FROM SNMPv2-SMI;
+
+    halonSecuritySP MODULE-IDENTITY
+        LAST-UPDATED        "201302061107Z"
+        ORGANIZATION        "Halon Security"
+        CONTACT-INFO        "http://www.halon.se"
+        DESCRIPTION         "SNMP MIB for Halon"
+
+        REVISION            "201302071132Z"
+        DESCRIPTION         "Initial release"
+        ::= { halonSecurityProducts 1 }
+
+
+    halonSecurity OBJECT IDENTIFIER ::= { enterprises 33234 }
+
+    halonSecurityProducts OBJECT IDENTIFIER ::= { halonSecurity 1 }
+
+    halonSecuritySPObjects OBJECT IDENTIFIER ::= { halonSecuritySP 1 }
+
+    serialNumber OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Serial number"
+        ::= { halonSecuritySPObjects 1 }
+
+    configurationRevision OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Running configuration revision"
+        ::= { halonSecuritySPObjects 2 }
+
+    mailQueueLength OBJECT-TYPE
+        SYNTAX              Counter64
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Length of mail queue to be delivered"
+        ::= { halonSecuritySPObjects 3 }
+
+    quarantinedMessages OBJECT-TYPE
+        SYNTAX              Counter64
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Messages in quarantine"
+        ::= { halonSecuritySPObjects 4 }
+
+    statTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF StatEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Table containing statistics"
+        ::= { halonSecuritySPObjects 5 }
+
+    statEntry OBJECT-TYPE
+        SYNTAX              StatEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Statistic entry"
+        INDEX               {
+                                statKey1Index,
+                                statKey2Index,
+                                statKey3Index
+                            }
+        ::= { statTable 1 }
+
+    StatEntry ::= SEQUENCE {
+        statKey1Index
+            OCTET STRING,
+        statKey2Index
+            OCTET STRING,
+        statKey3Index
+            OCTET STRING,
+        statCount
+            Counter64,
+        statCreated
+            Integer32,
+        statUpdated
+            Integer32
+    }
+
+    statKey1Index OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Key1"
+        ::= { statEntry 1 }
+
+    statKey2Index OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Key2"
+        ::= { statEntry 2 }
+
+    statKey3Index OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Key3"
+        ::= { statEntry 3 }
+
+    statCount OBJECT-TYPE
+        SYNTAX              Counter64
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Counter value"
+        ::= { statEntry 4 }
+
+    statCreated OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Unix timestamp when created"
+        ::= { statEntry 5 }
+
+    statUpdated OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Unix timestamp when last updated"
+        ::= { statEntry 6 }
+
+END
