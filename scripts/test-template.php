@@ -34,7 +34,7 @@ Usage:
     -d Debug
     
 Example:
-./scripts/test-template.php -t 10 -d localhost -r 2
+./scripts/test-template.php -t 10 -d -h localhost -r 2
 
 ");
     exit(1);
