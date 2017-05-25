@@ -106,9 +106,9 @@ if( !empty( $obj['faults'] ) ) {
                 break;
             case (array_key_exists('storage_id', $v)):
                 $data['entity_type'] = 'storage';
-                $data['entity_id'] = $v['processor_id'];
-                $data['entity_name'] = $v['processor_index'];
-                $data['entity_descr'] = $v['processor_descr'];
+                $data['entity_id'] = $v['storage_id'];
+                $data['entity_name'] = $v['storage_index'];
+                $data['entity_descr'] = $v['storage_descr'];
                 break;
             case (array_key_exists('processor_id', $v)):
                 $data['entity_type'] = 'processor';
