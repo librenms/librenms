@@ -112,9 +112,9 @@ if( !empty( $obj['faults'] ) ) {
                 break;
             case (array_key_exists('processor_id', $v)):
                 $data['entity_type'] = 'processor';
-                $data['entity_id'] = $v['storage_id'];
-                $data['entity_name'] = $v['storage_type'];
-                $data['entity_descr'] = $v['storage_descr'];
+                $data['entity_id'] = $v['processor_id'];
+                $data['entity_name'] = $v['processor_type'];
+                $data['entity_descr'] = $v['processor_descr'];
                 break;
             case (array_key_exists('bgpPeer_id', $v)):
                 $data['entity_type'] = 'bgp';
