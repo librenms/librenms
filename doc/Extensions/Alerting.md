@@ -179,7 +179,7 @@ info when ran without any paramaters.
 
 As an example, if you wanted to test template ID 10 against localhost running rule ID 2 then you would run:
 
-`./scripts/test-template.php -t 10 -d localhost -r 2`
+`./scripts/test-template.php -t 10 -d -h localhost -r 2`
 
 If the rule is currently alerting for localhost then you will get the full template as expected to see on email, if it's not then you will just see the 
 template without any fault information.
