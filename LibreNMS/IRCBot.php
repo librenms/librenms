@@ -253,9 +253,11 @@ class IRCBot
 
             if ($this->config['irc_alert_chan']) {
                 foreach ($this->config['irc_alert_chan'] as $chan) {
-                    $this->ircRaw('PRIVMSG '.$chan.' :'.$severity.trim($alert['title']).' - Rule: '.trim($alert['name'] ? $alert['name'] : $alert['rule']).(sizeof($alert['faults']) > 0 ? ' - Faults:' : ''));
-                    foreach ($alert['faults'] as $k => $v) {
-                        $this->ircRaw('PRIVMSG '.$chan.' :#'.$k.' '.$v['string']);
+                    $this->ircRaw('PRIVMSG '.$chan.' :'.$severity.trim($alert['title']));
+                    foreach (explode("\n", $alert['msg']) as $line) {
+                        if (trim($line) != trim($alert['title'])) {
+                            $this->ircRaw('PRIVMSG '.$chan.' :'.$line);
+                        }
                     }
                 }
             } else {
