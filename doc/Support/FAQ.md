@@ -293,6 +293,7 @@ Thanks for asking, sometimes it's not quite so obvious and everyone can contribu
     - If you know the vendor and can get permission to use logos that's also great.
 - Bugs. Found one? We want to know about it. Most bugs are fixed after being spotted and reported by someone, I'd love to say we are amazing developers and will fix all bugs before you spot them but that's just not true.
 - Feature requests. Can't code / won't code. No worries, chuck a feature request into Git Hub with enough detail and someone will take a look. A lot of the time this might be what interests someone, they need the same feature or they just have time. Please be patient, everyone who contributes does so in their own time.
+- Documentation. There are a lot of features that exist in the code, but don't appear until enabled or are otherwise undocumented. While the interface is fairly intuitive there's no actual user guide either.
 - Be nice, this is the foundation of this project. We expect everyone to be nice. People will fall out, people will disagree but please do it so in a respectable way.
 - Ask questions. Sometimes just by asking questions you prompt deeper conversations that can lead us to somewhere amazing so please never be afraid to ask a question.
 
