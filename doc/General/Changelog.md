@@ -1,3 +1,4 @@
+source: General/Changelog.md
 ## 1.28
 *(2017-05-28)*
 
@@ -54,7 +55,6 @@
 
 ---
 
-source: General/Changelog.md
 ## 1.27
 *(2017-04-29)*
 
