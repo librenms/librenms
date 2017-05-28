@@ -1,4 +1,60 @@
 source: General/Changelog.md
+## 1.28
+*(2017-05-28)*
+
+#### Features
+* Update Juniper MSS Support ([#6565](https://github.com/librenms/librenms/issues/6565))
+* Added ability to whitelist ifDescr values from being ignored with good_if ([#6584](https://github.com/librenms/librenms/issues/6584))
+* Added additional Unbound chart for query cache info ([#6574](https://github.com/librenms/librenms/issues/6574))
+* Wireless Sensors Overhaul ([#6471](https://github.com/librenms/librenms/pull/6471))
+* Updated BIND application ([#6218](https://github.com/librenms/librenms/issues/6218))
+
+#### Bugfixes
+* Added dell to mib_dir for windows / linux ([#6726](https://github.com/librenms/librenms/issues/6726))
+* Fix marking invalid ports as deleted in discovery ([#6665](https://github.com/librenms/librenms/issues/6665))
+* Improve authentication load time and security ([#6615](https://github.com/librenms/librenms/issues/6615))
+* page/graph load speed: part 1 ([#6611](https://github.com/librenms/librenms/issues/6611))
+* Fixed radius debug mode ([#6623](https://github.com/librenms/librenms/issues/6623))
+* Actives PRI calls on Cisco can be an array ([#6607](https://github.com/librenms/librenms/issues/6607))
+* MySQL app graphs with rrdcached ([#6608](https://github.com/librenms/librenms/issues/6608))
+* Fix issue with wireless sensors when there are too many oids ([#6578](https://github.com/librenms/librenms/issues/6578))
+
+#### Documentation
+* Create code of conduct page ([#6640](https://github.com/librenms/librenms/issues/6640))
+* Add all current wireless types. ([#6603](https://github.com/librenms/librenms/issues/6603))
+* Added seconds is the time unit. ([#6589](https://github.com/librenms/librenms/issues/6589))
+
+#### Refactoring
+* Added lock support to ./discovery.php -h new to prevent overlap ([#6568](https://github.com/librenms/librenms/issues/6568))
+* OS discovery tests are now dynamic ([#6555](https://github.com/librenms/librenms/issues/6555))
+* DB Updates will now file level lock to stop duplicate updates ([#6469](https://github.com/librenms/librenms/issues/6469))
+
+#### Devices
+* Add Wireless Support For Cisco IOS-XE([#6724](https://github.com/librenms/librenms/pull/6724))
+* Improve Aerohive Support ([#6721](https://github.com/librenms/librenms/issues/6721))
+* Add support for Halon Gateway ([#6716](https://github.com/librenms/librenms/issues/6716))
+* Added basic HPE OpenVMS detection ([#6706](https://github.com/librenms/librenms/issues/6706))
+* Added additional sensor state sysCmSyncStatusId for F5
+* Added more health information for APC units ([#6619](https://github.com/librenms/librenms/issues/6619))
+* Updated Lancom LCOS detection ([#6651](https://github.com/librenms/librenms/issues/6651))
+* Added 3 Phase APC UPS Support issue [#2733](https://github.com/librenms/librenms/issues/2733) & [#5504](https://github.com/librenms/librenms/issues/5504) ([#5558](https://github.com/librenms/librenms/issues/5558))
+* Add FWSM recognition to PIX OS ([#6569](https://github.com/librenms/librenms/issues/6569))
+* Aruba Instant AP wireless sensor support (Freq, NoiseFloor, Power, Util) ([#6564](https://github.com/librenms/librenms/issues/6564))
+* Added CPU and Memory pool for BDCom Switchs ([#6523](https://github.com/librenms/librenms/issues/6523))
+* Added support for Aruba ClearPass devices ([#6528](https://github.com/librenms/librenms/issues/6528))
+* Added support for Cisco's AsyncOS ([#6545](https://github.com/librenms/librenms/issues/6545))
+
+#### WebUI
+* Make login form more mobile-friendly ([#6707](https://github.com/librenms/librenms/issues/6707))
+* Updated link to peeringdb to use asn ([#6625](https://github.com/librenms/librenms/issues/6625))
+* Disabled settings button for Shared (read) dashboards if you are not the owner ([#6596](https://github.com/librenms/librenms/issues/6596))
+* Split apart max and min sensor limits, allows sorting ([#6592](https://github.com/librenms/librenms/issues/6592))
+
+#### Security
+* Remove possibility of xss in Oxidized and RIPE searches ([#6595](https://github.com/librenms/librenms/issues/6595))
+
+---
+
 ## 1.27
 *(2017-04-29)*
 
