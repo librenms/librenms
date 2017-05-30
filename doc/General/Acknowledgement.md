@@ -31,6 +31,7 @@ LibreNMS 3rd party acknowledgements
   - Symfony Yaml (https://github.com/symfony/yaml): MIT
   - PHPMailer (https://github.com/PHPMailer/PHPMailer): LGPL v2.1
   - pbin (https://github.com/glensc/pbin): GPLv2 (or later - see script header)
+  - php-cli-tools (https://github.com/wp-cli/php-cli-tools): MIT
 
 #### 3rd Party GPLv3 Non-compliant
 

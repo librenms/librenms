@@ -697,5 +697,59 @@
         ],
         "description": "Symfony Yaml Component",
         "homepage": "https://symfony.com"
+    },
+    {
+        "name": "wp-cli/php-cli-tools",
+        "version": "dev-librenms",
+        "version_normalized": "dev-librenms",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/librenms/php-cli-tools.git",
+            "reference": "57c01a2fb531d9a378c8297c3ac5f77d28516f9a"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/librenms/php-cli-tools/zipball/57c01a2fb531d9a378c8297c3ac5f77d28516f9a",
+            "reference": "57c01a2fb531d9a378c8297c3ac5f77d28516f9a",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">= 5.3.0"
+        },
+        "time": "2017-05-06 21:48:49",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "cli": "lib/"
+            },
+            "files": [
+                "lib/cli/cli.php"
+            ]
+        },
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Daniel Bachhuber",
+                "email": "daniel@handbuilt.co",
+                "role": "Maintainer"
+            },
+            {
+                "name": "James Logsdon",
+                "email": "jlogsdon@php.net",
+                "role": "Developer"
+            }
+        ],
+        "description": "Console utilities for PHP",
+        "homepage": "http://github.com/wp-cli/php-cli-tools",
+        "keywords": [
+            "cli",
+            "console"
+        ],
+        "support": {
+            "source": "https://github.com/librenms/php-cli-tools/tree/librenms-0.1"
+        }
     }
 ]

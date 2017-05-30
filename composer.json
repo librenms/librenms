@@ -29,7 +29,8 @@
         "dapphp/radius": "^2.0",
         "php-amqplib/php-amqplib": "^2.0",
         "symfony/yaml": "^2.8",
-        "rmccue/requests": "^1.7"
+        "rmccue/requests": "^1.7",
+        "wp-cli/php-cli-tools": "dev-librenms"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "2.6.*",
@@ -48,5 +49,11 @@
         "pre-update-cmd": "LibreNMS\\ComposerHelper::preUpdate",
         "post-autoload-dump": "LibreNMS\\ComposerHelper::postAutoloadDump",
         "commit": "LibreNMS\\ComposerHelper::commit"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "git@github.com:librenms/php-cli-tools.git"
+        }
+    ]
 }
