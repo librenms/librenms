@@ -715,6 +715,15 @@ class IRCBot
                 $devdown  = array_pop(dbFetchRow("SELECT count(*) FROM devices WHERE status = '0' AND `ignore` = '0'".$d_a));
                 $devign   = array_pop(dbFetchRow("SELECT count(*) FROM devices WHERE `ignore` = '1'".$d_a));
                 $devdis   = array_pop(dbFetchRow("SELECT count(*) FROM devices WHERE `disabled` = '1'".$d_a));
+                if ($devup > 0) {
+                    $devup = $this->_color($devup, 'green');
+                }
+                if ($devdown > 0) {
+                    $devdown = $this->_color($devdown, 'red');
+                    $devcount = $this->_color($devcount, 'orange', NULL, 'bold');
+                } else {
+                    $devcount = $this->_color($devcount, 'green', NULL, 'bold');
+                }
                 $msg      = 'Devices: '.$devcount.' ('.$devup.' up, '.$devdown.' down, '.$devign.' ignored, '.$devdis.' disabled'.')';
                 break;
 
@@ -727,6 +736,15 @@ class IRCBot
                 $prtsht   = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D WHERE I.ifAdminStatus = 'down' AND I.ignore = '0' AND D.device_id = I.device_id AND D.ignore = '0'".$p_a));
                 $prtign   = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D WHERE D.device_id = I.device_id AND (I.ignore = '1' OR D.ignore = '1')".$p_a));
                 $prterr   = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D WHERE D.device_id = I.device_id AND (I.ignore = '0' OR D.ignore = '0') AND (I.ifInErrors_delta > '0' OR I.ifOutErrors_delta > '0')".$p_a));
+                if ($prtup > 0) {
+                    $prtup = $this->_color($prtup, 'green');
+                }
+                if ($prtdown > 0) {
+                    $prtdown = $this->_color($prtdown, 'red');
+                    $prtcount = $this->_color($prtcount, 'orange', NULL, 'bold');
+                } else {
+                    $prtcount = $this->_color($prtcount, 'green', NULL, 'bold');
+                }
                 $msg      = 'Ports: '.$prtcount.' ('.$prtup.' up, '.$prtdown.' down, '.$prtign.' ignored, '.$prtsht.' shutdown'.')';
                 break;
 
@@ -738,6 +756,15 @@ class IRCBot
                 $srvdown  = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_status = '0' AND service_ignore = '0'".$d_a));
                 $srvign   = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_ignore = '1'".$d_a));
                 $srvdis   = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_disabled = '1'".$d_a));
+                if ($srvup > 0) {
+                    $srvup = $this->_color($srvup, 'green');
+                }
+                if ($srvdown > 0) {
+                    $srvdown = $this->_color($srvdown, 'red');
+                    $srvcount = $this->_color($srvcount, 'orange', NULL, 'bold');
+                } else {
+                    $srvcount = $this->_color($srvcount, 'green', NULL, 'bold');
+                }
                 $msg      = 'Services: '.$srvcount.' ('.$srvup.' up, '.$srvdown.' down, '.$srvign.' ignored, '.$srvdis.' disabled'.')';
                 break;
 
@@ -748,4 +775,126 @@ class IRCBot
 
         return $this->respond($msg);
     }//end _status()
+
+    private function _color($text, $fg_color, $bg_color=NULL, $other=NULL)
+    {
+        $this->log('Color '.$text.' '.$fg_color);
+        $ret = chr(3);
+        switch ($fg_color) {
+            case 'white':
+                $ret .= "00";
+                break;
+            case 'black':
+                $ret .= "01";
+                break;
+            case 'blue':
+                $ret .= "02";
+                break;
+            case 'green':
+                $ret .= "03";
+                break;
+            case 'red':
+                $ret .= "04";
+                break;
+            case 'brown':
+                $ret .= "05";
+                break;
+            case 'purple':
+                $ret .= "06";
+                break;
+            case 'orange':
+                $ret .= "07";
+                break;
+            case 'yellow':
+                $ret .= "08";
+                break;
+            case 'lightgreen':
+                $ret .= "09";
+                break;
+            case 'cyan':
+                $ret .= "10";
+                break;
+            case 'lightcyan':
+                $ret .= "11";
+                break;
+            case 'lightblue':
+                $ret .= "12";
+                break;
+            case 'pink':
+                $ret .= "13";
+                break;
+            case 'grey':
+                $ret .= "14";
+                break;
+            case 'lightgrey':
+                $ret .= "15";
+                break;
+        }
+        switch ($bg_color) {
+            case 'white':
+                $ret .= ",00";
+                break;
+            case 'black':
+                $ret .= ",01";
+                break;
+            case 'blue':
+                $ret .= ",02";
+                break;
+            case 'green':
+                $ret .= ",03";
+                break;
+            case 'red':
+                $ret .= ",04";
+                break;
+            case 'brown':
+                $ret .= ",05";
+                break;
+            case 'purple':
+                $ret .= ",06";
+                break;
+            case 'orange':
+                $ret .= ",07";
+                break;
+            case 'yellow':
+                $ret .= ",08";
+                break;
+            case 'lightgreen':
+                $ret .= ",09";
+                break;
+            case 'cyan':
+                $ret .= ",10";
+                break;
+            case 'lightcyan':
+                $ret .= ",11";
+                break;
+            case 'lightblue':
+                $ret .= ",12";
+                break;
+            case 'pink':
+                $ret .= ",13";
+                break;
+            case 'grey':
+                $ret .= ",14";
+                break;
+            case 'lightgrey':
+                $ret .= ",15";
+                break;
+        }
+        switch ($other) {
+            case 'bold':
+                $ret .= chr(2);
+                break;
+            case 'underline':
+                $ret .= chr(31);
+                break;
+            case 'italics':
+            case 'reverse':
+                $ret .= chr(22);
+                break;
+        }
+        $ret .= $text;
+        $ret .= chr(15);
+        return $ret;
+    }// end _color
+
 }//end class
