@@ -96,7 +96,7 @@ if ($vars['view'] == 'macaccounting_pkts') {
 print_optionbar_end();
 
 echo '<table border="0" cellspacing="0" cellpadding="5" width="100%">';
-echo '<tr style="height: 30px"><th>Peer address</th><th>Type</th><th>Remote AS</th><th>State</th><th>Uptime</th></tr>';
+echo '<tr style="height: 30px"><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>State</th><th>Uptime</th></tr>';
 
 $i = '1';
 
