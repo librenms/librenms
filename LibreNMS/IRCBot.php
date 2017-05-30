@@ -341,7 +341,7 @@ class IRCBot
                         }
                     }
                 }
-	    }
+            }
         }
         if ($this->isAuthd() || trim($this->command) == 'auth') {
             $this->proceedCommand(str_replace("\n", '', trim($this->command)), trim($tmp[1]));
@@ -394,7 +394,7 @@ class IRCBot
     {
         $arrData = explode(' ', $param, 2);
         return str_replace(':', '', $arrData[0]);
-    }//end getUser()
+    }//end getUserHost()
 
     private function connect($try = 0)
     {
