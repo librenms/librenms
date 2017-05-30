@@ -8,16 +8,23 @@ source: General/Changelog.md
 * Added additional Unbound chart for query cache info ([#6574](https://github.com/librenms/librenms/issues/6574))
 * Wireless Sensors Overhaul ([#6471](https://github.com/librenms/librenms/pull/6471))
 * Updated BIND application ([#6218](https://github.com/librenms/librenms/issues/6218))
+* Added script (scripts/test-template.php) to test alert templates ([#6631](https://github.com/librenms/librenms/issues/6631))
+* Improve Juniper MSS Support ([#6565](https://github.com/librenms/librenms/issues/6565))
 
 #### Bugfixes
 * Added dell to mib_dir for windows / linux ([#6726](https://github.com/librenms/librenms/issues/6726))
 * Fix marking invalid ports as deleted in discovery ([#6665](https://github.com/librenms/librenms/issues/6665))
 * Improve authentication load time and security ([#6615](https://github.com/librenms/librenms/issues/6615))
-* page/graph load speed: part 1 ([#6611](https://github.com/librenms/librenms/issues/6611))
+* Page/graph load speed: part 1 ([#6611](https://github.com/librenms/librenms/issues/6611))
 * Fixed radius debug mode ([#6623](https://github.com/librenms/librenms/issues/6623))
 * Actives PRI calls on Cisco can be an array ([#6607](https://github.com/librenms/librenms/issues/6607))
 * MySQL app graphs with rrdcached ([#6608](https://github.com/librenms/librenms/issues/6608))
 * Fix issue with wireless sensors when there are too many oids ([#6578](https://github.com/librenms/librenms/issues/6578))
+* Fix GE UPS voltage factor ([#6558](https://github.com/librenms/librenms/issues/6558))
+* Try to fix load for eaton-mgeups ([#6566](https://github.com/librenms/librenms/issues/6566))
+* Validate prefer capabilities over suid for fping ([#6644](https://github.com/librenms/librenms/issues/6644))
+* When force adding devices with v3, actually store the details ([#6691](https://github.com/librenms/librenms/issues/6691))
+* Fixed uptime detection ([#6705](https://github.com/librenms/librenms/issues/6705))
 
 #### Documentation
 * Create code of conduct page ([#6640](https://github.com/librenms/librenms/issues/6640))
@@ -28,30 +35,58 @@ source: General/Changelog.md
 * Added lock support to ./discovery.php -h new to prevent overlap ([#6568](https://github.com/librenms/librenms/issues/6568))
 * OS discovery tests are now dynamic ([#6555](https://github.com/librenms/librenms/issues/6555))
 * DB Updates will now file level lock to stop duplicate updates ([#6469](https://github.com/librenms/librenms/issues/6469))
+* Increased speed of loading syslog pages ([#6433](https://github.com/librenms/librenms/issues/6433))
+* Moved default alert rules into the collection ([#6621](https://github.com/librenms/librenms/issues/6621))
+* Modest speedup to database config population ([#6636](https://github.com/librenms/librenms/issues/6636))
+* Pretty mysql for alerts breaks regex rules ([#6614](https://github.com/librenms/librenms/issues/6614))
+* Updated vlan discovery to support JunOS ([#6597](https://github.com/librenms/librenms/issues/6597))
 
 #### Devices
-* Add Wireless Support For Cisco IOS-XE([#6724](https://github.com/librenms/librenms/pull/6724))
+* Added Wireless Support For Cisco IOS-XE([#6724](https://github.com/librenms/librenms/pull/6724))
 * Improve Aerohive Support ([#6721](https://github.com/librenms/librenms/issues/6721))
-* Add support for Halon Gateway ([#6716](https://github.com/librenms/librenms/issues/6716))
+* Added support for Halon Gateway ([#6716](https://github.com/librenms/librenms/issues/6716))
 * Added basic HPE OpenVMS detection ([#6706](https://github.com/librenms/librenms/issues/6706))
 * Added additional sensor state sysCmSyncStatusId for F5
 * Added more health information for APC units ([#6619](https://github.com/librenms/librenms/issues/6619))
 * Updated Lancom LCOS detection ([#6651](https://github.com/librenms/librenms/issues/6651))
-* Added 3 Phase APC UPS Support issue [#2733](https://github.com/librenms/librenms/issues/2733) & [#5504](https://github.com/librenms/librenms/issues/5504) ([#5558](https://github.com/librenms/librenms/issues/5558))
-* Add FWSM recognition to PIX OS ([#6569](https://github.com/librenms/librenms/issues/6569))
+* Added 3 Phase APC UPS Support [#2733](https://github.com/librenms/librenms/issues/2733) & [#5504](https://github.com/librenms/librenms/issues/5504) ([#5558](https://github.com/librenms/librenms/issues/5558))
+* Added FWSM recognition to PIX OS ([#6569](https://github.com/librenms/librenms/issues/6569))
 * Aruba Instant AP wireless sensor support (Freq, NoiseFloor, Power, Util) ([#6564](https://github.com/librenms/librenms/issues/6564))
 * Added CPU and Memory pool for BDCom Switchs ([#6523](https://github.com/librenms/librenms/issues/6523))
 * Added support for Aruba ClearPass devices ([#6528](https://github.com/librenms/librenms/issues/6528))
 * Added support for Cisco's AsyncOS ([#6545](https://github.com/librenms/librenms/issues/6545))
+* Added support for AKCP SecurityProbe ([#6550](https://github.com/librenms/librenms/issues/6550))
+* Added support for GE UPS (#6549) ([#6553](https://github.com/librenms/librenms/issues/6553))
+* Improve Extremeware and XOS detection ([#6554](https://github.com/librenms/librenms/issues/6554))
+* Added more sensors for Exalt ExtendAir devices ([#6531](https://github.com/librenms/librenms/issues/6531))
+* Added support for Terra sti410C ([#6598](https://github.com/librenms/librenms/issues/6598))
+* Make TiMOS detection more generic, rebrand to Nokia ([#6645](https://github.com/librenms/librenms/issues/6645))
+* Added HPE RT3000 UPS support ([#6638](https://github.com/librenms/librenms/issues/6638))
+* Added Enhance Barracuda NG Firewall Detection ([#6658](https://github.com/librenms/librenms/issues/6658))
+* Added support for Geist PDU ([#6646](https://github.com/librenms/librenms/issues/6646))
+* Improved Lancom LCOS detection, added LCOS-MIB ([#6651](https://github.com/librenms/librenms/issues/6651))
+* Added Basic Cisco SCE Support ([#6666](https://github.com/librenms/librenms/issues/6666))
+* Added support for MRV OptiDriver Optical Transport Platform ([#6656](https://github.com/librenms/librenms/issues/6656))
+* Update comware version and serial number polling ([#6686](https://github.com/librenms/librenms/issues/6686))
+* Added TiMOS temperature and power supply state sensors ([#6657](https://github.com/librenms/librenms/issues/6657))
+* Added state support FAN and Power Supply for Avaya VSP ([#6693](https://github.com/librenms/librenms/issues/6693))
+* Added detection for Cisco EPC devices ([#6690](https://github.com/librenms/librenms/issues/6690))
+* Added Wireless Support For Cisco IOS-XE ([#6724](https://github.com/librenms/librenms/issues/6724))
 
 #### WebUI
 * Make login form more mobile-friendly ([#6707](https://github.com/librenms/librenms/issues/6707))
 * Updated link to peeringdb to use asn ([#6625](https://github.com/librenms/librenms/issues/6625))
 * Disabled settings button for Shared (read) dashboards if you are not the owner ([#6596](https://github.com/librenms/librenms/issues/6596))
 * Split apart max and min sensor limits, allows sorting ([#6592](https://github.com/librenms/librenms/issues/6592))
+* Load device list for dropdowns using Ajax ([#6557](https://github.com/librenms/librenms/issues/6557))
+* Updated remaining display options where we do not show sysName if hostname is IP ([#6585](https://github.com/librenms/librenms/issues/6585))
 
 #### Security
 * Remove possibility of xss in Oxidized and RIPE searches ([#6595](https://github.com/librenms/librenms/issues/6595))
+
+#### Alerting
+* Added option to enable/disable option for sending alerts to normal users ([#6590](https://github.com/librenms/librenms/issues/6590))
+* Added HipChat v2 API + Color Changes ([#6669](https://github.com/librenms/librenms/issues/6669))
 
 ---
 
