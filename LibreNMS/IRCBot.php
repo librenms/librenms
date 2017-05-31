@@ -801,9 +801,9 @@ class IRCBot
             'lightgrey' => "15",
         );
         $ret = chr(3);
-        if (in_array($fg_color, $colors) {
+        if (in_array($fg_color, $colors)) {
             $ret .= $colors[$fg_color];
-            if (in_array($bg_color, $colors) {
+            if (in_array($bg_color, $colors)) {
                 $ret .= ",".$colors[$fg_color];
             }
         }
