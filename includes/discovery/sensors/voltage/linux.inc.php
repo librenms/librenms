@@ -4,8 +4,6 @@
  * requires snmp extend agent script from librenms-agent
  */
 $raspberry = snmp_get($device, 'HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0', '-Osqnv');
-$chip = snmp_get($device, '.1.3.6.1.4.1.50000.1.3.1.1.2.72.87', '-Oqv');
-
 if (preg_match("/(bcm).+(boardrev)/", $raspberry)) {
     $sensor_type = "rasbperry_volts";
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.';
@@ -29,15 +27,6 @@ if (preg_match("/(bcm).+(boardrev)/", $raspberry)) {
             discover_sensor($valid['sensor'], 'voltage', $device, $oid.$volt, $volt, $sensor_type, $descr, '1', '1', null, null, null, null, $value);
         }
     }
- } elseif (strpos($chip, 'CHIP') !== false) {
-    $sensor_type = "chip_volts";
-    $oid = '.1.3.6.1.4.1.50000.3.4.1.2.15.66.97.116.116.101.114.121.95.86.111.108.116.97.103.101.';
-    $descr = 'Battery';
-    $volt = '1';
-    $value = snmp_get($device, $oid.$volt, '-Oqv');
-    $value = $value / 1000;
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid.$volt, $volt, $sensor_type, $descr, '1', '1', null, null, null, null, $value);
-}
     /*
      * other linux os
      */
