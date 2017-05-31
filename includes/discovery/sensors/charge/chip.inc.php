@@ -11,5 +11,5 @@ if (strpos($chip, 'chip') !== false) {
     $descr = 'Battery charge';
     $index = '8';
     $value = snmp_get($device, $oid.$index, '-Oqv');
-    discover_sensor($valid['sensor'], 'charge', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', null, null, null, null, $value);
+    discover_sensor($valid['sensor'], 'charge', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
 }
