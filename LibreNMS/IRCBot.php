@@ -778,107 +778,34 @@ class IRCBot
 
     private function _color($text, $fg_color, $bg_color=NULL, $other=NULL)
     {
-        $this->log('Color '.$text.' '.$fg_color);
-        $ret = chr(3);
-        switch ($fg_color) {
-            case 'white':
-                $ret .= "00";
-                break;
-            case 'black':
-                $ret .= "01";
-                break;
-            case 'blue':
-                $ret .= "02";
-                break;
-            case 'green':
-                $ret .= "03";
-                break;
-            case 'red':
-                $ret .= "04";
-                break;
-            case 'brown':
-                $ret .= "05";
-                break;
-            case 'purple':
-                $ret .= "06";
-                break;
-            case 'orange':
-                $ret .= "07";
-                break;
-            case 'yellow':
-                $ret .= "08";
-                break;
-            case 'lightgreen':
-                $ret .= "09";
-                break;
-            case 'cyan':
-                $ret .= "10";
-                break;
-            case 'lightcyan':
-                $ret .= "11";
-                break;
-            case 'lightblue':
-                $ret .= "12";
-                break;
-            case 'pink':
-                $ret .= "13";
-                break;
-            case 'grey':
-                $ret .= "14";
-                break;
-            case 'lightgrey':
-                $ret .= "15";
-                break;
+
+        if ($this->debug) {
+            $this->log('Color '.$text.' '.$fg_color);
         }
-        switch ($bg_color) {
-            case 'white':
-                $ret .= ",00";
-                break;
-            case 'black':
-                $ret .= ",01";
-                break;
-            case 'blue':
-                $ret .= ",02";
-                break;
-            case 'green':
-                $ret .= ",03";
-                break;
-            case 'red':
-                $ret .= ",04";
-                break;
-            case 'brown':
-                $ret .= ",05";
-                break;
-            case 'purple':
-                $ret .= ",06";
-                break;
-            case 'orange':
-                $ret .= ",07";
-                break;
-            case 'yellow':
-                $ret .= ",08";
-                break;
-            case 'lightgreen':
-                $ret .= ",09";
-                break;
-            case 'cyan':
-                $ret .= ",10";
-                break;
-            case 'lightcyan':
-                $ret .= ",11";
-                break;
-            case 'lightblue':
-                $ret .= ",12";
-                break;
-            case 'pink':
-                $ret .= ",13";
-                break;
-            case 'grey':
-                $ret .= ",14";
-                break;
-            case 'lightgrey':
-                $ret .= ",15";
-                break;
+        $colors = array(
+            'white' => "00",
+            'black' => "01",
+            'blue' => "02",
+            'green' => "03",
+            'red' => "04",
+            'brown' => "05",
+            'purple' => "06",
+            'orange' => "07",
+            'yellow' => "08",
+            'lightgreen' => "09",
+            'cyan' => "10",
+            'lightcyan' => "11",
+            'lightblue' => "12",
+            'pink' => "13",
+            'grey' => "14",
+            'lightgrey' => "15",
+        );
+        $ret = chr(3);
+        if (in_array($fg_color, $colors) {
+            $ret .= $colors[$fg_color];
+            if (in_array($bg_color, $colors) {
+                $ret .= ",".$colors[$fg_color];
+            }
         }
         switch ($other) {
             case 'bold':
