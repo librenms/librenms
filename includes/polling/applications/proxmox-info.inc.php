@@ -1,8 +1,4 @@
 <?php
-//ini_set('display_errors', 'On');
-//error_reporting(E_ALL);
-
-//use LibreNMS\RRD\RrdDefinition;
 
 /**
  * Check if a Proxmox VM exists
@@ -56,7 +52,6 @@ if ($proxmox) {
 
         foreach ($pmxlines as $vm) {
             $vm = str_replace('"', '', $vm);
-            //list($vmid, $vmport, $vmpin, $vmpout, $vmdesc) = explode(' ', $vm, 5);
             list($vmid, $vmstatus, $vmdesc, $vmtype, $vmcpus, $vmuptime, $vmpid, $vmmem, $vmmaxmem, $vmdisk, $vmmaxdisk) = explode(' ', $vm, 11);
             print "Proxmox ($pmxcluster): $vmdesc: $vmstatus/$vmmem/$vmcpu/$vmstorage\n";
 
@@ -67,9 +62,6 @@ if ($proxmox) {
                 }
             }
 
-            //$tags = compact('name', 'app_id', 'pmxcluster', 'vmid', 'vmport', 'rrd_proxmox_name', 'rrd_def');
-            //data_update($device, 'app', $tags, $fields);
-
             $vmmem = intval($vmmem);
             $vmmaxmem = intval($vmmaxmem);
             $vmdisk = intval($vmdisk);
@@ -77,8 +69,6 @@ if ($proxmox) {
 
             $vmmemuse = round(($vmmem / $vmmaxmem) * 100, 2);
             $vmdiskuse = round(($vmdisk / $vmmaxdisk) * 100, 2);
-
-            print "VMUSE: $vmmemuse $vmdiskuse";
 
             if (proxmox_info_vm_exists($vmid, $pmxcluster, $pmxcache) === true) {
                 dbUpdate(
