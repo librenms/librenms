@@ -13,7 +13,6 @@
  * the source code distribution for details.
  */
 
-//rcChasFanAmbientTemperature
 $rcChasFan = snmpwalk_cache_multi_oid($device, 'rcChasFanAmbientTemperature', array(), 'RAPID-CITY');
 if (is_array($rcChasFan)) {
     foreach (array_keys($rcChasFan) as $index) {
@@ -21,59 +20,50 @@ if (is_array($rcChasFan)) {
         $value = $rcChasFan[$index]['rcChasFanAmbientTemperature'];
         $var1 = 'rcChasFanAmbientTemperature';
         $oid = '.1.3.6.1.4.1.2272.1.4.7.1.1.3.'.$index;
-        d_echo("VOSS $var1.$index: $value\n");
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", 'avaya-vsp', $descr, '1', '1', null, null, null, null, $value);
     }
 }
 
 unset($rcChasFan);
 
-//rcSingleCpSystemCpuTemperature
-$var1 = "rcSingleCpSystemCpuTemperature";
+$index = "rcSingleCpSystemCpuTemperature.0";
 $oid = ".1.3.6.1.4.1.2272.1.212.1.0";
 $descr = "CPU temperature";
-$value = snmp_get($device, "$var1.0", '-OvqU', 'RAPID-CITY');
-d_echo("VOSS $var1: $value\n");
+$value = snmp_get($device, $index, '-OvqU', 'RAPID-CITY');
 if ((is_numeric($value) && $value != 0)) {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'avaya-vsp', $descr, '1', '1', null, null, null, null, $value);
 }
 
-//rcSingleCpSystemMacTemperature
-$var1 = "rcSingleCpSystemMacTemperature";
+$index = "rcSingleCpSystemMacTemperature.0";
 $oid = ".1.3.6.1.4.1.2272.1.212.2.0";
 $descr = "MAC temperature";
-$value = snmp_get($device, "$var1.0", '-OvqU', 'RAPID-CITY');
-d_echo("VOSS $var1: $value\n");
+$value = snmp_get($device, $index, '-OvqU', 'RAPID-CITY');
 if ((is_numeric($value) && $value != 0)) {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'avaya-vsp', $descr, '1', '1', null, null, null, null, $value);
 }
 
-//rcSingleCpSystemPhy1Temperature
-$var1 = "rcSingleCpSystemPhy1Temperature";
+$index = "rcSingleCpSystemPhy1Temperature.0";
 $oid = ".1.3.6.1.4.1.2272.1.212.3.0";
 $descr = "PHY1 temperature";
-$value = snmp_get($device, "$var1.0", '-OvqU', 'RAPID-CITY');
-d_echo("VOSS $var1: $value\n");
+$value = snmp_get($device, $index, '-OvqU', 'RAPID-CITY');
 if ((is_numeric($value) && $value != 0)) {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'avaya-vsp', $descr, '1', '1', null, null, null, null, $value);
 }
 
-//rcSingleCpSystemPhy2Temperature
-$var1 = "rcSingleCpSystemPhy2Temperature";
+$index = "rcSingleCpSystemPhy2Temperature.0";
 $oid = ".1.3.6.1.4.1.2272.1.212.4.0";
 $descr = "PHY2 temperature";
-$value = snmp_get($device, "$var1.0", '-OvqU', 'RAPID-CITY');
+$value = snmp_get($device, $index, '-OvqU', 'RAPID-CITY');
 d_echo("VOSS $var1: $value\n");
 if ((is_numeric($value) && $value != 0)) {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'avaya-vsp', $descr, '1', '1', null, null, null, null, $value);
 }
 
-//rcSingleCpSystemMac2Temperature
-$var1 = "rcSingleCpSystemMac2Temperature";
+$index = "rcSingleCpSystemMac2Temperature.0";
 $oid = ".1.3.6.1.4.1.2272.1.212.5.0";
 $descr = "MAC2 temperature";
-$value = snmp_get($device, "$var1.0", '-OvqU', 'RAPID-CITY');
+$value = snmp_get($device, $index, '-OvqU', 'RAPID-CITY');
 d_echo("VOSS $var1: $value\n");
 if ((is_numeric($value) && $value != 0)) {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$var1.$index", $var1, $descr, '1', '1', null, null, null, null, $value);
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'avaya-vsp', $descr, '1', '1', null, null, null, null, $value);
 }
