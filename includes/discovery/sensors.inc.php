@@ -52,6 +52,7 @@ $run_sensors = array(
     'state',
     'temperature',
     'voltage',
+    'snr',
 );
 sensors($run_sensors, $device, $valid, $pre_cache);
 unset(

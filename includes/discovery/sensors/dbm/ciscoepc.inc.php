@@ -1,8 +1,8 @@
 <?php
 /**
- * process_config.inc.php
+ * ciscoepc.inc.php
  *
- * LibreNMS file to post process $config into something usable
+ * LibreNMS dbm discovery module for Cisco EPC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,14 +23,12 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if (empty($config['email_from'])) {
-    $config['email_from'] = '"' . $config['project_name'] . '" <' . $config['email_user'] . '@' . php_uname('n') . '>';
-}
-
-// We need rrdtool so ensure it's set
-if (empty($config['rrdtool'])) {
-    $config['rrdtool'] = '/usr/bin/rrdtool';
-}
-if (empty($config['rrdtool_verion'])) {
-    $config['rrdtool_version'] = 1.4;
+foreach ($pre_cache['ciscoepc_docsIfDownstreamChannelTable'] as $index => $data) {
+    if (is_numeric($data['docsIfDownChannelPower'])) {
+        $descr   = "Channel {$data['docsIfDownChannelId']}";
+        $oid     = '.1.3.6.1.2.1.10.127.1.1.1.1.6.' . $index;
+        $divisor = 10;
+        $value   = $data['docsIfDownChannelPower'];
+        discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'docsIfDownChannelPower.'.$index, 'ciscoepc', $descr, $divisor, '1', null, null, null, null, $value);
+    }
 }

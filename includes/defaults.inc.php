@@ -42,8 +42,6 @@ $config['db_socket']             = null;
 $config['own_hostname'] = 'localhost';
 
 // Location of executables
-$config['rrdtool']                  = '/usr/bin/rrdtool';
-$config['rrdtool_version']          = 1.4; // Doesn't need to contain minor numbers.
 $config['fping']                    = '/usr/bin/fping';
 $config['fping6']                   = 'fping6';
 $config['fping_options']['retries'] = 3;

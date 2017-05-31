@@ -1,8 +1,8 @@
 <?php
 /**
- * process_config.inc.php
+ * Iosxe.php
  *
- * LibreNMS file to post process $config into something usable
+ * Cisco IOS-XE Wireless LAN Controller
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,18 +19,12 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @copyright  2017 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-if (empty($config['email_from'])) {
-    $config['email_from'] = '"' . $config['project_name'] . '" <' . $config['email_user'] . '@' . php_uname('n') . '>';
-}
+namespace LibreNMS\OS;
 
-// We need rrdtool so ensure it's set
-if (empty($config['rrdtool'])) {
-    $config['rrdtool'] = '/usr/bin/rrdtool';
-}
-if (empty($config['rrdtool_verion'])) {
-    $config['rrdtool_version'] = 1.4;
+class Iosxe extends Ciscowlc
+{
 }

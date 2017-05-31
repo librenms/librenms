@@ -1,8 +1,8 @@
 <?php
 /**
- * process_config.inc.php
+ * ciscoepc.inc.php
  *
- * LibreNMS file to post process $config into something usable
+ * LibreNMS os sensor pre-cache module for Cisco EPC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,14 +23,8 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if (empty($config['email_from'])) {
-    $config['email_from'] = '"' . $config['project_name'] . '" <' . $config['email_user'] . '@' . php_uname('n') . '>';
-}
+echo 'docsIfDownstreamChannelTable ';
+$pre_cache['ciscoepc_docsIfDownstreamChannelTable'] = snmpwalk_cache_oid($device, 'docsIfDownstreamChannelTable', array(), 'DOCS-IF-MIB');
 
-// We need rrdtool so ensure it's set
-if (empty($config['rrdtool'])) {
-    $config['rrdtool'] = '/usr/bin/rrdtool';
-}
-if (empty($config['rrdtool_verion'])) {
-    $config['rrdtool_version'] = 1.4;
-}
+echo 'docsIfSignalQualityTable ';
+$pre_cache['ciscoepc_docsIfSignalQualityTable'] = snmpwalk_cache_oid($device, 'docsIfSignalQualityTable', array(), 'DOCS-IF-MIB');
