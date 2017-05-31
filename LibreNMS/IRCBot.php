@@ -248,7 +248,7 @@ class IRCBot
 
             $severity = str_replace(array('warning', 'critical'), array(chr(3).'8Warning', chr(3).'4Critical'), $alert['severity']).$severity_extended.chr(3).' ';
             if ($alert['state'] == 0 and $this->config['irc_alert_utf8']) {
-                $severity = str_replace(array('Warning', 'Critical'), array('W̶a̶r̶n̶i̶n̶g̶', 'C̶r̶i̶t̶i̶c̶a̶l̶'), $severity);
+                $severity = str_replace(array('Warning', 'Critical'), array('̶W̶a̶r̶n̶i̶n̶g', '̶C̶r̶i̶t̶i̶c̶a̶l'), $severity);
             }
 
             if ($this->config['irc_alert_chan']) {
