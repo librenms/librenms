@@ -68,3 +68,4 @@ foreach (explode("\n", $oids) as $data) {
         }
     }//end if
 }
+include "chip.inc.php";
