@@ -246,7 +246,7 @@ class IRCBot
                     $severity_extended = '';
             endswitch;
 
-            $severity = str_replace(array('warning', 'critical'), array(chr(3).'8Warning', chr(3).'4Critical'), $alert['severity']).$severity_extended.chr(3).' ';
+            $severity = str_replace(array('warning', 'critical'), array(_color('Warning', 'orange'), _color('Critical', 'red')), $alert['severity']).$severity_extended.' ';
             if ($alert['state'] == 0 and $this->config['irc_alert_utf8']) {
                 $severity = str_replace(array('Warning', 'Critical'), array('W̶a̶r̶n̶i̶n̶g̶', 'C̶r̶i̶t̶i̶c̶a̶l̶'), $severity);
             }
@@ -778,7 +778,6 @@ class IRCBot
 
     private function _color($text, $fg_color, $bg_color=NULL, $other=NULL)
     {
-
         if ($this->debug) {
             $this->log('Color '.$text.' '.$fg_color);
         }
