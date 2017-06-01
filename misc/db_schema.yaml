@@ -1252,7 +1252,18 @@ proxmox:
     device_id: { Field: device_id, Type: int(11), 'Null': false, Default: '0', Extra: '' }
     id: { Field: id, Type: int(11), 'Null': false, Default: null, Extra: auto_increment }
     last_seen: { Field: last_seen, Type: timestamp, 'Null': false, Default: CURRENT_TIMESTAMP, Extra: '' }
+    vmcpus: { Field: vmcpus, Type: int(11), 'Null': true, Default: null, Extra: '' }
+    vmdisk: { Field: vmdisk, Type: int(11), 'Null': true, Default: null, Extra: '' }
+    vmdiskuse: { Field: vmdiskuse, Type: float, 'Null': true, Default: null, Extra: '' }
     vmid: { Field: vmid, Type: int(11), 'Null': false, Default: null, Extra: '' }
+    vmmaxdisk: { Field: vmmaxdisk, Type: int(11), 'Null': true, Default: null, Extra: '' }
+    vmmaxmem: { Field: vmmaxmem, Type: int(11), 'Null': true, Default: null, Extra: '' }
+    vmmem: { Field: vmmem, Type: int(11), 'Null': true, Default: null, Extra: '' }
+    vmmemuse: { Field: vmmemuse, Type: float, 'Null': true, Default: null, Extra: '' }
+    vmpid: { Field: vmpid, Type: int(11), 'Null': true, Default: null, Extra: '' }
+    vmstatus: { Field: vmstatus, Type: varchar(50), 'Null': true, Default: null, Extra: '' }
+    vmtype: { Field: vmtype, Type: varchar(4), 'Null': true, Default: null, Extra: '' }
+    vmuptime: { Field: vmuptime, Type: int(11), 'Null': true, Default: null, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     cluster_vm: { Name: cluster_vm, Columns: [cluster, vmid], Unique: true, Type: BTREE }
