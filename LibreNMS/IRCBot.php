@@ -311,8 +311,8 @@ class IRCBot
                 if ($ctcp_reply) {
                     $this->log("Sending irc CTCP: ".'NOTICE '.$this->getUser($this->data)." :".$ctcp_reply);
                     return $this->ircRaw('NOTICE '.$this->getUser($this->data)." :".$ctcp_reply);
-                }                                                                                                                                                                                                              }
-
+                }
+            }
             $this->command = str_replace(array(chr(10), chr(13)), '', $ex[3]);
             if (strstr($this->command, ':.')) {
                 $this->handleCommand();
