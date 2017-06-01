@@ -292,7 +292,7 @@ class IRCBot
                 }
             }
 
-            if (preg_match("/^:".chr(1).".*/", $ex[3])) {
+            if (($this->config['irc_ctcp']) && (preg_match("/^:".chr(1).".*/", $ex[3]))) {
                 // Handle CTCP
                 $ctcp = trim(preg_replace("/[^A-Z]/", "", $ex[3]));
                 $ctcp_reply = NULL;
