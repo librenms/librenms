@@ -720,9 +720,9 @@ class IRCBot
                 }
                 if ($devdown > 0) {
                     $devdown = $this->_color($devdown, 'red');
-                    $devcount = $this->_color($devcount, 'orange', NULL, 'bold');
+                    $devcount = $this->_color($devcount, 'orange', null, 'bold');
                 } else {
-                    $devcount = $this->_color($devcount, 'green', NULL, 'bold');
+                    $devcount = $this->_color($devcount, 'green', null, 'bold');
                 }
                 $msg      = 'Devices: '.$devcount.' ('.$devup.' up, '.$devdown.' down, '.$devign.' ignored, '.$devdis.' disabled'.')';
                 break;
@@ -741,9 +741,9 @@ class IRCBot
                 }
                 if ($prtdown > 0) {
                     $prtdown = $this->_color($prtdown, 'red');
-                    $prtcount = $this->_color($prtcount, 'orange', NULL, 'bold');
+                    $prtcount = $this->_color($prtcount, 'orange', null, 'bold');
                 } else {
-                    $prtcount = $this->_color($prtcount, 'green', NULL, 'bold');
+                    $prtcount = $this->_color($prtcount, 'green', null, 'bold');
                 }
                 $msg      = 'Ports: '.$prtcount.' ('.$prtup.' up, '.$prtdown.' down, '.$prtign.' ignored, '.$prtsht.' shutdown'.')';
                 break;
@@ -761,9 +761,9 @@ class IRCBot
                 }
                 if ($srvdown > 0) {
                     $srvdown = $this->_color($srvdown, 'red');
-                    $srvcount = $this->_color($srvcount, 'orange', NULL, 'bold');
+                    $srvcount = $this->_color($srvcount, 'orange', null, 'bold');
                 } else {
-                    $srvcount = $this->_color($srvcount, 'green', NULL, 'bold');
+                    $srvcount = $this->_color($srvcount, 'green', null, 'bold');
                 }
                 $msg      = 'Services: '.$srvcount.' ('.$srvup.' up, '.$srvdown.' down, '.$srvign.' ignored, '.$srvdis.' disabled'.')';
                 break;
@@ -776,11 +776,8 @@ class IRCBot
         return $this->respond($msg);
     }//end _status()
 
-    private function _color($text, $fg_color, $bg_color=NULL, $other=NULL)
+    private function _color($text, $fg_color, $bg_color = null, $other = null)
     {
-        if ($this->debug) {
-            $this->log('Color '.$text.' '.$fg_color);
-        }
         $colors = array(
             'white' => "00",
             'black' => "01",
@@ -822,5 +819,4 @@ class IRCBot
         $ret .= chr(15);
         return $ret;
     }// end _color
-
 }//end class
