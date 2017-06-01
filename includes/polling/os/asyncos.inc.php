@@ -27,22 +27,22 @@ $version = $regexp_results[0];
 preg_match('/[[\w]+-[\w]+/', $serial, $regexp_results);
 $serial = $regexp_results[0];
 
-$sysobjectid = $poll_device['sysObjectID']
+$sysobjectid = $poll_device['sysObjectID'];
 
 # Get stats only if device is web proxy
-if (strcmp($sysobjectid, '.1.3.6.1.4.1.15497.1.2') == 0) {
+if (strcmp($sysobjectid, 'enterprises.15497.1.2') == 0) {
     $connections = snmp_get($device, 'tcpCurrEstab.0', '-OQv', 'TCP-MIB');
 
     if (is_numeric($connections)) {
         $rrd_name = 'asyncos_conns';
-        $rrd_def = RrdDefinition::make()->addDataset('connections', 'GAUGE', 0, 50000)
+        $rrd_def = RrdDefinition::make()->addDataset('connections', 'GAUGE', 0, 50000);
 
         $fields = array(
             'connections' => $connections,
         );
 
-        $tags = compact('rrd_name', 'rrd_def');
-        data_update($device, $rrd_name, $tags, $fields);
+        $tags = compact('rrd_def');
+        data_update($device, 'asyncos_conns', $tags, $fields);
 
         $graphs['asyncos_conns'] = true;
     }
