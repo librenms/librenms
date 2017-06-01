@@ -295,7 +295,7 @@ class IRCBot
             if (($this->config['irc_ctcp']) && (preg_match("/^:".chr(1).".*/", $ex[3]))) {
                 // Handle CTCP
                 $ctcp = trim(preg_replace("/[^A-Z]/", "", $ex[3]));
-                $ctcp_reply = NULL;
+                $ctcp_reply = null;
                 $this->log("Received irc CTCP: ".$ctcp." from ".$this->getUser($this->data));
                 switch($ctcp) {
                     case 'VERSION':
@@ -308,7 +308,7 @@ class IRCBot
                        $ctcp_reply = chr(1)."$ctcp ".date('c').chr(1);
                        break;
                 }
-                if ($ctcp_reply) {
+                if ($ctcp_reply !== null) {
                     $this->log("Sending irc CTCP: ".'NOTICE '.$this->getUser($this->data)." :".$ctcp_reply);
                     return $this->ircRaw('NOTICE '.$this->getUser($this->data)." :".$ctcp_reply);
                 }
