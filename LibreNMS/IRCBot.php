@@ -264,11 +264,11 @@ class IRCBot
             } else {
                 foreach ($this->authd as $nick => $data) {
                     if ($data['expire'] >= time()) {
-                        $this->ircRaw('PRIVMSG '.$nick.' :'.$severity.trim($alert['title']).' - Rule: '.trim($alert['name'] ? $alert['name'] : $alert['rule']).(sizeof($alert['faults']) > 0 ? ' - Faults'.(sizeof($alert['faults']) > 3 ? ' (showing first 3 out of '.sizeof($alert['faults']).' )' : '' ).':' : ''));
-                        foreach ($alert['faults'] as $k => $v) {
-                            $this->ircRaw('PRIVMSG '.$nick.' :#'.$k.' '.$v['string']);
-                            if ($k >= 3) {
-                                break;
+                        $this->ircRaw('PRIVMSG '.$nick.' :'.$severity.trim($alert['title']));
+                        foreach (explode("\n", $alert['msg']) as $line) {
+                            // We don't need to repeat the title
+                            if (trim($line) != trim($alert['title'])) {
+                                $this->ircRaw('PRIVMSG '.$nick.' :'.$line);
                             }
                         }
                     }
