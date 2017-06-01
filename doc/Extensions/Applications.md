@@ -115,7 +115,10 @@ it should be.
 
 ##### SNMP Extend
 
-1: Copy the shell script, postgres, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/bind -O /etc/snmp/bind)
+1: Copy the bind shell script, to the desired host (the host must be added to LibreNMS devices)
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/bind -O /etc/snmp/bind
+```
 
 2: Make the script executable (chmod +x /etc/snmp/bind)
 
