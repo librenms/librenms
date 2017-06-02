@@ -108,7 +108,7 @@ Or using a single string using `,` as delimiter between various channels:
    ...
    $config['irc_auth']['admin'][] = "*!root@nms.host.invalid";
    $config['irc_auth']['admin'][] = "*!*peter@peters.computer.invalid";
-   $config['irc_auth']['john][] = "john!doe@login.server.invalid;
+   $config['irc_auth']['john][] = "john!doe@login.server.invalid";
    ...
 ```
 Any client matching one of the first two hostmasks will automatically be authenticated as the "admin" user in LibreNMS, and clients matching the last line will be authenticated as the user "john" in LibreNMS, without using .auth and a waiting for a valid token.
