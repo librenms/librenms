@@ -6,6 +6,7 @@ over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_asyncos_conns, text: 'Current Connections' }
 discovery:
     - sysObjectId:
         - .1.3.6.1.4.1.15497.1
