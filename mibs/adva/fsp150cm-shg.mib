@@ -1,0 +1,317 @@
+F3-SHG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP 
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+             FROM SNMPv2-SMI
+    RowStatus, StorageType, DisplayString,
+    VariablePointer, TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    fsp150cm
+             FROM  ADVA-MIB
+    neIndex
+             FROM CM-ENTITY-MIB;
+
+f3SHGMIB MODULE-IDENTITY
+    LAST-UPDATED        "201212040000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Jakub Zalewski
+                     ADVA Optical Networking, Inc.
+                Tel: +48 58 7716 411
+             E-mail: jzalewski@advaoptical.com
+             Postal: ul. Slaska 35/37
+                     81-310 Gdynia, Poland"
+    DESCRIPTION
+            "This module defines the Split Horizon Group MIB defitinions
+             used by the F3 (FSP150CM/CC) product lines.  
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201212040000Z"
+    DESCRIPTION
+        "
+         Notes from release 201212040000Z,
+         (1) New f3ShgTable object:
+             f3ShgAlias
+
+         Notes from release 201210090000Z,
+         (1)MIB version ready for release FSP150CC 5.6CC." 
+
+    ::= {fsp150cm 27}
+
+-- 
+-- OID definitions
+-- 
+f3ShgConfigObjects      OBJECT IDENTIFIER ::= {f3SHGMIB 1}
+f3ShgConformance        OBJECT IDENTIFIER ::= {f3SHGMIB 2}
+
+--
+-- Split Horizon Group Table
+--
+f3ShgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ShgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "An entry containing information applicable to a particular
+           Shg Entity."
+
+   ::= { f3ShgConfigObjects 1 }
+
+f3ShgEntry OBJECT-TYPE
+    SYNTAX      F3ShgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The conceptual row in f3ShgTable."
+    INDEX   { neIndex, f3ShgIndex }
+
+   ::= { f3ShgTable 1 }
+
+F3ShgEntry ::= SEQUENCE {
+   f3ShgIndex              Unsigned32,
+   f3ShgAlias              DisplayString,
+   f3ShgStorageType        StorageType,
+   f3ShgRowStatus          RowStatus
+}
+
+f3ShgIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+              "This is the unique index for a Split Horizon Group within Network Element."
+   ::= { f3ShgEntry 1 }
+
+f3ShgAlias OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to provide an 
+          alias to the Split Horizon Group."
+   ::= { f3ShgEntry 2 }
+
+f3ShgStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+              "The storage type for this conceptual row."
+   ::= { f3ShgEntry 3 }
+
+f3ShgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3ShgRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3ShgRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The f3ShgRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+   ::= { f3ShgEntry 4 }
+
+--
+--  Split Horizon Group Member Ports Table
+--
+f3ShgMemberPortTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ShgMemberPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to Ports which are members of
+             Split Horizon Group instance."
+    ::= { f3ShgConfigObjects 2 }
+
+f3ShgMemberPortEntry OBJECT-TYPE
+    SYNTAX      F3ShgMemberPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ShgMemberPortTable."
+    INDEX { neIndex, f3ShgIndex, f3ShgMemberPort } 
+    ::= { f3ShgMemberPortTable 1 }
+
+F3ShgMemberPortEntry ::= SEQUENCE {
+    f3ShgMemberPort              VariablePointer,
+    f3ShgMemberPortStorageType   StorageType,
+    f3ShgMemberPortRowStatus     RowStatus
+}
+
+f3ShgMemberPort OBJECT-TYPE
+    SYNTAX        VariablePointer
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "Pointer to a Port instance which is a member of a SHG instance.
+          The pointer must be set to cmEthernetAccPortIndex instance if the SHG 
+          Port is an Access Port or to cmEthernetNetPortIndex if the SHG Port 
+          is a Network Port."
+    ::= { f3ShgMemberPortEntry 1 }
+
+f3ShgMemberPortStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+              "The storage type for this conceptual row."
+   ::= { f3ShgMemberPortEntry 2 }
+
+f3ShgMemberPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3ShgMemberRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3ShgMemberRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The f3ShgMemberRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+   ::= { f3ShgMemberPortEntry 3 }
+
+--
+--  Split Horizon Group Member Flows Table
+--
+f3ShgMemberFlowTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ShgMemberFlowEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to Flows which are members of
+             Split Horizon Group instance."
+    ::= { f3ShgConfigObjects 3 }
+
+f3ShgMemberFlowEntry OBJECT-TYPE
+    SYNTAX      F3ShgMemberFlowEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ShgMemberFlowTable."
+    INDEX { neIndex, f3ShgIndex, f3ShgMemberFlow } 
+    ::= { f3ShgMemberFlowTable 1 }
+
+F3ShgMemberFlowEntry ::= SEQUENCE {
+    f3ShgMemberFlow                   VariablePointer
+}
+
+f3ShgMemberFlow OBJECT-TYPE
+    SYNTAX        VariablePointer
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Pointer to a Flow instance which is a member of a SHG instance.
+          The pointer must be set to cmFlowIndex instance."
+    ::= { f3ShgMemberFlowEntry 1 }
+
+--
+--  Split Horizon Group Member Flows Point Table
+--
+f3ShgMemberFlowPointTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ShgMemberFlowPointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to Flow Points which are members of
+             Split Horizon Group instance."
+    ::= { f3ShgConfigObjects 4 }
+
+f3ShgMemberFlowPointEntry OBJECT-TYPE
+    SYNTAX      F3ShgMemberFlowPointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ShgMemberFlowPointTable."
+    INDEX { neIndex, f3ShgIndex, f3ShgMemberFlowPoint } 
+    ::= { f3ShgMemberFlowPointTable 1 }
+
+F3ShgMemberFlowPointEntry ::= SEQUENCE {
+    f3ShgMemberFlowPoint                   VariablePointer
+}
+
+f3ShgMemberFlowPoint OBJECT-TYPE
+    SYNTAX        VariablePointer
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Pointer to a Flow instance which is a member of a SHG instance.
+          The pointer must be set to cmFlowPointIndex/f3AccFlowPointAlias/f3NetFlowPointAlias instance."
+    ::= { f3ShgMemberFlowPointEntry 1 }
+
+--
+-- Conformance
+--
+f3ShgCompliances OBJECT IDENTIFIER ::= {f3ShgConformance 1}
+f3ShgGroups      OBJECT IDENTIFIER ::= {f3ShgConformance 2}
+
+f3ShgCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the F3-SHG-MIB compliance."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3ShgGroup, f3ShgMemberPortGroup, f3ShgMemberFlowGroup, f3ShgMemberFlowPointGroup
+        }
+    ::= { f3ShgCompliances 1 }
+
+f3ShgGroup OBJECT-GROUP
+    OBJECTS {
+      f3ShgAlias,
+      f3ShgStorageType,
+      f3ShgRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the Split Horizon Group."
+    ::= { f3ShgGroups 1 }
+
+f3ShgMemberPortGroup OBJECT-GROUP
+    OBJECTS {
+      f3ShgMemberPortStorageType,
+      f3ShgMemberPortRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the Split Horizon Group Members."
+    ::= { f3ShgGroups 2 }
+
+f3ShgMemberFlowGroup OBJECT-GROUP
+    OBJECTS {
+       f3ShgMemberFlow
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the Split Horizon Group Flow 
+              Members."
+    ::= { f3ShgGroups 3 }
+
+f3ShgMemberFlowPointGroup OBJECT-GROUP
+    OBJECTS {
+       f3ShgMemberFlowPoint
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the Split Horizon Group Flow 
+              Points."
+    ::= { f3ShgGroups 4 }
+
+END
+
