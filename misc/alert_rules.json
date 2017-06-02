@@ -101,5 +101,13 @@
   {
     "rule": "%wireless_sensors.sensor_class = 'clients' && %wireless_sensors.sensor_current >= %wireless_sensors.sensor_limit && %wireless_sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
     "name": "Too many wireless clients"
+  },
+  {
+    "rule": "Service warning",
+    "name": "%services.service_status = \"1\""
+  },
+  {
+    "rule": "Service critical",
+    "name": "%services.service_status = \"2\""
   }
 ]
