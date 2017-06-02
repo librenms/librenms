@@ -15,7 +15,7 @@ foreach ($app_devices as $app_device) {
     echo '<div class="panel panel-default">
         <div class="panel-heading">
         <h3 class="panel-title">
-        '.generate_device_link($app_device, shorthost($app_device['hostname']), array('tab' => 'apps', 'app' => $vars['app'])).'
+        '.generate_device_link($app_device, shorthost(ip_to_sysname($app_device,$app_device['hostname'])), array('tab' => 'apps', 'app' => $vars['app'])).'
         <div class="pull-right"><small class="muted">'.$app_device['app_instance'].' '.$app_device['app_status'].'</small></div>
         </h3>
         </div>
