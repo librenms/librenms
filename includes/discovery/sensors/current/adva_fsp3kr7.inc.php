@@ -22,23 +22,21 @@
 
     $multiplier = 1;
     $divisor    = 1000;
-    $sensorType = 'adva_fsp3kr7';
 
 if (is_array($pre_cache['adva_fsp3kr7_Card'])) {
     foreach (array_keys($pre_cache['adva_fsp3kr7_Card']) as $index) {
         if ($pre_cache['adva_fsp3kr7_Card'][$index]['eqptPhysInstValuePsuAmpere']) {
             $oid          = '.1.3.6.1.4.1.2544.1.11.11.1.2.1.1.1.6.'.$index;
             $descr        = strtoupper($pre_cache['adva_fsp3kr7_Card'][$index]['entityEqptAidString'])." Input";
-            $rrd_filename = $descr;
-            $current      = $pre_cache['adva_fsp3kr7_Card'][$index]['eqptPhysInstValuePsuAmpere'];
+            $current      = $pre_cache['adva_fsp3kr7_Card'][$index]['eqptPhysInstValuePsuAmpere']/$divisor;
 
             discover_sensor(
                 $valid['sensor'],
                 'current',
                 $device,
                 $oid,
-                $rrd_filename,
-                $sensorType,
+                'eqptPhysInstValuePsuAmpere'.$index,
+                'adva_fsp3kr7',
                 $descr,
                 $divisor,
                 $multiplier,

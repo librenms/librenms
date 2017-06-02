@@ -20,14 +20,12 @@
 
     $multiplier = 1;
     $divisor    = 10;
-    $sensorType = 'adva_fsp3kr7';
 
 foreach ($pre_cache['adva_fsp3kr7'] as $index => $entry) {
     if ($entry['entityFacilityAidString'] and $entry['pmSnapshotCurrentInputPower']) {
         $oidRX        = '.1.3.6.1.4.1.2544.1.11.7.7.2.3.1.2.' . $index;
         $descr        = $entry['entityFacilityAidString'].' RX';
-        $rrd_filename = $descr;
-        $currentRX    = $entry['pmSnapshotCurrentInputPower'];
+        $currentRX    = $entry['pmSnapshotCurrentInputPower']/$divisor;
         $descr        = $entry['entityFacilityAidString'].' RX';
 
         discover_sensor(
@@ -35,8 +33,8 @@ foreach ($pre_cache['adva_fsp3kr7'] as $index => $entry) {
             'dbm',
             $device,
             $oidRX,
-            $rrd_filename,
-            $sensorType,
+            'pmSnapshotCurrentInputPower'.$index,
+            'adva_fsp3kr7',
             $descr,
             $divisor,
             $multiplier,
@@ -51,16 +49,15 @@ foreach ($pre_cache['adva_fsp3kr7'] as $index => $entry) {
     if ($entry['entityFacilityAidString'] and $entry['pmSnapshotCurrentOutputPower']) {
         $oidTX     = '.1.3.6.1.4.1.2544.1.11.7.7.2.3.1.1.' . $index;
         $descr     = $entry['entityFacilityAidString'].' TX';
-        $rrd_filename = $descr;
-        $currentTX = $entry['pmSnapshotCurrentOutputPower'];
+        $currentTX = $entry['pmSnapshotCurrentOutputPower']/$divisor;
 
         discover_sensor(
             $valid['sensor'],
             'dbm',
             $device,
             $oidTX,
-            $rrd_filename,
-            $sensorType,
+            'pmSnapshotCurrentOutputPower'.$index,
+            'adva_fsp3kr7',
             $descr,
             $divisor,
             $multiplier,
