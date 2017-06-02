@@ -72,17 +72,17 @@ foreach (explode("\n", $oids) as $data) {
 $chip = snmp_get($device, '.1.3.6.1.2.1.1.1.0', '-Oqv');
 if (preg_match("/(Linux).+(ntc)/", $chip)) {
     $sensor_type = "chip_volts";
-    $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.10.112.111.119.101.114.45.115.116.97.116.';
+    $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.10.112.111.119.101.114.45.115.116.97.';
     $lowlimit     = 3.8;
     $lowwarnlimit = 3.8;
     $warnlimit    = 6.3;
     $limit        = 6.3;
     $descr = 'AC IN voltage';
-    $index = '2';
+    $index = '116.2';
     $value = snmp_get($device, $oid.$index, '-Oqv');
     discover_sensor($valid['sensor'], 'voltage', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     $descr = 'VBUS voltage';
-    $index = '4';
+    $index = '116.4';
     $value = snmp_get($device, $oid.$index, '-Oqv');
     discover_sensor($valid['sensor'], 'voltage', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     $lowlimit     = 2.75;
@@ -90,7 +90,7 @@ if (preg_match("/(Linux).+(ntc)/", $chip)) {
     $warnlimit    = 4.2;
     $limit        = 4.2;
     $descr = 'Battery voltage';
-    $index = '6';
+    $index = '116.6';
     $value = snmp_get($device, $oid.$index, '-Oqv');
     discover_sensor($valid['sensor'], 'voltage', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
 }
