@@ -319,6 +319,9 @@ class IRCBot
         $this->command = str_replace(':.', '', $this->command);
         $tmp           = explode(':.'.$this->command.' ', $this->data);
         $this->user    = $this->getAuthdUser();
+        if (!$this->isAuthd() && (isset($this->config['irc_auth']))) {
+            $this->hostAuth();
+        }
         if ($this->isAuthd() || trim($this->command) == 'auth') {
             $this->proceedCommand(str_replace("\n", '', trim($this->command)), trim($tmp[1]));
         }
@@ -366,6 +369,11 @@ class IRCBot
         return str_replace(':', '', $arrData[0]);
     }//end getUser()
 
+    private function getUserHost($param)
+    {
+        $arrData = explode(' ', $param, 2);
+        return str_replace(':', '', $arrData[0]);
+    }//end getUserHost()
 
     private function connect($try = 0)
     {
@@ -471,7 +479,38 @@ class IRCBot
     private function getAuthdUser()
     {
         return $this->authd[$this->getUser($this->data)];
-    }//end get_user()
+    }//end getAuthUser()
+
+    private function hostAuth()
+    {
+        foreach ($this->config['irc_auth'] as $nms_user => $hosts) {
+            foreach ($hosts as $host) {
+                $host = preg_replace("/\*/", ".*", $host);
+                if (preg_match("/$host/", $this->getUserHost($this->data))) {
+                    $user_id = get_userid(mres($nms_user));
+                    $user = get_user($user_id);
+                    $this->user['name'] = $user['username'];
+                    $this->user['id']   = $user_id;
+                    $this->user['level'] = get_userlevel($user['username']);
+                    $this->user['expire'] = (time() + ($this->config['irc_authtime'] * 3600));
+                    if ($this->user['level'] < 5) {
+                        foreach (dbFetchRows('SELECT device_id FROM devices_perms WHERE user_id = ?', array($this->user['id'])) as $tmp) {
+                            $this->user['devices'][] = $tmp['device_id'];
+                        }
+
+                        foreach (dbFetchRows('SELECT port_id FROM ports_perms WHERE user_id = ?', array($this->user['id'])) as $tmp) {
+                            $this->user['ports'][] = $tmp['port_id'];
+                        }
+                    }
+                    if ($this->debug) {
+                        $this->log("HostAuth on irc for '".$user['username']."', ID: '".$user_id."', Host: '".$host);
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
+    }//end hostAuth
 
 
     private function ircRaw($params)
