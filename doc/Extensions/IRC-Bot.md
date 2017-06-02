@@ -34,6 +34,7 @@ Option | Default-Value | Notes
 `$config['irc_nick']` | `LibreNMS` | Optional;
 `$config['irc_pass']` |  | Optional; This sends the IRC-PASS Sequence to IRC-Servers that require Password on Connect
 `$config['irc_port']` | `6667` | Required; To enable SSL append a `+` before the Port. (Example: `+6697`)
+`$config['irc_auth']` |  | Optional: Array of hostmasks that are automatically authenticated.  
 
 ### <a name="commands">IRC-Commands</a>
 
@@ -102,6 +103,15 @@ Or using a single string using `,` as delimiter between various channels:
    $config['irc_chan'] = "#librenms,#otherchan,#noc";
    ...
 ```
+### Hostmask authentication:
+```php
+   ...
+   $config['irc_auth']['admin'][] = "*!root@nms.host.invalid";
+   $config['irc_auth']['admin'][] = "*!*peter@peters.computer.invalid";
+   $config['irc_auth']['john][] = "john!doe@login.server.invalid";
+   ...
+```
+Any client matching one of the first two hostmasks will automatically be authenticated as the "admin" user in LibreNMS, and clients matching the last line will be authenticated as the user "john" in LibreNMS, without using .auth and a waiting for a valid token.
 
 # <a name="extensions">Extensions?!</a>
 
