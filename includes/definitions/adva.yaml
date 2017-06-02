@@ -1,0 +1,95 @@
+os: adva
+text: ADVA
+type: network
+icon: adva
+over:
+   - { graph: device_bits, text: Traffic }
+   - { graph: device_temperature, text: Temperature }
+discovery:
+   - sysObjectId:
+     - .1.3.6.1.4.1.2544.1
+mib_dir:
+   - adva
+poller_modules:
+   - applications: 0
+   - arp-table: 1
+   - aruba-controller: 0
+   - bgp-peers: 0
+   - cipsec-tunnels: 0
+   - cisco-ace-loadbalancer: 0
+   - cisco-ace-serverfarms: 0
+   - cisco-asa-firewall: 0
+   - cisco-cbqos: 0
+   - cisco-cef: 0
+   - cisco-ipsec-flow-monitor: 0
+   - cisco-mac-accounting: 0
+   - cisco-otv: 0
+   - cisco-remote-access-monitor: 0
+   - cisco-sla: 0
+   - cisco-voice: 0
+   - cisco-vpdn: 0
+   - entity-physical: 1
+   - hr-mib: 1
+   - ipSystemStats: 1
+   - ipmi: 0
+   - junose-atm-vp: 0
+   - loadbalancers: 0
+   - mef: 0
+   - mempools: 0
+   - mib: 0
+   - netscaler-vsvr: 0
+   - netstats: 1
+   - ntp: 1
+   - os: 1
+   - ospf: 1
+   - ports: 1
+   - processors: 1
+   - sensors: 1
+   - services: 1
+   - storage: 0
+   - stp: 1
+   - tnms-nbi: 0
+   - toner: 0
+   - ucd-diskio: 0
+   - ucd-mib: 0
+   - unix-agent: 0
+   - wifi: 0
+   - wireless: 0
+discovery_modules:
+   - applications: 0
+   - arp-table: 1
+   - bgp-peers: 0
+   - cisco-cbqos: 0
+   - cisco-cef: 0
+   - cisco-mac-accounting: 0
+   - cisco-otv: 0
+   - cico-pw: 0
+   - cisco-sla: 0
+   - cisco-vrf: 0
+   - cisco-vrf-lite: 0
+   - discovery-arp: 1
+   - discovery-protocols: 1
+   - entity-physical: 1
+   - hr-device: 1
+   - ipv4-addresses: 1
+   - ipv6-addresses: 1
+   - junose-atm-vp: 0
+   - libvirt-vminfo: 0
+   - loadbalancers: 0
+   - mef: 0
+   - mempools: 0
+   - ntp: 1
+   - os: 1
+   - ports: 1
+   - ports-stack: 1
+   - processors: 1
+   - route: 1
+   - sensors: 1
+   - services: 0
+   - storage: 0
+   - stp: 1
+   - toner: 0
+   - ucd-diskio: 0
+   - vlans: 1
+   - vmware-vminfo: 0
+   - wireless: 0
