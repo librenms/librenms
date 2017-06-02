@@ -552,7 +552,7 @@ You can use this array to rewrite the description of ASes that you have discover
 [Updating](../General/Updating.md)
 
 ### IPMI
-Setup the types of IPMI protocols to test a host for and it what order. Don't forget to install ipmitool on the monitoring host.
+Setup the types of IPMI protocols to test a host for and in what order. Don't forget to install ipmitool on the monitoring host.
 
 ```php
 $config['ipmi']['type'] = array();
