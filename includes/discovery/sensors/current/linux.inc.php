@@ -1,10 +1,10 @@
 <?php
 $chip = snmp_get($device, '.1.3.6.1.2.1.1.1.0', '-Oqv');
-if (strpos($chip, 'Linux chip') !== false) {
+if (preg_match("/(Linux).+(ntc)/", $chip)) {
     $sensor_type = "chip_currents";
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.10.112.111.119.101.114.45.115.116.97.116.';
-    $lowlimit     = null;
-    $lowwarnlimit = null;
+    $lowlimit     = 0;
+    $lowwarnlimit = 0;
     $warnlimit    = null;
     $limit        = null;
     $descr = 'AC IN current';
