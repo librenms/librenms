@@ -297,16 +297,16 @@ class IRCBot
                 $ctcp = trim(preg_replace("/[^A-Z]/", "", $ex[3]));
                 $ctcp_reply = null;
                 $this->log("Received irc CTCP: ".$ctcp." from ".$this->getUser($this->data));
-                switch($ctcp) {
+                switch ($ctcp) {
                     case 'VERSION':
-                       $ctcp_reply = chr(1)."$ctcp LibreNMS BOT - https://librenms.org/".chr(1);
-                       break;
+                        $ctcp_reply = chr(1)."$ctcp ".$this->config['irc_ctcp_version'].chr(1);
+                    break;
                     case 'PING':
-                       $ctcp_reply = chr(1)."$ctcp ".$ex[4]. " ".$ex[5].chr(1);
-                       break;
+                        $ctcp_reply = chr(1)."$ctcp ".$ex[4]. " ".$ex[5].chr(1);
+                    break;
                     case 'TIME':
-                       $ctcp_reply = chr(1)."$ctcp ".date('c').chr(1);
-                       break;
+                        $ctcp_reply = chr(1)."$ctcp ".date('c').chr(1);
+                    break;
                 }
                 if ($ctcp_reply !== null) {
                     $this->log("Sending irc CTCP: ".'NOTICE '.$this->getUser($this->data)." :".$ctcp_reply);
