@@ -629,6 +629,7 @@ class IRCBot
     private function _quit($params)
     {
         if ($this->user['level'] == 10) {
+            $this->ircRaw("QUIT :Requested");
             return die();
         } else {
             return $this->respond('Permission denied.');
