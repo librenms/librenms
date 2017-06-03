@@ -163,6 +163,10 @@ class IRCBot
                 }
             }
 
+            if (isset($this->tempnick)) {
+                 $this->ircRaw('NICK '.$this->nick);
+            }
+
             $this->getData();
             if ($this->config['irc_alert']) {
                 $this->alertData();
@@ -292,6 +296,30 @@ class IRCBot
                 }
             }
 
+            if (($ex[1] == 'NICK') && (preg_replace("/^:/", "", $ex[2]) == $this->nick)) {
+                // Nickname changed successfully
+                if ($this->debug) {
+                    $this->log("Regained our real nick");
+                }
+                unset($this->tempnick);
+            }
+            if (($ex[1] == 433) || ($ex[1] == 437)) {
+                // Nickname already in use / temp unavailable
+                if ($this->debug) {
+                    $this->log("Nickname already in use...");
+                }
+                if ($ex[2] != "*") {
+                    $this->tempnick = $ex[2];
+                }
+                if (!isset($this->tempnick)) {
+                     $this->tempnick = $this->nick.rand(0, 99);
+                }
+                if ($this->debug) {
+                    $this->log("Using temp nick ".$this->tempnick);
+                }
+                return $this->ircRaw('NICK '.$this->tempnick);
+            }
+
             $this->command = str_replace(array(chr(10), chr(13)), '', $ex[3]);
             if (strstr($this->command, ':.')) {
                 $this->handleCommand();
@@ -384,6 +412,7 @@ class IRCBot
 
         $this->log('Trying to connect ('.($try + 1).') to '.$this->server.':'.$this->port.($this->ssl ? ' (SSL)' : ''));
         if ($this->socket['irc']) {
+            $this->ircRaw('QUIT :Reloading');
             fclose($this->socket['irc']);
         }
 
@@ -572,6 +601,8 @@ class IRCBot
         if ($this->user['level'] == 10) {
             global $config;
             $config = array();
+            $config['install_dir'] = $this->config['install_dir'];
+            chdir($config['install_dir']);
             include 'includes/defaults.inc.php';
             include 'config.php';
             include 'includes/definitions.inc.php';
@@ -598,6 +629,7 @@ class IRCBot
     private function _quit($params)
     {
         if ($this->user['level'] == 10) {
+            $this->ircRaw("QUIT :Requested");
             return die();
         } else {
             return $this->respond('Permission denied.');
