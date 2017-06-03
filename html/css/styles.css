@@ -1590,6 +1590,12 @@ tr.search:nth-child(odd) {
   line-height: 32px;
 }
 
+@media (min-width: 992px) and (max-width: 1280px) {
+  .navbar-brand {
+    display: none !important;
+  }
+}
+
 .navbar-brand img {
   height: 100%;
   max-width: 170px;

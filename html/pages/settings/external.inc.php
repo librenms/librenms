@@ -61,7 +61,6 @@ $rrdtool_conf = array(
     ),
     array('name'               => 'rrd.heartbeat',
         'descr'                => 'Change the rrd heartbeat value (default 600)',
-
         'type'                 => 'text',
     ),
 );
