@@ -300,13 +300,13 @@ class IRCBot
                 switch ($ctcp) {
                     case 'VERSION':
                         $ctcp_reply = chr(1)."$ctcp ".$this->config['irc_ctcp_version'].chr(1);
-                    break;
+                        break;
                     case 'PING':
                         $ctcp_reply = chr(1)."$ctcp ".$ex[4]. " ".$ex[5].chr(1);
-                    break;
+                        break;
                     case 'TIME':
                         $ctcp_reply = chr(1)."$ctcp ".date('c').chr(1);
-                    break;
+                        break;
                 }
                 if ($ctcp_reply !== null) {
                     $this->log("Sending irc CTCP: ".'NOTICE '.$this->getUser($this->data)." :".$ctcp_reply);
