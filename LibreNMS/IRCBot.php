@@ -601,6 +601,8 @@ class IRCBot
         if ($this->user['level'] == 10) {
             global $config;
             $config = array();
+            $config['install_dir'] = $this->config['install_dir'];
+            chdir($config['install_dir']);
             include 'includes/defaults.inc.php';
             include 'config.php';
             include 'includes/definitions.inc.php';
