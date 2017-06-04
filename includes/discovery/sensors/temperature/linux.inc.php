@@ -43,4 +43,19 @@ if (starts_with($sysObjectId, '.1.3.6.1.4.1.232.')) {
     }
 }
 
+$chip = snmp_get($device, '.1.3.6.1.2.1.1.1.0', '-Oqv');
+
+if (preg_match("/(Linux).+(ntc)/", $chip)) {
+    $sensor_type = "chip_axp209_temperature";
+    $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.10.112.111.119.101.114.45.115.116.97.';
+    $lowlimit     = -40;
+    $lowwarnlimit = -35;
+    $warnlimit    = 120;
+    $limit        = 130;
+    $descr = 'AXP209 Temperature';
+    $index = '116.1';
+    $value = snmp_get($device, $oid.$index, '-Oqv');
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+}
+
 include_once $config['install_dir'] . '/includes/discovery/sensors/temperature/supermicro.inc.php';
