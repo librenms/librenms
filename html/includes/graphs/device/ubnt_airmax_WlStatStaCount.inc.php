@@ -6,7 +6,7 @@ $rrd_options .= ' -l 0 -E ';
 
 $rrdfilename = rrd_name($device['hostname'], 'ubnt-airmax-mib');
 
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'                         Now   Min  Max\\n'";
     $rrd_options .= ' DEF:WlStatStaCount='.$rrdfilename.':WlStatStaCount:AVERAGE ';
     $rrd_options .= " LINE1:WlStatStaCount#CC0000:'Stations             ' ";
