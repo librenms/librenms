@@ -115,7 +115,7 @@ if (is_array($oids)) {
                 // Check to make sure we've not already seen this sensor via cisco's entity sensor mib
                 if ($type == "power" && $device['os'] == "arista_eos" && preg_match("/DOM (R|T)x Power/i", $descr)) {
                     $type = "dbm";
-                    $current = round(10 * log10($sensor_value / 10000), 3);
+                    $current = round(10 * log10($entry['entPhySensorValue'] / 10000), 3);
                     $multiplier = 1;
                     $divisor = 1;
                     discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, null, null, null, null, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity']);

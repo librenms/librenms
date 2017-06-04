@@ -1,0 +1,980 @@
+CM-SECURITY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, Unsigned32
+             FROM SNMPv2-SMI
+    DateAndTime, DisplayString, TruthValue, RowStatus, StorageType,
+    TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE
+             FROM SNMPv2-CONF
+    fsp150cm
+             FROM  ADVA-MIB
+    IpVersion, UserInterfaceType
+             FROM  CM-COMMON-MIB
+    Ipv6Address
+             FROM  IPV6-TC
+    usmUserEntry
+             FROM  SNMP-USER-BASED-SM-MIB
+    SnmpAdminString
+             FROM  SNMP-FRAMEWORK-MIB;
+
+cmSecurityMIB MODULE-IDENTITY
+    LAST-UPDATED    "201606140000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Raghav Trivedi
+                     ADVA Optical Networking, Inc.
+                Tel: +1 972 759-1239
+             E-mail: rtrivedi@advaoptical.com
+             Postal: 2301 N. Greenville Ave. #300
+                     Richardson, TX USA 75082"
+    DESCRIPTION
+            "This module defines the Security MIB definitions 
+             used by the F3 (FSP150CM/CC) product lines.  These are used
+             to manage the user/authentication for CLI/GUI sessions.
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201606140000Z"
+    DESCRIPTION
+            "
+              Notes from release 201606140000Z
+              (1) added cmSecurityUserRemoteCryptoUser to cmSecurityUserTable
+
+              Notes from release 201602080000Z
+              (1)Added literal netconf to CmSecurityPrivLevel
+
+              Notes from release 201509180000Z
+              (1)Added cmSecurityCryptoPassword attribute to cmSecurityUserTable
+
+              Note from release  201106270000Z,
+              (1)Added f3TacacsPrivLevelControlEnabled, f3TacacsDefaultPrivLevel
+
+              Note from release 201104140000Z,
+              (1)Added cmSecurityUserAction to support remove-lockout
+
+              Note from release 201101050000Z,
+              (1)Added f3UsmUserTable - an augment to UsmUserTable
+
+              Note from release 201002120000Z,
+              (1)MIBs updated for supported functionality in R4.3CC and R4.1CM 
+                 (a)cmRemoteAuthServerTable has new objects 
+                    cmRemoteAuthServerAccountingPort to support RADIUS accounting
+              
+              Notes from release 200903190000Z,
+             (1)MIB version ready for release FSP150CC GE101, GE206 devices
+               (a)Added Textual convention CmSecurityPolicyStrength
+               (b)Added MIB scalar cmSecurityPolicyStrength
+
+             (2)Following changes are made to the cmSecurityUserTable,
+                (a)cmSecurityUserPassword column to modify security user password
+                (b)cmSecurityUserStorageType and cmSecurityUserRowStatus columns added 
+                   thereby allowing creation/deletion of Security Users
+                (c)cmSecurityUserComment, cmSecurityUserPrivLevel, 
+                   cmSecurityUserLoginTimeout, cmSecurityUserNumFailedLoginAttempts, 
+                   cmSecurityUserCliPagingEnable columns are now read-write
+                   to allow write access. 
+
+            Notes from release 200803030000Z,
+             (1)MIB version ready for release FSP150CM 3.1." 
+    ::= {fsp150cm 10}    
+
+-- 
+-- OID definitions
+-- 
+cmSecurityObjects           OBJECT IDENTIFIER ::= {cmSecurityMIB 1}
+cmSecurityConformance       OBJECT IDENTIFIER ::= {cmSecurityMIB 2}
+cmSecurityNotifications     OBJECT IDENTIFIER ::= {cmSecurityMIB 3}
+
+--
+-- Textual conventions.
+--
+CmRemoteAuthProtocol ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for remote authentication protocol.
+          none   - No remote authentication protocol, 
+          radius - RADIUS (Remote Authentication Dial-In User Service), 
+          tacacs - TACACS+(Terminal Access Controller Access Control System)."
+    SYNTAX       INTEGER {
+                   none (1),
+                   radius (2),
+                   tacacs (3)
+                 }
+
+CmSecurityAccessOrder ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for order for security access.
+             local  - Local database for user/security validation, 
+             remote - Remote protocol for user/security validation."
+    SYNTAX       INTEGER {
+                   local (1),
+                   remote (2)
+                 }
+
+CmSecurityAuthType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for remote authentication protocol types.
+             pap  - Password Authentication Protocol, 
+             chap - Challenge-Handshake Authentication Protocol."
+    SYNTAX       INTEGER {
+                   pap (1),
+                   chap (2)
+                 }
+
+CmSecurityPrivLevel ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Security Privilege Level.
+             retrieve         - Retrieve Privilege Level (can only 
+                                VIEW management information), 
+             maintenance      - Maintenance Privilege Level 
+                                (can VIEW management, as well as perform 
+                                maintenance operations such as loopbacks,
+                                etherjack diagnosis etc.)
+             provisioning     - Provisioning Privilege Level
+                                (can perform Provisioning operations) 
+             superuser        - Super User Privilege Level
+                                (can perform all operations)
+             testuser         - Retrieve Privilege Level
+                                and some maintenance, 
+                                provisioning operations.
+             cryptouser       - Crypto User Privilege Level 
+                                (can perform security operations)
+             netconf          - NETCONF Privilege Level"
+    SYNTAX       INTEGER {
+                   not-applicable(0),
+                   retrieve (1),
+                   maintenance (2),
+                   provisioning (3),
+                   superuser (4),
+                   testuser (5),
+                   cryptouser (6),
+                   netconf (7)
+                 }
+
+CmRemoteAuthOrder ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for order for remote authentication access.
+             first  - first to access the remote authentication, 
+             second - second to access the remote authentication,
+             third  - third to access the remote authentication."
+    SYNTAX       INTEGER {
+                   first (1),
+                   second (2),
+                   third (3)
+                 }
+
+CmSecurityPolicyStrength ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for security policy strength 
+             low  - Low Security Policy, 
+             medium - Medium Security Policy,
+             high  - High Security Policy."
+    SYNTAX       INTEGER {
+                   low (1),
+                   medium (2),
+                   high (3)
+                 }
+
+UsmUserAccessType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for type of USM User 
+             read-only  - Read only, 
+             read-write - Read write ,
+             trap-only  - Trap Only."
+    SYNTAX       INTEGER {
+                   read-only (1),
+                   read-write (2),
+                   trap-only (3)
+                 }
+
+
+SecurityUserAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Provides ability to manage security users."
+    SYNTAX       INTEGER {
+                   not-applicable(0),
+                   remove-lockout(1) -- removes the locked out condition on security user
+                 }
+
+SnmpSecurityTrapType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Provides ability to manage security traps.
+             all - trap is reported when user logs in, logs out or is locked out
+             loginFailed  - trap is reported only when user failed to log in
+             disabled  - security traps are disabled."
+
+    SYNTAX     INTEGER {
+                 all(1),
+                 loginFailed(2),
+                 disabled(3)
+               }
+
+PrivilegeRequestAction ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Privilege request action." 
+  SYNTAX        INTEGER
+                {
+                  undefined(0),
+                  none(1),
+                  approve(2),
+                  deny(3),
+                  cancel(4)
+                }
+
+PrivilegeRequestState ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Privilege request state." 
+  SYNTAX        INTEGER
+                {
+                  none(1),
+                  requestSent(2),
+                  requestCanceled(3),
+                  requestApproved(4),
+                  requestDenied(5),
+                  requestTimeout(6),
+                  accessExpired(7),
+                  accessCanceled(8)
+                }
+
+--
+-- Scalar definitions.
+--
+cmAuthProtocol OBJECT-TYPE
+    SYNTAX     CmRemoteAuthProtocol 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Remote user authentication protocol."
+    ::= { cmSecurityObjects 1 }
+
+
+cmAccessOrder OBJECT-TYPE
+    SYNTAX     CmSecurityAccessOrder 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Order of access for security, i.e. try 'local' first or
+             'remote' first."
+    ::= { cmSecurityObjects 2 }
+
+cmAuthType    OBJECT-TYPE
+    SYNTAX     CmSecurityAuthType 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "In case of remote authentication, the chosen protocol." 
+    ::= { cmSecurityObjects 3 }
+
+cmNASIpAddress    OBJECT-TYPE
+    SYNTAX     IpAddress 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "In case of remote authentication RADIUS, 
+             the Network Access Server's IP Address." 
+    ::= { cmSecurityObjects 4 }
+
+-- cmSecurityUserTable is { cmSecurityObjects 5 } 
+-- cmRemoteAuthServerTable is { cmSecurityObjects 6 } 
+
+cmSecurityPolicyStrength OBJECT-TYPE
+    SYNTAX     CmSecurityPolicyStrength 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object represents the security policy
+             strength of the system.  Based on this value,
+             the system puts additional restrictions on
+             the user id and password rules."
+    ::= { cmSecurityObjects 7 }
+
+cmRemoteAuthServerAccountingEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows to enable/disable RADIUS Accounting 
+          on all authentication servers." 
+     ::= { cmSecurityObjects 8 }
+
+-- f3UsmUserTable is { cmSecurityObjects 9 } 
+
+f3TacacsPrivLevelControlEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows to enable/disable the use of ENABLE authorization 
+          control to determine
+          the Privilege Level configured by the remote authentication server.
+          This object is only valid for TACACS+. Default value of this object is
+          TRUE."
+     ::= { cmSecurityObjects 10 }
+
+f3TacacsDefaultPrivLevel OBJECT-TYPE
+    SYNTAX     CmSecurityPrivLevel
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the default privilege level of the
+          TACACS+ user, when the use of  ENABLE authorization control is DISABLED, i.e.
+          f3TacacsPrivLevelControlEnabled is set to FALSE."
+     ::= { cmSecurityObjects 11 }
+
+f3NasIpv6Addr OBJECT-TYPE
+    SYNTAX     Ipv6Address
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describe the ipv6 address."
+     ::= { cmSecurityObjects 12 }
+
+f3SecurityTrapType OBJECT-TYPE
+    SYNTAX      SnmpSecurityTrapType
+    MAX-ACCESS  read-write
+    STATUS       current
+    DESCRIPTION
+         "This object provides ability to manage whether report security trap."
+    ::= { cmSecurityObjects 13 }
+
+f3SecurityTrapInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS       current
+    DESCRIPTION
+         "This object is used to describe the security trap info.
+          This object is used only in trap and GET operation on this object
+          will return empty string."
+    ::= { cmSecurityObjects 14 }
+
+-- f3PrivilegeChangeTable is { CmSecurityObjects 15 }
+
+f3UserPrivMgmtControl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object is used to enable/disable User Privilege Management."
+    ::= { cmSecurityObjects 16 }
+
+f3UserPrivRspTimeout OBJECT-TYPE
+    SYNTAX      Integer32 (1..60)
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object is used to set response timeout for user privilege
+          upgrade request in minutes."
+    ::= { cmSecurityObjects 17 }
+
+
+--
+-- Table definitions.
+--
+
+--
+-- Security User Table 
+--
+cmSecurityUserTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CmSecurityUserEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the security users. 
+             Entries cannot be created in this table by management
+             application action."
+    ::= { cmSecurityObjects 5 }
+
+
+cmSecurityUserEntry OBJECT-TYPE
+    SYNTAX     CmSecurityUserEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             security user."
+    INDEX { cmSecurityUserName, cmSecurityUserRemoteUser }
+    ::= { cmSecurityUserTable 1 }
+
+
+CmSecurityUserEntry ::= SEQUENCE {
+    cmSecurityUserName                     DisplayString,
+    cmSecurityUserComment                  DisplayString,
+    cmSecurityUserPrivLevel                CmSecurityPrivLevel,
+    cmSecurityUserLoginTimeout             Integer32,
+    cmSecurityUserNumFailedLoginAttempts   Integer32,
+    cmSecurityUserLastLoginTime            DateAndTime,
+    cmSecurityUserLockedout                TruthValue,
+    cmSecurityUserLastLockedoutTime        DateAndTime,
+    cmSecurityUserCliPagingEnable          TruthValue,
+    cmSecurityUserRemoteUser               TruthValue,
+    cmSecurityUserPassword                 DisplayString,
+    cmSecurityUserStorageType              StorageType,   
+    cmSecurityUserRowStatus                RowStatus,
+    cmSecurityUserAction                   SecurityUserAction,
+    cmSecurityCryptoPassword               DisplayString,
+    cmSecurityUserRemoteCryptoUser         TruthValue
+}
+
+cmSecurityUserName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..32)) 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Security User Name."
+     ::= { cmSecurityUserEntry 1 }
+
+cmSecurityUserComment OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..128)) 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Notes on Security User."
+     ::= { cmSecurityUserEntry 2 }
+
+cmSecurityUserPrivLevel OBJECT-TYPE
+    SYNTAX     CmSecurityPrivLevel 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Security User Privilege Level."
+     ::= { cmSecurityUserEntry 3 }
+
+cmSecurityUserLoginTimeout OBJECT-TYPE
+    SYNTAX     Integer32 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Security User Login Timeout."
+     ::= { cmSecurityUserEntry 4 }
+
+cmSecurityUserNumFailedLoginAttempts OBJECT-TYPE
+    SYNTAX     Integer32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Security User Number of Failed Login Attempts."
+     ::= { cmSecurityUserEntry 5 }
+
+cmSecurityUserLastLoginTime OBJECT-TYPE
+    SYNTAX     DateAndTime 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Security User Last Login Time."
+     ::= { cmSecurityUserEntry 6 }
+
+cmSecurityUserLockedout OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Whether the security user has been locked out."
+     ::= { cmSecurityUserEntry 7 }
+
+cmSecurityUserLastLockedoutTime OBJECT-TYPE
+    SYNTAX     DateAndTime 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Security User Last Locked out Time."
+     ::= { cmSecurityUserEntry 8 }
+
+cmSecurityUserCliPagingEnable OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Whether the security user has CLI paging enabled."
+     ::= { cmSecurityUserEntry 9 }
+
+cmSecurityUserRemoteUser OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Whether the security user is a remote user."
+     ::= { cmSecurityUserEntry 10 }
+
+cmSecurityUserPassword OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..32)) 
+    MAX-ACCESS read-create 
+    STATUS     current
+    DESCRIPTION
+         "Password of the security user. 
+          Note that this attribute is a SET only attribute."
+     ::= { cmSecurityUserEntry 11 }
+
+cmSecurityUserStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { cmSecurityUserEntry 12 }
+
+cmSecurityUserRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+            An entry MUST NOT exist in the active state unless all
+            objects in the entry have an appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of cmSecurityUserRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            cmSecurityUserRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The cmSecurityUserRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { cmSecurityUserEntry 13 }
+
+cmSecurityUserAction OBJECT-TYPE
+    SYNTAX     SecurityUserAction
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object provides ability to perform specific actions on security user.
+                 remove-lockout - this removes the locked out condition on the security user
+            ." 
+    ::= { cmSecurityUserEntry 14 }
+
+cmSecurityCryptoPassword OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..32)) 
+    MAX-ACCESS read-create 
+    STATUS     current
+    DESCRIPTION
+         "Second level password used in connectguard configurations.
+          This applies only to crypto users.
+          Note that this attribute is a SET only attribute."
+     ::= { cmSecurityUserEntry 15 }
+
+cmSecurityUserRemoteCryptoUser OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Indicates if a security user is a remote crypto user."
+     ::= { cmSecurityUserEntry 16 }
+
+--
+-- Remote Authentication Server Table 
+--
+cmRemoteAuthServerTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CmRemoteAuthServerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the remote authentication 
+             servers.
+             Entries cannot be created in this table by management
+             application action."
+    ::= { cmSecurityObjects 6 }
+
+
+cmRemoteAuthServerEntry OBJECT-TYPE
+    SYNTAX     CmRemoteAuthServerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             remote authentication server."
+    INDEX { cmRemoteAuthServerIndex }
+    ::= { cmRemoteAuthServerTable 1 }
+
+
+CmRemoteAuthServerEntry ::= SEQUENCE {
+    cmRemoteAuthServerIndex              Integer32,
+    cmRemoteAuthServerEnabled            TruthValue,
+    cmRemoteAuthServerOrder              CmRemoteAuthOrder,
+    cmRemoteAuthServerIpAddress          IpAddress,
+    cmRemoteAuthServerPort               Integer32,
+    cmRemoteAuthServerNumRetries         Integer32,
+    cmRemoteAuthServerTimeout            Integer32,
+    cmRemoteAuthServerSecret             DisplayString,
+    cmRemoteAuthServerAccountingPort     Integer32,
+    cmRemoteAuthServerIpVersion          IpVersion,
+    cmRemoteAuthServerIpv6Addr           Ipv6Address
+}
+
+cmRemoteAuthServerIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Unique index to address/configure a specific Remote 
+          Authentication Server."
+     ::= { cmRemoteAuthServerEntry 1 }
+
+cmRemoteAuthServerEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows enabling/disabling a Remote Authentication Server."
+     ::= { cmRemoteAuthServerEntry 2 }
+
+cmRemoteAuthServerOrder OBJECT-TYPE
+    SYNTAX     CmRemoteAuthOrder 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object determines the order in which the Remote 
+          Authentication Servers are accessed for security information."
+     ::= { cmRemoteAuthServerEntry 3 }
+
+cmRemoteAuthServerIpAddress OBJECT-TYPE
+    SYNTAX     IpAddress 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows to specify an IP Address for the Remote
+          Authentication Server."
+     ::= { cmRemoteAuthServerEntry 4 }
+
+cmRemoteAuthServerPort OBJECT-TYPE
+    SYNTAX     Integer32 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows to specify a Port for Remote Authentication
+          Server."
+     ::= { cmRemoteAuthServerEntry 5 }
+
+cmRemoteAuthServerNumRetries OBJECT-TYPE
+    SYNTAX     Integer32 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows to specify the number of retries the Remote 
+          Authentication Server must be tried for security access before
+          giving up."
+     ::= { cmRemoteAuthServerEntry 6 }
+
+cmRemoteAuthServerTimeout OBJECT-TYPE
+    SYNTAX     Integer32 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows to specify the timeout period for timing
+          out a security access request to the Remote Authentication Server."
+     ::= { cmRemoteAuthServerEntry 7 }
+
+cmRemoteAuthServerSecret OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..128)) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This allows configuration of secret password for Remote 
+          Authentication Server request."
+     ::= { cmRemoteAuthServerEntry 8 }
+
+cmRemoteAuthServerAccountingPort OBJECT-TYPE
+    SYNTAX     Integer32 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows to specify a Port for RADIUS Accounting." 
+     ::= { cmRemoteAuthServerEntry 9 }
+
+cmRemoteAuthServerIpVersion OBJECT-TYPE
+    SYNTAX     IpVersion 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describe the Ip Version." 
+     ::= { cmRemoteAuthServerEntry 10 }
+
+cmRemoteAuthServerIpv6Addr OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describe the Ipv6 Address." 
+     ::= { cmRemoteAuthServerEntry 11 }
+
+--
+-- USM User Extension Table 
+--
+f3UsmUserTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3UsmUserEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "This table is the extension of the F3 USM User Table."
+    ::= { cmSecurityObjects 9 }
+
+f3UsmUserEntry OBJECT-TYPE
+    SYNTAX     F3UsmUserEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry in the F3 USM User Table." 
+    AUGMENTS { usmUserEntry }
+    ::= { f3UsmUserTable 1 }
+
+F3UsmUserEntry ::= SEQUENCE {
+    f3UsmUserAccessType       UsmUserAccessType
+}
+
+f3UsmUserAccessType OBJECT-TYPE
+    SYNTAX     UsmUserAccessType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This indicates the type of USM User, read-only, read-write, trap-only."
+     ::= { f3UsmUserEntry 1 }
+
+f3PrivilegeChangeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3PrivilegeChangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table is used for Restricted User Login via NMS.
+         This is for users with lower privileges to elevate them to higher ones for limited amount of time."
+    ::=  { cmSecurityObjects 15 }
+
+f3PrivilegeChangeEntry OBJECT-TYPE
+    SYNTAX      F3PrivilegeChangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Column for privilegeChangeTable."
+    INDEX       { f3PrivilegeChangeId }
+    ::=  { f3PrivilegeChangeTable 1 }
+
+F3PrivilegeChangeEntry ::= SEQUENCE {
+    f3PrivilegeChangeId                   Unsigned32,
+    f3PrivilegeChangeUserName             SnmpAdminString,
+    f3PrivilegeChangeIpv4Address          IpAddress,
+    f3PrivilegeChangeIpv6Address          Ipv6Address,
+    f3PrivilegeChangeTerminalIpv4Address  IpAddress,
+    f3PrivilegeChangeTerminalIpv6Address  Ipv6Address,
+    f3PrivilegeChangeInterface            UserInterfaceType,
+    f3PrivilegeChangeCurrentPrivilege     CmSecurityPrivLevel,
+    f3PrivilegeChangeRequestedPrivilege   CmSecurityPrivLevel,
+    f3PrivilegeChangeDuration             Unsigned32,
+    f3PrivilegeChangeAction               PrivilegeRequestAction,
+    f3PrivilegeChangeState                PrivilegeRequestState,
+    f3PrivilegeChangeRemainingTime        Unsigned32,
+    f3PrivilegeChangeRemoteName           SnmpAdminString 
+}
+
+f3PrivilegeChangeId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Unique index identifying a request."
+    ::=  { f3PrivilegeChangeEntry 1 }
+
+f3PrivilegeChangeUserName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name string for user authentication purposes" 
+    ::=  { f3PrivilegeChangeEntry 2 }
+
+f3PrivilegeChangeIpv4Address OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPv4 address of interface to which user's terminal is connected."
+    ::=  { f3PrivilegeChangeEntry 3 }
+
+f3PrivilegeChangeIpv6Address OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPv6 address of interface to which user's terminal is connected."
+    ::=  { f3PrivilegeChangeEntry 4 }
+
+f3PrivilegeChangeTerminalIpv4Address OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Source IPv4 address of connected terminal."
+    ::=  { f3PrivilegeChangeEntry 5 }
+
+f3PrivilegeChangeTerminalIpv6Address OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Source IPv6 address of connected terminal."
+    ::=  { f3PrivilegeChangeEntry 6 }
+
+f3PrivilegeChangeInterface OBJECT-TYPE
+    SYNTAX      UserInterfaceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Interface used by the user" 
+    ::=  { f3PrivilegeChangeEntry 7 }
+
+f3PrivilegeChangeCurrentPrivilege OBJECT-TYPE
+    SYNTAX      CmSecurityPrivLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current privilege level of the user, who is requesting role upgrade." 
+    ::=  { f3PrivilegeChangeEntry 8 }
+
+f3PrivilegeChangeRequestedPrivilege OBJECT-TYPE
+    SYNTAX      CmSecurityPrivLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Privilege requested by user for session." 
+    ::=  { f3PrivilegeChangeEntry 9 }
+
+f3PrivilegeChangeDuration OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..480) 
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Requested time period by user (in minutes)."
+    ::=  { f3PrivilegeChangeEntry 10 }
+
+f3PrivilegeChangeAction OBJECT-TYPE
+    SYNTAX      PrivilegeRequestAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Privilege request action." 
+    ::=  { f3PrivilegeChangeEntry 11 }
+
+f3PrivilegeChangeState OBJECT-TYPE
+    SYNTAX      PrivilegeRequestState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Privilege request state." 
+    ::=  { f3PrivilegeChangeEntry 12 }
+
+f3PrivilegeChangeRemainingTime OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time remaining in session with upgrade user privilege (in seconds)." 
+    ::=  { f3PrivilegeChangeEntry 13 }
+
+f3PrivilegeChangeRemoteName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name string for Radius/Tacacs authentication purposes."
+    ::=  { f3PrivilegeChangeEntry 14 }
+
+---
+---Notifications
+---
+f3SecurityTrap NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "This is security trap. Security traps are reported
+             according to value of f3SecurityTrapType object."
+  ::= { cmSecurityNotifications 1 }
+
+f3PrivilegeChangeTrap NOTIFICATION-TYPE 
+    OBJECTS     { f3PrivilegeChangeState,
+                  f3PrivilegeChangeUserName,
+                  f3PrivilegeChangeIpv4Address,
+                  f3PrivilegeChangeIpv6Address,
+                  f3PrivilegeChangeTerminalIpv4Address,
+                  f3PrivilegeChangeTerminalIpv6Address,
+                  f3PrivilegeChangeInterface,
+                  f3PrivilegeChangeCurrentPrivilege,
+                  f3PrivilegeChangeRequestedPrivilege,
+                  f3PrivilegeChangeDuration
+                } 
+    STATUS      current
+    DESCRIPTION   "This trap is sent every time a privilege change request is changed (added, modified, removed)."
+    ::=  { cmSecurityNotifications 2 }
+--
+-- Conformance
+--
+cmSecurityCompliances OBJECT IDENTIFIER ::= {cmSecurityConformance 1}
+cmSecurityGroups      OBJECT IDENTIFIER ::= {cmSecurityConformance 2}
+
+cmSecurityCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the CM Security
+             group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              cmSecurityObjectGroup
+        }
+    ::= { cmSecurityCompliances 1 }
+
+cmSecurityObjectGroup OBJECT-GROUP
+    OBJECTS {
+        cmAuthProtocol, cmAccessOrder, cmAuthType, cmNASIpAddress,
+        cmSecurityPolicyStrength, cmRemoteAuthServerAccountingEnabled,
+
+        f3TacacsPrivLevelControlEnabled, f3TacacsDefaultPrivLevel,
+        f3NasIpv6Addr, f3SecurityTrapType, f3SecurityTrapInfo,
+
+        cmSecurityUserName, cmSecurityUserComment, cmSecurityUserPrivLevel,
+        cmSecurityUserLoginTimeout, cmSecurityUserNumFailedLoginAttempts,
+        cmSecurityUserLastLoginTime, cmSecurityUserLockedout,
+        cmSecurityUserLastLockedoutTime, cmSecurityUserCliPagingEnable,
+        cmSecurityUserRemoteUser, cmSecurityUserPassword,
+        cmSecurityUserStorageType, cmSecurityUserRowStatus, 
+        cmSecurityUserAction, cmSecurityCryptoPassword,
+
+        cmRemoteAuthServerIndex, cmRemoteAuthServerEnabled,
+        cmRemoteAuthServerOrder, cmRemoteAuthServerIpAddress,
+        cmRemoteAuthServerPort, cmRemoteAuthServerNumRetries,
+        cmRemoteAuthServerTimeout, cmRemoteAuthServerSecret,
+        cmRemoteAuthServerAccountingPort, cmRemoteAuthServerIpVersion,
+        cmRemoteAuthServerIpv6Addr,
+
+        f3UsmUserAccessType,
+
+        f3PrivilegeChangeUserName,
+        f3PrivilegeChangeIpv4Address, f3PrivilegeChangeIpv6Address,
+        f3PrivilegeChangeTerminalIpv4Address, f3PrivilegeChangeTerminalIpv6Address,
+        f3PrivilegeChangeInterface, f3PrivilegeChangeCurrentPrivilege,
+        f3PrivilegeChangeRequestedPrivilege, f3PrivilegeChangeDuration,
+        f3PrivilegeChangeAction, f3PrivilegeChangeState, f3PrivilegeChangeRemainingTime,
+        f3PrivilegeChangeRemoteName
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the CM Security
+             group."
+    ::= { cmSecurityGroups 1 }
+
+cmSecurityNotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        f3SecurityTrap
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of notifications used in the CM Security
+              group."
+    ::= { cmSecurityGroups 2 }
+
+END

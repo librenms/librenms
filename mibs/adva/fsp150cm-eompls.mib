@@ -1,0 +1,822 @@
+F3-EOMPLS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP 
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, IpAddress, Counter64
+             FROM SNMPv2-SMI
+    DateAndTime, MacAddress, RowStatus, StorageType, TruthValue,DisplayString,
+    VariablePointer, TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    AdminState, OperationalState, SecondaryState,
+    VlanId, VlanPriority,
+    CmPmIntervalType, CmPmBinAction, PerfCounter64
+             FROM  CM-COMMON-MIB
+    cmEthernetNetPortEntry, cmFlowEntry, cmPrioMapV2PrioMappingCOSEntry
+             FROM  CM-FACILITY-MIB
+    neIndex
+             FROM CM-ENTITY-MIB
+    fsp150cm
+             FROM  ADVA-MIB; 
+
+f3EoMplsMIB MODULE-IDENTITY
+    LAST-UPDATED        "201508140000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Jack Chen
+                     ADVA Optical Networking, Inc.
+                Tel: +48 58 7716 411
+             E-mail: jchen@advaoptical.com
+             Postal: ul. Slaska 35/37
+                     81-310 Gdynia, Poland"
+    DESCRIPTION
+            "This module defines the Ethernet Service Manager MIB defitinions
+             used by the F3 (FSP150CM/CC) product lines.  
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201508140000Z"
+    DESCRIPTION
+        "
+         Notes from release 201508140000Z." 
+
+    ::= {fsp150cm 39}
+
+--
+-- Textual Conventions
+--
+EoMplsMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "EoMpls mode"
+    SYNTAX       INTEGER {
+                   raw (1),
+                   tagged (2)
+                 }
+
+EoMplsDiscoveryType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "EoMpls discovery type"
+    SYNTAX       INTEGER {
+                   static (1),
+                   dynamic (2)
+                 }
+
+-- 
+-- OID definitions
+-- 
+f3EoMplsConfigObjects      OBJECT IDENTIFIER ::= {f3EoMplsMIB 1}
+f3EoMplsPerformance        OBJECT IDENTIFIER ::= {f3EoMplsMIB 2}
+f3EoMplsNotifications      OBJECT IDENTIFIER ::= {f3EoMplsMIB 3}
+f3EoMplsConformance        OBJECT IDENTIFIER ::= {f3EoMplsMIB 4}
+
+--
+-- EoMpls Pw Config Table
+--
+f3EoMplsPwTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3EoMplsPwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table has list of entries with which FSPNM can associate some
+         information in the form of name-value pairs."
+   ::= { f3EoMplsConfigObjects 1 }
+
+f3EoMplsPwEntry OBJECT-TYPE
+    SYNTAX      F3EoMplsPwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The conceptual row in f3EoMplsPwTable."
+    INDEX { neIndex, f3EoMplsPwIndex }
+   ::= { f3EoMplsPwTable 1 }
+
+F3EoMplsPwEntry ::= SEQUENCE {
+    f3EoMplsPwIndex                           Integer32,
+    f3EoMplsPwMode                            EoMplsMode,
+    f3EoMplsPwTxTunnelLabel                   Unsigned32,
+    f3EoMplsPwTxTunnelExp                     Unsigned32,
+    f3EoMplsPwTxTunnelTtl                     Unsigned32,
+    f3EoMplsPwTxVcLabelControl                TruthValue,
+    f3EoMplsPwTxVcLabel                       Unsigned32,
+    f3EoMplsPwTxVcExp                         Unsigned32,
+    f3EoMplsPwTxVcTtl                         Unsigned32,
+    f3EoMplsPwRxTunnelLabel                   Unsigned32,
+    f3EoMplsPwRxTunnelExp                     Unsigned32,
+    f3EoMplsPwRxTunnelTtl                     Unsigned32,
+    f3EoMplsPwRxVcLabelControl                TruthValue,
+    f3EoMplsPwRxVcLabel                       Unsigned32,
+    f3EoMplsPwRxVcExp                         Unsigned32,
+    f3EoMplsPwRxVcTtl                         Unsigned32,
+    f3EoMplsPwOuterStagControl                TruthValue,
+    f3EoMplsPwOuterStagVlanId                 VlanId,
+    f3EoMplsPwOuterStagVlanPri                VlanPriority,
+    f3EoMplsPwDiscoverType                    EoMplsDiscoveryType,
+    f3EoMplsPwDestIp                          IpAddress,
+    f3EoMplsPwDestMac                         MacAddress,
+    f3EoMplsPwAdminState                      AdminState,
+    f3EoMplsPwOperationalState                OperationalState,
+    f3EoMplsPwSecondaryState                  SecondaryState,
+    f3EoMplsPwStorageType                     StorageType,
+    f3EoMplsPwRowStatus                       RowStatus,
+    f3EoMplsPwInnerExpMappingControl          TruthValue,
+    f3EoMplsPwOuterExpMappingControl          TruthValue,
+    f3EoMplsPwOuterTagPriMappingControl       TruthValue,
+    f3EoMplsPwEgressInterface                 VariablePointer
+}
+
+f3EoMplsPwIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An integer index value used to uniquely identify this EoMpls Pw."
+   ::= { f3EoMplsPwEntry 1 }
+
+f3EoMplsPwMode OBJECT-TYPE
+    SYNTAX      EoMplsMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This objects specify EoMpls Pw's mode, it could be raw or tagged."
+   ::= { f3EoMplsPwEntry 2 }
+
+f3EoMplsPwTxTunnelLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This objects specify EoMpls tunnel label on transimitted direction."
+   ::= { f3EoMplsPwEntry 3 }
+
+f3EoMplsPwTxTunnelExp OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This objects specify EoMpls tunnel EXP value on transimitted direction."
+   ::= { f3EoMplsPwEntry 4 }
+
+
+f3EoMplsPwTxTunnelTtl OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This objects specify EoMpls tunnel Ttl on transimitted direction."
+   ::= { f3EoMplsPwEntry 5 }
+
+
+f3EoMplsPwTxVcLabelControl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This objects specify whether enabled VC label on transimitted direction."
+   ::= { f3EoMplsPwEntry 6 }
+
+f3EoMplsPwTxVcLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This objects specify EoMpls VC label on transimitted direction."
+   ::= { f3EoMplsPwEntry 7 }
+
+f3EoMplsPwTxVcExp OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This objects specify EoMpls VC EXP value on transimitted direction."
+   ::= { f3EoMplsPwEntry 8 }
+
+f3EoMplsPwTxVcTtl OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This objects specify EoMpls VC Ttl value on transimitted direction."
+   ::= { f3EoMplsPwEntry 9 }
+
+f3EoMplsPwRxTunnelLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This objects specify EoMpls tunnel label on recieve direction."
+   ::= { f3EoMplsPwEntry 10 }
+
+f3EoMplsPwRxTunnelExp OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This objects specify EoMpls tunnel label Exp on recieve direction."
+   ::= { f3EoMplsPwEntry 11 }
+
+f3EoMplsPwRxTunnelTtl OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This objects specify EoMpls tunnel label Ttl on recieve direction."
+   ::= { f3EoMplsPwEntry 12 }
+
+f3EoMplsPwRxVcLabelControl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This objects specify whether enabled VC label on recieve direction."
+   ::= { f3EoMplsPwEntry 13 }
+
+f3EoMplsPwRxVcLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This objects specify EoMpls VC label on recieve direction."
+   ::= { f3EoMplsPwEntry 14 }
+
+f3EoMplsPwRxVcExp OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This objects specify EoMpls VC label Exp on recieve direction."
+   ::= { f3EoMplsPwEntry 15 }
+
+f3EoMplsPwRxVcTtl OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This objects specify EoMpls VC label Ttl on recieve direction."
+   ::= { f3EoMplsPwEntry 16 }
+
+f3EoMplsPwOuterStagControl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This objects specify whether enabled outer stag."
+   ::= { f3EoMplsPwEntry 17 }
+
+f3EoMplsPwOuterStagVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows to specify outer stag VlanId."
+   ::= { f3EoMplsPwEntry 18 }
+
+f3EoMplsPwOuterStagVlanPri OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows to specify outer stag Vlan Priority."
+   ::= { f3EoMplsPwEntry 19 }
+
+f3EoMplsPwDiscoverType OBJECT-TYPE
+    SYNTAX      EoMplsDiscoveryType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows to specify EoMpls Pw discovery type."
+   ::= { f3EoMplsPwEntry 20 }
+
+f3EoMplsPwDestIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows to specify EoMpls Pw destination ip."
+   ::= { f3EoMplsPwEntry 21 }
+
+f3EoMplsPwDestMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows to specify EoMpls Pw destination MacAddress."
+   ::= { f3EoMplsPwEntry 22 }
+
+f3EoMplsPwAdminState OBJECT-TYPE
+    SYNTAX     AdminState
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object represents the Administrative State of the EoMpls Pw."
+     ::= { f3EoMplsPwEntry 23 }
+
+f3EoMplsPwOperationalState OBJECT-TYPE
+    SYNTAX     OperationalState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object represents the Operational State of the EoMpls Pw."
+     ::= { f3EoMplsPwEntry 24 }
+
+f3EoMplsPwSecondaryState OBJECT-TYPE
+    SYNTAX     SecondaryState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object represents the Secondary State of the EoMpls Pw."
+     ::= { f3EoMplsPwEntry 25 }
+
+f3EoMplsPwStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The type of storage configured for this entry."
+    ::= { f3EoMplsPwEntry 26 }
+
+f3EoMplsPwRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.
+          	An entry MUST NOT exist in the active state unless all
+          	objects in the entry have an appropriate value, as described
+          	in the description clause for each writable object.
+ 	
+          	The values of f3EoMplsPwRowStatus supported are
+          	createAndGo(4) and destroy(6).  All mandatory attributes
+          	must be specified in a single SNMP SET request with
+          	f3EoMplsPwRowStatus value as createAndGo(4).
+          	Upon successful row creation, this object has a
+          	value of active(1).
+ 	
+          	The f3EoMplsPwRowStatus object may be modified if
+          	the associated instance of this object is equal to active(1)."
+    ::= { f3EoMplsPwEntry 27 }
+
+f3EoMplsPwInnerExpMappingControl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "When its value is disabled, the priority mapping profile
+           won't take effect on inner EXP."
+    ::= { f3EoMplsPwEntry 28 }
+
+f3EoMplsPwOuterExpMappingControl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "When its value is disabled, the priority mapping profile
+           won't take effect on outer EXP."
+    ::= { f3EoMplsPwEntry 29 }
+
+f3EoMplsPwOuterTagPriMappingControl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "When its value is disabled, the priority mapping profile
+           won't take effect on outer stag."
+    ::= { f3EoMplsPwEntry 30 }
+
+f3EoMplsPwEgressInterface OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object specify the egress interface, it could be port, lag, ppg etc."
+    ::= { f3EoMplsPwEntry 31 }
+
+--
+-- flow extension Table
+--
+--f3FlowExtEoMplsTable OBJECT-TYPE
+--    SYNTAX      SEQUENCE OF F3FlowExtEoMplsEntry
+--    MAX-ACCESS  not-accessible
+--    STATUS      current
+--    DESCRIPTION
+--            "A list of entries corresponding to Flow for configuration purposes."
+--    ::= { f3EoMplsConfigObjects 2 }
+--
+--f3FlowExtEoMplsEntry OBJECT-TYPE
+--    SYNTAX      F3FlowExtEoMplsEntry
+--    MAX-ACCESS  not-accessible
+--    STATUS      current
+--    DESCRIPTION
+--            "A conceptual row in the f3FlowExtEoMplsTable."
+--    AUGMENTS { cmFlowEntry }
+--    ::= { f3FlowExtEoMplsTable 1 }
+--
+--F3FlowExtEoMplsEntry ::= SEQUENCE {
+--    f3FlowRefEoMplsPwObject               VariablePointer
+--}
+--
+--f3FlowRefEoMplsPwObject OBJECT-TYPE
+--    SYNTAX     VariablePointer
+--    MAX-ACCESS read-write
+--    STATUS     current
+--    DESCRIPTION
+--          "This object specifies EoMpls Pw object OID."
+--     ::= { f3FlowExtEoMplsEntry 1 }
+--
+--
+--
+--
+f3NetPortExtEoMplsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3NetPortExtEoMplsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table extends cmEthernetNetPortTable by adding EoMpls related parameters."
+    ::= { f3EoMplsConfigObjects 2 }
+
+f3NetPortExtEoMplsEntry OBJECT-TYPE
+    SYNTAX      F3NetPortExtEoMplsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3NetPortExtEoMplsTable."
+    AUGMENTS { cmEthernetNetPortEntry }
+    ::= { f3NetPortExtEoMplsTable 1 }
+
+F3NetPortExtEoMplsEntry ::= SEQUENCE {
+    f3NetPortExtEoMplsSrcIp            IpAddress
+}
+
+f3NetPortExtEoMplsSrcIp OBJECT-TYPE
+     SYNTAX     IpAddress
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "This object allows configuring EoMpls Source Ip address."
+     ::= { f3NetPortExtEoMplsEntry 1 }
+
+--
+--
+--
+f3PrioMapV2PrioMappingCosExtEoMplsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3PrioMapV2PrioMappingCosExtEoMplsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table extends cmPrioMapV2PrioMappingCOSTable by adding EoMpls related parameters."
+    ::= { f3EoMplsConfigObjects 3 }
+
+f3PrioMapV2PrioMappingCosExtEoMplsEntry OBJECT-TYPE
+    SYNTAX      F3PrioMapV2PrioMappingCosExtEoMplsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3PrioMapV2PrioMappingCosExtEoMplsTable."
+    AUGMENTS { cmPrioMapV2PrioMappingCOSEntry }
+    ::= { f3PrioMapV2PrioMappingCosExtEoMplsTable 1 }
+
+F3PrioMapV2PrioMappingCosExtEoMplsEntry ::= SEQUENCE {
+    f3PrioMapV2PrioMappingCosOuterMplsExp            Integer32,
+    f3PrioMapV2PrioMappingCosInnerMplsExp            Integer32
+}
+
+f3PrioMapV2PrioMappingCosOuterMplsExp OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "This object allows configuring EoMpls outer Mpls Exp."
+     ::= { f3PrioMapV2PrioMappingCosExtEoMplsEntry 1 }
+
+f3PrioMapV2PrioMappingCosInnerMplsExp OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "This object allows configuring EoMpls Inner Mpls Exp."
+     ::= { f3PrioMapV2PrioMappingCosExtEoMplsEntry 2 }
+
+--
+-- EoMpls Pw Current Statistics Table
+--
+f3EoMplsPwStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3EoMplsPwStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of EoMpls Pw related statistics.  
+             These reflect the current data."
+    ::= { f3EoMplsPerformance 1 }
+
+f3EoMplsPwStatsEntry OBJECT-TYPE
+    SYNTAX      F3EoMplsPwStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3EoMplsPwStatsTable.
+             Entries exist in this table for each EoMpls Pw."
+    INDEX { neIndex, f3EoMplsPwIndex, f3EoMplsPwStatsIndex }
+    ::= { f3EoMplsPwStatsTable 1 }
+
+F3EoMplsPwStatsEntry ::= SEQUENCE {
+    f3EoMplsPwStatsIndex               Integer32,
+    f3EoMplsPwStatsIntervalType        CmPmIntervalType,
+    f3EoMplsPwStatsValid               TruthValue,
+    f3EoMplsPwStatsAction              CmPmBinAction,
+    f3EoMplsPwStatsTtlEqual0Drop       PerfCounter64
+}
+
+f3EoMplsPwStatsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this L3 flow point statistics entry. 
+            1 - 15min
+            2 - 1day
+            3 - rollover
+            4 - 5min"
+    ::= { f3EoMplsPwStatsEntry 1 }
+
+f3EoMplsPwStatsIntervalType OBJECT-TYPE
+    SYNTAX      CmPmIntervalType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Interval over which Performance Monitoring data is collected."
+    ::= { f3EoMplsPwStatsEntry 2 }
+
+f3EoMplsPwStatsValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3EoMplsPwStatsEntry 3 }
+
+f3EoMplsPwStatsAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3EoMplsPwStatsEntry 4 }
+
+f3EoMplsPwStatsTtlEqual0Drop OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of packets matching the ACL rule."
+     ::= { f3EoMplsPwStatsEntry 5 }
+
+--
+-- EoMpls PW history Statistics Table
+--
+f3EoMplsPwHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3EoMplsPwHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of EoMpls related history statistics.  
+             These reflect the history data."
+    ::= { f3EoMplsPerformance 2 }
+
+f3EoMplsPwHistoryEntry OBJECT-TYPE
+    SYNTAX      F3EoMplsPwHistoryEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3EoMplsPwHistoryTable.
+             Entries exist in this table for each L3 acl rule."
+    INDEX { neIndex, f3EoMplsPwIndex,
+            f3EoMplsPwStatsIndex, f3EoMplsPwHistoryIndex }
+    ::= { f3EoMplsPwHistoryTable 1 }
+
+F3EoMplsPwHistoryEntry ::= SEQUENCE {
+    f3EoMplsPwHistoryIndex               Integer32,
+    f3EoMplsPwHistoryTime                DateAndTime,
+    f3EoMplsPwHistoryValid               TruthValue,
+    f3EoMplsPwHistoryAction              CmPmBinAction,
+    f3EoMplsPwHistoryTtlEqual0Drop       PerfCounter64
+}
+
+f3EoMplsPwHistoryIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this L3 flow point statistics entry. 
+            1 - 15min
+            2 - 1day
+            3 - rollover
+            4 - 5min"
+    ::= { f3EoMplsPwHistoryEntry 1 }
+
+f3EoMplsPwHistoryTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the time of history bin creation." 
+    ::= { f3EoMplsPwHistoryEntry 2 }
+
+f3EoMplsPwHistoryValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3EoMplsPwHistoryEntry 3 }
+
+f3EoMplsPwHistoryAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3EoMplsPwHistoryEntry 4 }
+
+f3EoMplsPwHistoryTtlEqual0Drop OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of packets matching acl rule."
+     ::= { f3EoMplsPwHistoryEntry 5 }
+
+--
+-- EoMpls PW Threshold Table
+--
+f3EoMplsPwThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3EoMplsPwThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table of entries that allow manageability of EoMpls Pw Thresholds."
+    ::= { f3EoMplsPerformance 3 }
+
+f3EoMplsPwThresholdEntry OBJECT-TYPE
+    SYNTAX      F3EoMplsPwThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3EoMplsPwThresholdTable."
+    INDEX { neIndex, f3EoMplsPwIndex,
+            f3EoMplsPwStatsIndex, f3EoMplsPwThresholdIndex }
+    ::= { f3EoMplsPwThresholdTable 1 }
+
+F3EoMplsPwThresholdEntry ::= SEQUENCE {
+    f3EoMplsPwThresholdIndex       Integer32,
+    f3EoMplsPwThresholdInterval    CmPmIntervalType,
+    f3EoMplsPwThresholdVariable    VariablePointer,
+    f3EoMplsPwThresholdValueLo     Unsigned32,
+    f3EoMplsPwThresholdValueHi     Unsigned32,
+    f3EoMplsPwThresholdMonValue    Counter64
+}
+
+f3EoMplsPwThresholdIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies an entry in the
+        f3EoMplsPwThresholdTable."
+    ::= { f3EoMplsPwThresholdEntry 1 }
+
+f3EoMplsPwThresholdInterval OBJECT-TYPE
+    SYNTAX     CmPmIntervalType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The interval over which monitored value is
+        sampled and compared with the specified threshold."
+    ::= { f3EoMplsPwThresholdEntry 2 }
+
+f3EoMplsPwThresholdVariable OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The object identifier of the particular variable to be
+        sampled."
+    ::= { f3EoMplsPwThresholdEntry 3 }
+
+f3EoMplsPwThresholdValueLo OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Lower 32 bits of the threshold value."
+    ::= { f3EoMplsPwThresholdEntry 4 }
+
+f3EoMplsPwThresholdValueHi OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Higher 32 bits of the threshold value."
+    ::= { f3EoMplsPwThresholdEntry 5 }
+
+f3EoMplsPwThresholdMonValue OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Monitored value corresponding to f3EoMplsPwThresholdVariable."
+    ::= { f3EoMplsPwThresholdEntry 6 }
+
+---
+---Notifications
+---
+f3EoMplsPwThresholdCrossingAlert NOTIFICATION-TYPE
+    OBJECTS {
+                f3EoMplsPwThresholdIndex,       
+                f3EoMplsPwThresholdInterval,
+                f3EoMplsPwThresholdVariable,
+                f3EoMplsPwThresholdValueLo,
+                f3EoMplsPwThresholdValueHi,
+                f3EoMplsPwThresholdMonValue
+            }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time a threshold on a PM condition
+             on an EoMpls Pw is crossed."
+  ::= { f3EoMplsNotifications 1 }
+
+--
+-- Conformance
+--
+f3EoMplsCompliances OBJECT IDENTIFIER ::= {f3EoMplsConformance 1}
+f3EoMplsGroups      OBJECT IDENTIFIER ::= {f3EoMplsConformance 2}
+
+f3EoMplsCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the F3-EOMPLS-MIB compilance."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3EoMplsConfigGroup
+        }
+    ::= { f3EoMplsCompliances 1 }
+
+f3EoMplsConfigGroup OBJECT-GROUP
+   OBJECTS {
+    f3EoMplsPwIndex,
+    f3EoMplsPwMode,
+    f3EoMplsPwTxTunnelLabel,
+    f3EoMplsPwTxTunnelExp,
+    f3EoMplsPwTxTunnelTtl,
+    f3EoMplsPwTxVcLabelControl,
+    f3EoMplsPwTxVcLabel,
+    f3EoMplsPwTxVcExp,
+    f3EoMplsPwTxVcTtl,
+    f3EoMplsPwRxTunnelLabel,
+    f3EoMplsPwRxTunnelExp,
+    f3EoMplsPwRxTunnelTtl,
+    f3EoMplsPwRxVcLabelControl,
+    f3EoMplsPwRxVcLabel,
+    f3EoMplsPwRxVcExp,
+    f3EoMplsPwRxVcTtl,
+    f3EoMplsPwOuterStagControl,
+    f3EoMplsPwOuterStagVlanId,
+    f3EoMplsPwOuterStagVlanPri,
+    f3EoMplsPwDiscoverType,
+    f3EoMplsPwDestIp,
+    f3EoMplsPwDestMac,
+    f3EoMplsPwAdminState,
+    f3EoMplsPwOperationalState,
+    f3EoMplsPwSecondaryState,
+    f3EoMplsPwStorageType,
+    f3EoMplsPwRowStatus,
+    f3EoMplsPwInnerExpMappingControl,
+    f3EoMplsPwOuterExpMappingControl,
+    f3EoMplsPwOuterTagPriMappingControl,
+    f3EoMplsPwEgressInterface,
+    f3NetPortExtEoMplsSrcIp,
+    f3PrioMapV2PrioMappingCosOuterMplsExp,
+    f3PrioMapV2PrioMappingCosInnerMplsExp,
+    f3EoMplsPwStatsIndex,
+    f3EoMplsPwStatsIntervalType,
+    f3EoMplsPwStatsValid,
+    f3EoMplsPwStatsAction,
+    f3EoMplsPwStatsTtlEqual0Drop,
+    f3EoMplsPwHistoryIndex,
+    f3EoMplsPwHistoryTime,
+    f3EoMplsPwHistoryValid,
+    f3EoMplsPwHistoryAction,
+    f3EoMplsPwHistoryTtlEqual0Drop,
+    f3EoMplsPwThresholdIndex,
+    f3EoMplsPwThresholdInterval,
+    f3EoMplsPwThresholdVariable,
+    f3EoMplsPwThresholdValueLo,
+    f3EoMplsPwThresholdValueHi,
+    f3EoMplsPwThresholdMonValue
+   }
+   STATUS  current
+   DESCRIPTION
+             "A collection of objects used to manage the EoMpls Configuration objects."
+    ::= { f3EoMplsGroups 1 }
+
+END
