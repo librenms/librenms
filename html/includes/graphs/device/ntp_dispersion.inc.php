@@ -28,7 +28,7 @@ $count = 0;
 foreach ($components as $id => $array) {
     $rrd_filename = rrd_name($device['hostname'], array('ntp', $array['peer']));
 
-    if (file_exists($rrd_filename)) {
+    if (rrdtool_check_rrd_exists($rrd_filename)) {
         // Grab a color from the array.
         if (isset($config['graph_colours']['mixed'][$count])) {
             $color = $config['graph_colours']['mixed'][$count];
