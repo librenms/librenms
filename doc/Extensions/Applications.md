@@ -25,6 +25,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Open Grid Scheduler](#opengridscheduler) - SNMP extend
 1. [OS Updates](#os-updates) - SNMP extend
 1. [PHP-FPM](#php-fpm) - SNMP extend
+1. [Pi-hole](#pi-hole) - SNMP extend
 1. [Postfix](#postfix) - SNMP extend
 1. [Postgres](#postgres) - SNMP extend
 1. [PowerDNS](#powerdns) - Agent
@@ -500,6 +501,24 @@ extend phpfpmsp /etc/snmp/phpfpm-sp
 6. Restart snmpd on your host
 
 It is worth noting that this only monitors a single pool. If you want to monitor multiple pools, this won't do it.
+
+### Pi-hole
+#### SNMP Extend
+
+1: Copy the shell script, pi-hole, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/pi-hole -O /etc/snmp/pi-hole)
+
+2: Make the script executable (chmod +x /etc/snmp/pi-hole)
+
+3: Edit your snmpd.conf file and add:
+```
+extend pi-hole /etc/snmp/pi-hole
+```
+
+4: To get all data you must get your API auth token from Pi-hole server and change the API_AUTH_KEY entry inside the snmp script.
+
+5: Restard snmpd.
+
+6: On the device page in Librenms, edit your host and check the `Pi-hole` under the Applications tab or wait for it to be auto-discovered.
 
 
 ### Postfix

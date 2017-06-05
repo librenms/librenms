@@ -121,6 +121,9 @@ function nicecase($item)
         case 'sdfsinfo':
             return 'SDFS info';
 
+        case 'pi-hole':
+            return 'Pi-hole';
+
         default:
             return ucfirst($item);
     }
