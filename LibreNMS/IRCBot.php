@@ -296,6 +296,28 @@ class IRCBot
                 }
             }
 
+            if (($this->config['irc_ctcp']) && (preg_match("/^:".chr(1).".*/", $ex[3]))) {
+                // Handle CTCP
+                $ctcp = trim(preg_replace("/[^A-Z]/", "", $ex[3]));
+                $ctcp_reply = null;
+                $this->log("Received irc CTCP: ".$ctcp." from ".$this->getUser($this->data));
+                switch ($ctcp) {
+                    case 'VERSION':
+                        $ctcp_reply = chr(1)."$ctcp ".$this->config['irc_ctcp_version'].chr(1);
+                        break;
+                    case 'PING':
+                        $ctcp_reply = chr(1)."$ctcp ".$ex[4]. " ".$ex[5].chr(1);
+                        break;
+                    case 'TIME':
+                        $ctcp_reply = chr(1)."$ctcp ".date('c').chr(1);
+                        break;
+                }
+                if ($ctcp_reply !== null) {
+                    $this->log("Sending irc CTCP: ".'NOTICE '.$this->getUser($this->data)." :".$ctcp_reply);
+                    return $this->ircRaw('NOTICE '.$this->getUser($this->data)." :".$ctcp_reply);
+                }
+            }
+
             if (($ex[1] == 'NICK') && (preg_replace("/^:/", "", $ex[2]) == $this->nick)) {
                 // Nickname changed successfully
                 if ($this->debug) {
