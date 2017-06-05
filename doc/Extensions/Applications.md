@@ -518,6 +518,8 @@ extend pi-hole /etc/snmp/pi-hole
 
 5: Restard snmpd.
 
+6: On the device page in Librenms, edit your host and check the `Pi-hole` under the Applications tab or wait for it to be auto-discovered.
+
 
 ### Postfix
 #### SNMP Extend
