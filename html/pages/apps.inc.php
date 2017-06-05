@@ -271,6 +271,11 @@ $graphs['sdfsinfo'] = array(
     'rates',
 );
 
+$graphs['pi-hole'] = array(
+    'stats',
+    'queries',
+);
+
 print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
