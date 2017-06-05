@@ -23,9 +23,7 @@ $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.112.105.45.104.111.108.101';
 $pihole = snmp_walk($device, $oid, $options);
 
 if ($pihole) {
-
     update_application($app, $pihole);
-
     list($domains_blocked, $dns_query, $ads_blocked, $ads_percentage, $unique_domains, $queries_forwarded, $queries_cached, $query_a, $query_aaaa, $query_ptr, $query_srv) = explode("\n", $pihole);
 
     $rrd_name = array('app', $name, $app_id);
