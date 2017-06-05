@@ -1,0 +1,139 @@
+-- *****************************************************************
+-- BASIS MIB
+--
+-- April 2003 Wei Gao
+--
+-- Copyright (c) 2003 by cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+BASIS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS 
+    stratacom,
+    ciscoWan
+                                        FROM CISCOWAN-SMI
+    MODULE-IDENTITY
+                                        FROM SNMPv2-SMI;
+
+basisMIB MODULE-IDENTITY
+    LAST-UPDATED    "200304040000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+                    "Cisco Systems
+                     Customer Service
+
+                     Postal: 170 W Tasman Drive
+                     San Jose, CA  95134
+                     USA
+
+                     Tel: +1 800 553-NETS
+
+                     E-mail: cs-wanatm@cisco.com"
+    DESCRIPTION     "This MIB Contains OID subtrees used in
+                     some of the MIBs under 'stratacom' enterprise.
+                     "
+
+    REVISION         "200304040000Z"
+    DESCRIPTION
+                     "Initial version of this MIB Module.
+
+                     The content of this MIB was originally available
+                     in SMIv1 version. The MIB has been converted to
+                     SMIv2 version and descriptions of some of the objects
+                     have been modified."
+    ::= { ciscoWan 67 }
+
+
+basis                   OBJECT IDENTIFIER ::= { stratacom 110 }
+par                     OBJECT IDENTIFIER ::= { stratacom 130 }
+
+basisSystem             OBJECT IDENTIFIER ::= { basis 1 }
+cardGeneric             OBJECT IDENTIFIER ::= { basis 2 }
+cardSpecific            OBJECT IDENTIFIER ::= { basis 3 }
+basisLines              OBJECT IDENTIFIER ::= { basis 4 }
+basisServices           OBJECT IDENTIFIER ::= { basis 5 }
+axisDiagnostics         OBJECT IDENTIFIER ::= { basis 6 }
+
+basisShelf              OBJECT IDENTIFIER ::= { basisSystem 1 }
+basisAsm                OBJECT IDENTIFIER ::= { basisSystem 2 }
+axisRedundancy		OBJECT IDENTIFIER ::= { basisSystem 3 }
+axisSvc			OBJECT IDENTIFIER ::= { basisSystem 4 }
+
+atmLmiSignaling         OBJECT IDENTIFIER ::= { cardSpecific 4 }
+
+atmAddressRegistration  OBJECT IDENTIFIER ::= { axisSvc 1 }
+
+dsx1                    OBJECT IDENTIFIER ::= { basisLines 3 }
+dsx3                    OBJECT IDENTIFIER ::= { basisLines 4 }
+x21                     OBJECT IDENTIFIER ::= { basisLines 5 }
+sonet                   OBJECT IDENTIFIER ::= { basisLines 6 }
+dsx0Vism                OBJECT IDENTIFIER ::= { basisLines 7 }
+
+dsx1Line                OBJECT IDENTIFIER ::= { dsx1 1 }
+dsx1Framing             OBJECT IDENTIFIER ::= { dsx1 2 }
+dsx1Plcp                OBJECT IDENTIFIER ::= { dsx1 3 }
+dsx3Line                OBJECT IDENTIFIER ::= { dsx3 1 }
+dsx3Framing             OBJECT IDENTIFIER ::= { dsx3 2 }
+plcp                    OBJECT IDENTIFIER ::= { dsx3 3 }
+
+cwsonetObjects          OBJECT IDENTIFIER ::= { sonet 1 }
+
+frameRelay              OBJECT IDENTIFIER ::= { basisServices 1 }
+frPort                  OBJECT IDENTIFIER ::= { frameRelay 1 }
+frChan                  OBJECT IDENTIFIER ::= { frameRelay 2 }
+frPortCnf               OBJECT IDENTIFIER ::= { frPort 1 }
+frPortCnfSig            OBJECT IDENTIFIER ::= { frPortCnf 2 }
+frPortCnfX21PortGrp     OBJECT IDENTIFIER ::= { frPortCnf 3 }
+frPortServiceQueGrp     OBJECT IDENTIFIER ::= { frPortCnf 4 }
+frPortCnfResPartGrp     OBJECT IDENTIFIER ::= { frPortCnf 5 }
+frPortCnt               OBJECT IDENTIFIER ::= { frPort 2 }
+frPortCntSig            OBJECT IDENTIFIER ::= { frPortCnt 2 }
+
+atm                     OBJECT IDENTIFIER ::= { basisServices 2 }
+ausmPort                OBJECT IDENTIFIER ::= { atm 1 }
+ausmPortCnf             OBJECT IDENTIFIER ::= { ausmPort 1 }
+ausmPortCnt             OBJECT IDENTIFIER ::= { ausmPort 3 }
+ausmChan                OBJECT IDENTIFIER ::= { atm 2 }
+
+circuitEmulation        OBJECT IDENTIFIER ::= { basisServices 3 }
+cesmChan                OBJECT IDENTIFIER ::= { circuitEmulation 2 }
+
+sna                     OBJECT IDENTIFIER ::= { basisServices 4 }
+snaport                 OBJECT IDENTIFIER ::= { sna 1 }
+snaportCnf              OBJECT IDENTIFIER ::= { snaport 1 }
+snaportCnfSig           OBJECT IDENTIFIER ::= { snaportCnf 2 }
+snaportCnt              OBJECT IDENTIFIER ::= { snaport 2 }
+snaPortCntSig           OBJECT IDENTIFIER ::= { snaportCnt 2 }
+
+voice                   OBJECT IDENTIFIER ::= { basisServices 5 }
+vismPort                OBJECT IDENTIFIER ::= { voice 2 }
+vismChanGrp             OBJECT IDENTIFIER ::= { voice 3 }
+vismChanCnfGrp          OBJECT IDENTIFIER ::= { vismChanGrp 1 }
+
+
+atmLines                OBJECT IDENTIFIER ::= { atm 5 }
+bbInterface             OBJECT IDENTIFIER ::= { atm 6 }
+bbChan                  OBJECT IDENTIFIER ::= { atm 7 }
+virtualInterface        OBJECT IDENTIFIER ::= { atm 8 }
+rpmInterface            OBJECT IDENTIFIER ::= { atm 9 }
+rpmChan                 OBJECT IDENTIFIER ::= { atm 10 }
+
+atmLineCnfGrp           OBJECT IDENTIFIER ::= { atmLines 1 }
+atmLineCntGrp           OBJECT IDENTIFIER ::= { atmLines 2 }
+
+bbIfCnf                 OBJECT IDENTIFIER ::= { bbInterface 1 }
+bbIfCnfResPartGrp       OBJECT IDENTIFIER ::= { bbInterface 2 }
+bbIfStateGrp            OBJECT IDENTIFIER ::= { bbInterface 3 }
+bbIfCnt                 OBJECT IDENTIFIER ::= { bbInterface 4 }
+
+bbChanCnfGrp            OBJECT IDENTIFIER ::= { bbChan 1 }
+bbChanStateGrp          OBJECT IDENTIFIER ::= { bbChan 2 }
+bbChanCntGrp            OBJECT IDENTIFIER ::= { bbChan 3 }
+
+rpmPort                 OBJECT IDENTIFIER ::= { rpmInterface 1 }
+
+rpmChanGrp              OBJECT IDENTIFIER ::= { rpmChan 1 }
+
+END
+

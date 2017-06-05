@@ -34,6 +34,7 @@ Table of Content:
     - [Cisco Spark](#transports-ciscospark)
     - [SMSEagle](#transports-smseagle)
     - [Syslog](#transports-syslog)
+    - [Elasticsearch](#transports-elasticsearch)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -679,15 +680,38 @@ $config['alert']['transports']['syslog']['syslog_facility'] = 3;
 ```
 ~
 
+## <a name="transports-elasticsearch">Elasticsearch</a>
+
+You can have LibreNMS emit alerts to an elasticsearch database. Each fault will be sent as a separate document.
+The index pattern uses strftime() formatting.
+The proxy setting uses the proxy set in config.php if true and does not if false; this allows you to use local servers.
+
+~
+```php
+$config['alert']['transports']['elasticsearch']['es_host']   = '127.0.0.1';
+$config['alert']['transports']['elasticsearch']['es_port']  = 9200;
+$config['alert']['transports']['elasticsearch']['es_index']  = 'librenms-%Y.%m.%d';
+$config['alert']['transports']['elasticsearch']['es_proxy'] = false;
+```
+~
+
 # <a name="entities">Entities
 
 Entities as described earlier are based on the table and column names within the database, if you are unsure of what the entity is you want then have a browse around inside MySQL using `show tables` and `desc <tablename>`.
 
 ## <a name="entity-devices">Devices</a>
 
-__devices.hostname__ = The devices hostname.
+__devices.hostname__ = The device hostname.
 
-__devices.location__ = The devices location.
+__devices.sysName__ = The device sysName.
+
+__devices.sysDescr__ = The device sysDescr.
+
+__devices.hardware__ = The device hardware.
+
+__devices.version__ = The device os version.
+
+__devices.location__ = The device location.
 
 __devices.status__ = The status of the device, 1 = up, 0 = down.
 
