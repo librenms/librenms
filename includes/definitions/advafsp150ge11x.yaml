@@ -1,0 +1,13 @@
+os: advafsp150ge11x
+text: ADVA FSP150CC GE11x
+type: network
+icon: adva
+group: MetroE
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_temperature, text: Temperature }
+discovery:
+    - sysObjectId:
+      - .1.3.6.1.4.1.2544.1.12.1.1
+mib_dir:
+    - advafsp150ge11x
