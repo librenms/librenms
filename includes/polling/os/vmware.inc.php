@@ -20,7 +20,7 @@ if (preg_match('/VMware-vCenter-Server-Appliance/', $data[0]['vmwProdBuild'])) {
 
     preg_match('/^(?>\S+\s){1,2}/', $vcsa, $ver);
     $version = $ver[0];
-    
+
     preg_match('/(\d){7}/', $vcsa, $feat);
     $features = 'build-'.$feat[0];
 
