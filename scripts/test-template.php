@@ -4,7 +4,7 @@
 $init_modules = array('alerts');
 require __DIR__ . '/../includes/init.php';
 
-$options = getopt('t:h:r:d::');
+$options = getopt('t:h:r:p:d::');
 
 if ($options['t'] && $options['h'] && $options['r']) {
     if (isset($options['d'])) {
@@ -22,6 +22,9 @@ if ($options['t'] && $options['h'] && $options['r']) {
     $alert['details'] = json_decode(gzuncompress($alert['details']), true);
     $obj = DescribeAlert($alert);
     $obj['template'] = dbFetchCell('SELECT `template` FROM `alert_templates` WHERE `id`=?', array($template_id));
+    if (isset($options['p'])) {
+        $obj['transport'] = $options['p'];
+    }
     d_echo($obj);
     $ack = FormatAlertTpl($obj);
     print_r($ack);
@@ -31,10 +34,11 @@ Usage:
     -t Is the template ID.
     -h Is the device ID or hostname
     -r Is the rule ID
+    -p Is the transport name (optional)
     -d Debug
     
 Example:
-./scripts/test-template.php -t 10 -d -h localhost -r 2
+./scripts/test-template.php -t 10 -d -h localhost -r 2 -p mail
 
 ");
     exit(1);
