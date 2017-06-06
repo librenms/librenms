@@ -20,7 +20,7 @@ Composer will now be installed into /opt/librenms/composer.phar.
 
 Now install the dependencies we require:
 
-`composer install`
+`./composer.phar install`
 
 Once composer is installed you can now run the code validation script:
 
