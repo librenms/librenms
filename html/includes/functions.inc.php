@@ -1016,18 +1016,6 @@ function demo_account()
     print_error("You are logged in as a demo account, this page isn't accessible to you");
 }//end demo_account()
 
-
-function get_client_ip()
-{
-    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        $client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-    } else {
-        $client_ip = $_SERVER['REMOTE_ADDR'];
-    }
-
-    return $client_ip;
-}//end get_client_ip()
-
 /**
  * @param $string
  * @param int $max
