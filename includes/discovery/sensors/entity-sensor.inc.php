@@ -34,13 +34,16 @@ $entitysensor['dBm']       = 'dbm';
 
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
-        // echo("[" . $entry['entPhySensorType'] . "|" . $entry['entPhySensorValue']. "|" . $index . "]");
+        // Fix for Cisco ASR920, 15.5(2)S
+        if ($entry['entPhySensorType'] == 'other' && str_contains($entity_array[$index]['entPhysicalName'], array('Rx Power Sensor', 'Tx Power Sensor'))) {
+            $entitysensor['other'] = 'dbm';
+        }
         if ($entitysensor[$entry['entPhySensorType']] && is_numeric($entry['entPhySensorValue']) && is_numeric($index)) {
             $entPhysicalIndex = $index;
             $oid              = '.1.3.6.1.2.1.99.1.1.1.4.'.$index;
             $current          = $entry['entPhySensorValue'];
             // ENTITY-SENSOR-MIB::entPhySensorUnitsDisplay.11 = STRING: "C"
-            $descr = $entity_array[$index]['entPhysicalName'];
+            $descr = ucwords($entity_array[$index]['entPhysicalName']);
             // if ($descr || $device['os'] == "iosxr")
             if ($descr) {
                 $descr = rewrite_entity_descr($descr);
