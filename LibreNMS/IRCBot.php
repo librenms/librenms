@@ -256,6 +256,7 @@ class IRCBot
                     $this->ircRaw('PRIVMSG '.$chan.' :'.$severity.trim($alert['title']));
                     foreach (explode("\n", $alert['msg']) as $line) {
                         // We don't need to repeat the title
+                        $line = strip_tags($line);
                         if (trim($line) != trim($alert['title'])) {
                             $this->ircRaw('PRIVMSG '.$chan.' :'.$line);
                         }
@@ -267,6 +268,7 @@ class IRCBot
                         $this->ircRaw('PRIVMSG '.$nick.' :'.$severity.trim($alert['title']));
                         foreach (explode("\n", $alert['msg']) as $line) {
                             // We don't need to repeat the title
+                            $line = strip_tags($line);
                             if (trim($line) != trim($alert['title'])) {
                                 $this->ircRaw('PRIVMSG '.$nick.' :'.$line);
                             }
