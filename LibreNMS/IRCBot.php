@@ -246,7 +246,7 @@ class IRCBot
                     $severity_extended = '';
             endswitch;
 
-            $severity = str_replace(array('warning', 'critical'), array($this->_color('Warning', 'orange'), $this->_color('Critical', 'red')), $alert['severity']).$severity_extended.' ';
+            $severity = str_replace(array('warning', 'critical'), array($this->_color('Warning', 'yellow'), $this->_color('Critical', 'red')), $alert['severity']).$severity_extended.' ';
             if ($alert['state'] == 0 and $this->config['irc_alert_utf8']) {
                 $severity = str_replace(array('Warning', 'Critical'), array('̶W̶a̶r̶n̶i̶n̶g', '̶C̶r̶i̶t̶i̶c̶a̶l'), $severity);
             }
@@ -720,7 +720,7 @@ class IRCBot
                 }
                 if ($devdown > 0) {
                     $devdown = $this->_color($devdown, 'red');
-                    $devcount = $this->_color($devcount, 'orange', null, 'bold');
+                    $devcount = $this->_color($devcount, 'yellow', null, 'bold');
                 } else {
                     $devcount = $this->_color($devcount, 'green', null, 'bold');
                 }
@@ -741,7 +741,7 @@ class IRCBot
                 }
                 if ($prtdown > 0) {
                     $prtdown = $this->_color($prtdown, 'red');
-                    $prtcount = $this->_color($prtcount, 'orange', null, 'bold');
+                    $prtcount = $this->_color($prtcount, 'yellow', null, 'bold');
                 } else {
                     $prtcount = $this->_color($prtcount, 'green', null, 'bold');
                 }
@@ -761,7 +761,7 @@ class IRCBot
                 }
                 if ($srvdown > 0) {
                     $srvdown = $this->_color($srvdown, 'red');
-                    $srvcount = $this->_color($srvcount, 'orange', null, 'bold');
+                    $srvcount = $this->_color($srvcount, 'yellow', null, 'bold');
                 } else {
                     $srvcount = $this->_color($srvcount, 'green', null, 'bold');
                 }
@@ -797,9 +797,9 @@ class IRCBot
             'lightgrey' => "15",
         );
         $ret = chr(3);
-        if (in_array($fg_color, $colors)) {
+        if (array_key_exists($fg_color, $colors)) {
             $ret .= $colors[$fg_color];
-            if (in_array($bg_color, $colors)) {
+            if (array_key_exists($bg_color, $colors)) {
                 $ret .= ",".$colors[$fg_color];
             }
         }
