@@ -1,0 +1,16 @@
+os: fibeair 
+text: 'Ceragon FibeAir 2000'
+type: wireless
+icon: ceragon
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_ping_perf, text: 'Ping Times' }
+mib_dir:
+    - fibeair
+poller_modules:
+    wifi: 1
+    mib: 1
+discovery:
+    -
+      sysDescr:
+          - 'FibeAir 4800 agent'
