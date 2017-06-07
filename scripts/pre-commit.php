@@ -51,7 +51,7 @@ $completed_tests = array(
 $all = !check_opt($options, 'l', 'lint', 's', 'style', 'u', 'unit');
 if ($all) {
     // no test specified, run all tests in this order
-    $options += array('u' => false, 's' => false, 'l' => false);
+    $options += array('l' => false, 's' => false, 'u' => false);
 }
 
 // run tests in the order they were specified
@@ -142,6 +142,7 @@ function check_lint($passthru = false, $command_only = false)
 
         if ($lint_ret > 0) {
             print(implode(PHP_EOL, $lint_output) . PHP_EOL);
+            exit(1);
         } else {
             echo "success\n";
         }
@@ -188,6 +189,7 @@ function check_style($passthru = false, $command_only = false)
         if ($cs_ret > 0) {
             echo "failed\n";
             print(implode(PHP_EOL, $cs_output) . PHP_EOL);
+            exit(1);
         } else {
             echo "success\n";
         }
@@ -247,6 +249,7 @@ function check_unit($passthru = false, $command_only = false, $fail_fast = false
             echo "failed\n";
             echo implode(PHP_EOL, $phpunit_output) . PHP_EOL;
             echo 'snmpsimd: output at /tmp/snmpsimd.log';
+            exit(1);
         } else {
             echo "success\n";
         }
