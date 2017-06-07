@@ -29,7 +29,7 @@ if ($config['enable_bgp']) {
             if (!empty($peer['bgpPeerIdentifier'])) {
                 if ($device['os'] != 'junos') {
                     // v4 BGP4 MIB
-                    if (count($peer_data_check) > 0) {
+                    if (count($peer_data_check) > 0 and !empty($peer_data_check[0][0])) {
                         if (strstr($peer['bgpPeerIdentifier'], ':')) {
                             $bgp_peer_ident = ipv62snmp($peer['bgpPeerIdentifier']);
                         } else {
