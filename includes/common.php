@@ -208,7 +208,7 @@ function get_all_devices()
     if (isset($cache['devices']['hostname'])) {
         $devices = array_keys($cache['devices']);
     } else {
-        $devices = dbFetchRows("SELECT * FROM `devices`");
+        $devices = dbFetchRows("SELECT * FROM `devices` ORDER BY hostname");
     }
 
     return $devices;
