@@ -332,3 +332,8 @@ If you want to pull any new updates provided by f0o's branch then whilst you are
 ```bash
 git pull f0o issue-1337
 ```
+Why cant Normal and Global View user see Oxidized?
+The thing is, configs can often contain sensitive data. Because of that we leave access only to global administrators.
+
+What is the Demo User?
+demo user allows full access except adding/editing users and deleting devices
