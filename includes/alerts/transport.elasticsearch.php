@@ -76,6 +76,7 @@ $data = array(
     "severity" => $severity,
     "first_occurrence" => $obj['timestamp'],
     "entity_type" => "device",
+    "entity_tab" => "overview",
     "entity_id" => $obj['device_id'],
     "entity_name" => $obj['hostname'],
     "entity_descr" => $obj['sysDescr'],
@@ -88,42 +89,49 @@ if( !empty( $obj['faults'] ) ) {
         switch (true) {
             case (array_key_exists('port_id', $v)):
                 $data['entity_type'] = 'port';
+                $data['entity_tab'] = 'port';
                 $data['entity_id'] = $v['port_id'];
                 $data['entity_name'] = $v['ifName'];
                 $data['entity_descr'] = $v['ifAlias'];
                 break;
             case (array_key_exists('sensor_id', $v)):
-                $data['entity_type'] = 'sensor';
+                $data['entity_type'] = $v['sensor_class'];
+                $data['entity_tab'] = 'health';
                 $data['entity_id'] = $v['sensor_id'];
-                $data['entity_name'] = $v['sensor_class'];
-                $data['entity_descr'] = $v['sensor_descr'];
+                $data['entity_name'] = $v['sensor_descr'];
+                $data['entity_descr'] = $v['sensor_type'];
                 break;
             case (array_key_exists('mempool_id', $v)):
                 $data['entity_type'] = 'mempool';
+                $data['entity_tab'] = 'health';
                 $data['entity_id'] = $v['mempool_id'];
                 $data['entity_name'] = $v['mempool_index'];
                 $data['entity_descr'] = $v['mempool_descr'];
                 break;
             case (array_key_exists('storage_id', $v)):
                 $data['entity_type'] = 'storage';
+                $data['entity_tab'] = 'health';
                 $data['entity_id'] = $v['storage_id'];
                 $data['entity_name'] = $v['storage_index'];
                 $data['entity_descr'] = $v['storage_descr'];
                 break;
             case (array_key_exists('processor_id', $v)):
                 $data['entity_type'] = 'processor';
+                $data['entity_tab'] = 'health';
                 $data['entity_id'] = $v['processor_id'];
                 $data['entity_name'] = $v['processor_type'];
                 $data['entity_descr'] = $v['processor_descr'];
                 break;
             case (array_key_exists('bgpPeer_id', $v)):
                 $data['entity_type'] = 'bgp';
+                $data['entity_tab'] = 'routing';
                 $data['entity_id'] = $v['bgpPeer_id'];
                 $data['entity_name'] = 'local: '.$v['bgpPeerLocalAddr'].' - AS'.$obj['bgpLocalAs'];
                 $data['entity_descr'] = 'remote: '.$v['bgpPeerIdentifier'].' - AS'.$v['bgpPeerRemoteAs'];
                 break;
             case (array_key_exists('tunnel_id', $v)):
                 $data['entity_type'] = 'ipsec_tunnel';
+                $data['entity_tab'] = 'routing';
                 $data['entity_id'] = $v['tunnel_id'];
                 $data['entity_name'] = $v['tunnel_name'];
                 $data['entity_descr'] = 'local: '.$v['local_addr'].':'.$v['local_port'].', remote: '.$v['peer_addr'].':'.$v['peer_port'];
