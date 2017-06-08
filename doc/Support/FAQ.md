@@ -26,8 +26,8 @@ source: Support/FAQ.md
  - [Why are some of my disks not showing?](#faq26)
  - [Why are my disks reporting an incorrect size?](#faq27)
  - [What is the Difference between Disable Device and Ignore a Device?](#faq28)
- - [Why cant Normal and Global View user see Oxidized?](#faq29)
- - [Demo User?](#faq30)
+ - [Why can't Normal and Global View users see Oxidized?](#faq29)
+ - [What is the Demo User for?](#faq30)
  
 ### Developing
  - [How do I add support for a new OS?](#faq8)
@@ -334,8 +334,8 @@ If you want to pull any new updates provided by f0o's branch then whilst you are
 ```bash
 git pull f0o issue-1337
 ```
-### <a name="faq29"> Why cant Normal and Global View user see Oxidized?</a> 
-The thing is, configs can often contain sensitive data. Because of that we leave access only to global administrators.
+### <a name="faq29"> Why can't Normal and Global View users see Oxidized?</a> 
+Configs can often contain sensitive data. Because of that only global admins can see configs.
 
-### <a name="faq30"> Demo User?</a> 
-demo user allows full access except adding/editing users and deleting devices and cant change passwords.
+### <a name="faq30"> What is the Demo User for?</a> 
+Demo users allow full access except adding/editing users and deleting devices and can't change passwords.
