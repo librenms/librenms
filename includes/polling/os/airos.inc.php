@@ -1,8 +1,16 @@
 <?php
 
-$hardware = 'Ubiquiti '.trim(snmp_get($device, 'dot11manufacturerProductName.10', '-Ovq', 'IEEE802dot11-MIB'));
+foreach (array(10,5) as $i) {
+    $result = snmp_get_multi_oid($device,"dot11manufacturerProductName.$i dot11manufacturerProductVersion.$i", '-OQUs', 'IEEE802dot11-MIB');
 
-$version         = trim(snmp_get($device, 'dot11manufacturerProductVersion.10', '-Ovq', 'IEEE802dot11-MIB'));
-list(, $version) = preg_split('/\.v/', $version);
+    if ($result) {
+        $hardware = 'Ubiquiti ' . $result["dot11manufacturerProductName.$i"];
+        $version  = $result["dot11manufacturerProductVersion.$i"];
+        list(, $version) = preg_split('/\.v/', $version);
+        break;
+    }
+}
+
+unset($result);
 
 // EOF
