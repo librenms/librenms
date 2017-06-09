@@ -10,19 +10,22 @@
  * the source code distribution for details.
  */
 
-d_echo('Quanta Temperatures');
+d_echo('Quanta Fan Speeds');
 $sensor_type = 'quanta_fan';
 //FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesFanSpeed
 $sensors_id_oid = '.1.3.6.1.4.1.4413.1.1.43.1.6.1.4';
-$sensors_id = snmp_walk($device, $sensors_id_oid, '-Ovq');
+$sensors_values = snmp_walk($device, $sensors_id_oid, '-Ovq');
+$sensor_id = 0;
 
-foreach (explode("\n", $sensors_id) as $sensor) {
-    $descr = 'Temperature '.$sensor.':';
+foreach (explode("\n", $sensors_values) as $current_value) {
+    $descr = 'Fan Speed '.$sensor_id.':';
     //FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesFanSpeed
-    $sensor_id_oid = '.1.3.6.1.4.1.4413.1.1.43.1.6.1.4.'.$sensor;
-    $current_value = trim(snmp_get($device, $sensor_id_oid, '-Oqv'));
+    $sensor_id_oid = '.1.3.6.1.4.1.4413.1.1.43.1.6.1.4.'.$sensor_id;
 
     if ($current_value > 0) {
-        discover_sensor($valid['sensor'], 'fanspeed', $device, $sensor_id_oid, $sensor, $sensor_type, $descr, 1, 1, null, null, null, null, $current_value);
+        discover_sensor($valid['sensor'], 'fanspeed', $device, $sensor_id_oid, $sensor_id, $sensor_type, $descr, 1, 1, null, null, null, null, $current_value);
     }
+
+    $sensor_id++;
 }
+

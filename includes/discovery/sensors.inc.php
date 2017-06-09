@@ -37,6 +37,11 @@ if (strstr($device['hardware'], 'ProLiant')) {
     include 'includes/discovery/sensors/state/hp.inc.php';
 }
 
+if ($device['os'] == 'quanta') {
+    include 'includes/discovery/sensors/fanspeed/quanta.inc.php';
+    include 'includes/discovery/sensors/temperature/quanta.inc.php';
+}
+
 $run_sensors = array(
     'airflow',
     'current',
