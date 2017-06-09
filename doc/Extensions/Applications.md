@@ -42,6 +42,9 @@ Different applications support a variety of ways collect data: by direct connect
 
 ### Apache
 Either use SNMP extend or use the agent.
+
+Note that you need to install and configure the Apache [mod_status](https://httpd.apache.org/docs/2.4/en/mod/mod_status.html) module before trying the script.
+
 ##### SNMP Extend
 1. Download the script onto the desired host (the host must be added to LibreNMS devices)
 ```
