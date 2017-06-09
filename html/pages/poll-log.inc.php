@@ -26,7 +26,7 @@ searchbar = "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">
 
 var grid = $("#poll-log").bootgrid({
     ajax: true,
-    rowCount: [50,100,250,-1],
+    rowCount: [50, 100, 250, -1],
     columnSelection: false,
     templates: {
         header: searchbar

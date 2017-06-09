@@ -72,7 +72,7 @@ var grid = $("#alert-schedule").bootgrid({
                 "</span></div>"+
                 "<div class=\"col-sm-4 actionBar\"><p class=\"{{css.search}}\"></p><p class=\"{{css.actions}}\"></p></div></div></div>"
     },
-    rowCount: [50,100,250,-1],
+    rowCount: [50, 100, 250, -1],
     post: function ()
     {
         return {
