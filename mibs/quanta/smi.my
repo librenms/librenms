@@ -1,0 +1,183 @@
+-- smi.my - Internet-standard SMI definitions
+
+-- $Header: /src1/shared/master/snmp/mibs/common/smi.my,v 1.2 1997/12/03 19:34:26 partain Exp $
+--
+-- Contributed by NYSERNet Inc.  This work was partially supported by the
+-- U.S. Defense Advanced Research Projects Agency and the Rome Air Development
+-- Center of the U.S. Air Force Systems Command under contract number
+-- F30602-88-C-0016.
+--
+--
+
+--
+--				  NOTICE
+--
+--    Acquisition, use, and distribution of this module and related
+--    materials are subject to the restrictions of a license agreement.
+--    Consult the Preface in the User's Manual for the full terms of
+--    this agreement.
+--
+--
+
+
+RFC1155-SMI DEFINITIONS ::= BEGIN
+
+EXPORTS -- EVERYTHING
+	internet, directory, mgmt,
+	experimental, private, enterprises,
+	OBJECT-TYPE, ObjectName, ObjectSyntax, SimpleSyntax,
+	ApplicationSyntax, NetworkAddress, IpAddress,
+	Counter, Gauge, TimeTicks, Opaque;
+
+-- the path to the root
+
+internet      OBJECT IDENTIFIER ::= { iso org(3) dod(6) 1 }
+
+directory     OBJECT IDENTIFIER ::= { internet 1 }
+
+mgmt          OBJECT IDENTIFIER ::= { internet 2 }
+
+experimental  OBJECT IDENTIFIER ::= { internet 3 }
+
+private       OBJECT IDENTIFIER ::= { internet 4 }
+enterprises   OBJECT IDENTIFIER ::= { private 1 }
+
+
+-- BSD UNIX-specific stuff
+
+unix	      OBJECT IDENTIFIER	::= { enterprises 4 }
+
+
+-- the agents group
+
+agents	OBJECT IDENTIFIER ::=	{ unix 1 }
+
+-- original "4BSD/ISODE SNMP"	{ agents 1 }
+
+-- versions of the "4BSD/ISODE SNMP" agent are now under { agents 2 }
+fourBSD-isode OBJECT IDENTIFIER ::= { agents 2 }
+-- fourBSD-isode.1:	add SMUX
+-- fourBSD-isode.2:	add views
+-- fourBSD-isode.3:	add sets
+
+
+-- the SMUX peer group
+
+peers	OBJECT IDENTIFIER ::=	{ unix 3 }
+
+-- versions of the unixd program are under { peers 1 }
+unixd	OBJECT IDENTIFIER ::=	{ peers 1 }
+-- the current version is unixd.1
+
+
+-- definition of object types
+
+-- OBJECT-TYPE MACRO ::=
+-- BEGIN
+--     TYPE NOTATION ::= "SYNTAX" type (TYPE ObjectSyntax)
+-- 		      "ACCESS" Access
+-- 		      "STATUS" Status
+--     VALUE NOTATION ::= value (VALUE ObjectName)
+-- 
+--     Access ::= "read-only"
+-- 		    | "read-write"
+-- 		    | "write-only"
+-- 		    | "not-accessible"
+--     Status ::= "mandatory"
+-- 		    | "optional"
+-- 		    | "obsolete"
+-- 		    | "deprecated"
+-- END
+
+
+-- names of objects in the MIB
+
+ObjectName ::=
+    OBJECT IDENTIFIER
+
+-- syntax of objects in the MIB
+
+ObjectSyntax ::=
+    CHOICE {
+        simple
+            SimpleSyntax,
+
+-- note that simple SEQUENCEs are not directly
+-- mentioned here to keep things simple (i.e.,
+-- prevent mis-use).  However, application-wide 
+-- types which are IMPLICITly encoded simple
+-- SEQUENCEs may appear in the following CHOICE
+
+        application-wide
+            ApplicationSyntax
+    }
+    
+SimpleSyntax ::=
+    CHOICE {
+        number
+            INTEGER,
+    
+        string
+            OCTET STRING,
+    
+        object
+            OBJECT IDENTIFIER,
+    
+        empty
+            NULL
+    }
+
+ApplicationSyntax ::=
+    CHOICE {
+        address
+            NetworkAddress,
+    
+	counter
+    	    Counter,
+
+	gauge
+	    Gauge,
+
+	ticks
+	    TimeTicks,
+
+        arbitrary
+            Opaque
+
+-- other application-wide types, as they are
+-- defined, will be added here
+    }
+
+
+-- application-wide types
+
+NetworkAddress ::=
+    CHOICE {
+        internet
+            IpAddress
+    }
+    
+IpAddress ::=
+    [APPLICATION 0]            -- in network-byte order
+        IMPLICIT OCTET STRING (SIZE (4))
+    
+Counter ::=
+    [APPLICATION 1]
+	IMPLICIT INTEGER (0..4294967295)
+
+Gauge ::=
+    [APPLICATION 2]
+	IMPLICIT INTEGER (0..4294967295)
+
+TimeTicks ::=
+    [APPLICATION 3]
+	IMPLICIT INTEGER (0..4294967295)
+
+Opaque ::=
+    [APPLICATION 4]             -- arbitrary ASN.1 value,
+        IMPLICIT OCTET STRING   --   "double-wrapped"
+
+DisplayString ::=
+	OCTET STRING
+
+END

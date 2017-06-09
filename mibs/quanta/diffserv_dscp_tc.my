@@ -1,0 +1,43 @@
+DIFFSERV-DSCP-TC DEFINITIONS ::= BEGIN
+
+    IMPORTS
+    Integer32, MODULE-IDENTITY, mib-2
+         FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+         FROM SNMPv2-TC;
+
+diffServDSCPTC MODULE-IDENTITY
+    LAST-UPDATED "200205090000Z"
+    ORGANIZATION "Netgear Inc"
+    CONTACT-INFO ""
+    DESCRIPTION
+       "The Textual Conventions defined in this module should be used
+       whenever a Differentiated Services Code Point is used in a MIB."
+    REVISION "200205090000Z"
+    DESCRIPTION
+       "Initial version, published as RFC 3289."
+    ::= { mib-2 96 }
+
+Dscp ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS   current
+    DESCRIPTION
+       "A Differentiated Services Code-Point that may be used for
+       marking a traffic stream."
+    REFERENCE
+        "RFC 2474, RFC 2780"
+    SYNTAX   Integer32 (0..63)
+
+DscpOrAny ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS   current
+    DESCRIPTION
+       "The IP header Differentiated Services Code-Point that may be
+
+       used for discriminating among traffic streams. The value -1 is
+       used to indicate a wild card i.e. any value."
+    REFERENCE
+        "RFC 2474, RFC 2780"
+    SYNTAX   Integer32 (-1 | 0..63)
+
+END
