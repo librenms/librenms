@@ -17,6 +17,7 @@
 <script>
 var grid = $("#ipv6-search").bootgrid({
     ajax: true,
+    rowCount: [50, 100, 250, -1],
     templates: {
         header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
                 "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\">"+
