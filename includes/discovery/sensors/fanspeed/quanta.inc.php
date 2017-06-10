@@ -1,6 +1,6 @@
 <?php
 /*
- * LibreNMS Quanta LB6M Temperature information module
+ * LibreNMS Quanta LB6M Fan Speed information
  *
  * Copyright (c) 2017 Mark Guzman <segfault@hasno.info>
  * This program is free software: you can redistribute it and/or modify it
@@ -28,4 +28,3 @@ foreach (explode("\n", $sensors_values) as $current_value) {
 
     $sensor_id++;
 }
-

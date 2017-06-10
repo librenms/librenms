@@ -13,6 +13,7 @@
 d_echo('Quanta Chassis state');
 //FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesTempUnitState
 $chassis_state_oid = '.1.3.6.1.4.1.4413.1.1.43.1.15.1.2.1';
+
 $state_name = 'quanta_state';
 $descr = 'Chassis state';
 $state = snmp_get($device, $chassis_state_oid, '-Oqv');
@@ -39,4 +40,58 @@ if (!empty($state)) {
     }
     discover_sensor($valid['sensor'], 'state', $device, $chassis_state_oid, 1, $state_name, $descr, '1', '1', null, null, null, null, $state, 'snmp', 1);
     create_sensor_to_state_index($device, $state_name, 1);
+}
+
+
+d_echo('Quanta Chassis Power Supply state');
+
+$tables = array(
+    array('powerSupplyTable','.1.3.6.1.4.1.4413.1.1.43.1.7.1.3','quantaPowerSupplyStatus', 'Power Supply '),
+);
+
+foreach ($tables as $tablevalue) {
+    $temp = snmpwalk_cache_multi_oid($device, $tablevalue[1], array());
+    $cur_oid = $tablevalue[1];
+
+
+    if (is_array($temp)) {
+        $state_name = $tablevalue[2];
+        $state_index_id = create_state_index($state_name);
+
+        if ($state_index_id !== null) {
+            if ($state_name == 'quantaPowerSupplyStatus') {
+                $states = array(
+                    array($state_index_id, 'other',        0, 0, 3),
+                    array($state_index_id, 'notpresent',   0, 1, 3),
+                    array($state_index_id, 'operational',  1, 2, 0),
+                    array($state_index_id, 'failed',       0, 3, 2),
+                    array($state_index_id, 'powering',     1, 4, 0),
+                    array($state_index_id, 'nopower',      0, 5, 1),
+                    array($state_index_id, 'notpowering',  0, 6, 1),
+                    array($state_index_id, 'incompatible', 0, 7, 2),
+                );
+            }
+
+            foreach ($states as $value) {
+                $insert = array(
+                    'state_index_id' => $value[0],
+                    'state_descr' => $value[1],
+                    'state_draw_graph' => $value[2],
+                    'state_value' => $value[3],
+                    'state_generic_value' => $value[4]
+                );
+                dbInsert($insert, 'state_translations');
+            }
+        }
+
+        $idx = 0;
+        foreach ($temp as $index => $entry) {
+            $descr = $tablevalue[3] . $idx;
+            $oid_for_entry = '.1.' . $index;
+            $idx++;
+
+            discover_sensor($valid['sensor'], 'state', $device, $oid_for_entry, $idx, $state_name, $descr, '1', '1', null, null, null, null, $entry['iso'], 'snmp');
+            create_sensor_to_state_index($device, $state_name, $idx);
+        }
+    }
 }
