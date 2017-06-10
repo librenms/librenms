@@ -6,6 +6,7 @@
 
 $sensor_oid = ".1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.1";
 $value = snmp_get($device, $sensor_oid, '-Oqve');
+$value = trim($value, '"');
 if (is_numeric($value)) {
     $sensor_type = "raspberry_temp";
     $descr = "CPU Temp";
