@@ -101,7 +101,7 @@ class Ewc extends OS implements
                 'ewc',
                 0,
                 'Connected APs',
-		$apactive[0]
+                $apactive[0]
             )
         );
     }
