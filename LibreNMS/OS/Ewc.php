@@ -53,7 +53,8 @@ class Ewc extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessClients() {
+    public function discoverWirelessClients()
+    {
         $apstats =  $this->getCacheByIndex('apStatsMuCounts', "HIPATH-WIRELESS-HWC-MIB");
         $apnames =  $this->getCacheByIndex('apName', "HIPATH-WIRELESS-HWC-MIB");
         $sensors = array(
@@ -104,5 +105,4 @@ class Ewc extends OS implements
             )
         );
     }
-
 }
