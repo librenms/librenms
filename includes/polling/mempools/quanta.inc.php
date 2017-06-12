@@ -10,8 +10,8 @@
  * the source code distribution for details.
  */
 
-$total = snmp_get($device, '.1.3.6.1.4.1.4413.1.1.1.1.4.2.0', '-Oqv');
-$free = snmp_get($device, '.1.3.6.1.4.1.4413.1.1.1.1.4.1.0', '-Oqv');
+$total = snmp_get($device, 'agentSwitchCpuProcessMemAvailable.0', '-OqvU', 'NETGEAR-SWITCHING-MIB');
+$free = snmp_get($device, 'agentSwitchCpuProcessMemFree.0', '-OqvU', 'NETGEAR-SWITCHING-MIB');
 
 $mempool['total'] = $total;
 $mempool['free'] = $free;

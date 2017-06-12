@@ -13,8 +13,8 @@
 if ($device['os'] == "quanta") {
     d_echo('Quanta Memory:');
 
-    $avail = snmp_get($device, 'agentSwitchCpuProcessMemFree.0', '-Oqv', 'NETGEAR-SWITCHING-MIB');
-    $total = snmp_get($device, 'agentSwitchCpuProcessMemAvailable.0', '-Oqv', 'NETGEAR-SWITCHING-MIB');
+    $avail = snmp_get($device, 'agentSwitchCpuProcessMemFree.0', '-OqvU', 'NETGEAR-SWITCHING-MIB');
+    $total = snmp_get($device, 'agentSwitchCpuProcessMemAvailable.0', '-OqvU', 'NETGEAR-SWITCHING-MIB');
     $used = $total - $avail;
     $percent = ($used / $total * 100);
 
