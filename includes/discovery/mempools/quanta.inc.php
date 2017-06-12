@@ -12,10 +12,9 @@
 
 if ($device['os'] == "quanta") {
     d_echo('Quanta Memory:');
-    //QUANTA-LB6M-REF-MIB::agentSwitchCpuProcessMemFree
-    $avail = snmp_get($device, '.1.3.6.1.4.1.4413.1.1.1.1.4.1.0', '-Oqv');
-    //QUANTA-LB6M-REF-MIB::agentSwitchCpuProcessMemAvailable
-    $total = snmp_get($device, '.1.3.6.1.4.1.4413.1.1.1.1.4.2.0', '-Oqv');
+
+    $avail = snmp_get($device, 'agentSwitchCpuProcessMemFree.0', '-Oqv', 'NETGEAR-SWITCHING-MIB');
+    $total = snmp_get($device, 'agentSwitchCpuProcessMemAvailable.0', '-Oqv', 'NETGEAR-SWITCHING-MIB');
     $used = $total - $avail;
     $percent = ($used / $total * 100);
 
