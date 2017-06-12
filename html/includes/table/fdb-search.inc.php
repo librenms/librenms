@@ -1,4 +1,5 @@
 <?php
+include '/opt/ChromePhp.php';
 $param = array();
 
 $sql .= ' FROM `ports_fdb` AS F, `ports` AS P, `devices` AS D, `vlans` as V ';
@@ -80,6 +81,7 @@ foreach (dbFetchRows($sql, $param) as $entry) {
             'interface'        => generate_port_link($entry, makeshortif(fixifname(cleanPort($entry['label'])))).' '.$error_img,
             'vlan'             => $entry['vlan_vlan'],
         );
+        ChromePhp::log(generate_port_link($entry, makeshortif(fixifname(cleanPort($entry['label'])))));
     }//end if
 
     unset($ignore);

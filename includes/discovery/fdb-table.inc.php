@@ -1,6 +1,12 @@
 <?php
 
-$continue = true;
+$os_filename = 'includes/discovery/fdb-table/' . $device['os'] . '.inc.php';
+if (is_file($os_filename)) {
+    $continue = true;
+} else {
+    echo "fdb-tables for " . $device['os'] . " is not yet implemented.\n";
+    exit;
+}
 
 // Build ifIndex to port_id dictionary
 $ifIndex_dict = array();
@@ -43,7 +49,7 @@ if ($continue) {
                 }
 
                 if (! empty($update_entry)) {
-                    dbUpdate($update_entry, 'ports_fdb', '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?', array($device['device_id'], $vlan_id, $mac_address));
+                    dbUpdate($update_entry, 'ports_fdb', '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?', array($device['device_id'], $vlan_id, $mac_address_entry));
                 }
                 unset($existing_fdbs[$vlan_id][$mac_address_entry]);
             } else {
