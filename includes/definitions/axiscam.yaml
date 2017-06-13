@@ -4,3 +4,6 @@ type: appliance
 icon: axis
 discovery:
     - sysDescr_regex: '/AXIS .* (Network Camera|Video Server|Network Video Encoder)/'
+over:
+    - { graph: device_temperature, text: 'Device Temperature' }
+    - { graph: device_state, text: 'Device State' }
