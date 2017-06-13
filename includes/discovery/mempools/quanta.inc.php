@@ -15,8 +15,6 @@ if ($device['os'] == "quanta") {
 
     $avail = snmp_get($device, 'agentSwitchCpuProcessMemFree.0', '-OqvU', 'NETGEAR-SWITCHING-MIB');
     $total = snmp_get($device, 'agentSwitchCpuProcessMemAvailable.0', '-OqvU', 'NETGEAR-SWITCHING-MIB');
-    $used = $total - $avail;
-    $percent = ($used / $total * 100);
 
     if ((is_numeric($total)) && (is_numeric($avail))) {
         discover_mempool($valid_mempool, $device, 0, 'quanta', 'Memory', '1', null, null);
