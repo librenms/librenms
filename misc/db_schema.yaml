@@ -426,7 +426,7 @@ devices:
     sysContact: { Field: sysContact, Type: text, 'Null': true, Default: null, Extra: '' }
     sysDescr: { Field: sysDescr, Type: text, 'Null': true, Default: null, Extra: '' }
     sysName: { Field: sysName, Type: varchar(128), 'Null': true, Default: null, Extra: '' }
-    sysObjectID: { Field: sysObjectID, Type: varchar(64), 'Null': true, Default: null, Extra: '' }
+    sysObjectID: { Field: sysObjectID, Type: varchar(128), 'Null': true, Default: null, Extra: '' }
     timeout: { Field: timeout, Type: int(11), 'Null': true, Default: null, Extra: '' }
     transport: { Field: transport, Type: varchar(16), 'Null': false, Default: udp, Extra: '' }
     type: { Field: type, Type: varchar(20), 'Null': false, Default: '', Extra: '' }
