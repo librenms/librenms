@@ -1,0 +1,158 @@
+IEEE8021-PFC-MIB DEFINITIONS ::= BEGIN
+
+-- ******************************************************************
+-- IEEE P802.1Qbb(TM) Priority-based Flow Control MIB
+-- ******************************************************************
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Unsigned32               FROM SNMPv2-SMI   -- [RFC2578]
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP             FROM SNMPv2-CONF  -- [RFC2580]
+    ifEntry,
+    ifGeneralInformationGroup
+                             FROM IF-MIB       -- [RFC2863]
+    systemGroup              FROM SNMPv2-MIB   -- [RFC3418]
+   ;
+
+ieee8021PFCMib MODULE-IDENTITY
+    LAST-UPDATED "201002080000Z" -- 02/08/2010 00:00GMT
+    ORGANIZATION "Netgear Inc"
+    CONTACT-INFO ""
+    DESCRIPTION
+      "Priority-based Flow Control module for managing IEEE 802.1Qbb"
+    REVISION "201002080000Z" -- 02/08/2010 00:00GMT
+    DESCRIPTION
+       "Included in IEEE P802.1Qbb
+
+         Copyright (C) IEEE."
+     ::= { iso(1) org(3) ieee(111)
+          standards-association-numbers-series-standards (2)
+          lan-man-stds (802) ieee802dot1 (1) ieee802dot1mibs (1) 21 }
+
+
+ieee8021PfcMIBObjects  OBJECT IDENTIFIER ::= { ieee8021PFCMib 1 }
+ieee8021PfcConformance OBJECT IDENTIFIER ::= { ieee8021PFCMib 2 }
+
+
+ieee8021PfcIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PfcIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A table of PFC information for all interfaces of a system."
+    REFERENCE
+       "802.1Qbb clause 12.18"
+    ::= { ieee8021PfcMIBObjects 1 }
+
+ieee8021PfcIfEntry OBJECT-TYPE
+    SYNTAX      Ieee8021PfcIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Each entry contains information about
+        the PFC function on a single interface."
+    REFERENCE
+       "802.1Qbb clause 12.18"
+    AUGMENTS { ifEntry }
+    ::= { ieee8021PfcIfTable 1 }
+
+Ieee8021PfcIfEntry ::= SEQUENCE {
+        ieee8021PfcLinkDelayAllowance  Unsigned32,
+        ieee8021PfcRequests            Counter32,
+        ieee8021PfcIndications         Counter32
+    }
+
+ieee8021PfcLinkDelayAllowance OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The allowance made for round-trip propagation delay
+         of the link in bits.
+
+         The value of this object MUST be retained across
+         reinitializations of the management system."
+    ::= { ieee8021PfcIfEntry 1 }
+
+ieee8021PfcRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Requests"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the invoked PFC M_CONTROL.request primitives.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the management system, and at other
+         times as indicated by the value of
+         ifCounterDiscontinuityTime."
+    ::= { ieee8021PfcIfEntry 2 }
+
+ieee8021PfcIndications OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Indications"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the received PFC M_CONTROL.indication primitives.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the management system, and at other
+         times as indicated by the value of
+         ifCounterDiscontinuityTime."
+    ::= { ieee8021PfcIfEntry 3 }
+
+-- ******************************************************************
+-- IEEE 802.1Qbb MIB Module - Conformance Information
+-- ******************************************************************
+
+ieee8021PfcCompliances
+    OBJECT IDENTIFIER ::= { ieee8021PfcConformance 1 }
+ieee8021PfcGroups
+    OBJECT IDENTIFIER ::= { ieee8021PfcConformance 2 }
+
+-- ******************************************************************
+-- Units of conformance
+-- ******************************************************************
+
+ieee8021PfcGlobalReqdGroup OBJECT-GROUP
+    OBJECTS {
+      ieee8021PfcLinkDelayAllowance,
+      ieee8021PfcRequests,
+      ieee8021PfcIndications
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects in the global required group."
+    ::= { ieee8021PfcGroups 1 }
+
+-- ******************************************************************
+-- MIB Module Compliance statements
+-- ******************************************************************
+
+ieee8021PfcCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support by a system of
+        the IEEE8021-PFC-MIB module."
+
+    MODULE SNMPv2-MIB -- The SNMPv2-MIB, RFC 3418
+        MANDATORY-GROUPS {
+            systemGroup
+        }
+
+    MODULE IF-MIB -- The interfaces MIB, RFC 2863
+        MANDATORY-GROUPS {
+            ifGeneralInformationGroup
+        }
+
+    MODULE
+        MANDATORY-GROUPS {
+            ieee8021PfcGlobalReqdGroup
+        }
+    ::= { ieee8021PfcCompliances 1 }
+
+END

@@ -1,0 +1,967 @@
+NETGEAR-QOS-COS-MIB DEFINITIONS ::= BEGIN 
+               
+IMPORTS           
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress,
+    Integer32, Unsigned32                FROM SNMPv2-SMI
+    
+    RowStatus, TEXTUAL-CONVENTION        FROM SNMPv2-TC
+    InterfaceIndexOrZero                 FROM IF-MIB
+    fastPathQOS                          FROM NETGEAR-QOS-MIB;
+
+    fastPathQOSCOS MODULE-IDENTITY
+        LAST-UPDATED "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The MIB definitions for Quality of Service - CoS Flex package."
+          
+        -- Revision history.      
+        REVISION
+          "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        DESCRIPTION
+          "Postal address updated."
+        REVISION
+          "201003170000Z" -- 17 Mar 2010 12:00:00 GMT
+        DESCRIPTION
+          "Fixed error in range of agentCosQueueWredDecayExponent."
+        REVISION
+          "200910270000Z" -- 27 Oct 2009 12:00:00 GMT
+        DESCRIPTION
+          "Updated description for agentCosQueueIntfShapingRate object."
+        REVISION
+          "200901060000Z" -- 6 Jan 2009 12:00:00 GMT
+        DESCRIPTION
+          "Added new objects in agentCosQueueMgmtTable with units of percentages, rather than 
+          Sixteenths or reciprocal exponentials. Deprecated the replaced objects."
+        REVISION
+          "200809230000Z" -- 23 Sep 2008 12:00:00 GMT
+        DESCRIPTION
+          "Changed object agentCosQueueIntfShapingRate to support configuration of bandwidth as
+           either percent of port speed or kilobits per second units.  Systems report which unit
+           applies via a new object agentCosQueueIntfShapingRateUnits object.  Added object 
+           agentCosQueueIntfShapingRateUnits."
+        REVISION
+          "200712190000Z" -- 19 Dec 2007 12:00:00 GMT
+        DESCRIPTION
+          "Changed objects agentCosQueueIntfShapingRate, agentCosQueueMinBandwidth, and agentCosQueueMaxBandwidth to allow
+           an increment of 1 percent rather than 5 percent."
+        REVISION
+          "200705230000Z" -- 23 May 2007 12:00:00 GMT
+        DESCRIPTION
+          "Netgear branding related changes."
+        REVISION
+          "200405030000Z" -- 3 May 2004 12:00:00 GMT
+        DESCRIPTION 
+          "Initial revision."
+    ::= { fastPathQOS 3 }
+
+    PercentByFives ::= TEXTUAL-CONVENTION
+         STATUS      current
+         DESCRIPTION 
+                     "An unsigned integer representing a value expressed 
+                     as a percentage with five percent increments."
+         SYNTAX      Unsigned32 (0|5|10|15|20|25|30|35|40|45|50|55|60|65|70|75|80|85|90|95|100)
+
+    Percent ::= TEXTUAL-CONVENTION
+         STATUS      current
+         DESCRIPTION 
+                     "An unsigned integer representing a value expressed 
+                     as a percentage with one percent increments."
+         SYNTAX      Unsigned32 (0..100)
+
+    Sixteenths ::= TEXTUAL-CONVENTION
+         STATUS      current
+         DESCRIPTION 
+                     "An unsigned integer representing the numerator of a 
+                     value expressing a fraction in terms of sixteenths 
+                     (0/16, 1/16, 2/16, up to 16/16)."
+         SYNTAX      Unsigned32 (0..16)
+
+--*********************************************************************
+--   agentCosMapCfgGroup
+--
+--      Note: System-wide configuration is supported for this 
+--            group by using an index value of 0.
+--*********************************************************************
+    agentCosMapCfgGroup         OBJECT IDENTIFIER ::= { fastPathQOSCOS 1 }
+
+    -- IP Precedence mapping table (global and per-port)
+    agentCosMapIpPrecTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentCosMapIpPrecEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table mapping evaluated IP precedence to Traffic 
+                     Class for a specific physical port.  Traffic class 
+                     is a number in the range 
+                     (0..(dot1dPortNumTrafficClasses-1))."
+         
+         ::= { agentCosMapCfgGroup 1 }             
+         
+    agentCosMapIpPrecEntry OBJECT-TYPE
+         SYNTAX      AgentCosMapIpPrecEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "IP Precedence to Traffic Class mapping for a port."
+         INDEX   { agentCosMapIpPrecIntfIndex, agentCosMapIpPrecValue }
+         ::= { agentCosMapIpPrecTable 1 }
+
+    AgentCosMapIpPrecEntry ::=
+         SEQUENCE {
+            agentCosMapIpPrecIntfIndex
+                InterfaceIndexOrZero,
+            agentCosMapIpPrecValue
+                Unsigned32,
+            agentCosMapIpPrecTrafficClass
+                Unsigned32
+         }
+
+    agentCosMapIpPrecIntfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "This is a unique index for an entry in the  
+                     agentCosMapIpPrecTable.  A non-zero value indicates  
+                     the ifIndex for the corresponding interface entry  
+                     in the ifTable.  A value of zero represents global
+                     configuration, which in turn causes all interface
+                     entries to be updated for a set operation, or 
+                     reflects the most recent global setting for a get
+                     operation."
+                    
+         ::= { agentCosMapIpPrecEntry 1 }
+
+    agentCosMapIpPrecValue OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The IP precedence value contained in the received 
+                     frame.  This value is only indicated in IP packets, 
+                     but is independent of both media-type and frame 
+                     tagging.
+                      
+                     Non-IP packets are handled in accordance with the 
+                     dot1dPortDefaultUserPriority value of the ingress 
+                     port."
+
+         ::= { agentCosMapIpPrecEntry 2 }
+
+    agentCosMapIpPrecTrafficClass OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Traffic class priority queue the received frame is 
+                     mapped to.  This represents the actual configuration 
+                     setting the port is using."
+                    
+         ::= { agentCosMapIpPrecEntry 3 }
+
+
+    -- IP DSCP mapping table (global and per-port)
+    agentCosMapIpDscpTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentCosMapIpDscpEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table mapping evaluated IP DSCP to Traffic Class 
+                     for a specific physical port.  Traffic class is a 
+                     number in the range 
+                     (0..(dot1dPortNumTrafficClasses-1))."
+         
+         ::= { agentCosMapCfgGroup 2 }             
+         
+    agentCosMapIpDscpEntry OBJECT-TYPE
+         SYNTAX      AgentCosMapIpDscpEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "IP DSCP to Traffic Class mapping for a port."
+         INDEX   { agentCosMapIpDscpIntfIndex, agentCosMapIpDscpValue }
+         ::= { agentCosMapIpDscpTable 1 }
+
+    AgentCosMapIpDscpEntry ::=
+         SEQUENCE {
+            agentCosMapIpDscpIntfIndex
+                InterfaceIndexOrZero,
+            agentCosMapIpDscpValue
+                Unsigned32,
+            agentCosMapIpDscpTrafficClass
+                Unsigned32
+         }
+
+    agentCosMapIpDscpIntfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "This is a unique index for an entry in the  
+                     agentCosMapIpDscpTable.  A non-zero value indicates  
+                     the ifIndex for the corresponding interface entry  
+                     in the ifTable.  A value of zero represents global
+                     configuration, which in turn causes all interface
+                     entries to be updated for a set operation, or 
+                     reflects the most recent global setting for a get
+                     operation."
+                    
+         ::= { agentCosMapIpDscpEntry 1 }
+
+    agentCosMapIpDscpValue OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..63)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The IP DSCP value contained in the received frame.  
+                     This value is only indicated in IP packets, but is 
+                     independent of both media-type and frame tagging.
+                     
+                     Non-IP packets are handled in accordance with the 
+                     dot1dPortDefaultUserPriority value of the ingress 
+                     port."
+
+         ::= { agentCosMapIpDscpEntry 2 }
+
+    agentCosMapIpDscpTrafficClass OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Traffic class priority queue the received frame is 
+                     mapped to."
+                    
+         ::= { agentCosMapIpDscpEntry 3 }
+
+
+    -- Interface trust mode (global and per-port)
+    agentCosMapIntfTrustTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentCosMapIntfTrustEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Specifies the interface trust mode of operation for 
+                     a port.  The trust mode setting determines which COS 
+                     mapping table is used for directing ingress packets 
+                     to a Traffic Class."
+         
+         ::= { agentCosMapCfgGroup 3 }             
+         
+    agentCosMapIntfTrustEntry OBJECT-TYPE
+         SYNTAX      AgentCosMapIntfTrustEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "COS interface trust mode."
+         INDEX   { agentCosMapIntfTrustIntfIndex }
+         ::= { agentCosMapIntfTrustTable 1 }
+
+    AgentCosMapIntfTrustEntry ::=
+         SEQUENCE {
+            agentCosMapIntfTrustIntfIndex
+                InterfaceIndexOrZero,
+            agentCosMapIntfTrustMode
+                INTEGER,
+            agentCosMapUntrustedTrafficClass
+                Unsigned32
+         }
+
+    agentCosMapIntfTrustIntfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "This is a unique index for an entry in the  
+                     agentCosMapIntfTrustTable.  A non-zero value indicates  
+                     the ifIndex for the corresponding interface entry  
+                     in the ifTable.  A value of zero represents global
+                     configuration, which in turn causes all interface
+                     entries to be updated for a set operation, or 
+                     reflects the most recent global setting for a get
+                     operation."
+                    
+         ::= { agentCosMapIntfTrustEntry 1 }
+
+    agentCosMapIntfTrustMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       untrusted(1),
+                       trustDot1p(2),
+                       trustIpPrecedence(3),
+                       trustIpDscp(4)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The class of service trust mode of an interface.  
+                     When set to a trusted mode, the appropriate COS 
+                     mapping table is used as follows:
+                       
+                         trustDot1p(2) : dot1dTrafficClassTable
+                         trustIpPrecedence(3): agentCosMapIpPrecTable
+                         trustIpDscp(4): agentCosMapIpDscpTable 
+                       
+                     For an untrusted(1) interface, packets are handled in 
+                     accordance with the dot1dPortDefaultUserPriority value 
+                     of the ingress port."
+
+         ::= { agentCosMapIntfTrustEntry 2 }
+
+    agentCosMapUntrustedTrafficClass OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION 
+                     "The traffic class (i.e. hardware queue) to which all
+                     untrusted traffic is assigned.  This includes all 
+                     traffic when the agentCosMapIntfTrustMode is set to 
+                     untrusted(1), or just non-IP packets when in 
+                     trustIpPrecedence(3) or trustIpDscp(4) modes.
+
+                     This is a read-only object that reflects the current setting
+                     of the dot1dPortDefaultUserPriority object as mapped 
+                     to a traffic class through the dot1dTrafficClassEntry."
+         ::= { agentCosMapIntfTrustEntry 3 }
+
+
+
+--*********************************************************************
+--   agentCosQueueCfgGroup
+--
+--      Note: System-wide configuration is supported for this 
+--            group by using an index value of 0.
+--*********************************************************************
+agentCosQueueCfgGroup   OBJECT IDENTIFIER ::= { fastPathQOSCOS 2 }
+
+    agentCosQueueNumQueuesPerPort OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION 
+                     "The number of configurable COS queues per port  
+                     supported by the hardware device."
+         ::= { agentCosQueueCfgGroup 1 }
+
+    agentCosQueueNumDropPrecedenceLevels OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION 
+                     "The number of distinct drop precedence levels per 
+                     queue supported by the hardware device.  These levels 
+                     are typically used when configuring the queue 
+                     management tail drop and WRED parameters."
+         ::= { agentCosQueueCfgGroup 2 }
+
+    -- Control table for managing queue configuration for the interface    
+    agentCosQueueControlTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentCosQueueControlEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Table of class-of-service queue configuration 
+                     controls for the specified interface."
+         ::= { agentCosQueueCfgGroup 3 }
+
+    agentCosQueueControlEntry OBJECT-TYPE
+         SYNTAX      AgentCosQueueControlEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Provides a general control mechanism that affects 
+                     all queues on a given interface."
+         INDEX       { agentCosQueueIntfIndex }
+         ::= { agentCosQueueControlTable 1 }
+         
+    AgentCosQueueControlEntry ::= SEQUENCE {         
+           agentCosQueueIntfIndex
+               InterfaceIndexOrZero,
+           agentCosQueueIntfShapingRate
+               Unsigned32,
+           agentCosQueueMgmtTypeIntf
+               INTEGER,
+           agentCosQueueWredDecayExponent
+               Unsigned32,
+           agentCosQueueDefaultsRestore
+               INTEGER,
+           agentCosQueueIntfShapingRateUnits
+               INTEGER
+           }
+    
+    agentCosQueueIntfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "This is a unique index for an entry in the  
+                     agentCosQueueControlTable, agentCosQueueTable,
+                     or agentCosQueueMgmtTable.  A non-zero value indicates  
+                     the ifIndex for the corresponding interface entry  
+                     in the ifTable.  A value of zero represents global
+                     configuration, which in turn causes all interface
+                     entries to be updated for a set operation, or 
+                     reflects the most recent global setting for a get
+                     operation."
+                    
+         ::= { agentCosQueueControlEntry 1 }
+
+    agentCosQueueIntfShapingRate OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION 
+                     "Maximum bandwidth allowed for this interface as a 
+                     whole, typically used to shape the outbound 
+                     transmission rate. The value is specified in terms 
+                     of percentage of overall link speed for the port in 
+                     1% increments.  A value of 0 means there is no 
+                     maximum bandwidth limit in effect and that the 
+                     interface is allowed to transmit up to its maximum 
+                     line rate (i.e., work conserving method).  
+                     The default value is 0.
+                     
+                     When set to a non-zero value, the interface is 
+                     restricted to using at most the bandwidth specified 
+                     in this object for the outbound transmission rate 
+                     (i.e., non-work-conserving method).  This bandwidth 
+                     value is independent of any per-queue maximum 
+                     bandwidth value(s) in effect for the interface, as 
+                     specified in the agentCosQueueMaxBandwidth ohject, 
+                     and should be considered as a second-level 
+                     transmission rate control mechanism that regulates 
+                     the output of the entire interface regardless of 
+                     which queues originate the outbound traffic.
+
+                     Valid value ranges depend on the value returned by 
+                     object agentCosQueueIntfShapingRateUnits.  If that 
+                     object returns percent(1), agentCosQueueIntfShapingRate
+                     accepts values 0..100.  If that object returns kbps(2),
+                     agentCosQueueIntfShapingRate accepts values 
+                     0,64..4294967295."
+         DEFVAL { 0 }
+         ::= { agentCosQueueControlEntry 2 }
+
+    agentCosQueueMgmtTypeIntf OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       taildrop(1),
+                       wred(2)
+                       }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The management technique used for all queues on this 
+                     interface.  If taildrop(1), then all new packets 
+                     presented to the queues are dropped based on some 
+                     maximum threshold value(s). If wred(2), then an 
+                     active queue management scheme is employed whereby 
+                     packet drop precedence is considered during times of 
+                     queue congestion using WRED parameters.   The 
+                     necessary queue management parameters are specified 
+                     in the agentCosQueueMgmtTable for the corresponding 
+                     agentCosQueueIntfIndex value.  The default for this
+                     object is taildrop(1).
+                     
+                     Implementations that support this object but do not 
+                     support weighted RED must return taildrop(1) for this 
+                     value and must not allow a value of wred(2) to be set."
+         DEFVAL { taildrop }
+         ::= { agentCosQueueControlEntry 3 }
+
+    agentCosQueueWredDecayExponent OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..15)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION 
+                     "The decay exponent value used with the weighted 
+                     random early discard (WRED) algorithm to determine 
+                     how quickly the average queue length calculation 
+                     reacts to the current length of the queue.  A higher 
+                     value produces a slower response, meaning previously 
+                     sampled queue length values are factored into the 
+                     calculation for a longer period of time.  The default 
+                     value is 9.
+                     
+                     Use caution when changing this value from its 
+                     default.  If set too low, short traffic bursts can 
+                     cause WRED to drop too many packets.  If set too 
+                     high, WRED might not detect queue congestion in a 
+                     timely manner and becomes ineffective.  The default 
+                     value should be sufficient for most users.
+                     
+                     This object value is only used when the 
+                     agentCosQueueMgmtType is set to wred(2) and is 
+                     otherwise ignored."
+         DEFVAL { 9 }
+         ::= { agentCosQueueControlEntry 4 }
+
+    agentCosQueueDefaultsRestore OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                       }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Causes the default values to be restored for all COS 
+                     queue objects defined for this interface.  This 
+                     includes objects in the following tables:  
+                           agentCosQueueTable
+                           agentCosQueueMgmtTable
+                           
+                      This object always reads as disable(2). This object may 
+                      only be set to enable(1), which immediately causes the 
+                      default value restoration action as described above. 
+                      In essence, this models a momentary-style push button 
+                      switch that triggers a restoration of the original 
+                      default values for all affected objects."
+         ::= { agentCosQueueControlEntry 5 }
+
+    agentCosQueueIntfShapingRateUnits OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     percent(1),
+                     kbps(2)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Gets the units of the threshold value to percentage of
+                     port speed or kilobits per second (kbps)."
+         DEFVAL { percent }
+         ::= { agentCosQueueControlEntry 6 }
+
+
+    -- Queue table for specifying attributes of each COS queue on an interface
+    agentCosQueueTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentCosQueueEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Table of class-of-service queue configuration 
+                     parameters for the specified interface."
+         ::= { agentCosQueueCfgGroup 4 }
+
+    agentCosQueueEntry OBJECT-TYPE
+         SYNTAX      AgentCosQueueEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Each entry describes a single class-of-service (COS) 
+                     queue for a given Interface Index. The number of 
+                     configurable COS queues for an interface vary based 
+                     on device capabilities.
+
+                     All objects defined for this table entry contain a 
+                     default value corresponding to a typical, 
+                     non-preferential treatment of packets traversing the 
+                     interface's COS queues."
+         INDEX       { agentCosQueueIntfIndex, agentCosQueueIndex }
+         ::= { agentCosQueueTable 1 }
+         
+    AgentCosQueueEntry ::= SEQUENCE {         
+           agentCosQueueIndex
+               Unsigned32,
+           agentCosQueueSchedulerType
+               INTEGER,
+           agentCosQueueMinBandwidth
+               Percent,
+           agentCosQueueMaxBandwidth
+               Percent,
+           agentCosQueueMgmtType
+               INTEGER
+           }
+    
+    agentCosQueueIndex OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The COS queue index, numbered 0 to (n-1), where n is 
+                     the total number of configurable interface queues for 
+                     the device as indicated by agentCosQueueNumQueuesPerPort.
+                     In general, a higher numbered queue index is used to 
+                     support higher priority traffic, although actual 
+                     operation may be altered via configuration through 
+                     this table."
+         ::= { agentCosQueueEntry 1 }
+
+    agentCosQueueSchedulerType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       strict(1),
+                       weighted(2)
+                       }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The type of scheduling used for this queue.  If 
+                     strict(1), then all traffic placed on this queue is 
+                     transmitted before any queue with a lower precedence 
+                     (lower agentCosQueueIndex).  A weighted(2) scheme 
+                     gives this queue service relative to other weighted 
+                     queues based on their relative agentCosQueueMinBandwidth 
+                     object values.  The default is weighted(2)."
+         DEFVAL { weighted }
+         ::= { agentCosQueueEntry 2 }
+
+    agentCosQueueMinBandwidth OBJECT-TYPE
+         SYNTAX      Percent
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Minimum guaranteed bandwidth allotted to this queue. 
+                     The value is specified in terms of percentage of 
+                     overall link speed for the port in 1% increments.  A 
+                     value of 0 means there is no guaranteed minimum 
+                     bandwidth in effect (best-effort service).  
+                     The default value is 0.
+                     
+                     The sum of all agentCosQueueMinBandwidth object 
+                     values for the queues on the same interface must not 
+                     exceed 100%.
+                     
+                     If the agentCosQueueMaxBandwidth corresponding to the 
+                     same agentCosQueueIndex on this interface is 
+                     currently set to a non-zero value, then setting this 
+                     object to a value greater than 
+                     agentCosQueueMaxBandwidth automatically updates 
+                     agentCosQueueMaxBandwidth to the same value to 
+                     maintain a proper relationship between the minimum 
+                     and maximum queue bandwidth specification.
+                     
+                     The value of this object is ignored when 
+                     agentCosQueueSchedulerType is set to strict(1)."
+         DEFVAL { 0 }
+         ::= { agentCosQueueEntry 3 }
+         
+    agentCosQueueMaxBandwidth OBJECT-TYPE
+         SYNTAX      Percent
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION 
+                     "Maximum bandwidth allowed for this queue, typically 
+                     used to shape the outbound transmission rate. The 
+                     value is specified in terms of percentage of overall 
+                     link speed for the port in 1% increments.  A value 
+                     of 0 means there is no maximum bandwidth limit in 
+                     effect and that the queue is allowed to use any 
+                     available excess bandwidth (i.e., work conserving 
+                     method).  The default value is 0.
+                     
+                     When set to a non-zero value, the queue is restricted 
+                     to using at most the bandwidth specified in this 
+                     object for the outbound transmission rate (i.e., 
+                     non-work-conserving method).  Any non-zero value set 
+                     for this object must be equal to or greater than the 
+                     value of agentCosQueueMinBandwidth for the same 
+                     agentCosQueueIndex on this interface."
+         DEFVAL { 0 }
+         ::= { agentCosQueueEntry 4 }
+
+    agentCosQueueMgmtType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       taildrop(1),
+                       wred(2)
+                       }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The queue depth management technique used when 
+                     per-queue specification is supported.  If 
+                     taildrop(1), then all new packets presented to the 
+                     queue are dropped based on some maximum threshold 
+                     value(s). If wred(2), then an active queue management 
+                     scheme is employed whereby packet drop precedence is 
+                     considered during times of queue congestion using 
+                     WRED parameters.   The necessary queue management 
+                     parameters are specified in the 
+                     agentCosQueueMgmtEntry for the corresponding 
+                     agentCosQueueIntfIndex and agentCosQueueIndex values.
+                     The default for this object is taildrop(1).
+                     
+                     Implementations that do not support weighted RED must 
+                     return taildrop(1) for this value and must not allow 
+                     a value of wred(2) to be set."
+         DEFVAL { taildrop }
+         ::= { agentCosQueueEntry 5 }
+
+
+    -- Queue management table for setting parameters related to queue depth
+    agentCosQueueMgmtTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentCosQueueMgmtEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Table of class-of-service queue drop precedence 
+                     configuration parameters.  The values in this table 
+                     are used based on the agentCosQueueMgmtType for the 
+                     corresponding agentCosQueueIntfIndex and agentCosQueueIndex 
+                     values.  These parameters are specified for each 
+                     drop precedence level supported within a queue."
+         ::= { agentCosQueueCfgGroup 5 }
+
+    agentCosQueueMgmtEntry OBJECT-TYPE
+         SYNTAX      AgentCosQueueMgmtEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "The individual objects in this table are specified 
+                     for each drop precedence level supported within a 
+                     particular queue on a given interface.  Each object's 
+                     usage is based on the current setting of the 
+                     agentCosQueueMgmtType.  
+                     
+                     See the individual object descriptions for details."
+         INDEX       { agentCosQueueIntfIndex, agentCosQueueIndex, agentCosQueueDropPrecIndex }
+         ::= { agentCosQueueMgmtTable 1 }
+         
+    AgentCosQueueMgmtEntry ::= SEQUENCE {         
+           agentCosQueueDropPrecIndex
+               Unsigned32,
+           agentCosQueueMgmtTailDropThreshold
+               Sixteenths,
+           agentCosQueueMgmtWredMinThreshold
+               Sixteenths,
+           agentCosQueueMgmtWredMaxThreshold
+               Sixteenths,
+           agentCosQueueMgmtWredDropProbScale
+               Unsigned32, 
+           agentCosQueueMgmtPercentTailDropThreshold
+                Percent,
+           agentCosQueueMgmtPercentWredMinThreshold
+                Percent,
+           agentCosQueueMgmtPercentWredMaxThreshold
+                Percent,
+           agentCosQueueMgmtWredDropProbability
+                Percent
+   }
+    
+    agentCosQueueDropPrecIndex OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The COS queue drop precedence level, numbered 1 to 
+                     p, where p is the total number of drop precedences 
+                     supported per queue, as indicated by 
+                     agentCosQueueNumDropPrecedenceLevels.  This is used as 
+                     the minor index into the table.  Each supported drop 
+                     precedence level for a queue has its own set of 
+                     configuration parameters.
+                     
+                     The actual number of drop precedence levels supported 
+                     depends on the device characteristics.  For example, 
+                     some implementations may allow for three levels of 
+                     drop precedence (1/2/3, sometimes referred to as 
+                     green/yellow/red), some may support two levels 
+                     (1/2, or high/low), while others only one. Some devices 
+                     use the lowest (highest-numbered) drop precedence 
+                     level to represent non-TCP traffic."
+         ::= { agentCosQueueMgmtEntry 1 }
+
+    agentCosQueueMgmtTailDropThreshold OBJECT-TYPE
+         SYNTAX      Sixteenths
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "Tail drop queue threshold above which all packets 
+                     are dropped for the current drop precedence level. 
+                     The value specifies the threshold based on a fraction 
+                     of the overall device queue size in terms of 
+                     sixteenths (0/16, 1/16, 2/16, ... 16/16). Since device 
+                     implementations vary, the actual value deployed may 
+                     be rounded up or down accordingly. 
+                     
+                     The default value is calculated from the 
+                     agentCosQueueIndex and agentCosQueueDropPrecIndex as 
+                     shown in the following table (values listed for drop 
+                     precedence levels 1, 2, and 3, respectively):
+                              Queue Index 0:  16, 14, 12
+                              Queue Index 1:  16, 14, 12
+                              Queue Index 2:  16, 14, 12
+                              Queue Index 3:  16, 14, 12
+                              Queue Index 4:  16, 14, 12
+                              Queue Index 5:  16, 14, 12
+                              Queue Index 6:  16, 14, 12
+                              Queue Index 7:  16, 14, 12
+                              
+                     This object is only used when agentCosQueueMgmtType 
+                     is set to taildrop(1)."
+         ::= { agentCosQueueMgmtEntry 2 }
+         
+    agentCosQueueMgmtWredMinThreshold OBJECT-TYPE
+         SYNTAX      Sixteenths
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "Weighted RED minimum queue threshold, below which no 
+                     packets are dropped for the current drop precedence 
+                     level. The value specifies the threshold based on a 
+                     fraction of the overall device queue size in terms of 
+                     sixteenths (0/16, 1/16, 2/16, ... 16/16). Since device 
+                     implementations vary, the actual value deployed may 
+                     be rounded up or down accordingly. 
+                     
+                     The default value is calculated from the 
+                     agentCosQueueIndex and agentCosQueueDropPrecIndex as 
+                     shown in the following table (values listed for drop 
+                     precedence levels 1, 2, and 3, respectively):
+                              Queue Index 0:   8,  6,  4
+                              Queue Index 1:   9,  7,  5
+                              Queue Index 2:  10,  8,  6
+                              Queue Index 3:  11,  9,  7
+                              Queue Index 4:  12, 10,  8
+                              Queue Index 5:  13, 11,  9
+                              Queue Index 6:  14, 12, 10
+                              Queue Index 7:  15, 13, 11
+                              
+                     This object is only used when agentCosQueueMgmtType 
+                     is set to wred(2). Any value set for this object must 
+                     be equal to or less than the value of 
+                     agentCosQueueMgmtWredMaxThreshold."
+         ::= { agentCosQueueMgmtEntry 3 }
+         
+    agentCosQueueMgmtWredMaxThreshold OBJECT-TYPE
+         SYNTAX      Sixteenths
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "Weighted RED maximum queue threshold, above which 
+                     all packets are dropped for the current drop 
+                     precedence level. The value specifies the threshold 
+                     based on a fraction the overall device queue size in 
+                     terms of sixteenths (0/16, 1/16, 2/16, ... 16/16). Since 
+                     device implementations vary, the actual value 
+                     deployed may be rounded up or down accordingly. 
+                     
+                     The default value is calculated from the 
+                     agentCosQueueIndex and agentCosQueueDropPrecIndex as 
+                     shown in the following table (values listed for drop 
+                     precedence levels 1, 2, and 3, respectively):
+                              Queue Index 0:  16, 14, 12
+                              Queue Index 1:  16, 14, 12
+                              Queue Index 2:  16, 14, 12
+                              Queue Index 3:  16, 14, 12
+                              Queue Index 4:  16, 14, 12
+                              Queue Index 5:  16, 14, 12
+                              Queue Index 6:  16, 14, 12
+                              Queue Index 7:  16, 14, 12
+                              
+                     This object is only used when agentCosQueueMgmtType 
+                     is set to wred(2). Any value set for this object must 
+                     be equal to or greater than the value of 
+                     agentCosQueueMgmtWredMinThreshold."
+         ::= { agentCosQueueMgmtEntry 4 }
+         
+    agentCosQueueMgmtWredDropProbScale OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..15)
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION 
+                     "A scaling factor used for the WRED calculation to 
+                     determine the packet drop probability for the current 
+                     drop precedence level. The value is specified as a 
+                     number S from 1-15 and is used in the formula: 1/(2**
+                     S), meaning one packet is dropped out of every (2**
+                     S). Packet dropping begins when 
+                     agentCosQueueMgmtWredMinThreshold is reached and 
+                     proceeds linearly up to the (2**S) value specified by 
+                     this object until the 
+                     agentCosQueueMgmtWredMaxThreshold is reached, beyond 
+                     which all packets are dropped. Smaller values of S 
+                     produce a steeper slope, hence a higher incidence of 
+                     randomly dropped packets.  
+                     
+                     The default value is 10, which corresponds to a drop 
+                     rate of 1 out of every (2**10)=1024 packets.                     
+                     
+                     This object is only used when agentCosQueueMgmtType 
+                     is set to wred(2)."
+         DEFVAL { 10 }
+         ::= { agentCosQueueMgmtEntry 5 }
+
+    agentCosQueueMgmtPercentTailDropThreshold OBJECT-TYPE
+         SYNTAX      Percent
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Tail drop queue threshold above which all packets 
+                     are dropped for the current drop precedence level. 
+                     The value specifies the threshold based on a percentage
+                     of the overall device queue size. Since device 
+                     implementations vary, the actual value deployed may 
+                     be rounded up or down accordingly. 
+                     
+                     The default value, for all queues, is 100% for drop 
+                     precedence 1 and non-TCP traffic, 90% and 80% for 
+                     drop precedences 2 and 3.
+                              
+                     This object is only used when agentCosQueueMgmtType 
+                     is set to taildrop(1)."
+         ::= { agentCosQueueMgmtEntry 6 }
+         
+    agentCosQueueMgmtPercentWredMinThreshold OBJECT-TYPE
+         SYNTAX      Percent
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Weighted RED minimum queue threshold, below which no 
+                     packets are dropped for the current drop precedence 
+                     level. The value specifies the threshold based on a 
+                     percentage of the overall device queue size. Since device 
+                     implementations vary, the actual value deployed may 
+                     be rounded up or down accordingly. 
+                     
+                     The default value, for all queues, is 100% for non-TCP 
+                     traffic, 40%, 30% and 20% for TCP drop precedences 1, 2 
+                     and 3.
+                                                            
+                     This object is only used when agentCosQueueMgmtType 
+                     is set to wred(2). Any value set for this object must 
+                     be equal to or less than the value of 
+                     agentCosQueueMgmtPercentWredMaxThreshold."
+         ::= { agentCosQueueMgmtEntry 7 }
+         
+    agentCosQueueMgmtPercentWredMaxThreshold OBJECT-TYPE
+         SYNTAX      Percent
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Weighted RED maximum queue threshold, above which 
+                     all packets are dropped for the current drop 
+                     precedence level. The value specifies the threshold 
+                     based on a percentage of the overall device queue size. 
+                     Since device implementations vary, the actual value 
+                     deployed may be rounded up or down accordingly. 
+                     
+                     The default value, for all queues, is 100% for drop 
+                     precedence 1 and non-TCP traffic, 90% and 80% for 
+                     drop precedences 2 and 3.
+                                                            
+                     This object is only used when agentCosQueueMgmtType 
+                     is set to wred(2). Any value set for this object must 
+                     be equal to or greater than the value of 
+                     agentCosQueueMgmtPercentWredMinThreshold."
+         ::= { agentCosQueueMgmtEntry 8 }
+         
+    agentCosQueueMgmtWredDropProbability OBJECT-TYPE
+         SYNTAX      Percent
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION 
+                     "A scaling factor used for the WRED calculation to 
+                     determine the packet drop probability for the current 
+                     drop precedence level. Packet dropping begins when 
+                     agentCosQueueMgmtWredMinThreshold is reached and 
+                     proceeds linearly up to the percentage value specified by 
+                     this object until the agentCosQueueMgmtWredMaxThreshold 
+                     is reached, beyond which all packets are dropped.   
+                     
+                     The default value is 10.                     
+                     
+                     This object is only used when agentCosQueueMgmtType 
+                     is set to wred(2)."
+         DEFVAL { 10 }
+         ::= { agentCosQueueMgmtEntry 9 }
+
+
+
+END
