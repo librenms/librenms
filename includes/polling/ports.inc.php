@@ -443,7 +443,7 @@ foreach ($ports as $port) {
         }
 
         if ($device['os'] === 'airos-af' && $port['ifAlias'] === 'eth0') {
-            $airos_stats = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.41112.1.3.3.1', $airos_stats, 'UBNT-AirFIBER-MIB');
+            $airos_stats = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.41112.1.3.3.1', array(), 'UBNT-AirFIBER-MIB');
             $this_port['ifInOctets'] = $airos_stats[1]['rxOctetsOK'];
             $this_port['ifOutOctets'] = $airos_stats[1]['txOctetsOK'];
             $this_port['ifInErrors'] = $airos_stats[1]['rxErroredFrames'];
@@ -483,7 +483,7 @@ foreach ($ports as $port) {
         }
 
         if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {
-            d_echo('HighSpeed ');
+            d_echo('ifHighSpeed ');
             $this_port['ifSpeed'] = ($this_port['ifHighSpeed'] * 1000000);
         } elseif (isset($this_port['ifSpeed']) && is_numeric($this_port['ifSpeed'])) {
             d_echo('ifSpeed ');
