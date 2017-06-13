@@ -1,8 +1,8 @@
 <?php
 /**
- * $axisaudio.inc.php
+ * chatsworth.inc.php
  *
- * LibreNMS OS poller module for Axis Audio Appliances
+ * LibreNMS OS poller module for Legacy Chatsworth PDU
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,14 +23,5 @@
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
 
-// .1.3.6.1.2.1.1.1.0 = STRING:  ; AXIS P8221; Network IO Audio Module; 5.10.3; Jan 29 2016 10:47; 174; 1;
-
-$data = explode('; ', $poll_device['sysDescr']);
-
-if (isset($data[1])) {
-    $hardware = $data[1];
-}
-
-if (isset($data[3])) {
-    $version = $data[3];
-}
+$serial = trim(snmp_get($device, '.1.3.6.1.4.1.30932.1.1.1.2.0', '-OQv'), '"');
+$version = trim(snmp_get($device, '.1.3.6.1.4.1.30932.1.1.1.1.0', '-OQv'), '"');
