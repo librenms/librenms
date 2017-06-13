@@ -10,7 +10,6 @@
  * the source code distribution for details.
  */
 
-
 d_echo('Quanta Chassis Power Supply state');
 
 $tables = array(
@@ -20,7 +19,6 @@ $tables = array(
 foreach ($tables as $tablevalue) {
     $temp = snmpwalk_cache_multi_oid($device, $tablevalue[1], array(), $tablevalue[4]);
     $cur_oid = $tablevalue[1];
-
 
     if (is_array($temp)) {
         $state_name = $tablevalue[2];
