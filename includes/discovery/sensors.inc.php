@@ -37,7 +37,6 @@ if (strstr($device['hardware'], 'ProLiant')) {
     include 'includes/discovery/sensors/state/hp.inc.php';
 }
 
-
 $run_sensors = array(
     'airflow',
     'current',
