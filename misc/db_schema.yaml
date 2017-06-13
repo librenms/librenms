@@ -426,7 +426,7 @@ devices:
     sysContact: { Field: sysContact, Type: text, 'Null': true, Default: null, Extra: '' }
     sysDescr: { Field: sysDescr, Type: text, 'Null': true, Default: null, Extra: '' }
     sysName: { Field: sysName, Type: varchar(128), 'Null': true, Default: null, Extra: '' }
-    sysObjectID: { Field: sysObjectID, Type: varchar(64), 'Null': true, Default: null, Extra: '' }
+    sysObjectID: { Field: sysObjectID, Type: varchar(128), 'Null': true, Default: null, Extra: '' }
     timeout: { Field: timeout, Type: int(11), 'Null': true, Default: null, Extra: '' }
     transport: { Field: transport, Type: varchar(16), 'Null': false, Default: udp, Extra: '' }
     type: { Field: type, Type: varchar(20), 'Null': false, Default: '', Extra: '' }
@@ -796,13 +796,6 @@ mibdefs:
     syntax: { Field: syntax, Type: varchar(255), 'Null': false, Default: null, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [module, mib, object_type], Unique: true, Type: BTREE }
-migrations:
-  Columns:
-    batch: { Field: batch, Type: int(11), 'Null': false, Default: null, Extra: '' }
-    id: { Field: id, Type: 'int(10) unsigned', 'Null': false, Default: null, Extra: auto_increment }
-    migration: { Field: migration, Type: varchar(255), 'Null': false, Default: null, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 munin_plugins:
   Columns:
     device_id: { Field: device_id, Type: int(11), 'Null': false, Default: null, Extra: '' }
@@ -977,14 +970,6 @@ packages:
     PRIMARY: { Name: PRIMARY, Columns: [pkg_id], Unique: true, Type: BTREE }
     unique_key: { Name: unique_key, Columns: [device_id, name, manager, arch, version, build], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
-password_resets:
-  Columns:
-    created_at: { Field: created_at, Type: timestamp, 'Null': true, Default: null, Extra: '' }
-    email: { Field: email, Type: varchar(255), 'Null': false, Default: null, Extra: '' }
-    token: { Field: token, Type: varchar(255), 'Null': false, Default: null, Extra: '' }
-  Indexes:
-    password_resets_email_index: { Name: password_resets_email_index, Columns: [email], Unique: false, Type: BTREE }
-    password_resets_token_index: { Name: password_resets_token_index, Columns: [token], Unique: false, Type: BTREE }
 pdb_ix:
   Columns:
     asn: { Field: asn, Type: 'int(10) unsigned', 'Null': false, Default: null, Extra: '' }
