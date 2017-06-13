@@ -11,7 +11,6 @@
  */
 
 d_echo('Quanta CPU usage:');
-//SNMPv2-SMI::enterprises.4413.1.1.1.1.4.9.0
 $proc_usage = snmp_get($device, 'agentSwitchCpuProcessTotalUtilization.0', '-Ovq', 'NETGEAR-SWITCHING-MIB');
 preg_match('/([0-9]+.[0-9]+)/', $proc_usage, $usage);
 $proc = $usage[0];
