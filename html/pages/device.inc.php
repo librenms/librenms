@@ -397,7 +397,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
                     $nfsensuffix = $config['nfsen_suffix'];
                 }
 
-                if($config['nfsen_split_char']) {
+                if (isset($config['nfsen_split_char']) && !empty($config['nfsen_split_char'])) {
                     $basefilename_underscored = preg_replace('/\./', $config['nfsen_split_char'], $device['hostname']);
                 } else {
                     $basefilename_underscored = $device['hostname'];
