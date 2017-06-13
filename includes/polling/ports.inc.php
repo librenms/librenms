@@ -474,7 +474,7 @@ foreach ($ports as $port) {
 
         // use HC values if they are available
         foreach ($hc_mappings as $hc_oid => $if_oid) {
-            if (isset($this_port[$hc_oid]) && $this_port[$hc_oid] > $this_port[$if_oid]) {
+            if (isset($this_port[$hc_oid]) && $this_port[$hc_oid]) {
                 d_echo("$hc_oid ");
                 $this_port[$if_oid] = $this_port[$hc_oid];
             } else {
