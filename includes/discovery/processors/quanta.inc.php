@@ -11,7 +11,6 @@
  */
 
 if ($device['os'] == 'quanta') {
-    //SNMPv2-SMI::enterprises.4413.1.1.1.1.4.9.0
     d_echo('Quanta CPU usage:');
     $descr = 'Processor';
     $proc_oid = 'agentSwitchCpuProcessTotalUtilization.0';
