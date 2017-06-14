@@ -607,16 +607,19 @@ extend powerdns-recursor /etc/snmp/powerdns-recursor
 This script uses `rec_control get-all` to collect stats.
 
 ### Proxmox
-1. Download the script onto the desired host (the host must be added to LibreNMS devices)
+1. For Proxmox 4.4+ install the libpve-apiclient-perl package
+`apt install libpve-apiclient-perl`
+
+2. Download the script onto the desired host (the host must be added to LibreNMS devices)
 `wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/proxmox -O /usr/local/bin/proxmox`
 
-2. Make the script executable: `chmod +x /usr/local/bin/proxmox`
+3. Make the script executable: `chmod +x /usr/local/bin/proxmox`
 
-3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+4. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 `extend proxmox /usr/local/bin/proxmox`
 (Note: if your snmpd doesn't run as root, you might have to invoke the script using sudo. `extend proxmox /usr/bin/sudo /usr/local/bin/proxmox`)
 
-4. Restart snmpd on your host
+5. Restart snmpd on your host
 
 
 ### Raspberry PI
