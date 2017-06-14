@@ -42,8 +42,13 @@ If you wish to render info for configure channels for a device, you need add the
 $config['nfsen_rrds'][] = '/var/nfsen/profiles-stat';
 ```
 
-When adding sources to nfsen.conf, it is important to use the hostname that matches what is configured in LibreNMS. 
+When adding sources to nfsen.conf, it is important to use the hostname that matches what is configured in LibreNMS, because the rrd files NfSen creates is named after the source name (ident), and it doesn't allow you to use an IP address instead. However, in LibreNMS, if your device is added by an IP address, add your source with any name of your choice, and create a symbolic link to the rrd file.
+```sh
+cd /var/nfsen/profiles-stat/sitea/
+ln -s mychannel.rrd librenmsdeviceIP.rrd
+```
 
 When creating profiles under nfsen, be sure to use the hostname so it matches the name in LibreNMS. That is where channel data will be pulled from.
 
-You should a new tab for the device called Nfsen.
+You should see a new tab for the device called Nfsen.
+
