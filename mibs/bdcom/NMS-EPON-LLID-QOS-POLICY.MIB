@@ -1,0 +1,87 @@
+-- *****************************************************************
+-- NMS-EPON-Liid.MIB:  NMS LLID Liid MIB file
+-- AUG 2009
+-- *****************************************************************
+--
+
+NMS-EPON-LLID-QOS-POLICY DEFINITIONS ::= BEGIN
+
+            IMPORTS
+            IpAddress
+				FROM RFC1155-SMI
+		    OBJECT-TYPE
+				FROM RFC-1212
+            DisplayString
+				FROM RFC1213-MIB
+		    nmsEPONGroup
+				FROM NMS-SMI
+		    TruthValue,RowStatus,PhysAddress,DisplayString,QosPolicy
+		    	FROM SNMPv2-TC;
+          
+                  nmsEponLiidQosPolicy        OBJECT IDENTIFIER ::= { nmsEPONGroup 102}
+             
+nmsEponLiidQosPolicyTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF nmsEponLiidQosPolicyEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A list of nmsEponLiidQosPolicyEntry entries. 
+				 The port-based security mac address information."
+					::= { nmsEponLiidQosPolicy 1 }		
+	                       
+		nmsEponLiidQosPolicyEntry	OBJECT-TYPE
+				SYNTAX		nmsEponLiidQosPolicyEntry
+				MAX-ACCESS	not-accessible
+				STATUS		current
+				DESCRIPTION	
+		"Policy Map Apply operation.(LiidIfIndex_LiidQosPolicy)to Apply a Policy Map.For example,'07_q1'will apply the policy map 'q1' to LLID which pon port diid is 7. For 3305, the EPON will return a error symbol to indicate 
+		                   a unsuccessful operation. " 				
+				INDEX		{LiidIfIndex,LiidQosPolicy}
+				::= { nmsEponLiidQosPolicyTable 1 }
+       
+		nmsEponLiidQosPolicyEntry	::= SEQUENCE { 
+                   	LiidIfIndex						INTEGER,                   
+		       		LiidQosPolicy				DisplayString,
+		            LiidQosPolicyCreate		DisplayString, 
+                    LiidQosPolicyDel			TruthValue
+  				}
+            
+		  
+               LiidIfIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                           "LLID interface id, unique in system."
+                   ::= { nmsEponLiidQosPolicyEntry 1 } 
+               
+               LiidQosPolicy OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                           "A unique string for each Policy Map up to 20 characters. 
+ 							This string is part of index of Table."
+                   ::= { nmsEponLiidQosPolicyEntry 2 } 
+
+               LiidQosPolicyCreate OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+		                   "Policy Map Apply operation.(LiidSlotIndex_LiidIfIndex_LiidQosPolicy)to Apply a  
+		                   Policy Map.For example,'07_q1'will apply the policy map 'q1' to Liid 7.
+		                   For 3305 ,the EPON will return a error symbol to indicate 
+		                   a unsuccessful operation. " 
+		           ::= { nmsEponLiidQosPolicyEntry 3 }  
+               LiidQosPolicyDel OBJECT-TYPE
+                   SYNTAX  TruthValue
+                   ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+                           "Liid  Policy Map delete flag,True(1) will delete the Policy Map."
+                   ::= { nmsEponLiidQosPolicyEntry 4} 
+             
+             
+
+              	
+END		

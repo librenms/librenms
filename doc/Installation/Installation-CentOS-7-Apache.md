@@ -14,10 +14,8 @@ mysql -uroot
 
 ```sql
 CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-GRANT ALL PRIVILEGES ON librenms.*
-  TO 'librenms'@'localhost'
-  IDENTIFIED BY '<password>'
-;
+CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
 FLUSH PRIVILEGES;
 exit
 ```
@@ -106,6 +104,13 @@ Add the following config:
     restorecon -RFvv /opt/librenms/logs/
     setsebool -P httpd_can_sendmail=1
     setsebool -P httpd_can_network_connect=1
+```
+
+#### Allow access through firewall
+
+```bash
+firewall-cmd --zone public --add-service http
+firewall-cmd --permanent --zone public --add-service http
 ```
 
 #### Restart Web server

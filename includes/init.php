@@ -27,6 +27,8 @@
  * @param array $modules Which modules to initialize
  */
 
+global $config;
+
 $install_dir = realpath(__DIR__ . '/..');
 $config['install_dir'] = $install_dir;
 chdir($install_dir);
@@ -102,17 +104,30 @@ if ($config['memcached']['enable'] === true) {
 }
 
 if (!module_selected('nodb', $init_modules)) {
-    // Connect to database
-    $database_link = mysqli_connect('p:' . $config['db_host'], $config['db_user'], $config['db_pass'], null, $config['db_port']);
-    if (!$database_link) {
-        echo '<h2>MySQL Error</h2>';
-        echo mysqli_connect_error();
-        die;
+    // Check for testing database
+    if (getenv('DBTEST')) {
+        if (isset($config['test_db_name'])) {
+            $config['db_name'] = $config['test_db_name'];
+        }
+        if (isset($config['test_db_user'])) {
+            $config['db_user'] = $config['test_db_user'];
+        }
+        if (isset($config['test_db_pass'])) {
+            $config['db_pass'] = $config['test_db_pass'];
+        }
     }
-    $database_db = mysqli_select_db($database_link, $config['db_name']);
-    dbQuery("SET NAMES 'utf8'");
-    dbQuery("SET CHARACTER SET 'utf8'");
-    dbQuery("SET COLLATION_CONNECTION = 'utf8_unicode_ci'");
+
+    // Connect to database
+    try {
+        dbConnect();
+    } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
+        if (isCli()) {
+            echo 'MySQL Error: ' . $e->getMessage() . PHP_EOL;
+        } else {
+            echo "<h2>MySQL Error</h2><p>" . $e->getMessage() . "</p>";
+        }
+        exit(2);
+    }
 
     // pull in the database config settings
     mergedb();
@@ -137,12 +152,8 @@ if (module_selected('web', $init_modules)) {
         $config['title_image'] = 'images/librenms_logo_'.$config['site_style'].'.svg';
     }
     require $install_dir . '/html/includes/vars.inc.php';
-    $tmp_list = dbFetchRows('SELECT DISTINCT(`os`) FROM `devices`');
-    $os_list = array();
-    foreach ($tmp_list as $k => $v) {
-        $os_list[] = $config['install_dir'].'/includes/definitions/'. $v['os'] . '.yaml';
-    }
-    load_all_os($os_list);
+
+    load_all_os(true);
 }
 
 $console_color = new Console_Color2();
@@ -154,6 +165,7 @@ if (module_selected('auth', $init_modules) ||
         $config['allow_unauth_graphs'] != true
     )
 ) {
+    require $install_dir . '/html/includes/authentication/functions.php';
     require $install_dir . '/html/includes/authenticate.inc.php';
 }
 

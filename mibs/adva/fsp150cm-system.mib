@@ -1,0 +1,2348 @@
+CM-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP 
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, IpAddress, Unsigned32
+             FROM SNMPv2-SMI
+    DateAndTime, DisplayString, TruthValue, RowStatus, 
+    StorageType, VariablePointer, TEXTUAL-CONVENTION, MacAddress
+             FROM SNMPv2-TC
+    SnmpEngineID
+             FROM SNMP-FRAMEWORK-MIB
+    fsp150cm , FileTransferProtocol, TrapCounter
+             FROM  ADVA-MIB
+    RestartType, IpVersion
+             FROM  CM-COMMON-MIB
+    InterfaceIndex
+             FROM IF-MIB
+    LldpV2DestAddressTableIndex
+             FROM LLDP-V2-TC-MIB
+    snmpTargetAddrName 
+             FROM SNMP-TARGET-MIB
+    Ipv6Address
+             FROM IPV6-TC
+    lldpV2RemEntry
+             FROM LLDP-V2-MIB;
+
+cmSystemMIB MODULE-IDENTITY
+    LAST-UPDATED    "201601150000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Raghav Trivedi
+                     ADVA Optical Networking, Inc.
+                Tel: +1 972 759-1239
+             E-mail: rtrivedi@advaoptical.com
+             Postal: 2301 N. Greenville Ave. #300
+                     Richardson, TX USA 75082"
+    DESCRIPTION
+            "This module defines the System MIB definitions used by 
+             the F3 (FSP150CM/CC) product lines.
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201601150000Z"
+    DESCRIPTION
+        " Notes from release 201601150000Z
+           a) added  f3SnmpLongIfAlias scalar variable
+
+          Notes from release 201307310000Z 
+          Added raw data functionality objects f3RawDataObjects 
+            -f3RawDataServerFtProtocol, f3RawDataServerFtServerName, 
+             f3RawDataServerFtPasswd and f3RawDataServerFtUserId
+
+        Notes from release 201111220000Z 
+         (i)Added configuration file functionality objects f3ConfigFileObjects 
+            -f3ConfigFileActionFileName, f3ConfigFileAction 
+             and f3ConfigFileTable
+         (ii)Added f3SystemFeatureTable
+ 
+        Notes from release 201106110000Z 
+         (i)Added f3DatabaseSyncTrapObject and f3DatabaseSyncTrap for 
+            NMS database sync facility in the case of bulk changes
+
+        Notes from release 201010140000Z
+         (i)Added the following literal to CmFileServicesMode 
+             securitylogfileupload,
+             alarmlogfileupload,   
+             auditlogfileupload,
+         (ii)Added the following literals to fileServicesAction
+                 put-securitylog-file,
+                 put-alarmlog-file,
+                 put-auditlog-file
+
+        Notes from release 201005130000Z
+         Added the following literal to CmFileServicesMode 
+               debugfileupload
+
+        Notes from release 201005130000Z
+         Added the following new objects,
+            f3SysLastResetType,
+            f3SysLastResetCauseType,
+            f3SysLastAbnormalResetTimestamp1,
+            f3SysLastAbnormalResetTimestamp2,
+            f3SysLastAbnormalResetTimestamp3
+
+        Notes from release 201003250000Z
+         This release is applicable to the FSP150CC Release 4.3 
+         device GE201.
+         New objects added in this release,
+             ntpServerRoundTripDelay, ntpServerPrecision
+
+         Notes from release 200906080000Z
+         This release is applicable to the FSP150CC Release 4.1 
+         devices GE101 and GE206.
+         New table added in this release,
+            f3SnmpTargetAddrExtTable
+ 
+         New notification added in this release,
+            cmSnmpDyingGaspTrap
+
+         New scalar added in this release,
+            serialPortDisconnectAutoLogOff, httpsEnabled, sftpEnabled
+
+         Notes from release 200803030000Z,
+          (1)MIB version ready for release FSP150CM 3.1." 
+    ::= {fsp150cm 2}    
+
+-- 
+-- OID definitions
+-- 
+cmSystemObjects              OBJECT IDENTIFIER ::= {cmSystemMIB 1}
+cmSystemNotifications        OBJECT IDENTIFIER ::= {cmSystemMIB 2}
+cmSystemConformance          OBJECT IDENTIFIER ::= {cmSystemMIB 3}
+f3BulkNotifObjects           OBJECT IDENTIFIER ::= {cmSystemMIB 4}
+f3SystemBulkNotifications    OBJECT IDENTIFIER ::= {cmSystemMIB 5}
+
+cmErrorInfoObjects           OBJECT IDENTIFIER ::= {cmSystemObjects 1}
+cmCliObjects                 OBJECT IDENTIFIER ::= {cmSystemObjects 2}
+cmAccessProtocols            OBJECT IDENTIFIER ::= {cmSystemObjects 3}
+cmSysSecObjects              OBJECT IDENTIFIER ::= {cmSystemObjects 4}
+cmSysModeObjects             OBJECT IDENTIFIER ::= {cmSystemObjects 5}
+cmDatabaseObjects            OBJECT IDENTIFIER ::= {cmSystemObjects 6}
+cmSoftwareObjects            OBJECT IDENTIFIER ::= {cmSystemObjects 7}
+cmFileServicesObjects        OBJECT IDENTIFIER ::= {cmSystemObjects 8}
+cmLogObjects                 OBJECT IDENTIFIER ::= {cmSystemObjects 9}
+cmTimeObjects                OBJECT IDENTIFIER ::= {cmSystemObjects 10}
+cmSnmpObjects                OBJECT IDENTIFIER ::= {cmSystemObjects 11}
+cmResetCauseObjects          OBJECT IDENTIFIER ::= {cmSystemObjects 12}
+f3NotifObjects               OBJECT IDENTIFIER ::= {cmSystemObjects 13}
+f3ConfigFileObjects          OBJECT IDENTIFIER ::= {cmSystemObjects 14}
+cmFeatureManagementObjects   OBJECT IDENTIFIER ::= {cmSystemObjects 15}
+cmLldpV2DestAdressADVAExtObjects       OBJECT IDENTIFIER ::= {cmSystemObjects 16}
+f3LldpV2ConfigurationADVAExtObjects    OBJECT IDENTIFIER ::= {cmSystemObjects 17}
+snmpIPv6UDPDomain                      OBJECT IDENTIFIER ::= {cmSystemObjects 18}
+f3RawDataObjects                       OBJECT IDENTIFIER ::= {cmSystemObjects 19}
+f3LldpV2RemoteSystemsData              OBJECT IDENTIFIER ::= {cmSystemObjects 20}
+
+
+
+-- 
+-- Textual Conventions 
+-- 
+CmAclFilterAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Access Control List 
+          permit - Permit access, 
+          deny   - Deny access."
+    SYNTAX       INTEGER {
+                   permit (1),
+                   deny (2)
+                 }
+
+CmAutoProvMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Auto Provisioning Mode 
+          off       - manual mode, 
+          confirm   - auto provisioning with confirmation 
+          auto      - true auto provisioning."
+    SYNTAX       INTEGER {
+                   off (1),
+                   confirm (2),
+                   auto (3)
+                 }
+
+CmNtpType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for NTP Types 
+          unicast     
+          multicast  
+          anycast  ."
+    SYNTAX       INTEGER {
+                   unicast (1)
+                 }
+
+CmNtpMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for NTP Types 
+            client,
+            server,
+            both."
+    SYNTAX       INTEGER {
+                   client (1),
+                   server (2),
+                   both (3)
+                 }
+
+CmNtpServerType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for NTP Server Types 
+          primary     
+          secondary ."
+    SYNTAX       INTEGER {
+                   not-applicable(0),
+                   primary (1),
+                   secondary (2)
+                 }
+
+CmFileTransferMethod ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for File Transfer Methods 
+            ftp - FTP
+            scp - SCP
+            sftp- Secure FTP
+            web - WEB based, this is a read-only."
+    SYNTAX       INTEGER {
+                   ftp (1),
+                   scp (2),
+                   sftp (3),
+                   web (4) -- This is a read-only enumeration
+                 }
+
+CmVersionType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Version Type
+            active,
+            standby."
+    SYNTAX       INTEGER {
+                   active (1),
+                   standby (2),
+                   staging (3)
+                 }
+
+CmFileServicesStatus ::= TEXTUAL-CONVENTION 
+    STATUS     current
+    DESCRIPTION
+            "Status of the user initiated file transfer.
+             in-progress        - File transfer / processing is in progress.
+             success            - File transfer and processing completed
+                                  successfully.
+             login-failed       - Login failed.
+             file-not-found     - File not found.
+             permission-denied  - Permission denied.
+             server-unreachable - Server unreachable.
+             no-space-left      - No space left on device.
+             invalid-file-type  - Invalid file type.
+             nobackup-database  - No backup database.
+             no-sw-toinstall    - No software to install.
+             sw-not-installed   - Software not installed.
+             validation-timer-notactive  - Validation timer not active.
+             cannot-revert      - Cannot revert.
+             install-failed     - Installation failed.
+             upgrade-failed     - Upgrade Failed.
+             revert-failed      - Revert failed.
+             failure            - Generic File transfer or processing failure.
+             badarchive         - Bad Archive.
+             incompatarchive    - Incompatible Archive."
+    SYNTAX     INTEGER {
+                 in-progress(1),
+                 success(2),
+                 login-failed(3),
+                 file-not-found(4),
+                 permission-denied(5),
+                 server-unreachable(6),
+                 no-space-left(7),
+                 invalid-file-type(8),
+                 nobackup-database(9),
+                 no-sw-toinstall(10),
+                 sw-not-installed(11),
+                 validation-timer-notactive(12),
+                 cannot-revert(13),
+                 install-failed(14),
+                 upgrade-failed(15),
+                 revert-failed(16),
+                 failure(17),
+                 badarchive(18),
+                 incompatarchive(19),
+                 swVersionNotApproved(20)
+               }
+
+CmFileServicesMode ::= TEXTUAL-CONVENTION 
+    STATUS     current
+    DESCRIPTION
+            "File Services Operation.
+             idle                   - Idle and available.
+             dbupload               - Database upload in progress. 
+             dbdownload             - Database download in progress. 
+             dbbackup               - Database backup in progress. 
+             dbrestore              - Database restore in progress. 
+             swdownload             - Software download in progress. 
+             swinstall              - Software install in progress. 
+             swupgrade              - Software upgrade in progress. 
+             swvalidate             - Software validation in progress. 
+             swcancelupgrade        - Software upgrade cancelled.
+             swrevert               - Software upgrade reverted.
+             rebooting              - System rebooting.
+             debugfileupload        - Last Reset Cause debug file upload in progress.
+             securitylogfileupload  - Security log upload in progress
+             alarmlogfileupload     - Alarm log upload in progress
+             auditlogfileupload     - Audit log upload in progress
+             dbpropagate            - Database propagate in progress.
+             swpropagate            - Software propagate in progress.
+             sysdiagfileupload      - System diagnose file upload in progress.
+             sysdiagfilesave        - System diagnose file save in progress.
+             configfileupload       - Configuration file upload in progress. 
+             configfiledownload     - Configuration file download in progress. 
+             defaultvalsfiledownload- Default Values file download in progress. 
+             satresultupload        - SAT test result file upload in progress.
+             "
+    SYNTAX     INTEGER {
+                 idle(1),
+                 dbupload(2),
+                 dbdownload(3),
+                 dbbackup(4),
+                 dbrestore(5),
+                 swdownload(6),
+                 swinstall(7),
+                 swupgrade(8),
+                 swvalidate(9),
+                 swcancelupgrade(10),
+                 swrevert(11),
+                 rebooting(12),
+                 debugfileupload(13),
+                 securitylogfileupload(14),
+                 alarmlogfileupload(15),
+                 auditlogfileupload(16),
+                 dbpropagate(17),
+                 swpropagate(18),
+                 sysdiagfileupload(19),
+                 sysdiagfilesave(20),
+                 configfileupload(21),
+                 configfiledownload(22),
+                 defaultvalsfiledownload(23),
+                 satresultupload(24)
+               }
+
+CmRestartCauseType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "System Restart Cause Type.
+             poweronreset       - Interruption of power.
+             userinitiated      - User initiated such as
+                                    software upgrade,
+                                    restore database,
+                                    restore system defaults,
+                                    restore factory defaults 
+             unrecoverableappevent - Unrecoverable application event
+             unrecoverablesysevent - Unrecoverable system event
+             hwwatchdogexpired  - Hardware watchdog expired 
+             bustxntimeout      - Bus transaction timeout 
+             hardware           - Hardware failure."
+    SYNTAX     INTEGER {
+                 poweronreset(1),
+                 userinitiated(2),
+                 unreoverableappevent(3),
+                 unrecoverablesysevent(4),
+                 hwwatchdogexpired(5),
+                 bustxntimeout(6),
+                 hardware(7)
+               }
+
+F3ConfigFileAction ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Defines the actions on configuration file.
+             none               - Unused value
+             restart-with-file  - Restart the system; System will revert to 
+                                  using system defaults and will apply the
+                                  specified configuration files on restart
+             save-delta         - Save delta configuration file : this
+                                  generates a running config delta w.r.t the
+                                  system defaults
+             remove             - Remove specified configuration file
+             save-full          - Save running configuration file and it will 
+                                  generate a full running config file
+             load-config        - Load specified delta config file without restarting."
+    SYNTAX     INTEGER {
+                 none(0),
+                 restart-with-file(1),
+                 save-delta(2),
+                 remove(3),
+                 save-full(4),
+                 load-config(5)
+               }
+
+F3ConfigFileStatus ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Defines the status of configuration file actions.
+             initial            - Initial status 
+             in-progress	- Configuration File Operation is in progress 
+             completed          - Configuration File Operation completed 
+             failed             - Configuration File Operation failed "
+    SYNTAX     INTEGER {
+                 not-applicable(0),
+                 initial(1),
+                 in-progress(2),
+                 completed(3),
+                 failed(4)
+               }
+
+TimeOfDayType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Defines the System Time Of Day Type.
+             local - System time driven by local clock
+             ntp   - System time driven by NTP client
+             ptp   - System time driven by PTP Telecom Slave
+             timeclock - Sytem time driven by time clock"
+             
+    SYNTAX     INTEGER {
+                 local(1),
+                 ntp(2),
+                 ptp(3),
+                 timeclock(4)
+               }
+
+LldpV2ConfigurationADVAExtMaxNeighborsAction ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Discard: information selected to be discarded is the 
+	    information in the current LLDPDU.
+            Deleteentry:information selected to be discarded is 
+	    currently in the LLDP remote systems MIB."
+             
+    SYNTAX     INTEGER {
+                 delete-entry(1),
+                 discard-lldppdu(2)
+               }
+
+FileTransferServerType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Defines the file transfer server Type.
+             ipaddr - server ipv4 address
+             ipv6addr   - server ipv6 address
+             hostname   - server host name
+             URL  - the URL of the remote server"
+             
+    SYNTAX     INTEGER {
+                 ipaddr (1),
+                 ipv6addr (2),
+                 hostname (3),
+                 url (4)
+               }
+
+ServerConfigType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Defines the file transfer server Type.
+             DHCP - Server is assigned by DHCP server
+             USERDEFINED   - server assinged with user configuration."
+             
+    SYNTAX     INTEGER {
+                 dhcp (1),
+                 userdefined (2)
+               }
+
+--
+--cmErrorInfoObjects
+--
+lastSetErrorInformation OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..256))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            " This provides detailed information on the last SNMP SET
+              operation failure on the enterprise MIBs."
+    ::= { cmErrorInfoObjects 1 }
+
+-- 
+-- cmCliObjects 
+--
+cliCmdPromptPrefix  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write 
+    STATUS       current
+    DESCRIPTION
+         "User specified command prompt prefix, used by the CLI, 
+          at the system level."
+    ::= { cmCliObjects 1 }
+
+
+--
+-- cmSysSecObjects
+--
+securityBanner OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..2000))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This provides ability to manage the security banner text
+           used for Graphical User Interface as well as CLI access."
+    ::= { cmSysSecObjects 1 }
+
+
+
+-- Access Control List (ACL)
+aclTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF ACLEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the access control
+             IP network addresses. Agent provides upto 10 access control
+             IP network addresses to be configured.  Access is only
+             'permitted' from these IP network addresses."
+    ::= { cmSysSecObjects 2 }
+
+aclEntry OBJECT-TYPE
+    SYNTAX     ACLEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             Access Control IP Network Address that can be configured."
+    INDEX { aclEntryIndex }
+    ::= { aclTable 1 }
+
+ACLEntry ::= SEQUENCE {
+    aclEntryIndex                   Integer32,
+    aclEntryFilterAction            CmAclFilterAction,
+    aclEntryNetworkAddress          IpAddress,
+    aclEntryNetworkMask             IpAddress,
+    aclEntryEnabled                 TruthValue,
+    aclEntryIpVersion               IpVersion,
+    aclEntryNetworkIpv6Addr         Ipv6Address,
+    aclEntryPrefixLength            Integer32
+}
+
+aclEntryIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..32)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+             an ACL entry within an ACL. The manager may not assume any
+             particular semantics or meaning to this index, except that
+             it identifies a logical row in the table."
+    ::= { aclEntry 1 }
+
+aclEntryFilterAction OBJECT-TYPE
+    SYNTAX   CmAclFilterAction 
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "Whether the network IP address specified by aclEntryNetworkAddress
+        and aclEntryNetworkMask has permission to access the system.
+        Currently, only 'permit' is supported."
+    ::= { aclEntry 2 }
+
+aclEntryNetworkAddress OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "The network IP address of the entry that will be permitted to access
+        the system."
+    ::= { aclEntry 3 }
+
+aclEntryNetworkMask OBJECT-TYPE
+    SYNTAX   IpAddress
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "The network IP mask of the entry that will be permitted to access
+        the system."
+    ::= { aclEntry 4 }
+
+aclEntryEnabled OBJECT-TYPE
+    SYNTAX   TruthValue
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This enables/disables the entity specified by
+        aclEntryNetworkAddress and aclEntryNetworkMask to access
+        the system."
+    ::= { aclEntry 5 }
+
+aclEntryIpVersion OBJECT-TYPE
+    SYNTAX   IpVersion
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe the ip version."
+    ::= { aclEntry 6 }
+
+aclEntryNetworkIpv6Addr OBJECT-TYPE
+    SYNTAX   Ipv6Address
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe the ipv6 adress."
+    ::= { aclEntry 7 }
+
+aclEntryPrefixLength OBJECT-TYPE
+    SYNTAX   Integer32 (0..128)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object describe the ipv6 Prefix length."
+    ::= { aclEntry 8 }
+
+serialPortDisconnectAutoLogOff OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This provides ability to manage the property of the system, which 
+           causes Auto Logoff of the user session on the serial port, when 
+           the serial port is disconnected." 
+    ::= { cmSysSecObjects 3 }
+
+securityPromptEnabled OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write 
+    STATUS       current
+    DESCRIPTION
+         "This object allows management of the CLI security prompt."
+    ::= { cmSysSecObjects 4 }
+
+--
+-- cmAccessProtocols
+--
+telnetEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This provides ability to enable/disable the TELNET protocol on the
+           system."
+    ::= { cmAccessProtocols 1 }
+
+sshEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This provides ability to enable/disable the Secure Shell protocol 
+           on the system."
+    ::= { cmAccessProtocols 2 }
+
+ftpEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This provides ability to enable/disable the File Transfer Protocol 
+           (FTP) on the system."
+    ::= { cmAccessProtocols 3 }
+
+scpEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This provides ability to enable/disable the Secure Copy (SCP) 
+           on the system."
+    ::= { cmAccessProtocols 4 }
+
+serialPortEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This provides ability to enable/disable the Serial Port 
+           on the system."
+    ::= { cmAccessProtocols 5 }
+
+httpEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This provides ability to enable/disable the HTTP protocol
+           on the system."
+    ::= { cmAccessProtocols 6 }
+
+httpsEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This provides ability to enable/disable the HTTP protocol
+           on the system."
+    ::= { cmAccessProtocols 7 }
+
+sftpEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This provides ability to enable/disable the SFTP protocol
+           on the system."
+    ::= { cmAccessProtocols 8 }
+
+tftpEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This provides ability to enable/disable the TFTP protocol
+           on the system."
+    ::= { cmAccessProtocols 9 }
+
+--
+--system Mode Objects
+--
+ntpMode OBJECT-TYPE
+    SYNTAX     CmNtpMode 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This provides ability to manage the Network Time Protocol (NTP)
+           mode on the system.  Currently, the system only supports 
+           'client' mode."
+    ::= { cmSysModeObjects 1 }
+
+autoProvMode OBJECT-TYPE
+    SYNTAX     INTEGER {
+                 off(1),
+                 confirm(2),
+                 auto(3) 
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This provides ability to manage the Auto Provisioning Mode 
+           on the system.  If the auto provisioning mode is 'off', auto 
+           discovery is disabled.  Network Elements (shelves) need to be 
+           manually configured from the user interfaces.  If the auto 
+           provisioning mode is 'confirm', Network Elements (shelves) are
+           auto discovered, however, they need to be accepted explicitly from
+           user interfaces to be managed.  If the auto provisioning mode
+           is 'auto', Network Elements (shelves) are auto discovered and
+           auto provisioned, as permanent, in the system."
+    ::= { cmSysModeObjects 2 }
+
+sysTimeOfDayType OBJECT-TYPE
+    SYNTAX     TimeOfDayType 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object provides ability to configure System Time of Day source.
+          This can be local, ntp or ptp. 
+          Before setting sysTimeOfDayType the f3PtpSysTimeOfDayClock object must be
+          set to configure PTP Telecom Slave object to be used as Clock source."
+    ::= { cmSysModeObjects 3 }
+
+ntpServerConfigType OBJECT-TYPE
+    SYNTAX      ServerConfigType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object describe the ntp server configure type."
+    ::= { cmSysModeObjects 4 }
+
+sysLogServerConfigType OBJECT-TYPE
+    SYNTAX      ServerConfigType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object describe the sys log server configure type."
+    ::= { cmSysModeObjects 5 }
+
+sysUseUtcLeapOffsetEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This attribute indicates whether to use the currentUtcLeapOffset 
+            in Announce message from PTP to get UTC time from TAI based 
+            timestamps in case we want DM/TWAMP timestamping based on UTC time. 
+            This attribute only works when PTP/TimeClock is configured as source of system time of day."
+    ::= { cmSysModeObjects 6 }
+
+
+--
+-- File Services functionality
+--
+fileServicesAction OBJECT-TYPE
+    SYNTAX     INTEGER {
+                 not-applicable(0),
+                 get-database(1),
+                 put-database(2),
+                 software-copy(3),
+                 get-sys-database(4),
+                 put-sys-database(5),
+                 get-defaultsvalue-file(6),
+                 put-sysresetdebuginfo-file(7),
+                 put-securitylog-file(8),
+                 put-alarmlog-file(9),
+                 put-auditlog-file(10),
+                 get-config-file(11),
+                 put-config-file(12),
+                 put-sat-result(13)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object is write only.  Setting this object initiates
+             a file transfer 
+
+             Supported actions are:
+             get-database(1)     - Copy a backup database from a
+                                   remote server and place it in the staging
+                                   area.  (See databaseAction)
+             put-database(2)     - Copy a backup database to a remote
+                                   server.  (See databaseAction)
+             software-copy(3)    - Transfer a software image file to the
+                                   system and write it to the standby 
+                                   partition.
+             get-sys-database(4) - Copy a system database from a
+                                   remote server and place it in the staging
+                                   area.  (See databaseAction)
+             put-sys-database(5) - Copy a system database to a remote
+                                   server.  (See databaseAction)
+             get-defaultsvalue-file(6) - Transfer the Defaults Value file 
+                                   to the system.
+             put-sysresetdebuginfo-file(7) - Transfer the System Reset Debug Information 
+                                   file to a remote server.
+             put-securitylog-file(8) - Transfer the System Security Log Information 
+                                   file to a remote server.
+             put-alarmlog-file(9) - Transfer the System Alarm Log Information 
+                                    file to a remote server.
+             put-audit-file(10)   - Transfer the System Audit Log Information 
+                                    file to a remote server.
+             get-config-file(11)  - Transfer the Configuration File from a remote server. 
+             put-config-file(12)  - Transfer the Configuration File to a remote server. 
+             put-sat-result(13)   - Transfer the SAT test result file to a remote server." 
+    ::= { cmFileServicesObjects 1 }
+
+fileServicesMethod OBJECT-TYPE
+    SYNTAX     CmFileTransferMethod 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Specifies the method of transferring the file.  Note
+             that web(4) is a read-only enumeration."
+    ::= { cmFileServicesObjects 2 }
+
+fileServicesServerIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "IP address of the remote server.  The value of this
+             object is cleared when fileServicesAction is set."
+    ::= { cmFileServicesObjects 3 }
+
+fileServicesUserId OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..32))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "User ID to use to authenticate the file transfer.  The value
+             of this object is cleared when fileServicesAction is set."
+    ::= { cmFileServicesObjects 4 }
+
+fileServicesPassword OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..32))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "User password to authenticate the file transfer.
+             Reading this object will return an empty string if the
+             password has not been set or ***** if the password has
+             been set.  The value of this object is cleared when
+             fileServicesAction is set."
+    ::= { cmFileServicesObjects 5 }
+
+fileServicesRemoteFile OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..256))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Path and name of the remote file.  The value of this object
+             is cleared when fileServicesAction is set."
+    ::= { cmFileServicesObjects 6 }
+
+fileServicesStatus OBJECT-TYPE
+    SYNTAX     CmFileServicesStatus 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Status of the user initiated file transfer."
+    ::= { cmFileServicesObjects 7 }
+
+fileServicesPercentComplete OBJECT-TYPE
+    SYNTAX     Integer32 (0..100)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Percent completion of operation."
+    ::= { cmFileServicesObjects 8 }
+
+fileServicesMode OBJECT-TYPE
+    SYNTAX     CmFileServicesMode 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object provides information on the current state
+             of file services."
+    ::= { cmFileServicesObjects 9 }
+
+fileServicesServerType OBJECT-TYPE
+    SYNTAX     FileTransferServerType 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object describe the remote server's address type."
+    ::= { cmFileServicesObjects 10 }
+
+fileServicesServerIpv6Addr OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "IPv6 address of the remote server.  The value of this
+             object is cleared when fileServicesAction is set."
+    ::= { cmFileServicesObjects 11 }
+
+
+--
+--Database Objects
+--
+databaseAction OBJECT-TYPE
+    SYNTAX     INTEGER {
+                 not-applicable(0),
+                 backup(1),
+                 restore(2),
+                 activate(3),
+                 save-sysdefaults(4),
+                 new-sysdefaults(5),
+                 restore-sysdefaults(6),
+                 restore-factorydefaults(7),
+                 propagate-to-standby-nemi(8),
+                 force-normal(9)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Initiates a configuration database action.  This object is
+             write only.  Supported actions are:
+             backup(1)          - Backup the saved configuration database.
+             restore(2)         - Restore the database to the standby partition.
+             activate(3)        - Switches the standby and active partitions and
+                                  restarts the system.
+             save-sysdefaults(4) - Save the database as system defaults.
+             new-sysdefaults(5) - Restart the system and overwrite the
+                                  old system default database with the
+                                  factory default database.
+             restore-sysdefaults(6) - Restart the system using the system
+                                  default database. 
+             restore-factorydefaults(7) - Restart the system using the factory
+                                  default database.
+             propagate-to-standby-nemi(8) - Propagate the running database 
+                                  to standby NEMI and activate it.
+             force-normal(9)    - Accept the database of the NEMI when the NEMI is in DB_maint status."
+    ::= { cmDatabaseObjects 1 }
+
+databaseLastSaveTime  OBJECT-TYPE
+    SYNTAX    DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object gives value of the last database save time." 
+    ::= { cmDatabaseObjects 2 }
+
+databaseTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF DatabaseEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table lists information about thns."
+    ::= { cmDatabaseObjects 3 }
+
+databaseEntry OBJECT-TYPE
+    SYNTAX     DatabaseEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A conceptual row in the databaseTable."
+    INDEX { databaseIndex }
+    ::= { databaseTable 1 }
+
+DatabaseEntry ::= SEQUENCE {
+    databaseIndex    Integer32,
+    databaseType     CmVersionType,
+    databaseVersion  DisplayString
+}
+
+databaseIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary integer index value used to uniquely identify
+         an entry within the databaseTable."
+    ::= { databaseEntry 1 }
+
+databaseType OBJECT-TYPE
+    SYNTAX      CmVersionType 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of database partition."
+    ::= { databaseEntry 2 }
+
+databaseVersion OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..16)) 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The database version string."
+    ::= { databaseEntry 3 }
+
+--
+-- Software Upgrade
+--
+softwareAction OBJECT-TYPE
+    SYNTAX     INTEGER {
+                 not-applicable(0),
+                 install(1),
+                 schedule-upgrade(2),
+                 cancel-upgrade(3),
+                 validate-upgrade(4),
+                 revert-upgrade(5),
+                 propagate-to-standby-nemi(6)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object is write only.  Setting this object initiates
+         the specified action.
+
+         Supported actions are:
+         install(1)          - Install software. 
+         schedule-upgrade(2) - Schedule a software upgrade.  At the
+                               scheduled time, the system will reboot and
+                               load the software image stored on the
+                               standby partition.  The scheduled time
+                               can be specified by softwareUpgradeTime.
+                               Also see softwareValidationTimer.
+         cancel-upgrade(3)   - Cancel a scheduled software upgrade.
+         validate-upgrade(4) - Indicate software as valid and cancel the
+                               validation timer. 
+         revert-upgrade(5)   - Revert to previous software image if it 
+                               still exists.
+         propagate-to-standby-nemi(6) - Propagate the running software release 
+                               to standby NEMI and active it."
+    ::= { cmSoftwareObjects 1 }
+
+softwareUpgradeTime OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Specifies the date and time to perform a software upgrade reboot.
+         If this object is set to a date and time in the past or has never
+         been set, the upgrade reboot will happen as soon as softwareAction
+         is set to schedule-upgrade(2).  This value becomes read-only when
+         an upgrade has been scheduled.  Default value is 1-1-2000 00:00:00."
+    ::= { cmSoftwareObjects 2 }
+
+softwareValidationTimer OBJECT-TYPE
+    SYNTAX     INTEGER (0 | 10..720)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Time in minutes before the system will reboot and revert to the active
+         software after a software upgrade.  If set to 0, the timer is
+         disabled and the software will automatically be validated after
+         a software upgrade reboot.  This object becomes read-only when
+         the software validation timer is active.  Default value is 0.
+         When enabled, valid values of the timer range from 10 minutes to 720 minutes."
+    ::= { cmSoftwareObjects 3 }
+
+softwareTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF SoftwareEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table lists information about the software installed
+         in the active and standby partitions."
+    ::= { cmSoftwareObjects 4 }
+
+softwareEntry OBJECT-TYPE
+    SYNTAX     SoftwareEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A conceptual row in the softwareTable."
+    INDEX { softwareIndex }
+    ::= { softwareTable 1 }
+
+SoftwareEntry ::= SEQUENCE {
+    softwareIndex    Integer32,
+    softwareType     CmVersionType,
+    softwareVersion  DisplayString
+    }
+
+softwareIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary integer index value used to uniquely identify
+         an entry within the softwareTable."
+    ::= { softwareEntry 1 }
+
+softwareType OBJECT-TYPE
+    SYNTAX      CmVersionType 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of software partition."
+    ::= { softwareEntry 2 }
+
+softwareVersion OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..16)) 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The software version string."
+    ::= { softwareEntry 3 }
+
+
+--
+--Logging
+--sysLogServer
+--
+cmSysLogObjects            OBJECT IDENTIFIER ::= {cmLogObjects 1}
+cmSecLogObjects            OBJECT IDENTIFIER ::= {cmLogObjects 2}
+cmAuditLogObjects          OBJECT IDENTIFIER ::= {cmLogObjects 3}
+cmAlarmLogObjects          OBJECT IDENTIFIER ::= {cmLogObjects 4}
+
+sysLogServerTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF SysLogServerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table allows configuration of the remote syslog hosts."
+    ::= { cmSysLogObjects 1 }
+
+sysLogServerEntry OBJECT-TYPE
+    SYNTAX     SysLogServerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A conceptual row in the sysLogServerTable."
+    INDEX { sysLogServerIndex }
+    ::= { sysLogServerTable 1 }
+
+SysLogServerEntry ::= SEQUENCE {
+        sysLogServerIndex   Integer32,
+        sysLogIpAddress     IpAddress,
+        sysLogPort          Integer32,
+        sysLogIpVersion     IpVersion,
+        sysLogIpv6Addr      Ipv6Address
+    }
+
+sysLogServerIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer index value used to uniquely identify
+         an entry within the sysLogServerTable."
+    ::= { sysLogServerEntry 1 }
+
+sysLogIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "IP address of the remote syslog server. Value of 0.0.0.0 indicates
+             the sys log server is not configured."
+    ::= { sysLogServerEntry 2 }
+
+sysLogPort OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Optional port address of the remote log server.  If not specified,
+             the default port for the standard syslog utility (UDP Port 514)
+             will be used."
+    ::= { sysLogServerEntry 3 }
+
+sysLogIpVersion OBJECT-TYPE
+    SYNTAX      IpVersion
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object describe the ip version."
+    ::= { sysLogServerEntry 4 }
+
+sysLogIpv6Addr OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object describe the ipv6 address."
+    ::= { sysLogServerEntry 5 }
+
+--
+-- security log
+--
+secLog2sysLogEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write 
+    STATUS     current
+    DESCRIPTION
+        "This allows to enable/disable the system security log to syslog."
+    ::= { cmSecLogObjects 1 }
+
+--
+-- audit log
+--
+auditLog2sysLogEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write 
+    STATUS     current
+    DESCRIPTION
+        "This allows to enable/disable the system audit log to syslog."
+    ::= { cmAuditLogObjects 1 }
+
+auditLog2fileEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write 
+    STATUS     current
+    DESCRIPTION
+        "This allows to enable/disable the system audit log to file."
+    ::= { cmAuditLogObjects 2 }
+
+--
+-- alarm log
+--
+alarmLog2sysLogEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write 
+    STATUS     current
+    DESCRIPTION
+        "This allows to enable/disable the system alarm log to syslog."
+    ::= { cmAlarmLogObjects 1 }
+
+alarmLog2fileEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write 
+    STATUS     current
+    DESCRIPTION
+        "This allows to enable/disable the system alarm log to file."
+    ::= { cmAlarmLogObjects 2 }
+
+--
+--NTP client
+--
+ntpClientEnabled  OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write 
+    STATUS     current
+    DESCRIPTION
+        "This allows to enable/disable the NTP client."
+    ::= { cmTimeObjects 1 }
+
+ntpPrimaryServer OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "IP address of the primary remote NTP time server. Value of 0.0.0.0 
+             indicates the NTP server is not configured."
+    ::= { cmTimeObjects 2 }
+
+ntpBackupServer OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "IP address of the backup remote NTP time server. Value of 0.0.0.0
+             indicates the NTP server is not configured."
+    ::= { cmTimeObjects 3 }
+
+ntpType OBJECT-TYPE
+    SYNTAX      CmNtpType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Type of communication with the remote NTP server."
+    ::= { cmTimeObjects 4 }
+
+ntpActiveServer OBJECT-TYPE
+    SYNTAX      CmNtpServerType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indication of which server is currently active."
+    ::= { cmTimeObjects 5 }
+
+ntpSwitchServer OBJECT-TYPE
+    SYNTAX      CmNtpServerType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Operation to switch the NTP Server."
+    ::= { cmTimeObjects 6 }
+
+ntpServerRoundTripDelay OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object provides the round-trip delay (in microseconds) 
+             to the NTP Server.  
+             It returns a value of 0 if NTP is not enabled."
+    ::= { cmTimeObjects 7 }
+
+ntpServerPrecision OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object provides the precision (in microseconds) 
+             to the NTP Server."
+    ::= { cmTimeObjects 8 }
+
+ntpPollingInterval OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object allows ability to configure the NTP polling
+             interval in seconds.  Polling interval is the time 
+             between successive NTP client requests to update local
+             time based on time at the NTP server."
+    ::= { cmTimeObjects 9 }
+
+ntpPrimaryServerIpVersion OBJECT-TYPE
+    SYNTAX      IpVersion
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object describe the ipversion of ntp server."
+    ::= { cmTimeObjects 10 }
+
+ntpPrimaryServerIpv6Addr OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object describe the ipv6 adress of ntp primary server."
+    ::= { cmTimeObjects 11 }
+
+ntpBackupServerIpVersion OBJECT-TYPE
+    SYNTAX      IpVersion
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object describe the ipversion of ntp server."
+    ::= { cmTimeObjects 12 }
+
+ntpBackupServerIpv6Addr OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object describe the ipv6 adress of ntp backup server."
+    ::= { cmTimeObjects 13 }
+
+--SNMP extensions
+f3SnmpTargetAddrExtTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3SnmpTargetAddrExtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table is an extension of the standard snmpTargetAddrTable(SNMP-TARGET-MIB).
+         This table is used to manage the SNMP Dying Gasp support."
+    ::= { cmSnmpObjects 1 }
+
+f3SnmpTargetAddrExtEntry OBJECT-TYPE
+    SYNTAX     F3SnmpTargetAddrExtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A conceptual row in the f3SnmpTargetAddrExtTable."
+    INDEX { IMPLIED snmpTargetAddrName }
+    ::= {  f3SnmpTargetAddrExtTable 1 }
+
+F3SnmpTargetAddrExtEntry ::= SEQUENCE {
+        f3SnmpTargetAddrExtDyingGaspPort        VariablePointer,
+        f3SnmpTargetAddrExtDyingGaspEnabled     TruthValue,
+        f3SnmpTargetAddrExtDyingGaspActive      TruthValue,
+        f3SnmpTargetAddrExtBulkTrapsEnabled     TruthValue
+    }
+
+f3SnmpTargetAddrExtDyingGaspPort OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "When SNMP Dying Gasp is enabled at Card level, 
+             this attribute provides information on the interface (physical port) 
+             through which this Target Address is reachable 
+             (using Layer 3 ping, trace route)."
+    ::= { f3SnmpTargetAddrExtEntry 1 }
+
+f3SnmpTargetAddrExtDyingGaspEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "When SNMP Dying Gasp is enabled at Card level, 
+             this attribute specifies whether this Target Address entry should be 
+             used in the SNMP Dying Gasp TRAP PDU or not."
+    ::= { f3SnmpTargetAddrExtEntry 2 }
+
+f3SnmpTargetAddrExtDyingGaspActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "When SNMP Dying Gasp is enabled at Card level, in case of 
+             multiple target addresses resolving to the same interface (port), 
+             this flag indicates which target address is used for the SNMP TRAP PDU."
+    ::= { f3SnmpTargetAddrExtEntry 3 }
+
+f3SnmpTargetAddrExtBulkTrapsEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Provides ability to enable/disable the Snmp Bulk Traps on
+             the Target Address."
+    ::= { f3SnmpTargetAddrExtEntry 4 }
+
+f3SnmpEngineID     OBJECT-TYPE
+    SYNTAX       SnmpEngineID
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION "An SNMP engine's administratively-unique identifier.
+
+                 Please note that f3SnmpEngineID differs from the
+                 standard snmpEngineID (SNMP-FRAMEWORK-MIB) with 
+                 MAX-ACCESS as read-write."
+    ::= { cmSnmpObjects 2 }
+
+f3SnmpLongIfAlias OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+    "This provides ability to enable/disable longer version of ifAlias. If enabled, ifAlias variable can support
+     up to 255 character string and when disabled ifAlias is limited to 64 character string. When disabled and if
+     alias is longer than 64 characters the ifAlias will return a string that is truncated to 64 characters."
+    ::= { cmSnmpObjects 3 }
+
+
+
+-- System Last Reset Cause Objects
+f3SysLastResetType    OBJECT-TYPE
+    SYNTAX       RestartType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION "This provides the System Last Reset Type."
+    ::= { cmResetCauseObjects 1 }
+
+f3SysLastResetCauseType    OBJECT-TYPE
+    SYNTAX       CmRestartCauseType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION "This provides the System Last Reset Cause Type."
+    ::= { cmResetCauseObjects 2 }
+
+f3SysLastAbnormalResetTimestamp1    OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION 
+          "This provides the timestamp of the most recent abnormal reset.
+           Note that the system keeps debug logs with 3 most recent 
+           abnormal resets. 8 octets of 0 value indicates that
+           there was no abnormal reset of the system."
+    ::= { cmResetCauseObjects 3 }
+
+f3SysLastAbnormalResetTimestamp2    OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION 
+          "This provides the timestamp of the second most recent abnormal reset.
+           Note that the system keeps debug logs with 3 most recent 
+           abnormal resets. 8 octets of 0 value indicates that
+           there was only one (f3SysLastAbnormalResetTimestamp1) abnormal
+           reset of the system."
+    ::= { cmResetCauseObjects 4 }
+
+f3SysLastAbnormalResetTimestamp3    OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION 
+          "This provides the timestamp of the third most recent abnormal reset.
+           Note that the system keeps debug logs with 3 most recent 
+           abnormal resets. 8 octets of 0 value indicates that
+           there were only two (f3SysLastAbnormalResetTimestamp1, 
+           f3SysLastAbnormalResetTimestamp2) abnormal resets of the system."
+    ::= { cmResetCauseObjects 5 }
+
+---
+--- Database Synchronization Trap Object
+---
+f3DatabaseSyncTrapObject    OBJECT-TYPE
+    SYNTAX       VariablePointer
+    MAX-ACCESS   not-accessible 
+    STATUS       current
+    DESCRIPTION 
+          "This object provides the Object Identifier (OID) of the entity
+           that needs to be synchronized.  This object is not accessible,
+           it is only carried in the f3DatabaseSyncTrap notification." 
+    ::= { f3NotifObjects 1 }
+
+
+---
+--- Start Ne Event Log Index Object
+---
+f3StartNeEventLogIndex    OBJECT-TYPE
+    SYNTAX       TrapCounter
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+          "This object provides the associated neEventsLogged counter
+           for the logged first event (trap) in the bulk trap."
+    ::= { f3BulkNotifObjects 1 }
+
+---
+--- End Ne Event Log Index Object
+---
+f3EndNeEventLogIndex    OBJECT-TYPE
+    SYNTAX       TrapCounter
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This object provides the associated neEventsLogged counter
+         for the logged last event (trap) in the bulk trap."
+    ::= { f3BulkNotifObjects 2 }
+
+---
+--- Configuration Files Object
+---
+f3ConfigFileActionFileName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..256))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "Configuration File name on which configFileAction is initiated."
+    ::= { f3ConfigFileObjects 1 }
+
+f3ConfigFileAction OBJECT-TYPE
+    SYNTAX     F3ConfigFileAction 
+    MAX-ACCESS read-write 
+    STATUS     current
+    DESCRIPTION
+            "Configuration File action to invoke config file operations."
+    ::= { f3ConfigFileObjects 2 }
+
+f3ConfigFileStatus OBJECT-TYPE
+    SYNTAX     F3ConfigFileStatus 
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+            "This object provides status of Configuration File actions."
+    ::= { f3ConfigFileObjects 3 }
+
+f3ConfigFileErrorInformation OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..512)) 
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+            "This object provides additional information for failed 
+             Configuration File actions."
+    ::= { f3ConfigFileObjects 4 }
+
+f3ConfigFileTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3ConfigFileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table lists information about the configuration files that
+         are resident on the node."
+    ::= { f3ConfigFileObjects 5 }
+
+f3ConfigFileEntry OBJECT-TYPE
+    SYNTAX     F3ConfigFileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A conceptual row in the f3ConfigFileTable."
+    INDEX { f3ConfigFileIndex }
+    ::= { f3ConfigFileTable 1 }
+
+F3ConfigFileEntry ::= SEQUENCE {
+        f3ConfigFileIndex        Integer32,
+        f3ConfigFileName         DisplayString, 
+        f3ConfigFileDescription  DisplayString
+    }
+
+f3ConfigFileIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary integer index value used to uniquely identify
+         an entry within the f3ConfigFileTable."
+    ::= { f3ConfigFileEntry 1 }
+
+f3ConfigFileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+        "Name of the configuration file."
+    ::= { f3ConfigFileEntry 2 }
+
+f3ConfigFileDescription OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..256)) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "User description of the configuration file."
+    ::= { f3ConfigFileEntry 3 }
+
+f3ConfigFilePercentComplete OBJECT-TYPE
+    SYNTAX     Integer32 (0..100)
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+            "This object provides configure file percent complete."
+    ::= { f3ConfigFileObjects 6 }
+
+--
+--Feature Management Objects
+--
+f3SystemFeatureTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3SystemFeatureEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table allows ability to manage enabling/disabling system features." 
+    ::= { cmFeatureManagementObjects 1 }
+
+f3SystemFeatureEntry OBJECT-TYPE
+    SYNTAX     F3SystemFeatureEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A conceptual row in the f3SystemFeatureTable."
+    INDEX { f3SystemFeatureIndex }
+    ::= { f3SystemFeatureTable 1 }
+
+F3SystemFeatureEntry ::= SEQUENCE {
+    f3SystemFeatureIndex     Integer32,
+    f3SystemFeatureName      DisplayString,
+    f3SystemFeatureEnabled   TruthValue
+}
+
+f3SystemFeatureIndex OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary integer index value used to uniquely identify
+         an entry within the f3SystemFeatureTable."
+    ::= { f3SystemFeatureEntry 1 }
+
+f3SystemFeatureName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides the name of the system feature."
+    ::= { f3SystemFeatureEntry 2 }
+
+f3SystemFeatureEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object allows system feature control.  If a specific feature
+         is disabled, the relevant operations to use that feature are denied." 
+    ::= { f3SystemFeatureEntry 3 }
+
+--
+--LLDPV2 DestAddress Ext Objects
+--
+f3SystemLldpV2DestAddressADVAExtTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3SystemLldpV2DestAddressADVAExtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This extension table adds a row status to allow user add/delete/edit the LLDP 
+        Destination Address which is defined to Read-Only in the standard MIB." 
+    ::= { cmLldpV2DestAdressADVAExtObjects 1 }
+
+f3SystemLldpV2DestAddressADVAExtEntry OBJECT-TYPE
+    SYNTAX     F3SystemLldpV2DestAddressADVAExtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A conceptual row in the f3SystemLldpV2DestAddressADVAExtTable."
+    INDEX { f3SystemLldpV2DestAddressADVAExtIndex }
+    ::= { f3SystemLldpV2DestAddressADVAExtTable 1 }
+
+F3SystemLldpV2DestAddressADVAExtEntry ::= SEQUENCE {
+    f3SystemLldpV2DestAddressADVAExtIndex     Integer32,
+    f3SystemLldpV2ADVAExtDestMacAddress       MacAddress,
+    f3SystemLldpV2DestAddressADVAExtRowStatus RowStatus
+}
+
+f3SystemLldpV2DestAddressADVAExtIndex OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary integer index value used to uniquely identify
+         an entry within the f3SystemLldpV2DestAddressADVAExtTable."
+    ::= { f3SystemLldpV2DestAddressADVAExtEntry 1 }
+
+f3SystemLldpV2ADVAExtDestMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This attribute description the standard MIB about LLDP Destination Mac Address."
+    ::= { f3SystemLldpV2DestAddressADVAExtEntry 2 }
+
+f3SystemLldpV2DestAddressADVAExtRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The status of this row.
+             The f3SystemLldpV2DestAddressADVAExtRowStatus object may be modified if
+             the associated instance of this object is equal to active(1),
+             notInService(2), or notReady(3)."
+    ::= { f3SystemLldpV2DestAddressADVAExtEntry 3 }
+
+--
+--LLDPV2 Port Config Address Ext Objects
+--
+f3SystemLldpV2PortConfigADVAExtTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3SystemLldpV2PortConfigADVAExtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This extension table adds a row status to allow user add/delete/edit the LLDP 
+        Destination Address for one port." 
+    ::= { cmLldpV2DestAdressADVAExtObjects 2 }
+
+f3SystemLldpV2PortConfigADVAExtEntry OBJECT-TYPE
+    SYNTAX     F3SystemLldpV2PortConfigADVAExtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A conceptual row in the f3SystemLldpV2PortConfigADVAExtTable."
+    INDEX { f3SystemLldpV2PortConfigADVAExtIfIndex, f3SystemLldpV2PortConfigADVAExtDestAddressIndex }
+    ::= { f3SystemLldpV2PortConfigADVAExtTable 1 }
+
+F3SystemLldpV2PortConfigADVAExtEntry ::= SEQUENCE {
+    f3SystemLldpV2PortConfigADVAExtIfIndex                InterfaceIndex,
+    f3SystemLldpV2PortConfigADVAExtDestAddressIndex       LldpV2DestAddressTableIndex,
+    f3SystemLldpV2PortConfigADVAExtAdminStatus            INTEGER,
+    f3SystemLldpV2PortConfigADVAExtNotificationEnable     TruthValue,
+    f3SystemLldpV2PortConfigADVAExtTLVsTxEnable           BITS,
+    f3SystemLldpV2PortConfigADVAExtStorageType            StorageType,
+    f3SystemLldpV2PortConfigADVAExtRowStatus              RowStatus
+}
+
+f3SystemLldpV2PortConfigADVAExtIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface index value used to identify the port
+            associated with this entry. Its value is an index into
+            the interfaces MIB.
+
+            The value of this object is used as an index to the
+            f3SystemLldpV2PortConfigADVAExtTable."
+    ::= { f3SystemLldpV2PortConfigADVAExtEntry 1 }
+
+f3SystemLldpV2PortConfigADVAExtDestAddressIndex OBJECT-TYPE
+    SYNTAX      LldpV2DestAddressTableIndex 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index value used to identify the destination
+            MAC address associated with this entry. Its value identifies
+            the row in the lldpV2DestAddressTable where the MAC address
+            can be found.
+
+            The value of this object is used as an index to the
+            f3SystemLldpV2PortConfigADVAExtTable."
+    ::= { f3SystemLldpV2PortConfigADVAExtEntry 2 }
+
+f3SystemLldpV2PortConfigADVAExtAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER { 
+       txOnly(1), 
+       rxOnly(2),
+       txAndRx(3),
+       disabled(4)
+    } 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The administratively desired status of the local LLDP agent.
+
+            If the associated f3SystemLldpV2PortConfigADVAExtAdminStatus object is
+            set to a value of 'txOnly(1)', then LLDP agent transmits
+            LLDPframes on this port and it does not store any
+            information about the remote systems connected.
+         
+            If the associated f3SystemLldpV2PortConfigADVAExtAdminStatus object is 
+            set to a value of 'rxOnly(2)', then the LLDP agent
+            receives, but it does not transmit LLDP frames on this port.
+
+            If the associated f3SystemLldpV2PortConfigADVAExtAdminStatus object is set
+            to a value of 'txAndRx(3)', then the LLDP agent transmits
+            and receives LLDP frames on this port.
+
+            If the associated f3SystemLldpV2PortConfigADVAExtAdminStatus object is set
+            to a value of 'disabled(4)', then LLDP agent does not
+            transmit or receive LLDP frames on this port. If there is
+            remote systems information which is received on this port
+            and stored in other tables, before the port's
+            f3SystemLldpV2PortConfigADVAExtAdminStatus becomes disabled, then that
+            information is deleted."
+    REFERENCE 
+            "9.2.5.1"
+    DEFVAL  { txAndRx }  
+   ::= { f3SystemLldpV2PortConfigADVAExtEntry 3 }
+
+
+
+f3SystemLldpV2PortConfigADVAExtNotificationEnable OBJECT-TYPE 
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write 
+    STATUS     current 
+    DESCRIPTION 
+            "The f3SystemLldpV2PortConfigADVAExtNotificationEnable controls, on a per
+            agent basis, whether or not notifications from the agent
+            are enabled. The value true(1) means that notifications are
+            enabled; the value false(2) means that they are not."
+    DEFVAL  { false }    
+   ::= { f3SystemLldpV2PortConfigADVAExtEntry 4 } 
+
+f3SystemLldpV2PortConfigADVAExtTLVsTxEnable OBJECT-TYPE
+    SYNTAX      BITS {
+            portDesc(0),
+            sysName(1),
+            sysDesc(2),
+            sysCap(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The f3SystemLldpV2PortConfigADVAExtTLVsTxEnable, defined as a bitmap,
+            includes the basic set of LLDP TLVs whose transmission is
+            allowed on the local LLDP agent by the network management.
+            Each bit in the bitmap corresponds to a TLV type associated
+            with a specific optional TLV.
+
+            It should be noted that the organizationally-specific TLVs
+            are excluded from the f3SystemLldpV2PortConfigADVAExtTLVsTxEnable bitmap.
+            
+            LLDP Organization Specific Information Extension MIBs should
+            have similar configuration object to control transmission
+            of their organizationally defined TLVs.
+
+            The bit 'portDesc(0)' indicates that LLDP agent should
+            transmit 'Port Description TLV'.
+
+            The bit 'sysName(1)' indicates that LLDP agent should transmit
+            'System Name TLV'.
+
+            The bit 'sysDesc(2)' indicates that LLDP agent should transmit
+            'System Description TLV'.
+
+            The bit 'sysCap(3)' indicates that LLDP agent should transmit
+            'System Capabilities TLV'.
+
+            There is no bit reserved for the management address TLV type
+            since transmission of management address TLVs are controlled
+            by another object, lldpV2ConfigManAddrTable.
+
+            The default value for f3SystemLldpV2PortConfigADVAExtTLVsTxEnable object is
+            empty set, which means no enumerated values are set.
+
+            The value of this object is restored from non-volatile
+            storage after a re-initialization of the management system."
+    REFERENCE 
+            "9.1.2.1"
+    DEFVAL  { { } }
+    ::= { f3SystemLldpV2PortConfigADVAExtEntry 5 }
+
+f3SystemLldpV2PortConfigADVAExtStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+              "The storage type for this conceptual row."
+   ::= { f3SystemLldpV2PortConfigADVAExtEntry 6 }
+
+f3SystemLldpV2PortConfigADVAExtRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3SystemLldpV2PortConfigADVAExtRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3SystemLldpV2PortConfigADVAExtRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The f3SystemLldpV2PortConfigADVAExtRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+   ::= { f3SystemLldpV2PortConfigADVAExtEntry 7 }
+
+--
+--LLDPV2 Man Address Config Tx Ports Ext Objects
+--
+f3SystemLldpV2ManAddrConfigTxPortsADVAExtTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3SystemLldpV2ManAddrConfigTxPortsADVAExtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This extension table adds a row status to allow user add/delete/edit the LLDP 
+        Destination Address for one port." 
+    ::= { cmLldpV2DestAdressADVAExtObjects 3 }
+
+f3SystemLldpV2ManAddrConfigTxPortsADVAExtEntry OBJECT-TYPE
+    SYNTAX     F3SystemLldpV2ManAddrConfigTxPortsADVAExtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A conceptual row in the f3SystemLldpV2ManAddrConfigTxPortsADVAExtTable."
+    INDEX { f3SystemLldpV2PortConfigADVAExtIfIndex, f3SystemLldpV2PortConfigADVAExtDestAddressIndex,
+            f3SystemLldpV2ManAddrConfigTxPortsADVAExtRefInterface}
+    ::= { f3SystemLldpV2ManAddrConfigTxPortsADVAExtTable 1 }
+
+F3SystemLldpV2ManAddrConfigTxPortsADVAExtEntry ::= SEQUENCE {
+    f3SystemLldpV2ManAddrConfigTxPortsADVAExtRefInterface VariablePointer,
+    f3SystemLldpV2ManAddrConfigTxPortsADVAExtEnable       TruthValue,
+    f3SystemLldpV2ManAddrConfigTxPortsADVAExtStorageType  StorageType,
+    f3SystemLldpV2ManAddrConfigTxPortsADVAExtRowStatus    RowStatus
+}
+
+f3SystemLldpV2ManAddrConfigTxPortsADVAExtRefInterface OBJECT-TYPE 
+    SYNTAX     VariablePointer
+    MAX-ACCESS not-accessible 
+    STATUS     current 
+    DESCRIPTION 
+            "This object describe the Tx Port is on what interface,
+            its value should be management tunnel or one dcn or none." 
+   ::= { f3SystemLldpV2ManAddrConfigTxPortsADVAExtEntry 1 } 
+
+f3SystemLldpV2ManAddrConfigTxPortsADVAExtEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object describe the interface on Tx Ports whether enabled."
+    ::= { f3SystemLldpV2ManAddrConfigTxPortsADVAExtEntry 2 }
+
+f3SystemLldpV2ManAddrConfigTxPortsADVAExtStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+              "The storage type for this conceptual row."
+   ::= { f3SystemLldpV2ManAddrConfigTxPortsADVAExtEntry 3 }
+
+f3SystemLldpV2ManAddrConfigTxPortsADVAExtRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3SystemLldpV2ManAddrConfigTxPortsADVAExtRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3SystemLldpV2ManAddrConfigTxPortsADVAExtRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The f3SystemLldpV2ManAddrConfigTxPortsADVAExtRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+   ::= { f3SystemLldpV2ManAddrConfigTxPortsADVAExtEntry 4 }
+
+-- 
+-- f3LldpMaxNeighborsAction
+--
+f3LldpMaxNeighborsAction  OBJECT-TYPE
+    SYNTAX      LldpV2ConfigurationADVAExtMaxNeighborsAction
+    MAX-ACCESS  read-write 
+    STATUS       current
+    DESCRIPTION
+         "Discard: information selected to be discarded is the 
+          information in the current LLDPDU.
+          Delete entry::information selected to be discarded is 
+          currently in the LLDP remote systems MIB."
+    ::= { f3LldpV2ConfigurationADVAExtObjects 1 }
+
+
+--
+--Raw Data Objects
+--
+f3RawDataServerFtProtocol OBJECT-TYPE
+    SYNTAX     CmFileTransferMethod 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Specifies the method of transferring the file.  Note
+             that web(4) is a read-only enumeration."
+    ::= { f3RawDataObjects 1 }
+
+f3RawDataServerFtServerName OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "IP address of the raw data server. Value of 0.0.0.0 
+             indicates the raw data server is not configured."
+    ::= { f3RawDataObjects 2 }
+
+f3RawDataServerFtUserId OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..32))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "User ID to use to authenticate the file transfer."
+    ::= { f3RawDataObjects 3 }
+
+
+f3RawDataServerFtPasswd OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..32))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "User password to authenticate the file transfer.
+             Reading this object will return an empty string if the
+             password has not been set or ***** if the password has
+             been set."
+    ::= { f3RawDataObjects 4 }
+
+--
+-- f3LldpV2RemExtTable
+--
+f3LldpV2RemExtTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3LldpV2RemExtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table is an extension of the standard lldpV2RemTable (LLDP-V2-MIB).
+        This table adds remote TTL attribute support"
+    ::= { f3LldpV2RemoteSystemsData 1 }
+
+f3LldpV2RemExtEntry OBJECT-TYPE
+    SYNTAX     F3LldpV2RemExtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A conceptual row in the f3LldpV2RemExtTable."
+    AUGMENTS { lldpV2RemEntry }
+    ::= { f3LldpV2RemExtTable 1 }
+
+F3LldpV2RemExtEntry ::= SEQUENCE {
+    f3LldpV2RemTTL     Unsigned32
+}
+
+f3LldpV2RemTTL  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Integer value which indicates the number of seconds that the
+          recipient LLDP agent is to regard the information associated
+          with particular MSAP identifier to be valid"
+    ::= { f3LldpV2RemExtEntry 1 }
+
+---
+---Notifications
+---
+cmStateChangeTrap  NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+       "This is the State Change Notification per Interface sent by the agent. 
+         The actual attribute value is sent by the agent in the form of
+         a varbind list, as additional objects, as per SMIv2 (RFC2578, Section 8.1)."
+  ::= { cmSystemNotifications 1 }
+
+cmAttributeValueChangeTrap NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "This is the Attribute Value Change Notification sent by the agent.
+             The actual attribute value is sent by the agent in the form of
+             a varbind list, as additional objects, as per SMIv2 (RFC2578, Section 8.1)."
+  ::= { cmSystemNotifications 2 }
+
+cmObjectCreationTrap NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+          "This is the Object Creation Notification sent by the agent.
+          The index value of the SNMP Row that is created is sent by the
+          agent in the form of a varbind list, as additional objects, 
+          as per SMIv2 (RFC2578, Section 8.1)."
+  ::= { cmSystemNotifications 3 }
+
+cmObjectDeletionTrap NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+          "This is the Object Deletion Notification sent by the agent.
+          The index value of the SNMP Row that is deleted is sent by the
+          agent in the form of a varbind list,
+          as per SMIv2 (RFC2578, Section 8.1)."
+  ::= { cmSystemNotifications 4 }
+
+cmSnmpDyingGaspTrap NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "This is the Dying Gasp SNMP trap sent by the agent."
+  ::= { cmSystemNotifications 5 }
+
+
+f3DatabaseSyncTrap NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "This is the Database Synchronization trap sent by 
+             the agent for bulk operations. The var bind list
+             can contain multiple variables with OIDs as 
+             f3DatabaseSyncTrapObject and values as the OIDs
+             of the entities that need synchronization.
+             The var-binds are sent implicitly, as per 
+             SMIv2 (RFC2578, Section 8.1)."
+  ::= { cmSystemNotifications 6 }
+
+
+f3BulkTrap NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "This is the bulk trap sent by
+             the agent for bulk operations."
+  ::= { f3SystemBulkNotifications 1 }
+
+--
+-- Conformance
+--
+cmSystemCompliances OBJECT IDENTIFIER ::= {cmSystemConformance 1}
+cmSystemGroups      OBJECT IDENTIFIER ::= {cmSystemConformance 2}
+f3SystemBulkGroups  OBJECT IDENTIFIER ::= {cmSystemConformance 3}
+
+cmSystemCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the CM System
+             group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              cmSystemObjectGroup, cmSystemNotifGroup, f3SystemObjectBulkGroup, f3SystemNotifBulkGroup
+        }
+    ::= { cmSystemCompliances 1 }
+
+cmSystemObjectGroup OBJECT-GROUP
+    OBJECTS {
+        lastSetErrorInformation, cliCmdPromptPrefix, securityPromptEnabled,
+        securityBanner,
+
+        aclEntryFilterAction, aclEntryNetworkAddress,
+        aclEntryNetworkMask, aclEntryEnabled, aclEntryIpVersion,
+        aclEntryNetworkIpv6Addr, aclEntryPrefixLength,
+        serialPortDisconnectAutoLogOff,
+
+        telnetEnabled, sshEnabled, ftpEnabled, scpEnabled, serialPortEnabled,
+        httpEnabled, httpsEnabled, sftpEnabled, tftpEnabled,
+        ntpMode, autoProvMode, sysTimeOfDayType, ntpServerConfigType,
+        sysLogServerConfigType,
+        fileServicesAction, 
+        fileServicesMethod, fileServicesServerIp, 
+        fileServicesUserId, fileServicesPassword, fileServicesRemoteFile,
+        fileServicesStatus, fileServicesPercentComplete,
+        fileServicesMode,
+
+        databaseAction, databaseLastSaveTime,
+        databaseIndex, databaseType, databaseVersion, 
+
+        softwareAction, 
+        softwareUpgradeTime, softwareValidationTimer, 
+        softwareIndex, softwareType, softwareVersion,
+
+        sysLogServerIndex, sysLogIpAddress,
+        sysLogPort, secLog2sysLogEnabled, 
+        auditLog2sysLogEnabled, auditLog2fileEnabled, 
+        alarmLog2sysLogEnabled, alarmLog2fileEnabled, 
+
+        ntpClientEnabled, ntpPrimaryServer, ntpBackupServer,
+        ntpType, ntpActiveServer, ntpSwitchServer,
+        ntpServerRoundTripDelay,  ntpServerPrecision,
+        ntpPollingInterval,
+
+        f3SnmpTargetAddrExtDyingGaspPort, f3SnmpTargetAddrExtDyingGaspEnabled,
+        f3SnmpTargetAddrExtDyingGaspActive, f3SnmpTargetAddrExtBulkTrapsEnabled,
+
+        f3SysLastResetType,
+        f3SysLastResetCauseType,
+        f3SysLastAbnormalResetTimestamp1,
+        f3SysLastAbnormalResetTimestamp2,
+        f3SysLastAbnormalResetTimestamp3,
+
+        f3DatabaseSyncTrapObject,
+
+        f3ConfigFileActionFileName, f3ConfigFileAction,
+        f3ConfigFileStatus, f3ConfigFileErrorInformation,
+        f3ConfigFileIndex, f3ConfigFileName, 
+        f3ConfigFileDescription,f3ConfigFilePercentComplete,
+
+        f3SystemFeatureIndex, f3SystemFeatureName, f3SystemFeatureEnabled,
+        f3SystemLldpV2DestAddressADVAExtIndex, f3SystemLldpV2ADVAExtDestMacAddress,
+        f3SystemLldpV2DestAddressADVAExtRowStatus, f3LldpMaxNeighborsAction,
+
+        f3SystemLldpV2PortConfigADVAExtIfIndex,
+        f3SystemLldpV2PortConfigADVAExtDestAddressIndex,
+        f3SystemLldpV2PortConfigADVAExtAdminStatus,
+        f3SystemLldpV2PortConfigADVAExtNotificationEnable,
+        f3SystemLldpV2PortConfigADVAExtTLVsTxEnable,
+        f3SystemLldpV2PortConfigADVAExtStorageType,
+        f3SystemLldpV2PortConfigADVAExtRowStatus,        
+        
+        f3SystemLldpV2ManAddrConfigTxPortsADVAExtRefInterface,
+        f3SystemLldpV2ManAddrConfigTxPortsADVAExtEnable,
+        f3SystemLldpV2ManAddrConfigTxPortsADVAExtStorageType,
+        f3SystemLldpV2ManAddrConfigTxPortsADVAExtRowStatus,
+
+        f3RawDataServerFtProtocol, f3RawDataServerFtServerName,
+        f3RawDataServerFtUserId, f3RawDataServerFtPasswd,
+
+        f3LldpV2RemTTL
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the CM System
+             group."
+    ::= { cmSystemGroups 1 }
+
+cmSystemNotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        cmStateChangeTrap, cmAttributeValueChangeTrap,
+        cmObjectCreationTrap, cmObjectDeletionTrap,
+        cmSnmpDyingGaspTrap, f3DatabaseSyncTrap
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of notifications used in the CM System
+             group."
+    ::= { cmSystemGroups 2 }
+
+cmSystemObjectGroupCmHub OBJECT-GROUP
+    OBJECTS {
+        lastSetErrorInformation, cliCmdPromptPrefix, securityPromptEnabled,
+        securityBanner,
+
+        aclEntryFilterAction, aclEntryNetworkAddress,
+        aclEntryNetworkMask, aclEntryEnabled,
+        serialPortDisconnectAutoLogOff,
+
+        telnetEnabled, sshEnabled, ftpEnabled, scpEnabled, serialPortEnabled,
+        httpEnabled, httpsEnabled, sftpEnabled,
+        ntpMode, autoProvMode, 
+        fileServicesAction, 
+        fileServicesMethod, fileServicesServerIp, 
+        fileServicesUserId, fileServicesPassword, fileServicesRemoteFile,
+        fileServicesStatus, fileServicesPercentComplete,
+        fileServicesMode,fileServicesServerType,
+        fileServicesServerIpv6Addr, sysLogIpVersion, sysLogIpv6Addr,
+        ntpPrimaryServerIpVersion, ntpPrimaryServerIpv6Addr,
+        ntpBackupServerIpVersion, ntpBackupServerIpv6Addr,
+
+        databaseAction, databaseLastSaveTime,
+        databaseIndex, databaseType, databaseVersion, 
+
+        softwareAction, 
+        softwareUpgradeTime, softwareValidationTimer, 
+        softwareIndex, softwareType, softwareVersion,
+
+        sysLogServerIndex, sysLogIpAddress,
+        sysLogPort, secLog2sysLogEnabled, 
+        auditLog2sysLogEnabled, auditLog2fileEnabled, 
+        alarmLog2sysLogEnabled, alarmLog2fileEnabled, 
+
+        ntpClientEnabled, ntpPrimaryServer, ntpBackupServer,
+        ntpType, ntpActiveServer, ntpSwitchServer,
+        ntpServerRoundTripDelay,  ntpServerPrecision,
+        ntpPollingInterval,
+
+        f3SnmpTargetAddrExtDyingGaspPort, f3SnmpTargetAddrExtDyingGaspEnabled,
+        f3SnmpTargetAddrExtDyingGaspActive,
+
+        f3SysLastResetType,
+        f3SysLastResetCauseType,
+        f3SysLastAbnormalResetTimestamp1,
+        f3SysLastAbnormalResetTimestamp2,
+        f3SysLastAbnormalResetTimestamp3,
+
+        f3DatabaseSyncTrapObject
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the CM System
+             group."
+    ::= { cmSystemGroups 3 }
+
+
+f3SystemObjectBulkGroup OBJECT-GROUP
+    OBJECTS {
+        f3StartNeEventLogIndex, f3EndNeEventLogIndex
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to manage the F3 System Bulk
+         group."
+    ::= { f3SystemBulkGroups 1 }
+
+
+f3SystemNotifBulkGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        f3BulkTrap
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of notifications used in the F3 System Bulk
+         group."
+    ::= { f3SystemBulkGroups 2 }
+
+END

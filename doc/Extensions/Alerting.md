@@ -4,10 +4,12 @@ Table of Content:
 - [About](#about)
 - [Rules](#rules)
     - [Syntax](#rules-syntax)
+    - [Options](#extra)
     - [Examples](#rules-examples)
     - [Procedure](#rules-procedure)
 - [Templates](#templates)
     - [Syntax](#templates-syntax)
+    - [Testing](#templates-testing)
     - [Examples](#templates-examples)
     - [Included](#templates-included)
 - [Transports](#transports)
@@ -32,6 +34,7 @@ Table of Content:
     - [Cisco Spark](#transports-ciscospark)
     - [SMSEagle](#transports-smseagle)
     - [Syslog](#transports-syslog)
+    - [Elasticsearch](#transports-elasticsearch)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -46,7 +49,6 @@ Table of Content:
     - [Time](#macros-time)
     - [Sensors](#macros-sensors)
     - [Misc](#macros-misc)
-- [Additional Options](#extra)
 
 
 # <a name="about">About</a>
@@ -85,6 +87,18 @@ __Glues__ can be either `&&` for `AND` or `||` for `OR`.
 
 __Note__: The difference between `Equals` and `Like` (and its negation) is that `Equals` does a strict comparison and `Like` allows the usage of RegExp.
 Arithmetics are allowed as well.
+
+# <a name="extra">Options</a>
+
+Here are some of the other options available when adding an alerting rule:
+
+- Rule name: The name associated with the rule.
+- Severity: How "important" the rule is.
+- Max alerts: The maximum number of alerts sent for the event.  `-1` means unlimited.
+- Delay: The amount of time in seconds to wait after a rule is matched before sending an alert.
+- Interval: The interval of time in seconds between alerts for an event until Max is reached.
+- Mute alerts: Disable sending alerts for this rule.
+- Invert match: Invert the matching rule (ie. alert on items that _don't_ match the rule).
 
 ## <a name="rules-examples">Examples</a>
 
@@ -159,18 +173,30 @@ Limit: %value.sensor_limit_low / %value.sensor_limit
 The Default Template is a 'one-size-fit-all'. We highly recommend defining own templates for your rules to include more specific information.
 Templates can be matched against several rules.
 
+## <a name="templates-testing">Testing</a>
+
+It's possible to test your new template before assigning it to a rule. To do so you can run `./scripts/test-template.php`. The script will provide the help 
+info when ran without any paramaters.
+
+As an example, if you wanted to test template ID 10 against localhost running rule ID 2 then you would run:
+
+`./scripts/test-template.php -t 10 -d -h localhost -r 2`
+
+If the rule is currently alerting for localhost then you will get the full template as expected to see on email, if it's not then you will just see the 
+template without any fault information.
+
 ## <a name="templates-examples">Examples</a>
 
 Default Template:
 ```text
-%title\r\n
-Severity: %severity\r\n
-{if %state == 0}Time elapsed: %elapsed\r\n{/if}
-Timestamp: %timestamp\r\n
-Unique-ID: %uid\r\n
-Rule: {if %name}%name{else}%rule{/if}\r\n
-{if %faults}Faults:\r\n
-{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}
+%title
+Severity: %severity
+{if %state == 0}Time elapsed: %elapsed{/if}
+Timestamp: %timestamp
+Unique-ID: %uid
+Rule: {if %name}%name{else}%rule{/if}
+{if %faults}Faults:
+{foreach %faults}  #%key: %value.string{/foreach}{/if}
 Alert sent to: {foreach %contacts}%value <%key> {/foreach}
 ```
 
@@ -654,15 +680,38 @@ $config['alert']['transports']['syslog']['syslog_facility'] = 3;
 ```
 ~
 
+## <a name="transports-elasticsearch">Elasticsearch</a>
+
+You can have LibreNMS emit alerts to an elasticsearch database. Each fault will be sent as a separate document.
+The index pattern uses strftime() formatting.
+The proxy setting uses the proxy set in config.php if true and does not if false; this allows you to use local servers.
+
+~
+```php
+$config['alert']['transports']['elasticsearch']['es_host']   = '127.0.0.1';
+$config['alert']['transports']['elasticsearch']['es_port']  = 9200;
+$config['alert']['transports']['elasticsearch']['es_index']  = 'librenms-%Y.%m.%d';
+$config['alert']['transports']['elasticsearch']['es_proxy'] = false;
+```
+~
+
 # <a name="entities">Entities
 
 Entities as described earlier are based on the table and column names within the database, if you are unsure of what the entity is you want then have a browse around inside MySQL using `show tables` and `desc <tablename>`.
 
 ## <a name="entity-devices">Devices</a>
 
-__devices.hostname__ = The devices hostname.
+__devices.hostname__ = The device hostname.
 
-__devices.location__ = The devices location.
+__devices.sysName__ = The device sysName.
+
+__devices.sysDescr__ = The device sysDescr.
+
+__devices.hardware__ = The device hardware.
+
+__devices.version__ = The device os version.
+
+__devices.location__ = The device location.
 
 __devices.status__ = The status of the device, 1 = up, 0 = down.
 
@@ -919,15 +968,3 @@ Entity: `%sensors.sensor_class = "current" && %sensors.sensor_descr = "Bank Tota
 Description: APC PDU over amperage
 
 Example: `%macros.pdu_over_amperage_apc = "1"`
-
-# <a name="extra">Additional Options</a>
-
-Here are some of the other options available when adding an alerting rule:
-
-- Rule name: The name associated with the rule.
-- Severity: How "important" the rule is.
-- Max alerts: The maximum number of alerts sent for the event.  `-1` means unlimited.
-- Delay: The amount of time to wait after a rule is matched before sending an alert.
-- Interval: The interval of time between alerts for an event until Max is reached.
-- Mute alerts: Disable sending alerts for this rule.
-- Invert match: Invert the matching rule (ie. alert on items that _don't_ match the rule).

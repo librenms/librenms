@@ -104,4 +104,28 @@ class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(is_ip('192.168.0.1', 'ipv6'));
         $this->assertFalse(is_ip('not_an_ip'));
     }
+
+    public function testDisplay()
+    {
+        $this->assertEquals('&lt;html&gt;string&lt;/html&gt;', display('<html>string</html>'));
+        $this->assertEquals('&lt;script&gt;alert("test")&lt;/script&gt;', display('<script>alert("test")</script>'));
+
+        $tmp_config = array(
+            'HTML.Allowed'    => 'b,iframe,i,ul,li,h1,h2,h3,h4,br,p',
+            'HTML.Trusted'    => true,
+            'HTML.SafeIframe' => true,
+        );
+
+        $this->assertEquals('<b>Bold</b>', display('<b>Bold</b>', $tmp_config));
+        $this->assertEquals('', display('<script>alert("test")</script>', $tmp_config));
+    }
+
+    public function testStringToClass()
+    {
+        $this->assertSame('LibreNMS\OS\Os', str_to_class('OS', 'LibreNMS\\OS\\'));
+        $this->assertSame('SpacesName', str_to_class('spaces name'));
+        $this->assertSame('DashName', str_to_class('dash-name'));
+        $this->assertSame('UnderscoreName', str_to_class('underscore_name'));
+        $this->assertSame('LibreNMS\\AllOfThemName', str_to_class('all OF-thEm_NaMe', 'LibreNMS\\'));
+    }
 }

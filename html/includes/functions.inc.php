@@ -72,6 +72,9 @@ function nicecase($item)
 
         case 'nfs-v3-stats':
             return 'NFS v3 Stats';
+            
+        case 'nfs-server':
+            return 'NFS Server';
 
         case 'ntp':
             return 'NTP';
@@ -111,6 +114,15 @@ function nicecase($item)
         
         case 'php-fpm':
             return 'PHP-FPM';
+
+        case 'opengridscheduler':
+            return 'Open Grid Scheduler';
+
+        case 'sdfsinfo':
+            return 'SDFS info';
+
+        case 'pi-hole':
+            return 'Pi-hole';
 
         default:
             return ucfirst($item);
@@ -255,7 +267,7 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
         $text = $device['hostname'];
     }
 
-    $text = ip_to_sysname($device, $text);
+    $text = format_hostname($device, $text);
 
     if (isset($config['os'][$device['os']]['over'])) {
         $graphs = $config['os'][$device['os']]['over'];
@@ -610,7 +622,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     global $config;
 
     $graph_array = array();
-    $port        = ifNameDescr($port);
+
     if (!$text) {
         $text = fixifName($port['label']);
     }
@@ -629,9 +641,9 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port = array_merge($port, device_by_id_cache($port['device_id']));
     }
 
-    $content = '<div class=list-large>'.$port['hostname'].' - '.fixifName($port['label']).'</div>';
+    $content = '<div class=list-large>'.$port['hostname'].' - '.fixifName(addslashes(display($port['label']))).'</div>';
     if ($port['ifAlias']) {
-        $content .= display($port['ifAlias']).'<br />';
+        $content .= addslashes(display($port['ifAlias'])).'<br />';
     }
 
     $content              .= "<div style=\'width: 850px\'>";
@@ -829,7 +841,7 @@ function generate_ap_link($args, $text = null, $type = null)
 {
     global $config;
 
-    $args = ifNameDescr($args);
+    $args = cleanPort($args);
     if (!$text) {
         $text = fixIfName($args['label']);
     }
@@ -1139,6 +1151,7 @@ function alert_details($details)
         }
 
         if ($tmp_alerts['port_id']) {
+            $tmp_alerts = cleanPort($tmp_alerts);
             $fault_detail .= generate_port_link($tmp_alerts).';&nbsp;';
             $fallback      = false;
         }
@@ -1490,6 +1503,56 @@ function get_disks($device)
     return dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr', array($device));
 }
 
+/**
+ * Get the fail2ban jails for a device... just requires the device ID
+ * an empty return means either no jails or fail2ban is not in use
+ * @param $device_id
+ * @return array
+ */
+function get_fail2ban_jails($device_id)
+{
+    $options=array(
+        'filter' => array(
+            'type' => array('=', 'fail2ban'),
+        ),
+    );
+
+    $component=new LibreNMS\Component();
+    $f2bc=$component->getComponents($device_id, $options);
+
+    if (isset($f2bc[$device_id])) {
+        $id = $component->getFirstComponentID($f2bc, $device_id);
+        return json_decode($f2bc[$device_id][$id]['jails']);
+    }
+
+    return array();
+}
+
+/**
+ * Get the Postgres databases for a device... just requires the device ID
+ * an empty return means Postres is not in use
+ * @param $device_id
+ * @return array
+ */
+function get_postgres_databases($device_id)
+{
+    $options=array(
+        'filter' => array(
+             'type' => array('=', 'postgres'),
+        ),
+    );
+
+    $component=new LibreNMS\Component();
+    $pgc=$component->getComponents($device_id, $options);
+
+    if (isset($pgc[$device_id])) {
+        $id = $component->getFirstComponentID($pgc, $device_id);
+        return json_decode($pgc[$device_id][$id]['databases']);
+    }
+
+    return array();
+}
+
 // takes the device array and app_id
 function get_disks_with_smart($device, $app_id)
 {
@@ -1505,4 +1568,66 @@ function get_disks_with_smart($device, $app_id)
         $all_disks_int++;
     }
     return $disks;
+}
+
+/**
+ * Gets all dashboards the user can access
+ * adds in the keys:
+ *   username - the username of the owner of each dashboard
+ *   default - the default dashboard for the logged in user
+ *
+ * @param int $user_id optionally get list for another user
+ * @return array list of dashboards
+ */
+function get_dashboards($user_id = null)
+{
+    $default = get_user_pref('dashboard');
+    $dashboards = dbFetchRows(
+        "SELECT * FROM `dashboards` WHERE dashboards.access > 0 || dashboards.user_id = ?",
+        array(is_null($user_id) ? $_SESSION['user_id'] : $user_id)
+    );
+
+    $usernames = array(
+        $_SESSION['user_id'] => $_SESSION['username']
+    );
+
+    $result = array();
+    foreach ($dashboards as $dashboard) {
+        $duid = $dashboard['user_id'];
+        if (!isset($usernames[$duid])) {
+            $user = get_user($duid);
+            $usernames[$duid] = $user['username'];
+        }
+
+        $dashboard['username'] = $usernames[$duid];
+        $dashboard['default'] = $dashboard['dashboard_id'] == $default;
+
+        $result[$dashboard['dashboard_id']] = $dashboard;
+    }
+
+    return $result;
+}
+
+/**
+ * Generate javascript to fill in a select box from an ajax list
+ *
+ * @param string $list_type type of list look in html/includes/list/
+ * @param string $selector jquery selector for the target select element
+ * @param int $selected the id of the item to mark as selected
+ * @return string the javascript (not including <script> tags)
+ */
+function generate_fill_select_js($list_type, $selector, $selected = null)
+{
+    return '$(document).ready(function() {
+    $select = $("' . $selector . '")
+    $.getJSON(\'ajax_list.php?id=' . $list_type . '\', function(data){
+        $.each(data, function(index,item) {
+            if (item.id == "' . $selected . '") {
+                $select.append("<option value=" + item.id + " selected>" + item.value + "</option>");
+            } else {
+                $select.append("<option value=" + item.id + ">" + item.value + "</option>");
+            }
+        });
+    });
+});';
 }

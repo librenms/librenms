@@ -8,12 +8,21 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 icon: cisco
+discovery:
+    -
+      sysDescr:
+          - 'Cisco Internetwork Operating System Software'
+          - 'IOS (tm)'
+          - 'Cisco IOS Software'
+          - 'Global Site Selector'
+      sysDescr_except:
+          - 'LINUX_IOSD'
+          - 'IOS-XE'
 bad_ifXEntry:
     - cisco1941
     - cisco886Va
     - cisco2811
 poller_modules:
-    wifi: 1
     cisco-ace-serverfarms: 1
     cisco-ace-loadbalancer: 1
     cisco-cbqos: 1
@@ -25,6 +34,7 @@ poller_modules:
     cisco-ipsec-flow-monitor: 1
     cipsec-tunnels: 1
     cisco-otv: 1
+    cisco-vpdn: 1
     ipmi: 0
 discovery_modules:
     cisco-cef: 1

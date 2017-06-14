@@ -148,13 +148,13 @@ foreach ($list as $items) {
     $local_device_id = $items['local_device_id'];
     if (!array_key_exists($local_device_id, $devices_by_id)) {
         $items['sysName'] = $items['local_sysName'];
-        $devices_by_id[$local_device_id] = array('id'=>$local_device_id,'label'=>shorthost(ip_to_sysname($items, $items['local_hostname']), 1),'title'=>generate_device_link($local_device, '', array(), '', '', '', 0),'shape'=>'box');
+        $devices_by_id[$local_device_id] = array('id'=>$local_device_id,'label'=>shorthost(format_hostname($items, $items['local_hostname']), 1),'title'=>generate_device_link($local_device, '', array(), '', '', '', 0),'shape'=>'box');
     }
 
     $remote_device_id = $items['remote_device_id'];
     if (!array_key_exists($remote_device_id, $devices_by_id)) {
         $items['sysName'] = $items['remote_sysName'];
-        $devices_by_id[$remote_device_id] = array('id'=>$remote_device_id,'label'=>shorthost(ip_to_sysname($items, $items['remote_hostname']), 1),'title'=>generate_device_link($remote_device, '', array(), '', '', '', 0),'shape'=>'box');
+        $devices_by_id[$remote_device_id] = array('id'=>$remote_device_id,'label'=>shorthost(format_hostname($items, $items['remote_hostname']), 1),'title'=>generate_device_link($remote_device, '', array(), '', '', '', 0),'shape'=>'box');
     }
 
     $speed = $items['local_ifspeed']/1000/1000;
@@ -193,8 +193,8 @@ foreach ($list as $items) {
         !array_key_exists($link_id2, $link_assoc_seen) &&
         !array_key_exists($device_id1, $device_assoc_seen) &&
         !array_key_exists($device_id2, $device_assoc_seen)) {
-        $local_port = ifNameDescr($local_port);
-        $remote_port = ifNameDescr($remote_port);
+        $local_port = cleanPort($local_port);
+        $remote_port = cleanPort($remote_port);
         $links[] = array('from'=>$items['local_device_id'],'to'=>$items['remote_device_id'],'label'=>shorten_interface_type($local_port['ifName']) . ' > ' . shorten_interface_type($remote_port['ifName']),'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#", "", $row_colour)."'>\n", '', 0, 1),'width'=>$width,'color'=>$link_color);
     }
     $link_assoc_seen[$link_id1] = 1;

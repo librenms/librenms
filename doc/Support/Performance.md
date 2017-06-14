@@ -89,3 +89,13 @@ If you would like to see if you should turn this on then run this query in MySQL
 |        81 |     2 |
 
 Here device id 128 and potentially 92 and 41 are likely candidates for this feature to be enabled on. Turn it on and then closely monitor the device for the next 15-30 minutes.
+
+### Web interface
+
+#### HTTP/2
+
+If you are running https then you should enable http/2 support in whatever web server you use:
+
+For Nginx (1.9.5 and above) change `listen 443 ssl;` to `listen 443 ssl http2;` in the Virtualhost config.
+
+For Apache (2.4.17 an above) set `Protocols h2 http/1.1` in the Virtualhost config.

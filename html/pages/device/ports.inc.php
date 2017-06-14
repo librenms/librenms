@@ -102,17 +102,18 @@ if ($vars['view'] == 'minigraphs') {
 
     // FIXME - FIX THIS. UGLY.
     foreach (dbFetchRows('select * from ports WHERE device_id = ? ORDER BY ifIndex', array($device['device_id'])) as $port) {
+        $port = cleanPort($port, $device);
         echo "<div style='display: block; padding: 3px; margin: 3px; min-width: 183px; max-width:183px; min-height:90px; max-height:90px; text-align: center; float: left; background-color: #e9e9e9;'>
             <div style='font-weight: bold;'>".makeshortif($port['ifDescr']).'</div>
             <a href="'.generate_port_url($port)."\" onmouseover=\"return overlib('\
             <div style=\'background-color: #ffffff;\'>\
             <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #555;\'>".$device['hostname'].' - '.$port['ifDescr'].'</div>\
-            '.display($port['ifAlias'])." \
+            '.$port['ifAlias']." \
             <img src=\'graph.php?type=".$graph_type.'&amp;id='.$port['port_id'].'&amp;from='.$from.'&amp;to='.$config['time']['now']."&amp;width=450&amp;height=150\'>\
             </div>\
             ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >"."<img src='graph.php?type=".$graph_type.'&amp;id='.$port['port_id'].'&amp;from='.$from.'&amp;to='.$config['time']['now']."&amp;width=180&amp;height=45&amp;legend=no'>
             </a>
-            <div style='font-size: 9px;'>".substr(short_port_descr(display($port['ifAlias'])), 0, 32).'</div>
+            <div style='font-size: 9px;'>".substr(short_port_descr($port['ifAlias']), 0, 32).'</div>
             </div>';
     }
 

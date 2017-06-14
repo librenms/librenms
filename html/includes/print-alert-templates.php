@@ -26,11 +26,12 @@ if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
 echo '<div class="table-responsive">
 <table class="table table-hover table-condensed" width="100%">
   <tr>
+    <th>#</th>
     <th>Name</th>
     <th>Action</th>
   </tr>
   <tr>
-    <td>';
+    <td colspan="2">';
 
 if ($_SESSION['userlevel'] >= '10') {
     echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#alert-template" data-template_id="">Create new alert template</button>';
@@ -76,6 +77,7 @@ $full_query = $full_query.$query." LIMIT $start,$results";
 
 foreach (dbFetchRows($full_query, $param) as $template) {
     echo '<tr id="row_'.$template['id'].'">
+            <td>#' . $template['id'] . '</td>
             <td>'.$template['name'].'</td>
             <td>';
     if ($_SESSION['userlevel'] >= '10') {

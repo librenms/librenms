@@ -838,6 +838,13 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   margin: 8px;
 }
 
+.infobox .rrd-pre {
+  background-color: #CCCCFF;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+
 .infobox-down {
 
 }
@@ -1583,6 +1590,12 @@ tr.search:nth-child(odd) {
   line-height: 32px;
 }
 
+@media (min-width: 992px) and (max-width: 1280px) {
+  .navbar-brand {
+    display: none !important;
+  }
+}
+
 .navbar-brand img {
   height: 100%;
   max-width: 170px;
@@ -1895,7 +1908,7 @@ label {
 .widget_body {
     overflow-y: auto;
     width: 100%;
-    height: calc(100% - 5px);
+    height: calc(100% - 38px);
 }
 
 .device-availability, .service-availability {
@@ -2099,18 +2112,18 @@ label {
     background-color: #f5f5f5;
 }
 
-.device-table-header-status {
-    width: 100px;
-    text-align: center;
+.device-table-metrics span {
+  display: inline-block;
+  white-space: nowrap;
 }
 
-.device-table-header-vendor {
-    width: 100px;
-    text-align: center;
+.device-table-metrics>a {
+  color:#000;
+  text-decoration:none;
 }
 
 .device-table-header-actions {
-  min-width: 120px;
+  min-width: 110px;
   text-align: center;
 }
 

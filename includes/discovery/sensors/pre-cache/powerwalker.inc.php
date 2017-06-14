@@ -23,12 +23,8 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if ($device['os'] === 'powerwalker') {
-    echo 'Pre-cache PowerWalker: ';
+echo 'upsInputEntry ';
+$pre_cache['powerwalker'] = snmpwalk_cache_index($device, 'upsInputEntry', array(), 'UPS-MIB');
 
-    $pw_oids = array();
-    echo 'Caching OIDs:';
-
-    $pw_oids = snmpwalk_cache_index($device, 'upsInputEntry', array(), 'UPS-MIB');
-    $pw_oids = snmpwalk_cache_index($device, 'upsOutputEntry', $pw_oids, 'UPS-MIB');
-}
+echo 'upsOutputEntry ';
+$pre_cache['powerwalker'] = snmpwalk_cache_index($device, 'upsOutputEntry', $pre_cache['powerwalker'], 'UPS-MIB');

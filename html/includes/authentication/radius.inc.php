@@ -1,33 +1,35 @@
 <?php
 
 use Dapphp\Radius\Radius;
+use LibreNMS\Exceptions\AuthenticationException;
 use Phpass\PasswordHash;
 
+/** @var Radius $radius */
 $radius = new Radius($config['radius']['hostname'], $config['radius']['secret'], $config['radius']['suffix'], $config['radius']['timeout'], $config['radius']['port']);
 
 function authenticate($username, $password)
 {
-    global $config, $radius, $debug;
+    global $radius, $debug;
 
     if (empty($username)) {
-        return 0;
-    } else {
-        if ($debug) {
-            $radius->SetDebugMode(true);
-        }
-        $rad = $radius->AccessRequest($username, $password);
-        if ($rad === true) {
-            adduser($username);
-            return 1;
-        } else {
-            return 0;
-        }
+        throw new AuthenticationException('Username is required');
     }
+
+    if ($debug) {
+        $radius->setDebug(true);
+    }
+
+    if ($radius->accessRequest($username, $password) === true) {
+        adduser($username, $password);
+        return true;
+    }
+
+    throw new AuthenticationException();
 }
 
-function reauthenticate()
+function reauthenticate($sess_id, $token)
 {
-    return 0;
+    return false;
 }
 
 
@@ -52,7 +54,7 @@ function auth_usermanagement()
 }
 
 
-function adduser($username, $password, $level = 1, $email = '', $realname = '', $can_modify_passwd = 0, $description = '', $twofactor = 0)
+function adduser($username, $password, $level = 1, $email = '', $realname = '', $can_modify_passwd = 0, $description = '')
 {
     // Check to see if user is already added in the database
     global $config;
@@ -62,7 +64,7 @@ function adduser($username, $password, $level = 1, $email = '', $realname = '', 
         if ($config['radius']['default_level'] > 0) {
             $level = $config['radius']['default_level'];
         }
-        $userid = dbInsert(array('username' => $username, 'password' => $encrypted, 'realname' => $realname, 'email' => $email, 'descr' => $description, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'twofactor' => $twofactor), 'users');
+        $userid = dbInsert(array('username' => $username, 'password' => $encrypted, 'realname' => $realname, 'email' => $email, 'descr' => $description, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd), 'users');
         if ($userid == false) {
             return false;
         } else {

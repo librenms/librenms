@@ -222,6 +222,7 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
         }
     },
     url: "ajax_table.php",
+    rowCount: [50, 100, 250, -1],
     formatters: {
         "status": function(column,row) {
             return "<h4><span class=\'label label-"+row.extra+" threeqtr-width\'>" + row.msg + "</span></h4>";
@@ -243,6 +244,7 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
     templates: {
     }
 }).on("loaded.rs.jquery.bootgrid", function() {
+    alerts_grid = $(this);
     alerts_grid.find(".incident-toggle").each( function() {
       $(this).parent().addClass(\'incident-toggle-td\');
     }).on("click", function(e) {
@@ -293,8 +295,11 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
             success: function(msg){
                 toastr.success(msg);
                 if(msg.indexOf("ERROR:") <= -1) {
-                    var $sortDictionary = alerts_grid.bootgrid("getSortDictionary");
-                    alerts_grid.bootgrid("sort", $sortDictionary); 
+                    $(".alerts").each(function(index) {
+                        var $sortDictionary = $(this).bootgrid("getSortDictionary");
+                        $(this).reload;
+                        $(this).bootgrid("sort", $sortDictionary);
+                    });
                 }
             },
             error: function(){

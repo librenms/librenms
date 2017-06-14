@@ -1,0 +1,1131 @@
+F3-CFM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-COMPLIANCE, OBJECT-GROUP 
+                FROM SNMPv2-CONF
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION 
+                FROM SNMPv2-TC
+        dot1agCfmMdIndex, dot1agCfmMaIndex, dot1agCfmMepIdentifier,
+        dot1agCfmMepEntry, Dot1agCfmMepId, Dot1agCfmMDLevel, dot1agCfmMaCompEntry
+                FROM IEEE8021-CFM-MIB
+        MacAddress, RowStatus, TruthValue, VariablePointer, StorageType
+                FROM SNMPv2-TC
+        InterfaceIndex
+                FROM IF-MIB
+        AdminState, VlanPriority, PerfCounter64, CmPmBinAction,
+        OperationalState, SecondaryState
+                FROM CM-COMMON-MIB
+        neIndex, shelfIndex, slotIndex
+                FROM CM-ENTITY-MIB
+        cmEthernetAccPortIndex, cmEthernetNetPortIndex, cmEthernetTrafficPortIndex 
+                FROM CM-FACILITY-MIB
+        fsp150cm
+                FROM ADVA-MIB;
+
+
+f3CfmMIB MODULE-IDENTITY
+    LAST-UPDATED    "201111220000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Raghav Trivedi
+                     ADVA Optical Networking, Inc.
+                Tel: +1 972 759-1239
+             E-mail: rtrivedi@advaoptical.com
+             Postal: 2301 N. Greenville Ave. #300
+                     Richardson, TX USA 75082"
+    DESCRIPTION
+            "This module defines the CFM (8021AG) Extension MIB definitions 
+             used by the F3 (FSP150CM/CC) product lines.  
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201111220000Z"
+    DESCRIPTION
+         "
+         Notes from release 201302130000Z,
+         (i)Added TEXTUAL-CONVENTION CfmSignalFailTriggers 
+         (ii)Added scalar cfmSignalFailTriggers 
+
+         Notes from release 201111220000Z,
+         (i)Added the following objects to support CFM MEPs and Server MEPs on
+            pluggable cards: 
+              -cfmMepOperationalState, cfmMepSecondaryState
+              -cfmServerMepAdminState, cfmServerMepOperationalState, 
+               cfmServerMepSecondaryState
+
+          Notes from release 201012160000Z,
+           -Formalized the OBJECT-GROUP definitions
+
+          Notes from release 201012160000Z,
+           -Updated description of cfmAccPortQosShaperIndex
+
+          Notes from release 201012140000Z,
+           -Added object cfmMepStatsAction
+
+         Notes from release 201005130000Z,
+         (1)New scalars slmMulticastMacAddress, slmOpcode, slrOpcode 
+            are added
+
+         Notes from release 201003310000Z,
+         (1)New table cfmServerMepTable is added
+
+         Notes from release 200903190000Z,
+         (1)MIB version ready for release of FSP150CC devices GE101 and GE206." 
+    ::= {fsp150cm 13}    
+
+--
+-- 801.1ag Extension Services
+--
+cfmExtSvc OBJECT IDENTIFIER ::= {f3CfmMIB 1}
+cfmExtSvcObjects OBJECT IDENTIFIER ::= {cfmExtSvc 1}
+cfmExtSvcConformance  OBJECT IDENTIFIER ::= {cfmExtSvc 2}
+
+--
+-- Textual Conventions
+--
+CfmAisGenTriggerTypes ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Bit Mask that specifies all the defects that can trigger AIS to be
+        generated."
+    SYNTAX BITS {
+                bAisDefRemoteCCM(0),
+                bAisDefErrorCCM(1),
+                bAisDefXconCCM(2),
+                bAisDefAis(3)
+               }
+
+CfmAisInterval ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "AIS interval which is the frequency of ETH-AIS frame generation.
+        Note the values of the 1 second and 1 minute integers which are aligned
+        with the values defined for the AIS interval for AIS PDU in Y.1731."
+    SYNTAX INTEGER {
+                aisInterval1sec(1),
+                aisInterval1min(2)
+               }
+
+CfmLmmDmmInterval ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Y.1731 Loss or delay measurement frame transmission interval."
+    SYNTAX INTEGER {
+                interval10msec(1),
+                interval100msec(2),
+                interval1sec(3),
+                interval10sec(4),
+                interval1min(5)
+               }
+
+CfmMepDefects ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION
+        "A MEP can detect and report a number of defects such as
+         RDI, MACStatus, RMEP CCM, Error CCM, Xconn CCM. These are
+         are defined in Dot1agCfmMepDefects in standard 802.1ag MIB.
+         Y.1731 adds additional defects such as AIS defect which is
+         defined here.
+          bDefAIS(0) A MEP received an ETH-AIS frame/indication.
+        "
+    SYNTAX BITS {
+                   bDefAIS(0)
+                }
+
+CfmLLFTriggerTypes ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Bit Mask that specifies all the conditions that trigger a link loss
+        forwarding."
+    SYNTAX BITS {
+                bAis(0),
+                bCcmIfStatusTlv(1),
+                bRemoteCCM(2),
+                bRDI(3)
+               }
+
+CfmSignalFailTriggers ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+       "Bit Mask that specifies all the conditions that trigger Signal Fail."
+    SYNTAX     BITS {
+                 rdiCcm(0),
+                 remoteCcm(1),
+                 erroredCcm(2),
+                 xconCcm(3),
+                 ais(4)
+               }
+
+CfmSlmEnabledTypes ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Bit Mask that specifies all the priorities."
+    SYNTAX BITS {
+                cos0(0),
+                cos1(1),
+                cos2(2),
+                cos3(3),
+                cos4(4),
+                cos5(5),
+                cos6(6),
+                cos7(7)
+               }
+
+
+--Scalars
+cfmExtScalars  OBJECT IDENTIFIER ::= {cfmExtSvcObjects 1}
+
+cfmEthType OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object provides the system level Ethernet type for CFM."
+    ::= { cfmExtScalars 1 }
+
+cfmMacAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides the system level Mac address for CFM."
+    ::= { cfmExtScalars 2 }
+slmMulticastMacAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object can be used to configure the Synthetic Loss Measurement(SLM)
+          Multicast MAC Address."
+    ::= { cfmExtScalars 3 }
+
+slmOpcode OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object can be used to configure the Operation Code for the
+          Synthetic Loss Measurement(SLM) message."
+    ::= { cfmExtScalars 4 }
+
+slrOpcode OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object can be used to configure the Operation Code for the
+          Synthetic Loss Response(SLR) message."
+    ::= { cfmExtScalars 5 }
+
+cfmSignalFailTriggers OBJECT-TYPE
+    SYNTAX    CfmSignalFailTriggers  
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object can be used to configure the list of defects which constitute
+          Signal Fail condition."
+    ::= { cfmExtScalars 6 }
+
+--
+-- Y.1731 configuration for MEP
+--
+cfmMepTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CfmMepEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Additional MEP configuration such as Y.1731 configuration."
+    ::= { cfmExtSvcObjects 2 }
+
+cfmMepEntry OBJECT-TYPE
+    SYNTAX     CfmMepEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of additional MEP parameters such the Y.1731 parameters."
+    AUGMENTS { dot1agCfmMepEntry }
+    ::= { cfmMepTable 1 }
+
+CfmMepEntry ::= SEQUENCE {
+    --CFM MEP admin state
+    cfmMepAdminState                         AdminState,
+
+    -- AIS params
+    cfmMepAisGenTriggerTypes                 CfmAisGenTriggerTypes,
+    cfmMepAisClientMdLevel                   Dot1agCfmMDLevel,
+    cfmMepAisInterval                        CfmAisInterval,
+    cfmMepAisGenEnabled                      TruthValue,
+    cfmMepAisPriority                        VlanPriority,
+
+    -- LM/DM params
+    cfmMepLmTxCountAllPriosEnabled           TruthValue,
+    cfmMepLmRxCountAllPriosEnabled           TruthValue,
+    cfmMepLmDualEndedCountAllPriosEnabled    TruthValue,
+    cfmMepLmCountInProfileEnabled            TruthValue,
+    cfmMepLmTxPriority                       VlanPriority,
+    cfmMepDmPriority                         VlanPriority,
+
+    --CCM stats
+    cfmMepRxCCMs                             PerfCounter64,
+    cfmMepErrCCMs                            PerfCounter64,
+
+    -- LLF/Misc Params
+    cfmMepLLFTriggerTypes                    CfmLLFTriggerTypes,
+    cfmMepDefects                            CfmMepDefects,
+    cfmMepTagEtherType                       Unsigned32,
+
+    -- Ability to clear stats
+    cfmMepStatsAction                        CmPmBinAction,
+
+    -- LB Params
+    cfmMepLbmInterval                        Integer32,
+
+    -- State Params
+    cfmMepOperationalState                   OperationalState,
+    cfmMepSecondaryState                     SecondaryState,
+    cfmMepSlmEnabled                         CfmSlmEnabledTypes,
+    cfmMepAssociatedObject                   VariablePointer
+}
+
+cfmMepAdminState OBJECT-TYPE
+    SYNTAX      AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Administrative State of the CFM MEPs." 
+    ::= { cfmMepEntry 1 }
+
+cfmMepAisGenTriggerTypes OBJECT-TYPE
+    SYNTAX     CfmAisGenTriggerTypes
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "A bit mask which indicates all the defects that result in triggering
+         an AIS for the higher level MEP or transmission of ETH-AIS."
+    ::= { cfmMepEntry 2 }
+
+cfmMepAisClientMdLevel OBJECT-TYPE
+    SYNTAX     Dot1agCfmMDLevel
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "AIS Client MD level which is the MD level used to identify any
+         higher level local MEPs for which AIS defect needs to be set or
+         MD level of the ETH-AIS frame generated if there are no local MEPs
+         at this MD level."
+    ::= { cfmMepEntry 3 }
+
+cfmMepAisInterval OBJECT-TYPE
+    SYNTAX     CfmAisInterval
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "ETH-AIS frame transmission interval if decision is made to transmit the
+         ETH-AIS frame."
+    ::= { cfmMepEntry 4 }
+
+cfmMepAisGenEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This flag enables/disables propagation of ETH-AIS to client MD levels."
+    ::= { cfmMepEntry 5 }
+
+cfmMepAisPriority OBJECT-TYPE
+    SYNTAX     VlanPriority
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This VLAN priority of the ETH-AIS frame."
+    ::= { cfmMepEntry 6 }
+
+cfmMepLmTxCountAllPriosEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This attribute is used when Y.1731 probes are created and LMM frames
+         are transmitted. As per Y.1731, loss measurement should be done per
+         priority class. The implementation is restricted to support counting
+         of frames for only one priority that can be modified. As an added
+         value there is an option to count all priorities. This flag is used
+         to decide whether to put cumulative data frame counts for all the
+         priorities into the LMM that is transmitted by the MEP instead of
+         data frame counts for a provisioned individual priority."
+    ::= { cfmMepEntry 7 }
+
+cfmMepLmRxCountAllPriosEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This attribute is used when Y.1731 probes are created and LMR frames
+         are transmitted. As per Y.1731, loss measurement should be done per
+         priority class. The implementation is restricted to support counting
+         of frames for only one priority that can be modified. As an added
+         value there is an option to count all priorities. This flag is used
+         to decide whether to put cumulative data frame counts for all the
+         priorities into the LMR that is transmitted by the MEP instead of
+         data frame counts for a provisioned individual priority. LMR is sent
+         by a MEP when an LMM is received."
+    ::= { cfmMepEntry 8 }
+
+cfmMepLmDualEndedCountAllPriosEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This attribute is used when Y.1731 probes are created and CCM frames
+         are transmitted with loss measurement counts. As per Y.1731, loss
+         measurement should be done per priority class. The implementation is
+         restricted to support counting of frames for only one priority that
+         can be modified. As an added value there is an option to count all
+         priorities. This flag is used to decide whether to put cumulative
+         data frame counts for all the priorities into the CCM instead of
+         data frame counts for a provisioned individual priority."
+    ::= { cfmMepEntry 9 }
+
+cfmMepLmCountInProfileEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "As per the Y.1731 data frames counted for loss measurement shall be
+         in-profile (green) data frames. As an added value, this flag is
+         provided for the device to count all frames instead of green frames
+         only. This flag could be set to false in cases where the remote
+         device is not color aware and/or capable of color marking. Even
+         if the device is capable of color marking and is color aware if the
+         outer tag is not an S-TAG it makes sense to set this flag to false.
+         As defined in IEEE 802.1ad the S-TAG has the drop eligibility bit
+         that is used to mark the frames green or yellow."
+    ::= { cfmMepEntry 10 }
+
+cfmMepLmTxPriority OBJECT-TYPE
+    SYNTAX     VlanPriority
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This attribute is used if cfmMepLmTxCountAllPrios is false.
+         This attribute serves three purposes:
+         - It is the VLAN priority of the LMM.
+         - Data frames transmitted and received with this VLAN priority
+           are counted by the MEP. The transmit count is sent in the LMM
+           and the receive count is used to complete the list of four
+           counts used for the loss measurement.
+         - If an LMR is received with a VLAN priority other than this
+           the LMR is dropped."
+    ::= { cfmMepEntry 11 }
+
+cfmMepDmPriority OBJECT-TYPE
+    SYNTAX     VlanPriority
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This attribute specifies the DMM frame VLAN priority."
+    ::= { cfmMepEntry 12 }
+
+cfmMepRxCCMs OBJECT-TYPE
+    SYNTAX     PerfCounter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This provides the total number of received CCMs on the MEP."
+    ::= { cfmMepEntry 13 }
+
+cfmMepErrCCMs OBJECT-TYPE
+    SYNTAX     PerfCounter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This provides the total number of errored CCMs on the MEP."
+    ::= { cfmMepEntry 14 }
+
+cfmMepLLFTriggerTypes OBJECT-TYPE
+    SYNTAX     CfmLLFTriggerTypes
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This bit mask indicates the CFM triggers that result in link loss
+         forwarding."
+    ::= { cfmMepEntry 15 }
+
+cfmMepDefects OBJECT-TYPE
+    SYNTAX     CfmMepDefects
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This bit mask indicates defects that not defined in standard 802.1ag
+         MIB such as AIS defect."
+    ::= { cfmMepEntry 16 }
+
+cfmMepTagEtherType OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object allows management of Ether Type for MEP VLAN Tag for the MEPs."
+    ::= { cfmMepEntry 17 }
+
+cfmMepStatsAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the CFM level 
+                 statistics : cfmMepRxCCMs, cfmMepErrCCMs."
+    ::= { cfmMepEntry 18 }
+
+cfmMepLbmInterval OBJECT-TYPE	
+    SYNTAX     Integer32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "ETH-LBM frame transmission interval."
+    ::= { cfmMepEntry 19 }
+
+-- State Management params
+cfmMepOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Operational State of the CFM MEP." 
+    ::= { cfmMepEntry 20 }
+
+cfmMepSecondaryState OBJECT-TYPE
+    SYNTAX      SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Secondary State of the CFM MEP." 
+    ::= { cfmMepEntry 21 }
+
+cfmMepSlmEnabled OBJECT-TYPE
+    SYNTAX      CfmSlmEnabledTypes 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This bit mask indicates the whether SLM is enabled per each COS." 
+    ::= { cfmMepEntry 22 }
+
+cfmMepAssociatedObject OBJECT-TYPE
+    SYNTAX      VariablePointer 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object represents the associated port, it could be port, flow or flow point." 
+    ::= { cfmMepEntry 23 }
+
+--
+-- CFM QOS Shapers for Down MEPs on Access Port
+--
+cfmAccPortQosShaperTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CfmAccPortQosShaperEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of configurable profile entries for CFM QoS Shapers for Access Port."
+    ::= { cfmExtSvcObjects 3 }
+
+cfmAccPortQosShaperEntry OBJECT-TYPE
+    SYNTAX     CfmAccPortQosShaperEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of parameters that set up the CFM QoS Queue profiles.
+         This shaper is created automatically when the first Down MEP
+         is created on a Access Port."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetAccPortIndex, 
+            cfmAccPortQosShaperIndex }
+    ::= { cfmAccPortQosShaperTable 1 }
+
+CfmAccPortQosShaperEntry ::= SEQUENCE {
+    cfmAccPortQosShaperIndex       Integer32,
+    cfmAccPortQosShaperCIR         Unsigned32,
+    cfmAccPortQosShaperBufSize     Unsigned32,
+    cfmAccPortQosShaperAdminState  AdminState
+}
+
+cfmAccPortQosShaperIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A unique index associated with the type of Access Port Based Shaper.
+         Index 1 refers to the Shaper associated with PORT-based Down MEPs,
+         Index 2 refers to the Shaper associated with the VID-based Down MEPs."
+    ::= { cfmAccPortQosShaperEntry 1 }
+
+cfmAccPortQosShaperCIR OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the queue CIR."
+     ::= { cfmAccPortQosShaperEntry 2 }
+
+cfmAccPortQosShaperBufSize OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the queue buffer size."
+     ::= { cfmAccPortQosShaperEntry 3 }
+
+cfmAccPortQosShaperAdminState OBJECT-TYPE
+    SYNTAX     AdminState
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows the management of the Shaper Administrative State.
+          Only 'in-service' and 'management' states are allowed."
+     ::= { cfmAccPortQosShaperEntry 4 }
+
+--
+-- CFM QOS Shapers for Down MEPs on Network Port
+--
+cfmNetPortQosShaperTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CfmNetPortQosShaperEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of configurable profile entries for CFM QoS Shapers for Network Port."
+    ::= { cfmExtSvcObjects 4 }
+
+cfmNetPortQosShaperEntry OBJECT-TYPE
+    SYNTAX     CfmNetPortQosShaperEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of parameters that set up the CFM QoS Queue profiles.
+         This shaper is created automatically when the first Down MEP
+         is created on a Network Port."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetNetPortIndex, 
+            cfmNetPortQosShaperTypeIndex }
+    ::= { cfmNetPortQosShaperTable 1 }
+
+CfmNetPortQosShaperEntry ::= SEQUENCE {
+    cfmNetPortQosShaperTypeIndex    Integer32,
+    cfmNetPortQosShaperCIR          Unsigned32,
+    cfmNetPortQosShaperBufSize      Unsigned32,
+    cfmNetPortQosShaperAdminState   AdminState
+}
+
+cfmNetPortQosShaperTypeIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A unique index associated with the type of Network Port Based Shaper.
+         Index 1 refers to the Shaper associated with PORT-based Down MEPs,
+         Index 2 refers to the Shaper associated with the VID-based Down MEPs."
+    ::= { cfmNetPortQosShaperEntry 1 }
+
+cfmNetPortQosShaperCIR OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the queue CIR."
+     ::= { cfmNetPortQosShaperEntry 2 }
+
+cfmNetPortQosShaperBufSize OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the queue buffer size."
+     ::= { cfmNetPortQosShaperEntry 3 }
+
+cfmNetPortQosShaperAdminState OBJECT-TYPE
+    SYNTAX     AdminState
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows the management of the Shaper Administrative State.
+          Only 'in-service' and 'management' states are allowed."
+     ::= { cfmNetPortQosShaperEntry 4 }
+
+--
+-- Server MEPs 
+--
+cfmServerMepTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CfmServerMepEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Server MEP management table."
+    ::= { cfmExtSvcObjects 5 }
+
+cfmServerMepEntry OBJECT-TYPE
+    SYNTAX     CfmServerMepEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This allows management of Server MEPs."
+    INDEX { cfmServerMepIndex }
+    ::= { cfmServerMepTable 1 }
+
+CfmServerMepEntry ::= SEQUENCE {
+    cfmServerMepIndex                    Integer32,
+    cfmServerMepAssociatedPort           VariablePointer,
+    cfmServerMepAisClientMdLevel         Dot1agCfmMDLevel,
+    cfmServerMepAisInterval              CfmAisInterval,
+    cfmServerMepAisGenEnabled            TruthValue,
+    cfmServerMepAisPriority              VlanPriority,
+    cfmServerMepStorageType              StorageType,
+    cfmServerMepRowStatus                RowStatus,
+    -- State Params
+    cfmServerMepAdminState               AdminState,
+    cfmServerMepOperationalState         OperationalState,
+    cfmServerMepSecondaryState           SecondaryState
+}
+
+cfmServerMepIndex OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The integer index value corresponding to a Server MEP."
+    ::= { cfmServerMepEntry 1 }
+
+cfmServerMepAssociatedPort OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This is the port on which the CFM Server MEP is created."
+    ::= { cfmServerMepEntry 2 }
+
+cfmServerMepAisClientMdLevel OBJECT-TYPE
+    SYNTAX     Dot1agCfmMDLevel
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "AIS Client MD level which is the MD level used to identify any
+         higher level local MEPs for which AIS defect needs to be set or
+         MD level of the ETH-AIS frame generated if there are no local MEPs
+         at this MD level."
+    ::= { cfmServerMepEntry 3 }
+
+cfmServerMepAisInterval OBJECT-TYPE
+    SYNTAX     CfmAisInterval
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "ETH-AIS frame transmission interval if decision is made to transmit the
+         ETH-AIS frame."
+    ::= { cfmServerMepEntry 4 }
+
+cfmServerMepAisGenEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This flag enables/disables propagation of ETH-AIS to client MD levels."
+    ::= { cfmServerMepEntry 5 }
+
+cfmServerMepAisPriority OBJECT-TYPE
+    SYNTAX     VlanPriority
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This VLAN priority of the ETH-AIS frame."
+    ::= { cfmServerMepEntry 6 }
+
+cfmServerMepStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { cfmServerMepEntry 7 }
+
+cfmServerMepRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+            An entry MUST NOT exist in the active state unless all
+            objects in the entry have an appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of cfmServerMepRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            cfmServerMepRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The cfmServerMepRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { cfmServerMepEntry 8 }
+
+cfmServerMepAdminState OBJECT-TYPE
+    SYNTAX      AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "This object represents the Administrative State of the Server MEP." 
+    ::= { cfmServerMepEntry 9 }
+
+cfmServerMepOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Operational State of the Server MEP." 
+    ::= { cfmServerMepEntry 10 }
+
+cfmServerMepSecondaryState OBJECT-TYPE
+    SYNTAX      SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Secondary State of the CFM MEP." 
+    ::= { cfmServerMepEntry 11 }
+
+--
+-- CFM QOS Shapers for down MEPs
+--
+cfmDownMEPQosShaperTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CfmDownMEPQosShaperEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of configurable profile entries for CFM QoS Shapers for down MEPs."
+    ::= { cfmExtSvcObjects 6 }
+
+cfmDownMEPQosShaperEntry OBJECT-TYPE
+    SYNTAX     CfmDownMEPQosShaperEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of parameters that set up the CFM QoS Queue profiles.
+         This shaper is created automatically when the first Down MEP
+         is created on a Port. Note, this queues is valid for port based Down MEPs, VID based down MEPs on NNI port."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetTrafficPortIndex, 
+            cfmDownMEPQosShaperType, cfmDownMEPQosShaperIndex }
+    ::= { cfmDownMEPQosShaperTable 1 }
+
+CfmDownMEPQosShaperEntry ::= SEQUENCE {
+    cfmDownMEPQosShaperIndex        Integer32,
+    cfmDownMEPQosShaperType         Integer32,
+    cfmDownMEPQosShaperCIR          Unsigned32,
+    cfmDownMEPQosShaperProfile      VariablePointer,
+    cfmDownMEPQosShaperAdminState   AdminState
+
+}
+
+cfmDownMEPQosShaperIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A unique index associated with the Shaper for Down MEPs."
+    ::= { cfmDownMEPQosShaperEntry 1 }
+    
+cfmDownMEPQosShaperType OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Type of  Shaper for Down MEPs.
+         1 refers to the Shaper associated with Down MEPs(for both port based and VID based) fot Transimit direction,
+         2 refers to the Shaper associated with Down MEPs(for both port based and VID based) fot Receiving direction"
+    ::= { cfmDownMEPQosShaperEntry 2 }
+
+cfmDownMEPQosShaperCIR OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the queue CIR."
+     ::= { cfmDownMEPQosShaperEntry 3 }
+
+cfmDownMEPQosShaperProfile OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the OID of cmQosQueueProfileIndex in the cmQosQueueProfileTable."
+     ::= { cfmDownMEPQosShaperEntry 4 }
+                                       
+cfmDownMEPQosShaperAdminState OBJECT-TYPE
+    SYNTAX     AdminState
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows the management of the Shaper Administrative State.
+          Only 'in-service' and 'management' states are allowed."
+     ::= { cfmDownMEPQosShaperEntry 5 }
+
+--
+-- CFM EXCLUDED MEP LIST
+--
+cfmMepExcludedMepListTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CfmMepExcludedMepListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of configurable profile entries for CFM excluded mep list."
+    ::= { cfmExtSvcObjects 7 }
+
+cfmMepExcludedMepListEntry OBJECT-TYPE
+    SYNTAX     CfmMepExcludedMepListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Excluded Remote Mep List for local Mep, not expected to receive OAM from these MEPs."
+    INDEX { dot1agCfmMdIndex, dot1agCfmMaIndex, dot1agCfmMepIdentifier, cfmMepExcludedMepListIdentifier }
+    ::= { cfmMepExcludedMepListTable 1 }
+
+CfmMepExcludedMepListEntry ::= SEQUENCE {
+    cfmMepExcludedMepListIdentifier        Unsigned32,
+    cfmMepExcludedMepListRowStatus         RowStatus
+}
+
+cfmMepExcludedMepListIdentifier OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..8191)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A unique index associated with CfmMepExcludedMepListEntry."
+    ::= { cfmMepExcludedMepListEntry 1 }
+    
+cfmMepExcludedMepListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+            An entry MUST NOT exist in the active state unless all
+            objects in the entry have an appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of cfmMepExcludedMepListRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            cfmMepExcludedMepListRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The cfmMepExcludedMepListRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { cfmMepExcludedMepListEntry 2 }
+
+--
+-- CFM MEP LBR TABLE
+--
+cfmMepLbrTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CfmMepLbrEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of configurable profile entries for MepLbr."
+    ::= { cfmExtSvcObjects 8 }
+
+cfmMepLbrEntry OBJECT-TYPE
+    SYNTAX     CfmMepLbrEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "MEP LBR statistic table."
+    INDEX { dot1agCfmMdIndex, dot1agCfmMaIndex, dot1agCfmMepIdentifier, cfmMepLbrMacAddress }
+    ::= { cfmMepLbrTable 1 }
+
+CfmMepLbrEntry ::= SEQUENCE {
+    cfmMepLbrMacAddress        MacAddress,
+    cfmMepLbrMepId             Integer32,
+    cfmMepLbrInOrder           PerfCounter64,
+    cfmMepLbrOutOfOder         PerfCounter64
+}
+
+cfmMepLbrMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Source Mac Address of LBR." 
+    ::= { cfmMepLbrEntry 1 }
+
+cfmMepLbrMepId OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Remote MEP ID." 
+    ::= { cfmMepLbrEntry 2 }
+
+cfmMepLbrInOrder OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total valid in-order LBR received." 
+    ::= { cfmMepLbrEntry 3 }
+
+cfmMepLbrOutOfOder OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total valid out of order LBR received." 
+    ::= { cfmMepLbrEntry 4 }
+
+--
+-- extension table for maComp
+--
+cfmMaCompTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CfmMaCompEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A additional list of MA components."
+    ::= { cfmExtSvcObjects 9 }
+
+cfmMaCompEntry OBJECT-TYPE
+    SYNTAX     CfmMaCompEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of additional maCompEntry."
+    AUGMENTS { dot1agCfmMaCompEntry }
+    ::= { cfmMaCompTable 1 }
+
+CfmMaCompEntry ::= SEQUENCE {
+    cfmMaCompIndex                         Unsigned32,
+    cfmMaCompEntity                        VariablePointer
+}
+
+cfmMaCompIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the maComp number value." 
+    ::= { cfmMaCompEntry 1 }
+
+cfmMaCompEntity OBJECT-TYPE
+    SYNTAX      VariablePointer 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "This object represents the maComp entity, it is should be port or flow's oid." 
+    ::= { cfmMaCompEntry 2 }
+
+--
+-- Conformance Section
+--
+cfmExtSvcCompliances OBJECT IDENTIFIER ::= {cfmExtSvcConformance 1}
+cfmExtSvcGroups OBJECT IDENTIFIER ::= {cfmExtSvcConformance 2}
+
+cfmExtCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "Describes the requirements for conformance to the CFM Extensions."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              cfmExtGroup, cfmGenGroup, cfmMepGroup, cfmPortShaperGroup, cfmServerMepGroup
+        }
+    ::= { cfmExtSvcCompliances 1 }
+
+-- CFM MEP extensions group
+cfmExtGroup OBJECT-GROUP
+    OBJECTS {
+        cfmEthType, cfmMacAddress, slmMulticastMacAddress,
+        slmOpcode, slrOpcode,
+
+        cfmMepAdminState, cfmMepAisGenTriggerTypes, cfmMepAisClientMdLevel, 
+        cfmMepAisInterval, cfmMepAisGenEnabled, cfmMepAisPriority, 
+        cfmMepLmTxCountAllPriosEnabled, cfmMepLmRxCountAllPriosEnabled, 
+        cfmMepLmDualEndedCountAllPriosEnabled, cfmMepLmCountInProfileEnabled, 
+        cfmMepLmTxPriority, cfmMepDmPriority, cfmMepRxCCMs, cfmMepErrCCMs, 
+        cfmMepLLFTriggerTypes, cfmMepDefects, cfmMepTagEtherType, cfmMepStatsAction, 
+        cfmMepLbmInterval,
+
+        cfmAccPortQosShaperIndex, cfmAccPortQosShaperCIR, 
+        cfmAccPortQosShaperBufSize, cfmAccPortQosShaperAdminState,
+
+        cfmNetPortQosShaperTypeIndex, cfmNetPortQosShaperCIR,
+        cfmNetPortQosShaperBufSize, cfmNetPortQosShaperAdminState,
+
+        cfmServerMepIndex, cfmServerMepAssociatedPort, cfmServerMepAisClientMdLevel,
+        cfmServerMepAisInterval, cfmServerMepAisGenEnabled, cfmServerMepAisPriority,
+        cfmServerMepStorageType, cfmServerMepRowStatus,
+        
+        cfmDownMEPQosShaperIndex,cfmDownMEPQosShaperType, cfmDownMEPQosShaperCIR, 
+        cfmDownMEPQosShaperProfile, cfmDownMEPQosShaperAdminState
+    }
+    STATUS  deprecated
+    DESCRIPTION
+        "******************THIS OBJECT GROUP IS NOW DEPRECATED ******************
+         A collection of objects used to identify CFM extension implementation compliance."
+    ::= { cfmExtSvcGroups 1 }
+
+cfmGenGroup OBJECT-GROUP
+    OBJECTS {
+        cfmEthType, cfmMacAddress, slmMulticastMacAddress,
+        slmOpcode, slrOpcode, cfmSignalFailTriggers
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to identify CFM extension implementation compliance."
+    ::= { cfmExtSvcGroups 2 }
+
+cfmMepGroup OBJECT-GROUP
+    OBJECTS {
+        cfmMepAdminState, cfmMepAisGenTriggerTypes, cfmMepAisClientMdLevel, 
+        cfmMepAisInterval, cfmMepAisGenEnabled, cfmMepAisPriority, 
+        cfmMepLmTxCountAllPriosEnabled, cfmMepLmRxCountAllPriosEnabled, 
+        cfmMepLmDualEndedCountAllPriosEnabled, cfmMepLmCountInProfileEnabled, 
+        cfmMepLmTxPriority, cfmMepDmPriority, cfmMepRxCCMs, cfmMepErrCCMs, 
+        cfmMepLLFTriggerTypes, cfmMepDefects, cfmMepTagEtherType, cfmMepStatsAction,
+        cfmMepOperationalState, cfmMepSecondaryState, cfmMepSlmEnabled, 
+        cfmMepExcludedMepListIdentifier, cfmMepExcludedMepListRowStatus,
+        cfmMepLbrMacAddress, cfmMepLbrMepId, cfmMepLbrInOrder, cfmMepLbrOutOfOder,
+        cfmMepAssociatedObject
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to identify additional CFM MEP functions."
+    ::= { cfmExtSvcGroups 3 }
+
+cfmPortShaperGroup OBJECT-GROUP
+    OBJECTS {
+        cfmAccPortQosShaperIndex, cfmAccPortQosShaperCIR, 
+        cfmAccPortQosShaperBufSize, cfmAccPortQosShaperAdminState,
+
+        cfmNetPortQosShaperTypeIndex, cfmNetPortQosShaperCIR,
+        cfmNetPortQosShaperBufSize, cfmNetPortQosShaperAdminState
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to identify CFM Port Shaper functionality."
+    ::= { cfmExtSvcGroups 4 }
+
+cfmServerMepGroup OBJECT-GROUP
+    OBJECTS {
+        cfmServerMepIndex, cfmServerMepAssociatedPort, cfmServerMepAisClientMdLevel,
+        cfmServerMepAisInterval, cfmServerMepAisGenEnabled, cfmServerMepAisPriority,
+        cfmServerMepStorageType, cfmServerMepRowStatus,
+        cfmServerMepAdminState, cfmServerMepOperationalState, cfmServerMepSecondaryState
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to identify CFM Server MEP functionality."
+    ::= { cfmExtSvcGroups 5 }
+
+cfmMaCompGroup OBJECT-GROUP
+    OBJECTS {
+        cfmMaCompIndex, cfmMaCompEntity
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of additional objects used to show maComp."
+    ::= { cfmExtSvcGroups 6 }
+
+END

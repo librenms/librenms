@@ -36,13 +36,12 @@ $config['mysql_log_level']       = 'ERROR';
 
 //MySQL port
 $config['db_port']               = 3306;
+$config['db_socket']             = null;
 
 // What is my own hostname (used to identify this host in its own database)
 $config['own_hostname'] = 'localhost';
 
 // Location of executables
-$config['rrdtool']                  = '/usr/bin/rrdtool';
-$config['rrdtool_version']          = 1.4; // Doesn't need to contain minor numbers.
 $config['fping']                    = '/usr/bin/fping';
 $config['fping6']                   = 'fping6';
 $config['fping_options']['retries'] = 3;
@@ -190,6 +189,9 @@ $config['snmp']['v3'][0]['cryptoalgo'] = 'AES';
 // Devices must respond to icmp by default
 $config['icmp_check'] = true;
 
+// The amount of time to keep the OS cache
+$config['os_def_cache_time'] = 86400;
+
 // Autodiscovery Settings
 $config['autodiscovery']['xdp'] = true;
 $config['autodiscovery']['xdp_exclude']['sysdesc_regexp'][] = '/-K9W8-/'; // Cisco Lightweight Access Point
@@ -336,7 +338,6 @@ $config['graph_colours']['mega']=array_merge(
     $config['graph_colours']['default'],
     $config['graph_colours']['mixed']
 );
-
 
 // Map colors
 $config['network_map_legend'] = array(
@@ -516,6 +517,7 @@ $config['bad_if'][] = 'span rp';
 $config['bad_if'][] = 'span sp';
 $config['bad_if'][] = 'sslvpn';
 $config['bad_if'][] = 'pppoe-';
+$config['bad_if'][] = 'irtual';
 // $config['bad_if'][] = "control plane";  // Example for cisco control plane
 // Ignore ports based on ifType. Case-sensitive.
 $config['bad_iftype'][] = 'voiceEncap';
@@ -564,17 +566,19 @@ $config['device_traffic_descr'][] = '/null/';
 $config['device_traffic_descr'][] = '/dummy/';
 
 // IRC Bot configuration
-$config['irc_host']       = '';
-$config['irc_port']       = '';
-$config['irc_maxretry']   = 3;
-$config['irc_nick']       = $config['project_name'];
-$config['irc_chan'][]     = '##'.$config['project_id'];
-$config['irc_pass']       = '';
-$config['irc_external']   = '';
-$config['irc_authtime']   = 3;
-$config['irc_debug']      = false;
-$config['irc_alert']      = false;
-$config['irc_alert_utf8'] = false;
+$config['irc_host']         = '';
+$config['irc_port']         = '';
+$config['irc_maxretry']     = 3;
+$config['irc_nick']         = $config['project_name'];
+$config['irc_chan'][]       = '##'.$config['project_id'];
+$config['irc_pass']         = '';
+$config['irc_external']     = '';
+$config['irc_authtime']     = 3;
+$config['irc_debug']        = false;
+$config['irc_alert']        = false;
+$config['irc_alert_utf8']   = false;
+$config['irc_ctcp']         = false;
+$config['irc_ctcp_version'] = "LibreNMS IRCbot. https://www.librenms.org/";
 
 // Authentication
 $config['allow_unauth_graphs'] = false;
@@ -713,6 +717,7 @@ $config['poller_modules']['junose-atm-vp']               = 0;
 $config['poller_modules']['toner']                       = 0;
 $config['poller_modules']['ucd-diskio']                  = 1;
 $config['poller_modules']['wifi']                        = 0;
+$config['poller_modules']['wireless']                    = 1;
 $config['poller_modules']['ospf']                        = 1;
 $config['poller_modules']['cisco-ipsec-flow-monitor']    = 0;
 $config['poller_modules']['cisco-remote-access-monitor'] = 0;
@@ -726,6 +731,7 @@ $config['poller_modules']['cisco-asa-firewall']          = 0;
 $config['poller_modules']['cisco-voice']                 = 0;
 $config['poller_modules']['cisco-cbqos']                 = 0;
 $config['poller_modules']['cisco-otv']                   = 0;
+$config['poller_modules']['cisco-vpdn']                  = 0;
 $config['poller_modules']['netscaler-vsvr']              = 0;
 $config['poller_modules']['aruba-controller']            = 0;
 $config['poller_modules']['entity-physical']             = 1;
@@ -736,6 +742,7 @@ $config['poller_modules']['ntp']                         = 1;
 $config['poller_modules']['services']                    = 1;
 $config['poller_modules']['loadbalancers']               = 0;
 $config['poller_modules']['mef']                         = 0;
+$config['poller_modules']['tnms-nbi']                    = 0;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
@@ -775,14 +782,7 @@ $config['discovery_modules']['stp']                  = 1;
 $config['discovery_modules']['ntp']                  = 1;
 $config['discovery_modules']['loadbalancers']        = 0;
 $config['discovery_modules']['mef']                  = 0;
-
-$config['modules_compat']['rfc1628']['liebert']    = 1;
-$config['modules_compat']['rfc1628']['netmanplus'] = 1;
-$config['modules_compat']['rfc1628']['deltaups']   = 1;
-$config['modules_compat']['rfc1628']['poweralert'] = 1;
-$config['modules_compat']['rfc1628']['webpower']   = 1;
-$config['modules_compat']['rfc1628']['huaweiups']  = 1;
-$config['modules_compat']['rfc1628']['generex-ups']  = 1;
+$config['discovery_modules']['wireless']             = 1;
 
 // Enable daily updates
 $config['update'] = 1;

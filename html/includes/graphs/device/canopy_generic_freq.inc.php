@@ -10,7 +10,7 @@
  */
 require 'includes/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'canopy-generic-freq');
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Ghz           Now     \\n'";
     $rrd_options .= ' DEF:freq='.$rrdfilename.':freq:AVERAGE ';
     $rrd_options .= " LINE2:freq#FF0000:'Frequency       ' ";

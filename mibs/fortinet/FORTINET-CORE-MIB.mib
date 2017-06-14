@@ -29,7 +29,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 fortinet MODULE-IDENTITY
-    LAST-UPDATED "201404100000Z"
+    LAST-UPDATED "201501140000Z"
     ORGANIZATION 
         "Fortinet Technologies, Inc."
     CONTACT-INFO 
@@ -37,6 +37,12 @@ fortinet MODULE-IDENTITY
          email: support@fortinet.com
          http://www.fortinet.com
         "
+    DESCRIPTION
+        "Registered FortiWANMib OIDs"
+    REVISION    "201501140000Z"
+    DESCRIPTION
+        "Registered and updated FortiAuthenticatorMib/FortiRecorderMib/FortiVoiceMib/FortiBridgeMib/FortiDirectorMib OIDs"
+    REVISION    "201412100000Z"
     DESCRIPTION
         "Registered FortiVoiceMib OID"
     REVISION    "201404100000Z"
@@ -163,7 +169,12 @@ fnCoreMib OBJECT IDENTIFIER ::= { fortinet 100 }
 -- fnFortiDNSMib      OBJECT IDENTIFIER ::= { fortinet 110 }
 -- fnFortiDDoSMib     OBJECT IDENTIFIER ::= { fortinet 111 }
 -- fnFortiADCMib      OBJECT IDENTIFIER ::= { fortinet 112 }
--- fnFortiVoiceMib    OBJECT IDENTIFIER ::= { fortinet 113 }
+-- fnFortiAuthenticatorMib    OBJECT IDENTIFIER ::= { fortinet 113 }
+-- fnFortiRecorderMib OBJECT IDENTIFIER ::= { fortinet 114 }
+-- fnFortiVoiceMib    OBJECT IDENTIFIER ::= { fortinet 115 }
+-- fnFortiBridgeMib   OBJECT IDENTIFIER ::= { fortinet 116 }
+-- fnFortiDirectorMib OBJECT IDENTIFIER ::= { fortinet 117 }
+-- fnFortiWANMib      OBJECT IDENTIFIER ::= { fortinet 118 }
 --
 
 --

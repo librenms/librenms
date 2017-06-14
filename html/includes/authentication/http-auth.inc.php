@@ -1,34 +1,21 @@
 <?php
 
+use LibreNMS\Exceptions\AuthenticationException;
 use Phpass\PasswordHash;
-
-if (!isset($_SESSION['username'])) {
-    $_SESSION['username'] = '';
-}
-
 
 function authenticate($username, $password)
 {
-    global $config;
-
-    if (isset($_SERVER['REMOTE_USER']) || isset($_SERVER['PHP_AUTH_USER'])) {
-        $_SESSION['username'] = mres($_SERVER['REMOTE_USER']) ?: mres($_SERVER['PHP_AUTH_USER']);
-
-        $row = @dbFetchRow('SELECT username FROM `users` WHERE `username`=?', array($_SESSION['username']));
-        if (isset($row['username']) && $row['username'] == $_SESSION['username']) {
-            return 1;
-        } else {
-            $_SESSION['username'] = $config['http_auth_guest'];
-            return 1;
-        }
+    if (user_exists($username)) {
+        return true;
     }
-    return 0;
+
+    throw new AuthenticationException('No matching user found and http_auth_guest is not set');
 }
 
 
-function reauthenticate($sess_id = '', $token = '')
+function reauthenticate($sess_id, $token)
 {
-    return 0;
+    return false;
 }
 
 
@@ -50,12 +37,12 @@ function auth_usermanagement()
 }
 
 
-function adduser($username, $password, $level, $email = '', $realname = '', $can_modify_passwd = 1, $description = '', $twofactor = 0)
+function adduser($username, $password, $level, $email = '', $realname = '', $can_modify_passwd = 1, $description = '')
 {
     if (!user_exists($username)) {
         $hasher    = new PasswordHash(8, false);
         $encrypted = $hasher->HashPassword($password);
-        $userid    = dbInsert(array('username' => $username, 'password' => $encrypted, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd, 'descr' => $description, 'twofactor' => $twofactor), 'users');
+        $userid    = dbInsert(array('username' => $username, 'password' => $encrypted, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd, 'descr' => $description), 'users');
         if ($userid == false) {
             return false;
         } else {
@@ -72,20 +59,34 @@ function adduser($username, $password, $level, $email = '', $realname = '', $can
 
 function user_exists($username)
 {
-    // FIXME this doesn't seem right? (adama)
-    return dbFetchCell('SELECT * FROM `users` WHERE `username` = ?', array($username));
+    global $config;
+
+    return dbFetchCell(
+        'SELECT COUNT(*) FROM `users` WHERE `username`=? OR `username`=?',
+        array($username, $config['http_auth_guest'])
+    ) > 0;
 }
 
 
 function get_userlevel($username)
 {
-    return dbFetchCell('SELECT `level` FROM `users` WHERE `username`= ?', array($username));
+    global $config;
+
+    return dbFetchCell(
+        'SELECT `level` FROM `users` WHERE `username`=? OR `username`=?',
+        array($username, $config['http_auth_guest'])
+    );
 }
 
 
 function get_userid($username)
 {
-    return dbFetchCell('SELECT `user_id` FROM `users` WHERE `username`= ?', array($username));
+    global $config;
+
+    return dbFetchCell(
+        'SELECT `user_id` FROM `users` WHERE `username`=? OR `username`=?',
+        array($username, $config['http_auth_guest'])
+    );
 }
 
 

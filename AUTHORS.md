@@ -186,7 +186,7 @@ LibreNMS contributors:
 - Zane C. Bowers-Hadley <vvelox@vvelox.net> (vvelox)
 - Valentin Polonuyer <valik.vicious@gmail.com> (ValikVicious)
 - Olivier Le Brouster <olb@nebkha.net> (ollb)
-- Avery Payne <avery.p.payne@gmail.com> (apayne) 
+- Avery Payne <avery.p.payne@gmail.com> (apayne)
 - Ryan Medlyn <ryan.medlyn@gmail.com> (rmedlyn)
 - Mark Hughes <m@rkhugh.es> (markehme)
 - Mark Abrahams <mark@abrahams.co.nz> (markabrahams)
@@ -195,6 +195,17 @@ LibreNMS contributors:
 - Hubert Ladet <mail4git38@gmail.com> (mail4git38)
 - Deeps (deepseth)
 - Jari Schäfer <jari.schaefer@gmail.com> (jarischaefer)
+- Jan-Philipp Litza <janphilipp@litza.de> (jplitza)
+- Chris Putnam <chrisputnam@gmail.com> (putnam)
+- Jonathan Price <jonathan@jonathanprice.uk> (Pricetx)
+- Remy de Boer <remy@slowpoke.nl> (remydb)
+- Ben Klang <ben@alkaloid.net> (bklang)
+- Tim Stallard <code@timstallard.me.uk> (TimStallard)
+- Svenn D'Hert <admin at svennd.be> (svennd)
+- Dominik Bay <db@rrbone.net> (eimann)
+- Nick Peelman <nick@peelman.us> (peelman)
+- Patrick Ryon <patrick@slashdoom.com> (slashdoom)
+- Mike Williams <mike@mgww.net> (network-guy)
 
 Observium was written by:
 - Adam Armstrong

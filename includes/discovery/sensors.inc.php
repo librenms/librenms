@@ -3,7 +3,14 @@
 $valid['sensor'] = array();
 
 // Pre-cache data for later use
-require 'includes/discovery/sensors/pre-cache.inc.php';
+$pre_cache = array();
+$pre_cache_file = 'includes/discovery/sensors/pre-cache/' . $device['os'] . '.inc.php';
+if (is_file($pre_cache_file)) {
+    echo "Pre-cache {$device['os']}: ";
+    include $pre_cache_file;
+    echo PHP_EOL;
+    d_echo($pre_cache);
+}
 
 // Run custom sensors 
 require 'includes/discovery/sensors/cisco-entity-sensor.inc.php';
@@ -45,6 +52,7 @@ $run_sensors = array(
     'state',
     'temperature',
     'voltage',
+    'snr',
 );
 sensors($run_sensors, $device, $valid, $pre_cache);
 unset(

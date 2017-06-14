@@ -31,6 +31,7 @@ pages:
     - General/Acknowledgement.md
     - General/Callback-Stats-and-Privacy.md
     - General/Changelog.md
+    - General/CODE_OF_CONDUCT.md
     - General/Contributing.md
     - General/Credits.md
     - General/Updating.md
@@ -83,7 +84,7 @@ pages:
     - Developing/Code-Structure.md
 
     - Developing/Creating-Documentation.md
-    - Developing/Support-New-OS.md
+    - Adding support for a new OS: Developing/Support-New-OS.md
     - Developing/Dynamic-Config.md
     - Developing/Sensor-State-Support.md
 
@@ -112,3 +113,9 @@ pages:
     - Support/Support-New-OS.md
     - Extensions/Agent-Setup.md
     - Extensions/RRDCached-Security.md
+    - Developing/os/Initial-Detection.md
+    - Developing/os/Mem-CPU-Information.md
+    - Developing/os/Test-Units.md
+    - Developing/os/Health-Information.md
+    - Developing/os/Wireless-Sensors.md
+    - Developing/os/Custom-Graphs.md

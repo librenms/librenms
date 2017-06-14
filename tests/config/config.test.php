@@ -3,7 +3,7 @@
 ## Have a look in includes/defaults.inc.php for examples of settings you can set here. DO NOT EDIT defaults.inc.php!
 
 ### Database config
-$config['db_host'] = 'localhost';
+$config['db_host'] = '127.0.0.1';
 $config['db_user'] = 'root';
 $config['db_pass'] = '';
 $config['db_name'] = 'librenms_phpunit_78hunjuybybh';

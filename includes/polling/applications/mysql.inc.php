@@ -9,9 +9,7 @@ if (!empty($agent_data['app'][$name])) {
     $mysql = $agent_data['app'][$name];
 } else {
     // Polls MySQL  statistics from script via SNMP
-    $mysql_cmd  = $config['snmpget'].' -m NET-SNMP-EXTEND-MIB -O qv '.snmp_gen_auth($device).' '.$device['hostname'].':'.$device['port'];
-    $mysql_cmd .= ' nsExtendOutputFull.5.109.121.115.113.108';
-    $mysql      = shell_exec($mysql_cmd);
+    $mysql = snmp_get($device, '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.109.121.115.113.108', '-Ovq');
 }
 
 update_application($app, $mysql);
@@ -110,7 +108,7 @@ foreach ($data as $str) {
 
 $fields = array();
 foreach ($mapping as $k => $v) {
-    $fields[$k] = isset($map[$v]) ? $map[$v] : (-1);
+    $fields[$k] = (isset($map[$v]) && $map[$v] >= 0) ? $map[$v] : 'U';
 }
 
 $rrd_name = array('app', $name, $app_id);
@@ -223,7 +221,7 @@ $rrd_def = new RrdDefinition();
 unset($fields);
 $fields = array();
 foreach ($mapping_status as $desc => $id) {
-    $fields[$desc] = isset($map[$id]) ? $map[$id] : (-1);
+    $fields[$desc] = (isset($map[$id]) && $map[$id] >= 0) ? $map[$id] : 'U';
     $rrd_def->addDataset($id, 'GAUGE', 0, 125000000000);
 }
 $status = true;

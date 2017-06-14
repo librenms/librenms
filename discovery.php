@@ -20,15 +20,6 @@ $options       = getopt('h:m:i:n:d::v::a::q', array('os:','type:'));
 
 if (!isset($options['q'])) {
     echo $config['project_name_version']." Discovery\n";
-    $versions = version_info(false);
-    echo "Version info:\n";
-    $cur_sha = $versions['local_sha'];
-    echo "Commit SHA: $cur_sha\n";
-    echo "DB Schema: ".$versions['db_schema']."\n";
-    echo "PHP: ".$versions['php_ver']."\n";
-    echo "MySQL: ".$versions['mysql_ver']."\n";
-    echo "RRDTool: ".$versions['rrdtool_ver']."\n";
-    echo "SNMP: ".$versions['netsnmp_ver']."\n";
 }
 
 if (isset($options['h'])) {
@@ -42,6 +33,7 @@ if (isset($options['h'])) {
         $where = ' ';
         $doing = 'all';
     } elseif ($options['h'] == 'new') {
+        set_lock('new-discovery');
         $where = 'AND `last_discovered` IS NULL';
         $doing = 'new';
     } elseif ($options['h']) {
@@ -71,6 +63,20 @@ if (isset($options['i']) && $options['i'] && isset($options['n'])) {
 }
 
 if (isset($options['d']) || isset($options['v'])) {
+    $versions = version_info(false);
+    echo <<<EOH
+===================================
+Version info:
+Commit SHA: {$versions['local_sha']}
+Commit Date: {$versions['local_date']}
+DB Schema: {$versions['db_schema']}
+PHP: {$versions['php_ver']}
+MySQL: {$versions['mysql_ver']}
+RRDTool: {$versions['rrdtool_ver']}
+SNMP: {$versions['netsnmp_ver']}
+==================================
+EOH;
+
     echo "DEBUG!\n";
     if (isset($options['v'])) {
         $vdebug = true;
@@ -108,7 +114,11 @@ if (!$where) {
     exit;
 }
 
-require 'includes/sql-schema/update.php';
+if (get_lock('schema') === false) {
+    require 'includes/sql-schema/update.php';
+}
+
+update_os_cache(); // will only update if needed
 
 $discovered_devices = 0;
 
@@ -116,6 +126,7 @@ if (!empty($config['distributed_poller_group'])) {
     $where .= ' AND poller_group IN('.$config['distributed_poller_group'].')';
 }
 
+global $device;
 foreach (dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
     discover_device($device, $options);
 }
@@ -126,6 +137,11 @@ $proctime = substr($run, 0, 5);
 
 if ($discovered_devices) {
     dbInsert(array('type' => 'discover', 'doing' => $doing, 'start' => $start, 'duration' => $proctime, 'devices' => $discovered_devices, 'poller' => $config['distributed_poller_name']), 'perf_times');
+    if ($doing === 'new') {
+        // We have added a new device by this point so we might want to do some other work
+        oxidized_reload_nodes();
+        release_lock('new-discovery');
+    }
 }
 
 $string = $argv[0]." $doing ".date($config['dateformat']['compact'])." - $discovered_devices devices discovered in $proctime secs";
