@@ -1,4 +1,4 @@
-os: chatsworth
+os: chatsworth-pdu
 text: 'Chatsworth PDU'
 type: power
 icon: chatsworth

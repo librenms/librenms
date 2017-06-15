@@ -1,6 +1,6 @@
 <?php
 /**
- * chatsworth.inc.php
+ * chatsworth-pdu.inc.php
  *
  * LibreNMS OS poller module for Legacy Chatsworth PDU
  *
