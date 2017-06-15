@@ -1,0 +1,534 @@
+BENU-HOST-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Counter64,  Integer32, Unsigned32, OBJECT-IDENTITY, TimeTicks
+    FROM SNMPv2-SMI
+     DisplayString, TEXTUAL-CONVENTION
+    FROM SNMPv2-TC
+     benuPlatform
+    FROM BENU-PLATFORM-MIB;
+
+
+bHostMIB MODULE-IDENTITY
+    LAST-UPDATED "201511030000Z" -- 03 Nov 2015
+    ORGANIZATION "Benu Networks"
+    CONTACT-INFO "Benu Networks Inc,
+      300 Concord Road,
+      Billerca MA 01821
+      Email: support@benunets.com"
+    DESCRIPTION
+        "This mib module defines statistics for software 
+        running entities.
+        Copyright (C) 2001, 2008 by Benu Networks, Inc.
+        All rights reserved."
+    REVISION "201511030000Z" -- 03 Nov 2015
+    DESCRIPTION "Changed bSysTotalMem, bSysMemUsed and bSysMemFree from CounterBasedGauge64 to Unsigned32"
+    REVISION "201504280000Z" -- 28 April 2015
+    DESCRIPTION "Improved the use of 64 Bit Gauge by replacing Unsigned64 with CounterBasedGauge64"
+    REVISION "201504270000Z" -- 27 April 2015
+    DESCRIPTION "Updated the description of bSWTaskRunStateTime"
+    REVISION "201501050000Z" -- 05 Jan 2015
+    DESCRIPTION "Updated notification assignments to comply with standards (RFC 2578)."
+    REVISION "201501040000Z" -- 04 Jan 2015
+    DESCRIPTION "Updated MIB file with change in MAX-ACCESS level for notification objects."
+    REVISION "201412170000Z" -- 17 Dec 2014
+    DESCRIPTION "updated MIB file with change in bHostNotifObjects"
+    REVISION "201409220000Z" -- 22 Sep 2014
+    DESCRIPTION "Changed bSWTaskRunStateTime from Unsigned32 to TimeTicks"
+    REVISION "201403210000Z" -- 21 March 2014
+    DESCRIPTION "Trap definitions are changed"
+    REVISION "201305270000Z" -- 20 May 2013
+    DESCRIPTION "Initial Version"
+
+    ::= { benuPlatform 5 }
+
+-- declare top-level MIB objects for each component
+
+bHostMIBObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "MIB objects for Host related  statistics are defined in this branch."
+   ::= { bHostMIB 1 }
+
+bHostNotifObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "Notifications of Host related statistics are defined in this branch."
+   ::= { bHostMIB 0 }
+
+bHostNotifVariables  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+       "MIB objects for Host notifications are defined in this branch."
+   ::= {  bHostMIB 2 }
+
+-- The Host Resources Running Software Performance table
+
+
+bSWTaskInfoTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF BSWTaskInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The (conceptual) table of running software
+        performance metrics."
+    ::= { bHostMIBObjects 1 }
+
+bSWTaskInfoEntry OBJECT-TYPE
+    SYNTAX     BSWTaskInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A (conceptual) entry containing software performance
+        metrics. "
+  INDEX {
+      bSWTaskIndex
+   }
+    ::= { bSWTaskInfoTable 1 }
+
+BSWTaskInfoEntry ::= SEQUENCE {
+        bSWTaskIndex                           Integer32,
+        bSWTaskName                            DisplayString,
+        bSWTaskProcessID                       Unsigned32,
+        bSWTaskLoadIntervalDuration            Unsigned32,
+        bSWTaskRunStateTime                    TimeTicks,
+        bSWTaskCPUUsage                        Unsigned32,
+        bSWTaskAvgCPUUsage                     Unsigned32,
+        bSWTaskMaxCPUUsage                     Unsigned32,
+        bSWTaskCodeSegmentSize                 Unsigned32,
+        bSWTaskDataSegmentSize                 Unsigned32,
+        bSWTaskResidentPhyMem                  Unsigned32,
+        bSWTaskVirtMemUsage                    Unsigned32,
+        bSWTaskSharedMem                       Unsigned32,
+        bSWTaskVirtMemPeakUsage                Unsigned32,
+        bSWTaskAvgCPUUsageHighThreshold        Unsigned32,
+        bSWTaskAvgCPUUsageLowThreshold         Unsigned32,
+        bSWTaskCPUUsageLimit                   Unsigned32,
+        bSWTaskRestartLimit                    Unsigned32,
+        bSWTaskRestartability                  INTEGER,
+        bSWTaskRestartCount                    Unsigned32
+}
+
+bSWTaskIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Index of the software task entry in the table."
+   ::= { bSWTaskInfoEntry 1 }
+
+bSWTaskName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The name  of the running software task."
+   ::= { bSWTaskInfoEntry 2 }
+
+bSWTaskProcessID  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Indicates Process ID."
+   ::= { bSWTaskInfoEntry 3 }
+
+bSWTaskLoadIntervalDuration  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Load interval duration in seconds."
+   ::= { bSWTaskInfoEntry 4 }
+
+bSWTaskRunStateTime  OBJECT-TYPE
+   SYNTAX      TimeTicks
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The amount of  CPU time used by the process since it is started.
+        Value will be in hundredths of a second"
+   ::= { bSWTaskInfoEntry 5 }
+
+bSWTaskCPUUsage  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "CPU usage of the task in the last 1 sec interval duration.
+        The task share of the elapsed time as a percentage of total CPU 
+        time is recorded for one second.
+        Unit is percentage. Range is from 0 to maxcore*100 "
+   ::= { bSWTaskInfoEntry 6 }
+
+bSWTaskAvgCPUUsage  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Average  CPU usage of the task in the last load interval duration.
+        The task share of the elapsed time as a percentage of total CPU 
+        time is recorded for every one second.These one second samples are
+        averaged over a period of load interval.After every one second, older
+        one sec sample will be discarded and new sample will be added to the 
+        set . After addition of a new sample value , average over one second
+        samples in a interval  will be done. 
+        Unit is percentage. Range is from 0 to maxcore*100 "
+   ::= { bSWTaskInfoEntry 7 }
+
+bSWTaskMaxCPUUsage  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Maximum  CPU usage of the task in the last load interval duration.
+        The task share of the elapsed time as a percentage of total CPU 
+        time is recorded for every one second. The maximum of these one 
+        second samples is calculated over a period of load interval duration. 
+        This counter enable to detect the spikes in cpu usage .
+        After every one second, older one sec sample will be discarded and 
+        new sample will be added to the set . After addition of new sample 
+        value , maximum value over one second intervals in a interval 
+        duration will be calculated . 
+        Unit is percentage. Range is from 0 to maxcore*100 "
+   ::= { bSWTaskInfoEntry 8 }
+
+bSWTaskCodeSegmentSize  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Code segment size of the process.
+        Units kilo-bytes"
+   ::= { bSWTaskInfoEntry 9 }
+
+bSWTaskDataSegmentSize  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Data segment  size of the process.
+        Units kilo-bytes"
+   ::= { bSWTaskInfoEntry 10 }
+
+
+bSWTaskResidentPhyMem  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The non-swapped physical memory a task has used.
+        Units kilo-bytes"
+   ::= { bSWTaskInfoEntry 11 }
+
+bSWTaskVirtMemUsage  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The  total  amount  of virtual memory used by the task.
+        Units kilo-bytes"
+   ::= { bSWTaskInfoEntry 12 }
+
+bSWTaskSharedMem  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The amount of shared memory used by a task. 
+        Units kilo-bytes"
+   ::= { bSWTaskInfoEntry 13 }
+
+bSWTaskVirtMemPeakUsage  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The peak usage of total  amount  of virtual memory used 
+	by the task.
+        Units kilo-bytes"
+   ::= { bSWTaskInfoEntry 14 }
+
+
+bSWTaskAvgCPUUsageHighThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The high threshold for average cpu utilization of a task  
+        in a load interval.  If a bSWTaskAvgCPUUsageLow event has
+        been generated ( or  no bSWTaskAvgCPUUsageHigh was
+        generated previously ) for this task, and the value for
+        average cpu utilization  has exceeded the value of
+        bSWTaskAvgCPUUsageHighThreshold, then a
+        bSWTaskAvgCPUUsageHigh event will be generated.  No more
+        bSWTaskAvgCPUUsageHigh events will be generated for this
+        task  until the value for average cpu utilization becomes equal to 
+        or less than the value of bSWTaskAvgCPUUsageLowThreshold.
+         Unit is percentage. Range is from 0 to bSWTaskCPUUsageLimit "
+   ::= { bSWTaskInfoEntry 15 }
+
+bSWTaskAvgCPUUsageLowThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The low threshold for avaerage cpu utilization of a task  
+        in a load interval.  If a bSWTaskAvgCPUUsageHigh event has
+        been generated ( or  no bSWTaskAvgCPUUsageLow was
+        generated previously ) for this task, and the value for
+        average cpu utilization  has fallen below the value of
+        bSWTaskAvgCPUUsageLowThreshold, then a
+        bSWTaskAvgCPUUsageLow event will be generated.  No more
+        bSWTaskAvgCPUUsageLow events will be generated for this
+        task  until the value for average cpu utilization exceeds  
+        the value of bSWTaskAvgCPUUsageHighThreshold.
+        Unit is percentage. Range is from 0 to bSWTaskAvgCPUUsageHighThreshold "
+   ::= { bSWTaskInfoEntry 16 }
+
+bSWTaskCPUUsageLimit  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The limit on cpu usage of the process.When cpu usage of a 
+         process reaches this limit , process would be killed and 
+         bSWTaskDied notification will be sent. The reason in this 
+         notification would be cpuUsageLimitReached .
+         Unit is percentage. Range is from 0 to maxcore*100 "
+   ::= { bSWTaskInfoEntry 17 }
+
+bSWTaskRestartLimit  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The limit on restart of the process.When bSWTaskRestartCount
+         of a process reaches this limit , process would not be restarted
+         and bSWTaskRestartLimitReached notification will be  sent" 
+   ::= { bSWTaskInfoEntry 18 }
+
+bSWTaskRestartability  OBJECT-TYPE
+   SYNTAX      INTEGER {
+                    yes(1),
+                    no(2)
+               }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "This indicates whether a process is enabled or not for 
+        restart. If enabled the process in context respawns after
+        it has crashed/stopped."
+   ::= { bSWTaskInfoEntry 19 }
+
+bSWTaskRestartCount  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This indicates the number of times the process has
+        respawned/restarted." 
+   ::= { bSWTaskInfoEntry 20 }
+
+-- System level objects
+
+bSysTotalMem  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "Total Usable RAM, kilobytes"
+   ::= { bHostMIBObjects 2 }
+
+bSysMemUsed  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The amount of physical RAM, in kilobytes, used by the system."
+   ::= { bHostMIBObjects 3 }
+
+bSysMemFree  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The amount of physical RAM, in kilobytes, left unused by the system."
+   ::= { bHostMIBObjects 4 }
+
+bSysTotalCPUUtilAvailable  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The total CPU utilization available across all CPU cores.
+         The value is maxcores * 100 percentage."
+   ::= { bHostMIBObjects 5 }
+
+bSysAvgCPUUtil15Sec  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The average CPU utilization across all CPU cores
+         in the last 15 seconds.
+         This value is updated for every bCPUMonInterval seconds.
+         Units is percentage . Range is from 0 to  100 ."
+   ::= { bHostMIBObjects 6 }
+
+
+bSysAvgCPUUtil1Min  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The average CPU utilization across all CPU cores
+         in the last one minute.
+         This value is updated for every bCPUMonInterval seconds.
+         Units is percentage . Range is from 0 to  100 ."
+   ::= { bHostMIBObjects 7 }
+
+
+bSysAvgCPUUtil5Min  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The average CPU utilization across all CPU cores
+         in the last five minutes.
+         This value is updated for every bCPUMonInterval seconds.
+         Units is percentage . Range is from 0 to  100 ."
+   ::= { bHostMIBObjects 8 }
+
+bCPUMonInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "CPU usage sampling interval. The value of this
+        object in seconds indicates the how often the 
+        CPU utilization is calculated and monitored across all cores.
+        This value for this will be configured by the CLI." 
+   ::= { bHostMIBObjects 9 }
+
+-- Host MIB notifications 
+
+bSWTaskDiedReason  OBJECT-TYPE
+   SYNTAX      INTEGER {
+                    cpuUsageLimitReached(1),
+                    unKnown(2)
+               }
+   MAX-ACCESS  accessible-for-notify 
+   STATUS      current
+   DESCRIPTION
+        "This indicates the reason for process kill"
+   ::= { bHostNotifVariables 1 }
+
+bSWProcessName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  accessible-for-notify 
+   STATUS      current
+   DESCRIPTION
+       "The name  of the running software task."
+   ::= { bHostNotifVariables 2 }
+
+bSWProcessID  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+       "Indicates Process ID."
+   ::= { bHostNotifVariables 3 }
+
+bSWProcessAvgCPUUsageLowThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+        "The low threshold for avaerage cpu utilization of a task
+        in a load interval.  If a bSWTaskAvgCPUUsageHigh event has
+        been generated ( or  no bSWTaskAvgCPUUsageLow was
+        generated previously ) for this task, and the value for
+        average cpu utilization  has fallen below the value of
+        bSWTaskAvgCPUUsageLowThreshold, then a
+        bSWTaskAvgCPUUsageLow event will be generated.  No more
+        bSWTaskAvgCPUUsageLow events will be generated for this
+        task  until the value for average cpu utilization exceeds
+        the value of bSWTaskAvgCPUUsageHighThreshold.
+        Unit is percentage. Range is from 0 to bSWTaskAvgCPUUsageHighThreshold "
+   ::= { bHostNotifVariables 4 }
+
+bSWProcessAvgCPUUsageHighThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+        "The high threshold for average cpu utilization of a task
+        in a load interval.  If a bSWTaskAvgCPUUsageLow event has
+        been generated ( or  no bSWTaskAvgCPUUsageHigh was
+        generated previously ) for this task, and the value for
+        average cpu utilization  has exceeded the value of
+        bSWTaskAvgCPUUsageHighThreshold, then a
+        bSWTaskAvgCPUUsageHigh event will be generated.  No more
+        bSWTaskAvgCPUUsageHigh events will be generated for this
+        task  until the value for average cpu utilization becomes equal to
+        or less than the value of bSWTaskAvgCPUUsageLowThreshold.
+         Unit is percentage. Range is from 0 to bSWTaskCPUUsageLimit "
+   ::= { bHostNotifVariables 5 }
+
+
+bSWTaskAvgCPUUsageLow  NOTIFICATION-TYPE
+    OBJECTS         {
+                        bSWProcessName,
+                        bSWProcessID,
+                        bSWProcessAvgCPUUsageLowThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the average cpu utilization
+        in a load interval is cleared , meaning that it
+        has fallen below the  value of bSWTaskAvgCPUUsageLowThreshold
+        for that task bSWTaskName."
+    ::= { bHostNotifObjects 1 }
+
+bSWTaskAvgCPUUsageHigh  NOTIFICATION-TYPE
+    OBJECTS         {
+                        bSWProcessName,
+                        bSWProcessID,
+                        bSWProcessAvgCPUUsageHighThreshold 
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the average cpu utilization
+        in a load interval has risen above the  value of 
+        bSWTaskAvgCPUUsageHighThreshold for that task bSWTaskName."
+    ::= { bHostNotifObjects 2 }
+
+bSWTaskDied  NOTIFICATION-TYPE
+    OBJECTS         {
+                        bSWProcessName,
+                        bSWProcessID,
+                        bSWTaskDiedReason
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the process has died.
+         This notification will also be sent if the process 
+	 manager kills a process because of reaching cpu usage limit
+         or process crashed/terminated"
+    ::= { bHostNotifObjects 3 }
+
+bSWTaskRestartLimitReached  NOTIFICATION-TYPE
+    OBJECTS         {
+                        bSWProcessName,
+                        bSWProcessID
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the process has reached maximum
+         restarts and all the attempts to restart the process has failed."
+    ::= { bHostNotifObjects 4 }
+
+END
