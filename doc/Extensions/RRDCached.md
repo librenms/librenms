@@ -62,8 +62,9 @@ $config['rrdcached']    = "unix:/var/run/rrdcached.sock";
 - Edit /etc/default/rrdcached to include:
 ```ssh
 DAEMON=/usr/bin/rrdcached
-DAEMON_GROUP=librenms
 DAEMON_USER=librenms
+DAEMON_GROUP=librenms
+WRITE_THREADS=4
 WRITE_TIMEOUT=1800
 WRITE_JITTER=1800
 BASE_PATH=/opt/librenms/rrd/
