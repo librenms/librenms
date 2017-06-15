@@ -20,7 +20,7 @@ It is a requirement that all pollers can access the central memcached to communi
  - a memcached install
  - a rrdcached install
 
-By default, all hosts are shared and have the `poller_group = 0`. To pin a device to a poller, set it to a value greater than 0 and set the same value in the poller's config with `$config['distributed_poller_group']`. One can also specify a comma separated string of poller groups in $config['distributed_poller_group'].  The poller will then poll devices from any of the groups listed.  If new devices get added from the poller they will be assigned to the first poller group in the list unless the group is specified when adding the device.
+By default, all hosts are shared and have the `poller_group = 0`. To pin a device to a poller, set it to a value greater than 0 and set the same value in the poller's config with `$config['distributed_poller_group']`. One can also specify a comma separated string of poller groups in $config['distributed_poller_group'].  The poller will then poll devices from any of the groups listed.  If new devices get added from the poller they will be assigned to the first poller group in the list unless the group is specified when adding the device. In the GUI you can define a name and ID for every `poller_group`. Example location A has id 1, location B has id 2 etc. When you add a device you can choose the poller to use for that device. 
 
 A standard configuration for a distributed poller would look like:
 
@@ -56,8 +56,24 @@ Central storage should be provided so all RRD files can be read from and written
 
 For this example, we are running RRDCached to allow all pollers and web/api servers to read/write to the rrd files with the rrd directory also exported by NFS for simple access and maintenance.
 
+Install RRD tool from source on the pollers and your main system to make sure you have RRDTool >=1.5.5. RRDTool 1.7 is the lastest version.
+
+On your main server you need to run rrdcached as a service listening on a TCP port. Run the following command as a deamon:
+
+```
+/usr/bin/rrdcached -l :42217 -w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -B -R -j /var/tmp -t 4 -F -b /opt/librenms/rrd/
+```
+
+On you pollers you can run rrdcached as followed: 
+
+```
+ExecStart=/usr/bin/rrdcached -w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -B -R -j /var/tmp -l unix:/var/run/rrdcached/rrdcached.sock -t 4 -F -
+```
+
 #### Memcache
 Memcache is required for the distributed pollers to be able to register to a central location and record what devices are polled. Memcache can run from any of the servers so long as it is accessible by all pollers.
+
+Installation documentation can be found in the LibreNMS project documentation.
 
 #### Pollers
 Pollers can be installed and run from anywhere, the only requirements are:
