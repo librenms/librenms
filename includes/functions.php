@@ -101,12 +101,16 @@ function getHostOS($device)
     $pattern = $config['install_dir'] . '/includes/definitions/*.yaml';
     foreach (glob($pattern) as $file) {
         $os = basename($file, '.yaml');
-        if (isset($config['os'][$os])) {
+        if (isset($config['os'][$os]['os'])) {
             $tmp = $config['os'][$os];
         } else {
             $tmp = Symfony\Component\Yaml\Yaml::parse(
                 file_get_contents($file)
             );
+            // pull in user overrides
+            if (isset($config['os'][$os])) {
+                $tmp = array_replace_recursive($tmp, $config['os'][$os]);
+            }
         }
         if (isset($tmp['discovery']) && is_array($tmp['discovery'])) {
             foreach ($tmp['discovery'] as $item) {
