@@ -104,7 +104,7 @@
   },
   
   {
-    "rule": "%syslog.timestamp > = %macros.past_5m && %syslog.msg ~ "@authentication failure@"",
+    "rule": "%syslog.timestamp > = %macros.past_5m && %syslog.msg ~ \"@authentication failure@\"",
     "name": "Syslog, Authentication failure on Device"
   },
   
