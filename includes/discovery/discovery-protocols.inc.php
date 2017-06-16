@@ -55,13 +55,7 @@ if ($config['autodiscovery']['xdp'] === true) {
             d_echo($cdp_if_array);
             foreach ($cdp_if_array as $entry_key => $cdp) {
                 if (is_valid_hostname($cdp['cdpCacheDeviceId']) || ($config['discovery_by_ip'] == true)) {
-                    $ip_arr = explode(" ", $cdp['cdpCacheAddress']);
-                    $a = hexdec($ip_arr[0]);
-                    $b = hexdec($ip_arr[1]);
-                    $c = hexdec($ip_arr[2]);
-                    $d = hexdec($ip_arr[3]);
-
-                    $cdp_ip = "$a.$b.$c.$d";
+                    $cdp_ip = hex_to_ip($cdp['cdpCacheAddress']);
                     $remote_device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ? OR `hostname` = ?', array($cdp['cdpCacheDeviceId'], $cdp['cdpCacheDeviceId'], $cdp_ip));
 
                     if (!$remote_device_id) {
@@ -183,14 +177,8 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                                 d_echo($ptopo_array);
                                 foreach ($ptopo_array as $ptopo) {
                                     if (strcmp(trim($ptopo['ptopoConnRemoteChassis']), trim($lldp['lldpRemChassisId'])) == 0) {
-                                        $ip_arr = explode(" ", $ptopo['ptopoConnAgentNetAddr']);
-
-                                        $a = hexdec($ip_arr[0]);
-                                        $b = hexdec($ip_arr[1]);
-                                        $c = hexdec($ip_arr[2]);
-                                        $d = hexdec($ip_arr[3]);
-
-                                        $discover_hostname = "$a.$b.$c.$d";
+                                        $discover_hostname = hex_to_ip($ptopo['ptopoConnAgentNetAddr']);
+                                        break;
                                     }
                                 }
                                 unset(
