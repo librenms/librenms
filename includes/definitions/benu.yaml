@@ -5,6 +5,10 @@ type: network
 icon: benu
 mib_dir:
     - benu
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_ucd_memory, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
 register_mibs:
     bSysMemUsed: BENU-HOST-MIB
     bSysAvgCPUUtil5Min: BENU-HOST-MIB
