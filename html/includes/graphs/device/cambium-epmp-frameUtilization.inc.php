@@ -11,7 +11,7 @@
 
 require 'includes/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'cambium-epmp-frameUtilization');
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'%                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:dlwlanframeutilization='.$rrdfilename.':dlwlanfrut:AVERAGE ';
     $rrd_options .= ' DEF:ulwlanframeutilization='.$rrdfilename.':ulwlanfrut:AVERAGE ';

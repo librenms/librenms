@@ -1,0 +1,870 @@
+F3-JDSU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, IpAddress, Unsigned32, Counter64
+             FROM SNMPv2-SMI
+    DateAndTime, DisplayString, TruthValue, RowStatus, StorageType, 
+    MacAddress, VariablePointer, TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    fsp150cm
+             FROM  ADVA-MIB 
+    VlanId, VlanPriority, AdminState, OperationalState, SecondaryState
+             FROM  CM-COMMON-MIB
+    neIndex, shelfIndex, slotIndex
+             FROM  CM-ENTITY-MIB
+    cmEthernetTrafficPortIndex, cmEthernetTrafficPortEntry
+             FROM  CM-FACILITY-MIB;
+
+f3JdsuMIB MODULE-IDENTITY
+    LAST-UPDATED    "201401020000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Jack Chen
+                     ADVA Optical Networking, Inc.
+                Tel: +86755 86217400-8205
+             E-mail: jchen@advaoptical.com
+             Postal: 
+             "
+    DESCRIPTION
+            "This module defines the JDSU MIB definitions used by 
+             the F3 (FSP150CM/CC) product lines.
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201401020000Z"
+    DESCRIPTION
+        "Notes from release 201401020000Z" 
+    ::= {fsp150cm 31}  
+
+-- 
+-- OID definitions
+-- 
+f3JdsuObjects        OBJECT IDENTIFIER ::= {f3JdsuMIB 1}
+f3JdsuNotifications  OBJECT IDENTIFIER ::= {f3JdsuMIB 2}
+f3JdsuConformance    OBJECT IDENTIFIER ::= {f3JdsuMIB 3}
+
+-- 
+-- Textual Conventions 
+-- 
+GeneratorStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The exact generator status."
+    SYNTAX INTEGER {
+                none(1),
+                initial(2),
+                helloIngress(3),
+                helloCompleted(4),
+                helloFailed(5),
+                lookupIngress(6),
+                lookupCompleted(7),
+                lookupFailed(8),
+                lookdownIngress(9),
+                lookdownCompleted(10),
+                lookdownFailed(11)
+               }
+
+ItemOperation ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicate the save action."
+    SYNTAX INTEGER {
+                notApplicable(1),
+                save(2)
+               }
+
+UpdateReachStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Action on update reachable status."
+    SYNTAX INTEGER {
+                notApplicable(1),
+                update(2)
+               }
+
+JdsuGeneratorFrameType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The frame type of JDSU generator.
+       frameType8023 means 802.3"
+    SYNTAX INTEGER {
+                none(1),
+                frameType8023(2)
+               }
+
+JdsuGeneratorPayloadType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The frame type of JDSU generator."
+    SYNTAX INTEGER {
+                none(1),
+                fixed(2),
+                random(3)
+               }
+
+GeneratorAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The lookup or lookdown action of JDSU generator."
+    SYNTAX INTEGER {
+                notApplicable(1),
+                loopUp(2),
+                loopDown(3)
+               }
+
+DiscoveryAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The lookup or lookdown action of JDSU generator."
+    SYNTAX INTEGER {
+                notApplicable(1),
+                discover(2)
+               }
+
+--
+--  JDSU Generator Discover filter
+--
+f3JdsuGeneratorPort OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object describes the port which will raise a JDSU discovery."
+    ::= { f3JdsuObjects 1 }
+
+f3JdsuGeneratorOuterVlanEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object describes whether the filter's Outer Vlan enabled."
+    ::= { f3JdsuObjects 2 }
+
+f3JdsuGeneratorOuterVlanId OBJECT-TYPE
+    SYNTAX     VlanId
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object describes the filter's Outer VlanId."
+    ::= { f3JdsuObjects 3 }
+
+f3JdsuGeneratorOuterVlanPri OBJECT-TYPE
+    SYNTAX     VlanPriority
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object describes the filter's Outer Vlan Priority."
+    ::= { f3JdsuObjects 4 }
+
+f3JdsuGeneratorOuterVlanEtherType OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object describes the filter's Outer Vlan Ether Type."
+    ::= { f3JdsuObjects 5 }
+
+f3JdsuGeneratorInnerVlan1Enabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object describes whether the filter's Inner Vlan1 enabled."
+    ::= { f3JdsuObjects 6 }
+
+f3JdsuGeneratorInnerVlan1Id OBJECT-TYPE
+    SYNTAX     VlanId
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object describes the filter's Inner Vlan1 ID."
+    ::= { f3JdsuObjects 7 }
+
+f3JdsuGeneratorInnerVlan1Pri OBJECT-TYPE
+    SYNTAX     VlanPriority
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object describes the filter's Inner Vlan1 Priority."
+    ::= { f3JdsuObjects 8 }
+
+f3JdsuGeneratorInnerVlan1EtherType OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object describes the filter's Inner Vlan1 Ether Type."
+    ::= { f3JdsuObjects 9 }
+
+f3JdsuGeneratorInnerVlan2Enabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object describes whether the filter's Inner Vlan2 enabled."
+    ::= { f3JdsuObjects 10 }
+
+f3JdsuGeneratorInnerVlan2Id OBJECT-TYPE
+    SYNTAX     VlanId
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object describes the filter's Inner Vlan2 ID."
+    ::= { f3JdsuObjects 11 }
+
+f3JdsuGeneratorInnerVlan2Pri OBJECT-TYPE
+    SYNTAX     VlanPriority
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object describes the filter's Inner Vlan2 Priority."
+    ::= { f3JdsuObjects 12 }
+
+f3JdsuGeneratorInnerVlan2EtherType OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object describes the filter's Inner Vlan2 Ether Type."
+    ::= { f3JdsuObjects 13 }
+
+f3JdsuGeneratorFrameType OBJECT-TYPE
+    SYNTAX     JdsuGeneratorFrameType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object describe the filter's frame type.
+            Its default value is 802.3."
+    ::= { f3JdsuObjects 14 }
+
+f3JdsuGeneratorPayloadType OBJECT-TYPE
+    SYNTAX     JdsuGeneratorPayloadType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Indicates the type of payload the remaining test frame shall contain, 
+            either fixed (incremental bytes or repeated bytes) or random 
+            (according to IEEE short continuous random test pattern). 
+            Default is random. This payload starts after the Ethernet frame 
+            header (including all VLAN tags)."
+    ::= { f3JdsuObjects 15 }
+
+f3JdsuGeneratorFrameLength OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Indicates the length of the frame which shall be injected, 
+            The size range for all ports is from 64 to 9600."
+    ::= { f3JdsuObjects 16 }
+
+f3JdsuGeneratorDiscoveryAction OBJECT-TYPE
+    SYNTAX     DiscoveryAction
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Indicates the discovery action on the JDSU generator."
+    ::= { f3JdsuObjects 17 }
+
+--
+--JDSU Generator Discover
+--
+f3JdsuGeneratorDiscoverTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3JdsuGeneratorDiscoverEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to JDSU Generator Discover Information."
+    ::= { f3JdsuObjects 18 }
+
+f3JdsuGeneratorDiscoverEntry OBJECT-TYPE
+    SYNTAX      F3JdsuGeneratorDiscoverEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3JdsuGeneratorDiscoverTable."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetTrafficPortIndex, f3JdsuGeneratorDiscoverDestMacAddr  }
+    ::= { f3JdsuGeneratorDiscoverTable 1 }
+
+F3JdsuGeneratorDiscoverEntry ::= SEQUENCE {
+    f3JdsuGeneratorDiscoverDestMacAddr             MacAddress,
+    f3JdsuGeneratorDiscoverOuterVlanEnabled        TruthValue,
+    f3JdsuGeneratorDiscoverOuterVlanId             VlanId,
+    f3JdsuGeneratorDiscoverOuterVlanPri            VlanPriority,
+    f3JdsuGeneratorDiscoverOuterVlanEtherType      Integer32,
+    f3JdsuGeneratorDiscoverInnerVlan1Enabled       TruthValue,
+    f3JdsuGeneratorDiscoverInnerVlan1Id            VlanId,
+    f3JdsuGeneratorDiscoverInnerVlan1Pri           VlanPriority,
+    f3JdsuGeneratorDiscoverInnerVlan1EtherType     Integer32,
+    f3JdsuGeneratorDiscoverInnerVlan2Enabled       TruthValue,
+    f3JdsuGeneratorDiscoverInnerVlan2Id            VlanId,
+    f3JdsuGeneratorDiscoverInnerVlan2Pri           VlanPriority,
+    f3JdsuGeneratorDiscoverInnerVlan2EtherType     Integer32,
+    f3JdsuGeneratorDiscoverFrameType               JdsuGeneratorFrameType,
+    f3JdsuGeneratorDiscoverPayloadType             JdsuGeneratorPayloadType,
+    f3JdsuGeneratorDiscoverFrameLength             Integer32,
+    f3JdsuGeneratorDiscoverUnitTextId              DisplayString,
+    f3JdsuGeneratorDiscoverIfReachable             TruthValue,
+    f3JdsuGeneratorDiscoverGeneratorStatus         GeneratorStatus,
+    f3JdsuGeneratorDiscoverItemOperation           ItemOperation,
+    f3JdsuGeneratorDiscoverItemIfSaved             TruthValue,
+    f3JdsuGeneratorDiscoverGeneratorAction         GeneratorAction
+}
+
+f3JdsuGeneratorDiscoverDestMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object describes the destination MAC address for the test frames."
+    ::= { f3JdsuGeneratorDiscoverEntry 1 }
+
+f3JdsuGeneratorDiscoverOuterVlanEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes whether the filter's Outer Vlan enabled."
+    ::= { f3JdsuGeneratorDiscoverEntry 2 }
+
+f3JdsuGeneratorDiscoverOuterVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes the filter's Outer Vlan ID."
+    ::= { f3JdsuGeneratorDiscoverEntry 3 }
+
+f3JdsuGeneratorDiscoverOuterVlanPri OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes the filter's Outer Vlan Priority."
+    ::= { f3JdsuGeneratorDiscoverEntry 4 }
+
+f3JdsuGeneratorDiscoverOuterVlanEtherType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describe the filter's Outer Vlan Ether Type."
+    ::= { f3JdsuGeneratorDiscoverEntry 5 }
+
+f3JdsuGeneratorDiscoverInnerVlan1Enabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes whether the filter's Inner Vlan1 enabled."
+    ::= { f3JdsuGeneratorDiscoverEntry 6 }
+
+f3JdsuGeneratorDiscoverInnerVlan1Id OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describe the filter's Inner Vlan1 ID."
+    ::= { f3JdsuGeneratorDiscoverEntry 7 }
+
+f3JdsuGeneratorDiscoverInnerVlan1Pri OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes the filter's Inner Vlan1 Priority."
+    ::= { f3JdsuGeneratorDiscoverEntry 8 }
+
+f3JdsuGeneratorDiscoverInnerVlan1EtherType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes the filter's Inner Vlan1 Ether Type."
+    ::= { f3JdsuGeneratorDiscoverEntry 9 }
+
+f3JdsuGeneratorDiscoverInnerVlan2Enabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes whether the filter's Inner Vlan2 enabled."
+    ::= { f3JdsuGeneratorDiscoverEntry 10 }
+
+f3JdsuGeneratorDiscoverInnerVlan2Id OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes the filter's Inner Vlan2 ID."
+    ::= { f3JdsuGeneratorDiscoverEntry 11 }
+
+f3JdsuGeneratorDiscoverInnerVlan2Pri OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes the filter's Inner Vlan2 Priority."
+    ::= { f3JdsuGeneratorDiscoverEntry 12 }
+
+f3JdsuGeneratorDiscoverInnerVlan2EtherType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes the filter's Inner Vlan2 Ether Type."
+    ::= { f3JdsuGeneratorDiscoverEntry 13 }
+
+f3JdsuGeneratorDiscoverFrameType OBJECT-TYPE
+    SYNTAX     JdsuGeneratorFrameType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object describes the filter's frame type.
+            Its default value is 802.3."
+    ::= { f3JdsuGeneratorDiscoverEntry 14 }
+
+f3JdsuGeneratorDiscoverPayloadType OBJECT-TYPE
+    SYNTAX     JdsuGeneratorPayloadType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Indicates the type of payload the remaining test frame shall contain, 
+            either fixed (incremental bytes or repeated bytes) or random 
+            (according to IEEE short continuous random test pattern). 
+            Default is random. This payload starts after the Ethernet frame 
+            header (including all VLAN tags)."
+    ::= { f3JdsuGeneratorDiscoverEntry 15 }
+
+f3JdsuGeneratorDiscoverFrameLength OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Indicates the length of the frame which shall be injected, 
+            The size range for all ports is from 64 to 9600."
+    ::= { f3JdsuGeneratorDiscoverEntry 16 }
+
+f3JdsuGeneratorDiscoverUnitTextId OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Indicates the string from remote device. Normally it is system name of remote device."
+    ::= { f3JdsuGeneratorDiscoverEntry 17 }
+
+f3JdsuGeneratorDiscoverIfReachable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Indicate whether the mac can be discovered or not exactly."
+    ::= { f3JdsuGeneratorDiscoverEntry 18 }
+
+f3JdsuGeneratorDiscoverGeneratorStatus OBJECT-TYPE
+    SYNTAX     GeneratorStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Indicates the generator status."
+    ::= { f3JdsuGeneratorDiscoverEntry 19 }
+
+f3JdsuGeneratorDiscoverItemOperation OBJECT-TYPE
+    SYNTAX     ItemOperation
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "action save the discoverd items."
+    ::= { f3JdsuGeneratorDiscoverEntry 20 }
+
+f3JdsuGeneratorDiscoverItemIfSaved OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Indicates whether the discoverd item saved status."
+    ::= { f3JdsuGeneratorDiscoverEntry 21 }
+
+f3JdsuGeneratorDiscoverGeneratorAction OBJECT-TYPE
+    SYNTAX     GeneratorAction
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Indicates looup or lookdown action."
+    ::= { f3JdsuGeneratorDiscoverEntry 22 }
+
+--
+--JDSU Generator Configure
+--
+f3JdsuGeneratorConfigureTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3JdsuGeneratorConfigureEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to JDSU Generator Configure Information."
+    ::= { f3JdsuObjects 19 }
+
+f3JdsuGeneratorConfigureEntry OBJECT-TYPE
+    SYNTAX      F3JdsuGeneratorConfigureEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3JdsuGeneratorConfigureTable."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetTrafficPortIndex, f3JdsuGeneratorConfigureDestMacAddr }
+    ::= { f3JdsuGeneratorConfigureTable 1 }
+
+F3JdsuGeneratorConfigureEntry ::= SEQUENCE {
+    f3JdsuGeneratorConfigureDestMacAddr             MacAddress,
+    f3JdsuGeneratorConfigureOuterVlanEnabled        TruthValue,
+    f3JdsuGeneratorConfigureOuterVlanId             VlanId,
+    f3JdsuGeneratorConfigureOuterVlanPri            VlanPriority,
+    f3JdsuGeneratorConfigureOuterVlanEtherType      Integer32,
+    f3JdsuGeneratorConfigureInnerVlan1Enabled       TruthValue,
+    f3JdsuGeneratorConfigureInnerVlan1Id            VlanId,
+    f3JdsuGeneratorConfigureInnerVlan1Pri           VlanPriority,
+    f3JdsuGeneratorConfigureInnerVlan1EtherType     Integer32,
+    f3JdsuGeneratorConfigureInnerVlan2Enabled       TruthValue,
+    f3JdsuGeneratorConfigureInnerVlan2Id            VlanId,
+    f3JdsuGeneratorConfigureInnerVlan2Pri           VlanPriority,
+    f3JdsuGeneratorConfigureInnerVlan2EtherType     Integer32,
+    f3JdsuGeneratorConfigureFrameType               JdsuGeneratorFrameType,
+    f3JdsuGeneratorConfigurePayloadType             JdsuGeneratorPayloadType,
+    f3JdsuGeneratorConfigureFrameLength             Integer32,
+    f3JdsuGeneratorConfigureUnitTextId              DisplayString,
+    f3JdsuGeneratorConfigureIfReachable             TruthValue,
+    f3JdsuGeneratorConfigureReachableUpdate         UpdateReachStatus,
+    f3JdsuGeneratorConfigureStatus                  GeneratorStatus,
+    f3JdsuGeneratorConfigureGeneratorAction         GeneratorAction,
+    f3JdsuGeneratorConfigureStorageType             StorageType,
+    f3JdsuGeneratorConfigureRowStatus               RowStatus
+}
+
+f3JdsuGeneratorConfigureDestMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object describes the destination MAC address for the test frames."
+    ::= { f3JdsuGeneratorConfigureEntry 1 }
+
+f3JdsuGeneratorConfigureOuterVlanEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes whether the filter's Outer Vlan enabled."
+    ::= { f3JdsuGeneratorConfigureEntry 2 }
+
+f3JdsuGeneratorConfigureOuterVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes the filter's Outer Vlan ID."
+    ::= { f3JdsuGeneratorConfigureEntry 3 }
+
+f3JdsuGeneratorConfigureOuterVlanPri OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes the filter's Outer Vlan Priority."
+    ::= { f3JdsuGeneratorConfigureEntry 4 }
+
+f3JdsuGeneratorConfigureOuterVlanEtherType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes the filter's Outer Vlan Ether Type."
+    ::= { f3JdsuGeneratorConfigureEntry 5 }
+
+f3JdsuGeneratorConfigureInnerVlan1Enabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes whether the filter's Inner Vlan1 enabled."
+    ::= { f3JdsuGeneratorConfigureEntry 6 }
+
+f3JdsuGeneratorConfigureInnerVlan1Id OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes the filter's Inner Vlan1 ID."
+    ::= { f3JdsuGeneratorConfigureEntry 7 }
+
+f3JdsuGeneratorConfigureInnerVlan1Pri OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes the filter's Inner Vlan1 Priority."
+    ::= { f3JdsuGeneratorConfigureEntry 8 }
+
+f3JdsuGeneratorConfigureInnerVlan1EtherType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes the filter's Inner Vlan1 Ether Type."
+    ::= { f3JdsuGeneratorConfigureEntry 9 }
+
+f3JdsuGeneratorConfigureInnerVlan2Enabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes whether the filter's Inner Vlan2 enabled."
+    ::= { f3JdsuGeneratorConfigureEntry 10 }
+
+f3JdsuGeneratorConfigureInnerVlan2Id OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes the filter's Inner Vlan2 ID."
+    ::= { f3JdsuGeneratorConfigureEntry 11 }
+
+f3JdsuGeneratorConfigureInnerVlan2Pri OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes the filter's Inner Vlan2 Priority."
+    ::= { f3JdsuGeneratorConfigureEntry 12 }
+
+f3JdsuGeneratorConfigureInnerVlan2EtherType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes the filter's Inner Vlan2 Ether Type."
+    ::= { f3JdsuGeneratorConfigureEntry 13 }
+
+f3JdsuGeneratorConfigureFrameType OBJECT-TYPE
+    SYNTAX     JdsuGeneratorFrameType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object describes the filter's frame type.
+            Its default value is 802.3."
+    ::= { f3JdsuGeneratorConfigureEntry 14 }
+
+f3JdsuGeneratorConfigurePayloadType OBJECT-TYPE
+    SYNTAX     JdsuGeneratorPayloadType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Indicates the type of payload the remaining test frame shall contain, 
+            either fixed (incremental bytes or repeated bytes) or random 
+            (according to IEEE short continuous random test pattern). 
+            Default is random. This payload starts after the Ethernet frame 
+            header (including all VLAN tags)."
+    ::= { f3JdsuGeneratorConfigureEntry 15 }
+
+f3JdsuGeneratorConfigureFrameLength OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Indicates the length of the frame which shall be injected, 
+            The size range for all ports is from 64 to 9600."
+    ::= { f3JdsuGeneratorConfigureEntry 16 }
+
+f3JdsuGeneratorConfigureUnitTextId OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Indicates the string from remote device. Normally it is system name of remote device."
+    ::= { f3JdsuGeneratorConfigureEntry 17 }
+
+f3JdsuGeneratorConfigureIfReachable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Indicates whether the mac can be Configureed or not exactly."
+    ::= { f3JdsuGeneratorConfigureEntry 18 }
+
+f3JdsuGeneratorConfigureReachableUpdate OBJECT-TYPE
+    SYNTAX     UpdateReachStatus
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Action on update the reachable status of the related item."
+    ::= { f3JdsuGeneratorConfigureEntry 19 }
+
+f3JdsuGeneratorConfigureStatus OBJECT-TYPE
+    SYNTAX     GeneratorStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Indicates the generator status exactly."
+    ::= { f3JdsuGeneratorConfigureEntry 20 }
+
+f3JdsuGeneratorConfigureGeneratorAction OBJECT-TYPE
+    SYNTAX     GeneratorAction
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Indicates JDSU Generator lookup or lookdown action."
+    ::= { f3JdsuGeneratorConfigureEntry 21 }
+
+f3JdsuGeneratorConfigureStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { f3JdsuGeneratorConfigureEntry 22 }
+
+f3JdsuGeneratorConfigureRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The status of this row.
+            Note: one row can be deleted by set this item as destoryed."
+    ::= { f3JdsuGeneratorConfigureEntry 23 }
+
+--
+-- Traffic Port JDSU Ext Table
+--
+
+f3EthernetTrafficPortJdsuExtTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3EthernetTrafficPortJdsuExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to Ethernet Traffic Port 
+            Facilities for JDSU configuration purposes."
+    ::= { f3JdsuObjects 20 }
+
+f3EthernetTrafficPortJdsuExtEntry OBJECT-TYPE
+    SYNTAX      F3EthernetTrafficPortJdsuExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the cmEthernetTrafficPortJdsuExtTable."
+    AUGMENTS { cmEthernetTrafficPortEntry }
+    ::= { f3EthernetTrafficPortJdsuExtTable 1 }
+
+F3EthernetTrafficPortJdsuExtEntry ::= SEQUENCE {
+    f3EthernetTrafficPortJdsuLoopbackEnabled       TruthValue,
+    f3EthernetTrafficPortJdsuGenerationEanbled     TruthValue,
+    f3EthernetTrafficPortJdsuLoopbackVlanList      DisplayString
+}
+
+f3EthernetTrafficPortJdsuLoopbackEnabled OBJECT-TYPE
+    SYNTAX      TruthValue  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enabled: reaction/response to JDSU in-band loopback requests and hallo requests.
+         Disabled: Not reaction/response to JDSU in-band loopback requests and hallo requests. 
+         FPGA shall not filter the JDSU control frames to processor.
+         From enabled to disabled, if there is already a JDSU loopback on the port, 
+         release current loopback.
+         JDSU loopback doesn't need port in maintenance state.
+         When JDSU Generation Enabled, this attribute can't be enabled."
+     ::= { f3EthernetTrafficPortJdsuExtEntry 1 }
+
+f3EthernetTrafficPortJdsuGenerationEanbled OBJECT-TYPE
+    SYNTAX      TruthValue  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object describes whether the user would to raise a JDSU discovery action.
+         When JDSU Loopback Enabled, this attribute cann't be enabled."
+     ::= { f3EthernetTrafficPortJdsuExtEntry 2 }
+
+f3EthernetTrafficPortJdsuLoopbackVlanList OBJECT-TYPE
+    SYNTAX      DisplayString  
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "In EG-X, up to 12 loopback can be supported and also up to 2 layer VLAN can be supported. 
+        The format is like 'OuterVid1-OuterPri1;InnerVid1-InnerPri1, OuterVid2-OuterPri2, 
+        OuterVid3-OuterPri3;InnerVid3-InnerPri3'('1-*;2-*, 3-*, 4-*;5-*')."
+     ::= { f3EthernetTrafficPortJdsuExtEntry 3 }
+
+f3JdsuCompliances OBJECT IDENTIFIER ::= {f3JdsuConformance 1}
+f3JdsuGroups      OBJECT IDENTIFIER ::= {f3JdsuConformance 2}
+
+f3JdsuCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the f3 jdsu group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3JdsuGroup  
+        }
+    ::= { f3JdsuCompliances 1 }
+
+f3JdsuGroup OBJECT-GROUP
+    OBJECTS {
+    f3JdsuGeneratorDiscoverDestMacAddr,
+    f3JdsuGeneratorDiscoverOuterVlanEnabled,
+    f3JdsuGeneratorDiscoverOuterVlanId,
+    f3JdsuGeneratorDiscoverOuterVlanPri,
+    f3JdsuGeneratorDiscoverOuterVlanEtherType,
+    f3JdsuGeneratorDiscoverInnerVlan1Enabled,
+    f3JdsuGeneratorDiscoverInnerVlan1Id,
+    f3JdsuGeneratorDiscoverInnerVlan1Pri,
+    f3JdsuGeneratorDiscoverInnerVlan1EtherType,
+    f3JdsuGeneratorDiscoverInnerVlan2Enabled,
+    f3JdsuGeneratorDiscoverInnerVlan2Id,
+    f3JdsuGeneratorDiscoverInnerVlan2Pri,
+    f3JdsuGeneratorDiscoverInnerVlan2EtherType,
+    f3JdsuGeneratorDiscoverFrameType,
+    f3JdsuGeneratorDiscoverPayloadType,
+    f3JdsuGeneratorDiscoverFrameLength,
+    f3JdsuGeneratorDiscoverUnitTextId,
+    f3JdsuGeneratorDiscoverIfReachable,
+    f3JdsuGeneratorDiscoverGeneratorStatus,
+    f3JdsuGeneratorDiscoverItemOperation,
+    f3JdsuGeneratorDiscoverItemIfSaved,
+    f3JdsuGeneratorDiscoverGeneratorAction,
+    f3JdsuGeneratorConfigureDestMacAddr,
+    f3JdsuGeneratorConfigureOuterVlanEnabled,
+    f3JdsuGeneratorConfigureOuterVlanId,
+    f3JdsuGeneratorConfigureOuterVlanPri,
+    f3JdsuGeneratorConfigureOuterVlanEtherType,
+    f3JdsuGeneratorConfigureInnerVlan1Enabled,
+    f3JdsuGeneratorConfigureInnerVlan1Id,
+    f3JdsuGeneratorConfigureInnerVlan1Pri,
+    f3JdsuGeneratorConfigureInnerVlan1EtherType,
+    f3JdsuGeneratorConfigureInnerVlan2Enabled,
+    f3JdsuGeneratorConfigureInnerVlan2Id,
+    f3JdsuGeneratorConfigureInnerVlan2Pri,
+    f3JdsuGeneratorConfigureInnerVlan2EtherType,
+    f3JdsuGeneratorConfigureFrameType,
+    f3JdsuGeneratorConfigurePayloadType,
+    f3JdsuGeneratorConfigureFrameLength,
+    f3JdsuGeneratorConfigureUnitTextId,
+    f3JdsuGeneratorConfigureIfReachable,
+    f3JdsuGeneratorConfigureReachableUpdate,
+    f3JdsuGeneratorConfigureStatus,
+    f3JdsuGeneratorConfigureGeneratorAction,
+    f3JdsuGeneratorConfigureStorageType,
+    f3JdsuGeneratorConfigureRowStatus,
+    f3EthernetTrafficPortJdsuLoopbackEnabled,
+    f3EthernetTrafficPortJdsuGenerationEanbled,
+    f3EthernetTrafficPortJdsuLoopbackVlanList,
+    f3JdsuGeneratorPort, f3JdsuGeneratorOuterVlanEnabled,
+    f3JdsuGeneratorOuterVlanId, f3JdsuGeneratorOuterVlanPri, f3JdsuGeneratorOuterVlanEtherType,
+    f3JdsuGeneratorInnerVlan1Enabled, f3JdsuGeneratorInnerVlan1Id, f3JdsuGeneratorInnerVlan1Pri,
+    f3JdsuGeneratorInnerVlan1EtherType, f3JdsuGeneratorInnerVlan2Enabled, f3JdsuGeneratorInnerVlan2Id,
+    f3JdsuGeneratorInnerVlan2Pri, f3JdsuGeneratorInnerVlan2EtherType, f3JdsuGeneratorFrameType, 
+    f3JdsuGeneratorPayloadType, f3JdsuGeneratorFrameLength, f3JdsuGeneratorDiscoveryAction
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the JDSU functionality."
+    ::= { f3JdsuGroups 1 }
+
+END

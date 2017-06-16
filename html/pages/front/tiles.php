@@ -223,8 +223,11 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
   </div>
   <hr>
 </div>
-<?php } //End Vars['bare'] If ?>
-<script src='https://www.google.com/jsapi'></script>
+<?php } //End Vars['bare'] If
+if (strpos($dash_config, 'globe') !== false) {
+    echo "<script src='https://www.google.com/jsapi'></script>";
+}
+?>
 <script src="js/jquery.gridster.min.js"></script>
 
 <span class="message" id="message"></span>

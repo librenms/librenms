@@ -4,17 +4,18 @@
            Integer32, Counter32,
            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
                FROM SNMPv2-SMI
-           DisplayString, TimeStamp
+           DisplayString, TimeStamp,TruthValue
                FROM SNMPv2-TC
            MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
                FROM SNMPv2-CONF
+           PhysicalIndex
+               FROM ENTITY-MIB
            hpicfObjectModules, hpicfCommon, hpicfCommonTrapsPrefix
                FROM HP-ICF-OID;
 
        hpicfChassisMib MODULE-IDENTITY
-            LAST-UPDATED "200011032216Z"  -- November 3, 2000
-            ORGANIZATION "Hewlett Packard Company,
-                          Network Infrastructure Solutions"
+            LAST-UPDATED "201108250847Z"  -- August 25, 2011    
+            ORGANIZATION "HP Networking"
             CONTACT-INFO
                     "Hewlett Packard Company
                      8000 Foothills Blvd.
@@ -23,9 +24,21 @@
                     "This MIB module describes chassis devices in the
                     HP Integrated Communication Facility product 
                     line.  Note that most of this module will be
-                    superceded by the standard Entity MIB.  However,
+                    superseded by the standard Entity MIB.  However,
                     the hpicfSensorTable will still be valid."
 
+            REVISION     "201108250847Z"  -- August 25, 2011
+            DESCRIPTION  "Added new scalars hpicfFanTrayType and 
+                          hpicfOpacityShieldInstalled."
+       
+            REVISION     "201008250000Z"  -- August 23, 2010
+            DESCRIPTION  "Added hpSystemAirEntPhysicalIndex to the air 
+                          temperature table."     
+
+            REVISION     "200904220000Z"  -- April 22, 2009
+            DESCRIPTION  "Added new SNMP object and SNMP table for chassis 
+                         temperature details"
+                          
             REVISION     "200011032216Z"  -- November 3, 2000
             DESCRIPTION  "Updated division name."
 
@@ -40,7 +53,7 @@
                     implementing another chassis MIB (like Entity MIB)
                     but still want to use the hpicfSensorTable.
                     Changed STATUS clause to deprecated for those
-                    objects that are superceded by the Entity MIB."
+                    objects that are superseded by the Entity MIB."
             REVISION     "9507130000Z"  -- July 13, 1995
             DESCRIPTION
                     "Added the hpicfSensorTrap."
@@ -251,7 +264,7 @@
                    The authoritative identification of the logical 
                    network device which provides an unambiguous means
                    of determining the type of device.  The value of 
-                   this object is analagous to MIB-II's sysObjectId."
+                   this object is analogous to MIB-II's sysObjectId."
            ::= { hpicfEntityEntry 3 }
 
        hpicfEntityDescr OBJECT-TYPE
@@ -400,7 +413,7 @@
                    "A number which identifies a particular sensor
                    from other sensors of the same kind.  For
                    instance, if there are many temperature sensors in
-                   this chassis, this number whould identify a
+                   this chassis, this number would identify a
                    particular temperature sensor in this chassis."
            ::= { hpicfSensorEntry 3 }
 
@@ -531,7 +544,168 @@
                    network address.."
            ::= { hpicfChassisAddrEntry 3 }
 
+       hpChassisTemperature  OBJECT IDENTIFIER
+                    ::= { hpicfChassis 8 }
 
+              
+       hpSystemAirTempTable OBJECT-TYPE
+           SYNTAX       SEQUENCE OF HpSystemAirTempEntry
+           MAX-ACCESS   not-accessible
+           STATUS       current
+           DESCRIPTION  "This table gives the temperature details of 
+                        chassis. These temperature details are 
+                        obtained by monitoring chassis temperature 
+                        sensors attached to the box by excluding
+                        ManagementModule, FabricModule, IMand 
+                        PowerSupply sensors. This will give current,
+                        maximum,minimum,threshold and average
+                        temperatures of chassis."
+           ::= { hpChassisTemperature 1 }
+
+       hpSystemAirTempEntry OBJECT-TYPE
+           SYNTAX     HpSystemAirTempEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION   "This is the table for chassis temperature 
+                         details."
+           INDEX      { hpSystemAirSensor }
+           ::= { hpSystemAirTempTable 1 }
+
+       HpSystemAirTempEntry ::=
+           SEQUENCE {
+              hpSystemAirSensor               Integer32,
+              hpSystemAirName                 OCTET STRING,
+              hpSystemAirCurrentTemp          OCTET STRING,
+              hpSystemAirMaxTemp              OCTET STRING,
+              hpSystemAirMinTemp              OCTET STRING,
+              hpSystemAirOverTemp             INTEGER,
+              hpSystemAirThresholdTemp        OCTET STRING,
+              hpSystemAirAvgTemp              OCTET STRING,
+              hpSystemAirEntPhysicalIndex     PhysicalIndex
+           }
+       
+       hpSystemAirSensor OBJECT-TYPE
+           SYNTAX       Integer32 (0..2147483647)
+           MAX-ACCESS   not-accessible
+           STATUS       current
+           DESCRIPTION  "This is the index for this table.This object 
+                        describes chassis attached temperature sensor.
+                        Based on the value of this index, temperature
+                        details are obtained from the sensor and are
+                        given." 
+           ::= {hpSystemAirTempEntry 1}
+
+       hpSystemAirName OBJECT-TYPE
+           SYNTAX       OCTET STRING(SIZE(1..20))
+           MAX-ACCESS   read-only
+           STATUS       current
+           DESCRIPTION  "This object describes name of the system
+                        which is chassis attached temperature sensor
+                        number. For example if the index 
+                        (hpSystemAirSensor) is '0' then the system 
+                        name is sys-1. Index starts from '0' but
+                        sensor number is '1'."
+           ::= {hpSystemAirTempEntry 2}
+
+       hpSystemAirCurrentTemp OBJECT-TYPE
+           SYNTAX       OCTET STRING(SIZE(1..6))
+           MAX-ACCESS   read-only
+           STATUS       current
+           DESCRIPTION  "This object gives current temperature of the
+                        system. This is the current temperature given
+                        by the indexed chassis attached temperature
+                        sensor on box."
+           ::= {hpSystemAirTempEntry 3}
+
+       hpSystemAirMaxTemp OBJECT-TYPE
+           SYNTAX       OCTET STRING( SIZE(1..6))
+           MAX-ACCESS   read-only
+           STATUS       current
+           DESCRIPTION  "This object gives Maximum temperature of the 
+                        chassis."
+           ::= {hpSystemAirTempEntry 4}
+
+
+       hpSystemAirMinTemp OBJECT-TYPE
+           SYNTAX       OCTET STRING(SIZE(1..6))
+           MAX-ACCESS   read-only
+           STATUS       current
+           DESCRIPTION  "This object gives Minimum temperature of the
+                        chassis."
+           ::= {hpSystemAirTempEntry 5}
+
+       hpSystemAirOverTemp OBJECT-TYPE
+           SYNTAX       INTEGER{
+                               yes(1),
+                               no(2)
+                               }
+           MAX-ACCESS   read-only
+           STATUS       current
+           DESCRIPTION  "This object gives Over temperature of the
+                        system. If the current temperature of the
+                        board is above threshold temperature and if 
+                        board stays at this temperature for 10 full
+                        seconds then its called over temperature." 
+           ::= {hpSystemAirTempEntry 6}
+       
+       hpSystemAirThresholdTemp OBJECT-TYPE
+           SYNTAX       OCTET STRING(SIZE(1..6))
+           MAX-ACCESS   read-only
+           STATUS       current
+           DESCRIPTION  "This object gives Threshold temperature of 
+                        the system. This is the utmost temperature 
+                        that the chassis can sustain. If chassis 
+                        temperature is above threshold then alarm will
+                        ring to inform over temperature condition."
+           ::= {hpSystemAirTempEntry 7}
+
+       hpSystemAirAvgTemp OBJECT-TYPE
+           SYNTAX       OCTET STRING(SIZE(1..5)) 
+           MAX-ACCESS   read-only
+           STATUS       current
+           DESCRIPTION  "This object gives Average temperature of the
+                        system. There will be some roll up function
+                        which will check current temperature at 
+                        particular intervals. Based on these current 
+                        temperatures over certain time, average 
+                        temperature is calculated." 
+           ::= {hpSystemAirTempEntry 8}
+
+       hpSystemAirEntPhysicalIndex OBJECT-TYPE
+           SYNTAX       PhysicalIndex
+           MAX-ACCESS   read-only
+           STATUS       current
+           DESCRIPTION  "This gives the entPhysicalIndex of the temperature
+                         sensor as in the entPhysicalTable (rfc2737)."          
+           ::= {hpSystemAirTempEntry 9}
+
+       hpicfFanTrayType  OBJECT-TYPE
+            SYNTAX       INTEGER {
+                            standard(1),
+                            highPerformance(2)
+                            }
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION  "If opacity shield is installed  hpicsFanTrayType 
+                          should be HighPerformance. This is applicable 
+                          only for 5406 5412 8212 and 8206 Switches."
+            DEFVAL { standard }
+            ::= { hpicfChassis 9 }
+       
+       hpicfOpacityShieldInstalled  OBJECT-TYPE
+            SYNTAX      TruthValue
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION  "It indicates that Opacity shield is Installed on 
+                         the switch. This is applicable only for 5406,5412,
+                         8212 and 8206 Switches."
+            DEFVAL { false }
+            ::= { hpicfChassis 10 }
+            
+
+
+
+       
        -- Common Traps
 
 
@@ -621,6 +795,24 @@
 
            ::= { hpicfChassisCompliances 3 }
 
+       hpicfChasTempCompliance MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION 
+                   " A compliance statement for chassis's system air temperature
+                     details."            
+           MODULE
+               MANDATORY-GROUPS {hpicfChasTempGroup}
+
+           ::= { hpicfChassisCompliances 4 } 
+
+       hpicfOpacityShieldsCompliance MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION 
+                   "A compliance statement for chassis's opacity Shield"            
+           MODULE
+               MANDATORY-GROUPS {hpicfOpacityShieldsGroup}
+
+           ::= { hpicfChassisCompliances 5 } 
 
        -- units of conformance
 
@@ -681,5 +873,30 @@
                    changes in the status of sensors."
            ::= { hpicfChassisGroups 4 }
 
+       hpicfChasTempGroup OBJECT-GROUP
+           OBJECTS    { hpSystemAirName,
+                        hpSystemAirCurrentTemp,
+                        hpSystemAirMaxTemp,
+                        hpSystemAirMinTemp,
+                        hpSystemAirThresholdTemp,
+                        hpSystemAirOverTemp,
+                        hpSystemAirAvgTemp,
+                        hpSystemAirEntPhysicalIndex
+                      }
+           STATUS   current
+           DESCRIPTION
+                   "A collection objects to give temperature details 
+                    of chassis"
+           ::= { hpicfChassisGroups 5 }
+      hpicfOpacityShieldsGroup  OBJECT-GROUP
+           OBJECTS    { hpicfFanTrayType ,
+                        hpicfOpacityShieldInstalled }
+           STATUS   current
+           DESCRIPTION
+                   "A collection of objects for Opacity Shields 
+                    of chassis"
+           ::= { hpicfChassisGroups 6 }
+
        END
+
 

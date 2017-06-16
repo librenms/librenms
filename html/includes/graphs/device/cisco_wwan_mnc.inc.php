@@ -11,7 +11,7 @@
 
 require 'includes/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'cisco-wwan-mnc');
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= ' DEF:mnc='.$rrdfilename.':mnc:LAST ';
     $rrd_options .= ' --lower-limit 0 ';
     $rrd_options .= " --vertical-label='MNC'";
