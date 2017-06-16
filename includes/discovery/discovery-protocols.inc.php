@@ -11,7 +11,7 @@ if ($device['os'] == 'ironware' && $config['autodiscovery']['xdp'] === true) {
     if ($fdp_array) {
         unset($fdp_links);
         foreach ($fdp_array as $key => $fdp_if_array) {
-            $interface    = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $key));
+            $interface = get_port_by_ifIndex($device['device_id'], $key);
             d_echo($fdp_if_array);
             foreach ($fdp_if_array as $entry_key => $fdp) {
                 $remote_device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ?', array($fdp['snFdpCacheDeviceId'], $fdp['snFdpCacheDeviceId']));
@@ -51,7 +51,7 @@ if ($config['autodiscovery']['xdp'] === true) {
     if ($cdp_array) {
         unset($cdp_links);
         foreach ($cdp_array as $key => $cdp_if_array) {
-            $interface        = dbFetchRow('SELECT * FROM `ports` WHERE device_id = ? AND `ifIndex` = ?', array($device['device_id'], $key));
+            $interface = get_port_by_ifIndex($device['device_id'], $key);
             d_echo($cdp_if_array);
             foreach ($cdp_if_array as $entry_key => $cdp) {
                 if (is_valid_hostname($cdp['cdpCacheDeviceId']) || ($config['discovery_by_ip'] == true)) {
@@ -116,7 +116,7 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
         unset($lldp_links);
         foreach ($lldp_array as $key => $lldp) {
             d_echo($lldp);
-            $interface     = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $lldp['lldpRemLocalPortNum']));
+            $interface = get_port_by_ifIndex($device['device_id'], $lldp['lldpRemLocalPortNum']);
             $remote_device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ?', array($lldp['lldpRemSysName'], $lldp['lldpRemSysName']));
 
             if (!$remote_device_id && is_valid_hostname($lldp['lldpRemSysName'])) {
@@ -156,15 +156,14 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
         $lldp_links = '';
         foreach ($lldp_array as $key => $lldp_if_array) {
             d_echo($lldp_if_array);
-            foreach (array_keys($lldp_if_array) as $entry_key) {
+            foreach ($lldp_if_array as $entry_key => $lldp_instance) {
                 if (is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex'])) {
                     $ifIndex = $dot1d_array[$entry_key]['dot1dBasePortIfIndex'];
                 } else {
                     $ifIndex = $entry_key;
                 }
+                $interface = get_port_by_ifIndex($device['device_id'], $ifIndex);
 
-                $interface     = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $ifIndex));
-                $lldp_instance = $lldp_if_array[$entry_key];
                 d_echo($lldp_instance);
                 foreach ($lldp_instance as $entry_instance => $lldp) {
                     $remote_device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ?', array($lldp['lldpRemSysName'], $lldp['lldpRemSysName']));
@@ -182,9 +181,9 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                             if (is_numeric($remote_device_id) === false) {
                                 $ptopo_array = snmpwalk_cache_oid($device, 'ptopoConnEntry', array(), 'PTOPO-MIB');
                                 d_echo($ptopo_array);
-                                foreach (array_keys($ptopo_array) as $ptopo_key) {
-                                    if (strcmp(trim($ptopo_array[$ptopo_key]['ptopoConnRemoteChassis']), trim($lldp['lldpRemChassisId'])) == 0) {
-                                        $ip_arr = explode(" ", $ptopo_array[$ptopo_key]['ptopoConnAgentNetAddr']);
+                                foreach ($ptopo_array as $ptopo) {
+                                    if (strcmp(trim($ptopo['ptopoConnRemoteChassis']), trim($lldp['lldpRemChassisId'])) == 0) {
+                                        $ip_arr = explode(" ", $ptopo['ptopoConnAgentNetAddr']);
 
                                         $a = hexdec($ip_arr[0]);
                                         $b = hexdec($ip_arr[1]);
