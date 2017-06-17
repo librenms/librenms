@@ -83,7 +83,7 @@ server {
  location / {
   try_files $uri $uri/ /index.php?$query_string;
  }
- location /api {
+ location /api/v0 {
   try_files $uri $uri/ /api_v0.php?$query_string;
  }
  location ~ \.php {
