@@ -1,5 +1,4 @@
 <?php
-include '/opt/ChromePhp.php';
 $param = array();
 
 $sql .= ' FROM `ports_fdb` AS F, `ports` AS P, `devices` AS D, `vlans` as V ';
@@ -71,7 +70,7 @@ foreach (dbFetchRows($sql, $param) as $entry) {
         } else {
             $error_img = '';
         }
-        
+
         $fdb_host = dbFetchRow('SELECT * FROM ports_fdb AS F, ipv4_mac AS M WHERE F.mac_address = ? AND M.mac_address = F.mac_address', array($entry['mac_address']));
         $response[] = array(
             'os'               => $entry['os'],
@@ -81,7 +80,6 @@ foreach (dbFetchRows($sql, $param) as $entry) {
             'interface'        => generate_port_link($entry, makeshortif(fixifname(cleanPort($entry['label'])))).' '.$error_img,
             'vlan'             => $entry['vlan_vlan'],
         );
-        ChromePhp::log(generate_port_link($entry, makeshortif(fixifname(cleanPort($entry['label'])))));
     }//end if
 
     unset($ignore);
