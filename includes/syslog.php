@@ -33,6 +33,10 @@ function get_cache($host, $value)
                 $dev_cache[$host]['version'] = dbFetchCell('SELECT `version` FROM devices WHERE `device_id`= ?', array(get_cache($host, 'device_id')));
                 break;
 
+            case 'hostname':
+                $dev_cache[$host]['hostname'] = dbFetchCell('SELECT `hostname` FROM devices WHERE `device_id` = ?', array(get_cache($host, 'device_id')));
+                break;
+
             default:
                 return null;
         }//end switch
@@ -56,6 +60,15 @@ function process_syslog($entry, $update)
     $entry['device_id'] = get_cache($entry['host'], 'device_id');
     if ($entry['device_id']) {
         $os = get_cache($entry['host'], 'os');
+        $hostname = get_cache($entry['host'], 'hostname');
+
+        if ((isset($config['enable_syslog_hooks'])) && ($config['enable_syslog_hooks']) && (isset($config['os'][$os]['syslog_hook'])) && (is_array($config['os'][$os]['syslog_hook']))) {
+            foreach ($config['os'][$os]['syslog_hook'] as $k => $v) {
+                if ((isset($v['script'])) && (isset($v['regex'])) && (preg_match($v['regex'], $entry['msg']))) {
+                    shell_exec(escapeshellcmd($v['script']).' '.escapeshellarg($hostname).' '.escapeshellarg($os).' '.escapeshellarg($entry['msg']).' >/dev/null 2>&1 &');
+                }
+            }
+        }
 
         if (in_array($os, array('ios', 'iosxe', 'catos'))) {
             // multipart message
