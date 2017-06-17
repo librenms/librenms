@@ -5,19 +5,17 @@ type: network
 icon: benu
 mib_dir:
     - benu
+discovery:
+    - sysDescr:
+        - BenuOS
 over:
+    - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'Processor Usage' }
-    - { graph: device_ucd_memory, text: 'Memory Usage' }
-    - { graph: device_storage, text: 'Storage Usage' }
-register_mibs:
-    bSysMemUsed: BENU-HOST-MIB
-    bSysAvgCPUUtil5Min: BENU-HOST-MIB
-    bTWagNumGrePmip6Tunnels: BENU-TWAG-STATS-MIB
-    bWagNumCurrentL2tpv3TunnelsIPv4: BENU-WAG-STATS-MIB
+    - { graph: device_mempool, text: 'Memory Usage' }
 poller_modules:
     mib: 1
 discovery_modules:
     mib: 1
-discovery:
-    - sysDescr:
-        - BenuOS
+register_mibs:
+    bTWagNumGrePmip6Tunnels: BENU-TWAG-STATS-MIB
+    bWagNumCurrentL2tpv3TunnelsIPv4: BENU-WAG-STATS-MIB
