@@ -102,6 +102,12 @@
     "rule": "%wireless_sensors.sensor_class = 'clients' && %wireless_sensors.sensor_current >= %wireless_sensors.sensor_limit && %wireless_sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
     "name": "Too many wireless clients"
   },
+  
+  {
+    "rule": "%syslog.timestamp > = %macros.past_5m && %syslog.msg ~ \"@authentication failure@\"",
+    "name": "Syslog, Authentication failure on Device"
+  },
+  
   {
     "rule": "Service warning",
     "name": "%services.service_status = \"1\""
