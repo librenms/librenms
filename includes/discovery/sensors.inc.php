@@ -12,6 +12,17 @@ if (is_file($pre_cache_file)) {
     d_echo($pre_cache);
 }
 
+if (isset($device['dynamic_discovery']['modules']['sensors'])) {
+    foreach ($device['dynamic_discovery']['modules']['sensors'] as $key => $data_array) {
+        foreach ($data_array as $data) {
+            foreach ((array)$data['oid'] as $oid) {
+                $tmp_name = $data['oid_name'] ?: $data['oid'];
+                $pre_cache[$tmp_name] = snmpwalk_cache_oid($device, $oid, $pre_cache[$tmp_name], $device['dynamic_discovery']['mib'], null, '-OeQUs');
+            }
+        }
+    }
+}
+
 // Run custom sensors 
 require 'includes/discovery/sensors/cisco-entity-sensor.inc.php';
 require 'includes/discovery/sensors/entity-sensor.inc.php';
