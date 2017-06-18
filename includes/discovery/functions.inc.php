@@ -1054,20 +1054,24 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                 $value = $snmp_data[$data['value']];
                 if ($snmp_data[$data['value']]) {
                     $oid = $data['num_oid'] . $index;
-                    $descr = $snmp_data[$data['descr']];
+                    if (isset($snmp_data[$data['descr']])) {
+                        $descr = $snmp_data[$data['descr']];
+                    } else {
+                        $descr = $data['descr'];
+                    }
+                    $divisor = $data['divisor'] ?: 1;
+                    $multiplier = $data['multiplier'] ?: 1;
+                    $low_limit = $data['low_limit'] ?: 'null';
+                    $low_warn_limit = $data['low_warn_limit'] ?: 'null';
+                    $warn_limit = $data['warn_limit'] ?: 'null';
+                    $high_limit = $data['high_limit'] ?: 'null';
                     if ($sensor_type !== 'state') {
-                        $divisor = $data['divisor'] ?: 1;
-                        $multiplier = $data['multiplier'] ?: 1;
                         if (is_numeric($divisor)) {
                             $value = $value / $divisor;
                         }
                         if (is_numeric($multiplier)) {
                             $value = $value * $multiplier;
                         }
-                        $low_limit = $data['low_limit'] ?: null;
-                        $low_warn_limit = $data['low_warn_limit'] ?: null;
-                        $warn_limit = $data['warn_limit'] ?: null;
-                        $high_limit = $data['high_limit'] ?: null;
                     } else {
                         $state_name = $data['descr'];
                         $state_index_id = create_state_index($state_name);
@@ -1082,12 +1086,13 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                             dbInsert($insert, 'state_translations');
                         }
                     }
-                    $tmp_index = str_replace('{{ $index }}', $index, $data['index']);
+                    $tmp_index = $data['index'] ?: $index;
+                    $uindex = str_replace('{{ $index }}', $index, $tmp_index);
                     if ($sensor_type === 'state') {
-                        discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $tmp_index, $state_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value);
-                        create_sensor_to_state_index($device, $state_name, $tmp_index);
+                        discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $state_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value);
+                        create_sensor_to_state_index($device, $state_name, $uindex);
                     } else {
-                        discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $tmp_index, $device['os'], $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value);
+                        discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $device['os'], $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value);
                     }
                 }
             }
