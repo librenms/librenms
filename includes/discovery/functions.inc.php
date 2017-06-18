@@ -1048,7 +1048,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 {
     if ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]) {
         foreach ($device['dynamic_discovery']['modules']['sensors'][$sensor_type] as $data) {
-            $tmp_name = $data['oid_name'] ?: $data['oid'];
+            $tmp_name = $data['oid'];
             $raw_data = $pre_cache[$tmp_name];
             foreach ($raw_data as $index => $snmp_data) {
                 $value = $snmp_data[$data['value']];

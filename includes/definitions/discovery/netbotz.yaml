@@ -3,7 +3,6 @@ modules:
     sensors:
         airflow:
             -
-                oid_name: netbotz_airflow
                 oid: airFlowSensorTable
                 value: airFlowSensorValue
                 divisor: 10
@@ -12,7 +11,6 @@ modules:
                 index: 'airFlowSensorValue.{{ $index }}'
         temperature:
             -
-                oid_name: netbotz_temperature
                 oid: dewPointSensorTable
                 value: dewPointSensorValue
                 divisor: 10
@@ -20,7 +18,6 @@ modules:
                 descr: dewPointSensorLabel
                 index: 'dewPointSensorValue.{{ $index }}'
             -
-                oid_name: netbotz_temperature
                 oid: tempSensorTable
                 value: tempSensorValue
                 num_oid: .1.3.6.1.4.1.5528.100.4.1.1.1.8.
@@ -28,7 +25,6 @@ modules:
                 index: '{{ $index }}'
         humidity:
             -
-                oid_name: netbotz_humidity
                 oid: humiSensorTable
                 value: humiSensorValue
                 num_oid: .1.3.6.1.4.1.5528.100.4.1.2.1.8.
