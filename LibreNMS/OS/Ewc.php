@@ -55,7 +55,7 @@ class Ewc extends OS implements
             new WirelessSensor(
                 'ap-count',
                 $this->getDeviceId(),
-                ['1.3.6.1.4.1.4329.15.3.2.10.1.7.0', '1.3.6.1.4.1.4329.15.3.2.10.1.8.0'],
+                array('1.3.6.1.4.1.4329.15.3.2.10.1.7.0', '1.3.6.1.4.1.4329.15.3.2.10.1.8.0'),
                 'ewc',
                 1,
                 'Total AP licenses'
