@@ -1,10 +1,10 @@
-os: benu
+os: benuos
 group: Benu
 text: 'Benu'
 type: network
 icon: benu
 mib_dir:
-    - benu
+    - benuos
 discovery:
     - sysDescr:
         - BenuOS
