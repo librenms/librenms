@@ -78,7 +78,7 @@ Next start syslog-ng:
 service syslog-ng restart
 ```
 
-Add the following to your LibreNMS config.php file to enable the Syslog extension:
+Add the following to your LibreNMS `config.php` file to enable the Syslog extension:
 
 ```ssh
 $config['enable_syslog'] = 1;
@@ -171,3 +171,28 @@ logging server librenms.ip 5 use-vrf default facility local6
 ```
 
 If you have permitted udp and tcp 514 through any firewall then that should be all you need. Logs should start appearing and displayed within the LibreNMS web UI.
+
+### External hooks
+
+Trigger external scripts based on specific syslog patterns being matched with syslog hooks. Add the following to your LibreNMS `config.php` to enable hooks:
+
+```ssh
+$config['enable_syslog_hooks'] = 1;
+```
+
+The below are some example hooks to call an external script in the event of a configuration change on Cisco IOS, IOS-XR and NX-OS devices. Add to your `config.php` file to enable.
+
+#### Cisco IOS
+```ssh
+$config['os']['ios']['syslog_hook'][] = Array('regex' => '/%SYS-(SW[0-9]+-)?5-CONFIG_I/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
+```
+
+#### Cisco NXOS
+```ssh
+$config['os']['nxos']['syslog_hook'][] = Array('regex' => '/%VSHD-5-VSHD_SYSLOG_CONFIG_I/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
+```
+
+#### Cisco IOSXR
+```ssh
+$config['os']['iosxr']['syslog_hook'][] = Array('regex' => '/%GBL-CONFIG-6-DB_COMMIT/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
+```
