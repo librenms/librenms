@@ -220,6 +220,9 @@ function list_devices()
         $sql = "`status`='0' AND `ignore`='0' AND `disabled`='0'";
     } elseif ($type == 'disabled') {
         $sql = "`disabled`='1'";
+    } elseif ($type == 'os') {
+        $sql = "`os`=?";
+        $param[] = $query;
     } elseif ($type == 'mac') {
         $join = " LEFT JOIN `ports` ON `devices`.`device_id`=`ports`.`device_id` LEFT JOIN `ipv4_mac` ON `ports`.`port_id`=`ipv4_mac`.`port_id` ";
         $sql = "`ipv4_mac`.`mac_address`=?";
