@@ -1065,6 +1065,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     $low_warn_limit = $data['low_warn_limit'] ?: 'null';
                     $warn_limit = $data['warn_limit'] ?: 'null';
                     $high_limit = $data['high_limit'] ?: 'null';
+                    $state_name = '';
                     if ($sensor_type !== 'state') {
                         if (is_numeric($divisor)) {
                             $value = $value / $divisor;
