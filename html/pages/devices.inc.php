@@ -1,6 +1,6 @@
 <?php
 
-// Set Defaults here
+// Set Defaults here algebur
 
 if (!isset($vars['format'])) {
     $vars['format'] = "list_detail";
