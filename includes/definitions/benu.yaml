@@ -2,7 +2,7 @@ os: benuos
 group: Benu
 text: 'Benu'
 type: network
-icon: benu
+icon: benuos
 mib_dir:
     - benuos
 discovery:
