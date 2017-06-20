@@ -35,6 +35,6 @@ if (empty($config['rrdtool_version'])) {
     $config['rrdtool_version'] = 1.4;
 }
 
-if($config['secure_cookies']) {
+if ($config['secure_cookies']) {
  ini_set('session.cookie_secure', 1);   
 }
