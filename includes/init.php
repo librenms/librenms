@@ -90,6 +90,9 @@ require $install_dir . '/includes/defaults.inc.php';
 require $install_dir . '/includes/definitions.inc.php';
 include $install_dir . '/config.php';
 
+# Uncomment the following line if you're using HTTPS and want secure session cookies
+# ini_set('session.cookie_secure', 1);
+
 // init memcached
 if ($config['memcached']['enable'] === true) {
     if (class_exists('Memcached')) {
