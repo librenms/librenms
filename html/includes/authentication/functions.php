@@ -143,7 +143,8 @@ function set_remember_me()
     }
 
     // Params: name, value, expire, path, domain, secure, httponly
-    // We set the secure param to $_SERVER["HTTPS"], which will return true and make it a secure cookie if HTTPS is being used
+    // We set the secure param to $_SERVER["HTTPS"], which will return true
+    // and make it a secure cookie if HTTPS is being used
     setcookie('sess_id', $sess_id, $expiration, '/', null, $_SERVER["HTTPS"], true);
     setcookie('token', $token_id, $expiration, '/', null, $_SERVER["HTTPS"], true);
     setcookie('auth', $auth, $expiration, '/', null, $_SERVER["HTTPS"], true);
@@ -196,7 +197,8 @@ function clear_remember_me($username)
 
     $time = time() - 60 * 60 * 24 * $config['auth_remember']; // time in the past to make sure
     // Params: name, value, expire, path, domain, secure, httponly
-    // We set the secure param to $_SERVER["HTTPS"], which will return true and make it a secure cookie if HTTPS is being used
+    // We set the secure param to $_SERVER["HTTPS"], which will return true
+    // and make it a secure cookie if HTTPS is being used
     setcookie('sess_id', '', $time, '/', null, $_SERVER["HTTPS"]);
     setcookie('token', '', $time, '/', null, $_SERVER["HTTPS"]);
     setcookie('auth', '', $time, '/', null, $_SERVER["HTTPS"]);
