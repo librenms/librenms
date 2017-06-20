@@ -238,7 +238,7 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
     {
         // populate fake $dev_cache and $config
         global $config, $dev_cache;
-        $dev_cache['1.1.1.1'] = array('device_id' => 1, 'os' => 'zywall', 'version' => 1);
+        $dev_cache['1.1.1.1'] = array('device_id' => 1, 'os' => 'zywall', 'version' => 1, 'hostname' => 'zywall');
         $config = array();
         $config['syslog_filter'] = array();
 
