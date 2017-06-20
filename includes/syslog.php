@@ -126,6 +126,18 @@ function process_syslog($entry, $update)
                 $entry['program'] = $matches['program'];
             }
             unset($matches);
+        } elseif ($os == 'zywall') {
+            // Zwwall sends messages without all the fields, so the offset is wrong
+            $msg = preg_replace("/\" /", '";', stripslashes($entry['program'].':'.$entry['msg']));
+            $msg = str_getcsv($msg, ';');
+            $entry['program'] = null;
+            foreach ($msg as $param) {
+                list($var, $val) = explode("=", $param);
+                if ($var == 'cat') {
+                    $entry['program'] = str_replace('"', '', $val);
+                }
+            }
+            $entry['msg'] = join(" ", $msg);
         }//end if
 
         if (!isset($entry['program'])) {
