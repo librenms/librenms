@@ -51,4 +51,4 @@ $config['enable_billing'] = 1;
 $config['show_services'] = 1;
 
 # Whether to use secure cookies. Should be true if you're using HTTPS
-$config['secure_cookies'] = true;
+$config['secure_cookies'] = false;
