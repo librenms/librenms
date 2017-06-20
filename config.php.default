@@ -49,6 +49,3 @@ $config['enable_billing'] = 1;
 
 # Enable the in-built services support (Nagios plugins)
 $config['show_services'] = 1;
-
-# Uncomment the following line if you're using HTTPS and want secure session cookies
-# ini_set('session.cookie_secure', 1);
