@@ -94,7 +94,7 @@ function dbQuery($sql, $parameters = array())
     $result = mysqli_query($database_link, $fullSql);
     if (!$result) {
         $mysql_error = mysqli_error($database_link);
-        if ((in_array($config['mysql_log_level'], array('INFO', 'ERROR')) && !preg_match('/Duplicate entry/', $mysql_error)) || (in_array($config['mysql_log_level'], array('DEBUG')))) {
+        if (isset($config['mysql_log_level']) && ((in_array($config['mysql_log_level'], array('INFO', 'ERROR')) && !preg_match('/Duplicate entry/', $mysql_error)) || in_array($config['mysql_log_level'], array('DEBUG')))) {
             if (!empty($mysql_error)) {
                 logfile(date($config['dateformat']['compact']) . " MySQL Error: $mysql_error ($fullSql)");
             }
@@ -344,7 +344,7 @@ function dbFetchRow($sql = null, $parameters = array(), $nocache = false)
 {
     global $config;
 
-    if ($config['memcached']['enable'] && $nocache === false) {
+    if (isset($config['memcached']['enable']) && $config['memcached']['enable'] && $nocache === false) {
         $result = $config['memcached']['resource']->get(hash('sha512', $sql.'|'.serialize($parameters)));
         if (!empty($result)) {
             return $result;
@@ -359,7 +359,7 @@ function dbFetchRow($sql = null, $parameters = array(), $nocache = false)
 
         recordDbStatistic('fetchrow', $time_start);
 
-        if ($config['memcached']['enable'] && $nocache === false) {
+        if (isset($config['memcached']['enable']) && $config['memcached']['enable'] && $nocache === false) {
             $config['memcached']['resource']->set(hash('sha512', $sql.'|'.serialize($parameters)), $row, $config['memcached']['ttl']);
         }
         return $row;
