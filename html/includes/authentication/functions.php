@@ -142,9 +142,11 @@ function set_remember_me()
         dbInsert($db_entry, 'session');
     }
 
-    setcookie('sess_id', $sess_id, $expiration, '/', null, false, true);
-    setcookie('token', $token_id, $expiration, '/', null, false, true);
-    setcookie('auth', $auth, $expiration, '/', null, false, true);
+    // Params: name, value, expire, path, domain, secure, httponly
+    // We set the secure param to $_SERVER["HTTPS"], which will return true and make it a secure cookie if HTTPS is being used
+    setcookie('sess_id', $sess_id, $expiration, '/', null, $_SERVER["HTTPS"], true);
+    setcookie('token', $token_id, $expiration, '/', null, $_SERVER["HTTPS"], true);
+    setcookie('auth', $auth, $expiration, '/', null, $_SERVER["HTTPS"], true);
 }
 
 /**
@@ -193,7 +195,9 @@ function clear_remember_me($username)
     unset($_COOKIE);
 
     $time = time() - 60 * 60 * 24 * $config['auth_remember']; // time in the past to make sure
-    setcookie('sess_id', '', $time, '/');
-    setcookie('token', '', $time, '/');
-    setcookie('auth', '', $time, '/');
+    // Params: name, value, expire, path, domain, secure, httponly
+    // We set the secure param to $_SERVER["HTTPS"], which will return true and make it a secure cookie if HTTPS is being used
+    setcookie('sess_id', '', $time, '/', null, $_SERVER["HTTPS"]);
+    setcookie('token', '', $time, '/', null, $_SERVER["HTTPS"]);
+    setcookie('auth', '', $time, '/', null, $_SERVER["HTTPS"]);
 }
