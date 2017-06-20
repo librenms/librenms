@@ -1052,12 +1052,12 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
             $raw_data = $pre_cache[$tmp_name];
             foreach ($raw_data as $index => $snmp_data) {
                 $value = $snmp_data[$data['value']];
-                if ($snmp_data[$data['value']]) {
+                if ($value) {
                     $oid = $data['num_oid'] . $index;
                     if (isset($snmp_data[$data['descr']])) {
                         $descr = $snmp_data[$data['descr']];
                     } else {
-                        $descr = $data['descr'];
+                        $descr = str_replace('{{ $index }}', $index, $data['descr']);;
                     }
                     $divisor = $data['divisor'] ?: 1;
                     $multiplier = $data['multiplier'] ?: 1;
