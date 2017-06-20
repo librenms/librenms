@@ -26,7 +26,7 @@ if ($device['os_group'] == 'printer') {
         $toner_oid     = ".1.3.6.1.2.1.43.11.1.1.9.$index";
         $capacity_oid  = ".1.3.6.1.2.1.43.11.1.1.8.$index";
 
-        if (empty($raw_toner)) {
+        if (empty($raw_toner) || $data['prtMarkerSuppliesLevel'] === '-3') {
             $toner_oid = ".1.3.6.1.4.1.367.3.2.1.2.24.1.1.5.$last_index";
             $raw_toner = snmp_get($device, $toner_oid, '-Oqv');
         }
