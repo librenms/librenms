@@ -67,6 +67,7 @@ The only sensor we have defined here is airflow. The available options are as fo
   - `high_limit` (optional): This is the critical high threshold that `value` should be (used in alerting).
   - `descr` (required): This is the key within the table that contains the description of this sensor.
   - `index` (optional): This is the index value we use to uniquely identify this sensor. `{{ $index }}` will be replaced by the `index` from the snmp walk.
+  - `skip_values` (optional): This is an array of values we should skip over.
 
 If you aren't able to use yaml to perform the sensor discovery, you will most likely need to use Advanced health discovery. 
 

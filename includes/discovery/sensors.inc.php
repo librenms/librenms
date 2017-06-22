@@ -16,8 +16,8 @@ if (isset($device['dynamic_discovery']['modules']['sensors'])) {
     foreach ($device['dynamic_discovery']['modules']['sensors'] as $key => $data_array) {
         foreach ($data_array as $data) {
             foreach ((array)$data['oid'] as $oid) {
-                $tmp_name = $data['oid'];
-                if (is_array($pre_cache[$tmp_name])) {
+                $tmp_name = $oid;
+                if (!isset($pre_cache[$tmp_name])) {
                     $pre_cache[$tmp_name] = snmpwalk_cache_oid($device, $oid, array(), $device['dynamic_discovery']['mib'], null, '-OeQUs');
                 }
             }

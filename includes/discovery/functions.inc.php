@@ -1051,13 +1051,20 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
             $tmp_name = $data['oid'];
             $raw_data = $pre_cache[$tmp_name];
             foreach ($raw_data as $index => $snmp_data) {
+                $skip = false;
                 $value = $snmp_data[$data['value']];
-                if ($value) {
+                foreach ((array)$data['skip_values'] as $skip_value) {
+                    echo "Here $value and $skip_value END\n";
+                    if ($value == $skip_value) {
+                        $skip = true;
+                    }
+                }
+                if ($skip === false && $value) {
                     $oid = $data['num_oid'] . $index;
                     if (isset($snmp_data[$data['descr']])) {
                         $descr = $snmp_data[$data['descr']];
                     } else {
-                        $descr = str_replace('{{ $index }}', $index, $data['descr']);;
+                        $descr = str_replace('{{ $index }}', $index, $data['descr']);
                     }
                     $divisor = $data['divisor'] ?: 1;
                     $multiplier = $data['multiplier'] ?: 1;

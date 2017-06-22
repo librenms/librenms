@@ -19,7 +19,7 @@ modules:
                 index: 'dewPointSensorValue.{{ $index }}'
             -
                 oid: tempSensorTable
-                value: tempSensorValue
+                value: tempSensorValueInt
                 num_oid: .1.3.6.1.4.1.5528.100.4.1.1.1.8.
                 descr: tempSensorLabel
                 index: '{{ $index }}'
