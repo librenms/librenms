@@ -619,11 +619,6 @@ function snmp_gen_auth(&$device)
     global $debug, $vdebug;
 
     $cmd = '';
-    $vlan = null;
-
-    if (isset($device['fdb_vlan'])) {
-        $vlan = $device['fdb_vlan'];
-    }
 
     if ($device['snmpver'] === 'v3') {
         $cmd = " -v3 -n '' -l '".$device['authlevel']."'";
@@ -655,8 +650,8 @@ function snmp_gen_auth(&$device)
     } elseif ($device['snmpver'] === 'v2c' or $device['snmpver'] === 'v1') {
         $cmd  = " -".$device['snmpver'];
         $cmd .= " -c '".$device['community']."'";
-        if ($vlan) {
-            $cmd .= '@' . $vlan;
+        if (isset($device['context_name'])) {
+            $cmd .= '@' . $device['context_name'];
         }
     } else {
         if ($debug) {
