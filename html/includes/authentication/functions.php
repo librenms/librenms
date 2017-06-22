@@ -141,7 +141,7 @@ function set_remember_me()
         $db_entry['session_auth'] = $auth;
         dbInsert($db_entry, 'session');
     }\
-    
+
     setcookie('sess_id', $sess_id, $expiration, '/', null, $config['secure_cookies'], true);
     setcookie('token', $token_id, $expiration, '/', null, $config['secure_cookies'], true);
     setcookie('auth', $auth, $expiration, '/', null, $config['secure_cookies'], true);
