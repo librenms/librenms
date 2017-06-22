@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] == 'benuos') {
+if ($device['os'] === 'benuos') {
     echo 'BENU CPU: ';
 
     $descr = 'Processor';
