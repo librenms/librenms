@@ -140,7 +140,8 @@ function set_remember_me()
         $db_entry['session_token'] = $token;
         $db_entry['session_auth'] = $auth;
         dbInsert($db_entry, 'session');
-    }
+    }\
+    
     setcookie('sess_id', $sess_id, $expiration, '/', null, $config['secure_cookies'], true);
     setcookie('token', $token_id, $expiration, '/', null, $config['secure_cookies'], true);
     setcookie('auth', $auth, $expiration, '/', null, $config['secure_cookies'], true);
@@ -192,9 +193,7 @@ function clear_remember_me($username)
     unset($_COOKIE);
 
     $time = time() - 60 * 60 * 24 * $config['auth_remember']; // time in the past to make sure
-    // Params: name, value, expire, path, domain, secure, httponly
-    // We set the secure param to $_SERVER["HTTPS"], which will return true
-    // and make it a secure cookie if HTTPS is being used
+
     setcookie('sess_id', '', $time, '/', null, $config['secure_cookies']);
     setcookie('token', '', $time, '/', null, $config['secure_cookies']);
     setcookie('auth', '', $time, '/', null, $config['secure_cookies']);
