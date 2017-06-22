@@ -77,10 +77,14 @@ server {
  index       index.php;
  access_log  /opt/librenms/logs/access_log;
  error_log   /opt/librenms/logs/error_log;
+ charset utf-8;
  gzip on;
  gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
  location / {
-  try_files $uri $uri/ @librenms;
+  try_files $uri $uri/ /index.php?$query_string;
+ }
+ location /api/v0 {
+  try_files $uri $uri/ /api_v0.php?$query_string;
  }
  location ~ \.php {
   include fastcgi.conf;
@@ -89,10 +93,6 @@ server {
  }
  location ~ /\.ht {
   deny all;
- }
- location @librenms {
-  rewrite api/v0(.*)$ /api_v0.php/$1 last;
-  rewrite ^(.+)$ /index.php/$1 last;
  }
 }
 ```
