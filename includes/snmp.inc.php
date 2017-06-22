@@ -537,7 +537,7 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = null, $mibdir =
  */
 function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array())
 {
-    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUsb', $mib);
+    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUsbet', $mib);
     $data = rtrim(external_exec($cmd));
 
     $line = strtok($data, "\n");
