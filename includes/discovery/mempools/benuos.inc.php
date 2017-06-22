@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] == 'benuos') {
+if ($device['os'] === 'benuos') {
     echo 'BENU-HOST-MIB: ';
     $memdata = snmp_get_multi($device, 'bSysTotalMem.0 bSysMemUsed.0 bSysMemFree.0', '-OQUs', 'BENU-HOST-MIB');
     $total   = $memdata[0]['bSysTotalMem'];
