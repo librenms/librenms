@@ -13,8 +13,6 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 poller_modules:
     mib: 1
-discovery_modules:
-    mib: 1
 register_mibs:
     bTWagNumGrePmip6Tunnels: BENU-TWAG-STATS-MIB
     bWagNumCurrentL2tpv3TunnelsIPv4: BENU-WAG-STATS-MIB
