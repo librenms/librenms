@@ -207,10 +207,10 @@ if (isset($opts['t'])) {
     switch ($opts['t']) {
         case 'udp':
             $force_transport = array('udp');
-        break;
+            break;
         case 'tcp':
             $force_transport = array('tcp');
-        break;
+            break;
     }
 }
 
