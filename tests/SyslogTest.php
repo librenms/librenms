@@ -234,4 +234,18 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
             array('device_id'=>1, 'program'=>'SNTP', 'msg'=>'updated time by -4 seconds')
         );
     }
+    public function testZywallSyslog()
+    {
+        // populate fake $dev_cache and $config
+        global $config, $dev_cache;
+        $dev_cache['1.1.1.1'] = array('device_id' => 1, 'os' => 'zywall', 'version' => 1, 'hostname' => 'zywall');
+        $config = array();
+        $config['syslog_filter'] = array();
+
+        // ---- USG60W ----
+        $this->checkSyslog(
+            "1.1.1.1||local1||info||info||8e||2017-06-14 17:51:25||0\" dst=\"0.0.0.0:0\" msg=\"DHCP server assigned 195.159.132.109 to Chromecast(6C:AD:F8:B1:10:1D)\" note=\"DHCP ACK\" user=\"unknown\" devID=\"a0e4cb7d7f52\" cat=\"DHCP\"||src=\"0.0.0.0",
+            array('device_id'=>1, 'program'=>'DHCP', 'msg'=>'src="0.0.0.0:0" dst="0.0.0.0:0" msg="DHCP server assigned 195.159.132.109 to Chromecast(6C:AD:F8:B1:10:1D)" note="DHCP ACK" user="unknown" devID="a0e4cb7d7f52" cat="DHCP"')
+        );
+    }
 }
