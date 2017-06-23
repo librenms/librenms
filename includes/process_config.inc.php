@@ -31,7 +31,6 @@ if (empty($config['email_from'])) {
 if (empty($config['rrdtool'])) {
     $config['rrdtool'] = '/usr/bin/rrdtool';
 }
-
 if (empty($config['rrdtool_version'])) {
     $config['rrdtool_version'] = 1.4;
 }
