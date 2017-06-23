@@ -1357,22 +1357,33 @@ function first_oid_match($device, $list)
     }
 }
 
+
+/**
+ * Convert a hex ip to a human readable string
+ *
+ * @param string $hex
+ * @return string
+ */
 function hex_to_ip($hex)
 {
-    $return = "";
-    if (filter_var($hex, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && filter_var($hex, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false) {
-        $hex_exp = explode(' ', $hex);
-        foreach ($hex_exp as $item) {
-            if (!empty($item) && $item != "\"") {
-                $return .= hexdec($item).'.';
-            }
-        }
-        $return = substr($return, 0, -1);
-    } else {
-        $return = $hex;
+    $hex = str_replace(array(' ', '"'), '', $hex);
+
+    if (filter_var($hex, FILTER_VALIDATE_IP)) {
+        return $hex;
     }
-    return $return;
+
+    if (strlen($hex) == 8) {
+        return long2ip(hexdec($hex));
+    }
+
+    if (strlen($hex) == 32) {
+        $ipv6 = implode(':', str_split($hex, 4));
+        return preg_replace('/:0*([0-9a-fA-F])/', ':$1', $ipv6);
+    }
+
+    return ''; // invalid input
 }
+
 function fix_integer_value($value)
 {
     if ($value < 0) {
