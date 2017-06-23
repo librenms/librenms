@@ -516,6 +516,58 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = null, $mibdir =
 }//end snmpwalk_cache_triple_oid()
 
 
+/**
+ * Walk an snmp mib oid and group items together based on the index.
+ * This is intended to be used with a string based oid.
+ * Any extra index data past $depth will be added after the oidName to keep grouping consistent.
+ *
+ * Example:
+ * snmpwalk_group($device, 'ifTable', 'IF-MIB');
+ * [
+ *   1 => [ 'ifIndex' => '1', 'ifDescr' => 'lo', 'ifMtu' => '65536', ...],
+ *   2 => [ 'ifIndex' => '2', 'ifDescr' => 'enp0s25', 'ifMtu' => '1500', ...],
+ * ]
+ *
+ * @param array $device Target device
+ * @param string $oid The string based oid to walk
+ * @param string $mib The MIB to use
+ * @param int $depth how many indexes to group
+ * @param array $array optionally insert the entries into an existing array (helpful for grouping multiple walks)
+ * @return array grouped array of data
+ */
+function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array())
+{
+    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUsbet', $mib);
+    $data = rtrim(external_exec($cmd));
+
+    $line = strtok($data, "\n");
+    while ($line !== false) {
+        if (str_contains($line, 'at this OID')) {
+            $line = strtok("\n");
+            continue;
+        }
+
+        list($oid, $value) = explode(' = ', $line, 2);
+        $parts = explode('.', $oid, $depth + 2); // + oid and extra data
+        array_splice($parts, $depth, 0, array_shift($parts)); // move the oid name to the correct depth
+
+        $line = strtok("\n"); // get the next line and concatenate multi-line values
+        while ($line !== false && !str_contains($line, '=')) {
+            $value .= $line . PHP_EOL;
+            $line = strtok("\n");
+        }
+
+        // merge the parts into an array, creating keys if they don't exist
+        $tmp = &$array;
+        foreach ($parts as $part) {
+            $tmp = &$tmp[$part];
+        }
+        $tmp = trim($value, "\" \n\r"); // assign the value as the leaf
+    }
+
+    return $array;
+}
+
 function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0)
 {
     $cmd = gen_snmpwalk_cmd($device, $oid, ' -OQUs', $mib);
