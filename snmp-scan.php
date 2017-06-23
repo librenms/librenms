@@ -41,7 +41,7 @@ if ($config['autodiscovery']['snmpscan'] === false) {
     exit(2);
 }
 
-function perform_snmp_scan($net, $force_network, $force_broadcast, $force_transport)
+function perform_snmp_scan($net, $force_network, $force_broadcast, $transport_protocol)
 {
     global $stats, $config, $debug, $vdebug, $more_info;
     echo 'Range: '.$net->network.'/'.$net->bitmask.PHP_EOL;
@@ -108,7 +108,7 @@ function perform_snmp_scan($net, $force_network, $force_broadcast, $force_transp
             }
             continue;
         }
-        foreach ($force_transport as $transport) {
+        foreach ($transport_protocol as $transport) {
             try {
                 addHost(gethostbyaddr($host), '', $config['snmp']['port'], $transport, $config['distributed_poller_group']);
                 $stats['added']++;
@@ -161,7 +161,7 @@ $start = false;
 $debug = false;
 $quiet = 1;
 $net   = false;
-$force_transport = array('udp','tcp');
+$transport_protocol = array('udp','tcp');
 
 if (isset($opts['h']) || (empty($opts) && (!isset($config['nets']) || empty($config['nets'])))) {
     echo 'Usage: '.$argv[0].' -r <CIDR_Range> [-d] [-l] [-h]'.PHP_EOL;
@@ -178,7 +178,7 @@ if (isset($opts['h']) || (empty($opts) && (!isset($config['nets']) || empty($con
     echo '  -i                Provide more information on actions'.PHP_EOL;
     echo '  -l                Show Legend'.PHP_EOL;
     echo '  -h                Print this text'.PHP_EOL;
-    echo '  -t                Force transport protocol. Ex : -t udp or -t tcp. If not set => both'.PHP_EOL;
+    echo '  -t                Select transport protocol. Ex : -t udp or -t tcp, not set => both'.PHP_EOL;
     exit(0);
 }
 if (isset($opts['d']) || isset($opts['v'])) {
@@ -206,10 +206,10 @@ if (isset($opts['i'])) {
 if (isset($opts['t'])) {
     switch ($opts['t']) {
         case 'udp':
-            $force_transport = array('udp');
+            $transport_protocol = array('udp');
             break;
         case 'tcp':
-            $force_transport = array('tcp');
+            $transport_protocol = array('tcp');
             break;
     }
 }
@@ -217,7 +217,7 @@ if (isset($opts['t'])) {
 if (isset($opts['r'])) {
     $net = Net_IPv4::parseAddress($opts['r']);
     if (ip2long($net->network) !== false) {
-        perform_snmp_scan($net, $force_network, $force_broadcast, $force_transport);
+        perform_snmp_scan($net, $force_network, $force_broadcast, $transport_protocol);
         echo 'Scanned '.$stats['count'].' IPs, Already known '.$stats['known'].' Devices, Added '.$stats['added'].' Devices, Failed to add '.$stats['failed'].' Devices.'.PHP_EOL;
         echo 'Runtime: '.(microtime(true)-$ts).' secs'.PHP_EOL;
     } else {
@@ -230,7 +230,7 @@ if (isset($opts['r'])) {
     }
     foreach ($config['nets'] as $subnet) {
         $net = Net_IPv4::parseAddress($subnet);
-        perform_snmp_scan($net, $force_network, $force_broadcast, $force_transport);
+        perform_snmp_scan($net, $force_network, $force_broadcast, $transport_protocol);
     }
     echo 'Scanned '.$stats['count'].' IPs, Already know '.$stats['known'].' Devices, Added '.$stats['added'].' Devices, Failed to add '.$stats['failed'].' Devices.'.PHP_EOL;
     echo 'Runtime: '.(microtime(true)-$ts).' secs'.PHP_EOL;

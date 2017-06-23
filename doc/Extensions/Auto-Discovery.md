@@ -106,13 +106,19 @@ Enabled by default.
 This module is invoked from bgp-peers discovery module.
 
 #### SNMP Scan
-This isn't actually an auto- mechanism but manually invoked.
+This isn't actually an auto-mechanism but manually invoked.
 
 It's designed to scan through all of the subnets in your config or what you have manually specified 
 to automatically add devices. An example of it's usage is:
 
 ```bash
 ./snmp-scan.php -r 192.168.0.0/24
+```
+
+You can choose to use UDP, TCP or both protocols for discovering your devices. Running only UDP can speed up your discovery if you're not using TCP for SNMP:
+
+```bash
+./snmp-scan.php -r 192.168.0.0/24 -t udp
 ```
 
 #### Discovering devices by IP
