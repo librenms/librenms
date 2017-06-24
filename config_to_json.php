@@ -7,12 +7,10 @@
  *
  */
 
-chdir(__DIR__); // cwd to the directory containing this script
+$init_modules = array();
+require __DIR__ . '/includes/init.php';
 
-// check if we are running through the CLI, otherwise abort
-if (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {
-    $config['install_dir'] = __DIR__;
-    include_once 'includes/defaults.inc.php';
-    include_once 'config.php';
+if (isCli()) {
+    global $config;
     echo json_encode($config);
 }
