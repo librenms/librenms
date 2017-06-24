@@ -4,8 +4,13 @@ use Dapphp\Radius\Radius;
 use LibreNMS\Exceptions\AuthenticationException;
 use Phpass\PasswordHash;
 
-/** @var Radius $radius */
-$radius = new Radius($config['radius']['hostname'], $config['radius']['secret'], $config['radius']['suffix'], $config['radius']['timeout'], $config['radius']['port']);
+function init_auth()
+{
+    /** @var Radius $radius */
+    global $radius, $config;
+
+    $radius = new Radius($config['radius']['hostname'], $config['radius']['secret'], $config['radius']['suffix'], $config['radius']['timeout'], $config['radius']['port']);
+}
 
 function authenticate($username, $password)
 {
