@@ -17,16 +17,6 @@ repo_name: GitHub
 google_analytics: ['UA-79149977-2', 'docs.librenms.org']
 pages:
 - Home: index.md
-- Installation:
-    - Installing LibreNMS: Installation/Installing-LibreNMS.md
-    - Ubuntu VM Image: Installation/Ubuntu-image.md
-    - CentOS VM Image: Installation/CentOS-image.md
-    - Ubuntu 16.04 (Nginx): Installation/Installation-Ubuntu-1604-Nginx.md
-    - Ubuntu 16.04 (Apache): Installation/Installation-Ubuntu-1604-Apache.md
-    - CentOS 7 (Nginx): Installation/Installation-CentOS-7-Nginx.md
-    - CentOS 7 (Apache): Installation/Installation-CentOS-7-Apache.md
-    - Older Docs: Installation/Installing-LibreNMS.md
-    - Migrating from Observium: Installation/Migrating-from-Observium.md
 - General:
     - General/Acknowledgement.md
     - General/Callback-Stats-and-Privacy.md
@@ -38,8 +28,17 @@ pages:
     - General/Releases.md
     - General/Security.md
     - General/Welcome-to-Observium-users.md
+- Installation:
+    - Installing LibreNMS: Installation/Installing-LibreNMS.md
+    - Ubuntu VM Image: Installation/Ubuntu-image.md
+    - CentOS VM Image: Installation/CentOS-image.md
+    - Ubuntu 16.04 (Nginx): Installation/Installation-Ubuntu-1604-Nginx.md
+    - Ubuntu 16.04 (Apache): Installation/Installation-Ubuntu-1604-Apache.md
+    - CentOS 7 (Nginx): Installation/Installation-CentOS-7-Nginx.md
+    - CentOS 7 (Apache): Installation/Installation-CentOS-7-Apache.md
+    - Older Docs: Installation/Installing-LibreNMS.md
+    - Migrating from Observium: Installation/Migrating-from-Observium.md
 - Extensions:
-    - Extensions/Alerting.md
     - Extensions/Applications.md
     - Extensions/Authentication.md
     - Extensions/Auto-Discovery.md
@@ -76,21 +75,8 @@ pages:
     - Extensions/Syslog.md
     - Extensions/Two-Factor-Auth.md
     - Extensions/Varnish.md
-- Developing:
-    - Developing/Using-Git.md
-    - Developing/Code-Guidelines.md
-    - Developing/Style-Guidelines.md
-    - Developing/Validating-Code.md
-    - Developing/Code-Structure.md
-
-    - Developing/Creating-Documentation.md
-    - Adding support for a new OS: Developing/Support-New-OS.md
-    - Developing/Dynamic-Config.md
-    - Developing/Sensor-State-Support.md
-
-    - Developing/Merging-Pull-Requests.md
-    - Developing/Creating-Release.md
 - API: API/API-Docs.md
+- Alerting: Alerting/Alerting.md
 - Support:
     - Support/1-Minute-Polling.md
     - Support/Configuration.md
@@ -103,6 +89,18 @@ pages:
     - Support/Poller Support.md
     - Support/Remote-Monitoring-VPN.md
     - Support/SNMP-Configuration-Examples.md
+- Developing:
+    - Developing/Using-Git.md
+    - Developing/Code-Guidelines.md
+    - Developing/Style-Guidelines.md
+    - Developing/Validating-Code.md
+    - Developing/Code-Structure.md
+    - Developing/Creating-Documentation.md
+    - Adding support for a new OS: Developing/Support-New-OS.md
+    - Developing/Dynamic-Config.md
+    - Developing/Sensor-State-Support.md
+    - Developing/Merging-Pull-Requests.md
+    - Developing/Creating-Release.md
 - hidden:
     - Ubuntu 14.04 (Nginx): Installation/Installation-Ubuntu-1404-Nginx.md
     - Ubuntu 14.04 (Apache): Installation/Installation-Ubuntu-1404-Apache.md
@@ -119,3 +117,10 @@ pages:
     - Developing/os/Health-Information.md
     - Developing/os/Wireless-Sensors.md
     - Developing/os/Custom-Graphs.md
+    - Extensions/Alerting.md
+    - Alerting/Rules.md
+    - Alerting/Templates.md
+    - Alerting/Transports.md
+    - Alerting/Entities.md
+    - Alerting/Macros.md
+    - Alerting/Rules.md
