@@ -31,3 +31,10 @@ OK - This is a good thing, you can skip over these :)
 WARN - You probably want to check this out.
 
 FAIL - This is going to need your attention!
+
+
+Any SQL errors can be corrected by running the commands included in the output of validate.php. They will usually start with `ALTER TABLE` and will need to be entered from an SQL prompt. To do so, run the commands below:
+`mysql -h 127.0.0.1 -u librenms -p`
+Enter the SQL password
+`use librenms;`
+Paste the SQL commands from the validation script output, watch for errors.
