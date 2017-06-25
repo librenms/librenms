@@ -783,7 +783,7 @@ $config['discovery_modules']['ntp']                  = 1;
 $config['discovery_modules']['loadbalancers']        = 0;
 $config['discovery_modules']['mef']                  = 0;
 $config['discovery_modules']['wireless']             = 1;
-$config['discovery_modules']['fdb-table']            = 1;
+
 // Enable daily updates
 $config['update'] = 1;
 

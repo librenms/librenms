@@ -666,6 +666,7 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib = 0)
     return $array;
 }//end snmp_cache_port_oids()
 
+
 function snmp_gen_auth(&$device)
 {
     global $debug, $vdebug;
@@ -702,9 +703,6 @@ function snmp_gen_auth(&$device)
     } elseif ($device['snmpver'] === 'v2c' or $device['snmpver'] === 'v1') {
         $cmd  = " -".$device['snmpver'];
         $cmd .= " -c '".$device['community']."'";
-        if (isset($device['context_name'])) {
-            $cmd .= '@' . $device['context_name'];
-        }
     } else {
         if ($debug) {
             print 'DEBUG: '.$device['snmpver']." : Unsupported SNMP Version (shouldn't be possible to get here)\n";
