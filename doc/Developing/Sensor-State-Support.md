@@ -91,7 +91,7 @@ modules:
                     - { descr: motionDetected, graph: 0, value: 1, generic: 2 }
             -
                 oid: otherStateSensorTable
-                value: otherStateSensorValue
+                value: otherStateSensorErrorStatus
                 num_oid: .1.3.6.1.4.1.5528.100.4.2.10.1.3.
                 descr: otherStateSensorLabel
                 index: '{{ $index }}'
