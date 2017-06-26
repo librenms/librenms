@@ -908,3 +908,10 @@ $config['xirrus_disable_stations']  = false;
 
 // Graphite default port
 $config['graphite']['port']         = 2003;
+
+// Whether to enable secure cookies. Setting this to true enable secure cookies
+// and only send them over HTTPS. Setting this to false will send cookies over
+// HTTP and HTTPS, but they will be insecure. Setting this to $_SERVER["HTTPS"]
+// will send secure cookies when the site is being accessed over HTTPS, and
+// send insecure cookies when the site is being accessed over HTTP.
+$config['secure_cookies'] = $_SERVER["HTTPS"];
