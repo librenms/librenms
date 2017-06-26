@@ -1,5 +1,7 @@
 source: Developing/os/Health-Information.md
 
+#### Sensors
+
 This document will guide you through adding health / sensor information for your new device.
  
 Currently we have support for the following health metrics along with the values we expect to see the data in:
@@ -17,9 +19,61 @@ Currently we have support for the following health metrics along with the values
 | power                           | W                           |
 | runtime                         | Min                         |
 | signal                          | dBm                         |
+| snr                             | SNR                         |
 | state                           | #                           |
 | temperature                     | C                           |
 | voltage                         | V                           |
+
+#### Simple health discovery
+
+We have support for defining health / sensor discovery using YAML files so that you don't need to know how to write PHP.
+
+All yaml files are located in `includes/definitions/discovery/$os.yaml`. Defining the information hear is not always 
+possible and is heavily reliant on vendors being sensible with the MIBs they generate. Only snmp walks are supported 
+and you must provide a sane table that can be traversed and contains all of the data you need. We will use netbotz as 
+an example here.
+
+`includes/definitions/discovery/netbotz.yaml`
+
+```yaml
+mib: NETBOTZV2-MIB
+modules:
+    sensors:
+        airflow:
+            -
+                oid_name: netbotz_airflow
+                oid: airFlowSensorTable
+                value: airFlowSensorValue
+                divisor: 10
+                num_oid: .1.3.6.1.4.1.5528.100.4.1.5.1.2.
+                descr: airFlowSensorLabel
+                index: 'airFlowSensorValue.{{ $index }}'
+```
+
+At the top you can define one or more mibs to be used in the lookup of data:
+
+`mib: NETBOTZV2-MIB`
+
+The only sensor we have defined here is airflow. The available options are as follows:
+
+  - `oid` (required): This is the name of the table you want to do the snmp walk on.
+  - `value` (required): This is the key within the table that contains the value.
+  - `num_oid` (required): This is the numerical OID that contains `value`. This should always be without the appended `index`.
+  - `divisor` (optional): This is the divisor to use against the returned `value`.
+  - `multiplier` (optional): This is the multiplier to use against the returned `value`.
+  - `low_limit` (optional): This is the critical low threshold that `value` should be (used in alerting).
+  - `low_warn_limit` (optional): This is the warning low threshold that `value` should be (used in alerting).
+  - `warn_limit` (optional): This is the warning high threshold that `value` should be (used in alerting).
+  - `high_limit` (optional): This is the critical high threshold that `value` should be (used in alerting).
+  - `descr` (required): This is the key within the table that contains the description of this sensor.
+  - `index` (optional): This is the index value we use to uniquely identify this sensor. `{{ $index }}` will be replaced by the `index` from the snmp walk.
+  - `skip_values` (optional): This is an array of values we should skip over.
+
+If you aren't able to use yaml to perform the sensor discovery, you will most likely need to use Advanced health discovery. 
+
+#### Advanced health discovery
+
+If you can't use the yaml files as above, then you will need to create the discovery code in php.
 
 The directory structure for sensor information is `includes/discovery/sensors/$class/$os.inc.php`. The format of all 
 of the sensors follows the same code format which is to call the `discover_sensor()` function - with the 
