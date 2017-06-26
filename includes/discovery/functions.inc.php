@@ -1059,7 +1059,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         $skip = true;
                     }
                 }
-                if ($skip === false && $value) {
+                if ($skip === false && is_numeric($value)) {
                     $oid = $data['num_oid'] . $index;
                     if (isset($snmp_data[$data['descr']])) {
                         $descr = $snmp_data[$data['descr']];
