@@ -27,7 +27,7 @@ import json
 import socket
 from collections import namedtuple
 from enum import Enum
-from ipaddress import ip_network
+from ipaddress import ip_network, ip_address
 from multiprocessing import Pool
 from os import path, chdir
 from subprocess import check_output, CalledProcessError
@@ -42,11 +42,13 @@ class Outcome(Enum):
     UNPINGABLE = 2
     KNOWN = 3
     FAILED = 4
+    EXCLUDED = 5
 
 VERBOSITY = 0
 THREADS = 32
+CONFIG = {}
 start_time = time()
-stats = {'count': 0, Outcome.ADDED: 0, Outcome.UNPINGABLE: 0, Outcome.KNOWN: 0, Outcome.FAILED: 0}
+stats = {'count': 0, Outcome.ADDED: 0, Outcome.UNPINGABLE: 0, Outcome.KNOWN: 0, Outcome.FAILED: 0, Outcome.EXCLUDED: 0}
 
 
 def get_outcome_symbol(outcome):
@@ -67,6 +69,17 @@ def handle_result(data):
 
     stats['count'] += 1
     stats[data.outcome] += 1
+
+
+def check_ip_excluded(ip):
+    excludes = CONFIG.get('autodiscovery', {}).get('nets-exclude', {})
+    for xnets in excludes:
+        if ip_address(ip) in ip_network(xnets):
+            if VERBOSITY > 1:
+                print("{} excluded by autodiscovery.nets-exclude".format(ip))
+            stats[Outcome.EXCLUDED] += 1
+            return True
+    return False
 
 
 def scan_host(ip):
@@ -94,6 +107,7 @@ def scan_host(ip):
 
         return Result(ip, hostname, Outcome.UNDEFINED, output)
 
+
 if __name__ == '__main__':
     ###################
     # Parse arguments #
@@ -115,13 +129,13 @@ if __name__ == '__main__':
     # Collect networks
     install_dir = path.dirname(path.realpath(__file__))
     chdir(install_dir)
-    config = json.loads(check_output(['/usr/bin/env', 'php', 'config_to_json.php']).decode('utf-8'))
+    CONFIG = json.loads(check_output(['/usr/bin/env', 'php', 'config_to_json.php']).decode('utf-8'))
 
-    if not config.get('nets', []) and not args.r:
+    if not CONFIG.get('nets', []) and not args.r:
         parser.error('$config[\'nets\'] is not set in config.php, you must specify a network to scan with -r')
 
     networks = []
-    for net in (args.r if args.r else config.get('nets', [])):
+    for net in (args.r if args.r else CONFIG.get('nets', [])):
         if net:
             networks.append(ip_network(net))
 
@@ -133,16 +147,17 @@ if __name__ == '__main__':
 
     print('Scanning IPs:')
 
-    pool = Pool(processes=THREADS)              # start 4 worker processes
+    pool = Pool(processes=THREADS)
 
     for network in networks:
         if str(network).endswith('/32'):
-            ip = str(network)[:-3]
-            pool.apply_async(scan_host, (ip,), callback=handle_result)
+            ips = [str(network)[:-3]]
+        else:
+            ips = network.hosts()
 
-        for ip in network.hosts():
-            ip = str(ip)
-            pool.apply_async(scan_host, (ip,), callback=handle_result)
+        for ip in ips:
+            if not check_ip_excluded(ip):
+                pool.apply_async(scan_host, (str(ip),), callback=handle_result)
 
     pool.close()
     pool.join()
@@ -150,5 +165,9 @@ if __name__ == '__main__':
     if VERBOSITY == 0:
         print("\n")
 
-    print('Scanned {} IPs: Already know {} devices, Added {} devices, Failed to add {} devices'.format(stats['count'], stats[Outcome.KNOWN], stats[Outcome.ADDED], stats[Outcome.FAILED]))
+    base = 'Scanned {} IPs: {} known devices, added {} devices, failed to add {} devices'
+    summary = base.format(stats['count'], stats[Outcome.KNOWN], stats[Outcome.ADDED], stats[Outcome.FAILED])
+    if stats[Outcome.EXCLUDED]:
+        summary += ', {} ips excluded by config'.format(stats[Outcome.EXCLUDED])
+    print(summary)
     print('Runtime: {:.2f} seconds'.format(time() - start_time))
