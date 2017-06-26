@@ -32,7 +32,7 @@ use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 class YamlTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function testYaml()
+    public function testOSYaml()
     {
         global $config;
 
@@ -47,6 +47,30 @@ class YamlTest extends \PHPUnit_Framework_TestCase
             $this->assertArrayHasKey('os', $data, $file);
             $this->assertArrayHasKey('type', $data, $file);
             $this->assertArrayHasKey('text', $data, $file);
+        }
+    }
+
+    public function testDiscoveryYaml()
+    {
+        global $config;
+
+        $pattern = $config['install_dir'] . '/includes/definitions/discovery/*.yaml';
+        foreach (glob($pattern) as $file) {
+            try {
+                $data = Yaml::parse(file_get_contents($file));
+            } catch (ParseException $e) {
+                throw new PHPUnitException("$file Could not be parsed");
+            }
+
+            foreach ($data['modules'] as $module => $sub_modules) {
+                foreach ($sub_modules as $sub_module) {
+                    foreach ($sub_module as $sensor) {
+                        $this->assertArrayHasKey('oid', $sensor, $file);
+                        $this->assertArrayHasKey('num_oid', $sensor, $file);
+                        $this->assertArrayHasKey('value', $sensor, $file);
+                    }
+                }
+            }
         }
     }
 }

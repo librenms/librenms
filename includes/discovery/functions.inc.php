@@ -85,8 +85,22 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
         d_echo("$ip not in a matched network - skipping\n");
     }//end if
 }
-
 //end discover_new_device()
+
+/**
+ * @param $device
+ */
+function load_discovery(&$device)
+{
+    global $config;
+    $yaml_discovery = $config['install_dir'] . '/includes/definitions/discovery/' . $device['os'] . '.yaml';
+    if (file_exists($yaml_discovery)) {
+        $device['dynamic_discovery'] = Symfony\Component\Yaml\Yaml::parse(
+            file_get_contents($yaml_discovery)
+        );
+    }
+    unset($yaml_discovery);
+}
 
 function discover_device(&$device, $options = null)
 {
@@ -119,6 +133,7 @@ function discover_device(&$device, $options = null)
     }
 
     load_os($device);
+    load_discovery($device);
     if (is_array($config['os'][$device['os']]['register_mibs'])) {
         register_mibs($device, $config['os'][$device['os']]['register_mibs'], 'includes/discovery/os/' . $device['os'] . '.inc.php');
     }
@@ -182,14 +197,11 @@ function discover_device(&$device, $options = null)
     echo "\n";
     $discovered_devices++;
 }
-
 //end discover_device()
+
 // Discover sensors
-
-
 function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null)
 {
-
     $low_limit      = set_null($low_limit);
     $low_warn_limit = set_null($low_warn_limit);
     $warn_limit     = set_null($warn_limit);
@@ -1032,6 +1044,70 @@ function ignore_storage($descr)
     return $deny;
 }
 
+function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
+{
+    if ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]) {
+        foreach ($device['dynamic_discovery']['modules']['sensors'][$sensor_type] as $data) {
+            $tmp_name = $data['oid'];
+            $raw_data = $pre_cache[$tmp_name];
+            foreach ($raw_data as $index => $snmp_data) {
+                $skip = false;
+                $value = $snmp_data[$data['value']];
+                foreach ((array)$data['skip_values'] as $skip_value) {
+                    echo "Here $value and $skip_value END\n";
+                    if ($value == $skip_value) {
+                        $skip = true;
+                    }
+                }
+                if ($skip === false && is_numeric($value)) {
+                    $oid = $data['num_oid'] . $index;
+                    if (isset($snmp_data[$data['descr']])) {
+                        $descr = $snmp_data[$data['descr']];
+                    } else {
+                        $descr = str_replace('{{ $index }}', $index, $data['descr']);
+                    }
+                    $divisor = $data['divisor'] ?: 1;
+                    $multiplier = $data['multiplier'] ?: 1;
+                    $low_limit = $data['low_limit'] ?: 'null';
+                    $low_warn_limit = $data['low_warn_limit'] ?: 'null';
+                    $warn_limit = $data['warn_limit'] ?: 'null';
+                    $high_limit = $data['high_limit'] ?: 'null';
+                    $state_name = '';
+                    if ($sensor_type !== 'state') {
+                        if (is_numeric($divisor)) {
+                            $value = $value / $divisor;
+                        }
+                        if (is_numeric($multiplier)) {
+                            $value = $value * $multiplier;
+                        }
+                    } else {
+                        $state_name = $data['descr'];
+                        $state_index_id = create_state_index($state_name);
+                        foreach ($data['states'] as $state) {
+                            $insert = array(
+                                'state_index_id' => $state_index_id,
+                                'state_descr' => $state['descr'],
+                                'state_draw_graph' => $state['graph'],
+                                'state_value' => $state['value'],
+                                'state_generic_value' => $state['generic']
+                            );
+                            dbInsert($insert, 'state_translations');
+                        }
+                    }
+                    $tmp_index = $data['index'] ?: $index;
+                    $uindex = str_replace('{{ $index }}', $index, $tmp_index);
+                    if ($sensor_type === 'state') {
+                        discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $state_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value);
+                        create_sensor_to_state_index($device, $state_name, $uindex);
+                    } else {
+                        discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $device['os'], $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value);
+                    }
+                }
+            }
+        }
+    }
+}
+
 /**
  * @param $types
  * @param $device
@@ -1055,6 +1131,7 @@ function sensors($types, $device, $valid, $pre_cache = array())
                 include $dir . '/rfc1628.inc.php';
             }
         }
+        discovery_process($valid, $device, $sensor_type, $pre_cache);
         d_echo($valid['sensor'][$sensor_type]);
         check_valid_sensors($device, $sensor_type, $valid['sensor']);
         echo "\n";
