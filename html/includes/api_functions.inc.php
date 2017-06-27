@@ -1517,7 +1517,7 @@ function list_services()
     // Filter BY STATE
     if (isset($_GET['state'])) {
         $where .= (!empty($where)) ? ' AND' : ' WHERE';
-        $where .= " services.service_status= ".$_GET['state']." AND services.service_disabled='0' AND services.service_ignore='0'";
+        $where .= " S.service_status= ".$_GET['state']." AND S.service_disabled='0' AND S.service_ignore='0'";
         if (!is_numeric($_GET['state'])) {
             $status   = 'error';
             $message = "No valid service state provided, valid option is 0=Ok, 1=Warning, 2=Critical";
@@ -1527,7 +1527,7 @@ function list_services()
     //Filter BY TYPE
     if (isset($_GET['type'])) {
         $where .= (!empty($where)) ? ' AND' : ' WHERE';
-        $where .= " services.service_type LIKE '".$_GET['type']."'";
+        $where .= " S.service_type LIKE '".$_GET['type']."'";
     }
 
     // GET BY HOST
@@ -1536,7 +1536,7 @@ function list_services()
         $hostname = $router['hostname'];
         $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
 
-        $where .= " services.device_id = ".$device_id;
+        $where .= " S.device_id = ".$device_id;
 
         if (!is_numeric($device_id)) {
             $status   = 'error';
@@ -1544,7 +1544,7 @@ function list_services()
         }
     }
 
-    $services[] = dbFetchRows('SELECT services.* FROM services '.$where.' GROUP BY services.service_ip ORDER BY services.service_ip');
+    $services[] = dbFetchRows('SELECT * FROM `services` as S '.$where.' GROUP BY S.service_ip ORDER BY S.service_ip');
 
     $count = count($services);
     $output = array(
