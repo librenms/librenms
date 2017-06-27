@@ -44,12 +44,12 @@ Table of Content:
     - [Processors](Entities.md#entity-processors)
     - [Storage](Entities.md#entity-storage)
     - [Sensors](Entities.md#entity-sensors)
-- [Macros](#macros)
-    - [Device](#macros-device)
-    - [Port](#macros-port)
-    - [Time](#macros-time)
-    - [Sensors](#macros-sensors)
-    - [Misc](#macros-misc)
+- [Macros](Macros.md)
+    - [Device](Macros.md#macros-device)
+    - [Port](Macros.md#macros-port)
+    - [Time](Macros.md#macros-time)
+    - [Sensors](Macros.md#macros-sensors)
+    - [Misc](Macros.md#macros-misc)
 
 
 # <a name="about">About</a>
