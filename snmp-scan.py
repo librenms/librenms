@@ -138,19 +138,17 @@ if __name__ == '__main__':
     VERBOSE_LEVEL = args.verbose or VERBOSE_LEVEL
     THREADS = args.threads or THREADS
 
-    print(VERBOSE_LEVEL)
-
-    # Collect networks
+    # Import LibreNMS config
     install_dir = path.dirname(path.realpath(__file__))
     chdir(install_dir)
     CONFIG = json.loads(check_output(['/usr/bin/env', 'php', 'config_to_json.php']).decode('utf-8'))
 
-    if not CONFIG.get('nets', []) and not args.network:
-        parser.error('$config[\'nets\'] is not set in config.php, you must specify a network to scan with -r')
-
     #######################
     # Build network lists #
     #######################
+    if not CONFIG.get('nets', []) and not args.network:
+        parser.error('$config[\'nets\'] is not set in config.php, you must specify a network to scan with -r')
+
     networks = []
     for net in (args.network if args.network else CONFIG.get('nets', [])):
         try:
