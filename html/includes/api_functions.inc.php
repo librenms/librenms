@@ -1502,6 +1502,7 @@ function list_arp()
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
 }
+
 function list_services()
 {
     global $config;
@@ -1510,30 +1511,32 @@ function list_services()
     $status   = 'ok';
     $code     = 200;
     $message  = '';
-    $host_par = array();
-    $sql_param = array();
     $services = array();
     $where    = '';
-    $devicewhere = '';
 
     // Filter BY STATE
     if (isset($_GET['state'])) {
-        $where  = " AND S.service_status= ? AND S.service_disabled='0' AND S.service_ignore='0'";
-        $host_par[] = $_GET['state'];
-
+        $where .= (!empty($where)) ? ' AND' : ' WHERE';
+        $where .= " services.service_status= ".$_GET['state']." AND services.service_disabled='0' AND services.service_ignore='0'";
         if (!is_numeric($_GET['state'])) {
             $status   = 'error';
             $message = "No valid service state provided, valid option is 0=Ok, 1=Warning, 2=Critical";
         }
     }
+    
+    //Filter BY TYPE
+    if (isset($_GET['type'])) {
+        $where .= (!empty($where)) ? ' AND' : ' WHERE';
+        $where .= " services.service_type LIKE '".$_GET['type']."'";
+    }
 
     // GET BY HOST
     if (isset($router['hostname'])) {
+        $where .= (!empty($where)) ? ' AND' : ' WHERE';
         $hostname = $router['hostname'];
         $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
 
-        $where .= " AND S.device_id = ?";
-        $host_par[] = $device_id;
+        $where .= " services.device_id = ".$device_id;
 
         if (!is_numeric($device_id)) {
             $status   = 'error';
@@ -1541,22 +1544,8 @@ function list_services()
         }
     }
 
-    // DEVICE
-    $host_sql = 'SELECT * FROM devices AS D, services AS S WHERE D.device_id = S.device_id '.$where.' GROUP BY D.hostname ORDER BY D.hostname';
+    $services[] = dbFetchRows('SELECT services.* FROM services '.$where.' GROUP BY services.service_ip ORDER BY services.service_ip');
 
-    // SERVICE
-    foreach (dbFetchRows($host_sql, $host_par) as $device) {
-        $device_id = $device['device_id'];
-        $sql_param[0] = $device_id;
-
-        // FILTER BY TYPE
-        if (isset($_GET['type'])) {
-            $devicewhere  = " AND `service_type` LIKE ?";
-            $sql_param[1] = $_GET['type'];
-        }
-
-        $services[] = dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ?".$devicewhere, $sql_param);
-    }
     $count = count($services);
     $output = array(
         'status'  => $status,
