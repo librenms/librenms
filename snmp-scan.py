@@ -101,7 +101,7 @@ def scan_host(ip):
         add_output = check_output(['/usr/bin/env', 'php', 'addhost.php', hostname or ip])
         return Result(ip, hostname, Outcome.ADDED, add_output)
     except CalledProcessError as err:
-        output = err.output.decode('utf-8').rstrip()
+        output = err.output.decode().rstrip()
         if err.returncode == 2:
             if 'Could not ping' in output:
                 return Result(ip, hostname, Outcome.UNPINGABLE, output)
@@ -141,7 +141,10 @@ if __name__ == '__main__':
     # Import LibreNMS config
     install_dir = path.dirname(path.realpath(__file__))
     chdir(install_dir)
-    CONFIG = json.loads(check_output(['/usr/bin/env', 'php', 'config_to_json.php']).decode('utf-8'))
+    try:
+        CONFIG = json.loads(check_output(['/usr/bin/env', 'php', 'config_to_json.php']).decode())
+    except CalledProcessError as e:
+        parser.error("Could not execute: {}\n{}".format(' '.join(e.cmd), e.output.decode().rstrip()))
 
     #######################
     # Build network lists #
