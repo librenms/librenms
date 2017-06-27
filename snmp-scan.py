@@ -112,10 +112,11 @@ def scan_host(ip):
                     return Result(ip, hostname, Outcome.FAILED, output)
             elif err.returncode == 3:
                 return Result(ip, hostname, Outcome.KNOWN, output)
-
-            return Result(ip, hostname, Outcome.UNDEFINED, output)
     except KeyboardInterrupt:
         return Result(ip, hostname, Outcome.TERMINATED, 'Terminated')
+
+    return Result(ip, hostname, Outcome.UNDEFINED, output)
+
 
 if __name__ == '__main__':
     ###################
