@@ -1512,31 +1512,34 @@ function list_services()
     $code     = 200;
     $message  = '';
     $services = array();
-    $where    = '';
+    $where    = array();
+    $params   = array();
 
-    // Filter BY STATE
+    // Filter by State
     if (isset($_GET['state'])) {
-        $where .= (!empty($where)) ? ' AND' : ' WHERE';
-        $where .= " S.service_status= ".$_GET['state']." AND S.service_disabled='0' AND S.service_ignore='0'";
+        $where[] = '`service_status`=?';
+        $params[] = $_GET['state'];
+        $where[] = "`service_disabled`='0'";
+        $where[] = "`service_ignore`='0'";
+
         if (!is_numeric($_GET['state'])) {
             $status   = 'error';
             $message = "No valid service state provided, valid option is 0=Ok, 1=Warning, 2=Critical";
         }
     }
-    
-    //Filter BY TYPE
-    if (isset($_GET['type'])) {
-        $where .= (!empty($where)) ? ' AND' : ' WHERE';
-        $where .= " S.service_type LIKE '".$_GET['type']."'";
-    }
 
-    // GET BY HOST
+    //Filter by Type
+    if (isset($_GET['type'])) {
+        $where[] = '`service_type` LIKE ?';
+        $params[] = $_GET['type'];
+    }
+    
+    //GET by Host
     if (isset($router['hostname'])) {
-        $where .= (!empty($where)) ? ' AND' : ' WHERE';
         $hostname = $router['hostname'];
         $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-
-        $where .= " S.device_id = ".$device_id;
+        $where[] = ' device_id = ?';
+        $params[] = $device_id;
 
         if (!is_numeric($device_id)) {
             $status   = 'error';
@@ -1544,7 +1547,13 @@ function list_services()
         }
     }
 
-    $services[] = dbFetchRows('SELECT * FROM `services` as S '.$where.' GROUP BY S.service_ip ORDER BY S.service_ip');
+    $query = 'SELECT * FROM `services`';
+
+    if (!empty($where)) {
+        $query .= ' WHERE ' . implode(' AND ', $where);
+    }
+    $query .= ' ORDER BY service_ip';
+    $services[] = dbFetchRows($query, $params);
 
     $count = count($services);
     $output = array(
