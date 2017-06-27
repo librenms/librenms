@@ -44,11 +44,18 @@ class Outcome(Enum):
     FAILED = 4
     EXCLUDED = 5
 
-VERBOSITY = 0
+
+VERBOSE_LEVEL = 0
 THREADS = 32
 CONFIG = {}
+EXCLUDED_NETS = []
 start_time = time()
 stats = {'count': 0, Outcome.ADDED: 0, Outcome.UNPINGABLE: 0, Outcome.KNOWN: 0, Outcome.FAILED: 0, Outcome.EXCLUDED: 0}
+
+
+def debug(message, level=2):
+    if level <= VERBOSE_LEVEL:
+        print(message)
 
 
 def get_outcome_symbol(outcome):
@@ -62,8 +69,8 @@ def get_outcome_symbol(outcome):
 
 
 def handle_result(data):
-    if VERBOSITY > 0:
-        print('Scanned {}: {}'.format(("{} ({})".format(data.hostname, data.ip) if data.hostname else data.ip), data.output))
+    if VERBOSE_LEVEL > 0:
+        print('Scanned \033[1m{}\033[0m {}'.format(("{} ({})".format(data.hostname, data.ip) if data.hostname else data.ip), data.output))
     else:
         print(get_outcome_symbol(data.outcome), end='', flush=True)
 
@@ -72,11 +79,9 @@ def handle_result(data):
 
 
 def check_ip_excluded(ip):
-    excludes = CONFIG.get('autodiscovery', {}).get('nets-exclude', {})
-    for xnets in excludes:
-        if ip_address(ip) in ip_network(xnets):
-            if VERBOSITY > 1:
-                print("{} excluded by autodiscovery.nets-exclude".format(ip))
+    for net in EXCLUDED_NETS:
+        if ip in net:
+            debug("\033[91m{} excluded by autodiscovery.nets-exclude\033[0m".format(ip), 1)
             stats[Outcome.EXCLUDED] += 1
             return True
     return False
@@ -113,7 +118,7 @@ if __name__ == '__main__':
     # Parse arguments #
     ###################
     parser = argparse.ArgumentParser(description='Scan network for snmp hosts and add them to LibreNMS.')
-    parser.add_argument('-r', action='append', metavar='NETWORK', help="""CIDR noted IP-Range to scan. Can be specified multiple times
+    parser.add_argument('network', nargs='*', help="""CIDR noted IP-Range to scan. Can be specified multiple times
     This argument is only required if $config['nets'] is not set
     Example: 192.168.0.0/24
     Example: 192.168.0.0/31 will be treated as an RFC3021 p-t-p network with two addresses, 192.168.0.0 and 192.168.0.1
@@ -121,37 +126,59 @@ if __name__ == '__main__':
     parser.add_argument('-t', dest='threads', type=int, help="How many IPs to scan at a time.  More will increase the scan speed, but could overload your system. Default: {}".format(THREADS))
     parser.add_argument('-l', '--legend', action='store_true', help="Print the legend.")
     parser.add_argument('-v', '--verbose', action='count', help="Show debug output. Specifying multiple times increases the verbosity.")
+
+    # compatibility arguments
+    parser.add_argument('-r', dest='network', action='append', metavar='network', help=argparse.SUPPRESS)
+    parser.add_argument('-d', '-i', dest='verbose', action='count', help=argparse.SUPPRESS)
+    parser.add_argument('-n', action='store_true', help=argparse.SUPPRESS)
+    parser.add_argument('-b', action='store_true', help=argparse.SUPPRESS)
+
     args = parser.parse_args()
 
-    VERBOSITY = args.verbose or VERBOSITY
+    VERBOSE_LEVEL = args.verbose or VERBOSE_LEVEL
     THREADS = args.threads or THREADS
+
+    print(VERBOSE_LEVEL)
 
     # Collect networks
     install_dir = path.dirname(path.realpath(__file__))
     chdir(install_dir)
     CONFIG = json.loads(check_output(['/usr/bin/env', 'php', 'config_to_json.php']).decode('utf-8'))
 
-    if not CONFIG.get('nets', []) and not args.r:
+    if not CONFIG.get('nets', []) and not args.network:
         parser.error('$config[\'nets\'] is not set in config.php, you must specify a network to scan with -r')
 
+    #######################
+    # Build network lists #
+    #######################
     networks = []
-    for net in (args.r if args.r else CONFIG.get('nets', [])):
-        if net:
-            networks.append(ip_network(net))
+    for net in (args.network if args.network else CONFIG.get('nets', [])):
+        try:
+            networks.append(ip_network(net, True))
+            debug('Network parsed: {}'.format(net), 2)
+        except ValueError as e:
+            parser.error('Invalid network format {}'.format(e))
+
+    for net in CONFIG.get('autodiscovery', {}).get('nets-exclude', {}):
+        try:
+            EXCLUDED_NETS.append(ip_network(net, True))
+            debug('Excluded network: {}'.format(net), 2)
+        except ValueError as e:
+            parser.error('Invalid excluded network format {}, check your config.php'.format(e))
 
     #################
     # Scan networks #
     #################
-    if args.legend:
-        print("Legend:\n+  Added device\n*  Known device\n-  Failed to add device\n.  Ping failed\n")
+    if args.legend and not VERBOSE_LEVEL:
+        print('Legend:\n+  Added device\n*  Known device\n-  Failed to add device\n.  Ping failed\n')
 
     print('Scanning IPs:')
 
     pool = Pool(processes=THREADS)
 
     for network in networks:
-        if str(network).endswith('/32'):
-            ips = [str(network)[:-3]]
+        if network.num_addresses == 1:
+            ips = [ip_address(network.network_address)]
         else:
             ips = network.hosts()
 
@@ -162,7 +189,7 @@ if __name__ == '__main__':
     pool.close()
     pool.join()
 
-    if VERBOSITY == 0:
+    if VERBOSE_LEVEL == 0:
         print("\n")
 
     base = 'Scanned {} IPs: {} known devices, added {} devices, failed to add {} devices'
