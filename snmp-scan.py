@@ -43,6 +43,7 @@ class Outcome(Enum):
     KNOWN = 3
     FAILED = 4
     EXCLUDED = 5
+    TERMINATED = 6
 
 
 VERBOSE_LEVEL = 0
@@ -50,7 +51,7 @@ THREADS = 32
 CONFIG = {}
 EXCLUDED_NETS = []
 start_time = time()
-stats = {'count': 0, Outcome.ADDED: 0, Outcome.UNPINGABLE: 0, Outcome.KNOWN: 0, Outcome.FAILED: 0, Outcome.EXCLUDED: 0}
+stats = {'count': 0, Outcome.ADDED: 0, Outcome.UNPINGABLE: 0, Outcome.KNOWN: 0, Outcome.FAILED: 0, Outcome.EXCLUDED: 0, Outcome.TERMINATED: 0}
 
 
 def debug(message, level=2):
@@ -65,6 +66,7 @@ def get_outcome_symbol(outcome):
         Outcome.UNPINGABLE: '.',
         Outcome.KNOWN: '*',
         Outcome.FAILED: '-',
+        Outcome.TERMINATED: ''
     }[outcome]
 
 
@@ -74,7 +76,7 @@ def handle_result(data):
     else:
         print(get_outcome_symbol(data.outcome), end='', flush=True)
 
-    stats['count'] += 1
+    stats['count'] += 0 if data.outcome == Outcome.TERMINATED else 1
     stats[data.outcome] += 1
 
 
@@ -91,27 +93,29 @@ def scan_host(ip):
     hostname = None
 
     try:
-        tmp = socket.gethostbyaddr(ip)[0]
-        if socket.gethostbyname(tmp) == ip:  # check that forward resolves
-            hostname = tmp
-    except socket.herror:
-        pass
+        try:
+            tmp = socket.gethostbyaddr(ip)[0]
+            if socket.gethostbyname(tmp) == ip:  # check that forward resolves
+                hostname = tmp
+        except socket.herror:
+            pass
 
-    try:
-        add_output = check_output(['/usr/bin/env', 'php', 'addhost.php', hostname or ip])
-        return Result(ip, hostname, Outcome.ADDED, add_output)
-    except CalledProcessError as err:
-        output = err.output.decode().rstrip()
-        if err.returncode == 2:
-            if 'Could not ping' in output:
-                return Result(ip, hostname, Outcome.UNPINGABLE, output)
-            else:
-                return Result(ip, hostname, Outcome.FAILED, output)
-        elif err.returncode == 3:
-            return Result(ip, hostname, Outcome.KNOWN, output)
+        try:
+            add_output = check_output(['/usr/bin/env', 'php', 'addhost.php', hostname or ip])
+            return Result(ip, hostname, Outcome.ADDED, add_output)
+        except CalledProcessError as err:
+            output = err.output.decode().rstrip()
+            if err.returncode == 2:
+                if 'Could not ping' in output:
+                    return Result(ip, hostname, Outcome.UNPINGABLE, output)
+                else:
+                    return Result(ip, hostname, Outcome.FAILED, output)
+            elif err.returncode == 3:
+                return Result(ip, hostname, Outcome.KNOWN, output)
 
-        return Result(ip, hostname, Outcome.UNDEFINED, output)
-
+            return Result(ip, hostname, Outcome.UNDEFINED, output)
+    except KeyboardInterrupt:
+        return Result(ip, hostname, Outcome.TERMINATED, 'Terminated')
 
 if __name__ == '__main__':
     ###################
@@ -170,6 +174,8 @@ if __name__ == '__main__':
     #################
     # Scan networks #
     #################
+    debug('SNMP settings from config.php: {}'.format(CONFIG.get('snmp', {})), 2)
+
     if args.legend and not VERBOSE_LEVEL:
         print('Legend:\n+  Added device\n*  Known device\n-  Failed to add device\n.  Ping failed\n')
 
@@ -177,18 +183,21 @@ if __name__ == '__main__':
 
     pool = Pool(processes=THREADS)
 
-    for network in networks:
-        if network.num_addresses == 1:
-            ips = [ip_address(network.network_address)]
-        else:
-            ips = network.hosts()
+    try:
+        for network in networks:
+            if network.num_addresses == 1:
+                ips = [ip_address(network.network_address)]
+            else:
+                ips = network.hosts()
 
-        for ip in ips:
-            if not check_ip_excluded(ip):
-                pool.apply_async(scan_host, (str(ip),), callback=handle_result)
+            for ip in ips:
+                if not check_ip_excluded(ip):
+                    pool.apply_async(scan_host, (str(ip),), callback=handle_result)
 
-    pool.close()
-    pool.join()
+        pool.close()
+        pool.join()
+    except KeyboardInterrupt:
+        pool.terminate()
 
     if VERBOSE_LEVEL == 0:
         print("\n")
