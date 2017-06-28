@@ -1538,7 +1538,7 @@ function list_services()
     if (isset($router['hostname'])) {
         $hostname = $router['hostname'];
         $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-        $where[] = ' device_id = ?';
+        $where[] = '`device_id` = ?';
         $params[] = $device_id;
 
         if (!is_numeric($device_id)) {
@@ -1552,8 +1552,8 @@ function list_services()
     if (!empty($where)) {
         $query .= ' WHERE ' . implode(' AND ', $where);
     }
-    $query .= ' ORDER BY service_ip';
-    $services[] = dbFetchRows($query, $params);
+    $query .= ' ORDER BY `service_ip`';
+    $services = array(dbFetchRows($query, $params)); // double array for backwards compat :(
 
     $count = count($services);
     $output = array(
