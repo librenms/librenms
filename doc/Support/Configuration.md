@@ -504,7 +504,6 @@ These options rely on daily.sh running from cron as per the installation instruc
 $config['syslog_purge']                                   = 30;
 $config['eventlog_purge']                                 = 30;
 $config['authlog_purge']                                  = 30;
-$config['perf_times_purge']                               = 30;
 $config['device_perf_purge']                              = 30;
 $config['rrd_purge']                                      = 90;// Not set by default
 ```

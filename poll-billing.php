@@ -78,7 +78,7 @@ function CollectData($bill_id)
             } else {
                 $port_data['in_delta'] = $port_data['last_in_delta'];
             }
-            
+
             if ($port_data['ifSpeed'] > 0 && (delta_to_bits($port_data['out_measurement'], $tmp_period)-delta_to_bits($port_data['last_out_measurement'], $tmp_period)) > $port_data['ifSpeed']) {
                 $port_data['out_delta'] = $port_data['last_out_delta'];
             } elseif ($port_data['out_measurement'] >= $port_data['last_out_measurement']) {
@@ -140,7 +140,6 @@ $poller_end  = microtime(true);
 $poller_run  = ($poller_end - $poller_start);
 $poller_time = substr($poller_run, 0, 5);
 
-dbInsert(array('type' => 'pollbill', 'doing' => $doing, 'start' => $poller_start, 'duration' => $poller_time, 'devices' => 0, 'poller' => $config['distributed_poller_name'] ), 'perf_times');
 if ($poller_time > 300) {
     logfile("BILLING: polling took longer than 5 minutes ($poller_time seconds)!");
 }

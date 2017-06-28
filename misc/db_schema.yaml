@@ -991,16 +991,6 @@ pdb_ix_peers:
     timestamp: { Field: timestamp, Type: 'int(10) unsigned', 'Null': true, Default: null, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [pdb_ix_peers_id], Unique: true, Type: BTREE }
-perf_times:
-  Columns:
-    devices: { Field: devices, Type: int(11), 'Null': false, Default: null, Extra: '' }
-    doing: { Field: doing, Type: varchar(64), 'Null': false, Default: null, Extra: '' }
-    duration: { Field: duration, Type: 'double(8,2)', 'Null': false, Default: null, Extra: '' }
-    poller: { Field: poller, Type: varchar(255), 'Null': false, Default: null, Extra: '' }
-    start: { Field: start, Type: int(11), 'Null': false, Default: null, Extra: '' }
-    type: { Field: type, Type: varchar(8), 'Null': false, Default: null, Extra: '' }
-  Indexes:
-    type: { Name: type, Columns: [type], Unique: false, Type: BTREE }
 plugins:
   Columns:
     plugin_active: { Field: plugin_active, Type: int(11), 'Null': false, Default: null, Extra: '' }

@@ -793,8 +793,6 @@ $config['syslog_purge'] = 30;
 $config['eventlog_purge'] = 30;
 // Number in days of how long to keep eventlog entries for.
 $config['authlog_purge'] = 30;
-// Number in days of how long to keep authlog entries for.
-$config['perf_times_purge'] = 30;
 // Number in days of how long to keep performace polling stats  entries for.
 $config['device_perf_purge'] = 7;
 // Number in days of how long to keep device performance data for.
