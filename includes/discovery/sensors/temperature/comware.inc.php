@@ -37,7 +37,7 @@ if (!empty($entphydata)) {
                     null,
                     $value['hh3cEntityExtTemperature'],
                     'snmp',
-                    $index
+                    $index['entPhysicalIndex']
                 );
             }
         }
@@ -56,7 +56,7 @@ foreach ($pre_cache['comware_oids'] as $index => $entry) {
         $limit                     = $entry['hh3cTransceiverTempHiAlarm'] / $divisor_alarm;
         $warn_limit                = $entry['hh3cTransceiverTempHiWarn'] / $divisor_alarm;
         $current                   = $entry['hh3cTransceiverTemperature'];
-        $entPhysicalIndex          = $index['entPhysicalIndex'];
+        $entPhysicalIndex          = $index;
         $entPhysicalIndex_measured = 'ports';
         foreach ($dbquery as $dbindex => $dbresult) {
             $descr = $dbresult['ifDescr'] . ' Temperature';
