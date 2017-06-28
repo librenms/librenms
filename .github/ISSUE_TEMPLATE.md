@@ -16,4 +16,4 @@ Please confirm each of the sections below by putting an `x` in the box like `[x]
 - [ ] Please do NOT post more than 10 lines of debug information here, use a pastebin service or GitHub Gists.
 
 Love librenms? Please consider supporting our collective:
-👉  https://opencollective.com/librenms/donate
+👉  https://t.libren.ms/donations
