@@ -1,37 +1,28 @@
 <?php
 
-$os_filename = 'includes/discovery/fdb-table/' . $device['os'] . '.inc.php';
+// Build a dictionary of vlans in database
+$vlans_dict = array();
+foreach (dbFetchRows("SELECT `vlan_id`, `vlan_vlan` from `vlans` WHERE `device_id` = ?", array($device['device_id'])) as $vlan_entry) {
+    $vlans_dict[$vlan_entry['vlan_vlan']] = $vlan_entry['vlan_id'];
+}
+$vlans_by_id = array_flip($vlans_dict);
 
-if (is_file($os_filename)) {
-    // Build ifIndex to port_id dictionary
-    $ifIndex_dict = array();
-    foreach (dbFetchRows("SELECT `ifIndex`,`port_id` FROM `ports` WHERE `device_id` = ?", array($device['device_id'])) as $port_entry) {
-        $ifIndex_dict[$port_entry['ifIndex']] = $port_entry['port_id'];
-    }
+// Build table of existing vlan/mac table
+$existing_fdbs = array();
+$sql_result = dbFetchRows("SELECT * FROM `ports_fdb` WHERE `device_id` = ?", array($device['device_id']));
+foreach ($sql_result as $entry) {
+    $existing_fdbs[$entry['vlan_id']][$entry['mac_address']] = $entry;
+}
 
-    // Build dot1dBasePort to port_id dictionary
-    $portid_dict = array();
+$insert = array(); // populate $insert with database entries
+if ($device['os'] == 'ios') {
+    include $config['install_dir'] . '/includes/discovery/fdb-table/ios.inc.php';
+} else {
+    // Check generic Q-BRIDGE-MIB and BRIDGE-MIB
+    include $config['install_dir'] . '/includes/discovery/fdb-table/bridge.inc.php';
+}
 
-    // Build a dictionary of vlans in database
-    $vlans_dict = array();
-    foreach (dbFetchRows("SELECT `vlan_id`, `vlan_vlan` from `vlans` WHERE `device_id` = ?", array($device['device_id'])) as $vlan_entry) {
-        $vlans_dict[$vlan_entry['vlan_vlan']] = $vlan_entry['vlan_id'];
-    }
-    $vlans_by_id = array_flip($vlans_dict);
-
-    // Build table of existing vlan/mac table
-    $existing_fdbs = array();
-    $sql_result = dbFetchRows("SELECT * FROM `ports_fdb` WHERE `device_id` = ?", array($device['device_id']));
-    foreach ($sql_result as $entry) {
-        $existing_fdbs[$entry['vlan_id']][$entry['mac_address']] = $entry;
-    }
-
-    // Include all fdb-table discovery modules
-    $insert = array();
-    include $os_filename;
-
-    $valid_fdb = array();
-
+if (!empty($insert)) {
     // synchronize with the database
     foreach ($insert as $vlan_id => $mac_address_table) {
         echo " {$vlans_by_id[$vlan_id]}: ";
@@ -42,13 +33,12 @@ if (is_file($os_filename)) {
 
                 if ($existing_fdbs[$vlan_id][$mac_address_entry]['port_id'] != $new_port) {
                     $port_fdb_id = $existing_fdbs[$vlan_id][$mac_address_entry]['ports_fdb_id'];
-                    $valid_fdb[] = $port_fdb_id;
 
                     dbUpdate(
                         array('port_id' => $new_port),
                         'ports_fdb',
-                        '`ports_fdb_id` = ?',
-                        array($port_fdb_id)
+                        '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?',
+                        array($device['device_id'], $vlan_id, $mac_address_entry)
                     );
                     echo 'U';
                 } else {
@@ -63,17 +53,21 @@ if (is_file($os_filename)) {
                     'device_id' => $device['device_id'],
                 );
 
-                $valid_fdb = dbInsert($new_entry, 'ports_fdb');
+                dbInsert($new_entry, 'ports_fdb');
                 echo '+';
             }
         }
 
+        // Delete old entries from the database
         foreach ($existing_fdbs[$vlan_id] as $entry) {
-            dbDelete('ports_fdb', '`ports_fdb_id` = ?', array($entry['ports_fdb_id']));
-            echo '-';
+                dbDelete(
+                    'ports_fdb',
+                    '`port_id` = ? AND `mac_address` = ? AND `vlan_id` = ? and `device_id` = ?',
+                    array($entry['port_id'], $entry['mac_address'], $entry['vlan_id'], $entry['device_id'])
+                );
+                echo '-';
         }
         echo PHP_EOL;
     }
-
-    unset($existing_fdbs, $ifIndex_dict, $portid_dict, $vlans_dict);
 }
+unset($existing_fdbs, $portid_dict, $vlans_dict);
