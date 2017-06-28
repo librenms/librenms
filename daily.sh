@@ -83,7 +83,7 @@ status_run() {
 # Arguments:
 #   args:
 #        Array of arguments to pass to
-#        daily.php 
+#        daily.php
 # Returns:
 #   Exit-Code of Command
 #######################################
@@ -100,7 +100,7 @@ call_daily_php() {
 # Globals:
 #   LIBRENMS_DIR
 # Arguments:
-#   
+#
 # Returns:
 #   Exit-Code of Command
 #######################################
@@ -178,7 +178,6 @@ main () {
                                "syslog"
                                "eventlog"
                                "authlog"
-                               "perf_time"
                                "callback"
                                "device_perf"
                                "purgeusers"
