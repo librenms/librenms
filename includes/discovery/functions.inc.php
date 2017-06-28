@@ -964,7 +964,7 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         }
     } elseif (($device['os'] == 'huaweiups') && ($sensor_type == 'frequency')) {
         return 100;
-    } elseif (($device['os'] == 'netmanplus') && ($sensor_type == 'voltage')) {
+    } elseif (($device['os'] == 'netmanplus') && ($sensor_type == 'load')) {
         return 1;
     } elseif ($device['os'] == 'generex-ups') {
         if ($sensor_type == 'load') {
