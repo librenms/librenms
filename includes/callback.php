@@ -79,8 +79,8 @@ if ($enabled == 1) {
 
     // sanitize sysDescr
     $device_info = array_map(function ($entry) {
-        // remove hostnames from linux and macosx
-        $entry['sysDescr'] = preg_replace_callback('/^(Linux |Darwin |FreeBSD )[A-Za-z0-9._\-]+ ([0-9.]{3,9})/', function ($matches) {
+        // remove hostnames from linux, macosx, and SunOS
+        $entry['sysDescr'] = preg_replace_callback('/^(Linux |Darwin |FreeBSD |SunOS )[A-Za-z0-9._\-]+ ([0-9.]{3,9})/', function ($matches) {
             return $matches[1] . 'hostname ' .$matches[2];
         }, $entry['sysDescr']);
 
