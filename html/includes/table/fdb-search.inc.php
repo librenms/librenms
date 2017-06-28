@@ -30,13 +30,13 @@ if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
     $mac_search = '%'.str_replace(array(':', ' ', '-', '.', '0x'), '', mres($_POST['searchPhrase'])).'%';
 
     if (isset($_POST['searchby']) && $_POST['searchby'] == 'vlan') {
-        $sql    .= ' AND `V`.`vlan_vlan` LIKE ?';
+        $sql    .= ' AND `V`.`vlan_vlan` = ?';
         $param[] = $vlan_search;
     } elseif (isset($_POST['searchby']) && $_POST['searchby'] == 'mac') {
         $sql    .= ' AND `F`.`mac_address` LIKE ?';
         $param[] = $mac_search;
     } else {
-        $sql .= ' AND (`V`.`vlan_vlan` LIKE ? OR `F`.`mac_address` LIKE ?)';
+        $sql .= ' AND (`V`.`vlan_vlan` = ? OR `F`.`mac_address` LIKE ?)';
         $param[] = $vlan_search;
         $param[] = $mac_search;
     }
@@ -66,7 +66,6 @@ if ($rowCount != -1) {
 
 $sql = "SELECT `P`.*, `ifDescr` AS `interface`, `F`.`mac_address`, `ipv4_mac`.`ipv4_address`, `V`.`vlan_vlan` as `vlan`, `D`.`hostname` AS `device` $sql";
 
-$debug = true;
 foreach (dbFetchRows($sql, $param) as $entry) {
     $entry = cleanPort($entry);
     if (!$ignore) {

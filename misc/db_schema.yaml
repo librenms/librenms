@@ -1136,6 +1136,7 @@ ports_fdb:
     mac_address: { Name: mac_address, Columns: [mac_address], Unique: false, Type: BTREE }
     ports_fdb_port_id_index: { Name: ports_fdb_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
     ports_fdb_device_id_index: { Name: ports_fdb_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    ports_fdb_vlan_id_index: { Name: ports_fdb_vlan_id_index, Columns: [vlan_id], Unique: false, Type: BTREE }
 ports_perms:
   Columns:
     access_level: { Field: access_level, Type: int(11), 'Null': false, Default: null, Extra: '' }
