@@ -1,7 +1,7 @@
 <?php
 
-$vtpdomains = snmpwalk_group($device, 'managementDomainName','CISCO-VTP-MIB');
-$vlans      = snmpwalk_group($device, 'vtpVlanEntry','CISCO-VTP-MIB', 2);
+$vtpdomains = snmpwalk_group($device, 'managementDomainName', 'CISCO-VTP-MIB');
+$vlans      = snmpwalk_group($device, 'vtpVlanEntry', 'CISCO-VTP-MIB', 2);
 
 foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
     echo "VTP Domain $vtpdomain_id {$vtpdomain['managementDomainName']}> ";
