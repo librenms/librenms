@@ -77,14 +77,6 @@ if ($options['f'] === 'authlog') {
     }
 }
 
-if ($options['f'] === 'perf_times') {
-    if (is_numeric($config['perf_times_purge'])) {
-        if (dbDelete('perf_times', 'start < UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL ? DAY))', array($config['perf_times_purge']))) {
-            echo 'Performance poller times cleared for entries over '.$config['perf_times_purge']." days\n";
-        }
-    }
-}
-
 if ($options['f'] === 'callback') {
     include_once 'includes/callback.php';
 }
