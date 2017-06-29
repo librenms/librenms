@@ -104,7 +104,7 @@ systemctl restart nginx
 
 #### Web installer
 
-Now head to: http://librenms.example.com/install.php and follow the on-screen instructions.
+Now head to: `http://librenms.example.com/install.php` and follow the on-screen instructions.
 
 #### Configure snmpd
 
