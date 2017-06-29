@@ -375,7 +375,6 @@ $config_file = <<<"EOD"
 \$config\['db_pass'\] = '$dbpass';
 \$config\['db_name'\] = '$dbname';
 \$config\['db_socket'\] = '$dbsocket';
-\$config\['db'\]\['extension'\] = "mysqli";// mysql or mysqli
 
 // This is the user LibreNMS will run as
 //Please ensure this user is created and has the correct permissions to your install
@@ -387,7 +386,7 @@ $config_file = <<<"EOD"
 \$config\['memcached'\]\['port'\]    = 11211;
 
 ### Locations - it is recommended to keep the default
-\$config\['install_dir'\]  = "$install_dir";
+#\$config\['install_dir'\]  = "$install_dir";
 
 ### This should *only* be set if you want to *force* a particular hostname/port
 ### It will prevent the web interface being usable form any other hostname
