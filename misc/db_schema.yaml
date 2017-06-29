@@ -1130,12 +1130,13 @@ ports_fdb:
   Columns:
     device_id: { Field: device_id, Type: 'int(11) unsigned', 'Null': false, Default: null, Extra: '' }
     mac_address: { Field: mac_address, Type: varchar(32), 'Null': false, Default: null, Extra: '' }
-    ports_fdb_id: { Field: ports_fdb_id, Type: bigint(20), 'Null': false, Default: null, Extra: auto_increment }
     port_id: { Field: port_id, Type: 'int(11) unsigned', 'Null': false, Default: null, Extra: '' }
     vlan_id: { Field: vlan_id, Type: 'int(11) unsigned', 'Null': false, Default: null, Extra: '' }
   Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [ports_fdb_id], Unique: true, Type: BTREE }
     mac_address: { Name: mac_address, Columns: [mac_address], Unique: false, Type: BTREE }
+    ports_fdb_port_id_index: { Name: ports_fdb_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+    ports_fdb_device_id_index: { Name: ports_fdb_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    ports_fdb_vlan_id_index: { Name: ports_fdb_vlan_id_index, Columns: [vlan_id], Unique: false, Type: BTREE }
 ports_perms:
   Columns:
     access_level: { Field: access_level, Type: int(11), 'Null': false, Default: null, Extra: '' }
