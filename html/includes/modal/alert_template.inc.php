@@ -102,8 +102,10 @@ $('#alert-template').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var template_id = button.data('template_id');
     var action = button.data('template_action');
+
     if(action == 'edit') {
         $('#template_id').val(template_id);
+        $('#create-template').text('Update template');
         $.ajax({
             type: "POST",
             url: "ajax_form.php",
@@ -124,6 +126,7 @@ $('#alert-template').on('hide.bs.modal', function(event) {
     $('#line').val('');
     $('#value').val('');
     $('#name').val('');
+    $('#create-template').text('Create template');
 });
 
 $('#create-template').click('', function(e) {
