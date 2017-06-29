@@ -142,7 +142,7 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
 
                     if (!$remote_device_id && is_valid_hostname($lldp['lldpRemSysName'])) {
                         if (!can_skip_discovery($config['autodiscovery']['xdp_exclude']['sysname_regexp'], $lldp['lldpRemSysName'], $lldp['lldpRemSysName']) &&
-                            can_skip_discovery($config['autodiscovery']['xdp_exclude']['sysdesc_regexp'], $lldp['lldpRemSysDesc'], $lldp['lldpRemSysName'])
+                            !can_skip_discovery($config['autodiscovery']['xdp_exclude']['sysdesc_regexp'], $lldp['lldpRemSysDesc'], $lldp['lldpRemSysName'])
                         ) {
                             $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
                             if (is_numeric($remote_device_id) === false) {
