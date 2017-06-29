@@ -5,10 +5,9 @@
     <table id="fdb-search" class="table table-hover table-condensed table-striped">
         <thead>
             <tr>
-                <th data-column-id="hostname" data-order="asc">Device</th>
-                <th data-column-id="os" data-width="15%">Device OS</th>
+                <th data-column-id="device" data-order="asc">Device</th>
                 <th data-column-id="mac_address">MAC Address</th>
-                <th data-column-id="ipv4_address" data-sortable="false">IPv4 Address</th>
+                <th data-column-id="ipv4_address">IPv4 Address</th>
                 <th data-column-id="interface">Port</th>
                 <th data-column-id="vlan">Vlan</th>
             </tr>
@@ -20,6 +19,7 @@
 
 var grid = $("#fdb-search").bootgrid({
     ajax: true,
+    rowCount: [50, 100, 250, -1],
     templates: {
         header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
                 "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\">"+
@@ -32,6 +32,7 @@ var grid = $("#fdb-search").bootgrid({
 // Select the devices only with FDB tables
 $sql = 'SELECT D.device_id AS device_id, `hostname` FROM `ports_fdb` AS F, `ports` AS P, `devices` AS D';
 
+$param = array();
 if (is_admin() === false && is_read() === false) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
     $where  .= ' AND `DP`.`user_id`=?';
