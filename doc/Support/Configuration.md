@@ -32,6 +32,13 @@ $config['db_pass'] = '';
 $config['db_name'] = '';
 ```
 
+If you use a unix socket, you can specify it with these options:
+```php
+$config['db_host']   = NULL;
+$config['db_port']   = NULL;
+$config['db_socket'] = '/run/mysqld/mysqld.sock';
+```
+
 ### Programs
 
 A lot of these are self explanatory so no further information may be provided. Any extensions that have dedicated 
@@ -314,7 +321,7 @@ The varying options after that are to support the different transports.
 
 ### Alerting
 
-[Alerting](../Extensions/Alerting.md)
+[Alerting](../Alerting/Alerting.md)
 
 ### Billing
 
@@ -387,6 +394,12 @@ Regex Matching:
 ```php
 $config['location_map_regex']['/Sink/'] = "Under The Sink, The Office, London, UK";
 ```
+Regex Match Substitution:
+```php
+$config['location_map_regex_sub']['/Sink/'] = "Under The Sink, The Office, London, UK [lat, long]";
+```
+If you have an SNMP SysLocation of "Rack10,Rm-314,Sink", Regex Match Substition yields "Rack10,Rm-314,Under The Sink, The Office, London, UK [lat, long]". This allows you to keep the SysLocation string short and keeps Rack/Room/Building information intact after the substitution.
+
 The above are examples, these will rewrite device snmp locations so you don't need to configure full location within snmp.
 
 ### Interfaces to be ignored
@@ -410,6 +423,18 @@ by continuing the array.
 `bad_ifname_regexp` is matched against the ifName value as a regular expression.
 
 `bad_ifalias_regexp` is matched against the ifAlias value as a regular expression.
+
+### Interfaces that shouldn't be ignored
+
+Examples:
+
+```php
+$config['good_if'][] = 'FastEthernet';
+$config['os']['ios']['good_if'][] = 'FastEthernet';
+```
+
+`good_if` is matched against ifDescr value. This can be a bad_if value as well which would stop that port from being ignored. 
+I.e If bad_if and good_if both contained FastEthernet then ports with this value in the ifDescr will be valid.
 
 ### Interfaces to be rewritten
 
@@ -527,7 +552,7 @@ You can use this array to rewrite the description of ASes that you have discover
 [Updating](../General/Updating.md)
 
 ### IPMI
-Setup the types of IPMI protocols to test a host for and it what order.
+Setup the types of IPMI protocols to test a host for and in what order. Don't forget to install ipmitool on the monitoring host.
 
 ```php
 $config['ipmi']['type'] = array();
