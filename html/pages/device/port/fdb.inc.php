@@ -6,8 +6,8 @@ $no_refresh = true;
         <tr>
             <th data-column-id="mac_address">MAC address</th>
             <th data-column-id="ipv4_address">IPv4 Address</th>
-            <th data-column-id="interface" data-sortable="false">Port</th>
-            <th data-column-id="vlan" data-sortable="false">Vlan</th>
+            <th data-column-id="interface">Port</th>
+            <th data-column-id="vlan">Vlan</th>
         </tr>
     </thead>
 </table>
@@ -20,7 +20,7 @@ var grid = $("#port-fdb").bootgrid({
     {
         return {
             id: "fdb-search",
-            device_id: "<?php echo $device['device_id']; ?>"
+            port_id: "<?php echo $port['port_id']; ?>"
         };
     },
     url: "ajax_table.php"

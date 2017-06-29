@@ -71,7 +71,7 @@ function get_mib_dir($device)
             }
         }
     }
-    
+
     return $extra;
 }
 
@@ -537,7 +537,7 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = null, $mibdir =
  */
 function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array())
 {
-    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUsbet', $mib);
+    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUsetX', $mib);
     $data = rtrim(external_exec($cmd));
 
     $line = strtok($data, "\n");
@@ -547,8 +547,9 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array())
             continue;
         }
 
-        list($oid, $value) = explode(' = ', $line, 2);
-        $parts = explode('.', $oid, $depth + 2); // + oid and extra data
+        list($address, $value) = explode(' =', $line, 2);
+        preg_match_all('/([^[\]]+)/', $address, $parts);
+        $parts = $parts[1];
         array_splice($parts, $depth, 0, array_shift($parts)); // move the oid name to the correct depth
 
         $line = strtok("\n"); // get the next line and concatenate multi-line values
@@ -675,12 +676,12 @@ function snmp_gen_auth(&$device)
 
     if ($device['snmpver'] === 'v3') {
         $cmd = " -v3 -n '' -l '".$device['authlevel']."'";
-        
+
         //add context if exist context
         if (key_exists('context_name', $device)) {
             $cmd = " -v3 -n '".$device['context_name']."' -l '".$device['authlevel']."'";
         }
-        
+
         if ($device['authlevel'] === 'noAuthNoPriv') {
             // We have to provide a username anyway (see Net-SNMP doc)
             $username = !empty($device['authname']) ? $device['authname'] : 'root';
