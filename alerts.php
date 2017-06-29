@@ -30,7 +30,7 @@ require __DIR__ . '/includes/init.php';
 
 $options = getopt('d::');
 
-set_lock('alerts');
+$alerts_lock = \LibreNMS\FileLock::lockOrDie('alerts');
 
 if (isset($options['d'])) {
     echo "DEBUG!\n";
@@ -60,4 +60,4 @@ if (!defined('TEST') && $config['alert']['disable'] != 'true') {
     echo 'End  : '.date('r')."\r\n";
 }
 
-release_lock('alerts');
+$alerts_lock->release();
