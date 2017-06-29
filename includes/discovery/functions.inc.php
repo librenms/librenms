@@ -33,7 +33,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
         if ($ip == $hostname) {
             d_echo("name lookup of $hostname failed\n");
             log_event("$method discovery of " . $hostname . " failed - Check name lookup", $device['device_id'], 'discovery', 5);
- 
+
             return false;
         }
     } elseif (filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === true || filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === true) {
@@ -41,7 +41,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
         if ($config['discovery_by_ip'] === false) {
             d_echo('Discovery by IP disabled, skipping ' . $hostname);
             log_event("$method discovery of " . $hostname . " failed - Discovery by IP disabled", $device['device_id'], 'discovery', 4);
- 
+
             return false;
         }
     }
@@ -785,7 +785,7 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
 
 /*
  * Check entity sensors to be excluded
- * 
+ *
  * @param string value to check
  * @param array device
  *
@@ -1086,17 +1086,19 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                             $value = $value * $multiplier;
                         }
                     } else {
-                        $state_name = $data['descr'];
+                        $state_name = $data['state_name'];
                         $state_index_id = create_state_index($state_name);
-                        foreach ($data['states'] as $state) {
-                            $insert = array(
-                                'state_index_id' => $state_index_id,
-                                'state_descr' => $state['descr'],
-                                'state_draw_graph' => $state['graph'],
-                                'state_value' => $state['value'],
-                                'state_generic_value' => $state['generic']
-                            );
-                            dbInsert($insert, 'state_translations');
+                        if ($state_index_id != null) {
+                            foreach ($data['states'] as $state) {
+                                $insert = array(
+                                    'state_index_id' => $state_index_id,
+                                    'state_descr' => $state['descr'],
+                                    'state_draw_graph' => $state['graph'],
+                                    'state_value' => $state['value'],
+                                    'state_generic_value' => $state['generic']
+                                );
+                                dbInsert($insert, 'state_translations');
+                            }
                         }
                     }
                     $tmp_index = $data['index'] ?: $index;
