@@ -41,7 +41,6 @@ modules:
     sensors:
         airflow:
             -
-                oid_name: netbotz_airflow
                 oid: airFlowSensorTable
                 value: airFlowSensorValue
                 divisor: 10
@@ -65,7 +64,7 @@ The only sensor we have defined here is airflow. The available options are as fo
   - `low_warn_limit` (optional): This is the warning low threshold that `value` should be (used in alerting).
   - `warn_limit` (optional): This is the warning high threshold that `value` should be (used in alerting).
   - `high_limit` (optional): This is the critical high threshold that `value` should be (used in alerting).
-  - `descr` (required): This is the key within the table that contains the description of this sensor.
+  - `descr` (required): The visible label for this sensor. It can be a key with in the table or a static string, optionally using `{{ index }}`
   - `index` (optional): This is the index value we use to uniquely identify this sensor. `{{ $index }}` will be replaced by the `index` from the snmp walk.
   - `skip_values` (optional): This is an array of values we should skip over.
 
