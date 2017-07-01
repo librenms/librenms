@@ -15,85 +15,98 @@
  * See COPYING for more details.
  */
 
-if (!isset($debug)  && php_sapi_name() == 'cli') {
+if (!isset($init_modules)  && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
     $init_modules = array();
     require realpath(__DIR__ . '/../..') . '/includes/init.php';
-
-    $options = getopt('d');
-    $debug = isset($options['d']);
 }
 
 set_lock('schema');
+
+$return = 0;
+
+// only import build.sql to an empty database
+$tables = dbFetchRows("SHOW TABLES FROM {$config['db_name']}");
+if (empty($tables)) {
+    echo "-- Creating base database structure\n";
+    $step = 0;
+    $sql_fh = fopen('build.sql', 'r');
+    if ($sql_fh === false) {
+        echo 'ERROR: Cannot open SQL build script '.$sql_file.PHP_EOL;
+        $return = 1;
+    }
+
+    while (!feof($sql_fh)) {
+        $line = fgetss($sql_fh);
+        echo 'Step #'.$step++.' ...'.PHP_EOL;
+
+        if (!empty($line)) {
+            $creation = dbQuery($line);
+            if (!$creation) {
+                echo 'WARNING: Cannot execute query ('.$line.'): '.mysqli_error($database_link)."\n";
+                $return = 1;
+            }
+        }
+    }
+
+    fclose($sql_fh);
+}
+
 
 d_echo("DB Schema update started....\n");
 
 if (db_schema_is_current()) {
     d_echo("DB Schema already up to date.\n");
-    release_lock('schema');
-    return;
-}
+} else {
+    // Set Database Character set and Collation
+    dbQuery('ALTER DATABASE ? CHARACTER SET utf8 COLLATE utf8_unicode_ci;', array(array($config['db_name'])));
 
-// Set Database Character set and Collation
-dbQuery('ALTER DATABASE ? CHARACTER SET utf8 COLLATE utf8_unicode_ci;', array(array($config['db_name'])));
+    $db_rev = get_db_schema();
+    $insert = ($db_rev == 0); // if $db_rev == 0, insert the first update
 
-$db_rev = get_db_schema();
-$insert = ($db_rev == 0); // if $db_rev == 0, insert the first update
-
-$updating = 0;
-$limit = 150; //magic marker far enough in the future
-foreach (get_schema_list() as $file_rev => $file) {
-    if ($file_rev > $db_rev) {
-        if (isset($_SESSION['stage'])) {
-            $limit++;
-            if (time()-$_SESSION['last'] > 45) {
-                $_SESSION['offset'] = $limit;
-                $GLOBALS['refresh'] = '<b>Updating, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
-                return;
+    $updating = 0;
+    foreach (get_schema_list() as $file_rev => $file) {
+        if ($file_rev > $db_rev) {
+            if (!$updating) {
+                echo "-- Updating database schema\n";
             }
-        }
 
-        if (!$updating) {
-            echo "-- Updating database schema\n";
-        }
+            printf('%03d -> %03d ...', $db_rev, $file_rev);
 
-        printf('%03d -> %03d ...', $db_rev, $file_rev);
+            $err = 0;
+            if ($data = file_get_contents($file)) {
+                foreach (explode("\n", $data) as $line) {
+                    if (trim($line)) {
+                        d_echo("$line \n");
 
-        $err = 0;
-        if ($data = file_get_contents($file)) {
-            foreach (explode("\n", $data) as $line) {
-                if (trim($line)) {
-                    d_echo("$line \n");
-
-                    if ($line[0] != '#') {
-                        if (!mysqli_query($database_link, $line)) {
-                            $err++;
-                            d_echo(mysqli_error($database_link) . PHP_EOL);
+                        if ($line[0] != '#') {
+                            if (!mysqli_query($database_link, $line)) {
+                                $err++;
+                                d_echo(mysqli_error($database_link) . PHP_EOL);
+                            }
                         }
                     }
                 }
+
+                echo " done ($err errors).\n";
+            } else {
+                echo " Could not open file! $file\n";
+                $return = 1;
+            }//end if
+
+            $updating++;
+            $db_rev = $file_rev;
+            if ($insert) {
+                dbInsert(array('version' => $db_rev), 'dbSchema');
+                $insert = false;
+            } else {
+                dbUpdate(array('version' => $db_rev), 'dbSchema');
             }
-
-            echo " done ($err errors).\n";
-        } else {
-            echo " Could not open file! $file\n";
         }//end if
+    }//end foreach
 
-        $updating++;
-        $db_rev = $file_rev;
-        if ($insert) {
-            dbInsert(array('version' => $db_rev), 'dbSchema');
-            $insert = false;
-        } else {
-            dbUpdate(array('version' => $db_rev), 'dbSchema');
-        }
-    }//end if
-}//end foreach
-
-if ($updating) {
-    echo "-- Done\n";
-    if (isset($_SESSION['stage'])) {
-        $_SESSION['build-ok'] = true;
+    if ($updating) {
+        echo "-- Done\n";
     }
 }
 
