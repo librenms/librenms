@@ -3,7 +3,7 @@ session_start();
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_POST = $_SESSION;
 } else {
-    $_SESSION = $_POST;
+    $_SESSION = array_replace($_SESSION, $_POST);
 }
 
 $stage = isset($_POST['stage']) ? $_POST['stage'] : 0;
@@ -64,6 +64,8 @@ if ($stage > 1) {
     $_SESSION['stage'] = $stage;
 }
 
+session_write_close();
+
 if ($stage == 4) {
     // Now check we have a username, password and email before adding new user
     if (empty($add_user) || empty($add_pass) || empty($add_email)) {
@@ -89,7 +91,6 @@ $stage_perc = $stage / $total_stages * 100;
 $complete = 1;
 
 ?>
-
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -100,11 +101,9 @@ $complete = 1;
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
-  <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" type="text/css" />
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-hover-dropdown.min.js"></script>
-  <script src="js/typeahead.min.js"></script>
   <script src="js/hogan-2.0.0.js"></script>
 
 </head>
@@ -309,29 +308,7 @@ if ($ext_loaded == 'no') {
      </div>
      <div class="col-md-6">
          <h5 class="text-center">Importing MySQL DB - Do not close this page or interrupt the import</h5>
-<?php
-// Ok now let's set the db connection up
-    $config['db_host'] = $dbhost;
-    $config['db_user'] = $dbuser;
-    $config['db_pass'] = $dbpass;
-    $config['db_name'] = $dbname;
-    $config['db_port'] = $dbport;
-    $config['db_socket'] = $dbsocket;
-    $sql_file = '../build.sql';
-    $_SESSION['last'] = time();
-    ob_end_flush();
-    ob_start();
-if ($_SESSION['offset'] < 100 && $_REQUEST['offset'] < 94) {
-    require '../build-base.php';
-} else {
-    require '../includes/sql-schema/update.php';
-}
-    $_SESSION['out'] .= ob_get_clean();
-    ob_end_clean();
-    ob_start();
-    echo $GLOBALS['refresh'];
-    echo "<pre>".trim($_SESSION['out'])."</pre>";
-?>
+        <textarea readonly id="db-update" class="form-control" rows="20" placeholder="Please Wait..." style="resize:vertical;"></textarea>
      </div>
      <div class="col-md-3">
      </div>
@@ -349,12 +326,28 @@ if ($_SESSION['offset'] < 100 && $_REQUEST['offset'] < 94) {
           <input type="hidden" name="dbname" value="<?php echo $dbname; ?>">
           <input type="hidden" name="dbport" value="<?php echo $dbport; ?>">
           <input type="hidden" name="dbsocket" value="<?php echo $dbsocket; ?>">
-          <button type="submit" class="btn btn-success">Goto Add User</button>
+          <button type="submit" id="add-user-btn" class="btn btn-success" disabled>Goto Add User</button>
         </form>
       </div>
       <div class="col-md-3">
       </div>
     </div>
+    <script type="text/javascript">
+        output = document.getElementById("db-update");
+        xhr = new XMLHttpRequest();
+        xhr.open("GET", "ajax_output.php?id=db-update", true);
+        xhr.onprogress = function (e) {
+            output.innerHTML = e.currentTarget.responseText;
+            output.scrollTop = output.scrollHeight - output.clientHeight; // scrolls the output area
+        };
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                console.log("Complete");
+                document.getElementById("add-user-btn").removeAttribute('disabled');
+            }
+        };
+        xhr.send();
+    </script>
 <?php
 } elseif ($stage == "5") {
 ?>

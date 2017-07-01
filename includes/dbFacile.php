@@ -55,7 +55,7 @@ function dbConnect($host = null, $user = '', $password = '', $database = '', $po
     if (!$database_db) {
         $db_create_sql = "CREATE DATABASE " . $config['db_name'] . " CHARACTER SET utf8 COLLATE utf8_unicode_ci";
         mysqli_query($database_link, $db_create_sql);
-        $database_db = mysqli_select_db($database_link, $config['db_name']);
+        $database_db = mysqli_select_db($database_link, $database);
     }
 
     if (!$database_db) {
