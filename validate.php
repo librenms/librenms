@@ -174,6 +174,12 @@ if (str_contains($strict_mode, 'STRICT_TRANS_TABLES')) {
     //print_fail('You have MySQL STRICT_TRANS_TABLES enabled, please disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
 }
 
+// Test for lower case table name support
+$lc_mode = dbFetchCell("SELECT @@global.lower_case_table_names");
+if ($lc_mode != 0) {
+    print_fail('You have lower_case_table_names set to 1 or true in mysql config.', 'Set lower_case_table_names=0 in your mysql config file');
+}
+
 if (empty($strict_mode) === false) {
     print_fail("You have not set sql_mode='' in your mysql config");
 }
@@ -215,6 +221,12 @@ if (is_file('misc/db_schema.yaml')) {
             $previous_column = '';
             foreach ($data['Columns'] as $column => $cdata) {
                 $cur = $current_schema[$table]['Columns'][$column];
+                if ($cur['Default'] == 'current_timestamp()') {
+                    $cur['Default'] = 'CURRENT_TIMESTAMP';
+                }
+                if ($cur['Extra'] == 'on update current_timestamp()') {
+                    $cur['Extra'] = 'on update CURRENT_TIMESTAMP';
+                }
                 if (empty($current_schema[$table]['Columns'][$column])) {
                     print_fail("Database: missing column ($table/$column)");
 
