@@ -2,6 +2,7 @@ os: powerwalker
 text: 'PowerWalker UPS'
 type: power
 icon: powerwalker
+rfc1628_compat: 1
 discovery:
    - sysObjectId:
        - .1.3.6.1.4.1.935.10
