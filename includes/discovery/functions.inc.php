@@ -959,49 +959,28 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
             } else {
                 return 1;
             }
-        } elseif ($sensor_type == 'voltage') {
-            return 1;
         }
-    } elseif (($device['os'] == 'huaweiups') && ($sensor_type == 'frequency')) {
-        return 100;
-    } elseif (($device['os'] == 'netmanplus') && ($sensor_type == 'load')) {
-        return 1;
-    } elseif (($device['os'] == 'netmanplus') && ($sensor_type == 'voltage')) {
-        if (preg_match('/.1.3.6.1.2.1.33.1.2.5./', $oid)) {
-            return 10;
-        }
-        return 1;
-    } elseif ($device['os'] == 'generex-ups') {
-        if ($sensor_type == 'load') {
-            return 1;
-        } elseif ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
-            return 1;
-        }
-    } elseif ($device['os'] == 'apc-mgeups') {
-        if ($sensor_type == 'load') {
-            return 1;
-        } elseif ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
-            return 1;
-        }
-    } elseif ($device['os'] == 'ge-ups') {
-        if ($sensor_type == 'load') {
-            return 1;
-        } elseif ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
-            return 1;
-        }
-    } elseif ($device['os'] == 'eaton-mgeups') {
-        if ($sensor_type == 'load') {
-            return 1;
+    } elseif ($device['os'] == 'huaweiups') {
+        if ($sensor_type == 'frequency') {
+            return 100;
         }
     } elseif ($device['os'] == 'hpe-rtups') {
-        if ($sensor_type == 'load') {
-            return 1;
-        } elseif ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.') && !starts_with($oid, '.1.3.6.1.2.1.33.1.3.3.1.3')) {
+        if ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.') && !starts_with($oid, '.1.3.6.1.2.1.33.1.3.3.1.3')) {
             return 1;
         }
     }
 
-    return 10; //default
+    // UPS-MIB Defaults
+
+    if ($sensor_type == 'load') {
+        return 1;
+    }
+
+    if ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
+        return 1;
+    }
+
+    return 10;
 }
 
 /**
