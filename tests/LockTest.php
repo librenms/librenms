@@ -26,11 +26,12 @@
 namespace LibreNMS\Tests;
 
 use LibreNMS\FileLock;
+use LibreNMS\MysqlLock;
 use PHPUnit\Framework\TestCase;
 
 class LockTest extends TestCase
 {
-    public function testLock()
+    public function testFileLock()
     {
         $lock = FileLock::lock('tests');
         $this->assertNotFalse($lock, 'Failed to acquire initial lock!');
@@ -43,7 +44,7 @@ class LockTest extends TestCase
         $this->assertNotFalse(FileLock::lock('tests'), 'Failed to remove lock when the lock object was destroyed');
     }
 
-    public function testLockFail()
+    public function testFileLockFail()
     {
         $lock = FileLock::lock('tests');
         $this->assertNotFalse($lock, 'Failed to acquire initial lock!');
@@ -52,7 +53,7 @@ class LockTest extends TestCase
         $this->assertFalse($failed_lock, 'Additional lock attempt did not fail');
     }
 
-    public function testLockWait()
+    public function testFileLockWait()
     {
         $lock = FileLock::lock('tests');
         $this->assertNotFalse($lock, 'Failed to acquire initial lock!');
@@ -66,6 +67,62 @@ class LockTest extends TestCase
 
         $start = microtime(true);
         $wait_lock = FileLock::lock('tests', 5);
+        $this->assertLessThan(1, microtime(true) - $start, 'Lock waited when it should not have');
+        $this->assertNotFalse($wait_lock, 'Second wait lock did not succeed');
+    }
+
+    public function testMysqlLock()
+    {
+        if (!getenv('DBTEST')) {
+            $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
+        }
+        dbConnect();
+
+        $lock = MysqlLock::lock('tests');
+        $this->assertNotFalse($lock, 'Failed to acquire initial lock!');
+        $lock->release();
+
+        $new_lock = MysqlLock::lock('tests');
+        $this->assertNotFalse($new_lock, 'Failed to release the lock with release()');
+
+        unset($new_lock);
+
+        $this->assertNotFalse(MysqlLock::lock('tests'), 'Failed to remove lock when the lock object was destroyed');
+    }
+
+    public function testMysqLockFail()
+    {
+        if (!getenv('DBTEST')) {
+            $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
+        }
+        dbConnect();
+
+        $lock = MysqlLock::lock('tests');
+        $this->assertNotFalse($lock, 'Failed to acquire initial lock!');
+
+        $failed_lock = MysqlLock::lock('tests');
+        $this->assertFalse($failed_lock, 'Additional lock attempt did not fail');
+    }
+
+    public function testMysqlLockWait()
+    {
+        if (!getenv('DBTEST')) {
+            $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
+        }
+        dbConnect();
+
+        $lock = MysqlLock::lock('tests');
+        $this->assertNotFalse($lock, 'Failed to acquire initial lock!');
+
+        $start = microtime(true);
+        $wait_lock = MysqlLock::lock('tests', 1);
+        $this->assertGreaterThan(1, microtime(true) - $start, 'Lock did not wait.');
+        $this->assertFalse($wait_lock, 'Waiting lock attempt did not fail');
+
+        $lock->release();
+
+        $start = microtime(true);
+        $wait_lock = MysqlLock::lock('tests', 5);
         $this->assertLessThan(1, microtime(true) - $start, 'Lock waited when it should not have');
         $this->assertNotFalse($wait_lock, 'Second wait lock did not succeed');
     }
