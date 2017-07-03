@@ -61,10 +61,8 @@ var grid = $("#alert-schedule").bootgrid({
         "status": function(column, row)
         {
             if (row.status == 1) {
-                //response = '<button type="button" class="btn btn-xs btn-danger" disabled>Lapsed</button>';
                 response = '<span class="label label-danger" disabled>Lapsed</span>';
             } else if (row.status == 2) {
-                //response = '<button type="button" class="btn btn-xs btn-success" disabled>Current</button>';
                 response = '<span class="label label-success" disabled>Current</span>';
             } 
             
