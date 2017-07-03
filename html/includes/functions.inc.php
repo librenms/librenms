@@ -1349,19 +1349,6 @@ function get_ports_from_type($given_types)
     return $ports;
 }
 
-function ipmiSensorName($hardwareId, $sensorIpmi, $rewriteArray)
-{
-    if (count($rewriteArray[$hardwareId]) > 0) {
-        if ($rewriteArray[$hardwareId][$sensorIpmi] != "") {
-            return $rewriteArray[$hardwareId][$sensorIpmi];
-        } else {
-            return $sensorIpmi;
-        }
-    } else {
-        return $sensorIpmi;
-    }
-}
-
 /**
  * @param $filename
  * @param $content
