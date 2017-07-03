@@ -46,17 +46,13 @@ if (is_admin() !== false) {
                     </div>
                     <div class="form-group">
                         <label for="recurring" class="col-sm-4 control-label">Recurring <strong class="text-danger">*</strong>: </label>
-                        <div class="col-sm-2">
-                            <input type="radio" class="form-control" id="recurring0" name="recurring" value="0" style="width: 20px;" checked="checked"/>
-                        </div>
-                        <div class="col-sm-2">
-                            <label class="col-sm-for="recurring0">No</label>
-                        </div>
-                        <div class="col-sm-2">
-                            <input type="radio" class="form-control" id="recurring1" name="recurring" value="1" style="width: 20px;" />
-                        </div>
-                        <div class="col-sm-2">
-                            <div style="padding-top:10px;"><label for="recurring1">Yes</label></div>
+                        <div class="col-sm-8"> 
+                            <label class="radio-inline">
+                                <input type="radio" id="recurring0" name="recurring" value="0" checked="checked"/> No
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" id="recurring1" name="recurring" value="1"/> Yes
+                            </label>
                         </div>
                     </div>
                     <div id="norecurringgroup">
@@ -117,7 +113,7 @@ if (is_admin() !== false) {
                             <input type='text' id='map-stub' name='map-stub' class='form-control'/>
                         </div>
                         <div class="col-sm-3">
-                            <button class="btn btn-primary btn-sm" type="button" name="add-map" id="add-map" value="Add">Add</button>
+                            <button class="btn btn-primary" type="button" name="add-map" id="add-map" value="Add">Add</button>
                         </div>
                     </div>
                     <div class="form-group">

@@ -41,6 +41,7 @@ if (is_admin() !== false) {
                     <th data-column-id="end_recurring_hr">End recurring hr</th>
                     <th data-column-id="recurring_day" data-sortable="false" data-searchable="false">Recurring on days</th>
                     <th data-column-id="actions" data-sortable="false" data-searchable="false" data-formatter="commands">Actions</th>
+                    <th data-column-id="status" data-sortable="false" data-searchable="false" data-formatter="status">Status</th>
                 </tr>
             </thead>
         </table>
@@ -55,11 +56,16 @@ var grid = $("#alert-schedule").bootgrid({
         {
             var response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#schedule-maintenance' data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-pencil\"></span></button> " +
                 "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-trash-o\"></span></button>";
- 
+            return response;
+        },
+        "status": function(column, row)
+        {
             if (row.status == 1) {
-                response = response + '<button type="button" class="btn btn-xs btn-danger" disabled>Lapsed</button>';
+                //response = '<button type="button" class="btn btn-xs btn-danger" disabled>Lapsed</button>';
+                response = '<span class="label label-danger" disabled>Lapsed</span>';
             } else if (row.status == 2) {
-                response = response + '<button type="button" class="btn btn-xs btn-success" disabled>Current</button>';
+                //response = '<button type="button" class="btn btn-xs btn-success" disabled>Current</button>';
+                response = '<span class="label label-success" disabled>Current</span>';
             } 
             
             return response;
