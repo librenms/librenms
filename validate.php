@@ -143,8 +143,11 @@ if (isset($config['user'])) {
     $find_result = rtrim(`find $tmp_dir \! -user $tmp_user`);
     if (!empty($find_result)) {
         // This isn't just the log directory, let's print the list to the user
-        $files = explode(PHP_EOL, $find_result);
-        if (is_array($files)) {
+        $files = array_diff(explode(PHP_EOL, $find_result), array(
+            "$tmp_dir/logs/error_log",
+            "$tmp_dir/logs/access_log",
+        ));
+        if (!empty($files)) {
             print_fail(
                 "We have found some files that are owned by a different user than $tmp_user, " .
                 'this will stop you updating automatically and / or rrd files being updated causing graphs to fail.',
