@@ -46,7 +46,7 @@ With:
 
 `33  */6   * * *   librenms    /opt/librenms/discovery-wrapper.php 1 >> /dev/null 2>&1`
 
-The default is for discovery wrapper to only use 1 thread so that it mimics the current behaviour. However if your 
+The default is for discovery wrapper to only use 1 thread so that it mimics the current behaviour. However if your
 system is powerful enough and the devices can cope then you can increase the thread count from 1 to a value of your
 choosing.
 
@@ -209,14 +209,26 @@ Using the SNMP-Scanner may take a long time to finish depending on the size of y
 
 If possible, divide your network into smaller subnets and scan these subnets instead. You can use an utility like the GNU Screen or tmux to avoid aborting the scan when logging out of your Shell. You can run several instances of the SNMP-Scanner simultaneously.
 
-To run the SNMP-Scanner you need to execute the `snmp-scan.php` from within your LibreNMS installation directory.
+To run the SNMP-Scanner you need to execute the `snmp-scan.py` from within your LibreNMS installation directory.
 
 Here the script's help-page for reference:
 ```text
-Usage: ./snmp-scan.php -r <CIDR_Range> [-d] [-l] [-h]
-  -r CIDR_Range     CIDR noted IP-Range to scan
-                    Example: 192.168.0.0/24
-  -d                Enable Debug
-  -l                Show Legend
-  -h                Print this text
+usage: snmp-scan.py [-h] [-r NETWORK] [-t THREADS] [-l] [-v]
+
+Scan network for snmp hosts and add them to LibreNMS.
+
+optional arguments:
+  -h, --help     show this help message and exit
+  -r NETWORK     CIDR noted IP-Range to scan. Can be specified multiple times
+                 This argument is only required if $config['nets'] is not set
+                 Example: 192.168.0.0/24 Example: 192.168.0.0/31 will be
+                 treated as an RFC3021 p-t-p network with two addresses,
+                 192.168.0.0 and 192.168.0.1 Example: 192.168.0.1/32 will be
+                 treated as a single host address
+  -t THREADS     How many IPs to scan at a time. More will increase the scan
+                 speed, but could overload your system. Default: 32
+  -l, --legend   Print the legend.
+  -v, --verbose  Show debug output. Specifying multiple times increases the
+                 verbosity.
+
 ```
