@@ -43,6 +43,13 @@ class Ewc extends OS implements
      */
     public function discoverWirelessApCount()
     {
+        $oids = array(
+            'HIPATH-WIRELESS-HWC-MIB::apCount.0',
+            'HIPATH-WIRELESS-HWC-MIB::licenseLocalAP.0',
+            'HIPATH-WIRELESS-HWC-MIB::licenseForeignAP.0'
+        );
+        $data = snmp_get_multi($this->getDevice(), $oids);
+        $licCount = $data[0]['licenseLocalAP'] + $data[0]['licenseForeignAP'];
         return array(
             new WirelessSensor(
                 'ap-count',
@@ -55,18 +62,16 @@ class Ewc extends OS implements
             new WirelessSensor(
                 'ap-count',
                 $this->getDeviceId(),
-                array('1.3.6.1.4.1.4329.15.3.2.10.1.7.0', '1.3.6.1.4.1.4329.15.3.2.10.1.8.0'),
+                '.1.3.6.1.4.1.4329.15.3.5.1.1.0',
                 'ewc',
                 1,
-                'Total AP licenses'
-            ),
-            new WirelessSensor(
-                'ap-count',
-                $this->getDeviceId(),
-                '1.3.6.1.4.1.4329.15.3.2.10.1.4.0',
-                'ewc',
-                2,
-                'AP licenses remaining'
+                'Configured APs',
+                $data[0]['apCount'],
+                1,
+                1,
+                'sum',
+                null,
+                $licCount
             )
         );
     }
@@ -114,7 +119,7 @@ class Ewc extends OS implements
             $sensors[] = new WirelessSensor(
                 'clients',
                 $this->getDeviceId(),
-                '1.3.6.1.4.1.4329.15.3.5.2.2.1.14.' . $index,
+                '1.3.6.1.4.1.4329.15.3.3.4.5.1.2.' . $index,
                 'ewc',
                 $name,
                 "SSID: $name"
