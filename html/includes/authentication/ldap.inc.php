@@ -2,13 +2,18 @@
 
 use LibreNMS\Exceptions\AuthenticationException;
 
-$ldap_connection = @ldap_connect($config['auth_ldap_server'], $config['auth_ldap_port']);
+function init_auth()
+{
+    global $config, $ldap_connection;
 
-if ($config['auth_ldap_starttls'] && ($config['auth_ldap_starttls'] == 'optional' || $config['auth_ldap_starttls'] == 'require')) {
-    $tls = ldap_start_tls($ldap_connection);
-    if ($config['auth_ldap_starttls'] == 'require' && $tls === false) {
-        echo '<h2>Fatal error: LDAP TLS required but not successfully negotiated:'.ldap_error($ldap_connection).'</h2>';
-        exit;
+    $ldap_connection = @ldap_connect($config['auth_ldap_server'], $config['auth_ldap_port']);
+
+    if ($config['auth_ldap_starttls'] && ($config['auth_ldap_starttls'] == 'optional' || $config['auth_ldap_starttls'] == 'require')) {
+        $tls = ldap_start_tls($ldap_connection);
+        if ($config['auth_ldap_starttls'] == 'require' && $tls === false) {
+            echo '<h2>Fatal error: LDAP TLS required but not successfully negotiated:'.ldap_error($ldap_connection).'</h2>';
+            exit;
+        }
     }
 }
 
