@@ -199,8 +199,10 @@ def lockFree(lock, db=db):
 
 
 def getLock(lock, db=db):
-    query = "SELECT GET_LOCK('{0}', 0)".format(lock)
-    return db.query(query)[0][0] == 1
+    if lockFree(lock):
+        query = "SELECT GET_LOCK('{0}', 0)".format(lock)
+        return db.query(query)[0][0] == 1
+    return False
 
 
 def releaseLock(lock, db=db):
