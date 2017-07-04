@@ -1057,9 +1057,8 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
             $raw_data = $pre_cache[$tmp_name];
             foreach ($raw_data as $index => $snmp_data) {
                 $skip = false;
-                $value = $snmp_data[$data['value']];
+                $value = $snmp_data[$data['value']] ?: $snmp_data[$data['oid']];
                 foreach ((array)$data['skip_values'] as $skip_value) {
-                    echo "Here $value and $skip_value END\n";
                     if ($value == $skip_value) {
                         $skip = true;
                     }
@@ -1086,7 +1085,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                             $value = $value * $multiplier;
                         }
                     } else {
-                        $state_name = $data['state_name'];
+                        $state_name = $data['state_name'] ?: $data['oid'];
                         $state_index_id = create_state_index($state_name);
                         if ($state_index_id != null) {
                             foreach ($data['states'] as $state) {
