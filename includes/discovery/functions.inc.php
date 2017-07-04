@@ -1049,22 +1049,71 @@ function ignore_storage($descr)
     return $deny;
 }
 
+/**
+ * @param $value
+ * @param $data
+ * @param $options
+ * @return bool
+ */
+function can_skip_sensor($value, $data, $options)
+{
+    foreach ((array)$data['skip_values'] as $skip_value) {
+        if ($value == $skip_value) {
+            return true;
+        }
+    }
+
+    if (isset($options['skip_values'])) {
+        if ($value == $options['skip_values']) {
+            return true;
+        }
+    }
+
+    foreach ((array)$data['skip_values_lt'] as $skip_value) {
+        if ($value < $skip_value) {
+            return true;
+        }
+    }
+
+    if (isset($options['skip_values_lt'])) {
+        if ($value < $options['skip_values_lt']) {
+            return true;
+        }
+    }
+
+    foreach ((array)$data['skip_values_gt'] as $skip_value) {
+        if ($value > $skip_value) {
+            return true;
+        }
+    }
+
+    if (isset($options['skip_values_gt'])) {
+        if ($value > $options['skip_values_gt']) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @param $valid
+ * @param $device
+ * @param $sensor_type
+ * @param $pre_cache
+ */
 function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 {
     if ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]) {
-        foreach ($device['dynamic_discovery']['modules']['sensors'][$sensor_type] as $data) {
+        $sensor_options = array();
+        if (isset($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'])) {
+            $sensor_options = $device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'];
+        }
+        foreach ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['data'] as $data) {
             $tmp_name = $data['oid'];
             $raw_data = $pre_cache[$tmp_name];
             foreach ($raw_data as $index => $snmp_data) {
-                $skip = false;
-                $value = $snmp_data[$data['value']];
-                foreach ((array)$data['skip_values'] as $skip_value) {
-                    echo "Here $value and $skip_value END\n";
-                    if ($value == $skip_value) {
-                        $skip = true;
-                    }
-                }
-                if ($skip === false && is_numeric($value)) {
+                $value = $snmp_data[$data['value']] ?: $snmp_data[$data['oid']];
+                if (can_skip_sensor($value, $data, $sensor_options) === false && is_numeric($value)) {
                     $oid = $data['num_oid'] . $index;
                     if (isset($snmp_data[$data['descr']])) {
                         $descr = $snmp_data[$data['descr']];
@@ -1086,7 +1135,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                             $value = $value * $multiplier;
                         }
                     } else {
-                        $state_name = $data['state_name'];
+                        $state_name = $data['state_name'] ?: $data['oid'];
                         $state_index_id = create_state_index($state_name);
                         if ($state_index_id != null) {
                             foreach ($data['states'] as $state) {
