@@ -15,7 +15,7 @@ When you get to *Step 3: Configure TLS/SSL on Web Server (Nginx)* there are some
 Follow the instructions regarding the "snippet" configuration, the main differences come when you get to *Adjust the Nginx Configuration to Use SSL*.
 Here you are again directed to edit `/etc/nginx/sites-available/default`, so we need to go to `/etc/nginx/conf.d/librenms.conf`.
 
-`sudo nano /etc/nginx/sites-available/default`
+`sudo vi /etc/nginx/sites-available/default`
 
 The top section of this file will look like this:
 ```
