@@ -11,71 +11,64 @@ modules:
         voltage:
             options:
                 skip_values_lt: 0
+                divisor: 10
             data:
                 -
                     oid: upsEPositiveBatteryVoltage
                     num_oid: .1.3.6.1.4.1.935.10.1.1.3.5.
                     index: 'upsEPositiveBatteryVoltage.{{ $index }}'
                     descr: Postitive Battery Voltage
-                    divisor: 10
                 -
                     oid: upsENegativeBatteryVoltage
                     num_oid: .1.3.6.1.4.1.935.10.1.1.3.6.
                     index: 'upsENegativeBatteryVoltage.{{ $index }}'
                     descr: Negative Battery Voltage
-                    divisor: 10
                 -
                     oid: upsESystemInputTable
                     num_oid: .1.3.6.1.4.1.935.10.1.1.2.16.1.3.
                     value: upsESystemInputVoltage
                     index: 'upsESystemInputVoltage.{{ $index }}'
                     descr: Input
-                    divisor: 10
                 -
                     oid: upsESystemOutputTable
                     num_oid: .1.3.6.1.4.1.935.10.1.1.2.18.1.3.
                     value: upsESystemOutputVoltage
                     index: 'upsESystemOutputVoltage.{{ $index }}'
                     descr: Output
-                    divisor: 10
                 -
                     oid: upsESystemBypassTable
                     num_oid: .1.3.6.1.4.1.935.10.1.1.2.20.1.3.
                     value: upsESystemBypassVoltage
                     index: 'upsESystemBypassVoltage.{{ $index }}'
                     descr: System Bypass
-                    divisor: 10
                 -
                     oid: upsEChargerModulesTable
                     num_oid: .1.3.6.1.4.1.935.10.1.1.3.12.1.3.
                     value: positiveChargeVotlage
                     index: 'positiveChargeVotlage.{{ $index }}'
                     descr: Positive Charge
-                    divisor: 10
                 -
                     oid: upsEChargerModulesTable
                     num_oid: .1.3.6.1.4.1.935.10.1.1.3.12.1.4.
                     value: negativeChargeVotlage
                     index: 'negativeChargeVotlage.{{ $index }}'
                     descr: Negative Charge
-                    divisor: 10
                 -
                     oid: upsEModulesTable
                     num_oid: .1.3.6.1.4.1.935.10.1.1.4.2.1.3.
                     value: upsEModulePositiveBusVolt
                     index: 'upsEModulePositiveBusVolt.{{ $index }}'
                     descr: Module Positive Charge
-                    divisor: 10
                 -
                     oid: upsEModulesTable
                     num_oid: .1.3.6.1.4.1.935.10.1.1.4.2.1.4.
                     value: upsEModuleNegativeBusVolt
                     index: 'upsEModuleNegativeBusVolt.{{ $index }}'
                     descr: Module Negative Charge
-                    divisor: 10
         frequency:
             options:
                 skip_values_lt: 0
+                divisor: 10
             data:
                 -
                     oid: upsESystemInputTable
@@ -83,21 +76,18 @@ modules:
                     value: upsESystemInputFrequency
                     index: 'upsESystemInputFrequency.{{ $index }}'
                     descr: System Input
-                    divisor: 10
                 -
                     oid: upsESystemOutputTable
                     num_oid: .1.3.6.1.4.1.935.10.1.1.2.18.1.2.
                     value: upsESystemOutputFrequency
                     index: 'upsESystemOutputFrequency.{{ $index }}'
                     descr: System Output
-                    divisor: 10
                 -
                     oid: upsESystemBypassTable
                     num_oid: .1.3.6.1.4.1.935.10.1.1.2.20.1.2.
                     value: upsESystemBypassFrequency
                     index: 'upsESystemBypassFrequency.{{ $index }}'
                     descr: System Bypass
-                    divisor: 10
         charge:
             data:
                 -
@@ -108,45 +98,42 @@ modules:
         temperature:
             options:
                 skip_values_lt: 0
+                divisor: 10
             data:
                 -
                     oid: upsESystemTemperature
                     num_oid: .1.3.6.1.4.1.935.10.1.1.3.4.
                     index: 'upsESystemTemperature.{{ $index }}'
                     descr: Ambient Temperature
-                    divisor: 10
                 -
                     oid: upsEBatteryTemperature
                     num_oid: .1.3.6.1.4.1.935.10.1.1.3.8.
                     index: 'upsEBatteryTemperature.{{ $index }}'
                     descr: Battery
-                    divisor: 10
                 -
                     oid: upsEChargerModulesTable
                     num_oid: .1.3.6.1.4.1.935.10.1.1.3.12.1.8.
                     value: chargerModulesTemperature
                     index: 'chargerModulesTemperature.{{ $index }}'
                     descr: Charger Module
-                    divisor: 10
                 -
                     oid: upsEModulesTable
                     num_oid: .1.3.6.1.4.1.935.10.1.1.4.2.1.5.
                     value: upsEModuleTemperature
                     index: 'upsEModuleTemperature.{{ $index }}'
                     descr: Module
-                    divisor: 10
                 -
                     oid: upsEEnvironmentTemperature
                     num_oid: .1.3.6.1.4.1.935.10.1.1.6.1.
                     value: upsEEnvironmentCurrentTemperature
                     index: 'upsEEnvironmentCurrentTemperature.{{ $index }}'
                     descr: Env Current Temp
-                    divisor: 10
                     low_limit: upsEEnvironmentTemperatureLowSetPoint
                     high_limit: upsEEnvironmentTemperatureHighSetPoint
         current:
             options:
                 skip_values_lt: 0
+                divisor: 10
             data:
                 -
                     oid: upsESystemInputTable
@@ -154,35 +141,30 @@ modules:
                     value: upsESystemInputCurrent
                     index: 'upsESystemInputCurrent.{{ $index }}'
                     descr: System Input Current
-                    divisor: 10
                 -
                     oid: upsESystemOutputTable
                     num_oid: .1.3.6.1.4.1.935.10.1.1.2.18.1.4.
                     value: upsESystemOutputCurrent
                     index: 'upsESystemOutputCurrent.{{ $index }}'
                     descr: System Output Current
-                    divisor: 10
                 -
                     oid: upsESystemBypassTable
                     num_oid: .1.3.6.1.4.1.935.10.1.1.2.20.1.4.
                     value: upsESystemBypassCurrent
                     index: 'upsESystemBypassCurrent.{{ $index }}'
                     descr: System Bypass
-                    divisor: 10
                 -
                     oid: upsEChargerModulesTable
                     num_oid: .1.3.6.1.4.1.935.10.1.1.3.12.1.5.
                     value: positiveChargeCurrent
                     index: 'positiveChargeCurrent.{{ $index }}'
                     descr: Postitive Charge
-                    divisor: 10
                 -
                     oid: upsEChargerModulesTable
                     num_oid: .1.3.6.1.4.1.935.10.1.1.3.12.1.6.
                     value: negativeChargeCurrent
                     index: 'negativeChargeCurrent.{{ $index }}'
                     descr: Negative Charge
-                    divisor: 10
         humidity:
             options:
                 skip_values_lt: 0
