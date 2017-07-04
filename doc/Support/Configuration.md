@@ -321,7 +321,7 @@ The varying options after that are to support the different transports.
 
 ### Alerting
 
-[Alerting](../Extensions/Alerting.md)
+[Alerting](../Alerting/Alerting.md)
 
 ### Billing
 

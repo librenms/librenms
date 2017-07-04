@@ -40,27 +40,32 @@
 
 use LibreNMS\Exceptions\AuthenticationException;
 
-if (! isset($_SESSION['username'])) {
-    $_SESSION['username'] = '';
-}
+function init_auth()
+{
+    global $ldap_connection, $config;
 
-/**
- * Set up connection to LDAP server
- */
-$ldap_connection = @ldap_connect($config['auth_ldap_server'], $config['auth_ldap_port']);
-if (! $ldap_connection) {
-    echo '<h2>Fatal error while connecting to LDAP server ' . $config['auth_ldap_server'] . ':' . $config['auth_ldap_port'] . ': ' . ldap_error($ldap_connection) . '</h2>';
-    exit;
-}
-if ($config['auth_ldap_version']) {
-    ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, $config['auth_ldap_version']);
-}
+    if (! isset($_SESSION['username'])) {
+        $_SESSION['username'] = '';
+    }
 
-if ($config['auth_ldap_starttls'] && ($config['auth_ldap_starttls'] == 'optional' || $config['auth_ldap_starttls'] == 'require')) {
-    $tls = ldap_start_tls($ldap_connection);
-    if ($config['auth_ldap_starttls'] == 'require' && $tls === false) {
-        echo '<h2>Fatal error: LDAP TLS required but not successfully negotiated:' . ldap_error($ldap_connection) . '</h2>';
+    /**
+     * Set up connection to LDAP server
+     */
+    $ldap_connection = @ldap_connect($config['auth_ldap_server'], $config['auth_ldap_port']);
+    if (! $ldap_connection) {
+        echo '<h2>Fatal error while connecting to LDAP server ' . $config['auth_ldap_server'] . ':' . $config['auth_ldap_port'] . ': ' . ldap_error($ldap_connection) . '</h2>';
         exit;
+    }
+    if ($config['auth_ldap_version']) {
+        ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, $config['auth_ldap_version']);
+    }
+
+    if ($config['auth_ldap_starttls'] && ($config['auth_ldap_starttls'] == 'optional' || $config['auth_ldap_starttls'] == 'require')) {
+        $tls = ldap_start_tls($ldap_connection);
+        if ($config['auth_ldap_starttls'] == 'require' && $tls === false) {
+            echo '<h2>Fatal error: LDAP TLS required but not successfully negotiated:' . ldap_error($ldap_connection) . '</h2>';
+            exit;
+        }
     }
 }
 

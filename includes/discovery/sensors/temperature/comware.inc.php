@@ -37,7 +37,7 @@ if (!empty($entphydata)) {
                     null,
                     $value['hh3cEntityExtTemperature'],
                     'snmp',
-                    $index
+                    $index['entPhysicalIndex']
                 );
             }
         }

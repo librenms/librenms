@@ -5,22 +5,27 @@
 // disable certificate checking before connect if required
 use LibreNMS\Exceptions\AuthenticationException;
 
-if (isset($config['auth_ad_check_certificates']) &&
-          !$config['auth_ad_check_certificates']) {
-    putenv('LDAPTLS_REQCERT=never');
-};
+function init_auth()
+{
+    global $ad_init, $ldap_connection, $config;
 
-if (isset($config['auth_ad_debug']) && $config['auth_ad_debug']) {
-    ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
-}
+    if (isset($config['auth_ad_check_certificates']) &&
+        !$config['auth_ad_check_certificates']) {
+        putenv('LDAPTLS_REQCERT=never');
+    };
 
-$ad_init = false;  // this variable tracks if bind has been called so we don't call it multiple times
-$ldap_connection = @ldap_connect($config['auth_ad_url']);
+    if (isset($config['auth_ad_debug']) && $config['auth_ad_debug']) {
+        ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
+    }
+
+    $ad_init = false;  // this variable tracks if bind has been called so we don't call it multiple times
+    $ldap_connection = @ldap_connect($config['auth_ad_url']);
 
 // disable referrals and force ldap version to 3
 
-ldap_set_option($ldap_connection, LDAP_OPT_REFERRALS, 0);
-ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+    ldap_set_option($ldap_connection, LDAP_OPT_REFERRALS, 0);
+    ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+}
 
 function authenticate($username, $password)
 {

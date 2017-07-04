@@ -3,6 +3,10 @@
 use LibreNMS\Exceptions\AuthenticationException;
 use Phpass\PasswordHash;
 
+function init_auth()
+{
+}
+
 function authenticate($username, $password)
 {
     $encrypted_old = md5($password);

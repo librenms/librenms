@@ -1,0 +1,1317 @@
+BENU-IPPOOL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   Counter64, Gauge32, Unsigned32, MODULE-IDENTITY, OBJECT-TYPE,
+   OBJECT-IDENTITY, NOTIFICATION-TYPE, mib-2, Integer32 FROM SNMPv2-SMI
+   TEXTUAL-CONVENTION, DisplayString, TruthValue FROM SNMPv2-TC
+   InetAddressType, InetAddress, InetAddressIPv4, 
+   InetAddressIPv6, InetPortNumber FROM INET-ADDRESS-MIB
+   benuWAG FROM BENU-WAG-MIB;
+
+benuIPPoolMIB  MODULE-IDENTITY
+            LAST-UPDATED "201508110000Z" -- August 11, 2015
+            ORGANIZATION "Benu Networks,Inc"
+            CONTACT-INFO "Benu Networks,Inc
+                          Corporate Headquarters
+                          300 Concord Road, Suite 110
+                          Billerica, MA 01821 USA
+                          Tel: +1 978-223-4700
+                          Fax: +1 978-362-1908
+                          Email: info@benunets.com"
+            DESCRIPTION
+               "The MIB module defines management information
+                related to the  IP Address Pools
+                Copyright (C)  2013 by Benu Networks, Inc.
+                All rights reserved."
+
+            REVISION "201508110000Z" -- August 11, 2015
+            DESCRIPTION "Added notifications for bIPPoolAddrExhausted and
+bIPv6PoolPrefixExhausted." 
+
+            REVISION "201501050000Z" -- January 05, 2015
+            DESCRIPTION "Updated notification assignments to comply with standards (RFC 2578)."
+
+            REVISION "201310210000Z" -- October 21, 2013
+            DESCRIPTION "Version includes IPv6 pools"
+  ::= { benuWAG 5 }
+
+-- declare top-level MIB objects for each component
+
+bIPPoolNotifications OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "IP Pool notifications are defined in this branch."
+  ::= { benuIPPoolMIB  0 }
+
+bIPv4PoolMIBObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "IPv4 Pool MIB objects information is defined in this branch."
+   ::= { benuIPPoolMIB 1 }
+
+bIPv4PoolNotifObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "IPv4 Pool Notifications are defined in this branch."
+   ::= { benuIPPoolMIB 2 }
+
+bIPv6PoolMIBObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "IPv6 Pool MIB objects information is defined in this branch."
+   ::= { benuIPPoolMIB 3 }
+
+bIPv6PoolNotifObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "IPv6 Pool Notifications are defined in this branch."
+   ::= { benuIPPoolMIB 4 }
+
+-- bIPPoolObjects Group
+
+bIPPoolTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BIPPoolEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of IP Pools that are configured in this server."
+   ::= { bIPv4PoolMIBObjects 1 }
+
+bIPPoolEntry  OBJECT-TYPE
+   SYNTAX      BIPPoolEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bIPPoolTable."
+   INDEX {
+      bIPPoolStatsInterval,
+      bIPPoolIndex
+   }
+   ::= { bIPPoolTable 1 }
+
+BIPPoolEntry ::= SEQUENCE {
+   bIPPoolStatsInterval                      Integer32,
+   bIPPoolIndex                              Integer32,
+   bIPPoolIntervalDuration                   Integer32,
+   bIPPoolName                               DisplayString,
+   bIPPoolStartAddress                       InetAddressIPv4,
+   bIPPoolEndAddress                         InetAddressIPv4,
+   bIPPoolTotalAddresses                     Unsigned32,
+   bIPPoolReservedAddresses                  Unsigned32,
+   bIPPoolPeakFreeAddresses                  Unsigned32,
+   bIPPoolPeakUsedAddresses                  Unsigned32,
+   bIPPoolUsedAddrLowThreshold               Unsigned32,
+   bIPPoolUsedAddrHighThreshold              Unsigned32,
+   bIPPoolGrpName                            DisplayString
+}
+
+bIPPoolStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval where the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics interval data greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i <n .
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bIPPoolEntry 1 }
+
+bIPPoolIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Index of the IP Pool  entry in the table."
+   ::= { bIPPoolEntry 2 }
+
+bIPPoolIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of the interval in minutes."
+   ::= { bIPPoolEntry 3 }
+
+bIPPoolName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The name  of the IP Pool  entry in the table."
+   ::= { bIPPoolEntry 4 }
+
+bIPPoolStartAddress  OBJECT-TYPE
+   SYNTAX      InetAddressIPv4
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The start address of the IP Pool range."
+   ::= { bIPPoolEntry 5 }
+
+bIPPoolEndAddress  OBJECT-TYPE
+   SYNTAX      InetAddressIPv4
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The end address of the IP Pool range."
+   ::= { bIPPoolEntry 6 }
+
+bIPPoolTotalAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of  addresses configured in the IP Pool."
+   ::= { bIPPoolEntry 7 }
+
+bIPPoolReservedAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The  number of reserved  addresses configured in the IP Pool."
+   ::= { bIPPoolEntry 8 }
+
+bIPPoolPeakFreeAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The  max number of free  addresses reached in the periodic interval ."
+   ::= { bIPPoolEntry 9 }
+
+bIPPoolPeakUsedAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The  max number of used  addresses reached in the periodic interval ."
+   ::= { bIPPoolEntry 10 }
+
+
+bIPPoolUsedAddrLowThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The low threshold for used IP addresses in this IP Pool.
+        If the value for used IP addresses in this IP Pool
+        becomes equal to or less than this value and the current
+        condition for bIPPoolUsedAddrHigh is raised, then a
+        bIPPoolUsedAddrLow event will be generated.  No more
+        bIPPoolUsedAddrLow events will be generated for this
+        IP Pool during its execution until the value for outstanding
+        used addresses has exceeded  the value of
+        bIPPoolUsedAddrHighThreshold."
+   ::= { bIPPoolEntry 11 }
+
+bIPPoolUsedAddrHighThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The high threshold for used addresses in this IP Pool.
+        If a bIPPoolUsedAddrLow event has been generated ( or  no
+        bIPPoolUsedAddrHigh was generated previously ) for this IP Pool,
+        and the value for used addresses has exceeded the value of
+        bIPPoolUsedAddrHighThreshold, then a
+        bIPPoolUsedAddrHigh  event will be generated.  No more
+        bIPPoolUsedAddrHigh  events will be generated for this
+        IP Pool  during this execution  until the  value for used addesses
+        becomes equal to or less than the value of
+        bIPPoolUsedAddrLowThreshold."
+   ::= { bIPPoolEntry 12 }
+
+bIPPoolGrpName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The name of the IP Pool Group."
+   ::= { bIPPoolEntry 13 }
+
+-- IP Pool Group Table
+
+bIPPoolGroupTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BIPPoolGroupEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of IP Pool Groups that are configured in this server."
+   ::= { bIPv4PoolMIBObjects 2 }
+
+bIPPoolGroupEntry  OBJECT-TYPE
+   SYNTAX      BIPPoolGroupEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bIPPoolGroupTable."
+   INDEX {
+      bIPPoolGroupStatsInterval,
+      bIPPoolGroupIndex
+   }
+   ::= { bIPPoolGroupTable 1 }
+
+BIPPoolGroupEntry ::= SEQUENCE {
+   bIPPoolGroupStatsInterval                      Integer32,
+   bIPPoolGroupIndex                              Integer32,
+   bIPPoolGroupIntervalDuration                   Integer32,
+   bIPPoolGroupName                               DisplayString,
+   bIPPoolGroupTotalAddresses                     Unsigned32,
+   bIPPoolGroupReservedAddresses                  Unsigned32,
+   bIPPoolGroupPeakFreeAddresses                  Unsigned32,
+   bIPPoolGroupPeakUsedAddresses                  Unsigned32
+}
+bIPPoolGroupStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval where the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics interval data greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i <n .
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bIPPoolGroupEntry 1 }
+
+bIPPoolGroupIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Index of the IP Pool Group entry in the table."
+   ::= { bIPPoolGroupEntry 2 }
+
+bIPPoolGroupIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of the interval in minutes."
+   ::= { bIPPoolGroupEntry 3 }
+
+bIPPoolGroupName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The name  of the IP Pool Group  entry in the table."
+   ::= { bIPPoolGroupEntry 4 }
+
+bIPPoolGroupTotalAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of  addresses configured in the IP Pool Group."
+   ::= { bIPPoolGroupEntry 5 }
+
+bIPPoolGroupReservedAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The  number of reserved  addresses configured in the IP Pool Group."
+   ::= { bIPPoolGroupEntry 6 }
+
+bIPPoolGroupPeakFreeAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The  max number of free  addresses reached in the periodic interval ."
+   ::= { bIPPoolGroupEntry 7 }
+
+bIPPoolGroupPeakUsedAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The  max number of used  addresses reached in the periodic interval ."
+   ::= { bIPPoolGroupEntry 8 }
+
+-- IP Pool Global Table
+
+bIPPoolGlobalTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BIPPoolGlobalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of IP Pool Global information in this server."
+   ::= { bIPv4PoolMIBObjects 3 }
+
+bIPPoolGlobalEntry  OBJECT-TYPE
+   SYNTAX      BIPPoolGlobalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bIPPoolGlobalTable."
+   INDEX {
+      bIPPoolGlobalStatsInterval,
+      bIPPoolClientIndex
+   }
+   ::= { bIPPoolGlobalTable 1 }
+
+BIPPoolGlobalEntry ::= SEQUENCE {
+   bIPPoolGlobalStatsInterval                         Integer32,
+   bIPPoolClientIndex                                 Integer32,
+   bIPPoolClientName                                  DisplayString,
+   bIPPoolGlobalAllocReq                              Unsigned32,
+   bIPPoolGlobalAllocReqSucc                          Unsigned32,
+   bIPPoolGlobalAllocReqUnSucc                        Unsigned32,
+   bIPPoolGlobalDupAllocReq                           Unsigned32,
+   bIPPoolGlobalStaticAllocReq                        Unsigned32,
+   bIPPoolGlobalAllocResponses                        Unsigned32,
+   bIPPoolGlobalDeAllocReq                            Unsigned32,
+   bIPPoolGlobalDeAllocReqSucc                        Unsigned32,
+   bIPPoolGlobalDeAllocReqUnSucc                      Unsigned32,
+   bIPPoolGlobalInvalidReq                            Unsigned32,
+   bIPPoolGlobalNotAvailCount                         Unsigned32,
+   bIPPoolGlobalPoolExhaustedCount                    Unsigned32,
+   bIPPoolGlobalGroupExhaustedCount                   Unsigned32,
+   bIPPoolGlobalInvalidPoolNameCount                  Unsigned32,
+   bIPPoolGlobalInvalidGroupNameCount                 Unsigned32,
+   bIPPoolGlobalInvalidIPAddrCount                    Unsigned32,
+   bIPPoolGlobalHashInsertFail                        Unsigned32,
+   bIPPoolGlobalHashDeleteFail                        Unsigned32,
+   bIPPoolGlobalRequestedAllocatedMismacth            Unsigned32,
+   bIPPoolGlobalRequestedIPNotFree                    Unsigned32,
+   bIPPoolGlobalGenErrCount                           Unsigned32,
+   bIPPoolGlobalAddrRelDueToIntAdd                    Unsigned32,
+   bIPPoolGlobalGroupDeAllocReq                       Unsigned32,
+   bIPPoolGlobalGroupDeAllocReqSucc                   Unsigned32,
+   bIPPoolGlobalGroupDeAllocReqUnSucc                 Unsigned32,
+   bIPPoolTotalPoolCreatedEvents                      Unsigned32,
+   bIPPoolTotalPoolDeletedEvents                      Unsigned32,
+   bIPPoolGlobalIntervalDuration                      Integer32
+}
+bIPPoolGlobalStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "The interval where the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics interval data greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i <n .
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bIPPoolGlobalEntry 1 }
+
+bIPPoolClientIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A number uniquely identifying client which uses IP Pool"
+   ::= { bIPPoolGlobalEntry 2 }
+
+bIPPoolClientName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "IP Pool client name"
+   ::= { bIPPoolGlobalEntry 3 }
+
+bIPPoolGlobalAllocReq  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of IP Address allocation requests."
+   ::= { bIPPoolGlobalEntry 4 }
+
+bIPPoolGlobalAllocReqSucc OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of IP Address allocation requests for which
+        allocation was successful."
+   ::= { bIPPoolGlobalEntry 5 }
+
+bIPPoolGlobalAllocReqUnSucc OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of IP Address allocation requests for which
+        allocation was Unsuccessful."
+   ::= { bIPPoolGlobalEntry 6 }
+
+bIPPoolGlobalDupAllocReq OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of duplicate IP Address allocation requests."
+   ::= { bIPPoolGlobalEntry 7 }
+
+bIPPoolGlobalStaticAllocReq OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of static IP Address allocation requests."
+   ::= { bIPPoolGlobalEntry 8 }
+
+bIPPoolGlobalAllocResponses OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of  IP address allocation responses ."
+   ::= { bIPPoolGlobalEntry 9 }
+
+bIPPoolGlobalDeAllocReq OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of IP Address  deallocation requests."
+   ::= { bIPPoolGlobalEntry 10 }
+
+bIPPoolGlobalDeAllocReqSucc OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of IP Address  deallocation requests which
+        are successful."
+   ::= { bIPPoolGlobalEntry 11 }
+
+bIPPoolGlobalDeAllocReqUnSucc OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of IP Address  deallocation requests which
+        are unsuccessful."
+   ::= { bIPPoolGlobalEntry 12 }
+
+bIPPoolGlobalInvalidReq OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of invalid IP Address allocation requests."
+   ::= { bIPPoolGlobalEntry 13 }
+
+bIPPoolGlobalNotAvailCount OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of requests for which the requested  IP pool is unavailable."
+   ::= { bIPPoolGlobalEntry 14 }
+
+bIPPoolGlobalPoolExhaustedCount OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of requests for which the requested  IP pool is exhausted."
+   ::= { bIPPoolGlobalEntry 15 }
+
+bIPPoolGlobalGroupExhaustedCount OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of requests for which the requested  IP pool group is exhausted."
+   ::= { bIPPoolGlobalEntry 16 }
+
+bIPPoolGlobalInvalidPoolNameCount OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of requests with invalid  IP pool  name."
+   ::= { bIPPoolGlobalEntry 17 }
+
+bIPPoolGlobalInvalidGroupNameCount OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of requests with invalid  IP pool group  name."
+   ::= { bIPPoolGlobalEntry 18 }
+
+bIPPoolGlobalInvalidIPAddrCount OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of  release requests with invalid IP addresses ."
+   ::= { bIPPoolGlobalEntry 19 }
+
+bIPPoolGlobalHashInsertFail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of  addresses for which  hash insert failed."
+   ::= { bIPPoolGlobalEntry 20 }
+
+bIPPoolGlobalHashDeleteFail OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of  addresses for which  hash delete failed."
+   ::= { bIPPoolGlobalEntry 21 }
+
+bIPPoolGlobalRequestedAllocatedMismacth OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of requests for which allocated and requested IP address do not match ."
+   ::= { bIPPoolGlobalEntry 22 }
+
+bIPPoolGlobalRequestedIPNotFree OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of requested addresses which were not free."
+   ::= { bIPPoolGlobalEntry 23 }
+
+bIPPoolGlobalGenErrCount OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of errors like memory allocation failures."
+   ::= { bIPPoolGlobalEntry 24 }
+
+bIPPoolGlobalAddrRelDueToIntAdd OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of  addresses released due to interface addition."
+   ::= { bIPPoolGlobalEntry 25 }
+
+bIPPoolGlobalGroupDeAllocReq OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of group deallocation requests."
+   ::= { bIPPoolGlobalEntry 26 }
+
+bIPPoolGlobalGroupDeAllocReqSucc OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of group  deallocation requests which
+        are successful."
+   ::= { bIPPoolGlobalEntry 27 }
+
+bIPPoolGlobalGroupDeAllocReqUnSucc OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of group deallocation requests which
+        are unsuccessful."
+   ::= { bIPPoolGlobalEntry 28 }
+
+bIPPoolTotalPoolCreatedEvents    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of ip pool create events."
+   ::= { bIPPoolGlobalEntry 29}
+
+bIPPoolTotalPoolDeletedEvents    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of ip pool delete events."
+   ::= { bIPPoolGlobalEntry 30}
+
+
+bIPPoolGlobalIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of the interval in minutes."
+   ::= { bIPPoolGlobalEntry  31 }
+
+-- IPv4 Pool Notifications
+
+bIPPoolUsedAddrLow       NOTIFICATION-TYPE
+    OBJECTS         {
+                        bIPPoolName,
+                        bIPPoolTotalAddresses,
+                        bIPPoolUsedAddrLowThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of used addresses
+         for a particular IP Pool is cleared , meaning that it
+         has fallen below the  value of bIPPoolUsedAddrLowThreshold
+         for that IP Pool."
+    ::= { bIPPoolNotifications 1 }
+
+bIPPoolUsedAddrHigh   NOTIFICATION-TYPE
+    OBJECTS         {
+                        bIPPoolName,
+                        bIPPoolTotalAddresses,
+                        bIPPoolUsedAddrHighThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of used
+        addresses for a particular IP Pool has risen above the
+        value of bIPPoolUsedAddrHighThreshold for that IP Pool."
+    ::= { bIPPoolNotifications 2 }
+
+bIPPoolAddrExhausted   NOTIFICATION-TYPE
+    OBJECTS         {
+                        bIPPoolName,
+                        bIPPoolTotalAddresses
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the particular IPv4 pool
+        is exhausted."
+    ::= { bIPPoolNotifications 5 }
+
+-- bIPv6PoolObjects Group
+
+bIPv6PoolTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BIPv6PoolEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of IPv6 Pools that are configured in this server."
+   ::= { bIPv6PoolMIBObjects 1 }
+
+bIPv6PoolEntry  OBJECT-TYPE
+   SYNTAX      BIPv6PoolEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bIPv6PoolTable."
+   INDEX {
+      bIPv6PoolStatsInterval,
+      bIPv6PoolIndex
+   }
+   ::= { bIPv6PoolTable 1 }
+
+BIPv6PoolEntry ::= SEQUENCE {
+   bIPv6PoolStatsInterval                      Integer32,
+   bIPv6PoolIndex                              Integer32,
+   bIPv6PoolIntervalDuration                   Integer32,
+   bIPv6PoolName                               DisplayString,
+   bIPv6PoolStartPrefix                        InetAddressIPv6,
+   bIPv6PoolEndPrefix                          InetAddressIPv6,
+   bIPv6PoolTotalPrefixes                      Unsigned32,
+   bIPv6PoolReservedPrefixes                   Unsigned32,
+   bIPv6PoolPeakFreePrefixes                   Unsigned32,
+   bIPv6PoolPeakUsedPrefixes                   Unsigned32,
+   bIPv6PoolUsedPrefixLowThreshold             Unsigned32,
+   bIPv6PoolUsedPrefixHighThreshold            Unsigned32,
+   bIPv6PoolGrpName                            DisplayString
+}
+
+bIPv6PoolStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval for acculating the measurements.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics interval data, greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bIPv6PoolEntry 1 }
+
+bIPv6PoolIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Index of the IPv6 Pool entry in the table."
+   ::= { bIPv6PoolEntry 2 }
+
+bIPv6PoolIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of the interval in minutes."
+   ::= { bIPv6PoolEntry 3 }
+
+bIPv6PoolName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The name of the IPv6 Pool entry in the table."
+   ::= { bIPv6PoolEntry 4 }
+
+bIPv6PoolStartPrefix  OBJECT-TYPE
+   SYNTAX      InetAddressIPv6
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The start prefix of the IPv6 Pool range."
+   ::= { bIPv6PoolEntry 5 }
+
+bIPv6PoolEndPrefix  OBJECT-TYPE
+   SYNTAX      InetAddressIPv6
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The end prefix of the IPv6 Pool range."
+   ::= { bIPv6PoolEntry 6 }
+
+bIPv6PoolTotalPrefixes  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of prefixes configured in the IPv6 Pool."
+   ::= { bIPv6PoolEntry 7 }
+
+bIPv6PoolReservedPrefixes  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The  number of reserved prefixes configured in the IPv6 Pool."
+   ::= { bIPv6PoolEntry 8 }
+
+bIPv6PoolPeakFreePrefixes  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The  maximum number of free prefixes reached in the periodic interval."
+   ::= { bIPv6PoolEntry 9 }
+
+bIPv6PoolPeakUsedPrefixes  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The  maximum number of used prefixes reached in the periodic interval."
+   ::= { bIPv6PoolEntry 10 }
+
+bIPv6PoolUsedPrefixLowThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The low threshold for used IPv6 prefixes in this IPv6 Pool.
+        If the value for used IPv6 prefixes in this IPv6 Pool
+        becomes equal to or less than this value and the current
+        condition for bIPv6PoolUsedPrefixHigh is raised, then a
+        bIPv6PoolUsedPrefixLow event will be generated.  No more
+        bIPv6PoolUsedPrefixLow events will be generated for this
+        IPv6 Pool during this execution until the value for 
+        used prefixes has exceeded the value of
+        bIPv6PoolUsedPrefixHighThreshold."
+   ::= { bIPv6PoolEntry 11 }
+
+bIPv6PoolUsedPrefixHighThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The high threshold for used prefixes in this IPv6 Pool.
+        If a bIPv6PoolUsedPrefixLow event has been generated (or  no
+        bIPv6PoolUsedPrefixHigh was generated previously) for this IPv6 Pool,
+        and the value for used prefixes has exceeded the value of
+        bIPv6PoolUsedAddrHighThreshold, then a
+        bIPv6PoolUsedAddrHigh event will be generated. No more
+        bIPv6PoolUsedAddrHigh events will be generated for this
+        IPv6 Pool during this execution until the value for used prefixes 
+        becomes equal to or less than the value of
+        bIPv6PoolUsedAddrLowThreshold."
+   ::= { bIPv6PoolEntry 12 }
+
+bIPv6PoolGrpName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The name of the IPv6 Pool Group."
+   ::= { bIPv6PoolEntry 13 }
+
+-- IPv6 Pool Group Table
+
+bIPv6PoolGroupTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BIPv6PoolGroupEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of IPv6 Pool Groups that are configured in this server."
+   ::= { bIPv6PoolMIBObjects 2 }
+
+bIPv6PoolGroupEntry  OBJECT-TYPE
+   SYNTAX      BIPv6PoolGroupEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bIPv6PoolGroupTable."
+   INDEX {
+      bIPv6PoolGroupStatsInterval,
+      bIPv6PoolGroupIndex
+   }
+   ::= { bIPv6PoolGroupTable 1 }
+
+BIPv6PoolGroupEntry ::= SEQUENCE {
+   bIPv6PoolGroupStatsInterval                      Integer32,
+   bIPv6PoolGroupIndex                              Integer32,
+   bIPv6PoolGroupIntervalDuration                   Integer32,
+   bIPv6PoolGroupName                               DisplayString,
+   bIPv6PoolGroupTotalPrefixes                      Unsigned32,
+   bIPv6PoolGroupReservedPrefixes                   Unsigned32,
+   bIPv6PoolGroupPeakFreePrefixes                   Unsigned32,
+   bIPv6PoolGroupPeakUsedPrefixes                   Unsigned32
+}
+
+bIPv6PoolGroupStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval for acculating the measurements.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics interval data, greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bIPv6PoolGroupEntry 1 }
+
+bIPv6PoolGroupIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Index of the IPv6 Pool Group entry in the table."
+   ::= { bIPv6PoolGroupEntry 2 }
+
+bIPv6PoolGroupIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of the interval in minutes."
+   ::= { bIPv6PoolGroupEntry 3 }
+
+bIPv6PoolGroupName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The name of the IPv6 Pool Group entry in the table."
+   ::= { bIPv6PoolGroupEntry 4 }
+
+bIPv6PoolGroupTotalPrefixes  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of prefixes configured in the IPv6 Pool Group."
+   ::= { bIPv6PoolGroupEntry 5 }
+
+bIPv6PoolGroupReservedPrefixes  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of reserved prefixes configured in the IPv6 Pool Group."
+   ::= { bIPv6PoolGroupEntry 6 }
+
+bIPv6PoolGroupPeakFreePrefixes  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The maximum number of free prefixes reached in the periodic interval."
+   ::= { bIPv6PoolGroupEntry 7 }
+
+bIPv6PoolGroupPeakUsedPrefixes  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The maximum number of used prefixes reached in the periodic interval ."
+   ::= { bIPv6PoolGroupEntry 8 }
+
+-- IPv6 Pool Global Table
+
+bIPv6PoolGlobalTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BIPv6PoolGlobalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of IPv6 Pool Global information in this server."
+   ::= { bIPv6PoolMIBObjects 3 }
+
+bIPv6PoolGlobalEntry  OBJECT-TYPE
+   SYNTAX      BIPv6PoolGlobalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bIPv6PoolGlobalTable."
+   INDEX {
+      bIPv6PoolGlobalStatsInterval,
+      bIPv6PoolClientIndex
+   }
+   ::= { bIPv6PoolGlobalTable 1 }
+
+BIPv6PoolGlobalEntry ::= SEQUENCE {
+   bIPv6PoolGlobalStatsInterval                         Integer32,
+   bIPv6PoolClientIndex                                 Integer32,
+   bIPv6PoolClientName                                  DisplayString,
+   bIPv6PoolGlobalAllocReq                              Unsigned32,
+   bIPv6PoolGlobalAllocReqSucc                          Unsigned32,
+   bIPv6PoolGlobalAllocReqUnSucc                        Unsigned32,
+   bIPv6PoolGlobalDupAllocReq                           Unsigned32,
+   bIPv6PoolGlobalStaticAllocReq                        Unsigned32,
+   bIPv6PoolGlobalAllocResponses                        Unsigned32,
+   bIPv6PoolGlobalDeAllocReq                            Unsigned32,
+   bIPv6PoolGlobalDeAllocReqSucc                        Unsigned32,
+   bIPv6PoolGlobalDeAllocReqUnSucc                      Unsigned32,
+   bIPv6PoolGlobalInvalidReq                            Unsigned32,
+   bIPv6PoolGlobalNotAvailCount                         Unsigned32,
+   bIPv6PoolGlobalPoolExhaustedCount                    Unsigned32,
+   bIPv6PoolGlobalGroupExhaustedCount                   Unsigned32,
+   bIPv6PoolGlobalInvalidPoolNameCount                  Unsigned32,
+   bIPv6PoolGlobalInvalidGroupNameCount                 Unsigned32,
+   bIPv6PoolGlobalInvalidIPAddrCount                    Unsigned32,
+   bIPv6PoolGlobalHashInsertFail                        Unsigned32,
+   bIPv6PoolGlobalHashDeleteFail                        Unsigned32,
+   bIPv6PoolGlobalRequestedAllocatedMismacth            Unsigned32,
+   bIPv6PoolGlobalRequestedIPNotFree                    Unsigned32,
+   bIPv6PoolGlobalGenErrCount                           Unsigned32,
+   bIPv6PoolGlobalPrefixRelDueToIntAdd                  Unsigned32,  
+   bIPv6PoolTotalPoolCreatedEvents                      Unsigned32,
+   bIPv6PoolTotalPoolDeletedEvents                      Unsigned32,
+   bIPv6PoolGlobalIntervalDuration                      Integer32
+}
+
+bIPv6PoolGlobalStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval for acculating the measurements.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics interval data, greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bIPv6PoolGlobalEntry 1 }
+
+bIPv6PoolClientIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A number uniquely identifying the client which uses IPv6 Pool."
+   ::= { bIPv6PoolGlobalEntry 2 }
+
+bIPv6PoolClientName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "IPv6 Pool client name."
+   ::= { bIPv6PoolGlobalEntry 3 }
+
+bIPv6PoolGlobalAllocReq  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of IPv6 prefix allocation requests."
+   ::= { bIPv6PoolGlobalEntry 4 }
+
+bIPv6PoolGlobalAllocReqSucc OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of IPv6 prefix allocation requests for which
+        allocation was successful."
+   ::= { bIPv6PoolGlobalEntry 5 }
+
+bIPv6PoolGlobalAllocReqUnSucc OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of IPv6 prefix allocation requests for which
+        allocation was unsuccessful."
+   ::= { bIPv6PoolGlobalEntry 6 }
+
+bIPv6PoolGlobalDupAllocReq OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of duplicate IPv6 prefix allocation requests."
+   ::= { bIPv6PoolGlobalEntry 7 }
+
+bIPv6PoolGlobalStaticAllocReq OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of static IPv6 allocation requests."
+   ::= { bIPv6PoolGlobalEntry 8 }
+
+bIPv6PoolGlobalAllocResponses OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of IPv6 prefix allocation responses."
+   ::= { bIPv6PoolGlobalEntry 9 }
+
+bIPv6PoolGlobalDeAllocReq OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of IPv6 prefix deallocation requests."
+   ::= { bIPv6PoolGlobalEntry 10 }
+
+bIPv6PoolGlobalDeAllocReqSucc OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of IPv6 prefix successful deallocation requests."
+   ::= { bIPv6PoolGlobalEntry 11 }
+
+bIPv6PoolGlobalDeAllocReqUnSucc OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of IPv6 prefix unsuccessful deallocation requests."
+   ::= { bIPv6PoolGlobalEntry 12 }
+
+bIPv6PoolGlobalInvalidReq OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of invalid IPv6 prefix allocation requests."
+   ::= { bIPv6PoolGlobalEntry 13 }
+
+bIPv6PoolGlobalNotAvailCount OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of requests for which the requested IPv6 pool is unavailable."
+   ::= { bIPv6PoolGlobalEntry 14 }
+
+bIPv6PoolGlobalPoolExhaustedCount OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of requests for which the requested IPv6 pool is exhausted."
+   ::= { bIPv6PoolGlobalEntry 15 }
+
+bIPv6PoolGlobalGroupExhaustedCount OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of requests for which the requested IPv6 pool group is exhausted."
+   ::= { bIPv6PoolGlobalEntry 16 }
+
+bIPv6PoolGlobalInvalidPoolNameCount OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of requests with invalid IPv6 pool name."
+   ::= { bIPv6PoolGlobalEntry 17 }
+
+bIPv6PoolGlobalInvalidGroupNameCount OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of requests with invalid IPv6 pool group name."
+   ::= { bIPv6PoolGlobalEntry 18 }
+
+bIPv6PoolGlobalInvalidIPAddrCount OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of release requests with invalid IPv6 prefixes."
+   ::= { bIPv6PoolGlobalEntry 19 }
+
+bIPv6PoolGlobalHashInsertFail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of prefixes for which hash insert failed."
+   ::= { bIPv6PoolGlobalEntry 20 }
+
+bIPv6PoolGlobalHashDeleteFail OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of prefixes for which hash delete failed."
+   ::= { bIPv6PoolGlobalEntry 21 }
+
+bIPv6PoolGlobalRequestedAllocatedMismacth OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of requests for which allocated and requested IPv6 prefixes do not match."
+   ::= { bIPv6PoolGlobalEntry 22 }
+
+bIPv6PoolGlobalRequestedIPNotFree OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of requested prefixes which were not free."
+   ::= { bIPv6PoolGlobalEntry 23 }
+
+bIPv6PoolGlobalGenErrCount OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of errors like memory allocation failures."
+   ::= { bIPv6PoolGlobalEntry 24 }
+
+bIPv6PoolGlobalPrefixRelDueToIntAdd OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of prefixes released due to interface addition."
+   ::= { bIPv6PoolGlobalEntry 25 }
+
+bIPv6PoolTotalPoolCreatedEvents    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of ipv6 pool create events."
+   ::= { bIPv6PoolGlobalEntry 26}
+
+bIPv6PoolTotalPoolDeletedEvents    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of ipv6 pool deleted events."
+   ::= { bIPv6PoolGlobalEntry 27}
+
+bIPv6PoolGlobalIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of the interval in minutes."
+   ::= { bIPv6PoolGlobalEntry  28 }
+
+-- IPv6 Pool Notifications
+
+bIPv6PoolUsedPrefixLow       NOTIFICATION-TYPE
+    OBJECTS         {
+                        bIPv6PoolName,
+                        bIPv6PoolTotalPrefixes,
+                        bIPv6PoolUsedPrefixLowThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of used prefixes
+         for a particular IPv6 Pool is cleared, meaning that it
+         has fallen below the value of bIPv6PoolUsedPrefixLowThreshold 
+         for that IPv6 Pool."
+    ::= { bIPPoolNotifications 3 }
+
+bIPv6PoolUsedPrefixHigh   NOTIFICATION-TYPE
+    OBJECTS         {
+                        bIPv6PoolName,
+                        bIPv6PoolTotalPrefixes,
+                        bIPv6PoolUsedPrefixHighThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of used
+        prefixes for a particular IPv6 Pool has risen above the
+        value of bIPv6PoolUsedPrefixHighThreshold for that IPv6 Pool."
+    ::= { bIPPoolNotifications 4 }
+
+bIPv6PoolPrefixExhausted  NOTIFICATION-TYPE
+    OBJECTS         {
+                        bIPv6PoolName,
+			            bIPv6PoolTotalPrefixes 
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the particular IPv6 pool is
+        exhausted."
+    ::= { bIPPoolNotifications 6 }
+
+END

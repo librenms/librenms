@@ -1,4 +1,91 @@
 source: General/Changelog.md
+## 1.29
+*(2017-06-24)*
+
+#### Features
+* New snmpwalk_group() function ([#6865](https://github.com/librenms/librenms/issues/6865))
+* Added support for passing state to alert templates test 
+* Added option to specify transport when testing a template ([#6755](https://github.com/librenms/librenms/issues/6755))
+* Added support to use IP addresses for NfSen filenames ([#6824](https://github.com/librenms/librenms/issues/6824))
+* Added pi-hole application support ([#6782](https://github.com/librenms/librenms/issues/6782))
+* Added some more coloring and make it easier to colorize messages for irc bot ([#6759](https://github.com/librenms/librenms/issues/6759))
+* Added syslog auth failure to alert_rules.json ([#6847](https://github.com/librenms/librenms/issues/6847))
+* Added support to use IP addresses for NfSen filenames ([#6824](https://github.com/librenms/librenms/issues/6824))
+* Added Irc host authentication ([#6757](https://github.com/librenms/librenms/issues/6757))
+* Added Syslog hooks for Oxidized integration (and more) ([#6785](https://github.com/librenms/librenms/issues/6785))
+
+#### Bugfixes
+* config_to_json.php does not pull in database configuration settings ([#6884](https://github.com/librenms/librenms/issues/6884))
+* Updated sysObjectId column in devices table to varchar(128) ([#6832](https://github.com/librenms/librenms/issues/6832))
+* Strip " from rPi temp sensor discovery ([#6815](https://github.com/librenms/librenms/issues/6815))
+* Check for ifHCInOctets and ifHighSpeed before falling back to if… ([#6777](https://github.com/librenms/librenms/issues/6777))
+* Updated Raspberry Pi Temp sensor discovery ([#6804](https://github.com/librenms/librenms/issues/6804))
+* Fix bad Cisco dBm discovery on some IOS versions ([#6789](https://github.com/librenms/librenms/issues/6789))
+* Ircbot - reformatted strikethrough for recovered alerts ([#6756](https://github.com/librenms/librenms/issues/6756))
+* Ensure rrdtool web settings aren't overwrote by defaults ([#6698](https://github.com/librenms/librenms/issues/6698))
+* Add column title under device bgp tab ([#6747](https://github.com/librenms/librenms/issues/6747))
+* Custom config.php os settings ([#6850](https://github.com/librenms/librenms/issues/6850))
+* Fix for syslog-messages from zywall (USG series) ([#6838](https://github.com/librenms/librenms/issues/6838))
+
+#### Documentation
+* Reorganised alerting docs + added some clarifications ([#6869](https://github.com/librenms/librenms/issues/6869))
+* Update Ubuntu and CentOS nginx install doc with a better nginx config ([#6836](https://github.com/librenms/librenms/issues/6836))
+* Added note to configure mod_status for Apache application ([#6810](https://github.com/librenms/librenms/issues/6810))
+* Updated ask people to contribute documentation ([#6739](https://github.com/librenms/librenms/issues/6739))
+* Reorganize auto-discovery docs and add a little info ([#6875](https://github.com/librenms/librenms/issues/6875))
+
+#### Devices
+* Added support for Radwin 5000 Series ([#6876](https://github.com/librenms/librenms/issues/6876))
+* Added support for Chatsworth PDU (legacy old pdus not sure model number) ([#6833](https://github.com/librenms/librenms/issues/6833))
+* Added detection for Microsemi PowerDsine PoE Midspans ([#6843](https://github.com/librenms/librenms/issues/6843))
+* Added additional sensors to Axis camera ([#6827](https://github.com/librenms/librenms/issues/6827))
+* Added Quanta lb6m device support ([#6816](https://github.com/librenms/librenms/issues/6816))
+* Added hardware and version from AirOS 8.x ([#6802](https://github.com/librenms/librenms/issues/6802))
+* Added support for processor and memory for 3com devices ([#6823](https://github.com/librenms/librenms/issues/6823))
+* Added state sensors to HP Procurve ([#6814](https://github.com/librenms/librenms/issues/6814))
+* Added detection for Atal Ethernetprobe ([#6778](https://github.com/librenms/librenms/issues/6778))
+* Updated vmware vcsa hardware/version detection  ([#6783](https://github.com/librenms/librenms/issues/6783))
+* Added C.H.I.P. power monitor ([#6763](https://github.com/librenms/librenms/issues/6763))
+* Updated cisco-iospri to check for numeric + named ifType and included new cisco mibs ([#6776](https://github.com/librenms/librenms/issues/6776))
+* Added detection for Arris C4c ([#6662](https://github.com/librenms/librenms/issues/6662))
+* Added Current Connections Graph for Cisco WSA ([#6734](https://github.com/librenms/librenms/issues/6734))
+* Added detection for AXIS Audio Appliances ([#6830](https://github.com/librenms/librenms/issues/6830))
+* Added basic support for CradlePoint WiPipe Cellular Broadband Routers ([#6695](https://github.com/librenms/librenms/issues/6695))
+* Added Avaya VSP Temperature Support ([#6692](https://github.com/librenms/librenms/issues/6692))
+* Added support for ADVA FSP150CC and FSP3000R7 Series ([#6696](https://github.com/librenms/librenms/issues/6696))
+* Updated Oracle ILOM detection ([#6779](https://github.com/librenms/librenms/issues/6779))
+* Added Cisco ASR, Nexus, etc. PSU State sensor ([#6790](https://github.com/librenms/librenms/issues/6790))
+* Updated Cisco NX-OS detection ([#6796](https://github.com/librenms/librenms/issues/6796))
+* Added more detection for Bintec smart devices ([#6780](https://github.com/librenms/librenms/issues/6780))
+* Added support for Schneider PowerLogic ([#6809](https://github.com/librenms/librenms/issues/6809))
+* Updated Cisco Unified CM detection and renamed to ucos ([#6813](https://github.com/librenms/librenms/issues/6813))
+* Added basic Support for Benu OS ([#6857](https://github.com/librenms/librenms/issues/6857))
+
+#### WebUI
+* Added "system name" for the "Services list" ([#6873](https://github.com/librenms/librenms/issues/6873))
+* Allow editing and deleting of lapsed alert schedules ([#6878](https://github.com/librenms/librenms/issues/6878))
+* Add bootgrid for authlog page, and fix poll-log searchbar layout on smaller screens ([#6805](https://github.com/librenms/librenms/issues/6805))
+* Updated all tables to have the same set number of items showing ([#6798](https://github.com/librenms/librenms/issues/6798))
+* Allow iframe in notes widget ([#6773](https://github.com/librenms/librenms/issues/6773))
+* Load google maps js library only if globe map widget is used
+* Added service alert rules ([#6772](https://github.com/librenms/librenms/issues/6772))
+* Added syslog auth failure to alert_rules.json ([#6847](https://github.com/librenms/librenms/issues/6847))
+* Fixed dashboard slowness with offline browser ([#6718](https://github.com/librenms/librenms/issues/6718))
+* Update graphs to use safer RRD check ([#6781](https://github.com/librenms/librenms/issues/6781))
+* Populate a sorted device list ([#6781](https://github.com/librenms/librenms/issues/6781))
+
+#### Alerts
+* Added elasticsearch transport and docs ([#6797](https://github.com/librenms/librenms/issues/6797))
+* Update irc transport to use templates ([#6758](https://github.com/librenms/librenms/issues/6758))
+
+#### API
+* Added search by os to list_devices ([#6861](https://github.com/librenms/librenms/issues/6861))
+
+#### Refactor
+* Discovery code cleanups ([#6856](https://github.com/librenms/librenms/issues/6856))
+
+---
+
 ## 1.28
 *(2017-05-28)*
 
