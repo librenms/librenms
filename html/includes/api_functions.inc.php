@@ -51,7 +51,7 @@ function get_graph_by_port_hostname()
     $app          = \Slim\Slim::getInstance();
     $router       = $app->router()->getCurrentRoute()->getParams();
     $hostname     = $router['hostname'];
-	$device_id    = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id    = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $vars         = array();
     $vars['port'] = urldecode($router['ifname']);
     $vars['type'] = $router['type'] ?: 'port_bits';
