@@ -89,6 +89,7 @@ pages:
     - Support/Poller Support.md
     - Support/Remote-Monitoring-VPN.md
     - Support/SNMP-Configuration-Examples.md
+    - Support/SSL-Configuration.md
 - Developing:
     - Developing/Using-Git.md
     - Developing/Code-Guidelines.md
