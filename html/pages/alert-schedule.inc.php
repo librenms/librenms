@@ -41,6 +41,7 @@ if (is_admin() !== false) {
                     <th data-column-id="end_recurring_hr">End recurring hr</th>
                     <th data-column-id="recurring_day" data-sortable="false" data-searchable="false">Recurring on days</th>
                     <th data-column-id="actions" data-sortable="false" data-searchable="false" data-formatter="commands">Actions</th>
+                    <th data-column-id="status" data-sortable="false" data-searchable="false" data-formatter="schedstatus">Status</th>
                 </tr>
             </thead>
         </table>
@@ -51,20 +52,23 @@ if (is_admin() !== false) {
 var grid = $("#alert-schedule").bootgrid({
     ajax: true,
     formatters: {
-        "commands": function(column, row)
-        {
+        "commands": function(column, row) {
             var response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#schedule-maintenance' data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-pencil\"></span></button> " +
                 "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-trash-o\"></span></button>";
- 
-            if (row.status == 1) {
-                response = response + '<button type="button" class="btn btn-xs btn-danger" disabled>Lapsed</button>';
-            } else if (row.status == 2) {
-                response = response + '<button type="button" class="btn btn-xs btn-success" disabled>Current</button>';
-            } 
+            return response;
+        },
+        "schedstatus": function(column, row) {
+            if (row.status == "1") {
+                response = '<span class="label label-danger">Lapsed</span>';
+            } else if (row.status == "2") {
+                response = '<span class="label label-success">Current</span>';
+            } else if (row.status == "0") {
+                response = '<span class="label label-warning">Set</span>';
+            }
             
             return response;
         }
-   },
+    },
     templates: {
         header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
                 "<div class=\"col-sm-8 actionBar\"><span class=\"pull-left\">"+
@@ -73,22 +77,18 @@ var grid = $("#alert-schedule").bootgrid({
                 "<div class=\"col-sm-4 actionBar\"><p class=\"{{css.search}}\"></p><p class=\"{{css.actions}}\"></p></div></div></div>"
     },
     rowCount: [50, 100, 250, -1],
-    post: function ()
-    {
+    post: function () {
         return {
             id: "alert-schedule",
         };
     },
     url: "ajax_table.php"
-}).on("loaded.rs.jquery.bootgrid", function()
-{
+}).on("loaded.rs.jquery.bootgrid", function() {
     /* Executes after data is loaded and rendered */
-    grid.find(".command-edit").on("click", function(e)
-    {
+    grid.find(".command-edit").on("click", function(e) {
         $('#schedule_id').val($(this).data("schedule_id"));
         $("#schedule-maintenance").modal('show');
-    }).end().find(".command-delete").on("click", function(e)
-    {
+    }).end().find(".command-delete").on("click", function(e) {
         $('#del_schedule_id').val($(this).data("schedule_id"));
         $('#delete-maintenance').modal('show');
     });

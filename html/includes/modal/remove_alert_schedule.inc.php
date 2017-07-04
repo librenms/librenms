@@ -38,15 +38,6 @@ if (is_admin() !== false) {
     </div>
 </div>
 <script>
-$('#schedule-maintenance').on('hide.bs.modal', function (event) {
-    $('#map-tags').data('tagmanager').empty();
-    $('#schedule_id').val('');
-    $('#title').val('');
-    $('#notes').val('');
-    $('#start').val('');
-    $('#end').val('');
-});
-
 $('#sched-maintenance-removal').click('', function(e) {
     e.preventDefault();
     $.ajax({
@@ -56,11 +47,12 @@ $('#sched-maintenance-removal').click('', function(e) {
         dataType: "json",
         success: function(data){
             if(data.status == 'ok') {
-                $("#message").html('<div class="alert alert-info">'+data.message+'</div>');
+                $("#message").html('<div class="alert alert-info" id="schedulemsg"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+'</div>');
+                window.setTimeout(function() { $('#schedulemsg').fadeOut().slideUp(); } , 5000);
                 $("#delete-maintenance").modal('hide');
                 $("#alert-schedule").bootgrid('reload');
             } else {
-                $("#response").html('<div class="alert alert-info">'+data.message+'</div>');
+                $("#response").html('<div class="alert alert-danger" id="schedulemodal-alert">'+data.message+'</div>');
             }
         },
         error: function(){
