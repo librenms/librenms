@@ -1120,8 +1120,8 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     } else {
                         $descr = str_replace('{{ $index }}', $index, $data['descr']);
                     }
-                    $divisor = $data['divisor'] ?: 1;
-                    $multiplier = $data['multiplier'] ?: 1;
+                    $divisor = $data['divisor'] ?: $sensor_options['divisor'] ?: 1;
+                    $multiplier = $data['multiplier'] ?: $sensor_options['multiplier'] ?: 1;
                     $low_limit = $data['low_limit'] ?: 'null';
                     $low_warn_limit = $data['low_warn_limit'] ?: 'null';
                     $warn_limit = $data['warn_limit'] ?: 'null';
