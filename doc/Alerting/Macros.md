@@ -119,6 +119,12 @@ Description: Only select sensors that aren't ignored.
 
 Source: `(%sensors.sensor_alert = 1)`
 
+Entity: `%macros.sensor_port_link`
+
+Description: Only selects sensors that have a port linked to them, the port is up and the device is up.
+
+Source: `(%sensors.entity_link_type = 'port' && %sensors.entity_link_index = %ports.ifIndex && %macros.port_up && %macros.device_up))`
+
 ## <a name="macros-misc">Misc</a> (Boolean)
 
 ### Packet Loss

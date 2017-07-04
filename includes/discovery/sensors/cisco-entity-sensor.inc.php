@@ -7,11 +7,14 @@ if ($device['os_group'] == 'cisco') {
     echo 'Caching OIDs:';
 
     if (!is_array($entity_array)) {
+        $tmp_oids = array('entPhysicalDescr', 'entPhysicalName', 'entPhysicalClass', 'entPhysicalContainedIn', 'entPhysicalParentRelPos');
         $entity_array = array();
-        echo ' entPhysicalDescr';
-        $entity_array = snmpwalk_cache_multi_oid($device, 'entPhysicalDescr', $entity_array, 'CISCO-ENTITY-SENSOR-MIB');
-        echo ' entPhysicalName';
-        $entity_array = snmpwalk_cache_multi_oid($device, 'entPhysicalName', $entity_array, 'CISCO-ENTITY-SENSOR-MIB');
+        foreach ($tmp_oids as $tmp_oid) {
+            echo " $tmp_oid";
+            $entity_array = snmpwalk_cache_multi_oid($device, $tmp_oid, $entity_array, 'ENTITY-MIB:CISCO-ENTITY-SENSOR-MIB');
+        }
+        echo ' entAliasMappingIdentifier';
+        $entity_array = snmpwalk_cache_twopart_oid($device, 'entAliasMappingIdentifier', $entity_array, 'ENTITY-MIB:IF-MIB');
     }
 
     echo '  entSensorType';
@@ -159,7 +162,26 @@ if ($device['os_group'] == 'cisco') {
                 }                                //end if
 
                 if ($ok) {
-                    discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', ucwords($descr), $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity']);
+                    $phys_index = $entity_array[$index]['entPhysicalContainedIn'];
+                    while ($phys_index != 0) {
+                        if ($index === $phys_index) {
+                            break;
+                        }
+                        if ($entity_array[$phys_index]['entPhysicalClass'] === 'port') {
+                            if (str_contains($entity_array[$phys_index][0]['entAliasMappingIdentifier'], 'ifIndex.')) {
+                                list(, $tmp_ifindex) = explode(".", $entity_array[$phys_index][0]['entAliasMappingIdentifier']);
+                                $tmp_port = get_port_by_index_cache($device['device_id'], $tmp_ifindex);
+                                if (is_array($tmp_port)) {
+                                    $entity_link_type = 'port';
+                                    $entity_link_index = $tmp_ifindex;
+                                }
+                            }
+                            break;
+                        } else {
+                            $phys_index = $entity_array[$phys_index]['entPhysicalContainedIn'];
+                        }
+                    }
+                    discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', ucwords($descr), $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null, $entity_link_type, $entity_link_index);
                     #Cisco IOS-XR : add a fake sensor to graph as dbm
                     if ($type == "power" and $device['os'] == "iosxr" and (preg_match("/power (R|T)x/i", $descr) or preg_match("/(R|T)x Power/i", $descr))) {
                             // convert Watts to dbm
@@ -172,7 +194,7 @@ if ($device['os_group'] == 'cisco') {
                             $multiplier = 1;
                             $divisor = 1;
                             //echo("\n".$valid['sensor'].", $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current");
-                            discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity']);
+                            discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null, $entity_link_type, $entity_link_index);
                     }
                 }
 
