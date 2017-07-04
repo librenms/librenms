@@ -148,6 +148,7 @@ $('#schedule-maintenance').on('hide.bs.modal', function (event) {
     $('#recurring_day').prop('checked', false);
     $('#norecurringgroup').show();
     $('#recurringgroup').hide();
+    $('#schedulemodal-alert').remove('');
 });
 
 $('#schedule-maintenance').on('show.bs.modal', function (event) {
@@ -236,15 +237,17 @@ $('#sched-submit').click('', function(e) {
         dataType: "json",
         success: function(data){
             if(data.status == 'ok') {
-                $("#message").html('<div class="alert alert-info">'+data.message+'</div>');
+                $("#message").html('<div id="schedulemsg" class="alert alert-info"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+'</div>');
+                window.setTimeout(function() { $('#schedulemsg').fadeOut().slideUp(); } , 5000);
                 $("#schedule-maintenance").modal('hide');
+                $("#schedulemodal-alert").remove();
                 $("#alert-schedule").bootgrid('reload');
             } else {
-                $("#response").html('<div class="alert alert-info">'+data.message+'</div>');
+                $("#response").html('<div id="schedulemodal-alert" class="alert alert-danger">'+data.message+'</div>');
             }
         },
         error: function(){
-            $("#response").html('<div class="alert alert-info">An error occurred.</div>');
+            $("#response").html('<div id="schedulemodal-alert" class="alert alert-danger">An error occurred.</div>');
         }
     });
 });
