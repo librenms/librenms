@@ -19,7 +19,7 @@ hijacking attacks. Set ``$config['secure_cookies'] = true`` in ``config.php`` to
 Please ensure you keep your install [up to date](Updating.md).
 
 ### Enabling HTTPS
-This example is specifically for Ubuntu 16.04 eith Nginx and uses an SSL certificate from Let's Encrypt.
+This example is specifically for Ubuntu 16.04 with Nginx and uses an SSL certificate from Let's Encrypt.
 Please follow [this](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04) excellent tutorial on setting up nginx with an SSL cert from LetsEncrypt.
 
 #### Step 1
