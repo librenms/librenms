@@ -1,0 +1,254 @@
+-- ********************************************************************
+-- RITTAL GmbH & Co. KG, Herborn
+-- CMC-III-MIB Version 1.6
+-- CMC-III-PU - 7030.000, 7030.010, 7030.020
+--
+-- Management Information Base for SNMP Network Management
+--
+-- Copyright 2015 Rittal Herborn.
+-- All Rights Reserved.
+--
+-- The information in this document is subject to change without notice.
+-- Refer to document "AGB_Software_Rittal.pdf".
+--
+-- ********************************************************************
+-- File   : $RCSfile: RITTAL-CMC-III-PRODUCTS-MIB.txt,v $
+-- Rev.   : $Revision: 1.6 $
+-- Date   : $Date: 2015/09/23 17:36:02 $
+-- Author : $Author: fis $
+-- Id     : $Id: RITTAL-CMC-III-PRODUCTS-MIB.txt,v 1.6 2015/09/23 17:36:02 fis Exp $
+-- ********************************************************************
+
+RITTAL-CMC-III-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                                MODULE-IDENTITY
+        FROM                SNMPv2-SMI
+                                cmcIII
+        FROM                RITTAL-CMC-III-MIB;
+
+
+cmcIIIProducts   MODULE-IDENTITY
+        LAST-UPDATED        "201508250000Z"
+        ORGANIZATION        "RITTAL GmbH & Co. KG"
+        CONTACT-INFO        "www.rittal.de
+
+                            RITTAL GmbH & Co. KG
+                            Forschung & Entwicklung
+                            Auf dem Stuetzelberg
+                            D-35745 Herborn
+                            Germany, Europe
+
+                            +49(0)2772 5050
+                            info@rittal.de."
+        DESCRIPTION         "The MIB module for representing cmcIII SNMP agent product entities."
+
+        REVISION            "201508250000Z"
+        DESCRIPTION         "Added external oids."
+
+        REVISION            "201508170000Z"
+        DESCRIPTION         "added PSM-CAN and SES products."
+
+        REVISION            "201501230000Z"
+        DESCRIPTION         "added new fire extinguisher products."
+
+        REVISION            "201308120000Z"
+        DESCRIPTION         "added PDU and RiMatrix products."
+
+        REVISION            "201306140000Z"
+        DESCRIPTION         "added object indentifiers."
+
+        REVISION            "201109010000Z"
+        DESCRIPTION         "Initial Version of cmcIII MIB."
+
+--  ::=          { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) rittal(2606) cmcIII(7) }
+        ::=                 { cmcIII            7 }
+
+-- ********************************************************************
+
+--  rittal                                          OBJECT IDENTIFIER ::= { enterprises       2606 }
+--  cmcIII                                          OBJECT IDENTIFIER ::= {   rittal             7 }
+--  cmcIIIProducts                                  OBJECT IDENTIFIER ::= {     cmcIII           7 }
+
+    cmcIIIProductUnit                               OBJECT IDENTIFIER ::= {       cmcIIIProducts 1 }
+    cmcIIIProductPort                               OBJECT IDENTIFIER ::= {       cmcIIIProducts 2 }
+    cmcIIIProductPowerSupply                        OBJECT IDENTIFIER ::= {       cmcIIIProducts 3 }
+    cmcIIIProductChassis                            OBJECT IDENTIFIER ::= {       cmcIIIProducts 4 }
+    cmcIIIProductSensor                             OBJECT IDENTIFIER ::= {       cmcIIIProducts 5 }
+
+-- ********************************************************************
+
+--  external oids:
+
+--  used in ptopoConnDiscAlgorithm:
+--  lldpMIB                                         OBJECT IDENTIFIER ::= { iso(1) std(0) iso8802(8802) ieee802dot1(1) ieee802dot1mibs(1) 2 }
+--  dot1dStpDesignatedRoot                          OBJECT IDENTIFIER ::= { iso(1) org(3) dod(6) internet(1) mgmt(2) mib-2(1) dot1dBridge(17) dot1dStp(2) 5 }
+--  dot1dStpPortDesignatedBridge                    OBJECT IDENTIFIER ::= { iso(1) org(3) dod(6) internet(1) mgmt(2) mib-2(1) dot1dBridge(17) dot1dStp(2) dot1dStpPortTable(15) dot1dStpPortEntry(1) 8 }
+--  ciscoCdpMIB                                     OBJECT IDENTIFIER ::= { enterprises cisco(9) ciscoMgmt(9) 23 }
+
+--  used in entPhysicalVendorType:
+--  arm                                             OBJECT IDENTIFIER ::= { enterprises          326     }
+--  atmel                                           OBJECT IDENTIFIER ::= { enterprises          410     }
+--  linux                                           OBJECT IDENTIFIER ::= { enterprises netsnmp(8072) netSnmpEnumerations(3) netSnmpAgentOIDs(2) 10 }
+--  freescale                                       OBJECT IDENTIFIER ::= { enterprises          33118   }
+
+-- ********************************************************************
+
+    cmcIIIProductUnitUnknown                        OBJECT IDENTIFIER ::= { cmcIIIProductUnit     1 }
+    cmcIIIProductUnitPUIII                          OBJECT IDENTIFIER ::= { cmcIIIProductUnit     2 }
+    cmcIIIProductUnitCompact                        OBJECT IDENTIFIER ::= { cmcIIIProductUnit     3 }
+    cmcIIIProductUnitLCP                            OBJECT IDENTIFIER ::= { cmcIIIProductUnit     4 }
+    cmcIIIProductUnitPDU                            OBJECT IDENTIFIER ::= { cmcIIIProductUnit     5 }
+    cmcIIIProductUnitRMS                            OBJECT IDENTIFIER ::= { cmcIIIProductUnit     6 }
+
+    cmcIIIProductPortUnknown                        OBJECT IDENTIFIER ::= { cmcIIIProductPort     1 }
+    cmcIIIProductPortLoopback                       OBJECT IDENTIFIER ::= { cmcIIIProductPort     2 }
+    cmcIIIProductPortCanBus                         OBJECT IDENTIFIER ::= { cmcIIIProductPort     3 }
+    cmcIIIProductPortEthernet                       OBJECT IDENTIFIER ::= { cmcIIIProductPort     4 }
+    cmcIIIProductPortVirtualCanBus                  OBJECT IDENTIFIER ::= { cmcIIIProductPort     5 }
+    cmcIIIProductPortTunnel                         OBJECT IDENTIFIER ::= { cmcIIIProductPort     6 }
+    cmcIIIProductPortSit                            OBJECT IDENTIFIER ::= { cmcIIIProductPort     7 }
+
+    cmcIIIProductPowerSupplyUnknown                 OBJECT IDENTIFIER ::= { cmcIIIProductPowerSupply      1 }
+    cmcIIIProductPowerSupplyAcAdapter               OBJECT IDENTIFIER ::= { cmcIIIProductPowerSupply      2 }
+    cmcIIIProductPowerSupplyTerminalStrip           OBJECT IDENTIFIER ::= { cmcIIIProductPowerSupply      3 }
+    cmcIIIProductPowerSupplyPOE                     OBJECT IDENTIFIER ::= { cmcIIIProductPowerSupply      4 }
+    cmcIIIProductPowerSupplyUSB                     OBJECT IDENTIFIER ::= { cmcIIIProductPowerSupply      5 }
+
+    cmcIIIProductChassisGateSensorUnknown           OBJECT IDENTIFIER ::= { cmcIIIProductChassis   256 } -- 0x0100
+    cmcIIIProductChassisGateLock                    OBJECT IDENTIFIER ::= { cmcIIIProductChassis   512 } -- 0x0200
+    cmcIIIProductChassisTemperature                 OBJECT IDENTIFIER ::= { cmcIIIProductChassis   768 } -- 0x0300
+    cmcIIIProductChassisTempHumi                    OBJECT IDENTIFIER ::= { cmcIIIProductChassis  1024 } -- 0x0400
+    cmcIIIProductChassisVandalism                   OBJECT IDENTIFIER ::= { cmcIIIProductChassis  1280 } -- 0x0500
+    cmcIIIProductChassisPressure                    OBJECT IDENTIFIER ::= { cmcIIIProductChassis  1536 } -- 0x0600
+    cmcIIIProductChassisAccess                      OBJECT IDENTIFIER ::= { cmcIIIProductChassis  1792 } -- 0x0700
+    cmcIIIProductChassisIOInput                     OBJECT IDENTIFIER ::= { cmcIIIProductChassis  2048 } -- 0x0800
+    cmcIIIProductChassisGateUnit-Cfg1               OBJECT IDENTIFIER ::= { cmcIIIProductChassis  2304 } -- 0x0900
+    cmcIIIProductChassisGateUnit-Cfg2               OBJECT IDENTIFIER ::= { cmcIIIProductChassis  2305 } -- 0x0901
+    cmcIIIProductChassisGateUnit-Cfg3               OBJECT IDENTIFIER ::= { cmcIIIProductChassis  2306 } -- 0x0902
+    cmcIIIProductChassisGateUnit-Cfg4               OBJECT IDENTIFIER ::= { cmcIIIProductChassis  2307 } -- 0x0903
+    cmcIIIProductChassisPowerOld                    OBJECT IDENTIFIER ::= { cmcIIIProductChassis  2560 } -- 0x0A00
+    cmcIIIProductChassisDRC                         OBJECT IDENTIFIER ::= { cmcIIIProductChassis  2816 } -- 0x0B00
+    cmcIIIProductChassisPower                       OBJECT IDENTIFIER ::= { cmcIIIProductChassis  3584 } -- 0x0E00
+    cmcIIIProductChassisUniInput                    OBJECT IDENTIFIER ::= { cmcIIIProductChassis  3328 } -- 0x0D00
+    cmcIIIProductChassisSmoke                       OBJECT IDENTIFIER ::= { cmcIIIProductChassis  4096 } -- 0x1000
+    cmcIIIProductChassisDCM                         OBJECT IDENTIFIER ::= { cmcIIIProductChassis  4352 } -- 0x1100
+    cmcIIIProductChassisLeakage                     OBJECT IDENTIFIER ::= { cmcIIIProductChassis  4608 } -- 0x1200
+    cmcIIIProductChassisPSM-CAN-C13                 OBJECT IDENTIFIER ::= { cmcIIIProductChassis  4864 } -- 0x1300
+    cmcIIIProductChassisPSM-CAN-C19                 OBJECT IDENTIFIER ::= { cmcIIIProductChassis  4865 } -- 0x1301
+    cmcIIIProductChassisPSM-CAN-Schuko              OBJECT IDENTIFIER ::= { cmcIIIProductChassis  4866 } -- 0x1302
+    cmcIIIProductChassisLCPFan                      OBJECT IDENTIFIER ::= { cmcIIIProductChassis  8192 } -- 0x2000
+    cmcIIIProductChassisLCPWtr                      OBJECT IDENTIFIER ::= { cmcIIIProductChassis  8448 } -- 0x2100
+    cmcIIIProductChassisLCPFcs                      OBJECT IDENTIFIER ::= { cmcIIIProductChassis  8704 } -- 0x2200
+    cmcIIIProductChassisLCPTsw                      OBJECT IDENTIFIER ::= { cmcIIIProductChassis  8960 } -- 0x2300
+    cmcIIIProductChassisLCPUdx                      OBJECT IDENTIFIER ::= { cmcIIIProductChassis  9216 } -- 0x2400
+    cmcIIIProductChassisLCP5                        OBJECT IDENTIFIER ::= { cmcIIIProductChassis  9472 } -- 0x2500
+    cmcIIIProductChassisLCPMsrz                     OBJECT IDENTIFIER ::= { cmcIIIProductChassis  9728 } -- 0x2600
+    cmcIIIProductChassisLCPT3                       OBJECT IDENTIFIER ::= { cmcIIIProductChassis  9984 } -- 0x2700
+    cmcIIIProductChassisLCPFlush                    OBJECT IDENTIFIER ::= { cmcIIIProductChassis 10240 } -- 0x2800
+    cmcIIIProductChassisLCP                         OBJECT IDENTIFIER ::= { cmcIIIProductChassis 10496 } -- 0x2900
+    cmcIIIProductChassisPSM-M16                     OBJECT IDENTIFIER ::= { cmcIIIProductChassis 12288 } -- 0x3000
+    cmcIIIProductChassisPSM-M32                     OBJECT IDENTIFIER ::= { cmcIIIProductChassis 12544 } -- 0x3100
+    cmcIIIProductChassisPSM-MID-M16                 OBJECT IDENTIFIER ::= { cmcIIIProductChassis 13312 } -- 0x3400
+    cmcIIIProductChassisPSM-MID-M32                 OBJECT IDENTIFIER ::= { cmcIIIProductChassis 13568 } -- 0x3500
+    cmcIIIProductChassisFireDetect                  OBJECT IDENTIFIER ::= { cmcIIIProductChassis 28672 } -- 0x7000
+    cmcIIIProductChassisFireExt                     OBJECT IDENTIFIER ::= { cmcIIIProductChassis 28928 } -- 0x7100
+    cmcIIIProductChassisFireExtSlave                OBJECT IDENTIFIER ::= { cmcIIIProductChassis 29184 } -- 0x7200
+    cmcIIIProductChassisFireExtOneU-MX              OBJECT IDENTIFIER ::= { cmcIIIProductChassis 29440 } -- 0x7300
+    cmcIIIProductChassisFireExtOneU-MX-ED           OBJECT IDENTIFIER ::= { cmcIIIProductChassis 29696 } -- 0x7400
+    cmcIIIProductChassisFireExtOneU-MX-DD           OBJECT IDENTIFIER ::= { cmcIIIProductChassis 29952 } -- 0x7500
+    cmcIIIProductChassisFireExtOneU-VSN             OBJECT IDENTIFIER ::= { cmcIIIProductChassis 30208 } -- 0x7600
+    cmcIIIProductChassisFireExtOneU-VSN-ED          OBJECT IDENTIFIER ::= { cmcIIIProductChassis 30464 } -- 0x7700
+    cmcIIIProductChassisFireExtOneU-VSN-DD          OBJECT IDENTIFIER ::= { cmcIIIProductChassis 30720 } -- 0x7800
+    cmcIIIProductChassisInternal                    OBJECT IDENTIFIER ::= { cmcIIIProductChassis 32768 } -- 0x8000
+    cmcIIIProductChassisSES                         OBJECT IDENTIFIER ::= { cmcIIIProductChassis 36864 } -- 0x9000
+    cmcIIIProductChassisVirtualTwoLevel             OBJECT IDENTIFIER ::= { cmcIIIProductChassis 61440 } -- 0xF000
+    cmcIIIProductChassisVirtualAccess               OBJECT IDENTIFIER ::= { cmcIIIProductChassis 61696 } -- 0xF100
+    cmcIIIProductChassisGateSensorAccess            OBJECT IDENTIFIER ::= { cmcIIIProductChassis   273 } -- 0x0111
+    cmcIIIProductChassisGateSensorMotion            OBJECT IDENTIFIER ::= { cmcIIIProductChassis   277 } -- 0x0115
+    cmcIIIProductChassisGateSensorSmoke             OBJECT IDENTIFIER ::= { cmcIIIProductChassis   279 } -- 0x0117
+    cmcIIIProductChassisGateSensorAirflow           OBJECT IDENTIFIER ::= { cmcIIIProductChassis   281 } -- 0x0119
+    cmcIIIProductChassisGateSensorInputNO           OBJECT IDENTIFIER ::= { cmcIIIProductChassis   289 } -- 0x0121
+    cmcIIIProductChassisGateSensorInputNC           OBJECT IDENTIFIER ::= { cmcIIIProductChassis   290 } -- 0x0122
+    cmcIIIProductChassisGateSensorVoltage           OBJECT IDENTIFIER ::= { cmcIIIProductChassis   297 } -- 0x0129
+    cmcIIIProductChassisGateSensorTemp              OBJECT IDENTIFIER ::= { cmcIIIProductChassis   305 } -- 0x0131
+    cmcIIIProductChassisGateSensor4to20mA           OBJECT IDENTIFIER ::= { cmcIIIProductChassis   307 } -- 0x0133
+    cmcIIIProductChassisGateSensorFireError         OBJECT IDENTIFIER ::= { cmcIIIProductChassis 337 } -- 0x0151
+    cmcIIIProductChassisGateSensorFirePre           OBJECT IDENTIFIER ::= { cmcIIIProductChassis   338 } -- 0x0152
+    cmcIIIProductChassisGateSensorFireMain          OBJECT IDENTIFIER ::= { cmcIIIProductChassis   339 } -- 0x0153
+    cmcIIIProductChassisGateSensorLeakage           OBJECT IDENTIFIER ::= { cmcIIIProductChassis   345 } -- 0x0159
+    cmcIIIProductChassisGateSensorOutput            OBJECT IDENTIFIER ::= { cmcIIIProductChassis   401 } -- 0x0191
+    cmcIIIProductChassisGateSensorDoorMag           OBJECT IDENTIFIER ::= { cmcIIIProductChassis   402 } -- 0x0192
+
+    cmcIIIProductChassisPDU-MET-M-1P-16A-C20-12-00  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14336 } -- 0x3800
+    cmcIIIProductChassisPDU-MET-M-1P-16A-CEE-24-04  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14337 } -- 0x3801
+    cmcIIIProductChassisPDU-MET-M-1P-32A-CEE-24-04  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14338 } -- 0x3802
+    cmcIIIProductChassisPDU-MET-M-3P-16A-CEE-18-03  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14339 } -- 0x3803
+    cmcIIIProductChassisPDU-MET-M-3P-16A-CEE-24-06  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14340 } -- 0x3804
+    cmcIIIProductChassisPDU-MET-M-3P-32A-CEE-24-06  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14341 } -- 0x3805
+    cmcIIIProductChassisPDU-MET-M-3P-32A-CEE-36-06  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14342 } -- 0x3806
+    cmcIIIProductChassisPDU-MET-M-3P-16A-CEE-42-00  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14343 } -- 0x3807
+    cmcIIIProductChassisPDU-MET-M-3P-32A-CEE-48-00  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14344 } -- 0x3808
+    cmcIIIProductChassisPDU-MET-M-3P-63A-CEE-12-12  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14345 } -- 0x3809
+    cmcIIIProductChassisPDU-MET-M-UserDefined       OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14591 } -- 0x38FF
+
+    cmcIIIProductChassisPDU-SWI-M-1P-16A-C20-12-00  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14592 } -- 0x3900
+    cmcIIIProductChassisPDU-SWI-M-1P-16A-CEE-24-04  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14593 } -- 0x3901
+    cmcIIIProductChassisPDU-SWI-M-1P-32A-CEE-24-04  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14594 } -- 0x3902
+    cmcIIIProductChassisPDU-SWI-M-3P-16A-CEE-18-03  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14595 } -- 0x3903
+    cmcIIIProductChassisPDU-SWI-M-3P-16A-CEE-24-06  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14596 } -- 0x3904
+    cmcIIIProductChassisPDU-SWI-M-3P-32A-CEE-24-06  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14597 } -- 0x3905
+    cmcIIIProductChassisPDU-SWI-M-3P-32A-CEE-36-06  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14598 } -- 0x3906
+    cmcIIIProductChassisPDU-SWI-M-3P-16A-CEE-42-00  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14599 } -- 0x3907
+    cmcIIIProductChassisPDU-SWI-M-3P-32A-CEE-48-00  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14600 } -- 0x3908
+    cmcIIIProductChassisPDU-SWI-M-UserDefined       OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14847 } -- 0x39FF
+
+    cmcIIIProductChassisPDU-MAN-M-1P-16A-C20-12-00  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14848 } -- 0x3A00
+    cmcIIIProductChassisPDU-MAN-M-1P-16A-CEE-24-04  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14849 } -- 0x3A01
+    cmcIIIProductChassisPDU-MAN-M-1P-32A-CEE-24-04  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14850 } -- 0x3A02
+    cmcIIIProductChassisPDU-MAN-M-3P-16A-CEE-18-03  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14851 } -- 0x3A03
+    cmcIIIProductChassisPDU-MAN-M-3P-16A-CEE-24-06  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14852 } -- 0x3A04
+    cmcIIIProductChassisPDU-MAN-M-3P-32A-CEE-24-06  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14853 } -- 0x3A05
+    cmcIIIProductChassisPDU-MAN-M-3P-32A-CEE-36-06  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14854 } -- 0x3A06
+    cmcIIIProductChassisPDU-MAN-M-3P-16A-CEE-42-00  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14855 } -- 0x3A07
+    cmcIIIProductChassisPDU-MAN-M-3P-32A-CEE-48-00  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   14856 } -- 0x3A08
+    cmcIIIProductChassisPDU-MAN-M-UserDefined       OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15103 } -- 0x3AFF
+
+    cmcIIIProductChassisPDU-MAN-S-1P-16A-C20-12-00  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15104 } -- 0x3B00
+    cmcIIIProductChassisPDU-MAN-S-1P-16A-CEE-24-04  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15105 } -- 0x3B01
+    cmcIIIProductChassisPDU-MAN-S-1P-32A-CEE-24-04  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15106 } -- 0x3B02
+    cmcIIIProductChassisPDU-MAN-S-3P-16A-CEE-18-03  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15107 } -- 0x3B03
+    cmcIIIProductChassisPDU-MAN-S-3P-16A-CEE-24-06  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15108 } -- 0x3B04
+    cmcIIIProductChassisPDU-MAN-S-3P-32A-CEE-24-06  OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15109 } -- 0x3B05
+    cmcIIIProductChassisPDU-MAN-S-UserDefined       OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15119 } -- 0x3B0F
+
+    cmcIIIProductChassisPDUu-MET-M-1P-13A-0UK-16-00 OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15360 } -- 0x3C00
+    cmcIIIProductChassisPDUu-MET-M-1P-16A-CEE-24-04 OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15361 } -- 0x3C01
+    cmcIIIProductChassisPDUu-MET-M-1P-32A-CEE-24-04 OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15362 } -- 0x3C02
+    cmcIIIProductChassisPDUu-MET-M-UserDefined      OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15615 } -- 0x3CFF
+
+    cmcIIIProductChassisPDUu-SWI-M-1P-13A-0UK-16-00 OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15616 } -- 0x3D00
+    cmcIIIProductChassisPDUu-SWI-M-1P-16A-0UK-16-00 OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15617 } -- 0x3D01
+    cmcIIIProductChassisPDUu-SWI-M-1P-32A-CEE-16-04 OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15618 } -- 0x3D02
+    cmcIIIProductChassisPDUu-SWI-M-UserDefined      OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15871 } -- 0x3DFF
+
+    cmcIIIProductChassisPDUu-MAN-M-1P-13A-0UK-16-00 OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15872 } -- 0x3E00
+    cmcIIIProductChassisPDUu-MAN-M-1P-16A-CEE-16-04 OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15873 } -- 0x3E01
+    cmcIIIProductChassisPDUu-MAN-M-1P-32A-CEE-16-04 OBJECT IDENTIFIER ::= { cmcIIIProductChassis   15874 } -- 0x3E02
+    cmcIIIProductChassisPDUu-MAN-M-UserDefined      OBJECT IDENTIFIER ::= { cmcIIIProductChassis   16127 } -- 0x3EFF
+
+    cmcIIIProductChassisPDUu-MAN-S-1P-13A-0UK-16-00 OBJECT IDENTIFIER ::= { cmcIIIProductChassis   16128 } -- 0x3F00
+    cmcIIIProductChassisPDUu-MAN-S-1P-16A-CEE-16-04 OBJECT IDENTIFIER ::= { cmcIIIProductChassis   16129 } -- 0x3F01
+    cmcIIIProductChassisPDUu-MAN-S-1P-32A-CEE-16-04 OBJECT IDENTIFIER ::= { cmcIIIProductChassis   16130 } -- 0x3F02
+    cmcIIIProductChassisPDUu-MAN-S-UserDefined      OBJECT IDENTIFIER ::= { cmcIIIProductChassis   16383 } -- 0x3FFF
+
+    cmcIIIProductChassisRiMatrixS-S6                OBJECT IDENTIFIER ::= { cmcIIIProductChassis  20481 } -- 0x5001
+    cmcIIIProductChassisRiMatrixS-D6                OBJECT IDENTIFIER ::= { cmcIIIProductChassis  20482 } -- 0x5002
+    cmcIIIProductChassisRiMatrixS-S9                OBJECT IDENTIFIER ::= { cmcIIIProductChassis  20483 } -- 0x5003
+    cmcIIIProductChassisRiMatrixS-D9                OBJECT IDENTIFIER ::= { cmcIIIProductChassis  20484 } -- 0x5004
+    cmcIIIProductChassisRiMatrixS-S6W               OBJECT IDENTIFIER ::= { cmcIIIProductChassis  20485 } -- 0x5005
+    cmcIIIProductChassisRiMatrixS-D6W               OBJECT IDENTIFIER ::= { cmcIIIProductChassis  20486 } -- 0x5006
+    cmcIIIProductChassisRiMatrixS-S9W               OBJECT IDENTIFIER ::= { cmcIIIProductChassis  20487 } -- 0x5007
+    cmcIIIProductChassisRiMatrixS-D9W               OBJECT IDENTIFIER ::= { cmcIIIProductChassis  20488 } -- 0x5008
+
+END
