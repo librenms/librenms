@@ -11,7 +11,7 @@ $vlans_by_id = array_flip($vlans_dict);
 $existing_fdbs = array();
 $sql_result = dbFetchRows("SELECT * FROM `ports_fdb` WHERE `device_id` = ?", array($device['device_id']));
 foreach ($sql_result as $entry) {
-    $existing_fdbs[$entry['vlan_id']][$entry['mac_address']] = $entry;
+    $existing_fdbs[(int)$entry['vlan_id']][$entry['mac_address']] = $entry;
 }
 
 $insert = array(); // populate $insert with database entries
@@ -58,16 +58,32 @@ if (!empty($insert)) {
             }
         }
 
-        // Delete old entries from the database
-        foreach ($existing_fdbs[$vlan_id] as $entry) {
-                dbDelete(
-                    'ports_fdb',
-                    '`port_id` = ? AND `mac_address` = ? AND `vlan_id` = ? and `device_id` = ?',
-                    array($entry['port_id'], $entry['mac_address'], $entry['vlan_id'], $entry['device_id'])
-                );
-                echo '-';
-        }
         echo PHP_EOL;
     }
+
+    // Delete old entries from the database
+    foreach ($existing_fdbs as $vlan_id => $entries) {
+        foreach ($entries as $entry) {
+            dbDelete(
+                'ports_fdb',
+                '`port_id` = ? AND `mac_address` = ? AND `vlan_id` = ? and `device_id` = ?',
+                array($entry['port_id'], $entry['mac_address'], $entry['vlan_id'], $entry['device_id'])
+            );
+            d_echo("Deleting: {$entry['mac_address']}\n", '-');
+        }
+    }
 }
-unset($existing_fdbs, $portid_dict, $vlans_dict);
+
+unset(
+    $vlan_entry,
+    $vlans_by_id,
+    $existing_fdbs,
+    $portid_dict,
+    $vlans_dict,
+    $insert,
+    $sql_result,
+    $vlans,
+    $port,
+    $fdbPort_table,
+    $entries
+);
