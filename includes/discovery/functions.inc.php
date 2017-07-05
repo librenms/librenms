@@ -1052,46 +1052,32 @@ function ignore_storage($descr)
 /**
  * @param $value
  * @param $data
- * @param $options
+ * @param $group
  * @return bool
  */
-function can_skip_sensor($value, $data, $options)
+function can_skip_sensor($value, $data, $group)
 {
-    foreach ((array)$data['skip_values'] as $skip_value) {
+    $skip_values = array_replace((array)$group['skip_values'], (array)$data['skip_values']);
+    foreach ($skip_values as $skip_value) {
         if ($value == $skip_value) {
             return true;
         }
     }
 
-    if (isset($options['skip_values'])) {
-        if ($value == $options['skip_values']) {
-            return true;
-        }
-    }
-
-    foreach ((array)$data['skip_values_lt'] as $skip_value) {
+    $skip_values_lt = array_replace((array)$group['skip_values_lt'], (array)$data['skip_values_lt']);
+    foreach ($skip_values_lt as $skip_value) {
         if ($value < $skip_value) {
             return true;
         }
     }
 
-    if (isset($options['skip_values_lt'])) {
-        if ($value < $options['skip_values_lt']) {
-            return true;
-        }
-    }
-
-    foreach ((array)$data['skip_values_gt'] as $skip_value) {
+    $skip_values_gt = array_reduce((array)$group['skip_values_gt'], (array)$data['skip_values_gt']);
+    foreach ($skip_values_gt as $skip_value) {
         if ($value > $skip_value) {
             return true;
         }
     }
-
-    if (isset($options['skip_values_gt'])) {
-        if ($value > $options['skip_values_gt']) {
-            return true;
-        }
-    }
+    
     return false;
 }
 
