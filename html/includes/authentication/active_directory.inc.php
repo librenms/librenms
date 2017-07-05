@@ -21,8 +21,14 @@ function init_auth()
     $ad_init = false;  // this variable tracks if bind has been called so we don't call it multiple times
     $ldap_connection = @ldap_connect($config['auth_ad_url']);
 
-// disable referrals and force ldap version to 3
+    // set timeout
+    ldap_set_option(
+        $ldap_connection,
+        LDAP_OPT_NETWORK_TIMEOUT,
+        isset($config['auth_ad_timeout']) ? isset($config['auth_ad_timeout']) : 5
+    );
 
+    // disable referrals and force ldap version to 3
     ldap_set_option($ldap_connection, LDAP_OPT_REFERRALS, 0);
     ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
 }
