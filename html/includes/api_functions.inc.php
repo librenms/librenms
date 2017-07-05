@@ -51,6 +51,7 @@ function get_graph_by_port_hostname()
     $app          = \Slim\Slim::getInstance();
     $router       = $app->router()->getCurrentRoute()->getParams();
     $hostname     = $router['hostname'];
+    $device_id    = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $vars         = array();
     $vars['port'] = urldecode($router['ifname']);
     $vars['type'] = $router['type'] ?: 'port_bits';
@@ -71,7 +72,7 @@ function get_graph_by_port_hostname()
     $vars['width']  = $_GET['width'] ?: 1075;
     $vars['height'] = $_GET['height'] ?: 300;
     $auth           = '1';
-    $vars['id']     = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`hostname`=? AND `P`.`$port`=? AND `deleted` = 0 LIMIT 1", array($hostname, $vars['port']));
+    $vars['id']     = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `P`.`$port`=? AND `deleted` = 0 LIMIT 1", array($device_id, $vars['port']));
     $app->response->headers->set('Content-Type', get_image_type());
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
