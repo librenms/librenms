@@ -12,44 +12,38 @@
  */
  
  
- function opentsdb_update($device, $measurement, $tags, $fields)
-{
+ function opentsdb_update($device, $measurement, $tags, $fields) {
 
         global $config, $opentsdb;      // Gloabal Variable look config.php for enable or disable OpenTSDB
 
-        if ($config['opentsdb']['enable'] == true)    // if OpenTSDB enable
-        {
-          if ($opentsdb != true)  // if the connection is already made
-
-          {$opentsdb = fsockopen($config['opentsdb']['host'], $config['opentsdb']['port']);}
-
-          $timestamp = time();
-          $tmp_tags = "hostname=".$device['hostname'];
+       if ($config['opentsdb']['enable'] == true) {   // if OpenTSDB enable
+             if ($opentsdb != true) {  // if the connection is already made
+                $opentsdb = fsockopen($config['opentsdb']['host'], $config['opentsdb']['port']);
+              }  
+        $timestamp = time();
+        $tmp_tags = "hostname=".$device['hostname'];
         
-   /*If you want to sort your metrics by customers and gain speed when you send yous queries on grafana you need to 
-     put $config['opentsdb']['co'] == true else false */
+        /*If you want to sort your metrics by customers and gain speed when you send yous queries on grafana you need to 
+        put $config['opentsdb']['co'] == true else false */
            
-        if ($config['opentsdb']['customer'] == true)
-          {
-            $co = $device['customer'];
-            $measurement = $measurement.".".$co;   // Add Object Code
-          }
+             if ($config['opentsdb']['customer'] == true) {
+                $co = $device['customer'];
+                $measurement = $measurement.".".$co;   // Add Object Code
+             }
 
-          foreach ($tags as $k => $v)
-             {
+          foreach ($tags as $k => $v) {
               $v = str_replace(array(' ',',','='), '_', $v);
               if (!empty($v)) {
                  $tmp_tags = $tmp_tags ." ". $k ."=".$v;
-                 }
+               }
              }
 
-          foreach ($fields as $k => $v)
-             {
+          foreach ($fields as $k => $v) {
               $tmp_tags_key = $tmp_tags ." ". "key" ."=".$k;
               $line = sprintf('put net.%s %d %f %s', strtolower($measurement), $timestamp, $v, $tmp_tags_key);
               d_echo("Sending to OPenTSDB: $line\n");
               fwrite($opentsdb, $line . "\n"); // send $line into OpenTSDB
-             }
+            }
         }
 }
 
