@@ -747,9 +747,9 @@ foreach ($ports as $port) {
 
         influx_update($device, 'ports', rrd_array_filter($tags), $fields);
         graphite_update($device, 'ports|' . $ifName, $tags, $fields);
-        foreach ($fields as $k => $v) {
-        opentsdb_update($device, "port." . $k, array('ifName' => $this_port['ifName'],'ifIndex' =>  getPortRrdName($port_id)), array('key' => $v));
-        }
+           foreach ($fields as $k => $v) {
+                opentsdb_update($device, "port." . $k, array('ifName' => $this_port['ifName'],'ifIndex' =>  getPortRrdName($port_id)), array('key' => $v));
+            }
 
 
         // End Update IF-MIB
