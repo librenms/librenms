@@ -49,6 +49,7 @@ require_once $install_dir . '/includes/common.php';
 require $install_dir . '/includes/dbFacile.php';
 require $install_dir . '/includes/rrdtool.inc.php';
 require $install_dir . '/includes/influxdb.inc.php';
+require $install_dir . '/includes/opentsdb.inc.php';
 require $install_dir . '/includes/graphite.inc.php';
 require $install_dir . '/includes/datastore.inc.php';
 require $install_dir . '/includes/billing.php';
