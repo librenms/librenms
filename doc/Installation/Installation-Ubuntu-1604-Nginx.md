@@ -9,10 +9,10 @@ source: Installation/Installation-Ubuntu-1604-Nginx.md
 ```bash
 apt-get install mariadb-server mariadb-client
 systemctl restart mysql
-mysql -u root -p
+mysql -uroot -p
 ```
 
-you should now be presented with the mariadb interactive shell, edit 'password' below to be a secure password, remember this  password as it needs to be used to configure LibreNMS
+> NOTE: Please change the 'password' below to something secure.
 
 ```sql
 CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
@@ -22,33 +22,41 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-```vim /etc/mysql/mariadb.conf.d/50-server.cnf```
-
-Within the [mysqld] section please add:
-
 ```bash
+vim /etc/mysql/mariadb.conf.d/50-server.cnf`
+```
+
+Within the `[mysqld]` section please add:
+
+```
 innodb_file_per_table=1
 sql-mode=""
 lower_case_table_names=0
 ```
 
-```systemctl restart mysql```
+```bash
+systemctl restart mysql
+```
 
 ### Web Server ###
 
 #### Install / Configure Nginx
 
-`sudo apt-get install php7.0-cli php7.0-mysql php7.0-gd php7.0-snmp php-pear php7.0-curl php7.0-fpm snmp graphviz php7.0-mcrypt php7.0-json nginx-full fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git curl`
+```bash
+apt-get install php7.0-cli php7.0-mysql php7.0-gd php7.0-snmp php-pear php7.0-curl php7.0-fpm snmp graphviz php7.0-mcrypt php7.0-json nginx-full fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git curl
+```
 
 Add the timezone to the following files - ensure `date.timezone` is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  
 
 Valid examples are: `date.timezone = America/New_York`, `date.timezone = Australia/Brisbane`, `date.timezone = Etc/UTC`.
 
-`nano /etc/php/7.0/fpm/php.ini`
+```bash
+vi /etc/php/7.0/fpm/php.ini
+```
 
-`nano /etc/php/7.0/cli/php.ini`
-
-restart php to roll in changes
+```bash
+vi /etc/php/7.0/cli/php.ini
+```
 
 ```bash
 systemctl restart php7.0-fpm
@@ -77,11 +85,11 @@ mkdir rrd logs
 chmod 775 rrd
 ```
 
-```
+```bash
 vim /etc/nginx/conf.d/librenms.conf
 ```
 
-Add the following config: edit `server_name` as required - 127.0.0.1 for localhost may be appropriate
+Add the following config: edit `server_name` as required
 
 ```nginx
 server {
@@ -137,7 +145,7 @@ systemctl restart snmpd
 
 #### Cron job
 
-```
+```bash
 cp librenms.nonroot.cron /etc/cron.d/librenms
 ```
 
@@ -145,7 +153,7 @@ cp librenms.nonroot.cron /etc/cron.d/librenms
 
 LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large and be rotated out.  To rotate out the old logs you can use the provided logrotate config file:
 
-```
+```bash
 cp misc/librenms.logrotate /etc/logrotate.d/librenms
 ```
 
@@ -158,32 +166,9 @@ chown -R librenms:librenms /opt/librenms
 Run validate.php as root in the librenms directory:
 
 ```bash
-cd /opt/librenms
+cd /opt/librenms && ./validate.php
 ```
 
-```bash
-./validate.php
-```
-example output (versions may vary)
-
-```bash
-libre@ubuntu:/opt/librenms$ sudo ./validate.php
-==========================================================
-Component | Version
---------- | -------
-LibreNMS  | 2ba7093d9caaf3627a721df00a31b667525f6804
-DB Schema | 199
-PHP       | 7.0.18-0ubuntu0.16.04.1
-MySQL     | 10.0.29-MariaDB-0ubuntu0.16.04.1
-RRDTool   | 1.5.5
-SNMP      | NET-SNMP 5.7.3
-==========================================================
-
-[OK]    Database connection successful
-[OK]    Database schema correct
-libre@ubuntu:/opt/librenms$
-
-```
 That's it!  You now should be able to log in to http://librenms.example.com/.  Please note that we have not covered HTTPS setup in this example, so your LibreNMS install is not secure by default.  Please do not expose it to the public Internet unless you have configured HTTPS and taken appropriate web server hardening steps.
 
 #### Add first device
