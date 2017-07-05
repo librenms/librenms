@@ -110,15 +110,7 @@ $graphs['nfs-v3-stats'] = array(
 );
 
 $graphs['nfs-server'] = array(
-    'stats_v2',
-    'stats',
-    'stats_v4',
-    'v4ops',
     'io',
-    'fh',
-    'rc',
-    'ra',
-    'net',
     'net_tcp_conns',
     'rpc',
 );
