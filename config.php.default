@@ -8,6 +8,13 @@ $config['db_user'] = 'USERNAME';
 $config['db_pass'] = 'PASSWORD';
 $config['db_name'] = 'librenms';
 
+
+// OpenTSDB configuration
+$config['opentsdb']['enable'] = true;
+$config['opentsdb']['host'] = 'localhost';
+$config['opentsdb']['port'] = 4242;
+$config['opentsdb']['customer'] = false;  // If you don't want to sort your metrics by customers
+
 // This is the user LibreNMS will run as
 //Please ensure this user is created and has the correct permissions to your install
 $config['user'] = 'librenms';
