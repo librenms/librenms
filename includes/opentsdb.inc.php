@@ -26,8 +26,9 @@
           $timestamp = time();
           $tmp_tags = "hostname=".$device['hostname'];
         
-   /*If you want to sort you metric by customer and gain speed when you send you query on grafana you need to put 
-     $config['opentsdb']['co'] == true else false */
+   /*If you want to sort your metrics by customers and gain speed when you send yous queries on grafana you need to 
+     put $config['opentsdb']['co'] == true else false */
+           
         if ($config['opentsdb']['customer'] == true)
           {
             $co = $device['customer'];
