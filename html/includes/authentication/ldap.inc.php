@@ -1,12 +1,19 @@
 <?php
 
-$ldap_connection = @ldap_connect($config['auth_ldap_server'], $config['auth_ldap_port']);
+use LibreNMS\Exceptions\AuthenticationException;
 
-if ($config['auth_ldap_starttls'] && ($config['auth_ldap_starttls'] == 'optional' || $config['auth_ldap_starttls'] == 'require')) {
-    $tls = ldap_start_tls($ldap_connection);
-    if ($config['auth_ldap_starttls'] == 'require' && $tls === false) {
-        echo '<h2>Fatal error: LDAP TLS required but not successfully negotiated:'.ldap_error($ldap_connection).'</h2>';
-        exit;
+function init_auth()
+{
+    global $config, $ldap_connection;
+
+    $ldap_connection = @ldap_connect($config['auth_ldap_server'], $config['auth_ldap_port']);
+
+    if ($config['auth_ldap_starttls'] && ($config['auth_ldap_starttls'] == 'optional' || $config['auth_ldap_starttls'] == 'require')) {
+        $tls = ldap_start_tls($ldap_connection);
+        if ($config['auth_ldap_starttls'] == 'require' && $tls === false) {
+            echo '<h2>Fatal error: LDAP TLS required but not successfully negotiated:'.ldap_error($ldap_connection).'</h2>';
+            exit;
+        }
     }
 }
 
@@ -15,14 +22,18 @@ function authenticate($username, $password)
 {
     global $config, $ldap_connection;
 
-    if ($username && $ldap_connection) {
+    if (!$ldap_connection) {
+        throw new AuthenticationException('Unable to connect to ldap server');
+    }
+
+    if ($username) {
         if ($config['auth_ldap_version']) {
             ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, $config['auth_ldap_version']);
         }
 
         if ($password && ldap_bind($ldap_connection, $config['auth_ldap_prefix'].$username.$config['auth_ldap_suffix'], $password)) {
             if (!$config['auth_ldap_group']) {
-                return 1;
+                return true;
             } else {
                 $ldap_groups = get_group_list();
                 foreach ($ldap_groups as $ldap_group) {
@@ -33,26 +44,26 @@ function authenticate($username, $password)
                         get_membername($username)
                     );
                     if ($ldap_comparison === true) {
-                        return 1;
+                        return true;
                     }
                 }
             }
-        } elseif (!isset($password) || $password == '') {
-            echo 'A password is required';
-        } else {
-            echo ldap_error($ldap_connection);
         }
-    } else {
-        // FIXME return a warning that LDAP couldn't connect?
+
+        if (!isset($password) || $password == '') {
+            throw new AuthenticationException('A password is required');
+        }
+
+        throw new AuthenticationException(ldap_error($ldap_connection));
     }
 
-    return 0;
+    throw new AuthenticationException();
 }
 
 
 function reauthenticate($sess_id, $token)
 {
-    return 0;
+    return false;
 }
 
 

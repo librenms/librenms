@@ -1,36 +1,43 @@
 <?php
 
-if (! isset($_SESSION['username'])) {
-    $_SESSION['username'] = '';
-}
+use LibreNMS\Exceptions\AuthenticationException;
+
+function init_auth()
+{
+    global $ldap_connection, $config;
+
+    if (! isset($_SESSION['username'])) {
+        $_SESSION['username'] = '';
+    }
 
 // Disable certificate checking before connect if required
-if (isset($config['auth_ad_check_certificates']) &&
+    if (isset($config['auth_ad_check_certificates']) &&
         $config['auth_ad_check_certificates'] == 0) {
-    putenv('LDAPTLS_REQCERT=never');
-};
+        putenv('LDAPTLS_REQCERT=never');
+    };
 
 // Set up connection to LDAP server
-$ldap_connection = @ldap_connect($config['auth_ad_url']);
-if (! $ldap_connection) {
-    echo '<h2>Fatal error while connecting to AD url ' . $config['auth_ad_url'] . ': ' . ldap_error($ldap_connection) . '</h2>';
-    exit;
-}
+    $ldap_connection = @ldap_connect($config['auth_ad_url']);
+    if (! $ldap_connection) {
+        echo '<h2>Fatal error while connecting to AD url ' . $config['auth_ad_url'] . ': ' . ldap_error($ldap_connection) . '</h2>';
+        exit;
+    }
 
 // disable referrals and force ldap version to 3
-ldap_set_option($ldap_connection, LDAP_OPT_REFERRALS, 0);
-ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+    ldap_set_option($ldap_connection, LDAP_OPT_REFERRALS, 0);
+    ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
 
 // Bind to AD
-if (isset($config['auth_ad_binduser']) && isset($config['auth_ad_bindpassword'])) {
-    // With specified bind user
-    if (! ldap_bind($ldap_connection, "${config['auth_ad_binduser']}@${config['auth_ad_domain']}", "${config['auth_ad_bindpassword']}")) {
-        echo ldap_error($ldap_connection);
-    }
-} else {
-    // Anonymous
-    if (! ldap_bind($ldap_connection)) {
-        echo ldap_error($ldap_connection);
+    if (isset($config['auth_ad_binduser']) && isset($config['auth_ad_bindpassword'])) {
+        // With specified bind user
+        if (! ldap_bind($ldap_connection, "${config['auth_ad_binduser']}@${config['auth_ad_domain']}", "${config['auth_ad_bindpassword']}")) {
+            echo ldap_error($ldap_connection);
+        }
+    } else {
+        // Anonymous
+        if (! ldap_bind($ldap_connection)) {
+            echo ldap_error($ldap_connection);
+        }
     }
 }
 
@@ -47,17 +54,16 @@ function authenticate($username, $password)
         }
 
         $_SESSION['username'] = $config['http_auth_guest'];
-        return 1;
+        return true;
     }
 
-    return 0;
+    throw new AuthenticationException();
 }
 
 
 function reauthenticate($sess_id, $token)
 {
-    // not supported so return 0
-    return 0;
+    return false;
 }
 
 

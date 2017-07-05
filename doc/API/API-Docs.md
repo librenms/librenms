@@ -727,6 +727,7 @@ Input:
     - up: Only devices that are up
     - down: Only devices that are down
     - disabled: Disabled devices
+    - os: search by os type
     - mac: search by mac address
     - ipv4: search by IPv4 address
     - ipv6: search by IPv6 address (compressed or uncompressed)

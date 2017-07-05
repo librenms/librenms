@@ -321,7 +321,7 @@ The varying options after that are to support the different transports.
 
 ### Alerting
 
-[Alerting](../Extensions/Alerting.md)
+[Alerting](../Alerting/Alerting.md)
 
 ### Billing
 
@@ -430,7 +430,7 @@ Examples:
 
 ```php
 $config['good_if'][] = 'FastEthernet';
-$config['os']['ios']['good_id'][] = 'FastEthernet';
+$config['os']['ios']['good_if'][] = 'FastEthernet';
 ```
 
 `good_if` is matched against ifDescr value. This can be a bad_if value as well which would stop that port from being ignored. 
@@ -552,7 +552,7 @@ You can use this array to rewrite the description of ASes that you have discover
 [Updating](../General/Updating.md)
 
 ### IPMI
-Setup the types of IPMI protocols to test a host for and it what order.
+Setup the types of IPMI protocols to test a host for and in what order. Don't forget to install ipmitool on the monitoring host.
 
 ```php
 $config['ipmi']['type'] = array();

@@ -27,6 +27,7 @@ Within the [mysqld] section please add:
 ```bash
 innodb_file_per_table=1
 sql-mode=""
+lower_case_table_names=0
 ```
 
 ```
@@ -104,6 +105,13 @@ Add the following config:
     restorecon -RFvv /opt/librenms/logs/
     setsebool -P httpd_can_sendmail=1
     setsebool -P httpd_can_network_connect=1
+```
+
+#### Allow access through firewall
+
+```bash
+firewall-cmd --zone public --add-service http
+firewall-cmd --permanent --zone public --add-service http
 ```
 
 #### Restart Web server

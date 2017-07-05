@@ -10,7 +10,7 @@
  */
 require 'includes/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'cambium-epmp-access');
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Value                Now     \\n'";
     $rrd_options .= ' DEF:entryAttempt='.$rrdfilename.':entryAttempt:AVERAGE ';
     $rrd_options .= ' DEF:entryAccess='.$rrdfilename.':entryAccess:AVERAGE ';

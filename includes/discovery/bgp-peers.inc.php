@@ -6,7 +6,7 @@ if ($config['enable_bgp']) {
         $vrfs_lite_cisco = array(array('context_name'=>null));
     }
 
-    $bgpLocalAs = trim(snmp_walk($device, '.1.3.6.1.2.1.15.2', '-Oqvn', 'BGP4-MIB'));
+    $bgpLocalAs = trim(snmp_walk($device, '.1.3.6.1.2.1.15.2', '-Oqvn'));
 
     foreach ($vrfs_lite_cisco as $vrf) {
         $device['context_name'] = $vrf['context_name'];

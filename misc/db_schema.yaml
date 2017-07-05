@@ -426,7 +426,7 @@ devices:
     sysContact: { Field: sysContact, Type: text, 'Null': true, Default: null, Extra: '' }
     sysDescr: { Field: sysDescr, Type: text, 'Null': true, Default: null, Extra: '' }
     sysName: { Field: sysName, Type: varchar(128), 'Null': true, Default: null, Extra: '' }
-    sysObjectID: { Field: sysObjectID, Type: varchar(64), 'Null': true, Default: null, Extra: '' }
+    sysObjectID: { Field: sysObjectID, Type: varchar(128), 'Null': true, Default: null, Extra: '' }
     timeout: { Field: timeout, Type: int(11), 'Null': true, Default: null, Extra: '' }
     transport: { Field: transport, Type: varchar(16), 'Null': false, Default: udp, Extra: '' }
     type: { Field: type, Type: varchar(20), 'Null': false, Default: '', Extra: '' }
@@ -630,6 +630,7 @@ ipv4_addresses:
 ipv4_mac:
   Columns:
     context_name: { Field: context_name, Type: varchar(128), 'Null': true, Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': true, Default: null, Extra: '' }
     ipv4_address: { Field: ipv4_address, Type: varchar(32), 'Null': false, Default: null, Extra: '' }
     mac_address: { Field: mac_address, Type: varchar(32), 'Null': false, Default: null, Extra: '' }
     port_id: { Field: port_id, Type: int(11), 'Null': false, Default: null, Extra: '' }
@@ -1126,6 +1127,17 @@ ports_adsl:
     port_id: { Field: port_id, Type: int(11), 'Null': false, Default: null, Extra: '' }
   Indexes:
     interface_id: { Name: interface_id, Columns: [port_id], Unique: true, Type: BTREE }
+ports_fdb:
+  Columns:
+    device_id: { Field: device_id, Type: 'int(11) unsigned', 'Null': false, Default: null, Extra: '' }
+    mac_address: { Field: mac_address, Type: varchar(32), 'Null': false, Default: null, Extra: '' }
+    port_id: { Field: port_id, Type: 'int(11) unsigned', 'Null': false, Default: null, Extra: '' }
+    vlan_id: { Field: vlan_id, Type: 'int(11) unsigned', 'Null': false, Default: null, Extra: '' }
+  Indexes:
+    mac_address: { Name: mac_address, Columns: [mac_address], Unique: false, Type: BTREE }
+    ports_fdb_port_id_index: { Name: ports_fdb_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+    ports_fdb_device_id_index: { Name: ports_fdb_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    ports_fdb_vlan_id_index: { Name: ports_fdb_vlan_id_index, Columns: [vlan_id], Unique: false, Type: BTREE }
 ports_perms:
   Columns:
     access_level: { Field: access_level, Type: int(11), 'Null': false, Default: null, Extra: '' }
@@ -1319,6 +1331,7 @@ sensors:
     sensor_oid: { Field: sensor_oid, Type: varchar(255), 'Null': false, Default: null, Extra: '' }
     sensor_prev: { Field: sensor_prev, Type: float, 'Null': true, Default: null, Extra: '' }
     sensor_type: { Field: sensor_type, Type: varchar(255), 'Null': false, Default: null, Extra: '' }
+    user_func: { Field: user_func, Type: varchar(100), 'Null': true, Default: null, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sensor_id], Unique: true, Type: BTREE }
     sensor_host: { Name: sensor_host, Columns: [device_id], Unique: false, Type: BTREE }

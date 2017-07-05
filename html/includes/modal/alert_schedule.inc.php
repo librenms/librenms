@@ -46,17 +46,13 @@ if (is_admin() !== false) {
                     </div>
                     <div class="form-group">
                         <label for="recurring" class="col-sm-4 control-label">Recurring <strong class="text-danger">*</strong>: </label>
-                        <div class="col-sm-2">
-                            <input type="radio" class="form-control" id="recurring0" name="recurring" value="0" style="width: 20px;" checked="checked"/>
-                        </div>
-                        <div class="col-sm-2">
-                            <label class="col-sm-for="recurring0">No</label>
-                        </div>
-                        <div class="col-sm-2">
-                            <input type="radio" class="form-control" id="recurring1" name="recurring" value="1" style="width: 20px;" />
-                        </div>
-                        <div class="col-sm-2">
-                            <div style="padding-top:10px;"><label for="recurring1">Yes</label></div>
+                        <div class="col-sm-8"> 
+                            <label class="radio-inline">
+                                <input type="radio" id="recurring0" name="recurring" value="0" checked="checked"/> No
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" id="recurring1" name="recurring" value="1"/> Yes
+                            </label>
                         </div>
                     </div>
                     <div id="norecurringgroup">
@@ -117,7 +113,7 @@ if (is_admin() !== false) {
                             <input type='text' id='map-stub' name='map-stub' class='form-control'/>
                         </div>
                         <div class="col-sm-3">
-                            <button class="btn btn-primary btn-sm" type="button" name="add-map" id="add-map" value="Add">Add</button>
+                            <button class="btn btn-primary" type="button" name="add-map" id="add-map" value="Add">Add</button>
                         </div>
                     </div>
                     <div class="form-group">
@@ -152,6 +148,7 @@ $('#schedule-maintenance').on('hide.bs.modal', function (event) {
     $('#recurring_day').prop('checked', false);
     $('#norecurringgroup').show();
     $('#recurringgroup').hide();
+    $('#schedulemodal-alert').remove('');
 });
 
 $('#schedule-maintenance').on('show.bs.modal', function (event) {
@@ -240,15 +237,17 @@ $('#sched-submit').click('', function(e) {
         dataType: "json",
         success: function(data){
             if(data.status == 'ok') {
-                $("#message").html('<div class="alert alert-info">'+data.message+'</div>');
+                $("#message").html('<div id="schedulemsg" class="alert alert-info"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+'</div>');
+                window.setTimeout(function() { $('#schedulemsg').fadeOut().slideUp(); } , 5000);
                 $("#schedule-maintenance").modal('hide');
+                $("#schedulemodal-alert").remove();
                 $("#alert-schedule").bootgrid('reload');
             } else {
-                $("#response").html('<div class="alert alert-info">'+data.message+'</div>');
+                $("#response").html('<div id="schedulemodal-alert" class="alert alert-danger">'+data.message+'</div>');
             }
         },
         error: function(){
-            $("#response").html('<div class="alert alert-info">An error occurred.</div>');
+            $("#response").html('<div id="schedulemodal-alert" class="alert alert-danger">An error occurred.</div>');
         }
     });
 });

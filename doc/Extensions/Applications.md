@@ -25,6 +25,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Open Grid Scheduler](#opengridscheduler) - SNMP extend
 1. [OS Updates](#os-updates) - SNMP extend
 1. [PHP-FPM](#php-fpm) - SNMP extend
+1. [Pi-hole](#pi-hole) - SNMP extend
 1. [Postfix](#postfix) - SNMP extend
 1. [Postgres](#postgres) - SNMP extend
 1. [PowerDNS](#powerdns) - Agent
@@ -41,6 +42,9 @@ Different applications support a variety of ways collect data: by direct connect
 
 ### Apache
 Either use SNMP extend or use the agent.
+
+Note that you need to install and configure the Apache [mod_status](https://httpd.apache.org/docs/2.4/en/mod/mod_status.html) module before trying the script.
+
 ##### SNMP Extend
 1. Download the script onto the desired host (the host must be added to LibreNMS devices)
 ```
@@ -115,7 +119,10 @@ it should be.
 
 ##### SNMP Extend
 
-1: Copy the shell script, postgres, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/bind -O /etc/snmp/bind)
+1: Copy the bind shell script, to the desired host (the host must be added to LibreNMS devices)
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/bind -O /etc/snmp/bind
+```
 
 2: Make the script executable (chmod +x /etc/snmp/bind)
 
@@ -498,6 +505,24 @@ extend phpfpmsp /etc/snmp/phpfpm-sp
 
 It is worth noting that this only monitors a single pool. If you want to monitor multiple pools, this won't do it.
 
+### Pi-hole
+#### SNMP Extend
+
+1: Copy the shell script, pi-hole, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/pi-hole -O /etc/snmp/pi-hole)
+
+2: Make the script executable (chmod +x /etc/snmp/pi-hole)
+
+3: Edit your snmpd.conf file and add:
+```
+extend pi-hole /etc/snmp/pi-hole
+```
+
+4: To get all data you must get your API auth token from Pi-hole server and change the API_AUTH_KEY entry inside the snmp script.
+
+5: Restard snmpd.
+
+6: On the device page in Librenms, edit your host and check the `Pi-hole` under the Applications tab or wait for it to be auto-discovered.
+
 
 ### Postfix
 #### SNMP Extend
@@ -565,7 +590,7 @@ The web-server must be enabled, see the Recursor docs: https://doc.powerdns.com/
 `$config['apps']['powerdns-recursor']['https']` true or false, defaults to use http.
 
 #### SNMP Extend
-1: Copy the shell script, postgres, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/powerdns-recursor -O /etc/snmp/powerdns-recursor)
+1: Copy the shell script, powerdns-recursor, to the desired host (the host must be added to LibreNMS devices) (wget https://github.com/librenms/librenms-agent/raw/master/snmp/powerdns-recursor -O /etc/snmp/powerdns-recursor)
 
 2: Make the script executable (chmod +x /etc/snmp/powerdns-recursor)
 
@@ -582,16 +607,19 @@ extend powerdns-recursor /etc/snmp/powerdns-recursor
 This script uses `rec_control get-all` to collect stats.
 
 ### Proxmox
-1. Download the script onto the desired host (the host must be added to LibreNMS devices)
+1. For Proxmox 4.4+ install the libpve-apiclient-perl package
+`apt install libpve-apiclient-perl`
+
+2. Download the script onto the desired host (the host must be added to LibreNMS devices)
 `wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/proxmox -O /usr/local/bin/proxmox`
 
-2. Make the script executable: `chmod +x /usr/local/bin/proxmox`
+3. Make the script executable: `chmod +x /usr/local/bin/proxmox`
 
-3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+4. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 `extend proxmox /usr/local/bin/proxmox`
 (Note: if your snmpd doesn't run as root, you might have to invoke the script using sudo. `extend proxmox /usr/bin/sudo /usr/local/bin/proxmox`)
 
-4. Restart snmpd on your host
+5. Restart snmpd on your host
 
 
 ### Raspberry PI

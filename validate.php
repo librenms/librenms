@@ -143,8 +143,11 @@ if (isset($config['user'])) {
     $find_result = rtrim(`find $tmp_dir \! -user $tmp_user`);
     if (!empty($find_result)) {
         // This isn't just the log directory, let's print the list to the user
-        $files = explode(PHP_EOL, $find_result);
-        if (is_array($files)) {
+        $files = array_diff(explode(PHP_EOL, $find_result), array(
+            "$tmp_dir/logs/error_log",
+            "$tmp_dir/logs/access_log",
+        ));
+        if (!empty($files)) {
             print_fail(
                 "We have found some files that are owned by a different user than $tmp_user, " .
                 'this will stop you updating automatically and / or rrd files being updated causing graphs to fail.',
@@ -172,6 +175,12 @@ $strict_mode = dbFetchCell("SELECT @@global.sql_mode");
 if (str_contains($strict_mode, 'STRICT_TRANS_TABLES')) {
     //FIXME - Come back to this once other MySQL modes are fixed
     //print_fail('You have MySQL STRICT_TRANS_TABLES enabled, please disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
+}
+
+// Test for lower case table name support
+$lc_mode = dbFetchCell("SELECT @@global.lower_case_table_names");
+if ($lc_mode != 0) {
+    print_fail('You have lower_case_table_names set to 1 or true in mysql config.', 'Set lower_case_table_names=0 in your mysql config file');
 }
 
 if (empty($strict_mode) === false) {
@@ -215,6 +224,12 @@ if (is_file('misc/db_schema.yaml')) {
             $previous_column = '';
             foreach ($data['Columns'] as $column => $cdata) {
                 $cur = $current_schema[$table]['Columns'][$column];
+                if ($cur['Default'] == 'current_timestamp()') {
+                    $cur['Default'] = 'CURRENT_TIMESTAMP';
+                }
+                if ($cur['Extra'] == 'on update current_timestamp()') {
+                    $cur['Extra'] = 'on update CURRENT_TIMESTAMP';
+                }
                 if (empty($current_schema[$table]['Columns'][$column])) {
                     print_fail("Database: missing column ($table/$column)");
 
@@ -323,13 +338,18 @@ if ($space_check < 1) {
 
 // Check programs
 $bins = array('fping','fping6','rrdtool','snmpwalk','snmpget','snmpbulkwalk');
-$suid_bins = array('fping', 'fping6');
 foreach ($bins as $bin) {
     $cmd = rtrim(shell_exec("which {$config[$bin]} 2>/dev/null"));
     if (!$cmd) {
         print_fail("$bin location is incorrect or bin not installed. \n\tYou can also manually set the path to $bin by placing the following in config.php: \n\t\$config['$bin'] = \"/path/to/$bin\";");
-    } elseif (in_array($bin, $suid_bins) && !(fileperms($cmd) & 2048)) {
-        print_fail("$bin should be suid!", "chmod u+s $cmd");
+    } elseif (in_array($bin, array('fping', 'fping6'))) {
+        if (trim(shell_exec("which getcap 2>/dev/null"))) {
+            if (!str_contains(shell_exec("getcap $cmd"), "$cmd = cap_net_raw+ep")) {
+                print_fail("$bin should have CAP_NET_RAW!", "setcap cap_net_raw+ep $cmd");
+            }
+        } elseif (!(fileperms($cmd) & 2048)) {
+            print_fail("$bin should be suid!", "chmod u+s $cmd");
+        }
     }
 }
 

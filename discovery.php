@@ -33,7 +33,7 @@ if (isset($options['h'])) {
         $where = ' ';
         $doing = 'all';
     } elseif ($options['h'] == 'new') {
-        set_lock('new-discovery');
+        $new_discovery_lock = \LibreNMS\FileLock::lockOrDie('new-discovery');
         $where = 'AND `last_discovered` IS NULL';
         $doing = 'new';
     } elseif ($options['h']) {
@@ -118,6 +118,8 @@ if (get_lock('schema') === false) {
     require 'includes/sql-schema/update.php';
 }
 
+update_os_cache(); // will only update if needed
+
 $discovered_devices = 0;
 
 if (!empty($config['distributed_poller_group'])) {
@@ -138,8 +140,11 @@ if ($discovered_devices) {
     if ($doing === 'new') {
         // We have added a new device by this point so we might want to do some other work
         oxidized_reload_nodes();
-        release_lock('new-discovery');
     }
+}
+
+if ($doing === 'new') {
+    $new_discovery_lock->release();
 }
 
 $string = $argv[0]." $doing ".date($config['dateformat']['compact'])." - $discovered_devices devices discovered in $proctime secs";

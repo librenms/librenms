@@ -101,12 +101,16 @@ function getHostOS($device)
     $pattern = $config['install_dir'] . '/includes/definitions/*.yaml';
     foreach (glob($pattern) as $file) {
         $os = basename($file, '.yaml');
-        if (isset($config['os'][$os])) {
+        if (isset($config['os'][$os]['os'])) {
             $tmp = $config['os'][$os];
         } else {
             $tmp = Symfony\Component\Yaml\Yaml::parse(
                 file_get_contents($file)
             );
+            // pull in user overrides
+            if (isset($config['os'][$os])) {
+                $tmp = array_replace_recursive($tmp, $config['os'][$os]);
+            }
         }
         if (isset($tmp['discovery']) && is_array($tmp['discovery'])) {
             foreach ($tmp['discovery'] as $item) {
@@ -440,7 +444,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         $snmpvers = array($snmp_version);
     }
 
-    $host_unreachable_exception = new HostUnreachableException("Could not connect, please check the snmp details and snmp reachability");
+    $host_unreachable_exception = new HostUnreachableException("Could not connect to $host, please check the snmp details and snmp reachability");
     // try different snmp variables to add the device
     foreach ($snmpvers as $snmpver) {
         if ($snmpver === "v3") {
@@ -1353,22 +1357,33 @@ function first_oid_match($device, $list)
     }
 }
 
+
+/**
+ * Convert a hex ip to a human readable string
+ *
+ * @param string $hex
+ * @return string
+ */
 function hex_to_ip($hex)
 {
-    $return = "";
-    if (filter_var($hex, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && filter_var($hex, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false) {
-        $hex_exp = explode(' ', $hex);
-        foreach ($hex_exp as $item) {
-            if (!empty($item) && $item != "\"") {
-                $return .= hexdec($item).'.';
-            }
-        }
-        $return = substr($return, 0, -1);
-    } else {
-        $return = $hex;
+    $hex = str_replace(array(' ', '"'), '', $hex);
+
+    if (filter_var($hex, FILTER_VALIDATE_IP)) {
+        return $hex;
     }
-    return $return;
+
+    if (strlen($hex) == 8) {
+        return long2ip(hexdec($hex));
+    }
+
+    if (strlen($hex) == 32) {
+        $ipv6 = implode(':', str_split($hex, 4));
+        return preg_replace('/:0*([0-9a-fA-F])/', ':$1', $ipv6);
+    }
+
+    return ''; // invalid input
 }
+
 function fix_integer_value($value)
 {
     if ($value < 0) {

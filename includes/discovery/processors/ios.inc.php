@@ -32,7 +32,7 @@ if ($device['os_group'] == 'cisco' || $device['os'] == 'acsw') {
             rrd_file_rename($device, $old_name, $new_name);
 
             if (!strstr($descr, 'No') && !strstr($usage, 'No') && $descr != '') {
-                discover_processor($valid['processor'], $device, $usage_oid, $index, 'cpm', $descr, '1', $usage, $entPhysicalIndex, null);
+                discover_processor($valid['processor'], $device, $usage_oid, $index, 'cpm', ucwords($descr), '1', $usage, $entPhysicalIndex, null);
             }
         }//end if
     }//end foreach

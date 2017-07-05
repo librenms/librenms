@@ -26,7 +26,9 @@ source: Support/FAQ.md
  - [Why are some of my disks not showing?](#faq26)
  - [Why are my disks reporting an incorrect size?](#faq27)
  - [What is the Difference between Disable Device and Ignore a Device?](#faq28)
-
+ - [Why can't Normal and Global View users see Oxidized?](#faq29)
+ - [What is the Demo User for?](#faq30)
+ 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
  - [What information do you need to add a new OS?](#faq20)
@@ -88,7 +90,7 @@ If the page you are trying to load has a substantial amount of data in it then i
 The easiest way to check if all is well is to run `./validate.php` as root from within your install directory. This should give you info on why things aren't working.
 
 One other reason could be a restricted snmpd.conf file or snmp view which limits the data sent back. If you use net-snmp then we suggest using 
-the (included snmpd.conf)[https://raw.githubusercontent.com/librenms/librenms/master/snmpd.conf.example] file.
+the [included snmpd.conf](https://raw.githubusercontent.com/librenms/librenms/master/snmpd.conf.example) file.
 
 #### <a name="faq7"> How do I debug pages not loading correctly?</a>
 
@@ -287,12 +289,13 @@ Thanks for asking, sometimes it's not quite so obvious and everyone can contribu
 - Code. This is a big thing. We want this community to grow by the software developing and evolving to cater for users needs. The biggest area that people can help make this happen is by providing code support. This doesn't necessarily mean contributing code for discovering a new device:
     - Web UI, a new look and feel has been adopted but we are not finished by any stretch of the imagination. Make suggestions, find and fix bugs, update the design / layout.
     - Poller / Discovery code. Improving it (we think a lot can be done to speed things up), adding new device support and updating old ones.
-    - The LibreNMS main website, this is hosted on Git Hub like the main repo and we accept use contributions here as well :)
-- Hardware. We don't physically need it but if we are to add device support, it's made a whole lot easier with access to the kit via snmp.
-    - If you've got mibs, they are handy as well :)
+    - The LibreNMS main website, this is hosted on GitHub like the main repo and we accept use contributions here as well :)
+- Hardware. We don't physically need it but if we are to add device support, it's made a whole lot easier with access to the kit via SNMP.
+    - If you've got MIBs, they are handy as well :)
     - If you know the vendor and can get permission to use logos that's also great.
 - Bugs. Found one? We want to know about it. Most bugs are fixed after being spotted and reported by someone, I'd love to say we are amazing developers and will fix all bugs before you spot them but that's just not true.
-- Feature requests. Can't code / won't code. No worries, chuck a feature request into Git Hub with enough detail and someone will take a look. A lot of the time this might be what interests someone, they need the same feature or they just have time. Please be patient, everyone who contributes does so in their own time.
+- Feature requests. Can't code / won't code. No worries, chuck a feature request into our [community forum](https://community.librenms.org) with enough detail and someone will take a look. A lot of the time this might be what interests someone, they need the same feature or they just have time. Please be patient, everyone who contributes does so in their own time.
+- Documentation. Documentation can always be improved and every little bit helps. Not all features are currently documented or documented well, there's speeling mistakes etc. It's very easy to submit updates [through the GitHub website](https://help.github.com/articles/editing-files-in-another-user-s-repository/), no git experience needed.
 - Be nice, this is the foundation of this project. We expect everyone to be nice. People will fall out, people will disagree but please do it so in a respectable way.
 - Ask questions. Sometimes just by asking questions you prompt deeper conversations that can lead us to somewhere amazing so please never be afraid to ask a question.
 
@@ -331,3 +334,8 @@ If you want to pull any new updates provided by f0o's branch then whilst you are
 ```bash
 git pull f0o issue-1337
 ```
+### <a name="faq29"> Why can't Normal and Global View users see Oxidized?</a> 
+Configs can often contain sensitive data. Because of that only global admins can see configs.
+
+### <a name="faq30"> What is the Demo User for?</a> 
+Demo users allow full access except adding/editing users and deleting devices and can't change passwords.

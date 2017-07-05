@@ -119,6 +119,17 @@ $table_base_oids = array(
     'ifAdminStatus',
 );
 
+$hc_mappings = array(
+    'ifHCInOctets' => 'ifInOctets',
+    'ifHCOutOctets' => 'ifOutOctets',
+    'ifHCInUcastPkts' => 'ifInUcastPkts',
+    'ifHCOutUcastPkts' => 'ifOutUcastPkts',
+    'ifHCInBroadcastPkts' => 'ifInBroadcastPkts',
+    'ifHCOutBroadcastPkts' => 'ifOutBroadcastPkts',
+    'ifHCInMulticastPkts' => 'ifInMulticastPkts',
+    'ifHCOutMulticastPkts' => 'ifOutMulticastPkts',
+);
+
 $hc_oids = array(
     'ifInMulticastPkts',
     'ifInBroadcastPkts',
@@ -199,7 +210,8 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
             $port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $port_stats, 'IF-MIB');
         }
         $hc_test = array_slice($port_stats, 0, 1);
-        if (!isset($hc_test[0]['ifHCInOctets']) && !is_numeric($hc_test[0]['ifHCInOctets'])) {
+        if ((!isset($hc_test[0]['ifHCInOctets']) && !is_numeric($hc_test[0]['ifHCInOctets'])) ||
+            ((!isset($hc_test[0]['ifHighSpeed']) && !is_numeric($hc_test[0]['ifHighSpeed'])))) {
             $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB', null, '-OQUst');
         } else {
             foreach ($ifmib_oids as $oid) {
@@ -430,17 +442,8 @@ foreach ($ports as $port) {
             $port['update']['poll_period'] = $polled_period;
         }
 
-        // use HC values if they are available
-        if (!isset($this_port['ifInOctets'])) {
-            echo "HC ";
-            $this_port['ifInOctets'] = $this_port['ifHCInOctets'];
-            $this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
-            $this_port['ifInUcastPkts'] = $this_port['ifHCInUcastPkts'];
-            $this_port['ifOutUcastPkts'] = $this_port['ifHCOutUcastPkts'];
-        }
-
         if ($device['os'] === 'airos-af' && $port['ifAlias'] === 'eth0') {
-            $airos_stats = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.41112.1.3.3.1', $airos_stats, 'UBNT-AirFIBER-MIB');
+            $airos_stats = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.41112.1.3.3.1', array(), 'UBNT-AirFIBER-MIB');
             $this_port['ifInOctets'] = $airos_stats[1]['rxOctetsOK'];
             $this_port['ifOutOctets'] = $airos_stats[1]['txOctetsOK'];
             $this_port['ifInErrors'] = $airos_stats[1]['rxErroredFrames'];
@@ -469,16 +472,18 @@ foreach ($ports as $port) {
             $this_port['ifPhysAddress']              = zeropad($a_a).zeropad($a_b).zeropad($a_c).zeropad($a_d).zeropad($a_e).zeropad($a_f);
         }
 
-        if (is_numeric($this_port['ifHCInBroadcastPkts']) && is_numeric($this_port['ifHCOutBroadcastPkts']) && is_numeric($this_port['ifHCInMulticastPkts']) && is_numeric($this_port['ifHCOutMulticastPkts']) && $device['os'] !== 'ciscosb') {
-            echo 'HC ';
-            $this_port['ifInBroadcastPkts']  = $this_port['ifHCInBroadcastPkts'];
-            $this_port['ifOutBroadcastPkts'] = $this_port['ifHCOutBroadcastPkts'];
-            $this_port['ifInMulticastPkts']  = $this_port['ifHCInMulticastPkts'];
-            $this_port['ifOutMulticastPkts'] = $this_port['ifHCOutMulticastPkts'];
+        // use HC values if they are available
+        foreach ($hc_mappings as $hc_oid => $if_oid) {
+            if (isset($this_port[$hc_oid]) && $this_port[$hc_oid]) {
+                d_echo("$hc_oid ");
+                $this_port[$if_oid] = $this_port[$hc_oid];
+            } else {
+                d_echo("$if_oid ");
+            }
         }
 
         if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {
-            d_echo('HighSpeed ');
+            d_echo('ifHighSpeed ');
             $this_port['ifSpeed'] = ($this_port['ifHighSpeed'] * 1000000);
         } elseif (isset($this_port['ifSpeed']) && is_numeric($this_port['ifSpeed'])) {
             d_echo('ifSpeed ');

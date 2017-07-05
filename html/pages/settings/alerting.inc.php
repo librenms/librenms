@@ -269,6 +269,10 @@ $general_conf = array(
           'descr'              => 'Issue alerts to read only users',
           'type'               => 'checkbox',
     ),
+    array('name'               => 'alert.users',
+        'descr'                => 'Issue alerts to normal users',
+        'type'                 => 'checkbox',
+    ),
     array('name'               => 'alert.syscontact',
           'descr'              => 'Issue alerts to sysContact',
           'type'               => 'checkbox',
@@ -1342,6 +1346,58 @@ echo '
                         <label for="syslog_facility" class="col-sm-4 control-label">Syslog Facility </label>
                         <div class="col-sm-4">
                             <input id="syslog_facility" class="form-control" type="text" name="global-config-input" value="'.$syslog_facility['config_value'].'" data-config_id="'.$syslog_facility['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>';
+$es_host     = get_config_by_name('alert.transports.elasticsearch.es_host');
+$es_port    = get_config_by_name('alert.transports.elasticsearch.es_port');
+$es_index    = get_config_by_name('alert.transports.elasticsearch.es_index');
+$es_proxy   = get_config_by_name('alert.transports.elasticsearch.es_proxy');
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#es_transport_expand"><i class="fa fa-caret-down"></i> Elasticsearch transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="elasticsearch" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="es_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="es_host" class="col-sm-4 control-label">Elasticsearch Host </label>
+                        <div class="col-sm-4">
+                            <input id="es_host" class="form-control" type="text" name="global-config-input" value="'.$es_host['config_value'].'" data-config_id="'.$es_host['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="es_port" class="col-sm-4 control-label">Elasticsearch Port </label>
+                        <div class="col-sm-4">
+                            <input id="es_port" class="form-control" type="text" name="global-config-input" value="'.$es_port['config_value'].'" data-config_id="'.$es_port['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="es_index" class="col-sm-4 control-label">Elasticsearch Index Pattern </label>
+                        <div class="col-sm-4">
+                            <input id="es_index" class="form-control" type="text" name="global-config-input" value="'.$es_index['config_value'].'" data-config_id="'.$es_index['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="es_proxy" class="col-sm-4 control-label">Use proxy if configured? </label>
+                        <div class="col-sm-4">
+                            <input id="es_proxy" type="checkbox" name="global-config-check" '.$es_proxy['config_value'].' data-on-text="Yes" data-off-text="No" data-size="small" data-config_id="'.$es_proxy['config_id'].'">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>

@@ -1,0 +1,403 @@
+NETGEAR-PFC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, 
+    Integer32, Unsigned32                FROM SNMPv2-SMI
+    RowStatus, MacAddress                FROM SNMPv2-TC
+    InterfaceIndex                       FROM IF-MIB
+    lb6m                             FROM QUANTA-LB6M-REF-MIB;
+
+    fastPathPFC MODULE-IDENTITY
+        LAST-UPDATED "201101260000Z" -- 26 January 2011 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The MIB definitions Priority based Flow Control Feature."
+
+      -- Revision history.
+    REVISION
+        "201101260000Z" -- 26 January 2011 12:00:00 GMT
+    DESCRIPTION
+        "Postal address updated."
+    REVISION
+        "200905220000Z"  -- 22 May 2009 12:00:00 GMT
+    DESCRIPTION
+        "Initial version."
+       
+    ::= { lb6m 47 }
+
+--*********************************************************************
+--   agentPfcCfgGroup
+--*********************************************************************
+agentPfcCfgGroup OBJECT IDENTIFIER ::= { fastPathPFC 1 }
+
+--*********************************************************************
+--   agentPfcTable
+--   PFC Profile Configuration table (per-interface)
+--*********************************************************************
+    agentPfcTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentPfcEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table providing configuration of PFC Profile per interface."
+
+         ::= { agentPfcCfgGroup 1 }
+
+    agentPfcEntry OBJECT-TYPE
+         SYNTAX      AgentPfcEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "PFC Profile configuration for a port."
+         INDEX   { agentPfcIntfIndex }
+         ::= { agentPfcTable 1 }
+
+    AgentPfcEntry::=
+         SEQUENCE {
+            agentPfcIntfIndex
+                InterfaceIndex,
+            agentPfcIntfAdminMode
+                INTEGER,
+            agentPfcIntfPfcStatus
+                INTEGER,
+            agentPfcTotalIntfPfcFramesRx
+                Unsigned32,                
+            agentPfcTotalIntfPfcFramesTx
+                Unsigned32,
+            agentPfcIntfLinkDelayAllowance
+                Unsigned32,
+            agentPfcIntfAdvWilling
+                INTEGER,
+            agentPfcIntfPeerDetected
+                INTEGER,
+            agentPfcIntfPeerMacAddr
+                MacAddress,
+            agentPfcIntfPeerWilling
+                INTEGER,
+            agentPfcIntfPeerMBCStatus
+                INTEGER,
+            agentPfcIntfPeerCapability
+                Unsigned32,
+            agentPfcIntfPeerCfgCompatible
+                INTEGER,
+            agentPfcIntfPeerCompatibleCfgCount
+                Unsigned32,
+            agentPfcIntfPeerIncompatibleCfgCount
+                Unsigned32
+         }
+
+    agentPfcIntfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndex
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "This is a unique index for an entry in the
+                     agentPfcTable. A non-zero value indicates
+                     the ifIndex for the corresponding interface entry
+                     in the ifTable."
+
+         ::= { agentPfcEntry 1 }
+
+    agentPfcIntfAdminMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                       }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables/disables PFC profile on an interface."
+         DEFVAL { 2 }
+
+         ::= { agentPfcEntry 2 }
+
+    agentPfcIntfPfcStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       active(1),
+                       inactive(2)
+                       }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Shows the operational-status of PFC on an interface."
+         DEFVAL { 2 }
+
+         ::= { agentPfcEntry 3 }
+
+    agentPfcTotalIntfPfcFramesRx OBJECT-TYPE
+         SYNTAX      Unsigned32 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Total Received PFC Frames on this interface."
+
+         ::= { agentPfcEntry 4 }
+         
+    agentPfcTotalIntfPfcFramesTx OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Total Transmitted PFC Frames on this interface."
+
+         ::= { agentPfcEntry 5 }
+
+    agentPfcIntfLinkDelayAllowance OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indicates the Link Delay Allowance on this interface, measured in bit times."
+
+         ::= { agentPfcEntry 6 }
+
+    agentPfcIntfAdvWilling OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       willing(1),
+                       unwilling(2)
+                       }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indicates if the interface is willing to accept PFC configuration via DCBX."
+
+         ::= { agentPfcEntry 7 }
+
+    agentPfcIntfPeerDetected OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       detected(1),
+                       absent(2)
+                       }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indicates if the peer has been detected via DCBX."
+
+         ::= { agentPfcEntry 8 }
+
+    agentPfcIntfPeerMacAddr OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "MAC address of the peer detected via DCBX. If there is no peer, this will be a null MAC address."
+
+         ::= { agentPfcEntry 9 }
+
+    agentPfcIntfPeerWilling OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       absent(1),
+                       willing(2),
+                       unwilling(3)
+                       }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indicates if the peer is willing to accept PFC configuration via DCBX."
+
+         ::= { agentPfcEntry 10 }
+
+    agentPfcIntfPeerMBCStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       absent(1),
+                       true(2),
+                       false(3)
+                       }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indicates if the peer has MACSEC bypass capability."
+
+         ::= { agentPfcEntry 11 }
+
+    agentPfcIntfPeerCapability OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indicates the number of no-drop priorities supported by the peer. If there is no peer, this will be zero."
+
+         ::= { agentPfcEntry 12 }
+
+    agentPfcIntfPeerCfgCompatible OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       absent(1),
+                       true(2),
+                       false(3)
+                       }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indicates if the peer's PFC configuration is compatible."
+
+         ::= { agentPfcEntry 13 }
+
+    agentPfcIntfPeerCompatibleCfgCount OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indicates the number of compatible PFC configurations received from the peer.
+                      Does not count duplicate configurations."
+
+         ::= { agentPfcEntry 14 }
+
+    agentPfcIntfPeerIncompatibleCfgCount OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indicates the number of incompatible PFC configurations received from the peer."
+
+         ::= { agentPfcEntry 15 }
+
+--*********************************************************************
+--   agentPfcActionTable
+--   PFC Priority and Action Mappings Configuration table (per-interface)
+--*********************************************************************
+    agentPfcActionTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentPfcActionEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table providing priority and action mappings configuration of PFC."
+
+         ::= { agentPfcCfgGroup 2 }
+
+    agentPfcActionEntry OBJECT-TYPE
+         SYNTAX      AgentPfcActionEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "PFC Action Profile configuration for a port."
+         INDEX   { agentPfcIntfIndex, agentPfcPriority }
+         ::= { agentPfcActionTable 1 }
+
+    AgentPfcActionEntry::=
+         SEQUENCE {
+            agentPfcPriority
+                Unsigned32,
+            agentPfcAction
+                INTEGER,
+            agentPfcOperAction
+                INTEGER,
+            agentPfcAdvAction
+                INTEGER,
+            agentPfcPeerAction
+                INTEGER
+         }
+
+    agentPfcPriority OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "This is a unique index for an entry in the
+                     agentPfcActionTable. A non-zero value indicates
+                     the CosQueue Priority."
+
+         ::= { agentPfcActionEntry 1 }
+
+    agentPfcAction   OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       drop(1),
+                       nodrop(2)
+                       }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Set Drop/No-Drop action in PFC profile for the corresponding priority."
+         DEFVAL { 1 }
+
+         ::= { agentPfcActionEntry 2 }
+         
+    agentPfcOperAction   OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       drop(1),
+                       nodrop(2)
+                       }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The operational Drop/No-Drop action in PFC profile for the corresponding priority."
+         DEFVAL { 1 }
+
+         ::= { agentPfcActionEntry 3 }
+         
+    agentPfcAdvAction   OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       drop(1),
+                       nodrop(2)
+                       }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The advertised Drop/No-Drop action in PFC profile for the corresponding priority."
+         DEFVAL { 1 }
+
+         ::= { agentPfcActionEntry 4 }
+         
+    agentPfcPeerAction   OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       absent(1),
+                       drop(2),
+                       nodrop(3)
+                       }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The peer's Drop/No-Drop action in PFC profile for the corresponding priority."
+         DEFVAL { 1 }
+
+         ::= { agentPfcActionEntry 5 }
+         
+--*********************************************************************
+--   agentPfcIntfStatsPerPriorityTable
+--   PFC Profile Statistics table (per-interface)
+--*********************************************************************
+    agentPfcIntfStatsPerPriorityTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentPfcIntfStatsPerPriorityEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table providing statistics of PFC per interface per priority."
+
+         ::= { agentPfcCfgGroup 3 }
+
+    agentPfcIntfStatsPerPriorityEntry OBJECT-TYPE
+         SYNTAX      AgentPfcIntfStatsPerPriorityEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "PFC Stats for a priority and for a port."
+         INDEX   { agentPfcIntfIndex, agentPfcPriority }
+         ::= { agentPfcIntfStatsPerPriorityTable 1 }
+
+    AgentPfcIntfStatsPerPriorityEntry::=
+         SEQUENCE {
+            agentPfcIntfPfcPriorityFramesRx
+                Unsigned32,
+            agentPfcIntfPfcPriorityFramesTx
+                Unsigned32
+         }
+
+    agentPfcIntfPfcPriorityFramesRx OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Received PFC Frames on this interface for a priority."
+
+         ::= { agentPfcIntfStatsPerPriorityEntry 1 }
+
+    agentPfcIntfPfcPriorityFramesTx OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Transmitted PFC Frames on this interface for a priority."
+
+         ::= { agentPfcIntfStatsPerPriorityEntry 2 }
+
+END
