@@ -34,8 +34,8 @@ $config['install_dir'] = $install_dir;
 chdir($install_dir);
 
 if (!getenv('TRAVIS')) {
-    require_once 'Net/IPv4.php';
-    require_once 'Net/IPv6.php';
+    include_once 'Net/IPv4.php';
+    include_once 'Net/IPv6.php';
 }
 
 # composer autoload

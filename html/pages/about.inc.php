@@ -155,7 +155,7 @@ $mysql_version   = $versions['mysql_ver'];
 $netsnmp_version = $versions['netsnmp_ver'];
 $rrdtool_version = $versions['rrdtool_ver'];
 $schema_version  = $versions['db_schema'];
-$version         = `git rev-parse --short HEAD`;
+$version         = $versions['local_ver'];
 $version_date    = $versions['local_date'];
 
 echo "
