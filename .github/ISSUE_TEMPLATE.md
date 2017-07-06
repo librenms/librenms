@@ -2,8 +2,10 @@ DO NOT DELETE THIS INFORMATION.
 
 > Please read this information carefully.
 
-GitHub issues is for  bugs, please do not post issues asking for help or how to do X, Y or Z. 
+GitHub issues is for known/validated bugs, please do not post issues asking for help or how to do X, Y or Z. 
+
 You can use our irc channel ##librenms on freenode to ask questions or our [community site](https://community.librenms.org).
+
 If you have a feature request please post this on our [community site](https://community.librenms.org/c/feature-requests).
 
 Please confirm each of the sections below by putting an `x` in the box like `[x]`.
