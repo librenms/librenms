@@ -144,9 +144,11 @@ function record_sensor_data($device, $all_sensors)
     );
 
     foreach ($all_sensors as $sensor) {
-        $class        = $sensor['sensor_class'];
-        $unit         = $supported_sensors[$class];
-        $sensor_value = $sensor['new_value'];
+        $class             = ucfirst($sensor['sensor_class']);
+        $unit              = $supported_sensors[$class];
+        $sensor_value      = $sensor['new_value'];
+        $prev_sensor_value = $sensor['sensor_current'];
+
         if ($sensor_value == -32768) {
             echo 'Invalid (-32768) ';
             $sensor_value = 0;
@@ -180,17 +182,26 @@ function record_sensor_data($device, $all_sensors)
         data_update($device, 'sensor', $tags, $fields);
 
         // FIXME also warn when crossing WARN level!
-        if ($sensor['sensor_limit_low'] != '' && $sensor['sensor_current'] > $sensor['sensor_limit_low'] && $sensor_value < $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {
+        if ($sensor['sensor_limit_low'] != '' && $prev_sensor_value > $sensor['sensor_limit_low'] && $sensor_value < $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
-            log_event(ucfirst($class) . ' ' . $sensor['sensor_descr'] . ' under threshold: ' . $sensor_value . " $unit (< " . $sensor['sensor_limit_low'] . " $unit)", $device, $class, 4, $sensor['sensor_id']);
-        } elseif ($sensor['sensor_limit'] != '' && $sensor['sensor_current'] < $sensor['sensor_limit'] && $sensor_value > $sensor['sensor_limit'] && $sensor['sensor_alert'] == 1) {
+            log_event("$class {$sensor['sensor_descr']} under threshold: $sensor_value $unit (< {$sensor['sensor_limit_low']} $unit)", $device, $class, 4, $sensor['sensor_id']);
+        } elseif ($sensor['sensor_limit'] != '' && $prev_sensor_value < $sensor['sensor_limit'] && $sensor_value > $sensor['sensor_limit'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
-            log_event(ucfirst($class) . ' ' . $sensor['sensor_descr'] . ' above threshold: ' . $sensor_value . " $unit (> " . $sensor['sensor_limit'] . " $unit)", $device, $class, 4, $sensor['sensor_id']);
+            log_event("$class {$sensor['sensor_descr']} above threshold: $sensor_value $unit (> {$sensor['sensor_limit']} $unit)", $device, $class, 4, $sensor['sensor_id']);
         }
-        if ($sensor['sensor_class'] == 'state' && $sensor['sensor_current'] != $sensor_value) {
-            log_event($class . ' sensor has changed from ' . $sensor['sensor_current'] . ' to ' . $sensor_value, $device, $class, 3, $sensor['sensor_id']);
+        if ($sensor['sensor_class'] == 'state' && $prev_sensor_value != $sensor_value) {
+            $trans = array_column(
+                dbFetchRows(
+                    "SELECT `state_translations`.`state_value`, `state_translations`.`state_descr` FROM `sensors_to_state_indexes` LEFT JOIN `state_translations` USING (`state_index_id`) WHERE `sensors_to_state_indexes`.`sensor_id`=? AND `state_translations`.`state_value` IN ($sensor_value,$prev_sensor_value)",
+                    array($sensor['sensor_id'])
+                ),
+                'state_descr',
+                'state_value'
+            );
+
+            log_event("$class sensor has changed from {$trans[$prev_sensor_value]} ($prev_sensor_value) to {$trans[$sensor_value]} ($sensor_value)", $device, $class, 3, $sensor['sensor_id']);
         }
-        dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $sensor['sensor_current'], 'lastupdate' => array('NOW()')), 'sensors', "`sensor_class` = ? AND `sensor_id` = ?", array($class,$sensor['sensor_id']));
+        dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $prev_sensor_value, 'lastupdate' => array('NOW()')), 'sensors', "`sensor_class` = ? AND `sensor_id` = ?", array($class,$sensor['sensor_id']));
     }
 }
 

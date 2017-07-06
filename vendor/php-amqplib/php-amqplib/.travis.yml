@@ -1,0 +1,12 @@
+before_script: ./bin/ci/before_build.sh
+
+language: php
+
+php:
+  - 5.3
+  - 5.4
+
+script: make test
+
+services:
+  rabbitmq
