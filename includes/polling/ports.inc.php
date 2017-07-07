@@ -11,7 +11,6 @@ $data_oids = array(
     'ifOperStatus',
     'ifMtu',
     'ifSpeed',
-    'ifHighSpeed',
     'ifType',
     'ifPhysAddress',
     'ifPromiscuousMode',
@@ -544,7 +543,7 @@ foreach ($ports as $port) {
                     $this_port['ifAlias'] = $port['ifAlias'];
                 }
             }
-            if ($oid == 'ifSpeed' || $oid == 'ifHighSpeed') {
+            if ($oid == 'ifSpeed') {
                 if ($attribs['ifSpeed:'.$port['ifName']]) {
                     $this_port[$oid] = $port[$oid];
                 }
