@@ -744,13 +744,14 @@ foreach ($ports as $port) {
         $fields['ifOutErrors_rate'] = $port['ifOutErrors_rate'];
         $fields['ifInOctets_rate'] = $port['ifInOctets_rate'];
         $fields['ifOutOctets_rate'] = $port['ifOutOctets_rate'];
+        $fields['ifInBits'] = $port['stats']['ifInBits_rate'];
+        $fields['ifOutBits']= $port['stats']['ifOutBits_rate'];
+        $fields['ifSpeed']= $this_port['ifSpeed'];
 
         influx_update($device, 'ports', rrd_array_filter($tags), $fields);
         graphite_update($device, 'ports|' . $ifName, $tags, $fields);
         opentsdb_update($device, 'port', array('ifName' => $this_port['ifName'],'ifIndex' =>  getPortRrdName($port_id)), $fields);
            
-
-
         // End Update IF-MIB
         // Update PAgP
         if ($this_port['pagpOperationMode'] || $port['pagpOperationMode']) {
