@@ -899,6 +899,12 @@ $config['default_port_association_mode'] = 'ifIndex';
 // See include/polling/ports.inc.php for a lenghty explanation.
 $config['ignore_unmapable_port'] = false;
 
+// OpenTSDB default configuration
+$config['opentsdb']['enable'] = false;
+$config['opentsdb']['host'] = '127.0.0.1';
+$config['opentsdb']['port'] = 4242;
+$config['opentsdb']['co'] = false;  // if you want to class your metric by
+
 // InfluxDB default configuration
 $config['influxdb']['timeout']      = 0;
 $config['influxdb']['verifySSL']    = false;
