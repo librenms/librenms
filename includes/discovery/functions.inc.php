@@ -1064,15 +1064,15 @@ function can_skip_sensor($value, $data, $group)
         }
     }
 
-    $skip_values_lt = array_replace((array)$group['skip_values_lt'], (array)$data['skip_values_lt']);
-    foreach ($skip_values_lt as $skip_value) {
+    $skip_values_lt = array_replace((array)$group['skip_value_lt'], (array)$data['skip_value_lt']);
+    foreach ($skip_value_lt as $skip_value) {
         if ($value < $skip_value) {
             return true;
         }
     }
 
-    $skip_values_gt = array_reduce((array)$group['skip_values_gt'], (array)$data['skip_values_gt']);
-    foreach ($skip_values_gt as $skip_value) {
+    $skip_values_gt = array_reduce((array)$group['skip_value_gt'], (array)$data['skip_value_gt']);
+    foreach ($skip_value_gt as $skip_value) {
         if ($value > $skip_value) {
             return true;
         }

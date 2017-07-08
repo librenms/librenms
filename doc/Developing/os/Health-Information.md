@@ -72,16 +72,16 @@ The only sensor we have defined here is airflow. The available options are as fo
   - `descr` (required): The visible label for this sensor. It can be a key with in the table or a static string, optionally using `{{ index }}`
   - `index` (optional): This is the index value we use to uniquely identify this sensor. `{{ $index }}` will be replaced by the `index` from the snmp walk.
   - `skip_values` (optional): This is an array of values we should skip over.
-  - `skip_values_lt` (optional): If sensor value is less than this, skip the discovery.
-  - `skip_values_gt` (optional): If sensor value is greater than this, skip the discovery.
+  - `skip_value_lt` (optional): If sensor value is less than this, skip the discovery.
+  - `skip_value_gt` (optional): If sensor value is greater than this, skip the discovery.
 
 For `options:` you have the following available:
 
   - `divisor`: This is the divisor to use against the returned `value`.
   - `multiplier`: This is the multiplier to use against the returned `value`.
   - `skip_values`: This is an array of values we should skip over.
-  - `skip_values_lt`: If sensor value is less than this, skip the discovery.
-  - `skip_values_gt`: If sensor value is greater than this, skip the discovery.
+  - `skip_value_lt`: If sensor value is less than this, skip the discovery.
+  - `skip_value_gt`: If sensor value is greater than this, skip the discovery.
 
 If you aren't able to use yaml to perform the sensor discovery, you will most likely need to use Advanced health discovery. 
 
