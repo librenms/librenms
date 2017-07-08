@@ -3,6 +3,7 @@
  * MysqlLock.php
  *
  * Create arbitrary Mysql named locks to synchronize multiple processes.  Not for locking tables.
+ * Warning! This will not work with Replication if statement based replication is enabled or Galera setups.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

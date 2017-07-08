@@ -72,7 +72,7 @@ class FileLock
 
         // try to acquire the lock each second until we reach the timeout, once if timeout is 0, forever if timeout < 0
         for ($i = 0; $i <= $timeout || $timeout < 0; $i++) {
-            if (flock($lock->handle, LOCK_EX | LOCK_NB)) {
+            if (flock($lock->handle, $timeout < 0 ? LOCK_EX : LOCK_EX | LOCK_NB)) {
                 $lock->acquired = true;
                 return $lock;
             }

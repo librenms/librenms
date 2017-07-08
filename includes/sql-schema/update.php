@@ -18,7 +18,7 @@ if (!isset($init_modules)  && php_sapi_name() == 'cli') {
     require realpath(__DIR__ . '/../..') . '/includes/init.php';
 }
 
-$schemaLock = \LibreNMS\MysqlLock::lock('schema', 30);
+$schemaLock = \LibreNMS\FileLock::lock('schema', 30);
 if ($schemaLock === false) {
     echo "Failed to acquire lock, skipping schema update\n";
     $return = 1;
