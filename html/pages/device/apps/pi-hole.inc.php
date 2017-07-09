@@ -16,8 +16,8 @@
 global $config;
 
 $graphs = array(
-    'pihole_stats' => 'Stats',
-    'pihole_queries' => 'Queries',
+    'pi-hole_stats' => 'Stats',
+    'pi-hole_queries' => 'Queries',
 );
 
 foreach ($graphs as $key => $text) {
