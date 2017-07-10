@@ -1041,7 +1041,6 @@ ports:
     ifDescr: { Field: ifDescr, Type: varchar(255), 'Null': true, Default: null, Extra: '' }
     ifDuplex: { Field: ifDuplex, Type: varchar(12), 'Null': true, Default: null, Extra: '' }
     ifHardType: { Field: ifHardType, Type: varchar(64), 'Null': true, Default: null, Extra: '' }
-    ifHighSpeed: { Field: ifHighSpeed, Type: int(11), 'Null': true, Default: null, Extra: '' }
     ifIndex: { Field: ifIndex, Type: bigint(20), 'Null': true, Default: '0', Extra: '' }
     ifInErrors: { Field: ifInErrors, Type: bigint(20), 'Null': true, Default: null, Extra: '' }
     ifInErrors_delta: { Field: ifInErrors_delta, Type: bigint(20), 'Null': true, Default: null, Extra: '' }
