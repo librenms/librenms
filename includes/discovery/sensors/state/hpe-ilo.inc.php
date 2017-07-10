@@ -99,7 +99,7 @@ foreach ($tables as $tablevalue) {
             } elseif ($state_name == 'cpqHeFltTolFanCondition') {
                 $descr = 'Fan #'.trim(snmp_get($device, ".1.3.6.1.4.1.232.6.2.6.7.1.2.$index", "-Ovqn"), '"');
             } elseif ($state_name == 'cpqHeResMem2ModuleCondition') {
-                $descr = trim(snmp_get($device, ".1.3.6.1.4.1.232.6.2.14.13.1.13.$index", "-Ovqn"),'"') .snmp_get($device, ".1.3.6.1.4.1.232.6.2.14.13.1.6.$index", "-Ovqn")/1024 . 'MB';
+                $descr = trim(snmp_get($device, ".1.3.6.1.4.1.232.6.2.14.13.1.13.$index", "-Ovqn"),'"'). ' ' .snmp_get($device, ".1.3.6.1.4.1.232.6.2.14.13.1.6.$index", "-Ovqn")/1024 . 'MB';
             }
 
             //Discover Sensors
