@@ -89,7 +89,6 @@ if (module_selected('alerts', $init_modules)) {
     require_once $install_dir . '/includes/alerts.inc.php';
 }
 
-
 // variable definitions
 require $install_dir . '/includes/cisco-entities.php';
 require $install_dir . '/includes/vmware_guestid.inc.php';
@@ -161,8 +160,9 @@ if (module_selected('web', $init_modules)) {
         $config['title_image'] = 'images/librenms_logo_'.$config['site_style'].'.svg';
     }
     require $install_dir . '/html/includes/vars.inc.php';
-
-    load_all_os(true);
+    if (module_selected('nodb', $init_modules)) {
+        load_all_os(true);
+    }
 }
 
 $console_color = new Console_Color2();
