@@ -67,7 +67,7 @@ class YamlTest extends \PHPUnit_Framework_TestCase
                     foreach ($sub_module as $sensor) {
                         $this->assertArrayHasKey('oid', $sensor, $file);
                         $this->assertArrayHasKey('num_oid', $sensor, $file);
-                        $this->assertArrayHasKey('value', $sensor, $file);
+                        $this->assertArrayHasKey('descr', $sensor, $file);
                     }
                 }
             }
