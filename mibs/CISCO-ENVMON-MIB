@@ -3,7 +3,7 @@
 --
 -- November 1994 Sandra C. Durham/Jeffrey T. Johnson
 --
--- Copyright (c) 1994-2001, 2002 by cisco Systems, Inc.
+-- Copyright (c) 1994-2003, 2004 by cisco Systems, Inc.
 -- All rights reserved.
 -- 
 -- *****************************************************************
@@ -30,7 +30,7 @@ IMPORTS
 
 
 ciscoEnvMonMIB MODULE-IDENTITY
-        LAST-UPDATED    "200311250000Z"
+        LAST-UPDATED    "200312010000Z"
         ORGANIZATION    "Cisco Systems, Inc."
         CONTACT-INFO
                 "       Cisco Systems
@@ -46,6 +46,10 @@ ciscoEnvMonMIB MODULE-IDENTITY
         DESCRIPTION
                 "The MIB module to describe the status of the Environmental
                 Monitor on those devices which support one."
+        REVISION        "200312010000Z" 
+        DESCRIPTION
+                "Added c37xx (13) and other (14) as values for 
+                 ciscoEnvMonPresent"
         REVISION        "200311250000Z"
         DESCRIPTION
                 "Added ciscoEnvMonMIBMiscNotifGroup."
@@ -158,7 +162,9 @@ ciscoEnvMonPresent OBJECT-TYPE
                         cat4000 (9),
                         c10000 (10),
                         osr7600(11),
-                        c7600  (12)
+                        c7600  (12),
+                        c37xx  (13),
+                        other  (14)
                    }
         MAX-ACCESS read-only
         STATUS     current
@@ -195,7 +201,7 @@ ciscoEnvMonVoltageStatusEntry OBJECT-TYPE
 
 CiscoEnvMonVoltageStatusEntry ::=
         SEQUENCE {
-                ciscoEnvMonVoltageStatusIndex   Integer32 (0..2147483647),
+                ciscoEnvMonVoltageStatusIndex   Integer32,
                 ciscoEnvMonVoltageStatusDescr   DisplayString,
                 ciscoEnvMonVoltageStatusValue   CiscoSignedGauge,
                 ciscoEnvMonVoltageThresholdLow  Integer32,
@@ -301,7 +307,7 @@ ciscoEnvMonTemperatureStatusEntry OBJECT-TYPE
 
 CiscoEnvMonTemperatureStatusEntry ::=
         SEQUENCE {
-                ciscoEnvMonTemperatureStatusIndex       Integer32 (0..2147483647),
+                ciscoEnvMonTemperatureStatusIndex       Integer32,
                 ciscoEnvMonTemperatureStatusDescr       DisplayString,
                 ciscoEnvMonTemperatureStatusValue       Gauge32,
                 ciscoEnvMonTemperatureThreshold         Integer32,
@@ -396,7 +402,7 @@ ciscoEnvMonFanStatusEntry OBJECT-TYPE
 
 CiscoEnvMonFanStatusEntry ::=
         SEQUENCE {
-                ciscoEnvMonFanStatusIndex       Integer32 (0..2147483647),
+                ciscoEnvMonFanStatusIndex       Integer32,
                 ciscoEnvMonFanStatusDescr       DisplayString,
                 ciscoEnvMonFanState             CiscoEnvMonState
         }
@@ -454,7 +460,7 @@ ciscoEnvMonSupplyStatusEntry OBJECT-TYPE
 
 CiscoEnvMonSupplyStatusEntry ::=
         SEQUENCE {
-                ciscoEnvMonSupplyStatusIndex    Integer32 (0..2147483647),
+                ciscoEnvMonSupplyStatusIndex    Integer32,
                 ciscoEnvMonSupplyStatusDescr    DisplayString,
                 ciscoEnvMonSupplyState          CiscoEnvMonState,
                 ciscoEnvMonSupplySource         INTEGER

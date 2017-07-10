@@ -1,11 +1,11 @@
-
 CISCO-PAGP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY,
     OBJECT-TYPE,
     Counter32,
-    Integer32
+    Integer32,
+    Unsigned32
             FROM SNMPv2-SMI
     TEXTUAL-CONVENTION,
     MacAddress,
@@ -24,7 +24,7 @@ IMPORTS
     ;
 
 ciscoPagpMIB MODULE-IDENTITY
-        LAST-UPDATED "200212130000Z"
+        LAST-UPDATED "201010200000Z"
         ORGANIZATION "Cisco Systems, Inc."
         CONTACT-INFO
             "       Cisco Systems
@@ -50,6 +50,15 @@ ciscoPagpMIB MODULE-IDENTITY
 
             You can monitor interfaces, agports, and related statistics
             through the ifStackTable and ifTable entries."
+        
+        REVISION    "201010200000Z"
+        DESCRIPTION
+                    "Added new enum values vlanIp(5) and 
+                     ipPort(6) to pagpDistributionProtocol object."
+       
+        REVISION    "200802010000Z"
+        DESCRIPTION
+                    "Added ciscoPagpRateAndTimeOutGroup."
         
         REVISION    "200212130000Z"
         DESCRIPTION "Added a new value vlanIpPort(4) to 
@@ -252,7 +261,9 @@ PagpEtherChannelEntry ::= SEQUENCE {
     pagpLearnMethod             PagpLearnMethod,
     pagpGroupIfIndex            InterfaceIndexOrZero,
     pagpDistributionProtocol    INTEGER,
-    pagpDistributionAddress     INTEGER 
+    pagpDistributionAddress     INTEGER,
+    pagpRate                    INTEGER,
+    pagpInPacketTimeout         Unsigned32
 }
 
 pagpEthcOperationMode OBJECT-TYPE
@@ -444,8 +455,10 @@ pagpDistributionProtocol OBJECT-TYPE
                           ip(1),     -- ip address
                           mac(2),    -- mac address 
                           port(3),   -- port number 
-                          vlanIpPort(4)  -- vlan number, ip address
-                                         -- and port number 
+                          vlanIpPort(4),  -- vlan number, ip address
+                                          -- and port number 
+                          vlanIp(5),  -- vlan number and ip address
+                          ipPort(6)   -- ip adddress and port number
                         }
     MAX-ACCESS  read-write
     STATUS      current
@@ -477,6 +490,32 @@ pagpDistributionAddress  OBJECT-TYPE
               result in having the same change on the other interfaces due to 
               hardware architecture."
     ::= { pagpEtherChannelEntry 10 }
+
+pagpRate     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        fast(1),
+                        normal(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Specifies the rate at which the PAgP packets are transmitted
+             on this interface.
+             fast(1)    :   PAgP packets are transmitted at the fast rate
+                            on this interface.
+             normal(2)  :   PAgP packets are transmitted at the normal rate
+                            on this interface."
+    ::= { pagpEtherChannelEntry 11 }
+
+pagpInPacketTimeout    OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    UNITS       "Seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Specifies the earliest time at which received PAgP 
+             information packets are timed out."
+    ::= { pagpEtherChannelEntry 12 }
 
 -- Per-interface PAgP Protocol Control Variables
 
@@ -908,7 +947,7 @@ ciscoPagpMIBComplianceV1R1 MODULE-COMPLIANCE
 
 ciscoPagpMIBComplianceV2R2 MODULE-COMPLIANCE
 
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
             "Conformance statement for the Fast Ethernet and Port
             Aggregation Protocol MIB."
@@ -928,6 +967,35 @@ ciscoPagpMIBComplianceV2R2 MODULE-COMPLIANCE
             "Interfaces which do not implement the Port Aggregation
             Protocol (PAgP) do not require the value pagpOn(3)."
         ::= { ciscoPagpMIBCompliances 2 }
+
+ciscoPagpMIBComplianceV3R3 MODULE-COMPLIANCE
+
+        STATUS  current
+        DESCRIPTION
+            "Conformance statement for the Fast Ethernet and Port
+            Aggregation Protocol MIB."
+
+        MODULE  -- this module
+        MANDATORY-GROUPS { ciscoPagpEthcGroupV2R2}
+
+        GROUP ciscoPagpPagpGroupV1R1
+        DESCRIPTION
+            "This group is mandatory for all interfaces which
+            implement the Port Aggregation Protocol (PAgP), and which
+            the value pagpOn(3) in the pagpEthcOperationMode variable."
+
+        OBJECT pagpEthcOperationMode
+        SYNTAX INTEGER { off(1), manual(2) }
+        DESCRIPTION
+            "Interfaces which do not implement the Port Aggregation
+            Protocol (PAgP) do not require the value pagpOn(3)."
+
+        GROUP ciscoPagpRateAndTimeOutGroup
+        DESCRIPTION
+            "This group is mandatory for platforms which support the rate
+             and timeout configuration for Port Aggregation Protocol (PAgP)
+             on capable interfaces."
+        ::= { ciscoPagpMIBCompliances 3 }
 
 -- Units of conformance
 
@@ -1000,6 +1068,20 @@ ciscoPagpEthcGroupV2R2 OBJECT-GROUP
             to configure and monitor the Fast Etherchannel
             operation and interface group-capability."
         ::= { ciscoPagpMIBGroups 3 }
+
+ciscoPagpRateAndTimeOutGroup   OBJECT-GROUP
+        OBJECTS {
+           pagpRate,
+           pagpInPacketTimeout
+        }
+        STATUS  current
+        DESCRIPTION
+            "A collection of objects which provide the information about
+             rate and timeout configuration for PAgP protocol on capable
+             interfaces."
+        ::= { ciscoPagpMIBGroups 4 }
+
 END
+
 
 
