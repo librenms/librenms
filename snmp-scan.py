@@ -60,7 +60,15 @@ THREADS = 32
 CONFIG = {}
 EXCLUDED_NETS = []
 start_time = time()
-stats = {'count': 0, Outcome.ADDED: 0, Outcome.UNPINGABLE: 0, Outcome.KNOWN: 0, Outcome.FAILED: 0, Outcome.EXCLUDED: 0, Outcome.TERMINATED: 0}
+stats = {
+    'count': 0,
+    Outcome.ADDED: 0,
+    Outcome.UNPINGABLE: 0,
+    Outcome.KNOWN: 0,
+    Outcome.FAILED: 0,
+    Outcome.EXCLUDED: 0,
+    Outcome.TERMINATED: 0
+}
 
 
 def debug(message, level=2):
@@ -81,7 +89,8 @@ def get_outcome_symbol(outcome):
 
 def handle_result(data):
     if VERBOSE_LEVEL > 0:
-        print('Scanned \033[1m{}\033[0m {}'.format(("{} ({})".format(data.hostname, data.ip) if data.hostname else data.ip), data.output))
+        print('Scanned \033[1m{}\033[0m {}'.format(
+            ("{} ({})".format(data.hostname, data.ip) if data.hostname else data.ip), data.output))
     else:
         print(get_outcome_symbol(data.outcome), end='')
         stdout.flush()
@@ -138,9 +147,12 @@ if __name__ == '__main__':
     Example: 192.168.0.0/24
     Example: 192.168.0.0/31 will be treated as an RFC3021 p-t-p network with two addresses, 192.168.0.0 and 192.168.0.1
     Example: 192.168.0.1/32 will be treated as a single host address""")
-    parser.add_argument('-t', dest='threads', type=int, help="How many IPs to scan at a time.  More will increase the scan speed, but could overload your system. Default: {}".format(THREADS))
+    parser.add_argument('-t', dest='threads', type=int,
+                        help="How many IPs to scan at a time.  More will increase the scan speed," +
+                             " but could overload your system. Default: {}".format(THREADS))
     parser.add_argument('-l', '--legend', action='store_true', help="Print the legend.")
-    parser.add_argument('-v', '--verbose', action='count', help="Show debug output. Specifying multiple times increases the verbosity.")
+    parser.add_argument('-v', '--verbose', action='count',
+                        help="Show debug output. Specifying multiple times increases the verbosity.")
 
     # compatibility arguments
     parser.add_argument('-r', dest='network', action='append', metavar='network', help=argparse.SUPPRESS)
@@ -166,7 +178,7 @@ if __name__ == '__main__':
     # Build network lists #
     #######################
     if not CONFIG.get('nets', []) and not args.network:
-        parser.error('$config[\'nets\'] is not set in config.php, you must specify a network to scan with -r')
+        parser.error('$config[\'nets\'] is not set in config.php, you must specify a network to scan')
 
     networks = []
     for net in (args.network if args.network else CONFIG.get('nets', [])):
