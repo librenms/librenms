@@ -142,7 +142,7 @@ if __name__ == '__main__':
     # Parse arguments #
     ###################
     parser = argparse.ArgumentParser(description='Scan network for snmp hosts and add them to LibreNMS.')
-    parser.add_argument('network', nargs='*', help="""CIDR noted IP-Range to scan. Can be specified multiple times
+    parser.add_argument('network', action='append', nargs='*', type=str, help="""CIDR noted IP-Range to scan. Can be specified multiple times
     This argument is only required if $config['nets'] is not set
     Example: 192.168.0.0/24
     Example: 192.168.0.0/31 will be treated as an RFC3021 p-t-p network with two addresses, 192.168.0.0 and 192.168.0.1
@@ -155,7 +155,7 @@ if __name__ == '__main__':
                         help="Show debug output. Specifying multiple times increases the verbosity.")
 
     # compatibility arguments
-    parser.add_argument('-r', dest='network', action='append', metavar='network', help=argparse.SUPPRESS)
+    parser.add_argument('-r', dest='network', action='append', help=argparse.SUPPRESS)
     parser.add_argument('-d', '-i', dest='verbose', action='count', help=argparse.SUPPRESS)
     parser.add_argument('-n', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('-b', action='store_true', help=argparse.SUPPRESS)
@@ -177,11 +177,22 @@ if __name__ == '__main__':
     #######################
     # Build network lists #
     #######################
-    if not CONFIG.get('nets', []) and not args.network:
+
+    # fix argparse awkwardness
+    netargs = []
+    for a in args.network:
+        if type(a) is list:
+            netargs += a
+        else:
+            netargs.append(a)
+
+    # make sure we have something to scan
+    if not CONFIG.get('nets', []) and not netargs:
         parser.error('$config[\'nets\'] is not set in config.php, you must specify a network to scan')
 
+    # check for valid networks
     networks = []
-    for net in (args.network if args.network else CONFIG.get('nets', [])):
+    for net in (netargs if netargs else CONFIG.get('nets', [])):
         try:
             networks.append(ip_network(u'%s' % net, True))
             debug('Network parsed: {}'.format(net), 2)
