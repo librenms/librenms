@@ -1,3 +1,3 @@
 source: Extensions/InfluxDB.md
 
-Enabling support for InfluxDB.
+Enabling support for OpenTSDB.
