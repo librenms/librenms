@@ -24,7 +24,7 @@ $config['opentsdb']['co'] = true;  // if you want to suffix your metric by Custo
 
 You can use the field 'co' to suffix your metrics if required, and Update the co field in your database with the list of your corresponding Customer and your metrics will be in the following syntax`net.measurement.co timestamps value hostname tags` else put it false and you will have this `net.measurement timestamps value hostname tags`.
 
-No credentials are needed if you don't use InfluxDB authentication.
+No credentials are needed.
 
-The same data then stored within rrd will be sent to OpenTSDB and recorded. You can then create graphs within Grafana
-to display the information you need.
+The same data than the one stored within rrd will be sent to OpenTSDB and recorded. You can then create graphs within Grafana to display the information you need.
+
