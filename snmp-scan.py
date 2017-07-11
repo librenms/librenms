@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 Scan networks for snmp hosts and add them to LibreNMS
 
@@ -21,17 +21,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 @author     Tony Murray <murraytony@gmail.com>
 """
 
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import argparse
 import json
-import socket
 from collections import namedtuple
-from enum import Enum
-from ipaddress import ip_network, ip_address
 from multiprocessing import Pool
 from os import path, chdir
+from socket import gethostbyname, gethostbyaddr, herror
 from subprocess import check_output, CalledProcessError
+from sys import stdout
 from time import time
+
+from enum import Enum
+
+try:
+    from ipaddress import ip_network, ip_address
+except:
+    print('Could not import ipaddress module.  Please install python2-ipaddress.')
+    exit(2)
 
 Result = namedtuple('Result', ['ip', 'hostname', 'outcome', 'output'])
 
@@ -74,7 +83,8 @@ def handle_result(data):
     if VERBOSE_LEVEL > 0:
         print('Scanned \033[1m{}\033[0m {}'.format(("{} ({})".format(data.hostname, data.ip) if data.hostname else data.ip), data.output))
     else:
-        print(get_outcome_symbol(data.outcome), end='', flush=True)
+        print(get_outcome_symbol(data.outcome), end='')
+        stdout.flush()
 
     stats['count'] += 0 if data.outcome == Outcome.TERMINATED else 1
     stats[data.outcome] += 1
@@ -94,10 +104,10 @@ def scan_host(ip):
 
     try:
         try:
-            tmp = socket.gethostbyaddr(ip)[0]
-            if socket.gethostbyname(tmp) == ip:  # check that forward resolves
+            tmp = gethostbyaddr(ip)[0]
+            if gethostbyname(tmp) == ip:  # check that forward resolves
                 hostname = tmp
-        except socket.herror:
+        except herror:
             pass
 
         try:
@@ -150,6 +160,7 @@ if __name__ == '__main__':
         CONFIG = json.loads(check_output(['/usr/bin/env', 'php', 'config_to_json.php']).decode())
     except CalledProcessError as e:
         parser.error("Could not execute: {}\n{}".format(' '.join(e.cmd), e.output.decode().rstrip()))
+        exit(2)
 
     #######################
     # Build network lists #
@@ -160,7 +171,7 @@ if __name__ == '__main__':
     networks = []
     for net in (args.network if args.network else CONFIG.get('nets', [])):
         try:
-            networks.append(ip_network(net, True))
+            networks.append(ip_network(u'%s' % net, True))
             debug('Network parsed: {}'.format(net), 2)
         except ValueError as e:
             parser.error('Invalid network format {}'.format(e))
