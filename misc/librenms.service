@@ -1,9 +1,9 @@
-[Unit] 
+[Unit]
 Description=LibreNMS SNMP Poller Service
-After=network.target 
+After=network.target
 
-[Service] 
-ExecStart=/opt/librenms/poller-service.py
+[Service]
+ExecStart=/opt/librenms/librenms-service.py -v
 WorkingDirectory=/opt/librenms
 User=librenms
 Group=librenms
