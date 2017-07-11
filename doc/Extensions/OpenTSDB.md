@@ -10,7 +10,7 @@ This module sends all metrics to OpenTSDB server. You need something like Grafan
 ### What you don't get
  - Pretty graphs, this is why at present you need Grafana. You need to build your own graphs within Grafana.
  
-RRD will continue to function as normally so LibreNMS itself should continue to function as normal.
+RRD will continue to function normally so LibreNMS itself should continue to function normally.
 
 for configuration in /opt/librenms/includes/defaults.inc.php.
 ### Configuration
