@@ -750,8 +750,8 @@ foreach ($ports as $port) {
 
         influx_update($device, 'ports', rrd_array_filter($tags), $fields);
         graphite_update($device, 'ports|' . $ifName, $tags, $fields);
-        opentsdb_update($device, 'port', array('ifName' => $this_port['ifName'],'ifIndex' =>  getPortRrdName($port_id)), $fields);
-           
+        opentsdb_update($device, 'port', array('ifName' => $this_port['ifName'],'ifIndex' => getPortRrdName($port_id)), $fields);
+
         // End Update IF-MIB
         // Update PAgP
         if ($this_port['pagpOperationMode'] || $port['pagpOperationMode']) {
