@@ -12,7 +12,7 @@ This module sends all metrics to OpenTSDB server. You need something like Grafan
  
 RRD will continue to function normally so LibreNMS itself should continue to function normally.
 
-for configuration in /opt/librenms/includes/defaults.inc.php.
+configuration in /opt/librenms/includes/defaults.inc.php.
 ### Configuration
 ```php
 // OpenTSDB default configuration
