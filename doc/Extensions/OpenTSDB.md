@@ -1,4 +1,4 @@
-source: Extensions/InfluxDB.md
+source: Extensions/OpenTSDB.md
 # Enabling support for OpenTSDB.
 
 This module sends all metrics to OpenTSDB server. You need something like Grafana for graphing.
@@ -22,7 +22,7 @@ $config['opentsdb']['port'] = 4242;
 $config['opentsdb']['co'] = true;  // if you want to suffix your metric by Customer identity or object code
 ```
 
-You can use the field 'co' to suffix your metrics if required, and Update the co field in your database with the list of your corresponding Customer and your metrics will be in the following syntax'net.measurement.co timestamps value hostname tags' else put it false and you will have this 'net.measurement timestamps value hostname tags'.
+You can use the field 'co' to suffix your metrics if required, and Update the co field in your database with the list of your corresponding Customer and your metrics will be in the following syntax`net.measurement.co timestamps value hostname tags` else put it false and you will have this `net.measurement timestamps value hostname tags`.
 
 No credentials are needed if you don't use InfluxDB authentication.
 
