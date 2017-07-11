@@ -1,0 +1,9 @@
+os: valere
+text: 'Eltek Valere'
+type: power
+icon: eltek
+nobulk: 1
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectId: .1.3.6.1.4.1.13858

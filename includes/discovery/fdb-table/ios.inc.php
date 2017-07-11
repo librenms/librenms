@@ -39,7 +39,7 @@ foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
                 $port_id = $portid_dict[$dot1dBasePort];
                 $vlan_id = isset($vlans_dict[$vlan_raw]) ? $vlans_dict[$vlan_raw] : 0;
                 $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
-                d_echo("vlan $vlan mac $mac_address port ($dot1dBasePort) $port_id\n");
+                d_echo("vlan $vlan_id mac $mac_address port ($dot1dBasePort) $port_id\n");
             }
 
             unset($device_vlan);
