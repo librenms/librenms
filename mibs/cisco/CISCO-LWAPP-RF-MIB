@@ -1,0 +1,1127 @@
+-- *******************************************************************
+-- CISCO-LWAPP-RF-MIB.my
+-- This MIB helps to manage the RF parameters on the controller
+-- June 2011, Srinath Candadai
+--   
+-- Copyright (c) 2011 by Cisco Systems Inc.
+-- All rights reserved.
+-- *******************************************************************
+
+CISCO-LWAPP-RF-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32,
+    Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    RowStatus,
+    TruthValue,
+    StorageType
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    CLApIfType
+        FROM CISCO-LWAPP-TC-MIB
+    cLAPGroupName
+        FROM CISCO-LWAPP-WLAN-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+ciscoLwappRFMIB MODULE-IDENTITY
+    LAST-UPDATED    "201111010000Z"
+    ORGANIZATION    "Cisco Systems Inc."
+    CONTACT-INFO
+            "Cisco Systems,
+            Customer Service
+            Postal: 170 West Tasman Drive
+            San Jose, CA  95134
+            USA
+            Tel: +1 800 553-NETS
+
+            Email: cs-wnbu-snmp@cisco.com"
+    DESCRIPTION
+        "This MIB is intended to be implemented on all those
+        devices operating as Central Controllers (CC)  that
+        terminate the Light Weight Access Point Protocol
+        tunnel from Cisco Light-weight LWAPP Access Points.
+
+        This MIB helps to manage the Radio Frequency (RF) 
+        parameters on the controller.
+
+        The relationship between CC and the LWAPP APs
+        can be depicted as follows:
+
+        +......+     +......+     +......+           +......+
+        +      +     +      +     +      +           +      +
+        +  CC  +     +  CC  +     +  CC  +           +  CC  +
+        +      +     +      +     +      +           +      +
+        +......+     +......+     +......+           +......+
+        ..            .             .                 .
+        ..            .             .                 .
+        .  .            .             .                 .
+        .    .            .             .                 .
+        .      .            .             .                 .
+        .        .            .             .                 .
+        +......+ +......+     +......+      +......+          +......+
+        +      + +      +     +      +      +      +          +      +
+        +  AP  + +  AP  +     +  AP  +      +  AP  +          +  AP  +
+        +      + +      +     +      +      +      +          +      +
+        +......+ +......+     +......+      +......+          +......+
+        .              .             .                 .
+        .  .              .             .                 .
+        .    .              .             .                 .
+        .      .              .             .                 .
+        .        .              .             .                 .
+        +......+ +......+     +......+      +......+          +......+
+        +      + +      +     +      +      +      +          +      +
+        +  MN  + +  MN  +     +  MN  +      +  MN  +          +  MN  +
+        +      + +      +     +      +      +      +          +      +
+        +......+ +......+     +......+      +......+          +......+
+
+        The LWAPP tunnel exists between the controller and
+        the APs.  The MNs communicate with the APs through
+        the protocol defined by the 802.11 standard.
+
+        LWAPP APs, upon bootup, discover and join one of the
+        controllers and the controller pushes the configuration,
+        that includes the WLAN parameters, to the LWAPP APs.
+        The APs then encapsulate all the 802.11 frames from
+        wireless clients inside LWAPP frames and forward
+        the LWAPP frames to the controller.
+
+                           GLOSSARY
+
+        Access Point ( AP )
+
+        An entity that contains an 802.11 medium access
+        control ( MAC ) and physical layer ( PHY ) interface
+        and provides access to the distribution services via
+        the wireless medium for associated clients.  
+
+        LWAPP APs encapsulate all the 802.11 frames in
+        LWAPP frames and sends it to the controller to which
+        it is logically connected to.
+
+        Central Controller ( CC )
+
+        The central entity that terminates the LWAPP protocol
+        tunnel from the LWAPP APs.  Throughout this MIB,
+        this entity also referred to as 'controller'.
+
+        Light Weight Access Point Protocol ( LWAPP ) 
+
+        This is a generic protocol that defines the
+        communication between the Access Points and the
+        controllers.
+
+        Mobile Node ( MN )
+
+        A roaming 802.11 wireless device in a wireless
+        network associated with an access point. 
+
+        802.1x
+
+        The IEEE ratified standard for enforcing port based
+        access control.  This was originally intended for
+        use on wired LANs and later extended for use in
+        802.11 WLAN environments.  This defines an
+        architecture with three main parts - a supplicant
+        (Ex. an 802.11 wireless client), an authenticator
+        (the AP) and an authentication server(a Radius
+        server).  The authenticator passes messages back
+        and forth between the supplicant and the
+        authentication server to enable the supplicant
+        get authenticated to the network.
+
+        Radio Frequency ( RF )
+               
+        Radio frequency (RF) is a rate of oscillation in the 
+        range of about 3 kHz to 300 GHz, which corresponds to 
+        the frequency of radio waves, and the 
+        alternating currents which carry radio signals.
+
+        Received Signal Strength Indicator ( RSSI )
+
+        A measure of the strength of the signal as
+        observed by the entity that received it,
+        expressed in 'dbm'.
+
+        Coverage Hole Detection ( CHD )
+
+        If clients on an Access Point are detected at low 
+        RSSI levels, it is considered a coverage hole  
+        by the Access Points. This indicates the existence 
+        of an area where clients are continually getting poor 
+        signal coverage, without having a viable location to 
+        roam to.
+ 
+
+        REFERENCE
+
+        [1] Wireless LAN Medium Access Control ( MAC ) and
+        Physical Layer ( PHY ) Specifications.
+
+        [2] Draft-obara-capwap-lwapp-00.txt, IETF Light 
+        Weight Access Point Protocol 
+
+        [3] IEEE 802.11 - The original 1 Mbit/s and 2 Mbit/s, 
+        2.4 GHz RF and IR standard."
+    REVISION        "201204270000Z"
+    DESCRIPTION
+        "Add 11n MCS rates support in profile,
+        cLRFProfileMcsDataRateTable is added for
+        this rate setting."
+    REVISION      "201201270000Z"
+    DESCRIPTION
+         " Below new objects have been added to the cLRFProfileTable
+           cLRFProfileHighDensityMaxRadioClients
+           cLRFProfileBandSelectProbeResponse
+           cLRFProfileBandSelectCycleCount
+           cLRFProfileBandSelectCycleThreshold
+           cLRFProfileBandSelectExpireSuppression
+           cLRFProfileBandSelectExpireDualBand
+           cLRFProfileBandSelectClientRSSI
+           cLRFProfileLoadBalancingWindowSize
+           cLRFProfileLoadBalancingDenialCount
+           cLRFProfileCHDDataRSSIThreshold
+           cLRFProfileCHDVoiceRSSIThreshold
+           cLRFProfileCHDClientExceptionLevel
+           cLRFProfileCHDCoverageExceptionLevel
+           cLRFProfileMulticastDataRate
+
+           One new scalar object has been added
+           cLRFProfileOutOfBoxAPConfig"
+
+    REVISION        "201111010000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { ciscoMgmt 778 }
+
+
+ciscoLwappRFMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoLwappRFMIB 0 }
+
+ciscoLwappRFMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoLwappRFMIB 1 }
+
+ciscoLwappRFMIBConform  OBJECT IDENTIFIER
+    ::= { ciscoLwappRFMIB 2 }
+
+ciscoLwappRFConfig  OBJECT IDENTIFIER
+    ::= { ciscoLwappRFMIBObjects 1 }
+
+ciscoLwappRFGlobalObjects OBJECT IDENTIFIER
+    ::= { ciscoLwappRFMIBObjects 2}
+
+CiscoLwappRFApDataRates ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This field indicates the data rates supported by an AP
+            'disabled'       
+                 The rate is not supported by the AP
+            'supported'      
+                The rate is supported by the AP
+            'mandatoryRate' 
+                The rate is required by the AP
+            'notApplicable' 
+                The rate is notApplicable."
+    SYNTAX          INTEGER {
+                        disabled(0),
+                        supported(1),
+                        mandatoryRate(2),
+                        notApplicable(3)
+                    }
+
+
+-- ********************************************************************
+-- *       AP Groups RF Profile 
+-- ********************************************************************
+
+cLAPGroupsRFProfileTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CLAPGroupsRFProfileEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table lists the mapping between an RF profile
+        and an AP group."
+    ::= { ciscoLwappRFConfig 1 }
+
+cLAPGroupsRFProfileEntry OBJECT-TYPE
+    SYNTAX          CLAPGroupsRFProfileEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing the configuration attributes
+        that affect the operation of the APs within
+        a group.
+
+        Entries can be added/deleted by explicit management 
+        action from NMS/EMS through the 'bsnAPGroupsVlanRowStatus' 
+        object in bsnAPGroupsVlanTable as defined by the 
+        AIRESPACE-WIRELESS-MIB."
+    INDEX           { cLAPGroupName } 
+    ::= { cLAPGroupsRFProfileTable 1 }
+
+CLAPGroupsRFProfileEntry ::= SEQUENCE {
+        cLAPGroups802dot11bgRFProfileName    SnmpAdminString,
+        cLAPGroups802dot11aRFProfileName     SnmpAdminString
+}
+
+cLAPGroups802dot11bgRFProfileName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the RF profile name assigned to this 
+        site on the 802.11bg radio. This profile being assigned should 
+        exist in the 'cLRFProfileTable'. To disassociate a profile with 
+        this site a string of zero length should be set."
+    ::= { cLAPGroupsRFProfileEntry 1 }
+
+cLAPGroups802dot11aRFProfileName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the RF profile name assigned to this 
+        site on the 802.11a radio. This profile being assigned should 
+        exist in the 'cLRFProfileTable'. To disassociate a profile with 
+        this site a string of zero length should be set."
+    ::= { cLAPGroupsRFProfileEntry 2 }
+
+-- ********************************************************************
+-- *       RF Profile Table
+-- ********************************************************************
+
+cLRFProfileTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CLRFProfileEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table lists the configuration for each
+        RF profile."
+    ::= { ciscoLwappRFConfig 2 }
+
+cLRFProfileEntry OBJECT-TYPE
+    SYNTAX          CLRFProfileEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing the configuration attributes
+        that affect the operation of  802.11 RF domain.
+
+        Entries can be added/deleted by explicit management 
+        action from NMS/EMS or through user console."
+    INDEX           { cLRFProfileName } 
+    ::= { cLRFProfileTable 1 }
+
+CLRFProfileEntry ::= SEQUENCE {
+        cLRFProfileName                          SnmpAdminString,
+        cLRFProfileDescr                         SnmpAdminString,
+        cLRFProfileTransmitPowerMin              Integer32,
+        cLRFProfileTransmitPowerMax              Integer32,
+        cLRFProfileTransmitPowerThresholdV1      Integer32,
+        cLRFProfileTransmitPowerThresholdV2      Integer32,
+        cLRFProfileDataRate1Mbps                 CiscoLwappRFApDataRates, 
+        cLRFProfileDataRate2Mbps                 CiscoLwappRFApDataRates,
+        cLRFProfileDataRate5AndHalfMbps          CiscoLwappRFApDataRates,
+        cLRFProfileDataRate11Mbps                CiscoLwappRFApDataRates,
+        cLRFProfileDataRate6Mbps                 CiscoLwappRFApDataRates,
+        cLRFProfileDataRate9Mbps                 CiscoLwappRFApDataRates,
+        cLRFProfileDataRate12Mbps                CiscoLwappRFApDataRates,
+        cLRFProfileDataRate18Mbps                CiscoLwappRFApDataRates,
+        cLRFProfileDataRate24Mbps                CiscoLwappRFApDataRates,
+        cLRFProfileDataRate36Mbps                CiscoLwappRFApDataRates,
+        cLRFProfileDataRate48Mbps                CiscoLwappRFApDataRates,
+        cLRFProfileDataRate54Mbps                CiscoLwappRFApDataRates,
+        cLRFProfileRadioType                     CLApIfType,
+        cLRFProfileStorageType                   StorageType,
+        cLRFProfileRowStatus                     RowStatus,
+        cLRFProfileHighDensityMaxRadioClients    Unsigned32, 
+        cLRFProfileBandSelectProbeResponse       TruthValue,
+        cLRFProfileBandSelectCycleCount          Unsigned32,
+        cLRFProfileBandSelectCycleThreshold      Unsigned32,            
+        cLRFProfileBandSelectExpireSuppression   Unsigned32, 
+        cLRFProfileBandSelectExpireDualBand      Unsigned32,
+        cLRFProfileBandSelectClientRSSI          Integer32,
+        cLRFProfileLoadBalancingWindowSize       Unsigned32,
+        cLRFProfileLoadBalancingDenialCount      Unsigned32,
+        cLRFProfileCHDDataRSSIThreshold          Integer32,
+        cLRFProfileCHDVoiceRSSIThreshold         Integer32,
+        cLRFProfileCHDClientExceptionLevel       Unsigned32, 
+        cLRFProfileCHDCoverageExceptionLevel     Unsigned32,  
+        cLRFProfileMulticastDataRate             Unsigned32, 
+        cLRFProfileHDClientTrapThreshold         Unsigned32,
+        cLRFProfileInterferenceThreshold         Unsigned32,
+        cLRFProfileNoiseThreshold                Integer32,
+        cLRFProfileUtilizationThreshold          Unsigned32,
+        cLRFProfile11nOnly                       TruthValue,
+        cLRFProfileDCAForeignContribution        TruthValue,
+        cLRFProfileDCAChannelWidth               INTEGER,
+        cLRFProfileDCAChannelList                SnmpAdminString,
+        cLRFProfileRxSopThreshold                INTEGER 
+}
+
+cLRFProfileName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..64))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object uniquely identifies a RF Profile."
+    ::= { cLRFProfileEntry 1 }
+
+cLRFProfileDescr OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies a human-readable description of the 
+        profile."
+    ::= { cLRFProfileEntry 2 }
+
+cLRFProfileTransmitPowerMin OBJECT-TYPE
+    SYNTAX          Integer32 (-10..30)
+    UNITS           "dbm"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the lower bound of transmit 
+        power value supported by an AP."  
+    DEFVAL          { -10 } 
+    ::= { cLRFProfileEntry 3 }
+
+cLRFProfileTransmitPowerMax OBJECT-TYPE
+    SYNTAX          Integer32 (-10..30)
+    UNITS           "dbm"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the uppoer bound of transmit 
+        power value supported by an AP."  
+    DEFVAL          { 30 } 
+    ::= { cLRFProfileEntry 4 }
+
+cLRFProfileTransmitPowerThresholdV1 OBJECT-TYPE
+    SYNTAX          Integer32 (-80..-50)
+    UNITS           "dbm"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the transmit power control
+        version 1 threshold for the radio resource management 
+        algorithm."
+    DEFVAL          { -70 } 
+    ::= { cLRFProfileEntry 5 }
+
+cLRFProfileTransmitPowerThresholdV2 OBJECT-TYPE
+    SYNTAX          Integer32 (-80..-50)
+    UNITS           "dbm"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the transmit power control
+        version 2 threshold for the radio resource management 
+        algorithm."
+    DEFVAL          { -67 } 
+    ::= { cLRFProfileEntry 6 }
+
+cLRFProfileDataRate1Mbps OBJECT-TYPE
+    SYNTAX          CiscoLwappRFApDataRates 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configuration for this 
+        data rate."
+    DEFVAL          { mandatoryRate } 
+    ::= { cLRFProfileEntry 7 }
+
+cLRFProfileDataRate2Mbps OBJECT-TYPE
+    SYNTAX          CiscoLwappRFApDataRates 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configuration for this 
+        data rate."
+    DEFVAL          { mandatoryRate } 
+    ::= { cLRFProfileEntry 8 }
+
+cLRFProfileDataRate5AndHalfMbps OBJECT-TYPE
+    SYNTAX          CiscoLwappRFApDataRates 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configuration for this 
+        data rate."
+    DEFVAL          { mandatoryRate }
+    ::= { cLRFProfileEntry 9 }
+
+cLRFProfileDataRate11Mbps OBJECT-TYPE
+    SYNTAX          CiscoLwappRFApDataRates 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configuration for this 
+        data rate."
+    DEFVAL          { mandatoryRate } 
+    ::= { cLRFProfileEntry 10 }
+
+cLRFProfileDataRate6Mbps OBJECT-TYPE
+    SYNTAX          CiscoLwappRFApDataRates 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configuration for this 
+        data rate."
+    DEFVAL          { supported } 
+    ::= { cLRFProfileEntry 11 }
+
+cLRFProfileDataRate9Mbps OBJECT-TYPE
+    SYNTAX          CiscoLwappRFApDataRates 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configuration for this 
+        data rate."
+    DEFVAL          { supported } 
+    ::= { cLRFProfileEntry 12 }
+
+
+cLRFProfileDataRate12Mbps OBJECT-TYPE
+    SYNTAX          CiscoLwappRFApDataRates 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configuration for this 
+        data rate."
+    DEFVAL          { supported } 
+    ::= { cLRFProfileEntry 13 }
+
+cLRFProfileDataRate18Mbps OBJECT-TYPE
+    SYNTAX          CiscoLwappRFApDataRates 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configuration for this 
+        data rate."
+    DEFVAL          { supported } 
+    ::= { cLRFProfileEntry 14 }
+
+cLRFProfileDataRate24Mbps OBJECT-TYPE
+    SYNTAX          CiscoLwappRFApDataRates 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configuration for this 
+        data rate."
+    DEFVAL          { supported } 
+    ::= { cLRFProfileEntry 15 }
+
+cLRFProfileDataRate36Mbps OBJECT-TYPE
+    SYNTAX          CiscoLwappRFApDataRates 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configuration for this 
+        data rate."
+    DEFVAL          { supported } 
+    ::= { cLRFProfileEntry 16 }
+
+cLRFProfileDataRate48Mbps OBJECT-TYPE
+    SYNTAX          CiscoLwappRFApDataRates 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configuration for this 
+        data rate."
+    DEFVAL          { supported } 
+    ::= { cLRFProfileEntry 17 }
+
+cLRFProfileDataRate54Mbps OBJECT-TYPE
+    SYNTAX          CiscoLwappRFApDataRates 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configuration for this 
+        data rate."
+    DEFVAL          { supported } 
+    ::= { cLRFProfileEntry 18 }
+
+cLRFProfileRadioType  OBJECT-TYPE
+    SYNTAX          CLApIfType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object is used to configure the radio
+         type for this profile."
+    ::= { cLRFProfileEntry 19 }
+
+cLRFProfileStorageType OBJECT-TYPE
+    SYNTAX          StorageType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object represents the storage type for this
+        conceptual row."
+    DEFVAL          { nonVolatile } 
+    ::= { cLRFProfileEntry 20 }
+ 
+cLRFProfileRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This is the status column for this row and used
+        to create and delete specific instances of rows 
+        in this table." 
+    ::= { cLRFProfileEntry 21 }
+
+cLRFProfileHighDensityMaxRadioClients OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the maximum number 
+         of clients per AP radio."
+    DEFVAL { 200 }  
+    ::= { cLRFProfileEntry 22 }
+
+cLRFProfileBandSelectProbeResponse OBJECT-TYPE
+    SYNTAX          TruthValue 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the AP's probe response 
+         with clients to verify whether client can associate
+         on both 2.4 GHz and 5Ghz spectrum.
+         When set to true, AP suppresses probe response 
+         to new clients for all SSIDs that are not being 
+         Band Select disabled."
+    DEFVAL { false } 
+    ::= { cLRFProfileEntry 23 }
+
+cLRFProfileBandSelectCycleCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the maximum 
+         number of cycles not responding." 
+    DEFVAL { 2 }  
+    ::= { cLRFProfileEntry 24 }
+
+cLRFProfileBandSelectCycleThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the cycle threshold
+         for band select."
+    DEFVAL { 200 }  
+    ::= { cLRFProfileEntry 25 }
+
+cLRFProfileBandSelectExpireSuppression OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the expire of 
+         suppression."
+    DEFVAL { 20 }  
+    ::= { cLRFProfileEntry 26 }
+
+cLRFProfileBandSelectExpireDualBand OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the expire of 
+         dual band."
+    DEFVAL { 60 } 
+    ::= { cLRFProfileEntry 27 }
+
+cLRFProfileBandSelectClientRSSI OBJECT-TYPE
+    SYNTAX          Integer32
+    UNITS           "dbm"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the minimum dBM 
+         of a client RSSI to respond to probe."
+    DEFVAL { -80 }  
+    ::= { cLRFProfileEntry 28 }
+
+cLRFProfileLoadBalancingWindowSize OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the number of
+         clients associated between APs."
+    DEFVAL { 5 } 
+    ::= { cLRFProfileEntry 29 }
+
+cLRFProfileLoadBalancingDenialCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies number of clients denial
+         with respect to AP."
+    DEFVAL { 3 } 
+    ::= { cLRFProfileEntry 30 }
+
+cLRFProfileCHDDataRSSIThreshold OBJECT-TYPE
+    SYNTAX          Integer32 
+    UNITS           "dbm"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the RSSI
+         threshold value for data packets."
+    DEFVAL { -80 }  
+    ::= { cLRFProfileEntry 31 }
+
+
+cLRFProfileCHDVoiceRSSIThreshold OBJECT-TYPE
+    SYNTAX          Integer32 
+    UNITS           "dbm"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies RSSI threshold  
+         value for voice packets."
+    DEFVAL { -80 } 
+    ::= { cLRFProfileEntry 32 }
+
+cLRFProfileCHDClientExceptionLevel OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the client minimum
+         exception level."
+    DEFVAL { 3 }  
+    ::= { cLRFProfileEntry 33 }
+
+cLRFProfileCHDCoverageExceptionLevel OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the coverage 
+         exception level."
+    DEFVAL { 25 }  
+    ::= { cLRFProfileEntry 34 }
+
+cLRFProfileMulticastDataRate OBJECT-TYPE
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the minimum 
+         multicast data rate.
+         A value 0 indicates that AP will automatically 
+         adjust data rates."
+    DEFVAL { 0 } 
+    ::= { cLRFProfileEntry 35 }
+
+cLRFProfile11nOnly OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies if 11n-client-only mode is 
+         enabled."
+    DEFVAL          {false}
+    ::= { cLRFProfileEntry 36 }
+
+cLRFProfileHDClientTrapThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the threshold number 
+         of clients per AP radio to trigger a trap.
+	 The trap ciscoLwappApClientThresholdNotify
+	 will be triggered once the count of clients
+	 on the AP radio reaches this limit. A value
+	 of zero indicates that the trap is disabled."
+    ::= { cLRFProfileEntry 37 }
+
+cLRFProfileInterferenceThreshold OBJECT-TYPE
+    SYNTAX Unsigned32(0..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "This object specifies the threshold number
+       of interference between 0 and 100 percent."
+   ::= {cLRFProfileEntry  38 }
+
+cLRFProfileNoiseThreshold OBJECT-TYPE
+    SYNTAX Integer32(-127..0)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+     "This object specifies the threshold number
+      of noise threshold between -127 and 0 dBm."
+   ::= {cLRFProfileEntry  39 }
+
+cLRFProfileUtilizationThreshold OBJECT-TYPE
+    SYNTAX Unsigned32(0..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "This object specifies the threshold number
+     of utlization threshold between 0 and 100 percent."
+   ::= {cLRFProfileEntry 40 }
+
+cLRFProfileDCAForeignContribution OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "This object specifies whether foreign interference
+    is taken into account for the DCA metrics."
+   ::= {cLRFProfileEntry 41 }
+
+cLRFProfileDCAChannelWidth OBJECT-TYPE
+    SYNTAX     INTEGER {
+                             min(1),
+                             medium(2),
+                             max(3)
+                           }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "This object specifies how the system performs DCA
+                channel width selection for the RFProfile
+                     min    - Min channel width(20Mhz) the radio supports
+                     medium - Medium channel width(40Mhz) supported by this radio.
+                     max    - Max channel width(80Mhz) supported by this radio."
+   ::= {cLRFProfileEntry 42 }
+   
+cLRFProfileDCAChannelList OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..500))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "This object specifies the 802.11 channels available to the 
+                RF Profile. A comma separated list of integers."
+   ::= {cLRFProfileEntry 43 }
+
+cLRFProfileRxSopThreshold OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        auto(0),
+                        low(1),
+                        medium(2),
+                        high(3)
+                    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "Configures the receiver start of packet threshold for the rf profile."
+    DEFVAL { auto }
+    ::= { cLRFProfileEntry 44 }
+
+
+
+--*******************************************************************
+--*     Out of Box AP config
+--*******************************************************************
+
+cLRFProfileOutOfBoxAPConfig OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the 
+         out of box AP group."
+    ::= { ciscoLwappRFGlobalObjects 1}
+
+
+cLRFProfileMcsDataRateTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CLRFProfileMcsDataRateEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the 11n MCS rates supported by
+        the RF profile, indexed by the MCS rate, ranging from 1
+        to 24, corresponding to rate MCS-0, MCS-1, ... MCS-23."
+    ::= { ciscoLwappRFConfig 3 }
+
+cLRFProfileMcsDataRateEntry OBJECT-TYPE
+    SYNTAX          CLRFProfileMcsDataRateEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing MCS date rate information applicable
+         to a particular profile."
+    INDEX           {
+                        cLRFProfileMcsName,
+                        cLRFProfileMcsRate
+                    }
+    ::= { cLRFProfileMcsDataRateTable 1 }
+
+CLRFProfileMcsDataRateEntry ::= SEQUENCE {
+    cLRFProfileMcsName          SnmpAdminString,
+    cLRFProfileMcsRate          Unsigned32,
+    cLRFProfileMcsRateSupport   TruthValue
+}
+
+cLRFProfileMcsName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..64))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+                    "This object uniquely identifies a RF Profile."
+    ::= { cLRFProfileMcsDataRateEntry 1 }
+
+cLRFProfileMcsRate OBJECT-TYPE
+   SYNTAX           Unsigned32
+   MAX-ACCESS       not-accessible
+   STATUS           current
+   DESCRIPTION
+        "This object uniquely identifies the MCS data rate
+        for a particular profile."
+   ::= { cLRFProfileMcsDataRateEntry 2 }
+
+cLRFProfileMcsRateSupport OBJECT-TYPE
+   SYNTAX           TruthValue
+   MAX-ACCESS       read-write
+   STATUS           current
+   DESCRIPTION
+        "This object is used to enable or disable the data
+        rate.  When this object is set to 'true' the MCS
+        support is enabled. When this object is set
+        to 'false' the MCS support is disabled.."
+   DEFVAL          { true }
+   ::= { cLRFProfileMcsDataRateEntry 3 }
+
+-- ********************************************************************
+-- *    Compliance statements
+-- ********************************************************************
+
+ciscoLwappRFMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoLwappRFMIBConform 1 }
+
+ciscoLwappRFMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoLwappRFMIBConform 2 }
+
+
+ciscoLwappRFMIBCompliance MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+       "The compliance statement for the SNMP entities that
+        implement the ciscoLwappRFMIB module.
+        
+        This compliance is deprecated and replaced by
+        ciscoLwappRFMIBComplianceVer1 ."
+    MODULE          -- this module
+    MANDATORY-GROUPS { ciscoLwappRFConfigGroup }
+
+    OBJECT          cLRFProfileRowStatus
+    SYNTAX          INTEGER  {
+                        active(1),
+                        createAndGo(4),
+                        destroy(6)
+                    }
+    DESCRIPTION
+        "An implementation is only required to support
+        three of the six enumerated values of the
+        RowStatus textual convention, specifically,
+        'active', 'createAndGo' and 'destroy'.
+        This compliance is deprecated and replaced 
+        by ciscoLwappRFMIBComplianceVer1."
+    ::= { ciscoLwappRFMIBCompliances 1 }
+
+ciscoLwappRFMIBComplianceVer1 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement the ciscoLwappRFMIB module."
+    MODULE          -- this module
+    MANDATORY-GROUPS { ciscoLwappRFConfigGroup, 
+                       ciscoLwappRFConfigGroup1, 
+                       ciscoLwappRFGlobalConfigGroup
+                     }
+
+    OBJECT          cLRFProfileRowStatus
+    SYNTAX          INTEGER  {
+                        active(1),
+                        createAndGo(4),
+                        destroy(6)
+                    }
+    DESCRIPTION
+        "An implementation is only required to support
+        three of the six enumerated values of the
+        RowStatus textual convention, specifically,
+        'active', 'createAndGo' and 'destroy'."
+    ::= { ciscoLwappRFMIBCompliances 2 }
+ 
+
+ciscoLwappRFMIBComplianceVer2 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement the ciscoLwappRFMIB module.
+        Added ciscoLwappRFConfigGroup2 to add object to raise
+	 trap when client count exceeds threshold and 
+	 ciscoLwappRFConfigGroup3 to address DCA settings"
+    MODULE          -- this module
+    MANDATORY-GROUPS { ciscoLwappRFConfigGroup, 
+                       ciscoLwappRFConfigGroup1, 
+                       ciscoLwappRFGlobalConfigGroup,
+                       ciscoLwappRFConfigGroup2,
+                       ciscoLwappRFConfigGroup3
+                     }
+    ::= { ciscoLwappRFMIBCompliances 3 }
+
+
+-- ********************************************************************
+-- *    Units of conformance
+-- ********************************************************************
+
+ciscoLwappRFConfigGroup OBJECT-GROUP
+    OBJECTS         { 
+                        cLAPGroups802dot11bgRFProfileName, 
+                        cLAPGroups802dot11aRFProfileName, 
+                        cLRFProfileDescr,                
+                        cLRFProfileTransmitPowerMin,    
+                        cLRFProfileTransmitPowerMax,   
+                        cLRFProfileTransmitPowerThresholdV1,  
+                        cLRFProfileTransmitPowerThresholdV2, 
+                        cLRFProfileDataRate1Mbps,           
+                        cLRFProfileDataRate2Mbps,          
+                        cLRFProfileDataRate5AndHalfMbps,  
+                        cLRFProfileDataRate11Mbps,       
+                        cLRFProfileDataRate6Mbps,       
+                        cLRFProfileDataRate9Mbps,      
+                        cLRFProfileDataRate12Mbps,    
+                        cLRFProfileDataRate18Mbps,   
+                        cLRFProfileDataRate24Mbps,  
+                        cLRFProfileDataRate36Mbps, 
+                        cLRFProfileDataRate48Mbps,
+                        cLRFProfileDataRate54Mbps,   
+                        cLRFProfileRadioType,     
+                        cLRFProfileStorageType,    
+                        cLRFProfileRowStatus,
+                        cLRFProfile11nOnly
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "This collection of objects specifies the
+        configuration of RF parameters on the controller 
+        to be passed to an LWAPP AP.This config group 
+        ciscoLwappRFConfigGroup is deprecated and replaced 
+        by ciscoLwappRFConfigGroupVer1"
+    ::= { ciscoLwappRFMIBGroups 1 }
+
+-- ********************************************************************
+-- *    Units of conformance
+-- ********************************************************************
+
+ciscoLwappRFConfigGroupVer1 OBJECT-GROUP
+    OBJECTS         { 
+                        cLAPGroups802dot11bgRFProfileName, 
+                        cLAPGroups802dot11aRFProfileName, 
+                        cLRFProfileDescr,                
+                        cLRFProfileTransmitPowerMin,    
+                        cLRFProfileTransmitPowerMax,   
+                        cLRFProfileTransmitPowerThresholdV1,  
+                        cLRFProfileTransmitPowerThresholdV2, 
+                        cLRFProfileDataRate1Mbps,           
+                        cLRFProfileDataRate2Mbps,          
+                        cLRFProfileDataRate5AndHalfMbps,  
+                        cLRFProfileDataRate11Mbps,       
+                        cLRFProfileDataRate6Mbps,       
+                        cLRFProfileDataRate9Mbps,      
+                        cLRFProfileDataRate12Mbps,    
+                        cLRFProfileDataRate18Mbps,   
+                        cLRFProfileDataRate24Mbps,  
+                        cLRFProfileDataRate36Mbps, 
+                        cLRFProfileDataRate48Mbps,
+                        cLRFProfileDataRate54Mbps,   
+                        cLRFProfileRadioType,     
+                        cLRFProfileStorageType,    
+                        cLRFProfileRowStatus,
+                        cLRFProfile11nOnly,
+                        cLRFProfileMcsName,
+                        cLRFProfileMcsRate,
+                        cLRFProfileMcsRateSupport
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects specifies the
+        configuration of RF parameters on the controller 
+        to be passed to an LWAPP AP."
+    ::= { ciscoLwappRFMIBGroups 2 }
+
+ciscoLwappRFConfigGroup1 OBJECT-GROUP
+    OBJECTS         { 
+                        cLRFProfileHighDensityMaxRadioClients,
+                        cLRFProfileBandSelectProbeResponse,
+                        cLRFProfileBandSelectCycleCount,
+                        cLRFProfileBandSelectCycleThreshold,
+                        cLRFProfileBandSelectExpireSuppression,
+                        cLRFProfileBandSelectExpireDualBand,
+                        cLRFProfileBandSelectClientRSSI,
+                        cLRFProfileLoadBalancingWindowSize,  
+                        cLRFProfileLoadBalancingDenialCount,
+                        cLRFProfileCHDDataRSSIThreshold,
+                        cLRFProfileCHDVoiceRSSIThreshold,
+                        cLRFProfileCHDClientExceptionLevel, 
+                        cLRFProfileCHDCoverageExceptionLevel, 
+                        cLRFProfileMulticastDataRate
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects specifies the
+        configuration of RF parameters on the controller 
+        to be passed to an LWAPP AP."
+    ::= { ciscoLwappRFMIBGroups 5 }
+
+ciscoLwappRFGlobalConfigGroup OBJECT-GROUP
+    OBJECTS         {   cLRFProfileOutOfBoxAPConfig }
+    STATUS          current
+    DESCRIPTION
+        "This is the RF global config parameter."
+    ::= { ciscoLwappRFMIBGroups 3 }
+
+ciscoLwappRFConfigGroup2 OBJECT-GROUP
+    OBJECTS         {  
+                       cLRFProfileHDClientTrapThreshold,
+                       cLRFProfileInterferenceThreshold,
+                       cLRFProfileNoiseThreshold,
+                       cLRFProfileUtilizationThreshold 
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configuration of Trap 
+	 threshold to be configured on the interface of an LWAPP AP."
+    ::= { ciscoLwappRFMIBGroups 4 }
+
+ciscoLwappRFConfigGroup3 OBJECT-GROUP
+    OBJECTS         {  
+                       cLRFProfileDCAForeignContribution,
+                       cLRFProfileDCAChannelWidth,
+                       cLRFProfileDCAChannelList
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configuration DCA for 
+        RF Profiles."
+    ::= { ciscoLwappRFMIBGroups 6 }
+
+
+ciscoLwappRFConfigGroup4 OBJECT-GROUP
+    OBJECTS         { cLRFProfileRxSopThreshold }
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the receiver start of packet
+        threshold for RF Profiles."
+    ::= { ciscoLwappRFMIBGroups 7 }
+END
