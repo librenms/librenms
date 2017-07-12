@@ -145,6 +145,9 @@ Further details: https://getchip.com/pages/chip
 
 #### SNMP Extend
 1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/chip.sh -O /etc/snmp/power-stat.sh
+```
 
 2. Make the script executable (chmod +x /etc/snmp/power-stat.sh)
 
