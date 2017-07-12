@@ -140,6 +140,9 @@ extend bind /etc/snmp/bind
 
 ### C.H.I.P
 
+C.H.I.P. is a $9 R8 based tiny computer ideal for small projects.  
+Further details: https://getchip.com/pages/chip
+
 #### SNMP Extend
 1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
 
