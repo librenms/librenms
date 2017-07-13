@@ -101,26 +101,23 @@ class Arubaos extends OS implements
     {
         $data = snmpwalk_cache_oid_num($this->getDevice(), $oid, array(), 'AI-AP-MIB');
 
-        $sensors = array();
-        foreach ($data as $oid => $entry) {
-            $oid_parts = explode('.', $oid);
-            $index = end($oid_parts);
-
-            if ($type == 'frequency') {
-                $current = WirelessSensor::channelToFrequency($this->decodeChannel($entry[$oid]));
-            } else {
-                $current = $entry[$oid];
-            }
-
-            $sensors[] = new WirelessSensor(
-                $type,
-                $this->getDeviceId(),
-                $oid,
-                'arubaos-iap',
-                $index,
-                sprintf($desc, $index),
-                $current
-            );
+        @@ -105,6 +105,7@@ class Arubaos extends OS implements
+         foreach ($data as $oid => $entry) {
+             $oid_parts = explode('.', $oid);
+             $index = end($oid_parts);
++            $tmp_index = "$oid.$index";
+ 
+             if ($type == 'frequency') {
+                 $current = WirelessSensor::channelToFrequency($this->decodeChannel($entry[$oid]));
+@@ -117,7 +118,7 @@ class Arubaos extends OS implements
+                 $this->getDeviceId(),
+                 $oid,
+                 'arubaos-iap',
+-                $index,
++                $tmp_index,
+                 sprintf($desc, $index),
+                 $current
+             );
         }
 
         return $sensors;
