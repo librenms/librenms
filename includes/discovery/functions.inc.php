@@ -1098,7 +1098,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
             $tmp_name = $data['oid'];
             $raw_data = $pre_cache[$tmp_name];
             foreach ($raw_data as $index => $snmp_data) {
-                $value = $snmp_data[$data['value']] ?: $snmp_data[$data['oid']];
+                $value = is_numeric($snmp_data[$data['value']]) ? $snmp_data[$data['value']] : ($snmp_data[$data['oid']] ?: false);
                 if (can_skip_sensor($value, $data, $sensor_options) === false && is_numeric($value)) {
                     $oid = $data['num_oid'] . $index;
                     if (isset($snmp_data[$data['descr']])) {
@@ -1106,8 +1106,8 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     } else {
                         $descr = str_replace('{{ $index }}', $index, $data['descr']);
                     }
-                    $divisor = $data['divisor'] ?: $sensor_options['divisor'] ?: 1;
-                    $multiplier = $data['multiplier'] ?: $sensor_options['multiplier'] ?: 1;
+                    $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
+                    $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
                     $low_limit = $data['low_limit'] ?: 'null';
                     $low_warn_limit = $data['low_warn_limit'] ?: 'null';
                     $warn_limit = $data['warn_limit'] ?: 'null';
