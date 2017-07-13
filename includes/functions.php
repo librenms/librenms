@@ -409,7 +409,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     global $config;
 
     // Test Database Exists
-    if (host_exists($host) === true) {
+    if (host_exists($host) == 1) {
         throw new HostExistsException("Already have host $host");
     }
 
@@ -722,8 +722,8 @@ function createHost(
         $device['os'] = getHostOS($device);
     }
 
-    if (host_exists($host, $snmphost)) {
-        throw new HostExistsException("Already have host $host ($snmphost)");
+    if (host_exists($host, $snmphost) == 5) {
+        throw new HostExistsException("Already have host $host ($snmphost) due to duplicate sysName");
     }
 
     $device_id = dbInsert($device, 'devices');
@@ -1520,8 +1520,9 @@ function snmpTransportToAddressFamily($transport)
  *
  * @param string $hostname The hostname to check for
  * @param string $snmphost The sysName to check
- * @return bool true if hostname already exists
- *              false if hostname doesn't exist
+ * @return int  1 if hostname already exists
+ *              5 if hostname exists via sysName
+ *              0 if hostname doesn't exist
  */
 function host_exists($hostname, $snmphost = '')
 {
