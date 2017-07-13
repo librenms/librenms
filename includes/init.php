@@ -95,7 +95,12 @@ require $install_dir . '/includes/cisco-entities.php';
 require $install_dir . '/includes/vmware_guestid.inc.php';
 require $install_dir . '/includes/defaults.inc.php';
 require $install_dir . '/includes/definitions.inc.php';
+
+// Display config.php errors instead of http 500
+$display_bak = ini_get('display_errors');
+ini_set('display_errors', 1);
 include $install_dir . '/config.php';
+ini_set('display_errors', $display_bak);
 
 // init memcached
 if ($config['memcached']['enable'] === true) {
