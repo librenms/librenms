@@ -109,6 +109,21 @@ if (is_array($oids)) {
                 } $descr = preg_replace('/[T|t]emperature[|s]/', '', $descr);
             }
 
+            if ($device['os'] == 'rittal-lcp') {
+                if ($type == 'voltage') {
+                    $divisor = 1000;
+                }
+                if ($descr == 'Temperature.Value') {
+                    $divisor = 1000;
+                }
+                if ($descr == 'System.Temperature.Value') {
+                    $divisor = 1000;
+                }
+                if ($type == 'humidity' && $current == '0') {
+                    $valid_sensor = false;
+                }
+            }
+
             // echo($descr . "|" . $index . "|" .$current . "|" . $multiplier . "|" . $divisor ."|" . $entry['entPhySensorScale'] . "|" . $entry['entPhySensorPrecision'] . "\n");
             if ($current == '-127' || ($device['os'] == 'asa' && str_contains($device['hardware'], 'sc'))) {
                 $valid_sensor = false;
