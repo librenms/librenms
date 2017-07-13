@@ -225,6 +225,10 @@ class HTMLPurifier_CSSDefinition extends HTMLPurifier_Definition
         );
         $max = $config->get('CSS.MaxImgLength');
 
+        $this->info['min-width'] =
+        $this->info['max-width'] =
+        $this->info['min-height'] =
+        $this->info['max-height'] =
         $this->info['width'] =
         $this->info['height'] =
             $max === null ?
