@@ -57,8 +57,9 @@ if ($_SESSION['userlevel'] == 11) {
                   <label for="id" class="col-sm-2 control-label">Device:</label>
                   <div class="col-sm-10">
                     <select name="id" class="form-control" id="id">
+                        <option disabled="disabled" selected="selected">Please select</option>
                     <?php
-                    foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $data) {
+                    foreach (dbFetchRows("SELECT `device_id`, `hostname` FROM `devices` ORDER BY `hostname`") as $data) {
                         echo("<option value='".$data['device_id']."'>".$data['hostname']."</option>");
                     }
 
