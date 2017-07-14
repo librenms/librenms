@@ -33,6 +33,8 @@ class MibTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Test mib file in a directory for errors
+     *
+     * @group mibs
      * @dataProvider mibDirs
      * @param $dir
      */
@@ -49,6 +51,7 @@ class MibTest extends \PHPUnit\Framework\TestCase
     /**
      * Test each mib file for errors
      *
+     * @group mibs
      * @dataProvider mibFiles
      * @param $path
      * @param $file
