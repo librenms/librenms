@@ -15,6 +15,6 @@ if ($device['os'] === 'hpmsm') {
     $descr = 'Processor';
     $usage = snmp_get($device, 'coUsInfoCpuUseNow.0', '-OQUvs', 'COLUBRIS-USAGE-INFORMATION-MIB', 'hpmsm');
     if (is_numeric($usage)) {
-        discover_processor($valid['processor'], $device, 'COLUBRIS-USAGE-INFORMATION-MIB::coUsInfoCpuUseNow.0', '0', 'hpmsm', $descr, '1', $usage);
+        discover_processor($valid['processor'], $device, '.1.3.6.1.4.1.8744.5.21.1.1.5.0', '0', 'hpmsm', $descr, '1', $usage);
     }
 }
