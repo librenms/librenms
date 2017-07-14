@@ -1,5 +1,5 @@
 source: Installation/Installation-Ubuntu-1604-Nginx.md
-> NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
+> NOTE: These instructions assume you are the **root** user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
 
 ### DB Server ###
 
@@ -12,6 +12,8 @@ systemctl restart mysql
 mysql -uroot -p
 ```
 
+> NOTE: Please change the 'password' below to something secure.
+
 ```sql
 CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
@@ -20,25 +22,41 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-`vim /etc/mysql/mariadb.conf.d/50-server.cnf`
-
-Within the [mysqld] section please add:
-
 ```bash
+vim /etc/mysql/mariadb.conf.d/50-server.cnf`
+```
+
+Within the `[mysqld]` section please add:
+
+```
 innodb_file_per_table=1
 sql-mode=""
 lower_case_table_names=0
 ```
 
-```systemctl restart mysql```
+```bash
+systemctl restart mysql
+```
 
 ### Web Server ###
 
 #### Install / Configure Nginx
 
-`apt-get install php7.0-cli php7.0-mysql php7.0-gd php7.0-snmp php-pear php7.0-curl php7.0-fpm snmp graphviz php7.0-mcrypt php7.0-json nginx-full fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git`
+```bash
+apt-get install php7.0-cli php7.0-mysql php7.0-gd php7.0-snmp php-pear php7.0-curl php7.0-fpm snmp graphviz php7.0-mcrypt php7.0-json nginx-full fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git curl
+```
 
-In `/etc/php/7.0/fpm/php.ini` and `/etc/php/7.0/cli/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
+Add the timezone to the following files - ensure `date.timezone` is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  
+
+Valid examples are: `date.timezone = America/New_York`, `date.timezone = Australia/Brisbane`, `date.timezone = Etc/UTC`.
+
+```bash
+vi /etc/php/7.0/fpm/php.ini
+```
+
+```bash
+vi /etc/php/7.0/cli/php.ini
+```
 
 ```bash
 systemctl restart php7.0-fpm
@@ -65,10 +83,13 @@ git clone https://github.com/librenms/librenms.git librenms
 cd /opt/librenms
 mkdir rrd logs
 chmod 775 rrd
+```
+
+```bash
 vim /etc/nginx/conf.d/librenms.conf
 ```
 
-Add the following config:
+Add the following config: edit `server_name` as required
 
 ```nginx
 server {
@@ -124,13 +145,17 @@ systemctl restart snmpd
 
 #### Cron job
 
-`cp librenms.nonroot.cron /etc/cron.d/librenms`
+```bash
+cp librenms.nonroot.cron /etc/cron.d/librenms
+```
 
 #### Copy logrotate config
 
 LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large and be rotated out.  To rotate out the old logs you can use the provided logrotate config file:
 
-    cp misc/librenms.logrotate /etc/logrotate.d/librenms
+```bash
+cp misc/librenms.logrotate /etc/logrotate.d/librenms
+```
 
 #### Final steps
 
@@ -141,8 +166,7 @@ chown -R librenms:librenms /opt/librenms
 Run validate.php as root in the librenms directory:
 
 ```bash
-cd /opt/librenms
-./validate.php
+cd /opt/librenms && ./validate.php
 ```
 
 That's it!  You now should be able to log in to http://librenms.example.com/.  Please note that we have not covered HTTPS setup in this example, so your LibreNMS install is not secure by default.  Please do not expose it to the public Internet unless you have configured HTTPS and taken appropriate web server hardening steps.
