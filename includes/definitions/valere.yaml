@@ -3,6 +3,8 @@ text: 'Eltek Valere'
 type: power
 icon: eltek
 nobulk: 1
+mib_dir:
+    - eltek
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:

@@ -2678,6 +2678,20 @@
 		external antenna.
 		Legal range: MinAntennaGain - Alarm.
 		"
+		::= { winlink1000OduAir 42 }
+
+	externalAlarmInPort1Alarm TRAP-TYPE
+		ENTERPRISE winlink1000
+		VARIABLES { winlink1000GeneralTrapDescription, winlink1000OduAgnCurrAlarmSeverity, winlink1000OduAgnCurrAlarmIfIndex,
+		winlink1000OduAgnCurrAlarmUnit, winlink1000OduAgnCurrAlarmTimeT, winlink1000OduAgnCurrAlarmId }
+		--&ACTIONS  { major }
+		--&MESG "$'1"
+		DESCRIPTION
+		"
+		The trap is sent every time an alarm occurs in the External Alarm Input of port #1.
+		Contains a single parameter, which is its description:
+		1 - Description: External Alarm 1 -  - Alarm.
+		"
 		::= 105
 
 	externalAlarmInPort2Alarm TRAP-TYPE

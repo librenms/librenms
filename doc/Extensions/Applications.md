@@ -7,6 +7,7 @@ Different applications support a variety of ways collect data: by direct connect
 
 1. [Apache](#apache) - SNMP extend, Agent
 1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
+1. [C.H.I.P.](#chip) - SNMP extend
 1. [DHCP Stats](#dhcp-stats) - SNMP extend
 1. [EXIM Stats](#exim-stats) - SNMP extend
 1. [Fail2ban](#fail2ban) - SNMP extend
@@ -140,6 +141,25 @@ extend bind /etc/snmp/bind
 2: Run `chmod +x /usr/lib/check_mk_agent/local/bind`
 
 3: Set the variable 'agent' to '1' in the config.
+
+### C.H.I.P
+
+C.H.I.P. is a $9 R8 based tiny computer ideal for small projects.  
+Further details: https://getchip.com/pages/chip
+
+#### SNMP Extend
+1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/chip.sh -O /etc/snmp/power-stat.sh
+```
+
+2. Make the script executable (chmod +x /etc/snmp/power-stat.sh)
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend power-stat /etc/snmp/power-stat.sh
+```
+4. Restart snmpd on your host
 
 
 ### DHCP Stats
