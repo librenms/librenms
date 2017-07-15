@@ -238,3 +238,69 @@ modules:
                     index: 'airIRRP100UnitStatusHumidifierCurrent.{{ $index }}'
                     descr: Humidifier
                     divisor: 10
+        fanspeed:
+            data:
+                -
+                    oid: airIRRP100UnitStatusFanSpeed
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.12.
+                    index: 'airIRRP100UnitStatusFanSpeed.{{ $index }}'
+                    descr: 'Fan Speed (%)'
+                    divisor: 10
+                -
+                    oid: airIRRP500UnitStatusFanSpeed
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.12.
+                    index: 'airIRRP500UnitStatusFanSpeed.{{ $index }}'
+                    descr: 'Fan Speed (%)'
+                    divisor: 10
+        frequency:
+            data:
+                -
+                    oid: airIRRP100UnitStatusCompressorDriveSpeed
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.35.
+                    index: 'airIRRP100UnitStatusCompressorDriveSpeed.{{ $index }}'
+                    descr: 'Drive Speed'
+                    divisor: 10
+                -
+                    oid: airIRRP500UnitStatusCompressorDriveSpeed
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.35.
+                    index: 'airIRRP500UnitStatusCompressorDriveSpeed.{{ $index }}'
+                    descr: 'Drive Speed'
+                    divisor: 10
+        power:
+            data:
+                -
+                    oid: airIRRP100UnitStatusCompressorDrivePower
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.35.
+                    index: 'airIRRP100UnitStatusCompressorDrivePower.{{ $index }}'
+                    descr: 'Drive Power'
+                    multiplier: 10
+                -
+                    oid: airIRRP100UnitStatusCoolDemand
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.13.
+                    index: 'airIRRP100UnitStatusCoolDemand.{{ $index }}'
+                    descr: 'Cooling Demand'
+                    multiplier: 100
+                -
+                    oid: airIRRP100UnitStatusCoolOutput
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.14.
+                    index: 'airIRRP100UnitStatusCoolOutput.{{ $index }}'
+                    descr: 'Cooling Output'
+                    multiplier: 100
+                -
+                    oid: airIRRP500UnitStatusCompressorDrivePower
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.35.
+                    index: 'airIRRP500UnitStatusCompressorDrivePower.{{ $index }}'
+                    descr: 'Drive Power'
+                    multiplier: 10
+                -
+                    oid: airIRRP500UnitStatusCoolDemand
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.13.
+                    index: 'airIRRP500UnitStatusCoolDemand.{{ $index }}'
+                    descr: 'Cooling Demand'
+                    multiplier: 100
+                -
+                    oid: airIRRP500UnitStatusCoolOutput
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.14.
+                    index: 'airIRRP500UnitStatusCoolOutput.{{ $index }}'
+                    descr: 'Cooling Output'
+                    multiplier: 100
