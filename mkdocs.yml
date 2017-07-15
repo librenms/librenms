@@ -59,6 +59,7 @@ pages:
     - Extensions/Memcached.md
     - Extensions/Network-Map.md
     - Extensions/NFSen.md
+    - Extensions/OpenTSDB.md
     - Extensions/Oxidized.md
     - Extensions/PeeringDB.md
     - Extensions/Plugin-System.md
