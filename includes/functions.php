@@ -1526,9 +1526,8 @@ function host_exists($hostname, $sysName = null)
             $query .= " OR `sysName`=?";
             $params[] = $full_sysname;
         }
-
-        return dbFetchCell($query, $params) > 0;
     }
+    return dbFetchCell($query, $params) > 0;
 }
 
 /**
