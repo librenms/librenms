@@ -327,10 +327,6 @@ foreach ($port_stats as $ifIndex => $port) {
 
     // Get port_id according to port_association_mode used for this device
     $port_id = get_port_id($ports_mapped, $port, $port_association_mode);
-    print_r($ports_mapped);
-    print_r($port);
-    print_r($port_association_mode);
-    print_r($port_id);exit;
 
     if (is_port_valid($port, $device)) {
         echo 'valid';
