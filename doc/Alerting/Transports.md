@@ -478,3 +478,19 @@ $config['alert']['transports']['elasticsearch']['es_index']  = 'librenms-%Y.%m.%
 $config['alert']['transports']['elasticsearch']['es_proxy'] = false;
 ```
 ~
+
+## <a name="transports-jira">JIRA</a>
+
+You can have LibreNMS create issues on a Jira instance for critical and warning alerts. The Jira transport only sets summary and description fiels. Therefore your Jira project must not have any other mandatory field for the provided issuetype. The config fields that need to set are Jira URL, Jira username, Jira password, Project key, and issue type. 
+Currently http authentication is used to access Jira and Jira username and password will be stored as cleartext in the LibreNMS database.
+
+~
+```php
+$config['alert']['transports']['jira']['url']   = 'https://myjira.mysite.com';
+$config['alert']['transports']['jira']['username']  = 'myjirauser';
+$config['alert']['transports']['jira']['password'] = 'myjirapass';
+$config['alert']['transports']['jira']['prjkey'][]  = 'JIRAPROJECTKEY';
+$config['alert']['transports']['jira']['issuetype'][]  = 'Myissuetype';
+```
+~
+
