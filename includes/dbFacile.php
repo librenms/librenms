@@ -19,6 +19,16 @@
 
 use LibreNMS\Exceptions\DatabaseConnectException;
 
+function dbIsConnected()
+{
+    global $database_link;
+    if (empty($database_link)) {
+        return false;
+    }
+
+    return mysqli_ping($database_link);
+}
+
 /**
  * Connect to the database.
  * Will use global $config variables if they are not sent: db_host, db_user, db_pass, db_name, db_port, db_socket
@@ -35,6 +45,11 @@ use LibreNMS\Exceptions\DatabaseConnectException;
 function dbConnect($host = null, $user = '', $password = '', $database = '', $port = null, $socket = null)
 {
     global $config, $database_link;
+
+    if (dbIsConnected()) {
+        return $database_link;
+    }
+
     $host = empty($host) ? $config['db_host'] : $host;
     $user = empty($user) ? $config['db_user'] : $user;
     $password = empty($password) ? $config['db_pass'] : $password;
