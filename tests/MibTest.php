@@ -96,10 +96,10 @@ class MibTest extends \PHPUnit\Framework\TestCase
         } else {
             $this->assertEquals($mib_name, $file, "$highlighted_file should be named $mib_name");
 
-//        $output = shell_exec("snmptranslate -M +{$config['mib_dir']}:$path -m +$mib_name SNMPv2-MIB::system 2>&1");
-//        $errors = str_replace("SNMPv2-MIB::system\n", '', $output);
-//
-//        $this->assertEmpty($errors, "$highlighted_file has errors!\n$errors");
+            $output = shell_exec("snmptranslate -M +{$config['mib_dir']}:$path -m +$mib_name SNMPv2-MIB::system 2>&1");
+            $errors = str_replace("SNMPv2-MIB::system\n", '', $output);
+
+            $this->assertEmpty($errors, "$highlighted_file has errors!\n$errors");
 
             if (isset($existing_mibs[$mib_name])) {
                 $existing_mibs[$mib_name][] = $file_path;
