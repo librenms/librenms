@@ -14,18 +14,23 @@ if (is_file($pre_cache_file)) {
 
 if (isset($device['dynamic_discovery']['modules']['sensors'])) {
     foreach ($device['dynamic_discovery']['modules']['sensors'] as $key => $data_array) {
-        foreach ($data_array as $data) {
+        foreach ($data_array['data'] as $data) {
             foreach ((array)$data['oid'] as $oid) {
                 $tmp_name = $oid;
                 if (!isset($pre_cache[$tmp_name])) {
-                    $pre_cache[$tmp_name] = snmpwalk_cache_oid($device, $oid, array(), $device['dynamic_discovery']['mib'], null, '-OeQUs');
+                    if (isset($data['snmp_flags'])) {
+                        $snmp_flag = $data['snmp_flags'];
+                    } else {
+                        $snmp_flag = '-OeQUs';
+                    }
+                    $pre_cache[$tmp_name] = snmpwalk_cache_oid($device, $oid, array(), $device['dynamic_discovery']['mib'], null, $snmp_flag);
                 }
             }
         }
     }
 }
 
-// Run custom sensors 
+// Run custom sensors
 require 'includes/discovery/sensors/cisco-entity-sensor.inc.php';
 require 'includes/discovery/sensors/entity-sensor.inc.php';
 require 'includes/discovery/sensors/ipmi.inc.php';

@@ -8,7 +8,7 @@
 -- May 2003, Jayakumar Kadirvelu
 -- August 2003, Edward Pham
 --   
--- Copyright (c) 2000-2008, 2010 by cisco Systems Inc.
+-- Copyright (c) 2000-2013 by cisco Systems Inc.
 -- by cisco Systems, Inc.
 -- All rights reserved.
 -- *****************************************************************
@@ -59,7 +59,7 @@ IMPORTS
 
 
 ciscoSwitchEngineMIB MODULE-IDENTITY
-    LAST-UPDATED    "201012170000Z"
+    LAST-UPDATED    "201302130000Z"
     ORGANIZATION    "Cisco Systems Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -96,6 +96,12 @@ ciscoSwitchEngineMIB MODULE-IDENTITY
         Layer 2 forwarding. However, they can also learn 'flows' through
         other physically-separate (external) Cisco routers that are
         connected to the switch-engine through the network."
+    REVISION        "201302130000Z"
+    DESCRIPTION
+        "Add enumerated value 37 - 85 to cseTcamResourceType."
+    REVISION        "201203120000Z"
+    DESCRIPTION
+        "Add cseStatisticsFlowGroup1."
     REVISION        "201012170000Z"
     DESCRIPTION
         "Add the following new enumerations to cseTcamResourceType:
@@ -2596,7 +2602,8 @@ cseFlowStatsEntry OBJECT-TYPE
     ::= { cseFlowStatsTable 1 }
 
 CseFlowStatsEntry ::= SEQUENCE {
-        cseFlowTotalFlows Gauge32
+        cseFlowTotalFlows     Gauge32,
+        cseFlowTotalIpv4Flows Gauge32
 }
 
 cseFlowTotalFlows OBJECT-TYPE
@@ -2607,6 +2614,15 @@ cseFlowTotalFlows OBJECT-TYPE
         "Indicates the total number of flow entries installed in
         this switching engine." 
     ::= { cseFlowStatsEntry 1 }
+
+cseFlowTotalIpv4Flows OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the total number of IPv4 flow entries in
+        this switching engine." 
+    ::= { cseFlowStatsEntry 2 }
  
 
 
@@ -2627,7 +2643,10 @@ cseNetflowLSExportHost OBJECT-TYPE
     DESCRIPTION
         "Network(IP) address in dotted decimal format or the DNS hostname
         of the host to which Netflow LAN switching statistics are 
-        exported." 
+        exported.
+
+        This object is deprecated and replaced by cndeCollectorAddress
+        in CISCO-NDE-MIB." 
     ::= { cseNetflowLS 2 }
 
 cseNetflowLSExportTransportNumber OBJECT-TYPE
@@ -2636,7 +2655,10 @@ cseNetflowLSExportTransportNumber OBJECT-TYPE
     STATUS          deprecated
     DESCRIPTION
         "The transport(UDP) port number to be used for the Netflow LAN
-        switching statistics being exported." 
+        switching statistics being exported.
+
+        This object is deprecated and replaced by cndeCollectorPort
+        in CISCO-NDE-MIB." 
     ::= { cseNetflowLS 3 }
 
 cseNetflowLSExportDataSource OBJECT-TYPE
@@ -4388,7 +4410,56 @@ cseTcamResourceType OBJECT-TYPE
                         tcamALabel(33),
                         tcamBLabel(34),
                         destInfoIn(35),
-                        destInfoOut(36)
+                        destInfoOut(36),
+                        tcam0Bank0(37),
+                        tcam0Bank1(38),
+                        tcam1Bank0(39),
+                        tcam1Bank1(40),
+                        tcam0Aggregate(41),
+                        tcam1Aggregate(42),
+                        bank0Aggregate(43),
+                        bank1Aggregate(44),
+                        lou(45),
+                        bothLouOperands(46),
+                        singleLouOperands(47),
+                        louL4SourcePort(48),
+                        louL4DstPort(49),
+                        louL3PacketLength(50),
+                        louIpTos(51),
+                        louIpDscp(52),
+                        louIpPrecedence(53),
+                        louIpTtl(54),
+                        tcpFlags(55),
+                        l4DynamicProtocolCam(56),
+                        macEtypeOrProtoCam(57),
+                        nonL4OpLabelsTcam0(58),
+                        nonL4OpLabelsTcam1(59),
+                        l4OpLabelTcam0(60),
+                        l4OpLabelTcam1(61),
+                        ingressDestInfoTable(62),
+                        egressDestInfoTable(63),
+                        ingressTcam(64),
+                        ingressIpv6Tcam(65), 
+                        ingressLou(66),
+                        ingressBothLouOperands(67),
+                        ingressSingleLouOperands(68),
+                        ingressLouL4SourcePort(69),
+                        ingressLouL4DstPort(70),
+                        ingressLouL3PacketLength(71),
+                        ingressLouL3Ttl(72),
+                        ingressLouL2Ttl(73),
+                        ingressTcpFlags(74),
+                        egressTcam(75),
+                        egressIpv6Tcam(76), 
+                        egressLou(77),
+                        egressBothLouOperands(78),
+                        egressSingleLouOperands(79),
+                        egressLouL4SourcePort(80),
+                        egressLouL4DstPort(81),
+                        egressLouL3PacketLength(82),
+                        egressLouL3Ttl(83),
+                        egressLouL2Ttl(84),
+                        egressTcpFlags(85)
                     }
     MAX-ACCESS      not-accessible
     STATUS          current
@@ -4506,7 +4577,158 @@ cseTcamResourceType OBJECT-TYPE
 
         destInfoOut(36) indicates that TCAM space is allocated for
         destination information table for OFE (Output/Egress Forwarding 
-        Engine) ACL redirects." 
+        Engine) ACL redirects.
+
+        tcam0Bank0(37) indicates that TCAM space is allocated for
+        TCAM 0 Bank 0.
+
+        tcam0Bank1(38) indicates that TCAM space is allocated for
+        TCAM 0 Bank 1.
+
+        tcam1Bank0(39) indicates that TCAM space is allocated for
+        TCAM 1 Bank 0.
+
+        tcam1Bank1(40) indicates that TCAM space is allocated for
+        TCAM 1 Bank 1.
+
+        tcam0Aggregate(41) indicates that TCAM space is allocated for
+        the aggregate of Bank 0 and Bank 1 on TCAM 0.
+
+        tcam1Aggregate(42) indicates that TCAM space is allocated for
+        the aggregate of Bank 0 and Bank 1 on TCAM 1.
+
+        bank0Aggregate(43) indicates that TCAM space is allocated for
+        the aggregate of TCAM 0 and TCAM 1 for Bank 0.
+
+        bank1Aggregate(44) indicates that TCAM space is allocated for
+        the aggregate of TCAM 0 and TCAM 1 for Bank 1.
+
+        lou(45) indicates that TCAM space is allocated for
+        LOUs (Logical Operation Unit). 
+
+        bothLouOperands(46) indicates that TCAM space is allocated for
+        LOUs with both operands.
+
+        singleLouOperands(47) indicates that TCAM space is allocated for
+        LOUs with single operands.
+
+        louL4SourcePort(48) indicates that TCAM space is allocated for
+        LOUs with L4 source port in comparison.
+
+        louL4DstPort(49) indicates that TCAM space is allocated for
+        LOUs with L4 destination port in comparison.
+
+        louL3PacketLength(50) indicates that TCAM space is allocated for
+        LOUs with L3 Length in comparison.
+
+        louIpTos(51) indicates that TCAM space is allocated for
+        LOUs with IP ToS (Type of Service) in comparison.
+
+        louIpDscp(52) indicates that TCAM space is allocated for
+        LOUs with IP DSCP (Differentiated Services Code Point)
+        in comparison.
+
+        louIpPrecedence(53) indicates that TCAM space is allocated for
+        LOUs with IP Precedence in comparison.
+
+        louIpTtl(54) indicates that TCAM space is allocated for
+        LOUs with IP TTL in comparison.
+
+        tcpFlags(55) indicates that TCAM space is allocated for
+        TCP Flags.
+
+        l4DynamicProtocolCam(56) indicates that TCAM space is allocated for
+        L4 Dynamic Protocol CAM.
+
+        macEtypeOrProtoCam(57) indicates that TCAM space is allocated for
+        MAC Etype or Protocol CAM.
+
+        nonL4OpLabelsTcam0(58) indicates that TCAM space is allocated for
+        labels without using any L4 operator resources like LOUs or TCP Flags 
+        for TCAM 0.
+
+        nonL4OpLabelsTcam1(59) indicates that TCAM space is allocated for
+        labels without using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 1.
+
+        l4OpLabelTcam0(60) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 0.
+
+        l4OpLabelTcam1(61) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 1.
+
+        ingressDestInfoTable(62) indicates that TCAM space is allocated for
+        Ingress Destination Info Table.
+
+        egressDestInfoTable(63) indicates that TCAM space is allocated for
+        Egress Destination Info Table.
+
+        ingressTcam(64) indicates that ingress TCAM resource utilization.
+
+        ingressIpv6Tcam(65) indicates that ingress TCAM space is allocated
+        for IPv6 compression.
+
+        ingressLou(66) indicates that ingress TCAM space is allocated for
+        LOUs (Logical Operation Unit).
+
+        ingressBothLouOperands(67) indicates that ingress TCAM space is
+        allocated for LOUs with both operands.
+
+        ingressSingleLouOperands(68) indicates that ingress TCAM space is
+        allocated for LOUs with single operands.
+
+        ingressLouL4SourcePort(69) indicates that ingress TCAM space is
+        allocated for LOUs with L4 source port in comparison.
+
+        ingressLouL4DstPort(70) indicates that ingress TCAM space is
+        allocated for LOUs with L4 destination port in comparison.
+
+        ingressLouL3PacketLength(71) indicates that ingress TCAM space is
+        allocated for LOUs with L3 Length in comparison.
+
+        ingressLouL3Ttl(72) indicates that ingress TCAM space is allocated
+        for LOUs with L3 TTL in comparison.
+
+        ingressLouL2Ttl(73) indicates that ingress TCAM space is allocated
+        for LOUs with L2 TTL in comparison. 
+
+        ingressTcpFlags(74) indicates that ingress TCAM space is allocated
+        for TCP Flags.
+
+        egressTcam(75) indicates that egress TCAM resource utilization.
+
+        egressIpv6Tcam(76) indicates that egress TCAM space is allocated
+        for IPv6 compression.
+
+        egressLou(77)indicates that egress TCAM space is allocated for
+        LOUs (Logical Operation Unit).
+
+        egressBothLouOperands(78) indicates that egress TCAM space is
+        allocated for LOUs with both operands.
+
+        egressSingleLouOperands(79) indicates that egress TCAM space is
+        allocated for LOUs with single operands.
+
+        egressLouL4SourcePort(80) indicates that egress TCAM space is
+        allocated for LOUs with L4 source port in comparison.
+
+        egressLouL4DstPort(81) indicates that egress TCAM space is
+        allocated for LOUs with L4 destination port in comparison.
+
+        egressLouL3PacketLength(82) indicates that egress TCAM space is
+        allocated for LOUs with L3 Length in comparison.
+
+        egressLouL3Ttl(83) indicates that egress TCAM space is allocated
+        for the LOUs with L3 TTL in comparison.
+
+        egressLouL2Ttl(84) indicates that egress TCAM space is allocated
+        for LOUs with L2 TTL in comparison.
+
+        egressTcpFlags(85) indicates that egress TCAM space is allocated
+        for TCP Flags."
+        
     ::= { cseTcamUsageEntry 1 }
 
 cseTcamResourceDescr OBJECT-TYPE
@@ -5020,7 +5242,7 @@ cseMIBCompliance6 MODULE-COMPLIANCE
     ::= { cseMIBCompliances 6 }
 
 cseMIBCompliance7 MODULE-COMPLIANCE
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The compliance statement for
         the CISCO-SWITCH-ENGINE-MIB MIB."
@@ -5117,6 +5339,123 @@ cseMIBCompliance7 MODULE-COMPLIANCE
         "Write access is not required, for systems which
         support just one include and one exclude filter"
     ::= { cseMIBCompliances 7 }
+
+cseMIBCompliance8 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for
+        the CISCO-SWITCH-ENGINE-MIB MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS { cseStatisticsGroup }
+
+    GROUP           cseRouterGroup
+    DESCRIPTION
+        "This group is mandatory only for those switches which
+        support layer 3 switching in the system."
+
+    GROUP           cseVlanStatisticsGroup
+    DESCRIPTION
+        "This group is mandatory only for those switches which
+        can provide per-vlan statistics."
+
+    GROUP           cseFlowMgmtGroupRev1
+    DESCRIPTION
+        "This group is mandatory only for those switches which
+        support layer 3 switching in the system."
+
+    GROUP           cseFlowMcastMgmtGroup1
+    DESCRIPTION
+        "This group is mandatory only for those switches which
+        support layer 3 IP multicast switching in the system."
+
+    GROUP           cseUcastCachePurgeGroup
+    DESCRIPTION
+        "This group is mandatory only for those switches which
+        supports IP/IPX unicast flow cache purging in the system."
+
+    GROUP           cseMcastCachePurgeGroup
+    DESCRIPTION
+        "This group is mandatory only for those switches which
+        supports IP multicast flow cache purging in the system."
+
+    GROUP           cseFlowMgmtOperStatusGroup
+    DESCRIPTION
+        "This group is mandatory only for those switches which
+        support operating status on aging time for flows used
+        in L3 switching."
+
+    GROUP           cse4kVlanGroup
+    DESCRIPTION
+        "This group must be implemented by the devices which
+        support the range of VlanIndex between 1024 and 4095"
+
+    GROUP           cseNDEMandatoryGroup
+    DESCRIPTION
+        "This group is mandatory for those switched which
+        support Netflow Data Export"
+
+    GROUP           cseNDESingleFilterGroupRev1
+    DESCRIPTION
+        "This group is mandatory in agents for which the value of
+        cseNetflowLSFilterSupport is single."
+
+    GROUP           cseNDEMultipleFiltersGroup
+    DESCRIPTION
+        "This group is mandatory in agents for which the value of
+        cseNetflowLSFilterSupport is multiple."
+
+    GROUP           cseProtocolFilterGroup
+    DESCRIPTION
+        "Implementation of this group is optional."
+
+    GROUP           cseStatisticsGroup2
+    DESCRIPTION
+        "Implementation of this group is optional."
+
+    GROUP           cseFlowMgmtExtGroup2
+    DESCRIPTION
+        "This group is mandatory only for those switches which
+        support layer 3 switching in the system."
+
+    GROUP           cseFlowMcastRtrMgmtGroup
+    DESCRIPTION
+        "Implementation of this group is optional."
+
+    GROUP           cseFlowMcastMgmtGroup2
+    DESCRIPTION
+        "This group is mandatory only for those switches which
+        support layer 3 IP multicast switching in the system."
+
+    GROUP           cseCacheStatisticsGroup
+    DESCRIPTION
+        "This group is mandatory only for those switches which
+        support switch engine statistics on flow cache entries
+        in the system."
+
+    GROUP           cseL3SwitchedPktsPerSecGroup
+    DESCRIPTION
+        "This group is mandatory only for those switches which
+        support switch engine statistics on total number of 
+        packets switched per second in the system."
+
+    GROUP           cseStatisticsFlowGroup1
+    DESCRIPTION
+        "This group is mandatory only for those switches which
+        support switch engine statistics on total number of 
+        Ipv4 flow entries."
+
+    OBJECT          cseNetflowLSFilterSelection
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required, for systems which
+        support just one include and one exclude filter."
+
+    OBJECT          cseNetflowLSFilterStatus
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required, for systems which
+        support just one include and one exclude filter"
+    ::= { cseMIBCompliances 8 }
 
 -- units of conformance
 
@@ -5263,7 +5602,9 @@ cseFlowMgmtGroup OBJECT-GROUP
         packets were switched within 32 seconds after the an L3
         flow entry was established).
 
-        - cseFlowIPXEstablishedAgingTime has a default value of 256."
+        - cseFlowIPXEstablishedAgingTime has a default value of 256.
+
+        cseFlowMgmtGroup object is superseded by cseFlowMgmtGroupRev1."
     ::= { cseMIBGroups 5 }
 
 cseNetflowLSGroup OBJECT-GROUP
@@ -5282,7 +5623,9 @@ cseNetflowLSGroup OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "A collection of objects providing information on the Netflow LAN
-        switching Data Export feature, if supported."
+        switching Data Export feature, if supported.
+
+        cseNetflowLSGroup object is superseded by cseNDESingleFilterGroupRev1."
     ::= { cseMIBGroups 6 }
 
 cseProtocolFilterGroup OBJECT-GROUP
@@ -5329,7 +5672,9 @@ cseFlowMcastMgmtGroup OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "A collection of objects for querying IP multicast flows
-        stored in hardware switching cache."
+        stored in hardware switching cache.
+
+        cseFlowMcastMgmtGroup object is superseded by cseFlowMcastMgmtGroup1."
     ::= { cseMIBGroups 8 }
 
 cseUcastCachePurgeGroup OBJECT-GROUP
@@ -5419,7 +5764,9 @@ cseNDESingleFilterGroup OBJECT-GROUP
     DESCRIPTION
         "A collection of objects providing information on the Netflow LAN
         switching Data Export feature, with a single host and a
-        single filter support."
+        single filter support.
+
+        cseNDESingleFilterGroup object is superseded by cseNDESingleFilterGroupRev1."
     ::= { cseMIBGroups 14 }
 
 cseNDEMultipleFiltersGroup OBJECT-GROUP
@@ -5782,9 +6129,12 @@ cseL3SwitchedPktsPerSecGroup OBJECT-GROUP
         second."
     ::= { cseMIBGroups 39 }
 
+cseStatisticsFlowGroup1 OBJECT-GROUP
+    OBJECTS         { cseFlowTotalIpv4Flows }
+    STATUS          current
+    DESCRIPTION
+        "A collection of object providing switch engine statistics
+        on total number of Ipv4 flow entries."
+    ::= { cseMIBGroups 40 }
+
 END
-
-
-
-
-

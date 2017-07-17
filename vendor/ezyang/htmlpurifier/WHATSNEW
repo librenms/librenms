@@ -1,9 +1,13 @@
-HTML Purifier 4.8.0 is a bugfix release, collecting a year
-of accumulated bug fixes.  In particular, we fixed some minor
-bugs and now declare full PHP 7 compatibility. The primary
-backwards-incompatible change is that HTML Purifier will now
-add rel="noreferrer" to all links with target attributes
-(you can disable this with %HTML.TargetNoReferrer.)  Other
-changes: new configuration options %CSS.AllowDuplicates and
-%Attr.ID.HTML5; border-radius is partially supported when
-%CSS.AllowProprietary, and tel URIs are supported by default.
+HTML Purifier 4.9.x is a maintenance release, collecting a year
+of accumulated bug fixes plus a few new features.  New features
+include support for min/max-width/height CSS, and rgba/hsl/hsla
+in color specifications.  Major bugfixes include improvements
+in the Serializer cache to avoid chmod'ing directories, better
+entity decoding (we won't accidentally encode entities that occur
+in URLs) and rel="noopener" on links with target attributes,
+to prevent them from overwriting the original frame.
+
+4.9.3 works around an infinite loop bug in PHP 7.1 with the opcode
+cache (and has one other, minor bugfix, avoiding using autoloading
+when testing for DOMDocument presence).  If these bugs do not
+affect you, you do not need to upgrade.
