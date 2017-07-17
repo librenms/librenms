@@ -2335,53 +2335,6 @@ function db_schema_is_current()
 }
 
 /**
- * Get the lock status for a given name
- * @param $name
- * @return bool
- */
-function get_lock($name)
-{
-    global $config;
-    $lock_file = $config['install_dir']."/.$name.lock";
-    if (file_exists($lock_file)) {
-        $pids = explode("\n", trim(`ps -e | grep php | awk '{print $1}'`));
-        $lpid = trim(file_get_contents($lock_file));
-        if (in_array($lpid, $pids)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
- * Set the lock status for a given name
- * @param $name
- */
-function set_lock($name)
-{
-    global $config;
-    $lock_file = $config['install_dir']."/.$name.lock";
-    $lock = get_lock($name);
-
-    if ($lock === true) {
-        echo "$lock_file exists, exiting\n";
-        exit(1);
-    } else {
-        file_put_contents($lock_file, getmypid());
-    }
-}
-
-/**
- * Release lock file for a given name
- * @param $name
- */
-function release_lock($name)
-{
-    global $config;
-    unlink($config['install_dir']."/.$name.lock");
-}
-
-/**
  * @param $device
  * @return int|null
  */
