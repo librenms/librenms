@@ -392,7 +392,7 @@ devices:
     authname: { Field: authname, Type: varchar(64), 'Null': true, Default: null, Extra: '' }
     authpass: { Field: authpass, Type: varchar(64), 'Null': true, Default: null, Extra: '' }
     bgpLocalAs: { Field: bgpLocalAs, Type: varchar(16), 'Null': true, Default: null, Extra: '' }
-    co: { Field: co, Type: varchar(80), 'Null': true, Default: '0', Extra: '' }
+    co: { Field: co, Type: varchar(80), 'Null': true, Default: null, Extra: '' }
     community: { Field: community, Type: varchar(255), 'Null': true, Default: null, Extra: '' }
     cryptoalgo: { Field: cryptoalgo, Type: 'enum(''AES'',''DES'','''')', 'Null': true, Default: null, Extra: '' }
     cryptopass: { Field: cryptopass, Type: varchar(64), 'Null': true, Default: null, Extra: '' }
