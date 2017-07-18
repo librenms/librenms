@@ -42,6 +42,7 @@ pages:
     - Extensions/Applications.md
     - Extensions/Authentication.md
     - Extensions/Auto-Discovery.md
+    - Extensions/Agent-Setup.md
     - Extensions/Billing-Module.md
     - Extensions/Component.md
     - Extensions/Dell-OpenManage.md
