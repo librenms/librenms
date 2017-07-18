@@ -161,6 +161,8 @@ if (module_selected('web', $init_modules)) {
     }
     require $install_dir . '/html/includes/vars.inc.php';
     if (module_selected('nodb', $init_modules)) {
+        load_all_os(false);
+    } else {
         load_all_os(true);
     }
 }
