@@ -19,8 +19,11 @@ function opentsdb_update($device, $measurement, $tags, $fields)
         if ($opentsdb != true) {
             $opentsdb = fsockopen($config['opentsdb']['host'], $config['opentsdb']['port']);
             d_echo("Connection made to OpenTSDB");
+        }
+        if ($opentsdb == true) {
+            d_echo("Connection to OpenTSDB is done\n");
         } else {
-            d_echo("Connection to OpenTSDB has failed");
+            d_echo("Connection to OpenTSDB has failed\n");
         }
 
           $flag=$config['opentsdb']['co'];
