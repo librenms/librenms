@@ -100,11 +100,9 @@ foreach ($operators as $operator) {
 
 $('#alert-template').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
-    var template_id = button.data('template_id');
-    var action = button.data('template_action');
+    var template_id = $('#template_id').val();
 
-    if(action == 'edit') {
-        $('#template_id').val(template_id);
+    if(template_id != null && template_id != '') {
         $('#create-template').text('Update template');
         $.ajax({
             type: "POST",
