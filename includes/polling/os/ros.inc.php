@@ -1,6 +1,6 @@
 <?php
 /**
- * siemens-rs.inc.php
+ * ros.inc.php
  *
  * LibreNMS os poller module for Siemens Ruggedcom Switches
  *
