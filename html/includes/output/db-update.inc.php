@@ -40,7 +40,7 @@ $db_vars = array(
     'dbsocket' => 's',
 );
 
-$cmd = $config['install_dir'] . '/build-base.php';
+$cmd = $config['install_dir'] . '/build-base.php -l';
 
 foreach ($db_vars as $var => $opt) {
     if ($_SESSION[$var]) {
