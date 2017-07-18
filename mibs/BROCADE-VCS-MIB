@@ -318,7 +318,7 @@
       DESCRIPTION
              "The compliance information for this MIB."
       MODULE -- this module
-      MANDATORY-GROUPS { brocadeVcsObjectGroup }
+      MANDATORY-GROUPS { brocadeVcsObjectsGroup }
 
       ::= { brocadeVcsCompliances 1 }
 

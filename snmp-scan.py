@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 Scan networks for snmp hosts and add them to LibreNMS
 
@@ -21,22 +21,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 @author     Tony Murray <murraytony@gmail.com>
 """
 
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import argparse
 import json
-import socket
 from collections import namedtuple
-from enum import Enum
-from ipaddress import ip_network, ip_address
 from multiprocessing import Pool
 from os import path, chdir
+from socket import gethostbyname, gethostbyaddr, herror
 from subprocess import check_output, CalledProcessError
+from sys import stdout
 from time import time
+
+try:
+    from ipaddress import ip_network, ip_address
+except:
+    print('Could not import ipaddress module.  Please install python-ipaddress or use python3 to run this script')
+    print('Debian/Ubuntu: apt install python-ipaddress')
+    print('RHEL/CentOS: yum install python-ipaddress')
+    exit(2)
 
 Result = namedtuple('Result', ['ip', 'hostname', 'outcome', 'output'])
 
 
-class Outcome(Enum):
+class Outcome:
     UNDEFINED = 0
     ADDED = 1
     UNPINGABLE = 2
@@ -51,7 +60,15 @@ THREADS = 32
 CONFIG = {}
 EXCLUDED_NETS = []
 start_time = time()
-stats = {'count': 0, Outcome.ADDED: 0, Outcome.UNPINGABLE: 0, Outcome.KNOWN: 0, Outcome.FAILED: 0, Outcome.EXCLUDED: 0, Outcome.TERMINATED: 0}
+stats = {
+    'count': 0,
+    Outcome.ADDED: 0,
+    Outcome.UNPINGABLE: 0,
+    Outcome.KNOWN: 0,
+    Outcome.FAILED: 0,
+    Outcome.EXCLUDED: 0,
+    Outcome.TERMINATED: 0
+}
 
 
 def debug(message, level=2):
@@ -72,9 +89,11 @@ def get_outcome_symbol(outcome):
 
 def handle_result(data):
     if VERBOSE_LEVEL > 0:
-        print('Scanned \033[1m{}\033[0m {}'.format(("{} ({})".format(data.hostname, data.ip) if data.hostname else data.ip), data.output))
+        print('Scanned \033[1m{}\033[0m {}'.format(
+            ("{} ({})".format(data.hostname, data.ip) if data.hostname else data.ip), data.output))
     else:
-        print(get_outcome_symbol(data.outcome), end='', flush=True)
+        print(get_outcome_symbol(data.outcome), end='')
+        stdout.flush()
 
     stats['count'] += 0 if data.outcome == Outcome.TERMINATED else 1
     stats[data.outcome] += 1
@@ -94,10 +113,10 @@ def scan_host(ip):
 
     try:
         try:
-            tmp = socket.gethostbyaddr(ip)[0]
-            if socket.gethostbyname(tmp) == ip:  # check that forward resolves
+            tmp = gethostbyaddr(ip)[0]
+            if gethostbyname(tmp) == ip:  # check that forward resolves
                 hostname = tmp
-        except socket.herror:
+        except herror:
             pass
 
         try:
@@ -123,17 +142,20 @@ if __name__ == '__main__':
     # Parse arguments #
     ###################
     parser = argparse.ArgumentParser(description='Scan network for snmp hosts and add them to LibreNMS.')
-    parser.add_argument('network', nargs='*', help="""CIDR noted IP-Range to scan. Can be specified multiple times
+    parser.add_argument('network', action='append', nargs='*', type=str, help="""CIDR noted IP-Range to scan. Can be specified multiple times
     This argument is only required if $config['nets'] is not set
     Example: 192.168.0.0/24
     Example: 192.168.0.0/31 will be treated as an RFC3021 p-t-p network with two addresses, 192.168.0.0 and 192.168.0.1
     Example: 192.168.0.1/32 will be treated as a single host address""")
-    parser.add_argument('-t', dest='threads', type=int, help="How many IPs to scan at a time.  More will increase the scan speed, but could overload your system. Default: {}".format(THREADS))
+    parser.add_argument('-t', dest='threads', type=int,
+                        help="How many IPs to scan at a time.  More will increase the scan speed," +
+                             " but could overload your system. Default: {}".format(THREADS))
     parser.add_argument('-l', '--legend', action='store_true', help="Print the legend.")
-    parser.add_argument('-v', '--verbose', action='count', help="Show debug output. Specifying multiple times increases the verbosity.")
+    parser.add_argument('-v', '--verbose', action='count',
+                        help="Show debug output. Specifying multiple times increases the verbosity.")
 
     # compatibility arguments
-    parser.add_argument('-r', dest='network', action='append', metavar='network', help=argparse.SUPPRESS)
+    parser.add_argument('-r', dest='network', action='append', help=argparse.SUPPRESS)
     parser.add_argument('-d', '-i', dest='verbose', action='count', help=argparse.SUPPRESS)
     parser.add_argument('-n', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('-b', action='store_true', help=argparse.SUPPRESS)
@@ -150,17 +172,29 @@ if __name__ == '__main__':
         CONFIG = json.loads(check_output(['/usr/bin/env', 'php', 'config_to_json.php']).decode())
     except CalledProcessError as e:
         parser.error("Could not execute: {}\n{}".format(' '.join(e.cmd), e.output.decode().rstrip()))
+        exit(2)
 
     #######################
     # Build network lists #
     #######################
-    if not CONFIG.get('nets', []) and not args.network:
-        parser.error('$config[\'nets\'] is not set in config.php, you must specify a network to scan with -r')
 
+    # fix argparse awkwardness
+    netargs = []
+    for a in args.network:
+        if type(a) is list:
+            netargs += a
+        else:
+            netargs.append(a)
+
+    # make sure we have something to scan
+    if not CONFIG.get('nets', []) and not netargs:
+        parser.error('$config[\'nets\'] is not set in config.php, you must specify a network to scan')
+
+    # check for valid networks
     networks = []
-    for net in (args.network if args.network else CONFIG.get('nets', [])):
+    for net in (netargs if netargs else CONFIG.get('nets', [])):
         try:
-            networks.append(ip_network(net, True))
+            networks.append(ip_network(u'%s' % net, True))
             debug('Network parsed: {}'.format(net), 2)
         except ValueError as e:
             parser.error('Invalid network format {}'.format(e))

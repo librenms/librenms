@@ -959,49 +959,28 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
             } else {
                 return 1;
             }
-        } elseif ($sensor_type == 'voltage') {
-            return 1;
         }
-    } elseif (($device['os'] == 'huaweiups') && ($sensor_type == 'frequency')) {
-        return 100;
-    } elseif (($device['os'] == 'netmanplus') && ($sensor_type == 'load')) {
-        return 1;
-    } elseif (($device['os'] == 'netmanplus') && ($sensor_type == 'voltage')) {
-        if (preg_match('/.1.3.6.1.2.1.33.1.2.5./', $oid)) {
-            return 10;
-        }
-        return 1;
-    } elseif ($device['os'] == 'generex-ups') {
-        if ($sensor_type == 'load') {
-            return 1;
-        } elseif ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
-            return 1;
-        }
-    } elseif ($device['os'] == 'apc-mgeups') {
-        if ($sensor_type == 'load') {
-            return 1;
-        } elseif ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
-            return 1;
-        }
-    } elseif ($device['os'] == 'ge-ups') {
-        if ($sensor_type == 'load') {
-            return 1;
-        } elseif ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
-            return 1;
-        }
-    } elseif ($device['os'] == 'eaton-mgeups') {
-        if ($sensor_type == 'load') {
-            return 1;
+    } elseif ($device['os'] == 'huaweiups') {
+        if ($sensor_type == 'frequency') {
+            return 100;
         }
     } elseif ($device['os'] == 'hpe-rtups') {
-        if ($sensor_type == 'load') {
-            return 1;
-        } elseif ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.') && !starts_with($oid, '.1.3.6.1.2.1.33.1.3.3.1.3')) {
+        if ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.') && !starts_with($oid, '.1.3.6.1.2.1.33.1.3.3.1.3')) {
             return 1;
         }
     }
 
-    return 10; //default
+    // UPS-MIB Defaults
+
+    if ($sensor_type == 'load') {
+        return 1;
+    }
+
+    if ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
+        return 1;
+    }
+
+    return 10;
 }
 
 /**
@@ -1049,30 +1028,65 @@ function ignore_storage($descr)
     return $deny;
 }
 
+/**
+ * @param $value
+ * @param $data
+ * @param $group
+ * @return bool
+ */
+function can_skip_sensor($value, $data, $group)
+{
+    $skip_values = array_replace((array)$group['skip_values'], (array)$data['skip_values']);
+    foreach ($skip_values as $skip_value) {
+        if ($value == $skip_value) {
+            return true;
+        }
+    }
+
+    $skip_value_lt = array_replace((array)$group['skip_value_lt'], (array)$data['skip_value_lt']);
+    foreach ($skip_value_lt as $skip_value) {
+        if ($value < $skip_value) {
+            return true;
+        }
+    }
+
+    $skip_value_gt = array_reduce((array)$group['skip_value_gt'], (array)$data['skip_value_gt']);
+    foreach ($skip_value_gt as $skip_value) {
+        if ($value > $skip_value) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * @param $valid
+ * @param $device
+ * @param $sensor_type
+ * @param $pre_cache
+ */
 function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 {
     if ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]) {
-        foreach ($device['dynamic_discovery']['modules']['sensors'][$sensor_type] as $data) {
+        $sensor_options = array();
+        if (isset($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'])) {
+            $sensor_options = $device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'];
+        }
+        foreach ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['data'] as $data) {
             $tmp_name = $data['oid'];
             $raw_data = $pre_cache[$tmp_name];
             foreach ($raw_data as $index => $snmp_data) {
-                $skip = false;
-                $value = $snmp_data[$data['value']];
-                foreach ((array)$data['skip_values'] as $skip_value) {
-                    echo "Here $value and $skip_value END\n";
-                    if ($value == $skip_value) {
-                        $skip = true;
-                    }
-                }
-                if ($skip === false && is_numeric($value)) {
+                $value = is_numeric($snmp_data[$data['value']]) ? $snmp_data[$data['value']] : ($snmp_data[$data['oid']] ?: false);
+                if (can_skip_sensor($value, $data, $sensor_options) === false && is_numeric($value)) {
                     $oid = $data['num_oid'] . $index;
                     if (isset($snmp_data[$data['descr']])) {
                         $descr = $snmp_data[$data['descr']];
                     } else {
                         $descr = str_replace('{{ $index }}', $index, $data['descr']);
                     }
-                    $divisor = $data['divisor'] ?: 1;
-                    $multiplier = $data['multiplier'] ?: 1;
+                    $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
+                    $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
                     $low_limit = $data['low_limit'] ?: 'null';
                     $low_warn_limit = $data['low_warn_limit'] ?: 'null';
                     $warn_limit = $data['warn_limit'] ?: 'null';
@@ -1086,7 +1100,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                             $value = $value * $multiplier;
                         }
                     } else {
-                        $state_name = $data['state_name'];
+                        $state_name = $data['state_name'] ?: $data['oid'];
                         $state_index_id = create_state_index($state_name);
                         if ($state_index_id != null) {
                             foreach ($data['states'] as $state) {

@@ -9,6 +9,57 @@ NEWS ( CHANGELOG and HISTORY )                                     HTMLPurifier
     . Internal change
 ==========================
 
+4.9.3, released 2017-06-02
+- Workaround PHP 7.1 infinite loop when opcode cache is enabled.
+  Thanks @Xiphin (#134, #135)
+- Don't use autoloader when testing for DOMDocument.  Hypothetically,
+  this could cause your install to start using DirectLex if you had
+  previously been monkeypatching in a custom, autoloaded implementation
+  of DOMDocument.  Don't do that.  Thanks @Izumi-kun (#130)
+
+4.9.2, released 2017-03-12
+- Fixes PHP 5.3 compatibility
+- Fix breakage when decoding decimal entities.  Thanks @rybakit (#129)
+
+4.9.1, released 2017-03-08
+! %URI.DefaultScheme can now be set to null, in which case
+  all relative paths are removed.
+! New CSS properties: min-width, max-width, min-height, max-height (#94)
+! Transparency (rgba) and hsl/hsla supported where color CSS is present.
+  Thanks @fxbt for contributing the patch. (#118)
+- When idn_to_ascii is defined, we might accept malformed
+  hostnames.  Apply validation to the result in such cases.
+- Close directory when done in Serializer DefinitionCache (#100)
+- Deleted some asserts to avoid linters from choking (#97)
+- Rework Serializer cache behavior to avoid chmod'ing if possible (#32)
+- Embedded semicolons in strings in CSS are now handled correctly!
+- We accidentally dropped certain Unicode characters if there was
+  one or more invalid characters.  This has been fixed, thanks
+  to mpyw <ryosuke_i_628@yahoo.co.jp>
+- Fix for "Don't truncate upon encountering </div> when using DOMLex"
+  caused a regression with HTML 4.01 Strict parsing with libxml 2.9.1
+  (and maybe later versions, but known OK with libxml 2.9.4).  The
+  fix is to go about handling truncation a bit more cleverly so that
+  we can wrap with divs (sidestepping the bug) but slurping out the
+  rest of the text in case it ran off the end.  (#78)
+- Fix PREG_BACKTRACK_LIMIT_ERROR in HTMLPurifier_Filter_ExtractStyle.
+  Thanks @breathbath for contributing the report and fix (#120)
+- Fix entity decoding algorithm to be more conservative about
+  decoding entities that are missing trailing semicolon.
+  To get old behavior, set %Core.LegacyEntityDecoder to true.
+  (#119)
+- Workaround libxml bug when HTML tags are embedded inside
+  script tags.  To disable workaround set %Core.AggressivelyRemoveScript
+  to false. (#83)
+# By default, when a link has a target attribute associated
+  with it, we now also add rel="noopener" in order to
+  prevent the new window from being able to overwrite
+  the original frame.  To disable this protection,
+  set %HTML.TargetNoopener to FALSE.
+
+4.9.0 was cut on Git but never properly released; when we did the
+real release we decided to skip this version number.
+
 4.8.0, released 2016-07-16
 # By default, when a link has a target attribute associated
   with it, we now also add rel="noreferrer" in order to

@@ -1,0 +1,2732 @@
+-- *******************************************************************
+-- CISCO-LWAPP-DOT11-CLIENT-MIB.my: Dot11 Wireless Clients MIB
+--                                                          
+-- June 2006, Devesh Pujari, Srinath Candadai
+-- March 2011 Suja Thangaveluchamy
+--
+-- Copyright (c) 2006, 2010-2012 by Cisco Systems Inc.
+-- All rights reserved.
+-- *******************************************************************
+--
+CISCO-LWAPP-DOT11-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS 
+        MODULE-IDENTITY, 
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Unsigned32,
+        Counter64,
+		IpAddress
+                FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, 
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        TruthValue,
+        MacAddress,
+        TimeInterval,
+        DisplayString,
+        TimeStamp,
+        RowStatus
+                FROM SNMPv2-TC 
+        ciscoMgmt
+                FROM CISCO-SMI
+        SnmpAdminString
+                FROM SNMP-FRAMEWORK-MIB
+        cLApDot11IfSlotId,
+        cLApName,
+        cLApLocation,
+        cLApIfLoadChannelUtilization,
+        cLApDot11RadioChannelNumber,
+        cLAPGroupVlanName,  
+        cLApSubMode
+                FROM CISCO-LWAPP-AP-MIB
+        CLApIfType,
+        CLDot11ClientStatus,
+        CLClientPowerSaveMode,
+	CcxServiceVersion
+                FROM CISCO-LWAPP-TC-MIB
+        InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB
+        CiscoURLStringOrEmpty
+                FROM CISCO-TC
+        cLMobilityExtMCClientAnchorMCPrivateAddress,
+        cLMobilityExtMCClientAnchorMCPrivateAddressType,
+        cLMobilityExtMCClientAssociatedMAAddress,
+        cLMobilityExtMCClientAssociatedMAAddressType,
+        cLMobilityExtMCClientAssociatedMCAddress,
+        cLMobilityExtMCClientAssociatedMCAddressType,
+        cLMobilityExtMCClientAssociatedMCGroupId,
+        cLMobilityExtMCClientAnchorMCGroupId
+              FROM CISCO-LWAPP-MOBILITY-EXT-MIB
+        VlanId
+                FROM Q-BRIDGE-MIB;
+
+
+--********************************************************************
+--*  MODULE IDENTITY
+--********************************************************************
+
+ciscoLwappDot11ClientMIB MODULE-IDENTITY
+        LAST-UPDATED    "201104290000Z"
+        ORGANIZATION    "Cisco Systems Inc."
+        CONTACT-INFO  
+               "        Cisco Systems,
+                        Customer Service
+                Postal: 170 West Tasman Drive
+                        San Jose, CA  95134
+                        USA
+                   Tel: +1 800 553-NETS
+
+                 Email: cs-wnbu-snmp@cisco.com"
+
+        DESCRIPTION             
+                "This MIB is intended to be implemented on all those
+                devices operating as Central controllers, that
+                terminate the Light Weight Access Point Protocol
+                tunnel from Cisco Light-weight LWAPP Access Points.
+
+                Information provided by this MIB is about the
+                configuration and monitoring of 802.11 wireless
+                clients in the network.
+
+                The relationship between CC and the LWAPP APs
+                can be depicted as follows:
+
+        +......+     +......+     +......+           +......+
+        +      +     +      +     +      +           +      +
+        +  CC  +     +  CC  +     +  CC  +           +  CC  +
+        +      +     +      +     +      +           +      +
+        +......+     +......+     +......+           +......+
+          ..            .             .                 .
+          ..            .             .                 .
+         .  .            .             .                 .
+        .    .            .             .                 .
+       .      .            .             .                 .
+      .        .            .             .                 .
+   +......+ +......+     +......+      +......+          +......+
+   +      + +      +     +      +      +      +          +      +
+   +  AP  + +  AP  +     +  AP  +      +  AP  +          +  AP  +
+   +      + +      +     +      +      +      +          +      +
+   +......+ +......+     +......+      +......+          +......+
+              .              .             .                 .
+            .  .              .             .                 .
+           .    .              .             .                 .
+          .      .              .             .                 .
+         .        .              .             .                 .
+      +......+ +......+     +......+      +......+          +......+
+      +      + +      +     +      +      +      +          +      +
+      +  MN  + +  MN  +     +  MN  +      +  MN  +          +  MN  +
+      +      + +      +     +      +      +      +          +      +
+      +......+ +......+     +......+      +......+          +......+
+
+                The LWAPP tunnel exists between the controller and
+                the APs.  The MNs communicate with the APs through
+                the protocol defined by the 802.11 standard.
+
+                LWAPP APs, upon bootup, discover and join one of the
+                controllers and the controller pushes the configuration,
+                that includes the WLAN parameters, to the LWAPP APs.
+                The APs then encapsulate all the 802.11 frames from
+                wireless clients inside LWAPP frames and forward
+                the LWAPP frames to the controller.
+
+                                   GLOSSARY
+
+                Access Point ( AP )
+
+                An entity that contains an 802.11 medium access
+                control ( MAC ) and physical layer ( PHY ) interface
+                and provides access to the distribution services via
+                the wireless medium for associated clients.  
+
+                LWAPP APs encapsulate all the 802.11 frames in
+                LWAPP frames and sends them to the controller to which
+                it is logically connected.
+
+                Basic Service Set ( BSS ) 
+
+                Coverage area of one access point is called a BSS. An 
+                access point (AP) acts as a master to control the 
+                clients within that BSS. 
+
+                Clear To Send (CTS)
+
+                Refer to the description of RTS.                
+
+                Light Weight Access Point Protocol ( LWAPP ) 
+
+                This is a generic protocol that defines the 
+                communication between the Access Points and the
+                Central Controller.
+
+ 
+                MAC Service Data Units ( MSDU )
+
+                The MSDU is that unit of data received from 
+                the logical link control ( LLC ) sub-layer which lies
+               above the medium access control ( MAC ) sub-layer in a
+                protocol stack. 
+
+                Message Integrity Code ( MIC )
+
+                A value generated by a symmetric key cryptographic 
+                function. If the input data are changed, a new value 
+                cannot be correctly computed without knowledge of the
+                symmetric key. Thus, the secret key protects the input 
+                data from undetectable alteration.
+  
+                Mobile Node ( MN )
+
+                A roaming 802.11 wireless device in a wireless
+                network associated with an access point. Mobile Node,
+                Mobile Station(Ms) and client are used 
+                interchangeably. 
+
+                Request To Send ( RTS )
+
+                A client wishing to send data initiates the process by
+                sending a Request To Send (RTS) frame. The destination
+                client replies with a Clear To Send (CTS) frame.
+
+                Wireless local-area network ( WLAN )
+                A local-area network that uses high-frequency radio 
+                waves rather than wires to communicate between nodes.
+              
+                Service Set Identifier (SSID)
+                A service set identifier is a name that identifies a particular
+                802.11 wireless LAN. A client device receives broadcast messages
+                from all access points within range advertising their SSIDs. The
+                client device can then either manually or automatically based on
+                configuration select the network with which to associate. The
+                SSID can be up to 32 characters long.
+
+                Hybrid Remote Edge Access Point (HREAP)
+                HREAP is a wireless solution for branch office and remote office
+                deployments. It enables customers to configure and control
+                access points in a branch or remote office from the corporate
+                office through a wide area network (WAN) link without deploying
+                a controller in each office.  
+
+                Workgroup Bridge ( WGB )
+                A WGB can provide a wireless infrastructure connection
+                for a Ethernet-enabled devices. Devices that do not have
+                a wireless client adapter in order to connect to the
+                wireless network can be connected to a WGB through 
+                Ethernet port.
+
+                KTS (Key Telephone System)
+
+		Key Telephone System is an alternative to a private branch exchange (PBX) 
+		phone system. A KTS is equipped with several buttons that allow a caller to
+		directly select outgoing lines or incoming calls, and use intercom and 
+		conference facilities. 
+ 
+                REFERENCE
+ 
+                [1] Wireless LAN Medium Access Control ( MAC ) and
+                Physical Layer ( PHY ) Specifications 
+  
+                [2] Draft-obara-capwap-lwapp-00.txt, IETF Light 
+                Weight Access Point Protocol "
+        REVISION        "201104290000Z"
+        DESCRIPTION
+                "Added ciscoLwappDot11ClientMIBStatusGroupRev2,
+                ciscoLwappDot11ClientMIBNotifsGroupRev2, 
+                and ciscoLwappDot11ClientMIBNotifControlGroup.
+                Deprecated ciscoLwappDot11ClientMIBCompliance and 
+                added ciscoLwappDot11ClientMIBComplianceRev2"
+        REVISION      "200611210000Z"
+        DESCRIPTION
+                "Initial version of this MIB module. "
+        ::= { ciscoMgmt 599 }
+     
+ciscoLwappDot11ClientMIBNotifs  OBJECT IDENTIFIER
+        ::= { ciscoLwappDot11ClientMIB 0 }
+
+ciscoLwappDot11ClientMIBObjects OBJECT IDENTIFIER 
+        ::= { ciscoLwappDot11ClientMIB 1 }
+
+ciscoLwappDot11ClientMIBConform OBJECT IDENTIFIER
+        ::= { ciscoLwappDot11ClientMIB 2 }
+
+ciscoLwappDot11ClientCcxMIBObjects OBJECT IDENTIFIER
+        ::= { ciscoLwappDot11ClientMIB 3 }
+
+cldcConfigObjects OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11ClientMIBObjects 1 }
+
+cldcNotifObjects OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11ClientMIBObjects 2 }
+
+cldcStatusObjects OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11ClientMIBObjects 3 }
+    
+cldcStatisticObjects OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11ClientMIBObjects 4 }
+  
+cldcCcxObjects OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11ClientCcxMIBObjects 1 }
+  
+--********************************************************************
+-- Wireless Clients 
+--********************************************************************
+
+cldcClientTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF CldcClientEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table represents the 802.11 wireless clients 
+                that are associated with the APs that have joined 
+                this controller.
+                An entry is created automatically by the controller 
+                when the client gets associated to the AP. An existing
+                entry gets deleted when the association gets dropped.
+                Each client added to this table is uniquely identified
+                by the client's MAC address."
+    ::= { cldcStatusObjects 1 }
+    
+cldcClientEntry OBJECT-TYPE
+        SYNTAX     CldcClientEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Each entry represents a conceptual row in this
+                table and provides the information about the
+                clients associated to the APs that have joined 
+                the controller. An entry is identified the client's
+                MAC address."
+        INDEX { cldcClientMacAddress }
+        ::= { cldcClientTable 1 }
+     
+CldcClientEntry ::= 
+        SEQUENCE {
+             cldcClientMacAddress      MacAddress,
+             cldcClientStatus          CLDot11ClientStatus,
+             cldcClientWlanProfileName SnmpAdminString,
+             cldcClientWgbStatus       INTEGER,
+             cldcClientWgbMacAddress   MacAddress,
+             cldcClientProtocol        INTEGER,
+             cldcAssociationMode       INTEGER,
+             cldcApMacAddress          MacAddress,
+             cldcIfType                CLApIfType,
+			 cldcClientIPAddress		IpAddress,
+			 cldcClientNacState			INTEGER,
+			 cldcClientQuarantineVLAN	VlanId,
+			 cldcClientAccessVLAN	 	VlanId,
+             cldcClientLoginTime        TimeStamp,
+             cldcClientUpTime           TimeInterval,
+             cldcClientPowerSaveMode    CLClientPowerSaveMode,
+             cldcClientCurrentTxRateSet OCTET STRING,
+             cldcClientDataRateSet      OCTET STRING,
+             cldcClientHreapApAuth      INTEGER,
+             cldcClient80211uCapable    TruthValue, 	
+             cldcClientPostureState     TruthValue,
+             cldcClientAclName          SnmpAdminString, 
+             cldcClientAclApplied       INTEGER, 
+             cldcClientRedirectUrl      CiscoURLStringOrEmpty,
+             cldcClientAaaOverrideAclName    SnmpAdminString,
+             cldcClientAaaOverrideAclApplied INTEGER,
+             cldcClientUsername         SnmpAdminString,
+             cldcClientSSID             SnmpAdminString,
+             cldcClientSecurityTagId    Unsigned32, 
+             cldcClientTypeKTS          TruthValue,
+             cldcClientIpv6AclName      DisplayString,
+             cldcClientIpv6AclApplied   INTEGER,
+             cldcClientDataSwitching    INTEGER,
+             cldcClientAuthentication   INTEGER,
+             cldcClientChannel          Unsigned32,
+             cldcClientAuthMode         INTEGER,
+             cldcClientReasonCode       INTEGER,
+             cldcClientSessionID        SnmpAdminString,
+             cldcClientApRoamMacAddress MacAddress, 
+             cldcClientMdnsProfile      SnmpAdminString,
+             cldcClientMdnsAdvCount	Unsigned32,
+             cldcClientPolicyName       SnmpAdminString,
+             cldcClientAAARole          SnmpAdminString,
+             cldcClientDeviceType       SnmpAdminString,
+             cldcUserAuthType           INTEGER
+        }
+   
+cldcClientMacAddress OBJECT-TYPE
+        SYNTAX     MacAddress
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This object specifies the MAC address of the
+                client for this entry  and uniquely identifies 
+                this entry. "
+        ::= { cldcClientEntry 1 }
+
+cldcClientStatus OBJECT-TYPE
+        SYNTAX     CLDot11ClientStatus
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The object that represents the current status of 
+                the client."
+        ::= { cldcClientEntry 2 }
+
+cldcClientWlanProfileName OBJECT-TYPE
+        SYNTAX     SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "This object specifies the WLAN Profile name
+                this 802.11 wireless client is connected to."
+        ::= { cldcClientEntry 3 }
+
+cldcClientWgbStatus OBJECT-TYPE
+        SYNTAX     INTEGER {
+                             regClient(1),
+                             wgbClient(2),
+                             wgb(3)
+                           }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The object that represents the work group bridging 
+                status of a DOT11 client.
+                'regClient' - The client is a wireless client
+                'wgbClient' - The client is connected via a WGB
+                'wgb'       - The client is the WGB itself."
+        ::= { cldcClientEntry 4 }
+
+cldcClientWgbMacAddress OBJECT-TYPE
+        SYNTAX     MacAddress
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "This object specifies the MAC address of the
+                WGB this 802.11 wireless client to which it is 
+                connected.  This returns a non-zero value when 
+                the cldcClientWgbStatus is wgbClient."
+
+        ::= { cldcClientEntry 5 }
+
+cldcClientProtocol OBJECT-TYPE
+        SYNTAX     INTEGER {
+                              dot11a (1),
+                              dot11b(2),
+                              dot11g(3),
+                              unknown(4),
+                              mobile(5),
+                              dot11n24(6),
+                              dot11n5(7),
+			                  ethernet(8),
+                              dot3(9),
+                              dot11ac5(10)
+                           }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The 802.11 protocol type of the client.
+                'dot11a'   - The client is using 802.11a standard 
+                             to connect to the access point (AP)
+                'dot11b'   - The client is using 802.11b standard 
+                             to connect to the access point (AP)
+                'dot11g'   - The client is using 802.11g standard 
+                             to connect to the access point (AP)
+                'unknown'  - The client protocol is unknown
+                'mobile'   - The client using mobile wireless to 
+                             connect to the access point (AP).
+                'dot11n24' - The client is using 802.11n standard 
+                             with 2.4 GHz frequency to connect to 
+                             the access point (AP)
+                'dot11n5'  - The client is using 802.11n standard 
+                             with 5 GHz frequency to connect to 
+                             the access point (AP).
+                'ethernet' - The client is using ethernet standard 
+                             to connect to the access point (AP).
+                'dot3'     - The client is using dot3 standard 
+                             to connect to the access point (AP).
+                'dot11ac5' - The client is using 802.11ac standard
+                             with 5 GHz frequency to connect to the
+                             access point (AP)."
+
+        ::= { cldcClientEntry 6 }
+
+cldcAssociationMode OBJECT-TYPE
+        SYNTAX     INTEGER {
+                         unknown(1),
+                         wep(2),
+                         wpa(3),
+                         wpa2(4)
+                       }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The association mode for which the key decrypt 
+            error occurred."
+        ::= { cldcClientEntry 7 }
+
+cldcApMacAddress OBJECT-TYPE
+        SYNTAX     MacAddress
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object specifies the radio MAC address
+            of a LWAPP AP. "
+        ::= { cldcClientEntry 8 }
+
+cldcIfType OBJECT-TYPE
+        SYNTAX  CLApIfType 
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object specifies the wireless interface type." 
+        ::= { cldcClientEntry 9 }
+
+cldcClientIPAddress	OBJECT-TYPE
+		SYNTAX	IpAddress
+		MAX-ACCESS 	read-only	
+		STATUS		current
+		DESCRIPTION
+			" This object specified client's IP address. "
+		::= { cldcClientEntry 10 }
+
+cldcClientNacState OBJECT-TYPE
+		SYNTAX	INTEGER {
+							quarantine(1),
+							access(2)
+						}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION	
+			"This object specifies the client's network admission
+                        control state.
+   
+                        'quarantine' -  The client goes through posture analysis and
+                           the client traffic is sent by controller 
+                           in quarantine vlan.
+   
+                        'access' - The client traffic is sent by controller in 
+                           access vlan. The client should have completed 
+                           posture analysis. 
+   
+                        Posture Analysis is a state change where the client applies  
+                        the configured policies to validate access to the network." 
+	
+		::= { cldcClientEntry 11 }
+
+cldcClientQuarantineVLAN	OBJECT-TYPE
+		SYNTAX	VlanId
+		MAX-ACCESS 	read-only	
+		STATUS		current
+		DESCRIPTION
+		        "This object indicates the quarantine VLAN for client. The
+                        quarantine VLAN only allows limited access to the network."
+		::= { cldcClientEntry 12 }
+	
+cldcClientAccessVLAN	OBJECT-TYPE
+		SYNTAX	VlanId
+		MAX-ACCESS 	read-only	
+		STATUS		current
+		DESCRIPTION
+			"This object indicates the access VLAN for client. The access
+                        VLAN allows unlimited access to the network." 
+		::=	{ cldcClientEntry 13 }
+
+cldcClientLoginTime OBJECT-TYPE
+        SYNTAX     TimeStamp
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object indicates the value of sysUpTime when the client
+           logged in."
+        ::= { cldcClientEntry 14 }
+
+
+cldcClientUpTime OBJECT-TYPE
+        SYNTAX     TimeInterval
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION                
+            "This object indicates the duration for which the client has
+            been associated with this device."
+        ::= { cldcClientEntry  15 }  
+
+cldcClientPowerSaveMode OBJECT-TYPE
+        SYNTAX CLClientPowerSaveMode
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the power management mode of the client." 
+        ::= { cldcClientEntry  16 }
+
+cldcClientCurrentTxRateSet OBJECT-TYPE
+        SYNTAX     OCTET STRING (SIZE(2))
+        UNITS      "Mbit/s"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION                
+            "This object indicates the current data rate at which the
+           client transmits and receives data. The data rate field is a 
+           16-bit unsigned value expressing the data rate of the packets 
+           received by the client."
+        REFERENCE       "RFC 5416"
+        ::= { cldcClientEntry  17 }
+
+cldcClientDataRateSet OBJECT-TYPE
+        SYNTAX     OCTET STRING (SIZE(1..126))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION                
+            "This object indicates the set of data rates at which the
+            client may transmit data. Each client can support up to 126 
+            rates. Each octet contains an integer value representing one of
+            these 126 rates ranging from 1 Mb/s to 63.5 Mb/s. One of the 
+            supported rates will be chosen by the access point for 
+            trasnmission with the client."
+        REFERENCE       "RFC 5416" 
+        ::= { cldcClientEntry  18 }
+
+cldcClientHreapApAuth OBJECT-TYPE
+        SYNTAX     INTEGER {
+                             true(1),
+                             false(2),
+                             notApplicable(3)
+                           }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object indicates whether the client is locally
+            authenticated or authenticated by the controller.
+            Local authentication is done only if the Access Point connected
+            to the client is of hreap mode.
+            A value of 'true' indicates that the client is locally
+            authenticated.
+            A value of 'false' indicates that the client is authenticated
+            by the controller.
+            A value of 'notApplicable' indicates that client is not
+            connected to a HREAP."
+        ::= { cldcClientEntry  19 }
+
+cldcClient80211uCapable OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION                
+            "This object indicates whether the client supports 802.11u
+            feature.
+            The 802.11u standard allows devices such as laptop computers or
+            cellular phones to join a wireless LAN widely used in the home,
+            office and some commercial establishments.
+            A value of 'true' indicates that the client supports the 
+            802.11u feature.
+            A value of 'false' indicates that the client does not support 
+            the 802.11u feature."
+        REFERENCE       "IEEE 802.11u" 
+        ::= { cldcClientEntry  20 }
+
+cldcClientPostureState OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the Posture state of the client.
+        Posture Analysis is a state change where the client applies  
+        the configured policies to validate access to the network.
+        A value of 'true' indicates that the client supports the 
+        Posture feature.
+        A value of 'false' indicates that the client does not support 
+        the Posture feature." 
+    ::= { cldcClientEntry 21 }
+
+cldcClientAclName OBJECT-TYPE
+    SYNTAX          SnmpAdminString 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the ACL Name for the client." 
+    ::= { cldcClientEntry 22 }
+
+
+cldcClientAclApplied OBJECT-TYPE
+        SYNTAX     INTEGER {
+                             true(1),
+                             false(2),
+                             notAvailable(3)
+                           }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object indicates the ACL applied status for the client. 
+             A value of 'true' indicates that the ACL is applied. 
+             A value of 'false' indicates that the ACL is not applied. 
+             A value of 'notAvailable' indicates that applied status is 
+             not available"
+
+        ::= { cldcClientEntry 23} 
+
+cldcClientRedirectUrl OBJECT-TYPE
+    SYNTAX          CiscoURLStringOrEmpty 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "This object indicates the AAA override redirect URL for a
+            client with cldcClientPostureState enabled.
+            The object has a valid value when the WLAN, with which the 
+            client has associated requires Conditional or Splash-Page Web 
+            Redirection. This object is otherwise not applicable, and 
+            contains a zero-length string." 
+    ::= { cldcClientEntry 24 }
+
+cldcClientAaaOverrideAclName OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "This object indicates the AAA Override ACL Name for the client
+            if cldcClientPostureState is enabled on the wlan."   
+    ::= { cldcClientEntry 25 }
+
+
+cldcClientAaaOverrideAclApplied OBJECT-TYPE
+        SYNTAX     INTEGER {
+                             true(1),
+                             false(2),
+                             notAvailable(3)
+                           }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object indicates the AAA Override ACL applied status for the client
+             if cldcClientPostureState is enabled on the wlan.
+             A value of 'true' indicates that the ACL is applied.
+             A value of 'false' indicates that the ACL is not applied.
+             A value of 'notAvailable' indicates that applied status is
+             not available"
+
+        ::= { cldcClientEntry 26}
+
+cldcClientUsername OBJECT-TYPE
+       SYNTAX          SnmpAdminString (SIZE  (0..32))
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+           "This object represents the username used by the client." 
+       ::= { cldcClientEntry 27 }
+   
+cldcClientSSID OBJECT-TYPE
+       SYNTAX          SnmpAdminString (SIZE  (0..32))
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+           "This object represents the SSID of the WLAN to which the
+           client is associated." 
+       ::= { cldcClientEntry 28 }
+   
+
+cldcClientSecurityTagId OBJECT-TYPE
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the security group tag of the client.
+         This parameter will have a non-zero value when the client is DOT1X
+         authenticated." 
+    ::= { cldcClientEntry 29 }
+
+cldcClientTypeKTS OBJECT-TYPE
+         SYNTAX     TruthValue
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+              "This object indicates whether the Client is NEC KTS Client or not.
+              A value of 'true' indicates that the client follows NEC KTS SIP protocol.
+              A value of 'false' indicates that the client does not follow NEC KTS SIP protocol."
+
+         ::= { cldcClientEntry 30}
+
+cldcClientIpv6AclName OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the ACL Name for
+        the Ipv6 client."
+    ::= { cldcClientEntry 31 }
+
+cldcClientIpv6AclApplied OBJECT-TYPE
+        SYNTAX     INTEGER {
+                             true(1),
+                             false(2),
+                             notAvailable(3)
+                           }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object indicates the ACL applied status for the IPv6 client.
+             A value of 'true' indicates that the ACL is applied.
+             A value of 'false' indicates that the ACL is not applied.
+             A value of 'NotAvailable' indicates that applied status is
+             not avaliable"
+
+        ::= { cldcClientEntry 32}
+
+cldcClientDataSwitching OBJECT-TYPE
+        SYNTAX     INTEGER {
+                             unknown(1),
+                             central(2),
+                             local(3)
+                           }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object specifies whether client is switching data
+	     locally or centrally."
+        ::= { cldcClientEntry 33}
+
+cldcClientAuthentication OBJECT-TYPE
+        SYNTAX     INTEGER {
+                             unknown(1),
+                             central(2),
+                             local(3)
+                           }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object specifies whether client is authentiated
+	     locally or centrally."
+        ::= { cldcClientEntry 34}
+
+cldcClientChannel OBJECT-TYPE
+        SYNTAX     Unsigned32 
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object specifies the access point's channel 
+             to which the client is associated."
+        ::= { cldcClientEntry 35}
+
+cldcClientAuthMode OBJECT-TYPE
+        SYNTAX     INTEGER {
+                            none (0),
+                            psk (1),
+                            radius (2),
+                            cckm (3),
+                            wapipsk (4),
+                            wapicert (5),
+                            ftDot1x(6),
+                            ftPsk(7),
+                            pmfDot1x(8),
+                            pmfPsk(9)
+	                       }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Represents the Authentication Mode of Client."
+        ::= { cldcClientEntry 36}
+
+cldcClientReasonCode OBJECT-TYPE
+     SYNTAX          INTEGER  {
+         unspecified(1),
+         previousAuthNotValid (2),
+         deauthenticationLeaving (3),
+         disassociationDueToInactivity (4),
+         disassociationAPBusy (5),
+         class2FrameFromNonAuthStation (6),
+         class2FrameFromNonAssStation (7),
+         disassociationStaHasLeft (8),
+         staReqAssociationWithoutAuth (9),
+         invalidInformationElement(40),
+         groupCipherInvalid (41),
+         unicastCipherInvalid (42),
+         akmpInvalid (43),
+         unsupportedRsnVersion (44),
+         invalidRsnIeCapabilities(45),
+         cipherSuiteRejected(46),
+         missingReasonCode (99),
+         maxAssociatedClientsReached(101),
+         maxAssociatedClientsReachedOnRadio(105),
+         maxAssociatedClientsReachedOnWlan(106),
+         unSpecifiedQosFailure(200),
+         qosPolicyMismatch(201),
+         inSufficientBandwidth(202),
+         inValidQosParams(203)
+     }
+     MAX-ACCESS  read-only
+     STATUS  current
+         DESCRIPTION
+         "unspecified - Unspecified.
+         previousAuthNotValid - Previous Authentication 
+                                          was not valid.
+         deauthenticationLeaving       - Leaving due to 
+                                       deauthentication.     
+         disassociationDueToInactivity - Disassociation 
+                                      due to Inactivity.
+         disassociationAPBusy - Disassociation since AP 
+                                               was busy.
+         class2FrameFromNonAuthStation -  Class 2 frame 
+                         from non authenticated station.
+         class2FrameFromNonAssStation - Class 2 frame 
+                            from non associated station.
+         disassociationStaHasLeft - Station has left due 
+                                      to disassociation.
+         staReqAssociationWithoutAuth    - Station send 
+             association request without authentication.
+         invalidInformationElement - Invalid information 
+                                                element.
+         groupCipherInvalid      - Invalid group Cipher.
+         unicastCipherInvalid  - Invalid unicast cipher.
+         akmpInvalid                     - Invalid AKMP.
+         unsupportedRsnVersion - Unsupported RSN version.
+         invalidRsnIeCapabilities       - Invalid RSN IE 
+                                            capabilities.
+         cipherSuiteRejected     - Cipher suite rejected.
+         missingReasonCode      - Reason code is missing.
+         maxAssociatedClientsReached - Maximum allowed 
+                    associated client number has reached.
+         maxAssociatedClientsReachedOnRadio - Maximum 
+         allowed associated client number has reached on
+         radio.
+         maxAssociatedClientsReachedOnWlan - Maximum
+         allowed associated client number has reached on
+         wlan.
+         unSpecifiedQosFailure - Unsupported QOS failure.
+         qosPolicyMismatch      - Mismatch on QOS policy.
+         inSufficientBandwidth  - Insufficient bandwidth.
+         inValidQosParams       - Invalid QOS parameters."
+     ::= { cldcClientEntry 37 }
+ 
+cldcClientSessionID OBJECT-TYPE
+         SYNTAX     SnmpAdminString
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+             "This object indicates the session 
+              to which the client is associated."
+         ::= { cldcClientEntry 38}
+ 
+cldcClientApRoamMacAddress OBJECT-TYPE
+         SYNTAX     MacAddress
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+                 "This object indicates the MAC address of the
+                 AP to which the client has roamed." 
+         ::= { cldcClientEntry 39 }
+
+cldcClientMdnsProfile OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "This object specifies the mDNS Profile name
+                this 802.11 wireless client is mapped to. It could
+		be mapped to the WLAN to which the client is 
+		connected to, or the interface/interface groups
+		mapped to the WLAN."
+        ::= { cldcClientEntry 40 }
+
+cldcClientMdnsAdvCount OBJECT-TYPE
+        SYNTAX     Unsigned32 
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object specifies the number of mDNS
+	     advertisements received on the client."
+        ::= { cldcClientEntry 41}
+
+cldcClientPolicyName OBJECT-TYPE
+         SYNTAX     SnmpAdminString
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+             "This object indicates the local classification  
+              policy to which the client is associated."
+         ::= { cldcClientEntry 42}
+ 
+cldcClientAAARole OBJECT-TYPE
+         SYNTAX     SnmpAdminString
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+             "This object indicates the role string of the client 
+              that is used as match criterion for local policy profiling.
+              This string is returned during authentication. "
+         ::= { cldcClientEntry 43}
+ 
+cldcClientDeviceType OBJECT-TYPE
+         SYNTAX     SnmpAdminString
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+             "This object specifies the device type of the client.
+              This is identified once the profiling operation is completed."
+         ::= { cldcClientEntry 44}
+
+cldcUserAuthType OBJECT-TYPE
+    SYNTAX     INTEGER {
+            open(1),
+            wepPsk(2),
+            portal(3),
+            simPeap(4),
+            other(5)
+    }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Represents the Authentication Type of User."
+        ::= { cldcClientEntry 45}
+ 
+cldcClientByIpTable OBJECT-TYPE
+       SYNTAX     SEQUENCE OF CldcClientByIpEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This table represents the 802.11 wireless clients
+                that are associated with the APs that have joined
+                this controller and are indexed by cldcClientByIpAddressType
+                and cldcClientByIpAddress.
+                An entry is created automatically by the controller
+                when the client gets associated to the AP. An existing
+                entry gets deleted when the association gets dropped."
+    ::= { cldcStatusObjects 2 }
+   
+cldcClientByIpEntry OBJECT-TYPE
+        SYNTAX     CldcClientByIpEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Each entry represents a conceptual row in this
+                table and provides the information about the
+                clients associated to the APs that have joined
+                the controller.
+                An entry is identified by the client's
+                IP address."
+        INDEX { cldcClientMacAddress,  cldcClientByIpAddressType,  cldcClientByIpAddress }
+        ::= { cldcClientByIpTable 1 }
+
+CldcClientByIpEntry ::=
+        SEQUENCE {
+             cldcClientByIpAddressType     InetAddressType,
+             cldcClientByIpAddress         InetAddress,
+             cldcClientByIpAddressDiscoverType INTEGER,
+             cldcClientByIpAddressLastSeen TimeStamp
+        }
+
+cldcClientByIpAddressType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This object represents the type of the Client's
+                address made available through
+               cldcClientByIpAddress."
+        ::= { cldcClientByIpEntry 2 }
+
+cldcClientByIpAddress OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "This object represents the inet address of the Client"
+        ::= { cldcClientByIpEntry 3 }
+
+cldcClientByIpAddressDiscoverType OBJECT-TYPE
+        SYNTAX     INTEGER {
+                             invalid(1),
+                             ndp(2),
+                             dhcp(3),
+                             packet(4),
+                             local(5),
+                             static(6)
+                           }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "This object represents the discovery type of the Client's
+                 address
+                 invalid(1) = unknown
+                 ndp(2) = Address learnt by neighbor discovery protocol
+                 dhcp(3) = Address learnt via DHCP
+                 packet(4) = Address learnt by data packet addressing learning
+                 local(5) = Address applied to local interface
+                 static(6) = Address assigned statically "
+        ::= { cldcClientByIpEntry 4 }
+
+cldcClientByIpAddressLastSeen OBJECT-TYPE
+        SYNTAX     TimeStamp
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "This object indicates timestamp of the time 
+                 when an address was last seen in REACHABLE state"
+        ::= { cldcClientByIpEntry 5 }
+
+--********************************************************************
+--*  Sleeping Client Details 
+--********************************************************************
+cldcSleepingClientTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF CldcSleepingClientEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            " This table represents the information about 
+              Sleeping clients"
+        ::= { cldcStatusObjects 3 }
+
+cldcSleepingClientEntry OBJECT-TYPE
+        SYNTAX     CldcSleepingClientEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An entry containing the information about sleeping clients."
+        INDEX   { cldcSleepingClientMacAddress }
+        ::= { cldcSleepingClientTable 1 }
+
+CldcSleepingClientEntry ::= 
+     SEQUENCE {
+           cldcSleepingClientMacAddress      MacAddress,
+           cldcSleepingClientSsid            OCTET STRING,
+           cldcSleepingClientUserName        SnmpAdminString,
+           cldcSleepingClientRemainingTime   TimeInterval,   
+           cldcSleepingClientRowStatus       RowStatus
+     }
+
+cldcSleepingClientMacAddress OBJECT-TYPE
+     SYNTAX     MacAddress
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the MAC address of the
+          sleeping client and uniquely identifies the entry."
+     ::= { cldcSleepingClientEntry 1 }
+
+cldcSleepingClientSsid OBJECT-TYPE
+     SYNTAX          OCTET STRING
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+         "This object represents the SSID of the WLAN to which the
+          sleeping client is associated." 
+     ::= { cldcSleepingClientEntry 2 }
+
+cldcSleepingClientUserName OBJECT-TYPE
+     SYNTAX          SnmpAdminString
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+         "This object represents the username used by the sleeping client." 
+     ::= { cldcSleepingClientEntry 3 }
+
+cldcSleepingClientRemainingTime OBJECT-TYPE
+     SYNTAX     TimeInterval
+     UNITS      "Hours"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object indicates the remaining session time
+          for the sleeping client." 
+     ::= { cldcSleepingClientEntry 4 }
+
+cldcSleepingClientRowStatus OBJECT-TYPE
+     SYNTAX          RowStatus
+     MAX-ACCESS      read-create
+     STATUS          current
+     DESCRIPTION
+         "This is the status column for this row and used
+          to delete specific instances of row in the table." 
+    ::= { cldcSleepingClientEntry 5 }
+
+--********************************************************************
+--*  Wireless client statistics 
+--********************************************************************
+
+cldcClientStatisticTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF CldcClientStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+           "This table lists statistics and status of the 802.11 wireless
+           clients associated with the access points attached to the 
+           controller."
+
+        ::= { cldcStatisticObjects 1 }
+
+cldcClientStatisticEntry OBJECT-TYPE
+        SYNTAX     CldcClientStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An entry in this table provides traffic statistics of the
+            associated client based upon its Mac address."
+        INDEX { cldcClientMacAddress }
+        ::= { cldcClientStatisticTable 1 }
+
+CldcClientStatisticEntry ::=
+        SEQUENCE {
+             cldcClientDataRetries               Counter64,
+             cldcClientRtsRetries                Counter64,
+             cldcClientDuplicatePackets          Counter64,
+             cldcClientDecryptFailures           Counter64,
+             cldcClientMicErrors                 Counter64,
+             cldcClientMicMissingFrames          Counter64,
+             cldcClientRaPacketsDropped          Counter64,
+             cldcClientInterimUpdatesCount       Counter64,
+	     cldcClientDataBytesReceived	 Counter64,
+             cldcClientRealtimeBytesReceived     Counter64,
+             cldcClientRxDataBytesDropped        Counter64,
+             cldcClientRxRealtimeBytesDropped    Counter64,
+             cldcClientDataBytesSent         	 Counter64,
+             cldcClientRealtimeBytesSent         Counter64,
+             cldcClientTxDataBytesDropped        Counter64,
+             cldcClientTxRealtimeBytesDropped    Counter64,
+             cldcClientDataPacketsReceived       Counter64,
+             cldcClientRealtimePacketsReceived   Counter64,
+             cldcClientRxDataPacketsDropped      Counter64,
+             cldcClientRxRealtimePacketsDropped  Counter64,
+             cldcClientDataPacketsSent           Counter64,
+             cldcClientRealtimePacketsSent       Counter64,
+             cldcClientTxDataPacketsDropped      Counter64,
+             cldcClientTxRealtimePacketsDropped  Counter64,
+             cldcClientTxDataPackets             Counter64,
+             cldcClientTxDataBytes               Counter64,
+             cldcClientRxDataPackets             Counter64,
+             cldcClientRxDataBytes               Counter64
+        }
+
+cldcClientDataRetries OBJECT-TYPE
+        SYNTAX     Counter64
+        UNITS      "Retries"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION                
+            "This object indicates the number of attempts made by the
+            client before transmitting the MSDU successfully."
+        ::= { cldcClientStatisticEntry  1 }
+
+cldcClientRtsRetries OBJECT-TYPE
+        SYNTAX     Counter64
+        UNITS      "Retries"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION                
+            "This object indicates the number of times the client has
+            attempted to send RTS packets before receiving CTS packets."
+        ::= { cldcClientStatisticEntry  2 }
+
+cldcClientDuplicatePackets  OBJECT-TYPE
+        SYNTAX     Counter64
+        UNITS      "Packets"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION                
+            "This object indicates the number of times a duplicate packet
+            is received for the client."
+        ::= { cldcClientStatisticEntry  3 }
+
+cldcClientDecryptFailures OBJECT-TYPE
+        SYNTAX     Counter64
+        UNITS      "Packets"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION                
+            "This object indicates the number of packets received from the
+            client that failed to decrypt properly." 
+        ::= { cldcClientStatisticEntry  4 }
+
+cldcClientMicErrors OBJECT-TYPE
+        SYNTAX     Counter64
+        UNITS      "Packets"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION                
+            "This object indicates the number of MIC errors experienced by
+            the client."
+        ::= { cldcClientStatisticEntry  5 }
+
+cldcClientMicMissingFrames OBJECT-TYPE
+        SYNTAX     Counter64
+        UNITS      "Packets"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION                
+            "This object indicates the number of missing MIC packets for
+            the client." 
+        ::= { cldcClientStatisticEntry  6 }
+
+cldcClientRaPacketsDropped OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION                
+            "This is the number of RA Packets dropped for this 
+            client."
+        ::= { cldcClientStatisticEntry  7 }
+
+cldcClientInterimUpdatesCount OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION                
+            "This is the number of interim updates count sent for this 
+            client."
+        ::= { cldcClientStatisticEntry  8 }
+
+cldcClientDataBytesReceived OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is the number data bytes received for this mobile station"
+        ::= { cldcClientStatisticEntry  9 }
+
+cldcClientRealtimeBytesReceived OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is the number realtime bytes received for this mobile station"
+        ::= { cldcClientStatisticEntry  10 }
+
+cldcClientRxDataBytesDropped OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is the number Rx data bytes dropped for this mobile station"
+        ::= { cldcClientStatisticEntry  11 }
+
+cldcClientRxRealtimeBytesDropped OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is the number Rx realtime bytes dropped for this mobile station"
+        ::= { cldcClientStatisticEntry  12 }
+
+cldcClientDataBytesSent OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is the number data bytes Sent for this mobile station"
+        ::= { cldcClientStatisticEntry  13 }
+
+cldcClientRealtimeBytesSent OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is the number realtime bytes Sent for this mobile station"
+        ::= { cldcClientStatisticEntry  14 }
+
+cldcClientTxDataBytesDropped OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is the number Tx data bytes dropped for this mobile station"
+        ::= { cldcClientStatisticEntry  15 }
+
+cldcClientTxRealtimeBytesDropped OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is the number Tx realtime bytes dropped for this mobile station"
+        ::= { cldcClientStatisticEntry  16 }
+
+cldcClientDataPacketsReceived OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is the number data Packets received for this mobile station"
+        ::= { cldcClientStatisticEntry  17 }
+
+cldcClientRealtimePacketsReceived OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is the number realtime Packets received for this mobile station"
+        ::= { cldcClientStatisticEntry  18 }
+
+cldcClientRxDataPacketsDropped OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is the number Rx data Packets dropped for this mobile station"
+        ::= { cldcClientStatisticEntry  19 }
+
+cldcClientRxRealtimePacketsDropped OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is the number Rx realtime Packets dropped for this mobile station"
+        ::= { cldcClientStatisticEntry  20 }
+
+cldcClientDataPacketsSent OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is the number data Packets Sent for this mobile station"
+        ::= { cldcClientStatisticEntry  21 }
+
+cldcClientRealtimePacketsSent OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is the number realtime Packets Sent for this mobile station"
+        ::= { cldcClientStatisticEntry  22 }
+
+cldcClientTxDataPacketsDropped OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is the number Tx data Packets dropped for this mobile station"
+        ::= { cldcClientStatisticEntry  23 }
+
+cldcClientTxRealtimePacketsDropped OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is the number Tx realtime Packets dropped for this mobile station"
+        ::= { cldcClientStatisticEntry  24 }
+
+cldcClientTxDataPackets OBJECT-TYPE
+         SYNTAX     Counter64
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+             "This is the number of data packets sent by this mobile station"
+         ::= { cldcClientStatisticEntry  25 }
+ 
+cldcClientTxDataBytes OBJECT-TYPE
+         SYNTAX     Counter64
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+             "This is the number of data bytes sent by this mobile station"
+         ::= { cldcClientStatisticEntry  26 }
+ 
+cldcClientRxDataPackets OBJECT-TYPE
+         SYNTAX     Counter64
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+             "This is the number of data packets sent for this mobile station"
+         ::= { cldcClientStatisticEntry  27 }
+ 
+cldcClientRxDataBytes OBJECT-TYPE
+         SYNTAX     Counter64
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+             "This is the number of data bytes sent for this mobile station"
+         ::= { cldcClientStatisticEntry  28 }
+
+--********************************************************************
+--*  Client Ccx Services Version Table 
+--********************************************************************
+
+cldccCcxVersionInfoTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF CldccCcxVersionInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS       current
+        DESCRIPTION
+                "This table contains the detail of the CCX version 
+                supported by the clients. This is used to identify 
+                the services supported by a CCX v6 client."	  		
+      ::= { cldcCcxObjects 1 }
+
+cldccCcxVersionInfoEntry OBJECT-TYPE
+        SYNTAX      CldccCcxVersionInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "There is an entry in the table for each entry identified by the client mac address."
+        INDEX
+                 {  cldcClientMacAddress  }
+        ::= { cldccCcxVersionInfoTable 1 }
+
+CldccCcxVersionInfoEntry ::=
+        SEQUENCE  {
+              cldccCcxFoundationServiceVersion  CcxServiceVersion,
+              cldccCcxLocationServiceVersion    CcxServiceVersion,
+              cldccCcxVoiceServiceVersion       CcxServiceVersion,
+              cldccCcxManagementServiceVersion  CcxServiceVersion
+        }
+
+cldccCcxFoundationServiceVersion   OBJECT-TYPE
+        SYNTAX     CcxServiceVersion
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION 
+                "This is the CCX version supported by the client
+                 for the service, foundation."
+::= { cldccCcxVersionInfoEntry 1 }
+
+cldccCcxLocationServiceVersion OBJECT-TYPE
+        SYNTAX     CcxServiceVersion
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION 
+                  "This is the CCX version supported by the client
+                   for the service, location."
+::= { cldccCcxVersionInfoEntry 2 }
+
+cldccCcxVoiceServiceVersion OBJECT-TYPE
+        SYNTAX     CcxServiceVersion
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION 
+                 "This is the CCX version supported by the client
+                 for the service, voice."
+::= { cldccCcxVersionInfoEntry 3 }
+
+cldccCcxManagementServiceVersion  OBJECT-TYPE
+        SYNTAX     CcxServiceVersion
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION 
+                 "This is the CCX version supported by the client
+                 for the service, management."
+::= { cldccCcxVersionInfoEntry 4 }
+
+--********************************************************************
+--*    NOTIFICATION  Control objects
+--********************************************************************
+cldcKeyDecryptErrorEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The object to control the generation of
+            ciscoLwappDot11ClientKeyDecryptError notification.
+
+            A value of 'true' indicates that the agent generates
+            ciscoLwappDot11ClientKeyDecryptError notification.
+
+            A value of 'false' indicates that the agent doesn't
+            generate ciscoLwappDot11ClientKeyDecryptError notification."
+    DEFVAL  { true }
+    ::= { cldcConfigObjects 1 }
+
+cldcAssocNacAlertEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+            "The object to control the generation of
+            ciscoLwappDot11ClientAssocNacAlert notification.
+ 
+            A value of 'true' indicates that the agent generates
+            ciscoLwappDot11ClientAssocNacAlert notification.
+ 
+            A value of 'false' indicates that the agent doesn't
+            generate ciscoLwappDot11ClientAssocNacAlert notification." 
+      ::= { cldcConfigObjects 2 }
+  
+cldcDisassocNacAlertEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+            "The object to control the generation of
+            ciscoLwappDot11ClientDisassocNacAlert notification.
+  
+            A value of 'true' indicates that the agent generates
+            ciscoLwappDot11ClientDisassocNacAlert notification.
+  
+            A value of 'false' indicates that the agent doesn't
+            generate ciscoLwappDot11ClientDisassocNacAlert notification." 
+      ::= { cldcConfigObjects 3 }
+
+cldcMovedToRunStateEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+            "The object to control the generation of
+            ciscoLwappDot11ClientMovedToRunState notification.
+  
+            A value of 'true' indicates that the agent generates
+            ciscoLwappDot11ClientMovedToRunState notification.
+  
+            A value of 'false' indicates that the agent doesn't
+            generate ciscoLwappDot11ClientMovedToRunState notification." 
+      ::= { cldcConfigObjects 4 }
+
+ciscoLwappDot11ClientStaticIpFailTrapEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The object to control the generation of
+            ciscoLwappDot11ClientStaticIpFailTrap notification.
+
+            A value of 'true' indicates that the agent generates
+            ciscoLwappDot11ClientStaticIpFailTrap notification.
+
+            A value of 'false' indicates that the agent doesn't
+            generate ciscoLwappDot11ClientStaticIpFailTrap notification."
+    DEFVAL  { true }
+    ::= { cldcConfigObjects 5 }
+
+--********************************************************************
+--*    NOTIFICATIONS Objects
+--********************************************************************
+cldcClientRSSI OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "This object specifies the average RSSI for the Mobile Station."
+    ::= { cldcNotifObjects 1 }
+ 
+cldcClientSNR OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "This object specifies the average SNR for the Mobile Station."
+    ::= { cldcNotifObjects 2 }
+
+cldcDOT11ClientReasonCode OBJECT-TYPE
+    SYNTAX INTEGER  {
+        unspecified(1),
+        previousAuthNotValid (2),
+        deauthenticationLeaving (3),
+        disassociationDueToInactivity (4),
+        disassociationAPBusy (5),
+        class2FrameFromNonAuthStation (6),
+        class2FrameFromNonAssStation (7),
+        disassociationStaHasLeft (8),
+        staReqAssociationWithoutAuth (9),
+        invalidInformationElement(40),
+        groupCipherInvalid (41),
+        unicastCipherInvalid (42),
+        akmpInvalid (43),
+        unsupportedRsnVersion (44),
+        invalidRsnIeCapabilities(45),
+        cipherSuiteRejected(46),
+        missingReasonCode (99),
+        maxAssociatedClientsReached(101),
+        maxAssociatedClientsReachedOnRadio(105),
+        maxAssociatedClientsReachedOnWlan(106),
+        unSpecifiedQosFailure(200),
+        qosPolicyMismatch(201),
+        inSufficientBandwidth(202),
+        inValidQosParams(203)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+        "unspecified - Unspecified.
+         previousAuthNotValid - Previous Authentication
+                                         was not valid.
+         deauthenticationLeaving       - Leaving due to
+                                       deauthentication.
+         disassociationDueToInactivity - Disassociation
+                                      due to Inactivity.
+         disassociationAPBusy - Disassociation since AP
+                                               was busy.
+         class2FrameFromNonAuthStation -  Class 2 frame
+                         from non authenticated station.
+         class2FrameFromNonAssStation - Class 2 frame
+                            from non associated station.
+         disassociationStaHasLeft - Station has left due
+                                      to disassociation.
+         staReqAssociationWithoutAuth    - Station send
+             association request without authentication.
+         invalidInformationElement - Invalid information
+                                                element.
+         groupCipherInvalid      - Invalid group Cipher.
+         unicastCipherInvalid  - Invalid unicast cipher.
+         akmpInvalid           - Invalid AKMP.
+         unsupportedRsnVersion - Unsupported RSN version.
+         invalidRsnIeCapabilities       - Invalid RSN IE
+                                            capabilities.
+         cipherSuiteRejected     - Cipher suite rejected.
+         missingReasonCode      - Reason code is missing.
+         maxAssociatedClientsReached -   Maximum allowed.
+                    associated client number has reached.
+         maxAssociatedClientsReachedOnRadio - Maximum
+         allowed associated client number has reached on
+                                                   radio.
+         maxAssociatedClientsReachedOnWlan - Maximum
+          allowed associated client number has reached on
+                                                    wlan.
+         unSpecifiedQosFailure - Unsupported QOS failure.
+         qosPolicyMismatch      - Mismatch on QOS policy.
+         inSufficientBandwidth  - Insufficient bandwidth.
+         inValidQosParams       - Invalid QOS parameters."
+    ::= { cldcNotifObjects 3 }
+ 
+cldcDOT11ClientTxDataPackets OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "This is the number of data packets sent by this mobile station"
+    ::= { cldcNotifObjects 4 }
+ 
+cldcDOT11ClientTxDataBytes OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "This is the number of data bytes sent by this mobile station"
+    ::= { cldcNotifObjects 5 }
+ 
+cldcDOT11ClientRxDataPackets OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "This is the number of data packets sent for this mobile station"
+    ::= { cldcNotifObjects 6 }
+ 
+cldcDOT11ClientRxDataBytes OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "This is the number of data bytes sent for this mobile station"
+    ::= { cldcNotifObjects 7 }
+ 
+cldcClientVlanId OBJECT-TYPE
+    SYNTAX Integer32 (0..4096)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Vlan ID of the Interface to which the client is
+         associated."
+    ::= { cldcNotifObjects 8 }
+ 
+cldcClientPolicyType OBJECT-TYPE
+    SYNTAX INTEGER {
+                         dot1x(1),
+                         wpa1(2),
+                         wpa2(3),
+                         wpa2vff(4),
+                         notavailable(5),
+                         unknown(6),
+                         wapi(7)
+                   }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Mode of the AP to which the Mobile Station is associated."
+    ::= {  cldcNotifObjects 9 }
+ 
+cldcClientEapType OBJECT-TYPE
+    SYNTAX INTEGER {
+                         eapTls(1),
+                         ttls(2),
+                         peap(3),
+                         leap(4),
+                         speke(5),
+                         eapFast(6),
+                         notavailable(7),
+                         unknown(8)
+                   }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+         "Mode of the AP to which the Mobile Station is associated."
+    ::= {  cldcNotifObjects 10 }
+ 
+cldcClientAID OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "AID for the mobile station"
+    ::= { cldcNotifObjects 11 }
+ 
+cldcClientAuthenticationAlgorithm OBJECT-TYPE
+    SYNTAX INTEGER  {
+                         openSystem (1),
+                         sharedKey(2),
+                         unknown(3),
+                         openAndEap(129)
+                    }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Authentication Algorithm of Mobile Station "
+    ::= { cldcNotifObjects 12 }
+ 
+cldcClientWepState OBJECT-TYPE
+    SYNTAX INTEGER  {
+                         enable(1),
+                         disable(2)
+                    }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "WEP State of Mobile Station"
+    ::= { cldcNotifObjects 13 }
+ 
+cldcClientEncryptionCypher OBJECT-TYPE
+    SYNTAX INTEGER  {
+                         ccmpAes(1),
+                         tkipMic(2),
+                         wep40(3),
+                         wep104(4),
+                         wep128(5),
+                         none(6),
+                         notavailable(7),
+                         unknown(8),
+                         wapiSMS4(9)
+                    }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Mode of the AP to which the Mobile Station is associated."
+    ::= { cldcNotifObjects 14 }
+ 
+cldcClientPortNumber OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The Port Number of this Airespace Switch on which the
+         traffic of the Mobile Station is coming through."
+    ::= { cldcNotifObjects 15 }
+
+cldcClientAnchorAddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "This object indicates mobility Anchor address type."
+     ::= { cldcNotifObjects 16 }
+ 
+cldcClientAnchorAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "If the Mobility Status of the Mobile Station is
+         Anchor then it will have Peer Ip Address and will
+         have Anchor IP if the Role is Foreign"
+     ::= { cldcNotifObjects 17 }
+ 
+cldcClientEssIndex OBJECT-TYPE
+    SYNTAX Unsigned32 (1..517)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Ess Index of the Wlan(SSID) that is being used by Mobile
+         Station to connect to AP"
+    ::= { cldcNotifObjects 18 }
+ 
+cldcClientCcxVersion OBJECT-TYPE
+    SYNTAX INTEGER {
+                      notSupported(1),
+                      ccxv1(2),
+                      ccxv2(3),
+                      ccxv3(4),
+                      ccxv4(5),
+                      ccxv5(6),
+                      ccxv6(7)
+                   }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Represents the Cisco Compatible Extensions (CCX)
+         Version the client is using for communication
+         with the AP."
+    DEFVAL { notSupported }
+    ::= {  cldcNotifObjects 19 }
+ 
+cldcClientE2eVersion OBJECT-TYPE
+    SYNTAX INTEGER {
+                      notSupported(1),
+                      e2ev1(2),
+                      e2ev2(3)
+                   }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Represents the End-2-End Version the client is
+         using for communication with the AP."
+    ::= {  cldcNotifObjects 20 }
+ 
+cldcClientInterface OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..32))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "Name of the Interface of the mobile client to the switch."
+    ::= { cldcNotifObjects 21 }
+ 
+cldcClientMobilityStatus OBJECT-TYPE
+    SYNTAX INTEGER  {
+                        unassociated(1),
+                        local(2),
+                        anchor(3),
+                        foreign(4),
+                        handoff(5),
+                        unknown(6),
+                        exportanchor(7),
+                        exportforeign(8)
+                    }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Mobility Role of the Mobile Station."
+    ::= { cldcNotifObjects 22 }
+ 
+cldcClientStatusCode OBJECT-TYPE
+    SYNTAX INTEGER(0..65535)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Status Code of the Mobile Station"
+    ::= { cldcNotifObjects 23 }
+ 
+
+cldcClientDeleteAction OBJECT-TYPE
+    SYNTAX INTEGER  {
+                         default(1),
+                         delete(2)
+                    }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Action to Deauthenticate the Mobile Station. Set the
+         State to delete."
+    ::= { cldcNotifObjects 24 }
+
+cldcClientSecurityPolicyStatus OBJECT-TYPE
+    SYNTAX INTEGER  {
+                         completed(1),
+                         notcompleted(2)
+                    }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "When this attribute has value completed, it shall
+         indicate that the Mobile Station has completed the
+         security policy checks. Otherwise the checks are yet
+         to be completed."
+    ::= { cldcNotifObjects 25 }
+
+cldcClientTrapEventTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "This object represents the inet address of the Client."
+    ::= { cldcNotifObjects 26 }
+
+cldcClientPolicyManagerState OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "This object represents the current policy enforcement
+        manager state of the client in controller." 
+    ::= { cldcNotifObjects 27 }
+
+cldcClientAssocTime OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "This object indicates the value of client association time"
+    ::= { cldcNotifObjects 28 }
+
+cldcClientPmipDataValid OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "This object represents whether client has valid PMIP data."
+    ::= { cldcNotifObjects 29 }
+
+cldcClientMobilityExtDataValid OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "This object represents new mobility status."
+    ::= { cldcNotifObjects 30 }
+
+cldcClientPolicyErrors OBJECT-TYPE
+    SYNTAX       Counter64
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Number of Policy Errors for Mobile Station"
+    ::= { cldcNotifObjects 31 }
+
+cldcClientSessionId OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "This object indicates the session 
+         to which the client is associated."
+    ::= { cldcNotifObjects 32}
+
+cldcClientPmipNai OBJECT-TYPE
+    SYNTAX 	SnmpAdminString 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the name of the
+         profile, the client is associated to."
+    ::= {cldcNotifObjects 33}
+
+cldcClientPmipState OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the state of the PMIP client:
+         null: binding doesn't exist
+         init: binding created, Retx timer running for PBU, binding not yet 
+               accepted from LMA, Tunnel/route is not yet setup
+         active:  binding accepted by LMA, refresh timer running, Tunnel/route setup   
+                  complete. 
+         refreshPending: Refresh timer expired and Retx timer running. PBU refresh
+                     sent, PBA not yet received from LMA, (Tunnel/route is already setup).
+         disconnectingSt: Dereg reply is expected.  Retx  timer is   
+                      running, tunnel/route is still setup."
+    ::= {cldcNotifObjects 34}
+
+cldcClientPmipInterface OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the interface to which the 
+         client is associated."
+    ::= {cldcNotifObjects 35}
+
+cldcClientPmipHomeAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the type of the Client's Home
+         address made available through cldcClientPmipHomeAddress."
+    ::= {cldcNotifObjects 36}
+
+cldcClientPmipHomeAddr OBJECT-TYPE
+    SYNTAX      InetAddress 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the Home Address of the client."
+    ::= {cldcNotifObjects 37}
+
+cldcClientPmipAtt OBJECT-TYPE
+    SYNTAX  INTEGER      {
+             reserved               (1),
+             logicalNetworkInterface(2),
+             pointToPointInterface  (3),
+             ethernet               (4),
+             wirelessLan            (5),
+             wimax                  (6),
+             threeGPPGERAN          (7),
+             threeGPPUTRAN          (8),
+             threeGPPETRAN          (9),
+             threeGPP2eHRPD         (10),
+             threeGPP2HRPD          (11),
+             threeGPP21xRTT         (12),
+             threeGPP2UMB           (13)
+           }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the access technology type by which 
+         the client is currently attached."
+    ::= {cldcNotifObjects 38}
+
+cldcClientPmipLocalLinkId OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the local link identifier of the client."
+    ::= {cldcNotifObjects 39}
+
+cldcClientPmipLmaName OBJECT-TYPE
+    SYNTAX      SnmpAdminString 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the LMA to which the client is connected."
+    ::= {cldcNotifObjects 40}
+
+cldcClientPmipLifeTime OBJECT-TYPE
+    SYNTAX      TimeTicks 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the duration of the PMIP client association."
+    ::= {cldcNotifObjects 41}
+
+cldcClientPmipDomainName OBJECT-TYPE
+    SYNTAX      SnmpAdminString 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the domain to which the PMIP client is associated."
+    ::= {cldcNotifObjects 42}
+
+cldcClientPmipUpKey OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the upstream key of the PMIP client."
+    ::= {cldcNotifObjects 43}
+
+cldcClientPmipDownKey OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the downstream key of the PMIP client."
+    ::= {cldcNotifObjects 44}
+
+--********************************************************************
+--*    NOTIFICATIONS 
+--********************************************************************
+ciscoLwappDot11ClientKeyDecryptError NOTIFICATION-TYPE
+    OBJECTS { 
+              cldcAssociationMode,
+              cldcClientMacAddress,
+              cldcApMacAddress,
+              cldcIfType,
+              cLApName,
+              cldcClientAuthMode			  
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when a decrypt error occurs.
+         The WEP WPA or WPA2 Key configured at the station may be wrong.
+         cldcAssociationMode represents the association mode for which 
+         the key decrypt error occurred.
+         cldcApMacAddress represents the MacAddress of the AP to which
+         the client is associated.
+         cldcIfType represents the wireless interface type of the client.
+         cLApName represents the name of the AP to which the client is 
+         associated."
+    ::= { ciscoLwappDot11ClientMIBNotifs 1 }
+
+ciscoLwappDot11ClientAssocNacAlert NOTIFICATION-TYPE
+	OBJECTS {
+                                cldcClientMacAddress,
+				cldcClientWlanProfileName,
+				cldcClientIPAddress,
+             	cldcApMacAddress,
+				cldcClientQuarantineVLAN,
+				cldcClientAccessVLAN,
+                cldcClientAuthMode				
+			}
+	STATUS current
+	DESCRIPTION
+          "This notification is generated when the client on NAC enabled
+          SSIDs complete layer2 authentication . This is to inform about 
+          client's presence to the NAC appliance.
+          cldcClientWlanProfileName represents the profile name of the 
+          WLAN, this 802.11 wireless client is connected to.
+          cldcClientIPAddress represents the unique ipaddress of the 
+          client.
+          cldcApMacAddress represents the MacAddress of the AP to which
+          the client is associated.
+          cldcClientQuarantineVLAN represents the quarantine VLAN for 
+          the client.
+          cldcClientAccessVLAN represents the access VLAN for the client."
+	::= { ciscoLwappDot11ClientMIBNotifs 2 }
+				
+				
+ciscoLwappDot11ClientDisassocNacAlert NOTIFICATION-TYPE
+	OBJECTS {
+                                cldcClientMacAddress,
+				cldcClientWlanProfileName,
+				cldcClientIPAddress,
+             	cldcApMacAddress,
+				cldcClientQuarantineVLAN,
+				cldcClientAccessVLAN
+			}
+	STATUS current
+	DESCRIPTION
+	  "This notification is generated when the controller removes the
+          client entry on NAC enabled SSIDs.
+          cldcClientWlanProfileName represents the profile name of the 
+          WLAN, this 802.11 wireless client is connected to.
+          cldcClientIPAddress represents the unique ipaddress of the 
+          client.
+          cldcApMacAddress represents the MacAddress of the AP to which
+          the client is associated.
+          cldcClientQuarantineVLAN represents the quarantine VLAN for the
+          client.
+          cldcClientAccessVLAN represents the access VLAN for the client.
+          This is issued on NAC enabled ssids, whenever WLC removes client's entry."
+	::= { ciscoLwappDot11ClientMIBNotifs 3 }
+
+ciscoLwappDot11ClientMovedToRunState NOTIFICATION-TYPE
+    OBJECTS { 
+              cldcClientMacAddress,
+              cldcClientIPAddress,
+              cldcClientUsername,
+              cldcClientSSID,
+              cldcApMacAddress,
+              cLApDot11IfSlotId,
+              cLApName
+    }
+    STATUS current
+    DESCRIPTION
+          "This notification is generated when the client completes the
+          PEM state and moves to the RUN state.
+          cldcClientUsername represents the username used by the client.
+          cldcClientIPAddress represents the unique ipaddress of the 
+          client.
+          cldcClientSSID represents the SSID of the WLAN to which the 
+          client is associated.
+          cldcApMacAddress represents the MacAddress of the AP to which
+          the client is associated.
+          cLApDot11IfSlotId represents the slotId of the AP to which
+          the client is associated.
+          cLApName represents the name of the AP to which the client is 
+          associated."
+    ::= { ciscoLwappDot11ClientMIBNotifs 4 }
+
+ciscoLwappDot11ClientStaticIpFailTrap NOTIFICATION-TYPE
+	OBJECTS {
+				cldcClientMacAddress,
+				cldcClientIPAddress
+			}
+	STATUS current
+	DESCRIPTION
+		  "This is issued whenever the subnet defined for the Static IP of a Client is not found."
+	::= { ciscoLwappDot11ClientMIBNotifs 5 }
+
+ciscoLwappDot11ClientDisassocDataStatsTrap NOTIFICATION-TYPE
+	OBJECTS {
+				cLApName,
+                                cLApDot11IfSlotId,
+                                cldcClientByIpAddressType,
+                                cldcClientByIpAddress,
+                                cldcApMacAddress, 
+                                cldcClientReasonCode,  
+                                cldcClientUsername,
+                                cldcClientSSID,
+                                cldcClientSessionID, 
+                                cldcClientTxDataPackets,             
+                                cldcClientTxDataBytes,
+                                cldcClientRxDataPackets,
+                                cldcClientRxDataBytes
+                }
+    STATUS current
+    DESCRIPTION
+        "The disassociate notification shall be sent when the Station
+        sends a Disassociation frame. The value of the notification
+        shall include the MAC address of the MAC to which the 
+        Disassociation frame was sent and the reason for the 
+        disassociation"
+    ::= { ciscoLwappDot11ClientMIBNotifs 6 }
+
+ciscoLwappDot11ClientAssocDataStatsTrap NOTIFICATION-TYPE
+	OBJECTS {
+                                cLApDot11IfSlotId,
+                                cldcClientByIpAddressType,
+                                cldcClientByIpAddress,
+                                cldcApMacAddress,
+                                cldcClientUsername,
+                                cldcClientApRoamMacAddress,
+                                cldcClientSSID,
+                                cldcClientTxDataPackets,             
+                                cldcClientTxDataBytes,
+                                cldcClientRxDataPackets,
+                                cldcClientRxDataBytes
+                }
+    STATUS current
+    DESCRIPTION
+        "The associate notification shall be sent when the Station
+        sends a association frame."
+    ::= { ciscoLwappDot11ClientMIBNotifs 7 }
+
+ciscoLwappDot11ClientSessionTrap NOTIFICATION-TYPE
+    OBJECTS { 
+              cLApDot11IfSlotId,
+              cLApName,
+              cldcClientByIpAddressType,
+              cldcClientByIpAddress,
+              cldcClientUsername,
+              cldcClientSSID,
+              cldcClientSessionID,
+              cldcApMacAddress
+            }
+    STATUS current
+    DESCRIPTION
+        "Issued when the client completes the PEM state and moves to the RUN state." 
+    ::= { ciscoLwappDot11ClientMIBNotifs 8 }
+
+ciscoLwappDot11ClientAssocTrap NOTIFICATION-TYPE
+    OBJECTS {
+              cldcClientTrapEventTime,
+              cldcClientMacAddress,
+              cldcClientByIpAddressType,
+              cldcClientByIpAddress,
+              cldcClientPolicyType,
+              cldcClientStatus,
+              cldcClientAID,
+              cldcApMacAddress,
+              cLApDot11IfSlotId,
+              cldcClientSSID,
+              cldcClientAuthenticationAlgorithm,
+              cldcClientEncryptionCypher,
+              cldcClientPortNumber,
+              cldcClientAnchorAddressType,
+              cldcClientAnchorAddress,
+              cldcClientEssIndex,
+              cldcClientWlanProfileName,
+              cldcClientWgbStatus,
+              cldcClientWgbMacAddress,
+              cldcClientCcxVersion,
+              cldcClientE2eVersion,
+              cldcClientInterface,
+              cldcClient80211uCapable,
+              cldcClientMobilityStatus,
+              cldcClientRSSI,
+              cldcClientSNR,
+              cldcClientSecurityPolicyStatus,
+              cldcClientLoginTime,
+              cldcClientAssocTime,
+              cldcClientCurrentTxRateSet,
+              cldcClientDataRateSet,
+              cldcClientHreapApAuth,
+              cldccCcxFoundationServiceVersion,
+              cldccCcxLocationServiceVersion,
+              cldccCcxVoiceServiceVersion,
+              cldccCcxManagementServiceVersion,
+              cldcClientDataSwitching,
+              cldcClientAuthentication,
+              cLApDot11RadioChannelNumber,
+              cLApIfLoadChannelUtilization,
+              cLApLocation,
+              cLAPGroupVlanName,
+              cLApSubMode,
+              cldcClientIPAddress,
+              cldcClientSessionId,
+              cldcClientVlanId,
+              cldcClientProtocol,
+              cldcClientEapType,
+              cldcClientPolicyErrors,
+              cldcClientDataRetries,
+              cldcClientRtsRetries,
+              cldcClientDataBytesSent,
+              cldcClientDataBytesReceived,
+              cldcClientDataPacketsSent,
+              cldcClientDataPacketsReceived,
+              cldcClientTxDataBytesDropped,
+              cldcClientRxDataBytesDropped,
+              cldcClientTxDataPacketsDropped,
+              cldcClientRxDataPacketsDropped
+            }
+    STATUS current
+    DESCRIPTION
+        "The notification shall be sent when the Station
+         associats to controller."
+    ::= { ciscoLwappDot11ClientMIBNotifs 9 }
+
+ciscoLwappDot11ClientDeAuthenticatedTrap NOTIFICATION-TYPE
+    OBJECTS {
+              cldcClientTrapEventTime,
+              cldcClientUpTime,
+              cldcClientMacAddress,
+              cldcClientByIpAddressType,
+              cldcClientByIpAddress,
+              cldcClientPostureState,
+              cldcClientProtocol,
+              cldcClientVlanId,
+              cldcClientPolicyType,
+              cldcClientEapType,
+              cldcClientStatus,
+              cldcClientAID,
+              cldcApMacAddress,
+              cLApDot11IfSlotId,
+              cldcClientSSID,
+              cldcClientAuthenticationAlgorithm,
+              cldcClientWepState,
+              cldcClientEncryptionCypher,
+              cldcClientPortNumber,
+              cldcClientAnchorAddressType,
+              cldcClientAnchorAddress,
+              cldcClientEssIndex,
+              cldcClientWlanProfileName,
+              cldcClientWgbStatus,
+              cldcClientWgbMacAddress,
+              cldcClientCcxVersion,
+              cldcClientE2eVersion,
+              cldcClientInterface,
+              cldcClient80211uCapable,
+              cldcClientMobilityStatus,
+              cldcClientRSSI,
+              cldcClientSNR,
+              cldcClientDataRetries,
+              cldcClientRtsRetries,
+              cldcClientUsername,
+              cldcDOT11ClientReasonCode,
+              cldcClientStatusCode, 
+              cldcClientDeleteAction,
+              cldcClientSecurityPolicyStatus,
+              cldcClientNacState,
+              cldcClientLoginTime,
+              cldcClientAssocTime,
+              cldcClientCurrentTxRateSet,
+              cldcClientDataRateSet,
+              cldcClientHreapApAuth,
+              cldccCcxFoundationServiceVersion,
+              cldccCcxLocationServiceVersion,
+              cldccCcxVoiceServiceVersion,
+              cldccCcxManagementServiceVersion,
+              cldcClientDataSwitching,
+              cldcClientAuthentication,
+              cldcClientByIpAddressDiscoverType,
+              cldcClientByIpAddressLastSeen,
+              cldcClientPowerSaveMode,
+              cLApDot11RadioChannelNumber,
+              cLApIfLoadChannelUtilization,
+              cLApLocation,
+              cLAPGroupVlanName,
+              cLApSubMode,
+              cldcClientIPAddress,
+              cldcClientPolicyErrors,
+              cldcClientPolicyManagerState,
+              cldcClientDataBytesSent,
+              cldcClientDataBytesReceived,
+              cldcClientDataPacketsSent,
+              cldcClientDataPacketsReceived,
+              cldcClientTxDataBytesDropped,
+              cldcClientRxDataBytesDropped,
+              cldcClientTxDataPacketsDropped,
+              cldcClientRxDataPacketsDropped,
+              cldcClientSessionId
+            }
+    STATUS current
+    DESCRIPTION
+        "The notification shall be sent when the Station
+         gets de-authenticated."
+    ::= { ciscoLwappDot11ClientMIBNotifs 10 }
+
+ciscoLwappDot11ClientMovedToRunStateNewTrap NOTIFICATION-TYPE
+    OBJECTS {
+              cldcClientTrapEventTime,
+              cldcClientMacAddress,
+              cldcClientByIpAddressType,
+              cldcClientByIpAddress,
+              cldcClientPostureState,
+              cldcClientProtocol,
+              cldcClientVlanId,
+              cldcClientPolicyType,
+              cldcClientEapType,
+              cldcClientStatus,
+              cldcClientAID,
+              cldcApMacAddress,
+              cLApDot11IfSlotId,
+              cldcClientWlanProfileName,
+              cldcClientAuthenticationAlgorithm,
+              cldcClientWepState,
+              cldcClientEncryptionCypher,
+              cldcClientPortNumber,
+              cldcClientAnchorAddressType,
+              cldcClientAnchorAddress,
+              cldcClientEssIndex,
+              cldcClientWgbStatus,
+              cldcClientWgbMacAddress,
+              cldcClientCcxVersion,
+              cldcClientE2eVersion,
+              cldcClient80211uCapable,
+              cldcClientMobilityStatus,
+              cldcClientRSSI,
+              cldcClientSNR,
+              cldcClientDataRetries,
+              cldcClientRtsRetries,
+              cldcClientUsername,
+              cldcClientStatusCode,
+              cldcClientSecurityPolicyStatus,
+              cldcClientNacState,
+              cldcClientLoginTime,
+              cldcClientDataRateSet,
+              cldcClientHreapApAuth,
+              cldccCcxFoundationServiceVersion,
+              cldccCcxLocationServiceVersion,
+              cldccCcxVoiceServiceVersion,
+              cldccCcxManagementServiceVersion,
+              cldcClientDataSwitching,
+              cldcClientAuthentication,
+              cldcClientByIpAddressDiscoverType,
+              cldcClientByIpAddressLastSeen,
+              cldcClientPowerSaveMode,
+              cLApDot11RadioChannelNumber,
+              cLApIfLoadChannelUtilization,
+              cLApSubMode,
+              cldcClientIPAddress,
+              cldcClientPolicyManagerState,
+              cldcClientPmipNai,
+              cldcClientPmipState,
+              cldcClientPmipInterface,
+              cldcClientPmipHomeAddrType,
+              cldcClientPmipHomeAddr,
+              cldcClientPmipAtt,
+              cldcClientPmipLocalLinkId,
+              cldcClientPmipDomainName,
+              cldcClientPmipLmaName,
+              cldcClientPmipUpKey,
+              cldcClientPmipDownKey,
+              cldcClientPmipLifeTime,
+              cLMobilityExtMCClientAnchorMCPrivateAddressType, 
+              cLMobilityExtMCClientAnchorMCPrivateAddress,
+              cLMobilityExtMCClientAssociatedMAAddressType,
+              cLMobilityExtMCClientAssociatedMAAddress,
+              cLMobilityExtMCClientAssociatedMCAddressType,
+              cLMobilityExtMCClientAssociatedMCAddress,
+              cLMobilityExtMCClientAssociatedMCGroupId,
+              cLMobilityExtMCClientAnchorMCGroupId,
+              cldcClientPmipDataValid,
+              cldcClientMobilityExtDataValid,
+              cldcClientSessionId
+            }
+    STATUS current
+    DESCRIPTION
+        "The notification shall be sent when the Station
+         moves to run or authenticated state."
+    ::= { ciscoLwappDot11ClientMIBNotifs 11 }
+
+ciscoLwappDot11ClientMobilityTrap NOTIFICATION-TYPE
+     OBJECTS {
+               cldcClientTrapEventTime,
+               cldcClientUpTime,
+               cldcClientMacAddress,
+               cldcClientByIpAddressType,
+               cldcClientByIpAddress,
+               cldcClientPostureState,
+               cldcClientProtocol,
+               cldcClientVlanId,
+               cldcClientPolicyType,
+               cldcClientEapType,
+               cldcClientStatus,
+               cldcClientAID,
+               cldcApMacAddress,
+               cLApDot11IfSlotId,
+               cldcClientSSID,
+               cldcClientAuthenticationAlgorithm,
+               cldcClientWepState,
+               cldcClientEncryptionCypher,
+               cldcClientPortNumber,
+               cldcClientAnchorAddressType,
+               cldcClientAnchorAddress,
+               cldcClientEssIndex,
+               cldcClientWlanProfileName,
+               cldcClientWgbStatus,
+               cldcClientWgbMacAddress,
+               cldcClientCcxVersion,
+               cldcClientE2eVersion,
+               cldcClientInterface,
+               cldcClient80211uCapable,
+               cldcClientMobilityStatus,
+               cldcClientRSSI,
+               cldcClientSNR,
+               cldcClientDataRetries,
+               cldcClientRtsRetries,
+               cldcClientUsername,
+               cldcDOT11ClientReasonCode,
+               cldcClientStatusCode, 
+               cldcClientDeleteAction,
+               cldcClientSecurityPolicyStatus,
+               cldcClientNacState,
+               cldcClientLoginTime,
+               cldcClientAssocTime,
+               cldcClientCurrentTxRateSet,
+               cldcClientDataRateSet,
+               cldcClientHreapApAuth,
+               cldccCcxFoundationServiceVersion,
+               cldccCcxLocationServiceVersion,
+               cldccCcxVoiceServiceVersion,
+               cldccCcxManagementServiceVersion,
+               cldcClientDataSwitching,
+               cldcClientAuthentication,
+               cldcClientByIpAddressDiscoverType,
+               cldcClientByIpAddressLastSeen,
+               cldcClientPowerSaveMode,
+               cLApDot11RadioChannelNumber,
+               cLApIfLoadChannelUtilization,
+               cLApLocation,
+               cLAPGroupVlanName,
+               cLApSubMode,
+               cldcClientIPAddress,
+               cldcClientPolicyErrors,
+               cldcClientPolicyManagerState,
+               cldcClientDataBytesSent,
+               cldcClientDataBytesReceived,
+               cldcClientDataPacketsSent,
+               cldcClientDataPacketsReceived,
+               cldcClientTxDataBytesDropped,
+               cldcClientRxDataBytesDropped,
+               cldcClientTxDataPacketsDropped,
+               cldcClientRxDataPacketsDropped,
+               cldcClientSessionId
+             }
+     STATUS current
+     DESCRIPTION
+         "The notification shall be sent when the Station
+          gets roamed."
+     ::= { ciscoLwappDot11ClientMIBNotifs 12 }
+
+--******************************************************************* 
+--*    Compliance statements  
+--********************************************************************
+
+ciscoLwappDot11ClientMIBCompliances OBJECT IDENTIFIER
+        ::= { ciscoLwappDot11ClientMIBConform 1 }
+
+ciscoLwappDot11ClientMIBGroups OBJECT IDENTIFIER
+        ::= { ciscoLwappDot11ClientMIBConform 2 }
+
+ciscoLwappDot11ClientMIBCompliance MODULE-COMPLIANCE
+        STATUS     deprecated 
+        DESCRIPTION
+                "The compliance statement for the SNMP entities that
+                implement this MIB. " 
+        MODULE MANDATORY-GROUPS {                
+                ciscoLwappDot11ClientMIBConfigGroup,
+                ciscoLwappDot11ClientMIBNotifsGroup,
+                ciscoLwappDot11ClientMIBStatusGroup
+        }
+        ::= { ciscoLwappDot11ClientMIBCompliances 1 }
+
+ciscoLwappDot11ClientMIBComplianceRev2 MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION
+          "The compliance statement for the SNMP entities that
+          implement this MIB."
+        MODULE          -- this module
+        MANDATORY-GROUPS {
+                          ciscoLwappDot11ClientMIBConfigGroup,
+                          ciscoLwappDot11ClientMIBNotifsGroup,
+                          ciscoLwappDot11ClientMIBStatusGroup,
+                          ciscoLwappDot11ClientMIBStatusGroupRev2,
+                          ciscoLwappDot11ClientMIBNotifsGroupRev2,
+                          ciscoLwappDot11ClientMIBNotifControlGroup
+                      }
+        ::= { ciscoLwappDot11ClientMIBCompliances 2 }
+
+--********************************************************************
+--*    Units of conformance  
+--********************************************************************
+
+ciscoLwappDot11ClientMIBConfigGroup OBJECT-GROUP
+        OBJECTS {
+                   cldcKeyDecryptErrorEnabled
+        }                
+        STATUS     current
+        DESCRIPTION
+                "This collection of objects specifies the required
+                configuration parameters for the 802.11 wireless 
+                clients."
+        ::= { ciscoLwappDot11ClientMIBGroups 1 }
+
+ciscoLwappDot11ClientMIBNotifsGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+                   ciscoLwappDot11ClientKeyDecryptError
+        }
+        STATUS     current
+        DESCRIPTION
+                "This collection of objects specifies the 
+                 notifications for the 802.11 wireless clients."
+        ::= { ciscoLwappDot11ClientMIBGroups 2 }
+
+ciscoLwappDot11ClientMIBStatusGroup OBJECT-GROUP
+        OBJECTS {
+                   cldcClientStatus,        
+                   cldcClientWlanProfileName,
+                   cldcClientWgbStatus,     
+                   cldcClientWgbMacAddress,
+                   cldcClientProtocol,
+                   cldcAssociationMode,
+                   cldcApMacAddress,
+                   cldcIfType,
+	 	   cldcClientIPAddress,	
+	 	   cldcClientNacState,
+	 	   cldcClientQuarantineVLAN,
+	           cldcClientAccessVLAN,
+                   cldcClientAuthMode		   		   
+        }                
+        STATUS     current
+        DESCRIPTION
+                "This collection of objects specifies the required
+                status parameters for the 802.11 wireless clients."
+        ::= { ciscoLwappDot11ClientMIBGroups 3 }
+
+ciscoLwappDot11ClientMIBStatusGroupRev2 OBJECT-GROUP
+        OBJECTS {
+                   cldcClientLoginTime,
+                   cldcClientUpTime,
+                   cldcClientPowerSaveMode,
+                   cldcClientCurrentTxRateSet,
+                   cldcClientDataRateSet,
+                   cldcClientHreapApAuth,
+                   cldcClient80211uCapable,
+                   cldcClientDataRetries,
+                   cldcClientRtsRetries,
+                   cldcClientDuplicatePackets,
+                   cldcClientDecryptFailures,
+                   cldcClientMicErrors,
+                   cldcClientMicMissingFrames,
+                   cldcClientIPAddress,
+                   cldcClientNacState,
+                   cldcClientQuarantineVLAN,
+                   cldcClientAccessVLAN,
+                   cldcClientPostureState,
+                   cldcClientAclName,
+                   cldcClientAclApplied,
+                   cldcClientRedirectUrl,
+                   cldcClientAaaOverrideAclName,
+                   cldcClientAaaOverrideAclApplied,
+                   cldcClientUsername,
+                   cldcClientSSID
+        }
+        STATUS current
+        DESCRIPTION
+                "This collection of objects specifies the required
+                status parameters for the 802.11 wireless clients."
+        ::= { ciscoLwappDot11ClientMIBGroups 4 }
+
+ciscoLwappDot11ClientMIBNotifsGroupRev2 NOTIFICATION-GROUP
+        NOTIFICATIONS {
+                   ciscoLwappDot11ClientAssocNacAlert,
+                   ciscoLwappDot11ClientDisassocNacAlert,
+                   ciscoLwappDot11ClientMovedToRunState
+        }
+        STATUS current
+        DESCRIPTION
+               "This collection of objects represents the
+               notifications for the 802.11 wireless clients."
+        ::= { ciscoLwappDot11ClientMIBGroups 5 }
+
+ciscoLwappDot11ClientMIBNotifControlGroup OBJECT-GROUP
+        OBJECTS {
+                  cldcAssocNacAlertEnabled,
+                  cldcDisassocNacAlertEnabled,
+                  cldcMovedToRunStateEnabled
+        }
+        STATUS current
+        DESCRIPTION
+              "This collection of objects represents the objects that control
+              the notifications for the 802.11 wireless clients."
+        ::= { ciscoLwappDot11ClientMIBGroups 6 }
+
+END
+
