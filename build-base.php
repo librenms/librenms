@@ -25,7 +25,7 @@
  */
 
 if (!isset($init_modules)) {
-    $opts = getopt('dh:u:p:n:t:s:');
+    $opts = getopt('ldh:u:p:n:t:s:');
 
     $db_vars = array(
         'db_host' => 'h',
@@ -47,6 +47,7 @@ if (!isset($init_modules)) {
     require __DIR__  . '/includes/init.php';
 
     $debug = isset($opts['d']);
+    $skip_schema_lock = isset($opts['l']);
 }
 
 require 'includes/sql-schema/update.php';

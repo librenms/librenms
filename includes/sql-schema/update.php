@@ -18,7 +18,12 @@ if (!isset($init_modules)  && php_sapi_name() == 'cli') {
     require realpath(__DIR__ . '/../..') . '/includes/init.php';
 }
 
-$schemaLock = \LibreNMS\FileLock::lock('schema', 30);
+if (isset($skip_schema_lock) && $skip_schema_lock) {
+    $schemaLock = true;
+} else {
+    $schemaLock = \LibreNMS\FileLock::lock('schema', 30);
+}
+
 if ($schemaLock === false) {
     echo "Failed to acquire lock, skipping schema update\n";
     $return = 1;
@@ -110,5 +115,7 @@ if ($schemaLock === false) {
         }
     }
 
-    $schemaLock->release();
+    if (is_a($schemaLock, '\LibreNMS\FileLock')) {
+        $schemaLock->release();
+    }
 }
