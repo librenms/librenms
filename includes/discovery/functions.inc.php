@@ -1084,13 +1084,18 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         $descr = $snmp_data[$data['descr']];
                     } else {
                         $descr = str_replace('{{ $index }}', $index, $data['descr']);
+                        preg_match('/(\{\{ \$)([a-zA-Z0-9]+)( \}\})/', $descr, $tmp_var);
+                        $tmp_var = $tmp_var[2];
+                        if ($snmp_data[$tmp_var]) {
+                            $descr = str_replace("{{ \$$tmp_var }}", $snmp_data[$tmp_var], $descr);
+                        }
                     }
                     $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
                     $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
-                    $low_limit = $data['low_limit'] ?: 'null';
-                    $low_warn_limit = $data['low_warn_limit'] ?: 'null';
-                    $warn_limit = $data['warn_limit'] ?: 'null';
-                    $high_limit = $data['high_limit'] ?: 'null';
+                    $low_limit = is_numeric($data['low_limit']) ? $data['low_limit'] : ($snmp_data[$data['low_limit']] ?: 'null');
+                    $low_warn_limit = is_numeric($data['low_warn_limit']) ? $data['low_warn_limit'] : ($snmp_data[$data['low_warn_limit']] ?: 'null');
+                    $warn_limit = is_numeric($data['warn_limit']) ? $data['warn_limit'] : ($snmp_data[$data['warn_limit']] ?: 'null');
+                    $high_limit = is_numeric($data['high_limit']) ? $data['high_limit'] : ($snmp_data[$data['high_limit']] ?: 'null');
                     $state_name = '';
                     if ($sensor_type !== 'state') {
                         if (is_numeric($divisor)) {
