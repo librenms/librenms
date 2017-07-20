@@ -22,7 +22,7 @@
  */
 
 // Don't create tickets for resolutions
-if($obj['status'] == 0 && $obj['msg'] != 'This is a test alert') {
+if($obj['severity'] == 'recovery' && $obj['msg'] != 'This is a test alert') {
     return True;
 }
 
@@ -60,9 +60,9 @@ $ret  = curl_exec($curl);
 $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 if( $code == 200 ) {
     $jiraout = json_decode($ret, true);
-    log_event("Created jira issue ".$jiraout['key']." for ".$device, $device, 'poller', 5);
+    d_echo("Created jira issue ".$jiraout['key']." for ".$device);
     return true;
 } else {
-    log_event("Jira connection error: ".serialize($ret) , $device, 'poller', 5);
+    d_echo("Jira connection error: ".serialize($ret));
     return false;
 }
