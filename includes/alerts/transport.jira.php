@@ -26,6 +26,7 @@ if($obj['status'] == 0 && $obj['msg'] != 'This is a test alert') {
     return True;
 }
 
+$device = device_by_id_cache($obj['device_id']); // for event logging
 
 $username = $opts['username'];
 $password = $opts['password'];
@@ -35,7 +36,7 @@ $details = "Librenms alert for: ".$obj['hostname'];
 $description = $obj['msg'];
 $url  = $opts['url'].'/rest/api/latest/issue';
 $curl = curl_init();
-  
+
 $data = array("project" => array("key" => $prjkey),
             "summary" => $details,
             "description" => $description,
@@ -58,7 +59,10 @@ curl_setopt($curl, CURLOPT_POSTFIELDS, $datastring);
 $ret  = curl_exec($curl);
 $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 if( $code == 200 ) {
-	return true;
+    $jiraout = json_decode($ret, true);
+    log_event("Created jira issue ".$jiraout['key']." for ".$device, $device, 'poller', 5);
+    return true;
 } else {
+    log_event("Jira connection error: ".serialize($ret) , $device, 'poller', 5);
     return false;
 }
