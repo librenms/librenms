@@ -56,11 +56,7 @@ if (getenv('DBTEST')) {
     $empty_db = (dbFetchCell("SELECT count(*) FROM `information_schema`.`tables` WHERE `table_type` = 'BASE TABLE' AND `table_schema` = ?", array($config['db_name'])) == 0);
     dbQuery("SET GLOBAL sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
 
-    if ($empty_db) {
-        $cmd = $config['install_dir'] . '/build-base.php';
-    } else {
-        $cmd = '/usr/bin/env php ' . $config['install_dir'] . '/includes/sql-schema/update.php';
-    }
+    $cmd = $config['install_dir'] . '/build-base.php';
     exec($cmd, $schema);
 
     register_shutdown_function(function () use ($empty_db, $sql_mode) {

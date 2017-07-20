@@ -163,6 +163,10 @@ class IRCBot
                 }
             }
 
+            if (isset($this->tempnick)) {
+                 $this->ircRaw('NICK '.$this->nick);
+            }
+
             $this->getData();
             if ($this->config['irc_alert']) {
                 $this->alertData();
@@ -246,26 +250,31 @@ class IRCBot
                     $severity_extended = '';
             endswitch;
 
-            $severity = str_replace(array('warning', 'critical'), array(_color('Warning', 'orange'), _color('Critical', 'red')), $alert['severity']).$severity_extended.' ';
+            $severity = str_replace(array('warning', 'critical'), array($this->_color('Warning', 'yellow'), $this->_color('Critical', 'red')), $alert['severity']).$severity_extended.' ';
             if ($alert['state'] == 0 and $this->config['irc_alert_utf8']) {
                 $severity = str_replace(array('Warning', 'Critical'), array('̶W̶a̶r̶n̶i̶n̶g', '̶C̶r̶i̶t̶i̶c̶a̶l'), $severity);
             }
 
             if ($this->config['irc_alert_chan']) {
                 foreach ($this->config['irc_alert_chan'] as $chan) {
-                    $this->ircRaw('PRIVMSG '.$chan.' :'.$severity.trim($alert['title']).' - Rule: '.trim($alert['name'] ? $alert['name'] : $alert['rule']).(sizeof($alert['faults']) > 0 ? ' - Faults:' : ''));
-                    foreach ($alert['faults'] as $k => $v) {
-                        $this->ircRaw('PRIVMSG '.$chan.' :#'.$k.' '.$v['string']);
+                    $this->ircRaw('PRIVMSG '.$chan.' :'.$severity.trim($alert['title']));
+                    foreach (explode("\n", $alert['msg']) as $line) {
+                        // We don't need to repeat the title
+                        $line = strip_tags($line);
+                        if (trim($line) != trim($alert['title'])) {
+                            $this->ircRaw('PRIVMSG '.$chan.' :'.$line);
+                        }
                     }
                 }
             } else {
                 foreach ($this->authd as $nick => $data) {
                     if ($data['expire'] >= time()) {
-                        $this->ircRaw('PRIVMSG '.$nick.' :'.$severity.trim($alert['title']).' - Rule: '.trim($alert['name'] ? $alert['name'] : $alert['rule']).(sizeof($alert['faults']) > 0 ? ' - Faults'.(sizeof($alert['faults']) > 3 ? ' (showing first 3 out of '.sizeof($alert['faults']).' )' : '' ).':' : ''));
-                        foreach ($alert['faults'] as $k => $v) {
-                            $this->ircRaw('PRIVMSG '.$nick.' :#'.$k.' '.$v['string']);
-                            if ($k >= 3) {
-                                break;
+                        $this->ircRaw('PRIVMSG '.$nick.' :'.$severity.trim($alert['title']));
+                        foreach (explode("\n", $alert['msg']) as $line) {
+                            // We don't need to repeat the title
+                            $line = strip_tags($line);
+                            if (trim($line) != trim($alert['title'])) {
+                                $this->ircRaw('PRIVMSG '.$nick.' :'.$line);
                             }
                         }
                     }
@@ -290,6 +299,52 @@ class IRCBot
                     $this->joinChan();
                     $this->j = 0;
                 }
+            }
+
+            if (($this->config['irc_ctcp']) && (preg_match("/^:".chr(1).".*/", $ex[3]))) {
+                // Handle CTCP
+                $ctcp = trim(preg_replace("/[^A-Z]/", "", $ex[3]));
+                $ctcp_reply = null;
+                $this->log("Received irc CTCP: ".$ctcp." from ".$this->getUser($this->data));
+                switch ($ctcp) {
+                    case 'VERSION':
+                        $ctcp_reply = chr(1)."$ctcp ".$this->config['irc_ctcp_version'].chr(1);
+                        break;
+                    case 'PING':
+                        $ctcp_reply = chr(1)."$ctcp ".$ex[4]. " ".$ex[5].chr(1);
+                        break;
+                    case 'TIME':
+                        $ctcp_reply = chr(1)."$ctcp ".date('c').chr(1);
+                        break;
+                }
+                if ($ctcp_reply !== null) {
+                    $this->log("Sending irc CTCP: ".'NOTICE '.$this->getUser($this->data)." :".$ctcp_reply);
+                    return $this->ircRaw('NOTICE '.$this->getUser($this->data)." :".$ctcp_reply);
+                }
+            }
+
+            if (($ex[1] == 'NICK') && (preg_replace("/^:/", "", $ex[2]) == $this->nick)) {
+                // Nickname changed successfully
+                if ($this->debug) {
+                    $this->log("Regained our real nick");
+                }
+                unset($this->tempnick);
+            }
+            if (($ex[1] == 433) || ($ex[1] == 437)) {
+                // Nickname already in use / temp unavailable
+                if ($this->debug) {
+                    $this->log("Nickname already in use...");
+                }
+                if ($ex[2] != "*") {
+                    $this->tempnick = $ex[2];
+                }
+                if (!isset($this->tempnick)) {
+                     $this->tempnick = $this->nick.rand(0, 99);
+                }
+                if ($this->debug) {
+                    $this->log("Using temp nick ".$this->tempnick);
+                }
+                return $this->ircRaw('NICK '.$this->tempnick);
             }
 
             $this->command = str_replace(array(chr(10), chr(13)), '', $ex[3]);
@@ -384,6 +439,7 @@ class IRCBot
 
         $this->log('Trying to connect ('.($try + 1).') to '.$this->server.':'.$this->port.($this->ssl ? ' (SSL)' : ''));
         if ($this->socket['irc']) {
+            $this->ircRaw('QUIT :Reloading');
             fclose($this->socket['irc']);
         }
 
@@ -572,6 +628,8 @@ class IRCBot
         if ($this->user['level'] == 10) {
             global $config;
             $config = array();
+            $config['install_dir'] = $this->config['install_dir'];
+            chdir($config['install_dir']);
             include 'includes/defaults.inc.php';
             include 'config.php';
             include 'includes/definitions.inc.php';
@@ -598,6 +656,7 @@ class IRCBot
     private function _quit($params)
     {
         if ($this->user['level'] == 10) {
+            $this->ircRaw("QUIT :Requested");
             return die();
         } else {
             return $this->respond('Permission denied.');
@@ -759,7 +818,7 @@ class IRCBot
                 }
                 if ($devdown > 0) {
                     $devdown = $this->_color($devdown, 'red');
-                    $devcount = $this->_color($devcount, 'orange', null, 'bold');
+                    $devcount = $this->_color($devcount, 'yellow', null, 'bold');
                 } else {
                     $devcount = $this->_color($devcount, 'green', null, 'bold');
                 }
@@ -780,7 +839,7 @@ class IRCBot
                 }
                 if ($prtdown > 0) {
                     $prtdown = $this->_color($prtdown, 'red');
-                    $prtcount = $this->_color($prtcount, 'orange', null, 'bold');
+                    $prtcount = $this->_color($prtcount, 'yellow', null, 'bold');
                 } else {
                     $prtcount = $this->_color($prtcount, 'green', null, 'bold');
                 }
@@ -800,7 +859,7 @@ class IRCBot
                 }
                 if ($srvdown > 0) {
                     $srvdown = $this->_color($srvdown, 'red');
-                    $srvcount = $this->_color($srvcount, 'orange', null, 'bold');
+                    $srvcount = $this->_color($srvcount, 'yellow', null, 'bold');
                 } else {
                     $srvcount = $this->_color($srvcount, 'green', null, 'bold');
                 }
@@ -836,9 +895,9 @@ class IRCBot
             'lightgrey' => "15",
         );
         $ret = chr(3);
-        if (in_array($fg_color, $colors)) {
+        if (array_key_exists($fg_color, $colors)) {
             $ret .= $colors[$fg_color];
-            if (in_array($bg_color, $colors)) {
+            if (array_key_exists($bg_color, $colors)) {
                 $ret .= ",".$colors[$fg_color];
             }
         }

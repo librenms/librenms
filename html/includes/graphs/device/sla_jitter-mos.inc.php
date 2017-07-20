@@ -17,7 +17,7 @@ require 'includes/graphs/common.inc.php';
 $rrd_options .= ' -l 0 -E ';
 $rrd_filename = rrd_name($device['hostname'], array('sla', $sla['sla_nr'], 'jitter'));
 
-if (file_exists($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_options .= " COMMENT:'                           Cur   Min   Max   Avg\\n'";
 
     $rrd_options .= " DEF:MOS=" . $rrd_filename . ":MOS:AVERAGE ";

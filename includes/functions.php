@@ -101,12 +101,16 @@ function getHostOS($device)
     $pattern = $config['install_dir'] . '/includes/definitions/*.yaml';
     foreach (glob($pattern) as $file) {
         $os = basename($file, '.yaml');
-        if (isset($config['os'][$os])) {
+        if (isset($config['os'][$os]['os'])) {
             $tmp = $config['os'][$os];
         } else {
             $tmp = Symfony\Component\Yaml\Yaml::parse(
                 file_get_contents($file)
             );
+            // pull in user overrides
+            if (isset($config['os'][$os])) {
+                $tmp = array_replace_recursive($tmp, $config['os'][$os]);
+            }
         }
         if (isset($tmp['discovery']) && is_array($tmp['discovery'])) {
             foreach ($tmp['discovery'] as $item) {
@@ -405,7 +409,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     global $config;
 
     // Test Database Exists
-    if (host_exists($host) === true) {
+    if (host_exists($host)) {
         throw new HostExistsException("Already have host $host");
     }
 
@@ -448,13 +452,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
             foreach ($config['snmp']['v3'] as $v3) {
                 $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode);
                 if ($force_add === true || isSNMPable($device)) {
-                    if ($force_add !== true) {
-                        $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-                    }
-                    $result = createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $snmphost, $force_add);
-                    if ($result !== false) {
-                        return $result;
-                    }
+                    return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add);
                 } else {
                     $host_unreachable_exception->addReason("SNMP $snmpver: No reply with credentials " . $v3['authname'] . "/" . $v3['authlevel']);
                 }
@@ -465,13 +463,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
                 $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode);
 
                 if ($force_add === true || isSNMPable($device)) {
-                    if ($force_add !== true) {
-                        $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-                    }
-                    $result = createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $snmphost, $force_add);
-                    if ($result !== false) {
-                        return $result;
-                    }
+                    return createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $force_add);
                 } else {
                     $host_unreachable_exception->addReason("SNMP $snmpver: No reply with community $community");
                 }
@@ -670,7 +662,6 @@ function getpollergroup($poller_group = '0')
  * @param array $v3 SNMPv3 settings required array keys: authlevel, authname, authpass, authalgo, cryptopass, cryptoalgo
  * @param int $poller_group distributed poller group to assign this host to
  * @param string $port_assoc_mode field to use to identify ports: ifIndex, ifName, ifDescr, ifAlias
- * @param string $snmphost device sysName to check for duplicates
  * @param bool $force_add Do not detect the host os
  * @return int the id of the added host
  * @throws HostExistsException Throws this exception if the host already exists
@@ -685,7 +676,6 @@ function createHost(
     $v3 = array(),
     $poller_group = 0,
     $port_assoc_mode = 'ifIndex',
-    $snmphost = '',
     $force_add = false
 ) {
     $host = trim(strtolower($host));
@@ -716,10 +706,11 @@ function createHost(
 
     if ($force_add !== true) {
         $device['os'] = getHostOS($device);
-    }
 
-    if (host_exists($host, $snmphost)) {
-        throw new HostExistsException("Already have host $host ($snmphost)");
+        $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
+        if (host_exists($host, $snmphost)) {
+            throw new HostExistsException("Already have host $host ($snmphost) due to duplicate sysName");
+        }
     }
 
     $device_id = dbInsert($device, 'devices');
@@ -1310,7 +1301,7 @@ function set_curl_proxy($curl)
 function get_proxy()
 {
     global $config;
-    
+
     if (getenv('http_proxy')) {
         return getenv('http_proxy');
     } elseif (getenv('https_proxy')) {
@@ -1353,22 +1344,33 @@ function first_oid_match($device, $list)
     }
 }
 
+
+/**
+ * Convert a hex ip to a human readable string
+ *
+ * @param string $hex
+ * @return string
+ */
 function hex_to_ip($hex)
 {
-    $return = "";
-    if (filter_var($hex, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && filter_var($hex, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false) {
-        $hex_exp = explode(' ', $hex);
-        foreach ($hex_exp as $item) {
-            if (!empty($item) && $item != "\"") {
-                $return .= hexdec($item).'.';
-            }
-        }
-        $return = substr($return, 0, -1);
-    } else {
-        $return = $hex;
+    $hex = str_replace(array(' ', '"'), '', $hex);
+
+    if (filter_var($hex, FILTER_VALIDATE_IP)) {
+        return $hex;
     }
-    return $return;
+
+    if (strlen($hex) == 8) {
+        return long2ip(hexdec($hex));
+    }
+
+    if (strlen($hex) == 32) {
+        $ipv6 = implode(':', str_split($hex, 4));
+        return preg_replace('/:0*([0-9a-fA-F])/', ':$1', $ipv6);
+    }
+
+    return ''; // invalid input
 }
+
 function fix_integer_value($value)
 {
     if ($value < 0) {
@@ -1504,32 +1506,28 @@ function snmpTransportToAddressFamily($transport)
  * Checks if the $hostname provided exists in the DB already
  *
  * @param string $hostname The hostname to check for
- * @param string $snmphost The sysName to check
+ * @param string $sysName The sysName to check
  * @return bool true if hostname already exists
  *              false if hostname doesn't exist
  */
-function host_exists($hostname, $snmphost = '')
+function host_exists($hostname, $sysName = null)
 {
     global $config;
-    $count = dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($hostname));
-    if ($count > 0) {
-        return true;
-    } else {
-        if ($config['allow_duplicate_sysName'] === false && !empty($snmphost)) {
-            if (!empty($config['mydomain'])) {
-                $full_host = rtrim($snmphost, '.') . '.' . $config['mydomain'];
-                $count = dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `sysName` = ? or `sysName` = ?", array($snmphost,$full_host));
-            } else {
-                $count = dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `sysName` = ?", array($snmphost));
-            }
-            if ($count > 0) {
-                return true;
-            } else {
-                return false;
-            }
+
+    $query = "SELECT COUNT(*) FROM `devices` WHERE `hostname`=?";
+    $params = array($hostname);
+
+    if (!empty($sysName) && !$config['allow_duplicate_sysName']) {
+        $query .= " OR `sysName`=?";
+        $params[] = $sysName;
+
+        if (!empty($config['mydomain'])) {
+            $full_sysname = rtrim($sysName, '.') . '.' . $config['mydomain'];
+            $query .= " OR `sysName`=?";
+            $params[] = $full_sysname;
         }
-        return false;
     }
+    return dbFetchCell($query, $params) > 0;
 }
 
 /**
@@ -2334,53 +2332,6 @@ function db_schema_is_current()
     $latest = key($schemas);
 
     return $current >= $latest;
-}
-
-/**
- * Get the lock status for a given name
- * @param $name
- * @return bool
- */
-function get_lock($name)
-{
-    global $config;
-    $lock_file = $config['install_dir']."/.$name.lock";
-    if (file_exists($lock_file)) {
-        $pids = explode("\n", trim(`ps -e | grep php | awk '{print $1}'`));
-        $lpid = trim(file_get_contents($lock_file));
-        if (in_array($lpid, $pids)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
- * Set the lock status for a given name
- * @param $name
- */
-function set_lock($name)
-{
-    global $config;
-    $lock_file = $config['install_dir']."/.$name.lock";
-    $lock = get_lock($name);
-
-    if ($lock === true) {
-        echo "$lock_file exists, exiting\n";
-        exit(1);
-    } else {
-        file_put_contents($lock_file, getmypid());
-    }
-}
-
-/**
- * Release lock file for a given name
- * @param $name
- */
-function release_lock($name)
-{
-    global $config;
-    unlink($config['install_dir']."/.$name.lock");
 }
 
 /**

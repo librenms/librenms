@@ -237,10 +237,7 @@ foreach (getlocations() as $location) {
       </div>
       <button type="submit" class="btn btn-default btn-sm">Search</button>
       <a class="btn btn-default btn-sm" href="<?php echo(generate_url(array('page' => 'ports', 'section' => $vars['section'], 'bare' => $vars['bare']))); ?>" title="Reset critera to default." >Reset</a>
-      </td>
     </form>
-  </tr>
-</table>
 
 <?php
 }

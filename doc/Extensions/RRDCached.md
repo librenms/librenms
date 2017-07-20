@@ -62,6 +62,9 @@ $config['rrdcached']    = "unix:/var/run/rrdcached.sock";
 - Edit /etc/default/rrdcached to include:
 ```ssh
 DAEMON=/usr/bin/rrdcached
+DAEMON_USER=librenms
+DAEMON_GROUP=librenms
+WRITE_THREADS=4
 WRITE_TIMEOUT=1800
 WRITE_JITTER=1800
 BASE_PATH=/opt/librenms/rrd/
@@ -69,7 +72,7 @@ JOURNAL_PATH=/var/lib/rrdcached/journal/
 PIDFILE=/var/run/rrdcached.pid
 SOCKFILE=/var/run/rrdcached.sock
 SOCKGROUP=librenms
-BASE_OPTIONS="-B -F"
+BASE_OPTIONS="-B -F -R"
 ```
 
 ### RRDCached installation CentOS 6

@@ -13,7 +13,7 @@ IMPORTS
 
 
 rlSysmngMib MODULE-IDENTITY
-        LAST-UPDATED "201010310000a"
+        LAST-UPDATED "201010310000z"
         ORGANIZATION "Cisco Systems, Inc."
 
         CONTACT-INFO
@@ -26,7 +26,7 @@ rlSysmngMib MODULE-IDENTITY
 
         DESCRIPTION
              "The private MIB module definition for System Manager pool."
-        REVISION "201010310000a"
+        REVISION "201010310000z"
         DESCRIPTION
              "Initial revision."
         ::= { switch001 204 }

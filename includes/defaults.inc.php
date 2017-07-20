@@ -30,7 +30,7 @@ $config['temp_dir']    = '/tmp';
 $config['log_dir']     = $config['install_dir'].'/logs';
 
 // MySQL extension to use
-$config['db']['extension']       = 'mysqli';//mysql and mysqli available
+$config['db']['extension']       = 'mysqli';
 // MySQL Debug level
 $config['mysql_log_level']       = 'ERROR';
 
@@ -566,17 +566,19 @@ $config['device_traffic_descr'][] = '/null/';
 $config['device_traffic_descr'][] = '/dummy/';
 
 // IRC Bot configuration
-$config['irc_host']       = '';
-$config['irc_port']       = '';
-$config['irc_maxretry']   = 3;
-$config['irc_nick']       = $config['project_name'];
-$config['irc_chan'][]     = '##'.$config['project_id'];
-$config['irc_pass']       = '';
-$config['irc_external']   = '';
-$config['irc_authtime']   = 3;
-$config['irc_debug']      = false;
-$config['irc_alert']      = false;
-$config['irc_alert_utf8'] = false;
+$config['irc_host']         = '';
+$config['irc_port']         = '';
+$config['irc_maxretry']     = 3;
+$config['irc_nick']         = $config['project_name'];
+$config['irc_chan'][]       = '##'.$config['project_id'];
+$config['irc_pass']         = '';
+$config['irc_external']     = '';
+$config['irc_authtime']     = 3;
+$config['irc_debug']        = false;
+$config['irc_alert']        = false;
+$config['irc_alert_utf8']   = false;
+$config['irc_ctcp']         = false;
+$config['irc_ctcp_version'] = "LibreNMS IRCbot. https://www.librenms.org/";
 
 // Authentication
 $config['allow_unauth_graphs'] = false;
@@ -781,7 +783,7 @@ $config['discovery_modules']['ntp']                  = 1;
 $config['discovery_modules']['loadbalancers']        = 0;
 $config['discovery_modules']['mef']                  = 0;
 $config['discovery_modules']['wireless']             = 1;
-
+$config['discovery_modules']['fdb-table']            = 1;
 // Enable daily updates
 $config['update'] = 1;
 
@@ -906,3 +908,10 @@ $config['xirrus_disable_stations']  = false;
 
 // Graphite default port
 $config['graphite']['port']         = 2003;
+
+// Whether to enable secure cookies. Setting this to true enable secure cookies
+// and only send them over HTTPS. Setting this to false will send cookies over
+// HTTP and HTTPS, but they will be insecure. Setting this to $_SERVER["HTTPS"]
+// will send secure cookies when the site is being accessed over HTTPS, and
+// send insecure cookies when the site is being accessed over HTTP.
+$config['secure_cookies'] = $_SERVER["HTTPS"];

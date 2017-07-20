@@ -121,6 +121,9 @@ function nicecase($item)
         case 'sdfsinfo':
             return 'SDFS info';
 
+        case 'pi-hole':
+            return 'Pi-hole';
+
         default:
             return ucfirst($item);
     }
@@ -1344,19 +1347,6 @@ function get_ports_from_type($given_types)
     # Run the query with the generated 'where' and necessary parameters, and send it back.
     $ports = dbFetchRows("SELECT * FROM `ports` as I, `devices` AS D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias", $type_param);
     return $ports;
-}
-
-function ipmiSensorName($hardwareId, $sensorIpmi, $rewriteArray)
-{
-    if (count($rewriteArray[$hardwareId]) > 0) {
-        if ($rewriteArray[$hardwareId][$sensorIpmi] != "") {
-            return $rewriteArray[$hardwareId][$sensorIpmi];
-        } else {
-            return $sensorIpmi;
-        }
-    } else {
-        return $sensorIpmi;
-    }
 }
 
 /**
