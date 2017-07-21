@@ -86,33 +86,36 @@ modules:
                         - { descr: closed, graph: 1, value: 2, generic: 2 }
                 -
                     oid: rPDU2PhaseStatusTable
+                    state_name: rPDU2PhaseStatusLoadState
                     value: rPDU2PhaseStatusLoadState
                     num_oid: .1.3.6.1.4.1.318.1.1.26.6.3.1.4.
                     index: 'rPDU2PhaseStatusLoadState.{{ $index }}'
-                    descr: 'Load state #{{ $index }}'
+                    descr: 'Load State, Phase #{{ $index }}'
                     states:
-                        - { descr: lowLoad, graph: 1, value: 1, generic: 1 }
+                        - { descr: lowLoad, graph: 1, value: 1, generic: 0 }
                         - { descr: normal, graph: 1, value: 2, generic: 0 }
                         - { descr: nearOverload, graph: 1, value: 3, generic: 1 }
                         - { descr: overload, graph: 1, value: 4, generic: 2 }
                 -
                     oid: rPDU2DeviceStatusTable
+                    state_name: rPDU2DeviceStatusLoadState
                     value: rPDU2DeviceStatusLoadState
                     num_oid: .1.3.6.1.4.1.318.1.1.26.4.3.1.4.
                     index: 'rPDU2DeviceStatusLoadState.{{ $index }}'
-                    descr: rPDU2DeviceStatusName
+                    descr: 'Device State'
                     states:
-                        - { descr: lowLoad, graph: 1, value: 1, generic: 1 }
+                        - { descr: lowLoad, graph: 1, value: 1, generic: 0 }
                         - { descr: normal, graph: 1, value: 2, generic: 0 }
                         - { descr: nearOverload, graph: 1, value: 3, generic: 1 }
                         - { descr: overload, graph: 1, value: 4, generic: 2 }
                         - { descr: notsupported, graph: 1, value: 5, generic: 3 }
                 -
                     oid: rPDU2DeviceStatusTable
+                    state_name: rPDU2DeviceStatusPowerSupplyAlarm
                     value: rPDU2DeviceStatusPowerSupplyAlarm
                     num_oid: .1.3.6.1.4.1.318.1.1.26.4.3.1.12.
                     index: 'rPDU2DeviceStatusPowerSupplyAlarm.{{ $index }}'
-                    descr: rPDU2DeviceStatusName
+                    descr: 'Power Supply State'
                     states:
                         - { descr: normal, graph: 1, value: 1, generic: 0 }
                         - { descr: alarm, graph: 1, value: 2, generic: 2 }
@@ -255,7 +258,7 @@ modules:
                     value: rPDU2PhaseStatusVoltage
                     num_oid: .1.3.6.1.4.1.318.1.1.26.6.3.1.6.
                     index: 'rPDU2PhaseStatusVoltage.{{ $index }}'
-                    descr: 'Voltage #{{ $index }}'
+                    descr: 'Voltage, Phase #{{ $index }}'
                     skip_value_lt: 0
         current:
             data:
@@ -283,7 +286,7 @@ modules:
                     num_oid: .1.3.6.1.4.1.318.1.1.26.6.3.1.5.
                     divisor: 10
                     index: 'rPDU2PhaseStatusCurrent.{{ $index }}'
-                    descr: 'Current #{{ $index }}'
+                    descr: 'Current, Phase #{{ $index }}'
         fanspeed:
             data:
                 -
@@ -354,13 +357,13 @@ modules:
                     oid: rPDU2PhaseStatusTable
                     value: rPDU2PhaseStatusPower
                     num_oid: .1.3.6.1.4.1.318.1.1.26.6.3.1.7.
-                    multiplier: 1000
+                    multiplier: 10
                     index: 'rPDU2PhaseStatusPower.{{ $index }}'
-                    descr: 'Power #{{ $index }}'
+                    descr: 'Power, Phase #{{ $index }}'
                 -
                     oid: rPDU2DeviceStatusTable
                     value: rPDU2DeviceStatusPower
                     num_oid: .1.3.6.1.4.1.318.1.1.26.4.3.1.5.
-                    multiplier: 100
+                    multiplier: 10
                     index: 'rPDU2DeviceStatusPower.{{ $index }}'
-                    descr: rPDU2DeviceStatusName
+                    descr: 'Power, Total'
