@@ -184,9 +184,7 @@ function discover_device(&$device, $options = null)
         register_mibs($device, $devicemib, "includes/discovery/functions.inc.php");
     }
 
-    $device_end = microtime(true);
-    $device_run = ($device_end - $device_start);
-    $device_time = substr($device_run, 0, 5);
+    $device_time  = round(microtime(true) - $device_start, 3);
 
     dbUpdate(array('last_discovered' => array('NOW()'), 'last_discovered_timetaken' => $device_time), 'devices', '`device_id` = ?', array($device['device_id']));
 
