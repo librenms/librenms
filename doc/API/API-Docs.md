@@ -65,7 +65,12 @@ source: API/API-Docs.md
     - [`services`](#api-services)
         - [`list_services`](#api-services-list_services)
         - [`get_service_for_host`](#api-services-get_service_for_host)
-
+    - [`logs`](#api-logs)
+        - [`list_eventlog`](#api-logs-list_eventlog)
+        - [`list_syslog`](#api-logs-list_syslog)
+        - [`list_alertlog`](#api-logs-list_alertlog)
+        - [`list_authlog`](#api-logs-list_authlog)
+        
 Describes the API structure.
 
 # <a name="api-structure">`Structure`</a> [`top`](#top)
@@ -1857,6 +1862,8 @@ Output:
 }
 ```
 
+## <a name="api-services">`Services`</a> [`top`](#top)
+
 ### <a name="api-services-list_services">Function: `list_services`</a> [`top`](#top)
 
 Retrieve all services
@@ -1960,6 +1967,77 @@ Output:
                 "service_ds": "{\"P2Vol_0_Processor_1_Vcore\":\"\",\"P2Vol_1_System_Board_1_-12V\":\"\",\"P2Vol_2_System_Board_1_12V\":\"\",\"P2Vol_3_System_Board_1_3.3VCC\":\"\",\"P2Vol_4_System_Board_1_5VCC\":\"\",\"P2Vol_5_System_Board_1_AVCC\":\"\",\"P2Vol_6_System_Board_1_VBAT\":\"\",\"P2Vol_7_System_Board_1_"
             }
         ]
+    ]
+}
+```
+
+## <a name="api-logs">`Logs`</a> [`top`](#top)
+
+### <a name="api-logs-list_eventlog">Function: `list_eventlog`</a> [`top`](#top)
+### <a name="api-logs-list_syslog">Function: `list_syslog`</a> [`top`](#top)
+### <a name="api-logs-list_alertlog">Function: `list_alertlog`</a> [`top`](#top)
+### <a name="api-logs-list_authlog">Function: `list_authlog`</a> [`top`](#top)
+
+All the `list_*logs` calls are aliased to `list_logs`.
+
+Retrieve all logs or logs for a specific device.
+
+Route: /api/v0/logs/eventlog/:hostname
+Route: /api/v0/logs/syslog/:hostname
+Route: /api/v0/logs/alertlog/:hostname
+Route: /api/v0/logs/authlog/:hostname
+
+  - id or hostname is the specific device
+
+Input:
+
+  - start: The page number to request.
+  - limit: The limit of results to be returned.
+  - from: The date and time to search from.
+  - to: The data and time to search to.
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/eventlog/:hostname
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/syslog/:hostname?limit=20
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/eventlog/:hostname?limit=20&start=5&from=2017-07-22%2023:00:00
+```
+
+Output:
+```text
+{
+    "status": "ok",
+    "err-msg": "",
+    "count": 5,
+    "total": "15",
+    "logs": [
+        {
+            "hostname": "localhost",
+            "sysName": "web01.1.novalocal",
+            "event_id": "10050349",
+            "host": "279",
+            "device_id": "279",
+            "datetime": "2017-07-22 19:57:47",
+            "message": "ifAlias:  ->  <pptp-something-something-tunnel-something>",
+            "type": "interface",
+            "reference": "NULL",
+            "username": "",
+            "severity": "3"
+        },
+        ....
+        {
+            "hostname": "localhost",
+            "sysName": "web01.1.novalocal",
+            "event_id": "10050353",
+            "host": "279",
+            "device_id": "279",
+            "datetime": "2017-07-22 19:57:47",
+            "message": "ifHighSpeed:  ->  0",
+            "type": "interface",
+            "reference": "NULL",
+            "username": "",
+            "severity": "3"
+        }
     ]
 }
 ```
