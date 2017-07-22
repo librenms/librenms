@@ -28,6 +28,8 @@ Currently we have support for the following health metrics along with the values
 
 We have support for defining health / sensor discovery using YAML files so that you don't need to know how to write PHP.
 
+> Please note that DISPLAY-HINTS are disabled so ensure you use the correct divisor / multiplier if applicable.
+
 All yaml files are located in `includes/definitions/discovery/$os.yaml`. Defining the information hear is not always 
 possible and is heavily reliant on vendors being sensible with the MIBs they generate. Only snmp walks are supported 
 and you must provide a sane table that can be traversed and contains all of the data you need. We will use netbotz as 
