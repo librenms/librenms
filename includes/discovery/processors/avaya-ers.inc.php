@@ -1,8 +1,8 @@
 <?php
 
 if ($device['os'] == 'avaya-ers') {
-    // Processor information only know to work with 5500 and 5600 switches
-    if (preg_match('/5[56][0-9][0-9]/', $device['sysDescr'])) {
+    // Processor information only know to work with 3500, 5500 and 5600 switches
+    if (preg_match('/[35][56][0-9][0-9]/', $device['sysDescr'])) {
         $procs = snmp_walk($device, '.1.3.6.1.4.1.45.1.6.3.8.1.1.6', '-Osqn');
 
         foreach (explode("\n", $procs) as $i => $t) {
