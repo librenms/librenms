@@ -23,6 +23,7 @@ print_optionbar_start();
                 <form method="post" action="" class="form-inline" role="form" id="result_form">
                     <div class="form-group">
                         <?php
+                        $params = array();
                         if (!is_numeric($vars['device'])) {
                         ?>
                         <select name="device" id="device" class="form-control input-sm">
@@ -42,6 +43,7 @@ print_optionbar_start();
                         <?php
                         } else {
                             echo '<input type="hidden" name="device" id="device" value="' . $vars['device'] . '">';
+                            $params[] = $vars['device'];
                         }
                         ?>
                     </div>
@@ -51,10 +53,10 @@ print_optionbar_start();
                                 <?php
                                 $sqlstatement = 'SELECT DISTINCT `program` FROM `syslog`';
                                 if (is_numeric($vars['device'])) {
-                                    $sqlstatement = $sqlstatement . ' WHERE device_id=' . $vars['device'];
+                                    $sqlstatement = $sqlstatement . ' WHERE device_id=?';
                                 }
                                 $sqlstatement = $sqlstatement .' ORDER BY `program`';
-                                foreach (dbFetchRows($sqlstatement) as $data) {
+                                foreach (dbFetchRows($sqlstatement, $params) as $data) {
                                     echo '"<option value="'.mres($data['program']).'"';
                                     if ($data['program'] == $vars['program']) {
                                         echo ' selected';
@@ -71,10 +73,10 @@ print_optionbar_start();
                                 <?php
                                 $sqlstatement = 'SELECT DISTINCT `priority` FROM `syslog`';
                                 if (is_numeric($vars['device'])) {
-                                    $sqlstatement = $sqlstatement . ' WHERE device_id=' . $vars['device'];
+                                    $sqlstatement = $sqlstatement . ' WHERE device_id=?';
                                 }
                                 $sqlstatement = $sqlstatement .' ORDER BY `level`';
-                                foreach (dbFetchRows($sqlstatement) as $data) {
+                                foreach (dbFetchRows($sqlstatement, $params) as $data) {
                                     echo '"<option value="'.mres($data['priority']).'"';
                                     if ($data['priority'] == $vars['priority']) {
                                         echo ' selected';
