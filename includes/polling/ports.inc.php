@@ -66,20 +66,6 @@ $stat_oids_db_extended = array(
     'ifOutMulticastPkts',
 );
 
-$cisco_oids = array(
-    'locIfHardType',
-    'locIfInRunts',
-    'locIfInGiants',
-    'locIfInCRC',
-    'locIfInFrame',
-    'locIfInOverrun',
-    'locIfInIgnored',
-    'locIfInAbort',
-    'locIfCollisions',
-    'locIfInputQueueDrops',
-    'locIfOutputQueueDrops',
-);
-
 $pagp_oids = array(
     'pagpOperationMode',
 );
@@ -172,6 +158,7 @@ $shared_oids = array(
 echo 'Caching Oids: ';
 $port_stats = array();
 $data       = array();
+$polled     = null;
 
 if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=') && version_compare($device['version'], '11.7', '<'))) {
     require_once 'ports/f5.inc.php';
@@ -201,6 +188,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
                         $port_stats[$i] = $data[$i];
                     }
                     $port_stats = snmp_get_multi($device, $oids, '-OQUst', 'IF-MIB', null, $port_stats);
+                    $port_stats[$i]['polled'] = time();
                 }
             }
         }
@@ -219,6 +207,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
                 $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB', null, '-OQUst');
             }
         }
+        $polled = time();
     }
 }
 
@@ -284,8 +273,6 @@ if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
 } elseif ($device['os'] != 'asa') {
     $port_stats = snmpwalk_cache_oid($device, 'dot1qPvid', $port_stats, 'Q-BRIDGE-MIB');
 }//end if
-
-$polled = time();
 
 // End Building SNMP Cache Array
 d_echo($port_stats);
@@ -430,7 +417,8 @@ foreach ($ports as $port) {
             $this_port['ifDescr'] = $matches[1];
         }
 
-        $polled_period = ($polled - $port['poll_time']);
+        $tmp_polled = $this_port['polled'] ?: $polled;
+        $polled_period = ($tmp_polled - $port['poll_time']);
 
         $port['update'] = array();
         $port['update_extended'] = array();
@@ -472,14 +460,22 @@ foreach ($ports as $port) {
             $this_port['ifPhysAddress']              = zeropad($a_a).zeropad($a_b).zeropad($a_c).zeropad($a_d).zeropad($a_e).zeropad($a_f);
         }
 
-        // use HC values if they are available
-        foreach ($hc_mappings as $hc_oid => $if_oid) {
-            if (isset($this_port[$hc_oid]) && $this_port[$hc_oid]) {
-                d_echo("$hc_oid ");
-                $this_port[$if_oid] = $this_port[$hc_oid];
-            } else {
-                d_echo("$if_oid ");
+        $hc_enabled = false;
+        // use HC values if they are available and not disabled
+        if ($config['os'][$device['os']]['no_hc'] != true) {
+            foreach ($hc_mappings as $hc_oid => $if_oid) {
+                if (isset($this_port[$hc_oid]) && $this_port[$hc_oid]) {
+                    if ($hc_oid === 'ifHCInOctets' || $hc_oid === 'ifHCOutOctets') {
+                        $hc_enabled = true;
+                    }
+                    d_echo("$hc_oid ");
+                    $this_port[$if_oid] = $this_port[$hc_oid];
+                } else {
+                    d_echo("$if_oid ");
+                }
             }
+        } else {
+            echo 'hc counters disabled';
         }
 
         if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {
@@ -553,11 +549,7 @@ foreach ($ports as $port) {
             if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid])) {
                 $port['update'][$oid] = array('NULL');
                 log_event($oid . ': ' . $port[$oid] . ' -> NULL', $device, 'interface', 4, $port['port_id']);
-                if ($debug) {
-                    d_echo($oid.': '.$port[$oid].' -> NULL ');
-                } else {
-                    echo $oid.' ';
-                }
+                d_echo($oid.': '.$port[$oid].' -> NULL ', $oid . ' ');
             } elseif ($port[$oid] != $this_port[$oid]) {
                 // if the value is different, update it
 
@@ -581,11 +573,7 @@ foreach ($ports as $port) {
                 }
 
                 log_event($oid . ': ' . $port[$oid] . ' -> ' . $this_port[$oid], $device, 'interface', 3, $port['port_id']);
-                if ($debug) {
-                    d_echo($oid.': '.$port[$oid].' -> '.$this_port[$oid].' ');
-                } else {
-                    echo $oid.' ';
-                }
+                d_echo($oid.': '.$port[$oid].' -> '.$this_port[$oid].' ', $oid . ' ');
             } else {
                 if ($oid == 'ifOperStatus' || $oid == 'ifAdminStatus') {
                     if ($port[$oid.'_prev'] == null) {
@@ -627,6 +615,8 @@ foreach ($ports as $port) {
         // End parse ifAlias
         // Update IF-MIB metrics
         $_stat_oids = array_merge($stat_oids_db, $stat_oids_db_extended);
+        unset($this_port['ifInOctets_rolled']);
+        unset($this_port['ifOutOctets_rolled']);
         foreach ($_stat_oids as $oid) {
             $port_update = 'update';
             $extended_metric = !in_array($oid, $stat_oids_db, true);
@@ -641,6 +631,20 @@ foreach ($ports as $port) {
 
             $oid_prev = $oid.'_prev';
             if (isset($port[$oid])) {
+                if ($device['uptime'] < $config['rrd']['step']) {
+                    // If the device uptime is less than the step value then this device has most likely rebooted
+                    // meaning we might have bad snmp data for *Octets
+                    if (($oid === 'ifInOctets' || $oid === 'ifOutOctets') && ($this_port[$oid] < $port[$oid])) {
+                        // We have negative value for *Octets
+                        $max_64 = '18446744073709551616';//Unused at the moment.
+                        $max_32 = '4294967296';
+                        if ($hc_enabled !== true) {
+                            // We store the new rolled version for use in rrd. DO NOT store in the DB as we need
+                            // to calculate the value again on the next poll.
+                            $this_port[$oid . '_rolled'] = (gmp_sub($max_32, $port[$oid])) + $this_port[$oid];
+                        }
+                    }
+                }
                 $oid_diff = ($this_port[$oid] - $port[$oid]);
                 $oid_rate = ($oid_diff / $polled_period);
                 if ($oid_rate < 0) {
@@ -712,8 +716,8 @@ foreach ($ports as $port) {
             ->addDataset('OUTMULTICASTPKTS', 'DERIVE', 0, 12500000000);
 
         $fields = array(
-            'INOCTETS'         => $this_port['ifInOctets'],
-            'OUTOCTETS'        => $this_port['ifOutOctets'],
+            'INOCTETS'         => $this_port['ifInOctets_rolled'] ?: $this_port['ifInOctets'],
+            'OUTOCTETS'        => $this_port['ifOutOctets_rolled'] ?: $this_port['ifOutOctets'],
             'INERRORS'         => $this_port['ifInErrors'],
             'OUTERRORS'        => $this_port['ifOutErrors'],
             'INUCASTPKTS'      => $this_port['ifInUcastPkts'],
@@ -802,4 +806,4 @@ foreach ($ports as $port) {
 } //end port update
 
 // Clear Variables Here
-unset($port_stats, $ports_found, $data_oids, $stat_oids, $stat_oids_db, $stat_oids_db_extended, $cisco_oids, $pagp_oids, $ifmib_oids, $hc_test, $ports_mapped, $ports, $_stat_oids, $rrd_def);
+unset($port_stats, $ports_found, $data_oids, $stat_oids, $stat_oids_db, $stat_oids_db_extended, $pagp_oids, $ifmib_oids, $hc_test, $ports_mapped, $ports, $_stat_oids, $rrd_def);
