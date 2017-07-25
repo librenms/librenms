@@ -92,10 +92,6 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
             "1.1.1.1||local7||info||info||be||2016-04-27 021:12:28||Mar 8 20:14:08.762: %FACILITY-SUBFACILITY-SEVERITY-MNEMONIC: Message-text||000956",
             array('device_id'=>1, 'program'=>'%FACILITY-SUBFACILITY-SEVERITY-MNEMONIC', 'msg'=>'Message-text')
         );
-        $this->checkSyslog(
-            "1.1.1.1||23||3||3||1328961:||2017-07-25 09:23:36|| Jul 25 09:23:35.026: %LINK-3-UPDOWN: Interface GigabitEthernet2/0/15, changed state to up||1328961",
-            array('device_id'=>1, 'program'=>'%LINK-3-UPDOWN', 'msg'=>'Interface GigabitEthernet2/0/15 changed state to up')
-        );
 
 
         // ---- CatOS ----
