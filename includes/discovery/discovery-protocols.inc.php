@@ -181,7 +181,11 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                     if ($remote_device_id) {
                         $if             = $lldp['lldpRemPortDesc'];
                         $id             = $lldp['lldpRemPortId'];
-                        $remote_port_id = dbFetchCell('SELECT `port_id` FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ? OR `ifDescr` = ? OR `ifName` = ? OR `ifPhysAddress` = ?) AND `device_id` = ?', array($if, $if, $id, $id, $remote_port_mac_address, $remote_device_id));
+                        if ($device['os'] == 'ros') {
+                            $remote_port_id = dbFetchCell('SELECT `port_id` FROM `ports` WHERE (`ifName` = ? OR `ifPhysAddress` = ?) AND `device_id` = ?', array($id, $remote_port_mac_address, $remote_device_id));
+                        } else {
+                            $remote_port_id = dbFetchCell('SELECT `port_id` FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ? OR `ifDescr` = ? OR `ifName` = ? OR `ifPhysAddress` = ?) AND `device_id` = ?', array($if, $if, $id, $id, $remote_port_mac_address, $remote_device_id));
+                        }
                     } else {
                         $remote_port_id = '0';
                     }
