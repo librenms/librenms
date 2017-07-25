@@ -73,6 +73,7 @@ print_optionbar_start();
                                 $sqlstatement = 'SELECT DISTINCT `priority` FROM `syslog`';
                                 if (is_numeric($vars['device'])) {
                                     $sqlstatement = $sqlstatement . ' WHERE device_id=?';
+                                    $param[] = $vars['device'];
                                 }
                                 $sqlstatement = $sqlstatement .' ORDER BY `level`';
                                 foreach (dbFetchRows($sqlstatement, $param) as $data) {
