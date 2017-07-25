@@ -49,7 +49,13 @@ print_optionbar_start();
                         <select name="program" id="program" class="form-control input-sm">
                             <option value="">All Programs</option>
                                 <?php
-                                foreach (dbFetchRows('SELECT DISTINCT `program` FROM `syslog` ORDER BY `program`') as $data) {
+                                $sqlstatement = 'SELECT DISTINCT `program` FROM `syslog`';
+                                if (is_numeric($vars['device'])) {
+                                    $sqlstatement = $sqlstatement . ' WHERE device_id=?';
+                                    $param[] = $vars['device'];
+                                }
+                                $sqlstatement = $sqlstatement .' ORDER BY `program`';
+                                foreach (dbFetchRows($sqlstatement, $param) as $data) {
                                     echo '"<option value="'.mres($data['program']).'"';
                                     if ($data['program'] == $vars['program']) {
                                         echo ' selected';
@@ -64,7 +70,13 @@ print_optionbar_start();
                         <select name="priority" id="priority" class="form-control input-sm">
                             <option value="">All Priorities</option>
                                 <?php
-                                foreach (dbFetchRows('SELECT DISTINCT `priority` FROM `syslog` ORDER BY `level`') as $data) {
+                                $sqlstatement = 'SELECT DISTINCT `priority` FROM `syslog`';
+                                if (is_numeric($vars['device'])) {
+                                    $sqlstatement = $sqlstatement . ' WHERE device_id=?';
+                                    $param[] = $vars['device'];
+                                }
+                                $sqlstatement = $sqlstatement .' ORDER BY `level`';
+                                foreach (dbFetchRows($sqlstatement, $param) as $data) {
                                     echo '"<option value="'.mres($data['priority']).'"';
                                     if ($data['priority'] == $vars['priority']) {
                                         echo ' selected';
