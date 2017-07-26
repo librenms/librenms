@@ -65,10 +65,15 @@ function user_exists($username)
 {
     global $config;
 
-    return dbFetchCell(
-        'SELECT COUNT(*) FROM `users` WHERE `username`=? OR `username`=?',
-        array($username, $config['http_auth_guest'])
-    ) > 0;
+    $query = 'SELECT COUNT(*) FROM `users` WHERE `username`=?';
+    $params = array($username);
+
+    if (isset($config['http_auth_guest'])) {
+        $query .=  ' OR `username`=?';
+        $params[] = $config['http_auth_guest'];
+    }
+
+    return dbFetchCell($query, $params) > 0;
 }
 
 
@@ -76,10 +81,17 @@ function get_userlevel($username)
 {
     global $config;
 
-    return dbFetchCell(
-        'SELECT `level` FROM `users` WHERE `username`=? OR `username`=?',
-        array($username, $config['http_auth_guest'])
-    );
+    $user_level = dbFetchCell('SELECT `level` FROM `users` WHERE `username`=?', array($username));
+
+    if ($user_level) {
+        return $user_level;
+    }
+
+    if (isset($config['http_auth_guest'])) {
+        return dbFetchCell('SELECT `level` FROM `users` WHERE `username`=?', array($config['http_auth_guest']));
+    }
+
+    return 0;
 }
 
 
@@ -87,10 +99,17 @@ function get_userid($username)
 {
     global $config;
 
-    return dbFetchCell(
-        'SELECT `user_id` FROM `users` WHERE `username`=? OR `username`=?',
-        array($username, $config['http_auth_guest'])
-    );
+    $user_id = dbFetchCell('SELECT `user_id` FROM `users` WHERE `username`=?', array($username));
+
+    if ($user_id) {
+        return $user_id;
+    }
+
+    if (isset($config['http_auth_guest'])) {
+        return dbFetchCell('SELECT `user_id` FROM `users` WHERE `username`=?', array($config['http_auth_guest']));
+    }
+
+    return -1;
 }
 
 

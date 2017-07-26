@@ -16,6 +16,8 @@
 chdir(__DIR__); // cwd to the directory containing this script
 
 require_once 'includes/common.php';
+require_once 'includes/functions.php';
+require_once 'includes/dbFacile.php';
 
 $options = getopt('m:h::');
 
@@ -38,85 +40,65 @@ if (isset($options['h'])) {
 }
 
 
+// Buffer output
+ob_start();
+register_shutdown_function(function () {
+    global $versions;
+    $output = ob_get_clean();
+    if (!isset($versions)) {
+        $versions = version_info();
+    }
+
+    @ob_end_clean();
+
+    echo <<< EOF
+====================================
+Component | Version
+--------- | -------
+LibreNMS  | {$versions['local_ver']}
+DB Schema | {$versions['db_schema']}
+PHP       | {$versions['php_ver']}
+MySQL     | {$versions['mysql_ver']}
+RRDTool   | {$versions['rrdtool_ver']}
+SNMP      | {$versions['netsnmp_ver']}
+====================================
+
+$output
+EOF;
+});
+
 // critical config.php checks
 if (!file_exists('config.php')) {
     print_fail('config.php does not exist, please copy config.php.default to config.php');
     exit;
 }
 
-$config_failed = false;
+$pre_checks_failed = false;
 $syntax_check = `php -ln config.php`;
 if (!str_contains($syntax_check, 'No syntax errors detected')) {
     print_fail('Syntax error in config.php');
     echo $syntax_check;
-    $config_failed = true;
+    $pre_checks_failed = true;
 }
 
 $first_line = rtrim(`head -n1 config.php`);
 if (!starts_with($first_line, '<?php')) {
     print_fail("config.php doesn't start with a <?php - please fix this ($first_line)");
-    $config_failed = true;
+    $pre_checks_failed = true;
 }
 if (str_contains(`tail config.php`, '?>')) {
     print_fail("Remove the ?> at the end of config.php");
-    $config_failed = true;
+    $pre_checks_failed = true;
 }
 
-if ($config_failed) {
-    exit;
-}
-
-$init_modules = array();
-require 'includes/init.php';
-
-// make sure install_dir is set correctly, or the next includes will fail
-if (!file_exists($config['install_dir'].'/config.php')) {
-    print_fail('$config[\'install_dir\'] is not set correctly.  It should probably be set to: ' . getcwd());
-    exit;
-}
-
-$git_found = check_git_exists();
-if ($git_found !== true) {
-    print_warn('Unable to locate git. This should probably be installed.');
-}
-
-$versions = version_info();
-$cur_sha = $versions['local_sha'];
-
-echo <<< EOF
-==========================================================
-Component | Version
---------- | -------
-LibreNMS  | {$cur_sha}
-DB Schema | {$versions['db_schema']}
-PHP       | {$versions['php_ver']}
-MySQL     | {$versions['mysql_ver']}
-RRDTool   | {$versions['rrdtool_ver']}
-SNMP      | {$versions['netsnmp_ver']}
-==========================================================
-\n
-EOF;
-
-// Check we are running this as the root user
-if (function_exists('posix_getpwuid')) {
-    $userinfo = posix_getpwuid(posix_geteuid());
-    $username = $userinfo['name'];
-} else {
-    $username = getenv('USERNAME') ?: getenv('USER'); //http://php.net/manual/en/function.get-current-user.php
-}
-if (!($username === 'root' || (isset($config['user']) && $username === $config['user']))) {
-    print_fail('You need to run this script as root' . (isset($config['user']) ? ' or '.$config['user'] : ''));
-}
-
-if ($git_found === true) {
-    if ($config['update_channel'] == 'master' && $cur_sha != $versions['github']['sha']) {
-        $commit_date = new DateTime('@'.$versions['local_date'], new DateTimeZone(date_default_timezone_get()));
-        print_warn("Your install is out of date, last update: " . $commit_date->format('r'));
-    }
+// Composer checks
+if (!file_exists('vendor/autoload.php')) {
+    print_fail('Composer has not been run, dependencies are missing', 'composer install --no-dev');
+    $pre_checks_failed = true;
 }
 
 // Check php modules we use to make sure they are loaded
-$extensions = array('pcre','curl','session','snmp','mcrypt');
+$extensions = array('mysqli','pcre','curl','session','snmp','mcrypt');
 foreach ($extensions as $extension) {
     if (extension_loaded($extension) === false) {
         $missing_extensions[] = $extension;
@@ -127,6 +109,31 @@ if (!empty($missing_extensions)) {
     foreach ($missing_extensions as $extension) {
         echo "$extension\n";
     }
+    $pre_checks_failed = true;
+}
+
+if ($pre_checks_failed) {
+    exit;
+}
+
+$init_modules = array('nodb');
+require 'includes/init.php';
+
+// make sure install_dir is set correctly, or the next includes will fail
+if (!file_exists($config['install_dir'].'/config.php')) {
+    print_fail('$config[\'install_dir\'] is not set correctly.  It should probably be set to: ' . getcwd());
+    exit;
+}
+
+// Check we are running this as the root user
+if (function_exists('posix_getpwuid')) {
+    $userinfo = posix_getpwuid(posix_geteuid());
+    $username = $userinfo['name'];
+} else {
+    $username = getenv('USERNAME') ?: getenv('USER'); //http://php.net/manual/en/function.get-current-user.php
+}
+if (!($username === 'root' || (isset($config['user']) && $username === $config['user']))) {
+    print_fail('You need to run this script as root' . (isset($config['user']) ? ' or '.$config['user'] : ''));
 }
 
 if (class_exists('Net_IPv4') === false) {
@@ -288,6 +295,37 @@ if (empty($schema_update)) {
     print_list($schema_update, "\t %s\n", 30);
 }
 
+$versions = version_info();
+
+// Check that rrdtool config version is what we see
+if (isset($config['rrdtool_version']) && (version_compare($config['rrdtool_version'], $versions['rrdtool_ver'], '>'))) {
+    print_fail('The rrdtool version you have specified is newer than what is installed.', "Either comment out \$config['rrdtool_version'] = '{$config['rrdtool_version']}'; or set \$config['rrdtool_version'] = '{$versions['rrdtool_ver']}';");
+}
+
+if (check_git_exists() === true) {
+    if ($config['update_channel'] == 'master' && $versions['local_sha'] != $versions['github']['sha']) {
+        $commit_date = new DateTime('@'.$versions['local_date'], new DateTimeZone(date_default_timezone_get()));
+        print_warn("Your install is out of date, last update: " . $commit_date->format('r'));
+    }
+
+    if ($versions['local_branch'] != 'master') {
+        print_warn("Your local git branch is not master, this will prevent automatic updates.");
+    }
+
+    // check for modified files
+    $modifiedcmd = 'git diff --name-only --exit-code';
+    if ($username === 'root') {
+        $modifiedcmd = 'su '.$config['user'].' -c "'.$modifiedcmd.'"';
+    }
+    exec($modifiedcmd, $cmdoutput, $code);
+    if ($code !== 0 && !empty($cmdoutput)) {
+        print_warn("Your local git contains modified files, this could prevent automatic updates.\nModified files:");
+        print_list($cmdoutput, "\t %s\n");
+    }
+} else {
+    print_warn('Unable to locate git. This should probably be installed.');
+}
+
 $ini_tz = ini_get('date.timezone');
 $sh_tz = rtrim(shell_exec('date +%Z'));
 $php_tz = date('T');
@@ -353,11 +391,6 @@ foreach ($bins as $bin) {
     }
 }
 
-// Check that rrdtool config version is what we see
-if (isset($config['rrdtool_version']) && (version_compare($config['rrdtool_version'], $versions['rrdtool_ver'], '>'))) {
-    print_fail('The rrdtool version you have specified is newer than what is installed.', "Either comment out \$config['rrdtool_version'] = '{$config['rrdtool_version']}'; or set \$config['rrdtool_version'] = '{$versions['rrdtool_ver']}';");
-}
-
 $disabled_functions = explode(',', ini_get('disable_functions'));
 $required_functions = array('exec','passthru','shell_exec','escapeshellarg','escapeshellcmd','proc_close','proc_open','popen');
 foreach ($required_functions as $function) {
@@ -408,22 +441,6 @@ if (dbFetchCell('SELECT COUNT(*) FROM `devices`') == 0) {
 }
 
 
-if ($git_found === true) {
-    if ($versions['local_branch'] != 'master') {
-        print_warn("Your local git branch is not master, this will prevent automatic updates.");
-    }
-
-    // check for modified files
-    $modifiedcmd = 'git diff --name-only --exit-code';
-    if ($username === 'root') {
-        $modifiedcmd = 'su '.$config['user'].' -c "'.$modifiedcmd.'"';
-    }
-    exec($modifiedcmd, $cmdoutput, $code);
-    if ($code !== 0 && !empty($cmdoutput)) {
-        print_warn("Your local git contains modified files, this could prevent automatic updates.\nModified files:");
-        print_list($cmdoutput, "\t %s\n");
-    }
-}
 // Modules test
 $modules = explode(',', $options['m']);
 foreach ($modules as $module) {

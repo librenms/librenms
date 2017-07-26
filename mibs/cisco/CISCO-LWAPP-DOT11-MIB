@@ -1,0 +1,1109 @@
+-- *******************************************************************
+-- CISCO-LWAPP-DOT11-MIB.my
+-- January 2007, Devesh Pujari, Srinath Candadai
+--   
+-- Copyright (c) 2007, 2009-2010 by Cisco Systems Inc.
+-- All rights reserved.
+-- *******************************************************************
+
+CISCO-LWAPP-DOT11-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Unsigned32,
+    Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TruthValue
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    CLDot11Band,
+    CLDot11ChannelBandwidth
+        FROM CISCO-LWAPP-TC-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+-- ********************************************************************
+-- *  MODULE IDENTITY
+-- ********************************************************************
+
+ciscoLwappDot11MIB MODULE-IDENTITY
+    LAST-UPDATED    "201005060000Z"
+    ORGANIZATION    "Cisco Systems Inc."
+    CONTACT-INFO
+            "Cisco Systems,
+            Customer Service
+            Postal: 170 West Tasman Drive
+            San Jose, CA  95134
+            USA
+            Tel: +1 800 553-NETS
+
+            Email: cs-wnbu-snmp@cisco.com"
+    DESCRIPTION
+        "This MIB is intended to be implemented on all those
+        devices operating as Central controllers, that
+        terminate the Light Weight Access Point Protocol
+        tunnel from Cisco Light-weight LWAPP Access Points.
+
+        This MIB provides the information about the
+        operational parameters of the 802.11 networks.
+        References about specific type of 802.11 flavors like
+        802.11a/b/g or 802.11n will be made whereever required
+        to indicate that the respective parameters are
+        applicable only to that particular type of 802.11
+        networks.
+
+        The relationship between CC and the LWAPP APs
+        can be depicted as follows:
+
+              +......+     +......+     +......+
+              +      +     +      +     +      +
+              +  CC  +     +  CC  +     +  CC  +
+              +      +     +      +     +      +
+              +......+     +......+     +......+
+                ..            .             .
+                ..            .             .
+               .  .            .             .
+              .    .            .             .
+             .      .            .             .
+            .        .            .             .
+        +......+ +......+     +......+      +......+
+        +      + +      +     +      +      +      +
+        +  AP  + +  AP  +     +  AP  +      +  AP  +
+        +      + +      +     +      +      +      +
+        +......+ +......+     +......+      +......+
+                   .              .             .
+                 .  .              .             .
+                .    .              .             .
+               .      .              .             .
+              .        .              .             .
+           +......+ +......+     +......+      +......+
+           +      + +      +     +      +      +      +
+           +  MN  + +  MN  +     +  MN  +      +  MN  +
+           +      + +      +     +      +      +      +
+           +......+ +......+     +......+      +......+
+
+
+        The LWAPP tunnel exists between the controller and
+        the APs.  The MNs communicate with the APs through
+        the protocol defined by the 802.11 standard.
+
+        LWAPP APs, upon bootup, discover and join one of the
+        controllers and the controller pushes the configuration,
+        that includes the WLAN parameters, to the LWAPP APs.
+        The APs then encapsulate all the 802.11 frames from
+        wireless clients inside LWAPP frames and forward
+        the LWAPP frames to the controller.
+
+                           GLOSSARY
+
+        Access Point ( AP )
+
+        An entity that contains an 802.11 medium access
+        control ( MAC ) and physical layer ( PHY ) interface
+        and provides access to the distribution services via
+        the wireless medium for associated clients.  
+
+        LWAPP APs encapsulate all the 802.11 frames in
+        LWAPP frames and sends them to the controller to which
+        it is logically connected.
+
+        Gratuitous Probe Response (GPR)
+
+        The Gratuitous Probe Response feature aids in conserving
+        battery power of WLAN-enabled cell phones by providing
+        a high rate packet on the order of tens of milliseconds
+        such that these kind of phones can wake up and wait at
+        predefined intervals, to reduce battery power.  The 
+        GPR packet is transmitted from the AP at a predefined
+        time interval.
+
+
+        Light Weight Access Point Protocol ( LWAPP )
+
+        This is a generic protocol that defines the 
+        communication between the Access Points and the
+        Central Controller. 
+
+        Mobile Node ( MN )
+
+        A roaming 802.11 wireless device in a wireless
+        network associated with an access point. Mobile Node 
+        and client are used interchangeably. 
+
+        TU
+
+        A measurement of time in units of 1024 microseconds.
+
+        802.11n
+
+        802.11n builds upon previous 802.11 standards by
+        adding MIMO (multiple-input multiple-output). 
+        MIMO uses multiple transmitter and receiver antennas
+        to allow for increased data throughput through spatial
+        multiplexing and increased range .
+
+        A-MPDU
+
+        An aggregated format that consists of several MAC
+        Protocol Data Units being aggregated and transmitted
+        in one PHY Service Data Unit.
+
+        A-MSDU
+
+        An aggregated format that consists of several MAC
+        Service Data Units being aggregated and transmitted
+        in one MAC Protocol Data Unit.
+
+        Reduced Inter-Frame Space ( RIFS )
+
+        A time interval between multiple transmissions of a
+        single transmitter used to reduce overhead and
+        increase network efficiency.
+
+        Modulation and Coding Scheme ( MCS )
+
+        This is a value that determines the modulation, coding
+        and number of spatial channels.  Each scheme specifies
+        the modulation technique, coding rate , number of 
+        spatial streams  etc and the corresponding data rate.
+
+        Guard Interval
+
+        Guard intervals are used to ensure that distinct 
+        transmissions do not interfere with one another. 
+        The purpose of the guard interval is to introduce 
+        immunity to propagation delays, echoes and 
+        reflections, to which digital data is normally 
+        very sensitive.
+
+        Media Access Control ( MAC )
+
+        The Media Access Control Layer is one of two sublayers 
+        that make up the Data Link Layer.  The MAC layer is 
+        responsible for moving data packets to and from one 
+        Network Interface Card (NIC) to another across a shared 
+        channel.
+
+        Suppression Table
+
+        When the Band Select feature is ON, AP suppresses 
+        the probe response to mobile stations on 2.4 GHz. AP 
+        suppresses probe response to new mobile stattions for 
+        all SSIDs that are being Band Select enabled. 
+        Suppressed mobile station and corresponding suprression 
+        counts are recorded in a table known as Suppression 
+        Table which is stored in internal database of controller.
+        Entries of this table aged-out to make place for new 
+        entries.
+
+        Dual Band Table
+
+        When AP sees probe request from any mobile station in 
+        both 2.4GHz and 5GHz band AP will know that mobile station
+        is capable of operating on both band. Dual band capable
+        mobile stations are recorded in a table known as dual band 
+        table which is stored in internal database of controller.
+        This record are kept to make sure 5GHz capable mobile station
+        should join 5GHz band only.
+        Entries in the table will be age out to make space for
+        new entries. 
+        The AP will not respond to the dual band mobile station's
+        2.4GHz probe until is removed from the dual band
+        table. AP fills the dual band table in the
+        following order until it is full:
+        1) mobile station with 5GHz probe that have associated to
+           2.4GHz.
+        2) mobile station with 5GHz probe that also have 2.4GHz
+           probes.
+        3) mobile station with just 5GHz probe detected and 5GHz
+           association.
+
+        RSSI
+
+        Received Signal Strength Indication (RSSI), the IEEE 802.11
+        standard defines a mechanism by which RF energy is to be 
+        measured by the circuitry on a wireless NIC. Its value is 
+        measured in dBm and ranges from -128 to 0.
+
+
+        REFERENCE
+
+        [1] Wireless LAN Medium Access Control ( MAC ) and
+            Physical Layer ( PHY ) Specifications.
+
+        [2] Draft-obara-Capwap-lwapp-00.txt, IETF Light
+            Weight Access Point Protocol.
+
+        [3] Enhanced Wireless Consortium MAC Specification,
+            v1.24.
+
+        [4] Enhanced Wireless Consortium PHY Specification,
+            v1.27."
+    REVISION        "201005060000Z"
+    DESCRIPTION
+        "Added cldHtDot11nEnable in CldHtMacOperationsEntry
+        Added ciscoLwappDot11CountryChangeNotif in
+        ciscoLwappDot11MIBNotifs
+        Added following in cldConfig:
+        cldMultipleCountryCode
+        cldRegulatoryDomain
+        cldCountryChangeNotifEnable
+        cldLoadBalancing
+        cldLoadBalancingEnable
+        cldLoadBalancingWindowSize
+        cldLoadBalancingDenialCount
+        cldBandSelect
+        cldBandSelectEnable
+        cldBandSelectCycleCount
+        cldBandSelectCycleThreshold
+        cldBandSelectAgeOutSuppression
+        cldBandSelectAgeOutDualBand
+        cldBandSelectClientRssi
+        Added following table:
+        cld11nMcsTable
+        cldCountryTable
+        Added the following OBJECT-GROUPs:
+        ciscoLwappDot11MIBConfigGroup
+        ciscoLwappDot11MIBNotifsGroup
+        ciscoLwappDot11MIBStatusGroup
+        Added ciscoLwappDot11MIBComplianceRev1 in 
+        OBJECT-COMPLIANCE."
+    REVISION        "200701040000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { ciscoMgmt 612 }
+
+
+ciscoLwappDot11MIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11MIB 0 }
+
+ciscoLwappDot11MIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11MIB 1 }
+
+ciscoLwappDot11MIBConform  OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11MIB 2 }
+
+cldConfig  OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11MIBObjects 1 }
+
+cldStatus  OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11MIBObjects 2 }
+
+-- ********************************************************************
+-- *    High Throughput MAc Operations table
+-- ********************************************************************
+
+cldHtMacOperationsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CldHtMacOperationsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table represents the operational parameters
+        at the MAC layer for the 802.11n networks managed 
+        through the controller. An agent adds an entry to 
+        this table for every 802.11n band on startup."
+    ::= { cldConfig 1 }
+
+cldHtMacOperationsEntry OBJECT-TYPE
+    SYNTAX          CldHtMacOperationsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry represents the operational parameters
+        at the MAC layer for 802.11n networks."
+    INDEX           { cldHtDot11nBand } 
+    ::= { cldHtMacOperationsTable 1 }
+
+CldHtMacOperationsEntry ::= SEQUENCE {
+        cldHtDot11nBand                CLDot11Band,
+        cldHtDot11nChannelBandwidth    CLDot11ChannelBandwidth,
+        cldHtDot11nRifsEnable          TruthValue,
+        cldHtDot11nAmsduEnable         TruthValue,
+        cldHtDot11nAmpduEnable         TruthValue,
+        cldHtDot11nGuardIntervalEnable TruthValue,
+        cldHtDot11nEnable              TruthValue
+}
+
+cldHtDot11nBand OBJECT-TYPE
+    SYNTAX          CLDot11Band
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object identifies the 802.11n band the parameters
+        correspond to." 
+    ::= { cldHtMacOperationsEntry 1 }
+
+cldHtDot11nChannelBandwidth OBJECT-TYPE
+    SYNTAX          CLDot11ChannelBandwidth
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object represents the channel bandwidth for
+        the 802.11n networks in the particular band."
+    DEFVAL          { twenty } 
+    ::= { cldHtMacOperationsEntry 2 }
+
+cldHtDot11nRifsEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to indicate the support for RIFS on
+        this band. A value of 'true' indicates that RIFS is 
+        enabled for this band. A value of 'false' indicates that 
+        RIFS is disabled for this band."
+    DEFVAL          { true } 
+    ::= { cldHtMacOperationsEntry 3 }
+
+cldHtDot11nAmsduEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to indicate the support for 802.11n
+        A-MSDU on this band. A value of 'true' indicates that 
+        A-MSDU is enabled for this band. A value of 'false' 
+        indicates that A-MSDU is disabled for this band."
+    DEFVAL          { true } 
+    ::= { cldHtMacOperationsEntry 4 }
+
+cldHtDot11nAmpduEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to indicate the support for 802.11n
+        A-MPDU on this band. A value of 'true' indicates that 
+        A-MPDU is enabled for this band. A value of 'false' 
+        indicates that A-MPDU is disabled for this band."
+    DEFVAL          { true } 
+    ::= { cldHtMacOperationsEntry 5 }
+
+cldHtDot11nGuardIntervalEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to indicate the support for 802.11n
+        guard interval on this band. A value of 'true' indicates 
+        that guard interval is enabled for this band. A value of 
+        'false' indicates that guard interval is disabled for
+        this band."
+    DEFVAL          { true } 
+    ::= { cldHtMacOperationsEntry 6 }
+
+cldHtDot11nEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to enable the controller to manage
+        802.11n networks. A value of 'true' means the 802.11n 
+        network is enabled. A value of 'false' means the 802.11n
+        network is disabled."
+    DEFVAL          { true } 
+    ::= { cldHtMacOperationsEntry 7 }
+ 
+
+
+-- ********************************************************************
+-- *    Configuration for parameters
+-- ********************************************************************
+
+cldMultipleCountryCode OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..255))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object represents the countries in which the
+        controller is operating. Multiple countries can be set.
+        The countries are displayed using a 3 letter code 
+        for each country separated by a comma." 
+    ::= { cldConfig 2 }
+
+cldRegulatoryDomain OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..255))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the regulatory domains for
+        the controller.
+        Regulatory domain specifies allowed 802.11 chanels.
+        Multiple domains can be listed seperated with spaces." 
+    ::= { cldConfig 3 }
+-- ********************************************************************
+-- *    MCS table
+-- ********************************************************************
+
+cld11nMcsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Cld11nMcsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table lists the MCS data rates used on the
+        802.11n networks managed by this controller."
+    ::= { cldConfig 4 }
+
+cld11nMcsEntry OBJECT-TYPE
+    SYNTAX          Cld11nMcsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in this table represents a MCS data rate for 802.11n
+        band which is uniquely identifies by cld11nMcsDataRateIndex 
+        and cld11nMcsBand.
+        All entries are added by the controller at startup.
+        cld11nMcsDataRate are calculated by different permutation of
+        cld11nMcsChannelWidth, cld11nMcsGuardInterval,
+        cld11nMcsModulation
+        etc. Different variables combination can give same data rate."
+    INDEX           {
+                        cld11nMcsBand,
+                        cld11nMcsDataRateIndex
+                    } 
+    ::= { cld11nMcsTable 1 }
+
+Cld11nMcsEntry ::= SEQUENCE {
+        cld11nMcsBand          CLDot11Band,
+        cld11nMcsDataRateIndex Unsigned32,
+        cld11nMcsDataRate      Unsigned32,
+        cld11nMcsSupportEnable TruthValue,
+        cld11nMcsChannelWidth  Unsigned32,
+        cld11nMcsGuardInterval Unsigned32,
+        cld11nMcsModulation    OCTET STRING
+}
+
+cld11nMcsBand OBJECT-TYPE
+    SYNTAX          CLDot11Band
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object identifies the 802.11n band to which
+        the data rate is applicable." 
+    ::= { cld11nMcsEntry 1 }
+
+cld11nMcsDataRateIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object uniquely identifies the data rate
+        for a particular band." 
+    ::= { cld11nMcsEntry 2 }
+
+cld11nMcsDataRate OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The object represents the data rate value for this
+        band." 
+    ::= { cld11nMcsEntry 3 }
+
+cld11nMcsSupportEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to enable or disable the data
+        rate.  When this object is set to 'true' the MCS 
+        support is enabled. When this object is set 
+        to 'false' the MCS support is disabled.."
+    DEFVAL          { true } 
+    ::= { cld11nMcsEntry 4 }
+
+cld11nMcsChannelWidth OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "MHz"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The object represents the channel width for which
+        cld11nMcsDataRate has been calculated." 
+    ::= { cld11nMcsEntry 5 }
+
+cld11nMcsGuardInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "ns"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The object represents the guard interval for which
+        cld11nMcsDataRate has been calculated." 
+    ::= { cld11nMcsEntry 6 }
+
+cld11nMcsModulation OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (1..255))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The object represents the modulation used to calculate
+        cld11nMcsDataRate." 
+    ::= { cld11nMcsEntry 7 }
+
+-- ********************************************************************
+-- *    MCS table
+-- ********************************************************************
+
+cld11acMcsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Cld11acMcsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table is used to configure 802.11ac specific MCS
+        data rate settings on a controller."
+    ::= { cldConfig 6 }
+
+cld11acMcsEntry OBJECT-TYPE
+    SYNTAX          Cld11acMcsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in this table represents the additional  MCS data rate for 802.11ac
+        band which is uniquely identifies by cld11acMcsSpatialStreamIndex
+        and cld11acMcsDataRateIndex.
+        All entries are added by the controller at startup."
+    INDEX           {
+                        cld11acMcsSpatialStreamIndex,
+                        cld11acMcsDataRateIndex
+                    } 
+    ::= { cld11acMcsTable 1 }
+
+Cld11acMcsEntry ::= SEQUENCE {
+        cld11acMcsSpatialStreamIndex    Unsigned32,
+        cld11acMcsDataRateIndex Unsigned32,
+        cld11acMcsSupportEnable TruthValue
+}
+
+
+cld11acMcsSpatialStreamIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The object represents the spatial stream number
+        related to MCS data rate settings on the 802.11ac
+        band." 
+    ::= { cld11acMcsEntry 1 }
+
+cld11acMcsDataRateIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object uniquely identifies the data rate
+        for a particular band." 
+    ::= { cld11acMcsEntry 2 }
+
+cld11acMcsSupportEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to enable or disable the data
+        rate.  When this object is set to 'true' the MCS 
+        support is enabled. When this object is set 
+        to 'false' the MCS support is disabled.."
+    DEFVAL          { true } 
+    ::= { cld11acMcsEntry 3 }
+
+-- *****************************
+-- LOAD BALANCING CONFIGURATION
+-- *****************************
+
+cld11acConfig  OBJECT IDENTIFIER
+    ::= { cldConfig 5 }
+ 
+cldVhtDot11acEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to enable the controller to manage
+        802.11ac networks. A value of 'true' means the 802.11ac
+        network is enabled. A value of 'false' means the 802.11ac
+        network is disabled."
+    DEFVAL          { true }
+    ::= { cld11acConfig 1 }
+
+-- *****************************
+-- LOAD BALANCING CONFIGURATION
+-- *****************************
+
+cldLoadBalancing  OBJECT IDENTIFIER
+    ::= { cldConfig 8 }
+
+
+cldLoadBalancingEnable OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        enable(1),
+                        disable(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the mode of Load Balancing.
+        Value of 1(enable) shows that the Load Balancing
+        is enabled and value of 2(disable) shows that it is
+        disabled.
+
+        If Load balancing is enable and wireless mobile station tries
+        to
+        associate any overloaded AP, association rejection
+        will be sent to mobile station from AP.
+
+        From 7.0 release onwards Load Balancing cannot be configured
+        globally. cldLoadBalancingEnable will be read-only attribute 
+        and it will always be enable.
+        Use cLWlanLoadBalancingEnable to configure it per WLAN."
+    DEFVAL          { enable } 
+    ::= { cldLoadBalancing 1 }
+
+cldLoadBalancingWindowSize OBJECT-TYPE
+    SYNTAX          Integer32 (0..20)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the threshold for the difference
+        between number of mobile station a given AP can have and 
+        mobile station count of the AP having minimum number of 
+        mobile station in the setup.
+
+        For example, suppose in a network setup there are three
+        APs are connected to Controller, say AP1, AP2 and AP3.
+        AP1 have 2 mobile stations, AP2 have 3 and AP3 have 4 
+        mobile stations.
+        Here AP1 have minimum number of mobile stations i.e. 2. 
+        Suppose window size is configured as 2. So every AP can have
+        2+2=4 mobile stations. So every 5th mobile station will be 
+        load balanced.
+
+        So, if any mobile station tries to join AP3, denial will be sent
+        from AP3. For a mobile station denial will be send only for
+        cldLoadBalancingDenialCount number of time."
+    DEFVAL          { 5 } 
+    ::= { cldLoadBalancing 2 }
+
+cldLoadBalancingDenialCount OBJECT-TYPE
+    SYNTAX          Integer32 (1..10)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies maximum number of association
+        rejection AP will send to a mobile station for a given sequence
+        of association.
+
+        When a mobile station tries to associate on wireless network, it
+        sends association request to AP. If AP is overloaded and
+        load balancing is enable on controller, AP will send a
+        denial to association request. If there are no other AP
+        in the vicinity of mobile station, it will try to associate same
+        AP again. So to restrict the number of denial sent from
+        AP, cldLoadBalancingDenialCount is defined. After maximum
+        denial count is reached mobile station will be able to
+        associate.
+
+        Association attempts on an AP from any mobile station before
+        associating any AP is called as sequence of assoociation."
+    DEFVAL          { 3 } 
+    ::= { cldLoadBalancing 3 }
+
+cldLoadBalancingTrafficThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32 
+    UNITS           "Percent"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the traffic threshold that  
+         triggers 'uplinkUsage' based load balancing. When the 
+         uplink usage of an AP is above this threshold, this AP 
+         is valid for 'uplinkUsage' based load balancing, if 
+         load balance is enabled by cLWlanLoadBalancingEnable 
+         and 'uplinkUsage' mode is chosen by cLWlanLoadBalancingMode
+         at that WLAN."
+    DEFVAL          { 50 }
+    ::= { cldLoadBalancing 4 }
+
+-- **************************
+-- BAND SELECT CONFIGURATION
+-- **************************
+
+cldBandSelect  OBJECT IDENTIFIER
+    ::= { cldConfig 9 }
+
+
+cldBandSelectEnable OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        enable(1),
+                        disable(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the mode of Band Select.
+        Value of 1(enable) shows that the Band Select
+        is enabled and value of 2(disable) shows that it is
+        disabled.
+
+        If Band Select is enable AP suppresses probe response
+        to new mobile station. AP will suppress probe request coming
+        only on 2.4 GHz radio.
+
+        From 7.0 release onwards Band Select cannot be configured
+        globally. cldBandSelectEnable will be read-only attribute 
+        and it will always be enable.
+        Use cLWlanBandSelectEnable to configure it per WLAN."
+    DEFVAL          { enable } 
+    ::= { cldBandSelect 1 }
+
+cldBandSelectCycleCount OBJECT-TYPE
+    SYNTAX          Integer32 (1..10)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies band select probe mobile station count.
+        Suppressed mobile stations and corresponding suppression count
+        are recorded in a suppression table which is stored in 
+        internal database of controllers. AP will suppress 
+        probe request of a mobile station till value of cycle count.
+        AP will increment cycle counter when a mobile station scan
+        a channel on 2.4GHz band after any time greater than
+        cldBandSelectCycleThreshold.
+        When a mobile station cycle count is reached and if mobile 
+        station still sends a probe request then AP will respond 
+        to it by probe response.
+
+        For example, we assume at minimum, a mobile station
+        will stay in a channel for 5 milliseconds and there are
+        11 channels. If the mobile station scans channel 1 and then the
+        other 10 channels, there should be at least a gap of 10x5
+        milliseconds between the last time AP hears the mobile station
+        probe and the latest one. AP only increments the count if
+        the difference of time between the latest and the last
+        probe is more than 50 milliseconds."
+    DEFVAL          { 3 } 
+    ::= { cldBandSelect 2 }
+
+cldBandSelectCycleThreshold OBJECT-TYPE
+    SYNTAX          Integer32 (1..1000)
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies time threshold for a new scanning
+        mobile station period. Mobile station cycle counter will 
+        increment only if mobile station scans same channel any 
+        time after cldBandSelectCycleThreshold is passed.
+
+        For example, if a mobile station is scanning a channel after
+        every 150 milliseconds and cycle threshold value is
+        configures as 200, then cycle count will be incremented
+        after 300 seconds. But if mobile station is scanning after every
+        250 milliseconds, then mobile station count will be incremented
+        after 250 milliseconds."
+    DEFVAL          { 200 } 
+    ::= { cldBandSelect 3 }
+
+cldBandSelectAgeOutSuppression OBJECT-TYPE
+    SYNTAX          Integer32 (10..200)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Suppressed mobile station are recorded in a suppression table.
+        This object specifies age out period after which entry
+        of mobile station will be removed.
+        All entries will stay in the table until it is aged
+        out or is replaced when table is full. If table is
+        full, and there is no space for new mobile station then AP
+        will replaced the oldest entry on the table that it
+        had responded already. If there as no empty slot in
+        the table, AP has to respond to all the new mobile station
+        until space starts getting available."
+    DEFVAL          { 20 } 
+    ::= { cldBandSelect 4 }
+
+cldBandSelectAgeOutDualBand OBJECT-TYPE
+    SYNTAX          Integer32 (10..300)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This objects specifies age out period after which mobile
+        station entry will be removed for dual band AP.
+        When AP sees probe request from any mobile station in both
+        2.4GHz and 5GHz band AP will know that mobile station is
+        capable of operating on both band. Dual band capable
+        mobile stations are recorded in a dual band table which 
+        is stored in internal database of controllers.
+        This record are kept to make sure 5GHz capable mobile station
+        should join 5GHz band only.
+        Entries in the table will be age out to make space for
+        new entries.
+
+        The AP will not respond to the dual band mobile station's
+        2.4GHz probe until is removed from the dual band
+        table. AP fills the dual band table in the
+        following order until it is full:
+        1) mobile station with 5GHz probe that have associated to
+           2.4GHz.
+        2) mobile station with 5GHz probe that also have 2.4GHz
+           probes.
+        3) mobile station with just 5GHz probe detected and 5GHz
+           association."
+    DEFVAL          { 60 } 
+    ::= { cldBandSelect 5 }
+
+cldBandSelectClientRssi OBJECT-TYPE
+    SYNTAX          Integer32 (-90..-20)
+    UNITS           "dBm"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies minimum mobile station RSSI threshold.
+        Mobile stations having RSSI below this value will not be
+        recorded in suppressed table.
+        This configuration filter out far away mobile stations with
+        low signal strength. This will limit the number of
+        mobile stations on the table to a reasonable amount."
+    DEFVAL          { -80 } 
+    ::= { cldBandSelect 6 }
+-- ********************************************************************
+-- Channel table for all  Country codes
+-- ********************************************************************
+
+cldCountryTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CldCountryEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides the list of countries and the
+        network parameters specific to the respective 
+        countries. It shows the 802.11 networks, managed by
+        this controller, where controller can operate."
+    ::= { cldStatus 1 }
+
+cldCountryEntry OBJECT-TYPE
+    SYNTAX          CldCountryEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A conceptual row in cldCountryTable. There is an
+        entry in this table for each country available at
+        the agent, as identified by a value of cldCountryCode.
+        Each entry also displays the corresponding channels
+        supported by the cldCountryCode.
+        All entries are added by the controller at startup."
+    INDEX           { cldCountryCode } 
+    ::= { cldCountryTable 1 }
+
+CldCountryEntry ::= SEQUENCE {
+        cldCountryCode              SnmpAdminString,
+        cldCountryName              SnmpAdminString,
+        cldCountryDot11aChannels    SnmpAdminString,
+        cldCountryDot11bChannels    SnmpAdminString,
+        cldCountryDot11aDcaChannels SnmpAdminString,
+        cldCountryDot11bDcaChannels SnmpAdminString
+}
+
+cldCountryCode OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..255))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object identifies the country for this entry.
+        The 3 letter country code for this index." 
+    ::= { cldCountryEntry 1 }
+
+cldCountryName OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the name of the country for
+        this entry." 
+    ::= { cldCountryEntry 2 }
+
+cldCountryDot11aChannels OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the 802.11a channels
+        separated by comma." 
+    ::= { cldCountryEntry 3 }
+
+cldCountryDot11bChannels OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the 802.11b channels
+        separated by comma." 
+    ::= { cldCountryEntry 4 }
+
+cldCountryDot11aDcaChannels OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the 802.11a DCA channels
+        separated by comma." 
+    ::= { cldCountryEntry 5 }
+
+cldCountryDot11bDcaChannels OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the 802.11b DCA channels
+        separated by comma." 
+    ::= { cldCountryEntry 6 }
+ 
+
+
+-- ********************************************************************
+-- *    NOTIFICATION Control objects
+-- ********************************************************************
+
+cldCountryChangeNotifEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to control the generation of
+        ciscoLwappDot11CountryChangeNotif notification.
+
+        A value of 'true' indicates that the agent generates
+        ciscoLwappDot11CountryChangeNotif notification.
+
+        A value of 'false' indicates that the agent doesn't
+        generate ciscoLwappDot11CountryChangeNotif 
+        notification."
+    DEFVAL          { true } 
+    ::= { cldConfig 7 }
+
+-- ********************************************************************
+-- Country Notifications
+-- ********************************************************************
+
+ciscoLwappDot11CountryChangeNotif NOTIFICATION-TYPE
+    OBJECTS         { cldMultipleCountryCode }
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated by the controller when the
+        country of operation of 802.11 networks is changed 
+        by the administrator. The new country code will be sent in 
+        this notification."
+   ::= { ciscoLwappDot11MIBNotifs 1 }
+-- ********************************************************************
+-- *    Units of conformance
+-- ********************************************************************
+
+ciscoLwappDot11MIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11MIBConform 1 }
+
+ciscoLwappDot11MIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11MIBConform 2 }
+
+
+-- STATUS deprecated by ciscoLwappDot11MIBComplianceRev1
+
+ciscoLwappDot11MIBCompliance MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement the ciscoLwappDot11MIB module."
+    MODULE          -- this module
+    MANDATORY-GROUPS { ciscoLwappDot11MIBMacOperGroup }
+    ::= { ciscoLwappDot11MIBCompliances 1 }
+
+-- Added since last MIB approval
+
+ciscoLwappDot11MIBComplianceRev1 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement the ciscoLwappDot11MIB module."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoLwappDot11MIBMacOperGroup,
+                        ciscoLwappDot11MIBConfigGroup,
+                        ciscoLwappDot11MIBNotifsGroup,
+                        ciscoLwappDot11MIBStatusGroup
+                    }
+    ::= { ciscoLwappDot11MIBCompliances 2 }
+
+ciscoLwappDot11MIBMacOperGroup OBJECT-GROUP
+    OBJECTS         {
+                        cldHtDot11nChannelBandwidth,
+                        cldHtDot11nRifsEnable,
+                        cldHtDot11nAmsduEnable,
+                        cldHtDot11nAmpduEnable,
+                        cldHtDot11nGuardIntervalEnable
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represents the
+        operational parameters at the MAC layer
+        for the 802.11n networks."
+    ::= { ciscoLwappDot11MIBGroups 1 }
+
+ciscoLwappDot11MIBConfigGroup OBJECT-GROUP
+    OBJECTS         {
+                        cldHtDot11nEnable,
+                        cldMultipleCountryCode,
+                        cldRegulatoryDomain,
+                        cld11nMcsDataRate,
+                        cld11nMcsSupportEnable,
+                        cldCountryChangeNotifEnable,
+                        cldLoadBalancingEnable,
+                        cldLoadBalancingWindowSize,
+                        cldLoadBalancingDenialCount,
+                        cldBandSelectEnable,
+                        cldBandSelectCycleCount,
+                        cldBandSelectCycleThreshold,
+                        cldBandSelectAgeOutSuppression,
+                        cldBandSelectAgeOutDualBand,
+                        cldBandSelectClientRssi,
+                        cld11nMcsChannelWidth,
+                        cld11nMcsGuardInterval,
+                        cld11nMcsModulation
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects specifies the configuration
+        parameters of 802.11i networks."
+    ::= { ciscoLwappDot11MIBGroups 2 }
+
+ciscoLwappDot11MIBNotifsGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    { ciscoLwappDot11CountryChangeNotif }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects specifies the
+        notifications generated by the controller."
+    ::= { ciscoLwappDot11MIBGroups 3 }
+
+ciscoLwappDot11MIBStatusGroup OBJECT-GROUP
+    OBJECTS         {
+                        cldCountryName,
+                        cldCountryDot11aChannels,
+                        cldCountryDot11bChannels,
+                        cldCountryDot11aDcaChannels,
+                        cldCountryDot11bDcaChannels
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects specifies the
+        notification objects for 802.11."
+    ::= { ciscoLwappDot11MIBGroups 4 }
+
+END

@@ -630,6 +630,7 @@ ipv4_addresses:
 ipv4_mac:
   Columns:
     context_name: { Field: context_name, Type: varchar(128), 'Null': true, Default: null, Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': true, Default: null, Extra: '' }
     ipv4_address: { Field: ipv4_address, Type: varchar(32), 'Null': false, Default: null, Extra: '' }
     mac_address: { Field: mac_address, Type: varchar(32), 'Null': false, Default: null, Extra: '' }
     port_id: { Field: port_id, Type: int(11), 'Null': false, Default: null, Extra: '' }

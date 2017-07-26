@@ -1,0 +1,653 @@
+-- ********************************************************************
+-- RITTAL GmbH & Co. KG, Herborn
+--
+-- Management Information Base for SNMP Network Management
+--
+-- Copyright 2015 Rittal Herborn.
+-- All Rights Reserved.
+--
+-- The information in this document is subject to change without notice.
+-- Refer to document "AGB_Software_Rittal.pdf".
+--
+-- ********************************************************************
+-- File   : $RCSfile: RITTAL-CMC-III-CAPABILITY-MIB.txt,v $
+-- Rev.   : $Revision: 1.8 $
+-- Date   : $Date: 2016/01/25 14:33:06 $
+-- Author : $Author: fis $
+-- Id     : $Id: RITTAL-CMC-III-CAPABILITY-MIB.txt,v 1.8 2016/01/25 14:33:06 fis Exp $
+-- ********************************************************************
+
+RITTAL-CMC-III-CAPABILITY-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                                AGENT-CAPABILITIES
+        FROM                SNMPv2-CONF
+                                MODULE-IDENTITY
+        FROM                SNMPv2-SMI
+                                cmcIII
+        FROM                RITTAL-CMC-III-MIB;
+
+cmcIIICapability        MODULE-IDENTITY
+        LAST-UPDATED        "201510270000Z"
+        ORGANIZATION        "RITTAL GmbH & Co. KG"
+        CONTACT-INFO        "www.rittal.de
+
+                            RITTAL GmbH & Co. KG
+                            Forschung & Entwicklung
+                            Auf dem Stuetzelberg
+                            D-35745 Herborn
+                            Germany, Europe
+
+                            +49(0)2772 5050
+                            info@rittal.de."
+        DESCRIPTION         "Private agent capabilitiy MIB of cmcIII SNMP agent."
+
+        REVISION            "201510270000Z"
+        DESCRIPTION         "Added cmcIIIPuCapsV104 and cmcIIIPduCapsV104."
+
+        REVISION            "201410060000Z"
+        DESCRIPTION         "Added variations of not supported functions of PDU."
+
+        REVISION            "201303300000Z"
+        DESCRIPTION         "Added cmcIIIPuCapsV103."
+
+        REVISION            "201208300000Z"
+        DESCRIPTION         "Added cmcIIIPduiCapsV102 and use new object group definitions."
+
+        REVISION            "201109010000Z"
+        DESCRIPTION         "The initial version (obsolete)."
+
+        ::=                 { cmcIII            8 }
+
+-- Caps: cmcIIIxxCapsVyyz = 3 (cmcIII) * 10000
+--                          + x (0 as default or cmcIIIUnitType for specific hardware) * 1000
+--                            + y (cmcIIIMibMajRev) * 100
+--                              + zz (cmcIIIMibMinRev)        
+
+cmcIIIPuCapsV102        AGENT-CAPABILITIES
+        PRODUCT-RELEASE     "V1.02"
+        STATUS              current
+        DESCRIPTION         "RITTAL GmbH & Co. KG : CMC III Processing Unit built-in capabilities."
+
+        SUPPORTS            ENTITY-MIB
+        INCLUDES            {
+                                entityGeneralGroup,
+                                entityLogical2Group,
+                                entityLogicalGroup,
+                                entityMappingGroup,
+                                entityNotificationsGroup,
+                                entityPhysical2Group,
+                                entityPhysical3Group,
+                                entityPhysicalGroup
+                            }
+
+        SUPPORTS            ENTITY-SENSOR-MIB
+        INCLUDES            {
+                                entitySensorValueGroup
+                            }
+
+        SUPPORTS            ENTITY-STATE-MIB
+        INCLUDES            {
+                                entStateGroup,
+                                entStateNotificationsGroup
+                            }
+
+        SUPPORTS            HOST-RESOURCES-MIB
+        INCLUDES            {
+                                hrDeviceGroup,
+                                hrSWRunGroup,
+                                hrSWRunPerfGroup,
+                                hrStorageGroup,
+                                hrSystemGroup
+                            }
+
+        SUPPORTS            IF-MIB
+        INCLUDES            {
+                                ifCounterDiscontinuityGroup,
+                                ifFixedLengthGroup,
+                                ifGeneralGroup,
+                                ifGeneralInformationGroup,
+                                ifHCFixedLengthGroup,
+                                ifHCPacketGroup,
+                                ifOldObjectsGroup,
+                                ifPacketGroup,
+                                ifVHCPacketGroup
+                            }
+
+        SUPPORTS            IP-FORWARD-MIB
+        INCLUDES            {
+                                ipForwardCidrRouteGroup
+                            }
+
+        SUPPORTS            IP-MIB
+        INCLUDES            {
+                                icmpGroup,
+                                icmpStatsGroup,
+                                ipAddressGroup,
+                                ipGroup,
+                                ipLastChangeGroup,
+                                ipNetToPhysicalGroup,
+                                ipSystemStatsGroup,
+                                ipSystemStatsHCPacketGroup,
+                                ipv4GeneralGroup,
+                                ipv4SystemStatsGroup,
+                                ipv4SystemStatsHCPacketGroup
+                            }
+
+        SUPPORTS            IPV6-MIB
+        INCLUDES            {
+                                ipv6GeneralGroup
+                            }
+
+        SUPPORTS            NOTIFICATION-LOG-MIB
+        INCLUDES            {
+                                notificationLogConfigGroup,
+                                notificationLogStatsGroup
+                            }
+
+        SUPPORTS            PTOPO-MIB
+        INCLUDES            {
+                                ptopoConfigGroup,
+                                ptopoDataGroup,
+                                ptopoGeneralGroup
+                            }
+
+        SUPPORTS            RITTAL-CMC-III-MIB
+        INCLUDES            {
+                                cmcIIIControlMibGroup,
+                                cmcIIIDeviceMibGroup,
+                                cmcIIIInfoMibGroup,
+                                cmcIIILdapMibGroup,
+                                cmcIIINotificationGroup,
+                                cmcIIINtpMibGroup,
+                                cmcIIIRelayMibGroup,
+                                cmcIIISetupMibGroup,
+                                cmcIIISmsMibGroup,
+                                cmcIIISmtpMibGroup,
+                                cmcIIISyslogMibGroup,
+                                cmcIIITrapGroup
+                            }
+
+        VARIATION           cmcIIITrapReceiverStatus
+        ACCESS              read-write
+        DESCRIPTION         "Enumeration types snmpv3Trap(5) and snmpv3Inform(6) are not supported."
+
+        VARIATION           cmcIIISmtpStatus
+        ACCESS              read-only
+        DESCRIPTION         "Status change is not supported."
+
+        VARIATION           cmcIIISmsStatus
+        ACCESS              read-only
+        DESCRIPTION         "Status change is not supported."
+
+        SUPPORTS            SNMP-FRAMEWORK-MIB
+        INCLUDES            {
+                                snmpEngineGroup
+                            }
+
+        SUPPORTS            SNMP-MPD-MIB
+        INCLUDES            {
+                                snmpMPDGroup
+                            }
+
+        SUPPORTS            SNMP-TARGET-MIB
+        INCLUDES            {
+                                snmpTargetBasicGroup,
+                                snmpTargetCommandResponderGroup,
+                                snmpTargetResponseGroup
+                            }
+
+        SUPPORTS            SNMP-USER-BASED-SM-MIB
+        INCLUDES            {
+                                usmMIBBasicGroup
+                            }
+
+        SUPPORTS            SNMP-VIEW-BASED-ACM-MIB
+        INCLUDES            {
+                                vacmBasicGroup
+                            }
+
+        SUPPORTS            SNMPv2-MIB
+        INCLUDES            {
+                                snmpCommunityGroup,
+                                snmpGroup,
+                                snmpObsoleteGroup,
+                                snmpSetGroup,
+                                systemGroup
+                            }
+
+        SUPPORTS            TCP-MIB
+        INCLUDES            {
+                                tcpBaseGroup,
+                                tcpConnectionGroup,
+                                tcpGroup,
+                                tcpListenerGroup
+                            }
+
+        SUPPORTS            UDP-MIB
+        INCLUDES            {
+                                udpBaseGroup,
+                                udpEndpointGroup,
+                                udpGroup
+                            }
+
+        ::=                 { cmcIIICapability  30102 }
+
+
+cmcIIIPuCapsV103        AGENT-CAPABILITIES
+        PRODUCT-RELEASE     "V1.03"
+        STATUS              current
+        DESCRIPTION         "RITTAL GmbH & Co. KG : CMC III Processing Unit built-in capabilities."
+
+        SUPPORTS            ENTITY-MIB
+        INCLUDES            {
+                                entityGeneralGroup,
+                                entityLogical2Group,
+                                entityLogicalGroup,
+                                entityMappingGroup,
+                                entityNotificationsGroup,
+                                entityPhysical2Group,
+                                entityPhysical3Group,
+                                entityPhysicalGroup
+                            }
+
+        SUPPORTS            ENTITY-SENSOR-MIB
+        INCLUDES            {
+                                entitySensorValueGroup
+                            }
+
+        SUPPORTS            ENTITY-STATE-MIB
+        INCLUDES            {
+                                entStateGroup,
+                                entStateNotificationsGroup
+                            }
+
+        SUPPORTS            HOST-RESOURCES-MIB
+        INCLUDES            {
+                                hrDeviceGroup,
+                                hrSWRunGroup,
+                                hrSWRunPerfGroup,
+                                hrStorageGroup,
+                                hrSystemGroup
+                            }
+
+        SUPPORTS            IF-MIB
+        INCLUDES            {
+                                ifCounterDiscontinuityGroup,
+                                ifFixedLengthGroup,
+                                ifGeneralGroup,
+                                ifGeneralInformationGroup,
+                                ifHCFixedLengthGroup,
+                                ifHCPacketGroup,
+                                ifOldObjectsGroup,
+                                ifPacketGroup,
+                                ifVHCPacketGroup
+                            }
+
+        SUPPORTS            IP-FORWARD-MIB
+        INCLUDES            {
+                                ipForwardCidrRouteGroup
+                            }
+
+        SUPPORTS            IP-MIB
+        INCLUDES            {
+                                icmpGroup,
+                                icmpStatsGroup,
+                                ipAddressGroup,
+                                ipGroup,
+                                ipLastChangeGroup,
+                                ipNetToPhysicalGroup,
+                                ipSystemStatsGroup,
+                                ipSystemStatsHCPacketGroup,
+                                ipv4GeneralGroup,
+                                ipv4SystemStatsGroup,
+                                ipv4SystemStatsHCPacketGroup
+                            }
+
+        SUPPORTS            IPV6-MIB
+        INCLUDES            {
+                                ipv6GeneralGroup
+                            }
+
+        SUPPORTS            NOTIFICATION-LOG-MIB
+        INCLUDES            {
+                                notificationLogConfigGroup,
+                                notificationLogStatsGroup
+                            }
+
+        SUPPORTS            PTOPO-MIB
+        INCLUDES            {
+                                ptopoConfigGroup,
+                                ptopoDataGroup,
+                                ptopoGeneralGroup
+                            }
+
+        SUPPORTS            RITTAL-CMC-III-MIB
+        INCLUDES            {
+                                cmcIIIControlMibGroup,
+                                cmcIIIDeviceMibGroup,
+                                cmcIIIDrcMibGroup,
+                                cmcIIIInfoMibGroup,
+                                cmcIIILdapMibGroup,
+                                cmcIIIModbusMibGroup,
+                                cmcIIINotificationGroup,
+                                cmcIIINtpMibGroup,
+                                cmcIIIRelayMibGroup,
+                                cmcIIISetupMibGroup,
+                                cmcIIIShutdownMibGroup,
+                                cmcIIISmsMibGroup,
+                                cmcIIISmtpMibGroup,
+                                cmcIIISyslogMibGroup,
+                                cmcIIITrapGroup
+                            }
+
+        VARIATION           cmcIIITrapReceiverStatus
+        ACCESS              read-write
+        DESCRIPTION         "Enumeration types snmpv3Trap(5) and snmpv3Inform(6) are not supported."
+
+        VARIATION           cmcIIISmtpStatus
+        ACCESS              read-only
+        DESCRIPTION         "Status change is not supported."
+
+        VARIATION           cmcIIISmsStatus
+        ACCESS              read-only
+        DESCRIPTION         "Status change is not supported."
+
+        SUPPORTS            SNMP-FRAMEWORK-MIB
+        INCLUDES            {
+                                snmpEngineGroup
+                            }
+
+        SUPPORTS            SNMP-MPD-MIB
+        INCLUDES            {
+                                snmpMPDGroup
+                            }
+
+        SUPPORTS            SNMP-TARGET-MIB
+        INCLUDES            {
+                                snmpTargetBasicGroup,
+                                snmpTargetCommandResponderGroup,
+                                snmpTargetResponseGroup
+                            }
+
+        SUPPORTS            SNMP-USER-BASED-SM-MIB
+        INCLUDES            {
+                                usmMIBBasicGroup
+                            }
+
+        SUPPORTS            SNMP-VIEW-BASED-ACM-MIB
+        INCLUDES            {
+                                vacmBasicGroup
+                            }
+
+        SUPPORTS            SNMPv2-MIB
+        INCLUDES            {
+                                snmpCommunityGroup,
+                                snmpGroup,
+                                snmpObsoleteGroup,
+                                snmpSetGroup,
+                                systemGroup
+                            }
+
+        SUPPORTS            TCP-MIB
+        INCLUDES            {
+                                tcpBaseGroup,
+                                tcpConnectionGroup,
+                                tcpGroup,
+                                tcpListenerGroup
+                            }
+
+        SUPPORTS            UDP-MIB
+        INCLUDES            {
+                                udpBaseGroup,
+                                udpEndpointGroup,
+                                udpGroup
+                            }
+
+        ::=                 { cmcIIICapability  30103 }
+
+
+cmcIIIPuCapsV104       AGENT-CAPABILITIES
+        PRODUCT-RELEASE     "V1.04"
+        STATUS              current
+        DESCRIPTION         "RITTAL GmbH & Co. KG : CMC III Power Distribution Unit built-in capabilities."
+
+        SUPPORTS            IF-MIB
+        INCLUDES            {
+                                ifCounterDiscontinuityGroup,
+                                ifFixedLengthGroup,
+                                ifGeneralGroup,
+                                ifGeneralInformationGroup,
+                                ifHCFixedLengthGroup,
+                                ifHCPacketGroup,
+                                ifOldObjectsGroup,
+                                ifPacketGroup,
+                                ifVHCPacketGroup
+                            }
+
+        SUPPORTS            NOTIFICATION-LOG-MIB
+        INCLUDES            {
+                                notificationLogConfigGroup,
+                                notificationLogStatsGroup
+                            }
+
+        SUPPORTS            PTOPO-MIB
+        INCLUDES            {
+                                ptopoConfigGroup,
+                                ptopoDataGroup,
+                                ptopoGeneralGroup
+                            }
+
+        SUPPORTS            RITTAL-CMC-III-MIB
+        INCLUDES            {
+                                cmcIIIControlMibGroup,
+                                cmcIIIDeviceMibGroup,
+                                cmcIIIDrcMibGroup,
+                                cmcIIIFileMibGroup,
+                                cmcIIIInfoMibGroup,
+                                cmcIIILdapMibGroup,
+                                cmcIIINotificationGroup,
+                                cmcIIINtpMibGroup,
+                                cmcIIISetupMibGroup,
+                                cmcIIISmtpMibGroup,
+                                cmcIIISyslogMibGroup,
+                                cmcIIITrapGroup
+                            }
+
+        VARIATION           cmcIIITrapReceiverStatus
+        ACCESS              read-write
+        DESCRIPTION         "Enumeration type snmpv3Inform(6) is not supported."
+
+        VARIATION           cmcIIISmtpStatus
+        ACCESS              read-only
+        DESCRIPTION         "Status change is not supported."
+
+        VARIATION           cmcIIIRadiusAuth
+        ACCESS              read-write
+        DESCRIPTION         "Enumeration type auto(1) is not supported."
+
+        VARIATION           cmcIIISmsQueue
+        ACCESS              read-only
+        DESCRIPTION         "SMS is not supported."
+
+        SUPPORTS            SNMP-COMMUNITY-MIB
+        INCLUDES            {
+                                snmpCommunityGroup
+                            }
+
+        SUPPORTS            SNMP-FRAMEWORK-MIB
+        INCLUDES            {
+                                snmpEngineGroup
+                            }
+
+        SUPPORTS            SNMP-MPD-MIB
+        INCLUDES            {
+                                snmpMPDGroup
+                            }
+
+        SUPPORTS            SNMP-NOTIFICATION-MIB
+        INCLUDES            {
+                                snmpNotifyGroup,
+                                snmpNotifyFilterGroup
+                            }
+
+        SUPPORTS            SNMP-TARGET-MIB
+        INCLUDES            {
+                                snmpTargetBasicGroup,
+                                snmpTargetCommandResponderGroup,
+                                snmpTargetResponseGroup
+                            }
+
+        SUPPORTS            SNMP-USER-BASED-SM-MIB
+        INCLUDES            {
+                                usmMIBBasicGroup
+                            }
+
+        SUPPORTS            SNMP-VIEW-BASED-ACM-MIB
+        INCLUDES            {
+                                vacmBasicGroup
+                            }
+
+        SUPPORTS            SNMPv2-MIB
+        INCLUDES            {
+                                snmpCommunityGroup,
+                                snmpGroup,
+                                snmpObsoleteGroup,
+                                snmpSetGroup,
+                                systemGroup
+                            }
+
+        ::=                 { cmcIIICapability  30104 }
+
+cmcIIIPduCapsV104       AGENT-CAPABILITIES
+        PRODUCT-RELEASE     "V1.04"
+        STATUS              current
+        DESCRIPTION         "RITTAL GmbH & Co. KG : CMC III Power Distribution Unit built-in capabilities."
+
+        SUPPORTS            IF-MIB
+        INCLUDES            {
+                                ifCounterDiscontinuityGroup,
+                                ifFixedLengthGroup,
+                                ifGeneralGroup,
+                                ifGeneralInformationGroup,
+                                ifHCFixedLengthGroup,
+                                ifHCPacketGroup,
+                                ifOldObjectsGroup,
+                                ifPacketGroup,
+                                ifVHCPacketGroup
+                            }
+
+        SUPPORTS            NOTIFICATION-LOG-MIB
+        INCLUDES            {
+                                notificationLogConfigGroup,
+                                notificationLogStatsGroup
+                            }
+
+        SUPPORTS            PTOPO-MIB
+        INCLUDES            {
+                                ptopoConfigGroup,
+                                ptopoDataGroup,
+                                ptopoGeneralGroup
+                            }
+
+        SUPPORTS            RITTAL-CMC-III-MIB
+        INCLUDES            {
+                                cmcIIIControlMibGroup,
+                                cmcIIIDeviceMibGroup,
+                                cmcIIIDrcMibGroup,
+                                cmcIIIFileMibGroup,
+                                cmcIIIInfoMibGroup,
+                                cmcIIILdapMibGroup,
+                                cmcIIINotificationGroup,
+                                cmcIIINtpMibGroup,
+                                cmcIIISetupMibGroup,
+                                cmcIIISmtpMibGroup,
+                                cmcIIISyslogMibGroup,
+                                cmcIIITrapGroup
+                            }
+
+        VARIATION           cmcIIITrapReceiverStatus
+        ACCESS              read-write
+        DESCRIPTION         "Enumeration type snmpv3Inform(6) is not supported."
+
+        VARIATION           cmcIIISmtpStatus
+        ACCESS              read-only
+        DESCRIPTION         "Status change is not supported."
+
+        VARIATION           cmcIIIRadiusAuth
+        ACCESS              read-write
+        DESCRIPTION         "Enumeration type auto(1) is not supported."
+
+        VARIATION           cmcIIISetBeeper
+        ACCESS              read-only
+        DESCRIPTION         "Beeper is not available."
+
+        VARIATION           cmcIIIQuitRelay
+        ACCESS              read-only
+        DESCRIPTION         "Alarm Relay is not available."
+
+        VARIATION           cmcIIILogicRelay
+        ACCESS              read-only
+        DESCRIPTION         "Alarm Relay is not available."
+
+        VARIATION           cmcIIIFunctionRelay
+        ACCESS              read-only
+        DESCRIPTION         "Alarm Relay is not available."
+
+        VARIATION           cmcIIIUnitMsgRelay
+        ACCESS              read-only
+        DESCRIPTION         "Alarm Relay is not available."
+
+        VARIATION           cmcIIISmsQueue
+        ACCESS              read-only
+        DESCRIPTION         "SMS is not supported."
+
+        SUPPORTS            SNMP-COMMUNITY-MIB
+        INCLUDES            {
+                                snmpCommunityGroup
+                            }
+
+        SUPPORTS            SNMP-FRAMEWORK-MIB
+        INCLUDES            {
+                                snmpEngineGroup
+                            }
+
+        SUPPORTS            SNMP-MPD-MIB
+        INCLUDES            {
+                                snmpMPDGroup
+                            }
+
+        SUPPORTS            SNMP-NOTIFICATION-MIB
+        INCLUDES            {
+                                snmpNotifyGroup,
+                                snmpNotifyFilterGroup
+                            }
+
+        SUPPORTS            SNMP-TARGET-MIB
+        INCLUDES            {
+                                snmpTargetBasicGroup,
+                                snmpTargetCommandResponderGroup,
+                                snmpTargetResponseGroup
+                            }
+
+        SUPPORTS            SNMP-USER-BASED-SM-MIB
+        INCLUDES            {
+                                usmMIBBasicGroup
+                            }
+
+        SUPPORTS            SNMP-VIEW-BASED-ACM-MIB
+        INCLUDES            {
+                                vacmBasicGroup
+                            }
+
+        SUPPORTS            SNMPv2-MIB
+        INCLUDES            {
+                                snmpCommunityGroup,
+                                snmpGroup,
+                                snmpObsoleteGroup,
+                                snmpSetGroup,
+                                systemGroup
+                            }
+
+        ::=                 { cmcIIICapability  34104 }
+END

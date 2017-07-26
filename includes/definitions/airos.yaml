@@ -1,6 +1,6 @@
 os: airos
 text: 'Ubiquiti AirOS'
-type: network
+type: wireless
 icon: ubiquiti
 nobulk: 1
 group: ubnt

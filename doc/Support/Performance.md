@@ -65,6 +65,13 @@ You can also set this globally with the config option `$config['snmp']['max_oid'
 The default 16 threads that `poller-wrapper.py` runs as isn't necessarily the optimal number. A general rule of thumb is 
 2 threads per core but we suggest that you play around with lowering / increasing the number until you get the optimal value.
 
+This can be changed by going to the cron job for librenms. Usually in /etc/cron.d/librenms and changing the "16"
+
+*/5  *    * * *   librenms    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
+
+KEEP in MIND that this dosnt always help, it depnds on your system and CPU. So Be careful. 
+
+
 #### Recursive DNS
 
 If your install uses hostnames for devices and you have quite a lot then it's advisable to setup a local recursive dns instance on the 

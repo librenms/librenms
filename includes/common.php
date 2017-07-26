@@ -659,10 +659,31 @@ function c_echo($string, $enabled = true)
     if (!$enabled) {
         return;
     }
-    global $console_color;
 
-    if ($console_color) {
-        echo $console_color->convert($string);
+    if (isCli()) {
+        global $console_color;
+        if ($console_color) {
+            echo $console_color->convert($string);
+        } else {
+            // limited functionality for validate.php
+            $search = array(
+                '/%n/',
+                '/%g/',
+                '/%R/',
+                '/%Y/',
+                '/%B/',
+                '/%((%)|.)/' // anything left over replace with empty string
+            );
+            $replace = array(
+                "\e[0m",
+                "\e[32m",
+                "\e[1;31m",
+                "\e[1;33m",
+                "\e[1;34m",
+                ""
+            );
+            echo preg_replace($search, $replace, $string);
+        }
     } else {
         echo preg_replace('/%((%)|.)/', '', $string);
     }
@@ -1097,15 +1118,20 @@ function version_info($remote = true)
             $output['github'] = json_decode(curl_exec($api), true);
         }
         list($local_sha, $local_date) = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
+        $output['local_ver']    = rtrim(`git describe --tags`);
         $output['local_sha']    = $local_sha;
         $output['local_date']   = $local_date;
         $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
     }
-    $output['db_schema']   = get_db_schema();
+    $output['db_schema']   = get_db_schema() ?: '?';
     $output['php_ver']     = phpversion();
-    $output['mysql_ver']   = dbFetchCell('SELECT version()');
-    $output['rrdtool_ver'] = implode(' ', array_slice(explode(' ', shell_exec($config['rrdtool'].' --version |head -n1')), 1, 1));
-    $output['netsnmp_ver'] = str_replace('version: ', '', rtrim(shell_exec($config['snmpget'].' --version 2>&1')));
+    $output['mysql_ver']   = dbIsConnected() ? dbFetchCell('SELECT version()') : '?';
+    $output['rrdtool_ver'] = str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
+        ($config['rrdtool'] ?: 'rrdtool') . ' --version |head -n1'
+    )), 1, 1)));
+    $output['netsnmp_ver'] = str_replace('version: ', '', rtrim(shell_exec(
+        ($config['snmpget'] ?: 'snmpget').' --version 2>&1'
+    )));
 
     return $output;
 }//end version_info()

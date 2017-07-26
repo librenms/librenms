@@ -21,8 +21,7 @@ function init_auth()
     $ad_init = false;  // this variable tracks if bind has been called so we don't call it multiple times
     $ldap_connection = @ldap_connect($config['auth_ad_url']);
 
-// disable referrals and force ldap version to 3
-
+    // disable referrals and force ldap version to 3
     ldap_set_option($ldap_connection, LDAP_OPT_REFERRALS, 0);
     ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
 }
@@ -452,21 +451,33 @@ function ad_bind($connection, $allow_anonymous = true, $force = false)
         return true; // bind already attempted
     }
 
+    // set timeout
+    ldap_set_option(
+        $connection,
+        LDAP_OPT_NETWORK_TIMEOUT,
+        isset($config['auth_ad_timeout']) ? isset($config['auth_ad_timeout']) : 5
+    );
+
     // With specified bind user
     if (isset($config['auth_ad_binduser'], $config['auth_ad_bindpassword'])) {
         $ad_init = true;
-        return ldap_bind(
+        $bind = ldap_bind(
             $connection,
             "${config['auth_ad_binduser']}@${config['auth_ad_domain']}",
             "${config['auth_ad_bindpassword']}"
         );
+        ldap_set_option($connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
+        return $bind;
     }
+
+    $bind = false;
 
     // Anonymous
     if ($allow_anonymous) {
         $ad_init = true;
-        return ldap_bind($connection);
+        $bind = ldap_bind($connection);
     }
 
-    return false;
+    ldap_set_option($connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
+    return $bind;
 }

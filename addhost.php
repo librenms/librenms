@@ -94,7 +94,7 @@ if (!empty($argv[1])) {
             }
 
             if ($seclevel === 'nanp') {
-                array_push($config['snmp']['v3'], $v3);
+                array_unshift($config['snmp']['v3'], $v3);
             }
         } elseif ($seclevel === 'anp' or $seclevel === 'authNoPriv') {
             $v3['authlevel'] = 'authNoPriv';
@@ -116,7 +116,7 @@ if (!empty($argv[1])) {
                 }
             }
 
-            array_push($config['snmp']['v3'], $v3);
+            array_unshift($config['snmp']['v3'], $v3);
         } elseif ($seclevel === 'ap' or $seclevel === 'authPriv') {
             $v3['authlevel']  = 'authPriv';
             $v3args           = array_slice($argv, 4);
@@ -158,7 +158,7 @@ if (!empty($argv[1])) {
         }
 
         if ($community) {
-            $config['snmp']['community'] = array($community);
+            array_unshift($config['snmp']['community'], $community);
         }
     }//end if
 

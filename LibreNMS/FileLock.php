@@ -15,12 +15,13 @@ namespace LibreNMS;
 
 class FileLock
 {
-    private $name = "";
-    private $file = "";
+    private $name;
+    private $file;
     /**
      * @var resource | false
      */
-    private $handle = false;
+    private $handle;
+
     private $acquired = false;
 
     private function __construct($lock_name)
@@ -59,32 +60,41 @@ class FileLock
      * Given a lock name, try to acquire the lock.
      * On success return a FileLock object, or on failure return false.
      * @param string $lock_name Name of lock
-     * @return mixed
+     * @param int $timeout Try for this many seconds to see if we can acquire the lock.  Default is no wait. A negative timeout will wait forever.
+     * @return self|false
      */
-    public static function lock($lock_name)
+    public static function lock($lock_name, $timeout = 0)
     {
         $lock = new self($lock_name);
         if ($lock->handle === false) {
             return false;
         }
 
-        if (flock($lock->handle, LOCK_EX | LOCK_NB)) {
-            $lock->acquired = true;
-            return $lock;
-        } else {
-            return false;
+        // try to acquire the lock each second until we reach the timeout, once if timeout is 0, forever if timeout < 0
+        for ($i = 0; $i <= $timeout || $timeout < 0; $i++) {
+            if (flock($lock->handle, $timeout < 0 ? LOCK_EX : LOCK_EX | LOCK_NB)) {
+                $lock->acquired = true;
+                return $lock;
+            }
+
+            if ($timeout) {
+                sleep(1);
+            }
         }
+
+        return false;
     }
 
     /**
      * Given a lock name, try to acquire the lock, exiting on failure.
      * On success return a FileLock object.
      * @param string $lock_name Name of lock
-     * @return FileLock
+     * @param int $timeout Try for this many seconds to see if we can acquire the lock.  Default is no wait. A negative timeout will wait forever.
+     * @return self
      */
-    public static function lockOrDie($lock_name)
+    public static function lockOrDie($lock_name, $timeout = 0)
     {
-        $lock = self::lock($lock_name);
+        $lock = self::lock($lock_name, $timeout);
 
         if ($lock === false) {
             echo "Failed to acquire lock $lock_name, exiting\n";

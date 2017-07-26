@@ -34,8 +34,8 @@ $config['install_dir'] = $install_dir;
 chdir($install_dir);
 
 if (!getenv('TRAVIS')) {
-    require_once 'Net/IPv4.php';
-    require_once 'Net/IPv6.php';
+    include_once 'Net/IPv4.php';
+    include_once 'Net/IPv6.php';
 }
 
 # composer autoload
@@ -56,6 +56,7 @@ require_once $install_dir . '/includes/common.php';
 require_once $install_dir . '/includes/dbFacile.php';
 require_once $install_dir . '/includes/rrdtool.inc.php';
 require_once $install_dir . '/includes/influxdb.inc.php';
+require_once $install_dir . '/includes/opentsdb.inc.php';
 require_once $install_dir . '/includes/graphite.inc.php';
 require_once $install_dir . '/includes/datastore.inc.php';
 require_once $install_dir . '/includes/billing.php';
@@ -89,13 +90,17 @@ if (module_selected('alerts', $init_modules)) {
     require_once $install_dir . '/includes/alerts.inc.php';
 }
 
-
 // variable definitions
 require $install_dir . '/includes/cisco-entities.php';
 require $install_dir . '/includes/vmware_guestid.inc.php';
 require $install_dir . '/includes/defaults.inc.php';
 require $install_dir . '/includes/definitions.inc.php';
+
+// Display config.php errors instead of http 500
+$display_bak = ini_get('display_errors');
+ini_set('display_errors', 1);
 include $install_dir . '/config.php';
+ini_set('display_errors', $display_bak);
 
 // init memcached
 if ($config['memcached']['enable'] === true) {
@@ -161,8 +166,11 @@ if (module_selected('web', $init_modules)) {
         $config['title_image'] = 'images/librenms_logo_'.$config['site_style'].'.svg';
     }
     require $install_dir . '/html/includes/vars.inc.php';
-
-    load_all_os(true);
+    if (module_selected('nodb', $init_modules)) {
+        load_all_os(false);
+    } else {
+        load_all_os(true);
+    }
 }
 
 $console_color = new Console_Color2();
