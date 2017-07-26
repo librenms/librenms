@@ -4,7 +4,7 @@
  * requires snmp extend agent script from librenms-agent
  */
 $state = "raspberry_codec";
-$oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.';
+$oid = '1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.';
 for ($codec = 8; $codec < 14; $codec++) {
     switch ($codec) {
         case "8":
@@ -26,8 +26,7 @@ for ($codec = 8; $codec < 14; $codec++) {
             $descr = "WMV9 codec";
             break;
     }
-    $value = snmp_get($device, $oid.$codec, '-Oqv');
-
+    $value = current($pre_cache['raspberry_pi_sensors'][$oid.$codec]);
     if (stripos($value, 'abled') !== false) {
         $state_index_id = create_state_index($state);
         if ($state_index_id) {
