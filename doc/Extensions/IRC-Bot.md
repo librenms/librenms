@@ -11,7 +11,7 @@ Table of Content:
 
 LibreNMS has an easy to use IRC-Interface for basic tasks like viewing last log-entry, current device/port status and such.
 
-By default the IRC-Bot will not start when executed and will return an error until at least `$config['irc_host']` and `$config['irc_port']` has been specified inside `config.php`.
+By default the IRC-Bot will not start when executed and will return an error until at least `$config['irc_host']` and `$config['irc_port']` has been specified inside `config.php`. (To start the IRC-Bot run ./irc.php )
 
 If no channel has been specified with `$config['irc_chan']`, `##librenms` will be used.
 The default Nick for the bot is `LibreNMS`.
