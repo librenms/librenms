@@ -3,7 +3,6 @@
 $OID = '.1.3.6.1.4.1.45.1.6.3.8.1.1.12';
 
 if ($device['os'] == 'avaya-ers') {
-
     $mem = snmp_walk($device, $OID, '-Osqn');
 
     echo "$mem\n";
