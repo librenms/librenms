@@ -2106,8 +2106,22 @@ function device_is_up($device, $record_perf = false)
     }
 
     if ($device['status'] != $response['status']) {
-        dbUpdate(array('status' => $response['status'], 'status_reason' => $response['status_reason']), 'devices', 'device_id=?', array($device['device_id']));
-        log_event('Device status changed to '.($response['status'] == '1' ? 'Up' : 'Down'). ' from ' . $response['status_reason'] . ' check.', $device, ($response['status'] == '1' ? 'up' : 'down'));
+        dbUpdate(
+            array('status' => $response['status'], 'status_reason' => $response['status_reason']),
+            'devices',
+            'device_id=?',
+            array($device['device_id'])
+        );
+
+        if ($response['status']) {
+            $type = 'up';
+            $reason = $device['status_reason'];
+        } else {
+            $type = 'down';
+            $reason = $response['status_reason'];
+        }
+
+        log_event('Device status changed to ' . ucfirst($type) . " from $reason check.", $device, $type);
     }
     return $response;
 }
