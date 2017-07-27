@@ -1,7 +1,6 @@
 <?php
 
-if ($device['os'] == 'avaya-ers') {
-    
+if ($device['os'] == 'avaya-ers') {    
     foreach (explode("\n", $procs) as $i => $t) {
         $t   = explode(' ', $t);
         $oid = $t[0];
