@@ -5,7 +5,7 @@ Table of Content:
    -   [Commands](#commands)
 -   [Examples](#examples)
 -   [Extensions](#extensions)
-
+-   Systemd start up script
 
 # <a name="about">About</a>
 
@@ -143,3 +143,21 @@ File: includes/ircbot/echo.inc.php
       return $this->respond("root shouldn't be online so late!");
    }
 ```
+
+Systemd start up script
+
+Basic systemd start up script to be placed in /etc/systemd/system/ to start irc service at boot. 
+
+librenms-irc.service script is located at /opt/librenms/misc/
+
+Once copied to /etc/systemd/system/ you must run the following commads:
+
+a) chmod 664 /etc/systemd/system/librenms-irc.service
+ 
+b) systemctl daemon-reload
+
+c) systemctl enable librenms-irc.service
+
+d) systemctl start librenms-irc.service
+
+It can be stopped or started just like any other systemd script such as systemctl start librenms-irc.service
