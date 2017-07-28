@@ -1,6 +1,7 @@
 <?php
 
-if ($device['os'] == 'avaya-ers') {    
+if ($device['os'] == 'avaya-ers') {
+    $procs = snmp_walk($device, '.1.3.6.1.4.1.45.1.6.3.8.1.1.6', '-Osqn');
     foreach (explode("\n", $procs) as $i => $t) {
         $t   = explode(' ', $t);
         $oid = $t[0];
