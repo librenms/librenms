@@ -8,7 +8,6 @@ modules:
                     num_oid: .1.3.6.1.4.1.15004.4.2.2.4.
                     descr: 'Power Supply 1 Status'
                     index: 'rcDeviceStsPowerSupply1.{{ $index }}'
-                    state_name: rcDeviceStsPowerSupply1
                     states:
                         - { descr: notPresent, graph: 0, value: 1, generic: 3 }
                         - { descr: functional, graph: 0, value: 2, generic: 0 }
@@ -19,7 +18,6 @@ modules:
                     num_oid: .1.3.6.1.4.1.15004.4.2.2.5.
                     descr: 'Power Supply 2 Status'
                     index: 'rcDeviceStsPowerSupply2.{{ $index }}'
-                    state_name: rcDeviceStsPowerSupply2
                     states:
                         - { descr: notPresent, graph: 0, value: 1, generic: 3 }
                         - { descr: functional, graph: 0, value: 2, generic: 0 }
@@ -30,7 +28,6 @@ modules:
                     num_oid: .1.3.6.1.4.1.15004.4.2.2.7.
                     descr: Fail Safe Relay
                     index: 'rcDeviceStsFailSafeRelay.{{ $index }}'
-                    state_name: rcDeviceStsFailSafeRelay
                     states:
                         - { descr: energized, graph: 0, value: 1, generic: 0 }
                         - { descr: deEnergized, graph: 0, value: 2, generic: 2 }
@@ -39,7 +36,6 @@ modules:
                     num_oid: .1.3.6.1.4.1.15004.4.2.2.10.
                     descr: 'Fan Bank Module 1'
                     index: 'rcDeviceStsFanBank1.{{ $index }}'
-                    state_name: rcDeviceStsFanBank1
                     states:
                         - { descr: notPresent, graph: 0, value: 1, generic: 3 }
                         - { descr: failed, graph: 0, value: 2, generic: 2 }
@@ -51,7 +47,6 @@ modules:
                     num_oid: .1.3.6.1.4.1.15004.4.2.2.11.
                     descr: 'Fan Bank Module 2'
                     index: 'rcDeviceStsFanBank2.{{ $index }}'
-                    state_name: rcDeviceStsFanBank2
                     states:
                         - { descr: notPresent, graph: 0, value: 1, generic: 3 }
                         - { descr: failed, graph: 0, value: 2, generic: 2 }
