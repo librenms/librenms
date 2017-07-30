@@ -1,0 +1,2 @@
+Defaults !requiretty
+apache ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart snmptt.service

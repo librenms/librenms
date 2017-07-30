@@ -1,0 +1,14 @@
+# for fast testing, you should disable these options for production environments
+UserKnownHostsFile=/dev/null
+StrictHostKeyChecking=no
+
+# Sample configurations
+Host poller1
+	HostName poller1.local.domain
+	User remoteuser
+	Port 22
+
+Host poller2
+	HostName poller2.local.domain
+	User remoteuser
+	Port 2244

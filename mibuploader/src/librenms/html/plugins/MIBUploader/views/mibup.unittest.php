@@ -1,0 +1,1 @@
+<?php echo $sVar1 . $sVar2; ?>val3
