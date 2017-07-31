@@ -129,6 +129,7 @@ main () {
             exit
         elif [[ "$up" == "1" ]]; then
             # Update to Master-Branch
+            git checkout vendor/ --quiet > /dev/null 2>&1
             old_ver=$(git show --pretty="%H" -s HEAD)
             status_run 'Updating to latest codebase' 'git pull --quiet' 'update'
             new_ver=$(git show --pretty="%H" -s HEAD)
@@ -137,6 +138,7 @@ main () {
             fi
         elif [[ "$up" == "3" ]]; then
             # Update to last Tag
+            git checkout vendor/ --quiet > /dev/null 2>&1
             old_ver=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
             status_run 'Updating to latest release' 'git fetch --tags && git checkout $(git describe --tags $(git rev-list --tags --max-count=1))' 'update'
             new_ver=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
