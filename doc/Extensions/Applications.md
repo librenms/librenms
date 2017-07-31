@@ -205,7 +205,7 @@ snmp ALL=(ALL) NOPASSWD: /etc/snmp/exim-stats.sh, /usr/bin/exim*
 
 2: Make the script executable (chmod +x /etc/snmp/fail2ban)
 
-3: Edit your snmpd.conf file (usually /etc/snmp/fail2ban) and add:
+3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
 extend fail2ban /etc/snmp/fail2ban
 ```
