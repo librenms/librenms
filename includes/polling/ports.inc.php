@@ -639,9 +639,14 @@ foreach ($ports as $port) {
                         $max_64 = '18446744073709551616';//Unused at the moment.
                         $max_32 = '4294967296';
                         if ($hc_enabled !== true) {
-                            // We store the new rolled version for use in rrd. DO NOT store in the DB as we need
-                            // to calculate the value again on the next poll.
-                            $this_port[$oid . '_rolled'] = (gmp_sub($max_32, $port[$oid])) + $this_port[$oid];
+                            if (function_exists('gmp_sub')) {
+                                // We store the new rolled version for use in rrd. DO NOT store in the DB as we need
+                                // to calculate the value again on the next poll.
+                                $this_port[$oid . '_rolled'] = (gmp_sub($max_32, $port[$oid])) + $this_port[$oid];
+                            } else {
+                                // No GMP http://uk1.php.net/manual/en/book.gmp.php function
+                                $this_port[$oid . '_rolled'] = ($max_32 - $port[$oid]) - $this_port[$oid];
+                            }
                         }
                     }
                 }
