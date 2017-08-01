@@ -1,5 +1,4 @@
 os: radware
-#text: 'Alteon ADC'
 text: RADWARE
 type: network
 icon: radware
