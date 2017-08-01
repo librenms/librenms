@@ -2,7 +2,7 @@
 /*
  * LibreNMS
  *
- * Copyright (c) 2017 Yacine Ben <https://github.com/yac01/librenms.git >
+ * Copyright (c) 2017 Yacine Benamsili <https://github.com/yac01/librenms.git >
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -18,9 +18,11 @@ function opentsdb_update($device, $measurement, $tags, $fields)
     if ($config['opentsdb']['enable'] == true) {
         if ($opentsdb != true) {
             $opentsdb = fsockopen($config['opentsdb']['host'], $config['opentsdb']['port']);
-            d_echo("Connection made to OpenTSDB");
+        }
+        if ($opentsdb == true) {
+            d_echo("Connection to OpenTSDB is done\n");
         } else {
-            d_echo("Connection to OpenTSDB has failed");
+            d_echo("Connection to OpenTSDB has failed\n");
         }
 
           $flag=$config['opentsdb']['co'];
