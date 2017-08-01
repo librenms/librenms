@@ -35,8 +35,8 @@ if ($device['os'] == 'avaya-ers') {
         }
         
         foreach ($egress_ids as $port_id) {
-            $ifIndex = $base_to_index[$port_id];
-            $per_vlan_data[$vlan_id][$ifIndex]['untagged'] = (in_array($port_id, $untagged_ids) ? 1 : 0);
+            $ifIndex = $base_to_index[$port_id - 1]; // -1 fixes off by one error
+            $per_vlan_data[$vlan_id][$ifIndex]['untagged'] = (in_array($port_id - 1, $untagged_ids) ? 1 : 0); // -1 fixes off by one error
         }
     }
 }
