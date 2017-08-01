@@ -23,13 +23,13 @@ if ($device['os'] == 'avaya-ers') {
             ), 'vlans');
             echo '+';
         }
-        $device['vlans'][$vtpdomain_id][$vlan_id] = $vlan_id;    
+        $device['vlans'][$vtpdomain_id][$vlan_id] = $vlan_id;
         $egress_ids = q_bridge_bits2indices($tagoruntag[$vlan_id]['rcVlanPortMembers']);
         $untagged_ids = array();
         
         foreach ($port_pvids as $port => $port_num) {
-            if ($port_num['rcVlanPortDefaultVlanId'] == $vlan_id && 
-            ($port_mode[$port]['rcVlanPortPerformTagging'] == 'false' || $port_mode[$port]['rcVlanPortPerformTagging'] == 4 )) {              
+            if ($port_num['rcVlanPortDefaultVlanId'] == $vlan_id &&
+            ($port_mode[$port]['rcVlanPortPerformTagging'] == 'false' || $port_mode[$port]['rcVlanPortPerformTagging'] == 4 )) {
                 array_push($untagged_ids, $port);
             }
         }
