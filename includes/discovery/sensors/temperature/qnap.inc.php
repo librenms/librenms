@@ -12,6 +12,7 @@
 
 echo 'QNAP: ';
 
+
 $cpu_temperature_oid = '.1.3.6.1.4.1.24681.1.3.5.0';
 $cpu_temperature = snmp_get($device, $cpu_temperature_oid, '-Oqv');
 discover_sensor($valid['sensor'], 'temperature', $device, $cpu_temperature_oid, '98', 'snmp', 'CPU Temperature', '1', '1', null, null, null, null, $cpu_temperature);
