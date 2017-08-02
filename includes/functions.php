@@ -891,9 +891,11 @@ function send_mail($emails, $subject, $message, $html = false)
         $mail->XMailer = $config['project_name_version'];
         $mail->CharSet = 'utf-8';
         $mail->WordWrap = 76;
-        $mail->Body = $message;
         if ($html) {
             $mail->isHTML(true);
+            $mail->Body = nl2br($message);
+        } else {
+            $mail->Body = $message;
         }
         switch (strtolower(trim($config['email_backend']))) {
             case 'sendmail':
