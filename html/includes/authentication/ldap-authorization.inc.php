@@ -352,4 +352,3 @@ function get_group_list()
 
     return $ldap_groups;
 }
-
