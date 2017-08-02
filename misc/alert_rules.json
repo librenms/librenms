@@ -109,11 +109,11 @@
   },
   
   {
-    "rule": "Service warning",
-    "name": "%services.service_status = \"1\""
+    "rule": "%services.service_status = \"1\"",
+    "name": "Service warning"
   },
   {
-    "rule": "Service critical",
-    "name": "%services.service_status = \"2\""
+    "rule": "%services.service_status = \"2\"",
+    "name": "Service critical"
   }
 ]
