@@ -14,6 +14,8 @@
 $init_modules = array();
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
+include_once 'Net/IPv4.php';
+
 $handle = fopen('ips.txt', 'w');
 
 foreach (dbFetchRows('SELECT * FROM `ipv4_networks`') as $data) {
@@ -22,7 +24,7 @@ foreach (dbFetchRows('SELECT * FROM `ipv4_networks`') as $data) {
     if ($bits != '32' && $bits != '32' && $bits > '22') {
         $addr      = Net_IPv4::parseAddress($cidr);
         $broadcast = $addr->broadcast;
-        $ip        = ip2long($network) + '1';
+        $ip        = ip2long($network) + 1;
         $end       = ip2long($broadcast);
         while ($ip < $end) {
             $ipdotted = long2ip($ip);
