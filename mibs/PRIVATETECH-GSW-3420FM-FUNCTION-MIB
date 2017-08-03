@@ -1,0 +1,3216 @@
+PRIVATETECH-GSW-3420FM-FUNCTION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    RowStatus,DisplayString,MacAddress FROM SNMPv2-TC
+    Unsigned32 FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,OBJECT-GROUP, NOTIFICATION-GROUP       FROM SNMPv2-CONF
+    ifIndex    FROM RFC1213-MIB
+    enterprises,MODULE-IDENTITY,OBJECT-TYPE,NOTIFICATION-TYPE,Counter32,Counter64,IpAddress        FROM SNMPv2-SMI;
+--    MacAddress FROM BRIDGE-MIB;
+
+ctcu MODULE-IDENTITY
+        LAST-UPDATED "201112150000Z" 
+        ORGANIZATION "Corp."
+        CONTACT-INFO
+            ""
+        DESCRIPTION
+            ""
+        REVISION     "201112150000Z" 
+        DESCRIPTION
+            ""
+        ::= { enterprises 4756 }
+
+gsw-3420FM                                              OBJECT IDENTIFIER ::= { ctcu 122 }
+switch6                                             OBJECT IDENTIFIER ::= { gsw-3420FM 6}
+sw24g                                               OBJECT IDENTIFIER ::= { switch6 24 }
+swbasicSwitch                                       OBJECT IDENTIFIER ::= { sw24g 1 }
+swConfiguration                                     OBJECT IDENTIFIER ::= { sw24g 2 }
+swSecurity                                          OBJECT IDENTIFIER ::= { sw24g 3 }
+swMaintenance                                       OBJECT IDENTIFIER ::= { sw24g 4 }
+swMonitor	                                          OBJECT IDENTIFIER ::= { sw24g 5 }
+swNotifications                                     OBJECT IDENTIFIER ::= { sw24g 6 }
+
+
+--  ------------------------------------------------
+
+swFirmwareVersion OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+       ""
+   ::= { swbasicSwitch 1 }
+
+  
+swHostMACAddress OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+       ""
+   ::= { swbasicSwitch 2 }
+
+swConsoleBaudrate OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+       ""
+   ::= { swbasicSwitch 3 }
+
+ 
+
+swConfigTime                                       OBJECT IDENTIFIER ::= { swConfiguration 1 }
+
+swConfigTimeClockSource OBJECT-TYPE
+   SYNTAX       INTEGER  (0|1)
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "default: 0,
+        0 : Use Local Settings,
+        1 : Use NTP Server."
+   ::= { swConfigTime 1 }
+   
+ 
+
+swConfigTimeNTP                                     OBJECT IDENTIFIER ::= { swConfigTime 2 }
+
+swConfigTimeNTPTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwConfigTimeNTPEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swConfigTimeNTP 1 }
+
+swConfigTimeNTPEntry OBJECT-TYPE
+   SYNTAX      SwConfigTimeNTPEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swConfigTimeNTPIndex  }
+   ::= { swConfigTimeNTPTable 1 }
+
+SwConfigTimeNTPEntry ::= SEQUENCE {
+   swConfigTimeNTPIndex             INTEGER,
+   swConfigTimeNTPServerIPType      INTEGER,
+   swConfigTimeNTPServer            DisplayString
+}
+
+swConfigTimeNTPIndex OBJECT-TYPE
+   SYNTAX      INTEGER (1..5)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " The index of the ntp entry. "
+   ::= { swConfigTimeNTPEntry 1 }
+
+swConfigTimeNTPServerIPType OBJECT-TYPE
+   SYNTAX       INTEGER(0|1)
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "Default: 0,
+        0 : IPv4,
+        1 : IPv6."
+   ::= { swConfigTimeNTPEntry 2 }
+
+swConfigTimeNTPServer OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "Get/Set the NTP Time Server1. You can use the IP address or domain name."
+   ::= { swConfigTimeNTPEntry 3 }
+
+
+ 
+swConfigTimeLocalTime  OBJECT-TYPE
+	SYNTAX	DisplayString( SIZE(0..20))
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"User can set current time. 
+                 Format: YYYY-MM-DD HH:MM:SS
+                 year: 1970-2037,
+                 month: 1-23,
+                 day: 1-31,
+                 hour: 0-23,
+                 minitue: 0-59,
+                 second: 0-59,
+                 Note: time can't small than (1970-1-1 0:0:0 + System Uptime)"
+	::= { swConfigTime 3 }
+
+--swConfigAccountUsers                        OBJECT IDENTIFIER ::= { swConfiguration 2 }
+
+
+
+--swConfigAccountUsersTable OBJECT-TYPE
+--   SYNTAX      SEQUENCE OF SwConfigAccountUsersEntry
+--   MAX-ACCESS  not-accessible
+--   STATUS      current
+--   DESCRIPTION
+--       " "
+--   ::= { swConfigAccountUsers 1 }
+
+--swConfigAccountUsersEntry OBJECT-TYPE
+--   SYNTAX      SwConfigAccountUsersEntry
+--   MAX-ACCESS  not-accessible
+--   STATUS      current
+--   DESCRIPTION
+--       ""
+--   INDEX    { swUserIndex  }
+--   ::= { swConfigAccountUsersTable 1 }
+
+
+--SwConfigAccountUsersEntry ::= SEQUENCE {
+--   swUserIndex              INTEGER,
+--   swUserName               DisplayString,
+--   swPassword               DisplayString,
+--   swUserPrivilegeLevel     INTEGER
+--}
+
+
+--swUserIndex OBJECT-TYPE
+--   SYNTAX      INTEGER (1..20)
+--   MAX-ACCESS  not-accessible
+--   STATUS      current
+--   DESCRIPTION
+--       " "
+--   ::= { swConfigAccountUsersEntry 1 }
+
+--swUserName OBJECT-TYPE
+--   SYNTAX      DisplayString (SIZE (1..32))
+--   MAX-ACCESS  read-only
+--   STATUS      current
+--   DESCRIPTION
+--       " "
+--   ::= { swConfigAccountUsersEntry 2 }
+
+--swPassword OBJECT-TYPE
+--   SYNTAX      DisplayString (SIZE (1..32))
+--   MAX-ACCESS  read-only
+--   STATUS      current
+--   DESCRIPTION
+--       " "
+--   ::= { swConfigAccountUsersEntry 3 }
+
+--swUserPrivilegeLevel OBJECT-TYPE
+--   SYNTAX      INTEGER (1..15)
+--   MAX-ACCESS  read-only
+--   STATUS      current
+--   DESCRIPTION
+--       "default:1 
+--        User privilege level range : 1 - 15"
+--   ::= { swConfigAccountUsersEntry 4 }
+
+ 
+ 
+-- swUserAdd  OBJECT-TYPE
+--   SYNTAX      DisplayString
+--   MAX-ACCESS  read-write
+--   STATUS      current
+--   DESCRIPTION 
+--       " format: <privilegelevel>:<username>:<password>"   
+--   ::= { swConfigAccountUsers 2 }   
+   
+--swUserDel  OBJECT-TYPE
+--   SYNTAX      DisplayString
+--   MAX-ACCESS  read-write
+--   STATUS      current
+--   DESCRIPTION 
+--      " format: <username>"  
+--   ::= { swConfigAccountUsers 3 }      
+   
+
+
+
+
+
+
+swIP                                                    OBJECT IDENTIFIER ::= { swConfiguration 3 }
+
+swIPMode OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "0: host
+        1: router
+       "
+   ::= { swIP 1 }
+   
+
+   
+swIPDNSMode OBJECT-TYPE
+   SYNTAX      INTEGER(0..3)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "0:From any DHCP interfaces
+         1:No DNS server
+         2:Configured
+         3:From this DHCP interface"
+   ::= { swIP 2 }
+   
+swIPDNSVlanId OBJECT-TYPE
+   SYNTAX      INTEGER (1..4094)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "When DNS mode is From this DHCP interface,
+        Specify from which DHCP-enabled interface a provided DNS server should be preferred"
+   ::= { swIP 3 }  
+        
+swIPDNSServer OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "When DNS mode is Configured,
+        Explicitly provide the IP address of the DNS Server"
+   ::= { swIP 4 }   
+
+swIPDNSProxy OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " 0:Disable
+         1:Enable
+       "
+   ::= { swIP 5 }
+
+
+
+swIPInterfaces                                          OBJECT IDENTIFIER ::= {swIP 6 }
+
+
+swIPVlanConfiguredTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SwIPVlanConfiguredEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing IP Interfaces information for
+        each VLAN configured into the device by (local or
+        network) management.  All entries are permanent and will
+        be restored after the device is reset."
+    ::= { swIPInterfaces 1 }
+
+swIPVlanConfiguredEntry OBJECT-TYPE
+    SYNTAX      SwIPVlanConfiguredEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IP interfaces information for a VLAN configured into the
+        device by (local or network) management."
+    INDEX   { swIPVlanId }
+    ::= { swIPVlanConfiguredTable 1 }
+
+SwIPVlanConfiguredEntry ::=
+    SEQUENCE {
+        swIPVlanId
+             INTEGER,
+        swIPVlanV4DHCPClient
+             INTEGER,
+        swIPVlanV4DHCPFallbackTimeout    
+             Unsigned32,     
+       swIPVlanIpType      
+             INTEGER,              
+        swIPVlanV4Address      
+             IpAddress,
+        swIPVlanV4MaskLen   
+             INTEGER, 
+        swIPVlanV6Address      
+             DisplayString,
+        swIPVlanV6Prefix   
+             INTEGER,                              
+        swIPVlanRowStatus
+            RowStatus
+    }
+    
+swIPVlanId OBJECT-TYPE
+   SYNTAX      INTEGER (1..4094)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "The VLAN-ID or other identifier referring to this VLAN."
+   ::= { swIPVlanConfiguredEntry 1 }   
+   
+swIPVlanV4DHCPClient OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default:0
+       0: disable
+       1: enable" 
+   ::= { swIPVlanConfiguredEntry 2 } 
+   
+swIPVlanV4DHCPFallbackTimeout OBJECT-TYPE
+   SYNTAX      Unsigned32 (0..4294967295)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "The number of seconds for trying to obtain a DHCP lease" 
+   ::= { swIPVlanConfiguredEntry 3 }    
+   
+swIPVlanIpType OBJECT-TYPE
+   SYNTAX      INTEGER (1|2)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " 1: IPV4
+         2: IPV6" 
+   ::= { swIPVlanConfiguredEntry 4 }    
+
+swIPVlanV4Address OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       ""
+   ::= { swIPVlanConfiguredEntry 5 }
+
+swIPVlanV4MaskLen OBJECT-TYPE
+   SYNTAX      INTEGER (0..32)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       ""
+   ::= { swIPVlanConfiguredEntry 6 }   
+  
+swIPVlanV6Address OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE (0..30))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       ""
+   ::= { swIPVlanConfiguredEntry 7 }
+
+swIPVlanV6Prefix OBJECT-TYPE
+   SYNTAX      INTEGER (1..128)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 96"
+   ::= { swIPVlanConfiguredEntry 8 }
+
+swIPVlanRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+    ::= { swIPVlanConfiguredEntry 9 }
+    
+    
+    
+swIPRoutes                                          OBJECT IDENTIFIER ::= {swIP 7 }
+
+
+swIPRoutesConfiguredTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SwIPRoutesConfiguredEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing IP Interfaces information for
+        each VLAN configured into the device by (local or
+        network) management.  All entries are permanent and will
+        be restored after the device is reset."
+    ::= { swIPRoutes 1 }
+
+swIPRoutesConfiguredEntry OBJECT-TYPE
+    SYNTAX      SwIPRoutesConfiguredEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IP interfaces information for a VLAN configured into the
+        device by (local or network) management."
+    INDEX   { swIPRoutesIndex }
+    ::= { swIPRoutesConfiguredTable 1 }
+
+SwIPRoutesConfiguredEntry ::=
+    SEQUENCE {
+        swIPRoutesIndex
+             INTEGER,
+        swIPRoutesIpType
+             INTEGER,
+        swIPRoutesV4Network
+             IpAddress,
+        swIPRoutesV4MaskLen   
+             INTEGER, 
+        swIPRoutesV4Gateway
+             IpAddress,             
+        swIPRoutesV6Network
+             DisplayString,
+        swIPRoutesV6MaskLen
+             INTEGER, 
+        swIPRoutesV6Gateway      
+             DisplayString,
+        swIPRoutesNextHopVLAN
+             INTEGER                                        
+    }
+    
+swIPRoutesIndex OBJECT-TYPE
+   SYNTAX      INTEGER (1..32)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "The Route Table index no."
+   ::= { swIPRoutesConfiguredEntry 1 }   
+   
+swIPRoutesIpType OBJECT-TYPE
+   SYNTAX      INTEGER (0|1|2)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default:0
+       0: Invalid 
+       1: IPV4
+       2: IPV6" 
+   ::= { swIPRoutesConfiguredEntry 2 } 
+   
+ 
+
+swIPRoutesV4Network OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "The destination IP network or host address of this route
+       Valid format is dotted decimal notationor . A default route can use the value 0.0.0.0
+       "
+    ::= { swIPRoutesConfiguredEntry 3 } 
+
+swIPRoutesV4MaskLen OBJECT-TYPE
+   SYNTAX      INTEGER (0..32)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "The destination IP network or host mask
+        Valid values are between 0 and 32 bits"
+    ::= { swIPRoutesConfiguredEntry 4 } 
+        
+swIPRoutesV4Gateway  OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "The IP address of the IP gateway.
+        Valid format is dotted decimal notation.
+        Gateway and Network must be of the same type."
+    ::= { swIPRoutesConfiguredEntry 5 }     
+    
+  
+swIPRoutesV6Network OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE (0..30))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "The destination IP network or host address of this route
+        Valid format is a valid IPv6 notation. A default route can use the value 
+        IPv6 :: notation"
+     ::= { swIPRoutesConfiguredEntry 6 }    
+
+swIPRoutesV6MaskLen  OBJECT-TYPE
+   SYNTAX      INTEGER (1..128)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "The destination IP network or host mask
+        respectively 128 for IPv6 routes
+       "       
+   ::= { swIPRoutesConfiguredEntry 7 }    
+   
+swIPRoutesV6Gateway OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE (0..30))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "The IP address of the IP gateway.
+        Valid format is a valid IPv6 notation.
+        Gateway and Network must be of the same type.
+       "
+     ::= { swIPRoutesConfiguredEntry 8 }     
+
+swIPRoutesNextHopVLAN OBJECT-TYPE
+   SYNTAX      INTEGER (1..4094)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "The VLAN ID (VID) of the specific IPv6 interface associated with the gateway"
+   ::= { swIPRoutesConfiguredEntry 9 }        
+
+swSyslog                                                OBJECT IDENTIFIER ::= { swConfiguration 4 }
+
+swSyslogConf                                            OBJECT IDENTIFIER ::= { swSyslog 1 }
+
+swServerMode OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0: disable
+       1: enable "
+   ::= { swSyslogConf 1 }
+
+swServerAddress OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE (0..45))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swSyslogConf 2 }
+
+swSyslogLevel OBJECT-TYPE
+   SYNTAX      INTEGER(0..2)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0 (Info)       
+       2: Error
+       1: Warning   
+       0: Info"
+   ::= { swSyslogConf 3 }
+
+
+
+
+swSnmp                                                OBJECT IDENTIFIER ::= { swConfiguration 5}
+
+swSnmpConf                                            OBJECT IDENTIFIER ::= { swSnmp 1 }
+
+swGetCommunity OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "Get/Set the get-community of the SNMP."
+   ::= { swSnmpConf 1 }
+
+swSetCommunityMode OBJECT-TYPE
+   SYNTAX       INTEGER(0|1) 
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "Get/Set the set-community mode of the SNMP.
+        default : 1, 0: disable, 1: enable. "
+   ::= { swSnmpConf 2 }
+
+swSetCommunity OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "Get/Set the set-community of the SNMP."
+   ::= { swSnmpConf 3 }
+
+swTrapHostConfTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwTrapHostConfEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A list of trap host entry. The numbers of entries are given by the value of swTrapHostConfNumber."
+   ::= { swSnmpConf 4 }
+   
+swTrapHostConfEntry OBJECT-TYPE
+   SYNTAX      SwTrapHostConfEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "This is the entry information for trap host."
+   INDEX    { swTrapHostConfIndex  }
+   ::= { swTrapHostConfTable 1 }
+
+SwTrapHostConfEntry ::= SEQUENCE {
+    swTrapHostConfIndex             INTEGER,
+    swTrapHostMode                  INTEGER,
+    swTrapHostConfVersion           INTEGER,
+    swTrapHostConfIPv4              DisplayString,
+    swTrapHostConfIPv6              DisplayString, 
+    swTrapHostConfCommunity         DisplayString 
+    
+}
+   
+swTrapHostConfIndex OBJECT-TYPE
+   SYNTAX      INTEGER (1..6)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " The index of the trap host entry. "
+   ::= { swTrapHostConfEntry 1 }
+   
+swTrapHostMode OBJECT-TYPE
+   SYNTAX       INTEGER(0|1) 
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "Trap mode.
+        default : 1, 0: disable, 1: enable. "
+   ::= { swTrapHostConfEntry 2 }
+   
+swTrapHostConfVersion OBJECT-TYPE
+   SYNTAX       INTEGER(1..3)
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "The version of the Trap PDU. Version : 1 (SNMPv1), 2(SNMPv2c), 3(SNMPv3)"
+   ::= { swTrapHostConfEntry 3 }
+
+swTrapHostConfIPv4 OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "This is the IPv4 of the trap host."
+   ::= { swTrapHostConfEntry 4}
+
+swTrapHostConfIPv6 OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "This is the IPv6 of the trap host."
+   ::= { swTrapHostConfEntry 5}
+
+
+
+swTrapHostConfCommunity OBJECT-TYPE
+   SYNTAX       DisplayString (SIZE (1..32))
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "The community/security name for the trap PDU."
+   ::= { swTrapHostConfEntry 6 }
+
+
+
+
+swSnmpVersion OBJECT-TYPE
+   SYNTAX       INTEGER(1..3)
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "The version of the SNMP. Version : 1 (SNMPv1), 2(SNMPv2c), 3(SNMPv3)"
+   ::= { swSnmpConf 5 }
+
+
+
+-- --------------------------------------------------------------------------------------------------
+
+
+swPort                                                  OBJECT IDENTIFIER ::= { swConfiguration 6 }
+
+swPortConfigurationTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwPortConfigurationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " Show port configurations. "
+   ::= { swPort 1 }
+
+swPortConfigurationEntry OBJECT-TYPE
+   SYNTAX      SwPortConfigurationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swPortConfPort  }
+   ::= { swPortConfigurationTable 1 }
+
+SwPortConfigurationEntry ::= SEQUENCE {
+   swPortConfPort                     INTEGER,
+   swPortConfPortMedia                DisplayString,
+   swPortConfLink                     DisplayString,
+   swPortConfCurrentSpeed             DisplayString,
+   swPortConfSpeed                    INTEGER,
+   swPortConfCurrentFlowControlRx     INTEGER,
+   swPortConfCurrentFlowControlTx     INTEGER,
+   swPortConfFlowControl              INTEGER,
+   swPortConfMaxFrameSize             INTEGER,
+   swPortConfExcessiveCollisionMode   INTEGER,
+   swPortConfPowerControl             INTEGER 
+      
+}
+
+swPortConfPort OBJECT-TYPE
+   SYNTAX      INTEGER (1..4095)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " port, range : 1 - port number. "
+   ::= { swPortConfigurationEntry 1 }
+
+swPortConfPortMedia OBJECT-TYPE
+   SYNTAX      DisplayString(SIZE (1..4))
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       " Show port media. "
+   ::= { swPortConfigurationEntry 2 }
+
+swPortConfLink OBJECT-TYPE
+   SYNTAX      DisplayString(SIZE (2..4))
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       " The current link state. "
+   ::= { swPortConfigurationEntry 3 }
+
+swPortConfCurrentSpeed OBJECT-TYPE
+   SYNTAX      DisplayString(SIZE (6..12))
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       " The current link speed of the port. "
+   ::= { swPortConfigurationEntry 4 }
+
+swPortConfSpeed OBJECT-TYPE
+   SYNTAX      INTEGER (0..6)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 1,
+        0: disable state
+        1: auto
+        2: 10 Half
+        3: 10 Full
+        4: 100 Half
+        5: 100 Full
+        6: 1G full 
+        7: SFP_Auto_AMS
+        8: 100-FX
+        9: 100-FX_AMS
+        10:1000-X
+        11:1000-X_AMS
+       "
+   ::= { swPortConfigurationEntry 5 }
+
+swPortConfCurrentFlowControlRx OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "0: disable
+        1: enable "
+   ::= { swPortConfigurationEntry 6 }
+
+swPortConfCurrentFlowControlTx OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "0: disable
+        1: enable "
+   ::= { swPortConfigurationEntry 7 }
+
+swPortConfFlowControl OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0,
+        0: disable
+        1: enable "
+   ::= { swPortConfigurationEntry 8 }
+
+swPortConfMaxFrameSize OBJECT-TYPE
+   SYNTAX      INTEGER (1518..9600)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 9600 , range : 1518 - 9600 "
+   ::= { swPortConfigurationEntry 9 }
+
+swPortConfExcessiveCollisionMode OBJECT-TYPE
+   SYNTAX      INTEGER  (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "default: Discard,
+        0: Discard
+        1: Restart "     
+   ::= { swPortConfigurationEntry 10 }
+
+
+swPortConfPowerControl OBJECT-TYPE
+   SYNTAX      INTEGER  (0..3)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0,        
+        0: Disable,
+        1: Actiphy,
+        2: Dynamic (perfectReach),
+        3: Enable "
+   ::= { swPortConfigurationEntry 11 }
+
+
+
+
+
+
+
+swVoiceVLAN                                             OBJECT IDENTIFIER ::= { swConfiguration 7 }
+
+swVoiceVLANConf                                         OBJECT IDENTIFIER ::= { swVoiceVLAN 1 }
+
+swVoiceVLANMode OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " Voice VLAN mode operation.
+       default: 0,
+       0: disable
+       1: enable"
+   ::= { swVoiceVLANConf 1 }
+
+swVoiceVLANVLANId OBJECT-TYPE
+   SYNTAX      INTEGER (1..4094)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Voice VLAN ID.
+        default: 1000,
+        range : 1-4094. "
+   ::= { swVoiceVLANConf 2 }
+
+swVoiceVLANAgingTime OBJECT-TYPE
+   SYNTAX      INTEGER (10..1000000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " Voice VLAN secure learning aging time. 
+         default: 86400,
+         range : 10 - 10000000. "
+   ::= { swVoiceVLANConf 3 }
+
+swVoiceVLANTrafficClass OBJECT-TYPE
+   SYNTAX      INTEGER (0..7)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " Voice VLAN traffic class, all traffic on the Voice VLAN
+         will apply this class, available value is from 0(Low)
+         to 7(High).
+         default: 7. "
+   ::= { swVoiceVLANConf 4 }
+
+
+swVoiceVLANPortTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwVoiceVLANPortEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " Show Voice Vlan configuration. "
+   ::= { swVoiceVLANConf 5 }
+
+swVoiceVLANPortEntry OBJECT-TYPE
+   SYNTAX      SwVoiceVLANPortEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swVoiceVLANPort  }
+   ::= { swVoiceVLANPortTable 1 }
+
+SwVoiceVLANPortEntry ::= SEQUENCE {
+   swVoiceVLANPort                    INTEGER,
+   swVoiceVLANPortMode                INTEGER,
+   swVoiceVLANPortSecurity            INTEGER,
+   swVoiceVLANPortDiscoveryProtocol   INTEGER
+}
+
+swVoiceVLANPort OBJECT-TYPE
+   SYNTAX      INTEGER (0..30)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " port, range : 1 - port number. "
+   ::= { swVoiceVLANPortEntry 1 }
+
+swVoiceVLANPortMode OBJECT-TYPE
+   SYNTAX      INTEGER (0..2)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " Voice VLAN port mode.  
+         default: 0,
+         0: Disable (Disjoin from Voice VLAN.)
+         1: Auto (Enable auto detect mode. It detects whether there is VoIP phone attached to the specific port and configures the Voice VLAN members automatically.)
+         2: Forced (Force join to Voice VLAN.)"
+   ::= { swVoiceVLANPortEntry 2 }
+
+swVoiceVLANPortSecurity OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " Voice VLAN port security mode. 
+         default: 0,
+         0: Disable (Disjoin from Voice VLAN.)
+         1: enable ( Enable Voice VLAN security mode. When the function is
+                     enabled, all non-telephone MAC address in Voice VLAN
+                     will be blocked 10 seconds.)"
+   ::= { swVoiceVLANPortEntry 3 }
+
+swVoiceVLANPortDiscoveryProtocol OBJECT-TYPE
+   SYNTAX      INTEGER (0..2)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " Voice VLAN port discovery protocol.  
+         default: 0
+         0: OUI (Detect telephony device by OUI address.)
+         1: LLDP (Detect telephony device by LLDP.)
+         2: Both (Both OUI and LLDP.) "
+   ::= { swVoiceVLANPortEntry 4 }
+
+
+swVoiceVLANOUI                                          OBJECT IDENTIFIER ::= { swVoiceVLAN 2 }
+
+swVoiceVLANOUICreate OBJECT-TYPE
+   SYNTAX       DisplayString (SIZE (1..32))
+   MAX-ACCESS   read-write
+   STATUS       current
+     DESCRIPTION
+       "OUI address, format : 0a-1b-2c"
+   ::= { swVoiceVLANOUI 1 }
+   
+swVoiceVLANOUIDelete OBJECT-TYPE
+   SYNTAX       DisplayString (SIZE (1..32))
+   MAX-ACCESS   read-write
+   STATUS       current
+     DESCRIPTION
+       "OUI address, format : 0a-1b-2c"
+   ::= { swVoiceVLANOUI 2 }   
+
+swVoiceVLANOUITable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwVoiceVLANOUIEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " Create Voice VLAN OUI entry. Modify OUI table will
+         restart auto detect OUI process. "
+   ::= { swVoiceVLANOUI 3 }
+
+swVoiceVLANOUIEntry OBJECT-TYPE
+   SYNTAX      SwVoiceVLANOUIEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swVoiceVLANOUIIndex  }
+   ::= { swVoiceVLANOUITable 1 }
+
+SwVoiceVLANOUIEntry ::= SEQUENCE {
+   swVoiceVLANOUIIndex         INTEGER,
+   swVoiceVLANTelephonyOUI     DisplayString,
+   swVoiceVLANDescription      DisplayString,
+   swVoiceVLANOUIRowStatus     INTEGER
+}
+
+swVoiceVLANOUIIndex OBJECT-TYPE
+   SYNTAX      INTEGER (1..16)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swVoiceVLANOUIEntry 1 }
+
+swVoiceVLANTelephonyOUI OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE (1..32))
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "OUI address, format : 0a-1b-2c "
+   ::= { swVoiceVLANOUIEntry 2 }
+
+swVoiceVLANDescription OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE (1..32))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " Up to 32 characters describing OUI address. "
+   ::= { swVoiceVLANOUIEntry 3 }
+
+swVoiceVLANOUIRowStatus OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       " 1: active
+         0: noactive"
+   ::= { swVoiceVLANOUIEntry 4 }
+
+
+swMirroring                                             OBJECT IDENTIFIER ::= { swConfiguration 8 }
+
+swPortToMirrorOn OBJECT-TYPE
+   SYNTAX      INTEGER 
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0 
+        0: disable,
+        range : 1 - port number. "
+   ::= { swMirroring 1 }
+
+swMirrorTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwMirrorEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swMirroring 2 }
+
+swMirrorEntry OBJECT-TYPE
+   SYNTAX      SwMirrorEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swMirrorPort  }
+   ::= { swMirrorTable 1 }
+
+SwMirrorEntry ::= SEQUENCE {
+   swMirrorPort		INTEGER,
+   swMirrorMode		INTEGER
+}
+
+swMirrorPort OBJECT-TYPE
+   SYNTAX      INTEGER (1..4095)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swMirrorEntry 1 }
+
+swMirrorMode OBJECT-TYPE
+   SYNTAX      INTEGER(0..3)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0: disable
+       1: enable
+       2: rx only
+       3: tx only
+       Setting Tx mirroring for analyzer port has no effect. Tx mirroring ignored"
+   ::= { swMirrorEntry 2 }
+
+
+swMirrorCpuMode OBJECT-TYPE
+   SYNTAX      INTEGER(0..3)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0: disable
+       1: enable
+       2: rx only
+       3: tx only
+       cpu mode"
+   ::= { swMirroring 3 }
+
+
+transceiverMgt                                             OBJECT IDENTIFIER ::= { swConfiguration 9 }
+
+-- transceiverInfoTable
+		transceiverInfo OBJECT IDENTIFIER ::= { transceiverMgt 1 }
+
+-- transceiverSerialInfoTable
+	
+        transceiverSerialInfoTable	OBJECT-TYPE
+        SYNTAX	SEQUENCE OF TransceiverSerialInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                 	""
+        ::= { transceiverInfo 1 }
+        
+	transceiverSerialInfoEntry OBJECT-TYPE
+        SYNTAX	TransceiverSerialInfoEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION    	"An entry in transceiverSerialInfoTable."
+        INDEX          	{ transceiverSerialInfoEntryPort }
+        ::= { transceiverSerialInfoTable 1 }
+
+        TransceiverSerialInfoEntry ::=
+           SEQUENCE {
+        	transceiverSerialInfoEntryPort			INTEGER,        	
+        	transceiverSerialInfoEntryStatus		INTEGER,
+        	transceiverSerialInfoEntryVendor		DisplayString,
+        	transceiverSerialInfoEntryPartNo		DisplayString,
+        	transceiverSerialInfoEntrySerialNo		DisplayString,
+        	transceiverSerialInfoEntryRevision		DisplayString,
+        	transceiverSerialInfoEntryDateCode		DisplayString,
+        	transceiverSerialInfoEntryTransceiver	DisplayString
+           }
+
+        transceiverSerialInfoEntryPort OBJECT-TYPE
+        SYNTAX  INTEGER (0..30)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Index of transceiverSerialInfo. It is referred to dot1dBasePort"
+        ::= { transceiverSerialInfoEntry 1 }
+        
+        transceiverSerialInfoEntryStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+        		okWithDDM(1),
+        		okWithoutDDM(2),
+        		txPort(3),
+        		na(4)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver module status."
+        ::= { transceiverSerialInfoEntry 2 }
+
+
+        transceiverSerialInfoEntryVendor OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver module vendor name."
+        ::= { transceiverSerialInfoEntry 3 }
+
+        transceiverSerialInfoEntryPartNo OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Part number provided by transceiver module vendor."
+        ::= { transceiverSerialInfoEntry 4 }
+        
+        transceiverSerialInfoEntrySerialNo OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Serial number provided by transceiver module vendor."
+        ::= { transceiverSerialInfoEntry 5 }
+
+        transceiverSerialInfoEntryRevision OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Revision level for part number provided by transceiver module vendor."
+        ::= { transceiverSerialInfoEntry 6 }
+
+        transceiverSerialInfoEntryDateCode OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver module vendor's manufacturing date code"
+        ::= { transceiverSerialInfoEntry 7 }
+        
+        transceiverSerialInfoEntryTransceiver OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver module type names"
+        ::= { transceiverSerialInfoEntry 8 }
+
+-- transceiverDdmInfoTable
+	
+        transceiverDdmInfoTable	OBJECT-TYPE
+        SYNTAX	SEQUENCE OF TransceiverDdmInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                 	""
+        ::= { transceiverInfo 2 }
+        
+	transceiverDdmInfoEntry OBJECT-TYPE
+        SYNTAX	TransceiverDdmInfoEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION    	"An entry in transceiverDdmInfoTable."
+        INDEX          	{ transceiverDdmInfoEntryPort, transceiverDdmInfoEntryType }
+        ::= { transceiverDdmInfoTable 1 }
+
+        TransceiverDdmInfoEntry ::=
+           SEQUENCE {
+        	transceiverDdmInfoEntryPort		INTEGER,    
+        	transceiverDdmInfoEntryType		INTEGER,    	
+        	transceiverDdmInfoEntryAlarmMax		INTEGER,
+        	transceiverDdmInfoEntryAlarmMin		INTEGER,
+        	transceiverDdmInfoEntryWarnMax		INTEGER,
+        	transceiverDdmInfoEntryWarnMin		INTEGER,
+        	transceiverDdmInfoEntryCurrent		INTEGER,
+        	transceiverDdmInfoEntryDescription	DisplayString
+           }
+
+        transceiverDdmInfoEntryPort OBJECT-TYPE
+        SYNTAX  INTEGER (0..30)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Index of transceiverDdmInfo. This will be referred to dot1dBasePort"
+        ::= { transceiverDdmInfoEntry 1 }
+        
+        transceiverDdmInfoEntryType OBJECT-TYPE
+        SYNTAX  INTEGER (0..10)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver module status."
+        ::= { transceiverDdmInfoEntry 2 }
+
+        transceiverDdmInfoEntryAlarmMax OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver module vendor name."
+        ::= { transceiverDdmInfoEntry 3 }
+
+        transceiverDdmInfoEntryAlarmMin OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Part number provided by transceiver module vendor."
+        ::= { transceiverDdmInfoEntry 4 }
+        
+        transceiverDdmInfoEntryWarnMax OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Serial number provided by transceiver module vendor."
+        ::= { transceiverDdmInfoEntry 5 }
+
+        transceiverDdmInfoEntryWarnMin OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Revision level for part number provided by transceiver module vendor."
+        ::= { transceiverDdmInfoEntry 6 }
+
+        transceiverDdmInfoEntryCurrent OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Transceiver module vendor's manufacturing date code.
+		true value: number divided by 100.
+
+		unit: 
+		  Temperature is celsius,
+		  Voltage is V,
+		  TxBiasCurrent is mA,
+		  TxPower is mW,
+		  RxPower is mW.
+        "
+        ::= { transceiverDdmInfoEntry 7 }
+
+        transceiverDdmInfoEntryDescription OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver module type names"
+        ::= { transceiverDdmInfoEntry 8 }           
+        
+             
+
+--------------------------------
+
+swLoopProtection                                                  OBJECT IDENTIFIER ::= { swConfiguration 10 }
+
+
+
+
+swLoopProtectionMode OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0: disable
+       1: enable"
+   ::= { swLoopProtection 1 }
+
+
+
+swLoopProtectionTransmissionTime OBJECT-TYPE
+   SYNTAX      INTEGER (1..10)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 5 , range : 1 - 10  "
+   ::= { swLoopProtection 2 }
+   
+swLoopProtectionShutdownTime OBJECT-TYPE
+   SYNTAX      INTEGER (0..604800)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 180 , range : 0 - 604800 "
+   ::= { swLoopProtection 3 }
+
+
+swLoopProtectionPortConfigurationTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwLoopProtectionPortConfigurationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " Show loop protection port configurations. "
+   ::= { swLoopProtection 6 }
+
+swLoopProtectionPortConfigurationEntry OBJECT-TYPE
+   SYNTAX      SwLoopProtectionPortConfigurationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swLoopProtectionPortConfPort  }
+   ::= { swLoopProtectionPortConfigurationTable 1 }
+
+SwLoopProtectionPortConfigurationEntry ::= SEQUENCE {
+   swLoopProtectionPortConfPort                     INTEGER,
+
+   swLoopProtectionPortConfEnable              INTEGER,
+   swLoopProtectionPortConfAction             INTEGER,
+   swLoopProtectionPortConfTxMode            INTEGER,
+   swLoopProtectionPortConfLoops	DisplayString,
+   swLoopProtectionPortConfStatus	DisplayString,
+   swLoopProtectionPortConfLoop		DisplayString,
+   swLoopProtectionPortConfTimeOfLastLoop	DisplayString
+  
+}
+
+swLoopProtectionPortConfPort OBJECT-TYPE
+   SYNTAX      INTEGER (1..4095)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " port, range : 1 - port number. "
+   ::= { swLoopProtectionPortConfigurationEntry 1 }
+
+swLoopProtectionPortConfEnable OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 1,
+        0: disable
+        1: enable "
+   ::= { swLoopProtectionPortConfigurationEntry 2 }
+
+swLoopProtectionPortConfAction OBJECT-TYPE
+   SYNTAX      INTEGER (0..2)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0,
+        0: Shutdown Port
+        1: Shutdown Port and Log
+        2: Log Only
+       "
+   ::= { swLoopProtectionPortConfigurationEntry 3 }
+
+swLoopProtectionPortConfTxMode OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 1,
+        0: disable
+        1: enable "
+   ::= { swLoopProtectionPortConfigurationEntry 4 }
+
+
+	
+swLoopProtectionPortConfLoops  OBJECT-TYPE
+	SYNTAX	DisplayString( SIZE(0..20))
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		" The number of loops detected on this port."
+	::= { swLoopProtectionPortConfigurationEntry 5 }
+
+swLoopProtectionPortConfStatus  OBJECT-TYPE
+	SYNTAX	DisplayString( SIZE(0..20))
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		" The current loop protection status of the port."
+	::= { swLoopProtectionPortConfigurationEntry 6 }
+
+swLoopProtectionPortConfLoop  OBJECT-TYPE
+	SYNTAX	DisplayString( SIZE(0..20))
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		" Whether a loop is currently detected on the port."
+	::= { swLoopProtectionPortConfigurationEntry 7 }
+
+swLoopProtectionPortConfTimeOfLastLoop  OBJECT-TYPE
+	SYNTAX	DisplayString( SIZE(0..60))
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		" The time of the last loop event detected."
+	::= { swLoopProtectionPortConfigurationEntry 8 }
+
+
+-- --------------------------------------------------------------------------------------------------------------------------
+
+swQoS                                                  OBJECT IDENTIFIER ::= { swConfiguration 11 }
+
+swPortPolicerConfigurationTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwPortPolicerConfigurationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " Show port configurations. "
+   ::= { swQoS 1 }
+
+swPortPolicerConfigurationEntry OBJECT-TYPE
+   SYNTAX      SwPortPolicerConfigurationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swPortPolicerPort  }
+   ::= { swPortPolicerConfigurationTable 1 }
+
+SwPortPolicerConfigurationEntry ::= SEQUENCE {
+   swPortPolicerPort              INTEGER,
+   swPortPolicerEnable            INTEGER,
+   swPortPolicerUnit              INTEGER,
+   swPortPolicerRate              INTEGER,
+   swPortPolicerFlowControl       INTEGER      
+}
+
+swPortPolicerPort OBJECT-TYPE
+   SYNTAX      INTEGER (1..4095)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " port, range : 1 - port number. "
+   ::= { swPortPolicerConfigurationEntry 1 }
+
+ 
+swPortPolicerEnable OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0,
+        0: disable
+        1: enable 
+       "
+   ::= { swPortPolicerConfigurationEntry 2 }
+
+swPortPolicerUnit OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls the unit of measure for the policer rate as bps, fps
+        0: bps 
+        1: fps"
+   ::= { swPortPolicerConfigurationEntry 3 }
+   
+swPortPolicerRate OBJECT-TYPE
+   SYNTAX      INTEGER (100..3300000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls the rate for the policer.
+        his value is restricted to 100-3300000 (k)"
+   ::= { swPortPolicerConfigurationEntry 4 }   
+   
+swPortPolicerFlowControl OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "If flow control is enabled and the port is in flow control mode,
+        then pause frames are sent instead of discarding frames.
+        0: disable
+        1: enable "
+   ::= { swPortPolicerConfigurationEntry 5 }   
+
+  
+
+
+swPortSchedulerConfigurationTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwPortSchedulerConfigurationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " Show port configurations. "
+   ::= { swQoS 2 }
+
+swPortSchedulerConfigurationEntry OBJECT-TYPE
+   SYNTAX      SwPortSchedulerConfigurationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swPortSchedulerPort  }
+   ::= { swPortSchedulerConfigurationTable 1 }
+
+SwPortSchedulerConfigurationEntry ::= SEQUENCE {
+   swPortSchedulerPort                       INTEGER,
+   swPortSchedulerMode                       INTEGER,
+   swPortQueueSchedulerWeightQ0              INTEGER,
+   swPortQueueSchedulerWeightQ1              INTEGER,
+   swPortQueueSchedulerWeightQ2              INTEGER,
+   swPortQueueSchedulerWeightQ3              INTEGER,      
+   swPortQueueSchedulerWeightQ4              INTEGER,   
+   swPortQueueSchedulerWeightQ5              INTEGER      
+}
+
+swPortSchedulerPort OBJECT-TYPE
+   SYNTAX      INTEGER (1..4095)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " port, range : 1 - port number. "
+   ::= { swPortSchedulerConfigurationEntry 1 }
+
+ 
+swPortSchedulerMode OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the scheduler mode is
+        default: 0,
+        0: Strict Priority
+        1: Weighted 
+       "
+   ::= { swPortSchedulerConfigurationEntry 2 }
+   
+swPortQueueSchedulerWeightQ0 OBJECT-TYPE
+   SYNTAX      INTEGER (1..100)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls the weight for this queue 0. 
+       The default value is 17. This value is restricted 
+       to 1-100. This parameter is only shown if Scheduler Mode 
+       is set to Weighted."
+   ::= { swPortSchedulerConfigurationEntry 3 }    
+
+swPortQueueSchedulerWeightQ1 OBJECT-TYPE
+   SYNTAX      INTEGER (1..100)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls the weight for this queue 1. 
+       The default value is 17. This value is restricted 
+       to 1-100. This parameter is only shown if Scheduler Mode 
+       is set to Weighted."
+   ::= { swPortSchedulerConfigurationEntry 4 } 
+   
+swPortQueueSchedulerWeightQ2 OBJECT-TYPE
+   SYNTAX      INTEGER (1..100)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls the weight for this queue 2. 
+       The default value is 17. This value is restricted 
+       to 1-100. This parameter is only shown if Scheduler Mode 
+       is set to Weighted."
+   ::= { swPortSchedulerConfigurationEntry 5 } 
+   
+swPortQueueSchedulerWeightQ3 OBJECT-TYPE
+   SYNTAX      INTEGER (1..100)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls the weight for this queue 3. 
+       The default value is 17. This value is restricted 
+       to 1-100. This parameter is only shown if Scheduler Mode 
+       is set to Weighted."
+   ::= { swPortSchedulerConfigurationEntry 6 } 
+   
+swPortQueueSchedulerWeightQ4 OBJECT-TYPE
+   SYNTAX      INTEGER (1..100)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls the weight for this queue 4. 
+       The default value is 17. This value is restricted 
+       to 1-100. This parameter is only shown if Scheduler Mode 
+       is set to Weighted."
+   ::= { swPortSchedulerConfigurationEntry 7 } 
+   
+swPortQueueSchedulerWeightQ5 OBJECT-TYPE
+   SYNTAX      INTEGER (1..100)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls the weight for this queue 5. 
+       The default value is 17. This value is restricted 
+       to 1-100. This parameter is only shown if Scheduler Mode 
+       is set to Weighted."
+   ::= { swPortSchedulerConfigurationEntry  8} 
+                
+
+swPortShaperConfigurationTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwPortShaperConfigurationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " Show port configurations. "
+   ::= { swQoS 3 }
+
+swPortShaperConfigurationEntry OBJECT-TYPE
+   SYNTAX      SwPortShaperConfigurationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swPortShaperPort  }
+   ::= { swPortShaperConfigurationTable 1 }
+
+SwPortShaperConfigurationEntry ::= SEQUENCE {
+   swPortShaperPort                     INTEGER,
+   swPortQueueShaperQ0Enable            INTEGER,
+   swPortQueueShaperQ0Rate              INTEGER,
+   swPortQueueShaperQ0Excess            INTEGER,
+   swPortQueueShaperQ1Enable            INTEGER,
+   swPortQueueShaperQ1Rate              INTEGER,
+   swPortQueueShaperQ1Excess            INTEGER,
+   swPortQueueShaperQ2Enable            INTEGER,
+   swPortQueueShaperQ2Rate              INTEGER,
+   swPortQueueShaperQ2Excess            INTEGER,
+   swPortQueueShaperQ3Enable            INTEGER,
+   swPortQueueShaperQ3Rate              INTEGER,
+   swPortQueueShaperQ3Excess            INTEGER,
+   swPortQueueShaperQ4Enable            INTEGER,
+   swPortQueueShaperQ4Rate              INTEGER,
+   swPortQueueShaperQ4Excess            INTEGER,
+   swPortQueueShaperQ5Enable            INTEGER,
+   swPortQueueShaperQ5Rate              INTEGER,
+   swPortQueueShaperQ5Excess            INTEGER,
+   swPortQueueShaperQ6Enable            INTEGER,
+   swPortQueueShaperQ6Rate              INTEGER,
+   swPortQueueShaperQ6Excess            INTEGER,
+   swPortQueueShaperQ7Enable            INTEGER,
+   swPortQueueShaperQ7Rate              INTEGER,
+   swPortQueueShaperQ7Excess            INTEGER,    
+   swPortPortShaperEnable               INTEGER,
+   swPortPortShaperRate                 INTEGER                        
+      
+}
+
+swPortShaperPort OBJECT-TYPE
+   SYNTAX      INTEGER (1..4095)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " port, range : 1 - port number. "
+   ::= { swPortShaperConfigurationEntry 1 }
+
+ 
+swPortQueueShaperQ0Enable OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the queue 0 shaper is enabled for 
+        this queue on this switch port
+        0: Disable
+        1: Enable 
+       "
+   ::= { swPortShaperConfigurationEntry 2 }
+   
+swPortQueueShaperQ0Rate OBJECT-TYPE
+   SYNTAX      INTEGER (100..3300000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "Controls the rate for the queue 0 shaper. 
+         and it is restricted to 100-3300000 (k) "
+   ::= { swPortShaperConfigurationEntry 3 }    
+
+swPortQueueShaperQ0Excess OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the queue 0 is allowed to use excess bandwidth.
+        default: 0,
+        0: Disable
+        1: Enable 
+       "
+   ::= { swPortShaperConfigurationEntry 4 } 
+   
+swPortQueueShaperQ1Enable OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the queue 1 shaper is enabled for 
+        this queue on this switch port
+        0: Disable
+        1: Enable 
+       "
+   ::= { swPortShaperConfigurationEntry 5 }
+   
+swPortQueueShaperQ1Rate OBJECT-TYPE
+   SYNTAX      INTEGER (100..3300000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "Controls the rate for the queue 2 shaper. 
+         and it is restricted to 100-3300000 (k) "
+   ::= { swPortShaperConfigurationEntry 6 }    
+
+swPortQueueShaperQ1Excess OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the queue 1 is allowed to use excess bandwidth.
+        default: 0,
+        0: Disable
+        1: Enable 
+       "
+   ::= { swPortShaperConfigurationEntry 7 } 
+   
+swPortQueueShaperQ2Enable OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the queue 2 shaper is enabled for 
+        this queue on this switch port
+        0: Disable
+        1: Enable 
+       "
+   ::= { swPortShaperConfigurationEntry 8 }
+   
+swPortQueueShaperQ2Rate OBJECT-TYPE
+   SYNTAX      INTEGER (100..3300000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "Controls the rate for the queue 2 shaper. 
+         and it is restricted to 100-3300000 (k) "
+   ::= { swPortShaperConfigurationEntry 9 }    
+
+swPortQueueShaperQ2Excess OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the queue 2 is allowed to use excess bandwidth.
+        default: 0,
+        0: Disable
+        1: Enable 
+       "
+   ::= { swPortShaperConfigurationEntry 10 } 
+   
+   swPortQueueShaperQ3Enable OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the queue 3 shaper is enabled for 
+        this queue on this switch port
+        0: Disable
+        1: Enable 
+       "
+   ::= { swPortShaperConfigurationEntry 11 }
+   
+swPortQueueShaperQ3Rate OBJECT-TYPE
+   SYNTAX      INTEGER (100..3300000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "Controls the rate for the queue 3 shaper. 
+         and it is restricted to 100-3300000 (k) "
+   ::= { swPortShaperConfigurationEntry 12 }    
+
+swPortQueueShaperQ3Excess OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the queue 3 is allowed to use excess bandwidth.
+        default: 0,
+        0: Disable
+        1: Enable 
+       "
+   ::= { swPortShaperConfigurationEntry 13 }
+    
+swPortQueueShaperQ4Enable OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the queue 4 shaper is enabled for 
+        this queue on this switch port
+        0: Disable
+        1: Enable 
+       "
+   ::= { swPortShaperConfigurationEntry 14 }
+   
+swPortQueueShaperQ4Rate OBJECT-TYPE
+   SYNTAX      INTEGER (100..3300000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "Controls the rate for the queue 4 shaper. 
+         and it is restricted to 100-3300000 (k) "
+   ::= { swPortShaperConfigurationEntry 15 }    
+
+swPortQueueShaperQ4Excess OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the queue 4 is allowed to use excess bandwidth.
+        default: 0,
+        0: Disable
+        1: Enable 
+       "
+   ::= { swPortShaperConfigurationEntry 16 }
+    
+swPortQueueShaperQ5Enable OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the queue 5 shaper is enabled for 
+        this queue on this switch port
+        0: Disable
+        1: Enable 
+       "
+   ::= { swPortShaperConfigurationEntry 17 }
+   
+swPortQueueShaperQ5Rate OBJECT-TYPE
+   SYNTAX      INTEGER (100..3300000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "Controls the rate for the queue 5 shaper. 
+         and it is restricted to 100-3300000 (k) "
+   ::= { swPortShaperConfigurationEntry 18 }    
+
+swPortQueueShaperQ5Excess OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the queue 5 is allowed to use excess bandwidth.
+        default: 0,
+        0: Disable
+        1: Enable 
+       "
+   ::= { swPortShaperConfigurationEntry 19 } 
+   
+swPortQueueShaperQ6Enable OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the queue 6 shaper is enabled for 
+        this queue on this switch port
+        0: Disable
+        1: Enable 
+       "
+   ::= { swPortShaperConfigurationEntry 20 }
+   
+swPortQueueShaperQ6Rate OBJECT-TYPE
+   SYNTAX      INTEGER (100..3300000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls the rate for the queue 6 shaper. 
+       and it is restricted to 100-3300000 (k) "
+   ::= { swPortShaperConfigurationEntry 21 }    
+
+swPortQueueShaperQ6Excess OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the queue 6 is allowed to use excess bandwidth.
+        default: 0,
+        0: Disable
+        1: Enable 
+       "
+   ::= { swPortShaperConfigurationEntry 22 } 
+   
+swPortQueueShaperQ7Enable OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the queue 7 shaper is enabled for 
+        this queue on this switch port
+        0: Disable
+        1: Enable 
+       "
+   ::= { swPortShaperConfigurationEntry 23 }
+   
+swPortQueueShaperQ7Rate OBJECT-TYPE
+   SYNTAX      INTEGER (100..3300000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "Controls the rate for the queue 7 shaper. 
+         and it is restricted to 100-3300000 (k) "
+   ::= { swPortShaperConfigurationEntry 24 }    
+
+swPortQueueShaperQ7Excess OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the queue 7 is allowed to use excess bandwidth.
+        default: 0,
+        0: Disable
+        1: Enable 
+       "
+   ::= { swPortShaperConfigurationEntry 25 }                   
+   
+swPortPortShaperEnable OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls whether the port shaper is enabled for this switch port.
+        0: Disable
+        1: Enable 
+       "
+   ::= { swPortShaperConfigurationEntry 26 }
+   
+swPortPortShaperRate OBJECT-TYPE
+   SYNTAX      INTEGER (100..3300000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls the rate for the port shaper 
+       Tand it is restricted to 100-3300000 (k)"
+   ::= { swPortShaperConfigurationEntry 27 }   
+   
+   
+swPortStormControlConfigurationTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwPortStormControlConfigurationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " Show port configurations. "
+   ::= { swQoS 4 }
+
+swPortStormControlConfigurationEntry OBJECT-TYPE
+   SYNTAX      SwPortStormControlConfigurationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swPortStormControlPort  }
+   ::= { swPortStormControlConfigurationTable 1 }
+
+SwPortStormControlConfigurationEntry ::= SEQUENCE {
+   swPortStormControlPort                 INTEGER,
+   swPortStormControlUnicastEnable        INTEGER,
+   swPortStormControlUnicastRate          INTEGER,
+   swPortStormControlUnicastUnit          INTEGER,
+   swPortStormControlUnknownEnable        INTEGER,
+   swPortStormControlUnknownRate          INTEGER,
+   swPortStormControlUnknownUnit          INTEGER,
+   swPortStormControlBroadcastEnable      INTEGER,
+   swPortStormControlBroadcastRate        INTEGER,
+   swPortStormControlBroadcastUnit        INTEGER      
+
+       
+}
+
+swPortStormControlPort OBJECT-TYPE
+   SYNTAX      INTEGER (1..4095)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " port, range : 1 - port number. "
+   ::= { swPortStormControlConfigurationEntry 1 }
+
+
+    
+swPortStormControlUnicastEnable OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "storm control status of the port for the Unicast frame type
+        0: disable
+        1: enable 
+       "
+   ::= { swPortStormControlConfigurationEntry 2 }
+
+swPortStormControlUnicastRate OBJECT-TYPE
+   SYNTAX      INTEGER (100..3300000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls thhe rate if Unicast packets. 
+        his value is restricted to 100-3300000 (k)"
+   ::= { swPortStormControlConfigurationEntry 3 }   
+   
+swPortStormControlUnicastUnit OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls the unit of Unicast packets rate as bps, fps
+        0: bps 
+        1: fps"
+   ::= { swPortStormControlConfigurationEntry 4 }  
+
+swPortStormControlUnknownEnable OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "storm control status of the port for the Unknown frame type
+        0: disable
+        1: enable 
+       "
+   ::= { swPortStormControlConfigurationEntry 5 }   
+   
+swPortStormControlUnknownRate OBJECT-TYPE
+   SYNTAX      INTEGER (100..3300000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls thhe rate if Unknown packets. 
+        his value is restricted to 100-3300000 (k)"
+   ::= { swPortStormControlConfigurationEntry 6 }   
+   
+swPortStormControlUnknownUnit OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls the unit of Unknown packets rate as bps, fps
+        0: bps 
+        1: fps"
+   ::= { swPortStormControlConfigurationEntry 7 }  
+   
+swPortStormControlBroadcastEnable OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "storm control status of the port for the Broadcast frame type
+        0: disable
+        1: enable 
+       "
+   ::= { swPortStormControlConfigurationEntry 8 }
+
+swPortStormControlBroadcastRate OBJECT-TYPE
+   SYNTAX      INTEGER (100..3300000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls thhe rate if Broadcast packets. 
+        his value is restricted to 100-3300000 (k)"
+   ::= { swPortStormControlConfigurationEntry 9 }   
+   
+swPortStormControlBroadcastUnit OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Controls the unit of Broadcast packets rate as bps, fps
+        0: bps 
+        1: fps"
+   ::= { swPortStormControlConfigurationEntry 10 }  
+   
+   
+
+-- --------------------------------------------------------------------------------------------------------------------------
+
+swIPSourceGuard                                         OBJECT IDENTIFIER ::= { swSecurity 1 }
+
+swIPSourceGuardConf                                     OBJECT IDENTIFIER ::= { swIPSourceGuard 1 }
+
+swIPSourceGuardMode OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " default:  0
+        0: disable
+        1: enable"
+   ::= { swIPSourceGuardConf 1 }
+
+swIPSourceGuardPortConfigTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwIPSourceGuardPortConfigEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swIPSourceGuardConf 2 }
+
+swIPSourceGuardPortConfigEntry OBJECT-TYPE
+   SYNTAX      SwIPSourceGuardPortConfigEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swIPSourceGuardPortConfigPort  }
+   ::= { swIPSourceGuardPortConfigTable 1 }
+
+SwIPSourceGuardPortConfigEntry ::= SEQUENCE {
+   swIPSourceGuardPortConfigPort               INTEGER,
+   swIPSourceGuardPortConfigMode               INTEGER,
+   swIPSourceGuardPortMaxDynamicClients        INTEGER
+}
+
+swIPSourceGuardPortConfigPort OBJECT-TYPE
+   SYNTAX      INTEGER (1..4095)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swIPSourceGuardPortConfigEntry 1 }
+
+swIPSourceGuardPortConfigMode OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0:disable
+       1:enable "
+   ::= { swIPSourceGuardPortConfigEntry 2 }
+
+swIPSourceGuardPortMaxDynamicClients OBJECT-TYPE
+   SYNTAX      INTEGER (0..2|99)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 99
+       0~2: Max Dynamic clients
+       99:Unlimited "
+   ::= { swIPSourceGuardPortConfigEntry 3 }
+
+
+swIPSourceGuardStatic                                OBJECT IDENTIFIER ::= { swIPSourceGuard 2 }
+
+
+
+swIPSourceGuardStaticTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwIPSourceGuardStaticEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swIPSourceGuardStatic 1 }
+
+swIPSourceGuardStaticEntry OBJECT-TYPE
+   SYNTAX      SwIPSourceGuardStaticEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swIPSourceGuardStaticIndex  }
+   ::= { swIPSourceGuardStaticTable 1 }
+
+SwIPSourceGuardStaticEntry ::= SEQUENCE {
+   swIPSourceGuardStaticIndex         INTEGER,
+   swIPSourceGuardStaticPort          INTEGER,
+   swIPSourceGuardStaticVLANId        INTEGER,
+   swIPSourceGuardStaticIPAddress     IpAddress,
+   swIPSourceGuardStaticMACAddress    MacAddress 
+     
+}
+
+swIPSourceGuardStaticIndex OBJECT-TYPE
+   SYNTAX      INTEGER (1..112)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swIPSourceGuardStaticEntry 1 }
+
+swIPSourceGuardStaticPort OBJECT-TYPE
+   SYNTAX      INTEGER (1..4095)
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       " Port, range: 1 - port number. "
+   ::= { swIPSourceGuardStaticEntry 2 }
+
+swIPSourceGuardStaticVLANId OBJECT-TYPE
+   SYNTAX      INTEGER (1..4094)
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       " VLAN ID, range: 1 - 4094. "
+   ::= { swIPSourceGuardStaticEntry 3 }
+
+swIPSourceGuardStaticIPAddress OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       " IP address allowed for doing IP source guard. "
+   ::= { swIPSourceGuardStaticEntry 4 }
+
+swIPSourceGuardStaticMACAddress OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       " Allowed Source MAC address, format 0a 1b 2c 3d 4e 5f "
+   ::= { swIPSourceGuardStaticEntry 5 }
+
+ 
+
+swIPSourceGuardDynamicTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwIPSourceGuardDynamicEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swIPSourceGuard 3 }
+
+swIPSourceGuardDynamicEntry OBJECT-TYPE
+   SYNTAX      SwIPSourceGuardDynamicEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swIPSourceGuardDynamicIndex  }
+   ::= { swIPSourceGuardDynamicTable 1 }
+
+SwIPSourceGuardDynamicEntry ::= SEQUENCE {
+   swIPSourceGuardDynamicIndex		    INTEGER,
+   swIPSourceGuardDynamicPort		    INTEGER,
+   swIPSourceGuardDynamicVLANId		    INTEGER,
+   swIPSourceGuardDynamicIPAddress		IpAddress,
+   swIPSourceGuardDynamicMACAddress		MacAddress
+}
+
+swIPSourceGuardDynamicIndex OBJECT-TYPE
+   SYNTAX      INTEGER(1..4095)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swIPSourceGuardDynamicEntry 1 }
+
+swIPSourceGuardDynamicPort OBJECT-TYPE
+   SYNTAX      INTEGER  
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swIPSourceGuardDynamicEntry 2 }
+
+swIPSourceGuardDynamicVLANId OBJECT-TYPE
+   SYNTAX      INTEGER (1..4094)
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swIPSourceGuardDynamicEntry 3 }
+
+swIPSourceGuardDynamicIPAddress OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swIPSourceGuardDynamicEntry 4 }
+
+swIPSourceGuardDynamicMACAddress OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swIPSourceGuardDynamicEntry 5 }
+   
+swIPSourceGuardAddDelStatic                                OBJECT IDENTIFIER ::= { swIPSourceGuard 4 }
+
+swIPSourceGuardAddStatic OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION 
+       " format: <portno>_<vid>_<ipaddress>_<macaddress> 
+         ipaddress format: xxx.xxx.xxx.xxx
+         macaddress format: 0a-1b-2c-3d-4e-5f
+         ex: 1_2_192.168.1.1_0a-1b-2c-3d-4e-5f"
+   ::= { swIPSourceGuardAddDelStatic 1 }   
+   
+swIPSourceGuardDelStatic OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION 
+       " format: <portno>_<vid>_<ipaddress>_<macaddress> 
+         ipaddress format: xxx.xxx.xxx.xxx
+         macaddress format: 0a-1b-2c-3d-4e-5f
+         ex: 1_2_192.168.1.1_0a-1b-2c-3d-4e-5f"
+   ::= { swIPSourceGuardAddDelStatic 2 }      
+
+swARPInspection                                         OBJECT IDENTIFIER ::= { swSecurity 2 }
+
+swARPInspectionConf                                     OBJECT IDENTIFIER ::= { swARPInspection 1 }
+
+swARPInspectionConfMode OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+        0: disable
+        1: enable"
+   ::= { swARPInspectionConf 1 }
+
+swARPInspectionConfTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwARPInspectionConfEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swARPInspectionConf 2 }
+
+swARPInspectionConfEntry OBJECT-TYPE
+   SYNTAX      SwARPInspectionConfEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swARPInspectionConfPortIndex  }
+   ::= { swARPInspectionConfTable 1 }
+
+SwARPInspectionConfEntry ::= SEQUENCE {
+   swARPInspectionConfPortIndex	INTEGER,
+   swARPInspectionConfPortMode	INTEGER
+}
+
+swARPInspectionConfPortIndex OBJECT-TYPE
+   SYNTAX      INTEGER(1..4095)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swARPInspectionConfEntry 1 }
+
+swARPInspectionConfPortMode OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+        0: disable
+        1: enable"
+   ::= { swARPInspectionConfEntry 2 }
+
+
+swARPInspectionStatic                                OBJECT IDENTIFIER ::= { swARPInspection 2 }
+
+swARPInspectionStaticTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwARPInspectionStaticEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swARPInspectionStatic 1 }
+
+swARPInspectionStaticEntry OBJECT-TYPE
+   SYNTAX      SwARPInspectionStaticEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swARPInspectionStaticIndex  }
+   ::= { swARPInspectionStaticTable 1 }
+
+SwARPInspectionStaticEntry ::= SEQUENCE {
+   swARPInspectionStaticIndex        INTEGER,
+   swARPInspectionStaticPort         INTEGER,
+   swARPInspectionStaticVLANId       INTEGER,
+   swARPInspectionStaticIPAddress	IpAddress,
+   swARPInspectionStaticMACAddress	MacAddress 
+   
+}
+
+swARPInspectionStaticIndex OBJECT-TYPE
+   SYNTAX      INTEGER(1..4095)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   ::= { swARPInspectionStaticEntry 1 }
+
+swARPInspectionStaticPort OBJECT-TYPE
+   SYNTAX      INTEGER(1..4095)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " Port, range: 1 - port number. "
+   ::= { swARPInspectionStaticEntry 2 }
+
+swARPInspectionStaticVLANId OBJECT-TYPE
+   SYNTAX      INTEGER (1..4094)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " VLAN ID, range: 1 - 4094. "
+   ::= { swARPInspectionStaticEntry 3 }
+
+swARPInspectionStaticIPAddress OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " IP address allowed for doing ARP request. "
+   ::= { swARPInspectionStaticEntry 4 }
+
+swARPInspectionStaticMACAddress OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " Allowed Source MAC address in ARP request packets, format 0a 1b 2c 3d 4e 5f "
+   ::= { swARPInspectionStaticEntry 5 }
+
+ 
+
+swARPInspectionDynamicTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwARPInspectionDynamicEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swARPInspection 3 }
+
+swARPInspectionDynamicEntry OBJECT-TYPE
+   SYNTAX      SwARPInspectionDynamicEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swARPInspectionDynamicIndex  }
+   ::= { swARPInspectionDynamicTable 1 }
+
+SwARPInspectionDynamicEntry ::= SEQUENCE {
+   swARPInspectionDynamicIndex		    INTEGER,
+   swARPInspectionDynamicPort		    INTEGER,
+   swARPInspectionDynamicVLANId		    INTEGER,
+   swARPInspectionDynamicIPAddress		IpAddress,
+   swARPInspectionDynamicMACAddress		MacAddress
+}
+
+swARPInspectionDynamicIndex OBJECT-TYPE
+   SYNTAX      INTEGER(1..4095)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swARPInspectionDynamicEntry 1 }
+
+swARPInspectionDynamicPort OBJECT-TYPE
+   SYNTAX      INTEGER(1..4095)
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       ""
+   ::= { swARPInspectionDynamicEntry 2 }
+
+swARPInspectionDynamicVLANId OBJECT-TYPE
+   SYNTAX      INTEGER (1..4094)
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       ""
+   ::= { swARPInspectionDynamicEntry 3 }
+
+swARPInspectionDynamicIPAddress OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       ""
+   ::= { swARPInspectionDynamicEntry 4 }
+
+swARPInspectionDynamicMACAddress OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       ""
+   ::= { swARPInspectionDynamicEntry 5 }
+
+swARPInspectionAddDelStatic                                OBJECT IDENTIFIER ::= { swARPInspection 4 }
+
+swARPInspectionAddStatic OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION 
+       " format: <portno>_<vid>_<ipaddress>_<macaddress> 
+         ipaddress format: xxx.xxx.xxx.xxx
+         macaddress format: 0a-1b-2c-3d-4e-5f
+         ex: 1_2_192.168.1.1_0a-1b-2c-3d-4e-5f"
+   ::= { swARPInspectionAddDelStatic 1 }   
+   
+swARPInspectionDelStatic OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION 
+       " format: <portno>_<vid>_<ipaddress>_<macaddress> 
+         ipaddress format: xxx.xxx.xxx.xxx
+         macaddress format: 0a-1b-2c-3d-4e-5f
+         ex: 1_2_192.168.1.1_0a-1b-2c-3d-4e-5f"
+   ::= { swARPInspectionAddDelStatic 2 }    
+
+swDHCPSnooping                                          OBJECT IDENTIFIER ::= { swSecurity 3 }
+
+swDHCPSnoopingConf                                          OBJECT IDENTIFIER ::= { swDHCPSnooping 1 }
+
+swDHCPSnoopingMode OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0: disable
+       1: enable"
+   ::= { swDHCPSnoopingConf 1 }
+
+swDHCPSnoopingPortModeConfigurationTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwDHCPSnoopingPortModeConfigurationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swDHCPSnoopingConf 2 }
+
+swDHCPSnoopingPortModeConfigurationEntry OBJECT-TYPE
+   SYNTAX      SwDHCPSnoopingPortModeConfigurationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swDHCPSnoopingPortModeConfigurationPort  }
+   ::= { swDHCPSnoopingPortModeConfigurationTable 1 }
+   
+SwDHCPSnoopingPortModeConfigurationEntry ::= SEQUENCE {
+   swDHCPSnoopingPortModeConfigurationPort	INTEGER,
+   swDHCPSnoopingPortModeConfigurationMode	INTEGER
+}
+
+swDHCPSnoopingPortModeConfigurationPort OBJECT-TYPE
+   SYNTAX      INTEGER(1..4095)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swDHCPSnoopingPortModeConfigurationEntry 1 }
+
+swDHCPSnoopingPortModeConfigurationMode OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 1
+       0: trust port mode
+       1: untrust port mode"
+   ::= { swDHCPSnoopingPortModeConfigurationEntry 2 }
+
+
+
+
+swDHCPSnoopingAgentURL  OBJECT-TYPE
+	SYNTAX	DisplayString( SIZE(0..358))
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		" Enter the location of the DHCP snooping database. The location should be expressed like this: tftp://(domain name or IP Address)}/directory, if applicable/file name; for example, tftp://192.168.1.1/database.txt."
+	::= { swDHCPSnoopingConf 3 }
+
+
+swDHCPSnoopingTimeoutInterval	 OBJECT-TYPE
+	SYNTAX	INTEGER(10..65535)
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		" Enter how hong (10-65535 seconds) the switch tries to complete a specific update in the DHCP dnooping database before it gives up."
+	::= { swDHCPSnoopingConf 4 }
+
+
+
+swDHCPSnoopingWriteDelayInterval	 OBJECT-TYPE
+	SYNTAX	INTEGER(10..65535)
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		" Enter how hong (10-65535 seconds) the switch waits to update the DHCP dnooping database."
+	::= { swDHCPSnoopingConf 5 }
+	
+
+swDHCPRelay                                             OBJECT IDENTIFIER ::= { swSecurity 4 }
+
+swDHCPRelayConfiguration                                         OBJECT IDENTIFIER ::= { swDHCPRelay 1 }
+
+swDHCPRelayServer OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swDHCPRelayConfiguration 1 }
+   
+swDHCPRelayMode OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0: disable
+       1: enable 
+       We need at least one server"
+   ::= { swDHCPRelayConfiguration 2 }   
+
+swDHCPRelayInformationMode OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0: disable
+       1: enable "
+   ::= { swDHCPRelayConfiguration 3 }
+
+swDHCPRelayInformationPolicy OBJECT-TYPE
+   SYNTAX      INTEGER(0..2)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0: replace
+       1: keep
+       2: drop "
+   ::= { swDHCPRelayConfiguration 4 }
+
+
+
+swPortSecurity                                          OBJECT IDENTIFIER ::= { swSecurity 5 }
+
+swPortSecLimitCtrl                                      OBJECT IDENTIFIER ::= { swPortSecurity 1 }
+
+swPortSecLimitCtrlSystemConf                            OBJECT IDENTIFIER ::= { swPortSecLimitCtrl 1 }
+
+swPortSecurityMode OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0: disable
+       1: enable "
+   ::= { swPortSecLimitCtrlSystemConf 1 }
+
+swPortSecurityAging OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0: disable
+       1: enable "
+   ::= { swPortSecLimitCtrlSystemConf 2 }
+
+swPortSecurityAgingPeriod OBJECT-TYPE
+   SYNTAX      INTEGER(10..10000000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 3600, range: 10-10000000 "
+   ::= { swPortSecLimitCtrlSystemConf 3 }
+
+swPortSecLimitCtrlTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwPortSecLimitCtrlEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swPortSecLimitCtrl 2 }
+
+swPortSecLimitCtrlEntry OBJECT-TYPE
+   SYNTAX      SwPortSecLimitCtrlEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swPortSecLimitCtrlPort  }
+   ::= { swPortSecLimitCtrlTable 1 }   
+
+SwPortSecLimitCtrlEntry ::= SEQUENCE {
+   swPortSecLimitCtrlPort            INTEGER,
+   swPortSecLimitCtrlPortMode	INTEGER,
+   swPortSecLimitCtrlPortLimit	INTEGER,
+   swPortSecLimitCtrlPortAction	INTEGER,
+   swPortSecLimitCtrlPortState	DisplayString,
+   swPortSecLimitCtrlPortReOpen	INTEGER
+}
+
+swPortSecLimitCtrlPort OBJECT-TYPE
+   SYNTAX      INTEGER (1..4095)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swPortSecLimitCtrlEntry 1 }
+
+swPortSecLimitCtrlPortMode OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0: disable
+       1: enable"
+   ::= { swPortSecLimitCtrlEntry 2 }
+
+swPortSecLimitCtrlPortLimit OBJECT-TYPE
+   SYNTAX      INTEGER(1..1024)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 4, range: 1-1024"
+   ::= { swPortSecLimitCtrlEntry 3 }
+
+swPortSecLimitCtrlPortAction OBJECT-TYPE
+   SYNTAX      INTEGER(0..3)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0: none
+       1: trap
+       2: shutdown
+       3: trap&shutdown"
+   ::= { swPortSecLimitCtrlEntry 4 }
+
+swPortSecLimitCtrlPortState OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       ""
+   ::= { swPortSecLimitCtrlEntry 5 }
+
+swPortSecLimitCtrlPortReOpen OBJECT-TYPE
+   SYNTAX      INTEGER (0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0: none
+       1: reopen"
+   ::= { swPortSecLimitCtrlEntry 6 }
+
+
+
+
+
+swAccessManagement                                      OBJECT IDENTIFIER ::= { swSecurity 6 }
+
+swAccessMgtConf                                         OBJECT IDENTIFIER ::= { swAccessManagement 1 }
+
+swAccessMgtConfMode OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0: disable
+       1: enable "
+   ::= { swAccessMgtConf 1 }
+
+
+
+swAccessMgtConfTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwAccessMgtConfEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swAccessMgtConf 2 }
+
+swAccessMgtConfEntry OBJECT-TYPE
+   SYNTAX      SwAccessMgtConfEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swAccessMgtIndex  }
+   ::= { swAccessMgtConfTable 1 }
+   
+SwAccessMgtConfEntry ::= SEQUENCE {
+   swAccessMgtIndex             INTEGER,
+   swAccessMgtAddresstype       INTEGER,
+   swAccessMgtStartIpAddress    DisplayString,
+   swAccessMgtEndIpAddress      DisplayString,
+   swAccessMgtHttpHttps         INTEGER,
+   swAccessMgtSNMP              INTEGER,
+   swAccessMgtTelnetSSH         INTEGER,
+   swAccessMgtRowStatus         INTEGER
+}
+
+swAccessMgtIndex OBJECT-TYPE
+   SYNTAX      INTEGER(1..16)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Access Management config index"
+   ::= { swAccessMgtConfEntry 1 }
+
+swAccessMgtAddresstype OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "0: ipv4
+       1: ipv6 "
+   ::= { swAccessMgtConfEntry 2 }
+   
+swAccessMgtStartIpAddress OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swAccessMgtConfEntry 3 }
+   
+swAccessMgtEndIpAddress OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swAccessMgtConfEntry 4 }
+
+swAccessMgtHttpHttps OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0: disable
+       1: enable "
+   ::= { swAccessMgtConfEntry 5 }
+
+swAccessMgtSNMP OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0: disable
+       1: enable "
+   ::= { swAccessMgtConfEntry 6 }
+
+swAccessMgtTelnetSSH OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+       0: disable
+       1: enable "
+   ::= { swAccessMgtConfEntry 7 }
+
+swAccessMgtRowStatus OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "1: active
+        0: notInservice"
+  
+   ::= { swAccessMgtConfEntry 8 }
+
+
+swSSH                                                   OBJECT IDENTIFIER ::= { swSecurity 7 }
+
+swSSHMode OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 1
+        0: disable
+        1: enable"
+   ::= { swSSH 1 }
+
+swHTTPS                                                 OBJECT IDENTIFIER ::= { swSecurity 8 }
+
+swHTTPSMode OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 1
+        0: disable
+        1: enable"
+   ::= { swHTTPS 1 }
+
+swHTTPSAutoRedirect OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+        0: disable
+        1: enable"
+   ::= { swHTTPS 2 }
+
+
+swAuthMethod                                            OBJECT IDENTIFIER ::= { swSecurity 9 }
+
+swAuthMethodTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwAuthMethodEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swAuthMethod 1 }
+   
+swAuthMethodEntry OBJECT-TYPE
+   SYNTAX      SwAuthMethodEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swAuthMethodIndex  }
+   ::= { swAuthMethodTable 1 }
+
+
+SwAuthMethodEntry ::= SEQUENCE {
+   swAuthMethodIndex              INTEGER,
+   swConsoleAuthMethod            INTEGER,
+   swTelnetAuthMethod             INTEGER,
+   swSshAuthMethod              INTEGER,
+   swWebAuthMethod                INTEGER
+ 
+}
+
+swAuthMethodIndex OBJECT-TYPE
+   SYNTAX      INTEGER (1..3)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swAuthMethodEntry 1 }
+
+swConsoleAuthMethod OBJECT-TYPE
+   SYNTAX      INTEGER(0..3)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 1
+        0: none
+        1: local
+        2: RADIUS
+        3: TACACS+"
+   ::= { swAuthMethodEntry 2 }
+
+ 
+
+swTelnetAuthMethod OBJECT-TYPE
+   SYNTAX      INTEGER(0..3)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 1
+        0: none
+        1: local
+        2: RADIUS
+        3: TACACS+"
+   ::= { swAuthMethodEntry 3 }
+
+ 
+
+swSshAuthMethod OBJECT-TYPE
+   SYNTAX      INTEGER(0..3)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 1
+        0: none
+        1: local
+        2: RADIUS
+        3: TACACS+"
+   ::= { swAuthMethodEntry 4 }
+
+ 
+swWebAuthMethod OBJECT-TYPE
+   SYNTAX      INTEGER(0..3)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 1
+        0: none
+        1: local
+        2: RADIUS
+        3: TACACS+"
+   ::= { swAuthMethodEntry 5 }
+
+ 
+swRestartDevice OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+        0:none
+        1:yes"
+   ::= { swMaintenance 1 }
+
+swFactoryDefaults OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+        0:none
+        1:yes"
+   ::= { swMaintenance 2}
+
+swSaveStartupConfig OBJECT-TYPE
+   SYNTAX      INTEGER(0|1)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "default: 0
+        0:none
+        1:yes"
+   ::= { swMaintenance 5}
+-- --------------------------------------------------------------------------------------------------------------------------
+
+
+swMonitorMac                                       OBJECT IDENTIFIER ::= { swMonitor 1 }
+
+--swConfigTimeClockSource OBJECT-TYPE
+--   SYNTAX       INTEGER  (0|1)
+--   MAX-ACCESS   read-write
+--   STATUS       current
+--   DESCRIPTION
+--       "default: 0,
+--        0 : Use Local Settings,
+--        1 : Use NTP Server."
+--   ::= { swConfigTime 1 }
+   
+ 
+
+swMonitorMacAddr                                     OBJECT IDENTIFIER ::= { swMonitorMac 2 }
+
+swMonitorMacAddrTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF SwMonitorMacAddrEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " "
+   ::= { swMonitorMacAddr 1 }
+
+swMonitorMacAddrEntry OBJECT-TYPE
+   SYNTAX      SwMonitorMacAddrEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       ""
+   INDEX    { swMonitorMacAddrIndex  }
+   ::= { swMonitorMacAddrTable 1 }
+
+SwMonitorMacAddrEntry ::= SEQUENCE {
+   swMonitorMacAddrIndex             INTEGER,
+   swMonitorMacAddrTypeVidMacAddressPorts      DisplayString
+}
+
+swMonitorMacAddrIndex OBJECT-TYPE
+   SYNTAX      INTEGER (0..8192)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " The index of the addr entry. "
+   ::= { swMonitorMacAddrEntry 1 }
+
+
+--swMonitorMacAddrPort OBJECT-TYPE
+--   SYNTAX       INTEGER(0..50)
+--   MAX-ACCESS   read-write
+--   STATUS       current
+--   DESCRIPTION
+--       "Default: 0,
+--        0 : IPv4,
+--        1 : IPv6."
+--   ::= { swMonitorMacAddrEntry 2 }
+
+
+
+swMonitorMacAddrTypeVidMacAddressPorts  OBJECT-TYPE
+	SYNTAX	DisplayString( SIZE(0..300))
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		" MAC Address Table. Format:Type    VID  MAC Address        Ports  Example:Dynamic 1    00-01-02-03-04-05  1  "
+   ::= { swMonitorMacAddrEntry 2 }
+
+----------------------------------------------------------------------
+-- Traps for use by port  ddmi alarn
+
+swTrap                                       OBJECT IDENTIFIER ::= { swNotifications 1 }
+
+-- Traps for use by port limit reached
+
+swLimitReachedTrap NOTIFICATION-TYPE
+      STATUS   current
+      DESCRIPTION
+		  "If Limit + 1 MAC addresses is seen on the port, send an SNMP trap"
+      ::= {swTrap 1 }
+ 
+-- Traps for use by port ddmi alarm
+ 
+swDDMAlarm NOTIFICATION-TYPE
+      STATUS   current
+      DESCRIPTION
+		  " Alarm flags associated with Fx transceiver temperature,supply voltage, Tx bias, Tx outpout
+		    power and received power."
+      ::= {swTrap 301 }
+
+
+swDDMWarn NOTIFICATION-TYPE
+      STATUS   current
+      DESCRIPTION
+		  " Warning flags associated with Fx transceiver temperature,supply voltage, Tx bias, Tx outpout
+		    power and received power."
+      ::= {swTrap 302 }        
+
+
+END
+
