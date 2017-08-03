@@ -98,6 +98,10 @@ class IPv4 extends IP
     public function inNetwork($network)
     {
         list($net, $cidr) = $this->extractCidr($network);
+        if (!self::isValid($net)) {
+            return false;
+        }
+
         $mask = $this->cidr2long($cidr);
         return ((ip2long($this->ip) & $mask) == (ip2long($net) & $mask));
     }

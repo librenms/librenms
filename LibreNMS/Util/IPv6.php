@@ -106,6 +106,10 @@ class IPv6 extends IP
     {
         list($net, $cidr) = $this->extractCidr($network);
 
+        if (!self::isValid($net)) {
+            return false;
+        }
+
         $net_bytes = unpack('n*', inet_pton($net));
         $ip_bytes = unpack('n*', inet_pton($this->ip));
         if ($net_bytes === false || $ip_bytes === false) {

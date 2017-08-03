@@ -16,6 +16,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Config;
+use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
 function generate_priority_icon($priority)
@@ -704,19 +706,19 @@ function is_mib_graph($type, $subtype)
  */
 function is_client_authorized($clientip)
 {
-    global $config;
-
-    if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs']) {
+    if (Config::get('allow_unauth_graphs', false)) {
         d_echo("Unauthorized graphs allowed\n");
         return true;
     }
 
-    if (isset($config['allow_unauth_graphs_cidr'])) {
-        foreach ($config['allow_unauth_graphs_cidr'] as $range) {
+    foreach (Config::get('allow_unauth_graphs_cidr', array()) as $range) {
+        try {
             if (IP::parse($clientip)->inNetwork($range)) {
                 d_echo("Unauthorized graphs allowed from $range\n");
                 return true;
             }
+        } catch (InvalidIpException $e) {
+            d_echo("Client IP ($clientip) is invalid.\n");
         }
     }
 
