@@ -2,6 +2,7 @@ os: avaya-ers
 text: 'ERS Firmware'
 type: network
 icon: avaya
+ifname: 1
 mib_dir:
     - nortel
 over:
