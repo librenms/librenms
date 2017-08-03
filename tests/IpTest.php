@@ -88,6 +88,7 @@ class IpTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('2001:db8::2:1', IP::fromHexString('2001:db8::2:1'));
         $this->assertEquals('2001:db8::2:1', IP::fromHexString('20 01 0d b8 00 00 00 00 00 00 00 00 00 02 00 01'));
         $this->assertEquals('2001:db8::2:1', IP::fromHexString('"20 01 0d b8 00 00 00 00 00 00 00 00 00 02 00 01"'));
+        $this->assertEquals('2001:db8::2:1', IP::fromHexString('"20:01:0d:b8:00:00:00:00:00:00:00:00:00:02:00:01"'));
         $this->assertEquals('2001:db8::2:1', IP::fromHexString('20010db8000000000000000000020001'));
 
         $this->assertEquals('::', IP::fromHexString('00000000000000000000000000000000'));

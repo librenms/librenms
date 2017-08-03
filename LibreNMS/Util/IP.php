@@ -42,7 +42,7 @@ abstract class IP
      */
     public static function fromHexString($hex, $ignore_errors = false)
     {
-        $hex = str_replace(array(' ', '"'), '', $hex);
+        $hex = str_replace(array(' ', '"', ':'), '', $hex);
 
         try {
             return self::parse($hex);
