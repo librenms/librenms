@@ -42,13 +42,15 @@ abstract class IP
      */
     public static function fromHexString($hex, $ignore_errors = false)
     {
-        $hex = str_replace(array(' ', '"', ':'), '', $hex);
+        $hex = str_replace(array(' ', '"'), '', $hex);
 
         try {
             return self::parse($hex);
         } catch (InvalidIpException $e) {
             // ignore
         }
+
+        $hex = str_replace(array(':', '.'), '', $hex);
 
         try {
             if (strlen($hex) == 8) {

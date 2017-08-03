@@ -784,7 +784,7 @@ function snmp2ipv6($ipv6_snmp)
 function ipv62snmp($ipv6)
 {
     try {
-        $ipv6_ip = str_replace(':', '', IP::parse($ipv6)->compress());
+        $ipv6_ip = str_replace(':', '', IP::parse($ipv6)->compressed());
     } catch (InvalidIpException $e) {
         return '';
     }
