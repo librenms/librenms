@@ -1310,6 +1310,8 @@ route:
 sensors:
   Columns:
     device_id: { Field: device_id, Type: 'int(11) unsigned', 'Null': false, Default: '0', Extra: '' }
+    entity_link_index: { Field: entity_link_index, Type: 'int(11) unsigned', 'Null': false, Default: '0', Extra: '' }
+    entity_link_type: { Field: entity_link_type, Type: varchar(32), 'Null': true, Default: null, Extra: '' }
     entPhysicalIndex: { Field: entPhysicalIndex, Type: varchar(16), 'Null': true, Default: null, Extra: '' }
     entPhysicalIndex_measured: { Field: entPhysicalIndex_measured, Type: varchar(16), 'Null': true, Default: null, Extra: '' }
     lastupdate: { Field: lastupdate, Type: timestamp, 'Null': false, Default: CURRENT_TIMESTAMP, Extra: 'on update CURRENT_TIMESTAMP' }
