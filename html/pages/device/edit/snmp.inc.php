@@ -20,6 +20,7 @@ if ($_POST['editing']) {
             'authalgo'   => mres($_POST['authalgo']),
             'cryptopass' => mres($_POST['cryptopass']),
             'cryptoalgo' => mres($_POST['cryptoalgo']),
+            'context_name' => mres($_POST['context_name']),
         );
 
         // FIXME needs better feedback
@@ -192,6 +193,12 @@ echo "        </select>
     <div id='snmpv3'>
     <div class='form-group'>
     <label class='col-sm-3 control-label'><h4><strong>SNMPv3 Configuration</strong></h4></label>
+    </div>
+    <div class='form-group'>
+        <label for='context_name' class='col-sm-3 control-label'>Context Name</label>
+        <div class='col-sm-3'>
+            <input type='text' name='context_name' id='context_name' class='form-control input-sm' value='".$device['context_name']."'>
+        </div>
     </div>
     <div class='form-group'>
     <label for='authlevel' class='col-sm-2 control-label'>Auth Level</label>
