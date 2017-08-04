@@ -1,5 +1,6 @@
-os: radware
-text: RADWARE
+os: alteonos
+group: radware
+text: AlteonOS
 type: network
 icon: radware
 over:
