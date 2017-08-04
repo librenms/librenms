@@ -202,6 +202,7 @@ function poll_service($service)
 
 function check_service($command)
 {
+    global $config;
     // This array is used to test for valid UOM's to be used for graphing.
     // Valid values from: https://nagios-plugins.org/doc/guidelines.html#AEN200
     // Note: This array must be decend from 2 char to 1 char so that the search works correctly.
