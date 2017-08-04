@@ -32,7 +32,7 @@ require_once 'includes/modal/attach_alert_template.inc.php';
 <?php
 $full_query = "SELECT id, name from alert_templates";
 foreach (dbFetchRows($full_query, $param) as $template) {
-    if($template['name'] == 'Default Alert Template') {
+    if ($template['name'] == 'Default Alert Template') {
         $default_tplid = $template['id'];
         continue;
     }

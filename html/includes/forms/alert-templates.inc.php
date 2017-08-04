@@ -59,7 +59,7 @@ if (!empty($name)) {
     } elseif ($_REQUEST['template']) {
         //Create new template
 
-        if($name != 'Default Alert Template') {
+        if ($name != 'Default Alert Template') {
             if (dbInsert(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates")) {
                 $ok = "Alert template has been created.";
             } else {
