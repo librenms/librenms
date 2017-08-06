@@ -462,7 +462,9 @@ foreach ($ports as $port) {
 
         $hc_enabled = false;
         // use HC values if they are available and not disabled
-        if ($config['os'][$device['os']]['no_hc'] != true) {
+        if (Config::getOsSetting($device, 'no_hc', false) ) {
+            echo 'hc counters disabled';
+        } else {
             foreach ($hc_mappings as $hc_oid => $if_oid) {
                 if (isset($this_port[$hc_oid]) && $this_port[$hc_oid]) {
                     if ($hc_oid === 'ifHCInOctets' || $hc_oid === 'ifHCOutOctets') {
@@ -474,8 +476,6 @@ foreach ($ports as $port) {
                     d_echo("$if_oid ");
                 }
             }
-        } else {
-            echo 'hc counters disabled';
         }
 
         if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {
@@ -645,7 +645,7 @@ foreach ($ports as $port) {
                                 $this_port[$oid . '_rolled'] = (gmp_sub($max_32, $port[$oid])) + $this_port[$oid];
                             } else {
                                 // No GMP http://uk1.php.net/manual/en/book.gmp.php function
-                                $this_port[$oid . '_rolled'] = ($max_32 - $port[$oid]) - $this_port[$oid];
+                                $this_port[$oid . '_rolled'] = ($max_32 - $port[$oid]) + $this_port[$oid];
                             }
                         }
                     }
