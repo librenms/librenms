@@ -5,4 +5,9 @@
             <directory>tests/</directory>
         </testsuite>
     </testsuites>
+    <groups>
+        <exclude>
+            <group>mibs</group>
+        </exclude>
+    </groups>
 </phpunit>
