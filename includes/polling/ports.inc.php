@@ -462,7 +462,7 @@ foreach ($ports as $port) {
 
         $hc_enabled = false;
         // use HC values if they are available and not disabled
-        if (Config::getOsSetting($device, 'no_hc', false) ) {
+        if (Config::getOsSetting($device, 'no_hc', false)) {
             echo 'hc counters disabled';
         } else {
             foreach ($hc_mappings as $hc_oid => $if_oid) {
