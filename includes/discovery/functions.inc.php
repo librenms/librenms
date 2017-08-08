@@ -1075,7 +1075,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
             $tmp_name = $data['oid'];
             $raw_data = $pre_cache[$tmp_name];
             foreach ($raw_data as $index => $snmp_data) {
-                $value = is_numeric($snmp_data[$data['value']]) ? $snmp_data[$data['value']] : ($snmp_data[$data['oid']] ?: false);
+                $value = is_numeric($snmp_data[$data['value']]) ? $snmp_data[$data['value']] : (is_numeric($snmp_data[$data['oid']]) ? $snmp_data[$data['oid']]: false);
                 if (can_skip_sensor($value, $data, $sensor_options) === false && is_numeric($value)) {
                     $oid = $data['num_oid'] . $index;
                     if (isset($snmp_data[$data['descr']])) {
