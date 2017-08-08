@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\IP;
+
 if ($config['enable_sla'] && $device['os_group'] == 'cisco') {
     $slas = snmp_walk($device, 'ciscoRttMonMIB.ciscoRttMonObjects.rttMonCtrl', '-Osq', '+CISCO-RTTMON-MIB');
 
@@ -58,7 +60,7 @@ if ($config['enable_sla'] && $device['os_group'] == 'cisco') {
                     break;
 
                 case 'echo':
-                    $data['tag'] = hex_to_ip($sla_config['rttMonEchoAdminTargetAddress']);
+                    $data['tag'] = IP::fromHexString($sla_config['rttMonEchoAdminTargetAddress'], true);
                     break;
 
                 case 'jitter':

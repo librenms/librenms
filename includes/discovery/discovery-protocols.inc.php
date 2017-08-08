@@ -2,6 +2,8 @@
 
 global $link_exists;
 
+use LibreNMS\Util\IP;
+
 $community = $device['community'];
 
 if ($device['os'] == 'ironware' && $config['autodiscovery']['xdp'] === true) {
@@ -48,7 +50,7 @@ if ($config['autodiscovery']['xdp'] === true) {
             d_echo($cdp_if_array);
             foreach ($cdp_if_array as $entry_key => $cdp) {
                 if (is_valid_hostname($cdp['cdpCacheDeviceId']) || ($config['discovery_by_ip'] == true)) {
-                    $cdp_ip = hex_to_ip($cdp['cdpCacheAddress']);
+                    $cdp_ip = IP::fromHexString($cdp['cdpCacheAddress'], true);
                     $remote_device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ? OR `hostname` = ?', array($cdp['cdpCacheDeviceId'], $cdp['cdpCacheDeviceId'], $cdp_ip));
 
                     if (!$remote_device_id &&
@@ -150,7 +152,7 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                                 d_echo($ptopo_array);
                                 foreach ($ptopo_array as $ptopo) {
                                     if (strcmp(trim($ptopo['ptopoConnRemoteChassis']), trim($lldp['lldpRemChassisId'])) == 0) {
-                                        $discover_hostname = hex_to_ip($ptopo['ptopoConnAgentNetAddr']);
+                                        $discover_hostname = IP::fromHexString($ptopo['ptopoConnAgentNetAddr'], true);
                                         break;
                                     }
                                 }
