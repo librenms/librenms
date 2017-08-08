@@ -20,7 +20,7 @@ for ($volt = 2; $volt < 6; $volt++) {
             $descr = "SDRAMp";
             break;
     }
-    $value = current($pre_cache['raspberry_pi_sensors'][$oid.$volt]);
+    $value = current($pre_cache['raspberry_pi_sensors']["raspberry.".$volt]);
     if (is_numeric($value)) {
         discover_sensor($valid['sensor'], 'voltage', $device, $oid.$volt, $volt, $sensor_type, $descr, '1', '1', null, null, null, null, $value);
     } else {

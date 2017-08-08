@@ -15,7 +15,7 @@ for ($freq = 6; $freq < 8; $freq++) {
             $descr = "Core";
             break;
     }
-    $value = current($pre_cache['raspberry_pi_sensors'][$oid.$freq]);
+    $value = current($pre_cache['raspberry_pi_sensors']["raspberry.".$freq]);
     if (is_numeric($value)) {
         discover_sensor($valid['sensor'], 'frequency', $device, $oid.$freq, $freq, $sensor_type, $descr, 1, 1, null, null, null, null, $value);
     } else {
