@@ -92,12 +92,11 @@ $complete = 1;
 
 ?>
 <!DOCTYPE HTML>
-<html>
+<html lang="en">
 <head>
   <title><?php echo($config['page_title_prefix']); ?></title>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
-  <meta http-equiv="content-language" content="en-us" />
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
@@ -105,26 +104,17 @@ $complete = 1;
   <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-hover-dropdown.min.js"></script>
   <script src="js/hogan-2.0.0.js"></script>
-
 </head>
 <body>
   <div class="container">
     <div class="row">
-      <div class="col-md-3">
-      </div>
-      <div class="col-md-6">
+      <div class="col-md-6 col-md-offset-3">
         <h2 class="text-center">Welcome to the <?php echo($config['project_name']); ?> install</h2>
-      </div>
-      <div class="col-md-3">
       </div>
     </div>
     <div class="row">
-      <div class="col-md-3">
-      </div>
-      <div class="col-md-6">
+      <div class="col-md-6 col-md-offset-3">
         <h4 class="text-center">Stage <?php echo $stage; ?> of <?php echo $total_stages; ?> complete</h4>
-      </div>
-      <div class="col-md-3">
       </div>
     </div>
 <?php
@@ -132,12 +122,8 @@ $complete = 1;
 if (!empty($msg)) {
 ?>
     <div class="row">
-      <div class="col-md-3">
-      </div>
-      <div class="col-md-6">
+      <div class="col-md-6 col-md-offset-3">
         <div class="alert alert-danger"><?php echo $msg; ?></div>
-      </div>
-      <div class="col-md-3">
       </div>
     </div>
 
@@ -146,16 +132,12 @@ if (!empty($msg)) {
 ?>
 
     <div class="row">
-      <div class="col-md-3">
-      </div>
-      <div class="col-md-6">
+      <div class="col-md-6 col-md-offset-3">
         <div class="progress progress-striped">
           <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?php echo $stage_perc; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $stage_perc; ?>%">
             <span class="sr-only"><?php echo $stage_perc; ?>% Complete</span>
           </div>
         </div>
-      </div>
-      <div class="col-md-3">
       </div>
     </div>
 
@@ -165,85 +147,66 @@ if ($stage == 0) {
 ?>
 
     <div class="row">
-      <div class="col-md-3">
-      </div>
-      <div class="col-md-6">
-        <h5 class="text-center">Checking PHP module support</h5>
-      </div>
-      <div class="col-md-3">
+      <div class="col-md-6 col-md-offset-3">
+        <h4 class="text-center">Pre-Install Checks</h4>
       </div>
     </div>
     <div class="row">
-      <div class="col-md-3">
-      </div>
-      <div class="col-md-6">
+      <div class="col-md-6 col-md-offset-3">
         <table class="table table-condensed table-bordered">
           <tr>
-            <th>Module</th>
-            <th>Installed</th>
+            <th>Item</th>
+            <th>Status</th>
             <th>Comments</th>
           </tr>
 <?php
 
+$complete = true;
 foreach ($modules as $extension) {
     if (extension_loaded("$extension")) {
-        $ext_loaded = 'yes';
+        $status = 'installed';
         $row_class = 'success';
     } else {
-        $ext_loaded = 'no';
+        $status = 'missing';
         $row_class = 'danger';
-        $complete = 0;
+        $complete = false;
     }
 
-    echo("   <tr class='$row_class'>
-            <td>$extension</td>
-            <td>$ext_loaded</td>");
-    if ($ext_loaded == 'no') {
-        echo("<td></td>");
-    } else {
-        echo("<td></td>");
-    }
-    echo("</tr>");
+    echo "<tr class='$row_class'><td>PHP module <strong>$extension</strong></td><td>$status</td><td></td></tr>";
 }
 
-    // Check for pear install
-    @include_once 'System.php';
-
-if (class_exists('System') === true) {
-    $ext_loaded = 'yes';
+if (is_writable(session_save_path())) {
+    $status = 'yes';
     $row_class = 'success';
 } else {
-    $ext_loaded = 'no';
+    $status = 'no';
     $row_class = 'danger';
+    $complete = false;
 }
 
-    echo("     <tr class='$row_class'>
-        <td>pear</td>
-        <td>$ext_loaded</td>");
-if ($ext_loaded == 'no') {
-    echo("<td>apt-get install php-pear / yum install php-pear</td>");
-} else {
-    echo("<td></td>");
+echo "<tr class='$row_class'><td>Session directory writable</td><td>$status</td><td>";
+if ($status == 'no') {
+    echo session_save_path() . " is not writable";
+    $group_info = posix_getgrgid(filegroup(session_save_path()));
+    if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
+        $group = $group_info['name'];
+        $user = get_current_user();
+        echo ", suggested fix <strong>usermod -a -G $group $user</strong>";
+    }
 }
-    echo("</tr>");
+echo "</td></tr>";
 ?>
         </table>
       </div>
-      <div class="col-md-3">
-      </div>
     </div>
     <div class="row">
-      <div class="col-md-3">
-      </div>
-      <div class="col-md-6">
+      <div class="col-md-6 col-md-offset-3">
         <form class="form-inline" role="form" method="post">
           <input type="hidden" name="stage" value="1">
-          <button type="submit" class="btn btn-success" <?php if ($complete == '0') {
+          <button type="submit" class="btn btn-success" <?php if (!$complete) {
                 echo "disabled='disabled'";
 } ?>>Next Stage</button>
         </form>
-      </div>
-      <div class="col-md-3">
       </div>
     </div>
 
