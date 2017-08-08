@@ -1482,11 +1482,10 @@ function list_arp()
             $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
             $arp = dbFetchRows("SELECT `ipv4_mac`.* FROM `ipv4_mac` LEFT JOIN `ports` ON `ipv4_mac`.`port_id` = `ports`.`port_id` WHERE `ports`.`device_id` = ?", array($device_id));
         } elseif (str_contains($ip, '/')) {
-            $ipv4 = new Net_IPv4();
-            $net = $ipv4->parseAddress($ip);
+            list($net, $cidr) = explode('/', $ip, 2);
             $arp = dbFetchRows(
                 'SELECT * FROM `ipv4_mac` WHERE (inet_aton(`ipv4_address`) & ?) = ?',
-                array(ip2long($net->netmask), ip2long($net->network))
+                array(cidr2long($cidr), ip2long($net))
             );
         } else {
             $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `ipv4_address`=?", array($ip));
@@ -1534,7 +1533,7 @@ function list_services()
         $where[] = '`service_type` LIKE ?';
         $params[] = $_GET['type'];
     }
-    
+
     //GET by Host
     if (isset($router['hostname'])) {
         $hostname = $router['hostname'];

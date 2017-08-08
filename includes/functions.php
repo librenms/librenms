@@ -15,8 +15,10 @@ use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
+use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
+use LibreNMS\Util\IP;
 
 function set_debug($debug)
 {
@@ -505,17 +507,6 @@ function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp
     return $device;
 }
 
-function netmask2cidr($netmask)
-{
-    $addr = Net_IPv4::parseAddress("1.2.3.4/$netmask");
-    return $addr->bitmask;
-}
-
-function cidr2netmask($netmask)
-{
-    return (long2ip(ip2long("255.255.255.255") << (32-$netmask)));
-}
-
 function formatUptime($diff, $format = "long")
 {
     $yearsDiff = floor($diff/31536000);
@@ -767,6 +758,7 @@ function match_network($nets, $ip, $first = false)
     return $return;
 }
 
+// FIXME port to LibreNMS\Util\IPv6 class
 function snmp2ipv6($ipv6_snmp)
 {
     $ipv6 = explode('.', $ipv6_snmp);
@@ -788,16 +780,17 @@ function snmp2ipv6($ipv6_snmp)
     return implode(':', $ipv6_2);
 }
 
+// FIXME port to LibreNMS\Util\IPv6 class
 function ipv62snmp($ipv6)
 {
-    $ipv6_split = array();
-    $ipv6_ex = explode(':', Net_IPv6::uncompress($ipv6));
-    for ($i = 0; $i < 8; $i++) {
-        $ipv6_ex[$i] = zeropad($ipv6_ex[$i], 4);
+    try {
+        $ipv6_ip = str_replace(':', '', IP::parse($ipv6)->compressed());
+    } catch (InvalidIpException $e) {
+        return '';
     }
-    $ipv6_ip = implode('', $ipv6_ex);
-    for ($i = 0; $i < 32;
-    $i+=2) {
+
+    $ipv6_split = array();
+    for ($i = 0; $i < 32; $i+=2) {
         $ipv6_split[] = hexdec(substr($ipv6_ip, $i, 2));
     }
 
@@ -1344,32 +1337,6 @@ function first_oid_match($device, $list)
     }
 }
 
-
-/**
- * Convert a hex ip to a human readable string
- *
- * @param string $hex
- * @return string
- */
-function hex_to_ip($hex)
-{
-    $hex = str_replace(array(' ', '"'), '', $hex);
-
-    if (filter_var($hex, FILTER_VALIDATE_IP)) {
-        return $hex;
-    }
-
-    if (strlen($hex) == 8) {
-        return long2ip(hexdec($hex));
-    }
-
-    if (strlen($hex) == 32) {
-        $ipv6 = implode(':', str_split($hex, 4));
-        return preg_replace('/:0*([0-9a-fA-F])/', ':$1', $ipv6);
-    }
-
-    return ''; // invalid input
-}
 
 function fix_integer_value($value)
 {

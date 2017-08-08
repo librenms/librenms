@@ -1,5 +1,8 @@
 <?php
 
+use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\IPv6;
+
 if ($_SESSION['userlevel'] < '5') {
     include 'includes/error-no-perm.inc.php';
 } else {
@@ -240,14 +243,15 @@ if ($_SESSION['userlevel'] < '5') {
             }
         }
 
-        if (filter_var($peer['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
-            $peer_ip = Net_IPv6::compress($peer['bgpLocalAddr']);
-        } else {
+        try {
+            $peer_ip = new IPv6($peer['bgpLocalAddr']);
+        } catch (InvalidIpException $e) {
             $peer_ip = $peer['bgpLocalAddr'];
         }
-        if (filter_var($peer['bgpPeerIdentifier'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
-            $peer_ident = Net_IPv6::compress($peer['bgpPeerIdentifier']);
-        } else {
+
+        try {
+            $peer_ident = new IPv6($peer['bgpPeerIdentifier']);
+        } catch (InvalidIpException $e) {
             $peer_ident = $peer['bgpPeerIdentifier'];
         }
 

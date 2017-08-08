@@ -50,22 +50,4 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(isHexString('a5 fj 53'));
         $this->assertFalse(isHexString('a5fe53'));
     }
-
-    public function testHexToIp()
-    {
-        $this->assertSame("192.168.1.254", hex_to_ip("c0 a8 01 fe"));
-        $this->assertSame("192.168.1.254", hex_to_ip("c0a801fe"));
-        $this->assertSame("192.168.1.254", hex_to_ip("c0 a8 01 fe "));
-        $this->assertNotSame("192.168.1.1.254", hex_to_ip("c0 a8 01 01 fe"));
-        $this->assertSame("192.168.1.254", hex_to_ip("\"c0 a8 01 fe\""));
-        $this->assertSame("192.168.1.254", hex_to_ip("192.168.1.254"));
-
-        $this->assertSame('2001:db8:0:0:0:0:2:1', hex_to_ip('2001:db8:0:0:0:0:2:1'));
-        $this->assertSame('2001:db8:0:0:0:0:2:1', hex_to_ip('20 01 0d b8 00 00 00 00 00 00 00 00 00 02 00 01'));
-        $this->assertSame('2001:db8:0:0:0:0:2:1', hex_to_ip('20010db8000000000000000000020001'));
-        $this->assertNotSame(
-            '2001:db8:0:0:0:0:2:0:1',
-            hex_to_ip('20 01 0d b8 00 00 00 00 00 00 00 00 00 02 00 00 00 01')
-        );
-    }
 }
