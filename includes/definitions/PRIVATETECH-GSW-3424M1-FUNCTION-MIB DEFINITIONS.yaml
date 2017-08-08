@@ -1,0 +1,15 @@
+os: ctcu
+text: 'CTC Union'
+type: network
+icon: ctcu
+mib_dir:
+    - PRIVATETECH-GSW-3424M1-FUNCTION-MIB DEFINITIONS
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+register_mibs:
+    ctcuSystemStats: PRIVATETECH-GSW-3424M1-FUNCTION-MIB
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.4756.
