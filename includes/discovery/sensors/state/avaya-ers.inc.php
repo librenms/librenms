@@ -5,23 +5,7 @@
  * LibreNMS Fan and Power Supply state Discovery module for Avaya ERS
  */
 
-/*  s5ChasComOperState
- * other(1).........some other state
- * notAvail(2)......state not available
- * removed(3).......component removed
- * disabled(4)......operation disabled
- * normal(5)........normal operation
- * resetInProg(6)...reset in progress
- * testing(7).......doing a self test
- * warning(8).......operating at warning level
- * nonFatalErr(9)...operating at error level
- * fatalErr(10).....error stopped operation
- * notConfig(11)....module needs to be configured
- * obsoleted(12)...module is obsoleted but in the chassis
-*/
-
-if ($device['os'] == 'avaya-ers') {
-    //$fan = snmpwalk_cache_oid($device, 's5ChasComOperState.6', array(), 'S5-CHASSIS-MIB');
+if ($device['os'] === 'avaya-ers') {
     $oid = snmpwalk_cache_oid($device, 's5ChasComTable', array(), 'S5-CHASSIS-MIB');
     $cur_oid = '.1.3.6.1.4.1.45.1.6.3.3.1.1.10.';
 
@@ -62,18 +46,19 @@ if ($device['os'] == 'avaya-ers') {
         $sensors = array();
         foreach ($oid as $key => $value) {
             if ($key[s5ChasComGrpIndx] == 5 || $key[s5ChasComGrpIndx] == 6) {
-                $sensors[$key] = $value;
+                $ers_sensors[$key] = $value;
             }
         }
 
-        foreach ($sensors as $index => $entry) {
+        foreach ($ers_sensors as $index => $entry) {
             //Get unit number
             $unit_array = explode(".", $index);
             $unit = floor($unit_array[1]/10);
+            $descr = "Unit $unit: $entry[s5ChasComDescr]";
             //Discover Sensors
-            discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, "Unit $unit: $entry[s5ChasComDescr]", '1', '1', null, null, null, null, $entry[s5ChasComOperState]);
+            discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, "s5ChasComOperState.$index", $state_name, $descr, '1', '1', null, null, null, null, $entry[s5ChasComOperState]);
             //Create Sensor To State Index
-            create_sensor_to_state_index($device, $state_name, $index);
+            create_sensor_to_state_index($device, $state_name, "s5ChasComOperState.$index");
         }
     }
 }
