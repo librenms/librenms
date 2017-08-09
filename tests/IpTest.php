@@ -167,4 +167,11 @@ class IpTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('2001:db8:85a3:341a::370:7334/128', IP::parse('2001:db8:85a3:341a::370:7334')->getNetwork());
         $this->assertSame('2001:db8:85a3:341a::370:7334', IP::parse('2001:db8:85a3:341a::370:7334/128')->getNetworkAddress());
     }
+
+    public function testIpv62snmp()
+    {
+        $this->assertSame('32.1.8.120.224.0.130.226.134.161.0.0.0.0.0.0', ipv62snmp('2001:878:e000:82e2:86a1:0000:0000:0000'));
+        $this->assertSame('0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1', ipv62snmp('::1'));
+        $this->assertSame('32.1.8.120.0.0.224.0.0.130.0.226.0.136.0.161', ipv62snmp('2001:0878:0000:e000:0082:00e2:0088:00a1'));
+    }
 }
