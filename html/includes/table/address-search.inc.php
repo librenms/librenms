@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\IP;
+
 $param = array();
 
 if (is_admin() === false && is_read() === false) {
@@ -81,14 +83,12 @@ foreach (dbFetchRows($sql, $param) as $interface) {
     $speed = humanspeed($interface['ifSpeed']);
     $type  = humanmedia($interface['ifType']);
 
-    if ($_POST['search_type'] == 'ipv6') {
-        list($prefix, $length) = explode('/', $interface['ipv6_network']);
-        $address               = Net_IPv6::compress($interface['ipv6_address']).'/'.$length;
+    if ($_POST['search_type'] == 'mac') {
+        $address = (string)IP::parse($interface['ipv6_network'], true);
     } elseif ($_POST['search_type'] == 'mac') {
         $address = formatMac($interface['ifPhysAddress']);
     } else {
-        list($prefix, $length) = explode('/', $interface['ipv4_network']);
-        $address               = $interface['ipv4_address'].'/'.$length;
+        $address = (string)IP::parse($interface['ipv6_network'], true);
     }
 
     if ($interface['in_errors'] > 0 || $interface['out_errors'] > 0) {

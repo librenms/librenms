@@ -1,8 +1,8 @@
 <?php
 /**
- * linux.inc.php
+ * ees.inc.php
  *
- * LibreNMS pre-cache discovery module for Linux
+ * LibreNMS os polling module for Emerson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,11 @@
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <gh+n@laf.io>
+ * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-echo 'RaspberryPi ';
-$pre_cache['raspberry_pi_sensors'] = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121', array());
+$tmp_ees = snmp_get_multi($device, 'identControllerFirmwareVersion.0 identControllerSerialNumber.0', '-OQUs', 'EES-POWER-MIB');
+$version = $tmp_ees[0]['identControllerFirmwareVersion'];
+$serial  = $tmp_ees[0]['identControllerSerialNumber'];
+
+unset($tmp_ees);
