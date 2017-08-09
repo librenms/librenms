@@ -780,21 +780,15 @@ function snmp2ipv6($ipv6_snmp)
     return implode(':', $ipv6_2);
 }
 
-// FIXME port to LibreNMS\Util\IPv6 class
 function ipv62snmp($ipv6)
 {
     try {
-        $ipv6_ip = str_replace(':', '', IP::parse($ipv6)->compressed());
+        $ipv6 = IP::parse($ipv6)->uncompressed();
+        $ipv6_split = str_split(str_replace(':', '', $ipv6), 2);
+        return implode('.', array_map('hexdec', $ipv6_split));
     } catch (InvalidIpException $e) {
         return '';
     }
-
-    $ipv6_split = array();
-    for ($i = 0; $i < 32; $i+=2) {
-        $ipv6_split[] = hexdec(substr($ipv6_ip, $i, 2));
-    }
-
-    return implode('.', $ipv6_split);
 }
 
 function get_astext($asn)
