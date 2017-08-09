@@ -3,9 +3,9 @@ text: Emerson Energy System
 type: power
 icon: emerson
 over:
-    - { graph: sensor_current, text: 'Current' }
-    - { graph: sensor_voltage, text: 'Voltage' }
-    - { graph: sensor_state, text: 'State' }
+    - { graph: device_current, text: 'Current' }
+    - { graph: device_voltage, text: 'Voltage' }
+    - { graph: device_state, text: 'State' }
 mib_dir:
     - emerson
 discovery:
