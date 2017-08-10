@@ -43,7 +43,7 @@ if ($device['os'] === 'avaya-ers') {
         }
     
         // get fans (6) and temp (5) sensor only from walk
-        $sensors = array();
+        $ers_sensors = array();
         foreach ($oid as $key => $value) {
             if ($key[s5ChasComGrpIndx] == 5 || $key[s5ChasComGrpIndx] == 6) {
                 $ers_sensors[$key] = $value;
