@@ -33,11 +33,6 @@ $install_dir = realpath(__DIR__ . '/..');
 $config['install_dir'] = $install_dir;
 chdir($install_dir);
 
-if (!getenv('TRAVIS')) {
-    include_once 'Net/IPv4.php';
-    include_once 'Net/IPv6.php';
-}
-
 # composer autoload
 require $install_dir . '/vendor/autoload.php';
 if (version_compare(PHP_VERSION, '5.4', '>=')) {

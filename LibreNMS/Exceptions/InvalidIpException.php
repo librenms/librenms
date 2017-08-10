@@ -1,8 +1,8 @@
 <?php
 /**
- * linux.inc.php
+ * InvalidIpException.php
  *
- * LibreNMS pre-cache discovery module for Linux
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,12 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <gh+n@laf.io>
+ * @copyright  2017 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-echo 'RaspberryPi ';
-$pre_cache['raspberry_pi_sensors'] = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121', array());
+namespace LibreNMS\Exceptions;
+
+class InvalidIpException extends \Exception
+{
+}

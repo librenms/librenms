@@ -1,4 +1,7 @@
 <?php
+
+use LibreNMS\Util\IP;
+
 if ($config['enable_bgp']) {
     if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=0)) {
         $vrfs_lite_cisco = $device['vrf_lite_cisco'];
@@ -81,23 +84,9 @@ if ($config['enable_bgp']) {
                         $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerEntry', $jbgp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                         d_echo($j_bgp);
                         foreach ($j_bgp as $index => $entry) {
-                            switch ($entry['jnxBgpM2PeerRemoteAddrType']) {
-                                case 'ipv4':
-                                    $ip = long2ip(hexdec($entry['jnxBgpM2PeerRemoteAddr']));
-                                    d_echo("peerindex for ipv4 $ip is ".$entry['jnxBgpM2PeerIndex']."\n");
-                                    $j_peerIndexes[$ip] = $entry['jnxBgpM2PeerIndex'];
-                                    break;
-                                case 'ipv6':
-                                    $ip6 = trim(str_replace(' ', '', $entry['jnxBgpM2PeerRemoteAddr']), '"');
-                                    $ip6 = substr($ip6, 0, 4).':'.substr($ip6, 4, 4).':'.substr($ip6, 8, 4).':'.substr($ip6, 12, 4).':'.substr($ip6, 16, 4).':'.substr($ip6, 20, 4).':'.substr($ip6, 24, 4).':'.substr($ip6, 28, 4);
-                                    $ip6 = Net_IPv6::compress($ip6);
-                                    d_echo("peerindex for ipv6 $ip6 is ".$entry['jnxBgpM2PeerIndex']."\n");
-                                    $j_peerIndexes[$ip6] = $entry['jnxBgpM2PeerIndex'];
-                                    break;
-                                default:
-                                    echo "HALP? Don't know RemoteAddrType ".$entry['jnxBgpM2PeerRemoteAddrType']."!\n";
-                                    break;
-                            }
+                            $ip = IP::fromHexString($entry['jnxBgpM2PeerRemoteAddr'], true);
+                            d_echo("peerindex for '.$ip->getFamily().' $ip is ".$entry['jnxBgpM2PeerIndex']."\n");
+                            $j_peerIndexes[$ip] = $entry['jnxBgpM2PeerIndex'];
                         }
                     }
 
