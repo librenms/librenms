@@ -22,6 +22,10 @@ $oids = snmpwalk_cache_multi_oid($device, 'entPhySensorPrecision', $oids, 'ENTIT
 echo ' entPhySensorValue';
 $oids = snmpwalk_cache_multi_oid($device, 'entPhySensorValue', $oids, 'ENTITY-SENSOR-MIB');
 
+if ($device['os'] === 'arista_eos') {
+    require 'includes/discovery/sensors/misc/arista-eos-limits.inc.php';
+}
+
 $entitysensor['voltsDC']   = 'voltage';
 $entitysensor['voltsAC']   = 'voltage';
 $entitysensor['amperes']   = 'current';
@@ -106,7 +110,8 @@ if (is_array($oids)) {
             if ($type == 'temperature') {
                 if ($current > '200') {
                     $valid_sensor = false;
-                } $descr = preg_replace('/[T|t]emperature[|s]/', '', $descr);
+                }
+                $descr = preg_replace('/[T|t]emperature[|s]/', '', $descr);
             }
 
             if ($device['os'] == 'rittal-lcp') {
@@ -136,10 +141,30 @@ if (is_array($oids)) {
                     $current = round(10 * log10($entry['entPhySensorValue'] / 10000), 3);
                     $multiplier = 1;
                     $divisor = 1;
-                    discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, null, null, null, null, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity']);
-                } else {
-                    discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, null, null, null, null, $current);
                 }
+                $low_limit      = null;
+                $low_warn_limit = null;
+                $warn_limit     = null;
+                $high_limit     = null;
+                if ($device['os'] === 'arista_eos') {
+                    if ($entry['aristaEntSensorThresholdLowWarning'] != '-1000000000' &&
+                    $entry['aristaEntSensorThresholdLowWarning'] != '0') {
+                        $low_warn_limit = $entry['aristaEntSensorThresholdLowWarning'] / $divisor;
+                    }
+                    if ($entry['aristaEntSensorThresholdLowCritical'] != '-1000000000' &&
+                    $entry['aristaEntSensorThresholdLowCritical'] != '0') {
+                        $low_limit = $entry['aristaEntSensorThresholdLowCritical'] / $divisor;
+                    }
+                    if ($entry['aristaEntSensorThresholdHighWarning'] != '1000000000' &&
+                    $entry['aristaEntSensorThresholdHighWarning'] != '0') {
+                        $warn_limit = $entry['aristaEntSensorThresholdHighWarning'] / $divisor;
+                    }
+                    if ($entry['aristaEntSensorThresholdHighCritical'] != '1000000000' &&
+                    $entry['aristaEntSensorThresholdHighCritical'] != '0') {
+                        $high_limit = $entry['aristaEntSensorThresholdHighCritical'] / $divisor;
+                    }
+                }
+                discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity']);
             }
         }//end if
     }//end foreach
