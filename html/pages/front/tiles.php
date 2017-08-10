@@ -575,6 +575,9 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
     }
 
     function widget_reload(id,data_type) {
+        $(".bootgrid-table").bootgrid("destroy");
+        $("#widget_body_"+id+" *").off();
+        $("#widget_body_"+id).empty();
         if( $("#widget_body_"+id).parent().data('settings') == 1 ) {
             settings = 1;
         } else {
