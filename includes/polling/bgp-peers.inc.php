@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\IP;
 
 if ($config['enable_bgp']) {
     $peers = dbFetchRows('SELECT * FROM bgpPeers WHERE device_id = ?', array($device['device_id']));
@@ -74,7 +75,7 @@ if ($config['enable_bgp']) {
                                     $v = preg_replace('/(\S+\s+\S+)\s/', '$1:', $v);
                                     $v = strtolower($v);
                                 } else {
-                                    $v = hex_to_ip($v);
+                                    $v = IP::fromHexString($v, true);
                                 }
                             }
 
@@ -99,7 +100,7 @@ if ($config['enable_bgp']) {
                             $octets = count(explode(".", $peer_ip_snmp));
                             if ($octets > 11) {
                                 // ipv6
-                                $tmp_peer_ip = Net_IPv6::compress(snmp2ipv6(implode('.', array_slice(explode('.', $peer_ip_snmp), (count(explode('.', $peer_ip_snmp)) - 16)))));
+                                $tmp_peer_ip = (string)IP::parse(snmp2ipv6(implode('.', array_slice(explode('.', $peer_ip_snmp), (count(explode('.', $peer_ip_snmp)) - 16)))), true);
                             } else {
                                 // ipv4
                                 $tmp_peer_ip = implode('.', array_slice(explode('.', $peer_ip_snmp), (count(explode('.', $peer_ip_snmp)) - 4)));
@@ -130,13 +131,9 @@ if ($config['enable_bgp']) {
                     $bgpPeerOutTotalMessages = $peer_data_tmp[$junos[$peer_ip]['hash']]['jnxBgpM2PeerOutTotalMessages'];
                     $bgpPeerFsmEstablishedTime = $peer_data_tmp[$junos[$peer_ip]['hash']]['jnxBgpM2PeerFsmEstablishedTime'];
                     $bgpPeerInUpdateElapsedTime = $peer_data_tmp[$junos[$peer_ip]['hash']]['jnxBgpM2PeerInUpdatesElapsedTime'];
-                    if ($peer_data_tmp[$junos[$peer_ip]['hash']]['jnxBgpM2PeerRemoteAddrType'] == 'ipv4') {
-                        $bgpLocalAddr = long2ip(hexdec($peer_data_tmp[$junos[$peer_ip]['hash']]['jnxBgpM2PeerLocalAddr']));
-                    } elseif ($peer_data_tmp[$junos[$peer_ip]['hash']]['jnxBgpM2PeerRemoteAddrType'] == 'ipv6') {
-                        $ip6 = trim(str_replace(' ', '', $peer_data_tmp[$junos[$peer_ip]['hash']]['jnxBgpM2PeerLocalAddr']), '"');
-                        $ip6 = substr($ip6, 0, 4).':'.substr($ip6, 4, 4).':'.substr($ip6, 8, 4).':'.substr($ip6, 12, 4).':'.substr($ip6, 16, 4).':'.substr($ip6, 20, 4).':'.substr($ip6, 24, 4).':'.substr($ip6, 28, 4);
-                        $bgpLocalAddr = Net_IPv6::compress($ip6);
-                    }
+
+                    $bgpLocalAddr = IP::fromHexString($peer_data_tmp[$junos[$peer_ip]['hash']]['jnxBgpM2PeerLocalAddr'], true);
+
                     d_echo("State = $bgpPeerState - AdminStatus: $bgpPeerAdminStatus\n");
 
                     if ($bgpLocalAddr == '00000000000000000000000000000000') {
@@ -286,7 +283,7 @@ if ($config['enable_bgp']) {
                             $j_prefixes = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PrefixOutPrefixes', $j_prefixes, 'BGP4-V2-MIB-JUNIPER', 'junos', '-OQnU');
                             d_echo($j_prefixes);
                         }
-                        
+
                         $cbgpPeerAcceptedPrefixes   = array_shift($j_prefixes['1.3.6.1.4.1.2636.5.1.1.2.6.2.1.8.'.$junos[$peer_ip]['index'].".$afis[$afi].".$safis[$safi]]);
                         $cbgpPeerDeniedPrefixes     = array_shift($j_prefixes['1.3.6.1.4.1.2636.5.1.1.2.6.2.1.9.'.$junos[$peer_ip]['index'].".$afis[$afi].".$safis[$safi]]);
                         $cbgpPeerAdvertisedPrefixes = array_shift($j_prefixes['1.3.6.1.4.1.2636.5.1.1.2.6.2.1.10.'.$junos[$peer_ip]['index'].".$afis[$afi].".$safis[$safi]]);

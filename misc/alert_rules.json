@@ -109,11 +109,19 @@
   },
   
   {
-    "rule": "Service warning",
-    "name": "%services.service_status = \"1\""
+    "rule": "%services.service_status = \"1\"",
+    "name": "Service warning"
   },
   {
-    "rule": "Service critical",
-    "name": "%services.service_status = \"2\""
+    "rule": "%services.service_status = \"2\"",
+    "name": "Service critical"
+  },
+  {
+    "rule": "%sensors.sensor_current > %sensors.sensor_limit && %sensors.sensor_alert = \"1\" && %macros.device_up = \"1\" && %macros.sensor_port_link = \"1\"",
+    "name": "Sensor over limit with linked port"
+  },
+  {
+    "rule": "%sensors.sensor_current < %sensors.sensor_limit_low && %sensors.sensor_alert = \"1\" && %macros.device_up = \"1\" && %macros.sensor_port_link = \"1\"",
+    "name": "Sensor under limit with linked port"
   }
 ]

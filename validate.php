@@ -136,13 +136,6 @@ if (!($username === 'root' || (isset($config['user']) && $username === $config['
     print_fail('You need to run this script as root' . (isset($config['user']) ? ' or '.$config['user'] : ''));
 }
 
-if (class_exists('Net_IPv4') === false) {
-    print_fail("It doesn't look like Net_IPv4 is installed");
-}
-if (class_exists('Net_IPv6') === false) {
-    print_fail("It doesn't look like Net_IPv6 is installed");
-}
-
 // Let's test the user configured if we have it
 if (isset($config['user'])) {
     $tmp_user = $config['user'];

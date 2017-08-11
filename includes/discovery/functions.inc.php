@@ -13,6 +13,8 @@
  */
 
 use LibreNMS\Exceptions\HostExistsException;
+use LibreNMS\Util\IP;
+use LibreNMS\Util\IPv6;
 
 function discover_new_device($hostname, $device = '', $method = '', $interface = '')
 {
@@ -734,13 +736,14 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
 {
     global $device;
 
-    $ipv6_network = Net_IPv6::getNetmask("$ipv6_address/$ipv6_prefixlen") . '/' . $ipv6_prefixlen;
-    $ipv6_compressed = Net_IPv6::compress($ipv6_address);
-
-    if (Net_IPv6::getAddressType($ipv6_address) == NET_IPV6_LOCAL_LINK) {
+    if (!IPv6::isValid($ipv6_address, true)) {
         // ignore link-locals (coming from IPV6-MIB)
         return;
     }
+
+    $ipv6 = new IPv6($ipv6_address);
+    $ipv6_network = $ipv6->getNetwork($ipv6_prefixlen);
+    $ipv6_compressed = $ipv6->compressed();
 
     if (dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifIndex` = ?', array($device['device_id'], $ifIndex)) != '0' && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1') {
         $port_id = dbFetchCell('SELECT port_id FROM `ports` WHERE device_id = ? AND ifIndex = ?', array($device['device_id'], $ifIndex));
@@ -1075,7 +1078,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
             $tmp_name = $data['oid'];
             $raw_data = $pre_cache[$tmp_name];
             foreach ($raw_data as $index => $snmp_data) {
-                $value = is_numeric($snmp_data[$data['value']]) ? $snmp_data[$data['value']] : ($snmp_data[$data['oid']] ?: false);
+                $value = is_numeric($snmp_data[$data['value']]) ? $snmp_data[$data['value']] : (is_numeric($snmp_data[$data['oid']]) ? $snmp_data[$data['oid']]: false);
                 if (can_skip_sensor($value, $data, $sensor_options) === false && is_numeric($value)) {
                     $oid = $data['num_oid'] . $index;
                     if (isset($snmp_data[$data['descr']])) {
@@ -1181,7 +1184,7 @@ function build_bgp_peers($device, $data, $peer2)
             $octets = count(explode(".", $peer_ip));
             if ($octets > 11) {
                 // ipv6
-                $peer_ip = Net_IPv6::compress(snmp2ipv6(implode('.', array_slice(explode('.', $peer_ip), (count(explode('.', $peer_ip)) - 16)))));
+                $peer_ip = (string)IP::parse(snmp2ipv6(implode('.', array_slice(explode('.', $peer_ip), (count(explode('.', $peer_ip)) - 16)))), true);
             } else {
                 // ipv4
                 $peer_ip = implode('.', array_slice(explode('.', $peer_ip), (count(explode('.', $peer_ip)) - 4)));
