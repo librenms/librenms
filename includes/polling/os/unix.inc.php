@@ -51,9 +51,15 @@ if ($device['os'] == "linux" || $device['os'] == "endian") {
     if (empty($hw)) {
     # Try detect using the extended option (dmidecode)
         $version_dmide = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.2.4.1.2.8.104.97.114.100.119.97.114.101.1", "-Oqv"));
+        if (!$version_dmide) { # No "extend" support, try "exec" support
+            $version_dmide = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.2.101.1", "-Oqv"));
+        }
         $version_dmide = trim(str_replace("\"", "", $version_dmide));
 
         $hardware_dmide = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.3.4.1.2.12.109.97.110.117.102.97.99.116.117.114.101.114.1", "-Oqv"));
+        if (!$hardware_dmide) { # No "extend" support, try "exec" support
+            $hardware_dmide = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.3.101.1", "-Oqv"));
+        }
         $hardware_dmide = trim(str_replace("\"", "", $hardware_dmide));
         if ($hardware_dmide) {
             $hardware = $hardware_dmide;
