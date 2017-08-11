@@ -23,6 +23,6 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-if ($sensor_config['geist_temp_unit'] === 0) {
+if ($sensor_config['geist_temp_unit'] == 0) {
     $sensor_value = conv_fahrenheit($sensor_value);
 }
