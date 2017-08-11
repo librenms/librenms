@@ -12,6 +12,7 @@ if ($_SESSION['widescreen']) {
     }
 
     $periods = array(
+	'onehour',
         'sixhour',
         'day',
         'week',
