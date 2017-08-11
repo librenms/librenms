@@ -1416,3 +1416,16 @@ function apc_relay_state($state)
             break;
     }
 }
+
+/**
+ * @param $value
+ * @return mixed
+ */
+function return_number($value)
+{
+    preg_match('/[\d\.\-]+/', $value, $temp_response);
+    if (!empty($temp_response[0])) {
+        $value = $temp_response[0];
+    }
+    return $value;
+}
