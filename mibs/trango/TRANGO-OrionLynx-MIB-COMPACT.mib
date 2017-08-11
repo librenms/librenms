@@ -1,0 +1,618 @@
+GIGA-PLUS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	OBJECT-IDENTITY,
+        IpAddress,
+        Unsigned32,
+        Counter64,
+	NOTIFICATION-TYPE,
+	enterprises
+		FROM SNMPv2-SMI
+	MODULE-COMPLIANCE
+		FROM SNMPv2-CONF
+        DisplayString
+                FROM SNMPv2-TC;
+	
+-- *******************************************************************
+-- * Trango module
+-- *******************************************************************
+trango		OBJECT IDENTIFIER ::= { enterprises 5454 }
+tbw 		OBJECT IDENTIFIER ::= { trango 1 }
+ptp		OBJECT IDENTIFIER ::= { tbw 80 }
+
+sys		OBJECT IDENTIFIER ::= { ptp 1 }
+modem		OBJECT IDENTIFIER ::= { ptp 2 }
+rf		OBJECT IDENTIFIER ::= { ptp 3 }
+gige		OBJECT IDENTIFIER ::= { ptp 4 }
+tdm		OBJECT IDENTIFIER ::= { ptp 5 }
+trangotrap	OBJECT IDENTIFIER ::= { ptp 6 }
+
+-- *******************************************************************
+-- ** System Information ** trango.tbw.ptp.sys
+-- *******************************************************************
+
+community       		OBJECT IDENTIFIER ::= { sys 8 }
+
+sysSNMPReadCommStr  		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(1..32))
+    	MAX-ACCESS  		read-write
+    	STATUS      		current
+    	DESCRIPTION 		"SNMP agent read community string"
+    	::= { community 1 }
+
+sysSNMPWriteCommStr 		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(1..32))
+    	MAX-ACCESS  		read-write
+    	STATUS      		current
+    	DESCRIPTION 		"SNMP agent Write community string"
+    	::= { community 2 }
+
+sysSNMPTrapCommStr 		OBJECT-TYPE
+    	SYNTAX      		DisplayString (SIZE(1..32))
+    	MAX-ACCESS  		read-write
+    	STATUS      		current
+    	DESCRIPTION 		"SNMP trap community string"
+    	::= { community 3 }
+
+sysIDUTemp              	OBJECT-TYPE
+    	SYNTAX              	INTEGER
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION         	"PIC's current temperatur reading in Celsius"
+    	::= { sys 19 }
+
+sysVoltage                      OBJECT-TYPE
+        SYNTAX                  Opaque
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display system voltage"
+        ::= { sys 44 }
+
+sysUptime                       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..100))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display system uptime"
+        ::= { sys 45 }	
+
+sysVoltage12                    OBJECT-TYPE
+        SYNTAX                  Opaque
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display power input(1.2V) "
+        ::= { sys 49 }
+
+sysVoltage25                    OBJECT-TYPE
+        SYNTAX                  Opaque
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display power input(2.5V)"
+        ::= { sys 50 }
+
+sysVoltage33                    OBJECT-TYPE
+        SYNTAX                  Opaque
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display power input(3.3V)"
+        ::= { sys 51 }
+
+acm             		OBJECT IDENTIFIER ::= { modem 3  }
+
+profile_x			OBJECT IDENTIFIER ::= { acm 5}
+
+modemACMTxProfile		        OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ACM transmitter profile"
+        ::= { profile_x 1 }
+
+modemACM256RxProfile            OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ACM receiver profile"
+        ::= { profile_x 2 }
+
+link             		OBJECT IDENTIFIER ::= { modem 4  }
+
+link_ber			OBJECT IDENTIFIER ::= { link 1 }
+
+modemBER      			OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Set/Display BER value"
+        ::= { link_ber 1 }
+
+modemBERStr      			OBJECT-TYPE
+        SYNTAX          	DisplayString (SIZE(0..80))
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display BER value string"
+        ::= { link_ber 2 }
+
+mse             		OBJECT IDENTIFIER ::= { link 2  }
+
+modemMSE      			OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display MSE value"
+        ::= { mse 1 }
+
+modemMSEInt      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display MSE value"
+        ::= { mse 2 }
+
+lock             		OBJECT IDENTIFIER ::= { modem 5  }
+
+modemLockStatus      		OBJECT-TYPE
+        SYNTAX          	INTEGER { nolock(0), lock(1), NA(2) }
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Set/Display link lock statsu"
+        ::= { lock 1 }
+
+debug             		OBJECT IDENTIFIER ::= { modem 6  }
+
+modemLDPCStressDecoder      	OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display LDPC Stress Decoder"
+        ::= { debug 1 }
+
+hc                              OBJECT IDENTIFIER ::= { modem 8  }
+
+modemHCNetComp                  OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display HC net compression"
+        ::= { hc 4 }
+
+modemHCGrossComp                OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display HC gross compression"
+        ::= { hc 5 }
+
+modemTxCapacity                 OBJECT-TYPE
+        SYNTAX                  OPAQUE(Float)
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display transmitter capacity"
+        ::= { modem 10 }
+
+modemSpeedCurrent               OBJECT-TYPE
+        SYNTAX                  OPAQUE(Float)
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display current speed"
+        ::= { modem 11 }
+
+power             		OBJECT IDENTIFIER ::= { rf 4  }
+
+rfPower      			OBJECT-TYPE
+        SYNTAX          	Opaque
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display TX power.  SNMPc does not support
+				setting and displaying float value."
+        ::= { power 1 }
+
+rfPowerInt      		OBJECT-TYPE
+        SYNTAX          	INTEGER
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display TX power 1/10 dB in step size "
+        ::= { power 2 }
+
+rssi             		OBJECT IDENTIFIER ::= { rf 14  }
+
+rfRSSIInt      			OBJECT-TYPE
+    	SYNTAX              	INTEGER
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display current RSSI value  "
+        ::= { rssi 2 }
+
+pll             		OBJECT IDENTIFIER ::= { rf 15  }
+
+rfODUIFpll      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { nolock(0), lock(1), NA(2) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Display current status of ODU IF PLL  "
+        ::= { pll 2 }
+
+rfODUTxpll      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { nolock(0), lock(1), NA(2) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Display current status of ODU TX PLL  "
+        ::= { pll 3 }
+
+rfODURxpll      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { nolock(0), lock(1), NA(2) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Display current status of ODU RX PLL  "
+        ::= { pll 4 }
+
+rfIDUTxpll      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { nolock(0), lock(1), NA(2) }
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Display current status of IDU TX PLL  "
+        ::= { pll 5 }
+
+eth1             		OBJECT IDENTIFIER ::= { gige 1  }
+
+config1             		OBJECT IDENTIFIER ::= { eth1 1  }
+
+gigeEth1Speed      		OBJECT-TYPE
+        SYNTAX          	INTEGER 
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display speed setting for ETH 1"
+        ::= { config1 7 }
+
+gigeEth1Status      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Set/Display port status for ETH 1"
+        ::= { config1 8 }
+
+counter1             		OBJECT IDENTIFIER ::= { eth1 2  }
+
+gigeEth1InTotalPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 IN non-unicast packet counter"
+        ::= { counter1 4 }
+
+gigeEth1OutTotalPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 OUT total packet counter"
+        ::= { counter1 8 }
+
+gigeEth1CRCError      		OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 CRC error counter"
+        ::= { counter1 9 }
+
+gigeEth1CollisionError      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 Collision error counter"
+        ::= { counter1 10 }
+
+gigeEth1InPortRate      	OBJECT-TYPE
+        SYNTAX          	Integer 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 In Port Rate"
+        ::= { counter1 11 }
+
+gigeEth1InPortUtil      	OBJECT-TYPE
+        SYNTAX          	Integer 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 In Port utilization"
+        ::= { counter1 12 }
+
+gigeEth1OutPortRate      	OBJECT-TYPE
+        SYNTAX          	Integer 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 Out Port Rate"
+        ::= { counter1 13 }
+
+gigeEth1OutPortUtil      	OBJECT-TYPE
+        SYNTAX          	Integer 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH1 Out Port utilization"
+        ::= { counter1 14 }
+
+gigeEth1InDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth1 In Discard"
+        ::= { counter1 15 }
+
+gigeEth1OutDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth1 Out Discard"
+        ::= { counter1 16 }
+
+eth2             		OBJECT IDENTIFIER ::= { gige 2  }
+
+config2             		OBJECT IDENTIFIER ::= { eth2 1  }
+
+gigeEth2Speed      		OBJECT-TYPE
+        SYNTAX          	INTEGER 
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display speed setting for ETH 2"
+        ::= { config2 7 }
+
+gigeEth2Status      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Set/Display port status for ETH 2"
+        ::= { config2 8 }
+
+counter2             		OBJECT IDENTIFIER ::= { eth2 2  }
+
+gigeEth2InTotalPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH2 IN non-unicast packet counter"
+        ::= { counter2 4 }
+
+gigeEth2OutTotalPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH2 OUT total packet counter"
+        ::= { counter2 8 }
+
+gigeEth2CRCError      		OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH2 CRC error counter"
+        ::= { counter2 9 }
+
+gigeEth2CollisionError      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH2 Collision error counter"
+        ::= { counter2 10 }
+
+gigeEth2InPortRate              OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ETH2 In Port Rate"
+        ::= { counter2 11 }
+
+gigeEth2InPortUtil              OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ETH2 In Port utilization"
+        ::= { counter2 12 }
+
+gigeEth2OutPortRate             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ETH2 Out Port Rate"
+        ::= { counter2 13 }
+
+gigeEth2OutPortUtil             OBJECT-TYPE
+        SYNTAX                  Integer 
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ETH2 Out Port utilization"
+        ::= { counter2 14 }
+
+gigeEth2InDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth2 In Discard"
+        ::= { counter2 15 }
+
+gigeEth2OutDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth2 Out Discard"
+        ::= { counter2 16 }
+
+eth3             		OBJECT IDENTIFIER ::= { gige 3  }
+
+config3             		OBJECT IDENTIFIER ::= { eth3 1  }
+
+gigeEth3Speed      		OBJECT-TYPE
+        SYNTAX          	INTEGER 
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display speed setting for ETH 3"
+        ::= { config3 7 }
+
+gigeEth3Status      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Set/Display port status for ETH 3"
+        ::= { config3 8 }
+
+counter3             		OBJECT IDENTIFIER ::= { eth3 2  }
+
+gigeEth3InTotalPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH3 IN non-unicast packet counter"
+        ::= { counter3 4 }
+
+gigeEth3OutTotalPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH3 OUT total packet counter"
+        ::= { counter3 8 }
+
+gigeEth3CRCError      		OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH3 CRC error counter"
+        ::= { counter3 9 }
+
+gigeEth3CollisionError      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH3 Collision error counter"
+        ::= { counter3 10 }
+
+gigeEth3InPortRate              OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ETH3 In Port Rate"
+        ::= { counter3 11 }
+
+gigeEth3InPortUtil              OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ETH3 In Port utilization"
+        ::= { counter3 12 }
+
+gigeEth3OutPortRate             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ETH3 Out Port Rate"
+        ::= { counter3 13 }
+
+gigeEth3OutPortUtil             OBJECT-TYPE
+        SYNTAX                  Integer 
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ETH3 Out Port utilization"
+        ::= { counter3 14 }
+
+gigeEth3InDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth3 In Discard"
+        ::= { counter3 15 }
+
+gigeEth3OutDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth3 Out Discard"
+        ::= { counter3 16 }
+
+eth4             		OBJECT IDENTIFIER ::= { gige 4  }
+
+config4             		OBJECT IDENTIFIER ::= { eth4 1  }
+
+gigeEth4Speed      		OBJECT-TYPE
+        SYNTAX          	INTEGER 
+        MAX-ACCESS      	read-write
+        STATUS          	current
+        DESCRIPTION     	"Set/Display speed setting for ETH 4"
+        ::= { config4 7 }
+
+gigeEth4Status      		OBJECT-TYPE
+    	SYNTAX              	INTEGER { off(0), on(1) }
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Set/Display port status for ETH 4"
+        ::= { config4 8 }
+
+counter4             		OBJECT IDENTIFIER ::= { eth4 2  }
+
+gigeEth4InTotalPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH3 IN non-unicast packet counter"
+        ::= { counter4 4 }
+
+gigeEth4OutTotalPackets      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH3 OUT total packet counter"
+        ::= { counter4 8 }
+
+gigeEth4CRCError      		OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH3 CRC error counter"
+        ::= { counter4 9 }
+
+gigeEth4CollisionError      	OBJECT-TYPE
+        SYNTAX          	Counter32 
+        MAX-ACCESS      	read-only
+        STATUS          	current
+        DESCRIPTION     	"Display ETH3 Collision error counter"
+        ::= { counter4 10 }
+
+gigeEth4InPortRate              OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ETH3 In Port Rate"
+        ::= { counter4 11 }
+
+gigeEth4InPortUtil              OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display ETH3 In Port utilization"
+        ::= { counter4 12 }
+
+gigeEth4OutPortRate             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth4 Out Port Rate"
+        ::= { counter4 13 }
+
+gigeEth4OutPortUtil             OBJECT-TYPE
+        SYNTAX                  Integer 
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth4 Out Port utilization"
+        ::= { counter4 14 }
+
+gigeEth4InDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth4 In Discard"
+        ::= { counter4 15 }
+
+gigeEth4OutDiscard             OBJECT-TYPE
+        SYNTAX                  Integer
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "Display Eth4 Out Discard"
+        ::= { counter4 16 }
+
+END
+
