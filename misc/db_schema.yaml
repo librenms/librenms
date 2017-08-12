@@ -416,6 +416,7 @@ devices:
     override_sysLocation: { Field: override_sysLocation, Type: tinyint(1), 'Null': true, Default: '0', Extra: '' }
     poller_group: { Field: poller_group, Type: int(11), 'Null': false, Default: '0', Extra: '' }
     port: { Field: port, Type: 'smallint(5) unsigned', 'Null': false, Default: '161', Extra: '' }
+    context_name: { Field: context_name, Type: varchar(64), 'Null': true, Default: null, Extra: '' }
     port_association_mode: { Field: port_association_mode, Type: int(11), 'Null': false, Default: '1', Extra: '' }
     purpose: { Field: purpose, Type: text, 'Null': true, Default: null, Extra: '' }
     retries: { Field: retries, Type: int(11), 'Null': true, Default: null, Extra: '' }
