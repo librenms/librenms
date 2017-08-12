@@ -1075,7 +1075,7 @@ ports:
     ifPhysAddress: { Field: ifPhysAddress, Type: text, 'Null': true, Default: null, Extra: '' }
     ifPromiscuousMode: { Field: ifPromiscuousMode, Type: varchar(12), 'Null': true, Default: null, Extra: '' }
     ifSpeed: { Field: ifSpeed, Type: bigint(20), 'Null': true, Default: null, Extra: '' }
-    ifTrunk: { Field: ifTrunk, Type: varchar(8), 'Null': true, Default: '', Extra: '' }
+    ifTrunk: { Field: ifTrunk, Type: varchar(16), 'Null': true, Default: null, Extra: '' }
     ifType: { Field: ifType, Type: text, 'Null': true, Default: null, Extra: '' }
     ifVlan: { Field: ifVlan, Type: varchar(8), 'Null': false, Default: '', Extra: '' }
     ifVrf: { Field: ifVrf, Type: int(11), 'Null': false, Default: '0', Extra: '' }
