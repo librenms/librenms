@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\IP;
+
 $link_array = array(
     'page'   => 'device',
     'device' => $device['device_id'],
@@ -191,9 +193,8 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
 
     unset($sep);
 
-    if (filter_var($peer['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
-        $peer['bgpPeerIdentifier'] = Net_IPv6::compress($peer['bgpPeerIdentifier']);
-    }
+    // make ipv6 look pretty
+    $peer['bgpPeerIdentifier'] = (string)IP::parse($peer['bgpPeerIdentifier'], true);
 
     // display overlib graphs
     $graph_array                = array();
