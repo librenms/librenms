@@ -2,7 +2,7 @@ source: Alerting/Templates.md
 
 # <a name="templates">Templates</a>
 
-Templates can be assigned to a single or a group of rules and can contain any kind of text.
+Templates can be assigned to a single or a group of rules and can contain any kind of text. There is also a default template which is used for any rule that isn't associated with a template. This template can be found under `Alert Templates` page and can be edited. It also has an option revert it back to its default content. 
 
 The template-parser understands `if` and `foreach` controls and replaces certain placeholders with information gathered about the alert.
 
@@ -100,7 +100,7 @@ Note the use of double-quotes.  Single quotes (`'`) in templates will be escaped
 We include a few templates for you to use, these are specific to the type of alert rules you are creating. For example if you create a rule that would alert on BGP sessions then you can 
 assign the BGP template to this rule to provide more information.
 
-The included templates are:
+The included templates apart from the default template are:
 
   - BGP Sessions
   - Ports
