@@ -63,11 +63,14 @@ class YamlTest extends \PHPUnit_Framework_TestCase
             }
 
             foreach ($data['modules'] as $module => $sub_modules) {
-                foreach ($sub_modules as $sub_module) {
+                foreach ($sub_modules as $type => $sub_module) {
                     foreach ($sub_module['data'] as $sensor) {
                         $this->assertArrayHasKey('oid', $sensor, $file);
-                        $this->assertArrayHasKey('num_oid', $sensor, $file);
-                        $this->assertArrayHasKey('descr', $sensor, $file);
+                        if ($type !== 'pre-cache') {
+                            $this->assertArrayHasKey('oid', $sensor, $file);
+                            $this->assertArrayHasKey('num_oid', $sensor, $file);
+                            $this->assertArrayHasKey('descr', $sensor, $file);
+                        }
                     }
                 }
             }
