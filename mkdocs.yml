@@ -51,16 +51,14 @@ pages:
     - Extensions/Email-Alerting.md
     - Extensions/Globe-Frontpage.md
     - Extensions/Graylog.md
-    - Extensions/Graphite.md
     - Extensions/IRC-Bot.md
     - Extensions/IRC-Bot-Extensions.md
-    - Extensions/InfluxDB.md
     - Extensions/Interface-Description-Parsing.md
     - Extensions/MIB-based-polling.md
     - Extensions/Memcached.md
+    - Extensions/Metric-Storage.md
     - Extensions/Network-Map.md
     - Extensions/NFSen.md
-    - Extensions/OpenTSDB.md
     - Extensions/Oxidized.md
     - Extensions/PeeringDB.md
     - Extensions/Plugin-System.md
@@ -105,25 +103,28 @@ pages:
     - Developing/Merging-Pull-Requests.md
     - Developing/Creating-Release.md
 - hidden:
-    - Ubuntu 14.04 (Nginx): Installation/Installation-Ubuntu-1404-Nginx.md
-    - Ubuntu 14.04 (Apache): Installation/Installation-Ubuntu-1404-Apache.md
-    - Ubuntu 14.04 (Lighttpd): Installation/Installation-Ubuntu-1404-Lighttpd.md
-    - CentOS 6 (Apache/Nginx): Installation/Installation-CentOS-6-Apache-Nginx.md
-    - Installation/Installation-(Debian-Ubuntu).md
-    - Installation/Installation-(RHEL-CentOS).md
-    - Support/Support-New-OS.md
-    - Extensions/Agent-Setup.md
-    - Extensions/RRDCached-Security.md
-    - Developing/os/Initial-Detection.md
-    - Developing/os/Mem-CPU-Information.md
-    - Developing/os/Test-Units.md
-    - Developing/os/Health-Information.md
-    - Developing/os/Wireless-Sensors.md
-    - Developing/os/Custom-Graphs.md
-    - Extensions/Alerting.md
     - Alerting/Rules.md
     - Alerting/Templates.md
     - Alerting/Transports.md
     - Alerting/Entities.md
     - Alerting/Macros.md
     - Alerting/Rules.md
+    - Developing/os/Initial-Detection.md
+    - Developing/os/Mem-CPU-Information.md
+    - Developing/os/Test-Units.md
+    - Developing/os/Health-Information.md
+    - Developing/os/Wireless-Sensors.md
+    - Developing/os/Custom-Graphs.md
+    - Extensions/Agent-Setup.md
+    - Extensions/Alerting.md
+    - Extensions/metrics/InfluxDB.md
+    - Extensions/metrics/Graphite.md
+    - Extensions/metrics/OpenTSDB.md
+    - Extensions/RRDCached-Security.md
+    - Installation/Installation-Ubuntu-1404-Nginx.md
+    - Installation/Installation-Ubuntu-1404-Apache.md
+    - Installation/Installation-Ubuntu-1404-Lighttpd.md
+    - Installation/Installation-CentOS-6-Apache-Nginx.md
+    - Installation/Installation-(Debian-Ubuntu).md
+    - Installation/Installation-(RHEL-CentOS).md
+    - Support/Support-New-OS.md
