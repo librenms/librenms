@@ -71,10 +71,8 @@ if (is_admin() !== false) {
         </div>
 
         <div class="form-group">
-                <label for='rule-glue' class='col-sm-3 control-label'>Connection: </label>
-                <div class="col-sm-5">
-                        <button class="btn btn-default btn-sm btn-warning" type="submit" name="rule-glue" value="&&" id="and" name="and">And</button>
-                        <button class="btn btn-default btn-sm btn-warning" type="submit" name="rule-glue" value="||" id="or" name="or">Or</button>
+                <div class="col-sm-offset-3 col-sm-5">
+                        <button class="btn btn-default btn-sm btn-warning" type="submit" name="rule-glue" value="&&" id="and" name="and">Add</button>
                         <span id="next-step-and"></span>
                 </div>
         </div>
@@ -347,7 +345,7 @@ $('#map-stub').typeahead({
     }
 });
 
-$('#and, #or').click('', function(e) {
+$('#and').click('', function(e) {
     e.preventDefault();
     $("#next-step-and").html("");
     var entity = $('#suggest').val();
@@ -408,7 +406,7 @@ $( "#suggest, #value" ).blur(function() {
     } else {
         $("#suggest").closest('.form-group').removeClass('has-error');
         $("#value").closest('.form-group').removeClass('has-error');
-        $("#next-step-and").html('<i class="fa fa-long-arrow-left fa-col-danger"></i> Click AND / OR');
+        $("#next-step-and").html('<i class="fa fa-long-arrow-left fa-col-danger"></i> Click Add');
     }
 });
 
