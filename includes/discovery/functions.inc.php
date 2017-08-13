@@ -1077,6 +1077,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
         foreach ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['data'] as $data) {
             $tmp_name = $data['oid'];
             $raw_data = $pre_cache[$tmp_name];
+            $cached_data = $pre_cache['__cached'] ?: array();
             foreach ($raw_data as $index => $snmp_data) {
                 $value = is_numeric($snmp_data[$data['value']]) ? $snmp_data[$data['value']] : (is_numeric($snmp_data[$data['oid']]) ? $snmp_data[$data['oid']]: false);
                 if (can_skip_sensor($value, $data, $sensor_options) === false && is_numeric($value)) {
@@ -1085,10 +1086,16 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         $descr = $snmp_data[$data['descr']];
                     } else {
                         $descr = str_replace('{{ $index }}', $index, $data['descr']);
-                        preg_match('/(\{\{ \$)([a-zA-Z0-9]+)( \}\})/', $descr, $tmp_var);
-                        $tmp_var = $tmp_var[2];
-                        if ($snmp_data[$tmp_var]) {
-                            $descr = str_replace("{{ \$$tmp_var }}", $snmp_data[$tmp_var], $descr);
+                        preg_match_all('/({{ [\$a-zA-Z0-9]+ }})/', $descr, $tmp_var, PREG_PATTERN_ORDER);
+                        $tmp_vars = $tmp_var[0];
+                        foreach ($tmp_vars as $k => $tmp_var) {
+                            $tmp_var = preg_replace('/({{ | }}|\$)/', '', $tmp_var);
+                            if ($snmp_data[$tmp_var]) {
+                                $descr = str_replace("{{ \$$tmp_var }}", $snmp_data[$tmp_var], $descr);
+                            }
+                            if ($cached_data[$index][$tmp_var]) {
+                                $descr = str_replace("{{ \$$tmp_var }}", $cached_data[$index][$tmp_var], $descr);
+                            }
                         }
                     }
                     $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
