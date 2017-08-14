@@ -2,6 +2,14 @@
 
 if (starts_with($poll_device['sysObjectID'], 'enterprises.259.6.')) {
     $tmp_mib = 'ES3528MO-MIB';
+} elseif (starts_with($poll_device['sysObjectID'], 'enterprises.259.10.1.22.')) {
+    $tmp_mib = 'ES3528MV2-MIB';
+} elseif (starts_with($poll_device['sysObjectID'], 'enterprises.259.10.1.24.')) {
+    $tmp_mib = 'ECS4510-MIB';
+} elseif (starts_with($poll_device['sysObjectID'], 'enterprises.259.10.1.42.')) {
+    $tmp_mib = 'ECS4210-MIB';
+} elseif (starts_with($poll_device['sysObjectID'], 'enterprises.259.10.1.27.')) {
+    $tmp_mib = 'ECS3510-MIB';
 } elseif (starts_with($poll_device['sysObjectID'], 'enterprises.259.10.')) {
     $tmp_mib = 'ECS4120-MIB';
 }
