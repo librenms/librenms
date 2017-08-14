@@ -1,8 +1,8 @@
 # /etc/systemd/system/librenms-irc.service 
 
-librenms-irc.service
 [Unit]
 Description=Librenms IRC bot
+After=network.target
 
 [Service]
 ExecStart=/opt/librenms/irc.php
