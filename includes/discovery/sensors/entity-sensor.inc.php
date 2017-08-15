@@ -150,21 +150,19 @@ if (is_array($oids)) {
                 if ($device['os'] === 'arista_eos' && $entry['aristaEntSensorStatusDescr'] != 'No thresholds are defined') {
                     if ($entry['aristaEntSensorThresholdLowWarning'] != '-1000000000' &&
                     $entry['aristaEntSensorThresholdLowWarning'] != '0') {
-                        $low_warn_limit = set_null($entry['aristaEntSensorThresholdLowWarning'] / $divisor);
+                        $low_warn_limit = set_null(round(10 * log10($entry['aristaEntSensorThresholdLowWarning'] / 10000)));
                     }
                     if ($entry['aristaEntSensorThresholdLowCritical'] != '-1000000000' &&
                     $entry['aristaEntSensorThresholdLowCritical'] != '0') {
-                        echo "\n|{$entry['aristaEntSensorThresholdLowCritical']}|$divisor";
-                        $low_limit = set_null($entry['aristaEntSensorThresholdLowCritical'] / $divisor);
-                        echo "$low_limit\n";
+                        $low_limit = set_null(round(10 * log10($entry['aristaEntSensorThresholdLowCritical'] / 10000)));
                     }
                     if ($entry['aristaEntSensorThresholdHighWarning'] != '1000000000' &&
                     $entry['aristaEntSensorThresholdHighWarning'] != '0') {
-                        $warn_limit = set_null($entry['aristaEntSensorThresholdHighWarning'] / $divisor);
+                        $warn_limit = set_null(round(10 * log10($entry['aristaEntSensorThresholdHighWarning'] / 10000)));
                     }
                     if ($entry['aristaEntSensorThresholdHighCritical'] != '1000000000' &&
                     $entry['aristaEntSensorThresholdHighCritical'] != '0') {
-                        $high_limit = set_null($entry['aristaEntSensorThresholdHighCritical'] / $divisor);
+                        $high_limit = set_null(round(10 * log10($entry['aristaEntSensorThresholdHighCritical'] / 10000)));
                     }
                 }
                 discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity']);
