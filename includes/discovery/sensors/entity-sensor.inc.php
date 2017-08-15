@@ -145,6 +145,9 @@ if (is_array($oids)) {
                     $low_limit      = $entry['aristaEntSensorThresholdLowCritical'];
                     $warn_limit     = $entry['aristaEntSensorThresholdHighWarning'];
                     $high_limit     = $entry['aristaEntSensorThresholdHighCritical'];
+                    if ($type === 'temperature') {
+                        $divisor = 10;
+                    }
                     if ($type == "power" && preg_match("/DOM (R|T)x Power/i", $descr)) {
                         $type           = "dbm";
                         $current        = round(10 * log10($entry['entPhySensorValue'] / 10000), 3);
@@ -154,16 +157,11 @@ if (is_array($oids)) {
                         $low_limit      = set_null(round(10 * log10($low_limit / 10000)));
                         $warn_limit     = set_null(round(10 * log10($warn_limit / 10000)));
                         $high_limit     = set_null(round(10 * log10($high_limit / 10000)));
-                    } elseif ($type === 'temperature') {
-                        $divisor        = 10;
-                        $multiplier     = 1;
+                    } else {
                         $low_warn_limit = $low_warn_limit / $divisor;
                         $low_limit      = $low_limit / $divisor;
                         $warn_limit     = $warn_limit / $divisor;
                         $high_limit     = $high_limit / $divisor;
-                    } elseif ($type === 'current') {
-                        $divisor        = 1;
-                        $multiplier     = 1;
                     }
                 }
                 $current = set_numeric($current);
