@@ -241,6 +241,8 @@ if (is_file('misc/db_schema.yaml')) {
                 } elseif ($cdata != $cur) {
                     print_fail("Database: incorrect column ($table/$column)");
                     $schema_update[] = "ALTER TABLE `$table` CHANGE `$column` " . column_schema_to_sql($cdata) . ';';
+                    print_r($cdata);
+                    print_r($cur);
                 }
                 $previous_column = $column;
                 unset($current_schema[$table]['Columns'][$column]); // remove checked columns
