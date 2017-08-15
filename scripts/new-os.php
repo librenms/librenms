@@ -7,7 +7,6 @@ require __DIR__ . '/../includes/init.php';
 $options = getopt('h:o:t:v:d::');
 
 if ($options['h'] && $options['o'] && $options['t'] && $options['v']) {
-
     $type = $options['t'];
     $vendor = $options['v'];
     if (isset($options['d'])) {
@@ -27,7 +26,6 @@ if ($options['h'] && $options['o'] && $options['t'] && $options['v']) {
     if (file_exists($definition_file)) {
         c_echo("The OS {$options['o']} appears to exist already, skipping to sensors support\n");
     } else {
-
         $sysDescr = snmp_get($device, 'sysDescr.0', '-OvQ', 'SNMPv2-MIB');
         $sysObjectId = explode('.', ltrim(snmp_get($device, 'sysObjectID.0', '-OnvQ', 'SNMPv2-MIB'), '.'));
         $end_oid = array_pop($sysObjectId);
@@ -157,7 +155,6 @@ modules:
         c_echo("$discovery_file already exists, here's the data we would have added:");
         c_echo($discovery_data);
     }
-
 } else {
     c_echo("
 Info:
@@ -178,7 +175,7 @@ Example:
 function get_user_input($msg)
 {
     c_echo($msg . ' ');
-    $handle = fopen ("php://stdin","r");
+    $handle = fopen("php://stdin", "r");
     $line = fgets($handle);
     return trim($line);
 }
