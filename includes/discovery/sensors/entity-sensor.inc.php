@@ -136,35 +136,37 @@ if (is_array($oids)) {
 
             if ($valid_sensor && dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ?", array($device['device_id'], $type, $index)) == '0') {
                 // Check to make sure we've not already seen this sensor via cisco's entity sensor mib
-                if ($type == "power" && $device['os'] == "arista_eos" && preg_match("/DOM (R|T)x Power/i", $descr)) {
-                    $type = "dbm";
-                    $current = round(10 * log10($entry['entPhySensorValue'] / 10000), 3);
-                    $multiplier = 1;
-                    $divisor = 1;
-                }
-                $current = set_numeric($current);
                 $low_limit      = null;
                 $low_warn_limit = null;
                 $warn_limit     = null;
                 $high_limit     = null;
-                if ($device['os'] === 'arista_eos' && $entry['aristaEntSensorStatusDescr'] != 'No thresholds are defined') {
-                    if ($entry['aristaEntSensorThresholdLowWarning'] != '-1000000000' &&
-                    $entry['aristaEntSensorThresholdLowWarning'] != '0') {
-                        $low_warn_limit = set_null(round(10 * log10($entry['aristaEntSensorThresholdLowWarning'] / 10000)));
-                    }
-                    if ($entry['aristaEntSensorThresholdLowCritical'] != '-1000000000' &&
-                    $entry['aristaEntSensorThresholdLowCritical'] != '0') {
-                        $low_limit = set_null(round(10 * log10($entry['aristaEntSensorThresholdLowCritical'] / 10000)));
-                    }
-                    if ($entry['aristaEntSensorThresholdHighWarning'] != '1000000000' &&
-                    $entry['aristaEntSensorThresholdHighWarning'] != '0') {
-                        $warn_limit = set_null(round(10 * log10($entry['aristaEntSensorThresholdHighWarning'] / 10000)));
-                    }
-                    if ($entry['aristaEntSensorThresholdHighCritical'] != '1000000000' &&
-                    $entry['aristaEntSensorThresholdHighCritical'] != '0') {
-                        $high_limit = set_null(round(10 * log10($entry['aristaEntSensorThresholdHighCritical'] / 10000)));
+                if ($device['os'] === 'arista_eos') {
+                    $low_warn_limit = $entry['aristaEntSensorThresholdLowWarning'];
+                    $low_limit      = $entry['aristaEntSensorThresholdLowCritical'];
+                    $warn_limit     = $entry['aristaEntSensorThresholdHighWarning'];
+                    $high_limit     = $entry['aristaEntSensorThresholdHighCritical'];
+                    if ($type == "power" && preg_match("/DOM (R|T)x Power/i", $descr)) {
+                        $type           = "dbm";
+                        $current        = round(10 * log10($entry['entPhySensorValue'] / 10000), 3);
+                        $multiplier     = 1;
+                        $divisor        = 1;
+                        $low_warn_limit = set_null(round(10 * log10($low_warn_limit / 10000)));
+                        $low_limit      = set_null(round(10 * log10($low_limit / 10000)));
+                        $warn_limit     = set_null(round(10 * log10($warn_limit / 10000)));
+                        $high_limit     = set_null(round(10 * log10($high_limit / 10000)));
+                    } elseif ($type === 'temperature') {
+                        $divisor        = 10;
+                        $multiplier     = 1;
+                        $low_warn_limit = $low_warn_limit / $divisor;
+                        $low_limit      = $low_limit / $divisor;
+                        $warn_limit     = $warn_limit / $divisor;
+                        $high_limit     = $high_limit / $divisor;
+                    } elseif ($type === 'current') {
+                        $divisor        = 1;
+                        $multiplier     = 1;
                     }
                 }
+                $current = set_numeric($current);
                 discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity']);
             }
         }//end if
