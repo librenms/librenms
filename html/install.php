@@ -2,7 +2,7 @@
 session_start();
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_POST = $_SESSION;
-} elseif(!file_exists("../config.php")) {
+} elseif (!file_exists("../config.php")) {
     $_SESSION = array_replace($_SESSION, $_POST);
 }
 
