@@ -1646,15 +1646,16 @@ function load_all_os($existing = false, $cached = true)
 }
 
 /**
- * Update the OS cache file cache/os_defs.cache
+ * * Update the OS cache file cache/os_defs.cache
+ * @param bool $force
  */
-function update_os_cache()
+function update_os_cache($force = false)
 {
     global $config;
     $cache_file = $config['install_dir'] . '/cache/os_defs.cache';
     $cache_keep_time = $config['os_def_cache_time'] - 7200; // 2hr buffer
 
-    if (!is_file($cache_file) || time() - filemtime($cache_file) > $cache_keep_time) {
+    if ($force === true || !is_file($cache_file) || time() - filemtime($cache_file) > $cache_keep_time) {
         d_echo('Updating os_def.cache... ');
         load_all_os(false, false);
         file_put_contents($cache_file, serialize($config['os']));
