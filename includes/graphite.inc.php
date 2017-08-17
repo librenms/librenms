@@ -35,6 +35,10 @@ function graphite_update($device, $measurement, $tags, $fields)
         }
 
         foreach ($fields as $k => $v) {
+            // Send zero for fields without values
+            if (empty($v)) {
+                $v = 0;
+            }
             $metric = implode(".", array_filter(array($graphite_prefix, $hostname, $measurement, $ms_name, $k)));
             $line = implode(" ", array($metric, $v, $timestamp));
             d_echo("Sending $line\n");
