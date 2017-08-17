@@ -36,6 +36,8 @@ function graphite_update($device, $measurement, $tags, $fields)
 
         foreach ($fields as $k => $v) {
             $metric = implode(".", array_filter(array($graphite_prefix, $hostname, $measurement, $ms_name, $k)));
+            // Further sanitize the full metric before sending, whitespace isn't allowed
+            $metric = preg_replace('/\s+/', '_', $metric);
             $line = implode(" ", array($metric, $v, $timestamp));
             d_echo("Sending $line\n");
             fwrite($graphite, $line . "\n");
