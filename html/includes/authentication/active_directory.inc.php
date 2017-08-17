@@ -37,19 +37,31 @@ function authenticate($username, $password)
             // group membership in one of the configured groups is required
             if (isset($config['auth_ad_require_groupmembership']) &&
                 $config['auth_ad_require_groupmembership']) {
-                $search = ldap_search(
-                    $ldap_connection,
-                    $config['auth_ad_base_dn'],
-                    get_auth_ad_user_filter($username),
-                    array('memberOf')
-                );
-                $entries = ldap_get_entries($ldap_connection, $search);
-                unset($entries[0]['memberof']['count']); //remove the annoying count
+                foreach ($config['auth_ad_groups'] as $group => $level) {
+                    // get DN for auth_ad_group
+                    $filter = "(&(objectClass=group)(cn=$group))";
+                    $search = ldap_search(
+                        $ldap_connection,
+                        $config['auth_ad_base_dn'],
+                        "(&(objectClass=group)(cn=$group))",
+                        array("cn")
+                    );
+                    $result = ldap_first_entry($ldap_connection, $search);
+                    $group_dn = ldap_get_dn($ldap_connection, $result);
 
-                foreach ($entries[0]['memberof'] as $entry) {
-                    $group_cn = get_cn($entry);
-                    if (isset($config['auth_ad_groups'][$group_cn]['level'])) {
-                        // user is in one of the defined groups
+                    $search = ldap_search(
+                        $ldap_connection,
+                        $config['auth_ad_base_dn'],
+                        // add 'LDAP_MATCHING_RULE_IN_CHAIN to the user filter to search for $username in nested $group_dn
+                        // using "DN" just to get a shorter array back
+                        "(&" . get_auth_ad_user_filter($username) . "(memberOf:1.2.840.113556.1.4.1941:=$group_dn))",
+                        array("DN")
+                    );
+                    $entries = ldap_get_entries($ldap_connection, $search);
+                    unset($entries[0]['memberof']['count']); //remove the annoying count
+
+                    if ($entries["count"] > 0) {
+                        // user is in the current group
                         return true;
                     }
                 }
@@ -57,13 +69,11 @@ function authenticate($username, $password)
                 // failed to find user
                 if (isset($config['auth_ad_debug']) && $config['auth_ad_debug']) {
                     if ($entries['count'] == 0) {
-                        throw new AuthenticationException('No groups found for user, check base dn');
-                    } else {
                         throw new AuthenticationException('User is not in one of the required groups');
                     }
                 }
 
-                throw new AuthenticationException();
+                return false;
             } else {
                 // group membership is not required and user is valid
                 return true;
@@ -171,22 +181,35 @@ function get_userlevel($username)
         }
     }
 
-    // Find all defined groups $username is in
-    $search = ldap_search(
-        $ldap_connection,
-        $config['auth_ad_base_dn'],
-        get_auth_ad_user_filter($username),
-        array('memberOf')
-    );
-    $entries = ldap_get_entries($ldap_connection, $search);
-    unset($entries[0]['memberof']['count']);
+    // go through all configured groups, find user in group, nested
+    foreach ($config['auth_ad_groups'] as $group => $level) {
+        // get DN for auth_ad_group
+        $filter = "(&(objectClass=group)(cn=$group))";
+        $search = ldap_search(
+            $ldap_connection,
+            $config['auth_ad_base_dn'],
+            "(&(objectClass=group)(cn=$group))",
+            array("cn")
+        );
+        $result = ldap_first_entry($ldap_connection, $search);
+        $group_dn = ldap_get_dn($ldap_connection, $result);
 
-    // Loop the list and find the highest level
-    foreach ($entries[0]['memberof'] as $entry) {
-        $group_cn = get_cn($entry);
-        if (isset($config['auth_ad_groups'][$group_cn]['level']) &&
-             $config['auth_ad_groups'][$group_cn]['level'] > $userlevel) {
-            $userlevel = $config['auth_ad_groups'][$group_cn]['level'];
+        $search = ldap_search(
+            $ldap_connection,
+            $config['auth_ad_base_dn'],
+            // add 'LDAP_MATCHING_RULE_IN_CHAIN to the user filter to search for $username in nested $group_dn
+            // limiting to "DN" for shorter array
+            "(&" . get_auth_ad_user_filter($username) . "(memberOf:1.2.840.113556.1.4.1941:=$group_dn))",
+            array("DN")
+        );
+        $entries = ldap_get_entries($ldap_connection, $search);
+        unset($entries[0]['memberof']['count']); //remove the annoying count
+
+        if ($entries["count"] > 0) {
+            // user is in the current group - save new userlevel if higher than before
+            if ($config['auth_ad_groups'][$group]['level'] > $userlevel) {
+                $userlevel = $config['auth_ad_groups'][$group]['level'];
+            }
         }
     }
 
