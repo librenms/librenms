@@ -16,8 +16,11 @@
 global $config;
 
 $graphs = array(
-    'pi-hole_stats' => 'Stats',
-    'pi-hole_queries' => 'Queries',
+    'pi-hole_query_types' => 'Query Types',
+    'pi-hole_destinations' => 'Destinations',
+    'pi-hole_query_results' => 'Query Results',
+    'pi-hole_block_percent' => 'Block Percentage',
+    'pi-hole_blocklist' => 'Blocklist Domains'
 );
 
 foreach ($graphs as $key => $text) {
