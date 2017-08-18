@@ -37,43 +37,19 @@ function authenticate($username, $password)
             // group membership in one of the configured groups is required
             if (isset($config['auth_ad_require_groupmembership']) &&
                 $config['auth_ad_require_groupmembership']) {
+                // cycle through defined groups, test for memberOf-ship
                 foreach ($config['auth_ad_groups'] as $group => $level) {
-                    // get DN for auth_ad_group
-                    $filter = "(&(objectClass=group)(cn=$group))";
-                    $search = ldap_search(
-                        $ldap_connection,
-                        $config['auth_ad_base_dn'],
-                        "(&(objectClass=group)(cn=$group))",
-                        array("cn")
-                    );
-                    $result = ldap_first_entry($ldap_connection, $search);
-                    $group_dn = ldap_get_dn($ldap_connection, $result);
-
-                    $search = ldap_search(
-                        $ldap_connection,
-                        $config['auth_ad_base_dn'],
-                        // add 'LDAP_MATCHING_RULE_IN_CHAIN to the user filter to search for $username in nested $group_dn
-                        // using "DN" just to get a shorter array back
-                        "(&" . get_auth_ad_user_filter($username) . "(memberOf:1.2.840.113556.1.4.1941:=$group_dn))",
-                        array("DN")
-                    );
-                    $entries = ldap_get_entries($ldap_connection, $search);
-                    unset($entries[0]['memberof']['count']); //remove the annoying count
-
-                    if ($entries["count"] > 0) {
-                        // user is in the current group
+                    if (user_in_group($username, $group)) {
                         return true;
                     }
                 }
 
                 // failed to find user
                 if (isset($config['auth_ad_debug']) && $config['auth_ad_debug']) {
-                    if ($entries['count'] == 0) {
-                        throw new AuthenticationException('User is not in one of the required groups');
-                    }
+                    throw new AuthenticationException('User is not in one of the required groups or user/group is outside the base dn');
                 }
 
-                return false;
+                throw new AuthenticationException();
             } else {
                 // group membership is not required and user is valid
                 return true;
@@ -111,6 +87,38 @@ function reauthenticate($sess_id, $token)
     }
 
     return false;
+}
+
+
+function user_in_group($username, $groupname)
+{
+    // check if user is member of the given group or nested groups
+
+    global $config, $ldap_connection;
+
+    // get DN for auth_ad_group
+    $filter = "(&(objectClass=group)(cn=$groupname))";
+    $search = ldap_search(
+        $ldap_connection,
+        $config['auth_ad_base_dn'],
+        "(&(objectClass=group)(cn=$groupname))",
+        array("cn")
+    );
+    $result = ldap_first_entry($ldap_connection, $search);
+    $group_dn = ldap_get_dn($ldap_connection, $result);
+
+    $search = ldap_search(
+        $ldap_connection,
+        $config['auth_ad_base_dn'],
+        // add 'LDAP_MATCHING_RULE_IN_CHAIN to the user filter to search for $username in nested $group_dn
+        // limiting to "DN" for shorter array
+        "(&" . get_auth_ad_user_filter($username) . "(memberOf:1.2.840.113556.1.4.1941:=$group_dn))",
+        array("DN")
+    );
+    $entries = ldap_get_entries($ldap_connection, $search);
+    unset($entries[0]['memberof']['count']); //remove the annoying count
+
+    return ($entries["count"] > 0);
 }
 
 
@@ -181,31 +189,9 @@ function get_userlevel($username)
         }
     }
 
-    // go through all configured groups, find user in group, nested
+    // cycle through defined groups, test for memberOf-ship
     foreach ($config['auth_ad_groups'] as $group => $level) {
-        // get DN for auth_ad_group
-        $filter = "(&(objectClass=group)(cn=$group))";
-        $search = ldap_search(
-            $ldap_connection,
-            $config['auth_ad_base_dn'],
-            "(&(objectClass=group)(cn=$group))",
-            array("cn")
-        );
-        $result = ldap_first_entry($ldap_connection, $search);
-        $group_dn = ldap_get_dn($ldap_connection, $result);
-
-        $search = ldap_search(
-            $ldap_connection,
-            $config['auth_ad_base_dn'],
-            // add 'LDAP_MATCHING_RULE_IN_CHAIN to the user filter to search for $username in nested $group_dn
-            // limiting to "DN" for shorter array
-            "(&" . get_auth_ad_user_filter($username) . "(memberOf:1.2.840.113556.1.4.1941:=$group_dn))",
-            array("DN")
-        );
-        $entries = ldap_get_entries($ldap_connection, $search);
-        unset($entries[0]['memberof']['count']); //remove the annoying count
-
-        if ($entries["count"] > 0) {
+        if (user_in_group($username, $group)) {
             // user is in the current group - save new userlevel if higher than before
             if ($config['auth_ad_groups'][$group]['level'] > $userlevel) {
                 $userlevel = $config['auth_ad_groups'][$group]['level'];
