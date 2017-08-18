@@ -12,5 +12,5 @@ echo 'Cambium CPU Usage';
 $usage = str_replace('"', "", snmp_get($device, 'CAMBIUM-PMP80211-MIB::sysCPUUsage.0', '-OvQ'));
 
 if (is_numeric($usage)) {
-    $proc = ($usage / 10);
+    $proc = $usage;
 }
