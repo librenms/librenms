@@ -2,7 +2,7 @@
 session_start();
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_POST = $_SESSION;
-} else {
+} elseif (!file_exists("../config.php")) {
     $_SESSION = array_replace($_SESSION, $_POST);
 }
 
@@ -52,7 +52,9 @@ $add_email = @$_POST['add_email'] ?: '';
 // Check we can connect to MySQL DB, if not, back to stage 1 :)
 if ($stage > 1) {
     try {
-        dbConnect();
+        if ($stage != 6) {
+            dbConnect();
+        }
         if ($stage == 2 && $_SESSION['build-ok'] == true) {
             $stage = 3;
             $msg = "It appears that the database is already setup so have moved onto stage $stage";
