@@ -35,11 +35,6 @@ $transparency  = 33;
 $rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'], $app['app_id']));
 
 $array = array(
-    'domains_blocked' => array('descr' => 'Blocked domains','colour' => '000000',),
-    'dns_query' => array('descr' => 'Today DNS Queries','colour' => '657C5E',),
-    'ads_blocked' => array('descr' => 'ADs blocked','colour' => 'F44842',),
-    'ads_percentage' => array('descr' => 'ADs blocked %','colour' => '912925',),
-    'unique_domains' => array('descr' => 'Unique domains','colour' => 'F44842',),
     'queries_forwarded' => array('descr' => 'Queries forwarded','colour' => '1F35A5',),
     'queries_cached' =>  array('descr' => 'Queries cached','colour' => '137C21',),
 );
