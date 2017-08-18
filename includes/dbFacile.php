@@ -58,6 +58,7 @@ function dbConnect($host = null, $user = '', $password = '', $database = '', $po
     $socket = empty($socket) ? $config['db_socket'] : $socket;
 
     $database_link = mysqli_connect('p:' . $host, $user, $password, null, $port, $socket);
+    mysqli_options($database_link, MYSQLI_OPT_LOCAL_INFILE, false);
     if ($database_link === false) {
         $error = mysqli_connect_error();
         if ($error == 'No such file or directory') {
