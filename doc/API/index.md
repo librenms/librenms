@@ -73,15 +73,15 @@ source: API/API-Docs.md
         
 Describes the API structure.
 
-# Structure <small>[`top`](#top)</small>
+# Structure
 
-## Versioning [`top`](#top)
+## Versioning
 
 Versioning an API is a minefield which saw us looking at numerous options on how to do this. Paul wrote an excellent blog post which touches on this: https://blog.librenms.org/2014/09/restful-apis/
 
 We have currently settled on using versioning within the API end point itself `/api/v0`. As the API itself is new and still in active development we also decided that v0 would be the best starting point to indicate it's in development.
 
-## Tokens [`top`](#top)
+## Tokens
 
 To access any of the token end points you will be required to authenticate using a token. Tokens can be created directly from within the LibreNMS web interface by going to `/api-access/`.
 
@@ -90,7 +90,7 @@ To access any of the token end points you will be required to authenticate using
 - Enter an optional description.
 - Click Create API Token.
 
-## Endpoints [`top`](#top)
+## Endpoints
 
 Whilst this documentation will describe and show examples of the end points, we've designed the API so you should be able to traverse through it without know any of the available API routes.
 
@@ -109,7 +109,7 @@ Output:
 }
 ```
 
-## Input [`top`](#top)
+## Input
 
 Input to the API is done in three different ways, sometimes a combination two or three of these.
 
@@ -120,18 +120,18 @@ Input to the API is done in three different ways, sometimes a combination two or
 curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":"public"}'-H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices
 ```
 
-## Output [`top`](#top)
+## Output
 
 Output from the API currently is via two output types.
 
   - JSON Most API responses will output json. As show in the example for calling the API endpoint.
   - PNG This is for when the request is for an image such as a graph for a switch port.
 
-# Endpoints [`top`](#top)
+# Endpoints
 
-## Devices [`top`](#top)
+## Devices
 
-### Function: `del_device` [`top`](#top)
+### Function: `del_device`
 
 Delete a given device.
 
@@ -165,7 +165,7 @@ Output:
 }
 ```
 
-### Function: `get_device` [`top`](#top)
+### Function: `get_device`
 
 Get details of a given device.
 
@@ -198,7 +198,7 @@ Output:
 }
 ```
 
-### Function: `get_graphs` [`top`](#top)
+### Function: `get_graphs`
 
 Get a list of available graphs for a device, this does not include ports.
 
@@ -238,7 +238,7 @@ Output:
 }
 ```
 
-### Function: `list_available_health_graphs` [`top`](#top)
+### Function: `list_available_health_graphs`
 This function allows to do three things:
 
   - Get a list of overall health graphs available.
@@ -343,7 +343,7 @@ Output:
 }
 ```
 
-### Function: `get_health_graph` [`top`](#top)
+### Function: `get_health_graph`
 
 Get a particular health class graph for a device, if you provide a sensor_id as well then a single sensor graph
 will be provided. If no sensor_id value is provided then you will be sent a stacked sensor graph.
@@ -378,7 +378,7 @@ Output is the graph of the particular health type sensor provided.
 
 
 
-### Function: `get_graph_generic_by_hostname` [`top`](#top)
+### Function: `get_graph_generic_by_hostname`
 
 Get a specific graph for a device, this does not include ports.
 
@@ -403,7 +403,7 @@ Output:
 
 Output is an image.
 
-### Function: `get_port_graphs` [`top`](#top)
+### Function: `get_port_graphs`
 
 Get a list of ports for a particular device.
 
@@ -440,7 +440,7 @@ Output:
     ]
 }
 ```
-### Function: `get_device_ip_addresses` [`top`](#top)
+### Function: `get_device_ip_addresses`
 
 Get a list of IP addresses (v4 and v6) associated with a device.
 
@@ -472,7 +472,7 @@ Output:
 }
 ```
 
-### Function: `get_port_stack` [`top`](#top)
+### Function: `get_port_stack`
 
 Get a list of port mappings for a device.  This is useful for showing physical ports that are in a virtual port-channel.
 
@@ -513,7 +513,7 @@ Output:
 }
 ```
 
-### Function: `get_components` [`top`](#top)
+### Function: `get_components`
 
 Get a list of components for a particular device.
 
@@ -577,7 +577,7 @@ Output:
 }
 ```
 
-### Function: `add_components` [`top`](#top)
+### Function: `add_components`
 
 Create a new component of a type on a particular device.
 
@@ -611,7 +611,7 @@ Output:
 }
 ```
 
-### Function: `edit_components` [`top`](#top)
+### Function: `edit_components`
 
 Edit an existing component on a particular device.
 
@@ -636,7 +636,7 @@ Output:
 
 Just take the JSON array from add_components or edit_components, edit as you wish and submit it back to edit_components.
 
-### Function: `delete_components` [`top`](#top)
+### Function: `delete_components`
 
 Delete an existing component on a particular device.
 
@@ -659,7 +659,7 @@ Output:
 }
 ```
 
-### Function: `get_port_stats_by_port_hostname` [`top`](#top)
+### Function: `get_port_stats_by_port_hostname`
 
 Get information about a particular port for a device.
 
@@ -692,7 +692,7 @@ Output:
 }
 ```
 
-### Function: `get_graph_by_port_hostname` [`top`](#top)
+### Function: `get_graph_by_port_hostname`
 
 Get a graph of a port for a particular device.
 
@@ -719,7 +719,7 @@ Output:
 
 Output is an image.
 
-### Function: `list_devices` [`top`](#top)
+### Function: `list_devices`
 
 Return a list of devices.
 
@@ -786,7 +786,7 @@ Output:
 }
 ```
 
-### Function: `add_device` [`top`](#top)
+### Function: `add_device`
 
 Add a new device.
 
@@ -828,7 +828,7 @@ Output:
 }
 ```
 
-### Function: `list_oxidized` [`top`](#top)
+### Function: `list_oxidized`
 
 List devices for use with Oxidized. If you have group support enabled then a group will also be returned based on your config.
 
@@ -858,7 +858,7 @@ Output:
 ]
 ```
 
-### Function: `update_device_field` [`top`](#top)
+### Function: `update_device_field`
 
 Update devices field in the database.
 
@@ -902,7 +902,7 @@ Output:
 ]
 ```
 
-### Function `get_device_groups` [`top`](#top)
+### Function `get_device_groups`
 
 List the device groups that a device is matched on.
 
@@ -938,9 +938,9 @@ Output:
 ]
 ```
 
-## `Device Groups` [`top`](#top)
+## `Device Groups`
 
-### Function `get_devicegroups` [`top`](#top)
+### Function `get_devicegroups`
 
 List all device groups.
 
@@ -974,9 +974,9 @@ Output:
 ]
 ```
 
-## `Ports` [`top`](#top)
+## `Ports`
 
-### Function `get_all_ports` [`top`](#top)
+### Function `get_all_ports`
 
 Get info for all ports on all devices.
 Strongly recommend that you use the `columns` parameter to avoid pulling too much data.
@@ -1019,7 +1019,7 @@ Output:
 }
 ```
 
-### Function `get_port_info` [`top`](#top)
+### Function `get_port_info`
 
 Get all info for a particular port.
 
@@ -1121,7 +1121,7 @@ Output:
 }
 ```
 
-### Function `get_port_info` [`top`](#top)
+### Function `get_port_info`
 
 Get all IP info (v4 and v6) for a given port id.
 
@@ -1157,7 +1157,7 @@ Output:
 }
 ```
 
-### Function `get_devices_by_group` [`top`](#top)
+### Function `get_devices_by_group`
 
 List all devices matching the group provided.
 
@@ -1196,9 +1196,9 @@ Output:
 ]
 ```
 
-## `Port Groups` [`top`](#top)
+## `Port Groups`
 
-### Function: `get_graph_by_portgroup` [`top`](#top)
+### Function: `get_graph_by_portgroup`
 
 Get the graph based on the group type.
 
@@ -1222,7 +1222,7 @@ Output:
 
 Output is an image.
 
-### Function: `get_graph_by_portgroup_multiport_bits` [`top`](#top)
+### Function: `get_graph_by_portgroup_multiport_bits`
 
 Get the graph based on the multiple port id separated by commas `,`.
 
@@ -1247,9 +1247,9 @@ Output:
 Output is an image.
 
 
-## `Routing` [`top`](#top)
+## `Routing`
 
-### Function: `list_bgp` [`top`](#top)
+### Function: `list_bgp`
 
 List the current BGP sessions.
 
@@ -1278,7 +1278,7 @@ Output:
 }
 ```
 
-### Function: `list_ipsec` [`top`](#top)
+### Function: `list_ipsec`
 
 List the current IPSec tunnels which are active.
 
@@ -1315,9 +1315,9 @@ Output:
 ```
 > Please note, this will only show active VPN sessions not all configured.
 
-## `Switching` [`top`](#top)
+## `Switching`
 
-### Function: `get_vlans` [`top`](#top)
+### Function: `get_vlans`
 
 Get a list of all VLANs for a given device.
 
@@ -1351,9 +1351,9 @@ Output:
 }
 ```
 
-## `Alerts` [`top`](#top)
+## `Alerts`
 
-### Function: `get_alert` [`top`](#top)
+### Function: `get_alert`
 
 Get details of an alert
 
@@ -1390,7 +1390,7 @@ Output:
 }
 ```
 
-### Function: `ack_alert` [`top`](#top)
+### Function: `ack_alert`
 
 Acknowledge an alert
 
@@ -1416,7 +1416,7 @@ Output:
 }
 ```
 
-### Function: `unmute_alert` [`top`](#top)
+### Function: `unmute_alert`
 
 Unmute an alert
 
@@ -1443,7 +1443,7 @@ Output:
 ```
 
 
-### Function: `list_alerts` [`top`](#top)
+### Function: `list_alerts`
 
 List all alerts
 
@@ -1477,9 +1477,9 @@ Output:
 }
 ```
 
-## Rules [`top`](#top)
+## Rules
 
-### Function: `get_alert_rule` [`top`](#top)
+### Function: `get_alert_rule`
 
 Get the alert rule details.
 
@@ -1516,7 +1516,7 @@ Output:
 }
 ```
 
-### Function: `delete_rule` [`top`](#top)
+### Function: `delete_rule`
 
 Delete an alert rule by id
 
@@ -1542,7 +1542,7 @@ Output:
 }
 ```
 
-### Function: `list_alert_rules` [`top`](#top)
+### Function: `list_alert_rules`
 
 List the alert rules.
 
@@ -1578,7 +1578,7 @@ Output:
 }
 ```
 
-### Function: `add_rule` [`top`](#top)
+### Function: `add_rule`
 
 Add a new alert rule.
 
@@ -1612,7 +1612,7 @@ rules
 }
 ```
 
-### Function: `edit_rule` [`top`](#top)
+### Function: `edit_rule`
 
 Edit an existing alert rule
 
@@ -1647,9 +1647,9 @@ rules
 }
 ```
 
-## Inventory [`top`](#top)
+## Inventory
 
-### Function: `get_inventory` [`top`](#top)
+### Function: `get_inventory`
 
 Retrieve the inventory for a device. If you call this without any parameters then you will only get part of the inventory. This is because a lot of devices nest each component, for instance you may initially have the chassis, within this the ports - 1 being an sfp cage, then the sfp itself. The way this API call is designed is to enable a recursive lookup. The first call will retrieve the root entry, included within this response will be entPhysicalIndex, you can then call for entPhysicalContainedIn which will then return the next layer of results.
 
@@ -1699,9 +1699,9 @@ Output:
 }
 ```
 
-## Bills [`top`](#top)
+## Bills
 
-### Function: `list_bills` [`top`](#top)
+### Function: `list_bills`
 
 Retrieve the list of bills currently in the system.
 
@@ -1760,7 +1760,7 @@ Output:
 }
 ```
 
-### Function: `get_bill` [`top`](#top)
+### Function: `get_bill`
 
 Retrieve a specific bill
 
@@ -1827,7 +1827,7 @@ Output:
 }
 ```
 
-### Function: `list_arp` [`top`](#top)
+### Function: `list_arp`
 
 Retrieve a specific ARP entry or all ARP enties for a device
 
@@ -1864,9 +1864,9 @@ Output:
 }
 ```
 
-## Services [`top`](#top)
+## Services
 
-### Function: `list_services` [`top`](#top)
+### Function: `list_services`
 
 Retrieve all services
 
@@ -1926,7 +1926,7 @@ Output:
     ]
 }
 ```
-### Function: `get_service_for_host` [`top`](#top)
+### Function: `get_service_for_host`
 
 Retrieve services for device
 
@@ -1973,12 +1973,12 @@ Output:
 }
 ```
 
-## Logs [`top`](#top)
+## Logs
 
-### Function: `list_eventlog` [`top`](#top)
-### Function: `list_syslog` [`top`](#top)
-### Function: `list_alertlog` [`top`](#top)
-### Function: `list_authlog` [`top`](#top)
+### Function: `list_eventlog`
+### Function: `list_syslog`
+### Function: `list_alertlog`
+### Function: `list_authlog`
 
 All the `list_*logs` calls are aliased to `list_logs`.
 
