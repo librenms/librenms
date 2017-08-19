@@ -1,4 +1,4 @@
-source: API/API-Docs.md
+source: API/index.md
 [TOC]
         
 Describes the API structure.
@@ -1695,8 +1695,8 @@ Output:
 Retrieve a specific bill
 
 Route: `/api/v0/bills/:id`
-       /api/v0/bills?ref=:ref
-       /api/v0/bills?custid=:custid
+       `/api/v0/bills?ref=:ref`
+       `/api/v0/bills?custid=:custid`
 
   - id is the specific bill id
   - ref is the billing reference
@@ -1916,7 +1916,7 @@ Input:
   - limit: The limit of results to be returned.
   - from: The date and time to search from.
   - to: The data and time to search to.
-  
+
 ### Function: `list_eventlog`
 Route: `/api/v0/logs/eventlog/:hostname`
 
