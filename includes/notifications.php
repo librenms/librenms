@@ -4,21 +4,24 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /**
  * Notification Poller
- * @author Daniel Preussker
  * @copyright 2015 Daniel Preussker, QuxLabs UG
- * @license GPL
- * @package LibreNMS
+ * @copyright 2017 Tony Murray
+ * @author    Daniel Preussker
+ * @author    Tony Murray <murraytony@gmail.com>
+ * @license   GPL
+ * @package   LibreNMS
+ * @link      http://librenms.org
  * @subpackage Notifications
  */
 
@@ -109,4 +112,35 @@ function parse_atom($feed)
     return $obj;
 }
 
-post_notifications();
+function new_notification($title, $message, $severity = 0, $source = 'adhoc', $date = null)
+{
+    $notif = array(
+        'title' => $title,
+        'body' => $message,
+        'severity' => $severity,
+        'source' => $source,
+        'checksum' => hash('sha512', $title . $message),
+        'datetime' => strftime('%F', is_null($date) ? time() : strtotime($date))
+    );
+
+    if (dbFetchCell('SELECT 1 FROM `notifications` WHERE `checksum` = ?', array($notif['checksum'])) != 1) {
+        return dbInsert('notifications', $notif) > 0;
+    }
+
+    return false;
+}
+
+/**
+ * Removes notifications by title.
+ * This should be used with care.
+ *
+ * @param string $title
+ */
+function remove_notification($title)
+{
+    $id = dbFetchCell('SELECT `notifications_id` FROM `notifications` WHERE `title`=?', array($title));
+    if ($id) {
+        dbDelete('notifications', '`notifications_id`=?', array($id));
+        dbDelete('notifications_attribs', '`notifications_id`=?', array($id));
+    }
+}
