@@ -1,75 +1,5 @@
 source: API/API-Docs.md
-- API
-<a name="top"></a>
-- [`Structure`](#api-structure)
-    - [`Versioning`](#api-versioning)
-    - [`token`](#api-tokens)
-    - [`end-points`](#api-end_points)
-    - [`input`](#api-input)
-    - [`output`](#api-output)
-- [`endpoints`](#api-endpoints)
-    - [`devices`](#api-devices)
-        - [`del_device`](#api-route-2)
-        - [`get_device`](#api-route-3)
-        - [`get_graphs`](#api-route-5)
-        - [`list_available_health_graphs`](#api-route-list_available_health_graphs)
-        - [`get_health_graph`](#api-route-get_health_graph)
-        - [`get_graph_generic_by_hostname`](#api-route-6)
-        - [`get_port_graphs`](#api-route-7)
-        - [`get_device_ip_addresses`](#api-route-get_device_ip_addresses)
-        - [`get_port_stack`](#api-route-29)
-        - [`get_components`](#api-route-25)
-        - [`add_components`](#api-route-26)
-        - [`edit_components`](#api-route-27)
-        - [`delete_components`](#api-route-28)
-        - [`get_port_stats_by_port_hostname`](#api-route-8)
-        - [`get_graph_by_port_hostname`](#api-route-9)
-        - [`list_devices`](#api-route-10)
-        - [`add_device`](#api-route-11)
-        - [`list_oxidized`](#api-route-21)
-        - [`update_device_field`](#api-route-update_device_field)
-        - [`get_device_groups`](#api-route-get_device_groups)
-    - [`devicegroups`](#api-devicegroups)
-        - [`get_devicegroups`](#api-route-get_devicegroups)
-        - [`get_devices_by_group`](#api-route-get_devices_by_group)
-    - [`ports`](#api-ports)
-        - [`get_all_ports`](#api-get_all_ports)
-        - [`get_port_info`](#api-route-get_port_info)
-        - [`get_port_ip_info`](#api-route-get_port_ip_info)
-    - [`portgroups`](#api-portgroups)
-        - [`get_graph_by_portgroup_multiport_bits`](#api-route-get_graph_by_portgroup_multiport_bits)
-        - [`get_graph_by_portgroup`](#api-route-get_graph_by_portgroup)
-    - [`routing`](#api-routing)
-        - [`list_bgp`](#api-route-1)
-        - [`list_ipsec`](#list_ipsec)
-    - [`switching`](#api-switching)
-        - [`get_vlans`](#api-route-4)
-    - [`alerts`](#api-alerts)
-        - [`get_alert`](#api-route-12)
-        - [`ack_alert`](#api-route-13)
-        - [`unmute_alert`](#api-route-24)
-        - [`list_alerts`](#api-route-14)
-    - [`rules`](#api-rules)
-        - [`get_alert_rule`](#api-route-15)
-        - [`delete_rule`](#api-route-16)
-        - [`list_alert_rules`](#api-route-17)
-        - [`add_rule`](#api-route-18)
-        - [`edit_rule`](#api-route-19)
-    - [`inventory`](#api-inventory)
-        - [`get_inventory`](#api-route-20)
-    - [`bills`](#api-bills)
-        - [`list_bills`](#api-route-22)
-        - [`get_bill`](#api-route-23)
-    - [`resources`](#api-resources)
-        - [`list_arp`](#api-resources-list_arp)
-    - [`services`](#api-services)
-        - [`list_services`](#api-services-list_services)
-        - [`get_service_for_host`](#api-services-get_service_for_host)
-    - [`logs`](#api-logs)
-        - [`list_eventlog`](#api-logs-list_eventlog)
-        - [`list_syslog`](#api-logs-list_syslog)
-        - [`list_alertlog`](#api-logs-list_alertlog)
-        - [`list_authlog`](#api-logs-list_authlog)
+[TOC]
         
 Describes the API structure.
 
@@ -351,7 +281,7 @@ will be provided. If no sensor_id value is provided then you will be sent a stac
 Route: /api/v0/devices/:hostname/graphs/health/:type(/:sensor_id)
 
   - hostname can be either the device hostname or id
-  - type is the name of the health graph as returned by [`list_available_health_graphs`](#api-route-list_available_health_graphs)
+  - type is the name of the health graph as returned by [`list_available_health_graphs`](#function-list_available_health_graphs)
   - sensor_id (optional) restricts the graph to return a particular health sensor graph.
 
 Input:
@@ -385,7 +315,7 @@ Get a specific graph for a device, this does not include ports.
 Route: /api/v0/devices/:hostname/:type
 
   - hostname can be either the device hostname or id
-  - type is the type of graph you want, use [`get_graphs`](#api-route-5) to see the graphs available. Defaults to device_uptime.
+  - type is the type of graph you want, use [`get_graphs`](#function-get_graphs to see the graphs available. Defaults to device_uptime.
 
 Input:
 
@@ -666,7 +596,7 @@ Get information about a particular port for a device.
 Route: /api/v0/devices/:hostname/ports/:ifname
 
   - hostname can be either the device hostname or id
-  - ifname can be any of the interface names for the device which can be obtained using [`get_port_graphs`](#api-route-7). Please ensure that the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need to be urlencoded.
+  - ifname can be any of the interface names for the device which can be obtained using [`get_port_graphs`](#function-get_port_graphs). Please ensure that the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need to be urlencoded.
 
 Input:
 
@@ -699,8 +629,8 @@ Get a graph of a port for a particular device.
 Route: /api/v0/devices/:hostname/ports/:ifname/:type
 
   - hostname can be either the device hostname or id
-  - ifname can be any of the interface names for the device which can be obtained using [`get_port_graphs`](#api-route-7). Please ensure that the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need to be urlencoded.
-  - type is the port type you want the graph for, you can request a list of ports for a device with [`get_port_graphs`](#api-route-7).
+  - ifname can be any of the interface names for the device which can be obtained using [`get_port_graphs`](#function-get_port_graphs). Please ensure that the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need to be urlencoded.
+  - type is the port type you want the graph for, you can request a list of ports for a device with [`get_port_graphs`](#function-get_port_graphs).
 
 Input:
 
@@ -938,7 +868,7 @@ Output:
 ]
 ```
 
-## `Device Groups`
+## Device Groups
 
 ### Function `get_devicegroups`
 
@@ -974,7 +904,7 @@ Output:
 ]
 ```
 
-## `Ports`
+## Ports
 
 ### Function `get_all_ports`
 
@@ -1163,7 +1093,7 @@ List all devices matching the group provided.
 
 Route: /api/v0/devicegroups/:name
 
-  - name Is the name of the device group which can be obtained using [`get_devicegroups`](#api-route-get_devicegroups). Please ensure that the name is urlencoded if it needs to be (i.e Linux Servers would need to be urlencoded.
+  - name Is the name of the device group which can be obtained using [`get_devicegroups`](#function-get_devicegroups). Please ensure that the name is urlencoded if it needs to be (i.e Linux Servers would need to be urlencoded.
 
 Input (JSON):
 
@@ -1196,7 +1126,7 @@ Output:
 ]
 ```
 
-## `Port Groups`
+## Port Groups
 
 ### Function: `get_graph_by_portgroup`
 
@@ -1247,7 +1177,7 @@ Output:
 Output is an image.
 
 
-## `Routing`
+## Routing
 
 ### Function: `list_bgp`
 
@@ -1315,7 +1245,7 @@ Output:
 ```
 > Please note, this will only show active VPN sessions not all configured.
 
-## `Switching`
+## Switching
 
 ### Function: `get_vlans`
 
@@ -1351,7 +1281,7 @@ Output:
 }
 ```
 
-## `Alerts`
+## Alerts
 
 ### Function: `get_alert`
 
@@ -1359,7 +1289,7 @@ Get details of an alert
 
 Route: /api/v0/alerts/:id
 
-  - id is the alert id, you can obtain a list of alert ids from [`list_alerts`](#api-route-14).
+  - id is the alert id, you can obtain a list of alert ids from [`list_alerts`](#function-list_alerts).
 
 Input:
 
@@ -1396,7 +1326,7 @@ Acknowledge an alert
 
 Route: /api/v0/alerts/:id
 
-  - id is the alert id, you can obtain a list of alert ids from [`list_alerts`](#api-route-14).
+  - id is the alert id, you can obtain a list of alert ids from [`list_alerts`](#function-list_alerts).
 
 Input:
 
@@ -1422,7 +1352,7 @@ Unmute an alert
 
 Route: /api/v0/alerts/unmute/:id
 
-  - id is the alert id, you can obtain a list of alert ids from [`list_alerts`](#api-route-14).
+  - id is the alert id, you can obtain a list of alert ids from [`list_alerts`](#function-list_alerts).
 
 Input:
 
