@@ -1675,6 +1675,19 @@ function fahrenheit_to_celsius($scale, $value)
     }
     return sprintf('%.02f', $value);
 }
+
+/**
+ *
+ * Simply passes the fahrenheit value to fahrenheit_to_celsius()
+ *
+ * @param $value
+ * @return float
+ */
+function conv_fahrenheit($value)
+{
+    return fahrenheit_to_celsius('fahrenheit', $value);
+}
+
 function uw_to_dbm($value)
 {
     return 10 * log10($value / 1000);

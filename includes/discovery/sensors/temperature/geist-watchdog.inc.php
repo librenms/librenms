@@ -30,6 +30,13 @@ if ($value) {
     discover_sensor($valid['sensor'], 'temperature', $device, $current_oid, 'climateTempC', 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value);
 }
 
+$value = snmp_get($device, 'climateTempF', '-Oqv', 'GEIST-MIB-V3');
+if ($value) {
+    $current_oid = '.1.3.6.1.4.1.21239.2.2.1.6.1';
+    $descr = 'Temperature';
+    discover_sensor($valid['sensor'], 'temperature', $device, $current_oid, 'climateTempF', 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value, null, null, null, 'conv_fahrenheit');
+}
+
 $value = snmp_get($device, 'internalTemp.1', '-Oqv', 'GEIST-V4-MIB');
 if ($value) {
     $current_oid = '.1.3.6.1.4.1.21239.5.1.2.1.5.1';
