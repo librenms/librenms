@@ -65,7 +65,7 @@ Output from the API currently is via two output types.
 
 Delete a given device.
 
-Route: /api/v0/devices/:hostname
+Route: `/api/v0/devices/:hostname`
 
   - hostname can be either the device hostname or id
 
@@ -99,7 +99,7 @@ Output:
 
 Get details of a given device.
 
-Route: /api/v0/devices/:hostname
+Route: `/api/v0/devices/:hostname`
 
   - hostname can be either the device hostname or id
 
@@ -132,7 +132,7 @@ Output:
 
 Get a list of available graphs for a device, this does not include ports.
 
-Route: /api/v0/devices/:hostname/graphs
+Route: `/api/v0/devices/:hostname/graphs`
 
   - hostname can be either the device hostname or id
 
@@ -175,7 +175,7 @@ This function allows to do three things:
   - Get a list of health graphs based on provided class.
   - Get the health sensors information based on ID.
 
-Route: /api/v0/devices/:hostname/health(/:type)(/:sensor_id)
+Route: `/api/v0/devices/:hostname/health(/:type)(/:sensor_id)`
 
   - hostname can be either the device hostname or id
   - type (optional) is health type / sensor class
@@ -278,7 +278,7 @@ Output:
 Get a particular health class graph for a device, if you provide a sensor_id as well then a single sensor graph
 will be provided. If no sensor_id value is provided then you will be sent a stacked sensor graph.
 
-Route: /api/v0/devices/:hostname/graphs/health/:type(/:sensor_id)
+Route: `/api/v0/devices/:hostname/graphs/health/:type(/:sensor_id)`
 
   - hostname can be either the device hostname or id
   - type is the name of the health graph as returned by [`list_available_health_graphs`](#function-list_available_health_graphs)
@@ -312,7 +312,7 @@ Output is the graph of the particular health type sensor provided.
 
 Get a specific graph for a device, this does not include ports.
 
-Route: /api/v0/devices/:hostname/:type
+Route: `/api/v0/devices/:hostname/:type`
 
   - hostname can be either the device hostname or id
   - type is the type of graph you want, use [`get_graphs`](#function-get_graphs to see the graphs available. Defaults to device_uptime.
@@ -337,7 +337,7 @@ Output is an image.
 
 Get a list of ports for a particular device.
 
-Route: /api/v0/devices/:hostname/ports
+Route: `/api/v0/devices/:hostname/ports`
 
   - hostname can be either the device hostname or id
 
@@ -374,7 +374,7 @@ Output:
 
 Get a list of IP addresses (v4 and v6) associated with a device.
 
-Route: /api/v0/devices/:hostname/ip
+Route: `/api/v0/devices/:hostname/ip`
 
   - hostname can be either the device hostname or id
 
@@ -406,7 +406,7 @@ Output:
 
 Get a list of port mappings for a device.  This is useful for showing physical ports that are in a virtual port-channel.
 
-Route: /api/v0/devices/:hostname/port_stack
+Route: `/api/v0/devices/:hostname/port_stack`
 
   - hostname can be either the device hostname or id
 
@@ -447,7 +447,7 @@ Output:
 
 Get a list of components for a particular device.
 
-Route: /api/v0/devices/:hostname/components
+Route: `/api/v0/devices/:hostname/components`
 
   - hostname can be either the device hostname or id
 
@@ -511,7 +511,7 @@ Output:
 
 Create a new component of a type on a particular device.
 
-Route: /api/v0/devices/:hostname/components/:type
+Route: `/api/v0/devices/:hostname/components/:type`
 
   - hostname can be either the device hostname or id
   - type is the type of component to add
@@ -545,7 +545,7 @@ Output:
 
 Edit an existing component on a particular device.
 
-Route: /api/v0/devices/:hostname/components
+Route: `/api/v0/devices/:hostname/components`
 
   - hostname can be either the device hostname or id
 
@@ -570,7 +570,7 @@ Just take the JSON array from add_components or edit_components, edit as you wis
 
 Delete an existing component on a particular device.
 
-Route: /api/v0/devices/:hostname/components/:component
+Route: `/api/v0/devices/:hostname/components/:component`
 
   - hostname can be either the device hostname or id
   - component is the component ID to be deleted.
@@ -593,7 +593,7 @@ Output:
 
 Get information about a particular port for a device.
 
-Route: /api/v0/devices/:hostname/ports/:ifname
+Route: `/api/v0/devices/:hostname/ports/:ifname`
 
   - hostname can be either the device hostname or id
   - ifname can be any of the interface names for the device which can be obtained using [`get_port_graphs`](#function-get_port_graphs). Please ensure that the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need to be urlencoded.
@@ -626,7 +626,7 @@ Output:
 
 Get a graph of a port for a particular device.
 
-Route: /api/v0/devices/:hostname/ports/:ifname/:type
+Route: `/api/v0/devices/:hostname/ports/:ifname/:type`
 
   - hostname can be either the device hostname or id
   - ifname can be any of the interface names for the device which can be obtained using [`get_port_graphs`](#function-get_port_graphs). Please ensure that the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need to be urlencoded.
@@ -653,7 +653,7 @@ Output is an image.
 
 Return a list of devices.
 
-Route: /api/v0/devices
+Route: `/api/v0/devices`
 
 Input:
 
@@ -720,7 +720,7 @@ Output:
 
 Add a new device.
 
-Route: /api/v0/devices
+Route: `/api/v0/devices`
 
 Input (JSON):
 
@@ -762,7 +762,7 @@ Output:
 
 List devices for use with Oxidized. If you have group support enabled then a group will also be returned based on your config.
 
-Route: /api/v0/oxidized
+Route: `/api/v0/oxidized`
 
 Input (JSON):
 
@@ -792,7 +792,7 @@ Output:
 
 Update devices field in the database.
 
-Route: /api/v0/devices/:hostname
+Route: `/api/v0/devices/:hostname`
 
   - hostname can be either the device hostname or id
 
@@ -836,7 +836,7 @@ Output:
 
 List the device groups that a device is matched on.
 
-Route: /api/v0/devices/:hostname/groups
+Route: `/api/v0/devices/:hostname/groups`
 
   - hostname can be either the device hostname or id
 
@@ -874,7 +874,7 @@ Output:
 
 List all device groups.
 
-Route: /api/v0/devicegroups
+Route: `/api/v0/devicegroups`
 
 Input (JSON):
 
@@ -911,7 +911,7 @@ Output:
 Get info for all ports on all devices.
 Strongly recommend that you use the `columns` parameter to avoid pulling too much data.
 
-Route: /api/v0/ports
+Route: `/api/v0/ports`
 
   -
 
@@ -953,7 +953,7 @@ Output:
 
 Get all info for a particular port.
 
-Route: /api/v0/ports/:portid
+Route: `/api/v0/ports/:portid`
 
   - portid must be an integer
 
@@ -1055,7 +1055,7 @@ Output:
 
 Get all IP info (v4 and v6) for a given port id.
 
-Route: /api/v0/ports/:portid/ip
+Route: `/api/v0/ports/:portid/ip`
 
   - portid must be an integer
 
@@ -1091,7 +1091,7 @@ Output:
 
 List all devices matching the group provided.
 
-Route: /api/v0/devicegroups/:name
+Route: `/api/v0/devicegroups/:name`
 
   - name Is the name of the device group which can be obtained using [`get_devicegroups`](#function-get_devicegroups). Please ensure that the name is urlencoded if it needs to be (i.e Linux Servers would need to be urlencoded.
 
@@ -1132,7 +1132,7 @@ Output:
 
 Get the graph based on the group type.
 
-Route: /api/v0/devices/portgroups/:group
+Route: `/api/v0/devices/portgroups/:group`
 
   - group is the type of port group graph you want, I.e Transit, Peering, etc. You can specify multiple types comma separated.
 
@@ -1156,7 +1156,7 @@ Output is an image.
 
 Get the graph based on the multiple port id separated by commas `,`.
 
-Route: /api/v0/devices/portgroups/multiport/bits/:id
+Route: `/api/v0/devices/portgroups/multiport/bits/:id`
 
   - id is a comma separated list of port ids you want, I.e 1,2,3,4, etc. You can specify multiple IDs comma separated.
 
@@ -1183,7 +1183,7 @@ Output is an image.
 
 List the current BGP sessions.
 
-Route: /api/v0/bgp
+Route: `/api/v0/bgp`
 
 Input:
 
@@ -1212,7 +1212,7 @@ Output:
 
 List the current IPSec tunnels which are active.
 
-Route: /api/v0/routing/ipsec/data/:hostname
+Route: `/api/v0/routing/ipsec/data/:hostname`
 
   - hostname can be either the device hostname or id
 
@@ -1251,7 +1251,7 @@ Output:
 
 Get a list of all VLANs for a given device.
 
-Route: /api/v0/devices/:hostname/vlans
+Route: `/api/v0/devices/:hostname/vlans`
 
   - hostname can be either the device hostname or id
 
@@ -1287,7 +1287,7 @@ Output:
 
 Get details of an alert
 
-Route: /api/v0/alerts/:id
+Route: `/api/v0/alerts/:id`
 
   - id is the alert id, you can obtain a list of alert ids from [`list_alerts`](#function-list_alerts).
 
@@ -1324,7 +1324,7 @@ Output:
 
 Acknowledge an alert
 
-Route: /api/v0/alerts/:id
+Route: `/api/v0/alerts/:id`
 
   - id is the alert id, you can obtain a list of alert ids from [`list_alerts`](#function-list_alerts).
 
@@ -1350,7 +1350,7 @@ Output:
 
 Unmute an alert
 
-Route: /api/v0/alerts/unmute/:id
+Route: `/api/v0/alerts/unmute/:id`
 
   - id is the alert id, you can obtain a list of alert ids from [`list_alerts`](#function-list_alerts).
 
@@ -1377,7 +1377,7 @@ Output:
 
 List all alerts
 
-Route: /api/v0/alerts
+Route: `/api/v0/alerts`
 
 Input:
 
@@ -1413,7 +1413,7 @@ Output:
 
 Get the alert rule details.
 
-Route: /api/v0/rules/:id
+Route: `/api/v0/rules/:id`
 
   - id is the rule id.
 
@@ -1450,7 +1450,7 @@ Output:
 
 Delete an alert rule by id
 
-Route: /api/v0/rules/:id
+Route: `/api/v0/rules/:id`
 
   - id is the rule id.
 
@@ -1476,7 +1476,7 @@ Output:
 
 List the alert rules.
 
-Route: /api/v0/rules
+Route: `/api/v0/rules`
 
   -
 
@@ -1512,7 +1512,7 @@ Output:
 
 Add a new alert rule.
 
-Route: /api/v0/rules
+Route: `/api/v0/rules`
 
   -
 
@@ -1546,7 +1546,7 @@ rules
 
 Edit an existing alert rule
 
-Route: /api/v0/rules
+Route: `/api/v0/rules`
 
   -
 
@@ -1583,7 +1583,7 @@ rules
 
 Retrieve the inventory for a device. If you call this without any parameters then you will only get part of the inventory. This is because a lot of devices nest each component, for instance you may initially have the chassis, within this the ports - 1 being an sfp cage, then the sfp itself. The way this API call is designed is to enable a recursive lookup. The first call will retrieve the root entry, included within this response will be entPhysicalIndex, you can then call for entPhysicalContainedIn which will then return the next layer of results.
 
-Route: /api/v0/inventory/:hostname
+Route: `/api/v0/inventory/:hostname`
 
   - hostname can be either the device hostname or the device id
 
@@ -1635,7 +1635,7 @@ Output:
 
 Retrieve the list of bills currently in the system.
 
-Route: /api/v0/bills
+Route: `/api/v0/bills`
 
 Input:
 
@@ -1694,7 +1694,7 @@ Output:
 
 Retrieve a specific bill
 
-Route: /api/v0/bills/:id
+Route: `/api/v0/bills/:id`
        /api/v0/bills?ref=:ref
        /api/v0/bills?custid=:custid
 
@@ -1761,7 +1761,7 @@ Output:
 
 Retrieve a specific ARP entry or all ARP enties for a device
 
-Route: /api/v0/resources/ip/arp/:ip
+Route: `/api/v0/resources/ip/arp/:ip`
 
   - ip is the specific IP you would like to query, if this is all then you need to pass ?device=_hostname_ (or device id)
   - This may also be a cidr network, for example 192.168.1.0/24
@@ -1800,7 +1800,7 @@ Output:
 
 Retrieve all services
 
-Route: /api/v0/services
+Route: `/api/v0/services`
 
 Input:
 
@@ -1860,7 +1860,7 @@ Output:
 
 Retrieve services for device
 
-Route: /api/v0/services/:hostname
+Route: `/api/v0/services/:hostname`
 
   - id or hostname is the specific device
 
@@ -1904,20 +1904,9 @@ Output:
 ```
 
 ## Logs
-
-### Function: `list_eventlog`
-### Function: `list_syslog`
-### Function: `list_alertlog`
-### Function: `list_authlog`
-
 All the `list_*logs` calls are aliased to `list_logs`.
 
 Retrieve all logs or logs for a specific device.
-
-Route: /api/v0/logs/eventlog/:hostname
-Route: /api/v0/logs/syslog/:hostname
-Route: /api/v0/logs/alertlog/:hostname
-Route: /api/v0/logs/authlog/:hostname
 
   - id or hostname is the specific device
 
@@ -1927,6 +1916,20 @@ Input:
   - limit: The limit of results to be returned.
   - from: The date and time to search from.
   - to: The data and time to search to.
+  
+### Function: `list_eventlog`
+Route: `/api/v0/logs/eventlog/:hostname`
+
+### Function: `list_syslog`
+Route: `/api/v0/logs/syslog/:hostname`
+
+### Function: `list_alertlog`
+Route: `/api/v0/logs/alertlog/:hostname`
+
+### Function: `list_authlog`
+Route: `/api/v0/logs/authlog/:hostname`
+
+
 
 Example:
 ```curl
