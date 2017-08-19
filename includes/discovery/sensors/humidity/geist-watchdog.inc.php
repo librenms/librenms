@@ -23,14 +23,14 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$value = snmp_get($device, 'climateHumidity', '-Oqv', 'GEIST-MIB-V3');
+$value = return_number(snmp_get($device, 'climateHumidity', '-Oqv', 'GEIST-MIB-V3'));
 if ($value) {
     $current_oid = '.1.3.6.1.4.1.21239.2.2.1.7.1';
     $descr = 'Humidity';
     discover_sensor($valid['sensor'], 'humidity', $device, $current_oid, 'climateHumidity', 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value);
 }
 
-$value = snmp_get($device, 'internalHumidity.1', '-Oqv', 'GEIST-V4-MIB');
+$value = return_number(snmp_get($device, 'internalHumidity.1', '-Oqv', 'GEIST-V4-MIB'));
 if ($value) {
     $current_oid = '.1.3.6.1.4.1.21239.5.1.2.1.6.1';
     $descr = 'Internal humidity';
