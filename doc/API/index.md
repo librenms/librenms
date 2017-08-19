@@ -98,8 +98,10 @@ You can do this by first calling `/api/v0`:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0
+```
 
-Output
+Output:
+```json
 {
  "list_bgp": "https://librenms.org/api/v0/bgp",
   ...
@@ -147,7 +149,7 @@ curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/d
 ```
 
 Output:
-```text
+```json
 {
     "status": "ok",
     "message": "Removed device localhost",
@@ -181,7 +183,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/loc
 ```
 
 Output:
-```text
+```json
 {
     "status": "ok",
     "devices": [
@@ -214,7 +216,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/loc
 ```
 
 Output:
-```text
+```json
 {
     "status": "ok",
     "err-msg": "",
@@ -420,7 +422,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/loc
 
 Output:
 
-```text
+```json
 {
     "status": "ok",
     "err-msg": "",
@@ -453,7 +455,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/loc
 
 Output:
 
-```text
+```json
 {
     "status": "ok",
     "err-msg": "",
@@ -489,7 +491,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/loc
 
 Output:
 
-```text
+```json
 {
   "status": "ok",
   "err-msg": "",
@@ -535,7 +537,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/loc
 
 Output:
 
-```text
+```json
 {
     "status": "ok",
     "err-msg": "",
@@ -591,7 +593,7 @@ curl -X POST -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/dev
 
 Output:
 
-```text
+```json
 {
     "status": "ok",
     "err-msg": "",
@@ -624,7 +626,7 @@ curl -X PUT -d '{"4459": {"type": "APITEST","label": "This is a test label","sta
 
 Output:
 
-```text
+```json
 {
     "status": "ok",
     "err-msg": "",
@@ -650,7 +652,7 @@ curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/d
 
 Output:
 
-```text
+```json
 {
     "status": "ok",
     "err-msg": ""
@@ -677,7 +679,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/loc
 
 Output:
 
-```text
+```json
 {
  "status": "ok",
  "port": {
@@ -745,7 +747,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices?ord
 
 Output:
 
-```text
+```json
 {
  "status": "ok",
  "count": 1,
@@ -768,7 +770,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices?typ
 
 Output:
 
-```text
+```json
 {
  "status": "ok",
  "count": 1,
@@ -819,7 +821,7 @@ curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":
 
 Output:
 
-```text
+```json
 {
     "status": "ok",
     "message": "Device localhost.localdomain (57) has been added successfully"
@@ -843,7 +845,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized
 
 Output:
 
-```text
+```json
 [
     {
         "hostname": "localhost",
@@ -876,7 +878,7 @@ curl -X PATCH -d '{"field": "notes", "data": "This server should be kept online"
 
 Output:
 
-```text
+```json
 [
     {
         "status": "ok",
@@ -891,7 +893,7 @@ curl -X PATCH -d '{"field": ["notes","purpose"], "data": ["This server should be
 
 Output:
 
-```text
+```json
 [
     {
         "status": "ok",
@@ -918,7 +920,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/loc
 ```
 
 Output:
-```text
+```json
 [
     {
         "status": "ok",
@@ -954,7 +956,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devicegroup
 ```
 
 Output:
-```text
+```json
 [
     {
         "status": "ok",
@@ -995,7 +997,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports?colum
 
 Output:
 
-```text
+```json
 {
   "status": "ok",
   "err-msg": "",
@@ -1036,7 +1038,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports/323
 
 Output:
 
-```text
+```json
 {
   "status": "ok",
   "err-msg": "",
@@ -1138,7 +1140,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports/323/i
 
 Output:
 
-```text
+```json
 {
   "status": "ok",
   "err-msg": "",
@@ -1173,7 +1175,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devicegroup
 ```
 
 Output:
-```text
+```json
 [
      {
          "status": "ok",
@@ -1265,7 +1267,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp
 ```
 
 Output:
-```text
+```json
 {
  "status": "ok",
  "err-msg": "",
@@ -1294,7 +1296,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/ips
 ```
 
 Output:
-```text
+```json
 {
     "status": "ok",
     "err-msg": "",
@@ -1333,7 +1335,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/loc
 ```
 
 Output:
-```text
+```json
 {
     "status": "ok",
     "count": 0,
@@ -1369,7 +1371,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/alerts/1
 ```
 
 Output:
-```text
+```json
 {
  "status": "ok",
  "err-msg": "",
@@ -1406,7 +1408,7 @@ curl -X PUT -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/aler
 ```
 
 Output:
-```text
+```json
 {
  "status": "ok",
  "err-msg": "",
@@ -1432,7 +1434,7 @@ curl -X PUT -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/aler
 ```
 
 Output:
-```text
+```json
 {
  "status": "ok",
  "err-msg": "",
@@ -1457,7 +1459,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/alerts?stat
 ```
 
 Output:
-```text
+```json
 {
  "status": "ok",
  "err-msg": "",
@@ -1495,7 +1497,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/rules/1
 ```
 
 Output:
-```text
+```json
 {
  "status": "ok",
  "err-msg": "",
@@ -1532,7 +1534,7 @@ curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/r
 ```
 
 Output:
-```text
+```json
 {
  "status": "ok",
  "err-msg": "",
@@ -1558,7 +1560,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/rules
 ```
 
 Output:
-```text
+```json
 {
  "status": "ok",
  "err-msg": "",
@@ -1602,7 +1604,7 @@ curl -X POST -d '{"device_id":"-1", "rule":"%devices.os != \"Cisco\"","severity"
 ```
 
 Output:
-```text
+```json
 rules
 {
  "status": "ok",
@@ -1637,7 +1639,7 @@ curl -X PUT -d '{"rule_id":1,"device_id":"-1", "rule":"%devices.os != \"Cisco\""
 ```
 
 Output:
-```text
+```json
 rules
 {
  "status": "ok",
@@ -1666,7 +1668,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/inventory/l
 ```
 
 Output:
-```text
+```json
 {
     "status": "ok",
     "err-msg": "",
@@ -1713,7 +1715,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills
 ```
 
 Output:
-```text
+```json
 {
  "status": "ok",
  "err-msg": "",
@@ -1780,7 +1782,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills?custi
 ```
 
 Output:
-```text
+```json
 {
  "status": "ok",
  "err-msg": "",
@@ -1846,7 +1848,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/i
 ```
 
 Output:
-```text
+```json
 {
     "status": "ok",
     "err-msg": "",
@@ -1883,7 +1885,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services?st
 ```
 
 Output:
-```text
+```json
 {
     "status": "ok",
     "err-msg": "",
@@ -1945,7 +1947,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/:h
 ```
 
 Output:
-```text
+```json
 {
     "status": "ok",
     "err-msg": "",
@@ -2004,7 +2006,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/eventl
 ```
 
 Output:
-```text
+```json
 {
     "status": "ok",
     "err-msg": "",
