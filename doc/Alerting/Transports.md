@@ -1,6 +1,6 @@
 source: Alerting/Transports.md
 
-# <a name="transports">Transports</a>
+# Transports
 
 Transports are located within `includes/alerts/transports.*.php` and defined as well as configured via ~~`$config['alert']['transports']['Example'] = 'Some Options'`~~.
 
@@ -24,7 +24,7 @@ $config['alert']['globals'] = true; //Include Global-Read into alert-contacts
 $config['alert']['admins']  = true; //Include Administrators into alert-contacts
 ```
 
-## <a name="transports-email">E-Mail</a>
+## E-Mail
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
@@ -62,17 +62,17 @@ $config['alert']['default_mail']           = '';                   //Default ema
 ```
 ~~
 
-## <a name="transports-api">API</a>
+## API
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
 API transports definitions are a bit more complex than the E-Mail configuration.
 The basis for configuration is ~~`$config['alert']['transports']['api'][METHOD]`~~ where `METHOD` can be `get`,`post` or `put`.
 This basis has to contain an array with URLs of each API to call.
-The URL can have the same placeholders as defined in the [Template-Syntax](#templates-syntax).
+The URL can have the same placeholders as defined in the [Template-Syntax](Templates#syntax).
 If the `METHOD` is `get`, all placeholders will be URL-Encoded.
 The API transport uses cURL to call the APIs, therefore you might need to install `php5-curl` or similar in order to make it work.
-__Note__: it is highly recommended to define own [Templates](#templates) when you want to use the API transport. The default template might exceed URL-length for GET requests and therefore cause all sorts of errors.
+__Note__: it is highly recommended to define own [Templates](Templates) when you want to use the API transport. The default template might exceed URL-length for GET requests and therefore cause all sorts of errors.
 
 Example:
 ~~
@@ -81,7 +81,7 @@ $config['alert']['transports']['api']['get'][] = "https://api.thirdparti.es/issu
 ```
 ~~
 
-## <a name="transports-nagios">Nagios Compatible</a>
+## Nagios Compatible
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
@@ -93,7 +93,7 @@ $config['alert']['transports']['nagios'] = "/path/to/my.fifo"; //Flapjack expect
 ```
 ~~
 
-## <a name="transports-irc">IRC</a>
+## IRC
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
@@ -105,7 +105,7 @@ $config['alert']['transports']['irc'] = true;
 ```
 ~~
 
-## <a name="transports-slack">Slack</a>
+## Slack
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
@@ -122,7 +122,7 @@ $config['alert']['transports']['slack'][] = array('url' => "https://hooks.slack.
 ```
 ~~
 
-## <a name="transports-slack">Rocket.chat</a>
+## Rocket.chat
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -135,7 +135,7 @@ $config['alert']['transports']['rocket'][] = array('url' => "https://rocket.url/
 
 ```
 
-## <a name="transports-hipchat">HipChat</a>
+## HipChat
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
@@ -186,7 +186,7 @@ $config['alert']['transports']['hipchat'][] = array("url" => "https://api.hipcha
 > results, such as HipChat attempting to interpret angled brackets (`<` and
 > `>`).
 
-## <a name="transports-pagerduty">PagerDuty</a>
+## PagerDuty
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
@@ -208,7 +208,7 @@ That's it!
 
 __Note__: Currently ACK notifications are not transported to PagerDuty, This is going to be fixed within the next major version (version by date of writing: 2015.05)
 
-## <a name="transports-pushover">Pushover</a>
+## Pushover
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -239,7 +239,7 @@ $config['alert']['transports']['pushover'][] = array(
 ```
 ~~
 
-## <a name="transports-boxcar">Boxcar</a>
+## Boxcar
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -265,7 +265,7 @@ $config['alert']['transports']['boxcar'][] = array(
 ```
 ~~
 
-## <a name="transports-telegram">Telegram</a>
+## Telegram
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -298,7 +298,7 @@ $config['alert']['transports']['pushbullet'] = 'MYFANCYACCESSTOKEN';
 ```
 ~~
 
-## <a name="transports-clickatell">Clickatell</a>
+## Clickatell
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -315,7 +315,7 @@ $config['alert']['transports']['clickatell']['to'][]  = '+1234567892';
 ```
 ~~
 
-## <a name="transports-playsms">PlaySMS</a>
+## PlaySMS
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -334,7 +334,7 @@ $config['alert']['transports']['playsms']['to'][]  = '+1234567891';
 ```
 ~~
 
-## <a name="transports-victorops">VictorOps</a>
+## VictorOps
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -352,7 +352,7 @@ $config['alert']['transports']['victorops']['url'] = 'https://alert.victorops.co
 ```
 ~~
 
-## <a name="transports-canopsis">Canopsis</a>
+## Canopsis
 
 Canopsis is a hypervision tool. LibreNMS can send alerts to Canopsis which are then converted to canopsis events. To configure the transport, go to:
 
@@ -374,7 +374,7 @@ For more information about canopsis and its events, take a look here :
  http://www.canopsis.org/
  http://www.canopsis.org/wp-content/themes/canopsis/doc/sakura/user-guide/event-spec.html
 
-## <a name="transports-osticket">osTicket</a>
+## osTicket
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -391,7 +391,7 @@ $config['alert']['transports']['osticket']['token'] = '123456789';
 ```
 ~~
 
-## <a name="transports-msteams">Microsoft Teams</a>
+## Microsoft Teams
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -407,7 +407,7 @@ $config['alert']['transports']['msteams']['url'] = 'https://outlook.office365.co
 ```
 ~
 
-## <a name="transports-ciscospark">Cisco Spark</a>
+## Cisco Spark
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -431,7 +431,7 @@ $config['alert']['transports']['ciscospark']['roomid'] = '1234567890QWERTYUIOP';
 ```
 ~
 
-## <a name="transports-smseagle">SMSEagle</a>
+## SMSEagle
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -449,7 +449,7 @@ $config['alert']['transports']['smseagle']['to'][]  = '0834567891';
 ```
 ~
 
-## <a name="transports-syslog">Syslog</a>
+## Syslog
 
 You can have LibreNMS emit alerts as syslogs complying with RFC 3164.
 More information on RFC 3164 can be found here: https://tools.ietf.org/html/rfc3164
@@ -464,7 +464,7 @@ $config['alert']['transports']['syslog']['syslog_facility'] = 3;
 ```
 ~
 
-## <a name="transports-elasticsearch">Elasticsearch</a>
+## Elasticsearch
 
 You can have LibreNMS emit alerts to an elasticsearch database. Each fault will be sent as a separate document.
 The index pattern uses strftime() formatting.
@@ -479,7 +479,7 @@ $config['alert']['transports']['elasticsearch']['es_proxy'] = false;
 ```
 ~
 
-## <a name="transports-jira">JIRA</a>
+## JIRA
 
 You can have LibreNMS create issues on a Jira instance for critical and warning alerts. The Jira transport only sets summary and description fiels. Therefore your Jira project must not have any other mandatory field for the provided issuetype. The config fields that need to set are Jira URL, Jira username, Jira password, Project key, and issue type. 
 Currently http authentication is used to access Jira and Jira username and password will be stored as cleartext in the LibreNMS database.
