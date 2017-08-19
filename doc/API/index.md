@@ -73,15 +73,15 @@ source: API/API-Docs.md
         
 Describes the API structure.
 
-# `Structure` <small>[`top`](#top)</small>
+# Structure <small>[`top`](#top)</small>
 
-## `Versioning` [`top`](#top)
+## Versioning [`top`](#top)
 
 Versioning an API is a minefield which saw us looking at numerous options on how to do this. Paul wrote an excellent blog post which touches on this: https://blog.librenms.org/2014/09/restful-apis/
 
 We have currently settled on using versioning within the API end point itself `/api/v0`. As the API itself is new and still in active development we also decided that v0 would be the best starting point to indicate it's in development.
 
-## `Tokens` [`top`](#top)
+## Tokens [`top`](#top)
 
 To access any of the token end points you will be required to authenticate using a token. Tokens can be created directly from within the LibreNMS web interface by going to `/api-access/`.
 
@@ -90,7 +90,7 @@ To access any of the token end points you will be required to authenticate using
 - Enter an optional description.
 - Click Create API Token.
 
-## `Endpoints` [`top`](#top)
+## Endpoints [`top`](#top)
 
 Whilst this documentation will describe and show examples of the end points, we've designed the API so you should be able to traverse through it without know any of the available API routes.
 
@@ -107,7 +107,7 @@ Output
 }
 ```
 
-## `Input` [`top`](#top)
+## Input [`top`](#top)
 
 Input to the API is done in three different ways, sometimes a combination two or three of these.
 
@@ -118,16 +118,16 @@ Input to the API is done in three different ways, sometimes a combination two or
 curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":"public"}'-H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices
 ```
 
-## `Output` [`top`](#top)
+## Output [`top`](#top)
 
 Output from the API currently is via two output types.
 
   - JSON Most API responses will output json. As show in the example for calling the API endpoint.
   - PNG This is for when the request is for an image such as a graph for a switch port.
 
-# `Endpoints` [`top`](#top)
+# Endpoints [`top`](#top)
 
-## `Devices` [`top`](#top)
+## Devices [`top`](#top)
 
 ### Function: `del_device` [`top`](#top)
 
@@ -1475,7 +1475,7 @@ Output:
 }
 ```
 
-## `Rules` [`top`](#top)
+## Rules [`top`](#top)
 
 ### Function: `get_alert_rule` [`top`](#top)
 
@@ -1645,7 +1645,7 @@ rules
 }
 ```
 
-## `Inventory` [`top`](#top)
+## Inventory [`top`](#top)
 
 ### Function: `get_inventory` [`top`](#top)
 
@@ -1697,7 +1697,7 @@ Output:
 }
 ```
 
-## `Bills` [`top`](#top)
+## Bills [`top`](#top)
 
 ### Function: `list_bills` [`top`](#top)
 
@@ -1862,7 +1862,7 @@ Output:
 }
 ```
 
-## `Services` [`top`](#top)
+## Services [`top`](#top)
 
 ### Function: `list_services` [`top`](#top)
 
@@ -1971,7 +1971,7 @@ Output:
 }
 ```
 
-## `Logs` [`top`](#top)
+## Logs [`top`](#top)
 
 ### Function: `list_eventlog` [`top`](#top)
 ### Function: `list_syslog` [`top`](#top)
