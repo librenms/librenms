@@ -29,8 +29,4 @@ rrd
 !/lib/yaml
 /vendor
 composer.phar
-
-# Docs #
-########
-out
 librenms_theme
