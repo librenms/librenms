@@ -16,8 +16,8 @@ $oids = trim($oids);
 foreach (explode("\n", $oids) as $data) {
     $data = trim($data);
     list($dataoid,$dataval) = explode(" ", $data);
-    $oidparts=explode(".", $dataoid);
-    $oididx=$oidparts[count($oidparts)-1];
+    $oidparts = explode(".", $dataoid);
+    $oididx = $oidparts[count($oidparts)-1];
     if ($data and $dataval == "1") {
         $value_oid = ".1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4.".$oididx;
         $descr_oid = ".1.3.6.1.4.1.1588.2.1.1.1.1.22.1.5.".$oididx;
