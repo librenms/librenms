@@ -4,6 +4,7 @@
 
 // disable certificate checking before connect if required
 use LibreNMS\Exceptions\AuthenticationException;
+use LibreNMS\Config;
 
 function init_auth()
 {
@@ -97,7 +98,6 @@ function user_in_group($username, $groupname)
     global $config, $ldap_connection;
 
     // get DN for auth_ad_group
-    $filter = "(&(objectClass=group)(cn=$groupname))";
     $search = ldap_search(
         $ldap_connection,
         $config['auth_ad_base_dn'],
@@ -116,7 +116,6 @@ function user_in_group($username, $groupname)
         array("DN")
     );
     $entries = ldap_get_entries($ldap_connection, $search);
-    unset($entries[0]['memberof']['count']); //remove the annoying count
 
     return ($entries["count"] > 0);
 }
@@ -193,8 +192,8 @@ function get_userlevel($username)
     foreach ($config['auth_ad_groups'] as $group => $level) {
         if (user_in_group($username, $group)) {
             // user is in the current group - save new userlevel if higher than before
-            if ($config['auth_ad_groups'][$group]['level'] > $userlevel) {
-                $userlevel = $config['auth_ad_groups'][$group]['level'];
+            if (Config::get("auth_ad_groups.$group.level") > $userlevel) {
+                $userlevel = Config::get("auth_ad_groups.$group.level");
             }
         }
     }
