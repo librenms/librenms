@@ -689,6 +689,8 @@ if (isset($_SERVER['HTTPS'])) {
 // Set some times needed by loads of scripts (it's dynamic, so we do it here!)
 $config['time']['now']      = time();
 $config['time']['now']     -= ($config['time']['now'] % 300);
+$config['time']['onehour'] = ($config['time']['now'] - 3600);
+// time() - (1 * 60 * 60);
 $config['time']['fourhour'] = ($config['time']['now'] - 14400);
 // time() - (4 * 60 * 60);
 $config['time']['sixhour'] = ($config['time']['now'] - 21600);
