@@ -15,7 +15,9 @@ foreach ($sql_result as $entry) {
 }
 
 $insert = array(); // populate $insert with database entries
-if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
+if (file_exists($config['install_dir'] . "/includes/discovery/fdb-table/{$device['os']}.inc.php")) {
+    require $config['install_dir'] . "/includes/discovery/fdb-table/{$device['os']}.inc.php";
+} elseif ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
     include $config['install_dir'] . '/includes/discovery/fdb-table/ios.inc.php';
 } else {
     // Check generic Q-BRIDGE-MIB and BRIDGE-MIB
