@@ -210,7 +210,7 @@ $config['int_l2tp']                = 0;  # Enable L2TP Port Types
 ```
 Enable / disable certain menus from being shown in the WebUI.
 
-+You are able to adjust the number and time frames of the quick select time options for graphs and the mini graphs shown per row.
+You are able to adjust the number and time frames of the quick select time options for graphs and the mini graphs shown per row.
  
 Quick select:
 ```php
