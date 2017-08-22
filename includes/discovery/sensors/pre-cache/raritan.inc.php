@@ -28,3 +28,6 @@ $pre_cache['raritan_inletTable'] = snmpwalk_group($device, 'inletTable', 'PDU-MI
 
 echo 'inletPoleTable ';
 $pre_cache['raritan_inletPoleTable'] = snmpwalk_group($device, 'inletPoleTable', 'PDU-MIB', 2);
+
+echo 'inletLabel ';
+$pre_cache['raritan_inletLabel'] = snmpwalk_cache_oid($device, 'inletLabel', array(), 'PDU2-MIB');
