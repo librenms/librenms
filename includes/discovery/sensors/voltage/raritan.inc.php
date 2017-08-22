@@ -41,7 +41,7 @@ foreach ($pre_cache['raritan_inletTable'] as $index => $raritan_data) {
 
 foreach ($pre_cache['raritan_inletLabel'] as $index => $inlet_data) {
     $inlet_descr = $inlet_data['inletLabel'];
-    $inlet_oid     = ".1.3.6.1.4.1.13742.6.5.2.3.1.4.$index.5";
+    $inlet_oid     = ".1.3.6.1.4.1.13742.6.5.2.3.1.4.$index.4";
     $inlet_divisor = pow(10, snmp_get($device, "inletSensorDecimalDigits.$index.rmsVoltage", '-Ovq', 'PDU2-MIB'));
     $inlet_power   = (snmp_get($device, "measurementsInletSensorValue.$index.rmsVoltage", '-Ovq', 'PDU2-MIB') / $inlet_divisor);
 
