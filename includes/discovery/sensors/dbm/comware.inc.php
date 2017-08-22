@@ -12,12 +12,6 @@
 
 echo 'Comware ';
     
-// Based on 10G_BASE_LR_SFP, as HP does not provide threshold values through snmp
-// Alarm thresholds:
-// RX power(dBm)  TX power(dBm)
-// 2.50           3.50
-// -12.30         -11.20
-    
 $multiplier = 1;
 $divisor    = 100;
 foreach ($pre_cache['comware_oids'] as $index => $entry) {
@@ -27,10 +21,10 @@ foreach ($pre_cache['comware_oids'] as $index => $entry) {
             $index,
             $device['device_id']
         ));
-        $limit_low                 = -30;
-        $warn_limit_low            = -12.3;
-        $limit                     = 2.5;
-        $warn_limit                = -3;
+        $limit_low                 = uw_to_dbm($entry['hh3cTransceiverRcvPwrLoAlarm'] / 10);
+        $warn_limit_low            = uw_to_dbm($entry['hh3cTransceiverRcvPwrLoWarn'] / 10);
+        $limit                     = uw_to_dbm($entry['hh3cTransceiverRcvPwrHiAlarm'] / 10);
+        $warn_limit                = uw_to_dbm($entry['hh3cTransceiverRcvPwrHiWarn'] / 10);
         $current                   = $entry['hh3cTransceiverCurRXPower'] / $divisor;
         $entPhysicalIndex          = $index;
         $entPhysicalIndex_measured = 'ports';
@@ -46,10 +40,10 @@ foreach ($pre_cache['comware_oids'] as $index => $entry) {
             $index,
             $device['device_id']
         ));
-        $limit_low                 = -30;
-        $warn_limit_low            = -11.2;
-        $limit                     = 3.5;
-        $warn_limit                = -3;
+        $limit_low                 = uw_to_dbm($entry['hh3cTransceiverPwrOutLoAlarm'] / 10);
+        $warn_limit_low            = uw_to_dbm($entry['hh3cTransceiverPwrOutLoWarn'] / 10);
+        $limit                     = uw_to_dbm($entry['hh3cTransceiverPwrOutHiAlarm'] / 10);
+        $warn_limit                = uw_to_dbm($entry['hh3cTransceiverPwrOutHiWarn'] / 10);
         $current                   = $entry['hh3cTransceiverCurTXPower'] / $divisor;
         $entPhysicalIndex          = $index;
         $entPhysicalIndex_measured = 'ports';
