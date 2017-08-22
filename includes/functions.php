@@ -1491,36 +1491,6 @@ function host_exists($hostname, $sysName = null)
     return dbFetchCell($query, $params) > 0;
 }
 
-/**
- * Check the innodb buffer size
- *
- * @return array including the current set size and the currently used buffer
-**/
-function innodb_buffer_check()
-{
-    $pool['size'] = dbFetchCell('SELECT @@innodb_buffer_pool_size');
-    // The following query is from the excellent mysqltuner.pl by Major Hayden https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl
-    $pool['used'] = dbFetchCell('SELECT SUM(DATA_LENGTH+INDEX_LENGTH) FROM information_schema.TABLES WHERE TABLE_SCHEMA NOT IN ("information_schema", "performance_schema", "mysql") AND ENGINE = "InnoDB" GROUP BY ENGINE ORDER BY ENGINE ASC');
-    return $pool;
-}
-
-/**
- * Print warning about InnoDB buffer size
- *
- * @param array $innodb_buffer An array that contains the used and current size
- *
- * @return string $output
-**/
-function warn_innodb_buffer($innodb_buffer)
-{
-    $output  = 'InnoDB Buffersize too small.'.PHP_EOL;
-    $output .= 'Current size: '.($innodb_buffer['size'] / 1024 / 1024).' MiB'.PHP_EOL;
-    $output .= 'Minimum Required: '.($innodb_buffer['used'] / 1024 / 1024).' MiB'.PHP_EOL;
-    $output .= 'To ensure integrity, we\'re not going to pull any updates until the buffersize has been adjusted.'.PHP_EOL;
-    $output .= 'Config proposal: "innodb_buffer_pool_size = '.pow(2, ceil(log(($innodb_buffer['used'] / 1024 / 1024), 2))).'M"'.PHP_EOL;
-    return $output;
-}
-
 function oxidized_reload_nodes()
 {
 
@@ -2202,7 +2172,7 @@ function dump_db_schema()
                 'Field'   => $data['COLUMN_NAME'],
                 'Type'    => $data['COLUMN_TYPE'],
                 'Null'    => $data['IS_NULLABLE'] === 'YES',
-                'Default' => $data['COLUMN_DEFAULT'],
+                'Default' => trim($data['COLUMN_DEFAULT'], "'") ?: 'NULL',
                 'Extra'   => $data['EXTRA'],
             );
         }

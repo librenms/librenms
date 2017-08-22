@@ -112,6 +112,7 @@ server {
   include fastcgi.conf;
   fastcgi_split_path_info ^(.+\.php)(/.+)$;
   fastcgi_pass unix:/var/run/php-fpm/php7.0-fpm.sock;
+  fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
  }
  location ~ /\.ht {
   deny all;
@@ -125,7 +126,10 @@ server {
     yum install policycoreutils-python
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/logs(/.*)?'
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/logs(/.*)?'
+    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/rrd(/.*)?'
+    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/rrd(/.*)?'
     restorecon -RFvv /opt/librenms/logs/
+    restorecon -RFvv /opt/librenms/rrd/
     setsebool -P httpd_can_sendmail=1
 ```
 

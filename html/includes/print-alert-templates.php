@@ -24,9 +24,18 @@ require_once 'includes/modal/attach_alert_template.inc.php';
           </tr>
       </thead>
       <tbody>
+          <tr data-row-id="0">
+            <td>0</td>
+            <td>Default Alert Template</td>
+            <td></td>
+          </tr>
 <?php
 $full_query = "SELECT id, name from alert_templates";
 foreach (dbFetchRows($full_query, $param) as $template) {
+    if ($template['name'] == 'Default Alert Template') {
+        $default_tplid = $template['id'];
+        continue;
+    }
     echo '<tr data-row-id="'.$template['id'].'">
             <td>'.$template['id'].'</td>
             <td>'.$template['name'].'</td>
@@ -59,14 +68,26 @@ $(document).ready(function() {
         },
         formatters: {
             "commands": function(column, row) {
-                var response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-toggle=\"modal\" data-target='#confirm-delete-alert-template' data-template_id=\"" + row.id + "\" name='delete-alert-template'><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button> " + "<button type='button' class='btn btn-warning btn-xs command-attach' data-toggle='modal' data-target='#attach-alert-template' data-template_id='" + row.id + "' name='attach-alert-template'><i class='fa fa-th-list' aria-hidden='true'></i></button>";
+                var response = '';
+                if(row.id == 0) {
+                    response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" disabled=\"disabled\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button> " + "<button type='button' class='btn btn-warning btn-xs command-attach' disabled=\"disabled\"><i class='fa fa-th-list' aria-hidden='true'></i></button>";
+                } else {
+                    response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-toggle=\"modal\" data-target='#confirm-delete-alert-template' data-template_id=\"" + row.id + "\" name='delete-alert-template'><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button> " + "<button type='button' class='btn btn-warning btn-xs command-attach' data-toggle='modal' data-target='#attach-alert-template' data-template_id='" + row.id + "' name='attach-alert-template'><i class='fa fa-th-list' aria-hidden='true'></i></button>";
+                }
                 return response;
             }
         },
     }).on("loaded.rs.jquery.bootgrid", function() {
         /* Executes after data is loaded and rendered */
         grid.find(".command-edit").on("click", function(e) {
-            $('#template_id').val($(this).data("template_id"));
+            var localtmpl_id = $(this).data("template_id");
+            if(localtmpl_id == 0) {
+                $('#default_template').val("1");
+                $('#template_id').val(<?=$default_tplid?>);
+            } else {
+                $('#default_template').val("0");
+                $('#template_id').val(localtmpl_id);
+            }
             $("#alert-template").modal('show');
         }).end().find(".command-delete").on("click", function(e) {
             $('#template_id').val($(this).data("template_id"));

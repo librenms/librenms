@@ -1,12 +1,12 @@
 source: Alerting/Templates.md
 
-# <a name="templates">Templates</a>
+# Templates
 
-Templates can be assigned to a single or a group of rules and can contain any kind of text.
+Templates can be assigned to a single or a group of rules and can contain any kind of text. There is also a default template which is used for any rule that isn't associated with a template. This template can be found under `Alert Templates` page and can be edited. It also has an option revert it back to its default content. 
 
 The template-parser understands `if` and `foreach` controls and replaces certain placeholders with information gathered about the alert.
 
-## <a name="templates-syntax">Syntax</a>
+## Syntax
 
 Controls:
 
@@ -58,7 +58,7 @@ Limit: %value.sensor_limit_low / %value.sensor_limit
 
 The Default Template is a 'one-size-fit-all'. We highly recommend defining your own templates for your rules to include more specific information.
 
-## <a name="templates-testing">Testing</a>
+## Testing
 
 It's possible to test your new template before assigning it to a rule. To do so you can run `./scripts/test-template.php`. The script will provide the help 
 info when ran without any parameters.
@@ -70,7 +70,7 @@ As an example, if you wanted to test template ID 10 against localhost running ru
 If the rule is currently alerting for localhost then you will get the full template as expected to see on email, if it's not then you will just see the 
 template without any fault information.
 
-## <a name="templates-examples">Examples</a>
+## Examples
 
 Default Template:
 ```text
@@ -95,12 +95,12 @@ Conditional formatting example, will display a link to the host in email or just
 
 Note the use of double-quotes.  Single quotes (`'`) in templates will be escaped (replaced with `\'`) in the output and should therefore be avoided.
 
-## <a name="templates-included">Included</a>
+## Included
 
 We include a few templates for you to use, these are specific to the type of alert rules you are creating. For example if you create a rule that would alert on BGP sessions then you can 
 assign the BGP template to this rule to provide more information.
 
-The included templates are:
+The included templates apart from the default template are:
 
   - BGP Sessions
   - Ports

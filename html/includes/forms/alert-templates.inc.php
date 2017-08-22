@@ -59,10 +59,14 @@ if (!empty($name)) {
     } elseif ($_REQUEST['template']) {
         //Create new template
 
-        if (dbInsert(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates")) {
-            $ok = "Alert template has been created.";
+        if ($name != 'Default Alert Template') {
+            if (dbInsert(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates")) {
+                $ok = "Alert template has been created.";
+            } else {
+                $error = "Could not create alert template";
+            }
         } else {
-            $error = "Could not create alert template";
+            $error = "This template name is reserved!";
         }
     } else {
         $error = "We could not work out what you wanted to do!";

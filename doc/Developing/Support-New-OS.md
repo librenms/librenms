@@ -1,4 +1,5 @@
 source: Developing/Support-New-OS.md
+hide_toc: true
 
 This document is broken down into the relevant sections depending on what support you are adding.
 During all of these examples we will be using the OS of `pulse` as the example OS we will add. 

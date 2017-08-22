@@ -264,8 +264,11 @@ $graphs['sdfsinfo'] = array(
 );
 
 $graphs['pi-hole'] = array(
-    'stats',
-    'queries',
+    'query_types',
+    'destinations',
+    'query_results',
+    'block_percent',
+    'blocklist',
 );
 
 print_optionbar_start();

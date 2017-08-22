@@ -1,24 +1,18 @@
 source: Extensions/IRC-Bot.md
-Table of Content:
--   [About](#about)
-   -   [Configuration](#config)
-   -   [Commands](#commands)
--   [Examples](#examples)
--   [Extensions](#extensions)
+[TOC]
 
-
-# <a name="about">About</a>
+# About
 
 LibreNMS has an easy to use IRC-Interface for basic tasks like viewing last log-entry, current device/port status and such.
 
-By default the IRC-Bot will not start when executed and will return an error until at least `$config['irc_host']` and `$config['irc_port']` has been specified inside `config.php`.
+By default the IRC-Bot will not start when executed and will return an error until at least `$config['irc_host']` and `$config['irc_port']` has been specified inside `config.php`. (To start the IRC-Bot run ./irc.php )
 
 If no channel has been specified with `$config['irc_chan']`, `##librenms` will be used.
 The default Nick for the bot is `LibreNMS`.
 
 The Bot will reply the same way it's being called. If you send it the commands via Query, it will respond in the Query. If you send the commands via a Channel, then it will respond in the Channel.
 
-### <a name="config">Configuration & Defaults</a>
+### Configuration & Defaults
 
 Option | Default-Value | Notes
 --- | --- | ---
@@ -38,7 +32,7 @@ Option | Default-Value | Notes
 `$config['irc_ctcp_version']` | `LibreNMS IRCbot. https://www.librenms.org/` | Optional: Reply-string to CTCP VERSION requests
 `$config['irc_auth']` |  | Optional: Array of hostmasks that are automatically authenticated.  
 
-### <a name="commands">IRC-Commands</a>
+### IRC-Commands
 
 Command | Description
 --- | ---
@@ -57,7 +51,7 @@ Command | Description
 
 ( __/!\__ All commands are case-_insensitive_ but their arguments are case-_sensitive_)
 
-# <a name="examples">Examples</a>
+# Examples
 
 ### Server examples:
 
@@ -115,7 +109,7 @@ Or using a single string using `,` as delimiter between various channels:
 ```
 Any client matching one of the first two hostmasks will automatically be authenticated as the "admin" user in LibreNMS, and clients matching the last line will be authenticated as the user "john" in LibreNMS, without using .auth and a waiting for a valid token.
 
-# <a name="extensions">Extensions?!</a>
+# Extensions?!
 
 The bot is coded in a unified way.
 This makes writing extensions by far less painful.
@@ -143,3 +137,21 @@ File: includes/ircbot/echo.inc.php
       return $this->respond("root shouldn't be online so late!");
    }
 ```
+
+# Systemd start up script
+
+Basic systemd start up script to be placed in /etc/systemd/system/ to start irc service at boot. 
+
+librenms-irc.service script is located at /opt/librenms/misc/
+
+Once copied to /etc/systemd/system/ you must run the following commands:
+
+a) chmod 664 /etc/systemd/system/librenms-irc.service
+ 
+b) systemctl daemon-reload
+
+c) systemctl enable librenms-irc.service
+
+d) systemctl start librenms-irc.service
+
+It can be stopped or started just like any other systemd script such as systemctl start librenms-irc.service
