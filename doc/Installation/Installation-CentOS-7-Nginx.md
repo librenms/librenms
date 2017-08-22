@@ -20,7 +20,7 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-`vim /etc/my.cnf`
+`vi /etc/my.cnf`
 
 Within the [mysqld] section please add:
 
@@ -63,6 +63,7 @@ Restart PHP.
 
 ```bash
 systemctl restart php-fpm
+systemctl enable php-fpm
 ```
 
 #### Add librenms user
@@ -86,7 +87,7 @@ git clone https://github.com/librenms/librenms.git librenms
 cd /opt/librenms
 mkdir rrd logs
 chmod 775 rrd
-vim /etc/nginx/conf.d/librenms.conf
+vi /etc/nginx/conf.d/librenms.conf
 ```
 
 Add the following config:
@@ -119,6 +120,20 @@ server {
  }
 }
 ```
+
+If LibreNMS will be your only vhost on this server then you will need to remove the default server block for nginx.
+
+Edit `/etc/nginx/nginx.conf` and look for a large block of text starting like:
+
+```
+server {
+        listen       80;
+        server_name  localhost;
+...
+}
+```
+
+Remove this block of text.
 
 #### SELinux
 
@@ -158,7 +173,7 @@ Once you have completed the web installer steps. Please add the following to `co
 
 ```bash
 cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
-vim /etc/snmp/snmpd.conf
+vi /etc/snmp/snmpd.conf
 ```
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
