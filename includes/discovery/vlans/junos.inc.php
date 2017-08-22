@@ -8,11 +8,21 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
     echo "ver $vlanversion ";
     $vtpdomain_id = '1';
     $vlans        = snmpwalk_cache_oid($device, 'jnxExVlanName', array(), 'JUNIPER-VLAN-MIB');
-    $tagoruntag   = snmpwalk_cache_oid($device, 'jnxExVlanTag', array(), 'JUNIPER-VLAN-MIB', null, '-OQUs --hexOutputLength=0');
-    $untag        = snmpwalk_cache_oid($device, 'jnxExVlanPortTagness', array(), 'JUNIPER-VLAN-MIB', null, '-OQeUs --hexOutputLength=0');
+    if (empty($vlans)) {
+        $vlans      = snmpwalk_cache_oid($device, 'jnxL2aldVlanName', array(), 'JUNIPER-L2ALD-MIB');
+        $tagoruntag = snmpwalk_cache_oid($device, 'jnxL2aldVlanTag', array(), 'JUNIPER-L2ALD-MIB', null, '-OQUs --hexOutputLength=0');
+        $untag      = snmpwalk_cache_oid($device, 'jnxExVlanPortTagness', array(), 'JUNIPER-VLAN-MIB', null, '-OQeUs --hexOutputLength=0');
+        $tmp_tag    = 'jnxL2aldVlanTag';
+        $tmp_name   = 'jnxL2aldVlanName';
+    } else {
+        $tagoruntag = snmpwalk_cache_oid($device, 'jnxExVlanTag', array(), 'JUNIPER-VLAN-MIB', null, '-OQUs --hexOutputLength=0');
+        $untag      = snmpwalk_cache_oid($device, 'jnxExVlanPortTagness', array(), 'JUNIPER-VLAN-MIB', null, '-OQeUs --hexOutputLength=0');
+        $tmp_tag    = 'jnxExVlanTag';
+        $tmp_name   = 'jnxExVlanName';
+    }
 
     foreach ($vlans as $vlan_id => $vlan) {
-        $vlan_id = $tagoruntag[$vlan_id]['jnxExVlanTag'];
+        $vlan_id = $tagoruntag[$vlan_id][$tmp_tag];
         d_echo(" $vlan_id");
         if (is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
             echo '.';
@@ -21,14 +31,14 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
                 'device_id' => $device['device_id'],
                 'vlan_domain' => $vtpdomain_id,
                 'vlan_vlan' => $vlan_id,
-                'vlan_name' => $vlan['jnxExVlanName'],
+                'vlan_name' => $vlan[$tmp_name],
                 'vlan_type' => array('NULL')
             ), 'vlans');
             echo '+';
         }
 
         $device['vlans'][$vtpdomain_id][$vlan_id] = $vlan_id;
-        $egress_ids = $tagoruntag[$vlan_id]['jnxExVlanTag'];
+        $egress_ids = $tagoruntag[$vlan_id][$tmp_tag];
 
         foreach ($egress_ids as $port_id) {
             $ifIndex = $base_to_index[$port_id];
