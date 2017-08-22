@@ -298,7 +298,10 @@ if (isset($config['rrdtool_version']) && (version_compare($config['rrdtool_versi
 if (check_git_exists() === true) {
     if ($config['update_channel'] == 'master' && $versions['local_sha'] != $versions['github']['sha']) {
         $commit_date = new DateTime('@'.$versions['local_date'], new DateTimeZone(date_default_timezone_get()));
-        print_warn("Your install is out of date, last update: " . $commit_date->format('r'));
+        $new_date    = new DateTime("now");
+        if ($commit_date->diff($new_date)->days > 1) {
+            print_warn("Your install is over 24 hours out of date, last update: " . $commit_date->format('r'));
+        }
     }
 
     if ($versions['local_branch'] != 'master') {
