@@ -105,8 +105,6 @@ if (is_array($oids)) {
                 $divisor = $divisor.str_pad('', $entry['entPhySensorPrecision'], '0');
             }
 
-            $current = ($current * $multiplier / $divisor);
-
             if ($type == 'temperature') {
                 if ($current > '200') {
                     $valid_sensor = false;
@@ -149,14 +147,17 @@ if (is_array($oids)) {
                         $divisor = 10;
                     }
                     if ($type == "power" && preg_match("/DOM (R|T)x Power/i", $descr)) {
-                        $type           = "dbm";
-                        $current        = round(10 * log10($entry['entPhySensorValue'] / 10000), 3);
-                        $multiplier     = 1;
-                        $divisor        = 1;
+                        $type = "dbm";
+                        $current = round(10 * log10($entry['entPhySensorValue'] / 10000), 3);
+                        $multiplier = 1;
+                        $divisor = 1;
                         $low_warn_limit = set_null(round(10 * log10($low_warn_limit / 10000)));
-                        $low_limit      = set_null(round(10 * log10($low_limit / 10000)));
-                        $warn_limit     = set_null(round(10 * log10($warn_limit / 10000)));
-                        $high_limit     = set_null(round(10 * log10($high_limit / 10000)));
+                        $low_limit = set_null(round(10 * log10($low_limit / 10000)));
+                        $warn_limit = set_null(round(10 * log10($warn_limit / 10000)));
+                        $high_limit = set_null(round(10 * log10($high_limit / 10000)));
+                    } elseif ($type == 'current' && preg_match("/DOM (R|T)x Bias/i", $descr)) {
+                        $divisor = 1;
+                        $multiplier = 1;
                     } else {
                         $low_warn_limit = $low_warn_limit / $divisor;
                         $low_limit      = $low_limit / $divisor;
@@ -165,6 +166,7 @@ if (is_array($oids)) {
                     }
                 }
                 $current = set_numeric($current);
+                $current = ($current * $multiplier / $divisor);
                 discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity']);
             }
         }//end if
