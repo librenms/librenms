@@ -38,3 +38,14 @@ foreach ($pre_cache['raritan_inletTable'] as $index => $raritan_data) {
         discover_sensor($valid["sensor"], "voltage", $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
     }
 }
+
+foreach ($pre_cache['raritan_inletLabel'] as $index => $inlet_data) {
+    $inlet_descr = $inlet_data['inletLabel'];
+    $inlet_oid     = ".1.3.6.1.4.1.13742.6.5.2.3.1.4.$index.4";
+    $inlet_divisor = pow(10, snmp_get($device, "inletSensorDecimalDigits.$index.rmsVoltage", '-Ovq', 'PDU2-MIB'));
+    $inlet_power   = (snmp_get($device, "measurementsInletSensorValue.$index.rmsVoltage", '-Ovq', 'PDU2-MIB') / $inlet_divisor);
+
+    if ($inlet_power >= 0) {
+        discover_sensor($valid['sensor'], 'voltage', $device, $inlet_oid, $index.'.rmsVoltage', 'raritan', $inlet_descr, $inlet_divisor, 1, null, null, null, null, $inlet_power);
+    }
+}
