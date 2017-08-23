@@ -1,8 +1,8 @@
 <?php
 /**
- * raritan.inc.php
+ * edgeswitch.inc.php
  *
- * LibreNMS pre-cache discovery module for Raritan
+ * FDP Table discovery file for EdgeSwitch
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,15 +19,17 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <gh+n@laf.io>
+ * @copyright  2017 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-echo 'inletTable ';
-$pre_cache['raritan_inletTable'] = snmpwalk_group($device, 'inletTable', 'PDU-MIB');
+$binding = snmpwalk_group($device, 'agentDynamicDsBindingTable', 'EdgeSwitch-SWITCHING-MIB', 1);
 
-echo 'inletPoleTable ';
-$pre_cache['raritan_inletPoleTable'] = snmpwalk_group($device, 'inletPoleTable', 'PDU-MIB', 2);
-
-echo 'inletLabel ';
-$pre_cache['raritan_inletLabel'] = snmpwalk_cache_oid($device, 'inletLabel', array(), 'PDU2-MIB');
+foreach ($binding as $mac => $data) {
+    $port = get_port_by_index_cache($device['device_id'], $data['agentDynamicDsBindingIfIndex']);
+    $port_id = $port['port_id'];
+    $mac_address = implode(array_map('zeropad', explode(':', $mac)));
+    $vlan_id = $data['agentDynamicDsBindingVlanId'] ?: 0;
+    $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
+    d_echo("vlan $vlan_id mac $mac_address port $port_id\n");
+}

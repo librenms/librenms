@@ -48,10 +48,10 @@ hide_toc: true
                 <span> API</span>
             </div>
             <br />
-            <a href="/API/API-Docs/">API Docs</a><br />
-            <a href="/API/API-Docs/#api-structure">API Structure</a><br />
-            <a href="/API/API-Docs/#api-endpoints">API Endpoints</a><br />
-            <a href="/API/API-Docs/"><strong>More...</strong></a>
+            <a href="/API/">API Docs</a><br>
+            <a href="/API/#api-structure">API Structure</a><br>
+            <a href="/API/#api-endpoints">API Endpoints</a><br>
+            <a href="/API/"><strong>More...</strong></a>
         </div>
     </div>
     <div class="col-md-4">

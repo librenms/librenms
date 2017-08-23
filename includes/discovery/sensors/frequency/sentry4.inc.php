@@ -1,8 +1,8 @@
 <?php
 /**
- * raritan.inc.php
+ * sentry4.inc.php
  *
- * LibreNMS pre-cache discovery module for Raritan
+ * LibreNMS frequency discovery module for Sentry4
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,11 +23,12 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-echo 'inletTable ';
-$pre_cache['raritan_inletTable'] = snmpwalk_group($device, 'inletTable', 'PDU-MIB');
-
-echo 'inletPoleTable ';
-$pre_cache['raritan_inletPoleTable'] = snmpwalk_group($device, 'inletPoleTable', 'PDU-MIB', 2);
-
-echo 'inletLabel ';
-$pre_cache['raritan_inletLabel'] = snmpwalk_cache_oid($device, 'inletLabel', array(), 'PDU2-MIB');
+foreach ($pre_cache['sentry4_input'] as $index => $data) {
+    $descr   = $data['st4InputCordName'];
+    $oid     = ".1.3.6.1.4.1.1718.4.1.3.3.1.11.$index";
+    $current = $data['st4InputCordFrequency'];
+    $divisor = 10;
+    if ($current >= 0) {
+        discover_sensor($valid['sensor'], 'frequency', $device, $oid, "st4InputCord.$index", 'sentry4', $descr, $divisor, 1, null, null, null, null, $current);
+    }
+}
