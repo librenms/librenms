@@ -112,6 +112,16 @@ function parse_atom($feed)
     return $obj;
 }
 
+/**
+ * Create a new custom notification. Duplicate title+message notifications will not be created.
+ *
+ * @param string $title
+ * @param string $message
+ * @param int $severity 0=ok, 1=warning, 2=critical
+ * @param string $source A string describing what created this notification
+ * @param string $date
+ * @return bool
+ */
 function new_notification($title, $message, $severity = 0, $source = 'adhoc', $date = null)
 {
     $notif = array(
@@ -131,15 +141,15 @@ function new_notification($title, $message, $severity = 0, $source = 'adhoc', $d
 }
 
 /**
- * Removes notifications by title.
+ * Removes all notifications with the given title.
  * This should be used with care.
  *
  * @param string $title
  */
 function remove_notification($title)
 {
-    $id = dbFetchCell('SELECT `notifications_id` FROM `notifications` WHERE `title`=?', array($title));
-    if ($id) {
+    $ids = dbFetchColumn('SELECT `notifications_id` FROM `notifications` WHERE `title`=?', array($title));
+    foreach ($ids as $id) {
         dbDelete('notifications', '`notifications_id`=?', array($id));
         dbDelete('notifications_attribs', '`notifications_id`=?', array($id));
     }

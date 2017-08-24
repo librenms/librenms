@@ -97,7 +97,7 @@ call_daily_php() {
 }
 
 #######################################
-# Post critical notification for the user
+# Set critical notifications for the user
 # Globals:
 #   LIBRENMS_DIR
 # Arguments:
@@ -107,12 +107,12 @@ call_daily_php() {
 # Returns:
 #   Exit-Code of Command
 #######################################
-post_notification() {
+set_notification() {
     local args="$@";
     local arg_type=$1;
     local arg_result=$2;
 
-    php "${LIBRENMS_DIR}/daily.php" -f post_notification -t ${arg_type} -r ${arg_result};
+    php "${LIBRENMS_DIR}/daily.php" -f set_notification -t ${arg_type} -r ${arg_result};
 }
 
 #######################################
@@ -173,7 +173,7 @@ main () {
         fi
 
         if (( $update_res > 0 )); then
-            post_notification update 0
+            set_notification update 0
         fi
 
         if [[ "$old_ver" != "$new_ver" ]]; then
@@ -182,10 +182,10 @@ main () {
             # Run post update checks
             if [ ! -f "${LIBRENMS_DIR}/vendor/autoload.php" ]; then
                 status_run "Reverting update, check the output of composer diagnose" "git checkout $old_ver" 'update'
-                post_notification update 0
+                set_notification update 0
             else
                 status_run "Updated from $old_ver to $new_ver" ''
-                post_notification update 1  # only clear the error if update was a success
+                set_notification update 1  # only clear the error if update was a success
             fi
         fi
 

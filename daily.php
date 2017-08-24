@@ -98,7 +98,7 @@ if ($options['f'] === 'device_perf') {
     }
 }
 
-if ($options['f'] === 'post_notification') {
+if ($options['f'] === 'set_notification') {
     if ($options['t'] === 'update') {
         $title = 'Error: Daily update failed';
 
