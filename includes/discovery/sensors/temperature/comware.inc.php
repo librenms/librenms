@@ -48,7 +48,7 @@ $multiplier    = 1;
 $divisor       = 1;
 $divisor_alarm = 1000;
 foreach ($pre_cache['comware_oids'] as $index => $entry) {
-    if (is_numeric($entry['hh3cTransceiverTemperature']) && $entry['hh3cTransceiverTemperature'] != 2147483647) {
+    if (is_numeric($entry['hh3cTransceiverTemperature']) && $entry['hh3cTransceiverTemperature'] != 2147483647 && isset($entry['hh3cTransceiverDiagnostic'])) {
         $oid                       = '.1.3.6.1.4.1.25506.2.70.1.1.1.15.' . $index;
         $dbquery                   = dbFetchRows("SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ? AND `ifAdminStatus` = 'up'", array($index,$device['device_id']));
         $limit_low                 = $entry['hh3cTransceiverTempLoAlarm'] / $divisor_alarm;
@@ -59,7 +59,7 @@ foreach ($pre_cache['comware_oids'] as $index => $entry) {
         $entPhysicalIndex          = $index;
         $entPhysicalIndex_measured = 'ports';
         foreach ($dbquery as $dbindex => $dbresult) {
-            $descr = $dbresult['ifDescr'] . ' Temperature';
+            $descr = makeshortif($dbresult['ifDescr']) . ' Module';
             discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'temp-trans-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
         }
     }
