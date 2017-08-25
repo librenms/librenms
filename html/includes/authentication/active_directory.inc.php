@@ -95,12 +95,12 @@ function user_in_group($username, $groupname)
 {
     // check if user is member of the given group or nested groups
 
-    global $config, $ldap_connection;
+    global $ldap_connection;
 
     // get DN for auth_ad_group
     $search = ldap_search(
         $ldap_connection,
-        $config['auth_ad_base_dn'],
+        Config::get('auth_ad_base_dn'),
         "(&(objectClass=group)(cn=$groupname))",
         array("cn")
     );
@@ -109,7 +109,7 @@ function user_in_group($username, $groupname)
 
     $search = ldap_search(
         $ldap_connection,
-        $config['auth_ad_base_dn'],
+        Config::get('auth_ad_base_dn'),
         // add 'LDAP_MATCHING_RULE_IN_CHAIN to the user filter to search for $username in nested $group_dn
         // limiting to "DN" for shorter array
         "(&" . get_auth_ad_user_filter($username) . "(memberOf:1.2.840.113556.1.4.1941:=$group_dn))",
