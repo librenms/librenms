@@ -73,8 +73,7 @@ if (!$auth) {
 
     print_optionbar_start();
 
-    $thumb_array = array('sixhour' => '6 Hours', 'day' => '24 Hours', 'twoday' => '48 Hours', 'week' => 'One Week', 'twoweek' => 'Two Weeks',
-        'month' => 'One Month', 'twomonth' => 'Two Months','year' => 'One Year', 'twoyear' => 'Two Years');
+    $thumb_array = $config['graphs']['row']['normal'];
 
     echo '<table width=100% class="thumbnail_graph_table"><tr>';
 
