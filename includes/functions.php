@@ -2172,7 +2172,7 @@ function dump_db_schema()
                 'Field'   => $data['COLUMN_NAME'],
                 'Type'    => $data['COLUMN_TYPE'],
                 'Null'    => $data['IS_NULLABLE'] === 'YES',
-                'Default' => trim($data['COLUMN_DEFAULT'], "'") ?: 'NULL',
+                'Default' => isset($data['COLUMN_DEFAULT']) ? trim($data['COLUMN_DEFAULT'], "'") : 'NULL',
                 'Extra'   => $data['EXTRA'],
             );
         }
