@@ -856,13 +856,15 @@ notifications:
   Columns:
     body: { Field: body, Type: text, 'Null': false, Default: 'NULL', Extra: '' }
     checksum: { Field: checksum, Type: varchar(128), 'Null': false, Default: 'NULL', Extra: '' }
-    datetime: { Field: datetime, Type: timestamp, 'Null': false, Default: CURRENT_TIMESTAMP, Extra: '' }
+    datetime: { Field: datetime, Type: timestamp, 'Null': false, Default: '1970-01-02 00:00:00', Extra: '' }
     notifications_id: { Field: notifications_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
+    severity: { Field: severity, Type: int(11), 'Null': true, Default: '0', Extra: '' }
     source: { Field: source, Type: varchar(255), 'Null': false, Default: '', Extra: '' }
     title: { Field: title, Type: varchar(255), 'Null': false, Default: '', Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [notifications_id], Unique: true, Type: BTREE }
     checksum: { Name: checksum, Columns: [checksum], Unique: true, Type: BTREE }
+    notifications_severity_index: { Name: notifications_severity_index, Columns: [severity], Unique: false, Type: BTREE }
 notifications_attribs:
   Columns:
     attrib_id: { Field: attrib_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }

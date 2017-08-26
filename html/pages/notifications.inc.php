@@ -4,12 +4,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
@@ -66,16 +66,28 @@ $notifications = new ObjectCache('notifications');
 foreach ($notifications['sticky'] as $notif) {
     if (is_numeric($notif['source'])) {
         $notif['source'] = dbFetchCell('select username from users where user_id =?', array($notif['source']));
-    } ?>
-  <div class="well">
-    <div class="row">
-      <div class="col-md-12">
-        <h4 class="text-warning" id="<?php echo $notif['notifications_id']; ?>"><strong><i class="fa fa-bell-o"></i>&nbsp;&nbsp;&nbsp;<?php echo $notif['title']; ?></strong>&nbsp;<span class="pull-right"><?php echo ($notif['user_id'] != $_SESSION['user_id'] ? '<code>Sticky by '.dbFetchCell('select username from users where user_id = ?', array($notif['user_id'])).'</code>' : '<button class="btn btn-primary fa fa-bell-slash-o unstick-notif" data-toggle="tooltip" data-placement="bottom" title="Remove Sticky" style="margin-top:-10px;"></button>'); ?></span></h4>
+    }
+    echo '<div class="well"><div class="row"> <div class="col-md-12">';
+
+    $class = $notif['severity'] == 2 ? 'text-danger' : 'text-warning';
+    echo "<h4 class='$class' id='${notif['notifications_id']}'>";
+    echo "<strong><i class='fa fa-bell-o'></i>&nbsp;${notif['title']}</strong>";
+    echo "<span class='pull-right'>";
+
+    if ($notif['user_id'] != $_SESSION['user_id']) {
+        $sticky_user = get_user($notif['user_id']);
+        echo "<code>Sticky by ${sticky_user['username']}</code>";
+    } else {
+        echo '<button class="btn btn-primary fa fa-bell-slash-o unstick-notif" data-toggle="tooltip" data-placement="bottom" title="Remove Sticky" style="margin-top:-10px;"></button>';
+    }
+
+    echo '</span></h4>';
+?>
       </div>
     </div>
     <div class="row">
       <div class="col-md-12">
-        <blockquote>
+        <blockquote<?php echo $notif['severity'] == 2 ? ' style="border-color: darkred;"' : '' ?>>
           <p><?php echo $notif['body']; ?></p>
           <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
         </blockquote>
@@ -89,14 +101,24 @@ foreach ($notifications['sticky'] as $notif) {
 <?php
 foreach ($notifications['unread'] as $notif) {
     if (is_numeric($notif['source'])) {
-        $notif['source'] = dbFetchCell('select username from users where user_id =?', array($notif['source']));
-    } ?>
-  <div class="well">
-    <div class="row">
-      <div class="col-md-12">
-        <h4 class="text-success" id="<?php echo $notif['notifications_id']; ?>"><strong><?php echo $notif['title']; ?></strong><span class="pull-right">
-<?php echo ($_SESSION['userlevel'] == 10 ? '<button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button>' : ''); ?>
-&nbsp;
+        $source_user = get_user($notif['source']);
+        $notif['source'] = $source_user['username'];
+    }
+    echo '<div class="well"><div class="row"> <div class="col-md-12">';
+    d_echo($notif);
+    $class = 'text-success';
+    if ($notif['severity'] == 1) {
+        $class='text-warning';
+    } elseif ($notif['severity'] == 2) {
+        $class = 'text-danger';
+    }
+    echo "<h4 class='$class' id='${notif['notifications_id']}'>${notif['title']}<span class='pull-right'>";
+
+    if (is_admin()) {
+        echo '<button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button>';
+    }
+?>
+
 <button class="btn btn-primary fa fa-eye read-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Read" style="margin-top:-10px;"></button>
 </span>
 </h4>
@@ -104,7 +126,7 @@ foreach ($notifications['unread'] as $notif) {
     </div>
     <div class="row">
       <div class="col-md-12">
-        <blockquote>
+          <blockquote<?php echo $notif['severity'] == 2 ? ' style="border-color: darkred;"' : '' ?>>
           <p><?php echo preg_replace('/\\\n/', '<br />', $notif['body']); ?></p>
           <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
         </blockquote>
@@ -125,17 +147,26 @@ foreach ($notifications['unread'] as $notif) {
       <h2>Archive</h2>
     </div>
   </div>
-<?php    foreach (array_reverse($notifications['read']) as $notif) { ?>
-  <div class="well">
-    <div class="row">
-      <div class="col-md-12">
-        <h4 id="<?php echo $notif['notifications_id']; ?>"><?php echo $notif['title'];
-        echo ($_SESSION['userlevel'] == 10 ? '<span class="pull-right"><button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button></span>' : ''); ?>
+<?php
+foreach (array_reverse($notifications['read']) as $notif) {
+    echo '<div class="well"><div class="row"> <div class="col-md-12"><h4';
+    if ($notif['severity'] == 1) {
+        echo ' class="text-warning"';
+    } elseif ($notif['severity'] == 2) {
+        echo ' class="text-danger"';
+    }
+    echo  " id='${notif['notifications_id']}'>${notif['title']}";
+
+    if ($_SESSION['userlevel'] == 10) {
+        echo '<span class="pull-right"><button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button></span>';
+    }
+?>
+        </h4>
       </div>
     </div>
     <div class="row">
       <div class="col-md-12">
-        <blockquote>
+          <blockquote<?php echo $notif['severity'] == 2 ? ' style="border-color: darkred;"' : '' ?>>
           <p><?php echo preg_replace('/\\\n/', '<br />', $notif['body']); ?></p>
           <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
         </blockquote>
