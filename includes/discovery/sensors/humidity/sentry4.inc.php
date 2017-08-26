@@ -1,8 +1,8 @@
 <?php
 /**
- * raritan.inc.php
+ * sentry4.inc.php
  *
- * LibreNMS pre-cache discovery module for Raritan
+ * LibreNMS humidity discovery module for Sentry4
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,11 +23,15 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-echo 'inletTable ';
-$pre_cache['raritan_inletTable'] = snmpwalk_group($device, 'inletTable', 'PDU-MIB');
-
-echo 'inletPoleTable ';
-$pre_cache['raritan_inletPoleTable'] = snmpwalk_group($device, 'inletPoleTable', 'PDU-MIB', 2);
-
-echo 'inletLabel ';
-$pre_cache['raritan_inletLabel'] = snmpwalk_cache_oid($device, 'inletLabel', array(), 'PDU2-MIB');
+foreach ($pre_cache['sentry4_humid'] as $index => $data) {
+    $descr           = $data['st4HumidSensorName'];
+    $oid             = ".1.3.6.1.4.1.1718.4.1.10.3.1.1.$index";
+    $low_limit       = $data['st4HumidSensorLowAlarm'];
+    $low_warn_limit  = $data['st4HumidSensorLowWarning'];
+    $high_limit      = $data['st4HumidSensorHighAlarm'];
+    $high_warn_limit = $data['st4HumidSensorHighWarning'];
+    $current         = $data['st4HumidSensorValue'];
+    if ($current >= 0) {
+        discover_sensor($valid['sensor'], 'humidity', $device, $oid, "st4HumidSensor.$index", 'sentry4', $descr, 1, 1, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+    }
+}

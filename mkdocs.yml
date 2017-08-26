@@ -75,7 +75,7 @@ pages:
       - Extensions/Syslog.md
       - Extensions/Two-Factor-Auth.md
       - Extensions/Varnish.md
-  - API: API/API-Docs.md
+  - API: API/index.md
   - Alerting: Alerting/index.md
   - Support:
       - Support/1-Minute-Polling.md

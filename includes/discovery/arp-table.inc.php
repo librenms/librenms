@@ -33,8 +33,12 @@ foreach ($vrfs_lite_cisco as $vrf) {
     $context = $vrf['context_name'];
     $device['context_name']=$context;
 
-    $arp_data = snmpwalk_group($device, 'ipNetToPhysicalPhysAddress', 'IP-MIB');
-    $arp_data = snmpwalk_group($device, 'ipNetToMediaPhysAddress', 'IP-MIB', 1, $arp_data);
+    if (file_exists($config['install_dir'] . "/includes/discovery/arp-table/{$device['os']}.inc.php")) {
+        include $config['install_dir'] . "/includes/discovery/arp-table/{$device['os']}.inc.php";
+    } else {
+        $arp_data = snmpwalk_group($device, 'ipNetToPhysicalPhysAddress', 'IP-MIB');
+        $arp_data = snmpwalk_group($device, 'ipNetToMediaPhysAddress', 'IP-MIB', 1, $arp_data);
+    }
 
     $existing_data = dbFetchRows(
         "SELECT * from `ipv4_mac` WHERE `device_id`=? AND `context_name`=?",
