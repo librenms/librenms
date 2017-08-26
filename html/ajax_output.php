@@ -14,7 +14,6 @@
 
 session_start();
 if (isset($_SESSION['stage']) && $_SESSION['stage'] == 2) {
-    $_SESSION['build-ok'] = true;
     $init_modules = array('web', 'nodb');
     require realpath(__DIR__ . '/..') . '/includes/init.php';
 } else {
