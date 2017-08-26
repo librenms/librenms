@@ -33,10 +33,10 @@ hide_toc: true
                 <span> Alerting</span>
             </div>
             <br />
-            <a href="/Extensions/Alerting/#rules">Rules</a><br />
-            <a href="/Extensions/Alerting/#templates">Templates</a><br />
-            <a href="/Extensions/Alerting/#transports">Transports</a><br />
-            <a href="/Extensions/Alerting/"><strong>More...</strong></a>
+            <a href="/Alerting/Rules/#rules">Rules</a><br />
+            <a href="/Alerting/Templates/">Templates</a><br />
+            <a href="/Alerting/Transports/">Transports</a><br />
+            <a href="/Alerting/"><strong>More...</strong></a>
         </div>
     </div>
 </div>
