@@ -75,12 +75,17 @@ if ($stage == 4) {
         $msg = "You haven't entered enough information to add the user account, please check below and re-try";
     }
 } elseif ($stage == 6) {
-    session_destroy();
     // If we get here then let's do some final checks.
     if (!file_exists("../config.php")) {
         // config.php file doesn't exist. go back to that stage
         $msg = "config.php still doesn't exist";
         $stage = 5;
+    } else {
+        // all done, remove all traces of the install session
+        session_unset();
+        session_destroy();
+        setcookie(session_name(), '', 0, '/');
+        session_regenerate_id(true);
     }
 }
 
@@ -135,8 +140,9 @@ if (!empty($msg)) {
 
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
-        <div class="progress progress-striped">
-          <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?php echo $stage_perc; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $stage_perc; ?>%">
+        <div id="install-progress" class="progress progress-striped">
+          <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?php echo $stage_perc; ?>"
+               aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $stage_perc; ?>%">
             <span class="sr-only"><?php echo $stage_perc; ?>% Complete</span>
           </div>
         </div>
@@ -205,7 +211,7 @@ echo "</td></tr>";
       <div class="col-md-6 col-md-offset-3">
         <form class="form-inline" role="form" method="post">
           <input type="hidden" name="stage" value="1">
-          <button type="submit" class="btn btn-success" <?php if (!$complete) {
+          <button type="submit" class="btn btn-success pull-right" <?php if (!$complete) {
                 echo "disabled='disabled'";
 } ?>>Next Stage</button>
         </form>
@@ -258,7 +264,7 @@ echo "</td></tr>";
               <input type="text" class="form-control" name="dbname" id="dbname" value="<?php echo $dbname; ?>">
             </div>
           </div>
-          <button type="submit" class="btn btn-success">Next Stage</button>
+          <button type="submit" class="btn btn-success pull-right">Next Stage</button>
         </form>
       </div>
       <div class="col-md-3">
@@ -291,27 +297,36 @@ echo "</td></tr>";
           <input type="hidden" name="dbname" value="<?php echo $dbname; ?>">
           <input type="hidden" name="dbport" value="<?php echo $dbport; ?>">
           <input type="hidden" name="dbsocket" value="<?php echo $dbsocket; ?>">
-          <button type="submit" id="add-user-btn" class="btn btn-success" disabled>Goto Add User</button>
+          <input type="button" id="retry-btn" value="Retry" onClick="window.location.reload()" style="display: none;" class="btn btn-success">
+          <button type="submit" id="add-user-btn" class="btn btn-success pull-right" disabled>Goto Add User</button>
         </form>
       </div>
       <div class="col-md-3">
       </div>
     </div>
     <script type="text/javascript">
-        output = document.getElementById("db-update");
+        var output = document.getElementById("db-update");
         xhr = new XMLHttpRequest();
         xhr.open("GET", "ajax_output.php?id=db-update", true);
         xhr.onprogress = function (e) {
             output.innerHTML = e.currentTarget.responseText;
             output.scrollTop = output.scrollHeight - output.clientHeight; // scrolls the output area
         };
+        xhr.timeout = 40000; // if no response for 40s, allow the user to retry
+        xhr.ontimeout = function (e) {
+            $("#retry-btn").css("display", "");
+        };
         xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) {
-                console.log("Complete");
-                document.getElementById("add-user-btn").removeAttribute('disabled');
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    console.log("Complete");
+                    $('#add-user-btn').removeAttr('disabled');
+                }
+                $('#install-progress').removeClass('active')
             }
         };
         xhr.send();
+        $('#install-progress').addClass('active')
     </script>
 <?php
 } elseif ($stage == "5") {
@@ -394,7 +409,7 @@ if (!file_exists("../config.php")) {
           <input type="hidden" name="dbpass" value="<?php echo $dbpass; ?>">
           <input type="hidden" name="dbname" value="<?php echo $dbname; ?>">
           <input type="hidden" name="dbsocket" value="<?php echo $dbsocket; ?>">
-        <button type="submit" class="btn btn-success">Finish install</button>
+        <button type="submit" class="btn btn-success pull-right">Finish install</button>
       </form>
 <?php
 
@@ -435,7 +450,7 @@ if (!file_exists("../config.php")) {
               <input type="email" class="form-control" name="add_email" id="add_email" value="<?php echo $add_email; ?>">
             </div>
           </div>
-          <button type="submit" class="btn btn-success">Add User</button>
+          <button type="submit" class="btn btn-success pull-right">Add User</button>
         </form>
       </div>
       <div class="col-md-3">
@@ -473,7 +488,7 @@ if (auth_usermanagement()) {
           <input type="hidden" name="dbpass" value="<?php echo $dbpass; ?>">
           <input type="hidden" name="dbname" value="<?php echo $dbname; ?>">
           <input type="hidden" name="dbsocket" value="<?php echo $dbsocket; ?>">
-          <button type="submit" class="btn btn-success" <?php if ($proceed == "1") {
+          <button type="submit" class="btn btn-success pull-right" <?php if ($proceed == "1") {
                 echo "disabled='disabled'";
 } ?>>Generate Config</button>
         </form>
