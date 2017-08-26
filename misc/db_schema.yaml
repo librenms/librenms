@@ -864,6 +864,7 @@ notifications:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [notifications_id], Unique: true, Type: BTREE }
     checksum: { Name: checksum, Columns: [checksum], Unique: true, Type: BTREE }
+    notifications_severity_index: { Name: notifications_severity_index, Columns: [severity], Unique: false, Type: BTREE }
 notifications_attribs:
   Columns:
     attrib_id: { Field: attrib_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
