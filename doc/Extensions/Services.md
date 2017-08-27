@@ -25,7 +25,8 @@ $config['nagios_plugins']   = "/usr/lib/nagios/plugins";
 ```
 
 This will point LibreNMS at the location of the nagios plugins - please ensure that any plugins you use are set to executable.
-Usaully: chmod +x /usr/lib/nagios/plugins
+
+For example: chmod +x /usr/lib/nagios/plugins/*
 
 Finally, you now need to add check-services.php to the current cron file (/etc/cron.d/librenms typically) like:
 ```bash
