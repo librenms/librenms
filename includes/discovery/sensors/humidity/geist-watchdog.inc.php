@@ -29,10 +29,3 @@ if ($value) {
     $descr = 'Humidity';
     discover_sensor($valid['sensor'], 'humidity', $device, $current_oid, 'climateHumidity', 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value);
 }
-
-$value = return_number(snmp_get($device, 'internalHumidity.1', '-Oqv', 'GEIST-V4-MIB'));
-if ($value) {
-    $current_oid = '.1.3.6.1.4.1.21239.5.1.2.1.6.1';
-    $descr = 'Internal humidity';
-    discover_sensor($valid['sensor'], 'humidity', $device, $current_oid, 'internalHumidity.1', 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value);
-}
