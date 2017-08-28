@@ -1,4 +1,3 @@
-UPDATE dbSchema SET version = 107;
 CREATE TABLE bill_port_counters_tmp(port_id int NOT NULL PRIMARY KEY, `timestamp` timestamp NOT NULL DEFAULT current_timestamp, in_counter bigint, in_delta bigint NOT NULL DEFAULT 0, out_counter bigint, out_delta bigint NOT NULL DEFAULT 0);
 INSERT INTO bill_port_counters_tmp(port_id, timestamp, in_counter, out_counter) SELECT q.port_id, q.max_timestamp, max(i.counter), max(o.counter) FROM (SELECT port_id, MAX(`timestamp`) AS max_timestamp FROM port_in_measurements GROUP BY port_id) q INNER JOIN port_in_measurements i ON q.port_id = i.port_id AND q.max_timestamp = i.timestamp INNER JOIN port_out_measurements o ON q.port_id = o.port_id AND q.max_timestamp = o.timestamp GROUP BY q.port_id, q.max_timestamp;
 RENAME TABLE bill_port_counters_tmp TO bill_port_counters;

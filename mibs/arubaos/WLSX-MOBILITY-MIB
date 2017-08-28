@@ -1,9 +1,10 @@
--- ArubaOS 3.2.0.0_16376
+--- ArubaOS 6.5.2.0_59123
 -- vim:set ts=4 sw=4:
 WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
-       TEXTUAL-CONVENTION,
+       TEXTUAL-CONVENTION FROM SNMPv2-TC 
+              
        MODULE-IDENTITY,
        OBJECT-TYPE,
        snmpModules,
@@ -42,7 +43,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
 			FROM ARUBA-MIB;
 
    wlsxMobilityMIB MODULE-IDENTITY 
-       LAST-UPDATED "0611040527Z"
+       LAST-UPDATED "0804160206Z"
        ORGANIZATION "Aruba Wireless Networks"
        CONTACT-INFO
             "Postal:    1322 Crossman Avenue
@@ -53,7 +54,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
            "This MIB module defines MIB objects which provide
             information about the mobility subsystem in the
 			Aruba controller."
-       REVISION        "0611040527Z"
+       REVISION        "0804160206Z"
        DESCRIPTION
            "The initial revision."
        ::= { wlsxEnterpriseMibModules 9 }
@@ -289,7 +290,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of packet Proxy State machine Received
+			This describes the number of packet Proxy State machine Received
             "
         ::= { wlsxMobilityProxyStatsGroup 1 }
 
@@ -299,7 +300,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of packet Proxy State machine Processed
+			This describes the number of packet Proxy State machine Processed
             "
         ::= { wlsxMobilityProxyStatsGroup 2 }
 
@@ -309,7 +310,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of packet Proxy State machine Forwarded back to Datapath
+			This describes the number of packet Proxy State machine Forwarded back to Datapath
             "
         ::= { wlsxMobilityProxyStatsGroup 3 }
 
@@ -319,7 +320,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of packet Proxy State machine Dropped
+			This describes the number of packet Proxy State machine Dropped
             "
         ::= { wlsxMobilityProxyStatsGroup 4 }
 
@@ -329,7 +330,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of mobility events Proxy State machine ignored as it is busy.
+			This describes the number of mobility events Proxy State machine ignored as it is busy.
             "
         ::= { wlsxMobilityProxyStatsGroup 5 }
 
@@ -339,7 +340,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of mobility clients with <No Mobility Service>
+			This describes the number of mobility clients with <No Mobility Service>
 			
             "
         ::= { wlsxMobilityProxyStatsGroup 6 }
@@ -350,7 +351,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of times mobility detected client IP change
+			This describes the number of times mobility detected client IP change
             "
         ::= { wlsxMobilityProxyStatsGroup 7 }
 
@@ -360,7 +361,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of times mobility detected client ESSID change
+			This describes the number of times mobility detected client ESSID change
             "
         ::= { wlsxMobilityProxyStatsGroup 8 }
 
@@ -372,7 +373,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of DHCP Bootp messages received
+			This describes the number of DHCP Bootp messages received
             "
         ::= { wlsxMobilityProxyDHCPStatsGroup 1 }
 
@@ -383,7 +384,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of DHCP messages Processed
+			This describes the number of DHCP messages Processed
             "
         ::= { wlsxMobilityProxyDHCPStatsGroup 2 }
 
@@ -394,7 +395,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of DHCP messages forwarded
+			This describes the number of DHCP messages forwarded
             "
         ::= { wlsxMobilityProxyDHCPStatsGroup 3 }
 
@@ -405,7 +406,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of DHCP messages Dropped
+			This describes the number of DHCP messages Dropped
             "
         ::= { wlsxMobilityProxyDHCPStatsGroup  4 }
 
@@ -415,7 +416,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of DHCP NAK received from the server.
+			This describes the number of DHCP NAK received from the server.
             "
         ::= { wlsxMobilityProxyDHCPStatsGroup  5 }
 
@@ -426,7 +427,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of DHCP packets marked invalid by mobility
+			This describes the number of DHCP packets marked invalid by mobility
             "
         ::= { wlsxMobilityProxyDHCPStatsGroup  6 }
 
@@ -437,7 +438,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Non-DHCP frames received by DHCP state machine
+			This describes the number of Non-DHCP frames received by DHCP state machine
             "
         ::= { wlsxMobilityProxyDHCPStatsGroup  7 }
 
@@ -448,7 +449,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of DHCP requested IP for which home vlan does not exist.
+			This describes the number of DHCP requested IP for which home vlan does not exist.
             "
         ::= { wlsxMobilityProxyDHCPStatsGroup  8 }
 
@@ -459,7 +460,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of unexpected DHCP frames received from client
+			This describes the number of unexpected DHCP frames received from client
             "
         ::= { wlsxMobilityProxyDHCPStatsGroup  9 }
 
@@ -469,7 +470,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of unexpected DHCP frames received from remote HA/FA.
+			This describes the number of unexpected DHCP frames received from remote HA/FA.
             "
         ::= { wlsxMobilityProxyDHCPStatsGroup  10 }
 
@@ -482,7 +483,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Registration request received by HA
+			This describes the number of Registration request received by HA
             "
         ::= { wlsxMobilityHAStatsGroup  1 }
 
@@ -493,7 +494,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Registration request reply sent by HA
+			This describes the number of Registration request reply sent by HA
             "
         ::= { wlsxMobilityHAStatsGroup  2 }
 
@@ -504,7 +505,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Registration request accepted by HA
+			This describes the number of Registration request accepted by HA
             "
         ::= { wlsxMobilityHAStatsGroup  3 }
 
@@ -515,7 +516,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Registration request denied by HA
+			This describes the number of Registration request denied by HA
             "
         ::= { wlsxMobilityHAStatsGroup  4 }
 
@@ -526,7 +527,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Registration request Ignored by HA
+			This describes the number of Registration request Ignored by HA
             "
         ::= { wlsxMobilityHAStatsGroup  5 }
 
@@ -537,7 +538,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Registration request denied for Administrative reasons by HA
+			This describes the number of Registration request denied for Administrative reasons by HA
             "
         ::= { wlsxMobilityHAStatsGroup  6 }
 
@@ -548,7 +549,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Registration request denied due to lack of resources by HA
+			This describes the number of Registration request denied due to lack of resources by HA
             "
         ::= { wlsxMobilityHAStatsGroup  7 }
 
@@ -559,7 +560,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of times MN-HA authentication failed
+			This describes the number of times MN-HA authentication failed
             "
         ::= { wlsxMobilityHAStatsGroup  8 }
 
@@ -570,7 +571,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of HA-FA authentication failed
+			This describes the number of HA-FA authentication failed
             "
         ::= { wlsxMobilityHAStatsGroup  9 }
 
@@ -581,7 +582,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of mobileIP messages rejected by HA due to bad Identication
+			This describes the number of mobileIP messages rejected by HA due to bad identification
             "
         ::= { wlsxMobilityHAStatsGroup  10 }
 
@@ -591,7 +592,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of mobileIP messages rejected by HA as they are poorly formed
+			This describes the number of mobileIP messages rejected by HA as they are poorly formed
             "
         ::= { wlsxMobilityHAStatsGroup  11 }
 
@@ -601,7 +602,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Registration Request rejected due to too many bindings at HA
+			This describes the number of Registration Request rejected due to too many bindings at HA
             "
         ::= { wlsxMobilityHAStatsGroup  12 }
 
@@ -611,7 +612,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of times binding expired
+			This describes the number of times binding expired
             "
         ::= { wlsxMobilityHAStatsGroup  13 }
 
@@ -623,7 +624,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Registration request sent by FA
+			This describes the number of Registration request sent by FA
             "
         ::= { wlsxMobilityFAStatsGroup  1 }
 
@@ -634,7 +635,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Registration request reply received by FA
+			This describes the number of Registration request reply received by FA
             "
         ::= { wlsxMobilityFAStatsGroup  2 }
 
@@ -645,7 +646,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Registration request accepted by HA
+			This describes the number of Registration request accepted by HA
             "
         ::= { wlsxMobilityFAStatsGroup  3 }
 
@@ -656,7 +657,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Registration request rejected by HA
+			This describes the number of Registration request rejected by HA
             "
         ::= { wlsxMobilityFAStatsGroup  4 }
 
@@ -667,7 +668,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of times MN-HA authentication failed
+			This describes the number of times MN-HA authentication failed
             "
         ::= { wlsxMobilityFAStatsGroup  5 }
 
@@ -678,7 +679,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of FA-HA authentication failed
+			This describes the number of FA-HA authentication failed
             "
         ::= { wlsxMobilityFAStatsGroup  6 }
 
@@ -689,7 +690,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of mobileIP messages rejected by FA due to bad Identication
+			This describes the number of mobileIP messages rejected by FA due to bad identification
             "
         ::= { wlsxMobilityFAStatsGroup  7 }
 
@@ -699,7 +700,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of mobileIP messages rejected by FA as they are poorly formed
+			This describes the number of mobileIP messages rejected by FA as they are poorly formed
             "
         ::= { wlsxMobilityFAStatsGroup  8 }
 
@@ -712,7 +713,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Registration revocation request sent 
+			This describes the number of Registration revocation request sent 
             "
         ::= { wlsxMobilityHAFARevocationStatsGroup  1 }
 
@@ -722,7 +723,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Registration revocation ack received
+			This describes the number of Registration revocation ack received
             "
         ::= { wlsxMobilityHAFARevocationStatsGroup  2 }
 
@@ -732,7 +733,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Registration revocation request received
+			This describes the number of Registration revocation request received
             "
         ::= { wlsxMobilityHAFARevocationStatsGroup  3 }
 
@@ -742,7 +743,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of received Registration revocation request ack sent
+			This describes the number of received Registration revocation request ack sent
             "
         ::= { wlsxMobilityHAFARevocationStatsGroup  4 }
 
@@ -752,7 +753,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Registration revocation request ignored
+			This describes the number of Registration revocation request ignored
             "
         ::= { wlsxMobilityHAFARevocationStatsGroup  5 }
 
@@ -762,7 +763,7 @@ WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			This desribes the number of Registration revocation ack Ignored
+			This describes the number of Registration revocation ack Ignored
             "
         ::= { wlsxMobilityHAFARevocationStatsGroup  6 }
 

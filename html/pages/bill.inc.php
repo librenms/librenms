@@ -75,7 +75,8 @@ if (bill_permitted($bill_id)) {
 
         // Collected Earlier
         foreach ($ports as $port) {
-            $portalias = (empty($port['ifAlias']) ? '' : ' - '.display($port['ifAlias']).'');
+            $port = cleanPort($port);
+            $portalias = (empty($port['ifAlias']) ? '' : ' - '.$port['ifAlias'].'');
 
             echo '<div class="list-group-item">';
             echo generate_port_link($port, $port['ifName'].$portalias).' on '.generate_device_link($port);
@@ -175,7 +176,7 @@ if (bill_permitted($bill_id)) {
         <tr>
             <td colspan="2">
 <?php
-            echo 'Predicated usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['total_data']));
+            echo 'Predicted usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['total_data']));
 ?>
             </td>
 <?php
@@ -197,7 +198,7 @@ if (bill_permitted($bill_id)) {
         <tr>
             <td colspan="2">
 <?php
-            echo 'Predicated usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th']));
+            echo 'Predicted usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th']));
 ?>
             </td>
 

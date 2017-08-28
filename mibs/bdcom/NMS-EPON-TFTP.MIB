@@ -1,0 +1,91 @@
+-- *****************************************************************
+-- NMS-EPON-TFTP.my: NMS EPON TFTP MIB
+--
+-- October 2009
+-- Edit by LIUQIANG
+-- Copyright (c) 2008 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-EPON-TFTP DEFINITIONS ::= BEGIN
+
+
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsEPONGroup                                 FROM NMS-SMI;
+    
+  
+  
+    nmsEponTftp         OBJECT IDENTIFIER ::= { nmsEPONGroup 20 }
+
+    
+
+                         
+               nmsTftpSrcPath OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS EPON OLT device  source file path."
+                   ::= { nmsEponTftp 1 }
+    
+                         
+               nmsTftpSrcFileName OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS EPON OLT device source file name."
+                   ::= { nmsEponTftp 2 }
+    
+               nmsTftpDestPath OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS EPON OLT device destination file path."
+                   ::= { nmsEponTftp 3 }
+    
+               nmsTftpDestFileName OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS EPON OLT device destination file name."
+                   ::= { nmsEponTftp 4 }
+    
+               nmsTftpActvice OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          upload(1),
+                          download(2),
+                          disable(3)
+                               	    }
+
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS EPON OLT device tftp operation status. When the value 'upload(1)' is set, all the value in this mib file would be read into system and cresponding file in destination would be uploaded into flash. As the value 'download(2)' is set, the file in the flash would be downloaded into local machine. After all the operations finish, the value would be set as 'disable(3)' automatically. "
+                   ::= { nmsEponTftp 5 }
+    
+    
+               nmsTftpResult OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                         success(0),
+                         failure(8888)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS EPON OLT device tftp operation result."
+                   ::= { nmsEponTftp 6 }
+    
+
+
+
+END    
+

@@ -1,0 +1,171 @@
+-- ****************************************************************************
+--  COLUBRIS-CONNECTION-LIMITING-MIB definitions
+--
+--  Copyright (c) 2005, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Connection limiting MIB file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-CONNECTION-LIMITING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, IpAddress
+        FROM    SNMPv2-SMI
+    MacAddress
+        FROM    SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM    SNMPv2-CONF
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+    ColubrisNotificationEnable
+        FROM    COLUBRIS-TC
+;
+
+
+colubrisConnectionLimitingMIB MODULE-IDENTITY
+    LAST-UPDATED    "200501210000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris Networks Connection limiting module."
+
+    ::= { colubrisMgmtV2 18 }
+
+
+-- colubrisConnectionLimitingMIBObjects definition
+colubrisConnectionLimitingMIBObjects OBJECT IDENTIFIER ::= { colubrisConnectionLimitingMIB 1 }
+
+-- Firmware Distribution groups
+connectionLimitingConfig OBJECT IDENTIFIER ::=  { colubrisConnectionLimitingMIBObjects 1 }
+connectionLimitingInfo OBJECT IDENTIFIER ::=  { colubrisConnectionLimitingMIBObjects 2 }
+
+
+-- The connectionLimitingConfig group controls the process parameters
+
+connectionLimitingMaximumUserConnections OBJECT-TYPE
+    SYNTAX      Integer32 (20..2000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the maximum number of simultaneous connections
+                 allowed for a specific user. If this amount of connections 
+                 is reached, no other connections will be allowed
+                 for user and a trap is generated."
+    ::= { connectionLimitingConfig 1 }
+
+connectionLimitingNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if connectionLimitingMaximumUserConnectionsReached
+                 notifications are generated."
+    DEFVAL      { enable }
+    ::= { connectionLimitingConfig 2 }
+
+
+-- The connectionLimitingInfo group contains information and statuses about
+-- the connection limiting feature.
+
+connectionLimitingMaximumSystemConnections OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the maximum number of simultaneous connections that
+                 are supported by the device. This is calculated based
+                 on the device type and available memory."
+    ::= { connectionLimitingInfo 1 }
+
+connectionLimitingUserMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Specifies the MAC address of the user that has reached the
+                 maximum number of connections."
+    ::= { connectionLimitingInfo 2 }
+
+connectionLimitingUserIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Specifies the IP address of the user that has reached the
+                 maximum number of connections."
+    ::= { connectionLimitingInfo 3 }
+
+
+-- Connection Limiting notifications
+colubrisConnectionLimitingMIBNotificationPrefix OBJECT IDENTIFIER ::= { colubrisConnectionLimitingMIB 2 }
+colubrisConnectionLimitingMIBNotifications OBJECT IDENTIFIER ::= { colubrisConnectionLimitingMIBNotificationPrefix 0 }
+
+connectionLimitingMaximumUserConnectionsReached NOTIFICATION-TYPE
+    OBJECTS     {
+                    connectionLimitingMaximumUserConnections,
+                    connectionLimitingUserMACAddress,
+                    connectionLimitingUserIPAddress
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a user has reached their maximum number of connections."
+  --#SUMMARY "Maximum number of connections has been reached for MAC:%s IP:%s (Maximum allowed:%d)"
+  --#ARGUMENTS { 1, 2, 0 }
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisConnectionLimitingMIBNotifications 1 }
+
+
+-- conformance information
+colubrisConnectionLimitingMIBConformance OBJECT IDENTIFIER ::= { colubrisConnectionLimitingMIB 3 }
+colubrisConnectionLimitingMIBCompliances OBJECT IDENTIFIER ::= { colubrisConnectionLimitingMIBConformance 1 }
+colubrisConnectionLimitingMIBGroups      OBJECT IDENTIFIER ::= { colubrisConnectionLimitingMIBConformance 2 }
+
+-- compliance statements
+colubrisConnectionLimitingMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for entities which implement
+                 the Colubris Networks Tools MIB."
+    MODULE      MANDATORY-GROUPS
+                {
+                    colubrisConnectionLimitingConfigMIBGroup,
+                    colubrisConnectionLimitingInfoMIBGroup,
+                    colubrisConnectionLimitingNotificationGroup
+                }
+    ::= { colubrisConnectionLimitingMIBCompliances 1 }
+
+-- units of conformance
+colubrisConnectionLimitingConfigMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    connectionLimitingMaximumUserConnections,
+                    connectionLimitingNotificationEnabled
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing control over the connection
+                 limiting MIB capability."
+    ::= { colubrisConnectionLimitingMIBGroups 1 }
+
+colubrisConnectionLimitingInfoMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    connectionLimitingMaximumSystemConnections,
+                    connectionLimitingUserMACAddress,
+                    connectionLimitingUserIPAddress
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing information over the
+                 connection limiting MIB capability."
+    ::= { colubrisConnectionLimitingMIBGroups 2 }
+
+colubrisConnectionLimitingNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        connectionLimitingMaximumUserConnectionsReached
+                    }
+    STATUS      current
+    DESCRIPTION "A collection of supported notifications."
+    ::= { colubrisConnectionLimitingMIBGroups 3 }
+
+END

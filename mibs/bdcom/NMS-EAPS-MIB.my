@@ -1,0 +1,436 @@
+--
+-- NMS EAPS MIB
+--    2009.12.02 Lysh
+--    Last Update: 2010.5.11
+--
+
+NMS-EAPS-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		OBJECT-TYPE
+			FROM RFC-1212
+		nmslocal
+			FROM NMS-SMI;
+
+--
+-- Node definitions
+--
+
+-- 1.3.6.1.4.1.3320.2.X
+nmsEAPS OBJECT IDENTIFIER ::={ nmslocal 230 }
+
+	-- 1.3.6.1.4.1.3320.2.X.1
+	nmsEAPSRings OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The number of running ethernet ring instances."
+		::={ nmsEAPS 1 }
+
+	-- 1.3.6.1.4.1.3320.2.X.2
+	nmsEAPSPduRx OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The total number of input EAPS PDUs."
+		::={ nmsEAPS 2 }
+
+	-- 1.3.6.1.4.1.3320.2.X.3
+	nmsEAPSPduTx OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The total number of output EAPS PDUs."
+		::={ nmsEAPS 3 }
+
+	-- 1.3.6.1.4.1.3320.2.X.4
+	nmsEAPSRingTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF NMSEAPSRingTableEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A table that contains information of ethernet ring instances."
+		::= { nmsEAPS 4 }
+
+		-- 1.3.6.1.4.1.3320.2.X.4.1
+		nmsEAPSRingTableEntry OBJECT-TYPE
+			SYNTAX NMSEAPSRingTableEntry
+			ACCESS  not-accessible
+			STATUS  mandatory
+			DESCRIPTION
+				"A table that contains information of ethernet ring instances."
+			INDEX { nmsEAPSRingID }
+			::= { nmsEAPSRingTable 1 }
+
+		NMSEAPSRingTableEntry ::=
+			SEQUENCE {
+				nmsEAPSRingID
+					INTEGER,
+				nmsEAPSRingNodeType
+					INTEGER,
+				nmsEAPSRingControlVlan
+					INTEGER,
+				nmsEAPSRingPorts
+					INTEGER,
+				nmsEAPSRingState
+					INTEGER,
+				nmsEAPSRingHealthCheck
+					INTEGER,
+				nmsEAPSRingHelloTime
+					INTEGER,
+				nmsEAPSRingFailTime
+					INTEGER,
+				nmsEAPSRingPreforwardTime
+					INTEGER,
+				nmsEAPSRingAdminStatus
+					INTEGER,
+				nmsEAPSRingPrimaryPort
+					INTEGER,
+				nmsEAPSRingPrimaryPortState
+					INTEGER,
+				nmsEAPSRingPrimaryPortStatus
+					INTEGER,
+				nmsEAPSRingSecondaryPort
+					INTEGER,
+				nmsEAPSRingSecondaryPortState
+					INTEGER,
+				nmsEAPSRingSecondaryPortStatus
+					INTEGER
+			}
+
+			-- 1.3.6.1.4.1.3320.2.X.4.1.1
+			nmsEAPSRingID OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-only
+				STATUS mandatory
+				DESCRIPTION
+					"The index of ethernet ring instances."
+				::={ nmsEAPSRingTableEntry 1 }
+
+			-- 1.3.6.1.4.1.3320.2.X.4.1.2
+			nmsEAPSRingNodeType OBJECT-TYPE
+				SYNTAX INTEGER {
+					unknown(0),
+					masterNode(1),
+					transitNode(2)
+				}
+				ACCESS read-write
+				STATUS mandatory
+				DESCRIPTION
+					"A value indicates the node-type of this device in the ring."
+				::={ nmsEAPSRingTableEntry 2 }
+
+			-- 1.3.6.1.4.1.3320.2.X.4.1.3
+			nmsEAPSRingControlVlan OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-write
+				STATUS mandatory
+				DESCRIPTION
+					"The id of the VLAN in which EAPS PDUs are transmitted."
+				::={ nmsEAPSRingTableEntry 3 }
+
+			-- 1.3.6.1.4.1.3320.2.X.4.1.4
+			nmsEAPSRingPorts OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-only
+				STATUS mandatory
+				DESCRIPTION
+					"The number of interfaces which are configured in a ring."
+				::={ nmsEAPSRingTableEntry 4 }
+
+			-- 1.3.6.1.4.1.3320.2.X.4.1.5
+			nmsEAPSRingState OBJECT-TYPE
+				SYNTAX INTEGER {
+					unknown(0),
+					complete(1),
+					ringFault(2)
+				}
+				ACCESS read-only
+				STATUS mandatory
+				DESCRIPTION
+					"A value indicates the state of a node in the ring.
+					Only the value from a MasterNode indicates the state of the whole ring.
+					The value from a TransitNode means the local ring ports are all operational or not."
+				::={ nmsEAPSRingTableEntry 5 }
+
+			-- 1.3.6.1.4.1.3320.2.X.4.1.6
+			nmsEAPSRingHealthCheck OBJECT-TYPE
+				SYNTAX INTEGER {
+					disabled(0),
+					enabled(1)
+				}
+				ACCESS read-only
+				STATUS mandatory
+				DESCRIPTION
+					"A value indicates whether Health packets are being sent from MasterNode.
+					Available only for MasterNodes."
+				::={ nmsEAPSRingTableEntry 6 }
+
+			-- 1.3.6.1.4.1.3320.2.X.4.1.7
+			nmsEAPSRingHelloTime OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-write
+				STATUS mandatory
+				DESCRIPTION
+					"The inteval between the transmit of two Health packets, in seconds.
+					Available only for MasterNodes."
+				::={ nmsEAPSRingTableEntry 7 }
+
+			-- 1.3.6.1.4.1.3320.2.X.4.1.8
+			nmsEAPSRingFailTime OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-write
+				STATUS mandatory
+				DESCRIPTION
+					"The hold time for the SecondaryPort after a Health packet is received, in seconds.
+					Available only for MasterNodes."
+				::={ nmsEAPSRingTableEntry 8 }
+
+			-- 1.3.6.1.4.1.3320.2.X.4.1.9
+			nmsEAPSRingPreforwardTime OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-write
+				STATUS mandatory
+				DESCRIPTION
+					"The hold time for a TransitPort which is recovered from a failure,	in seconds.
+					During the pre-forward time, no packets other than PDUs in control vlan can be forwarded.
+					Only available for TransitNodes."
+				::={ nmsEAPSRingTableEntry 9 }
+
+			-- 1.3.6.1.4.1.3320.2.X.4.1.10
+			nmsEAPSRingAdminStatus OBJECT-TYPE
+				SYNTAX INTEGER {
+					disabled(0),
+					enabled(1),
+					running(2)
+				}
+				ACCESS read-create
+				STATUS mandatory
+				DESCRIPTION
+					"A read-create value that indicates the configuration status 
+					of the ring instance. Set this value to 'enabled' to start 
+					the ring or 'disabled' to stop it. The value 'running' indicates
+					that the ring is currently configured and running, in which case,
+					the values of node-type and control-vlan cannot be modified."
+				::={ nmsEAPSRingTableEntry 10 }
+			
+			-- 1.3.6.1.4.1.3320.2.X.4.1.11
+			nmsEAPSRingPrimaryPort OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-write
+				STATUS mandatory
+				DESCRIPTION
+					"The interface index of the primary-port if the 'nmsEAPSRingNodeType' is 'masterNode',
+					or the ifIndex of the first transit-port if 'transitNode'. Value 0 means that this port
+					is not configured."
+				::={ nmsEAPSRingTableEntry 11 }
+				
+			-- 1.3.6.1.4.1.3320.2.X.4.1.12
+			nmsEAPSRingPrimaryPortState OBJECT-TYPE
+				SYNTAX INTEGER {
+					unknown(0),
+					forwarding(1),
+					preforwarding(2),
+					blocking(3)
+				}
+				ACCESS read-only
+				STATUS mandatory
+				DESCRIPTION
+					"The forwarding state of the primary-port or the first transit-port."
+				::={ nmsEAPSRingTableEntry 12 }
+				
+			-- 1.3.6.1.4.1.3320.2.X.4.1.13
+			nmsEAPSRingPrimaryPortStatus OBJECT-TYPE
+				SYNTAX INTEGER {
+					link-down(0),
+					link-up(1)
+				}
+				ACCESS read-only
+				STATUS mandatory
+				DESCRIPTION
+					"The link status of the primary-port or the first transit-port."
+				::={ nmsEAPSRingTableEntry 13 }
+				
+			-- 1.3.6.1.4.1.3320.2.X.4.1.14
+			nmsEAPSRingSecondaryPort OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-write
+				STATUS mandatory
+				DESCRIPTION
+					"The interface index of the secondary-port if the 'nmsEAPSRingNodeType' is 'masterNode',
+					or the ifIndex of the second transit-port if 'transitNode'. Value 0 means that this port
+					is not configured."
+				::={ nmsEAPSRingTableEntry 14 }
+				
+			-- 1.3.6.1.4.1.3320.2.X.4.1.15
+			nmsEAPSRingSecondaryPortState OBJECT-TYPE
+				SYNTAX INTEGER {
+					unknown(0),
+					forwarding(1),
+					preforwarding(2),
+					blocking(3)
+				}
+				ACCESS read-only
+				STATUS mandatory
+				DESCRIPTION
+					"The forwarding state of the secondary-port or the second transit-port."
+				::={ nmsEAPSRingTableEntry 15 }
+				
+			-- 1.3.6.1.4.1.3320.2.X.4.1.16
+			nmsEAPSRingSecondaryPortStatus OBJECT-TYPE
+				SYNTAX INTEGER  {
+					link-down(0),
+					link-up(1)
+				}
+				ACCESS read-only
+				STATUS mandatory
+				DESCRIPTION
+					"The link status of the secondary-port or the second transit-port."
+				::={ nmsEAPSRingTableEntry 16 }
+
+	-- 1.3.6.1.4.1.3320.2.X.5
+	nmsEAPSRingPortTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF NMSEAPSRingPortTableEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A table that contains information of ethernet ring ports."
+		::= { nmsEAPS 5 }
+
+		-- 1.3.6.1.4.1.3320.2.X.5.1
+		nmsEAPSRingPortTableEntry OBJECT-TYPE
+			SYNTAX NMSEAPSRingPortTableEntry
+			ACCESS  not-accessible
+			STATUS  mandatory
+			DESCRIPTION
+				"A table that contains information of ethernet ring ports."
+			INDEX { nmsEAPSRingPortRingID, nmsEAPSRingPort }
+			::= { nmsEAPSRingPortTable 1 }
+
+		NMSEAPSRingPortTableEntry ::=
+			SEQUENCE {
+				nmsEAPSRingPortRingID
+					INTEGER,
+				nmsEAPSRingPort
+					INTEGER,
+				nmsEAPSRingPortType
+					INTEGER,
+				nmsEAPSRingPortState
+					INTEGER,
+				nmsEAPSRingPortForwards
+					INTEGER,
+				nmsEAPSRingPortRx
+					INTEGER,
+				nmsEAPSRingPortTx
+					INTEGER,
+				nmsEAPSRingPortStatus
+					INTEGER
+			}
+
+			-- 1.3.6.1.4.1.3320.2.X.5.1.1
+			nmsEAPSRingPortRingID OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-only
+				STATUS mandatory
+				DESCRIPTION
+					"The index of an ethernet ring instance, in which this port is configured."
+				::={ nmsEAPSRingPortTableEntry 1 }
+
+			-- 1.3.6.1.4.1.3320.2.X.5.1.2
+			nmsEAPSRingPort OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-only
+				STATUS mandatory
+				DESCRIPTION
+					"The port number of the ring port."
+				::={ nmsEAPSRingPortTableEntry 2 }
+
+			-- 1.3.6.1.4.1.3320.2.X.5.1.3
+			nmsEAPSRingPortType OBJECT-TYPE
+				SYNTAX INTEGER {
+					unknown(0),
+					primaryPort(1),
+					secondaryPort(2),
+					transitPort(3)
+				}
+				ACCESS read-only
+				STATUS mandatory
+				DESCRIPTION
+					"A value indicates the type of a ring port."
+				::={ nmsEAPSRingPortTableEntry 3 }
+
+			-- 1.3.6.1.4.1.3320.2.X.5.1.4
+			nmsEAPSRingPortState OBJECT-TYPE
+				SYNTAX INTEGER {
+					unknown(0),
+					forwarding(1),
+					preforwarding(2),
+					blocking(3)
+				}
+				ACCESS read-only
+				STATUS mandatory
+				DESCRIPTION
+					"A value indicates the forward state of a ring port in data vlans."
+				::={ nmsEAPSRingPortTableEntry 4 }
+
+			-- 1.3.6.1.4.1.3320.2.X.5.1.5
+			nmsEAPSRingPortForwards OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-only
+				STATUS mandatory
+				DESCRIPTION
+					"The number of times this port has transitioned to forwarding state."
+				::={ nmsEAPSRingPortTableEntry 5 }
+
+			-- 1.3.6.1.4.1.3320.2.X.5.1.6
+			nmsEAPSRingPortRx OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-only
+				STATUS mandatory
+				DESCRIPTION
+					"The number of received EAPS PDUs on this port."
+				::={ nmsEAPSRingPortTableEntry 6 }
+
+			-- 1.3.6.1.4.1.3320.2.X.5.1.7
+			nmsEAPSRingPortTx OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-only
+				STATUS mandatory
+				DESCRIPTION
+					"The Number of transmitted EAPS PDUs on this port."
+				::={ nmsEAPSRingPortTableEntry 7 }
+
+			-- 1.3.6.1.4.1.3320.2.X.5.1.8
+			nmsEAPSRingPortStatus OBJECT-TYPE
+				SYNTAX INTEGER  {
+					link-down(0),
+					link-up(1)
+				}
+				ACCESS read-only
+				STATUS mandatory
+				DESCRIPTION
+					"The link status of the ring port."
+				::={ nmsEAPSRingPortTableEntry 8 }
+
+	-- Notifications
+
+	-- 1.3.6.1.4.1.3320.2.X.6
+	nmsEAPSRingNotifications OBJECT IDENTIFIER ::= { nmsEAPS 6 }
+
+	nmsEAPSRingNotification NOTIFICATION-TYPE
+		OBJECTS {
+			nmsEAPSRingID,
+			nmsEAPSRingNodeType,
+			nmsEAPSRingState
+		}
+		STATUS current
+		DESCRIPTION
+			"This notification is generated when a MasterNode detects that
+			the state of ring is changed."
+		::= { nmsEAPSRingNotifications 1 }
+
+END
+

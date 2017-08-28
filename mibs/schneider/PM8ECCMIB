@@ -1,0 +1,1365 @@
+PM8ECCMIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    enterprises
+        FROM RFC1155-SMI
+    OBJECT-TYPE
+        FROM RFC-1212
+    TRAP-TYPE
+        FROM RFC-1215;
+
+    AlarmType ::= INTEGER {
+                                overValue( 10 ),
+                                overPower( 11 ),
+                                overReversePower( 12 ),
+                                underValue( 20 ),
+                                underPower( 21 ),
+                                phaseRotationReversal( 51 ),
+                                phaseLossVoltage( 52 ),
+                                phaseLossCurrent( 53 ),
+                                powerFactorLeading( 54 ),
+                                powerFactorLagging( 55 ),
+                                digitalInputOFFtoON( 60 ),
+                                digitalInputONtoOFF( 61 ),
+                                unaryEvent( 70 ),
+                                voltageOrCurrentSwell( 80 ),
+                                voltageOrCurrentSag( 90 ),
+                                combinatorialAND( 100 ),
+                                combinatorialNAND( 101 ),
+                                combinatorialOR( 102 ),
+                                combinatorialNOR( 103 ),
+                                combinatorialXOR( 104 ),
+                                combinatorialNOT( 105 ),
+                                diagnostic( 1280 )
+                            }
+
+    IOPointType ::= INTEGER {
+                                digitalInput( 1 ),
+                                digitalOutput( 2 ),
+                                analogInput( 3 ),
+                                analogOutput( 4 )
+                            }
+
+    IOPointLabel ::= OCTET STRING (SIZE(0..16))
+
+    AlarmLabel ::= OCTET STRING (SIZE(0..16))
+
+
+
+    schneiderElectric OBJECT IDENTIFIER ::= { enterprises 3833 }
+
+    transparentFactoryEthernet OBJECT IDENTIFIER ::= { schneiderElectric 1 }
+
+    equipmentProfile OBJECT IDENTIFIER ::= { transparentFactoryEthernet 7 }
+
+    tfProducts OBJECT IDENTIFIER ::= { equipmentProfile 255 }
+
+    ecc OBJECT IDENTIFIER ::= { tfProducts 15 }
+
+    pm8ecc OBJECT IDENTIFIER ::= { ecc 1 }
+
+    metering OBJECT IDENTIFIER ::= { pm8ecc 1 }
+
+    systemWiringTypeTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF SystemWiringTypeEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "The wiring system type of the host meter."
+        ::= { metering 1 }
+
+    systemWiringTypeEntry OBJECT-TYPE
+        SYNTAX              SystemWiringTypeEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter System Wiring Type"
+        INDEX               {
+                                swtIndex
+                            }
+        ::= { systemWiringTypeTable 1 }
+
+    SystemWiringTypeEntry ::= SEQUENCE {
+        swtIndex
+            INTEGER,
+        swtWiringType
+            INTEGER
+    }
+
+    swtIndex OBJECT-TYPE
+        SYNTAX              INTEGER (1..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "System Wiring Type Table Index"
+        ::= { systemWiringTypeEntry 1 }
+
+    swtWiringType OBJECT-TYPE
+        SYNTAX              INTEGER (10 | 11 | 12 | 30 | 31 | 32 | 40 | 42 | 44)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Single Phase Line to Neutral 2 Wire 1CT 1PT is
+                            '10' Single Phase Line to Line 2 Wire 1CT 1PT
+                            is '11' Single Phase 3-Wire 3 wire 2CT 2PT is
+                            '12' Three Phase 3 Wire 2CT 2PT is '30' Three
+                            Phase 3 Wire 3CT 2PT is '31' Three Phase 3 Wire
+                            1CT 2PT is '32' Three Phase 4 Wire 3CT 3PT is
+                            '40' Three Phase 4 Wire 3CT 2PT is '42' Three
+                            Phase 4 Wire 1CT 3PT is '44'"
+        ::= { systemWiringTypeEntry 2 }
+
+    loadCurrentTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF LoadCurrentEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Load Current Table"
+        ::= { metering 2 }
+
+    loadCurrentEntry OBJECT-TYPE
+        SYNTAX              LoadCurrentEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Load Current Table"
+        INDEX               {
+                                lcIndex
+                            }
+        ::= { loadCurrentTable 1 }
+
+    LoadCurrentEntry ::= SEQUENCE {
+        lcIndex
+            INTEGER,
+        lcIa
+            OCTET STRING,
+        lcIb
+            OCTET STRING,
+        lcIc
+            OCTET STRING,
+        lcIAvg
+            OCTET STRING
+    }
+
+    lcIndex OBJECT-TYPE
+        SYNTAX              INTEGER (1..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Load Current Table Index"
+        ::= { loadCurrentEntry 1 }
+
+    lcIa OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Load Current Phase A Units = A (Amps)"
+        ::= { loadCurrentEntry 2 }
+
+    lcIb OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Load Current Phase B Units = A (Amps)"
+        ::= { loadCurrentEntry 3 }
+
+    lcIc OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Load Current Phase C Units = A (Amps)"
+        ::= { loadCurrentEntry 4 }
+
+    lcIAvg OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Load Current 3 Phase Average Units
+                            = A (Amps)"
+        ::= { loadCurrentEntry 5 }
+
+    powerTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF PowerEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Power Table"
+        ::= { metering 3 }
+
+    powerEntry OBJECT-TYPE
+        SYNTAX              PowerEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Power Table"
+        INDEX               {
+                                pIndex
+                            }
+        ::= { powerTable 1 }
+
+    PowerEntry ::= SEQUENCE {
+        pIndex
+            INTEGER,
+        pReal
+            OCTET STRING,
+        pReactive
+            OCTET STRING,
+        pApparent
+            OCTET STRING
+    }
+
+    pIndex OBJECT-TYPE
+        SYNTAX              INTEGER (1..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Power Table Index"
+        ::= { powerEntry 1 }
+
+    pReal OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Real Power Units = kW"
+        ::= { powerEntry 2 }
+
+    pReactive OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Reactive Power Units = kVAR"
+        ::= { powerEntry 3 }
+
+    pApparent OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Apparent Power Units = kVA"
+        ::= { powerEntry 4 }
+
+    powerFactorTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF PowerFactorEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Power Factor Table"
+        ::= { metering 4 }
+
+    powerFactorEntry OBJECT-TYPE
+        SYNTAX              PowerFactorEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Power Factor Table"
+        INDEX               {
+                                pfIndex
+                            }
+        ::= { powerFactorTable 1 }
+
+    PowerFactorEntry ::= SEQUENCE {
+        pfIndex
+            INTEGER,
+        pfPowerFactorTotal
+            OCTET STRING,
+        pfPowerFactorDescription
+            OCTET STRING
+    }
+
+    pfIndex OBJECT-TYPE
+        SYNTAX              INTEGER (1..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Power Factor Table Index"
+        ::= { powerFactorEntry 1 }
+
+    pfPowerFactorTotal OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter 3 Phase Total Power Factor"
+        ::= { powerFactorEntry 2 }
+
+    pfPowerFactorDescription OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Describes the current power factor Lead/Lag for
+                            IEEE mode Cap/Ind for IEC mode"
+        ::= { powerFactorEntry 3 }
+
+    voltageTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF VoltageEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Voltage Table"
+        ::= { metering 5 }
+
+    voltageEntry OBJECT-TYPE
+        SYNTAX              VoltageEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Voltage Table"
+        INDEX               {
+                                vIndex
+                            }
+        ::= { voltageTable 1 }
+
+    VoltageEntry ::= SEQUENCE {
+        vIndex
+            INTEGER,
+        vVab
+            OCTET STRING,
+        vVbc
+            OCTET STRING,
+        vVca
+            OCTET STRING,
+        vVllAvg
+            OCTET STRING,
+        vVan
+            OCTET STRING,
+        vVbn
+            OCTET STRING,
+        vVcn
+            OCTET STRING,
+        vVlnAvg
+            OCTET STRING
+    }
+
+    vIndex OBJECT-TYPE
+        SYNTAX              INTEGER (1..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Voltage Table Index"
+        ::= { voltageEntry 1 }
+
+    vVab OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Voltage Line A to Line B Units = V
+                            (Volts)"
+        ::= { voltageEntry 2 }
+
+    vVbc OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Voltage Line B to Line C Units = V
+                            (Volts)"
+        ::= { voltageEntry 3 }
+
+    vVca OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Voltage Line C to Line A Units = V
+                            (Volts)"
+        ::= { voltageEntry 4 }
+
+    vVllAvg OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Voltage Line to Line Average Voltage
+                            Units = V (Volts)"
+        ::= { voltageEntry 5 }
+
+    vVan OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Voltage Line A to Neutral Units = V
+                            (Volts)"
+        ::= { voltageEntry 6 }
+
+    vVbn OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Voltage Line B to Neutral Units = V
+                            (Volts)"
+        ::= { voltageEntry 7 }
+
+    vVcn OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Voltage Line C to Neutral Units = V
+                            (Volts)"
+        ::= { voltageEntry 8 }
+
+    vVlnAvg OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Voltage Line to Neutral 3 Phase Average
+                            Units = V (Volts)"
+        ::= { voltageEntry 9 }
+
+    frequencyTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF FrequencyEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Frequency Table"
+        ::= { metering 6 }
+
+    frequencyEntry OBJECT-TYPE
+        SYNTAX              FrequencyEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Frequency Table"
+        INDEX               {
+                                fIndex
+                            }
+        ::= { frequencyTable 1 }
+
+    FrequencyEntry ::= SEQUENCE {
+        fIndex
+            INTEGER,
+        fFrequency
+            OCTET STRING
+    }
+
+    fIndex OBJECT-TYPE
+        SYNTAX              INTEGER (1..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Frequency Table Index"
+        ::= { frequencyEntry 1 }
+
+    fFrequency OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Frequency Units = Hz"
+        ::= { frequencyEntry 2 }
+
+    currentDemandTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CurrentDemandEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Current Demand Table"
+        ::= { metering 7 }
+
+    currentDemandEntry OBJECT-TYPE
+        SYNTAX              CurrentDemandEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Current Demand Table"
+        INDEX               {
+                                cdPhase,
+                                cdIndex
+                            }
+        ::= { currentDemandTable 1 }
+
+    CurrentDemandEntry ::= SEQUENCE {
+        cdIndex
+            INTEGER,
+        cdPhase
+            OCTET STRING,
+        cdPresentCurrentDemand
+            OCTET STRING,
+        cdPeakCurrentDemand
+            OCTET STRING,
+        cdLastCurrentDemand
+            OCTET STRING,
+        cdPeakDateTime
+            OCTET STRING,
+        cdResetDateTime
+            OCTET STRING,
+        cdPhaseEnum
+            INTEGER
+    }
+
+    cdIndex OBJECT-TYPE
+        SYNTAX              INTEGER (1..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Demand Current Table Index"
+        ::= { currentDemandEntry 1 }
+
+    cdPhase OBJECT-TYPE
+        SYNTAX              OCTET STRING (SIZE(2))
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Current Demand Phase Name"
+        ::= { currentDemandEntry 2 }
+
+    cdPresentCurrentDemand OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Present Demand Current Units = A (Amps)"
+        ::= { currentDemandEntry 3 }
+
+    cdPeakCurrentDemand OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Peak Current Demand Units = A (Amps)"
+        ::= { currentDemandEntry 4 }
+
+    cdLastCurrentDemand OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Current Demand Last Interval Units
+                            = A (Amps)"
+        ::= { currentDemandEntry 5 }
+
+    cdPeakDateTime OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Peak Current Demand Date and Time"
+        ::= { currentDemandEntry 6 }
+
+    cdResetDateTime OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Date and Time of Demand Current Reset"
+        ::= { currentDemandEntry 7 }
+
+    cdPhaseEnum OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                currentPhaseA( 1 ),
+                                currentPhaseB( 2 ),
+                                currentPhaseC( 3 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Current Demand Phase"
+        ::= { currentDemandEntry 8 }
+
+    powerDemandTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF PowerDemandEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Power Demand"
+        ::= { metering 8 }
+
+    powerDemandEntry OBJECT-TYPE
+        SYNTAX              PowerDemandEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Power Demand Table"
+        INDEX               {
+                                pdComponent,
+                                pdIndex
+                            }
+        ::= { powerDemandTable 1 }
+
+    PowerDemandEntry ::= SEQUENCE {
+        pdIndex
+            INTEGER,
+        pdComponent
+            OCTET STRING,
+        pdPresentPowerDemand
+            OCTET STRING,
+        pdPeakPowerDemand
+            OCTET STRING,
+        pdLastPowerDemand
+            OCTET STRING,
+        pdPeakDateTime
+            OCTET STRING,
+        pdResetDateTime
+            OCTET STRING,
+        pdComponentEnum
+            INTEGER
+    }
+
+    pdIndex OBJECT-TYPE
+        SYNTAX              INTEGER (1..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Power Demand Table Index"
+        ::= { powerDemandEntry 1 }
+
+    pdComponent OBJECT-TYPE
+        SYNTAX              OCTET STRING (SIZE(4..8))
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Power Demand Component Units: Real
+                            = kW Reacitve = kVAR Apparent = kVA"
+        ::= { powerDemandEntry 2 }
+
+    pdPresentPowerDemand OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Present Demand Power"
+        ::= { powerDemandEntry 3 }
+
+    pdPeakPowerDemand OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Peak Power Demand"
+        ::= { powerDemandEntry 4 }
+
+    pdLastPowerDemand OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Power Demand Last Interval"
+        ::= { powerDemandEntry 5 }
+
+    pdPeakDateTime OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Peak Power Demand Date and Time"
+        ::= { powerDemandEntry 6 }
+
+    pdResetDateTime OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Date and Time of Power Demand Reset"
+        ::= { powerDemandEntry 7 }
+
+    pdComponentEnum OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                realPower( 1 ),
+                                reactivePower( 2 ),
+                                apparentPower( 3 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Power Demand Component"
+        ::= { powerDemandEntry 8 }
+
+    energyTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF EnergyEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Energy Table"
+        ::= { metering 9 }
+
+    energyEntry OBJECT-TYPE
+        SYNTAX              EnergyEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Energy Table"
+        INDEX               {
+                                eIndex
+                            }
+        ::= { energyTable 1 }
+
+    EnergyEntry ::= SEQUENCE {
+        eIndex
+            INTEGER,
+        eRealEnergy
+            OCTET STRING,
+        eDateTimeRealEnergyReset
+            OCTET STRING,
+        eReactiveEnergy
+            OCTET STRING,
+        eDateTimeReactiveEnergyReset
+            OCTET STRING,
+        eApparentEnergy
+            OCTET STRING,
+        eDateTimeApparentEnergyReset
+            OCTET STRING
+    }
+
+    eIndex OBJECT-TYPE
+        SYNTAX              INTEGER (1..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Energy Table Index"
+        ::= { energyEntry 1 }
+
+    eRealEnergy OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Real Energy Units = Wh"
+        ::= { energyEntry 2 }
+
+    eDateTimeRealEnergyReset OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Date and Time Real Energy Accumulation
+                            was reset"
+        ::= { energyEntry 3 }
+
+    eReactiveEnergy OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Reactive Energy Units = VARh"
+        ::= { energyEntry 4 }
+
+    eDateTimeReactiveEnergyReset OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Date and Time Reative Energy Accumulation
+                            was reset"
+        ::= { energyEntry 5 }
+
+    eApparentEnergy OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Apparent Energy Units = VAh"
+        ::= { energyEntry 6 }
+
+    eDateTimeApparentEnergyReset OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Date and Time Reactive Energy Accumulation
+                            was reset"
+        ::= { energyEntry 7 }
+
+    alarms OBJECT IDENTIFIER ::= { pm8ecc 2 }
+
+    alarmConfigurationTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF AlarmConfigurationEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Displays the current configuration of the Host
+                            Meter On-board alarms"
+        ::= { alarms 1 }
+
+    alarmConfigurationEntry OBJECT-TYPE
+        SYNTAX              AlarmConfigurationEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Contains configuration information for the Host
+                            Meter On-board Alarms"
+        INDEX               {
+                                acIndex,
+                                acPosition
+                            }
+        ::= { alarmConfigurationTable 1 }
+
+    AlarmConfigurationEntry ::= SEQUENCE {
+        acIndex
+            INTEGER,
+        acPosition
+            INTEGER,
+        acAlarmLabel
+            AlarmLabel,
+        acEnabled
+            INTEGER,
+        acStatus
+            INTEGER,
+        acCounter
+            INTEGER,
+        acPriority
+            INTEGER,
+        acType
+            AlarmType,
+        acAlarmList1
+            INTEGER,
+        acAlarmList2
+            INTEGER,
+        acAlarmList3
+            INTEGER,
+        acAlarmList4
+            INTEGER
+    }
+
+    acIndex OBJECT-TYPE
+        SYNTAX              INTEGER (1..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Alarm Configuration Table Index"
+        ::= { alarmConfigurationEntry 1 }
+
+    acPosition OBJECT-TYPE
+        SYNTAX              INTEGER (1..74)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Indicates the position of the alarm. 1 - 74"
+        ::= { alarmConfigurationEntry 2 }
+
+    acAlarmLabel OBJECT-TYPE
+        SYNTAX              AlarmLabel
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "The name of the alarm (user configurable)"
+        ::= { alarmConfigurationEntry 3 }
+
+    acEnabled OBJECT-TYPE
+        SYNTAX              INTEGER (0 | 255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Indicates whether the alarm is enabled or not.
+                            0 = Disabled 255 = Enabled"
+        ::= { alarmConfigurationEntry 4 }
+
+    acStatus OBJECT-TYPE
+        SYNTAX              INTEGER (0..1)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Indicates whether the alarm is active. 0 = Inactive
+                            1 = Active"
+        ::= { alarmConfigurationEntry 5 }
+
+    acCounter OBJECT-TYPE
+        SYNTAX              INTEGER (0..32767)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Indicates the number of times the alarm has been
+                            activated. Note: This counter resets at 32767"
+        ::= { alarmConfigurationEntry 6 }
+
+    acPriority OBJECT-TYPE
+        SYNTAX              INTEGER (0..3)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "The priority of the alarm. 0 = No Priority 1 =
+                            Low Priority 2 = Medium Priority 3 = High Priority"
+        ::= { alarmConfigurationEntry 7 }
+
+    acType OBJECT-TYPE
+        SYNTAX              AlarmType
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Indicates the type of the alarm."
+        ::= { alarmConfigurationEntry 8 }
+
+    acAlarmList1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Used for combinatorial type alarms - The position
+                            of the first alarm that is used to evaluate the
+                            alarm state."
+        ::= { alarmConfigurationEntry 9 }
+
+    acAlarmList2 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Used for combinatorial type alarms - The position
+                            of the second alarm that is used to evaluate
+                            the alarm state."
+        ::= { alarmConfigurationEntry 10 }
+
+    acAlarmList3 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Used for combinatorial type alarms - The position
+                            of the third alarm that is used to evaluate the
+                            alarm state."
+        ::= { alarmConfigurationEntry 11 }
+
+    acAlarmList4 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Used for combinatorial type alarms - The position
+                            of the fourth alarm that is used to evaluate
+                            the alarm state."
+        ::= { alarmConfigurationEntry 12 }
+
+    alarmSummaryBitmapsTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF AlarmSummaryBitmapsEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Indicates the state of the Host Meter On-Board
+                            Alarms"
+        ::= { alarms 2 }
+
+    alarmSummaryBitmapsEntry OBJECT-TYPE
+        SYNTAX              AlarmSummaryBitmapsEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Indicates the status of the Host Meter On-Board
+                            Alarms"
+        INDEX               {
+                                alSumIndex
+                            }
+        ::= { alarmSummaryBitmapsTable 1 }
+
+    AlarmSummaryBitmapsEntry ::= SEQUENCE {
+        alSumIndex
+            INTEGER,
+        alSumAlarms1to16
+            OCTET STRING,
+        alSumAlarms17to32
+            OCTET STRING,
+        alSumAlarms33to48
+            OCTET STRING,
+        alSumAlarms49to64
+            OCTET STRING,
+        alSumAlarms65to74
+            OCTET STRING
+    }
+
+    alSumIndex OBJECT-TYPE
+        SYNTAX              INTEGER (1..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Alarm Summary Bitmap Table Index"
+        ::= { alarmSummaryBitmapsEntry 1 }
+
+    alSumAlarms1to16 OBJECT-TYPE
+        SYNTAX              OCTET STRING (SIZE(16))
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Indicates the status of Alarms 1 - 16 (16-bits,
+                            bit-0 = Alarm 1)"
+        ::= { alarmSummaryBitmapsEntry 2 }
+
+    alSumAlarms17to32 OBJECT-TYPE
+        SYNTAX              OCTET STRING (SIZE(16))
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Indicates the status of Alarms 17 - 32 (16-bits,
+                            bit-0 = Alarm 17)"
+        ::= { alarmSummaryBitmapsEntry 3 }
+
+    alSumAlarms33to48 OBJECT-TYPE
+        SYNTAX              OCTET STRING (SIZE(16))
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Indicates the status of Alarms 33 - 48 (16-bits,
+                            bit-0 = Alarm 33)"
+        ::= { alarmSummaryBitmapsEntry 4 }
+
+    alSumAlarms49to64 OBJECT-TYPE
+        SYNTAX              OCTET STRING (SIZE(16))
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Indicates the status of Alarms 49 - 64 (16-bits,
+                            bit-0 = Alarm 49)"
+        ::= { alarmSummaryBitmapsEntry 5 }
+
+    alSumAlarms65to74 OBJECT-TYPE
+        SYNTAX              OCTET STRING (SIZE(16))
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Indicates the status of Alarms 65 - 74 (16-bits,
+                            bit-0 = Alarm 65, bit-9 = Alarm 74)"
+        ::= { alarmSummaryBitmapsEntry 6 }
+
+    alarmCountersTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF AlarmCountersEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter On-Board Alarm Counters"
+        ::= { alarms 3 }
+
+    alarmCountersEntry OBJECT-TYPE
+        SYNTAX              AlarmCountersEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter On-Board Alarm Counters"
+        INDEX               {
+                                alCntAlarmPosition,
+                                alCntIndex
+                            }
+        ::= { alarmCountersTable 1 }
+
+    AlarmCountersEntry ::= SEQUENCE {
+        alCntIndex
+            INTEGER,
+        alCntAlarmPosition
+            INTEGER,
+        alCntCount
+            INTEGER
+    }
+
+    alCntIndex OBJECT-TYPE
+        SYNTAX              INTEGER (1..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Alarm Counters Table Index"
+        ::= { alarmCountersEntry 1 }
+
+    alCntAlarmPosition OBJECT-TYPE
+        SYNTAX              INTEGER (1..74)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "The Host Meter Alarm Position"
+        ::= { alarmCountersEntry 2 }
+
+    alCntCount OBJECT-TYPE
+        SYNTAX              INTEGER (0..65535)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "The number of times the Host Meter On-Board alarm
+                            has transitioned from an inactive state to an
+                            active state"
+        ::= { alarmCountersEntry 3 }
+
+    io OBJECT IDENTIFIER ::= { pm8ecc 3 }
+
+    ioOptionIDTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF IoOptionIDEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "I/O Option Module Installed on the Host Meter"
+        ::= { io 1 }
+
+    ioOptionIDEntry OBJECT-TYPE
+        SYNTAX              IoOptionIDEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "I/O Option Card Installed On-board the Host Meter"
+        INDEX               {
+                                ioIDIndex
+                            }
+        ::= { ioOptionIDTable 1 }
+
+    IoOptionIDEntry ::= SEQUENCE {
+        ioIDIndex
+            INTEGER,
+        ioIDInstalledOptionSlot1
+            INTEGER,
+        ioIDInstalledOptionSlot2
+            INTEGER
+    }
+
+    ioIDIndex OBJECT-TYPE
+        SYNTAX              INTEGER (1..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "I/O Installed Option ID Table Index"
+        ::= { ioOptionIDEntry 1 }
+
+    ioIDInstalledOptionSlot1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                unused( 1 ),
+                                io-22( 2 ),
+                                io-26( 3 ),
+                                io-2222( 4 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "0 = Not Installed 1 = Unused 2 = IO22 3 = IO26
+                            4 = IO 2222"
+        ::= { ioOptionIDEntry 2 }
+
+    ioIDInstalledOptionSlot2 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                unused( 1 ),
+                                io-22( 2 ),
+                                io-26( 3 ),
+                                io-2222( 4 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "0 = Not Installed 1 = Unused 2 = IO22 3 = IO26
+                            4 = IO 2222"
+        ::= { ioOptionIDEntry 3 }
+
+    ioConfigurationTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF IoConfigurationEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Displays the current I/O configuration for each
+                            I/O point"
+        ::= { io 2 }
+
+    ioConfigurationEntry OBJECT-TYPE
+        SYNTAX              IoConfigurationEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Contains configuration information for the Host
+                            Meter On-board I/O"
+        INDEX               {
+                                iocIndex,
+                                iocPointNumber
+                            }
+        ::= { ioConfigurationTable 1 }
+
+    IoConfigurationEntry ::= SEQUENCE {
+        iocIndex
+            INTEGER,
+        iocPointNumber
+            INTEGER,
+        iocLabel
+            IOPointLabel,
+        iocStateOrValue
+            OCTET STRING,
+        iocPointType
+            IOPointType,
+        iocMode
+            INTEGER,
+        iocType
+            INTEGER,
+        iocCount
+            OCTET STRING
+    }
+
+    iocIndex OBJECT-TYPE
+        SYNTAX              INTEGER (1..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "I/O Configuration Table Index"
+        ::= { ioConfigurationEntry 1 }
+
+    iocPointNumber OBJECT-TYPE
+        SYNTAX              INTEGER (1..18)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "The point number for this I/O Point"
+        ::= { ioConfigurationEntry 2 }
+
+    iocLabel OBJECT-TYPE
+        SYNTAX              IOPointLabel
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "The name of the I/O Point (user configurable)"
+        ::= { ioConfigurationEntry 3 }
+
+    iocStateOrValue OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Displays the current value for the I/O Point Digial
+                            I/O: 1 = Active or 0 = Inactive
+                            
+                            Analog I/O: Scaled input/output value"
+        ::= { ioConfigurationEntry 4 }
+
+    iocPointType OBJECT-TYPE
+        SYNTAX              IOPointType
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "The type of I/O at this point"
+        ::= { ioConfigurationEntry 5 }
+
+    iocMode OBJECT-TYPE
+        SYNTAX              INTEGER (0..9)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "For Digital Inputs and Outputs this object is
+                            always 0 indicating “Discrete”.
+                            
+                            For Analog Inputs and Outputs this object indicates
+                            the range of analog I/O values (used without
+                            units) 0 = 0 – 1 1 = 0 – 5 2 = 0 – 10 3 = 0 –
+                            20 4 = 1 – 5 5 = 4 – 20 6 = -5 – 5 7 = -10 –
+                            10 8 = -100 – 100 9 = User defined (values default
+                            to 0)"
+        ::= { ioConfigurationEntry 6 }
+
+    iocType OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "For Digital Inputs this object indicates input
+                            type 1 = Unused 2 = AC/DC
+                            
+                            For Digital Outputs this object indicates output
+                            type 1 = solid state relay 2 = electromechanical
+                            relay
+                            
+                            For Analog Inputs and Outputs this object indicates
+                            the digital resolution of the I/O hardware. 0
+                            = 8-Bit, unipolar 1 = 10-Bit, unipolar 2 = 12-Bit,
+                            unipolar 3 = 14-Bit, unipolar 4 = 16-Bit, unipolar
+                            5 = 16-Bit, bipolar with sign 6 = reserved 7
+                            = reserved 8 = Resolution for IO2222 Voltage
+                            range 0 - 4000 9 = Resolution for IO2222 Current
+                            range 800 - 4000"
+        ::= { ioConfigurationEntry 7 }
+
+    iocCount OBJECT-TYPE
+        SYNTAX              OCTET STRING (SIZE(8))
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Number of times digital I/O point has transitioned
+                            from OFF to ON"
+        ::= { ioConfigurationEntry 8 }
+
+    ioStatusBitmapsTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF IoStatusBitmapsEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter I/O Status Bitmaps"
+        ::= { io 3 }
+
+    ioStatusBitmapsEntry OBJECT-TYPE
+        SYNTAX              IoStatusBitmapsEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter On-Board I/O Status Bitmaps"
+        INDEX               {
+                                ioStatIndex
+                            }
+        ::= { ioStatusBitmapsTable 1 }
+
+    IoStatusBitmapsEntry ::= SEQUENCE {
+        ioStatIndex
+            INTEGER,
+        ioStatSummaryBitmap
+            OCTET STRING
+    }
+
+    ioStatIndex OBJECT-TYPE
+        SYNTAX              INTEGER (1..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "I/O Summary Bitmaps Table Index"
+        ::= { ioStatusBitmapsEntry 1 }
+
+    ioStatSummaryBitmap OBJECT-TYPE
+        SYNTAX              OCTET STRING (SIZE(18))
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Indicates the Status of the Host Meter I/O Points
+                            Bit-0 = I/O Point 1 Bit-1 = I/O Point 2 ... Bit-17
+                            = I/O Point 18"
+        ::= { ioStatusBitmapsEntry 2 }
+
+    meterSystem OBJECT IDENTIFIER ::= { pm8ecc 4 }
+
+    meterIdentificationTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF MeterIdentificationEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Identification"
+        ::= { meterSystem 1 }
+
+    meterIdentificationEntry OBJECT-TYPE
+        SYNTAX              MeterIdentificationEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Identification"
+        INDEX               {
+                                midIndex
+                            }
+        ::= { meterIdentificationTable 1 }
+
+    MeterIdentificationEntry ::= SEQUENCE {
+        midIndex
+            INTEGER,
+        midSerialNumber
+            INTEGER,
+        midFirmwareVersion
+            OCTET STRING,
+        midModelNumber
+            OCTET STRING,
+        midDeviceName
+            OCTET STRING
+    }
+
+    midIndex OBJECT-TYPE
+        SYNTAX              INTEGER (1..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Meter Identification Table Index"
+        ::= { meterIdentificationEntry 1 }
+
+    midSerialNumber OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host meter 32 bit Serial Number"
+        ::= { meterIdentificationEntry 2 }
+
+    midFirmwareVersion OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Firmware Version"
+        ::= { meterIdentificationEntry 3 }
+
+    midModelNumber OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Model Number"
+        ::= { meterIdentificationEntry 4 }
+
+    midDeviceName OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host Meter Label plus Nameplate"
+        ::= { meterIdentificationEntry 5 }
+
+    trapVariables OBJECT IDENTIFIER ::= { pm8ecc 5 }
+
+    alarmDateAndTime OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "The Date and Time of the alarm state change."
+        ::= { trapVariables 1 }
+
+    alarmLabel OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "The Descriptive Label given to the alarm"
+        ::= { trapVariables 2 }
+
+    alarmState OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "The state of the Alarm - pickup, dropout, unary,
+                            diagnostic"
+        ::= { trapVariables 3 }
+
+    alarmValue OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "The value of the alarm when it changed state."
+        ::= { trapVariables 4 }
+
+    alarmPriority OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                highPriority( 1 ),
+                                mediumPriority( 2 ),
+                                lowPriority( 3 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "The priority defined for the alarm."
+        ::= { trapVariables 5 }
+
+    mibVersion OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "This is the current version of the MIB"
+        ::= { pm8ecc 6 }
+
+
+    pm8OnBoardAlarmP1 TRAP-TYPE
+        ENTERPRISE          pm8ecc
+        VARIABLES           {
+                                alarmDateAndTime,
+                                alarmLabel,
+                                alarmState,
+                                alarmValue,
+                                alarmPriority
+                            }
+        DESCRIPTION         "Indicates the Host Meter On-Board Alarm system has
+                             detected a state change of an enabled alarm with a
+                             priority of 1"
+        ::= 1
+
+    pm8OnBoardAlarmP2 TRAP-TYPE
+        ENTERPRISE          pm8ecc
+        VARIABLES           {
+                                alarmDateAndTime,
+                                alarmLabel,
+                                alarmState,
+                                alarmValue,
+                                alarmPriority
+                            }
+        DESCRIPTION         "Indicates the Host Meter On-Board Alarm system has
+                             detected a state change of an enabled alarm with a
+                             priority of 2"
+        ::= 2
+
+    pm8OnBoardAlarmP3 TRAP-TYPE
+        ENTERPRISE          pm8ecc
+        VARIABLES           {
+                                alarmDateAndTime,
+                                alarmLabel,
+                                alarmState,
+                                alarmValue,
+                                alarmPriority
+                            }
+        DESCRIPTION         "Indicates the Host Meter On-Board Alarm system has
+                             detected a state change of an enabled alarm with a
+                             priority of 3"
+        ::= 3
+
+
+END
+

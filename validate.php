@@ -16,6 +16,8 @@
 chdir(__DIR__); // cwd to the directory containing this script
 
 require_once 'includes/common.php';
+require_once 'includes/functions.php';
+require_once 'includes/dbFacile.php';
 
 $options = getopt('m:h::');
 
@@ -38,35 +40,83 @@ if (isset($options['h'])) {
 }
 
 
+// Buffer output
+ob_start();
+register_shutdown_function(function () {
+    global $versions;
+    $output = ob_get_clean();
+    if (!isset($versions)) {
+        $versions = version_info();
+    }
+
+    @ob_end_clean();
+
+    echo <<< EOF
+====================================
+Component | Version
+--------- | -------
+LibreNMS  | {$versions['local_ver']}
+DB Schema | {$versions['db_schema']}
+PHP       | {$versions['php_ver']}
+MySQL     | {$versions['mysql_ver']}
+RRDTool   | {$versions['rrdtool_ver']}
+SNMP      | {$versions['netsnmp_ver']}
+====================================
+
+$output
+EOF;
+});
+
 // critical config.php checks
 if (!file_exists('config.php')) {
     print_fail('config.php does not exist, please copy config.php.default to config.php');
     exit;
 }
 
-$config_failed = false;
+$pre_checks_failed = false;
 $syntax_check = `php -ln config.php`;
 if (!str_contains($syntax_check, 'No syntax errors detected')) {
     print_fail('Syntax error in config.php');
     echo $syntax_check;
-    $config_failed = true;
+    $pre_checks_failed = true;
 }
 
 $first_line = rtrim(`head -n1 config.php`);
 if (!starts_with($first_line, '<?php')) {
     print_fail("config.php doesn't start with a <?php - please fix this ($first_line)");
-    $config_failed = true;
+    $pre_checks_failed = true;
 }
 if (str_contains(`tail config.php`, '?>')) {
     print_fail("Remove the ?> at the end of config.php");
-    $config_failed = true;
+    $pre_checks_failed = true;
 }
 
-if ($config_failed) {
+// Composer checks
+if (!file_exists('vendor/autoload.php')) {
+    print_fail('Composer has not been run, dependencies are missing', 'composer install --no-dev');
+    $pre_checks_failed = true;
+}
+
+// Check php modules we use to make sure they are loaded
+$extensions = array('mysqli','pcre','curl','session','snmp','mcrypt');
+foreach ($extensions as $extension) {
+    if (extension_loaded($extension) === false) {
+        $missing_extensions[] = $extension;
+    }
+}
+if (!empty($missing_extensions)) {
+    print_fail("We couldn't find the following php extensions, please ensure they are installed:");
+    foreach ($missing_extensions as $extension) {
+        echo "$extension\n";
+    }
+    $pre_checks_failed = true;
+}
+
+if ($pre_checks_failed) {
     exit;
 }
 
-$init_modules = array();
+$init_modules = array('nodb');
 require 'includes/init.php';
 
 // make sure install_dir is set correctly, or the next includes will fail
@@ -74,28 +124,6 @@ if (!file_exists($config['install_dir'].'/config.php')) {
     print_fail('$config[\'install_dir\'] is not set correctly.  It should probably be set to: ' . getcwd());
     exit;
 }
-
-$git_found = check_git_exists();
-if ($git_found !== true) {
-    print_warn('Unable to locate git. This should probably be installed.');
-}
-
-$versions = version_info();
-$cur_sha = $versions['local_sha'];
-
-echo <<< EOF
-==========================================================
-Component | Version
---------- | -------
-LibreNMS  | {$cur_sha}
-DB Schema | {$versions['db_schema']}
-PHP       | {$versions['php_ver']}
-MySQL     | {$versions['mysql_ver']}
-RRDTool   | {$versions['rrdtool_ver']}
-SNMP      | {$versions['netsnmp_ver']}
-==========================================================
-\n
-EOF;
 
 // Check we are running this as the root user
 if (function_exists('posix_getpwuid')) {
@@ -108,34 +136,6 @@ if (!($username === 'root' || (isset($config['user']) && $username === $config['
     print_fail('You need to run this script as root' . (isset($config['user']) ? ' or '.$config['user'] : ''));
 }
 
-if ($git_found === true) {
-    if ($config['update_channel'] == 'master' && $cur_sha != $versions['github']['sha']) {
-        $commit_date = new DateTime('@'.$versions['local_date'], new DateTimeZone(date_default_timezone_get()));
-        print_warn("Your install is out of date, last update: " . $commit_date->format('r'));
-    }
-}
-
-// Check php modules we use to make sure they are loaded
-$extensions = array('pcre','curl','session','snmp','mcrypt');
-foreach ($extensions as $extension) {
-    if (extension_loaded($extension) === false) {
-        $missing_extensions[] = $extension;
-    }
-}
-if (!empty($missing_extensions)) {
-    print_fail("We couldn't find the following php extensions, please ensure they are installed:");
-    foreach ($missing_extensions as $extension) {
-        echo "$extension\n";
-    }
-}
-
-if (class_exists('Net_IPv4') === false) {
-    print_fail("It doesn't look like Net_IPv4 is installed");
-}
-if (class_exists('Net_IPv6') === false) {
-    print_fail("It doesn't look like Net_IPv6 is installed");
-}
-
 // Let's test the user configured if we have it
 if (isset($config['user'])) {
     $tmp_user = $config['user'];
@@ -143,9 +143,16 @@ if (isset($config['user'])) {
     $find_result = rtrim(`find $tmp_dir \! -user $tmp_user`);
     if (!empty($find_result)) {
         // This isn't just the log directory, let's print the list to the user
-        $files = explode(PHP_EOL, $find_result);
-        if (is_array($files)) {
-            print_fail("We have found some files that are owned by a different user than $tmp_user, this will stop you updating automatically and / or rrd files being updated causing graphs to fail:\nIf you don't run a bespoke install then you can fix this by running `chown -R $tmp_user:$tmp_user ".$config['install_dir']."`");
+        $files = array_diff(explode(PHP_EOL, $find_result), array(
+            "$tmp_dir/logs/error_log",
+            "$tmp_dir/logs/access_log",
+        ));
+        if (!empty($files)) {
+            print_fail(
+                "We have found some files that are owned by a different user than $tmp_user, " .
+                'this will stop you updating automatically and / or rrd files being updated causing graphs to fail.',
+                "chown -R $tmp_user:$tmp_user {$config['install_dir']}"
+            );
             print_list($files, "\t %s\n");
         }
     }
@@ -154,17 +161,164 @@ if (isset($config['user'])) {
 }
 
 // Run test on MySQL
-$test_db = @mysqli_connect($config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name'], $config['db_port']);
-if (mysqli_connect_error()) {
-    print_fail('Error connecting to your database '.mysqli_connect_error());
-} else {
+try {
+    dbConnect();
     print_ok('Database connection successful');
+} catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
+    print_fail('Error connecting to your database '.$e->getMessage());
 }
+// pull in the database config settings
+mergedb();
 
 // Test for MySQL Strict mode
 $strict_mode = dbFetchCell("SELECT @@global.sql_mode");
-if (strstr($strict_mode, 'STRICT_TRANS_TABLES')) {
-    print_fail('You have MySQL STRICT_TRANS_TABLES enabled, please disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
+if (str_contains($strict_mode, 'STRICT_TRANS_TABLES')) {
+    //FIXME - Come back to this once other MySQL modes are fixed
+    //print_fail('You have MySQL STRICT_TRANS_TABLES enabled, please disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
+}
+
+// Test for lower case table name support
+$lc_mode = dbFetchCell("SELECT @@global.lower_case_table_names");
+if ($lc_mode != 0) {
+    print_fail('You have lower_case_table_names set to 1 or true in mysql config.', 'Set lower_case_table_names=0 in your mysql config file');
+}
+
+if (empty($strict_mode) === false) {
+    print_fail("You have not set sql_mode='' in your mysql config");
+}
+
+// Test for correct character set and collation
+$collation = dbFetchRows("SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA S WHERE schema_name = '" . $config['db_name'] . "' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8' OR DEFAULT_COLLATION_NAME != 'utf8_unicode_ci')");
+if (empty($collation) !== true) {
+    print_fail('MySQL Database collation is wrong: ' . implode(' ', $collation[0]), 'https://t.libren.ms/-zdwk');
+}
+$collation_tables = dbFetchRows("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '" . $config['db_name'] . "' AND  ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );");
+if (empty($collation_tables) !== true) {
+    print_fail('MySQL tables collation is wrong: ', 'http://bit.ly/2lAG9H8');
+    print_list($collation_tables, "\t %s\n");
+}
+$collation_columns = dbFetchRows("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . $config['db_name'] . "'  AND  ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );");
+if (empty($collation_columns) !== true) {
+    print_fail('MySQL column collation is wrong: ', 'https://t.libren.ms/-zdwk');
+    print_list($collation_columns, "\t %s\n");
+}
+
+if (is_file('misc/db_schema.yaml')) {
+    $master_schema = Symfony\Component\Yaml\Yaml::parse(
+        file_get_contents('misc/db_schema.yaml')
+    );
+
+    $current_schema = dump_db_schema();
+    $schema_update = array();
+
+    foreach ((array)$master_schema as $table => $data) {
+        if (empty($current_schema[$table])) {
+            print_fail("Database: missing table ($table)");
+
+            $columns = array_map('column_schema_to_sql', $data['Columns']);
+            $indexes = array_map('index_schema_to_sql', $data['Indexes']);
+            $def = implode(', ', array_merge(array_values($columns), array_values($indexes)));
+
+            $schema_update[] = "CREATE TABLE `$table` ($def);";
+        } else {
+            $previous_column = '';
+            foreach ($data['Columns'] as $column => $cdata) {
+                $cur = $current_schema[$table]['Columns'][$column];
+                if ($cur['Default'] == 'current_timestamp()') {
+                    $cur['Default'] = 'CURRENT_TIMESTAMP';
+                }
+                if ($cur['Extra'] == 'on update current_timestamp()') {
+                    $cur['Extra'] = 'on update CURRENT_TIMESTAMP';
+                }
+                if (empty($current_schema[$table]['Columns'][$column])) {
+                    print_fail("Database: missing column ($table/$column)");
+
+                    $sql = "ALTER TABLE `$table` ADD " . column_schema_to_sql($cdata);
+                    if (!empty($previous_column)) {
+                        $sql .= " AFTER `$previous_column`";
+                    }
+                    $schema_update[] = $sql . ';';
+                } elseif ($cdata != $cur) {
+                    print_fail("Database: incorrect column ($table/$column)");
+                    $schema_update[] = "ALTER TABLE `$table` CHANGE `$column` " . column_schema_to_sql($cdata) . ';';
+                }
+                $previous_column = $column;
+                unset($current_schema[$table]['Columns'][$column]); // remove checked columns
+            }
+
+            foreach ($current_schema[$table]['Columns'] as $column => $_unused) {
+                print_fail("Database: extra column ($table/$column)");
+                $schema_update[] = "ALTER TABLE `$table` DROP `$column`;";
+            }
+
+
+            foreach ($data['Indexes'] as $name => $index) {
+                if (empty($current_schema[$table]['Indexes'][$name])) {
+                    print_fail("Database: missing index ($table/$name)");
+                    $schema_update[] = "ALTER TABLE `$table` ADD " . index_schema_to_sql($index) . ';';
+                } elseif ($index != $current_schema[$table]['Indexes'][$name]) {
+                    print_fail("Database: incorrect index ($table/$name)");
+                    $schema_update[] = "ALTER TABLE `$table` DROP INDEX `$name`, " . index_schema_to_sql($index) . ';';
+                }
+
+                unset($current_schema[$table]['Indexes'][$name]);
+            }
+
+            foreach ($current_schema[$table]['Indexes'] as $name => $_unused) {
+                print_fail("Database: extra index ($table/$name)");
+                $schema_update[] = "ALTER TABLE `$table` DROP INDEX `$name`;";
+            }
+        }
+
+        unset($current_schema[$table]); // remove checked tables
+    }
+
+    foreach ($current_schema as $table => $data) {
+        print_fail("Database: extra table ($table)");
+        $schema_update[] = "DROP TABLE `$table`;";
+    }
+} else {
+    print_warn("We haven't detected the db_schema.yaml file");
+}
+
+if (empty($schema_update)) {
+    print_ok('Database schema correct');
+} else {
+    print_fail("We have detected that your database schema may be wrong, please report the following to us on IRC or the community site (https://t.libren.ms/5gscd):");
+    print_list($schema_update, "\t %s\n", 30);
+}
+
+$versions = version_info();
+
+// Check that rrdtool config version is what we see
+if (isset($config['rrdtool_version']) && (version_compare($config['rrdtool_version'], $versions['rrdtool_ver'], '>'))) {
+    print_fail('The rrdtool version you have specified is newer than what is installed.', "Either comment out \$config['rrdtool_version'] = '{$config['rrdtool_version']}'; or set \$config['rrdtool_version'] = '{$versions['rrdtool_ver']}';");
+}
+
+if (check_git_exists() === true) {
+    if ($config['update_channel'] == 'master' && $versions['local_sha'] != $versions['github']['sha']) {
+        $commit_date = new DateTime('@'.$versions['local_date'], new DateTimeZone(date_default_timezone_get()));
+        if ($commit_date->diff(new DateTime())->days > 0) {
+            print_warn("Your install is over 24 hours out of date, last update: " . $commit_date->format('r'));
+        }
+    }
+
+    if ($versions['local_branch'] != 'master') {
+        print_warn("Your local git branch is not master, this will prevent automatic updates.");
+    }
+
+    // check for modified files
+    $modifiedcmd = 'git diff --name-only --exit-code';
+    if ($username === 'root') {
+        $modifiedcmd = 'su '.$config['user'].' -c "'.$modifiedcmd.'"';
+    }
+    exec($modifiedcmd, $cmdoutput, $code);
+    if ($code !== 0 && !empty($cmdoutput)) {
+        print_warn("Your local git contains modified files, this could prevent automatic updates.\nModified files:");
+        print_list($cmdoutput, "\t %s\n");
+    }
+} else {
+    print_warn('Unable to locate git. This should probably be installed.');
 }
 
 $ini_tz = ini_get('date.timezone');
@@ -172,7 +326,10 @@ $sh_tz = rtrim(shell_exec('date +%Z'));
 $php_tz = date('T');
 
 if (empty($ini_tz)) {
-    print_fail('You have no timezone set for php: http://php.net/manual/en/datetime.configuration.php#ini.date.timezone.');
+    print_fail(
+        'You have no timezone set for php.',
+        'http://php.net/manual/en/datetime.configuration.php#ini.date.timezone'
+    );
 } elseif ($sh_tz !== $php_tz) {
     print_fail("You have a different system timezone ($sh_tz) specified to the php configured timezone ($php_tz), please correct this.");
 }
@@ -190,7 +347,7 @@ if (!$config['rrdcached']) {
     }
 
     if (substr(sprintf('%o', fileperms($config['rrd_dir'])), -3) != 775) {
-        print_warn('Your RRD directory is not set to 0775, please check our installation instructions');
+        print_warn('Your RRD directory is not set to 0775', "chmod 775 {$config['rrd_dir']}");
     }
 }
 
@@ -214,13 +371,18 @@ if ($space_check < 1) {
 
 // Check programs
 $bins = array('fping','fping6','rrdtool','snmpwalk','snmpget','snmpbulkwalk');
-$suid_bins = array('fping', 'fping6');
 foreach ($bins as $bin) {
     $cmd = rtrim(shell_exec("which {$config[$bin]} 2>/dev/null"));
     if (!$cmd) {
         print_fail("$bin location is incorrect or bin not installed. \n\tYou can also manually set the path to $bin by placing the following in config.php: \n\t\$config['$bin'] = \"/path/to/$bin\";");
-    } elseif (in_array($bin, $suid_bins) && !(fileperms($cmd) & 2048)) {
-        print_fail("$bin should be suid, please chmod u+s $cmd");
+    } elseif (in_array($bin, array('fping', 'fping6'))) {
+        if (trim(shell_exec("which getcap 2>/dev/null"))) {
+            if (!str_contains(shell_exec("getcap $cmd"), "$cmd = cap_net_raw+ep")) {
+                print_fail("$bin should have CAP_NET_RAW!", "setcap cap_net_raw+ep $cmd");
+            }
+        } elseif (!(fileperms($cmd) & 2048)) {
+            print_fail("$bin should be suid!", "chmod u+s $cmd");
+        }
     }
 }
 
@@ -239,46 +401,41 @@ if (!function_exists('openssl_random_pseudo_bytes')) {
     }
 }
 
-// check discovery last run
-if (dbFetchCell('SELECT COUNT(*) FROM `devices` WHERE `last_discovered` IS NOT NULL') == 0) {
-    print_fail('Discovery has never run, check the cron job');
-} elseif (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_discovered` <= DATE_ADD(NOW(), INTERVAL - 24 hour) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {
-    print_fail("Discovery has not completed in the last 24 hours, check the cron job");
-}
-
 // check poller
-if (dbFetchCell('SELECT COUNT(*) FROM `devices` WHERE `last_polled` IS NOT NULL') == 0) {
+if (dbFetchCell('SELECT COUNT(*) FROM `pollers`')) {
+    if (dbFetchCell('SELECT COUNT(*) FROM `pollers` WHERE `last_polled` >= DATE_ADD(NOW(), INTERVAL - 5 MINUTE)') == 0) {
+        print_fail("The poller has not run in the last 5 minutes, check the cron job");
+    }
+} else {
     print_fail('The poller has never run, check the cron job');
-} elseif (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_polled` >= DATE_ADD(NOW(), INTERVAL - 5 minute) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") == 0) {
-    print_fail("The poller has not run in the last 5 minutes, check the cron job");
-} elseif (count($devices = dbFetchColumn("SELECT `hostname` FROM `devices` WHERE (`last_polled` < DATE_ADD(NOW(), INTERVAL - 5 minute) OR `last_polled` IS NULL) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1")) > 0) {
-    print_warn("Some devices have not been polled in the last 5 minutes.
+}
+
+
+if (dbFetchCell('SELECT COUNT(*) FROM `devices`') == 0) {
+    print_warn("You have not added any devices yet.");
+} else {
+// check discovery last run
+    if (dbFetchCell('SELECT COUNT(*) FROM `devices` WHERE `last_discovered` IS NOT NULL') == 0) {
+        print_fail('Discovery has never run, check the cron job');
+    } elseif (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_discovered` <= DATE_ADD(NOW(), INTERVAL - 24 HOUR) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {
+        print_fail("Discovery has not completed in the last 24 hours, check the cron job");
+    }
+
+// check devices polling
+    if (count($devices = dbFetchColumn("SELECT `hostname` FROM `devices` WHERE (`last_polled` < DATE_ADD(NOW(), INTERVAL - 5 MINUTE) OR `last_polled` IS NULL) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1")) > 0) {
+        print_warn("Some devices have not been polled in the last 5 minutes.
         You may have performance issues. Check your poll log and see: http://docs.librenms.org/Support/Performance/");
-    print_list($devices, "\t %s\n");
-}
+        print_list($devices, "\t %s\n");
+    }
 
-if (count($devices = dbFetchColumn('SELECT `hostname` FROM `devices` WHERE last_polled_timetaken > 300 AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1')) > 0) {
-    print_fail("Some devices have not completed their polling run in 5 minutes, this will create gaps in data.
+    if (count($devices = dbFetchColumn('SELECT `hostname` FROM `devices` WHERE last_polled_timetaken > 300 AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1')) > 0) {
+        print_fail("Some devices have not completed their polling run in 5 minutes, this will create gaps in data.
         Check your poll log and refer to http://docs.librenms.org/Support/Performance/");
-    print_list($devices, "\t %s\n");
-}
-
-if ($git_found === true) {
-    if ($versions['local_branch'] != 'master') {
-        print_warn("Your local git branch is not master, this will prevent automatic updates.");
-    }
-
-    // check for modified files
-    $modifiedcmd = 'git diff --name-only --exit-code';
-    if ($username === 'root') {
-        $modifiedcmd = 'su '.$config['user'].' -c "'.$modifiedcmd.'"';
-    }
-    exec($modifiedcmd, $cmdoutput, $code);
-    if ($code !== 0 && !empty($cmdoutput)) {
-        print_warn("Your local git contains modified files, this could prevent automatic updates.\nModified files:");
-        print_list($cmdoutput, "\t %s\n");
+        print_list($devices, "\t %s\n");
     }
 }
+
+
 // Modules test
 $modules = explode(',', $options['m']);
 foreach ($modules as $module) {
@@ -396,16 +553,35 @@ function print_ok($msg)
 }//end print_ok()
 
 
-function print_fail($msg)
+function print_fail($msg, $fix = null)
 {
-    c_echo("[%RFAIL%n]  $msg\n");
-}//end print_fail()
+    c_echo("[%RFAIL%n]  $msg");
+    if ($fix && strlen($msg) > 72) {
+        echo PHP_EOL . "       ";
+    }
+    print_fix($fix);
+}
 
 
-function print_warn($msg)
+function print_warn($msg, $fix = null)
 {
-    c_echo("[%YWARN%n]  $msg\n");
-}//end print_warn()
+    c_echo("[%YWARN%n]  $msg");
+    if ($fix && strlen($msg) > 72) {
+        echo PHP_EOL . "       ";
+    }
+    print_fix($fix);
+}
+
+/**
+ * @param $fix
+ */
+function print_fix($fix)
+{
+    if (!empty($fix)) {
+        c_echo(" [%BFIX%n] %B$fix%n");
+    }
+    echo PHP_EOL;
+}
 
 function check_rrdcached()
 {

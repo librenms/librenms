@@ -19,6 +19,6 @@ foreach (explode("\n", $oids) as $data) {
         $type             = 'rfc1628';
         $index            = (500 + $current_id);
 
-        discover_sensor($valid['sensor'], 'charge', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'charge', $device, $current_oid, $index, $type, $descr, 1, 1, 15, 50, null, 101, $current);
     }
 }

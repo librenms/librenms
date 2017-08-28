@@ -1,0 +1,566 @@
+NETGEAR-RADIUS-AUTH-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+-- Netgear Radius Authentication Client MIB
+-- Copyright Netgear Inc (2003-2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+    IpAddress, Counter32, Unsigned32, Integer32
+                                        FROM SNMPv2-SMI
+    RowStatus                           FROM SNMPv2-TC
+    lb6m                            FROM QUANTA-LB6M-REF-MIB
+    InetAddress,InetAddressType         FROM INET-ADDRESS-MIB
+    DisplayString                       FROM RFC1213-MIB
+    InterfaceIndexOrZero                FROM IF-MIB;
+
+    fastPathRadius MODULE-IDENTITY
+        LAST-UPDATED "201404210000Z" -- 21 April 2014 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The Netgear Private MIB for FastPath Radius Authentication Client"
+
+        -- Revision history.
+        REVISION
+          "201404210000Z" -- 21 April 2014 12:00:00 GMT
+        DESCRIPTION
+          "Dynamic Authorization Statistics related objects are added."
+        REVISION
+          "201112140000Z" -- 14 Dec 2011 12:00:00 GMT
+        DESCRIPTION
+          "Radius Source Interface related Object added"
+        REVISION
+          "201109260000Z" -- 26 Sep 2011 12:00:00 GMT
+        DESCRIPTION
+          "Shared Secret Key Length Updated."
+        REVISION
+          "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        DESCRIPTION
+          "Postal address updated."
+        REVISION
+          "200705230000Z" -- 23 May 2007 12:00:00 GMT
+        DESCRIPTION
+          "Netgear branding related changes."
+        REVISION
+          "200311210000Z" -- 21 Nov 2003 12:00:00 GMT
+        DESCRIPTION
+          "Revisions made for new release."
+        REVISION
+          "200305070000Z"
+        DESCRIPTION
+          "Initial version."
+          
+    ::= { lb6m 8 }
+
+
+    --**************************************************************************************
+    -- agentRadiusConfigGroup
+    --
+    --**************************************************************************************
+
+    agentRadiusConfigGroup                      OBJECT IDENTIFIER ::= { fastPathRadius 1 }
+
+    agentRadiusMaxTransmit OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..15)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Maximum number of retransmissions of a RADIUS request packet"
+         DEFVAL { 4 }
+         ::= { agentRadiusConfigGroup 1 }
+
+    agentRadiusTimeout OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..30)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Time out duration (in seconds) before packets are retransmitted"
+         DEFVAL { 5 }
+         ::= { agentRadiusConfigGroup 2 }
+    agentRadiusAccountingMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Identifies if RADIUS Accounting has been enabled or not"
+         DEFVAL { disable }
+         ::= { agentRadiusConfigGroup 3 }
+    agentRadiusStatsClear OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "When set to enable(1), all Radius statistics will be reset."
+         DEFVAL { disable }
+         ::= { agentRadiusConfigGroup 4 }
+    agentRadiusAccountingIndexNextValid OBJECT-TYPE
+         SYNTAX      Integer32 (0|1..2147483647)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indicates the next valid index into the agentRadiusAccountingConfigTable 
+                     for creation.  If no additional entries are allowed, this will be 0."
+         ::= { agentRadiusConfigGroup 5 }
+
+    --**************************************************************************************
+    -- agentRadiusAccountingConfigTable
+    --
+    --**************************************************************************************
+
+    agentRadiusAccountingConfigTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentRadiusAccountingConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Table with information about Radius Accounting Server IP
+                     Addresses, port numbers and shared secret.  Only one entry is
+                     supported at this time."
+         ::= { agentRadiusConfigGroup 6 }
+
+    agentRadiusAccountingConfigEntry OBJECT-TYPE
+         SYNTAX      AgentRadiusAccountingConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Entry consisting of configuration data for a Radius Accounting Server."
+         INDEX       { agentRadiusAccountingServerIndex }
+         ::= { agentRadiusAccountingConfigTable 1 }
+         
+    AgentRadiusAccountingConfigEntry ::=
+         SEQUENCE {
+         agentRadiusAccountingServerIndex
+                 Integer32,
+         agentRadiusAccountingServerAddress
+                 InetAddress,
+         agentRadiusAccountingServerAddressType
+                 InetAddressType,
+         agentRadiusAccountingPort
+                 Unsigned32,
+         agentRadiusAccountingSecret
+                 DisplayString,
+         agentRadiusAccountingStatus
+                 RowStatus,
+         agentRadiusAccountingServerName
+                 DisplayString
+         }
+
+    agentRadiusAccountingServerIndex OBJECT-TYPE
+         SYNTAX      Integer32 (1..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Unique index of the configured RADIUS accounting server.  The next valid
+                     value of this object for creation is specified by 
+                     agentRadiusAccountingIndexNextValid.
+                     "
+         ::= { agentRadiusAccountingConfigEntry 1 }
+
+    agentRadiusAccountingServerAddress OBJECT-TYPE
+         SYNTAX      InetAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP Address of the configured RADIUS accounting server.
+                     This object cannot be changed after creation."
+         ::= { agentRadiusAccountingConfigEntry 2 }
+     
+   agentRadiusAccountingServerAddressType OBJECT-TYPE
+         SYNTAX      InetAddressType
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP Address Type of the configured RADIUS accounting server.
+                     This object cannot be changed after creation."
+         ::= { agentRadiusAccountingConfigEntry 3 }
+
+    agentRadiusAccountingPort OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..65535)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Port number for the RADIUS accounting server."
+         DEFVAL { 1813 }
+         ::= { agentRadiusAccountingConfigEntry 4 }
+
+    agentRadiusAccountingSecret OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..64))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Configured shared sercret for the RADIUS accounting server."
+         ::= { agentRadiusAccountingConfigEntry 5 }
+
+    agentRadiusAccountingStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Creates or destroys a RADIUS accounting server entry.
+                     During creation, the next available index is specified by the
+                     agentRadiusAccountingIndexNextValid object.  Rows creation using
+                     a different value for agentRadiusAccountingServerIndex will fail.
+                     
+                     active(1)       - This entry is active.
+                     createAndGo(4)  - Creates a new entry.
+                     destroy(6)      - Deletes an entry."
+         ::= { agentRadiusAccountingConfigEntry 6 }
+
+    agentRadiusAccountingServerName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..32))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Configured identification name for the RADIUS Accounting
+                      server."
+         ::= { agentRadiusAccountingConfigEntry 7 }
+
+    --**************************************************************************************
+    
+    agentRadiusServerIndexNextValid OBJECT-TYPE
+         SYNTAX      Integer32 (0|1..2147483647)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indicates the next valid index into the agentRadiusServerConfigTable 
+                     for creation.  If no additional entries are allowed, this will be 0."
+         ::= { agentRadiusConfigGroup 7 }
+    
+    --**************************************************************************************
+    -- agentRadiusServerConfigTable
+    --
+    --**************************************************************************************
+
+    agentRadiusServerConfigTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentRadiusServerConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Table with information about Radius Authentication Server IP
+                     Addresses, port numbers and shared secret"
+         ::= { agentRadiusConfigGroup 8 }
+
+    agentRadiusServerConfigEntry OBJECT-TYPE
+         SYNTAX      AgentRadiusServerConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Entry consisting of configuration data for a Radius 
+                     Authentication Server."
+         INDEX       { agentRadiusServerIndex }
+         ::= { agentRadiusServerConfigTable 1 }
+         
+    AgentRadiusServerConfigEntry ::=
+         SEQUENCE {
+         agentRadiusServerIndex
+                 Integer32,
+         agentRadiusServerAddress
+                 InetAddress,
+         agentRadiusServerAddressType
+                 InetAddressType,
+         agentRadiusServerPort
+                 Unsigned32,
+         agentRadiusServerSecret
+                 DisplayString,
+         agentRadiusServerPrimaryMode
+                 INTEGER,
+         agentRadiusServerCurrentMode
+                 INTEGER,
+         agentRadiusServerMsgAuth
+                 INTEGER,
+         agentRadiusServerRowStatus
+                 RowStatus,
+         agentRadiusServerName
+                 DisplayString,
+         agentRadiusServerInetAddress
+                 InetAddress,
+         agentRadiusServerTimeout               
+                 Unsigned32,
+         agentRadiusServerRetransmit            
+                 Unsigned32,
+         agentRadiusServerDeadtime              
+                 Unsigned32,
+         agentRadiusServerSourceIPAddr          
+                 IpAddress,
+         agentRadiusServerPriority              
+                 Unsigned32,
+         agentRadiusServerUsageType             
+                 INTEGER
+         }
+
+    agentRadiusServerIndex OBJECT-TYPE
+         SYNTAX      Integer32 (1..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Unique index of the configured RADIUS server"
+         ::= { agentRadiusServerConfigEntry 1 }
+
+    agentRadiusServerAddress OBJECT-TYPE
+         SYNTAX      InetAddress
+         MAX-ACCESS  read-create
+         STATUS      obsolete
+         DESCRIPTION
+                     "IP Address of the configured RADIUS server.
+                     This object cannot be changed after creation."
+         ::= { agentRadiusServerConfigEntry 2 }
+  
+    agentRadiusServerAddressType OBJECT-TYPE
+         SYNTAX      InetAddressType
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP Address Type of the configured RADIUS server.
+                     This object cannot be changed after creation."
+         ::= { agentRadiusServerConfigEntry 3 }
+
+    agentRadiusServerPort OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..65535)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Port number for the RADIUS server."
+         DEFVAL { 1812 }
+         ::= { agentRadiusServerConfigEntry 4 }
+
+    agentRadiusServerSecret OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..64))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Configured shared sercret for the RADIUS server."
+         ::= { agentRadiusServerConfigEntry 5 }
+
+    agentRadiusServerPrimaryMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Configure the RADIUS server to be the primary server. If there is any 
+                     other server that is configured to be primary, that server is set to be 
+                     a seconday server and this entry is set Primary."
+         ::= { agentRadiusServerConfigEntry 6 }
+
+    agentRadiusServerCurrentMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     yes(1),
+                     no(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indicate if the RADIUS server is the current server in user for
+                     authentication."
+         ::= { agentRadiusServerConfigEntry 7 }
+
+    agentRadiusServerMsgAuth OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enable or disable the message authenticator attribute for this 
+                     RADIUS server."
+         ::= { agentRadiusServerConfigEntry 8 }
+
+    agentRadiusServerRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Creates or destroys a RADIUS Authentication server entry.
+                     During creation, the next available index is specified by the
+                     agentRadiusServerIndexNextValid object.  Rows creation using
+                     a different value for agentRadiusServerIndex will fail.
+                     
+                     active(1)       - This entry is active.
+                     createAndGo(4)  - Creates a new entry.
+                     destroy(6)      - Deletes an entry."
+         ::= { agentRadiusServerConfigEntry 9 }
+
+    agentRadiusServerName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..32))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Configured identification name for the RADIUS server."
+         ::= { agentRadiusServerConfigEntry 10 }
+
+    agentRadiusServerInetAddress OBJECT-TYPE
+         SYNTAX      InetAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP Address of the configured RADIUS server.
+                     This object cannot be changed after creation."
+         ::= { agentRadiusServerConfigEntry 11 }
+  
+    agentRadiusServerTimeout            OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..30)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Time out duration (in seconds) before packets are retransmitted"
+         DEFVAL { 3 }
+         ::= { agentRadiusServerConfigEntry 12 }
+
+    agentRadiusServerRetransmit         OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..10)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Maximum number of retransmissions of a RADIUS request packet"
+         DEFVAL { 3 }
+         ::= { agentRadiusServerConfigEntry 13 }
+
+    agentRadiusServerDeadtime         OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..2000)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Length of time (in minutes) for which a RADIUS server is skipped over by transaction requests."
+         DEFVAL { 0 }
+         ::= { agentRadiusServerConfigEntry 14 }
+
+    agentRadiusServerSourceIPAddr       OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Source IP address that will be used for the communication with RADIUS servers."
+         ::= { agentRadiusServerConfigEntry 15 }
+
+    agentRadiusServerPriority   OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..65535)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Priority specifies the order in which the servers will be used, where 0 is the highest
+                     priority in radius server config mode."
+         DEFVAL { 0 }
+         ::= { agentRadiusServerConfigEntry 16 }
+
+    agentRadiusServerUsageType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     all(1),
+                     login(2),
+                     dot1x(3)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Specify the usage type of the server."
+         DEFVAL  { all }
+         ::= { agentRadiusServerConfigEntry 17 }
+
+    --**************************************************************************************
+
+    agentRadiusAuthenticationServers OBJECT-TYPE
+         SYNTAX      Unsigned32 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Number of RADIUS Authentication Servers that have been configured."         
+         ::= { agentRadiusConfigGroup 9 }
+    agentRadiusAccountingServers OBJECT-TYPE
+         SYNTAX      Unsigned32 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Number of RADIUS Accounting Servers that have been configured."         
+         ::= { agentRadiusConfigGroup 10 }
+    agentRadiusNamedAuthenticationServerGroups OBJECT-TYPE
+         SYNTAX      Unsigned32 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Number of configured RADIUS named Authentication Server groups."         
+         ::= { agentRadiusConfigGroup 11 }
+    agentRadiusNamedAccountingServerGroups OBJECT-TYPE
+         SYNTAX      Unsigned32 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Number of configured RADIUS named Accounting Server groups."         
+         ::= { agentRadiusConfigGroup 12 }
+    agentRadiusDeadTime OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..2000)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Length of time (in minutes) for which a RADIUS server is skipped over by transaction requests."
+         DEFVAL { 0 }
+         ::= { agentRadiusConfigGroup 13 }
+
+    agentRadiusServerKey OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0..128))
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "RADIUS Server key specifies the authentication and encryption key for all RADIUS communications
+                     between the switch and the RADIUS server. This key must match the encryption used on the RADIUS
+                     daemon."
+         ::= { agentRadiusConfigGroup 14 }
+
+    agentRadiusSourceIPAddr OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Source IP address that will be used for the communication with RADIUS servers."
+         ::= { agentRadiusConfigGroup 15 }
+
+    agentRadiusNasIpAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Used to set the NAS-IP address for the radius server."
+         ::= { agentRadiusConfigGroup  16 }
+
+    agentAuthorizationNetworkRadiusMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(0)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Used to enable/disable Vlan assignment mode."
+         ::= { agentRadiusConfigGroup 17}
+
+    agentRadiusSourceInterface OBJECT-TYPE
+       SYNTAX      InterfaceIndexOrZero
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "A source-interface selection on an Interface Index (like vlan based
+               routing interface, port based routing interface, loopback interface).
+               A non-zero value indicates ifIndex for the corresponding interface 
+               entry in the ifTable is selected. A zero value indicates the 
+               source-interface un-selection."
+       ::= { agentRadiusConfigGroup 18 }
+
+
+END

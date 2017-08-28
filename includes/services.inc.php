@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 function get_service_status($device = null)
 {
     $sql_query = "SELECT service_status, count(service_status) as count FROM services WHERE";
@@ -157,14 +159,14 @@ function poll_service($service)
         }
 
         // rrd definition
-        $rrd_def = array();
+        $rrd_def = new RrdDefinition();
         foreach ($perf as $k => $v) {
             if (($v['uom'] == 'c') && !(preg_match('/[Uu]ptime/', $k))) {
                 // This is a counter, create the DS as such
-                $rrd_def[] = "DS:".$k.":COUNTER:600:0:U";
+                $rrd_def->addDataset($k, 'COUNTER', 0);
             } else {
                 // Not a counter, must be a gauge
-                $rrd_def[] = "DS:".$k.":GAUGE:600:0:U";
+                $rrd_def->addDataset($k, 'GAUGE', 0);
             }
         }
 
@@ -200,13 +202,18 @@ function poll_service($service)
 
 function check_service($command)
 {
+    global $config;
     // This array is used to test for valid UOM's to be used for graphing.
     // Valid values from: https://nagios-plugins.org/doc/guidelines.html#AEN200
     // Note: This array must be decend from 2 char to 1 char so that the search works correctly.
     $valid_uom = array ('us', 'ms', 'KB', 'MB', 'GB', 'TB', 'c', 's', '%', 'B');
 
     // Make our command safe.
-    $command = 'LC_NUMERIC="C" '. escapeshellcmd($command);
+    $p_config = HTMLPurifier_Config::createDefault();
+    $p_config->set('Cache.SerializerPath', $config['temp_dir']);
+    $purifier = new HTMLPurifier($p_config);
+
+    $command = 'LC_NUMERIC="C" '. $purifier->purify($command);
 
     // Run the command and return its response.
     exec($command, $response_array, $status);

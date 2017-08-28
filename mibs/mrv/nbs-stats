@@ -1,0 +1,117 @@
+NBS-STATS-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    nbs
+        FROM NBS-MIB
+    ;
+
+
+
+nbsStatsMib  MODULE-IDENTITY
+    LAST-UPDATED  "201303130000Z"
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+
+    DESCRIPTION
+      "For managing statistics"
+    ::= { nbs 233 }
+
+-- *******************************************************************
+-- NBS-STATS-MIB local defines
+-- *******************************************************************
+
+
+-- *******************************************************************
+-- Groups in NBS-STATS-MIB
+-- *******************************************************************
+
+nbsStatInfoGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      ""
+    ::= { nbsStatsMib 1 }
+
+
+
+-- ********************************************************************
+--
+-- Objects for the nbsStatInfoGrp group
+--
+-- ********************************************************************
+
+
+--
+-- nbsStatInfoTable
+--
+
+nbsStatInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsStatInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A table that provides basic control information for entity
+        (typically ports) statistics."
+    ::= { nbsStatInfoGrp 10 }
+
+nbsStatInfoEntry      OBJECT-TYPE
+    SYNTAX      NbsStatInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Contains a description of a particular statistics entity"
+    INDEX { nbsStatInfoIndex }
+    ::= { nbsStatInfoTable 1 }
+
+NbsStatInfoEntry ::= SEQUENCE {
+    nbsStatInfoIndex                InterfaceIndex,
+    nbsStatInfoCounters             INTEGER,
+    nbsStatInfoPmData               INTEGER
+}
+
+nbsStatInfoIndex      OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "ifIndex-like identifier of a component that has statistics."
+    ::= { nbsStatInfoEntry 1 }
+
+nbsStatInfoCounters     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported  (1),
+        counting      (2),
+        clearing      (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Used to clear all entity-specific counters to zero.
+        Aliased/Equivalent to NBS-CMMC-MIB CountersState objects."
+    ::= { nbsStatInfoEntry 2 }
+
+nbsStatInfoPmData     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported  (1),
+        counting      (2),
+        clearing      (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Used to clear all entity-specific performance monitoring (PM) data
+        to zero. Examples include: nbsFecpmCurrentTable, nbsFecpmHistoricTable,
+        nbsFecpmRunningTable, nbsOtnpmCurrentTable, nbsOtnpmHistoricTable, and
+        nbsOtnpmRunningTable."
+    ::= { nbsStatInfoEntry 3 }
+
+
+END
+

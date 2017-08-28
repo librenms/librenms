@@ -1,0 +1,109 @@
+-- *****************************************************************
+-- NMS-EPON-ONU.MIB:  NMS LLID ONU MIB file
+-- AUG 2009
+-- *****************************************************************
+--
+
+NMS-EPON-ONU-STATIC-MAC DEFINITIONS ::= BEGIN
+
+            IMPORTS
+            IpAddress
+				FROM RFC1155-SMI
+		    OBJECT-TYPE
+				FROM RFC-1212
+            DisplayString
+				FROM RFC1213-MIB
+		    nmsEPONGroup
+				FROM NMS-SMI
+		    TruthValue,RowStatus,PhysAddress,DisplayString,MacAddress
+		    	FROM SNMPv2-TC;
+          
+                  nmsEponOnuStaticMac        OBJECT IDENTIFIER ::= { nmsEPONGroup 101}
+             
+nmsEponOnuStaticMacTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF nmsEponOnuStaticMacEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A list of nmsEponOnuStaticMacEntry entries. 
+				 The port-based security mac address information."
+					::= { nmsEponOnuStaticMac 1 }		
+	                       
+		nmsEponOnuStaticMacEntry	OBJECT-TYPE
+				SYNTAX		nmsEponOnuStaticMacEntry
+				MAX-ACCESS	not-accessible
+				STATUS		current
+				DESCRIPTION	
+							"ONU static MAC address create operation.
+		                   (onuSlotIndex_onuIfIndex_onuStaticMacAddress_onuStaticMacAddressPortBitmap)to add a static 
+		                   mac address.For example,'0_20_010000000001_00000003'will add the mac address '010000000001' to port 1 
+		                   and port 2 of the ONU whose onuSlotIndex is 0 and onuIfIndex is 20.For 3305 the onuSlotIndex = 0.
+		                   The EPON will return a error symbol to indicate a unsuccessful operation. "
+				INDEX		{ onuSlotIndex , onuIfIndex,onuStaticMacAddress}
+				::= { nmsEponOnuStaticMacTable 1 }
+       
+		nmsEponOnuStaticMacEntry	::= SEQUENCE { 
+		          	onuSlotIndex					INTEGER,  
+                   	onuIfIndex						INTEGER,                   
+		       		onuStaticMacAddress				MacAddress,
+		            onuStaticMacAddressPortBitmap	OCTET STRING,
+		            onuStaticMacAddressCreate		OCTET STRING, 
+                    onuStaticMacAddressDel			TruthValue
+  				}
+            
+		  
+                onuSlotIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                           "Slot id, unique in system."
+                   ::= { nmsEponOnuStaticMacEntry 1 }
+                     
+               onuIfIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                           "LLID interface id, unique in system."
+                   ::= { nmsEponOnuStaticMacEntry 2 } 
+               
+               onuStaticMacAddress OBJECT-TYPE
+                   SYNTAX  MacAddress
+                   ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                           "ONU static MAC address. Need to configure with corresponding MAC addresss port together."
+                   ::= { nmsEponOnuStaticMacEntry 3 } 
+
+               onuStaticMacAddressPortBitmap OBJECT-TYPE
+                   SYNTAX  OCTET STRING 
+                   ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                           "ONU static MAC address port bitmap value. Each bit manifests an ONU port static MAC address 
+                           status. 0= no,1=yes. Fox example,3 means port 1 and port 2."
+                   ::= { nmsEponOnuStaticMacEntry 4} 
+
+               onuStaticMacAddressCreate OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+		                   "ONU static MAC address create operation.
+		                   (onuSlotIndex_onuIfIndex_onuStaticMacAddress_onuStaticMacAddressPortBitmap)to add a static 
+		                   mac address.For example,'0_20_010000000001_00000003'will add the mac address '010000000001' to 
+		                   port 1 and port 2 of the ONU whose onuSlotIndex is 0 and onuIfIndex is 20.For 3305 the 
+		                   onuSlotIndex = 0.The EPON will return a error symbol to indicate a unsuccessful operation. "
+                   ::= { nmsEponOnuStaticMacEntry 5 }  
+               onuStaticMacAddressDel OBJECT-TYPE
+                   SYNTAX  TruthValue
+                   ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+                           "ONU static MAC address delete flag,True(1) will delete the mac address."
+                   ::= { nmsEponOnuStaticMacEntry 6 } 
+             
+             
+
+              	
+END		

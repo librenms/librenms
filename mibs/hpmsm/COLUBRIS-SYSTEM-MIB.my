@@ -1,0 +1,614 @@
+-- ****************************************************************************
+--  COLUBRIS-SYSTEM-MIB definitions
+--
+--  Copyright (c) 2004, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Generic system information for Colubris Networks devices.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Counter32, IpAddress
+        FROM    SNMPv2-SMI
+    MacAddress, DisplayString, TruthValue
+        FROM    SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM    SNMPv2-CONF
+    ifOutUcastPkts, ifInUcastPkts, ifOutErrors, ifInErrors
+        FROM    IF-MIB
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+    ColubrisAuthenticationMode, ColubrisNotificationEnable,
+    ColubrisProfileIndexOrZero
+        FROM    COLUBRIS-TC
+;
+
+
+colubrisSystemMIB  MODULE-IDENTITY
+    LAST-UPDATED    "200703200000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Generic system information for Colubris Networks devices."
+
+    ::= { colubrisMgmtV2 6 }
+
+
+-- colubrisSystemMIB definition
+colubrisSystemMIBObjects OBJECT IDENTIFIER ::= { colubrisSystemMIB 1 }
+
+-- definition of objects groups
+systemInfo  OBJECT IDENTIFIER ::= { colubrisSystemMIBObjects 1 }
+systemTime  OBJECT IDENTIFIER ::= { colubrisSystemMIBObjects 2 }
+adminAccess OBJECT IDENTIFIER ::= { colubrisSystemMIBObjects 3 }
+heartbeat   OBJECT IDENTIFIER ::= { colubrisSystemMIBObjects 4 }
+
+-- system information group
+systemProductName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Colubris Networks product name for the device."
+    ::= { systemInfo 1 }
+
+systemFirmwareRevision OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Revision number of the device firmware."
+    ::= { systemInfo 2 }
+
+systemBootRevision OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Revision number of the device boot loader."
+    ::= { systemInfo 3 }
+
+systemHardwareRevision OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Revision number of the system hardware."
+    ::= { systemInfo 4 }
+
+systemSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Device serial number."
+    ::= { systemInfo 5 }
+
+systemConfigurationVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "User-defined string to identify the current device
+                 configuration. This string could be anything in printable
+                 ASCII characters."
+    ::= { systemInfo 6 }
+
+systemUpTime OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "How long the system has been running since its last restart. 
+                 When this counter reaches its maximum value, it wraps
+                 around and starts increasing again from zero."
+    ::= { systemInfo 7 }
+
+systemMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "MAC address of the device. This information is 
+                 only returned in a systemHeartbeatNotification event."
+    ::= { systemInfo 8 }
+
+systemWanPortIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "IP address of the device WAN port. This information is 
+                 only returned in a systemHeartbeatNotification event."
+    ::= { systemInfo 9 }
+
+systemProductFlavor OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The product flavor can extends or alter the
+                 functionality of a Colubris product."
+    ::= { systemInfo 10 }
+
+systemDeviceIdentification OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Manufacturing Ethernet base MAC address."
+    ::= { systemInfo 11 }
+
+
+-- system time group
+systemTimeUpdateMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    manual(1),
+                    sntpUdp(2),
+                    tp(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the method and format used to set the system time.
+
+                  'manual': Operator must configures the system time
+                            parameters manually in the GMT zone.
+
+                  'sntpUdp': Look for time servers in the
+                             systemTimeServerTable in order to synchronize
+                             the device system time using SNTP.
+
+                  'tp': Look for time servers in the systemTimeServerTable
+                        in order to synchronize the device system time using
+                        the Time Protocol."
+    ::= { systemTime 1 }
+
+systemTimeLostWhenRebooting OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if the system time is lost after rebooting or not.
+                   'true': Indicates that the system time has been lost,
+                   'false': Indicates that the system time has been kept."
+    ::= { systemTime 2 }
+
+systemTimeDSTOn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if the system time need to be adjusted to compensate
+                 for daylight savings.
+
+                  'true': Adjusts the system time by adding one hour.
+
+                  'false': Keep the current system time."
+    ::= { systemTime 3 }
+
+systemDate OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (10))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the current GMT system date when 
+                systemTimeUpdateMode attribute is set to 'manual' mode.
+                Reading this attributes will return the current date.
+
+                Specify year (1995-3000), month (01-12), and day (01-31)
+                in the format YYYY/MM/DD. The '/' character is mandatory
+                between the fields."
+    ::= { systemTime 4 }
+
+systemTimeOfDay OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (8))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the current GMT system time when 
+                 systemTimeUpdateMode attribute is set to 'manual' mode.
+                 Specify hour (00-24), minutes (00-59), and seconds (00-59)
+                 in the format HH:MM:SS. The ':' character is mandatory 
+                 between the fields."
+    ::= { systemTime 5 }
+
+systemTimeZone OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (6))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the current system time zone in the 
+                 relation to UTC. Specify the direction from UTC (+ or -),
+                 hours from UTC (00-14 or 00-12), and minutes from UTC
+                 (00 or 30) in the format +/-HH:MM.
+
+                 The '+' or '-' character is mandatory at the beginning
+                 of the expression. The ':' character is mandatory between 
+                 the time fields."
+    ::= { systemTime 6 }
+
+systemTimeServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SystemTimeServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table containing the list of SNTP time servers that can
+                 be used to synchronize the device system time. In tabular
+                 form to allow multiple instances on an agent."
+    ::= { systemTime 7 }
+
+systemTimeServerEntry OBJECT-TYPE
+    SYNTAX      SystemTimeServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A SNTP time server used to get the device time.
+                 systemTimeServerIndex - Uniquely identifies a time server in
+                                         the table."
+    INDEX       { systemTimeServerIndex }
+    ::= { systemTimeServerTable 1 }
+
+SystemTimeServerEntry ::= SEQUENCE
+    {
+        systemTimeServerIndex       Integer32,
+        systemTimeServerAddress     DisplayString
+    }
+
+systemTimeServerIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..20)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Index of the time server in the systemTimeServerTable."
+    ::= { systemTimeServerEntry 1 }
+
+systemTimeServerAddress OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the DNS name or IP address of the time server to use.
+                 Setting an entry to a null string will delete the entry."
+    ::= { systemTimeServerEntry 2 }
+
+systemTimeServerNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if timeServerFailure notifications are generated."
+    ::= { systemTime 8 }
+
+
+-- admin access group
+adminAccessAuthenMode OBJECT-TYPE
+    SYNTAX      ColubrisAuthenticationMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if administrator authentication is performed
+                 locally or via an AAA server. You must have configured an 
+                 AAA profile and the adminAccessAuthenProfileIndex attribute 
+                 before you can select a profile or an error will be returned."
+    ::= { adminAccess 1 }
+
+adminAccessAuthenProfileIndex OBJECT-TYPE
+    SYNTAX      ColubrisProfileIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the AAA profile to be used in order to
+                 authenticate the administrator. This parameter
+                 only applies when the adminAccessAuthenMode
+                 is set to 'profile'. When the special value zero is 
+                 specified, no AAA server profile is selected."
+    ::= { adminAccess 2 }
+
+adminAccessMaxLoginAttempts OBJECT-TYPE
+    SYNTAX      Integer32 (1..32767)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the number of successive unsuccessful authentications
+                 that must occur to generate an
+                 adminAccessAuthFailureNotification event."
+    ::= { adminAccess 3 }
+
+adminAccessLockOutPeriod OBJECT-TYPE
+    SYNTAX      Integer32 (0..60)
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the duration when further login attempts are blocked
+                 after adminAccessMaxLoginAttempts has been reached.
+                 Setting this value to zero disables the lock out
+                 feature."
+    ::= { adminAccess 4 }
+
+adminAccessLoginNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if an adminAccessLoginNotification event is generated
+                 after an administrator is successfully authenticated."
+    DEFVAL      { enable }
+    ::= { adminAccess 5 }
+
+adminAccessAuthFailureNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if an adminAccessAuthFailureNotification event is
+                 generated when the number of successive unsuccessful
+                 authentications attempts exceed the value of
+                 adminAccessMaxLoginAttempts."
+    DEFVAL      { enable }
+    ::= { adminAccess 6 }
+
+adminAccessInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Contains various information about the administrator.
+                 This parameter is used in the adminAccessAuthFailureNotification
+                 event to return the administrator status to a management system."
+    ::= { adminAccess 7 }
+
+adminAccessProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AdminAccessProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This table handles the profile of several administrator users.
+                 In tabular form in order to allow multiple instances on an
+                 agent."
+    ::= { adminAccess 8 }
+
+adminAccessProfileEntry OBJECT-TYPE
+    SYNTAX      AdminAccessProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An administrator profile configured in the administrator
+                 access table."
+    INDEX       { adminAccessProfileIndex }
+    ::= { adminAccessProfileTable 1 }
+
+AdminAccessProfileEntry ::= SEQUENCE
+{
+    adminAccessProfileIndex             Integer32,
+    adminAccessUserName                 OCTET STRING,
+    adminAccessAdministrativeRights     INTEGER
+}
+
+adminAccessProfileIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Specifies the index of the administrator profile."
+    ::= { adminAccessProfileEntry 1 }
+
+adminAccessUserName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..253))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the user name of the administrator."
+    ::= { adminAccessProfileEntry 2 }
+
+adminAccessAdministrativeRights OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    readOnly(1),
+                    readWrite(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the administrative rights of this specific
+                 administrator."
+    ::= { adminAccessProfileEntry 3 }
+
+adminAccessLogoutNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if an adminAccessLogoutNotification event is generated
+                 after an administrator logs out from the web interface."
+    DEFVAL      { enable }
+    ::= { adminAccess 9 }
+
+
+-- heartbeat group
+heartbeatPeriod OBJECT-TYPE
+    SYNTAX      Integer32 (30..31536000)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the delay between 2 heartbeat notifications.
+                 The range of this parameter is 30 seconds to 1 year."
+    ::= { heartbeat 1 }
+
+heartbeatNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if systemHeartbeatNotification events are
+                 generated."
+    DEFVAL      { enable }
+    ::= { heartbeat 2 }
+
+
+-- system notification
+colubrisSystemMIBNotificationPrefix OBJECT IDENTIFIER ::= { colubrisSystemMIB 2 }
+colubrisSystemMIBNotifications OBJECT IDENTIFIER ::= { colubrisSystemMIBNotificationPrefix 0 }
+
+adminAccessAuthFailureNotification NOTIFICATION-TYPE
+    OBJECTS     {
+                    adminAccessInfo
+                }
+    STATUS      current
+    DESCRIPTION "Sent after an administrator authentication failure."
+  --#SUMMARY "Failed web management tool login. Cause: %s"
+  --#ARGUMENTS { 0 }
+  --#SEVERITY WARNING
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisSystemMIBNotifications 1 }
+
+adminAccessLoginNotification NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION "Sent after an administrator is successfully authenticated."
+  --#SUMMARY "Successful web management tool login."
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisSystemMIBNotifications 2 }
+
+systemColdStart NOTIFICATION-TYPE
+    OBJECTS     {
+                    systemProductName,
+                    systemFirmwareRevision,
+                    systemConfigurationVersion,
+                    systemSerialNumber
+                }
+    STATUS      current
+    DESCRIPTION "Sent at system boot up."
+  --#SUMMARY "Cold start: %s firmware:%s config version:%s serial number:%s"
+  --#ARGUMENTS { 0, 1, 2, 3 }
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisSystemMIBNotifications 3 }
+
+systemHeartbeatNotification NOTIFICATION-TYPE
+    OBJECTS     {
+                    systemSerialNumber,
+                    systemMacAddress,
+                    systemWanPortIpAddress,
+                    systemUpTime,
+                    ifOutUcastPkts,
+                    ifInUcastPkts,
+                    ifOutErrors,
+                    ifInErrors,
+                    ifOutUcastPkts,
+                    ifInUcastPkts,
+                    ifOutErrors,
+                    ifInErrors,
+                    ifOutUcastPkts,
+                    ifInUcastPkts,
+                    ifOutErrors,
+                    ifInErrors
+                }
+    STATUS      current
+    DESCRIPTION "Sent every heartbeatPeriod."
+  --#SUMMARY "Heartbeat: WAN port MAC address:%s WAN port IP address:%s uptime (sec.):%d"
+  --#ARGUMENTS { 1, 2, 3 }
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "IGNORE"
+    ::= { colubrisSystemMIBNotifications 4 }
+
+adminAccessLogoutNotification NOTIFICATION-TYPE
+    OBJECTS     {
+                    adminAccessInfo
+                }
+    STATUS      current
+    DESCRIPTION "Sent after an administrator has logout."
+  --#SUMMARY "Web management tool logout. Cause: %s"
+  --#ARGUMENTS { 0 }
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisSystemMIBNotifications 5 }
+
+timeServerFailure NOTIFICATION-TYPE
+    OBJECTS     {
+                    systemTimeServerAddress
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a time server of the system time table is unreachable."
+  --#SUMMARY "Get time failed from time server %s"
+  --#ARGUMENTS { 0 }
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisSystemMIBNotifications 6 }
+
+
+-- conformance information
+colubrisSystemMIBConformance    OBJECT IDENTIFIER ::= { colubrisSystemMIB 3 }
+colubrisSystemMIBCompliances    OBJECT IDENTIFIER ::= { colubrisSystemMIBConformance 1 }
+colubrisSystemMIBGroups         OBJECT IDENTIFIER ::= { colubrisSystemMIBConformance 2 }
+
+
+-- compliance statements
+colubrisSystemMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for entities which implement the
+                 Colubris Networks System MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisSystemMIBGroup,
+                        colubrisSystemNotificationGroup,
+                        colubrisAdminAccessProfileGroup,
+                        colubrisAdminAccessNotificationGroup,
+                        colubrisTimeNotificationGroup
+                    }
+    ::= { colubrisSystemMIBCompliances 1 }
+
+
+-- units of conformance
+colubrisSystemMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    systemProductName,
+                    systemFirmwareRevision,
+                    systemBootRevision,
+                    systemHardwareRevision,
+                    systemSerialNumber,
+                    systemConfigurationVersion,
+                    systemUpTime,
+                    systemMacAddress,
+                    systemWanPortIpAddress,
+                    systemProductFlavor,
+                    systemDeviceIdentification,
+                    systemTimeUpdateMode,
+                    systemTimeLostWhenRebooting,
+                    systemTimeDSTOn,
+                    systemDate,
+                    systemTimeOfDay,
+                    systemTimeZone,
+                    systemTimeServerAddress,
+                    systemTimeServerNotificationEnabled,
+                    heartbeatPeriod,
+                    heartbeatNotificationEnabled
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing the System MIB capability."
+    ::= { colubrisSystemMIBGroups 1 }
+
+colubrisAdminAccessProfileGroup OBJECT-GROUP
+    OBJECTS     {
+                    adminAccessAuthenMode,
+                    adminAccessMaxLoginAttempts,
+                    adminAccessLockOutPeriod,
+                    adminAccessLoginNotificationEnabled,
+                    adminAccessAuthFailureNotificationEnabled,
+                    adminAccessAuthenProfileIndex,
+                    adminAccessInfo,
+                    adminAccessUserName,
+                    adminAccessAdministrativeRights,
+                    adminAccessLogoutNotificationEnabled
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing the administrator access
+                 configuration capability."
+    ::= { colubrisSystemMIBGroups 2 }
+
+colubrisSystemNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        systemColdStart,
+                        systemHeartbeatNotification
+                    }
+    STATUS      current
+    DESCRIPTION "A collection of supported notifications"
+    ::= { colubrisSystemMIBGroups 3 }
+
+colubrisAdminAccessNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        adminAccessAuthFailureNotification,
+                        adminAccessLoginNotification,
+                        adminAccessLogoutNotification
+                    }
+    STATUS      current
+    DESCRIPTION "A collection of supported notifications"
+    ::= { colubrisSystemMIBGroups 4 }
+
+colubrisTimeNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        timeServerFailure
+                    }
+    STATUS      current
+    DESCRIPTION "A collection of supported notifications"
+    ::= { colubrisSystemMIBGroups 5 }
+
+END

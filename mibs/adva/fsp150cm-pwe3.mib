@@ -1,0 +1,1462 @@
+F3-PWE3-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    IpAddress, Integer32, Unsigned32, Counter64
+             FROM SNMPv2-SMI
+    DisplayString, TruthValue, RowStatus, StorageType, VariablePointer,
+    MacAddress, DateAndTime, TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    neIndex, shelfIndex, slotIndex
+             FROM  CM-ENTITY-MIB
+    cmEthernetAccPortIndex, cmEthernetNetPortIndex
+             FROM  CM-FACILITY-MIB
+    IpVersion, CmPmIntervalType, CmPmBinAction, VlanId, VlanPriority
+             FROM  CM-COMMON-MIB
+    fsp150cm
+             FROM  ADVA-MIB
+    AdminState, OperationalState, SecondaryState, PerfCounter64, 
+         IpPriorityMapMode FROM  CM-COMMON-MIB;
+
+f3Pwe3MIB MODULE-IDENTITY
+    LAST-UPDATED    "201204030000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Raghav Trivedi
+                     ADVA Optical Networking, Inc.
+                Tel: +1 972 759-1239
+             E-mail: rtrivedi@advaoptical.com
+             Postal: 2301 N. Greenville Ave. #300
+                     Richardson, TX USA 75082"
+    DESCRIPTION
+            "This module provides the F3 Pseudo Wire definitions used by 
+             the F3 (FSP150CM/CC) product lines.  
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201204030000Z"
+    DESCRIPTION
+         "
+          Notes from release 201204030000Z
+            (i)Initial version
+         ." 
+    ::= {fsp150cm 19}    
+
+-- 
+-- OID definitions
+-- 
+f3Pwe3ConfigObjects            OBJECT IDENTIFIER ::= {f3Pwe3MIB 1}
+f3Pwe3PerformanceObjects       OBJECT IDENTIFIER ::= {f3Pwe3MIB 2}
+f3Pwe3PerformanceNotifications OBJECT IDENTIFIER ::= {f3Pwe3MIB 3}
+f3Pwe3Conformance              OBJECT IDENTIFIER ::= {f3Pwe3MIB 4}
+
+-- 
+-- Textual Conventions 
+-- 
+PWE3SatopDiscoveryType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+          "Enumerations for PWE3 SATop Discovery Type."
+    SYNTAX   INTEGER {
+               dynamic(1),
+               static(2)
+             }
+
+PWE3SatopEncapsulationType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+          "Enumerations for PWE3 SATop Encapsulation Type."
+    SYNTAX   INTEGER {
+               vlan-one-mpls-label(1),
+               vlan-two-mpls-label(2),
+               novlan-two-mpls-label(3)
+             }
+
+PWE3SatopRTPTSUpdateFreqType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+          "Enumerations for PWE3 SATop RTP Update Frequency."
+    SYNTAX   INTEGER {
+               freq-8kHz (1),
+               freq-16kHz (2),
+               freq-32kHz (3),
+               freq-64kHz (4),
+               freq-128kHz (5),
+               freq-256kHz (6),
+               freq-512kHz (7),
+               freq-1024kHz (8)
+             }
+
+PWE3SatopTransportMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+          "Enumerations for PWE3 SATop Transport Mode."
+    SYNTAX   INTEGER {
+               satop-e1 (1),
+               satop-t1 (2),
+               satop-octetalignt1 (3)
+             }
+
+MplsLabel ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+          "Definition of MPLS Label.  
+           The bits in network order (left-to-right) are, 
+
+           Label(20-bits):QOS(3-bits):Bottom-of-Stack(1-bit):TTL(8-bits)
+
+           These constitute the 32-bit unsigned integer."
+    SYNTAX   Unsigned32 
+
+--
+-- CONFIGURATION 
+--
+
+--
+-- PWE3 Profiles
+--
+-- PWE3 Idle Pattern Profile
+--
+f3Pwe3IdlePatternProfileTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3Pwe3IdlePatternProfileEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A list of entries corresponding to the PWE3 Idle Pattern 
+        Profile entities."
+    ::= { f3Pwe3ConfigObjects 1 }
+
+f3Pwe3IdlePatternProfileEntry OBJECT-TYPE
+    SYNTAX     F3Pwe3IdlePatternProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+          "An entry containing information applicable to a particular
+           PWE3 Idle Pattern Profile Entity.  These profiles are used
+           by PWE3 SAToP entities."
+    INDEX { f3Pwe3IdlePatternProfileIndex }
+    ::= { f3Pwe3IdlePatternProfileTable 1 }
+
+
+F3Pwe3IdlePatternProfileEntry ::= SEQUENCE {
+    f3Pwe3IdlePatternProfileIndex  Integer32,
+    f3Pwe3IdlePatternProfileByte   Unsigned32
+}
+
+f3Pwe3IdlePatternProfileIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the PWE3 Idle Pattern Profile."
+     ::= { f3Pwe3IdlePatternProfileEntry 1 }
+
+f3Pwe3IdlePatternProfileByte    OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to specify the 
+           Idle Pattern Profile information."
+     ::= { f3Pwe3IdlePatternProfileEntry 2 }
+
+--
+--
+-- PWE3 Resync Profile 
+--
+f3Pwe3ResyncProfileTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3Pwe3ResyncProfileEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A list of entries corresponding to the PWE3 Resync Profile entities."
+    ::= { f3Pwe3ConfigObjects 2 }
+
+f3Pwe3ResyncProfileEntry OBJECT-TYPE
+    SYNTAX     F3Pwe3ResyncProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+          "An entry containing information applicable to a particular
+           PWE3 Resync Profile Entity.  These profiles are used
+           by PWE3 SAToP entities."
+    INDEX { f3Pwe3ResyncProfileIndex }
+    ::= { f3Pwe3ResyncProfileTable 1 }
+
+
+F3Pwe3ResyncProfileEntry ::= SEQUENCE {
+    f3Pwe3ResyncProfileIndex            Integer32,
+    f3Pwe3ResyncProfileIncreaseFactor   Unsigned32,
+    f3Pwe3ResyncProfileDecreaseFactor   Unsigned32,
+    f3Pwe3ResyncProfileResyncThreshold  Unsigned32
+}
+
+f3Pwe3ResyncProfileIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the PWE3 Resync Profile."
+     ::= { f3Pwe3ResyncProfileEntry 1 }
+
+f3Pwe3ResyncProfileIncreaseFactor    OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to specify the 
+           PWE3 Resync Profile Increase Factor.  This is used to define
+           the fill rate of the leaky bucket algorithm associated with the
+           Resync mechanism."
+     ::= { f3Pwe3ResyncProfileEntry 2 }
+
+f3Pwe3ResyncProfileDecreaseFactor    OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to specify the 
+           PWE3 Resync Profile Decrease Factor.  This is used to define
+           the leak rate for the leaky bucket algorithm associated with
+           the Resync mechanism."
+     ::= { f3Pwe3ResyncProfileEntry 3 }
+
+f3Pwe3ResyncProfileResyncThreshold    OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to specify the 
+           PWE3 Resync Profile Resync Threshold.  This is the threshold value
+           at which point the pseudo-wire connection is deemed out of 
+           synchronization state."
+     ::= { f3Pwe3ResyncProfileEntry 4 }
+
+--
+--
+-- PWE3 Loopback Profile 
+--
+f3Pwe3LoopbackProfileTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3Pwe3LoopbackProfileEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A list of entries corresponding to the PWE3 Loopback Profile entities."
+    ::= { f3Pwe3ConfigObjects 3 }
+
+f3Pwe3LoopbackProfileEntry OBJECT-TYPE
+    SYNTAX     F3Pwe3LoopbackProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+          "An entry containing information applicable to a particular
+           PWE3 Loopback Profile Entity.  These profiles are used
+           by PWE3 T1/E1 interfaces."
+    INDEX { f3Pwe3LoopbackProfileIndex }
+    ::= { f3Pwe3LoopbackProfileTable 1 }
+
+F3Pwe3LoopbackProfileEntry ::= SEQUENCE {
+    f3Pwe3LoopbackProfileIndex         Integer32,
+    f3Pwe3LoopbackProfileLength        Unsigned32,
+    f3Pwe3LoopbackProfilePattern       Unsigned32,
+    f3Pwe3LoopbackProfileRepeatTime    Unsigned32,
+    f3Pwe3LoopbackProfileClearLength   Unsigned32,
+    f3Pwe3LoopbackProfileClearPattern  Unsigned32
+}
+
+f3Pwe3LoopbackProfileIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the PWE3 Loopback Profile."
+     ::= { f3Pwe3LoopbackProfileEntry 1 }
+
+f3Pwe3LoopbackProfileLength  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to specify the 
+           PWE3 Loopback Length."
+     ::= { f3Pwe3LoopbackProfileEntry 2 }
+
+f3Pwe3LoopbackProfilePattern  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to specify the 
+           PWE3 Loopback Pattern."
+     ::= { f3Pwe3LoopbackProfileEntry 3 }
+
+f3Pwe3LoopbackProfileRepeatTime  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to specify the 
+           PWE3 Loopback Profile Repeat Time (Duration)."
+     ::= { f3Pwe3LoopbackProfileEntry 4 }
+
+f3Pwe3LoopbackProfileClearLength  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to specify the 
+           Loopback PWE3 Clear Length."
+     ::= { f3Pwe3LoopbackProfileEntry 5 }
+
+f3Pwe3LoopbackProfileClearPattern  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to specify the 
+           PWE3 Loopback Clear Pattern."
+     ::= { f3Pwe3LoopbackProfileEntry 6 }
+
+--
+--
+-- PWE3 Loss Profile 
+--
+f3Pwe3LossProfileTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3Pwe3LossProfileEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A list of entries corresponding to the PWE3 Loss Profile entities."
+    ::= { f3Pwe3ConfigObjects 4 }
+
+f3Pwe3LossProfileEntry OBJECT-TYPE
+    SYNTAX     F3Pwe3LossProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+          "An entry containing information applicable to a particular
+           PWE3 Loss Profile Entity.  These profiles are used
+           by PWE3 SAToP entities."
+    INDEX { f3Pwe3LossProfileIndex }
+    ::= { f3Pwe3LossProfileTable 1 }
+
+F3Pwe3LossProfileEntry ::= SEQUENCE {
+    f3Pwe3LossProfileIndex               Integer32,
+    f3Pwe3LossProfileLossStateEnterTime  Unsigned32,
+    f3Pwe3LossProfileLossStateExitTime   Unsigned32
+}
+
+f3Pwe3LossProfileIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the PWE3 Loss Profile."
+     ::= { f3Pwe3LossProfileEntry 1 }
+
+f3Pwe3LossProfileLossStateEnterTime    OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to specify the 
+           holdoff time that will be applied prior to the SAToP 
+           instance entering a Loss State."
+     ::= { f3Pwe3LossProfileEntry 2 }
+
+f3Pwe3LossProfileLossStateExitTime    OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to specify the 
+           holdon time that will be applied when the conditon causing 
+           the loss state clears."
+     ::= { f3Pwe3LossProfileEntry 3 }
+
+--
+--
+-- PWE3 AIS Stabilization Profile 
+--
+f3Pwe3AisStabilizationProfileTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3Pwe3AisStabilizationProfileEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A list of entries corresponding to the PWE3 AisStabilization 
+        Profile entities."
+    ::= { f3Pwe3ConfigObjects 5 }
+
+f3Pwe3AisStabilizationProfileEntry OBJECT-TYPE
+    SYNTAX     F3Pwe3AisStabilizationProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+          "An entry containing information applicable to a particular
+           PWE3 AisStabilization Profile Entity.  These profiles are used
+           by PWE3 SAToP entities."
+    INDEX { f3Pwe3AisStabilizationProfileIndex }
+    ::= { f3Pwe3AisStabilizationProfileTable 1 }
+
+F3Pwe3AisStabilizationProfileEntry ::= SEQUENCE {
+    f3Pwe3AisStabilizationProfileIndex      Integer32,
+    f3Pwe3AisStabilizationProfileEnterTime  Unsigned32,
+    f3Pwe3AisStabilizationProfileExitTime   Unsigned32
+}
+
+f3Pwe3AisStabilizationProfileIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the PWE3 AIS 
+          Stabilization Profile."
+     ::= { f3Pwe3AisStabilizationProfileEntry 1 }
+
+f3Pwe3AisStabilizationProfileEnterTime    OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to specify the 
+           time (in hundreds of milliseconds) that will be applied on a 
+           LOS event, before the SAToP instance transmits all 1s pattern 
+           downstream (AIS).  
+           Range 0 to 3 seconds in 100 millisecond increments."
+     ::= { f3Pwe3AisStabilizationProfileEntry 2 }
+
+f3Pwe3AisStabilizationProfileExitTime    OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to specify the 
+           holdon time that will be applied when leaving the AIS 
+           Stabilization period.
+           Range 0 to 3 seconds in 100 milliseconds increments 
+           (e.g. parameter range is 0 to 30)."
+     ::= { f3Pwe3AisStabilizationProfileEntry 3 }
+
+--
+-- SAToP (Structure Agnostic TDM over Packet) Table 
+--
+f3Pwe3SatopTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3Pwe3SatopEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A list of entries corresponding to the PWE3 SAToP entities."
+    ::= { f3Pwe3ConfigObjects 6 }
+
+f3Pwe3SatopEntry OBJECT-TYPE
+    SYNTAX     F3Pwe3SatopEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+          "An entry containing information applicable to a particular
+           PWE3 SAToP Entity."
+    INDEX { neIndex, shelfIndex, slotIndex, f3Pwe3SatopIndex }
+    ::= { f3Pwe3SatopTable 1 }
+
+
+F3Pwe3SatopEntry ::= SEQUENCE {
+-- index related/alias
+    f3Pwe3SatopIndex                    Integer32,
+    f3Pwe3SatopAlias                    DisplayString,
+
+-- state management
+    f3Pwe3SatopAdminState               AdminState,
+    f3Pwe3SatopOperationalState         OperationalState,
+    f3Pwe3SatopSecondaryState           SecondaryState,
+
+-- Associated TDM entity 
+    f3Pwe3SatopTDMEntity                VariablePointer,  
+
+-- Discovery type
+    f3Pwe3SatopDiscoveryType            PWE3SatopDiscoveryType,
+
+-- SATOP header  related
+    f3Pwe3SatopRemoteIpAddress          IpAddress,
+    f3Pwe3SatopRemoteMacAddress         MacAddress,
+    f3Pwe3SatopEncapsulationType        PWE3SatopEncapsulationType,
+    f3Pwe3SatopRTPEnabled               TruthValue,
+    f3Pwe3SatopRTPUpdateFrequency       PWE3SatopRTPTSUpdateFreqType,
+    f3Pwe3SatopControlWordEnabled       TruthValue,
+    f3Pwe3SatopJitterBufferSize         Unsigned32,
+    f3Pwe3SatopPayloadSize              Unsigned32,
+    f3Pwe3SatopVlanId                   VlanId,
+    f3Pwe3SatopVlanPriority             VlanPriority,
+    f3Pwe3SatopRxMplsLabel1             MplsLabel,
+    f3Pwe3SatopRxMplsLabel2             MplsLabel,
+    f3Pwe3SatopTxMplsLabel1             MplsLabel,
+    f3Pwe3SatopTxMplsLabel2             MplsLabel,
+
+-- associated profiles 
+    f3Pwe3SatopAisStabilizationProfile  VariablePointer,
+    f3Pwe3SatopResyncProfile            VariablePointer,
+    f3Pwe3SatopLossProfile              VariablePointer,
+    f3Pwe3SatopTransportMode            PWE3SatopTransportMode,
+
+-- creation/deletion
+    f3Pwe3SatopStorageType              StorageType,
+    f3Pwe3SatopRowStatus                RowStatus
+}
+
+f3Pwe3SatopIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the SAToP Entity."
+     ::= { f3Pwe3SatopEntry 1 }
+
+f3Pwe3SatopAlias    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to provide an 
+          alias to the PWE3 SAToP entity."
+     ::= { f3Pwe3SatopEntry 2 }
+
+f3Pwe3SatopAdminState OBJECT-TYPE
+    SYNTAX      AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "This object represents the Administrative State of the PWE3 
+           SAToP entity."
+    ::= { f3Pwe3SatopEntry 3 }
+
+f3Pwe3SatopOperationalState   OBJECT-TYPE
+    SYNTAX      OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "This object represents the Operational State of the PWE3 
+           SAToP entity." 
+    ::= { f3Pwe3SatopEntry 4 }
+
+f3Pwe3SatopSecondaryState     OBJECT-TYPE
+    SYNTAX      SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object represents the Secondary State of the PWE3 
+            SAToP entity."
+    ::= { f3Pwe3SatopEntry 5 }
+
+f3Pwe3SatopTDMEntity     OBJECT-TYPE
+    SYNTAX      VariablePointer 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows specification of the T1/E1 entity
+            associated with the SAToP.  This is only used at
+            SATop creation time. Result of get operation on this object
+            will result with zeroDotZero since one Satop could have more
+            then one associated TDM entity. Subsequently, the associated
+            TDM entities are managed via f3Pwe3SatopTDMEntityTable.
+           "
+    ::= { f3Pwe3SatopEntry 6 }
+
+f3Pwe3SatopDiscoveryType     OBJECT-TYPE
+    SYNTAX      PWE3SatopDiscoveryType 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows ability to statically/dynamically 
+            determine the MAC address of the remote IP Address 
+            associated with the SAToP. In the case of static discovery
+            type, f3Pwe3SatopRemoteMacAddress must be explicitly specified.
+            In the case of dynamic discovery, the system will use
+            ARP mechanism to obtain the remote Layer 2 MAC address." 
+    ::= { f3Pwe3SatopEntry 7 }
+
+f3Pwe3SatopRemoteIpAddress     OBJECT-TYPE
+    SYNTAX      IpAddress 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows ability to specify the remote IP 
+            Address. This is used in the PWE payload." 
+    ::= { f3Pwe3SatopEntry 8 }
+
+f3Pwe3SatopRemoteMacAddress     OBJECT-TYPE
+    SYNTAX      MacAddress 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows ability to specify the remote Layer 2 
+            MAC Address. This must be specified in case of
+            f3Pwe3SatopDiscoveryType as static.  This is derived
+            dynamically (via ARP) if f3Pwe3SatopDiscoveryType is dynamic,
+            i.e. it does not have to be specified."
+    ::= { f3Pwe3SatopEntry 9 }
+
+f3Pwe3SatopEncapsulationType     OBJECT-TYPE
+    SYNTAX      PWE3SatopEncapsulationType 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows ability to specify the encapsulation 
+            type of the SATop.  It can be encapsulated with
+            VLAN and single MPLS label(vlan-one-mpls-label), 
+            VLAN and two MPLS labels (vlan-two-mpls-label),
+            untagged and two MPLS labels (novlan-two-mpls-label)
+           ."
+    ::= { f3Pwe3SatopEntry 10 }
+
+f3Pwe3SatopRTPEnabled     OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object enables/disables RTP header for this SATop instance." 
+    ::= { f3Pwe3SatopEntry 11 }
+
+f3Pwe3SatopRTPUpdateFrequency     OBJECT-TYPE
+    SYNTAX      PWE3SatopRTPTSUpdateFreqType 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "When f3Pwe3SatopRTPEnabled is true, this object allows
+            specification of the RTP clock update frequency." 
+    ::= { f3Pwe3SatopEntry 12 }
+
+f3Pwe3SatopControlWordEnabled     OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object is used for 3rd party interoperability, since
+            earlier versions of PWE do not support control-word." 
+    ::= { f3Pwe3SatopEntry 13 }
+
+f3Pwe3SatopJitterBufferSize     OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows definition of size of the jitter buffer
+            in microseconds for this SATop instance." 
+    ::= { f3Pwe3SatopEntry 14 }
+
+f3Pwe3SatopPayloadSize     OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows specification of the SATop payload size." 
+    ::= { f3Pwe3SatopEntry 15 }
+
+f3Pwe3SatopVlanId     OBJECT-TYPE
+    SYNTAX      VlanId 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows specification of the SATop VLAN Id.
+            Applicable for vlan based encapsulation types." 
+    ::= { f3Pwe3SatopEntry 16 }
+
+f3Pwe3SatopVlanPriority     OBJECT-TYPE
+    SYNTAX      VlanPriority 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows specification of the SATop VLAN Priority.
+            Applicable for vlan based encapsulation types." 
+    ::= { f3Pwe3SatopEntry 17 }
+
+f3Pwe3SatopRxMplsLabel1     OBJECT-TYPE
+    SYNTAX      MplsLabel 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows specification of the expected
+            receive MPLS Label.  
+            Applicable for single MPLS label encapsulation type." 
+    ::= { f3Pwe3SatopEntry 18 }
+
+f3Pwe3SatopRxMplsLabel2     OBJECT-TYPE
+    SYNTAX      MplsLabel 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows specification of the expected
+            receive MPLS Label.  
+            Applicable for dual MPLS label encapsulation types." 
+    ::= { f3Pwe3SatopEntry 19 }
+
+f3Pwe3SatopTxMplsLabel1     OBJECT-TYPE
+    SYNTAX      MplsLabel 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows specification of the transmitted
+            MPLS Label, used for multiplexing.  
+            Applicable for single MPLS label encapsulation type." 
+    ::= { f3Pwe3SatopEntry 20 }
+
+f3Pwe3SatopTxMplsLabel2     OBJECT-TYPE
+    SYNTAX      MplsLabel 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows specification of the transmitted 
+            MPLS Label, used for multiplexing.  
+            Applicable for dual MPLS label encapsulation type." 
+    ::= { f3Pwe3SatopEntry 21 }
+
+f3Pwe3SatopAisStabilizationProfile     OBJECT-TYPE
+    SYNTAX      VariablePointer 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows specification of the AIS stabilization 
+            Profile object. If no profile is associated, this value should be
+            0.0." 
+    ::= { f3Pwe3SatopEntry 22 }
+
+f3Pwe3SatopResyncProfile     OBJECT-TYPE
+    SYNTAX      VariablePointer 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows specification of the Resync 
+            Profile object.  If no profile is associated, this value
+            should be 0.0." 
+    ::= { f3Pwe3SatopEntry 23 }
+
+f3Pwe3SatopLossProfile     OBJECT-TYPE
+    SYNTAX      VariablePointer 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows specification of the Loss 
+            Profile object.  If no profile is associated, this value
+            should be 0.0." 
+    ::= { f3Pwe3SatopEntry 24 }
+
+f3Pwe3SatopTransportMode     OBJECT-TYPE
+    SYNTAX      PWE3SatopTransportMode 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows specification of the SATop transport mode." 
+    ::= { f3Pwe3SatopEntry 25 }
+
+f3Pwe3SatopStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { f3Pwe3SatopEntry 26 }
+
+f3Pwe3SatopRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3Pwe3SatopRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3Pwe3SatopRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The f3Pwe3SatopRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { f3Pwe3SatopEntry 27 }
+
+
+--
+-- PWE3 SATop TDM Entities Table 
+--
+f3Pwe3SatopTDMEntitiesTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3Pwe3SatopTDMEntitiesEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "A list of entries corresponding to the PWE3 SATop TDM entities 
+          ."
+    ::= { f3Pwe3ConfigObjects 7 }
+
+f3Pwe3SatopTDMEntitiesEntry OBJECT-TYPE
+    SYNTAX     F3Pwe3SatopTDMEntitiesEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+          "An entry containing information applicable to a particular
+           PWE3 SATop TDM entity."
+    INDEX { neIndex, shelfIndex, slotIndex, f3Pwe3SatopIndex, f3Pwe3SatopTDMEntityIndex}
+    ::= { f3Pwe3SatopTDMEntitiesTable 1 }
+
+F3Pwe3SatopTDMEntitiesEntry ::= SEQUENCE {
+    f3Pwe3SatopTDMEntityIndex            Integer32,
+
+    f3Pwe3SatopTDMEntityObject           VariablePointer,
+
+    f3Pwe3SatopTDMEntityStorageType      StorageType,
+    f3Pwe3SatopTDMEntityRowStatus        RowStatus
+}
+
+f3Pwe3SatopTDMEntityIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the PWE3 SATOP TDM Entity."
+     ::= { f3Pwe3SatopTDMEntitiesEntry 1 }
+
+f3Pwe3SatopTDMEntityObject OBJECT-TYPE
+    SYNTAX     VariablePointer 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object points to the PWE3 SATOP TDM Entity.  This is
+          OID of the actual T1/E1 interface."
+     ::= { f3Pwe3SatopTDMEntitiesEntry 2 }
+
+f3Pwe3SatopTDMEntityStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { f3Pwe3SatopTDMEntitiesEntry 3 }
+
+f3Pwe3SatopTDMEntityRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3Pwe3SatopTDMEntityRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3Pwe3SatopTDMEntityRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The f3Pwe3SatopTDMEntityRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { f3Pwe3SatopTDMEntitiesEntry 4 }
+
+--
+-- Performance Tables
+--
+-- PWE3 SATOP Stats (Current) Table
+--
+f3Pwe3SatopStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3Pwe3SatopStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The PWE3 SATop Current data."
+    ::= { f3Pwe3PerformanceObjects 1 }
+
+f3Pwe3SatopStatsEntry OBJECT-TYPE
+    SYNTAX      F3Pwe3SatopStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3Pwe3SatopStatsTable."
+    INDEX { neIndex, shelfIndex, slotIndex, f3Pwe3SatopIndex, f3Pwe3SatopStatsIndex }
+    ::= { f3Pwe3SatopStatsTable 1 }
+
+F3Pwe3SatopStatsEntry ::= SEQUENCE {
+    f3Pwe3SatopStatsIndex                 Integer32,
+    f3Pwe3SatopStatsIntervalType          CmPmIntervalType,
+    f3Pwe3SatopStatsValid                 TruthValue,
+    f3Pwe3SatopStatsAction                CmPmBinAction,
+    f3Pwe3SatopStatsESs                   PerfCounter64,
+    f3Pwe3SatopStatsSESs                  PerfCounter64,
+    f3Pwe3SatopStatsEBs                   PerfCounter64,
+    f3Pwe3SatopStatsResyncs               PerfCounter64,
+    f3Pwe3SatopStatsMaxJitter             Unsigned32,
+    f3Pwe3SatopStatsFramesTx              PerfCounter64,
+    f3Pwe3SatopStatsPayloadOctetsTx       PerfCounter64,
+    f3Pwe3SatopStatsFramesRx              PerfCounter64,
+    f3Pwe3SatopStatsPayloadOctetsRx       PerfCounter64,
+    f3Pwe3SatopStatsOutOfSeqFramesRx      PerfCounter64,
+    f3Pwe3SatopStatsLostFrames            PerfCounter64,
+    f3Pwe3SatopStatsLostFramesStateTrans  PerfCounter64,
+    f3Pwe3SatopStatsMalformedFramesRx     PerfCounter64,
+    f3Pwe3SatopStatsJitterBufferLateFrames PerfCounter64
+}
+
+f3Pwe3SatopStatsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "An index of the SATop current bin."
+    ::= { f3Pwe3SatopStatsEntry 1 }
+
+f3Pwe3SatopStatsIntervalType OBJECT-TYPE
+    SYNTAX      CmPmIntervalType
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+            "Indicates the type of collection, i.e. whether it is
+             15 Min, 1 Day."
+    ::= { f3Pwe3SatopStatsEntry 2 }
+
+f3Pwe3SatopStatsValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3Pwe3SatopStatsEntry 3 }
+
+f3Pwe3SatopStatsAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3Pwe3SatopStatsEntry 4 }
+
+
+f3Pwe3SatopStatsESs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+            "The counter associated with the number 
+            of Errored Seconds encountered by the 
+            SATop in the current bin."
+     ::= { f3Pwe3SatopStatsEntry 5 }
+
+f3Pwe3SatopStatsSESs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Severely Errored Seconds encountered by the 
+         SATop in the current bin."
+     ::= { f3Pwe3SatopStatsEntry 6 }
+
+f3Pwe3SatopStatsEBs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Errored Blocsk encountered by the SATop
+         in the current bin."
+     ::= { f3Pwe3SatopStatsEntry 7 }
+
+f3Pwe3SatopStatsResyncs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Resync count events encountered by the 
+         SATop in the current bin."
+     ::= { f3Pwe3SatopStatsEntry 8 }
+
+f3Pwe3SatopStatsMaxJitter OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum absolute jitter on SATop in the current bin." 
+     ::= { f3Pwe3SatopStatsEntry 9 }
+
+f3Pwe3SatopStatsFramesTx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Frames Transmitted in the current bin." 
+     ::= { f3Pwe3SatopStatsEntry 10 }
+
+f3Pwe3SatopStatsPayloadOctetsTx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Payload Octets Transmitted in the current bin." 
+     ::= { f3Pwe3SatopStatsEntry 11 }
+
+f3Pwe3SatopStatsFramesRx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Frames Received in the current bin." 
+     ::= { f3Pwe3SatopStatsEntry 12 }
+
+f3Pwe3SatopStatsPayloadOctetsRx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Payload Octets Received in the current bin." 
+     ::= { f3Pwe3SatopStatsEntry 13 }
+
+f3Pwe3SatopStatsOutOfSeqFramesRx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Out of Sequence Frames Received in the current bin." 
+     ::= { f3Pwe3SatopStatsEntry 14 }
+
+f3Pwe3SatopStatsLostFrames OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Lost Frames detected in the current bin." 
+     ::= { f3Pwe3SatopStatsEntry 15 }
+
+f3Pwe3SatopStatsLostFramesStateTrans OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of transitions to
+         Lost Frame State detected in the current bin." 
+     ::= { f3Pwe3SatopStatsEntry 16 }
+
+f3Pwe3SatopStatsMalformedFramesRx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Malformed Frames received in the current bin." 
+     ::= { f3Pwe3SatopStatsEntry 17 }
+
+f3Pwe3SatopStatsJitterBufferLateFrames OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Jitter Buffer Late Frames in the current bin." 
+     ::= { f3Pwe3SatopStatsEntry 18 }
+
+--
+-- PWE3 SATOP History Table
+--
+f3Pwe3SatopHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3Pwe3SatopHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The PWE3 SATop History data."
+    ::= { f3Pwe3PerformanceObjects 2 }
+
+f3Pwe3SatopHistoryEntry OBJECT-TYPE
+    SYNTAX      F3Pwe3SatopHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3Pwe3SatopHistoryTable."
+    INDEX { neIndex, shelfIndex, slotIndex, f3Pwe3SatopIndex, f3Pwe3SatopStatsIndex, 
+            f3Pwe3SatopHistoryIndex }
+    ::= { f3Pwe3SatopHistoryTable 1 }
+
+F3Pwe3SatopHistoryEntry ::= SEQUENCE {
+    f3Pwe3SatopHistoryIndex                 Integer32,
+    f3Pwe3SatopHistoryTime                  DateAndTime,
+    f3Pwe3SatopHistoryValid                 TruthValue,
+    f3Pwe3SatopHistoryAction                CmPmBinAction,
+    f3Pwe3SatopHistoryESs                   PerfCounter64,
+    f3Pwe3SatopHistorySESs                  PerfCounter64,
+    f3Pwe3SatopHistoryEBs                   PerfCounter64,
+    f3Pwe3SatopHistoryResyncs               PerfCounter64,
+    f3Pwe3SatopHistoryMaxJitter             Unsigned32,
+    f3Pwe3SatopHistoryFramesTx              PerfCounter64,
+    f3Pwe3SatopHistoryPayloadOctetsTx       PerfCounter64,
+    f3Pwe3SatopHistoryFramesRx              PerfCounter64,
+    f3Pwe3SatopHistoryPayloadOctetsRx       PerfCounter64,
+    f3Pwe3SatopHistoryOutOfSeqFramesRx      PerfCounter64,
+    f3Pwe3SatopHistoryLostFrames            PerfCounter64,
+    f3Pwe3SatopHistoryLostFramesStateTrans  PerfCounter64,
+    f3Pwe3SatopHistoryMalformedFramesRx     PerfCounter64,
+    f3Pwe3SatopHistoryJitterBufferLateFrames PerfCounter64
+}
+
+f3Pwe3SatopHistoryIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "An index of the SATop current bin."
+    ::= { f3Pwe3SatopHistoryEntry 1 }
+
+f3Pwe3SatopHistoryTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+            "Indicates the time of history bin creation."
+    ::= { f3Pwe3SatopHistoryEntry 2 }
+
+f3Pwe3SatopHistoryValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3Pwe3SatopHistoryEntry 3 }
+
+f3Pwe3SatopHistoryAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3Pwe3SatopHistoryEntry 4 }
+
+f3Pwe3SatopHistoryESs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+            "The counter associated with the number 
+            of Errored Seconds encountered by the 
+            SATop in the current bin."
+     ::= { f3Pwe3SatopHistoryEntry 5 }
+
+f3Pwe3SatopHistorySESs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Severely Errored Seconds encountered by the 
+         SATop in the current bin."
+     ::= { f3Pwe3SatopHistoryEntry 6 }
+
+f3Pwe3SatopHistoryEBs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Errored Blocsk encountered by the SATop
+         in the current bin."
+     ::= { f3Pwe3SatopHistoryEntry 7 }
+
+f3Pwe3SatopHistoryResyncs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Resync count events encountered by the 
+         SATop in the current bin."
+     ::= { f3Pwe3SatopHistoryEntry 8 }
+
+f3Pwe3SatopHistoryMaxJitter OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum absolute jitter on SATop in the current bin." 
+     ::= { f3Pwe3SatopHistoryEntry 9 }
+
+f3Pwe3SatopHistoryFramesTx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Frames Transmitted in the current bin." 
+     ::= { f3Pwe3SatopHistoryEntry 10 }
+
+f3Pwe3SatopHistoryPayloadOctetsTx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Payload Octets Transmitted in the current bin." 
+     ::= { f3Pwe3SatopHistoryEntry 11 }
+
+f3Pwe3SatopHistoryFramesRx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Frames Received in the current bin." 
+     ::= { f3Pwe3SatopHistoryEntry 12 }
+
+f3Pwe3SatopHistoryPayloadOctetsRx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Payload Octets Received in the current bin." 
+     ::= { f3Pwe3SatopHistoryEntry 13 }
+
+f3Pwe3SatopHistoryOutOfSeqFramesRx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Out of Sequence Frames Received in the current bin." 
+     ::= { f3Pwe3SatopHistoryEntry 14 }
+
+f3Pwe3SatopHistoryLostFrames OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Lost Frames detected in the current bin." 
+     ::= { f3Pwe3SatopHistoryEntry 15 }
+
+f3Pwe3SatopHistoryLostFramesStateTrans OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of transitions to
+         Lost Frame State detected in the current bin." 
+     ::= { f3Pwe3SatopHistoryEntry 16 }
+
+f3Pwe3SatopHistoryMalformedFramesRx OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Malformed Frames received in the current bin." 
+     ::= { f3Pwe3SatopHistoryEntry 17 }
+
+f3Pwe3SatopHistoryJitterBufferLateFrames OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The counter associated with the number of 
+         Jitter Buffer Overruns in the current bin." 
+     ::= { f3Pwe3SatopHistoryEntry 18 }
+
+--
+-- PWE3 SATop Threshold Table
+--
+f3Pwe3SatopThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3Pwe3SatopThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table of entries that allow manageability of SATop 
+             Thresholds."
+    ::= { f3Pwe3PerformanceObjects 3 }
+
+f3Pwe3SatopThresholdEntry OBJECT-TYPE
+    SYNTAX      F3Pwe3SatopThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3Pwe3SatopThresholdTable."
+    INDEX {  neIndex, shelfIndex, slotIndex, f3Pwe3SatopIndex, f3Pwe3SatopStatsIndex, 
+            f3Pwe3SatopThresholdIndex }
+    ::= { f3Pwe3SatopThresholdTable 1 }
+
+F3Pwe3SatopThresholdEntry ::= SEQUENCE {
+    f3Pwe3SatopThresholdIndex       Integer32,
+    f3Pwe3SatopThresholdInterval    CmPmIntervalType,
+    f3Pwe3SatopThresholdVariable    VariablePointer,
+    f3Pwe3SatopThresholdValueLo     Unsigned32,
+    f3Pwe3SatopThresholdValueHi     Unsigned32,
+    f3Pwe3SatopThresholdMonValue    Counter64
+}
+
+f3Pwe3SatopThresholdIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS  not-accessible 
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies an entry in the
+        f3Pwe3SatopThresholdTable."
+    ::= { f3Pwe3SatopThresholdEntry 1 }
+
+f3Pwe3SatopThresholdInterval OBJECT-TYPE
+    SYNTAX     CmPmIntervalType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The interval over which monitored value is
+        sampled and compared with the specified threshold."
+    ::= { f3Pwe3SatopThresholdEntry 2 }
+
+f3Pwe3SatopThresholdVariable OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The object identifier of the particular variable to be
+        sampled."
+    ::= { f3Pwe3SatopThresholdEntry 3 }
+
+f3Pwe3SatopThresholdValueLo OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Lower 32 bits of the threshold value."
+    ::= { f3Pwe3SatopThresholdEntry 4 }
+
+f3Pwe3SatopThresholdValueHi OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Higher 32 bits of the threshold value."
+    ::= { f3Pwe3SatopThresholdEntry 5 }
+
+f3Pwe3SatopThresholdMonValue OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Monitored value corresponding to f3Pwe3SatopThresholdVariable."
+    ::= { f3Pwe3SatopThresholdEntry 6 }
+
+---
+---Notifications
+---
+f3Pwe3SatopThresholdCrossingAlert NOTIFICATION-TYPE
+    OBJECTS {
+        f3Pwe3SatopThresholdIndex,
+        f3Pwe3SatopThresholdInterval,
+        f3Pwe3SatopThresholdVariable,
+        f3Pwe3SatopThresholdValueLo,
+        f3Pwe3SatopThresholdValueHi,
+        f3Pwe3SatopThresholdMonValue
+    }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time a threshold on a PM condition
+             on an PWE3 SATop is crossed."
+  ::= { f3Pwe3PerformanceNotifications 1 }
+
+--
+-- CONFORMANCE
+--
+f3Pwe3Compliances OBJECT IDENTIFIER ::= {f3Pwe3Conformance 1}
+f3Pwe3Groups      OBJECT IDENTIFIER ::= {f3Pwe3Conformance 2}
+
+f3Pwe3Compliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the F3 PWE3
+             group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3Pwe3ObjectGroup, f3Pwe3PerfObjectGroup, f3Pwe3PerfNotifGroup
+        }
+    ::= { f3Pwe3Compliances 1 }
+
+f3Pwe3ObjectGroup OBJECT-GROUP
+    OBJECTS {
+        f3Pwe3IdlePatternProfileIndex, f3Pwe3IdlePatternProfileByte, 
+        f3Pwe3ResyncProfileIndex, f3Pwe3ResyncProfileIncreaseFactor,
+        f3Pwe3ResyncProfileDecreaseFactor, f3Pwe3ResyncProfileResyncThreshold,
+        f3Pwe3LoopbackProfileIndex, f3Pwe3LoopbackProfileLength,
+        f3Pwe3LoopbackProfilePattern, f3Pwe3LoopbackProfileRepeatTime,
+        f3Pwe3LoopbackProfileClearLength, f3Pwe3LoopbackProfileClearPattern, 
+        f3Pwe3LossProfileIndex, f3Pwe3LossProfileLossStateEnterTime,
+        f3Pwe3LossProfileLossStateExitTime,
+        f3Pwe3AisStabilizationProfileIndex, 
+        f3Pwe3AisStabilizationProfileEnterTime,
+        f3Pwe3AisStabilizationProfileExitTime,
+
+        f3Pwe3SatopIndex, f3Pwe3SatopAlias,
+        f3Pwe3SatopAdminState, f3Pwe3SatopOperationalState,
+        f3Pwe3SatopSecondaryState, f3Pwe3SatopTDMEntity,  
+        f3Pwe3SatopDiscoveryType, f3Pwe3SatopRemoteIpAddress,
+        f3Pwe3SatopRemoteMacAddress, f3Pwe3SatopEncapsulationType,
+        f3Pwe3SatopRTPEnabled, f3Pwe3SatopRTPUpdateFrequency,
+        f3Pwe3SatopControlWordEnabled, f3Pwe3SatopJitterBufferSize,
+        f3Pwe3SatopPayloadSize, f3Pwe3SatopVlanId, f3Pwe3SatopVlanPriority,
+        f3Pwe3SatopRxMplsLabel1, f3Pwe3SatopRxMplsLabel2,
+        f3Pwe3SatopTxMplsLabel1, f3Pwe3SatopTxMplsLabel2,
+        f3Pwe3SatopAisStabilizationProfile, f3Pwe3SatopResyncProfile,
+        f3Pwe3SatopLossProfile, f3Pwe3SatopTransportMode,
+        f3Pwe3SatopStorageType, f3Pwe3SatopRowStatus,
+
+        f3Pwe3SatopTDMEntityIndex, f3Pwe3SatopTDMEntityObject, 
+        f3Pwe3SatopTDMEntityStorageType, f3Pwe3SatopTDMEntityRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to manage the F3 PWE3 Configuration data."
+    ::= { f3Pwe3Groups 1 }
+
+f3Pwe3PerfObjectGroup OBJECT-GROUP
+    OBJECTS {
+        f3Pwe3SatopStatsIndex, f3Pwe3SatopStatsIntervalType,
+        f3Pwe3SatopStatsValid, f3Pwe3SatopStatsAction,
+        f3Pwe3SatopStatsESs, f3Pwe3SatopStatsSESs,
+        f3Pwe3SatopStatsEBs,
+        f3Pwe3SatopStatsResyncs, f3Pwe3SatopStatsMaxJitter,
+        f3Pwe3SatopStatsFramesTx, f3Pwe3SatopStatsPayloadOctetsTx,
+        f3Pwe3SatopStatsFramesRx, f3Pwe3SatopStatsPayloadOctetsRx,
+        f3Pwe3SatopStatsOutOfSeqFramesRx, f3Pwe3SatopStatsLostFrames,
+        f3Pwe3SatopStatsLostFramesStateTrans, 
+        f3Pwe3SatopStatsMalformedFramesRx, 
+        f3Pwe3SatopStatsJitterBufferLateFrames, 
+
+        f3Pwe3SatopHistoryIndex, f3Pwe3SatopHistoryTime,
+        f3Pwe3SatopHistoryValid, f3Pwe3SatopHistoryAction,
+        f3Pwe3SatopHistoryESs, f3Pwe3SatopHistorySESs,
+        f3Pwe3SatopHistoryEBs,
+        f3Pwe3SatopHistoryResyncs, f3Pwe3SatopHistoryMaxJitter,
+        f3Pwe3SatopHistoryFramesTx, f3Pwe3SatopHistoryPayloadOctetsTx,
+        f3Pwe3SatopHistoryFramesRx, f3Pwe3SatopHistoryPayloadOctetsRx,
+        f3Pwe3SatopHistoryOutOfSeqFramesRx, f3Pwe3SatopHistoryLostFrames,
+        f3Pwe3SatopHistoryLostFramesStateTrans, 
+        f3Pwe3SatopHistoryMalformedFramesRx, 
+        f3Pwe3SatopHistoryJitterBufferLateFrames,
+
+        f3Pwe3SatopThresholdIndex, f3Pwe3SatopThresholdInterval,
+        f3Pwe3SatopThresholdVariable, f3Pwe3SatopThresholdValueLo,
+        f3Pwe3SatopThresholdValueHi, f3Pwe3SatopThresholdMonValue
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to manage the F3 PWE3 Performance data."
+    ::= { f3Pwe3Groups 2 }
+
+f3Pwe3PerfNotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        f3Pwe3SatopThresholdCrossingAlert
+    }
+    STATUS  current
+    DESCRIPTION
+         "A collection of notifications related to F3 PWE3 Threshold Crossing 
+          Alerts."
+    ::= { f3Pwe3Groups 3 }
+END

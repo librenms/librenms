@@ -1,0 +1,57 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+--
+-- CIENA-GLOBAL-MIB.my
+--
+--
+
+	CIENA-GLOBAL-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS                
+   Counter64, OBJECT-TYPE                 
+        FROM SNMPv2-SMI  
+   MacAddress
+   		FROM SNMPv2-TC               
+   cienaCommon
+        FROM CIENA-SMI
+   CienaGlobalSeverity
+   		FROM CIENA-TC;
+
+	
+		cienaGlobal MODULE-IDENTITY
+		LAST-UPDATED "201003280000Z"
+		ORGANIZATION "Ciena, Inc."
+		CONTACT-INFO 
+			"  Mib Meister
+			115 North Sullivan Road
+			Spokane Valley, WA 99037
+			USA            
+			Phone:  +1 509 242 9000
+			Email:  support@ciena.com"
+	      DESCRIPTION
+		       "Initial creation. This module defines the object identifiers that are
+		       common across all modules."
+			::= { cienaCommon 3 }
+		
+  
+--
+-- Node definitions
+--
+	
+  cienaGlobalSeverity	OBJECT-TYPE
+ 	 SYNTAX		CienaGlobalSeverity
+	 MAX-ACCESS	accessible-for-notify
+	 STATUS		current
+	 DESCRIPTION
+		"This object defines the severity of a trap and is a part of every trap defined in the system."        
+	 ::= { cienaGlobal 1 } 
+
+
+  cienaGlobalMacAddress    OBJECT-TYPE
+     SYNTAX           MacAddress
+     MAX-ACCESS       accessible-for-notify
+     STATUS           current
+     DESCRIPTION
+	     "This object indicates the chassis MAC address."     
+     ::= { cienaGlobal 2 }
+			
+  END

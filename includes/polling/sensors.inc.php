@@ -13,7 +13,7 @@
 
 $sensors = dbFetchRows("SELECT `sensor_class` FROM `sensors` WHERE `device_id` = ? GROUP BY `sensor_class`", array($device['device_id']));
 foreach ($sensors as $sensor_type) {
-    poll_sensor($device, $sensor_type);
+    poll_sensor($device, $sensor_type['sensor_class']);
 }
 
 unset($sensors, $sensor_type);

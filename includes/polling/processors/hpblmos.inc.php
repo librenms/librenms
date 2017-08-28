@@ -10,8 +10,6 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == 'hpblmos') {
-    $idle = snmp_get($device, '.1.3.6.1.4.1.2021.11.11.0', '-Ovqn');
-    $usage = 100 - $idle;
-    $proc = $usage;
-}
+$idle = snmp_get($device, '.1.3.6.1.4.1.2021.11.11.0', '-Ovqn');
+$usage = 100 - $idle;
+$proc = $usage;

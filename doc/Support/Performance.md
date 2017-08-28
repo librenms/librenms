@@ -65,6 +65,13 @@ You can also set this globally with the config option `$config['snmp']['max_oid'
 The default 16 threads that `poller-wrapper.py` runs as isn't necessarily the optimal number. A general rule of thumb is 
 2 threads per core but we suggest that you play around with lowering / increasing the number until you get the optimal value.
 
+This can be changed by going to the cron job for librenms. Usually in /etc/cron.d/librenms and changing the "16"
+
+*/5  *    * * *   librenms    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
+
+KEEP in MIND that this dosnt always help, it depnds on your system and CPU. So Be careful. 
+
+
 #### Recursive DNS
 
 If your install uses hostnames for devices and you have quite a lot then it's advisable to setup a local recursive dns instance on the 
@@ -89,3 +96,13 @@ If you would like to see if you should turn this on then run this query in MySQL
 |        81 |     2 |
 
 Here device id 128 and potentially 92 and 41 are likely candidates for this feature to be enabled on. Turn it on and then closely monitor the device for the next 15-30 minutes.
+
+### Web interface
+
+#### HTTP/2
+
+If you are running https then you should enable http/2 support in whatever web server you use:
+
+For Nginx (1.9.5 and above) change `listen 443 ssl;` to `listen 443 ssl http2;` in the Virtualhost config.
+
+For Apache (2.4.17 an above) set `Protocols h2 http/1.1` in the Virtualhost config.

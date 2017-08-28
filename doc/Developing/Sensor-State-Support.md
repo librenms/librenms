@@ -48,6 +48,66 @@ We also map these values to the actual state sensor(state_index) where these val
 *Is as you might have guessed, where the sensor_id is mapped to a state_index_id.*
 
 ### Example
+
+For YAML based state discovery:
+
+```yaml
+mib: NETBOTZV2-MIB
+modules:
+    sensors:
+        state:
+            -
+                oid: dryContactSensorTable
+                value: dryContactSensorValue
+                num_oid: .1.3.6.1.4.1.5528.100.4.2.1.1.2.
+                descr: dryContactSensorLabel
+                index: 'dryContactSensor.{{ $index }}'
+                state_name: dryContactSensor
+                states:
+                    - { descr: 'null', graph: 0, value: -1, generic: 3 }
+                    - { descr: open, graph: 0, value: 0, generic: 0 }
+                    - { descr: closed, graph: 0, value: 1, generic: 2 }
+            -
+                oid: doorSwitchSensorTable
+                value: doorSwitchSensorValue
+                num_oid: .1.3.6.1.4.1.5528.100.4.2.2.1.2.
+                descr: doorSwitchSensorLabel
+                index: 'doorSwitchSensor.{{ $index }}'
+                state_name: doorSwitchSensor
+                states:
+                    - { descr: 'null', graph: 0, value: -1, generic: 3 }
+                    - { descr: open, graph: 0, value: 0, generic: 0 }
+                    - { descr: closed, graph: 0, value: 1, generic: 2 }
+            -
+                oid: cameraMotionSensorTable
+                value: cameraMotionSensorValue
+                num_oid: .1.3.6.1.4.1.5528.100.4.2.3.1.2.
+                descr: cameraMotionSensorLabel
+                index: 'cameraMotionSensor.{{ $index }}'
+                state_name: cameraMotionSensor
+                states:
+                    - { descr: 'null', graph: 0, value: -1, generic: 3 }
+                    - { descr: noMotion, graph: 0, value: 0, generic: 0 }
+                    - { descr: motionDetected, graph: 0, value: 1, generic: 2 }
+            -
+                oid: otherStateSensorTable
+                value: otherStateSensorErrorStatus
+                num_oid: .1.3.6.1.4.1.5528.100.4.2.10.1.3.
+                descr: otherStateSensorLabel
+                index: '{{ $index }}'
+                state_name: otherStateSensorErrorStatus
+                states:
+                    - { descr: normal, graph: 0, value: 0, generic: 0 }
+                    - { descr: info, graph: 0, value: 1, generic: 1 }
+                    - { descr: warning, graph: 0, value: 2, generic: 1 }
+                    - { descr: error, graph: 0, value: 3, generic: 2 }
+                    - { descr: critical, graph: 0, value: 4, generic: 2 }
+                    - { descr: failure, graph: 0, value: 5, generic: 2 }
+
+```
+
+For advanced state discovery:
+
 This example will be based on a Cisco power supply sensor and is all it takes to have sensor state support for Cisco power supplys in Cisco switches.
 The file should be located in /includes/discovery/sensors/state/cisco.inc.php.
 

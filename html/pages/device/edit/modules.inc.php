@@ -77,7 +77,8 @@ foreach ($poller_modules as $module => $module_status) {
        <td>
        ');
 
-    echo('<input type="checkbox" name="poller-module" data-poller_module="'.$module.'" data-device_id="'.$device['device_id'].'" '.$module_checked.'>');
+    echo '<input type="checkbox" style="visibility:hidden;width:100px;" name="poller-module" data-poller_module="'
+        .$module.'" data-device_id="'.$device['device_id'].'" '.$module_checked.'>';
 
     echo('
        </td>
@@ -159,7 +160,8 @@ foreach ($discovery_modules as $module => $module_status) {
         </td>
         <td>');
 
-    echo('<input type="checkbox" name="discovery-module" data-discovery_module="'.$module.'" data-device_id="'.$device['device_id'].'" '.$module_checked.'>');
+    echo '<input type="checkbox" style="visibility:hidden;width:100px;" name="discovery-module" data-discovery_module="'
+        .$module.'" data-device_id="'.$device['device_id'].'" '.$module_checked.'>';
 
     echo('
         </td>

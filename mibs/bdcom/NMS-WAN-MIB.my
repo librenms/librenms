@@ -1,0 +1,122 @@
+-- *****************************************************************
+-- NMS-WAN-MIB.my: NMS WAN MIB
+--
+-- March 2010
+-- Edit by LIUQIANG
+-- Copyright (c) 2010 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+
+NMS-WAN-MIB DEFINITIONS ::= BEGIN 
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+                                                FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                          FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP             FROM SNMPv2-CONF
+    ifIndex                            FROM RFC1213-MIB
+    IpAddress   				FROM RFC1155-SMI
+    nmsMgmt                             FROM NMS-SMI;
+
+--definition of NMS device wan information
+
+               	wan         OBJECT IDENTIFIER ::= { nmsMgmt 356 }
+
+               nmsWanIfTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSWanIfEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS WAN interface table."
+                   ::= { wan 1 }
+        
+               nmsWanIfEntry OBJECT-TYPE
+                   SYNTAX  NMSWanIfEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS WAN interface table entry."
+                   INDEX   { ifIndex }
+                   ::= { nmsWanIfTable 1 }
+        
+               NMSWanIfEntry ::=
+                   SEQUENCE {
+                       nmsWanIfConnType
+                           INTEGER,
+                       nmsWanIfIpAddr
+                           IpAddress,
+                       nmsWanIfMask
+                           IpAddress,
+                       nmsWanIfDefaultGateway
+                           IpAddress,
+                       nmsWanIfMasterDNS
+                           IpAddress,
+                       nmsWanIfSlaveDNS
+                           IpAddress,
+                       nmsWanIfMTU
+                           INTEGER
+                   }
+
+               
+               nmsWanIfConnType OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS WAN interface connection type. This type is temporarily unknown"
+                   ::= { nmsWanIfEntry 1 }
+               
+               nmsWanIfIpAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS WAN interface IP address, the same value as ipAdEntAddr in ipAddrTable."
+                   ::= { nmsWanIfEntry 2 }
+               
+               nmsWanIfMask OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS WAN interface mask, the same value as ipAdEntNetMask in ipAddrTable."
+                   ::= { nmsWanIfEntry 3 }
+               
+               nmsWanIfDefaultGateway OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS WAN interface default gateway."
+                   ::= { nmsWanIfEntry 4 }
+               
+               nmsWanIfMasterDNS OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS WAN interface master DNS address."
+                   ::= { nmsWanIfEntry 5 }
+               
+               nmsWanIfSlaveDNS OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS WAN interface slave DNS address."
+                   ::= { nmsWanIfEntry 6 }
+
+               nmsWanIfMTU OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS WAN interface MTU value, the same value as ifMTU in ifTable."
+                   ::= { nmsWanIfEntry 7 }
+               
+               
+               
+               
+END               
+               

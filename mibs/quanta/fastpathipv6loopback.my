@@ -1,0 +1,111 @@
+NETGEAR-IPV6-LOOPBACK-MIB DEFINITIONS ::= BEGIN
+
+-- Netgear IPV6 Loopback MIB
+-- Copyright Netgear Inc (2001-2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE          FROM SNMPv2-SMI
+    RowStatus
+                                          FROM SNMPv2-TC
+    InetAddressPrefixLength			          FROM INET-ADDRESS-MIB
+    Ipv6AddressPrefix				              FROM IPV6-TC
+    agentLoopbackID			                  FROM NETGEAR-LOOPBACK-MIB
+    lb6m                              FROM QUANTA-LB6M-REF-MIB;
+    
+    fastPathIpv6Loopback MODULE-IDENTITY
+        LAST-UPDATED "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The Netgear Private MIB for FastPath Loopback IPV6 address configuration"
+
+      -- Revision history.
+        REVISION
+          "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        DESCRIPTION
+          "Postal address updated."
+        REVISION
+          "200705230000Z" -- 23 May 2007 12:00:00 GMT
+        DESCRIPTION
+          "Netgear branding related changes."
+
+
+    ::= { lb6m 23 }
+    --**************************************************************************************
+    -- agentLoopbackIpv6Group
+    --
+    --**************************************************************************************
+
+    agentLoopbackIpv6Group       OBJECT IDENTIFIER ::= { fastPathIpv6Loopback 1 }
+
+    agentLoopbackIpv6PrefixTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentLoopbackIpv6PrefixEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of the Ipv6 prefixes associated with loopback instances"
+         ::= { agentLoopbackIpv6Group 1 }
+
+    agentLoopbackIpv6PrefixEntry OBJECT-TYPE
+         SYNTAX      AgentLoopbackIpv6PrefixEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     ""
+         INDEX       { agentLoopbackID,  agentLoopbackIpv6PrefixPrefix, agentLoopbackIpv6PrefixPrefixLen}
+         ::= { agentLoopbackIpv6PrefixTable 1 }
+
+    AgentLoopbackIpv6PrefixEntry ::= SEQUENCE {
+                        agentLoopbackIpv6PrefixPrefix
+                           Ipv6AddressPrefix,
+                        agentLoopbackIpv6PrefixPrefixLen
+                           InetAddressPrefixLength,
+                        agentLoopbackIpv6PrefixStatus
+                           RowStatus
+           }
+
+    agentLoopbackIpv6PrefixPrefix OBJECT-TYPE
+         SYNTAX          Ipv6AddressPrefix
+         MAX-ACCESS      not-accessible
+         STATUS          current
+         DESCRIPTION
+                     "The prefix associated with the loopback interface. The data type
+                      is used to model the Ipv6 address. It is a binary string
+                      of 16 octects in network byte-order. It specifies the IP 
+                      address of loopback which will be in Ipv6 Format, generated
+                      using internal interface number."
+         ::= { agentLoopbackIpv6PrefixEntry 1 }
+
+    agentLoopbackIpv6PrefixPrefixLen  OBJECT-TYPE
+         SYNTAX      InetAddressPrefixLength
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The length of the prefix (in bits)."
+         DEFVAL { 0 }
+         ::= { agentLoopbackIpv6PrefixEntry 2 }
+         
+    agentLoopbackIpv6PrefixStatus OBJECT-TYPE
+         SYNTAX       RowStatus
+         MAX-ACCESS   read-create
+         STATUS       current
+         DESCRIPTION
+                     "Status of this instance.Row can be added or deleted
+                     by setting the value to createAndGo/destroy
+                      
+                     active(1)      - this Loopback instance is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance"
+         ::= { agentLoopbackIpv6PrefixEntry 3 }
+END

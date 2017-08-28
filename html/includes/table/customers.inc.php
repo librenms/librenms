@@ -50,6 +50,7 @@ foreach (dbFetchRows($sql, $param) as $customer) {
 
         $ifname  = fixifname($device['ifDescr']);
         $ifclass = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
+        $port    = cleanPort($port);
 
         if ($device['os'] == 'ios') {
             if ($port['ifTrunk']) {

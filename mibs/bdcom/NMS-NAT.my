@@ -1,0 +1,450 @@
+-- *****************************************************************
+-- NMS-NAT.my:  NMS NAT MIB file
+-- OCT. 25 2003
+-- *****************************************************************
+--
+
+            NMS-NAT DEFINITIONS ::= BEGIN
+
+            IMPORTS 
+            	MODULE-IDENTITY,
+        		OBJECT-TYPE
+            		FROM SNMPv2-SMI            	
+            		
+            	DisplayString 
+					FROM RFC1213-MIB
+
+                nmsMgmt
+					FROM NMS-SMI;
+                                   
+nmsNatMIB  MODULE-IDENTITY
+        LAST-UPDATED    "200310250000Z"
+        ORGANIZATION    ""
+        CONTACT-INFO
+                	""
+			
+        DESCRIPTION
+            "This MIB module defines the generic managed objects
+            for NAT."
+        ::= { nmsMgmt 100 }
+
+
+
+nmsNatObjects   OBJECT IDENTIFIER ::= { nmsNatMIB 1 }
+
+         -- The NAT PAT link Table       
+         	--.1
+         nmsNatSessionNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of the total session in the NAPT rule."
+              ::= { nmsNatObjects 1 }
+		
+		--jiudian mib .2.1.1--.2.1.12
+         nmsNatSessionTableJD OBJECT-TYPE
+              SYNTAX  SEQUENCE OF NMSNatSessionEntryJD
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              		"The (conceptual) table containing one entry for each
+             		NAT session currently active on this NAT device."
+              ::= { nmsNatObjects 2 } 
+                                                
+          nmsNatSessionEntryJD OBJECT-TYPE
+              SYNTAX  NMSNatSessionEntryJD
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              		"An entry (conceptual row) containing information
+             		about an active NAT session on this NAT device."
+              INDEX   { nmsNatSessionId }
+              ::= { nmsNatSessionTableJD 1 }
+
+          NMSNatSessionEntryJD ::= SEQUENCE {
+			    nmsNatSessionIdJD                  OCTET STRING,
+			    nmsNatSessionProtocolTypeJD        INTEGER,
+			    nmsNatSessionDirectionJD           INTEGER,	
+			    nmsNatSessionIntAddrJD			    OCTET STRING,
+			    nmsNatSessionIntPortJD     		INTEGER,
+			    nmsNatSessionExtAddrJD			    IpAddress,
+			    nmsNatSessionExtPortJD             INTEGER,
+			    nmsNatSessionRemoteAddrJD      	IpAddress,
+			    nmsNatSessionRemotePortJD      	INTEGER,
+			    nmsNatSessionUpTimeJD              TimeTicks,
+			    nmsNatSessionIdletimeJD		    TimeTicks,
+			    nmsNatSessionContextJD             DisplayString,   
+			    nmsNATLimitedHostSessionsJD		INTEGER,
+			    nmsNATHostFlowsJD		INTEGER
+		  }
+		       
+		  nmsNatSessionIdJD OBJECT-TYPE
+			    SYNTAX     OCTET STRING 
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The session ID for this NAT session."
+			    ::= { nmsNatSessionEntryJD 1 }
+			    
+		  nmsNatSessionProtocolTypeJD OBJECT-TYPE
+			    SYNTAX     INTEGER{
+                        		other (-1), -- not specified
+                        		icmp (1),
+                        		udp (2),
+                        		tcp (4)
+                        	}
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The protocol type of this session.
+			
+			             TCP and UDP sessions are uniquely identified by the
+			             tuple of (source IP address, source UDP/TCP port,
+			             destination IP address, destination TCP/UCP port).
+			             ICMP query sessions are identified by the tuple of
+			             (source IP address, ICMP query ID, destination IP
+			             address)."
+			    ::= { nmsNatSessionEntryJD 2 }
+			    
+		  nmsNatSessionDirectionJD OBJECT-TYPE
+			    SYNTAX     INTEGER {
+			                   inbound (1),
+			                   outbound (2)
+			               }
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The direction of this session with respect to the
+			             local network. 'inbound' indicates that this session
+			             was initiated from the public network into the private
+			             network. 'outbound' indicates that this session was
+			             initiated from the private network into the public
+			             network."
+			    ::= { nmsNatSessionEntryJD 3 }
+
+		  nmsNatSessionIntAddrJD OBJECT-TYPE
+			    SYNTAX     OCTET STRING
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The original IP address of the session endpoint that
+			             lies in the private network."
+			    ::= { nmsNatSessionEntryJD 4 }
+          
+         	 nmsNatSessionIntPortJD OBJECT-TYPE
+			    SYNTAX     INTEGER
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The original transport port of the session endpoint that
+			             belongs to the private network. If this is an ICMP session
+			             then the value is the ICMP request ID."
+			    ::= { nmsNatSessionEntryJD 5 }
+
+		  nmsNatSessionExtAddrJD OBJECT-TYPE
+			    SYNTAX     IpAddress
+			    ACCESS	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The translated IP address of the session endpoint that
+			             lies in the private network."
+			    ::= { nmsNatSessionEntryJD 6 }     
+		  
+		  nmsNatSessionExtPortJD OBJECT-TYPE
+			    SYNTAX     INTEGER
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			    		"The original IP address of the session endpoint that lies
+             			in the public network."
+			    ::= { nmsNatSessionEntryJD 7 }    
+		  
+		  nmsNatSessionRemoteAddrJD OBJECT-TYPE
+			    SYNTAX     IpAddress
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The original IP address of the session endpoint that lies
+			             in the public network."
+    			::= { nmsNatSessionEntryJD 8 }
+
+		  nmsNatSessionRemotePortJD OBJECT-TYPE
+			    SYNTAX     INTEGER
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The original transport port of the session endpoint that
+			             belongs to the public network. If this is an ICMP
+			             session then the value contains the ICMP request ID."
+			    ::= { nmsNatSessionEntryJD 9 } 
+			    
+		  nmsNatSessionUpTimeJD OBJECT-TYPE
+			    SYNTAX     TimeTicks
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The up time of this session in one-hundredths of a
+			             second."
+			    ::= { nmsNatSessionEntryJD 10 }
+		  
+		  nmsNatSessionIdletimeJD OBJECT-TYPE
+			    SYNTAX     TimeTicks
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The time in one-hundredths of a second since a packet
+			             belonging to this session was last detected."
+			    ::= { nmsNatSessionEntryJD 11 }
+          
+          	nmsNatSessionContextJD OBJECT-TYPE
+	              SYNTAX  DisplayString (SIZE (0..255))
+	              ACCESS  read-only
+	              STATUS  mandatory
+	              DESCRIPTION
+	                      "A textual string containing information about the
+	                      protocol context of the session."
+	              ::= { nmsNatSessionEntryJD 12 }
+			
+			
+			-- wangba mib .3		                               
+          nmsNATLimitedTotalSessions OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of the total permitted session in the NAPT rule."
+              ::= { nmsNatObjects 3 }   
+              
+                       -- .4.1.1 - .4.1.14
+          NMSNatSessionEntry ::= SEQUENCE {
+			    nmsNatSessionId                  OCTET STRING,
+			    nmsNatSessionProtocolType        OCTET STRING,
+			    nmsNatSessionDirection           OCTET STRING,	
+			    nmsNatSessionIntAddr			OCTET STRING,
+			    nmsNatSessionIntPort     		OCTET STRING,
+			    nmsNatSessionExtAddr			    OCTET STRING,
+			    nmsNatSessionExtPort             OCTET STRING,
+			    nmsNatSessionRemoteAddr      	OCTET STRING,
+			    nmsNatSessionRemotePort      	OCTET STRING,
+			    nmsNatSessionUpTime              OCTET STRING,
+			    nmsNatSessionIdletime		    OCTET STRING,
+			    nmsNatSessionContext             OCTET STRING,   
+			    nmsNATLimitedHostSessions		OCTET STRING,
+			    nmsNATHostFlows		OCTET STRING
+		  }
+		                         
+         nmsNatSessionTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF NMSNatSessionEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              		"The (conceptual) table containing one entry for each
+             		NAT session currently active on this NAT device."
+              ::= { nmsNatObjects 4 } 
+                                                
+          nmsNatSessionEntry OBJECT-TYPE
+              SYNTAX  NMSNatSessionEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              		"An entry (conceptual row) containing information
+             		about an active NAT session on this NAT device."
+              INDEX   { nmsNatSessionId }
+              ::= { nmsNatSessionTable 1 }
+		       
+		  nmsNatSessionId OBJECT-TYPE
+			    SYNTAX     OCTET STRING 
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The session ID for this NAT session."
+			    ::= { nmsNatSessionEntry 1 }
+			    
+		  nmsNatSessionProtocolType OBJECT-TYPE
+			    SYNTAX     OCTET STRING
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The protocol type of this session.
+			
+			             TCP and UDP sessions are uniquely identified by the
+			             tuple of (source IP address, source UDP/TCP port,
+			             destination IP address, destination TCP/UCP port).
+			             ICMP query sessions are identified by the tuple of
+			             (source IP address, ICMP query ID, destination IP
+			             address)."
+			    ::= { nmsNatSessionEntry 2 }
+			    
+		  nmsNatSessionDirection OBJECT-TYPE
+			    SYNTAX     OCTET STRING
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The direction of this session with respect to the
+			             local network. 'inbound' indicates that this session
+			             was initiated from the public network into the private
+			             network. 'outbound' indicates that this session was
+			             initiated from the private network into the public
+			             network."
+			    ::= { nmsNatSessionEntry 3 }
+
+		  nmsNatSessionIntAddr OBJECT-TYPE
+			    SYNTAX     OCTET STRING
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The original IP address of the session endpoint that
+			             lies in the private network."
+			    ::= { nmsNatSessionEntry 4 }
+          
+         	 nmsNatSessionIntPort OBJECT-TYPE
+			    SYNTAX     OCTET STRING
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The original transport port of the session endpoint that
+			             belongs to the private network. If this is an ICMP session
+			             then the value is the ICMP request ID."
+			    ::= { nmsNatSessionEntry 5 }
+
+		  nmsNatSessionExtAddr OBJECT-TYPE
+			    SYNTAX     OCTET STRING
+			    ACCESS	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The translated IP address of the session endpoint that
+			             lies in the private network."
+			    ::= { nmsNatSessionEntry 6 }     
+		  
+		  nmsNatSessionExtPort OBJECT-TYPE
+			    SYNTAX     OCTET STRING
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			    		"The original IP address of the session endpoint that lies
+             			in the public network."
+			    ::= { nmsNatSessionEntry 7 }    
+		  
+		  nmsNatSessionRemoteAddr OBJECT-TYPE
+			    SYNTAX     OCTET STRING
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The original IP address of the session endpoint that lies
+			             in the public network."
+    			::= { nmsNatSessionEntry 8 }
+
+		  nmsNatSessionRemotePort OBJECT-TYPE
+			    SYNTAX     OCTET STRING
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The original transport port of the session endpoint that
+			             belongs to the public network. If this is an ICMP
+			             session then the value contains the ICMP request ID."
+			    ::= { nmsNatSessionEntry 9 } 
+			    
+		  nmsNatSessionUpTime OBJECT-TYPE
+			    SYNTAX     OCTET STRING
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The up time of this session in one-hundredths of a
+			             second."
+			    ::= { nmsNatSessionEntry 10 }
+		  
+		  nmsNatSessionIdletime OBJECT-TYPE
+			    SYNTAX     OCTET STRING
+			    ACCESS 	   read-only
+			    STATUS     current
+			    DESCRIPTION
+			            "The time in one-hundredths of a second since a packet
+			             belonging to this session was last detected."
+			    ::= { nmsNatSessionEntry 11 }
+          
+          	nmsNatSessionContext OBJECT-TYPE
+	              SYNTAX  OCTET STRING
+	              ACCESS  read-only
+	              STATUS  mandatory
+	              DESCRIPTION
+	                      "A textual string containing information about the
+	                      protocol context of the session."
+	              ::= { nmsNatSessionEntry 12 }
+	              
+          	nmsNATLimitedHostSessions OBJECT-TYPE
+	              SYNTAX  OCTET STRING
+	              ACCESS  read-write
+	              STATUS  mandatory
+	              DESCRIPTION
+	                      "The number of the permitted single session in the NAPT rule."
+	              ::= { nmsNatSessionEntry 13 }  
+		
+		nmsNATHostFlows OBJECT-TYPE
+	              SYNTAX  OCTET STRING
+	              ACCESS  read-only
+	              STATUS  mandatory
+	              DESCRIPTION
+	                      "The bytes number of each link during one period."
+	              ::= { nmsNatSessionEntry 14 } 
+	         
+         nmsNatCpuPercent OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of the total cpu usage percent."
+              ::= { nmsNatObjects 5 }
+              
+         nmsNatHeapPercent OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of the total heap allocation percent."
+              ::= { nmsNatObjects 6 }
+              
+         nmsNatMblkPercent OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of the total Mblk allocation percent."
+              ::= { nmsNatObjects 7 }
+              
+         nmsNathostlimitset OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "set the count that nat can service for inside users"
+              ::= { nmsNatObjects 8 }
+              
+         nmsNathostlimitcurrent OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "currently, nat service how many inside user."
+              ::= { nmsNatObjects 9 }
+              
+         nmsNathostlimitenable OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "enable limit-user function."
+              ::= { nmsNatObjects 10 }
+              
+         nmsNatIf OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "the ifindex of NAT Interface."
+              ::= { nmsNatObjects 11 }
+              
+	-- End of table
+
+
+END

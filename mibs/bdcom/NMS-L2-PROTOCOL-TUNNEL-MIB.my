@@ -1,0 +1,71 @@
+-- *****************************************************************
+-- NMS L2 Protocol Tunnel MIB
+--   
+-- 2013-02-21, Lysh
+--
+-- ****************************************************************
+
+NMS-L2-PROTOCOL-TUNNEL-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE
+            FROM SNMPv2-SMI
+        ifIndex
+            FROM IF-MIB
+        nmsMgmt
+            FROM NMS-SMI;
+
+nmsL2ProtocolTunnelMIB MODULE-IDENTITY
+    LAST-UPDATED    "201302210000Z"
+    ORGANIZATION    ""
+    CONTACT-INFO    ""
+    DESCRIPTION
+        "This MIB module is for layer 2 protocol tunneling configurations.
+
+        Layer 2 protocol tunneling function allows separate user networks
+        to be considered as a single LAN. These user networks are connected
+        via a switched network, which is running L2PT, and transparently
+        forwads the specified l2 protocol data units(PDUs) from one user
+        network to another."
+        ::= { nmsMgmt 357 }
+
+l2ptMIBObjects  OBJECT IDENTIFIER ::= { nmsL2ProtocolTunnelMIB 1 }
+
+l2ptGlobal  OBJECT IDENTIFIER ::= { l2ptMIBObjects 1 }
+
+l2ptIntfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF L2ptIntfEntry
+    ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the L2 protocol tunnel configuration of interfaces.
+        Currently supported L2 PDU type is STP."
+    ::= { l2ptMIBObjects 2 }
+
+l2ptIntfEntry OBJECT-TYPE
+    SYNTAX      L2ptIntfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "L2 protocol tunnel configuration of interfaces."
+    INDEX       { ifIndex }
+    ::= { l2ptIntfTable 1 }
+
+L2ptIntfEntry ::= SEQUENCE {
+    l2ptIntfStpTnl      INTEGER
+}
+
+l2ptIntfStpTnl OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if the tunneling of STP BPDUs is enabled on this interface."
+    DEFVAL      { disabled }
+    ::= { l2ptIntfEntry 1 }
+
+END

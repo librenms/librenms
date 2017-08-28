@@ -17,6 +17,74 @@
  * 3. Oh, and dbFetchAll() is now dbFetchRows()
  */
 
+use LibreNMS\Exceptions\DatabaseConnectException;
+
+function dbIsConnected()
+{
+    global $database_link;
+    if (empty($database_link)) {
+        return false;
+    }
+
+    return mysqli_ping($database_link);
+}
+
+/**
+ * Connect to the database.
+ * Will use global $config variables if they are not sent: db_host, db_user, db_pass, db_name, db_port, db_socket
+ *
+ * @param string $host
+ * @param string $user
+ * @param string $password
+ * @param string $database
+ * @param string $port
+ * @param string $socket
+ * @return mysqli
+ * @throws DatabaseConnectException
+ */
+function dbConnect($host = null, $user = '', $password = '', $database = '', $port = null, $socket = null)
+{
+    global $config, $database_link;
+
+    if (dbIsConnected()) {
+        return $database_link;
+    }
+
+    $host = empty($host) ? $config['db_host'] : $host;
+    $user = empty($user) ? $config['db_user'] : $user;
+    $password = empty($password) ? $config['db_pass'] : $password;
+    $database = empty($database) ? $config['db_name'] : $database;
+    $port = empty($port) ? $config['db_port'] : $port;
+    $socket = empty($socket) ? $config['db_socket'] : $socket;
+
+    $database_link = mysqli_connect('p:' . $host, $user, $password, null, $port, $socket);
+    mysqli_options($database_link, MYSQLI_OPT_LOCAL_INFILE, false);
+    if ($database_link === false) {
+        $error = mysqli_connect_error();
+        if ($error == 'No such file or directory') {
+            $error = 'Could not connect to ' . $host;
+        }
+        throw new DatabaseConnectException($error);
+    }
+
+    $database_db = mysqli_select_db($database_link, $config['db_name']);
+    if (!$database_db) {
+        $db_create_sql = "CREATE DATABASE " . $config['db_name'] . " CHARACTER SET utf8 COLLATE utf8_unicode_ci";
+        mysqli_query($database_link, $db_create_sql);
+        $database_db = mysqli_select_db($database_link, $database);
+    }
+
+    if (!$database_db) {
+        throw new DatabaseConnectException("Could not select database: $database. " . mysqli_error($database_link));
+    }
+
+    dbQuery("SET NAMES 'utf8'");
+    dbQuery("SET CHARACTER SET 'utf8'");
+    dbQuery("SET COLLATION_CONNECTION = 'utf8_unicode_ci'");
+
+    return $database_link;
+}
+
 /*
  * Performs a query using the given string.
  * Used by the other _query functions.
@@ -42,7 +110,7 @@ function dbQuery($sql, $parameters = array())
     $result = mysqli_query($database_link, $fullSql);
     if (!$result) {
         $mysql_error = mysqli_error($database_link);
-        if ((in_array($config['mysql_log_level'], array('INFO', 'ERROR')) && !preg_match('/Duplicate entry/', $mysql_error)) || (in_array($config['mysql_log_level'], array('DEBUG')))) {
+        if (isset($config['mysql_log_level']) && ((in_array($config['mysql_log_level'], array('INFO', 'ERROR')) && !preg_match('/Duplicate entry/', $mysql_error)) || in_array($config['mysql_log_level'], array('DEBUG')))) {
             if (!empty($mysql_error)) {
                 logfile(date($config['dateformat']['compact']) . " MySQL Error: $mysql_error ($fullSql)");
             }
@@ -292,7 +360,7 @@ function dbFetchRow($sql = null, $parameters = array(), $nocache = false)
 {
     global $config;
 
-    if ($config['memcached']['enable'] && $nocache === false) {
+    if (isset($config['memcached']['enable']) && $config['memcached']['enable'] && $nocache === false) {
         $result = $config['memcached']['resource']->get(hash('sha512', $sql.'|'.serialize($parameters)));
         if (!empty($result)) {
             return $result;
@@ -307,7 +375,7 @@ function dbFetchRow($sql = null, $parameters = array(), $nocache = false)
 
         recordDbStatistic('fetchrow', $time_start);
 
-        if ($config['memcached']['enable'] && $nocache === false) {
+        if (isset($config['memcached']['enable']) && $config['memcached']['enable'] && $nocache === false) {
             $config['memcached']['resource']->set(hash('sha512', $sql.'|'.serialize($parameters)), $row, $config['memcached']['ttl']);
         }
         return $row;
@@ -508,3 +576,15 @@ function dbRollbackTransaction()
     global $database_link;
     mysqli_query($database_link, 'rollback');
 }//end dbRollbackTransaction()
+
+/**
+ * Generate a string of placeholders to pass to fill in a list
+ * result will look like this: (?, ?, ?, ?)
+ *
+ * @param $count
+ * @return string placholder list
+ */
+function dbGenPlaceholders($count)
+{
+    return '(' . implode(',', array_fill(0, $count, '?')) . ')';
+}

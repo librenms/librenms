@@ -9,15 +9,13 @@ source: Installation/Installation-CentOS-7-Apache.md
 ```bash
 yum install mariadb-server mariadb
 systemctl restart mariadb
-mysql -uroot -p
+mysql -uroot
 ```
 
 ```sql
-CREATE DATABASE librenms;
-GRANT ALL PRIVILEGES ON librenms.*
-  TO 'librenms'@'localhost'
-  IDENTIFIED BY '<password>'
-;
+CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
 FLUSH PRIVILEGES;
 exit
 ```
@@ -29,9 +27,13 @@ Within the [mysqld] section please add:
 ```bash
 innodb_file_per_table=1
 sql-mode=""
+lower_case_table_names=0
 ```
 
-```systemctl restart mariadb```
+```
+systemctl enable mariadb  
+systemctl restart mariadb
+```
 
 ### Web Server ###
 
@@ -42,10 +44,7 @@ yum install epel-release
 rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 
-yum install php70w php70w-cli php70w-gd php70w-mysql php70w-snmp php70w-pear php70w-curl php70w-common httpd net-snmp mariadb ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils cronie php70w-mcrypt fping git
-
-pear install Net_IPv4-1.3.4
-pear install Net_IPv6-1.2.2b2
+yum install php70w php70w-cli php70w-gd php70w-mysql php70w-snmp php70w-curl php70w-common httpd net-snmp mariadb ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils cronie php70w-mcrypt fping git
 ```
 
 In `/etc/php.ini` ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
@@ -100,9 +99,18 @@ Add the following config:
     yum install policycoreutils-python
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/logs(/.*)?'
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/logs(/.*)?'
+    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/rrd(/.*)?'
+    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/rrd(/.*)?'
     restorecon -RFvv /opt/librenms/logs/
     setsebool -P httpd_can_sendmail=1
-    sesetbool -P httpd_can_network_connect=1
+    setsebool -P httpd_can_network_connect=1
+```
+
+#### Allow access through firewall
+
+```bash
+firewall-cmd --zone public --add-service http
+firewall-cmd --permanent --zone public --add-service http
 ```
 
 #### Restart Web server

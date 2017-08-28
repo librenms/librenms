@@ -1,0 +1,205 @@
+-- *****************************************************************
+-- NMS-REMOTE-PING-MIB.my: NMS Remote Ping MIB
+--
+-- November 2007
+-- Edit by LIUQIANG
+-- Copyright (c) 2007 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-REMOTE-PING-MIB DEFINITIONS ::= BEGIN 
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, TimeStamp,
+    TruthValue                                  FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsMgmt, nmslocal                                   	FROM NMS-SMI
+    IpAddress                                   FROM RFC1155-SMI
+    DisplayString				FROM RFC1213-MIB;
+
+
+--definition of remote ping set and trap related values
+
+               remoteping         OBJECT IDENTIFIER ::= { nmslocal 221 }
+               
+               EntryStatus ::= INTEGER
+                         { valid(1),
+                           createRequest(2),
+                           underCreation(3),
+                           invalid(4)
+                         }
+                         
+               RPingResult ::= INTEGER
+                         {
+                           reply(1)
+                           timeOut(2)
+                           ttlExpire(3)
+                           unReachable(4)	
+                         }          
+               
+
+               rPingSetTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF RPingSetTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of remote ping set entries."
+                   ::= { remoteping 1 }
+
+               rPingSetTableEntry OBJECT-TYPE
+                   SYNTAX  RPingSetTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of remote ping parameters to be set in the
+                            NMS device."
+                   INDEX { srcIpAddress }
+               ::= { rPingSetTable 1 }
+
+               RPingSetTableEntry ::=
+                   SEQUENCE {
+                       srcIpAddr
+                           IpAddress,
+                       waitTime
+                       	   INTEGER (1..3600),
+                       dataSize
+                       	   INTEGER (36..20000),
+                       pkgNum
+                       	   INTEGER (1..200),
+                       rPingSetStatus
+                       	   EntryStatus
+                  }
+
+              srcIpAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  write-only
+                   STATUS  mandatory
+                    DESCRIPTION
+                      "The IP address of the server to ping."
+              	   ::= { rPingSetTableEntry 1 }
+
+               waitTime OBJECT-TYPE
+                   SYNTAX  INTEGER (0..3600)
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Timeout in seconds to wait for each reply."
+                   ::= { rPingSetTableEntry 2 }
+
+               dataSize OBJECT-TYPE
+                   SYNTAX  INTEGER (36..20000)
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Size of each package to ping."
+                   ::= { rPingSetTableEntry 3 }
+
+               pkgNum OBJECT-TYPE
+                   SYNTAX  INTEGER (1..200)
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of packages to ping."
+                   ::= { rPingSetTableEntry 4 }
+
+              rPingSetStatus OBJECT-TYPE
+                   SYNTAX  EntryStatus
+                   ACCESS  write-only
+                   STATUS  mandatory
+                    DESCRIPTION
+                      "The status of the parameters to be set."
+              	   ::= { rPingSetTableEntry 5 }
+
+
+
+
+               rPingResultTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF RPingResultTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of remote ping result value entries."
+                   ::= { remoteping 2 }
+
+               rPingResultTableEntry OBJECT-TYPE
+                   SYNTAX  RPingResultTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of remote ping result value from 
+                            NMS device."
+                   INDEX { pingIpAddr }
+               ::= { rPingResultTable 1 }
+
+               RPingResultTableEntry ::=
+                   SEQUENCE {
+                       pingIpAddr
+                           IpAddress,
+                       pingResult
+                       	   RPingResult,
+                       pkgSize
+                       	   INTEGER (36..20000),
+                       timeOut
+                       	   INTEGER (1..3600)
+                  }
+
+              pingIpAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                    DESCRIPTION
+                      "The IP address of the server to ping."
+              	   ::= { rPingResultTableEntry 1 }
+
+
+               pingResult OBJECT-TYPE
+                   SYNTAX  RPingResult
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "result value of remote ping ."
+                   ::= { rPingResultTableEntry 2 }
+                   
+               
+               pkgSize OBJECT-TYPE
+                   SYNTAX  INTEGER (36..20000)
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Size of each package to ping."
+                   ::= { rPingResultTableEntry 3 }
+
+               timeOut OBJECT-TYPE
+                   SYNTAX  INTEGER (0..3600)
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Timeout in seconds to wait for each reply."
+                   ::= { rPingResultTableEntry 4 }
+
+
+-- Notifications
+	rPingResultNotifications OBJECT IDENTIFIER
+                                ::= { remoteping 3 }
+
+
+	rPingNotification NOTIFICATION-TYPE
+    		OBJECTS {
+        		pingIpAddr,
+        		pingResult,
+        		pkgSize,
+        		timeOut
+        		
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when a user set a ping operation to this device. Once a ping response returns, there is a trap to generate. "
+    		::= { rPingResultNotifications 1 }
+
+
+
+
+END

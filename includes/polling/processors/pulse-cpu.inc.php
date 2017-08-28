@@ -14,10 +14,8 @@
 
 echo 'Pulse Secure CPU Usage';
 
-if ($device['os'] == 'pulse') {
-    $usage = str_replace('"', "", snmp_get($device, 'PULSESECURE-PSG-MIB::iveCpuUtil.0', '-OvQ'));
+$usage = str_replace('"', "", snmp_get($device, 'PULSESECURE-PSG-MIB::iveCpuUtil.0', '-OvQ'));
 
-    if (is_numeric($usage)) {
-        $proc = ($usage * 100);
-    }
+if (is_numeric($usage)) {
+    $proc = ($usage * 100);
 }

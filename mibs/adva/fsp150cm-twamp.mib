@@ -1,0 +1,3746 @@
+F3-TWAMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, Unsigned32
+             FROM SNMPv2-SMI
+    DateAndTime, DisplayString, TruthValue, RowStatus, StorageType, 
+    MacAddress, VariablePointer, TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    IpVersion, PerfCounter64, VlanId, VlanPriority
+             FROM CM-COMMON-MIB
+    Ipv6Address
+             FROM  IPV6-TC
+    IpMode
+             FROM  CM-IP-MIB
+    AdminState, OperationalState, SecondaryState, VlanId, VlanPriority,
+    CmPmBinAction
+             FROM  CM-COMMON-MIB
+    fsp150cm
+             FROM  ADVA-MIB
+    neIndex
+             FROM  CM-ENTITY-MIB;
+
+f3TwampMIB MODULE-IDENTITY
+    LAST-UPDATED        "201406040000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Sridhara Gangula
+                     ADVA Optical Networking, Inc.
+                Tel: +1 972 759 1229
+             E-mail: sgangula@advaoptical.com
+             Postal: 2301 N. Greenville Ave., #300
+                     Richardson, TX-75025, U.S.A
+
+                     Marek Romaniuk
+                     ADVA Optical Networking, Inc.
+                Tel: +48 58 7716 414
+             E-mail: mromaniuk@advaoptical.com
+             Postal: ul. Slaska 35/37
+                     81-310 Gdynia, Poland"
+
+    DESCRIPTION
+            "This module defines the TWAMP MIB definitions 
+             used by the F3 (FSP150CM/CC) product lines.
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201406040000Z"
+    DESCRIPTION
+        "
+         Notes from release 201402250000Z,
+         (1) First version: Only with Responder-side tables." 
+
+    ::= {fsp150cm 33}
+
+-- 
+-- OID definitions
+-- 
+
+f3TwampConfigObjects            OBJECT IDENTIFIER ::= {f3TwampMIB 1}
+f3TwampCounterObjects           OBJECT IDENTIFIER ::= {f3TwampMIB 2}
+f3TwampActionObjects            OBJECT IDENTIFIER ::= {f3TwampMIB 3}
+f3TwampConformance              OBJECT IDENTIFIER ::= {f3TwampMIB 4}
+f3TwampNotifications            OBJECT IDENTIFIER ::= {f3TwampMIB 5}
+
+--
+-- Textual Conventions 
+-- 
+
+TwampControlClientStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "TWAMP Control Client entity state machine status."
+    SYNTAX     INTEGER {
+                 init (1),
+                 twampControlDisabled (2),
+                 twampControlEnabled (3),
+                 waitForConnectionAck (4)
+               }
+
+TwampServerStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "TWAMP Server entity state machine status."
+    SYNTAX     INTEGER {
+                 init (1),
+                 twampControlDisabled (2),
+                 twampControlEnabled (3)
+               }
+
+TwampClientConnStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "TWAMP Control Client Connection entity state machine status."
+    SYNTAX     INTEGER {
+                 init (1),
+                 waitingForServerGreeting (2),
+                 waitingForServerStart (3),
+                 requestSessions (4),
+                 waitingForStartAck (5),
+                 testInProgress (6),
+                 waitingForTestCompletions (7)
+               }
+
+TwampServerConnStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "TWAMP Server Connection entity state machine status."
+    SYNTAX     INTEGER {
+                 init (1),
+                 waitingForSessions (2),
+                 testInProgress (3),
+                 waitingForSessionIntransitTimeouts (4),
+                 end (5)
+               }
+
+TwampSessionSenderStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "TWAMP Session Sender entity state machine status."
+    SYNTAX     INTEGER {
+                 init (1),
+                 idle (2),
+                 testInProgress (3),
+                 waitingForTestCompletion (4)
+               }
+
+TwampSessionReflectorStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "TWAMP Session Reflector entity state machine status."
+    SYNTAX     INTEGER {
+                 init (1),
+                 testReady (2),
+                 waitingForIntransitTimeout (3),
+                 end (4)
+               }
+
+TwampSessionStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "TWAMP Reflector Session entity state machine status."
+    SYNTAX     INTEGER {
+                 init (1),
+                 testInProgress (2),
+                 idle (3)
+               }
+
+TwampPktSchedType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "TWAMP Packet Scheduling involves multiple slots and each slot
+         can be fixed packet interval or exponential pseudo random packet
+         interval."
+    SYNTAX     INTEGER {
+                 fixed (1),
+                 expPseudoRandom (2)
+               }
+
+TwampTestPattern ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "TWAMP test packet payload pattern:
+            allZeros - TWAMP Test packet payload shall be all ZEROs"
+    SYNTAX     INTEGER {
+                 allZeros (1)
+               }
+
+TwampPmIntervalType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "TWAMP PM Interval Types."
+    SYNTAX     INTEGER {
+                 curr (1),
+                 rollover (2)
+               }
+
+TwampHistoryIntervalType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "TWAMP Performance Monitoring interval type."
+    SYNTAX     INTEGER {
+                 interval1min (1),
+                 interval5min (2),
+                 interval10min (3),
+                 interval15min (4),
+                 interval60min (5)
+               }
+
+TwampDistStatsType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Indicates the TWAMP Statistics Distribution Type."
+    SYNTAX       INTEGER {
+                   twoWayPd (1),
+                   oneWayS2RPd (2),
+                   oneWayR2SPd (3),
+                   oneWayS2RPdv (4),
+                   oneWayR2SPdv (5)
+                 }
+
+TwampStartTimeType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "TWAMP Test Session start time type:
+            immediate - This indicates to start now
+            relative - This is the time relative to current time
+            fixed - This is the absolute wall clock start time"
+    SYNTAX     INTEGER {
+                 immediate (1),
+                 relative (2),
+                 fixed (3)
+               }
+
+TwampServerAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "User action initiated on Twamp Server"
+    SYNTAX       INTEGER {
+                   noAction (1),
+                   addSessReflector (2),
+                   rmvSessReflector (3)
+                 }
+
+TwampControlClientAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "User action initiated on Twamp Control Client"
+    SYNTAX       INTEGER {
+                   noAction (1),
+                   addSessSender (2),
+                   rmvSessSender (3),
+                   startSessions (4),
+                   stopSessions (5)
+                 }
+
+
+TwampSessionAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "User action initiated on Twamp Session"
+    SYNTAX       INTEGER {
+                   noAction (1),
+                   clearSequenceNumber (2)
+                 }
+
+--
+--  TWAMP IP Interface
+--
+
+f3TwampIpInterfaceTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3TwampIpInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to TWAMP IP Interfaces
+             that are used for the TWAMP. These IP interfaces facilitate
+             generation and reception of TWAMP Control and Test packets."
+    ::= { f3TwampConfigObjects 1 }
+
+f3TwampIpInterfaceEntry OBJECT-TYPE
+    SYNTAX      F3TwampIpInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3TwampIpInterfaceTable."
+    INDEX { f3TwampIpInterfaceName }
+    ::= { f3TwampIpInterfaceTable 1 }
+
+F3TwampIpInterfaceEntry ::= SEQUENCE {
+    f3TwampIpInterfaceName         DisplayString,
+    f3TwampIpInterfacePort         VariablePointer,
+    f3TwampIpInterfaceIpMode       IpMode,
+    f3TwampIpInterfaceIpv4Address  IpAddress,
+    f3TwampIpInterfaceIpv4Mask     IpAddress,
+    f3TwampIpInterfaceMtu          Integer32,
+    f3TwampIpInterfaceStorageType  StorageType,
+    f3TwampIpInterfaceRowStatus    RowStatus
+}
+
+f3TwampIpInterfaceName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (1..15))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "Name of the TWAMP IP interface."
+    ::= { f3TwampIpInterfaceEntry 1 }
+
+f3TwampIpInterfacePort OBJECT-TYPE
+    SYNTAX  VariablePointer
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "This is the physical or logical port on which the TWAMP
+        IP Interface is associated with."
+    ::= { f3TwampIpInterfaceEntry 2 }
+
+f3TwampIpInterfaceIpMode OBJECT-TYPE
+    SYNTAX  IpMode
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "This object is the ipmode of TWAMP IP Interface and indicates if
+        the interface is IPv4-only or IPv4-and-IPv6.
+        Currently it is read-only and will be set to IPv4 Only."
+    ::= { f3TwampIpInterfaceEntry 3 }
+
+f3TwampIpInterfaceIpv4Address OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "IPv4 Address of the TWAMP IP Interface." 
+    ::= { f3TwampIpInterfaceEntry 4 }
+
+f3TwampIpInterfaceIpv4Mask OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "IPv4 Mask of the TWAMP IP Interface." 
+    ::= { f3TwampIpInterfaceEntry 5 }
+
+f3TwampIpInterfaceMtu OBJECT-TYPE
+    SYNTAX   Integer32 (256..1500)
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "TWAMP IP Interface MTU."
+    DEFVAL { 1500 }
+    ::= { f3TwampIpInterfaceEntry 6 }
+
+f3TwampIpInterfaceStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The type of storage configured for this entry."
+    ::= { f3TwampIpInterfaceEntry 7 }
+
+f3TwampIpInterfaceRowStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+         "The status of this row.  An entry MUST NOT exist in the 
+          active state unless all objects in the entry have an 
+          appropriate value, as described
+          in the description clause for each writable object.
+
+          The values of f3TwampIpInterfaceRowStatus supported are
+          createAndGo(4) and destroy(6).  All mandatory attributes
+          must be specified in a single SNMP SET request with
+          f3TwampIpInterfaceRowStatus value as createAndGo(4).
+          Upon successful row creation, this object has a
+          value of active(1).
+          
+          The f3TwampIpInterfaceRowStatus object may be modified if
+          the associated instance of this object is equal to active(1)."
+    ::= { f3TwampIpInterfaceEntry 8 }
+
+--
+--  TWAMP Server
+--
+
+f3TwampServerTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3TwampServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to TWAMP Server entities.
+             This entity performs the functions of TWAMP Server when TWAMP
+             Control protocol is enabled as defined in RFC 5357. This entity
+             is created even when TWAMP Control is disabled as a container
+             for Session Reflectors."
+    ::= { f3TwampConfigObjects 2 }
+
+f3TwampServerEntry OBJECT-TYPE
+    SYNTAX      F3TwampServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3TwampServerTable."
+    INDEX { neIndex, f3TwampServerIndex }
+    ::= { f3TwampServerTable 1 }
+
+F3TwampServerEntry ::= SEQUENCE {
+    f3TwampServerIndex                Integer32,
+    f3TwampServerAdminState           AdminState,
+    f3TwampServerOperationalState     OperationalState,
+    f3TwampServerSecondaryState       SecondaryState,
+    f3TwampServerAlias                DisplayString,
+    f3TwampServerPort                 VariablePointer,
+    f3TwampServerStatus               TwampServerStatus,
+    f3TwampServerSessionIdleTimeout   Unsigned32,
+    f3TwampServerSessionAgingTimeout  Unsigned32,
+    f3TwampServerActionObject         VariablePointer,
+    f3TwampServerAction               TwampServerAction,
+    f3TwampServerStorageType          StorageType,
+    f3TwampServerRowStatus            RowStatus
+}
+
+f3TwampServerIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..500)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An integer index value used to uniquely identify
+             a TWAMP Server under the NE."
+    ::= { f3TwampServerEntry 1 }
+
+f3TwampServerAdminState OBJECT-TYPE
+    SYNTAX      AdminState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "All the state related attributes are added to support this entity
+        being in outage state. But AdminState is always InService and is
+        not editable."
+    ::= { f3TwampServerEntry 2 }
+
+f3TwampServerOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Operational state can take Normal or Outage. When the TWAMP entity
+        is operational then this is Normal. In some situations like a Card
+        is unplugged and TWAMP entity is not operational this attribute goes
+        to Outage state."
+    ::= { f3TwampServerEntry 3 }
+
+f3TwampServerSecondaryState OBJECT-TYPE
+    SYNTAX      SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Secondary state can be Active or SGEO. When Operational state is
+        Normal this is Active. When Operational State is Outage then this
+        is SGEO."
+    ::= { f3TwampServerEntry 4 }
+
+f3TwampServerAlias OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..64))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "An alias associated with the TWAMP Server."
+    ::= { f3TwampServerEntry 5 }
+
+f3TwampServerPort OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This is the physical or logical port on which the Server and the
+        corresponding Session Reflectors are associated with."
+     ::= { f3TwampServerEntry 6 }
+
+f3TwampServerStatus OBJECT-TYPE
+    SYNTAX     TwampServerStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "This indicates the current state of the Server state machine."
+    ::= { f3TwampServerEntry 7 }
+
+f3TwampServerSessionIdleTimeout OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "When a TWAMP Test packet Is not received for this timeout period the
+        TWAMP Session will go to IDLE state where Aging timer is started. This
+        time is specified in seconds."
+    DEFVAL { 5 }
+    ::= { f3TwampServerEntry 8 }
+
+f3TwampServerSessionAgingTimeout OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "After a Session goes into IDLE state this timer with this timeout
+        is started and on expiry the Session will terminate. This
+        time is specified in seconds."
+    DEFVAL { 900 }
+    ::= { f3TwampServerEntry 9 }
+
+f3TwampServerActionObject OBJECT-TYPE
+    SYNTAX      VariablePointer 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "Object identfier used to specify the OID of a Session Reflector on which 
+          f3TwampServerAction should occur. Applicable for addSessReflector 
+          and rmvSessReflector actions."
+    ::= { f3TwampServerEntry 10 }
+
+f3TwampServerAction OBJECT-TYPE
+    SYNTAX      TwampServerAction 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "User action performed on this Twamp Server instance.
+          For addSessReflector and rmvSessReflector actions 
+          f3TwampServerActionObject has to be specified prior 
+          to setting this object."
+    ::= { f3TwampServerEntry 11 }
+
+f3TwampServerStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The type of storage configured for this entry."
+    ::= { f3TwampServerEntry 12 }
+
+f3TwampServerRowStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+         "The status of this row.  An entry MUST NOT exist in the 
+          active state unless all objects in the entry have an 
+          appropriate value, as described
+          in the description clause for each writable object.
+
+          The values of f3TwampServerRowStatus supported are
+          createAndGo(4) and destroy(6).  All mandatory attributes
+          must be specified in a single SNMP SET request with
+          f3TwampServerRowStatus value as createAndGo(4).
+          Upon successful row creation, this object has a
+          value of active(1).
+          
+          The f3TwampServerRowStatus object may be modified if
+          the associated instance of this object is equal to active(1)."
+    ::= { f3TwampServerEntry 13 }
+
+--
+--  TWAMP Server Session Reflector List
+--
+
+f3TwampServerSessionReflectorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3TwampServerSessionReflectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to Session Reflector entities
+             associated with a TWAMP Server."
+    ::= { f3TwampConfigObjects 3 }
+
+f3TwampServerSessionReflectorEntry OBJECT-TYPE
+    SYNTAX      F3TwampServerSessionReflectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3TwampServerSessionReflectorTable."
+    INDEX { neIndex, f3TwampServerIndex, f3TwampServerSessionReflectorIndex }
+    ::= { f3TwampServerSessionReflectorTable 1 }
+
+F3TwampServerSessionReflectorEntry ::= SEQUENCE {
+    f3TwampServerSessionReflectorIndex          Integer32,
+    f3TwampServerSessionReflector               VariablePointer
+}
+
+f3TwampServerSessionReflectorIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..500)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A unique index identifying the Session Reflector that is added to the Server.
+        Note that this is not f3TwampSessionReflectorIndex."
+    ::= { f3TwampServerSessionReflectorEntry 1 }
+
+f3TwampServerSessionReflector OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "This is the pointer to the Session Reflector added to the Server."
+    ::= { f3TwampServerSessionReflectorEntry 2 }
+
+--
+--  TWAMP Session Reflector
+--
+
+f3TwampSessionReflectorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3TwampSessionReflectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A list of entries corresponding to TWAMP Session Reflector entities.
+        This entity performs the functions of TWAMP Session Reflector which
+        is to reflect TWAMP Test packets."
+    ::= { f3TwampConfigObjects 4 }
+
+f3TwampSessionReflectorEntry OBJECT-TYPE
+    SYNTAX      F3TwampSessionReflectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3TwampSessionReflectorTable."
+    INDEX { neIndex, f3TwampSessionReflectorIndex }
+    ::= { f3TwampSessionReflectorTable 1 }
+
+F3TwampSessionReflectorEntry ::= SEQUENCE {
+    f3TwampSessionReflectorIndex             Integer32,
+    f3TwampSessionReflectorAdminState        AdminState,
+    f3TwampSessionReflectorOperationalState  OperationalState,
+    f3TwampSessionReflectorSecondaryState    SecondaryState,
+    f3TwampSessionReflectorAlias             DisplayString,
+    f3TwampSessionReflectorIpInterface       DisplayString,  
+    f3TwampSessionReflectorUdpPort           Unsigned32,
+    f3TwampSessionReflectorUseSenderSeqNum   TruthValue,
+    f3TwampSessionReflectorUserCreated       TruthValue,
+    f3TwampSessionReflectorStatus            TwampSessionReflectorStatus,
+    f3TwampSessionReflectorAssocServer       VariablePointer,
+    f3TwampSessionReflectorStorageType       StorageType,
+    f3TwampSessionReflectorRowStatus         RowStatus
+}
+
+f3TwampSessionReflectorIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..500)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An integer index value used to uniquely identify
+             a TWAMP Session Reflector under the NE."
+    ::= { f3TwampSessionReflectorEntry 1 }
+
+f3TwampSessionReflectorAdminState OBJECT-TYPE
+    SYNTAX      AdminState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "All the state related attributes are added to support this entity
+        being in outage state. But AdminState is always InService and is
+        not editable."
+    ::= { f3TwampSessionReflectorEntry 2 }
+
+f3TwampSessionReflectorOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Operational state can take Normal or Outage. When the TWAMP entity
+        is operational then this is Normal. In some situations like a Card
+        is unplugged and TWAMP entity is not operational this attribute goes
+        to Outage state."
+    ::= { f3TwampSessionReflectorEntry 3 }
+
+f3TwampSessionReflectorSecondaryState OBJECT-TYPE
+    SYNTAX      SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Secondary state can be Active or SGEO. When Operational state is
+        Normal this is Active. When Operational State is Outage then this
+        is SGEO."
+    ::= { f3TwampSessionReflectorEntry 4 }
+
+f3TwampSessionReflectorAlias   OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..64))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "An alias associated with the TWAMP Session Reflector."
+    ::= { f3TwampSessionReflectorEntry 5 }
+
+f3TwampSessionReflectorIpInterface OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (1..15))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This is the IP interface used by SessionReflector.
+        Session Reflector may use the same IP interface as any Control Client,
+        Server, Session Sender or Session Reflector in the system as long as
+        it has a unique UDP port."
+    ::= { f3TwampSessionReflectorEntry 6 }
+
+f3TwampSessionReflectorUdpPort OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..65535)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This is the UDP Port used by the Session Reflector for TWAMP Test.
+        The Combination of f3TwampSessionReflectorIpInterface and 
+        f3TwampSessionReflectorUdpPort shall be unique amongst all
+        Session Senders and Session Reflectors on the system."
+    ::= { f3TwampSessionReflectorEntry 7 }
+
+f3TwampSessionReflectorUseSenderSeqNum OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "TWAMP Light suggests that if the Session Reflector does not have
+        the knowledge of the session state the Reflector has to copy the
+        received sequence number into the Sequence Number field of the
+        reflected TWAMP Test packet.
+        This option is used if the Session Reflector is associated
+        with a TwampServer which has f3TwampServerControlEnabled to true.
+        If this is set to FALSE, the Session Reflector shall use its
+        sequence number which is not reset until it rolls over.
+        But there is an option for user to clear the sequence number."
+    DEFVAL { false }
+    ::= { f3TwampSessionReflectorEntry 8 }
+
+f3TwampSessionReflectorUserCreated OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "When Session Reflector is created by the user this attribute will
+        be set to true. If the Session Reflector is created as a consequence
+        of Session request from the Control Client the Session Reflector is
+        created by Server and this attribute is set to false."
+    ::= { f3TwampSessionReflectorEntry 9 }
+
+f3TwampSessionReflectorStatus OBJECT-TYPE
+    SYNTAX     TwampSessionReflectorStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "This indicates the current state of the Session Reflector state
+        machine."
+    ::= { f3TwampSessionReflectorEntry 10 }
+
+f3TwampSessionReflectorAssocServer OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "This is the pointer to the associated TWAMP Server."
+    ::= { f3TwampSessionReflectorEntry 11 }
+
+f3TwampSessionReflectorStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The type of storage configured for this entry."
+    ::= { f3TwampSessionReflectorEntry 12 }
+
+f3TwampSessionReflectorRowStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+         "The status of this row.  An entry MUST NOT exist in the 
+          active state unless all objects in the entry have an 
+          appropriate value, as described
+          in the description clause for each writable object.
+
+          The values of f3TwampSessionReflectorRowStatus supported are
+          createAndGo(4) and destroy(6).  All mandatory attributes
+          must be specified in a single SNMP SET request with
+          f3TwampSessionReflectorRowStatus value as createAndGo(4).
+          Upon successful row creation, this object has a
+          value of active(1).
+          
+          The f3TwampSessionReflectorRowStatus object may be modified if
+          the associated instance of this object is equal to active(1)."
+    ::= { f3TwampSessionReflectorEntry 13 }
+
+--
+--  TWAMP Session
+--
+
+f3TwampSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3TwampSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A list of entries corresponding to TWAMP Session entities.
+        This entity represents a TWAMP Test session between a remote
+        Session Sender and a local Session Reflector."
+    ::= { f3TwampConfigObjects 5 }
+
+f3TwampSessionEntry OBJECT-TYPE
+    SYNTAX      F3TwampSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3TwampSessionTable."
+    INDEX { neIndex, f3TwampSessionReflectorIndex,
+            f3TwampSessionSsIpv4Address, f3TwampSessionSsUdpPort }
+    ::= { f3TwampSessionTable 1 }
+
+F3TwampSessionEntry ::= SEQUENCE {
+    f3TwampSessionSsIpv4Address         IpAddress,
+    f3TwampSessionSsUdpPort             Unsigned32,
+    f3TwampSessionStatus                TwampSessionStatus,
+    f3TwampSessionVlanEnabled           TruthValue,  
+    f3TwampSessionOuterVlanEtherType    Unsigned32,
+    f3TwampSessionOuterVlanId           VlanId,
+    f3TwampSessionOuterVlanPriority     VlanPriority,
+    f3TwampSessionInnerVlanEnabled      TruthValue,  
+    f3TwampSessionInnerVlanEtherType    Unsigned32,
+    f3TwampSessionInnerVlanId           VlanId,
+    f3TwampSessionInnerVlanPriority     VlanPriority,
+    f3TwampSessionDscpValue             Unsigned32,
+    f3TwampSessionSequenceNumber        Unsigned32,
+    f3TwampSessionAction                TwampSessionAction
+}
+
+f3TwampSessionSsIpv4Address OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "IPv4 Address of the remote Session Sender. This with the
+        f3TwampSessionUdpPort uniquely identifies a TWAMP test session
+        between a remote Session Sender and local Session Reflector."
+    ::= { f3TwampSessionEntry 1 }
+
+f3TwampSessionSsUdpPort OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "This is the UDP Port of the remote Session Sender. This with the
+        f3TwampSessionIpv4Address uniquely identifies a TWAMP test session
+        between a remote Session Sender and local Session Reflector."
+    ::= { f3TwampSessionEntry 2 }
+
+f3TwampSessionStatus OBJECT-TYPE
+    SYNTAX     TwampSessionStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "This indicates the current state of the TWAMP Session state machine."
+     ::= { f3TwampSessionEntry 3 }
+
+f3TwampSessionVlanEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This indicates if the received TWAMP test packets have a VLAN Tag."
+     ::= { f3TwampSessionEntry 4 }
+  
+f3TwampSessionOuterVlanEtherType OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This is the VLAN Tag Ethertype (TPID) of the outer VLAN tag
+            of the received TWAMP test packets."
+     ::= { f3TwampSessionEntry 5 }
+
+f3TwampSessionOuterVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This is the outer VLAN ID of the received TWAMP test packets."
+     ::= { f3TwampSessionEntry 6 }
+
+f3TwampSessionOuterVlanPriority OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This is the outer VLAN Priority of the received TWAMP test packets."
+     ::= { f3TwampSessionEntry 7 }
+
+f3TwampSessionInnerVlanEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This indicates if the received TWAMP test packets have an inner
+            VLAN tag."
+     ::= { f3TwampSessionEntry 8 }
+  
+f3TwampSessionInnerVlanEtherType OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This is the VLAN Tag Ethertype (TPID) of the inner VLAN tag
+            of the received TWAMP test packets."
+     ::= { f3TwampSessionEntry 9 }
+
+f3TwampSessionInnerVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This is the inner VLAN ID of the received TWAMP test packets."
+     ::= { f3TwampSessionEntry 10 }
+
+f3TwampSessionInnerVlanPriority OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This is the inner VLAN Priority of the received TWAMP test packets."
+     ::= { f3TwampSessionEntry 11 }
+
+f3TwampSessionDscpValue OBJECT-TYPE 
+    SYNTAX      Unsigned32 (0..63)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This is the DSCP value in the received TWAMP test packets."
+     ::= { f3TwampSessionEntry 12 }
+
+f3TwampSessionSequenceNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This is the receive side sequence number that is set in the
+            reflected TWAMP Test packet. This is incremented for each
+            reflected TWAMP Test packet."
+     ::= { f3TwampSessionEntry 13 }
+
+f3TwampSessionAction OBJECT-TYPE
+    SYNTAX      TwampSessionAction 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the user action performed on this TWAMP Session instance."
+     ::= { f3TwampSessionEntry 14 }
+
+--
+--  TWAMP Control Client
+--
+
+f3TwampControlClientTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3TwampControlClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to TWAMP Control Client entities.
+             This entity performs the functions of TWAMP Control Client when TWAMP
+             Control protocol is enabled as defined in RFC 5357. This entity
+             is created even when TWAMP Control is disabled as a container
+             for Session Senders."
+    ::= { f3TwampConfigObjects 6 }
+
+f3TwampControlClientEntry OBJECT-TYPE
+    SYNTAX      F3TwampControlClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3TwampControlClientTable."
+    INDEX { neIndex, f3TwampControlClientIndex }
+    ::= { f3TwampControlClientTable 1 }
+
+F3TwampControlClientEntry ::= SEQUENCE {
+    f3TwampControlClientIndex                Integer32,
+    f3TwampControlClientAdminState           AdminState,
+    f3TwampControlClientOperationalState     OperationalState,
+    f3TwampControlClientSecondaryState       SecondaryState,
+    f3TwampControlClientAlias                DisplayString,
+    f3TwampControlClientPort                 VariablePointer,
+    f3TwampControlClientStatus               TwampControlClientStatus,
+    f3TwampControlClientActionObject         VariablePointer,
+    f3TwampControlClientAction               TwampControlClientAction,
+    f3TwampControlClientStorageType          StorageType,
+    f3TwampControlClientRowStatus            RowStatus
+}
+
+f3TwampControlClientIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..500)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An integer index value used to uniquely identify
+             a TWAMP Control Client under the NE."
+    ::= { f3TwampControlClientEntry 1 }
+    
+f3TwampControlClientAdminState OBJECT-TYPE
+    SYNTAX      AdminState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "All the state related attributes are added to support this entity
+        being in outage state. But AdminState is always InService and is
+        not editable."
+    ::= { f3TwampControlClientEntry 2 }
+
+f3TwampControlClientOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Operational state can take Normal or Outage. When the TWAMP entity
+        is operational then this is Normal. In some situations like a Card
+        is unplugged and TWAMP entity is not operational this attribute goes
+        to Outage state."
+    ::= { f3TwampControlClientEntry 3 }
+
+f3TwampControlClientSecondaryState OBJECT-TYPE
+    SYNTAX      SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Secondary state can be Active or SGEO. When Operational state is
+        Normal this is Active. When Operational State is Outage then this
+        is SGEO."
+    ::= { f3TwampControlClientEntry 4 }
+
+f3TwampControlClientAlias OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..64))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "An alias associated with the TWAMP Control Client."
+    ::= { f3TwampControlClientEntry 5 }
+
+f3TwampControlClientPort OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This is the physical or logical port on which the Control Client and the
+        corresponding Session Senders are associated with."
+     ::= { f3TwampControlClientEntry 6 }
+
+f3TwampControlClientStatus OBJECT-TYPE
+    SYNTAX     TwampControlClientStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "This indicates the current state of the Control Client state machine."
+    ::= { f3TwampControlClientEntry 7 }
+
+f3TwampControlClientActionObject OBJECT-TYPE
+    SYNTAX      VariablePointer 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "Object identfier used to specify the OID of a Session Sender on which 
+          f3TwampControlClientAction should occur. Applicable for addSessSender 
+          and rmvSessSender actions."
+    ::= { f3TwampControlClientEntry 8 }
+
+f3TwampControlClientAction OBJECT-TYPE
+    SYNTAX      TwampControlClientAction 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "User action performed on this Twamp Control Client instance.
+          For addSessSender and rmvSessSender actions 
+          f3TwampControlClientActionObject has to be specified prior 
+          to setting this object."
+    ::= { f3TwampControlClientEntry 9 }
+
+f3TwampControlClientStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The type of storage configured for this entry."
+    ::= { f3TwampControlClientEntry 10 }
+
+f3TwampControlClientRowStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+         "The status of this row.  An entry MUST NOT exist in the 
+          active state unless all objects in the entry have an 
+          appropriate value, as described
+          in the description clause for each writable object.
+
+          The values of f3TwampControlClientRowStatus supported are
+          createAndGo(4) and destroy(6).  All mandatory attributes
+          must be specified in a single SNMP SET request with
+          f3TwampControlClientRowStatus value as createAndGo(4).
+          Upon successful row creation, this object has a
+          value of active(1).
+          
+          The f3TwampControlClientRowStatus object may be modified if
+          the associated instance of this object is equal to active(1)."
+    ::= { f3TwampControlClientEntry 11 }
+
+--
+--  TWAMP Control Client Session Sender List
+--
+
+f3TwampControlClientSessionSenderTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3TwampControlClientSessionSenderEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to Session Sender entities
+             associated with a TWAMP Control Client."
+    ::= { f3TwampConfigObjects 7 }
+
+f3TwampControlClientSessionSenderEntry OBJECT-TYPE
+    SYNTAX      F3TwampControlClientSessionSenderEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3TwampControlClientSessionSenderTable."
+    INDEX { neIndex, f3TwampControlClientIndex, f3TwampControlClientSessionSenderIndex }
+    ::= { f3TwampControlClientSessionSenderTable 1 }
+
+F3TwampControlClientSessionSenderEntry ::= SEQUENCE {
+    f3TwampControlClientSessionSenderIndex          Integer32,
+    f3TwampControlClientSessionSender               VariablePointer
+}
+
+f3TwampControlClientSessionSenderIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..500)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A unique index identifying the Session Sender that is added to the Control Client.
+        Note that this is not f3TwampSessionSenderIndex."
+    ::= { f3TwampControlClientSessionSenderEntry 1 }
+
+f3TwampControlClientSessionSender OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "This is the pointer to the Session Sender added to the Control Client."
+    ::= { f3TwampControlClientSessionSenderEntry 2 }
+
+--
+--  TWAMP Session Sender
+--
+
+f3TwampSessionSenderTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3TwampSessionSenderEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A list of entries corresponding to TWAMP Session Sender entities.
+        This entity performs the functions of TWAMP Session Sender which
+        is to send TWAMP Test packets."
+    ::= { f3TwampConfigObjects 8 }
+
+f3TwampSessionSenderEntry OBJECT-TYPE
+    SYNTAX      F3TwampSessionSenderEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3TwampSessionSenderTable."
+    INDEX { neIndex, f3TwampSessionSenderIndex }
+    ::= { f3TwampSessionSenderTable 1 }
+
+F3TwampSessionSenderEntry ::= SEQUENCE {
+    f3TwampSessionSenderIndex                   Integer32,
+    f3TwampSessionSenderAdminState              AdminState,
+    f3TwampSessionSenderOperationalState        OperationalState,
+    f3TwampSessionSenderSecondaryState          SecondaryState,
+    f3TwampSessionSenderAlias                   DisplayString,
+    f3TwampSessionSenderIpInterface             DisplayString,  
+    f3TwampSessionSenderUdpPort                 Unsigned32,
+    f3TwampSessionSenderPktSchedTimeInterval    Unsigned32,
+    f3TwampSessionSenderSrIpv4Address           IpAddress,
+    f3TwampSessionSenderSrUdpPort               Unsigned32,
+    f3TwampSessionSenderDscpValue               Unsigned32,
+    f3TwampSessionSenderNumPkts                 Unsigned32,
+    f3TwampSessionSenderPktSize                 Unsigned32,
+    f3TwampSessionSenderTestPattern             TwampTestPattern,
+    f3TwampSessionSenderStartTimeType           TwampStartTimeType,
+    f3TwampSessionSenderStartDate               DisplayString,
+    f3TwampSessionSenderStartTime               DisplayString,
+    f3TwampSessionSenderRespTimeout             Unsigned32,
+    f3TwampSessionSenderVlanEnabled             TruthValue,
+    f3TwampSessionSenderOuterVlanId             VlanId,
+    f3TwampSessionSenderOuterVlanPriority       VlanPriority,
+    f3TwampSessionSenderOuterVlanEtherType      Unsigned32,
+    f3TwampSessionSenderInnerVlanEnabled        TruthValue,
+    f3TwampSessionSenderInnerVlanId             VlanId,
+    f3TwampSessionSenderInnerVlanPriority       VlanPriority,
+    f3TwampSessionSenderInnerVlanEtherType      Unsigned32,
+    f3TwampSessionSenderSeqNumber               Unsigned32,
+    f3TwampSessionSenderStatus                  TwampSessionSenderStatus,
+    f3TwampSessionSenderAssocControlClient      VariablePointer,
+    f3TwampSessionSenderHistoryBins             Unsigned32,
+    f3TwampSessionSenderHistoryInterval         TwampHistoryIntervalType,
+    f3TwampSessionSenderDistHistoryBins         Unsigned32,
+    f3TwampSessionSenderDistHistoryInterval     TwampHistoryIntervalType,
+    f3TwampSessionSenderStorageType             StorageType,
+    f3TwampSessionSenderRowStatus               RowStatus
+}
+
+f3TwampSessionSenderIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..500)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An integer index value used to uniquely identify
+             a TWAMP Session Sender under the NE."
+    ::= { f3TwampSessionSenderEntry 1 }
+
+f3TwampSessionSenderAdminState OBJECT-TYPE
+    SYNTAX      AdminState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "All the state related attributes are added to support this entity
+        being in outage state. But AdminState is always InService and is
+        not editable."
+    ::= { f3TwampSessionSenderEntry 2 }
+
+f3TwampSessionSenderOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Operational state can take Normal or Outage. When the TWAMP entity
+        is operational then this is Normal. In some situations like a Card
+        is unplugged and TWAMP entity is not operational this attribute goes
+        to Outage state."
+    ::= { f3TwampSessionSenderEntry 3 }
+
+f3TwampSessionSenderSecondaryState OBJECT-TYPE
+    SYNTAX      SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Secondary state can be Active or SGEO. When Operational state is
+        Normal this is Active. When Operational State is Outage then this
+        is SGEO."
+    ::= { f3TwampSessionSenderEntry 4 }
+
+f3TwampSessionSenderAlias   OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..64))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "An alias associated with the TWAMP Session Sender."
+    ::= { f3TwampSessionSenderEntry 5 }
+
+f3TwampSessionSenderIpInterface OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (1..15))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This is the IP interface used by Session Sender.
+        Session Sender may use the same IP interface as any Control Client,
+        Server, Session Sender or Session Sender in the system as long as
+        it has a unique UDP port."
+    ::= { f3TwampSessionSenderEntry 6 }
+
+f3TwampSessionSenderUdpPort OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..65535)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This is the UDP Port used by the Session Sender for TWAMP Test.
+        The Combination of f3TwampSessionSenderIpInterface and 
+        f3TwampSessionSenderUdpPort shall be unique amongst all 
+        Session Senders and Session Reflectors on the system."
+    ::= { f3TwampSessionSenderEntry 7 }
+
+f3TwampSessionSenderPktSchedTimeInterval OBJECT-TYPE
+    SYNTAX     Unsigned32 (10..3600000)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This is the time interval between TWAMP-Test packets."
+    DEFVAL { 1000 }
+    ::= { f3TwampSessionSenderEntry 8 }
+
+f3TwampSessionSenderSrIpv4Address OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This is the IPv4 address of the Session Reflector."
+    ::= { f3TwampSessionSenderEntry 9 }
+
+f3TwampSessionSenderSrUdpPort OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..65535)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This is the UDP Port recommended by the Session Sender
+       for the Session Reflector for TWAMP Test."
+    ::= { f3TwampSessionSenderEntry 10 }
+
+f3TwampSessionSenderDscpValue OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..63)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This is the TWAMP Test packet DSCP value to be used in the IP header.
+       This is read-create when the TWAMP Control is disabled. When TWAMP
+       Control is enabled this will be read-only and will have the same as
+       the DSCP value of the Control Client."
+    ::= { f3TwampSessionSenderEntry 11 }
+    
+f3TwampSessionSenderNumPkts OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..4294967295)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This is the number TWAMP test packets to send for test session."
+    ::= { f3TwampSessionSenderEntry 12 }
+
+f3TwampSessionSenderPktSize OBJECT-TYPE
+    SYNTAX     Unsigned32 (79..1526)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This is the size of the TWAMP test packet. For unauthenticated mode,
+       Minimum is the 18 (Eth Hdr) + 20 (IP Hdr) + 41 (TWAMP) Bytes.
+       The TWAMP test packet will be padded to the specified size."
+    ::= { f3TwampSessionSenderEntry 13 }
+
+f3TwampSessionSenderTestPattern OBJECT-TYPE
+    SYNTAX     TwampTestPattern
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "This the pattern of the bytes in the padding of the TWAMP Test packet."
+    ::= { f3TwampSessionSenderEntry 14 }
+    
+f3TwampSessionSenderStartTimeType OBJECT-TYPE
+    SYNTAX     TwampStartTimeType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This indicates the start time type which tells how to interpret
+       the start time attribute.
+       
+       If IMMEDIATE, f3TwampSessionSenderStartTime is not applicable
+       If RELATIVE, f3TwampSessionSenderStartTime is the relative to current time
+       If FIXED, f3TwampSessionSenderStartTime is the wall clock start time"
+    ::= { f3TwampSessionSenderEntry 15 }
+
+f3TwampSessionSenderStartDate OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0 | 10))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This is the date part of the Session Sender start time. When TWAMP Control
+       is enabled, the Date and Time are converted to the NTP timestamp format as
+       defined in RFC 1305 [REF13] to send in Request-TW-Session message. 
+       The first 32 bits are the seconds since 0h Jan 1 1900 and the second 32 bits
+       is the fractional second and is the number of units of 200 picoseconds.
+       
+       If f3TwampSessionSenderStartTimeType is IMMEDIATE, this attribute is not applicable.
+       If f3TwampSessionSenderStartTimeType is RELATIVE, this attribute is not applicable.
+       If f3TwampSessionSenderStartTimeType is FIXED, this attribute is the date
+       when to start the test."
+    ::= { f3TwampSessionSenderEntry 16 }
+
+f3TwampSessionSenderStartTime OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0 | 8))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This is the time part of the Session Sender start time. When TWAMP Control
+       is enabled, the Date and Time are converted to the NTP timestamp format as
+       defined in RFC 1305 [REF13] to send in Request-TW-Session message. 
+       The first 32 bits are the seconds since 0h Jan 1 1900 and the second 32 bits
+       is the fractional second and is the number of units of 200 picoseconds.
+       
+       If f3TwampSessionSenderStartTimeType is IMMEDIATE, this attribute is not applicable.
+       If f3TwampSessionSenderStartTimeType is RELATIVE, this attribute is not applicable.
+       If f3TwampSessionSenderStartTimeType is FIXED, this attribute is the time
+       when to start the test."
+    ::= { f3TwampSessionSenderEntry 17 }
+    
+f3TwampSessionSenderRespTimeout OBJECT-TYPE
+    SYNTAX     Unsigned32 (2..10)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This is how much time the Session Sender will wait for the response to a
+       TWAMP Test packet. In effect the TWAMP Test is complete after Test
+       Duration + Response Timeout."
+    DEFVAL { 5 }       
+    ::= { f3TwampSessionSenderEntry 18 }
+
+f3TwampSessionSenderVlanEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This indicates whether the TWAMP Test packets are tagged or not."
+    ::= { f3TwampSessionSenderEntry 19 }
+    
+f3TwampSessionSenderOuterVlanId OBJECT-TYPE
+    SYNTAX     VlanId
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This specifies the outer VLAN ID. This is applicable if 
+       f3TwampSessionSenderVlanEnabled is true."
+    ::= { f3TwampSessionSenderEntry 20 }
+    
+f3TwampSessionSenderOuterVlanPriority OBJECT-TYPE
+    SYNTAX     VlanPriority
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This specifies the outer VLAN priority. This is applicable if 
+       f3TwampSessionSenderVlanEnabled is true."
+    ::= { f3TwampSessionSenderEntry 21 }
+    
+f3TwampSessionSenderOuterVlanEtherType OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This specifies the outer VLAN tag Ethertype/TPID. This is applicable if 
+       f3TwampSessionSenderVlanEnabled is true."
+    ::= { f3TwampSessionSenderEntry 22 }
+
+f3TwampSessionSenderInnerVlanEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This indicates whether the TWAMP Test packets are double tagged or not.
+       This is applicable only if f3TwampSessionSenderVlanEnabled is true."
+    ::= { f3TwampSessionSenderEntry 23 }
+    
+f3TwampSessionSenderInnerVlanId OBJECT-TYPE
+    SYNTAX     VlanId
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This specifies the inner VLAN ID. This is applicable if 
+       f3TwampSessionSenderInnerVlanEnabled is true."
+    ::= { f3TwampSessionSenderEntry 24 }
+    
+f3TwampSessionSenderInnerVlanPriority OBJECT-TYPE
+    SYNTAX     VlanPriority
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This specifies the inner VLAN priority. This is applicable if 
+       f3TwampSessionSenderInnerVlanEnabled is true."
+    ::= { f3TwampSessionSenderEntry 25 }
+    
+f3TwampSessionSenderInnerVlanEtherType OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This specifies the outer VLAN tag Ethertype/TPID. This is applicable if 
+       f3TwampSessionSenderInnerVlanEnabled is true."
+    ::= { f3TwampSessionSenderEntry 26 }    
+
+f3TwampSessionSenderSeqNumber OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..4294967295)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "This is the session sender sequence number that is set in the generated
+       TWAMP Test packet."
+    ::= { f3TwampSessionSenderEntry 27 }   
+
+f3TwampSessionSenderStatus OBJECT-TYPE
+    SYNTAX     TwampSessionSenderStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "This indicates the current state of the Session Sender state machine."
+    ::= { f3TwampSessionSenderEntry 28 }   
+
+f3TwampSessionSenderAssocControlClient OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "This is the pointer to the associated TWAMP Control Client."
+    ::= { f3TwampSessionSenderEntry 29 }
+
+f3TwampSessionSenderHistoryBins OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This object allows specification of number of history bins.
+       This is the total history data that will be maintained
+       for a Session Sender run, at any instance."
+    ::= { f3TwampSessionSenderEntry 30 }
+    
+f3TwampSessionSenderHistoryInterval OBJECT-TYPE
+    SYNTAX     TwampHistoryIntervalType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This object allows specification of the history interval
+       period."
+    ::= { f3TwampSessionSenderEntry 31 }
+    
+f3TwampSessionSenderDistHistoryBins OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This object allows specification of number of distribution
+       history bins. This is the total history distribution data that
+       will be maintained for a Session Sender run, at any instance."
+    ::= { f3TwampSessionSenderEntry 32 }
+    
+f3TwampSessionSenderDistHistoryInterval OBJECT-TYPE
+    SYNTAX     TwampHistoryIntervalType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "This object allows specification of the history distribution
+       interval period."
+    ::= { f3TwampSessionSenderEntry 33 }
+
+f3TwampSessionSenderStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The type of storage configured for this entry."
+    ::= { f3TwampSessionSenderEntry 34 }
+
+f3TwampSessionSenderRowStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+         "The status of this row.  An entry MUST NOT exist in the 
+          active state unless all objects in the entry have an 
+          appropriate value, as described
+          in the description clause for each writable object.
+
+          The values of f3TwampSessionSenderRowStatus supported are
+          createAndGo(4) and destroy(6).  All mandatory attributes
+          must be specified in a single SNMP SET request with
+          f3TwampSessionSenderRowStatus value as createAndGo(4).
+          Upon successful row creation, this object has a
+          value of active(1).
+          
+          The f3TwampSessionSenderRowStatus object may be modified if
+          the associated instance of this object is equal to active(1)."
+    ::= { f3TwampSessionSenderEntry 35 }
+
+--
+-- Session Sender Current Statistics Table
+--
+f3TwampStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3TwampStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A current statistics for a Session Sender."
+    ::= { f3TwampConfigObjects 9 }
+
+f3TwampStatsEntry OBJECT-TYPE
+    SYNTAX      F3TwampStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3TwampStatsTable."
+    INDEX { neIndex, f3TwampSessionSenderIndex, f3TwampStatsIndex }
+    ::= { f3TwampStatsTable 1 }
+
+F3TwampStatsEntry ::= SEQUENCE {
+    f3TwampStatsIndex                        TwampPmIntervalType,
+    f3TwampStatsValid                        TruthValue,
+    f3TwampStatsAction                       CmPmBinAction,
+    f3TwampStatsTime                         DateAndTime,
+    f3TwampStatsS2RPkts                      PerfCounter64,
+    f3TwampStatsR2SPkts                      PerfCounter64,
+    f3TwampStatsS2RLostPkts                  PerfCounter64,
+    f3TwampStatsR2SLostPkts                  PerfCounter64,
+    f3TwampStatsS2RSyncErrs                  PerfCounter64,
+    f3TwampStatsR2SSyncErrs                  PerfCounter64,
+    f3TwampStatsOutOfSeqErrs                 PerfCounter64,
+    f3TwampStatsSeqGaps                      PerfCounter64,
+    f3TwampStatsMinTwoWayPD                  Unsigned32,
+    f3TwampStatsMaxTwoWayPD                  Unsigned32,
+    f3TwampStatsAvgTwoWayPD                  Unsigned32,
+    f3TwampStatsSumTwoWayPD                  Unsigned32,
+    f3TwampStatsSumOfSqTwoWayPD              Unsigned32,   
+    f3TwampStatsMinOneWayS2RPD               Unsigned32,
+    f3TwampStatsMaxOneWayS2RPD               Unsigned32,
+    f3TwampStatsAvgOneWayS2RPD               Unsigned32,
+    f3TwampStatsSumOneWayS2RPD               Unsigned32,
+    f3TwampStatsSumOfSqOneWayS2RPD           Unsigned32,
+    f3TwampStatsMinOneWayR2SPD               Unsigned32,
+    f3TwampStatsMaxOneWayR2SPD               Unsigned32,
+    f3TwampStatsAvgOneWayR2SPD               Unsigned32,
+    f3TwampStatsSumOneWayR2SPD               Unsigned32,
+    f3TwampStatsSumOfSqOneWayR2SPD           Unsigned32,
+    f3TwampStatsMinOneWayS2RAbsPDV           Unsigned32,
+    f3TwampStatsMaxOneWayS2RAbsPDV           Unsigned32,
+    f3TwampStatsAvgOneWayS2RAbsPDV           Unsigned32,
+    f3TwampStatsSumOneWayS2RAbsPDV           Unsigned32,
+    f3TwampStatsSumOfSqOneWayS2RAbsPDV       Unsigned32,
+    f3TwampStatsNumOneWayS2RAbsPDV           Unsigned32,    
+    f3TwampStatsMinOneWayR2SAbsPDV           Unsigned32,
+    f3TwampStatsMaxOneWayR2SAbsPDV           Unsigned32,
+    f3TwampStatsAvgOneWayR2SAbsPDV           Unsigned32,
+    f3TwampStatsSumOneWayR2SAbsPDV           Unsigned32,
+    f3TwampStatsSumOfSqOneWayR2SAbsPDV       Unsigned32,
+    f3TwampStatsNumOneWayR2SAbsPDV           Unsigned32,    
+    f3TwampStatsMinOneWayS2RNegPDV           Unsigned32,
+    f3TwampStatsMaxOneWayS2RNegPDV           Unsigned32,
+    f3TwampStatsAvgOneWayS2RNegPDV           Unsigned32,
+    f3TwampStatsSumOneWayS2RNegPDV           Unsigned32,
+    f3TwampStatsSumOfSqOneWayS2RNegPDV       Unsigned32,
+    f3TwampStatsNumOneWayS2RNegPDV           Unsigned32,  
+    f3TwampStatsMinOneWayR2SNegPDV           Unsigned32,
+    f3TwampStatsMaxOneWayR2SNegPDV           Unsigned32,
+    f3TwampStatsAvgOneWayR2SNegPDV           Unsigned32,
+    f3TwampStatsSumOneWayR2SNegPDV           Unsigned32,
+    f3TwampStatsSumOfSqOneWayR2SNegPDV       Unsigned32,
+    f3TwampStatsNumOneWayR2SNegPDV           Unsigned32,    
+    f3TwampStatsMinOneWayS2RPosPDV           Unsigned32,
+    f3TwampStatsMaxOneWayS2RPosPDV           Unsigned32,
+    f3TwampStatsAvgOneWayS2RPosPDV           Unsigned32,
+    f3TwampStatsSumOneWayS2RPosPDV           Unsigned32,
+    f3TwampStatsSumOfSqOneWayS2RPosPDV       Unsigned32,
+    f3TwampStatsNumOneWayS2RPosPDV           Unsigned32,    
+    f3TwampStatsMinOneWayR2SPosPDV           Unsigned32,
+    f3TwampStatsMaxOneWayR2SPosPDV           Unsigned32,
+    f3TwampStatsAvgOneWayR2SPosPDV           Unsigned32,
+    f3TwampStatsSumOneWayR2SPosPDV           Unsigned32,
+    f3TwampStatsSumOfSqOneWayR2SPosPDV       Unsigned32,
+    f3TwampStatsNumOneWayR2SPosPDV           Unsigned32,
+    f3TwampStatsNumTwoWayPD                  Unsigned32,
+    f3TwampStatsNumOneWayS2RPD               Unsigned32,
+    f3TwampStatsNumOneWayR2SPD               Unsigned32
+}
+
+f3TwampStatsIndex OBJECT-TYPE
+    SYNTAX      TwampPmIntervalType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            the Session Sender statistics entry. Possible values are current
+            or rollover."
+    ::= { f3TwampStatsEntry 1 }
+
+f3TwampStatsValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3TwampStatsEntry 2 }
+
+f3TwampStatsAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3TwampStatsEntry 3 }
+
+f3TwampStatsTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This is the start time of the current bin."
+    ::= { f3TwampStatsEntry 4 }
+
+f3TwampStatsS2RPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of Transmitted Packets in the current interval."
+     ::= { f3TwampStatsEntry 5 }
+
+f3TwampStatsR2SPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of Received Packets in the current interval."
+     ::= { f3TwampStatsEntry 6 }
+
+f3TwampStatsS2RLostPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of Lost Pkts from Session Sender to Session Reflector
+          in the current interval."
+     ::= { f3TwampStatsEntry 7 }
+
+f3TwampStatsR2SLostPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of Lost Pkts from Session Reflector to Session Sender in
+          the current interval."
+     ::= { f3TwampStatsEntry 8 }
+
+f3TwampStatsS2RSyncErrs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of (time) Synchronization Errors from Session Sender to
+          Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 9 }
+
+f3TwampStatsR2SSyncErrs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of (time) Synchronization Errors from Session Reflector to
+          Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 10 }
+
+f3TwampStatsOutOfSeqErrs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of out of sequence errors across all
+          packets received in the current interval. If (Received Seq Number)
+          is less than or equal to (Last Received Seq Number),
+          it is termed as out of sequence error."
+     ::= { f3TwampStatsEntry 11 }
+
+f3TwampStatsSeqGaps OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of sequence gaps across all
+          packets received in the current interval. If (Received Seq Number)
+          is greater than or equal to (Last Received Seq Number + 2))
+          it is termed as a sequence gap."
+     ::= { f3TwampStatsEntry 12 }
+
+f3TwampStatsMinTwoWayPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum two-way delay(in microseconds) across all
+          packets received in the current interval.
+          The Session Reflector's processing time is excluded from the value."
+     ::= { f3TwampStatsEntry 13 }
+
+f3TwampStatsMaxTwoWayPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum two-way delay(in microseconds) across all
+          packets received in the current interval.
+          The Session Reflector's processing time is excluded from the value."
+     ::= { f3TwampStatsEntry 14 }
+
+f3TwampStatsAvgTwoWayPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average two-way delay(in microseconds) across all
+          packets received in the current interval.
+          The Session Reflector's processing time is excluded from the value."
+     ::= { f3TwampStatsEntry 15 }
+
+f3TwampStatsSumTwoWayPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of  two-way delay(in microseconds)
+          in the current interval.
+          The Session Reflector's processing time is excluded from the value."
+     ::= { f3TwampStatsEntry 16 }
+
+f3TwampStatsSumOfSqTwoWayPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of  two-way delays in the current interval."
+     ::= { f3TwampStatsEntry 17 }
+
+f3TwampStatsMinOneWayS2RPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum one-way Session Sender to Session Reflector
+          delay(in microseconds) across all packets received in the
+          current interval."
+     ::= { f3TwampStatsEntry 18 }
+
+f3TwampStatsMaxOneWayS2RPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum one-way Session Sender to Session Reflector
+          delay(in microseconds) across all packets received in the
+          current interval."
+     ::= { f3TwampStatsEntry 19 }
+     
+f3TwampStatsAvgOneWayS2RPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average one-way Session Sender to Session Reflector
+          delay(in microseconds) across all packets received in the
+          current interval."
+     ::= { f3TwampStatsEntry 20 }
+
+f3TwampStatsSumOneWayS2RPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of one-way delay from Sesssion Sender to
+          Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 21 }
+
+f3TwampStatsSumOfSqOneWayS2RPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of one-way delay from Session Sender to
+          Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 22 }
+
+f3TwampStatsMinOneWayR2SPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum one-way Session Reflector to Session Sender
+          delay(in microseconds) across all packets received in the
+          current interval."
+     ::= { f3TwampStatsEntry 23 }
+
+f3TwampStatsMaxOneWayR2SPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum one-way Session Reflector to Session Sender
+          delay(in microseconds) across all packets received in the
+          current interval."
+     ::= { f3TwampStatsEntry 24 }
+     
+f3TwampStatsAvgOneWayR2SPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average one-way Session Reflector to Session Sender
+          delay(in microseconds) across all packets received in the
+          current interval."
+     ::= { f3TwampStatsEntry 25 }
+
+f3TwampStatsSumOneWayR2SPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of one-way delay from Session Reflector to
+          Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 26 }
+
+f3TwampStatsSumOfSqOneWayR2SPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of one-way delay from Session Reflector to
+          Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 27 }
+
+f3TwampStatsMinOneWayS2RAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum absolute one-way packet delay variation from
+          Sesson Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 28 }
+
+f3TwampStatsMaxOneWayS2RAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum absolute one-way packet delay variation from
+          Sesson Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 29 }
+     
+f3TwampStatsAvgOneWayS2RAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average absolute one-way packet delay variation from
+          Sesson Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 30 }
+
+f3TwampStatsSumOneWayS2RAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of absolute one-way packet delay variations from
+          Sesson Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 31 }
+
+f3TwampStatsSumOfSqOneWayS2RAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of absolute one-way packet delay variations from
+          Sesson Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 32 }
+
+f3TwampStatsNumOneWayS2RAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of absolute one-way packet delay variations from
+          Sesson Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 33 }
+
+f3TwampStatsMinOneWayR2SAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum absolute one-way packet delay variation from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 34 }
+
+f3TwampStatsMaxOneWayR2SAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum absolute one-way packet delay variation from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 35 }
+     
+f3TwampStatsAvgOneWayR2SAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average absolute one-way packet delay variation from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 36 }
+
+f3TwampStatsSumOneWayR2SAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of absolute one-way packet delay variations from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 37 }
+
+f3TwampStatsSumOfSqOneWayR2SAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of absolute one-way packet delay variations from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 38 }
+
+f3TwampStatsNumOneWayR2SAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of absolute one-way packet delay variations from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 39 }
+
+f3TwampStatsMinOneWayS2RNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum negative one-way packet delay variation from
+          Sesson Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 40 }
+
+f3TwampStatsMaxOneWayS2RNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum negative one-way packet delay variation from
+          Sesson Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 41 }
+
+f3TwampStatsAvgOneWayS2RNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average negative one-way packet delay variation from
+          Sesson Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 42 }
+
+f3TwampStatsSumOneWayS2RNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of negative one-way packet delay variations from
+          Sesson Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 43 }
+
+f3TwampStatsSumOfSqOneWayS2RNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of negative one-way packet delay variations from
+          Sesson Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 44 }
+
+f3TwampStatsNumOneWayS2RNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of negative one-way packet delay variations from
+          Sesson Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 45 }
+
+f3TwampStatsMinOneWayR2SNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum negative one-way packet delay variation from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 46 }
+
+f3TwampStatsMaxOneWayR2SNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum negative one-way packet delay variation from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 47 }
+
+f3TwampStatsAvgOneWayR2SNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average negative one-way packet delay variation from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 48 }
+     
+f3TwampStatsSumOneWayR2SNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of negative one-way packet delay variations from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 49 }
+
+f3TwampStatsSumOfSqOneWayR2SNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of negative one-way packet delay variations from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 50 }
+
+f3TwampStatsNumOneWayR2SNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of negative one-way packet delay variations from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 51 }
+
+f3TwampStatsMinOneWayS2RPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum positive one-way packet delay variation from
+          Session Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 52 }
+
+f3TwampStatsMaxOneWayS2RPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum positive one-way packet delay variation from
+          Session Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 53 }
+
+f3TwampStatsAvgOneWayS2RPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average positive one-way packet delay variation from
+          Session Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 54 }
+     
+f3TwampStatsSumOneWayS2RPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of  positive one-way packet delay variations from
+          Session Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 55 }
+
+f3TwampStatsSumOfSqOneWayS2RPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of  positive one-way packet delay variations from
+          Session Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 56 }
+
+f3TwampStatsNumOneWayS2RPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of  positive one-way packet delay variations from
+          Session Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 57 }
+
+f3TwampStatsMinOneWayR2SPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum positive one-way packet delay variation from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 58 }
+
+f3TwampStatsMaxOneWayR2SPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum positive one-way packet delay variation from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 59 }
+
+f3TwampStatsAvgOneWayR2SPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average positive one-way packet delay variation from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 60 }
+     
+f3TwampStatsSumOneWayR2SPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of  positive one-way packet delay variations from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 61 }
+
+f3TwampStatsSumOfSqOneWayR2SPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of  positive one-way packet delay variations from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 62 }
+
+f3TwampStatsNumOneWayR2SPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of  positive one-way packet delay variations from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 63 }
+     
+f3TwampStatsNumTwoWayPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of two-way packet delay samples in the 
+         current interval."
+     ::= { f3TwampStatsEntry 64 }
+
+f3TwampStatsNumOneWayS2RPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of one-way packet delay samples from
+          Session Sender to Session Reflector in the current interval."
+     ::= { f3TwampStatsEntry 65 }
+
+f3TwampStatsNumOneWayR2SPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of one-way packet delay samples from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampStatsEntry 66 }
+
+--
+-- Session Sender History Statistics Table
+--
+f3TwampHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3TwampHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A history statistics for a Session Sender."
+    ::= { f3TwampConfigObjects 10 }
+
+f3TwampHistoryEntry OBJECT-TYPE
+    SYNTAX      F3TwampHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3TwampHistoryTable. "
+    INDEX { neIndex, f3TwampSessionSenderIndex, f3TwampHistoryIndex }
+    ::= { f3TwampHistoryTable 1 }
+
+F3TwampHistoryEntry ::= SEQUENCE {
+    f3TwampHistoryIndex                        Integer32,
+    f3TwampHistoryValid                        TruthValue,
+    f3TwampHistoryAction                       CmPmBinAction,
+    f3TwampHistoryTime                         DateAndTime,
+    f3TwampHistoryS2RPkts                      PerfCounter64,
+    f3TwampHistoryR2SPkts                      PerfCounter64,
+    f3TwampHistoryS2RLostPkts                  PerfCounter64,
+    f3TwampHistoryR2SLostPkts                  PerfCounter64,
+    f3TwampHistoryS2RSyncErrs                  PerfCounter64,
+    f3TwampHistoryR2SSyncErrs                  PerfCounter64,
+    f3TwampHistoryOutOfSeqErrs                 PerfCounter64,
+    f3TwampHistorySeqGaps                      PerfCounter64,  
+    f3TwampHistoryMinTwoWayPD                  Unsigned32,
+    f3TwampHistoryMaxTwoWayPD                  Unsigned32,
+    f3TwampHistoryAvgTwoWayPD                  Unsigned32,
+    f3TwampHistorySumTwoWayPD                  Unsigned32,
+    f3TwampHistorySumOfSqTwoWayPD              Unsigned32,    
+    f3TwampHistoryMinOneWayS2RPD               Unsigned32,
+    f3TwampHistoryMaxOneWayS2RPD               Unsigned32,
+    f3TwampHistoryAvgOneWayS2RPD               Unsigned32,
+    f3TwampHistorySumOneWayS2RPD               Unsigned32,
+    f3TwampHistorySumOfSqOneWayS2RPD           Unsigned32,    
+    f3TwampHistoryMinOneWayR2SPD               Unsigned32,
+    f3TwampHistoryMaxOneWayR2SPD               Unsigned32,
+    f3TwampHistoryAvgOneWayR2SPD               Unsigned32,
+    f3TwampHistorySumOneWayR2SPD               Unsigned32,
+    f3TwampHistorySumOfSqOneWayR2SPD           Unsigned32,
+    f3TwampHistoryMinOneWayS2RAbsPDV           Unsigned32,
+    f3TwampHistoryMaxOneWayS2RAbsPDV           Unsigned32,
+    f3TwampHistoryAvgOneWayS2RAbsPDV           Unsigned32,
+    f3TwampHistorySumOneWayS2RAbsPDV           Unsigned32,
+    f3TwampHistorySumOfSqOneWayS2RAbsPDV       Unsigned32,
+    f3TwampHistoryNumOneWayS2RAbsPDV           Unsigned32,    
+    f3TwampHistoryMinOneWayR2SAbsPDV           Unsigned32,
+    f3TwampHistoryMaxOneWayR2SAbsPDV           Unsigned32,
+    f3TwampHistoryAvgOneWayR2SAbsPDV           Unsigned32,
+    f3TwampHistorySumOneWayR2SAbsPDV           Unsigned32,
+    f3TwampHistorySumOfSqOneWayR2SAbsPDV       Unsigned32,
+    f3TwampHistoryNumOneWayR2SAbsPDV           Unsigned32,    
+    f3TwampHistoryMinOneWayS2RNegPDV           Unsigned32,
+    f3TwampHistoryMaxOneWayS2RNegPDV           Unsigned32,
+    f3TwampHistoryAvgOneWayS2RNegPDV           Unsigned32,
+    f3TwampHistorySumOneWayS2RNegPDV           Unsigned32,
+    f3TwampHistorySumOfSqOneWayS2RNegPDV       Unsigned32,
+    f3TwampHistoryNumOneWayS2RNegPDV           Unsigned32,    
+    f3TwampHistoryMinOneWayR2SNegPDV           Unsigned32,
+    f3TwampHistoryMaxOneWayR2SNegPDV           Unsigned32,
+    f3TwampHistoryAvgOneWayR2SNegPDV           Unsigned32,
+    f3TwampHistorySumOneWayR2SNegPDV           Unsigned32,
+    f3TwampHistorySumOfSqOneWayR2SNegPDV       Unsigned32,
+    f3TwampHistoryNumOneWayR2SNegPDV           Unsigned32,    
+    f3TwampHistoryMinOneWayS2RPosPDV           Unsigned32,
+    f3TwampHistoryMaxOneWayS2RPosPDV           Unsigned32,
+    f3TwampHistoryAvgOneWayS2RPosPDV           Unsigned32,
+    f3TwampHistorySumOneWayS2RPosPDV           Unsigned32,
+    f3TwampHistorySumOfSqOneWayS2RPosPDV       Unsigned32,
+    f3TwampHistoryNumOneWayS2RPosPDV           Unsigned32,    
+    f3TwampHistoryMinOneWayR2SPosPDV           Unsigned32,
+    f3TwampHistoryMaxOneWayR2SPosPDV           Unsigned32,
+    f3TwampHistoryAvgOneWayR2SPosPDV           Unsigned32,
+    f3TwampHistorySumOneWayR2SPosPDV           Unsigned32,
+    f3TwampHistorySumOfSqOneWayR2SPosPDV       Unsigned32,
+    f3TwampHistoryNumOneWayR2SPosPDV           Unsigned32,
+    f3TwampHistoryNumTwoWayPD                  Unsigned32,
+    f3TwampHistoryNumOneWayS2RPD               Unsigned32,
+    f3TwampHistoryNumOneWayR2SPD               Unsigned32
+}
+
+f3TwampHistoryIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+             the Session Sender statistics history entry."
+    ::= { f3TwampHistoryEntry 1 }
+
+f3TwampHistoryValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3TwampHistoryEntry 2 }
+
+f3TwampHistoryAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3TwampHistoryEntry 3 }
+
+f3TwampHistoryTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This is the start time of the history bin."
+    ::= { f3TwampHistoryEntry 4 }
+
+f3TwampHistoryS2RPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of Transmitted Packets in the interval."
+     ::= { f3TwampHistoryEntry 5 }
+
+f3TwampHistoryR2SPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of Received Packets in the interval."
+     ::= { f3TwampHistoryEntry 6 }
+
+f3TwampHistoryS2RLostPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of Lost Pkts from Session Sender to Session Reflector
+          in the interval."
+     ::= { f3TwampHistoryEntry 7 }
+
+f3TwampHistoryR2SLostPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of Lost Pkts from Session Reflector to Session Sender in
+          the interval."
+     ::= { f3TwampHistoryEntry 8 }
+
+f3TwampHistoryS2RSyncErrs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of (time) Synchronization Errors from Session Sender to
+          Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 9 }
+
+f3TwampHistoryR2SSyncErrs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of (time) Synchronization Errors from Session Reflector to
+          Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 10 }
+
+f3TwampHistoryOutOfSeqErrs OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of out of sequence errors across all
+          packets received in the interval. If (Received Seq Number)
+          is less than or equal to (Last Received Seq Number),
+          it is termed as out of sequence error."
+     ::= { f3TwampHistoryEntry 11 }
+
+f3TwampHistorySeqGaps OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of sequence gaps across all
+          packets received in the interval. If (Received Seq Number)
+          is greater than or equal to (Last Received Seq Number + 2))
+          it is termed as a sequence gap."
+     ::= { f3TwampHistoryEntry 12 }
+
+f3TwampHistoryMinTwoWayPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum two-way delay(in microseconds) across all
+          packets received in the interval.
+          The Session Reflector's processing time is excluded from the value."
+     ::= { f3TwampHistoryEntry 13 }
+
+f3TwampHistoryMaxTwoWayPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum two-way delay(in microseconds) across all
+          packets received in the interval.
+          The Session Reflector's processing time is excluded from the value."
+     ::= { f3TwampHistoryEntry 14 }
+
+f3TwampHistoryAvgTwoWayPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average two-way delay(in microseconds) across all
+          packets received in the interval.
+          The Session Reflector's processing time is excluded from the value."
+     ::= { f3TwampHistoryEntry 15 }
+
+f3TwampHistorySumTwoWayPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of  two-way delay(in microseconds)
+          in the interval.
+          The Session Reflector's processing time is excluded from the value."
+     ::= { f3TwampHistoryEntry 16 }
+
+f3TwampHistorySumOfSqTwoWayPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of  two-way delays in the interval."
+     ::= { f3TwampHistoryEntry 17 }
+
+f3TwampHistoryMinOneWayS2RPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum one-way Session Sender to Session Reflector
+          delay(in microseconds) across all packets received in the
+          interval."
+     ::= { f3TwampHistoryEntry 18 }
+
+f3TwampHistoryMaxOneWayS2RPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum one-way Session Sender to Session Reflector
+          delay(in microseconds) across all packets received in the
+          interval."
+     ::= { f3TwampHistoryEntry 19 }
+
+f3TwampHistoryAvgOneWayS2RPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average one-way Session Sender to Session Reflector
+          delay(in microseconds) across all packets received in the
+          interval."
+     ::= { f3TwampHistoryEntry 20 }
+
+f3TwampHistorySumOneWayS2RPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of one-way delay from Sesssion Sender to
+          Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 21 }
+
+f3TwampHistorySumOfSqOneWayS2RPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of one-way delay from Session Sender to
+          Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 22 }
+
+f3TwampHistoryMinOneWayR2SPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum one-way Session Reflector to Session Sender
+          delay(in microseconds) across all packets received in the
+          interval."
+     ::= { f3TwampHistoryEntry 23 }
+
+f3TwampHistoryMaxOneWayR2SPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum one-way Session Reflector to Session Sender
+          delay(in microseconds) across all packets received in the
+          interval."
+     ::= { f3TwampHistoryEntry 24 }
+
+f3TwampHistoryAvgOneWayR2SPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average one-way Session Reflector to Session Sender
+          delay(in microseconds) across all packets received in the
+          interval."
+     ::= { f3TwampHistoryEntry 25 }
+
+f3TwampHistorySumOneWayR2SPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of one-way delay from Session Reflector to
+          Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 26 }
+
+f3TwampHistorySumOfSqOneWayR2SPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of one-way delay from Session Reflector to
+          Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 27 }
+
+f3TwampHistoryMinOneWayS2RAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum absolute one-way packet delay variation from
+          Sesson Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 28 }
+
+f3TwampHistoryMaxOneWayS2RAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum absolute one-way packet delay variation from
+          Sesson Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 29 }
+
+f3TwampHistoryAvgOneWayS2RAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average absolute one-way packet delay variation from
+          Sesson Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 30 }
+
+f3TwampHistorySumOneWayS2RAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of absolute one-way packet delay variations from
+          Sesson Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 31 }
+
+f3TwampHistorySumOfSqOneWayS2RAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of absolute one-way packet delay variations from
+          Sesson Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 32 }
+
+f3TwampHistoryNumOneWayS2RAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of absolute one-way packet delay variations from
+          Sesson Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 33 }
+
+f3TwampHistoryMinOneWayR2SAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum absolute one-way packet delay variation from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 34 }
+
+f3TwampHistoryMaxOneWayR2SAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum absolute one-way packet delay variation from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 35 }
+
+f3TwampHistoryAvgOneWayR2SAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average absolute one-way packet delay variation from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 36 }
+
+f3TwampHistorySumOneWayR2SAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of absolute one-way packet delay variations from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 37 }
+
+f3TwampHistorySumOfSqOneWayR2SAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of absolute one-way packet delay variations from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 38 }
+
+f3TwampHistoryNumOneWayR2SAbsPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of absolute one-way packet delay variations from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 39 }
+
+f3TwampHistoryMinOneWayS2RNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum negative one-way packet delay variation from
+          Sesson Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 40 }
+
+f3TwampHistoryMaxOneWayS2RNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum negative one-way packet delay variation from
+          Sesson Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 41 }
+
+f3TwampHistoryAvgOneWayS2RNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average negative one-way packet delay variation from
+          Sesson Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 42 }
+
+f3TwampHistorySumOneWayS2RNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of negative one-way packet delay variations from
+          Sesson Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 43 }
+
+f3TwampHistorySumOfSqOneWayS2RNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of negative one-way packet delay variations from
+          Sesson Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 44 }
+
+f3TwampHistoryNumOneWayS2RNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of negative one-way packet delay variations from
+          Sesson Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 45 }
+
+f3TwampHistoryMinOneWayR2SNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum negative one-way packet delay variation from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 46 }
+
+f3TwampHistoryMaxOneWayR2SNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum negative one-way packet delay variation from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 47 }
+
+f3TwampHistoryAvgOneWayR2SNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average negative one-way packet delay variation from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 48 }
+
+f3TwampHistorySumOneWayR2SNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of negative one-way packet delay variations from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 49 }
+
+f3TwampHistorySumOfSqOneWayR2SNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of negative one-way packet delay variations from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 50 }
+
+f3TwampHistoryNumOneWayR2SNegPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of negative one-way packet delay variations from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 51 }
+
+f3TwampHistoryMinOneWayS2RPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum positive one-way packet delay variation from
+          Session Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 52 }
+
+f3TwampHistoryMaxOneWayS2RPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum positive one-way packet delay variation from
+          Session Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 53 }
+
+f3TwampHistoryAvgOneWayS2RPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average positive one-way packet delay variation from
+          Session Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 54 }
+
+f3TwampHistorySumOneWayS2RPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of  positive one-way packet delay variations from
+          Session Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 55 }
+
+f3TwampHistorySumOfSqOneWayS2RPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of  positive one-way packet delay variations from
+          Session Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 56 }
+
+f3TwampHistoryNumOneWayS2RPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of  positive one-way packet delay variations from
+          Session Sender to Session Reflector in the interval."
+     ::= { f3TwampHistoryEntry 57 }
+
+f3TwampHistoryMinOneWayR2SPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The minimum positive one-way packet delay variation from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 58 }
+
+f3TwampHistoryMaxOneWayR2SPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The maximum positive one-way packet delay variation from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 59 }
+
+f3TwampHistoryAvgOneWayR2SPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The average positive one-way packet delay variation from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 60 }
+
+f3TwampHistorySumOneWayR2SPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total sum of  positive one-way packet delay variations from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 61 }
+
+f3TwampHistorySumOfSqOneWayR2SPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of square of  positive one-way packet delay variations from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 62 }
+
+f3TwampHistoryNumOneWayR2SPosPDV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of  positive one-way packet delay variations from
+          Session Reflector to Session Sender in the interval."
+     ::= { f3TwampHistoryEntry 63 }
+     
+f3TwampHistoryNumTwoWayPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of two-way packet delay samples in the 
+         current interval."
+     ::= { f3TwampHistoryEntry 64 }
+
+f3TwampHistoryNumOneWayS2RPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of one-way packet delay samples from
+          Session Sender to Session Reflector in the current interval."
+     ::= { f3TwampHistoryEntry 65 }
+
+f3TwampHistoryNumOneWayR2SPD OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of one-way packet delay samples from
+          Session Reflector to Session Sender in the current interval."
+     ::= { f3TwampHistoryEntry 66 }
+
+--
+-- Session Sender Statistics - Distribution Config Table
+--
+f3TwampDistStatsConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3TwampDistStatsConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries that need to be configured
+             in order to obtain statistical distribution
+             of Session Sender collected data."
+    ::= { f3TwampConfigObjects 11 }
+
+f3TwampDistStatsConfigEntry  OBJECT-TYPE
+    SYNTAX      F3TwampDistStatsConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A row in the f3TwampDistStatsConfigTable."
+    INDEX { neIndex, f3TwampSessionSenderIndex, f3TwampDistStatsConfigIndex }
+    ::= { f3TwampDistStatsConfigTable 1 }
+
+F3TwampDistStatsConfigEntry ::= SEQUENCE {
+    f3TwampDistStatsConfigIndex         TwampDistStatsType,
+    f3TwampDistStatsConfigMinVal        Integer32,
+    f3TwampDistStatsConfigMaxVal        Integer32,
+    f3TwampDistStatsConfigNumBins       Unsigned32
+}
+
+f3TwampDistStatsConfigIndex OBJECT-TYPE
+    SYNTAX      TwampDistStatsType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A unique index for each row. Indicates whether the statistical 
+             distribution is for two-way packet delay (twoway-pd), one-way 
+             Session Sender to Session Reflector packet delay (oneway-s2r-pd), 
+             one-way Session Reflector to Session Sender packet delay (oneway-r2s-pd),
+             one-way Session Sender to Session Reflector packet delay variation 
+             (oneway-s2r-pdv) or Session Reflector to Session Sender packet delay 
+             variation (oneway-r2s-pdv)."
+    ::= { f3TwampDistStatsConfigEntry 1 }
+
+f3TwampDistStatsConfigMinVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Minimum sample value in distribution."
+    ::= { f3TwampDistStatsConfigEntry 2 }
+
+f3TwampDistStatsConfigMaxVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Maximum sample value in distribution."
+    ::= { f3TwampDistStatsConfigEntry 3 }
+
+f3TwampDistStatsConfigNumBins OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Number of distribution bins."
+    ::= { f3TwampDistStatsConfigEntry 4 }
+
+--
+-- Session Sender Statistics - Current Distribution Results Table
+--
+f3TwampDistStatsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3TwampDistStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries that provide statistical distribution
+             of Session Sender collected data."
+    ::= { f3TwampConfigObjects 12 }
+
+f3TwampDistStatsEntry  OBJECT-TYPE
+    SYNTAX      F3TwampDistStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A row in the f3TwampDistStatsTable."
+    INDEX { neIndex, f3TwampSessionSenderIndex, f3TwampDistStatsConfigIndex }
+    ::= { f3TwampDistStatsTable 1 }
+
+F3TwampDistStatsEntry ::= SEQUENCE {
+    f3TwampDistStatsValid          TruthValue,
+    f3TwampDistStatsTime           DateAndTime,
+    f3TwampDistStatsAction         CmPmBinAction,
+    f3TwampDistStatsNumBins        Integer32,
+    f3TwampDistStatsLTMin          PerfCounter64,
+    f3TwampDistStatsGTMax          PerfCounter64
+}
+
+f3TwampDistStatsValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3TwampDistStatsEntry 1 }
+
+f3TwampDistStatsTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This is the start time of the current bin."
+    ::= { f3TwampDistStatsEntry 2 }
+
+f3TwampDistStatsAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3TwampDistStatsEntry 3 }
+
+f3TwampDistStatsNumBins OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of bins over which the statistical
+             data is distributed."
+    ::= { f3TwampDistStatsEntry 4 }
+
+f3TwampDistStatsLTMin OBJECT-TYPE
+    SYNTAX      PerfCounter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of sample data points which are
+             less than the minimum value specified."
+    ::= { f3TwampDistStatsEntry 5 }
+
+f3TwampDistStatsGTMax OBJECT-TYPE
+    SYNTAX      PerfCounter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of sample data points which are
+             greater than the maximum value specified."
+    ::= { f3TwampDistStatsEntry 6 }
+
+--
+-- Session Sender Statistics - Current Distribution Results BIN Table
+--
+f3TwampDistStatsBinTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3TwampDistStatsBinEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries that provide statistical distribution
+             of Session Sender collected data for specific BINs."
+    ::= { f3TwampConfigObjects 13 }
+
+f3TwampDistStatsBinEntry  OBJECT-TYPE
+    SYNTAX      F3TwampDistStatsBinEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A row in the f3TwampDistStatsBinTable."
+    INDEX { neIndex, f3TwampSessionSenderIndex, f3TwampDistStatsConfigIndex,
+            f3TwampDistStatsBinIndex }
+    ::= { f3TwampDistStatsBinTable 1 }
+
+F3TwampDistStatsBinEntry ::= SEQUENCE {
+    f3TwampDistStatsBinIndex        Integer32,
+    f3TwampDistStatsBinLower        Integer32,
+    f3TwampDistStatsBinUpper        Integer32,
+    f3TwampDistStatsBinNumSamples   PerfCounter64
+}
+
+f3TwampDistStatsBinIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..10)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An index for each row that uniquely provides statistical
+             data for a range."
+    ::= { f3TwampDistStatsBinEntry 1 }
+
+f3TwampDistStatsBinLower OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The lower limit of values collected in this bin."
+    ::= { f3TwampDistStatsBinEntry 2 }
+
+f3TwampDistStatsBinUpper OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The upper limit of values collected in this bin."
+    ::= { f3TwampDistStatsBinEntry 3 }
+
+f3TwampDistStatsBinNumSamples OBJECT-TYPE
+    SYNTAX      PerfCounter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of sample data points which fall between
+             the lower and upper limits."
+    ::= { f3TwampDistStatsBinEntry 4 }
+
+--
+-- Session Sender Statistics - History Distribution Results Table
+--
+f3TwampDistHistoryTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3TwampDistHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries that provide statistical distribution
+             history of Session Sender collected data."
+    ::= { f3TwampConfigObjects 14 }
+
+f3TwampDistHistoryEntry  OBJECT-TYPE
+    SYNTAX      F3TwampDistHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A row in the f3TwampDistHistoryTable."
+    INDEX { neIndex, f3TwampSessionSenderIndex,
+            f3TwampDistStatsConfigIndex,
+            f3TwampDistHistoryIndex }
+    ::= { f3TwampDistHistoryTable 1 }
+
+F3TwampDistHistoryEntry ::= SEQUENCE {
+    f3TwampDistHistoryIndex          Integer32,
+    f3TwampDistHistoryValid          TruthValue,
+    f3TwampDistHistoryTime           DateAndTime,
+    f3TwampDistHistoryAction         CmPmBinAction,
+    f3TwampDistHistoryNumBins        Integer32,
+    f3TwampDistHistoryLTMin          PerfCounter64,
+    f3TwampDistHistoryGTMax          PerfCounter64
+}
+
+f3TwampDistHistoryIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An integer index value used to uniquely identify current 
+            distribution statistics." 
+    ::= { f3TwampDistHistoryEntry 1 }
+
+f3TwampDistHistoryValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3TwampDistHistoryEntry 2 }
+
+f3TwampDistHistoryTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This is the start time of the history bin."
+    ::= { f3TwampDistHistoryEntry 3 }
+
+f3TwampDistHistoryAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3TwampDistHistoryEntry 4 }
+
+f3TwampDistHistoryNumBins OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of bins over which the statistical
+             data is distributed."
+    ::= { f3TwampDistHistoryEntry 5 }
+
+f3TwampDistHistoryLTMin OBJECT-TYPE
+    SYNTAX      PerfCounter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of sample data points which are
+             less than the minimum value specified."
+    ::= { f3TwampDistHistoryEntry 6 }
+
+f3TwampDistHistoryGTMax OBJECT-TYPE
+    SYNTAX      PerfCounter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of sample data points which are
+             greater than the maximum value specified."
+    ::= { f3TwampDistHistoryEntry 7 }
+
+--
+-- Session Sender Statistics - History Distribution Results BIN Table
+--
+f3TwampDistHistoryBinTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3TwampDistHistoryBinEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries that provide statistical distribution
+             of Session Sender collected data for specific BINs."
+    ::= { f3TwampConfigObjects 15 }
+
+f3TwampDistHistoryBinEntry  OBJECT-TYPE
+    SYNTAX      F3TwampDistHistoryBinEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A row in the f3TwampDistHistoryBinTable."
+    INDEX { neIndex, f3TwampSessionSenderIndex, 
+            f3TwampDistStatsConfigIndex,
+            f3TwampDistHistoryIndex,
+            f3TwampDistHistoryBinIndex }
+    ::= { f3TwampDistHistoryBinTable 1 }
+
+F3TwampDistHistoryBinEntry ::= SEQUENCE {
+    f3TwampDistHistoryBinIndex        Integer32,
+    f3TwampDistHistoryBinLower        Integer32,
+    f3TwampDistHistoryBinUpper        Integer32,
+    f3TwampDistHistoryBinNumSamples   PerfCounter64
+}
+
+f3TwampDistHistoryBinIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..10)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An index for each row that uniquely provides statistical
+             data for a range."
+    ::= { f3TwampDistHistoryBinEntry 1 }
+
+f3TwampDistHistoryBinLower OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The lower limit of values collected in this bin."
+    ::= { f3TwampDistHistoryBinEntry 2 }
+
+f3TwampDistHistoryBinUpper OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The upper limit of values collected in this bin."
+    ::= { f3TwampDistHistoryBinEntry 3 }
+
+f3TwampDistHistoryBinNumSamples OBJECT-TYPE
+    SYNTAX      PerfCounter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of sample data points which fall between
+             the lower and upper limits."
+    ::= { f3TwampDistHistoryBinEntry 4 }
+
+--
+-- Session Sender Threshold Table
+--
+f3TwampStatsThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3TwampStatsThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table of entries that allow manageability of Session Sender
+             Thresholds."
+    ::= { f3TwampConfigObjects 16 }
+
+f3TwampStatsThresholdEntry OBJECT-TYPE
+    SYNTAX      F3TwampStatsThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3TwampStatsThresholdTable."
+    INDEX { neIndex, f3TwampSessionSenderIndex, f3TwampStatsThresholdIndex }
+    ::= { f3TwampStatsThresholdTable 1 }
+
+F3TwampStatsThresholdEntry ::= SEQUENCE {
+    f3TwampStatsThresholdIndex       Integer32,
+    f3TwampStatsThresholdVariable    VariablePointer,
+    f3TwampStatsThresholdAbsValueLo  Unsigned32,
+    f3TwampStatsThresholdAbsValueHi  Unsigned32,
+    f3TwampStatsThresholdMonValue    PerfCounter64
+}
+
+f3TwampStatsThresholdIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies an entry in the
+        f3TwampStatsThresholdTable."
+    ::= { f3TwampStatsThresholdEntry 1 }
+
+f3TwampStatsThresholdVariable OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The object identifier of the particular variable to be
+        sampled.  Objects of the f3TwampStatsTable are
+        monitored. Only variables that resolve to an ASN.1 primitive
+        type of INTEGER (INTEGER, Integer32, Counter32, PerfCounter64,
+        Gauge, or TimeTicks) may be sampled."
+    ::= { f3TwampStatsThresholdEntry 2 }
+
+f3TwampStatsThresholdAbsValueLo OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Lower 32 bits of the absolute value of the threshold."
+    ::= { f3TwampStatsThresholdEntry 3 }
+
+f3TwampStatsThresholdAbsValueHi OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Higher 32 bits of the absolute value of the threshold."
+    ::= { f3TwampStatsThresholdEntry 4 }
+
+f3TwampStatsThresholdMonValue OBJECT-TYPE
+    SYNTAX     PerfCounter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Monitored value corresponding to f3TwampStatsThresholdVariable."
+    ::= { f3TwampStatsThresholdEntry 5 }
+
+
+--
+-- Notifications, i.e., traps.
+--
+
+twampSessionSenderThresholdCrossingAlert NOTIFICATION-TYPE
+       OBJECTS {
+                  f3TwampStatsThresholdIndex,
+                  f3TwampStatsThresholdVariable,
+                  f3TwampStatsThresholdAbsValueLo,
+                  f3TwampStatsThresholdAbsValueHi,
+                  f3TwampStatsThresholdMonValue
+               }
+
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time a threshold on a PM condition
+             on Session Sender is crossed."
+  ::= { f3TwampNotifications 1 }
+
+--
+-- Conformance
+--
+
+f3TwampCompliances OBJECT IDENTIFIER ::= {f3TwampConformance 1}
+f3TwampGroups    OBJECT IDENTIFIER ::= {f3TwampConformance 2}
+
+f3TwampCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the F3-TWAMP-MIB compilance."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+           f3TwampIpInterfaceGroup,
+           f3TwampServerGroup,
+           f3TwampServerSessionReflectorGroup,
+           f3TwampSessionReflectorGroup,
+           f3TwampSessionGroup,
+           f3TwampControlClientGroup,
+           f3TwampControlClientSessionSenderGroup,
+           f3TwampSessionSenderGroup,
+           f3TwampStatisticsGroup,
+           f3TwampDistributionStatisticsGroup,
+           f3TwampThresholdGroup
+        }
+    ::= { f3TwampCompliances 1 }
+
+f3TwampIpInterfaceGroup OBJECT-GROUP
+    OBJECTS {
+       f3TwampIpInterfacePort,
+       f3TwampIpInterfaceIpMode,
+       f3TwampIpInterfaceIpv4Address,
+       f3TwampIpInterfaceIpv4Mask,
+       f3TwampIpInterfaceMtu,
+       f3TwampIpInterfaceStorageType,
+       f3TwampIpInterfaceRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of TWAMP IP Interface objects."
+    ::= { f3TwampGroups 1 }
+
+f3TwampServerGroup OBJECT-GROUP
+    OBJECTS {
+       f3TwampServerAdminState,
+       f3TwampServerOperationalState,
+       f3TwampServerSecondaryState,
+       f3TwampServerAlias,
+       f3TwampServerPort,
+       f3TwampServerStatus,
+       f3TwampServerSessionIdleTimeout,
+       f3TwampServerSessionAgingTimeout,
+       f3TwampServerActionObject,
+       f3TwampServerAction,
+       f3TwampServerStorageType,
+       f3TwampServerRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of TWAMP Server objects."
+    ::= { f3TwampGroups 2 }
+
+f3TwampServerSessionReflectorGroup OBJECT-GROUP
+    OBJECTS {
+       f3TwampServerSessionReflector
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of TWAMP Server Session Reflector List objects."
+    ::= { f3TwampGroups 3 }
+
+f3TwampSessionReflectorGroup OBJECT-GROUP
+    OBJECTS {
+       f3TwampSessionReflectorAdminState,
+       f3TwampSessionReflectorOperationalState,
+       f3TwampSessionReflectorSecondaryState,
+       f3TwampSessionReflectorAlias,
+       f3TwampSessionReflectorIpInterface,
+       f3TwampSessionReflectorUdpPort,
+       f3TwampSessionReflectorUseSenderSeqNum,
+       f3TwampSessionReflectorUserCreated,
+       f3TwampSessionReflectorStatus,
+       f3TwampSessionReflectorAssocServer,
+       f3TwampSessionReflectorStorageType,
+       f3TwampSessionReflectorRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of TWAMP Session Reflector objects."
+    ::= { f3TwampGroups 4 }
+
+f3TwampSessionGroup OBJECT-GROUP
+    OBJECTS {
+       f3TwampSessionStatus,
+       f3TwampSessionVlanEnabled,
+       f3TwampSessionOuterVlanEtherType,
+       f3TwampSessionOuterVlanId,
+       f3TwampSessionOuterVlanPriority,
+       f3TwampSessionInnerVlanEnabled,
+       f3TwampSessionInnerVlanEtherType, 
+       f3TwampSessionInnerVlanId,
+       f3TwampSessionInnerVlanPriority,
+       f3TwampSessionDscpValue,
+       f3TwampSessionSequenceNumber,
+       f3TwampSessionAction
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of TWAMP Session objects."
+    ::= { f3TwampGroups 5 }
+
+f3TwampControlClientGroup OBJECT-GROUP
+    OBJECTS {
+       f3TwampControlClientAdminState,
+       f3TwampControlClientOperationalState,
+       f3TwampControlClientSecondaryState,
+       f3TwampControlClientAlias,       
+       f3TwampControlClientPort,
+       f3TwampControlClientStatus,
+       f3TwampControlClientActionObject,
+       f3TwampControlClientAction,
+       f3TwampControlClientStorageType,
+       f3TwampControlClientRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of TWAMP Control Client objects."
+    ::= { f3TwampGroups 6 }
+
+f3TwampControlClientSessionSenderGroup OBJECT-GROUP
+    OBJECTS {
+       f3TwampControlClientSessionSender
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of TWAMP Control Client Session Sender List objects."
+    ::= { f3TwampGroups 7 }
+
+f3TwampSessionSenderGroup OBJECT-GROUP
+    OBJECTS {
+       f3TwampSessionSenderAdminState,
+       f3TwampSessionSenderOperationalState,
+       f3TwampSessionSenderSecondaryState,
+       f3TwampSessionSenderAlias,
+       f3TwampSessionSenderIpInterface,  
+       f3TwampSessionSenderUdpPort,
+       f3TwampSessionSenderPktSchedTimeInterval,
+       f3TwampSessionSenderSrIpv4Address,
+       f3TwampSessionSenderSrUdpPort,
+       f3TwampSessionSenderDscpValue,
+       f3TwampSessionSenderNumPkts,
+       f3TwampSessionSenderPktSize,
+       f3TwampSessionSenderTestPattern,
+       f3TwampSessionSenderStartTimeType,
+       f3TwampSessionSenderStartDate,
+       f3TwampSessionSenderStartTime,
+       f3TwampSessionSenderRespTimeout,
+       f3TwampSessionSenderVlanEnabled,
+       f3TwampSessionSenderOuterVlanId,
+       f3TwampSessionSenderOuterVlanPriority,
+       f3TwampSessionSenderOuterVlanEtherType,
+       f3TwampSessionSenderInnerVlanEnabled,
+       f3TwampSessionSenderInnerVlanId,
+       f3TwampSessionSenderInnerVlanPriority,
+       f3TwampSessionSenderInnerVlanEtherType,
+       f3TwampSessionSenderSeqNumber,
+       f3TwampSessionSenderStatus,
+       f3TwampSessionSenderAssocControlClient,
+       f3TwampSessionSenderHistoryBins,
+       f3TwampSessionSenderHistoryInterval,
+       f3TwampSessionSenderDistHistoryBins,
+       f3TwampSessionSenderDistHistoryInterval,
+       f3TwampSessionSenderStorageType,
+       f3TwampSessionSenderRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of TWAMP Session Sender objects."
+    ::= { f3TwampGroups 8 }
+
+f3TwampStatisticsGroup OBJECT-GROUP
+    OBJECTS {
+       f3TwampStatsValid,
+       f3TwampStatsAction,
+       f3TwampStatsTime,
+       f3TwampStatsS2RPkts,
+       f3TwampStatsR2SPkts,
+       f3TwampStatsS2RLostPkts,
+       f3TwampStatsR2SLostPkts,
+       f3TwampStatsS2RSyncErrs,
+       f3TwampStatsR2SSyncErrs,
+       f3TwampStatsOutOfSeqErrs,
+       f3TwampStatsSeqGaps,
+       f3TwampStatsMinTwoWayPD,
+       f3TwampStatsMaxTwoWayPD,
+       f3TwampStatsAvgTwoWayPD,
+       f3TwampStatsSumTwoWayPD,
+       f3TwampStatsSumOfSqTwoWayPD,
+       f3TwampStatsMinOneWayS2RPD,
+       f3TwampStatsMaxOneWayS2RPD,
+       f3TwampStatsAvgOneWayS2RPD,
+       f3TwampStatsSumOneWayS2RPD,
+       f3TwampStatsSumOfSqOneWayS2RPD,
+       f3TwampStatsMinOneWayR2SPD,
+       f3TwampStatsMaxOneWayR2SPD,
+       f3TwampStatsAvgOneWayR2SPD,
+       f3TwampStatsSumOneWayR2SPD,
+       f3TwampStatsSumOfSqOneWayR2SPD,
+       f3TwampStatsMinOneWayS2RAbsPDV,
+       f3TwampStatsMaxOneWayS2RAbsPDV,
+       f3TwampStatsAvgOneWayS2RAbsPDV,
+       f3TwampStatsSumOneWayS2RAbsPDV,
+       f3TwampStatsSumOfSqOneWayS2RAbsPDV,
+       f3TwampStatsNumOneWayS2RAbsPDV,
+       f3TwampStatsMinOneWayR2SAbsPDV,
+       f3TwampStatsMaxOneWayR2SAbsPDV,
+       f3TwampStatsAvgOneWayR2SAbsPDV,
+       f3TwampStatsSumOneWayR2SAbsPDV,
+       f3TwampStatsSumOfSqOneWayR2SAbsPDV,
+       f3TwampStatsNumOneWayR2SAbsPDV,
+       f3TwampStatsMinOneWayS2RNegPDV,
+       f3TwampStatsMaxOneWayS2RNegPDV,
+       f3TwampStatsAvgOneWayS2RNegPDV,
+       f3TwampStatsSumOneWayS2RNegPDV,
+       f3TwampStatsSumOfSqOneWayS2RNegPDV,
+       f3TwampStatsNumOneWayS2RNegPDV,    
+       f3TwampStatsMinOneWayR2SNegPDV,
+       f3TwampStatsMaxOneWayR2SNegPDV,
+       f3TwampStatsAvgOneWayR2SNegPDV,
+       f3TwampStatsSumOneWayR2SNegPDV,
+       f3TwampStatsSumOfSqOneWayR2SNegPDV,
+       f3TwampStatsNumOneWayR2SNegPDV,   
+       f3TwampStatsMinOneWayS2RPosPDV,
+       f3TwampStatsMaxOneWayS2RPosPDV,
+       f3TwampStatsAvgOneWayS2RPosPDV,
+       f3TwampStatsSumOneWayS2RPosPDV,
+       f3TwampStatsSumOfSqOneWayS2RPosPDV,
+       f3TwampStatsNumOneWayS2RPosPDV,    
+       f3TwampStatsMinOneWayR2SPosPDV,
+       f3TwampStatsMaxOneWayR2SPosPDV,
+       f3TwampStatsAvgOneWayR2SPosPDV,
+       f3TwampStatsSumOneWayR2SPosPDV,
+       f3TwampStatsSumOfSqOneWayR2SPosPDV,
+       f3TwampStatsNumOneWayR2SPosPDV,
+       f3TwampStatsNumTwoWayPD,
+       f3TwampStatsNumOneWayS2RPD,
+       f3TwampStatsNumOneWayR2SPD,
+       f3TwampHistoryValid,
+       f3TwampHistoryAction,
+       f3TwampHistoryTime,
+       f3TwampHistoryS2RPkts,
+       f3TwampHistoryR2SPkts,
+       f3TwampHistoryS2RLostPkts,
+       f3TwampHistoryR2SLostPkts,
+       f3TwampHistoryS2RSyncErrs,
+       f3TwampHistoryR2SSyncErrs,
+       f3TwampHistoryOutOfSeqErrs,
+       f3TwampHistorySeqGaps,
+       f3TwampHistoryMinTwoWayPD,
+       f3TwampHistoryMaxTwoWayPD,
+       f3TwampHistoryAvgTwoWayPD,
+       f3TwampHistorySumTwoWayPD,
+       f3TwampHistorySumOfSqTwoWayPD,    
+       f3TwampHistoryMinOneWayS2RPD,
+       f3TwampHistoryMaxOneWayS2RPD,
+       f3TwampHistoryAvgOneWayS2RPD,
+       f3TwampHistorySumOneWayS2RPD,
+       f3TwampHistorySumOfSqOneWayS2RPD,   
+       f3TwampHistoryMinOneWayR2SPD,
+       f3TwampHistoryMaxOneWayR2SPD,
+       f3TwampHistoryAvgOneWayR2SPD,
+       f3TwampHistorySumOneWayR2SPD,
+       f3TwampHistorySumOfSqOneWayR2SPD,
+       f3TwampHistoryMinOneWayS2RAbsPDV,
+       f3TwampHistoryMaxOneWayS2RAbsPDV,
+       f3TwampHistoryAvgOneWayS2RAbsPDV,
+       f3TwampHistorySumOneWayS2RAbsPDV,
+       f3TwampHistorySumOfSqOneWayS2RAbsPDV,
+       f3TwampHistoryNumOneWayS2RAbsPDV,
+       f3TwampHistoryMinOneWayR2SAbsPDV,
+       f3TwampHistoryMaxOneWayR2SAbsPDV,
+       f3TwampHistoryAvgOneWayR2SAbsPDV,
+       f3TwampHistorySumOneWayR2SAbsPDV,
+       f3TwampHistorySumOfSqOneWayR2SAbsPDV,
+       f3TwampHistoryNumOneWayR2SAbsPDV,
+       f3TwampHistoryMinOneWayS2RNegPDV,
+       f3TwampHistoryMaxOneWayS2RNegPDV,
+       f3TwampHistoryAvgOneWayS2RNegPDV,
+       f3TwampHistorySumOneWayS2RNegPDV,
+       f3TwampHistorySumOfSqOneWayS2RNegPDV,
+       f3TwampHistoryNumOneWayS2RNegPDV, 
+       f3TwampHistoryMinOneWayR2SNegPDV,
+       f3TwampHistoryMaxOneWayR2SNegPDV,
+       f3TwampHistoryAvgOneWayR2SNegPDV,
+       f3TwampHistorySumOneWayR2SNegPDV,
+       f3TwampHistorySumOfSqOneWayR2SNegPDV,
+       f3TwampHistoryNumOneWayR2SNegPDV, 
+       f3TwampHistoryMinOneWayS2RPosPDV,
+       f3TwampHistoryMaxOneWayS2RPosPDV,
+       f3TwampHistoryAvgOneWayS2RPosPDV,
+       f3TwampHistorySumOneWayS2RPosPDV,
+       f3TwampHistorySumOfSqOneWayS2RPosPDV,
+       f3TwampHistoryNumOneWayS2RPosPDV,
+       f3TwampHistoryMinOneWayR2SPosPDV,
+       f3TwampHistoryMaxOneWayR2SPosPDV,
+       f3TwampHistoryAvgOneWayR2SPosPDV,
+       f3TwampHistorySumOneWayR2SPosPDV,
+       f3TwampHistorySumOfSqOneWayR2SPosPDV,
+       f3TwampHistoryNumOneWayR2SPosPDV,
+       f3TwampHistoryNumTwoWayPD,
+       f3TwampHistoryNumOneWayS2RPD,
+       f3TwampHistoryNumOneWayR2SPD
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of TWAMP Statistics objects."
+    ::= { f3TwampGroups 9 }
+
+f3TwampDistributionStatisticsGroup OBJECT-GROUP
+    OBJECTS {
+       f3TwampDistStatsConfigMinVal,
+       f3TwampDistStatsConfigMaxVal,
+       f3TwampDistStatsConfigNumBins,
+       f3TwampDistStatsValid,
+       f3TwampDistStatsTime,
+       f3TwampDistStatsAction,
+       f3TwampDistStatsNumBins,
+       f3TwampDistStatsLTMin,
+       f3TwampDistStatsGTMax,
+       f3TwampDistStatsBinLower,
+       f3TwampDistStatsBinUpper,
+       f3TwampDistStatsBinNumSamples,
+       f3TwampDistHistoryValid,
+       f3TwampDistHistoryTime,
+       f3TwampDistHistoryAction,
+       f3TwampDistHistoryNumBins,
+       f3TwampDistHistoryLTMin,
+       f3TwampDistHistoryGTMax,
+       f3TwampDistHistoryBinLower,
+       f3TwampDistHistoryBinUpper,
+       f3TwampDistHistoryBinNumSamples
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of TWAMP Distribution Statistics objects."
+    ::= { f3TwampGroups 10 }
+
+f3TwampThresholdGroup OBJECT-GROUP
+    OBJECTS {
+       f3TwampStatsThresholdVariable,
+       f3TwampStatsThresholdAbsValueLo,
+       f3TwampStatsThresholdAbsValueHi,
+       f3TwampStatsThresholdMonValue
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of TWAMP Threshold objects."
+    ::= { f3TwampGroups 11 }
+
+END

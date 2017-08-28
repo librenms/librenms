@@ -1,0 +1,68 @@
+-- *****************************************************************
+-- NMS-EPON-ONU-BATCH-UPDATE.MIB:  NMS LLID ONU BATCH UPDATE MIB file
+-- APRIL 2010
+-- *****************************************************************
+--
+
+               NMS-EPON-ONU-BATCH-UPDATE DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+	            PortList
+	                FROM Q-BRIDGE-MIB
+		    TruthValue,RowStatus,PhysAddress,DisplayString,MacAddress
+		    	FROM SNMPv2-TC;
+          
+               nmsEponOnuBatchUpdate         OBJECT IDENTIFIER ::= { nmsEPONGroup 23 }
+               
+               onuUpdateLLIDs OBJECT-TYPE
+                   SYNTAX  PortList
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU LLID list, which defines the ONU to be updated."
+                   ::= { nmsEponOnuBatchUpdate 1 } 
+                   
+               onuUpdateFileName OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The file name in OLT flash, which is ONU bin file and must be existed."
+                   ::= { nmsEponOnuBatchUpdate 2 } 
+                   
+               onuUpdateAction OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   no_action(0),
+                                   update(1),
+                                   commit(2)
+                                  }
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The update operation indication. 0-no action for update, 1-action for update."
+                   ::= { nmsEponOnuBatchUpdate 3 } 
+                   
+               onuUpdateResult OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   success(0),
+                                   processing(1),
+                                   other(2)
+                                  }
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The result for update. 0-success, 1-processing, 2-other result values and reserved for system."
+                   ::= { nmsEponOnuBatchUpdate 4 } 
+                   
+               
+                   
+                   
+END               

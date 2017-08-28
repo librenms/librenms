@@ -34,7 +34,12 @@ if ($data[1]['entPhysicalContainedIn'] == '0') {
         $hardware = $data[1]['entPhysicalModelName'];
     }
 }
-if (!empty($data[1001]['entPhysicalModelName'])) {
+
+if (!empty($data[1000]['entPhysicalModelName'])) {
+    $hardware = $data[1000]['entPhysicalModelName'];
+} elseif (!empty($data[1000]['entPhysicalContainedIn'])) {
+    $hardware = $data[$data[1000]['entPhysicalContainedIn']]['entPhysicalName'];
+} elseif (!empty($data[1001]['entPhysicalModelName'])) {
     $hardware = $data[1001]['entPhysicalModelName'];
 } elseif (!empty($data[1001]['entPhysicalContainedIn'])) {
     $hardware = $data[$data[1001]['entPhysicalContainedIn']]['entPhysicalName'];

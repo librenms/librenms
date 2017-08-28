@@ -1,0 +1,225 @@
+-- *****************************************************************
+-- NMS-DHCP-SERVER-MIB.my: NMS WLAN MIB
+--
+-- March 2010
+-- Edit by LIUQIANG
+-- Copyright (c) 2010 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-DHCP-SNOOPING-MIB DEFINITIONS ::= BEGIN 
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+                                                FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                          FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP             FROM SNMPv2-CONF
+    IpAddress   								FROM RFC1155-SMI
+    nmslocal                           			FROM NMS-SMI
+	VlanIndex									FROM Q-BRIDGE-MIB 
+	InterfaceIndex								FROM IF-MIB
+	InetAddressType,InetAddress			        FROM INET-ADDRESS-MIB
+	RowStatus,MacAddress									FROM SNMPv2-TC;
+
+
+--definition of NMS device DHCP Snooping related address
+
+	dhcpsnooping         OBJECT IDENTIFIER ::= { nmslocal 233 }
+
+	dhcpSnoopingStatus OBJECT-TYPE
+              SYNTAX  INTEGER{disable(0),
+                              enable(1)
+                              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "NMS device DHCP Snooping status. 0-disable, 1-enable."
+              ::= { dhcpsnooping 1 }
+	
+	nmsBindingsTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF NmsBindingsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A table provides the DHCP bindings information learnt by
+        the device." 
+    ::= { dhcpsnooping 2 }
+	                                                                        
+	                                    
+	nmsBindingsEntry OBJECT-TYPE
+    SYNTAX       NmsBindingsEntry 
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A row instance contains the IP address, Mac address, 
+        VLAN number, interface number, leased time, binding type, binding status and
+        status of this instance." 
+    INDEX { nmsBindingsIpAddress }
+    ::= { nmsBindingsTable 1 }
+		
+	NmsBindingsEntry ::= SEQUENCE {
+	nmsBindingsIpAddress       InetAddress,
+	nmsBindingsMacAddress      MacAddress, 
+    nmsBindingsVlan            VlanIndex,
+    nmsBindingsInterface       InterfaceIndex,
+    nmsBindingsLeasedTime      Unsigned32,
+    nmsBindingsType        	 Unsigned32,
+    nmsBindingsStatus          Unsigned32, 
+    nmsBindingsrowstatus		 RowStatus		 
+	}
+	 
+	nmsBindingsIpAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the type of IP address denoted
+        in nmsBindingsIpAddress object." 
+    ::= { nmsBindingsEntry 1 }
+			  
+	nmsBindingsMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress 
+    MAX-ACCESS  read-only   
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the MAC address of a DHCP client
+         host." 
+    ::= { nmsBindingsEntry 2 }
+	
+	nmsBindingsVlan OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the VLAN to which a DHCP client host
+         belongs."
+    ::= { nmsBindingsEntry 3 }
+			  
+	nmsBindingsInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only	
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the interface where a DHCP client
+        host connects to."
+    ::= { nmsBindingsEntry 4 }
+	
+	nmsBindingsLeasedTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the leased time of this DHCP
+        bindings."
+    ::= { nmsBindingsEntry 5 }
+	
+	nmsBindingsType OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the type of IP address denoted
+        in nmsBindingsIpAddress object.1 is dhcp snooping type, and 2 is manual type." 
+    ::= { nmsBindingsEntry 6 }
+	
+	nmsBindingsStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The bindings status is DIA¡¢IP Guard."
+    ::= { nmsBindingsEntry 7 }
+	
+	nmsBindingsrowstatus OBJECT-TYPE
+	SYNTAX	   RowStatus
+	ACCESS	   read-write
+	STATUS	   mandatory
+	DESCRIPTION
+	"Table row status.
+	SNMP_ROW_ACTIVE				1, not allowed
+	SNMP_ROW_NOTREADY			3, not allowed
+	SNMP_ROW_CREATEANDGO		4, not allowed
+	SNMP_ROW_DESTROY			6, delete bindings"
+	::= { nmsBindingsEntry 8 }
+	
+	
+	------------------------------------------------------------------------------
+	
+	nmsipsourceBindingsTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF NmsipsourceBindingsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A table provides the DHCP bindings information configed manually." 
+    ::= { dhcpsnooping 3 }
+	                                                                        
+	                                    
+	nmsipsourceBindingsEntry OBJECT-TYPE
+    SYNTAX       NmsipsourceBindingsEntry 
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A row instance contains the Mac address, IP address type,
+        IP address, VLAN number, interface number, leased time and
+        status of this instance." 
+    INDEX { nmsipsourceBindingsIpAddress }
+    ::= { nmsipsourceBindingsTable 1 }
+		
+	NmsipsourceBindingsEntry ::= SEQUENCE {
+	nmsipsourceBindingsrowstatus		 RowStatus,
+	nmsipsourceBindingsIpAddress       InetAddress,
+	nmsipsourceBindingsMacAddress      MacAddress, 
+    nmsipsourceBindingsInterface       InterfaceIndex,
+    nmsipsourceBindingsVlanID         VlanIndex
+
+	}    
+	
+	nmsipsourceBindingsrowstatus OBJECT-TYPE
+	SYNTAX	   RowStatus
+	ACCESS	   read-write
+	STATUS	   mandatory
+	DESCRIPTION
+	"Table row status.
+	SNMP_ROW_ACTIVE				1, active a mib bindings
+	SNMP_ROW_NOTREADY			3, not allowed
+	SNMP_ROW_CREATEANDGO		4, create a mib bindings row
+	SNMP_ROW_DESTROY			6, delete bindings"
+	::= { nmsipsourceBindingsEntry 1 }
+	
+	nmsipsourceBindingsIpAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write	
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the IP address of a bindings to be configed." 
+    ::= { nmsipsourceBindingsEntry 2 }
+
+	nmsipsourceBindingsMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress 
+    MAX-ACCESS  read-write			
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the MAC address of a DHCP client
+         host." 
+    ::= { nmsipsourceBindingsEntry 3 }
+
+	nmsipsourceBindingsInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write		
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the interface where a DHCP client
+        host connects to."
+    ::= { nmsipsourceBindingsEntry 4 }
+
+    nmsipsourceBindingsVlanID OBJECT-TYPE
+    SYNTAX  	VlanIndex
+    MAX-ACCESS	read-write
+    STATUS		current
+    DESCRIPTION
+    	"This objiec indicates the VLAN to which a DHCP client host
+    	belongs."                                                  
+    ::= { nmsipsourceBindingsEntry 5 }
+	
+END

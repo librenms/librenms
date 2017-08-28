@@ -26,7 +26,7 @@ if ($width > '500') {
 $descr = rrdtool_escape(short_hrDeviceDescr($mempool['mempool_descr']), $descr_len);
 
 $perc       = round($mempool['mempool_perc'], 0);
-$background = get_percentage_colours($perc);
+$background = get_percentage_colours($perc, $mempool['mempool_perc_warn']);
 
 $rrd_options .= " DEF:$mempool[mempool_id]used=$rrd_filename:used:AVERAGE";
 $rrd_options .= " DEF:$mempool[mempool_id]free=$rrd_filename:free:AVERAGE";

@@ -11,6 +11,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Util\IP;
+
 $module = 'ntp';
 
 $component = new LibreNMS\Component();
@@ -46,7 +48,7 @@ if (is_null($cntpPeersVarEntry)) {
         $result['peer'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][3][$index];
         $result['port'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][4][$index];
         $result['stratum'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][9][$index];
-        $result['peerref'] = hex_to_ip($cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][15][$index]);
+        $result['peerref'] = IP::fromHexString($cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][15][$index], true);
         $result['label'] = $result['peer'].":".$result['port'];
 
         // Set the status, 16 = Bad

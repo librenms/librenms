@@ -1,0 +1,114 @@
+-- *****************************************************************
+-- NMS-SYS-TRAP.my: NMS SYS-TRAP MIB
+--
+-- March 2010
+-- Edit by LIUQIANG
+-- Copyright (c) 2010 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+
+NMS-SYS-TRAP DEFINITIONS ::= BEGIN 
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, INTEGER
+                                                FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                          FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP             FROM SNMPv2-CONF
+    entPhysicalSerialNum                        FROM ENTITY-MIB
+    sysDescr,sysObjectID,sysUpTime,sysContact,sysLocation FROM RFC1213-MIB
+    nmsMgmt                             FROM NMS-SMI;
+    
+    
+
+-- Notifications   --
+	nmsSysNotifications OBJECT IDENTIFIER
+                                ::= { nmsMgmt 354 }
+
+
+	nmsSysResetNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                  sysDescr,
+                  sysObjectID,
+                  sysUpTime,
+		  sysContact,
+		  sysLocation
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification before system reset. "
+    		::= { nmsSysNotifications 1 }
+
+	nmsSnmpAgentInitNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                  sysDescr,
+                  sysObjectID,
+                  sysUpTime,
+		  sysContact,
+		  sysLocation
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification after snmp ageent starts. "
+    		::= { nmsSysNotifications 2 }
+    		
+    	
+    	
+        nmsDeviceOUI OBJECT-TYPE
+            SYNTAX  OCTET STRING
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "NMS OUI, first 6 bits in mac address."
+            ::= { nmsSysNotifications 3 }
+    		
+    	
+	nmsWillRebootNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                  nmsDeviceOUI,
+		  entPhysicalSerialNum
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification after system reset or snmp ageent starts. "
+    		::= { nmsSysNotifications 4 }
+    		
+	nmsCPUExNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                  nmsDeviceOUI,
+		  entPhysicalSerialNum
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when cpu usage execeeds the threshold. "
+    		::= { nmsSysNotifications 5 }
+    		
+	nmsMemoryExNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                  nmsDeviceOUI,
+		  entPhysicalSerialNum
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when memory usage execeeds the threshold. "
+    		::= { nmsSysNotifications 6 }
+    		
+	nmsHardwareFailedNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                  nmsDeviceOUI,
+		  entPhysicalSerialNum
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when hardware failure. "
+    		::= { nmsSysNotifications 7 }
+    		
+       
+
+
+	
+	
+
+
+END    
+    

@@ -37,6 +37,7 @@ print_optionbar_end();
 echo '<table cellpadding=5 cellspacing=0 class=devicetable width=100%>';
 
 foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I WHERE P.port_id = I.port_id AND I.device_id = ? ORDER BY I.ifDescr', array($device['device_id'])) as $pw_a) {
+    $pw_a = cleanPort($pw_a);
     $i = 0;
     while ($i < count($linkdone)) {
         $thislink = $pw_a['device_id'].$pw_a['port_id'];
@@ -52,6 +53,7 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I WHERE P.port_id
         AND P.cpwVcID = ? AND P.port_id = I.port_id',
         array( $pw_a['peer_device_id'], $pw_a['cpwVcID'],)
     );
+    $pw_b = cleanPort($pw_b);
 
     if (!port_permitted($pw_a['port_id'])) {
         $skip = 'yes';
@@ -73,7 +75,7 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I WHERE P.port_id
         echo "<tr style=\"background-color: #$bg;\"><td rowspan=2 style='font-size:18px; padding:4px;'>".$pw_a['cpwVcID'].'</td><td>'.generate_port_link($pw_a)."</td>
             <td rowspan=2> <i class='fa fa-arrows-alt fa-lg icon-theme' aria-hidden='true'></i> </td>
             <td>".generate_device_link($pw_b).'</td><td>'.generate_port_link($pw_b).'</td></tr>';
-        echo "<tr style=\"background-color: #$bg;\"><td colspan=2>".display($pw_a['ifAlias']).'</td><td>'.display($pw_b['ifAlias']).'</td></tr>';
+        echo "<tr style=\"background-color: #$bg;\"><td colspan=2>".$pw_a['ifAlias'].'</td><td>'.$pw_b['ifAlias'].'</td></tr>';
 
         if ($vars['view'] == 'minigraphs') {
             echo "<tr style=\"background-color: #$bg;\"><td></td><td colspan=2>";

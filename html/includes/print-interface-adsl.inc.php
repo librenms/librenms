@@ -1,12 +1,14 @@
 <?php
 
 // This file prints a table row for each interface
+use LibreNMS\Util\IP;
+
 $port['device_id'] = $device['device_id'];
 $port['hostname']  = $device['hostname'];
 
 $if_id = $port['port_id'];
 
-$port = ifLabel($port);
+$port = cleanPort($port);
 
 if (!is_integer($i / 2)) {
     $row_colour = $list_colour_a;
@@ -40,7 +42,7 @@ if ($port_details) {
 
     foreach (dbFetchRows('SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?', array($port['port_id'])) as $ip6) {
         ;
-        echo "$break <a class=interface-desc href=\"javascript:popUp('netcmd.php?cmd=whois&amp;query=".$ip6['ipv6_address']."')\">".Net_IPv6::compress($ip6['ipv6_address']).'/'.$ip6['ipv6_prefixlen'].'</a>';
+        echo "$break <a class=interface-desc href=\"javascript:popUp('netcmd.php?cmd=whois&amp;query=".$ip6['ipv6_address']."')\">".IP::parse($ip6['ipv6_address'], true).'/'.$ip6['ipv6_prefixlen'].'</a>';
         $break = ',';
     }
 }

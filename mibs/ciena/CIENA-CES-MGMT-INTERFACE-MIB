@@ -1,0 +1,625 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+--
+ -- CIENA-CES-MGMT-INTERFACE-MIB.my
+ --
+ --
+
+ CIENA-CES-MGMT-INTERFACE-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS        
+   Integer32, Unsigned32, OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI         
+   DisplayString            
+        FROM SNMPv2-TC      
+   InetAddressType, InetAddress ,InetAddressPrefixLength  
+        FROM INET-ADDRESS-MIB  
+   cienaGlobalSeverity, cienaGlobalMacAddress
+        FROM  CIENA-GLOBAL-MIB
+   CienaGlobalState
+        FROM CIENA-TC
+   cienaCesNotifications, cienaCesConfig
+       FROM CIENA-SMI;                      
+    
+ cienaCesMgmtInterfaceMIB MODULE-IDENTITY
+        LAST-UPDATED "201505150000Z"
+        ORGANIZATION "Ciena, Inc"
+        CONTACT-INFO
+            "       Mib Meister
+                    115 North Sullivan Road
+                    Spokane Valley, WA 99037
+                    USA             
+                    Phone:  +1 509 242 9000
+                    Email:  support@ciena.com"                              
+        DESCRIPTION
+            "This module defines the management interface details and the 
+             associated notifications."
+
+        REVISION  "201505150000Z"
+        DESCRIPTION
+            "Added cienaCesInetIcmpPortUnreachable."
+        REVISION  "201504230000Z"
+        DESCRIPTION
+            "Defined cienaCesInetMgmtPort OBJECT IDENTIFIER at cienaCesMgmtInterface 5.
+             Defined cienaCesInetMgmtPortInterface at cienaCesInetMgmtPort 1."
+        REVISION  "201504060000Z"
+        DESCRIPTION
+            "Added new object, cienaCesInetMgmtInterfaceIngressAclProfId, to the cienaCesInetMgmtInterfaceTable
+             in order to display the ID of the ingress ACL profile attached to the management interface."
+        REVISION  "201411180000Z"
+        DESCRIPTION
+            "Defined cienaCesInetTcpStack OBJECT IDENTIFIER at cienaCesMgmtInterface 4.
+             Defined cienaCesInetTcpTimestamps at cienaCesInetTcpStack 1."
+        REVISION  "201410070000Z"
+        DESCRIPTION
+            "Added cienaCesInetIcmpAcceptRedirects and cienaCesInetIcmpEchoIgnoreBroadcasts."
+        REVISION  "201306170000Z"
+        DESCRIPTION
+            "Added cienaCesInetMgmtInterfaceDomainVsName to allow a correlation of the
+             remote interface and the virtual switch being used."
+        REVISION  "201204040000Z"
+        DESCRIPTION
+            "Initial creation."  
+        ::= { cienaCesConfig 27 }
+
+
+ --
+ -- Node definitions
+ --
+   
+ cienaCesMgmtInterfaceMIBObjects OBJECT IDENTIFIER ::= { cienaCesMgmtInterfaceMIB 1 }
+ 
+ 
+ --
+ -- IP Interface Node
+ --
+ cienaCesMgmtInterface OBJECT IDENTIFIER ::= { cienaCesMgmtInterfaceMIBObjects 1 }
+
+ -- Notifications 
+  
+ cienaCesMgmtInterfaceMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 27 } 
+ cienaCesMgmtInterfaceMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { cienaCesMgmtInterfaceMIBNotificationPrefix 0 }
+        
+
+ -- Conformance information 
+ 
+ cienaCesMgmtInterfaceMIBConformance OBJECT IDENTIFIER ::= { cienaCesMgmtInterfaceMIB 3 } 
+ cienaCesMgmtInterfaceMIBCompliances OBJECT IDENTIFIER ::= { cienaCesMgmtInterfaceMIBConformance 1 }     
+ cienaCesMgmtInterfaceMIBGroups      OBJECT IDENTIFIER ::= { cienaCesMgmtInterfaceMIBConformance 2 }
+
+
+ cienaCesInetMgmtInterfaceTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF CienaCesInetMgmtInterfaceEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "Table of management interfaces."
+     ::= { cienaCesMgmtInterface 1 }
+        
+ cienaCesInetMgmtInterfaceEntry OBJECT-TYPE
+     SYNTAX     CienaCesInetMgmtInterfaceEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "These interfaces are used to cause the switch CPU to
+         become involved with the IP traffic. By default, a 
+         minimum of two interfaces , one for
+         the local management interface and one for the remote 
+         management interface."
+     INDEX { cienaCesInetMgmtInterfaceIndex,cienaCesInetMgmtInterfaceAddrType,cienaCesInetMgmtInterfaceAddr}
+        ::= { cienaCesInetMgmtInterfaceTable 1 }
+        
+ CienaCesInetMgmtInterfaceEntry ::=  SEQUENCE { 
+      cienaCesInetMgmtInterfaceIndex               Integer32,
+      cienaCesInetMgmtInterfaceAddrType            InetAddressType,
+      cienaCesInetMgmtInterfaceAddr                InetAddress,    
+      cienaCesInetMgmtInterfaceAddrPrefixLength    InetAddressPrefixLength,
+      cienaCesInetMgmtInterfaceName                DisplayString,   
+      cienaCesInetMgmtInterfaceAdminState          CienaGlobalState,
+      cienaCesInetMgmtInterfaceOperState           CienaGlobalState,
+      cienaCesInetMgmtInterfaceDomain              INTEGER,
+      cienaCesInetMgmtInterfaceDomainId            Integer32,
+      cienaCesInetMgmtInterfacePktPriority         Integer32,
+      cienaCesInetMgmtInterfaceMtu                 Unsigned32,
+      cienaCesInetMgmtInterfaceNotifIndex          Integer32,
+      cienaCesInetMgmtInterfaceNotifAddrType       InetAddressType,
+      cienaCesInetMgmtInterfaceNotifAddr           InetAddress,
+      cienaCesInetMgmtInterfaceDomainVsName        DisplayString,
+      cienaCesInetMgmtInterfaceIngressAclProfId    Unsigned32
+ }
+  
+  cienaCesInetMgmtInterfaceIndex OBJECT-TYPE
+     SYNTAX       Integer32 (0..2147483647)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "Specifies the management interface index."
+     ::= { cienaCesInetMgmtInterfaceEntry 1 } 
+
+  cienaCesInetMgmtInterfaceAddrType OBJECT-TYPE
+     SYNTAX       InetAddressType
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "This OID specifies the Inet address type of the OIDs cienaCesInetMgmtInterfaceAddr and 
+         cienaCesInetMgmtInterfacePrefixLength.
+         When representing:
+         ipv4 : cienaCesInetMgmtInterfaceAddr should be compliant with InetAddressIPv4 from RFC 4001
+         ipv6 : cienaCesInetMgmtInterfaceAddr should be compliant with InetAddressIPv6 from RFC 4001"
+     ::= { cienaCesInetMgmtInterfaceEntry 2 } 
+
+  cienaCesInetMgmtInterfaceAddr OBJECT-TYPE
+     SYNTAX       InetAddress
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "Inet address associated with this interface. 
+         This OID should be used in conjuction with cienaCesInetMgmtInterfaceAddrType. 
+         This value should be compliant with RFC 4001 InetAddressType."
+     ::= { cienaCesInetMgmtInterfaceEntry 3 }
+
+  cienaCesInetMgmtInterfaceAddrPrefixLength OBJECT-TYPE
+     SYNTAX       InetAddressPrefixLength
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "Specifies the address prefix length. This OID should be used in conjuction 
+         with cienaCesInetMgmtInterfaceAddrType. 
+         This OID should be compliant with RFC 4001 InetAddressPrefixLength."
+     ::= { cienaCesInetMgmtInterfaceEntry 4 }
+        
+ cienaCesInetMgmtInterfaceName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..32))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "The management interface name for this interface."
+     ::= { cienaCesInetMgmtInterfaceEntry 5 }
+ 
+  cienaCesInetMgmtInterfaceAdminState  OBJECT-TYPE
+    SYNTAX      CienaGlobalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The admin state of this management interface. A value of enabled(1) 
+        indicates  that this interface is enabled and a value of 
+        disabled(2) indicates that this interface is disabled."
+    ::= { cienaCesInetMgmtInterfaceEntry 6 }
+       
+ cienaCesInetMgmtInterfaceOperState  OBJECT-TYPE
+    SYNTAX      CienaGlobalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The oper state of this management interface. A value of enabled(1) 
+        indicates  that this interface is enabled and a value of 
+        disabled(2) indicates that this interface is disabled."
+    ::= { cienaCesInetMgmtInterfaceEntry 7 }
+
+ cienaCesInetMgmtInterfaceDomain  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                 unknown(1),
+                 vs(2),
+                 vlan(3)
+                 }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the management interface domain."
+    ::= { cienaCesInetMgmtInterfaceEntry 8 }
+ 
+  cienaCesInetMgmtInterfaceDomainId  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the management interface domain index. 
+         When cienaCesInetMgmtInterfaceDomain represents 'vs', this object represents the vs index.
+         When cienaCesInetMgmtInterfaceDomain represents 'vlan , this object represents the vlan id."
+    ::= { cienaCesInetMgmtInterfaceEntry 9 }
+
+ cienaCesInetMgmtInterfacePktPriority  OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The 802.1p priority value for the management traffic on this interface."
+    ::= { cienaCesInetMgmtInterfaceEntry 10 }
+ 
+  cienaCesInetMgmtInterfaceMtu  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the interface path MTU."
+    ::= { cienaCesInetMgmtInterfaceEntry 11 }
+  
+  cienaCesInetMgmtInterfaceNotifIndex OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "Specifies the management interface index."
+     ::= { cienaCesInetMgmtInterfaceEntry 12 } 
+
+  cienaCesInetMgmtInterfaceNotifAddrType OBJECT-TYPE
+     SYNTAX       InetAddressType
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "This OID specifies the Inet address type of the OIDs cienaCesInetMgmtInterfaceNotifAddr and 
+         cienaCesInetMgmtInterfacePrefixLength.
+         When representing:
+         ipv4 : cienaCesInetMgmtInterfaceNotifAddr should be compliant with InetAddressIPv4 from RFC 4001
+         ipv6 : cienaCesInetMgmtInterfaceNotifAddr should be compliant with InetAddressIPv6 from RFC 4001"
+     ::= { cienaCesInetMgmtInterfaceEntry 13 } 
+
+  cienaCesInetMgmtInterfaceNotifAddr OBJECT-TYPE
+     SYNTAX       InetAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "Inet address associated with this interface. 
+         This OID should be used in conjuction with cienaCesInetMgmtInterfaceNotifAddrType. 
+         This value should be compliant with RFC 4001 InetAddressType."
+     ::= { cienaCesInetMgmtInterfaceEntry 14 }
+
+ cienaCesInetMgmtInterfaceDomainVsName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..31))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "The virtual switch name associated with the cienaCesInetMgmtInterfaceDomainId when
+          the cienaCesInetMgmtInterfaceDomain is vs."
+     ::= { cienaCesInetMgmtInterfaceEntry 15 }
+
+ cienaCesInetMgmtInterfaceIngressAclProfId OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "The ID of the ingress ACL profile attached to the management interface.
+          A non-zero value refers to the ACL profile as defined by the cienaCesAclProfileId object
+          in the cienaCesAccessListMIB module.         
+          A value of 0 means no ingress ACL profile is attached to this interface."
+     ::= { cienaCesInetMgmtInterfaceEntry 16 }
+ 
+
+--
+-- Gateway
+--  
+
+cienaCesInetGatewayTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF CienaCesInetGatewayEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "Table of gateway Inet addresses."
+     ::= { cienaCesMgmtInterface 2 }
+        
+ cienaCesInetGatewayEntry OBJECT-TYPE
+     SYNTAX     CienaCesInetGatewayEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "Gateway addresses represented here are used by the
+          management interfaces."
+     INDEX { cienaCesInetGatewayAddrType,cienaCesInetGatewayAddr}
+        ::= { cienaCesInetGatewayTable 1 }
+        
+ CienaCesInetGatewayEntry ::=  SEQUENCE { 
+      cienaCesInetGatewayAddrType    InetAddressType,
+      cienaCesInetGatewayAddr        InetAddress,
+      cienaCesInetGatewaySource      INTEGER,
+      cienaCesInetGatewayOperState   INTEGER,
+      cienaCesInetGatewayNotifAddrType InetAddressType,
+      cienaCesInetGatewayNotifAddr     InetAddress
+ }
+
+ cienaCesInetGatewayAddrType OBJECT-TYPE
+     SYNTAX       InetAddressType
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "This OID specifies the Inet Address Type of the OID cienaCesInetGatewayAddr 
+          When representing :
+         ipv4 : cienaCesInetGatewayAddr should be compliant with InetAddressIPv4 from RFC 4001
+         ipv6 : cienaCesInetGatewayAddr should be compliant with InetAddressIPv6 from RFC 4001
+         ipv6z : cienaCesInetGatewayAddr should be compliant with InetAddressIPv6z from RFC 4001"
+
+     ::= { cienaCesInetGatewayEntry 2 } 
+
+  cienaCesInetGatewayAddr OBJECT-TYPE
+     SYNTAX       InetAddress
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "Inet address associated with this interface. 
+         This OID should be used in conjuction with cienaCesInetGatewayAddrType. 
+         The InetAddress set here should be compliant with RFC 4001 InetAddressType."
+     ::= { cienaCesInetGatewayEntry 3 }
+  
+ cienaCesInetGatewaySource OBJECT-TYPE
+     SYNTAX     INTEGER 
+                {  
+                   unknown(1),
+                   dhcpv4(2),
+                   userConfiguredPrimary(3),
+                   userConfiguredBackup(4),
+                   auto(5)                
+                }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Specifies how this gateway was configured."
+     ::= { cienaCesInetGatewayEntry  4 }
+  
+ cienaCesInetGatewayOperState OBJECT-TYPE
+     SYNTAX      INTEGER
+     			 {      
+     			   selected(1),
+     			   disabled(2),
+     			   enabled(3),
+     			   unavailable(4),
+     			   standby(5)     			   
+     			 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Specifies the gateway's operational status."
+     ::= { cienaCesInetGatewayEntry 5 }
+ 
+  cienaCesInetGatewayNotifAddrType OBJECT-TYPE
+     SYNTAX       InetAddressType
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "This OID specifies the Inet Address Type of the OID cienaCesInetGatewayNotifAddr 
+          When representing :
+         ipv4 : cienaCesInetGatewayNotifAddr should be compliant with InetAddressIPv4 from RFC 4001
+         ipv6 : cienaCesInetGatewayNotifAddr should be compliant with InetAddressIPv6 from RFC 4001
+         ipv6z : cienaCesInetGatewayNotifAddr should be compliant with InetAddressIPv6z from RFC 4001"
+
+     ::= { cienaCesInetGatewayEntry 6 } 
+
+  cienaCesInetGatewayNotifAddr OBJECT-TYPE
+     SYNTAX       InetAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "Inet address associated with this interface. 
+         This OID should be used in conjuction with cienaCesInetGatewayNotifAddrType. 
+         The InetAddress set here should be compliant with RFC 4001 InetAddressType."
+     ::= { cienaCesInetGatewayEntry 7 }
+
+--
+-- IP forwarding and DSCP
+--
+  cienaCesInetStackTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF CienaCesInetStackEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "Table of Inet stack states."
+     ::= { cienaCesMgmtInterface 3 }
+        
+ cienaCesInetStackEntry OBJECT-TYPE
+     SYNTAX     CienaCesInetStackEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "Inet address type stack operational states."
+     INDEX { cienaCesInetAddrType}
+        ::= { cienaCesInetStackTable 1 }
+        
+ CienaCesInetStackEntry ::=  SEQUENCE { 
+      cienaCesInetAddrType           InetAddressType,
+      cienaCesInetForwardingState    INTEGER,
+      cienaCesInetDefaultDscp        Unsigned32,
+      cienaCesInetIcmpAcceptRedirects       INTEGER,
+      cienaCesInetIcmpEchoIgnoreBroadcasts  INTEGER,
+      cienaCesInetIcmpPortUnreachable       INTEGER
+ }
+
+ cienaCesInetAddrType OBJECT-TYPE
+     SYNTAX       InetAddressType
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "This object indicates the interface address type."
+     ::= { cienaCesInetStackEntry 1 } 
+
+  cienaCesInetForwardingState OBJECT-TYPE
+     SYNTAX       INTEGER
+     		      {
+     		        on(1),
+     		        off(2)
+     		      }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "This object indicates the forwarding state associated with this address type 
+          represented by cienaCesInetAddrType."
+     ::= { cienaCesInetStackEntry 2 }
+  
+ cienaCesInetDefaultDscp OBJECT-TYPE
+     SYNTAX      Unsigned32 
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "This object indicates the default DSCP associated with this address type 
+          represented by cienaCesInetAddrType."
+     ::= { cienaCesInetStackEntry  3 }
+  
+  cienaCesInetIcmpAcceptRedirects OBJECT-TYPE
+     SYNTAX       INTEGER
+     		      {
+     		        on(1),
+     		        off(2)
+     		      }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "This object indicates the ICMP accept-redirects setting associated with this address
+          type represented by cienaCesInetAddrType.  When on, the corresponding IP stack will
+          act upon received ICMP redirect messages.  When off, the corresponding IP stack
+          will not act upon received ICMP redirect messages."
+     ::= { cienaCesInetStackEntry 4 }
+
+  cienaCesInetIcmpEchoIgnoreBroadcasts OBJECT-TYPE
+     SYNTAX       INTEGER
+     		      {
+     		        on(1),
+     		        off(2)
+     		      }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "This object indicates the ICMP echo-ignore-broadcasts setting associated with this address
+          type represented by cienaCesInetAddrType.  This setting refers to whether the device will
+          ignore ICMP Echo Request messages which are directed toward a multicast or broadcast
+          destination address."
+     ::= { cienaCesInetStackEntry 5 }
+
+  cienaCesInetIcmpPortUnreachable OBJECT-TYPE
+     SYNTAX       INTEGER
+     		      {
+     		        on(1),
+     		        off(2)
+     		      }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "This object indicates the ICMP port-unreachable setting associated with this address
+          type represented by cienaCesInetAddrType.  When on, the corresponding IP stack will
+          send ICMP port-unreachable messages when appropriate to do so.  When off, the
+          corresponding IP stack will not send ICMP port-unreachable messages."
+     ::= { cienaCesInetStackEntry 6 }
+
+--
+-- TCP stack settings
+--
+  cienaCesInetTcpStack OBJECT IDENTIFIER ::= { cienaCesMgmtInterface 4 }
+
+  cienaCesInetTcpTimestamps OBJECT-TYPE
+     SYNTAX       INTEGER
+     		      {
+     		        on(1),
+     		        off(2)
+     		      }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "This object indicates the current setting of the TCP timestamps option used by
+          the TCP stack of the device."
+     ::= { cienaCesInetTcpStack 1 }
+
+--
+-- MGMT port settings
+--
+  cienaCesInetMgmtPort OBJECT IDENTIFIER ::= { cienaCesMgmtInterface 5 }
+
+  cienaCesInetMgmtPortInterface OBJECT-TYPE
+     SYNTAX       INTEGER
+     		      {
+     		        local(1),
+     		        remote(2)
+     		      }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "This object indicates the way in which traffic at the MGMT port is used."
+     ::= { cienaCesInetMgmtPort 1 }
+
+ --
+ -- notifications
+ --
+ cienaCesInetMgmtAddrChangeNotification NOTIFICATION-TYPE
+    OBJECTS {  
+               cienaGlobalSeverity,
+               cienaGlobalMacAddress,       
+               cienaCesInetMgmtInterfaceNotifIndex,
+               cienaCesInetMgmtInterfaceNotifAddrType,
+               cienaCesInetMgmtInterfaceNotifAddr,
+               cienaCesInetMgmtInterfaceAddrPrefixLength,
+               cienaCesInetMgmtInterfaceName
+            }
+    STATUS  current
+    DESCRIPTION
+        "A cienaCesInetMgmtAddrChangeNotification is sent when the 
+        inet address of the associated interface changes. " 
+    ::= { cienaCesMgmtInterfaceMIBNotifications 1 }
+ 
+  cienaCesInetMgmtAddrAddedNotification NOTIFICATION-TYPE
+    OBJECTS {  
+               cienaGlobalSeverity,
+               cienaGlobalMacAddress,       
+               cienaCesInetMgmtInterfaceNotifIndex,
+               cienaCesInetMgmtInterfaceNotifAddrType,
+               cienaCesInetMgmtInterfaceNotifAddr,
+               cienaCesInetMgmtInterfaceAddrPrefixLength,
+               cienaCesInetMgmtInterfaceName
+            }
+    STATUS  current
+    DESCRIPTION
+        "A cienaCesInetMgmtAddrChangeNotification is sent when a new interface 
+         is added." 
+    ::= { cienaCesMgmtInterfaceMIBNotifications 2 }
+
+ cienaCesInetMgmtAddrRemovedNotification NOTIFICATION-TYPE
+    OBJECTS {  
+               cienaGlobalSeverity,
+               cienaGlobalMacAddress,       
+               cienaCesInetMgmtInterfaceNotifIndex,
+               cienaCesInetMgmtInterfaceNotifAddrType,
+               cienaCesInetMgmtInterfaceNotifAddr,
+               cienaCesInetMgmtInterfaceAddrPrefixLength,
+               cienaCesInetMgmtInterfaceName
+            }
+    STATUS  current
+    DESCRIPTION
+        "A cienaCesInetMgmtAddrChangeNotification is sent when an interface
+         is removed." 
+    ::= { cienaCesMgmtInterfaceMIBNotifications 3 }
+ 
+   cienaCesInetGatewayAddrChangeNotification  NOTIFICATION-TYPE
+    OBJECTS {   
+                cienaGlobalSeverity,
+                cienaGlobalMacAddress,
+                cienaCesInetGatewayNotifAddrType,
+                cienaCesInetGatewayNotifAddr                 
+            }
+    STATUS     current
+    DESCRIPTION  
+        "A cienaCesInetGatewayAddrChangeNotification is sent  
+        when the address associated with the gateway is changed."  
+    ::= { cienaCesMgmtInterfaceMIBNotifications 4 }
+ 
+    cienaCesInetGatewayAddedNotification  NOTIFICATION-TYPE
+    OBJECTS {   
+                cienaGlobalSeverity,
+                cienaGlobalMacAddress,
+                cienaCesInetGatewayNotifAddrType,
+                cienaCesInetGatewayNotifAddr                 
+            }
+    STATUS     current
+    DESCRIPTION  
+        "A cienaCesInetGatewayAddrAddNotification is sent  
+        when a new gateway is added."  
+    ::= { cienaCesMgmtInterfaceMIBNotifications 5 }
+ 
+    cienaCesInetGatewayRemovedNotification  NOTIFICATION-TYPE
+    OBJECTS {   
+                cienaGlobalSeverity,
+                cienaGlobalMacAddress,
+                cienaCesInetGatewayNotifAddrType,
+                cienaCesInetGatewayNotifAddr                 
+            }
+    STATUS     current
+    DESCRIPTION  
+        "A cienaCesInetGatewayRemovedNotification is sent  
+        when a gateway is removed."  
+    ::= { cienaCesMgmtInterfaceMIBNotifications 6 }
+
+  END

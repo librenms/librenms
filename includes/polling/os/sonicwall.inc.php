@@ -9,6 +9,8 @@
 // SNMPv2-SMI::enterprises.8741.2.1.1.3.0 = STRING: "SonicOS Enhanced 5.6.0.11-61o"
 // SNMPv2-SMI::enterprises.8741.2.1.1.4.0 = STRING: "5.0.2.11"
 
+use LibreNMS\RRD\RrdDefinition;
+
 $hardware = trim(snmp_get($device, '.1.3.6.1.4.1.8741.2.1.1.1.0', '-OQv', '', ''), '" ');
 $serial = trim(snmp_get($device, '.1.3.6.1.4.1.8741.2.1.1.2.0', '-OQv', '', ''), '" ');
 $fwversion = trim(snmp_get($device, '.1.3.6.1.4.1.8741.2.1.1.3.0', '-OQv', '', ''), '" ');
@@ -18,10 +20,9 @@ $oids = 'sonicCurrentConnCacheEntries.0 sonicMaxConnCacheEntries.0';
 $data = snmp_get_multi($device, $oids, '-OQUs', 'SONICWALL-FIREWALL-IP-STATISTICS-MIB');
 
 if (is_numeric($data)) {
-    $rrd_def = array(
-        'DS:activesessions:GAUGE:600:0:U',
-        'DS:maxsessions:GAUGE:600:0:U',
-    );
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('activesessions', 'GAUGE', 0)
+        ->addDataset('maxsessions', 'GAUGE', 0);
     $fields = array(
         'activesessions' => $data[0]['sonicCurrentConnCacheEntries'],
         'maxsessions' => $data[0]['sonicMaxConnCacheEntries'],

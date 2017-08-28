@@ -1,9 +1,10 @@
--- ArubaOS 3.2.0.0_16376
+--- ArubaOS 6.5.2.0_59123
 -- vim:set ts=4 sw=4:
 WLSX-MESH-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
-       TEXTUAL-CONVENTION,
+       TEXTUAL-CONVENTION FROM SNMPv2-TC 
+              
        MODULE-IDENTITY,
        OBJECT-TYPE,
        snmpModules,
@@ -39,7 +40,7 @@ WLSX-MESH-MIB DEFINITIONS ::= BEGIN
 			FROM ARUBA-MIB;
 
    wlsxMeshMIB MODULE-IDENTITY 
-       LAST-UPDATED "0707040044Z"
+       LAST-UPDATED "0708060518Z"
        ORGANIZATION "Aruba Wireless Networks"
        CONTACT-INFO
             "Postal:    1322 Crossman Avenue
@@ -50,7 +51,7 @@ WLSX-MESH-MIB DEFINITIONS ::= BEGIN
            "This MIB module defines MIB objects which provides
             information about Mesh portal and topology 
 		in the Aruba controller."
-       REVISION        "0707040044Z"
+       REVISION        "0708060518Z"
        DESCRIPTION
            "The initial revision."
        ::= { wlsxEnterpriseMibModules 13 }
@@ -90,15 +91,23 @@ WLSX-MESH-MIB DEFINITIONS ::= BEGIN
       
    MeshEntry ::=
      SEQUENCE {
-		wlsxMeshRole           ArubaMeshRole,
-		wlsxMeshNodeParent    MacAddress,
-		wlsxMeshNodeChildrenCount  Unsigned32,
-		wlsxMeshNodeCluster      DisplayString,
-		wlsxMeshNodeRfBand    ArubaPhyType,
-		wlsxMeshNodePathCost  Integer32,
-		wlsxMeshNodeNodeCost  Integer32,
-		wlsxMeshNodeLinkCost  Integer32,
-		wlsxMeshNodeHopCount  Integer32
+		wlsxMeshRole                    ArubaMeshRole,
+		wlsxMeshNodeParent              MacAddress,
+		wlsxMeshNodeChildrenCount       Unsigned32,
+		wlsxMeshNodeCluster             DisplayString,
+		wlsxMeshNodeRfBand              ArubaPhyType,
+		wlsxMeshNodePathCost            Integer32,
+		wlsxMeshNodeNodeCost            Integer32,
+		wlsxMeshNodeLinkCost            Integer32,
+		wlsxMeshNodeHopCount            Integer32,
+                wlsxMeshSNR                     Unsigned32,
+                wlsxMeshTxRate                  Unsigned32,
+                wlsxMeshRxRate                  Unsigned32,
+                wlsxMeshUplinkAge               TimeTicks,
+                wlsxMeshNumRecoveryChildren     Unsigned32,
+                wlsxMeshTopologyUpdateAge       TimeTicks,
+                wlsxMeshIsRecovery              TruthValue,
+                wlsxMeshIs11n                   TruthValue
     } 
 	wlsxMeshRole OBJECT-TYPE
          SYNTAX       ArubaMeshRole
@@ -116,7 +125,7 @@ WLSX-MESH-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			Mesh node parent
+			Wired MAC address of mesh node's parent
             "
         ::= { wlsxMeshNodeEntry 2 }
 
@@ -136,7 +145,7 @@ WLSX-MESH-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			Mesh cluster name. Value in float.
+			Mesh cluster name.
             "
         ::= { wlsxMeshNodeEntry 4 }
 
@@ -186,8 +195,88 @@ WLSX-MESH-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			Mesh topology hop cost
+			Mesh topology hop count.
             "
         ::= { wlsxMeshNodeEntry 9 }
+
+  	wlsxMeshSNR OBJECT-TYPE
+         SYNTAX       Unsigned32
+  		 MAX-ACCESS   read-only		
+         STATUS       current
+         DESCRIPTION
+            "
+			Signal-to-noise ratio mesh point sees its parent at. 
+            "
+        ::= { wlsxMeshNodeEntry 10 }
+
+  	wlsxMeshTxRate OBJECT-TYPE
+         SYNTAX       Unsigned32
+  		 MAX-ACCESS   read-only		
+         STATUS       current
+         DESCRIPTION
+            "
+			Transmit rate for mesh-uplink [mbps].
+            "
+        ::= { wlsxMeshNodeEntry 11 }
+
+  	wlsxMeshRxRate OBJECT-TYPE
+         SYNTAX       Unsigned32
+  		 MAX-ACCESS   read-only		
+         STATUS       current
+         DESCRIPTION
+            "
+			Receive rate for mesh-uplink [mbps].
+            "
+        ::= { wlsxMeshNodeEntry 12 }
+
+  	wlsxMeshUplinkAge OBJECT-TYPE
+         SYNTAX       TimeTicks
+  		 MAX-ACCESS   read-only		
+         STATUS       current
+         DESCRIPTION
+            "
+			Time elapsed since the mesh-uplink was formed.
+            "
+        ::= { wlsxMeshNodeEntry 13 }
+
+  	wlsxMeshNumRecoveryChildren OBJECT-TYPE
+         SYNTAX       Unsigned32
+  		 MAX-ACCESS   read-only		
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of children in recovery this mesh node has.
+            "
+        ::= { wlsxMeshNodeEntry 14 }
+
+  	wlsxMeshTopologyUpdateAge OBJECT-TYPE
+         SYNTAX       TimeTicks
+  		 MAX-ACCESS   read-only		
+         STATUS       current
+         DESCRIPTION
+            "
+			Time elapsed since the last mesh topology update was received from this node.
+            "
+        ::= { wlsxMeshNodeEntry 15 }
+
+  	wlsxMeshIsRecovery OBJECT-TYPE
+         SYNTAX       TruthValue
+  		 MAX-ACCESS   read-only		
+         STATUS       current
+         DESCRIPTION
+            "
+			True if this mesh point is in recovery.
+            "
+        ::= { wlsxMeshNodeEntry 16 }
+
+  	wlsxMeshIs11n OBJECT-TYPE
+         SYNTAX       TruthValue
+  		 MAX-ACCESS   read-only		
+         STATUS       current
+         DESCRIPTION
+            "
+			True if this mesh node is 11n-enabled.
+            "
+        ::= { wlsxMeshNodeEntry 17 }
 
 END        

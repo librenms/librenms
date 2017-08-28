@@ -6,5 +6,5 @@ over:
     - { graph: device_processor, text: CPU }
     - { graph: device_mempool, text: Memory }
 discovery:
-    - sysDescr:
-        - SonicWALL
+    - sysObjectId:
+        - .1.3.6.1.4.1.8741.

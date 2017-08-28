@@ -1,5 +1,5 @@
 source: Installation/Ubuntu-image.md
-> NOTE: We highly advice that you change all passwords on this image when you deploy it!!
+> NOTE: We highly advise that you change all passwords on this image when you deploy it!!
 
 > NOTE: Read the above note again!
 

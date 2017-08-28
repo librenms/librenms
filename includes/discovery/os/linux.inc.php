@@ -12,6 +12,8 @@ if (starts_with($sysDescr, 'Linux') || starts_with($sysObjectId, '.1.3.6.1.4.1.8
         } elseif (snmp_get($device, 'fwVersion.1', '-Osqnv', 'UBNT-AirFIBER-MIB', 'ubnt') !== false) {
             $os = 'airos-af';
         }
+    } elseif (snmp_get($device, 'extrahopInfoVersionString', '-Osqnv', 'EXTRAHOP-MIB', 'extrahop') !== false) {
+        $os = 'extrahop';
     } elseif (snmp_get($device, 'GANDI-MIB::rxCounter.0', '-Osqnv', 'GANDI-MIB') !== false) {
         $os = 'pktj';
     } elseif (snmp_get($device, 'SFA-INFO::systemName.0', '-Osqnv', 'SFA-INFO') !== false) {

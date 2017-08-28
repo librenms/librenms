@@ -188,11 +188,16 @@ function QueryDevicesFromGroup($group_id)
  * Get an array of all the device ids belonging to this group_id
  * @param $group_id
  * @param bool $nested Return an array of arrays containing 'device_id'. (for API compatibility)
+ * @param string $full Return all fields from devices_id
  * @return array
  */
-function GetDevicesFromGroup($group_id, $nested = false)
+function GetDevicesFromGroup($group_id, $nested = false, $full = '')
 {
-    $query = 'SELECT `device_id` FROM `device_group_device` WHERE `device_group_id`=?';
+    if ($full) {
+        $query = 'SELECT `device_groups`.`name`, `devices`.* FROM `device_groups` INNER JOIN `device_group_device` ON `device_groups`.`id` = `device_group_device`.`device_group_id` INNER JOIN `devices` ON `device_group_device`.`device_id` = `devices`.`device_id` WHERE `device_groups`.`id` = ?';
+    } else {
+        $query = 'SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ? ';
+    }
     if ($nested) {
         return dbFetchRows($query, array($group_id));
     } else {

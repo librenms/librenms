@@ -5,7 +5,7 @@ DROP TABLE `frequency`;
 ALTER TABLE  `mempools` CHANGE  `mempool_index`  `mempool_index` VARCHAR( 16 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
 ALTER TABLE `vrfs` CHANGE `mplsVpnVrfRouteDistinguisher` `mplsVpnVrfRouteDistinguisher` varchar(26) NOT NULL;
 ## Change port rrds
-ALTER TABLE  `perf_times` CHANGE  `duration`  `duration` DOUBLE( 8, 2 ) NOT NULL
+ALTER TABLE  `perf_times` CHANGE  `duration`  `duration` DOUBLE( 8, 2 ) NOT NULL;
 ## Extend port descriptions
 ALTER TABLE ports MODIFY port_descr_circuit VARCHAR(255);
 ALTER TABLE ports MODIFY port_descr_descr VARCHAR(255);

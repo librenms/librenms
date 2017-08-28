@@ -1,9 +1,11 @@
 <?php
-//
-// NO CHANGES TO THIS FILE, IT IS NOT USER-EDITABLE   #
-//
-// YES, THAT MEANS YOU                   #
-//
+/*
+ NO CHANGES TO THIS FILE, IT IS NOT USER-EDITABLE
+
+ YES, THAT MEANS YOU
+
+ Any changes you want to make here, make in config.php instead.
+*/
 
 $config['os']['default']['over'][0]['graph'] = 'device_processor';
 $config['os']['default']['over'][0]['text']  = 'Processor Usage';
@@ -111,6 +113,10 @@ $config['graph_types']['device']['ubnt_airfiber_RFTotOctetsRx']['descr'] = 'RF T
 $config['graph_types']['device']['ubnt_airfiber_RFTotPktsRx']['section'] = 'wireless';
 $config['graph_types']['device']['ubnt_airfiber_RFTotPktsRx']['order'] = '7';
 $config['graph_types']['device']['ubnt_airfiber_RFTotPktsRx']['descr'] = 'RF Total Packets Rx';
+
+$config['graph_types']['device']['ubnt_airfiber_RxPower']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airfiber_RxPower']['order'] = '8';
+$config['graph_types']['device']['ubnt_airfiber_RxPower']['descr'] = 'Radio Rx Power';
 
 // Unifi Support
 $config['graph_types']['device']['ubnt_unifi_RadioCu_0']['section'] = 'wireless';
@@ -645,6 +651,16 @@ $config['device_types'][$i]['text'] = 'Appliance';
 $config['device_types'][$i]['type'] = 'appliance';
 $config['device_types'][$i]['icon'] = 'appliance.png';
 
+$i++;
+$config['device_types'][$i]['text'] = 'Collaboration';
+$config['device_types'][$i]['type'] = 'collaboration';
+$config['device_types'][$i]['icon'] = 'collaboration.png';
+
+$i++;
+$config['device_types'][$i]['text'] = 'Workstation';
+$config['device_types'][$i]['type'] = 'workstation';
+$config['device_types'][$i]['icon'] = 'workstation.png';
+
 //
 // No changes below this line #
 //
@@ -673,6 +689,8 @@ if (isset($_SERVER['HTTPS'])) {
 // Set some times needed by loads of scripts (it's dynamic, so we do it here!)
 $config['time']['now']      = time();
 $config['time']['now']     -= ($config['time']['now'] % 300);
+$config['time']['onehour'] = ($config['time']['now'] - 3600);
+// time() - (1 * 60 * 60);
 $config['time']['fourhour'] = ($config['time']['now'] - 14400);
 // time() - (4 * 60 * 60);
 $config['time']['sixhour'] = ($config['time']['now'] - 21600);
@@ -704,6 +722,8 @@ $config['ipmi_unit']['Volts']     = 'voltage';
 $config['ipmi_unit']['degrees C'] = 'temperature';
 $config['ipmi_unit']['RPM']       = 'fanspeed';
 $config['ipmi_unit']['Watts']     = 'power';
+$config['ipmi_unit']['Amps']      = 'current';
+$config['ipmi_unit']['percent']   = 'load';
 $config['ipmi_unit']['discrete']  = '';
 
 // Define some variables if they aren't set by user definition in config.php

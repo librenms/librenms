@@ -23,9 +23,9 @@ $poller_start = microtime(true);
 echo "Starting Polling Session ... \n\n";
 
 // Wait for schema update, as running during update can break update
-$dbVersion = dbFetchCell('SELECT version FROM dbSchema');
+$dbVersion = get_db_schema();
 if ($dbVersion < 107) {
-    logfile("BILLING: Cannot continue until dbSchema update to >= 107 is complete");
+    logfile("BILLING: Cannot continue until the database schema update to >= 107 is complete");
     exit(1);
 }
 

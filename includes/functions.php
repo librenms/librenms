@@ -15,8 +15,10 @@ use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
+use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
+use LibreNMS\Util\IP;
 
 function set_debug($debug)
 {
@@ -100,9 +102,18 @@ function getHostOS($device)
     // check yaml files
     $pattern = $config['install_dir'] . '/includes/definitions/*.yaml';
     foreach (glob($pattern) as $file) {
-        $tmp = Symfony\Component\Yaml\Yaml::parse(
-            file_get_contents($file)
-        );
+        $os = basename($file, '.yaml');
+        if (isset($config['os'][$os]['os'])) {
+            $tmp = $config['os'][$os];
+        } else {
+            $tmp = Symfony\Component\Yaml\Yaml::parse(
+                file_get_contents($file)
+            );
+            // pull in user overrides
+            if (isset($config['os'][$os])) {
+                $tmp = array_replace_recursive($tmp, $config['os'][$os]);
+            }
+        }
         if (isset($tmp['discovery']) && is_array($tmp['discovery'])) {
             foreach ($tmp['discovery'] as $item) {
                 // check each item individually, if all the conditions in that item are true, we have a match
@@ -141,20 +152,24 @@ function checkDiscovery($array, $sysObjectId, $sysDescr)
 {
     // all items must be true
     foreach ($array as $key => $value) {
+        if ($check = ends_with($key, '_except')) {
+            $key = substr($key, 0, -7);
+        }
+
         if ($key == 'sysObjectId') {
-            if (!starts_with($sysObjectId, $value)) {
+            if (starts_with($sysObjectId, $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysDescr') {
-            if (!str_contains($sysDescr, $value)) {
+            if (str_contains($sysDescr, $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysDescr_regex') {
-            if (!preg_match_any($sysDescr, $value)) {
+            if (preg_match_any($sysDescr, $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysObjectId_regex') {
-            if (!preg_match_any($sysObjectId, $value)) {
+            if (preg_match_any($sysObjectId, $value) == $check) {
                 return false;
             }
         }
@@ -224,12 +239,18 @@ function getLogo($device)
 }
 
 /**
- * @param $device
+ * @param array $device
+ * @param string $class to apply to the image tag
  * @return string an image tag with the logo for this device. Images are often wide, not square.
  */
-function getLogoTag($device)
+function getLogoTag($device, $class = null)
 {
-    return '<img src="' . getLogo($device) . '" title="' . getImageTitle($device) . '"/>';
+    $tag = '<img src="' . getLogo($device) . '" title="' . getImageTitle($device) . '"';
+    if (isset($class)) {
+        $tag .= " class=\"$class\" ";
+    }
+    $tag .= ' />';
+    return  $tag;
 }
 
 /**
@@ -337,6 +358,11 @@ function delete_device($id)
         $ret .= "Removed interface $int_id ($int_if)\n";
     }
 
+    // Remove sensors manually due to constraints
+    foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `device_id` = ?", array($id)) as $sensor) {
+        $sensor_id = $sensor['sensor_id'];
+        dbDelete('sensors_to_state_indexes', "`sensor_id` = ?", array($sensor));
+    }
     $fields = array('device_id','host');
     foreach ($fields as $field) {
         foreach (dbFetch("SELECT table_name FROM information_schema.columns WHERE table_schema = ? AND column_name = ?", array($config['db_name'],$field)) as $table) {
@@ -356,6 +382,7 @@ function delete_device($id)
 
     $ret .= "Removed device $host\n";
     log_event("Device $host has been removed", 0, 'system', 3);
+    oxidized_reload_nodes();
     return $ret;
 }
 
@@ -384,7 +411,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     global $config;
 
     // Test Database Exists
-    if (host_exists($host) === true) {
+    if (host_exists($host)) {
         throw new HostExistsException("Already have host $host");
     }
 
@@ -419,7 +446,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         $snmpvers = array($snmp_version);
     }
 
-    $host_unreachable_exception = new HostUnreachableException("Could not connect, please check the snmp details and snmp reachability");
+    $host_unreachable_exception = new HostUnreachableException("Could not connect to $host, please check the snmp details and snmp reachability");
     // try different snmp variables to add the device
     foreach ($snmpvers as $snmpver) {
         if ($snmpver === "v3") {
@@ -427,13 +454,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
             foreach ($config['snmp']['v3'] as $v3) {
                 $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode);
                 if ($force_add === true || isSNMPable($device)) {
-                    if ($force_add !== true) {
-                        $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-                    }
-                    $result = createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $snmphost, $force_add);
-                    if ($result !== false) {
-                        return $result;
-                    }
+                    return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add);
                 } else {
                     $host_unreachable_exception->addReason("SNMP $snmpver: No reply with credentials " . $v3['authname'] . "/" . $v3['authlevel']);
                 }
@@ -444,13 +465,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
                 $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode);
 
                 if ($force_add === true || isSNMPable($device)) {
-                    if ($force_add !== true) {
-                        $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-                    }
-                    $result = createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $snmphost, $force_add);
-                    if ($result !== false) {
-                        return $result;
-                    }
+                    return createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $force_add);
                 } else {
                     $host_unreachable_exception->addReason("SNMP $snmpver: No reply with community $community");
                 }
@@ -490,17 +505,6 @@ function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp
     }
 
     return $device;
-}
-
-function netmask2cidr($netmask)
-{
-    $addr = Net_IPv4::parseAddress("1.2.3.4/$netmask");
-    return $addr->bitmask;
-}
-
-function cidr2netmask($netmask)
-{
-    return (long2ip(ip2long("255.255.255.255") << (32-$netmask)));
 }
 
 function formatUptime($diff, $format = "long")
@@ -557,15 +561,16 @@ function isSNMPable($device)
 {
     global $config;
 
-    $pos = snmp_get($device, "sysObjectID.0", "-Oqv", "SNMPv2-MIB");
-    if (empty($pos)) {
-        // Support for Hikvision
-        $pos = snmp_get($device, "SNMPv2-SMI::enterprises.39165.1.1.0", "-Oqv", "SNMPv2-MIB");
-    }
-    if ($pos === '' || $pos === false) {
-        return false;
-    } else {
+    $pos = snmp_check($device);
+    if ($pos === true) {
         return true;
+    } else {
+        $pos = snmp_get($device, "sysObjectID.0", "-Oqv", "SNMPv2-MIB");
+        if ($pos === '' || $pos === false) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }
 
@@ -637,9 +642,33 @@ function getpollergroup($poller_group = '0')
     }
 }
 
-function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group = '0', $port_assoc_mode = 'ifIndex', $snmphost = '', $force_add = false)
-{
-    global $config;
+/**
+ * Add a host to the database
+ *
+ * @param string $host The IP or hostname to add
+ * @param string $community The snmp community
+ * @param string $snmpver snmp version: v1 | v2c | v3
+ * @param int $port SNMP port number
+ * @param string $transport SNMP transport: udp | udp6 | udp | tcp6
+ * @param array $v3 SNMPv3 settings required array keys: authlevel, authname, authpass, authalgo, cryptopass, cryptoalgo
+ * @param int $poller_group distributed poller group to assign this host to
+ * @param string $port_assoc_mode field to use to identify ports: ifIndex, ifName, ifDescr, ifAlias
+ * @param bool $force_add Do not detect the host os
+ * @return int the id of the added host
+ * @throws HostExistsException Throws this exception if the host already exists
+ * @throws Exception Throws this exception if insertion into the database fails
+ */
+function createHost(
+    $host,
+    $community,
+    $snmpver,
+    $port = 161,
+    $transport = 'udp',
+    $v3 = array(),
+    $poller_group = 0,
+    $port_assoc_mode = 'ifIndex',
+    $force_add = false
+) {
     $host = trim(strtolower($host));
 
     $poller_group=getpollergroup($poller_group);
@@ -650,8 +679,10 @@ function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp'
         $port_assoc_mode = get_port_assoc_mode_id($port_assoc_mode);
     }
 
-    $device = array('hostname' => $host,
+    $device = array(
+        'hostname' => $host,
         'sysName' => $host,
+        'os' => 'generic',
         'community' => $community,
         'port' => $port,
         'transport' => $transport,
@@ -662,28 +693,23 @@ function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp'
         'port_association_mode' => $port_assoc_mode,
     );
 
-    $device = array_merge($device, $v3);
+    $device = array_merge($device, $v3);  // merge v3 settings
 
     if ($force_add !== true) {
         $device['os'] = getHostOS($device);
-    } else {
-        $device['os'] = 'generic';
-    }
 
-    if ($device['os']) {
-        if (host_exists($host, $snmphost) === false) {
-            $device_id = dbInsert($device, 'devices');
-            if ($device_id) {
-                oxidized_reload_nodes();
-                return $device_id;
-            }
-        } else {
-            throw new HostExistsException("Already have host $host ($snmphost)");
+        $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
+        if (host_exists($host, $snmphost)) {
+            throw new HostExistsException("Already have host $host ($snmphost) due to duplicate sysName");
         }
     }
 
-    // couldn't add the device
-    return false;
+    $device_id = dbInsert($device, 'devices');
+    if ($device_id) {
+        return $device_id;
+    }
+
+    throw new \Exception("Failed to add host to the database, please run ./validate.php");
 }
 
 function isDomainResolves($domain)
@@ -732,6 +758,7 @@ function match_network($nets, $ip, $first = false)
     return $return;
 }
 
+// FIXME port to LibreNMS\Util\IPv6 class
 function snmp2ipv6($ipv6_snmp)
 {
     $ipv6 = explode('.', $ipv6_snmp);
@@ -755,18 +782,13 @@ function snmp2ipv6($ipv6_snmp)
 
 function ipv62snmp($ipv6)
 {
-    $ipv6_split = array();
-    $ipv6_ex = explode(':', Net_IPv6::uncompress($ipv6));
-    for ($i = 0; $i < 8; $i++) {
-        $ipv6_ex[$i] = zeropad($ipv6_ex[$i], 4);
+    try {
+        $ipv6 = IP::parse($ipv6)->uncompressed();
+        $ipv6_split = str_split(str_replace(':', '', $ipv6), 2);
+        return implode('.', array_map('hexdec', $ipv6_split));
+    } catch (InvalidIpException $e) {
+        return '';
     }
-    $ipv6_ip = implode('', $ipv6_ex);
-    for ($i = 0; $i < 32;
-    $i+=2) {
-        $ipv6_split[] = hexdec(substr($ipv6_ip, $i, 2));
-    }
-
-    return implode('.', $ipv6_split);
 }
 
 function get_astext($asn)
@@ -788,20 +810,30 @@ function get_astext($asn)
     }
 }
 
-# Use this function to write to the eventlog table
+/**
+ * Log events to the event table
+ *
+ * @param string $text message describing the event
+ * @param array|int $device device array or device_id
+ * @param string $type brief category for this event. Examples: sensor, state, stp, system, temperature, interface
+ * @param int $severity 1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
+ * @param int $reference the id of the referenced entity.  Supported types: interface
+ */
 function log_event($text, $device = null, $type = null, $severity = 2, $reference = null)
 {
     if (!is_array($device)) {
         $device = device_by_id_cache($device);
     }
 
-    $insert = array('host' => ($device['device_id'] ? $device['device_id'] : 0),
-        'device_id' => ($device['device_id'] ? $device['device_id'] : 0),
-        'reference' => ($reference ? $reference : "NULL"),
-        'type' => ($type ? $type : "NULL"),
+    $insert = array('host' => ($device['device_id'] ?: 0),
+        'device_id' => ($device['device_id'] ?: 0),
+        'reference' => ($reference ?: "NULL"),
+        'type' => ($type ?: "NULL"),
         'datetime' => array("NOW()"),
         'severity' => $severity,
-        'message' => $text);
+        'message' => $text,
+        'username'  => $_SESSION['username'] ?: '',
+     );
 
     dbInsert($insert, 'eventlog');
 }
@@ -835,9 +867,7 @@ function send_mail($emails, $subject, $message, $html = false)
     if (is_array($emails) || ($emails = parse_email($emails))) {
         $mail = new PHPMailer();
         $mail->Hostname = php_uname('n');
-        if (empty($config['email_from'])) {
-            $config['email_from'] = '"' . $config['project_name'] . '" <' . $config['email_user'] . '@'.$mail->Hostname.'>';
-        }
+
         foreach (parse_email($config['email_from']) as $from => $from_name) {
             $mail->setFrom($from, $from_name);
         }
@@ -924,7 +954,7 @@ function snmp_hexstring($hex)
 # Check if the supplied string is an SNMP hex string
 function isHexString($str)
 {
-    return preg_match("/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is", trim($str));
+    return (bool)preg_match("/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is", trim($str));
 }
 
 # Include all .inc.php files in $dir
@@ -957,8 +987,6 @@ function is_port_valid($port, $device)
     if (empty($port['ifDescr']) && empty($port['ifAlias']) && empty($port['ifName'])) {
         // If these are all empty, we are just going to show blank names in the ui
         $valid = 0;
-    } elseif (strstr($port['ifDescr'], "irtual") && strpos($port['ifDescr'], "Virtual Services Platform") === false) {
-        $valid = 0;
     } else {
         $valid = 1;
         $if = strtolower($port['ifDescr']);
@@ -968,10 +996,16 @@ function is_port_valid($port, $device)
         if (is_array($config['os'][$device['os']]['bad_if'])) {
             $fringe = array_merge($config['bad_if'], $config['os'][$device['os']]['bad_if']);
         }
+        $config['good_if'] = $config['good_if'] ?: array();
+        if (is_array($config['os'][$device['os']]['good_if'])) {
+            $good_if = array_merge($config['good_if'], $config['os'][$device['os']]['good_if']);
+        }
         foreach ($fringe as $bi) {
             if (stristr($if, $bi)) {
-                $valid = 0;
-                d_echo("ignored : $bi : $if");
+                if (!str_contains($good_if, $if)) {
+                    $valid = 0;
+                    d_echo("ignored : $bi : $if");
+                }
             }
         }
         if (is_array($config['bad_if_regexp'])) {
@@ -982,7 +1016,7 @@ function is_port_valid($port, $device)
             foreach ($fringe as $bi) {
                 if (preg_match($bi ."i", $if)) {
                     $valid = 0;
-                    d_echo("ignored : $bi : ".$if);
+                    d_echo("ignored : $bi : " . $if);
                 }
             }
         }
@@ -1237,24 +1271,34 @@ function guidv4($data)
  */
 function set_curl_proxy($curl)
 {
-    global $config;
-
-    $proxy = '';
-    if (getenv('http_proxy')) {
-        $proxy = getenv('http_proxy');
-    } elseif (getenv('https_proxy')) {
-        $proxy = getenv('https_proxy');
-    } elseif (isset($config['callback_proxy'])) {
-        $proxy = $config['callback_proxy'];
-    } elseif (isset($config['http_proxy'])) {
-        $proxy = $config['http_proxy'];
-    }
+    $proxy = get_proxy();
 
     $tmp = rtrim($proxy, "/");
     $proxy = str_replace(array("http://", "https://"), "", $tmp);
     if (!empty($proxy)) {
         curl_setopt($curl, CURLOPT_PROXY, $proxy);
     }
+}
+
+/**
+ * Return the proxy url
+ *
+ * @return array|bool|false|string
+ */
+function get_proxy()
+{
+    global $config;
+
+    if (getenv('http_proxy')) {
+        return getenv('http_proxy');
+    } elseif (getenv('https_proxy')) {
+        return getenv('https_proxy');
+    } elseif (isset($config['callback_proxy'])) {
+        return $config['callback_proxy'];
+    } elseif (isset($config['http_proxy'])) {
+        return $config['http_proxy'];
+    }
+    return false;
 }
 
 function target_to_id($target)
@@ -1287,22 +1331,7 @@ function first_oid_match($device, $list)
     }
 }
 
-function hex_to_ip($hex)
-{
-    $return = "";
-    if (filter_var($hex, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && filter_var($hex, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false) {
-        $hex_exp = explode(' ', $hex);
-        foreach ($hex_exp as $item) {
-            if (!empty($item) && $item != "\"") {
-                $return .= hexdec($item).'.';
-            }
-        }
-        $return = substr($return, 0, -1);
-    } else {
-        $return = $hex;
-    }
-    return $return;
-}
+
 function fix_integer_value($value)
 {
     if ($value < 0) {
@@ -1438,57 +1467,28 @@ function snmpTransportToAddressFamily($transport)
  * Checks if the $hostname provided exists in the DB already
  *
  * @param string $hostname The hostname to check for
- *
+ * @param string $sysName The sysName to check
  * @return bool true if hostname already exists
  *              false if hostname doesn't exist
-**/
-function host_exists($hostname, $snmphost = '')
+ */
+function host_exists($hostname, $sysName = null)
 {
     global $config;
-    $count = dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($hostname));
-    if ($count > 0) {
-        return true;
-    } else {
-        if ($config['allow_duplicate_sysName'] === false && !empty($snmphost)) {
-            $count = dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `sysName` = ?", array($snmphost));
-            if ($count > 0) {
-                return true;
-            } else {
-                return false;
-            }
+
+    $query = "SELECT COUNT(*) FROM `devices` WHERE `hostname`=?";
+    $params = array($hostname);
+
+    if (!empty($sysName) && !$config['allow_duplicate_sysName']) {
+        $query .= " OR `sysName`=?";
+        $params[] = $sysName;
+
+        if (!empty($config['mydomain'])) {
+            $full_sysname = rtrim($sysName, '.') . '.' . $config['mydomain'];
+            $query .= " OR `sysName`=?";
+            $params[] = $full_sysname;
         }
-        return false;
     }
-}
-
-/**
- * Check the innodb buffer size
- *
- * @return array including the current set size and the currently used buffer
-**/
-function innodb_buffer_check()
-{
-    $pool['size'] = dbFetchCell('SELECT @@innodb_buffer_pool_size');
-    // The following query is from the excellent mysqltuner.pl by Major Hayden https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl
-    $pool['used'] = dbFetchCell('SELECT SUM(DATA_LENGTH+INDEX_LENGTH) FROM information_schema.TABLES WHERE TABLE_SCHEMA NOT IN ("information_schema", "performance_schema", "mysql") AND ENGINE = "InnoDB" GROUP BY ENGINE ORDER BY ENGINE ASC');
-    return $pool;
-}
-
-/**
- * Print warning about InnoDB buffer size
- *
- * @param array $innodb_buffer An array that contains the used and current size
- *
- * @return string $output
-**/
-function warn_innodb_buffer($innodb_buffer)
-{
-    $output  = 'InnoDB Buffersize too small.'.PHP_EOL;
-    $output .= 'Current size: '.($innodb_buffer['size'] / 1024 / 1024).' MiB'.PHP_EOL;
-    $output .= 'Minimum Required: '.($innodb_buffer['used'] / 1024 / 1024).' MiB'.PHP_EOL;
-    $output .= 'To ensure integrity, we\'re not going to pull any updates until the buffersize has been adjusted.'.PHP_EOL;
-    $output .= 'Config proposal: "innodb_buffer_pool_size = '.pow(2, ceil(log(($innodb_buffer['used'] / 1024 / 1024), 2))).'M"'.PHP_EOL;
-    return $output;
+    return dbFetchCell($query, $params) > 0;
 }
 
 function oxidized_reload_nodes()
@@ -1497,7 +1497,7 @@ function oxidized_reload_nodes()
     global $config;
 
     if ($config['oxidized']['enabled'] === true && $config['oxidized']['reload_nodes'] === true && isset($config['oxidized']['url'])) {
-        $oxidized_reload_url = $config['oxidized']['url'] . '/reload?format=json';
+        $oxidized_reload_url = $config['oxidized']['url'] . '/reload.json';
         $ch = curl_init($oxidized_reload_url);
 
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
@@ -1588,9 +1588,16 @@ function rrdtest($path, &$stdOutput, &$stdError)
 
 function create_state_index($state_name)
 {
-    if (dbFetchRow('SELECT * FROM state_indexes WHERE state_name = ?', array($state_name)) != true) {
+    $state_index_id = dbFetchCell('SELECT `state_index_id` FROM state_indexes WHERE state_name = ? LIMIT 1', array($state_name));
+    if (!is_numeric($state_index_id)) {
         $insert = array('state_name' => $state_name);
         return dbInsert($insert, 'state_indexes');
+    } else {
+        $translations = dbFetchRows('SELECT * FROM `state_translations` WHERE `state_index_id` = ?', array($state_index_id));
+        if (count($translations) == 0) {
+            // If we don't have any translations something has gone wrong so return the state_index_id so they get created.
+            return $state_index_id;
+        }
     }
 }
 
@@ -1904,10 +1911,12 @@ function initStats()
             'insert_sec' => 0.0,
             'update' => 0,
             'update_sec' => 0.0,
+            'delete' => 0,
+            'delete_sec' => 0.0,
             'fetchcell' => 0,
             'fetchcell_sec' => 0.0,
-            'fetchcol' => 0,
-            'fetchcol_sec' => 0.0,
+            'fetchcolumn' => 0,
+            'fetchcolumn_sec' => 0.0,
             'fetchrow' => 0,
             'fetchrow_sec' => 0.0,
             'fetchrows' => 0,
@@ -2028,8 +2037,22 @@ function device_is_up($device, $record_perf = false)
     }
 
     if ($device['status'] != $response['status']) {
-        dbUpdate(array('status' => $response['status'], 'status_reason' => $response['status_reason']), 'devices', 'device_id=?', array($device['device_id']));
-        log_event('Device status changed to '.($response['status'] == '1' ? 'Up' : 'Down'). ' from ' . $response['status_reason'] . ' check.', $device, ($response['status'] == '1' ? 'up' : 'down'));
+        dbUpdate(
+            array('status' => $response['status'], 'status_reason' => $response['status_reason']),
+            'devices',
+            'device_id=?',
+            array($device['device_id'])
+        );
+
+        if ($response['status']) {
+            $type = 'up';
+            $reason = $device['status_reason'];
+        } else {
+            $type = 'down';
+            $reason = $response['status_reason'];
+        }
+
+        log_event('Device status changed to ' . ucfirst($type) . " from $reason check.", $device, $type);
     }
     return $response;
 }
@@ -2042,5 +2065,235 @@ function update_device_logo(&$device)
         $device['icon'] = $icon;
         dbUpdate(array('icon' => $icon), 'devices', 'device_id=?', array($device['device_id']));
         echo "Changed Icon! : $icon\n";
+    }
+}
+
+/**
+ * Function to generate PeeringDB Cache
+ */
+function cache_peeringdb()
+{
+    global $config;
+    if ($config['peeringdb']['enabled'] === true) {
+        $peeringdb_url = 'https://peeringdb.com/api';
+        // We cache for 71 hours
+        $cached = dbFetchCell("SELECT count(*) FROM `pdb_ix` WHERE (UNIX_TIMESTAMP() - timestamp) < 255600");
+        if ($cached == 0) {
+            $rand = rand(30, 600);
+            echo "No cached PeeringDB data found, sleeping for $rand seconds" . PHP_EOL;
+            sleep($rand);
+            foreach (dbFetchRows("SELECT `bgpLocalAs` FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 GROUP BY `bgpLocalAs`") as $as) {
+                $asn = $as['bgpLocalAs'];
+                $get = Requests::get($peeringdb_url . '/net?depth=2&asn=' . $asn, array(), array('proxy' => get_proxy()));
+                $json_data = $get->body;
+                $data = json_decode($json_data);
+                $ixs = $data->{'data'}{0}->{'netixlan_set'};
+                foreach ($ixs as $ix) {
+                    $ixid = $ix->{'ix_id'};
+                    $tmp_ix = dbFetchRow("SELECT * FROM `pdb_ix` WHERE `ix_id` = ? AND asn = ?", array($ixid, $asn));
+                    if ($tmp_ix) {
+                        $pdb_ix_id = $tmp_ix['pdb_ix_id'];
+                        $update = array('name' => $ix->{'name'}, 'timestamp' => time());
+                        dbUpdate($update, 'pdb_ix', '`ix_id` = ? AND `asn` = ?', array($ixid, $asn));
+                    } else {
+                        $insert = array(
+                            'ix_id' => $ixid,
+                            'name' => $ix->{'name'},
+                            'asn' => $asn,
+                            'timestamp' => time()
+                        );
+                        $pdb_ix_id = dbInsert($insert, 'pdb_ix');
+                    }
+                    $keep = $pdb_ix_id;
+                    $get_ix = Requests::get("$peeringdb_url/netixlan?ix_id=$ixid", array(), array('proxy' => get_proxy()));
+                    $ix_json = $get_ix->body;
+                    $ix_data = json_decode($ix_json);
+                    $peers = $ix_data->{'data'};
+                    foreach ($peers as $index => $peer) {
+                        $peer_name = get_astext($peer->{'asn'});
+                        $tmp_peer = dbFetchRow("SELECT * FROM `pdb_ix_peers` WHERE `peer_id` = ? AND `ix_id` = ?", array($peer->{'id'}, $ixid));
+                        if ($tmp_peer) {
+                            $peer_keep[] = $tmp_peer['pdb_ix_peers_id'];
+                            $update = array(
+                                'remote_asn'     => $peer->{'asn'},
+                                'remote_ipaddr4'  => $peer->{'ipaddr4'},
+                                'remote_ipaddr6' => $peer->{'ipaddr6'},
+                                'name'           => $peer_name,
+                            );
+                            dbUpdate($update, 'pdb_ix_peers', '`pdb_ix_peers_id` = ?', array($tmp_peer['pdb_ix_peers_id']));
+                        } else {
+                            $peer_insert = array(
+                                'ix_id'          => $ixid,
+                                'peer_id'        => $peer->{'id'},
+                                'remote_asn'     => $peer->{'asn'},
+                                'remote_ipaddr4' => $peer->{'ipaddr4'},
+                                'remote_ipaddr6' => $peer->{'ipaddr6'},
+                                'name'           => $peer_name,
+                                'timestamp'      => time()
+                            );
+                            $peer_keep[] = dbInsert($peer_insert, 'pdb_ix_peers');
+                        }
+                    }
+                    $pdb_ix_peers_ids = implode(',', $peer_keep);
+                    dbDelete('pdb_ix_peers', "`pdb_ix_peers_id` NOT IN ($pdb_ix_peers_ids)");
+                }
+                $pdb_ix_ids = implode(',', $keep);
+                dbDelete('pdb_ix', "`pdb_ix_id` NOT IN ($pdb_ix_ids)");
+            }
+        } else {
+            echo "Cached PeeringDB data found....." . PHP_EOL;
+        }
+    } else {
+        echo 'Peering DB integration disabled' . PHP_EOL;
+    }
+}
+
+/**
+ * Dump the database schema to an array.
+ * The top level will be a list of tables
+ * Each table contains the keys Columns and Indexes.
+ *
+ * Each entry in the Columns array contains these keys: Field, Type, Null, Default, Extra
+ * Each entry in the Indexes array contains these keys: Name, Columns(array), Unique
+ *
+ * @return array
+ */
+function dump_db_schema()
+{
+    global $config;
+
+    $output = array();
+
+    foreach (dbFetchRows("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{$config['db_name']}' ORDER BY TABLE_NAME;") as $table) {
+        $table = $table['TABLE_NAME'];
+        foreach (dbFetchRows("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$config['db_name']}' AND TABLE_NAME='$table' ORDER BY COLUMN_NAME") as $data) {
+            $column = $data['COLUMN_NAME'];
+            $output[$table]['Columns'][$column] = array(
+                'Field'   => $data['COLUMN_NAME'],
+                'Type'    => $data['COLUMN_TYPE'],
+                'Null'    => $data['IS_NULLABLE'] === 'YES',
+                'Default' => isset($data['COLUMN_DEFAULT']) ? trim($data['COLUMN_DEFAULT'], "'") : 'NULL',
+                'Extra'   => $data['EXTRA'],
+            );
+        }
+
+        foreach (dbFetchRows("SHOW INDEX FROM `$table`") as $key) {
+            $key_name = $key['Key_name'];
+            if (isset($output[$table]['Indexes'][$key_name])) {
+                $output[$table]['Indexes'][$key_name]['Columns'][] = $key['Column_name'];
+            } else {
+                $output[$table]['Indexes'][$key_name] = array(
+                    'Name'    => $key['Key_name'],
+                    'Columns' => array($key['Column_name']),
+                    'Unique'  => !$key['Non_unique'],
+                    'Type'    => $key['Index_type'],
+                );
+            }
+        }
+    }
+    return $output;
+}
+
+/**
+ * Generate an SQL segment to create the column based on data from dump_db_schema()
+ *
+ * @param array $column_data The array of data for the column
+ * @return string sql fragment, for example: "`ix_id` int(10) unsigned NOT NULL"
+ */
+function column_schema_to_sql($column_data)
+{
+    $null = $column_data['Null'] ? 'NULL' : 'NOT NULL';
+    $default = $column_data['Default'] == '' ? '' : "DEFAULT '{$column_data['Default']}'";
+    if (str_contains($default, 'CURRENT_TIMESTAMP')) {
+        $default = str_replace("'", "", $default);
+    }
+    return trim("`{$column_data['Field']}` {$column_data['Type']} $null $default {$column_data['Extra']}");
+}
+
+/**
+ * Generate an SQL segment to create the index based on data from dump_db_schema()
+ *
+ * @param array $index_data The array of data for the index
+ * @return string sql fragment, for example: "PRIMARY KEY (`device_id`)"
+ */
+function index_schema_to_sql($index_data)
+{
+    if ($index_data['Name'] == 'PRIMARY') {
+        $index = 'PRIMARY KEY (%s)';
+    } elseif ($index_data['Unique']) {
+        $index = "UNIQUE `{$index_data['Name']}` (%s)";
+    } else {
+        $index = "INDEX `{$index_data['Name']}` (%s)";
+    }
+
+    $columns = implode(',', array_map(function ($col) {
+        return "`$col`";
+    }, $index_data['Columns']));
+
+    return sprintf($index, $columns);
+}
+
+/**
+ * Get an array of the schema files.
+ * schema_version => full_file_name
+ *
+ * @return mixed
+ */
+function get_schema_list()
+{
+    global $config;
+
+    // glob returns an array sorted by filename
+    $files = glob($config['install_dir'].'/sql-schema/*.sql');
+
+    // set the keys to the db schema version
+    return array_reduce($files, function ($array, $file) {
+        $array[basename($file, '.sql')] = $file;
+        return $array;
+    }, array());
+}
+
+/**
+ * Get the current database schema, will return 0 if there is no schema.
+ *
+ * @return int
+ */
+function get_db_schema()
+{
+    return (int)@dbFetchCell('SELECT version FROM `dbSchema` ORDER BY version DESC LIMIT 1');
+}
+
+/**
+ * Check if the database schema is up to date.
+ *
+ * @return bool
+ */
+function db_schema_is_current()
+{
+    $current = get_db_schema();
+
+    $schemas = get_schema_list();
+    end($schemas);
+    $latest = key($schemas);
+
+    return $current >= $latest;
+}
+
+/**
+ * @param $device
+ * @return int|null
+ */
+function get_device_oid_limit($device)
+{
+    global $config;
+
+    $max_oid = $device['snmp_max_oid'];
+
+    if (isset($max_oid) && $max_oid > 0) {
+        return $max_oid;
+    } elseif (isset($config['snmp']['max_oid']) && $config['snmp']['max_oid'] > 0) {
+        return $config['snmp']['max_oid'];
+    } else {
+        return 10;
     }
 }

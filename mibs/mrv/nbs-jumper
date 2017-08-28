@@ -1,0 +1,139 @@
+NBS-JUMPER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    Unsigned32, OBJECT-TYPE,
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    DisplayString
+        FROM SNMPv2-TC
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    nbs
+        FROM NBS-MIB
+    ;
+
+nbsJumperMib  MODULE-IDENTITY
+    LAST-UPDATED "201209260000Z"  -- Sep 26, 2012
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+
+    DESCRIPTION
+      "MIB for reporting configuration of module's dipswitches and jumpers"
+
+    ::= { nbs 210 }
+
+-- *******************************************************************
+-- NBS-JUMPER-MIB local defines
+-- *******************************************************************
+nbsJumperGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Jumper and dipswitch information"
+    ::= { nbsJumperMib 1 }
+
+-- *******************************************************************
+--
+-- the nbsJumperTable
+--
+-- *******************************************************************
+
+nbsJumperTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of entries in nbsJumperTable."
+        ::= { nbsJumperGrp 1 }
+
+nbsJumperTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsJumperEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "All Jumper and dipswitch information"
+        ::= { nbsJumperGrp 2 }
+
+nbsJumperEntry      OBJECT-TYPE
+        SYNTAX      NbsJumperEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Individual Jumper and dipswitch information"
+        INDEX { nbsJumperIfIndex, nbsJumperIndex }
+        ::= { nbsJumperTable 1 }
+
+NbsJumperEntry ::= SEQUENCE {
+        nbsJumperIfIndex       InterfaceIndex,
+        nbsJumperIndex         INTEGER,
+        nbsJumperPosition      INTEGER,
+        nbsJumperInterpret     DisplayString,
+        nbsJumperSilkScreen    DisplayString,
+        nbsJumperDescription   DisplayString
+}
+
+nbsJumperIfIndex   OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Unique identifier of this module in format css000 where
+           c is nbsCmmcChassisIndex and ss is nbsCmmcSlotIndex of
+           this board."
+        ::= { nbsJumperEntry 1 }
+
+nbsJumperIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Unique index of the jumper or dipswitch.  Index starts at 1."
+        ::= { nbsJumperEntry 2 }
+
+nbsJumperPosition OBJECT-TYPE
+        SYNTAX      INTEGER{
+         notSupported (1),
+         off          (2),
+         on           (3)
+        }
+
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Actual/current position of this jumper or dipswitch.  For
+                 jumpers, on(3) indicates the pin pair is connected, off(2)
+                 means the jumper pair is unconnected."
+        ::= { nbsJumperEntry 3 }
+
+nbsJumperInterpret OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..50))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Textual interpretation of the current
+                 nbsJumperPosition - what being on(3) or off(2)
+                 means for this feature."
+        ::= { nbsJumperEntry 4 }
+
+nbsJumperSilkScreen OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The J number for this jumper, or SW block plus switch
+                 number for this dipswitch, as etched into the circuit
+                 board or dipswitch block."
+        ::= { nbsJumperEntry 5 }
+
+nbsJumperDescription OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Role of this jumper, feature it represents."
+        ::= { nbsJumperEntry 6 }
+END

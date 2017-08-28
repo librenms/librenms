@@ -65,11 +65,11 @@ foreach ($port_stats as $ifIndex => $port) {
 
         // We've seen it. Remove it from the cache.
         unset($ports_l[$ifIndex]);
-    } // Port vanished (mark as deleted)
-    else {
+    } else {
+        // Port vanished (mark as deleted)
         if (is_array($ports_db[$port_id])) {
             if ($ports_db[$port_id]['deleted'] != '1') {
-                dbUpdate(array('deleted' => '1'), 'ports', "`port_id` = ?, `ifName` => '?', `ifAlias` => '?', `ifDescr` => '?'", array($port_id, $ifName, $ifAlias, $ifDescr));
+                dbUpdate(array('deleted' => '1'), 'ports', '`port_id` = ?', array($port_id));
                 $ports_db[$port_id]['deleted'] = '1';
                 echo '-';
             }

@@ -33,6 +33,15 @@ $graphs['nginx']     = array(
     'req',
 );
 
+$graphs['postfix'] = array(
+    'messages',
+    'qstats',
+    'bytes',
+    'sr',
+    'deferral',
+    'rejects',
+);
+
 $graphs['powerdns-recursor'] = array(
     'questions',
     'answers',
@@ -54,6 +63,15 @@ $graphs['tinydns']   = array(
     'errors',
     'dnssec',
     'other',
+);
+
+$graphs['postgres'] = array(
+    'backends',
+    'cr',
+    'rows',
+    'hr',
+    'index',
+    'sequential'
 );
 
 $graphs['powerdns'] = array(
@@ -91,12 +109,22 @@ $graphs['nfs-v3-stats'] = array(
     'rpc',
 );
 
+$graphs['nfs-server'] = array(
+    'io',
+    'net_tcp_conns',
+    'rpc',
+);
+
 $graphs['os-updates'] = array(
     'packages',
 );
 
 $graphs['dhcp-stats'] = array(
      'stats',
+);
+
+$graphs['fail2ban'] = array(
+    'banned',
 );
 
 $graphs['freeswitch'] = array(
@@ -130,6 +158,117 @@ $graphs['gpsd'] = array(
 $graphs['exim-stats'] = array(
     'frozen',
     'queue'
+);
+
+$graphs['php-fpm'] = array(
+    'stats'
+);
+
+$graphs['nvidia'] = array(
+    'sm',
+    'mem',
+    'enc',
+    'dec',
+    'rxpci',
+    'txpci',
+    'fb',
+    'bar1',
+    'mclk',
+    'pclk',
+    'pwr',
+    'temp',
+    'pviol',
+    'tviol',
+    'sbecc',
+    'dbecc',
+);
+
+$graphs['squid'] = array(
+    'memory',
+    'clients',
+    'cpuusage',
+    'objcount',
+    'filedescr',
+    'httpbw',
+    'http',
+    'server',
+    'serverbw',
+    'reqhit',
+    'bytehit',
+    'sysnumread',
+    'pagefaults',
+    'cputime',
+);
+
+$graphs['opengridscheduler'] = array(
+    'ogs'
+);
+
+$graphs['fbsd-nfs-server'] = array(
+    'stats',
+    'cache',
+    'gathering',
+);
+
+$graphs['fbsd-nfs-client'] = array(
+    'stats',
+    'cache',
+    'rpc',
+);
+
+$graphs['unbound'] = array(
+    'queries',
+    'cache',
+);
+
+$graphs['bind']      = array(
+    'incoming',
+    'outgoing',
+    'rr_positive',
+    'rr_negative',
+    'rtt',
+    'resolver_failure',
+    'resolver_qrs',
+    'resolver_naf',
+    'server_received',
+    'server_results',
+    'server_issues',
+    'cache_hm',
+    'adb_in',
+    'sockets_active',
+    'sockets_errors',
+);
+
+$graphs['smart'] = array(
+    'id5',
+    'id10',
+    'id173',
+    'id183',
+    'id184',
+    'id187',
+    'id188',
+    'id190',
+    'id194',
+    'id196',
+    'id197',
+    'id198',
+    'id199',
+    'id231',
+    'id233',
+);
+
+$graphs['sdfsinfo'] = array(
+    'volume',
+    'blocks',
+    'rates',
+);
+
+$graphs['pi-hole'] = array(
+    'query_types',
+    'destinations',
+    'query_results',
+    'block_percent',
+    'blocklist',
 );
 
 print_optionbar_start();

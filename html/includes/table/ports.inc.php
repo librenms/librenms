@@ -139,6 +139,7 @@ $query .= $sql;
 
 foreach (dbFetchRows($query, $param) as $port) {
     $device = device_by_id_cache($port['device_id']);
+    $port = cleanPort($port, $device);
 
     // FIXME what actions should we have?
     $actions = '<div class="container-fluid"><div class="row">';
@@ -168,7 +169,7 @@ foreach (dbFetchRows($query, $param) as $port) {
         'ifInErrors' => $port['ifInErrors'],
         'ifOutErrors' => $port['ifOutErrors'],
         'ifType' => humanmedia($port['ifType']),
-        'description' => display($port['ifAlias']),
+        'description' => $port['ifAlias'],
         'actions' => $actions,
     );
 }

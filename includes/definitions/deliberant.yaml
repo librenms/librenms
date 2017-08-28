@@ -7,5 +7,3 @@ over:
 discovery:
     - sysDescr:
         - Deliberant
-poller_modules:
-    wifi: 1

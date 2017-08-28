@@ -23,16 +23,14 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if ($device['group'] == 'zyxel') {
-    echo 'Zyxel: ';
-    $oid = '.1.3.6.1.4.1.890.1.15.3.2.5.0';
-    $perc = snmp_get($device, $oid, '-OvQ');
-    if (is_numeric($perc)) {
-        $mempool['perc'] = $perc;
-        $mempool['used'] = $perc;
-        $mempool['total'] = 100;
-        $mempool['free'] = 100 - $perc;
-    }
+echo 'Zyxel: ';
+$oid = '.1.3.6.1.4.1.890.1.15.3.2.5.0';
+$perc = snmp_get($device, $oid, '-OvQ');
+if (is_numeric($perc)) {
+    $mempool['perc'] = $perc;
+    $mempool['used'] = $perc;
+    $mempool['total'] = 100;
+    $mempool['free'] = 100 - $perc;
 }
 
 unset(

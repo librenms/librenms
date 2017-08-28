@@ -82,8 +82,8 @@ $app->group(
                 $app->group(
                     '/portgroups',
                     function () use ($app) {
+                        $app->get('/multiport/bits/:id', 'authToken', 'get_graph_by_portgroup')->name('get_graph_by_portgroup_multiport_bits');
                         $app->get('/:group', 'authToken', 'get_graph_by_portgroup')->name('get_graph_by_portgroup');
-                        // api/v0/portgroups/$group
                     }
                 );
                 $app->group(
@@ -153,7 +153,7 @@ $app->group(
                         $app->group(
                             '/ip',
                             function () use ($app) {
-                                $app->get('/arp/:ip', 'authToken', 'list_arp')->name('list_arp');
+                                $app->get('/arp/:ip', 'authToken', 'list_arp')->name('list_arp')->conditions(array('ip' => '[^?]+'));
                             }
                         );
                     }
@@ -168,6 +168,15 @@ $app->group(
                 );
                 $app->get('/services', 'authToken', 'list_services')->name('list_services');
                 // End Service
+                $app->group(
+                    '/logs',
+                    function () use ($app) {
+                        $app->get('/eventlog(/:hostname)', 'authToken', 'list_logs')->name('list_eventlog');
+                        $app->get('/syslog(/:hostname)', 'authToken', 'list_logs')->name('list_syslog');
+                        $app->get('/alertlog(/:hostname)', 'authToken', 'list_logs')->name('list_alertlog');
+                        $app->get('/authlog(/:hostname)', 'authToken', 'list_logs')->name('list_authlog');
+                    }
+                );
             }
         );
         $app->get('/v0', 'authToken', 'show_endpoints');

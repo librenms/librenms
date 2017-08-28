@@ -72,6 +72,7 @@ $menu_options['graphs']   = 'Graphs';
 $menu_options['realtime'] = 'Real time';
 // FIXME CONDITIONAL
 $menu_options['arp']    = 'ARP Table';
+$menu_options['fdb']    = 'FDB Table';
 $menu_options['events'] = 'Eventlog';
 $menu_options['notes'] = 'Notes';
 

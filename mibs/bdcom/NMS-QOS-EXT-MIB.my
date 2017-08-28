@@ -1,0 +1,1489 @@
+-- *****************************************************************
+-- qos ext MIB -  The MIB for Switch Product
+--
+-- Oct 2009 nie
+
+-- Copyright (c) 2012 by  Co., Ltd. 
+-- All rights reserved.
+-- *****************************************************************
+   
+-- ********************************************************************************
+--  Log for Switch MIB.
+--
+--  FEB 17 2012
+
+
+-- ********************************************************************************   
+ 
+NMS-QOS-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, 
+	OBJECT-TYPE, 
+	Counter32,
+	Gauge32,
+	Counter64,
+	Integer32, 
+	TimeTicks, 
+	mib-2, 
+	NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION,
+	DisplayString, 
+	PhysAddress, 
+	TruthValue, 
+	RowStatus, 
+	TimeStamp, 
+	TestAndIncr,
+	MacAddress 
+		FROM SNMPv2-TC
+	MODULE-COMPLIANCE, 
+	OBJECT-GROUP        
+		FROM SNMPv2-CONF 
+	qos
+				FROM NMS-QOS-MIB;	
+
+--ifDefaultCoSTable
+
+          ifDefaultCoSTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF IfDefaultCoSEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of interface default CoS entries."
+              ::= { qos 10 }
+
+          ifDefaultCoSEntry OBJECT-TYPE
+              SYNTAX  IfDefaultCoSEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An interface Default CoS entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { ifDefaultCoSIndex }
+              ::= { ifDefaultCoSTable 1 }
+
+          IfDefaultCoSEntry ::=
+              SEQUENCE {
+                  ifDefaultCoSIndex
+                      INTEGER,
+                  defaultCoS
+                      INTEGER
+              }
+
+          ifDefaultCoSIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of interface. The same value as ifIndex in ifTable of RFC1213."
+              ::= { ifDefaultCoSEntry 1 }
+
+          defaultCoS OBJECT-TYPE
+              SYNTAX  INTEGER(0..7)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Port default cos value. The range is 0-7. 8 means deletion."
+              ::= { ifDefaultCoSEntry 2 }
+
+
+
+--ifQueueBandwidthTable
+
+          ifQueueBandwidthTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF IfQueueBandwidthEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of interface Queue Bandwidth entries."
+              ::= { qos 13 }
+
+          ifQueueBandwidthEntry OBJECT-TYPE
+              SYNTAX  IfQueueBandwidthEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An interface Queue Bandwidth entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { ifQueueBandwidthIndex,queueID }
+              ::= { ifQueueBandwidthTable 1 }
+
+          IfQueueBandwidthEntry ::=
+              SEQUENCE {
+                  ifQueueBandwidthIndex
+                      INTEGER,
+                  queueID
+                      INTEGER,
+                  minBandwidth
+                      INTEGER,
+                  maxBandwidth
+                      INTEGER,
+                  ifDefaultCoSRowStatus
+                      RowStatus
+              }
+
+          ifQueueBandwidthIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of interface. The same value as ifIndex in ifTable of RFC1213."
+              ::= { ifQueueBandwidthEntry 1 }
+
+          queueID OBJECT-TYPE
+              SYNTAX  INTEGER(1..8)
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of interface. Queue number. The range is 1-8."
+              ::= { ifQueueBandwidthEntry 2 }
+
+          minBandwidth OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Min bandwidth. The unit is 64kbps. The range is different for different interface. Default is 0."
+              ::= { ifQueueBandwidthEntry 3 }
+
+          maxBandwidth OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Max bandwidth. The unit is 64kbps. The range is different for different interface. Default is 0."
+              ::= { ifQueueBandwidthEntry 4 }
+
+          ifDefaultCoSRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Row Status."
+              ::= { ifQueueBandwidthEntry 5 }
+
+
+--policyMapTable
+
+          policyMapTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF PolicyMapEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of policy Map entries."
+              ::= { qos 14 }
+
+          policyMapEntry OBJECT-TYPE
+              SYNTAX  PolicyMapEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An interface policy Map entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { policyMapName }
+              ::= { policyMapTable 1 }
+
+          PolicyMapEntry ::=
+              SEQUENCE {
+                  policyMapName
+                      DisplayString,
+                  policyMapRowStatus
+                      RowStatus,
+                  policyDescription
+                      DisplayString,
+                  classifyIPV4AclDelete
+                      INTEGER,
+                  classifyIPV4AclName
+                      DisplayString,
+                  classifyIPV6AclDelete
+                      INTEGER,
+                  classifyIPV6AclName
+                      DisplayString,
+                  classifyMacAclDelete
+                      INTEGER,
+                  classifyMacAclName
+                      DisplayString,
+                  classifyDscp
+                      INTEGER,
+                  classifyVlanID
+                      INTEGER,
+                  classifyVlan2ID
+                      INTEGER,
+                  classifyVlanMask
+                      INTEGER,
+                  classifyIVlanID
+                      INTEGER,
+                  classifyIVlan2ID
+                      INTEGER,
+                  classifyIVlanMask
+                      INTEGER,
+                  classifyCos
+                      INTEGER,
+                  classifyICos
+                      INTEGER,
+                  classifyEtherType
+                      INTEGER,
+                  classifyArpRequest
+                      INTEGER,
+                  classifyArpReply
+                      INTEGER,
+                  classifyAny
+                      INTEGER,
+                  actionBandwidth
+                      INTEGER,
+                  actionCos
+                      INTEGER,
+                  actionICos
+                      INTEGER,
+                  actionQueueID
+                      INTEGER,
+                  actionDscp
+                      INTEGER,
+                  actionTos
+                      INTEGER,
+                  actionVlanOperation
+                      INTEGER,
+                  actionVlanID
+                      INTEGER,
+                  actionIVlanOperation
+                      INTEGER,
+                  actionIVlanID
+                      INTEGER,
+                  actionRedirect
+                      INTEGER,
+                  actionMirror
+                      INTEGER,
+                  actionStatistics
+                      INTEGER,
+                  actionDrop
+                      INTEGER,
+                  actionForward
+                      INTEGER,
+                  actionMacAddress
+                      MacAddress,
+                  actionCir
+                      INTEGER,
+                  actionPir
+                      INTEGER,
+                  actionEir
+                      INTEGER,
+                  actionBc    
+                      INTEGER,
+                  actionBe    
+                      INTEGER,
+                  actionEbs    
+                      INTEGER,
+                  actionCopyCos
+                      INTEGER,
+                  actionCopyToCpu
+                      INTEGER,
+                  actionColorBlind
+                      INTEGER,
+                  actionGreenForwared
+                      INTEGER,
+                  actionGreenQueue
+                      INTEGER,
+                  actionGreenCos
+                      INTEGER,
+                  actionGreenDroppreference
+                      INTEGER,
+                  actionGreenCopyToCpu
+                      INTEGER,
+                  actionYellowDrop
+                      INTEGER,
+                  actionYellowForwared
+                      INTEGER,
+                  actionYellowQueue
+                      INTEGER,
+                  actionYellowCos
+                      INTEGER,
+                  actionYellowDroppreference
+                      INTEGER,
+                  actionYellowCopyToCpu
+                      INTEGER,
+                  actionRedDrop
+                      INTEGER,
+                  actionRedForwared
+                      INTEGER,
+                  actionRedQueue
+                      INTEGER,
+                  actionRedCos
+                      INTEGER,
+                  actionRedDroppreference
+                      INTEGER,
+                  actionRedCopyToCpu
+                      INTEGER,
+                  actionCirDel
+                      INTEGER,
+                  classifyPrecedence
+                      INTEGER,
+                  classifyTos
+                      INTEGER,
+                  classifyDiffserv
+                      INTEGER,
+                  classifyDstport
+                      INTEGER
+                      
+              }
+
+          policyMapName OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of policy map. The length is 1-20."
+              ::= { policyMapEntry 1 }
+
+          policyMapRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-create
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Row status. It used to add, delete, or modify policy map."
+              ::= { policyMapEntry 2 }
+
+          policyDescription OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The description of policy map. The length is 1-32."
+              ::= { policyMapEntry 3 }
+
+          classifyIPV4AclDelete OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              match(1),
+                              not-match(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Match ip acl or not. 1 means to match ip acl, and 2 means not to match ip acl."
+              ::= { policyMapEntry 4 }
+
+          classifyIPV4AclName OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The name of ip acl to match."
+              ::= { policyMapEntry 5 }
+
+          classifyIPV6AclDelete OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              match(1),
+                              not-match(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Match ipv6 acl or not. 1 means to match ipv6 acl, and 2 means not to match ipv6 acl."
+              ::= { policyMapEntry 6 }
+
+          classifyIPV6AclName OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The name of ipv6 acl to match."
+              ::= { policyMapEntry 7 }
+
+          classifyMacAclDelete OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              match(1),
+                              not-match(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Match mac acl or not. 1 means to match mac acl, and 2 means not to match mac acl."
+              ::= { policyMapEntry 8 }
+
+          classifyMacAclName OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The name of mac acl to match."
+              ::= { policyMapEntry 9 }
+
+          classifyDscp OBJECT-TYPE
+              SYNTAX  INTEGER(0..64)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The dscp value to match. The range is 0-63. 64 means not to match."
+              ::= { policyMapEntry 10 }
+
+          classifyVlanID OBJECT-TYPE
+              SYNTAX  INTEGER(1..4095)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The vlanID to match. The range is 1-4094. 4095 means not to match."
+              ::= { policyMapEntry 11 }
+
+          classifyVlan2ID OBJECT-TYPE
+              SYNTAX  INTEGER(1..4095)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The vlan range to match. This value is upper limitation, and classifyVlanID is down limitation. The range is 1-4094. 4095 means not to match."
+              ::= { policyMapEntry 12 }
+
+          classifyVlanMask OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The mask of vlan to match. This value is used with classifyVlanID. The range is 1-0xFFF. 0 means not to match."
+              ::= { policyMapEntry 13 }
+
+          classifyIVlanID OBJECT-TYPE
+              SYNTAX  INTEGER(1..4095)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The inner vlanID to match. The range is 1-4094. 4095 means not to match."
+              ::= { policyMapEntry 14 }
+
+          classifyIVlan2ID OBJECT-TYPE
+              SYNTAX  INTEGER(1..4095)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The inner vlan range to match. This value is upper limitation, and classifyIVlanID is down limitation. The range is 1-4094. 4095 means not to match."
+              ::= { policyMapEntry 15 }
+
+          classifyIVlanMask OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The mask of inner vlan to match. This value is used with classifyIVlanID. The range is 1-0xFFF. 0 means not to match."
+              ::= { policyMapEntry 16 }
+
+          classifyCos OBJECT-TYPE
+              SYNTAX  INTEGER(0..8)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The cos value to match. The range is 0-7. 8 means not to match."
+              ::= { policyMapEntry 17 }
+
+          classifyICos OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The inner cos value to match. The range is 0-7. 8 means not to match."
+              ::= { policyMapEntry 18 }
+
+          classifyEtherType OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The ethernet type to match. The range is 0-0xFFFF. 0 means not to match."
+              ::= { policyMapEntry 19 }
+
+          classifyArpRequest OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              match(1),
+                              not-match(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Match arp request. 1 means match, and 2 means not to match."
+              ::= { policyMapEntry 20 }
+
+          classifyArpReply OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              match(1),
+                              not-match(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Match arp reply. 1 means match, and 2 means not to match."
+              ::= { policyMapEntry 21 }
+
+          classifyAny OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              match(1),
+                              not-match(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Match any. 1 means match, and 2 means not to match."
+              ::= { policyMapEntry 22 }
+
+          actionBandwidth OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Rate limitation. 0 means no rate limitation."
+              ::= { policyMapEntry 23 }
+
+          actionCos OBJECT-TYPE
+              SYNTAX  INTEGER(0..8)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Modify cos value. The range is 0-7. 8 means not to modify."
+              ::= { policyMapEntry 24 }
+
+          actionICos OBJECT-TYPE
+              SYNTAX  INTEGER(0..8)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Modify inner cos value. The range is 0-7.8 means not to modify."
+              ::= { policyMapEntry 25 }
+
+          actionQueueID OBJECT-TYPE
+              SYNTAX  INTEGER(1..9)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The queueID frame in. The range is 1-8. 9 means not to modify."
+              ::= { policyMapEntry 26 }
+
+          actionDscp OBJECT-TYPE
+              SYNTAX  INTEGER(0..64)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Modify dscp value. The range is 0-63. 64 means not to modify."
+              ::= { policyMapEntry 27 }
+
+          actionTos OBJECT-TYPE
+              SYNTAX  INTEGER(0..8)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Modify tos value. The range is 0-7. 8 means not to modify."
+              ::= { policyMapEntry 28 }
+
+          actionVlanOperation OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              not-modify(1),
+                              replace(2),
+                              add(3),
+                              delete(4)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The operation of tag. 1-not modify, 2-replace, 3-add, 4-delete."
+              ::= { policyMapEntry 29 }
+
+          actionVlanID OBJECT-TYPE
+              SYNTAX  INTEGER(1..4094)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The vlanID to replace or add. The range is 1-4094."
+              ::= { policyMapEntry 30 }
+
+          actionIVlanOperation OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              not-modify(1),
+                              replace(2),
+                              add(3),
+                              delete(4)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The operation of inner tag.  1-not modify, 2-replace, 3-add, 4-delete."
+              ::= { policyMapEntry 31 }
+
+          actionIVlanID OBJECT-TYPE
+              SYNTAX  INTEGER(1..4094)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The inner vlanID to replace or add. The range is 1-4094."
+              ::= { policyMapEntry 32 }
+
+          actionRedirect OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The diID of interface frame send to. 0 means not to redirect."
+              ::= { policyMapEntry 33 }
+
+          actionMirror OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "SessionID of mirror. 0 means not to mirror."
+              ::= { policyMapEntry 34 }
+
+          actionStatistics OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              count(1),
+                              not-count(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Flow statistics. 1 means to count the number of flow, and 2 means not to count the number of flow."
+              ::= { policyMapEntry 35 }
+
+          actionDrop OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              drop(1),
+                              not-drop(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Drop packet. 1 means to drop the packet, and 2 means not to care about this action."
+              ::= { policyMapEntry 36 }
+
+          actionForward OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              forward(1),
+                              not-care-this-action(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Forward packet. 1 means to forward the packet, and 2 means not to care about this action."
+              ::= { policyMapEntry 37 }
+
+          actionMacAddress OBJECT-TYPE
+              SYNTAX  MacAddress
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The new destination mac address of frame to be modified. 0 means not to modify destination mac address."
+              ::= { policyMapEntry 38 }
+
+          actionCir OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The commited information rate. 0 means no cir bandwidth."
+              ::= { policyMapEntry 39 }
+
+          actionPir OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The peak information rate. 0 means no pir bandwidth."
+              ::= { policyMapEntry 40 }
+
+          actionEir OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The excess information rate. 0 means no eir bandwidth."
+              ::= { policyMapEntry 41 }
+
+          actionBc OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The commited burst size. 0 means no commited burst size."
+              ::= { policyMapEntry 42 }
+
+          actionBe OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The excess information rate. 0 means no eir bandwidth."
+              ::= { policyMapEntry 43 }
+
+          actionEbs OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The excess burst size. 0 means no excess burst size ."
+              ::= { policyMapEntry 44 }
+
+          actionCopyCos OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              copy(1),
+                              do-not-copy(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Copy inner cos to outer cos. 1 means copy, and 2 means no copy."
+              ::= { policyMapEntry 45 }
+
+          actionCopyToCpu OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              copy(1),
+                              do-not-copy(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Copy packet to cpu.1 means to copy packet to cpu.2meas not to care about this acion."
+              ::= { policyMapEntry 46 }
+
+          actionColorBlind OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              blind-mode(1),
+                              aware-mode(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Set color mode.1 means to set blind mode.2 means to set aware mode."
+              ::= { policyMapEntry 47 }
+
+          actionGreenForwared OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              forward(1),
+                              not-forward(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Forward green packet. 1 means to forward green packet, and 2 means not to care about this action."
+              ::= { policyMapEntry 48 }
+
+          actionGreenQueue OBJECT-TYPE
+              SYNTAX  INTEGER(1..9)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The queueID frame in for green packets. The range is 1-8. 9 means not to modify."
+              ::= { policyMapEntry 49 }
+
+          actionGreenCos OBJECT-TYPE
+              SYNTAX  INTEGER(0..8)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Modify cos value for green packets. The range is 0-7. 8 means not to modify."
+              ::= { policyMapEntry 50 }
+
+          actionGreenDroppreference OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              green(1),
+                              yellow(2),
+                              red(3),
+                              not-modify(4)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Modify packet color.1 means green.2 means yellow.3 means red.4 means not to modify."
+              ::= { policyMapEntry 51 }
+
+          actionGreenCopyToCpu OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              copy(1),
+                              do-not-copy(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Copy green packet to cpu.1 means to copy packet to cpu.2meas not to care about this acion."
+              ::= { policyMapEntry 52 }
+
+          actionYellowDrop OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              drop(1),
+                              not-drop(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Drop yellow packet. 1 means to drop the packet, and 2 means not to care about this action."
+              ::= { policyMapEntry 53 }
+
+          actionYellowForwared OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              forward(1),
+                              not-forward(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Forward yellow packet. 1 means to forward packet, and 2 means not to care about this action."
+              ::= { policyMapEntry 54 }
+
+          actionYellowQueue OBJECT-TYPE
+              SYNTAX  INTEGER(1..9)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The queueID frame in for yellow packets. The range is 1-8. 9 means not to modify."
+              ::= { policyMapEntry 55 }
+
+          actionYellowCos OBJECT-TYPE
+              SYNTAX  INTEGER(0..8)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Modify cos value for yellow packets. The range is 0-7. 8 means not to modify."
+              ::= { policyMapEntry 56 }
+
+          actionYellowDroppreference OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              green(1),
+                              yellow(2),
+                              red(3),
+                              not-modify(4)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Modify packet color.1 means green.2 means yellow.3 means red.4 means not to modify."
+              ::= { policyMapEntry 57 }
+
+          actionYellowCopyToCpu OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              copy(1),
+                              do-not-copy(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Copy yellow packet to cpu.1 means to copy packet to cpu.2meas not to care about this acion."
+              ::= { policyMapEntry 58 }
+
+          actionRedDrop OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              drop(1),
+                              not-drop(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Drop red packet. 1 means to drop the packet, and 2 means not to care about this action."
+              ::= { policyMapEntry 59 }
+
+          actionRedForwared OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              forward(1),
+                              not-forward(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Forward red packet. 1 means to forward  packet, and 2 means not to care about this action."
+              ::= { policyMapEntry 60 }
+
+          actionRedQueue OBJECT-TYPE
+              SYNTAX  INTEGER(1..9)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The queueID frame in for red packets. The range is 1-8. 9 means not to modify."
+              ::= { policyMapEntry 61 }
+
+          actionRedCos OBJECT-TYPE
+              SYNTAX  INTEGER(0..8)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Modify cos value for red packets. The range is 0-7. 8 means not to modify."
+              ::= { policyMapEntry 62 }
+
+          actionRedDroppreference OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              green(1),
+                              yellow(2),
+                              red(3),
+                              not-modify(4)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Modify packet color.1 means green.2 means yellow.3 means red.4 means not to modify."
+              ::= { policyMapEntry 63 }
+
+          actionRedCopyToCpu OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              copy(1),
+                              do-not-copy(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Copy red packet to cpu.1 means to copy packet to cpu.2meas not to care about this acion."
+              ::= { policyMapEntry 64 }
+
+          actionCirDel OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              delete(1),
+                              not-action(2)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Delete Cir actions.1 means to delete Cir actions. 2 means not to care about this action."
+              ::= { policyMapEntry 65 }
+
+          classifyPrecedence OBJECT-TYPE
+              SYNTAX  INTEGER(0..8)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The precedence to match. The range is 0-7. 8 means not to match."
+              ::= { policyMapEntry 66 }
+
+          classifyTos OBJECT-TYPE
+              SYNTAX  INTEGER(0..16)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The tos to match. The range is 0-15. 16 means not to match."
+              ::= { policyMapEntry 67 }
+
+          classifyDiffserv OBJECT-TYPE
+              SYNTAX  INTEGER(0..256)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The Diffserv to match. The range is 0-255. 256 means not to match."
+              ::= { policyMapEntry 68 }
+
+          classifyDstport OBJECT-TYPE
+              SYNTAX  INTEGER(1..25)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The destination port to match. The range is 1-24. 25 means not to match."
+              ::= { policyMapEntry 69 }
+
+
+
+
+
+
+
+
+--policyMapGlobalAppTable
+
+          policyMapGlobalAppTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF PolicyMapGlobalAppEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of policy Map Global App entries."
+              ::= { qos 11 }
+
+         policyMapGlobalAppEntry OBJECT-TYPE
+              SYNTAX  PolicyMapGlobalAppEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An policy Map Global App entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { policyMapGlobalAppName,direction }
+              ::= { policyMapGlobalAppTable 1 }
+
+          PolicyMapGlobalAppEntry ::=
+              SEQUENCE {
+                  policyMapGlobalAppName
+                      DisplayString,
+                  direction
+                      INTEGER,
+                  operation
+                      INTEGER
+              }
+
+          policyMapGlobalAppName OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of policy map. The length is 1-20."
+              ::= { policyMapGlobalAppEntry 1 }
+
+          direction OBJECT-TYPE
+              SYNTAX  INTEGER{
+              		      ingress(1),
+              		      egress(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The direction policy map applied. 1 means ingress, and 2 means egress."
+              ::= { policyMapGlobalAppEntry 2 }
+
+          operation OBJECT-TYPE
+              SYNTAX  INTEGER{
+              		      add(1),
+              		      delete(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete policy map. 1 means add, and 2 means delete."
+              ::= { policyMapGlobalAppEntry 3 }
+
+
+
+
+--dscpMapTable
+
+          dscpMapTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF DscpMapEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of dscp Map entries."
+              ::= { qos 12 }
+
+         dscpMapEntry OBJECT-TYPE
+              SYNTAX  DscpMapEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An dscp Map entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { dscpValueCurr }
+              ::= { dscpMapTable 1 }
+
+          DscpMapEntry ::=
+              SEQUENCE {
+                  dscpValueCurr
+                      INTEGER,
+                  dscpValueModified
+                      INTEGER,
+                  cosValue
+                      INTEGER,
+                  cngStatus
+                      INTEGER
+              }
+
+          dscpValueCurr OBJECT-TYPE
+              SYNTAX  INTEGER{
+              		      add(1),
+              		      delete(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete policy map. 1 means add, and 2 means delete."
+              ::= { dscpMapEntry 1 }
+
+          dscpValueModified OBJECT-TYPE
+              SYNTAX  INTEGER(0..64)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Dscp value to modify. The range is 0-63. 64 means no modification."
+              ::= { dscpMapEntry 2 }
+
+          cosValue OBJECT-TYPE
+              SYNTAX  INTEGER(0..8)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Cos value to modify. The range is 0-7. 8 means no modification."
+              ::= { dscpMapEntry 3 }
+
+          cngStatus OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              no-congestion-status(0),
+              		      green(1),
+              		      yellow(2),
+              		      red(3)             		   
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Congestion status. 1-green, 2-yellow, 3-red. 0 means no congestion status."
+              ::= { dscpMapEntry 4 }
+
+
+
+--policyMapSlotAppTable
+
+          policyMapSlotAppTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF PolicyMapSlotAppEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of policy Map Slot App entry."
+              ::= { qos 15 }
+
+         policyMapSlotAppEntry OBJECT-TYPE
+              SYNTAX  PolicyMapSlotAppEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An policy Map Slot App entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { dscpValueCurr }
+              ::= { policyMapSlotAppTable 1 }
+
+          PolicyMapSlotAppEntry ::=
+              SEQUENCE {
+                  policyMapSlotAppName
+                      DisplayString,
+                  policyMapSlotAppSlot
+                      INTEGER,
+                  policyMapSlotAppDirection
+                      INTEGER,
+                  policyMapSlotAppOper
+                      INTEGER
+              }
+
+          policyMapSlotAppName OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of policy map slot. The length is 1-20."
+              ::= { policyMapSlotAppEntry 1 }
+
+
+
+          policyMapSlotAppSlot OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "SlotID of device."
+              ::= { policyMapSlotAppEntry 2 }
+
+          policyMapSlotAppDirection OBJECT-TYPE
+              SYNTAX  INTEGER{
+              		      ingress(1),
+              		      egress(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "The direction policy map applied. 1 means ingress, and 2 means egress."
+              ::= { policyMapSlotAppEntry 3 }
+
+          policyMapSlotAppOper OBJECT-TYPE
+              SYNTAX  INTEGER{
+              		      add(1),
+              		      delete(2)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Add or delete policy map. 1 means add, and 2 means delete."
+              ::= { policyMapSlotAppEntry 4 }
+
+--qosSlotStatTable
+
+          qosSlotStatTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF QosSlotStatEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of qos Slot Stat entry."
+              ::= { qos 16 }
+
+         qosSlotStatEntry OBJECT-TYPE
+              SYNTAX  QosSlotStatEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An qos Slot Stat entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { qosSlotStatName,qosSlotStatSlotNo }
+              ::= { qosSlotStatTable 1 }
+
+          QosSlotStatEntry ::=
+              SEQUENCE {
+                  qosSlotStatName
+                      DisplayString,
+                  qosSlotStatSlotNo
+                      INTEGER,
+                  qosSlotInProfileCount
+                      INTEGER,
+                  qosSlotOutProfileCount
+                      INTEGER
+              }
+
+          qosSlotStatName OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of qos Slot Stat Name. The length is 1-20."
+              ::= { qosSlotStatEntry 1 }
+
+
+
+          qosSlotStatSlotNo OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "SlotID of device."
+              ::= { qosSlotStatEntry 2 }
+
+          qosSlotInProfileCount OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Slot of in-profile count(bits)."
+              ::= { qosSlotStatEntry 3 }
+
+          qosSlotOutProfileCount OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Slot of out-profile count(bits)."
+              ::= { qosSlotStatEntry 4 }
+
+
+--qosIFStatTable
+
+          qosIFStatTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF QosIFStatEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of qos interface Stat entry."
+              ::= { qos 17 }
+
+         qosIFStatEntry OBJECT-TYPE
+              SYNTAX  QosIFStatEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An qos interface Stat entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { qosIFStatName,qosIFStatSlotNo }
+              ::= { qosIFStatTable 1 }
+
+          QosIFStatEntry ::=
+              SEQUENCE {
+                  qosIFStatName
+                      DisplayString,
+                  qosIFStatInterfaceNo
+                      INTEGER,
+                  qosIFInProfileCount
+                      INTEGER,
+                  qosIFOutProfileCount
+                      INTEGER
+              }
+
+
+          qosIFStatName OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Indexs of qos interface Stat Name. The length is 1-20."
+              ::= { qosIFStatEntry 1 }
+
+
+          qosIFStatInterfaceNo OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "interface NAME of device."
+              ::= { qosIFStatEntry 2 }
+
+          qosIFInProfileCount OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface of in-profile count(bits)."
+              ::= { qosIFStatEntry 3 }
+
+          qosIFOutProfileCount OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface of out-profile count(bits)."
+              ::= { qosIFStatEntry 4 }
+
+
+-- QosTrust
+
+          qosTrust OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              dscp(1),
+                              cos(2),
+                              untrust(3)
+                             }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Qos trust mode.1-dscp,2-cos,3-untrust.Default is cos."
+              ::= { qos 18 }
+
+--cosToLocalTable
+
+          cosToLocalTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF CosToLocalEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of qos to local mapping table entry."
+              ::= { qos 19 }
+
+         cosToLocalEntry OBJECT-TYPE
+              SYNTAX  CosToLocalEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An cos to local mapping table entry."
+              INDEX   { cos }
+              ::= { cosToLocalTable 1 }
+
+          CosToLocalEntry ::=
+              SEQUENCE {
+                  cos
+                      INTEGER,
+                  cosToLocal
+                      INTEGER,
+                  cng
+                      INTEGER
+              }
+
+          cos OBJECT-TYPE
+              SYNTAX  INTEGER(0..7)
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Cos value. The range is 0-7. it is index of table."
+              ::= { cosToLocalEntry 1 }
+
+          cosToLocal OBJECT-TYPE
+              SYNTAX  INTEGER(0..7)
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Cos value to local. The range is 0-7. it is index of table."
+              ::= { cosToLocalEntry 2 }
+
+          cng OBJECT-TYPE
+              SYNTAX  INTEGER{
+                              no-congestion(0),
+                              green(1),
+                              yellow(2),
+                              red(3)
+                              }
+              ACCESS  read-write
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Congestion status. 1-green, 2-yellow, 3-red. 0 means no congestion status."
+              ::= { cosToLocalEntry 3 }
+
+
+
+
+END
+
+
+

@@ -11,7 +11,7 @@ To enable this set the following config:
 $config['rrdtool_version'] = '1.5.5';
 ```
 
-### Support matrix
+### Distributed Poller Support Matrix
 
 Shared FS: Is a shared filesystem required?
 
@@ -62,6 +62,9 @@ $config['rrdcached']    = "unix:/var/run/rrdcached.sock";
 - Edit /etc/default/rrdcached to include:
 ```ssh
 DAEMON=/usr/bin/rrdcached
+DAEMON_USER=librenms
+DAEMON_GROUP=librenms
+WRITE_THREADS=4
 WRITE_TIMEOUT=1800
 WRITE_JITTER=1800
 BASE_PATH=/opt/librenms/rrd/
@@ -69,7 +72,7 @@ JOURNAL_PATH=/var/lib/rrdcached/journal/
 PIDFILE=/var/run/rrdcached.pid
 SOCKFILE=/var/run/rrdcached.sock
 SOCKGROUP=librenms
-BASE_OPTIONS="-B -F"
+BASE_OPTIONS="-B -F -R"
 ```
 
 ### RRDCached installation CentOS 6
@@ -156,12 +159,6 @@ systemctl enable --now rrdcached.service
 ```ssh
 $config['rrdcached']    = "unix:/var/run/rrdcached/rrdcached.sock";
 ```
-
-- Restart Apache
-```ssh
-systemctl restart httpd
-```
-
 Check to see if the graphs are being drawn in LibreNMS. This might take a few minutes.
 After at least one poll cycle (5 mins), check the LibreNMS disk I/O performance delta.
 Disk I/O can be found under the menu Devices>All Devices>[localhost hostname]>Health>Disk I/O.

@@ -1,0 +1,658 @@
+-- *********************************************************************
+-- NETFLOW-MIB.my
+--
+-- Copyright (c) 2012
+-- All rights reserved.
+-- *********************************************************************
+--
+NETFLOW-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Counter32,
+        Unsigned32,
+        Integer32,
+        Gauge32,
+        Counter64
+                FROM SNMPv2-SMI
+        InetAddressType,
+        InetAddress,
+        InetPortNumber
+                FROM INET-ADDRESS-MIB
+        RowStatus,
+        TruthValue,
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+                FROM SNMPv2-CONF  
+        ifIndex
+                FROM IF-MIB
+        nmsMgmt
+                FROM NMS-SMI;
+                
+netflowMIB MODULE-IDENTITY
+        LAST-UPDATED    "201203190000Z"
+        ORGANIZATION    "BDCOM Systems, Inc."
+        CONTACT-INFO
+                "        BDCOM Systems
+                         Customer Service
+                "
+        DESCRIPTION
+                "The Netflow MIB provides a simple and easy method
+                 to get NetFlow cache information, current NetFlow
+                 configuration and statistics. It will enable medium to
+                 small size enterprises to take advantage of NetFlow
+                 technology over SNMP at a reduced infrastructure cost.
+                 The MIB is created to provide Netflow information in
+                 these areas:
+
+                        1. Cache information and configuration.
+                        2. Collector information and configuration.
+                        3. Export Statistics.
+                        4. Version 9 Export Template information.
+
+                 Terminology used
+
+                 Flow
+                 A flow is defined as a unidirectional sequence of 
+				 packets with some common properties that pass 
+				 through a network device.  These collected flows 
+				 are exported to an external device, the NetFlow
+				 collector.  Network flows are highly granular;
+                 for example, flow records include details such 
+				 as IP addresses, packet and byte counts,timestamps, 
+				 Type of Service (ToS), application ports, 
+				 input and output interfaces, etc.
+
+                 Exporter
+                 A device (for example, a router) with NetFlow
+                 services enabled. The exporter monitors packets
+                 entering an observation point and creates flows out
+                 of these packets. The information from these flows
+                 are exported in the form of Flow Records to
+                 the collector.
+
+                 Flow Record
+                 A Flow Record provides information about an IP Flow
+                 that exists on the Exporter. The Flow Records are
+                 commonly referred to as NetFlow Services data or
+                 NetFlow data.
+
+                 Collector
+                 The NetFlow Collector receives Flow Records from
+                 one or more Exporters. It processes the received
+                 export packet, i.e. parses, stores, display the 
+				 Flow Record information. The flow records may be optionally
+                 aggregated before being stored into the hard disk.
+                                      
+                 Template
+                 NetFlow Version 9 Export format is template based.
+                 Version 9 record format consists of a packet header
+                 followed by at least one or more template or data
+                 FlowSets. A template FlowSet (collection of one or more
+                 template) provides a description of the fields that
+                 will be present in future data FlowSets. Templates
+                 provide an extensible design to the record format,
+                 a feature that should allow future enhancements to
+                 NetFlow services without requiring concurrent changes
+                 to the basic flow-record format.
+
+                 One additional record type is also a part of
+                 Version 9 specification: an options template. Rather
+                 than supplying information about IP flows, options are
+                 used to supply information about the NetFlow process
+                 configuration or NetFlow process specific data."
+
+        REVISION "201203190000Z"
+        DESCRIPTION
+                 "Initial version of this MIB module."
+
+        ::= { bdMgmt 226 }
+
+
+-- Overview of MIB Objects:
+--
+-- Defines 4 groups of objects.
+--
+-- 1. netflowCacheInfo              : A group of objects related to cache
+--                                    information and configuration stored
+--                                    per cache configuration.
+--
+-- 2. netflowCollectorInfo          : A group of objects related to Collector
+--                                    configuration and information.
+--
+-- 3. netflowExportStatistics       : Provides export statistics information.
+--
+-- 4. netflowTemplateInfo           : Provides Template based Version 9
+--                                    flow exported information and statistics.
+
+netflowMIBObjects   	OBJECT IDENTIFIER ::= { netflowMIB 1 }  
+
+netflowCacheInfo            OBJECT IDENTIFIER ::= { netflowMIBObjects 1 }
+netflowCollectorInfo        OBJECT IDENTIFIER ::= { netflowMIBObjects 2 }
+netflowExportStatistics     OBJECT IDENTIFIER ::= { netflowMIBObjects 3 }
+netflowTemplateInfo         OBJECT IDENTIFIER ::= { netflowMIBObjects 4 }
+
+-- Textual Conventions
+
+NetflowInterfaceDirectionTypes ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Defines different direction types of interface netflow configuration."
+    SYNTAX  INTEGER{
+            interfaceDirNone(0),
+            interfaceDirIngress(1),
+            interfaceDirEgress(2),
+            interfaceDirBoth(3)
+    }
+
+NetflowAggregationtypes ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Defines different aggregation types of netflow cache."
+    SYNTAX  INTEGER{
+            main(0),
+            as(1),
+            protocolPort(2),
+            sourcePrefix(3),
+            destinationPrefix(4),
+            prefix(5),
+            asTos(6),
+            protocolPortTos(7),
+            sourcePrefixTos(8),
+            destinationPrefixTos(9),
+            prefixTos(10),
+            prefixPort(11),
+            bgpNexthopTos(12)
+    }   
+    
+NetflowVersionType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Defines different types of Version."
+    SYNTAX  INTEGER{
+            version1(1),
+            version5(5),
+            version9(9)
+    }
+
+NetflowTemplateTypes ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Defines different types of Template."
+    SYNTAX  INTEGER{
+            template(1),
+            optionTemplate(2)
+    }
+    
+-- end of textual conventions
+
+
+-- Object Group: netflowCacheInfo
+--
+--      netflowInterfaceTable
+--          netflowInterfaceEntry
+--              ifIndex
+--              netflowCacheNetflowEnable
+--      netflowCacheTable
+--          netflowCacheEntry
+--              netflowCacheType
+--              netflowCacheEnable
+--              netflowCacheEntries
+--              netflowUsedEntries
+--              netflowUnUsedEntries
+--              netflowActiveTimeout
+--              netflowInactiveTimeout
+
+netflowInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NetflowInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides Netflow Enable information per interface."
+    ::= { netflowCacheInfo 1 }
+
+netflowInterfaceEntry OBJECT-TYPE
+    SYNTAX     NetflowInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A conceptual row in the netflowInterfaceEntry."
+    INDEX { ifIndex }
+    ::= { netflowInterfaceTable 1}
+
+NetflowInterfaceEntry ::= SEQUENCE {
+        netflowCacheNetflowEnable              NetflowInterfaceDirectionTypes
+}
+
+netflowCacheNetflowEnable OBJECT-TYPE
+    SYNTAX      NetflowInterfaceDirectionTypes
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the netflow feature is enabled for this
+         interface, and if so, in which directions."
+    ::= { netflowInterfaceEntry 1 }
+
+netflowCacheTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF NetflowCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A table containing configuration and statistics per cache.
+         Cache may be main cache or an aggregation cache."
+    ::= { netflowCacheInfo 2 }
+
+netflowCacheEntry OBJECT-TYPE
+    SYNTAX     NetflowCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A conceptual row in the netflowCacheEntry."
+    INDEX { netflowCacheType }
+    ::= { netflowCacheTable 1}
+
+NetflowCacheEntry ::= SEQUENCE {
+        netflowCacheType                  NetflowAggregationtypes,
+        netflowCacheEnable                TruthValue,
+        netflowCacheEntries               Unsigned32,
+        netflowUsedEntries                Unsigned32,
+        netflowUnUsedEntries              Unsigned32,
+        netflowActiveTimeOut              Unsigned32,
+        netflowInactiveTimeOut            Unsigned32
+     }
+
+netflowCacheType OBJECT-TYPE
+    SYNTAX      NetflowAggregationtypes
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The type of netflow cache.
+
+         NetFlow aggregation maintains one or more extra flow caches
+         with different combinations of fields that determine
+         which traditional flows are grouped together."
+    ::= { netflowCacheEntry 1 }
+
+netflowCacheEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether netflow is enabled for this cache type."
+    ::= { netflowCacheEntry 2 }
+
+netflowCacheEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of entries that can be cached for this cache type.
+         The accepted value could be limited based on the amount of
+         memory available in the system."
+     ::= { netflowCacheEntry 3 }
+
+netflowUsedEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of currently used flow entries."
+    ::= { netflowCacheEntry 4 }
+
+netflowUnUsedEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of currently available flow entries."
+    ::= { netflowCacheEntry 5 }
+
+netflowActiveTimeOut OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The timeout period (in minutes) for removing active flows
+         from the cache."
+    ::= { netflowCacheEntry 6 }
+
+netflowInactiveTimeOut OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The timeout period (in seconds) for removing inactive flows
+         from the cache."
+    ::= {netflowCacheEntry 7}
+
+-- Object Group: netflowCollectorInfo
+--  
+--        netflowCollectorVersionInfoTable
+--            netflowCollectorVersionInfoEntry
+--                INDEX netflowCacheType
+--                netflowExportVersion
+--        netflowMaxCollectors
+--        netflowCollectorTable
+--            netflowCollectorEntry
+--                INDEX netflowCacheType
+--                netflowCollectorAddressType
+--                netflowCollectorAddress
+--                netflowCollectorPort
+--                netflowCollectorStatus
+    
+netflowCollectorVersionInfoTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF NetflowCollectorVersionInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A table containing version information about export configuration per
+         cache type."
+    ::= { netflowCollectorInfo 1 }
+
+netflowCollectorVersionInfoEntry OBJECT-TYPE
+    SYNTAX     NetflowCollectorVersionInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A conceptual row in the netflowCollectorInfoEntry."
+    INDEX { netflowCacheType }
+    ::= { netflowCollectorVersionInfoTable 1}
+
+NetflowCollectorVersionInfoEntry ::= SEQUENCE {
+        netflowExportVersion              NetflowVersionType
+     }
+
+netflowExportVersion OBJECT-TYPE
+    SYNTAX      NetflowVersionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The NetFlow data export version."
+    ::= { netflowCollectorVersionInfoEntry 1 }
+
+netflowMaxCollectors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of entries allowed in the netflowCollectorTable
+         for each cache type.
+         A zero indicates export is not supported in the device.
+         The agent should set this value during initialization, and
+         the value for this object cannot be changed during the
+         system's operation."
+    ::= { netflowCollectorInfo 2 }
+
+netflowCollectorTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF NetflowCollectorEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A control table to configure the collectors that the netflow
+         packets are exported to. The number of entries that can be
+         configured for the cache type is limited by the value of
+         netflowMaxCollectors."
+    ::= { netflowCollectorInfo 3 }
+
+netflowCollectorEntry OBJECT-TYPE
+    SYNTAX     NetflowCollectorEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A conceptual row in the netflowCollectorEntry."
+    INDEX { netflowCacheType}
+    ::= { netflowCollectorTable 1 }
+
+NetflowCollectorEntry ::= SEQUENCE {
+        netflowCollectorAddressType       InetAddressType,
+        netflowCollectorAddress           InetAddress,
+        netflowCollectorPort              InetPortNumber,
+        netflowCollectorStatus            RowStatus
+   }
+
+netflowCollectorAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The type of Internet address used by this entry."
+    ::= { netflowCollectorEntry 1 }
+
+netflowCollectorAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The Internet address of the collector. This is the
+         address which the Netflow data is exported to."
+    ::= { netflowCollectorEntry 2 }
+
+netflowCollectorPort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The transport port of the collector which the Netflow data is
+         exported to."
+    ::= { netflowCollectorEntry 3}
+    
+netflowCollectorStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object is used to create or delete an entry
+         in the netflowCollectorTable.
+
+         * A row may be created using the 'CreateAndGo' or 'CreateAndWait' option. 
+           When the row is successfully created, the RowStatus would be
+           set to 'active' by the agent.
+
+         * A row may be deleted by setting the RowStatus to 'destroy'.
+         "
+    ::= { netflowCollectorEntry 4 }
+
+-- Object Group: netflowExportStatistics
+----      netflowOctetsExport
+--        netflowRecordsExported
+--        netflowPktsExported
+--        netflowPktsFailed
+
+netflowOctetsExport OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "total Number of bytes statistics records which were exported."
+    ::= { netflowExportStatistics 1 }
+
+netflowRecordsExported OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "total Number of flow statistics records which were exported."
+    ::= { netflowExportStatistics 2 }
+
+netflowPktsExported OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of packets (udp datagrams) which were exported."
+    ::= { netflowExportStatistics 3 }
+
+netflowPktsFailed OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of times a flow record failed to be exported."
+    ::= { netflowExportStatistics 4 }
+
+-- Object Group: netflowTemplateInfo
+--               
+--        netflowTemplateOptionsFlag
+--        netflowTemplateTable
+--            netflowTemplateEntry
+--                netflowTemplateType
+--                netflowTemplateAdded
+--                netflowTemplateActive
+--                netflowTemplateAgerPolls
+--        netflowTemplateExportInfoTable
+--            netflowTemplateExportInfoEntry
+--                INDEX netflowCacheType
+--                netflowTemplateExportVer9Enable
+--                netflowTemplateExportVer9TplTimeout
+--                netflowTemplateExportVer9OptTimeout
+--                netflowTemplateExportVer9TplRefreshRate
+--                netflowTemplateExportVer9OptRefreshRate
+
+netflowTemplateOptionsFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "indicate that it has option template."
+    ::= { netflowTemplateInfo 1 }
+
+netflowTemplateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NetflowTemplateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A control table to provide statistics of version 9
+         Flow and Option templates."
+    ::= { netflowTemplateInfo 2 }
+
+netflowTemplateEntry OBJECT-TYPE
+    SYNTAX      NetflowTemplateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the netflowTemplateEntry."
+    INDEX { netflowTemplateType }
+    ::= { netflowTemplateTable 1 }
+
+NetflowTemplateEntry ::= SEQUENCE {
+        netflowTemplateType                 NetflowTemplateTypes,
+        netflowTemplateAdded                Unsigned32,
+        netflowTemplateActive               Unsigned32,
+        netflowTemplateAgerPolls            Unsigned32
+   }
+      
+netflowTemplateType OBJECT-TYPE
+    SYNTAX     NetflowTemplateTypes
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Defines the structure and interpretation of fields in a data
+         record and serves as an INDEX in this table. Version 9 has two
+         types of Templates: Flow Templates and Option Templates."
+    ::= { netflowTemplateEntry 1 }
+
+netflowTemplateAdded OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of templates added."
+    ::= { netflowTemplateEntry 2 }
+
+netflowTemplateActive OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of active templates."
+    ::= { netflowTemplateEntry 3 }
+
+netflowTemplateAgerPolls OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of template ager polls."
+    ::= { netflowTemplateEntry 4 }
+
+netflowTemplateExportInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NetflowTemplateExportInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A control table providing information about version 9."
+    ::= { netflowTemplateInfo 3 }
+
+netflowTemplateExportInfoEntry OBJECT-TYPE
+    SYNTAX      NetflowTemplateExportInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the netflowTemplateExportInfoEntry."
+    INDEX { netflowCacheType }
+    ::= { netflowTemplateExportInfoTable 1 }
+
+NetflowTemplateExportInfoEntry ::= SEQUENCE {
+        netflowTemplateExportVer9Enable             TruthValue,
+        netflowTemplateExportVer9TplTimeout         Unsigned32,
+        netflowTemplateExportVer9OptTimeout         Unsigned32,
+        netflowTemplateExportVer9TplRefreshRate     Unsigned32,
+        netflowTemplateExportVer9OptRefreshRate     Unsigned32
+   }
+
+netflowTemplateExportVer9Enable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Object to indicate whether version 9 export is configured
+         or not."
+    ::= { netflowTemplateExportInfoEntry 1 }
+
+netflowTemplateExportVer9TplTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Export template time out.
+         Templates are resent after this time."
+    ::= { netflowTemplateExportInfoEntry 2 }
+
+netflowTemplateExportVer9OptTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Export option time out.
+         Options are resent after this time."
+    ::= { netflowTemplateExportInfoEntry 3 }
+
+netflowTemplateExportVer9TplRefreshRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "packets"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Template refresh rate.
+         Templates are resent after this many packets."
+    ::= { netflowTemplateExportInfoEntry 4 }
+
+netflowTemplateExportVer9OptRefreshRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "packets"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Option refresh rate.
+         Options are resent after this many packets."
+    ::= { netflowTemplateExportInfoEntry 5 }    
+
+END
+

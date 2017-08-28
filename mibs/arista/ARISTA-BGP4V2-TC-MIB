@@ -1,0 +1,93 @@
+-- extracted from draft-ietf-idr-bgp4-mibv2-tc-mib-03.txt
+-- at Tue Jul 12 06:11:02 2011
+
+-- Renumbered to sit underneath Arista's enterprise.
+
+ ARISTA-BGP4V2-TC-MIB DEFINITIONS ::= BEGIN
+
+     IMPORTS
+         MODULE-IDENTITY FROM SNMPv2-SMI
+         aristaExperiment FROM ARISTA-SMI-MIB
+         TEXTUAL-CONVENTION FROM SNMPv2-TC;
+
+         aristaBgp4V2TC MODULE-IDENTITY
+             LAST-UPDATED "201408150000Z"
+             ORGANIZATION "Arista Networks, Inc."
+             CONTACT-INFO
+                 "Arista Networks, Inc.
+
+                  Postal: 5453 Great America Parkway
+                          Santa Clara, CA 95054
+
+                  Tel: +1 408 547-5500
+
+                  E-mail: snmp@arista.com"
+             DESCRIPTION
+                     "Textual conventions for BGP-4.
+                      This version was published in
+                      draft-ietf-idr-bgp4-mibv2-13, and
+                      modified to be homed inside the Arista
+                      enterprise.  There were no other
+                      modifications.
+
+
+                      Copyright (C) The IETF Trust (2011).  This
+                      version of this MIB module is part of
+                      draft-ietf-idr-bgp4-mibv2-13.txt;
+                      see the draft itself for full legal notices."
+
+             REVISION "201408150000Z"
+             DESCRIPTION
+                    "Updated postal and e-mail addresses."
+             REVISION "201210190000Z"
+             DESCRIPTION
+                    "Renumbered inside the Arista enterprise space."
+             REVISION "201101170000Z"
+             DESCRIPTION
+                    "Initial version."
+             ::= { aristaExperiment 2 }
+
+     --
+     -- Textual Conventions
+     --
+
+     AristaBgp4V2IdentifierTC ::= TEXTUAL-CONVENTION
+         DISPLAY-HINT "1d."
+         STATUS       current
+         DESCRIPTION
+             "The representation of a BGP Identifier.  BGP Identifiers
+              are presented in the received network byte order.
+
+              The BGP Identifier is displayed as if it is an IP address,
+              even if it would be an illegal one."
+         REFERENCE
+             "RFC 4273, Section 4.2"
+         SYNTAX OCTET STRING(SIZE (4))
+
+     AristaBgp4V2AddressFamilyIdentifierTC ::= TEXTUAL-CONVENTION
+         STATUS       current
+         DESCRIPTION
+             "The representation of a BGP AFI.  The value of this object
+              should be restricted to be between the values of 0 and
+              65535."
+         REFERENCE
+             "RFC 4760, Section 3"
+         SYNTAX INTEGER {
+                 ipv4(1),
+                 ipv6(2)
+             }
+
+     AristaBgp4V2SubsequentAddressFamilyIdentifierTC ::= TEXTUAL-CONVENTION
+         STATUS       current
+         DESCRIPTION
+             "The representation of a BGP SAFI"
+         REFERENCE
+             "RFC 4760, Section 3.  The value of this object should be
+              restricted to be between the values of 0 and 255."
+         SYNTAX INTEGER {
+                 unicast(1),
+                 multicast(2),
+                 mpls(4)
+             }
+
+ END

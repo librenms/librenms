@@ -209,4 +209,31 @@ unset($graph, $oids, $oid);
 
 poll_mib_def($device, 'UBNT-AirFIBER-MIB:UBNT', 'ubiquiti', $mib_oids, $mib_graphs, $graphs);
 
+
+echo ' UBNT-AirFIBER-MIB Rx levels ';
+
+// $mib_oids                                (oidindex,dsname,dsdescription,dstype)
+$mib_oids = array(
+    'rxPower0'                 => array(
+            '1',
+            'rxPower0',
+            'Rx Chain0 Power',
+            'GAUGE',
+    ),
+    'rxPower1'                 => array(
+            '1',
+            'rxPower1',
+            'Rx Chain1 Power',
+            'GAUGE',
+    ),
+);
+
+$mib_graphs = array(
+    'ubnt_airfiber_RxPower',
+);
+
+unset($graph, $oids, $oid);
+
+poll_mib_def($device, 'UBNT-AirFIBER-MIB:UBNT', 'ubiquiti', $mib_oids, $mib_graphs, $graphs, 'ubnt-airfibre-mib-rx');
+
 // EOF

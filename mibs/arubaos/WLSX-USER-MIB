@@ -1,15 +1,18 @@
--- ArubaOS 3.2.0.0_16376
+--- ArubaOS 6.5.2.0_59123
 -- vim:set ts=4 sw=4:
    WLSX-USER-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
-       TEXTUAL-CONVENTION,
+       TEXTUAL-CONVENTION FROM SNMPv2-TC 
+       
        MODULE-IDENTITY,
        OBJECT-TYPE,
        snmpModules,
        Integer32,
+       Unsigned32,
 	   Counter32,
 	   IpAddress,
+       Counter64,
 	   NOTIFICATION-TYPE
            FROM SNMPv2-SMI
 
@@ -30,7 +33,10 @@
 
 	   ArubaAuthenticationMethods,
 	   ArubaSubAuthenticationMethods,
-	   ArubaPhyType
+	   ArubaEncryptionType,
+	   ArubaPhyType,
+	   ArubaHTMode,
+       ArubaUserForwardMode
 	   		FROM ARUBA-TC
 		wlsxEnterpriseMibModules
 			FROM ARUBA-MIB
@@ -38,7 +44,7 @@
 			FROM WLSX-WLAN-MIB;
 
    wlsxUserMIB MODULE-IDENTITY 
-       LAST-UPDATED "0704110326Z"
+       LAST-UPDATED "1001261806Z"
        ORGANIZATION "Aruba Wireless Networks"
        CONTACT-INFO
             "Postal:    1322 Crossman Avenue
@@ -48,7 +54,7 @@
        DESCRIPTION
            "This MIB module defines MIB objects which provide
             information about the users in an Aruba controller."
-       REVISION        "0704110326Z"
+       REVISION        "1001261806Z"
        DESCRIPTION
            "The initial revision."
        ::= { wlsxEnterpriseMibModules 4 }
@@ -58,7 +64,7 @@
 -- wlsxUserAllInfoGroup contains information about the users in the controller.
  
   wlsxTotalNumOfUsers OBJECT-TYPE
-         SYNTAX       Counter32
+         SYNTAX       Unsigned32
          MAX-ACCESS   read-only
          STATUS       current
          DESCRIPTION
@@ -123,7 +129,18 @@
 	 	nUserUPBWContractId				Integer32,
 	 	nUserDNBWContractName			DisplayString,
 	 	nUserDNBWContractUsage			INTEGER,
-	 	nUserDNBWContractId				Integer32
+	 	nUserDNBWContractId				Integer32,
+		nUserHTMode   				    ArubaHTMode,
+        nUserForwardMode                ArubaUserForwardMode,
+		nUserEncryptionMethod			ArubaEncryptionType,
+		nUserDeviceID				    DisplayString,
+		nUserConnectedModule            Integer32,
+		nUserDeviceType				DisplayString,
+		nUserRxDataPkts64               Counter64,
+		nUserTxDataPkts64               Counter64,
+		nUserRxDataOctets64             Counter64,
+		nUserTxDataOctets64             Counter64,
+		nVIAUserDeviceID 				MacAddress
      }
 
      nUserPhyAddress OBJECT-TYPE
@@ -244,7 +261,7 @@
      nUserIsOnHomeAgent OBJECT-TYPE
          SYNTAX       TruthValue
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			The Object will indicate if the controller is the home controller 
@@ -255,7 +272,7 @@
      nUserHomeAgentIpAddress OBJECT-TYPE
          SYNTAX       IpAddress
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			The Home agent IP Address of the user. If this user is already on 
@@ -270,7 +287,8 @@
 		 				visitor(1),
 						away(2),
 						associated(3),
-						wired(4)
+						wired(4),
+                        wireless(5)
 		 				}
          MAX-ACCESS   read-only
          STATUS       current
@@ -284,7 +302,7 @@
      nUserHomeVlan OBJECT-TYPE
          SYNTAX       Integer32
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
 			Home VLAN of the User. If the user is on the home controller 
@@ -483,6 +501,124 @@
             "
         ::= { wlsxUserEntry 33 }
 
+     nUserHTMode OBJECT-TYPE
+         SYNTAX       ArubaHTMode
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The HT mode of this user, if any.
+            "
+        ::= { wlsxUserEntry 34 }
+
+     nUserEncryptionMethod OBJECT-TYPE
+         SYNTAX       ArubaEncryptionType
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Encryption method.
+            "
+        ::= { wlsxUserEntry 35 }
+ 
+     nUserForwardMode OBJECT-TYPE
+         SYNTAX       ArubaUserForwardMode
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			User mode.
+            "
+        ::= { wlsxUserEntry 36 }
+        
+     nUserDeviceID OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..128))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Device ID
+            "
+        ::= { wlsxUserEntry 37 }
+
+     nUserConnectedModule OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            The module to which the user is connected, if wired.
+
+            "
+        ::= { wlsxUserEntry 38 }
+
+     nUserDeviceType OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..31))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Device type
+            "
+        ::= { wlsxUserEntry 39 }
+
+     nUserRxDataPkts64 OBJECT-TYPE
+         SYNTAX       Counter64
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This object specifies number of packets received by this IP
+            for which this user is connected to the controller.
+            "
+         ::= { wlsxUserEntry 40 }
+
+     nUserTxDataPkts64 OBJECT-TYPE
+         SYNTAX       Counter64
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This object specifies number of packets transmitted by this IP
+            for which this user is connected to the controller.
+            "
+         ::= { wlsxUserEntry 41 }
+
+     nUserRxDataOctets64 OBJECT-TYPE
+         SYNTAX       Counter64
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This object specifies number of octets received by this IP
+            for which this user is connected to the controller.
+            "
+         ::= { wlsxUserEntry 42 }
+
+     nUserTxDataOctets64 OBJECT-TYPE
+         SYNTAX       Counter64
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This object specifies number of octets transmitted by this IP
+            for which this user is connected to the controller.
+            "
+        ::= { wlsxUserEntry 43 }
+
+    nVIAUserDeviceID OBJECT-TYPE
+         SYNTAX       MacAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                MAC address of the station from which the user connected to
+                the controller using VIA.
+            "
+        ::= { wlsxUserEntry 44 }
+
+
+
   wlsxUserSessionTimeTable OBJECT-TYPE
 	  SYNTAX		SEQUENCE OF WlsxUserSessionTimeEntry
 	  MAX-ACCESS	not-accessible
@@ -533,5 +669,61 @@
 			Number of users that are connected to the essid whose sessions expired in this time interval.
             "
         ::= { wlsxUserSessionTimeEntry 2 }
+
+-- wlsxUserStatsGroup 
+-- This group lists the user count information based on the auth type
+
+  wlsxUserStatsGroup               OBJECT IDENTIFIER ::= { wlsxUserAllInfoGroup 4 }
+
+     wlsxNumOfUsers8021x    OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			 Number of 802.1x users.
+            "
+        ::= { wlsxUserStatsGroup 1 }
+
+     wlsxNumOfUsersVPN      OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Number of VPN users.
+            "
+        ::= { wlsxUserStatsGroup 2 }
+
+     wlsxNumOfUsersCP      OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Number of Captive Portal  users.
+            "
+        ::= { wlsxUserStatsGroup 3 }
+
+     wlsxNumOfUsersMAC      OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Number of MAC users.
+            "
+        ::= { wlsxUserStatsGroup 4 }
+
+     wlsxNumOfUsersStateful8021x      OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Number of stateful 802.1x users.
+            "
+        ::= { wlsxUserStatsGroup 5 }
+
 
 END

@@ -1,0 +1,97 @@
+--
+-- *****************************************************************
+-- NMS-EPON-EOC-TRAP.MIB: NMS EPON EOC TRAP MIB
+--
+-- Sep 2011
+-- Edit by LIUQIANG
+-- Copyright (c) 2008 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-EPON-EOC-TRAP DEFINITIONS ::= BEGIN
+
+
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsEPONGroup                                 FROM NMS-SMI
+    uniSeqNo,eocMasterMacAddr,eocMasterRegStatus,isEocMasterPresent
+                                                FROM NMS-EPON-EOC-COMM
+    onuID                                       FROM NMS-EPON-ONU    
+    terSeqNo,slaveMacAddr,slaveRegStatus
+                                                FROM NMS-EPON-EOC-SLAVE;    
+             
+        
+                                               
+
+               nmsEponEocTrap         OBJECT IDENTIFIER ::= { nmsEPONGroup 33 }
+               
+               
+      -- Notifications
+	nmsEocMasterRegNotifications OBJECT IDENTIFIER
+                                ::= { nmsEponEocTrap 1 }
+
+
+	nmsEocMasterRegNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       onuID,
+                       uniSeqNo,
+                       eocMasterMacAddr,
+                       eocMasterRegStatus
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when EoC master register/deregister."
+    		::= { nmsEocMasterRegNotifications 1 }
+
+      -- Notifications
+	nmsEocMasterPreNotifications OBJECT IDENTIFIER
+                                ::= { nmsEponEocTrap 2 }
+
+
+	nmsEocMasterPreNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       onuID,
+                       uniSeqNo,
+                       eocMasterMacAddr,
+                       isEocMasterPresent
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when EoC master present/absent."
+    		::= { nmsEocMasterPreNotifications 1 }
+
+
+
+      -- Notifications
+	nmsEocSlaveRegNotifications OBJECT IDENTIFIER
+                                ::= { nmsEponEocTrap 3 }
+
+
+	nmsEocSlaveRegNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       onuID,
+                       uniSeqNo,
+                       eocMasterMacAddr,
+                       terSeqNo,
+                       slaveMacAddr,
+                       slaveRegStatus
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when EoC slave register/deregister."
+    		::= { nmsEocSlaveRegNotifications 1 }
+
+
+        
+
+END
+               
+               
+               
+               
+               

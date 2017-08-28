@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 $serial   = trim(snmp_get($device, "ibSerialNumber.0", "-OQv", "IB-PLATFORMONE-MIB"));
 $version  = trim(snmp_get($device, "ibNiosVersion.0", "-OQv", "IB-PLATFORMONE-MIB"));
 $hardware = trim(snmp_get($device, "ibHardwareType.0", "-OQv", "IB-PLATFORMONE-MIB"));
@@ -16,12 +18,11 @@ $oids =
 
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
-$rrd_def = array(
-    'DS:success:DERIVE:600:0:U',
-    'DS:failure:DERIVE:600:0:U',
-    'DS:reject:DERIVE:600:0:U',
-    'DS:prereq_reject:DERIVE:600:0:U'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('success', 'DERIVE', 0)
+    ->addDataset('failure', 'DERIVE', 0)
+    ->addDataset('reject', 'DERIVE', 0)
+    ->addDataset('prereq_reject', 'DERIVE', 0);
 
 $fields = array(
     'success'       => $data[0]['ibDDNSUpdateSuccess'],
@@ -46,10 +47,9 @@ $oids =
 
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
-$rrd_def = array(
-        'DS:PerfAA:GAUGE:600:0:U',
-        'DS:PerfnonAA:GAUGE:600:0:U'
-);
+$rrd_def = RrdDefinition::make()
+        ->addDataset('PerfAA', 'GAUGE', 0)
+        ->addDataset('PerfnonAA', 'GAUGE', 0);
 
 $fields = array(
     'PerfAA'    => $data[0]['ibNetworkMonitorDNSAAT1AvgLatency'],
@@ -72,12 +72,11 @@ $oids =
 
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
-$rrd_def = array(
-    'DS:success:DERIVE:600:0:U',
-    'DS:failure:DERIVE:600:0:U',
-    'DS:nxdomain:DERIVE:600:0:U',
-    'DS:nxrrset:DERIVE:600:0:U'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('success', 'DERIVE', 0)
+    ->addDataset('failure', 'DERIVE', 0)
+    ->addDataset('nxdomain', 'DERIVE', 0)
+    ->addDataset('nxrrset', 'DERIVE', 0);
 
 $fields = array(
     'success'       => $data['"summary"']['ibBindZoneSuccess'],
@@ -108,17 +107,16 @@ $oids =
 
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
-$rrd_def = array(
-    'DS:ack:DERIVE:600:0:U',
-    'DS:decline:DERIVE:600:0:U',
-    'DS:discover:DERIVE:600:0:U',
-    'DS:inform:DERIVE:600:0:U',
-    'DS:nack:DERIVE:600:0:U',
-    'DS:offer:DERIVE:600:0:U',
-    'DS:other:DERIVE:600:0:U',
-    'DS:release:DERIVE:600:0:U',
-    'DS:request:DERIVE:600:0:U'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('ack', 'DERIVE', 0)
+    ->addDataset('decline', 'DERIVE', 0)
+    ->addDataset('discover', 'DERIVE', 0)
+    ->addDataset('inform', 'DERIVE', 0)
+    ->addDataset('nack', 'DERIVE', 0)
+    ->addDataset('offer', 'DERIVE', 0)
+    ->addDataset('other', 'DERIVE', 0)
+    ->addDataset('release', 'DERIVE', 0)
+    ->addDataset('request', 'DERIVE', 0);
 
 $fields = array(
     'ack'      => $data[0]['ibDhcpTotalNoOfAcks'],

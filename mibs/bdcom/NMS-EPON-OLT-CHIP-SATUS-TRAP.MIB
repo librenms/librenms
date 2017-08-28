@@ -1,0 +1,50 @@
+-- *****************************************************************
+-- NMS-EPON-OLT-CHIP-STATUS-TRAP.my: NMS EPON OLT CHIP STATUS TRAP MIB
+--
+-- October 2009
+-- Edit by LIUQIANG
+-- Copyright (c) 2009 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-EPON-OLT-CHIP-STATUS-TRAP DEFINITIONS ::= BEGIN
+
+
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsEPONGroup                              		FROM NMS-SMI
+    IpAddress, TimeTicks                                   FROM RFC1155-SMI
+    PhysAddress				                FROM RFC1213-MIB
+    oltChipIndex, oltSlotID, oltChipModuleID, oltChipDeviceID, oltChipMACAddress, oltChipStatus       FROM NMS-EPON-OLT-CHIP-INFO;
+
+
+               nmsEponOltChipStatusTrap         OBJECT IDENTIFIER ::= { nmsEPONGroup 15 }
+            
+
+-- Notifications
+	nmsEponOltChipStatusNotifications OBJECT IDENTIFIER
+                                ::= { nmsEponOltChipStatusTrap 1 }
+
+
+	nmsEponOltChipStatusNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       oltChipIndex,
+                       oltSlotID,
+                       oltChipModuleID,
+                       oltChipDeviceID,
+                       oltChipMACAddress,
+                       oltChipStatus
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when error olt chip ."
+    		::= { nmsEponOltChipStatusNotifications 1 }
+
+              
+
+END

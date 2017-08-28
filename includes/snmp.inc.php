@@ -15,6 +15,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\RRD\RrdDefinition;
+
 function string_to_oid($string)
 {
     $oid = strlen($string);
@@ -69,7 +71,7 @@ function get_mib_dir($device)
             }
         }
     }
-    
+
     return $extra;
 }
 
@@ -255,6 +257,27 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     }
 }//end snmp_get()
 
+/**
+ * @param $device
+ * @return bool
+ */
+function snmp_check($device)
+{
+    $time_start = microtime(true);
+
+    $oid = '.1.3.6.1.2.1.1.2.0';
+    $options = '-Oqvn';
+    $cmd = gen_snmpget_cmd($device, $oid, $options);
+    exec($cmd, $data, $code);
+    d_echo("SNMP Check response code: $code".PHP_EOL);
+
+    recordSnmpStatistic('snmpget', $time_start);
+
+    if ($code === 0) {
+        return true;
+    }
+    return false;
+}//end snmp_check()
 
 function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
@@ -345,8 +368,24 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = null, $mibdir = null, 
     foreach (explode("\n", $data) as $entry) {
         list($oid,$value)  = explode('=', $entry, 2);
         $oid               = trim($oid);
-        $value             = trim($value);
+        $value             = trim($value, "\" \\\n\r");
         list($oid, $index) = explode('.', $oid, 2);
+        if (!strstr($value, 'at this OID') && isset($oid) && isset($index)) {
+            $array[$index][$oid] = $value;
+        }
+    }
+
+    return $array;
+}//end snmpwalk_cache_oid()
+
+function snmpwalk_cache_numerical_oid($device, $oid, $array, $mib = null, $mibdir = null, $snmpflags = '-OQUsn')
+{
+    $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
+    foreach (explode("\n", $data) as $entry) {
+        list($oid,$value)  = explode('=', $entry, 2);
+        $oid               = trim($oid);
+        $value             = trim($value);
+        list($index,) = explode('.', strrev($oid), 2);
         if (!strstr($value, 'at this OID') && isset($oid) && isset($index)) {
             $array[$index][$oid] = $value;
         }
@@ -477,6 +516,59 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = null, $mibdir =
 }//end snmpwalk_cache_triple_oid()
 
 
+/**
+ * Walk an snmp mib oid and group items together based on the index.
+ * This is intended to be used with a string based oid.
+ * Any extra index data past $depth will be added after the oidName to keep grouping consistent.
+ *
+ * Example:
+ * snmpwalk_group($device, 'ifTable', 'IF-MIB');
+ * [
+ *   1 => [ 'ifIndex' => '1', 'ifDescr' => 'lo', 'ifMtu' => '65536', ...],
+ *   2 => [ 'ifIndex' => '2', 'ifDescr' => 'enp0s25', 'ifMtu' => '1500', ...],
+ * ]
+ *
+ * @param array $device Target device
+ * @param string $oid The string based oid to walk
+ * @param string $mib The MIB to use
+ * @param int $depth how many indexes to group
+ * @param array $array optionally insert the entries into an existing array (helpful for grouping multiple walks)
+ * @return array grouped array of data
+ */
+function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array())
+{
+    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUsetX', $mib);
+    $data = rtrim(external_exec($cmd));
+
+    $line = strtok($data, "\n");
+    while ($line !== false) {
+        if (str_contains($line, 'at this OID')) {
+            $line = strtok("\n");
+            continue;
+        }
+
+        list($address, $value) = explode(' =', $line, 2);
+        preg_match_all('/([^[\]]+)/', $address, $parts);
+        $parts = $parts[1];
+        array_splice($parts, $depth, 0, array_shift($parts)); // move the oid name to the correct depth
+
+        $line = strtok("\n"); // get the next line and concatenate multi-line values
+        while ($line !== false && !str_contains($line, '=')) {
+            $value .= $line . PHP_EOL;
+            $line = strtok("\n");
+        }
+
+        // merge the parts into an array, creating keys if they don't exist
+        $tmp = &$array;
+        foreach ($parts as $part) {
+            $tmp = &$tmp[trim($part, '"')];
+        }
+        $tmp = trim($value, "\" \n\r"); // assign the value as the leaf
+    }
+
+    return $array;
+}
+
 function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0)
 {
     $cmd = gen_snmpwalk_cmd($device, $oid, ' -OQUs', $mib);
@@ -584,12 +676,12 @@ function snmp_gen_auth(&$device)
 
     if ($device['snmpver'] === 'v3') {
         $cmd = " -v3 -n '' -l '".$device['authlevel']."'";
-        
+
         //add context if exist context
         if (key_exists('context_name', $device)) {
             $cmd = " -v3 -n '".$device['context_name']."' -l '".$device['authlevel']."'";
         }
-        
+
         if ($device['authlevel'] === 'noAuthNoPriv') {
             // We have to provide a username anyway (see Net-SNMP doc)
             $username = !empty($device['authname']) ? $device['authname'] : 'root';
@@ -844,11 +936,15 @@ function snmp_translate($oid, $module, $mibdir = null, $device = array())
 } // snmp_translate
 
 
-/*
+/**
  * check if the type of the oid is a numeric type, and if so,
- * @return the name of RRD type that is best suited to saving it
+ * return the correct RrdDefinition
+ *
+ * @param string $oid
+ * @param array $mibdef
+ * @return RrdDefinition|false
  */
-function oid_rrd_type($oid, $mibdef)
+function oid_rrd_def($oid, $mibdef)
 {
     if (!isset($mibdef[$oid])) {
         return false;
@@ -865,15 +961,15 @@ function oid_rrd_type($oid, $mibdef)
 
         case 'INTEGER':
         case 'Integer32':
-            return 'GAUGE:600:U:U';
+            return RrdDefinition::make()->addDataset('mibval', 'GAUGE');
 
         case 'Counter32':
         case 'Counter64':
-            return 'COUNTER:600:0:U';
+            return RrdDefinition::make()->addDataset('mibval', 'COUNTER', 0);
 
         case 'Gauge32':
         case 'Unsigned32':
-            return 'GAUGE:600:0:U';
+            return RrdDefinition::make()->addDataset('mibval', 'GAUGE', 0);
     }
 
     return false;
@@ -955,15 +1051,15 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
                 'numvalue'      => $numvalue,
             );
 
-            $type = oid_rrd_type($obj, $mibdef);
-            if ($type === false) {
+            $rrd_def = oid_rrd_def($obj, $mibdef);
+            if ($rrd_def === false) {
                 continue;
             }
 
             $usedoids[$index][$obj] = $val;
 
             $tags = array(
-                'rrd_def'       => array("DS:mibval:$type"),
+                'rrd_def'       => $rrd_def,
                 'rrd_name'      => array($mibname, $mibdef[$obj]['shortname'], $index),
                 'rrd_oldname'   => array($mibname, $mibdef[$obj]['object_type'], $index),
                 'index'         => $index,

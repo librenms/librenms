@@ -11,6 +11,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\RRD\RrdDefinition;
+
 if ($device['os_group'] == "cisco") {
     // Total
     $total = 0;
@@ -27,10 +29,9 @@ if ($device['os_group'] == "cisco") {
                 $active += $value[''];
             }
 
-            $rrd_def = array(
-                'DS:total:GAUGE:600:0:U',
-                'DS:active:GAUGE:600:0:U'
-            );
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('total', 'GAUGE', 0)
+                ->addDataset('active', 'GAUGE', 0);
 
             $fields = array(
                 'total' => $total,
