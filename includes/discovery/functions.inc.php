@@ -1074,10 +1074,18 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
         if (isset($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'])) {
             $sensor_options = $device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'];
         }
+
+        d_echo("Dynamic Discovery ($sensor_type): ");
+        d_echo($device['dynamic_discovery']['modules']['sensors'][$sensor_type]);
+
         foreach ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['data'] as $data) {
             $tmp_name = $data['oid'];
-            $raw_data = $pre_cache[$tmp_name];
+            $raw_data = (array)$pre_cache[$tmp_name];
             $cached_data = $pre_cache['__cached'] ?: array();
+
+            d_echo("Data $tmp_name: ");
+            d_echo($raw_data);
+
             foreach ($raw_data as $index => $snmp_data) {
                 // get the value for this sensor, check 'value' and 'oid', if state string, translate to a number
                 $data_name = isset($data['value']) ? $data['value'] : $data['oid'];  // fallback to oid if value is not set
