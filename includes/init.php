@@ -149,7 +149,9 @@ if (!module_selected('nodb', $init_modules)) {
 if (file_exists($config['install_dir'] . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
     require_once $install_dir . '/html/includes/authentication/functions.php';
     require_once $config['install_dir'] . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php';
-    init_auth();
+    if (! isCli()) {
+        init_auth();
+    }
 } else {
     print_error('ERROR: no valid auth_mechanism defined!');
     exit();
