@@ -75,6 +75,11 @@ To create an alerting rule to alert on service=critical, your alerting rule woul
     
 ## Debug
 
+Change user to librenms for example 
+```
+su - librenms
+```
+then you can run the following command to help trouble shoot services. 
 ```
 ./check-services.php -d
 ```
