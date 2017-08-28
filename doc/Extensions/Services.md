@@ -72,3 +72,9 @@ Services uses the Nagios Alerting scheme where:
 To create an alerting rule to alert on service=critical, your alerting rule would look like:
 
     %services.service_status = "2"
+    
+## Debug
+
+```
+./check-services.php -d
+```
