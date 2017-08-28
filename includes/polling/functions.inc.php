@@ -20,15 +20,16 @@ function bulk_sensor_snmpget($device, $sensors)
 
 /**
  * @param $device
+ * @param string $type type/class of sensor
  * @return array
  */
-function sensor_precache($device)
+function sensor_precache($device, $type)
 {
-    $sensor_config = array();
+    $sensor_cache = array();
     if (file_exists('includes/polling/sensors/pre-cache/'. $device['os'] .'.inc.php')) {
         include 'includes/polling/sensors/pre-cache/'. $device['os'] .'.inc.php';
     }
-    return $sensor_config;
+    return $sensor_cache;
 }
 
 function poll_sensor($device, $class)
@@ -51,7 +52,7 @@ function poll_sensor($device, $class)
 
     $snmp_data = bulk_sensor_snmpget($device, $sensors);
 
-    $sensor_cache = sensor_precache($device);
+    $sensor_cache = sensor_precache($device, $class);
 
     foreach ($sensors as $sensor) {
         echo 'Checking (' . $sensor['poller_type'] . ") $class " . $sensor['sensor_descr'] . '... '.PHP_EOL;
