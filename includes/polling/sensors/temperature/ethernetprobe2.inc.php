@@ -24,5 +24,5 @@
  */
 
 $temp_type = snmp_get($device, '.1.3.6.1.4.1.3854.1.2.2.1.16.1.12.' . $sensor['sensor_index'], '-Oqv', 'SPAGENT-MIB');
-$sensor_value = fahrenheit_to_celsius($temp_type, $sensor_value);
+$sensor_value = fahrenheit_to_celsius($sensor_value, $temp_type);
 unset($temp_type);
