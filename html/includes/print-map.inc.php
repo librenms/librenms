@@ -148,13 +148,13 @@ foreach ($list as $items) {
     $local_device_id = $items['local_device_id'];
     if (!array_key_exists($local_device_id, $devices_by_id)) {
         $items['sysName'] = $items['local_sysName'];
-        $devices_by_id[$local_device_id] = array('id'=>$local_device_id,'label'=>shorthost(ip_to_sysname($items, $items['local_hostname']), 1),'title'=>generate_device_link($local_device, '', array(), '', '', '', 0),'shape'=>'box');
+        $devices_by_id[$local_device_id] = array('id'=>$local_device_id,'label'=>shorthost(format_hostname($items, $items['local_hostname']), 1),'title'=>generate_device_link($local_device, '', array(), '', '', '', 0),'shape'=>'box');
     }
 
     $remote_device_id = $items['remote_device_id'];
     if (!array_key_exists($remote_device_id, $devices_by_id)) {
         $items['sysName'] = $items['remote_sysName'];
-        $devices_by_id[$remote_device_id] = array('id'=>$remote_device_id,'label'=>shorthost(ip_to_sysname($items, $items['remote_hostname']), 1),'title'=>generate_device_link($remote_device, '', array(), '', '', '', 0),'shape'=>'box');
+        $devices_by_id[$remote_device_id] = array('id'=>$remote_device_id,'label'=>shorthost(format_hostname($items, $items['remote_hostname']), 1),'title'=>generate_device_link($remote_device, '', array(), '', '', '', 0),'shape'=>'box');
     }
 
     $speed = $items['local_ifspeed']/1000/1000;

@@ -1,0 +1,542 @@
+F3-EOTDM-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32, Unsigned32
+                FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF
+        RowStatus, StorageType, DisplayString, VariablePointer,  
+        TEXTUAL-CONVENTION,  TruthValue
+                FROM SNMPv2-TC
+        InterfaceIndex
+                FROM IF-MIB
+        neIndex, shelfIndex, slotIndex 
+                FROM CM-ENTITY-MIB
+        fsp150cm
+                FROM  ADVA-MIB
+        AdminState, OperationalState, SecondaryState
+                FROM  CM-COMMON-MIB;
+
+
+f3EOTDMMIB MODULE-IDENTITY
+    LAST-UPDATED    "201205100000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Kasen Zeng
+                     ADVA Optical Networking, Inc.
+                     Tel: 
+                     E-mail: kzeng@advaoptical.com
+                     Postal: 18/F, Maoye Times Square,
+                     Haide 2nd Road, Nanshan District,
+                     Shenzhen, P.R.China 518054"
+    DESCRIPTION
+            "This module defines the EOTDM MIB definitions used by 
+             the F3 (FSP150CM/CC) product lines.
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201205100000Z"
+    DESCRIPTION
+            "Notes from release 201205100000Z,
+             (1)MIB version ready for release FSP150CM 5.5." 
+    ::= {fsp150cm 17}
+
+
+-- 
+-- OID definitions
+-- 
+f3EotdmObjects         OBJECT IDENTIFIER ::= {f3EOTDMMIB 1}
+f3EotdmConformance     OBJECT IDENTIFIER ::= {f3EOTDMMIB 2}
+
+
+-- 
+-- Textual Conventions 
+-- 
+VcgType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Describes the VC type in a virtual concatenate group. All VCs in this
+        group is the same type."
+    SYNTAX       INTEGER {
+                   none (0),
+                   t1 (1),
+                   e1 (2),
+                   t3 (3),
+                   e3 (4),
+                   vc12 (5),
+                   vc3 (6),
+                   vc4 (7),
+                   vt15 (8),
+                   sts1 (9),
+                   sts3c (10)
+                 }
+
+WtrTime ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Wait to restore(WTR) time for LCAS protocol when the dMSU defect
+        occured (Unit: minute)."
+    SYNTAX  INTEGER (0..12)
+
+HoldOffTime ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Hold off time for LCAS protocol when the dMSU defect occured
+        (Unit: 100ms)."
+    SYNTAX  INTEGER (0..100)
+
+CtrlState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Discribes the CTRL status of a virtual container in LCAS
+         control packet:
+         - ctrlNotAppl: NA:    Not applicable, ie, this VC is not allocated
+                               to a VCG or LCAS is disabled
+         - ctrlFixed:   FIXED: This end uses fixed bandwidth (non-LCAS mode)
+         - ctrlAdd:     ADD:   This member is about to be added to the group
+         - ctrlNorm:    NORM:  Normal transmission
+         - ctrlEos:     EOS:   End of Sequence and Normal transmission
+         - ctrlIdle:    IDLE:  This member is not part of the group or about
+                               to be removed
+         - ctrlDnu:     DNU:   Do Not Use (the payload) the Sk side reported
+                               FAIL status"
+    SYNTAX       INTEGER {
+                   ctrlNotAppl (0),
+                   ctrlFixed (1),
+                   ctrlAdd (2),
+                   ctrlNorm (3),
+                   ctrlEos (4),
+                   ctrlIdle (5),
+                   ctrlDnu (6)
+                 }
+
+LcasSoState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "The status of LCAS protocol at the source end of a virtual container:
+         - srcNotAppl: NA:     Not applicable, ie, this VC is not allocated
+                             to a VCG or LCAS is disabled
+         -srcIdle:    IDLE:   The VC is not in use or has been removed.
+         - srcAdd:     ADD:    The VC is in the process of being added.
+                             May also indicate that the sink end:
+                             - does not have LCAS enabled and this VC is
+                               in use at this end, or
+                             - this VC is not allocated in the service.
+         - srcNorm:    NORM:   The VC is in use with a good path to the
+                             sink end.
+         - srcDnu:     DNU:   'Do not use' indicates the VC is in use but
+                             has a failed path to the sink end.
+         - srcRemove:  REMOVE: The VC is being deleted from the service."
+    SYNTAX  INTEGER {
+              srcNotAppl (0),
+              srcIdle (1),
+              srcAdd (2),
+              srcNorm (3),
+              srcDnu (4),
+              srcRemove (5)
+            }
+
+MstState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Discribes the MST status of a virtual container in LCAS
+         control packet:
+         - mstNotAppl: NA:   Not applicable, ie, this VC is not allocated
+                             to a VCG or LCAS is disabled
+         - mstOk:      OK:   The MST status of this virtual container is OK
+         - mstFail:    FAIL: The MST status of this virtual container is FAIL"
+    SYNTAX       INTEGER {
+                   mstNotAppl (0),
+                   mstOk (1),
+                   mstFail (2)
+                 }
+
+LcasSkState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "The status of LCAS protocol at the sink end of a virtual container:
+         - sinkNotAppl: NA:   Not applicable, ie, this VC is not allocated
+                              to a VCG or LCAS is disabled
+         - sinkIdle:    IDLE: The virtual container is not in use.
+         - sinkOk:      OK:   Normal incoming signal, or has acknowledged
+                              a request to be added to the service.
+         - sinkFail:    FAIL: Failure condition on incoming signal, or has
+                              acknowledged a request for removal."
+    SYNTAX  INTEGER {
+              sinkNotAppl (0),
+              sinkIdle (1),
+              sinkOk (2),
+              sinkFail (3)
+            }
+
+
+--
+--  FSP150 CM EoTDM Configuration Tables
+--
+
+--
+--  VCG Table
+--
+vcgTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VcgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to virtual concatenate groups."
+    ::= { f3EotdmObjects 1 }
+
+vcgEntry  OBJECT-TYPE
+    SYNTAX      VcgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the vcgTable."
+    INDEX { neIndex, shelfIndex, slotIndex, vcgIndex }
+    ::= { vcgTable 1 }
+
+VcgEntry ::= SEQUENCE {
+    vcgIndex                   Integer32,
+    vcgIfIndex                 InterfaceIndex,
+    vcgAssociatedEthernetPort  VariablePointer,
+    vcgAdminState              AdminState,
+    vcgOperationalState        OperationalState,
+    vcgSecondaryState          SecondaryState,
+    vcgType                    VcgType,
+    vcgLcasEnabled             TruthValue,
+    vcgWtrTimer                WtrTime,
+    vcgHoldOffTimer            HoldOffTime,
+    vcgClearWtrTimer           INTEGER,
+    vcgRowStatus               RowStatus
+}
+
+vcgIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An integer index value used to uniquely identify this vcg within a card."
+    ::= { vcgEntry 1 }
+
+vcgIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object has the same value as ifIndex for vcg."
+    ::= { vcgEntry 2 }
+
+vcgAssociatedEthernetPort OBJECT-TYPE 
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes the related Ethernet Port of the vcg."
+     ::= { vcgEntry 3 }
+
+vcgAdminState OBJECT-TYPE
+    SYNTAX      AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Administrative State of the vcg."
+    ::= { vcgEntry 4 }
+
+vcgOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Operational State of the vcg."
+    ::= { vcgEntry 5 }
+
+vcgSecondaryState OBJECT-TYPE
+    SYNTAX      SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Secondary State of the vcg."
+    ::= { vcgEntry 6 }
+
+vcgType OBJECT-TYPE
+    SYNTAX      VcgType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Type of paths in this VCG. All paths in this VCG are the same type.
+          This is a required field when creating a VCG, and can not be
+          changed on an existing VCG.
+          See the definition of VcType for more details."
+    ::= { vcgEntry 7 }
+
+vcgLcasEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object provides whether Lcas is enabled/disabled."
+    ::= { vcgEntry 8 }
+
+vcgWtrTimer OBJECT-TYPE
+    SYNTAX      WtrTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object specifies wait to restore(WTR) time for LCAS protocol.
+         When creating VCG with LCAS enabled, it is the default value,
+         says 5 minutes. When creating VCG with LCAS disabled, it is 0 (means
+         that the WTR is disabled)."
+    ::= { vcgEntry 9 }
+
+vcgHoldOffTimer OBJECT-TYPE
+    SYNTAX      HoldOffTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object specifies hold off time for LCAS protocol.
+         When creating VCG with LCAS enabled, it is the default value,
+         says 0 ms. When creating VCG with LCAS disabled, it is 0 ms."
+    ::= { vcgEntry 10 }
+
+vcgClearWtrTimer OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "This object will trigger an action.
+         When writing with '1', a 'clear WTR timer' action for all paths in
+         the VCG is triggered. Writing '0' is no effect.
+         When reading, it always returns 0."
+    ::= { vcgEntry 11 }
+
+vcgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of vcgRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            neRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The vcgRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { vcgEntry 12 }
+
+--
+-- VCG Member Table
+--
+vcgMemberTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VcgMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to VCGs. Each entry of the table
+             represents a path which is allocated to a VCG."
+    ::= { f3EotdmObjects 2 }
+
+vcgMemberEntry  OBJECT-TYPE
+    SYNTAX      VcgMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the vcgMemberTable."
+    INDEX { neIndex, shelfIndex, slotIndex, vcgIndex, vcgMemberIndex }
+    ::= { vcgMemberTable 1 }
+
+VcgMemberEntry ::= SEQUENCE {
+    vcgMemberIndex                   Integer32,
+    vcgMemberIfIndex                 InterfaceIndex,
+    vcgMemberRowStatus               RowStatus,
+    vcgMemberSoSendSeq               INTEGER,
+    vcgMemberSoLcasSendCtrl          CtrlState,
+    vcgMemberSoLcasRecvMst           MstState,
+    vcgMemberSoLcasState             LcasSoState,
+    vcgMemberSkRecvSeq               INTEGER,
+    vcgMemberSkRecvExpectSeq         INTEGER,
+    vcgMemberSkLcasRecvCtrl          CtrlState,
+    vcgMemberSkLcasSendMst           MstState,
+    vcgMemberSkLcasState             LcasSkState
+}
+
+vcgMemberIndex  OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "An integer index value used to uniquely identify this vcg member."
+     ::= { vcgMemberEntry 1 }
+
+vcgMemberIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "This object has the same value as ifIndex for 
+             vcg path.  An integer index value used to 
+             uniquely identify this vcg path."
+    ::= { vcgMemberEntry 2 }
+
+vcgMemberRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of vcgMemberRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            neRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The vcgMemberRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { vcgMemberEntry 3 }
+
+vcgMemberSoSendSeq  OBJECT-TYPE
+     SYNTAX     INTEGER ( -1..63 )
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "As the source side, this object reports the sequence number sent
+          to the sink side. The sequence number is determined by the LCAS
+          protocol (when LCAS is enabled) or by the order that each path was
+          added into the VCG (when LCAS is disabled). If SQ is invalid,
+          -1 is returned"
+     ::= { vcgMemberEntry 4 }
+
+vcgMemberSoLcasSendCtrl  OBJECT-TYPE
+     SYNTAX     CtrlState
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "As the source side, this object reports the CTRL status which is
+          sent to the sink side. The CTRL status is determined by the LCAS
+          protocol.
+          When LCAS is not used, the value 'ctrlNotAppl' is returned."
+     ::= { vcgMemberEntry 5 }
+
+vcgMemberSoLcasRecvMst  OBJECT-TYPE
+     SYNTAX     MstState
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "As the source side, this object reports the member status which is
+          received from sink side. The member status is determined by the
+          LCAS protocol.
+          When LCAS is not used, the value 'mstNotAppl' is returned."
+     ::= { vcgMemberEntry 6 }
+
+vcgMemberSoLcasState  OBJECT-TYPE
+     SYNTAX     LcasSoState
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object reports the current source status of this path as
+          determined by the LCAS protocol. When LCAS is not in use,
+          the value 'srcNotAppl' is returned."
+     ::= { vcgMemberEntry 7 }
+
+vcgMemberSkRecvSeq  OBJECT-TYPE
+     SYNTAX     INTEGER (-1..63)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "As the sink side, this object reports the sequence number which is
+          received from source side. If SQ is invalid, -1 is returned."
+     ::= { vcgMemberEntry 8 }
+
+vcgMemberSkRecvExpectSeq  OBJECT-TYPE
+     SYNTAX     INTEGER (-1..63)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "As the sink side, this object reports the sequence number expected.
+          If LCAS is enabled, this value is -1. Otherwise, it's the order that
+          each path was added into the VCG, starting from 0.
+          If SQ is invalid, -1 is returned."
+     ::= { vcgMemberEntry 9 }
+
+vcgMemberSkLcasRecvCtrl  OBJECT-TYPE
+     SYNTAX     CtrlState
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "As the sink side, this object reports the CTRL status which is
+          received from source side. The CTRL status is determined by the
+          LCAS protocol. When LCAS is not used, the value 'ctrlNotAppl'
+          is returned."
+     ::= { vcgMemberEntry 10 }
+
+vcgMemberSkLcasSendMst  OBJECT-TYPE
+     SYNTAX     MstState
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "As the sink side, this object reports the member status which is
+          sent to source side. The 'member status' is determined by the status
+          of received path member. When LCAS is not used, the value 'mstNotAppl'
+          is returned."
+     ::= { vcgMemberEntry 11 }
+
+vcgMemberSkLcasState  OBJECT-TYPE
+     SYNTAX     LcasSkState
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object reports the current sink status of this path as
+          determined by the LCAS protocol. When LCAS is not in use,
+          the value 'sinkNotAppl' is returned."
+     ::= { vcgMemberEntry 12 }
+
+
+--
+-- Conformance
+--
+f3EotdmCompliances OBJECT IDENTIFIER ::= {f3EotdmConformance 1}
+f3EotdmGroups      OBJECT IDENTIFIER ::= {f3EotdmConformance 2}
+
+f3EotdmCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the f3 Tdm
+             group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3EotdmObjectGroup
+        }
+    ::= { f3EotdmCompliances 1 }
+
+f3EotdmObjectGroup OBJECT-GROUP
+    OBJECTS {
+    vcgIndex, vcgIfIndex,
+    vcgAssociatedEthernetPort, vcgAdminState,
+    vcgOperationalState, vcgSecondaryState, 
+    vcgType, vcgLcasEnabled, 
+    vcgWtrTimer, vcgHoldOffTimer, 
+    vcgClearWtrTimer, vcgRowStatus,
+    
+    vcgMemberIndex, vcgMemberIfIndex, 
+    vcgMemberRowStatus, vcgMemberSoSendSeq, 
+    vcgMemberSoLcasSendCtrl, vcgMemberSoLcasRecvMst, 
+    vcgMemberSoLcasState, vcgMemberSkRecvSeq, 
+    vcgMemberSkRecvExpectSeq, vcgMemberSkLcasRecvCtrl, 
+    vcgMemberSkLcasSendMst, vcgMemberSkLcasState
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the f3 Tdm
+             group."
+    ::= { f3EotdmGroups 1 }
+
+END

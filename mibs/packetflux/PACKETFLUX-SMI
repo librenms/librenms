@@ -1,0 +1,34 @@
+PACKETFLUX-SMI DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY, enterprises, OBJECT-IDENTITY
+        FROM SNMPv2-SMI;
+
+    packetflux MODULE-IDENTITY
+        LAST-UPDATED        "201306041631Z"
+        ORGANIZATION        "PacketFlux Technologies"
+        CONTACT-INFO        "custsvc@packetflux.com    
+                            http://www.packetflux.com"
+        DESCRIPTION         "SMI MIB for PacketFlux Technologies"
+
+        REVISION            "201306041631Z"
+        DESCRIPTION         "initial version of this module"
+        REVISION            "201306042158Z"
+        DESCRIPTION         "Correct MIB ID"
+        ::= { enterprises 32050 }
+
+
+    packetfluxProducts OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "packetfluxProducts is the root OBJECT IDENTIFIER
+                            for products released by packetflux technologies."
+        ::= { packetflux 1 }
+
+    packetfluxMgmt OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "This is the main subtree for all packetflux product
+                            management mibs."
+        ::= { packetflux 2 }
+
+
+END
+

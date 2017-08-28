@@ -1,0 +1,601 @@
+-- ****************************************************************************
+--  COLUBRIS-WDS-MIB definitions
+--
+--  Copyright (c) 2006, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris WDS MIB file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-WDS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+        FROM    SNMPv2-SMI
+    DisplayString, MacAddress, TruthValue
+        FROM    SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM    SNMPv2-CONF
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+;
+
+
+colubrisWdsMIB MODULE-IDENTITY
+    LAST-UPDATED    "200801040000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris WDS MIB."
+
+    ::= { colubrisMgmtV2 33 }
+
+
+-- colubrisWdsMIB definition
+colubrisWdsMIBObjects OBJECT IDENTIFIER ::= { colubrisWdsMIB 1 }
+
+-- colubris WDS groups
+coWDSInfoGroup        OBJECT IDENTIFIER ::= { colubrisWdsMIBObjects 1 }
+coWDSRadioGroup       OBJECT IDENTIFIER ::= { colubrisWdsMIBObjects 2 }
+coWDSGroupGroup       OBJECT IDENTIFIER ::= { colubrisWdsMIBObjects 3 }
+coWDSLinkGroup        OBJECT IDENTIFIER ::= { colubrisWdsMIBObjects 4 }
+coWDSNetworkScanGroup OBJECT IDENTIFIER ::= { colubrisWdsMIBObjects 5 }
+
+coWDSNumberOfGroup OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..6)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of WDS groups supported by the product."
+    ::= { coWDSInfoGroup 1 }
+
+coWDSDynamicModeImplemented OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if dynamic WDS mode is available in the product."
+    ::= { coWDSInfoGroup 2 }
+
+coWDSRadioTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoWDSRadioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Conceptual table for the ACK distance parameter."
+    ::= { coWDSRadioGroup 1 }
+
+coWDSRadioEntry OBJECT-TYPE
+    SYNTAX      CoWDSRadioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An Entry (conceptual row) in the ACK distance Table.
+
+                 coWDSRadioIndex - Radio number where the ACK
+                                      distance is applied."
+    INDEX       { coWDSRadioIndex }
+    ::= { coWDSRadioTable 1 }
+
+CoWDSRadioEntry ::= SEQUENCE
+{
+    coWDSRadioIndex         Integer32,
+    coWDSRadioAckDistance   Unsigned32,
+    coWDSRadioQoS           INTEGER
+}
+
+coWDSRadioIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Radio number."
+    ::= { coWDSRadioEntry 1 }
+
+coWDSRadioAckDistance OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "km"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum distance between the device and the remote peers."
+    ::= { coWDSRadioEntry 2 }
+
+coWDSRadioQoS OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    disabled(1),
+                    vlan(2),
+                    veryHigh(3),
+                    high(4),
+                    normal(5),
+                    low(6),
+                    diffSrv(7),
+                    tos(8),
+                    ipQos(9)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "QoS priority mechanism used to maps the traffic to
+                 one of the four WMM traffic queues."
+    ::= { coWDSRadioEntry 3 }
+
+coWDSGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoWDSGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Conceptual table for the WDS Groups. This table contains
+                 the six WDS Groups configuration information."
+    ::= { coWDSGroupGroup 1 }
+
+coWDSGroupEntry OBJECT-TYPE
+    SYNTAX      CoWDSGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An Entry (conceptual row) in the WDS Group Table.
+
+                 coWDSGroupIndex - Uniquely identify a WDS group
+                                   inside the WDS group table."
+    INDEX       { coWDSGroupIndex }
+    ::= { coWDSGroupTable 1 }
+
+CoWDSGroupEntry ::= SEQUENCE
+{
+    coWDSGroupIndex            Integer32,
+    coWDSGroupName             DisplayString,
+    coWDSGroupState            INTEGER,
+    coWDSGroupSecurity         INTEGER,
+    coWDSGroupAddressing       INTEGER,
+    coWDSGroupStaticMacAddress MacAddress,
+    coWDSGroupDynamicMode      INTEGER,
+    coWDSGroupDynamicGroupId   Unsigned32
+}
+
+coWDSGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..6)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The auxiliary variable used to identify instances of WDS
+                 groups."
+    ::= { coWDSGroupEntry 1 }
+
+coWDSGroupName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Friendly name of the WDS group."
+    ::= { coWDSGroupEntry 2 }
+
+coWDSGroupState OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies if the WDS group is active in the radios."
+    ::= { coWDSGroupEntry 3 }
+
+coWDSGroupSecurity OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    none(1),
+                    wep(2),
+                    tkip(3),
+                    aes(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the encryption used by the WDS group."
+    ::= { coWDSGroupEntry 4 }
+
+coWDSGroupAddressing OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    static(1),
+                    dynamic(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies if the WDS group is static or dynamic."
+    ::= { coWDSGroupEntry 5 }
+
+coWDSGroupStaticMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "For static WDS group, this object specify the MAC
+                 address of the remote WDS device."
+    ::= { coWDSGroupEntry 6 }
+
+coWDSGroupDynamicMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    none(0),
+                    master(1),
+                    slave(2),
+                    alternateMaster(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the mode of the dynamic WDS group."
+    ::= { coWDSGroupEntry 7 }
+
+coWDSGroupDynamicGroupId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the group identifier of the dynamic WDS group."
+    ::= { coWDSGroupEntry 8 }
+
+coWDSLinkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoWDSLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Conceptual table for the WDS links. This table contains
+                 up to 54 WDS links status information."
+    ::= { coWDSLinkGroup 1 }
+
+coWDSLinkEntry OBJECT-TYPE
+    SYNTAX      CoWDSLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An Entry (conceptual row) in the WDS Link Table.
+
+                 coWDSGroupIndex - Uniquely identify a WDS group
+                                   inside the WDS group table.
+                 coWDSLinkIndex - Uniquely identify a WDS link
+                                  inside a WDS group."
+    INDEX       { coWDSGroupIndex, coWDSLinkIndex }
+    ::= { coWDSLinkTable 1 }
+
+CoWDSLinkEntry ::= SEQUENCE
+{
+    coWDSLinkIndex          Integer32,
+    coWDSLinkState          INTEGER,
+    coWDSLinkRadio          Integer32,
+    coWDSLinkPeerMacAddress MacAddress,
+    coWDSLinkMaster         TruthValue,
+    coWDSLinkAuthorized     TruthValue,
+    coWDSLinkEncryption     INTEGER,
+    coWDSLinkIdleTime       Unsigned32,
+    coWDSLinkSNR            Integer32,
+    coWDSLinkTxRate         Unsigned32,
+    coWDSLinkRxRate         Unsigned32,
+    coWDSLinkIfIndex        Integer32,
+    coWDSLinkHT             TruthValue,
+    coWDSLinkTxMCS          Unsigned32,
+    coWDSLinkRxMCS          Unsigned32,
+    coWDSLinkSignal         Integer32,
+    coWDSLinkNoise          Integer32
+}
+
+coWDSLinkIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..54)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The auxiliary variable used to identify instances of WDS
+                 links."
+    ::= { coWDSLinkEntry 1 }
+
+coWDSLinkState OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    down(1),
+                    acquiring(2),
+                    inactive(3),
+                    active(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the state of the WDS link."
+    ::= { coWDSLinkEntry 2 }
+
+coWDSLinkRadio OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Radio number where the WDS peer was detected."
+    ::= { coWDSLinkEntry 3 }
+
+coWDSLinkPeerMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MAC address of the WDS peer."
+    ::= { coWDSLinkEntry 4 }
+
+coWDSLinkMaster OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Determine if this link is a link to a master.
+                 Providing upstream network access."
+    ::= { coWDSLinkEntry 5 }
+
+coWDSLinkAuthorized OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encryption, if any, can proceed."
+    ::= { coWDSLinkEntry 6 }
+
+coWDSLinkEncryption OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    none(1),
+                    wep(2),
+                    tkip(3),
+                    aes(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the encryption used by the WDS link."
+    ::= { coWDSLinkEntry 7 }
+
+coWDSLinkIdleTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inactivity time."
+    ::= { coWDSLinkEntry 8 }
+
+coWDSLinkSNR OBJECT-TYPE
+    SYNTAX      Integer32 (0..92)
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Signal noise ratio of the WDS peer."
+    ::= { coWDSLinkEntry 9 }
+
+coWDSLinkTxRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "500Kb/s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current transmit rate of the WDS peer."
+    ::= { coWDSLinkEntry 10 }
+
+coWDSLinkRxRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "500Kb/s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current receive rate of the WDS peer."
+    ::= { coWDSLinkEntry 11 }
+
+coWDSLinkIfIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ifIndex of the associated interface in the ifTable."
+    ::= { coWDSLinkEntry 12 }
+
+coWDSLinkHT OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if the link is using high throughput
+                 data rates."
+    ::= { coWDSLinkEntry 13 }
+
+coWDSLinkTxMCS OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current transmit MCS of the HT WDS peer."
+    ::= { coWDSLinkEntry 14 }
+
+coWDSLinkRxMCS OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current receive MCS of the HT WDS peer."
+    ::= { coWDSLinkEntry 15 }
+
+coWDSLinkSignal OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Strength of the wireless signal."
+    ::= { coWDSLinkEntry 16 }
+
+coWDSLinkNoise OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Level of local background noise."
+    ::= { coWDSLinkEntry 17 }
+
+coWDSNetworkScanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoWDSNetworkScanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Conceptual table for the WDS network scans."
+    ::= { coWDSNetworkScanGroup 1 }
+
+coWDSNetworkScanEntry OBJECT-TYPE
+    SYNTAX      CoWDSNetworkScanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An Entry (conceptual row) in the WDS Network Scan
+                 Table.
+
+                 coWDSScanRadioIndex - Radio number where the WDS peer
+                                       was detected.
+                 coWDSScanPeerIndex - Uniquely identify a WDS peer
+                                      on a radio inside the WDS
+                                      network scan table."
+    INDEX       { coWDSScanRadioIndex, coWDSScanPeerIndex }
+    ::= { coWDSNetworkScanTable 1 }
+
+CoWDSNetworkScanEntry ::= SEQUENCE
+{
+    coWDSScanRadioIndex     Integer32,
+    coWDSScanPeerIndex      Integer32,
+    coWDSScanGroupId        Unsigned32,
+    coWDSScanPeerMacAddress MacAddress,
+    coWDSScanChannel        Unsigned32,
+    coWDSScanSNR            Integer32,
+    coWDSScanMode           INTEGER,
+    coWDSScanAvailable      TruthValue
+}
+
+coWDSScanRadioIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Radio number where the WDS peer was detected."
+    ::= { coWDSNetworkScanEntry 1 }
+
+coWDSScanPeerIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Uniquely identify a WDS peer on a radio."
+    ::= { coWDSNetworkScanEntry 2 }
+
+coWDSScanGroupId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Group id used by the WDS peer."
+    ::= { coWDSNetworkScanEntry 3 }
+
+coWDSScanPeerMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MAC address of the WDS peer."
+    ::= { coWDSNetworkScanEntry 4 }
+
+coWDSScanChannel OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..199)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Channel on which the peer is transmitting."
+    ::= { coWDSNetworkScanEntry 5 }
+
+coWDSScanSNR OBJECT-TYPE
+    SYNTAX      Integer32 (0..92)
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Signal noise ratio of the WDS peer."
+    ::= { coWDSNetworkScanEntry 6 }
+
+coWDSScanMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    master(1),
+                    slave(2),
+                    alternateMaster(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current mode of the WDS peer."
+    ::= { coWDSNetworkScanEntry 7 }
+
+coWDSScanAvailable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Peer is accepting connections."
+    ::= { coWDSNetworkScanEntry 8 }
+
+
+-- conformance information
+colubrisWdsMIBConformance OBJECT IDENTIFIER ::= { colubrisWdsMIB 2 }
+colubrisWdsMIBCompliances OBJECT IDENTIFIER ::= { colubrisWdsMIBConformance 1 }
+colubrisWdsMIBGroups      OBJECT IDENTIFIER ::= { colubrisWdsMIBConformance 2 }
+
+-- compliance statements
+colubrisWdsMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for the WDS MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisWDSInfoMIBGroup,
+                        colubrisWDSRadioMIBGroup,
+                        colubrisWDSGroupMIBGroup,
+                        colubrisWDSLinkMIBGroup,
+                        colubrisWDSScanMIBGroup
+                    }
+    ::= { colubrisWdsMIBCompliances 1 }
+
+-- units of conformance
+colubrisWDSInfoMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coWDSNumberOfGroup,
+                    coWDSDynamicModeImplemented
+                }
+    STATUS      current
+    DESCRIPTION "A collection of scalar objects for WDS."
+    ::= { colubrisWdsMIBGroups 1 }
+
+colubrisWDSRadioMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coWDSRadioAckDistance,
+                    coWDSRadioQoS
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for the WDS radios."
+    ::= { colubrisWdsMIBGroups 2 }
+
+colubrisWDSGroupMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coWDSGroupName,
+                    coWDSGroupState,
+                    coWDSGroupSecurity,
+                    coWDSGroupAddressing,
+                    coWDSGroupStaticMacAddress,
+                    coWDSGroupDynamicMode,
+                    coWDSGroupDynamicGroupId
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for the WDS groups."
+    ::= { colubrisWdsMIBGroups 3 }
+
+colubrisWDSLinkMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coWDSLinkState,
+                    coWDSLinkRadio,
+                    coWDSLinkPeerMacAddress,
+                    coWDSLinkMaster,
+                    coWDSLinkAuthorized,
+                    coWDSLinkEncryption,
+                    coWDSLinkIdleTime,
+                    coWDSLinkSNR,
+                    coWDSLinkTxRate,
+                    coWDSLinkRxRate,
+                    coWDSLinkIfIndex,
+                    coWDSLinkHT,
+                    coWDSLinkTxMCS,
+                    coWDSLinkRxMCS,
+                    coWDSLinkSignal,
+                    coWDSLinkNoise
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for the WDS links."
+    ::= { colubrisWdsMIBGroups 4 }
+
+colubrisWDSScanMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coWDSScanGroupId,
+                    coWDSScanPeerMacAddress,
+                    coWDSScanChannel,
+                    coWDSScanSNR,
+                    coWDSScanMode,
+                    coWDSScanAvailable
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for the WDS network scan."
+    ::= { colubrisWdsMIBGroups 5 }
+
+END

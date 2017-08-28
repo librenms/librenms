@@ -68,7 +68,7 @@ if ($services[$vars['service']]['service_ds'] != "") {
     $ds = $vars['ds'];
     $label = $graphinfo[$vars['ds']];
 
-    if (file_exists($rrd_filename)) {
+    if (rrdtool_check_rrd_exists($rrd_filename)) {
         if (isset($check_graph)) {
             // We have a graph definition, use it.
             $rrd_additions .= $check_graph[$ds];

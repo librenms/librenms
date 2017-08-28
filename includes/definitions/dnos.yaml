@@ -10,5 +10,9 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
-    - sysObjectId:
-        - .1.3.6.1.4.1.6027.1.
+    -
+        sysObjectId:
+            - .1.3.6.1.4.1.6027.1.
+        sysDescr_except:
+            - Force10 Operating System
+            - Force10 Networks Real Time Operating System Software

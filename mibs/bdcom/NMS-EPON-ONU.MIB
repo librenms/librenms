@@ -1,0 +1,1781 @@
+-- *****************************************************************
+-- NMS-EPON-ONU.MIB:  NMS LLID ONU MIB file
+-- AUG 2009
+-- *****************************************************************
+--
+
+               NMS-EPON-ONU DEFINITIONS ::= BEGIN
+
+               IMPORTS
+               	    llidIfIndex
+			FROM NMS-EPON-LLID
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+		    TruthValue,RowStatus,PhysAddress,DisplayString,MacAddress,IpAddress
+		    	FROM SNMPv2-TC
+		    InetAddressIPv6
+		        FROM INET-ADDRESS-MIB;
+          
+               nmsEponOnu         OBJECT IDENTIFIER ::= { nmsEPONGroup 10 }
+               
+               nmsepononuTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOnuEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon ONU and LLID table entries."
+                   ::= { nmsEponOnu 1 }
+
+               nmsEponOnuEntry OBJECT-TYPE
+                   SYNTAX NMSEponOnuEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon ONU and LLID table."
+                   INDEX { llidIfIndex }
+               ::= { nmsepononuTable 1 }
+
+               NMSEponOnuEntry ::=
+                   SEQUENCE {
+                       onuVendorID
+                           DisplayString,
+                       onuModuleID
+                           DisplayString,
+		       onuID
+                           PhysAddress,
+		       onuHardwareVersion
+                           DisplayString,
+		       onuSoftwareVersion
+                           DisplayString,
+		       onuFirmwareVersion
+                           DisplayString,
+		       onuChipVendorID
+                           DisplayString,
+		       onuChipModuleID
+                           DisplayString,
+		       onuChipRevision
+                           DisplayString,
+		       onuIcVersion
+                           DisplayString,
+		       onuServiceSupported
+                           BIT STRING,
+		       onuGePortCount
+                           INTEGER,
+		       onuGePortDistributing
+                           BIT STRING,
+		       onuFePortCount
+                           INTEGER,
+		       onuFePortDistributing
+                           BIT STRING,
+		       onuPotsPortCount
+                           INTEGER,
+		       onuE1PortCount
+                           INTEGER,
+		       onuUsQueueCount
+                           INTEGER,
+		       onuUsQueueMaxCount
+                           INTEGER,
+		       onuDsQueueCount
+                           INTEGER,
+		       onuDsQueueMaxCount
+                           INTEGER,
+		       onuIsBakupBattery
+                           INTEGER,
+		       onuADSL2PlusPortCount
+                           INTEGER,
+		       onuVDSL2PortCount
+                           INTEGER,
+		       onuLLIDCount
+                           INTEGER,
+		       onuStatus
+                           INTEGER,
+		       onuDistance
+                           INTEGER,
+		       onuBindStatus
+                           INTEGER,
+		       onuReset
+                           INTEGER,
+		       onuUpdateImage
+                           OCTET STRING,
+		       onuUpdateEepromImage
+                           OCTET STRING,
+		       onuEncryptionStatus
+                           TruthValue,
+		       onuEncryptionMode
+                           INTEGER,
+		       onuIgmpSnoopingStatus
+                           TruthValue,
+		       onuMcstMode
+                           INTEGER,
+		       OnuAFastLeaveAbility
+                           INTEGER,
+		       onuAcFastLeaveAdminControl
+                           INTEGER,
+		       onuAFastLeaveAdminState
+                           INTEGER,
+		       onuInFecStatus
+                           TruthValue,
+		       onuOutFecStatus
+                           TruthValue,
+		       onuIfProtectedStatus
+                           TruthValue,
+		       onuSehedulePolicy
+                           INTEGER,
+		       onuDynamicMacLearningStatus
+                           INTEGER,
+		       onuDynamicMacAgingTime
+                           INTEGER,
+		       onuStaticMacAddress
+                           MacAddress,
+		       onuStaticMacAddressPortBitmap
+                           BIT STRING,
+		       onuStaticMacAddressConfigRowStatus
+                           RowStatus,
+		       onuClearDynamicMacAddressByMac
+                           MacAddress,
+		       onuClearDynamicMacAddressByPort
+                           INTEGER,
+		       onuPriorityQueueMapping
+                           OCTET STRING,
+                       onuVlanMode
+                           INTEGER,
+                       --new add for liqiancheng
+		       onuIpAddressMode
+                           INTEGER,
+		       onuStaticIpAddress
+                           IpAddress,
+		       onuStaticIpMask
+                           IpAddress,
+		       onuStaticIpGateway
+                           IpAddress,
+		       onuMgmtVlan
+                           INTEGER,
+		       onuStaticIpAddressRowStatus
+                           RowStatus,
+                       onuCIR
+                           INTEGER,
+                       onuCBS
+                           INTEGER,
+                       onuEBS
+                           INTEGER,
+                       onuIfMacACL
+                           DisplayString,
+                       onuIfIpACL
+                           DisplayString,
+		       onuVlans
+                           BIT STRING,
+                       onuActivePonDiid
+                           INTEGER,
+                       onuPonPortCount
+                       	   INTEGER,
+                       onuActivePonPortIndex
+                           INTEGER,
+                       onuSerialPortWorkMode
+                       	   INTEGER,
+                       onuSerialPortWorkPort
+                       	   INTEGER,
+		       onuSerialWorkModeRowStatus
+                           RowStatus,
+		       onuRemoteServerIpAddrIndex
+                           INTEGER,
+		       onuPeerOLTIpAddr
+                       	   IpAddress,
+                       onuPeerPONIndex	   
+                           INTEGER,
+                       onuSerialPortCount
+                           INTEGER,
+                       onuBakupPonStatus
+                           INTEGER,
+                       onuCurrentPONInUse
+                           INTEGER,
+                       onuCurrentPONMAC                   
+                           PhysAddress,
+                       onuPeerPONDiid
+                           INTEGER,
+                       onuPeerPONMAC
+                           PhysAddress,
+                       onuConfigurablePortDiid
+                           INTEGER
+		}
+
+               onuVendorID OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU vendor id."
+                   ::= { nmsEponOnuEntry 1 } 
+		
+               onuModuleID OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU module id."
+                   ::= { nmsEponOnuEntry 2 } 
+		
+               onuID OBJECT-TYPE
+                   SYNTAX  PhysAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU id.This value is ONU MAC address."
+                   ::= { nmsEponOnuEntry 3 } 
+		
+               onuHardwareVersion OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU hardware version."
+                   ::= { nmsEponOnuEntry 4 } 
+
+               onuSoftwareVersion OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU hardware version."
+                   ::= { nmsEponOnuEntry 5 } 
+		
+               onuFirmwareVersion OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU firmware version."
+                   ::= { nmsEponOnuEntry 6 } 
+		
+               onuChipVendorID OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU chip vendor id."
+                   ::= { nmsEponOnuEntry 7 } 
+		
+               onuChipModuleID OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU chip module id."
+                   ::= { nmsEponOnuEntry 8 } 
+		
+               onuChipRevision OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU chip revision."
+                   ::= { nmsEponOnuEntry 9 } 
+		
+               onuIcVersion OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU chip revision."
+                   ::= { nmsEponOnuEntry 10 } 
+		
+               onuServiceSupported OBJECT-TYPE
+                   SYNTAX  BIT STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU service type supported.The format is bitmap.bit0=1:support 1000M ethernet interface;
+                           bit0=0:do not suport gigaethernet interface;bit1=1:support 100M ethernet interface but 1000M is not supported
+                           bit1=0:do not support 100M ethernet interface;bit2=1:support VoIP service;bit2=0:do not support VoIP service;
+                           bit3=1:support TDM CES service;bit3=0:do not support TDM CES service;bit4=1:support ADSL2+ service;
+                           bit4=0:do not support ADSL2+ service; bit5=0:support VDSL2 service;bit5=1:do not support VDSL2 service;"
+                   ::= { nmsEponOnuEntry 11 } 
+		
+               onuGePortCount OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU 1000M ethernet UNI port count."
+                   ::= { nmsEponOnuEntry 12 } 
+		
+               onuGePortDistributing OBJECT-TYPE
+                   SYNTAX  BIT STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU 1000M ethernet UNI port bitmaps.There are totaly 8 bit strings, each 
+                           bit means the bandwidth of corresponding port.So 64 ports can be described.0 means 100M,1 means 1000M."
+                   ::= { nmsEponOnuEntry 13 } 
+		
+               onuFePortCount OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU 100M ethernet UNI port count."
+                   ::= { nmsEponOnuEntry 14 } 
+
+               onuFePortDistributing OBJECT-TYPE
+                   SYNTAX  BIT STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU 1000M ethernet UNI port bitmaps.There are totaly 8 bit strings, each 
+                           bit means the bandwidth of corresponding port.So 64 ports can be described.0 means 100M,1 means 1000M."
+                   ::= { nmsEponOnuEntry 15 } 
+                   
+               onuPotsPortCount OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU IAD POTS port count."
+                   ::= { nmsEponOnuEntry 16 } 
+
+               onuE1PortCount OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU E1 port count."
+                   ::= { nmsEponOnuEntry 17 } 
+
+               onuUsQueueCount OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU upstream queues count."
+                   ::= { nmsEponOnuEntry 18 } 
+
+               onuUsQueueMaxCount OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU upstream queues maximum count of per port."
+                   ::= { nmsEponOnuEntry 19 } 
+
+               onuDsQueueCount OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU downstream queues count."
+                   ::= { nmsEponOnuEntry 20 } 
+
+               onuDsQueueMaxCount OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU downstream queues maximum count of per port."
+                   ::= { nmsEponOnuEntry 21 } 
+
+               onuIsBakupBattery OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          yes(0),
+                          no(1)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "If ONU have bakup battery or not."
+                   ::= { nmsEponOnuEntry 22 } 
+
+               onuADSL2PlusPortCount OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of ADSL2+ port."
+                   ::= { nmsEponOnuEntry 23 } 
+
+               onuVDSL2PortCount OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of VDSL2 port."
+                   ::= { nmsEponOnuEntry 24 } 
+
+               onuLLIDCount OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of LLID. ONU notify OLT whether the multi-LLID mode is supported or not. "
+                   ::= { nmsEponOnuEntry 25 } 
+
+               onuStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          authenticated(0),
+                          registered(1),
+                          deregistered(2),
+                          auto_config(3),
+                          lost(4),
+                          standby(5)
+                          
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU Status. 0-authenticated, 1-registered,  2-deregistered, auto_config(3), lost(4), standby(5)."
+                   ::= { nmsEponOnuEntry 26 } 
+
+               onuDistance OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Disatance between OLT and ONU. "
+                   ::= { nmsEponOnuEntry 27 } 
+
+               onuBindStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          static(0),
+                          dynamic(1)
+                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU bind status. 0-static, 1-dynamic."
+                   ::= { nmsEponOnuEntry 28 } 
+
+               onuReset OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          reset(0),
+                          no-reset(1)
+                   }
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU reset operation. 0-reset, 1-no-reset."
+                   ::= { nmsEponOnuEntry 29 } 
+
+               onuUpdateImage OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU update image name."
+                   ::= { nmsEponOnuEntry 30 } 
+
+               onuUpdateEepromImage OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU update eeprom image name."
+                   ::= { nmsEponOnuEntry 31 } 
+
+               onuEncryptionStatus OBJECT-TYPE
+                   SYNTAX  TruthValue
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Global-level encryption enable or disable for an ONU.."
+                   ::= { nmsEponOnuEntry 32 } 
+
+               onuEncryptionMode OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          ctc-churning(2)
+                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Global-level encryption mode for an ONU."
+                   ::= { nmsEponOnuEntry 33 } 
+
+               onuIgmpSnoopingStatus OBJECT-TYPE
+                   SYNTAX  TruthValue
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enables or disables ONU multicast."
+                   ::= { nmsEponOnuEntry 34 } 
+
+               onuMcstMode OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          igmp-snooping(0),
+                          dynamic-controllable(1)
+                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Config multicast mode.0-IGMP Snooping, 1-CTC dynamic controllable multicast.Only igmp-snooping is supported currently."
+                   ::= { nmsEponOnuEntry 35 } 
+
+               OnuAFastLeaveAbility OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          multicast-non-fast-leave(0),
+                          igmp-snooping-fast-leave(1),
+                          controlable-multicast-non-fast-leave(2),
+                          controlable-multicast-fast-leave(3)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Definition of ONU a fast-leave ability.multicast-non-fast-leave(0),igmp-snooping-fast-leave(1),
+                          controlable-multicast-non-fast-leave(2),controlable-multicast-fast-leave(3)"
+                   ::= { nmsEponOnuEntry 36 } 
+
+               onuAcFastLeaveAdminControl OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          deactivate-Fast-Leave-Function(1),
+                          activate-Fast-Leave-Function(2)
+                   }
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Activating a fast-leave ability. deactivate-Fast-Leave-Function(1), activate-Fast-Leave-Function(2)"
+                   ::= { nmsEponOnuEntry 37 } 
+
+               onuAFastLeaveAdminState OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          disable(1),
+                          enable(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU multicast fast-leave ability. disable(1), enable(2)."
+                   ::= { nmsEponOnuEntry 38 } 
+
+               onuInFecStatus OBJECT-TYPE
+                   SYNTAX  TruthValue
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU receiving FEC status."
+                   ::= { nmsEponOnuEntry 39 } 
+
+               onuOutFecStatus OBJECT-TYPE
+                   SYNTAX  TruthValue
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU sending FEC status."
+                   ::= { nmsEponOnuEntry 40 } 
+
+               onuIfProtectedStatus OBJECT-TYPE
+                   SYNTAX  TruthValue
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU port protected status."
+                   ::= { nmsEponOnuEntry 41 } 
+
+               onuSehedulePolicy OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          sp(1),
+                          wrr(2)
+                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU schedule policy.1=sp(1), 2=wrr(2)."
+                   ::= { nmsEponOnuEntry 42 } 
+
+               onuDynamicMacLearningStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          off(1),
+                          on(2)
+                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU dynamic MAC address learning status. 1=off, 2=on."
+                   ::= { nmsEponOnuEntry 43 } 
+
+               onuDynamicMacAgingTime OBJECT-TYPE
+                   SYNTAX  INTEGER(0..3825)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU dynamic MAC address aging time. Range is 0 or 15-3825"
+                   ::= { nmsEponOnuEntry 44 } 
+
+               onuStaticMacAddress OBJECT-TYPE
+                   SYNTAX  MacAddress
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU static MAC address. Need to configure with corresponding MAC addresss port together."
+                   ::= { nmsEponOnuEntry 45 } 
+
+               onuStaticMacAddressPortBitmap OBJECT-TYPE
+                   SYNTAX  BIT STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU static MAC address port bitmap value. Each bit manifests an ONU port static MAC address status. 0= no,1=yes. "
+                   ::= { nmsEponOnuEntry 46 } 
+
+               onuStaticMacAddressConfigRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU static MAC address configuration row status. "
+                   ::= { nmsEponOnuEntry 47 } 
+
+               onuClearDynamicMacAddressByMac OBJECT-TYPE
+                   SYNTAX  MacAddress
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Clear dynamic MAC address according to MAC."
+                   ::= { nmsEponOnuEntry 48 } 
+
+               onuClearDynamicMacAddressByPort OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Clear dynamic MAC address according to port number."
+                   ::= { nmsEponOnuEntry 49 } 
+
+               onuPriorityQueueMapping OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU priority queue mapping.Totally 8 bytes,each byte manifests priority of corresponding queue number sorted by byte count."
+                   ::= { nmsEponOnuEntry 50 } 
+
+               onuVlanMode OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          transparent-mode(0),
+                          tag-mode(1),
+                          translation-mode(2),
+                          stacking-mode(3),
+                          none(254)
+                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU VLAN mode.(0 - transparent mode, 1 - tag mode, 2 - translation mode, 3 - stacking mode, 254 - none). Only UNI set is supported."
+                   ::= { nmsEponOnuEntry 51 } 
+
+               onuIpAddressMode OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                          dhcp(1),
+                          static(2)
+                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU IP address work mode. 0-default mode, dhcp, 1-static IP address mode."
+                   ::= { nmsEponOnuEntry 52 } 
+
+               onuStaticIpAddress OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU static ip address."
+                   ::= { nmsEponOnuEntry 53 } 
+
+               onuStaticIpMask OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU static ip mask."
+                   ::= { nmsEponOnuEntry 54 } 
+
+               onuStaticIpGateway OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU static ip gateway address."
+                   ::= { nmsEponOnuEntry 55 } 
+
+               onuMgmtVlan OBJECT-TYPE
+                   SYNTAX  INTEGER(1..4094)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU management VLAN."
+                   ::= { nmsEponOnuEntry 56 } 
+
+               onuStaticIpAddressRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU static ip address configuration row status. These four items: onuIpAddressMode, onuStaticIpAddress, onuStaticIpMask, onuStaticIpGateway, onuMgmtVlan, are added together. "
+                   ::= { nmsEponOnuEntry 57 } 
+
+               onuCIR OBJECT-TYPE
+                   SYNTAX  INTEGER(0..16777215)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "onu CIR."
+                   ::= { nmsEponOnuEntry 58 } 
+
+               onuCBS OBJECT-TYPE
+                   SYNTAX  INTEGER(0..65535)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "onu CBS."
+                   ::= { nmsEponOnuEntry 59 } 
+
+               onuEBS OBJECT-TYPE
+                   SYNTAX  INTEGER(0..65535)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "onu EBS."
+                   ::= { nmsEponOnuEntry 60 } 
+
+               onuIfMacACL OBJECT-TYPE
+                   SYNTAX  DisplayString 
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU MAC address ACL."
+                   ::= { nmsEponOnuEntry 61 } 
+
+               onuIfIpACL OBJECT-TYPE
+                   SYNTAX  DisplayString 
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU address ACL."
+                   ::= { nmsEponOnuEntry 62 } 
+
+               onuVlans OBJECT-TYPE
+                   SYNTAX  BIT STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU VLAN set value. Each bit manifests a VLAN status. 0= no,1=yes. "
+                   ::= { nmsEponOnuEntry 63 } 
+
+               onuActivePonDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU active pon port VS OLT PON diID."
+                   ::= { nmsEponOnuEntry 64 } 
+
+               onuPonPortCount OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU pon port count. Max is 2, and min is 1."
+                   ::= { nmsEponOnuEntry 65 } 
+
+               onuActivePonPortIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU active pon port VS OLT pon port index."
+                   ::= { nmsEponOnuEntry 66 } 
+
+               onuSerialPortWorkMode OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                  none(0),
+                                  tcp-server(1),
+                                  udp(2),
+                                  tcp-client(3)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU active pon port work mode. Default value is 0-none. "
+                   ::= { nmsEponOnuEntry 67 } 
+
+               onuSerialPortWorkPort OBJECT-TYPE
+                   SYNTAX  INTEGER(5000..30000)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port work port."
+                   ::= { nmsEponOnuEntry 68 } 
+
+               onuSerialWorkModeRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port setting row status. These two items: onuSerialPortWorkMode and onuSerialPortWorkPort, are added together. "
+                   ::= { nmsEponOnuEntry 69 } 
+
+               onuRemoteServerIpAddrIndex OBJECT-TYPE
+                   SYNTAX  INTEGER(0..1000)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU remote server IP address index. This value is index of NMS-EPON-ONU-REMOTE-SERVER-INFO. 0-this value is deleted. Default value is none. "
+                   ::= { nmsEponOnuEntry 70 } 
+
+               onuPeerOLTIpAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU peer OLT IP address."
+                   ::= { nmsEponOnuEntry 71 } 
+
+               onuPeerPONIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU peer PON port index."
+                   ::= { nmsEponOnuEntry 72 } 
+
+               onuSerialPortCount OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU serial port count. If no serial port, value set to 0."
+                   ::= { nmsEponOnuEntry 73 } 
+
+               onuBakupPonStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   	passive(0),  
+                   	active(1)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU bakup PON port status. passive(0), active(1)"
+                   ::= { nmsEponOnuEntry 74 } 
+
+               onuCurrentPONInUse OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   	in_use(1),  
+                   	not_in_use(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU current PON port using status. in_use(1), not_in_use(2). This node is noly use for D-PSG."
+                   ::= { nmsEponOnuEntry 75 } 
+
+               onuCurrentPONMAC OBJECT-TYPE
+                   SYNTAX  PhysAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU current PON MAC address. This node is noly use for D-PSG."
+                   ::= { nmsEponOnuEntry 76 } 
+
+               onuPeerPONDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU peer PON DIid value. This node is noly use for D-PSG."
+                   ::= { nmsEponOnuEntry 77 } 
+
+               onuPeerPONMAC OBJECT-TYPE
+                   SYNTAX  PhysAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU peer PON MAC address. This node is noly use for D-PSG."
+                   ::= { nmsEponOnuEntry 78 } 
+
+
+               onuConfigurablePortDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU configurabale PON DIid value. This node is noly use for D-PSG."
+                   ::= { nmsEponOnuEntry 79 } 
+                   
+
+                 
+
+
+
+               nmsepononuPonSwitchTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOnuPonSwitchEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon ONU Pon Port Switch table entries. That table only uses for double PON port ONU device."
+                   ::= { nmsEponOnu 2 }
+
+               nmsEponOnuPonSwitchEntry OBJECT-TYPE
+                   SYNTAX NMSEponOnuPonSwitchEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in switch of
+                            epon ONU PON port."
+                   INDEX { ifIndex }
+               ::= { nmsepononuPonSwitchTable 1 }
+
+               NMSEponOnuPonSwitchEntry ::=
+                   SEQUENCE {
+                       ifIndex
+                           INTEGER,
+                       operType
+                           INTEGER
+		}
+				
+               ifIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EPON port diID or ONU llid."
+                   ::= { nmsEponOnuPonSwitchEntry 1 } 
+
+               operType OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   	switchBack(0),  
+                   	switchToAnother(1)
+                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU PON port switch operation type. 0-switch to another PON port and never switch back, 1-switch to another PON port and switch back."
+                   ::= { nmsEponOnuPonSwitchEntry 2 } 
+
+
+               nmsepononucap2Table OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOnuCap2Entry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon ONU capability-2 table entries."
+                   ::= { nmsEponOnu 3 }
+
+               nmsEponOnuCap2Entry OBJECT-TYPE
+                   SYNTAX NMSEponOnuCap2Entry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon ONU capability-2 table."
+                   INDEX { llidIfIndex }
+               ::= { nmsepononucap2Table 1 }
+
+               NMSEponOnuCap2Entry ::=
+                   SEQUENCE {
+		       cap2OnuType
+                           INTEGER,
+		       cap2Multillid
+                           INTEGER,
+		       cap2ProtectionType
+                           INTEGER,
+		       cap2NumPONIf
+                           INTEGER,
+		       cap2NumSlot
+                           INTEGER,
+		       cap2NumIfType
+                           INTEGER,
+		       cap2NumGEPorts
+                           INTEGER,
+		       cap2NumFEPorts
+                           INTEGER,
+		       cap2NumVoIPPorts
+                           INTEGER,
+		       cap2NumTDMPorts
+                           INTEGER,
+		       cap2NumADSL2Ports
+                           INTEGER,
+		       cap2NumVDSL2Ports
+                           INTEGER,
+		       cap2NumWLANPorts
+                           INTEGER,
+		       cap2NumUSBPorts
+                           INTEGER,
+		       cap2NumCATVRFPorts
+                           INTEGER,
+		       cap2NumSerialPorts
+                           INTEGER,
+		       cap2BatteryBackup
+                           INTEGER
+		}
+
+               cap2OnuType OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   	SFU(0),
+                   	HGU(1),
+                   	SBU(2),
+                   	MDU-3(3),
+                   	MDU-4(4),
+                   	MDU-5(5),
+                   	MDU-6(6),
+                   	MDU-7(7),
+                   	MTU(8)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU type."
+                   ::= { nmsEponOnuCap2Entry 1 } 
+               cap2Multillid OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   yes(0),
+                   no(1)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "If ONU support multillid or not."
+                   ::= { nmsEponOnuCap2Entry 2 } 
+               cap2ProtectionType OBJECT-TYPE
+                   SYNTAX  INTEGER{ 
+                   notsupported(0),
+                   supportc-psg(1),
+                   supportd-psg(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU protection type: not supported is 0, support c-psg is 1, support d-psg is 2."
+                   ::= { nmsEponOnuCap2Entry 3 } 
+               cap2NumPONIf OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of pon ports."
+                   ::= { nmsEponOnuCap2Entry 4 } 
+               cap2NumSlot OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of slots."
+                   ::= { nmsEponOnuCap2Entry 5 } 
+               cap2NumIfType OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of interface types."
+                   ::= { nmsEponOnuCap2Entry 6 } 
+               cap2NumGEPorts OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of GE ports."
+                   ::= { nmsEponOnuCap2Entry 7 } 
+               cap2NumFEPorts OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of FE ports."
+                   ::= { nmsEponOnuCap2Entry 8 } 
+               cap2NumVoIPPorts OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of VoIP ports."
+                   ::= { nmsEponOnuCap2Entry 9 } 
+               cap2NumTDMPorts OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of TDM ports."
+                   ::= { nmsEponOnuCap2Entry 10 } 
+               cap2NumADSL2Ports OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of ADSL2 ports."
+                   ::= { nmsEponOnuCap2Entry 11 } 
+               cap2NumVDSL2Ports OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of VDSL2 ports."
+                   ::= { nmsEponOnuCap2Entry 12 } 
+               cap2NumWLANPorts OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of WLAN ports."
+                   ::= { nmsEponOnuCap2Entry 13 } 
+               cap2NumUSBPorts OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of USB ports."
+                   ::= { nmsEponOnuCap2Entry 14 } 
+               cap2NumCATVRFPorts OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of CATV RF ports."
+                   ::= { nmsEponOnuCap2Entry 15 } 
+               cap2NumSerialPorts OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of serial ports."
+                   ::= { nmsEponOnuCap2Entry 16 } 
+               cap2BatteryBackup OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   yes(1),
+                   no(0)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "If ONU have bakup battery or not."
+                   ::= { nmsEponOnuCap2Entry 17 } 
+	
+	
+               nmsepononusnmpTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOnuSnmpEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon ONU capability-2 table entries."
+                   ::= { nmsEponOnu 4 }
+
+               nmsEponOnuSnmpEntry OBJECT-TYPE
+                   SYNTAX NMSEponOnuSnmpEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon ONU capability-2 table."
+                   INDEX { llidIfIndex }
+               ::= { nmsepononusnmpTable 1 }
+
+               NMSEponOnuSnmpEntry ::=
+                   SEQUENCE {
+		       onuMacAddr
+                           PhysAddress,
+		       onuIpAddr
+                           IpAddress,
+		       onuCommRo
+                           DisplayString,
+		       onuCommRw
+                           DisplayString,
+		       onuSnmpPort
+                           INTEGER,
+		       onuSnmpTrapPort
+                           INTEGER,
+		       onuSnmpVersion
+                           INTEGER,
+		       onuSnmpTrapVersion
+                           INTEGER,
+		       onuSnmpTrapHost
+                           IpAddress
+		}
+	
+               onuMacAddr OBJECT-TYPE
+                   SYNTAX  PhysAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU MAC address ."
+                   ::= { nmsEponOnuSnmpEntry 1 } 
+	
+               onuIpAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU IP address ."
+                   ::= { nmsEponOnuSnmpEntry 2 } 
+	
+               onuCommRo OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU SNMP read community ."
+                   ::= { nmsEponOnuSnmpEntry 3 } 
+	
+               onuCommRw OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU SNMP read & write community ."
+                   ::= { nmsEponOnuSnmpEntry 4 } 
+	
+               onuSnmpPort OBJECT-TYPE
+                   SYNTAX  INTEGER(1..65535)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU SNMP get/set port number ."
+                   ::= { nmsEponOnuSnmpEntry 5 } 
+	
+               onuSnmpTrapPort OBJECT-TYPE
+                   SYNTAX  INTEGER(1..65535)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU SNMP trap port number ."
+                   ::= { nmsEponOnuSnmpEntry 6 } 
+	
+               onuSnmpVersion OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   		   v1(1),
+                   		   v2c(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU SNMP get/set operation package version ."
+                   ::= { nmsEponOnuSnmpEntry 7} 
+	
+               onuSnmpTrapVersion OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   		   v1(1),
+                   		   v2c(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU SNMP trap package version ."
+                   ::= { nmsEponOnuSnmpEntry 8} 
+	
+               onuSnmpTrapHost OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU SNMP trap host name."
+                   ::= { nmsEponOnuSnmpEntry 9 } 
+	
+
+
+               nmsepononuopticalportTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOnuOpticalPortEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon ONU Optical Port table entries."
+                   ::= { nmsEponOnu 5 }
+
+               nmsEponOnuOpticalPortEntry OBJECT-TYPE
+                   SYNTAX NMSEponOnuOpticalPortEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon ONU Optical Port table."
+                   INDEX { opIfIndex }
+               ::= { nmsepononuopticalportTable 1 }
+
+               NMSEponOnuOpticalPortEntry ::=
+                   SEQUENCE {
+                       opIfIndex
+                           INTEGER,
+		       opModuleTemp
+                           INTEGER,
+		       opModuleVolt
+                           INTEGER,
+		       opModuleCurrent
+                           INTEGER,
+		       opModuleRxPower
+                           INTEGER,
+		       opModuleTxPower
+                           INTEGER
+		}
+               opIfIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU PON port ifIndex. The same value as ifIndex in ifTable."
+                   ::= { nmsEponOnuOpticalPortEntry 1 } 
+	
+
+               opModuleTemp OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU PON port optical module temperature. Unit is 1/256 Celsuis."
+                   ::= { nmsEponOnuOpticalPortEntry 2 } 
+	
+               opModuleVolt OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU PON port optical module volt. Unit is 100uV."
+                   ::= { nmsEponOnuOpticalPortEntry 3 } 
+	
+               opModuleCurrent OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU PON port optical module volt. Unit is 2uA."
+                   ::= { nmsEponOnuOpticalPortEntry 4 } 
+	
+               opModuleRxPower OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU PON port optical receive power. Unit is 0.1dB."
+                   ::= { nmsEponOnuOpticalPortEntry 5 } 
+	
+               opModuleTxPower OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU PON port optical send power. Unit is 0.1dB."
+                   ::= { nmsEponOnuOpticalPortEntry 6 } 
+	
+--	onuIPParamGetTable
+
+
+
+
+               onuIPParamGetTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF OnuIPParamGetEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon ONU IP Parameter getting table entries."
+                   ::= { nmsEponOnu 7 }
+
+               onuIPParamGetEntry OBJECT-TYPE
+                   SYNTAX OnuIPParamGetEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon ONU IP Param getting table."
+                   INDEX { onuIfIndex }
+               ::= { onuIPParamGetTable 1 }
+
+               OnuIPParamGetEntry ::=
+                   SEQUENCE {
+                       onuIfIndex
+                           INTEGER,
+		       ipVersion
+                           INTEGER,
+		       ipv4Address
+                           IpAddress,
+		       ipv4Mask
+                           IpAddress,
+		       ipv4GateWay
+                           IpAddress,
+		       ipv6Address
+                           InetAddressIPv6,
+                       ipv6Prefix
+                           INTEGER,
+                       ipv6GateWay                           
+                           InetAddressIPv6,
+		       CVLAN
+                           INTEGER,
+		       SVLAN
+                           INTEGER,
+		       Priority
+                           INTEGER
+		}
+
+               onuIfIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Index of LLID interface."
+                   ::= { onuIPParamGetEntry 1 } 
+	
+               ipVersion OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   ipv4(1),
+                                   ipv6(2)
+                                  }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Onu management ip version. 1 means ipv4, 2 means ipv6."
+                   ::= { onuIPParamGetEntry 2 } 
+	
+               ipv4Address OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Onu management ipv4 address. Valid only ipVersion is 1(ipv4)."
+                   ::= { onuIPParamGetEntry 3 } 
+	
+               ipv4Mask OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Onu management ipv4 mask. Valid only ipVersion is 1(ipv4)."
+                   ::= { onuIPParamGetEntry 4 } 
+	
+               ipv4GateWay OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Onu management ipv4 gateway. Valid only ipVersion is 1(ipv4)."
+                   ::= { onuIPParamGetEntry 5 } 
+	
+               ipv6Address OBJECT-TYPE
+                   SYNTAX  InetAddressIPv6
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Onu management ipv6 address. Valid only ipVersion is 2(ipv6)."
+                   ::= { onuIPParamGetEntry 6 } 
+	
+               ipv6Prefix OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Onu management ipv6 prefix. Valid only ipVersion is 2(ipv6)."
+                   ::= { onuIPParamGetEntry 7 } 
+	
+               ipv6GateWay OBJECT-TYPE
+                   SYNTAX  InetAddressIPv6
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Onu management ipv6 gateway. Valid only ipVersion is 2(ipv6)."
+                   ::= { onuIPParamGetEntry 8 } 
+	
+               CVLAN OBJECT-TYPE
+                   SYNTAX  INTEGER(1..4094)
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Onu management cvlan. If Packet has two tags, This is inner tag. The range is 1-4094."
+                   ::= { onuIPParamGetEntry 9 } 
+	
+               SVLAN OBJECT-TYPE
+                   SYNTAX  INTEGER(0..4094)
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Onu management svlan. The range is 0-4094. 0 means packet has only one tag, vlanid is cvlan. Nonzero means packet has two tags, and vlanid of ounter tag is svlan."
+                   ::= { onuIPParamGetEntry 10 } 
+	
+               Priority OBJECT-TYPE
+                   SYNTAX  INTEGER(0..7)
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Onu management vlan priority. The range is 0-7."
+                   ::= { onuIPParamGetEntry 11 } 
+	
+-- onuCTCIPParamConfigTable
+
+                -- 29
+                onuCTCIPParamConfigTable OBJECT-TYPE
+                	SYNTAX SEQUENCE OF OnuCTCIPParamConfigEntry
+                	MAX-ACCESS not-accessible
+                	STATUS current
+                	DESCRIPTION
+                		"onuCTCIPParamConfigTable."
+                	::= {nmsEponOnu  29 }
+                 
+                -- 29.1                                
+                onuCTCIPParamConfigEntry OBJECT-TYPE   
+                	SYNTAX OnuCTCIPParamConfigEntry
+                	MAX-ACCESS not-accessible      	
+                	STATUS current                	
+                	DESCRIPTION                    
+                		"Table of onuCTCIPParamConfig."         
+	                INDEX { ifIndex }
+	                ::= { onuCTCIPParamConfigTable 1 }
+                		
+		OnuCTCIPParamConfigEntry ::=
+			SEQUENCE { 
+				ifIndex
+					INTEGER,
+				ipVersion
+					INTEGER,
+				ipv4Address
+					IpAddress,
+				ipv4Mask
+					IpAddress,
+				ipv4GateWay
+					IpAddress,
+				ipv6Address
+					InetAddressIPv6,
+				ipv6Prefix
+					INTEGER,
+				ipv6GateWay
+					InetAddressIPv6,
+				cVLAN
+					INTEGER,
+				sVLAN
+					INTEGER,
+				priority
+					INTEGER,
+				onuIPConfigRowStatus
+					RowStatus
+			 }
+
+                		
+                -- 29.1.1
+                ifIndex OBJECT-TYPE
+                	SYNTAX INTEGER
+                	MAX-ACCESS read-only
+                	STATUS current
+                	DESCRIPTION
+                		"Index of LLID interface."
+                        ::= { onuCTCIPParamConfigEntry 1 }
+                        
+                        
+                          
+                -- 29.1.2
+                ipVersion OBJECT-TYPE
+                	SYNTAX INTEGER{
+                	            ipv4(1),
+                	            ipv6(2)
+                	}
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management ip version. 1 means ipv4, 2 means ipv6."
+                	::= { onuCTCIPParamConfigEntry 2 }
+                
+                
+                -- 29.1.3
+                ipv4Address OBJECT-TYPE
+                	SYNTAX IpAddress
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management ipv4 address. Valid only ipVersion is 1(ipv4)."
+                	::= { onuCTCIPParamConfigEntry 3 }
+                
+                
+                -- 29.1.4
+                ipv4Mask OBJECT-TYPE
+                	SYNTAX IpAddress
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management ipv4 mask. Valid only ipVersion is 1(ipv4)."
+                	::= { onuCTCIPParamConfigEntry 4 }
+                
+                
+                -- 29.1.5
+                ipv4GateWay OBJECT-TYPE
+                	SYNTAX IpAddress
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management ipv4 gateway. Valid only ipVersion is 1(ipv4)."
+                	::= { onuCTCIPParamConfigEntry 5 }
+                
+                
+                -- 29.1.6
+                ipv6Address OBJECT-TYPE
+                	SYNTAX InetAddressIPv6
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management ipv6 address. Valid only ipVersion is 2(ipv6)."
+                	::= { onuCTCIPParamConfigEntry 6 }
+                
+                
+                -- 29.1.7
+                ipv6Prefix OBJECT-TYPE
+                	SYNTAX INTEGER
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management ipv6 prefix. Valid only ipVersion is 2(ipv6)."
+                	::= { onuCTCIPParamConfigEntry 7 }
+                
+                
+                -- 29.1.8
+                ipv6GateWay OBJECT-TYPE
+                	SYNTAX InetAddressIPv6
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management ipv6 gateway. Valid only ipVersion is 2(ipv6)."
+                	::= { onuCTCIPParamConfigEntry 8 }
+                
+                
+                -- 29.1.9
+                cVLAN OBJECT-TYPE
+                	SYNTAX INTEGER (1..4094)
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management cvlan. If Packet has two tags, This is inner tag. The range is 1-4094."
+                	::= { onuCTCIPParamConfigEntry 9 }
+                
+                
+                -- 29.1.10
+                sVLAN OBJECT-TYPE
+                	SYNTAX INTEGER (0..4094)
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management svlan. The range is 0-4094. 0 means packet has only one tag, vlanid is cvlan. 
+                		Nonzero means packet has two tags, and vlanid of ounter tag is svlan."
+                	::= { onuCTCIPParamConfigEntry 10 }
+                
+                
+                -- 29.1.11
+                priority OBJECT-TYPE
+                	SYNTAX INTEGER (0..7)
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management vlan priority. The range is 0-7."
+                	::= { onuCTCIPParamConfigEntry 11 }
+                
+                
+                -- 29.1.12
+                onuIPConfigRowStatus OBJECT-TYPE
+                	SYNTAX RowStatus
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"CTC ONU ip address configuration row status. These ten items: ipVersion,ipv4Address, 
+                		ipv4Mask,ipv4GateWay, ipv6Address, ipv6Prefix, ipv6GateWay, CVLAN, SVLAN, Priority, are added together."
+                	::= { onuCTCIPParamConfigEntry 12 }
+                
+
+
+
+-- onuCATVConfigTable
+
+                -- 30
+                onuCATVConfigTable OBJECT-TYPE
+                	SYNTAX SEQUENCE OF OnuCATVConfigEntry
+                	MAX-ACCESS not-accessible
+                	STATUS current
+                	DESCRIPTION
+                		"onuCATVConfigTable."
+                	::= {nmsEponOnu  30 }
+                 
+                -- 30.1                                
+                onuCATVConfigEntry OBJECT-TYPE   
+                	SYNTAX OnuCATVConfigEntry
+                	MAX-ACCESS not-accessible      	
+                	STATUS current                	
+                	DESCRIPTION                    
+                		"Table of onuCATVConfig."         
+	                INDEX { ifCATVIndex }
+	                ::= { onuCATVConfigTable 1 }
+                		
+		OnuCATVConfigEntry ::=
+			SEQUENCE { 
+				ifCATVIndex
+					INTEGER,
+				ifCATVAdminStatus
+					INTEGER
+			 }
+
+
+                -- 30.1.1
+                ifCATVIndex OBJECT-TYPE
+                	SYNTAX INTEGER
+                	MAX-ACCESS read-only
+                	STATUS current
+                	DESCRIPTION
+                		"Index of LLID interface."
+                        ::= { onuCATVConfigEntry 1 }
+                        
+                -- 30.1.2
+                ifCATVAdminStatus OBJECT-TYPE
+                	SYNTAX INTEGER{
+                	            up(1),
+                	            down(2)
+                	}
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu CATV module admin status. 1 means admin up, 2 means admin down. Default is 1(admin up)."
+                        ::= { onuCATVConfigEntry 2 }
+                        
+                
+-- onuCATVRxPowerTable
+
+                -- 30
+                onuCATVRxPowerTable OBJECT-TYPE
+                	SYNTAX SEQUENCE OF OnuCATVRxPowerEntry
+                	MAX-ACCESS not-accessible
+                	STATUS current
+                	DESCRIPTION
+                		"onuCATVRxPowerTable."
+                	::= {nmsEponOnu  31 }
+                 
+                -- 30.1                                
+                onuCATVRxPowerEntry OBJECT-TYPE   
+                	SYNTAX OnuCATVRxPowerEntry
+                	MAX-ACCESS not-accessible      	
+                	STATUS current                	
+                	DESCRIPTION                    
+                		"Table of onuCATVRxPower."         
+	                INDEX { ifCATVRxIndex }
+	                ::= { onuCATVRxPowerTable 1 }
+                		
+		OnuCATVRxPowerEntry ::=
+			SEQUENCE { 
+				ifCATVRxIndex
+					INTEGER,
+				rxPower
+					INTEGER
+			 }
+
+
+                -- 30.1.1
+                ifCATVRxIndex OBJECT-TYPE
+                	SYNTAX INTEGER
+                	MAX-ACCESS read-only
+                	STATUS current
+                	DESCRIPTION
+                		"Index of LLID interface."
+                        ::= { onuCATVRxPowerEntry 1 }
+                        
+                -- 30.1.2
+                rxPower OBJECT-TYPE
+                	SYNTAX INTEGER
+                	MAX-ACCESS read-only
+                	STATUS current
+                	DESCRIPTION
+                		"Onu CATV module rx power. Unit is 0.1 DBm."
+                        ::= { onuCATVRxPowerEntry 2 }
+                        
+                
+
+                		
+                		
+                		
+ END	
+                		

@@ -2,8 +2,8 @@
 session_start();
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_POST = $_SESSION;
-} else {
-    $_SESSION = $_POST;
+} elseif (!file_exists("../config.php")) {
+    $_SESSION = array_replace($_SESSION, $_POST);
 }
 
 $stage = isset($_POST['stage']) ? $_POST['stage'] : 0;
@@ -22,7 +22,7 @@ if ($stage > 3) {
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 // List of php modules we expect to see
-$modules = array('gd','mysqli','snmp','mcrypt');
+$modules = array('gd','mysqli','mcrypt');
 
 $dbhost = @$_POST['dbhost'] ?: 'localhost';
 $dbuser = @$_POST['dbuser'] ?: 'librenms';
@@ -52,7 +52,9 @@ $add_email = @$_POST['add_email'] ?: '';
 // Check we can connect to MySQL DB, if not, back to stage 1 :)
 if ($stage > 1) {
     try {
-        dbConnect();
+        if ($stage != 6) {
+            dbConnect();
+        }
         if ($stage == 2 && $_SESSION['build-ok'] == true) {
             $stage = 3;
             $msg = "It appears that the database is already setup so have moved onto stage $stage";
@@ -64,6 +66,8 @@ if ($stage > 1) {
     $_SESSION['stage'] = $stage;
 }
 
+session_write_close();
+
 if ($stage == 4) {
     // Now check we have a username, password and email before adding new user
     if (empty($add_user) || empty($add_pass) || empty($add_email)) {
@@ -71,12 +75,17 @@ if ($stage == 4) {
         $msg = "You haven't entered enough information to add the user account, please check below and re-try";
     }
 } elseif ($stage == 6) {
-    session_destroy();
     // If we get here then let's do some final checks.
     if (!file_exists("../config.php")) {
         // config.php file doesn't exist. go back to that stage
         $msg = "config.php still doesn't exist";
         $stage = 5;
+    } else {
+        // all done, remove all traces of the install session
+        session_unset();
+        session_destroy();
+        setcookie(session_name(), '', 0, '/');
+        session_regenerate_id(true);
     }
 }
 
@@ -89,43 +98,30 @@ $stage_perc = $stage / $total_stages * 100;
 $complete = 1;
 
 ?>
-
 <!DOCTYPE HTML>
-<html>
+<html lang="en">
 <head>
   <title><?php echo($config['page_title_prefix']); ?></title>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
-  <meta http-equiv="content-language" content="en-us" />
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
-  <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" type="text/css" />
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-hover-dropdown.min.js"></script>
-  <script src="js/typeahead.min.js"></script>
   <script src="js/hogan-2.0.0.js"></script>
-
 </head>
 <body>
   <div class="container">
     <div class="row">
-      <div class="col-md-3">
-      </div>
-      <div class="col-md-6">
+      <div class="col-md-6 col-md-offset-3">
         <h2 class="text-center">Welcome to the <?php echo($config['project_name']); ?> install</h2>
-      </div>
-      <div class="col-md-3">
       </div>
     </div>
     <div class="row">
-      <div class="col-md-3">
-      </div>
-      <div class="col-md-6">
+      <div class="col-md-6 col-md-offset-3">
         <h4 class="text-center">Stage <?php echo $stage; ?> of <?php echo $total_stages; ?> complete</h4>
-      </div>
-      <div class="col-md-3">
       </div>
     </div>
 <?php
@@ -133,12 +129,8 @@ $complete = 1;
 if (!empty($msg)) {
 ?>
     <div class="row">
-      <div class="col-md-3">
-      </div>
-      <div class="col-md-6">
+      <div class="col-md-6 col-md-offset-3">
         <div class="alert alert-danger"><?php echo $msg; ?></div>
-      </div>
-      <div class="col-md-3">
       </div>
     </div>
 
@@ -147,16 +139,13 @@ if (!empty($msg)) {
 ?>
 
     <div class="row">
-      <div class="col-md-3">
-      </div>
-      <div class="col-md-6">
-        <div class="progress progress-striped">
-          <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?php echo $stage_perc; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $stage_perc; ?>%">
+      <div class="col-md-6 col-md-offset-3">
+        <div id="install-progress" class="progress progress-striped">
+          <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?php echo $stage_perc; ?>"
+               aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $stage_perc; ?>%">
             <span class="sr-only"><?php echo $stage_perc; ?>% Complete</span>
           </div>
         </div>
-      </div>
-      <div class="col-md-3">
       </div>
     </div>
 
@@ -166,85 +155,66 @@ if ($stage == 0) {
 ?>
 
     <div class="row">
-      <div class="col-md-3">
-      </div>
-      <div class="col-md-6">
-        <h5 class="text-center">Checking PHP module support</h5>
-      </div>
-      <div class="col-md-3">
+      <div class="col-md-6 col-md-offset-3">
+        <h4 class="text-center">Pre-Install Checks</h4>
       </div>
     </div>
     <div class="row">
-      <div class="col-md-3">
-      </div>
-      <div class="col-md-6">
+      <div class="col-md-6 col-md-offset-3">
         <table class="table table-condensed table-bordered">
           <tr>
-            <th>Module</th>
-            <th>Installed</th>
+            <th>Item</th>
+            <th>Status</th>
             <th>Comments</th>
           </tr>
 <?php
 
+$complete = true;
 foreach ($modules as $extension) {
     if (extension_loaded("$extension")) {
-        $ext_loaded = 'yes';
+        $status = 'installed';
         $row_class = 'success';
     } else {
-        $ext_loaded = 'no';
+        $status = 'missing';
         $row_class = 'danger';
-        $complete = 0;
+        $complete = false;
     }
 
-    echo("   <tr class='$row_class'>
-            <td>$extension</td>
-            <td>$ext_loaded</td>");
-    if ($ext_loaded == 'no') {
-        echo("<td></td>");
-    } else {
-        echo("<td></td>");
-    }
-    echo("</tr>");
+    echo "<tr class='$row_class'><td>PHP module <strong>$extension</strong></td><td>$status</td><td></td></tr>";
 }
 
-    // Check for pear install
-    @include_once 'System.php';
-
-if (class_exists('System') === true) {
-    $ext_loaded = 'yes';
+if (is_writable(session_save_path())) {
+    $status = 'yes';
     $row_class = 'success';
 } else {
-    $ext_loaded = 'no';
+    $status = 'no';
     $row_class = 'danger';
+    $complete = false;
 }
 
-    echo("     <tr class='$row_class'>
-        <td>pear</td>
-        <td>$ext_loaded</td>");
-if ($ext_loaded == 'no') {
-    echo("<td>apt-get install php-pear / yum install php-pear</td>");
-} else {
-    echo("<td></td>");
+echo "<tr class='$row_class'><td>Session directory writable</td><td>$status</td><td>";
+if ($status == 'no') {
+    echo session_save_path() . " is not writable";
+    $group_info = posix_getgrgid(filegroup(session_save_path()));
+    if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
+        $group = $group_info['name'];
+        $user = get_current_user();
+        echo ", suggested fix <strong>usermod -a -G $group $user</strong>";
+    }
 }
-    echo("</tr>");
+echo "</td></tr>";
 ?>
         </table>
       </div>
-      <div class="col-md-3">
-      </div>
     </div>
     <div class="row">
-      <div class="col-md-3">
-      </div>
-      <div class="col-md-6">
+      <div class="col-md-6 col-md-offset-3">
         <form class="form-inline" role="form" method="post">
           <input type="hidden" name="stage" value="1">
-          <button type="submit" class="btn btn-success" <?php if ($complete == '0') {
+          <button type="submit" class="btn btn-success pull-right" <?php if (!$complete) {
                 echo "disabled='disabled'";
 } ?>>Next Stage</button>
         </form>
-      </div>
-      <div class="col-md-3">
       </div>
     </div>
 
@@ -294,7 +264,7 @@ if ($ext_loaded == 'no') {
               <input type="text" class="form-control" name="dbname" id="dbname" value="<?php echo $dbname; ?>">
             </div>
           </div>
-          <button type="submit" class="btn btn-success">Next Stage</button>
+          <button type="submit" class="btn btn-success pull-right">Next Stage</button>
         </form>
       </div>
       <div class="col-md-3">
@@ -309,29 +279,7 @@ if ($ext_loaded == 'no') {
      </div>
      <div class="col-md-6">
          <h5 class="text-center">Importing MySQL DB - Do not close this page or interrupt the import</h5>
-<?php
-// Ok now let's set the db connection up
-    $config['db_host'] = $dbhost;
-    $config['db_user'] = $dbuser;
-    $config['db_pass'] = $dbpass;
-    $config['db_name'] = $dbname;
-    $config['db_port'] = $dbport;
-    $config['db_socket'] = $dbsocket;
-    $sql_file = '../build.sql';
-    $_SESSION['last'] = time();
-    ob_end_flush();
-    ob_start();
-if ($_SESSION['offset'] < 100 && $_REQUEST['offset'] < 94) {
-    require '../build-base.php';
-} else {
-    require '../includes/sql-schema/update.php';
-}
-    $_SESSION['out'] .= ob_get_clean();
-    ob_end_clean();
-    ob_start();
-    echo $GLOBALS['refresh'];
-    echo "<pre>".trim($_SESSION['out'])."</pre>";
-?>
+        <textarea readonly id="db-update" class="form-control" rows="20" placeholder="Please Wait..." style="resize:vertical;"></textarea>
      </div>
      <div class="col-md-3">
      </div>
@@ -349,12 +297,37 @@ if ($_SESSION['offset'] < 100 && $_REQUEST['offset'] < 94) {
           <input type="hidden" name="dbname" value="<?php echo $dbname; ?>">
           <input type="hidden" name="dbport" value="<?php echo $dbport; ?>">
           <input type="hidden" name="dbsocket" value="<?php echo $dbsocket; ?>">
-          <button type="submit" class="btn btn-success">Goto Add User</button>
+          <input type="button" id="retry-btn" value="Retry" onClick="window.location.reload()" style="display: none;" class="btn btn-success">
+          <button type="submit" id="add-user-btn" class="btn btn-success pull-right" disabled>Goto Add User</button>
         </form>
       </div>
       <div class="col-md-3">
       </div>
     </div>
+    <script type="text/javascript">
+        var output = document.getElementById("db-update");
+        xhr = new XMLHttpRequest();
+        xhr.open("GET", "ajax_output.php?id=db-update", true);
+        xhr.onprogress = function (e) {
+            output.innerHTML = e.currentTarget.responseText;
+            output.scrollTop = output.scrollHeight - output.clientHeight; // scrolls the output area
+        };
+        xhr.timeout = 40000; // if no response for 40s, allow the user to retry
+        xhr.ontimeout = function (e) {
+            $("#retry-btn").css("display", "");
+        };
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    console.log("Complete");
+                    $('#add-user-btn').removeAttr('disabled');
+                }
+                $('#install-progress').removeClass('active')
+            }
+        };
+        xhr.send();
+        $('#install-progress').addClass('active')
+    </script>
 <?php
 } elseif ($stage == "5") {
 ?>
@@ -375,7 +348,6 @@ $config_file = <<<"EOD"
 \$config\['db_pass'\] = '$dbpass';
 \$config\['db_name'\] = '$dbname';
 \$config\['db_socket'\] = '$dbsocket';
-\$config\['db'\]\['extension'\] = "mysqli";// mysql or mysqli
 
 // This is the user LibreNMS will run as
 //Please ensure this user is created and has the correct permissions to your install
@@ -387,7 +359,7 @@ $config_file = <<<"EOD"
 \$config\['memcached'\]\['port'\]    = 11211;
 
 ### Locations - it is recommended to keep the default
-\$config\['install_dir'\]  = "$install_dir";
+#\$config\['install_dir'\]  = "$install_dir";
 
 ### This should *only* be set if you want to *force* a particular hostname/port
 ### It will prevent the web interface being usable form any other hostname
@@ -437,7 +409,7 @@ if (!file_exists("../config.php")) {
           <input type="hidden" name="dbpass" value="<?php echo $dbpass; ?>">
           <input type="hidden" name="dbname" value="<?php echo $dbname; ?>">
           <input type="hidden" name="dbsocket" value="<?php echo $dbsocket; ?>">
-        <button type="submit" class="btn btn-success">Finish install</button>
+        <button type="submit" class="btn btn-success pull-right">Finish install</button>
       </form>
 <?php
 
@@ -478,7 +450,7 @@ if (!file_exists("../config.php")) {
               <input type="email" class="form-control" name="add_email" id="add_email" value="<?php echo $add_email; ?>">
             </div>
           </div>
-          <button type="submit" class="btn btn-success">Add User</button>
+          <button type="submit" class="btn btn-success pull-right">Add User</button>
         </form>
       </div>
       <div class="col-md-3">
@@ -516,7 +488,7 @@ if (auth_usermanagement()) {
           <input type="hidden" name="dbpass" value="<?php echo $dbpass; ?>">
           <input type="hidden" name="dbname" value="<?php echo $dbname; ?>">
           <input type="hidden" name="dbsocket" value="<?php echo $dbsocket; ?>">
-          <button type="submit" class="btn btn-success" <?php if ($proceed == "1") {
+          <button type="submit" class="btn btn-success pull-right" <?php if ($proceed == "1") {
                 echo "disabled='disabled'";
 } ?>>Generate Config</button>
         </form>

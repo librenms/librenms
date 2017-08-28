@@ -30,7 +30,7 @@ $config['temp_dir']    = '/tmp';
 $config['log_dir']     = $config['install_dir'].'/logs';
 
 // MySQL extension to use
-$config['db']['extension']       = 'mysqli';//mysql and mysqli available
+$config['db']['extension']       = 'mysqli';
 // MySQL Debug level
 $config['mysql_log_level']       = 'ERROR';
 
@@ -42,8 +42,6 @@ $config['db_socket']             = null;
 $config['own_hostname'] = 'localhost';
 
 // Location of executables
-$config['rrdtool']                  = '/usr/bin/rrdtool';
-$config['rrdtool_version']          = 1.4; // Doesn't need to contain minor numbers.
 $config['fping']                    = '/usr/bin/fping';
 $config['fping6']                   = 'fping6';
 $config['fping_options']['retries'] = 3;
@@ -190,6 +188,9 @@ $config['snmp']['v3'][0]['cryptoalgo'] = 'AES';
 
 // Devices must respond to icmp by default
 $config['icmp_check'] = true;
+
+// The amount of time to keep the OS cache
+$config['os_def_cache_time'] = 86400;
 
 // Autodiscovery Settings
 $config['autodiscovery']['xdp'] = true;
@@ -338,7 +339,6 @@ $config['graph_colours']['mega']=array_merge(
     $config['graph_colours']['mixed']
 );
 
-
 // Map colors
 $config['network_map_legend'] = array(
     '0'   => '#aeaeae',
@@ -353,6 +353,28 @@ $config['network_map_legend'] = array(
     '90'  => '#ff6600',
     '100' => '#ff0000',
 );
+
+// Default mini graph time options:
+$config['graphs']['mini']['widescreen'] = array(
+    'sixhour' => '6 Hours',
+    'day' => '24 Hours',
+    'twoday' => '48 Hours',
+    'week' => 'One Week',
+    'twoweek' => 'Two Weeks',
+    'month' => 'One Month',
+    'twomonth' => 'Two Months',
+    'year' => 'One Year',
+    'twoyear' => 'Two Years',
+);
+
+$config['graphs']['mini']['normal'] = array(
+    'day' => '24 Hours',
+    'week' => 'One Week',
+    'month' => 'One Month',
+    'year' => 'One Year',
+);
+
+$config['graphs']['row']['normal'] = $config['graphs']['mini']['widescreen'];
 
 // Network Map Items
 $config['network_map_items'] = array('xdp','mac');
@@ -517,6 +539,7 @@ $config['bad_if'][] = 'span rp';
 $config['bad_if'][] = 'span sp';
 $config['bad_if'][] = 'sslvpn';
 $config['bad_if'][] = 'pppoe-';
+$config['bad_if'][] = 'irtual';
 // $config['bad_if'][] = "control plane";  // Example for cisco control plane
 // Ignore ports based on ifType. Case-sensitive.
 $config['bad_iftype'][] = 'voiceEncap';
@@ -565,17 +588,19 @@ $config['device_traffic_descr'][] = '/null/';
 $config['device_traffic_descr'][] = '/dummy/';
 
 // IRC Bot configuration
-$config['irc_host']       = '';
-$config['irc_port']       = '';
-$config['irc_maxretry']   = 3;
-$config['irc_nick']       = $config['project_name'];
-$config['irc_chan'][]     = '##'.$config['project_id'];
-$config['irc_pass']       = '';
-$config['irc_external']   = '';
-$config['irc_authtime']   = 3;
-$config['irc_debug']      = false;
-$config['irc_alert']      = false;
-$config['irc_alert_utf8'] = false;
+$config['irc_host']         = '';
+$config['irc_port']         = '';
+$config['irc_maxretry']     = 3;
+$config['irc_nick']         = $config['project_name'];
+$config['irc_chan'][]       = '##'.$config['project_id'];
+$config['irc_pass']         = '';
+$config['irc_external']     = '';
+$config['irc_authtime']     = 3;
+$config['irc_debug']        = false;
+$config['irc_alert']        = false;
+$config['irc_alert_utf8']   = false;
+$config['irc_ctcp']         = false;
+$config['irc_ctcp_version'] = "LibreNMS IRCbot. https://www.librenms.org/";
 
 // Authentication
 $config['allow_unauth_graphs'] = false;
@@ -714,6 +739,7 @@ $config['poller_modules']['junose-atm-vp']               = 0;
 $config['poller_modules']['toner']                       = 0;
 $config['poller_modules']['ucd-diskio']                  = 1;
 $config['poller_modules']['wifi']                        = 0;
+$config['poller_modules']['wireless']                    = 1;
 $config['poller_modules']['ospf']                        = 1;
 $config['poller_modules']['cisco-ipsec-flow-monitor']    = 0;
 $config['poller_modules']['cisco-remote-access-monitor'] = 0;
@@ -778,15 +804,8 @@ $config['discovery_modules']['stp']                  = 1;
 $config['discovery_modules']['ntp']                  = 1;
 $config['discovery_modules']['loadbalancers']        = 0;
 $config['discovery_modules']['mef']                  = 0;
-
-$config['modules_compat']['rfc1628']['liebert']    = 1;
-$config['modules_compat']['rfc1628']['netmanplus'] = 1;
-$config['modules_compat']['rfc1628']['deltaups']   = 1;
-$config['modules_compat']['rfc1628']['poweralert'] = 1;
-$config['modules_compat']['rfc1628']['webpower']   = 1;
-$config['modules_compat']['rfc1628']['huaweiups']  = 1;
-$config['modules_compat']['rfc1628']['generex-ups']  = 1;
-
+$config['discovery_modules']['wireless']             = 1;
+$config['discovery_modules']['fdb-table']            = 1;
 // Enable daily updates
 $config['update'] = 1;
 
@@ -911,3 +930,10 @@ $config['xirrus_disable_stations']  = false;
 
 // Graphite default port
 $config['graphite']['port']         = 2003;
+
+// Whether to enable secure cookies. Setting this to true enable secure cookies
+// and only send them over HTTPS. Setting this to false will send cookies over
+// HTTP and HTTPS, but they will be insecure. Setting this to $_SERVER["HTTPS"]
+// will send secure cookies when the site is being accessed over HTTPS, and
+// send insecure cookies when the site is being accessed over HTTP.
+$config['secure_cookies'] = $_SERVER["HTTPS"];

@@ -23,7 +23,16 @@
 
 // loop through each room
 foreach($opts as $option) {
+    $version = 1;
+    if (stripos($option['url'], "v2")) {
+        $version = 2;
+    }
+
+    // Generate our URL from the base URL + room_id and the auth token if the version is 2.
     $url = $option['url'];
+    if ($version == 2) {
+        $url .= "/".urlencode($option["room_id"])."/notification?auth_token=".urlencode($option["auth_token"]);
+    }
     foreach($obj as $key=>$value) {
         $api = str_replace("%".$key, $method == "get" ? urlencode($value) : $value, $api);
     }
@@ -44,11 +53,18 @@ foreach($opts as $option) {
     } elseif(stripos($obj["msg"], "rebooted")) {
         $color = "yellow";
     } else {
-	      $color = $option["color"];
+        if (empty($option["color"]) || $option["color"] == 'u') {
+            $color = 'red';
+        } else {
+            $color = $option["color"];
+        }
     }
 
+
     $data[] = "message=".urlencode($obj["msg"]);
-    $data[] = "room_id=".urlencode($option["room_id"]);
+    if ($version == 1) {
+        $data[] = "room_id=".urlencode($option["room_id"]);
+    }
     $data[] = "from=".urlencode($option["from"]);
     $data[] = "color=".urlencode($color);
     $data[] = "notify=".urlencode($option["notify"]);
@@ -66,7 +82,7 @@ foreach($opts as $option) {
     $ret = curl_exec($curl);
 
     $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    if($code != 200) {
+    if($code != 200 && $code != 204) {
         var_dump("API '$url' returned Error");
         var_dump("Params: " . $message);
         var_dump("Return: " . $ret);

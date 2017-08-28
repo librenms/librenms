@@ -1,0 +1,569 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+--
+ -- CIENA-CES-ACL-MIB.my
+ --
+ --
+
+ CIENA-CES-ACL-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS        
+   Counter32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI         
+   InetAddressType, InetAddress, InetAddressPrefixLength  
+        FROM INET-ADDRESS-MIB  
+   CienaGlobalState
+        FROM CIENA-TC
+   cienaCesConfig
+       FROM CIENA-SMI;                      
+    
+ cienaCesAclMIB MODULE-IDENTITY
+        LAST-UPDATED "201211210000Z"
+        ORGANIZATION "Ciena, Inc"
+        CONTACT-INFO
+            "       Mib Meister
+                    115 North Sullivan Road
+                    Spokane Valley, WA 99037
+                    USA             
+                    Phone:  +1 509 242 9000
+                    Email:  support@ciena.com"                              
+        DESCRIPTION
+            "This module defines the ACL details and the 
+             associated notifications."
+
+        REVISION  "201211210000Z"
+        DESCRIPTION
+            "Created new Extended table for the ACL rules which is indexed
+             by both source and destination IP.
+             Deprecated the cienaCesAclTable.
+             Added new global counter for bad protocol."
+
+        REVISION  "201205010000Z"
+        DESCRIPTION
+            "Initial creation."        
+        ::= { cienaCesConfig 25 }
+
+ --
+ -- Node definitions
+ --
+   
+ cienaCesAclMIBObjects OBJECT IDENTIFIER ::= { cienaCesAclMIB 1 }
+ 
+ 
+ --
+ -- Acl Node
+ --
+ cienaCesAclGlobal OBJECT IDENTIFIER ::= { cienaCesAclMIBObjects 1 }
+ cienaCesAclRules OBJECT IDENTIFIER ::= { cienaCesAclMIBObjects 2 }
+
+ -- Conformance information 
+ 
+ cienaCesAclMIBConformance OBJECT IDENTIFIER ::= { cienaCesAclMIB 3 } 
+ cienaCesAclMIBCompliances OBJECT IDENTIFIER ::= { cienaCesAclMIBConformance 1 }     
+ cienaCesAclMIBGroups      OBJECT IDENTIFIER ::= { cienaCesAclMIBConformance 2 }
+
+
+ --
+ -- IP ACL Items
+ --
+ 
+  cienaCesAclAdminState OBJECT-TYPE
+    SYNTAX      CienaGlobalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the global IP ACL state."
+    ::= { cienaCesAclGlobal 1 } 
+    
+  cienaCesAclCacheHit OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object indicates the number of lookups satisfied by a cache hit."
+   ::= { cienaCesAclGlobal 2 }
+   
+  cienaCesAclNoHit OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object indicates the number of lookups that failed because the source
+      ip address did not match a table entry."
+   ::= { cienaCesAclGlobal 3 }
+   
+  cienaCesAclBadPort OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object indicates the number of lookups that failed because the ingress
+      port was disallowed by a table entry."
+   ::= { cienaCesAclGlobal 4 }   
+                                  
+  cienaCesAclBadDscp OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object indicates the number of lookups that failed because the ingress
+      DSCP value was disallowed by a table entry."
+   ::= { cienaCesAclGlobal 5 }
+   
+   cienaCesAclOperState OBJECT-TYPE
+    SYNTAX      CienaGlobalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "This object indicates the current operational state of the IP ACL system."
+    ::= { cienaCesAclGlobal 6 } 
+ 
+   cienaCesAclInUseEntries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "This object indicates the number of IP ACL rules that are currently configured."
+   ::= { cienaCesAclGlobal 7 }
+  
+  cienaCesAclMaxEntries OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object indicates the maximum number of IP ACL rules that can be configured."
+   ::= { cienaCesAclGlobal 8 }
+
+  cienaCesAclBadProtocol OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object indicates the number of lookups that failed because protocol
+       didn't match protocol allowed for matching src/dst subnet"
+   ::= { cienaCesAclGlobal 9 }
+ 
+  --
+  --  IP ACL Table
+  --                                   
+  cienaCesAclTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesAclEntry
+     MAX-ACCESS not-accessible
+     STATUS     deprecated
+     DESCRIPTION
+            "The (conceptual) table listing the parameters for the IP ACL table."  
+     ::= { cienaCesAclRules 1 }
+                
+  cienaCesAclEntry OBJECT-TYPE
+     SYNTAX      CienaCesAclEntry
+     MAX-ACCESS  not-accessible
+     STATUS      deprecated
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaCesAclTable."
+     INDEX {cienaCesAclEntryInetAddrType,cienaCesAclEntryInetAddr,
+            cienaCesAclEntryInetPrefixLength}
+     ::= { cienaCesAclTable 1 }
+                
+  CienaCesAclEntry ::=  SEQUENCE { 
+     cienaCesAclEntryInetAddrType       InetAddressType,
+     cienaCesAclEntryInetAddr           InetAddress,  
+     cienaCesAclEntryInetPrefixLength   InetAddressPrefixLength,
+     cienaCesAclEntryHits               Counter32,
+     cienaCesAclEntryBadPort            Counter32,
+     cienaCesAclEntryDscpMask           OCTET STRING,
+     cienaCesAclEntryBadDscp            Counter32,
+     cienaCesAclEntryPortBitMask        OCTET STRING,
+     cienaCesAclEntryNotifInetAddrType       InetAddressType,
+     cienaCesAclEntryNotifInetAddr           InetAddress,  
+     cienaCesAclEntryNotifInetPrefixLength   InetAddressPrefixLength 
+  }
+  
+  cienaCesAclEntryInetAddrType OBJECT-TYPE
+     SYNTAX      InetAddressType
+     MAX-ACCESS  not-accessible
+     STATUS      deprecated 
+     DESCRIPTION
+         "This object indicates the IP network type which will be authorized.
+          This OID specifies the Inet address type of the OIDs 
+          cienaCesAclEntryInetAddr and cienaCesAclEntryInetPrefixLength.
+          When representing:
+          ipv4 : cienaCesAclEntryInetAddr should be compliant with 
+                 InetAddressIPv4 from RFC 4001
+          ipv6 : cienaCesAclEntryInetAddr should be compliant with 
+                 InetAddressIPv6 from RFC 4001"
+     ::= { cienaCesAclEntry 1 }
+
+  cienaCesAclEntryInetAddr OBJECT-TYPE
+     SYNTAX      InetAddress
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+         "This object indicates the source IP network address that will 
+          be authorized.  This OID should be used in conjunction with 
+          cienaCesAclEntryInetAddrType and should be compliant with RFC 
+          4001 InetAddressType."  
+     ::= { cienaCesAclEntry 2 }
+  
+  cienaCesAclEntryInetPrefixLength OBJECT-TYPE
+     SYNTAX      InetAddressPrefixLength
+     MAX-ACCESS  not-accessible
+     STATUS      deprecated
+     DESCRIPTION
+         "This object indicates the prefix length for the source IP network
+          that will be authorized.  This OID should be used in conjunction 
+          with cienaCesAclEntryInetAddrType."  
+     ::= { cienaCesAclEntry 3 }     
+     
+  cienaCesAclEntryHits OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      deprecated 
+   DESCRIPTION
+      "This object indicates the number of lookups that matched the table entry."
+   ::= { cienaCesAclEntry 4 }
+
+  cienaCesAclEntryBadPort OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      deprecated 
+   DESCRIPTION
+      "This object indicates the number of lookups that failed because the ingress
+      port was disallowed by the table entry."
+   ::= { cienaCesAclEntry 5 }
+
+  cienaCesAclEntryDscpMask OBJECT-TYPE
+     SYNTAX      OCTET STRING(SIZE(8))
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+       "This object indicates the DSCP values for which IP packets 
+        are allowed to ingress.  The mask is big endian and each bit,
+        numbered from 0 to 63, represents a DSCP value numbered from
+        0 to 63.  A value of 0xFFFFFFFFFFFFFFFF may be used to specify all."
+     ::= { cienaCesAclEntry 6 }        
+     
+  cienaCesAclEntryBadDscp OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      deprecated
+   DESCRIPTION
+      "This object indicates the number of lookups that failed because the ingress
+      DSCP value was disallowed by the table entry."
+   ::= { cienaCesAclEntry 7 }
+
+  cienaCesAclEntryPortBitMask OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE(8)) 
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+       "This object indicates the physical ports on which frames will
+        be allowed to ingress from.  The mask is big endian and each bit,
+        numbered from 0 to 63, represents a physical port numbered from
+        1 to 64.  A value of 0xFFFFFFFFFFFFFFFF may be used to specify all ports."
+     ::= { cienaCesAclEntry 8 }                                 
+  
+   cienaCesAclEntryNotifInetAddrType OBJECT-TYPE
+     SYNTAX      InetAddressType
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+         "This object indicates the IP network type which will be authorized.
+          This OID specifies the Inet address type of the OIDs cienaCesAclEntryNotifInetAddr and 
+          cienaCesAclEntryNotifInetPrefixLength.
+          When representing:
+          ipv4 : cienaCesAclEntryInetAddr should be compliant with InetAddressIPv4 from RFC 4001
+          ipv6 : cienaCesAclEntryInetAddr should be compliant with InetAddressIPv6 from RFC 4001"
+     ::= { cienaCesAclEntry 9 }
+
+  cienaCesAclEntryNotifInetAddr OBJECT-TYPE
+     SYNTAX      InetAddress
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+         "This object indicates the IP network address that will be authorized.
+         This OID should be used in conjunction with cienaCesAclEntryNotifInetAddrType
+         and should be compliant with RFC 4001 InetAddressType."  
+     ::= { cienaCesAclEntry 10 }
+  
+  cienaCesAclEntryNotifInetPrefixLength OBJECT-TYPE
+     SYNTAX      InetAddressPrefixLength
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+         "This object indicates the prefix length for the IP network that will be authorized.
+          This OID should be used in conjunction with cienaCesAclEntryNotifInetAddrType."  
+     ::= { cienaCesAclEntry 11 } 
+
+  --
+  --  Extended IP ACL Table
+  --                                   
+  cienaCesExtAclTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesExtAclEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the parameters for the 
+             extended IP ACL table."  
+     ::= { cienaCesAclRules 2 }
+                
+  cienaCesExtAclEntry OBJECT-TYPE
+     SYNTAX      CienaCesExtAclEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaCesExtAclTable."
+     INDEX {cienaCesExtAclEntrySrcInetAddrType,cienaCesExtAclEntrySrcInetAddr,
+            cienaCesExtAclEntrySrcInetPrefixLen,
+            cienaCesExtAclEntryDstInetAddrType,cienaCesExtAclEntryDstInetAddr,
+            cienaCesExtAclEntryDstInetPrefixLen}
+     ::= { cienaCesExtAclTable 1 }
+                
+  CienaCesExtAclEntry ::=  SEQUENCE { 
+     cienaCesExtAclEntrySrcInetAddrType    InetAddressType,
+     cienaCesExtAclEntrySrcInetAddr        InetAddress,  
+     cienaCesExtAclEntrySrcInetPrefixLen   InetAddressPrefixLength,
+     cienaCesExtAclEntryDstInetAddrType    InetAddressType,
+     cienaCesExtAclEntryDstInetAddr        InetAddress,  
+     cienaCesExtAclEntryDstInetPrefixLen   InetAddressPrefixLength,
+     cienaCesExtAclEntryNotifSrcInetAddrType  InetAddressType,
+     cienaCesExtAclEntryNotifSrcInetAddr      InetAddress,  
+     cienaCesExtAclEntryNotifSrcInetPrefixLen InetAddressPrefixLength,
+     cienaCesExtAclEntryNotifDstInetAddrType  InetAddressType,
+     cienaCesExtAclEntryNotifDstInetAddr      InetAddress,  
+     cienaCesExtAclEntryNotifDstInetPrefixLen InetAddressPrefixLength,
+     cienaCesExtAclEntryHits               Counter32,
+     cienaCesExtAclEntryBadPort            Counter32,
+     cienaCesExtAclEntryDscpMask           OCTET STRING,
+     cienaCesExtAclEntryBadDscp            Counter32,
+     cienaCesExtAclEntryPortBitMask        OCTET STRING,
+     cienaCesExtAclEntryProtocol           BITS,
+     cienaCesExtAclEntryBadProtocol        Counter32
+  }
+  
+  cienaCesExtAclEntrySrcInetAddrType OBJECT-TYPE
+     SYNTAX      InetAddressType
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This object indicates the IP network type which will be authorized.
+          This OID specifies the Inet address type of the OIDs 
+          cienaCesExtAclEntrySrcInetAddr and
+          cienaCesExtAclEntrySrcInetPrefixLen.
+          When representing:
+          ipv4 : cienaCesExtAclEntrySrcInetAddr should be compliant with 
+                 InetAddressIPv4 from RFC 4001
+          ipv6 : cienaCesExtAclEntrySrcInetAddr should be compliant with 
+                 InetAddressIPv6 from RFC 4001"
+     ::= { cienaCesExtAclEntry 1 }
+
+  cienaCesExtAclEntrySrcInetAddr OBJECT-TYPE
+     SYNTAX      InetAddress (SIZE(16))
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This object indicates the source IP network address that will 
+          be authorized.  This OID should be used in conjunction with 
+          cienaCesExtAclEntrySrcInetAddrType and should be compliant with RFC 
+          4001 InetAddressType."  
+     ::= { cienaCesExtAclEntry 2 }
+  
+  cienaCesExtAclEntrySrcInetPrefixLen OBJECT-TYPE
+     SYNTAX      InetAddressPrefixLength
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This object indicates the prefix length for the source IP network
+          that will be authorized.  This OID should be used in conjunction 
+          with cienaCesExtAclEntrySrcInetAddrType."  
+     ::= { cienaCesExtAclEntry 3 }     
+     
+  cienaCesExtAclEntryDstInetAddrType OBJECT-TYPE
+     SYNTAX      InetAddressType
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This object indicates the IP network type which will be authorized.
+          This OID specifies the Inet address type of the OIDs 
+          cienaCesExtAclEntryDstInetAddr and
+          cienaCesExtAclEntryDstInetPrefixLen.
+          When representing:
+          ipv4 : cienaCesExtAclEntryDstInetAddr should be compliant with 
+                 InetAddressIPv4 from RFC 4001
+          ipv6 : cienaCesExtAclEntryDstInetAddr should be compliant with 
+                 InetAddressIPv6 from RFC 4001"
+     ::= { cienaCesExtAclEntry 4 }
+
+  cienaCesExtAclEntryDstInetAddr OBJECT-TYPE
+     SYNTAX      InetAddress (SIZE(16))
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This object indicates the destination IP network address that will 
+          be authorized.  This OID should be used in conjunction with 
+          cienaCesExtAclEntryDstInetAddrType and should be compliant with RFC 
+          4001 InetAddressType."  
+     ::= { cienaCesExtAclEntry 5 }
+  
+  cienaCesExtAclEntryDstInetPrefixLen OBJECT-TYPE
+     SYNTAX      InetAddressPrefixLength
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This object indicates the prefix length for the destination IP network
+          that will be authorized.  This OID should be used in conjunction 
+          with cienaCesExtAclEntryDstInetAddrType."  
+     ::= { cienaCesExtAclEntry 6 }     
+     
+  cienaCesExtAclEntryNotifSrcInetAddrType OBJECT-TYPE
+     SYNTAX      InetAddressType
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Duplicate of cienaCesExtAclEntrySrcInetAddrType for display purposes.
+          This object indicates the IP network type which will be authorized.
+          This OID specifies the Inet address type of the OIDs 
+          cienaCesExtAclEntrySrcInetAddr and
+          cienaCesExtAclEntrySrcInetPrefixLen.
+          When representing:
+          ipv4 : cienaCesExtAclEntrySrcInetAddr should be compliant with 
+                 InetAddressIPv4 from RFC 4001
+          ipv6 : cienaCesExtAclEntrySrcInetAddr should be compliant with 
+                 InetAddressIPv6 from RFC 4001"
+     ::= { cienaCesExtAclEntry 7 }
+
+  cienaCesExtAclEntryNotifSrcInetAddr OBJECT-TYPE
+     SYNTAX      InetAddress
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Duplicate of cienaCesExtAclEntrySrcInetAddr for display purposes.
+          This object indicates the source IP network address that will 
+          be authorized.  This OID should be used in conjunction with 
+          cienaCesExtAclEntryNotifSrcInetAddrType and should be compliant 
+          with RFC 4001 InetAddressType."  
+     ::= { cienaCesExtAclEntry 8 }
+  
+  cienaCesExtAclEntryNotifSrcInetPrefixLen OBJECT-TYPE
+     SYNTAX      InetAddressPrefixLength
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Duplicate of cienaCesExtAclEntrySrcInetPrefixLen for display purposes.
+          This object indicates the prefix length for the source IP network
+          that will be authorized.  This OID should be used in conjunction 
+          with cienaCesExtAclEntryNotifSrcInetAddrType."  
+     ::= { cienaCesExtAclEntry 9 }     
+     
+  cienaCesExtAclEntryNotifDstInetAddrType OBJECT-TYPE
+     SYNTAX      InetAddressType
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Duplicate of cienaCesExtAclEntryDstInetAddrType for display purposes.
+          This object indicates the IP network type which will be authorized.
+          This OID specifies the Inet address type of the OIDs 
+          cienaCesExtAclEntryNotifDstInetAddr and
+          cienaCesExtAclEntryNotifDstInetPrefixLen.
+          When representing:
+          ipv4 : cienaCesExtAclEntryNotifDstInetAddr should be compliant with 
+                 InetAddressIPv4 from RFC 4001
+          ipv6 : cienaCesExtAclEntryNotifDstInetAddr should be compliant with 
+                 InetAddressIPv6 from RFC 4001"
+     ::= { cienaCesExtAclEntry 10 }
+
+  cienaCesExtAclEntryNotifDstInetAddr OBJECT-TYPE
+     SYNTAX      InetAddress
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Duplicate of cienaCesExtAclEntryDstInetAddr for display purposes.
+          This object indicates the destination IP network address that will 
+          be authorized.  This OID should be used in conjunction with 
+          cienaCesExtAclEntryNotifDstInetAddrType and should be compliant 
+          with RFC 4001 InetAddressType."  
+     ::= { cienaCesExtAclEntry 11 }
+  
+  cienaCesExtAclEntryNotifDstInetPrefixLen OBJECT-TYPE
+     SYNTAX      InetAddressPrefixLength
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Duplicate of cienaCesExtAclEntryDstInetPrefixLen for display purposes.
+          This object indicates the prefix length for the destination IP network
+          that will be authorized.  This OID should be used in conjunction 
+          with cienaCesExtAclEntryNotifDstInetAddrType."  
+     ::= { cienaCesExtAclEntry 12 }     
+
+  cienaCesExtAclEntryHits OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object indicates the number of lookups that matched the table entry."
+   ::= { cienaCesExtAclEntry 13 }
+
+  cienaCesExtAclEntryBadPort OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object indicates the number of lookups that failed because the ingress
+      port was disallowed by the table entry."
+   ::= { cienaCesExtAclEntry 14 }
+
+  cienaCesExtAclEntryDscpMask OBJECT-TYPE
+     SYNTAX      OCTET STRING(SIZE(8))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+       "This object indicates the DSCP values for which IP packets 
+        are allowed to ingress.  The mask is big endian and each bit,
+        numbered from 0 to 63, represents a DSCP value numbered from
+        0 to 63.  A value of 0xFFFFFFFFFFFFFFFF may be used to specify all."
+     ::= { cienaCesExtAclEntry 15 }        
+     
+  cienaCesExtAclEntryBadDscp OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object indicates the number of lookups that failed because the ingress
+      DSCP value was disallowed by the table entry."
+   ::= { cienaCesExtAclEntry 16 }
+
+  cienaCesExtAclEntryPortBitMask OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE(8)) 
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+       "This object indicates the physical ports on which frames will
+        be allowed to ingress from.  The mask is big endian and each bit,
+        numbered from 0 to 63, represents a physical port numbered from
+        1 to 64.  A value of 0xFFFFFFFFFFFFFFFF may be used to specify all
+        ports."
+     ::= { cienaCesExtAclEntry 17 }                                 
+  
+  cienaCesExtAclEntryProtocol OBJECT-TYPE
+     SYNTAX  BITS {
+        icmp(0),
+        tcp(1),
+        udp(2),
+        all(15)
+     }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "List of protocols allowed for the ACL entry."
+             
+     ::= { cienaCesExtAclEntry 18 }
+
+  cienaCesExtAclEntryBadProtocol OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object indicates the number of lookups that failed because
+       the protocol value did't match what was in the ACL entry with IP
+       address(es) matching"
+   ::= { cienaCesExtAclEntry 19 }
+
+ END

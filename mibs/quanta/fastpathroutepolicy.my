@@ -1,0 +1,368 @@
+NETGEAR-ROUTE-POLICY-MIB DEFINITIONS ::= BEGIN
+
+-- Netgear Inc Route-Map MIB
+-- Copyright Netgear Inc (200x-2012) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32 FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue, RowStatus FROM SNMPv2-TC
+    DisplayString                        FROM RFC1213-MIB
+    ifIndex, InterfaceIndex, InterfaceIndexOrZero
+                                        FROM IF-MIB
+    fastPathRouting                      FROM NETGEAR-ROUTING-MIB;
+
+    fastPathRoutePolicy MODULE-IDENTITY
+        LAST-UPDATED "201210010000Z" -- 01 0ctober 2012 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The MIB definitions for Route Policy system."
+    ::= { fastPathRouting 20 }
+
+
+-- Textual Convention
+   FastpathRoutePolicyAction ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+          "Determines whether a Route Map statement
+           should be permitted or denied."
+      SYNTAX INTEGER {
+          permit(1),
+          deny(2)
+    }
+   FastpathRoutePolicyStmtIpPrecedence ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+          "Possible values of IP precedence that can be
+           configured in a route-map statement."
+      SYNTAX INTEGER {
+          routine(0),
+          priority(1),
+          immediate(2),
+          flash(3),
+          flash-override(4),
+          critical(5),
+          internet(6),
+          network(7),
+          invalid(8) 
+    }
+
+-- fastpath route policy name table. We create a Route-map statement through this table.
+
+   fastpathRoutePolicyNameTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF FastpathRoutePolicyNameEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "Table to configure or fetch current list of route-map statements"
+   ::= { fastPathRoutePolicy  1}
+
+   fastpathRoutePolicyNameEntry OBJECT-TYPE
+      SYNTAX      FastpathRoutePolicyNameEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "Each entry in this table corresponds to a route-map statement"
+      INDEX {fastpathRoutePolicyName,fastpathRoutePolicyStmtActionType,fastpathRoutePolicySequence}                 
+    ::= { fastpathRoutePolicyNameTable 1 }
+
+   FastpathRoutePolicyNameEntry::= SEQUENCE {
+    fastpathRoutePolicyName                  DisplayString,
+    fastpathRoutePolicyStmtActionType        FastpathRoutePolicyAction,
+    fastpathRoutePolicySequence              Unsigned32,
+    fastpathRoutePolicyNameRowStatus         RowStatus
+   }
+
+  fastpathRoutePolicyName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE(1..32))
+     MAX-ACCESS  read-create
+     STATUS  current
+     DESCRIPTION
+         "The name of a Route Map statement."
+  ::= { fastpathRoutePolicyNameEntry 1 }
+
+fastpathRoutePolicyStmtActionType OBJECT-TYPE
+    SYNTAX      FastpathRoutePolicyAction
+    MAX-ACCESS   read-create
+    STATUS  current
+    DESCRIPTION
+        "The action associated with this route-map statement.
+         This can be either Permit/Deny  "
+    ::= { fastpathRoutePolicyNameEntry 2 }
+
+fastpathRoutePolicySequence OBJECT-TYPE
+    SYNTAX       Unsigned32 (0..65535)
+    MAX-ACCESS   read-create
+    STATUS  current
+    DESCRIPTION
+        "Route Maps are linked together using sequence numbers.
+         All Route Maps with the same index and with different
+         sequence numbers are linked together and processed in
+         order of increasing sequence number."
+    ::= { fastpathRoutePolicyNameEntry 3 }
+
+  fastpathRoutePolicyNameRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS  current
+     DESCRIPTION
+         "Controls creation and deletion of Row Status entries."
+  ::= { fastpathRoutePolicyNameEntry 4 }
+
+
+--*********************************************************************
+--route-map statement table to configure 'match' or 'set' terms
+--*********************************************************************
+  fastpathRoutePolicyStamentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FastpathRoutePolicyStatementEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to configure match or set statements in a route-map statement."
+    ::= { fastPathRoutePolicy  2 }
+
+fastpathRoutePolicyStatementEntry OBJECT-TYPE
+    SYNTAX      FastpathRoutePolicyStatementEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes match and set terms in a route-map statement if configured"
+    INDEX {fastpathRoutePolicyStmtName,fastpathRoutePolicyStmtSeqNum,fastpathRoutePolicyStmtAction}
+    ::= { fastpathRoutePolicyStamentTable 1 }
+
+FastpathRoutePolicyStatementEntry::= SEQUENCE {
+    fastpathRoutePolicyStmtName                       DisplayString,
+    fastpathRoutePolicyStmtSeqNum                     Unsigned32,
+    fastpathRoutePolicyStmtAction                     FastpathRoutePolicyAction,
+    fastpathRoutePolicyStmtMatchIpv4AclList           DisplayString,
+    fastpathRoutePolicyStmtMatchIpv4AclDelList        DisplayString,
+    fastpathRoutePolicyStmtMatchMacAclList            DisplayString,
+    fastpathRoutePolicyStmtMatchMacAclDelList         DisplayString,
+    fastpathRoutePolicyStmtMatchPacketLengthRangeMin  Unsigned32,
+    fastpathRoutePolicyStmtMatchPacketLengthRangeMax  Unsigned32,
+    fastpathRoutePolicyStmtSetIpNextHopList           DisplayString,
+    fastpathRoutePolicyStmtSetIpNextHopDelList        DisplayString,
+    fastpathRoutePolicyStmtSetDefaultIpNextHopList    DisplayString,
+    fastpathRoutePolicyStmtSetDefaultIpNextHopDelList DisplayString,
+    fastpathRoutePolicyStmtSetIpPrecedence            FastpathRoutePolicyStmtIpPrecedence,
+    fastpathRoutePolicyStmtSetIntfNull0               TruthValue   
+  }
+
+ fastpathRoutePolicyStmtName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE(1..31))
+     MAX-ACCESS  not-accessible 
+     STATUS  current
+     DESCRIPTION
+         "The name of a Route Map."
+  ::= { fastpathRoutePolicyStatementEntry 1 }
+
+  fastpathRoutePolicyStmtSeqNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible 
+    STATUS  current
+    DESCRIPTION
+        "Route Maps are linked together using sequence numbers.
+         All Route Maps with the same index and with different
+         sequence numbers are linked together and processed in
+         order of increasing sequence number."
+    ::= { fastpathRoutePolicyStatementEntry 2 }
+
+  fastpathRoutePolicyStmtAction OBJECT-TYPE
+    SYNTAX      FastpathRoutePolicyAction
+    MAX-ACCESS  not-accessible 
+    STATUS  current
+    DESCRIPTION
+        "The action associated with this route-map statement.
+         This can be either Permit/Deny  "
+    ::= { fastpathRoutePolicyStatementEntry 3 }
+
+  fastpathRoutePolicyStmtMatchIpv4AclList OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The string containing a list of IPv4 ACLs. This
+         list contains either IPV4 standard ACL/IPV4 extended
+         ACL/ named IPv4 ACL. In a single match statement,
+         up to a maximum of 16 IPV4 ACLs can be included. "
+    ::= { fastpathRoutePolicyStatementEntry 4 }
+
+  fastpathRoutePolicyStmtMatchIpv4AclDelList OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The string containing a list of IPv4 ACLs. This
+         list contains either IPV4 standard ACL/IPV4 extended
+         ACL/ named IPv4 ACL. In a single match statement,
+         up to a maximum of 16 IPV4 ACLs can be included.This
+         list is used to delete already configured match list
+         of IPv4 ACLs in route-map statement.Earlier this list
+         should have configured through MIB object 
+         fastpathRoutePolicyStmtMatchIpv4AclList  "
+    ::= { fastpathRoutePolicyStatementEntry 5 }
+
+  fastpathRoutePolicyStmtMatchMacAclList OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The string containing a list of MAC ACLs. This
+         list contains upto 16 MAC ACL names that can be
+         included in a match statement. "
+    ::= { fastpathRoutePolicyStatementEntry 6 }
+
+  fastpathRoutePolicyStmtMatchMacAclDelList OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The string containing a list of MAC ACLs. This
+         list contains upto 16 MAC ACL names that can be
+         included in a match statement. This MIB object is 
+         used to delete MAC ACL lists matched in a route-map
+         statement via fastpathRoutePolicyStmtMatchMacAclList. "
+    ::= { fastpathRoutePolicyStatementEntry 7 }
+
+  fastpathRoutePolicyStmtMatchPacketLengthRangeMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Minimum value in the packet length range in a match
+         length term. A value of zero is used to disable/remove
+         minimum length configuration. "
+    ::= { fastpathRoutePolicyStatementEntry 8}
+
+  fastpathRoutePolicyStmtMatchPacketLengthRangeMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Maximum value in the packet length range in a match
+         length term. A value of zero is used to disable/remove
+         maximum length configuration.  "
+    ::= { fastpathRoutePolicyStatementEntry 9 }
+
+  fastpathRoutePolicyStmtSetIpNextHopList OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The string containing a list of next-hop IP addresses.
+         Upto a maximum of 16 IP addresses can be specified "
+    ::= { fastpathRoutePolicyStatementEntry 10 }
+
+  fastpathRoutePolicyStmtSetIpNextHopDelList OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The string containing a list of next-hop IP addresses.
+         Upto a maximum of 16 IP addresses can be specified.This
+         MIB object is used to delete IP next-hop list configured
+         via fastpathRoutePolicyStmtSetIpNextHopList "
+    ::= { fastpathRoutePolicyStatementEntry 11 }
+
+  fastpathRoutePolicyStmtSetDefaultIpNextHopList OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The string containing a list of default next-hop IP addresses.
+         Upto a maximum of 16 IP addresses can be specified "
+    ::= { fastpathRoutePolicyStatementEntry 12 }
+
+  fastpathRoutePolicyStmtSetDefaultIpNextHopDelList OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The string containing a list of default next-hop IP addresses.
+         Upto a maximum of 16 IP addresses can be specified.This MIB
+         object is used to delete IP default next-hop list configured
+         via fastpathRoutePolicyStmtSetDefaultIpNextHopList "
+    ::= { fastpathRoutePolicyStatementEntry 13 }
+
+  fastpathRoutePolicyStmtSetIpPrecedence OBJECT-TYPE
+    SYNTAX      FastpathRoutePolicyStmtIpPrecedence
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "IP Precedence value to be remarked. This is specified through
+         set clause in route-map statement. In order to remove configured precedence value,
+         use invalid(8) option. "
+    ::= { fastpathRoutePolicyStatementEntry 14 } 
+  
+   fastpathRoutePolicyStmtSetIntfNull0 OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Specifying null0 as an interface in a route-map 
+                      statement" 
+   ::= { fastpathRoutePolicyStatementEntry 15 }
+
+--******************************************************************************
+--Applying Route Maps to interface
+
+--*******************************************************************************
+fastpathRoutePolicyIfTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF FastpathRoutePolicyIfEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of interfaces on which route-map is applied."
+         ::= { fastPathRoutePolicy  3 }
+
+fastpathRoutePolicyIfEntry OBJECT-TYPE
+         SYNTAX      FastpathRoutePolicyIfEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     ""
+         INDEX       { fastpathRoutePolicyIfIndex,fastpathRoutePolicyIfName}
+         ::= { fastpathRoutePolicyIfTable 1 }
+
+FastpathRoutePolicyIfEntry::= SEQUENCE {
+    fastpathRoutePolicyIfIndex      InterfaceIndex,
+    fastpathRoutePolicyIfName       DisplayString,
+    fastpathRoutePolicyIfRowStatus  RowStatus 
+  }
+
+  fastpathRoutePolicyIfIndex OBJECT-TYPE
+     SYNTAX     InterfaceIndex 
+     MAX-ACCESS  read-create
+     STATUS  current
+     DESCRIPTION
+         "Interface to which route-map needs to be applied or Interface from which route-map needs to be removed."
+  ::= { fastpathRoutePolicyIfEntry 1 }
+
+  fastpathRoutePolicyIfName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE(1..31))
+     MAX-ACCESS  read-create
+     STATUS  current
+     DESCRIPTION
+         "The name of a Route Map."
+  ::= { fastpathRoutePolicyIfEntry 2 }
+
+fastpathRoutePolicyIfRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Controls creation and deletion of Row Status entries."
+    ::= { fastpathRoutePolicyIfEntry 3 }
+END

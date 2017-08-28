@@ -1,0 +1,162 @@
+
+NBS-SYSLOG-SERVER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        OBJECT-TYPE, OBJECT-IDENTITY, MODULE-IDENTITY, Unsigned32
+            FROM SNMPv2-SMI
+        nbs
+            FROM NBS-MIB
+        InetAddress, InetAddressType
+            FROM INET-ADDRESS-MIB
+        ;
+
+nbsSyslogServerMib MODULE-IDENTITY
+        LAST-UPDATED "201209260000Z"  -- Sep 26, 2012
+        ORGANIZATION  "NBS"
+        CONTACT-INFO
+          "For technical support, please contact your service channel"
+
+        DESCRIPTION
+          "MIB for representing NBS remote syslog servers"
+
+        ::= { nbs 206 }
+
+
+-- *******************************************************************
+-- NBS-SYSLOG-SERVER-MIB local defines
+-- *******************************************************************
+
+nbsSyslogServerGrp OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "Meta MIB"
+        ::= { nbsSyslogServerMib 1 }
+
+-- *******************************************************************
+-- the  nbsSyslogServerTable
+-- *******************************************************************
+
+nbsSyslogServerTableSize  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of entries in nbsSyslogServerTable table."
+
+        ::= { nbsSyslogServerGrp 1 }
+
+nbsSyslogServerTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF NbsSyslogServerEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Syslog messages will be sent to
+                 every active server in the table."
+        ::= { nbsSyslogServerGrp 2 }
+
+nbsSyslogServerEntry OBJECT-TYPE
+        SYNTAX      NbsSyslogServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "A remote syslog server."
+
+        INDEX { nbsSyslogServerIndex }
+        ::= { nbsSyslogServerTable 1 }
+
+NbsSyslogServerEntry ::= SEQUENCE {
+          nbsSyslogServerIndex       INTEGER,
+          nbsSyslogServerStatus      INTEGER,
+          nbsSyslogServerAddressType InetAddressType,
+          nbsSyslogServerAddress     InetAddress,
+          nbsSyslogServerPort        Unsigned32,
+          nbsSyslogServerLevel       INTEGER
+        }
+
+nbsSyslogServerIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..5)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The index of the entry/row in the syslog table."
+
+        ::= { nbsSyslogServerEntry 1 }
+
+nbsSyslogServerStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    invalid(1),
+                    active (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "This object is used to get/set the validity of the information
+           contained by nbsSyslogServerEntry row.
+
+           Setting this object to the value invalid(1) has the effect of
+           deleting the corresponding nbsSyslogServerTable entry.
+           Deleting an entry has the effect of initializing it to default
+           values : IpAddr = 0.0.0.0, Port = 0 etc.
+
+           Setting this object to the value active(2) entry has the effect of
+           creating a new row in the nbsSyslogServerTable object, if an
+           entry with the same nbsSyslogServerIpAddr does not exist. If
+           such an entry exists, then a 'badValue' error will be returned.
+
+           The GET operations will receive a value of active(2) for existing
+           entries. An invalid(1) value indicates an entry that was deleted by
+           a previous SET operation."
+
+        DEFVAL { invalid }
+        ::= { nbsSyslogServerEntry 2 }
+
+nbsSyslogServerAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                "The address type of nbsSyslogServerAddress.
+                 Currently ipv4 and ipv6 are supported."
+
+        DEFVAL { ipv4 }
+        ::= { nbsSyslogServerEntry 3 }
+
+nbsSyslogServerAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "IP address of a remote server that should be sent syslog messages."
+
+        ::= { nbsSyslogServerEntry 4 }
+
+nbsSyslogServerPort OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "UDP port of the remote syslog server.
+           The default port is 514."
+
+        DEFVAL { 514 }
+        ::= { nbsSyslogServerEntry 5 }
+
+nbsSyslogServerLevel OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      deprecated1 (1),
+                      emerg       (2),
+                      alert       (3),
+                      crit        (4),
+                      error       (5),
+                      warning     (6),
+                      notice      (7),
+                      info        (8),
+                      debug       (9)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Indicates the level of messages that are sent to this syslog server."
+
+        DEFVAL { warning }
+        ::= { nbsSyslogServerEntry 6 }
+END

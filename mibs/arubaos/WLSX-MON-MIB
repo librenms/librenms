@@ -1,9 +1,10 @@
--- ArubaOS 3.2.0.0_16376
+--- ArubaOS 6.5.2.0_59123
 -- vim:set ts=4 sw=4: 
 WLSX-MON-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
-       TEXTUAL-CONVENTION,
+       TEXTUAL-CONVENTION FROM SNMPv2-TC 
+
        MODULE-IDENTITY,
        OBJECT-TYPE,
        snmpModules,
@@ -31,7 +32,12 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
 	   ArubaStationType,
 	   ArubaPhyType,
 	   ArubaAPMatchType,
-	   ArubaAPMatchMethod
+	   ArubaAPMatchMethod,
+	   ArubaHTMode,
+	   ArubaHTRate,
+	   ArubaMonEncryptionType,
+       ArubaMonEncryptionCipher,
+       ArubaMonAuthAlgorithm
 	   		FROM ARUBA-TC
 
        OBJECT-GROUP
@@ -40,7 +46,7 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
 			FROM ARUBA-MIB;
 
    wlsxMonMIB MODULE-IDENTITY 
-       LAST-UPDATED "0701172333Z"
+       LAST-UPDATED "0804160206Z"
        ORGANIZATION "Aruba Wireless Networks"
        CONTACT-INFO
             "Postal:    1322 Crossman Avenue
@@ -52,7 +58,7 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
 		   This MIB module defines MIB objects which provide
            information about the Monitored Access Points.
 		   "
-       REVISION        "0701172333Z"
+       REVISION        "0804160206Z"
        DESCRIPTION
            "The initial revision."
        ::= { wlsxEnterpriseMibModules 6 }
@@ -357,7 +363,7 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
         ::= { wlsxMonAPStatsEntry 23 }
 	
 -- This table breaks down the AP statistics observed into different
--- rate catagories.
+-- rate categories.
 
    wlsxMonAPRateStatsTable  OBJECT-TYPE 
 	  SYNTAX       SEQUENCE OF WlsxMonAPRateStatsEntry 
@@ -366,7 +372,7 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION 
 	  	"
 		This table contains all the monitored AP Packet and Byte Counts
-		but represented in terms of rate catagories.
+		but represented in terms of rate categories.
 		"
 	
       ::= { wlsxMonAccessPointStatsGroup 2 } 
@@ -382,30 +388,30 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
 	
      WlsxMonAPRateStatsEntry ::=
      SEQUENCE {
-		 monAPStatsTotPktsAt1Mbps			Counter32  ,
-		 monAPStatsTotBytesAt1Mbps			Counter32  ,
-		 monAPStatsTotPktsAt2Mbps			Counter32  ,
-		 monAPStatsTotBytesAt2Mbps			Counter32  ,
-		 monAPStatsTotPktsAt5Mbps			Counter32  ,
-		 monAPStatsTotBytesAt5Mbps			Counter32  ,
-		 monAPStatsTotPktsAt11Mbps			Counter32  ,
-		 monAPStatsTotBytesAt11Mbps		Counter32  ,
-		 monAPStatsTotPktsAt6Mbps			Counter32  ,
-		 monAPStatsTotBytesAt6Mbps			Counter32  ,
-		 monAPStatsTotPktsAt12Mbps			Counter32  ,
-		 monAPStatsTotBytesAt12Mbps		Counter32  ,
-		 monAPStatsTotPktsAt18Mbps			Counter32  ,
-		 monAPStatsTotBytesAt18Mbps		Counter32  ,
-		 monAPStatsTotPktsAt24Mbps			Counter32  ,
-		 monAPStatsTotBytesAt24Mbps		Counter32  ,
-		 monAPStatsTotPktsAt36Mbps			Counter32  ,
-		 monAPStatsTotBytesAt36Mbps		Counter32  ,
-		 monAPStatsTotPktsAt48Mbps			Counter32  ,
-		 monAPStatsTotBytesAt48Mbps		Counter32  ,
-		 monAPStatsTotPktsAt54Mbps			Counter32 ,
+		 monAPStatsTotPktsAt1Mbps			Counter32,
+		 monAPStatsTotBytesAt1Mbps			Counter32,
+		 monAPStatsTotPktsAt2Mbps			Counter32,
+		 monAPStatsTotBytesAt2Mbps			Counter32,
+		 monAPStatsTotPktsAt5Mbps			Counter32,
+		 monAPStatsTotBytesAt5Mbps			Counter32,
+		 monAPStatsTotPktsAt11Mbps			Counter32,
+		 monAPStatsTotBytesAt11Mbps		Counter32,
+		 monAPStatsTotPktsAt6Mbps			Counter32,
+		 monAPStatsTotBytesAt6Mbps			Counter32,
+		 monAPStatsTotPktsAt12Mbps			Counter32,
+		 monAPStatsTotBytesAt12Mbps		Counter32,
+		 monAPStatsTotPktsAt18Mbps			Counter32,
+		 monAPStatsTotBytesAt18Mbps		Counter32,
+		 monAPStatsTotPktsAt24Mbps			Counter32,
+		 monAPStatsTotBytesAt24Mbps		Counter32,
+		 monAPStatsTotPktsAt36Mbps			Counter32,
+		 monAPStatsTotBytesAt36Mbps		Counter32,
+		 monAPStatsTotPktsAt48Mbps			Counter32,
+		 monAPStatsTotBytesAt48Mbps		Counter32,
+		 monAPStatsTotPktsAt54Mbps			Counter32,
 		 monAPStatsTotBytesAt54Mbps		Counter32, 
-		 monAPStatsTotPktsAt9Mbps			Counter32 ,
-		 monAPStatsTotBytesAt9Mbps		Counter32 
+		 monAPStatsTotPktsAt9Mbps			Counter32,
+		 monAPStatsTotBytesAt9Mbps		Counter32
      }
 
      monAPStatsTotPktsAt1Mbps OBJECT-TYPE
@@ -976,6 +982,67 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
             "
         ::= { wlsxMonAPPktSizeStatsEntry 6 }
 
+-- This table breaks down the AP statistics observed into different
+-- HT rate categories.
+
+   wlsxMonAPHTRateStatsTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxMonAPHTRateStatsEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+		This table contains all the monitored AP Packet and Byte Counts
+		but represented in terms of HT rate categories.
+		"
+	
+      ::= { wlsxMonAccessPointStatsGroup 6 } 
+
+     wlsxMonAPHTRateStatsEntry OBJECT-TYPE 
+	  SYNTAX       WlsxMonAPHTRateStatsEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "Data rate based packet and byte count entry for a monitored AP"
+	  INDEX { monPhyAddress, monRadioNumber, monitoredApBSSID, monHTRate }
+      ::= { wlsxMonAPHTRateStatsTable 1 } 
+	
+     WlsxMonAPHTRateStatsEntry ::=
+     SEQUENCE {
+	 	 monHTRate					    ArubaHTRate,
+		 monAPStatsTotHTPkts			Counter32,
+		 monAPStatsTotHTBytes			Counter32
+	 }
+
+	monHTRate OBJECT-TYPE
+         SYNTAX       ArubaHTRate
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The rate at which the counters apply
+            "
+        ::= { wlsxMonAPHTRateStatsEntry 1 }
+
+	monAPStatsTotHTPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The total number of packets processed at the indicated rate 
+            "
+        ::= { wlsxMonAPHTRateStatsEntry 2 }
+
+	monAPStatsTotHTBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The total number of bytes processed at the indicated rate 
+            "
+        ::= { wlsxMonAPHTRateStatsEntry 3 }
+
 -- wlsxMonStationStatsGroup contains all the statistics observed by different 
 -- Air Monitors attached to this controller. 
 -- Station Statatistics are observed by the Air Monitor for that 
@@ -1324,7 +1391,7 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
         ::= { wlsxMonStationStatsEntry 27 }
 
 -- This table breaks down the Station statistics into different
--- rate catagories.
+-- rate categories.
 
    wlsxMonStaRateStatsTable  OBJECT-TYPE 
 	  SYNTAX       SEQUENCE OF WlsxMonStaRateStatsEntry 
@@ -1333,7 +1400,7 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION 
 	  	"
 		This table contains all the Packet and Byte Counts for a monitored station
-		represented in terms of rate catagories.
+		represented in terms of rate categories.
 		"
       ::= { wlsxMonStationStatsGroup 2} 
 
@@ -1348,56 +1415,54 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
 	
      WlsxMonStaRateStatsEntry ::=
      SEQUENCE {
-		 monStaTxPktsAt1Mbps			Counter32  ,
-		 monStaTxBytesAt1Mbps			Counter32  ,
-		 monStaTxPktsAt2Mbps			Counter32  ,
-		 monStaTxBytesAt2Mbps			Counter32  ,
-		 monStaTxPktsAt5Mbps			Counter32  ,
-		 monStaTxBytesAt5Mbps			Counter32  ,
-		 monStaTxPktsAt11Mbps			Counter32  ,
-		 monStaTxBytesAt11Mbps			Counter32  ,
-		 monStaTxPktsAt6Mbps			Counter32  ,
-		 monStaTxBytesAt6Mbps			Counter32  ,
-		 monStaTxPktsAt12Mbps			Counter32  ,
-		 monStaTxBytesAt12Mbps			Counter32  ,
-		 monStaTxPktsAt18Mbps			Counter32  ,
-		 monStaTxBytesAt18Mbps			Counter32  ,
-		 monStaTxPktsAt24Mbps			Counter32  ,
-		 monStaTxBytesAt24Mbps			Counter32  ,
-		 monStaTxPktsAt36Mbps			Counter32  ,
-		 monStaTxBytesAt36Mbps			Counter32  ,
-		 monStaTxPktsAt48Mbps			Counter32  ,
-		 monStaTxBytesAt48Mbps			Counter32  ,
-		 monStaTxPktsAt54Mbps			Counter32  ,
-		 monStaTxBytesAt54Mbps			Counter32  ,
-		 monStaRxPktsAt1Mbps			Counter32  ,
-		 monStaRxBytesAt1Mbps			Counter32  ,
-		 monStaRxPktsAt2Mbps			Counter32  ,
-		 monStaRxBytesAt2Mbps			Counter32  ,
-		 monStaRxPktsAt5Mbps			Counter32  ,
-		 monStaRxBytesAt5Mbps			Counter32  ,
-		 monStaRxPktsAt11Mbps			Counter32  ,
-		 monStaRxBytesAt11Mbps			Counter32  ,
-		 monStaRxPktsAt6Mbps			Counter32  ,
-		 monStaRxBytesAt6Mbps			Counter32  ,
-		 monStaRxPktsAt12Mbps			Counter32  ,
-		 monStaRxBytesAt12Mbps			Counter32  ,
-		 monStaRxPktsAt18Mbps			Counter32  ,
-		 monStaRxBytesAt18Mbps			Counter32  ,
-		 monStaRxPktsAt24Mbps			Counter32  ,
-		 monStaRxBytesAt24Mbps			Counter32  ,
-		 monStaRxPktsAt36Mbps			Counter32  ,
-		 monStaRxBytesAt36Mbps			Counter32  ,
-		 monStaRxPktsAt48Mbps			Counter32  ,
-		 monStaRxBytesAt48Mbps			Counter32  ,
-		 monStaRxPktsAt54Mbps			Counter32  ,
-		 monStaRxBytesAt54Mbps			Counter32  ,
-		 monStaTxPktsAt9Mbps			Counter32  ,
-		 monStaTxBytesAt9Mbps			Counter32  ,
-		 monStaRxPktsAt9Mbps			Counter32  ,
-		 monStaRxBytesAt9Mbps			Counter32 
-
-
+		 monStaTxPktsAt1Mbps				Counter32,
+		 monStaTxBytesAt1Mbps				Counter32,
+		 monStaTxPktsAt2Mbps				Counter32,
+		 monStaTxBytesAt2Mbps				Counter32,
+		 monStaTxPktsAt5Mbps				Counter32,
+		 monStaTxBytesAt5Mbps				Counter32,
+		 monStaTxPktsAt11Mbps				Counter32,
+		 monStaTxBytesAt11Mbps				Counter32,
+		 monStaTxPktsAt6Mbps				Counter32,
+		 monStaTxBytesAt6Mbps				Counter32,
+		 monStaTxPktsAt12Mbps				Counter32,
+		 monStaTxBytesAt12Mbps				Counter32,
+		 monStaTxPktsAt18Mbps				Counter32,
+		 monStaTxBytesAt18Mbps				Counter32,
+		 monStaTxPktsAt24Mbps				Counter32,
+		 monStaTxBytesAt24Mbps				Counter32,
+		 monStaTxPktsAt36Mbps				Counter32,
+		 monStaTxBytesAt36Mbps				Counter32,
+		 monStaTxPktsAt48Mbps				Counter32,
+		 monStaTxBytesAt48Mbps				Counter32,
+		 monStaTxPktsAt54Mbps				Counter32,
+		 monStaTxBytesAt54Mbps				Counter32,
+		 monStaRxPktsAt1Mbps				Counter32,
+		 monStaRxBytesAt1Mbps				Counter32,
+		 monStaRxPktsAt2Mbps				Counter32,
+		 monStaRxBytesAt2Mbps				Counter32,
+		 monStaRxPktsAt5Mbps				Counter32,
+		 monStaRxBytesAt5Mbps				Counter32,
+		 monStaRxPktsAt11Mbps				Counter32,
+		 monStaRxBytesAt11Mbps				Counter32,
+		 monStaRxPktsAt6Mbps				Counter32,
+		 monStaRxBytesAt6Mbps				Counter32,
+		 monStaRxPktsAt12Mbps				Counter32,
+		 monStaRxBytesAt12Mbps				Counter32,
+		 monStaRxPktsAt18Mbps				Counter32,
+		 monStaRxBytesAt18Mbps				Counter32,
+		 monStaRxPktsAt24Mbps				Counter32,
+		 monStaRxBytesAt24Mbps				Counter32,
+		 monStaRxPktsAt36Mbps				Counter32,
+		 monStaRxBytesAt36Mbps				Counter32,
+		 monStaRxPktsAt48Mbps				Counter32,
+		 monStaRxBytesAt48Mbps				Counter32,
+		 monStaRxPktsAt54Mbps				Counter32,
+		 monStaRxBytesAt54Mbps				Counter32,
+		 monStaTxPktsAt9Mbps				Counter32,
+		 monStaTxBytesAt9Mbps				Counter32,
+		 monStaRxPktsAt9Mbps				Counter32,
+		 monStaRxBytesAt9Mbps				Counter32
      }
 
      monStaTxPktsAt1Mbps OBJECT-TYPE
@@ -1825,7 +1890,7 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
          DESCRIPTION
             "
 			 This attribute indicates the number of Packets Received by the 
-			 station at 36Mpbs rate.
+			 station at 36Mbps rate.
             "
         ::= { wlsxMonStaRateStatsEntry 39 }
 
@@ -1836,7 +1901,7 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
          DESCRIPTION
             "
 			 This attribute indicates the number of Octets Received by the 
-			 station at 36Mpbs rate.
+			 station at 36Mbps rate.
             "
         ::= { wlsxMonStaRateStatsEntry 40 }
 
@@ -1929,6 +1994,7 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
 			 station at 9Mbps rate.
             "
         ::= { wlsxMonStaRateStatsEntry 48 }
+
 
 -- This table breaks down the Station statistics based on the
 -- Destination Address Types. 
@@ -2415,7 +2481,12 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
 		 monAPInfoStatus                INTEGER,
 		 monAPInfoConfidence			Integer32,
 		 monAPInfoMatchType				ArubaAPMatchType,
-		 monAPInfoMatchMethod			ArubaAPMatchMethod
+		 monAPInfoMatchMethod			ArubaAPMatchMethod,
+		 monAPInfoHTMode				ArubaHTMode,
+		 monAPInfoEncryptionType        ArubaMonEncryptionType,
+		 monAPInfoWPAUnicastCipher      ArubaMonEncryptionCipher,
+		 monAPInfoWPAAuthAlgorithm      ArubaMonAuthAlgorithm,
+		 monAPInfoIBSS                  TruthValue
    }
 
 	monAPInfoPhyType OBJECT-TYPE
@@ -2539,7 +2610,7 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			The method used to classify the AP as a rouge or suspected rogue AP.
+			The method used to classify the AP as a rogue or suspected rogue AP.
             "
         ::= { wlsxMonAPInfoEntry 12 }
 
@@ -2549,10 +2620,62 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
          STATUS       current
          DESCRIPTION
             "
-			Indicates how the match occured for rouge or suspect-rogue
+			Indicates how the match occurred for rogue or suspect-rogue
 			classification: an exact or +1 or -1 MAC match.
             "
         ::= { wlsxMonAPInfoEntry 13 }
+
+   monAPInfoHTMode OBJECT-TYPE
+         SYNTAX       ArubaHTMode
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates the HT mode of the monitored AP, if any.
+            "
+        ::= { wlsxMonAPInfoEntry 14 }
+
+   monAPInfoEncryptionType OBJECT-TYPE
+         SYNTAX       ArubaMonEncryptionType
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates the Encryption type of the monitored AP.
+            "
+        ::= { wlsxMonAPInfoEntry 15 }
+
+   monAPInfoWPAUnicastCipher OBJECT-TYPE
+         SYNTAX       ArubaMonEncryptionCipher
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates the WPA/WPA2 unicast cipher supported by the monitored AP.
+            If multiple ciphers are supported, the weakest will be indicated. 
+            "
+        ::= { wlsxMonAPInfoEntry 16 }
+
+   monAPInfoWPAAuthAlgorithm OBJECT-TYPE
+         SYNTAX       ArubaMonAuthAlgorithm
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates the WPA/WPA2 authentication algorithm supported by the monitored AP.
+            If multiple authentication algorithms are supported, the weakest will be indicated. 
+            "
+        ::= { wlsxMonAPInfoEntry 17 }
+
+   monAPInfoIBSS OBJECT-TYPE
+         SYNTAX       TruthValue
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates if the monitored AP is part of an adhoc network.
+            "
+        ::= { wlsxMonAPInfoEntry 18 }
 
    wlsxMonStationInfoTable  OBJECT-TYPE 
 	  SYNTAX       SEQUENCE OF MonStationInfoEntry 
@@ -2586,7 +2709,8 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
 		 monStaInfoInactivityTime		TimeTicks,
 		 monStaInfoSnrSignalPkts		Integer32,
 		 monStaInfoSnrSampleTime        Integer32,
-		 monStaInfoStatus               INTEGER
+		 monStaInfoStatus               INTEGER,
+		 monStaInfoHTMode				ArubaHTMode
    }
 
 	monStaInfoChannelNum OBJECT-TYPE
@@ -2701,6 +2825,16 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
             "
         ::= { wlsxMonStationInfoEntry 11 }
 
+   monStaInfoHTMode OBJECT-TYPE
+         SYNTAX       ArubaHTMode
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates the HT mode of the station, if any.
+            "
+        ::= { wlsxMonStationInfoEntry 12 }
+
 -- Event table contains the event ID and the number of events of that type
 -- raised so far
 
@@ -2749,5 +2883,76 @@ WLSX-MON-MIB DEFINITIONS ::= BEGIN
             "
         ::= { wlsxMonEventCountEntry 2 }
 
+-- This table breaks down the station statistics observed into different
+-- HT rate categories.
+
+   wlsxMonStationHTRateStatsTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxMonStationHTRateStatsEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+		This table contains all the monitored AP Packet and Byte Counts
+		but represented in terms of HT rate categories.
+		"
+	
+      ::= { wlsxMonStationStatsGroup 7 } 
+
+     wlsxMonStationHTRateStatsEntry OBJECT-TYPE 
+	  SYNTAX       WlsxMonStationHTRateStatsEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "HT Data rate based packet and byte count entry for a monitored station"
+	  INDEX { monPhyAddress, monRadioNumber, monitoredStaPhyAddress, monHTRate }
+      ::= { wlsxMonStationHTRateStatsTable 1 } 
+	
+     WlsxMonStationHTRateStatsEntry ::=
+     SEQUENCE {
+		 monStaTxHTPkts				Counter32,
+		 monStaTxHTBytes			Counter32,
+		 monStaRxHTPkts				Counter32,
+		 monStaRxHTBytes			Counter32
+	 }
+
+	 monStaTxHTPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The total number of packets transmitted at the indicated rate 
+            "
+        ::= { wlsxMonStationHTRateStatsEntry 1 }
+
+	 monStaTxHTBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The total number of bytes transmitted at the indicated rate 
+            "
+        ::= { wlsxMonStationHTRateStatsEntry 2 }
+
+	 monStaRxHTPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The total number of packets received at the indicated rate 
+            "
+        ::= { wlsxMonStationHTRateStatsEntry 3 }
+
+	 monStaRxHTBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The total number of bytes received at the indicated rate 
+            "
+        ::= { wlsxMonStationHTRateStatsEntry 4 }
 
 END

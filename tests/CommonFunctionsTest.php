@@ -25,6 +25,10 @@
 
 namespace LibreNMS\Tests;
 
+use LibreNMS\Util\IP;
+use LibreNMS\Util\IPv4;
+use LibreNMS\Util\IPv6;
+
 class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
 {
     public function testStrContains()
@@ -95,16 +99,6 @@ class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, set_null(2, 0, 2));
     }
 
-    public function testIsIp()
-    {
-        $this->assertTrue(is_ip('192.168.0.1'));
-        $this->assertTrue(is_ip('192.168.0.1', 'ipv4'));
-        $this->assertTrue(is_ip('2001:4860:4860::8888', 'ipv6'));
-        $this->assertFalse(is_ip('2001:4860:4860::8888', 'ipv4'));
-        $this->assertFalse(is_ip('192.168.0.1', 'ipv6'));
-        $this->assertFalse(is_ip('not_an_ip'));
-    }
-
     public function testDisplay()
     {
         $this->assertEquals('&lt;html&gt;string&lt;/html&gt;', display('<html>string</html>'));
@@ -118,5 +112,14 @@ class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('<b>Bold</b>', display('<b>Bold</b>', $tmp_config));
         $this->assertEquals('', display('<script>alert("test")</script>', $tmp_config));
+    }
+
+    public function testStringToClass()
+    {
+        $this->assertSame('LibreNMS\OS\Os', str_to_class('OS', 'LibreNMS\\OS\\'));
+        $this->assertSame('SpacesName', str_to_class('spaces name'));
+        $this->assertSame('DashName', str_to_class('dash-name'));
+        $this->assertSame('UnderscoreName', str_to_class('underscore_name'));
+        $this->assertSame('LibreNMS\\AllOfThemName', str_to_class('all OF-thEm_NaMe', 'LibreNMS\\'));
     }
 }

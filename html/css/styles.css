@@ -1590,6 +1590,12 @@ tr.search:nth-child(odd) {
   line-height: 32px;
 }
 
+@media (min-width: 992px) and (max-width: 1280px) {
+  .navbar-brand {
+    display: none !important;
+  }
+}
+
 .navbar-brand img {
   height: 100%;
   max-width: 170px;
@@ -2106,18 +2112,18 @@ label {
     background-color: #f5f5f5;
 }
 
-.device-table-header-status {
-    width: 100px;
-    text-align: center;
+.device-table-metrics span {
+  display: inline-block;
+  white-space: nowrap;
 }
 
-.device-table-header-vendor {
-    width: 100px;
-    text-align: center;
+.device-table-metrics>a {
+  color:#000;
+  text-decoration:none;
 }
 
 .device-table-header-actions {
-  min-width: 120px;
+  min-width: 110px;
   text-align: center;
 }
 

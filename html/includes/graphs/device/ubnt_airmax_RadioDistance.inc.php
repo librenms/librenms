@@ -5,7 +5,7 @@ require 'includes/graphs/common.inc.php';
 // $rrd_options .= " -l 0 -E ";
 $rrdfilename = rrd_name($device['hostname'], 'ubnt-airmax-mib');
 
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Metres                     Now    Min     Max\\n'";
     $rrd_options .= ' DEF:RadioDistance='.$rrdfilename.':RadioDistance:AVERAGE ';
     $rrd_options .= " LINE1:RadioDistance#CC0000:'Distance             ' ";

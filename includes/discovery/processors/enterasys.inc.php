@@ -14,11 +14,13 @@ if ($device['os'] == 'enterasys') {
     $divisor = 10;
     $oids = snmp_walk($device, 'etsysResourceCpuLoad5min', '-Osqn', 'ENTERASYS-RESOURCE-UTILIZATION-MIB');
 
+    $proc_count = 0;
     foreach (explode("\n", $oids) as $data) {
         list($oid, $usage) = explode(" ", $data);
-        $usage = $usage/10;
+        $usage = $usage/$divisor;
         if (is_numeric($usage)) {
-            discover_processor($valid['processor'], $device, $oid, '0', 'enterasys', $descr, $divisor, $usage);
+            discover_processor($valid['processor'], $device, $oid, $proc_count, 'enterasys', $descr, $divisor, $usage);
+            $proc_count++;
         }
     }
 }

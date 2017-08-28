@@ -108,7 +108,7 @@ foreach ($data as $str) {
 
 $fields = array();
 foreach ($mapping as $k => $v) {
-    $fields[$k] = isset($map[$v]) ? $map[$v] : (-1);
+    $fields[$k] = (isset($map[$v]) && $map[$v] >= 0) ? $map[$v] : 'U';
 }
 
 $rrd_name = array('app', $name, $app_id);
@@ -221,7 +221,7 @@ $rrd_def = new RrdDefinition();
 unset($fields);
 $fields = array();
 foreach ($mapping_status as $desc => $id) {
-    $fields[$desc] = isset($map[$id]) ? $map[$id] : (-1);
+    $fields[$desc] = (isset($map[$id]) && $map[$id] >= 0) ? $map[$id] : 'U';
     $rrd_def->addDataset($id, 'GAUGE', 0, 125000000000);
 }
 $status = true;

@@ -1,0 +1,394 @@
+BENU-IP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, OBJECT-IDENTITY, Counter64
+    FROM SNMPv2-SMI
+     DisplayString
+    FROM SNMPv2-TC
+     benuPlatform
+    FROM BENU-PLATFORM-MIB;
+
+
+bIPMIB MODULE-IDENTITY
+    LAST-UPDATED "201412170000Z"  -- 17 Dec 2014
+    ORGANIZATION "Benu Networks"
+    CONTACT-INFO "Benu Networks Inc,
+      300 Concord Road,
+      Billerca MA 01821
+      Email: support@benunets.com"
+    DESCRIPTION
+        "This MIB module defines IP utilization statistics.
+        Copyright (C) 2001, 2008 by Benu Networks, Inc.
+        All rights reserved."
+
+    REVISION "201412170000Z" -- 17 Dec 2014
+    DESCRIPTION "updated MIB file with change in bIPNotifObjects"
+    REVISION "201311280000Z" -- 28 Nov 2013
+    DESCRIPTION
+        "Marked bIPPortTxFramesWoErrExclPausFrame as deprecated
+        as it is not supported. Removed unnecessary IMPORTS and added missing.
+        Also, Changed SYNTAX of bIPPortIndex from Integer32 to Unsigned32."
+    REVISION "201305310000Z" -- 31 May 2013
+    DESCRIPTION "Initial Version"
+
+    ::= { benuPlatform 6 }
+
+-- declare top-level MIB objects for each component
+
+bIPMIBObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "MIB objects for IP utilization statistics are defined in this branch."
+   ::= { bIPMIB 1 }
+
+bIPNotifObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "Notifications of IP utilization statistics are defined in this branch."
+   ::= { bIPMIB 0 }
+
+
+-- IP utilization Performance table per each interface
+
+bIPPortTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF BIPPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table of IP utilization performance metrics
+         of each interface."
+    ::= { bIPMIBObjects 1 }
+
+bIPPortEntry OBJECT-TYPE
+    SYNTAX     BIPPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry containing IP utilization performance metrics
+         for each interface."
+  INDEX {
+      bIPPortIndex
+   }
+    ::= { bIPPortTable 1 }
+
+BIPPortEntry ::= SEQUENCE {
+        bIPPortIndex                                         Unsigned32,
+        bIPPortInterfaceName                                 DisplayString,
+        bIPPortTxBytesInFrameWoErr                           Counter64,
+        bIPPortTxFramesWoErrExclPausFrame                    Counter64,
+        bIPPortTxBcastFrames                                 Counter64,
+        bIPPortTxL2McastFrames                               Counter64,
+        bIPPortTxPausFrame                                   Counter64,
+        bIPPortTx64byteFrames                                Counter64,
+        bIPPortTx65to127byteFrames                           Counter64,
+        bIPPortTx128to255byteFrames                          Counter64,
+        bIPPortTx256to511byteFrames                          Counter64,
+        bIPPortTx512to1023byteFrames                         Counter64,
+        bIPPortTx1024to1518byteFrames                        Counter64,
+        bIPPortTx1519to1522byteFrames                        Counter64,
+        bIPPortTx1523toMaxByteFrames                         Counter64,
+        bIPPortTx17to63byteFrames                            Counter64,
+        bIPPortTxBadFcsFrames                                Counter64,
+        bIPPortRxBytesInFrameWoErr                           Counter64,
+        bIPPortRxBcastFrames                                 Counter64,
+        bIPPortRxL2McastFrames                               Counter64,
+        bIPPortRxPausFrames                                  Counter64,
+        bIPPortRx64byteFrames                                Counter64,
+        bIPPortRx65to127byteFrames                           Counter64,
+        bIPPortRx128to255byteFrames                          Counter64,
+        bIPPortRx256to511byteFrames                          Counter64,
+        bIPPortRx512to1023byteFrames                         Counter64,
+        bIPPortRx1024to1518byteFrames                        Counter64,
+        bIPPortRx1519to1522byteFrames                        Counter64,
+        bIPPortRx1523to10368byteFrames                       Counter64,
+        bIPPortRxShortFrames                                 Counter64,
+        bIPPortRxJabberFrames                                Counter64,
+        bIPPortRxOvrSzFrames                                 Counter64,
+        bIPPortRxLenFldErrFrames                             Counter64,
+        bIPPortRxSymbErrs                                    Counter64,
+        bIPPortRxIntrPktJunk                                 Counter64
+}
+
+bIPPortIndex  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Interface index of the port
+        This will be similar to ifIndex of IF-MIB."
+   ::= { bIPPortEntry 1 }
+
+bIPPortInterfaceName    OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Name of the interface associated with this port."
+   ::= { bIPPortEntry 2 }
+
+bIPPortTxBytesInFrameWoErr  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total bytes transmitted without errors."
+   ::= { bIPPortEntry 3 }
+
+bIPPortTxFramesWoErrExclPausFrame  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         deprecated
+   DESCRIPTION
+       "Total frames transmitted without errors excluding pause frames."
+   ::= { bIPPortEntry 4 }
+
+bIPPortTxBcastFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total broadcast frames transmitted."
+   ::= { bIPPortEntry 5 }
+
+bIPPortTxL2McastFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total Layer 2 multicast frames transmitted."
+   ::= { bIPPortEntry 6 }
+
+bIPPortTxPausFrame  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total broadcast frames transmitted."
+   ::= { bIPPortEntry 7 }
+
+bIPPortTx64byteFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total 64-byte frames transmitted."
+   ::= { bIPPortEntry 8 }
+
+bIPPortTx65to127byteFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total 65 to 127-byte frames transmitted."
+   ::= { bIPPortEntry 9 }
+
+bIPPortTx128to255byteFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total 128 to 255-byte frames transmitted."
+   ::= { bIPPortEntry 10 }
+
+bIPPortTx256to511byteFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total 256 to 511-byte frames transmitted."
+   ::= { bIPPortEntry 11 }
+
+bIPPortTx512to1023byteFrames  OBJECT-TYPE
+  SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total 512 to 1023-byte frames transmitted."
+   ::= { bIPPortEntry 12 }
+
+bIPPortTx1024to1518byteFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total 1024 to 1518-byte frames transmitted."
+   ::= { bIPPortEntry 13 }
+
+bIPPortTx1519to1522byteFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total 1519 to 1522-byte frames transmitted."
+   ::= { bIPPortEntry 14 }
+
+bIPPortTx1523toMaxByteFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total 1523 to Max-byte frames transmitted."
+   ::= { bIPPortEntry 15 }
+
+bIPPortTx17to63byteFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total 17 to 63-byte frames transmitted."
+   ::= { bIPPortEntry 16 }
+
+bIPPortTxBadFcsFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total bad FCS frames transmitted."
+   ::= { bIPPortEntry 17 }
+
+bIPPortRxBytesInFrameWoErr  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total bytes received without errors."
+   ::= { bIPPortEntry 18 }
+
+bIPPortRxBcastFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total broadcast frames received."
+   ::= { bIPPortEntry 19 }
+
+bIPPortRxL2McastFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total multicase frames received."
+   ::= { bIPPortEntry 20 }
+
+bIPPortRxPausFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total pause frames received."
+   ::= { bIPPortEntry 21 }
+
+bIPPortRx64byteFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total 64-byte frames received."
+   ::= { bIPPortEntry 22 }
+
+bIPPortRx65to127byteFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total 65 to 127-byte frames received."
+   ::= { bIPPortEntry 23 }
+
+bIPPortRx128to255byteFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total 128 to 255-byte frames received."
+   ::= { bIPPortEntry 24 }
+
+bIPPortRx256to511byteFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total 256 to 511-byte frames received."
+   ::= { bIPPortEntry 25 }
+
+bIPPortRx512to1023byteFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total 512 to 1023-byte frames received."
+   ::= { bIPPortEntry 26 }
+
+bIPPortRx1024to1518byteFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total 1024 to 1518-byte frames received."
+   ::= { bIPPortEntry 27 }
+
+bIPPortRx1519to1522byteFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total 1519 to 1522-byte frames received."
+   ::= { bIPPortEntry 28 }
+
+bIPPortRx1523to10368byteFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total 1523 to 10368-byte frames received."
+   ::= { bIPPortEntry 29 }
+
+bIPPortRxShortFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total short frames received."
+   ::= { bIPPortEntry 30 }
+
+bIPPortRxJabberFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total jabber frames received."
+   ::= { bIPPortEntry 31 }
+
+bIPPortRxOvrSzFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total oversize frames received."
+   ::= { bIPPortEntry 32 }
+
+bIPPortRxLenFldErrFrames  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total length field error frames received."
+   ::= { bIPPortEntry 33 }
+
+bIPPortRxSymbErrs  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total symbol error frames received."
+   ::= { bIPPortEntry 34 }
+
+bIPPortRxIntrPktJunk  OBJECT-TYPE
+   SYNTAX         Counter64
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Total inter packet junk error frames received."
+   ::= { bIPPortEntry 35 }
+
+END

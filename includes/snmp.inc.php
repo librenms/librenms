@@ -71,7 +71,7 @@ function get_mib_dir($device)
             }
         }
     }
-    
+
     return $extra;
 }
 
@@ -368,7 +368,7 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = null, $mibdir = null, 
     foreach (explode("\n", $data) as $entry) {
         list($oid,$value)  = explode('=', $entry, 2);
         $oid               = trim($oid);
-        $value             = trim($value);
+        $value             = trim($value, "\" \\\n\r");
         list($oid, $index) = explode('.', $oid, 2);
         if (!strstr($value, 'at this OID') && isset($oid) && isset($index)) {
             $array[$index][$oid] = $value;
@@ -516,6 +516,59 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = null, $mibdir =
 }//end snmpwalk_cache_triple_oid()
 
 
+/**
+ * Walk an snmp mib oid and group items together based on the index.
+ * This is intended to be used with a string based oid.
+ * Any extra index data past $depth will be added after the oidName to keep grouping consistent.
+ *
+ * Example:
+ * snmpwalk_group($device, 'ifTable', 'IF-MIB');
+ * [
+ *   1 => [ 'ifIndex' => '1', 'ifDescr' => 'lo', 'ifMtu' => '65536', ...],
+ *   2 => [ 'ifIndex' => '2', 'ifDescr' => 'enp0s25', 'ifMtu' => '1500', ...],
+ * ]
+ *
+ * @param array $device Target device
+ * @param string $oid The string based oid to walk
+ * @param string $mib The MIB to use
+ * @param int $depth how many indexes to group
+ * @param array $array optionally insert the entries into an existing array (helpful for grouping multiple walks)
+ * @return array grouped array of data
+ */
+function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array())
+{
+    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUsetX', $mib);
+    $data = rtrim(external_exec($cmd));
+
+    $line = strtok($data, "\n");
+    while ($line !== false) {
+        if (str_contains($line, 'at this OID')) {
+            $line = strtok("\n");
+            continue;
+        }
+
+        list($address, $value) = explode(' =', $line, 2);
+        preg_match_all('/([^[\]]+)/', $address, $parts);
+        $parts = $parts[1];
+        array_splice($parts, $depth, 0, array_shift($parts)); // move the oid name to the correct depth
+
+        $line = strtok("\n"); // get the next line and concatenate multi-line values
+        while ($line !== false && !str_contains($line, '=')) {
+            $value .= $line . PHP_EOL;
+            $line = strtok("\n");
+        }
+
+        // merge the parts into an array, creating keys if they don't exist
+        $tmp = &$array;
+        foreach ($parts as $part) {
+            $tmp = &$tmp[trim($part, '"')];
+        }
+        $tmp = trim($value, "\" \n\r"); // assign the value as the leaf
+    }
+
+    return $array;
+}
+
 function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0)
 {
     $cmd = gen_snmpwalk_cmd($device, $oid, ' -OQUs', $mib);
@@ -623,12 +676,12 @@ function snmp_gen_auth(&$device)
 
     if ($device['snmpver'] === 'v3') {
         $cmd = " -v3 -n '' -l '".$device['authlevel']."'";
-        
+
         //add context if exist context
         if (key_exists('context_name', $device)) {
             $cmd = " -v3 -n '".$device['context_name']."' -l '".$device['authlevel']."'";
         }
-        
+
         if ($device['authlevel'] === 'noAuthNoPriv') {
             // We have to provide a username anyway (see Net-SNMP doc)
             $username = !empty($device['authname']) ? $device['authname'] : 'root';

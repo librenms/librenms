@@ -121,3 +121,10 @@ $config['oxidized']['ignore_types'] = array('server');
 $config['oxidized']['ignore_os'] = array('linux');
 ```
 
+### Trigger configuration downloads
+
+Using the Oxidized REST API and [Syslog Hooks](/Extensions/Syslog/#external-hooks), Oxidized can trigger configuration downloads whenever a configuration change event has been logged. An example script to do this is included in `./scripts/syslog-notify-oxidized.php`. Oxidized can spawn a new worker thread and perform the download immediately with the following configuration
+
+```bash
+next_adds_job: true
+```

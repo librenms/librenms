@@ -1,0 +1,316 @@
+-- *****************************************************************
+-- NMS-SERIAL.MIB:  NMS SERIAL MIB file
+-- JAN 2011
+-- *****************************************************************
+--
+
+               NMS-SERIAL DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString, ifDescr
+			FROM RFC1213-MIB
+		    nmsMgmt
+			FROM NMS-SMI
+		    TruthValue
+		    	FROM SNMPv2-TC;
+          
+               nmsSerial         OBJECT IDENTIFIER ::= { nmsMgmt 193 }
+               
+               serialSession         OBJECT IDENTIFIER ::= { nmsSerial 1 }
+               
+               
+               
+               serialSessionTcpServerPort OBJECT-TYPE
+                   SYNTAX  INTEGER(5000..30000)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial session for TCP server port number."
+                   ::= { serialSession 1 } 
+               
+               serialSessionTcpClientPort OBJECT-TYPE
+                   SYNTAX  INTEGER(5000..30000)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial session for TCP client port number."
+                   ::= { serialSession 2 } 
+               
+               serialSessionTcpClientSvrAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial session for TCP client service address."
+                   ::= { serialSession 3 } 
+               
+               serialSessionTcpAction OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   apply(0),
+                                   noAction(1)
+                                  }
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial session for TCP server parameters setting action. 
+                           When set to 0,the value of SerialSessionTcpServerPort, 
+                           SerialSessionTcpClientPort and 
+                           SerialSessionTcpClientSvrAddr will be set together."
+                   ::= { serialSession 4 } 
+               
+               serialSessionUdpClientPort OBJECT-TYPE
+                   SYNTAX  INTEGER(5000..30000)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial session for UDP client port number."
+                   ::= { serialSession 5 } 
+               
+               serialSessionUdpClientSvrAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial session for UDP client service address."
+                   ::= { serialSession 6 } 
+               
+               serialSessionUdpAction OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   apply(0),
+                                   noAction(1)
+                                  }
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial session for TCP server parameters setting action. 
+                           When set to 0,the value of SerialSessionUdpClientPort and 
+                           SerialSessionUdpClientSvrAddr will be set together."
+                   ::= { serialSession 7 } 
+                   
+               serialSessionNoServer OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   apply(0),
+                                   noAction(1)
+                                  }
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Close serial session."
+                   ::= { serialSession 8 } 
+               
+               
+               nmsSerialPortTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSSerialPortEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of serial port table entries."
+                   ::= { nmsSerial 2 }
+
+               nmsSerialPortEntry OBJECT-TYPE
+                   SYNTAX NMSSerialPortEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            serial port table."
+                   INDEX {  }
+               ::= { nmsSerialPortTable 1 }
+
+               NMSSerialPortEntry ::=
+                   SEQUENCE {
+                       serialPortIndex
+                           INTEGER,    
+                       serialPortMode
+                       	   INTEGER,
+                       serialPortSpeed
+                           INTEGER,
+		       serialPortDataBits
+                           INTEGER,
+                       serialPortHaltBits
+                           INTEGER,
+                       serialPortParity
+                           INTEGER,
+		       serialPortFlowControl
+                           INTEGER,
+		       serialPortDataReadInterval
+                           INTEGER,
+                       serialPortReadTrigger
+                           INTEGER,
+                       serialPortKeepaliveMode
+                           INTEGER,
+		       serialPortLoopback
+                           TruthValue
+                }
+                
+               serialPortIndex OBJECT-TYPE
+                   SYNTAX  INTEGER(1..16)
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial interface id, unique in system."
+                   ::= { nmsSerialPortEntry 1 } 
+                   
+               serialPortMode OBJECT-TYPE
+                   SYNTAX  INTEGER{ rs232-full-duplex(1),
+                                    rs485-half-duplex(2),
+                                    rs485-full-duplex(3)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial interface mode."
+                   ::= { nmsSerialPortEntry 2 } 
+               
+               serialPortSpeed OBJECT-TYPE
+                   SYNTAX  INTEGER(9600..115200)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial interface speed."
+                   ::= { nmsSerialPortEntry 3 } 
+               
+               serialPortDataBits OBJECT-TYPE
+                   SYNTAX  INTEGER(5..8)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial interface data bits."
+                   ::= { nmsSerialPortEntry 4 } 
+               
+               serialPortHaltBits OBJECT-TYPE
+                   SYNTAX  INTEGER(1..2)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial interface halt bits."
+                   ::= { nmsSerialPortEntry 5 } 
+               
+               serialPortParity OBJECT-TYPE
+                   SYNTAX  INTEGER{none(0),
+                                   odd(1),
+                                   even(2),
+                                   mark(3),
+                                   space(4)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial interface parity."
+                   ::= { nmsSerialPortEntry 6 } 
+               
+               serialPortFlowControl OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   none(0),
+                                   software(1),
+                                   hardware(2)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial interface flow control."
+                   ::= { nmsSerialPortEntry 7 } 
+               
+               serialPortDataReadInterval OBJECT-TYPE
+                   SYNTAX  INTEGER(10..100000)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial interface data read interval. The unit is mili-second."
+                   ::= { nmsSerialPortEntry 8 } 
+               
+               serialPortReadTrigger OBJECT-TYPE
+                   SYNTAX  INTEGER(10..1000)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial interface read trigger."
+                   ::= { nmsSerialPortEntry 9 } 
+               
+               serialPortKeepaliveMode OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   disable(0),
+                                   enable(1)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial interface keepalive mode."
+                   ::= { nmsSerialPortEntry 10 } 
+               
+               serialPortLoopback OBJECT-TYPE
+                   SYNTAX  TruthValue
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial interface loopback test."
+                   ::= { nmsSerialPortEntry 11 } 
+               
+   
+
+               nmsSerialTrap         OBJECT IDENTIFIER ::= { nmsSerial 3 }
+
+        nmsSerialBreak OBJECT-TYPE
+            SYNTAX  INTEGER{
+                            break(0),
+                            recover(1)
+                           }
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "Serial port status change.0-break, 1-recover."
+            ::= { nmsSerialTrap 1 } 
+
+        nmsLoopbackDetectResult OBJECT-TYPE
+            SYNTAX  INTEGER{
+                            ok(0),
+                            error(1)
+                           }
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "Serial port status change reason."
+            ::= { nmsSerialTrap 2 } 
+            
+            
+-- Notifications            
+	nmsSerialBreakNotifications OBJECT IDENTIFIER
+                                ::= { nmsSerialTrap 3 }
+
+	nmsSerialBreakNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       serialPortIndex,
+                       nmsSerialBreak
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when serial interface status changes ."
+    		::= { nmsSerialBreakNotifications 1 }
+
+
+-- Notifications
+	nmsLoopbackDetectResultNotifications OBJECT IDENTIFIER
+                                ::= { nmsSerialTrap 4 }
+
+	nmsLoopbackDetectResultNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       serialPortIndex,
+                       nmsLoopbackDetectResult
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when serial port get a loopback result."
+    		::= { nmsLoopbackDetectResultNotifications 1 }
+
+
+                
+
+
+END
+                
+              
+	

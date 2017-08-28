@@ -29,13 +29,13 @@ if ($width > '500') {
 
 if ($device['hostname'] == $config['own_hostname']) {
     $filename = $config['smokeping']['dir'].$dest['hostname'].'.rrd';
-    if (!file_exists($filename)) {
+    if (!rrdtool_check_rrd_exists($filename)) {
         // Try with dots in hostname replaced by underscores
         $filename = $config['smokeping']['dir'].str_replace('.', '_', $dest['hostname']).'.rrd';
     }
 } else {
     $filename = $config['smokeping']['dir'].$dest['hostname'].'~'.$device['hostname'].'.rrd';
-    if (!file_exists($filename)) {
+    if (!rrdtool_check_rrd_exists($filename)) {
         // Try with dots in hostname replaced by underscores
         $filename = $config['smokeping']['dir'].str_replace('.', '_', $dest['hostname']).'~'.$device['hostname'].'.rrd';
     }

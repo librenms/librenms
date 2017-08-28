@@ -168,6 +168,15 @@ $app->group(
                 );
                 $app->get('/services', 'authToken', 'list_services')->name('list_services');
                 // End Service
+                $app->group(
+                    '/logs',
+                    function () use ($app) {
+                        $app->get('/eventlog(/:hostname)', 'authToken', 'list_logs')->name('list_eventlog');
+                        $app->get('/syslog(/:hostname)', 'authToken', 'list_logs')->name('list_syslog');
+                        $app->get('/alertlog(/:hostname)', 'authToken', 'list_logs')->name('list_alertlog');
+                        $app->get('/authlog(/:hostname)', 'authToken', 'list_logs')->name('list_authlog');
+                    }
+                );
             }
         );
         $app->get('/v0', 'authToken', 'show_endpoints');

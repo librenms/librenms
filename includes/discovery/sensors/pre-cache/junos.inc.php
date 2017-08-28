@@ -10,8 +10,8 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] === 'junos') {
-    $pre_cache['junos_oids'] = snmpwalk_cache_multi_oid($device, 'JnxDomCurrentEntry', array(), 'JUNIPER-DOM-MIB', 'junos');
-    $pre_cache['junos_multilane_oids'] = snmpwalk_cache_multi_oid($device, 'JnxDomCurrentLaneEntry', array(), 'JUNIPER-DOM-MIB', 'junos');
-    d_echo($pre_cache);
-}
+echo 'JnxDomCurrentEntry ';
+$pre_cache['junos_oids'] = snmpwalk_cache_multi_oid($device, 'JnxDomCurrentEntry', array(), 'JUNIPER-DOM-MIB', 'junos');
+
+echo 'JnxDomCurrentLaneEntry ';
+$pre_cache['junos_multilane_oids'] = snmpwalk_cache_multi_oid($device, 'JnxDomCurrentLaneEntry', array(), 'JUNIPER-DOM-MIB', 'junos');

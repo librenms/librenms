@@ -10,13 +10,20 @@ $versionModifier = trim(snmp_get($device, '1.3.6.1.4.1.6527.3.1.2.1.1.7.0', '-OQ
 
 $version = 'v' . $majorVersion . '.' . $minorVersion . '.' . $versionModifier;
 
-//SNMPv2-MIB::sysDescr.0 = STRING: TiMOS-B-9.0.R3 both/hops Nokia SAS-Sx 48Tp4SFP+ (PoE) 7210 Copyright (c) 2000-2017 Nokia.
-//All rights reserved. All use subject to applicable license agreements.
-//Built on Thu Jan 5 11:01:16 IST 2017 by builder in /home/builder/9.0B1/R3/panos/main
+$chassis_type_name_array = snmpwalk_cache_oid($device, 'tmnxChassisTypeName', $a = array(), 'TIMETRA-CHASSIS-MIB', 'aos', '-OQUs');
 
-$pattern = "~(cpm|both)\/(hops64|hops|x86_64) (?'hardware'.*)\sCopyright~";
-preg_match($pattern, $poll_device['sysDescr'], $matches);
+$hardware_array = reset($chassis_type_name_array);
+$hardware = end($hardware_array);
 
-if ($matches['hardware']) {
-    $hardware = $matches['hardware'];
+$props = snmpwalk_cache_numerical_oid($device, 'tmnxHwEntry.7', $props = array(), 'TIMETRA-CHASSIS-MIB', 'aos', '-OQne');
+foreach ($props as $p) {
+    foreach ($p as $k => $v) {
+        if ($v == 3) {
+            $shrapnel = explode('.', $k);
+            $unitID =  end($shrapnel);
+            $serial = snmp_get($device, "1.3.6.1.4.1.6527.3.1.2.2.1.8.1.5.1.$unitID", '-OQv', 'TIMETRA-CHASSIS-MIB', 'aos');
+            unset($shrapnel);
+        }
+    }
 }
+unset($props, $p, $k, $v, $unitID);

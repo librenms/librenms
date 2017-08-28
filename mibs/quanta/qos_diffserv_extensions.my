@@ -1,0 +1,1074 @@
+NETGEAR-QOS-DIFFSERV-EXTENSIONS-MIB DEFINITIONS ::= BEGIN
+
+-- Netgear Inc Quality of Service Diffserv Extensions MIB
+-- Copyright Netgear Inc (2001-2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+IMPORTS
+    IpAddress, Integer32, Unsigned32, MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY
+         FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, StorageType, MacAddress
+         FROM SNMPv2-TC
+    InterfaceIndex
+        FROM IF-MIB
+    InetPortNumber
+        FROM INET-ADDRESS-MIB
+    DisplayString
+        FROM RFC1213-MIB
+    IndexInteger, IndexIntegerNextFree, IfDirection, diffServMeterEntry
+        FROM DIFFSERV-MIB
+    lb6m        FROM QUANTA-LB6M-REF-MIB;
+    
+    fastPathQOSDiffServExtensions MODULE-IDENTITY
+        LAST-UPDATED "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          ""
+          
+        -- Revision history.      
+        REVISION
+          "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        DESCRIPTION
+          "Postal address updated."
+        REVISION
+          "200705230000Z" -- 23 May 2007 12:00:00 GMT
+        DESCRIPTION
+          "Netgear branding related changes."
+        REVISION 
+          "200406300000Z" -- 30 Jun 2003 12:00:00 GMT
+        DESCRIPTION
+          "DiffServ enhancements for NETGEAR Release 5.0."
+        REVISION 
+          "200311210000Z" -- 21 Nov 2003 12:00:00 GMT
+        DESCRIPTION
+          "Revisions made for new release."
+        REVISION 
+          "200111010933Z"
+        DESCRIPTION
+          "Initial version."
+    ::= { lb6m 6 } 
+
+IpPrecedence ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS   current
+    DESCRIPTION
+       "An IP Precedence value that may be used for marking a traffic stream."
+    SYNTAX   Integer32 (0..7)
+
+Cos ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS   current
+    DESCRIPTION
+       "The 802.1p header Class of Service field that may be used for
+       marking a traffic streams. Also known as the Ethernet frame 
+       priority."
+    SYNTAX   Integer32 (0..7)
+
+CosOrAny ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS   current
+    DESCRIPTION
+       "The 802.1p header Class of Service field that may be used for
+       discriminating among traffic streams. Also known as the Ethernet 
+       frame priority.  The value -1 is used to indicate a wild card 
+       i.e. any value."
+    SYNTAX   Integer32 (-1 | 0..7)
+    
+VlanIdOrAny ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS   current
+    DESCRIPTION
+       "The virtual LAN identifier (VLAN ID) that may be used to 
+       differentiate among traffic streams. The value -1 is
+       used to indicate a wild card i.e. any value."
+    SYNTAX   Integer32 (-1 | 1..4094)
+
+EtypeOrAny ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "x"
+    STATUS   current
+    DESCRIPTION
+       "Ethertype value field that may be used to differentiate among traffic  
+    streams.  The allowed value is 0x0600 to 0xFFFF, with a value of
+    0 used to indicate this object is not involved in the classifier
+    entry."
+    SYNTAX   Unsigned32 (0 | 1536..65535)   -- hex value 0x0600 to 0xFFFF
+    
+agentDiffServMIBObjects     OBJECT IDENTIFIER ::= { fastPathQOSDiffServExtensions 1 }
+agentDiffServMIBAdmin       OBJECT IDENTIFIER ::= { fastPathQOSDiffServExtensions 2 }
+
+--
+-- Classifiers
+--
+
+agentDiffServClassifier     OBJECT IDENTIFIER ::= { agentDiffServMIBObjects 1 }
+
+--
+-- Auxiliary Multi-field Classification Table
+--
+-- Classification based on different fields in the Layer 2 and IP headers.
+-- Functional Data Paths may share definitions by using the same entry.
+--
+-- NOTE: This table is an alternative to the IP Multi-field Classification
+--       Table.
+--
+
+agentDiffServAuxMfClfrNextFree  OBJECT-TYPE
+    SYNTAX       IndexIntegerNextFree
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "This object contains an unused value for
+        agentDiffServAuxMfClfrId , or a zero to indicate that none exist."
+    ::= { agentDiffServClassifier 1 }
+
+agentDiffServAuxMfClfrTable OBJECT-TYPE
+    SYNTAX   SEQUENCE OF AgentDiffServAuxMfClfrEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+       "A table of Auxiliary Multi-field Classifier filter entries that a
+       system may use to identify IP traffic."
+    ::= { agentDiffServClassifier 2 }
+
+agentDiffServAuxMfClfrEntry OBJECT-TYPE
+    SYNTAX       AgentDiffServAuxMfClfrEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+       "An IP Multi-field Classifier entry describes a single filter."
+    INDEX { agentDiffServAuxMfClfrId }
+    ::= { agentDiffServAuxMfClfrTable 1 }
+
+AgentDiffServAuxMfClfrEntry ::= SEQUENCE {
+    agentDiffServAuxMfClfrId            IndexInteger,
+    agentDiffServAuxMfClfrDstAddr       IpAddress,
+    agentDiffServAuxMfClfrDstMask       IpAddress,
+    agentDiffServAuxMfClfrSrcAddr       IpAddress,
+    agentDiffServAuxMfClfrSrcMask       IpAddress,
+    agentDiffServAuxMfClfrProtocol      Unsigned32,
+    agentDiffServAuxMfClfrDstL4PortMin  InetPortNumber,
+    agentDiffServAuxMfClfrDstL4PortMax  InetPortNumber,
+    agentDiffServAuxMfClfrSrcL4PortMin  InetPortNumber,
+    agentDiffServAuxMfClfrSrcL4PortMax  InetPortNumber,
+    agentDiffServAuxMfClfrCos           CosOrAny,
+    agentDiffServAuxMfClfrTos           OCTET STRING,
+    agentDiffServAuxMfClfrTosMask       OCTET STRING,
+    agentDiffServAuxMfClfrDstMac        MacAddress,
+    agentDiffServAuxMfClfrDstMacMask    MacAddress,
+    agentDiffServAuxMfClfrSrcMac        MacAddress,
+    agentDiffServAuxMfClfrSrcMacMask    MacAddress,
+    agentDiffServAuxMfClfrVlanId        VlanIdOrAny,
+    agentDiffServAuxMfClfrStorage       StorageType,
+    agentDiffServAuxMfClfrStatus        RowStatus,
+    agentDiffServAuxMfClfrCos2          CosOrAny,
+    agentDiffServAuxMfClfrEtypeVal1     EtypeOrAny,
+    agentDiffServAuxMfClfrEtypeVal2     EtypeOrAny,
+    agentDiffServAuxMfClfrVlanIdMin     Unsigned32,
+    agentDiffServAuxMfClfrVlanIdMax     Unsigned32,
+    agentDiffServAuxMfClfrVlanId2Min    Unsigned32,
+    agentDiffServAuxMfClfrVlanId2Max    Unsigned32
+}
+
+agentDiffServAuxMfClfrId OBJECT-TYPE
+    SYNTAX         IndexInteger
+    MAX-ACCESS     not-accessible
+    STATUS     current
+    DESCRIPTION
+       "An index that enumerates the Auxiliary MultiField Classifier filter
+       entries.  Managers obtain new values for row creation in this
+       table by reading agentDiffServAuxMfClfrNextFree."
+
+    ::= { agentDiffServAuxMfClfrEntry 1 }
+
+agentDiffServAuxMfClfrDstAddr OBJECT-TYPE
+    SYNTAX         IpAddress
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "The IP address to match against the packet's destination IP
+        address."
+    ::= { agentDiffServAuxMfClfrEntry 2 }
+    
+agentDiffServAuxMfClfrDstMask OBJECT-TYPE
+    SYNTAX         IpAddress
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "This mask value identifies the portion of agentDiffServAuxMfClfrDstAddr
+        that is compared against a packet. 
+    A non-contiguous mask value is permitted. A mask of 0 indicates a match
+    of any address."
+    DEFVAL         { '00000000'h }
+    ::= { agentDiffServAuxMfClfrEntry 3 }
+    
+
+agentDiffServAuxMfClfrSrcAddr OBJECT-TYPE
+    SYNTAX         IpAddress
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "The IP address to match against the packet's source IP
+        address."
+    ::= { agentDiffServAuxMfClfrEntry 4 }
+    
+agentDiffServAuxMfClfrSrcMask OBJECT-TYPE
+    SYNTAX         IpAddress
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "This mask value identifies the portion of agentDiffServAuxMfClfrSrcAddr
+        that is compared against a packet. 
+    A non-contiguous mask value is permitted. A mask of 0 indicates a match
+    of any address."
+    DEFVAL         { '00000000'h }
+    ::= { agentDiffServAuxMfClfrEntry 5 }
+    
+    
+agentDiffServAuxMfClfrProtocol OBJECT-TYPE
+    SYNTAX         Unsigned32 (0..255)
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "The IP protocol to match against the IPv4 protocol number. A value of 255 means
+       match all.  "
+    DEFVAL         { 255 }
+    ::= { agentDiffServAuxMfClfrEntry 6 }
+    
+    
+agentDiffServAuxMfClfrDstL4PortMin OBJECT-TYPE
+    SYNTAX         InetPortNumber
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "The minimum value that the layer-4 destination port number in the packet must have
+        in order to match this classifier entry.  "
+    DEFVAL         { 0 }
+    ::= { agentDiffServAuxMfClfrEntry 7 }
+    
+    
+agentDiffServAuxMfClfrDstL4PortMax OBJECT-TYPE
+    SYNTAX         InetPortNumber
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "The maximum value that the layer-4 destination port number in the 
+        packet must have in order to match this classifier entry. 
+    This value must be equal to or greater than the value specified
+       for this entry in agentDiffServAuxMfClfrDstL4PortMin.  "
+    DEFVAL         { 65535 }
+    ::= { agentDiffServAuxMfClfrEntry 8 }
+    
+    
+agentDiffServAuxMfClfrSrcL4PortMin OBJECT-TYPE
+    SYNTAX         InetPortNumber
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "The minimum value that the layer-4 source port number in the
+       packet must have in order to match this classifier entry.  "
+    DEFVAL         { 0 }
+    ::= { agentDiffServAuxMfClfrEntry 9 }
+    
+    
+agentDiffServAuxMfClfrSrcL4PortMax OBJECT-TYPE
+    SYNTAX         InetPortNumber
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "The maximum value that the layer-4 source port number in the
+        packet must have in order to match this classifier entry. This
+        value must be equal to or greater than the value specified for
+        this entry in diffServMultiFieldClfrSrcL4PortMin.  "
+    DEFVAL         { 65535 }
+    ::= { agentDiffServAuxMfClfrEntry 10 }
+    
+    
+agentDiffServAuxMfClfrCos OBJECT-TYPE
+    SYNTAX         CosOrAny
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "Three-bit user priority field in the 802.1Q tag header of a tagged 
+        Ethernet frame used as a class-match parameter.  For frames 
+        containing a double VLAN tag, this field is located in the first/outer
+        tag.  A value of -1 indicates that a specific COS value has not been
+    defined and thus all COS values are considered a match."
+    DEFVAL         { -1 }
+    ::= { agentDiffServAuxMfClfrEntry 11 }
+    
+    
+agentDiffServAuxMfClfrTos OBJECT-TYPE
+    SYNTAX         OCTET STRING (SIZE(1))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "IP TOS bits value, defined as all eight bits of the Service 
+        Type octet in the IPv4 header. There are multiple, overlapping, 
+    meanings of the TOS octet in use today:
+
+          Precedence (bits 7-5):  IP Precedence, values 0-7
+      DSCP (bits 7-2):  IP DiffServ Code Point, values 0-63
+      TOS (bits 7-0):  IP Type of Service, by bits, values 0-255
+
+    Each of these definitions can be produced using the appropriate
+    agentDiffServAuxMfClfrTosMask mask value. These definitions are 
+    mutually-exclusive, so only one is allowed for any given classifier
+    element."
+    ::= { agentDiffServAuxMfClfrEntry 12 }
+    
+    
+agentDiffServAuxMfClfrTosMask OBJECT-TYPE
+    SYNTAX         OCTET STRING (SIZE(1))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "IP TOS bits mask value. It identifies the portion of 
+        agentDiffServAuxMfClfrTos that is compared against a packet. 
+    A non-contiguous mask value is permitted. A mask of 0 indicates a match
+    of any TOS value.
+
+        There are multiple, overlapping meanings of the TOS octet in use today.
+    These are represented by the following specific mask values:
+
+          Precedence (bits 7-5):  224 (bit mask '11100000')
+      DSCP (bits 7-2):  252 (bit mask '11111100')
+      TOS (bits 7-0):  255 (bit mask '11111111')
+
+        Other mask values are also permitted."
+    ::= { agentDiffServAuxMfClfrEntry 13 }
+    
+    
+agentDiffServAuxMfClfrDstMac OBJECT-TYPE
+    SYNTAX         MacAddress
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "Destination MAC address. "
+    ::= { agentDiffServAuxMfClfrEntry 14 }
+    
+    
+agentDiffServAuxMfClfrDstMacMask OBJECT-TYPE
+    SYNTAX         MacAddress
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "Destination MAC address mask value. This mask value
+        identifies the portion of agentDiffServAuxMfClfrDstMac 
+    that is compared against a packet. 
+    A non-contiguous mask value is permitted. A mask of 0 indicates a match
+    of any MAC address."
+    ::= { agentDiffServAuxMfClfrEntry 15 }
+    
+    
+agentDiffServAuxMfClfrSrcMac OBJECT-TYPE
+    SYNTAX         MacAddress
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "Source MAC address. "
+    ::= { agentDiffServAuxMfClfrEntry 16 }
+    
+    
+agentDiffServAuxMfClfrSrcMacMask OBJECT-TYPE
+    SYNTAX         MacAddress
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "Source MAC address mask value. This mask value
+        identifies the portion of agentDiffServAuxMfClfrSrcMac 
+    that is compared against a packet. 
+    A non-contiguous mask value is permitted. A mask of 0 indicates a match
+    of any MAC address."
+    ::= { agentDiffServAuxMfClfrEntry 17 }
+    
+agentDiffServAuxMfClfrVlanId OBJECT-TYPE
+    SYNTAX         VlanIdOrAny
+    MAX-ACCESS     read-create
+    STATUS         obsolete
+    DESCRIPTION
+       "VLAN ID  value for the classifier. A value of -1 indicates that 
+       a specific VLAN ID value has not been defined and thus all 
+       VLAN ID values are considered a match."
+    DEFVAL         { -1 }
+    ::= { agentDiffServAuxMfClfrEntry 18 }
+
+
+agentDiffServAuxMfClfrStorage OBJECT-TYPE
+    SYNTAX       StorageType
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+       "The storage type for this conceptual row. "
+    DEFVAL { nonVolatile }
+    ::= { agentDiffServAuxMfClfrEntry 19 }
+
+agentDiffServAuxMfClfrStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of this conceptual row."
+    ::= { agentDiffServAuxMfClfrEntry 20 }
+  
+agentDiffServAuxMfClfrCos2 OBJECT-TYPE
+    SYNTAX         CosOrAny
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "Three-bit user priority field in the second/inner 802.1Q tag header of a 
+        double VLAN tagged Ethernet frame used as a class-match parameter 
+    A value of -1 indicates that a specific Secondary COS value has not been 
+    defined and thus all Secondary COS values are considered a match."
+    DEFVAL         { -1 }
+    ::= { agentDiffServAuxMfClfrEntry 21 }
+    
+agentDiffServAuxMfClfrEtypeVal1 OBJECT-TYPE
+    SYNTAX         EtypeOrAny
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "Ethertype value to be compared in order to match this classifier entry.
+    The allowed value for this object is 0x0600 to 0xFFFF, with a value of 
+    0 used to indicate this object is not involved in the classifier entry."
+    DEFVAL         { 0 }
+    ::= { agentDiffServAuxMfClfrEntry 22 }
+    
+    
+agentDiffServAuxMfClfrEtypeVal2 OBJECT-TYPE
+    SYNTAX         EtypeOrAny
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "A second Ethertype value to be compared in order to match  
+        this classifier entry.  This value is considered in addition
+    to the value specified by agentDiffServAuxMfClfrEtypeVal1 and serves
+    as a second possible match value (i.e. a packet can match either 
+    EtypeVal1 or EtypeVal2).  The allowed value for this object is
+    0x0600 to 0xFFFF, with a value of 0 used to indicate this object is
+    not involved in the classifier entry."
+    DEFVAL         { 0 }
+    ::= { agentDiffServAuxMfClfrEntry 23 }
+    
+    
+agentDiffServAuxMfClfrVlanIdMin OBJECT-TYPE
+    SYNTAX         Unsigned32 (1..4094)
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "The minimum value that the VLAN ID in the packet must have
+        in order to match this classifier entry.  This field is defined
+        as the 12-bit VLAN identifier in the 802.1Q tag header of a 
+    tagged Ethernet frame.  For a double VLAN tagged frame, this 
+    field is contained in the first/outer tag."
+    DEFVAL         { 1 }
+    ::= { agentDiffServAuxMfClfrEntry 24 }
+
+
+agentDiffServAuxMfClfrVlanIdMax OBJECT-TYPE
+    SYNTAX         Unsigned32 (1..4094)
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "The maximum value that the VLAN ID in the packet must have
+        in order to match this classifier entry.  This field is defined
+        as the 12-bit VLAN identifier in the 802.1Q tag header of a 
+    tagged Ethernet frame.  For a double VLAN tagged frame, this 
+    field is contained in the first/outer tag.  This value must be 
+    equal to or greater than the value specified for the entry in 
+        agentDiffServAuxMfClfrVlanIdMin."
+    DEFVAL         { 4094 }
+    ::= { agentDiffServAuxMfClfrEntry 25 }
+    
+
+agentDiffServAuxMfClfrVlanId2Min OBJECT-TYPE
+    SYNTAX         Unsigned32 (1..4094)
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "The minimum value that the Secondary VLAN ID in the packet must have
+        in order to match this classifier entry.  This field is defined
+        as the 12-bit VLAN identifier in the second/inner 802.1Q tag header 
+    of a double VLAN tagged Ethernet frame."
+    DEFVAL         { 1 }
+    ::= { agentDiffServAuxMfClfrEntry 26 }
+
+
+agentDiffServAuxMfClfrVlanId2Max OBJECT-TYPE
+    SYNTAX         Unsigned32 (1..4094)
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "The maximum value that the Secondary VLAN ID in the packet must have
+        in order to match this classifier entry.  This field is defined
+        as the 12-bit VLAN identifier in the second/inner 802.1Q tag header
+    of a double VLAN tagged Ethernet frame.  This value must be equal to or 
+    greater than the value specified for the entry in 
+        agentDiffServAuxMfClfrVlanId2Min."
+    DEFVAL         { 4094 }
+    ::= { agentDiffServAuxMfClfrEntry 27 }
+    
+    
+    
+--
+-- Actions
+--
+
+agentDiffServAction         OBJECT IDENTIFIER ::= { agentDiffServMIBObjects 2 }
+
+--
+-- IP Precedence Mark Action Table
+--
+-- Rows of this table are pointed to by diffServActionSpecific to
+-- provide detailed parameters specific to the IP Precedence Mark action.
+--
+-- A single entry in this table can be shared by multiple
+-- diffServActionTable entries.
+--
+-- NOTE: This table is referenced instead of the DSCP Mark Action Table
+--       when marking the IP Precedence of a packet rather than its DSCP.
+--
+
+agentDiffServIpPrecMarkActTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF AgentDiffServIpPrecMarkActEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "This table enumerates specific IP Precedence values used for marking
+       or remarking the Precedence field of IP packets. The entries of this 
+       table may be referenced by a diffServActionSpecific attribute."
+    ::= { agentDiffServAction 4 }
+
+agentDiffServIpPrecMarkActEntry OBJECT-TYPE
+    SYNTAX       AgentDiffServIpPrecMarkActEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "An entry in the IP Precedence mark action table that describes a
+       single IP Precedence value used for marking."
+    INDEX { agentDiffServIpPrecMarkActPrecedence }
+    ::= { agentDiffServIpPrecMarkActTable 1 }
+
+AgentDiffServIpPrecMarkActEntry ::= SEQUENCE  {
+    agentDiffServIpPrecMarkActPrecedence     IpPrecedence
+}
+
+agentDiffServIpPrecMarkActPrecedence OBJECT-TYPE
+    SYNTAX       IpPrecedence
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "The IP Precedence that this Action will store into the Precedence
+       field of the IP packet. It is quite possible that the only packets 
+       subject to this Action are already marked with this IP Precedence. 
+       Note also that Differentiated Services processing may result in a
+       packet being marked on both ingress to a network and on egress from 
+       it, and that ingress and egress can occur in the same router."
+    ::= { agentDiffServIpPrecMarkActEntry 1 }
+
+
+--
+-- COS Mark Action Table
+--
+-- Rows of this table are pointed to by diffServActionSpecific to
+-- provide detailed parameters specific to the COS Mark action.
+--
+-- A single entry in this table can be shared by multiple
+-- diffServActionTable entries.
+--
+-- NOTE: This table is referenced when marking the Class of Service 
+--       priority bits as defined in the 802.1Q tag header of a
+--       tagged Ethernet frame.  For frames containing a double VLAN
+--       tag, this field is located in the first/outer tag.
+--
+
+agentDiffServCosMarkActTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF AgentDiffServCosMarkActEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "This table enumerates specific Class of Service values used for marking
+       or remarking the priority bits in the 802.1p header. The entries of this 
+       table may be referenced by a diffServActionSpecific attribute."
+    ::= { agentDiffServAction 2 }
+
+agentDiffServCosMarkActEntry OBJECT-TYPE
+    SYNTAX       AgentDiffServCosMarkActEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "An entry in the COS mark action table that describes a
+       single Class of Service value used for marking."
+    INDEX { agentDiffServCosMarkActCos }
+    ::= { agentDiffServCosMarkActTable 1 }
+
+AgentDiffServCosMarkActEntry ::= SEQUENCE  {
+    agentDiffServCosMarkActCos     Cos
+}
+
+agentDiffServCosMarkActCos OBJECT-TYPE
+    SYNTAX       Cos
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "The Class of Service value that this Action will store into the
+       priority bits of the 802.1p header. It is quite possible that the 
+       only packets subject to this Action are already marked with this COS 
+       value."
+    ::= { agentDiffServCosMarkActEntry 1 }
+
+
+--
+-- Secondary COS (COS2) Mark Action Table
+--
+-- Rows of this table are pointed to by diffServActionSpecific to
+-- provide detailed parameters specific to the Secondary COS Mark action.
+--
+-- A single entry in this table can be shared by multiple
+-- diffServActionTable entries.
+--
+-- NOTE: This table is referenced when marking the Secondary Class of Service 
+--       priority bits as defined in the second/inner 802.1Q tag header of a 
+--       double VLAN tagged Ethernet packet.
+--
+
+agentDiffServCos2MarkActTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF AgentDiffServCos2MarkActEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "This table enumerates specific Secondary Class of Service values used for marking
+       or remarking the priority bits in the second/inner 802.1Q tag header of a double VLAN
+       tagged Ethernet packet.  The entries of this table may be referenced by 
+       a diffServActionSpecific attribute."
+    ::= { agentDiffServAction 5 }
+
+agentDiffServCos2MarkActEntry OBJECT-TYPE
+    SYNTAX       AgentDiffServCos2MarkActEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "An entry in the Secondary COS mark action table that describes a
+       single Class of Service value used for marking."
+    INDEX { agentDiffServCos2MarkActCos }
+    ::= { agentDiffServCos2MarkActTable 1 }
+
+AgentDiffServCos2MarkActEntry ::= SEQUENCE  {
+    agentDiffServCos2MarkActCos     Cos
+}
+
+agentDiffServCos2MarkActCos OBJECT-TYPE
+    SYNTAX       Cos
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "The Secondary Class of Service value that this Action will store into the
+       priority bits of the second/inner 802.1p tag header. It is quite possible
+       that the only packets subject to this Action are already marked with this
+       COS value."
+    ::= { agentDiffServCos2MarkActEntry 1 }
+
+
+--
+-- Assign Queue Table
+--
+-- Rows of this table are pointed to by diffServActionSpecific to
+-- provide detailed parameters specific to the Assign Queue action.
+--
+
+agentDiffServAssignQueueNextFree OBJECT-TYPE
+    SYNTAX       IndexIntegerNextFree
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "This object contains an unused value for agentDiffServAssignIndex, or a
+        zero to indicate that none exist."
+    ::= { agentDiffServAction 6 }
+
+agentDiffServAssignQueueTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF AgentDiffServAssignQueueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "A table used for assigning a stream of Differentiated Services
+        traffic to a specific quality of service (QoS) queue. 
+        The traffic stream is identified by the upstream Functional 
+        Data Path Element(s), i.e. by the object(s) that point
+        to each entry in this table.  This may include all traffic on an
+        interface or just a portion thereof."
+    ::= { agentDiffServAction 7 }
+
+agentDiffServAssignQueueEntry OBJECT-TYPE
+    SYNTAX       AgentDiffServAssignQueueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "An entry in the assign queue table describes a specific (egress)
+        QoS queue identifier for a traffic stream."
+    INDEX { agentDiffServAssignQueueIndex }
+    ::= { agentDiffServAssignQueueTable 1 }
+
+AgentDiffServAssignQueueEntry ::= SEQUENCE  {
+    agentDiffServAssignQueueIndex             IndexInteger,
+    agentDiffServAssignQueueQnum              Unsigned32,
+    agentDiffServAssignQueueStorage           StorageType,
+    agentDiffServAssignQueueStatus            RowStatus
+}
+
+agentDiffServAssignQueueIndex OBJECT-TYPE
+    SYNTAX       IndexInteger
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "An index that enumerates the Assign Queue entries.  Managers obtain
+        new values for row creation in this table by reading
+        agentDiffServAssignQueueNextFree."
+    ::= { agentDiffServAssignQueueEntry 1 }
+
+agentDiffServAssignQueueQnum OBJECT-TYPE
+    SYNTAX       Unsigned32 (0..7)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+       "The queue identifier value.  This value indicates the QoS queue
+        number to which the traffic stream for this data path is directed 
+    for egress from the device."
+    ::= { agentDiffServAssignQueueEntry 2 }
+
+agentDiffServAssignQueueStorage OBJECT-TYPE
+    SYNTAX       StorageType
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+       "The storage type for this conceptual row.  Conceptual rows
+        having the value 'permanent' need not allow write-access to any
+        columnar objects in the row."
+    DEFVAL { nonVolatile }
+    ::= { agentDiffServAssignQueueEntry 3 }
+
+agentDiffServAssignQueueStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+
+    STATUS       current
+    DESCRIPTION
+       "The status of this conceptual row. All writable objects in this
+        row may be modified at any time. Setting this variable to
+        'destroy' when the MIB contains one or more RowPointers pointing
+        to it results in destruction being delayed until the row is no
+        longer used."
+    ::= { agentDiffServAssignQueueEntry 4 }
+
+
+--
+-- Redirect Table
+--
+-- Rows of this table are pointed to by diffServActionSpecific to
+-- provide detailed parameters specific to the Redirect action.
+--
+
+agentDiffServRedirectNextFree OBJECT-TYPE
+    SYNTAX       IndexIntegerNextFree
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "This object contains an unused value for agentDiffServRedirectId, or a
+        zero to indicate that none exist."
+    ::= { agentDiffServAction 8 }
+
+agentDiffServRedirectTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF AgentDiffServRedirectEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "A table used for redirecting a stream of Differentiated Services
+        traffic to a specific egress interface, bypassing any normal
+        device forwarding decision.  The traffic stream is identified by 
+    the upstream Functional Data Path Element(s), i.e. by the object(s) 
+    that point to each entry in this table.  This may include all traffic
+    on an interface or just a portion thereof."
+    ::= { agentDiffServAction 9 }
+
+agentDiffServRedirectEntry OBJECT-TYPE
+    SYNTAX       AgentDiffServRedirectEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "An entry in the redirect table describes a specific external
+        interface number used as the egress point of a traffic stream."
+    INDEX { agentDiffServRedirectId }
+    ::= { agentDiffServRedirectTable 1 }
+
+AgentDiffServRedirectEntry ::= SEQUENCE  {
+    agentDiffServRedirectId                IndexInteger,
+    agentDiffServRedirectIntf              InterfaceIndex,
+    agentDiffServRedirectStorage           StorageType,
+    agentDiffServRedirectStatus            RowStatus
+}
+
+agentDiffServRedirectId OBJECT-TYPE
+    SYNTAX       IndexInteger
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "An index that enumerates the Redirect entries.  Managers obtain new
+       values for row creation in this table by reading
+       agentDiffServRedirectNextFree."
+    ::= { agentDiffServRedirectEntry 1 }
+
+agentDiffServRedirectIntf OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+       "The external interface number identifier value.  This value indicates 
+        the egress interface to which the traffic stream for this data path
+        is directed.  Normal traffic forwarding decisions are bypassed."
+    ::= { agentDiffServRedirectEntry 2 }
+
+agentDiffServRedirectStorage OBJECT-TYPE
+    SYNTAX       StorageType
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+       "The storage type for this conceptual row.  Conceptual rows
+       having the value 'permanent' need not allow write-access to any
+       columnar objects in the row."
+    DEFVAL { nonVolatile }
+    ::= { agentDiffServRedirectEntry 3 }
+
+agentDiffServRedirectStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+
+    STATUS       current
+    DESCRIPTION
+       "The status of this conceptual row. All writable objects in this
+       row may be modified at any time. Setting this variable to
+       'destroy' when the MIB contains one or more RowPointers pointing
+       to it results in destruction being delayed until the row is no
+       longer used."
+    ::= { agentDiffServRedirectEntry 4 }
+
+
+--
+-- Mirror Table
+--
+-- Rows of this table are pointed to by diffServActionSpecific to
+-- provide detailed parameters specific to the Mirror action.
+--
+
+agentDiffServMirrorNextFree OBJECT-TYPE
+    SYNTAX       IndexIntegerNextFree
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "This object contains an unused value for agentDiffServMirrorId, or a
+        zero to indicate that none exist."
+    ::= { agentDiffServAction 10 }
+
+agentDiffServMirrorTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF AgentDiffServMirrorEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "A table used for mirroring a stream of Differentiated Services
+        traffic to a specific egress interface, in addition to any normal
+        device forwarding decision.  The traffic stream is identified by 
+    the upstream Functional Data Path Element(s), i.e. by the object(s) 
+    that point to each entry in this table.  This may include all traffic
+    on an interface or just a portion thereof."
+    ::= { agentDiffServAction 11 }
+
+agentDiffServMirrorEntry OBJECT-TYPE
+    SYNTAX       AgentDiffServMirrorEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "An entry in the mirror table describes a specific external
+        interface number used as the egress point of a copied traffic
+    stream."
+    INDEX { agentDiffServMirrorId }
+    ::= { agentDiffServMirrorTable 1 }
+
+AgentDiffServMirrorEntry ::= SEQUENCE  {
+    agentDiffServMirrorId                  IndexInteger,
+    agentDiffServMirrorIntf                InterfaceIndex,
+    agentDiffServMirrorStorage             StorageType,
+    agentDiffServMirrorStatus              RowStatus
+}
+
+agentDiffServMirrorId OBJECT-TYPE
+    SYNTAX       IndexInteger
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "An index that enumerates the Mirror entries.  Managers obtain new
+       values for row creation in this table by reading
+       agentDiffServMirrorNextFree."
+    ::= { agentDiffServMirrorEntry 1 }
+
+agentDiffServMirrorIntf OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+       "The external interface number identifier value.  This value indicates 
+        the egress interface to which the traffic stream for this data path
+        is copied.  Normal traffic forwarding decisions are still performed
+    on the traffic stream."
+    ::= { agentDiffServMirrorEntry 2 }
+
+agentDiffServMirrorStorage OBJECT-TYPE
+    SYNTAX       StorageType
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+       "The storage type for this conceptual row.  Conceptual rows
+       having the value 'permanent' need not allow write-access to any
+       columnar objects in the row."
+    DEFVAL { nonVolatile }
+    ::= { agentDiffServMirrorEntry 3 }
+
+agentDiffServMirrorStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+
+    STATUS       current
+    DESCRIPTION
+       "The status of this conceptual row. All writable objects in this
+       row may be modified at any time. Setting this variable to
+       'destroy' when the MIB contains one or more RowPointers pointing
+       to it results in destruction being delayed until the row is no
+       longer used."
+    ::= { agentDiffServMirrorEntry 4 }
+
+
+
+--
+-- Meter
+--
+
+agentDiffServMeter          OBJECT IDENTIFIER ::= { agentDiffServMIBObjects 3 }
+
+--
+-- Color Aware Table
+--
+-- Augments the diffServMeterTable to provide additional information regarding
+-- the policing color mode and its associated color-aware parameters.  Each 
+-- row in this table is indexed using a meter Id corresponding to its
+-- associated Meter Table row plus a local table row index.
+--
+
+agentDiffServColorAwareTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF AgentDiffServColorAwareEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "A table used for augmenting the Differentiated Services
+        meter information with information describing the packet coloration
+        characteristics for a color-aware mode of policing.  The 
+    diffServMeterId is used as the index to this table,
+    which logically extends the Meter table row with the columnar
+    objects defined in this Color Aware table row."
+    ::= { agentDiffServMeter 1 }
+
+agentDiffServColorAwareEntry OBJECT-TYPE
+    SYNTAX       AgentDiffServColorAwareEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "An entry in the color aware table describes a single color conformance 
+        level of a meter."
+    AUGMENTS { diffServMeterEntry }
+    ::= { agentDiffServColorAwareTable 1 }
+
+AgentDiffServColorAwareEntry ::= SEQUENCE  {
+    agentDiffServColorAwareLevel             INTEGER,
+    agentDiffServColorAwareMode              INTEGER,
+    agentDiffServColorAwareValue             Unsigned32
+}
+
+agentDiffServColorAwareLevel OBJECT-TYPE
+    SYNTAX       INTEGER {
+                  conform(1),
+          exceed(2),
+                  unused(3)
+         }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+       "The metering conformance level of this table entry.  A policing meter 
+        represents either a conforming or an exceeding level of traffic
+        in the traffic stream for this data path. The color characteristics
+    used by the meter are relevant to this conformance level.  This 
+    object is set to unused(3) when the meter is not being used for
+    policing."
+    DEFVAL { unused }
+    ::= { agentDiffServColorAwareEntry 1 }
+
+agentDiffServColorAwareMode OBJECT-TYPE
+    SYNTAX       INTEGER {
+                  blind(1),
+          awarecos(2),
+          awarecos2(3),
+          awareipdscp(4),
+          awareipprec(5),
+          awareunused(6)
+         }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+       "The color mode indicator for the meter.  When set to blind(1),  
+        metering is performed in a color-blind manner such that any 
+        packet markings are ignored by the meter.  The other values
+    listed for this object indicate the packet field used for determining
+    its pre-existing color marking.  In color-aware mode, the 
+    current color of a packet (e.g. green, yellow, red) influences
+    the metering outcome.  The object value awareunused(6) is 
+    special in that it denotes that the specific field attributes
+    are not specified for the meter even though a color aware scheme
+    is in use for policing.  This object always returns blind(1) when the 
+    agentDiffServColorAwareLevel is set to unused(3)."
+    DEFVAL { blind }
+    ::= { agentDiffServColorAwareEntry 2 }
+
+agentDiffServColorAwareValue OBJECT-TYPE
+    SYNTAX       Unsigned32 (0..63)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+       "The value of the color aware table entry.  This value is used 
+        to compare the field indicated in agentDiffServColorAwareMode against
+        packets in a traffic stream along the data path supplying the meter
+    for a given conformance level.  This object always returns 0 when the
+    agentDiffServColorAwareMode is set to blind(1) or awareunused(6)."
+    DEFVAL { 0 }
+    ::= { agentDiffServColorAwareEntry 3 }
+
+
+
+--
+-- OIDs for diffServTBParamType standard MIB definitions: additional values
+--
+
+agentDiffServTBMeters  OBJECT IDENTIFIER ::= { agentDiffServMIBAdmin 1 }
+
+agentDiffServTBParamSimpleTokenBucketAware OBJECT-IDENTITY
+    STATUS       current
+    DESCRIPTION
+       "Two Parameter Token Bucket Meter as described in the Informal
+       Differentiated Services Model section 5.2.3, but using a 
+       color-aware mode of operation."
+    ::= { agentDiffServTBMeters 1 }
+    
+END

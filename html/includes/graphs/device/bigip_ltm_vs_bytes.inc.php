@@ -29,7 +29,7 @@ if (isset($components[$vars['id']])) {
     $rrd_options .= " COMMENT:'Bits           Now      Ave      Max\\n'";
 
     $rrd_filename = rrd_name($device['hostname'], array('f5-ltm-vs', $label, $hash));
-    if (file_exists($rrd_filename)) {
+    if (rrdtool_check_rrd_exists($rrd_filename)) {
         $rrd_options .= " DEF:INBYTES=" . $rrd_filename . ":bytesin:AVERAGE ";
         $rrd_options .= " CDEF:INBITS=INBYTES,8,* ";
         $rrd_options .= " LINE1.25:INBITS#330033:'Bits In '";

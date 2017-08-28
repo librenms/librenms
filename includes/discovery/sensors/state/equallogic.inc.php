@@ -141,3 +141,87 @@ eqlMemberHealthDetailsPowerSupplyCurrentState
         }//end if
     }//end foreach
 }//end if empty oids
+
+
+$oids_disks = snmp_walk($device, 'eqlDiskSerialNumber', '-OQn', 'EQLDISK-MIB', 'equallogic');
+
+d_echo('Disk Serials oids:' . PHP_EOL);
+d_echo($oids_disks."\n");
+
+$disks_base_oid         = '.1.3.6.1.4.1.12740.3.1.1.1.8.1.'; // eqlDiskStatus
+
+if (!empty($oids_disks)) {
+    $disks_state_name = 'eqlDiskStatus';
+    $disks_state_index_id = create_state_index($disks_state_name);
+
+    if ($disks_state_index_id) {
+        $disk_states = array(
+            array($disks_state_index_id,'on-line',1,1,0),
+            array($disks_state_index_id,'spare',1,2,0),
+            array($disks_state_index_id,'failed',1,3,2),
+            array($disks_state_index_id,'off-line',1,4,1),
+            array($disks_state_index_id,'alt-sig',1,5,1),
+            array($disks_state_index_id,'too-small',1,6,2),
+            array($disks_state_index_id,'history-of-failures',1,7,1),
+            array($disks_state_index_id,'unsupported-version',1,8,1),
+        );
+        foreach ($disk_states as $value) {
+            $insert = array(
+                'state_index_id' => $value[0],
+                'state_descr' => $value[1],
+                'state_draw_graph' => $value[2],
+                'state_value' => $value[3],
+                'state_generic_value' => $value[4]
+            );
+            dbInsert($insert, 'state_translations');
+        }
+    }
+
+    foreach (explode("\n", $oids_disks) as $data) {
+        $data = trim($data);
+        if (!empty($data)) {
+            list($oid,$descr) = explode(' = ', $data, 2);
+            $split_oid        = explode('.', $oid);
+            $disk_index        = $split_oid[(count($split_oid) - 1)];
+            $member_id        = $split_oid[(count($split_oid) - 2)];
+            $num_index        = $member_id.'.'.$disk_index;
+            $oid              = $disks_base_oid.$num_index;
+            $extra            = snmp_get($device, $oid, '-OQne', 'EQLDISK-MIB', 'equallogic');
+            d_echo($extra);
+            if (!empty($extra)) {
+                list($foid,$pstatus) = explode(' = ', $extra, 2);
+                $index        = 'eqlDiskStatus.'.$disk_index;
+                $low_limit    = 0.5;
+                $high_limit   = 1.5;
+                discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $disks_state_name, "Disk $disk_index - $descr", 1, 1, $low_limit, $low_limit, $high_limit, $high_limit, $pstatus, 'snmp', $index);
+                create_sensor_to_state_index($device, $disks_state_name, $index);
+                unset(
+                    $index,
+                    $low_limit,
+                    $high_limit
+                );
+            }
+            unset(
+                $split_oid,
+                $disk_index,
+                $index,
+                $member_id,
+                $num_index,
+                $oid,
+                $extra
+            );
+        }//end if
+        unset(
+            $data
+        );
+    }//end foreach
+}//end if empty oids
+
+unset(
+    $oid_disks,
+    $disks_base_oid,
+    $disks_state_name,
+    $disks_state_index_id,
+    $disk_states,
+    $insert
+);

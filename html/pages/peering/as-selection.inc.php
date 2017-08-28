@@ -45,7 +45,7 @@ echo "<div class='alert alert-info' role='alert'>Cached date: $cache_date</div>"
 <script>
     var grid = $("#asn").bootgrid({
         ajax: true,
-        rowCount: [25,50,100,250,-1],
+        rowCount: [50, 100, 250, -1],
         post: function ()
         {
             return {

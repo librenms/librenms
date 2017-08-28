@@ -19,6 +19,7 @@ $common_output[] = '
 
 var eventlog_grid = $("#eventlog").bootgrid({
     ajax: true,
+    rowCount: [50, 100, 250, -1],
     post: function ()
     {
         return {

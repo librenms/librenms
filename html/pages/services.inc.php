@@ -95,10 +95,10 @@ if (isset($state)) {
 <div class="row col-sm-12"><span id="message"></span></div>
 <?php
 if ($_SESSION['userlevel'] >= '5') {
-    $host_sql = 'SELECT `D`.`device_id`,`D`.`hostname` FROM devices AS D, services AS S WHERE D.device_id = S.device_id GROUP BY `D`.`hostname`, `D`.`device_id` ORDER BY D.hostname';
+    $host_sql = 'SELECT `D`.`device_id`,`D`.`hostname`,`D`.`sysName` FROM devices AS D, services AS S WHERE D.device_id = S.device_id GROUP BY `D`.`hostname`, `D`.`device_id` ORDER BY D.hostname';
     $host_par = array();
 } else {
-    $host_sql = 'SELECT `D`.`device_id`,`D`.`hostname` FROM devices AS D, services AS S, devices_perms AS P WHERE D.device_id = S.device_id AND D.device_id = P.device_id AND P.user_id = ? GROUP BY `D`.`hostname`, `D`.`device_id` ORDER BY D.hostname';
+    $host_sql = 'SELECT `D`.`device_id`,`D`.`hostname`,`D`.`sysName` FROM devices AS D, services AS S, devices_perms AS P WHERE D.device_id = S.device_id AND D.device_id = P.device_id AND P.user_id = ? GROUP BY `D`.`hostname`, `D`.`device_id` ORDER BY D.hostname';
     $host_par = array($_SESSION['user_id']);
 }
 
@@ -106,6 +106,7 @@ $shift = 1;
 foreach (dbFetchRows($host_sql, $host_par) as $device) {
     $device_id       = $device['device_id'];
     $device_hostname = $device['hostname'];
+    $device_sysName  = $device['sysName'];
     $devlink = generate_device_link($device, null, array('tab' => 'services'));
     if ($shift == 1) {
         array_unshift($sql_param, $device_id);
@@ -130,7 +131,7 @@ foreach (dbFetchRows($host_sql, $host_par) as $device) {
             echo '
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">'.$devlink.'</h3>
+        <h3 class="panel-title">'.$devlink.'</h3>'.$device_sysName.'
     </div>
     <div class="panel-body">
                 ';

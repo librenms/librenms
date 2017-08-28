@@ -1,14 +1,14 @@
 MIMOSA-NETWORKS-BFIVE-MIB DEFINITIONS ::= BEGIN
 
---  Copyright (C) 2015, Mimosa Networks, Inc. All Rights Reserved.
+--  Copyright (C) 2016, Mimosa Networks, Inc. All Rights Reserved.
 --
 --  Mimosa Networks MIB
---  Revision: 1.00
---  Date: June 03, 2015
+--  Revision: 1.01
+--  Date: October 24, 2016
 --
 --  Mimosa Networks, Inc.
---  300 Orchard City Dr.
---  Campbell, CA 95008
+--  469 El Camino Real Ste 100
+--  Santa Clara, CA 95050
 --  support@mimosa.co
 --
 --  This MIB defines the MIB specification for Mimosa Network's Products
@@ -58,14 +58,14 @@ mimosaB5Module MODULE-IDENTITY
     CONTACT-INFO
     	"postal:
     	Mimosa Networks, Inc.
-		300 Orchard City Dr.
-		Campbell, CA 95008
+		469 El Camino Real Ste 100
+		Santa Clara, CA 95050
         email: support@mimosa.co"
     DESCRIPTION
 		"Mimosa device MIB definitions"
-	REVISION	"201506030000Z"
+	REVISION	"201610240000Z"
     DESCRIPTION
-		"First draft"
+		"Compatible with Firmware 1.4.1"
     ::= { mimosaConformanceGroup 1 }
 
 mimosaGeneral       OBJECT IDENTIFIER ::= { mimosaWireless 1 }
@@ -380,7 +380,7 @@ mimosaChain OBJECT-TYPE
     ::= { mimosaChainEntry 1 }
 
 mimosaTxPower OBJECT-TYPE
-    SYNTAX      DecimalOne
+    SYNTAX      Integer32
     UNITS       "dBm"
     MAX-ACCESS  read-only
     STATUS      current
@@ -390,7 +390,7 @@ mimosaTxPower OBJECT-TYPE
     ::= { mimosaChainEntry 2 }
 
 mimosaRxPower OBJECT-TYPE
-    SYNTAX      DecimalOne
+    SYNTAX      Integer32
     UNITS       "dBm"
     MAX-ACCESS  read-only
     STATUS      current
@@ -400,7 +400,7 @@ mimosaRxPower OBJECT-TYPE
     ::= { mimosaChainEntry 3 }
 
 mimosaRxNoise OBJECT-TYPE
-    SYNTAX      DecimalOne
+    SYNTAX      Integer32
     UNITS       "dBm"
     MAX-ACCESS  read-only
     STATUS      current
@@ -409,7 +409,7 @@ mimosaRxNoise OBJECT-TYPE
     ::= { mimosaChainEntry 4 }
 
 mimosaSNR OBJECT-TYPE
-    SYNTAX      DecimalOne
+    SYNTAX      Integer32
     UNITS       "dB"
     MAX-ACCESS  read-only
     STATUS      current
@@ -464,10 +464,12 @@ MimosaStreamEntry ::=
         mimosaStream       Integer32,
         mimosaTxPhy        Integer32,
         mimosaTxMCS        Integer32,
-        mimosaRxPhy        Integer32,
+        mimosaTxWidth      Integer32,
+	 mimosaRxPhy        Integer32,
         mimosaRxMCS        Integer32,
-        mimosaRxEVM        DecimalOne
-    }
+        mimosaRxWidth      Integer32,
+	mimosaRxEVM        DecimalOne
+   }
 
 mimosaStream OBJECT-TYPE
     SYNTAX      Integer32 (0..65535)
@@ -495,6 +497,16 @@ mimosaTxMCS OBJECT-TYPE
          -1 means this particular TxStream is not a valid entry."
     ::= { mimosaStreamEntry 3 }
 
+mimosaTxWidth OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MHz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the channel width based on MCS. A value of 
+	 -1 means this particular TxWidth is not a valid entry"
+    ::= { mimosaStreamEntry 4 }
+
 mimosaRxPhy OBJECT-TYPE
     SYNTAX      Integer32
     UNITS       "Mbps"
@@ -502,7 +514,7 @@ mimosaRxPhy OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Specifies the receive rate of the given data stream."
-    ::= { mimosaStreamEntry 4 }
+    ::= { mimosaStreamEntry 5 }
 
 mimosaRxMCS OBJECT-TYPE
     SYNTAX      Integer32
@@ -511,18 +523,27 @@ mimosaRxMCS OBJECT-TYPE
     DESCRIPTION
         "Specifies the receive MCS of the given data stream. A value of
          -1 means this particular RxStream is not a valid entry."
-    ::= { mimosaStreamEntry 5 }
+    ::= { mimosaStreamEntry 6 }
+
+mimosaRxWidth OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS	"MHz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the receive Rx Width of the given data stream. A value of
+         -1 means this particular RxWidth is not a valid entry."
+    ::= { mimosaStreamEntry 7 }
 
 mimosaRxEVM OBJECT-TYPE
-    SYNTAX      DecimalOne
+    SYNTAX      Integer32
     UNITS       "dB"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "Specifies the receive Error Vector Magnitude (EVM) of the given data
          stream."
-    ::= { mimosaStreamEntry 6 }
-
+    ::= { mimosaStreamEntry 8 }
 
 mimosaChannelTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF MimosaChannelEntry
@@ -584,7 +605,7 @@ mimosaChannelWidth OBJECT-TYPE
     ::= { mimosaChannelEntry 3 }
 
 mimosaChannelTxPower OBJECT-TYPE
-    SYNTAX      DecimalOne
+    SYNTAX      Integer32
     UNITS       "dBm"
     MAX-ACCESS  read-only
     STATUS      current
@@ -637,7 +658,7 @@ mimosaTotalRxPower OBJECT-TYPE
     ::= { mimosaRfInfo 6 }
 
 mimosaTargetSignalStrength OBJECT-TYPE
-    SYNTAX      DecimalOne
+    SYNTAX      Integer32
     UNITS        "dB"
     MAX-ACCESS   read-only
     STATUS       current

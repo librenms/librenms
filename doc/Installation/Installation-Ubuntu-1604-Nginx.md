@@ -27,6 +27,7 @@ Within the [mysqld] section please add:
 ```bash
 innodb_file_per_table=1
 sql-mode=""
+lower_case_table_names=0
 ```
 
 ```systemctl restart mysql```
@@ -35,7 +36,7 @@ sql-mode=""
 
 #### Install / Configure Nginx
 
-`apt-get install php7.0-cli php7.0-mysql php7.0-gd php7.0-snmp php-pear php7.0-curl php7.0-fpm snmp graphviz php7.0-mcrypt php7.0-json nginx-full fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git`
+`apt-get install php7.0-cli php7.0-mysql php7.0-gd php7.0-snmp php7.0-curl php7.0-fpm snmp graphviz php7.0-mcrypt php7.0-json nginx-full fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd rrdtool git`
 
 In `/etc/php/7.0/fpm/php.ini` and `/etc/php/7.0/cli/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
 
@@ -77,10 +78,14 @@ server {
  index       index.php;
  access_log  /opt/librenms/logs/access_log;
  error_log   /opt/librenms/logs/error_log;
+ charset utf-8;
  gzip on;
- gzip_types text/css application/x-javascript text/richtext image/svg+xml text/plain    text/xsd text/xsl text/xml image/x-icon;
+ gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
  location / {
-  try_files $uri $uri/ @librenms;
+  try_files $uri $uri/ /index.php?$query_string;
+ }
+ location /api/v0 {
+  try_files $uri $uri/ /api_v0.php?$query_string;
  }
  location ~ \.php {
   include fastcgi.conf;
@@ -89,10 +94,6 @@ server {
  }
  location ~ /\.ht {
   deny all;
- }
- location @librenms {
-  rewrite api/v0(.*)$ /api_v0.php/$1 last;
-  rewrite ^(.+)$ /index.php/$1 last;
  }
 }
 ```
@@ -104,7 +105,7 @@ systemctl restart nginx
 
 #### Web installer
 
-Now head to: http://librenms.example.com/install.php and follow the on-screen instructions.
+Now head to: `http://librenms.example.com/install.php` and follow the on-screen instructions.
 
 #### Configure snmpd
 

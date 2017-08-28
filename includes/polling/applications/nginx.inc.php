@@ -10,12 +10,13 @@ if (!empty($agent_data['app'][$name])) {
     // Polls nginx statistics from script via SNMP
     $nginx = snmp_get($device, '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.110.103.105.110.120', '-Ovq');
 }
+$nginx = trim($nginx, '"');
 update_application($app, $nginx);
 
 echo ' nginx';
 
-list($active, $reading, $writing, $waiting, $req) = explode("\n", $nginx);
-d_echo("active: $active reading: $reading writing: $writing waiting: $waiting Requests: $req");
+list($active, $reading, $writing, $waiting, $req) = array_map('rtrim', explode("\n", $nginx));
+d_echo("active: $active reading: $reading writing: $writing waiting: $waiting Requests: $req\n");
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
@@ -37,4 +38,4 @@ $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 
 // Unset the variables we set here
-unset($nginx, $active, $reading, $writing, $req, $rrd_name, $rrd_def, $tags);
+unset($nginx, $active, $reading, $writing, $waiting, $req, $rrd_name, $rrd_def, $tags);

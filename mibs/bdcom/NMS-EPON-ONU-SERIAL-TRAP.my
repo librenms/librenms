@@ -1,0 +1,105 @@
+-- *****************************************************************
+-- NMS-EPON-ONU-SERIAL-TRAP.MIB: NMS EPON ONU SERIAL TRAP MIB
+--
+-- May 2010
+-- Edit by LIUQIANG
+-- Copyright (c) 2008 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-EPON-ONU-SERIAL-TRAP DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER
+                           FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsEPONGroup                                 FROM NMS-SMI
+    llidIfIndex                                 FROM NMS-EPON-LLID
+    ifDescr                                     FROM RFC-1213
+    onuIfSequenceNo                             FROM NMS-EPON-ONU-INTERFACE
+    onuID                                       FROM NMS-EPON-ONU;
+
+
+               nmsEponOnuSerialTrap         OBJECT IDENTIFIER ::= { nmsEPONGroup 26 }
+                         
+             
+                                
+                                
+        nmsEponOnuSerialBreak OBJECT-TYPE
+            SYNTAX  INTEGER{
+                            break(0),
+                            recover(1)
+                           }
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "ONU serial port status change.0-break, 1-recover."
+            ::= { nmsEponOnuSerialTrap 1 } 
+                                
+        nmsEponOnuSerialBreakReason OBJECT-TYPE
+            SYNTAX  INTEGER{
+                            network_break(1)
+                           }
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "ONU serial port status change reason."
+            ::= { nmsEponOnuSerialTrap 2 } 
+            
+        nmsEponOnuLoopbackDetectResult OBJECT-TYPE
+            SYNTAX  INTEGER{
+                            ok(0),
+                            error(1)
+                           }
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "ONU serial port status change reason."
+            ::= { nmsEponOnuSerialTrap 3 } 
+            
+            
+       
+                                        
+
+-- Notifications
+	nmsEponOnuSerialBreakNotifications OBJECT IDENTIFIER
+                                ::= { nmsEponOnuSerialTrap 4 }
+
+	nmsEponOnuSerialBreakNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       llidIfIndex,
+                       onuIfSequenceNo,
+                       ifDescr,
+                       nmsEponOnuSerialBreak,
+                       nmsEponOnuSerialBreakReason,
+                       onuID
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when onu serial interface status changes ."
+    		::= { nmsEponOnuSerialBreakNotifications 1 }
+
+-- Notifications
+	nmsEponOnuoopbackDetectResultNotifications OBJECT IDENTIFIER
+                                ::= { nmsEponOnuSerialTrap 5 }
+
+	nmsEponOnuLoopbackDetectResultNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       llidIfIndex,
+                       onuIfSequenceNo,
+                       ifDescr,
+                       nmsEponOnuLoopbackDetectResult,
+                       onuID
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when onu get a loopback result."
+    		::= { nmsEponOnuoopbackDetectResultNotifications 1 }
+
+              
+
+END
+
+

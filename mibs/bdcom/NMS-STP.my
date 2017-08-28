@@ -1,0 +1,215 @@
+-- *****************************************************************
+-- NMS-STP.my: NMS VLAN EXT MIB
+--
+-- July 2013
+-- Edit by LIUQIANG
+-- Copyright (c) 2010 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-STP DEFINITIONS ::= BEGIN 
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32,Counter64             FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsMgmt                                   	FROM NMS-SMI
+    ifIndex		                        FROM RFC1213-MIB;
+
+
+--definition of nms device stp informations
+
+               stp         OBJECT IDENTIFIER ::= { nmsMgmt 253 }
+
+               stpOptfPortFast OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   True(1), 
+                                   False(2)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Port Fast immediately brings a port to the forwarding state from a blocking state, bypassing the listening and learning states."
+                   ::= { stp 1 }
+
+               stpOptfBpduGuard OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   True(1), 
+                                   False(2)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "BPDU guard can operate in all spanning tree modes, but the feature operates with some differences. 
+                           In SSTP and PVST modes, if a Port Fast-enabled port receives a BPDU,it will be shutdown. 
+                           In RSTP and MSTP modes, if a port receives a BPDU, it will be blocked for double forward time.
+			   In all spanning tree modes, a BPDU guard-enabled port will not send BPDUs."
+                   ::= { stp 2 }
+
+               stpOptfBpduFilter OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   True(1), 
+                                   False(2)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "This feature prevents ports from sending BPDUs. If a BPDU is received on a Port Fast-enabled port, 
+                           the port loses its Port Fast-operational status,and BPDU filtering is disabled. "
+                   ::= { stp 3 }
+
+               stpOptfUplinkFast OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   True(1), 
+                                   False(2)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "UplinkFast can accelerate the choice of a new root port when a link or switch fails or when the spanning
+                           tree reconfigures itself. The root port transitions to the forwarding state immediately without going through
+                           the listening and learning states, as it would with the normal spanning-tree procedures."
+                   ::= { stp 4 }
+
+               stpOptfBackboneFast OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   True(1), 
+                                   False(2)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "BackboneFast detects indirect failures in the core of the backbone.
+                           When a switch receives an inferior BPDU from the designated port of another switch, 
+                           the BPDU is a signal that the other switch might have lost its path to the root, 
+                           and BackboneFast tries to find an alternate path to the root. "
+                   ::= { stp 5 }
+
+               stpOptfLoopGuard OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   True(1), 
+                                   False(2)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Loop guard prevents alternate and root ports from becoming designated ports.
+                           
+                           In SSTP and PVST modes, if a Loop guard-enabled port is designated port, it is always blocked.
+
+                           In RSTP and MSTP modes, if a Loop guard-enabled port becomes designated port because of a failure
+                           that can't receive BPDUs, it is blocked."
+                   ::= { stp 6 }
+
+
+
+               stpPortOptfTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF StpPortOptfTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A table of stpPortOptf operation."
+                   ::= { stp 7 }
+
+               stpPortOptfTableEntry OBJECT-TYPE
+                   SYNTAX  StpPortOptfTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of Stp Port Optf operation."
+                   INDEX { ifIndex }
+               ::= { stpPortOptfTable 1 }
+
+               StpPortOptfTableEntry ::=
+                   SEQUENCE {
+                       stpPortOptfPortFast          INTEGER,
+                       stpPortOptfBpduGuard         INTEGER,
+                       stpPortOptfBpduFilter        INTEGER,
+                       stpPortOptfLoopFast          INTEGER,
+                       stpPortOptfRootLoopGuard     INTEGER
+                   }
+
+               stpPortOptfPortFast OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   no(0),
+                                   enabled(1),
+                                   disabled(2)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Port Fast immediately brings a port to the forwarding state from a blocking state, bypassing the listening and learning states."
+                   ::= { stpPortOptfTableEntry 1 }
+                   
+               stpPortOptfBpduGuard OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   no(0),
+                                   enabled(1),
+                                   disabled(2)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "BPDU guard can operate in all spanning tree modes, but the feature operates with some differences. 
+                           In SSTP and PVST modes, if a Port Fast-enabled port receives a BPDU,it will be shutdown. 
+                           In RSTP and MSTP modes, if a port receives a BPDU, it will be blocked for double forward time.
+                           In all spanning tree modes, a BPDU guard-enabled port will not send BPDUs."
+                   ::= { stpPortOptfTableEntry 2 }
+                   
+               stpPortOptfBpduFilter OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   no(0),
+                                   enabled(1),
+                                   disabled(2)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "This featue prevents ports from sending BPDUs. If a BPDU is received on a Port Fast-enabled port, 
+                           the port loses its Port Fast-operational status,and BPDU filtering is disabled."
+                   ::= { stpPortOptfTableEntry 3 }
+                   
+               stpPortOptfLoopFast OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   no(0),
+                                   enabled(1),
+                                   disabled(2)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "This feature is used to minimize the convergence time in RSTP mode."
+                   ::= { stpPortOptfTableEntry 4 }
+                   
+               stpPortOptfRootLoopGuard OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   no(0),
+				                           rootGuard(1),
+                                   loopGuard(2),
+                                   disabled(3)
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Root Guard prevents a port that is receiving superior BPDUs from becoming root port.
+
+                           In SSTP and PVST modes, if a Root Guard-enabled port is receiving superior BPDUs, it is always blocked.
+
+                           In RSTP and MSTP modes, if a Root Guard-enabled port originally didn't receive superior BPDUs, but now
+                           it is receiving superior BPUDs, it is blocked. 
+
+
+                           Loop guard prevents alternate and root ports from becoming designated ports.
+
+                           In SSTP and PVST modes, if a Loop guard-enabled port is designated port, it is always blocked.
+
+                           In RSTP and MSTP modes, if a Loop guard-enabled port becomes designated port because of a failure
+                           that can't receive BPDUs, it is blocked."
+                   ::= { stpPortOptfTableEntry 5 }
+
+END
+
+
+
+                                  

@@ -13,6 +13,8 @@
  */
 
 use LibreNMS\Exceptions\HostExistsException;
+use LibreNMS\Util\IP;
+use LibreNMS\Util\IPv6;
 
 function discover_new_device($hostname, $device = '', $method = '', $interface = '')
 {
@@ -33,7 +35,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
         if ($ip == $hostname) {
             d_echo("name lookup of $hostname failed\n");
             log_event("$method discovery of " . $hostname . " failed - Check name lookup", $device['device_id'], 'discovery', 5);
- 
+
             return false;
         }
     } elseif (filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === true || filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === true) {
@@ -41,7 +43,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
         if ($config['discovery_by_ip'] === false) {
             d_echo('Discovery by IP disabled, skipping ' . $hostname);
             log_event("$method discovery of " . $hostname . " failed - Discovery by IP disabled", $device['device_id'], 'discovery', 4);
- 
+
             return false;
         }
     }
@@ -79,16 +81,30 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
         } catch (HostExistsException $e) {
             // already have this device
         } catch (Exception $e) {
-            log_event("$method discovery of " . $hostname . " ($ip) failed - " . $e->getMessage(), null, null, 5);
+            log_event("$method discovery of " . $hostname . " ($ip) failed - " . $e->getMessage(), $device['device_id'], 'discovery', 5);
         }
     } else {
         d_echo("$ip not in a matched network - skipping\n");
     }//end if
 }
-
 //end discover_new_device()
 
-function discover_device($device, $options = null)
+/**
+ * @param $device
+ */
+function load_discovery(&$device)
+{
+    global $config;
+    $yaml_discovery = $config['install_dir'] . '/includes/definitions/discovery/' . $device['os'] . '.yaml';
+    if (file_exists($yaml_discovery)) {
+        $device['dynamic_discovery'] = Symfony\Component\Yaml\Yaml::parse(
+            file_get_contents($yaml_discovery)
+        );
+    }
+    unset($yaml_discovery);
+}
+
+function discover_device(&$device, $options = null)
 {
     global $config, $valid;
 
@@ -119,6 +135,7 @@ function discover_device($device, $options = null)
     }
 
     load_os($device);
+    load_discovery($device);
     if (is_array($config['os'][$device['os']]['register_mibs'])) {
         register_mibs($device, $config['os'][$device['os']]['register_mibs'], 'includes/discovery/os/' . $device['os'] . '.inc.php');
     }
@@ -169,9 +186,7 @@ function discover_device($device, $options = null)
         register_mibs($device, $devicemib, "includes/discovery/functions.inc.php");
     }
 
-    $device_end = microtime(true);
-    $device_run = ($device_end - $device_start);
-    $device_time = substr($device_run, 0, 5);
+    $device_time  = round(microtime(true) - $device_start, 3);
 
     dbUpdate(array('last_discovered' => array('NOW()'), 'last_discovered_timetaken' => $device_time), 'devices', '`device_id` = ?', array($device['device_id']));
 
@@ -182,14 +197,11 @@ function discover_device($device, $options = null)
     echo "\n";
     $discovered_devices++;
 }
-
 //end discover_device()
+
 // Discover sensors
-
-
-function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null)
+function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $entity_link_type = null, $entity_link_index = 0)
 {
-
     $low_limit      = set_null($low_limit);
     $low_warn_limit = set_null($low_warn_limit);
     $warn_limit     = set_null($warn_limit);
@@ -241,6 +253,9 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             'sensor_current' => $current,
             'entPhysicalIndex' => $entPhysicalIndex,
             'entPhysicalIndex_measured' => $entPhysicalIndex_measured,
+            'user_func' => $user_func,
+            'entity_link_type' => $entity_link_type,
+            'entity_link_index' => $entity_link_index,
         );
 
         foreach ($insert as $key => $val_check) {
@@ -324,7 +339,11 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             $multiplier == $sensor_entry['sensor_multiplier'] &&
             $divisor == $sensor_entry['sensor_divisor'] &&
             $entPhysicalIndex_measured == $sensor_entry['entPhysicalIndex_measured'] &&
-            $entPhysicalIndex == $sensor_entry['entPhysicalIndex']
+            $entPhysicalIndex == $sensor_entry['entPhysicalIndex'] &&
+            $user_func == $sensor_entry['user_func'] &&
+            $entity_link_type == $sensor_entry['entity_link_type'] &&
+            $entity_link_index == $sensor_entry['entity_link_index']
+
         ) {
             echo '.';
         } else {
@@ -335,6 +354,9 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
                 'sensor_divisor' => $divisor,
                 'entPhysicalIndex' => $entPhysicalIndex,
                 'entPhysicalIndex_measured' => $entPhysicalIndex_measured,
+                'user_func' => $user_func,
+                'entity_link_type' => $entity_link_type,
+                'entity_link_index' => $entity_link_index,
             );
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
             echo 'U';
@@ -365,7 +387,7 @@ function sensor_low_limit($class, $current)
             break;
 
         case 'humidity':
-            $limit = '70';
+            $limit = '30';
             break;
 
         case 'frequency':
@@ -386,6 +408,11 @@ function sensor_low_limit($class, $current)
 
         case 'signal':
             $limit = -80;
+            break;
+        case 'airflow':
+        case 'dbm':
+        case 'snr':
+            $limit = ($current * 0.95);
             break;
     }//end switch
 
@@ -437,6 +464,11 @@ function sensor_limit($class, $current)
 
         case 'load':
             $limit = 80;
+            break;
+        case 'airflow':
+        case 'dbm':
+        case 'snr':
+            $limit = ($current * 1.05);
             break;
     }//end switch
 
@@ -651,11 +683,11 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
                 'mempool_total' => 0,
             );
 
-            if (!empty($entPhysicalIndex)) {
+            if (is_numeric($entPhysicalIndex)) {
                 $insert_data['entPhysicalIndex'] = $entPhysicalIndex;
             }
 
-            if (!empty($hrDeviceIndex)) {
+            if (is_numeric($hrDeviceIndex)) {
                 $insert_data['hrDeviceIndex'] = $hrDeviceIndex;
             }
 
@@ -711,47 +743,57 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
 {
     global $device;
 
-    $ipv6_network = Net_IPv6::getNetmask("$ipv6_address/$ipv6_prefixlen") . '/' . $ipv6_prefixlen;
-    $ipv6_compressed = Net_IPv6::compress($ipv6_address);
-
-    if (Net_IPv6::getAddressType($ipv6_address) == NET_IPV6_LOCAL_LINK) {
+    if (!IPv6::isValid($ipv6_address, true)) {
         // ignore link-locals (coming from IPV6-MIB)
         return;
     }
 
+    $ipv6 = new IPv6($ipv6_address);
+    $ipv6_network = $ipv6->getNetwork($ipv6_prefixlen);
+    $ipv6_compressed = $ipv6->compressed();
+
     if (dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifIndex` = ?', array($device['device_id'], $ifIndex)) != '0' && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1') {
         $port_id = dbFetchCell('SELECT port_id FROM `ports` WHERE device_id = ? AND ifIndex = ?', array($device['device_id'], $ifIndex));
 
-        if (dbFetchCell('SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = ?', array($ipv6_network)) < '1') {
-            dbInsert(array('ipv6_network' => $ipv6_network, 'context_name' => $context_name), 'ipv6_networks');
-            echo 'N';
-        } else {
-            //Update Context
-            dbUpdate(array('context_name' => $device['context_name']), 'ipv6_networks', '`ipv6_network` = ?', array($ipv6_network));
-            echo 'n';
+        if (is_numeric($port_id)) {
+            if (dbFetchCell('SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = ?', array($ipv6_network)) < '1') {
+                dbInsert(array('ipv6_network' => $ipv6_network, 'context_name' => $context_name), 'ipv6_networks');
+                echo 'N';
+            } else {
+                //Update Context
+                dbUpdate(array('context_name' => $device['context_name']), 'ipv6_networks', '`ipv6_network` = ?', array($ipv6_network));
+                echo 'n';
+            }
+
+            $ipv6_network_id = dbFetchCell('SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ? AND `context_name` = ?', array($ipv6_network, $context_name));
+
+            if (dbFetchCell('SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', array($ipv6_address, $ipv6_prefixlen, $port_id)) == '0') {
+                dbInsert(array(
+                    'ipv6_address' => $ipv6_address,
+                    'ipv6_compressed' => $ipv6_compressed,
+                    'ipv6_prefixlen' => $ipv6_prefixlen,
+                    'ipv6_origin' => $ipv6_origin,
+                    'ipv6_network_id' => $ipv6_network_id,
+                    'port_id' => $port_id,
+                    'context_name' => $context_name
+                ), 'ipv6_addresses');
+                echo '+';
+            } else {
+                //Update Context
+                dbUpdate(array('context_name' => $device['context_name']), 'ipv6_addresses', '`ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', array($ipv6_address, $ipv6_prefixlen, $port_id));
+                echo '.';
+            }
+
+            $full_address = "$ipv6_address/$ipv6_prefixlen";
+            $valid_address = $full_address . '-' . $port_id;
+            $valid['ipv6'][$valid_address] = 1;
         }
-
-
-        $ipv6_network_id = dbFetchCell('SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ? AND `context_name` = ?', array($ipv6_network, $context_name));
-
-        if (dbFetchCell('SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', array($ipv6_address, $ipv6_prefixlen, $port_id)) == '0') {
-            dbInsert(array('ipv6_address' => $ipv6_address, 'ipv6_compressed' => $ipv6_compressed, 'ipv6_prefixlen' => $ipv6_prefixlen, 'ipv6_origin' => $ipv6_origin, 'ipv6_network_id' => $ipv6_network_id, 'port_id' => $port_id, 'context_name' => $context_name), 'ipv6_addresses');
-            echo '+';
-        } else {
-            //Update Context
-            dbUpdate(array('context_name' => $device['context_name']), 'ipv6_addresses', '`ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', array($ipv6_address, $ipv6_prefixlen, $port_id));
-            echo '.';
-        }
-
-        $full_address = "$ipv6_address/$ipv6_prefixlen";
-        $valid_address = $full_address . '-' . $port_id;
-        $valid['ipv6'][$valid_address] = 1;
     }//end if
 }//end discover_process_ipv6()
 
 /*
  * Check entity sensors to be excluded
- * 
+ *
  * @param string value to check
  * @param array device
  *
@@ -925,22 +967,28 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
             } else {
                 return 1;
             }
-        } elseif ($sensor_type == 'voltage') {
-            return 1;
         }
-    } elseif (($device['os'] == 'huaweiups') && ($sensor_type == 'frequency')) {
-        return 100;
-    } elseif (($device['os'] == 'netmanplus') && ($sensor_type == 'voltage')) {
-        return 1;
-    } elseif ($device['os'] == 'generex-ups') {
-        if ($sensor_type == 'load') {
-            return 1;
-        } elseif ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
+    } elseif ($device['os'] == 'huaweiups') {
+        if ($sensor_type == 'frequency') {
+            return 100;
+        }
+    } elseif ($device['os'] == 'hpe-rtups') {
+        if ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.') && !starts_with($oid, '.1.3.6.1.2.1.33.1.3.3.1.3')) {
             return 1;
         }
     }
 
-    return 10; //default
+    // UPS-MIB Defaults
+
+    if ($sensor_type == 'load') {
+        return 1;
+    }
+
+    if ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
+        return 1;
+    }
+
+    return 10;
 }
 
 /**
@@ -989,6 +1037,119 @@ function ignore_storage($descr)
 }
 
 /**
+ * @param $value
+ * @param $data
+ * @param $group
+ * @return bool
+ */
+function can_skip_sensor($value, $data, $group)
+{
+    $skip_values = array_replace((array)$group['skip_values'], (array)$data['skip_values']);
+    foreach ($skip_values as $skip_value) {
+        if ($value == $skip_value) {
+            return true;
+        }
+    }
+
+    $skip_value_lt = array_replace((array)$group['skip_value_lt'], (array)$data['skip_value_lt']);
+    foreach ($skip_value_lt as $skip_value) {
+        if ($value < $skip_value) {
+            return true;
+        }
+    }
+
+    $skip_value_gt = array_reduce((array)$group['skip_value_gt'], (array)$data['skip_value_gt']);
+    foreach ($skip_value_gt as $skip_value) {
+        if ($value > $skip_value) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * @param $valid
+ * @param $device
+ * @param $sensor_type
+ * @param $pre_cache
+ */
+function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
+{
+    if ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]) {
+        $sensor_options = array();
+        if (isset($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'])) {
+            $sensor_options = $device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'];
+        }
+        foreach ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['data'] as $data) {
+            $tmp_name = $data['oid'];
+            $raw_data = $pre_cache[$tmp_name];
+            $cached_data = $pre_cache['__cached'] ?: array();
+            foreach ($raw_data as $index => $snmp_data) {
+                $value = is_numeric($snmp_data[$data['value']]) ? $snmp_data[$data['value']] : (is_numeric($snmp_data[$data['oid']]) ? $snmp_data[$data['oid']]: false);
+                if (can_skip_sensor($value, $data, $sensor_options) === false && is_numeric($value)) {
+                    $oid = $data['num_oid'] . $index;
+                    if (isset($snmp_data[$data['descr']])) {
+                        $descr = $snmp_data[$data['descr']];
+                    } else {
+                        $descr = str_replace('{{ $index }}', $index, $data['descr']);
+                        preg_match_all('/({{ [\$a-zA-Z0-9]+ }})/', $descr, $tmp_var, PREG_PATTERN_ORDER);
+                        $tmp_vars = $tmp_var[0];
+                        foreach ($tmp_vars as $k => $tmp_var) {
+                            $tmp_var = preg_replace('/({{ | }}|\$)/', '', $tmp_var);
+                            if ($snmp_data[$tmp_var]) {
+                                $descr = str_replace("{{ \$$tmp_var }}", $snmp_data[$tmp_var], $descr);
+                            }
+                            if ($cached_data[$index][$tmp_var]) {
+                                $descr = str_replace("{{ \$$tmp_var }}", $cached_data[$index][$tmp_var], $descr);
+                            }
+                        }
+                    }
+                    $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
+                    $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
+                    $low_limit = is_numeric($data['low_limit']) ? $data['low_limit'] : ($snmp_data[$data['low_limit']] ?: 'null');
+                    $low_warn_limit = is_numeric($data['low_warn_limit']) ? $data['low_warn_limit'] : ($snmp_data[$data['low_warn_limit']] ?: 'null');
+                    $warn_limit = is_numeric($data['warn_limit']) ? $data['warn_limit'] : ($snmp_data[$data['warn_limit']] ?: 'null');
+                    $high_limit = is_numeric($data['high_limit']) ? $data['high_limit'] : ($snmp_data[$data['high_limit']] ?: 'null');
+                    $state_name = '';
+                    if ($sensor_type !== 'state') {
+                        if (is_numeric($divisor)) {
+                            $value = $value / $divisor;
+                        }
+                        if (is_numeric($multiplier)) {
+                            $value = $value * $multiplier;
+                        }
+                    } else {
+                        $state_name = $data['state_name'] ?: $data['oid'];
+                        $state_index_id = create_state_index($state_name);
+                        if ($state_index_id != null) {
+                            foreach ($data['states'] as $state) {
+                                $insert = array(
+                                    'state_index_id' => $state_index_id,
+                                    'state_descr' => $state['descr'],
+                                    'state_draw_graph' => $state['graph'],
+                                    'state_value' => $state['value'],
+                                    'state_generic_value' => $state['generic']
+                                );
+                                dbInsert($insert, 'state_translations');
+                            }
+                        }
+                    }
+                    $tmp_index = $data['index'] ?: $index;
+                    $uindex = str_replace('{{ $index }}', $index, $tmp_index);
+                    if ($sensor_type === 'state') {
+                        discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $state_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value);
+                        create_sensor_to_state_index($device, $state_name, $uindex);
+                    } else {
+                        discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $device['os'], $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value);
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
  * @param $types
  * @param $device
  * @param array $pre_cache
@@ -1006,11 +1167,12 @@ function sensors($types, $device, $valid, $pre_cache = array())
         if (is_file($dir . $device['os'] . '.inc.php')) {
             include $dir . $device['os'] . '.inc.php';
         }
-        if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modules_compat']['rfc1628'][$device['os']]) {
+        if (isset($config['os'][$device['os']]['rfc1628_compat']) && $config['os'][$device['os']]['rfc1628_compat']) {
             if (is_file($dir  . '/rfc1628.inc.php')) {
                 include $dir . '/rfc1628.inc.php';
             }
         }
+        discovery_process($valid, $device, $sensor_type, $pre_cache);
         d_echo($valid['sensor'][$sensor_type]);
         check_valid_sensors($device, $sensor_type, $valid['sensor']);
         echo "\n";
@@ -1036,7 +1198,7 @@ function build_bgp_peers($device, $data, $peer2)
             $octets = count(explode(".", $peer_ip));
             if ($octets > 11) {
                 // ipv6
-                $peer_ip = Net_IPv6::compress(snmp2ipv6(implode('.', array_slice(explode('.', $peer_ip), (count(explode('.', $peer_ip)) - 16)))));
+                $peer_ip = (string)IP::parse(snmp2ipv6(implode('.', array_slice(explode('.', $peer_ip), (count(explode('.', $peer_ip)) - 16)))), true);
             } else {
                 // ipv4
                 $peer_ip = implode('.', array_slice(explode('.', $peer_ip), (count(explode('.', $peer_ip)) - 4)));

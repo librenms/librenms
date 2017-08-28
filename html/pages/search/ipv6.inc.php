@@ -17,6 +17,7 @@
 <script>
 var grid = $("#ipv6-search").bootgrid({
     ajax: true,
+    rowCount: [50, 100, 250, -1],
     templates: {
         header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
                 "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\">"+
@@ -26,7 +27,7 @@ var grid = $("#ipv6-search").bootgrid({
                 "<option value=\"\">All Devices</option>"+
 <?php
 
-$sql = 'SELECT `devices`.`device_id`,`hostname` FROM `devices`';
+$sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName` FROM `devices`';
 
 if (is_admin() === false && is_read() === false) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
@@ -42,7 +43,7 @@ foreach (dbFetchRows($sql, $param) as $data) {
         echo '" selected"+';
     }
 
-    echo '">'.$data['hostname'].'</option>"+';
+    echo '">'.format_hostname($data, $data['hostname']).'</option>"+';
 }
 ?>
                 "</select>"+

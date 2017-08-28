@@ -62,4 +62,18 @@ $fields = array (
     );
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
+#Unbound Cache
+$rrd_name =  array('app', $name,'cache',$app_id);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('queries', 'DERIVE', 0, 125000000000)
+    ->addDataset('hits', 'DERIVE', 0, 125000000000)
+    ->addDataset('misses', 'DERIVE', 0, 125000000000);
+$fields = array (
+    'queries' => $unbound['total.num.queries'],
+    'hits' => $unbound['total.num.cachehits'],
+    'misses' => $unbound['total.num.cachemiss']
+    );
+$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+data_update($device, 'app', $tags, $fields);
+
 unset($lines , $unbound, $rrd_name, $rrd_def, $fields, $tags);

@@ -1,6 +1,6 @@
 <?php
 
-if (preg_match('/^Cisco IOS Software, .+? Software(\, )?([\s\w\d]+)? \([^\-]+-([\w\d]+)-\w\), Version ([^,]+)/', $poll_device['sysDescr'], $regexp_result)) {
+if (preg_match('/^Cisco IOS Software.*?, .+? Software(\, )?([\s\w\d]+)? \([^\-]+-([\w\d]+)-\w\), Version ([^,]+)/', $poll_device['sysDescr'], $regexp_result)) {
     $features = $regexp_result[3];
     $version  = $regexp_result[4];
     $hardware = $regexp_result[2];

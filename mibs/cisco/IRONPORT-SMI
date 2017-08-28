@@ -1,0 +1,54 @@
+-- *****************************************************************
+-- IRONPORT-SMI 
+--
+-- Copyright (c) 2005-2011 by Cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+IRONPORT-SMI DEFINITIONS ::= BEGIN
+
+--
+-- Top-level infrastructure of the IronPort project enterprise MIB tree
+--
+
+IMPORTS
+    MODULE-IDENTITY,
+    enterprises
+        FROM SNMPv2-SMI;
+
+ironPort MODULE-IDENTITY
+    LAST-UPDATED    "201105021600Z"
+    ORGANIZATION    "IronPort Systems"
+    CONTACT-INFO
+        "       Cisco IronPort Email and Web Security
+                Customer Service
+
+        Postal: 950 Elm Avenue
+                San Bruno, CA 94066
+                USA
+
+           Tel: +1 (650) 989-6533
+
+        E-mail: customercare@ironport.com"
+    DESCRIPTION
+        "Top-level infrastructure of the Cisco IronPort project
+         enterprise MIB tree."
+    REVISION        "201105021600Z"
+    DESCRIPTION
+        "Cleaned up SMI definition."
+    REVISION        "200506170000Z"
+    DESCRIPTION
+        "Initial revision."
+    ::= { enterprises 15497 }
+
+
+--
+--  IronPort enterprise-specific management objects
+--
+
+asyncOSAppliances
+    OBJECT IDENTIFIER ::= { ironPort 1 }
+asyncOSMail
+    OBJECT IDENTIFIER ::= { asyncOSAppliances 1 }
+
+END

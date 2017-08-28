@@ -1,0 +1,435 @@
+NBS-REDUNDANCY-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    RowStatus
+        FROM SNMPv2-TC
+    InterfaceIndex
+        FROM IF-MIB
+    nbsCmmcChassisIndex, nbsCmmcSlotIndex, nbsCmmcPortIndex
+        FROM NBS-CMMC-MIB
+    nbs
+        FROM NBS-MIB
+    ;
+
+nbsRedundancyMib  MODULE-IDENTITY
+    LAST-UPDATED  "201505010000Z"
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+    DESCRIPTION
+      "Information Base for redundancy settings."
+    ::= { nbs 221 }
+
+
+-- *******************************************************************
+-- Groups in NBS-REDUNDANCY-MIB
+-- *******************************************************************
+
+
+nbsRedundCfgGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Redundancy settings"
+    ::= { nbsRedundancyMib 1 }
+
+
+
+nbsRedundEventGrp  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Redundancy-related events"
+    ::= { nbsRedundancyMib 100 }
+
+
+
+nbsYcableTraps  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Y-cable Traps or Notifications"
+    ::= { nbsRedundEventGrp 0 }
+
+
+
+-- ********************************************************************
+--
+-- nbsRedundCfgGrp
+--
+-- ********************************************************************
+
+nbsRedundCfgTableSize  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of entries in nbsRedundCfgTable."
+    ::= { nbsRedundCfgGrp 1 }
+
+nbsRedundCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsRedundCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table lists all ports that can be redundant group
+        members."
+    ::= { nbsRedundCfgGrp 2 }
+
+nbsRedundCfgEntry      OBJECT-TYPE
+    SYNTAX      NbsRedundCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Redundancy status of a port."
+    INDEX { nbsRedundCfgNdx }
+    ::= { nbsRedundCfgTable 1 }
+
+NbsRedundCfgEntry ::= SEQUENCE {
+    nbsRedundCfgNdx             InterfaceIndex,
+    nbsRedundCfgPartnerNdxAdmin InterfaceIndex,
+    nbsRedundCfgPartnerNdxOper  InterfaceIndex,
+    nbsRedundCfgStatusAdmin     INTEGER,
+    nbsRedundCfgStatusOper      INTEGER,
+    nbsRedundCfgPreferredAdmin  INTEGER,
+--  nbsRedundCfgPreferredOper   INTEGER,
+    nbsRedundCfgStandbyTxAdmin  INTEGER,
+--  nbsRedundCfgStandbyTxOper   INTEGER,
+    nbsRedundCfgStandbyTxToggle INTEGER,
+    nbsRedundCfgIfTypeAdmin     INTEGER,
+    nbsRedundCfgIfTypeOper      INTEGER,
+    nbsRedundCfgGroupNumberAdmin INTEGER,
+    nbsRedundCfgGroupNumberOper INTEGER
+}
+
+nbsRedundCfgNdx      OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Unique index of a redundant port."
+    ::= { nbsRedundCfgEntry 1 }
+
+nbsRedundCfgPartnerNdxAdmin  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Administratively desired InterfaceIndex of the other port in
+        this port's redundant pair."
+    ::= { nbsRedundCfgEntry 2 }
+
+nbsRedundCfgPartnerNdxOper  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Current operational InterfaceIndex of the other port in this
+        port's redundant pair."
+    ::= { nbsRedundCfgEntry 3 }
+
+nbsRedundCfgStatusAdmin    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        standby      (2),
+        active       (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Impulse.  Used to trigger an immediate switchover.  Equivalent
+        (aliased) to nbsCmmcPortSelectLink."
+    ::= { nbsRedundCfgEntry 10 }
+
+nbsRedundCfgStatusOper    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        standby      (2),
+        active       (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Actual redundancy status of this port."
+    ::= { nbsRedundCfgEntry 11 }
+
+nbsRedundCfgPreferredAdmin    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        preferNot    (2),
+        preferActive (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Persistent.  Used to optionally indicate one port in a
+        redundant pair should always be active if it has ifOperStatus
+        up(1).  Equivalent/aliased to nbsCmmcPortPreferred.
+
+        Setting one port to preferActive(3) forces its redundant
+        partner to preferNot(2).
+
+        Setting a port to preferNot(2) has no effect on its redundant
+        partner."
+    ::= { nbsRedundCfgEntry 20 }
+
+--nbsRedundCfgPreferredOper    OBJECT-TYPE
+--    SYNTAX      INTEGER {
+--        notSupported (1),
+--        preferNot    (2),
+--        preferActive (3)
+--    }
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--       "This object holds the same value as nbsRedundCfgPreferredAdmin
+--        unless a redundant pair requires a preferred port and the user
+--        has not indicated one."
+--    ::= { nbsRedundCfgEntry 21 }
+
+nbsRedundCfgStandbyTxAdmin    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        standbyCold  (2), -- 1:1
+        standbyHot   (3)  -- 1+1
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Persistent. Desired transmitter state for this port when it is
+        in standby.  Equivalent/aliased to nbsCmmcPortRedundantTxMode.
+
+        If this cannot be selected by the user, this should be
+        notSupported(1).
+
+        For 1+1 redundancy, use standbyHot(3).
+
+        For 1:1 redundancy, use standbyCold(2)."
+    DEFVAL { standbyHot }
+    ::= { nbsRedundCfgEntry 30 }
+
+--nbsRedundCfgStandbyTxOper    OBJECT-TYPE
+--    SYNTAX      INTEGER {
+--        notSupported (1),
+--        standbyCold  (2), -- -- 1:1
+--        standbyHot   (3)  -- -- 1+1
+--    }
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--       "Persistent. Actual transmitter state for this port when it is
+--        in standby..
+--
+--        For 1+1 redundancy, Agent will report standbyHot(3).
+--
+--        For 1:1 redundancy, Agent reports standbyCold(2)."
+--    DEFVAL { standbyHot }
+--    ::= { nbsRedundCfgEntry 31 }
+
+nbsRedundCfgStandbyTxToggle    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        txOff        (2),
+        txToggle     (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Persistent. Setting this to txToggle(3) allows a formerly
+        active port that detects no signal to notify its remote partner
+        that it is ready to transmit and connectivity is re-established
+        between them.
+
+        Enabling this feature may result in unnecessary switchovers and
+        dropped traffic."
+    DEFVAL { txOff }
+    ::= { nbsRedundCfgEntry 40 }
+
+nbsRedundCfgIfTypeAdmin    OBJECT-TYPE
+   SYNTAX      INTEGER {
+       notSupported (1),
+       access       (2),
+       trunk        (3)
+   }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This port's administratively desired type"
+   ::= { nbsRedundCfgEntry 50 }
+
+nbsRedundCfgIfTypeOper    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        access       (2),
+        trunk        (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This port's current operational type"
+    ::= { nbsRedundCfgEntry 51 }
+
+nbsRedundCfgGroupNumberAdmin   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This port's administratively desired group."
+    ::= { nbsRedundCfgEntry 60 }
+
+nbsRedundCfgGroupNumberOper   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This port's current operational group."
+    ::= { nbsRedundCfgEntry 61 }
+
+nbsRedundGroupCfgTableSize  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of entries in nbsRedundGroupCfgTable."
+    ::= { nbsRedundCfgGrp 3 }
+
+nbsRedundGroupCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsRedundGroupCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table lists all ports in a redundant pair."
+    ::= { nbsRedundCfgGrp 4 }
+
+nbsRedundGroupCfgEntry      OBJECT-TYPE
+    SYNTAX      NbsRedundGroupCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Redundancy status of a port."
+    INDEX { nbsRedundGroupCfgNdx, nbsRedundGroupCfgNumber }
+    ::= { nbsRedundGroupCfgTable 1 }
+
+NbsRedundGroupCfgEntry ::= SEQUENCE {
+    nbsRedundGroupCfgNdx         InterfaceIndex,
+    nbsRedundGroupCfgNumber      INTEGER,
+    nbsRedundGroupCfgOper        OCTET STRING,
+    nbsRedundGroupCfgModeAdmin   INTEGER,
+    nbsRedundGroupCfgModeOper    INTEGER,
+    nbsRedundGroupCfgYcableAdmin INTEGER,
+    nbsRedundGroupCfgYcableOper  INTEGER,
+    nbsRedundGroupCfgRowStatus   RowStatus
+}
+
+nbsRedundGroupCfgNdx      OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Unique index of a slot."
+    ::= { nbsRedundGroupCfgEntry 1 }
+
+nbsRedundGroupCfgNumber   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Unique index of a slot's group number."
+    ::= { nbsRedundGroupCfgEntry 2 }
+
+nbsRedundGroupCfgOper    OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This bitmask indicates this group's current operational port
+        membership.
+
+        Bit 0 is reserved."
+    ::= { nbsRedundGroupCfgEntry 13 }
+
+nbsRedundGroupCfgModeAdmin    OBJECT-TYPE
+   SYNTAX      INTEGER {
+       notSupported (1),
+       modeA       (2),
+       modeB       (3)
+   }
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+      "This group's administratively desired mode.
+
+       For modeA, when a faulty condition occurs on one member, all the
+       members in the group will take the same action concurrently.
+
+       For modeB, only the faulty member will take action."
+
+   DEFVAL { modeB }
+   ::= { nbsRedundGroupCfgEntry 15 }
+
+nbsRedundGroupCfgModeOper    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        modeA       (2),
+        modeB       (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This group's current operational mode"
+    ::= { nbsRedundGroupCfgEntry 16 }
+
+nbsRedundGroupCfgYcableAdmin OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported  (1),
+        disabled      (2),
+        enabled       (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object is used to enable and disable Y-Cable redundancy
+           on a group."
+
+    DEFVAL { disabled }
+    ::= { nbsRedundGroupCfgEntry 20 }
+
+nbsRedundGroupCfgYcableOper OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported  (1),
+        disabled      (2),
+        enabled       (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This Ycable group's current operational status."
+
+    ::= { nbsRedundGroupCfgEntry 21 }
+
+nbsRedundGroupCfgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This table RowStatus object to create, modify and delete the rows"
+    ::= { nbsRedundGroupCfgEntry 50 }
+
+
+
+-- ********************************************************************
+--
+-- nbsRedundEventGrp
+--
+-- ********************************************************************
+
+nbsYcableTrapsStatusChanged  NOTIFICATION-TYPE
+    OBJECTS   { nbsCmmcChassisIndex, nbsCmmcSlotIndex, nbsCmmcPortIndex,
+                nbsRedundCfgStatusOper }
+    STATUS      current
+    DESCRIPTION
+       "Sent when the nbsRedundCfgStatusOper of a port changes.
+        This Notification should be of Severity INFO."
+    ::= { nbsYcableTraps 10 }
+
+
+END

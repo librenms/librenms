@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 GH_REPO="@github.com/librenms-docs/librenms-docs.github.io.git"
 FULL_REPO="https://${GH_TOKEN}$GH_REPO"
 THEME_REPO="https://github.com/librenms-docs/librenms_theme.git"

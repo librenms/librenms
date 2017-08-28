@@ -1,0 +1,1549 @@
+--
+--                      C&C Power DC_SYSTEM MIB
+--         Management Information Base for SNMP Network Management
+--
+--      Copyright 2004 C&C Power, Inc.
+--
+--      C&C Power shall not be liable for technical or
+--      editorial errors or omissions contained herein. The information in
+--      this document is provided "as is" without warranty of any kind and
+--      is subject to change without notice. The warranties for C&C Power products
+--      are set forth in the express limited warranty statements
+--      accompanying such products. Nothing herein should be construed as
+--      constituting an additional warranty.
+--
+--      The C&C Power Enterprise number is 18642.
+--      The ASN.1 prefix to, and including the C&C Power Enterprise is:
+--           1.3.6.1.4.1.18642
+--
+--    MIB Version 1.0
+--    *********************************************************************
+--    Release History
+--       Initial Release Date: August 9, 2004 (Version 1.0)
+--       Author: Jeff Gear
+--    Revision History
+--       Date:
+--       Revision:
+--    *********************************************************************
+
+CCPOWER-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+     	enterprises    FROM RFC1155-SMI
+      DisplayString  FROM RFC1213-MIB
+      OBJECT-TYPE    FROM RFC-1212
+      TRAP-TYPE      FROM RFC-1215;
+
+   ccpower           OBJECT IDENTIFIER ::= { enterprises 18642 }
+   dcSystem          OBJECT IDENTIFIER ::= { ccpower 1 }
+
+-- *********************************************************************
+-- readWriteObjects definition
+-- *********************************************************************
+
+   readWriteObjects OBJECT IDENTIFIER ::= { dcSystem 1 }
+
+-- *********************************************************************
+-- readWriteObjects.settings definition
+-- *********************************************************************
+
+	settings OBJECT IDENTIFIER ::= { readWriteObjects 1 }
+
+   floatVoltage OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Rectifier DC Output Voltage.
+                  Return value is XXX representing XX.X volts."
+   	::= { settings 1 }
+
+   overloadCurrent OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Current which when exceeded will cause an alarm.
+                  Return value is XXXX representing XXXX amps."
+   	::= { settings 2 }
+
+   highVoltageAlarm OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Voltage which when exceeded will cause an alarm.
+                  Return value is XXX representing XX.X volts."
+   	::= { settings 3 }
+
+   lowVoltageAlarm OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Voltage which when exceeded will cause an alarm.
+                  Return value is XXX representing XX.X volts."
+   	::= { settings 4 }
+
+   disconnect1Voltage OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Voltage which when exceeded will cause a specific load to disconnect.
+                  Return value is XXX representing XX.X volts."
+   	::= { settings 5 }
+
+   disconnect1Temperature OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Temperature which when exceeded will cause a specific load to disconnect.
+                  Return value is XX representing XX °C."
+   	::= { settings 6 }
+
+   disconnect1LoadShedSundayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Sunday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 7 }
+
+   disconnect1LoadShedMondayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Monday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 8 }
+
+   disconnect1LoadShedTuesdayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Tuesday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 9 }
+
+   disconnect1LoadShedWednesdayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Wednesday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 10 }
+
+   disconnect1LoadShedThursdayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Thursday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 11 }
+
+   disconnect1LoadShedFridayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Friday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 12 }
+
+   disconnect1LoadShedSaturdayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Saturday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 13 }
+
+   disconnect2Voltage OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Voltage which when exceeded will cause a specific load to disconnect.
+                  Return value is XXX representing XX.X volts."
+   	::= { settings 14 }
+
+   disconnect2Temperature OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Temperature which when exceeded will cause a specific load to disconnect.
+                  Return value is XX representing XX °C."
+   	::= { settings 15 }
+
+   disconnect2LoadShedSundayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Sunday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 16 }
+
+   disconnect2LoadShedMondayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Monday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 17 }
+
+   disconnect2LoadShedTuesdayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Tuesday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 18 }
+
+   disconnect2LoadShedWednesdayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Wednesday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 19 }
+
+   disconnect2LoadShedThursdayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Thursday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 20 }
+
+   disconnect2LoadShedFridayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Friday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 21 }
+
+   disconnect2LoadShedSaturdayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Saturday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 22 }
+
+   disconnect3Voltage OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Voltage which when exceeded will cause a specific load to disconnect.
+                  Return value is XXX representing XX.X volts."
+   	::= { settings 23 }
+
+   disconnect3Temperature OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Temperature which when exceeded will cause a specific load to disconnect.
+                  Return value is XX representing XX °C."
+   	::= { settings 24 }
+
+   disconnect3LoadShedSundayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Sunday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 25 }
+
+   disconnect3LoadShedMondayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Monday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 26 }
+
+   disconnect3LoadShedTuesdayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Tuesday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 27 }
+
+   disconnect3LoadShedWednesdayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Wednesday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 28 }
+
+   disconnect3LoadShedThursdayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Thursday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 29 }
+
+   disconnect3LoadShedFridayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Friday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 30 }
+
+   disconnect3LoadShedSaturdayOff OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Saturday which when reached will cause a specific load to disconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 31 }
+
+   reconnect1Voltage OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Voltage which when reached will cause a specific load to reconnect.
+                  Return value is XXX representing XX.X volts."
+   	::= { settings 32 }
+
+   reconnect1LoadShedSundayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 33 }
+
+   reconnect1LoadShedMondayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Monday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 34 }
+
+   reconnect1LoadShedTuesdayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Tuesday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 35 }
+
+   reconnect1LoadShedWednesdayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Wednesday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 36 }
+
+   reconnect1LoadShedThursdayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Thursday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 37 }
+
+   reconnect1LoadShedFridayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Friday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 38 }
+
+   reconnect1LoadShedSaturdayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Saturday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 39 }
+
+   reconnect2Voltage OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Voltage which when reached will cause a specific load to reconnect.
+                  Return value is XXX representing XX.X volts."
+   	::= { settings 40 }
+
+   reconnect2LoadShedSundayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Sunday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 41 }
+
+   reconnect2LoadShedMondayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Monday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 42 }
+
+   reconnect2LoadShedTuesdayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Tuesday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 43 }
+
+   reconnect2LoadShedWednesdayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Wednesday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 44 }
+
+   reconnect2LoadShedThursdayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Thursday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 45 }
+
+   reconnect2LoadShedFridayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Friday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 46 }
+
+   reconnect2LoadShedSaturdayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Saturday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 47 }
+
+   reconnect3Voltage OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Voltage which when reached will cause a specific load to reconnect.
+                  Return value is XXX representing XX.X volts."
+   	::= { settings 48 }
+
+   reconnect3LoadShedSundayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Sunday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 49 }
+
+   reconnect3LoadShedMondayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Monday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 50 }
+
+   reconnect3LoadShedTuesdayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Tuesday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 51 }
+
+   reconnect3LoadShedWednesdayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Wednesday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 52 }
+
+   reconnect3LoadShedThursdayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Thursday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 53 }
+
+   reconnect3LoadShedFridayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Friday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 54 }
+
+   reconnect3LoadShedSaturdayOn OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Time on Saturday which when reached will cause a specific load to reconnect.
+                  Return value is XX:XX representing HH:MM."
+   	::= { settings 55 }
+
+   equalizeTime OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Number of hours the equalize voltage is to be applied.
+                  Return value is XXX representing XX.X hours."
+   	::= { settings 56 }
+
+   equalizeVoltage OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Equalize voltage to be applied.
+                  Return value is XXX representing XX.X volts."
+   	::= { settings 57 }
+
+   batteryResistancePercentChange OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Resistance percentange change that when reached will cause an alarm.
+                  Return value is XXX representing XXX %."
+   	::= { settings 58 }
+
+   batteryResistanceTestInterval OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Battery resistance test interval.
+                  Return value is XX representing XX weeks."
+   	::= { settings 59 }
+
+   loadShedTimeControl OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			enabled(1),
+         disabled(2)
+      }
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Load shed time control enabled/disabled status.
+                  Return value: 1 = time control enabled, 2 = time control disabled."
+   	::= { settings 60 }
+
+   batteryFloatCurrent OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-write
+   	STATUS		mandatory
+   	DESCRIPTION	"Battery float current.
+                  Return value is XXX representing XXX amps."
+   	::= { settings 61 }
+
+-- *********************************************************************
+-- readOnlyObjects definition
+-- *********************************************************************
+
+   readOnlyObjects OBJECT IDENTIFIER ::= { dcSystem 2 }
+
+-- *********************************************************************
+-- readOnlyObjects.rectifiers definition
+-- *********************************************************************
+
+	rectifiers OBJECT IDENTIFIER ::= { readOnlyObjects 1 }
+
+   rectifierFloatVoltage OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Rectifier float voltage.
+                  Return value is XXX representing XX.X volts. Valid ranges are 24.0 to 57.0 volts."
+   	::= { rectifiers 1 }
+
+   rectifierLoadCurrent OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Rectifier DC load current.
+                  Return value is XXXX representing XXXX amps. Valid ranges are 0000 to 5000 amps."
+   	::= { rectifiers 2}
+
+-- *********************************************************************
+-- readOnlyObjects.batteries definition
+-- *********************************************************************
+
+	batteries OBJECT IDENTIFIER ::= { readOnlyObjects 2 }
+
+   batteryCurrent OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Battery current.
+                  Return value is XXXX representing XXXX amps. Valid ranges are 0000 to 1000 amps."
+   	::= { batteries 1 }
+
+   batteryTemperature OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Battery temperature.
+                  Return value is XX representing XX °C. Valid ranges are -40 to 99 °C."
+   	::= { batteries 2 }
+
+   batteryResistanceReference OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Initial battery resistance.
+                  Return value is XXXXX representing X.XXXX ohms. Valid ranges are 0.0000 to 5.0000 ohms."
+   	::= { batteries 3 }
+
+   batteryResistanceReading OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Last battery resistance reading.
+                   Return value is XXXXX representing X.XXXX ohms. Valid ranges are 0.0000 to 5.0000 ohms."
+   	::= { batteries 4 }
+
+   batteryResistanceChange OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Percent change from last battery resistance reading.
+                  Return value is XXX representing XXX %. Valid ranges are 001 to 999 %."
+   	::= { batteries 5 }
+
+   batteryCycles1 OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Number of discharge/recharge cycles less than 1 minute.
+                  Return value is XXX representing XXX cycles. Valid ranges are 000 to 255 cycles."
+   	::= { batteries 6 }
+
+   batteryCycles1to5 OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Number of discharge/recharge cycles from 1 to 5 minutes.
+                  Return value is XXX representing XXX cycles. Valid ranges are 000 to 255 cycles."
+   	::= { batteries 7 }
+
+   batteryCycles5to15 OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Number of discharge/recharge cycles from 5 to 15 minutes.
+                  Return value is XXX representing XXX cycles. Valid ranges are 000 to 255 cycles."
+   	::= { batteries 8 }
+
+   batteryCycles15 OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Number of discharge/recharge cycles greater than 15 minutes.
+                  Return value is XXX representing XXX cycles. Valid ranges are 000 to 255 cycles."
+   	::= { batteries 9 }
+
+   batteryCycles15LastCycleDate OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Last cycle date of batteryCycles15.
+                  Return value is MM-DD-YY, HH-MM."
+   	::= { batteries 10 }
+
+   batteryCycles15LastDuration OBJECT-TYPE
+   	SYNTAX		INTEGER
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Duration of batteryCycles15 last cycle.
+                  Return value is XXXX representing XXXX minutes."
+   	::= { batteries 11 }
+
+   batteryTestFault OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			abort1(1),
+         abort2(2),
+         abort3(3),
+         none(4)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Battery failure has occured during battery restistance test.
+                  Return value: 1 = Abort 1, 2 = Abort 2, 3 = Abort 3, 4 = None."
+   	::= { batteries 12 }
+
+-- *********************************************************************
+-- readOnlyObjects.factorySettings definition
+-- *********************************************************************
+
+	factorySettings OBJECT IDENTIFIER ::= { readOnlyObjects 3 }
+
+   floatVoltagePresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Float voltage factory setting range.
+                  Return value is XX.X volts min, XX.X volts max."
+   	::= { factorySettings 1 }
+
+   highVoltageAlarmPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"High voltage alarm factory setting range.
+                  Return value is XX.X volts min, XX.X volts max."
+   	::= { factorySettings 2 }
+
+   lowVoltageAlarmPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Low voltage alarm factory setting range.
+                  Return value is XX.X volts min, XX.X volts max."
+   	::= { factorySettings 3 }
+
+   disconnect1VoltagePresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect voltage 1 factory setting range.
+                   Return value is XX.X volts min, XX.X volts max."
+   	::= { factorySettings 4 }
+
+   disconnect1TemperaturePreset OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect temperature 1 factory setting.
+                  Return value is XX °C."
+   	::= { factorySettings 5 }
+
+   disconnect1LoadShedSundayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 1 load shed Sunday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 6 }
+
+   disconnect1LoadShedMondayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 1 load shed Monday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 7 }
+
+   disconnect1LoadShedTuesdayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 1 load shed Tuesday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 8 }
+
+   disconnect1LoadShedWednesdayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 1 load shed Wednesday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 9 }
+
+   disconnect1LoadShedThursdayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 1 load shed Thursday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 10 }
+
+   disconnect1LoadShedFridayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 1 load shed Friday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 11 }
+
+   disconnect1LoadShedSaturdayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 1 load shed Saturday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 12 }
+
+   reconnectVoltage1Presets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Reconnect voltage 1 factory setting range.
+                  Return value is XX.X volts min, XX.X volts max."
+   	::= { factorySettings 13 }
+
+   disconnect2VoltagePresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect voltage 2 factory setting range.
+                  Return value is XX.X volts min, XX.X volts max."
+   	::= { factorySettings 14 }
+
+   disconnect2TemperaturePreset OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect temperature 2 factory setting.
+                  Return value is XX °C."
+   	::= { factorySettings 15 }
+
+   disconnect2LoadShedSundayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 2 load shed Sunday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 16 }
+
+   disconnect2LoadShedMondayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 2 load shed Monday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 17 }
+
+   disconnect2LoadShedTuesdayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 2 load shed Tuesday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 18 }
+
+   disconnect2LoadShedWednesdayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 2 load shed Wednesday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 19 }
+
+   disconnect2LoadShedThursdayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 2 load shed Thursday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 20 }
+
+   disconnect2LoadShedFridayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 2 load shed Friday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 21 }
+
+   disconnect2LoadShedSaturdayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 2 load shed Saturday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 22 }
+
+   reconnect2VoltagePresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Reconnect voltage 2 factory setting range.
+                  Return value is XX.X volts min, XX.X volts max."
+   	::= { factorySettings 23 }
+
+   disconnect3VoltagePresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect voltage 3 factory setting range.
+                  Return value is XX.X volts min, XX.X volts max."
+   	::= { factorySettings 24 }
+
+   disconnect3TemperaturePreset OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect temperature 3 factory setting.
+                  Return value is XX °C."
+   	::= { factorySettings 25 }
+
+   disconnect3LoadShedSundayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 3 load shed Sunday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 26 }
+
+   disconnect3LoadShedMondayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 3 load shed Monday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 27 }
+
+   disconnect3LoadShedTuesdayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 3 load shed Tuesday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 28 }
+
+   disconnect3LoadShedWednesdayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 3 load shed Wednesday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 29 }
+
+   disconnect3LoadShedThursdayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 3 load shed Thursday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 30 }
+
+   disconnect3LoadShedFridayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 3 load shed Friday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 31 }
+
+   disconnect3LoadShedSaturdayPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Disconnect 3 load shed Saturday time settings.
+                  Return value is XX:Xx off, XX:XX on."
+   	::= { factorySettings 32 }
+
+   reconnect3VoltagePresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Reconnect voltage 3 factory setting range.
+                  Return value is XX.X volts min, XX.X volts max."
+   	::= { factorySettings 33 }
+
+   overloadCurrentPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Overload current factory setting range.
+                  Return value is XXXX amps min, XXXX amps max."
+   	::= { factorySettings 34 }
+
+   maximumCurrentPreset OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Maximum current factory setting.
+                  Return value is XXXX amps."
+   	::= { factorySettings 35 }
+
+   batteryFloatCurrentPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Battery float current factory settings.
+                  Return value is XXX amps min, XXX amps max."
+   	::= { factorySettings 36 }
+
+   equalizeTimePresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Equalize time factory setting range.
+                  Return value is 00.0 hours min, XX.X hours max."
+   	::= { factorySettings 37 }
+
+   equalizeVoltagePresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Equalize voltage factory setting range.
+                  Return value is XX.X volts min, XX.X volts max."
+   	::= { factorySettings 38 }
+
+   batteryResistancePresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Battery resistance percent change factory setting range.
+                  Return value is XXX % min, XXX % max."
+   	::= { factorySettings 39 }
+
+   batteryTestIntervalPresets OBJECT-TYPE
+   	SYNTAX		DisplayString
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Battery resistance test interval factory setting range.
+                  Return value is XX weeks min, XX weeks max."
+   	::= { factorySettings 40 }
+
+-- *********************************************************************
+-- readOnlyObjects.alarmStatus definition
+-- *********************************************************************
+
+	alarmStatus OBJECT IDENTIFIER ::= { readOnlyObjects 4 }
+
+   highVoltageAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"High voltage alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 1 }
+
+   lowVoltageAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Low voltage alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 2 }
+
+   overloadAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Overload alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 3 }
+
+   breakerAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Breaker alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 4 }
+
+   acFailureAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"AC failure alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 5 }
+
+   fanFailureAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Fan failure alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 6 }
+
+   rectifierFailureAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Rectifier failure alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 7 }
+
+   majorAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Major alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 8 }
+
+   lowVoltageDisconnect1TemperatureAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Low voltage disconnect 1 high temperature alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 9 }
+
+   lowVoltageDisconnect2TemperatureAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Low voltage disconnect 2 high temperature alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 10 }
+
+   lowVoltageDisconnect3TemperatureAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Low voltage disconnect 3 high temperature alarm status.
+                   Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 11 }
+
+   lowVoltageDisconnect1VoltageAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Low voltage disconnect 1 low voltage alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 12 }
+
+   lowVoltageDisconnect2VoltageAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Low voltage disconnect 2 low voltage alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 13 }
+
+   lowVoltageDisconnect3VoltageAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Low voltage disconnect 3 low voltage alarm status.
+                   Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 14 }
+
+   batteryResistanceAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Battery resistance alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 15 }
+
+   batteryCurrentAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Battery resistance alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 16 }
+
+   batteryTestAbortCondition1AlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Battery test abort condition 1 alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 17 }
+
+   batteryTestAbortCondition2AlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Battery test abort condition 2 alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 18 }
+
+   batteryTestAbortCondition3AlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Battery test abort condition 3 alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 19 }
+
+   batteryDisconnectAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Battery disconnect alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 20 }
+
+   fuseAlarmStatus OBJECT-TYPE
+   	SYNTAX		INTEGER {
+			inactive(1),
+         active(2)
+      }
+   	ACCESS		read-only
+   	STATUS		mandatory
+   	DESCRIPTION	"Fuse alarm status.
+                  Return value 1 = alarm inactive, 2 = alarm active."
+   	::= { alarmStatus 21 }
+
+-- *********************************************************************
+-- readOnlyObjects.digitalSensorAlarms definition
+-- *********************************************************************
+
+	digitalSensorAlarms OBJECT IDENTIFIER ::= { readOnlyObjects 5 }
+
+   breakerTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+      --#SEVERITY CRITICAL
+   	DESCRIPTION "Breaker has tripped."
+   	::= 0
+
+   fuseTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+      --#SEVERITY CRITICAL
+   	DESCRIPTION "Fuse has opened."
+   	::= 1
+
+   batteryDisconnectTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+      --#SEVERITY CRITICAL
+   	DESCRIPTION "Battery disconnect has operated."
+   	::= 2
+
+   programmableTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Programmable alarm has occurred."
+      --#SEVERITY CRITICAL
+   	::= 3
+
+-- *********************************************************************
+-- readOnlyObjects.SystemAlarms definition
+-- *********************************************************************
+
+	systemAlarms OBJECT IDENTIFIER ::= { readOnlyObjects 6 }
+
+   highVoltageTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Float voltage has exceeded preset value.
+                  Return value: High voltage alarm XX.X volts."
+      --#SEVERITY WARNING
+   	::= 4
+
+   lowVoltageTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Float voltage is below preset value.
+                  Return value: Low voltage alarm XX.X volts."
+      --#SEVERITY WARNING
+   	::= 5
+
+   loadOverCurrentTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Load current has exceeded preset value.
+                  Return value: Load over current alarm XXXX amps."
+      --#SEVERITY WARNING
+   	::= 6
+
+   batteryFloatCurrentTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Battery float current has exceeded preset value.
+                  Return value: Battery float current alarm XXXX amps."
+      --#SEVERITY CRITICAL
+   	::= 7
+
+   loadDisconnect1VoltageTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Load disconnect 1 voltage has dropped below preset value.
+                  Return value: Load disconnect 1 voltage XX.X volts."
+      --#SEVERITY CRITICAL
+   	::= 8
+
+   loadDisconnect2VoltageTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Load disconnect 2 voltage has dropped below preset value.
+                  Return value: Load disconnect 2 voltage XX.X volts."
+      --#SEVERITY CRITICAL
+   	::= 9
+
+   loadDisconnect3VoltageTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Load disconnect 3 voltage has dropped below preset value.
+                  Return value: Load disconnect 3 voltage XX.X volts."
+      --#SEVERITY CRITICAL
+   	::= 10
+
+   loadDisconnect1TemperatureTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Load disconnect 1 temperature has exceeded preset value.
+                  Return value: Load disconnect 1 temperature alarm XX °C."
+      --#SEVERITY CRITICAL
+   	::= 11
+
+   loadDisconnect2TemperatureTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Load disconnect 2 temperature has exceeded preset value.
+                  Return value: Load disconnect 2 temperature alarm XX °C."
+      --#SEVERITY CRITICAL
+   	::= 12
+
+   loadDisconnect3TemperatureTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Load disconnect 3 temperature has exceeded preset value.
+                  Return value: Load disconnect 3 temperature alarm XX °C."
+      --#SEVERITY CRITICAL
+   	::= 13
+
+   rectifierFailureTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Rectifier failure.
+                  Return value: Rectifier failure."
+      --#SEVERITY WARNING
+   	::= 14
+
+   fanFailureTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Rectifier fan has failed.
+                  Return value: Fan failure."
+      --#SEVERITY CRITICAL
+   	::= 15
+
+   acFailureTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Rectifier has lost AC input power.
+                  Return value: AC failure."
+      --#SEVERITY CRITICAL
+   	::= 16
+
+   majorFailureTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Multiple failures of AC, rectififers, fans or a programmed alarm.
+                  Return value: Multiple AC, fan, rectifier or optional alarm failures has occurred."
+      --#SEVERITY CRITICAL
+   	::= 17
+
+   batteryResistanceTrap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Battery resistance has increased by a programmed percentage.
+                  Return value: Battery resistance alarm X.XXXX ohms, XXX %."
+      --#SEVERITY WARNING
+   	::= 18
+
+   batteryTestAbort1Trap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Battery failure abort 1 has occured during battery resistance test.
+                  Return value: Battery test failure: Abort 1."
+      --#SEVERITY CRITICAL
+   	::= 19
+
+   batteryTestAbort2Trap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Battery failure abort 2 has occured during battery resistance test.
+                  Return value: Battery test failure: Abort 2."
+      --#SEVERITY CRITICAL
+   	::= 20
+
+   batteryTestAbort3Trap TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Battery failure abort 3 has occured during battery resistance test.
+                  Return value: Battery test failure: Abort 3."
+      --#SEVERITY CRITICAL
+   	::= 21
+
+-- *********************************************************************
+-- readOnlyObjects.digitalSensorAlarmClears definition
+-- *********************************************************************
+
+	digitalSensorAlarmClears OBJECT IDENTIFIER ::= { readOnlyObjects 7 }
+
+   breakerTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Breaker alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 100
+
+   fuseTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Fuse alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 101
+
+   batteryDisconnectTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Battery disconnect alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 102
+
+   programmableTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Programmable alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 103
+
+-- *********************************************************************
+-- readOnlyObjects.SystemAlarmClears definition
+-- *********************************************************************
+
+	systemAlarmClears OBJECT IDENTIFIER ::= { readOnlyObjects 8 }
+
+   highVoltageTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "High voltage alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 104
+
+   lowVoltageTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Low voltage alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+      ::= 105
+
+   loadOverCurrentTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Load over current alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 106
+
+   batteryFloatCurrentTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Battery float current alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 107
+
+   loadDisconnect1VoltageTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Load disconnect 1 voltage alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 108
+
+   loadDisconnect2VoltageTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Load disconnect 2 voltage alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 109
+
+   loadDisconnect3VoltageTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Load disconnect 3 voltage alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 110
+
+   loadDisconnect1TemperatureTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Load disconnect 1 temperature alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 111
+
+   loadDisconnect2TemperatureTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Load disconnect 2 temperature alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 112
+
+   loadDisconnect3TemperatureTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Load disconnect 3 temperature alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 113
+
+   rectifierFailureTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Rectififer failure alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 114
+
+   fanFailureTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Fan failure alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 115
+
+   acFailureTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "AC failure alarm been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 116
+
+   majorFailureTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Major failure alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 117
+
+   batteryResistanceTrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Battery resistance alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 118
+
+   batteryTestAbort1TrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Battery test abort 1 alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 119
+
+   batteryTestAbort2TrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Battery test abort 2 alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 120
+
+   batteryTestAbort3TrapClear TRAP-TYPE
+   	ENTERPRISE ccpower
+   	DESCRIPTION "Battery test abort 3 alarm has been cleared."
+      --#SEVERITY INFORMATIONAL
+   	::= 121
+
+END
+
+

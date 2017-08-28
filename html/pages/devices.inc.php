@@ -379,17 +379,17 @@ if ($format == "graph") {
         <table id="devices" class="table table-condensed table-hover">    
             <thead>
                 <tr>
-                    <th data-column-id="status" data-searchable="false" data-formatter="status" data-header-css-class="device-table-header-status">Status</th>
+                    <th data-column-id="status" data-width="100px" data-searchable="false" data-formatter="status">Status</th>
     ';
 
     if ($subformat == "detail") {
-        echo '<th data-column-id="icon" data-sortable="false" data-searchable="false" data-formatter="icon" data-header-css-class="device-table-header-vendor">Vendor</th>';
+        echo '<th data-column-id="icon" data-width="80px" data-sortable="false" data-searchable="false" data-formatter="icon">Vendor</th>';
     }
 
     echo '<th data-column-id="hostname" data-order="asc">Device</th>';
 
     if ($subformat == "detail") {
-        echo '<th data-column-id="ports" data-sortable="false" data-searchable="false">Metrics</th>';
+        echo '<th data-column-id="ports" data-width="100px" data-sortable="false" data-searchable="false">Metrics</th>';
     }
 
     echo '
@@ -403,7 +403,7 @@ if ($format == "graph") {
     }
 
     echo '
-                    <th data-column-id="actions" data-sortable="false" data-searchable="false" data-header-css-class="device-table-header-actions">Actions</th>
+                    <th data-column-id="actions" data-width="90px" data-sortable="false" data-searchable="false" data-header-css-class="device-table-header-actions">Actions</th>
                 </tr>
             </thead>
         </table>

@@ -22,7 +22,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
     $entity_state = get_dev_entity_state($device['device_id']);
 
     // print_r($entity_state);
-    $pagetitle[] = ip_to_sysname($device, $device['hostname']);
+    $pagetitle[] = format_hostname($device, $device['hostname']);
 
     $component = new LibreNMS\Component();
     $component_count = $component->getComponentCount($device['device_id']);
@@ -121,6 +121,14 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
             echo '<li role="presentation" '.$select['slas'].$select['sla'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'slas')).'">
                 <i class="fa fa-flag fa-lg icon-theme" aria-hidden="true"></i> SLAs
+                </a>
+                </li>';
+        }
+
+        if (@dbFetchCell('SELECT COUNT(*) FROM `wireless_sensors` WHERE `device_id`=?', array($device['device_id'])) > '0') {
+            echo '<li role="presentation" '.$select['wireless'].'>
+                <a href="'.generate_device_url($device, array('tab' => 'wireless')).'">
+                <i class="fa fa-wifi fa-lg icon-theme"  aria-hidden="true"></i> Wireless
                 </a>
                 </li>';
         }
@@ -389,7 +397,12 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
                     $nfsensuffix = $config['nfsen_suffix'];
                 }
 
-                $basefilename_underscored = preg_replace('/\./', $config['nfsen_split_char'], $device['hostname']);
+                if (isset($config['nfsen_split_char']) && !empty($config['nfsen_split_char'])) {
+                    $basefilename_underscored = preg_replace('/\./', $config['nfsen_split_char'], $device['hostname']);
+                } else {
+                    $basefilename_underscored = $device['hostname'];
+                }
+
                 $nfsen_filename           = preg_replace('/'.$nfsensuffix.'/', '', $basefilename_underscored);
                 if (is_file($nfsenrrds.$nfsen_filename.'.rrd')) {
                     $nfsen_rrd_file = $nfsenrrds.$nfsen_filename.'.rrd';

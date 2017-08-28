@@ -1,0 +1,144 @@
+-- *****************************************************************
+-- NMS-EPON-OAM-REMOTE-LOOPBACK.MIB:  NMS OLT MIB file
+-- AUG 2009
+-- *****************************************************************
+--
+
+               NMS-EPON-OAM-REMOTE-LOOPBACK DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter64
+			FROM SNMPv2-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString, ifIndex, PhysAddress
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+		    RowStatus
+		    	FROM SNMPv2-TC
+		    llidIfIndex
+		    	FROM NMS-EPON-LLID;
+		    
+          
+               nmsEponOltOamRemoteLoopback         OBJECT IDENTIFIER ::= { nmsEPONGroup 3 }
+               
+               
+               
+               nmsEponOltOamRemoteLoopbackTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOltOamRemoteLoopbackEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon olt oam remote loopback table entries."
+                   ::= { nmsEponOltOamRemoteLoopback 1 }
+
+               nmsEponOltOamRemoteLoopbackEntry OBJECT-TYPE
+                   SYNTAX NMSEponOltOamRemoteLoopbackEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon olt oam remote loopback table."
+                   INDEX { llidIfIndex }
+               ::= { nmsEponOltOamRemoteLoopbackTable 1 }
+
+               NMSEponOltOamRemoteLoopbackEntry ::=
+                   SEQUENCE {
+                       oltTxFrameSize
+                           INTEGER,
+                       oltTxFrameCount
+                           INTEGER,
+                       oltRxFrameCount
+                           INTEGER,
+                       oltOutOfSequenceFrameCount
+                           INTEGER,
+                       oltLossPercentage
+                           INTEGER,
+                       oltMinRtt
+                           Counter64,
+                       oltAverageRtt
+                           Counter64,
+                       oltMaxRtt
+                           Counter64,
+                       oltLoopbackRowStatus
+                           RowStatus
+                   }
+
+               oltTxFrameSize OBJECT-TYPE
+                   SYNTAX  INTEGER(64..1518)
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT tx frame size, range is 64-1518."
+                   ::= { nmsEponOltOamRemoteLoopbackEntry 1 } 
+
+               oltTxFrameCount OBJECT-TYPE
+                   SYNTAX  INTEGER(1..99)
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT tx frame count, range is 1-99."
+                   ::= { nmsEponOltOamRemoteLoopbackEntry 2 } 
+
+               oltRxFrameCount OBJECT-TYPE
+                   SYNTAX  INTEGER(1..99)
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT rx frame count, range is 1-99."
+                   ::= { nmsEponOltOamRemoteLoopbackEntry 3 } 
+
+               oltOutOfSequenceFrameCount OBJECT-TYPE
+                   SYNTAX  INTEGER(1..99)
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT out of sequence frame count, range is 1-99."
+                   ::= { nmsEponOltOamRemoteLoopbackEntry 4 } 
+
+               oltLossPercentage OBJECT-TYPE
+                   SYNTAX  INTEGER(0..100)
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Percentage of OLT losing frame, range is 0-100."
+                   ::= { nmsEponOltOamRemoteLoopbackEntry 5 } 
+
+               oltMinRtt OBJECT-TYPE
+                   SYNTAX  Counter64
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT minimum RTT(Round Trip Time)."
+                   ::= { nmsEponOltOamRemoteLoopbackEntry 6 } 
+
+               oltAverageRtt OBJECT-TYPE
+                   SYNTAX  Counter64
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT average RTT(Round Trip Time)."
+                   ::= { nmsEponOltOamRemoteLoopbackEntry 7 } 
+
+               oltMaxRtt OBJECT-TYPE
+                   SYNTAX  Counter64
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT maximum RTT(Round Trip Time)."
+                   ::= { nmsEponOltOamRemoteLoopbackEntry 8 } 
+
+               oltLoopbackRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "OLT loopback row status."
+                   ::= { nmsEponOltOamRemoteLoopbackEntry 9 } 
+
+
+               
+
+
+END

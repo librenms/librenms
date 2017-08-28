@@ -1,6 +1,7 @@
 <?php
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
+use LibreNMS\Device\WirelessSensor;
 use LibreNMS\ObjectCache;
 
 $service_status   = get_service_status();
@@ -125,6 +126,7 @@ if (dbFetchCell("SELECT 1 from `packages` LIMIT 1")) {
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv6'))); ?>"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> IPv6 Address</a></li>
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'mac'))); ?>"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> MAC Address</a></li>
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'arp'))); ?>"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> ARP Tables</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'fdb'))); ?>"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> FDB Tables</a></li>
 <?php
 if (is_module_enabled('poller', 'mib')) {
 ?>
@@ -372,7 +374,7 @@ if ($menu_sensors) {
     echo('            <li role="presentation" class="divider"></li>');
 }
 
-$icons = array('fanspeed'=>'tachometer','humidity'=>'tint','temperature'=>'thermometer-full','current'=>'bolt','frequency'=>'line-chart','power'=>'power-off','voltage'=>'bolt','charge'=>'battery-half','dbm'=>'sun-o', 'load'=>'percent', 'runtime' => 'hourglass-half', 'state'=>'bullseye','signal'=>'wifi');
+$icons = array('fanspeed'=>'tachometer','humidity'=>'tint','temperature'=>'thermometer-full','current'=>'bolt','frequency'=>'line-chart','power'=>'power-off','voltage'=>'bolt','charge'=>'battery-half','dbm'=>'sun-o', 'load'=>'percent', 'runtime' => 'hourglass-half', 'state'=>'bullseye','signal'=>'wifi', 'snr'=>'signal');
 foreach (array('fanspeed','humidity','temperature','signal') as $item) {
     if (isset($menu_sensors[$item])) {
         echo('            <li><a href="health/metric='.$item.'/"><i class="fa fa-'.$icons[$item].' fa-fw fa-lg" aria-hidden="true"></i> '.nicecase($item).'</a></li>');
@@ -409,6 +411,25 @@ foreach (array_keys($menu_sensors) as $item) {
           </ul>
         </li>
 <?php
+
+$valid_wireless_types = WirelessSensor::getTypes(true);
+
+if (!empty($valid_wireless_types)) {
+    echo '<li class="dropdown">
+          <a href="wireless/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
+          <i class="fa fa-wifi fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Wireless</span></a>
+          <ul class="dropdown-menu">';
+
+    foreach ($valid_wireless_types as $type => $meta) {
+        echo '<li><a href="wireless/metric='.$type.'/">';
+        echo '<i class="fa fa-'.$meta['icon'].' fa-fw fa-lg" aria-hidden="true"></i> ';
+        echo $meta['short'];
+        echo '</a></li>';
+    }
+
+    echo '</ul></li>';
+}
+
 
 $app_list = dbFetchRows("SELECT DISTINCT(`app_type`) AS `app_type` FROM `applications` ORDER BY `app_type`");
 

@@ -45,6 +45,6 @@ class PolarScale extends LinearScale
         } else {
             $y = ($this->graph->img->top_margin + $this->graph->img->plotheight) - $y;
         }
-        return [$x, $y];
+        return array($x, $y);
     }
 }

@@ -21,7 +21,7 @@ if ($device['os'] == 'cambium') {
             '0',
             'cambium-cpu',
             $descr,
-            '100',
+            '10',
             $usage,
             null,
             null

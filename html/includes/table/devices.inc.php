@@ -162,6 +162,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
     $device['os_text'] = $config['os'][$device['os']]['text'];
     $port_count = dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE `device_id` = ?', array($device['device_id']));
     $sensor_count = dbFetchCell('SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ?', array($device['device_id']));
+    $wireless_count = dbFetchCell('SELECT COUNT(*) FROM `wireless_sensors` WHERE `device_id` = ?', array($device['device_id']));
 
     $actions = '
         <div class="container-fluid">
@@ -198,26 +199,42 @@ foreach (dbFetchRows($sql, $param) as $device) {
         $os = $device['os_text'] . '<br>' . $device['version'];
         $device['ip'] = inet6_ntop($device['ip']);
         $uptime = formatUptime($device['uptime'], 'short');
-        if (ip_to_sysname($device, $device['hostname']) !== $device['sysName']) {
+        if (format_hostname($device) !== $device['sysName']) {
             $hostname .= '<br />' . $device['sysName'];
         } elseif ($device['hostname'] !== $device['ip']) {
             $hostname .= '<br />' . $device['hostname'];
         }
-        if (empty($port_count)) {
-            $port_count = 0;
-            $col_port = '';
-        }
+
+        $metrics = array();
         if ($port_count) {
-            $col_port = '<i class="fa fa-link fa-lg icon-theme"></i> ' . $port_count . '<br>';
+            $port_widget = '<a href="' . generate_device_url($device, array('tab' => 'ports')) . '">';
+            $port_widget .= '<span><i class="fa fa-link fa-lg icon-theme"></i> ' . $port_count;
+            $port_widget .= '</span></a> ';
+            $metrics[] = $port_widget;
         }
 
         if ($sensor_count) {
-            $col_port .= '<i class="fa fa-dashboard fa-lg icon-theme"></i> ' . $sensor_count;
+            $sensor_widget = '<a href="' . generate_device_url($device, array('tab' => 'health')) . '">';
+            $sensor_widget .= '<span><i class="fa fa-dashboard fa-lg icon-theme"></i> ' . $sensor_count;
+            $sensor_widget .= '</span></a> ';
+            $metrics[] = $sensor_widget;
         }
+
+        if ($wireless_count) {
+            $wireless_widget = '<a href="' . generate_device_url($device, array('tab' => 'wireless')) . '">';
+            $wireless_widget .= '<span><i class="fa fa-wifi fa-lg icon-theme"></i> ' . $wireless_count;
+            $wireless_widget .= '</span></a> ';
+            $metrics[] = $wireless_widget;
+        }
+
+        $col_port = '<div class="device-table-metrics">';
+        $col_port .= implode(count($metrics) == 2 ? '<br />' : '', $metrics);
+        $col_port .= '</div>';
     } else {
         $platform = $device['hardware'];
         $os = $device['os_text'] . ' ' . $device['version'];
         $uptime = formatUptime($device['uptime'], 'short');
+        $col_port = '';
     }
 
     $response[] = array(

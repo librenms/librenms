@@ -222,6 +222,7 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
         }
     },
     url: "ajax_table.php",
+    rowCount: [50, 100, 250, -1],
     formatters: {
         "status": function(column,row) {
             return "<h4><span class=\'label label-"+row.extra+" threeqtr-width\'>" + row.msg + "</span></h4>";

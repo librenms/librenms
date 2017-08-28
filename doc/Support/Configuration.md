@@ -210,6 +210,44 @@ $config['int_l2tp']                = 0;  # Enable L2TP Port Types
 ```
 Enable / disable certain menus from being shown in the WebUI.
 
+You are able to adjust the number and time frames of the quick select time options for graphs and the mini graphs shown per row.
+
+Quick select:
+```php
+$config['graphs']['mini']['normal'] = array(
+    'day' => '24 Hours',
+    'week' => 'One Week',
+    'month' => 'One Month',
+    'year' => 'One Year',
+);
+$config['graphs']['mini']['widescreen'] = array(
+    'sixhour' => '6 Hours',
+    'day' => '24 Hours',
+    'twoday' => '48 Hours',
+    'week' => 'One Week',
+    'twoweek' => 'Two Weeks',
+    'month' => 'One Month',
+    'twomonth' => 'Two Months',
+    'year' => 'One Year',
+    'twoyear' => 'Two Years',
+);
+```
+
+Mini graphs:
+```php
+$config['graphs']['row']['normal'] = array(
+    'sixhour' => '6 Hours',
+    'day' => '24 Hours',
+    'twoday' => '48 Hours',
+    'week' => 'One Week',
+    'twoweek' => 'Two Weeks',
+    'month' => 'One Month',
+    'twomonth' => 'Two Months',
+    'year' => 'One Year',
+    'twoyear' => 'Two Years',
+);
+```
+
 ```php
 $config['web_mouseover']      = true;
 ```
@@ -321,7 +359,7 @@ The varying options after that are to support the different transports.
 
 ### Alerting
 
-[Alerting](../Extensions/Alerting.md)
+[Alerting](../Alerting/index.md)
 
 ### Billing
 
@@ -394,6 +432,12 @@ Regex Matching:
 ```php
 $config['location_map_regex']['/Sink/'] = "Under The Sink, The Office, London, UK";
 ```
+Regex Match Substitution:
+```php
+$config['location_map_regex_sub']['/Sink/'] = "Under The Sink, The Office, London, UK [lat, long]";
+```
+If you have an SNMP SysLocation of "Rack10,Rm-314,Sink", Regex Match Substition yields "Rack10,Rm-314,Under The Sink, The Office, London, UK [lat, long]". This allows you to keep the SysLocation string short and keeps Rack/Room/Building information intact after the substitution.
+
 The above are examples, these will rewrite device snmp locations so you don't need to configure full location within snmp.
 
 ### Interfaces to be ignored
@@ -417,6 +461,18 @@ by continuing the array.
 `bad_ifname_regexp` is matched against the ifName value as a regular expression.
 
 `bad_ifalias_regexp` is matched against the ifAlias value as a regular expression.
+
+### Interfaces that shouldn't be ignored
+
+Examples:
+
+```php
+$config['good_if'][] = 'FastEthernet';
+$config['os']['ios']['good_if'][] = 'FastEthernet';
+```
+
+`good_if` is matched against ifDescr value. This can be a bad_if value as well which would stop that port from being ignored. 
+I.e If bad_if and good_if both contained FastEthernet then ports with this value in the ifDescr will be valid.
 
 ### Interfaces to be rewritten
 
@@ -487,7 +543,7 @@ $config['syslog_purge']                                   = 30;
 $config['eventlog_purge']                                 = 30;
 $config['authlog_purge']                                  = 30;
 $config['perf_times_purge']                               = 30;
-$config['device_perf_purge']                              = 30;
+$config['device_perf_purge']                              = 7;
 $config['rrd_purge']                                      = 90;// Not set by default
 ```
 These options will ensure data within LibreNMS over X days old is automatically purged. You can alter these individually,
@@ -534,7 +590,7 @@ You can use this array to rewrite the description of ASes that you have discover
 [Updating](../General/Updating.md)
 
 ### IPMI
-Setup the types of IPMI protocols to test a host for and it what order.
+Setup the types of IPMI protocols to test a host for and in what order. Don't forget to install ipmitool on the monitoring host.
 
 ```php
 $config['ipmi']['type'] = array();

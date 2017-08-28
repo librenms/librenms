@@ -17,7 +17,7 @@ require 'includes/graphs/common.inc.php';
 $rrd_options .= ' -l 0 -E ';
 $rrd_filename = $config['rrd_dir']."/".$device['hostname']."/".safename('sla-'.$sla['sla_nr'].'-jitter.rrd');
 
-if (file_exists($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_options .= " COMMENT:'                            Cur   Min  Max\\n'";
 
     $rrd_options .= " DEF:SD=" . $rrd_filename . ":AvgSDJ:AVERAGE ";

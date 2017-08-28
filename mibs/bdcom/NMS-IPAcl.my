@@ -1,0 +1,686 @@
+-- *****************************************************************
+-- NMS-IPAcl.my:  NMS IPAcl MIB file
+-- NOV. 18 2008
+-- *****************************************************************
+--
+
+            NMS-IPAcl DEFINITIONS ::= BEGIN
+
+            IMPORTS 
+            	MODULE-IDENTITY,
+        		OBJECT-TYPE
+            		FROM SNMPv2-SMI 
+            	nmslocal
+            		FROM NMS-SMI	           	           		
+            	DisplayString 
+					FROM RFC1213-MIB
+ 			   	RowStatus
+  		      		FROM SNMPv2-TC;
+                                   
+nmsIPAclMIB  MODULE-IDENTITY
+        LAST-UPDATED    "200811180000Z"
+        ORGANIZATION    ""
+        CONTACT-INFO
+                	""
+			
+        DESCRIPTION
+            "This MIB module defines the generic managed objects
+            for IP Acl."
+        ::= { nmslocal 5 }
+                             
+                             
+         nmsAclTotal OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              		"the total num of access-lists"
+              ::= { nmsIPAclMIB 1 } 
+ --ACL TABLE
+         nmsIPAclTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF NMSIPAclEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              		"This table containing one entry for each
+             		IP Acl on this device."
+              ::= { nmsIPAclMIB 2 } 
+                                                
+          nmsIPAclEntry OBJECT-TYPE
+              SYNTAX  NMSIPAclEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              		"An entry (conceptual row) containing information
+             		about an IP Acl on this device."
+              INDEX   { nmsIPAclname }
+              ::= { nmsIPAclTable 1 }
+
+          NMSIPAclEntry ::= SEQUENCE {			    
+          		nmsIPAclname           	DisplayString,
+          		nmsIPAclEntrytotal       INTEGER,		
+          	    nmsIPAclType				INTEGER, 
+          	    nmsIPAclMergeEnable		INTEGER, 
+          	    nmsIPAclRowStatus		RowStatus		
+			    }     
+
+		  nmsIPAclname OBJECT-TYPE
+			    SYNTAX     DisplayString 
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The name of this IP Acl."
+			    ::= { nmsIPAclEntry 1 }   
+			                                                        
+			                                                        
+		  nmsIPAclEntrytotal OBJECT-TYPE
+			    SYNTAX    INTEGER 
+			    ACCESS 	   read-only
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The total number of this IP Acl entries."
+			    ::= { nmsIPAclEntry 2 }  
+			    
+		  nmsIPAclType OBJECT-TYPE
+			    SYNTAX     INTEGER{
+                        		standard (1),
+                        		extended (0)
+                        	}
+			    ACCESS 	   read-write
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "The type of this IP Acl."
+			    ::= { nmsIPAclEntry 3 }
+
+		  nmsIPAclMergeEnable OBJECT-TYPE
+			    SYNTAX     INTEGER{
+                        		enable (1),
+                        		disable (0)
+                        	}
+			    ACCESS 	   read-write
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "if merge enable"
+			    ::= { nmsIPAclEntry 4 }
+ 		
+		  nmsIPAclRowStatus OBJECT-TYPE
+			    SYNTAX     RowStatus 
+			    ACCESS 	   read-write
+			    STATUS     mandatory
+			    DESCRIPTION
+			            "table row status"
+			    ::= { nmsIPAclEntry 5 } 		  	    
+			    
+			    
+--STANDARD ACL RULE TABLE
+	          nmsIPAclsRuleTable OBJECT-TYPE
+             		    SYNTAX  SEQUENCE OF NMSIPAclsRuleEntry
+             		    ACCESS  not-accessible
+             		    STATUS  mandatory
+            		    DESCRIPTION
+              			   ""
+              		    ::= { nmsIPAclMIB 3 } 
+
+          		nmsIPAclsRuleEntry OBJECT-TYPE
+            		 	 SYNTAX  NMSIPAclsRuleEntry
+            		 	 ACCESS  not-accessible
+            		 	 STATUS  mandatory
+            		 	 DESCRIPTION
+              				""
+              			 INDEX   { nmsIPAclsname,nmsIPAclsentryId }
+              		    ::= { nmsIPAclsRuleTable 1 }
+
+         		 NMSIPAclsRuleEntry ::= SEQUENCE {          
+         		 		nmsIPAclsname                 DisplayString,
+					    nmsIPAclsentryId              INTEGER,       
+					    nmsIPAclsrule        			INTEGER,		
+					    nmsIPAclssrcip		IpAddress,
+					    nmsIPAclssrcmask		IpAddress,
+					  	nmsIPAclssrcbeginip		IpAddress,
+					    nmsIPAclssrcendip		IpAddress,  
+					    nmsIPAclscompare        			INTEGER,  
+					    nmsIPAclsany        			INTEGER,  
+					    nmsIPAclslog        			INTEGER,  
+					    nmsIPAclsrowstatus	RowStatus
+				 		 }
+                   
+                nmsIPAclsname OBJECT-TYPE
+			   	 		SYNTAX     DisplayString 
+			   			ACCESS 	   read-only
+			   			STATUS     current
+			    		DESCRIPTION
+			           			"The name of this IP Acl."
+			    		::= { nmsIPAclsRuleEntry 1 }
+
+		 		 nmsIPAclsentryId OBJECT-TYPE
+					    SYNTAX     INTEGER 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "Index of the entry"
+					    ::= { nmsIPAclsRuleEntry 2 }
+
+		 		 nmsIPAclsrule OBJECT-TYPE
+					    SYNTAX     INTEGER{    
+					    		permit (1),
+                        		deny (0)	
+     				    		} 
+					    ACCESS 	   read-write
+					    STATUS     mandatory
+					    DESCRIPTION
+					            "IP ACL rule"
+					    ::= { nmsIPAclsRuleEntry 3 }
+
+		 		 nmsIPAclssrcip OBJECT-TYPE
+					    SYNTAX     IpAddress 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "source ip address"
+					    ::= { nmsIPAclsRuleEntry 4 }
+
+		 		 nmsIPAclssrcmask OBJECT-TYPE
+					    SYNTAX     IpAddress 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "subnet mask of source ip address"
+					    ::= { nmsIPAclsRuleEntry 5 }
+	
+		 		 nmsIPAclssrcbeginip OBJECT-TYPE
+					    SYNTAX     IpAddress 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "destination ip address"
+					    ::= { nmsIPAclsRuleEntry 6 }
+
+		 		 nmsIPAclssrcendip OBJECT-TYPE
+					    SYNTAX     IpAddress 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "subnet mask of destination ip address"
+					    ::= { nmsIPAclsRuleEntry 7 }
+
+		 		 nmsIPAclscompare OBJECT-TYPE
+					    SYNTAX     INTEGER{    
+					    		usemask (1),
+                        		userange (2)	
+     				    		} 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "compare flag"
+					    ::= { nmsIPAclsRuleEntry 8 }
+
+		 		 nmsIPAclsany OBJECT-TYPE
+					    SYNTAX     INTEGER{    
+					    		usezero (1),
+                        		useany (0)	
+     				    		} 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "any flag"
+					    ::= { nmsIPAclsRuleEntry 9 }
+
+		 		 nmsIPAclslog OBJECT-TYPE
+					    SYNTAX     INTEGER{    
+					    		enable (1),
+                        		disable (0)	
+     				    		} 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "logging packet"
+					    ::= { nmsIPAclsRuleEntry 10 }
+
+		 		 nmsIPAclsrowstatus OBJECT-TYPE
+					    SYNTAX     RowStatus 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "table row status"
+					    ::= { nmsIPAclsRuleEntry 11 }
+   
+			    
+--EXTENDED ACL RULE TABLE			    
+
+	          nmsIPAcleRuleTable OBJECT-TYPE
+             		    SYNTAX  SEQUENCE OF NMSIPAcleRuleEntry
+             		    ACCESS  not-accessible
+             		    STATUS  mandatory
+            		    DESCRIPTION
+              			   ""
+              		    ::= { nmsIPAclMIB 4 } 
+
+          		nmsIPAcleRuleEntry OBJECT-TYPE
+            		 	 SYNTAX  NMSIPAcleRuleEntry
+            		 	 ACCESS  not-accessible
+            		 	 STATUS  mandatory
+            		 	 DESCRIPTION
+              				""
+              			 INDEX   { nmsIPAclename,nmsIPAcleentryId }
+              		    ::= { nmsIPAcleRuleTable 1 }
+
+         		 NMSIPAcleRuleEntry ::= SEQUENCE {          
+         		 		nmsIPAclename                 DisplayString,
+					    nmsIPAcleentryId              INTEGER,       
+					    nmsIPAclerule        			INTEGER, 
+					    nmsIPAcleprotocol			INTEGER,
+					    nmsIPAclesrceid           	INTEGER,		
+					    nmsIPAclesrcip		IpAddress,
+					    nmsIPAclesrcmask		IpAddress, 
+					    nmsIPAclesrcport		INTEGER,  
+					    nmsIPAclesrcpflag	INTEGER,
+					    nmsIPAclesrcbeginip	IpAddress,
+					    nmsIPAclesrcendip	IpAddress,
+					    nmsIPAclesrcbeginport INTEGER,
+					    nmsIPAclesrcendport	INTEGER, 
+					    nmsIPAclesrccompare	INTEGER,
+					    nmsIPAclesrcany		INTEGER,
+					    nmsIPAcledeseid      INTEGER,		
+					    nmsIPAcledesip		IpAddress,
+					    nmsIPAcledesmask		IpAddress, 
+					    nmsIPAcledesport		INTEGER,  
+					    nmsIPAcledespflag	INTEGER,
+					    nmsIPAcledesbeginip	IpAddress,
+					    nmsIPAcledesendip	IpAddress,
+					    nmsIPAcledesbeginport INTEGER,
+					    nmsIPAcledesendport	INTEGER,   
+					    nmsIPAcledescompare	INTEGER,
+					    nmsIPAcledesany		INTEGER,
+					    nmsIPAcleicmptype		INTEGER,
+					    nmsIPAcleigmptype		INTEGER,
+					    nmsIPAcletimerange	DisplayString, 
+					    nmsIPAcletos			INTEGER,
+					    nmsIPAcleprecedence	INTEGER,
+					    nmsIPAcleestablished	INTEGER, 
+					    nmsIPAclelog			INTEGER,
+					    nmsIPAcledonotfragment			INTEGER,
+					    nmsIPAcleisfragment	INTEGER,
+					    nmsIPAcletotallen	INTEGER, 
+					    nmsIPAcletotallenflag			INTEGER,
+					    nmsIPAclettl	INTEGER, 
+					    nmsIPAclettlflag			INTEGER,
+					    nmsIPAclerowstatus   RowStatus
+				 		 }
+                   
+                nmsIPAclename OBJECT-TYPE
+			   	 		SYNTAX     DisplayString 
+			   			ACCESS 	   read-only
+			   			STATUS     current
+			    		DESCRIPTION
+			           			"The name of this IP Acl."
+			    		::= { nmsIPAcleRuleEntry 1 }
+
+		 		 nmsIPAcleentryId OBJECT-TYPE
+					    SYNTAX     INTEGER 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "Index of the entry"
+					    ::= { nmsIPAcleRuleEntry 2 }
+
+		 		 nmsIPAclerule OBJECT-TYPE
+					    SYNTAX     INTEGER{    
+					    		permit (1),
+                        		   		deny (0)	
+     				    		} 
+					    ACCESS 	   read-write
+					    STATUS     mandatory
+					    DESCRIPTION
+					            "IP ACL rule"
+					    ::= { nmsIPAcleRuleEntry 3 }
+
+		 		 nmsIPAcleprotocol OBJECT-TYPE
+					    SYNTAX     INTEGER 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "protocol num"
+					    ::= { nmsIPAcleRuleEntry 4 }  
+					    
+		 		 nmsIPAclesrceid OBJECT-TYPE
+					    SYNTAX     INTEGER 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "source interface id"
+					    ::= { nmsIPAcleRuleEntry 5 }
+
+		 		 nmsIPAclesrcip OBJECT-TYPE
+					    SYNTAX     IpAddress 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "source ip address"
+					    ::= { nmsIPAcleRuleEntry 6 }
+
+		 		 nmsIPAclesrcmask OBJECT-TYPE
+					    SYNTAX     IpAddress 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "subnet mask of source ip address"
+					    ::= { nmsIPAcleRuleEntry 7 }       
+					    
+		 		 nmsIPAclesrcport OBJECT-TYPE
+					    SYNTAX     INTEGER 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "source port num"
+					    ::= { nmsIPAcleRuleEntry 8 }   
+					    
+		 		 nmsIPAclesrcpflag OBJECT-TYPE
+					    SYNTAX     INTEGER{
+                        		none (0),
+                        		gt (1),
+                        		lt (2),
+                        		eq (3),
+                        		neq (4),
+                        		range (5)
+                        	}
+ 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "source port flag"
+					    ::= { nmsIPAcleRuleEntry 9 }
+	
+		 		 nmsIPAclesrcbeginip OBJECT-TYPE
+					    SYNTAX     IpAddress 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "source ip address range begin"
+					    ::= { nmsIPAcleRuleEntry 10 }
+
+		 		 nmsIPAclesrcendip OBJECT-TYPE
+					    SYNTAX     IpAddress 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "source ip address range end"
+					    ::= { nmsIPAcleRuleEntry 11 }
+
+                nmsIPAclesrcbeginport OBJECT-TYPE
+			   	 		SYNTAX     INTEGER 
+			   			ACCESS 	   read-write
+			   			STATUS     current
+			    		DESCRIPTION
+			           			"source port range begin"
+			    		::= { nmsIPAcleRuleEntry 12 }
+				nmsIPAclesrcendport OBJECT-TYPE
+					    SYNTAX     INTEGER 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "source port range end"
+					    ::= { nmsIPAcleRuleEntry 13 }
+				nmsIPAclesrccompare OBJECT-TYPE
+					    SYNTAX     INTEGER{    
+					    		usemask (1),
+                        		userange (2)	
+     				    		} 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "source compare flag"
+					    ::= { nmsIPAcleRuleEntry 14 }   
+					    
+				nmsIPAclesrcany OBJECT-TYPE
+					    SYNTAX     INTEGER{    
+					    		usezero (1),
+                        		useany (0)	
+     				    		} 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "source any flag"
+					    ::= { nmsIPAcleRuleEntry 15 }
+ 										    
+		 		 nmsIPAcledeseid OBJECT-TYPE
+					    SYNTAX     INTEGER 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "destination interface id"
+					    ::= { nmsIPAcleRuleEntry 16 }
+
+		 		 nmsIPAcledesip OBJECT-TYPE
+					    SYNTAX     IpAddress 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "destination ip address"
+					    ::= { nmsIPAcleRuleEntry 17 }
+
+		 		 nmsIPAcledesmask OBJECT-TYPE
+					    SYNTAX     IpAddress 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "subnet mask of destination ip address"
+					    ::= { nmsIPAcleRuleEntry 18 }       
+					    
+		 		 nmsIPAcledesport OBJECT-TYPE
+					    SYNTAX     INTEGER 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "destination port num"
+					    ::= { nmsIPAcleRuleEntry 19 }   
+					    
+		 		 nmsIPAcledespflag OBJECT-TYPE
+					    SYNTAX     INTEGER{
+                        		none (0),
+                        		gt (1),
+                        		lt (2),
+                        		eq (3),
+                        		neq (4),
+                        		range (5)
+                        	}
+ 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "destination port flag"
+					    ::= { nmsIPAcleRuleEntry 20 }
+	
+		 		 nmsIPAcledesbeginip OBJECT-TYPE
+					    SYNTAX     IpAddress 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "destination ip address range begin"
+					    ::= { nmsIPAcleRuleEntry 21 }
+
+		 		 nmsIPAcledesendip OBJECT-TYPE
+					    SYNTAX     IpAddress 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "destination ip address range end"
+					    ::= { nmsIPAcleRuleEntry 22 }
+
+                nmsIPAcledesbeginport OBJECT-TYPE
+			   	 		SYNTAX     INTEGER 
+			   			ACCESS 	   read-write
+			   			STATUS     current
+			    		DESCRIPTION
+			           			"destination port range begin"
+			    		::= { nmsIPAcleRuleEntry 23 }
+
+		 		 nmsIPAcledesendport OBJECT-TYPE
+					    SYNTAX     INTEGER 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "destination port range end"
+					    ::= { nmsIPAcleRuleEntry 24 }
+
+				nmsIPAcledescompare OBJECT-TYPE
+					    SYNTAX     INTEGER{    
+					    		usemask (1),
+                        		userange (2)	
+     				    		} 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "destination compare flag"
+					    ::= { nmsIPAcleRuleEntry 25 }   
+					    
+				nmsIPAcledesany OBJECT-TYPE
+					    SYNTAX     INTEGER{    
+					    		usezero (1),
+                        		useany (0)	
+     				    		} 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "destination any flag"
+					    ::= { nmsIPAcleRuleEntry 26 }
+
+		 		 nmsIPAcleicmptype OBJECT-TYPE
+					    SYNTAX     INTEGER
+					    ACCESS 	   read-write
+					    STATUS     mandatory
+					    DESCRIPTION
+					            "ICMP type"
+					    ::= { nmsIPAcleRuleEntry 27 }
+
+		 		 nmsIPAcleigmptype OBJECT-TYPE
+					    SYNTAX     INTEGER 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "IGMP type"
+					    ::= { nmsIPAcleRuleEntry 28 }
+
+		 		 nmsIPAcletimerange OBJECT-TYPE
+					    SYNTAX     DisplayString 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "Time-range name"
+					    ::= { nmsIPAcleRuleEntry 29 }
+
+		 		 nmsIPAcletos OBJECT-TYPE
+					    SYNTAX     INTEGER 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "tos level"
+					    ::= { nmsIPAcleRuleEntry 30 }
+	
+		 		 nmsIPAcleprecedence OBJECT-TYPE
+					    SYNTAX     INTEGER 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "precedence level"
+					    ::= { nmsIPAcleRuleEntry 31 }
+                 
+		 		 nmsIPAcleestablished OBJECT-TYPE
+					    SYNTAX     INTEGER{    
+					    		yes (1),
+                        		no (0)	
+     				    		} 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "if an established connection"
+					    ::= { nmsIPAcleRuleEntry 32 }           
+
+		 		 nmsIPAclelog OBJECT-TYPE
+					    SYNTAX     INTEGER{    
+					    		enable (1),
+                        		disable (0)	
+     				    		} 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "logging packet"
+					    ::= { nmsIPAcleRuleEntry 33 }
+					    
+		 		 nmsIPAcledonotfragment OBJECT-TYPE
+					    SYNTAX     INTEGER{ 
+					    		notset (2),   
+					    		set (1),
+                        		donotcheck (0)	
+     				    		} 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "if donotfragment flag is set"
+					    ::= { nmsIPAcleRuleEntry 34 }
+					    
+		 		 nmsIPAcleisfragment OBJECT-TYPE
+					    SYNTAX     INTEGER{ 
+					    		notset (2),   
+					    		set (1),
+                        		donotcheck (0)	
+     				    		}  
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "if isfragment flag is set"
+					    ::= { nmsIPAcleRuleEntry 35 }
+					    
+		 		 nmsIPAcletotallen OBJECT-TYPE
+					    SYNTAX     INTEGER(0..65535)
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "total length of ip packet"
+					    ::= { nmsIPAcleRuleEntry 36 }
+					    
+		 		 nmsIPAcletotallenflag OBJECT-TYPE
+					    SYNTAX     INTEGER{
+                        		donotcheck (0),
+                        		gt (1),
+                        		lt (2),
+                        		eq (3)
+                     	} 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "flag of total length value"
+					    ::= { nmsIPAcleRuleEntry 37 }
+					    
+		 		 nmsIPAclettl OBJECT-TYPE
+					    SYNTAX     INTEGER(0..255) 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "time to live of ip packet"
+					    ::= { nmsIPAcleRuleEntry 38 }
+					    
+		 		 nmsIPAclettlflag OBJECT-TYPE
+					    SYNTAX     INTEGER{
+                        		donotcheck (0),
+                        		gt (1),
+                        		lt (2),
+                        		eq (3)
+                     	} 
+					    ACCESS 	   read-write
+					    STATUS     current
+					    DESCRIPTION
+					            "flag of time to live value"
+					    ::= { nmsIPAcleRuleEntry 39 }
+					    
+                nmsIPAclerowstatus OBJECT-TYPE
+			   	 		SYNTAX     RowStatus 
+			   			ACCESS 	   read-write
+			   			STATUS     current
+			    		DESCRIPTION
+			           			"The table row status"
+			    		::= { nmsIPAcleRuleEntry 40 }
+
+
+END
+
+

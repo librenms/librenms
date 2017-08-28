@@ -72,8 +72,8 @@ foreach ($files as $file) {
     $rrd_file = array_pop($tmp);
     echo "Converting $file: ";
     $command = "$rrdtool dump $file > $random && 
-        sed -i 's/<step>300/<step>$step/' $random && 
-        sed -i 's/<minimal_heartbeat>600/<minimal_heartbeat>$heartbeat/' $random &&
+        sed -i 's/<step>\([0-9]*\)/<step>$step/' $random && 
+        sed -i 's/<minimal_heartbeat>\([0-9]*\)/<minimal_heartbeat>$heartbeat/' $random &&
         $rrdtool restore -f $random $file &&
         rm -f $random";
     exec($command, $output, $code);

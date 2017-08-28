@@ -23,15 +23,14 @@ print_optionbar_start();
       <select name="device" id="device" class="form-control input-sm">
         <option value="">All Devices</option>
         <?php
-        foreach (get_all_devices() as $hostname) {
-            $device_id = getidbyname($hostname);
-            if (device_permitted($device_id)) {
-                echo "<option value='".$device_id."'";
-                if ($device_id == $_POST['device']) {
+        foreach (get_all_devices() as $data) {
+            if (device_permitted($data['device_id'])) {
+                echo "<option value='".$data['device_id']."'";
+                if ($data['device_id'] == $_POST['device']) {
                     echo 'selected';
                 }
 
-                echo '>'.$hostname.'</option>';
+                echo '>'.format_hostname($data).'</option>';
             }
         }
         ?>

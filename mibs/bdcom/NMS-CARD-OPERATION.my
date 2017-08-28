@@ -1,0 +1,280 @@
+-- *****************************************************************
+-- NMS-CARD-OPERATION-MIB.my: NMS Card Reset MIB
+--
+-- January 2010
+-- Edit by LIUQIANG
+-- Copyright (c) 2010 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-CARD-OPERATION-MIB DEFINITIONS ::= BEGIN 
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+                                                FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TimeStamp
+                                                FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsMgmt, nmslocal                             FROM NMS-SMI
+    DisplayString				FROM RFC1213-MIB
+    nmscardType,nmscardHwVersion,nmscardSerial,nmscardSwVersion,nmscardSlotNumber FROM NMS-CHASSIS;
+
+
+--definition of NMS device card related operations and trap related values
+
+               cardOper         OBJECT IDENTIFIER ::= { nmsMgmt 184 }
+
+	        
+               cardMasSlvSwitch OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   master-slave-switch(0)
+                                   }
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Device master card and slave card switch operation."
+                   ::= { cardOper 1 }
+
+
+
+               cardResetTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF CardResetTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of cards reset entries."
+                   ::= { cardOper 2 }
+
+               CardResetTableEntry OBJECT-TYPE
+                   SYNTAX  CardResetTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of cards to be reset."
+                   INDEX { cardIndex }
+               ::= { cardResetTable 1 }
+
+               CardResetTableEntry ::=
+                   SEQUENCE {
+                       nmscardIndex
+                           INTEGER,
+                       nmscardType
+                           INTEGER,
+                       nmscardDescr
+                       	   DisplayString,
+                       nmscardReset
+                       	   INTEGER
+                  }
+
+
+               nmscardIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Index into cardTable (not physical chassis
+                           slot number), the same with the nmscardIndex of nmscardTable in NMS-CHASSIS-MIB."
+                   ::= { cardResetTableEntry 1 }
+
+
+               nmscardType OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Type of card, the same with the nmscardIndex of nmscardTable in NMS-CHASSIS-MIB."
+                   ::= { cardResetTableEntry 2 }
+
+
+
+               nmscardDescr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Text description of this card, the same value with the nmscardIndex of nmscardTable in NMS-CHASSIS-MIB."
+                   ::= { cardResetTableEntry 3 }
+
+               nmscardReset OBJECT-TYPE
+                   SYNTAX  INTEGER{ 
+                                    no-reset(0),
+                                    reset(1),
+                                    shutdown-slot(2),
+                                    no-shutdown-slot(3)
+                                    
+                                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "When value is set to reset(1), that means card reset; when value is set to shutdown-slot(2), no-shutdown-slot(3), only shut down or no shut down the corresponding slot."
+                   ::= { cardResetTableEntry 4 }
+                   
+                   
+                   
+               cardMSSwitchTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF CardMSSwitchTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of cards MSSwitch entries."
+                   ::= { cardOper 3 }
+
+               cardMSSwitchTableEntry OBJECT-TYPE
+                   SYNTAX  CardMSSwitchTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of cards to be MSSwitch."
+                   INDEX { cardIndex }
+               ::= { cardMSSwitchTable 1 }
+
+               CardMSSwitchTableEntry ::=
+                   SEQUENCE {
+                       nmscardIndexOld
+                           INTEGER,
+                       nmscardSlotNumberOld
+                       	   INTEGER,
+                       nmscardDescrOld
+                       	   DisplayString,
+                       nmscardIndexNew
+                           INTEGER,
+                       nmscardSlotNumberNew
+                       	   INTEGER,
+                       nmscardDescrNew
+                       	   DisplayString
+                  }
+
+
+               nmscardIndexOld OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Index into cardTable (not physical chassis
+                           slot number), the same with the nmscardIndex of nmscardTable in NMS-CHASSIS-MIB."
+                   ::= { cardMSSwitchTableEntry 1 }
+
+
+               nmscardSlotNumberOld OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Type of card, the same with the nmscardSlotNumber of nmscardTable in NMS-CHASSIS-MIB."
+                   ::= { cardMSSwitchTableEntry 2 }
+
+
+
+               nmscardDescrOld OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Text description of this card, the same value with the nmscardIndex of nmscardTable in NMS-CHASSIS-MIB."
+                   ::= { cardMSSwitchTableEntry 3 }
+                   
+
+               nmscardIndexNew OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Index into cardTable (not physical chassis
+                           slot number), the same with the nmscardIndex of nmscardTable in NMS-CHASSIS-MIB."
+                   ::= { cardMSSwitchTableEntry 4 }
+
+
+               nmscardSlotNumberNew OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Type of card, the same with the nmscardSlotNumber of nmscardTable in NMS-CHASSIS-MIB."
+                   ::= { cardMSSwitchTableEntry 5 }
+
+
+
+               nmscardDescrNew OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Text description of this card, the same value with the nmscardIndex of nmscardTable in NMS-CHASSIS-MIB."
+                   ::= { cardMSSwitchTableEntry 6 }                   
+                   
+                   
+                   
+                   
+-- Notifications
+	nmsCardResetNotifications OBJECT IDENTIFIER
+                                ::= { cardOper 4 }
+
+
+	resetNotification NOTIFICATION-TYPE
+    		OBJECTS {
+        		nmscardIndex,
+        		nmscardType,
+        		nmscardDescr,
+        		nmscardSerial,
+        		nmscardHwVersion,
+        		nmscardSwVersion,
+        		nmscardSlotNumber
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when a certain card reset. "
+    		::= { nmsCardResetNotifications 1 }
+
+
+	nmsCardMSSwitchNotifications OBJECT IDENTIFIER
+                                ::= { cardOper 5 }
+
+
+	msSwitchNotification NOTIFICATION-TYPE
+    		OBJECTS {
+        		nmscardIndexOld,
+        		nmscardDescrOld,
+        		nmscardSlotNumberOld,
+        		nmscardIndexNew,
+        		nmscardDescrNew,
+        		nmscardSlotNumberNew
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when slave card switch into master card. "
+    		::= { nmsCardMSSwitchNotifications 1 }
+
+
+	nmsCardInitSucceedNotifications OBJECT IDENTIFIER
+                                ::= { cardOper 6 }
+
+
+	cardInitSucceedNotification NOTIFICATION-TYPE
+    		OBJECTS {
+        		nmscardIndex,
+        		nmscardType,
+        		nmscardDescr,
+        		nmscardSerial,
+        		nmscardHwVersion,
+        		nmscardSwVersion,
+        		nmscardSlotNumber
+        		   		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when card initialized successfully . "
+    		::= { nmsCardInitSucceedNotifications 1 }
+
+               nmsDeviceReset OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                   device-reset(1)
+                                   }
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Device reset operation."
+                   ::= { cardOper 7 }
+               
+
+
+END

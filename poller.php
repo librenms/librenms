@@ -16,16 +16,6 @@ require __DIR__ . '/includes/init.php';
 
 $poller_start = microtime(true);
 echo $config['project_name_version']." Poller\n";
-$versions = version_info(false);
-echo "Version info:\n";
-$cur_sha = $versions['local_sha'];
-echo "Commit SHA: $cur_sha\n";
-echo "Commit Date: ".$versions['local_date']."\n";
-echo "DB Schema: ".$versions['db_schema']."\n";
-echo "PHP: ".$versions['php_ver']."\n";
-echo "MySQL: ".$versions['mysql_ver']."\n";
-echo "RRDTool: ".$versions['rrdtool_ver']."\n";
-echo "SNMP: ".$versions['netsnmp_ver']."\n";
 
 $options = getopt('h:m:i:n:r::d::v::a::f::q');
 
@@ -85,6 +75,20 @@ if (!$where) {
 }
 
 if (isset($options['d']) || isset($options['v'])) {
+    $versions = version_info(false);
+    echo <<<EOH
+===================================
+Version info:
+Commit SHA: {$versions['local_sha']}
+Commit Date: {$versions['local_date']}
+DB Schema: {$versions['db_schema']}
+PHP: {$versions['php_ver']}
+MySQL: {$versions['mysql_ver']}
+RRDTool: {$versions['rrdtool_ver']}
+SNMP: {$versions['netsnmp_ver']}
+==================================
+EOH;
+
     echo "DEBUG!\n";
     if (isset($options['v'])) {
         $vdebug = true;

@@ -38,27 +38,27 @@ define('RANGE_DISCRETE', 1);
 class WindrosePlot
 {
     private $iAntiAlias = true;
-    private $iData = [];
+    private $iData = array();
     public $iX = 0.5, $iY = 0.5;
     public $iSize = 0.55;
     private $iGridColor1 = 'gray', $iGridColor2 = 'darkgreen';
-    private $iRadialColorArray = [];
-    private $iRadialWeightArray = [];
-    private $iRadialStyleArray = [];
-    private $iRanges = [1, 2, 3, 5, 6, 10, 13.5, 99.0];
+    private $iRadialColorArray = array();
+    private $iRadialWeightArray = array();
+    private $iRadialStyleArray = array();
+    private $iRanges = array(1, 2, 3, 5, 6, 10, 13.5, 99.0);
     private $iRangeStyle = RANGE_OVERLAPPING;
     public $iCenterSize = 60;
     private $iType = WINDROSE_TYPE16;
     public $iFontFamily = FF_VERDANA, $iFontStyle = FS_NORMAL, $iFontSize = 10;
     public $iFontColor = 'darkgray';
     private $iRadialGridStyle = 'longdashed';
-    private $iAllDirectionLabels = ['E', 'ENE', 'NE', 'NNE', 'N', 'NNW', 'NW', 'WNW', 'W', 'WSW', 'SW', 'SSW', 'S', 'SSE', 'SE', 'ESE'];
-    private $iStandardDirections = [];
+    private $iAllDirectionLabels = array('E', 'ENE', 'NE', 'NNE', 'N', 'NNW', 'NW', 'WNW', 'W', 'WSW', 'SW', 'SSW', 'S', 'SSE', 'SE', 'ESE');
+    private $iStandardDirections = array();
     private $iCircGridWeight = 3, $iRadialGridWeight = 1;
     private $iLabelMargin = 12;
-    private $iLegweights = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
-    private $iLegColors = ['orange', 'black', 'blue', 'red', 'green', 'purple', 'navy', 'yellow', 'brown'];
-    private $iLabelFormatString = '', $iLabels = [];
+    private $iLegweights = array(2, 4, 6, 8, 10, 12, 14, 16, 18, 20);
+    private $iLegColors = array('orange', 'black', 'blue', 'red', 'green', 'purple', 'navy', 'yellow', 'brown');
+    private $iLabelFormatString = '', $iLabels = array();
     private $iLabelPositioning = LBLPOSITION_EDGE;
     private $iColor = 'white';
     private $iShowBox = false, $iBoxColor = 'black', $iBoxWeight = 1, $iBoxStyle = 'solid';
@@ -194,7 +194,7 @@ class WindrosePlot
     public function SetRadialGridStyle($aStyle)
     {
         $aStyle = strtolower($aStyle);
-        if (!in_array($aStyle, ['solid', 'dotted', 'dashed', 'longdashed'])) {
+        if (!in_array($aStyle, array('solid', 'dotted', 'dashed', 'longdashed'))) {
             Util\JpGraphError::RaiseL(22005); //("Line style for radial lines must be on of ('solid','dotted','dashed','longdashed') ");
         }
         $this->iRadialGridStyle = $aStyle;
@@ -296,7 +296,7 @@ class WindrosePlot
         $x4 = $xt + $weight * sin($a);
         $y4 = $yt + $weight * cos($a);
 
-        $pts = [$x1, $y1, $x2, $y2, $x3, $y3, $x4, $y4];
+        $pts = array($x1, $y1, $x2, $y2, $x3, $y3, $x4, $y4);
         $aImg->SetColor($color);
         $aImg->FilledPolygon($pts);
 
@@ -441,7 +441,7 @@ class WindrosePlot
                 } elseif (!empty($this->iData[$i])) {
                     $data[$i] = $this->iData[$i];
                 } else {
-                    $data[$i] = [];
+                    $data[$i] = array();
                 }
             }
 
@@ -593,7 +593,7 @@ class WindrosePlot
 
         // Stroke grid lines for directions and remember the
         // position for the labels
-        $txtpos = [];
+        $txtpos = array();
         $num = count($this->iData);
 
         $keys = array_keys($this->iData);
@@ -637,7 +637,7 @@ class WindrosePlot
                 $dblImg->SetLineStyle($this->iRadialStyleArray[$dir]);
             }
             $dblImg->StyleLine($xxc, $yyc, $x, $y);
-            $txtpos[] = [$x, $y, $a];
+            $txtpos[] = array($x, $y, $a);
         }
         $dblImg->SetLineWeight(1);
 
@@ -753,7 +753,7 @@ class WindrosePlot
     // corresponding index.
     public function FixupIndexes($aDataArray, $num)
     {
-        $ret = [];
+        $ret = array();
         $keys = array_keys($aDataArray);
         foreach ($aDataArray as $idx => $data) {
             if (is_string($idx)) {
@@ -811,7 +811,7 @@ class WindrosePlot
         $this->iRadialWeightArray = $this->FixupIndexes($this->iRadialWeightArray, $num);
         $this->iRadialStyleArray = $this->FixupIndexes($this->iRadialStyleArray, $num);
 
-        $txtpos = [];
+        $txtpos = array();
         $a = 2 * M_PI / $num;
         $dblImg->SetColor($this->iGridColor2);
         $dblImg->SetLineStyle($this->iRadialGridStyle);
@@ -841,7 +841,7 @@ class WindrosePlot
             }
 
             $dblImg->StyleLine($xxc, $yyc, $x, $y);
-            $txtpos[] = [$x, $y, $a * $i];
+            $txtpos[] = array($x, $y, $a * $i);
         }
         $dblImg->SetLineWeight(1);
 
@@ -1156,7 +1156,7 @@ class WindrosePlot
                     $const1 = 4;
                     $const2 = 4;
                 }
-                $tmp = [];
+                $tmp = array();
                 $n = count($this->iData);
                 foreach ($this->iData as $key => $val) {
                     if (is_numeric($key)) {

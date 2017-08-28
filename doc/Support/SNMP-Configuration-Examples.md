@@ -6,12 +6,13 @@ Table of Content:
 - [Devices](#devices)
     - [Cisco](#cisco)
         - [Adaptive Security Appliance (ASA)](#adaptive-security-appliance-asa)
-        - [IOS / IOS XE / NX-OS](#ios--ios-xe--nx-os)
+        - [IOS / IOS XE](#ios--ios-xe)
+        - [NX-OS](#nx-os)
         - [Wireless LAN Controller (WLC)](#wireless-lan-controller-wlc)
     - [HPE 3PAR](#hpe3par)
         - [Inform OS 3.2.x](#inform-os-32x)
     - [Infoblox](#infoblox)
-        - [NIOS 7.x](#nios-7x)
+        - [NIOS 7.x+](#nios-7x)
     - [Juniper](#juniper)
         - [Junos OS](#junos-os)
     - [Mikrotik](#mikrotik)
@@ -22,24 +23,75 @@ Table of Content:
     - [Linux (snmpd v2)](#linux-snmpd)
     - [Linux (snmpd v3)](#linux-snmpd-v3)
     - [Windows Server 2008 R2](#windows-server-2008-r2)
-    - [Windows Server 2012 R2](#windows-server-2012-r2)
+    - [Windows Server 2012 R2 and 2016](#windows-server-2012-r2-and-2016)
 
 ## Devices
 
 ### Cisco
 #### Adaptive Security Appliance (ASA)
+
+ASDM
+
 1. Launch ASDM and connect to your device
 2. Go to Configuration > Management Access > SNMP
 3. Add your community string
 4. Add in the "SNMP Host Access List" section your LibreNMS server IP address
 5. Click Apply and Save
 
-#### IOS / IOS XE / NX-OS
+CLI 
 
-``` 
-snmp-server community YOUR-COMMUNITY RO
-snmp-server contact YOUR-CONTACT
-snmp-server location YOUR-LOCATION
+```
+# SNMPv2c
+
+snmp-server community <YOUR-COMMUNITY>
+snmp-server contact <YOUR-CONTACT>
+snmp-server location <YOUR-LOCATION>
+snmp-server host <INTERFACE> <LIBRENMS-IP> poll community <YOUR-COMMUNITY> version 2c
+
+# SNMPv3
+
+snmp-server group <GROUP-NAME> v3 priv
+snmp-server user <USER-NAME> <GROUP-NAME> v3 auth sha <AUTH-PASSWORD> priv aes 128 <PRIV-PASSWORD>
+snmp-server contact <YOUR-CONTACT>
+snmp-server location <YOUR-LOCATION>
+snmp-server host <INTERFACE> <LIBRENMS-IP> poll version 3 <USER-NAME>
+```
+
+#### IOS / IOS XE
+
+```
+# SNMPv2c
+ 
+snmp-server community <YOUR-COMMUNITY> RO
+snmp-server contact <YOUR-CONTACT>
+snmp-server location <YOUR-LOCATION>
+
+# SNMPv3
+
+snmp-server group <GROUP-NAME> v3 priv
+snmp-server user <USER-NAME> <GROUP-NAME> v3 auth sha <AUTH-PASSWORD> priv aes 128 <PRIV-PASSWORD>
+snmp-server contact <YOUR-CONTACT>
+snmp-server location <YOUR-LOCATION>
+
+# Note: The following is also required if using SNMPv3 and you want to populate the FDB table.
+
+snmp-server group <GROUP-NAME> v3 priv context vlan- match prefix 
+```
+
+#### NX-OS
+
+```
+# SNMPv2c
+
+snmp-server community <YOUR-COMMUNITY> RO
+snmp-server contact <YOUR-CONTACT>
+snmp-server location <YOUR-LOCATION>
+
+# SNMPv3
+
+snmp-server user <USER-NAME> <GROUP-NAME> v3 auth sha <AUTH-PASSWORD> priv aes 128 <PRIV-PASSWORD>
+snmp-server contact <YOUR-CONTACT>
+snmp-server location <YOUR-LOCATION>
 ```
 
 #### Wireless LAN Controller (WLC)
@@ -64,7 +116,7 @@ setsnmppw <community>
 ```
 
 ### Infoblox
-#### NIOS 7.x
+#### NIOS 7.x+
 1. Access the web admin page and log in
 2. Go to Grid tab > Grid Manager
 3. In the right menu select "Grid properties"
@@ -208,7 +260,7 @@ service snmpd restart
 10. In "Accept SNMP packets from these hosts" click "Add" and add your LibreNMS server IP address
 11. Validate change by clicking "Apply"
 
-### Windows Server 2012 R2
+### Windows Server 2012 R2 and 2016
 1. Log in to your Windows Server 2012 R2
 2. Start "Server Manager" under "Administrative Tools"
 3. Click "Manage" and then "Add Roles and Features"
