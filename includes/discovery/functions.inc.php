@@ -818,13 +818,13 @@ function check_entity_sensor($string, $device)
  * Helper function to improve readability
  * Can't use mib based polling, because the snmp implentation and mibs are terrible
  *
- * @param (device) array - device array
- * @param (sensor) array(id, oid, type, descr, descr_oid, min, max, divisor)
+ * @param array $device device array
+ * @param array $sensor array(id, oid, type, descr, descr_oid, min, max, divisor)
+ * @param array $valid valid sensors array
+ * @return bool
  */
-function avtech_add_sensor($device, $sensor)
+function avtech_add_sensor($device, $sensor, &$valid)
 {
-    global $valid;
-
     // set the id, must be unique
     if (isset($sensor['id'])) {
         $id = $sensor['id'];
@@ -844,6 +844,10 @@ function avtech_add_sensor($device, $sensor)
     }
     d_echo('Sensor oid: ' . $oid . "\n");
 
+    // get the type
+    $type = $sensor['type'] ? $sensor['type'] : 'temperature';
+    d_echo('Sensor type: ' . $type . "\n");
+
     // get the sensor value
     $value = snmp_get($device, $oid, '-OvQ');
     // if the sensor doesn't exist abort
@@ -853,10 +857,6 @@ function avtech_add_sensor($device, $sensor)
         return false;
     }
     d_echo('Sensor value: ' . $value . "\n");
-
-    // get the type
-    $type = $sensor['type'] ? $sensor['type'] : 'temperature';
-    d_echo('Sensor type: ' . $type . "\n");
 
     $type_name = $device['os'];
     if ($type == 'switch') {
