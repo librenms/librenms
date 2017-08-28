@@ -79,7 +79,7 @@ Change user to librenms for example
 ```
 su - librenms
 ```
-then you can run the following command to help trouble shoot services. 
+then you can run the following command to help troubleshoot services. 
 ```
 ./check-services.php -d
 ```
