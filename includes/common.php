@@ -1664,28 +1664,19 @@ function update_os_cache($force = false)
 }
 
 /**
- * @param $scale
- * @param $value
- * @return float
+ * Converts fahrenheit to celsius (with 2 decimal places)
+ * if $scale is not fahrenheit, it assumes celsius and  returns the value
+ *
+ * @param float $value
+ * @param string $scale fahrenheit or celsius
+ * @return string (containing a float)
  */
-function fahrenheit_to_celsius($scale, $value)
+function fahrenheit_to_celsius($value, $scale = 'fahrenheit')
 {
     if ($scale === 'fahrenheit') {
         $value = ($value - 32) / 1.8;
     }
     return sprintf('%.02f', $value);
-}
-
-/**
- *
- * Simply passes the fahrenheit value to fahrenheit_to_celsius()
- *
- * @param $value
- * @return float
- */
-function conv_fahrenheit($value)
-{
-    return fahrenheit_to_celsius('fahrenheit', $value);
 }
 
 function uw_to_dbm($value)
