@@ -4,7 +4,6 @@
 
 // disable certificate checking before connect if required
 use LibreNMS\Exceptions\AuthenticationException;
-use LibreNMS\Config;
 
 function init_auth()
 {
@@ -38,16 +37,30 @@ function authenticate($username, $password)
             // group membership in one of the configured groups is required
             if (isset($config['auth_ad_require_groupmembership']) &&
                 $config['auth_ad_require_groupmembership']) {
-                // cycle through defined groups, test for memberOf-ship
-                foreach ($config['auth_ad_groups'] as $group => $level) {
-                    if (user_in_group($username, $group)) {
+                $search = ldap_search(
+                    $ldap_connection,
+                    $config['auth_ad_base_dn'],
+                    get_auth_ad_user_filter($username),
+                    array('memberOf')
+                );
+                $entries = ldap_get_entries($ldap_connection, $search);
+                unset($entries[0]['memberof']['count']); //remove the annoying count
+
+                foreach ($entries[0]['memberof'] as $entry) {
+                    $group_cn = get_cn($entry);
+                    if (isset($config['auth_ad_groups'][$group_cn]['level'])) {
+                        // user is in one of the defined groups
                         return true;
                     }
                 }
 
                 // failed to find user
                 if (isset($config['auth_ad_debug']) && $config['auth_ad_debug']) {
-                    throw new AuthenticationException('User is not in one of the required groups or user/group is outside the base dn');
+                    if ($entries['count'] == 0) {
+                        throw new AuthenticationException('No groups found for user, check base dn');
+                    } else {
+                        throw new AuthenticationException('User is not in one of the required groups');
+                    }
                 }
 
                 throw new AuthenticationException();
@@ -88,36 +101,6 @@ function reauthenticate($sess_id, $token)
     }
 
     return false;
-}
-
-
-function user_in_group($username, $groupname)
-{
-    // check if user is member of the given group or nested groups
-
-    global $ldap_connection;
-
-    // get DN for auth_ad_group
-    $search = ldap_search(
-        $ldap_connection,
-        Config::get('auth_ad_base_dn'),
-        "(&(objectClass=group)(cn=$groupname))",
-        array("cn")
-    );
-    $result = ldap_first_entry($ldap_connection, $search);
-    $group_dn = ldap_get_dn($ldap_connection, $result);
-
-    $search = ldap_search(
-        $ldap_connection,
-        Config::get('auth_ad_base_dn'),
-        // add 'LDAP_MATCHING_RULE_IN_CHAIN to the user filter to search for $username in nested $group_dn
-        // limiting to "DN" for shorter array
-        "(&" . get_auth_ad_user_filter($username) . "(memberOf:1.2.840.113556.1.4.1941:=$group_dn))",
-        array("DN")
-    );
-    $entries = ldap_get_entries($ldap_connection, $search);
-
-    return ($entries["count"] > 0);
 }
 
 
@@ -188,13 +171,22 @@ function get_userlevel($username)
         }
     }
 
-    // cycle through defined groups, test for memberOf-ship
-    foreach ($config['auth_ad_groups'] as $group => $level) {
-        if (user_in_group($username, $group)) {
-            // user is in the current group - save new userlevel if higher than before
-            if (Config::get("auth_ad_groups.$group.level") > $userlevel) {
-                $userlevel = Config::get("auth_ad_groups.$group.level");
-            }
+    // Find all defined groups $username is in
+    $search = ldap_search(
+        $ldap_connection,
+        $config['auth_ad_base_dn'],
+        get_auth_ad_user_filter($username),
+        array('memberOf')
+    );
+    $entries = ldap_get_entries($ldap_connection, $search);
+    unset($entries[0]['memberof']['count']);
+
+    // Loop the list and find the highest level
+    foreach ($entries[0]['memberof'] as $entry) {
+        $group_cn = get_cn($entry);
+        if (isset($config['auth_ad_groups'][$group_cn]['level']) &&
+             $config['auth_ad_groups'][$group_cn]['level'] > $userlevel) {
+            $userlevel = $config['auth_ad_groups'][$group_cn]['level'];
         }
     }
 
