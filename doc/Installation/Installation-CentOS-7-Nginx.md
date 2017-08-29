@@ -143,6 +143,7 @@ Remove this block of text.
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/logs(/.*)?'
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/rrd(/.*)?'
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/rrd(/.*)?'
+    semanage fcontext -a -t user_cron_spool_t /etc/cron.d/librenms
     restorecon -RFvv /opt/librenms/logs/
     restorecon -RFvv /opt/librenms/rrd/
     setsebool -P httpd_can_sendmail=1
