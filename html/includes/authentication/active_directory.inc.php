@@ -97,15 +97,27 @@ function user_in_group($username, $groupname)
 
     global $ldap_connection;
 
+    $search_filter = "(&(objectClass=group)(cn=$groupname))";
+
     // get DN for auth_ad_group
     $search = ldap_search(
         $ldap_connection,
         Config::get('auth_ad_base_dn'),
-        "(&(objectClass=group)(cn=$groupname))",
+        $search_filter,
         array("cn")
     );
-    $result = ldap_first_entry($ldap_connection, $search);
-    $group_dn = ldap_get_dn($ldap_connection, $result);
+    $result = ldap_get_entries($ldap_connection, $search);
+
+    if ($result == false) {
+        // FIXME: what went wrong?
+        throw new AuthenticationException("LDAP query failed for group '$groupname' using filter '$search_filter'");
+    } elseif ($result['count'] == 0) {
+        throw new AuthenticationException("Failed to find group matching '$groupname' using filter '$search_filter'");
+    } elseif ($result['count'] > 1) {
+        throw new AuthenticationException("Multiple groups returned for '$groupname' using filter '$search_filter'");
+    }
+
+    $group_dn = $result[0]["dn"];
 
     $search = ldap_search(
         $ldap_connection,
