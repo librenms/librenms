@@ -302,7 +302,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_polled` <= DATE_ADD(
     $msg_box[] = array('type' => 'warning', 'message' => "<a href=\"poll-log/filter=unpolled/\">It appears as though you have some devices that haven't completed polling within the last 15 minutes, you may want to check that out :)</a>",'title' => 'Devices unpolled');
 }
 
-foreach (dbFetchRows('SELECT * FROM `notifications` WHERE `severity` > 1') as $notification) {
+foreach (dbFetchRows('SELECT `notifications`.* FROM `notifications` WHERE NOT exists( SELECT 1 FROM `notifications_attribs` WHERE `notifications`.`notifications_id` = `notifications_attribs`.`notifications_id` AND `notifications_attribs`.`user_id` = ?) AND `severity` > 1', array($_SESSION['user_id'])) as $notification) {
     $msg_box[] = array(
         'type' => 'error',
         'message' => "<a href='notifications/'>${notification['body']}</a>",
