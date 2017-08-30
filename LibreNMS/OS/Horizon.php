@@ -5,10 +5,9 @@ namespace LibreNMS\OS;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Device\WirelessSensor;
-
 use LibreNMS\OS;
 
-class Horizon extends OS implements WirelessSnrDiscovery,WirelessPowerDiscovery
+class Horizon extends OS implements WirelessSnrDiscovery, WirelessPowerDiscovery
 {
     
     public function discoverWirelessSnr()
