@@ -3,6 +3,7 @@
 // easier to rewrite for Active Directory than to bash it into existing LDAP implementation
 
 // disable certificate checking before connect if required
+use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 
 function init_auth()
@@ -28,39 +29,24 @@ function init_auth()
 
 function authenticate($username, $password)
 {
-    global $config, $ldap_connection, $ad_init;
+    global $ldap_connection, $ad_init;
 
     if ($ldap_connection) {
         // bind with sAMAccountName instead of full LDAP DN
-        if ($username && $password && ldap_bind($ldap_connection, "{$username}@{$config['auth_ad_domain']}", $password)) {
+        if ($username && $password && ldap_bind($ldap_connection, $username . '@' . Config::get('auth_ad_domain'), $password)) {
             $ad_init = true;
             // group membership in one of the configured groups is required
-            if (isset($config['auth_ad_require_groupmembership']) &&
-                $config['auth_ad_require_groupmembership']) {
-                $search = ldap_search(
-                    $ldap_connection,
-                    $config['auth_ad_base_dn'],
-                    get_auth_ad_user_filter($username),
-                    array('memberOf')
-                );
-                $entries = ldap_get_entries($ldap_connection, $search);
-                unset($entries[0]['memberof']['count']); //remove the annoying count
-
-                foreach ($entries[0]['memberof'] as $entry) {
-                    $group_cn = get_cn($entry);
-                    if (isset($config['auth_ad_groups'][$group_cn]['level'])) {
-                        // user is in one of the defined groups
+            if (Config::get('auth_ad_require_groupmembership', true)) {
+                // cycle through defined groups, test for memberOf-ship
+                foreach (Config::get('auth_ad_groups') as $group => $level) {
+                    if (user_in_group($username, $group)) {
                         return true;
                     }
                 }
 
                 // failed to find user
-                if (isset($config['auth_ad_debug']) && $config['auth_ad_debug']) {
-                    if ($entries['count'] == 0) {
-                        throw new AuthenticationException('No groups found for user, check base dn');
-                    } else {
-                        throw new AuthenticationException('User is not in one of the required groups');
-                    }
+                if (Config::get('auth_ad_debug', false)) {
+                    throw new AuthenticationException('User is not in one of the required groups or user/group is outside the base dn');
                 }
 
                 throw new AuthenticationException();
@@ -73,7 +59,7 @@ function authenticate($username, $password)
 
     if (!isset($password) || $password == '') {
         throw new AuthenticationException('A password is required');
-    } elseif (isset($config['auth_ad_debug']) && $config['auth_ad_debug']) {
+    } elseif (Config::get('auth_ad_debug', false)) {
         ldap_get_option($ldap_connection, LDAP_OPT_DIAGNOSTIC_MESSAGE, $extended_error);
         throw new AuthenticationException(ldap_error($ldap_connection).'<br />'.$extended_error);
     }
@@ -101,6 +87,36 @@ function reauthenticate($sess_id, $token)
     }
 
     return false;
+}
+
+
+function user_in_group($username, $groupname)
+{
+    // check if user is member of the given group or nested groups
+
+    global $ldap_connection;
+
+    // get DN for auth_ad_group
+    $search = ldap_search(
+        $ldap_connection,
+        Config::get('auth_ad_base_dn'),
+        "(&(objectClass=group)(cn=$groupname))",
+        array("cn")
+    );
+    $result = ldap_first_entry($ldap_connection, $search);
+    $group_dn = ldap_get_dn($ldap_connection, $result);
+
+    $search = ldap_search(
+        $ldap_connection,
+        Config::get('auth_ad_base_dn'),
+        // add 'LDAP_MATCHING_RULE_IN_CHAIN to the user filter to search for $username in nested $group_dn
+        // limiting to "DN" for shorter array
+        "(&" . get_auth_ad_user_filter($username) . "(memberOf:1.2.840.113556.1.4.1941:=$group_dn))",
+        array("DN")
+    );
+    $entries = ldap_get_entries($ldap_connection, $search);
+
+    return ($entries["count"] > 0);
 }
 
 
@@ -161,32 +177,23 @@ function user_exists($username)
 
 function get_userlevel($username)
 {
-    global $config, $ldap_connection;
+    global $ldap_connection;
     ad_bind($ldap_connection); // make sure we called bind
 
     $userlevel = 0;
-    if (isset($config['auth_ad_require_groupmembership']) && $config['auth_ad_require_groupmembership'] == 0) {
-        if (isset($config['auth_ad_global_read']) && $config['auth_ad_global_read'] === 1) {
+    if (!Config::get('auth_ad_require_groupmembership', true)) {
+        if (Config::get('auth_ad_global_read', false)) {
             $userlevel = 5;
         }
     }
 
-    // Find all defined groups $username is in
-    $search = ldap_search(
-        $ldap_connection,
-        $config['auth_ad_base_dn'],
-        get_auth_ad_user_filter($username),
-        array('memberOf')
-    );
-    $entries = ldap_get_entries($ldap_connection, $search);
-    unset($entries[0]['memberof']['count']);
-
-    // Loop the list and find the highest level
-    foreach ($entries[0]['memberof'] as $entry) {
-        $group_cn = get_cn($entry);
-        if (isset($config['auth_ad_groups'][$group_cn]['level']) &&
-             $config['auth_ad_groups'][$group_cn]['level'] > $userlevel) {
-            $userlevel = $config['auth_ad_groups'][$group_cn]['level'];
+    // cycle through defined groups, test for memberOf-ship
+    foreach (Config::get('auth_ad_groups', array()) as $group => $level) {
+        if (user_in_group($username, $group)) {
+            // user is in the current group - save new userlevel if higher than before
+            if ($level['level'] > $userlevel) {
+                $userlevel = $level['level'];
+            }
         }
     }
 
