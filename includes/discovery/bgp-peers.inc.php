@@ -1,8 +1,9 @@
 <?php
 
+use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
-if ($config['enable_bgp']) {
+if (Config::get('enable_bgp')) {
     if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=0)) {
         $vrfs_lite_cisco = $device['vrf_lite_cisco'];
     } else {

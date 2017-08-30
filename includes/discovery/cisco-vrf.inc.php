@@ -1,7 +1,8 @@
 <?php
 
-// FIXME : dbFacile !
-if ($config['enable_vrfs']) {
+use LibreNMS\Config;
+
+if (Config::get('enable_vrfs')) {
     if ($device['os_group'] == 'cisco' || $device['os_group'] == 'junos' || $device['os'] == 'ironware') {
         unset($vrf_count);
 
