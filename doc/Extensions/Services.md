@@ -76,3 +76,14 @@ Services uses the Nagios Alerting scheme where:
 To create an alerting rule to alert on service=critical, your alerting rule would look like:
 
     %services.service_status = "2"
+    
+## Debug
+
+Change user to librenms for example 
+```
+su - librenms
+```
+then you can run the following command to help troubleshoot services. 
+```
+./check-services.php -d
+```
