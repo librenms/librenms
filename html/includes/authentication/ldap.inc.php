@@ -7,25 +7,26 @@ function init_auth()
     global $config, $ldap_connection;
     
     
-    if(! isset($config['auth_ldap_server']) ) {
+    if (!isset($config['auth_ldap_server'])) {
         echo '<h2>Fatal error while connecting to LDAP server you must fill at least the "auth_ldap_server" in config.php.</h2>';
         exit;
     }
     
     /* need if we use multiples ldap server */
-    if(gettype($config['auth_ldap_server']) == 'array') {
+    if (gettype($config['auth_ldap_server']) == 'array') {
         foreach($config['auth_ldap_server'] as $ldap_server) {
-            if(preg_match('/^ldap/', $ldap_server)) {
+            if (preg_match('/^ldap/', $ldap_server)) {
                 $ldap_connection = @ldap_connect($ldap_server);
-            } elseif ( isset($config['auth_ldap_port']) ) {
+            } elseif ( isset($config['auth_ldap_port'])) {
                 $ldap_connection = @ldap_connect( $ldap_server, $config['auth_ldap_port']);
             }
-            if( $ldap_connection ) {
+            
+            if ($ldap_connection) {
                 break;
             }
         }
-        if (! $ldap_connection) {
-            echo '<h2>Fatal error while connecting to LDAP servers ' . join(',',$config['auth_ldap_server']) . '</h2>';
+        if (!$ldap_connection) {
+            echo '<h2>Fatal error while connecting to LDAP servers ' . join(',', $config['auth_ldap_server']) . '</h2>';
             exit;
         }
     } else {
@@ -33,7 +34,7 @@ function init_auth()
          * Set up connection to LDAP server
          */
         $ldap_connection = @ldap_connect($config['auth_ldap_server'], $config['auth_ldap_port']);
-        if (! $ldap_connection) {
+        if (!$ldap_connection) {
             echo '<h2>Fatal error while connecting to LDAP server ' . $config['auth_ldap_server'] . ':' . $config['auth_ldap_port'] . ': ' . ldap_error($ldap_connection) . '</h2>';
             exit;
         }
