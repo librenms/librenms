@@ -318,7 +318,9 @@ function renamehost($id, $new, $source = 'console')
     global $config;
 
     $host = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
-    if (!is_dir($config['rrd_dir']."/$new") && rename($config['rrd_dir']."/$host", $config['rrd_dir']."/$new") === true) {
+    $host_esc = str_replace(':', '_', trim($host, '[]'));
+    $new_esc = str_replace(':', '_', trim($new, '[]'));
+    if (!is_dir($config['rrd_dir']."/$new_esc") && rename($config['rrd_dir']."/$host_esc", $config['rrd_dir']."/$new_esc") === true) {
         dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
         log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
     } else {
