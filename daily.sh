@@ -110,9 +110,9 @@ call_daily_php() {
 set_notification() {
     local args="$@";
     local arg_type=$1;
-    local arg_clear_message=$2;
+    local arg_remove_message=$2;
 
-    php "${LIBRENMS_DIR}/daily.php" -f set_notification -t ${arg_type} -r ${arg_clear_message};
+    php "${LIBRENMS_DIR}/daily.php" -f set_notification -t ${arg_type} -r ${arg_remove_message};
 }
 
 #######################################
