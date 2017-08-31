@@ -69,7 +69,7 @@ function authenticate($username, $password)
 
 function reauthenticate($sess_id, $token)
 {
-    global $config, $ldap_connection;
+    global $ldap_connection;
 
     if (ad_bind($ldap_connection, false, true)) {
         $sess_id = clean($sess_id);
@@ -77,7 +77,7 @@ function reauthenticate($sess_id, $token)
         list($username, $hash) = explode('|', $token);
 
         if (!user_exists($username)) {
-            if (isset($config['auth_ad_debug']) && $config['auth_ad_debug']) {
+            if (Config::get('auth_ad_debug', false)) {
                 throw new AuthenticationException("$username is not a valid AD user");
             }
             throw new AuthenticationException();
@@ -107,13 +107,19 @@ function user_in_group($username, $groupname)
     );
     $result = ldap_get_entries($ldap_connection, $search);
 
-    if ($result == false) {
-        // FIXME: what went wrong?
-        throw new AuthenticationException("LDAP query failed for group '$groupname' using filter '$search_filter'");
-    } elseif ($result['count'] == 0) {
-        throw new AuthenticationException("Failed to find group matching '$groupname' using filter '$search_filter'");
-    } elseif ($result['count'] > 1) {
-        throw new AuthenticationException("Multiple groups returned for '$groupname' using filter '$search_filter'");
+    if ($result == false || $result['count'] !== 1) {
+        if (Config::get('auth_ad_debug', false)) {
+            if ($result == false) {
+                // FIXME: what went wrong?
+                throw new AuthenticationException("LDAP query failed for group '$groupname' using filter '$search_filter'");
+            } elseif ($result['count'] == 0) {
+                throw new AuthenticationException("Failed to find group matching '$groupname' using filter '$search_filter'");
+            } elseif ($result['count'] > 1) {
+                throw new AuthenticationException("Multiple groups returned for '$groupname' using filter '$search_filter'");
+            }
+        }
+
+        throw new AuthenticationException();
     }
 
     $group_dn = $result[0]["dn"];
