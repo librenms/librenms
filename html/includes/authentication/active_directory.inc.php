@@ -38,7 +38,7 @@ function authenticate($username, $password)
             // group membership in one of the configured groups is required
             if (Config::get('auth_ad_require_groupmembership', true)) {
                 // cycle through defined groups, test for memberOf-ship
-                foreach (Config::get('auth_ad_groups') as $group => $level) {
+                foreach (Config::get('auth_ad_groups', array()) as $group => $level) {
                     if (user_in_group($username, $group)) {
                         return true;
                     }
@@ -201,11 +201,11 @@ function get_userlevel($username)
 
     // cycle through defined groups, test for memberOf-ship
     foreach (Config::get('auth_ad_groups', array()) as $group => $level) {
-        if (user_in_group($username, $group)) {
-            // user is in the current group - save new userlevel if higher than before
-            if ($level['level'] > $userlevel) {
-                $userlevel = $level['level'];
+        try {
+            if (user_in_group($username, $group)) {
+                $userlevel = max($userlevel, $level['level']);
             }
+        } catch (AuthenticationException $e) {
         }
     }
 
