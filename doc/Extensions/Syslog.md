@@ -184,7 +184,7 @@ The below are some example hooks to call an external script in the event of a co
 
 #### Cisco ASA
 ```ssh
-$config['os']['asa']['syslog_hook'][] = Array('regex' => '/%ASA-5-111005/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
+$config['os']['asa']['syslog_hook'][] = Array('regex' => '/%ASA-(config-)?5-111005/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
 ```
 
 #### Cisco IOS
