@@ -110,9 +110,9 @@ call_daily_php() {
 set_notification() {
     local args="$@";
     local arg_type=$1;
-    local arg_result=$2;
+    local arg_clear_message=$2;
 
-    php "${LIBRENMS_DIR}/daily.php" -f set_notification -t ${arg_type} -r ${arg_result};
+    php "${LIBRENMS_DIR}/daily.php" -f set_notification -t ${arg_type} -r ${arg_clear_message};
 }
 
 #######################################
@@ -151,7 +151,7 @@ main () {
         up=$(php daily.php -f update >&2; echo $?)
         if [[ "$up" == "0" ]]; then
             ${DAILY_SCRIPT} no-code-update
-            set_notification update 0  # make sure there are no update notifications if update is disabled
+            set_notification update 1  # make sure there are no update notifications if update is disabled
             exit
         fi
 
