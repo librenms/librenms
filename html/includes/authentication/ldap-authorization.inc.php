@@ -55,11 +55,11 @@ function init_auth()
 
     /* need if we use multiples ldap server */
     if (gettype($config['auth_ldap_server']) == 'array') {
-        foreach($config['auth_ldap_server'] as $ldap_server) {
+        foreach ($config['auth_ldap_server'] as $ldap_server) {
             if (preg_match('/^ldap/', $ldap_server)) {
                 $ldap_connection = @ldap_connect($ldap_server);
             } elseif (isset($config['auth_ldap_port'])) {
-                $ldap_connection = @ldap_connect( $ldap_server, $config['auth_ldap_port']);
+                $ldap_connection = @ldap_connect($ldap_server, $config['auth_ldap_port']);
             }
             if ($ldap_connection) {
                 break;
