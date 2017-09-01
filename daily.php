@@ -57,6 +57,7 @@ if ($options['f'] === 'syslog') {
                 break;
             }
         }
+
         dbDelete('syslog', 'seq >= ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $config['syslog_purge']));
 
         $rows = (int)dbFetchCell('SELECT MIN(seq) FROM syslog');
@@ -73,6 +74,7 @@ if ($options['f'] === 'syslog') {
                 break;
             }
         }
+
         dbDelete('syslog', 'seq >= ? AND timestamp > DATE_SUB(NOW(), INTERVAL 7 DAY)', array($rows));
     }
 }
