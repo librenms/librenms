@@ -13,23 +13,16 @@
 
 if ($device['os'] == 'comware') {
     echo 'HPE Comware ';
+    $entity_data = snmpwalk_cache_oid($device, 'entPhysicalName', array(), 'ENTITY-MIB');
+    $procdata = snmpwalk_cache_oid($device, 'hh3cEntityExtCpuUsage', array(), 'HH3C-ENTITY-EXT-MIB');
 
-    $entity_data = snmpwalk_cache_oid($device, 'entPhysicalClass', array(), 'ENTITY-MIB');
-    $indexes = array_keys(array_filter($entity_data, function ($entry) {
-        return $entry['entPhysicalClass'] == 'module';
-    }));
-
-    if (!empty($indexes)) {
-        $procdata = snmpwalk_cache_oid($device, 'hh3cEntityExtCpuUsage', array(), 'HH3C-ENTITY-EXT-MIB');
-
-        foreach ($indexes as $i => $entIndex) {
-            if (isset($procdata[$entIndex])) {
-                $cur_oid = ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.$entIndex";
-                $cur_value = $procdata[$entIndex]['hh3cEntityExtCpuUsage'];
-                $descr = 'Slot ' . ++$i;
-                if ($cur_value > 0) {
-                    discover_processor($valid['processor'], $device, $cur_oid, $entIndex, 'comware', $descr, '1', $cur_value);
-                }
+    foreach ($entity_data as $entity => $value) {
+        if (str_contains($value['entPhysicalName'], array('Board', 'MPU', 'RPU')) && !str_contains($value['entPhysicalName'], array('Fixed SubCard on Board'))) {
+            if (isset($procdata[$entity]['hh3cEntityExtCpuUsage'])) {
+                $cur_oid = ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.$entity";
+                $cur_value = $procdata[$entity]['hh3cEntityExtCpuUsage'];
+                $descr = $value['entPhysicalName'];
+                discover_processor($valid['processor'], $device, $cur_oid, $entity, 'comware', $descr, '1', $cur_value);
             }
         }
     }
