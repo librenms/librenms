@@ -183,6 +183,7 @@ function makeshortif($if)
         'tunnel'              => 'Tunnel',
         'serviceinstance'     => 'SI',
         'dwdm'                => 'DWDM',
+        'bundle-ether'        => 'BE',
     );
 
     $if = fixifName($if);
@@ -1004,6 +1005,7 @@ function fixifName($inf)
         'hp procurve switch software loopback interface' => 'Loopback Interface',
         'control plane interface'                        => 'Control Plane',
         'loop'                                           => 'Loop',
+        'bundle-ether'                                   => 'Bundle-Ether',
     );
 
     $inf = strtolower($inf);
