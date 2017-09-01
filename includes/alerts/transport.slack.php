@@ -33,6 +33,7 @@ foreach( $opts as $tmp_api ) {
                 'color' => $color,
                 'title' => $obj['title'],
                 'text' => $slack_msg,
+                'mrkdwn_in' => ['text', 'fallback']
             )
         ),
         'channel' => $tmp_api['channel'],
