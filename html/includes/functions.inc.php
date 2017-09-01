@@ -1051,6 +1051,7 @@ function shorten_interface_type($string)
             'GigabitEthernet',
             'Port-Channel',
             'Ethernet',
+            'Bundle-Ether',
         ),
         array(
             'Fa',
@@ -1058,6 +1059,7 @@ function shorten_interface_type($string)
             'Gi',
             'Po',
             'Eth',
+            'BE',
         ),
         $string
     );
