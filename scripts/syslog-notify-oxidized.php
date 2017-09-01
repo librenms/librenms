@@ -35,4 +35,7 @@ if (preg_match('/(SYS-(SW[0-9]+-)?5-CONFIG_I|VSHD-5-VSHD_SYSLOG_CONFIG_I): Confi
 } elseif (preg_match('/GBL-CONFIG-6-DB_COMMIT : Configuration committed by user \\\\\'(?P<user>.+?)\\\\\'..*/', $msg, $matches)) {
     $username = $matches['user'];
     oxidized_node_update($hostname, $username, $msg);
+} elseif (preg_match('/ASA-(config-)?5-111005: (?P<user>.+) end configuration: OK/', $msg, $matches)) {
+    $username = $matches['user'];
+    oxidized_node_update($hostname, $username, $msg);
 }
