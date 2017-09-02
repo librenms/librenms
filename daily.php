@@ -67,15 +67,15 @@ if ($options['f'] === 'syslog') {
                 break;
             }
 
-            if (dbDelete('syslog', 'seq >= ? AND seq < ? AND timestamp > DATE_SUB(NOW(), INTERVAL 7 DAY)', array($rows, $limit)) > 0) {
+            if (dbDelete('syslog', 'seq >= ? AND seq < ? AND timestamp > DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $limit, $config['syslog_future_purge'])) > 0) {
                 $rows = $limit;
-                echo "Syslog cleared for entries from more than 7 days in the future 1000 limit\n";
+                echo "Syslog cleared for entries from more than ".$config['syslog_future_purge']." days in the future 1000 limit\n";
             } else {
                 break;
             }
         }
 
-        dbDelete('syslog', 'seq >= ? AND timestamp > DATE_SUB(NOW(), INTERVAL 7 DAY)', array($rows));
+        dbDelete('syslog', 'seq >= ? AND timestamp > DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $config['syslog_future_purge']));
     }
 }
 
