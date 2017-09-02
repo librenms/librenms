@@ -318,7 +318,7 @@ function renamehost($id, $new, $source = 'console')
     global $config;
 
     $host = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
-    if (!is_dir($config['rrd_dir']."/$new") && rename($config['rrd_dir']."/$host", $config['rrd_dir']."/$new") === true) {
+    if (!is_dir(get_rrd_dir($new)) && rename(get_rrd_dir($host), get_rrd_dir($new)) === true) {
         dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
         log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
     } else {
@@ -374,7 +374,7 @@ function delete_device($id)
         }
     }
 
-    $ex = shell_exec("bash -c '( [ ! -d ".trim($config['rrd_dir'])."/".$host." ] || rm -vrf ".trim($config['rrd_dir'])."/".$host." 2>&1 ) && echo -n OK'");
+    $ex = shell_exec("bash -c '( [ ! -d ".trim(get_rrd_dir($host))." ] || rm -vrf ".trim(get_rrd_dir($host))." 2>&1 ) && echo -n OK'");
     $tmp = explode("\n", $ex);
     if ($tmp[sizeof($tmp)-1] != "OK") {
         $ret .= "Could not remove files:\n$ex\n";
