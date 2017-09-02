@@ -300,9 +300,23 @@ function rrd_name($host, $extra, $extension = ".rrd")
 {
     global $config;
     $filename = safename(is_array($extra) ? implode("-", $extra) : $extra);
-    $host = str_replace(':', '_', trim($host, '[]'));
-    return implode("/", array($config['rrd_dir'], $host, $filename.$extension));
+    return implode("/", array(get_rrd_dir($host), $filename.$extension));
 } // rrd_name
+
+
+/**
+ * Generates a path based on the hostname (or IP)
+ *
+ * @param string $host Host name
+ * @return string the name of the rrd directory for $host
+ */
+function get_rrd_dir($host)
+{
+    global $config;
+    $host = str_replace(':', '_', trim($host, '[]'));
+    return implode("/", array($config['rrd_dir'], $host));
+} // rrd_dir
+
 
 /**
  * Generates a filename for a proxmox cluster rrd

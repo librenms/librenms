@@ -51,14 +51,13 @@ if (empty($hostname)) {
 
 $step      = $config['rrd']['step'];
 $heartbeat = $config['rrd']['heartbeat'];
-$rrd_path  = $config['rrd_dir'];
 $rrdtool   = $config['rrdtool'];
 $tmp_path  = $config['temp_dir'];
 
 if ($hostname === 'all') {
     $hostname = '*';
 }
-$files = glob($rrd_path . '/' . $hostname . '/*.rrd');
+$files = glob(get_rrd_dir($hostname) . '/*.rrd');
 
 $run = readline("Are you sure you want to run this command [N/y]: ");
 if (!($run == 'y' || $run == 'Y')) {
