@@ -184,14 +184,17 @@ function dbBulkInsert($data, $table)
         $data  = $table;
         $table = $tmp;
     }
-    if (count($data) === 0) {
+    // check that data isn't an empty array
+    if (empty($data)) {
         return false;
     }
-    if (count($data[0]) === 0) {
+    // make sure we have fields to insert
+    $fields = array_keys(reset($data));
+    if (empty($fields)) {
         return false;
     }
 
-    $sql = 'INSERT INTO `'.$table.'` (`'.implode('`,`', array_keys($data[0])).'`)  VALUES ';
+    $sql = 'INSERT INTO `'.$table.'` (`'.implode('`,`', $fields).'`)  VALUES ';
     $values ='';
 
     foreach ($data as $row) {
