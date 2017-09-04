@@ -571,7 +571,7 @@ graph_types:
     graph_descr: { Field: graph_descr, Type: varchar(255), 'Null': true, Default: 'NULL', Extra: '' }
     graph_order: { Field: graph_order, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
     graph_section: { Field: graph_section, Type: varchar(32), 'Null': false, Default: 'NULL', Extra: '' }
-    graph_subtype: { Field: graph_subtype, Type: varchar(64), 'Null': false, Default: '', Extra: '' }
+    graph_subtype: { Field: graph_subtype, Type: varchar(64), 'Null': false, Default: 'NULL', Extra: '' }
     graph_type: { Field: graph_type, Type: varchar(32), 'Null': false, Default: 'NULL', Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [graph_type, graph_subtype, graph_section], Unique: true, Type: BTREE }
