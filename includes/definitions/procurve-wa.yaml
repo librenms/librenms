@@ -1,0 +1,11 @@
+os: procurve-wa
+text: 'HP ProCurve Access Point'
+type: wireless
+icon: hpe
+over:
+    - { graph: device_bits, text: Traffic }
+mib_dir:
+    - hp
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.11.2.14.
