@@ -14,10 +14,12 @@
 
 function authToken(\Slim\Route $route)
 {
+    global $config;
+
     $app   = \Slim\Slim::getInstance();
     $token = $app->request->headers->get('X-Auth-Token');
     if (isset($token) && !empty($token)) {
-        if (!function_exists('get_user')) {
+        if (!function_exists('get_user') || $config['api_auth_local'] === true) {
             $username = dbFetchCell('SELECT `U`.`username` FROM `api_tokens` AS AT JOIN `users` AS U ON `AT`.`user_id`=`U`.`user_id` WHERE `AT`.`token_hash`=?', array($token));
         } else {
             $username = get_user(dbFetchCell('SELECT `AT`.`user_id` FROM `api_tokens` AS AT WHERE `AT`.`token_hash`=?', array($token)));
