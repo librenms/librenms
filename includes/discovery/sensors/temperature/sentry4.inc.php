@@ -39,9 +39,9 @@ foreach (explode("\n", $oids) as $data) {
         $low_limit       = (snmp_get($device, "st4TempSensorLowAlarm.1.$index", '-Ovq', 'Sentry4-MIB') / $divisor);
         $high_warn_limit = (snmp_get($device, "st4TempSensorHighWarning.1.$index", '-Ovq', 'Sentry4-MIB') / $divisor);
         $high_limit      = (snmp_get($device, "st4TempSensorHighAlarm.1.$index", '-Ovq', 'Sentry4-MIB') / $divisor);
-        $current         = (snmp_get($device, "$temperature_oid", '-Ovq', 'Sentry4-MIB') / $divisor);
+        $current         = (snmp_get($device, "$temperature_oid", '-OvqU', 'Sentry4-MIB') / $divisor);
 
-        if ($current >= 0) {
+        if (is_numeric($current) && $current >= 0) {
             discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $index, 'sentry4', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
         }
     }

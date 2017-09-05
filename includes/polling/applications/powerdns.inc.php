@@ -13,6 +13,7 @@ if ($agent_data['app'][$name]) {
     $powerdns = $agent_data['app'][$name];
 } else {
     $powerdns = snmp_get($device, $oid, $options);
+    $powerdns = trim($powerdns, '"');
 }
 update_application($app, $powerdns);
 

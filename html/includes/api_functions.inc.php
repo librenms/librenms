@@ -1482,11 +1482,10 @@ function list_arp()
             $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
             $arp = dbFetchRows("SELECT `ipv4_mac`.* FROM `ipv4_mac` LEFT JOIN `ports` ON `ipv4_mac`.`port_id` = `ports`.`port_id` WHERE `ports`.`device_id` = ?", array($device_id));
         } elseif (str_contains($ip, '/')) {
-            $ipv4 = new Net_IPv4();
-            $net = $ipv4->parseAddress($ip);
+            list($net, $cidr) = explode('/', $ip, 2);
             $arp = dbFetchRows(
                 'SELECT * FROM `ipv4_mac` WHERE (inet_aton(`ipv4_address`) & ?) = ?',
-                array(ip2long($net->netmask), ip2long($net->network))
+                array(cidr2long($cidr), ip2long($net))
             );
         } else {
             $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `ipv4_address`=?", array($ip));
@@ -1534,7 +1533,7 @@ function list_services()
         $where[] = '`service_type` LIKE ?';
         $params[] = $_GET['type'];
     }
-    
+
     //GET by Host
     if (isset($router['hostname'])) {
         $hostname = $router['hostname'];
@@ -1562,6 +1561,79 @@ function list_services()
         'err-msg' => $message,
         'count'   => $count,
         'services' => $services,
+    );
+
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
+
+function list_logs()
+{
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $type = $app->router()->getCurrentRoute()->getName();
+    $hostname = $router['hostname'];
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if ($type === 'list_eventlog') {
+        $table = 'eventlog';
+        $timestamp = 'datetime';
+    } elseif ($type === 'list_syslog') {
+        $table = 'syslog';
+        $timestamp = 'timestamp';
+    } elseif ($type === 'list_alertlog') {
+        $table = 'alert_log';
+        $timestamp = 'time_logged';
+    } elseif ($type === 'list_authlog') {
+        $table = 'authlog';
+        $timestamp = 'datetime';
+    } else {
+        $table = 'eventlog';
+        $timestamp = 'datetime';
+    }
+
+    $message = '';
+    $status = 'ok';
+    $code = 200;
+    $start = mres($_GET['start']) ?: 1;
+    $limit = mres($_GET['limit']) ?: 50;
+    $from = mres($_GET['from']);
+    $to = mres($_GET['to']);
+
+    $count_query = 'SELECT COUNT(*)';
+    $full_query = "SELECT `devices`.`hostname`, `devices`.`sysName`, `$table`.*";
+
+    $param = array();
+    $query = " FROM $table LEFT JOIN `devices` ON `$table`.`device_id`=`devices`.`device_id` WHERE 1";
+
+    if (is_numeric($device_id)) {
+        $query .= " AND `devices`.`device_id` = ?";
+        $param[] = $device_id;
+    }
+
+    if ($from) {
+        $query .= " AND $timestamp >= ?";
+        $param[] = $from;
+    }
+
+    if ($to) {
+        $query .= " AND $timestamp <= ?";
+        $param[] = $to;
+    }
+
+    $count_query = $count_query . $query;
+    $count = dbFetchCell($count_query, $param);
+    $full_query = $full_query . $query . " ORDER BY $timestamp ASC LIMIT $start,$limit";
+    $logs = dbFetchRows($full_query, $param);
+
+    $limited_count = count($logs);
+    $output = array(
+        'status' => $status,
+        'err-msg' => $message,
+        'count' => $limited_count,
+        'total' => $count,
+        'logs' => $logs,
     );
 
     $app->response->setStatus($code);

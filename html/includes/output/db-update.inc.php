@@ -61,7 +61,11 @@ if (($fp = popen($cmd . ' 2>&1', "r"))) {
     if (pclose($fp) === 0) {
         echo "Database is up to date!";
         $_SESSION['build-ok'] = true;
+    } else {
+        echo "Database schema update failed!";
     }
 }
 
+ob_end_flush();
+flush();
 session_write_close();

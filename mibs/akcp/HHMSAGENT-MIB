@@ -1,0 +1,1830 @@
+--/***************************************************************************/
+--/**                                                                        */
+--/**               AKCP, Inc                                                */
+--/**               Proprietary and Confidential Information                 */
+--/**                                                                        */
+--/** This material contains, and is part of a computer software program     */
+--/** which is, proprietary and confidential information owned by AKCP, INC. */ 
+--/** The program, including this material,                                  */
+--/** may not be duplicated, disclosed or reproduced in whole or in part for */
+--/** any purpose without the express written authorization of AKCP, Inc     */
+--/** All authorized reproductions must be marked with this legend.          */
+--/**                                                                        */
+--/**                                                                        */
+--/**                         Copyright (c) 1995-01                          */
+--/**                         AKCP, Incorporated                             */
+--/**                         All rights reserved                            */
+--/**                                                                        */
+--/***************************************************************************/
+
+
+HHMSAGENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        enterprises, IpAddress
+                FROM RFC1155-SMI
+        OBJECT-TYPE
+                FROM RFC-1212
+        DisplayString
+                FROM RFC1213-MIB
+        TRAP-TYPE
+                FROM RFC-1215;
+
+
+   akcp	OBJECT IDENTIFIER ::= { enterprises 3854 }
+   hhmsagent	OBJECT IDENTIFIER ::= { akcp 1 }
+
+
+      hhmsAgentSummary         OBJECT IDENTIFIER  ::=  {  hhmsagent 1   }
+
+         hhmsAgentLocation OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+            "The Agent location"
+            ::=  {  hhmsAgentSummary 1   }
+
+         hhmsAgentStatus OBJECT-TYPE
+            SYNTAX  INTEGER {
+            noStatus(1),
+            normal(2),
+            warning(3),
+            critical(4),
+			   sensorError(5)
+				}
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+            "The current status of this Agent. The status of the agent is the worst status of all the sensors usder the control of this agent."
+            ::=  {  hhmsAgentSummary 2   }
+
+         hhmsNumberBadSensors OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+            "How many sensors controlled by this agent are not functioning properly"
+            ::=  {  hhmsAgentSummary 4   }
+
+         hhmsLocationBadSensor OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+            "The Location of the first bad sensor controlled by this agent."
+            ::=  {  hhmsAgentSummary 5   }
+
+         hhmsAgentManufName OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+            "The manufacturers name"
+            ::=  {  hhmsAgentSummary 6   }
+
+         hhmsAgentHelpUrl OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+            "The URL of the web based help"
+            ::=  {  hhmsAgentSummary 7   }
+
+         hhmsAgentHtmlView OBJECT-TYPE
+            SYNTAX  INTEGER {
+            sensorArray(1),
+            sensorArrayPro(2),
+            advanced(3)
+				}
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+            "Which view of the sensors the user is served via the web server"
+            ::=  {  hhmsAgentSummary 8   }
+
+         hhmsAgentHtmlStandardTitle OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+            "The titles of the standard html view"
+            ::=  {  hhmsAgentSummary 9   }
+
+         hhmsAgentHtmlStandardButton OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+            "The buttons of the standard html view"
+            ::=  {  hhmsAgentSummary 10   }
+
+
+      hhmsSensor OBJECT IDENTIFIER  ::=  {  hhmsagent 2 }
+
+         hhmsSensorArrayTable OBJECT IDENTIFIER ::= { hhmsSensor 2  }
+ 
+            hhmsSensorArrayEntry OBJECT IDENTIFIER ::= { hhmsSensorArrayTable 1  }
+
+               hhmsSensorArrayHost OBJECT-TYPE
+                  SYNTAX  IpAddress
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The Host of this sensor, this is the IP address"
+                  ::=  {  hhmsSensorArrayEntry 1   }
+
+               hhmsSensorArrayUseDHCP OBJECT-TYPE
+                  SYNTAX  INTEGER {
+			         yes(1),
+			         no(2)
+                  }
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "To use DHCP enter a 1, to use a static IP address enter a 2"
+                  ::=  {  hhmsSensorArrayEntry 2   }
+
+
+               hhmsSensorArrayMAC OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The MAC address of this sensor."
+                  ::=  {  hhmsSensorArrayEntry 3   }
+
+               hhmsSensorArraySetCommunity OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The sensorArray community string used for snmp Sets"
+                  ::=  {  hhmsSensorArrayEntry 4   }
+
+               hhmsSensorArrayGetCommunity OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The sensorArray community string used for snmp Gets"
+                  ::=  {  hhmsSensorArrayEntry 5   }
+
+               hhmsSensorArrayDescription OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "A Description of this sensorArray"
+                  ::=  {  hhmsSensorArrayEntry 6   }
+
+               hhmsSensorArrayLocation OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The description of the physical location of this sensorArray"
+                  ::=  {  hhmsSensorArrayEntry 7   }
+
+               hhmsSensorArrayLastUpdate OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The last time the sensorArray was read"
+                  ::=  {  hhmsSensorArrayEntry 8  }
+
+               hhmsSensorArrayStatus OBJECT-TYPE
+                  SYNTAX  INTEGER {
+		   	      noStatus(1),
+			         normal(2),
+		   	      sensorError(7)
+                  }
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The current status of this sensorArray"
+                  ::=  {  hhmsSensorArrayEntry 9   }
+   
+               hhmsSensorArrayOnline OBJECT-TYPE
+                  SYNTAX  INTEGER {
+			         online(1),
+			         offline(2)
+                  }
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "If this sensorArray is currently online"
+                  ::=  {  hhmsSensorArrayEntry 10   }
+   
+               hhmsSensorArrayGoOnline OBJECT-TYPE
+                  SYNTAX  INTEGER {
+			         goOnline(1),
+			         goOffline(2)
+                  }
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "To put online enter a 1, to take offline enter a 2"
+                  ::=  {  hhmsSensorArrayEntry 11   }
+
+               hhmsSensorArrayReadInterval OBJECT-TYPE
+                  SYNTAX  INTEGER
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "How many seconds between readings of this sensor"
+                  ::=  {  hhmsSensorArrayEntry 12  }
+
+               hhmsSensorArrayReceiveTimeout OBJECT-TYPE
+                  SYNTAX  INTEGER
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "How many seconds to wait to receive data from the sensor"
+                  ::=  {  hhmsSensorArrayEntry 13  }
+   
+               hhmsSensorArrayReceiveRetries OBJECT-TYPE
+                  SYNTAX  INTEGER
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "How many times to retry to receive data before giving up. A -1 means never give up trying"
+                  ::=  {  hhmsSensorArrayEntry 14   }
+
+               hhmsSensorArrayVersion OBJECT-TYPE
+                  SYNTAX  INTEGER
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The version of this SensorArray"
+                  ::=  {  hhmsSensorArrayEntry 15   }
+
+               hhmsSensorArrayTempTable OBJECT-TYPE
+                  SYNTAX  SEQUENCE OF HhmsSensorArrayTempEntry
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "This table contains the data for every Temperature Sensor in the SensorArray. Each row in the table contains data for a different Temperature Sensor."
+                  ::=  {  hhmsSensorArrayEntry 16   }
+
+               hhmsSensorArrayTempEntry OBJECT-TYPE
+                  SYNTAX  HhmsSensorArrayTempEntry
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "This is an entry in the hhmsSensorArrayTempEntry Table"
+                  INDEX         { hhmsSensorArrayTempIndex }
+                  ::=  {  hhmsSensorArrayTempTable 1 }
+
+                  HhmsSensorArrayTempEntry ::= SEQUENCE {
+                     hhmsSensorArrayTempDescription
+                        DisplayString,
+                     hhmsSensorArrayTempLocation
+                        DisplayString,
+                     hhmsSensorArrayTempDegree
+                        INTEGER,
+                     hhmsSensorArrayTempStatus
+                        INTEGER,
+                     hhmsSensorArrayTempOnline
+                        INTEGER,
+                     hhmsSensorArrayTempGoOnline
+                        INTEGER,
+                     hhmsSensorArrayTempHighWarning
+                        INTEGER,
+                     hhmsSensorArrayTempHighCritical
+                        INTEGER,
+                     hhmsSensorArrayTempLowWarning
+                        INTEGER,
+                     hhmsSensorArrayTempLowCritical
+                        INTEGER,
+                     hhmsSensorArrayTempRearm
+                        INTEGER,
+                     hhmsSensorArrayTempDegreeType
+                        INTEGER,
+                     hhmsSensorArrayTempSensorType
+                        INTEGER,
+                     hhmsSensorArrayTempTestStatus
+                        INTEGER,
+                     hhmsSensorArrayTempTestDegree
+                        INTEGER,
+                     hhmsSensorArrayTempIndex
+                        INTEGER
+                  }
+                  hhmsSensorArrayTempDescription OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "A Description of this sensor"
+                     ::=  {  hhmsSensorArrayTempEntry 1   }
+
+                  hhmsSensorArrayTempLocation OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The physical location of this sensor"
+                     ::=  {  hhmsSensorArrayTempEntry 2   }
+
+                  hhmsSensorArrayTempDegree OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The degrees in this sensor"
+                     ::=  {  hhmsSensorArrayTempEntry 3   }
+
+                  hhmsSensorArrayTempStatus OBJECT-TYPE
+                     SYNTAX  INTEGER {
+                     noStatus(1),
+			            normal(2),
+			            highWarning(3),
+			            highCritical(4),
+                     lowWarning(5),
+                     lowCritical(6),
+                     sensorError(7)
+                     }
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The current status of this Sensor"
+                     ::=  {  hhmsSensorArrayTempEntry 4   }
+      
+                  hhmsSensorArrayTempOnline OBJECT-TYPE
+                     SYNTAX  INTEGER {
+			            online(1),
+			            offline(2)
+                     }
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "If this Sensor is currently online"
+                     ::=  {  hhmsSensorArrayTempEntry 5   }
+   
+                  hhmsSensorArrayTempGoOnline OBJECT-TYPE
+                     SYNTAX  INTEGER {
+		   	         goOnline(1),
+			            goOffline(2)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "To put online enter a 1, to take offline enter a 2"
+                     ::=  {  hhmsSensorArrayTempEntry 6   }
+         
+                  hhmsSensorArrayTempHighWarning OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "How hot this sensor gets before it sends a warning"
+                     ::=  {  hhmsSensorArrayTempEntry 7   }
+      
+                  hhmsSensorArrayTempHighCritical OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "How hot this sensor gets before it sends a critical event"
+                     ::=  {  hhmsSensorArrayTempEntry 8   }
+   
+                  hhmsSensorArrayTempLowWarning OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "How cold this sensor gets before it sends a warning"
+                     ::=  {  hhmsSensorArrayTempEntry 9   }
+   
+                  hhmsSensorArrayTempLowCritical OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "How cold this sensor gets before it sends a critical event"
+                     ::=  {  hhmsSensorArrayTempEntry 10   }
+      
+                  hhmsSensorArrayTempRearm OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The number of degrees to rearm the status. For example if status goes from normal to warning, the temp must go down hhmsTempRearm degrees below warning before the status goes to normal"
+                     ::=  {  hhmsSensorArrayTempEntry 11   }
+   
+                  hhmsSensorArrayTempDegreeType OBJECT-TYPE
+                     SYNTAX  INTEGER {
+   		   	      fahr(0),
+	   		         celsius(1)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The degrees are in fahrenheit(0) or in celsius(1)"
+                     ::=  {  hhmsSensorArrayTempEntry 12   }
+      
+                  hhmsSensorArrayTempSensorType OBJECT-TYPE
+                     SYNTAX  INTEGER {
+   		   	      type1(0),
+	   		         type2(1)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The type of temperture sensor"
+                     ::=  {  hhmsSensorArrayTempEntry 13   }
+      
+                  hhmsSensorArrayTempTestStatus OBJECT-TYPE
+                     SYNTAX  INTEGER {
+			            testNoStatus(1),
+			            testNormal(2),
+			            testHighWarning(3),
+      			      testHighCritical(4),
+	      		      testLowWarning(5),
+		      	      testLowCritical(6),
+			            sensorError(7)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Set the status for test purposes"
+                     ::=  {  hhmsSensorArrayTempEntry 14   }
+   
+                  hhmsSensorArrayTempTestDegree OBJECT-TYPE
+                     SYNTAX  INTEGER 
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Enter the degrees in this sensor for test purposes"
+                     ::=  {  hhmsSensorArrayTempEntry 15   }
+
+                  hhmsSensorArrayTempIndex OBJECT-TYPE
+                     SYNTAX  INTEGER (0..3)
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The index into the temperature sensor table"
+                     ::=  {  hhmsSensorArrayTempEntry 16   }
+
+
+
+               hhmsSensorArrayHumidityTable OBJECT-TYPE
+                  SYNTAX  SEQUENCE OF HhmsSensorArrayHumidityEntry
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "This table contains the data for every Humidity Sensor in the SensorArray. Each row in the table contains data for a different Humidity Sensor."
+                  ::=  {  hhmsSensorArrayEntry 17   }
+
+               hhmsSensorArrayHumidityEntry OBJECT-TYPE
+                  SYNTAX  HhmsSensorArrayHumidityEntry
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "This is an entry in the hhmsSensorArrayHumidityEntry Table"
+                  INDEX         { hhmsSensorArrayHumidityIndex }
+                  ::=  { hhmsSensorArrayHumidityTable 1 }
+
+                  HhmsSensorArrayHumidityEntry ::= SEQUENCE {
+                     hhmsSensorArrayHumidityDescription
+                        DisplayString,
+                     hhmsSensorArrayHumidityLocation
+                        DisplayString,
+                     hhmsSensorArrayHumidityPercent
+                        INTEGER,
+                     hhmsSensorArrayHumidityStatus
+                        INTEGER,
+                     hhmsSensorArrayHumidityOnline
+                        INTEGER,
+                     hhmsSensorArrayHumidityGoOnline
+                        INTEGER,
+                     hhmsSensorArrayHumidityHighWarning
+                        INTEGER,
+                     hhmsSensorArrayHumidityHighCritical
+                        INTEGER,
+                     hhmsSensorArrayHumidityLowWarning
+                        INTEGER,
+                     hhmsSensorArrayHumidityLowCritical
+                        INTEGER,
+                     hhmsSensorArrayHumidityRearm
+                        INTEGER,
+                     hhmsSensorArrayHumidityTestStatus
+                        INTEGER,
+                     hhmsSensorArrayHumidityTestPercent
+                        INTEGER,
+                     hhmsSensorArrayHumidityIndex
+                        INTEGER
+                  }
+                  hhmsSensorArrayHumidityDescription OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "A Description of this sensor"
+                     ::=  {  hhmsSensorArrayHumidityEntry 1   }
+
+                  hhmsSensorArrayHumidityLocation OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The physical location of this sensor"
+                     ::=  {  hhmsSensorArrayHumidityEntry 2   }
+
+                  hhmsSensorArrayHumidityPercent OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The relative humidity percentage measured by this sensor"
+                     ::=  {  hhmsSensorArrayHumidityEntry 3   }
+
+                  hhmsSensorArrayHumidityStatus OBJECT-TYPE
+                     SYNTAX  INTEGER {
+                     noStatus(1),
+			            normal(2),
+			            highWarning(3),
+			            highCritical(4),
+                     lowWarning(5),
+                     lowCritical(6),
+                     sensorError(7)
+                     }
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The current status of this Sensor"
+                     ::=  {  hhmsSensorArrayHumidityEntry 4   }
+      
+                  hhmsSensorArrayHumidityOnline OBJECT-TYPE
+                     SYNTAX  INTEGER {
+			            online(1),
+			            offline(2)
+                     }
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "If this Sensor is currently online"
+                        ::=  {  hhmsSensorArrayHumidityEntry 5   }
+   
+                  hhmsSensorArrayHumidityGoOnline OBJECT-TYPE
+                     SYNTAX  INTEGER {
+		   	         goOnline(1),
+			            goOffline(2)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "To put online enter a 1, to take offline enter a 2"
+                     ::=  {  hhmsSensorArrayHumidityEntry 6   }
+      
+                  hhmsSensorArrayHumidityHighWarning OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "How high the relative humidity this sensor measures before it sends a warning"
+                     ::=  {  hhmsSensorArrayHumidityEntry 7   }
+      
+                  hhmsSensorArrayHumidityHighCritical OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "How high the relative humidity this sensor measures before it becomes critical"
+                     ::=  {  hhmsSensorArrayHumidityEntry 8   }
+   
+                  hhmsSensorArrayHumidityLowWarning OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "How low the relative humidity this sensor measures before it sends a warning"
+                     ::=  {  hhmsSensorArrayHumidityEntry 9   }
+   
+                  hhmsSensorArrayHumidityLowCritical OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "How low the relative humidity this sensor measures before it becomes critical"
+                     ::=  {  hhmsSensorArrayHumidityEntry 10   }
+         
+                  hhmsSensorArrayHumidityRearm OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The percent relative humidity to rearm the status. For example if status goes from normal to warning, the humidity must go down hhmsHumidityRearm below warning before the status goes to normal"
+                     ::=  {  hhmsSensorArrayHumidityEntry 11   }
+      
+                  hhmsSensorArrayHumidityTestStatus OBJECT-TYPE
+                     SYNTAX  INTEGER {
+			            testNoStatus(1),
+			            testNormal(2),
+			            testHighWarning(3),
+      			      testHighCritical(4),
+	      		      testLowWarning(5),
+		      	      testLowCritical(6),
+			            sensorError(7)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Set the status for test purposes"
+                     ::=  {  hhmsSensorArrayHumidityEntry 12   }
+   
+                  hhmsSensorArrayHumidityTestPercent OBJECT-TYPE
+                     SYNTAX  INTEGER 
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Enter the percent of relative humidity in this sensor for test purposes"
+                     ::=  {  hhmsSensorArrayHumidityEntry 13   }
+
+                  hhmsSensorArrayHumidityIndex OBJECT-TYPE
+                     SYNTAX  INTEGER (0..2)
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The index into the Humidity sensor table"
+                     ::=  {  hhmsSensorArrayHumidityEntry 14   }
+
+
+               hhmsSensorArraySwitchTable OBJECT-TYPE
+                  SYNTAX  SEQUENCE OF HhmsSensorArraySwitchEntry
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "This table contains the data for every Switch Sensor in the SensorArray. Each row in the table contains data for a different Switch Sensor."
+                  ::=  {  hhmsSensorArrayEntry 18   }
+
+               hhmsSensorArraySwitchEntry OBJECT-TYPE
+                  SYNTAX  HhmsSensorArraySwitchEntry
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "This is an entry in the hhmsSensorArraySwitchEntry Table"
+                  INDEX         { hhmsSensorArraySwitchIndex }
+                  ::=  { hhmsSensorArraySwitchTable 1 }
+
+                  HhmsSensorArraySwitchEntry ::= SEQUENCE {
+                     hhmsSensorArraySwitchDescription
+                        DisplayString,
+                     hhmsSensorArraySwitchLocation
+                        DisplayString,
+                     hhmsSensorArraySwitchStatus
+                        INTEGER,
+                     hhmsSensorArraySwitchOnline
+                        INTEGER,
+                     hhmsSensorArraySwitchGoOnline
+                        INTEGER,
+                     hhmsSensorArraySwitchDirection
+                        INTEGER,
+                     hhmsSensorArraySwitchNormalState
+                        INTEGER,
+                     hhmsSensorArraySwitchOutputLevel
+                        INTEGER,
+                     hhmsSensorArraySwitchTestState
+                        INTEGER,
+                     hhmsSensorArraySwitchIndex
+                        INTEGER
+                  }
+                  hhmsSensorArraySwitchDescription OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "A Description of this sensor Switch"
+                     ::=  {  hhmsSensorArraySwitchEntry 1   }
+
+                  hhmsSensorArraySwitchLocation OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The physical location of this sensor Switch"
+                     ::=  {  hhmsSensorArraySwitchEntry 2   }
+
+                  hhmsSensorArraySwitchStatus OBJECT-TYPE
+                     SYNTAX  INTEGER {
+		      	      noStatus(1),
+			            normal(2),
+			            critical(4),
+	   	   	      sensorError(7)
+                     }
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The current status of this Sensor, only input switches have a status"
+                     ::=  {  hhmsSensorArraySwitchEntry 3  }
+
+                  hhmsSensorArraySwitchOnline OBJECT-TYPE
+                     SYNTAX  INTEGER {
+			            online(1),
+			            offline(2)
+                     }
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "If this Sensor is currently online"
+                        ::=  {  hhmsSensorArraySwitchEntry 4  }
+   
+                  hhmsSensorArraySwitchGoOnline OBJECT-TYPE
+                     SYNTAX  INTEGER {
+		   	         goOnline(1),
+			            goOffline(2)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "To put online enter a 1, to take offline enter a 2"
+                     ::=  {  hhmsSensorArraySwitchEntry 5  }
+
+                  hhmsSensorArraySwitchDirection OBJECT-TYPE
+                     SYNTAX  INTEGER {
+		   	         input(0),
+			            output(1)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "To set a switch to input enter 0. To set a switch to output enter 1"
+                     ::=  {  hhmsSensorArraySwitchEntry 6  }
+
+                  hhmsSensorArraySwitchNormalState OBJECT-TYPE
+                     SYNTAX  INTEGER {
+		   	         closed(0),
+			            open(1)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The normal state of an input switch. If an input switch is in this state it is normal, else it is critical. An open switch senses +5 volts. A closed switch senses 0 volts."
+                     ::=  {  hhmsSensorArraySwitchEntry 7  }
+                     
+                  hhmsSensorArraySwitchOutputLevel OBJECT-TYPE
+                     SYNTAX  INTEGER {
+		   	         low(0),
+			            high(1)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "An output swith can be set to this level"
+                     ::=  {  hhmsSensorArraySwitchEntry 8  }
+                     
+                  hhmsSensorArraySwitchTestState OBJECT-TYPE
+                     SYNTAX  INTEGER {
+		      	      noStatus(1),
+			            normal(2),
+			            critical(4),
+	   	   	      sensorError(7)
+                     }
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Enter the status of this Sensor for test purposes"
+                     ::=  {  hhmsSensorArraySwitchEntry 9  }
+                     
+                  hhmsSensorArraySwitchIndex OBJECT-TYPE
+                     SYNTAX  INTEGER (0..24)
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The index into the Switch sensor table"
+                     ::=  {  hhmsSensorArraySwitchEntry 10   }
+
+
+               hhmsSensorArraySerialTable OBJECT-TYPE
+                  SYNTAX  SEQUENCE OF HhmsSensorArraySerialEntry
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "This table contains the data for every Serial Port in the SensorArray. Each row in the table contains data for a different Serial Port."
+                  ::=  {  hhmsSensorArrayEntry 19   }
+
+               hhmsSensorArraySerialEntry OBJECT-TYPE
+                  SYNTAX  HhmsSensorArraySerialEntry
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "This is an entry in the hhmsSensorArraySerialEntry Table"
+                  INDEX         { hhmsSensorArraySerialIndex }
+                  ::=  { hhmsSensorArraySerialTable 1 }
+
+                  HhmsSensorArraySerialEntry ::= SEQUENCE {
+                     hhmsSensorArraySerialDescription
+                        DisplayString,
+                     hhmsSensorArraySerialLocation
+                        DisplayString,
+                     hhmsSensorArraySerialStatus
+                        INTEGER,
+                     hhmsSensorArraySerialOnline
+                        INTEGER,
+                     hhmsSensorArraySerialGoOnline
+                        INTEGER,
+                     hhmsSensorArraySerialData
+                        DisplayString,
+                     hhmsSensorArraySerialBaud
+                        INTEGER,
+                     hhmsSensorArraySerialDataBits
+                        INTEGER,
+                     hhmsSensorArraySerialParity
+                        INTEGER,
+                     hhmsSensorArraySerialStop
+                        INTEGER,
+                     hhmsSensorArraySerialCTS
+                        INTEGER,
+                     hhmsSensorArraySerialRTS
+                        INTEGER,
+                     hhmsSensorArraySerialConfig
+                        DisplayString,
+                     hhmsSensorArraySerialIndex
+                        INTEGER
+                  }
+                  hhmsSensorArraySerialDescription OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "A Description of this Serial Port"
+                     ::=  {  hhmsSensorArraySerialEntry 1   }
+
+                  hhmsSensorArraySerialLocation OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The physical location of this Serial Port"
+                     ::=  {  hhmsSensorArraySerialEntry 2   }
+
+                  hhmsSensorArraySerialStatus OBJECT-TYPE
+                     SYNTAX  INTEGER {
+		      	      noStatus(1),
+			            normal(2),
+			            critical(4),
+	   	   	      sensorError(7)
+                     }
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The current status of this Serial Port"
+                     ::=  {  hhmsSensorArraySerialEntry 3  }
+
+                  hhmsSensorArraySerialOnline OBJECT-TYPE
+                     SYNTAX  INTEGER {
+			            online(1),
+			            offline(2)
+                     }
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "If this Serial Port is currently online"
+                        ::=  {  hhmsSensorArraySerialEntry 4  }
+   
+                  hhmsSensorArraySerialGoOnline OBJECT-TYPE
+                     SYNTAX  INTEGER {
+		   	         goOnline(1),
+			            goOffline(2)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "To put online enter a 1, to take offline enter a 2"
+                     ::=  {  hhmsSensorArraySerialEntry 5  }
+
+                  hhmsSensorArraySerialData OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Write sends data, read gets data from this Serial Port"
+                     ::=  {  hhmsSensorArraySerialEntry 6   }
+
+                  hhmsSensorArraySerialBaud OBJECT-TYPE
+                     SYNTAX  INTEGER {
+			            baud1200(255),
+			            baud2400(129),
+			            baud4800(64),
+			            baud9600(32),
+			            baud19200(15),
+			            baud28800(10),
+			            baud38400(7),
+			            baud57600(4),
+			            baud115200(2)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Choose the baud rate for this serial port"
+                     ::=  {  hhmsSensorArraySerialEntry 7  }
+
+                  hhmsSensorArraySerialDataBits OBJECT-TYPE
+                     SYNTAX  INTEGER {
+		   	         eight(8)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Parity bit for this serial port"
+                     ::=  {  hhmsSensorArraySerialEntry 8  }
+
+                  hhmsSensorArraySerialParity OBJECT-TYPE
+                     SYNTAX  INTEGER {
+		   	         none(1)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Parity bit for this serial port"
+                     ::=  {  hhmsSensorArraySerialEntry 9  }
+
+                  hhmsSensorArraySerialStop OBJECT-TYPE
+                     SYNTAX  INTEGER {
+		   	         one(1)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Stop bits for this serial port"
+                     ::=  {  hhmsSensorArraySerialEntry 10  }
+
+                  hhmsSensorArraySerialCTS OBJECT-TYPE
+                     SYNTAX  INTEGER {
+		   	         on(1),
+                     off(2)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Turn CTS on or off for this serial port"
+                     ::=  {  hhmsSensorArraySerialEntry 11  }
+
+                  hhmsSensorArraySerialRTS OBJECT-TYPE
+                     SYNTAX  INTEGER {
+		   	         on(1),
+                     off(2)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Turn RTS on or off for this serial port"
+                     ::=  {  hhmsSensorArraySerialEntry 12  }
+
+                  hhmsSensorArraySerialConfig OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "A Description of this Serial Port"
+                     ::=  {  hhmsSensorArraySerialEntry 13  }
+
+                  hhmsSensorArraySerialIndex OBJECT-TYPE
+                     SYNTAX  INTEGER (0..1)
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The index into the Serial table"
+                     ::=  {  hhmsSensorArraySerialEntry 14   }
+
+               hhmsSensorArrayDebug OBJECT-TYPE
+                  SYNTAX  INTEGER {
+      	         on(1),
+                  off(0)
+                  }
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "Turn on or off debug messages"
+                  ::=  {  hhmsSensorArrayEntry 20  }
+
+               hhmsSensorArrayDebugIP OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The IP address to send debug messages to"
+                  ::=  {  hhmsSensorArrayEntry 21  }
+
+               hhmsSensorArrayTrapResend OBJECT-TYPE
+                  SYNTAX  INTEGER {
+      	         on(1),
+                  off(0)
+                  }
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "If traps for Warning or Error should be resent. Traps for Normal status are sent once"
+                  ::=  {  hhmsSensorArrayEntry 22  }
+
+               hhmsSensorArrayTrapResendInterval OBJECT-TYPE
+                  SYNTAX  INTEGER
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "How often to resend mail or Traps. Enter the number of seconds from 15 to 65535. Mail for WARNING and ERROR are resent at this interval. Traps for Normal status are sent once"
+                  ::=  {  hhmsSensorArrayEntry 23  }
+
+               hhmsSensorArraySendTraps OBJECT-TYPE
+                  SYNTAX  INTEGER {
+                  on(1),
+                  off(2)
+                  }
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "Turn on or off the sending of traps"
+                  ::=  {  hhmsSensorArrayEntry 24  }
+
+               hhmsSensorArrayTrapDestination OBJECT-TYPE
+                  SYNTAX  IpAddress
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The IP address of the trap destination"
+                  ::=  {  hhmsSensorArrayEntry 25  }
+
+               hhmsSensorArrayTrapCommunity OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The community string of the trap destination"
+                  ::=  {  hhmsSensorArrayEntry 26  }
+
+               hhmsSensorArrayTrapDefaultGateway OBJECT-TYPE
+                  SYNTAX  IpAddress
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "If the trap destination is on another network, enter the IP address of the router"
+                  ::=  {  hhmsSensorArrayEntry 27  }
+
+               hhmsSensorArrayTrapUseDefaultGateway OBJECT-TYPE
+                  SYNTAX  INTEGER {
+      	         on(1),
+                  off(2)
+                  }
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "If the trap destination uses the default gateway"
+                  ::=  {  hhmsSensorArrayEntry 28  }
+
+               hhmsSensorArrayTrapDestinationMac OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "If the trap destination MAC address"
+                  ::=  {  hhmsSensorArrayEntry 29  }
+
+
+               hhmsSensorArraySendMail OBJECT-TYPE
+                  SYNTAX  INTEGER {
+                  on(1),
+                  off(2)
+                  }
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "Turn on or off the sending of Mail"
+                  ::=  {  hhmsSensorArrayEntry 30  }
+
+               hhmsSensorArrayMailRecpt OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The email address of the Recipient"
+                  ::=  {  hhmsSensorArrayEntry 31  }
+
+               hhmsSensorArrayMailFrom OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The email address of the Sender"
+                  ::=  {  hhmsSensorArrayEntry 32  }
+
+               hhmsSensorArrayMailSmpt OBJECT-TYPE
+                  SYNTAX  IpAddress
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The IP Address of the SMPT server. Note: This must be in dotted decimal form"
+                  ::=  {  hhmsSensorArrayEntry 33  }
+
+               hhmsSensorArrayMailGateway OBJECT-TYPE
+                  SYNTAX  IpAddress
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "If the smpt server is on another network, enter the IP address of the router"
+                  ::=  {  hhmsSensorArrayEntry 34  }
+
+               hhmsSensorArrayMailUseGateway OBJECT-TYPE
+                  SYNTAX  INTEGER {
+      	         on(1),
+                  off(2)
+                  }
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "If the mail uses the default gateway"
+                  ::=  {  hhmsSensorArrayEntry 35  }
+
+               hhmsSensorArrayMailResendInterval OBJECT-TYPE
+                  SYNTAX  INTEGER
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "How often to resend mail or Traps. Enter the number of seconds from 10 to 65535. Mail for WARNING and ERROR are resent at this interval. Mail for Normal status are sent once"
+                  ::=  {  hhmsSensorArrayEntry 36  }
+
+               hhmsSensorArrayMailMaxResend OBJECT-TYPE
+                  SYNTAX  INTEGER
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The maximum number of times to resend mail. If set to 0 only send once. The maximum value is 25"
+                  ::=  {  hhmsSensorArrayEntry 37  }
+
+               hhmsSensorArrayMailDestinationMac OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "If the mail destination MAC address, either the smpt server or the gateway"
+                  ::=  {  hhmsSensorArrayEntry 38  }
+
+               hhmsSensorArrayMailLastStatus OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The status of the most recent attempt to send an email"
+                  ::=  {  hhmsSensorArrayEntry 39  }
+
+
+               hhmsSensorArrayPowerControlTable OBJECT-TYPE
+                  SYNTAX  SEQUENCE OF HhmsSensorArrayPowerControlEntry
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "This table contains the Power Control features in the sensorArray."
+                  ::=  {  hhmsSensorArrayEntry 40   }
+
+               hhmsSensorArrayPowerControlEntry OBJECT-TYPE
+                  SYNTAX  HhmsSensorArrayPowerControlEntry
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "This is an entry in the hhmsSensorArrayPowerControlEntry Table"
+                  INDEX         { hhmsSensorArrayPowerControlIndex }
+                  ::=  { hhmsSensorArrayPowerControlTable 1 }
+
+                  HhmsSensorArrayPowerControlEntry ::= SEQUENCE {
+                     hhmsSensorArrayPowerModuleDescription
+                        DisplayString,
+                     hhmsSensorArrayPowerModuleStatus
+                        INTEGER,
+                     hhmsSensorArrayPowerModuleOnline
+                        INTEGER,
+                     hhmsSensorArrayPowerModuleGoOnline
+                        INTEGER,
+                     hhmsSensorArrayPowerOutletDescription
+                        DisplayString,
+                     hhmsSensorArrayPowerOutletStatus
+                        INTEGER,
+                     hhmsSensorArrayPowerOutletSet
+                        INTEGER,
+                     hhmsSensorArrayPowerControlIndex
+                        INTEGER
+                  }
+                  hhmsSensorArrayPowerModuleDescription OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "A Description of this Power Module"
+                     ::=  {  hhmsSensorArrayPowerControlEntry 1  }
+
+                  hhmsSensorArrayPowerModuleStatus OBJECT-TYPE
+                     SYNTAX  INTEGER {
+                     noStatus(1),
+                     normal(2),
+                     sensorError(7)
+                     }
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The current status of this Sensor"
+                     ::=  {  hhmsSensorArrayPowerControlEntry 2  }
+      
+                  hhmsSensorArrayPowerModuleOnline OBJECT-TYPE
+                     SYNTAX  INTEGER {
+			            online(1),
+			            offline(2)
+                     }
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "If this Sensor is currently online"
+                        ::=  {  hhmsSensorArrayPowerControlEntry 3  }
+   
+                  hhmsSensorArrayPowerModuleGoOnline OBJECT-TYPE
+                     SYNTAX  INTEGER {
+		   	         goOnline(1),
+			            goOffline(2)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "To put online enter a 1, to take offline enter a 2"
+                     ::=  {  hhmsSensorArrayPowerControlEntry 4  }
+
+                  hhmsSensorArrayPowerOutletDescription OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "A Description of this Power Port"
+                     ::=  {  hhmsSensorArrayPowerControlEntry 5  }
+
+                  hhmsSensorArrayPowerOutletStatus OBJECT-TYPE
+                     SYNTAX  INTEGER {
+                     noStatus(1),
+                     on(2),
+                     off(3),
+                     sensorError(7)
+                     }
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The current status of this Sensor"
+                     ::=  {  hhmsSensorArrayPowerControlEntry 6  }
+      
+                  hhmsSensorArrayPowerOutletSet OBJECT-TYPE
+                     SYNTAX  INTEGER {
+                     noStatus(1),
+                     on(2),
+                     off(3),
+                     reboot(4),
+                     sensorError(7)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The current status of this Sensor"
+                     ::=  {  hhmsSensorArrayPowerControlEntry 7  }
+
+                  hhmsSensorArrayPowerControlIndex OBJECT-TYPE
+                     SYNTAX  INTEGER (0..1)
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The index into the Power Control table"
+                     ::=  {  hhmsSensorArrayPowerControlEntry 8   }
+
+
+               hhmsSensorArrayPowerMonitorTable OBJECT-TYPE
+                  SYNTAX  SEQUENCE OF HhmsSensorArrayPowerMonitorEntry
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "This table contains the Power Monitor features in the sensorArray."
+                  ::=  {  hhmsSensorArrayEntry 41   }
+
+               hhmsSensorArrayPowerMonitorEntry OBJECT-TYPE
+                  SYNTAX  HhmsSensorArrayPowerMonitorEntry
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "This is an entry in the hhmsSensorArrayPowerMonitorEntry Table"
+                  INDEX         { hhmsSensorArrayPowerMonitorIndex }
+                  ::=  { hhmsSensorArrayPowerMonitorTable 1 }
+
+                  HhmsSensorArrayPowerMonitorEntry ::= SEQUENCE {
+                     hhmsSensorArrayPowerMonitorDescription
+                        DisplayString,
+                     hhmsSensorArrayPowerMonitorCurrent
+                        INTEGER,
+                     hhmsSensorArrayPowerMonitorVoltage
+                        INTEGER,
+                     hhmsSensorArrayPowerMonitorPower
+                        DisplayString,
+                     hhmsSensorArrayPowerMonitorStatus
+                        INTEGER,
+                     hhmsSensorArrayPowerMonitorOnline
+                        INTEGER,
+                     hhmsSensorArrayPowerMonitorGoOnline
+                        INTEGER,
+                     hhmsSensorArrayPowerMonitorHighWarning
+                        INTEGER,
+                     hhmsSensorArrayPowerMonitorHighCritical
+                        INTEGER,
+                     hhmsSensorArrayPowerMonitorLowWarning
+                        INTEGER,
+                     hhmsSensorArrayPowerMonitorLowCritical
+                        INTEGER,
+                     hhmsSensorArrayPowerMonitorRearm
+                        INTEGER,
+                     hhmsSensorArrayPowerMonitorIndex
+                        INTEGER
+                  }
+                  hhmsSensorArrayPowerMonitorDescription OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "A Description of this Power Monitor"
+                     ::=  {  hhmsSensorArrayPowerMonitorEntry 1  }
+
+                  hhmsSensorArrayPowerMonitorCurrent OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The current in this sensor"
+                     ::=  {  hhmsSensorArrayPowerMonitorEntry 2   }
+
+                  hhmsSensorArrayPowerMonitorVoltage OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The voltage in this sensor"
+                     ::=  {  hhmsSensorArrayPowerMonitorEntry 3   }
+
+                  hhmsSensorArrayPowerMonitorPower OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The total energy measured so far by this sensor"
+                     ::=  {  hhmsSensorArrayPowerMonitorEntry 4   }
+
+                  hhmsSensorArrayPowerMonitorStatus OBJECT-TYPE
+                     SYNTAX  INTEGER {
+                     noStatus(1),
+			            normal(2),
+			            highWarning(3),
+			            highCritical(4),
+                     lowWarning(5),
+                     lowCritical(6),
+                     sensorError(7)
+                     }
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The current status of this Sensor"
+                     ::=  {  hhmsSensorArrayPowerMonitorEntry 5  }
+      
+                  hhmsSensorArrayPowerMonitorOnline OBJECT-TYPE
+                     SYNTAX  INTEGER {
+			            online(1),
+			            offline(2)
+                     }
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "If this Sensor is currently online"
+                     ::=  {  hhmsSensorArrayPowerMonitorEntry 6  }
+   
+                  hhmsSensorArrayPowerMonitorGoOnline OBJECT-TYPE
+                     SYNTAX  INTEGER {
+                     goOnline(1),
+			            goOffline(2)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "To put online enter a 1, to take offline enter a 2"
+                     ::=  {  hhmsSensorArrayPowerMonitorEntry 7  }
+
+                  hhmsSensorArrayPowerMonitorHighWarning OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "How many watts of power this sensor detects before the sensor status is set to warning"
+                     ::=  {  hhmsSensorArrayPowerMonitorEntry 8   }
+      
+                  hhmsSensorArrayPowerMonitorHighCritical OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "How many watts of power this sensor detects before the sensor status is set to critical"
+                     ::=  {  hhmsSensorArrayPowerMonitorEntry 9   }
+   
+                  hhmsSensorArrayPowerMonitorLowWarning OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "How many watts of power this sensor detects before the sensor status is set to warning"
+                     ::=  {  hhmsSensorArrayPowerMonitorEntry 10   }
+   
+                  hhmsSensorArrayPowerMonitorLowCritical OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "How many watts of power this sensor detects before the sensor status is set to critical"
+                     ::=  {  hhmsSensorArrayPowerMonitorEntry 11   }
+      
+                  hhmsSensorArrayPowerMonitorRearm OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "How many watts of power this sensor detects to rearm the status. For example if status goes from normal to warning, the temp must go down hhmsTempRearm degrees below warning before the status goes to normal"
+                     ::=  {  hhmsSensorArrayPowerMonitorEntry 12   }
+   
+                  hhmsSensorArrayPowerMonitorIndex OBJECT-TYPE
+                     SYNTAX  INTEGER (0..4)
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The index into the Power table"
+                     ::=  {  hhmsSensorArrayPowerMonitorEntry 13   }
+
+               hhmsSensorArrayHighDriveTable OBJECT-TYPE
+                  SYNTAX  SEQUENCE OF HhmsSensorArrayHighDriveEntry
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "This table contains the High Current Drivers in the sensorArray."
+                  ::=  {  hhmsSensorArrayEntry 42   }
+
+               hhmsSensorArrayHighDriveEntry OBJECT-TYPE
+                  SYNTAX  HhmsSensorArrayHighDriveEntry
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "This is an entry in the hhmsSensorArrayHighDriveEntry Table"
+                  INDEX         { hhmsSensorArrayHighDriveIndex }
+                  ::=  { hhmsSensorArrayHighDriveTable 1 }
+
+                  HhmsSensorArrayHighDriveEntry ::= SEQUENCE {
+                     hhmsSensorArrayHighDriveDescription
+                        DisplayString,
+                     hhmsSensorArrayHighDriveOutputLevel
+                        INTEGER,
+                     hhmsSensorArrayHighDriveIndex
+                        INTEGER
+                  }
+
+                  hhmsSensorArrayHighDriveDescription OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "A Description of this Power Monitor"
+                     ::=  {  hhmsSensorArrayHighDriveEntry 1 }
+
+                  hhmsSensorArrayHighDriveOutputLevel OBJECT-TYPE
+                     SYNTAX  INTEGER {
+		   	         closed(0),
+			            open(1)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The Driver can be on or off. If closed the Open Collector will sink current. If open the Open Collector will tri state"
+                     ::=  {  hhmsSensorArrayHighDriveEntry 2 }
+   
+                  hhmsSensorArrayHighDriveIndex OBJECT-TYPE
+                     SYNTAX  INTEGER (0..3)
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The index into the HighDrive table"
+                     ::=  {  hhmsSensorArrayHighDriveEntry 3 }
+
+               hhmsSensorArrayCameraTable OBJECT-TYPE
+                  SYNTAX  SEQUENCE OF HhmsSensorArrayCameraEntry
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "This table contains the Camera features in the sensorArray."
+                  ::=  {  hhmsSensorArrayEntry 43   }
+
+               hhmsSensorArrayCameraEntry OBJECT-TYPE
+                  SYNTAX  HhmsSensorArrayCameraEntry
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "This is an entry in the hhmsSensorArrayCameraEntry Table"
+                  INDEX         { hhmsSensorArrayCameraIndex }
+                  ::=  { hhmsSensorArrayCameraTable 1 }
+
+                  HhmsSensorArrayCameraEntry ::= SEQUENCE {
+                     hhmsSensorArrayCameraDescription
+                        DisplayString,
+                     hhmsSensorArrayCameraOnline
+                        INTEGER,
+                     hhmsSensorArrayCameraGoOnline
+                        INTEGER,
+                     hhmsSensorArrayCameraUrlMain
+                        DisplayString,
+                     hhmsSensorArrayCameraUrlExtension
+                        DisplayString,
+                     hhmsSensorArrayCameraRefreshRate
+                        INTEGER,
+                     hhmsSensorArrayCameraIndex
+                        INTEGER
+                  }
+
+                  hhmsSensorArrayCameraDescription OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "A Description of this Camera"
+                     ::=  {  hhmsSensorArrayCameraEntry 1  }
+
+                  hhmsSensorArrayCameraOnline OBJECT-TYPE
+                     SYNTAX  INTEGER {
+			            online(1),
+			            offline(2)
+                     }
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "If this Sensor is currently online"
+                     ::=  {  hhmsSensorArrayCameraEntry 2  }
+   
+                  hhmsSensorArrayCameraGoOnline OBJECT-TYPE
+                     SYNTAX  INTEGER {
+                     goOnline(1),
+			            goOffline(2)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "To put online enter a 1, to take offline enter a 2"
+                     ::=  {  hhmsSensorArrayCameraEntry 3  }
+
+                  hhmsSensorArrayCameraUrlMain OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The URL of the Camera, for example http://10.1.1.7"
+                     ::=  {  hhmsSensorArrayCameraEntry 4  }
+
+                  hhmsSensorArrayCameraUrlExtension OBJECT-TYPE
+                     SYNTAX  DisplayString
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The cgi extension for the Picture from this Camera for example /webcam/server.jpg"
+                     ::=  {  hhmsSensorArrayCameraEntry 5  }
+
+                  hhmsSensorArrayCameraRefreshRate OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "How often to refresh the image on the browser in seconds from 5 to 254"
+                     ::=  {  hhmsSensorArrayCameraEntry 6  }
+
+                  hhmsSensorArrayCameraIndex OBJECT-TYPE
+                     SYNTAX  INTEGER (0..3)
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "The index into the Camera table"
+                     ::=  {  hhmsSensorArrayCameraEntry 7  }
+
+               hhmsSensorArrayTrapMailPollInterval OBJECT-TYPE
+                  SYNTAX  INTEGER
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "How often the sensor thresholds are tested before sending traps or mail. This can vary from 3 to 15 seconds"
+                  ::=  {  hhmsSensorArrayEntry 50  }
+
+               hhmsSensorArraySendTestMail OBJECT-TYPE
+                  SYNTAX  INTEGER
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "Send out an email test message"
+                  ::=  {  hhmsSensorArrayEntry 51  }
+
+               hhmsSensorArrayLastSystemError OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "A text string containing the description of the last system error"
+                  ::=  {  hhmsSensorArrayEntry 52  }
+
+               hhmsSensorArrayDataCollectionPeriod OBJECT-TYPE
+                  SYNTAX  INTEGER
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The number of minutes between collections of the data logger. This can vary from 1 to 60 minutes"
+                  ::=  {  hhmsSensorArrayEntry 53  }
+
+               hhmsSensorArrayMailTimeout OBJECT-TYPE
+                  SYNTAX  INTEGER
+                  ACCESS  read-write
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The number of seconds to wait for a timeout while sending email This can vary from 10 to 60 seconds"
+                  ::=  {  hhmsSensorArrayEntry 54  }
+
+
+
+      hhmsAgentConfig          OBJECT IDENTIFIER  ::=  {  hhmsagent 5   }
+
+         hhmsAgentVersion OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+            "The hhms agent release version number"
+            ::=  {  hhmsAgentConfig 1   }
+
+         hhmsCompressedSummaryTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF HhmsCompressedSummaryEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+            "This table contains a way to get summary info to the browser using minimum communication. One get contains a PDU info from multiple sensorArrays"
+            ::=  {  hhmsAgentConfig 7   }
+
+            hhmsCompressedSummaryEntry OBJECT-TYPE
+               SYNTAX  HhmsCompressedSummaryEntry
+               ACCESS  not-accessible
+               STATUS  mandatory
+               DESCRIPTION
+               "This is an entry in the hhmsCompressedSummary Table"
+               INDEX         { hhmsCompressedSummaryIndex }
+               ::=  { hhmsCompressedSummaryTable 1 }
+
+            HhmsCompressedSummaryEntry ::= SEQUENCE {
+               hhmsCompressedSummaryGet
+                  DisplayString,
+               hhmsCompressedSummaryIndex
+                  INTEGER
+               }
+
+            hhmsCompressedSummaryGet OBJECT-TYPE
+               SYNTAX  DisplayString
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION
+               "Get multiple compressed summary PDU"
+               ::=  {  hhmsCompressedSummaryEntry 1   }
+
+            hhmsCompressedSummaryIndex OBJECT-TYPE
+               SYNTAX  INTEGER (0..1)
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION
+               "The index into the compressed summary table"
+               ::=  {  hhmsCompressedSummaryEntry 2   }
+
+--
+-- Varbinds used in TRAP Definitions
+--
+
+      hhmsAgentTraps      OBJECT IDENTIFIER  ::=  {  hhmsagent 7   }
+
+      hhmsSensorStatus OBJECT-TYPE
+            SYNTAX  INTEGER {
+               noStatus(1),
+               normal(2),
+               highWarning(3),
+               highCritical(4),
+               lowWarning(5),
+               lowCritical(6),
+               sensorError(7)
+				}
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+         "The current integer status of the sensor causing this trap to be sent"
+         ::=  {  hhmsAgentTraps 1  }
+      
+      hhmsSensorValue OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+         "The current integer value of the sensor causing this trap to be sent"
+         ::=  {  hhmsAgentTraps 2  }
+      
+      hhmsSensorLevelExceeded OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+         "The integer level that was exceeded causing this trap to be sent"
+         ::=  {  hhmsAgentTraps 3  }
+      
+
+      hhmsSensorIndex OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+         "The integer index of the sensor causing this trap to be sent"
+         ::=  {  hhmsAgentTraps 4  }
+      
+
+      hhmsSensorName OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+         "The name of the sensor causing this trap to be sent"
+         ::=  {  hhmsAgentTraps 5  }
+      
+      hhmsSensorDescription OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+         "The description of the sensor causing this trap to be sent"
+         ::=  {  hhmsAgentTraps 6  }
+      
+
+-- TRAP Definitions
+
+
+	hhmsUnknownStatus TRAP-TYPE
+		ENTERPRISE hhmsagent
+		DESCRIPTION
+			"hhmsagent status went to Unknown"
+		::= 0
+
+	hhmsNormalStatus TRAP-TYPE
+		ENTERPRISE hhmsagent
+		DESCRIPTION
+			"hhmsagent status is Normal"
+		::= 1
+
+	hhmsWarningStatus TRAP-TYPE
+		ENTERPRISE hhmsagent
+		DESCRIPTION
+			"hhmsagent status went to Warning"
+		::= 2
+
+	hhmsCriticalStatus TRAP-TYPE
+		ENTERPRISE hhmsagent
+		DESCRIPTION
+			"hhmsagent status went to Critical"
+		::= 3
+
+	hhmsDownStatus TRAP-TYPE
+		ENTERPRISE hhmsagent
+		DESCRIPTION
+			"hhmsagent status went to Disabled"
+		::= 4
+
+	hhmsTemperatureStatus TRAP-TYPE
+		ENTERPRISE hhmsagent
+		VARIABLES
+			{ hhmsSensorStatus, hhmsSensorValue, hhmsSensorLevelExceeded, 
+         hhmsSensorIndex, hhmsSensorName, hhmsSensorDescription }
+		DESCRIPTION
+			"Temperature sensor trap"
+		::= 10
+
+	hhmsHumidityStatus TRAP-TYPE
+		ENTERPRISE hhmsagent
+		VARIABLES
+			{ hhmsSensorStatus, hhmsSensorValue, hhmsSensorLevelExceeded, 
+         hhmsSensorIndex, hhmsSensorName, hhmsSensorDescription }
+		DESCRIPTION
+			"Humidity sensor trap"
+		::= 20
+
+	hhmsSwitchStatus TRAP-TYPE
+		ENTERPRISE hhmsagent
+		VARIABLES
+			{ hhmsSensorStatus, hhmsSensorValue, hhmsSensorLevelExceeded, 
+         hhmsSensorIndex, hhmsSensorName, hhmsSensorDescription }
+		DESCRIPTION
+			"Switch sensor trap"
+		::= 30
+
+	hhmsPowerMonitorStatus TRAP-TYPE
+		ENTERPRISE hhmsagent
+		VARIABLES
+			{ hhmsSensorStatus, hhmsSensorValue, hhmsSensorLevelExceeded, 
+         hhmsSensorIndex, hhmsSensorName, hhmsSensorDescription }
+		DESCRIPTION
+			"Power Monitor sensor trap"
+		::= 40
+
+END

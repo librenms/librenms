@@ -20,7 +20,7 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-`vim /etc/my.cnf`
+`vi /etc/my.cnf`
 
 Within the [mysqld] section please add:
 
@@ -44,10 +44,7 @@ yum install epel-release
 rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 
-yum install php70w php70w-cli php70w-gd php70w-mysql php70w-snmp php70w-pear php70w-curl php70w-common php70w-fpm nginx net-snmp mariadb ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils cronie php70w-mcrypt fping git
-
-pear install Net_IPv4-1.3.4
-pear install Net_IPv6-1.2.2b2
+yum install php70w php70w-cli php70w-gd php70w-mysql php70w-snmp php70w-curl php70w-common php70w-fpm nginx net-snmp mariadb ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils cronie php70w-mcrypt fping git
 ```
 
 In `/etc/php.ini` ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
@@ -66,6 +63,7 @@ Restart PHP.
 
 ```bash
 systemctl restart php-fpm
+systemctl enable php-fpm
 ```
 
 #### Add librenms user
@@ -89,7 +87,7 @@ git clone https://github.com/librenms/librenms.git librenms
 cd /opt/librenms
 mkdir rrd logs
 chmod 775 rrd
-vim /etc/nginx/conf.d/librenms.conf
+vi /etc/nginx/conf.d/librenms.conf
 ```
 
 Add the following config:
@@ -115,6 +113,7 @@ server {
   include fastcgi.conf;
   fastcgi_split_path_info ^(.+\.php)(/.+)$;
   fastcgi_pass unix:/var/run/php-fpm/php7.0-fpm.sock;
+  fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
  }
  location ~ /\.ht {
   deny all;
@@ -122,13 +121,30 @@ server {
 }
 ```
 
+If LibreNMS will be your only vhost on this server then you will need to remove the default server block for nginx.
+
+Edit `/etc/nginx/nginx.conf` and look for a large block of text starting like:
+
+```
+server {
+        listen       80;
+        server_name  localhost;
+...
+}
+```
+
+Remove this block of text.
+
 #### SELinux
 
 ```bash
     yum install policycoreutils-python
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/logs(/.*)?'
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/logs(/.*)?'
+    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/rrd(/.*)?'
+    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/rrd(/.*)?'
     restorecon -RFvv /opt/librenms/logs/
+    restorecon -RFvv /opt/librenms/rrd/
     setsebool -P httpd_can_sendmail=1
 ```
 
@@ -157,7 +173,7 @@ Once you have completed the web installer steps. Please add the following to `co
 
 ```bash
 cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
-vim /etc/snmp/snmpd.conf
+vi /etc/snmp/snmpd.conf
 ```
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.

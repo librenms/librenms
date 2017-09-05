@@ -33,11 +33,6 @@ $install_dir = realpath(__DIR__ . '/..');
 $config['install_dir'] = $install_dir;
 chdir($install_dir);
 
-if (!getenv('TRAVIS')) {
-    include_once 'Net/IPv4.php';
-    include_once 'Net/IPv6.php';
-}
-
 # composer autoload
 require $install_dir . '/vendor/autoload.php';
 if (version_compare(PHP_VERSION, '5.4', '>=')) {
@@ -89,7 +84,6 @@ if (module_selected('alerts', $init_modules)) {
     require_once $install_dir . '/includes/device-groups.inc.php';
     require_once $install_dir . '/includes/alerts.inc.php';
 }
-
 
 // variable definitions
 require $install_dir . '/includes/cisco-entities.php';
@@ -152,9 +146,9 @@ if (!module_selected('nodb', $init_modules)) {
     require $install_dir . '/includes/process_config.inc.php';
 }
 
-if (file_exists($config['install_dir'] . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
+if (file_exists($install_dir . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
     require_once $install_dir . '/html/includes/authentication/functions.php';
-    require_once $config['install_dir'] . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php';
+    require_once $install_dir . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php';
     init_auth();
 } else {
     print_error('ERROR: no valid auth_mechanism defined!');
@@ -167,8 +161,11 @@ if (module_selected('web', $init_modules)) {
         $config['title_image'] = 'images/librenms_logo_'.$config['site_style'].'.svg';
     }
     require $install_dir . '/html/includes/vars.inc.php';
-
-    load_all_os(true);
+    if (module_selected('nodb', $init_modules)) {
+        load_all_os(false);
+    } else {
+        load_all_os(true);
+    }
 }
 
 $console_color = new Console_Color2();

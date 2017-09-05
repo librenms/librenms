@@ -58,6 +58,7 @@ function dbConnect($host = null, $user = '', $password = '', $database = '', $po
     $socket = empty($socket) ? $config['db_socket'] : $socket;
 
     $database_link = mysqli_connect('p:' . $host, $user, $password, null, $port, $socket);
+    mysqli_options($database_link, MYSQLI_OPT_LOCAL_INFILE, false);
     if ($database_link === false) {
         $error = mysqli_connect_error();
         if ($error == 'No such file or directory') {
@@ -183,14 +184,17 @@ function dbBulkInsert($data, $table)
         $data  = $table;
         $table = $tmp;
     }
-    if (count($data) === 0) {
+    // check that data isn't an empty array
+    if (empty($data)) {
         return false;
     }
-    if (count($data[0]) === 0) {
+    // make sure we have fields to insert
+    $fields = array_keys(reset($data));
+    if (empty($fields)) {
         return false;
     }
 
-    $sql = 'INSERT INTO `'.$table.'` (`'.implode('`,`', array_keys($data[0])).'`)  VALUES ';
+    $sql = 'INSERT INTO `'.$table.'` (`'.implode('`,`', $fields).'`)  VALUES ';
     $values ='';
 
     foreach ($data as $row) {

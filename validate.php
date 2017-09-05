@@ -136,13 +136,6 @@ if (!($username === 'root' || (isset($config['user']) && $username === $config['
     print_fail('You need to run this script as root' . (isset($config['user']) ? ' or '.$config['user'] : ''));
 }
 
-if (class_exists('Net_IPv4') === false) {
-    print_fail("It doesn't look like Net_IPv4 is installed");
-}
-if (class_exists('Net_IPv6') === false) {
-    print_fail("It doesn't look like Net_IPv6 is installed");
-}
-
 // Let's test the user configured if we have it
 if (isset($config['user'])) {
     $tmp_user = $config['user'];
@@ -305,7 +298,9 @@ if (isset($config['rrdtool_version']) && (version_compare($config['rrdtool_versi
 if (check_git_exists() === true) {
     if ($config['update_channel'] == 'master' && $versions['local_sha'] != $versions['github']['sha']) {
         $commit_date = new DateTime('@'.$versions['local_date'], new DateTimeZone(date_default_timezone_get()));
-        print_warn("Your install is out of date, last update: " . $commit_date->format('r'));
+        if ($commit_date->diff(new DateTime())->days > 0) {
+            print_warn("Your install is over 24 hours out of date, last update: " . $commit_date->format('r'));
+        }
     }
 
     if ($versions['local_branch'] != 'master') {

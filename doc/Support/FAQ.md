@@ -28,6 +28,7 @@ source: Support/FAQ.md
  - [What is the Difference between Disable Device and Ignore a Device?](#faq28)
  - [Why can't Normal and Global View users see Oxidized?](#faq29)
  - [What is the Demo User for?](#faq30)
+ - [Why does modifying 'Default Alert Template' fail?](#faq31)
  
 ### Developing
  - [How do I add support for a new OS?](#faq8)
@@ -339,3 +340,10 @@ Configs can often contain sensitive data. Because of that only global admins can
 
 ### <a name="faq30"> What is the Demo User for?</a> 
 Demo users allow full access except adding/editing users and deleting devices and can't change passwords.
+
+### <a name="faq31"> Why does modifying 'Default Alert Template' fail?</a>
+This template's entry could be missing in the database. Please run:
+
+```bash
+mysql -u librenms -p < sql-schema/202.sql
+```

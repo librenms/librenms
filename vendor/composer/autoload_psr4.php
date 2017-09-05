@@ -6,9 +6,12 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Ulrichsg\\Getopt\\' => array($vendorDir . '/ulrichsg/getopt-php/src'),
     'Symfony\\Component\\Yaml\\' => array($vendorDir . '/symfony/yaml'),
+    'ReadmeGen\\' => array($vendorDir . '/fojuth/readmegen/src'),
     'LibreNMS\\Tests\\' => array($baseDir . '/tests'),
     'LibreNMS\\' => array($baseDir . '/LibreNMS'),
+    'Doctrine\\Instantiator\\' => array($vendorDir . '/doctrine/instantiator/src/Doctrine/Instantiator'),
     'Dapphp\\Radius\\' => array($vendorDir . '/dapphp/radius/src'),
     'Amenadiel\\JpGraph\\Util\\' => array($vendorDir . '/amenadiel/jpgraph/src/util'),
     'Amenadiel\\JpGraph\\Themes\\' => array($vendorDir . '/amenadiel/jpgraph/src/themes'),

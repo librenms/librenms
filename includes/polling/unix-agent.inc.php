@@ -24,7 +24,7 @@ if ($device['os_group'] == 'unix') {
     $agentinfo = stream_get_meta_data($agent);
 
     if (!$agent) {
-        echo 'Connection to UNIX agent failed on port '.$port.'.';
+        echo 'Connection to UNIX agent failed on port '.$agent_port.'.';
     } else {
         // fetch data while not eof and not timed-out
         while ((!feof($agent)) && (!$agentinfo['timed_out'])) {
@@ -33,7 +33,7 @@ if ($device['os_group'] == 'unix') {
         }
 
         if ($agentinfo['timed_out']) {
-            echo 'Connection to UNIX agent timed out during fetch on port '.$port.'.';
+            echo 'Connection to UNIX agent timed out during fetch on port '.$agent_port.'.';
         }
     }
 

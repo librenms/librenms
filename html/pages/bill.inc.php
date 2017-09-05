@@ -176,7 +176,7 @@ if (bill_permitted($bill_id)) {
         <tr>
             <td colspan="2">
 <?php
-            echo 'Predicated usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['total_data']));
+            echo 'Predicted usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['total_data']));
 ?>
             </td>
 <?php
@@ -198,7 +198,7 @@ if (bill_permitted($bill_id)) {
         <tr>
             <td colspan="2">
 <?php
-            echo 'Predicated usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th']));
+            echo 'Predicted usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th']));
 ?>
             </td>
 

@@ -20,15 +20,16 @@ function bulk_sensor_snmpget($device, $sensors)
 
 /**
  * @param $device
+ * @param string $type type/class of sensor
  * @return array
  */
-function sensor_precache($device)
+function sensor_precache($device, $type)
 {
-    $sensor_config = array();
+    $sensor_cache = array();
     if (file_exists('includes/polling/sensors/pre-cache/'. $device['os'] .'.inc.php')) {
         include 'includes/polling/sensors/pre-cache/'. $device['os'] .'.inc.php';
     }
-    return $sensor_config;
+    return $sensor_cache;
 }
 
 function poll_sensor($device, $class)
@@ -51,7 +52,7 @@ function poll_sensor($device, $class)
 
     $snmp_data = bulk_sensor_snmpget($device, $sensors);
 
-    $sensor_cache = sensor_precache($device);
+    $sensor_cache = sensor_precache($device, $class);
 
     foreach ($sensors as $sensor) {
         echo 'Checking (' . $sensor['poller_type'] . ") $class " . $sensor['sensor_descr'] . '... '.PHP_EOL;
@@ -207,7 +208,7 @@ function record_sensor_data($device, $all_sensors)
 
 function poll_device($device, $options)
 {
-    global $config, $device, $polled_devices, $memcache;
+    global $config, $device;
 
     $attribs = get_dev_attribs($device['device_id']);
     $device['attribs'] = $attribs;
@@ -279,8 +280,6 @@ function poll_device($device, $options)
                 ($os_module_status && !isset($attribs['poll_'.$module])) ||
                 ($module_status && !isset($os_module_status) && !isset($attribs['poll_' . $module]))) {
                 $start_memory = memory_get_usage();
-                $module_start = 0;
-                $module_time  = 0;
                 $module_start = microtime(true);
                 echo "\n#### Load poller module $module ####\n";
                 include "includes/polling/$module.inc.php";
@@ -341,23 +340,6 @@ function poll_device($device, $options)
             }
         }//end if
 
-        $device_end  = microtime(true);
-        $device_run  = ($device_end - $device_start);
-        $device_time = substr($device_run, 0, 5);
-
-        // Poller performance
-        if (!empty($device_time)) {
-            $tags = array(
-                'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
-                'module'  => 'ALL',
-            );
-            $fields = array(
-                'poller' => $device_time,
-            );
-
-            data_update($device, 'poller-perf', $tags, $fields);
-        }
-
         // Ping response
         if (can_ping_device($attribs) === true  &&  !empty($response['ping_time'])) {
             $tags = array(
@@ -373,11 +355,32 @@ function poll_device($device, $options)
             data_update($device, 'ping-perf', $tags, $fields);
         }
 
+        $device_time  = round(microtime(true) - $device_start, 3);
+
+        // Poller performance
+        if (!empty($device_time)) {
+            $tags = array(
+                'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
+                'module'  => 'ALL',
+            );
+            $fields = array(
+                'poller' => $device_time,
+            );
+
+            data_update($device, 'poller-perf', $tags, $fields);
+        }
+
         $update_array['last_polled']           = array('NOW()');
         $update_array['last_polled_timetaken'] = $device_time;
 
         // echo("$device_end - $device_start; $device_time $device_run");
         echo "Polled in $device_time seconds\n";
+
+        // check if the poll took to long and log an event
+        if ($device_time > $config['rrd']['step']) {
+            log_event("Polling took longer than " . round($config['rrd']['step'] / 60, 2) .
+                ' minutes!  This will cause gaps in graphs.', $device, 'system', 5);
+        }
 
         d_echo('Updating '.$device['hostname']."\n");
 

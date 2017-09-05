@@ -23,4 +23,4 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$sensor_value = fahrenheit_to_celsius($sensor_cache['scale'], $sensor_value);
+$sensor_value = fahrenheit_to_celsius($sensor_value, $sensor_cache['scale']);

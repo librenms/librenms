@@ -19,29 +19,23 @@ if (empty($_SERVER['PATH_INFO'])) {
     }
 }
 
-function logErrors($errno, $errstr, $errfile, $errline)
-{
-    global $php_debug;
-    $php_debug[] = array('errno' => $errno, 'errstr' => $errstr, 'errfile' => $errfile, 'errline' => $errline);
-}
-
-function catchFatal()
-{
-    $last_error = error_get_last();
-    if ($last_error['type'] == 1) {
-        $log_error = array($last_error['type'],$last_error['message'],$last_error['file'],$last_error['line']);
-        print_r($log_error);
-    }
-}
-
 if (strpos($_SERVER['REQUEST_URI'], "debug")) {
     $debug = true;
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
     ini_set('error_reporting', E_ALL);
-    set_error_handler('logErrors');
-    register_shutdown_function('catchFatal');
+    set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+        global $php_debug;
+        $php_debug[] = array('errno' => $errno, 'errstr' => $errstr, 'errfile' => $errfile, 'errline' => $errline);
+    });
+    register_shutdown_function(function () {
+        $last_error = error_get_last();
+        if ($last_error['type'] == 1) {
+            $log_error = array($last_error['type'], $last_error['message'], $last_error['file'], $last_error['line']);
+            print_r($log_error);
+        }
+    });
     $sql_debug = array();
     $php_debug = array();
 } else {
@@ -306,6 +300,14 @@ echo('<h5>Powered by <a href="' . $config['project_home'] . '" target="_blank" r
 
 if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_polled` <= DATE_ADD(NOW(), INTERVAL - 15 minute) AND `ignore` = 0 AND `disabled` = 0 AND status = 1", array()) > 0) {
     $msg_box[] = array('type' => 'warning', 'message' => "<a href=\"poll-log/filter=unpolled/\">It appears as though you have some devices that haven't completed polling within the last 15 minutes, you may want to check that out :)</a>",'title' => 'Devices unpolled');
+}
+
+foreach (dbFetchRows('SELECT `notifications`.* FROM `notifications` WHERE NOT exists( SELECT 1 FROM `notifications_attribs` WHERE `notifications`.`notifications_id` = `notifications_attribs`.`notifications_id` AND `notifications_attribs`.`user_id` = ?) AND `severity` > 1', array($_SESSION['user_id'])) as $notification) {
+    $msg_box[] = array(
+        'type' => 'error',
+        'message' => "<a href='notifications/'>${notification['body']}</a>",
+        'title' => $notification['title']
+    );
 }
 
 if (is_array($msg_box)) {

@@ -15,8 +15,10 @@ use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
+use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
+use LibreNMS\Util\IP;
 
 function set_debug($debug)
 {
@@ -316,7 +318,7 @@ function renamehost($id, $new, $source = 'console')
     global $config;
 
     $host = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
-    if (!is_dir($config['rrd_dir']."/$new") && rename($config['rrd_dir']."/$host", $config['rrd_dir']."/$new") === true) {
+    if (!is_dir(get_rrd_dir($new)) && rename(get_rrd_dir($host), get_rrd_dir($new)) === true) {
         dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
         log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
     } else {
@@ -372,7 +374,7 @@ function delete_device($id)
         }
     }
 
-    $ex = shell_exec("bash -c '( [ ! -d ".trim($config['rrd_dir'])."/".$host." ] || rm -vrf ".trim($config['rrd_dir'])."/".$host." 2>&1 ) && echo -n OK'");
+    $ex = shell_exec("bash -c '( [ ! -d ".trim(get_rrd_dir($host))." ] || rm -vrf ".trim(get_rrd_dir($host))." 2>&1 ) && echo -n OK'");
     $tmp = explode("\n", $ex);
     if ($tmp[sizeof($tmp)-1] != "OK") {
         $ret .= "Could not remove files:\n$ex\n";
@@ -503,17 +505,6 @@ function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp
     }
 
     return $device;
-}
-
-function netmask2cidr($netmask)
-{
-    $addr = Net_IPv4::parseAddress("1.2.3.4/$netmask");
-    return $addr->bitmask;
-}
-
-function cidr2netmask($netmask)
-{
-    return (long2ip(ip2long("255.255.255.255") << (32-$netmask)));
 }
 
 function formatUptime($diff, $format = "long")
@@ -767,6 +758,7 @@ function match_network($nets, $ip, $first = false)
     return $return;
 }
 
+// FIXME port to LibreNMS\Util\IPv6 class
 function snmp2ipv6($ipv6_snmp)
 {
     $ipv6 = explode('.', $ipv6_snmp);
@@ -790,18 +782,13 @@ function snmp2ipv6($ipv6_snmp)
 
 function ipv62snmp($ipv6)
 {
-    $ipv6_split = array();
-    $ipv6_ex = explode(':', Net_IPv6::uncompress($ipv6));
-    for ($i = 0; $i < 8; $i++) {
-        $ipv6_ex[$i] = zeropad($ipv6_ex[$i], 4);
+    try {
+        $ipv6 = IP::parse($ipv6)->uncompressed();
+        $ipv6_split = str_split(str_replace(':', '', $ipv6), 2);
+        return implode('.', array_map('hexdec', $ipv6_split));
+    } catch (InvalidIpException $e) {
+        return '';
     }
-    $ipv6_ip = implode('', $ipv6_ex);
-    for ($i = 0; $i < 32;
-    $i+=2) {
-        $ipv6_split[] = hexdec(substr($ipv6_ip, $i, 2));
-    }
-
-    return implode('.', $ipv6_split);
 }
 
 function get_astext($asn)
@@ -1345,32 +1332,6 @@ function first_oid_match($device, $list)
 }
 
 
-/**
- * Convert a hex ip to a human readable string
- *
- * @param string $hex
- * @return string
- */
-function hex_to_ip($hex)
-{
-    $hex = str_replace(array(' ', '"'), '', $hex);
-
-    if (filter_var($hex, FILTER_VALIDATE_IP)) {
-        return $hex;
-    }
-
-    if (strlen($hex) == 8) {
-        return long2ip(hexdec($hex));
-    }
-
-    if (strlen($hex) == 32) {
-        $ipv6 = implode(':', str_split($hex, 4));
-        return preg_replace('/:0*([0-9a-fA-F])/', ':$1', $ipv6);
-    }
-
-    return ''; // invalid input
-}
-
 function fix_integer_value($value)
 {
     if ($value < 0) {
@@ -1530,36 +1491,6 @@ function host_exists($hostname, $sysName = null)
     return dbFetchCell($query, $params) > 0;
 }
 
-/**
- * Check the innodb buffer size
- *
- * @return array including the current set size and the currently used buffer
-**/
-function innodb_buffer_check()
-{
-    $pool['size'] = dbFetchCell('SELECT @@innodb_buffer_pool_size');
-    // The following query is from the excellent mysqltuner.pl by Major Hayden https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl
-    $pool['used'] = dbFetchCell('SELECT SUM(DATA_LENGTH+INDEX_LENGTH) FROM information_schema.TABLES WHERE TABLE_SCHEMA NOT IN ("information_schema", "performance_schema", "mysql") AND ENGINE = "InnoDB" GROUP BY ENGINE ORDER BY ENGINE ASC');
-    return $pool;
-}
-
-/**
- * Print warning about InnoDB buffer size
- *
- * @param array $innodb_buffer An array that contains the used and current size
- *
- * @return string $output
-**/
-function warn_innodb_buffer($innodb_buffer)
-{
-    $output  = 'InnoDB Buffersize too small.'.PHP_EOL;
-    $output .= 'Current size: '.($innodb_buffer['size'] / 1024 / 1024).' MiB'.PHP_EOL;
-    $output .= 'Minimum Required: '.($innodb_buffer['used'] / 1024 / 1024).' MiB'.PHP_EOL;
-    $output .= 'To ensure integrity, we\'re not going to pull any updates until the buffersize has been adjusted.'.PHP_EOL;
-    $output .= 'Config proposal: "innodb_buffer_pool_size = '.pow(2, ceil(log(($innodb_buffer['used'] / 1024 / 1024), 2))).'M"'.PHP_EOL;
-    return $output;
-}
-
 function oxidized_reload_nodes()
 {
 
@@ -1655,19 +1586,87 @@ function rrdtest($path, &$stdOutput, &$stdError)
     return $status['exitcode'];
 }
 
-function create_state_index($state_name)
+/**
+ * Create a new state index.  Update translations if $states is given.
+ *
+ * For for backward compatibility:
+ *   Returns null if $states is empty, $state_name already exists, and contains state translations
+ *
+ * @param string $state_name the unique name for this state translation
+ * @param array $states array of states, each must contain keys: descr, graph, value, generic
+ * @return int|null
+ */
+function create_state_index($state_name, $states = array())
 {
     $state_index_id = dbFetchCell('SELECT `state_index_id` FROM state_indexes WHERE state_name = ? LIMIT 1', array($state_name));
     if (!is_numeric($state_index_id)) {
-        $insert = array('state_name' => $state_name);
-        return dbInsert($insert, 'state_indexes');
-    } else {
+        $state_index_id = dbInsert(array('state_name' => $state_name), 'state_indexes');
+
+        // legacy code, return index so states are created
+        if (empty($states)) {
+            return $state_index_id;
+        }
+    }
+
+    // check or synchronize states
+    if (empty($states)) {
         $translations = dbFetchRows('SELECT * FROM `state_translations` WHERE `state_index_id` = ?', array($state_index_id));
         if (count($translations) == 0) {
             // If we don't have any translations something has gone wrong so return the state_index_id so they get created.
             return $state_index_id;
         }
+    } else {
+        sync_sensor_states($state_index_id, $states);
     }
+
+    return null;
+}
+
+/**
+ * Synchronize the sensor state translations with the database
+ *
+ * @param int $state_index_id index of the state
+ * @param array $states array of states, each must contain keys: descr, graph, value, generic
+ */
+function sync_sensor_states($state_index_id, $states)
+{
+    $new_translations = array_reduce($states, function ($array, $state) use ($state_index_id) {
+        $array[$state['value']] = array(
+            'state_index_id' => $state_index_id,
+            'state_descr' => $state['descr'],
+            'state_draw_graph' => $state['graph'],
+            'state_value' => $state['value'],
+            'state_generic_value' => $state['generic']
+        );
+        return $array;
+    }, array());
+
+    $existing_translations = dbFetchRows(
+        'SELECT `state_index_id`,`state_descr`,`state_draw_graph`,`state_value`,`state_generic_value` FROM `state_translations` WHERE `state_index_id`=?',
+        array($state_index_id)
+    );
+
+    foreach ($existing_translations as $translation) {
+        $value = $translation['state_value'];
+        if (isset($new_translations[$value])) {
+            if ($new_translations[$value] != $translation) {
+                dbUpdate(
+                    $new_translations[$value],
+                    'state_translations',
+                    '`state_index_id`=? AND `state_value`=?',
+                    array($state_index_id, $value)
+                );
+            }
+
+            // this translation is synchronized, it doesn't need to be inserted
+            unset($new_translations[$value]);
+        } else {
+            dbDelete('state_translations', '`state_index_id`=? AND `state_value`=?', array($state_index_id, $value));
+        }
+    }
+
+    // insert any new translations
+    dbBulkInsert($new_translations, 'state_translations');
 }
 
 function create_sensor_to_state_index($device, $state_name, $index)
@@ -2106,8 +2105,22 @@ function device_is_up($device, $record_perf = false)
     }
 
     if ($device['status'] != $response['status']) {
-        dbUpdate(array('status' => $response['status'], 'status_reason' => $response['status_reason']), 'devices', 'device_id=?', array($device['device_id']));
-        log_event('Device status changed to '.($response['status'] == '1' ? 'Up' : 'Down'). ' from ' . $response['status_reason'] . ' check.', $device, ($response['status'] == '1' ? 'up' : 'down'));
+        dbUpdate(
+            array('status' => $response['status'], 'status_reason' => $response['status_reason']),
+            'devices',
+            'device_id=?',
+            array($device['device_id'])
+        );
+
+        if ($response['status']) {
+            $type = 'up';
+            $reason = $device['status_reason'];
+        } else {
+            $type = 'down';
+            $reason = $response['status_reason'];
+        }
+
+        log_event('Device status changed to ' . ucfirst($type) . " from $reason check.", $device, $type);
     }
     return $response;
 }
@@ -2227,7 +2240,7 @@ function dump_db_schema()
                 'Field'   => $data['COLUMN_NAME'],
                 'Type'    => $data['COLUMN_TYPE'],
                 'Null'    => $data['IS_NULLABLE'] === 'YES',
-                'Default' => $data['COLUMN_DEFAULT'],
+                'Default' => isset($data['COLUMN_DEFAULT']) ? trim($data['COLUMN_DEFAULT'], "'") : 'NULL',
                 'Extra'   => $data['EXTRA'],
             );
         }

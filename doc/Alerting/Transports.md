@@ -1,6 +1,6 @@
 source: Alerting/Transports.md
 
-# <a name="transports">Transports</a>
+# Transports
 
 Transports are located within `includes/alerts/transports.*.php` and defined as well as configured via ~~`$config['alert']['transports']['Example'] = 'Some Options'`~~.
 
@@ -24,7 +24,7 @@ $config['alert']['globals'] = true; //Include Global-Read into alert-contacts
 $config['alert']['admins']  = true; //Include Administrators into alert-contacts
 ```
 
-## <a name="transports-email">E-Mail</a>
+## E-Mail
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
@@ -34,15 +34,13 @@ set the devices sysContact, override the sysContact or have your users emails se
 `email@domain.com, alerting@domain.com`
 
 E-Mail transport is enabled with adding the following to your `config.php`:
-~
 ```php
 $config['alert']['transports']['mail'] = true;
 ```
-~~
 
 The E-Mail transports uses the same email-configuration like the rest of LibreNMS.
 As a small reminder, here is it's configuration directives including defaults:
-~~
+
 ```php
 $config['email_backend']                   = 'mail';               // Mail backend. Allowed: "mail" (PHP's built-in), "sendmail", "smtp".
 $config['email_from']                      = NULL;                 // Mail from. Default: "ProjectName" <projectid@`hostname`>
@@ -60,52 +58,47 @@ $config['email_smtp_password']             = NULL;                 // Password f
 $config['alert']['default_only']           = false;                //Only issue to default_mail
 $config['alert']['default_mail']           = '';                   //Default email
 ```
-~~
 
-## <a name="transports-api">API</a>
+## API
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
 API transports definitions are a bit more complex than the E-Mail configuration.
 The basis for configuration is ~~`$config['alert']['transports']['api'][METHOD]`~~ where `METHOD` can be `get`,`post` or `put`.
 This basis has to contain an array with URLs of each API to call.
-The URL can have the same placeholders as defined in the [Template-Syntax](#templates-syntax).
+The URL can have the same placeholders as defined in the [Template-Syntax](Templates#syntax).
 If the `METHOD` is `get`, all placeholders will be URL-Encoded.
 The API transport uses cURL to call the APIs, therefore you might need to install `php5-curl` or similar in order to make it work.
-__Note__: it is highly recommended to define own [Templates](#templates) when you want to use the API transport. The default template might exceed URL-length for GET requests and therefore cause all sorts of errors.
+__Note__: it is highly recommended to define own [Templates](Templates) when you want to use the API transport. The default template might exceed URL-length for GET requests and therefore cause all sorts of errors.
 
 Example:
-~~
+
 ```php
 $config['alert']['transports']['api']['get'][] = "https://api.thirdparti.es/issue?apikey=abcdefg&subject=%title";
 ```
-~~
 
-## <a name="transports-nagios">Nagios Compatible</a>
+## Nagios Compatible
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
 The nagios transport will feed a FIFO at the defined location with the same format that nagios would.
 This allows you to use other Alerting-Systems to work with LibreNMS, for example [Flapjack](http://flapjack.io).
-~~
 ```php
 $config['alert']['transports']['nagios'] = "/path/to/my.fifo"; //Flapjack expects it to be at '/var/cache/nagios3/event_stream.fifo'
 ```
-~~
 
-## <a name="transports-irc">IRC</a>
+## IRC
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
 The IRC transports only works together with the LibreNMS IRC-Bot.
 Configuration of the LibreNMS IRC-Bot is described [here](https://github.com/librenms/librenms/blob/master/doc/Extensions/IRC-Bot.md).
-~~
+
 ```php
 $config['alert']['transports']['irc'] = true;
 ```
-~~
 
-## <a name="transports-slack">Slack</a>
+## Slack
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
@@ -113,16 +106,13 @@ $config['alert']['transports']['irc'] = true;
 
 The Slack transport will POST the alert message to your Slack Incoming WebHook using the [attachments](https://api.slack.com/docs/message-attachments) option, you are able to specify multiple webhooks along with the relevant options to go with it. Simple html tags are stripped from the message. All options are optional, the only required value is for url, without this then no call to Slack will be made. Below is an example of how to send alerts to two channels with different customised options: 
 
-~~
 ```php
 $config['alert']['transports']['slack'][] = array('url' => "https://hooks.slack.com/services/A12B34CDE/F56GH78JK/L901LmNopqrSTUVw2w3XYZAB4C", 'channel' => '#Alerting');
 
 $config['alert']['transports']['slack'][] = array('url' => "https://hooks.slack.com/services/A12B34CDE/F56GH78JK/L901LmNopqrSTUVw2w3XYZAB4C", 'channel' => '@john', 'username' => 'LibreNMS', 'icon_emoji' => ':ghost:');
-
 ```
-~~
 
-## <a name="transports-slack">Rocket.chat</a>
+## Rocket.chat
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -132,10 +122,9 @@ The Rocket.chat transport will POST the alert message to your Rocket.chat Incomi
 $config['alert']['transports']['rocket'][] = array('url' => "https://rocket.url/api/v1/chat.postMessage", 'channel' => '#Alerting');
 
 $config['alert']['transports']['rocket'][] = array('url' => "https://rocket.url/api/v1/chat.postMessage", 'channel' => '@john', 'username' => 'LibreNMS', 'icon_emoji' => ':ghost:');
-
 ```
 
-## <a name="transports-hipchat">HipChat</a>
+## HipChat
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
@@ -166,7 +155,6 @@ for details on acceptable values.
 
 Below are two examples of sending messages to a HipChat room.
 
-~~
 ```php
 $config['alert']['transports']['hipchat'][] = array("url" => "https://api.hipchat.com/v1/rooms/message?auth_token=9109jawregoaih",
                                                     "room_id" => "1234567",
@@ -179,14 +167,13 @@ $config['alert']['transports']['hipchat'][] = array("url" => "https://api.hipcha
                                                     "notify" => 1,
                                                     "message_format" => "text");
 ```
-~~
 
 > Note: The default message format for HipChat messages is HTML.  It is
 > recommended that you specify the `text` message format to prevent unexpected
 > results, such as HipChat attempting to interpret angled brackets (`<` and
 > `>`).
 
-## <a name="transports-pagerduty">PagerDuty</a>
+## PagerDuty
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
@@ -198,17 +185,15 @@ All you need is to create a Service with type Generic API on your PagerDuty dash
 
 Now copy your API-Key from the newly created Service and setup the transport like:
 
-~~
 ```php
 $config['alert']['transports']['pagerduty'] = 'MYAPIKEYGOESHERE';
 ```
-~~
 
 That's it!
 
 __Note__: Currently ACK notifications are not transported to PagerDuty, This is going to be fixed within the next major version (version by date of writing: 2015.05)
 
-## <a name="transports-pushover">Pushover</a>
+## Pushover
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -218,18 +203,15 @@ Firstly you need to create a new Application (called LibreNMS, for example) in y
 
 Now copy your API Token/Key from the newly created Application and setup the transport in your config.php like:
 
-~~
 ```php
 $config['alert']['transports']['pushover'][] = array(
                                                     "appkey" => 'APPLICATIONAPIKEYGOESHERE',
                                                     "userkey" => 'USERKEYGOESHERE',
                                                     );
 ```
-~~
 
 To modify the Critical alert sound, add the 'sound_critical' parameter, example:
 
-~~
 ```php
 $config['alert']['transports']['pushover'][] = array(
                                                     "appkey" => 'APPLICATIONAPIKEYGOESHERE',
@@ -237,35 +219,30 @@ $config['alert']['transports']['pushover'][] = array(
                                                     "sound_critical" => 'siren',
                                                     );
 ```
-~~
 
-## <a name="transports-boxcar">Boxcar</a>
+## Boxcar
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
 Enabling Boxcar support is super easy.
 Copy your access token from the Boxcar app or from the Boxcar.io website and setup the transport in your config.php like:
 
-~~
 ```php
 $config['alert']['transports']['boxcar'][] = array(
                                                     "access_token" => 'ACCESSTOKENGOESHERE',
                                                     );
 ```
-~~
 
 To modify the Critical alert sound, add the 'sound_critical' parameter, example:
 
-~~
 ```php
 $config['alert']['transports']['boxcar'][] = array(
                                                     "access_token" => 'ACCESSTOKENGOESHERE',
                                                     "sound_critical" => 'detonator-charge',
                                                     );
 ```
-~~
 
-## <a name="transports-telegram">Telegram</a>
+## Telegram
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -285,20 +262,18 @@ $config['alert']['transports']['boxcar'][] = array(
 6. Now create a new "Telegram transport" in LibreNMS (Global Settings -> Alerting Settings -> Telegram transport).
 Click on 'Add Telegram config' and put your chat id and token into the relevant box.
 
-## <a name="transports-pushbullet">Pushbullet</a>
+## Pushbullet
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
 Enabling Pushbullet is a piece of cake.
 Get your Access Token from your Pushbullet's settings page and set it in your config like:
 
-~~
 ```php
 $config['alert']['transports']['pushbullet'] = 'MYFANCYACCESSTOKEN';
 ```
-~~
 
-## <a name="transports-clickatell">Clickatell</a>
+## Clickatell
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -306,16 +281,14 @@ Clickatell provides a REST-API requiring an Authorization-Token and at least one
 Please consult Clickatell's documentation regarding number formatting.
 Here an example using 3 numbers, any amount of numbers is supported:
 
-~~
 ```php
 $config['alert']['transports']['clickatell']['token'] = 'MYFANCYACCESSTOKEN';
 $config['alert']['transports']['clickatell']['to'][]  = '+1234567890';
 $config['alert']['transports']['clickatell']['to'][]  = '+1234567891';
 $config['alert']['transports']['clickatell']['to'][]  = '+1234567892';
 ```
-~~
 
-## <a name="transports-playsms">PlaySMS</a>
+## PlaySMS
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -323,7 +296,6 @@ PlaySMS is an open source SMS-Gateway that can be used via their HTTP-API using 
 Please consult PlaySMS's documentation regarding number formatting.
 Here an example using 3 numbers, any amount of numbers is supported:
 
-~~
 ```php
 $config['alert']['transports']['playsms']['url']   = 'https://localhost/index.php?app=ws';
 $config['alert']['transports']['playsms']['user']  = 'user1';
@@ -332,9 +304,8 @@ $config['alert']['transports']['playsms']['from']  = '+1234567892'; //Optional
 $config['alert']['transports']['playsms']['to'][]  = '+1234567890';
 $config['alert']['transports']['playsms']['to'][]  = '+1234567891';
 ```
-~~
 
-## <a name="transports-victorops">VictorOps</a>
+## VictorOps
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -346,13 +317,11 @@ The URL provided will have $routing_key at the end, you need to change this to s
 
 `https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms`
 
-~~
 ```php
 $config['alert']['transports']['victorops']['url'] = 'https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms';
 ```
-~~
 
-## <a name="transports-canopsis">Canopsis</a>
+## Canopsis
 
 Canopsis is a hypervision tool. LibreNMS can send alerts to Canopsis which are then converted to canopsis events. To configure the transport, go to:
 
@@ -360,7 +329,6 @@ Global Settings -> Alerting Settings -> Canopsis Transport.
 
 You will need to fill this paramaters :
 
-~~
 ```php
 $config['alert']['transports']['canopsis']['host'] = 'www.xxx.yyy.zzz';
 $config['alert']['transports']['canopsis']['port'] = '5672';
@@ -368,13 +336,12 @@ $config['alert']['transports']['canopsis']['user'] = 'admin';
 $config['alert']['transports']['canopsis']['passwd'] = 'my_password';
 $config['alert']['transports']['canopsis']['vhost'] = 'canopsis';
 ```
-~~
 
 For more information about canopsis and its events, take a look here :
  http://www.canopsis.org/
  http://www.canopsis.org/wp-content/themes/canopsis/doc/sakura/user-guide/event-spec.html
 
-## <a name="transports-osticket">osTicket</a>
+## osTicket
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -384,14 +351,12 @@ Global Settings -> Alerting Settings -> osTicket Transport.
 
 This can also be done manually in config.php :
 
-~~
 ```php
 $config['alert']['transports']['osticket']['url'] = 'http://osticket.example.com/api/http.php/tickets.json';
 $config['alert']['transports']['osticket']['token'] = '123456789';
 ```
-~~
 
-## <a name="transports-msteams">Microsoft Teams</a>
+## Microsoft Teams
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -401,13 +366,11 @@ Global Settings -> Alerting Settings -> Microsoft Teams Transport.
 
 This can also be done manually in config.php :
 
-~
 ```php
 $config['alert']['transports']['msteams']['url'] = 'https://outlook.office365.com/webhook/123456789';
 ```
-~
 
-## <a name="transports-ciscospark">Cisco Spark</a>
+## Cisco Spark
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -424,14 +387,12 @@ Global Settings -> Alerting Settings -> Cisco Spark transport.
 
 This can also be done manually in config.php :
 
-~
 ```php
 $config['alert']['transports']['ciscospark']['token'] = '1234567890QWERTYUIOP';
 $config['alert']['transports']['ciscospark']['roomid'] = '1234567890QWERTYUIOP';
 ```
-~
 
-## <a name="transports-smseagle">SMSEagle</a>
+## SMSEagle
 
 [Using a proxy?](../Support/Configuration.md#proxy-support)
 
@@ -439,7 +400,6 @@ SMSEagle is a hardware SMS Gateway that can be used via their HTTP-API using a U
 Please consult their documentation at [www.smseagle.eu](http://www.smseagle.eu)
 Destination numbers are one per line, with no spaces. They can be in either local or international dialling format.
 
-~
 ```php
 $config['alert']['transports']['smseagle']['url']   = 'ip.add.re.ss';
 $config['alert']['transports']['smseagle']['user']  = 'smseagle_user';
@@ -447,44 +407,38 @@ $config['alert']['transports']['smseagle']['token'] = 'smseagle_user_password';
 $config['alert']['transports']['smseagle']['to'][]  = '+3534567890';
 $config['alert']['transports']['smseagle']['to'][]  = '0834567891';
 ```
-~
 
-## <a name="transports-syslog">Syslog</a>
+## Syslog
 
 You can have LibreNMS emit alerts as syslogs complying with RFC 3164.
 More information on RFC 3164 can be found here: https://tools.ietf.org/html/rfc3164
 Example output: `<26> Mar 22 00:59:03 librenms.host.net librenms[233]: [Critical] network.device.net: Port Down - port_id => 98939; ifDescr => xe-1/1/0;`
 Each fault will be sent as a separate syslog.
 
-~
 ```php
 $config['alert']['transports']['syslog']['syslog_host']   = '127.0.0.1';
 $config['alert']['transports']['syslog']['syslog_port']  = 514;
 $config['alert']['transports']['syslog']['syslog_facility'] = 3;
 ```
-~
 
-## <a name="transports-elasticsearch">Elasticsearch</a>
+## Elasticsearch
 
 You can have LibreNMS emit alerts to an elasticsearch database. Each fault will be sent as a separate document.
 The index pattern uses strftime() formatting.
 The proxy setting uses the proxy set in config.php if true and does not if false; this allows you to use local servers.
 
-~
 ```php
 $config['alert']['transports']['elasticsearch']['es_host']   = '127.0.0.1';
 $config['alert']['transports']['elasticsearch']['es_port']  = 9200;
 $config['alert']['transports']['elasticsearch']['es_index']  = 'librenms-%Y.%m.%d';
 $config['alert']['transports']['elasticsearch']['es_proxy'] = false;
 ```
-~
 
-## <a name="transports-jira">JIRA</a>
+## JIRA
 
 You can have LibreNMS create issues on a Jira instance for critical and warning alerts. The Jira transport only sets summary and description fiels. Therefore your Jira project must not have any other mandatory field for the provided issuetype. The config fields that need to set are Jira URL, Jira username, Jira password, Project key, and issue type. 
 Currently http authentication is used to access Jira and Jira username and password will be stored as cleartext in the LibreNMS database.
 
-~
 ```php
 $config['alert']['transports']['jira']['url']   = 'https://myjira.mysite.com';
 $config['alert']['transports']['jira']['username']  = 'myjirauser';
@@ -492,5 +446,3 @@ $config['alert']['transports']['jira']['password'] = 'myjirapass';
 $config['alert']['transports']['jira']['prjkey'][]  = 'JIRAPROJECTKEY';
 $config['alert']['transports']['jira']['issuetype'][]  = 'Myissuetype';
 ```
-~
-

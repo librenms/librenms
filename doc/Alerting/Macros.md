@@ -1,6 +1,6 @@
 source: Alerting/Macros.md
 
-# <a name="macros">Macros</a>
+# Macros
 
 Macros are shorthands to either portion of rules or pure SQL enhanced with placeholders.
 
@@ -25,7 +25,7 @@ Example
 ((%ports.ifInOctets_rate*8) / %ports.ifSpeed)*100
 ```
 
-## <a name="macros-device">Device</a> (Boolean)
+## Device (Boolean)
 
 Entity: `%macros.device`
 
@@ -33,7 +33,7 @@ Description: Only select devices that aren't deleted, ignored or disabled.
 
 Source: `(%devices.disabled = "0" && %devices.ignore = "0")`
 
-### <a name="macros-device-up">Device is up</a> (Boolean)
+### Device is up (Boolean)
 
 Entity: `%macros.device_up`
 
@@ -43,7 +43,7 @@ Implies: %macros.device
 
 Source: `(%devices.status = "1" && %macros.device)`
 
-### <a name="macros-device-down">Device is down</a> (Boolean)
+### Device is down (Boolean)
 
 Entity: `%macros.device_down`
 
@@ -53,7 +53,7 @@ Implies: %macros.device
 
 Source: `(%devices.status = "0" && %macros.device)`
 
-## <a name="macros-port">Port</a> (Boolean)
+## Port (Boolean)
 
 Entity: `%macros.port`
 
@@ -61,7 +61,7 @@ Description: Only select ports that aren't deleted, ignored or disabled.
 
 Source: `(%ports.deleted = "0" && %ports.ignore = "0" && %ports.disabled = "0")`
 
-### <a name="macros-port-up">Port is up</a> (Boolean)
+### Port is up (Boolean)
 
 Entity: `%macros.port_up`
 
@@ -71,7 +71,7 @@ Implies: %macros.port
 
 Source: `(%ports.ifOperStatus = "up" && %ports.ifAdminStatus = "up" && %macros.port)`
 
-### <a name="macros-port-down">Port is down</a> (Boolean)
+### Port is down (Boolean)
 
 Entity: `%macros.port_down`
 
@@ -81,7 +81,7 @@ Implies: %macros.port
 
 Source: `(%ports.ifOperStatus = "down" && %ports.ifAdminStatus != "down" && %macros.port)`
 
-### <a name="macros-port-usage-perc">Port-Usage in Percent</a> (Decimal)
+### Port-Usage in Percent (Decimal)
 
 Entity: `%macros.port_usage_perc`
 
@@ -89,9 +89,9 @@ Description: Return port-usage in percent.
 
 Source: `((%ports.ifInOctets_rate*8) / %ports.ifSpeed)*100`
 
-## <a name="macros-time">Time</a>
+## Time
 
-### <a name="macros-time-now">Now</a> (Datetime)
+### Now (Datetime)
 
 Entity: `%macros.now`
 
@@ -99,7 +99,7 @@ Description: Alias of MySQL's NOW()
 
 Source: `NOW()`
 
-### <a name="macros-time-past-Nm">Past N Minutes</a> (Datetime)
+### Past N Minutes (Datetime)
 
 Entity: `%macros.past_$m`
 
@@ -111,7 +111,7 @@ Resolution: 5,10,15,30,60
 
 Source: `DATE_SUB(NOW(),INTERVAL $ MINUTE)`
 
-## <a name="macros-sensors">Sensors</a> (Boolean)
+## Sensors (Boolean)
 
 Entity: `%macros.sensor`
 
@@ -119,7 +119,13 @@ Description: Only select sensors that aren't ignored.
 
 Source: `(%sensors.sensor_alert = 1)`
 
-## <a name="macros-misc">Misc</a> (Boolean)
+Entity: `%macros.sensor_port_link`
+
+Description: Only selects sensors that have a port linked to them, the port is up and the device is up.
+
+Source: `(%sensors.entity_link_type = 'port' && %sensors.entity_link_index = %ports.ifIndex && %macros.port_up && %macros.device_up))`
+
+## Misc (Boolean)
 
 ### Packet Loss
 

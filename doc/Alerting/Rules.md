@@ -1,13 +1,13 @@
 source: Alerting/Rules.md
 
-# <a name="rules">Rules</a>
+# Rules
 
 Rules are defined using a logical language.
 The GUI provides a simple way of creating basic rules.
 Creating more complicated rules which may include maths calculations and MySQL queries can be 
 done using [macros](Macros.md)
 
-## <a name="rules-syntax">Syntax</a>
+## Syntax
 
 Rules must consist of at least 3 elements: An __Entity__, a __Condition__ and a __Value__.
 Rules can contain braces and __Glues__.
@@ -32,7 +32,7 @@ __Note__: The difference between `Equals` and `Like` (and its negation) is that 
 
 Arithmetics are allowed as well.
 
-# <a name="extra">Options</a>
+# Options
 
 Here are some of the other options available when adding an alerting rule:
 
@@ -44,7 +44,7 @@ Here are some of the other options available when adding an alerting rule:
 - Mute alerts: Disable sending alerts for this rule.
 - Invert match: Invert the matching rule (ie. alert on items that _don't_ match the rule).
 
-## <a name="rules-examples">Examples</a>
+## Examples
 
 Alert when:
 
@@ -59,5 +59,11 @@ Alert when:
 - High CPU usage(per core usage, not overall): `%macros.device_up = "1" && %processors.processor_usage >= "90"`
 - High port usage, where description is not client & ifType is not softwareLoopback: `%macros.port_usage_perc >= "80" && %port.port_descr_type != "client" && %ports.ifType != "softwareLoopback"`
 
-## <a name="rules-procedure">Procedure</a>
+## Procedure
 You can associate a rule to a procedure by giving the URL of the procedure when creating the rule. Only links like "http://" are supported, otherwise an error will be returned. Once configured, procedure can be opened from the Alert widget through the "Open" button, which can be shown/hidden from the widget configuration box.
+
+## Testing alerts
+
+You can test your transports by forcing an actual active alert to run regardless of the interval or delay values.
+
+`./scripts/test-alert.php`. This script accepts -r for the rule id, -h for the device id or hostname and -d for debug.

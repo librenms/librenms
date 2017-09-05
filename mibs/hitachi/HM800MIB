@@ -1,0 +1,634 @@
+--
+-- Hitachi Virtual Storage Platform Gx00 SNMP Agent MIB definition.
+--
+-- Version.6.2
+--
+-- All Rights Reserved, Copyright (C) 2015,Hitachi, Ltd.
+--
+-- MIB Version:Trap (for failure notice by trap)
+--	
+--    Support Function
+--
+--
+
+HM800MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+OBJECT-TYPE		FROM RFC-1212
+TRAP-TYPE		FROM RFC-1215
+DisplayString	FROM RFC1213-MIB
+enterprises		FROM RFC1155-SMI;
+
+--
+-- Hitachi and RAID sub-tree
+--
+
+hitachi         OBJECT IDENTIFIER ::= { enterprises 116 }
+system          OBJECT IDENTIFIER ::= { hitachi 3 }
+storage         OBJECT IDENTIFIER ::= { system 11 }
+raid            OBJECT IDENTIFIER ::= { storage 4 }
+raidDummy       OBJECT IDENTIFIER ::= { raid 1 }
+raidRoot        OBJECT IDENTIFIER ::= { raidDummy 1 }
+
+systemExMib     OBJECT IDENTIFIER ::= { hitachi 5 }
+storageExMib    OBJECT IDENTIFIER ::= { systemExMib 11 }
+raidExMib       OBJECT IDENTIFIER ::= { storageExMib 4 }
+raidExMibDummy  OBJECT IDENTIFIER ::= { raidExMib 1 }
+raidExMibDummyX	OBJECT IDENTIFIER ::= { raidExMib 2 }
+raidExMibRoot   OBJECT IDENTIFIER ::= { raidExMibDummy 1 }
+
+--
+-- Basic information
+--
+
+raidExMibName		OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Product name of the SVP."
+	::= { raidExMibRoot 1 }
+
+raidExMibVersion	OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"SVP micro-program version."
+	::= { raidExMibRoot 2 }
+
+raidExMibAgentVersion	OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Extension Agent version."
+	::= { raidExMibRoot 3 }
+
+raidExMibDkcCount	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Number of DKC which is registered on the SVP."
+	::= { raidExMibRoot 4 }
+
+--
+-- Raid list
+--
+
+raidExMibRaidListTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF RaidExMibRaidListEntry
+	ACCESS		not-accessible 
+	STATUS		mandatory
+	DESCRIPTION
+		"List of DKC which is registered on the SVP."
+	::= { raidExMibRoot 5 }
+
+raidExMibRaidListEntry		OBJECT-TYPE
+	SYNTAX		RaidExMibRaidListEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION
+		"Entry of DKC list."
+	INDEX {
+		raidlistSerialNumber
+	}
+	::= { raidExMibRaidListTable 1 }
+
+RaidExMibRaidListEntry ::=
+	SEQUENCE {
+	raidlistSerialNumber	INTEGER,
+	raidlistMibNickName	DisplayString (SIZE(0..18)),
+	raidlistDKCMainVersion	DisplayString,
+	raidlistDKCProductName	DisplayString
+	}
+
+raidlistSerialNumber	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Serial Number of the DKC."
+	::= { raidExMibRaidListEntry 1 }
+
+raidlistMibNickName	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..18))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	
+		"Nickname of the DKC."
+	::= { raidExMibRaidListEntry 2 }
+
+raidlistDKCMainVersion	OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	
+		"DKC Firmware Version."
+	::= { raidExMibRaidListEntry 3 }
+
+raidlistDKCProductName	OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	
+		"DKC Product Name."
+	::= { raidExMibRaidListEntry 4 }
+
+--
+-- Disk controller information
+--
+
+raidExMibDKCHWTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF RaidExMibDKCHWEntry
+	ACCESS		not-accessible 
+	STATUS		mandatory
+	DESCRIPTION	
+		"Error information of the DKC."
+	::= { raidExMibRoot 6 }
+
+raidExMibDKCHWEntry		OBJECT-TYPE
+	SYNTAX		RaidExMibDKCHWEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION	
+		"Entry of DKC information."
+	INDEX		{
+		dkcRaidListIndexSerialNumber
+	}
+	::= { raidExMibDKCHWTable 1 }
+	
+RaidExMibDKCHWEntry ::=
+	SEQUENCE	{
+		dkcRaidListIndexSerialNumber	INTEGER,
+		dkcHWProcessor			INTEGER,
+		dkcHWCSW			INTEGER,
+		dkcHWCache			INTEGER,
+		dkcHWSM				INTEGER,
+		dkcHWPS				INTEGER,
+		dkcHWBattery			INTEGER,
+		dkcHWFan			INTEGER,
+		dkcHWEnvironment		INTEGER
+	}
+
+dkcRaidListIndexSerialNumber	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	
+		"Serial Number the DKC."
+	::= { raidExMibDKCHWEntry 1 }
+
+dkcHWProcessor		OBJECT-TYPE
+	SYNTAX		INTEGER {
+				noError(1),
+				acute(2),
+				serious(3),
+				moderate(4),
+				service(5)
+	}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Information of processor."
+	::= { raidExMibDKCHWEntry 2 }
+
+dkcHWCSW		OBJECT-TYPE
+	SYNTAX		INTEGER {
+				noError(1),
+				acute(2),
+				serious(3),
+				moderate(4),
+				service(5)
+	}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Information of internal bus."
+	::= { raidExMibDKCHWEntry 3 }
+
+dkcHWCache		OBJECT-TYPE
+	SYNTAX		INTEGER {
+				noError(1),
+				acute(2),
+				serious(3),
+				moderate(4),
+				service(5)
+	}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Information of cache."
+	::= { raidExMibDKCHWEntry 4 }
+
+dkcHWSM			OBJECT-TYPE
+	SYNTAX		INTEGER {
+				noError(1),
+				acute(2),
+				serious(3),
+				moderate(4),
+				service(5)
+	}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Information of shared memory."
+	::= { raidExMibDKCHWEntry 5 }
+
+dkcHWPS		OBJECT-TYPE
+	SYNTAX		INTEGER {
+				noError(1),
+				acute(2),
+				serious(3),
+				moderate(4),
+				service(5)
+	}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Information of power supply."
+	::= { raidExMibDKCHWEntry 6 }
+
+dkcHWBattery		OBJECT-TYPE
+	SYNTAX		INTEGER {
+				noError(1),
+				acute(2),
+				serious(3),
+				moderate(4),
+				service(5)
+	}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Information of battery."
+	::= { raidExMibDKCHWEntry 7 }
+
+dkcHWFan		OBJECT-TYPE
+	SYNTAX		INTEGER {
+				noError(1),
+				acute(2),
+				serious(3),
+				moderate(4),
+				service(5)
+	}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Information of fan."
+	::= { raidExMibDKCHWEntry 8 }
+
+dkcHWEnvironment	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				noError(1),
+				acute(2),
+				serious(3),
+				moderate(4),
+				service(5)
+	}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Information of Environment."
+	::= { raidExMibDKCHWEntry 9}
+
+--
+-- Disk unit information
+--
+
+raidExMibDKUHWTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF RaidExMibDKUHWEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION	
+		"Error information of the DKU."
+	::= { raidExMibRoot 7 }
+
+raidExMibDKUHWEntry		OBJECT-TYPE
+	SYNTAX		RaidExMibDKUHWEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION
+		"Entry of DKU information."
+	INDEX {
+		dkuRaidListIndexSerialNumber
+	}
+	::= { raidExMibDKUHWTable 1 }
+
+RaidExMibDKUHWEntry ::=
+	SEQUENCE	{
+		dkuRaidListIndexSerialNumber	INTEGER,
+		dkuHWPS				INTEGER,
+		dkuHWFan			INTEGER,
+		dkuHWEnvironment		INTEGER,
+		dkuHWDrive			INTEGER
+	}
+
+dkuRaidListIndexSerialNumber	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Serial Number of the DKC."
+	::= { raidExMibDKUHWEntry 1 }
+
+dkuHWPS			OBJECT-TYPE
+	SYNTAX		INTEGER {
+				noError(1),
+				acute(2),
+				serious(3),
+				moderate(4),
+				service(5)
+	}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Information of DKU power supply."
+	::= { raidExMibDKUHWEntry 2 }
+
+dkuHWFan		OBJECT-TYPE
+	SYNTAX		INTEGER {
+				noError(1),
+				acute(2),
+				serious(3),
+				moderate(4),
+				service(5)
+	}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Information of DKU fan."
+	::= { raidExMibDKUHWEntry 3 }
+
+dkuHWEnvironment	OBJECT-TYPE
+	SYNTAX		INTEGER	{
+				noError(1),
+				acute(2),
+				serious(3),
+				moderate(4),
+				service(5)
+	}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Information of DKU Environment."
+	::= { raidExMibDKUHWEntry 4 }
+
+dkuHWDrive		OBJECT-TYPE
+	SYNTAX		INTEGER	{
+				noError(1),
+				acute(2),
+				serious(3),
+				moderate(4),
+				service(5)
+	}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Information of Drive."
+	::= { raidExMibDKUHWEntry 5 }
+
+--
+-- Trap List
+--
+
+raidExMibTrapListTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF RaidExMibTrapListEntry
+	ACCESS		not-accessible 
+	STATUS		mandatory
+	DESCRIPTION
+		"Trap list Table."
+	::= { raidExMibRoot 8 }
+
+raidExMibTrapListEntry		OBJECT-TYPE
+	SYNTAX		RaidExMibTrapListEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION
+		"Trap list Table index."
+	INDEX {
+		eventListIndexSerialNumber,
+		eventListIndexRecordNo
+	}
+	::= { raidExMibTrapListTable 1 }
+
+RaidExMibTrapListEntry ::=
+	SEQUENCE {
+	eventListIndexSerialNumber	INTEGER,
+	eventListNickname		DisplayString (SIZE(0..18)),
+	eventListIndexRecordNo		Counter,
+	eventListREFCODE		DisplayString (SIZE(6)),
+	eventListDate			DisplayString (SIZE(10)),
+	eventListTime			DisplayString (SIZE(8)),
+	eventListDescription	DisplayString (SIZE(0..256))
+	}
+
+eventListIndexSerialNumber	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Serial Number of the DKC."
+	::= { raidExMibTrapListEntry 1 }
+
+eventListNickname	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..18))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Nickname of the DKC."
+	::= { raidExMibTrapListEntry 2 }
+
+eventListIndexRecordNo	OBJECT-TYPE
+	SYNTAX		Counter
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The record number of the event trap list."
+	::= { raidExMibTrapListEntry 3 }
+
+eventListREFCODE		OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(6))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The Reference code of the event trap. "
+	::= { raidExMibTrapListEntry 4 }
+
+eventListDate		OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(10))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The Date of the event trap. "
+	::= { raidExMibTrapListEntry 5 }
+
+eventListTime		OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(8))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"The Time of the event trap. "
+	::= { raidExMibTrapListEntry 6 }
+
+eventListDescription OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..256))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION
+		"Detail information of reference code. "
+	::= { raidExMibTrapListEntry 7 }
+
+--
+-- Trap definition
+--
+
+eventTrapSerialNumber		OBJECT-TYPE
+	SYNTAX			INTEGER
+	ACCESS			not-accessible
+	STATUS			mandatory
+	DESCRIPTION
+		"Serial Number of HM800 where an error occurred."
+	::= { raidExMibDummyX 1 }
+
+eventTrapNickname			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			not-accessible
+	STATUS			mandatory
+	DESCRIPTION
+		"Nickname of HM800 where an error occurred."
+	::= { raidExMibDummyX 2 }
+
+eventTrapREFCODE 			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			not-accessible
+	STATUS			mandatory
+	DESCRIPTION
+		"Error reference code."
+	::= { raidExMibDummyX 3 }
+
+eventTrapPartsID			OBJECT-TYPE
+	SYNTAX			OBJECT IDENTIFIER
+	ACCESS			not-accessible
+	STATUS			mandatory
+	DESCRIPTION
+		"Error parts code of HM800 where an error occurred."
+	::= { raidExMibDummyX 4 }
+
+eventTrapDate       OBJECT-TYPE
+	SYNTAX          DisplayString
+	ACCESS          not-accessible
+	STATUS          mandatory
+	DESCRIPTION
+		"Date of HM800 where an error occurred."
+	::= { raidExMibDummyX 5 }
+
+eventTrapTime			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			not-accessible
+	STATUS			mandatory
+	DESCRIPTION
+		"Time of HM800 where an error occurred."
+	::= { raidExMibDummyX 6 }
+
+eventTrapDescription 	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..256))
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION
+		" Detail information of an error. "
+	::= { raidExMibDummyX 7 }
+
+raideventUseracute	TRAP-TYPE
+	ENTERPRISE	raidRoot
+	VARIABLES	{
+		eventTrapSerialNumber,
+		eventTrapNickname,
+		eventTrapREFCODE,
+		eventTrapPartsID,
+		eventTrapDate,
+		eventTrapTime,
+		eventTrapDescription
+	}
+	DESCRIPTION	
+		"The impact of this event on the subsystem is acute."
+	--#TYPE		"Error events occurred" 
+	--#SUMMARY	"An error event occurred on system %d."
+	--#SUMMARY	"REFCODE is %s."
+	--#SUMMARY	"Parts ID is %s."
+	--#SUMMARY	"Information - %s."
+	--#ARGUMENTS	{0,2,3,6}
+	--#SEVERITY	CRITICAL
+	--#CATEGORY	"Error Events"
+	::= 1
+
+raideventUserserious	TRAP-TYPE
+	ENTERPRISE	raidRoot
+	VARIABLES	{
+		eventTrapSerialNumber,
+		eventTrapNickname,
+		eventTrapREFCODE,
+		eventTrapPartsID,
+		eventTrapDate,
+		eventTrapTime,
+		eventTrapDescription
+	}
+	DESCRIPTION	
+		"The impact of this event on the subsystem is serious."
+	--#TYPE		"Error events occurred" 
+	--#SUMMARY	"An error event occurred on system %d."
+	--#SUMMARY	"REFCODE is %s."
+	--#SUMMARY	"Parts ID is %s."
+	--#SUMMARY	"Information - %s."
+	--#ARGUMENTS	{0,2,3,6}
+	--#SEVERITY	MAJOR
+	--#CATEGORY	"Error Events"
+	::= 2
+
+raideventUsermoderate	TRAP-TYPE
+	ENTERPRISE	raidRoot
+	VARIABLES	{
+		eventTrapSerialNumber,
+		eventTrapNickname,
+		eventTrapREFCODE,
+		eventTrapPartsID,
+		eventTrapDate,
+		eventTrapTime,
+		eventTrapDescription
+	}
+	DESCRIPTION	
+		"The impact of this event on the subsystem is moderate."
+	--#TYPE		"Error events occurred" 
+	--#SUMMARY	"An error event occurred on system %d."
+	--#SUMMARY	"REFCODE is %s."
+	--#SUMMARY	"Parts ID is %s."
+	--#SUMMARY	"Information - %s."
+	--#ARGUMENTS	{0,2,3,6}
+	--#SEVERITY	MINOR
+	--#CATEGORY	"Error Events"
+	::= 3
+
+raideventUserservice	TRAP-TYPE
+	ENTERPRISE	raidRoot
+	VARIABLES	{
+		eventTrapSerialNumber,
+		eventTrapNickname,
+		eventTrapREFCODE,
+		eventTrapPartsID,
+		eventTrapDate,
+		eventTrapTime,
+		eventTrapDescription
+	}
+	DESCRIPTION	
+		"The impact of this event on the subsystem is low."
+	--#TYPE		"Error events occurred" 
+	--#SUMMARY	"An error event occurred on system %d."
+	--#SUMMARY	"REFCODE is %s."
+	--#SUMMARY	"Parts ID is %s."
+	--#SUMMARY	"Information - %s."
+	--#ARGUMENTS	{0,2,3,6}
+	--#SEVERITY	INFORMATIONAL
+	--#CATEGORY	"Error Events"
+	::= 4
+
+END

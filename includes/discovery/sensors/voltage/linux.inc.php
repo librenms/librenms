@@ -3,33 +3,29 @@
  * voltages for raspberry pi
  * requires snmp extend agent script from librenms-agent
  */
-$raspberry = snmp_get($device, 'HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0', '-Osqnv');
-if (preg_match("/(bcm).+(boardrev)/", $raspberry)) {
-    $sensor_type = "rasbperry_volts";
-    $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.';
-    for ($volt = 2; $volt < 6; $volt++) {
-        switch ($volt) {
-            case "2":
-                $descr = "Core";
-                break;
-            case "3":
-                $descr = "SDRAMc";
-                break;
-            case "4":
-                $descr = "SDRAMi";
-                break;
-            case "5":
-                $descr = "SDRAMp";
-                break;
-        }
-        $value = snmp_get($device, $oid.$volt, '-Oqv');
-        if (is_numeric($value)) {
-            discover_sensor($valid['sensor'], 'voltage', $device, $oid.$volt, $volt, $sensor_type, $descr, '1', '1', null, null, null, null, $value);
-        }
+$sensor_type = "rasbperry_volts";
+$oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.';
+for ($volt = 2; $volt < 6; $volt++) {
+    switch ($volt) {
+        case "2":
+            $descr = "Core";
+            break;
+        case "3":
+            $descr = "SDRAMc";
+            break;
+        case "4":
+            $descr = "SDRAMi";
+            break;
+        case "5":
+            $descr = "SDRAMp";
+            break;
     }
-    /*
-     * other linux os
-     */
+    $value = current($pre_cache['raspberry_pi_sensors']["raspberry.".$volt]);
+    if (is_numeric($value)) {
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid.$volt, $volt, $sensor_type, $descr, '1', '1', null, null, null, null, $value);
+    } else {
+        break;
+    }
 }
 
 $oids = snmp_walk($device, '.1.3.6.1.4.1.10876.2.1.1.1.1.3', '-OsqnU', 'SUPERMICRO-HEALTH-MIB');
