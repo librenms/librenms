@@ -1,8 +1,8 @@
 <?php
 /**
- * ericsson-es.inc.php
+ * ericsson-ucp.inc.php
  *
- * LibreNMS os polling module for Ericsson ES
+ * LibreNMS os polling module for Ericsson iPECS UCP
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

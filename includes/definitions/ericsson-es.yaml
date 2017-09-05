@@ -1,9 +1,12 @@
 os: ericsson-es
-text: Ericsson iPECS ES
+text: 'EricssonLG SwitchOS'
 type: network
 icon: ericsson
+group: ericssonlg
 over:
     - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     - sysObjectId:
-        - .1.3.6.1.4.1.572.17389.204
+        - .1.3.6.1.4.1.572.17389
