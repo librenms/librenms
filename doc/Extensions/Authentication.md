@@ -232,3 +232,20 @@ $config['auth_ad_binduser']     = "ad_binduser";
 $config['auth_ad_bindpassword'] = "ad_bindpassword";
 $config['auth_ldap_cache_ttl']  = 300;
 ```
+
+### API access 
+
+Config option: `auth_api_local`
+
+The API uses the authentication extension set with `$config['auth_mechanism']` by default. It is possible to have API calls authenticated against the mysql-database with the following config (default value is false):
+
+```php
+$config['auth_api_local'] = true;
+```
+
+It is not possible to add local tokens from the web-interface if `auth_mechanism` is something else than mysql. 
+To add API-tokens/users you will have to either:
+
+- manually alter the database
+
+- temporarily set `$config['auth_mechanism'] = mysql;` and add them from the webinterface
