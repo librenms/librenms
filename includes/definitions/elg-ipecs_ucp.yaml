@@ -1,5 +1,5 @@
-os: ericsson-ucp
-text: Ericsson iPECS UCP
+os: elg-ipecs_ucp
+text: Ericsson LG iPECS UCP
 type: network
 icon: ericsson
 over:

@@ -1,8 +1,8 @@
-os: ericsson-es
-text: 'EricssonLG SwitchOS'
+os: elg-ipecs_es
+text: 'EricssonLG IPECS ES'
 type: network
 icon: ericsson
-group: ericssonlg
+group: ericsson
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
