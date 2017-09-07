@@ -1691,7 +1691,11 @@ function uw_to_dbm($value)
  */
 function set_null($value, $default = null, $min = null)
 {
-    if (!is_numeric($value)) {
+    if (is_nan($value)) {
+        return $default;
+    } elseif (is_infinite($value)) {
+        return $default;
+    } elseif (!is_numeric($value)) {
         return $default;
     } elseif (isset($min) && $value < $min) {
         return $default;
@@ -1705,7 +1709,11 @@ function set_null($value, $default = null, $min = null)
  */
 function set_numeric($value, $default = 0)
 {
-    if (!isset($value) || !is_numeric($value)) {
+    if (is_nan($value) ||
+        is_infinite($value) ||
+        !isset($value) ||
+        !is_numeric($value)
+    ) {
         $value = $default;
     }
     return $value;
