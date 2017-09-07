@@ -86,6 +86,9 @@ class Mimosa extends OS implements
      */
     public function discoverWirelessFrequency()
     {
+        $sensors = array();
+
+        // ptp radios
         $polar = $this->getCacheByIndex('mimosaPolarization', 'MIMOSA-NETWORKS-BFIVE-MIB');
         $freq = $this->getCacheByIndex('mimosaCenterFreq', 'MIMOSA-NETWORKS-BFIVE-MIB');
 
@@ -97,19 +100,35 @@ class Mimosa extends OS implements
             $descr = 'Frequency: $s Chain';
         }
 
-        foreach ($freq as $frequency => $index) {
-            return array(
-                new WirelessSensor(
-                    'frequency',
-                    $this->getDeviceId(),
-                    '.1.3.6.1.4.1.43356.2.1.2.6.1.1.6.' . $index,
-                    'mimosa',
-                    $index,
-                    sprintf($descr, $this->getPolarization($polar[$index])),
-                    $frequency
-                )
+        foreach ($freq as $index => $frequency) {
+            $sensors[] = new WirelessSensor(
+                'frequency',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.43356.2.1.2.6.1.1.6.' . $index,
+                'mimosa',
+                $index,
+                sprintf($descr, $this->getPolarization($polar[$index])),
+                $frequency
             );
         }
+
+        // ptmp radios
+        $ptmpRadioName = $this->getCacheByIndex('mimosaPtmpChPwrRadioName', 'MIMOSA-NETWORKS-PTMP-MIB');
+        $ptmpFreq = snmpwalk_group($this->getDevice(), 'mimosaPtmpChPwrCntrFreqCur', 'MIMOSA-NETWORKS-PTMP-MIB');
+
+        foreach ($ptmpFreq as $index => $frequency) {
+            $sensors[] = new WirelessSensor(
+                'frequency',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.43356.2.1.2.9.3.3.1.7.' . $index,
+                'mimosa',
+                $index,
+                $ptmpRadioName[$index],
+                $frequency['mimosaPtmpChPwrCntrFreqCur']
+            );
+        }
+
+        return $sensors;
     }
 
     private function getPolarization($polarization)
@@ -152,11 +171,13 @@ class Mimosa extends OS implements
      */
     public function discoverWirelessPower()
     {
+        $sensors = array();
+
+        // ptp radios
         $polar = $this->getCacheByIndex('mimosaPolarization', 'MIMOSA-NETWORKS-BFIVE-MIB');
         $oids = snmpwalk_cache_oid($this->getDevice(), 'mimosaTxPower', array(), 'MIMOSA-NETWORKS-BFIVE-MIB');
         $oids = snmpwalk_cache_oid($this->getDevice(), 'mimosaRxPower', $oids, 'MIMOSA-NETWORKS-BFIVE-MIB');
 
-        $sensors = array();
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'power',
@@ -175,6 +196,36 @@ class Mimosa extends OS implements
                 $index,
                 sprintf('Rx Power: %s Chain', $this->getPolarization($polar[$index])),
                 $entry['mimosaRxPower']
+            );
+        }
+
+        // ptmp radios
+        $ptmpRadioName = $this->getCacheByIndex('mimosaPtmpChPwrRadioName', 'MIMOSA-NETWORKS-PTMP-MIB');
+        $ptmpTxPow = snmpwalk_group($this->getDevice(), 'mimosaPtmpChPwrTxPowerCur', 'MIMOSA-NETWORKS-PTMP-MIB');
+
+        foreach ($ptmpTxPow as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'power',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.43356.2.1.2.9.3.3.1.10.' . $index,
+                'mimosa-tx',
+                $index,
+                'Tx Power: ' . $ptmpRadioName[$index],
+                $entry['mimosaPtmpChPwrTxPowerCur']
+            );
+        }
+
+        $ptmpRxPow = snmpwalk_group($this->getDevice(), 'mimosaPtmpChPwrMinRxPower', 'MIMOSA-NETWORKS-PTMP-MIB');
+
+        foreach ($ptmpRxPow as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'power',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.43356.2.1.2.9.3.3.1.12.' . $index,
+                'mimosa-rx',
+                $index,
+                'Min Rx Power: ' . $ptmpRadioName[$index],
+                $entry['mimosaPtmpChPwrMinRxPower']
             );
         }
 
