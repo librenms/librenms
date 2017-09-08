@@ -1,0 +1,1585 @@
+	SAF-INTEGRAW-MIB DEFINITIONS ::= BEGIN
+
+-- Definitions for include by other SAF Tehnika mib modules
+
+IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, Counter64,
+      TimeTicks
+          FROM SNMPv2-SMI                -- [RFC2578]
+      pointToPoint
+          FROM SAF-ENTERPRISE
+      safIntegra
+          FROM SAF-INTEGRA-MIB
+      DisplayString, DateAndTime, PhysAddress
+          FROM SNMPv2-TC
+      OBJECT-GROUP, MODULE-COMPLIANCE
+          FROM SNMPv2-CONF               -- [RFC2580]
+      IpAddress
+          FROM SNMPv2-SMI                -- [RFC2578]
+      IANAifType
+          FROM IANAifType-MIB;
+
+-- saf            OBJECT IDENTIFIER ::= { enterprises 7571 }
+-- microwaveRadio   OBJECT IDENTIFIER ::= { tehnika 1 }
+-- pointToPoint     OBJECT IDENTIFIER ::= { microwaveRadio 1 }
+-- safIntegra       OBJECT IDENTIFIER ::= { pointToPoint 7 }
+ 
+integraW MODULE-IDENTITY
+        LAST-UPDATED "201605110000Z" --  11 may 2016
+        ORGANIZATION "SAF Tehnika"
+        CONTACT-INFO
+               "SAF Tehnika technical support
+                <techsupport>"
+        DESCRIPTION
+               "SAF IntegraW radio management base"
+-- Revision history
+        REVISION   "201605110000Z" --  11 may 2016
+        DESCRIPTION
+                "Rx Level State added"
+        REVISION   "201509170000Z" --  17 sep 2015
+        DESCRIPTION
+                "Conformance updated"
+        REVISION   "201509150000Z" --  15 sep 2015
+        DESCRIPTION
+                "Local/remote IP address, mask, gateway OIDs added"
+        REVISION   "201508120000Z" --  12 aug 2015
+        DESCRIPTION
+                "Syntax error fixes"
+        REVISION   "201507290000Z" --  29 jul 2015
+        DESCRIPTION
+                "No modem distortion data is available on Integra-W"
+        REVISION   "201505290000Z" --  29 may 2015
+        DESCRIPTION
+                "No carrier offset and modem temp. data are available on Integra-W"
+        REVISION   "201505200000Z" --  20 may 2015
+        DESCRIPTION
+               "Public Release 1.04.
+                Radio PLL status, free physical memory, CPU idle objects added"
+        REVISION   "201504210000Z" --  21 apr 2015
+        DESCRIPTION
+               "Public Release 1.03.
+                Added OIDs for modem signal quality and distortion"
+        REVISION   "201504140000Z" --  14 apr 2015
+        DESCRIPTION
+               "Descriptions updated"
+        REVISION   "201503240000Z" --  24 mar 2015
+        DESCRIPTION
+               "Public Release 1.02.
+                Removed integraWifLinkUpDownTrapEnable OID"
+        REVISION   "201502040000Z" --  04 feb 2015
+        DESCRIPTION
+               "Syntax fix for integraWmodemRadialMse"
+        REVISION   "201501200000Z" --  20 jan 2015
+        DESCRIPTION
+               "Small typographic error fix"
+        REVISION   "201501080000Z" --  08 jan 2015
+        DESCRIPTION
+               "Public Release 1.01. Syntax & units fixed"
+        REVISION   "201501060000Z" --  06 jan 2015
+        DESCRIPTION
+               "Public Release 1.0"
+        ::= { safIntegra 2 }
+
+
+integraWtimestamp OBJECT-TYPE
+   SYNTAX      DateAndTime
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "Last data update time"
+   ::= { integraW 1 }
+
+-- radio
+
+integraWradio  OBJECT IDENTIFIER ::=   { integraW 2 }
+integraWradioTxPower OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "dBm"
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION "Output power of radio transmitter"
+              ::= { integraWradio 1 }
+
+integraWradioTxFrequency OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kHz"
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION "Frequency of radio transmitter"
+              ::= { integraWradio 2 }
+
+integraWradioRxLevel OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "dBm"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Level of the received signal"
+              ::= { integraWradio 3 }
+
+integraWradioSide     OBJECT-TYPE
+              SYNTAX  INTEGER {
+                high(1),
+                low(2),
+                error(3)
+                }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Radio side: Low/High"
+              ::= { integraWradio 4 }
+
+integraWradioTxMute   OBJECT-TYPE
+              SYNTAX  INTEGER {
+                 on(1),
+                 off(2),
+                 error(3)
+                 }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Status of 'Tx mute'
+       1 - Tx is muted,
+       2 - Tx is not muted.
+                      3 - Status information unavailable"
+              ::= { integraWradio 5 }
+
+integraWradioDuplexShift OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kHz"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                    "Utilized duplex shift in kHz"
+              ::= { integraWradio 6 }
+
+integraWradioRxFrequency OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kHz"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Frequency of radio receiver"
+              ::= { integraWradio 7 }
+
+integraWradioTemperature OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "C"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Radio module temperature *10 Celsius"
+              ::= { integraWradio 8 }
+
+integraWradioTxMuteDuration OBJECT-TYPE
+              SYNTAX  Integer32(0..214748364)
+              UNITS   "s"
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION
+                    "Time remaning for Tx to be muted in seconds.
+                    To turn mute on send number of seconds between 10 and MAX.
+                    To turn mute off send 0.
+                    GET will retrieve remaining duration for mute or 
+                    0 if Tx mute is turned off."
+              ::= { integraWradio 9 }
+
+--Settable radio parameter range values
+
+integraWradioRangesTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF IntegraWradioRangeEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "Network interface port status data."
+              ::= { integraWradio 10 }
+
+integraWradioRangeEntry OBJECT-TYPE
+              SYNTAX IntegraWradioRangeEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "An entry containing network physical port status info."
+              INDEX  { integraWradioRangeEntryIndex }
+              ::= { integraWradioRangesTable 1 }
+
+IntegraWradioRangeEntry ::=
+              SEQUENCE {
+                    integraWradioRangeEntryIndex
+                        Integer32,
+                    integraWradioRangeDescr
+                        DisplayString,
+                    integraWradioRangeTxPower
+                        Integer32,
+                    integraWradioRangeTxFrequency
+                        Integer32
+              }
+
+integraWradioRangeEntryIndex OBJECT-TYPE
+              SYNTAX Integer32 (1..2)
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "A unique value, greater than zero, for each range 
+                      entry. Starts with 1 and is equal to a number of all range 
+                      parameters."
+              ::= { integraWradioRangeEntry 1 }
+
+integraWradioRangeDescr OBJECT-TYPE
+              SYNTAX DisplayString (SIZE (0..255))
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "'Minimal' and 'maximal' labels"
+              ::= { integraWradioRangeEntry 2 }
+
+integraWradioRangeTxPower OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "dBm"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Output power ranges for integraWradio transmitter"
+              ::= { integraWradioRangeEntry 3 }
+
+integraWradioRangeTxFrequency OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kHz"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Frequency ranges for integraWradio transmitter"
+              ::= { integraWradioRangeEntry 4 }
+
+integraWradioPLL OBJECT-TYPE
+              SYNTAX  INTEGER {
+                error(1),
+          ok(2)
+              }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "PLL state of local-oscillator generator"
+              ::= { integraWradio 11 }
+
+integraWradioRxLevelState OBJECT-TYPE
+              SYNTAX  INTEGER {
+                ok(1),
+                low(2),
+                high(3),
+                error(4)
+              }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Received signal level state"
+              ::= { integraWradio 12 }
+
+-- modem
+
+integraWmodem  OBJECT IDENTIFIER ::=   { integraW 3 }
+-- modem-status
+-- modem-config
+-- misc
+integraWmodemAcquireStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                 acquireInProgress(1),
+                 acquireLocked(2),
+                 acquireFailed(3)
+              }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "This is the current status of modem data acquire
+                           when queried modem status.
+                           For detailed info use modemAcquireLastStatusDetails."
+              ::= { integraWmodem 1 }
+
+integraWmodemMse OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "dB"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Current MSE value (floating point value multiplied by 10)"
+              ::= { integraWmodem 2 }
+
+-- ldpcDecoderStress OBJECT-TYPE
+integraWmodemFecLoad OBJECT-TYPE
+              SYNTAX  DisplayString
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Decoder stress or FEC load value (floating point in textual representation)"
+              ::= { integraWmodem 3 }
+
+integraWmodemSyncLoss OBJECT-TYPE
+              SYNTAX  INTEGER {
+                 locked(1),
+                 unlocked(2),
+                 unknown(3)
+              }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Modem synchronization status"
+              ::= { integraWmodem 4 }
+
+-- integraWmodemTemperature OBJECT-TYPE
+--            SYNTAX  Integer32
+--            UNITS   "C"
+--            MAX-ACCESS  read-only
+--            STATUS  current
+--            DESCRIPTION "Modem DSP temperature *10 Celsius"
+--            ::= { integraWmodem 5 }
+
+integraWmodemBandwidth OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kHz"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Signal bandwidth"
+              ::= { integraWmodem 6 }
+
+integraWmodemModulation    OBJECT-TYPE
+              SYNTAX  DisplayString
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Modulation (preferred)"
+              ::= { integraWmodem 7 }
+
+integraWmodemRxModulation    OBJECT-TYPE
+              SYNTAX  DisplayString
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Current (actual) Rx Modulation"
+              ::= { integraWmodem 8 }
+
+integraWmodemTxModulation    OBJECT-TYPE
+              SYNTAX  DisplayString
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Current (actual) Tx Modulation"
+              ::= { integraWmodem 9 }
+
+integraWmodemRxCapacity OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kb/s"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Rx ethernet capacity in kilobits per second"
+              ::= { integraWmodem 10 }
+
+integraWmodemTxCapacity OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kb/s"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Tx ethernet capacity in kilobits per second"
+              ::= { integraWmodem 11 }
+
+integraWmodemAcmEngine OBJECT-TYPE
+              SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2),
+                 error(3)
+              }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "ACM engine status"
+              ::= { integraWmodem 12 }
+
+-- integraWmodemCarrierOffset OBJECT-TYPE
+--            SYNTAX Integer32
+--            UNITS "Hz"
+--            MAX-ACCESS read-only
+--            STATUS current
+--            DESCRIPTION "Modem carrier offset"
+--            ::= { integraWmodem 13 }
+
+integraWmodemSignalQuality OBJECT-TYPE
+              SYNTAX Integer32
+              UNITS "%"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem signal quality in %"
+              ::= { integraWmodem 14 }
+
+-- integraWmodemDistortion OBJECT-TYPE
+--            SYNTAX Integer32
+--            UNITS "%"
+--            MAX-ACCESS read-only
+--            STATUS current
+--            DESCRIPTION "Modem distortion in %"
+--            ::= { integraWmodem 15 }
+
+
+-- system
+
+integraWsystem OBJECT IDENTIFIER ::= { integraW 4 }
+
+integraWsysCPUtemperature OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "C"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "System CPU temperature *10 Celsius"
+              ::= { integraWsystem 2 }
+
+integraWsysLicenseExpire OBJECT-TYPE
+              SYNTAX  Gauge32
+              UNITS   "s"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "License expires after number of seconds. 
+                           In the case of -1, check licenseGenStatus status"
+              ::= { integraWsystem 3 }
+integraWsysLicenseGenStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                ok(1),
+                expired(2),
+                unknown(3),
+                unlimitedTime(4)
+                }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "License General status."
+              ::= { integraWsystem 4 }
+
+integraWsysPSUvoltage    OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "mV"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Power voltage in mV"
+              ::= { integraWsystem 5 }
+
+integraWsysPSUcurrent    OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "mA"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Power current in mA"
+              ::= { integraWsystem 6 }
+integraWsysPSUpower    OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "mW"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Power consumption in mW"
+              ::= { integraWsystem 7 }
+integraWsysBoardTemperature OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "C"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "System temperature *10 Celsius"
+              ::= { integraWsystem 8 }
+integraWsysFreeMemory OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "%"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "System free memory *10 %"
+              ::= { integraWsystem 9 }
+integraWsysCPUidle OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "%"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "System CPU idle *10 %"
+              ::= { integraWsystem 10 }
+
+
+-- Ethernet
+integraWethernet      OBJECT IDENTIFIER ::=   { integraW 5 }
+   -- Port status
+integraWifStatusTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF IntegraWifPortEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "Network interface port status data."
+              ::= { integraWethernet 1 }
+
+integraWifPortEntry   OBJECT-TYPE
+              SYNTAX IntegraWifPortEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "An entry containing network physical port status info."
+              INDEX  { integraWifPortStatIndex }
+              ::= { integraWifStatusTable 1 }
+
+IntegraWifPortEntry   ::=
+              SEQUENCE {
+                    integraWifPortStatIndex
+                        Integer32,
+                    integraWifPortStatDescr
+                        DisplayString,
+                    integraWifPortType
+                        IANAifType,
+                    integraWifPortMtu
+                        Integer32,
+                    integraWifPortSpeed
+                        Gauge32,
+                    integraWifPortPhysAddress
+                        PhysAddress,
+                    integraWifPortAdminStatus
+                        INTEGER,
+                    integraWifPortOperStatus
+                        INTEGER,
+                    integraWifPortLastChange
+                        TimeTicks,
+                    integraWifPortAutoneg
+                        INTEGER,
+                    integraWifPortDuplex
+                        INTEGER,
+                    integraWifPortSyncEthActive
+                        INTEGER,
+                    integraWifPortSyncEthPrio
+                        Integer32,
+                    integraWifPortFlowControl
+                        INTEGER
+              }
+
+integraWifPortStatIndex OBJECT-TYPE
+              SYNTAX Integer32 (1..4)
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "A unique value, greater than zero, for each physical
+                      network interface. It is recommended that
+                      values are assigned contiguously starting from 1."
+              ::= { integraWifPortEntry 1 }
+
+integraWifPortStatDescr OBJECT-TYPE
+              SYNTAX DisplayString (SIZE (0..255))
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Physical network interface description.
+                      LAN1 is electrical, LAN2 and LAN3 are SFP
+                      and WAN is radio port."
+              ::= { integraWifPortEntry 2 }
+
+integraWifPortType    OBJECT-TYPE
+              SYNTAX IANAifType
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "The type of interface, distinguished according to
+                      the physical/link protocol(s) immediately `below'
+                      the network layer in the protocol stack."
+              ::= { integraWifPortEntry 3 }
+
+integraWifPortMtu     OBJECT-TYPE
+              SYNTAX Integer32
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Maximum transmission unit value in bytes."
+              ::= { integraWifPortEntry 4 }
+
+integraWifPortSpeed   OBJECT-TYPE
+              SYNTAX Gauge32
+              UNITS "bps"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Link speed in bits per second."
+              ::= { integraWifPortEntry 5 }
+
+integraWifPortPhysAddress OBJECT-TYPE
+              SYNTAX PhysAddress
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "The interface's address at the protocol layer
+                      immediately `below' the network layer in the
+                      protocol stack.  For interfaces which do not have
+                      such an address (e.g., a serial line), this object
+                      should contain an octet string of zero length."
+              ::= { integraWifPortEntry 6 }
+
+integraWifPortAdminStatus OBJECT-TYPE
+              SYNTAX INTEGER {
+                         enabled(1),
+                         disabled(2),
+                         unknown(3)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Desired state of network interfaces. Interfaces
+                      can be enabled(1), disabled(2), unknown(3) (no info received)."
+              ::= { integraWifPortEntry 7 }
+
+integraWifPortOperStatus OBJECT-TYPE
+              SYNTAX INTEGER {
+                         up(1),
+                         down(2),
+                         unknown(3)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Actual state of interfaces. Link can be up(1),
+                      down(2) or in unknown(3) state."
+              ::= { integraWifPortEntry 8 }
+
+integraWifPortLastChange OBJECT-TYPE
+              SYNTAX TimeTicks
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "This parameter value is always 0 at the moment."
+              ::= { integraWifPortEntry 9 }
+
+integraWifPortAutoneg OBJECT-TYPE
+              SYNTAX INTEGER {
+                         enabled(1),
+                         disabled(2),
+                         unknown(3)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Auto-negotiation status. Unknown means no info was received."
+              ::= { integraWifPortEntry 10 }
+
+integraWifPortDuplex  OBJECT-TYPE
+              SYNTAX INTEGER {
+                         full(1),
+                         half(2),
+                         unknown(3)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Duplex status for the interface."
+              ::= { integraWifPortEntry 11 }
+
+integraWifPortSyncEthActive OBJECT-TYPE
+              SYNTAX INTEGER {
+                         off(0),
+                         on(1)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Synchronous Ethernet status.
+                      Can be active(1) or inactive(0)."
+              ::= { integraWifPortEntry 12 }
+
+integraWifPortSyncEthPrio OBJECT-TYPE
+              SYNTAX Integer32
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Synchronous Ethernet priority."
+              ::= { integraWifPortEntry 13 }
+
+integraWifPortFlowControl OBJECT-TYPE
+              SYNTAX INTEGER {
+                         enabled(1),
+                         disabled(2),
+                         unknown(3)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Flow control status."
+              ::= { integraWifPortEntry 14 }
+
+
+   -- Port statistics
+integraWifStatisticsTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF IntegraWifPortStcEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "Network interface port statistics data."
+              ::= { integraWethernet 2 }
+
+integraWifPortStcEntry OBJECT-TYPE
+              SYNTAX IntegraWifPortStcEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "An entry containing network physical port statistics counter data."
+              INDEX  { integraWifPortStcIndex }
+              ::= { integraWifStatisticsTable 1 }
+
+IntegraWifPortStcEntry    ::=
+              SEQUENCE {
+                    integraWifPortStcIndex
+                        Integer32,
+                    integraWifPortStcDescr
+                        DisplayString,
+                    integraWifTimePassed
+                        TimeTicks,
+                    integraWrxDetected
+                        Counter64,
+                    integraWrxDropped
+                        Counter64,
+                    integraWtxDetected
+                        Counter64,
+                    integraWtxDropped
+                        Counter64,
+                    integraWrxBytes
+                        Counter64,
+                    integraWtxBytes
+                        Counter64,
+                    integraWrx64Frames
+                        Counter64,
+                    integraWrx65to127Frames
+                        Counter64,
+                    integraWrx128to255Frames
+                        Counter64,
+                    integraWrx256to511Frames
+                        Counter64,
+                    integraWrx512to1023Frames
+                        Counter64,
+                    integraWrx1024toMaxFrames
+                        Counter64,
+                    integraWrxUsizeFrames
+                        Counter64,
+                    integraWrxOsizeFrames
+                        Counter64,
+                    integraWtx64Frames
+                        Counter64,
+                    integraWtx65to127Frames
+                        Counter64,
+                    integraWtx128to255Frames
+                        Counter64,
+                    integraWtx256to511Frames
+                        Counter64,
+                    integraWtx512to1023Frames
+                        Counter64,
+                    integraWtx1024toMaxFrames
+                        Counter64,
+                    integraWtxUsizeFrames
+                        Counter64,
+                    integraWtxOsizeFrames
+                        Counter64,
+                    integraWrxGoodFrames
+                        Counter64,
+                    integraWrxErrors
+                        Counter64,
+                    integraWrxFifoErr
+                        Counter64,
+                    integraWrxCRCErrors
+                        Counter64,
+                    integraWrxBcastFrames
+                        Counter64,
+                    integraWrxMcastFrames
+                        Counter64,
+                    integraWrxCntrlFrames
+                        Counter64,
+                    integraWrxLenErrors
+                        Counter64,
+                    integraWrxVlanFrames
+                        Counter64,
+                    integraWrxPauseFrames
+                        Counter64,
+                    integraWrxOpErrors
+                        Counter64,
+                    integraWrxFrameErrors
+                        Counter64,
+                    integraWtxGoodFrames
+                        Counter64,
+                    integraWtxErrors
+                        Counter64,
+                    integraWtxFifoErr
+                        Counter64,
+                    integraWtxBcastFrames
+                        Counter64,
+                    integraWtxMcastFrames
+                        Counter64,
+                    integraWtxUrunErrors
+                        Counter64,
+                    integraWtxCntrlFrames
+                        Counter64,
+                    integraWtxVlanFrames
+                        Counter64,
+                    integraWtxPauseFrames
+                        Counter64,
+                    integraWtxSingleCollisions
+                        Counter64,
+                    integraWtxMultiCollisions
+                        Counter64,
+                    integraWtxDeferred
+                        Counter64,
+                    integraWtxLateCollisions
+                        Counter64,
+                    integraWtxExcessCollisions
+                        Counter64,
+                    integraWtxExcessDeferral
+                        Counter64,
+                    integraWtxAlignErrors
+                        Counter64,
+                    integraWtxCarrierErrors
+                        Counter64,
+                    integraWtxCollisions
+                        Counter64
+               }
+
+integraWifPortStcIndex OBJECT-TYPE
+              SYNTAX Integer32 (1..5)
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "A unique value, greater than zero, for each physical
+                      network interface. It is recommended that
+                      values are assigned contiguously starting from 1."
+              ::= { integraWifPortStcEntry 1 }
+
+integraWifPortStcDescr OBJECT-TYPE
+              SYNTAX DisplayString (SIZE (0..255))
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Physical network interface description.
+                      LAN1 is electrical, LAN2 and LAN3 are SFP,
+                      WAN is radio port and MNG is internal management interface."
+              ::= { integraWifPortStcEntry 2 }
+
+integraWifTimePassed OBJECT-TYPE
+              SYNTAX TimeTicks
+              UNITS "s/100"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Statistics collection time."
+              ::= { integraWifPortStcEntry 3 }
+
+integraWrxDetected OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Detected ingoing packets counter."
+              ::= { integraWifPortStcEntry 4 }
+
+integraWrxDropped OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Dropped ingoing packets counter."
+              ::= { integraWifPortStcEntry 5 }
+
+integraWtxDetected OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Detected outgoing packets counter."
+              ::= { integraWifPortStcEntry 6 }
+
+integraWtxDropped OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Dropped outgoing packets counter."
+              ::= { integraWifPortStcEntry 7 }
+
+integraWrxBytes OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Ingoing bytes counter."
+              ::= { integraWifPortStcEntry 8 }
+
+integraWtxBytes OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Outgoing bytes counter."
+              ::= { integraWifPortStcEntry 9 }
+
+integraWrx64Frames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 10 }
+
+integraWrx65to127Frames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 11 }
+
+integraWrx128to255Frames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 12 }
+
+integraWrx256to511Frames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 13 }
+
+integraWrx512to1023Frames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 14 }
+
+integraWrx1024toMaxFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 15 }
+
+integraWrxUsizeFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 16 }
+
+integraWrxOsizeFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 17 }
+
+integraWtx64Frames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 18 }
+
+integraWtx65to127Frames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 19 }
+
+integraWtx128to255Frames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 20 }
+
+integraWtx256to511Frames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 21 }
+
+integraWtx512to1023Frames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 22 }
+
+integraWtx1024toMaxFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 23 }
+
+integraWtxUsizeFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 24 }
+
+integraWtxOsizeFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 25 }
+
+integraWrxGoodFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 26 }
+
+integraWrxErrors OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 27 }
+
+integraWrxFifoErr OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 28 }
+
+integraWrxCRCErrors OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 29 }
+
+integraWrxBcastFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 30 }
+
+integraWrxMcastFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 31 }
+
+integraWrxCntrlFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 32 }
+
+integraWrxLenErrors OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 33 }
+
+integraWrxVlanFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 34 }
+
+integraWrxPauseFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 35 }
+
+integraWrxOpErrors OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 36 }
+
+integraWrxFrameErrors OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 37 }
+
+integraWtxGoodFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 38 }
+
+integraWtxErrors OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 39 }
+
+integraWtxFifoErr OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 40 }
+
+integraWtxBcastFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 41 }
+
+integraWtxMcastFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 42 }
+
+integraWtxUrunErrors OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 43 }
+
+integraWtxCntrlFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 44 }
+
+integraWtxVlanFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 45 }
+
+integraWtxPauseFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 46 }
+
+integraWtxSingleCollisions OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 47 }
+
+integraWtxMultiCollisions OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 48 }
+
+integraWtxDeferred OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 49 }
+
+integraWtxLateCollisions OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 50 }
+
+integraWtxExcessCollisions OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 51 }
+
+integraWtxExcessDeferral OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 52 }
+
+integraWtxAlignErrors OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 53 }
+
+integraWtxCarrierErrors OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 54 }
+
+integraWtxCollisions OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      ""
+              ::= { integraWifPortStcEntry 55 }
+
+
+
+-- Configuration applying/saving objects
+
+integraWexecuteConfig OBJECT-TYPE
+              SYNTAX INTEGER {
+                 execute(1)
+              }
+              MAX-ACCESS  read-write
+              STATUS current
+              DESCRIPTION "This object can only be set to 1.
+                           It initiates new running configuration 
+                           applying using values, that have been set before.
+                           Setting it when no new changes are available
+                           will do nothing and return an error.
+                           GET will return 0 if there were no errors,
+                           while executing configuration or will return
+                           a bitmask, that shows which SET requests have failed.
+                           Those failed requests will be shown bit wise
+                           from LSB as follows:
+                           BIT0 radioTxMuteDuration
+                           BIT1 radioTxFrequency
+                           BIT2 radioTxPower"
+              ::= { integraW 6 }
+
+integraWneedStore OBJECT-TYPE
+              SYNTAX INTEGER {
+                 no(0)
+              }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "This object shows if there is unsaved,
+                           but executed (running) configuration.
+                           Unsaved changes will be lost after
+                           device reboot. Unsaved entities are shown
+                           bit wise, starting from LSB as follows:
+                           BIT0 Aggregation
+                           BIT1 Event log
+                           BIT2 Modem
+                           BIT3 Network
+                           BIT4 Performance
+                           BIT5 Radio
+                           BIT6 SNMP
+                           BIT7 Synchronous Ethernet
+                           BIT8 System"
+              ::= { integraW 7 }
+
+integraWstoreConfig OBJECT-TYPE
+              SYNTAX INTEGER {
+                 store(1)
+              }
+              MAX-ACCESS  read-write
+              STATUS current
+              DESCRIPTION "This object can only be set to 1.
+                           It initiates saving of running configuration.
+                           It will only work if there are unsaved,
+                           but executed (running) changes (configuration).
+                           Setting it when no new running configuration
+                           is available will do nothing and return an error."
+              ::= { integraW 8 }
+
+
+-- IP settings
+
+integraWnetCfg OBJECT IDENTIFIER ::= { integraW 9 }
+
+integraWnetCfgIPaddress OBJECT-TYPE
+              SYNTAX IpAddress
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION "Local IP address"
+              ::= { integraWnetCfg 1 }
+
+integraWnetCfgIPmask OBJECT-TYPE
+              SYNTAX IpAddress
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION "Local IP mask"
+              ::= { integraWnetCfg 2 }
+
+integraWnetCfgIPgateway OBJECT-TYPE
+              SYNTAX IpAddress
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION "IP gateway
+                          Send '0' or '255.255.255.255' to clear."
+              ::= { integraWnetCfg 3 }
+
+integraWnetCfgRemoteIPaddress OBJECT-TYPE
+              SYNTAX IpAddress
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Remote IP address"
+              ::= { integraWnetCfg 4 }
+
+
+-- Conformance
+
+integraWConformance OBJECT IDENTIFIER ::= { integraW 10 }
+integraWCompliances OBJECT IDENTIFIER ::= { integraWConformance 1 }
+
+integraWCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION "The compliance statement for SNMP engine which
+                 implements the SAF Tehnika Integra-W device."
+    MODULE -- this module
+      MANDATORY-GROUPS { 
+                integraWMiscGroup,
+                integraWRadioGroup,
+                integraWModemGroup,
+                integraWSystemGroup,
+                integraWEthernetGeneralGroup,
+                integraWEthernetMiiPortGroup }
+    ::= { integraWCompliances 1 }
+integraWGroups  OBJECT IDENTIFIER ::= { integraWConformance 2 }
+
+integraWMiscGroup OBJECT-GROUP
+   OBJECTS {
+          integraWtimestamp
+   }
+   STATUS   current
+   DESCRIPTION "misc data"
+   ::= { integraWGroups 1 }
+
+integraWRadioGroup OBJECT-GROUP
+   OBJECTS {
+          integraWradioTxPower,
+          integraWradioTxFrequency,
+          integraWradioRxLevel,
+          integraWradioSide,
+          integraWradioTxMute,
+          integraWradioDuplexShift,
+          integraWradioRxFrequency,
+          integraWradioTemperature,
+          integraWradioTxMuteDuration,
+          integraWradioRangeEntryIndex,
+          integraWradioRangeDescr,
+          integraWradioRangeTxPower,
+          integraWradioRangeTxFrequency,
+          integraWradioPLL
+   }
+   STATUS   current
+   DESCRIPTION "Radio group."
+   ::= { integraWGroups 2 }
+
+integraWModemGroup OBJECT-GROUP
+   OBJECTS {
+          integraWmodemAcquireStatus,
+          integraWmodemMse,
+          integraWmodemFecLoad,
+          integraWmodemSyncLoss,
+          integraWmodemBandwidth,
+          integraWmodemModulation,
+          integraWmodemRxModulation,
+          integraWmodemTxModulation,
+          integraWmodemRxCapacity,
+          integraWmodemTxCapacity,
+          integraWmodemAcmEngine,
+          integraWmodemSignalQuality
+   }
+   STATUS   current
+   DESCRIPTION "Modem group."
+   ::= { integraWGroups 3 }
+
+integraWSystemGroup OBJECT-GROUP
+   OBJECTS {
+          integraWsysCPUtemperature,
+          integraWsysLicenseExpire,
+          integraWsysLicenseGenStatus,
+          integraWsysPSUvoltage,
+          integraWsysPSUcurrent,
+          integraWsysPSUpower,
+          integraWsysBoardTemperature,
+          integraWsysFreeMemory,
+          integraWsysCPUidle,
+          integraWexecuteConfig,
+          integraWneedStore,
+          integraWstoreConfig
+   }
+   STATUS   current
+   DESCRIPTION "System group."
+   ::= { integraWGroups 4 }
+
+integraWEthernetGeneralGroup OBJECT-GROUP
+   OBJECTS {
+          integraWifPortStatIndex,
+          integraWifPortStatDescr,
+          integraWifPortType,
+          integraWifPortMtu,
+          integraWifPortSpeed,
+          integraWifPortPhysAddress,
+          integraWifPortAdminStatus,
+          integraWifPortOperStatus,
+          integraWifPortLastChange,
+          integraWifPortAutoneg,
+          integraWifPortDuplex,
+          integraWifPortSyncEthActive,
+          integraWifPortSyncEthPrio,
+          integraWifPortFlowControl,
+          integraWifPortStcIndex,
+          integraWifPortStcDescr,
+          integraWifTimePassed,
+          integraWnetCfgIPaddress,
+          integraWnetCfgIPmask,
+          integraWnetCfgIPgateway,
+          integraWnetCfgRemoteIPaddress
+   }
+   STATUS current
+   DESCRIPTION "A collection to objects, providing info applicable to
+               all network interfaces."
+   ::= { integraWGroups 5 }
+
+integraWEthernetMiiPortGroup OBJECT-GROUP
+   OBJECTS {
+          integraWrxDetected,
+          integraWrxDropped,
+          integraWtxDetected,
+          integraWtxDropped,
+          integraWrxBytes,
+          integraWtxBytes,
+          integraWrx64Frames,
+          integraWrx65to127Frames,
+          integraWrx128to255Frames,
+          integraWrx256to511Frames,
+          integraWrx512to1023Frames,
+          integraWrx1024toMaxFrames,
+          integraWrxUsizeFrames,
+          integraWrxOsizeFrames,
+          integraWtx64Frames,
+          integraWtx65to127Frames,
+          integraWtx128to255Frames,
+          integraWtx256to511Frames,
+          integraWtx512to1023Frames,
+          integraWtx1024toMaxFrames,
+          integraWtxUsizeFrames,
+          integraWtxOsizeFrames,
+          integraWrxGoodFrames,
+          integraWrxErrors,
+          integraWrxFifoErr,
+          integraWrxCRCErrors,
+          integraWrxBcastFrames,
+          integraWrxMcastFrames,
+          integraWrxCntrlFrames,
+          integraWrxLenErrors,
+          integraWrxVlanFrames,
+          integraWrxPauseFrames,
+          integraWrxOpErrors,
+          integraWrxFrameErrors,
+          integraWtxGoodFrames,
+          integraWtxErrors,
+          integraWtxFifoErr,
+          integraWtxBcastFrames,
+          integraWtxMcastFrames,
+          integraWtxUrunErrors,
+          integraWtxCntrlFrames,
+          integraWtxVlanFrames,
+          integraWtxPauseFrames,
+          integraWtxSingleCollisions,
+          integraWtxMultiCollisions,
+          integraWtxDeferred,
+          integraWtxLateCollisions,
+          integraWtxExcessCollisions,
+          integraWtxExcessDeferral,
+          integraWtxAlignErrors,
+          integraWtxCarrierErrors,
+          integraWtxCollisions
+   }
+   STATUS current
+   DESCRIPTION "A collection of objects, providing info applicable 
+               only to MII group interfaces."
+   ::= { integraWGroups 6 }
+
+END
