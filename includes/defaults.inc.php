@@ -560,6 +560,7 @@ $config['bad_iftype'][] = 'aal5';
 $config['bad_iftype'][] = 'shdsl';
 $config['bad_iftype'][] = 'mpls';
 
+$config['bad_if_regexp'][] = '/^lo[0-9]*.*/';
 $config['bad_if_regexp'][] = '/^ng[0-9]+$/';
 $config['bad_if_regexp'][] = '/^sl[0-9]/';
 
