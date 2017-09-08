@@ -81,20 +81,42 @@ class Config
 
     /**
      * Get a setting from the $config['os'] array using the os of the given device
-     * The sames as Config::get("os.{$device['os']}.$key")
+     * If that is not set, fallback to the same global config key
      *
-     * @param array $device Device array
+     * @param string $os The os name
      * @param string $key period separated config variable name
      * @param mixed $default optional value to return if the setting is not set
      * @return mixed
      */
-    public static function getOsSetting($device, $key, $default = null)
+    public static function getOsSetting($os, $key, $default = null)
     {
-        if (!isset($device['os'])) {
-            return $default;
+        if ($os) {
+            $os_key = "os.$os.$key";
+
+            if (self::has($os_key)) {
+                return self::get($os_key);
+            }
         }
 
-        return self::get("os.{$device['os']}.$key", $default);
+        return self::get($key, $default);
+    }
+
+    /**
+     * Get the merged array from the global and os settings for the specified key.
+     * Removes any duplicates.
+     * When the arrays have keys, os settings take precedence over global settings
+     *
+     * @param string $os The os name
+     * @param string $key period separated config variable name
+     * @param array $default optional array to return if the setting is not set
+     * @return array
+     */
+    public static function getCombined($os, $key, $default = array())
+    {
+        return array_unique(array_merge(
+            (array)self::get($key, $default),
+            (array)self::getOsSetting($os, $key, $default)
+        ));
     }
 
     /**
