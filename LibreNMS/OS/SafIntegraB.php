@@ -114,9 +114,18 @@ class SafIntegraB extends OS implements
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.1.2.1.0',
-                'saf-integrab-rx',
+                'saf-integrab-tx',
                 'integraBradioTxPower',
-                'Rx Power'
+                'Tx Power'
+            ),
+            // SAF-INTEGRAB-MIB::integraBradioRxLevel
+            new WirelessSensor(
+                'power',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.7571.100.1.1.7.1.2.3.0',
+                'saf-integrab-rx-level',
+                'integraBradioRxLevel',
+                'Rx Level'
             ),
         );
     }
