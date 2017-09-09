@@ -1,0 +1,6 @@
+os: remoteye4
+text: 'Toshiba RemotEye4'
+type: power
+icon: toshiba
+mib_dir:
+    - toshiba
