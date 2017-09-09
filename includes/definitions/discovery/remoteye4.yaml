@@ -54,6 +54,8 @@ modules:
                     index: 'upsBatteryVoltage.{{ $index }}'
                     descr: Battery
         current:
+            options:
+                divisor: 10
             data:
                 -
                     oid: upsInputCurrentPhaseA
@@ -87,7 +89,7 @@ modules:
                     descr: Output Phase C
         frequency:
             options:
-                divisor: 1000
+                divisor: 10
             data:
                 -
                     oid: upsInputFrequency
