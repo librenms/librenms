@@ -127,7 +127,7 @@ discovery:
                     $discovery[$type] .= "
                 -
                     oid: $table_name
-                    value: $value,
+                    value: $value
                     num_oid: {$tmp_table[$value]}.
                     descr: $descr";
                     if ($multiplier) {
