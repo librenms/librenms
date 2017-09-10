@@ -123,13 +123,8 @@ if (isset($sort) && !empty($sort)) {
     }
 }
 
-if (isset($current)) {
-    $limit_low = (($current * $rowCount) - ($rowCount));
-    $limit_high = $rowCount;
-}
-
 if ($rowCount != -1) {
-    $sql .= " LIMIT $limit_low,$limit_high";
+    $sql .= " LIMIT $current,$rowCount";
 }
 
 $query = 'SELECT DISTINCT(`ports`.`port_id`),`ports`.*';
@@ -175,10 +170,9 @@ foreach (dbFetchRows($query, $param) as $port) {
 }
 
 $output = array(
-    'current' => $current,
-    'rowCount' => $rowCount,
-    'rows' => $response,
-    'total' => $total,
+    'draw' => $draw,
+    'recordsFiltered' => $total,
+    'recordsTotal' => $total,
+    'data' => $response,
 );
-
-echo _json_encode($output);
+echo json_encode($output);

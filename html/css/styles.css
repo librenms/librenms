@@ -317,6 +317,11 @@ A.purple:visited, a.purple, .purple { color: #740074; }
 .greybg  { background-color: #DEEFEF; }
 .blackbg { background-color: #000000; }
 
+
+td.greenTableItem  { color: #008C00; }
+td.blueTableItem   { color: #0000ff; }
+td.redTableItem    { color: #CC0000; }
+
 .selector {
   width:275px;
 }
