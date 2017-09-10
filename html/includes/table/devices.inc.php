@@ -222,7 +222,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
         }
 
         $col_port = '<div class="device-table-metrics">';
-        $col_port .= implode(count($metrics) > 1 ? '<br />' : '', $metrics);
+        $col_port .= implode(count($metrics) == 2 ? '<br />' : '', $metrics);
         $col_port .= '</div>';
     } else {
         $platform = $device['hardware'];
