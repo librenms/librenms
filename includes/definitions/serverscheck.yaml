@@ -5,3 +5,5 @@ icon: serverscheck
 discovery:
     - sysObjectId:
         - .1.3.6.1.4.1.17095
+mib_dir:
+    - serverscheck
