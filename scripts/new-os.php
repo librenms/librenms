@@ -84,7 +84,7 @@ discovery:
         }
 
         if ($os === 'generic') {
-            c_ech("Base discovery file created,");
+            c_echo("Base discovery file created,");
         }
     }
 
