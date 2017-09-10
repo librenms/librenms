@@ -125,7 +125,6 @@ if (empty($config['favicon'])) {
   <link href="css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
   <link href="css/toastr.min.css" rel="stylesheet" type="text/css" />
   <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
-  <link href="css/jquery.bootgrid.min.css" rel="stylesheet" type="text/css" />
   <link href="css/datatables.min.css" rel="stylesheet" type="text/css" />
   <link href="css/tagmanager.css" rel="stylesheet" type="text/css" />
   <link href="css/mktree.css" rel="stylesheet" type="text/css" />
@@ -157,7 +156,6 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
   <script src="js/jquery-ui.min.js"></script>
   <script src="js/tagmanager.js"></script>
   <script src="js/mktree.js"></script>
-  <script src="js/jquery.bootgrid.min.js"></script>
   <script src="js/datatables.min.js"></script>
   <script src="js/handlebars.min.js"></script>
   <script src="js/pace.min.js"></script>
