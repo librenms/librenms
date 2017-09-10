@@ -13,7 +13,7 @@ if ($vars['errors']) {
 }
 ?>
 <div class="panel panel-default panel-condensed">
-    <div >
+    <div class="table-responsive">
         <table id="ports" class="table table-condensed table-hover">
             <thead>
                 <tr>
@@ -55,7 +55,8 @@ $('#ports').DataTable( {
     "serverSide": true,
     "processing": true,
     "scrollX": false,
-    "responsive": true,
+    "sScrollX": "100%",
+    "sScrollXInner": "100%",
     "dom":  "ltip",
     "ajax": {
         "url": "ajax_table.php",
