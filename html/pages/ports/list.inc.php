@@ -18,7 +18,7 @@ if ($vars['errors']) {
             <thead>
                 <tr>
                     <th data-column-id="device">Device</th>
-                    <th data-column-id="port"<?php echo $sort ?>>Port</th>
+                    <th data-column-id="port">Port</th>
                     <th data-column-id="ifLastChange">Status Changed</th>
                     <th data-column-id="ifConnectorPresent" data-visible="false">Connected</th>
                     <th data-column-id="ifSpeed">Speed</th>
@@ -55,6 +55,7 @@ $('#ports').DataTable( {
     "serverSide": true,
     "processing": true,
     "scrollX": false,
+    "responsive": true,
     "dom":  "ltip",
     "ajax": {
         "url": "ajax_table.php",
@@ -73,9 +74,6 @@ $('#ports').DataTable( {
             "ignore": "<?php echo mres($vars['ignore']); ?>",
             "deleted": "<?php echo mres($vars['deleted']); ?>",
             "errors": "<?php echo mres($vars['errors']); ?>",
-            "current": "1",
-            "rowCount": "1000",
-            "sort[port]":"asc",
         }
     },
     columns: [
@@ -130,6 +128,7 @@ $('#ports').DataTable( {
             "className": "redTableItem",
             "targets": [10, 11]
         },
-    ]
+    ],
+    "order": [[1, "asc"]]
 } );
 </script>
