@@ -33,12 +33,9 @@ the buttons will depend on the area of the website being used but btn-sm is prob
 ### Tables
 
 Unless the table being used will only ever display a handful of items - yeah that's what we all said, then you need to
-write your table using [JQuery Bootgrid](http://www.jquery-bootgrid.com/). This shouldn't take that much more code to
+write your table using [JQuery TableGrid](https://datatables.net/). This shouldn't take that much more code to
 do this but provides so much flexibility along with stopping the need for retrieving all the data from SQL in the first
 place.
-
-As an example pull request, see [PR 706](https://github.com/librenms/librenms/pull/706/files) to get an idea of what
-it's like to convert an existing pure html table to Bootgrid.
 
 ### Datetime format
 

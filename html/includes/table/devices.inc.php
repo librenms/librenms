@@ -105,13 +105,8 @@ if (!isset($sort) || empty($sort)) {
 
 $sql .= " ORDER BY $sort";
 
-if (isset($current)) {
-    $limit_low = (($current * $rowCount) - ($rowCount));
-    $limit_high = $rowCount;
-}
-
 if ($rowCount != -1) {
-    $sql .= " LIMIT $limit_low,$limit_high";
+    $sql .= " LIMIT $current,$rowCount";
 }
 
 $sql = "SELECT DISTINCT(`devices`.`device_id`),`devices`.* $sql";
@@ -121,7 +116,6 @@ if (!isset($_POST['format'])) {
 }
 
 list($format, $subformat) = explode('_', $_POST['format']);
-
 foreach (dbFetchRows($sql, $param) as $device) {
     if (isset($bg) && $bg == $list_colour_b) {
         $bg = $list_colour_a;
@@ -251,11 +245,10 @@ foreach (dbFetchRows($sql, $param) as $device) {
         'actions' => $actions,
     );
 }//end foreach
-
 $output = array(
-    'current' => $current,
-    'rowCount' => $rowCount,
-    'rows' => $response,
-    'total' => $total,
+    'draw' => $draw,
+    'recordsFiltered' => $total,
+    'recordsTotal' => $total,
+    'data' => $response,
 );
-echo _json_encode($output);
+echo json_encode($output);

@@ -6,7 +6,7 @@ LibreNMS 3rd party acknowledgements
 
   - Bootstrap (http://getbootstrap.com/): MIT
   - Font Awesome (http://fontawesome.io/icons/): MIT License
-  - Jquery Bootgrid (http://www.jquery-bootgrid.com/): MIT License
+  - Jquery DataTables (http://datatables.net/): MIT License
   - Pace (https://github.com/HubSpot/pace): Open License
   - Twitter typeahead (http://twitter.github.io/typeahead.js/): Open License
   - Vis (http://visjs.org/): MIT / Apache 2.0

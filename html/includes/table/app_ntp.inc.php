@@ -6,8 +6,8 @@ $options['filter']['ignore'] = array('=',0);
 $options['type'] = 'ntp';
 $components = $component->getComponents(null, $options);
 
-$first = $_POST['current']-1;           // Which record do we start on.
-$last = $first + $_POST['rowCount'];    // Which record do we end on.
+$first = $current;           // Which record do we start on.
+$last = $first + $rowCount;    // Which record do we end on.
 $count = 0;
 // Loop through each device in the component array
 foreach ($components as $devid => $comp) {
@@ -100,9 +100,9 @@ if ($count == 0) {
 }
 
 $output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $count,
+    'draw' => $draw,
+    'recordsFiltered' => $count,
+    'recordsTotal' => $count,
+    'data' => $response,
 );
-echo _json_encode($output);
+echo json_encode($output);

@@ -2,29 +2,13 @@
     <div class="panel-heading">
         <strong>IPv6 Addresses</strong>
     </div>
-    <table id="ipv6-search" class="table table-hover table-condensed table-striped">
-        <thead>
-            <tr>
-                <th data-column-id="hostname">Device</th>
-                <th data-column-id="interface">Interface</th>
-                <th data-column-id="address" data-sortable="false">Address</th>
-                <th data-column-id="description" data-sortable="false">Description</th>
-            </tr>
-        <thead>
-    </table>
-</div>
-
-<script>
-var grid = $("#ipv6-search").bootgrid({
-    ajax: true,
-    rowCount: [50, 100, 250, -1],
-    templates: {
-        header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
-                "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\">"+
-                "<form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\">"+
-                "<div class=\"form-group\">"+
-                "<select name=\"device_id\" id=\"device_id\" class=\"form-control input-sm\">"+
-                "<option value=\"\">All Devices</option>"+
+    <div id="ipv6-search-header" class="bootgrid-header container-fluid">
+        <div class="row">
+            <div class="col-sm-9 actionBar"><span class="pull-left">
+                <form method="post" action class="form-inline" role="form">
+                    <div class="form-group">
+                        <select name="device_id" id="device_id" class="form-control input-sm">
+                            <option value="">All Devices</option>"
 <?php
 
 $sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName` FROM `devices`';
@@ -38,46 +22,89 @@ if (is_admin() === false && is_read() === false) {
 $sql .= " $where ORDER BY `hostname`";
 
 foreach (dbFetchRows($sql, $param) as $data) {
-    echo '"<option value=\"'.$data['device_id'].'\""+';
+    echo '<option value="'.$data['device_id'].'"';
     if ($data['device_id'] == $_POST['device_id']) {
-        echo '" selected"+';
+        echo ' selected';
     }
 
-    echo '">'.format_hostname($data, $data['hostname']).'</option>"+';
+    echo '>'.format_hostname($data, $data['hostname']).'</option>';
 }
 ?>
-                "</select>"+
-                "</div>"+
-                "<div class=\"form-group\">"+
-                "<select name=\"interface\" id=\"interface\" class=\"form-control input-sm\">"+
-                "<option value=\"\">All Interfaces</option>"+
-                "<option value=\"Loopback%\""+
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select name="interface" id="interface" class="form-control input-sm">
+                            <option value="">All Interfaces</option>
+                            <option value="Loopback%"
 <?php
 if ($_POST['interface'] == 'Loopback%') {
-    echo '" selected "+';
+    echo ' selected ';
 }
 
 ?>
-
-                ">Loopbacks</option>"+
-                "<option value=\"Vlan%\""+
+>Loopbacks</option>
+                            <option value="Vlan%"
 <?php
 if ($_POST['interface'] == 'Vlan%') {
-    echo '" selected "+';
+    echo ' selected ';
 }
 
 ?>
+                            >VLANs</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="address" id="address" size=40 value="<?php echo $_POST['address']; ?>" class="form-control input-sm" placeholder="IPv6 Address"/>
+                    </div>
+                    <button type="submit" class="btn btn-default input-sm">Search</button>
+                </form>
+            </span></div>
+        </div>
+    </div>
+    <table id="ipv6-search" class="table table-hover table-condensed table-striped">
+        <thead>
+            <tr>
+                <th data-column-id="hostname">Device</th>
+                <th data-column-id="interface">Interface</th>
+                <th data-column-id="address" data-sortable="false">Address</th>
+                <th data-column-id="description" data-sortable="false">Description</th>
+            </tr>
+        <thead>
+    </table>
+</div>
 
-                ">VLANs</option>"+
-                "</select>"+
-                "</div>"+
-                "<div class=\"form-group\">"+
-                "<input type=\"text\" name=\"address\" id=\"address\" size=40 value=\"<?php echo $_POST['address']; ?>\" class=\"form-control input-sm\" placeholder=\"IPv6 Address\"/>"+
-                "</div>"+
-                "<button type=\"submit\" class=\"btn btn-default input-sm\">Search</button>"+
-                "</form></span></div>"+
-                  "<div class=\"col-sm-3 actionBar\"><p class=\"{{css.actions}}\"></p></div></div></div>"
+<script>
+$('#ipv6-search').DataTable( {
+    "lengthMenu": [[50, 100, 250, -1], [50, 100, 250, "All"]],
+    "serverSide": true,
+    "processing": true,
+    "scrollX": false,
+    "sScrollX": "100%",
+    "sScrollXInner": "100%",
+    "dom":  "ltip",
+    "ajax": {
+        "url": "ajax_table.php",
+        "type": "POST",
+        "data": {
+            "id": "address-search",
+            "search_type": "ipv6",
+            "device_id": '<?php echo htmlspecialchars($_POST['device_id']); ?>',
+            "interface": '<?php echo mres($_POST['interface']); ?>',
+            "address": '<?php echo mres($_POST['address']); ?>',
+        },
     },
+    "columns": [
+        { "data": "hostname" },
+        { "data": "interface" },
+        { "data": "address" },
+        { "data": "description" },
+    ],
+    "order": [[0, "asc"]],
+} );
+/*
+var grid = $("#ipv6-search").bootgrid({
+    ajax: true,
+    rowCount: [50, 100, 250, -1],
     post: function ()
     {
         return {
@@ -90,5 +117,6 @@ if ($_POST['interface'] == 'Vlan%') {
     },
     url: "ajax_table.php"
 });
+ */
 
 </script>

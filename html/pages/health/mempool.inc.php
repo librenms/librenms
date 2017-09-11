@@ -13,7 +13,34 @@
 </div>
 
 <script>
-    var grid = $("#mempool").bootgrid({
+    $('#mempool').DataTable( {
+        "lengthMenu": [[50, 100, 250, -1], [50, 100, 250, "All"]],
+        "serverSide": true,
+        "processing": true,
+        "scrollX": false,
+        "sScrollX": "100%",
+        "sScrollXInner": "100%",
+        "dom":  "ltip",
+        "ajax": {
+            "url": "ajax_table.php",
+            "type": "POST",
+            "data": {
+                "id": "mempool",
+                "view": '<?php echo $vars['view']; ?>'
+            }
+        },
+        columns: [
+            { "data": "hostname" },
+            { "data": "mempool_descr" },
+            { "data": "graph" },
+            { "data": "mempool_used" },
+            { "data": "mempool_perc" },
+        ],
+        "order": [[0, "asc"]]
+    } );
+
+    /*
+var grid = $("#mempool").bootgrid({
         ajax: true,
         rowCount: [50, 100, 250, -1],
         post: function ()
@@ -35,4 +62,5 @@
         templates: {
         }
     });
+     */
 </script>

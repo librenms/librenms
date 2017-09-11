@@ -53,15 +53,9 @@ if (!isset($sort) || empty($sort)) {
 }
 $sql .= " ORDER BY $sort";
 
-// select only the required rows
-if (isset($current)) {
-    $limit_low  = (($current * $rowCount) - ($rowCount));
-    $limit_high = $rowCount;
-}
 if ($rowCount != -1) {
-    $sql .= " LIMIT $limit_low,$limit_high";
+    $sql .= " LIMIT $current, $rowCount";
 }
-
 // load data from database into response array
 $response = array();
 foreach (dbFetchRows($sql) as $mib) {
@@ -73,9 +67,9 @@ foreach (dbFetchRows($sql) as $mib) {
 }
 
 $output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
+    'draw' => $draw,
+    'recordsFiltered' => $total,
+    'recordsTotal' => $total,
+    'data' => $response,
 );
-echo _json_encode($output);
+echo json_encode($output);

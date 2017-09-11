@@ -23,9 +23,29 @@ if (!$_SESSION['authenticated']) {
 set_debug($_REQUEST['debug']);
 
 $current = $_REQUEST['current'];
+if (isset($_REQUEST['start'])) {
+    $current = $_REQUEST['start'];
+}
 settype($current, 'integer');
+
 $rowCount = $_REQUEST['rowCount'];
+if (isset($_REQUEST['length'])) {
+    $rowCount = $_REQUEST['length'];
+}
 settype($rowCount, 'integer');
+
+
+if (isset($_REQUEST['draw'])) {
+    $draw = $_REQUEST['draw'];
+    settype($draw, 'integer');
+}
+
+if (isset($_REQUEST['order'])) {
+    $sortField = $_REQUEST['columns'][$_REQUEST['order'][0]['column']]['data'];
+    $sortOrder = $_REQUEST['order'][0]['dir'];
+    $sort .= " $sortField $sortOrder";
+}
+
 if (isset($_REQUEST['sort']) && is_array($_POST['sort'])) {
     foreach ($_REQUEST['sort'] as $k => $v) {
         $sort .= " $k $v";

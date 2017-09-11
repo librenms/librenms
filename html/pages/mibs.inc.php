@@ -27,32 +27,44 @@ if (is_module_enabled('poller', 'mib')) {
                 <th data-column-id="oid">Object Id</th>
                 <th data-column-id="syntax">Syntax</th>
                 <th data-column-id="description">Description</th>
-                <!-- th data-column-id="max_access">Maximum Access</th>
-                <th data-column-id="status">Status</th -->
+                <th data-column-id="max_access" data-visible="false">Maximum Access</th>
+                <th data-column-id="status" data-visible="false">Status</th>
                 <th data-column-id="included_by">Included by</th>
                 <th data-column-id="last_modified">Last modified</th>
             </tr>
         </thead>
     </table>
 </div>
-
 <script>
-    var grid = $("#mibs").bootgrid({
-        ajax: true,
-        rowCount: [50, 100, 250, -1],
-        post: function ()
-        {
-            return {
-                id: "mibs",
-                view: '<?php echo $vars['view']; ?>'
-            };
+$("#mibs").DataTable({
+    "lengthMenu": [[50, 100, 250, -1], [50, 100, 250, "All"]],
+    "serverSide": true,
+    "processing": true,
+    "scrollX": false,
+    "sScrollX": "100%",
+    "sScrollXInner": "100%",
+    "dom":  "ltip",
+    "ajax": {
+        "url": "ajax_table.php",
+        "type": "POST",
+        "data": {
+            "id": "mibs",
         },
-        url: "ajax_table.php",
-        formatters: {
-        },
-        templates: {
-        }
-    });
+    },
+    "columns": [
+        { "data": "module" },
+        { "data": "mib" },
+        { "data": "object_type" },
+        { "data": "oid" },
+        { "data": "syntax" },
+        { "data": "description" },
+        { "data": "max_access" },
+        { "data": "status" },
+        { "data": "included_by" },
+        { "data": "last_modified" }
+    ],
+    "order": [[0, "asc"]],
+});
 </script>
 <?php
 } else {
