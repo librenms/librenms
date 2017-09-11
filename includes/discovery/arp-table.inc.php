@@ -23,6 +23,8 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Config;
+
 if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=0)) {
     $vrfs_lite_cisco = $device['vrf_lite_cisco'];
 } else {
@@ -33,8 +35,8 @@ foreach ($vrfs_lite_cisco as $vrf) {
     $context = $vrf['context_name'];
     $device['context_name']=$context;
 
-    if (file_exists($config['install_dir'] . "/includes/discovery/arp-table/{$device['os']}.inc.php")) {
-        include $config['install_dir'] . "/includes/discovery/arp-table/{$device['os']}.inc.php";
+    if (file_exists(Config::get('install_dir') . "/includes/discovery/arp-table/{$device['os']}.inc.php")) {
+        include Config::get('install_dir') . "/includes/discovery/arp-table/{$device['os']}.inc.php";
     } else {
         $arp_data = snmpwalk_group($device, 'ipNetToPhysicalPhysAddress', 'IP-MIB');
         $arp_data = snmpwalk_group($device, 'ipNetToMediaPhysAddress', 'IP-MIB', 1, $arp_data);

@@ -1,6 +1,8 @@
 <?php
 
-if ($config['enable_inventory']) {
+use LibreNMS\Config;
+
+if (Config::get('enable_inventory')) {
     // Legacy entPhysical - junos/timos/cisco
     include 'includes/discovery/entity-physical/entity-physical.inc.php';
 
