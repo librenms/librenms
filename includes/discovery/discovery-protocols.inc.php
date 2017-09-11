@@ -50,7 +50,7 @@ if (Config::get('autodiscovery.xdp') === true) {
             $interface = get_port_by_ifIndex($device['device_id'], $key);
             d_echo($cdp_if_array);
             foreach ($cdp_if_array as $entry_key => $cdp) {
-                if (is_valid_hostname($cdp['cdpCacheDeviceId']) || Config::get('discovery_by_ip')) {
+                if (is_valid_hostname($cdp['cdpCacheDeviceId']) || Config::get('discovery_by_ip', false)) {
                     $cdp_ip = IP::fromHexString($cdp['cdpCacheAddress'], true);
                     $remote_device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ? OR `hostname` = ?', array($cdp['cdpCacheDeviceId'], $cdp['cdpCacheDeviceId'], $cdp_ip));
 
@@ -59,7 +59,7 @@ if (Config::get('autodiscovery.xdp') === true) {
                         !can_skip_discovery(Config::get('autodiscovery.xdp_exclude.sysname_regexp'), $cdp['cdpCacheDeviceId'], $cdp['cdpCacheDeviceId']) &&
                         !can_skip_discovery(Config::get('autodiscovery.xdp_exclude.sysdesc_regexp'), $cdp['cdpCacheVersion'], $cdp['cdpCacheDeviceId'])
                     ) {
-                        if (Config::get('discovery_by_ip')) {
+                        if (Config::get('discovery_by_ip', false)) {
                             $remote_device_id = discover_new_device($cdp_ip, $device, 'CDP', $interface);
                         } else {
                             $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId'], $device, 'CDP', $interface);
