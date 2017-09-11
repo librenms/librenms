@@ -24,21 +24,28 @@ searchbar = "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">
             "<a href='<?php echo generate_url(array('page' => 'poll-log', 'filter' => 'unpolled')); ?>' class='btn btn-danger btn-sm'>Unpolled devices</a>"+
             "</div><div class=\"col-sm-4 actionBar\"><p class=\"{{css.search}}\"></p><p class=\"{{css.actions}}\"></p></div>";
 
-var grid = $("#poll-log").bootgrid({
-    ajax: true,
-    rowCount: [50, 100, 250, -1],
-    columnSelection: false,
-    templates: {
-        header: searchbar
+$('#poll-log').DataTable( {
+    "lengthMenu": [[50, 100, 250, -1], [50, 100, 250, "All"]],
+    "serverSide": true,
+    "processing": true,
+    "scrollX": false,
+    "sScrollX": "100%",
+    "sScrollXInner": "100%",
+    "dom":  "ltip",
+    "ajax": {
+        "url": "ajax_table.php",
+        "type": "POST",
+        "data": {
+            "id": "poll-log",
+            "type": "<?php echo $type;?>"
+        },
     },
-    post: function ()
-    {
-        return {
-            id: "poll-log",
-            type: "<?php echo $type;?>"
-        };
-    },
-    url: "ajax_table.php"
+    "columns": [
+        { "data": "hostname" },
+        { "data": "last_polled" },
+        { "data": "poller_group" },
+        { "data": "last_polled_timetaken" },
+    ],
+    "order": [[0, "asc"]],
 });
-
 </script>

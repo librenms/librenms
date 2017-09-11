@@ -2078,6 +2078,9 @@ label {
     margin: 5px;
 }
 
+#ipv6-search-header {
+    margin: 15px;
+}
 .devices-input-small {
     line-height: 14px;
 }

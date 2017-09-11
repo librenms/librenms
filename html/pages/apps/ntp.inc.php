@@ -91,16 +91,29 @@ print_optionbar_end();
     </thead>
 </table>
 <script>
-    $("#ntp-table").bootgrid({
-        ajax: true,
-        post: function ()
-        {
-            return {
-                id: "app_ntp",
-                view: '<?php echo $vars['view']; ?>',
-                graph: '<?php echo $vars['graph']; ?>',
-            };
+$('#ntp-table').DataTable( {
+    "lengthMenu": [[50, 100, 250, -1], [50, 100, 250, "All"]],
+    "serverSide": true,
+    "processing": true,
+    "scrollX": false,
+    "sScrollX": "100%",
+    "sScrollXInner": "100%",
+    "dom":  "ltip",
+    "ajax": {
+        "url": "ajax_table.php",
+        "type": "POST",
+        "data": {
+            "id": "app_ntp",
+            "view": "<?php echo $vars['view']; ?>",
+            "graph": "<?php echo $vars['graph']; ?>",
         },
-        url: "ajax_table.php",
-    });
+    },
+    "columns": [
+        { "data": "device" },
+        { "data": "peer" },
+        { "data": "stratum" },
+        { "data": "error" },
+    ],
+    "order": [[1, "asc"]],
+});
 </script>
