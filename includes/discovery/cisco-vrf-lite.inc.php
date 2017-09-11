@@ -18,7 +18,9 @@
 global $debug;
 
 // This one only will work with the CISCO-CONTEXT-MAPPING-MIB V2 of cisco
-if ($config['enable_vrf_lite_cisco']) {
+use LibreNMS\Config;
+
+if (Config::get('enable_vrf_lite_cisco')) {
     $ids = array();
 
     // For the moment only will be cisco and the version 3
@@ -42,15 +44,15 @@ if ($config['enable_vrf_lite_cisco']) {
             }
         }
         unset($listVrf);
-        
+
         $listIntance = snmp_walk($device, "cContextMappingProtoInstName", "-Osq -Ln", $mib, null);
         $listIntance = str_replace("cContextMappingProtoInstName.", "", $listIntance);
         $listIntance = str_replace('"', "", $listIntance);
         $listIntance = trim($listIntance);
-        
+
         d_echo("\n[DEBUG]\nUsing $mib\n[/DEBUG]\n");
         d_echo("\n[DEBUG]\n List Intance only names\n$listIntance\n[/DEBUG]\n");
-        
+
         foreach (explode("\n", $listIntance) as $lineIntance) {
             $tmpIntance = explode(" ", $lineIntance, 2);
             //the $tmpIntance[0] will be the context and $tmpIntance[1] the intance
@@ -72,7 +74,7 @@ if ($config['enable_vrf_lite_cisco']) {
             if (!empty($tmpVrf)) {
                 $ids[$tmpVrf['vrf_lite_cisco_id']] = $tmpVrf['vrf_lite_cisco_id'];
                 $vrfUpdate=array();
-                
+
                 foreach ($vrfUpdate as $key => $value) {
                     if ($vrf[$key]!=$value) {
                         $vrfUpdate[$key]=$value;

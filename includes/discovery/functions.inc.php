@@ -12,16 +12,15 @@
  * See COPYING for more details.
  */
 
+use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
 
 function discover_new_device($hostname, $device = '', $method = '', $interface = '')
 {
-    global $config;
-
-    if (!empty($config['mydomain'])) {
-        $full_host = rtrim($hostname, '.') . '.' . $config['mydomain'];
+    if (Config::has('mydomain')) {
+        $full_host = rtrim($hostname, '.') . '.' . Config::get('mydomain');
         if (isDomainResolves($full_host)) {
             $hostname = $full_host;
         }
@@ -40,7 +39,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
         }
     } elseif (filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === true || filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === true) {
         // gethostbyname returned a valid $ip, was $dst_host an IP?
-        if ($config['discovery_by_ip'] === false) {
+        if (!Config::get('discovery_by_ip', false)) {
             d_echo('Discovery by IP disabled, skipping ' . $hostname);
             log_event("$method discovery of " . $hostname . " failed - Discovery by IP disabled", $device['device_id'], 'discovery', 4);
 
@@ -52,15 +51,15 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
 
     $hostname = rtrim($hostname, '.');
     // remove trailing dot
-    if (match_network($config['autodiscovery']['nets-exclude'], $ip)) {
+    if (match_network(Config::get('autodiscovery.nets-exclude'), $ip)) {
         d_echo("$ip in an excluded network - skipping\n");
 
         return false;
     }
 
-    if (match_network($config['nets'], $ip)) {
+    if (match_network(Config::get('nets'), $ip)) {
         try {
-            $remote_device_id = addHost($hostname, '', '161', 'udp', $config['distributed_poller_group']);
+            $remote_device_id = addHost($hostname, '', '161', 'udp', Config::get('distributed_poller_group'));
             $remote_device = device_by_id_cache($remote_device_id, 1);
             echo '+[' . $remote_device['hostname'] . '(' . $remote_device['device_id'] . ')]';
             discover_device($remote_device);
@@ -94,8 +93,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
  */
 function load_discovery(&$device)
 {
-    global $config;
-    $yaml_discovery = $config['install_dir'] . '/includes/definitions/discovery/' . $device['os'] . '.yaml';
+    $yaml_discovery = Config::get('install_dir') . '/includes/definitions/discovery/' . $device['os'] . '.yaml';
     if (file_exists($yaml_discovery)) {
         $device['dynamic_discovery'] = Symfony\Component\Yaml\Yaml::parse(
             file_get_contents($yaml_discovery)
@@ -106,7 +104,7 @@ function load_discovery(&$device)
 
 function discover_device(&$device, $options = null)
 {
-    global $config, $valid;
+    global $valid;
 
     $valid = array();
     // Reset $valid array
@@ -136,25 +134,23 @@ function discover_device(&$device, $options = null)
 
     load_os($device);
     load_discovery($device);
-    if (is_array($config['os'][$device['os']]['register_mibs'])) {
-        register_mibs($device, $config['os'][$device['os']]['register_mibs'], 'includes/discovery/os/' . $device['os'] . '.inc.php');
-    }
+    register_mibs($device, Config::getOsSetting($device, 'register_mibs', array()), 'includes/discovery/os/' . $device['os'] . '.inc.php');
 
     echo "\n";
 
     // If we've specified modules, use them, else walk the modules array
     $force_module = false;
     if ($options['m']) {
-        $config['discovery_modules'] = array();
+        Config::set('discovery_modules', array());
         foreach (explode(',', $options['m']) as $module) {
             if (is_file("includes/discovery/$module.inc.php")) {
-                $config['discovery_modules'][$module] = 1;
+                Config::set("discovery_modules.$module", 1);
                 $force_module = true;
             }
         }
     }
-    foreach ($config['discovery_modules'] as $module => $module_status) {
-        $os_module_status = $config['os'][$device['os']]['discovery_modules'][$module];
+    foreach (Config::get('discovery_modules', array()) as $module => $module_status) {
+        $os_module_status = Config::getOsSetting($device, "discovery_modules.$module");
         d_echo("Modules status: Global" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
         d_echo("OS" . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
         d_echo("Device" . (isset($attribs['discover_' . $module]) ? ($attribs['discover_' . $module] ? '+ ' : '- ') : '  '));
@@ -802,22 +798,16 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
 */
 function check_entity_sensor($string, $device)
 {
-    global $config;
-    $valid  = true;
-    $string = strtolower($string);
-    if (is_array($config['bad_entity_sensor_regex'])) {
-        $fringe = $config['bad_entity_sensor_regex'];
-        if (is_array($config['os'][$device['os']]['bad_entity_sensor_regex'])) {
-            $fringe = array_merge($config['bad_entity_sensor_regex'], $config['os'][$device['os']]['bad_entity_sensor_regex']);
-        }
-        foreach ($fringe as $bad) {
-            if (preg_match($bad . "i", $string)) {
-                $valid = false;
-                d_echo("Ignored entity sensor: $bad : $string");
-            }
+    $fringe = array_merge(Config::get('bad_entity_sensor_regex', array()), Config::getOsSetting($device, 'bad_entity_sensor_regex', array()));
+
+    foreach ($fringe as $bad) {
+        if (preg_match($bad . "i", $string)) {
+            d_echo("Ignored entity sensor: $bad : $string");
+            return false;
         }
     }
-    return $valid;
+
+    return true;
 }
 
 
@@ -1005,35 +995,33 @@ function get_toner_capacity($raw_capacity)
 }
 
 /**
- * @param $descr
- * @return int
+ * @param string $descr
+ * @return bool
  */
 function ignore_storage($descr)
 {
-    global $config;
-    $deny = 0;
-    foreach ($config['ignore_mount'] as $bi) {
+    foreach (Config::get('ignore_mount', array()) as $bi) {
         if ($bi == $descr) {
-            $deny = 1;
             d_echo("$bi == $descr \n");
+            return true;
         }
     }
 
-    foreach ($config['ignore_mount_string'] as $bi) {
-        if (strpos($descr, $bi) !== false) {
-            $deny = 1;
+    foreach (Config::get('ignore_mount_string', array()) as $bi) {
+        if (str_contains($descr, $bi)) {
             d_echo("strpos: $descr, $bi \n");
+            return true;
         }
     }
 
-    foreach ($config['ignore_mount_regexp'] as $bi) {
-        if (preg_match($bi, $descr) > '0') {
-            $deny = 1;
+    foreach (Config::get('ignore_mount_regexp', array()) as $bi) {
+        if (preg_match($bi, $descr)) {
             d_echo("preg_match $bi, $descr \n");
+            return true;
         }
     }
 
-    return $deny;
+    return false;
 }
 
 /**
@@ -1165,10 +1153,9 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
  */
 function sensors($types, $device, $valid, $pre_cache = array())
 {
-    global $config;
     foreach ((array)$types as $sensor_type) {
         echo ucfirst($sensor_type) . ': ';
-        $dir = $config['install_dir'] . '/includes/discovery/sensors/' . $sensor_type .'/';
+        $dir = Config::get('install_dir') . '/includes/discovery/sensors/' . $sensor_type .'/';
 
         if (is_file($dir . $device['os_group'] . '.inc.php')) {
             include $dir . $device['os_group'] . '.inc.php';
@@ -1176,7 +1163,7 @@ function sensors($types, $device, $valid, $pre_cache = array())
         if (is_file($dir . $device['os'] . '.inc.php')) {
             include $dir . $device['os'] . '.inc.php';
         }
-        if (isset($config['os'][$device['os']]['rfc1628_compat']) && $config['os'][$device['os']]['rfc1628_compat']) {
+        if (Config::getOsSetting($device, 'rfc1628_compat', false)) {
             if (is_file($dir  . '/rfc1628.inc.php')) {
                 include $dir . '/rfc1628.inc.php';
             }
@@ -1266,7 +1253,6 @@ function build_cbgp_peers($device, $peer, $af_data, $peer2)
 
 function add_bgp_peer($device, $peer)
 {
-    global $config;
     if (dbFetchCell('SELECT COUNT(*) from `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ?', array($device['device_id'], $peer['ip'])) < '1') {
         $bgpPeers = array(
             'device_id' => $device['device_id'],
@@ -1286,8 +1272,8 @@ function add_bgp_peer($device, $peer)
             'bgpPeerInUpdateElapsedTime' => 0,
         );
         dbInsert($bgpPeers, 'bgpPeers');
-        if ($config['autodiscovery']['bgp'] === true) {
-            $name             = gethostbyaddr($peer['ip']);
+        if (Config::get('autodiscovery.bgp')) {
+            $name = gethostbyaddr($peer['ip']);
             discover_new_device($name, $device, 'BGP');
         }
         echo '+';

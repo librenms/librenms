@@ -23,6 +23,8 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Config;
+
 echo "\nApplications: ";
 
 // fetch applications from the client
@@ -31,7 +33,7 @@ $results = snmpwalk_cache_oid($device, 'nsExtendStatus', array(), 'NET-SNMP-EXTE
 // Load our list of available applications
 $applications = array();
 if ($results) {
-    foreach (glob($config['install_dir'] . '/includes/polling/applications/*.inc.php') as $file) {
+    foreach (glob(Config::get('install_dir') . '/includes/polling/applications/*.inc.php') as $file) {
         $name = basename($file, '.inc.php');
         $applications[$name] = $name;
     }
