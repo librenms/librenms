@@ -3,6 +3,11 @@ if ($_POST['editing']) {
     if ($_SESSION['userlevel'] > "7") {
         $updated = 0;
 
+        if (isset($_POST['parent_id']) && is_numeric($_POST['parent_id'])) {
+            $parent_id = $_POST['parent_id'];
+            dbUpdate(array('parent_id'=>$parent_id), 'devices', '`device_id`=?', array($device['device_id']));
+        }
+
         $override_sysLocation_bool = mres($_POST['override_sysLocation']);
         if (isset($_POST['sysLocation'])) {
             $override_sysLocation_string = $_POST['sysLocation'];
@@ -156,6 +161,25 @@ if ($updated && $update_message) {
       <input id="sysLocation" name="sysLocation" class="form-control" <?php if (!$override_sysLocation) {
             echo(' disabled="1"');
 } ?> value="<?php echo($override_sysLocation_string); ?>" />
+    </div>
+</div>
+<div class="form-group">
+    <label for="parent_id" class="col-sm-2 control-label">This host depends on:</label>
+    <div class="col-sm-6">
+        <select name="parent_id" id="parent_id">
+            <option value="0">None</option>
+            <?php
+                $available_devs = dbFetchRows('SELECT `device_id`,`hostname` FROM `devices` WHERE `device_id` <> ? ORDER BY `hostname` ASC', array($device['device_id']));
+                foreach ($available_devs as $dev) {
+                    if ($device['parent_id'] == $dev['device_id']) {
+                        $selected = 'selected="selected"';
+                    } else {
+                        $selected = '';
+                    }
+                    echo "<option value=".$dev['device_id']." ".$selected.">".$dev['hostname']."</option>";
+                }
+            ?>
+        </select>
     </div>
 </div>
 <div class="form-group">
