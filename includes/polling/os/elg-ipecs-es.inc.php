@@ -1,6 +1,6 @@
 <?php
 /**
- * ericsson-ucp.inc.php
+ * elg-ipecs-es.inc.php
  *
  * LibreNMS os polling module for Ericsson iPECS ES
  *
