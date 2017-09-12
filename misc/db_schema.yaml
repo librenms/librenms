@@ -421,6 +421,7 @@ devices:
     retries: { Field: retries, Type: int(11), 'Null': true, Default: 'NULL', Extra: '' }
     serial: { Field: serial, Type: text, 'Null': true, Default: 'NULL', Extra: '' }
     snmpver: { Field: snmpver, Type: varchar(4), 'Null': false, Default: v2c, Extra: '' }
+    snmp_disable: { Field: snmp_disable, Type: tinyint(1), 'Null': false, Default: '0', Extra: '' }
     status: { Field: status, Type: tinyint(4), 'Null': false, Default: '0', Extra: '' }
     status_reason: { Field: status_reason, Type: varchar(50), 'Null': false, Default: 'NULL', Extra: '' }
     sysContact: { Field: sysContact, Type: text, 'Null': true, Default: 'NULL', Extra: '' }
