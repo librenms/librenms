@@ -312,7 +312,7 @@ echo "</td></tr>";
             output.innerHTML = e.currentTarget.responseText;
             output.scrollTop = output.scrollHeight - output.clientHeight; // scrolls the output area
         };
-        xhr.timeout = 40000; // if no response for 40s, allow the user to retry
+        xhr.timeout = 90000; // if no response for 90s, allow the user to retry
         xhr.ontimeout = function (e) {
             $("#retry-btn").css("display", "");
         };

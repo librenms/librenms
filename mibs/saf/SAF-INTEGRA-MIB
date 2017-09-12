@@ -1,0 +1,40 @@
+	SAF-INTEGRA-MIB DEFINITIONS ::= BEGIN
+
+-- Definitions for include by other SAF Tehnika mib modules
+
+IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, Counter64,
+      TimeTicks
+          FROM SNMPv2-SMI                -- [RFC2578]
+      pointToPoint
+          FROM SAF-ENTERPRISE
+      DisplayString, DateAndTime, PhysAddress
+          FROM SNMPv2-TC
+      OBJECT-GROUP, MODULE-COMPLIANCE
+          FROM SNMPv2-CONF               -- [RFC2580]
+      IANAifType
+          FROM IANAifType-MIB;
+ 
+-- saf            OBJECT IDENTIFIER ::= { enterprises 7571 }
+-- microwaveRadio   OBJECT IDENTIFIER ::= { tehnika 1 }
+-- pointToPoint     OBJECT IDENTIFIER ::= { microwaveRadio 1 }
+
+safIntegra MODULE-IDENTITY
+       LAST-UPDATED "201501060000Z" --  06 jan 2015
+       ORGANIZATION "SAF Tehnika"
+       CONTACT-INFO
+               "SAF Tehnika technical support
+                <techsupport>"
+       DESCRIPTION
+               "SAF Integra management base"
+-- Revision history
+       REVISION   "201501060000Z" --  06 jan 2015
+       DESCRIPTION
+               "Public Release 1.01.
+                IntegraB module separated"
+       REVISION   "201309190000Z" --  19 sep 2013
+       DESCRIPTION
+               "Public Release 1.0"
+       ::= { pointToPoint 7 }
+
+END
