@@ -2081,6 +2081,23 @@ label {
 #ipv6-search-header {
     margin: 15px;
 }
+
+#ipv4-search-header {
+    margin: 15px;
+}
+
+#mac-search-header {
+    margin: 15px;
+}
+
+#arp-search-header {
+    margin: 15px;
+}
+
+#fdb-search-header {
+    margin: 15px;
+}
+
 .devices-input-small {
     line-height: 14px;
 }

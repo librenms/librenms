@@ -101,22 +101,4 @@ $('#ipv6-search').DataTable( {
     ],
     "order": [[0, "asc"]],
 } );
-/*
-var grid = $("#ipv6-search").bootgrid({
-    ajax: true,
-    rowCount: [50, 100, 250, -1],
-    post: function ()
-    {
-        return {
-            id: "address-search",
-            search_type: "ipv6",
-            device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
-            interface: '<?php echo mres($_POST['interface']); ?>',
-            address: '<?php echo mres($_POST['address']); ?>'
-        };
-    },
-    url: "ajax_table.php"
-});
- */
-
 </script>
