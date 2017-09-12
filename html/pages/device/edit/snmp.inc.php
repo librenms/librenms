@@ -2,52 +2,61 @@
 
 if ($_POST['editing']) {
     if ($_SESSION['userlevel'] > '7') {
-        $no_checks    = ($_POST['no_checks'] == 'on');
-        $community    = mres($_POST['community']);
-        $snmpver      = mres($_POST['snmpver']);
-        $transport    = $_POST['transport'] ? mres($_POST['transport']) : $transport = 'udp';
-        $port         = $_POST['port'] ? mres($_POST['port']) : $config['snmp']['port'];
-        $timeout      = mres($_POST['timeout']);
-        $retries      = mres($_POST['retries']);
         $poller_group = isset($_POST['poller_group']) ? mres($_POST['poller_group']) : 0;
-        $port_assoc_mode = mres($_POST['port_assoc_mode']);
-        $max_repeaters = mres($_POST['max_repeaters']);
-        $max_oid      = mres($_POST['max_oid']);
-        $v3           = array(
-            'authlevel'  => mres($_POST['authlevel']),
-            'authname'   => mres($_POST['authname']),
-            'authpass'   => mres($_POST['authpass']),
-            'authalgo'   => mres($_POST['authalgo']),
-            'cryptopass' => mres($_POST['cryptopass']),
-            'cryptoalgo' => mres($_POST['cryptoalgo']),
-        );
+        if ($_POST['no_snmp'] != 'on') {
+            $no_checks    = ($_POST['no_checks'] == 'on');
+            $community    = mres($_POST['community']);
+            $snmpver      = mres($_POST['snmpver']);
+            $transport    = $_POST['transport'] ? mres($_POST['transport']) : $transport = 'udp';
+            $port         = $_POST['port'] ? mres($_POST['port']) : $config['snmp']['port'];
+            $timeout      = mres($_POST['timeout']);
+            $retries      = mres($_POST['retries']);
+            $port_assoc_mode = mres($_POST['port_assoc_mode']);
+            $max_repeaters = mres($_POST['max_repeaters']);
+            $max_oid      = mres($_POST['max_oid']);
+            $v3           = array(
+                'authlevel'  => mres($_POST['authlevel']),
+                'authname'   => mres($_POST['authname']),
+                'authpass'   => mres($_POST['authpass']),
+                'authalgo'   => mres($_POST['authalgo']),
+                'cryptopass' => mres($_POST['cryptopass']),
+                'cryptoalgo' => mres($_POST['cryptoalgo']),
+            );
 
-        // FIXME needs better feedback
-        $update = array(
-            'community'    => $community,
-            'snmpver'      => $snmpver,
-            'port'         => $port,
-            'transport'    => $transport,
-            'poller_group' => $poller_group,
-            'port_association_mode' => $port_assoc_mode,
-        );
+            // FIXME needs better feedback
+            $update = array(
+                'community'    => $community,
+                'snmpver'      => $snmpver,
+                'port'         => $port,
+                'transport'    => $transport,
+                'poller_group' => $poller_group,
+                'port_association_mode' => $port_assoc_mode,
+                'snmp_disable' => 0,
+            );
 
-        if ($_POST['timeout']) {
-            $update['timeout'] = $timeout;
+            if ($_POST['timeout']) {
+                $update['timeout'] = $timeout;
+            } else {
+                $update['timeout'] = array('NULL');
+            }
+
+            if ($_POST['retries']) {
+                $update['retries'] = $retries;
+            } else {
+                $update['retries'] = array('NULL');
+            }
+            $update = array_merge($update, $v3);
         } else {
-            $update['timeout'] = array('NULL');
+            $update['snmp_disable'] = 1;
+            $update['os']           = "ping";
+            $update['hardware']     = mres($_POST['hardware']);
+            $update['features']     = null;
+            $update['version']      = null;
+            $update['icon']         = null;
         }
-
-        if ($_POST['retries']) {
-            $update['retries'] = $retries;
-        } else {
-            $update['retries'] = array('NULL');
-        }
-
-        $update = array_merge($update, $v3);
 
         $device_tmp = deviceArray($device['hostname'], $community, $snmpver, $port, $transport, $v3, $port_assoc_mode);
-        if ($no_checks === true || isSNMPable($device_tmp)) {
+        if ($no_checks === true || $_POST['no_snmp'] == 'on' || isSNMPable($device_tmp)) {
             $rows_updated = dbUpdate($update, 'devices', '`device_id` = ?', array($device['device_id']));
             
             $max_repeaters_set = false;
@@ -109,6 +118,24 @@ $max_oid = get_dev_attrib($device, 'snmp_max_oid');
 
 echo "
     <form id='edit' name='edit' method='post' action='' role='form' class='form-horizontal'>
+    <div class='form-group'>
+    <div class='col-sm-offset-2 col-sm-9'>
+    <div class='checkbox'>
+    <label>
+    <input type='checkbox' name='no_snmp' id='no_snmp' onChange='disableSnmp(this);'".($device['snmp_disable'] ? " checked" : "")."> Disable SNMP?
+    </label>
+    </div>
+    </div>
+    </div>
+    <div id='snmp_override' style='display: ".($device['snmp_disable'] ? "block" : "none").";'>
+    <div class='form-group'>
+    <label for='hardware' class='col-sm-2 control-label'> Hardware</label>
+    <div class='col-sm-4'>
+    <input id='hardware' class='form-control' name='hardware' value='".$device['hardware']."'/>
+    </div>
+    </div>
+    </div>
+    <div id='snmp_conf' style='display: ".($device['snmp_disable'] ? "none" : "block").";'>
     <input type=hidden name='editing' value='yes'>
     <div class='form-group'>
     <label for='snmpver' class='col-sm-2 control-label'>SNMP Details</label>
@@ -251,6 +278,7 @@ echo "        </select>
         </div>
     </div>
 </div>
+</div>
 <?php
 
 if ($config['distributed_poller'] === true) {
@@ -299,6 +327,15 @@ function changeForm() {
     else if(snmpVersion == 'v3') {
         $('#snmpv1_2').hide();
         $('#snmpv3').show();
+    }
+}
+function disableSnmp(e) {
+    if(e.checked) {
+        $('#snmp_conf').hide();
+        $('#snmp_override').show();
+    } else {
+        $('#snmp_conf').show();
+        $('#snmp_override').hide();
     }
 }
 <?php

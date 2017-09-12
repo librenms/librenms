@@ -2090,7 +2090,10 @@ function device_is_up($device, $record_perf = false)
     $response              = array();
     $response['ping_time'] = $ping_response['last_ping_timetaken'];
     if ($ping_response['result']) {
-        if (isSNMPable($device)) {
+        if ($device['snmp_disable']) {
+            $response['status']        = '1';
+            $response['status_reason'] = '';
+        } elseif (isSNMPable($device)) {
             $response['status']        = '1';
             $response['status_reason'] = '';
         } else {
@@ -2104,7 +2107,7 @@ function device_is_up($device, $record_perf = false)
         $response['status_reason'] = 'icmp';
     }
 
-    if ($device['status'] != $response['status']) {
+    if ($device['status'] != $response['status'] || $device['status_reason'] != $response['status_reason']) {
         dbUpdate(
             array('status' => $response['status'], 'status_reason' => $response['status_reason']),
             'devices',
