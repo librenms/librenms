@@ -1,6 +1,8 @@
 <?php
 
-if ($config['enable_pseudowires'] && $device['os_group'] == 'cisco') {
+use LibreNMS\Config;
+
+if (Config::get('enable_pseudowires') && $device['os_group'] == 'cisco') {
     unset($cpw_count);
     unset($cpw_exists);
 

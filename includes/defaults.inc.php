@@ -51,6 +51,7 @@ $config['fping_options']['millisec'] = 200;
 $config['snmpwalk']                  = '/usr/bin/snmpwalk';
 $config['snmpget']                   = '/usr/bin/snmpget';
 $config['snmpbulkwalk']              = '/usr/bin/snmpbulkwalk';
+$config['snmptranslate']             = '/usr/bin/snmptranslate';
 $config['whois']          = '/usr/bin/whois';
 $config['ping']           = '/bin/ping';
 $config['mtr']            = '/usr/bin/mtr';
@@ -619,6 +620,7 @@ $config['auth_ldap_port']   = 389;
 $config['auth_ldap_prefix'] = 'uid=';
 $config['auth_ldap_suffix'] = ',ou=People,dc=example,dc=com';
 $config['auth_ldap_group']  = 'cn=groupname,ou=groups,dc=example,dc=com';
+$config['auth_ldap_uid_attribute'] = 'uidnumber';
 
 $config['auth_ldap_attr']['uid'] = "uid";
 $config['auth_ldap_groupbase']                  = 'ou=group,dc=example,dc=com';

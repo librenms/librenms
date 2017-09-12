@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Config;
+
 $netapp_storage = snmpwalk_cache_oid($device, 'dfEntry', null, 'NETAPP-MIB');
 
 if (is_array($netapp_storage)) {
@@ -16,28 +18,28 @@ if (is_array($netapp_storage)) {
             $used = ($storage['dfKBytesUsed'] * $units);
         }
 
-        foreach ($config['ignore_mount'] as $bi) {
+        foreach (Config::get('ignore_mount', array()) as $bi) {
             if ($bi == $descr) {
-                $deny = 1;
                 d_echo("$bi == $descr \n");
+                continue;
             }
         }
 
-        foreach ($config['ignore_mount_string'] as $bi) {
+        foreach (Config::get('ignore_mount_string', array()) as $bi) {
             if (strpos($descr, $bi) !== false) {
-                $deny = 1;
                 d_echo("strpos: $descr, $bi \n");
+                continue;
             }
         }
 
-        foreach ($config['ignore_mount_regexp'] as $bi) {
+        foreach (Config::get('ignore_mount_regexp', array()) as $bi) {
             if (preg_match($bi, $descr) > '0') {
-                $deny = 1;
                 d_echo("preg_match $bi, $descr \n");
+                continue;
             }
         }
 
-        if (!$deny && is_numeric($index)) {
+        if (is_numeric($index)) {
             discover_storage($valid_storage, $device, $index, $fstype, 'netapp-storage', $descr, $size, $units, $used);
         }
 

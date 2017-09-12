@@ -1,6 +1,8 @@
 <?php
 
 // Build a dictionary of vlans in database
+use LibreNMS\Config;
+
 $vlans_dict = array();
 foreach (dbFetchRows("SELECT `vlan_id`, `vlan_vlan` from `vlans` WHERE `device_id` = ?", array($device['device_id'])) as $vlan_entry) {
     $vlans_dict[$vlan_entry['vlan_vlan']] = $vlan_entry['vlan_id'];
@@ -15,13 +17,13 @@ foreach ($sql_result as $entry) {
 }
 
 $insert = array(); // populate $insert with database entries
-if (file_exists($config['install_dir'] . "/includes/discovery/fdb-table/{$device['os']}.inc.php")) {
-    require $config['install_dir'] . "/includes/discovery/fdb-table/{$device['os']}.inc.php";
+if (file_exists(Config::get('install_dir') . "/includes/discovery/fdb-table/{$device['os']}.inc.php")) {
+    require Config::get('install_dir') . "/includes/discovery/fdb-table/{$device['os']}.inc.php";
 } elseif ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
-    include $config['install_dir'] . '/includes/discovery/fdb-table/ios.inc.php';
+    include Config::get('install_dir') . '/includes/discovery/fdb-table/ios.inc.php';
 } else {
     // Check generic Q-BRIDGE-MIB and BRIDGE-MIB
-    include $config['install_dir'] . '/includes/discovery/fdb-table/bridge.inc.php';
+    include Config::get('install_dir') . '/includes/discovery/fdb-table/bridge.inc.php';
 }
 
 if (!empty($insert)) {
