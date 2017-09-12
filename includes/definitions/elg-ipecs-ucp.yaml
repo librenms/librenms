@@ -1,4 +1,4 @@
-os: elg-ipecs_ucp
+os: elg-ipecs-ucp
 text: 'Ericsson LG iPECS UCP'
 type: appliance
 icon: ericsson
