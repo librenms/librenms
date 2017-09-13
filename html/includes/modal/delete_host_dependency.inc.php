@@ -43,8 +43,8 @@ if (is_admin() === false) {
 <script>
 $('#hostdep-removal').click('', function(event) {
     event.preventDefault();
-    var parent_id = $("#parent_id").val();
-    var device_id = $("#device_id").val();
+    var parent_id = $("#delete-parent_id").val();
+    var device_id = $("#delete-device_id").val();
     $("#modal_hostname").text();
     $.ajax({
         type: 'POST',
@@ -52,17 +52,18 @@ $('#hostdep-removal').click('', function(event) {
         data: { type: "delete-host-dependency", device_id: device_id },
         dataType: "html",
         success: function(msg) {
-            /* FIXME: need to enable delete button
-            if(msg.indexOf("ERROR:") <= -1) {
-                $("#row_"+map_id).remove();
-            }
-            */
             $("#message").html('<div class="alert alert-info">'+msg+'</div>');
             $("#confirm-delete").modal('hide');
+            setTimeout(function() {
+               location.reload(1);
+            }, 1000);
         },
         error: function() {
             $("#message").html('<div class="alert alert-info">The host dependency could not be deleted.</div>');
             $("#confirm-delete").modal('hide');
+            setTimeout(function() {
+               location.reload(1);
+            }, 1000);
         }
     });
 });

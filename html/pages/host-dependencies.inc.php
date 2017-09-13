@@ -17,8 +17,8 @@ $no_refresh = true;
 $pagetitle[] = 'Host Dependencies';
 
 require_once 'includes/modal/delete_host_dependency.inc.php';
-#require_once 'includes/modal/delete_alert_template.inc.php';
 require_once 'includes/modal/edit_host_dependency.inc.php';
+require_once 'includes/modal/manage_host_dependencies.inc.php';
 ?>
 <div class="row">
     <div class="col-sm-12">
@@ -63,7 +63,7 @@ var grid = $("#hostdeps").bootgrid({
 <?php if ($_SESSION['userlevel'] >= '10') { ?>
                         <div class="col-sm-8 actionBar"> \
                             <span class="pull-left"> \
-                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#manage-dependencies" data-template_id="">Manage Host Dependencies</button> \
+                            <button type="button" class="btn btn-primary btn-sm command-manage" data-toggle="modal" data-target="#manage-dependencies" data-template_id="">Manage Host Dependencies</button> \
                             </span> \
                         </div> \
                 <div class="col-sm-4 actionBar"><p class="{{css.search}}"></p><p class="{{css.actions}}"></p></div></div></div>'
@@ -75,7 +75,7 @@ var grid = $("#hostdeps").bootgrid({
     formatters: {
         "actions": function(column, row) {
             var buttonClass = '';
-            var response =  "<button type='button' class='btn btn-primary btn-sm command-edit' aria-label='Edit' data-toggle='modal' data-target='#edit-dependency' data-device_id='"+row.id+"' data-host_name='"+row.hostname+"' name='edit-host-dependency'><i class='fa fa-pencil' aria-hidden='true'></i></button> ";
+            var response =  "<button type='button' class='btn btn-primary btn-sm command-edit' aria-label='Edit' data-toggle='modal' data-target='#edit-dependency' data-device_id='"+row.id+"' data-host_name='"+row.hostname+"' data-parent_id='"+row.parentid+"' name='edit-host-dependency'><i class='fa fa-pencil' aria-hidden='true'></i></button> ";
             if (row.parent == 'None') {
                 buttonClass = 'command-delete btn btn-danger btn-sm disabled';
             } else {
@@ -89,18 +89,17 @@ var grid = $("#hostdeps").bootgrid({
     e.preventDefault();
         /* Executes after data is loaded and rendered */
     grid.find(".command-edit").on("click", function(e) {
-            $("#edit-device_id").val($(this).data("device_id"));
-            console.log($(this).data("device_id"));
-            $('#edit-dependency').modal('show');
+        $("#edit-device_id").val($(this).data("device_id"));
+        $("#edit-parent_id").val($(this).data("parent_id"));
+        $('#edit-dependency').modal('show');
         $('.modalhostname').text($(this).data("host_name"));
     }).end().find(".command-delete").on("click", function(e) {
         $("#delete-device_id").val($(this).data("device_id"));
         $("#delete-parent_id").val($(this).data("device_parent"));
         $('#confirm-delete').modal('show');
         $('.modalhostname').text($(this).data("host_name"));
-    }).end().find(".wwwwcommand-edit").on("click", function(e) {
-            $('#confirm-delete').modal('show');
+    }).end().find(".command-manage").on("click", function(e) {
+        $('#manage-dependencies').modal('show');
     });
 });
-
 </script>

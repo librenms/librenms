@@ -21,6 +21,6 @@ if (!is_numeric($_POST['device_id'])) {
     echo 'ERROR: Wrong device id!';
     exit;
 } else {
-    $device_deps = dbFetchRows('SELECT device_id, hostname from devices WHERE device_id ` <>  ?', array($_POST['device_id']));
-    echo json_encode($device_deps, true);
+    $device_deps = dbFetchRows('SELECT `device_id`,`hostname` from `devices` WHERE `device_id` <>  ? ORDER BY `hostname` ASC', array($_POST['device_id']));
+    echo json_encode($device_deps, JSON_FORCE_OBJECT);
 }
