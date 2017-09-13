@@ -802,6 +802,10 @@ function RunAlerts()
             $noacc = false;
         }
 
+        if (IsParentDown($alert['device_id'])) {
+            $noiss = true;
+        }
+
         if (IsMaintenance($alert['device_id']) > 0) {
             $noiss = true;
             $noacc = true;
@@ -866,3 +870,22 @@ function ExtTransports($obj)
         echo '; ';
     }
 }//end ExtTransports()
+
+/**
+ * Check if a device's parent is down
+ * @param int $device Device-ID
+ * @return bool
+ */
+function IsParentDown($device)
+{
+    $parent_id = dbFetchCell("SELECT parent_id from `devices` WHERE device_id = ?", array($device));
+    if (!$parent_id || $parent_id == null || $parent_id == 0) {
+        return False;
+    }
+
+    $result = dbFetchCell("SELECT id from alerts WHERE device_id = ? AND state <> 0", array($parent_id));
+    if ($result) {
+        return True;
+    }
+    return False;
+} //end IsParentDown()
