@@ -995,28 +995,31 @@ function get_toner_capacity($raw_capacity)
 }
 
 /**
- * @param string $descr
- * @return bool
+ * Should we ignore this storage device based on teh description? (usually the mount path or drive)
+ *
+ * @param string $os The OS of the device
+ * @param string $descr The description of the storage
+ * @return boolean
  */
-function ignore_storage($descr)
+function ignore_storage($os, $descr)
 {
-    foreach (Config::get('ignore_mount', array()) as $bi) {
-        if ($bi == $descr) {
-            d_echo("$bi == $descr \n");
+    foreach (Config::getOsSetting($os, 'ignore_mount') as $im) {
+        if ($im == $descr) {
+            d_echo("ignored $descr (matched: $im)\n");
             return true;
         }
     }
 
-    foreach (Config::get('ignore_mount_string', array()) as $bi) {
-        if (str_contains($descr, $bi)) {
-            d_echo("strpos: $descr, $bi \n");
+    foreach (Config::getOsSetting($os, 'ignore_mount_string') as $ims) {
+        if (str_contains($descr, $ims)) {
+            d_echo("ignored $descr (matched: $ims)\n");
             return true;
         }
     }
 
-    foreach (Config::get('ignore_mount_regexp', array()) as $bi) {
-        if (preg_match($bi, $descr)) {
-            d_echo("preg_match $bi, $descr \n");
+    foreach (Config::getOsSetting($os, 'ignore_mount_regexp') as $imr) {
+        if (preg_match($imr, $descr)) {
+            d_echo("ignored $descr (matched: $imr)\n");
             return true;
         }
     }

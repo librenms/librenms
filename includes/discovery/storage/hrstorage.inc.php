@@ -43,7 +43,7 @@ if (is_array($hrstorage_array)) {
             continue;
         }
 
-        if (ignore_storage($descr)) {
+        if (ignore_storage($device['os'], $descr)) {
             continue;
         }
 
