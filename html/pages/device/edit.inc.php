@@ -11,6 +11,7 @@ if ($_SESSION['userlevel'] < '7') {
     print_error("Insufficient Privileges");
 } else {
     $panes['device']   = 'Device Settings';
+	$panes['passwords']   = 'Device Passwords';
     $panes['snmp']     = 'SNMP';
     $panes['ports']    = 'Port Settings';
 
