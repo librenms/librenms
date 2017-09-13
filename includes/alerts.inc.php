@@ -881,12 +881,12 @@ function IsParentDown($device)
 {
     $parent_id = dbFetchCell("SELECT `parent_id` from `devices` WHERE device_id = ?", array($device));
     if (!$parent_id || $parent_id == null || $parent_id == 0) {
-        return False;
+        return false;
     }
 
     $result = dbFetchCell("SELECT `status` from `devices` WHERE device_id = ? and status_reason = 'icmp'", array($parent_id));
     if ($result) {
-        return True;
+        return true;
     }
-    return False;
+    return false;
 } //end IsParentDown()

@@ -39,17 +39,17 @@ require_once 'includes/modal/manage_host_dependencies.inc.php';
         </thead>
         <tbody>
 <?php
-        $result = dbFetchRows("SELECT a.device_id as id, a.hostname as child, b.hostname as parent, b.device_id as parentid from devices as a LEFT JOIN devices as b ON a.parent_id = b.device_id ORDER BY a.hostname");
-        foreach ($result as $dev) {
-            if ($dev['parent'] == NULL || $dev['parentid'] == 0) {
-                $parent = 'None';
-                $parentid = 0;
-            } else {
-                $parent = $dev['parent'];
-                $parentid = $dev['parentid'];
-            }
-            echo "<tr><td>".$dev['id']."</td><td>".$dev['child']."</td><td>".$parent."</td><td>".$parentid."</td><td></td></tr>";
-        }
+$result = dbFetchRows("SELECT a.device_id as id, a.hostname as child, b.hostname as parent, b.device_id as parentid from devices as a LEFT JOIN devices as b ON a.parent_id = b.device_id ORDER BY a.hostname");
+foreach ($result as $dev) {
+    if ($dev['parent'] == NULL || $dev['parentid'] == 0) {
+        $parent = 'None';
+        $parentid = 0;
+    } else {
+        $parent = $dev['parent'];
+        $parentid = $dev['parentid'];
+    }
+    echo "<tr><td>".$dev['id']."</td><td>".$dev['child']."</td><td>".$parent."</td><td>".$parentid."</td><td></td></tr>";
+}
 ?>
         </tbody>
     </table>

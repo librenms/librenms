@@ -169,15 +169,15 @@ if ($updated && $update_message) {
         <select name="parent_id" id="parent_id">
             <option value="0">None</option>
             <?php
-                $available_devs = dbFetchRows('SELECT `device_id`,`hostname` FROM `devices` WHERE `device_id` <> ? ORDER BY `hostname` ASC', array($device['device_id']));
-                foreach ($available_devs as $dev) {
-                    if ($device['parent_id'] == $dev['device_id']) {
-                        $selected = 'selected="selected"';
-                    } else {
-                        $selected = '';
-                    }
-                    echo "<option value=".$dev['device_id']." ".$selected.">".$dev['hostname']."</option>";
+            $available_devs = dbFetchRows('SELECT `device_id`,`hostname` FROM `devices` WHERE `device_id` <> ? ORDER BY `hostname` ASC', array($device['device_id']));
+            foreach ($available_devs as $dev) {
+                if ($device['parent_id'] == $dev['device_id']) {
+                    $selected = 'selected="selected"';
+                } else {
+                    $selected = '';
                 }
+                echo "<option value=".$dev['device_id']." ".$selected.">".$dev['hostname']."</option>";
+            }
             ?>
         </select>
     </div>

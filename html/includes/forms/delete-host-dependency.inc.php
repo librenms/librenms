@@ -21,7 +21,7 @@ if (!is_numeric($_POST['device_id'])) {
     echo 'ERROR: Wrong device id!';
     exit;
 } else {
-    if (dbUpdate(array('parent_id' => NULL), 'devices', '`device_id` =  ?', array($_POST['device_id']))) {
+    if (dbUpdate(array('parent_id' => null), 'devices', '`device_id` =  ?', array($_POST['device_id']))) {
         echo 'Host dependency has been deleted.';
         exit;
     } else {
