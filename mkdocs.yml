@@ -115,6 +115,7 @@ pages:
       - Developing/os/Health-Information.md
       - Developing/os/Wireless-Sensors.md
       - Developing/os/Custom-Graphs.md
+      - Developing/os/Settings.md
       - Extensions/Agent-Setup.md
       - Extensions/Alerting.md
       - Extensions/metrics/InfluxDB.md
