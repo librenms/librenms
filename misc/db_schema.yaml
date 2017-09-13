@@ -403,7 +403,6 @@ devices:
     icon: { Field: icon, Type: varchar(255), 'Null': true, Default: 'NULL', Extra: '' }
     ignore: { Field: ignore, Type: tinyint(4), 'Null': false, Default: '0', Extra: '' }
     ip: { Field: ip, Type: varbinary(16), 'Null': true, Default: 'NULL', Extra: '' }
-    iswmi: { Field: iswmi, Type: tinyint(1), 'Null': true, Default: '0', Extra: '' }
     last_discovered: { Field: last_discovered, Type: timestamp, 'Null': true, Default: 'NULL', Extra: '' }
     last_discovered_timetaken: { Field: last_discovered_timetaken, Type: 'double(5,2)', 'Null': true, Default: 'NULL', Extra: '' }
     last_ping: { Field: last_ping, Type: timestamp, 'Null': true, Default: 'NULL', Extra: '' }
@@ -415,7 +414,7 @@ devices:
     notes: { Field: notes, Type: text, 'Null': true, Default: 'NULL', Extra: '' }
     os: { Field: os, Type: varchar(32), 'Null': true, Default: 'NULL', Extra: '' }
     override_sysLocation: { Field: override_sysLocation, Type: tinyint(1), 'Null': true, Default: '0', Extra: '' }
-    parent_id: { Field: parent_id, Type: int(11), 'Null': true, Default: 'NULL', Extra: '' }
+    parent_id: { Field: parent_id, Type: 'int(11) unsigned', 'Null': true, Default: 'NULL', Extra: '' }
     poller_group: { Field: poller_group, Type: int(11), 'Null': false, Default: '0', Extra: '' }
     port: { Field: port, Type: 'smallint(5) unsigned', 'Null': false, Default: '161', Extra: '' }
     port_association_mode: { Field: port_association_mode, Type: int(11), 'Null': false, Default: '1', Extra: '' }
@@ -428,7 +427,7 @@ devices:
     sysContact: { Field: sysContact, Type: text, 'Null': true, Default: 'NULL', Extra: '' }
     sysDescr: { Field: sysDescr, Type: text, 'Null': true, Default: 'NULL', Extra: '' }
     sysName: { Field: sysName, Type: varchar(128), 'Null': true, Default: 'NULL', Extra: '' }
-    sysObjectID: { Field: sysObjectID, Type: varchar(64), 'Null': true, Default: 'NULL', Extra: '' }
+    sysObjectID: { Field: sysObjectID, Type: varchar(128), 'Null': true, Default: 'NULL', Extra: '' }
     timeout: { Field: timeout, Type: int(11), 'Null': true, Default: 'NULL', Extra: '' }
     transport: { Field: transport, Type: varchar(16), 'Null': false, Default: udp, Extra: '' }
     type: { Field: type, Type: varchar(20), 'Null': false, Default: '', Extra: '' }
@@ -442,6 +441,7 @@ devices:
     os: { Name: os, Columns: [os], Unique: false, Type: BTREE }
     last_polled: { Name: last_polled, Columns: [last_polled], Unique: false, Type: BTREE }
     last_poll_attempted: { Name: last_poll_attempted, Columns: [last_poll_attempted], Unique: false, Type: BTREE }
+    parent_id: { Name: parent_id, Columns: [parent_id], Unique: false, Type: BTREE }
 devices_attribs:
   Columns:
     attrib_id: { Field: attrib_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
@@ -573,7 +573,7 @@ graph_types:
     graph_descr: { Field: graph_descr, Type: varchar(255), 'Null': true, Default: 'NULL', Extra: '' }
     graph_order: { Field: graph_order, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
     graph_section: { Field: graph_section, Type: varchar(32), 'Null': false, Default: 'NULL', Extra: '' }
-    graph_subtype: { Field: graph_subtype, Type: varchar(64), 'Null': false, Default: '', Extra: '' }
+    graph_subtype: { Field: graph_subtype, Type: varchar(64), 'Null': false, Default: 'NULL', Extra: '' }
     graph_type: { Field: graph_type, Type: varchar(32), 'Null': false, Default: 'NULL', Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [graph_type, graph_subtype, graph_section], Unique: true, Type: BTREE }
@@ -632,6 +632,7 @@ ipv4_addresses:
 ipv4_mac:
   Columns:
     context_name: { Field: context_name, Type: varchar(128), 'Null': true, Default: 'NULL', Extra: '' }
+    device_id: { Field: device_id, Type: int(11), 'Null': true, Default: 'NULL', Extra: '' }
     ipv4_address: { Field: ipv4_address, Type: varchar(32), 'Null': false, Default: 'NULL', Extra: '' }
     mac_address: { Field: mac_address, Type: varchar(32), 'Null': false, Default: 'NULL', Extra: '' }
     port_id: { Field: port_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
@@ -857,13 +858,15 @@ notifications:
   Columns:
     body: { Field: body, Type: text, 'Null': false, Default: 'NULL', Extra: '' }
     checksum: { Field: checksum, Type: varchar(128), 'Null': false, Default: 'NULL', Extra: '' }
-    datetime: { Field: datetime, Type: timestamp, 'Null': false, Default: CURRENT_TIMESTAMP, Extra: '' }
+    datetime: { Field: datetime, Type: timestamp, 'Null': false, Default: '1970-01-02 00:00:00', Extra: '' }
     notifications_id: { Field: notifications_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
+    severity: { Field: severity, Type: int(11), 'Null': true, Default: '0', Extra: '' }
     source: { Field: source, Type: varchar(255), 'Null': false, Default: '', Extra: '' }
     title: { Field: title, Type: varchar(255), 'Null': false, Default: '', Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [notifications_id], Unique: true, Type: BTREE }
     checksum: { Name: checksum, Columns: [checksum], Unique: true, Type: BTREE }
+    notifications_severity_index: { Name: notifications_severity_index, Columns: [severity], Unique: false, Type: BTREE }
 notifications_attribs:
   Columns:
     attrib_id: { Field: attrib_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
@@ -1076,7 +1079,7 @@ ports:
     ifPhysAddress: { Field: ifPhysAddress, Type: text, 'Null': true, Default: 'NULL', Extra: '' }
     ifPromiscuousMode: { Field: ifPromiscuousMode, Type: varchar(12), 'Null': true, Default: 'NULL', Extra: '' }
     ifSpeed: { Field: ifSpeed, Type: bigint(20), 'Null': true, Default: 'NULL', Extra: '' }
-    ifTrunk: { Field: ifTrunk, Type: varchar(8), 'Null': true, Default: '', Extra: '' }
+    ifTrunk: { Field: ifTrunk, Type: varchar(16), 'Null': true, Default: 'NULL', Extra: '' }
     ifType: { Field: ifType, Type: text, 'Null': true, Default: 'NULL', Extra: '' }
     ifVlan: { Field: ifVlan, Type: varchar(8), 'Null': false, Default: '', Extra: '' }
     ifVrf: { Field: ifVrf, Type: int(11), 'Null': false, Default: '0', Extra: '' }
@@ -1128,6 +1131,17 @@ ports_adsl:
     port_id: { Field: port_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
   Indexes:
     interface_id: { Name: interface_id, Columns: [port_id], Unique: true, Type: BTREE }
+ports_fdb:
+  Columns:
+    device_id: { Field: device_id, Type: 'int(11) unsigned', 'Null': false, Default: 'NULL', Extra: '' }
+    mac_address: { Field: mac_address, Type: varchar(32), 'Null': false, Default: 'NULL', Extra: '' }
+    port_id: { Field: port_id, Type: 'int(11) unsigned', 'Null': false, Default: 'NULL', Extra: '' }
+    vlan_id: { Field: vlan_id, Type: 'int(11) unsigned', 'Null': false, Default: 'NULL', Extra: '' }
+  Indexes:
+    mac_address: { Name: mac_address, Columns: [mac_address], Unique: false, Type: BTREE }
+    ports_fdb_port_id_index: { Name: ports_fdb_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+    ports_fdb_device_id_index: { Name: ports_fdb_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    ports_fdb_vlan_id_index: { Name: ports_fdb_vlan_id_index, Columns: [vlan_id], Unique: false, Type: BTREE }
 ports_perms:
   Columns:
     access_level: { Field: access_level, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
@@ -1300,6 +1314,8 @@ route:
 sensors:
   Columns:
     device_id: { Field: device_id, Type: 'int(11) unsigned', 'Null': false, Default: '0', Extra: '' }
+    entity_link_index: { Field: entity_link_index, Type: 'int(11) unsigned', 'Null': false, Default: '0', Extra: '' }
+    entity_link_type: { Field: entity_link_type, Type: varchar(32), 'Null': true, Default: 'NULL', Extra: '' }
     entPhysicalIndex: { Field: entPhysicalIndex, Type: varchar(16), 'Null': true, Default: 'NULL', Extra: '' }
     entPhysicalIndex_measured: { Field: entPhysicalIndex_measured, Type: varchar(16), 'Null': true, Default: 'NULL', Extra: '' }
     lastupdate: { Field: lastupdate, Type: timestamp, 'Null': false, Default: CURRENT_TIMESTAMP, Extra: 'on update CURRENT_TIMESTAMP' }
@@ -1321,6 +1337,7 @@ sensors:
     sensor_oid: { Field: sensor_oid, Type: varchar(255), 'Null': false, Default: 'NULL', Extra: '' }
     sensor_prev: { Field: sensor_prev, Type: float, 'Null': true, Default: 'NULL', Extra: '' }
     sensor_type: { Field: sensor_type, Type: varchar(255), 'Null': false, Default: 'NULL', Extra: '' }
+    user_func: { Field: user_func, Type: varchar(100), 'Null': true, Default: 'NULL', Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sensor_id], Unique: true, Type: BTREE }
     sensor_host: { Name: sensor_host, Columns: [device_id], Unique: false, Type: BTREE }
@@ -1456,6 +1473,7 @@ syslog:
     datetime: { Name: datetime, Columns: [timestamp], Unique: false, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
     program: { Name: program, Columns: [program], Unique: false, Type: BTREE }
+    priority_level: { Name: priority_level, Columns: [priority, level], Unique: false, Type: BTREE }
 tnmsneinfo:
   Columns:
     device_id: { Field: device_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
@@ -1616,7 +1634,7 @@ wireless_sensors:
     sensor_limit_low_warn: { Field: sensor_limit_low_warn, Type: float, 'Null': true, Default: 'NULL', Extra: '' }
     sensor_limit_warn: { Field: sensor_limit_warn, Type: float, 'Null': true, Default: 'NULL', Extra: '' }
     sensor_multiplier: { Field: sensor_multiplier, Type: int(11), 'Null': false, Default: '1', Extra: '' }
-    sensor_oids: { Field: sensor_oids, Type: varchar(255), 'Null': false, Default: 'NULL', Extra: '' }
+    sensor_oids: { Field: sensor_oids, Type: text, 'Null': false, Default: 'NULL', Extra: '' }
     sensor_prev: { Field: sensor_prev, Type: float, 'Null': true, Default: 'NULL', Extra: '' }
     sensor_type: { Field: sensor_type, Type: varchar(255), 'Null': false, Default: 'NULL', Extra: '' }
   Indexes:
