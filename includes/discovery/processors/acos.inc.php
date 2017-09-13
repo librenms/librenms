@@ -2,7 +2,7 @@
 /**
  * acos.inc.php
  *
- * LibreNMS mempools discovery module for A10 ACOS
+ * LibreNMS processors discovery module for A10 ACOS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,12 @@
 
 if ($device['os'] === 'acos') {
     echo 'ACOS: ';
-    $usage = snmp_get($device, 'axSysMemoryUsage.0', '-Ovq', 'A10-AX-MIB');
-    if (is_numeric($usage)) {
-        discover_mempool($valid_mempool, $device, 0, 'acos', 'System Memory', '1024', null, null);
+    $acos_procs = snmpwalk_group($device, 'axSysCpuTable', 'A10-AX-MIB');
+    foreach ($acos_procs as $proc_index => $proc_info) {
+        $usage = $proc_info['axSysCpuUsageValue'];
+        if (is_numeric($usage)) {
+            $descr = "Proc #$proc_index";
+            discover_processor($valid['processor'], $device, ".1.3.6.1.4.1.22610.2.4.1.3.2.1.3.$proc_index", $proc_index, 'acos', $descr, '1', $usage, null, null);
+        }
     }
 }
