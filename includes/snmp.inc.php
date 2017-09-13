@@ -226,7 +226,7 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
     foreach (explode("\n", $data) as $entry) {
         list($oid,$value)  = explode('=', $entry, 2);
         $oid               = trim($oid);
-        $value             = trim($value);
+        $value             = trim($value, "\" \n\r");
         if (!strstr($value, 'at this OID') && isset($oid)) {
             $array[$oid] = $value;
         }
