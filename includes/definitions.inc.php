@@ -600,6 +600,11 @@ $config['graph_types']['device']['riverbed_passthrough']['section'] = 'network';
 $config['graph_types']['device']['riverbed_passthrough']['order'] = 3;
 $config['graph_types']['device']['riverbed_passthrough']['descr'] = 'Bandwidth Passthrough';
 
+//mikrotik specific graphs
+$config['graph_types']['device']['routeros_leases']['section'] = 'network';
+$config['graph_types']['device']['routeros_leases']['order'] = 0;
+$config['graph_types']['device']['routeros_leases']['descr'] = 'DHCP Lease Count';
+
 // Device Types
 $i = 0;
 $config['device_types'][$i]['text'] = 'Servers';
