@@ -850,6 +850,8 @@ $config['enable_footer'] = 1;
 // Set this to 0 if you want to disable the footer copyright in the web interface
 $config['api_demo'] = 0;
 // Set this to 1 if you want to disable some untrusting features for the API
+$config['api_auth_local'] = false;
+// Set this to true if you have changed auth_mechanism, but want to use mysql database for API-tokens
 // Distributed Poller-Settings
 $config['distributed_poller']                = false;
 $config['distributed_poller_name']           = file_get_contents('/proc/sys/kernel/hostname');
