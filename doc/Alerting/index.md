@@ -53,6 +53,8 @@ Table of Content:
     - [Sensors](Macros.md#macros-sensors)
     - [Misc](Macros.md#macros-misc)
 
+- [Host Dependencies](Hostdependencies.md)
+
 
 # About
 

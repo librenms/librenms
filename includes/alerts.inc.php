@@ -873,17 +873,18 @@ function ExtTransports($obj)
 
 /**
  * Check if a device's parent is down
+ * Returns true if parent is down
  * @param int $device Device-ID
  * @return bool
  */
 function IsParentDown($device)
 {
-    $parent_id = dbFetchCell("SELECT parent_id from `devices` WHERE device_id = ?", array($device));
+    $parent_id = dbFetchCell("SELECT `parent_id` from `devices` WHERE device_id = ?", array($device));
     if (!$parent_id || $parent_id == null || $parent_id == 0) {
         return False;
     }
 
-    $result = dbFetchCell("SELECT id from alerts WHERE device_id = ? AND state <> 0", array($parent_id));
+    $result = dbFetchCell("SELECT `status` from `devices` WHERE device_id = ? and status_reason = 'icmp'", array($parent_id));
     if ($result) {
         return True;
     }
