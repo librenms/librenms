@@ -2,6 +2,8 @@
 
 echo 'RFC1628 ';
 
+$data = snmpwalk_group($device, 'upsOutputPercentLoad', 'UPS-MIB');
+
 $oids = snmp_walk($device, '.1.3.6.1.2.1.33.1.4.4.1.5', '-Osqn', 'UPS-MIB');
 d_echo($oids."\n");
 
