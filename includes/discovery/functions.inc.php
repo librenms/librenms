@@ -1109,10 +1109,10 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         $tmp_vars = $tmp_var[0];
                         foreach ($tmp_vars as $k => $tmp_var) {
                             $tmp_var = preg_replace('/({{ | }}|\$)/', '', $tmp_var);
-                            if ($snmp_data[$tmp_var]) {
+                            if (isset($snmp_data[$tmp_var])) {
                                 $descr = str_replace("{{ \$$tmp_var }}", $snmp_data[$tmp_var], $descr);
                             }
-                            if ($cached_data[$index][$tmp_var]) {
+                            if (isset($cached_data[$index][$tmp_var])) {
                                 $descr = str_replace("{{ \$$tmp_var }}", $cached_data[$index][$tmp_var], $descr);
                             }
                         }

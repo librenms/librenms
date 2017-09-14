@@ -1,0 +1,242 @@
+	-- SmartOptics Enterprise Specific Port MIB.
+--
+-- Copyright (c) 2014, SmartOptics
+-- All rights reserved
+--
+
+MSERIES-PORT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32
+    FROM SNMPv2-SMI
+    DisplayString
+    FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE
+    FROM SNMPv2-CONF
+    PortType, PortStatus, PortMode
+    FROM MSERIES-TC
+    mseries
+    FROM MSERIES-MIB;
+
+smartPort     MODULE-IDENTITY
+                LAST-UPDATED    "201402121344Z"
+                ORGANIZATION    "SmartOptics"
+                CONTACT-INFO    "http://www.smartoptics.com"
+                DESCRIPTION
+                                "This is the enterprise specific Port MIB for SmartOptics M-Series."
+                REVISION        "201402121344Z"
+                DESCRIPTION
+                                "The initial revision of the MSERIES Port MIB."
+
+                ::=  { mseries 3 }
+
+        smartPortObjects   OBJECT IDENTIFIER
+                ::= { smartPort 1 }
+
+        smartPortGeneral   OBJECT IDENTIFIER
+                ::=  { smartPortObjects  1}
+
+        smartPortList   OBJECT IDENTIFIER
+                ::=  { smartPortObjects  2}
+
+        smartPortMIBConformance   OBJECT IDENTIFIER
+                ::=  { smartPort  2}
+
+        smartPortGroups   OBJECT IDENTIFIER
+                ::=  { smartPortMIBConformance  1}
+
+        smartPortCompliances   OBJECT IDENTIFIER
+                ::=  { smartPortMIBConformance  2}
+
+
+--
+-- General
+--
+
+--
+-- The Port Table
+--
+
+smartPortTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SmartPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A port table."
+    ::= { smartPortList 1 }
+
+smartPortEntry OBJECT-TYPE
+    SYNTAX      SmartPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the port list."
+    INDEX { smartPortIndex }
+    ::= { smartPortTable 1 }
+
+SmartPortEntry ::=
+    SEQUENCE {
+        smartPortIndex                     Unsigned32,
+        smartPortName                      DisplayString,
+        smartPortAlias                     DisplayString,
+        smartPortType                      PortType,
+        smartPortPower                     Integer32,
+        smartPortStatus                    PortStatus,
+        smartPortMode                      PortMode,
+        smartPortHighPowerAlarmThreshold   Integer32,
+        smartPortLowPowerAlarmThreshold    Integer32
+}
+
+smartPortIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique index for each port that corresponds to the index in the interface table"
+    ::= { smartPortEntry 1 }
+
+smartPortName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the port."
+    ::= { smartPortEntry 2 }
+
+smartPortAlias OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User configurable Port Alias for the port.
+
+         Not writeable in SmartOS v2.3"
+    ::= { smartPortEntry 3 }
+
+smartPortType OBJECT-TYPE
+    SYNTAX      PortType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of port.
+
+         rx(1) - Receiving port.
+
+         tx(2) - Transmitting port.
+
+         biDi(3) - Bidirectional port."
+    ::= { smartPortEntry 4 }
+
+smartPortPower OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The power level in units of 0.1 dBm."
+    ::= { smartPortEntry 5 }
+
+smartPortStatus OBJECT-TYPE
+    SYNTAX      PortStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state for a port.
+
+        idle(1) - The port is not activated
+
+        down(2) - The port traffic is lost.
+
+        up(3) - There is traffic on the port.
+
+        high(4) - The port got to high power.
+
+        low(5) - The port got to low power.
+
+        eyeSafety(6) - The Line Tx port is in Eye Safety Mode.
+        This means that either the connector on the
+        Line Tx port is not inserted or that you have
+        too strong reflection from the line fiber.
+
+        cd(7) - Channel detected.
+
+        ncd(8) - No channel detected."
+    ::= { smartPortEntry 6 }
+
+smartPortMode OBJECT-TYPE
+    SYNTAX      PortMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Mode of the Port.
+
+         normal (1) - The port is active. No alarms
+         are beeing suppressed.
+
+         service (2) . The port is in service mode
+         and alarms are beeing suppressed. When service
+         is ready smartPortMode  should be set to
+         'normal' again.
+
+         Not writeable in SmartOS v2.3"
+    ::= { smartPortEntry 7 }
+
+smartPortHighPowerAlarmThreshold OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The threshold for the High Power alarm.
+
+         Not writeable in SmartOS v2.3"
+    ::= { smartPortEntry 8 }
+
+smartPortLowPowerAlarmThreshold OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The threshold for the Low Power alarm.
+
+         Not writeable in SmartOS v2.3"
+    ::= { smartPortEntry 9 }
+
+
+-- ----------------------------------------------------
+-- Conformance
+-- ----------------------------------------------------
+
+
+-- ----------------------------------------------------
+-- Object and event groups
+-- ----------------------------------------------------
+
+smartPortListGroupV1 OBJECT-GROUP
+    OBJECTS {
+        smartPortIndex,
+        smartPortName,
+        smartPortAlias,
+        smartPortType,
+        smartPortPower,
+        smartPortStatus,
+        smartPortMode,
+        smartPortHighPowerAlarmThreshold,
+        smartPortLowPowerAlarmThreshold }
+    STATUS      current
+    DESCRIPTION
+        "The Port List MIB objects v1."
+    ::= { smartPortGroups 1 }
+
+-- ----------------------------------------------------
+-- Compliance
+-- ----------------------------------------------------
+
+smartPortBasicComplV1 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Basic implementation requirements for the port MIB V1."
+    MODULE
+        MANDATORY-GROUPS {
+            smartPortListGroupV1 }
+    ::= { smartPortCompliances 1 }
+
+END
