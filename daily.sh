@@ -115,6 +115,22 @@ set_notification() {
     php "${LIBRENMS_DIR}/daily.php" -f set_notification -t ${arg_type} -r ${arg_remove_message};
 }
 
+# add the arg_type notification
+add_notification() {
+    local args="$@";
+    local arg_type=$1;
+
+    set_notification $1 0
+}
+
+# clear/remove the arg_type notification
+remove_notification() {
+    local args="$@";
+    local arg_type=$1;
+
+    set_notification $1 1
+}
+
 #######################################
 # Entry into program
 # Globals:
@@ -151,7 +167,7 @@ main () {
         up=$(php daily.php -f update >&2; echo $?)
         if [[ "$up" == "0" ]]; then
             ${DAILY_SCRIPT} no-code-update
-            set_notification update 1  # make sure there are no update notifications if update is disabled
+            remove_notification update  # make sure there are no update notifications if update is disabled
             exit
         fi
 
@@ -174,7 +190,7 @@ main () {
         fi
 
         if (( $update_res > 0 )); then
-            set_notification update 0
+            add_notification update
         fi
 
         if [[ "$old_ver" != "$new_ver" ]]; then
@@ -183,10 +199,10 @@ main () {
             # Run post update checks
             if [ ! -f "${LIBRENMS_DIR}/vendor/autoload.php" ]; then
                 status_run "Reverting update, check the output of composer diagnose" "git checkout $old_ver" 'update'
-                set_notification update 0
+                add_notification update
             else
                 status_run "Updated from $old_ver to $new_ver" ''
-                set_notification update 1  # only clear the error if update was a success
+                remove_notification update  # only clear the error if update was a success
             fi
         fi
 
