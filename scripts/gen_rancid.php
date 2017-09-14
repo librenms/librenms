@@ -42,6 +42,7 @@ $rancid_map['procurve']   = 'hp';
 $rancid_map['nxos']       = 'cisco-nx';
 $rancid_map['mikrotik']   = 'mikrotik';
 $rancid_map['screenos']   = 'netscreen';
+$rancid_map['xos']        = 'extreme';
 
 foreach (dbFetchRows("SELECT `hostname`,`os`,`disabled`,`status` FROM `devices` WHERE `ignore` = 0 AND `type` != '' GROUP BY `hostname`") as $devices) {
     if (isset($rancid_map[$devices['os']])) {

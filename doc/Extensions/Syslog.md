@@ -180,7 +180,12 @@ Trigger external scripts based on specific syslog patterns being matched with sy
 $config['enable_syslog_hooks'] = 1;
 ```
 
-The below are some example hooks to call an external script in the event of a configuration change on Cisco IOS, IOS-XR and NX-OS devices. Add to your `config.php` file to enable.
+The below are some example hooks to call an external script in the event of a configuration change on Cisco ASA, IOS, NX-OS and IOS-XR devices. Add to your `config.php` file to enable.
+
+#### Cisco ASA
+```ssh
+$config['os']['asa']['syslog_hook'][] = Array('regex' => '/%ASA-(config-)?5-111005/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
+```
 
 #### Cisco IOS
 ```ssh

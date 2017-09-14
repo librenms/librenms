@@ -61,6 +61,7 @@ function poll_sensor($device, $class)
             $mibdir = null;
 
             $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']]));
+            echo "HERE $sensor_value END".PHP_EOL;
 
             if (file_exists('includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php')) {
                 require 'includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php';

@@ -139,7 +139,7 @@ function get_userid($username)
     $entries = ldap_get_entries($ldap_connection, $search);
 
     if ($entries['count']) {
-        return $entries[0]['uidnumber'][0];
+        return $entries[0][$config['auth_ldap_uid_attribute']][0];
     }
 
     return -1;
@@ -167,7 +167,7 @@ function get_userlist()
         foreach ($entries as $entry) {
             $username    = $entry['uid'][0];
             $realname    = $entry['cn'][0];
-            $user_id     = $entry['uidnumber'][0];
+            $user_id     = $entry[$config['auth_ldap_uid_attribute']][0];
             $email       = $entry[$config['auth_ldap_emailattr']][0];
             $ldap_groups = get_group_list();
             foreach ($ldap_groups as $ldap_group) {

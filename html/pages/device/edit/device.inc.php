@@ -213,7 +213,7 @@ if ($updated && $update_message) {
 </script>
 <?php
 print_optionbar_start();
-list($sizeondisk, $numrrds) = foldersize($config['rrd_dir']."/".$device['hostname']);
+list($sizeondisk, $numrrds) = foldersize(get_rrd_dir($device['hostname']));
 echo("Size on Disk: <b>" . formatStorage($sizeondisk) . "</b> in <b>" . $numrrds . " RRD files</b>.");
 print_optionbar_end();
 ?>

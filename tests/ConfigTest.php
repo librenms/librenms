@@ -80,13 +80,29 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testGetOsSetting()
     {
         global $config;
-        $device = array('os' => 'nullos');
         $config['os']['nullos']['fancy'] = true;
+        $config['fallback'] = true;
 
-        $this->assertNull(Config::getOsSetting(array(), 'unset'), '$device array missing os should return null');
-        $this->assertNull(Config::getOsSetting($device, 'unset'), 'Non-existing settings should return null');
-        $this->assertFalse(Config::getOsSetting($device, 'unset', false), 'Non-existing settings should return $default');
-        $this->assertTrue(Config::getOsSetting($device, 'fancy'), 'Failed to get setting');
+        $this->assertNull(Config::getOsSetting(null, 'unset'), '$os is null, should return null');
+        $this->assertNull(Config::getOsSetting('nullos', 'unset'), 'Non-existing settings should return null');
+        $this->assertFalse(Config::getOsSetting('nullos', 'unset', false), 'Non-existing settings should return $default');
+        $this->assertTrue(Config::getOsSetting('nullos', 'fancy'), 'Failed to get setting');
+        $this->assertTrue(Config::getOsSetting('nullos', 'fallback'), 'Failed to fallback to global setting');
+    }
+
+    public function testGetCombined()
+    {
+        global $config;
+        $config['num'] = array('one', 'two');
+        $config['os']['nullos']['num'] = array('two', 'three');
+        $config['assoc'] = array('a' => 'same', 'b' => 'same');
+        $config['os']['nullos']['assoc'] = array('b' => 'different', 'c' => 'still same');
+
+        $combined =  Config::getCombined('nullos', 'num');
+        sort($combined);
+        $this->assertEquals(array('one', 'three', 'two'), $combined);
+
+        $this->assertSame(array('a' => 'same', 'b' => 'different', 'c' => 'still same'), Config::getCombined('nullos', 'assoc'));
     }
 
     public function testSet()
