@@ -44,6 +44,13 @@ if (!empty($device['ip'])) {
     }
 }
 
+if ($device['purpose']) {
+    echo '<tr>
+        <td>Description</td>
+        <td>'.display($device['purpose']).'</td>
+      </tr>';
+}
+
 if ($device['hardware']) {
     echo '<tr>
         <td>Hardware</td>
