@@ -32,6 +32,7 @@ modules:
                     oid: upsOutputFrequency
                     num_oid: .1.3.6.1.4.1.7309.6.1.4.2.
                     index: 'upsOutputFrequency.{{ $index }}'
+                    divisor: 10
                     descr: Output
         current:
             data:
@@ -40,6 +41,7 @@ modules:
                     value: upsOutputCurrent
                     num_oid: .1.3.6.1.4.1.7309.6.1.4.4.1.3.
                     index: 'upsOutputCurrent.{{ $index }}'
+                    divisor: 10
                     descr: 'Output #{{ $index }}'
         power:
             data:
@@ -86,7 +88,7 @@ modules:
                     state_name: upsOutputSource
                     states:
                         - { value: 1, generic: 0, graph: 1, descr: standby }
-                        - { value: 2, generic: 1, graph: 1, descr: line }
+                        - { value: 2, generic: 0, graph: 1, descr: line }
                         - { value: 3, generic: 1, graph: 1, descr: boost2 }
                         - { value: 4, generic: 1, graph: 1, descr: boost1 }
                         - { value: 5, generic: 1, graph: 1, descr: buck1 }
