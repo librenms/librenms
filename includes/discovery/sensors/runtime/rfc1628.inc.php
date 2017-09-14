@@ -2,7 +2,7 @@
 
 echo 'RFC1628 ';
 
-// UPS-MIB::upsSeconsOnBattery
+// UPS-MIB::upsSecondsOnBattery
 $secs_on_battery_oid = '.1.3.6.1.2.1.33.1.2.2.0';
 $secs_on_battery = snmp_get($device, $secs_on_battery_oid, '-Oqv');
 
