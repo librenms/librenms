@@ -251,7 +251,14 @@ function poll_device($device, $options)
         echo "Created directory : $host_rrd\n";
     }
 
-    $response = device_is_up($device, true);
+    if ($attribs['override_snmp_disable'] == "true") {
+        $response = array();
+        $response['ping_time'] = '0';
+        $response['status'] = '1';
+        $response['status_reason'] = 'SNMP Disabled';
+    } else {
+        $response = device_is_up($device, true);
+    }
 
     if ($response['status'] == '1') {
         $graphs    = array();
