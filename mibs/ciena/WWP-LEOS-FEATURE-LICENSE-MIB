@@ -1,0 +1,480 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+
+ --
+ -- WWP-LEOS-FEATURE-LICENSE-MIB.my
+ --
+ --
+
+ WWP-LEOS-FEATURE-LICENSE-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+     	
+   Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+	    FROM SNMPv2-SMI			
+   DisplayString, TruthValue
+	    FROM SNMPv2-TC	
+   wwpModulesLeos      
+       FROM WWP-SMI;
+	
+	
+ wwpLeosFeatureLicenseMIB MODULE-IDENTITY
+            LAST-UPDATED "201001280000Z"
+            ORGANIZATION "Ciena, Inc"
+            CONTACT-INFO
+               "   Mib Meister
+                   115 North Sullivan Road
+                   Spokane Valley, WA 99037
+                   USA             
+                   Phone:  +1 509 242 9000
+                   Email:  support@ciena.com"
+            DESCRIPTION
+               "The MIB module for the WWP Premium Feature License Manager."
+            REVISION     "201001280000Z"  -- 28th January. 2010  
+            DESCRIPTION
+               "Revise to reflect new premium feature licensing model."
+            REVISION     "200508050000Z"  -- 5th August. 2005  
+            DESCRIPTION
+               "Initial creation."
+       ::= { wwpModulesLeos 29 }
+            
+
+ --
+ -- Node definitions
+ --
+	
+ wwpLeosFeatureLicenseMIBObjects OBJECT IDENTIFIER ::= { wwpLeosFeatureLicenseMIB 1 }
+ 
+ 
+ --
+ -- Premium Feature License Node
+ --
+ wwpLeosPremiumFeatureLicense OBJECT IDENTIFIER ::= { wwpLeosFeatureLicenseMIBObjects 1 }
+ wwpLeosPremiumFeatureLicenseStatusNotif        OBJECT IDENTIFIER ::= { wwpLeosFeatureLicenseMIBObjects 2 }  		
+ 
+ -- Notifications 
+  
+ wwpLeosFeatureLicenseMIBNotificationPrefix OBJECT IDENTIFIER ::= { wwpLeosFeatureLicenseMIB 2 }
+ 
+ wwpLeosFeatureLicenseMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { wwpLeosFeatureLicenseMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpLeosFeatureLicenseMIBConformance OBJECT IDENTIFIER ::= { wwpLeosFeatureLicenseMIB 3 }
+ wwpLeosFeatureLicenseMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosFeatureLicenseMIBConformance 1 } 		
+ wwpLeosFeatureLicenseMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosFeatureLicenseMIBConformance 2 }
+
+ --
+ -- Scalar Attributes
+ --             
+ wwpLeosPremiumFeatureStatusTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF WwpLeosPremiumFeatureStatusEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of premium features and the operational status of each."
+     ::= { wwpLeosPremiumFeatureLicense 1 }
+		
+ wwpLeosPremiumFeatureStatusEntry OBJECT-TYPE
+     SYNTAX     WwpLeosPremiumFeatureStatusEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "Each entry represents a premium feature."
+     INDEX { wwpLeosPremiumFeatureId }
+           ::= { wwpLeosPremiumFeatureStatusTable 1 }
+ 
+ WwpLeosPremiumFeatureStatusEntry ::=  SEQUENCE { 
+      wwpLeosPremiumFeatureId                   INTEGER,
+      wwpLeosPremiumFeatureName                 OCTET STRING,
+      wwpLeosPremiumFeatureDomainName           OCTET STRING,
+      wwpLeosPremiumFeatureDomainId             INTEGER,
+      wwpLeosPremiumFeatureCustomerId           INTEGER,
+      wwpLeosPremiumFeatureLicenseAdminId       INTEGER,
+      wwpLeosPremiumFeatureOperStatus           INTEGER,
+      wwpLeosPremiumFeatureDaysRemaining        INTEGER,
+      wwpLeosPremiumFeatureLicenseKey           OCTET STRING
+ }
+ 
+ wwpLeosPremiumFeatureId OBJECT-TYPE
+     SYNTAX        INTEGER {            
+                        baseFeatures(0),
+                        dynamicVPLS(1),
+                        security(2),
+                        pbt(3),
+                        carrierEdition(4),
+                        advancedEthernet(5),
+                        advancedOam(6),
+                        pbbTe(7),
+                        advanced10G(8),
+                        aeAndAoam(9),
+                        pbb(10),
+                        advancedSync(11)
+                   }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Unique ID assigned to each premium feature requiring
+             a license. It is the index into the table."
+     ::= { wwpLeosPremiumFeatureStatusEntry 1 }
+
+ wwpLeosPremiumFeatureName OBJECT-TYPE
+     SYNTAX       OCTET STRING (SIZE(0..64))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The name of a premium feature."
+     ::= { wwpLeosPremiumFeatureStatusEntry 2 }
+
+ wwpLeosPremiumFeatureDomainName OBJECT-TYPE
+     SYNTAX       OCTET STRING (SIZE(0..64))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The name of the license domain that this premium feature is a member of."
+     ::= { wwpLeosPremiumFeatureStatusEntry 3 }
+
+ wwpLeosPremiumFeatureDomainId OBJECT-TYPE
+     SYNTAX       INTEGER  (0..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Unique ID assigned to each license domain."
+     ::= { wwpLeosPremiumFeatureStatusEntry 4 }
+
+ wwpLeosPremiumFeatureCustomerId OBJECT-TYPE
+     SYNTAX       INTEGER   (0..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Customer ID."
+     ::= { wwpLeosPremiumFeatureStatusEntry 5 }
+
+ wwpLeosPremiumFeatureLicenseAdminId OBJECT-TYPE
+     SYNTAX       INTEGER    (0..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Premium feature license administrator unique ID."
+     ::= { wwpLeosPremiumFeatureStatusEntry 6 }    
+
+ wwpLeosPremiumFeatureOperStatus OBJECT-TYPE
+     SYNTAX        INTEGER {
+                        infoNotAvailable(1),
+                        notInstalled(2),
+                        installed(3),
+                        partial(4),
+                        noBaseLic(5)
+                   }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Premium feature license Status. Installed or not installed.
+             infoNotAvailable: Licensing information is not applicable or does
+               not apply to the platform.
+            notInstalled: referred to as an invalid license.  This means that
+               none of the operationally enabled modules has a key installed
+               for this license.
+            installed: referred to as a valid license.  This means that all 
+               of the operationally enabled modules have a key installed for 
+               this license and all conditional requirements for such license
+               installation have been satisfied.
+            partial: referred to as a partial License.  This means that one 
+               or more, but not all, operationally enabled modules have a key
+               installed for this license.
+            noBasicLic: Requires Basic or Carrier License.  This means the 
+               feature has its key installed into all operationally enabled
+               modules however such feature is not considered installed, or 
+               valid, because the Basic Edition or Carrier Edition license
+               is not installed, or valid. "
+     DEFVAL      { notInstalled }
+     ::= { wwpLeosPremiumFeatureStatusEntry 7 }
+  
+ wwpLeosPremiumFeatureDaysRemaining OBJECT-TYPE
+     SYNTAX       INTEGER (0..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Days remaining on this premium feature license."
+     ::= { wwpLeosPremiumFeatureStatusEntry 8 }
+     
+ wwpLeosPremiumFeatureLicenseKey OBJECT-TYPE
+     SYNTAX       OCTET STRING (SIZE (0..64))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specifies the installed license key string for this feature.
+              This object will return 0 if this feature is not installed."
+     ::= { wwpLeosPremiumFeatureStatusEntry 9 }
+     
+ --
+ --
+ --
+ wwpLeosPremiumFeatureLicenseKeyInstall OBJECT-TYPE
+        SYNTAX   		DisplayString
+        MAX-ACCESS   	read-write
+        STATUS   		current
+        DESCRIPTION
+           "This object can be set to install the license Key.
+            New License Key if accepted will be installed and will 
+            show up in wwpLeosPremiumFeatureStatusTable.
+            Get operation on this object will always return 0."
+        ::= { wwpLeosPremiumFeatureLicense 2 }
+ 
+ wwpLeosPremiumFeatureLicenseNameUnInstall OBJECT-TYPE
+        SYNTAX   		DisplayString
+        MAX-ACCESS   	read-write
+        STATUS   		current
+        DESCRIPTION
+           "This object can be set to un-install the feature license.
+            This object must be set to feature name that needs to be uninstalled.
+            Feature name can be obtained from (wwpLeosPremiumFeatureName) MIB object in
+            wwpLeosPremiumFeatureStatusTable table.
+            Get operation on this object will always return 0."
+        ::= { wwpLeosPremiumFeatureLicense 3 }     
+        
+  
+  --
+ -- Installed Premium feature licenses by module slot
+ -- Extended from TCE
+ -- TCE features
+ --                  
+                
+ wwpLeosTcePremiumFeatureLicense OBJECT IDENTIFIER ::= { wwpLeosFeatureLicenseMIBObjects 10 }	
+ 
+ wwpLeosPremiumFeatureLicenseInstalledTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF WwpLeosPremiumFeatureLicenseInstalledEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+        "Table of installed premium features and the operational status of each."
+     ::= { wwpLeosTcePremiumFeatureLicense 1 }
+      
+ wwpLeosPremiumFeatureLicenseInstalledEntry OBJECT-TYPE
+     SYNTAX     WwpLeosPremiumFeatureLicenseInstalledEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "Each entry represents an installed premium feature license."
+     INDEX { wwpLeosPremiumFeatureLicenseInstalledModuleIndex, 
+             wwpLeosPremiumFeatureId }
+           ::= { wwpLeosPremiumFeatureLicenseInstalledTable 1 }
+ 
+ WwpLeosPremiumFeatureLicenseInstalledEntry ::=  SEQUENCE { 
+     wwpLeosPremiumFeatureLicenseInstalledModuleIndex        Unsigned32,
+     wwpLeosPremiumFeatureLicenseInstalledOemId          INTEGER,
+     wwpLeosPremiumFeatureLicenseInstalledCustomerId     INTEGER,
+     wwpLeosPremiumFeatureLicenseInstalledAdminId        INTEGER,
+     wwpLeosPremiumFeatureLicenseInstalledDaysRemaining  INTEGER,
+     wwpLeosPremiumFeatureLicenseInstalledEnabled        TruthValue,
+     wwpLeosPremiumFeatureLicenseInstalledSequence       Unsigned32,
+     wwpLeosPremiumFeatureLicenseInstalledDomainId       INTEGER,
+     wwpLeosPremiumFeatureLicenseInstalledName           DisplayString,
+     wwpLeosPremiumFeatureLicenseInstalledDomainName     DisplayString,
+     wwpLeosPremiumFeatureLicenseInstalledKey            OCTET STRING
+ }
+ 
+ wwpLeosPremiumFeatureLicenseInstalledModuleIndex OBJECT-TYPE
+     SYNTAX       Unsigned32 (1..3)
+     --MAX-ACCESS   read-only
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Chassis module number that the premium feature license is installed."
+     ::= { wwpLeosPremiumFeatureLicenseInstalledEntry 1 }
+
+
+ wwpLeosPremiumFeatureLicenseInstalledOemId OBJECT-TYPE
+     SYNTAX       INTEGER (0..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The installed premium feature license Oem unique ID."
+     ::= { wwpLeosPremiumFeatureLicenseInstalledEntry 3 }
+
+ wwpLeosPremiumFeatureLicenseInstalledCustomerId OBJECT-TYPE
+     SYNTAX       INTEGER (0..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The installed premium feature license customer unique ID."
+     ::= { wwpLeosPremiumFeatureLicenseInstalledEntry 4 }
+
+ wwpLeosPremiumFeatureLicenseInstalledAdminId OBJECT-TYPE
+     SYNTAX       INTEGER (0..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The installed premium feature license administrator unique ID."
+     ::= { wwpLeosPremiumFeatureLicenseInstalledEntry 5 }    
+
+ wwpLeosPremiumFeatureLicenseInstalledDaysRemaining OBJECT-TYPE
+     SYNTAX       INTEGER (0..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Days remaining on this installed premium feature license."
+     ::= { wwpLeosPremiumFeatureLicenseInstalledEntry 6 }
+     
+ wwpLeosPremiumFeatureLicenseInstalledEnabled OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The premium feature license Status. "
+     ::= { wwpLeosPremiumFeatureLicenseInstalledEntry 7 }
+  
+ wwpLeosPremiumFeatureLicenseInstalledSequence OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Premium feature license sequence number."
+     ::= { wwpLeosPremiumFeatureLicenseInstalledEntry 8 }
+ 
+ wwpLeosPremiumFeatureLicenseInstalledDomainId OBJECT-TYPE
+     SYNTAX       INTEGER (0..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The installed premium feature license domain unique ID."
+     ::= { wwpLeosPremiumFeatureLicenseInstalledEntry 9 }
+
+ wwpLeosPremiumFeatureLicenseInstalledName OBJECT-TYPE
+     SYNTAX       DisplayString 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The name of this installed premium feature license."
+     ::= { wwpLeosPremiumFeatureLicenseInstalledEntry 10 }
+
+ wwpLeosPremiumFeatureLicenseInstalledDomainName OBJECT-TYPE
+     SYNTAX       DisplayString 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The name of the license domain that this installed premium feature is a member of."
+     ::= { wwpLeosPremiumFeatureLicenseInstalledEntry 11 }
+
+
+ wwpLeosPremiumFeatureLicenseInstalledKey OBJECT-TYPE
+ --needs to be a hex representation ?
+     SYNTAX       OCTET STRING (SIZE (0..64))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specifies the installed license key string for this installed premium feature.
+              This object will return zero length if this feature is not installed."
+     ::= { wwpLeosPremiumFeatureLicenseInstalledEntry 12 }
+     
+     
+ --
+ -- Installing premium feature license key to a chassis slot
+ --
+ wwpLeosPremiumFeatureLicenseInstall      OBJECT IDENTIFIER ::= { wwpLeosTcePremiumFeatureLicense 2 } 
+ wwpLeosPremiumFeatureLicenseInstallModuleIndex OBJECT-TYPE
+     SYNTAX       Unsigned32 (1..3)
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+           "Chassis slot number that the feature license is designated to."
+     ::= { wwpLeosPremiumFeatureLicenseInstall 1 }
+
+ wwpLeosPremiumFeatureLicenseInstallKey OBJECT-TYPE
+        SYNTAX       DisplayString
+        --needs to be a hex representation? comes up alright as Display String
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+           "New License Key to be installed on slot specified by
+            wwpLeosPremiumFeatureLicenseInstallModuleIndex."
+        ::= { wwpLeosPremiumFeatureLicenseInstall 2 }
+  
+ wwpLeosPremiumFeatureLicenseInstallCommit OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+           "Setting this object to True will start the Premium License Key installation
+            specified by the wwpLeosPremiumFeatureLicenseInstallKey onto the slot specified by
+            wwpLeosPremiumFeatureLicenseInstallModuleIndex. New License Key if accepted will be installed 
+            and will be included in wwpLeosPremiumFeatureLicenseInstalledTable. 
+            
+            Upon a successful set, the wwpLeosPremiumFeatureLicenseInstallModuleIndex and 
+            wwpLeosPremiumFeatureLicenseInstallKey will be cleared.
+            
+            Get operation on this object will always return False."
+     ::= { wwpLeosPremiumFeatureLicenseInstall 3 }
+
+ wwpLeosPremiumFeatureLicenseInstallUnsuccessful OBJECT-TYPE
+        SYNTAX       DisplayString
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+           "This object represents the status of an install operation.
+            This object is included in the wwpLeosPremiumFeatureLicenseInstallErrorNotification
+            upon an unsuccessful installation.
+            Get operation on this object will always return zero length."
+        ::= { wwpLeosPremiumFeatureLicenseInstall 4 } 
+
+ --
+ -- Uninstall premium feature liecense key from chassis slot
+ --
+ wwpLeosPremiumFeatureLicenseUninstall   OBJECT IDENTIFIER ::= { wwpLeosTcePremiumFeatureLicense 3 } 
+ 
+ wwpLeosPremiumFeatureLicenseUninstallModuleIndex OBJECT-TYPE
+     SYNTAX       Unsigned32 (1..3)
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+           "Chassis module number that the feature license was installed in.
+            This object can be set to Uninstall the license Key."
+     ::= { wwpLeosPremiumFeatureLicenseUninstall 1 }
+
+ wwpLeosPremiumFeatureLicenseUninstallName OBJECT-TYPE
+        SYNTAX       DisplayString
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+           "This object must be set to feature name that needs to be 
+            uninstalled. Premium feature name can be obtained from 
+            (wwpLeosPremiumFeatureLicenseName) MIB object in wwpLeosPremiumFeatureLicenseInstalledTable."
+        ::= { wwpLeosPremiumFeatureLicenseUninstall 2 }
+ 
+ wwpLeosPremiumFeatureLicenseUninstallCommit OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+           "Setting this object to True will start the Premium License Key uninstallation
+            specified by the wwpLeosPremiumFeatureLicenseUninstallName onto the slot specified by
+            wwpLeosPremiumFeatureLicenseUninstallModuleIndex. Get operation on this object will always return False."
+     ::= { wwpLeosPremiumFeatureLicenseUninstall 3 } 
+     
+   
+ --
+ -- Notifications
+ --
+ wwpLeosPremiumFeatureLicenseStatusNotification NOTIFICATION-TYPE
+     OBJECTS      { 
+                  wwpLeosPremiumFeatureName,
+                  wwpLeosPremiumFeatureOperStatus
+                  }
+     STATUS    current
+     DESCRIPTION
+        "The notification is sent when there was change in operational
+         status of a premium feature license. "
+     ::= { wwpLeosFeatureLicenseMIBNotifications 1 }
+
+ wwpLeosPremiumFeatureLicenseInstallErrorNotification NOTIFICATION-TYPE
+       OBJECTS      { 
+                    wwpLeosPremiumFeatureLicenseInstallModuleIndex,
+                    wwpLeosPremiumFeatureLicenseInstallUnsuccessful
+                    }
+        STATUS    current
+        DESCRIPTION
+             "The notification is sent when there was an unsuccessful installation
+              of a premium feature license."
+        ::= { wwpLeosFeatureLicenseMIBNotifications 2 }
+    
+ END

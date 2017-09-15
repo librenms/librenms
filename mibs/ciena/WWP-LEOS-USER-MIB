@@ -1,0 +1,333 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-USER-MIB.my
+ --
+ --
+
+ WWP-LEOS-USER-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   Integer32, Unsigned32, Counter32, OBJECT-TYPE, MODULE-IDENTITY			
+	    FROM SNMPv2-SMI			
+   RowStatus, DisplayString, TruthValue		
+	    FROM SNMPv2-TC						
+   wwpModulesLeos		
+	    FROM WWP-SMI;
+	
+	
+ wwpLeosUserMIB MODULE-IDENTITY
+	    LAST-UPDATED "201207110000Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+	    DESCRIPTION
+                    "This MIB module defines the generic managed objects
+                     for User Information on WWP devices."  
+	    REVISION  "201207110000Z"
+	    DESCRIPTION
+                     "Changed the definitions of the wwpLeosUserPrivLevel
+                      values to match those used internally and at the CLI."
+	    REVISION    "201206270000Z"
+	    DESCRIPTION
+                    "Corrected string lengths."
+ 	    REVISION  "201107060000Z"
+	    DESCRIPTION
+	             " Added a new object wwpLeosUserAuthProviderScope."
+       	REVISION    "200703010000Z" 
+	    DESCRIPTION
+                     "Initial creation."   
+	    ::= { wwpModulesLeos 39 }
+		
+ --
+ -- Node definitions
+ --
+	
+ wwpLeosUserMIBObjects 	OBJECT IDENTIFIER ::= { wwpLeosUserMIB 1 }
+ wwpLeosUser 			OBJECT IDENTIFIER ::= { wwpLeosUserMIBObjects 1 }
+ 
+ --
+ -- Notifications 
+ --
+  
+ wwpLeosUserMIBNotificationPrefix	OBJECT IDENTIFIER ::= { wwpLeosUserMIB 2 } 
+ wwpLeosUserMIBNotifications    	OBJECT IDENTIFIER ::= { wwpLeosUserMIBNotificationPrefix 0 }
+
+ --
+ -- Conformance information 
+ --
+ 
+ wwpLeosUserMIBConformance 	OBJECT IDENTIFIER ::= { wwpLeosUserMIB 3 } 
+ wwpLeosUserMIBCompliances 	OBJECT IDENTIFIER ::= { wwpLeosUserMIBConformance 1 } 		
+ wwpLeosUserMIBGroups      	OBJECT IDENTIFIER ::= { wwpLeosUserMIBConformance 2 }
+
+ wwpLeosUserAuthProviderTable OBJECT-TYPE
+     	SYNTAX       SEQUENCE OF WwpLeosUserAuthProviderEntry
+     	MAX-ACCESS   not-accessible
+     	STATUS       current
+     	DESCRIPTION	 "Table of UserAuth Providers."
+     	::= { wwpLeosUser 1 }
+		
+ wwpLeosUserAuthProviderEntry OBJECT-TYPE
+     	SYNTAX       WwpLeosUserAuthProviderEntry
+     	MAX-ACCESS   not-accessible
+     	STATUS       current
+     	DESCRIPTION	  "An entry for each User Authorization Provider."
+     	INDEX { wwpLeosUserAuthProviderPriority }
+     	::= { wwpLeosUserAuthProviderTable 1 }
+		 
+ WwpLeosUserAuthProviderEntry ::= SEQUENCE { 
+     	wwpLeosUserAuthProviderPriority		Integer32,
+     	wwpLeosUserAuthProviderType			INTEGER,
+     	wwpLeosUserAuthProviderCalled		Unsigned32,
+     	wwpLeosUserAuthProviderSuccess		Unsigned32,
+     	wwpLeosUserAuthProviderFailure    	Unsigned32,
+        wwpLeosUserAuthProviderSkipped          Unsigned32,
+        wwpLeosUserAuthProviderScope            INTEGER
+ }
+
+ wwpLeosUserAuthProviderPriority OBJECT-TYPE
+     	SYNTAX     		Integer32 (1..2)
+     	MAX-ACCESS   	not-accessible
+     	STATUS       	current
+     	DESCRIPTION	   	"The priority of this user authentication provider."
+     	::= { wwpLeosUserAuthProviderEntry 1 }
+		
+ wwpLeosUserAuthProviderType OBJECT-TYPE
+ 		SYNTAX			INTEGER {
+ 							none	(1),	-- No Method Configured
+ 							local	(2),	-- Local Authentication
+ 							radius	(3),	-- Radius Authentication
+ 							tacacs	(4)	-- Tacacs Authentication
+ 						}
+     	MAX-ACCESS  	read-write
+     	STATUS      	current
+     	DESCRIPTION	  	"The type/method of this user authentication provider.
+     					 At least one entry must be a provider other than 'none'
+     					 and any given provider may not be used twice.  When a
+     					 provider is changed to 'none', lower priority providers
+     					 will have their priority increased to close the gap."
+     	::= { wwpLeosUserAuthProviderEntry 2 }
+     	
+ wwpLeosUserAuthProviderCalled OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-write
+ 		STATUS			current
+ 		DESCRIPTION		"The number of calls to this user authentication provider.
+ 						 The counter is cleared automatically when AuthProviderType
+ 						 is changed or may be cleared manually." 
+ 		::= { wwpLeosUserAuthProviderEntry 3 }
+ 
+  wwpLeosUserAuthProviderSuccess OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-write
+ 		STATUS			current
+ 		DESCRIPTION		"The number of times this user authentication provider returned
+ 						 a Success response.  The counter is cleared automatically when
+ 						 AuthProviderType is changed or may be cleared manually." 
+ 		::= { wwpLeosUserAuthProviderEntry 4 }
+ 
+ wwpLeosUserAuthProviderFailure OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-write
+ 		STATUS			current
+ 		DESCRIPTION		"The number of times this user authentication provider returned
+ 						 a Failure response.  The counter is cleared automatically when
+ 						 AuthProviderType is changed or may be cleared manually." 
+ 		::= { wwpLeosUserAuthProviderEntry 5 }
+ 
+ wwpLeosUserAuthProviderSkipped OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-write
+ 		STATUS			current
+ 		DESCRIPTION		"The number of times this user authentication provider returned
+ 						 a Skip Me response.  The counter is cleared automatically when
+ 						 AuthProviderType is changed or may be cleared manually." 
+ 		::= { wwpLeosUserAuthProviderEntry 6 }
+                 
+ wwpLeosUserAuthProviderScope OBJECT-TYPE
+                SYNTAX                  INTEGER
+                                        {
+                                                none (0),
+                                                serial (1),
+                                                remote (2),
+                                                all    (3)
+                                        }
+
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The scope to be used for each authentication method." 
+                DEFVAL                 { all }
+                ::= { wwpLeosUserAuthProviderEntry 7 }
+                                 
+ wwpLeosUserWhoTable OBJECT-TYPE
+     	SYNTAX       SEQUENCE OF WwpLeosUserWhoEntry
+     	MAX-ACCESS   not-accessible
+     	STATUS       current
+     	DESCRIPTION	 "Table of logged in users."
+     	::= { wwpLeosUser 2 }
+		
+ wwpLeosUserWhoEntry OBJECT-TYPE
+     	SYNTAX       WwpLeosUserWhoEntry
+     	MAX-ACCESS   not-accessible
+     	STATUS       current
+     	DESCRIPTION	  "An entry for each logged in user."
+     	INDEX { wwpLeosUserWhoPid }
+     	::= { wwpLeosUserWhoTable 1 }
+		 
+ WwpLeosUserWhoEntry ::= SEQUENCE { 
+     	wwpLeosUserWhoPid					Unsigned32,
+     	wwpLeosUserWhoUser					DisplayString,
+     	wwpLeosUserWhoTerminal				DisplayString,
+     	wwpLeosUserWhoIdleTime				Counter32,
+     	wwpLeosUserWhoStatus				RowStatus
+ }
+
+ wwpLeosUserWhoPid OBJECT-TYPE
+     	SYNTAX     		Unsigned32
+     	MAX-ACCESS   	not-accessible
+     	STATUS       	current
+     	DESCRIPTION	   	"The pid of the users shell process."
+     	::= { wwpLeosUserWhoEntry 1 } 
+     	
+ wwpLeosUserWhoUser OBJECT-TYPE
+ 		SYNTAX			DisplayString(SIZE(0..32))
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"The username used during login authentication."
+ 		::= { wwpLeosUserWhoEntry 2 }
+ 		
+ wwpLeosUserWhoTerminal OBJECT-TYPE
+ 		SYNTAX			DisplayString(SIZE(0..64))
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"The terminal the user logged in from."
+ 		::= { wwpLeosUserWhoEntry 3 }
+ 		
+ wwpLeosUserWhoIdleTime OBJECT-TYPE
+ 		SYNTAX			Counter32
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"The users idle time in minutes.  This counter is reset to
+ 						 zero when ever the shell process detects input from the user."
+ 		::= { wwpLeosUserWhoEntry 4 }     
+ 		
+ wwpLeosUserWhoStatus OBJECT-TYPE
+ 		SYNTAX			RowStatus
+ 		MAX-ACCESS		read-write
+ 		STATUS			current
+ 		DESCRIPTION		"Status of the users shell process.  To kill a users
+ 						shell, set this object to 'Destroy'."
+ 		::= { wwpLeosUserWhoEntry 5 }
+                                
+ 
+ wwpLeosUserTable OBJECT-TYPE
+ 		SYNTAX			SEQUENCE OF WwpLeosUserEntry
+ 		MAX-ACCESS		not-accessible
+ 		STATUS			current
+ 		DESCRIPTION		"Table of locally configured users."
+ 		::= { wwpLeosUser 3 }
+ 		
+ wwpLeosUserEntry OBJECT-TYPE
+ 		SYNTAX			WwpLeosUserEntry
+ 		MAX-ACCESS		not-accessible
+ 		STATUS			current
+ 		DESCRIPTION		"An entry for each user in the local password file."
+ 		INDEX { wwpLeosUserUid }
+ 		::= { wwpLeosUserTable 1 }
+ 		
+ WwpLeosUserEntry ::= SEQUENCE { 
+ 		wwpLeosUserUid				Unsigned32,
+ 		wwpLeosUserName				DisplayString,
+ 		wwpLeosUserPassword			DisplayString,
+ 		wwpLeosUserPrivLevel		INTEGER,
+ 		wwpLeosUserIsDefault		TruthValue,
+ 		wwpLeosUserIsEncrypted		TruthValue,
+ 		wwpLeosUserIsModified		TruthValue,
+ 		wwpLeosUserStatus			RowStatus
+ } 
+ 
+ wwpLeosUserUid OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		not-accessible
+ 		STATUS			current
+ 		DESCRIPTION		"The numeric userid of the user.  These numbers are generated
+ 						by the device in order to making indexing the table easy, but
+ 						they are not tied to specific user names during a reboot.  When
+ 						a new user is created, the userid must be an unused value."
+ 		::= { wwpLeosUserEntry 1 }
+ 		
+ wwpLeosUserName OBJECT-TYPE
+ 		SYNTAX			DisplayString(SIZE(1..32))
+ 		MAX-ACCESS		read-create
+ 		STATUS			current
+ 		DESCRIPTION		"The name of the user."
+ 		::= { wwpLeosUserEntry 2 }
+ 		
+ wwpLeosUserPassword OBJECT-TYPE
+ 		SYNTAX			DisplayString(SIZE(0..34))
+ 		MAX-ACCESS		read-create
+ 		STATUS			current
+ 		DESCRIPTION		"The users password in encrypted form.  When setting this object
+ 						 you must set wwpLeosUserIsEncrypted at the same time in order to
+ 						 specify whether the password you are setting needs to be encrypted
+ 						 by the device or whether you have already encrypted it."
+ 		::= { wwpLeosUserEntry 3 }
+ 		
+ wwpLeosUserPrivLevel OBJECT-TYPE
+ 		SYNTAX			INTEGER {
+ 							none	(0),	-- No Privileges
+ 							limited	(1),	-- Read-Only Privileges
+ 							admin	(2),	-- Admin, Read-Write Privileges
+ 							super	(3),	-- Super User, Read-Write-Create Privileges
+ 							diag	(4) 	-- Diagnostic, Unrestricted Privileges
+ 						}
+ 		MAX-ACCESS		read-create
+ 		STATUS			current
+ 		DESCRIPTION		"The privilege level of the user."
+ 		::= { wwpLeosUserEntry 4 }
+ 		
+ wwpLeosUserIsDefault OBJECT-TYPE
+ 		SYNTAX			TruthValue
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"When this is set to True, the user is one of the default
+ 						users created in the device at boot time."
+ 		::= { wwpLeosUserEntry 5 }
+ 		
+ wwpLeosUserIsEncrypted OBJECT-TYPE
+ 		SYNTAX			TruthValue
+ 		MAX-ACCESS		read-create
+ 		STATUS			current
+ 		DESCRIPTION		"This will always be True on a Get as the password is always
+ 						stored locally on the device in encrypted form.  During a Set,
+ 						it is False if you are sending wwpLeosUserPassword in the clear
+ 						so the device can encrypt it, or True if wwpLeosUserPassword is
+ 						already in encrypted MD5 form."
+ 		::= { wwpLeosUserEntry 6 }
+ 		
+ wwpLeosUserIsModified OBJECT-TYPE
+ 		SYNTAX			TruthValue
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"When this is set to True, the user is one of the default
+ 						users created in the device, but one or more properties of
+ 						the user account has been altered from the default values."
+ 		::= { wwpLeosUserEntry 7 } 
+ 		
+ wwpLeosUserStatus		OBJECT-TYPE
+ 		SYNTAX			RowStatus
+ 		MAX-ACCESS		read-create
+ 		STATUS			current
+ 		DESCRIPTION		"Use CreateAndGo to create a new user, Destroy to remove a user."
+ 		::= { wwpLeosUserEntry 8 }
+                              
+ END
+
+ --
+ -- WWP-User-MIB
+ --

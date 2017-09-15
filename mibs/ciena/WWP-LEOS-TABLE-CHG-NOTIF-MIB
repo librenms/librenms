@@ -1,0 +1,259 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-TABLE-CHG-NOTIF-MIB.my
+ --
+ --
+
+ WWP-LEOS-TABLE-CHG-NOTIF-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   Integer32, Unsigned32, Counter32, IpAddress, OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY			
+	FROM SNMPv2-SMI			
+   DisplayString, MacAddress, RowStatus, TEXTUAL-CONVENTION, TruthValue			
+	FROM SNMPv2-TC
+   AddressFamilyNumbers
+	FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB
+   wwpModules, wwpModulesLeos		
+	FROM WWP-SMI;
+
+	
+ wwpLeosTableChgNotifMIB MODULE-IDENTITY
+	 LAST-UPDATED "200203120000Z"
+	 ORGANIZATION "Ciena, Inc"
+	 CONTACT-INFO
+		  "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+	  DESCRIPTION
+	          "This MIB module is used to maintain the table of (Table, Ems IP)"
+	  REVISION    "200203120000Z"
+	  DESCRIPTION
+      	          "Initial creation."
+	  ::= { wwpModulesLeos 9}
+
+ 
+ --
+ -- Node definitions
+ --
+
+ wwpLeosTableChgNotifMIBObjects OBJECT IDENTIFIER ::= { wwpLeosTableChgNotifMIB 1 }
+
+ wwpLeosTableChgNotif  OBJECT IDENTIFIER ::= {  wwpLeosTableChgNotifMIBObjects 7 }
+
+ -- Notifications 
+  
+ wwpLeosTableChgNotifMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpLeosTableChgNotifMIB 2 } 
+ 
+ wwpLeosTableChgNotifMIBNotifications       OBJECT IDENTIFIER ::=  { wwpLeosTableChgNotifMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpLeosTableChgNotifMIBConformance OBJECT IDENTIFIER ::= { wwpLeosTableChgNotifMIB 3 } 
+ wwpLeosTableChgNotifMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosTableChgNotifMIBConformance 1 } 		
+ wwpLeosTableChgNotifMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosTableChgNotifMIBConformance 2 } 
+ 
+ wwpLeosTableTrapNotifTimer   OBJECT-TYPE
+     SYNTAX		      INTEGER (30..3600)
+     MAX-ACCESS		  read-write
+     STATUS		      current
+     DESCRIPTION
+	     "Setting this value will set the trap timer. Device will 
+	      send the trap notification after every wwpLeosTableTrapNotifTimer 
+	      seconds if any of the table changes."
+     ::= { wwpLeosTableChgNotifMIBObjects 1 }
+
+ wwpLeosListenerRefreshTimer   OBJECT-TYPE
+     SYNTAX		       INTEGER (30..1000)
+     MAX-ACCESS		   read-write
+     STATUS		       current
+     DESCRIPTION
+	     "Setting this value will set the listener refresh timer. Device will 
+	      send the trap notification 'wwpLeosTableRefreshTrap' after every 
+	      'wwpLeosListenerRefreshTimer' seconds if count value associated with 
+	      'wwpLeosListenerEntry' becomes 20 or 10 or 5. Device will delete entry 
+	       from wwpLeosListenerEntry once count = 0. Minimum value is 30 seconds and 
+	       maximum = 1000 seconds."
+     ::= { wwpLeosTableChgNotifMIBObjects 2 }
+ 
+ wwpLeosTableChgNotifTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosTableChgNotifEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of Ems."
+     ::= { wwpLeosTableChgNotifMIBObjects 4 }
+		
+ wwpLeosTableChgNotifEntry OBJECT-TYPE
+     SYNTAX       WwpLeosTableChgNotifEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Ems Entry in the ems Port Table."
+     INDEX { wwpLeosTableChgNotifIndex}
+     ::= { wwpLeosTableChgNotifTable 1 } 
+
+ WwpLeosTableChgNotifEntry ::= SEQUENCE { 
+     wwpLeosTableChgNotifIndex         INTEGER,     
+     wwpLeosTableChgNotifOid           OBJECT IDENTIFIER,     
+     wwpLeosTableChgNotifNumChanges    Counter32
+  }
+
+ wwpLeosTableChgNotifIndex   OBJECT-TYPE
+     SYNTAX         INTEGER (1..100)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This is the index used for this table."	      
+     ::= { wwpLeosTableChgNotifEntry 1 }
+ 
+ wwpLeosTableChgNotifOid   OBJECT-TYPE
+     SYNTAX         OBJECT IDENTIFIER
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This is the OID of the table for which device will send trap
+	      if anything changed in this table."
+     ::= { wwpLeosTableChgNotifEntry 2 }
+                         
+ wwpLeosTableChgNotifNumChanges   OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This variables returns the counter value which keeps track of
+	      how many times wwpLeosTableChgNotifOid has changed. This counter is
+	      32 bit counter and will never reset, except if device is rebooted."
+     ::= { wwpLeosTableChgNotifEntry 3 } 
+ 
+ -- 
+ -- Listener table index by ip
+ -- 
+ wwpLeosListenerTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosListenerEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of EMS/NMS IP's. This table uses Multiple Set operation to create 
+	      entry in the table."
+     ::= { wwpLeosTableChgNotifMIBObjects 5 }
+		
+ wwpLeosListenerEntry OBJECT-TYPE
+     SYNTAX       WwpLeosListenerEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Entry of each EMS/NMS who is interested to receive
+	      table change notification."
+     INDEX { wwpLeosListenerIndex }
+     ::= { wwpLeosListenerTable 1 } 
+
+ WwpLeosListenerEntry ::= SEQUENCE { 
+     wwpLeosListenerIndex	INTEGER,     
+     wwpLeosListenerAddr        DisplayString,
+     wwpLeosListenerResolvedIp  IpAddress,    
+     wwpLeosListenerStatus      RowStatus
+  }
+
+ wwpLeosListenerIndex   OBJECT-TYPE
+     SYNTAX         INTEGER (1..10)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "Specifies the unique index in the wwpLeosListenerTable."	      
+     ::= { wwpLeosListenerEntry 1 }
+ 
+ wwpLeosListenerAddr   OBJECT-TYPE
+     SYNTAX         DisplayString
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+	     "This is the host name or ip address of the EMS/NMS."	      
+     ::= { wwpLeosListenerEntry 2 } 
+ 
+ wwpLeosListenerResolvedIp   OBJECT-TYPE
+     SYNTAX         IpAddress
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This shows the resolved IP address of the host name specified in 
+	      wwpLeosListenerAddr. If wwpLeosListenerAddr is set to IpV4 type then
+	      wwpLeosListenerResolvedIp is equal to wwpLeosListenerAddr.
+	      If wwpLeosListenerAddr is set to DNS type then
+	      wwpLeosListenerResolvedIp is equal to 0 if it is unresolved 
+	      or is equal to resolved IP address."	      
+     ::= { wwpLeosListenerEntry 3 }
+
+ wwpLeosListenerStatus   OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+	     "Used to manage the creation and deletion of the 
+	     conceptual rows in this table.
+
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'.
+
+	     Setting this object to 'active' if it is already active 
+	     will result in refreshing this entry.
+
+	     Setting this object to 'create and go' if this entry is already active 
+	     will result in refreshing this entry.
+	     
+	     This table uses Multiple Set operation to create 
+	     entry in the table.
+	     wwpLeosListenerAddr and wwpLeosListenerStatus and index are mandatory objects that need 
+	     to be set when creating entry.
+	     When deleting an entry only the index needs to be specified.
+	     "
+     ::= { wwpLeosListenerEntry 4 }
+
+ --
+ -- Notifications
+ -- 
+ 
+ wwpLeosTableChgNotifIndexStr   OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (0..255))
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This variable contains the string of indexes that changed 
+	      corresponding to table wwpLeosTableChgNotifOid. This variable 
+	      is sent in the trap 'wwpLeosTableChgTrap'."
+     ::= { wwpLeosTableChgNotif 1 }
+ 
+ wwpLeosListenerRefreshCount   OBJECT-TYPE
+     SYNTAX		   INTEGER (30..1000)
+     MAX-ACCESS		   read-only
+     STATUS		   current
+     DESCRIPTION
+	     "This is the count value for each listener entry. when this count value 
+	      becomes zero, the listener entry corresponding to this value will be deleted.
+	      This count value is sent in the trap."
+     ::= { wwpLeosTableChgNotif 2 }  
+
+ wwpLeosTableChgTrap  NOTIFICATION-TYPE
+        OBJECTS	   {	
+	                wwpLeosTableChgNotifOid, 
+                        wwpLeosTableChgNotifNumChanges,
+			wwpLeosTableChgNotifIndexStr
+		   }
+	STATUS	   current
+	DESCRIPTION
+		"A notification is sent whenever the table has changed.
+                 OID of the table and the counter associated with this table is 
+		 sent in the trap."
+	::= { wwpLeosTableChgNotifMIBNotifications 1 }
+ 
+ wwpLeosTableRefreshTrap  NOTIFICATION-TYPE
+        OBJECTS	   {wwpLeosListenerRefreshCount}
+	STATUS	   current
+	DESCRIPTION
+		"A notification is sent whenever the listener table entry needs
+                 to be refreshed."
+	::= { wwpLeosTableChgNotifMIBNotifications 2 }
+ END
+ 

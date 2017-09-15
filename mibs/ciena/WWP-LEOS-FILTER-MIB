@@ -1,0 +1,450 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-FILTER-MIB.my
+ --
+ --
+
+ WWP-LEOS-FILTER-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   Unsigned32, Counter32, OBJECT-TYPE, MODULE-IDENTITY
+	FROM SNMPv2-SMI	
+   RowStatus			
+	FROM SNMPv2-TC							
+   wwpModulesLeos		
+	FROM WWP-SMI;
+
+	
+ wwpLeosFilterMIB MODULE-IDENTITY
+	    LAST-UPDATED "200602171845Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+	    DESCRIPTION
+		    "This MIB module defines the managed objects to support
+		    the protocol filtering on the WWP products."  
+
+	    REVISION    "200602171845Z"
+	    DESCRIPTION
+		    "wwpLeosFilterProtocolType - IP protocol field is 8 bits,
+		    restrict syntax range to 0-255."
+	    REVISION    "200301151700Z"
+	    DESCRIPTION
+		    "Initial creation."
+
+	    ::= { wwpModulesLeos 15 }
+ 
+ --
+ -- Node definitions
+ --
+	
+ wwpLeosFilterMIBObjects OBJECT IDENTIFIER ::= { wwpLeosFilterMIB 1 }
+
+ wwpLeosFilter  OBJECT IDENTIFIER ::= { wwpLeosFilterMIBObjects 1 }
+ 
+ -- Notifications 
+  
+ wwpLeosFilterMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpLeosFilterMIB 2 } 
+ wwpLeosFilterMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { wwpLeosFilterMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpLeosFilterMIBConformance OBJECT IDENTIFIER ::= { wwpLeosFilterMIB 3 } 
+ wwpLeosFilterMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosFilterMIBConformance 1 } 		
+ wwpLeosFilterMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosFilterMIBConformance 2 }
+
+ wwpLeosFilterResources  OBJECT IDENTIFIER ::= { wwpLeosFilter 1 }
+
+ wwpLeosFilterMaxHardwareResources OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum number of protocol filters resources this device
+        supports."
+    ::= { wwpLeosFilterResources 1 }
+    
+ wwpLeosFilterUsedHardwareResources OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the total number of hardware filter resources currently used out of 
+	 wwpLeosFilterMaxHardwareResources."
+    ::= { wwpLeosFilterResources 2 }
+ 
+ wwpLeosFilterCreated OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of filters currently created on the device."
+    ::= { wwpLeosFilterResources 3 }
+ 
+ wwpLeosFilterCountersMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total maximum number of counters supported on the device."
+    ::= { wwpLeosFilterResources 4 }
+ 
+ wwpLeosFilterCountersUsed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of counters currently used on the device."
+    ::= { wwpLeosFilterResources 5 }
+
+ --
+ -- Filter Table
+ --
+ wwpLeosFilterTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosFilterEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the configuration 
+	    parameters for the protocol filter."  
+     ::= { wwpLeosFilter 2 }
+		
+ wwpLeosFilterEntry OBJECT-TYPE
+     SYNTAX      WwpLeosFilterEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the wwpLeosFilterTable."
+     INDEX { wwpLeosFilterIndex}
+     ::= { wwpLeosFilterTable 1 }
+		
+ WwpLeosFilterEntry ::=  SEQUENCE { 
+     wwpLeosFilterIndex			INTEGER,
+     wwpLeosFilterName			OCTET STRING,
+     wwpLeosFilterAdminState		INTEGER,
+     wwpLeosFilterOperState		INTEGER,     
+     wwpLeosFilterCounter		INTEGER,     
+     wwpLeosFilterStatus		RowStatus
+ }
+
+ wwpLeosFilterIndex OBJECT-TYPE 
+     SYNTAX      INTEGER (1..64)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "The index used in the table. It identifies the unique entry in the table."
+     ::= { wwpLeosFilterEntry 1 }
+
+ wwpLeosFilterName OBJECT-TYPE 
+     SYNTAX      OCTET STRING (SIZE(1..16))
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+           "Specifies the name of the filter."
+     ::= { wwpLeosFilterEntry 2 }
+  
+ wwpLeosFilterAdminState OBJECT-TYPE 
+     SYNTAX      INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+           "Specifies the admin state of the filter."
+     ::= { wwpLeosFilterEntry 3 }
+ 
+ wwpLeosFilterOperState OBJECT-TYPE 
+     SYNTAX      INTEGER {
+			enabled(1),
+			disabled(2)
+			}
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "Specifies the operational state of the filter."
+     ::= { wwpLeosFilterEntry 4 }
+ 
+ wwpLeosFilterCounter OBJECT-TYPE 
+     SYNTAX      INTEGER {
+                      on(1),
+		      off(2)		      
+		 }
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+           "Specifies of counters for this filter need to be toggled." 
+     ::= { wwpLeosFilterEntry 5 }
+     
+ wwpLeosFilterStatus OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+	     "Used to manage the creation and deletion of the 
+	     conceptual rows in this table.
+
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'.    
+	     
+             To delete a row in this table, a manager must
+             set this object to 'destroy'."
+     ::= { wwpLeosFilterEntry 6 }
+ 
+ --
+ -- Filter Protocol Table
+ --
+ wwpLeosFilterProtocolTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosFilterProtocolEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the configuration 
+	     parameters for the filter protocol table. 
+	     Multiple Set operation must be performed on 
+	     this table to create entries in the table.
+	     This table shows all protocols (standard and custom)
+	     protocols configured on the device."  
+     ::= { wwpLeosFilter 3 }
+		
+ wwpLeosFilterProtocolEntry OBJECT-TYPE
+     SYNTAX      WwpLeosFilterProtocolEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the wwpLeosFilterProtocolTable."
+     INDEX { wwpLeosFilterProtocolIndex}
+     ::= { wwpLeosFilterProtocolTable 1 }
+		
+ WwpLeosFilterProtocolEntry ::=  SEQUENCE { 
+     wwpLeosFilterProtocolIndex			INTEGER,
+     wwpLeosFilterProtocolName			OCTET STRING,
+     wwpLeosFilterProtocolType			INTEGER,
+     wwpLeosFilterProtocolSrcPort		INTEGER,
+     wwpLeosFilterProtocolDstPort		INTEGER,
+     wwpLeosFilterProtocolStatus		RowStatus
+ }
+
+ wwpLeosFilterProtocolIndex OBJECT-TYPE 
+     SYNTAX      INTEGER (1..41)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "The protocol filter index used in the table. It uniquely identifies 
+	    the entry in the wwpLeosFilterProtocolTable table."
+     ::= { wwpLeosFilterProtocolEntry 1 }
+
+ wwpLeosFilterProtocolName OBJECT-TYPE 
+     SYNTAX      OCTET STRING (SIZE(1..16))
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+           "Specifies the name of the protocol filter."
+     ::= { wwpLeosFilterProtocolEntry 2 }
+
+ wwpLeosFilterProtocolType OBJECT-TYPE 
+     SYNTAX      INTEGER(0..255)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+           "Specifies the protocol IP number associated with this entry." 
+     ::= { wwpLeosFilterProtocolEntry 3 }
+ 
+ wwpLeosFilterProtocolSrcPort OBJECT-TYPE 
+     SYNTAX      INTEGER (0..65535)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+           "Specifies the source port associated with this entry.
+	    If set to 0 means all ports." 
+     ::= { wwpLeosFilterProtocolEntry 4 }
+ 
+ wwpLeosFilterProtocolDstPort OBJECT-TYPE 
+     SYNTAX      INTEGER (0..65535)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+           "Specifies the destination port associated with this entry.
+	    If set to 0 means all ports." 
+     ::= { wwpLeosFilterProtocolEntry 5 }
+     
+ wwpLeosFilterProtocolStatus OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+	     "Used to manage the creation and deletion of the 
+	      rows in this table.
+
+             To create a row in this table, a manager must
+             use multiple set operation to set all the following 
+	     objects.
+
+	     wwpLeosFilterProtocolName, wwpLeosFilterProtocolIp, 
+	     wwpLeosFilterProtocolSrcPort, wwpLeosFilterProtocolDstPort,
+	     wwpLeosFilterProtocolStatus.
+		
+	     wwpLeosFilterProtocolStatus must be set to 'createandgo' to create entry.
+	     
+	     To delete and entry set this object to destroy."
+     ::= { wwpLeosFilterProtocolEntry 6 }
+ 
+ --
+ -- Filter Member Table
+ --
+ wwpLeosFilterMemTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosFilterMemEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The table lists the configuration parameters for the filter 
+	     membership table."  
+     ::= { wwpLeosFilter 4 }
+		
+ wwpLeosFilterMemEntry OBJECT-TYPE
+     SYNTAX      WwpLeosFilterMemEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the wwpLeosFilterMemTable."
+     INDEX { wwpLeosFilterIndex, wwpLeosFilterVlan, wwpLeosFilterPortId}
+     ::= { wwpLeosFilterMemTable 1 }
+		
+ WwpLeosFilterMemEntry ::=  SEQUENCE { 
+     wwpLeosFilterVlan			   INTEGER,
+     wwpLeosFilterPortId		   INTEGER,
+     wwpLeosFilterMemStatus		RowStatus,
+     wwpLeosFilterMemRule		   INTEGER
+ }
+
+ wwpLeosFilterVlan OBJECT-TYPE 
+     SYNTAX      INTEGER (0..24576)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "Specifies the VLAN associated with this filter.
+	    It is also used as index in the table. if specified
+	    as 0 then it means all vlans." 
+     ::= { wwpLeosFilterMemEntry 1 }
+
+ wwpLeosFilterPortId OBJECT-TYPE 
+     SYNTAX      INTEGER (0..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "Specifies the port id associated with this filter.
+	    It is also used as index in the table. If wwpLeosFilterPortId is
+	    set to 0 then it means all ports." 
+     ::= { wwpLeosFilterMemEntry 2 }
+ 
+ wwpLeosFilterMemStatus OBJECT-TYPE 
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+	     "Used to manage the creation and deletion of the 
+	     conceptual rows in this table.
+
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'.
+	     
+	     To delete a row in this table, a manager must
+             set this object to 'destroy'."
+     ::= { wwpLeosFilterMemEntry 3 } 
+ 
+ wwpLeosFilterMemRule OBJECT-TYPE 
+     SYNTAX       INTEGER {
+            block(1),
+		      allow(2)
+		  }     
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+           "Specifies rule to apply to this filter-vlan-port member -- block traffic or allow traffic. This
+            value has a default value of block" 
+     DEFVAL { block }
+     ::= { wwpLeosFilterMemEntry 4 }
+
+ --
+ -- Filter protocol Member Table
+ --
+ wwpLeosFilterProtocolMemTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosFilterProtocolMemEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the configuration 
+	    parameters for the filter-protocol membership table."  
+     ::= { wwpLeosFilter 5 }
+		
+ wwpLeosFilterProtocolMemEntry OBJECT-TYPE
+     SYNTAX      WwpLeosFilterProtocolMemEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the wwpLeosFilterProtocolMemTable."
+     INDEX { wwpLeosFilterIndex, wwpLeosFilterProtocolIndex}
+     ::= { wwpLeosFilterProtocolMemTable 1 }
+		
+ WwpLeosFilterProtocolMemEntry ::=  SEQUENCE { 
+     wwpLeosFilterProtocolMemStatus		RowStatus
+ }
+
+ wwpLeosFilterProtocolMemStatus OBJECT-TYPE 
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+	     "Used to manage the creation and deletion of the 
+	     conceptual rows in this table.
+
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'.
+	     
+	     To delete a row in this table, a manager must
+             set this object to 'destroy'."
+     ::= { wwpLeosFilterProtocolMemEntry 1 }
+
+ --
+ --  The Filter Stats Table
+ --
+ wwpLeosFilterStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosFilterStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table to view the statistics of each
+	     filter entry."
+    ::= { wwpLeosFilter 6 }
+
+ wwpLeosFilterStatsEntry OBJECT-TYPE
+    SYNTAX     WwpLeosFilterStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the wwpLeosFilterStatsTable."
+    INDEX      { wwpLeosFilterIndex}
+    ::= { wwpLeosFilterStatsTable 1 }
+
+ WwpLeosFilterStatsEntry ::= SEQUENCE {    
+    wwpLeosFilterDropBytes        Counter32    
+ }
+ 
+ wwpLeosFilterDropBytes   OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+    	     "The number of packets that matched any protocol or member associated with this filter.
+            This includes dropped and/or forwarded packets."               
+     ::= { wwpLeosFilterStatsEntry 1 }    
+
+ END
+ 
+

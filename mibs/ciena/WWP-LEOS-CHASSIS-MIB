@@ -1,0 +1,2318 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-CHASSIS-MIB.my
+ --
+ --
+
+ WWP-LEOS-CHASSIS-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+     Integer32, Unsigned32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+     	    FROM SNMPv2-SMI
+     TruthValue, DateAndTime, MacAddress, DisplayString, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+     wwpModulesLeos		
+	    FROM WWP-SMI;	
+
+ wwpLeosChassisMIB MODULE-IDENTITY
+	    LAST-UPDATED "201209270000Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+		DESCRIPTION
+		    "Added wwpLeosSystemPartNumber and wwpLeosSystemSerialNumber"
+		REVISION    "201209270000Z"
+		DESCRIPTION
+		    "Added new last reset reasons."
+		REVISION    "201111140000Z"
+		DESCRIPTION
+			"Added wwpLeosChassisDoorAlarmTable for configuring door alarm dampening on the 3911."
+		REVISION	   "201103220000Z" 
+		DESCRIPTION
+			"Added wwpLeosChassisExternalAlarmStatusChangeNotification."
+		REVISION 	"201001270000Z"			
+		DESCRIPTION
+			"Added wwpLeosChassisInnerDoorStatusChangeNotification and wwpLeosChassisOuterDoorStatusChangeNotification."
+		REVISION 	"200911090000Z"
+		DESCRIPTION
+			"Added objects to specify chassis Attributes like the deviceId, h/w version,
+			param version, Inner/Outer Door status, Mfg Date, MAC address. Also added 
+			notification objects for Dying Gasp and Inner/Outer Door open/close."
+		REVISION     "200810060000Z"  
+	        DESCRIPTION
+		        "The MIB module for the WWP Specifc chassis mib. It contains the 
+                         variables which applies on the whole chassis for the WWP System."
+		REVISION 	"200806140000Z"
+	        DESCRIPTION
+		        "Added the power capabilities and FPGA AOAM fields under wwpLeosChassisPlatformCaps."
+	    REVISION     "200705060048Z"  --  5th May. 2007  
+	    DESCRIPTION
+		    "Updated the battery status. Added the four notifications
+                    for the battery state change. The new added notification
+                    wwpLeosChassisPowerSourceNotification replaces the 
+                    wwpLeosChassisPowerSwitchNotification."
+            REVISION     "200304280000Z"  -- 28th April. 2003  
+	    DESCRIPTION
+		    "Added valid range check for time-offset settings using the
+                    wwpLeosChassisSystemTimeOffset object. The range was previously
+                    unchecked accepting the maximum 32bit signed integer values."
+	    REVISION     "200303110000Z"  -- 11th March. 2003  
+	    DESCRIPTION
+		    "Changed the temperature thresholds to be read-write.
+		    Added Battery States and updated the notification for the 
+		    battery states. Added dry contact, door and RF notifications."
+	    REVISION    "200104031700Z"
+	    DESCRIPTION
+		    "Initial creation."
+	    ::= { wwpModulesLeos 11 }
+
+ 
+ --
+ -- Textual conventions
+ --
+
+ PortList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying ports 1 through
+        8, the second octet specifying ports 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered port, and the least significant bit
+        represents the highest numbered port.  Thus, each port
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that port is included in the set of ports; the port
+        is not included if its bit has a value of '0'."
+    SYNTAX      OCTET STRING (SIZE (0..255))	
+     FileName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+            "Represents the textual convention which defines the 
+	     name string and display hint"
+    SYNTAX       OCTET STRING (SIZE (0..64))					
+
+ --
+ -- Node definitions
+ --
+	
+ wwpLeosChassisMIBObjects OBJECT IDENTIFIER ::= { wwpLeosChassisMIB 1 }
+ 
+ wwpLeosChassis OBJECT IDENTIFIER ::= { wwpLeosChassisMIBObjects 1 }
+ wwpLeosChassisNotifAttrs OBJECT IDENTIFIER ::= { wwpLeosChassisMIBObjects 2 }
+ 
+  -- the Chassis Module 
+
+ wwpLeosChassisModule OBJECT IDENTIFIER ::= { wwpLeosChassis 1 } 
+
+ -- the Battery Module 
+
+ wwpLeosChassisBatteryModule OBJECT IDENTIFIER ::= { wwpLeosChassis 2 } 
+
+ -- the Power Supply module group.
+          
+ wwpLeosChassisPowerSupplyModule OBJECT IDENTIFIER ::= { wwpLeosChassis 3 }
+
+ -- the Fan module group.
+ 
+ wwpLeosChassisFanModule  OBJECT IDENTIFIER ::= { wwpLeosChassis 4 } 
+
+ -- the Temp Module
+
+ wwpLeosChassisTempSensor OBJECT IDENTIFIER ::= { wwpLeosChassis 5 }  
+ 
+ -- The Chassis Notif Objects
+ 
+ wwpLeosChassisNotif   OBJECT IDENTIFIER ::= { wwpLeosChassis 7 }
+ 
+ -- The Chassis Platform Capabilities Objects
+ 
+ wwpLeosChassisPlatformCaps   OBJECT IDENTIFIER ::= { wwpLeosChassis 8 }
+ 
+ -- The Chassis Resource Counts Objects
+ 
+ wwpLeosChassisResourceCounts   OBJECT IDENTIFIER ::= { wwpLeosChassis 9 }
+ 
+ 
+ 
+ -- Notifications 
+  
+ wwpLeosChassisMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpLeosChassisMIB 2 } 
+ wwpLeosChassisMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { wwpLeosChassisMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpLeosChassisMIBConformance OBJECT IDENTIFIER ::= { wwpLeosChassisMIB 3 } 
+ wwpLeosChassisMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosChassisMIBConformance 1 } 		
+ wwpLeosChassisMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosChassisMIBConformance 2 }
+ 
+ wwpLeosChassisRebootState    OBJECT-TYPE
+     SYNTAX           TruthValue
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "Setting this to true will cause chassis to reboot only if
+	      software upgrade is not in progress."
+     DEFVAL { false }
+     ::= { wwpLeosChassisModule 1 }
+ 
+ wwpLeosChassisSystemTimeOffsetScope    OBJECT-TYPE
+     SYNTAX           INTEGER {
+     					    dhcp(1),
+     					    user(2),
+     					    both(3)					
+     					}
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+	     "This object specifies who has configured system time-offset."     
+     ::= { wwpLeosChassisModule 2 }
+          
+ wwpLeosChassisSystemTimeOffset    OBJECT-TYPE
+     SYNTAX           Integer32 (-43200..50400)
+     UNITS			  "seconds"
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "The system time-offset in seconds from 
+	      UTC -- positive->east, negative->west."     
+     ::= { wwpLeosChassisModule 3 }
+     
+ wwpLeosChassisSerialConsoleState    OBJECT-TYPE
+     SYNTAX           INTEGER {
+     					 disabled(1),
+     					 enabled(2)
+     				  }     
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "This object specifies the current state of serial console. 
+	      It can be set to disabled/enabled."     
+     ::= { wwpLeosChassisModule 4 }
+     
+ wwpLeosChassisShellInactivityTimerState    OBJECT-TYPE
+     SYNTAX           INTEGER {
+     					disabled(1),
+     					enabled(2)
+     				  }
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "This object specifies if device should close the shell sessions which
+	      are inactive for sometime. The time is decided by 
+	      wwpLeosChassisShellInactivityTimeout."	      
+     ::= { wwpLeosChassisModule 5 }
+     
+ wwpLeosChassisShellInactivityTimeout    OBJECT-TYPE
+     SYNTAX           INTEGER (1..1500)
+     UNITS			  "minutes"
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "This object specifies the idle time after which the device will 
+	      forcefully close the shell sessions if enabled 
+	      (decided by wwpLeosChassisShellInactivityTimerState)."     
+     ::= { wwpLeosChassisModule 6 }  
+          
+ -- Defect 17574: Fixed by removing baud rate settings
+ -- wwpLeosChassisSerialConsoleBaudRate  OBJECT-TYPE
+ --    SYNTAX        INTEGER {
+ --    					rate9600(1),
+ --    					rate19200(2),
+ --    					rate38400(3),
+ --    					rate57600(4),
+ --    					rate15200(5)    					
+ --    				}
+ --    MAX-ACCESS    read-write
+ --    STATUS        current
+ --    DESCRIPTION
+ --        "The baud rate to be used for the serial console."
+ --    ::= { wwpLeosChassisModule 7 }
+ 
+ wwpLeosChassisSerialConsoleDataBits  OBJECT-TYPE
+    SYNTAX        INTEGER (7..8)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The data bits to be used for the serial console."
+    ::= { wwpLeosChassisModule 8 }
+
+-- Defect 17942 
+-- wwpLeosChassisSerialConsoleFlowCarrierDetect  OBJECT-TYPE
+--    SYNTAX        INTEGER {
+--    					off(1),
+--    					on(2)
+--    				}
+--    MAX-ACCESS    read-write
+--    STATUS        current
+--    DESCRIPTION
+--        "This mib object specifies if the flow carrier detection should be 'on' or 'off' for the serial console."
+--    ::= { wwpLeosChassisModule 9 }
+ 
+-- Defect 17942 
+-- wwpLeosChassisSerialConsoleFlowRTSCTS  OBJECT-TYPE
+--    SYNTAX        INTEGER {
+--    					off(1),
+--    					on(2)
+--    				}
+--    MAX-ACCESS    read-write
+--    STATUS        current
+--    DESCRIPTION
+--        "This mib object specifies if the flow RTS CTS should be 'on' or 'off' for the serial console."
+--    ::= { wwpLeosChassisModule 10 }
+ 
+-- Defect 17942 
+-- wwpLeosChassisSerialConsoleFlowDSRDTR  OBJECT-TYPE
+--    SYNTAX        INTEGER {
+--    					off(1),
+--    					on(2)
+--    				}
+--    MAX-ACCESS    read-write
+--    STATUS        current
+--    DESCRIPTION
+--        "This mib object specifies if the flow DSR DTR should be 'on' or 'off' for the serial console."
+--    ::= { wwpLeosChassisModule 11 }
+ 
+ wwpLeosChassisSerialConsoleParity  OBJECT-TYPE
+    SYNTAX        INTEGER {
+    					even(1),
+    					mark(2),
+    					none(3),
+    					odd(4),
+    					space(5)
+    				}
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The parity to be used for the serial console."
+    ::= { wwpLeosChassisModule 12 }
+ 
+ wwpLeosChassisSerialConsoleStopBits  OBJECT-TYPE
+    SYNTAX        INTEGER (1..2)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The stop bits to be used for the serial console."
+    ::= { wwpLeosChassisModule 13 }
+    
+ wwpLeosChassisRebootNow    OBJECT-TYPE
+     SYNTAX           TruthValue
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "Setting this to true will force the device to reboot irrespective of whether software upgrade 
+	      is in progress or not."
+     DEFVAL { false }
+     ::= { wwpLeosChassisModule 14 }   
+     
+ wwpLeosChassisShellLoginTimerState    OBJECT-TYPE
+     SYNTAX           INTEGER {
+     					disabled(1),
+     					enabled(2)
+     				  }
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "This object specifies if device should terminate a login session which
+	      is inactive for sometime. The time is decided by 
+	      wwpLeosChassisShellLoginTimeout."	      
+     ::= { wwpLeosChassisModule 15 }
+     
+ wwpLeosChassisShellLoginTimeout    OBJECT-TYPE
+     SYNTAX           INTEGER (10..300)
+     UNITS			  "seconds"
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "This object specifies the idle time after which the device will 
+	      forcefully close the login session if enabled 
+	      by wwpLeosChassisShellLoginTimerState."     
+     ::= { wwpLeosChassisModule 16 }  
+         
+ wwpLeosChassisScheduledRebootTable    OBJECT-TYPE
+     SYNTAX           SEQUENCE OF WwpLeosChassisScheduledRebootEntry
+     MAX-ACCESS       not-accessible
+     STATUS           current
+     DESCRIPTION
+	     "Schedule a system reboot for this box."
+     ::= { wwpLeosChassisModule 17 }
+     
+ wwpLeosChassisWelcomeBanner OBJECT-TYPE
+     SYNTAX             FileName
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Gets or sets the name of the current welcome banner file used
+		 after the CLI Login."
+     ::= { wwpLeosChassisModule 18 }
+
+  wwpLeosChassisResetWelcomeBanner OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION
+                "Resets the welcome banner to the default if set."
+     ::= { wwpLeosChassisModule 19 }   
+
+  wwpLeosChassisLoginBanner OBJECT-TYPE
+       SYNTAX             FileName
+       MAX-ACCESS         read-write
+       STATUS             current
+       DESCRIPTION
+                "Gets or sets the name of the current login banner file used
+		 before the CLI Login."
+       ::= { wwpLeosChassisModule 20 }
+
+  wwpLeosChassisResetLoginBanner OBJECT-TYPE
+       SYNTAX             TruthValue
+       MAX-ACCESS         read-write
+       STATUS             current
+       DESCRIPTION
+                "Resets the login banner to the default if set."
+       ::= { wwpLeosChassisModule 21 }
+
+ wwpLeosChassisMacAddress    OBJECT-TYPE
+     SYNTAX           MacAddress
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+	     "This object indicates the chassis MAC address."     
+     ::= { wwpLeosChassisModule 50 }
+     
+     wwpLeosChassisDeviceId    OBJECT-TYPE
+     SYNTAX           DisplayString
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+	     "This object indicates the device ID of the chassis."     
+     ::= { wwpLeosChassisModule 51 }
+
+      wwpLeosChassisSerialNumber    OBJECT-TYPE
+     SYNTAX           DisplayString
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+	     "This object indicates the chassis serial number."     
+     ::= { wwpLeosChassisModule 52 }
+     
+  wwpLeosChassisMfgDate    OBJECT-TYPE
+     SYNTAX           DateAndTime
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+	     "This object indicates the chassis manufacturing date."     
+     ::= { wwpLeosChassisModule 53 }   
+   
+  wwpLeosChassisParamVersion    OBJECT-TYPE
+     SYNTAX           DisplayString
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+	     "This object indicates the chassis param version."     
+     ::= { wwpLeosChassisModule 54 }  
+  
+  wwpLeosChassisHardwareVersion    OBJECT-TYPE
+     SYNTAX           DisplayString
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+	     "This object indicates the chassis Hardware version."     
+     ::= { wwpLeosChassisModule 55 }      
+     
+   wwpLeosChassisInnerDoorStatus	OBJECT-TYPE
+   	SYNTAX       INTEGER  { 
+   				  none(0),
+                  open(1),
+                  closed(2),
+                  override(3)
+              }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "Specifies the status of the Inner Door."
+     ::= { wwpLeosChassisModule 56 }
+   
+   wwpLeosChassisOuterDoorStatus	OBJECT-TYPE
+   	SYNTAX       INTEGER  { 
+   				  none(0),
+                  open(1),
+                  closed(2)                  
+              }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "Specifies the status of the Outer Door."
+     ::= { wwpLeosChassisModule 57 }
+     
+   wwpLeosChassisPostState			OBJECT-TYPE
+    SYNTAX		 INTEGER  {
+    				enabled(1),
+    				disabled(2)
+    		  }
+    MAX-ACCESS	  read-write
+    STATUS		  current
+    DESCRIPTION
+    		"Specifies the POST state of the chassis."
+    ::= { wwpLeosChassisModule 60	}
+ 
+ wwpLeosChassisPostResultTable    OBJECT-TYPE
+     SYNTAX           SEQUENCE OF WwpLeosChassisPostResultEntry
+     MAX-ACCESS       not-accessible
+     STATUS           current
+     DESCRIPTION
+	     "Display the Post Results only when the Chassis Post State is enabled."
+     ::= { wwpLeosChassisModule 61 }
+ wwpLeosChassisExternalAlarmStatus	OBJECT-TYPE
+   	SYNTAX       INTEGER  { 
+   				  raised(1),
+                  cleared(2)                  
+              }
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+             "This OID is sent in the wwpLeosChassisExternalAlarmStatusChangeNotification trap to identify whether a specific external alarm has been raised or cleared."
+     ::= { wwpLeosChassisModule 62 }
+                                    
+ wwpLeosChassisExternalAlarm	OBJECT-TYPE
+     SYNTAX       INTEGER (0..2147483647)	
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+             "This OID is sent in the wwpLeosChassisExternalAlarmStatusChangeNotification trap to identify which alarm was triggered."
+     ::= { wwpLeosChassisModule 63 }    
+     
+  wwpLeosSystemPartNumber    OBJECT-TYPE
+     SYNTAX           DisplayString
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+	     "This object indicates the system part/revision number."     
+     ::= { wwpLeosChassisModule 66 }      
+                                
+  wwpLeosSystemSerialNumber    OBJECT-TYPE
+     SYNTAX           DisplayString
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+	     "This object indicates the system serial number."     
+     ::= { wwpLeosChassisModule 67 }      
+                                
+
+ wwpLeosChassisPostResultEntry	   OBJECT-TYPE
+     SYNTAX			WwpLeosChassisPostResultEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "."
+     INDEX  { wwpLeosChassisPostResultIndex }
+     ::= { wwpLeosChassisPostResultTable 1 }
+     
+ WwpLeosChassisPostResultEntry  ::=   SEQUENCE	{
+     wwpLeosChassisPostResultIndex		INTEGER,
+     wwpLeosChassisPostResultCode		Unsigned32,
+     wwpLeosChassisPostResultMessage	DisplayString
+ }          
+ 
+ wwpLeosChassisPostResultIndex OBJECT-TYPE
+     SYNTAX      INTEGER  (1..32)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+            "Unique index for the Post Result Table."
+     ::= { wwpLeosChassisPostResultEntry 1 }
+
+ wwpLeosChassisPostResultCode OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	     "The result code returned by the device POST test."
+     ::= { wwpLeosChassisPostResultEntry 2 }	
+
+ wwpLeosChassisPostResultMessage OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The test result string generated by the POST tests"
+     ::= { wwpLeosChassisPostResultEntry 3 }
+
+ wwpLeosChassisScheduledRebootEntry     OBJECT-TYPE
+     SYNTAX         WwpLeosChassisScheduledRebootEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "An entry in the ScheduledRebootTable holding the date/time."
+     INDEX  { wwpLeosChassisScheduledRebootIndex }
+     ::= { wwpLeosChassisScheduledRebootTable 1 }
+
+ WwpLeosChassisScheduledRebootEntry ::=  SEQUENCE  {
+     wwpLeosChassisScheduledRebootIndex        INTEGER,
+     wwpLeosChassisScheduledRebootTimestamp    DateAndTime,
+     wwpLeosChassisScheduledRebootActive       TruthValue,
+     wwpLeosChassisScheduledRebootNopost       TruthValue,
+     wwpLeosChassisScheduledRebootDelay        INTEGER
+ }
+
+ wwpLeosChassisScheduledRebootIndex  OBJECT-TYPE
+     SYNTAX            INTEGER (1..1)
+     MAX-ACCESS        read-write
+     STATUS            current
+     DESCRIPTION
+             "Denotes singleton table entry."
+     ::= { wwpLeosChassisScheduledRebootEntry 1 }
+
+ wwpLeosChassisScheduledRebootTimestamp    OBJECT-TYPE
+     SYNTAX           DateAndTime
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "The date and time of the reboot scheduled for this box."  
+      ::= { wwpLeosChassisScheduledRebootEntry 2 }
+
+ wwpLeosChassisScheduledRebootActive    OBJECT-TYPE
+     SYNTAX           TruthValue
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "Indicates whether a scheduled reboot is desired or exists."
+     DEFVAL { false }
+     ::= { wwpLeosChassisScheduledRebootEntry 3 }   
+     
+ wwpLeosChassisScheduledRebootNopost    OBJECT-TYPE
+     SYNTAX           TruthValue
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "Indicates whether POST is disabled for next reboot."
+     DEFVAL { false }
+     ::= { wwpLeosChassisScheduledRebootEntry 4 }   
+     
+ wwpLeosChassisScheduledRebootDelay  OBJECT-TYPE
+     SYNTAX            INTEGER (1..86400)
+     MAX-ACCESS        read-write
+     STATUS            current
+     DESCRIPTION
+             "Denotes seconds to wait before reboot."
+     ::= { wwpLeosChassisScheduledRebootEntry 5 }
+
+ wwpLeosChassisDoorAlarmTable    OBJECT-TYPE
+     SYNTAX           SEQUENCE OF WwpLeosChassisDoorAlarmEntry
+     MAX-ACCESS       not-accessible
+     STATUS           current
+     DESCRIPTION
+	     "Door alarm settings."
+     ::= { wwpLeosChassisModule 64 } 
+    
+ wwpLeosChassisDoorAlarmEntry     OBJECT-TYPE
+     SYNTAX         WwpLeosChassisDoorAlarmEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "An entry in the DoorAlarmTable containing door alarm flap settings."
+     INDEX  { wwpLeosChassisDoorAlarmIndex }
+     ::= { wwpLeosChassisDoorAlarmTable 1 }
+
+ WwpLeosChassisDoorAlarmEntry ::=  SEQUENCE  {
+     wwpLeosChassisDoorAlarmIndex            INTEGER,
+     wwpLeosChassisDoorAlarmStatus           INTEGER,
+     wwpLeosChassisDoorAlarmAdminStatus      INTEGER,
+     wwpLeosChassisDoorAlarmFlapDetect       INTEGER,
+     wwpLeosChassisDoorAlarmFlapCount        INTEGER,
+     wwpLeosChassisDoorAlarmFlapDetectTime   INTEGER,
+     wwpLeosChassisDoorAlarmFlapHoldTime     INTEGER
+ }
+
+ wwpLeosChassisDoorAlarmIndex     OBJECT-TYPE
+     SYNTAX         INTEGER {
+                inner(0),
+                outer(1)
+     }
+     MAX-ACCESS     accessible-for-notify
+     STATUS         current
+     DESCRIPTION
+             "An index into the DoorAlarmTable."
+     ::= { wwpLeosChassisDoorAlarmEntry 1 }
+
+ wwpLeosChassisDoorAlarmStatus     OBJECT-TYPE
+     SYNTAX         INTEGER {
+                enabled(1),
+                disabled(2)
+     }
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "Indicates if the door alarm is enabled or disabled."
+     ::= { wwpLeosChassisDoorAlarmEntry 2 }
+
+ wwpLeosChassisDoorAlarmAdminStatus     OBJECT-TYPE
+     SYNTAX         INTEGER {
+                enabled(1),
+                disabled(2)
+     }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Indicates if the door alarm admin is set to enabled or disabled."
+     DEFVAL { 1 }
+     ::= { wwpLeosChassisDoorAlarmEntry 3 }
+
+ wwpLeosChassisDoorAlarmFlapDetect     OBJECT-TYPE
+     SYNTAX         INTEGER {
+                enabled(1),
+                disabled(2)
+     }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Indicates if the door alarm flap detection is either enabled or disabled."
+     DEFVAL { 2 }
+     ::= { wwpLeosChassisDoorAlarmEntry 4 }
+
+ wwpLeosChassisDoorAlarmFlapCount     OBJECT-TYPE
+     SYNTAX         INTEGER (3..100)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "The number of events that must occur during the door flap detect time for door monitoring to be disabled."
+     DEFVAL { 5 }
+     ::= { wwpLeosChassisDoorAlarmEntry 5 }
+
+ wwpLeosChassisDoorAlarmFlapDetectTime     OBJECT-TYPE
+     SYNTAX         INTEGER (5..3600)
+     UNITS          "seconds"
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "The amount of time in seconds during which the door flap count must be reached for door monitoring to be disabled."
+     DEFVAL { 10 }
+     ::= { wwpLeosChassisDoorAlarmEntry 6 }
+
+ wwpLeosChassisDoorAlarmFlapHoldTime     OBJECT-TYPE
+     SYNTAX         INTEGER (60..3600)
+     UNITS          "seconds"
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "The amount of time in seconds required to elapse before door alarm monitoring will be re-enabled."
+     DEFVAL { 300 }
+     ::= { wwpLeosChassisDoorAlarmEntry 7 }    
+    
+ -- 
+ -- Power Module
+ --      
+ wwpLeosChassisPowerTable  OBJECT-TYPE
+     SYNTAX      SEQUENCE OF WwpLeosChassisPowerEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "A list of power supply entries."
+     ::= { wwpLeosChassisPowerSupplyModule 1 }
+
+ wwpLeosChassisPowerEntry     OBJECT-TYPE
+     SYNTAX         WwpLeosChassisPowerEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "An entry in the powerTable providing objects for a
+             power supply."
+     INDEX  { wwpLeosChassisPowerSupplyNum }
+     ::= { wwpLeosChassisPowerTable 1 }
+
+ WwpLeosChassisPowerEntry ::=  SEQUENCE  {
+     wwpLeosChassisPowerSupplyNum         Integer32,
+     wwpLeosChassisPowerSupplyState       INTEGER,
+     wwpLeosChassisPowerSupplyType		INTEGER,
+     wwpLeosChassisPowerSupplyRedundantState  INTEGER 
+ }
+
+ wwpLeosChassisPowerSupplyNum  OBJECT-TYPE
+     SYNTAX            Integer32(1..2147483647) 
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "Denotes the power supply."
+     ::= { wwpLeosChassisPowerEntry 1 }
+
+ wwpLeosChassisPowerSupplyState  OBJECT-TYPE
+     SYNTAX  INTEGER  {
+                  online(1),
+                  offline(2),
+                  faulted(3)                  
+              }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "Specifies the power supply's state."
+     ::= { wwpLeosChassisPowerEntry 2 }
+
+ wwpLeosChassisPowerSupplyType  OBJECT-TYPE
+     SYNTAX       INTEGER  {
+                       ac(1),
+                       dc(2),
+                       unequipped(3)                       
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+              "Specifies the power supply type."
+      ::= { wwpLeosChassisPowerEntry 3 }
+
+ wwpLeosChassisPowerSupplyRedundantState  OBJECT-TYPE
+     SYNTAX  INTEGER  {
+                  protected(1),
+                  unprotected(2)                  
+             }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "Specfiies power supply redundant state."
+     ::= { wwpLeosChassisPowerEntry 4 }
+
+ wwpLeosChassisRedPowerSupplyNotifEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "This variable  indicates  whether  the  system
+             generates the wwpLeosChassisRedPowerSupplyNotification. 
+             A false value prevents this notifications
+             from being generated by this system."
+    DEFVAL { true }
+    ::= { wwpLeosChassisPowerSupplyModule 2 }
+
+ --
+ --  The Fan module group
+ --
+ wwpLeosChassisFanModuleTable  OBJECT-TYPE
+     SYNTAX      SEQUENCE OF WwpLeosChassisFanModuleEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "A list of fan module entries."
+     ::= { wwpLeosChassisFanModule 1 }
+
+ wwpLeosChassisFanModuleEntry  OBJECT-TYPE
+     SYNTAX         WwpLeosChassisFanModuleEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "An entry in the fan module Table providing objects for a
+             fan module."
+     INDEX  { wwpLeosChassisFanModuleNum }
+     ::= { wwpLeosChassisFanModuleTable 1 }
+
+ WwpLeosChassisFanModuleEntry ::=  SEQUENCE  {
+     wwpLeosChassisFanModuleNum          Integer32,
+     wwpLeosChassisFanModuleType         INTEGER,
+     wwpLeosChassisFanModuleStatus       INTEGER,
+     wwpLeosChassisFanAvgSpeed           Integer32,
+     wwpLeosChassisFanCurrentSpeed       Integer32,
+     wwpLeosChassisFanMinSpeed           Integer32
+ }
+
+ wwpLeosChassisFanModuleNum  OBJECT-TYPE
+     SYNTAX        Integer32 (1..2147483647)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "Denotes the Fan module."
+     ::= { wwpLeosChassisFanModuleEntry 1 }
+
+ wwpLeosChassisFanModuleType OBJECT-TYPE
+     SYNTAX        INTEGER  {
+                        fixed(1),
+                        hotSwappable(2),
+                        unequipped(3)                        
+                   }
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "Denotes the fan modules type.
+	      'fixed' means fan is fixed and cannot be removed.
+	      'hotswappable' means fan can be removed and inserted 
+	      whenever required.
+	      'unequipped' means fan is not installed."
+     ::= { wwpLeosChassisFanModuleEntry 2 }
+ 
+ wwpLeosChassisFanModuleStatus OBJECT-TYPE
+     SYNTAX        INTEGER  {
+                        ok(1),
+                        pending(2),
+                        failure(3)                        
+                   }
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "Denotes the fan modules status. 
+	      'ok' means fan is operational,
+	      'pending' means fan is installed but statistics
+	      are not yet available,
+	      'failure' means fan is not working."
+     ::= { wwpLeosChassisFanModuleEntry 3 }
+
+ wwpLeosChassisFanAvgSpeed OBJECT-TYPE
+     SYNTAX        Integer32 (0..2147483647)
+     UNITS         "rpm"
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "The fans average speed in RPM.  The average is calculated
+	     on a continuous basis from system startup."
+     ::= { wwpLeosChassisFanModuleEntry 4 }
+
+ wwpLeosChassisFanCurrentSpeed OBJECT-TYPE
+     SYNTAX        Integer32 (0..2147483647)
+     UNITS         "rpm"
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+    	     "The current speed of the fan in RPM."
+     ::= { wwpLeosChassisFanModuleEntry 5 }
+
+ wwpLeosChassisFanMinSpeed OBJECT-TYPE
+     SYNTAX        Integer32 (0..2147483647)
+     UNITS         "rpm"
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+    	     "The minimum speed of the fan in RPM."
+     ::= { wwpLeosChassisFanModuleEntry 6 }
+ 
+ 
+ wwpLeosChassisFanModuleNotifEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "This variable  indicates  whether  the  system
+             generates the wwpLeosChassisFanModuleNotification. 
+             A false value prevents this notifications
+             from being generated by this system."
+    DEFVAL { true }
+    ::= { wwpLeosChassisFanModule 2 }
+
+ --
+ --  The Temp module group
+ --
+ wwpLeosChassisTempSensorTable  OBJECT-TYPE
+     SYNTAX      SEQUENCE OF WwpLeosChassisTempSensorEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "A list of Temp Sensors entries."
+     ::= { wwpLeosChassisTempSensor 1 }
+
+ wwpLeosChassisTempSensorEntry  OBJECT-TYPE
+     SYNTAX         WwpLeosChassisTempSensorEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "An entry in the Temp Sensor Table providing objects for a
+             Temp Sensor."
+     INDEX  { wwpLeosChassisTempSensorNum }
+     ::= { wwpLeosChassisTempSensorTable 1 }
+
+ WwpLeosChassisTempSensorEntry ::=  SEQUENCE  {
+     wwpLeosChassisTempSensorNum               Integer32,
+     wwpLeosChassisTempSensorValue             Integer32,
+     wwpLeosChassisTempSensorHighThreshold     Integer32,
+     wwpLeosChassisTempSensorLowThreshold      Integer32,
+     wwpLeosChassisTempSensorState             INTEGER
+ }
+
+ wwpLeosChassisTempSensorNum  OBJECT-TYPE
+     SYNTAX        Integer32 (1..2147483647)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "Denotes the Temp sensor module."
+     ::= { wwpLeosChassisTempSensorEntry 1 }
+
+ wwpLeosChassisTempSensorValue OBJECT-TYPE
+     SYNTAX        Integer32
+     UNITS         "degrees Celsius"
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+    	     "The value of temperature measured by the sensor 
+              inside the device in degrees C."
+     ::= { wwpLeosChassisTempSensorEntry 2 }
+ 
+ wwpLeosChassisTempSensorHighThreshold   OBJECT-TYPE
+     SYNTAX       Integer32
+     UNITS        "degrees Celsius"
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "The highest value that the object wwpLeosChassisTempSensorValue
+              may obtain at which a wwpLeosChassisMIBTempNotification is sent."
+     ::= { wwpLeosChassisTempSensorEntry 3 }
+
+ wwpLeosChassisTempSensorLowThreshold   OBJECT-TYPE
+     SYNTAX       Integer32
+     UNITS        "degrees Celsius"
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "The Lowest value that the object wwpLeosChassisTempSensorValue
+              may obtain at which a wwpLeosChassisMIBTempNotification is sent."
+     ::= { wwpLeosChassisTempSensorEntry 4 }
+
+ wwpLeosChassisTempSensorState   OBJECT-TYPE
+     SYNTAX       INTEGER {
+                        higherThanThreshold(0),
+                        normal(1),
+                        lowerThanThreshold(2)
+                  }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The state indicates whether the current temp is greater than,
+             equal to or less than the threshold state."
+     ::= { wwpLeosChassisTempSensorEntry 5 }
+
+ wwpLeosChassisTempNotifEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "This variable  indicates  whether  the  system
+             generates the wwpLeosChassisTempNotification. 
+             A false value prevents this notifications
+             from being generated by this system."
+    DEFVAL { true }
+    ::= { wwpLeosChassisTempSensor 2 }
+ 
+ wwpLeosChassisTempHighThreshold OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "This variable indicates the high temperature threshold
+	      to be used by the device when checking temperature 
+	      of the device. This object is similar to wwpLeosChassisTempSensorHighThreshold
+	      only difference is that wwpLeosChassisTempHighThreshold is 
+	      global attribute not per sensor based.
+	      wwpLeosChassisTempSensorHighThreshold will have the same value as 
+	      wwpLeosChassisTempHighThreshold at all times. 
+	      wwpLeosChassisTempSensorHighThreshold is basically redundant."
+    ::= { wwpLeosChassisTempSensor 3 }
+
+  wwpLeosChassisTempLowThreshold OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "This variable indicates the low temperature threshold
+	      to be used by the device when checking temperature 
+	      of the device. This object is similar to 
+	      wwpLeosChassisTempSensorLowThreshold
+	      only difference is that wwpLeosChassisTempLowThreshold is global 
+	      attribute not per sensor based.
+	      wwpLeosChassisTempSensorLowThreshold will have the same value as 
+	      wwpLeosChassisTempLowThreshold at all times.
+	      wwpLeosChassisTempSensorLowThreshold is basically redundant."
+    ::= { wwpLeosChassisTempSensor 4 }  
+
+ --
+ -- notif group
+ --  
+ wwpPowerSwitchingOp OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        none(0),
+                        acToBattery(1),
+                        bateryToAC(2)                     
+                    }
+     --MAX-ACCESS     accessible-for-notify
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "The object to notify whether the input power supply is switching
+             from ac to Battery or vice versa."
+     ::= { wwpLeosChassisNotif 1 }
+
+ --
+ -- chassis battery group
+ --
+ wwpLeosChassisBatteryStatus     OBJECT-TYPE
+     SYNTAX           INTEGER {
+     					   online(0),
+                           present(1),
+	                   missing(2)
+	              } 
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+	     "Describes the current status of the 
+             battery. If battery is connected then the
+             status is indicated as 'present'." 
+     ::= { wwpLeosChassisBatteryModule 1 }
+  
+ wwpLeosChassisBatteryVoltageLevel     OBJECT-TYPE
+     SYNTAX           INTEGER {
+     					   unknown(0),
+                           normal(1),
+	                   low(2)
+	              } 
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+	     "Describes the current voltage level of the 
+             battery." 
+     ::= { wwpLeosChassisBatteryModule 2 }
+     
+ wwpLeosChassisBatteryCondition  OBJECT-TYPE
+     SYNTAX           INTEGER {
+     					   unknown(0),
+                           good(1),
+	                   bad(2)
+	              } 
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+	     "Describes the current condition of the battery." 
+     ::= { wwpLeosChassisBatteryModule 3 }
+     
+ wwpLeosChassisPowerSource OBJECT-TYPE
+     SYNTAX           INTEGER {
+                           primaryPower(1),
+	                   battery(2)
+	              } 
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+	     "Describes the current power source for the device." 
+     ::= { wwpLeosChassisBatteryModule 4 }
+     
+ wwpLeosChassisBatteryNormalStateName     OBJECT-TYPE
+     SYNTAX           OCTET STRING (SIZE(1..128))  
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "The state name associated with the normal state
+	     of the battery."
+     ::= { wwpLeosChassisBatteryModule 5 }
+     
+ wwpLeosChassisBatteryLowStateName     OBJECT-TYPE
+     SYNTAX           OCTET STRING (SIZE(1..128))  
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "The state name associated with the low state
+	     of the battery."
+     ::= { wwpLeosChassisBatteryModule 6 }
+
+ wwpLeosChassisBatteryGoodStateName     OBJECT-TYPE
+     SYNTAX           OCTET STRING (SIZE(1..128))  
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "The state name associated with the good state
+	     of the battery."
+     ::= { wwpLeosChassisBatteryModule 7 }
+ 
+ wwpLeosChassisBatteryBadStateName     OBJECT-TYPE
+     SYNTAX           OCTET STRING (SIZE(1..128))  
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "The state name associated with the bad state
+	     of the battery."
+     ::= { wwpLeosChassisBatteryModule 8 }
+     
+ wwpLeosChassisBatteryPresentStateName     OBJECT-TYPE
+     SYNTAX           OCTET STRING (SIZE(1..128))  
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "The state name associated with the battery state 
+             'present'." 
+     ::= { wwpLeosChassisBatteryModule 9 }
+     
+ wwpLeosChassisBatteryMissingStateName     OBJECT-TYPE
+     SYNTAX           OCTET STRING (SIZE(1..128))  
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "The state name associated with the battery state 
+             'missing'." 
+     ::= { wwpLeosChassisBatteryModule 10 }
+    
+ wwpLeosChassisBatteryPowerPrimaryStateName     OBJECT-TYPE
+     SYNTAX           OCTET STRING (SIZE(1..128))  
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+             "The state name associated with the state when the
+              device is on primary power." 
+     ::= { wwpLeosChassisBatteryModule 11 }
+      
+ wwpLeosChassisBatteryPowerBatteryStateName     OBJECT-TYPE
+     SYNTAX           OCTET STRING (SIZE(1..128))  
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+	     "The state name associated with the state when the
+             device is on battery power." 
+     ::= { wwpLeosChassisBatteryModule 12 }
+     
+ 
+      
+ wwpLeosChassisBatteryLowStateNotifEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "This variable indicates whether the system
+             will generate the wwpLeosChassisBatteryStatusNotification
+             in case of battery state changing from normal to low
+             or vice versa. 
+             A false value prevents this notifications
+             from being generated by this system."
+    DEFVAL { true }
+    ::= { wwpLeosChassisBatteryModule 13 }
+     
+ wwpLeosChassisBatteryBadStateNotifEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "This variable indicates whether the system
+             will generate the wwpLeosChassisBatteryStatusNotification
+             in case of battery state changing from good to bad
+             or vice versa.
+             A false value prevents this notifications
+             from being generated by this system."
+    DEFVAL { true }
+    ::= { wwpLeosChassisBatteryModule 14 }
+    
+ wwpLeosChassisBatteryMissingStateNotifEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "This variable indicates whether the system
+             will generate the wwpLeosChassisBatteryStatusNotification
+             in case of battery state changing from present to missing
+             or vice versa.
+             A false value prevents this notifications
+             from being generated by this system."
+    DEFVAL { true }
+    ::= { wwpLeosChassisBatteryModule 15 }
+    
+ wwpLeosChassisBatteryPowerNotifEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "This variable indicates whether the system
+             will generate the wwpLeosChassisBatteryStatusNotification
+             in case of input power changing from primary to battery
+             or vice versa.
+             A false value prevents this notifications
+             from being generated by this system."
+    DEFVAL { true }
+    ::= { wwpLeosChassisBatteryModule 16 }         
+   
+ wwpLeosChassisPostErrorCategory OBJECT-TYPE
+     SYNTAX      INTEGER {
+     					chassis(1),
+     					blade(2),
+     					port(3)
+     				}
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+             "This variable indicates the category of post errors. This
+              object is sent out as one of the binding in Post Error
+              Notification."    
+    ::= { wwpLeosChassisNotifAttrs 1 }
+    
+  wwpLeosChassisPostErrorValue OBJECT-TYPE
+     SYNTAX      INTEGER (0..65535)
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+             "This variable indicates the value associated with category 
+              wwpLeosChassisPostErrorCategory. If this value is 0 then 
+              no value corresponds to wwpLeosChassisPostErrorCategory."
+    DEFVAL { 0 }
+    ::= { wwpLeosChassisNotifAttrs 2 }
+ 
+  wwpLeosChassisPostErrorCode OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+             "This variable indicates the post error code."    
+    ::= { wwpLeosChassisNotifAttrs 3 }
+    
+  wwpLeosChassisPostErrorMsg OBJECT-TYPE  	 
+     SYNTAX      DisplayString
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+             "This variable indicates the post error message 
+              associated with category wwpLeosChassisPostErrorCategory."    
+    ::= { wwpLeosChassisNotifAttrs 4 }
+
+  wwpLeosChassisRebootReasonErrorType OBJECT-TYPE  	 
+     SYNTAX      INTEGER {  
+                                unknown(1),
+                                snmp(2),
+                                powerFailure(3),
+                                appload(4),
+                                errorHandler(5),
+                                watchDog(6),
+                                upgrade(7),
+                                cli(8),           
+                                resetButton(9),
+                                serviceModeChange(10),
+                                guardianReboot(11),
+                                guardianSaosRestart(12)
+                                }
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+             "This variable indicates the type of reboot reasons
+              included in the wwpLeosChassisRebootNotification trap."    
+    ::= { wwpLeosChassisNotifAttrs 5 }
+  
+  wwpLeosChassisSnmpState OBJECT-TYPE  	 
+     SYNTAX      INTEGER {
+     				disabled(1),
+     				enabled(2)
+     				}
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION
+             "This variable indicates the snmp state."    
+    ::= { wwpLeosChassisNotifAttrs 6 }    
+     
+ --
+ -- Notifications
+ -- 
+ wwpLeosChassisPowerSupplyStatusNotification NOTIFICATION-TYPE
+	OBJECTS	{
+                wwpLeosChassisPowerSupplyNum, 
+                wwpLeosChassisPowerSupplyState,
+                wwpLeosChassisPowerSupplyType              
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosChassisPowerSupplyStatusNotification is sent if a 
+		power supply state is changed."
+	::= { wwpLeosChassisMIBNotifications 1 }
+ 
+ wwpLeosChassisFanModuleNotification NOTIFICATION-TYPE
+	OBJECTS	{
+		wwpLeosChassisFanModuleNum,		
+		wwpLeosChassisFanModuleStatus
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosChassisFanModuleNotification is sent if the 
+		fan state changes."
+	::= { wwpLeosChassisMIBNotifications 2 }
+
+ wwpLeosChassisTempNotification NOTIFICATION-TYPE
+	OBJECTS	{
+                wwpLeosChassisTempSensorState,
+                wwpLeosChassisTempSensorValue,
+                wwpLeosChassisTempSensorHighThreshold,
+                wwpLeosChassisTempSensorLowThreshold          
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosChassisTempNotification is sent if the 
+		wwpLeosChassisTempSensorState is changed."
+	::= { wwpLeosChassisMIBNotifications 3 }
+
+ wwpLeosChassisPowerSwitchNotification NOTIFICATION-TYPE
+	OBJECTS	{
+                wwpPowerSwitchingOp           
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosChassisPowerSwitchNotification is sent if the 
+		input power supply is switched to Battery from the 
+                AC power or switched from the Battery to the AC Power."
+	::= { wwpLeosChassisMIBNotifications 4 }
+
+ wwpLeosChassisBatteryStatusNotification NOTIFICATION-TYPE
+	OBJECTS	{
+	           wwpLeosChassisBatteryStatus
+                }
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosChassisBatteryStatusNotification is sent if the 
+		Battery status changes. If the device supports the 
+                configurable battery state names, then the corresponding 
+                battery state name should also be sent with this notification." 
+	::= { wwpLeosChassisMIBNotifications 5 }
+
+ wwpLeosChassisBatteryVoltageLevelNotification NOTIFICATION-TYPE
+	OBJECTS	{
+	        wwpLeosChassisBatteryVoltageLevel
+                }
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosChassisBatteryVoltageLevelNotification is sent if the 
+		Battery voltage level changes from normal to low or vice versa.
+                If the device supports the configurable battery state names, then 
+                the corresponding battery state name should also be sent with 
+                this notification." 
+	::= { wwpLeosChassisMIBNotifications 6 }
+ 
+ wwpLeosChassisBatteryConditionNotification NOTIFICATION-TYPE
+	OBJECTS	{
+	        wwpLeosChassisBatteryCondition
+                }
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosChassisBatteryConditionNotification is sent if the 
+		Battery condition changes from good to bad or vice versa.
+                If the device supports the configurable battery state names, then 
+                the corresponding battery state name should also be sent with 
+                this notification." 
+	::= { wwpLeosChassisMIBNotifications 7 }
+         
+ wwpLeosChassisPowerSourceNotification NOTIFICATION-TYPE
+	OBJECTS	{
+	        wwpLeosChassisPowerSource
+                }
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosChassisPowerSourceNotification is sent if the 
+		Battery input power source changes from battery to primary
+                power or vice versa. A device which supports 
+                wwpLeosChassisPowerSwitchNotification should not support this
+                notification. If the device supports the configurable 
+                battery state names, then the corresponding battery state 
+                name should also be sent with this notification." 
+	::= { wwpLeosChassisMIBNotifications 8 }    
+ 
+ wwpLeosChassisPostErrorNotification NOTIFICATION-TYPE
+	OBJECTS	{				
+	        	wwpLeosChassisPostErrorCategory,
+	        	wwpLeosChassisPostErrorValue,
+	        	wwpLeosChassisPostErrorCode,
+	        	wwpLeosChassisPostErrorMsg
+            }
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosChassisPostErrorNotification is sent after cold start trap 
+		 if the device detects post errors." 
+	::= { wwpLeosChassisMIBNotifications 9 }
+
+ wwpLeosChassisRebootNotification NOTIFICATION-TYPE
+	OBJECTS	{
+				wwpLeosChassisRebootReasonErrorType				  	
+            }
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosChassisRebootNotification is sent whenever device is rebooted using CLI / SNMP." 
+	::= { wwpLeosChassisMIBNotifications 10 }
+ 
+ wwpLeosChassisSnmpStateNotification NOTIFICATION-TYPE
+	OBJECTS	{
+				wwpLeosChassisSnmpState
+            }
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent everytime SNMP operational state is changed.
+		 If SNMP is globally disabled then device will not send COLD start Trap but 
+		 instead it will send wwpLeosChassisSnmpStateNotification notification." 
+	::= { wwpLeosChassisMIBNotifications 11 }     
+
+wwpLeosChassisDyingGaspNotification NOTIFICATION-TYPE
+	OBJECTS	{
+				wwpLeosChassisDeviceId,
+				wwpLeosChassisHardwareVersion,
+				wwpLeosChassisSerialNumber,
+				wwpLeosChassisMacAddress,
+				wwpLeosChassisMfgDate,
+				wwpLeosChassisParamVersion
+            }
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent when the system goes down" 
+	::= { wwpLeosChassisMIBNotifications 12 }     
+  
+  wwpLeosChassisDoorStatusChangeNotification NOTIFICATION-TYPE
+	OBJECTS	{
+				wwpLeosChassisDeviceId,
+				wwpLeosChassisHardwareVersion,
+				wwpLeosChassisSerialNumber,
+				wwpLeosChassisMacAddress,
+				wwpLeosChassisMfgDate,
+				wwpLeosChassisParamVersion,
+				wwpLeosChassisInnerDoorStatus,
+				wwpLeosChassisOuterDoorStatus
+            }
+	STATUS	deprecated
+	DESCRIPTION
+		"This notification is sent each time the chassis door is opened." 
+	::= { wwpLeosChassisMIBNotifications 13 }
+  
+  wwpLeosChassisInnerDoorStatusChangeNotification NOTIFICATION-TYPE
+  	OBJECTS	{
+				wwpLeosChassisDeviceId,
+				wwpLeosChassisHardwareVersion,
+				wwpLeosChassisSerialNumber,
+				wwpLeosChassisMacAddress,
+				wwpLeosChassisMfgDate,
+				wwpLeosChassisParamVersion,
+				wwpLeosChassisInnerDoorStatus
+            }
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent each time the chassis inner door status changes." 
+	::= { wwpLeosChassisMIBNotifications 14 }
+
+  wwpLeosChassisOuterDoorStatusChangeNotification NOTIFICATION-TYPE
+  	OBJECTS	{
+				wwpLeosChassisDeviceId,
+				wwpLeosChassisHardwareVersion,
+				wwpLeosChassisSerialNumber,
+				wwpLeosChassisMacAddress,
+				wwpLeosChassisMfgDate,
+				wwpLeosChassisParamVersion,
+				wwpLeosChassisOuterDoorStatus
+            }
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent each time the chassis outer door status changes." 
+	::= { wwpLeosChassisMIBNotifications 15 }
+	
+	wwpLeosChassisExternalAlarmStatusChangeNotification NOTIFICATION-TYPE
+	OBJECTS	{
+				wwpLeosChassisDeviceId,
+				wwpLeosChassisHardwareVersion,
+				wwpLeosChassisSerialNumber,
+				wwpLeosChassisMacAddress,
+				wwpLeosChassisMfgDate,
+				wwpLeosChassisParamVersion,
+				wwpLeosChassisOuterDoorStatus,
+				wwpLeosChassisExternalAlarm,
+				wwpLeosChassisExternalAlarmStatus
+            }
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent each time the chassis external alarm status changes." 
+	::= { wwpLeosChassisMIBNotifications 16 }
+  
+  wwpLeosChassisDoorAlarmStatusChangeNotification NOTIFICATION-TYPE
+	OBJECTS	{
+				wwpLeosChassisDoorAlarmIndex,
+				wwpLeosChassisDoorAlarmStatus
+            }
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent each time the door alarm status changes." 
+	::= { wwpLeosChassisMIBNotifications 17 }
+  
+	
+ --
+ -- Platform Capability
+ -- 
+
+ wwpLeosChassisPlatformCapsMaxPhysPorts  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..28)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of physical ports supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 1 }
+
+ wwpLeosChassisPlatformCapsMaxAggrPorts  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..14)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of LAGs supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 2 }
+
+ wwpLeosChassisPlatformCapsMaxVlans  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..4064)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of VLANs supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 3 }
+
+ wwpLeosChassisPlatformCapsMaxIgmpSnoopVlans  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..32)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of IGMP VLANs snooped simultaneously on this machine."
+     ::= { wwpLeosChassisPlatformCaps 4 }
+
+ wwpLeosChassisPlatformCapsMaxMulticastgroups  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..1024)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of IGMP multicast groups supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 5 }
+
+ wwpLeosChassisPlatformCapsMaxRstpDomains  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..16)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of RSTP domains supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 6 }
+
+ wwpLeosChassisPlatformCapsMaxTunnels  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..64)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of transport tunnels supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 7 }
+
+ wwpLeosChassisPlatformCapsMaxIngressTunnels  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..32)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of ingress tunnels supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 8 }
+
+ wwpLeosChassisPlatformCapsMaxEgressTunnels  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..32)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of egress tunnels supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 9 }
+
+ wwpLeosChassisPlatformCapsMaxVcs  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..127)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of virtual circuits supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 10 }
+
+ wwpLeosChassisPlatformCapsMaxVss  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..127)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of virtual switches supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 11 }
+
+ wwpLeosChassisPlatformCapsMaxVsMembers  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..5334)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of virtual switch members supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 12 }
+
+ wwpLeosChassisPlatformCapsMaxLearnedMacs  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..20000)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of learned MACs supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 13 }
+
+ wwpLeosChassisPlatformCapsMaxFsmtEntries  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..140)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of FSMT entries supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 14 }
+
+ wwpLeosChassisPlatformCapsMaxFsmtCosEntries  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..34)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of FSMT COS entries supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 15 }
+
+ wwpLeosChassisPlatformCapsMaxL4ProtEntries  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..62)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of L4 Prot/P entries supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 16 }
+
+ wwpLeosChassisPlatformCapsMaxSltEntries  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..99)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of SLT entries supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 17 }
+
+ wwpLeosChassisPlatformCapsMaxSactEntries  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..2074)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of SACT entries supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 18 }
+
+ wwpLeosChassisPlatformCapsMaxSmtEntries  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..1024)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of SMT entries supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 19 }
+
+ wwpLeosChassisPlatformCapsMaxEprSnids  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..8)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of EPR snids supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 20 }
+
+ wwpLeosChassisPlatformCapsMaxSltWildcards  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..3)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of SLT wildcards supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 21 }
+
+ wwpLeosChassisPlatformCapsVlanTranslation  OBJECT-TYPE
+     SYNTAX        TruthValue
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "Denotes whether VLAN translation is supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 22 }
+
+ wwpLeosChassisPlatformCapsProtocolFilters  OBJECT-TYPE
+     SYNTAX        TruthValue
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "Denotes whether protocol filters are supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 23 }
+
+ wwpLeosChassisPlatformCapsMultiSubsPerPort  OBJECT-TYPE
+     SYNTAX        TruthValue
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "Denotes whether multiple subscribers per port are supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 24 }
+
+ wwpLeosChassisPlatformCapsVplsFpga  OBJECT-TYPE
+     SYNTAX        TruthValue
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "Denotes whether VPLS FPGA hardware exists on this machine."
+     ::= { wwpLeosChassisPlatformCaps 25 }
+
+ wwpLeosChassisPlatformCapsPbtFpga  OBJECT-TYPE
+     SYNTAX        TruthValue
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "Denotes whether PBT FPGA hardware exists on this machine."
+     ::= { wwpLeosChassisPlatformCaps 26 }
+
+ wwpLeosChassisPlatformCapsAoamFpga  OBJECT-TYPE
+     SYNTAX        TruthValue
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "Denotes whether AOAM FPGA hardware exists on this machine."
+     ::= { wwpLeosChassisPlatformCaps 27 }
+
+ wwpLeosChassisPlatformCapsDcPower  OBJECT-TYPE
+     SYNTAX        TruthValue
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "Denotes whether DC Power is supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 29 }
+
+ wwpLeosChassisPlatformCapsAcPower  OBJECT-TYPE
+     SYNTAX        TruthValue
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "Denotes whether AC Power is supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 30 }
+
+ wwpLeosChassisPlatformCapsRedunPower  OBJECT-TYPE
+     SYNTAX        TruthValue
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "Denotes whether Redundant Power is supported on this machine."
+     ::= { wwpLeosChassisPlatformCaps 31 }
+
+ --
+ -- Resource Counts
+ -- 
+
+ wwpLeosChassisResourcesMaxPorts  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..28)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of ports on this machine."
+     ::= { wwpLeosChassisResourceCounts 1 }
+
+ wwpLeosChassisResourcesFreePorts  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..28)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of ports free on this machine."
+     ::= { wwpLeosChassisResourceCounts 2 }
+
+ wwpLeosChassisResourcesMaxAggrPorts  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..14)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of LAG ports on this machine."
+     ::= { wwpLeosChassisResourceCounts 3 }
+
+ wwpLeosChassisResourcesFreeAggrs  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..14)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of LAG ports free on this machine."
+     ::= { wwpLeosChassisResourceCounts 4 }
+
+ wwpLeosChassisResourcesMaxPortStateGrps  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..21)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of Port State groups on this machine."
+     ::= { wwpLeosChassisResourceCounts 5 }
+
+ wwpLeosChassisResourcesFreePortStateGrps  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..21)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of Port State Groups free on this machine."
+     ::= { wwpLeosChassisResourceCounts 6 }
+
+ wwpLeosChassisResourcesMaxVlans  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..4064)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of VLANs on this machine."
+     ::= { wwpLeosChassisResourceCounts 7 }
+
+ wwpLeosChassisResourcesFreeVlans  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..4064)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of VLANs free on this machine."
+     ::= { wwpLeosChassisResourceCounts 8 }
+
+ wwpLeosChassisResourcesMaxVlanMembers  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..170688)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of VLAN members on this machine."
+     ::= { wwpLeosChassisResourceCounts 9 }
+
+ wwpLeosChassisResourcesFreeVlanMembers  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..170688)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of VLAN members free on this machine."
+     ::= { wwpLeosChassisResourceCounts 10 }
+
+ wwpLeosChassisResourcesMaxEprSnets  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..8)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of EPR VLANs on this machine."
+     ::= { wwpLeosChassisResourceCounts 11 }
+
+ wwpLeosChassisResourcesFreeEprSnets  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..8)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of EPR VLANs free on this machine."
+     ::= { wwpLeosChassisResourceCounts 12 }
+
+ wwpLeosChassisResourcesMaxMcastSnets  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..32)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of multicast VLANs on this machine."
+     ::= { wwpLeosChassisResourceCounts 13 }
+
+ wwpLeosChassisResourcesFreeMcastSnets  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..32)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of multicast VLANs free on this machine."
+     ::= { wwpLeosChassisResourceCounts 14 }
+
+ wwpLeosChassisResourcesMaxMcastGroups  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..1024)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of multicast groups on this machine."
+     ::= { wwpLeosChassisResourceCounts 15 }
+
+ wwpLeosChassisResourcesFreeMcastGroups  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..1024)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of multicast groups free on this machine."
+     ::= { wwpLeosChassisResourceCounts 16 }
+
+ wwpLeosChassisResourcesMaxDhcpRelayAgnts  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..16)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of DHCP Relay Agents on this machine."
+     ::= { wwpLeosChassisResourceCounts 17 }
+
+ wwpLeosChassisResourcesFreeDhcpRelayAgnts  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..16)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of DHCP Relay Agents free on this machine."
+     ::= { wwpLeosChassisResourceCounts 18 }
+
+ wwpLeosChassisResourcesMaxTunnels  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..64)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of tunnels on this machine."
+     ::= { wwpLeosChassisResourceCounts 19 }
+
+ wwpLeosChassisResourcesFreeTunnels  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..64)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of tunnels free on this machine."
+     ::= { wwpLeosChassisResourceCounts 20 }
+
+ wwpLeosChassisResourcesMaxIngressTunnels  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..32)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of Ingress tunnels on this machine."
+     ::= { wwpLeosChassisResourceCounts 21 }
+
+ wwpLeosChassisResourcesFreeIngressTunnels  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..32)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of Ingress tunnels free on this machine."
+     ::= { wwpLeosChassisResourceCounts 22 }
+
+ wwpLeosChassisResourcesMaxEgressTunnels  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..32)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of Egress tunnels on this machine."
+     ::= { wwpLeosChassisResourceCounts 23 }
+
+ wwpLeosChassisResourcesFreeEgressTunnels  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..32)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of Egress tunnels free on this machine."
+     ::= { wwpLeosChassisResourceCounts 24 }
+
+ wwpLeosChassisResourcesMaxVcs  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..127)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of Virtual Circuits on this machine."
+     ::= { wwpLeosChassisResourceCounts 25 }
+
+ wwpLeosChassisResourcesFreeVcs  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..127)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of Virtual Circuits free on this machine."
+     ::= { wwpLeosChassisResourceCounts 26 }
+
+ wwpLeosChassisResourcesMaxVss  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..127)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of Virtual Switches on this machine."
+     ::= { wwpLeosChassisResourceCounts 27 }
+
+ wwpLeosChassisResourcesFreeVss  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..127)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of Virtual Switches free on this machine."
+     ::= { wwpLeosChassisResourceCounts 28 }
+
+ wwpLeosChassisResourcesMaxVsMembers  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..5334)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of Virtual Switch members on this machine."
+     ::= { wwpLeosChassisResourceCounts 29 }
+
+ wwpLeosChassisResourcesFreeVsMembers  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..5334)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of Virtual Switch members free on this machine."
+     ::= { wwpLeosChassisResourceCounts 30 }
+
+ wwpLeosChassisResourcesMaxSlevelWcards  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..3)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of Service Level Wildcards on this machine."
+     ::= { wwpLeosChassisResourceCounts 31 }
+
+ wwpLeosChassisResourcesFreeSlevelWcards  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..3)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of Service Level Wildcards free on this machine."
+     ::= { wwpLeosChassisResourceCounts 32 }
+
+ wwpLeosChassisResourcesMaxSlevels  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..102)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of Service Level Wildcards on this machine."
+     ::= { wwpLeosChassisResourceCounts 33 }
+
+ wwpLeosChassisResourcesFreeSlevels  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..102)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of Service Levels free on this machine."
+     ::= { wwpLeosChassisResourceCounts 34 }
+
+ wwpLeosChassisResourcesMaxSmappings  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..140)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of Service Mappings on this machine."
+     ::= { wwpLeosChassisResourceCounts 35 }
+
+ wwpLeosChassisResourcesFreeSmappings  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..140)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of Service Mappings free on this machine."
+     ::= { wwpLeosChassisResourceCounts 36 }
+
+ wwpLeosChassisResourcesMaxSmappingCosResources  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..34)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of Service Mapping COS resources on this machine."
+     ::= { wwpLeosChassisResourceCounts 37 }
+
+ wwpLeosChassisResourcesFreeSmappingCosResources  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..34)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of Service Mapping COS resources free on this machine."
+     ::= { wwpLeosChassisResourceCounts 38 }
+
+ wwpLeosChassisResourcesMaxSmappingPrtclResources  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..62)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of Service Mapping Protocol resources on this machine."
+     ::= { wwpLeosChassisResourceCounts 39 }
+
+ wwpLeosChassisResourcesFreeSmappingPrtclResources  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..62)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of Service Mapping Protocol resources free on this machine."
+     ::= { wwpLeosChassisResourceCounts 40 }
+
+ wwpLeosChassisResourcesMaxQosResEgs  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..99)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of QosResEg resources on this machine."
+     ::= { wwpLeosChassisResourceCounts 41 }
+
+ wwpLeosChassisResourcesFreeQosResEgs  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..99)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of QosResEg resources free on this machine."
+     ::= { wwpLeosChassisResourceCounts 42 }
+
+ wwpLeosChassisResourcesMaxTprofGblCscdEntries  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..3)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of TprofGblCscdEntries on this machine."
+     ::= { wwpLeosChassisResourceCounts 43 }
+
+ wwpLeosChassisResourcesFreeTprofGblCscdEntries  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..3)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of TprofGblCscdEntries free on this machine."
+     ::= { wwpLeosChassisResourceCounts 44 }
+
+ wwpLeosChassisResourcesMaxTprofCscdEntries  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..126)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of TprofCscdEntries on this machine."
+     ::= { wwpLeosChassisResourceCounts 45 }
+
+ wwpLeosChassisResourcesFreeTprofCscdEntries  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..126)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of TprofCscdEntries free on this machine."
+     ::= { wwpLeosChassisResourceCounts 46 }
+
+ wwpLeosChassisResourcesMaxTprofStdEntries  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..336)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of TprofStdEntries on this machine."
+     ::= { wwpLeosChassisResourceCounts 47 }
+
+ wwpLeosChassisResourcesFreeTprofStdEntries  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..336)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of TprofStdEntries free on this machine."
+     ::= { wwpLeosChassisResourceCounts 48 }
+
+ wwpLeosChassisResourcesMaxSaccessEntries  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..2074)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of SaccessEntries on this machine."
+     ::= { wwpLeosChassisResourceCounts 49 }
+
+ wwpLeosChassisResourcesFreeSaccessEntries  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..2074)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of SaccessEntries free on this machine."
+     ::= { wwpLeosChassisResourceCounts 50 }
+
+ wwpLeosChassisResourcesMaxSmacEntries  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..1024)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of SmacEntries on this machine."
+     ::= { wwpLeosChassisResourceCounts 51 }
+
+ wwpLeosChassisResourcesFreeSmacEntries  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..1024)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of SmacEntries free on this machine."
+     ::= { wwpLeosChassisResourceCounts 52 }
+
+ wwpLeosChassisResourcesMaxDrvNoLrnSacResources  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..2048)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of DrvNoLrnSacResources on this machine."
+     ::= { wwpLeosChassisResourceCounts 53 }
+
+ wwpLeosChassisResourcesFreeDrvNoLrnSacResources  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..2048)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of DrvNoLrnSacResources free on this machine."
+     ::= { wwpLeosChassisResourceCounts 54 }
+
+ wwpLeosChassisResourcesMaxLearnEntries  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..20000)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of LearnEntries on this machine."
+     ::= { wwpLeosChassisResourceCounts 55 }
+
+ wwpLeosChassisResourcesFreeLearnEntries  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..20000)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of LearnEntries free on this machine."
+     ::= { wwpLeosChassisResourceCounts 56 }
+
+ wwpLeosChassisResourcesMaxCustomPrtcls  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..16)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of CustomPrtcls on this machine."
+     ::= { wwpLeosChassisResourceCounts 57 }
+
+ wwpLeosChassisResourcesFreeCustomPrtcls  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..16)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of CustomPrtcls free on this machine."
+     ::= { wwpLeosChassisResourceCounts 58 }
+
+ wwpLeosChassisResourcesMaxPrtcls  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..32)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of Prtcls on this machine."
+     ::= { wwpLeosChassisResourceCounts 59 }
+
+ wwpLeosChassisResourcesFreePrtcls  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..32)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of Prtcls free on this machine."
+     ::= { wwpLeosChassisResourceCounts 60 }
+
+ wwpLeosChassisResourcesMaxPrtclFilters  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..64)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of PrtclFilters on this machine."
+     ::= { wwpLeosChassisResourceCounts 61 }
+
+ wwpLeosChassisResourcesFreePrtclFilters  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..64)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of PrtclFilters free on this machine."
+     ::= { wwpLeosChassisResourceCounts 62 }
+
+ wwpLeosChassisResourcesMaxPrtclFilterMembs  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..512)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of PrtclFilterMembs on this machine."
+     ::= { wwpLeosChassisResourceCounts 63 }
+
+ wwpLeosChassisResourcesFreePrtclFilterMembs  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..512)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of PrtclFilterMembs free on this machine."
+     ::= { wwpLeosChassisResourceCounts 64 }
+
+ wwpLeosChassisResourcesMaxBcastFilters  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..64)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of BcastFilters on this machine."
+     ::= { wwpLeosChassisResourceCounts 65 }
+
+ wwpLeosChassisResourcesFreeBcastFilters  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..64)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of BcastFilters free on this machine."
+     ::= { wwpLeosChassisResourceCounts 66 }
+
+ wwpLeosChassisResourcesMaxBcastFilterMembs  OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..4064)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The maximum number of BcastFilterMembs on this machine."
+     ::= { wwpLeosChassisResourceCounts 67 }
+
+ wwpLeosChassisResourcesFreeBcastFilterMembs  OBJECT-TYPE
+     SYNTAX        Gauge32 (0..4064)
+     MAX-ACCESS    read-only 
+     STATUS        current
+     DESCRIPTION
+             "The number of BcastFilterMembs free on this machine."
+     ::= { wwpLeosChassisResourceCounts 68 }
+
+  END
+
+ 

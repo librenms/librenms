@@ -1,0 +1,713 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+WWP-LEOS-MPLS-OAM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, IpAddress, Unsigned32
+        FROM SNMPv2-SMI                  -- RFC2578
+    TEXTUAL-CONVENTION, RowStatus, DisplayString
+        FROM SNMPv2-TC                   -- RFC2579
+    wwpModulesLeos		
+	FROM WWP-SMI;
+
+ wwpLeosMPLSOamMIB MODULE-IDENTITY
+    LAST-UPDATED "200605260000Z"         -- 26 September 2006
+    ORGANIZATION "IETF Distributed Management Working Group"
+    CONTACT-INFO
+        "Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+    DESCRIPTION
+        "The MPLS OAM MIB provides the capability of controlling the use of the 
+         wwpLeosMplsOAMLspPing and wwpLeosMplsOAMLspTraceRt function at a remote host."
+     REVISION     "200605260000Z"         -- 26 May 2006
+     DESCRIPTION
+         "Initial version"
+    ::= { wwpModulesLeos 36 }
+
+ -- Textual Conventions
+
+  OperationResponseStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Used to report the result of an operation:
+
+         responseReceived(1) - Operation completes successfully.
+         unknown(2) - Operation failed due to unknown error.
+         requestTimedOut(4) - Operation failed to receive a
+              valid reply within the time limit imposed on it.
+         unknownLsp(5) - LSP with the specified name does not exist.
+         maxConcurrentLimitReached(6) - The maximum number of
+              concurrent active operations would have been exceeded
+              if the corresponding operation was allowed."
+    SYNTAX INTEGER {
+                 responseReceived(1),
+                 unknown(2),
+                 requestTimedOut(4),
+                 unknownLsp(5),
+                 maxConcurrentLimitReached(6)
+              }
+
+
+  LspPingReturnCode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Used to report the Return Code in the Echo Reply packet:
+         noReturnCode(0) - No return Code
+         malformedEchoRequest(1) - Malformed Echo Request received
+         oneOrMoreTlvsNotUnderstood(2) - 
+         egressForFec(3) - Replying router is egress for the FEC at stack Depth indicated in 
+                           wwpLeosMPLSOamLspPingProbeHistoryRetSubCode
+         noMappingForFec(4) - Replying router has no mapping for the FEC at stack depth
+                              as indicated in wwpLeosMPLSOamLspPingProbeHistoryRetSubCode
+         downstreamMappingMismatch(5)
+         upstreamInterfaceIndexUnknown(6)
+         labelSwitchedFec(8) - Label switched at stack depth as indicated in
+                               wwpLeosMPLSOamLspPingProbeHistoryRetSubCode
+         labelSwitchedNoForwardingFec(9) - Label switched but no MPLS forwarding at stack depth as indicated in
+                                           wwpLeosMPLSOamLspPingProbeHistoryRetSubCode
+         wrongLabel(10) - Mapping for this FEC is not the given label at stack depth as indicated in
+                          wwpLeosMPLSOamLspPingProbeHistoryRetSubCode
+         noLabel(11) - No label entry at stack depth as indicated in wwpLeosMPLSOamLspPingProbeHistoryRetSubCode
+         unknownFec(12) - Protocol not associated with interface at FEC stack depth as indicated in
+                          wwpLeosMPLSOamLspPingProbeHistoryRetSubCode."
+    SYNTAX INTEGER {
+                 noReturnCode(0),
+                 malformedEchoRequest(1),
+                 oneOrMoreTlvsNotUnderstood(2),
+                 egressForFec(3),
+                 noMappingForFec(4),
+                 downstreamMappingMismatch(5),
+                 upstreamInterfaceIndexUnknown(6),
+                 labelSwitchedFec(8),
+                 labelSwitchedNoForwardingFec(9),
+                 wrongLabel(10),
+                 noLabel(11),
+                 unknownFec(12)
+              }
+
+
+  LspType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Used to indicate LSP Type"
+    SYNTAX INTEGER {
+                 rsvpTeTunnel(1)                 
+              }
+
+ -- Top level structure of the MIB
+
+ wwpLeosMPLSOamObjects                    OBJECT IDENTIFIER ::= { wwpLeosMPLSOamMIB 1 }
+ wwpLeosMPLSOamNotifications              OBJECT IDENTIFIER ::= { wwpLeosMPLSOamMIB 2 }
+ wwpLeosMPLSOamConformance                OBJECT IDENTIFIER ::= { wwpLeosMPLSOamMIB 3 }
+
+ -- Simple Object Definitions
+ wwpLeosMPLSOAMLspPingMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "requests"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The maximum number of Lsp Ping that are allowed at any given time."
+    ::= { wwpLeosMPLSOamObjects 1 }
+ 
+ wwpLeosMPLSOAMLspTraceRtMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "requests"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The maximum number of Lsp Trace Routes that are allowed at any given time."
+    ::= { wwpLeosMPLSOamObjects 2 }
+    
+ -- LspPing Control Table
+
+ wwpLeosMPLSOamLspPingCtlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosMPLSOamLspPingCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the wwpLeosMPLSOamLspPing Control Table for providing, via SNMP,
+         the capability of performing wwpLeosMPLSOamLspPing operations at
+         a remote host.  The results of these operations are
+         stored in the wwpLeosMPLSOamLspPingResultsTable.
+         When creating any entry in the table wwpLeosMPLSOamLspPingCtlLspName must be operationally enabled
+         else error will be returned."
+   ::= { wwpLeosMPLSOamObjects 3 }
+
+ wwpLeosMPLSOamLspPingCtlEntry OBJECT-TYPE
+    SYNTAX      WwpLeosMPLSOamLspPingCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the wwpLeosMPLSOamLspPingCtlTable."
+    INDEX { wwpLeosMPLSOamLspPingCtlIndex }
+    ::= { wwpLeosMPLSOamLspPingCtlTable 1 }   
+    
+ WwpLeosMPLSOamLspPingCtlEntry ::=
+    SEQUENCE {
+        wwpLeosMPLSOamLspPingCtlIndex                  Integer32,
+        wwpLeosMPLSOamLspPingCtlLspType                LspType,
+        wwpLeosMPLSOamLspPingCtlLspName                DisplayString,
+        wwpLeosMPLSOamLspPingCtlPktSize                Unsigned32,
+        wwpLeosMPLSOamLspPingCtlTimeOut                Unsigned32,
+        wwpLeosMPLSOamLspPingCtlCount             		Unsigned32,
+        wwpLeosMPLSOamLspPingCtlAdminState				INTEGER,
+        wwpLeosMPLSOamLspPingCtlTtl                    Integer32,
+        wwpLeosMPLSOamLspPingCtlRowStatus              RowStatus        
+    }
+
+ wwpLeosMPLSOamLspPingCtlIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..5)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This mib object is used as index in the table."
+    ::= { wwpLeosMPLSOamLspPingCtlEntry 1 }
+
+ wwpLeosMPLSOamLspPingCtlLspType OBJECT-TYPE
+    SYNTAX      LspType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of LSP to be used at a remote
+        host for performing a wwpLeosMPLSOamLspPing operation."
+    DEFVAL { rsvpTeTunnel }
+    ::= { wwpLeosMPLSOamLspPingCtlEntry 3 }
+
+ wwpLeosMPLSOamLspPingCtlLspName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..15))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the LSP Name for performing a wwpLeosMPLSOamLspPing operation.
+        A value for this object MUST be set prior to transitioning
+        its corresponding wwpLeosMPLSOamLspPingCtlEntry to active(1) via
+        wwpLeosMPLSOamLspPingCtlRowStatus."
+    ::= { wwpLeosMPLSOamLspPingCtlEntry 4 }
+
+ wwpLeosMPLSOamLspPingCtlPktSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (96..1464)    
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the size of the data portion to be
+        transmitted in a wwpLeosMPLSOamLspPing operation in octets.  A wwpLeosMPLSOamLspPing
+        request is usually an ICMP message encoded
+        into an IP packet.  An IP packet has a maximum size
+        of 65535 octets.  Subtracting the size of the ICMP
+        or UDP header (both 8 octets) and the size of the IP
+        header (20 octets) yields a maximum size of 65507
+        octets."
+    DEFVAL { 96 }
+    ::= { wwpLeosMPLSOamLspPingCtlEntry 5 }
+
+ wwpLeosMPLSOamLspPingCtlTimeOut OBJECT-TYPE
+    SYNTAX      Unsigned32 (1000..10000)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the time-out value, in seconds, for a remote wwpLeosMPLSOamLspPing operation."
+    DEFVAL { 1000 }
+    ::= { wwpLeosMPLSOamLspPingCtlEntry 6 }
+
+ wwpLeosMPLSOamLspPingCtlCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)    
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the number of times to perform a wwpLeosMPLSOamLspPing operation at a remote host."
+    DEFVAL { 1 }
+    ::= { wwpLeosMPLSOamLspPingCtlEntry 7 }
+
+ wwpLeosMPLSOamLspPingCtlAdminState OBJECT-TYPE
+    SYNTAX      INTEGER {
+    				disabled(1),       -- stop sending ping
+    				enabled(2)         -- start sending ping
+    			}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this object to 'true' will stop sending the ping."
+    DEFVAL { enabled }
+    ::= { wwpLeosMPLSOamLspPingCtlEntry 8 }
+ 
+ wwpLeosMPLSOamLspPingCtlTtl OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the TTL to be used in the MPLS label header."
+    ::= { wwpLeosMPLSOamLspPingCtlEntry 9 }
+
+  wwpLeosMPLSOamLspPingCtlRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows entries to be created and deleted
+        in the wwpLeosMPLSOamLspPingCtlTable.  Deletion of an entry in this
+        table results in all corresponding (same
+        wwpLeosMPLSOamLspPingCtlIndex index values)
+        wwpLeosMPLSOamLspPingResultsTable."
+    ::= { wwpLeosMPLSOamLspPingCtlEntry 10 }
+
+
+-- MPLSOamLspPing Results Table
+
+ wwpLeosMPLSOamLspPingResultsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosMPLSOamLspPingResultsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the LspPing Results Table for providing
+        the capability of performing wwpLeosMPLSOamLspPing operations at
+        a remote host.  The results of these operations are
+        stored in the wwpLeosMPLSOamLspPingResultsTable and the wwpLeosMPLSOamLspPingPastProbeTable.
+
+        An entry is added to the wwpLeosMPLSOamLspPingResultsTable when an
+        wwpLeosMPLSOamLspPingCtlEntry is started by successful transition
+        of its wwpLeosMPLSOamLspPingCtlAdminStatus object to enabled(1).
+        An entry is removed from the wwpLeosMPLSOamLspPingResultsTable when
+        its corresponding wwpLeosMPLSOamLspPingCtlEntry is deleted."
+   ::= { wwpLeosMPLSOamObjects 4 }
+
+ wwpLeosMPLSOamLspPingResultsEntry OBJECT-TYPE
+    SYNTAX      WwpLeosMPLSOamLspPingResultsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the wwpLeosMPLSOamLspPingResultsTable.  The
+        wwpLeosMPLSOamLspPingResultsTable has the same indexing as the
+        wwpLeosMPLSOamLspPingCtlTable in order for a wwpLeosMPLSOamLspPingResultsEntry to
+        correspond to the wwpLeosMPLSOamLspPingCtlEntry that caused it to
+        be created."
+    INDEX {
+             wwpLeosMPLSOamLspPingCtlIndex
+          }
+    ::= { wwpLeosMPLSOamLspPingResultsTable 1 }
+
+ WwpLeosMPLSOamLspPingResultsEntry ::=
+    SEQUENCE {
+        wwpLeosMPLSOamLspPingResultsOperStatus          INTEGER,
+        wwpLeosMPLSOamLspPingResultsStatus          INTEGER,
+        wwpLeosMPLSOamLspPingResultsLspType             LspType,
+        wwpLeosMPLSOamLspPingResultsLspName             OCTET STRING,
+        wwpLeosMPLSOamLspPingResultsMinRtt              Unsigned32,
+        wwpLeosMPLSOamLspPingResultsMaxRtt              Unsigned32,
+        wwpLeosMPLSOamLspPingResultsAverageRtt          Unsigned32,
+        wwpLeosMPLSOamLspPingResultsProbesSent          Unsigned32,        
+        wwpLeosMPLSOamLspPingResultsProbeResponses      Unsigned32        
+     }
+
+ wwpLeosMPLSOamLspPingResultsOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          enabled(1),  -- test is in progress
+                          disabled(2)  -- test has stopped
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reflects the operational state of a wwpLeosMPLSOamLspPingCtlEntry:
+           enabled(1)   - Test is active.
+           disabled(2)  - Test has stopped."
+    ::= { wwpLeosMPLSOamLspPingResultsEntry 1 }
+ 
+ wwpLeosMPLSOamLspPingResultsStatus OBJECT-TYPE
+    SYNTAX      INTEGER { 
+    					  unknown(1),
+                          success(2),
+                          failed(3) 
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reflects the final result of the wwpLeosMPLSOamLspPingCtlEntry."
+    ::= { wwpLeosMPLSOamLspPingResultsEntry 2 }
+
+ wwpLeosMPLSOamLspPingResultsLspType OBJECT-TYPE
+    SYNTAX      LspType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This objects indicates the type of LSP stored
+        in the corresponding wwpLeosMPLSOamLspPingResultsLspName
+        object."
+   ::= { wwpLeosMPLSOamLspPingResultsEntry 3 }
+
+ wwpLeosMPLSOamLspPingResultsLspName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This objects reports the LSP Name."
+    ::= { wwpLeosMPLSOamLspPingResultsEntry 4 }
+
+ wwpLeosMPLSOamLspPingResultsMinRtt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum wwpLeosMPLSOamLspPing round-trip-time (RTT) received.  A value
+        of 0 for this object implies that no RTT has been received."
+    ::= { wwpLeosMPLSOamLspPingResultsEntry 5 }
+
+ wwpLeosMPLSOamLspPingResultsMaxRtt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum wwpLeosMPLSOamLspPing round-trip-time (RTT) received.  A value
+        of 0 for this object implies that no RTT has been received."
+    ::= { wwpLeosMPLSOamLspPingResultsEntry 6 }
+
+  wwpLeosMPLSOamLspPingResultsAverageRtt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current average wwpLeosMPLSOamLspPing round-trip-time (RTT)."
+    ::= { wwpLeosMPLSOamLspPingResultsEntry 7 }
+  
+  wwpLeosMPLSOamLspPingResultsProbesSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "probes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object reflects the number of probes sent
+        for the corresponding wwpLeosMPLSOamLspPingCtlEntry and wwpLeosMPLSOamLspPingResultsEntry.
+        The value of this object MUST be reported as 0 when no probes
+        have been sent."
+    ::= { wwpLeosMPLSOamLspPingResultsEntry 8 }
+    
+  wwpLeosMPLSOamLspPingResultsProbeResponses OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "responses"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of responses received for the corresponding
+        wwpLeosMPLSOamLspPingCtlEntry and wwpLeosMPLSOamLspPingResultsEntry.  The value of this object
+        MUST be reported as 0 when no probe responses have been
+        received."
+    ::= { wwpLeosMPLSOamLspPingResultsEntry 9 }
+
+ --
+ -- Traceroute Control Table
+ --
+ wwpLeosMPLSOamLspTraceRouteCtlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosMPLSOamLspTraceRouteCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the Remote Operations Traceroute Control Table for
+        providing the capability of invoking traceroute from a remote
+        host.  The results of traceroute operations can be stored in
+        the wwpLeosMPLSOamLspTraceRouteResultsTable, wwpLeosMPLSOamLspTraceRouteHopsTable."
+   ::= { wwpLeosMPLSOamObjects 5 }
+
+ wwpLeosMPLSOamLspTraceRouteCtlEntry OBJECT-TYPE
+    SYNTAX      WwpLeosMPLSOamLspTraceRouteCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the wwpLeosMPLSOamLspTraceRouteCtlTable."
+    INDEX { wwpLeosMPLSOamLspTraceRouteCtlIndex }
+    ::= { wwpLeosMPLSOamLspTraceRouteCtlTable 1 }
+
+ WwpLeosMPLSOamLspTraceRouteCtlEntry ::=
+    SEQUENCE {
+      wwpLeosMPLSOamLspTraceRouteCtlIndex              Integer32,
+      wwpLeosMPLSOamLspTraceRouteCtlLspType            LspType,
+      wwpLeosMPLSOamLspTraceRouteCtlLspName            DisplayString,
+      wwpLeosMPLSOamLspTraceRouteCtlTimeOut            Unsigned32,
+      wwpLeosMPLSOamLspTraceRouteCtlMaxTtl             Unsigned32,
+      wwpLeosMPLSOamLspTraceRouteCtlAdminStatus        INTEGER,
+      wwpLeosMPLSOamLspTraceRouteCtlRowStatus          RowStatus
+    }
+    
+ wwpLeosMPLSOamLspTraceRouteCtlIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..5)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This mib object is used as index in the table."
+    ::= { wwpLeosMPLSOamLspTraceRouteCtlEntry 1 }
+
+ wwpLeosMPLSOamLspTraceRouteCtlLspType OBJECT-TYPE
+    SYNTAX      LspType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of LSP."
+    DEFVAL { rsvpTeTunnel }
+    ::= { wwpLeosMPLSOamLspTraceRouteCtlEntry 2 }
+
+ wwpLeosMPLSOamLspTraceRouteCtlLspName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..15))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the LSP Name. A value for this object MUST be set prior to
+        transitioning its corresponding wwpLeosMPLSOamLspTraceRouteCtlEntry to
+        active(1) via wwpLeosMPLSOamLspTraceRouteCtlRowStatus."
+    ::= { wwpLeosMPLSOamLspTraceRouteCtlEntry 3 }
+
+ wwpLeosMPLSOamLspTraceRouteCtlTimeOut OBJECT-TYPE
+    SYNTAX      Unsigned32 (1000..10000)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the time-out value, in seconds, for a traceroute request."    
+    ::= { wwpLeosMPLSOamLspTraceRouteCtlEntry 4 }
+
+ wwpLeosMPLSOamLspTraceRouteCtlMaxTtl OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..30)
+    UNITS       "time-to-live value"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum time-to-live value."
+    DEFVAL { 30 }
+    ::= { wwpLeosMPLSOamLspTraceRouteCtlEntry 5 }
+
+ wwpLeosMPLSOamLspTraceRouteCtlAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          enabled(1), -- operation should be started
+                          disabled(2) -- operation should be stopped
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Reflects the desired state that an wwpLeosMPLSOamLspTraceRouteCtlEntry
+        should be in:
+
+           enabled(1)  - Attempt to activate the test as defined by
+                         this wwpLeosMPLSOamLspTraceRouteCtlEntry.
+           disabled(2) - Deactivate the test as defined by this
+                         wwpLeosMPLSOamLspTraceRouteCtlEntry.
+
+        Refer to the corresponding wwpLeosMPLSOamLspTraceRouteResultsOperStatus to
+        determine the operational state of the test defined by
+        this entry."
+     DEFVAL { disabled }
+    ::= { wwpLeosMPLSOamLspTraceRouteCtlEntry 6 }
+
+ wwpLeosMPLSOamLspTraceRouteCtlRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows entries to be created and deleted
+        in the wwpLeosMPLSOamLspTraceRouteCtlTable.  Deletion of an entry in
+        this table results in all corresponding wwpLeosMPLSOamLspTraceRouteResultsTable
+        and wwpLeosMPLSOamLspTraceRouteHopsTable entries being deleted."
+    ::= { wwpLeosMPLSOamLspTraceRouteCtlEntry 7 }    
+    
+--
+-- MPLS Trace Route Result Table
+--                       
+wwpLeosMPLSOamLspTraceRouteResultsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosMPLSOamLspTraceRouteResultsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the Remote Operations Traceroute Results Table for
+        keeping track of the status of a wwpLeosMPLSOamLspTraceRouteCtlEntry.
+
+        An entry is added to the wwpLeosMPLSOamLspTraceRouteResultsTable when an
+        wwpLeosMPLSOamLspTraceRouteCtlEntry is started by successful transition
+        of its wwpLeosMPLSOamLspTraceRouteCtlAdminStatus object to enabled(1).
+        An entry is removed from the wwpLeosMPLSOamLspTraceRouteResultsTable when
+        its corresponding wwpLeosMPLSOamLspTraceRouteCtlEntry is deleted."
+   ::= { wwpLeosMPLSOamObjects 6 }
+
+ wwpLeosMPLSOamLspTraceRouteResultsEntry OBJECT-TYPE
+    SYNTAX      WwpLeosMPLSOamLspTraceRouteResultsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the wwpLeosMPLSOamLspTraceRouteResultsTable."
+    INDEX { wwpLeosMPLSOamLspTraceRouteCtlIndex }
+    ::= { wwpLeosMPLSOamLspTraceRouteResultsTable 1 }
+
+ WwpLeosMPLSOamLspTraceRouteResultsEntry ::=
+    SEQUENCE {
+      wwpLeosMPLSOamLspTraceRouteResultsOperStatus       INTEGER,
+      wwpLeosMPLSOamLspTraceRouteResultsStatus       	 INTEGER,      
+      wwpLeosMPLSOamLspTraceRouteResultsCurHopCount      Gauge32      
+    } 
+
+ wwpLeosMPLSOamLspTraceRouteResultsOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          enabled(1), -- test is in progress
+                          disabled(2) -- test has stopped
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reflects the operational state of an wwpLeosMPLSOamLspTraceRouteCtlEntry:
+           enabled(1)  - Test is active.
+           disabled(2) - Test has stopped."
+    ::= { wwpLeosMPLSOamLspTraceRouteResultsEntry 1 }
+ 
+ wwpLeosMPLSOamLspTraceRouteResultsStatus OBJECT-TYPE
+    SYNTAX      INTEGER {      
+    					  unknown(1),
+                          success(2), 
+                          fail(3) 
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reflects the final status of an wwpLeosMPLSOamLspTraceRouteCtlEntry."
+    ::= { wwpLeosMPLSOamLspTraceRouteResultsEntry 2 }
+
+ wwpLeosMPLSOamLspTraceRouteResultsCurHopCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "hops"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reflects the current TTL value (range from 1 to
+        255) for a remote traceroute operation.
+        Maximum TTL value is determined by
+        wwpLeosMPLSOamLspTraceRouteCtlMaxTtl."
+    ::= { wwpLeosMPLSOamLspTraceRouteResultsEntry 3 }
+
+  --
+  -- Trace Route Hop Table
+  --
+  wwpLeosMPLSOamLspTraceRouteHopTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosMPLSOamLspTraceRouteHopEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the Remote Operations Traceroute Results Table for
+        storing the results of a traceroute operation.
+
+        An implementation of this MIB will remove the oldest
+        entry in the wwpLeosMPLSOamTraceRouteProbeHistoryTable to allow the
+        addition of an new entry once the number of rows in
+        the wwpLeosMPLSOamTraceRouteProbeHistoryTable reaches the value specified
+        by wwpLeosMPLSOamTraceRouteCtlMaxRows."
+   ::= { wwpLeosMPLSOamObjects 7 }
+
+  wwpLeosMPLSOamLspTraceRouteHopEntry OBJECT-TYPE
+    SYNTAX      WwpLeosMPLSOamLspTraceRouteHopEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines a table for storing the results of a traceroute
+        operation.  Entries in this table are limited by
+        the value of the corresponding wwpLeosMPLSOamLspTraceRouteCtlMaxRows
+        object.
+
+        The first two index elements identify the
+        wwpLeosMPLSOamLspTraceRouteCtlEntry that a wwpLeosMPLSOamLspTraceRouteProbeHistoryEntry
+        belongs to.  The third index element selects a single
+        traceroute operation result.  The fourth and fifth indexes
+        select the hop and the probe for a particular
+        traceroute operation."
+    INDEX {  wwpLeosMPLSOamLspTraceRouteCtlIndex, wwpLeosMPLSOamLspTraceRouteHopIndex }
+    ::= { wwpLeosMPLSOamLspTraceRouteHopTable 1 }
+
+ WwpLeosMPLSOamLspTraceRouteHopEntry ::=
+    SEQUENCE {
+      wwpLeosMPLSOamLspTraceRouteHopIndex                     Unsigned32,
+      wwpLeosMPLSOamLspTraceRouteHopIp				          IpAddress,
+      wwpLeosMPLSOamLspTraceRouteHopLabel				      Unsigned32
+ }  
+ 
+ wwpLeosMPLSOamLspTraceRouteHopIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..5)
+    UNITS       "hops"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reflects the current TTL value (range from 1 to
+        255) for a remote traceroute operation.
+        Maximum TTL value is determined by
+        wwpLeosMPLSOamLspTraceRouteCtlMaxTtl."
+    ::= { wwpLeosMPLSOamLspTraceRouteHopEntry 1 }    
+    
+  wwpLeosMPLSOamLspTraceRouteHopIp OBJECT-TYPE
+    SYNTAX      IpAddress    
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reflects the current TTL value (range from 1 to
+        255) for a remote traceroute operation.
+        Maximum TTL value is determined by
+        wwpLeosMPLSOamLspTraceRouteCtlMaxTtl."
+    ::= { wwpLeosMPLSOamLspTraceRouteHopEntry 2 }
+    
+  wwpLeosMPLSOamLspTraceRouteHopLabel OBJECT-TYPE
+    SYNTAX      Unsigned32    
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reflects the current TTL value (range from 1 to
+        255) for a remote traceroute operation.
+        Maximum TTL value is determined by
+        wwpLeosMPLSOamLspTraceRouteCtlMaxTtl."
+    ::= { wwpLeosMPLSOamLspTraceRouteHopEntry 3 }
+
+ 
+ 
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

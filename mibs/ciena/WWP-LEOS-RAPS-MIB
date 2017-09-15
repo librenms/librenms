@@ -1,0 +1,778 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-RAPS-MIB.my
+ --
+ --
+
+ WWP-LEOS-RAPS-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   Counter32, OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY			
+	    FROM SNMPv2-SMI			
+   TruthValue, RowStatus, TEXTUAL-CONVENTION, MacAddress		
+	    FROM SNMPv2-TC
+   wwpModules, wwpModulesLeos		
+	    FROM WWP-SMI;
+	
+	
+ wwpLeosRapsMIB MODULE-IDENTITY
+	    LAST-UPDATED "201009161700Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "  Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+	    DESCRIPTION
+		    "The MIB module for the WWP RAPSMib specific information."
+	    REVISION    "201009161700Z"
+	    DESCRIPTION
+		    "Initial creation."
+	    ::= { wwpModulesLeos 47 }
+						
+ --
+ -- Node definitions
+ --
+	
+ wwpLeosRapsMIBObjects OBJECT IDENTIFIER ::= { wwpLeosRapsMIB 1 }
+
+ wwpLeosRapsGlobal OBJECT IDENTIFIER ::= { wwpLeosRapsMIBObjects 1 }
+ wwpLeosRapsLogicalRing OBJECT IDENTIFIER ::= { wwpLeosRapsMIBObjects 2 }
+ wwpLeosRapsVirtualRing OBJECT IDENTIFIER ::= { wwpLeosRapsMIBObjects 3 }
+ wwpLeosRapsVirtualRingMember OBJECT IDENTIFIER ::= { wwpLeosRapsMIBObjects 4 }
+ 
+ -- Notifications 
+  
+ wwpLeosRapsMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpLeosRapsMIB 2 } 
+ wwpLeosRapsMIBNotifications    OBJECT IDENTIFIER ::=    { wwpLeosRapsMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpLeosRapsMIBConformance OBJECT IDENTIFIER ::= { wwpLeosRapsMIB 3 } 
+ wwpLeosRapsMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosRapsMIBConformance 1 } 		
+ wwpLeosRapsMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosRapsMIBConformance 2 } 
+
+-- 
+-- ***********************************************************
+-- 
+--                 Global Ring Config    
+-- 
+-- *********************************************************** 
+--
+
+ wwpLeosRapsGlobalAttrs  OBJECT IDENTIFIER ::= { wwpLeosRapsGlobal 1}
+
+ wwpLeosRapsState   OBJECT-TYPE
+     SYNTAX         INTEGER {	
+			disabled(1),
+			enabled(2)
+		    }
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This object represents the global ring-protection state."
+     DEFVAL     { 2 }
+     ::= { wwpLeosRapsGlobalAttrs 1 }
+
+ wwpLeosRapsNodeId   OBJECT-TYPE
+     SYNTAX              MacAddress 	
+     MAX-ACCESS          read-only
+     STATUS              current
+     DESCRIPTION
+	     "Node Id."
+     ::= { wwpLeosRapsGlobalAttrs 2 }
+
+ wwpLeosRapsEtherType   OBJECT-TYPE
+     SYNTAX              OCTET STRING (SIZE(1..2))
+     MAX-ACCESS          read-only
+     STATUS              current
+     DESCRIPTION
+	     "This object represents the etype value that is used in B-Tag section of RAPS encapsulation.."
+     ::= { wwpLeosRapsGlobalAttrs 3 }
+
+ wwpLeosRapsNumberOfRings   OBJECT-TYPE
+     SYNTAX              INTEGER (0..65535)
+     MAX-ACCESS          read-only
+     STATUS              current
+     DESCRIPTION
+	     "Number of logical rings."
+     ::= { wwpLeosRapsGlobalAttrs 4 }
+
+-- 
+-- ***********************************************************
+-- 
+--                 Logical Ring Config    
+-- 
+-- *********************************************************** 
+--
+ WwpLeosRapsLogicalRingEntry ::= SEQUENCE { 
+     wwpLeosRapsLogicalRingIndex  			INTEGER,
+     wwpLeosRapsLogicalRingName				OCTET STRING,
+     wwpLeosRapsLogicalRingId	  			INTEGER,
+     wwpLeosRapsLogicalRingEastPortId			INTEGER,
+     wwpLeosRapsLogicalRingWestPortId			INTEGER,
+     wwpLeosRapsLogicalRingGuardTime  			INTEGER,
+     wwpLeosRapsLogicalRingWtr		  		INTEGER,
+     wwpLeosRapsLogicalRingWtb				INTEGER ,
+     wwpLeosRapsLogicalRingWestHoldOffTime		INTEGER,
+     wwpLeosRapsLogicalRingWestForce			INTEGER,
+     wwpLeosRapsLogicalRingWestCfmService		OCTET STRING,
+     wwpLeosRapsLogicalRingEastHoldOffTime		INTEGER,
+     wwpLeosRapsLogicalRingEastForce			INTEGER,
+     wwpLeosRapsLogicalRingEastCfmService		OCTET STRING,
+     wwpLeosRapsLogicalRingNumberOfVirtualRings	        INTEGER
+  }
+
+
+  wwpLeosRapsLogicalRingTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosRapsLogicalRingEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of Logical Rings."
+     ::= { wwpLeosRapsLogicalRing 1 }
+		
+ wwpLeosRapsLogicalRingEntry OBJECT-TYPE
+     SYNTAX       WwpLeosRapsLogicalRingEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Raps logical ring entry in the logical ring table."
+     INDEX { wwpLeosRapsLogicalRingIndex }
+     ::= { wwpLeosRapsLogicalRingTable 1 } 
+
+
+ wwpLeosRapsLogicalRingIndex   OBJECT-TYPE
+     SYNTAX         INTEGER (1..60) 
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+	     "Logical Ring Index."
+     ::= { wwpLeosRapsLogicalRingEntry 1 }
+ 
+ wwpLeosRapsLogicalRingName   OBJECT-TYPE
+     SYNTAX         OCTET STRING (SIZE (1..32))
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "The name of the logical ring."
+     ::= { wwpLeosRapsLogicalRingEntry 2 }
+
+  wwpLeosRapsLogicalRingId   OBJECT-TYPE
+     SYNTAX         INTEGER (1..255) 
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "Logical Ring ID."
+     ::= { wwpLeosRapsLogicalRingEntry 3 }
+
+   wwpLeosRapsLogicalRingGuardTime   OBJECT-TYPE
+     SYNTAX         INTEGER (10..2000) 
+     UNITS           "milliseconds"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "Guard time."
+    DEFVAL     { 500 }
+     ::= { wwpLeosRapsLogicalRingEntry 4 }
+
+   wwpLeosRapsLogicalRingWtr   OBJECT-TYPE
+     SYNTAX         INTEGER (1..12)
+     UNITS           "minutes"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "Wait to restore time."
+    DEFVAL     { 5 }
+     ::= { wwpLeosRapsLogicalRingEntry 5 }
+
+ wwpLeosRapsLogicalRingWtb   OBJECT-TYPE
+     SYNTAX         INTEGER
+     UNITS           "minutes"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This object shows Wait To Block time configured for this logical ring."
+     ::= { wwpLeosRapsLogicalRingEntry 6 }
+
+   wwpLeosRapsLogicalRingWestPortId   OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "West link port ID"
+     ::= { wwpLeosRapsLogicalRingEntry 7 }
+
+   wwpLeosRapsLogicalRingWestHoldOffTime   OBJECT-TYPE
+     SYNTAX         INTEGER (0..10000)
+     UNITS           "milliseconds"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "Holdoff time."
+    DEFVAL     { 0 }
+     ::= { wwpLeosRapsLogicalRingEntry 8 }
+
+   wwpLeosRapsLogicalRingWestForce   OBJECT-TYPE
+     SYNTAX         INTEGER {	
+			off(1),
+			on(2)
+		    }
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object represents a logial ring link to force switch state."
+     DEFVAL     { 1 }
+     ::= { wwpLeosRapsLogicalRingEntry 9 }
+
+ wwpLeosRapsLogicalRingWestCfmService   OBJECT-TYPE
+     SYNTAX              OCTET STRING (SIZE (1..32))
+     MAX-ACCESS     read-only
+     STATUS         	   current
+     DESCRIPTION
+	     "This object add a CFM service to a logical ring link."
+     ::= { wwpLeosRapsLogicalRingEntry 10 }
+
+   wwpLeosRapsLogicalRingEastPortId   OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "East link port ID"
+     ::= { wwpLeosRapsLogicalRingEntry 11 }
+
+   wwpLeosRapsLogicalRingEastHoldOffTime   OBJECT-TYPE
+     SYNTAX         INTEGER (0..10000)
+     UNITS           "milliseconds"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "Holdoff time."
+    DEFVAL     { 0 }
+     ::= { wwpLeosRapsLogicalRingEntry 12 }
+
+   wwpLeosRapsLogicalRingEastForce   OBJECT-TYPE
+     SYNTAX         INTEGER {	
+			off(1),
+			on(2)
+		    }
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object set a logial ring link to force switch state."
+     DEFVAL     { 1 }
+     ::= { wwpLeosRapsLogicalRingEntry 13 }
+
+ wwpLeosRapsLogicalRingEastCfmService   OBJECT-TYPE
+     SYNTAX              OCTET STRING(SIZE (1..32))
+     MAX-ACCESS     read-only
+     STATUS         	   current
+     DESCRIPTION
+	     "This object add a CFM service to a logical ring link."
+     ::= { wwpLeosRapsLogicalRingEntry 14 }
+
+   wwpLeosRapsLogicalRingNumberOfVirtualRings   OBJECT-TYPE
+     SYNTAX         INTEGER (0..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     " This object shows number of virtual rings in this logical ring."
+    DEFVAL     { 0 }
+     ::= { wwpLeosRapsLogicalRingEntry 15 }
+
+-- 
+-- ***********************************************************
+-- 
+--                 Virtual Ring     
+-- 
+-- *********************************************************** 
+--
+
+ WwpLeosRapsVirtualRingEntry ::= SEQUENCE { 
+     wwpLeosRapsVirtualRingIndex  				INTEGER,
+     wwpLeosRapsVirtualRingName				OCTET STRING,
+     wwpLeosRapsVirtualRingVid				INTEGER,
+     wwpLeosRapsVirtualRingLogicalRingId			INTEGER,
+     wwpLeosRapsVirtualRingMel				INTEGER,
+     wwpLeosRapsVirtualRingRevertive			INTEGER,
+     wwpLeosRapsVirtualRingState				INTEGER,
+     wwpLeosRapsVirtualRingStatus				INTEGER,
+     wwpLeosRapsVirtualRingAlarm				INTEGER,
+     wwpLeosRapsVirtualRingNumOfSwitchOvers		INTEGER,
+     wwpLeosRapsVirtualRingUptimeFromLastFailure	Counter32,
+     wwpLeosRapsVirtualRingTotalDownTime			Counter32,    
+     wwpLeosRapsVirtualRingWestPortRpl			INTEGER,    
+     wwpLeosRapsVirtualRingWestPortState			INTEGER,  
+     wwpLeosRapsVirtualRingWestPortStatus			INTEGER, 
+     wwpLeosRapsVirtualRingWestPortNrRxd			Counter32,  
+     wwpLeosRapsVirtualRingWestPortNrTxd			Counter32,    
+     wwpLeosRapsVirtualRingWestPortSfRxd			Counter32,
+     wwpLeosRapsVirtualRingWestPortSfTxd			Counter32,  
+     wwpLeosRapsVirtualRingWestPortFsRxd			Counter32,
+     wwpLeosRapsVirtualRingWestPortFsTxd			Counter32,  
+     wwpLeosRapsVirtualRingWestPortNrRbRxd		Counter32,
+     wwpLeosRapsVirtualRingWestPortNrRbTxd		Counter32,  
+     wwpLeosRapsVirtualRingEastPortRpl			INTEGER,    
+     wwpLeosRapsVirtualRingEastPortState			INTEGER,  
+     wwpLeosRapsVirtualRingEastPortStatus			INTEGER, 
+     wwpLeosRapsVirtualRingEastPortNrRxd			Counter32,  
+     wwpLeosRapsVirtualRingEastPortNrTxd			Counter32,    
+     wwpLeosRapsVirtualRingEastPortSfRxd			Counter32,
+     wwpLeosRapsVirtualRingEastPortSfTxd			Counter32,  
+     wwpLeosRapsVirtualRingEastPortFsRxd			Counter32,
+     wwpLeosRapsVirtualRingEastPortFsTxd			Counter32,  
+     wwpLeosRapsVirtualRingEastPortNrRbRxd		Counter32,
+     wwpLeosRapsVirtualRingEastPortNrRbTxd		Counter32,
+     wwpLeosRapsVirtualRingType                                 INTEGER,
+     wwpLeosRapsVirtualRingSubRingPortTerm              INTEGER
+  }
+
+  wwpLeosRapsVirtualRingTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosRapsVirtualRingEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of Virtual Rings."
+     ::= { wwpLeosRapsVirtualRing 1 }
+		
+ wwpLeosRapsVirtualRingEntry OBJECT-TYPE
+     SYNTAX       WwpLeosRapsVirtualRingEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Raps Virtual ring entry in the Virtual ring table."
+     INDEX { wwpLeosRapsVirtualRingIndex }
+     ::= { wwpLeosRapsVirtualRingTable 1 } 
+
+
+
+ wwpLeosRapsVirtualRingIndex   OBJECT-TYPE
+     SYNTAX         INTEGER (1..240) 
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+	     "Virtual Ring Index."
+     ::= { wwpLeosRapsVirtualRingEntry 1 }
+ 
+ wwpLeosRapsVirtualRingName   OBJECT-TYPE
+     SYNTAX         OCTET STRING(SIZE (1..32))
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "The name of the virtual ring."
+     ::= { wwpLeosRapsVirtualRingEntry 2 }
+
+ wwpLeosRapsVirtualRingVid   OBJECT-TYPE
+     SYNTAX         INTEGER (1..4094) 
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "Virtual Ring VID."
+     ::= { wwpLeosRapsVirtualRingEntry 3 }
+
+ wwpLeosRapsVirtualRingLogicalRingId   OBJECT-TYPE
+     SYNTAX         INTEGER (1..255) 
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "ID of the logical ring which this virtual ring belongs to."
+     ::= { wwpLeosRapsVirtualRingEntry 4 }
+
+ wwpLeosRapsVirtualRingMel   OBJECT-TYPE
+     SYNTAX         INTEGER (0..7) 
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This object represents the Maintenance Group Level of a virtual ring."
+     ::= { wwpLeosRapsVirtualRingEntry 5 }
+
+ wwpLeosRapsVirtualRingRevertive   OBJECT-TYPE
+     SYNTAX         INTEGER {
+     				off(1),
+     				on(2)
+     				}
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This object indicates if a virtual ring is revertive or not."
+     DEFVAL     { 2 }
+     ::= { wwpLeosRapsVirtualRingEntry 6 }
+
+ wwpLeosRapsVirtualRingState   OBJECT-TYPE
+     SYNTAX         INTEGER {	
+     			adminDisabled(1),
+			ok(2),
+			protecting(3),
+			recovering(4)
+		    }
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows the current state of a virtual ring."
+     ::= { wwpLeosRapsVirtualRingEntry 7 }
+
+ wwpLeosRapsVirtualRingStatus   OBJECT-TYPE
+     SYNTAX         INTEGER {	
+			clear(1),
+			localSignalFail(2),
+			localForceSwitch(3),
+			remoteOrOtherPortSignalFail(4),
+			remoteOrOtherPortForceSwitch(5),
+                        provisioningMismatch(6)
+		    }
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows the current status of a virtual ring."
+     ::= { wwpLeosRapsVirtualRingEntry 8 }
+
+ wwpLeosRapsVirtualRingAlarm   OBJECT-TYPE
+     SYNTAX         INTEGER {	
+			clear(1),
+			protectionSwitching(2),
+			provisionMismatch(3)
+		    }
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows the current alarm status of a virtual ring."
+     ::= { wwpLeosRapsVirtualRingEntry 9 }
+
+ wwpLeosRapsVirtualRingNumOfSwitchOvers   OBJECT-TYPE
+     SYNTAX         INTEGER (0..65535) 	
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows the number of protection switching that has occurred for this virtual ring."
+     ::= { wwpLeosRapsVirtualRingEntry 10 }
+
+ wwpLeosRapsVirtualRingUptimeFromLastFailure   OBJECT-TYPE
+     SYNTAX         Counter32 	
+     UNITS           "seconds"
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows the up time from the last failure for this virtual ring."
+     ::= { wwpLeosRapsVirtualRingEntry 11 }
+
+ wwpLeosRapsVirtualRingTotalDownTime   OBJECT-TYPE
+     SYNTAX         Counter32
+     UNITS           "seconds"
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows the total down time for this virtual ring."
+     ::= { wwpLeosRapsVirtualRingEntry 12 }
+
+ wwpLeosRapsVirtualRingWestPortRpl   OBJECT-TYPE
+     SYNTAX         INTEGER {	
+			none(1),
+			owner(2)
+		    }
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object RPL ownership for  virtual ring's west link."
+     DEFVAL     { 1 }
+     ::= { wwpLeosRapsVirtualRingEntry 13 }
+
+ wwpLeosRapsVirtualRingWestPortState   OBJECT-TYPE
+     SYNTAX         INTEGER {	
+			disabled(1),
+			forwarding(2),
+			blocked(3)
+		    }
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object show the virtual ring's west link state."
+     ::= { wwpLeosRapsVirtualRingEntry 14 }
+
+ wwpLeosRapsVirtualRingWestPortStatus   OBJECT-TYPE
+     SYNTAX         INTEGER {	
+			oK(1),
+			down(2),
+			ccmFailure(3),
+			localForceSwitch(4),
+			remoteForceSwitch(5),
+			remoteSignalFailure(6)
+		    }
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object show the virtual ring's west link status."
+     ::= { wwpLeosRapsVirtualRingEntry 15 }
+
+ wwpLeosRapsVirtualRingWestPortNrRxd   OBJECT-TYPE
+     SYNTAX         Counter32 	
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows number of No Request received on the west link."
+     ::= { wwpLeosRapsVirtualRingEntry 16 }
+
+ wwpLeosRapsVirtualRingWestPortNrTxd   OBJECT-TYPE
+     SYNTAX         Counter32 	
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows number of No Request transmitted on the west link."
+     ::= { wwpLeosRapsVirtualRingEntry 17 }
+
+
+ wwpLeosRapsVirtualRingWestPortSfRxd   OBJECT-TYPE
+     SYNTAX         Counter32 	
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows number of Signal Failures received on the west link."
+     ::= { wwpLeosRapsVirtualRingEntry 18 }
+
+ wwpLeosRapsVirtualRingWestPortSfTxd   OBJECT-TYPE
+     SYNTAX         Counter32 	
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows number of Signal Failures transmitted on the west link."
+     ::= { wwpLeosRapsVirtualRingEntry 19 }
+
+ wwpLeosRapsVirtualRingWestPortFsRxd   OBJECT-TYPE
+     SYNTAX         Counter32 	
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows number of Force Switch received on the west link."
+     ::= { wwpLeosRapsVirtualRingEntry 20 }
+
+ wwpLeosRapsVirtualRingWestPortFsTxd   OBJECT-TYPE
+     SYNTAX         Counter32 	
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows number of Force Switch transmitted on the west link."
+     ::= { wwpLeosRapsVirtualRingEntry 21 }
+
+ wwpLeosRapsVirtualRingWestPortNrRbRxd   OBJECT-TYPE
+     SYNTAX         Counter32 	
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows number of  No Request RPL Blocked received on the west link."
+     ::= { wwpLeosRapsVirtualRingEntry 22 }
+
+ wwpLeosRapsVirtualRingWestPortNrRbTxd   OBJECT-TYPE
+     SYNTAX         Counter32 	
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows number of No No Request RPL Blocked transmitted on the west link."
+     ::= { wwpLeosRapsVirtualRingEntry 23 }
+
+ wwpLeosRapsVirtualRingEastPortRpl   OBJECT-TYPE
+     SYNTAX         INTEGER {	
+			none(1),
+			owner(2)
+		    }
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object RPL ownership for  virtual ring's east link."
+     DEFVAL     { 1 }
+     ::= { wwpLeosRapsVirtualRingEntry 24 }
+
+ wwpLeosRapsVirtualRingEastPortState   OBJECT-TYPE
+     SYNTAX         INTEGER {	
+			disabled(1),
+			forwarding(2),
+			blocked(3)
+		    }
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object show the virtual ring's east link state."
+     ::= { wwpLeosRapsVirtualRingEntry 25 }
+
+ wwpLeosRapsVirtualRingEastPortStatus   OBJECT-TYPE
+     SYNTAX         INTEGER {	
+			ok(1),
+			down(2),
+			ccmFailure(3),
+			localForceSwitch(4),
+			remoteForceSwitch(5),
+			remoteSignalFailure(6)
+		    }
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object show the virtual ring's east link status."
+     ::= { wwpLeosRapsVirtualRingEntry 26 }
+
+ wwpLeosRapsVirtualRingEastPortNrRxd   OBJECT-TYPE
+     SYNTAX         Counter32 	
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows number of No Request received on the east link."
+     ::= { wwpLeosRapsVirtualRingEntry 27  }
+
+ wwpLeosRapsVirtualRingEastPortNrTxd   OBJECT-TYPE
+     SYNTAX         Counter32 	
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows number of No Request transmitted on the east link."
+     ::= { wwpLeosRapsVirtualRingEntry 28  }
+
+
+ wwpLeosRapsVirtualRingEastPortSfRxd   OBJECT-TYPE
+     SYNTAX         Counter32 	
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows number of Signal Failures received on the east link."
+     ::= { wwpLeosRapsVirtualRingEntry 29  }
+
+ wwpLeosRapsVirtualRingEastPortSfTxd   OBJECT-TYPE
+     SYNTAX         Counter32 	
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows number of Signal Failures transmitted on the east link."
+     ::= { wwpLeosRapsVirtualRingEntry 30 }
+
+ wwpLeosRapsVirtualRingEastPortFsRxd   OBJECT-TYPE
+     SYNTAX         Counter32 	
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows number of Force Switch received on the east link."
+     ::= { wwpLeosRapsVirtualRingEntry 31 }
+
+ wwpLeosRapsVirtualRingEastPortFsTxd   OBJECT-TYPE
+     SYNTAX         Counter32 	
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows number of Force Switch transmitted on the east link."
+     ::= { wwpLeosRapsVirtualRingEntry 32 }
+
+ wwpLeosRapsVirtualRingEastPortNrRbRxd   OBJECT-TYPE
+     SYNTAX         Counter32 	
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows number of  No Request RPL Blocked received on the east link."
+     ::= { wwpLeosRapsVirtualRingEntry 33 }
+
+ wwpLeosRapsVirtualRingEastPortNrRbTxd   OBJECT-TYPE
+     SYNTAX         Counter32 	
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows number of No No Request RPL Blocked transmitted on the east link."
+     ::= { wwpLeosRapsVirtualRingEntry 34 }
+
+ wwpLeosRapsVirtualRingType   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        majorRing(1),
+                        subRing(2)
+                    }
+     MAX-ACCESS     read-only  
+     STATUS               current
+     DESCRIPTION
+             "This object represents the virtual ring type."
+     ::= { wwpLeosRapsVirtualRingEntry 35 }
+
+ wwpLeosRapsVirtualRingSubRingPortTerm   OBJECT-TYPE
+     SYNTAX         INTEGER {  
+                        noTerminate(1),
+                        westPortTerminate(2),
+                        eastPortTerminate(3)
+                    }
+     MAX-ACCESS     read-only  
+     STATUS               current
+     DESCRIPTION
+             "This object represents the virtual sub ring termination port."
+     ::= { wwpLeosRapsVirtualRingEntry 36 }
+
+ WwpLeosRapsVirtualRingMemberEntry ::= SEQUENCE { 
+     wwpLeosRapsVirtualRingMemberVlanId		       INTEGER
+  }
+
+  wwpLeosRapsVirtualRingMemberTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosRapsVirtualRingMemberEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of Virtual Ring VLAN members."
+     ::= { wwpLeosRapsVirtualRingMember 1 }
+		
+ wwpLeosRapsVirtualRingMemberEntry OBJECT-TYPE
+     SYNTAX       WwpLeosRapsVirtualRingMemberEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Raps Virtual ring member entry in the Virtual ring table."
+     INDEX { wwpLeosRapsVirtualRingIndex, wwpLeosRapsVirtualRingMemberVlanId }
+     ::= { wwpLeosRapsVirtualRingMemberTable 1 } 
+
+
+ wwpLeosRapsVirtualRingMemberVlanId OBJECT-TYPE
+     SYNTAX       INTEGER (1..4095) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Raps Virtual ring member entry in the Virtual ring table."
+     ::= { wwpLeosRapsVirtualRingMemberEntry 2 } 
+
+WwpLeosRapsVirtualRingMemberVsEntry ::= SEQUENCE { 
+     wwpLeosRapsVirtualRingMemberVsId		       INTEGER
+  }
+
+  wwpLeosRapsVirtualRingMemberVsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosRapsVirtualRingMemberVsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of Virtual Ring members."
+     ::= { wwpLeosRapsVirtualRingMember 2 }
+		
+ wwpLeosRapsVirtualRingMemberVsEntry OBJECT-TYPE
+     SYNTAX       WwpLeosRapsVirtualRingMemberVsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Raps Virtual ring member entry in the Virtual ring table."
+     INDEX { wwpLeosRapsVirtualRingIndex, wwpLeosRapsVirtualRingMemberVsId }
+     ::= { wwpLeosRapsVirtualRingMemberVsTable 1 } 
+
+
+ wwpLeosRapsVirtualRingMemberVsId OBJECT-TYPE
+     SYNTAX       INTEGER (1..10000)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Raps Virtual ring member entry in the Virtual ring table."
+     ::= { wwpLeosRapsVirtualRingMemberVsEntry 1 } 
+
+ --
+ -- Notifications
+ --
+ wwpLeosRapsAlarm NOTIFICATION-TYPE
+	OBJECTS	{                
+		     wwpLeosRapsVirtualRingName,
+		     wwpLeosRapsVirtualRingAlarm
+		}
+	STATUS	current
+	DESCRIPTION
+		"A alarm notification is sent when a ring detects Provisioning-Mismatch, 
+		 Protection-Switch-Active or when the condition clears."		 
+	::= { wwpLeosRapsMIBNotifications 1 }
+ 
+ END
+
+ --
+ -- WWP-RAPS-MIB
+ --

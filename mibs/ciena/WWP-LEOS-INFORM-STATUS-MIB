@@ -1,0 +1,476 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-INFORM-STATUS-MIB.my
+ --
+ --
+
+ WWP-LEOS-INFORM-STATUS-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   Unsigned32, IpAddress, TimeTicks, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+	    FROM SNMPv2-SMI
+   MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+   InetAddressType, InetAddress ,InetAddressPrefixLength
+            FROM INET-ADDRESS-MIB
+   wwpModulesLeos		
+	    FROM WWP-SMI;
+	
+	
+ wwpLeosInformStatusMIB MODULE-IDENTITY
+	    LAST-UPDATED "201203190000Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+   	    DESCRIPTION
+		    "New table wwpLeosInetTargetInformStatusTable has been added to support INET addressing."
+        REVISION     "201203190000Z"    
+	    DESCRIPTION
+                    "This MIB module defines managed objects
+                     for Reliable Trap Feature on WWP devices."  
+       	REVISION    "201009100000Z" 
+	    DESCRIPTION
+                     "Initial creation."   
+	    ::= { wwpModulesLeos 42 }
+		
+ --
+ -- Node definitions
+ --
+	
+ wwpLeosInformStatusMIBObjects 	OBJECT IDENTIFIER ::= { wwpLeosInformStatusMIB 1 }
+ wwpLeosInformStatus 			OBJECT IDENTIFIER ::= { wwpLeosInformStatusMIBObjects 1 }
+ 
+ --
+ -- Notifications 
+ --
+  
+ wwpLeosInformStatusMIBNotificationPrefix	OBJECT IDENTIFIER ::= { wwpLeosInformStatusMIB 2 } 
+ wwpLeosInformStatusMIBNotifications    	OBJECT IDENTIFIER ::= { wwpLeosInformStatusMIBNotificationPrefix 0 }
+
+ --
+ -- Conformance information 
+ --
+ 
+ wwpLeosInformStatusMIBConformance 	OBJECT IDENTIFIER ::= { wwpLeosInformStatusMIB 3 } 
+ wwpLeosInformStatusMIBCompliances 	OBJECT IDENTIFIER ::= { wwpLeosInformStatusMIBConformance 1 } 		
+ wwpLeosInformStatusMIBGroups      	OBJECT IDENTIFIER ::= { wwpLeosInformStatusMIBConformance 2 }
+ 
+ wwpLeosInformStatusGlobal		   OBJECT IDENTIFIER ::= { wwpLeosInformStatus 1 }  
+ 
+ wwpLeosInformStatusReliableTrapState  OBJECT-TYPE
+ 	   SYNTAX      INTEGER {
+                                disabled(1),
+                                enabled(2)
+                                }
+
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION	 "Reliable Trap State."
+       ::= { wwpLeosInformStatusGlobal 1 }
+ 
+ wwpLeosInformStatusReliableTrapStatsClear  OBJECT-TYPE
+       SYNTAX      INTEGER {
+                                none(0),
+                                clear(1)
+                                }
+
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION	 "Get on this object will always return none. Setting this object to clear(1) will clear
+       				  Reliable Trap Statistics."
+       ::= { wwpLeosInformStatusGlobal 2 }
+--
+--wwpLeosInformStatusTable
+--
+ wwpLeosInformStatusTable OBJECT-TYPE
+     	SYNTAX       SEQUENCE OF WwpLeosInformStatusEntry
+     	MAX-ACCESS   not-accessible
+     	STATUS       current
+     	DESCRIPTION	 "Table of UserAuth Providers."
+     	::= { wwpLeosInformStatus 2 }
+		
+ wwpLeosInformStatusEntry OBJECT-TYPE
+     	SYNTAX       WwpLeosInformStatusEntry
+     	MAX-ACCESS   not-accessible
+     	STATUS       current
+     	DESCRIPTION	  "An entry for each User Authorization Provider."
+     	INDEX { wwpLeosInformStatusTargetIp, wwpLeosInformStatusTargetPort }
+     	::= { wwpLeosInformStatusTable 1 }
+		 
+ WwpLeosInformStatusEntry ::= SEQUENCE { 
+     	wwpLeosInformStatusTargetIp							IpAddress,
+     	wwpLeosInformStatusTargetPort						Unsigned32,
+     	wwpLeosInformStatusPendingInforms					Unsigned32,
+     	wwpLeosInformStatusLostInforms						Unsigned32, 
+     	wwpLeosInformStatusDroppedInforms					Unsigned32,
+     	wwpLeosInformStatusTimeout							Unsigned32,
+     	wwpLeosInformStatusRetries							Unsigned32,
+     	wwpLeosInformStatusCurrentTimeoutValue				Unsigned32,
+     	wwpLeosInformStatusCurrentRetries					Unsigned32,
+     	wwpLeosInformStatusTotalTimeouts	 				Unsigned32,
+     	wwpLeosInformStatusTotalAcknowledgedInforms 		Unsigned32,		
+     	wwpLeosInformStatusMaxTransmissions					Unsigned32,
+     	wwpLeosInformStatusMaxDelayToAcknowledgeInform		Unsigned32, 
+     	wwpLeosInformStatusLastDiscardedInformTimeStamp 	TimeTicks,
+     	wwpLeosInformStatusResend  							INTEGER,
+     	wwpLeosInformStatusClearStats						INTEGER
+ }
+
+ wwpLeosInformStatusTargetIp OBJECT-TYPE
+     	SYNTAX     		IpAddress
+     	MAX-ACCESS   	accessible-for-notify
+     	STATUS       	current
+     	DESCRIPTION	   	"Ip Address of Manager."
+     	::= { wwpLeosInformStatusEntry 1 }
+   
+ wwpLeosInformStatusTargetPort OBJECT-TYPE
+        SYNTAX     		Unsigned32
+     	MAX-ACCESS   	not-accessible
+     	STATUS       	current
+     	DESCRIPTION	   	"Udp Port of Manager."
+     	::= { wwpLeosInformStatusEntry 2 }
+
+ wwpLeosInformStatusPendingInforms OBJECT-TYPE
+ 		SYNTAX			Unsigned32			
+ 		MAX-ACCESS  	read-only
+     	STATUS      	current
+     	DESCRIPTION	  	"Count of pending informs in manager's inform Queue."
+     	::= { wwpLeosInformStatusEntry 3 }
+     	
+ wwpLeosInformStatusLostInforms OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"Count of lost informs in manager's inform queue since system restart." 
+ 		::= { wwpLeosInformStatusEntry 4 }
+ 		
+ wwpLeosInformStatusDroppedInforms OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"Count of dropped informs in manager's inform queue since last successful transmission." 
+ 		::= { wwpLeosInformStatusEntry 5 }
+ 		
+ wwpLeosInformStatusTimeout	OBJECT-TYPE
+  		SYNTAX			Unsigned32
+ 		UNITS           "centi-seconds"
+ 		MAX-ACCESS		read-only
+ 		STATUS			current       
+ 		DESCRIPTION		"Timeout value configured for this manager in 1/100 secs units." 
+ 		::= { wwpLeosInformStatusEntry 6 }
+			
+ wwpLeosInformStatusRetries	OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"Retries value configured for this manager." 
+ 		::= { wwpLeosInformStatusEntry 7 }
+ 		
+ wwpLeosInformStatusCurrentTimeoutValue	OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		UNITS           "centi-seconds"
+ 		MAX-ACCESS		read-only
+ 		STATUS			current       
+ 		DESCRIPTION		"Current timeout value in 1/100 secs units." 
+ 		::= { wwpLeosInformStatusEntry 8 } 
+ 		
+ wwpLeosInformStatusCurrentRetries	OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"Current retry value." 
+ 		::= { wwpLeosInformStatusEntry 9 }
+ 		
+ wwpLeosInformStatusTotalTimeouts  OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"Total timeouts for this manager." 
+ 		::= { wwpLeosInformStatusEntry 10 }
+	
+ wwpLeosInformStatusTotalAcknowledgedInforms OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"Total acknowledged informs for this manager." 
+ 		::= { wwpLeosInformStatusEntry 11 }
+ 		
+ wwpLeosInformStatusMaxTransmissions	OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"Max transmissions of an inform for this manager." 
+ 		::= { wwpLeosInformStatusEntry 12 }
+ 
+ wwpLeosInformStatusMaxDelayToAcknowledgeInform	OBJECT-TYPE 
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"Max delay to acknowledge an informs for this manager." 
+ 		::= { wwpLeosInformStatusEntry 13 }
+	
+ 				 
+ wwpLeosInformStatusLastDiscardedInformTimeStamp OBJECT-TYPE
+ 		SYNTAX TimeTicks
+ 		MAX-ACCESS read-only
+ 		STATUS current
+ 		DESCRIPTION "Time Stamp of last dropped notification"
+ 		::= { wwpLeosInformStatusEntry 14} 
+ 		
+ wwpLeosInformStatusResend		OBJECT-TYPE
+ 		SYNTAX INTEGER {
+ 				none(0),
+ 				send(1)
+ 		}				
+ 		MAX-ACCESS read-write
+ 		STATUS current
+ 		DESCRIPTION "Setting this object to send(1) will cause it to send any pending informs from the manager's inform queue "
+ 		::= { wwpLeosInformStatusEntry 15 }
+ 
+ wwpLeosInformStatusClearStats 	OBJECT-TYPE
+ 	SYNTAX INTEGER {
+ 					none(0),
+ 					clear(1)
+ 				   }
+ 	MAX-ACCESS read-write
+ 	STATUS 		current
+ 	DESCRIPTION "Setting this object to clear(1) will clear reliable trap statistics for this manager"
+ 	::= { wwpLeosInformStatusEntry 16 } 	
+ 
+--
+--wwpLeosInetTargetInformStatusTable
+--
+ wwpLeosInetTargetInformStatusTable OBJECT-TYPE
+     	SYNTAX       SEQUENCE OF WwpLeosInetTargetInformStatusEntry 
+     	MAX-ACCESS   not-accessible
+     	STATUS       current
+     	DESCRIPTION	 "Table of UserAuth Providers."
+     	::= { wwpLeosInformStatus 3 }
+		
+ wwpLeosInetTargetInformStatusEntry OBJECT-TYPE
+     	SYNTAX       WwpLeosInetTargetInformStatusEntry 
+     	MAX-ACCESS   not-accessible
+     	STATUS       current
+     	DESCRIPTION  "An entry for each User Authorization Provider."
+     	INDEX { wwpLeosInetTargetInformStatusInetAddrType,wwpLeosInetTargetInformStatusInetAddr,
+     	        wwpLeosInetTargetInformStatusTargetPort }
+     	::= { wwpLeosInetTargetInformStatusTable 1 }
+		 
+ WwpLeosInetTargetInformStatusEntry ::= SEQUENCE { 
+     	wwpLeosInetTargetInformStatusInetAddrType				InetAddressType,
+     	wwpLeosInetTargetInformStatusInetAddr					InetAddress,
+     	wwpLeosInetTargetInformStatusTargetPort					Unsigned32,
+     	wwpLeosInetTargetInformStatusPendingInforms				Unsigned32,
+     	wwpLeosInetTargetInformStatusLostInforms				Unsigned32, 
+     	wwpLeosInetTargetInformStatusDroppedInforms				Unsigned32,
+     	wwpLeosInetTargetInformStatusTimeout					Unsigned32,
+     	wwpLeosInetTargetInformStatusRetries					Unsigned32,
+     	wwpLeosInetTargetInformStatusCurrentTimeoutValue		Unsigned32,
+     	wwpLeosInetTargetInformStatusCurrentRetries				Unsigned32,
+     	wwpLeosInetTargetInformStatusTotalTimeouts	 			Unsigned32,
+     	wwpLeosInetTargetInformStatusTotalAcknowledgedInforms 	Unsigned32,		
+     	wwpLeosInetTargetInformStatusMaxTransmissions			Unsigned32,
+     	wwpLeosInetTargetInformStatusMaxDelayToAcknowledgeInform	Unsigned32, 
+     	wwpLeosInetTargetInformStatusLastDiscardedInformTimeStamp 	TimeTicks,
+     	wwpLeosInetTargetInformStatusResend  					INTEGER,
+     	wwpLeosInetTargetInformStatusClearStats					INTEGER
+ }
+
+  wwpLeosInetTargetInformStatusInetAddrType OBJECT-TYPE
+     	SYNTAX     		InetAddressType
+     	MAX-ACCESS   	accessible-for-notify
+     	STATUS       	current
+     	DESCRIPTION	   	
+     	"Inet Address type of Manager. 	Used in conjunction with wwpLeosInetTargetInformStatusInetAddr
+     	  When representing :
+          ipv4 : wwpLeosInetTargetInformStatusInetAddr should be compliant with InetAddressIPv4 from RFC 4001 
+          ipv6 : wwpLeosInetTargetInformStatusInetAddr should be compliant with InetAddressIPv6 from RFC 4001"
+     	::= { wwpLeosInetTargetInformStatusEntry 1 }
+
+ wwpLeosInetTargetInformStatusInetAddr OBJECT-TYPE
+     	SYNTAX     		InetAddress
+     	MAX-ACCESS   	accessible-for-notify
+     	STATUS       	current
+     	DESCRIPTION	   	
+     	"Inet Address of Manager. This OID should be used in conjuction with 
+     	wwpLeosInetTargetInformStatusInetAddrType. 
+        The InetAddress specified here will be compliant with RFC 4001."
+     	::= { wwpLeosInetTargetInformStatusEntry 2 }
+  
+ wwpLeosInetTargetInformStatusTargetPort OBJECT-TYPE
+        SYNTAX     		Unsigned32
+     	MAX-ACCESS   	not-accessible
+     	STATUS       	current
+     	DESCRIPTION	   	"Udp Port of Manager."
+     	::= { wwpLeosInetTargetInformStatusEntry 3 }
+
+ wwpLeosInetTargetInformStatusPendingInforms OBJECT-TYPE
+ 		SYNTAX			Unsigned32			
+ 		MAX-ACCESS  	read-only
+     	STATUS      	current
+     	DESCRIPTION	  	"Count of pending informs in manager's inform Queue."
+     	::= { wwpLeosInetTargetInformStatusEntry 4 }
+     	
+ wwpLeosInetTargetInformStatusLostInforms OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"Count of lost informs in manager's inform queue since system restart." 
+ 		::= { wwpLeosInetTargetInformStatusEntry 5 }
+ 		
+ wwpLeosInetTargetInformStatusDroppedInforms OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"Count of dropped informs in manager's inform queue since last successful transmission." 
+ 		::= { wwpLeosInetTargetInformStatusEntry 6 }
+ 		
+ wwpLeosInetTargetInformStatusTimeout	OBJECT-TYPE
+  		SYNTAX			Unsigned32
+ 		UNITS           "centi-seconds"
+ 		MAX-ACCESS		read-only
+ 		STATUS			current       
+ 		DESCRIPTION		"Timeout value configured for this manager in 1/100 secs units." 
+ 		::= { wwpLeosInetTargetInformStatusEntry 7 }
+			
+ wwpLeosInetTargetInformStatusRetries	OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"Retries value configured for this manager." 
+ 		::= { wwpLeosInetTargetInformStatusEntry 8 }
+ 		
+ wwpLeosInetTargetInformStatusCurrentTimeoutValue	OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		UNITS           "centi-seconds"
+ 		MAX-ACCESS		read-only
+ 		STATUS			current       
+ 		DESCRIPTION		"Current timeout value in 1/100 secs units." 
+ 		::= { wwpLeosInetTargetInformStatusEntry 9 } 
+ 		
+ wwpLeosInetTargetInformStatusCurrentRetries	OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"Current retry value." 
+ 		::= { wwpLeosInetTargetInformStatusEntry 10 }
+ 		
+ wwpLeosInetTargetInformStatusTotalTimeouts  OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"Total timeouts for this manager." 
+ 		::= { wwpLeosInetTargetInformStatusEntry 11 }
+	
+ wwpLeosInetTargetInformStatusTotalAcknowledgedInforms OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"Total acknowledged informs for this manager." 
+ 		::= { wwpLeosInetTargetInformStatusEntry 12 }
+ 		
+ wwpLeosInetTargetInformStatusMaxTransmissions	OBJECT-TYPE
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"Max transmissions of an inform for this manager." 
+ 		::= { wwpLeosInetTargetInformStatusEntry 13 }
+ 
+ wwpLeosInetTargetInformStatusMaxDelayToAcknowledgeInform	OBJECT-TYPE 
+ 		SYNTAX			Unsigned32
+ 		MAX-ACCESS		read-only
+ 		STATUS			current
+ 		DESCRIPTION		"Max delay to acknowledge an informs for this manager." 
+ 		::= { wwpLeosInetTargetInformStatusEntry 14 }
+	
+ 				 
+ wwpLeosInetTargetInformStatusLastDiscardedInformTimeStamp OBJECT-TYPE
+ 		SYNTAX TimeTicks
+ 		MAX-ACCESS read-only
+ 		STATUS current
+ 		DESCRIPTION "Time Stamp of last dropped notification"
+ 		::= { wwpLeosInetTargetInformStatusEntry 15} 
+ 		
+ wwpLeosInetTargetInformStatusResend		OBJECT-TYPE
+ 		SYNTAX INTEGER {
+ 				none(0),
+ 				send(1)
+ 		}				
+ 		MAX-ACCESS read-write
+ 		STATUS current
+ 		DESCRIPTION "Setting this object to send(1) will cause it to send any pending informs from the manager's inform queue "
+ 		::= { wwpLeosInetTargetInformStatusEntry 16 }
+ 
+ wwpLeosInetTargetInformStatusClearStats 	OBJECT-TYPE
+ 	SYNTAX INTEGER {
+ 					none(0),
+ 					clear(1)
+ 				   }
+ 	MAX-ACCESS read-write
+ 	STATUS 		current
+ 	DESCRIPTION "Setting this object to clear(1) will clear reliable trap statistics for this manager"
+ 	::= { wwpLeosInetTargetInformStatusEntry 17 } 	
+   
+       
+--notifications                                               
+ wwpLeosInformDiscardNotification NOTIFICATION-TYPE
+	OBJECTS	   {
+			wwpLeosInformStatusTargetIp,
+			wwpLeosInformStatusLostInforms,
+			wwpLeosInformStatusLastDiscardedInformTimeStamp
+		   }
+	STATUS	   current
+	DESCRIPTION
+		"A wwpLeosInformDiscardNotification notification is sent whenever a notification is overwritten in
+		manager's inform queue and previously generated inform request times out."
+	::= {   wwpLeosInformStatusMIBNotifications 1 }   
+
+ wwpLeosInetTargetInformDiscardNotification NOTIFICATION-TYPE
+	OBJECTS	   {
+			wwpLeosInetTargetInformStatusInetAddr,
+			wwpLeosInetTargetInformStatusInetAddrType,
+			wwpLeosInetTargetInformStatusLostInforms,
+			wwpLeosInetTargetInformStatusLastDiscardedInformTimeStamp
+		   }
+	STATUS	   current
+	DESCRIPTION
+		"This notification is sent whenever a notification is overwritten in
+		manager's inform queue and previously generated inform request times out.
+		This notification supports inet addressing."
+	::= {   wwpLeosInformStatusMIBNotifications 2 }
+ 
+ --
+ -- module compliance  
+ --
+   wwpLeosInetTargetInformStatusCompliance MODULE-COMPLIANCE
+       STATUS      current
+       DESCRIPTION
+           "The compliance statement of the wwpLeosInform MIB."
+       MODULE
+
+       GROUP   wwpLeosInetTargetInformStatusIPv6Group
+       DESCRIPTION
+           "This group is mandatory when IPv6 addresses are supported."       
+
+       OBJECT  wwpLeosInetTargetInformStatusInetAddrType
+       SYNTAX  InetAddressType { ipv4(1), ipv6(2) }
+       DESCRIPTION
+           "An implementation is only required to support IPv4
+            and IPv6 addresses without zone indices."
+       ::= { wwpLeosInformStatusMIBCompliances 1 }                                            
+	
+   wwpLeosInetTargetInformStatusIPv6Group OBJECT-GROUP
+       OBJECTS { wwpLeosInetTargetInformStatusInetAddrType, wwpLeosInetTargetInformStatusInetAddr }
+       STATUS  current
+       DESCRIPTION "Inform status objects for IPv6 address."
+       ::= { wwpLeosInformStatusMIBGroups 1 }
+ END
+
+ --
+ -- WWP-User-MIB
+ --
