@@ -1,6 +1,7 @@
 os: routeros
 text: 'Mikrotik RouterOS'
 type: network
+rfc1628_compat: 1
 nobulk: 1
 mib_dir:
     - mikrotik
