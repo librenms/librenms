@@ -49,6 +49,10 @@ if ($device['os'] == 'openbsd') {
     include 'includes/discovery/sensors/openbsd.inc.php';
 }
 
+if ($device['os'] == 'ciena-sds') {
+    require 'includes/discovery/sensors/dbm/ciena.inc.php';
+}
+
 if (strstr($device['hardware'], 'Dell')) {
     include 'includes/discovery/sensors/fanspeed/dell.inc.php';
     include 'includes/discovery/sensors/power/dell.inc.php';
