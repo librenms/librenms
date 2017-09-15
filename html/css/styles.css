@@ -1943,6 +1943,7 @@ label {
 }
 
 .availability-label {
+  border-radius: 0 .25em 0 .25em;
   float:right;
   margin:-8px;
 }
