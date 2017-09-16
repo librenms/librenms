@@ -64,7 +64,7 @@ foreach ($bypass_power as $index => $data) {
         $valid['sensor'],
         'power',
         $device,
-        ".1.3.6.1.2.1.33.1.3.3.1.4.$index",
+        ".1.3.6.1.2.1.33.1.5.3.1.4.$index",
         200+$index,
         "rfc1628",
         $descr,
