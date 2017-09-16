@@ -98,9 +98,9 @@ if (!file_exists('vendor/autoload.php')) {
 }
 
 // Check php modules we use to make sure they are loaded
-$extensions = array('mysqli','pcre','curl','session','snmp','mcrypt');
+$extensions = array('mysqli','pcre','curl','session','snmp','mcrypt', 'xml');
 foreach ($extensions as $extension) {
-    if (extension_loaded($extension) === false) {
+    if (extension_loaded($extension) == false) {
         $missing_extensions[] = $extension;
     }
 }
