@@ -1408,7 +1408,7 @@ state_translations:
     state_index_id: { Field: state_index_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
     state_lastupdated: { Field: state_lastupdated, Type: timestamp, 'Null': false, Default: CURRENT_TIMESTAMP, Extra: 'on update CURRENT_TIMESTAMP' }
     state_translation_id: { Field: state_translation_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
-    state_value: { Field: state_value, Type: 'smallint(5) unsigned', 'Null': false, Default: 'NULL', Extra: '' }
+    state_value: { Field: state_value, Type: smallint(5), 'Null': false, Default: '0', Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [state_translation_id], Unique: true, Type: BTREE }
     state_index_id_value: { Name: state_index_id_value, Columns: [state_index_id, state_value], Unique: true, Type: BTREE }
