@@ -12,7 +12,15 @@ if ($device['os'] == 'avaya-ers') {
     foreach ($vlans as $vlan_id => $vlan) {
         d_echo(" $vlan_id");
         if (is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
-            echo '.';
+            $vlan_data = $vlans_db[$vtpdomain_id][$vlan_id];
+            if ($vlan_data['vlan_name'] != $vlan['rcVlanName']) {
+                $vlan_upd['vlan_name'] = $vlan['rcVlanName'];
+                dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', array($vlan_data['vlan_id']));
+                log_event("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> {$vlan['rcVlanName']} ", $device, 'vlan', 3, $vlan_data['vlan_id']);
+                echo 'U';
+            } else {
+                echo '.';
+            }
         } else {
             dbInsert(array(
                 'device_id' => $device['device_id'],
