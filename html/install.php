@@ -183,7 +183,7 @@ foreach ($modules as $extension) {
     echo "<tr class='$row_class'><td>PHP module <strong>$extension</strong></td><td>$status</td><td></td></tr>";
 }
 
-if (is_writable(session_save_path())) {
+if (is_writable(session_save_path() === '' ? '/tmp' : session_save_path())) {
     $status = 'yes';
     $row_class = 'success';
 } else {
