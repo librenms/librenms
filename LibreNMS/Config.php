@@ -139,7 +139,7 @@ class Config
 
         if (!isset($config['os'][$os][$key])) {
             if (!str_contains($key, '.')) {
-                return $default;
+                return self::get($key, $default);
             }
             if (!self::has("os.$os.$key")) {
                 return self::get($key, $default);
