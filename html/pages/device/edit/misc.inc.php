@@ -9,6 +9,12 @@ echo '
         </div>
     </div>
     <div class="form-group">
+        <label for="snmp" class="col-sm-4 control-label">Disable SNMP?</label>
+        <div class="col-sm-8">
+            '.dynamic_override_config('checkbox', 'override_snmp_disable', $device).'
+        </div>
+    </div>
+    <div class="form-group">
         <label for="oxidized" class="col-sm-4 control-label">Exclude from Oxidized?</label>
         <div class="col-sm-8">
             '.dynamic_override_config('checkbox', 'override_Oxidized_disable', $device).'
