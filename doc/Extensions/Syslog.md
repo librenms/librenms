@@ -102,7 +102,7 @@ Create a file called something like `/etc/rsyslog.d/30-librenms.conf` containing
 # Feed syslog messages to librenms
 $ModLoad omprog
 
-$template librenms,"%fromhost%||%syslogfacility%||%syslogpriority%||%syslogseverity%||%syslogtag%||%$year%-%$month%-%$day% %timereported:8:25%||%msg%||%programname%\n"
+$template librenms,"%fromhost%||%syslogfacility%||%syslogpriority%||%syslogseverity%||%syslogtag%||%$year%-%$month%-%$day% %timegenerated:8:25%||%msg%||%programname%\n"
 
 *.* action(type="omprog" binary="/opt/librenms/syslog.php" template="librenms")
 
