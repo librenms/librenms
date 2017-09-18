@@ -13,6 +13,7 @@ return array(
     'LibreNMS\\' => array($baseDir . '/LibreNMS'),
     'Doctrine\\Instantiator\\' => array($vendorDir . '/doctrine/instantiator/src/Doctrine/Instantiator'),
     'Dapphp\\Radius\\' => array($vendorDir . '/dapphp/radius/src'),
+    'CorsSlim\\' => array($vendorDir . '/palanik/corsslim'),
     'Amenadiel\\JpGraph\\Util\\' => array($vendorDir . '/amenadiel/jpgraph/src/util'),
     'Amenadiel\\JpGraph\\Themes\\' => array($vendorDir . '/amenadiel/jpgraph/src/themes'),
     'Amenadiel\\JpGraph\\Text\\' => array($vendorDir . '/amenadiel/jpgraph/src/text'),
