@@ -116,6 +116,37 @@
     "rule": "%services.service_status = \"2\"",
     "name": "Service critical"
   },
+  
+   {
+    "rule": "%syslog.timestamp >= %macros.past_5m && %syslog.priority ~ \"alert\"",
+    "name": "Syslog, received Alert Priority Message"
+  },
+  
+    {
+    "rule": "%syslog.timestamp >= %macros.past_5m && %syslog.priority ~ \"emerg\" || %syslog.priority ~ \"emergency\"",
+    "name": "Syslog, received Emergency Priority Message"
+  },
+  
+   {
+    "rule": "	%sensors.sensor_type ~ \"upsAdvBatteryReplaceIndicator\" && %sensors.sensor_current = \"2\"",
+    "name": "APC UPS Battery Needs Replacement"
+  },
+  
+  {
+    "rule": " %sensors.sensor_current = \"3\" && %sensors.sensor_type = \"upsBasicOutputStatus\"",
+    "name": "APC UPS Switched to Battery Power"
+  },
+  
+  {
+    "rule": " %sensors.sensor_current = \"10\" && %sensors.sensor_type = \"upsBasicOutputStatus\"",
+    "name": "APC UPS in Hardware Failure Bypass Mode"
+  },
+  
+  {
+    "rule": " %sensors.sensor_current = \"16\" && %sensors.sensor_type = \"upsBasicOutputStatus\"",
+    "name": "APC UPS in Emergency Static Bypass Mode"
+  },
+  
   {
     "rule": "%sensors.sensor_current > %sensors.sensor_limit && %sensors.sensor_alert = \"1\" && %macros.device_up = \"1\" && %macros.sensor_port_link = \"1\"",
     "name": "Sensor over limit with linked port"
