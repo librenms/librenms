@@ -7,6 +7,9 @@ require 'includes/include-dir.inc.php';
 // Last-resort discovery here
 require 'processors-ucd-old.inc.php';
 
+// Run processor discovery from yaml now
+processor_discovery($valid, $device, $pre_cache);
+
 // Remove processors which weren't redetected here
 $sql = "SELECT * FROM `processors` WHERE `device_id`  = '".$device['device_id']."'";
 

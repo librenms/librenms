@@ -62,29 +62,38 @@ class YamlTest extends \PHPUnit_Framework_TestCase
         }
 
         foreach ($data['modules'] as $module => $sub_modules) {
-            foreach ($sub_modules as $type => $sub_module) {
-                $this->assertArrayHasKey('data', $sub_module, "$type is missing data key");
-                foreach ($sub_module['data'] as $sensor_index => $sensor) {
-                    $this->assertArrayHasKey('oid', $sensor, "$type.data.$sensor_index is missing oid key");
-                    if ($type !== 'pre-cache') {
-                        $this->assertArrayHasKey('num_oid', $sensor, "$type.data.$sensor_index(${sensor['oid']}) is missing num_oid key");
-                        $this->assertArrayHasKey('descr', $sensor, "$type.data.$sensor_index(${sensor['oid']}) is missing descr key");
-                    }
+            if ($module === 'sensors') {
+                foreach ($sub_modules as $type => $sub_module) {
+                    $this->assertArrayHasKey('data', $sub_module, "$type is missing data key");
+                    foreach ($sub_module['data'] as $sensor_index => $sensor) {
+                        $this->assertArrayHasKey('oid', $sensor, "$type.data.$sensor_index is missing oid key");
+                        if ($type !== 'pre-cache') {
+                            $this->assertArrayHasKey('num_oid', $sensor, "$type.data.$sensor_index(${sensor['oid']}) is missing num_oid key");
+                            $this->assertArrayHasKey('descr', $sensor, "$type.data.$sensor_index(${sensor['oid']}) is missing descr key");
+                        }
 
-                    if ($type === 'state') {
-                        $this->assertArrayHasKey('states', $sensor, "$type.data(${sensor['oid']}) is missing states key");
+                        if ($type === 'state') {
+                            $this->assertArrayHasKey('states', $sensor, "$type.data(${sensor['oid']}) is missing states key");
 
-                        foreach ($sensor['states'] as $state_index => $state) {
-                            $this->assertArrayHasKey('descr', $state, "$type.data.$sensor_index(${sensor['oid']}).states.$state_index is missing descr key");
-                            $this->assertNotEmpty($state['descr'], "$type.data.$sensor_index(${sensor['oid']}).states.$state_index(${state['descr']}) descr must not be empty");
-                            $this->assertArrayHasKey('graph', $state, "$type.data.$sensor_index(${sensor['oid']}).states.$state_index(${state['descr']}) is missing graph key");
-                            $this->assertTrue($state['graph'] === 0 || $state['graph'] === 1, "$type.data.$sensor_index(${sensor['oid']}).states.$state_index(${state['descr']}) invalid graph value must be 0 or 1");
-                            $this->assertArrayHasKey('value', $state, "$type.data.$sensor_index(${sensor['oid']}).states.$state_index(${state['descr']}) is missing value key");
-                            $this->assertInternalType('int', $state['value'], "$type.data.$sensor_index(${sensor['oid']}).states.$state_index(${state['descr']}) value must be an int");
-                            $this->assertArrayHasKey('generic', $state, "$type.data.$sensor_index(${sensor['oid']}).states.$state_index(${state['descr']}) is missing generic key");
-                            $this->assertInternalType('int', $state['generic'], "$type.data.$sensor_index(${sensor['oid']}).states.$state_index(${state['descr']}) generic must be an int");
+                            foreach ($sensor['states'] as $state_index => $state) {
+                                $this->assertArrayHasKey('descr', $state, "$type.data.$sensor_index(${sensor['oid']}).states.$state_index is missing descr key");
+                                $this->assertNotEmpty($state['descr'], "$type.data.$sensor_index(${sensor['oid']}).states.$state_index(${state['descr']}) descr must not be empty");
+                                $this->assertArrayHasKey('graph', $state, "$type.data.$sensor_index(${sensor['oid']}).states.$state_index(${state['descr']}) is missing graph key");
+                                $this->assertTrue($state['graph'] === 0 || $state['graph'] === 1, "$type.data.$sensor_index(${sensor['oid']}).states.$state_index(${state['descr']}) invalid graph value must be 0 or 1");
+                                $this->assertArrayHasKey('value', $state, "$type.data.$sensor_index(${sensor['oid']}).states.$state_index(${state['descr']}) is missing value key");
+                                $this->assertInternalType('int', $state['value'], "$type.data.$sensor_index(${sensor['oid']}).states.$state_index(${state['descr']}) value must be an int");
+                                $this->assertArrayHasKey('generic', $state, "$type.data.$sensor_index(${sensor['oid']}).states.$state_index(${state['descr']}) is missing generic key");
+                                $this->assertInternalType('int', $state['generic'], "$type.data.$sensor_index(${sensor['oid']}).states.$state_index(${state['descr']}) generic must be an int");
+                            }
                         }
                     }
+                }
+            } else {
+                $this->assertArrayHasKey('data', $sub_modules, "$module is missing data key");
+                foreach ($sub_modules['data'] as $index => $data) {
+                    $this->assertArrayHasKey('oid', $data, "$module.data.$index is missing oid key");
+                    $this->assertArrayHasKey('num_oid', $data, "$module.data.$index is missing num_oid key");
+                    $this->assertArrayHasKey('descr', $data, "$module.data.$index is missing descr key");
                 }
             }
         }
