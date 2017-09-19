@@ -1,8 +1,6 @@
 source: General/Acknowledgement.md
-LibreNMS 3rd party acknowledgements
------------------------------------
 
-#### 3rd Party GPLv3 Compliant
+## 3rd Party GPLv3 Compliant
 
   - Bootstrap (http://getbootstrap.com/): MIT
   - Font Awesome (http://fontawesome.io/icons/): MIT License
@@ -31,8 +29,12 @@ LibreNMS 3rd party acknowledgements
   - Symfony Yaml (https://github.com/symfony/yaml): MIT
   - PHPMailer (https://github.com/PHPMailer/PHPMailer): LGPL v2.1
   - pbin (https://github.com/glensc/pbin): GPLv2 (or later - see script header)
+  - Code for UBNT Devices Mark Gibbons <mgibbons@oemcomp.com> Initial code base submitted via PR721
+  - (Jquery LazyLoad)[http://www.appelsiini.net/projects/lazyload]: MIT License
+  - (influxdb-php)[https://github.com/influxdb/influxdb-php]: MIT License
 
-#### 3rd Party GPLv3 Non-compliant
+
+## 3rd Party GPLv3 Non-compliant
 
   - JpGraph (html/includes/jpgraph): QPL 1.0 license
   - MIBS (mibs): unknown/various

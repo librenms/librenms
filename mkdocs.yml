@@ -1,6 +1,6 @@
 site_name: LibreNMS Docs
 docs_dir: doc
-theme_dir: 'librenms_theme'
+theme_dir: 'mkdocs-windmill/mkdocs_windmill/'
 theme: null
 site_dir: out
 site_url: http://docs.librenms.org
@@ -17,18 +17,12 @@ repo_name: GitHub
 google_analytics: ['UA-79149977-2', 'docs.librenms.org']
 pages:
   - Home: index.md
-  - General:
-      - General/Acknowledgement.md
-      - General/Callback-Stats-and-Privacy.md
+  - 01. General:
+      - Acknowledgements: General/Acknowledgement.md
       - General/Changelog.md
       - Code of Conduct: General/CODE_OF_CONDUCT.md
-      - General/Contributing.md
-      - General/Credits.md
-      - General/Updating.md
-      - General/Releases.md
-      - General/Security.md
       - General/Welcome-to-Observium-users.md
-  - Installation:
+  - 02. Installing:
       - Installing LibreNMS: Installation/Installing-LibreNMS.md
       - Ubuntu VM Image: Installation/Ubuntu-image.md
       - CentOS VM Image: Installation/CentOS-image.md
@@ -36,9 +30,11 @@ pages:
       - Ubuntu 16.04 (Apache): Installation/Installation-Ubuntu-1604-Apache.md
       - CentOS 7 (Nginx): Installation/Installation-CentOS-7-Nginx.md
       - CentOS 7 (Apache): Installation/Installation-CentOS-7-Apache.md
-      - Older Docs: Installation/Installing-LibreNMS.md
       - Migrating from Observium: Installation/Migrating-from-Observium.md
-  - Extensions:
+  - 03. Getting started:
+      - Choosing a release: General/Releases.md
+      - Updating an install: General/Updating.md
+  - '04. Available Extensions':
       - Extensions/Applications.md
       - Extensions/Authentication.md
       - Extensions/Auto-Discovery.md
@@ -75,9 +71,9 @@ pages:
       - Extensions/Syslog.md
       - Extensions/Two-Factor-Auth.md
       - Extensions/Varnish.md
-  - API: API/index.md
-  - Alerting: Alerting/index.md
-  - Support:
+  - 05. API: API/index.md
+  - 06. Alerting: Alerting/index.md
+  - 07. Getting help:
       - Support/1-Minute-Polling.md
       - Support/Configuration.md
       - Support/Discovery Support.md
@@ -90,7 +86,8 @@ pages:
       - Support/Remote-Monitoring-VPN.md
       - Support/SNMP-Configuration-Examples.md
       - Support/SSL-Configuration.md
-  - Developing:
+  - 08. Contributing:
+      - General/Contributing.md
       - Developing/Using-Git.md
       - Developing/Code-Guidelines.md
       - Developing/Style-Guidelines.md
@@ -102,6 +99,9 @@ pages:
       - Developing/Sensor-State-Support.md
       - Developing/Merging-Pull-Requests.md
       - Developing/Creating-Release.md
+  - 09. Misc:
+      - Submitting stats: General/Callback-Stats-and-Privacy.md
+      - General/Security.md
   - hidden:
       - Alerting/Rules.md
       - Alerting/Templates.md
@@ -122,6 +122,7 @@ pages:
       - Extensions/metrics/Graphite.md
       - Extensions/metrics/OpenTSDB.md
       - Extensions/RRDCached-Security.md
+      - General/Credits.md
       - Installation/Installation-Ubuntu-1404-Nginx.md
       - Installation/Installation-Ubuntu-1404-Apache.md
       - Installation/Installation-Ubuntu-1404-Lighttpd.md
