@@ -64,8 +64,9 @@ function process_syslog($entry, $update)
 
         if ((isset($config['enable_syslog_hooks'])) && ($config['enable_syslog_hooks']) && (isset($config['os'][$os]['syslog_hook'])) && (is_array($config['os'][$os]['syslog_hook']))) {
             foreach ($config['os'][$os]['syslog_hook'] as $k => $v) {
-                if ((isset($v['script'])) && (isset($v['regex'])) && (preg_match($v['regex'], $entry['msg']))) {
-                    shell_exec(escapeshellcmd($v['script']).' '.escapeshellarg($hostname).' '.escapeshellarg($os).' '.escapeshellarg($entry['msg']).' >/dev/null 2>&1 &');
+                $syslogprogmsg = $entry['program'].": ".$entry['msg'];
+                if ((isset($v['script'])) && (isset($v['regex'])) && ((preg_match($v['regex'], $syslogprogmsg)))) {
+                    shell_exec(escapeshellcmd($v['script']).' '.escapeshellarg($hostname).' '.escapeshellarg($os).' '.escapeshellarg($syslogprogmsg).' >/dev/null 2>&1 &');
                 }
             }
         }

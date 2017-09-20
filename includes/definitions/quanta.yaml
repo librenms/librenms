@@ -17,3 +17,4 @@ discovery:
       sysDescr_regex:
           - '/VxWorks/'
           - '/quanta/i'
+          - '/FASTPATH (Switching|Routing)/'

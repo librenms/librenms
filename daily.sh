@@ -151,7 +151,7 @@ main () {
         up=$(php daily.php -f update >&2; echo $?)
         if [[ "$up" == "0" ]]; then
             ${DAILY_SCRIPT} no-code-update
-            set_notification update 0  # make sure there are no update notifications if update is disabled
+            set_notification update 1  # make sure there are no update notifications if update is disabled
             exit
         fi
 

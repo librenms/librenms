@@ -10,7 +10,7 @@ $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 33;
-$rrd_filename  = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfs-stats-'.$app['app_id'].'.rrd';
+$rrd_filename  = get_rrd_dir($device['hostname']).'/app-nfs-stats-'.$app['app_id'].'.rrd';
 $array = array(
     'io_read' => array('descr' => 'read','colour' => '2B9220',),
     'io_write' => array('descr' => 'write','colour' => 'B0262D',),
