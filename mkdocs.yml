@@ -9,7 +9,6 @@ markdown_extensions:
     - pymdownx.tilde
 extra_css:
     - librenms.css
-include_next_prev: false
 site_author: LibreNMS
 site_description: LibreNMS user and developer documentation
 repo_url: https://github.com/librenms/librenms
@@ -72,7 +71,12 @@ pages:
       - Extensions/Two-Factor-Auth.md
       - Extensions/Varnish.md
   - 05. API: API/index.md
-  - 06. Alerting: Alerting/index.md
+  - 06. Alerting:
+      - Alerting/Rules.md
+      - Alerting/Templates.md
+      - Alerting/Transports.md
+      - Alerting/Entities.md
+      - Alerting/Macros.md
   - 07. Getting help:
       - Support/1-Minute-Polling.md
       - Support/Configuration.md
@@ -101,7 +105,7 @@ pages:
       - Developing/Creating-Release.md
   - 09. Misc:
       - Submitting stats: General/Callback-Stats-and-Privacy.md
-      - General/Security.md
+      - Security information: General/Security.md
   - hidden:
       - Alerting/Rules.md
       - Alerting/Templates.md
