@@ -102,12 +102,10 @@
     "rule": "%wireless_sensors.sensor_class = 'clients' && %wireless_sensors.sensor_current >= %wireless_sensors.sensor_limit && %wireless_sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
     "name": "Too many wireless clients"
   },
-  
   {
     "rule": "%syslog.timestamp > = %macros.past_5m && %syslog.msg ~ \"@authentication failure@\"",
     "name": "Syslog, Authentication failure on Device"
   },
-  
   {
     "rule": "%services.service_status = \"1\"",
     "name": "Service warning"
@@ -115,6 +113,46 @@
   {
     "rule": "%services.service_status = \"2\"",
     "name": "Service critical"
+  },
+   {
+    "rule": "%syslog.timestamp >= %macros.past_5m && %syslog.priority ~ \"alert\"",
+    "name": "Syslog, received Alert Priority Message"
+  },
+    {
+    "rule": "%syslog.timestamp >= %macros.past_5m && %syslog.priority ~ \"emergency\"",
+    "name": "Syslog, received Emergency Priority Message"
+  },
+     {
+    "rule": "%syslog.timestamp = %macros.past_5m && %syslog.msg ~ \"@arp table is full@\"",
+    "name": "Syslog, ARP table is full check on device "
+  },
+   {
+    "rule": "%sensors.sensor_type = \"upsAdvBatteryReplaceIndicator\" && %sensors.sensor_current = \"2\"",
+    "name": "APC UPS Battery Needs Replacement"
+  },
+  {
+    "rule": "%sensors.sensor_current = \"3\" && %sensors.sensor_type = \"upsBasicOutputStatus\"",
+    "name": "APC UPS Switched to Battery Power"
+  },
+  {
+    "rule": "%sensors.sensor_current = \"10\" && %sensors.sensor_type = \"upsBasicOutputStatus\"",
+    "name": "APC UPS in Hardware Failure Bypass Mode"
+  },
+  {
+    "rule": "%sensors.sensor_current = \"16\" && %sensors.sensor_type = \"upsBasicOutputStatus\"",
+    "name": "APC UPS in Emergency Static Bypass Mode"
+  },
+  {
+    "rule": "%sensors.sensor_current = \"12\" && %sensors.sensor_type = \"upsBasicOutputStatus\"",
+    "name": "APC UPS in Smart Trim Mode"
+  },
+   {
+    "rule": "%sensors.sensor_oid ~ \".1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.[2-5]\" && %sensors.sensor_current = \"2\"",
+    "name": "HP Procurve Bad Power Supply"
+  },
+    {
+    "rule": "%sensors.sensor_oid = \".1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.1\" && %sensors.sensor_current = \"2\"",
+    "name": "HP Procurve Fan Fault"
   },
   {
     "rule": "%sensors.sensor_current > %sensors.sensor_limit && %sensors.sensor_alert = \"1\" && %macros.device_up = \"1\" && %macros.sensor_port_link = \"1\"",
