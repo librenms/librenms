@@ -441,7 +441,6 @@ devices:
     os: { Name: os, Columns: [os], Unique: false, Type: BTREE }
     last_polled: { Name: last_polled, Columns: [last_polled], Unique: false, Type: BTREE }
     last_poll_attempted: { Name: last_poll_attempted, Columns: [last_poll_attempted], Unique: false, Type: BTREE }
-    parent_id_idx: { Name: parent_id_idx, Columns: [parent_id], Unique: false, Type: BTREE }
 devices_attribs:
   Columns:
     attrib_id: { Field: attrib_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
