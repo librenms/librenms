@@ -34,6 +34,10 @@ class ComposerStaticInit272059f49825f0adab6de160cf59ca72
             'Doctrine\\Instantiator\\' => 22,
             'Dapphp\\Radius\\' => 14,
         ),
+        'C' => 
+        array (
+            'CorsSlim\\' => 9,
+        ),
         'A' => 
         array (
             'Amenadiel\\JpGraph\\Util\\' => 23,
@@ -74,6 +78,10 @@ class ComposerStaticInit272059f49825f0adab6de160cf59ca72
         'Dapphp\\Radius\\' => 
         array (
             0 => __DIR__ . '/..' . '/dapphp/radius/src',
+        ),
+        'CorsSlim\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/palanik/corsslim',
         ),
         'Amenadiel\\JpGraph\\Util\\' => 
         array (
