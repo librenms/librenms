@@ -939,3 +939,10 @@ $config['graphite']['port']         = 2003;
 // will send secure cookies when the site is being accessed over HTTPS, and
 // send insecure cookies when the site is being accessed over HTTP.
 $config['secure_cookies'] = $_SERVER["HTTPS"];
+
+// API config
+$config['api']['cors']['enabled'] = false;
+$config['api']['cors']['origin'] = '*';
+$config['api']['cors']['maxage'] = '86400';
+$config['api']['cors']['allowmethods'] = array('POST', 'GET', 'PUT', 'DELETE', 'PATCH');
+$config['api']['cors']['allowheaders'] = array('Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Auth-Token');
