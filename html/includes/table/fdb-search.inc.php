@@ -61,13 +61,8 @@ if (!isset($sort) || empty($sort)) {
 
 $sql .= " ORDER BY $sort";
 
-if (isset($current)) {
-    $limit_low  = (($current * $rowCount) - ($rowCount));
-    $limit_high = $rowCount;
-}
-
 if ($rowCount != -1) {
-    $sql .= " LIMIT $limit_low,$limit_high";
+    $sql .= " LIMIT $current,$rowCount";
 }
 
 $response = array();
@@ -97,9 +92,9 @@ foreach (dbFetchRows($select . $sql, $param) as $entry) {
 }//end foreach
 
 $output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
+    'draw' => $draw,
+    'recordsFiltered' => $total,
+    'recordsTotal' => $total,
+    'data' => $response,
 );
-echo _json_encode($output);
+echo json_encode($output);

@@ -30,6 +30,27 @@
 </div>
 
 <script>
+    $('#mempool').DataTable( {
+        "serverSide": true,
+        "processing": true,
+        "scrollX": false,
+        "sScrollX": "100%",
+        "sScrollXInner": "100%",
+        "dom":  "ltip",
+        "ajax": {
+            "url": "ajax_table.php",
+            "type": "POST",
+            "data": {
+                "id": "mempool-edit",
+                "device_id": <?php echo $device['device_id']; ?>,
+                }
+        }
+        columns: [
+            { "data": "device" },
+        ],
+        "order": [[0, "asc"]]
+}
+/*
     var grid = $("#mempool").bootgrid({
         ajax: true,
         rowCount: [50, 100, 250, -1],
@@ -83,4 +104,5 @@
             });
         });
     });
+ */
 </script>

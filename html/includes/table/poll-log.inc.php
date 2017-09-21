@@ -37,13 +37,8 @@ if (empty($total)) {
     $total = 0;
 }
 
-if (isset($current)) {
-    $limit_low  = (($current * $rowCount) - ($rowCount));
-    $limit_high = $rowCount;
-}
-
 if ($rowCount != -1) {
-    $sql .= " LIMIT $limit_low,$limit_high";
+    $sql .= " LIMIT $current,$rowCount";
 }
 
 $sql = "SELECT D.device_id,D.hostname AS `hostname`, D.last_polled AS `last_polled`, `group_name`, D.last_polled_timetaken AS `last_polled_timetaken` $sql";
@@ -61,9 +56,9 @@ foreach (dbFetchRows($sql, array(), true) as $device) {
 }
 
 $output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
+    'draw' => $draw,
+    'recordsFiltered' => $total,
+    'recordsTotal' => $total,
+    'data' => $response,
 );
-echo _json_encode($output);
+echo json_encode($output);

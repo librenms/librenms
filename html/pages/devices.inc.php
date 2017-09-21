@@ -413,42 +413,68 @@ if ($format == "graph") {
     ?>
 
     <script>
-        var grid = $("#devices").bootgrid({
-            ajax: true,
-            rowCount: [50, 100, 250, -1],
-            columnSelection: true,
-            formatters: {
-                "status": function (column, row) {
-                    return "<span class=\"label label-" + row.extra + " devices-status-box-" + row.list_type + "\">" + row.msg + "</span>";
-                },
-                "icon": function (column, row) {
-                    return "<span class=\"device-table-icon\">" + row.icon + "</span>";
+        $('#devices').DataTable( {
+            "lengthMenu": [[50, 100, 250, -1], [50, 100, 250, "All"]],
+            "serverSide": true,
+            "processing": true,
+            "scrollX": false,
+            "responsive": true,
+            "dom":  "ltip",
+            "order": [[2, "asc"]],
+            "ajax": {
+                "url": "ajax_table.php",
+                "type": "POST",
+                "data": {
+                    "id": "devices",
+                    "format": ' <?php echo mres($vars['format']); ?>',
+                    "hostname": '<?php echo htmlspecialchars($vars['hostname']); ?>',
+                    "os": '<?php echo mres($vars['os']); ?>',
+                    "version": '<?php echo mres($vars['version']); ?>',
+                    "hardware": '<?php echo mres($vars['hardware']); ?>',
+                    "features": '<?php echo mres($vars['features']); ?>',
+                    "location": '<?php echo mres($vars['location']); ?>',
+                    "type": '<?php echo mres($vars['type']); ?>',
+                    "state": '<?php echo mres($vars['state']); ?>',
+                    "disabled": '<?php echo mres($vars['disabled']); ?>',
+                    "ignore": '<?php echo mres($vars['ignore']); ?>',
+                    "group": '<?php echo mres($vars['group']); ?>',
                 }
             },
-            templates: {
-                header: "<div class=\"devices-headers-table-menu\"><p class=\"{{css.actions}}\"></p></div><div class=\"row\"></div>"
-
-            },
-            post: function () {
-                return {
-                    id: "devices",
-                    format: ' <?php echo mres($vars['format']); ?>',
-                    hostname: '<?php echo htmlspecialchars($vars['hostname']); ?>',
-                    os: '<?php echo mres($vars['os']); ?>',
-                    version: '<?php echo mres($vars['version']); ?>',
-                    hardware: '<?php echo mres($vars['hardware']); ?>',
-                    features: '<?php echo mres($vars['features']); ?>',
-                    location: '<?php echo mres($vars['location']); ?>',
-                    type: '<?php echo mres($vars['type']); ?>',
-                    state: '<?php echo mres($vars['state']); ?>',
-                    disabled: '<?php echo mres($vars['disabled']); ?>',
-                    ignore: '<?php echo mres($vars['ignore']); ?>',
-                    group: '<?php echo mres($vars['group']); ?>',
-                };
-            },
-            url: "ajax_table.php"
+            columns: [
+                { "data": "hostname" },
+                <?php if ($subformat == "detail") {
+                        echo '{ "data": "icon" },';
+                    }
+                ?>
+                { "data": "hostname" },
+                <?php if ($subformat == "detail") {
+                        echo '{ "data": "ports" },';
+                    }
+                ?>
+                { "data": "hardware" },
+                { "data": "os" },
+                { "data": "uptime" },
+                <?php if ($subformat == "detail") {
+                        echo '{ "data": "location" },';
+                    }
+                ?>
+                { "data": "actions" },
+            ],
+            "columnDefs": [
+                {
+                    "render" : function (data, type, row) {
+                        return  "<span class=\"label label-" + row.extra + " devices-status-box-" + row.list_type + "\">" + row.msg + "</span>";
+                    },
+                    "targets": 0
+                },
+                {
+                    "render" : function (data, type, row) {
+                        return  "<span class=\"device-table-icon\">" + data + "</span>";
+                    },
+                    "targets": 1
+                },
+            ],
         });
-
     </script>
 
     <?php
