@@ -11,6 +11,28 @@ For example, to set an alternate icon for ios:
 $config['os']['ios']['icon'] = 'fuzzybunny';
 ```
 
+### Ignoring Interfaces
+See also: [Global Ignoring Interfaces Config](../../Support/Configuration.md#interfaces-to-be-ignored)
+
+> These settings are merged with the global settings, so you can only undo global ones with good_if
+
+```yaml
+empty_ifdescr: false # allow empty ifDescr
+bad_if: # ifDescr (substring, case insensitive)
+    - lp0
+bad_if_regexp: # ifDescr (regex, case insensitive)
+    - "/^ng[0-9]+$/"
+bad_ifname_regexp: # ifName (regex, case insensitive)
+    - "/^xdsl_channel /"
+bad_ifalias_regexp: # ifAlias (regex, case insensitive)
+    - "/^vlan/"
+bad_iftype: # ifType (substring)
+    - sonet
+good_if: # ignore all other bad_if settings ifDescr (substring, case insensitive)
+    - virtual
+
+```
+
 
 ### Storage Settings
 See also: [Global Storage Config](../../Support/Configuration.md#storage-configuration)
