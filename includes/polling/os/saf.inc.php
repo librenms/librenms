@@ -12,6 +12,7 @@
  * the source code distribution for details.
 */
 
-list(,$version,,$hardware,$serial,,) = explode(";", $poll_device['sysDescr']);
-list(,$hardware) = explode(":", $hardware);
+list(,$version,,,$serial,,) = explode(";", $poll_device['sysDescr']);
+$hardware = str_replace('"', "", snmp_get($device, 'product.0', '-OQva', 'SAF-IPRADIO', 'saf'));
+$version = end(explode(" ", $version));
 list(,$serial) = explode(":", $serial);

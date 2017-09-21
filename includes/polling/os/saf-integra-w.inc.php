@@ -26,3 +26,5 @@
 $saf_integra = preg_split('/;/', $poll_device['sysDescr']);
 
 $serial = str_replace('S/N: ', '', $saf_integra[8]);
+$version = str_replace('Vers: ', '', $saf_integra[1]);
+$hardware = str_replace('Prod: ', '', $saf_integra[0]);
