@@ -37,6 +37,15 @@ class Config
     public static function get($key, $default = null)
     {
         global $config;
+
+        if (isset($config[$key])) {
+            return $config[$key];
+        }
+
+        if (!str_contains($key, '.')) {
+            return $default;
+        }
+
         $keys = explode('.', $key);
 
         $curr = &$config;
@@ -90,9 +99,18 @@ class Config
      */
     public static function getOsSetting($os, $key, $default = null)
     {
-        if ($os) {
-            $os_key = "os.$os.$key";
+        global $config;
 
+        if ($os) {
+            if (isset($config['os'][$os][$key])) {
+                return $config['os'][$os][$key];
+            }
+
+            if (!str_contains($key, '.')) {
+                return self::get($key, $default);
+            }
+
+            $os_key = "os.$os.$key";
             if (self::has($os_key)) {
                 return self::get($os_key);
             }
@@ -113,6 +131,21 @@ class Config
      */
     public static function getCombined($os, $key, $default = array())
     {
+        global $config;
+
+        if (!self::has($key)) {
+            return self::get("os.$os.$key", $default);
+        }
+
+        if (!isset($config['os'][$os][$key])) {
+            if (!str_contains($key, '.')) {
+                return self::get($key, $default);
+            }
+            if (!self::has("os.$os.$key")) {
+                return self::get($key, $default);
+            }
+        }
+
         return array_unique(array_merge(
             (array)self::get($key, $default),
             (array)self::getOsSetting($os, $key, $default)
@@ -147,6 +180,15 @@ class Config
     public static function has($key)
     {
         global $config;
+
+        if (isset($config[$key])) {
+            return true;
+        }
+
+        if (!str_contains($key, '.')) {
+            return false;
+        }
+
         $keys = explode('.', $key);
         $last = array_pop($keys);
 

@@ -97,6 +97,12 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $config['os']['nullos']['num'] = array('two', 'three');
         $config['assoc'] = array('a' => 'same', 'b' => 'same');
         $config['os']['nullos']['assoc'] = array('b' => 'different', 'c' => 'still same');
+        $config['os']['nullos']['osset'] = true;
+        $config['gset'] = true;
+
+        $this->assertTrue(Config::getCombined('nullos', 'non-existent', true), 'Did not return default value on non-existent key');
+        $this->assertTrue(Config::getCombined('nullos', 'osset', false), 'Did not return OS value when global value is not set');
+        $this->assertTrue(Config::getCombined('nullos', 'gset', false), 'Did not return global value when OS value is not set');
 
         $combined =  Config::getCombined('nullos', 'num');
         sort($combined);
