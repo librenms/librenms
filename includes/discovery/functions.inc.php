@@ -544,21 +544,21 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
         echo '+';
         d_echo("( $inserted inserted )");
     } else {
-        $data = dbFetchRow('SELECT * FROM `links` WHERE `remote_hostname` = ? AND `local_port_id` = ? AND `protocol` = ? AND `remote_port` = ?', array($remote_hostname, $local_port_id, $protocol, $remote_port));
-        if ($data['remote_port_id'] == $remote_port_id && $data['remote_platform'] == $remote_platform && $remote_version == $remote_version && $data['local_device_id'] > 0 && $data['remote_device_id'] > 0) {
+        $sql = 'SELECT `local_device_id`,`remote_platform`,`remote_version`,`remote_device_id`,`remote_port_id` FROM `links`';
+        $sql .= ' WHERE `remote_hostname` = ? AND `local_port_id` = ? AND `protocol` = ? AND `remote_port` = ?';
+        $data = dbFetchRow($sql, array($remote_hostname, $local_port_id, $protocol, $remote_port));
+
+        $update_data = array(
+            'local_device_id' => $local_device_id,
+            'remote_platform' => $remote_platform,
+            'remote_version' => $remote_version,
+            'remote_device_id' => $remote_device_id,
+            'remote_port_id' => $remote_port_id
+        );
+
+        if ($data == $update_data) {
             echo '.';
         } else {
-            $update_data = array(
-                'remote_platform' => $remote_platform,
-                'remote_version' => $remote_version,
-                'local_device_id' => $local_device_id,
-                'remote_device_id' => $remote_device_id,
-            );
-
-            if (!empty($remote_port_id)) {
-                $update_data['remote_port_id'] = $remote_port_id;
-            }
-
             $updated = dbUpdate($update_data, 'links', '`id` = ?', array($data['id']));
             echo 'U';
             d_echo("( $updated updated )");

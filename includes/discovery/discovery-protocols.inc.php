@@ -22,20 +22,18 @@ if ($device['os'] == 'ironware' && Config::get('autodiscovery.xdp') === true) {
                 $remote_device_id = discover_new_device($fdp['snFdpCacheDeviceId'], $device, 'FDP', $interface);
             }
 
-            if ($remote_device_id) {
-                $remote_port_id = find_port_id($fdp['snFdpCacheDevicePort'], '', $remote_device_id);
-                discover_link(
-                    $interface['port_id'],
-                    $fdp['snFdpCacheVendorId'],
-                    $remote_port_id,
-                    $fdp['snFdpCacheDeviceId'],
-                    $fdp['snFdpCacheDevicePort'],
-                    $fdp['snFdpCachePlatform'],
-                    $fdp['snFdpCacheVersion'],
-                    $device['device_id'],
-                    $remote_device_id
-                );
-            }
+            $remote_port_id = find_port_id($fdp['snFdpCacheDevicePort'], '', $remote_device_id);
+            discover_link(
+                $interface['port_id'],
+                $fdp['snFdpCacheVendorId'],
+                $remote_port_id,
+                $fdp['snFdpCacheDeviceId'],
+                $fdp['snFdpCacheDevicePort'],
+                $fdp['snFdpCachePlatform'],
+                $fdp['snFdpCacheVersion'],
+                $device['device_id'],
+                $remote_device_id
+            );
         }
     }//end foreach
     echo PHP_EOL;
@@ -64,7 +62,7 @@ if (Config::get('autodiscovery.xdp') === true) {
                 }
             }
 
-            if ($remote_device_id && $interface['port_id'] && $cdp['cdpCacheDeviceId'] && $cdp['cdpCacheDevicePort']) {
+            if ($interface['port_id'] && $cdp['cdpCacheDeviceId'] && $cdp['cdpCacheDevicePort']) {
                 $remote_port_id = find_port_id($cdp['cdpCacheDevicePort'], '', $remote_device_id);
                 discover_link(
                     $interface['port_id'],
@@ -99,7 +97,7 @@ if ($device['os'] == 'pbn' && Config::get('autodiscovery.xdp') === true) {
             $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
         }
 
-        if ($remote_device_id && $interface['port_id'] && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
+        if ($interface['port_id'] && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
             $remote_port_id = find_port_id($lldp['lldpRemPortDesc'], $lldp['lldpRemPortId'], $remote_device_id);
             discover_link(
                 $interface['port_id'],
@@ -159,33 +157,32 @@ if ($device['os'] == 'pbn' && Config::get('autodiscovery.xdp') === true) {
                     }
                 }
 
-                if ($remote_device_id) {
-                    $remote_port_id = find_port_id(
-                        $lldp['lldpRemPortDesc'],
-                        $lldp['lldpRemPortId'],
-                        $remote_device_id,
-                        $remote_port_mac
-                    );
+                $remote_port_id = find_port_id(
+                    $lldp['lldpRemPortDesc'],
+                    $lldp['lldpRemPortId'],
+                    $remote_device_id,
+                    $remote_port_mac
+                );
 
-                    if (empty($lldp['lldpRemSysName'])) {
-                        $remote_device = device_by_id_cache($remote_device_id);
-                        $lldp['lldpRemSysName'] = $remote_device['sysName'] ?: $remote_device['hostname'];
-                    }
-
-                    if ($interface['port_id'] && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
-                        discover_link(
-                            $interface['port_id'],
-                            'lldp',
-                            $remote_port_id,
-                            $lldp['lldpRemSysName'],
-                            $lldp['lldpRemPortId'],
-                            null,
-                            $lldp['lldpRemSysDesc'],
-                            $device['device_id'],
-                            $remote_device_id
-                        );
-                    }
+                if (empty($lldp['lldpRemSysName'])) {
+                    $remote_device = device_by_id_cache($remote_device_id);
+                    $lldp['lldpRemSysName'] = $remote_device['sysName'] ?: $remote_device['hostname'];
                 }
+
+                if ($interface['port_id'] && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
+                    discover_link(
+                        $interface['port_id'],
+                        'lldp',
+                        $remote_port_id,
+                        $lldp['lldpRemSysName'],
+                        $lldp['lldpRemPortId'],
+                        null,
+                        $lldp['lldpRemSysDesc'],
+                        $device['device_id'],
+                        $remote_device_id
+                    );
+                }
+
             }//end foreach
         }//end foreach
     }//end foreach
