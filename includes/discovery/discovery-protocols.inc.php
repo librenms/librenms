@@ -182,7 +182,6 @@ if ($device['os'] == 'pbn' && Config::get('autodiscovery.xdp') === true) {
                         $remote_device_id
                     );
                 }
-
             }//end foreach
         }//end foreach
     }//end foreach

@@ -1365,7 +1365,7 @@ function can_skip_discovery($sysName, $sysDescr = '', $platform = '')
  * @param string $mac_address
  * @return int the device_id or 0
  */
-function find_device_id($name='', $ip='', $mac_address='')
+function find_device_id($name = '', $ip = '', $mac_address = '')
 {
     $where = array();
     $params = array();
@@ -1420,7 +1420,7 @@ function find_device_id($name='', $ip='', $mac_address='')
  * @param string $mac_address check against ifPysAddress (should be in lowercase hexadecimal)
  * @return int
  */
-function find_port_id($description, $identifier='', $device_id = 0, $mac_address = null)
+function find_port_id($description, $identifier = '', $device_id = 0, $mac_address = null)
 {
     $sql = 'SELECT `port_id` FROM `ports` WHERE (`ifDescr`=? OR `ifName`=?';
     $params = array($description, $description);
