@@ -884,7 +884,7 @@ function IsParentDown($device)
         return false;
     }
 
-    $result = dbFetchCell("SELECT `status` from `devices` WHERE device_id = ? and status_reason = 'icmp'", array($parent_id));
+    $result = dbFetchCell("SELECT `id` from `devices` WHERE device_id = ? and status_reason = 'icmp'", array($parent_id));
     if ($result) {
         return true;
     }
