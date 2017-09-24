@@ -374,7 +374,25 @@ if ($menu_sensors) {
     echo('            <li role="presentation" class="divider"></li>');
 }
 
-$icons = array('fanspeed'=>'tachometer','humidity'=>'tint','temperature'=>'thermometer-full','current'=>'bolt','frequency'=>'line-chart','power'=>'power-off','voltage'=>'bolt','charge'=>'battery-half','dbm'=>'sun-o', 'load'=>'percent', 'runtime' => 'hourglass-half', 'state'=>'bullseye','signal'=>'wifi', 'snr'=>'signal');
+$icons = array(
+    'fanspeed' => 'tachometer',
+    'humidity' => 'tint',
+    'temperature' => 'thermometer-full',
+    'current' => 'bolt',
+    'frequency' => 'line-chart',
+    'power' => 'power-off',
+    'voltage' => 'bolt',
+    'charge' => 'battery-half',
+    'dbm' => 'sun-o',
+    'load' => 'percent',
+    'runtime' => 'hourglass-half',
+    'state' => 'bullseye',
+    'signal' => 'wifi',
+    'snr' => 'signal',
+    'pressure' => 'thermometer-empty',
+    'cooling' => 'thermometer-full',
+    'airflow' => 'angle-double-right',
+);
 foreach (array('fanspeed','humidity','temperature','signal') as $item) {
     if (isset($menu_sensors[$item])) {
         echo('            <li><a href="health/metric='.$item.'/"><i class="fa fa-'.$icons[$item].' fa-fw fa-lg" aria-hidden="true"></i> '.nicecase($item).'</a></li>');

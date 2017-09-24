@@ -43,6 +43,12 @@ if ($used_sensors['signal']) {
 if ($used_sensors['snr']) {
     $datas[] = 'snr';
 }
+if ($used_sensors['pressure']) {
+    $datas[] = 'pressure';
+}
+if ($used_sensors['cooling']) {
+    $datas[] = 'cooling';
+}
 
 // FIXME generalize -> static-config ?
 $type_text['overview'] = "Overview";
@@ -65,6 +71,8 @@ $type_text['load'] = "Load";
 $type_text['state'] = "State";
 $type_text['signal'] = "Signal";
 $type_text['snr'] = "SNR";
+$type_text['pressure'] = "Pressure";
+$type_text['cooling'] = "Cooling";
 
 if (!$vars['metric']) {
     $vars['metric'] = "processor";
