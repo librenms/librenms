@@ -70,6 +70,63 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFileExists(GuzzleHttp\default_ca_bundle());
     }
+
+    public function noProxyProvider()
+    {
+        return [
+            ['mit.edu', ['.mit.edu'], false],
+            ['foo.mit.edu', ['.mit.edu'], true],
+            ['mit.edu', ['mit.edu'], true],
+            ['mit.edu', ['baz', 'mit.edu'], true],
+            ['mit.edu', ['', '', 'mit.edu'], true],
+            ['mit.edu', ['baz', '*'], true],
+        ];
+    }
+
+    /**
+     * @dataProvider noproxyProvider
+     */
+    public function testChecksNoProxyList($host, $list, $result)
+    {
+        $this->assertSame(
+            $result,
+            \GuzzleHttp\is_host_in_noproxy($host, $list)
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testEnsuresNoProxyCheckHostIsSet()
+    {
+        \GuzzleHttp\is_host_in_noproxy('', []);
+    }
+
+    public function testEncodesJson()
+    {
+        $this->assertEquals('true', \GuzzleHttp\json_encode(true));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testEncodesJsonAndThrowsOnError()
+    {
+        \GuzzleHttp\json_encode("\x99");
+    }
+
+    public function testDecodesJson()
+    {
+        $this->assertSame(true, \GuzzleHttp\json_decode('true'));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testDecodesJsonAndThrowsOnError()
+    {
+        \GuzzleHttp\json_decode('{{]]');
+    }
 }
 
 final class StrClass

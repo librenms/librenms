@@ -24,8 +24,6 @@ namespace Symfony\Component\EventDispatcher;
  * @author Jonathan Wage <jonwage@gmail.com>
  * @author Roman Borschel <roman@code-factory.org>
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class Event
 {
@@ -35,7 +33,7 @@ class Event
     private $propagationStopped = false;
 
     /**
-     * @var EventDispatcher Dispatcher that dispatched this event
+     * @var EventDispatcherInterface Dispatcher that dispatched this event
      */
     private $dispatcher;
 
@@ -49,9 +47,7 @@ class Event
      *
      * @see Event::stopPropagation()
      *
-     * @return bool Whether propagation was already stopped for this event.
-     *
-     * @api
+     * @return bool Whether propagation was already stopped for this event
      */
     public function isPropagationStopped()
     {
@@ -64,8 +60,6 @@ class Event
      * If multiple event listeners are connected to the same event, no
      * further event listener will be triggered once any trigger calls
      * stopPropagation().
-     *
-     * @api
      */
     public function stopPropagation()
     {
@@ -78,8 +72,6 @@ class Event
      * @param EventDispatcherInterface $dispatcher
      *
      * @deprecated since version 2.4, to be removed in 3.0. The event dispatcher is passed to the listener call.
-     *
-     * @api
      */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
@@ -92,8 +84,6 @@ class Event
      * @return EventDispatcherInterface
      *
      * @deprecated since version 2.4, to be removed in 3.0. The event dispatcher is passed to the listener call.
-     *
-     * @api
      */
     public function getDispatcher()
     {
@@ -108,8 +98,6 @@ class Event
      * @return string
      *
      * @deprecated since version 2.4, to be removed in 3.0. The event name is passed to the listener call.
-     *
-     * @api
      */
     public function getName()
     {
@@ -121,11 +109,9 @@ class Event
     /**
      * Sets the event's name property.
      *
-     * @param string $name The event name.
+     * @param string $name The event name
      *
      * @deprecated since version 2.4, to be removed in 3.0. The event name is passed to the listener call.
-     *
-     * @api
      */
     public function setName($name)
     {
