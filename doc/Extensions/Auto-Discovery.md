@@ -127,9 +127,7 @@ This module is invoked from bgp-peers discovery module.
 ### SNMP Scan
 Apart from the aforementioned Auto-Discovery options, LibreNMS is also able to proactively scan a network for SNMP-enabled devices using the configured version/credentials.
 
-Using the SNMP-Scanner may take a long time to finish depending on the size of your network. Tests have shown that a sparsely-populated /24 is scanned within 2 Minutes whereas a sparsely populated /16 will take about 11 Hours.
-
-If possible, divide your network into smaller subnets and scan these subnets instead. You can use an utility like the GNU Screen or tmux to avoid aborting the scan when logging out of your Shell. You can run several instances of the SNMP-Scanner simultaneously.
+SNMP Scan will scan `$config['nets']` by default and respects `$config['autodiscovery']['nets-exclude']`.
 
 To run the SNMP-Scanner you need to execute the `snmp-scan.py` from within your LibreNMS installation directory.
 
