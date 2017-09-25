@@ -403,10 +403,10 @@ modules:
                     num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.2.
                     index: 'airIRG2RDT2StatusCoolOutput.{{ $index }}'
                     descr: Output
-                    multiplier: 1000
+                    multiplier: 100
                 -
                     oid: airIRG2RDT2StatusCoolDemand
                     num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.3.
                     index: 'airIRG2RDT2StatusCoolDemand.{{ $index }}'
                     descr: Demand
-                    multiplier: 1000
+                    multiplier: 100
