@@ -1,8 +1,8 @@
 <?php
 /**
- * ipecs.inc.php
+ * elg-ipecs-es.inc.php
  *
- * LibreNMS OS poller module for Ericsson iPECS
+ * LibreNMS os polling module for Ericsson iPECS ES
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,9 @@
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <gh+n@laf.io>
+ * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-list(,$hardware,) = explode(',', $poll_device['sysDescr'], 3);
+list ($hardware, $dump) = explode(' ', $poll_device['sysDescr'], 2);
+
+unset($dump);
