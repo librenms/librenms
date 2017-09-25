@@ -1,6 +1,6 @@
 site_name: LibreNMS Docs
 docs_dir: doc
-theme_dir: 'mkdocs-windmill/mkdocs_windmill/'
+theme_dir: 'theme_v2'
 theme: null
 site_dir: out
 site_url: http://docs.librenms.org
