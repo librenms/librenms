@@ -28,6 +28,8 @@ Creating a Client
         'timeout'  => 2.0,
     ]);
 
+Clients are immutable in Guzzle 6, which means that you cannot change the defaults used by a client after it's created.
+
 The client constructor accepts an associative array of options:
 
 ``base_uri``
@@ -42,9 +44,9 @@ The client constructor accepts an associative array of options:
         // Create a client with a base URI
         $client = new GuzzleHttp\Client(['base_uri' => 'https://foo.com/api/']);
         // Send a request to https://foo.com/api/test
-        $response = $client->get('test');
+        $response = $client->request('GET', 'test');
         // Send a request to https://foo.com/root
-        $response = $client->get('/root');
+        $response = $client->request('GET', '/root');
 
     Don't feel like reading RFC 3986? Here are some quick examples on how a
     ``base_uri`` is resolved with another URI.
@@ -95,7 +97,7 @@ ready:
 
     use GuzzleHttp\Psr7\Request;
 
-    $request = new Request('PUT', 'http:/httpbin.org/put');
+    $request = new Request('PUT', 'http://httpbin.org/put');
     $response = $client->send($request, ['timeout' => 2]);
 
 Client objects provide a great deal of flexibility in how request are
@@ -181,13 +183,17 @@ requests.
         'webp'  => $client->getAsync('/image/webp')
     ];
 
-    // Wait on all of the requests to complete.
+    // Wait on all of the requests to complete. Throws a ConnectException 
+    // if any of the requests fail
     $results = Promise\unwrap($promises);
+    
+    // Wait for the requests to complete, even if some of them fail
+    $results = Promise\settle($promises)->wait();
 
     // You can access each result using the key provided to the unwrap
     // function.
-    echo $results['image']->getHeader('Content-Length');
-    echo $results['png']->getHeader('Content-Length');
+    echo $results['image']['value']->getHeader('Content-Length')[0]
+    echo $results['png']['value']->getHeader('Content-Length')[0]
 
 You can use the ``GuzzleHttp\Pool`` object when you have an indeterminate
 amount of requests you wish to send.
@@ -222,7 +228,24 @@ amount of requests you wish to send.
 
     // Force the pool of requests to complete.
     $promise->wait();
+    
+Or using a closure that will return a promise once the pool calls the closure.
 
+.. code-block:: php
+
+    $client = new Client();
+
+    $requests = function ($total) use ($client) {
+        $uri = 'http://127.0.0.1:8126/guzzle-server/perf';
+        for ($i = 0; $i < $total; $i++) {
+            yield function() use ($client, $uri) {
+                return $client->getAsync($uri);
+            };
+        }
+    };
+
+    $pool = new Pool($client, $requests(100));
+        
 
 Using Responses
 ===============
@@ -256,6 +279,21 @@ You can retrieve headers from the response:
         echo $name . ': ' . implode(', ', $values) . "\r\n";
     }
 
+The body of a response can be retrieved using the ``getBody`` method. The body
+can be used as a string, cast to a string, or used as a stream like object.
+
+.. code-block:: php
+
+    $body = $response->getBody();
+    // Implicitly cast the body to a string and echo it
+    echo $body;
+    // Explicitly cast the body to a string
+    $stringBody = (string) $body;
+    // Read 10 bytes from the body
+    $tenBytes = $body->read(10);
+    // Read the remaining contents of the body as a string
+    $remainingBytes = $body->getContents();
+
 
 Query String Parameters
 =======================
@@ -266,14 +304,14 @@ You can set query string parameters in the request's URI:
 
 .. code-block:: php
 
-    $response = $client->get('http://httpbin.org?foo=bar');
+    $response = $client->request('GET', 'http://httpbin.org?foo=bar');
 
 You can specify the query string parameters using the ``query`` request
 option as an array.
 
 .. code-block:: php
 
-    $client->get('http://httpbin.org', [
+    $client->request('GET', 'http://httpbin.org', [
         'query' => ['foo' => 'bar']
     ]);
 
@@ -284,7 +322,7 @@ And finally, you can provide the ``query`` request option as a string.
 
 .. code-block:: php
 
-    $client->get('http://httpbin.org', ['query' => 'foo=bar']);
+    $client->request('GET', 'http://httpbin.org', ['query' => 'foo=bar']);
 
 
 Uploading Data
@@ -299,22 +337,24 @@ resource returned from ``fopen``, or an instance of a
 .. code-block:: php
 
     // Provide the body as a string.
-    $r = $client->post('http://httpbin.org/post', ['body' => 'raw data']);
+    $r = $client->request('POST', 'http://httpbin.org/post', [
+        'body' => 'raw data'
+    ]);
 
     // Provide an fopen resource.
     $body = fopen('/path/to/file', 'r');
-    $r = $client->post('http://httpbin.org/post', ['body' => $body]);
+    $r = $client->request('POST', 'http://httpbin.org/post', ['body' => $body]);
 
     // Use the stream_for() function to create a PSR-7 stream.
     $body = \GuzzleHttp\Psr7\stream_for('hello!');
-    $r = $client->post('http://httpbin.org/post', ['body' => $body]);
+    $r = $client->request('POST', 'http://httpbin.org/post', ['body' => $body]);
 
 An easy way to upload JSON data and set the appropriate header is using the
 ``json`` request option:
 
 .. code-block:: php
 
-    $r = $client->put('http://httpbin.org/put', [
+    $r = $client->request('PUT', 'http://httpbin.org/put', [
         'json' => ['foo' => 'bar']
     ]);
 
@@ -334,7 +374,7 @@ specify the POST fields as an array in the ``form_params`` request options.
 
 .. code-block:: php
 
-    $response = $client->post('http://httpbin.org/post', [
+    $response = $client->request('POST', 'http://httpbin.org/post', [
         'form_params' => [
             'field_name' => 'abc',
             'other_field' => '123',
@@ -360,7 +400,7 @@ associative arrays, where each associative array contains the following keys:
 
 .. code-block:: php
 
-    $response = $client->post('http://httpbin.org/post', [
+    $response = $client->request('POST', 'http://httpbin.org/post', [
         'multipart' => [
             [
                 'name'     => 'field_name',
@@ -387,13 +427,15 @@ Cookies
 
 Guzzle can maintain a cookie session for you if instructed using the
 ``cookies`` request option. When sending a request, the ``cookies`` option
-must be set an an instance of ``GuzzleHttp\Subscriber\CookieJar\CookieJarInterface``.
+must be set to an instance of ``GuzzleHttp\Cookie\CookieJarInterface``.
 
 .. code-block:: php
 
     // Use a specific cookie jar
     $jar = new \GuzzleHttp\Cookie\CookieJar;
-    $r = $client->get('http://httpbin.org/cookies', ['cookies' => $jar]);
+    $r = $client->request('GET', 'http://httpbin.org/cookies', [
+        'cookies' => $jar
+    ]);
 
 You can set ``cookies`` to ``true`` in a client constructor if you would like
 to use a shared cookie jar for all requests.
@@ -402,7 +444,7 @@ to use a shared cookie jar for all requests.
 
     // Use a shared client cookie jar
     $client = new \GuzzleHttp\Client(['cookies' => true]);
-    $r = $client->get('http://httpbin.org/cookies');
+    $r = $client->request('GET', 'http://httpbin.org/cookies');
 
 
 Redirects
@@ -422,7 +464,7 @@ customize the redirect behavior using the ``allow_redirects`` request option.
 
 .. code-block:: php
 
-    $response = $client->get('http://github.com');
+    $response = $client->request('GET', 'http://github.com');
     echo $response->getStatusCode();
     // 200
 
@@ -430,7 +472,9 @@ The following example shows that redirects can be disabled.
 
 .. code-block:: php
 
-    $response = $client->get('http://github.com', ['allow_redirects' => false]);
+    $response = $client->request('GET', 'http://github.com', [
+        'allow_redirects' => false
+    ]);
     echo $response->getStatusCode();
     // 301
 
@@ -448,14 +492,15 @@ Guzzle throws exceptions for errors that occur during a transfer.
 
   .. code-block:: php
 
+      use GuzzleHttp\Psr7;
       use GuzzleHttp\Exception\RequestException;
 
       try {
-          $client->get('https://github.com/_abc_123_404');
+          $client->request('GET', 'https://github.com/_abc_123_404');
       } catch (RequestException $e) {
-          echo $e->getRequest();
+          echo Psr7\str($e->getRequest());
           if ($e->hasResponse()) {
-              echo $e->getResponse();
+              echo Psr7\str($e->getResponse());
           }
       }
 
@@ -474,10 +519,10 @@ Guzzle throws exceptions for errors that occur during a transfer.
       use GuzzleHttp\Exception\ClientException;
 
       try {
-          $client->get('https://github.com/_abc_123_404');
+          $client->request('GET', 'https://github.com/_abc_123_404');
       } catch (ClientException $e) {
-          echo $e->getRequest();
-          echo $e->getResponse();
+          echo Psr7\str($e->getRequest());
+          echo Psr7\str($e->getResponse());
       }
 
 - A ``GuzzleHttp\Exception\ServerException`` is thrown for 500 level
@@ -505,6 +550,8 @@ behavior of the library.
     the timeout.
 ``HTTP_PROXY``
     Defines the proxy to use when sending requests using the "http" protocol.
+    
+    Note: because the HTTP_PROXY variable may contain arbitrary user input on some (CGI) environments, the variable is only used on the CLI SAPI. See https://httpoxy.org for more information.
 ``HTTPS_PROXY``
     Defines the proxy to use when sending requests using the "https" protocol.
 
