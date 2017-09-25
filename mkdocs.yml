@@ -20,6 +20,7 @@ pages:
       - Acknowledgements: General/Acknowledgement.md
       - General/Changelog.md
       - Code of Conduct: General/CODE_OF_CONDUCT.md
+      - Support/Features.md
       - General/Welcome-to-Observium-users.md
   - 2. Installing:
       - Installing LibreNMS: Installation/Installing-LibreNMS.md
@@ -50,6 +51,8 @@ pages:
       - Extensions/Smokeping.md
       - Extensions/Syslog.md
   - 5. Advanced Setup:
+      - Support/1-Minute-Polling.md
+      - Configuration docs: Support/Configuration.md
       - Authentication Options: Extensions/Authentication.md
       - Two-Factor Auth: Extensions/Two-Factor-Auth.md
       - Auto-discovery Setup: Extensions/Auto-Discovery.md
@@ -78,15 +81,12 @@ pages:
       - Alerting/Macros.md
       - Alerting/Testing.md
   - 9. Getting help:
-      - Support/1-Minute-Polling.md
-      - Support/Configuration.md
-      - Support/Discovery Support.md
-      - Support/Example-Hardware-Setup.md
       - Support/FAQ.md
-      - Support/Features.md
       - Support/Install Validation.md
       - Support/Performance.md
+      - Support/Discovery Support.md
       - Support/Poller Support.md
+      - Support/Example-Hardware-Setup.md
       - Support/Remote-Monitoring-VPN.md
       - Support/SNMP-Configuration-Examples.md
       - Support/SSL-Configuration.md
