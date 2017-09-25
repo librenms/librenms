@@ -47,7 +47,7 @@ if (!empty($device['ip'])) {
 if ($device['purpose']) {
     echo '<tr>
         <td>Description</td>
-        <td>'.display($device['purpose']).'</td>
+        <td>'.html_entity_decode(display($device['purpose'])).'</td>
       </tr>';
 }
 
