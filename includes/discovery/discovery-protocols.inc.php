@@ -234,6 +234,11 @@ foreach (dbFetchRows($sql, array($device['device_id'])) as $test) {
     }
 }
 
+// remove orphaned links
+$deleted = dbQuery('DELETE `l` FROM `links` `l` LEFT JOIN `devices` `d` ON `d`.`device_id` = `l`.`local_device_id` WHERE `d`.`device_id` IS NULL');
+echo str_repeat('-', $deleted);
+d_echo(" $deleted orphaned links deleted\n");
+
 unset(
     $link_exists,
     $sql,
