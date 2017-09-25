@@ -21,8 +21,6 @@ namespace Symfony\Component\EventDispatcher;
  * @author Jonathan Wage <jonwage@gmail.com>
  * @author Roman Borschel <roman@code-factory.org>
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 interface EventSubscriberInterface
 {
@@ -40,11 +38,9 @@ interface EventSubscriberInterface
      *
      *  * array('eventName' => 'methodName')
      *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
+     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2')))
      *
      * @return array The event names to listen to
-     *
-     * @api
      */
     public static function getSubscribedEvents();
 }

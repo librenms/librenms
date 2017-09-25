@@ -5,7 +5,6 @@ use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\Handler\CurlMultiHandler;
 use GuzzleHttp\Handler\Proxy;
 use GuzzleHttp\Handler\StreamHandler;
-use Psr\Http\Message\StreamInterface;
 
 /**
  * Expands a URI template
@@ -104,8 +103,12 @@ function debug_resource($value = null)
 function choose_handler()
 {
     $handler = null;
-    if (extension_loaded('curl')) {
+    if (function_exists('curl_multi_exec') && function_exists('curl_exec')) {
         $handler = Proxy::wrapSync(new CurlMultiHandler(), new CurlHandler());
+    } elseif (function_exists('curl_exec')) {
+        $handler = new CurlHandler();
+    } elseif (function_exists('curl_multi_exec')) {
+        $handler = new CurlMultiHandler();
     }
 
     if (ini_get('allow_url_fopen')) {
@@ -131,7 +134,7 @@ function default_user_agent()
 
     if (!$defaultAgent) {
         $defaultAgent = 'GuzzleHttp/' . Client::VERSION;
-        if (extension_loaded('curl')) {
+        if (extension_loaded('curl') && function_exists('curl_version')) {
             $defaultAgent .= ' curl/' . \curl_version()['version'];
         }
         $defaultAgent .= ' PHP/' . PHP_VERSION;
@@ -164,8 +167,12 @@ function default_ca_bundle()
         '/etc/ssl/certs/ca-certificates.crt',
         // FreeBSD (provided by the ca_root_nss package)
         '/usr/local/share/certs/ca-root-nss.crt',
+        // SLES 12 (provided by the ca-certificates package)
+        '/var/lib/ca-certificates/ca-bundle.pem',
         // OS X provided by homebrew (using the default path)
         '/usr/local/etc/openssl/cert.pem',
+        // Google app engine
+        '/etc/ca-certificates.crt',
         // Windows?
         'C:\\windows\\system32\\curl-ca-bundle.crt',
         'C:\\windows\\curl-ca-bundle.crt',
@@ -222,4 +229,103 @@ function normalize_header_keys(array $headers)
     }
 
     return $result;
+}
+
+/**
+ * Returns true if the provided host matches any of the no proxy areas.
+ *
+ * This method will strip a port from the host if it is present. Each pattern
+ * can be matched with an exact match (e.g., "foo.com" == "foo.com") or a
+ * partial match: (e.g., "foo.com" == "baz.foo.com" and ".foo.com" ==
+ * "baz.foo.com", but ".foo.com" != "foo.com").
+ *
+ * Areas are matched in the following cases:
+ * 1. "*" (without quotes) always matches any hosts.
+ * 2. An exact match.
+ * 3. The area starts with "." and the area is the last part of the host. e.g.
+ *    '.mit.edu' will match any host that ends with '.mit.edu'.
+ *
+ * @param string $host         Host to check against the patterns.
+ * @param array  $noProxyArray An array of host patterns.
+ *
+ * @return bool
+ */
+function is_host_in_noproxy($host, array $noProxyArray)
+{
+    if (strlen($host) === 0) {
+        throw new \InvalidArgumentException('Empty host provided');
+    }
+
+    // Strip port if present.
+    if (strpos($host, ':')) {
+        $host = explode($host, ':', 2)[0];
+    }
+
+    foreach ($noProxyArray as $area) {
+        // Always match on wildcards.
+        if ($area === '*') {
+            return true;
+        } elseif (empty($area)) {
+            // Don't match on empty values.
+            continue;
+        } elseif ($area === $host) {
+            // Exact matches.
+            return true;
+        } else {
+            // Special match if the area when prefixed with ".". Remove any
+            // existing leading "." and add a new leading ".".
+            $area = '.' . ltrim($area, '.');
+            if (substr($host, -(strlen($area))) === $area) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Wrapper for json_decode that throws when an error occurs.
+ *
+ * @param string $json    JSON data to parse
+ * @param bool $assoc     When true, returned objects will be converted
+ *                        into associative arrays.
+ * @param int    $depth   User specified recursion depth.
+ * @param int    $options Bitmask of JSON decode options.
+ *
+ * @return mixed
+ * @throws \InvalidArgumentException if the JSON cannot be decoded.
+ * @link http://www.php.net/manual/en/function.json-decode.php
+ */
+function json_decode($json, $assoc = false, $depth = 512, $options = 0)
+{
+    $data = \json_decode($json, $assoc, $depth, $options);
+    if (JSON_ERROR_NONE !== json_last_error()) {
+        throw new \InvalidArgumentException(
+            'json_decode error: ' . json_last_error_msg());
+    }
+
+    return $data;
+}
+
+/**
+ * Wrapper for JSON encoding that throws when an error occurs.
+ *
+ * @param mixed $value   The value being encoded
+ * @param int    $options JSON encode option bitmask
+ * @param int    $depth   Set the maximum depth. Must be greater than zero.
+ *
+ * @return string
+ * @throws \InvalidArgumentException if the JSON cannot be encoded.
+ * @link http://www.php.net/manual/en/function.json-encode.php
+ */
+function json_encode($value, $options = 0, $depth = 512)
+{
+    $json = \json_encode($value, $options, $depth);
+    if (JSON_ERROR_NONE !== json_last_error()) {
+        throw new \InvalidArgumentException(
+            'json_encode error: ' . json_last_error_msg());
+    }
+
+    return $json;
 }

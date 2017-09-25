@@ -21,7 +21,7 @@ class LimitStream implements StreamInterface
      * @param StreamInterface $stream Stream to wrap
      * @param int             $limit  Total number of bytes to allow to be read
      *                                from the stream. Pass -1 for no limit.
-     * @param int|null        $offset Position to seek to before reading (only
+     * @param int             $offset Position to seek to before reading (only
      *                                works on seekable streams).
      */
     public function __construct(

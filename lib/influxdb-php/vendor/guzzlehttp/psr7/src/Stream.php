@@ -38,7 +38,7 @@ class Stream implements StreamInterface
      * This constructor accepts an associative array of options.
      *
      * - size: (int) If a read stream would otherwise have an indeterminate
-     *   size, but the size is known due to foreknownledge, then you can
+     *   size, but the size is known due to foreknowledge, then you can
      *   provide that size, in bytes.
      * - metadata: (array) Any additional metadata to return when the metadata
      *   of the stream is accessed.
@@ -207,8 +207,20 @@ class Stream implements StreamInterface
         if (!$this->readable) {
             throw new \RuntimeException('Cannot read from non-readable stream');
         }
+        if ($length < 0) {
+            throw new \RuntimeException('Length parameter cannot be negative');
+        }
 
-        return fread($this->stream, $length);
+        if (0 === $length) {
+            return '';
+        }
+
+        $string = fread($this->stream, $length);
+        if (false === $string) {
+            throw new \RuntimeException('Unable to read from stream');
+        }
+
+        return $string;
     }
 
     public function write($string)
