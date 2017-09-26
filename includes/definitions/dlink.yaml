@@ -10,3 +10,6 @@ discovery:
     - sysDescr_regex:
         - '/^DES-/'
         - '/^DGS-/'
+good_if:
+    - po
+    - vlan

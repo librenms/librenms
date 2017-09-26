@@ -41,30 +41,35 @@ class CachingStream implements StreamInterface
         $this->seek(0);
     }
 
-    /**
-     * {@inheritdoc}
-     * @throws \RuntimeException When seeking with SEEK_END or when seeking
-     *     past the total size of the buffer stream
-     */
     public function seek($offset, $whence = SEEK_SET)
     {
         if ($whence == SEEK_SET) {
             $byte = $offset;
         } elseif ($whence == SEEK_CUR) {
             $byte = $offset + $this->tell();
+        } elseif ($whence == SEEK_END) {
+            $size = $this->remoteStream->getSize();
+            if ($size === null) {
+                $size = $this->cacheEntireStream();
+            }
+            $byte = $size + $offset;
         } else {
-            throw new \RuntimeException('CachingStream::seek() supports SEEK_SET and SEEK_CUR');
+            throw new \InvalidArgumentException('Invalid whence');
         }
 
-        // You cannot skip ahead past where you've read from the remote stream
-        if ($byte > $this->stream->getSize()) {
-            throw new \RuntimeException(
-                sprintf('Cannot seek to byte %d when the buffered stream only'
-                    . ' contains %d bytes', $byte, $this->stream->getSize())
-            );
-        }
+        $diff = $byte - $this->stream->getSize();
 
-        $this->stream->seek($byte);
+        if ($diff > 0) {
+            // Read the remoteStream until we have read in at least the amount
+            // of bytes requested, or we reach the end of the file.
+            while ($diff > 0 && !$this->remoteStream->eof()) {
+                $this->read($diff);
+                $diff = $byte - $this->stream->getSize();
+            }
+        } else {
+            // We can just do a normal seek since we've already seen this byte.
+            $this->stream->seek($byte);
+        }
     }
 
     public function read($length)
@@ -121,5 +126,13 @@ class CachingStream implements StreamInterface
     public function close()
     {
         $this->remoteStream->close() && $this->stream->close();
+    }
+
+    private function cacheEntireStream()
+    {
+        $target = new FnStream(['write' => 'strlen']);
+        copy_to_stream($this, $target);
+
+        return $this->tell();
     }
 }

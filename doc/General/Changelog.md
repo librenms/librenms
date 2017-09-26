@@ -1,4 +1,3 @@
-source: General/Changelog.md
 ## 1.31
 *(2017-08-26)*
 

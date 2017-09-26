@@ -28,10 +28,11 @@ allow_redirects
     ::
 
         [
-            'max'       => 5,
-            'strict'    => false,
-            'referer'   => true,
-            'protocols' => ['http', 'https']
+            'max'             => 5,
+            'strict'          => false,
+            'referer'         => false,
+            'protocols'       => ['http', 'https'],
+            'track_redirects' => false
         ]
 
 :Constant: ``GuzzleHttp\RequestOptions::ALLOW_REDIRECTS``
@@ -40,7 +41,7 @@ Set to ``false`` to disable redirects.
 
 .. code-block:: php
 
-    $res = $client->get('/redirect/3', ['allow_redirects' => false]);
+    $res = $client->request('GET', '/redirect/3', ['allow_redirects' => false]);
     echo $res->getStatusCode();
     // 302
 
@@ -49,7 +50,7 @@ number of 5 redirects.
 
 .. code-block:: php
 
-    $res = $client->get('/redirect/3');
+    $res = $client->request('GET', '/redirect/3');
     echo $res->getStatusCode();
     // 200
 
@@ -61,7 +62,7 @@ pairs:
   Strict RFC compliant redirects mean that POST redirect requests are sent as
   POST requests vs. doing what most browsers do which is redirect POST requests
   with GET requests.
-- referer: (bool, default=true) Set to false to disable adding the Referer
+- referer: (bool, default=false) Set to true to enable adding the Referer
   header when redirecting.
 - protocols: (array, default=['http', 'https']) Specified which protocols are
   allowed for redirect requests.
@@ -69,6 +70,14 @@ pairs:
   is encountered. The callable is invoked with the original request and the
   redirect response that was received. Any return value from the on_redirect
   function is ignored.
+- track_redirects: (bool) When set to ``true``, each redirected URI and status
+  code encountered will be tracked in the ``X-Guzzle-Redirect-History`` and
+  ``X-Guzzle-Redirect-Status-History`` headers respectively. All URIs and
+  status codes will be stored in the order which the redirects were encountered.
+
+  Note: When tracking redirects the ``X-Guzzle-Redirect-History`` header will
+  exclude the initial request's URI and the ``X-Guzzle-Redirect-Status-History``
+  header will exclude the final status code.
 
 .. code-block:: php
 
@@ -82,19 +91,27 @@ pairs:
         UriInterface $uri
     ) {
         echo 'Redirecting! ' . $request->getUri() . ' to ' . $uri . "\n";
-    }
+    };
 
-    $res = $client->get('/redirect/3', [
+    $res = $client->request('GET', '/redirect/3', [
         'allow_redirects' => [
-            'max'         => 10,        // allow at most 10 redirects.
-            'strict'      => true,      // use "strict" RFC compliant redirects.
-            'referer'     => true,      // add a Referer header
-            'protocols'   => ['https'], // only allow https URLs
-            'on_redirect' => $onRedirect
+            'max'             => 10,        // allow at most 10 redirects.
+            'strict'          => true,      // use "strict" RFC compliant redirects.
+            'referer'         => true,      // add a Referer header
+            'protocols'       => ['https'], // only allow https URLs
+            'on_redirect'     => $onRedirect,
+            'track_redirects' => true
         ]
     ]);
+
     echo $res->getStatusCode();
     // 200
+
+    echo $res->getHeaderLine('X-Guzzle-Redirect-History');
+    // http://first-redirect, http://second-redirect, etc...
+
+    echo $res->getHeaderLine('X-Guzzle-Redirect-Status-History');
+    // 301, 302, etc...
 
 .. warning::
 
@@ -127,7 +144,7 @@ basic
 
 .. code-block:: php
 
-    $client->get('/get', ['auth' => ['username', 'password']]);
+    $client->request('GET', '/get', ['auth' => ['username', 'password']]);
 
 digest
     Use `digest authentication <http://www.ietf.org/rfc/rfc2069.txt>`_
@@ -135,13 +152,29 @@ digest
 
 .. code-block:: php
 
-    $client->get('/get', ['auth' => ['username', 'password', 'digest']]);
+    $client->request('GET', '/get', [
+        'auth' => ['username', 'password', 'digest']
+    ]);
 
 .. note::
 
     This is currently only supported when using the cURL handler, but
     creating a replacement that can be used with any HTTP handler is
     planned.
+
+ntlm
+    Use `Microsoft NTLM authentication <https://msdn.microsoft.com/en-us/library/windows/desktop/aa378749(v=vs.85).aspx>`_
+    (must be supported by the HTTP handler).
+
+.. code-block:: php
+
+    $client->request('GET', '/get', [
+        'auth' => ['username', 'password', 'ntlm']
+    ]);
+
+.. note::
+
+    This is currently only supported when using the cURL handler.
 
 
 body
@@ -152,8 +185,7 @@ body
 :Types:
     - string
     - ``fopen()`` resource
-    - ``GuzzleHttp\Stream\StreamInterface``
-    - ``GuzzleHttp\Post\PostBodyInterface``
+    - ``Psr\Http\Message\StreamInterface``
 :Default: None
 :Constant: ``GuzzleHttp\RequestOptions::BODY``
 
@@ -163,8 +195,8 @@ This setting can be set to any of the following types:
 
   .. code-block:: php
 
-  // You can send requests that use a string as the message body.
-  $client->put('/put', ['body' => 'foo']);
+      // You can send requests that use a string as the message body.
+      $client->request('PUT', '/put', ['body' => 'foo']);
 
 - resource returned from ``fopen()``
 
@@ -172,15 +204,19 @@ This setting can be set to any of the following types:
 
       // You can send requests that use a stream resource as the body.
       $resource = fopen('http://httpbin.org', 'r');
-      $client->put('/put', ['body' => $resource]);
+      $client->request('PUT', '/put', ['body' => $resource]);
 
-- ``GuzzleHttp\Stream\StreamInterface``
+- ``Psr\Http\Message\StreamInterface``
 
   .. code-block:: php
 
       // You can send requests that use a Guzzle stream object as the body
       $stream = GuzzleHttp\Psr7\stream_for('contents...');
-      $client->post('/post', ['body' => $stream]);
+      $client->request('POST', '/post', ['body' => $stream]);
+
+.. note::
+
+    This option cannot be used with ``form_params``, ``multipart``, or ``json``
 
 
 .. _cert-option:
@@ -201,7 +237,7 @@ cert
 
 .. code-block:: php
 
-    $client->get('/', ['cert' => ['/path/server.pem', 'password']]);
+    $client->request('GET', '/', ['cert' => ['/path/server.pem', 'password']]);
 
 
 .. _cookies-option:
@@ -221,7 +257,7 @@ You must specify the cookies option as a
 .. code-block:: php
 
     $jar = new \GuzzleHttp\Cookie\CookieJar();
-    $client->get('/get', ['cookies' => $jar]);
+    $client->request('GET', '/get', ['cookies' => $jar]);
 
 .. warning::
 
@@ -250,7 +286,7 @@ connect_timeout
 .. code-block:: php
 
     // Timeout if the client fails to connect to the server in 3.14 seconds.
-    $client->get('/delay/5', ['connect_timeout' => 3.14]);
+    $client->request('GET', '/delay/5', ['connect_timeout' => 3.14]);
 
 .. note::
 
@@ -278,7 +314,7 @@ debug
 
 .. code-block:: php
 
-    $client->get('/get', ['debug' => true]);
+    $client->request('GET', '/get', ['debug' => true]);
 
 Running the above example would output something like the following:
 
@@ -324,7 +360,7 @@ bytes pass through the handler unchanged.
 .. code-block:: php
 
     // Request gzipped data, but do not decode it while downloading
-    $client->get('/foo.js', [
+    $client->request('GET', '/foo.js', [
         'headers'        => ['Accept-Encoding' => 'gzip'],
         'decode_content' => false
     ]);
@@ -336,7 +372,7 @@ header of the request.
 .. code-block:: php
 
     // Pass "gzip" as the Accept-Encoding header.
-    $client->get('/foo.js', ['decode_content' => 'gzip']);
+    $client->request('GET', '/foo.js', ['decode_content' => 'gzip']);
 
 
 .. _delay-option:
@@ -382,6 +418,29 @@ the body of a request is greater than 1 MB and a request is using HTTP/1.1.
     implemented by Guzzle HTTP handlers used by a client.
 
 
+force_ip_resolve
+----------------
+
+:Summary: Set to "v4" if you want the HTTP handlers to use only ipv4 protocol or "v6" for ipv6 protocol.
+:Types: string
+:Default: null
+:Constant: ``GuzzleHttp\RequestOptions::FORCE_IP_RESOLVE``
+
+.. code-block:: php
+
+    // Force ipv4 protocol
+    $client->request('GET', '/foo', ['force_ip_resolve' => 'v4']);
+
+    // Force ipv6 protocol
+    $client->request('GET', '/foo', ['force_ip_resolve' => 'v6']);
+
+.. note::
+
+    This setting must be supported by the HTTP handler used to send a request.
+    ``force_ip_resolve`` is currently only supported by the built-in cURL
+    and stream handlers.
+
+
 form_params
 -----------
 
@@ -396,7 +455,7 @@ present.
 
 .. code-block:: php
 
-    $client->post('/post', [
+    $client->request('POST', '/post', [
         'form_params' => [
             'foo' => 'bar',
             'baz' => ['hi', 'there!']
@@ -408,6 +467,8 @@ present.
     ``form_params`` cannot be used with the ``multipart`` option. You will need to use
     one or the other. Use ``form_params`` for ``application/x-www-form-urlencoded``
     requests, and ``multipart`` for ``multipart/form-data`` requests.
+
+    This option cannot be used with ``body``, ``multipart``, or ``json``
 
 
 headers
@@ -423,7 +484,7 @@ headers
 .. code-block:: php
 
     // Set various headers on a request
-    $client->get('/get', [
+    $client->request('GET', '/get', [
         'headers' => [
             'User-Agent' => 'testing/1.0',
             'Accept'     => 'application/json',
@@ -433,8 +494,8 @@ headers
 
 Headers may be added as default options when creating a client. When headers
 are used as default options, they are only applied if the request being created
-does not already contain the specific header. This include both requests passed
-to the client in the ``send()`` and ``sendAsync()`` methods and requests
+does not already contain the specific header. This includes both requests passed
+to the client in the ``send()`` and ``sendAsync()`` methods, and requests
 created by the client (e.g., ``request()`` and ``requestAsync()``).
 
 .. code-block:: php
@@ -442,14 +503,14 @@ created by the client (e.g., ``request()`` and ``requestAsync()``).
     $client = new GuzzleHttp\Client(['headers' => ['X-Foo' => 'Bar']]);
 
     // Will send a request with the X-Foo header.
-    $client->get('/get');
+    $client->request('GET', '/get');
 
     // Sets the X-Foo header to "test", which prevents the default header
     // from being applied.
-    $client->get('/get', ['headers' => ['X-Foo' => 'test']);
+    $client->request('GET', '/get', ['headers' => ['X-Foo' => 'test']]);
 
     // Will disable adding in default headers.
-    $client->get('/get', ['headers' => null]);
+    $client->request('GET', '/get', ['headers' => null]);
 
     // Will not overwrite the X-Foo header because it is in the message.
     use GuzzleHttp\Psr7\Request;
@@ -477,10 +538,10 @@ http_errors
 
 .. code-block:: php
 
-    $client->get('/status/500');
+    $client->request('GET', '/status/500');
     // Throws a GuzzleHttp\Exception\ServerException
 
-    $res = $client->get('/status/500', ['http_errors' => false]);
+    $res = $client->request('GET', '/status/500', ['http_errors' => false]);
     echo $res->getStatusCode();
     // 500
 
@@ -505,7 +566,7 @@ json
 
 .. code-block:: php
 
-    $response = $client->put('/put', ['json' => ['foo' => 'bar']]);
+    $response = $client->request('PUT', '/put', ['json' => ['foo' => 'bar']]);
 
 Here's an example of using the ``tap`` middleware to see what request is sent
 over the wire.
@@ -518,13 +579,13 @@ over the wire.
     $clientHandler = $client->getConfig('handler');
     // Create a middleware that echoes parts of the request.
     $tapMiddleware = Middleware::tap(function ($request) {
-        echo $request->getHeader('Content-Type');
+        echo $request->getHeaderLine('Content-Type');
         // application/json
         echo $request->getBody();
         // {"foo":"bar"}
     });
 
-    $response = $client->put('/put', [
+    $response = $client->request('PUT', '/put', [
         'json'    => ['foo' => 'bar'],
         'handler' => $tapMiddleware($clientHandler)
     ]);
@@ -537,6 +598,8 @@ over the wire.
     JSON encoded data into the request yourself using the ``body`` request
     option and you must specify the correct Content-Type header using the
     ``headers`` request option.
+
+    This option cannot be used with ``body``, ``form_params``, or ``multipart``
 
 
 multipart
@@ -558,7 +621,7 @@ the following key value pairs:
 
 .. code-block:: php
 
-    $client->post('/post', [
+    $client->request('POST', '/post', [
         'multipart' => [
             [
                 'name'     => 'foo',
@@ -583,6 +646,8 @@ the following key value pairs:
     use one or the other. Use ``form_params`` for ``application/x-www-form-urlencoded``
     requests, and ``multipart`` for ``multipart/form-data`` requests.
 
+    This option cannot be used with ``body``, ``form_params``, or ``json``
+
 
 .. _on-headers:
 
@@ -605,7 +670,7 @@ can be written to the sink.
 .. code-block:: php
 
     // Reject responses that are greater than 1024 bytes.
-    $client->get('http://httpbin.org/stream/1024', [
+    $client->request('GET', 'http://httpbin.org/stream/1024', [
         'on_headers' => function (ResponseInterface $response) {
             if ($response->getHeaderLine('Content-Length') > 1024) {
                 throw new \Exception('The file is too big!');
@@ -617,6 +682,83 @@ can be written to the sink.
 
     When writing HTTP handlers, the ``on_headers`` function must be invoked
     before writing data to the body of the response.
+
+
+.. _on_stats:
+
+on_stats
+--------
+
+:Summary: ``on_stats`` allows you to get access to transfer statistics of a
+    request and access the lower level transfer details of the handler
+    associated with your client. ``on_stats`` is a callable that is invoked
+    when a handler has finished sending a request. The callback is invoked
+    with transfer statistics about the request, the response received, or the
+    error encountered. Included in the data is the total amount of time taken
+    to send the request.
+:Types: - callable
+:Constant: ``GuzzleHttp\RequestOptions::ON_STATS``
+
+The callable accepts a ``GuzzleHttp\TransferStats`` object.
+
+.. code-block:: php
+
+    use GuzzleHttp\TransferStats;
+
+    $client = new GuzzleHttp\Client();
+
+    $client->request('GET', 'http://httpbin.org/stream/1024', [
+        'on_stats' => function (TransferStats $stats) {
+            echo $stats->getEffectiveUri() . "\n";
+            echo $stats->getTransferTime() . "\n";
+            var_dump($stats->getHandlerStats());
+
+            // You must check if a response was received before using the
+            // response object.
+            if ($stats->hasResponse()) {
+                echo $stats->getResponse()->getStatusCode();
+            } else {
+                // Error data is handler specific. You will need to know what
+                // type of error data your handler uses before using this
+                // value.
+                var_dump($stats->getHandlerErrorData());
+            }
+        }
+    ]);
+
+
+progress
+--------
+
+:Summary: Defines a function to invoke when transfer progress is made.
+:Types: - callable
+:Default: None
+:Constant: ``GuzzleHttp\RequestOptions::PROGRESS``
+
+The function accepts the following positional arguments:
+
+- the total number of bytes expected to be downloaded
+- the number of bytes downloaded so far
+- the total number of bytes expected to be uploaded
+- the number of bytes uploaded so far
+
+.. code-block:: php
+
+    // Send a GET request to /get?foo=bar
+    $result = $client->request(
+        'GET',
+        '/',
+        [
+            'progress' => function(
+                $downloadTotal,
+                $downloadedBytes,
+                $uploadTotal,
+                $uploadedBytes
+            ) {
+                //do something
+            },
+        ]
+    );
 
 
 .. _proxy-option:
@@ -636,17 +778,27 @@ Pass a string to specify a proxy for all protocols.
 
 .. code-block:: php
 
-    $client->get('/', ['proxy' => 'tcp://localhost:8125']);
+    $client->request('GET', '/', ['proxy' => 'tcp://localhost:8125']);
 
 Pass an associative array to specify HTTP proxies for specific URI schemes
-(i.e., "http", "https").
+(i.e., "http", "https"). Provide a ``no`` key value pair to provide a list of
+host names that should not be proxied to.
+
+.. note::
+
+    Guzzle will automatically populate this value with your environment's
+    ``NO_PROXY`` environment variable. However, when providing a ``proxy``
+    request option, it is up to your to provide the ``no`` value parsed from
+    the ``NO_PROXY`` environment variable
+    (e.g., ``explode(',', getenv('NO_PROXY'))``).
 
 .. code-block:: php
 
-    $client->get('/', [
+    $client->request('GET', '/', [
         'proxy' => [
             'http'  => 'tcp://localhost:8125', // Use this proxy with "http"
-            'https' => 'tcp://localhost:9124'  // Use this proxy with "https"
+            'https' => 'tcp://localhost:9124', // Use this proxy with "https",
+            'no' => ['.mit.edu', 'foo.com']    // Don't use a proxy with these
         ]
     ]);
 
@@ -670,16 +822,40 @@ query
 .. code-block:: php
 
     // Send a GET request to /get?foo=bar
-    $client->get('/get', ['query' => ['foo' => 'bar']]);
+    $client->request('GET', '/get', ['query' => ['foo' => 'bar']]);
 
-Query strings specified in the ``query`` option will overwrite an query string
+Query strings specified in the ``query`` option will overwrite all query string
 values supplied in the URI of a request.
 
 .. code-block:: php
 
     // Send a GET request to /get?foo=bar
-    $client->get('/get?abc=123', ['query' => ['foo' => 'bar']]);
+    $client->request('GET', '/get?abc=123', ['query' => ['foo' => 'bar']]);
 
+read_timeout
+------------
+
+:Summary: Float describing the timeout to use when reading a streamed body
+:Types: float
+:Default: Defaults to the value of the ``default_socket_timeout`` PHP ini setting
+:Constant: ``GuzzleHttp\RequestOptions::READ_TIMEOUT``
+
+The timeout applies to individual read operations on a streamed body (when the ``stream`` option is enabled).
+
+.. code-block:: php
+
+    $response = $client->request('GET', '/stream', [
+        'stream' => true,
+        'read_timeout' => 10,
+    ]);
+
+    $body = $response->getBody();
+
+    // Returns false on timeout
+    $data = $body->read(1024);
+
+    // Returns false on timeout
+    $line = fgets($body->detach());
 
 .. _sink-option:
 
@@ -700,14 +876,14 @@ response body:
 
 .. code-block:: php
 
-    $client->get('/stream/20', ['sink' => '/path/to/file']);
+    $client->request('GET', '/stream/20', ['sink' => '/path/to/file']);
 
 Pass a resource returned from ``fopen()`` to write the response to a PHP stream:
 
 .. code-block:: php
 
     $resource = fopen('/path/to/file', 'w');
-    $client->get('/stream/20', ['sink' => $resource]);
+    $client->request('GET', '/stream/20', ['sink' => $resource]);
 
 Pass a ``Psr\Http\Message\StreamInterface`` object to stream the response
 body to an open PSR-7 stream.
@@ -716,7 +892,7 @@ body to an open PSR-7 stream.
 
     $resource = fopen('/path/to/file', 'w');
     $stream = GuzzleHttp\Psr7\stream_for($resource);
-    $client->get('/stream/20', ['save_to' => $stream]);
+    $client->request('GET', '/stream/20', ['save_to' => $stream]);
 
 .. note::
 
@@ -760,7 +936,7 @@ stream
 
 .. code-block:: php
 
-    $response = $client->get('/stream/20', ['stream' => true]);
+    $response = $client->request('GET', '/stream/20', ['stream' => true]);
     // Read bytes off of the stream until the end of the stream is reached
     $body = $response->getBody();
     while (!$body->eof()) {
@@ -806,13 +982,13 @@ verify
 .. code-block:: php
 
     // Use the system's CA bundle (this is the default setting)
-    $client->get('/', ['verify' => true]);
+    $client->request('GET', '/', ['verify' => true]);
 
     // Use a custom SSL certificate on disk.
-    $client->get('/', ['verify' => '/path/to/cert.pem']);
+    $client->request('GET', '/', ['verify' => '/path/to/cert.pem']);
 
     // Disable validation entirely (don't do this!).
-    $client->get('/', ['verify' => false]);
+    $client->request('GET', '/', ['verify' => false]);
 
 Not all system's have a known CA bundle on disk. For example, Windows and
 OS X do not have a single common location for CA bundles. When setting
@@ -864,7 +1040,7 @@ timeout
 .. code-block:: php
 
     // Timeout if a server does not return a response in 3.14 seconds.
-    $client->get('/delay/5', ['timeout' => 3.14]);
+    $client->request('GET', '/delay/5', ['timeout' => 3.14]);
     // PHP Fatal error:  Uncaught exception 'GuzzleHttp\Exception\RequestException'
 
 
@@ -881,4 +1057,4 @@ version
 .. code-block:: php
 
     // Force HTTP/1.0
-    $request = $client->get('/get', ['version' => 1.0]);
+    $request = $client->request('GET', '/get', ['version' => 1.0]);
