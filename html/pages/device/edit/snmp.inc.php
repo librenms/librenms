@@ -48,7 +48,7 @@ if ($_POST['editing']) {
             $update = array_merge($update, $v3);
         } else {
             $update['snmp_disable'] = 1;
-            $update['os']           = mres($_POST['os']) ? mres($_POST['os_id']) : "ping";
+            $update['os']           = $_POST['os'] ? mres($_POST['os_id']) : "ping";
             $update['hardware']     = mres($_POST['hardware']);
             $update['features']     = null;
             $update['version']      = null;
