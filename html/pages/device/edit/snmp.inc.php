@@ -48,7 +48,7 @@ if ($_POST['editing']) {
             $update = array_merge($update, $v3);
         } else {
             $update['snmp_disable'] = 1;
-            $update['os']           = "ping";
+            $update['os']           = mres($_POST['os_id']) ? mres($_POST['os_id']) : "ping";
             $update['hardware']     = mres($_POST['hardware']);
             $update['features']     = null;
             $update['version']      = null;
@@ -132,6 +132,13 @@ echo "
     <label for='hardware' class='col-sm-2 control-label'> Hardware</label>
     <div class='col-sm-4'>
     <input id='hardware' class='form-control' name='hardware' value='".$device['hardware']."'/>
+    </div>
+    </div>
+    <div class='form-group'>
+    <label for='hardware' class='col-sm-2 control-label'> OS</label>
+    <div class='col-sm-4'>
+    <input id='os' class='form-control' name='os' value='".$config['os'][$device['os']]['text']."'/>
+    <input type='hidden' id='os_id' class='form-control' name='os_id' value='".$device['os']."'/>
     </div>
     </div>
     </div>
@@ -338,6 +345,48 @@ function disableSnmp(e) {
         $('#snmp_override').hide();
     }
 }
+
+var os_suggestions = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    remote: {
+        url: "ajax_ossuggest.php?term=%QUERY",
+        filter: function (output) {
+            return $.map(output, function (item) {
+                return {
+                    text: item.text,
+                    os: item.os,
+                };
+            });
+        },
+        wildcard: "%QUERY"
+    }
+});
+os_suggestions.initialize();
+$('#os').typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 1,
+        classNames: {
+            menu: 'typeahead-left'
+        }
+    },
+    {
+        source: os_suggestions.ttAdapter(),
+        async: true,
+        displayKey: 'text',
+        valueKey: 'os',
+        templates: {
+            suggestion: Handlebars.compile('<p>&nbsp;{{text}}</p>')
+        },
+        limit: 20
+    });
+
+$("#os").on("typeahead:selected typeahead:autocompleted", function(e,datum) {
+    $("#os_id").val(datum.os);
+    $("#os").html('<mark>' + datum.text + '</mark>');
+});
+
 <?php
 if ($snmpver == 'v3' || $device['snmpver'] == 'v3') {
     echo "$('#snmpv1_2').toggle();";
