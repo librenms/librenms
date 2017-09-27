@@ -336,6 +336,12 @@ if (empty($ini_tz)) {
     print_fail("You have a different system timezone ($sh_tz) specified to the php configured timezone ($php_tz), please correct this.");
 }
 
+// check php cookie config
+$cookieParams = session_get_cookie_params();
+if ($cookieParams['httponly'] !== false) {
+    print_fail("Disable httponly as it will at least break the install");
+}
+
 // Test transports
 if ($config['alerts']['email']['enable'] === true) {
     print_warn('You have the old alerting system enabled - this is to be deprecated on the 1st of June 2015: https://groups.google.com/forum/#!topic/librenms-project/1llxos4m0p4');
