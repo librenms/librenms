@@ -12,7 +12,8 @@
  * the source code distribution for details.
 */
 
-list(,$version,,,$serial,,) = explode(";", $poll_device['sysDescr']);
-$hardware = str_replace('"', "", snmp_get($device, 'product.0', '-OQva', 'SAF-IPRADIO', 'saf'));
-$version = end(explode(" ", $version));
-list(,$serial) = explode(":", $serial);
+preg_match('/ radio;(.*) v([0-9.]*);.*;SN: ([0-9]+);/', $poll_device['sysDescr'], $matches);
+
+$hardware = $matches[1];
+$version = $matches[2];
+$serial = $matches[3];
