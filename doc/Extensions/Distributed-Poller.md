@@ -108,7 +108,7 @@ Running RRDCached
 Ubuntu (/etc/default/rrdcached)
 ```conf
 OPTS="-l 0:42217"
-OPTS="$OPTS -j /var/lib/rrdcached/journal/ -F"
+OPTS="$OPTS -R -j /var/lib/rrdcached/journal/ -F"
 OPTS="$OPTS -b /opt/librenms/rrd -B"
 OPTS="$OPTS -w 1800 -z 900"
 ```
