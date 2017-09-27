@@ -35,10 +35,8 @@ curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($obj));
 $ret = curl_exec($curl);
 $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-var_dump("Response from OpsGenie: " . $ret); //FIXME: proper debugging
-
 if($code != 200) {
-    var_dump("Error when sending post request to OpsGenie. Response code: " . $code); //FIXME: proper debugging
+    var_dump("Error when sending post request to OpsGenie. Response code: " . $code . " Response body: " . $ret); //FIXME: proper debugging
     return false;
 }
 
