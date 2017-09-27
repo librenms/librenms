@@ -23,6 +23,8 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$saf_integra = preg_split('/;/', $poll_device['sysDescr']);
+preg_match('/Prod: ([A-Za-z-_]+);Vers: ([0-9.]+);.*;S\/N: ([0-9]+)/', $poll_device['sysDescr'], $matches);
 
-$serial = str_replace('S/N: ', '', $saf_integra[8]);
+$hardware = $matches[1];
+$version = $matches[2];
+$serial = $matches[3];
