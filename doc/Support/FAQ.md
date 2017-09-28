@@ -349,5 +349,5 @@ This template's entry could be missing in the database. Please run:
 mysql -u librenms -p < sql-schema/202.sql
 ```
 ### <a name="faq32"> Why would alert un-mute itself?</a> 
-If an alert un-mutes itself then it most likely means that the alert cleared and is then triggered again.
+If alert un-mutes itself then it most likely means that the alert cleared and is then triggered again.
 Please review eventlog as it will tell you in there.
