@@ -15,4 +15,5 @@ discovery:
       sysDescr_regex:
           - '/^ZyWALL/'
           - '/^USG60/'
+          - '/^USG110/'
     - sysDescr_regex: '/^ZyWALL 2X/'
