@@ -91,6 +91,9 @@ db_password = config['db_pass']
 if config['db_host'][:5].lower() == 'unix:':
     db_server = config['db_host']
     db_port = 0
+elif config['db_socket']:
+    db_server = config['db_socket']
+    db_port = 0
 elif ':' in config['db_host']:
     db_server = config['db_host'].rsplit(':')[0]
     db_port = int(config['db_host'].rsplit(':')[1])

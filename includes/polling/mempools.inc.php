@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', array($device['device_id'])) as $mempool) {
     echo 'Mempool '.$mempool['mempool_descr'].': ';
 
@@ -20,10 +22,9 @@ foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', array($device
     echo $percent.'% ';
 
     $rrd_name = array('mempool', $mempool_type, $mempool_index);
-    $rrd_def = array(
-        'DS:used:GAUGE:600:0:U',
-        'DS:free:GAUGE:600:0:U'
-    );
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('used', 'GAUGE', 0)
+        ->addDataset('free', 'GAUGE', 0);
 
     $fields = array(
         'used' => $mempool['used'],

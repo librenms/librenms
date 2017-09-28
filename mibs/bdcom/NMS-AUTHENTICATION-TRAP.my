@@ -1,0 +1,98 @@
+-- *****************************************************************
+-- NMS-AUTHENTICATION-TRAP.MIB: NMS AUTHENTICATION TRAP MIB
+--
+-- JAN 2010
+-- Edit by LIUQIANG
+-- Copyright (c) 2010 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-AUTHENTICATION-TRAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    IpAddress   				FROM RFC1155-SMI
+    nmsEPONGroup,nmsMgmt                                 FROM NMS-SMI;
+
+
+               nmsAuthenticationTrap         OBJECT IDENTIFIER ::= { nmsMgmt 188 }
+               
+               
+    
+-- Notifications
+          authenIpAddr OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Definition of variable binding in authentication trap."
+              ::= { nmsAuthenticationTrap 1 }
+              
+          authenVty OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Definition of variable binding in authentication trap."
+              ::= { nmsAuthenticationTrap 2 }
+              
+          authenUserName OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Definition of variable binding in authentication trap."
+              ::= { nmsAuthenticationTrap 3 }
+              
+          authenTime OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Definition of variable binding in authentication trap."
+              ::= { nmsAuthenticationTrap 4 }
+              
+          authenStatus OBJECT-TYPE
+              SYNTAX  INTEGER{
+                                success(0),
+                                failed(1)
+                             }
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Definition of variable binding in authentication trap."
+              ::= { nmsAuthenticationTrap 5 }
+              
+              
+              
+              
+
+	nmsAuthNotifications OBJECT IDENTIFIER
+                                ::= { nmsAuthenticationTrap 6 }
+
+
+	nmsAuthNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       authenIpAddr,
+                       authenVty,
+                       authenUserName,
+                       authenTime,
+                       authenStatus
+                        }
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when login authentication succeeds or fails."
+    		::= { nmsAuthNotifications 1 }
+
+              
+END
+               
+
+	
+
+
+
+

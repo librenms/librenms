@@ -1,0 +1,189 @@
+-- *****************************************************************
+-- NMS-FILTER-TRAP.my: NMS FILTER TRAP MIB
+--
+-- November 2008
+-- Edit by LIUQIANG
+-- Copyright (c) 2008 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-FILTER-TRAP DEFINITIONS ::= BEGIN
+
+
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmslocal                              		FROM NMS-SMI
+    IpAddress, TimeTicks                                   FROM RFC1155-SMI
+    PhysAddress				                FROM RFC1213-MIB;
+
+--definition of the filter table content
+
+               nmsfilter         OBJECT IDENTIFIER ::= { nmslocal 222 }
+               
+               TypeOfBlock ::= INTEGER
+                	{ arp(1),
+                           bpdu(2),
+                           dhcp(3),
+                           ip(4),
+                           igmp(5)
+                         }
+                         
+               TypeOfAction ::= INTEGER
+                         {
+                           off(0),
+                           on(1)
+                          }
+
+               
+               
+               
+               nmsFilterTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSFilterEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of filter entries."
+                   ::= { nmsfilter 1 }
+
+               nmsFilterEntry OBJECT-TYPE
+                   SYNTAX  NMSFilterEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of filter objects in the
+                            NMS device which includes the blocked content."
+                   INDEX { filterIndex }
+               ::= { nmsFilterTable 1 }
+
+               NMSFilterEntry ::=
+                   SEQUENCE {
+                       lineIndex
+                           INTEGER (0..32),
+                       timeOcr
+                           TimeTicks,
+                       timeHold
+                           TimeTicks,                       
+                       filterIpAddress    
+                           IpAddress,
+                       filterPhyAddress
+                       	   PhysAddress,
+                       portNum
+                       	   INTEGER,
+                       message
+                       	   TypeOfBlock,
+                       vlanID
+                       	   INTEGER (1..4094),
+                       Action
+                       	   TypeOfAction	
+                  }
+              
+		
+               lineIndex OBJECT-TYPE
+                   SYNTAX  INTEGER (0..32)
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "index of the filter table."
+                   ::= { nmsFilterEntry 1 }
+		
+
+              timeOcr OBJECT-TYPE
+                   SYNTAX  TimeTicks
+              	   ACCESS  read-only
+              	   STATUS  mandatory
+              	   DESCRIPTION
+                   	   "Occurance time of blocking."
+              	   ::= { nmsFilterEntry 2 }
+
+
+
+              timeHold OBJECT-TYPE
+                   SYNTAX  TimeTicks
+              	   ACCESS  read-only
+              	   STATUS  mandatory
+              	   DESCRIPTION
+                   	   "Hold time of blocking."
+              	   ::= { nmsFilterEntry 3 }
+
+
+              filterIpAddress OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                    DESCRIPTION
+                      "The IP address of blocked device."
+              	   ::= { nmsFilterEntry 4 }
+
+
+              filterPhyAddress OBJECT-TYPE
+                   SYNTAX  PhysAddress
+              	   ACCESS  read-only
+              	   STATUS  mandatory
+              	   DESCRIPTION
+                   	   "The mac address of blocked device."
+              	   ::= { nmsFilterEntry 5 }
+
+              portNum OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "interface index to be blocked."
+                   ::= { nmsFilterEntry 6 }
+
+              message OBJECT-TYPE
+                   SYNTAX  TypeOfBlock
+              	   ACCESS  read-only
+              	   STATUS  mandatory
+              	   DESCRIPTION
+                   	   "Type of blocking."
+              	   ::= { nmsFilterEntry 7 }
+
+
+              vlanID OBJECT-TYPE
+                   SYNTAX  INTEGER (1..4094)
+                   ACCESS  read-only
+                   STATUS  mandatory
+                    DESCRIPTION
+                      "The vlan identifier of blocked device port."
+              	   ::= { nmsFilterEntry 8 }
+
+
+              Action OBJECT-TYPE
+                   SYNTAX  TypeOfAction
+              	   ACCESS  read-only
+              	   STATUS  mandatory
+              	   DESCRIPTION
+                   	   "The action, which means block or unblock."
+              	   ::= { nmsFilterEntry 9 }
+                   
+
+-- Notifications
+	nmsFilterMIBNotifications OBJECT IDENTIFIER
+                                ::= { nmsfilter 2 }
+
+
+	nmsFilterNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       timeOcr,
+                       timeHold,
+                       filterIpAddress,
+                       filterPhyAddress,
+                       portNum,
+                       message,
+                       vlanID,
+                       Action
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when certain defined types of packages have been blocked or unblocked."
+    		::= { nmsFilterMIBNotifications 1 }
+
+              
+
+END

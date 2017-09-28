@@ -36,5 +36,17 @@
    to the overview menu.</description>
    <pubDate>Mon, 12 Sep 2016 20:00:00 +0000</pubDate>
  </item>
+ <item>
+   <title>Wireless Section in Beta</title>
+   <description>The new wireless section is under development. Please visit our community to discuss these changes and help improve LibreNMS.
+   https://t.libren.ms/5fglp</description>
+   <pubDate>Mon, 1 May 2017 20:00:00 +0000</pubDate>
+ </item>
+ <item>
+   <title>Update to alerting to normal users</title>
+   <description>We have released an update to fix normal users receiving alerts with no ability to turn this off. An option is now available within the General alert settings section to
+   enable this. Please note that the default is off to match with the other default contact settings. If you expect normal users to receive alerts then you should enable this new option.</description>
+   <pubDate>Mon, 15 May 2017 23:00:00 +0000</pubDate>
+ </item>
 </channel>
 </rss>

@@ -1,0 +1,51 @@
+-- *****************************************************************
+-- NMS-EPON-ONU-IF-TRAP.MIB: NMS EPON OLT CHIP STATUS TRAP MIB
+--
+-- October 2009
+-- Edit by LIUQIANG
+-- Copyright (c) 2008 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-EPON-ONU-IF-TRAP DEFINITIONS ::= BEGIN
+
+
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsEPONGroup                                 FROM NMS-SMI
+    llidIfIndex                                 FROM NMS-EPON-LLID
+    ifDescr                                     FROM RFC1213-MIB                                                 
+    onuID                                      FROM NMS-EPON-ONU
+    onuIfSequenceNo, onuUniIfOperStatus         FROM NMS-EPON-ONU-INTERFACE;
+
+
+               nmsEponOnuIfStatusTrap         OBJECT IDENTIFIER ::= { nmsEPONGroup 19 }
+                         
+             
+
+-- Notifications
+	nmsEponOnuIfStatusNotifications OBJECT IDENTIFIER
+                                ::= { nmsEponOnuIfStatusTrap 1 }
+
+
+	nmsEponOnuIfStatusNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       llidIfIndex,
+                       onuID,
+                       ifDescr,
+                       onuIfSequenceNo,
+                       onuUniIfOperStatus
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when onu interface status changes ."
+    		::= { nmsEponOnuIfStatusNotifications 1 }
+
+              
+
+END

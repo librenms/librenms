@@ -7,11 +7,11 @@ TEXTUAL-CONVENTION, DisplayString, MacAddress, DateAndTime FROM SNMPv2-TC
 OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF;
 
 mikrotikExperimentalModule MODULE-IDENTITY
-  LAST-UPDATED "201608310000Z"
+  LAST-UPDATED "201703100000Z"
   ORGANIZATION "MikroTik"
   CONTACT-INFO "support@mikrotik.com"
   DESCRIPTION ""
-  REVISION "201608310000Z"
+  REVISION "201703100000Z"
   DESCRIPTION ""
   ::= { mikrotik 1 }
 
@@ -38,6 +38,7 @@ mtxrPOE OBJECT IDENTIFIER ::= { mtXRouterOs 15 }
 mtxrLTEModem OBJECT IDENTIFIER ::= { mtXRouterOs 16 }
 mtxrPartition OBJECT IDENTIFIER ::= { mtXRouterOs 17 }
 mtxrScriptRun OBJECT IDENTIFIER ::= { mtXRouterOs 18 }
+mtxrOptical OBJECT IDENTIFIER ::= { mtXRouterOs 19 }
 
 ObjectIndex ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "x"
@@ -77,6 +78,24 @@ Power ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d-1"
     STATUS current
     DESCRIPTION ""
+    SYNTAX Integer32 (-2147483648..2147483647)
+
+GDiv100 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS current
+    DESCRIPTION "/100"
+    SYNTAX Gauge32
+
+GDiv1000 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-3"
+    STATUS current
+    DESCRIPTION "/1000"
+    SYNTAX Gauge32
+
+IDiv1000 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-3"
+    STATUS current
+    DESCRIPTION "/1000"
     SYNTAX Integer32 (-2147483648..2147483647)
 
 BoolValue ::= TEXTUAL-CONVENTION
@@ -480,15 +499,17 @@ MtxrWlCMRtabEntry ::= SEQUENCE {
     mtxrWlCMRtabTxRate Gauge32,
     mtxrWlCMRtabRxRate Gauge32,
     mtxrWlCMRtabTxStrength Integer32,
-    mtxrWlCMRtabRxStrength Integer32
+    mtxrWlCMRtabRxStrength Integer32,
+    mtxrWlCMRtabSsid DisplayString
 }
 
 mtxrWlCMRtabAddr OBJECT-TYPE
     SYNTAX MacAddress
-    MAX-ACCESS not-accessible
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION ""
     ::= { mtxrWlCMRtabEntry 1 }
+    -- should not be accessible in SMIv2
 
 mtxrWlCMRtabIface OBJECT-TYPE
     SYNTAX ObjectIndex
@@ -560,6 +581,13 @@ mtxrWlCMRtabRxStrength OBJECT-TYPE
     DESCRIPTION ""
     ::= { mtxrWlCMRtabEntry 11 }
 
+mtxrWlCMRtabSsid OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWlCMRtabEntry 12 }
+
 mtxrWlCMRtabEntryCount OBJECT-TYPE
     SYNTAX Gauge32
     MAX-ACCESS read-only
@@ -567,7 +595,61 @@ mtxrWlCMRtabEntryCount OBJECT-TYPE
     DESCRIPTION "Wireless CAPSMAN registration table entry count"
     ::= { mtxrWireless 6 }
 
+mtxrWirelessGroup OBJECT-GROUP OBJECTS {
+        mtxrWlStatTxRate,
+	mtxrWlStatRxRate,
+	mtxrWlStatStrength,
+	mtxrWlStatSsid,
+        mtxrWlStatBssid,
+	mtxrWlStatFreq,
+	mtxrWlStatBand,
+	mtxrWlRtabStrength,
+	mtxrWlRtabTxBytes,
+        mtxrWlRtabRxBytes,
+	mtxrWlRtabTxPackets,
+	mtxrWlRtabRxPackets,
+        mtxrWlRtabTxRate,
+	mtxrWlRtabRxRate,
+	mtxrWlRtabEntryCount,
+        mtxrWlRtabRouterOSVersion,
+        mtxrWlRtabUptime,
+        mtxrWlRtabSignalToNoise,
+        mtxrWlRtabTxStrengthCh0,
+        mtxrWlRtabRxStrengthCh0,
+        mtxrWlRtabTxStrengthCh1,
+        mtxrWlRtabRxStrengthCh1,
+        mtxrWlRtabTxStrengthCh2,
+        mtxrWlRtabRxStrengthCh2,
+        mtxrWlRtabTxStrength,
+        mtxrWlApTxRate,
+	mtxrWlApRxRate,
+	mtxrWlApSsid,
+        mtxrWlApBssid,
+        mtxrWlApClientCount,
+        mtxrWlApBand,
+        mtxrWlApFreq,
+        mtxrWlApNoiseFloor,
+        mtxrWlApOverallTxCCQ,
+        mtxrWlApAuthClientCount,
+        mtxrWlCMRtabAddr,
+        mtxrWlCMRtabTxBytes,
+        mtxrWlCMRtabRxBytes,
+        mtxrWlCMRtabTxPackets,
+        mtxrWlCMRtabRxPackets,
+        mtxrWlCMRtabTxRate,
+        mtxrWlCMRtabRxRate,
+        mtxrWlCMRtabUptime,
+        mtxrWlCMRtabTxStrength,
+        mtxrWlCMRtabRxStrength,
+        mtxrWlCMRtabSsid,
+        mtxrWlCMRtabEntryCount
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 1 }
+
 -- QUEUES ********************************************************************
+
 mtxrQueueSimpleTable OBJECT-TYPE
     SYNTAX SEQUENCE OF MtxrQueueSimpleEntry
     MAX-ACCESS not-accessible
@@ -796,6 +878,25 @@ mtxrQueueTreeDropped OBJECT-TYPE
     DESCRIPTION ""
     ::= { mtxrQueueTreeEntry 9 }
 
+mtxrQueueGroup OBJECT-GROUP OBJECTS {
+        mtxrQueueSimpleName, mtxrQueueSimpleSrcAddr, mtxrQueueSimpleSrcMask,
+        mtxrQueueSimpleDstAddr, mtxrQueueSimpleDstMask, mtxrQueueSimpleIface,
+        mtxrQueueSimpleBytesIn, mtxrQueueSimpleBytesOut,
+        mtxrQueueSimplePacketsIn, mtxrQueueSimplePacketsOut, mtxrQueueTreeName,
+        mtxrQueueSimplePCQQueuesIn,
+        mtxrQueueSimplePCQQueuesOut,
+        mtxrQueueSimpleDroppedIn,
+        mtxrQueueSimpleDroppedOut,
+        mtxrQueueTreeFlow, mtxrQueueTreeParentIndex, mtxrQueueTreeBytes,
+        mtxrQueueTreePackets,
+        mtxrQueueTreeHCBytes,
+        mtxrQueueTreePCQQueues,
+        mtxrQueueTreeDropped
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 2 }
+
 -- HEALTH ********************************************************************
 
 mtxrHlCoreVoltage OBJECT-TYPE
@@ -924,6 +1025,20 @@ mtxrHlFanSpeed2 OBJECT-TYPE
     DESCRIPTION "rpm"
     ::= { mtxrHealth 18 }
 
+mtxrHealthGroup OBJECT-GROUP OBJECTS {
+        mtxrHlCoreVoltage, mtxrHlThreeDotThreeVoltage, mtxrHlFiveVoltage,
+        mtxrHlTwelveVoltage, mtxrHlSensorTemperature, mtxrHlCpuTemperature,
+        mtxrHlBoardTemperature, mtxrHlVoltage, mtxrHlActiveFan, 
+	mtxrHlTemperature, mtxrHlProcessorTemperature,
+        mtxrHlCurrent, mtxrHlPower,
+        mtxrHlProcessorFrequency,
+        mtxrHlPowerSupplyState, mtxrHlBackupPowerSupplyState,
+        mtxrHlFanSpeed1, mtxrHlFanSpeed2
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 3 }
+
 -- LICENSE ********************************************************************
 
 mtxrLicSoftwareId OBJECT-TYPE
@@ -961,7 +1076,14 @@ mtxrLicUpgradableTo OBJECT-TYPE
     DESCRIPTION "upgradable to"
     ::= { mtxrLicense 5 }
 
--- ACTIVE USERS ***************************************************************
+mtxrLincenseGroup OBJECT-GROUP OBJECTS {
+        mtxrLicSoftwareId, mtxrLicUpgrUntil, mtxrLicLevel, mtxrLicVersion, mtxrLicUpgradableTo
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 4 }
+
+-- HOTSPOT ***************************************************************
 
 mtxrHotspotActiveUsersTable OBJECT-TYPE
     SYNTAX SEQUENCE OF MtxrHotspotActiveUsersTableEntry
@@ -1141,12 +1263,46 @@ mtxrHotspotActiveUserBlockedByAdvert OBJECT-TYPE
     DESCRIPTION ""
     ::= { mtxrHotspotActiveUsersTableEntry 20 }
 
+mtxrHotspotActiveUserGroup OBJECT-GROUP OBJECTS {
+	mtxrHotspotActiveUserServerID,
+	mtxrHotspotActiveUserName,
+	mtxrHotspotActiveUserDomain,
+	mtxrHotspotActiveUserIP,
+	mtxrHotspotActiveUserMAC,
+	mtxrHotspotActiveUserConnectTime,
+	mtxrHotspotActiveUserValidTillTime,
+	mtxrHotspotActiveUserIdleStartTime,
+	mtxrHotspotActiveUserIdleTimeout,
+	mtxrHotspotActiveUserPingTimeout,
+	mtxrHotspotActiveUserBytesIn,
+	mtxrHotspotActiveUserBytesOut,
+	mtxrHotspotActiveUserPacketsIn,
+	mtxrHotspotActiveUserPacketsOut,
+	mtxrHotspotActiveUserLimitBytesIn,
+	mtxrHotspotActiveUserLimitBytesOut,
+	mtxrHotspotActiveUserAdvertStatus,
+	mtxrHotspotActiveUserRadius,
+	mtxrHotspotActiveUserBlockedByAdvert
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 5 }
+
+-- DHCP ********************************************************************
+
 mtxrDHCPLeaseCount OBJECT-TYPE
     SYNTAX Gauge32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION ""
     ::= { mtxrDHCP 1 }
+
+mtxrDHCPGroup OBJECT-GROUP OBJECTS {
+        mtxrDHCPLeaseCount
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 12 }
 
 -- SYSTEM ********************************************************************
 
@@ -1199,6 +1355,19 @@ mtxrFirmwareUpgradeVersion OBJECT-TYPE
     DESCRIPTION "Upgrade firmware version"
     ::= { mtxrSystem 7 }
 
+mtxrSystemGroup OBJECT-GROUP OBJECTS {
+        mtxrSystemReboot,
+        mtxrUSBPowerReset,
+        mtxrSerialNumber,
+        mtxrFirmwareVersion,
+        mtxrNote,
+        mtxrBuildTime,
+        mtxrFirmwareUpgradeVersion
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 13 }
+
 -- SCRIPTS ********************************************************************
 
 mtxrScriptTable OBJECT-TYPE
@@ -1242,6 +1411,13 @@ mtxrScriptRunCmd OBJECT-TYPE
     STATUS current
     DESCRIPTION "set non zero to run"
     ::= { mtxrScriptTableEntry 3 }
+
+mtxrScriptGroup OBJECT-GROUP OBJECTS {
+	mtxrScriptName, mtxrScriptRunCmd
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 8 }
 
 -- SCRIPT RUN *****************************************************************
 
@@ -1354,6 +1530,14 @@ mtxrDnConnected OBJECT-TYPE
     DESCRIPTION "0 - not connected, connected otherwise"
     ::= { mtxrDnStatEntry 6 }
 
+mtxrNstremeDualGroup OBJECT-GROUP OBJECTS {
+	mtxrDnStatTxRate, mtxrDnStatRxRate,
+	mtxrDnStatTxStrength, mtxrDnStatRxStrength, mtxrDnConnected
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 10 }
+
 -- NEIGHBOR *******************************************************************
 
 mtxrNeighborTable OBJECT-TYPE
@@ -1438,139 +1622,6 @@ mtxrNeighborInterfaceID OBJECT-TYPE
     DESCRIPTION ""
     ::= { mtxrNeighborTableEntry 8 }
 
--- GROUPS *********************************************************************
-
-mtxrWirelessGroup OBJECT-GROUP OBJECTS {
-        mtxrWlStatTxRate,
-	mtxrWlStatRxRate,
-	mtxrWlStatStrength,
-	mtxrWlStatSsid,
-        mtxrWlStatBssid,
-	mtxrWlStatFreq,
-	mtxrWlStatBand,
-	mtxrWlRtabStrength,
-	mtxrWlRtabTxBytes,
-        mtxrWlRtabRxBytes,
-	mtxrWlRtabTxPackets,
-	mtxrWlRtabRxPackets,
-        mtxrWlRtabTxRate,
-	mtxrWlRtabRxRate,
-	mtxrWlRtabEntryCount,
-        mtxrWlRtabRouterOSVersion,
-        mtxrWlRtabUptime,
-        mtxrWlRtabSignalToNoise,
-        mtxrWlRtabTxStrengthCh0,
-        mtxrWlRtabRxStrengthCh0,
-        mtxrWlRtabTxStrengthCh1,
-        mtxrWlRtabRxStrengthCh1,
-        mtxrWlRtabTxStrengthCh2,
-        mtxrWlRtabRxStrengthCh2,
-        mtxrWlRtabTxStrength,
-        mtxrWlApTxRate,
-	mtxrWlApRxRate,
-	mtxrWlApSsid,
-        mtxrWlApBssid,
-        mtxrWlApClientCount,
-        mtxrWlApBand,
-        mtxrWlApFreq,
-        mtxrWlApNoiseFloor,
-        mtxrWlApOverallTxCCQ,
-        mtxrWlApAuthClientCount,
-        mtxrWlCMRtabTxBytes,
-        mtxrWlCMRtabRxBytes,
-        mtxrWlCMRtabTxPackets,
-        mtxrWlCMRtabRxPackets,
-        mtxrWlCMRtabTxRate,
-        mtxrWlCMRtabRxRate,
-        mtxrWlCMRtabUptime,
-        mtxrWlCMRtabTxStrength,
-        mtxrWlCMRtabRxStrength,
-        mtxrWlCMRtabEntryCount
-    }
-    STATUS current
-    DESCRIPTION ""
-    ::= { mtXRouterOsGroups 1 }
-
-mtxrQueueGroup OBJECT-GROUP OBJECTS {
-        mtxrQueueSimpleName, mtxrQueueSimpleSrcAddr, mtxrQueueSimpleSrcMask,
-        mtxrQueueSimpleDstAddr, mtxrQueueSimpleDstMask, mtxrQueueSimpleIface,
-        mtxrQueueSimpleBytesIn, mtxrQueueSimpleBytesOut,
-        mtxrQueueSimplePacketsIn, mtxrQueueSimplePacketsOut, mtxrQueueTreeName,
-        mtxrQueueSimplePCQQueuesIn,
-        mtxrQueueSimplePCQQueuesOut,
-        mtxrQueueSimpleDroppedIn,
-        mtxrQueueSimpleDroppedOut,
-        mtxrQueueTreeFlow, mtxrQueueTreeParentIndex, mtxrQueueTreeBytes,
-        mtxrQueueTreePackets,
-        mtxrQueueTreeHCBytes,
-        mtxrQueueTreePCQQueues,
-        mtxrQueueTreeDropped
-    }
-    STATUS current
-    DESCRIPTION ""
-    ::= { mtXRouterOsGroups 2 }
-
-mtxrHealthGroup OBJECT-GROUP OBJECTS {
-        mtxrHlCoreVoltage, mtxrHlThreeDotThreeVoltage, mtxrHlFiveVoltage,
-        mtxrHlTwelveVoltage, mtxrHlSensorTemperature, mtxrHlCpuTemperature,
-        mtxrHlBoardTemperature, mtxrHlVoltage, mtxrHlActiveFan, 
-	mtxrHlTemperature, mtxrHlProcessorTemperature,
-        mtxrHlCurrent, mtxrHlPower,
-        mtxrHlProcessorFrequency,
-        mtxrHlPowerSupplyState, mtxrHlBackupPowerSupplyState,
-        mtxrHlFanSpeed1, mtxrHlFanSpeed2
-    }
-    STATUS current
-    DESCRIPTION ""
-    ::= { mtXRouterOsGroups 3 }
-
-mtxrLincenseGroup OBJECT-GROUP OBJECTS {
-        mtxrLicSoftwareId, mtxrLicUpgrUntil, mtxrLicLevel, mtxrLicVersion, mtxrLicUpgradableTo
-    }
-    STATUS current
-    DESCRIPTION ""
-    ::= { mtXRouterOsGroups 4 }
-
-mtxrHotspotActiveUserGroup OBJECT-GROUP OBJECTS {
-	mtxrHotspotActiveUserServerID,
-	mtxrHotspotActiveUserName,
-	mtxrHotspotActiveUserDomain,
-	mtxrHotspotActiveUserIP,
-	mtxrHotspotActiveUserMAC,
-	mtxrHotspotActiveUserConnectTime,
-	mtxrHotspotActiveUserValidTillTime,
-	mtxrHotspotActiveUserIdleStartTime,
-	mtxrHotspotActiveUserIdleTimeout,
-	mtxrHotspotActiveUserPingTimeout,
-	mtxrHotspotActiveUserBytesIn,
-	mtxrHotspotActiveUserBytesOut,
-	mtxrHotspotActiveUserPacketsIn,
-	mtxrHotspotActiveUserPacketsOut,
-	mtxrHotspotActiveUserLimitBytesIn,
-	mtxrHotspotActiveUserLimitBytesOut,
-	mtxrHotspotActiveUserAdvertStatus,
-	mtxrHotspotActiveUserRadius,
-	mtxrHotspotActiveUserBlockedByAdvert
-    }
-    STATUS current
-    DESCRIPTION ""
-    ::= { mtXRouterOsGroups 5 }
-
-mtxrScriptGroup OBJECT-GROUP OBJECTS {
-	mtxrScriptName, mtxrScriptRunCmd
-    }
-    STATUS current
-    DESCRIPTION ""
-    ::= { mtXRouterOsGroups 8 }
-
-mtxrNstremeDualGroup OBJECT-GROUP OBJECTS {
-	mtxrDnStatTxRate, mtxrDnStatRxRate,
-	mtxrDnStatTxStrength, mtxrDnStatRxStrength, mtxrDnConnected
-    }
-    STATUS current
-    DESCRIPTION ""
-    ::= { mtXRouterOsGroups 10 }
-
 mtxrNeighborGroup OBJECT-GROUP OBJECTS {
 	mtxrNeighborIpAddress,
 	mtxrNeighborMacAddress,
@@ -1583,166 +1634,6 @@ mtxrNeighborGroup OBJECT-GROUP OBJECTS {
     STATUS current
     DESCRIPTION ""
     ::= { mtXRouterOsGroups 11 }
-
-mtxrDHCPGroup OBJECT-GROUP OBJECTS {
-        mtxrDHCPLeaseCount
-    }
-    STATUS current
-    DESCRIPTION ""
-    ::= { mtXRouterOsGroups 12 }
-
-mtxrSystemGroup OBJECT-GROUP OBJECTS {
-        mtxrSystemReboot,
-        mtxrUSBPowerReset,
-        mtxrSerialNumber,
-        mtxrFirmwareVersion,
-        mtxrNote,
-        mtxrBuildTime,
-        mtxrFirmwareUpgradeVersion
-    }
-    STATUS current
-    DESCRIPTION ""
-    ::= { mtXRouterOsGroups 13 }
-
-mtxrTrapGroup NOTIFICATION-GROUP NOTIFICATIONS {
-        mtxrTrap,
-        mtxrTemperatureException
-    }
-    STATUS current
-    DESCRIPTION ""
-    ::= { mtXRouterOsGroups 14 }
-
-mtxrGPSGroup OBJECT-GROUP OBJECTS {
-        mtxrDate,
-        mtxrLongtitude,
-        mtxrLatitude,
-        mtxrAltitude,
-        mtxrSpeed,
-        mtxrSattelites,
-        mtxrValid
-    }
-    STATUS current
-    DESCRIPTION ""
-    ::= { mtXRouterOsGroups 15 }
-
-mtxrWirelessModemGroup OBJECT-GROUP OBJECTS {
-        mtxrWirelessModemSignalStrength,
-        mtxrWirelessModemSignalECIO
-    }
-    STATUS current
-    DESCRIPTION ""
-    ::= { mtXRouterOsGroups 16 }
-
-mtxrInterfaceStatsGroup OBJECT-GROUP OBJECTS {
-        mtxrInterfaceStatsName,
-        mtxrInterfaceStatsDriverRxBytes,
-        mtxrInterfaceStatsDriverRxPackets,
-        mtxrInterfaceStatsDriverTxBytes,
-        mtxrInterfaceStatsDriverTxPackets,
-
-        mtxrInterfaceStatsTxRx64,
-        mtxrInterfaceStatsTxRx65To127,
-        mtxrInterfaceStatsTxRx128To255,
-        mtxrInterfaceStatsTxRx256To511,
-        mtxrInterfaceStatsTxRx512To1023,
-        mtxrInterfaceStatsTxRx1024To1518,
-        mtxrInterfaceStatsTxRx1519ToMax,
-
-        mtxrInterfaceStatsRxBytes,
-        mtxrInterfaceStatsRxPackets,
-        mtxrInterfaceStatsRxTooShort,
-        mtxrInterfaceStatsRx64,
-        mtxrInterfaceStatsRx65To127,
-        mtxrInterfaceStatsRx128To255,
-        mtxrInterfaceStatsRx256To511,
-        mtxrInterfaceStatsRx512To1023,
-        mtxrInterfaceStatsRx1024To1518,
-        mtxrInterfaceStatsRx1519ToMax,
-        mtxrInterfaceStatsRxTooLong,
-        mtxrInterfaceStatsRxBroadcast,
-        mtxrInterfaceStatsRxPause,
-        mtxrInterfaceStatsRxMulticast,
-        mtxrInterfaceStatsRxFCSError,
-        mtxrInterfaceStatsRxAlignError,
-        mtxrInterfaceStatsRxFragment,
-        mtxrInterfaceStatsRxOverflow,
-        mtxrInterfaceStatsRxControl,
-        mtxrInterfaceStatsRxUnknownOp,
-        mtxrInterfaceStatsRxLengthError,
-        mtxrInterfaceStatsRxCodeError,
-        mtxrInterfaceStatsRxCarrierError,
-        mtxrInterfaceStatsRxJabber,
-        mtxrInterfaceStatsRxDrop,
-
-        mtxrInterfaceStatsTxBytes,
-        mtxrInterfaceStatsTxPackets,
-        mtxrInterfaceStatsTxTooShort,
-        mtxrInterfaceStatsTx64,
-        mtxrInterfaceStatsTx65To127,
-        mtxrInterfaceStatsTx128To255,
-        mtxrInterfaceStatsTx256To511,
-        mtxrInterfaceStatsTx512To1023,
-        mtxrInterfaceStatsTx1024To1518,
-        mtxrInterfaceStatsTx1519ToMax,
-        mtxrInterfaceStatsTxTooLong,
-        mtxrInterfaceStatsTxBroadcast,
-        mtxrInterfaceStatsTxPause,
-        mtxrInterfaceStatsTxMulticast,
-        mtxrInterfaceStatsTxUnderrun,
-        mtxrInterfaceStatsTxCollision,
-        mtxrInterfaceStatsTxExcessiveCollision,
-        mtxrInterfaceStatsTxMultipleCollision,
-        mtxrInterfaceStatsTxSingleCollision,
-        mtxrInterfaceStatsTxExcessiveDeferred,
-        mtxrInterfaceStatsTxDeferred,
-        mtxrInterfaceStatsTxLateCollision,
-        mtxrInterfaceStatsTxTotalCollision,
-        mtxrInterfaceStatsTxPauseHonored,
-        mtxrInterfaceStatsTxDrop,
-        mtxrInterfaceStatsTxJabber,
-        mtxrInterfaceStatsTxFCSError,
-        mtxrInterfaceStatsTxControl,
-        mtxrInterfaceStatsTxFragment
-    }
-    STATUS current
-    DESCRIPTION ""
-    ::= { mtXRouterOsGroups 17 }
-
-mtxrPOEGroup OBJECT-GROUP OBJECTS {
-        mtxrPOEName,
-        mtxrPOEStatus,
-        mtxrPOEVoltage,
-        mtxrPOECurrent,
-        mtxrPOEPower
-    }
-    STATUS current
-    DESCRIPTION ""
-    ::= { mtXRouterOsGroups 18 }
-
-mtxrLTEModemGroup OBJECT-GROUP OBJECTS {
-        mtxrLTEModemSignalRSSI,
-        mtxrLTEModemSignalRSRQ,
-        mtxrLTEModemSignalRSRP,
-        mtxrLTEModemCellId,
-        mtxrLTEModemAccessTechnology
-    }
-    STATUS current
-    DESCRIPTION ""
-    ::= { mtXRouterOsGroups 19 }
-
--- TRAPS **********************************************************************
-
-mtxrNotifications OBJECT IDENTIFIER ::= { mtxrTraps 0 }
-
-mtxrTrap NOTIFICATION-TYPE
-    STATUS  current
-    DESCRIPTION "Mikrotik trap OID"
-    ::= { mtxrNotifications 1 }
-
-mtxrTemperatureException NOTIFICATION-TYPE
-    STATUS current
-    DESCRIPTION "Mikrotik CPU temperature exception trap"
-    ::= { mtxrNotifications 2 }
 
 -- GPS ************************************************************************
 
@@ -1795,6 +1686,19 @@ mtxrValid OBJECT-TYPE
     DESCRIPTION "is the data valid"
     ::= { mtxrGps 7 }
 
+mtxrGPSGroup OBJECT-GROUP OBJECTS {
+        mtxrDate,
+        mtxrLongtitude,
+        mtxrLatitude,
+        mtxrAltitude,
+        mtxrSpeed,
+        mtxrSattelites,
+        mtxrValid
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 15 }
+
 -- Wireless Modem ************************************************************
 
 mtxrWirelessModemSignalStrength OBJECT-TYPE
@@ -1810,6 +1714,14 @@ mtxrWirelessModemSignalECIO OBJECT-TYPE
     STATUS current
     DESCRIPTION "signal EC/IO in dB (if first ppp-client modem supports)"
     ::= { mtxrWirelessModem 2 }
+
+mtxrWirelessModemGroup OBJECT-GROUP OBJECTS {
+        mtxrWirelessModemSignalStrength,
+        mtxrWirelessModemSignalECIO
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 16 }
 
 -- Interface Stats ************************************************************
 
@@ -2373,6 +2285,81 @@ mtxrInterfaceStatsTxFragment OBJECT-TYPE
     DESCRIPTION ""
     ::= { mtxrInterfaceStatsEntry 89 }
 
+mtxrInterfaceStatsGroup OBJECT-GROUP OBJECTS {
+        mtxrInterfaceStatsName,
+        mtxrInterfaceStatsDriverRxBytes,
+        mtxrInterfaceStatsDriverRxPackets,
+        mtxrInterfaceStatsDriverTxBytes,
+        mtxrInterfaceStatsDriverTxPackets,
+
+        mtxrInterfaceStatsTxRx64,
+        mtxrInterfaceStatsTxRx65To127,
+        mtxrInterfaceStatsTxRx128To255,
+        mtxrInterfaceStatsTxRx256To511,
+        mtxrInterfaceStatsTxRx512To1023,
+        mtxrInterfaceStatsTxRx1024To1518,
+        mtxrInterfaceStatsTxRx1519ToMax,
+
+        mtxrInterfaceStatsRxBytes,
+        mtxrInterfaceStatsRxPackets,
+        mtxrInterfaceStatsRxTooShort,
+        mtxrInterfaceStatsRx64,
+        mtxrInterfaceStatsRx65To127,
+        mtxrInterfaceStatsRx128To255,
+        mtxrInterfaceStatsRx256To511,
+        mtxrInterfaceStatsRx512To1023,
+        mtxrInterfaceStatsRx1024To1518,
+        mtxrInterfaceStatsRx1519ToMax,
+        mtxrInterfaceStatsRxTooLong,
+        mtxrInterfaceStatsRxBroadcast,
+        mtxrInterfaceStatsRxPause,
+        mtxrInterfaceStatsRxMulticast,
+        mtxrInterfaceStatsRxFCSError,
+        mtxrInterfaceStatsRxAlignError,
+        mtxrInterfaceStatsRxFragment,
+        mtxrInterfaceStatsRxOverflow,
+        mtxrInterfaceStatsRxControl,
+        mtxrInterfaceStatsRxUnknownOp,
+        mtxrInterfaceStatsRxLengthError,
+        mtxrInterfaceStatsRxCodeError,
+        mtxrInterfaceStatsRxCarrierError,
+        mtxrInterfaceStatsRxJabber,
+        mtxrInterfaceStatsRxDrop,
+
+        mtxrInterfaceStatsTxBytes,
+        mtxrInterfaceStatsTxPackets,
+        mtxrInterfaceStatsTxTooShort,
+        mtxrInterfaceStatsTx64,
+        mtxrInterfaceStatsTx65To127,
+        mtxrInterfaceStatsTx128To255,
+        mtxrInterfaceStatsTx256To511,
+        mtxrInterfaceStatsTx512To1023,
+        mtxrInterfaceStatsTx1024To1518,
+        mtxrInterfaceStatsTx1519ToMax,
+        mtxrInterfaceStatsTxTooLong,
+        mtxrInterfaceStatsTxBroadcast,
+        mtxrInterfaceStatsTxPause,
+        mtxrInterfaceStatsTxMulticast,
+        mtxrInterfaceStatsTxUnderrun,
+        mtxrInterfaceStatsTxCollision,
+        mtxrInterfaceStatsTxExcessiveCollision,
+        mtxrInterfaceStatsTxMultipleCollision,
+        mtxrInterfaceStatsTxSingleCollision,
+        mtxrInterfaceStatsTxExcessiveDeferred,
+        mtxrInterfaceStatsTxDeferred,
+        mtxrInterfaceStatsTxLateCollision,
+        mtxrInterfaceStatsTxTotalCollision,
+        mtxrInterfaceStatsTxPauseHonored,
+        mtxrInterfaceStatsTxDrop,
+        mtxrInterfaceStatsTxJabber,
+        mtxrInterfaceStatsTxFCSError,
+        mtxrInterfaceStatsTxControl,
+        mtxrInterfaceStatsTxFragment
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 17 }
+
 -- POE ************************************************************************
 
 mtxrPOETable OBJECT-TYPE
@@ -2446,6 +2433,17 @@ mtxrPOEPower OBJECT-TYPE
     DESCRIPTION "W"
     ::= { mtxrPOEEntry 6 }
 
+mtxrPOEGroup OBJECT-GROUP OBJECTS {
+        mtxrPOEName,
+        mtxrPOEStatus,
+        mtxrPOEVoltage,
+        mtxrPOECurrent,
+        mtxrPOEPower
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 18 }
+
 -- LTE Modem ************************************************************
 
 mtxrLTEModemTable OBJECT-TYPE
@@ -2469,7 +2467,8 @@ MtxrLTEModemEntry ::= SEQUENCE {
     mtxrLTEModemSignalRSRQ Integer32,
     mtxrLTEModemSignalRSRP Integer32,
     mtxrLTEModemCellId HexInt,
-    mtxrLTEModemAccessTechnology INTEGER
+    mtxrLTEModemAccessTechnology INTEGER,
+    mtxrLTEModemSignalSINR Integer32
 }
 
 mtxrLTEModemInterfaceIndex OBJECT-TYPE
@@ -2523,6 +2522,25 @@ mtxrLTEModemAccessTechnology OBJECT-TYPE
     STATUS current
     DESCRIPTION "as reported by +CREG"
     ::= { mtxrLTEModemEntry 6 }
+
+mtxrLTEModemSignalSINR OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "dB"
+    ::= { mtxrLTEModemEntry 7 }
+
+mtxrLTEModemGroup OBJECT-GROUP OBJECTS {
+        mtxrLTEModemSignalRSSI,
+        mtxrLTEModemSignalRSRQ,
+        mtxrLTEModemSignalRSRP,
+        mtxrLTEModemCellId,
+        mtxrLTEModemAccessTechnology,
+        mtxrLTEModemSignalSINR
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 19 }
 
 -- Partition ************************************************************
 
@@ -2603,6 +2621,150 @@ mtxrPartitionGroup OBJECT-GROUP OBJECTS {
     DESCRIPTION ""
     ::= { mtXRouterOsGroups 20 }
 
+-- OPTICAL *****************************************************************
+
+mtxrOpticalTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MtxrOpticalTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "SFP and GPON information"
+    ::= { mtxrOptical 1 }
+
+mtxrOpticalTableEntry OBJECT-TYPE
+    SYNTAX MtxrOpticalTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { mtxrOpticalIndex }
+    ::= { mtxrOpticalTable 1 }
+
+MtxrOpticalTableEntry ::= SEQUENCE {
+	mtxrOpticalIndex ObjectIndex,
+        mtxrOpticalName DisplayString,
+        mtxrOpticalRxLoss BoolValue,
+        mtxrOpticalTxFault BoolValue,
+        mtxrOpticalWavelength GDiv100,
+        mtxrOpticalTemperature Gauge32,
+        mtxrOpticalSupplyVoltage GDiv1000,
+        mtxrOpticalTxBiasCurrent Gauge32,
+        mtxrOpticalTxPower IDiv1000,
+        mtxrOpticalRxPower IDiv1000
+}
+
+mtxrOpticalGroup OBJECT-GROUP OBJECTS {
+        mtxrOpticalName,
+        mtxrOpticalRxLoss,
+        mtxrOpticalTxFault,
+        mtxrOpticalWavelength,
+        mtxrOpticalTemperature,
+        mtxrOpticalSupplyVoltage,
+        mtxrOpticalTxBiasCurrent,
+        mtxrOpticalTxPower,
+        mtxrOpticalRxPower
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 6 }
+
+mtxrOpticalIndex OBJECT-TYPE
+    SYNTAX ObjectIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 1 }
+
+mtxrOpticalName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 2 }
+
+mtxrOpticalRxLoss OBJECT-TYPE
+    SYNTAX BoolValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 3 }
+
+mtxrOpticalTxFault OBJECT-TYPE
+    SYNTAX BoolValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 4 }
+
+mtxrOpticalWavelength OBJECT-TYPE
+    SYNTAX GDiv100
+    UNITS "nm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 5 }
+
+mtxrOpticalTemperature OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "C"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 6 }
+
+mtxrOpticalSupplyVoltage OBJECT-TYPE
+    SYNTAX GDiv1000
+    UNITS "V"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 7 }
+
+mtxrOpticalTxBiasCurrent OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "mA"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 8 }
+
+mtxrOpticalTxPower OBJECT-TYPE
+    SYNTAX IDiv1000
+    UNITS "dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 9 }
+
+mtxrOpticalRxPower OBJECT-TYPE
+    SYNTAX IDiv1000
+    UNITS "dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 10 }
+
+-- TRAPS **********************************************************************
+
+mtxrNotifications OBJECT IDENTIFIER ::= { mtxrTraps 0 }
+
+mtxrTrap NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION "Mikrotik trap OID"
+    ::= { mtxrNotifications 1 }
+
+mtxrTemperatureException NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Mikrotik CPU temperature exception trap"
+    ::= { mtxrNotifications 2 }
+
+mtxrTrapGroup NOTIFICATION-GROUP NOTIFICATIONS {
+        mtxrTrap,
+        mtxrTemperatureException
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 14 }
+
 -- ***************************************************************************
+
 END
 

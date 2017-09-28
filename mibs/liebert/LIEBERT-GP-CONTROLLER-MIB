@@ -1,0 +1,109 @@
+-- =============================================================================
+LIEBERT-GP-CONTROLLER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    Integer32, 
+    Unsigned32
+        FROM SNMPv2-SMI
+    liebertControllerModuleReg, 
+    lgpController
+        FROM LIEBERT-GP-REGISTRATION-MIB
+    ;
+
+-- =============================================================================
+-- Module Identification and Registration
+-- =============================================================================
+--
+liebertControllerModule MODULE-IDENTITY
+  LAST-UPDATED "200807020000Z"
+  ORGANIZATION "Liebert Corporation"
+  CONTACT-INFO
+      "Contact:   Technical Support
+
+      Postal:
+      Liebert Corporation
+      1050 Dearborn Drive
+      P.O. Box 29186
+      Columbus OH, 43229
+      US
+
+      Tel: +1 (800) 222-5877
+
+      E-mail: liebert.monitoring@emerson.com
+      Web:    www.liebert.com
+
+      Author:  Gregory M. Hoge"
+
+   DESCRIPTION
+      "The MIB module used to specify Liebert Controller OIDs
+
+      Copyright 2000-2008 Liebert Corporation. All rights reserved.
+      Reproduction of this document is authorized on the condition
+      that the forgoing copyright notice is included.
+
+      This Specification is supplied 'AS IS' and Liebert Corporation
+      makes no warranty, either express or implied, as to the use,
+      operation, condition, or performance of the Specification."
+
+   REVISION "200807020000Z"
+   DESCRIPTION
+    "Removed unnecessary item from import statement"
+
+   REVISION "200801100000Z"
+   DESCRIPTION
+    "Modified contact email address."
+
+   REVISION "200602220000Z"
+   DESCRIPTION
+    "Added support for Liebert DS Unit."
+
+   ::= { liebertControllerModuleReg 1 }
+
+-- =============================================================================
+-- lgpController - Liebert Controller Group
+-- =============================================================================
+
+lgpCtrlNumberInstalledControlModules OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of control modules installed in the device."
+    ::= { lgpController 1 }
+
+lgpCtrlNumberFailedControlModules OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of control modules in the device that have failed."
+    ::= { lgpController 2 }
+
+lgpCtrlNumberRedundantControlModules OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of redundant control modules installed in the device."
+    ::= { lgpController 3 }
+
+lgpCtrlNumberControlModuleWarnings OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of control modules in the device that have a warning."
+    ::= { lgpController 5 }
+
+lgpCtrlBoardBatteryVoltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01 Volts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The control board battery voltage.  Typically this battery is used
+        to provide backup power to memory and other vital circuits."
+    ::= { lgpController 6 }
+END

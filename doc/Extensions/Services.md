@@ -25,6 +25,10 @@ $config['nagios_plugins']   = "/usr/lib/nagios/plugins";
 ```
 
 This will point LibreNMS at the location of the nagios plugins - please ensure that any plugins you use are set to executable.
+For example: 
+```
+chmod +x /usr/lib/nagios/plugins/*
+```
 
 Finally, you now need to add check-services.php to the current cron file (/etc/cron.d/librenms typically) like:
 ```bash
@@ -72,3 +76,14 @@ Services uses the Nagios Alerting scheme where:
 To create an alerting rule to alert on service=critical, your alerting rule would look like:
 
     %services.service_status = "2"
+    
+## Debug
+
+Change user to librenms for example 
+```
+su - librenms
+```
+then you can run the following command to help troubleshoot services. 
+```
+./check-services.php -d
+```

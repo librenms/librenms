@@ -1,0 +1,238 @@
+-- ****************************************************************************
+--  COLUBRIS-SYSLOG-MIB definitions
+--
+--  Copyright (c) 2004, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Networks Syslog MIB file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-SYSLOG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32
+        FROM    SNMPv2-SMI
+    TEXTUAL-CONVENTION, 
+    DisplayString
+        FROM    SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM    SNMPv2-CONF
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+    ColubrisNotificationEnable
+        FROM    COLUBRIS-TC
+;
+
+
+colubrisSyslogMIB MODULE-IDENTITY
+    LAST-UPDATED    "200402100000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris Networks Syslog MIB module."
+
+    ::= { colubrisMgmtV2 3 }
+
+
+-- colubrisSyslogMIBObjects definition
+colubrisSyslogMIBObjects OBJECT IDENTIFIER ::= { colubrisSyslogMIB 1 }
+
+-- system log groups
+syslogConfig OBJECT IDENTIFIER ::=  { colubrisSyslogMIBObjects 1 }
+syslogMessage OBJECT IDENTIFIER ::= { colubrisSyslogMIBObjects 2 }
+
+-- system log severity textual convention
+--      This values is the actual value the syslog daemon uses,
+--      plus 1. For example: the value for debug severity will
+--      be 8 instead of 7.
+SyslogSeverity ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Indicates the severity of a syslog message.
+                 NOTE: This values is the actual value the syslog daemon uses,
+                       plus 1. For example: the value for debug severity will
+                       be 8 instead of 7."
+    SYNTAX      INTEGER
+                {
+                    emergency(1),
+                    alert(2),
+                    critical(3),
+                    error(4),
+                    warning(5),
+                    notice(6),
+                    info(7),
+                    debug(8)
+                }
+
+-- system log configuration
+syslogSeverityNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if syslogSeverityNotification events are
+                 generated."
+    DEFVAL      { enable }
+    ::= { syslogConfig 1 }
+
+syslogRegExMatchNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if syslogRegExMatchNotification events are
+                 generated."
+    DEFVAL      { disable }
+    ::= { syslogConfig 2 }
+
+syslogSeverityLevel OBJECT-TYPE
+    SYNTAX      SyslogSeverity
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the severity level of messages that the syslog daemon
+                 will log. Only messages with a severity level equal to or
+                 greater than syslogSeverityLevel will be logged. For example,
+                 A value of error(4) means that messages with warning, notice,
+                 info or debug severity will not be logged."
+    DEFVAL      { warning }
+    ::= { syslogConfig 3 }
+
+syslogTrapSeverityLevel OBJECT-TYPE
+    SYNTAX      SyslogSeverity
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the severity level of messages that will generate a 
+                 syslogSeverityNotification notification. For example, a value
+                 of error(4) means that messages with warning, notice, info or
+                 debug severity will never generate a notification."
+    DEFVAL      { warning }
+    ::= { syslogConfig 4 }
+
+syslogMessageRegEx OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the regular expression that will trigger a
+                 syslogRegExMatchNotification. When set to an empty string, 
+                 there is no attempt to match the syslog message generated 
+                 by the device with the content of syslogMessageRegEx."
+    ::= { syslogConfig 5 }
+
+-- system log message
+syslogMsgNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "A unique ID representing a message in the system log."
+    ::= { syslogMessage 1 }
+    
+syslogMsgFacility OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "A string representing the facility that sent the message."
+    ::= { syslogMessage 2  }
+
+syslogMsgSeverity OBJECT-TYPE
+    SYNTAX      SyslogSeverity
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The severity level of the message in the system log."
+    ::= { syslogMessage 3  }
+
+syslogMsgText OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The message itself as logged in the system log."
+    ::= { syslogMessage 4 }
+
+-- system log notifications
+colubrisSyslogMIBNotificationPrefix OBJECT IDENTIFIER ::= { colubrisSyslogMIB 2 }
+colubrisSyslogMIBNotifications OBJECT IDENTIFIER ::= { colubrisSyslogMIBNotificationPrefix 0 }
+
+syslogSeverityNotification NOTIFICATION-TYPE
+    OBJECTS     {
+                    syslogMsgNumber,
+                    syslogMsgFacility,
+                    syslogMsgSeverity,
+                    syslogMsgText
+                }
+    STATUS      current
+    DESCRIPTION "Sent when the device generated a syslog message that is 
+                 of the right severity level. This severity level is set by
+                 syslogTrapSeverityLevel."
+  --#SUMMARY "Syslog severity trap for msg #%d severity %d: %s - %s"
+  --#ARGUMENTS { 0, 2, 1, 3 }
+  --#SEVERITY MAJOR
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisSyslogMIBNotifications 1 }
+
+syslogRegExMatchNotification NOTIFICATION-TYPE
+    OBJECTS     {
+                    syslogMsgNumber,
+                    syslogMsgFacility,
+                    syslogMsgSeverity,
+                    syslogMsgText
+                }
+    STATUS      current
+    DESCRIPTION "Sent when the device generated a syslog message that 
+                 matches the regular expression specified in
+                 syslogMessageRegEx."
+  --#SUMMARY "Syslog regex match trap for msg #%d severity %d: %s - %s"
+  --#ARGUMENTS { 0, 2, 1, 3 }
+  --#SEVERITY MAJOR
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisSyslogMIBNotifications 2 }
+
+-- conformance information
+
+colubrisSyslogMIBConformance OBJECT IDENTIFIER ::= { colubrisSyslogMIB 3 }
+colubrisSyslogMIBCompliances OBJECT IDENTIFIER ::= { colubrisSyslogMIBConformance 1 }
+colubrisSyslogMIBGroups      OBJECT IDENTIFIER ::= { colubrisSyslogMIBConformance 2 }
+
+-- compliance statements
+colubrisSyslogMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for entities which implement
+                 the Colubris Networks Syslog MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisSyslogMIBGroup,
+                        colubrisSyslogNotificationGroup
+                    }
+    ::= { colubrisSyslogMIBCompliances 1 }
+
+-- units of conformance
+colubrisSyslogMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    syslogSeverityNotificationEnabled,
+                    syslogRegExMatchNotificationEnabled,
+                    syslogSeverityLevel,
+                    syslogTrapSeverityLevel,
+                    syslogMessageRegEx,
+                    syslogMsgNumber,
+                    syslogMsgFacility,
+                    syslogMsgSeverity,
+                    syslogMsgText
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing the Syslog MIB capability."
+    ::= { colubrisSyslogMIBGroups 1 }
+
+colubrisSyslogNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        syslogSeverityNotification,
+                        syslogRegExMatchNotification
+                    }
+    STATUS      current
+    DESCRIPTION "A collection of supported notifications."
+    ::= { colubrisSyslogMIBGroups 2 }
+
+END

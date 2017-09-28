@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Authentication\TwoFactor;
+
 $no_refresh = true;
 
 $pagetitle[] = 'Preferences';
@@ -26,7 +28,7 @@ if ($_SESSION['userlevel'] == 11) {
     }
     if ($vars['action'] === 'changedash') {
         if (!empty($vars['dashboard'])) {
-            dbUpdate(array('dashboard'=>$vars['dashboard']), 'users', 'user_id = ?', array($_SESSION['user_id']));
+            set_user_pref('dashboard', (int)$vars['dashboard']);
             $updatedashboard_message = "User default dashboard updated";
         }
     }
@@ -73,22 +75,19 @@ if ($_SESSION['userlevel'] == 11) {
 
     if ($config['twofactor'] === true) {
         if ($_POST['twofactorremove'] == 1) {
-            include_once $config['install_dir'].'/html/includes/authentication/twofactor.lib.php';
             if (!isset($_POST['twofactor'])) {
                 echo '<div class="well"><form class="form-horizontal" role="form" action="" method="post" name="twofactorform">';
                 echo '<input type="hidden" name="twofactorremove" value="1" />';
-                echo twofactor_form(false);
+                echo TwoFactor::getForm(false);
                 echo '</form></div>';
             } else {
-                $twofactor = dbFetchRow('SELECT twofactor FROM users WHERE username = ?', array($_SESSION['username']));
-                if (empty($twofactor['twofactor'])) {
+                $twofactor = get_user_pref('twofactor');
+                if (empty($twofactor)) {
                     echo '<div class="alert alert-danger">Error: How did you even get here?!</div><script>window.location = "preferences/";</script>';
-                } else {
-                    $twofactor = json_decode($twofactor['twofactor'], true);
                 }
 
-                if (verify_hotp($twofactor['key'], $_POST['twofactor'], $twofactor['counter'])) {
-                    if (!dbUpdate(array('twofactor' => ''), 'users', 'username = ?', array($_SESSION['username']))) {
+                if (TwoFactor::verifyHOTP($twofactor['key'], $_POST['twofactor'], $twofactor['counter'])) {
+                    if (!set_user_pref('twofactor', array())) {
                         echo '<div class="alert alert-danger">Error while disabling TwoFactor.</div>';
                     } else {
                         echo '<div class="alert alert-success">TwoFactor Disabled.</div>';
@@ -99,11 +98,10 @@ if ($_SESSION['userlevel'] == 11) {
                 }
             }//end if
         } else {
-            $twofactor = dbFetchRow('SELECT twofactor FROM users WHERE username = ?', array($_SESSION['username']));
+            $twofactor = get_user_pref('twofactor');
             echo '<script src="js/jquery.qrcode.min.js"></script>';
             echo '<div class="well"><h3>Two-Factor Authentication</h3>';
-            if (!empty($twofactor['twofactor'])) {
-                $twofactor         = json_decode($twofactor['twofactor'], true);
+            if (!empty($twofactor)) {
                 $twofactor['text'] = "<div class='form-group'>
   <label for='twofactorkey' class='col-sm-2 control-label'>Secret Key</label>
   <div class='col-sm-4'>
@@ -137,17 +135,16 @@ if ($_SESSION['userlevel'] == 11) {
 </form>';
             } else {
                 if (isset($_POST['gentwofactorkey']) && isset($_POST['twofactortype'])) {
-                    include_once $config['install_dir'].'/html/includes/authentication/twofactor.lib.php';
-                    $chk = dbFetchRow('SELECT twofactor FROM users WHERE username = ?', array($_SESSION['username']));
-                    if (empty($chk['twofactor'])) {
-                        $twofactor = array('key' => twofactor_genkey());
+                    $chk = get_user_pref('twofactor');
+                    if (empty($chk)) {
+                        $twofactor = array('key' => TwoFactor::genKey());
                         if ($_POST['twofactortype'] == 'counter') {
                             $twofactor['counter'] = 1;
                         } else {
                             $twofactor['counter'] = false;
                         }
 
-                        if (!dbUpdate(array('twofactor' => json_encode($twofactor)), 'users', 'username = ?', array($_SESSION['username']))) {
+                        if (!set_user_pref('twofactor', $twofactor)) {
                             echo '<div class="alert alert-danger">Error inserting TwoFactor details. Please try again later and contact Administrator if error persists.</div>';
                         } else {
                             echo '<div class="alert alert-success">Added TwoFactor credentials. Please reload page.</div><script>window.location = "preferences/";</script>';
@@ -191,18 +188,9 @@ echo "
         <label for='dashboard' class='col-sm-2 control-label'>Dashboard</label>
         <div class='col-sm-4'>
           <select class='form-control' name='dashboard'>";
-$defdash = dbFetchCell("SELECT dashboard FROM users WHERE user_id = ?", array($_SESSION['user_id']));
-$dashoptions = dbFetchRows(
-    "SELECT dashboards.*,users.username
-    FROM `dashboards`
-    INNER JOIN `users` ON users.user_id = dashboards.user_id
-    WHERE (dashboards.access > 0 && dashboards.user_id != ?) || dashboards.user_id = ?",
-    array($_SESSION['user_id'],$_SESSION['user_id'])
-);
-
-foreach ($dashoptions as $dash) {
+foreach (get_dashboards() as $dash) {
     echo "
-            <option value='".$dash['dashboard_id']."'".($defdash == $dash['dashboard_id'] ? ' selected' : '').">".display($dash['username']).':'.display($dash['dashboard_name'])."</option>";
+            <option value='".$dash['dashboard_id']."'".($dash['default'] ? ' selected' : '').">".display($dash['username']).':'.display($dash['dashboard_name'])."</option>";
 }
 echo "
           </select>

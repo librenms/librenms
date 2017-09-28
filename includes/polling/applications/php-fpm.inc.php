@@ -1,26 +1,28 @@
 <?php
+
+use LibreNMS\RRD\RrdDefinition;
+
 $name = 'php-fpm';
 $app_id = $app['app_id'];
 
 $options      = '-O qv';
-$mib          = 'NET-SNMP-EXTEND-MIB';
-$oid          = 'nsExtendOutputFull.8.112.104.112.102.112.109.115.112';
-$phpfpm = snmp_walk($device, $oid, $options, $mib);
+$oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.104.112.102.112.109.115.112';
+$phpfpm = snmp_walk($device, $oid, $options);
+update_application($app, $phpfpm);
 
 list($pool,$start_time,$start_since,$accepted_conn,$listen_queue,$max_listen_queue,$listen_queue_len,$idle_processes,
      $active_processes,$total_processes,$max_active_processes,$max_children_reached,$slow_requests) = explode("\n", $phpfpm);
 
 $rrd_name = array('app', $name, $app_id);
-$rrd_def = array(
-    'DS:lq:GAUGE:600:0:U',
-    'DS:mlq:GAUGE:600:0:U',
-    'DS:ip:GAUGE:600:0:U',
-    'DS:ap:GAUGE:600:0:U',
-    'DS:tp:GAUGE:600:0:U',
-    'DS:map:GAUGE:600:0:U',
-    'DS:mcr:GAUGE:600:0:U',
-    'DS:sr:GAUGE:600:0:U'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('lq', 'GAUGE', 0)
+    ->addDataset('mlq', 'GAUGE', 0)
+    ->addDataset('ip', 'GAUGE', 0)
+    ->addDataset('ap', 'GAUGE', 0)
+    ->addDataset('tp', 'GAUGE', 0)
+    ->addDataset('map', 'GAUGE', 0)
+    ->addDataset('mcr', 'GAUGE', 0)
+    ->addDataset('sr', 'GAUGE', 0);
 
 $fields = array(
     'lq' => $listen_queue,

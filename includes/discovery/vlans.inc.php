@@ -23,8 +23,16 @@ foreach ($tmp_base_indexes as $index => $array) {
 }
 $index_to_base = array_flip($base_to_index);
 
-require 'includes/discovery/vlans/q-bridge-mib.inc.php';
-require 'includes/discovery/vlans/cisco-vtp.inc.php';
+if ($device['os'] === 'junos') {
+    require 'includes/discovery/vlans/junos.inc.php';
+} elseif ($device['os'] === 'avaya-ers') {
+    require 'includes/discovery/vlans/avaya-ers.inc.php';
+}
+
+if (empty($device['vlans']) === true) {
+    require 'includes/discovery/vlans/q-bridge-mib.inc.php';
+    require 'includes/discovery/vlans/cisco-vtp.inc.php';
+}
 
 // Fetch switchport <> VLAN relationships. This is DIRTY.
 foreach ($device['vlans'] as $domain_id => $vlans) {
@@ -64,7 +72,7 @@ foreach ($device['vlans'] as $domain_id => $vlans) {
                 $db_id = dbInsert(array_merge($db_w, $db_a), 'ports_vlans');
                 echo 'Inserted';
             }
-            $valid_vlan_port_ids[] = $db_id;
+            $valid_vlan_port[] = $db_id;
 
             echo PHP_EOL;
         }//end foreach

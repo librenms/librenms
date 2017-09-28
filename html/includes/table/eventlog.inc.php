@@ -25,7 +25,7 @@ if ($_SESSION['userlevel'] >= '5') {
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `E`.`datetime` LIKE '%$searchPhrase%' OR `E`.`message` LIKE '%$searchPhrase%' OR `E`.`type` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `E`.`datetime` LIKE '%$searchPhrase%' OR `E`.`message` LIKE '%$searchPhrase%' OR `E`.`type` LIKE '%$searchPhrase%' OR `E`.`username` LIKE '%$searchPhrase%')";
 }
 
 $count_sql = "SELECT COUNT(event_id) $sql";
@@ -54,18 +54,20 @@ $sql = "SELECT `E`.*,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['co
 foreach (dbFetchRows($sql, $param) as $eventlog) {
     $dev = device_by_id_cache($eventlog['host']);
     if ($eventlog['type'] == 'interface') {
-        $this_if = ifLabel(getifbyid($eventlog['reference']));
+        $this_if = cleanPort(getifbyid($eventlog['reference']));
         $type    = '<b>'.generate_port_link($this_if, makeshortif(strtolower($this_if['label']))).'</b>';
     } else {
         $type = $eventlog['type'];
     }
     $severity_colour = $eventlog['severity'];
+
     $response[] = array(
         'eventicon' => "<i class='fa fa-bookmark fa-lg ".eventlog_severity($severity_colour)."' aria-hidden='true'></i>",
-        'datetime' => $eventlog['humandate'],
-        'hostname' => generate_device_link($dev, shorthost($dev['hostname'])),
-        'type'     => $type,
-        'message'  => htmlspecialchars($eventlog['message']),
+        'datetime'  => $eventlog['humandate'],
+        'hostname'  => generate_device_link($dev, shorthost($dev['hostname'])),
+        'type'      => $type,
+        'message'   => htmlspecialchars($eventlog['message']),
+        'username'   => $eventlog['username'],
     );
 }
 

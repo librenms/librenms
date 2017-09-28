@@ -1,6 +1,8 @@
 <?php
 
 // Build SNMP Cache Array
+use LibreNMS\RRD\RrdDefinition;
+
 $data_oids = array(
     'ifName',
     'ifDescr',
@@ -64,23 +66,6 @@ $stat_oids_db_extended = array(
     'ifOutMulticastPkts',
 );
 
-// From above for DB
-$etherlike_oids = array(
-    'dot3StatsAlignmentErrors',
-    'dot3StatsFCSErrors',
-    'dot3StatsSingleCollisionFrames',
-    'dot3StatsMultipleCollisionFrames',
-    'dot3StatsSQETestErrors',
-    'dot3StatsDeferredTransmissions',
-    'dot3StatsLateCollisions',
-    'dot3StatsExcessiveCollisions',
-    'dot3StatsInternalMacTransmitErrors',
-    'dot3StatsCarrierSenseErrors',
-    'dot3StatsFrameTooLongs',
-    'dot3StatsInternalMacReceiveErrors',
-    'dot3StatsSymbolErrors',
-);
-
 $cisco_oids = array(
     'locIfHardType',
     'locIfInRunts',
@@ -97,6 +82,9 @@ $cisco_oids = array(
 
 $pagp_oids = array(
     'pagpOperationMode',
+);
+
+$pagp_extended_oids = array(
     'pagpPortState',
     'pagpPartnerDeviceId',
     'pagpPartnerLearnMethod',
@@ -129,6 +117,17 @@ $table_base_oids = array(
     'ifHighSpeed',
     'ifOperStatus',
     'ifAdminStatus',
+);
+
+$hc_mappings = array(
+    'ifHCInOctets' => 'ifInOctets',
+    'ifHCOutOctets' => 'ifOutOctets',
+    'ifHCInUcastPkts' => 'ifInUcastPkts',
+    'ifHCOutUcastPkts' => 'ifOutUcastPkts',
+    'ifHCInBroadcastPkts' => 'ifInBroadcastPkts',
+    'ifHCOutBroadcastPkts' => 'ifOutBroadcastPkts',
+    'ifHCInMulticastPkts' => 'ifInMulticastPkts',
+    'ifHCOutMulticastPkts' => 'ifOutMulticastPkts',
 );
 
 $hc_oids = array(
@@ -179,17 +178,12 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
 } else {
     if ($config['polling']['selected_ports'] === true || $device['attribs']['selected_ports'] == 'true') {
         echo('Select ports polling');
-        foreach ($table_base_oids as $oid) {
-            $data = snmpwalk_cache_oid($device, $oid, $data, 'IF-MIB');
-        }
-        unset(
-            $oid,
-            $table_base_oids
-        );
         $lports = dbFetchRows("SELECT * FROM `ports` where `device_id` = ? AND `deleted` = 0 AND `disabled` = 0", array($device['device_id']));
         foreach ($lports as $lport) {
             if (is_port_valid($lport, $device)) {
                 $i = $lport['ifIndex'];
+                $base_oids = implode(".$i ", $table_base_oids) . ".$i";
+                $data = snmp_get_multi($device, $base_oids, '-OQUst', 'IF-MIB', null, $data);
                 if ($lport['ifAdminStatus_prev'] === 'down' && $data[$i]['ifAdminStatus'] === 'down') {
                     echo 'port is still admin down';
                 } elseif ($lport['ifOperStatus_prev'] === 'down' && $data[$i]['ifOperStatus'] === 'down') {
@@ -216,7 +210,8 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
             $port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $port_stats, 'IF-MIB');
         }
         $hc_test = array_slice($port_stats, 0, 1);
-        if (!isset($hc_test[0]['ifHCInOctets']) && !is_numeric($hc_test[0]['ifHCInOctets'])) {
+        if ((!isset($hc_test[0]['ifHCInOctets']) && !is_numeric($hc_test[0]['ifHCInOctets'])) ||
+            ((!isset($hc_test[0]['ifHighSpeed']) && !is_numeric($hc_test[0]['ifHighSpeed'])))) {
             $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB', null, '-OQUst');
         } else {
             foreach ($ifmib_oids as $oid) {
@@ -227,11 +222,11 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
     }
 }
 
-if ($config['enable_ports_etherlike']) {
-    echo 'dot3Stats ';
-    $port_stats = snmpwalk_cache_oid($device, 'dot3StatsEntry', $port_stats, 'EtherLike-MIB');
-} else {
+if ($device['os'] != 'asa') {
     echo 'dot3StatsDuplexStatus';
+    if ($config['enable_ports_poe'] || $config['enable_ports_etherlike']) {
+        $port_stats = snmpwalk_cache_oid($device, 'dot3StatsIndex', $port_stats, 'EtherLike-MIB');
+    }
     $port_stats = snmpwalk_cache_oid($device, 'dot3StatsDuplexStatus', $port_stats, 'EtherLike-MIB');
 }
 
@@ -268,13 +263,17 @@ if ($config['enable_ports_poe']) {
     $port_stats = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', $port_stats, 'CISCO-POWER-ETHERNET-EXT-MIB');
 }
 
-// FIXME This probably needs re-enabled. We need to clear these things when they get unset, too.
-// foreach ($etherlike_oids as $oid) { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "EtherLike-MIB"); }
-// foreach ($cisco_oids as $oid)     { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "OLD-CISCO-INTERFACES-MIB"); }
-// foreach ($pagp_oids as $oid)      { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "CISCO-PAGP-MIB"); }
 if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
     foreach ($pagp_oids as $oid) {
-        $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'CISCO-PAGP-MIB');
+        $pagp_port_stats = snmpwalk_cache_oid($device, $oid, array(), 'CISCO-PAGP-MIB');
+    }
+    if (count($pagp_port_stats) > 0) {
+        foreach ($pagp_port_stats as $p_index => $p_stats) {
+            $port_stats[$p_index]['pagpOperationMode'] = $p_stats['pagpOperationMode'];
+        }
+        foreach ($pagp_extended_oids as $oid) {
+            $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'CISCO-PAGP-MIB');
+        }
     }
 
     // Grab data to put ports into vlans or make them trunks
@@ -282,8 +281,8 @@ if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
     $port_stats = snmpwalk_cache_oid($device, 'vmVlan', $port_stats, 'CISCO-VLAN-MEMBERSHIP-MIB');
     $port_stats = snmpwalk_cache_oid($device, 'vlanTrunkPortEncapsulationOperType', $port_stats, 'CISCO-VTP-MIB');
     $port_stats = snmpwalk_cache_oid($device, 'vlanTrunkPortNativeVlan', $port_stats, 'CISCO-VTP-MIB');
-} else {
-    $port_stats = snmpwalk_cache_oid($device, 'dot1qPortVlanTable', $port_stats, 'Q-BRIDGE-MIB');
+} elseif ($device['os'] != 'asa') {
+    $port_stats = snmpwalk_cache_oid($device, 'dot1qPvid', $port_stats, 'Q-BRIDGE-MIB');
 }//end if
 
 $polled = time();
@@ -443,19 +442,8 @@ foreach ($ports as $port) {
             $port['update']['poll_period'] = $polled_period;
         }
 
-        // Copy ifHC[In|Out]Octets values to non-HC if they exist
-        if ($this_port['ifHCInOctets'] > 0 && is_numeric($this_port['ifHCInOctets']) && $this_port['ifHCOutOctets'] > 0 && is_numeric($this_port['ifHCOutOctets'])) {
-            echo 'HC ';
-            $this_port['ifInOctets']  = $this_port['ifHCInOctets'];
-            $this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
-        }
-        if (is_numeric($this_port['ifHCInUcastPkts']) && $this_port['ifHCInUcastPkts'] > 0 && is_numeric($this_port['ifHCOutUcastPkts']) && $this_port['ifHCOutUcastPkts'] > 0) {
-            $this_port['ifInUcastPkts']  = $this_port['ifHCInUcastPkts'];
-            $this_port['ifOutUcastPkts'] = $this_port['ifHCOutUcastPkts'];
-        }
-
         if ($device['os'] === 'airos-af' && $port['ifAlias'] === 'eth0') {
-            $airos_stats = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.41112.1.3.3.1', $airos_stats, 'UBNT-AirFIBER-MIB');
+            $airos_stats = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.41112.1.3.3.1', array(), 'UBNT-AirFIBER-MIB');
             $this_port['ifInOctets'] = $airos_stats[1]['rxOctetsOK'];
             $this_port['ifOutOctets'] = $airos_stats[1]['txOctetsOK'];
             $this_port['ifInErrors'] = $airos_stats[1]['rxErroredFrames'];
@@ -484,16 +472,18 @@ foreach ($ports as $port) {
             $this_port['ifPhysAddress']              = zeropad($a_a).zeropad($a_b).zeropad($a_c).zeropad($a_d).zeropad($a_e).zeropad($a_f);
         }
 
-        if (is_numeric($this_port['ifHCInBroadcastPkts']) && is_numeric($this_port['ifHCOutBroadcastPkts']) && is_numeric($this_port['ifHCInMulticastPkts']) && is_numeric($this_port['ifHCOutMulticastPkts']) && $device['os'] !== 'ciscosb') {
-            echo 'HC ';
-            $this_port['ifInBroadcastPkts']  = $this_port['ifHCInBroadcastPkts'];
-            $this_port['ifOutBroadcastPkts'] = $this_port['ifHCOutBroadcastPkts'];
-            $this_port['ifInMulticastPkts']  = $this_port['ifHCInMulticastPkts'];
-            $this_port['ifOutMulticastPkts'] = $this_port['ifHCOutMulticastPkts'];
+        // use HC values if they are available
+        foreach ($hc_mappings as $hc_oid => $if_oid) {
+            if (isset($this_port[$hc_oid]) && $this_port[$hc_oid]) {
+                d_echo("$hc_oid ");
+                $this_port[$if_oid] = $this_port[$hc_oid];
+            } else {
+                d_echo("$if_oid ");
+            }
         }
 
         if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {
-            d_echo('HighSpeed ');
+            d_echo('ifHighSpeed ');
             $this_port['ifSpeed'] = ($this_port['ifHighSpeed'] * 1000000);
         } elseif (isset($this_port['ifSpeed']) && is_numeric($this_port['ifSpeed'])) {
             d_echo('ifSpeed ');
@@ -535,7 +525,13 @@ foreach ($ports as $port) {
         // FIXME use $q_bridge_mib[$this_port['ifIndex']] to see if it is a trunk (>1 array count)
         echo 'VLAN == '.$this_port['ifVlan'];
 
-    // When devices do not provide ifAlias data, populate with ifDescr data if configured
+        // When devices do not provide ifDescr data, populate with ifName data if available
+        if ($this_port['ifDescr'] == '' || $this_port['ifDescr'] == null) {
+            $this_port['ifDescr'] = $this_port['ifName'];
+            d_echo('Using ifName as ifDescr');
+        }
+
+        // When devices do not provide ifAlias data, populate with ifDescr data if configured
         if ($this_port['ifAlias'] == '' || $this_port['ifAlias'] == null) {
             $this_port['ifAlias'] = $this_port['ifDescr'];
             d_echo('Using ifDescr as ifAlias');
@@ -704,23 +700,22 @@ foreach ($ports as $port) {
         // Update data stores
         $rrd_name = getPortRrdName($port_id);
         $rrdfile = rrd_name($device['hostname'], $rrd_name);
-        $rrd_def = array(
-            'DS:INOCTETS:DERIVE:600:0:12500000000',
-            'DS:OUTOCTETS:DERIVE:600:0:12500000000',
-            'DS:INERRORS:DERIVE:600:0:12500000000',
-            'DS:OUTERRORS:DERIVE:600:0:12500000000',
-            'DS:INUCASTPKTS:DERIVE:600:0:12500000000',
-            'DS:OUTUCASTPKTS:DERIVE:600:0:12500000000',
-            'DS:INNUCASTPKTS:DERIVE:600:0:12500000000',
-            'DS:OUTNUCASTPKTS:DERIVE:600:0:12500000000',
-            'DS:INDISCARDS:DERIVE:600:0:12500000000',
-            'DS:OUTDISCARDS:DERIVE:600:0:12500000000',
-            'DS:INUNKNOWNPROTOS:DERIVE:600:0:12500000000',
-            'DS:INBROADCASTPKTS:DERIVE:600:0:12500000000',
-            'DS:OUTBROADCASTPKTS:DERIVE:600:0:12500000000',
-            'DS:INMULTICASTPKTS:DERIVE:600:0:12500000000',
-            'DS:OUTMULTICASTPKTS:DERIVE:600:0:12500000000'
-        );
+        $rrd_def = RrdDefinition::make()
+            ->addDataset('INOCTETS', 'DERIVE', 0, 12500000000)
+            ->addDataset('OUTOCTETS', 'DERIVE', 0, 12500000000)
+            ->addDataset('INERRORS', 'DERIVE', 0, 12500000000)
+            ->addDataset('OUTERRORS', 'DERIVE', 0, 12500000000)
+            ->addDataset('INUCASTPKTS', 'DERIVE', 0, 12500000000)
+            ->addDataset('OUTUCASTPKTS', 'DERIVE', 0, 12500000000)
+            ->addDataset('INNUCASTPKTS', 'DERIVE', 0, 12500000000)
+            ->addDataset('OUTNUCASTPKTS', 'DERIVE', 0, 12500000000)
+            ->addDataset('INDISCARDS', 'DERIVE', 0, 12500000000)
+            ->addDataset('OUTDISCARDS', 'DERIVE', 0, 12500000000)
+            ->addDataset('INUNKNOWNPROTOS', 'DERIVE', 0, 12500000000)
+            ->addDataset('INBROADCASTPKTS', 'DERIVE', 0, 12500000000)
+            ->addDataset('OUTBROADCASTPKTS', 'DERIVE', 0, 12500000000)
+            ->addDataset('INMULTICASTPKTS', 'DERIVE', 0, 12500000000)
+            ->addDataset('OUTMULTICASTPKTS', 'DERIVE', 0, 12500000000);
 
         $fields = array(
             'INOCTETS'         => $this_port['ifInOctets'],
@@ -757,6 +752,8 @@ foreach ($ports as $port) {
         $fields['ifOutOctets_rate'] = $port['ifOutOctets_rate'];
 
         influx_update($device, 'ports', rrd_array_filter($tags), $fields);
+        graphite_update($device, 'ports|' . $ifName, $tags, $fields);
+        opentsdb_update($device, 'port', array('ifName' => $this_port['ifName'], 'ifIndex' => getPortRrdName($port_id)), $fields);
 
         // End Update IF-MIB
         // Update PAgP
@@ -811,4 +808,4 @@ foreach ($ports as $port) {
 } //end port update
 
 // Clear Variables Here
-unset($port_stats, $ports_found, $data_oids, $stat_oids, $stat_oids_db, $stat_oids_db_extended, $etherlike_oids, $cisco_oids, $pagp_oids, $ifmib_oids, $hc_test, $ports_mapped, $ports, $_stat_oids, $rrd_def);
+unset($port_stats, $ports_found, $data_oids, $stat_oids, $stat_oids_db, $stat_oids_db_extended, $cisco_oids, $pagp_oids, $ifmib_oids, $hc_test, $ports_mapped, $ports, $_stat_oids, $rrd_def);

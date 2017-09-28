@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 $ipmi_rows = dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND poller_type='ipmi'", array($device['device_id']));
 
 if (is_array($ipmi_rows)) {
@@ -16,9 +18,15 @@ if (is_array($ipmi_rows)) {
             $remote = " -H " . $ipmi['host'] . " -U '" . $ipmi['user'] . "' -P '" . $ipmi['password'] . "' -L USER";
         }
 
-        $results = external_exec($config['ipmitool'] . ' -I ' . $ipmi['type'] . ' -c ' . $remote . ' sdr 2>/dev/null');
-        d_echo($results);
-        echo " done.\n";
+        // Check to see if we know which IPMI interface to use
+        // so we dont use wrong arguments for ipmitool
+        if ($ipmi['type'] != '') {
+            $results = external_exec($config['ipmitool'] . ' -I ' . $ipmi['type'] . ' -c ' . $remote . ' sdr 2>/dev/null');
+            d_echo($results);
+            echo " done.\n";
+        } else {
+            echo " type not yet discovered.\n";
+        }
 
         foreach (explode("\n", $results) as $row) {
             list($desc, $value, $type, $status) = explode(',', $row);
@@ -36,7 +44,7 @@ if (is_array($ipmi_rows)) {
             echo $sensor . " $unit\n";
 
             $rrd_name = get_sensor_rrd_name($device, $ipmisensors);
-            $rrd_def = 'DS:sensor:GAUGE:600:-20000:20000';
+            $rrd_def = RrdDefinition::make()->addDataset('sensor', 'GAUGE', -20000, 20000);
 
             $fields = array(
                 'sensor' => $sensor,

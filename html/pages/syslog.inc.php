@@ -28,14 +28,13 @@ print_optionbar_start();
                         <select name="device" id="device" class="form-control input-sm">
                             <option value="">All Devices</option>
                             <?php
-                            foreach (get_all_devices() as $hostname) {
-                                $device_id = getidbyname($hostname);
-                                if (device_permitted($device_id)) {
-                                    echo '"<option value="' . $device_id . '"';
-                                    if ($device_id == $vars['device']) {
+                            foreach (get_all_devices() as $data) {
+                                if (device_permitted($data['device_id'])) {
+                                    echo '"<option value="' . $data['device_id'] . '"';
+                                    if ($data['device_id'] == $vars['device']) {
                                         echo ' selected';
                                     }
-                                    echo '>' . $hostname . '</option>';
+                                    echo '>' . format_hostname($data) . '</option>';
                                 }
                             }
                             ?>
@@ -50,7 +49,13 @@ print_optionbar_start();
                         <select name="program" id="program" class="form-control input-sm">
                             <option value="">All Programs</option>
                                 <?php
-                                foreach (dbFetchRows('SELECT DISTINCT `program` FROM `syslog` ORDER BY `program`') as $data) {
+                                $sqlstatement = 'SELECT DISTINCT `program` FROM `syslog`';
+                                if (is_numeric($vars['device'])) {
+                                    $sqlstatement = $sqlstatement . ' WHERE device_id=?';
+                                    $param[] = $vars['device'];
+                                }
+                                $sqlstatement = $sqlstatement .' ORDER BY `program`';
+                                foreach (dbFetchRows($sqlstatement, $param) as $data) {
                                     echo '"<option value="'.mres($data['program']).'"';
                                     if ($data['program'] == $vars['program']) {
                                         echo ' selected';
@@ -65,7 +70,13 @@ print_optionbar_start();
                         <select name="priority" id="priority" class="form-control input-sm">
                             <option value="">All Priorities</option>
                                 <?php
-                                foreach (dbFetchRows('SELECT DISTINCT `priority` FROM `syslog` ORDER BY `level`') as $data) {
+                                $sqlstatement = 'SELECT DISTINCT `priority` FROM `syslog`';
+                                if (is_numeric($vars['device'])) {
+                                    $sqlstatement = $sqlstatement . ' WHERE device_id=?';
+                                    $param[] = $vars['device'];
+                                }
+                                $sqlstatement = $sqlstatement .' ORDER BY `level`';
+                                foreach (dbFetchRows($sqlstatement, $param) as $data) {
                                     echo '"<option value="'.mres($data['priority']).'"';
                                     if ($data['priority'] == $vars['priority']) {
                                         echo ' selected';

@@ -16,6 +16,10 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Config;
+use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\IP;
+
 function generate_priority_icon($priority)
 {
     $map = array(
@@ -206,11 +210,9 @@ function get_all_devices()
     // FIXME respect $type (server, network, etc) -- needs an array fill in topnav.
 
     if (isset($cache['devices']['hostname'])) {
-        $devices = array_keys($cache['devices']['hostname']);
+        $devices = array_keys($cache['devices']);
     } else {
-        foreach (dbFetchRows("SELECT `hostname` FROM `devices`") as $data) {
-            $devices[] = $data['hostname'];
-        }
+        $devices = dbFetchRows("SELECT * FROM `devices` ORDER BY hostname");
     }
 
     return $devices;
@@ -340,7 +342,7 @@ function device_by_id_cache($device_id, $refresh = '0')
         $device = $cache['devices']['id'][$device_id];
     } else {
         $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device_id));
-        
+
         //order vrf_lite_cisco with context, this will help to get the vrf_name and instance_name all the time
         $vrfs_lite_cisco = dbFetchRows("SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = ?", array($device_id));
         if (!empty($vrfs_lite_cisco)) {
@@ -477,11 +479,7 @@ function safedescr($descr)
 
 function zeropad($num, $length = 2)
 {
-    while (strlen($num) < $length) {
-        $num = '0'.$num;
-    }
-
-    return $num;
+    return str_pad($num, $length, '0', STR_PAD_LEFT);
 }
 
 function set_dev_attrib($device, $attrib_type, $attrib_value)
@@ -661,10 +659,31 @@ function c_echo($string, $enabled = true)
     if (!$enabled) {
         return;
     }
-    global $console_color;
 
-    if ($console_color) {
-        echo $console_color->convert($string);
+    if (isCli()) {
+        global $console_color;
+        if ($console_color) {
+            echo $console_color->convert($string);
+        } else {
+            // limited functionality for validate.php
+            $search = array(
+                '/%n/',
+                '/%g/',
+                '/%R/',
+                '/%Y/',
+                '/%B/',
+                '/%((%)|.)/' // anything left over replace with empty string
+            );
+            $replace = array(
+                "\e[0m",
+                "\e[32m",
+                "\e[1;31m",
+                "\e[1;33m",
+                "\e[1;34m",
+                ""
+            );
+            echo preg_replace($search, $replace, $string);
+        }
     } else {
         echo preg_replace('/%((%)|.)/', '', $string);
     }
@@ -687,19 +706,19 @@ function is_mib_graph($type, $subtype)
  */
 function is_client_authorized($clientip)
 {
-    global $config;
-
-    if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs']) {
+    if (Config::get('allow_unauth_graphs', false)) {
         d_echo("Unauthorized graphs allowed\n");
         return true;
     }
 
-    if (isset($config['allow_unauth_graphs_cidr'])) {
-        foreach ($config['allow_unauth_graphs_cidr'] as $range) {
-            if (Net_IPv4::ipInNetwork($clientip, $range)) {
+    foreach (Config::get('allow_unauth_graphs_cidr', array()) as $range) {
+        try {
+            if (IP::parse($clientip)->inNetwork($range)) {
                 d_echo("Unauthorized graphs allowed from $range\n");
                 return true;
             }
+        } catch (InvalidIpException $e) {
+            d_echo("Client IP ($clientip) is invalid.\n");
         }
     }
 
@@ -1099,15 +1118,20 @@ function version_info($remote = true)
             $output['github'] = json_decode(curl_exec($api), true);
         }
         list($local_sha, $local_date) = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
+        $output['local_ver']    = rtrim(`git describe --tags`);
         $output['local_sha']    = $local_sha;
         $output['local_date']   = $local_date;
         $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
     }
-    $output['db_schema']   = dbFetchCell('SELECT version FROM dbSchema');
+    $output['db_schema']   = get_db_schema() ?: '?';
     $output['php_ver']     = phpversion();
-    $output['mysql_ver']   = dbFetchCell('SELECT version()');
-    $output['rrdtool_ver'] = implode(' ', array_slice(explode(' ', shell_exec($config['rrdtool'].' --version |head -n1')), 1, 1));
-    $output['netsnmp_ver'] = str_replace('version: ', '', rtrim(shell_exec($config['snmpget'].' --version 2>&1')));
+    $output['mysql_ver']   = dbIsConnected() ? dbFetchCell('SELECT version()') : '?';
+    $output['rrdtool_ver'] = str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
+        ($config['rrdtool'] ?: 'rrdtool') . ' --version |head -n1'
+    )), 1, 1)));
+    $output['netsnmp_ver'] = str_replace('version: ', '', rtrim(shell_exec(
+        ($config['snmpget'] ?: 'snmpget').' --version 2>&1'
+    )));
 
     return $output;
 }//end version_info()
@@ -1128,21 +1152,24 @@ function inet6_ntop($ip)
 }
 
 /**
- * Convert IP to use sysName
+ * If hostname is an ip, use return sysName
  * @param array device
- * @param string ip address
+ * @param string hostname
  * @return string
 **/
-function ip_to_sysname($device, $ip)
+function format_hostname($device, $hostname = '')
 {
     global $config;
-    if ($config['force_ip_to_sysname'] === true) {
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
-            $ip = $device['sysName'];
+    if (empty($hostname)) {
+        $hostname = $device['hostname'];
+    }
+    if ($config['force_ip_to_sysname'] === true && !empty($device['sysName'])) {
+        if (filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
+            $hostname = $device['sysName'];
         }
     }
-    return $ip;
-}//end ip_to_sysname
+    return $hostname;
+}//end format_hostname
 
 /**
  * Return valid port association modes
@@ -1454,10 +1481,13 @@ function starts_with($haystack, $needles, $case_insensitive = false)
 function get_auth_ad_user_filter($username)
 {
     global $config;
-    $user_filter = "(samaccountname=$username)";
+
+    // don't return disabled users
+    $user_filter = "(&(samaccountname=$username)(!(useraccountcontrol:1.2.840.113556.1.4.803:=2))";
     if ($config['auth_ad_user_filter']) {
-        $user_filter = "(&{$config['auth_ad_user_filter']}$user_filter)";
+        $user_filter .= $config['auth_ad_user_filter'];
     }
+    $user_filter .= ')';
     return $user_filter;
 }
 
@@ -1481,6 +1511,12 @@ function get_auth_ad_group_filter($groupname)
  */
 function print_list($list, $format, $max = 10)
 {
+    if (is_array(current($list))) {
+        $list = array_map(function ($item) {
+            return implode(' ', $item);
+        }, $list);
+    }
+
     foreach (array_slice($list, 0, $max) as $item) {
         printf($format, $item);
     }
@@ -1502,16 +1538,27 @@ function clean($value)
 
 /**
  * @param $value
+ * @param array $purifier_config (key, value pair)
  * @return string
  */
-function display($value)
+function display($value, $purifier_config = array())
 {
     /** @var HTMLPurifier $purifier */
     global $config, $purifier;
+
+    // If $purifier_config is non-empty then we don't want
+    // to convert html tags and allow these to be controlled
+    // by purifier instead.
+    if (empty($purifier_config)) {
+        $value = htmlentities($value);
+    }
     if (!isset($purifier)) {
         // initialize HTML Purifier here since this is the only user
         $p_config = HTMLPurifier_Config::createDefault();
         $p_config->set('Cache.SerializerPath', $config['temp_dir']);
+        foreach ($purifier_config as $k => $v) {
+            $p_config->set($k, $v);
+        }
         $purifier = new HTMLPurifier($p_config);
     }
 
@@ -1546,7 +1593,7 @@ function load_os(&$device)
         log_event('Device type changed ' . $device['type'] . ' => ' . $config['os'][$device['os']]['type'], $device, 'system', 3);
         $device['type'] = $config['os'][$device['os']]['type'];
         dbUpdate(array('type' => $device['type']), 'devices', 'device_id=?', array($device['device_id']));
-        echo "Device type changed to " . $device['type'] . "!\n";
+        d_echo("Device type changed to " . $device['type'] . "!\n");
     }
 
     if ($config['os'][$device['os']]['group']) {
@@ -1555,40 +1602,83 @@ function load_os(&$device)
 }
 
 /**
- * @param array $restricted
+ * Load all OS, optionally load just the OS used by existing devices
+ * Default cache time is 1 day. Controlled by os_def_cache_time.
+ *
+ * @param bool $existing Only load OS that have existing OS in the database
+ * @param bool $cached Load os definitions from the cache file
  */
-function load_all_os($restricted = array())
+function load_all_os($existing = false, $cached = true)
 {
     global $config;
-    if (!empty($restricted)) {
-        $list = $restricted;
+    $cache_file = $config['install_dir'] . '/cache/os_defs.cache';
+
+    if ($cached && is_file($cache_file) && (time() - filemtime($cache_file) < $config['os_def_cache_time'])) {
+        // Cached
+        $os_defs = unserialize(file_get_contents($cache_file));
+
+        if ($existing) {
+            // remove unneeded os
+            $os_defs = array_diff_key($os_defs, dbFetchColumn('SELECT DISTINCT(`os`) FROM `devices`'));
+        }
+
+        $config['os'] = array_replace_recursive($os_defs, $config['os']);
     } else {
-        $list = glob($config['install_dir'].'/includes/definitions/*.yaml');
-    }
-    foreach ($list as $file) {
-        $tmp = Symfony\Component\Yaml\Yaml::parse(
-            file_get_contents($file)
-        );
-        if (isset($config['os'][$tmp['os']])) {
-            $config['os'][$tmp['os']] = array_replace_recursive($tmp, $config['os'][$tmp['os']]);
+        // load from yaml
+        if ($existing) {
+            $os_list = array_map(function ($os) use ($config) {
+                return $config['install_dir'] . '/includes/definitions/'. $os . '.yaml';
+            }, dbFetchColumn('SELECT DISTINCT(`os`) FROM `devices`'));
         } else {
-            $config['os'][$tmp['os']] = $tmp;
+            $os_list = glob($config['install_dir'].'/includes/definitions/*.yaml');
+        }
+
+        foreach ($os_list as $file) {
+            $tmp = Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+
+            if (isset($config['os'][$tmp['os']])) {
+                $config['os'][$tmp['os']] = array_replace_recursive($tmp, $config['os'][$tmp['os']]);
+            } else {
+                $config['os'][$tmp['os']] = $tmp;
+            }
         }
     }
 }
 
 /**
- * @param $scale
- * @param $value
- * @return float
+ * * Update the OS cache file cache/os_defs.cache
+ * @param bool $force
  */
-function fahrenheit_to_celsius($scale, $value)
+function update_os_cache($force = false)
+{
+    global $config;
+    $cache_file = $config['install_dir'] . '/cache/os_defs.cache';
+    $cache_keep_time = $config['os_def_cache_time'] - 7200; // 2hr buffer
+
+    if ($force === true || !is_file($cache_file) || time() - filemtime($cache_file) > $cache_keep_time) {
+        d_echo('Updating os_def.cache... ');
+        load_all_os(false, false);
+        file_put_contents($cache_file, serialize($config['os']));
+        d_echo("Done\n");
+    }
+}
+
+/**
+ * Converts fahrenheit to celsius (with 2 decimal places)
+ * if $scale is not fahrenheit, it assumes celsius and  returns the value
+ *
+ * @param float $value
+ * @param string $scale fahrenheit or celsius
+ * @return string (containing a float)
+ */
+function fahrenheit_to_celsius($value, $scale = 'fahrenheit')
 {
     if ($scale === 'fahrenheit') {
         $value = ($value - 32) / 1.8;
     }
     return sprintf('%.02f', $value);
 }
+
 function uw_to_dbm($value)
 {
     return 10 * log10($value / 1000);
@@ -1599,10 +1689,16 @@ function uw_to_dbm($value)
  * @param int $min
  * @return null
  */
-function set_null($value, $default = null, $min = 0)
+function set_null($value, $default = null, $min = null)
 {
-    if (!isset($value) || !is_numeric($value) || (isset($min) && $value <= $min)) {
-        $value = $default;
+    if (is_nan($value)) {
+        return $default;
+    } elseif (is_infinite($value)) {
+        return $default;
+    } elseif (!is_numeric($value)) {
+        return $default;
+    } elseif (isset($min) && $value < $min) {
+        return $default;
     }
     return $value;
 }
@@ -1613,7 +1709,11 @@ function set_null($value, $default = null, $min = 0)
  */
 function set_numeric($value, $default = 0)
 {
-    if (!isset($value) || !is_numeric($value)) {
+    if (is_nan($value) ||
+        is_infinite($value) ||
+        !isset($value) ||
+        !is_numeric($value)
+    ) {
         $value = $default;
     }
     return $value;
@@ -1621,7 +1721,8 @@ function set_numeric($value, $default = 0)
 
 function check_git_exists()
 {
-    if (`which git`) {
+    exec('git > /dev/null 2>&1', $response, $exit_code);
+    if ($exit_code === 1) {
         return true;
     } else {
         return false;
@@ -1637,4 +1738,91 @@ function get_vm_parent_id($device)
     }
 
     return dbFetchCell("SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?", array($device['hostname'],$device['hostname'].'.'.$config['mydomain']));
+}
+
+/**
+ * Fetch a user preference from the database
+ * Do not use strict comparison as results could be strings
+ *
+ * @param string $name preference name
+ * @param mixed $default value to return if the preference is not set
+ * @param int $user_id for this user_id otherwise, the currently logged in user
+ * @return mixed value of this preference
+ */
+function get_user_pref($name, $default = null, $user_id = null)
+{
+    global $user_prefs;
+
+    if (is_array($user_prefs) && array_key_exists($name, $user_prefs)) {
+        return $user_prefs[$name];
+    }
+
+    if (is_null($user_id)) {
+        $user_id = $_SESSION['user_id'];
+    }
+
+    $pref = dbFetchCell(
+        'SELECT `value` FROM `users_prefs` WHERE `user_id`=? AND `pref`=?',
+        array($user_id, $name)
+    );
+
+    if (!is_null($pref)) {
+        $pref = json_decode($pref, true);
+        $user_prefs[$name] = $pref;
+        return $pref;
+    }
+
+    return $default;
+}
+
+/**
+ * Set a user preference value
+ *
+ * @param string $name preference name
+ * @param mixed $value value of this preference
+ * @param int $user_id for this user_id otherwise, the currently logged in user
+ * @return bool whether the setting was changed or not
+ */
+function set_user_pref($name, $value, $user_id = null)
+{
+    global $user_prefs;
+    if (is_null($user_id)) {
+        $user_id = $_SESSION['user_id'];
+    }
+
+    $pref = array(
+        'user_id' => $user_id,
+        'pref' => $name,
+        'value' => json_encode($value),
+    );
+
+    if (dbFetchCell('SELECT count(*) FROM `users_prefs` WHERE `user_id`=? AND `pref`=?', array($user_id, $name))) {
+        $update = array('value' => json_encode($value));
+        $params = array($user_id, $name);
+
+        $result = dbUpdate($update, 'users_prefs', '`user_id`=? AND `pref`=?', $params) > 0;
+    } else {
+        $result = dbInsert($pref, 'users_prefs') !== null;
+    }
+
+    if ($result) {
+        $user_prefs[$name] = $value;
+    }
+
+    return $result;
+}
+
+/**
+ * Generate a class name from a lowercase string containing - or _
+ * Remove - and _ and camel case words
+ *
+ * @param string $name The string to convert to a class name
+ * @param string $namespace namespace to prepend to the name for example: LibreNMS\
+ * @return string  Class name
+ */
+function str_to_class($name, $namespace = null)
+{
+    $pre_format = str_replace(array('-', '_'), ' ', $name);
+    $class = str_replace(' ', '', ucwords(strtolower($pre_format)));
+    return $namespace . $class;
 }

@@ -23,17 +23,19 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if ($mempool['mempool_index'] === 0) {
+if ($mempool['mempool_index'] == 0) {
     $mem_perc = snmp_get($device, '.1.3.6.1.4.1.21067.2.1.2.4.2.0', '-OvQ');
     $mem_capacity = snmp_get($device, '.1.3.6.1.4.1.21067.2.1.2.4.1.0', '-OvQ');
+    $mem_capacity = ($mem_capacity*1024*1024);
     $mempool['total'] = $mem_capacity;
     $mempool['used']  = ($mem_capacity / 100) * $mem_perc;
     $mempool['free']  = $mempool['total'] - $mempool['used'];
 }
 
-if ($mempool['mempool_index'] === 1) {
+if ($mempool['mempool_index'] == 1) {
     $swap_perc = snmp_get($device, '.1.3.6.1.4.1.21067.2.1.2.4.4.0', '-OvQ');
     $swap_capacity = snmp_get($device, '.1.3.6.1.4.1.21067.2.1.2.4.3.0', '-OvQ');
+    $swap_capacity = ($swap_capacity*1024*1024);
     $mempool['total'] = $swap_capacity;
     $mempool['used']  = ($swap_capacity / 100) * $swap_perc;
     $mempool['free']  = $mempool['total'] - $mempool['used'];

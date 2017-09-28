@@ -22,10 +22,9 @@ if (isset($parameters)) {
     $status  = 'error';
     $message = 'ERROR: Could not query';
 }
-
-echo _json_encode(array(
+echo display(_json_encode(array(
      'status'                   => $status,
      'message'                  => $message,
      'search_in_conf_textbox'   => $parameters,
      'output'                   => $output
-));
+)));

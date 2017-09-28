@@ -5,7 +5,7 @@ require 'includes/graphs/common.inc.php';
 // $rrd_options .= " -l 0 -E ";
 $rrdfilename = rrd_name($device['hostname'], 'ubnt-airmax-mib');
 
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'mbps                   Now      Min       Max\\n'";
     $rrd_options .= ' DEF:WlStatTxRate='.$rrdfilename.':WlStatTxRate:AVERAGE ';
     $rrd_options .= ' CDEF:WlStatTxRateC=WlStatTxRate,1000,/ ';

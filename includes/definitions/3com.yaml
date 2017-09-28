@@ -4,7 +4,6 @@ over:
     - { graph: device_bits, text: Traffic }
 type: network
 discovery:
-    - sysDescr:
-        - 3Com Switch
-        - 3Com SuperStack
-        - 3Com Baseline
+    - sysObjectId:
+      - .1.3.6.1.4.1.43.1.
+      - .1.3.6.1.4.1.43.10.

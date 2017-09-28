@@ -1,0 +1,172 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+--
+-- CIENA-CES-CONFIG-MGMT-MIB
+--
+
+CIENA-CES-CONFIG-MGMT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    DisplayString, DateAndTime, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    cienaGlobalSeverity
+        FROM CIENA-GLOBAL-MIB
+    cienaCesNotifications, cienaCesConfig
+        FROM CIENA-SMI;
+
+cienaCesConfigMgmtMIB MODULE-IDENTITY
+        LAST-UPDATED "201502110000Z"
+        ORGANIZATION "Ciena, Inc"
+        CONTACT-INFO
+            "       Mib Meister
+                    115 North Sullivan Road
+                    Spokane Valley, WA 99037
+                    USA             
+                    Phone:  +1 509 242 9000
+                    Email:  support@ciena.com"   
+        DESCRIPTION
+            "This module defines device configuration information and associated notifications."
+
+        REVISION "201502110000Z"
+        DESCRIPTION
+            "Initial creation."
+        ::= { cienaCesConfig 36 }
+
+--
+-- Textual conventions
+--
+CienaCesConfigMgmtContext ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The context in which the configuration change was done.
+         
+         unknown(1)     An unknown context. This value is used
+                        when the system cannot find what mechanism
+                        was used to modify the configuration state
+         
+         cli(2)         The configuration state was modified using
+                        the command line interface
+
+         snmp(3)        The configuration state was modified using
+                        SNMP
+
+         netconf(4)     The configuration state was modified using
+                        NETCONF"
+    SYNTAX      INTEGER {
+                                unknown(1),
+                                cli(2),
+                                snmp(3),
+                                netconf(4)
+                        }
+--
+-- Node definitions
+--
+cienaCesConfigMgmtMIBObjects OBJECT IDENTIFIER ::= { cienaCesConfigMgmtMIB 1 }
+
+--
+-- Config groups
+--
+cienaCesConfigMgmt OBJECT IDENTIFIER ::= { cienaCesConfigMgmtMIBObjects 1 }
+
+--
+-- Notification groups
+--
+
+cienaCesConfigMgmtMIBNotificationsPrefix OBJECT IDENTIFIER ::= { cienaCesNotifications 36 }
+cienaCesConfigMgmtMIBNotifications       OBJECT IDENTIFIER ::= { cienaCesConfigMgmtMIBNotificationsPrefix 0 }
+
+--
+-- Conformance groups
+--
+
+cienaCesConfigMgmtMIBConformance OBJECT IDENTIFIER ::= { cienaCesConfigMgmtMIB 2 }
+cienaCesConfigMgmtMIBCompliances OBJECT IDENTIFIER ::= { cienaCesConfigMgmtMIBConformance 1 }
+cienaCesConfigMgmtMIBGroups      OBJECT IDENTIFIER ::= { cienaCesConfigMgmtMIBConformance 2 }
+
+--
+-- Configuration information
+--
+
+cienaCesConfigMgmtConfigLastSaved OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The date and time of the most recent running configuration save."
+    ::= { cienaCesConfigMgmt 1 }
+
+cienaCesConfigMgmtConfigLastChanged OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The date and time of the most recent running configuration change."
+    ::= { cienaCesConfigMgmt 2 }
+
+cienaCesConfigMgmtConfigLastContext OBJECT-TYPE
+    SYNTAX     CienaCesConfigMgmtContext
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The last context that modified the configuration state."
+    ::= { cienaCesConfigMgmt 3 }
+
+cienaCesConfigMgmtConfigLastUser OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The last user that modified the configuration state."
+    ::= { cienaCesConfigMgmt 4 }
+
+cienaCesConfigMgmtConfigLastOrigin OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The last origin that modified the configuration state such as
+         an IP address or terminal."
+    ::= { cienaCesConfigMgmt 5 }
+
+--
+-- Notifications
+--
+
+cienaCesConfigMgmtConfigSavedNotification NOTIFICATION-TYPE
+        OBJECTS {
+                        cienaGlobalSeverity,
+                        cienaCesConfigMgmtConfigLastSaved,
+                        cienaCesConfigMgmtConfigLastChanged
+                }
+        STATUS  current
+        DESCRIPTION
+            "This notification is sent when the configuration is saved."
+        ::= { cienaCesConfigMgmtMIBNotifications 1 }
+
+cienaCesConfigMgmtConfigChangeNotification NOTIFICATION-TYPE
+        OBJECTS {
+                        cienaGlobalSeverity,
+                        cienaCesConfigMgmtConfigLastContext,
+                        cienaCesConfigMgmtConfigLastUser,
+                        cienaCesConfigMgmtConfigLastOrigin,
+                        cienaCesConfigMgmtConfigLastChanged                        
+                }
+        STATUS  current
+        DESCRIPTION
+            "This notification is sent when the configuration on the device changes.
+             
+             A hysteresis mechanism is evaluated before sending in an effort to limit the
+             number of events generated. This mechanism will send out one notification
+             when an accumulation rate threshold is crossed. If the context/user/origin
+             of a configuration change does not match the currently tracked 
+             context/user/origin, then this notification will automatically be sent.
+             The hysteresis algorithm will then be evaluated based on the new 
+             context/user/origin."
+        ::= { cienaCesConfigMgmtMIBNotifications 2 }
+
+END
+
+--
+-- CIENA-CES-CONFIG-MGMT-MIB
+--

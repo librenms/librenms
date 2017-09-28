@@ -358,7 +358,6 @@ A.purple:visited, a.purple, .purple { color: #740074; }
 
 .box-desc {
   font-size: 12px;
-  font-style: italic;
 }
 
 .interface-desc {
@@ -838,6 +837,13 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   font-size: 12px;
   margin: 8px;
 }
+
+.infobox .rrd-pre {
+  background-color: #CCCCFF;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
 
 .infobox-down {
 
@@ -1584,6 +1590,12 @@ tr.search:nth-child(odd) {
   line-height: 32px;
 }
 
+@media (min-width: 992px) and (max-width: 1280px) {
+  .navbar-brand {
+    display: none !important;
+  }
+}
+
 .navbar-brand img {
   height: 100%;
   max-width: 170px;
@@ -1765,7 +1777,9 @@ tr.search:nth-child(odd) {
     height: 600px;
 }
 
-.edit-storage-input {
+.edit-storage-input,
+.edit-processor-input,
+.edit-mempool-input {
     width: 100px;
 }
 
@@ -1830,16 +1844,6 @@ label {
         max-width: 45px;
         max-height: 50px;
     }
-    .device-header-table .device-icon .device-icon-48h img {
-       max-width: 20px;
-       max-height: 20px;
-    }
-    .device-header-table img {
-       max-width: 115px;
-       max-height: 40px;
-    }
-    .device-header-table {font-size : 8px;}
-    .device-header-table a {font-size : 11px;}
 }
 
 @media only screen and (max-width: 768px) and (min-width: 481px) {
@@ -1848,12 +1852,6 @@ label {
         max-width: 60px;
         max-height: 55px;
     }
-    .device-header-table img {
-       max-width: 150px;
-       max-height: 50px;
-    }
-    .device-header-table {font-size : 10px;}
-    .device-header-table a {font-size : 17px;}
 }
 
 
@@ -1910,7 +1908,7 @@ label {
 .widget_body {
     overflow-y: auto;
     width: 100%;
-    height: calc(100% - 5px);
+    height: calc(100% - 38px);
 }
 
 .device-availability, .service-availability {
@@ -1945,6 +1943,7 @@ label {
 }
 
 .availability-label {
+  border-radius: 0 .25em 0 .25em;
   float:right;
   margin:-8px;
 }
@@ -2053,18 +2052,9 @@ label {
   line-height:34px;
 }
 
-@media only screen and (max-width: 1240px) and (min-width: 1200px) {
-    .nav > li > a {
-        padding: 4px 4px !important;
-        padding-top: 15px !important;
-    }
-}
-
-@media only screen and (min-width: 1241px) {
-    .nav > li > a {
-        padding: 5px 5px !important;
-        padding-top: 15px !important;
-    }
+.nav > li > a {
+  padding-left: 10px;
+  padding-right: 5px;
 }
 
 /* devices layout modifications */
@@ -2123,18 +2113,18 @@ label {
     background-color: #f5f5f5;
 }
 
-.device-table-header-status {
-    width: 100px;
-    text-align: center;
+.device-table-metrics span {
+  display: inline-block;
+  white-space: nowrap;
 }
 
-.device-table-header-vendor {
-    width: 100px;
-    text-align: center;
+.device-table-metrics>a {
+  color:#000;
+  text-decoration:none;
 }
 
 .device-table-header-actions {
-  min-width: 120px;
+  min-width: 110px;
   text-align: center;
 }
 
@@ -2161,24 +2151,10 @@ label {
   width: 40px;
 }
 
-.device-icon-48h img {
-  height: 48px;
+.device-icon-header {
+  height: 52px;
   max-width: 250px;
-}
-
-.device-title-bar-1 {
-  width: 25%;
-  max-width: 25%;
-}
-
-.device-title-bar-2 {
-  width: 25%;
-  max-width: 25%;
- }
-
-.device-title-bar-3 {
-  width: 50%;
-  max-width: 50%;
+  margin-right: 15px;
 }
 
 .severity-ok {

@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 if ($device['os_group'] == 'unix') {
     echo $config['project_name'].' UNIX Agent: ';
 
@@ -22,7 +24,7 @@ if ($device['os_group'] == 'unix') {
     $agentinfo = stream_get_meta_data($agent);
 
     if (!$agent) {
-        echo 'Connection to UNIX agent failed on port '.$port.'.';
+        echo 'Connection to UNIX agent failed on port '.$agent_port.'.';
     } else {
         // fetch data while not eof and not timed-out
         while ((!feof($agent)) && (!$agentinfo['timed_out'])) {
@@ -31,7 +33,7 @@ if ($device['os_group'] == 'unix') {
         }
 
         if ($agentinfo['timed_out']) {
-            echo 'Connection to UNIX agent timed out during fetch on port '.$port.'.';
+            echo 'Connection to UNIX agent timed out during fetch on port '.$agent_port.'.';
         }
     }
 
@@ -42,7 +44,7 @@ if ($device['os_group'] == 'unix') {
         echo 'execution time: '.$agent_time.'ms';
 
         $tags = array(
-            'rrd_def' => 'DS:time:GAUGE:600:0:U',
+            'rrd_def' => RrdDefinition::make()->addDataset('time', 'GAUGE', 0),
         );
         $fields = array(
             'time' => $agent_time,
@@ -154,6 +156,10 @@ if ($device['os_group'] == 'unix') {
     if (!empty($agent_sensors)) {
         echo 'Sensors: ';
         check_valid_sensors($device, 'temperature', $valid['sensor'], 'agent');
+        d_echo($agent_sensors);
+        if (count($agent_sensors) > 0) {
+            record_sensor_data($device, $agent_sensors);
+        }
         echo "\n";
     }
 

@@ -1,0 +1,27 @@
+{
+    "name": "palanik/corsslim",
+    "description": "Cross-origin resource sharing (CORS) middleware for PHP Slim.",
+    "keywords": [
+        "corsslim",
+        "cors",
+        "slimphp",
+        "slim",
+        "cross-origin",
+        "preflight"
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/palanik/CorsSlim",
+    "authors": [
+        {
+            "name": "palanik"
+        }
+    ],
+    "require": {
+        "slim/slim": ">=2.4.0 <3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "CorsSlim\\": "."
+        }
+    }
+}

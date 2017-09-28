@@ -49,9 +49,9 @@ if ($ports['total']) {
     echo '
     <tr>
       <td><i class="fa fa-link fa-lg" style="color:black" aria-hidden="true"></i> '.$ports['total'].'</td>
-      <td><i class="fa fa-link fa-lg" style="color:green" aria-hidden="true"></i> '.$ports['up'].'</td>
-      <td><i class="fa fa-link fa-lg" style="color:red" aria-hidden="true"></i> '.$ports['down'].'</td>
-      <td><i class="fa fa-link fa-lg" style="color:grey" aria-hidden="true"></i> '.$ports['disabled'].'</td>
+      <td><i class="fa fa-link fa-lg interface-upup" aria-hidden="true"></i> '.$ports['up'].'</td>
+      <td><i class="fa fa-link fa-lg interface-updown" aria-hidden="true"></i> '.$ports['down'].'</td>
+      <td><i class="fa fa-link fa-lg interface-admindown" aria-hidden="true"></i> '.$ports['disabled'].'</td>
     </tr>';
 
     echo '<tr>
@@ -60,7 +60,7 @@ if ($ports['total']) {
     $ifsep = '';
 
     foreach (dbFetchRows("SELECT * FROM `ports` WHERE device_id = ? AND `deleted` != '1'", array($device['device_id'])) as $data) {
-        $data     = ifNameDescr($data);
+        $data = cleanPort($data);
         $data = array_merge($data, $device);
         echo "$ifsep".generate_port_link($data, makeshortif(strtolower($data['label'])));
         $ifsep = ', ';

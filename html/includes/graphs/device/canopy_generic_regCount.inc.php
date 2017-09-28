@@ -13,7 +13,7 @@ $scale_min = 0;
 
 require 'includes/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'canopy-generic-regCount');
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dBm                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:regCount='.$rrdfilename.':regCount:AVERAGE ';
     $rrd_options .= ' DEF:failed='.$rrdfilename.':failed:AVERAGE ';

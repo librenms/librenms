@@ -13,12 +13,12 @@ use GuzzleHttp\Psr7\NoSeekStream;
 class LimitStreamTest extends \PHPUnit_Framework_TestCase
 {
     /** @var LimitStream */
-    protected $body;
+    private $body;
 
     /** @var Stream */
-    protected $decorated;
+    private $decorated;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->decorated = Psr7\stream_for(fopen(__FILE__, 'r'));
         $this->body = new LimitStream($this->decorated, 10, 3);
@@ -41,15 +41,6 @@ class LimitStreamTest extends \PHPUnit_Framework_TestCase
         $body = Psr7\stream_for('foo_baz_bar');
         $limited = new LimitStream($body, 3, 4);
         $this->assertEquals('baz', (string) $limited);
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Unable to seek to stream position 10 with whence 0
-     */
-    public function testEnsuresPositionCanBeekSeekedTo()
-    {
-        new LimitStream(Psr7\stream_for(''), 0, 10);
     }
 
     public function testReturnsSubsetOfEmptyBodyWhenCastToString()

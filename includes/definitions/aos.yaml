@@ -7,3 +7,8 @@ ifname: 1
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 icon: alcatellucent
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.6486.801.
+        - .1.3.6.1.4.1.6486.800.1.1.2.1.
+        - .1.3.6.1.4.1.6486.800.1.1.2.2.4. #OmniStack LS

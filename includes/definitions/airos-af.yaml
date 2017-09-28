@@ -1,6 +1,6 @@
 os: airos-af
 text: 'Ubiquiti AirFiber'
-type: network
+type: wireless
 icon: ubiquiti
 nobulk: 1
 group: ubnt

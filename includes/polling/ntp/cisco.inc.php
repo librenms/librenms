@@ -11,6 +11,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\RRD\RrdDefinition;
+
 $tmp_module = 'ntp';
 
 $component = new LibreNMS\Component();
@@ -34,12 +36,11 @@ if (count($components > 0)) {
 
         // Let's make sure the rrd is setup for this class.
         $rrd_name = array('ntp', $peer);
-        $rrd_def = array(
-            'DS:stratum:GAUGE:600:0:U',
-            'DS:offset:GAUGE:600:0:U',
-            'DS:delay:GAUGE:600:0:U',
-            'DS:dispersion:GAUGE:600:0:U',
-        );
+        $rrd_def = RrdDefinition::make()
+            ->addDataset('stratum', 'GAUGE', 0)
+            ->addDataset('offset', 'GAUGE', 0)
+            ->addDataset('delay', 'GAUGE', 0)
+            ->addDataset('dispersion', 'GAUGE', 0);
 
         $array['stratum'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][9][$array['UID']];
         // Set the status, 16 = Bad

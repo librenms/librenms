@@ -42,7 +42,7 @@ if ($_SESSION['userlevel'] >= '5') {
     $param = array_merge(array($_SESSION['user_id']), $param);
 }
 
-$count_sql = "SELECT COUNT(timestamp) $sql";
+$count_sql = "SELECT COUNT(*) $sql";
 $total     = dbFetchCell($count_sql, $param);
 if (empty($total)) {
     $total = 0;

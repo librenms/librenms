@@ -50,6 +50,7 @@ function printEntPhysical($ent, $level, $class)
 
         if ($ent['ifIndex']) {
             $interface              = dbFetchRow('SELECT * FROM `ports` WHERE ifIndex = ? AND device_id = ?', array($ent['ifIndex'], $device['device_id']));
+            $interface              = cleanPort($interface);
             $ent['entPhysicalName'] = generate_port_link($interface);
         }
 

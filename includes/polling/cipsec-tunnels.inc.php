@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 if ($device['os_group'] == 'cisco') {
 // FIXME - seems to be broken. IPs appear with leading zeroes.
     $ipsec_array = snmpwalk_cache_oid($device, 'cipSecTunnelEntry', array(), 'CISCO-IPSEC-FLOW-MONITOR-MIB');
@@ -89,10 +91,10 @@ if ($device['os_group'] == 'cisco') {
         }
 
         $rrd_name = array('ipsectunnel', $address);
-        $rrd_def = array();
+        $rrd_def = new RrdDefinition();
         foreach ($oids as $oid) {
-            $oid_ds = substr(str_replace('cipSec', '', $oid), 0, 19);
-            $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:1000000000";
+            $oid_ds = str_replace('cipSec', '', $oid);
+            $rrd_def->addDataset($oid_ds, 'COUNTER', null, 1000000000);
         }
 
         $fields = array();

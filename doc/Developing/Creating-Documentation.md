@@ -25,7 +25,7 @@ Our docs are based on Markdown using mkdocs which adheres to markdown specs and 
 couple of extra libraries:
 
   - pymdownx.tasklist
-  - mdx_del_ins
+  - pymdownx.tilde
 
 This means you can use:
 

@@ -1,0 +1,90 @@
+-- *****************************************************************
+-- NMS-IF-QOS-POLICY.MIB:  NMS IF QOS POLICY MIB file
+-- FEB 2010
+-- *****************************************************************
+--
+
+NMS-IF-QOS-POLICY DEFINITIONS ::= BEGIN
+
+            IMPORTS
+            IpAddress
+				FROM RFC1155-SMI
+		    OBJECT-TYPE
+				FROM RFC-1212
+            DisplayString
+				FROM RFC1213-MIB
+		    nmsMgmt
+				FROM NMS-SMI
+		    TruthValue,RowStatus,PhysAddress,DisplayString,QosPolicy
+		    	FROM SNMPv2-TC;
+          
+                  nmsIfQosPolicy        OBJECT IDENTIFIER ::= { nmsMgmt 186}
+             
+nmsIfQosPolicyTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF NMSIfQosPolicyEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A list of nmsIfQosPolicyEntry entries. 
+				 The port-based security mac address information."
+					::= { nmsIfQosPolicy 1 }		
+	                       
+		nmsIfQosPolicyEntry	OBJECT-TYPE
+				SYNTAX		NMSIfQosPolicyEntry
+				MAX-ACCESS	not-accessible
+				STATUS		current
+				DESCRIPTION	
+							"Policy Map Apply operation.(IfIndex_QosPolicy)to Apply a  
+		                   Policy Map.For example,'07_q1'will apply the policy map 'q1' to interface which pon port diid is 7." 				
+		                 INDEX		{ nmsIfIndex,nmsIfQosPolicy,nmsIfQosPolicyDirection}
+				::= { nmsIfQosPolicyTable 1 }
+       
+		NMSIfQosPolicyEntry	::= SEQUENCE { 
+                   	nmsIfIndex				INTEGER,    
+		       	nmsIfQosPolicyDirection                  INTEGER,
+		       	nmsIfQosPolicy		 		DisplayString,
+		        nmsIfQosPolicyOperation	        	INTEGER
+  				}
+            
+		  
+               nmsIfIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                           "LLID interface id, unique in system."
+                   ::= { nmsIfQosPolicyEntry 1 } 
+               
+               nmsIfQosPolicyDirection OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    ingress(1),
+                                    egress(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+                           "A unique integer note for each interface Policy Map direction. 1-ingerss, 2-egress."
+                   ::= { nmsIfQosPolicyEntry 2 } 
+
+               nmsIfQosPolicy OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                           "A unique string for each Policy Map up to 20 characters. 
+ 							This string is part of index of Table."
+                   ::= { nmsIfQosPolicyEntry 3 } 
+
+               nmsIfQosPolicyOperation OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   		    doNothing(0),	
+                                    create(1),
+                                    delete(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+		                   "Policy Map Apply operation.0-do nothing, 1-create a single policy applying to a certain interface, 2-delete a single policy applying to a certain interface. " 
+		           ::= { nmsIfQosPolicyEntry 4 }  
+
+              	
+END		

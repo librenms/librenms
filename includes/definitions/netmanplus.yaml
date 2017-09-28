@@ -3,6 +3,7 @@ text: 'NetMan Plus'
 group: ups
 nobulk: 1
 type: power
+rfc1628_compat: 1
 over:
     - { graph: device_current, text: Current }
 discovery:

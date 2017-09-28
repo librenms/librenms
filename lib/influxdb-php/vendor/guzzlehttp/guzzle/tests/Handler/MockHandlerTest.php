@@ -5,6 +5,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\TransferStats;
 
 /**
  * @covers \GuzzleHttp\Handler\MockHandler
@@ -27,6 +28,11 @@ class MockHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $mock);
     }
 
+    public function testEmptyHandlerIsCountable()
+    {
+        $this->assertCount(0, new MockHandler());
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -43,7 +49,6 @@ class MockHandlerTest extends \PHPUnit_Framework_TestCase
         $mock = new MockHandler([$e]);
         $request = new Request('GET', 'http://example.com');
         $p = $mock($request, []);
-        $this->assertEquals(PromiseInterface::REJECTED, $p->getState());
         try {
             $p->wait();
             $this->fail();
@@ -62,6 +67,48 @@ class MockHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['foo' => 'bar'], $mock->getLastOptions());
     }
 
+    public function testSinkFilename()
+    {
+        $filename = sys_get_temp_dir().'/mock_test_'.uniqid();
+        $res = new Response(200, [], 'TEST CONTENT');
+        $mock = new MockHandler([$res]);
+        $request = new Request('GET', '/');
+        $p = $mock($request, ['sink' => $filename]);
+        $p->wait();
+
+        $this->assertFileExists($filename);
+        $this->assertEquals('TEST CONTENT', file_get_contents($filename));
+
+        unlink($filename);
+    }
+
+    public function testSinkResource()
+    {
+        $file = tmpfile();
+        $meta = stream_get_meta_data($file);
+        $res = new Response(200, [], 'TEST CONTENT');
+        $mock = new MockHandler([$res]);
+        $request = new Request('GET', '/');
+        $p = $mock($request, ['sink' => $file]);
+        $p->wait();
+
+        $this->assertFileExists($meta['uri']);
+        $this->assertEquals('TEST CONTENT', file_get_contents($meta['uri']));
+    }
+
+    public function testSinkStream()
+    {
+        $stream = new \GuzzleHttp\Psr7\Stream(tmpfile());
+        $res = new Response(200, [], 'TEST CONTENT');
+        $mock = new MockHandler([$res]);
+        $request = new Request('GET', '/');
+        $p = $mock($request, ['sink' => $stream]);
+        $p->wait();
+
+        $this->assertFileExists($stream->getMetadata('uri'));
+        $this->assertEquals('TEST CONTENT', file_get_contents($stream->getMetadata('uri')));
+    }
+
     public function testCanEnqueueCallables()
     {
         $r = new Response();
@@ -72,6 +119,35 @@ class MockHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($r, $p->wait());
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testEnsuresOnHeadersIsCallable()
+    {
+        $res = new Response();
+        $mock = new MockHandler([$res]);
+        $request = new Request('GET', 'http://example.com');
+        $mock($request, ['on_headers' => 'error!']);
+    }
+
+    /**
+     * @expectedException \GuzzleHttp\Exception\RequestException
+     * @expectedExceptionMessage An error was encountered during the on_headers event
+     * @expectedExceptionMessage test
+     */
+    public function testRejectsPromiseWhenOnHeadersFails()
+    {
+        $res = new Response();
+        $mock = new MockHandler([$res]);
+        $request = new Request('GET', 'http://example.com');
+        $promise = $mock($request, [
+            'on_headers' => function () {
+                throw new \Exception('test');
+            }
+        ]);
+
+        $promise->wait();
+    }
     public function testInvokesOnFulfilled()
     {
         $res = new Response();
@@ -112,5 +188,36 @@ class MockHandlerTest extends \PHPUnit_Framework_TestCase
         $mock = MockHandler::createWithMiddleware([$r]);
         $request = new Request('GET', 'http://example.com');
         $mock($request, ['http_errors' => true])->wait();
+    }
+
+    public function testInvokesOnStatsFunctionForResponse()
+    {
+        $res = new Response();
+        $mock = new MockHandler([$res]);
+        $request = new Request('GET', 'http://example.com');
+        $stats = null;
+        $onStats = function (TransferStats $s) use (&$stats) {
+            $stats = $s;
+        };
+        $p = $mock($request, ['on_stats' => $onStats]);
+        $p->wait();
+        $this->assertSame($res, $stats->getResponse());
+        $this->assertSame($request, $stats->getRequest());
+    }
+
+    public function testInvokesOnStatsFunctionForError()
+    {
+        $e = new \Exception('a');
+        $c = null;
+        $mock = new MockHandler([$e], null, function ($v) use (&$c) { $c = $v; });
+        $request = new Request('GET', 'http://example.com');
+        $stats = null;
+        $onStats = function (TransferStats $s) use (&$stats) {
+            $stats = $s;
+        };
+        $mock($request, ['on_stats' => $onStats])->wait(false);
+        $this->assertSame($e, $stats->getHandlerErrorData());
+        $this->assertSame(null, $stats->getResponse());
+        $this->assertSame($request, $stats->getRequest());
     }
 }

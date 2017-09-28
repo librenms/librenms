@@ -1,0 +1,1560 @@
+-- Title:      BREEZECOM  Private MIB
+--             This Private MIB supports all BREEZECOM products.
+--             This File includes support for all the BreezeAccess Product Line.
+--
+--
+-- Version:    4.5.16
+-- Date:       Tuesday August 14 2007
+-- Comments:   BREEZECOM agents also support the following Public MIBs:
+--              - MIB-II  ( RFC1213 )
+--              - BRIDGE - MIB  ( RFC1286 )
+
+
+-- Some MIB compilers require that the following lines 
+-- for proper compilation
+
+--#include "rfc1155.smi"
+--#include "rfc1212.smi"
+
+ALVARION-DOT11-WLAN-TST-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS  
+    enterprises 
+ FROM RFC1155-SMI
+    OBJECT-TYPE
+ FROM RFC1212;
+
+-- mgmt           OBJECT IDENTIFIER ::= { iso org(3) dod(6) internet(1)  mgmt(2) }
+-- mib            OBJECT IDENTIFIER ::= { mgmt 1  }
+-- directory      OBJECT IDENTIFIER ::= { internet 1  }
+-- experimental   OBJECT IDENTIFIER ::= { internet 3  }
+-- private        OBJECT IDENTIFIER ::= { internet 4  }
+-- enterprises    OBJECT IDENTIFIER ::= { private 1  }
+
+-- End of lines which might be needed to other MIB browsers 
+-- for proper compilation
+
+
+
+  MacAddress ::= OCTET STRING (SIZE(6))
+  DisplayString ::= OCTET STRING 
+
+
+--  breezecom        OBJECT IDENTIFIER ::= { enterprises 710 }
+--  breezecomPrvRev  OBJECT IDENTIFIER ::= { breezecom 3 }
+--  brzAccessMib     OBJECT IDENTIFIER ::= { breezecomPrvRev 3}
+   
+  alvarion        	OBJECT IDENTIFIER ::= { enterprises 12394 }
+  alvarionPrvRev  	OBJECT IDENTIFIER ::= { alvarion       3  }
+  brzLighteningMib  OBJECT IDENTIFIER ::= { alvarionPrvRev 1  }
+  brzLighteningTest OBJECT IDENTIFIER ::= { alvarionPrvRev 2  }
+
+
+-- ****************************************************************************************
+-- ****************************************************************************************
+
+-- Service Params
+-- ==============
+
+  brzLighteGenParams OBJECT IDENTIFIER ::= { brzLighteningTest 1  }
+
+    brzLighteUnitName OBJECT-TYPE
+	     	SYNTAX DisplayString   
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteGenParams 1 }
+
+    brzLighteUnitType OBJECT-TYPE
+	     	SYNTAX  DisplayString  
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteGenParams 2 }
+
+    brzLighteUnitBand OBJECT-TYPE
+	     	SYNTAX DisplayString    
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteGenParams 3 }
+
+    brzLighteUnitHwVer OBJECT-TYPE
+	     	SYNTAX DisplayString   
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteGenParams 4 }
+
+    brzLighteUnitSwVer OBJECT-TYPE
+	     	SYNTAX DisplayString   
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteGenParams 5 }
+
+    brzLighteUnitShadowVer OBJECT-TYPE
+	     	SYNTAX DisplayString   
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteGenParams 6 }
+
+    brzLighteUnitFlashType OBJECT-TYPE
+	     	SYNTAX DisplayString   
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteGenParams 7 }
+
+    brzLighteUnitFlashSize OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteGenParams 8 }
+
+
+    brzLighteUnitStatus OBJECT-TYPE
+	     	SYNTAX INTEGER {scaning(0), sync_waitForAdd(1), authenticating(2),
+	     					authenticated(3),associated(4),unknown(5)}  
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteGenParams 10 }
+
+    brzLighteUnitAssocStatus OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteGenParams 11 }
+
+    brzLighteUnitBssId OBJECT-TYPE
+	     	SYNTAX MacAddress   
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteGenParams 12 }
+
+    brzLighteUnitMacAddress OBJECT-TYPE
+	     	SYNTAX  DisplayString 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteGenParams 13 }
+
+    brzLighteLockFlashUnitMacAddress OBJECT-TYPE
+	     	SYNTAX  INTEGER {flashMacAdd_Lock(1), flashMacAdd_UnLock(2)} 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteGenParams 14 }
+
+    brzLighteUnitHWReset OBJECT-TYPE
+	     	SYNTAX  INTEGER {resetHW(1), cancel(2)} 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteGenParams 15 }
+
+
+  brzLighteTxRxSettings OBJECT IDENTIFIER ::= { brzLighteningTest 2  }
+    
+    brzLighteSetTransmitMode OBJECT-TYPE
+	     	SYNTAX INTEGER {Cont_tx_100_Data(1),tx_CW(3),Cont_tx_99_Data(4)}  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteTxRxSettings 1 }
+
+
+    brzLighteTxFrequencyCenter OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteTxRxSettings 2 }
+
+    brzLighteRxFrequencyCenter OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteTxRxSettings 3 }
+	
+  brzLighteTransmitParams OBJECT IDENTIFIER ::= { brzLighteTxRxSettings 4  }
+    
+    brzLighteTransmitPowerLevel OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteTransmitParams 1 }
+
+
+    brzLighteBitRate OBJECT-TYPE
+	     	SYNTAX INTEGER {mbps_6(6),mbps_9(9),mbps_12(12),
+	     					mbps_18(18),mbps_24(24),mbps_36(36),
+	     					mbps_48(48),mbps_54(54)}  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteTransmitParams 2 }
+
+
+  brzLighteTxVVAParams OBJECT IDENTIFIER ::= { brzLighteTransmitParams 3  }
+    
+    brzLighteSetTxVVA OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteTxVVAParams 1 }
+
+
+    brzLighteVVATableStatus OBJECT-TYPE
+	     	SYNTAX INTEGER {unBurned(0),burned(1)}  
+	     	ACCESS read-only
+	     	STATUS obsolete
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteTxVVAParams 7 }
+
+    brzLightePoutAtTRSwitchRxMode OBJECT-TYPE
+	     	SYNTAX DisplayString   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteTxVVAParams 8 }
+
+  brzLighteNewVvaParams OBJECT IDENTIFIER ::= { brzLighteTxVVAParams 9  }
+
+    brzLighteSetOpenLoopState OBJECT-TYPE
+	     	SYNTAX INTEGER {cancel(0),setOpenLoop(1)}   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "Set The unit to min pcdac power , vva 0 , open loop state -> for rev C only."
+			::= { brzLighteNewVvaParams 1 }
+
+    brzLighteMaxPowerOpenLoop OBJECT-TYPE
+	     	SYNTAX DisplayString   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteNewVvaParams 2 }
+
+ 
+
+	brzLighteNewVvaTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF brzLighteNewVvaEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+	        "A table of up to 63 indexes."
+			::= { brzLighteNewVvaParams 7 }
+
+	brzLighteNewVvaEntry  OBJECT-TYPE
+			SYNTAX brzLighteNewVvaEntry
+			ACCESS not-accessible
+			STATUS mandatory
+	        DESCRIPTION
+	        "A table entry."
+			INDEX { brzLighteNewVvaEntry }
+			::= { brzLighteNewVvaTable 1 }
+
+	brzLighteNewVvaTableIndex   OBJECT-TYPE
+			SYNTAX	INTEGER  
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION	 
+	        "."	
+	    ::= { brzLighteNewVvaEntry 1 }
+
+	brzLighteNewVvaTableData   OBJECT-TYPE
+			SYNTAX	INTEGER  
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION	 
+	        "."	
+	    ::= { brzLighteNewVvaEntry 2 }
+
+	
+    brzLighteTxNewVVATableRequest OBJECT-TYPE
+	     	SYNTAX INTEGER  {burn(0),load(1), cancel(2)} 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            ""
+			::= { brzLighteNewVvaParams 8 }
+
+
+    brzLighteMaxPowerAtMaxRate OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            ""
+			::= { brzLighteNewVvaParams 9 }
+
+
+    brzLighteNewVVaTableStatus OBJECT-TYPE
+	     	SYNTAX INTEGER {vvaNotCalibrated(0) , vvaCalibrated(1)} 
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            " 0 = NOT Calibrated - use Hard Coded Table accordig to Hw Revision ,
+              1 = VVa Table calibrated for 5.4 GHz Units."
+			::= { brzLighteNewVvaParams 10 }
+
+
+    brzLighteFixVVaAttenuation_5_4GHz OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            " ."
+			::= { brzLighteNewVvaParams 11 }
+
+
+    brzLighteSetNewVVaTableToLinear OBJECT-TYPE
+	     	SYNTAX INTEGER {cancel(0) , setLinear(1)} 
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            " ."
+			::= { brzLighteNewVvaParams 12 }
+
+
+
+  brzLightePCDAC OBJECT IDENTIFIER ::= { brzLighteTransmitParams 4  }
+	
+	brzLightePcdacTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF brzLightePcdacEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+	        "A table of up to 63 indexes."
+			::= { brzLightePCDAC 1 }
+
+	brzLightePcdacEntry  OBJECT-TYPE
+			SYNTAX brzLightePcdacEntry
+			ACCESS not-accessible
+			STATUS mandatory
+	        DESCRIPTION
+	        "A table entry."
+			INDEX { brzLightePcdacTableIdx }
+			::= { brzLightePcdacTable 1 }
+
+	brzLightePcdacEntry ::= SEQUENCE {
+			brzLightePcdacTableIdx  INTEGER,
+			brzLightePcdacTableData  INTEGER
+			}
+
+	brzLightePcdacTableIdx   OBJECT-TYPE
+			SYNTAX	INTEGER  {pcdac_Min(0),pcdac_Max(1),pcdac_0_pcnt(2),pcdac_5_pcnt(3),
+							  pcdac_10_pcnt(4),pcdac_20_pcnt(5),pcdac_30_pcnt(6),pcdac_50_pcnt(7),
+							  pcdac_70_pcnt(8),pcdac_85_pcnt(9),pcdac_90_pcnt(10),pcdac_95_pcnt(11),pcdac_100_pcnt(12)}
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION	 
+	        "A table Index."	
+	    ::= { brzLightePcdacEntry 1 }
+
+		 
+	brzLightePcdacTableData   OBJECT-TYPE
+			SYNTAX	INTEGER  
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION	 
+	        "."	
+	    ::= { brzLightePcdacEntry 2 }
+
+    brzLightePcdacTableCurrentChannel OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightePCDAC 2 }
+
+
+    brzLightePcdacTableRequest OBJECT-TYPE
+	     	SYNTAX INTEGER {write_pcdac_Channels(0), write_pcdac_Values(1), cancel(2)}  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightePCDAC 3 }
+
+    brzLightePcdacBurnToFlash OBJECT-TYPE
+	     	SYNTAX INTEGER {cancel (0), burn_to_flash(1)}  
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightePCDAC 4 }
+
+	
+
+	brzLightePcdacChannelsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF brzLightePcdacChannelsEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+	        "A table of up to 10 indexes."
+			::= { brzLightePCDAC 5 }
+
+	brzLightePcdacChannelsEntry  OBJECT-TYPE
+			SYNTAX brzLightePcdacChannelsEntry
+			ACCESS not-accessible
+			STATUS mandatory
+	        DESCRIPTION
+	        "A table entry."
+			INDEX { brzLightePcdacChannelsTableIdx }
+			::= { brzLightePcdacChannelsTable 1 }
+
+	brzLightePcdacChannelsEntry ::= SEQUENCE {
+			brzLightePcdacChannelsTableIdx  INTEGER,
+			brzLightePcdacChannelsTableData  INTEGER
+			}
+
+	brzLightePcdacChannelsTableIdx   OBJECT-TYPE
+			SYNTAX	INTEGER  {channel_0(0),channel_1(1),channel_2(2),
+							  channel_3(3),channel_4(4),channel_5(5),
+							  channel_6(6),channel_7(7),channel_8(8),channel_9(9)}
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION	 
+	        "A table Index."	
+	    ::= { brzLightePcdacChannelsEntry 1 }
+
+		 
+	brzLightePcdacChannelsTableData   OBJECT-TYPE
+			SYNTAX	INTEGER  
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION	 
+	        "."	
+	    ::= { brzLightePcdacChannelsEntry 2 }
+
+  brzLighteTransmit OBJECT IDENTIFIER ::= { brzLighteTransmitParams 5  }
+   
+
+    brzLighteSetTransmitOn OBJECT-TYPE
+	     	SYNTAX INTEGER  {start_Tx(1),stop_Tx(2)} 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteTransmit 1 }
+
+    brzLighteforcePowerTx OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "Enter the power multipled by 2."
+			::= { brzLighteTransmitParams  6 }
+
+    brzLighteRereadProm OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteTransmitParams  7 }
+
+    brzLighteTypeOfTxPattern OBJECT-TYPE
+	     	SYNTAX INTEGER  {FixedPattern(0) , randomPattern(1)}
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteTransmitParams  8 }
+
+    brzLighteTxFixedPattern OBJECT-TYPE
+	     	SYNTAX DisplayString  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "Enter Exactly 8 Hex digits."
+			::= { brzLighteTransmitParams  9 }
+
+    brzLighteTurboMode OBJECT-TYPE
+	     	SYNTAX INTEGER  {normal(0) , turbo(1), half(2) , quarter(3)}
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteTransmitParams  10 }
+
+
+    brzLightenewTxGainOffset OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteTransmitParams  11 }
+ 
+    brzLighteGainStep OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteTransmitParams  12 }
+
+
+
+    brzLighteChannelMode OBJECT-TYPE
+	     	SYNTAX INTEGER {channel_57(0) ,channel_24(1) } 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteTransmitParams  13 }
+
+
+
+  brzLighteRawPowerDataRevisionC OBJECT IDENTIFIER ::= { brzLighteTransmitParams 14 }
+    
+    brzLightePwr1_Xg1 OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteRawPowerDataRevisionC  1 }
+    
+    brzLightePwr2_Xg1 OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteRawPowerDataRevisionC  2 }
+
+    brzLightePwr3_Xg1 OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteRawPowerDataRevisionC  3 }
+
+    brzLightePwr4_Xg1 OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteRawPowerDataRevisionC  4 }
+
+    brzLightePcd2_Delta OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteRawPowerDataRevisionC  5 }
+
+    brzLightePcd3_Delta OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteRawPowerDataRevisionC  6 }
+
+    brzLightePcd4_Delta OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteRawPowerDataRevisionC  7 }
+
+    brzLightePwr1_xg2 OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteRawPowerDataRevisionC  8 }
+
+    brzLightePwr2_xg2 OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteRawPowerDataRevisionC  9 }
+
+    brzLightePwr3_xg2 OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteRawPowerDataRevisionC  10 }
+
+    brzLightePcd1 OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteRawPowerDataRevisionC  11 }
+
+    brzLighteTxGainForNormalMode OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteTransmitParams  15 }
+
+
+  brzLighteRecieveParams OBJECT IDENTIFIER ::= { brzLighteTxRxSettings 5 }
+
+
+  brzLighteRxVVA OBJECT IDENTIFIER ::= { brzLighteRecieveParams 2  }
+    
+    brzLighteSetRxVVA OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteRxVVA 1 }
+
+    brzLighteTRSwitchControl OBJECT-TYPE
+	     	SYNTAX INTEGER {normal(1),rx_and_Tx_attenuated(2),tx_attenuated_state(3),rx_attenuated_state(4)}  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteTxRxSettings 6 }
+
+    brzLighteTRSwitchOption OBJECT-TYPE
+	     	SYNTAX INTEGER {disable(0), enable(1)}  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "Enable/Disable the TR/Switch algorithm running in normal mode."
+			::= { brzLighteTxRxSettings 7 }
+
+	brzLightePcktLen OBJECT-TYPE
+	     	SYNTAX INTEGER (1..4056)
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "Packet length for OFDM 99% - Body length"
+			::= { brzLighteTxRxSettings 8 }
+
+  brzLighteTests OBJECT IDENTIFIER ::= { brzLighteningTest 3 }
+  brzLighteBerPerTest OBJECT IDENTIFIER ::= { brzLighteTests 1 }
+  brzLighteBerPerParams OBJECT IDENTIFIER ::= { brzLighteBerPerTest 1 }
+    
+    brzLighteBerPerParamsLength OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteBerPerParams 1 }
+
+    brzLighteBerPerParamsInterval OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteBerPerParams 2 }
+
+    brzLighteBerPerParamsRate OBJECT-TYPE
+	     	SYNTAX INTEGER {mbps_6(6),mbps_9(9),mbps_12(12),
+	     					mbps_18(18),mbps_24(24),mbps_36(36),
+	     					mbps_48(48),mbps_54(54)}
+	     					--,all_Rates(100)}  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteBerPerParams 3 }
+
+    brzLighteBerPerParamsPackets OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteBerPerParams 4 }
+
+
+    brzLighteResetBerPerCounters OBJECT-TYPE
+	     	SYNTAX INTEGER  {cancel(0), reset(1)} 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteBerPerTest 2 }
+
+    brzLighteRunBerPerTest OBJECT-TYPE
+	     	SYNTAX INTEGER  {run_Tx_ber_test(0), run_Rx_ber_test(1),stop_test(2)} 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteBerPerTest 3 }
+
+  brzLighteBerPerTestResults OBJECT IDENTIFIER ::= { brzLighteBerPerTest 4 }
+
+    brzLighteErrors OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "Applicable to SU and AU. Read-only.
+             The number of frames received from the wireless
+             media with errors (CRC errors)."
+			::= { brzLighteBerPerTestResults 1 }
+
+
+    brzLighteGoodPacketsRecieved OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "Applicable to SU and AU. Read only.
+             The total number of frames that were received
+             from the wireless media.
+             The count includes data and control and management
+             frames, including beacons received from the AU.
+             The count does not include frames that were discarded
+             internally, bad frames and duplicate frames."
+			::= { brzLighteBerPerTestResults 3 }
+
+  brzLighteRssiTest OBJECT IDENTIFIER ::= { brzLighteTests 2 }
+
+    brzLighteAvgRssiRecieved OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteRssiTest 1 }
+
+    brzLighteInRangeRecievedPackets OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteRssiTest 2 }
+
+    brzLighteOutOfRangeRecievedPackets OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteRssiTest 3 }
+
+
+			 
+	brzLighteRxRssiTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF brzLighteRxRssiEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+	        "A table of up to 63 indexes."
+			::= { brzLighteRssiTest 4 }
+
+	brzLighteRxRssiEntry  OBJECT-TYPE
+			SYNTAX brzLighteRxRssiEntry
+			ACCESS not-accessible
+			STATUS mandatory
+	        DESCRIPTION
+	        "A table entry."
+			INDEX { brzLighteRxRssiTableIdx }
+			::= { brzLighteRxRssiTable 1 }
+
+	brzLighteRxRssiEntry ::= SEQUENCE {
+			brzLighteRxRssiTableIdx  INTEGER,
+			brzLighteRxRssiTableData  INTEGER
+			}
+
+	brzLighteRxRssiTableIdx   OBJECT-TYPE
+			SYNTAX	INTEGER  
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION	 
+	        "A table Index."	
+	    ::= { brzLighteRxRssiEntry 1 }
+
+	brzLighteRxRssiTableData   OBJECT-TYPE
+			SYNTAX	INTEGER  
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION	 
+	        "."	
+	    ::= { brzLighteRxRssiEntry 2 }
+
+
+
+
+
+
+
+
+
+  brzLighteBistTest OBJECT IDENTIFIER ::= { brzLighteTests 3 }
+
+--    brzLighteRunBistTest OBJECT-TYPE
+--	     	SYNTAX INTEGER  {runSdram_Test(1),runFlash_Test(2)}
+--	     	ACCESS read-write
+--	     	STATUS mandatory
+--		    DESCRIPTION	 
+--            "."
+--			::= { brzLighteBistTest 1 }
+--
+    brzLighteMemoryTestResult OBJECT-TYPE
+	     	SYNTAX INTEGER  {pass(0),fail(1)} 
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteBistTest 1 }
+
+    brzLighteEthernetMacRegTestResult OBJECT-TYPE
+	     	SYNTAX INTEGER  {pass(0),fail(1)} 
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteBistTest 2 }
+
+    brzLighteEthernetPhyRegTestResult OBJECT-TYPE
+	     	SYNTAX INTEGER  {pass(0),fail(1)} 
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteBistTest 3 }
+
+    brzLighteEthernetIntrptTestResult OBJECT-TYPE
+	     	SYNTAX INTEGER  {pass(0),fail(1)} 
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteBistTest 4 }
+
+
+  brzLightLedsTest OBJECT IDENTIFIER ::= { brzLighteTests 4 }
+
+    brzLighteTurnLedsOn OBJECT-TYPE
+	     	SYNTAX INTEGER  {turnLedsOn(1),turnLedsOff(2)} 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightLedsTest 1 }
+
+  brzLightDebugParams OBJECT IDENTIFIER ::= { brzLighteningTest 5  }
+--    
+    
+    brzLighteSwitchSettintTime OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 1 }
+   
+    brzLighteTxEndTo_Xlna_On OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 2 }
+
+
+    brzLighteTxEndTo_Xpa_Off OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 3 }
+
+    brzLighteTxFrameTo_Xpa_On OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 4 }
+
+
+    brzLighteBeaconsRate OBJECT-TYPE
+	     	SYNTAX INTEGER  {stopBeacons(1) , cancel(2)} 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 5 }
+
+
+    brzLighteObSetting OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 6 }
+
+    brzLighteDbSetting OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 7 }
+
+    brzLighteXpdGain OBJECT-TYPE
+	     	SYNTAX INTEGER  {val_0(0), val_6(6) , val12(12), val_18(18)} 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 8 }
+
+    brzLighteToggleExternalPower OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 9 }
+
+    brzLightePowerOverride OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 10 }
+
+    brzLighteAntennaSwitch OBJECT-TYPE
+	     	SYNTAX INTEGER {switch(1) , cancel(2)}  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 11 }
+
+    brzLighteRfGainBoost OBJECT-TYPE
+	     	SYNTAX INTEGER {val_0(0) , val_5(5) , val_10(10)}  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 12 }
+
+    brzLighteConfigSet OBJECT-TYPE
+	     	SYNTAX INTEGER {regConfig(1) , cancel(2)}  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 13 }
+
+	brzLighteTxPowerTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF BrzLighteTxPowerEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+	        "A table of up to 63 indexes."
+			::= { brzLightDebugParams 14 }
+
+	brzLighteTxPowerEntry  OBJECT-TYPE
+			SYNTAX BrzLighteTxPowerEntry
+			ACCESS not-accessible
+			STATUS mandatory
+	        DESCRIPTION
+	        "A table entry."
+			INDEX { brzLighteTxPowerTableIdx }
+			::= { brzLighteTxPowerTable 1 }
+
+	brzLighteTxPowerEntry ::= SEQUENCE {
+			brzLighteTxPowerTableIdx           INTEGER, 
+			brzLighteTxPowerTablePcdac	       INTEGER
+			}
+
+	brzLighteTxPowerTableIdx   OBJECT-TYPE
+			SYNTAX	INTEGER  
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION	 
+	        "A table Index."	
+	    ::= { brzLighteTxPowerEntry 1 }
+		 
+
+	brzLighteTxPowerTablePcdac   OBJECT-TYPE
+			SYNTAX	INTEGER  
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION	 
+	        "A table Index."	
+	    ::= { brzLighteTxPowerEntry 2 }
+
+
+
+
+    brzLighteFtpStatus OBJECT-TYPE
+	     	SYNTAX INTEGER {ftpActive(1) ,ftpSuccess(2), ftpFail(3)}  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 15 }
+
+
+
+
+brzLightAuAvarageSNR OBJECT IDENTIFIER ::= { brzLightDebugParams 16  }
+
+    brzLighteAuAvgSNRSupport OBJECT-TYPE
+	     	SYNTAX INTEGER  {disable (0) , enable(1)} 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightAuAvarageSNR 1 }
+
+
+    brzLighteShowAuAvgSNR OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightAuAvarageSNR 2 }
+
+
+
+    brzaccVLRtsCtsFailed   OBJECT-TYPE
+            SYNTAX  Counter32  
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "." 
+        ::= { brzLightDebugParams 17 }
+
+
+    brzLighteHeatControl OBJECT-TYPE
+	     	SYNTAX INTEGER {normal_heat_operation(0), mac_roc_heater_on(1)}  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 18 }
+
+
+    brzLightePaSleepControl OBJECT-TYPE
+	     	SYNTAX INTEGER {paSleepOfF(0), paSleepOn(1)}  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 19 }
+
+
+    brzLighteFilterControl OBJECT-TYPE
+	     	SYNTAX INTEGER {lowband(0), upperBand(1)}  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "When FIL_SEL='0'  Japanese lower band 4950 MHz is Selected
+			 When FIL_SEL='1'  Japanese upper band 5060 MHz is Selected."
+			::= { brzLightDebugParams 20 }
+
+    brzLighteTx_frame_to_tx_d_start OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 21 }
+
+
+    brzLighteTx_frame_to_xpaa_on OBJECT-TYPE
+	     	SYNTAX INTEGER   
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLightDebugParams 22 }
+
+    brzLighteAteMode OBJECT-TYPE
+	     	SYNTAX INTEGER  {normalMode(0),ateMode_Tx(1),ateMode_Rx(2)} 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteningTest 7 }
+
+
+
+
+
+brzLighteWCU OBJECT IDENTIFIER ::= { brzLighteningTest 9  }
+
+    brzLighteChallengeText OBJECT-TYPE
+	     	SYNTAX DisplayString
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteWCU 1 }
+ 
+ 
+    brzLighteCpldVersion OBJECT-TYPE
+	     	SYNTAX DisplayString
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteWCU 2 }
+
+
+    brzLighteAuType OBJECT-TYPE
+	     	SYNTAX INTEGER {auNI(1) , auBS(2),suOnly(3)}
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteWCU 3 }
+ 
+    brzLighteHwMaxRate OBJECT-TYPE
+	     	SYNTAX INTEGER {rate6Mbps(1) , rate24Mbps(2),rate14Mbps(3),
+	     	                rate28Mbps(4),rate54Mbps(5),rateUnLimitedMbps(6),
+	     	                rate3Mbps(7), rateSUIMbps(9)}
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteWCU 4 }
+ 
+    brzLighteSysConfiguration OBJECT-TYPE
+	     	SYNTAX INTEGER {pToMultiPoint(1) , pToPoint(2)}
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteWCU 5 }
+ 
+
+    brzaccVLUnitHwOutputPower   OBJECT-TYPE
+            SYNTAX  DisplayString  
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU and SU.
+             The output power to the antenna port supported by the unit"
+            ::= { brzLighteWCU 6 }
+
+
+    brzLighteChannelBandwidth OBJECT-TYPE
+	     	SYNTAX INTEGER {channelBW5Mhz(1) , channelBW10Mhz(2),channelBW20Mhz(3)}
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteWCU 7 }
+
+
+    brzLighteDeleteShadowVersion OBJECT-TYPE
+	     	SYNTAX INTEGER {deleteShadow(1) , cancel(2)}
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteWCU 8 }
+
+
+    brzLighteBridgeMode OBJECT-TYPE
+	     	SYNTAX INTEGER {mode_BD(1) , mode_1D(2), mode_4D(3)}
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteWCU 9 }
+
+
+brzLighteSecurityPermissions  OBJECT IDENTIFIER ::= { brzLighteWCU 10  }
+  
+    brzLighteSecurityPermission  OBJECT-TYPE
+	     	SYNTAX INTEGER {forbidden(1) , permitted(2)}
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteSecurityPermissions 1 }
+    
+
+    brzLighteDataEncryption  OBJECT-TYPE
+	     	SYNTAX INTEGER {forbidden(1) , permitted(2)}
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteSecurityPermissions 2 }
+
+
+    brzLighteEncryptionByAes  OBJECT-TYPE
+	     	SYNTAX INTEGER {forbidden(1) , permitted(2)}
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteSecurityPermissions 3 }
+
+
+
+    AuthenticationBySharedKeyAlgorithm  OBJECT-TYPE
+	     	SYNTAX INTEGER {forbidden(1) , permitted(2)}
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteSecurityPermissions 4 }
+
+    brzLighteUnitConfigurationMode OBJECT-TYPE
+	     	SYNTAX INTEGER {
+	     	                 AU_BS(1)  , AU_SA(2)  ,SU_6_1D(3),
+	     					 SU_6_BD(4),SU_24_BD(5),BU_B14(6),
+	     					 BU_B28(7) ,RB_B14(8)  ,RB_B28(9),SU_BD(10),SU_54_BD(11), 
+	     					 SU_3_1D (12), SU_3_4D (13), 
+	     					 AUS_BS(14), AUS_SA(15),
+							 AU_BS_4900(16), AU_SA_4900(17), SU_BD_4900(18), 
+							 BU_B100(19), RB_B100(20), SU_I(21),
+							 AU_EZ(22),
+	     					 setDefaults(100)
+	     				   }
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteWCU 11 }
+
+
+    brzLighteHwUnitType OBJECT-TYPE
+	     	SYNTAX INTEGER { AU(1) , SU(2) ,ATE_AU(3),ATE_SU(4) }
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteWCU 12 }
+
+
+    brzLighteSetConfigurationMode OBJECT-TYPE
+	     	SYNTAX INTEGER {
+	     	                 AU_BS(1)  , AU_SA(2)  ,SU_6_1D(3),
+	     					 SU_6_BD(4),SU_24_BD(5),BU_B14(6),
+	     					 BU_B28(7) ,RB_B14(8)  ,RB_B28(9),SU_BD(10),SU_54_BD(11), 
+	     					 SU_3_1D (12), SU_3_4D (13),
+	     					 AUS_BS(14), AUS_SA(15),
+							 AU_BS_4900(16), AU_SA_4900(17), SU_BD_4900(18), 
+							 BU_B100(19), RB_B100(20), SU_I(21),
+							 AU_EZ(22),
+	     					 setDefaults(100)
+	     				   }
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteWCU 13 }
+	
+
+    brzLighteCountryCode OBJECT-TYPE
+	     	SYNTAX INTEGER 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "."
+			::= { brzLighteWCU 14 }
+
+
+    brzLighteAntennaGain OBJECT-TYPE
+	     	SYNTAX DisplayString 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            " -1 stands for: do NOT transmit, -2 stands for: don't care."
+			::= { brzLighteWCU 15 }
+
+brzLighteOemParams  OBJECT IDENTIFIER ::= { brzLighteWCU 16 }
+
+    brzLighteFixOemType OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(32))
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION  
+            "Get/Set OEM Type of Unit.
+             1: Alvarion,
+             4: Nera,
+             6: Empty OEM Strings."
+            ::= { brzLighteOemParams 1 }
+
+    brzLighteOemProjectNameString OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(32))
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION  
+            "Get/Set OEM Product Line of Unit.
+             The setting is only possible if the oem string is empty."
+            ::= { brzLighteOemParams 2 }
+
+    brzLighteOemManufactureNameString OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(32))
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION  
+            "Get/Set OEM Vendor Name for Unit.
+             The setting is only possible if the oem string is empty."
+            ::= { brzLighteOemParams 3 }
+
+   brzLighteSetMibEnterprise OBJECT-TYPE
+	     	SYNTAX INTEGER { enterprise710 (710), enterprise8295 (8295) }
+		    ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "enterprise710 -  breezecom, enterprise8295 - bwa.
+             will come into effect only after next reset. To use
+             this, the unit must be in technician mode. "
+            ::= { brzLighteOemParams 4 }
+
+
+	brzLighteAtherosRegTable  OBJECT-TYPE
+            SYNTAX SEQUENCE OF BrzLighteAtherosRegEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units. Atheros registers Table"
+            ::= {brzLighteningTest 11}
+
+    brzLighteAtherosRegEntry OBJECT-TYPE
+            SYNTAX BrzLighteAtherosRegEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units. 
+             AN entry in the Atheros register table"  
+             INDEX { brzLighteAtherosRegOffsetMask }
+            ::= { brzLighteAtherosRegTable 1 }
+
+    BrzLighteAtherosRegEntry ::= SEQUENCE {
+    		brzLighteAtehrosRegValue				INTEGER,
+            brzLighteAtherosRegOffsetMask			INTEGER
+            }
+               
+    brzLighteAtehrosRegValue  OBJECT-TYPE
+            SYNTAX INTEGER  
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            ""
+           ::= { brzLighteAtherosRegEntry 1 }
+
+    brzLighteAtherosRegOffsetMask   OBJECT-TYPE
+            SYNTAX INTEGER  
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            ""
+           ::= { brzLighteAtherosRegEntry 2 }
+           
+    brzLighteAUSSubscribersNo OBJECT-TYPE
+	     	SYNTAX INTEGER 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "Number of Subscribers that can be associated to AUS"
+			::= { brzLighteWCU 17 }
+				
+	brzLighteSUPMaxMirDownlink OBJECT-TYPE
+        	SYNTAX  INTEGER  
+        	MAX-ACCESS read-write
+        	STATUS current
+        	DESCRIPTION 
+        	"Applicable to AU only. 
+         	Range for set: 128 to 53,888 (Kbps)
+         	The actual value (Get) will be the entered value rounded to the nearest 
+         	multiple of 128 (N*128)." 
+			::= { brzLighteWCU 19 }
+			
+	brzLighteBNB10MHzSupport OBJECT-TYPE
+        	SYNTAX  INTEGER  { nonSupported(0), supported(1) } 
+        	MAX-ACCESS read-write
+        	STATUS current
+        	DESCRIPTION 
+        	"Applicable to BNB only" 
+			::= { brzLighteWCU 20 }
+		 
+			
+   brzLighteModemUtilisation OBJECT-TYPE
+	     	SYNTAX INTEGER 
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "Modem Utilization value"
+			::= { brzLighteningTest 12 }
+
+brzLighteANI  OBJECT IDENTIFIER ::= { brzLighteningTest 13 }		
+	
+	brzLighteNoiseImmunityStateControl OBJECT-TYPE
+	     	SYNTAX INTEGER { Manual(0),Automatic(1) } 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "Noise Immunity State Control"
+			::= { brzLighteANI 1 }
+			
+	brzLighteNoiseImmunityLevel OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "Noise Immunity Level
+            Allowed range is 0 to 4"
+			::= { brzLighteANI 2 }	
+			
+	brzLighteSpurImunityLevel OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "Spur Imunity Level
+            Allowed range is 0 to 7"
+			::= { brzLighteANI 3 }	
+			
+	brzLighteOFDMWeakSignal OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "OFDM Weak Signal
+            Allowed range is 0 to 1"
+			::= { brzLighteANI 4 }
+			
+	brzLightePulseDetectionSensitivity OBJECT-TYPE
+	     	SYNTAX INTEGER { Low(0),High(1) } 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "Pulse Detection Sensitivity"
+			::= { brzLighteANI 5 }	
+													     			
+brzLighteANIState OBJECT IDENTIFIER ::= { brzLighteningTest 14 }
+
+	brzLighte_noiseImmunityLevel OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "noiseImmunityLevel"
+			::= { brzLighteANIState 1 }	
+			
+	brzLighte_spurImmunityLevel OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "spurImmunityLevel"
+			::= { brzLighteANIState 2 }
+			
+	brzLighte_ofdmWeakSigDetectionOff OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "ofdmWeakSigDetectionOff"
+			::= { brzLighteANIState 3 }
+		
+	brzLighte_cckWeakSigThresholdHigh OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "cckWeakSigThresholdHigh"
+			::= { brzLighteANIState 4 }
+	
+	brzLighte_firstepLevel OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "firstepLevel"
+			::= { brzLighteANIState 5 }
+			
+	brzLighte_spurImmunityBias OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "spurImmunityBias"
+			::= { brzLighteANIState 6 }
+			
+	brzLighte_phyErrStatsDisabled OBJECT-TYPE
+	     	SYNTAX INTEGER  
+	     	ACCESS read-only
+	     	STATUS mandatory
+		    DESCRIPTION	 
+            "phyErrStatsDisabled"
+			::= { brzLighteANIState 7 }													
+
+   brzLighteVLAteSetTestResults OBJECT-TYPE
+	     	SYNTAX  INTEGER {none(0), pass(1), fail(2)} 
+	     	ACCESS read-write
+	     	STATUS mandatory
+		DESCRIPTION	 
+            "Set the Ate Test Results"
+		::= { brzLighteGenParams 16 }
+
+    brzLighteVLSetSerialNumber OBJECT-TYPE
+	     	SYNTAX  DisplayString (SIZE(0..35))
+     		ACCESS read-write
+	     	STATUS mandatory
+		DESCRIPTION	 
+            "Set the Serial Number"
+		::= { brzLighteGenParams 17 }
+END

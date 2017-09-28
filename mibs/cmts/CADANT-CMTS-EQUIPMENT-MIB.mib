@@ -1,0 +1,2235 @@
+
+CADANT-CMTS-EQUIPMENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cadEquipment
+        FROM CADANT-PRODUCTS-MIB
+    AdminState, 
+    CardId, 
+    CardSubType, 
+    CardType, 
+    DiskVolumeUsageLevel,
+    DuplexStatus, 
+    EqActionType, 
+    FirmwareSource, 
+    FlowControlMode,
+    PicType, 
+    PortId,
+    PortMode,
+    PortDetectedMode,
+    PortType, 
+    PrimaryState, 
+    SecondaryState, 
+    ShelfId,
+    UnknownState
+        FROM CADANT-TC
+    TenthdBmV
+        FROM DOCS-IF-MIB
+    InterfaceIndexOrZero
+        FROM IF-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Counter32, 
+    Integer32, 
+    MODULE-IDENTITY, 
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE, 
+    TimeTicks, 
+    IpAddress,
+    Unsigned32
+        FROM SNMPv2-SMI
+    DateAndTime,
+    DisplayString, 
+    MacAddress, 
+    RowStatus,
+    TEXTUAL-CONVENTION, 
+    TimeStamp, 
+    TruthValue
+        FROM SNMPv2-TC;
+
+cadEquipmentMib MODULE-IDENTITY
+    LAST-UPDATED "200903030000Z" -- March 3, 2009
+    ORGANIZATION 
+        "Arris International, Inc."
+    CONTACT-INFO 
+        "Arris Technical Support
+         Phone: +1 630 281 3000
+         E-Mail: support@arrisi.com"
+    DESCRIPTION 
+        "This MIB is intended to describe all objects which are used to
+         control and report on the state of a Cadant CMTS. These objects
+         are used to perform the following functions on a Cadant CMTS:
+
+         a) provision the cards, ports, and the CMTS itself
+         b) run dianostic tests
+         c) configure auditing parameters
+         d) receive equipment-related traps "
+    REVISION "200903030000Z" -- March 3, 2009
+    DESCRIPTION 
+	"Change syntax of cmIpAddress from IpAddress to OCTET STRING to handle IPv4 and v6."
+    REVISION "200901050000Z" -- January 5, 2009
+    DESCRIPTION 
+	"Add restrictions on the size of some strings in card table."
+    REVISION "200810140000Z" -- October 14, 2008
+    DESCRIPTION 
+	"Add shelf id back into trap messages."
+    REVISION "200810010000Z" -- October 1, 2008
+    DESCRIPTION 
+	"Add ranges for allowable card temperatures."
+    REVISION "200807030000Z" -- July 3, 2008
+    DESCRIPTION 
+	"Remove portGroupId since cable-mac replaced this MIB object.
+	Add shelfNumber to portPrStateChange, portSecStateChange and portDplxStatusChange to match the variable binding list seen on trap monitor."
+    REVISION "200806180000Z" -- June 18, 2008
+    DESCRIPTION 
+	"Additional support for disk sizes."
+    REVISION "200804280000Z" -- April 28, 2008
+    DESCRIPTION 
+	"Initial support for MPM carrier cards."
+    REVISION "200804020000Z" -- April 2, 2008
+    DESCRIPTION 
+	"Support various levels of temperature warnings."
+    REVISION "200802250000Z" -- Feb 25, 2008
+    DESCRIPTION 
+	"Allowed Event Ids to range 0x00000000 to 0xFFFFFFFF for fpgaErrorEvent Table."
+    REVISION "200711050000Z" -- Nov 5, 2007
+    DESCRIPTION 
+        "Add port flow control parameters and remove gbic support."
+    REVISION "200701100000Z" -- Jan 10, 2007
+    DESCRIPTION 
+        "Remove cardSwBuildTime"
+    REVISION "200611130000Z" -- Nov 13, 2006
+    DESCRIPTION 
+        "Remove portMacPortId"
+    REVISION "200609120000Z" -- Sep 12, 2006
+    DESCRIPTION 
+        "Change syntax of portMacPortId from MacPortId to MacPortIdWithInvalid (65536 is invalid)"
+    REVISION "200608230000Z" -- Aug 23, 2006
+    DESCRIPTION 
+        "Add portMacPortId"
+    REVISION "200602140000Z"
+    DESCRIPTION 
+        "Add additional variable-binding cmIpAddress cmRegistrationNotification"
+    REVISION    "200508300000Z"
+    DESCRIPTION 
+        "Add support for RCM module."
+    REVISION "200504060000Z"
+    DESCRIPTION 
+        "Add support for CM registration notification"
+    REVISION "200502040000Z"
+    DESCRIPTION 
+        "Add downstream power loss notification."
+    REVISION "200501240000Z"
+    DESCRIPTION 
+        "Add last card reset reason to card table."
+    REVISION "200412010000Z"
+    DESCRIPTION 
+        "Add downstream power visibility to port table."
+    REVISION "200411180000Z"
+    DESCRIPTION 
+        "(1) Add 2 additional variable-bindings to cmResetClearNotification.
+         (2) Add 1 additional variable-binding  to cmResetNotification."
+    REVISION "200411110000Z"
+    DESCRIPTION 
+        "Add preliminary support for customized FPGA error event handling."
+    REVISION "200409070000Z"
+    DESCRIPTION 
+        "Add cardSubType, portGroupId and portDocsIfIndex to C4 Port Primary
+         and Secondary Trap."
+    REVISION "200407230000Z"
+    DESCRIPTION 
+        "(1) Modify the TEXTUAL-CONVENTION of TestId.
+         (2) Add diagTestId for cardTestResultNotification."
+    REVISION "200403220000Z"
+    DESCRIPTION 
+        "Added portDescription."
+    REVISION "200403180000Z"
+    DESCRIPTION 
+        "(1) Add support for card temperature trap control.
+         (2) Fix smidump error by changing diskVolumeFileName object mibtree"
+    REVISION "200402040000Z"
+    DESCRIPTION 
+        "Add CmResetClear notification."
+    REVISION "200312180000Z"
+    DESCRIPTION 
+        "Add support for logical uchannel port type and
+         preliminary support for extended gbic information."
+    REVISION "200303310000Z"
+    DESCRIPTION 
+        "Add preliminary pic support."
+    REVISION "200303170000Z"
+    DESCRIPTION 
+        "Add card detail support."
+    REVISION "200303050000Z"
+    DESCRIPTION 
+        "Replacing portGroupId with portCardSubType and renaming portDPortId to portGroupId."
+    REVISION "200303020000Z"
+    DESCRIPTION 
+        "Add card temperature monitoring."
+    REVISION "200301290000Z"
+    DESCRIPTION 
+        "Adding portDPortId and portConnectorId objects to portTable to support 2D12U CAM."
+    REVISION "200212140000Z"
+    DESCRIPTION 
+        "Revise audit entries. Add auditAutoScheduling and auditLogOutput control.
+         Remove auditResultNotification"            
+    REVISION "200211070000Z"
+    DESCRIPTION 
+        "Add support for diskVolume"
+    REVISION "200209250000Z"
+    DESCRIPTION 
+        "Undo previous change."
+    REVISION "200209010000Z"
+    DESCRIPTION 
+        "Make cardsubtype backward compatible."
+    REVISION "200205010000Z"
+    DESCRIPTION 
+        "Add support for cardFpgaToCpuSendRate."
+    REVISION "200112281630Z"
+    DESCRIPTION 
+        "Add support for cardSwBuildTime."
+    REVISION "200112211630Z"
+    DESCRIPTION 
+        "Add support for cardUpTime."
+    REVISION "200110030000Z"
+    DESCRIPTION 
+        "Add support for card detected trap."
+    REVISION "200107170000Z"
+    DESCRIPTION 
+        "Add support for card sparing."
+
+    ::= { cadEquipment 1 }
+
+
+TestId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        " Used as index to Test Tables. "
+    SYNTAX      Integer32 (1..100)
+
+TestType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        " Indicates whether this is a 'Test', a 'Diagnostic',
+         or unknown. "
+    SYNTAX      INTEGER { 
+        test(1), 
+        diagnostic(2), 
+        unknown(3) 
+    }
+
+TestCommand ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        " A set of commands applicable to this test. A value of
+         noop will do nothing. "
+    SYNTAX      INTEGER { 
+        noop(1), 
+        stop(2), 
+        disable(3), 
+        enable(4),
+        runNow(5) 
+    }
+
+TestScheduleCommand ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        " A set of periodic schedule command applicable to
+         this test. This is used in conjunction with the 
+         TestSchedule and TestTime to specify the start
+         time of the test. If the TestSchedule value is 0, 
+         then the test will be executed once at the time
+         specified by the TestTime. For any other 
+         TestSchedule value, the test will be executed at
+         time specified by the TestTime and repeated 
+         periodically base on the value specified by 
+         TestSchedule. A value of noop will do nothing. "
+    SYNTAX      INTEGER { 
+        noop(1), 
+        disable(2), 
+        enable(3) 
+    }
+
+TestSchedule ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        " A set of scheduling interval option applicable to this 
+         test only if Schedule is selected. This is recommended for 
+         hardware routine exercise (REX).  The value expresses in multiple
+         of hours. For example: 1 hour interval, 24 hour interval, 48 hour interval.
+         A value of 0 indicate no scheduling option for this test."
+    SYNTAX      Integer32
+
+TestResult ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        " Test Result. "
+    SYNTAX      INTEGER { 
+        notRun(1),
+        inProgress(2), 
+        pass(3), 
+        fail(4),
+        inconclusive(5),
+        timeOut(6),
+        abort(7) 
+    }
+
+TestTransactionId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        " Transaction Id associated with a test or diagnostic. The EMS must populate
+         the value of this object to be able to correlate the test sent and the 
+         result coming back.  "
+    SYNTAX      Integer32 (0..2147483647)
+
+equipmentTraps OBJECT IDENTIFIER
+    ::= { cadEquipmentMib 0 }
+
+--
+-- System General Object Group
+--
+systemGeneral OBJECT IDENTIFIER
+    ::= { cadEquipmentMib 1 }
+
+systemClock     OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS      accessible-for-notify
+        STATUS      current
+        DESCRIPTION 
+            "CMTS local date and time displayed as 
+             yyyy-mm-dd,hh:mm:ss.d,+/-hh:mm, where the date is yyyy-mmmm-dd and 
+             time in deci-seconds is hh:mm:ss.d, adn teh current offset from 
+             GMT is +/-hh:mm. This object is adjusted by teh TZ and DST rules.
+             E.g. 2002-5-26,13;30:15.0,-4:0"
+        ::= { systemGeneral 1 }
+
+trapCounter OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            " This is the trap sequence number that increments each
+            time a trap is sent. It is persistent across resets. "
+        ::= { systemGeneral 2 }
+
+trapSeverity OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        cleared(1),
+                        indeterminate(2),
+                        warning(3),
+                        minor(4),
+                        major(5),
+                        critical(6),
+                        informational(7)
+                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            " Severity level of a Cadant trap. "
+        DEFVAL { cleared }
+        ::= { systemGeneral 3 }
+
+systemKey OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The systemKey is a unique string used for Candant's CMTS
+              identification. The EMS uses this key string as well as the
+              sysOid in the MIB-II system group MIB to identify Candant's
+              CMTS's. "
+        ::= { systemGeneral 4 }
+
+cardNumber OBJECT-TYPE
+        SYNTAX      CardId
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            " Card Id used in traps. A value 99 indicates an invalid cardNumber. "
+        DEFVAL { 99 }
+        ::= { systemGeneral 98 }
+
+portNumber OBJECT-TYPE
+        SYNTAX  PortId
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            " Port Id used in traps. A value of 99 indicates an invalid portNumber. "
+        DEFVAL { 99 }
+        ::= { systemGeneral 99 }
+
+diskDriveNumber OBJECT-TYPE
+        SYNTAX      Integer32 (0..99)
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            " Disk drive ID use in a Cadant trap. A value of 99 indicates an invalid diskDriveNumber"
+        DEFVAL { 99 }
+        ::= { systemGeneral 100 }
+
+diskVolumeNumber OBJECT-TYPE
+        SYNTAX      Integer32 (0..99)
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            " Disk volume ID use in a Cadant trap. A value of 99 indicates an invalid diskVolumeNumber"
+        DEFVAL { 99 }
+        ::= { systemGeneral 101 }
+
+--
+-- Shelf Object Group
+--
+shelfObjects OBJECT IDENTIFIER
+    ::= { cadEquipmentMib 2 }
+
+shelfNumber OBJECT-TYPE
+        SYNTAX  ShelfId
+        MAX-ACCESS read-only
+        STATUS      deprecated
+        DESCRIPTION
+            " The instance identifier of a Cadant CMTS in a multi-Cadant CMTS
+            configuration. This shelfNumber is used in traps.  A value of 99 
+            indicates an invalid shelfNumber. "
+        DEFVAL { 1 }
+        ::= { shelfObjects 1 }
+
+shelfName OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            " A string that represents the name of this machine and may uniquely
+            identify it from other network devices. "
+        DEFVAL { "Cadant C4 CMTS" }
+        ::= { shelfObjects 2 }
+
+shelfSwVersion OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "The software version currently executing."
+        ::= { shelfObjects 3 }
+
+--
+-- Equipment State Object Group
+--
+equipmentState OBJECT IDENTIFIER
+    ::= { cadEquipmentMib 3 }
+
+cardLastChangeTime OBJECT-TYPE
+        SYNTAX          TimeStamp
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The value of sysUpTime at the time any of the objects
+            in cardTable last changed. "
+        ::= {  equipmentState 2 }
+
+portLastChangeTime OBJECT-TYPE
+        SYNTAX          TimeStamp
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The value of sysUpTime at the time any of the objects
+            in portTable last changed. "
+        ::= { equipmentState 3 }
+
+--
+-- Equipment Tables (cards and ports)
+--
+equipmentTbl OBJECT IDENTIFIER
+    ::= { cadEquipmentMib 4 }
+
+--
+-- Card table
+--
+cardTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CardEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A table of card or circuit pack information."
+        ::= { equipmentTbl 2 }
+
+cardEntry OBJECT-TYPE
+        SYNTAX  CardEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A conceptual row containing pertinent information about a card or
+            a circuit pack. "
+        INDEX   { cardShelfId, cardId }
+        ::= { cardTable 1 }
+        
+CardEntry ::= SEQUENCE {
+                cardShelfId             ShelfId,
+                cardId                  CardId,
+                cardName                DisplayString,
+                cardType                CardType,
+                cardSubType             CardSubType,
+                cardSerialNum           DisplayString,
+                cardFwVersion           DisplayString,
+                cardHwVersion           DisplayString,
+                cardSwVersion           DisplayString,
+                cardAdminState          AdminState,
+                cardPrState             PrimaryState,
+                cardSecState            SecondaryState,
+                cardDplxStatus          DuplexStatus,
+                cardAction              EqActionType,
+                cardTrapInh             BITS,
+                cardNumPorts            Integer32,
+                cardDetected            CardType,
+                cardSubDetected         CardSubType,
+                cardFwUpdateStatus      TruthValue,
+                cardSpareGroupId        CardId,
+                cardSpareGroupMode      INTEGER,
+                cardUpTime              TimeTicks,
+                cardTemperature         Integer32,
+                cardCpuType             DisplayString,
+                cardCpuSpeed            Unsigned32,
+                cardBusSpeed            Unsigned32,
+                cardRamSize             Unsigned32,
+                cardFlashSize           Unsigned32,
+                cardCPLDVersion         DisplayString,
+                cardFpgaSource          FirmwareSource,
+                cardBootVersion         DisplayString,
+                cardLastBootVersion     DisplayString,
+                cardLastBootSource      FirmwareSource,
+                cardPicDetected         PicType,
+                cardPicSerialNum        DisplayString,
+                cardPicHwVersion        DisplayString,
+                cardLastResetReason     DisplayString,
+                cardTemperatureHighWarn Integer32,
+                cardTemperatureHighError Integer32,
+                cardCarrierSerialNum    DisplayString,
+                cardCarrierFwVersion    DisplayString,
+                cardCarrierHwVersion    DisplayString
+                }
+        
+cardShelfId OBJECT-TYPE
+        SYNTAX      ShelfId
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+        DESCRIPTION
+            "The unique id the shelf that contains this card."
+        ::= { cardEntry 1 }
+
+cardId OBJECT-TYPE
+        SYNTAX      CardId
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The unique id of this card within the shelf. The 
+             convention of cardId is as follows:
+            - Indices from 1 to 50 [1 - 50] are reserved for Circuit Packs. 
+              In this case, the cardId is 1 plus the 0-based slot number. 
+            - Indices from 51 to 98 [51 - 98] are reserved for Auxilliary Devices in within
+              a shelf. Auxilliary Devices or Modules could be Fan Module, Power Module,
+              Tape Drive and or Disc-Drive. In this case, the cardName and cardType
+              indentify the Auxilliary Devices. Not all of row attributes are applicable
+              for Auxilliary Devices. "
+        ::= { cardEntry 2 }
+
+cardName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        " This is the name of the card, if it has one. "
+        ::= { cardEntry 3 }
+
+cardType OBJECT-TYPE
+        SYNTAX      CardType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                " The type of card, if any. For example Ecard, Fcard, Dcard or Ucard
+                 If the slot is empty, the value would be 'empty'. "
+        ::= { cardEntry 4 }
+
+cardSubType OBJECT-TYPE
+        SYNTAX      CardSubType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            " The cardType alone may not be specific enough to fully describe the
+             type of card that is in this slot. For example, a card type of Dcard
+             might have a more  specific type of 1D8U with integrated upconverter.
+             If the card needs no further specificication that the cardType, then
+             the value of cardSubType is 'none'. Not yet implemented. "
+        ::= { cardEntry 5 }
+
+cardSerialNum OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the serial number of the card. "
+        ::= { cardEntry 6 }
+
+cardFwVersion OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..128))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the firmware or FPGA version number of the card. "
+        ::= { cardEntry 7 }
+
+cardHwVersion OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..128))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the hardware version of the card. "
+        ::= { cardEntry 8 }
+
+cardSwVersion OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the software version of the card. "
+        ::= { cardEntry 9 }
+
+cardAdminState OBJECT-TYPE
+        SYNTAX      AdminState
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            " This is the administrative state of this card. "
+        ::= { cardEntry 12 }
+
+cardPrState OBJECT-TYPE
+        SYNTAX      PrimaryState
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the primary state of this card. "
+        ::= { cardEntry 13 }
+
+cardSecState OBJECT-TYPE
+        SYNTAX      SecondaryState
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the secondary state of this card. "
+        ::= { cardEntry 14 }
+
+cardDplxStatus OBJECT-TYPE
+        SYNTAX      DuplexStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the duplexing status of this card. "
+        ::= { cardEntry 15 }
+
+cardAction OBJECT-TYPE
+        SYNTAX      EqActionType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            " Write-only action performed on this card. "
+        ::= { cardEntry 17 }
+
+cardTrapInh OBJECT-TYPE
+        SYNTAX      BITS { primary(0), secondary(1), duplex(2), detected(3), 
+                    tempoutofrange(4), tempnoreport(5), tempoverheat(6) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            " If a bit is set, the corresponding state change trap
+            will not be sent. "
+        ::= { cardEntry 18 }
+
+cardNumPorts OBJECT-TYPE
+        SYNTAX      Integer32 (0..50)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " Number of ports this card contains. "
+        ::= { cardEntry 19 }
+
+cardDetected OBJECT-TYPE
+        SYNTAX      CardType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " CardType dectected automatically by the CMTS. "
+        ::= { cardEntry 20 }
+
+cardSubDetected OBJECT-TYPE
+        SYNTAX      CardSubType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " CardSubType dectected automatically by the CMTS. "
+        ::= { cardEntry 21 }
+
+cardFwUpdateStatus OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " Set to TRUE if a firmware update is in progress or has been done,
+            else set to FALSE. "
+        DEFVAL { false }
+        ::= { cardEntry 23 }
+
+cardSpareGroupId OBJECT-TYPE
+        SYNTAX CardId
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " The cardId of the spare group leader for this sparing group.  
+            This value will be set to the invalid card id for all cards not
+            associated with a sparing group. "
+        ::= { cardEntry 24 }
+
+cardSpareGroupMode OBJECT-TYPE
+        SYNTAX INTEGER {
+          manual(1),
+          auto(2),
+          invalid(99)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " The admin mode of the spare group leader for this sparing group.
+            This value will be set to the invalid card id for all cards not
+            associated with a sparing group. "
+        ::= { cardEntry 25 }
+
+cardUpTime OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The value of sysUpTime when the primary state for this card 
+            made a transition from OOS to IS. "
+        ::= { cardEntry 26 }
+
+cardTemperature OBJECT-TYPE
+        SYNTAX Integer32 (-30..120|999)
+        UNITS "degrees Centigrade"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The current operational temperature of the card. "
+        DEFVAL { 999 }
+        ::= { cardEntry 29 }
+
+cardCpuType OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..25))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The current CPU type of the card. "
+        ::= { cardEntry 30 }
+
+cardCpuSpeed OBJECT-TYPE
+        SYNTAX Unsigned32
+        UNITS "MHz"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The current CPU speed of the card. "
+        ::= { cardEntry 31 }
+
+cardBusSpeed OBJECT-TYPE
+        SYNTAX Unsigned32
+        UNITS "hertz"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The current bus speed of the card. "
+        ::= { cardEntry 32 }
+
+cardRamSize OBJECT-TYPE
+        SYNTAX Unsigned32
+        UNITS "bytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The current size of installed RAM of the card. "
+        ::= { cardEntry 33 }
+
+cardFlashSize OBJECT-TYPE
+        SYNTAX Unsigned32
+        UNITS "bytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The current size of installed FLASH of the card. "
+        ::= { cardEntry 34 }
+
+cardCPLDVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The current version of CPLD installed on the card. "
+        ::= { cardEntry 35 }
+
+cardFpgaSource OBJECT-TYPE
+        SYNTAX FirmwareSource
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The source of the running version of the FPGAs on the card. "
+        DEFVAL { committed }
+        ::= { cardEntry 36 }
+
+cardBootVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..90))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The current versions of the boot loaders installed on the card. "
+        ::= { cardEntry 37 }
+
+cardLastBootVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..20))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The last version of the boot loader used on the card. "
+        ::= { cardEntry 38 }
+
+cardLastBootSource OBJECT-TYPE
+        SYNTAX FirmwareSource
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The source of the version of the bootloader last
+              used on the card. "
+        DEFVAL { boot1 }
+        ::= { cardEntry 39 }
+
+cardPicDetected OBJECT-TYPE
+        SYNTAX PicType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The type of PIC detected in this slot. "
+        DEFVAL { invalid }
+        ::= { cardEntry 40 }
+
+cardPicSerialNum OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the serial number of the PIC. "
+        DEFVAL { "" }
+        ::= { cardEntry 41 }
+
+cardPicHwVersion OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the hardware version of the PIC. "
+        DEFVAL { "" }
+        ::= { cardEntry 42 }
+
+cardLastResetReason OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The reason for the latest card recovery. "
+        DEFVAL { "" }
+        ::= { cardEntry 43 }
+
+cardTemperatureHighWarn OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "degrees Centigrade"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " The temperature of the card at which warnings are generated. "
+        DEFVAL { 70 }
+        ::= { cardEntry 44 }
+
+cardTemperatureHighError OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "degrees Centigrade"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " The temperature of the card at which recoveries are initiated. "
+        DEFVAL { 90 }
+        ::= { cardEntry 45 }
+
+cardCarrierSerialNum OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the serial number of the carrier card, and valid only for DMM/MPM cards. "
+        DEFVAL { "" }
+        ::= { cardEntry 46 }
+
+cardCarrierFwVersion OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..128))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the firmware version of the carrier card, and valid only for DMM/MPM cards. "
+        DEFVAL { "" }
+        ::= { cardEntry 47 }
+
+cardCarrierHwVersion OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..128))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the hardwarer versioin of the carrier card, and valid only for DMM/MPM cards. "
+        DEFVAL { "" }
+        ::= { cardEntry 48 }
+
+--
+-- Port table
+--
+portTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF PortEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A table of Ports information."
+        ::= { equipmentTbl 3 }
+
+portEntry OBJECT-TYPE
+        SYNTAX  PortEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A conceptual row containing pertinent information about a port 
+             owned by a card."
+        INDEX   { portShelfId, portCardId, portId }
+        ::= { portTable 1 }
+        
+PortEntry ::= SEQUENCE {
+                portShelfId             ShelfId,
+                portCardId              CardId,
+                portId                  PortId,
+                portType                PortType,
+                portAdminState          AdminState,
+                portPrState             PrimaryState,
+                portSecState            SecondaryState,
+                portDplxStatus          DuplexStatus,
+                portAction              EqActionType,
+                portTrapInh             BITS,
+                portNumChans            Integer32,
+                portDocsIfIndex         InterfaceIndexOrZero,
+                portMacAddress          MacAddress,
+                portMode                PortMode,
+                portDetectedMode        PortDetectedMode,
+                portBgpId               Integer32,
+                portConnectorId         PortId,
+                portCardSubType         CardSubType,
+                portDescription         DisplayString,
+                portCurrDsPower         TenthdBmV,
+                portMinDsPower          TenthdBmV,
+                portMaxDsPower          TenthdBmV,
+                portTxFlowControlMode   FlowControlMode,
+                portRxFlowControlMode   FlowControlMode,
+                portTxFlowControlDetected    FlowControlMode,
+                portRxFlowControlDetected    FlowControlMode,
+                portMacIfIndex          InterfaceIndexOrZero
+        }
+
+portShelfId OBJECT-TYPE
+        SYNTAX  ShelfId
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+                "The unique id of the shelf this port belongs to."
+        ::= { portEntry 1 }
+
+portCardId OBJECT-TYPE
+        SYNTAX  CardId
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The unique id of the card this port belongs to."
+        ::= { portEntry 2 }
+
+portId OBJECT-TYPE
+        SYNTAX PortId
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The unique id of this port within a card.
+             the shelfId, the cardId and portId uniquely identify a port "   
+        ::= { portEntry 3 }
+
+portType OBJECT-TYPE
+        SYNTAX  PortType
+        MAX-ACCESS      read-only
+        STATUS  current
+        DESCRIPTION
+             " Type of this port. "
+        ::= { portEntry 4 }
+
+portAdminState OBJECT-TYPE
+        SYNTAX  AdminState
+        MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+            "The Admin state of this port"
+        ::= { portEntry 6 }
+
+portPrState OBJECT-TYPE
+        SYNTAX  PrimaryState
+        MAX-ACCESS      read-only
+        STATUS  current
+        DESCRIPTION
+            "The primary state of this port"
+        ::= { portEntry 7 }
+
+portSecState OBJECT-TYPE
+        SYNTAX  SecondaryState
+        MAX-ACCESS      read-only
+        STATUS  current
+        DESCRIPTION
+            "The secondary state of this port"
+        ::= { portEntry 8 }
+
+portDplxStatus OBJECT-TYPE
+        SYNTAX  DuplexStatus
+        MAX-ACCESS      read-only
+        STATUS  current
+        DESCRIPTION
+            "The port Duplexing status."
+        ::= { portEntry 9 }
+
+portAction OBJECT-TYPE
+        SYNTAX EqActionType
+        MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+            " Write-only action performed on a Port. "
+        ::= { portEntry 11 }
+
+portTrapInh OBJECT-TYPE
+    SYNTAX      BITS { primary(0), secondary(1), duplex(2), 
+                    linkUpLinkDown(3) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " If a bit is set, the corresponding state change trap
+            will not be sent. "
+        ::= { portEntry 12 }
+
+portNumChans OBJECT-TYPE
+        SYNTAX Integer32 (0..50)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Number of channels this port contains. "
+        ::= { portEntry 13 }
+
+portDocsIfIndex OBJECT-TYPE
+        SYNTAX InterfaceIndexOrZero
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " This object is here just in case a Port component does
+            have a one to one correspondent with the IfTable. Example: D card
+            in Cadant's CMTS system contains 8 ports, 1 for downstream channel and
+            up to 3 upstream channels. Each channel will correspond to an ifIndex as
+            specified in the ipcdn-rf-interface-mib. In this case, this object MUST
+            have the same value as of ifIndex. A -1 indicates that this port does not
+            have an association in the Iftable. "
+        ::= { portEntry 14 }
+
+portMacAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The physical address value for this card. This value is used to
+            populate the ifPhysAddress field in the IfTable and other Tables in docsis RFC MIBs."           
+        ::= { portEntry 15 }
+
+portMode OBJECT-TYPE
+        SYNTAX PortMode
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " The desired operating mode of an ethernet port. Not yet implemented. "
+        DEFVAL { autoNegotiate }
+        ::= { portEntry 16 }
+
+portDetectedMode OBJECT-TYPE
+        SYNTAX PortDetectedMode
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The current operating mode of an ethernet port. "
+        ::= { portEntry 17 }
+
+
+portBgpId OBJECT-TYPE
+        SYNTAX Integer32 (-2147483647..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The bridge group port id for this port. "
+        ::= { portEntry 19 }
+
+portConnectorId OBJECT-TYPE
+        SYNTAX PortId
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " For portType = uport, the rear pic connector this port is mapped to.
+            Otherwise, the value of this object is invalid(99). "
+        DEFVAL { 99 }
+        ::= { portEntry 20 }
+
+portCardSubType OBJECT-TYPE
+        SYNTAX CardSubType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The CardSubType of the card this port belongs to."
+        ::= { portEntry 21 }
+
+portDescription OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            " A persistent copy of ifAlias for this interface."
+        ::= { portEntry 27 }
+
+portCurrDsPower OBJECT-TYPE
+        SYNTAX      TenthdBmV 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The latest downstream power level reported by the port.
+              This is valid on for ports of type dport."
+        DEFVAL { 0 }
+        ::= { portEntry 28 }
+
+portMinDsPower OBJECT-TYPE
+        SYNTAX      TenthdBmV 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The latest downstream power level reported by the port.
+              This is valid on for ports of type dport."
+        DEFVAL { 0 }
+        ::= { portEntry 29 }
+
+portMaxDsPower OBJECT-TYPE
+        SYNTAX      TenthdBmV 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The latest downstream power level reported by the port.
+              This is valid on for ports of type dport."
+        DEFVAL { 0 }
+        ::= { portEntry 30 }
+
+portTxFlowControlMode OBJECT-TYPE
+        SYNTAX      FlowControlMode 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            " The transmit flow control settings for this port (network ports only)."
+        DEFVAL { desired }
+        ::= { portEntry 31 }
+
+portRxFlowControlMode OBJECT-TYPE
+        SYNTAX      FlowControlMode 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            " The receive flow control settings for this port (network ports only)."
+        DEFVAL { desired }
+        ::= { portEntry 32 }
+
+portTxFlowControlDetected OBJECT-TYPE
+        SYNTAX      FlowControlMode 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The reported transmit flow control settings for this port (network ports only)."
+        DEFVAL { unknown }
+        ::= { portEntry 33 }
+
+portRxFlowControlDetected OBJECT-TYPE
+        SYNTAX      FlowControlMode 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The reported receive flow control settings for this port (network ports only)."
+        DEFVAL { unknown }
+        ::= { portEntry 34 }
+
+portMacIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The MAC IfIndex currently associcated with the RF port."
+        DEFVAL { 0 }
+        ::= { portEntry 35 }
+
+
+
+--
+-- Disk volume tables
+--
+diskVolumeTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DiskVolumeEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A table of disk volume information."
+        ::= { equipmentTbl 4 }
+
+diskVolumeEntry OBJECT-TYPE
+        SYNTAX  DiskVolumeEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A conceptual row containing pertinent information about a disk volume "
+        INDEX   { diskVolumeShelfId, diskVolumeCardId, diskVolumeDriveId, diskVolumeId }
+        ::= { diskVolumeTable 1 }
+        
+DiskVolumeEntry ::= SEQUENCE {
+                diskVolumeShelfId                 ShelfId,
+                diskVolumeCardId                  CardId,
+                diskVolumeDriveId                 Integer32,
+                diskVolumeId                      Integer32,
+                diskVolumeName                    DisplayString,
+                diskVolumeSize                    Integer32,
+                diskVolumeUsageLevel              DiskVolumeUsageLevel,
+                diskVolumeUsagePercentage         Integer32,
+                diskVolumeUsageCriticalThreshold  Integer32,
+                diskVolumeUsageMajorThreshold     Integer32,
+                diskVolumeUsageMinorThreshold     Integer32,
+                diskVolumeAutoDeleteUnusedFile    TruthValue,
+                diskVolumeTrapInh                 BITS,
+                diskVolumeDiskSize                Integer32
+                }
+
+diskVolumeShelfId OBJECT-TYPE
+        SYNTAX  ShelfId
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "The unique id of the shelf this disk volume belongs to."
+        ::= { diskVolumeEntry 1 }
+
+diskVolumeCardId OBJECT-TYPE
+        SYNTAX  CardId
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The unique id of the card this disk volume belongs to."
+        ::= { diskVolumeEntry 2 }
+
+diskVolumeDriveId OBJECT-TYPE
+        SYNTAX Integer32 (1..99)
+        MAX-ACCESS     not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The unique id of the disk drive this disk volume belongs to.
+             A value of 99 indicates an invalid disk drive"
+        ::= { diskVolumeEntry 3 }
+
+diskVolumeId OBJECT-TYPE
+        SYNTAX Integer32 (1..99)
+        MAX-ACCESS     not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The unique id of this disk volume.
+             the diskVolumeShelfId, the diskVolumeCardId, the diskVolumeDiskId, 
+             and the. A value of 99 indicate an invalid volume "
+        ::= { diskVolumeEntry 4 }
+
+diskVolumeName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of the disk volume."
+        ::= { diskVolumeEntry 5 }
+
+diskVolumeSize OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The disk volume size in units of 512 bytes."
+        ::= { diskVolumeEntry 6 }
+
+diskVolumeUsageLevel OBJECT-TYPE
+        SYNTAX      DiskVolumeUsageLevel
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The disk volume usage level."
+        ::= { diskVolumeEntry 7 }
+
+diskVolumeUsagePercentage OBJECT-TYPE
+        SYNTAX      Integer32 (0..100)
+        UNITS       "percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The disk volume usage percentage."
+        ::= { diskVolumeEntry 8 }
+
+diskVolumeUsageCriticalThreshold OBJECT-TYPE
+        SYNTAX      Integer32 (0..100)
+        UNITS       "percent"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Usage percentage level when exceed will cause a
+             diskVolumeUsageNotification trap to be sent with 
+             diskVolumeUsageLevel of diskVolumeUsageCritical."
+        DEFVAL { 90 }
+        ::= { diskVolumeEntry 9 }
+
+diskVolumeUsageMajorThreshold OBJECT-TYPE
+        SYNTAX      Integer32 (0..100)
+        UNITS       "percent"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Usage percentage level when exceed will cause a
+             diskVolumeUsageNotification trap to be sent with 
+             diskVolumeUsageLevel of diskVolumeUsageMajor."
+        DEFVAL { 80 }
+        ::= { diskVolumeEntry 10 }
+
+diskVolumeUsageMinorThreshold OBJECT-TYPE
+        SYNTAX      Integer32 (0..100)
+        UNITS       "percent"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Usage percentage level when exceed will cause a
+             diskVolumeUsageNotification trap to be sent with 
+             diskVolumeUsageLevel of diskVolumeUsageMinor."
+        DEFVAL { 70 }
+        ::= { diskVolumeEntry 11 }
+
+diskVolumeAutoDeleteUnusedFile OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "When set to TRUE to the system will automatically delete 
+             unused files when diskVolumeUsage exceed the 
+             diskVolumeUsageCriticalThreshold value."
+        DEFVAL { false }
+        ::= { diskVolumeEntry 12 }
+
+diskVolumeTrapInh OBJECT-TYPE
+        SYNTAX      BITS { criticalUsageLevel(0), majorUsageLevel(1), 
+                           minorUsageLevel(2), autoDeleteFiles(3) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "If a bit is set, the corresponding trap
+             will not be sent. "
+        DEFVAL      { {} }
+        ::= { diskVolumeEntry 13 }
+
+diskVolumeDiskSize OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total physical disk capacity in bytes."
+        DEFVAL { 0 }
+        ::= { diskVolumeEntry 14 }
+
+diskVolumeFileName  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The name of a file on the disk volume use for trap notification."
+        ::= { equipmentTbl 5 }
+
+--============= DIAGNOSTIC/TEST GROUP =================--
+-- This group contains objects defined for the purpose of diagnostic and test.
+-- The disctinction between diagnostic and test is that: The resource must be in
+-- the OOS state before Diagnostic (DGN) can begin. Test, however, does not require the
+-- resource to be OOS. In-service loop back is an example of test.
+-- Test/DGN can be performed on a shelf, a card or a port. Therefore, each of them will
+-- have their own test/Dgn table.
+-- The EMS needs to retreive the test/dgn table to see what test or dgn are supported 
+-- by the element.
+-- A single test/dgn consists of:
+-- a TestId, a TestName, a TestDescription, a set of commands performed on the test,
+-- a test scheduling options, a description of test result. 
+-- A test Transaction Id which is populated by the EMS to synchronize test results coming
+-- back from the Agent. 
+-- Test result will be sent back to the EMS via a TestResultNotification trap.
+-- 
+--=======================================================--
+equipmentDiag OBJECT IDENTIFIER
+    ::= { cadEquipmentMib 5 }
+
+--
+-- CMTS diagnostic configuration
+--
+eqDiagConfig OBJECT IDENTIFIER
+    ::= { equipmentDiag 1 }
+
+remainInDiagMode OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "When set to TRUE, the device being diagnosed will remain
+             in diagnostic state when the diagnostic test is completed.
+             When set to FALSE, the device will revert to its original
+             state when the diagnostic test is completed."
+        DEFVAL { true }
+        ::= { eqDiagConfig 1 }
+
+consoleOutput OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  not-accessible
+        STATUS  obsolete
+        DESCRIPTION
+            "If true then the diagnostic result will be displayed on the
+             system console. "
+        DEFVAL { false }
+        ::= { eqDiagConfig 2 }
+
+verboseLevel OBJECT-TYPE
+        SYNTAX  Integer32 (0..2)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Verbose output level for diagnostic console output
+             display. Higher number indicate more detailed output."
+        DEFVAL { 2 }
+        ::= { eqDiagConfig 3 }
+
+diagTestId OBJECT-TYPE
+    SYNTAX TestId
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            " Test Identification Number. Used in cardTestResultNotification variable-binding"
+        ::= { equipmentDiag 2 }
+
+--
+-- Card test table
+--
+cardTestTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CardTestEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A table of test available for a card. "
+        ::= { equipmentDiag 3 }
+
+cardTestEntry OBJECT-TYPE
+        SYNTAX  CardTestEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A conceptual row containing information about tests or dignostics available for
+             a card. "
+        INDEX   { cardShelfTestIndex, cardTestIndex, cardTestId }
+        ::= { cardTestTable 1 }
+        
+CardTestEntry ::= SEQUENCE {
+                cardShelfTestIndex      ShelfId,
+                cardTestIndex           CardId,
+                cardTestId              TestId,
+                cardTestName            DisplayString,
+                cardTestType            TestType,
+                cardTestDescription     DisplayString,
+                cardTestCommand         TestCommand,
+                cardTestScheduleCommand TestScheduleCommand,
+                cardTestSchedule        TestSchedule,
+                cardTestTime            DateAndTime,
+                cardTestResult          TestResult,
+                cardTestResultDesc      DisplayString,
+                cardTestTransId         TestTransactionId
+                }
+
+cardShelfTestIndex OBJECT-TYPE
+        SYNTAX ShelfId
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            " Shelf Identification Number taken from the Shelf Table. Used as index. "
+        ::= { cardTestEntry 1 }
+
+cardTestIndex OBJECT-TYPE
+        SYNTAX CardId
+        MAX-ACCESS not-accessible 
+        STATUS current
+        DESCRIPTION
+            " Card Identification Number taken from the CardTable. Used as index. "
+        ::= { cardTestEntry 2 }
+
+cardTestId OBJECT-TYPE
+        SYNTAX TestId
+        MAX-ACCESS not-accessible 
+        STATUS current
+        DESCRIPTION
+            " Test Identification Number. Used as index to test table "
+        ::= { cardTestEntry 3 }
+
+cardTestName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..100))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " A unique name for this test."
+        ::= { cardTestEntry 4 }
+
+cardTestType OBJECT-TYPE
+        SYNTAX TestType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Test Type."
+        DEFVAL { unknown }
+        ::= { cardTestEntry 5 }
+
+cardTestDescription OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " A short description of the test. "
+        ::= { cardTestEntry 6 }
+
+cardTestCommand OBJECT-TYPE
+        SYNTAX TestCommand
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Command to be execute this test on this shelf "
+        DEFVAL { noop }
+        ::= { cardTestEntry 7 }
+
+cardTestScheduleCommand OBJECT-TYPE
+        SYNTAX TestScheduleCommand
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Schedule Command to be execute this test on this shelf "
+        DEFVAL { noop }
+        ::= { cardTestEntry 8 }
+
+cardTestSchedule OBJECT-TYPE
+        SYNTAX TestSchedule
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                " Test Scheduling. "
+        DEFVAL { 0 }
+        ::= { cardTestEntry 9 }
+
+cardTestTime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Test start time. "
+        ::= { cardTestEntry 10 }
+
+cardTestResult OBJECT-TYPE
+        SYNTAX TestResult
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Result of the test. "
+        DEFVAL { notRun }
+        ::= { cardTestEntry 11 }
+
+cardTestResultDesc OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Additional information of the test result. "
+        ::= { cardTestEntry 12 }
+
+cardTestTransId OBJECT-TYPE
+        SYNTAX TestTransactionId
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Test transaction Id. "
+        ::= { cardTestEntry 13 }
+
+--
+-- Audit configuration
+--
+equipmentAudit OBJECT IDENTIFIER
+    ::= { cadEquipmentMib 6 }
+
+auditAutoScheduling OBJECT-TYPE
+        SYNTAX TruthValue       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Enable or disable automatic audit execution. "
+        DEFVAL { true }
+        ::= { equipmentAudit 1 }
+
+auditLogOutput OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Enable or disable logging of error entries to system log. "
+        DEFVAL { true }
+        ::= { equipmentAudit 2 }
+
+auditLogThrottle OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Enable or disable audit log output throttling to prevent
+              audit errors from flooding the log. "
+        DEFVAL { true }
+        ::= { equipmentAudit 3 }
+
+auditTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AuditEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A table of test available for a card. "
+        ::= { equipmentAudit 4 }
+
+auditEntry OBJECT-TYPE
+        SYNTAX  AuditEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            " A conceptual row contains information about Audits. "
+        INDEX   { auditShelfId, auditCardId, auditId }
+        ::= { auditTable 1 }
+        
+AuditEntry ::= SEQUENCE {
+                auditShelfId            ShelfId,
+                auditCardId             CardId,
+                auditId                 Unsigned32,
+                auditName               DisplayString,
+                auditDescription        DisplayString,
+                auditTime               DateAndTime,
+                auditCommand            INTEGER,
+                auditStatus             INTEGER,
+                auditResult             INTEGER,
+                auditPassedCount        Unsigned32,
+                auditFailedCount        Unsigned32,
+                auditCycleCount         Unsigned32,
+                auditTotalPassedCount   Unsigned32,
+                auditTotalFailedCount   Unsigned32
+                }
+
+auditShelfId OBJECT-TYPE
+        SYNTAX      ShelfId
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            " Shelf Identification Number taken from the Shelf Table. Used as index. "
+        ::= { auditEntry 1 }
+
+auditCardId OBJECT-TYPE
+        SYNTAX CardId
+        MAX-ACCESS not-accessible 
+        STATUS current
+        DESCRIPTION
+            " Card Identification Number taken from the CardTable. Used as index. "
+        ::= { auditEntry 2 }
+
+auditId  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            " Unique ID of the internal Audit "
+        ::= { auditEntry 3 }
+
+auditName  OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Name of the internal Audit "
+    ::= { auditEntry 4 }
+
+auditDescription  OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the  Audit "
+        ::= { auditEntry 5 }
+
+auditTime  OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Start time of the audit.  "
+        ::= { auditEntry 6 }
+
+auditCommand  OBJECT-TYPE
+        SYNTAX INTEGER {
+                enable(1), 
+                disable(2), 
+                runnow(4) 
+        }       
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Audit Commands. The runnow command will stop the currently running 
+              audit sequence and start executing requested audit immediated. If 
+              enabled, automatic audit schedule will be restarted."
+        DEFVAL { enable }
+        ::= { auditEntry 7 }
+
+auditStatus  OBJECT-TYPE
+        SYNTAX INTEGER {
+                enable(1), 
+                disable(2) 
+        }       
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Audit status. "
+        ::= { auditEntry 8 }
+
+auditResult  OBJECT-TYPE
+        SYNTAX INTEGER {
+                passed(1), 
+                failed(2), 
+                abort(4), 
+                notRun(5) 
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Audit Result. "
+        ::= { auditEntry 9 }
+
+auditPassedCount  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Number of passed entry during previous audit run. "
+        ::= { auditEntry 10 }
+
+auditFailedCount  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Number of failed entry during previous audit run. "
+        ::= { auditEntry 11 }
+
+auditCycleCount  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Number of audit run completed. "
+        ::= { auditEntry 12 }
+
+auditTotalPassedCount  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Number of cumulative passed entry of all audit runs. "
+        ::= { auditEntry 13 }
+
+auditTotalFailedCount  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Number of cumulative failed entry of all audit runs. "
+        ::= { auditEntry 14 }
+
+--
+-- Cablemodem status notifications
+--
+cmDevice OBJECT IDENTIFIER
+    ::= { cadEquipmentMib 8 }
+
+cmMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "The MAC address for the cable modem"
+    ::= { cmDevice 1 }
+
+cmVendor OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "The vendor name of the cable modem"
+    ::= { cmDevice 2 }
+
+cmResetReason OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "The reason for the cable modem to reset"
+    ::= { cmDevice 3 }
+
+cmUChannelID OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "The CMTS upstream channel ID which is connected to the cable modem"
+    ::= { cmDevice 4 }
+
+cmPrimarySID OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..16383)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "The primary Service Identifier (SID) assigned by the CMTS associated with the cable modem"
+    ::= { cmDevice 5 }
+
+cmResetStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "The cable modem status before it resets"
+    ::= { cmDevice 6 }
+
+cmResetUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This value indicates how long in hundreds of seconds the cable modem
+         is up since it is initial ranged"
+    ::= { cmDevice 7 }
+
+cmResetInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "The additional information for the cable modem to reset"
+    ::= { cmDevice 8 }
+
+cmIpAddress OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4 | 16)) 
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The IP Address of the cable modem"
+    ::= { cmDevice 9 }
+
+--
+-- FPGA Error Event configuration
+--
+equipmentError OBJECT IDENTIFIER
+    ::= { cadEquipmentMib 9 }
+
+fpgaErrorEventTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF FpgaErrorEventEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Overrides default handling of FPGA error events."
+        ::= { equipmentError 1 }
+
+fpgaErrorEventEntry OBJECT-TYPE
+        SYNTAX  FpgaErrorEventEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A conceptual row containing information about FPGA error event handling."
+        INDEX   { cardId, errEventId }
+        ::= { fpgaErrorEventTable 1 }
+        
+FpgaErrorEventEntry ::= SEQUENCE {
+                errEventId                Unsigned32,
+                errEvRecoveryEnabled      TruthValue,
+                errEvLoggingEnabled       TruthValue,
+                errEvLogLevel             Integer32,
+                errEvRowStatus            RowStatus
+                }
+
+errEventId  OBJECT-TYPE
+        SYNTAX Unsigned32 (0..4294967295) 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            " Event ID associated with the FPGA error. A row in
+              this table defines behavior for a specific FPGA error
+              that overrides the default behavior of the system. "
+        ::= { fpgaErrorEventEntry 1 }
+
+errEvRecoveryEnabled  OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            " If true, the card can be recovered when this FPGA error
+              is detected.  When the card is recovered depends on the
+              setting of errEvRecoveryThreshold. If this value is false,
+              the card will not be recovered when this error is detected. "
+        DEFVAL { true }
+        ::= { fpgaErrorEventEntry 2 }
+
+errEvLoggingEnabled  OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            " If true, the card will provide notification of the 
+              occurance of the this error.  When the notification
+              occurs is dependent on the setting of 
+              errEvLogThrottleThreshold.  The severity of the notification
+              is determined by the setting of errEvLogLevel. "
+        DEFVAL { true }
+        ::= { fpgaErrorEventEntry 3 }
+
+errEvLogLevel  OBJECT-TYPE
+        SYNTAX Integer32 (1..8)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            " If errEvLoggingEnabled is true, this setting sets the 
+              severity level of the generated notification.  In
+              general, higher values indicate lower severity. "
+        DEFVAL { 4 }
+        ::= { fpgaErrorEventEntry 4 }
+
+errEvRowStatus  OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            " The only set actions supported on this table are
+              createAndGo(4) and destroy(6). "
+        ::= { fpgaErrorEventEntry 5 }
+
+--
+-- Arris Equipment MIB conformance statements
+--
+cadEquipmentMibConformance OBJECT IDENTIFIER
+    ::= { cadEquipmentMib 10 }
+
+cadEquipmentMibCompliances OBJECT IDENTIFIER
+    ::= { cadEquipmentMibConformance 1 }
+
+cadEquipmentMibGroup OBJECT IDENTIFIER
+    ::= { cadEquipmentMibConformance 2 }
+
+--
+-- Equipment state change notifications
+-- 
+cardPrStateChange NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity,shelfNumber, cardNumber, 
+                      cardType, cardSubType, cardPrState }
+        STATUS current
+        DESCRIPTION
+            " This trap is sent whenever the card's Primary
+            state changes. "
+        ::= { equipmentTraps 5 }
+
+cardSecStateChange NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity,shelfNumber, cardNumber, 
+                      cardType, cardSubType, cardSecState }
+        STATUS current
+        DESCRIPTION
+            " This trap is sent whenever the card's Secondary
+            state changes. "
+        ::= { equipmentTraps 6 }
+
+cardDetectedChange NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity,shelfNumber, cardNumber, 
+                      cardDetected, cardSubDetected }
+        STATUS current
+        DESCRIPTION
+            " This trap is sent whenever a new card is detected. "
+        ::= { equipmentTraps 7 }         
+
+cardDplxStatusChange NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity,shelfNumber, cardNumber, 
+                      cardType, cardSubType, cardDplxStatus }
+        STATUS current
+        DESCRIPTION
+            " This trap is sent whenever the card's Duplex
+            status changes. "
+        ::= { equipmentTraps 8 }
+
+portPrStateChange NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, shelfNumber, cardNumber, 
+                      portNumber, portType, portPrState, portCardSubType, 
+                      portDocsIfIndex }
+        STATUS current
+        DESCRIPTION
+            " This trap is sent whenever the port's Primary
+            state changes. "
+        ::= { equipmentTraps 9 }
+
+portSecStateChange NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, shelfNumber, cardNumber, 
+                      portNumber, portType, portSecState, portCardSubType, 
+                      portDocsIfIndex }
+        STATUS current
+        DESCRIPTION
+            " This trap is sent whenever the port's Secondary
+            state changes. "
+        ::= { equipmentTraps 10 }
+
+portDplxStatusChange NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, shelfNumber, cardNumber, 
+                      portNumber, portType, cardDplxStatus }
+        STATUS current
+        DESCRIPTION
+            " This trap is sent whenever the port's Duplex
+            status changes. "
+        ::= { equipmentTraps 11 }
+
+cardTestResultNotification NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity,shelfNumber, cardNumber, 
+                      diagTestId, cardTestName, cardTestResult, 
+                      cardTestResultDesc, cardTestTransId }
+        STATUS current
+        DESCRIPTION
+            " This trap is sent when a test or diagnostic completed on a card. "
+        ::= { equipmentTraps 13 }
+
+cmResetClearNotification        NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, systemClock, trapSeverity, cmMacAddress, 
+                      cmUChannelID, cardNumber }
+        STATUS current
+        DESCRIPTION
+            " This trap is sent when a CM is on-line from previous flap."
+        ::= { equipmentTraps 15 }
+
+--
+-- Cablemodem reset definition
+--
+cmResetNotification     NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, systemClock, trapSeverity, cmMacAddress, 
+                      cmVendor, cmResetReason, cmUChannelID, cmPrimarySID, 
+                      cmResetStatus, cmResetUpTime, cardNumber, cmResetInfo }
+        STATUS current
+        DESCRIPTION
+            " This trap is sent when a CM is reset."
+        ::= { equipmentTraps 16 }
+
+diskVolumeUsageNotification NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, shelfNumber, cardNumber, 
+                      diskDriveNumber, diskVolumeNumber, 
+                      diskVolumeUsageLevel, diskVolumeName }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent when a disk volume usage level 
+             exceed a disk usage threshold."
+        ::= { equipmentTraps 17 }
+
+diskVolumeAutoDeleteFileNotification NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, shelfNumber, cardNumber, 
+                      diskDriveNumber, diskVolumeNumber, diskVolumeName, 
+                      diskVolumeFileName }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent when a file is automatically
+             deleted by the system in respond to disk volume
+             usage exceed critical thresholh."
+        ::= { equipmentTraps 18 }
+
+cardTempOutOfRangeNotification NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, cardNumber }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent when the card temperature is out of range."
+        ::= { equipmentTraps 19 }
+
+cardTempNoReportNotification NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, cardNumber }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent when there is no reporting on card temperature."
+        ::= { equipmentTraps 20 }
+
+cardTempOverHeatNotification NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, cardNumber }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent when the card is overheat, card is being shut down."
+        ::= { equipmentTraps 21 }
+
+downstreamPowerLoss NOTIFICATION-TYPE
+    OBJECTS     { trapCounter, trapSeverity, cardNumber, portNumber }
+        STATUS current
+        DESCRIPTION
+            " This trap is sent when c4 detects the loss of downstream power."
+        ::= { equipmentTraps 22 }
+
+--
+-- Cablemodem registration definition
+--
+cmRegistrationNotification      NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, systemClock, trapSeverity, cmMacAddress, 
+                      cmVendor, cmUChannelID, cardNumber, cmIpAddress }
+        STATUS current
+        DESCRIPTION
+            " This trap is sent when a CM is registered."
+        ::= { equipmentTraps 23 }
+
+--
+-- MIB conformance object groups
+--
+systemGeneralGroup      OBJECT-GROUP
+        OBJECTS     { systemClock, trapCounter, trapSeverity, systemKey }
+        STATUS  current
+        DESCRIPTION
+            " This group contains a collection of objects general to the overall
+            system. "
+    ::= { cadEquipmentMibGroup 1 }
+
+equipmentStateGroup     OBJECT-GROUP
+        OBJECTS     { cardLastChangeTime, portLastChangeTime }
+        STATUS  current
+        DESCRIPTION
+            " This group contains a collection of objects general to the state
+             of the equipments. "
+    ::= { cadEquipmentMibGroup 2 }
+
+equipmentShelfGroup     OBJECT-GROUP
+        OBJECTS     { shelfName, shelfSwVersion }
+        STATUS  current
+        DESCRIPTION
+            " This group contains a collection of objects general specific to shelf
+              objects. "
+    ::= { cadEquipmentMibGroup 3 }
+
+equipmentCardGroup      OBJECT-GROUP
+        OBJECTS     { cardName, cardType, cardSubType, cardSerialNum, 
+                      cardFwVersion, cardHwVersion, cardSwVersion, 
+                      cardAdminState, cardPrState, cardSecState, 
+                      cardDplxStatus, cardAction, 
+                      cardTrapInh, cardNumPorts, cardDetected, 
+                      cardSubDetected, cardFwUpdateStatus, cardSpareGroupId, 
+                      cardSpareGroupMode, cardUpTime, cardTemperature, 
+                      cardCpuType, cardCpuSpeed, cardBusSpeed, cardRamSize, 
+                      cardFlashSize, cardCPLDVersion, cardFpgaSource, 
+                      cardBootVersion, cardLastBootVersion, 
+                      cardLastBootSource, cardPicDetected, cardPicSerialNum, 
+                      cardPicHwVersion, cardTemperatureHighWarn, cardTemperatureHighError }
+        STATUS  current
+        DESCRIPTION
+            " This group contains a collection of objects general specific to Card 
+            table. "
+    ::= { cadEquipmentMibGroup 4 }
+
+equipmentPortGroup      OBJECT-GROUP
+        OBJECTS     { portType, portAdminState, portPrState, portSecState, 
+                      portDplxStatus, portAction, 
+                      portTrapInh, portNumChans, portMacAddress, portMode, 
+                      portDetectedMode, portDocsIfIndex, portBgpId, 
+                      portConnectorId, portCardSubType,
+                      portDescription, portCurrDsPower, portMinDsPower, portMaxDsPower,
+                      portTxFlowControlMode, portRxFlowControlMode, 
+                      portTxFlowControlDetected, portRxFlowControlDetected }
+        STATUS  current
+        DESCRIPTION
+            " This group contains a collection of objects specific to Port table. "
+    ::= { cadEquipmentMibGroup 5 }
+
+equipmentDiagGroup  OBJECT-GROUP
+        OBJECTS     { remainInDiagMode, verboseLevel }
+        STATUS  current
+        DESCRIPTION
+            " This group contains a collection of objects specific to equipment diagnostics. "
+    ::= { cadEquipmentMibGroup 6 }
+
+equipmentCardTestGroup  OBJECT-GROUP
+        OBJECTS     { cardTestName, cardTestType, cardTestDescription, 
+                      cardTestCommand, cardTestScheduleCommand, 
+                      cardTestSchedule, cardTestTime, cardTestResult, 
+                      cardTestResultDesc, cardTestTransId }
+        STATUS  current
+        DESCRIPTION
+            " This group contains a collection of objects specific to card Test group "
+    ::= { cadEquipmentMibGroup 8 }
+
+equipmentAuditGroup  OBJECT-GROUP
+        OBJECTS     { auditAutoScheduling, auditLogOutput, auditLogThrottle, 
+                      auditName, auditDescription, auditTime, auditCommand, 
+                      auditStatus, auditResult, auditPassedCount, 
+                      auditFailedCount, auditCycleCount, 
+                      auditTotalPassedCount, auditTotalFailedCount }
+        STATUS  current
+        DESCRIPTION
+            " This group contains a collection of objects specific audit group. "
+    ::= { cadEquipmentMibGroup 10 }
+
+diskVolumeGroup  OBJECT-GROUP
+        OBJECTS     { diskVolumeName, diskVolumeSize, diskVolumeUsageLevel, 
+                    diskVolumeUsagePercentage,
+                    diskVolumeUsageCriticalThreshold,
+                    diskVolumeUsageMajorThreshold,
+                    diskVolumeUsageMinorThreshold,
+                    diskVolumeAutoDeleteUnusedFile, diskVolumeTrapInh, 
+                    diskVolumeFileName }
+        STATUS  current
+        DESCRIPTION
+            " This group contains a collection of objects specific to disk volume objects. "
+    ::= { cadEquipmentMibGroup 11 }
+
+fpgaErrorEventGroup  OBJECT-GROUP
+        OBJECTS     { errEvRecoveryEnabled, errEvLoggingEnabled, 
+                      errEvLogLevel }
+        STATUS  current
+        DESCRIPTION
+            " This group contains a collection of objects dealing with FPGA errors. "
+    ::= { cadEquipmentMibGroup 12 }
+
+cadEquipmentMibCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION 
+            "The compliance statement for entities which
+             implement the Equipment MIB. "
+
+        MODULE      -- this module
+
+        MANDATORY-GROUPS        { systemGeneralGroup, 
+                  equipmentStateGroup, equipmentShelfGroup, 
+                  equipmentCardGroup, equipmentPortGroup, 
+                  equipmentDiagGroup, equipmentCardTestGroup, 
+                  equipmentAuditGroup, 
+                  diskVolumeGroup, fpgaErrorEventGroup }
+
+    ::= { cadEquipmentMibCompliances 1 }
+
+END -- end of module CADANT-CMTS-EQUIPMENT-MIB.
+

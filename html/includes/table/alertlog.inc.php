@@ -44,12 +44,17 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT D.device_id,name AS alert,state,time_logged,DATE_FORMAT(time_logged, '".$config['dateformat']['mysql']['compact']."') as humandate,details $sql";
+$sql = "SELECT D.device_id,name AS alert,rule_id, state,time_logged,DATE_FORMAT(time_logged, '".$config['dateformat']['mysql']['compact']."') as humandate,details $sql";
 
 $rulei = 0;
 foreach (dbFetchRows($sql, $param) as $alertlog) {
     $dev          = device_by_id_cache($alertlog['device_id']);
-    $fault_detail = alert_details($alertlog['details']);
+    logfile($alertlog['rule_id']);
+    $log          = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? AND `state` = 1 ORDER BY id DESC LIMIT 1', array($alertlog['rule_id'], $alertlog['device_id']));
+    $fault_detail = alert_details($log);
+    if (empty($fault_detail)) {
+        $fault_detail = 'Rule created, no faults found';
+    }
     $alert_state  = $alertlog['state'];
     if ($alert_state == '0') {
         $fa_icon  = 'check';

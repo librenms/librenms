@@ -1,0 +1,495 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+ --
+ -- CIENA-CES-ALARM-MIB.my
+ --
+
+ CIENA-CES-ALARM-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+     Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY
+            FROM SNMPv2-SMI
+     TruthValue, DisplayString
+            FROM SNMPv2-TC
+     ItuPerceivedSeverity
+            FROM ITU-ALARM-TC-MIB
+     alarmListName, alarmModelIndex, alarmActiveDateAndTime, alarmActiveIndex, alarmClearIndex, alarmClearDateAndTime, alarmModelState
+            FROM ALARM-MIB
+     cienaCesConfig
+            FROM CIENA-SMI;
+
+ cienaCesAlarmMIB MODULE-IDENTITY
+        LAST-UPDATED "201611070000Z"
+        ORGANIZATION "Ciena, Inc"
+        CONTACT-INFO
+            "   Mib Meister
+                115 North Sullivan Road
+                Spokane Valley, WA 99037
+                USA
+                Phone:  +1 509 242 9000
+                Email:  support@ciena.com"
+        DESCRIPTION
+            "This module defines the alarm objects."
+
+        REVISION "201611070000Z"
+        DESCRIPTION
+            "Added cienaCesAlarmActiveTimeStamp to the cienaCesAlarmActiveTable."
+
+        REVISION "201602220000Z"
+        DESCRIPTION
+            "Added cienaCesAlarmSense to the cienaCesAlarmEntry object
+             Added cienaCesAlarmTrigger to the cienaCesAlarmEntry object."
+
+        REVISION "201509160000Z"
+        DESCRIPTION
+            "Added cienaCesAlarmLogModelIndex and cienaCesAlarmLogTimeStamp to the cienaCesAlarmLogEntry object"
+        
+        REVISION "201505130000Z"
+        DESCRIPTION
+            "Change MAX-ACCESS of cienaCesAlarmCutoff from 'read-only' to 'read-write'."
+
+        REVISION "201203140130Z"
+        DESCRIPTION
+            "Initial creation."
+        ::= { cienaCesConfig 24 }
+
+ --
+ -- Node definitions
+ --
+
+ cienaCesAlarmMIBObjects     OBJECT IDENTIFIER ::= { cienaCesAlarmMIB 1 }
+
+ cienaCesAlarmGlobal         OBJECT IDENTIFIER ::= { cienaCesAlarmMIBObjects 1 }
+ cienaCesAlarm               OBJECT IDENTIFIER ::= { cienaCesAlarmMIBObjects 2 }
+ cienaCesAlarmActive         OBJECT IDENTIFIER ::= { cienaCesAlarmMIBObjects 3 }
+ cienaCesAlarmClear          OBJECT IDENTIFIER ::= { cienaCesAlarmMIBObjects 4 }
+ cienaCesAlarmLog            OBJECT IDENTIFIER ::= { cienaCesAlarmMIBObjects 5 }
+
+ --  Notifications
+
+ cienaCesAlarmMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesAlarmMIB 2 }
+ cienaCesAlarmMIBNotifications       OBJECT IDENTIFIER ::= { cienaCesAlarmMIBNotificationPrefix 0 }
+
+ -- Conformance information
+
+ cienaCesAlarmMIBConformance OBJECT IDENTIFIER ::= { cienaCesAlarmMIB 3 }
+ cienaCesAlarmMIBCompliances OBJECT IDENTIFIER ::= { cienaCesAlarmMIBConformance 1 }
+ cienaCesAlarmMIBGroups      OBJECT IDENTIFIER ::= { cienaCesAlarmMIBConformance 2 }
+
+ --
+ -- Global stuff
+ --
+ cienaCesAlarmCutOff    OBJECT-TYPE
+     SYNTAX            TruthValue
+     MAX-ACCESS        read-write
+     STATUS            current
+     DESCRIPTION
+         "When read this object will always return false.
+          When written with a value of true, will invoke the alarm cutoff."
+     ::= { cienaCesAlarmGlobal 1 }
+
+ --
+ -- Alarm table
+ --
+ cienaCesAlarmTable  OBJECT-TYPE
+     SYNTAX      SEQUENCE OF CienaCesAlarmEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "A list of alarm entries supported by device."
+     ::= { cienaCesAlarm 1 }
+
+ cienaCesAlarmEntry     OBJECT-TYPE
+     SYNTAX         CienaCesAlarmEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "An entry in the alarm table."
+     INDEX  { alarmListName, alarmModelIndex, alarmModelState  }
+     ::= { cienaCesAlarmTable 1 }
+
+ CienaCesAlarmEntry ::=  SEQUENCE  {
+     cienaCesAlarmDescription                           DisplayString,
+     cienaCesAlarmThreshold                             Integer32,
+     cienaCesAlarmLeak                                  Integer32,
+     cienaCesAlarmGPO                                   TruthValue,
+     cienaCesAlarmEvery                                 Integer32,
+     cienaCesAlarmToMinor                               Integer32,
+     cienaCesAlarmToMajor                               Integer32,
+     cienaCesAlarmToCritical                            Integer32,
+     cienaCesAlarmSense                                 TruthValue,
+     cienaCesAlarmTrigger                               TruthValue
+ }
+
+ cienaCesAlarmDescription  OBJECT-TYPE
+     SYNTAX            DisplayString
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the description of the alarm."
+     ::= { cienaCesAlarmEntry 1 }
+
+ cienaCesAlarmThreshold  OBJECT-TYPE
+     SYNTAX            Integer32 (1..65535)
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the threshold for the alarm."
+     ::= { cienaCesAlarmEntry 2 }
+
+ cienaCesAlarmLeak  OBJECT-TYPE
+     SYNTAX            Integer32 (0..65535)
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the alarm leak for the given alarm."
+     ::= { cienaCesAlarmEntry 3 }
+
+ cienaCesAlarmGPO  OBJECT-TYPE
+     SYNTAX            TruthValue
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the GPO detection for this alarm."
+     ::= { cienaCesAlarmEntry 4 }
+
+ cienaCesAlarmEvery  OBJECT-TYPE
+     SYNTAX            Integer32
+     UNITS             "seconds"
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the unique index of the table."
+     ::= { cienaCesAlarmEntry 5 }
+
+ cienaCesAlarmToMinor  OBJECT-TYPE
+     SYNTAX            Integer32
+     UNITS             "seconds"
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the time after which the severity specified by alarmModelState
+              will be escalated to minor."
+     ::= { cienaCesAlarmEntry 6 }
+
+ cienaCesAlarmToMajor  OBJECT-TYPE
+     SYNTAX            Integer32
+     UNITS             "seconds"
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the time after which the severity specified by alarmModelState
+              will be escalated to major."
+     ::= { cienaCesAlarmEntry 7 }
+
+ cienaCesAlarmToCritical  OBJECT-TYPE
+     SYNTAX            Integer32
+     UNITS             "seconds"
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the time after which the severity specified by alarmModelState
+              will be escalated to critical."
+     ::= { cienaCesAlarmEntry 8 }
+
+ cienaCesAlarmSense  OBJECT-TYPE
+     SYNTAX          TruthValue
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+               "This object indicates the polarity of an external alarm input pin.
+                This object shall return false(2) for regular (non-external) alarms."
+     ::= { cienaCesAlarmEntry 9 }
+
+ cienaCesAlarmTrigger  OBJECT-TYPE
+     SYNTAX          TruthValue
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+               "This object indicates whether an external alarm is
+                currently in 'forced' mode. This object shall return
+                false(2) for regular (non-external) alarms."
+     ::= { cienaCesAlarmEntry 10 }
+
+ --
+ -- Alarm Severity table
+ --
+ cienaCesAlarmSeverityTable  OBJECT-TYPE
+     SYNTAX      SEQUENCE OF CienaCesAlarmSeverityEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "A list of alarm severity entries supported by device."
+     ::= { cienaCesAlarm 2 }
+
+ cienaCesAlarmSeverityEntry     OBJECT-TYPE
+     SYNTAX         CienaCesAlarmSeverityEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "An entry in the alarm severity table."
+     INDEX  { alarmListName, alarmModelIndex }
+     ::= { cienaCesAlarmSeverityTable 1 }
+
+ CienaCesAlarmSeverityEntry ::=  SEQUENCE  {
+     cienaCesAlarmSeverity              ItuPerceivedSeverity
+ }
+
+ cienaCesAlarmSeverity  OBJECT-TYPE
+     SYNTAX            ItuPerceivedSeverity
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object allows changing the severity of the alarm."
+     ::= { cienaCesAlarmSeverityEntry 1 }
+
+ --
+ -- Active alarm table
+ --
+ cienaCesAlarmActiveTable  OBJECT-TYPE
+     SYNTAX      SEQUENCE OF CienaCesAlarmActiveEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "A list of Active supply entries."
+     ::= { cienaCesAlarmActive 1 }
+
+ cienaCesAlarmActiveEntry     OBJECT-TYPE
+     SYNTAX         CienaCesAlarmActiveEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "An entry in the Active table providing objects for a
+             power supply."
+     INDEX  { alarmListName, alarmActiveIndex, alarmActiveDateAndTime }
+     ::= { cienaCesAlarmActiveTable 1 }
+
+ CienaCesAlarmActiveEntry ::=  SEQUENCE  {
+     cienaCesAlarmActiveSeverity                            ItuPerceivedSeverity,
+     cienaCesAlarmActiveInvokeId                            Integer32,
+     cienaCesAlarmActiveManagedObjectClass                  INTEGER,
+     cienaCesAlarmActiveManagedObjectInterpret              OCTET STRING,
+     cienaCesAlarmActiveManagedObjectInstance               OCTET STRING,
+     cienaCesAlarmActiveAck                                 TruthValue,
+     cienaCesAlarmActiveDescription                         DisplayString,
+     cienaCesAlarmActiveTimeStamp                           DisplayString
+ }
+
+ cienaCesAlarmActiveSeverity  OBJECT-TYPE
+     SYNTAX            ItuPerceivedSeverity
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the unique index of the table."
+     ::= { cienaCesAlarmActiveEntry 1 }
+
+ cienaCesAlarmActiveInvokeId  OBJECT-TYPE
+     SYNTAX            Integer32
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the unique index of the table."
+     ::= { cienaCesAlarmActiveEntry 2 }
+
+ cienaCesAlarmActiveManagedObjectClass  OBJECT-TYPE
+     SYNTAX            INTEGER  {
+                        unknown(1),
+                        chassis(2),
+                        slot(3),
+                        port(4)
+                        }
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the unique index of the table."
+     ::= { cienaCesAlarmActiveEntry 3 }
+
+ cienaCesAlarmActiveManagedObjectInterpret  OBJECT-TYPE
+     SYNTAX            OCTET STRING (SIZE(1..15))
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates how to interpret cienaCesAlarmActiveManagedObjectInstance."
+     ::= { cienaCesAlarmActiveEntry 4 }
+
+ cienaCesAlarmActiveManagedObjectInstance  OBJECT-TYPE
+     SYNTAX            OCTET STRING (SIZE(1..8))
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the unique index of the table."
+     ::= { cienaCesAlarmActiveEntry 5 }
+
+ cienaCesAlarmActiveAck   OBJECT-TYPE
+     SYNTAX            TruthValue
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates whether this alarm is acknowledged or not."
+     ::= { cienaCesAlarmActiveEntry 6 }
+
+ cienaCesAlarmActiveDescription  OBJECT-TYPE
+     SYNTAX            DisplayString
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the description of the alarm."
+     ::= { cienaCesAlarmActiveEntry 7 }
+
+ cienaCesAlarmActiveTimeStamp  OBJECT-TYPE
+     SYNTAX            DisplayString
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the UTC timestamp for the alarm."
+     ::= { cienaCesAlarmActiveEntry 8 }
+
+ --
+ -- Clear alarm table
+ --
+ cienaCesAlarmClearTable  OBJECT-TYPE
+     SYNTAX      SEQUENCE OF CienaCesAlarmClearEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "A list of Clear supply entries."
+     ::= { cienaCesAlarmClear 1 }
+
+ cienaCesAlarmClearEntry     OBJECT-TYPE
+     SYNTAX         CienaCesAlarmClearEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "An entry in the Clear table providing objects for a
+             power supply."
+     INDEX  { alarmListName, alarmClearIndex, alarmClearDateAndTime }
+     ::= { cienaCesAlarmClearTable 1 }
+
+ CienaCesAlarmClearEntry ::=  SEQUENCE  {
+     cienaCesAlarmClearManagedObjectClass           INTEGER,
+     cienaCesAlarmClearManagedObjectInterpret       OCTET STRING,
+     cienaCesAlarmClearManagedObjectInstance        OCTET STRING
+ }
+
+ cienaCesAlarmClearManagedObjectClass  OBJECT-TYPE
+     SYNTAX            INTEGER  {
+                        unknown(1),
+                        chassis(2),
+                        slot(3),
+                        port(4)
+                        }
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the unique index of the table."
+     ::= { cienaCesAlarmClearEntry 3 }
+
+ cienaCesAlarmClearManagedObjectInterpret  OBJECT-TYPE
+     SYNTAX            OCTET STRING (SIZE(1..15))
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates how to interpret cienaCesAlarmClearManagedObjectInstance."
+     ::= { cienaCesAlarmClearEntry 4 }
+
+ cienaCesAlarmClearManagedObjectInstance  OBJECT-TYPE
+     SYNTAX            OCTET STRING (SIZE(1..6))
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the unique index of the table."
+     ::= { cienaCesAlarmClearEntry 5 }
+
+ --
+ -- log alarm table
+ --
+ cienaCesAlarmLogTable  OBJECT-TYPE
+     SYNTAX      SEQUENCE OF CienaCesAlarmLogEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "A list of Log supply entries."
+     ::= { cienaCesAlarmLog 1 }
+
+ cienaCesAlarmLogEntry     OBJECT-TYPE
+     SYNTAX         CienaCesAlarmLogEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "An entry in the Log table providing objects for a
+             power supply."
+     INDEX  { alarmListName, cienaCesAlarmLogIndex }
+     ::= { cienaCesAlarmLogTable 1 }
+
+ CienaCesAlarmLogEntry ::=  SEQUENCE  {
+     cienaCesAlarmLogIndex                      Unsigned32,
+     cienaCesAlarmLogSeverity                   ItuPerceivedSeverity,
+     cienaCesAlarmLogManagedObjectClass         INTEGER,
+     cienaCesAlarmLogManagedObjectInterpret     OCTET STRING,
+     cienaCesAlarmLogManagedObjectInstance      OCTET STRING,
+     cienaCesAlarmLogModelIndex                 Unsigned32,
+     cienaCesAlarmLogTimeStamp                  DisplayString
+ }
+
+ cienaCesAlarmLogIndex  OBJECT-TYPE
+     SYNTAX            Unsigned32 (1..4294967295)
+     MAX-ACCESS        not-accessible
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the unique index of the table."
+     ::= { cienaCesAlarmLogEntry 1 }
+
+ cienaCesAlarmLogSeverity  OBJECT-TYPE
+     SYNTAX            ItuPerceivedSeverity
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the unique index of the table."
+     ::= { cienaCesAlarmLogEntry 2 }
+
+ cienaCesAlarmLogManagedObjectClass  OBJECT-TYPE
+     SYNTAX            INTEGER  {
+                        unknown(1),
+                        chassis(2),
+                        slot(3),
+                        port(4)
+                        }
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the unique index of the table."
+     ::= { cienaCesAlarmLogEntry 3 }
+
+ cienaCesAlarmLogManagedObjectInterpret  OBJECT-TYPE
+     SYNTAX            OCTET STRING (SIZE(1..15))
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates how to interpret cienaCesAlarmLogManagedObjectInstance."
+     ::= { cienaCesAlarmLogEntry 4 }
+
+ cienaCesAlarmLogManagedObjectInstance  OBJECT-TYPE
+     SYNTAX            OCTET STRING (SIZE(1..6))
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the unique index of the table."
+     ::= { cienaCesAlarmLogEntry 5 }
+
+ cienaCesAlarmLogModelIndex  OBJECT-TYPE
+     SYNTAX            Unsigned32 (1..4294967295)
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the corresponding value of the
+              alarmModelIndex for this table entry."
+     ::= { cienaCesAlarmLogEntry 6 }
+
+ cienaCesAlarmLogTimeStamp  OBJECT-TYPE
+     SYNTAX            DisplayString
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+             "This object indicates the timestamp for the alarm."
+     ::= { cienaCesAlarmLogEntry 7 }
+
+ END

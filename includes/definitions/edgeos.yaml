@@ -7,6 +7,7 @@ over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_ucd_memory, text: 'Memory Usage' }
 discovery:
+    - sysObjectId: .1.3.6.1.4.1.41112.1.5
     - sysDescr_regex:
         - '/^EdgeOS/'
         - '/^EdgeRouter/'

@@ -1,0 +1,36 @@
+AXIS-ROOT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI;
+
+axis MODULE-IDENTITY
+    LAST-UPDATED "201206081000Z"
+    ORGANIZATION "Axis Communications AB"
+    CONTACT-INFO
+        "Postal: Axis Communications AB
+                  Emdalavagen 14
+                  SE-223 69 Lund
+                  Sweden
+                  Phone: +46 (0)46 272 18 00
+                  Fax:   +46 (0)46 13 61 30
+                  E-Mail: info@axis.com
+                  Web: www.axis.com"
+    DESCRIPTION
+        "The AXIS root MIB."
+    REVISION      "201206081000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { enterprises 368 }  -- assigned by IANA
+
+products OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "products is the root OBJECT IDENTIFIER from which
+         sysObjectID values are assigned. Actual values and
+         respectively products sub-tree are defined in:
+         AXIS-PRINTSERVER-MIB
+         AXIS-VIDEO-MIB"
+    ::= { axis 1 }
+
+END

@@ -1,0 +1,117 @@
+--------------------------------------------------------------------
+-- NMS-IP-ADDRESS-MIB
+-- AUTHER : LIUQIANG
+-- OCT 2011
+--------------------------------------------------------------------
+
+            NMS-IP-ADDRESS-MIB DEFINITIONS ::= BEGIN
+
+            IMPORTS
+                    TimeTicks
+            FROM RFC1155-SMI
+                    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString,PhysAddress
+			FROM RFC1213-MIB
+		    nmslocal
+			FROM NMS-SMI
+		    IpAddress     FROM  RFC1155-SMI
+		    TruthValue,RowStatus  	FROM SNMPv2-TC;
+          
+               ipAddr             OBJECT IDENTIFIER ::= { nmslocal 237 }
+
+               IpEntDefaultGateway OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Device IP default gateway setting. In 2-layer switch this value is set to default gateway, and in 3-layer switch, this value is NULL."
+                   ::= { ipAddr 1 }
+               
+               ipAddrTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF IpAddrTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A table of interface IP address ."
+                   ::= { ipAddr 2 }
+
+               ipAddrTableEntry OBJECT-TYPE
+                   SYNTAX  IpAddrTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of inteface IP address table."
+                   INDEX { nmsIpEntAddr }
+               ::= { ipAddrTable 1 }
+
+               IpAddrTableEntry ::=
+                   SEQUENCE {
+                       nmsIpEntAddr
+                           IpAddress,
+                       nmsIpEntIfindex
+                           INTEGER,
+                       nmsIpEntNetMask
+                       	   IpAddress,
+                       nmsIpEntRowStatus
+                           RowStatus,
+                       nmsIpMacAddress
+                           PhysAddress,
+                       nmsIpIsSecondary
+                           INTEGER
+                          }
+	
+               nmsIpEntAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "This means inteface that value is 'nmsIpEntIfindex' corresoponding IP address.  "
+                   ::= { ipAddrTableEntry 1 }
+                   
+               nmsIpEntIfindex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Interface index. The same value as ifIndex in ifTable. This inteface must be routing interface, otherwise while setting this value, ths system will return error.  "
+                   ::= { ipAddrTableEntry 2 }
+                   	
+               nmsIpEntNetMask OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "This means inteface mask that value is 'nmsIpEntIfindex' corresoponding IP address.  "
+                   ::= { ipAddrTableEntry 3 }
+                   
+               nmsIpEntRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Interface IP address table row status.  "
+                   ::= { ipAddrTableEntry 4 }
+                   
+               nmsIpMacAddress OBJECT-TYPE
+                   SYNTAX  PhysAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Interface IP address VS MAC address.  "
+                   ::= { ipAddrTableEntry 5 }
+                   
+               nmsIpIsSecondary OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                        		secondary (1),
+                        		primary (0)
+                        	}
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The ip address configured is primary or secondary. A secondary address can't be configured until the primary one exist."
+                   ::= { ipAddrTableEntry 6 }
+                   	
+              
+
+END

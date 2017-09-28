@@ -2,6 +2,7 @@ os: arista_eos
 text: 'Arista EOS'
 type: network
 icon: arista
+group: arista
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

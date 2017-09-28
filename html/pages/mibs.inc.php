@@ -39,7 +39,7 @@ if (is_module_enabled('poller', 'mib')) {
 <script>
     var grid = $("#mibs").bootgrid({
         ajax: true,
-        rowCount: [50,100,250,-1],
+        rowCount: [50, 100, 250, -1],
         post: function ()
         {
             return {

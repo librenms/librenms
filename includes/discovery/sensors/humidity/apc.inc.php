@@ -39,3 +39,14 @@ foreach (array_keys($apc_env_data) as $index) {
         }
     }
 }
+
+foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
+    $cur_oid    = '.1.3.6.1.4.1.318.1.1.10.4.2.3.1.6.' . $index;
+    $descr      = $data['memSensorsStatusSensorName'] . ' - ' . $data['memSensorsStatusSensorLocation'];
+    $divisor    = 1;
+    $multiplier = 1;
+    $value      = $data['memSensorsHumidity'];
+    if (is_numeric($value)) {
+        discover_sensor($valid['sensor'], 'humidity', $device, $cur_oid, 'memSensorsHumidity.' . $index, 'apc', $descr, $divisor, $multiplier, null, null, null, null, $value);
+    }
+}

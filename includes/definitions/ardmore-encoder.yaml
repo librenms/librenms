@@ -1,0 +1,9 @@
+os: ardmore-encoder
+text: 'AvediaStream Encoder'
+type: appliance
+icon: exterity
+over:
+    - { graph: device_bits, text: Traffic }
+discovery:
+    - sysDescr_regex:
+        - '/Ardmore-Encoder_VX/'

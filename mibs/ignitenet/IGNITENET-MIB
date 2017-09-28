@@ -1,0 +1,483 @@
+IGNITENET-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Counter64, IpAddress,
+        enterprises FROM SNMPv2-SMI
+        DisplayString, TruthValue, MacAddress FROM SNMPv2-TC
+        OBJECT-GROUP FROM SNMPv2-CONF;
+
+    ignitenetMIB MODULE-IDENTITY
+        LAST-UPDATED "201602240000Z"
+        ORGANIZATION "IgniteNet"
+        CONTACT-INFO "support@ignitenet.com"
+        DESCRIPTION  "The MIB module for IgniteNet entities"
+        REVISION "201602240000Z"
+        DESCRIPTION "Initial revision"
+        ::= { ignitenet 1 }
+
+    ignitenet OBJECT IDENTIFIER ::= { enterprises 47307 }
+
+    product         OBJECT IDENTIFIER ::= { ignitenetMIB 1 }
+    ethernetPorts   OBJECT IDENTIFIER ::= { ignitenetMIB 2 }
+    radios          OBJECT IDENTIFIER ::= { ignitenetMIB 3 }
+    metrolinqRadios OBJECT IDENTIFIER ::= { ignitenetMIB 4 }
+
+
+-- ===========================================================
+-- IgniteNet product descriptions
+-- ===========================================================
+
+model OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Model of the IgniteNet product"
+    ::= { product 1 }
+
+hwVersion OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Hardware version of the IgniteNet product"
+    ::= { product 2 }
+
+
+fwVersion OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Firmware version of the IgniteNet product"
+    ::= { product 3 }
+
+
+-- ===========================================================
+-- IgniteNet ethernet ports info descriptions
+-- ===========================================================
+
+ethNumber  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of ethernet ports (regardless of their
+            current state) present on this system."
+    ::= { ethernetPorts 1 }
+
+
+-- Ethernet Info Table
+
+ethInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EthInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of ethernet ports. The number of entries is
+            given by the value of ethNumber."
+    ::= { ethernetPorts 2 }
+
+ethInfoEntry OBJECT-TYPE
+    SYNTAX      EthInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing ethernet port status information."
+    INDEX   { ethNumber }
+    ::= { ethInfoTable 1 }
+
+EthInfoEntry ::=
+    SEQUENCE {
+        ethInfoIndex  EthernetIndex,
+        ethDescr      DisplayString,
+        ethInfoSpeed  Integer32,
+        ethInfoDuplex INTEGER
+    }
+
+ethInfoIndex OBJECT-TYPE
+    SYNTAX      EthernetIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each radio, starting from one."
+    ::= { ethInfoEntry 1 }
+
+ethDescr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Ethernet speed in MB/s"
+    ::= { ethInfoEntry 2 }
+
+ethInfoSpeed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Ethernet speed in MB/s"
+    ::= { ethInfoEntry 3 }
+
+ethInfoDuplex OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    half(1),
+                    full(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Ethernet speed in MB/s"
+    ::= { ethInfoEntry 4 }
+
+
+
+-- ===========================================================
+-- IgniteNet MetroLinq radio info descriptions
+-- ===========================================================
+
+mlRadioNumber  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of radios (regardless of their
+            current state) present on this system."
+    ::= { metrolinqRadios 1 }
+
+-- Radio info table
+
+mlRadioInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MlRadioInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of radio entries.  The number of entries is
+            given by the value of radioNumber."
+    ::= { metrolinqRadios 2 }
+
+mlRadioInfoEntry OBJECT-TYPE
+    SYNTAX      MlRadioInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface."
+    INDEX   { mlRadioNumber }
+    ::= { mlRadioInfoTable 1 }
+
+MlRadioInfoEntry ::=
+    SEQUENCE {
+        mlRadioInfoIndex      RadioIndex,
+        mlRadioInfoEnabled    INTEGER,
+        mlRadioInfoRegDomain  DisplayString,
+        mlRadioInfoFrequency  FrequencyGHz,
+        mlRadioInfomcs        RadioMcsRate,
+        mlRadioInfoAckTimeout Integer32,
+        mlRadioInfoTxPower    Integer32,
+        mlRadioInfoAMSDU      INTEGER,
+        mlRadioInfoAMPDU      INTEGER,
+        mlRadioInfoRSSILocal  Integer32,
+        mlRadioInfoRSSIRemote Integer32,
+        mlRadioInfoEncryption INTEGER,
+        mlRadioInfoSSID       DisplayString,
+        mlRadioInfoFailover   INTEGER
+    }
+
+mlRadioInfoIndex OBJECT-TYPE
+    SYNTAX      RadioIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each radio, starting from one."
+    ::= { mlRadioInfoEntry 1 }
+
+mlRadioInfoEnabled OBJECT-TYPE
+    SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)       -- ready to pass packets
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The enabled or disabled state of the radio."
+    ::= { mlRadioInfoEntry 2 }
+
+mlRadioInfoRegDomain OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Regulation domain set for the radio."
+    ::= { mlRadioInfoEntry 3 }
+
+mlRadioInfoFrequency OBJECT-TYPE
+    SYNTAX      FrequencyGHz
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Frequency, raw value expressed in MHz, displayed in GHz"
+    ::= { mlRadioInfoEntry 4 }
+
+mlRadioInfomcs OBJECT-TYPE
+    SYNTAX      RadioMcsRate
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A value of the radio Modulation and Coding Scheme"
+    ::= { mlRadioInfoEntry 5 }
+
+mlRadioInfoAckTimeout OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Radio ack timeout in µs"
+    ::= { mlRadioInfoEntry 6 }
+
+mlRadioInfoTxPower OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Radio transmission power in dBm"
+    ::= { mlRadioInfoEntry 7 }
+
+mlRadioInfoAMSDU OBJECT-TYPE
+    SYNTAX INTEGER {
+                off(0),
+                on(1)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Radio frame aggregation with MAC Service Data Unit"
+    ::= { mlRadioInfoEntry 8 }
+
+mlRadioInfoAMPDU OBJECT-TYPE
+    SYNTAX INTEGER {
+                off(0),
+                on(1)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Radio frame aggregation with MAC Protocol Data Unit"
+    ::= { mlRadioInfoEntry 9 }
+
+mlRadioInfoRSSILocal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Radio received signal strength indicator of the local site"
+    ::= { mlRadioInfoEntry 10 }
+
+mlRadioInfoRSSIRemote OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Radio received signal strength indicator of the remote site"
+    ::= { mlRadioInfoEntry 11 }
+
+mlRadioInfoEncryption OBJECT-TYPE
+    SYNTAX       INTEGER {
+                off(0),
+                on(1)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Encryption use on the radio"
+    ::= { mlRadioInfoEntry 12 }
+
+mlRadioInfoSSID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Setting to failover to 5 GHz radio if 60 GHz is not available or out of range."
+    ::= { mlRadioInfoEntry 13 }
+
+
+mlRadioInfoFailover OBJECT-TYPE
+    SYNTAX INTEGER {
+                off(0),
+                on(1)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Setting to failover to 5 GHz radio if 60 GHz is not available or out of range."
+    ::= { mlRadioInfoEntry 14 }
+
+-- Radio Status table
+
+mlRadioStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MlRadioStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of radio entries.  The number of entries is
+            given by the value of radioNumber."
+    ::= { metrolinqRadios 3 }
+
+mlRadioStatusEntry OBJECT-TYPE
+    SYNTAX      MlRadioStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing radio status information."
+    INDEX   { mlRadioNumber }
+    ::= { mlRadioStatusTable 1 }
+
+MlRadioStatusEntry ::=
+    SEQUENCE {
+        mlRadioStatusIndex          RadioIndex,
+        mlRadioStatusFailoverStatus INTEGER,
+        mlRadioStatusFailoverStats  Integer32,
+        mlRadioStatusCRCErrors      Integer32,
+        mlRadioStatusDrops          Integer32,
+        mlRadioStatusRetries        Integer32
+    }
+
+mlRadioStatusIndex OBJECT-TYPE
+    SYNTAX      RadioIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater or equal to zero, for each radio, starting from zero."
+    ::= { mlRadioStatusEntry 1 }
+
+mlRadioStatusFailoverStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                off(0),
+                on(1)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indication whether or not 60 GHz radio is failovered to 5 GHz radio."
+    ::= { mlRadioStatusEntry 2 }
+
+mlRadioStatusFailoverStats OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of radio failovers."
+    ::= { mlRadioStatusEntry 3 }
+
+mlRadioStatusCRCErrors OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of CRC errors."
+    ::= { mlRadioStatusEntry 4 }
+
+mlRadioStatusDrops OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of radio packet drops."
+    ::= { mlRadioStatusEntry 5 }
+
+
+mlRadioStatusRetries OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of radio retries."
+    ::= { mlRadioStatusEntry 6 }
+
+-- ===========================================================
+-- Textual Conventions
+-- ===========================================================
+
+RadioIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+            "A unique value, greater than zero, for each radio, starting from one."
+    SYNTAX       Integer32 (1..2147483647)
+
+EthernetIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+            "A unique value, greater than zero, for each ethernet port, starting from one."
+    SYNTAX       Integer32 (1..2147483647)
+
+EthernetIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+            "A unique value, greater or equal to zero, for each radio, starting from zero."
+    SYNTAX       Integer32 (0..2147483647)
+
+FrequencyGHz ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-3"
+    STATUS       current
+    DESCRIPTION
+            "Frequency, raw value expressed in MHz, displayed in GHz"
+    SYNTAX       Integer32 (0..100000000)
+
+RadioMcsRate ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "A value of the radio Modulation and Coding Scheme"
+    SYNTAX INTEGER {
+        auto(0),
+        mcs-6m(4),
+        mcs-9M(5),
+        mcs-12M(6),
+        mcs-18M(7),
+        mcs-24M(8),
+        mcs-36M(9),
+        mcs-48M(10),
+        mcs-54M(11),
+        mcs0(12),
+        mcs1(13),
+        mcs2(14),
+        mcs3(15),
+        mcs4(16),
+        mcs5(17),
+        mcs6(18),
+        mcs7(19),
+        mcs8(20),
+        mcs9(21),
+        mcs10(22),
+        mcs11(23),
+        mcs12(24),
+        mcs13(25),
+        mcs14(26),
+        mcs15(27),
+        nss1-mcs0(30),
+        nss1-mcs1(31),
+        nss1-mcs2(32),
+        nss1-mcs3(33),
+        nss1-mcs4(34),
+        nss1-mcs5(35),
+        nss1-mcs6(36),
+        nss1-mcs7(37),
+        nss1-mcs8(38),
+        nss1-mcs9(39),
+        nss2-mcs1(40),
+        nss2-mcs2(41),
+        nss2-mcs3(42),
+        nss2-mcs4(43),
+        nss2-mcs5(44),
+        nss2-mcs6(45),
+        nss2-mcs7(46),
+        nss2-mcs8(47),
+        nss2-mcs9(49)
+    }
+
+END
+
+

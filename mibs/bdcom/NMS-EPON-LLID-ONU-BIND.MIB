@@ -1,0 +1,253 @@
+-- *****************************************************************
+-- NMS-EPON-LLID-ONU-BIND.MIB:  NMS LLID ONU binding MIB file
+-- AUG 2009
+-- *****************************************************************
+--
+
+               NMS-EPON-LLID-ONU-BIND DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+		    TruthValue,RowStatus,MacAddress
+		    	FROM SNMPv2-TC;
+          
+               nmsEponLlidOnuBind         OBJECT IDENTIFIER ::= { nmsEPONGroup 11 }
+               
+               nmseponllidonubindTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponLlidOnuBindEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon ONU and LLID vs ONU binding table entries."
+                   ::= { nmsEponLlidOnuBind 1 }
+
+               nmsEponLlidOnuBindEntry OBJECT-TYPE
+                   SYNTAX NMSEponLlidOnuBindEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon ONU and LLID vs ONU binding table."
+                   INDEX { llidEponIfDiid }
+               ::= { nmseponllidonubindTable 1 }
+
+               NMSEponLlidOnuBindEntry ::=
+                   SEQUENCE {
+                       llidEponIfDiid
+                           INTEGER,
+                       llidSequenceNo
+                           INTEGER,
+                       onuMacAddressIndex
+                           MacAddress,
+                       llidOnuBindDesc
+                           OCTET STRING,
+                       llidOnuBindType
+                           INTEGER,
+                       llidOnuBindStatus
+                           INTEGER,
+                       llidOnuBindDistance
+                           INTEGER,
+                       llidOnuBindRTT
+                           INTEGER
+                      
+                   }
+                   
+                   
+          -- The following section describes the components of the
+          -- table.
+
+               llidEponIfDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EPON port DIID that LLID belongs to."
+                   ::= { nmsEponLlidOnuBindEntry 1 } 
+                   	
+               llidSequenceNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LLID sequence number."
+                   ::= { nmsEponLlidOnuBindEntry 2 } 
+                   	
+               onuMacAddressIndex OBJECT-TYPE
+                   SYNTAX  MacAddress
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU MAC address, that is unique id for ONU."
+                   ::= { nmsEponLlidOnuBindEntry 3 } 
+                   	
+               llidOnuBindDesc OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LLID & ONU binding description."
+                   ::= { nmsEponLlidOnuBindEntry 4 } 
+                   	
+               llidOnuBindType OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   	static(0),
+                   	dynamic(1)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LLID & ONU binding type,0-static, 1-dynamic."
+                   ::= { nmsEponLlidOnuBindEntry 5 } 
+                   	
+               llidOnuBindStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   	authenticated(0),
+                   	registered(1),
+                   	deregistered(2),
+                   	discovered(3),
+                   	lost(4),
+                   	auto_configured(5),
+                   	unknow(255)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LLID & ONU binding status."
+                   ::= { nmsEponLlidOnuBindEntry 6 } 
+                   	
+               llidOnuBindDistance OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LLID & ONU binding Distance."
+                   ::= { nmsEponLlidOnuBindEntry 7 } 
+                   	
+               llidOnuBindRTT OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LLID & ONU binding round-trip time."
+                   ::= { nmsEponLlidOnuBindEntry 8 } 
+
+
+               nmsEponllidCreateTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NmsEponllidCreateEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of creating LLID port without binding ONU."
+                   ::= { nmsEponLlidOnuBind 2 }
+
+               nmsEponllidCreateEntry OBJECT-TYPE
+                   SYNTAX NmsEponllidCreateEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of creating LLID port without binding ONU."
+                   INDEX { llidEponIfDiid,llidSequenceNo }
+               ::= { nmsEponllidCreateTable 1 }
+
+               NmsEponllidCreateEntry ::=
+                   SEQUENCE {
+                       llidEponIfDiid
+                           INTEGER,
+                       llidSequenceNo
+                           INTEGER,
+                       llidCreateRowStatus
+                           RowStatus,
+                       llidBindOnuStatus
+                           INTEGER
+                                            
+                   }
+
+               llidEponIfDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EPON port DIID that LLID belongs to."
+                   ::= { nmsEponllidCreateEntry 1 } 
+                   	
+               llidSequenceNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LLID sequence number."
+                   ::= { nmsEponllidCreateEntry 2 } 
+                   	
+               llidCreateRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "A set value for creating LLID port without binding ONU alone. "
+                   ::= { nmsEponllidCreateEntry 3 } 
+                   	
+               llidBindOnuStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   			binded(1),
+                   			unbinded(2)
+                                  }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LLID port binding onu status. binded(1),unbinded(2)"
+                   ::= { nmsEponllidCreateEntry 4 } 
+                   	
+                   
+                   
+                   	
+               nmsEponUnbindOnuMacAddrTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NmsEponUnbindOnuMacAddrEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of unbinding ONU on particular PON port."
+                   ::= { nmsEponLlidOnuBind 3 }
+
+               nmsEponUnbindOnuMacAddrEntry OBJECT-TYPE
+                   SYNTAX NmsEponUnbindOnuMacAddrEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of unbinding ONU on particular PON port."
+                   INDEX { llidEponIfDiid,onuMacAddr }
+               ::= { nmsEponUnbindOnuMacAddrTable 1 }
+
+               NmsEponUnbindOnuMacAddrEntry ::=
+                   SEQUENCE {
+                       llidEponIfDiid
+                           INTEGER,
+                       onuMacAddr
+                           MacAddress
+                   }
+
+               llidEponIfDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "EPON port DIID that LLID belongs to."
+                   ::= { nmsEponUnbindOnuMacAddrEntry 1 } 
+                   	
+               onuMacAddr OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Unbing ONU MAC address of particular PON port."
+                   ::= { nmsEponUnbindOnuMacAddrEntry 2 } 
+
+
+               
+END

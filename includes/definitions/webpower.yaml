@@ -1,6 +1,7 @@
 os: webpower
 text: WebPower
 type: power
+rfc1628_compat: 1
 over:
     - { graph: device_current, text: Current }
 discovery:

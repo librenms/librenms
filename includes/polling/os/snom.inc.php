@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 echo "Polling SNOM device...\n";
 
 // Get SNOM specific version string from silly SNOM location. Silly SNOM!
@@ -24,14 +26,13 @@ $rxbytes = (0 - $rxbytes * 8);
 echo "$rxbytes, $rxpkts, $txbytes, $txpkts, $calls, $registrations";
 
 $rrd_name = 'data';
-$rrd_def = array(
-    'DS:INOCTETS:COUNTER:600:U:100000000000',
-    'DS:OUTOCTETS:COUNTER:600:U:10000000000',
-    'DS:INPKTS:COUNTER:600:U:10000000000',
-    'DS:OUTPKTS:COUNTER:600:U:10000000000',
-    'DS:CALLS:COUNTER:600:U:10000000000',
-    'DS:REGISTRATIONS:COUNTER:600:U:10000000000'
-);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('INOCTETS', 'COUNTER', null, 100000000000)
+    ->addDataset('OUTOCTETS', 'COUNTER', null, 10000000000)
+    ->addDataset('INPKTS', 'COUNTER', null, 10000000000)
+    ->addDataset('OUTPKTS', 'COUNTER', null, 10000000000)
+    ->addDataset('CALLS', 'COUNTER', null, 10000000000)
+    ->addDataset('REGISTRATIONS', 'COUNTER', null, 10000000000);
 
 $fields = array(
     'INOCTETS'      => $rxbytes,

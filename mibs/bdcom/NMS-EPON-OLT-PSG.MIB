@@ -1,0 +1,272 @@
+-- *****************************************************************
+-- NMS-EPON-OLT-PSG.MIB:  NMS OLT-PSG MIB file
+-- AUG 2009
+-- *****************************************************************
+--
+
+               NMS-EPON-OLT-PSG DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+		    RowStatus
+                        FROM SNMPv2-TC
+                    DisplayString, ifIndex, PhysAddress,ifDescr
+			FROM RFC1213-MIB
+		    onuActivePonDiid
+			FROM NMS-EPON-ONU
+			llidIfIndex
+			FROM NMS-EPON-LLID			
+		    nmsEPONGroup
+			FROM NMS-SMI;
+          
+               nmsEponOltPsg        OBJECT IDENTIFIER ::= { nmsEPONGroup 7 }
+
+               nmseponoltpsgTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOltPsgEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon olt PSG table entries."
+                   ::= { nmsEponOltPsg 1 }
+
+               nmsEponOltPsgEntry OBJECT-TYPE
+                   SYNTAX NMSEponOltPsgEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon olt PSG table."
+                   INDEX { psgDiid }
+               ::= { nmseponoltpsgTable 1 }
+
+               NMSEponOltPsgEntry ::=
+                   SEQUENCE {
+                       psgDiid
+                           INTEGER,
+                       psgIfDescr
+                           OCTET STRING,
+                       activeEponDiid
+                           INTEGER,
+                       standbyEponDiid
+                           INTEGER,
+                       currentActiveEponDiid
+                           INTEGER,
+                       currentActiveEponIfDescr
+                           OCTET STRING,
+                       currentStandbyEponDiid
+                           INTEGER,
+                       currentStandbyEponIfDescr
+                           OCTET STRING,
+                       psgRowStatus
+                           RowStatus
+                   }
+
+               psgDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PSG diid,unique in devices."
+                   ::= { nmsEponOltPsgEntry 1 } 
+
+               psgIfDescr OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PSG port description in device."
+                   ::= { nmsEponOltPsgEntry 2 } 
+
+               activeEponDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "active EPON port id in PSG."
+                   ::= { nmsEponOltPsgEntry 3 } 
+
+               standbyEponDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "standby EPON port id in PSG."
+                   ::= { nmsEponOltPsgEntry 4 } 
+
+               currentActiveEponDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current active EPON port id in PSG."
+                   ::= { nmsEponOltPsgEntry 5 } 
+
+               currentActiveEponIfDescr OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current active EPON port description in PSG."
+                   ::= { nmsEponOltPsgEntry 6 } 
+
+               currentStandbyEponDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current standby EPON port id in PSG."
+                   ::= { nmsEponOltPsgEntry 7 } 
+
+               currentStandbyEponIfDescr OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current standby EPON port description in PSG."
+                   ::= { nmsEponOltPsgEntry 8 } 
+
+               psgRowStatus OBJECT-TYPE
+                   SYNTAX  RowStatus
+                   ACCESS  read-create
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Row status,that a row could be created in PSG."
+                   ::= { nmsEponOltPsgEntry 9 } 
+                   
+                   
+                   
+               nmsEponOltPsgCreateTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOltPsgCreateEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon olt PSG port create table entries."
+                   ::= { nmsEponOltPsg 2 }
+
+               nmsEponOltPsgCreateEntry OBJECT-TYPE
+                   SYNTAX NMSEponOltPsgCreateEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon olt PSG port create table."
+                   INDEX { psgDiid }
+               ::= { nmsEponOltPsgCreateTable 1 }
+              
+
+               NMSEponOltPsgCreateEntry ::=
+                   SEQUENCE {
+                       psgPortSlotNo
+                           INTEGER,
+                       psgPortSeqencelNo
+                           INTEGER,
+                       psgPortDiid
+                           INTEGER,
+                       psgPortOper
+                           INTEGER,
+                       psgPortType
+                           INTEGER
+                      
+                   }
+
+               psgPortSlotNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PSG port slot number, the same value as chassis-mib slot number."
+                   ::= { nmsEponOltPsgCreateEntry 1 } 
+
+               psgPortSeqencelNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PSG port sequence number, the different value in different slot."
+                   ::= { nmsEponOltPsgCreateEntry 2 } 
+
+               psgPortDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PSG port diid, the same value as ifIndex in RFC-1213."
+                   ::= { nmsEponOltPsgCreateEntry 3 } 
+
+               psgPortOper OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                            create(1),
+                            delete(2),
+                            switch(3)
+                                  }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PSG port operation, 1-ceate a new psg port, 2-delete a current psg port, 3-switch between active port and standby port."
+                   ::= { nmsEponOltPsgCreateEntry 4 } 
+                   
+               psgPortType OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                            b_psg(1),
+                            c_psg(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PSG port operation, 1-b-psg a new psg port, 2-c-psg a current psg port, 3-switch between active port and standby port."
+                   ::= { nmsEponOltPsgCreateEntry 5 } 
+              
+
+
+
+--psg trap Notifications
+	nmsEponPsgNotifications OBJECT IDENTIFIER
+                                ::= { nmsEponOltPsg 3 }
+
+
+	nmsEponPsgNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       psgDiid,
+                       ifDescr,
+                       currentActiveEponDiid,
+                       currentActiveEponIfDescr,
+                       currentStandbyEponDiid,
+                       currentStandbyEponIfDescr
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when optical interface upload/download power exceed the threshold ruled in opticalPortPowerTable."
+    		::= { nmsEponPsgNotifications 1 }
+
+--psg trap Notifications
+	nmsEponPsgSwitchNotifications OBJECT IDENTIFIER
+                                ::= { nmsEponOltPsg 4 }
+
+
+	nmsEponPsgSwitchNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       llidIfIndex,
+                       ifDescr,
+                       psgDiid,
+                       psgIfDescr,
+                       currentActiveEponDiid,
+                       currentActiveEponIfDescr,
+                       currentStandbyEponDiid,
+                       currentStandbyEponIfDescr
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when psg interface switches."
+    		::= { nmsEponPsgSwitchNotifications 1 }
+
+
+
+
+
+
+
+END
+

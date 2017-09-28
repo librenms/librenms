@@ -11,7 +11,7 @@
 
 require 'includes/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'cambium-epmp-modulation');
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Value                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:uplinkMCSMode='.$rrdfilename.':uplinkMCSMode:AVERAGE ';
     $rrd_options .= ' DEF:downlinkMCSMode='.$rrdfilename.':downlinkMCSMode:AVERAGE ';

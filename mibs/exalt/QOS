@@ -1,0 +1,364 @@
+QOS DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    VlanIdT, QosTagT, EnableStatusT
+        FROM ExaltComm
+    radioConfig
+        FROM ExaltComProducts;
+
+  QosPriorityT ::= TEXTUAL-CONVENTION
+        STATUS             current
+        DESCRIPTION         "This MIB variable sets Qos priority, the higher number 
+                             the higher priority"
+        SYNTAX             INTEGER {
+                                     priority0(0),
+                                     priority1(1),
+                                     priority2(2),
+                                     priority3(3)
+                            }
+
+  QosModeT ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION       "This MIB variable sets Qos Mode"
+        SYNTAX            INTEGER {
+                                    disable(0),
+                                    qos-mode-802-1p(4),
+                                    qos-mode-diffserv(5),
+                                    qos-mode-port(6)
+                            }
+
+  QosScheduleModeT ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION       "This MIB variable defines available QoS Scheduler modes"
+        SYNTAX            INTEGER {
+                                    weighted-round-robin(0),
+                                    hybrid1-mode-3sp-2wrr-1wrr-0wrr(1),
+                                    hybrid2-mode-3sp-2sp-1wrr-0wrr(2),
+                                    strict-priority(3)
+                            }
+
+  QosCos3WeightT ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION       "This MIB variable defines available weights for Queue 3"
+        SYNTAX            INTEGER {
+                                    w-8(8),
+                                    w-16(16),
+                                    w-32(32)
+                            }
+
+  QosCos2WeightT ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION       "This MIB variable defines available weights for Queue 2"
+        SYNTAX            INTEGER {
+                                    w-4(4),
+                                    w-8(8),
+                                    w-16(16)
+                            }
+
+  QosCos1WeightT ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION       "This MIB variable defines available weights for Queue 1"
+        SYNTAX            INTEGER {
+                                    w-2(2),
+                                    w-4(4),
+                                    w-8(8)
+                            }
+
+  QosCos0WeightT ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION       "This MIB variable defines available weights for Queue 0"
+        SYNTAX            INTEGER {
+                                    w-1(1),
+                                    w-2(2),
+                                    w-4(4)
+                            }
+
+  -- define advSystemConfig here to allow modular inclusion of feature
+  -- same definition could exist in other features such as Aggregation that belong 
+  -- to advSystemConfig
+  advSystemConfig OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION         "This is the device specific advanced configuration section."
+        ::= { radioConfig 5 }
+
+  extAirG2QoS OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION         "QOS configuration."
+        ::= { advSystemConfig 8 }
+
+    qosDefaultQueue OBJECT-TYPE
+        SYNTAX              QosPriorityT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The default queue to catch all traffic that don't belong to any queue."
+        ::= { extAirG2QoS 1 }
+
+    qosEth1Mode OBJECT-TYPE
+        SYNTAX              QosModeT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This setting set the qos mode or disable QoS on ETH1."
+        ::= { extAirG2QoS 2 }
+
+    qosEth2Mode OBJECT-TYPE
+        SYNTAX              QosModeT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This setting set the qos mode or disable QoS on ETH2."
+        ::= { extAirG2QoS 3 }
+
+    qosDiffServList OBJECT-TYPE
+        SYNTAX              SEQUENCE OF QosDiffServEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "This is a table of Qos DiffServ value and proiority."
+        ::= { extAirG2QoS 4 }
+
+    qosScheduler OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "QOS Scheduler configuration."
+        ::= { extAirG2QoS 7 }
+
+
+    qosDiffServEntry OBJECT-TYPE
+        SYNTAX              QosDiffServEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "This is DiffServ table entry."
+        INDEX               {
+                               diffServValue, diffServPriority, diffServEnable
+                            }
+        ::= { qosDiffServList 1 }
+
+    QosDiffServEntry ::= SEQUENCE {
+        diffServValue   INTEGER,
+        diffServPriority  QosPriorityT,
+        diffServEnable    EnableStatusT
+    }
+
+    diffServValue OBJECT-TYPE
+        SYNTAX              Integer32 (0..63)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This is the value for the corresponding DiffServ table entry."
+        ::= { qosDiffServEntry 1 }
+
+    diffServPriority OBJECT-TYPE
+        SYNTAX              QosPriorityT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This is the priority for the corresponding DiffServ table entry."
+        ::= { qosDiffServEntry 2 }
+
+    diffServEnable OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This is the status for the corresponding  DiffServ table entry."
+        ::= { qosDiffServEntry 3 }
+
+    qosPortETH1Conf OBJECT IDENTIFIER ::= { extAirG2QoS 5 }
+
+    qosEth1m802dot1pList OBJECT-TYPE
+        SYNTAX              SEQUENCE OF QosEth1m802dot1pEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "This is a table of Qos 802.1p tag and proiority."
+        ::= { qosPortETH1Conf 1 }
+
+    qosEth1m802dot1pEntry OBJECT-TYPE
+        SYNTAX              QosEth1m802dot1pEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "This is a 802.1p table entry."
+        INDEX               {
+                               tagEth1Priority, tagEth1Status
+                            }
+        ::= { qosEth1m802dot1pList 1 }
+
+    QosEth1m802dot1pEntry ::= SEQUENCE {
+        tagEth1Priority
+            QosPriorityT,
+        tagEth1Status
+            EnableStatusT
+    }
+
+    tagEth1Priority OBJECT-TYPE
+        SYNTAX              QosPriorityT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This is the priority for the corresponding ETH1 802.1p tag entry."
+        ::= { qosEth1m802dot1pEntry 1 }
+
+    tagEth1Status OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This is the status for the corresponding ETH1 802.1p tag entry."
+        ::= { qosEth1m802dot1pEntry 2 }
+
+    qosEth1PortList OBJECT-TYPE
+        SYNTAX              SEQUENCE OF QosEth1PortEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "This is a table of Qos Port mode."
+        ::= { qosPortETH1Conf 2 }
+
+    qosEth1PortEntry OBJECT-TYPE
+        SYNTAX              QosEth1PortEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "This is a Port mode table entry."
+        INDEX               {
+                               portEth1Priority, portEth1Status
+                            }
+        ::= { qosEth1PortList 1 }
+
+    QosEth1PortEntry ::= SEQUENCE {
+        portEth1Priority
+            QosPriorityT,
+        portEth1Status
+            EnableStatusT
+    }
+
+    portEth1Priority OBJECT-TYPE
+        SYNTAX              QosPriorityT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This is the priority for the corresponding ETH1 Port mode entry."
+        ::= { qosEth1PortEntry 1 }
+
+    portEth1Status OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This is the status for the corresponding ETH1 Port mode entry."
+        ::= { qosEth1PortEntry 2 }
+
+    qosPortETH2Conf OBJECT IDENTIFIER ::= { extAirG2QoS 6 }
+
+    qosEth2m802dot1pList OBJECT-TYPE
+        SYNTAX              SEQUENCE OF QosEth2m802dot1pEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "This is a table of Qos 802.1p tag and proiority."
+        ::= { qosPortETH2Conf 1 }
+
+    qosEth2m802dot1pEntry OBJECT-TYPE
+        SYNTAX              QosEth2m802dot1pEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "This is a 802.1p table entry."
+        INDEX               {
+                               tagEth2Priority, tagEth2Status
+                            }
+        ::= { qosEth2m802dot1pList 1 }
+
+    QosEth2m802dot1pEntry ::= SEQUENCE {
+        tagEth2Priority
+            QosPriorityT,
+        tagEth2Status
+            EnableStatusT
+    }
+
+    tagEth2Priority OBJECT-TYPE
+        SYNTAX              QosPriorityT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This is the priority for the corresponding ETH2 802.1p tag entry."
+        ::= { qosEth2m802dot1pEntry 1 }
+
+    tagEth2Status OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This is the status for the corresponding ETH2 802.1p tag entry."
+        ::= { qosEth2m802dot1pEntry 2 }
+
+    qosEth2PortList OBJECT-TYPE
+        SYNTAX              SEQUENCE OF QosEth2PortEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "This is a table of Qos Port mode."
+        ::= { qosPortETH2Conf 2 }
+
+
+    qosEth2PortEntry OBJECT-TYPE
+        SYNTAX              QosEth2PortEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "This is a ETH2 Port mode table entry."
+        INDEX               {
+                               portEth2Priority, portEth2Status
+                            }
+        ::= { qosEth2PortList 1 }
+
+    QosEth2PortEntry ::= SEQUENCE {
+        portEth2Priority
+            QosPriorityT,
+        portEth2Status
+            EnableStatusT
+    }
+
+    portEth2Priority OBJECT-TYPE
+        SYNTAX              QosPriorityT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This is the priority for the corresponding ETH2 Port mode entry."
+        ::= { qosEth2PortEntry 1 }
+
+    portEth2Status OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This is the status for the corresponding ETH2 Port mode entry."
+        ::= { qosEth2PortEntry 2 }
+
+    qosScheduleMode OBJECT-TYPE
+        SYNTAX              QosScheduleModeT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The QoS queues scheduler mode"
+        ::= { qosScheduler 1 }
+
+    qosCos3Weight OBJECT-TYPE
+        SYNTAX              QosCos3WeightT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "QoS queue 3 weight."
+        ::= { qosScheduler 2 }
+
+    qosCos2Weight OBJECT-TYPE
+        SYNTAX              QosCos2WeightT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "QoS queue 2 weight."
+        ::= { qosScheduler 3 }
+
+    qosCos1Weight OBJECT-TYPE
+        SYNTAX              QosCos1WeightT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "QoS queue 1 weight."
+        ::= { qosScheduler 4 }
+
+    qosCos0Weight OBJECT-TYPE
+        SYNTAX              QosCos0WeightT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "QoS queue 0 weight."
+        ::= { qosScheduler 5 }
+
+
+    commitQosSettings OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "This command allows saving or clear configuration.
+                            Options are: save, clear, correspondingly saving changes to
+                            configuration to the persistent storage or clearing unsaved changes."
+        ::= { extAirG2QoS 1000 }
+END

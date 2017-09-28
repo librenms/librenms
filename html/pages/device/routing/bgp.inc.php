@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\IP;
+
 $link_array = array(
     'page'   => 'device',
     'device' => $device['device_id'],
@@ -41,7 +43,7 @@ echo ' | Prefixes: ';
 
 if ($vars['view'] == 'prefixes_ipv4unicast') {
     echo "<span class='pagemenu-selected'>";
-    $extra_sql = " AND `bgpLocalAddr` NOT LIKE '%:%'";
+    $extra_sql = " AND `bgpPeerIdentifier` NOT LIKE '%:%'";
 }
 
 echo generate_link('IPv4', $link_array, array('view' => 'prefixes_ipv4unicast'));
@@ -64,7 +66,7 @@ echo ' | ';
 
 if ($vars['view'] == 'prefixes_ipv6unicast') {
     echo "<span class='pagemenu-selected'>";
-    $extra_sql = " AND `bgpLocalAddr` LIKE '%:%'";
+    $extra_sql = " AND `bgpPeerIdentifier` LIKE '%:%'";
 }
 
 echo generate_link('IPv6', $link_array, array('view' => 'prefixes_ipv6unicast'));
@@ -96,7 +98,7 @@ if ($vars['view'] == 'macaccounting_pkts') {
 print_optionbar_end();
 
 echo '<table border="0" cellspacing="0" cellpadding="5" width="100%">';
-echo '<tr style="height: 30px"><td width=1></td><th></th><th>Peer address</th><th>Type</th><th>Remote AS</th><th>State</th><th>Uptime</th></tr>';
+echo '<tr style="height: 30px"><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>State</th><th>Uptime</th></tr>';
 
 $i = '1';
 
@@ -160,6 +162,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
         unset($peerhost);
     }
 
+    $peerhost = cleanPort($peerhost);
     if (is_array($peerhost)) {
         // $peername = generate_device_link($peerhost);
         $peername = generate_device_link($peerhost).' '.generate_port_link($peerhost);
@@ -190,9 +193,8 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
 
     unset($sep);
 
-    if (filter_var($peer['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
-        $peer['bgpPeerIdentifier'] = Net_IPv6::compress($peer['bgpPeerIdentifier']);
-    }
+    // make ipv6 look pretty
+    $peer['bgpPeerIdentifier'] = (string)IP::parse($peer['bgpPeerIdentifier'], true);
 
     // display overlib graphs
     $graph_array                = array();
@@ -208,12 +210,17 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     $graph_array_zoom['height'] = '150';
     $graph_array_zoom['width']  = '500';
     $overlib_link = "device/device=".$peer['device_id']."/tab=routing/proto=bgp/";
-    $peeraddresslink = "<span class=list-large>".overlib_link(null, $peer['bgpPeerIdentifier'], generate_graph_tag($graph_array_zoom), null)."</span>";
+
+    $link_array         = $graph_array;
+    $link_array['page'] = 'graphs';
+    unset($link_array['height'], $link_array['width'], $link_array['legend']);
+    $link = generate_url($link_array);
+    $peeraddresslink = "<span class=list-large>".overlib_link($link, $peer['bgpPeerIdentifier'], generate_graph_tag($graph_array_zoom), null)."</span>";
 
     echo '<tr bgcolor="'.$bg_colour.'"'.($peer['alert'] ? ' bordercolor="#cc0000"' : '').($peer['disabled'] ? ' bordercolor="#cccccc"' : '').'>
         ';
 
-    echo '   <td width=20><span class=list-large>'.$i.'</span></td>
+    echo '
         <td>'.$peeraddresslink.'<br />'.$peername."</td>
         <td>$peer_type</td>
         <td style='font-size: 10px; font-weight: bold; line-height: 10px;'>".(isset($peer['afi']) ? $peer['afi'] : '').'</td>

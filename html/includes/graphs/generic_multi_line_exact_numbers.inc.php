@@ -35,7 +35,7 @@ foreach ($rrd_list as $rrd) {
         $colour = $config['graph_colours'][$colours][$colour_iter];
         $colour_iter++;
     }
-  
+    $i++;
     $ds       = $rrd['ds'];
     $filename = $rrd['filename'];
 

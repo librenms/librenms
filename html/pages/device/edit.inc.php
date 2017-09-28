@@ -29,11 +29,17 @@ if ($_SESSION['userlevel'] < '7') {
 
     $panes['ipmi']     = 'IPMI';
 
-    if (dbFetchCell("SELECT COUNT(sensor_id) FROM `sensors` WHERE device_id = ? AND sensor_deleted='0' LIMIT 1", array($device['device_id'])) > 0) {
+    if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `sensor_deleted`='0' LIMIT 1", array($device['device_id'])) > 0) {
         $panes['health'] = 'Health';
     }
 
+    if (dbFetchCell("SELECT COUNT(*) FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_deleted`='0' LIMIT 1", array($device['device_id'])) > 0) {
+        $panes['wireless-sensors'] = 'Wireless Sensors';
+    }
+
     $panes['storage']  = 'Storage';
+    $panes['processors']  = 'Processors';
+    $panes['mempools']  = 'Memory';
     $panes['misc']     = 'Misc';
 
     $panes['component'] = 'Components';

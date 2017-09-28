@@ -10,7 +10,7 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
     }
 
     if ($sensor['poller_type'] == "ipmi") {
-        $sensor_descr = ipmiSensorName($device['hardware'], $sensor['sensor_descr'], $ipmiSensorsNames);
+        $sensor_descr = ipmiSensorName($device['hardware'], $sensor['sensor_descr']);
     } else {
         $sensor_descr = $sensor['sensor_descr'];
     }

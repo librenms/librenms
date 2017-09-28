@@ -1,0 +1,1904 @@
+NETGEAR-QOS-ACL-MIB DEFINITIONS ::= BEGIN
+
+-- Netgear Inc Quality of Service - ACL Package MIB
+-- Copyright Netgear Inc (2002-2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+    IpAddress, Integer32, Unsigned32, Counter64          
+                                         FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, MacAddress, TruthValue      
+                                         FROM SNMPv2-TC
+
+    DisplayString                        FROM RFC1213-MIB
+    InterfaceIndexOrZero                 FROM IF-MIB
+    fastPathQOS                          FROM NETGEAR-QOS-MIB;
+                
+    fastPathQOSACL MODULE-IDENTITY
+        LAST-UPDATED "201204270000Z" -- 27 April 2012 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The MIB definitions for Quality of Service - ACL Flex package."
+          
+        -- Revision history.  
+        REVISION
+          "201204270000Z" -- 27 April 2012 12:00:00 GMT
+        DESCRIPTION
+          "Added support for ACL Redirect to External Agent action attribute."
+        REVISION
+          "201202140000Z" -- 14 Feb 2012 12:00:00 GMT
+        DESCRIPTION
+          "Added support for ACL Rate Limiting rule attribute."
+        REVISION
+          "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        DESCRIPTION
+          "Postal address updated."
+        REVISION
+          "200705230000Z" -- 23 May 2007 12:00:00 GMT
+        DESCRIPTION
+          "Netgear branding related changes."
+        REVISION
+          "200507080000Z" -- 08 Jul 2005 12:00:00 GMT
+        DESCRIPTION
+          "Added support for ACL rule logging and trap notification."
+        REVISION
+          "200409200000Z" -- 20 Sep 2004 12:00:00 GMT
+        DESCRIPTION
+          "Added L2 MAC ACL support."
+        REVISION
+          "200311210000Z" -- 21 Nov 2003 12:00:00 GMT
+        DESCRIPTION
+          "Revisions made for new release."
+        REVISION
+          "200302062334Z" -- 6 February 2003
+        DESCRIPTION 
+          "Updated for release"
+    ::= { fastPathQOS 2 }
+
+
+    EtypeValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "x"
+    STATUS   current
+    DESCRIPTION
+       "Ethertype value of a packet.  The allowed value is 0x0600 to 0xFFFF."
+    SYNTAX   Unsigned32 (1536..65535)   -- hex value 0x0600 to 0xFFFF
+    
+    Ipv6AddressPrefix ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:"
+    STATUS       current
+    DESCRIPTION
+        "This data type is used to model IPv6 address prefixes. This is a binary 
+        string of up to 16 octets in network byte-order."
+    SYNTAX       OCTET STRING (SIZE (0..16))     
+   
+    AclBurstSize ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS   current
+    DESCRIPTION
+       "The number of kilobytes (Kbytes) in a packet that may be sent in a
+       traffic stream without regard for other traffic streams."
+    SYNTAX   Unsigned32 (1..128)
+
+--**************************************************************************************
+    
+    aclNamedIpv4IndexNextFree OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                     "This object contains an unused value for the aclIndex
+                      to be used when creating a new named IPv4 ACL.  A value of zero
+                      zero indicates the ACL table is full."
+    ::= { fastPathQOSACL 14 }
+
+    --**************************************************************************************
+    
+    aclTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AclEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of ACL instances."
+         ::= { fastPathQOSACL 1 }
+
+    aclEntry OBJECT-TYPE
+         SYNTAX      AclEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     ""
+         INDEX       { aclIndex }
+         ::= { aclTable 1 }
+         
+    AclEntry ::= SEQUENCE {         
+           aclIndex
+               Integer32,
+           aclStatus
+               RowStatus,
+           aclName
+               DisplayString
+           }
+    
+    aclIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The IP ACL table index this instance is associated with."
+         ::= { aclEntry 1 }
+         
+    aclStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Status of this instance.  Entries can not be deleted until all rows in 
+                     the aclIfTable and aclRuleTable with corresponding values of aclIndex 
+                     have been deleted.
+                     
+                     active(1)      - this ACL instance is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance"
+         ::= { aclEntry 2 }
+    
+    aclName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..31))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The name of this IPv4 ACL entry, which must consist of
+                      1 to 31 alphanumeric characters and uniquely identify
+                      this IPv4 ACL. An existing IPv4 ACL can be renamed by
+                      setting this object to a new name.
+
+                      This object must be set to complete a new IPv4 ACL 
+                      row instance."
+         ::= { aclEntry 3 }
+
+    --**************************************************************************************
+    
+    aclIfTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AclIfEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of ACL interface instances per direction."
+         ::= { fastPathQOSACL 8 }
+
+    aclIfEntry OBJECT-TYPE
+         SYNTAX      AclIfEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     ""
+         INDEX       { aclIfIndex, aclIfDirection, aclIfSequence, aclIfAclType, aclIfAclId  }
+         ::= { aclIfTable 1 }
+         
+    AclIfEntry ::= SEQUENCE {         
+           aclIfIndex
+               Integer32,
+           aclIfDirection
+               INTEGER,
+           aclIfSequence
+               Unsigned32,
+           aclIfAclType
+               INTEGER,
+           aclIfAclId
+               Integer32,
+           aclIfStatus
+               RowStatus
+           }
+    
+    aclIfIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The interface to which this ACL instance applies."
+         ::= { aclIfEntry 1 }
+         
+    aclIfDirection OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      inbound(1),
+                      outbound(2)
+                     }
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The interface direction to which this ACL instance applies."
+         ::= { aclIfEntry 2 }
+         
+    aclIfSequence OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4294967295)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The relative evaluation sequence of this ACL for this
+                      interface and direction.  When multiple ACLs are allowed 
+                      for a given interface and direction, the sequence number 
+                      determines the order in which the list of ACLs are evaluated,
+                      with lower sequence numbers given higher precedence.  The
+                      sequence number value is arbitrary, but must be a unique
+                      non-zero value for a given interface and direction.
+                       
+                      Setting this object to an existing sequence number 
+                      value for a given interface and direction causes the 
+                      ACL corresponding to that value to be replaced with
+                      this ACL."
+         ::= { aclIfEntry 3 }
+         
+    aclIfAclType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      ip(1),
+                      mac(2),
+                      ipv6(3)
+                     }
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The type of this ACL, which is used to interpret the 
+                      aclIfId object value.  Each type of ACL uses its own
+                      numbering scheme for identification (see aclIfAclId object
+                      for details).
+
+                      The aclIfAclId object must be specified along with this 
+                      object."
+         ::= { aclIfEntry 4 }
+         
+    aclIfAclId OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The ACL identifier value, which is interpreted based on
+                      the aclIfType object.
+
+                      For the IP ACLs, the actual ACL number is its identifier
+                      as follows:  IP standard ranges from 1-99, while 
+                      IP extended ranges from 100-199. Here, aclIfAclId represents 
+                      aclIndex. 
+
+                      The MAC ACLs use an internally-generated index value
+                      that is assigned when the ACL is created.Here, aclIfAclId 
+                      represents aclMacIndex.
+
+                      The IPv6 ACLs use an internally-generated index value
+                      that is assigned when the ACL is created.Here, aclVlanAclId 
+                      represents aclIpv6Index.  
+
+                      The aclIfType object must be specified along with
+                      this object."
+         ::= { aclIfEntry 5 }
+         
+    aclIfStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Status of this instance.
+                     
+                     active(1)      - this ACL interface instance is active
+                     createAndGo(4) - set to this value to assign an ACL to an interface and direction
+                     destroy(6)     - set to this value to remove an ACL from an interface and direction"
+         ::= { aclIfEntry 6 }
+
+
+    --**************************************************************************************
+    -- Layer 3 IP Access List Rules
+    --
+    --**************************************************************************************
+    
+    aclRuleTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AclRuleEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of IP ACL Rule instances."
+         ::= { fastPathQOSACL 4 }
+
+    aclRuleEntry OBJECT-TYPE
+         SYNTAX      AclRuleEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of IP ACL Classification Rules"
+         INDEX       { aclIndex, aclRuleIndex }
+         ::= { aclRuleTable 1 }
+         
+    AclRuleEntry ::= SEQUENCE {         
+           aclRuleIndex
+               Integer32,
+           aclRuleAction
+               INTEGER,
+           aclRuleProtocol
+               Integer32,
+           aclRuleSrcIpAddress
+               IpAddress,
+           aclRuleSrcIpMask
+               IpAddress,
+           aclRuleSrcL4Port
+               Integer32,
+           aclRuleSrcL4PortRangeStart
+               Integer32,
+           aclRuleSrcL4PortRangeEnd
+               Integer32,
+           aclRuleDestIpAddress
+               IpAddress,
+           aclRuleDestIpMask
+               IpAddress,
+           aclRuleDestL4Port
+               Integer32,
+           aclRuleDestL4PortRangeStart
+               Integer32,
+           aclRuleDestL4PortRangeEnd
+               Integer32,
+           aclRuleIPDSCP
+               Integer32,
+           aclRuleIpPrecedence
+               Integer32,
+           aclRuleIpTosBits
+               Integer32,
+           aclRuleIpTosMask
+               Integer32,
+           aclRuleStatus
+               RowStatus,
+           aclRuleAssignQueueId
+               Unsigned32,
+           aclRuleRedirectIntf
+               InterfaceIndexOrZero,
+           aclRuleMatchEvery
+              TruthValue,
+           aclRuleMirrorIntf
+               InterfaceIndexOrZero,
+           aclRuleLogging
+             TruthValue,
+           aclRuleTimeRangeName
+               DisplayString,
+           aclRuleTimeRangeStatus
+               INTEGER,
+           aclRuleRateLimitCrate
+               Unsigned32,
+           aclRuleRateLimitCburst
+               AclBurstSize,
+          aclRuleIcmpType
+             Integer32,
+          aclRuleIcmpCode
+            Integer32,
+          aclRuleIgmpType
+            Integer32,
+          aclRuleEstablished
+            TruthValue,
+          aclRuleFragments
+            TruthValue
+           }
+    
+    aclRuleIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The index of this rule instance within an IP ACL."
+         ::= { aclRuleEntry 1 }
+         
+    aclRuleAction OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      permit(1),
+                      deny(2)
+                      }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The type of action this rule should perform."
+         DEFVAL { deny }
+         ::= { aclRuleEntry 2 }
+         
+    aclRuleProtocol OBJECT-TYPE
+         SYNTAX      Integer32 (1..255)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "icmp - 1
+                      igmp - 2
+                      ip - 4
+                      tcp - 6
+                      udp - 17
+                      All values from 1 to 255 are valid."
+         ::= { aclRuleEntry 3 }
+           
+    aclRuleSrcIpAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Source IP Address used in the ACL Classification."
+         ::= { aclRuleEntry 4 }
+
+    aclRuleSrcIpMask OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Source IP Mask used in the ACL Classification.
+         This mask is expressed using wild-card notation,which
+         is the 1's compliment of traditional  Subnet Masks.
+         Here, the 'Don't care bits' are represented by binary 1's and 
+         'Do care bits' are represented by binary 0's. "
+         ::= { aclRuleEntry 5 }
+
+
+    aclRuleSrcL4Port OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Source Port Number (Layer 4) used in the ACL Classification."
+         ::= { aclRuleEntry 6 }
+
+    aclRuleSrcL4PortRangeStart OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Source Port Number(Layer 4) range start."
+         ::= { aclRuleEntry 7 }
+
+    aclRuleSrcL4PortRangeEnd OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Source Port Number(Layer 4) range end."
+         ::= { aclRuleEntry 8 }
+
+    aclRuleDestIpAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Destination IP Address used in the ACL Classification."
+         ::= { aclRuleEntry 9 }
+
+    aclRuleDestIpMask OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Destination  IP Mask used in the ACL Classification.
+         This mask is expressed using wild-card notation,which
+         is   the 1's compliment of traditional  Subnet Masks.
+         Here, the 'Don't care bits' are represented by binary 1's and 
+         'Do care bits' are represented by binary 0's. "
+         ::= { aclRuleEntry 10 }
+
+    aclRuleDestL4Port OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Destination Port (Layer 4) used in ACl classification."
+         ::= { aclRuleEntry 11 }
+
+    aclRuleDestL4PortRangeStart OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Destination Port (Layer 4) starting range used in ACL classification."
+         ::= { aclRuleEntry 12 }
+
+    aclRuleDestL4PortRangeEnd OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Destination Port (Layer 4) ending range used in ACL classification."
+         ::= { aclRuleEntry 13 }
+
+    aclRuleIPDSCP OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Differentiated Services Code Point value."
+         ::= { aclRuleEntry 14 }
+
+    aclRuleIpPrecedence OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Type of Service (TOS) IP Precedence value."
+         ::= { aclRuleEntry 15 }
+
+    aclRuleIpTosBits OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Type of Service (TOS) Bits value."
+         ::= { aclRuleEntry 16 }
+
+    aclRuleIpTosMask OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Type of Service (TOS) Mask value."
+         ::= { aclRuleEntry 17 }
+
+    aclRuleStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Status of this instance.
+                     
+                     active(1)      - this ACL Rule is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance"
+         ::= { aclRuleEntry 18 }
+
+    aclRuleAssignQueueId OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Queue identifier to which all inbound packets matching this 
+                      ACL rule are directed.  This object defaults to the standard
+                      queue assignment for user priority 0 traffic per the IEEE 802.1D
+                      specification based on the number of assignable queues in the 
+                      system:
+                         1-3 queues:  0
+                         4-7 queues:  1
+                           8 queues:  2
+                      This default assignment is static and is not influenced by
+                      other system configuration changes."
+         ::= { aclRuleEntry 19 }
+         
+    aclRuleRedirectIntf OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "A non-zero value indicates the external ifIndex to which all 
+                      inbound packets matching this ACL rule are directed.  A 
+                      value of zero means packet redirection is not in effect, which
+                      is the default value of this object.  Note that packet
+		      redirection and mirroring (aclRuleMirrorIntf object)
+		      are mutually-exclusive rule attributes."
+         DEFVAL { 0 }
+         ::= { aclRuleEntry 20 }
+         
+    aclRuleMatchEvery OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate that the ACL rule is defined to match on every IP packet, 
+                      regardless of content."
+         ::= { aclRuleEntry 21 }
+         
+    aclRuleMirrorIntf OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "A non-zero value indicates the external ifIndex to which all 
+                      inbound packets matching this ACL rule are copied.  A 
+                      value of zero means packet mirroring is not in effect, which
+                      is the default value of this object.  Note that packet
+		      mirroring and redirection (aclRuleRedirectIntf object)
+		      are mutually-exclusive rule attributes."
+         DEFVAL { 0 }
+         ::= { aclRuleEntry 22 }
+         
+    aclRuleLogging OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate that the ACL rule is being logged. 
+                      A hardware count of the number of times this rule is
+		      hit is reported via the aclTrapRuleLogEvent notification.
+
+                      This object may be supported for an aclRuleAction 
+		      setting of permit(1) and/or deny(2), depending on the
+		      ACL feature capabilities of the device."
+         ::= { aclRuleEntry 23 }     
+
+    aclRuleTimeRangeName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..31))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Name of the time range, that the ACL rule 
+                      has referenced.It must start with alphabet and shall consist of
+                      1 to 31 alphanumeric characters."
+         ::= { aclRuleEntry 24 }
+
+    aclRuleTimeRangeStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     inactive(1),
+                     active(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Flag that indicates the ACL rule status.
+                      If the status is active, it implies that the ACL rule is in effect.
+                      If the status is inactive, it implies that the ACL rule is not in effect."
+         ::= { aclRuleEntry 25 }
+
+    aclRuleRateLimitCrate OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Committed rate attribute statement value, specified in kbps."
+         ::= { aclRuleEntry 26 }
+
+    aclRuleRateLimitCburst OBJECT-TYPE
+         SYNTAX      AclBurstSize
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Committed burst size attribute statement value, specified in kbytes."
+         ::= { aclRuleEntry 27 }
+
+    aclRuleIcmpType OBJECT-TYPE
+         SYNTAX      Integer32 (1..255)
+         MAX-ACCESS  read-create 
+         STATUS      current
+         DESCRIPTION
+                     "ACL rule matches on the specified ICMP type. All values 
+                      from 1 to 255 are valid."
+         ::= { aclRuleEntry 29 }
+
+    aclRuleIcmpCode OBJECT-TYPE
+         SYNTAX      Integer32 (1..255)
+         MAX-ACCESS  read-create 
+         STATUS      current
+         DESCRIPTION
+                     "ACL rule matches on the specified ICMP code. All values
+                      from 1 to 255 are valid."
+         ::= { aclRuleEntry 30}
+
+    aclRuleIgmpType OBJECT-TYPE
+         SYNTAX      Integer32 (1..255)
+         MAX-ACCESS  read-create 
+         STATUS      current
+         DESCRIPTION
+                     "ACL rule matches on the specified IGMP type. All values
+                      from 1 to 255 are valid."
+         ::= { aclRuleEntry 31 }
+
+    aclRuleEstablished OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate the ACL rule to match on TCP packets that 
+                     has either RST or ACK bits set in the TCP header" 
+         ::= { aclRuleEntry 32}
+
+    aclRuleFragments OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate the ACL rule to match if the packet is fragmented"
+         ::= { aclRuleEntry 33}
+
+--**************************************************************************************
+    -- Layer 2 MAC Access Lists
+    --
+    --**************************************************************************************
+    
+    aclMacIndexNextFree OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                     "This object contains an unused value for the aclMacIndex
+                      to be used when creating a new MAC ACL.  A value of zero
+                      zero indicates the ACL table is full."
+    ::= { fastPathQOSACL 5 }
+
+    --**************************************************************************************
+
+    aclMacTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AclMacEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of MAC ACL instances."
+         ::= { fastPathQOSACL 6 }
+
+    aclMacEntry OBJECT-TYPE
+         SYNTAX      AclMacEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     ""
+         INDEX       { aclMacIndex }
+         ::= { aclMacTable 1 }
+         
+    AclMacEntry ::= SEQUENCE {         
+           aclMacIndex
+               Integer32,
+           aclMacName
+               DisplayString,
+           aclMacStatus
+               RowStatus
+           }
+    
+    aclMacIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The MAC ACL table index this instance is associated with.
+                      When creating a new MAC ACL, refer to the aclMacIndexNextFree
+                      object to determine the next available aclMacIndex to use."
+         ::= { aclMacEntry 1 }
+         
+    aclMacName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..31))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The name of this MAC ACL entry, which must consist of
+                      1 to 31 alphanumeric characters and uniquely identify
+                      this MAC ACL.  An existing MAC ACL can be renamed by
+                      setting this object to a new name.
+
+                      This object must be set to complete a new MAC ACL 
+                      row instance."
+         ::= { aclMacEntry 2 }
+    
+    aclMacStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Status of this instance.  ACL MAC entries can not be deleted until all rows in 
+                     the aclIfTable and aclRuleTable with corresponding values of aclMacIndex 
+                     have been deleted.
+                     
+                     active(1)      - this ACL instance is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance
+
+                     The aclMacName object must be set to complete this row instance."
+         ::= { aclMacEntry 3 }
+
+    --**************************************************************************************
+    
+    aclMacRuleTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AclMacRuleEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of layer 2 MAC ACL Rule instances."
+         ::= { fastPathQOSACL 7 }
+
+    aclMacRuleEntry OBJECT-TYPE
+         SYNTAX      AclMacRuleEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of layer 2 MAC ACL Classification Rules"
+         INDEX       { aclMacIndex, aclMacRuleIndex }
+         ::= { aclMacRuleTable 1 }
+         
+    AclMacRuleEntry ::= SEQUENCE {         
+           aclMacRuleIndex
+               Integer32,
+           aclMacRuleAction
+               INTEGER,
+           aclMacRuleCos
+               Unsigned32,
+           aclMacRuleCos2
+               Unsigned32,
+           aclMacRuleDestMacAddr
+               MacAddress,
+           aclMacRuleDestMacMask
+               MacAddress,
+           aclMacRuleEtypeKey
+               INTEGER,
+           aclMacRuleEtypeValue
+               EtypeValue,
+           aclMacRuleSrcMacAddr
+               MacAddress,
+           aclMacRuleSrcMacMask
+               MacAddress,
+           aclMacRuleVlanId
+               Unsigned32,
+           aclMacRuleVlanIdRangeStart
+               Unsigned32,
+           aclMacRuleVlanIdRangeEnd
+               Unsigned32,
+           aclMacRuleVlanId2
+               Unsigned32,
+           aclMacRuleVlanId2RangeStart
+               Unsigned32,
+           aclMacRuleVlanId2RangeEnd
+               Unsigned32,
+           aclMacRuleStatus
+               RowStatus,
+           aclMacRuleAssignQueueId
+               Unsigned32,
+           aclMacRuleRedirectIntf
+               InterfaceIndexOrZero,
+           aclMacRuleMatchEvery
+               TruthValue,
+           aclMacRuleMirrorIntf
+               InterfaceIndexOrZero,
+           aclMacRuleLogging
+               TruthValue,
+           aclMacRuleTimeRangeName
+               DisplayString,
+           aclMacRuleTimeRangeStatus
+               INTEGER,
+           aclMacRuleRateLimitCrate
+               Unsigned32,
+           aclMacRuleRateLimitCburst
+               AclBurstSize
+
+           }
+    
+    aclMacRuleIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The index of this rule instance within an MAC ACL."
+         ::= { aclMacRuleEntry 1 }
+         
+    aclMacRuleAction OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      permit(1),
+                      deny(2)
+                      }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The type of action this MAC ACL rule should perform."
+         DEFVAL { deny }
+         ::= { aclMacRuleEntry 2 }
+         
+     aclMacRuleCos OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Class of Service (COS) used in the MAC ACL Classification.
+
+                      This is the three-bit user priority field in the 802.1Q tag 
+                      header of a tagged Ethernet frame. For frames containing a 
+                      double VLAN tag, this field is located in the first/outer tag."
+         ::= { aclMacRuleEntry 3 }
+                  
+     aclMacRuleCos2 OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Secondary Class of Service (COS2) used in the MAC ACL Classification.
+
+                      This is the three-bit user priority field in the second/inner 802.1Q 
+                      tag header of a double VLAN tagged Ethernet frame."
+         ::= { aclMacRuleEntry 4 }
+                  
+    aclMacRuleDestMacAddr OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Destination MAC address used in the MAC ACL Classification."
+         ::= { aclMacRuleEntry 5 }
+         
+    aclMacRuleDestMacMask OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Destination MAC address mask used in the MAC ACL Classification. 
+
+                      This mask value identifies the portion of the aclMacRuleDestMacAddr
+                      that is compared against a packet. A non-contiguous mask value is 
+                      permitted."
+         ::= { aclMacRuleEntry 6 }
+         
+    aclMacRuleEtypeKey OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      custom(1),
+                      appletalk(2),
+                      arp(3),
+                      ibmsna(4),
+                      ipv4(5),
+                      ipv6(6),
+                      ipx(7),
+                      mplsmcast(8),
+                      mplsucast(9),
+                      netbios(10),
+                      novell(11),
+                      pppoe(12),
+                      rarp(13)
+                     }
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "The Ethertype keyword used in the MAC ACL Classification.
+
+                      A keyword of custom(1) requires that the aclMacRuleEtypeValue
+                      object also be set."
+         ::= { aclMacRuleEntry 7 }
+         
+    aclMacRuleEtypeValue OBJECT-TYPE
+         SYNTAX      EtypeValue
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "The Ethertype custom value used in the MAC ACL Classification.
+
+                      This object is only valid if the aclMacRuleEtypeKey is set to 
+                      custom(1).  The allowed value for this object is 0x0600 to 0xFFFF
+		      (1536 to 65535)."
+         ::= { aclMacRuleEntry 8 }
+         
+    aclMacRuleSrcMacAddr OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Source MAC address used in the MAC ACL Classification."
+         ::= { aclMacRuleEntry 9 }
+         
+    aclMacRuleSrcMacMask OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Source MAC address mask used in the MAC ACL Classification. 
+
+                      This mask value identifies the portion of the aclMacRuleSrcMacAddr
+                      that is compared against a packet. A non-contiguous mask value is 
+                      permitted."
+         ::= { aclMacRuleEntry 10 }
+
+    aclMacRuleVlanId OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4093)
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "The VLAN ID value used in the MAC ACL Classification.
+
+                      The VLAN ID field is defined as the 12-bit VLAN identifier
+                      in the 802.1Q tag header of a tagged Ethernet frame.  This is 
+                      contained in the first/outer tag of a double VLAN tagged frame."
+         ::= { aclMacRuleEntry 11 }
+         
+    aclMacRuleVlanIdRangeStart OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4093)
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "The VLAN ID range start value used in the MAC ACL Classification.
+		      Setting this value greater than the current aclMacRuleVlanIdRangeEnd
+		      changes the VLAN ID range end to the same value as the range start.
+
+                      The VLAN ID field is defined as the 12-bit VLAN identifier
+                      in the 802.1Q tag header of a tagged Ethernet frame.  This is 
+                      contained in the first/outer tag of a double VLAN tagged frame."
+         ::= { aclMacRuleEntry 12 }
+         
+    aclMacRuleVlanIdRangeEnd OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4093)
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "The VLAN ID range end value used in the MAC ACL Classification.
+		      Setting this value less than the current aclMacRuleVlanIdRangeStart
+		      changes the VLAN ID range start to the same value as the range end.
+
+                      The VLAN ID field is defined as the 12-bit VLAN identifier
+                      in the 802.1Q tag header of a tagged Ethernet frame.  This is 
+                      contained in the first/outer tag of a double VLAN tagged frame."
+         ::= { aclMacRuleEntry 13 }
+         
+    aclMacRuleVlanId2 OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4093)
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "The Secondary VLAN ID value used in the MAC ACL Classification.
+
+                      The Secondary VLAN ID field is defined as the 12-bit VLAN identifier
+                      in the second/inner 802.1Q tag header of a double VLAN tagged Ethernet 
+                      frame."
+         ::= { aclMacRuleEntry 14 }
+         
+    aclMacRuleVlanId2RangeStart OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4093)
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "The Secondary VLAN ID range start value used in the MAC ACL Classification.
+		      Setting this value greater than the current aclMacRuleVlanId2RangeEnd
+		      changes the Secondary VLAN ID range end to the same value as the range start.
+
+                      The Secondary VLAN ID field is defined as the 12-bit VLAN identifier
+                      in the second/inner 802.1Q tag header of a double VLAN tagged Ethernet 
+                      frame."
+         ::= { aclMacRuleEntry 15 }
+         
+    aclMacRuleVlanId2RangeEnd OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4093)
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "The Secondary VLAN ID range end value used in the MAC ACL Classification.
+		      Setting this value less than the current aclMacRuleVlanId2RangeStart
+		      changes the Secondary VLAN ID range start to the same value as the range end.
+
+                      The Secondary VLAN ID field is defined as the 12-bit VLAN identifier
+                      in the second/inner 802.1Q tag header of a double VLAN tagged Ethernet 
+                      frame."
+         ::= { aclMacRuleEntry 16 }
+         
+    aclMacRuleStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Status of this instance.
+                     
+                     active(1)      - this ACL Rule is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance"
+         ::= { aclMacRuleEntry 17 }
+
+    aclMacRuleAssignQueueId OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Queue identifier to which all inbound packets matching this 
+                      MAC ACL rule are directed.  This object defaults to the standard
+                      queue assignment for user priority 0 traffic per the IEEE 802.1D
+                      specification based on the number of assignable queues in the 
+                      system:
+                         1-3 queues:  0
+                         4-7 queues:  1
+                           8 queues:  2
+                      This default assignment is static and is not influenced by
+                      other system configuration changes."
+         ::= { aclMacRuleEntry 18 }
+         
+    aclMacRuleRedirectIntf OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "A non-zero value indicates the external ifIndex to which all 
+                      inbound packets matching this MAC ACL rule are directed.  A
+                      value of zero means packet redirection is not in effect, which
+                      is the default value of this object.  Note that packet
+		      redirection and mirroring (aclMacRuleMirrorIntf object)
+		      are mutually-exclusive rule attributes."
+         DEFVAL { 0 }
+         ::= { aclMacRuleEntry 19 }
+         
+    aclMacRuleMatchEvery OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate that the MAC ACL rule is defined to match all packets, 
+                      regardless of Ethertype."
+         ::= { aclMacRuleEntry 20 }
+         
+    aclMacRuleMirrorIntf OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "A non-zero value indicates the external ifIndex to which all 
+                      inbound packets matching this MAC ACL rule are copied.  A
+                      value of zero means packet mirroring is not in effect, which
+                      is the default value of this object.  Note that packet
+		      mirroring and redirection (aclMacRuleRedirectIntf object)
+		      are mutually-exclusive rule attributes."
+         DEFVAL { 0 }
+         ::= { aclMacRuleEntry 21 }
+         
+    aclMacRuleLogging OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate that the ACL rule is being logged. 
+                      A hardware count of the number of times this rule is
+		      hit is reported via the aclTrapRuleLogEvent notification.
+
+                      This object may be supported for an aclMacRuleAction 
+		      setting of permit(1) and/or deny(2), depending on the
+		      ACL feature capabilities of the device."
+         ::= { aclMacRuleEntry 22 }
+
+   aclMacRuleTimeRangeName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..31))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Name of the time range, that the ACL rule
+                      has referenced.It must start with alphabet and shall consist of
+                      1 to 31 alphanumeric characters."
+         ::= { aclMacRuleEntry 23 }
+
+    aclMacRuleTimeRangeStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     inactive(1),
+                     active(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Flag that indicates the ACL rule status.
+                      If the status is active, it implies that the ACL rule is in effect.
+                      If the status is inactive, it implies that the ACL rule is not in effect."
+         ::= { aclMacRuleEntry 24 }
+
+    aclMacRuleRateLimitCrate OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Committed rate attribute statement value, specified in kbps."
+         ::= { aclMacRuleEntry 25 }
+
+    aclMacRuleRateLimitCburst OBJECT-TYPE
+         SYNTAX      AclBurstSize
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Committed burst size attribute statement value, specified in kbytes."
+         ::= { aclMacRuleEntry 26 }
+
+
+
+    --**************************************************************************************
+    -- Global controls
+    --
+    --**************************************************************************************
+    
+    --**************************************************************************************
+    --    aclLoggingGroup
+    --**************************************************************************************
+
+    aclLoggingGroup        OBJECT IDENTIFIER ::= { fastPathQOSACL 9 }
+                                    
+    aclTrapRuleIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                     "The index of an ACL rule instance.
+		      Used by aclTrapRuleLogEvent trap."
+         ::= { aclLoggingGroup 2 }
+         
+    aclTrapRuleAction OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      permit(1),
+                      deny(2)
+                      }
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                     "The type of action this rule should perform, either 
+		      permit(1) or deny(2).
+		      Used by aclTrapRuleLogEvent trap."
+         ::= { aclLoggingGroup 3 }
+         
+    aclTrapRuleHitCount OBJECT-TYPE
+         SYNTAX      Counter64
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                     "Number of times the ACL rule was hit during the most
+		      recent logging interval.  Used by aclTrapRuleLogEvent trap."
+         ::= { aclLoggingGroup 4 }
+         
+    aclTrapFlag OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "ACL Trap Flag - Enables or disables ACL trap generation.
+                     When this value is set to enable(1), ACL traps are 
+                     sent from the switch when they occur."
+         ::= { aclLoggingGroup 5 }
+
+      aclTrapRuleTimeRangeName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..31))
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                     "Name of the time range on which there is a notification received.
+                      Used by aclTrapRuleTimeRangeEvent."
+       ::= { aclLoggingGroup 6 }
+
+     aclTrapRuleTimeRangeNotification OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     activate(1),
+                     deactivate(2),
+                     delete(3)
+                     }
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate the type of time range notification received.
+                      Used by aclTrapRuleTimeRangeEvent."
+      ::= { aclLoggingGroup 7 }
+
+     aclTrapRuleInstallationStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     failure(1),
+                     success(2)
+                     }
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                     "Value specifies the status of the ACL Rule installed in hardware as activated/deactivated.
+                      Used by aclTrapRuleTimeRangeEvent."
+      ::= { aclLoggingGroup 8 }
+
+    --**************************************************************************************
+    -- ACL Trap Definitions
+    --**************************************************************************************
+
+    aclNotifications   OBJECT IDENTIFIER ::= { fastPathQOSACL 0 }
+
+    aclTrapRuleLogEvent NOTIFICATION-TYPE
+        OBJECTS {
+                 aclIfAclType,
+		 aclIfAclId,
+		 aclTrapRuleIndex,
+		 aclTrapRuleAction,
+                 aclTrapRuleHitCount
+                }
+        STATUS  current
+        DESCRIPTION
+            "This trap is generated on a periodic basis to indicate that an 
+	     ACL rule configured for logging was actively used by hardware to 
+             take action on one or more packets.  The aclTrapRuleHitCount denotes 
+	     the number of times this rule was hit during the most recent logging
+	     interval.  ACL Trap generation requires that the aclTrapFlag object
+	     be set to enable(1)."
+         ::= { aclNotifications 1 }
+
+    aclTrapRuleTimeRangeEvent NOTIFICATION-TYPE
+        OBJECTS {
+                 aclIfAclType,
+                 aclIfAclId,
+                 aclTrapRuleIndex,
+                 aclTrapRuleTimeRangeName,
+                 aclTrapRuleTimeRangeNotification,
+                 aclTrapRuleInstallationStatus
+                }
+         STATUS  current
+        DESCRIPTION
+            "This trap is generated when there is a time range notification
+             received on any Time based ACL rule.
+             The aclTrapRuleTimeRangeName denotes the time range name associated with the ACL Rule, 
+             aclTrapRuleTimeRangeNotification indicates the type of notification received and 
+             aclTrapRuleInstallationStatus indicates the installation status of ACL Rule in hardware.
+             When activate notification is received ACL rule is activated in the hardware.
+             When deactivate notifcation is received ACL rule is deactivated in the hardware. 
+             When delete notification is received ACL rule is activated in the hardware, if it is 
+             already not activated. ACL Trap generation requires the aclTrapFlag object be set to enable(1)."
+         ::= { aclNotifications 2 }
+
+    --**************************************************************************************
+
+--**************************************************************************************
+-- 
+--
+--**************************************************************************************
+    
+    aclIpv6IndexNextFree OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                     "This object contains an unused value for the aclIPv6Index
+                      to be used when creating a new IPv6 ACL.  A value of zero
+                      zero indicates the ACL table is full."
+    ::= { fastPathQOSACL 10 }
+
+    --**************************************************************************************
+
+    aclIpv6Table OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AclIpv6Entry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of Ipv6 ACL instances."
+         ::= { fastPathQOSACL 11 }
+
+    aclIpv6Entry OBJECT-TYPE
+         SYNTAX      AclIpv6Entry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     ""
+         INDEX       { aclIpv6Index }
+         ::= { aclIpv6Table 1 }
+         
+    AclIpv6Entry ::= SEQUENCE {         
+           aclIpv6Index
+               Integer32,
+           aclIpv6Name
+               DisplayString,
+           aclIpv6Status
+               RowStatus
+           }
+    
+    aclIpv6Index OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The IPv6 ACL table index this instance is associated with.
+                      When creating a new IPv6 ACL, refer to the aclIPv6IndexNextFree
+                      object to determine the next available aclIpv6Index to use."
+         ::= { aclIpv6Entry 1 }
+         
+    aclIpv6Name OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..31))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The name of this IPv6 ACL entry, which must consist of
+                      1 to 31 alphanumeric characters and uniquely identify
+                      this IPv6 ACL. An existing IPv6 ACL can be renamed by
+                      setting this object to a new name.
+
+                      This object must be set to complete a new IPv6 ACL 
+                      row instance."
+         ::= { aclIpv6Entry 2 }
+    
+    aclIpv6Status OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Status of this instance.
+                     
+                     active(1)      - this ACL instance is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance
+
+                     The aclMacName object must be set to complete this row instance."
+         ::= { aclIpv6Entry 3 }
+
+--**************************************************************************************
+    aclIpv6RuleTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AclIpv6RuleEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of IPv6 ACL Rule instances."
+         ::= { fastPathQOSACL 12 }
+
+    aclIpv6RuleEntry OBJECT-TYPE
+         SYNTAX      AclIpv6RuleEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of IPv6 ACL Classification Rules"
+         INDEX       { aclIpv6Index, aclIpv6RuleIndex }
+         ::= { aclIpv6RuleTable 1 }
+         
+    AclIpv6RuleEntry ::= SEQUENCE {         
+           aclIpv6RuleIndex
+               Integer32,
+           aclIpv6RuleAction
+               INTEGER,
+           aclIpv6RuleLogging
+              TruthValue,
+           aclIpv6RuleAssignQueueId
+              Unsigned32,
+           aclIpv6RuleRedirectIntf
+              InterfaceIndexOrZero,
+           aclIpv6RuleMirrorIntf
+              InterfaceIndexOrZero,
+           aclIpv6RuleMatchEvery
+              TruthValue,
+           aclIpv6RuleProtocol
+              Integer32,
+           aclIpv6RuleSrcL4Port
+               Integer32,
+           aclIpv6RuleSrcL4PortRangeStart
+               Integer32,
+           aclIpv6RuleSrcL4PortRangeEnd
+               Integer32,
+           aclIpv6RuleDestL4Port
+               Integer32,
+           aclIpv6RuleDestL4PortRangeStart
+               Integer32,
+           aclIpv6RuleDestL4PortRangeEnd
+               Integer32,
+           aclIpv6RuleFlowLabel
+               Integer32,
+           aclIpv6RuleIPDSCP
+               Integer32,
+           aclIpv6RuleStatus
+               RowStatus,
+           aclRuleSrcIpv6Prefix
+              Ipv6AddressPrefix,
+           aclRuleSrcIpv6PrefixLength
+              Integer32,     
+           aclRuleDstIpv6Prefix
+              Ipv6AddressPrefix,
+           aclRuleDstIpv6PrefixLength
+              Integer32,          
+           aclIpv6RuleTimeRangeName
+               DisplayString,
+           aclIpv6RuleTimeRangeStatus
+               INTEGER,
+           aclIpv6RuleRateLimitCrate
+              Unsigned32,
+           aclIpv6RuleRateLimitCburst
+              AclBurstSize,
+           aclIpv6RuleIcmpType
+             Integer32,
+           aclIpv6RuleIcmpCode
+            Integer32,
+           aclIpv6RuleRouting
+            TruthValue,
+           aclIpv6RuleFragments
+            TruthValue,
+            aclIpv6RuleEstablished
+            TruthValue
+           }
+    
+    aclIpv6RuleIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The index of this rule instance within an IPv6 ACL."
+         ::= { aclIpv6RuleEntry 1 }
+         
+    aclIpv6RuleAction OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      permit(1),
+                      deny(2)
+                      }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The type of action this IPv6 ACL rule should perform."
+         DEFVAL { deny }
+         ::= { aclIpv6RuleEntry 2 }
+           
+    aclIpv6RuleLogging OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate that the ACL rule is being logged. 
+                      A hardware count of the number of times this rule is
+		      hit is reported via the aclTrapRuleLogEvent notification.
+
+                      This object may be supported for an aclIPv6RuleAction 
+		      setting of permit(1) and/or deny(2), depending on the
+		      ACL feature capabilities of the device."
+         ::= { aclIpv6RuleEntry 3 }
+
+     
+    aclIpv6RuleAssignQueueId OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Queue identifier to which all inbound packets matching this 
+                      ACL rule are directed.  This object defaults to the standard
+                      queue assignment for user priority 0 traffic per the IEEE 802.1D
+                      specification based on the number of assignable queues in the 
+                      system:
+                         1-3 queues:  0
+                         4-7 queues:  1
+                           8 queues:  2
+                      This default assignment is static and is not influenced by
+                      other system configuration changes."
+         ::= { aclIpv6RuleEntry 4 }
+   
+    aclIpv6RuleRedirectIntf OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "A non-zero value indicates the external ifIndex to which all 
+                      inbound packets matching this Ipv6 ACL rule are directed.  A 
+                      value of zero means packet redirection is not in effect, which
+                      is the default value of this object.  Note that packet
+		      redirection and mirroring (aclIpv6RuleMirrorIntf object)
+		      are mutually-exclusive rule attributes."
+         DEFVAL { 0 }
+         ::= { aclIpv6RuleEntry 5 }
+         
+    aclIpv6RuleMirrorIntf OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "A non-zero value indicates the external ifIndex to which all 
+                      inbound packets matching this IPv6 ACL rule are copied.  A 
+                      value of zero means packet mirroring is not in effect, which
+                      is the default value of this object.  Note that packet
+		      mirroring and redirection (aclIpv6RuleRedirectIntf object)
+		      are mutually-exclusive rule attributes."
+         DEFVAL { 0 }
+         ::= { aclIpv6RuleEntry 6 }
+                 
+     aclIpv6RuleMatchEvery OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate that the ACL rule is defined to match on every IP packet, 
+                      regardless of content."
+         ::= { aclIpv6RuleEntry 7 }
+      
+     aclIpv6RuleProtocol OBJECT-TYPE
+         SYNTAX      Integer32 (1..255)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "icmp - 1
+                      igmp - 2
+                      ip - 4
+                      tcp - 6
+                      udp - 17
+                      All values from 1 to 255 are valid."
+         ::= { aclIpv6RuleEntry 8 }
+
+    aclIpv6RuleSrcL4Port OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Source Port Number (Layer 4) used in the ACL Classification."
+         ::= { aclIpv6RuleEntry 9 }
+
+    aclIpv6RuleSrcL4PortRangeStart OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Source Port Number(Layer 4) range start."
+         ::= { aclIpv6RuleEntry 10 }
+
+    aclIpv6RuleSrcL4PortRangeEnd OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Source Port Number(Layer 4) range end."
+         ::= { aclIpv6RuleEntry 11 }
+    
+    aclIpv6RuleDestL4Port OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Destination Port (Layer 4) used in ACl classification."
+         ::= { aclIpv6RuleEntry 12 }
+
+    aclIpv6RuleDestL4PortRangeStart OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Destination Port (Layer 4) starting range used in ACL classification."
+         ::= { aclIpv6RuleEntry 13 }
+
+    aclIpv6RuleDestL4PortRangeEnd OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Destination Port (Layer 4) ending range used in ACL classification."
+         ::= { aclIpv6RuleEntry 14 }
+
+    aclIpv6RuleStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Status of this instance.
+                     active(1)      - this ACL Rule is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance"
+         ::= { aclIpv6RuleEntry 15 }
+    
+    aclIpv6RuleFlowLabel OBJECT-TYPE
+         SYNTAX      Integer32 (0..1048575)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flow label is 20-bit number that is unique to an IPv6 packet, used by end 
+                     stations to signify quality-of-service handling in routers."
+         ::= { aclIpv6RuleEntry 16 }
+                
+    aclIpv6RuleIPDSCP OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Differentiated Services Code Point value."
+         ::= { aclIpv6RuleEntry 17 }
+        
+      aclRuleSrcIpv6Prefix OBJECT-TYPE
+         SYNTAX         Ipv6AddressPrefix
+         MAX-ACCESS     read-write
+         STATUS         current
+         DESCRIPTION
+           "The Ipv6 Prefix Address configured on the Service Port."
+         ::= { aclIpv6RuleEntry 18 } 
+        
+     aclRuleSrcIpv6PrefixLength OBJECT-TYPE
+         SYNTAX      Integer32 (1..128)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Prefix Length."
+         ::= { aclIpv6RuleEntry 19 }
+
+     aclRuleDstIpv6Prefix OBJECT-TYPE
+         SYNTAX         Ipv6AddressPrefix
+         MAX-ACCESS     read-write
+         STATUS         current
+         DESCRIPTION
+           "The Ipv6 Prefix Address configured on the Service Port."
+         ::= { aclIpv6RuleEntry 20 } 
+        
+     aclRuleDstIpv6PrefixLength OBJECT-TYPE
+         SYNTAX      Integer32 (1..128)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Prefix Length."
+         ::= { aclIpv6RuleEntry 21 }    
+
+    aclIpv6RuleTimeRangeName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..31))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Name of the time range, that the ACL rule
+                      has referenced.It must start with alphabet and shall consist of
+                      1 to 31 alphanumeric characters."
+       ::= { aclIpv6RuleEntry 22 }
+
+    aclIpv6RuleTimeRangeStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     inactive(1),
+                     active(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Flag that indicates the ACL rule status.
+                      If the status is active, it implies that the ACL rule is in effect.
+                      If the status is inactive, it implies that the ACL rule is not in effect."
+         ::= { aclIpv6RuleEntry 23}
+
+    aclIpv6RuleRateLimitCrate OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Committed rate attribute statement value, specified in kbps."
+         ::= { aclIpv6RuleEntry 24}
+
+    aclIpv6RuleRateLimitCburst OBJECT-TYPE
+         SYNTAX      AclBurstSize
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Committed burst size attribute statement value, specified in kbytes."
+         ::= { aclIpv6RuleEntry 25}
+
+
+    aclIpv6RuleIcmpType OBJECT-TYPE
+         SYNTAX      Integer32 (1..255)
+         MAX-ACCESS  read-create 
+         STATUS      current
+         DESCRIPTION
+                     "ACL rule matches on the specified ICMP type. All values
+                     from 1 to 255 are valid."
+         ::= { aclIpv6RuleEntry 27 }
+
+    aclIpv6RuleIcmpCode OBJECT-TYPE
+         SYNTAX      Integer32 (1..255)
+         MAX-ACCESS  read-create 
+         STATUS      current
+         DESCRIPTION
+                     "ACL rule matches on the specified ICMP code. All values 
+                      from 1 to 255 are valid."
+         ::= { aclIpv6RuleEntry 28}
+    aclIpv6RuleRouting OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate the ACL rule to match on packets 
+                      with routing extention header"
+         ::= { aclIpv6RuleEntry 29}
+
+    aclIpv6RuleFragments OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate the ACL rule to match if the packets 
+                     with fragments extention header"
+
+         ::= { aclIpv6RuleEntry 30}
+    aclIpv6RuleEstablished OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate the ACL rule to match on TCP packets that 
+                     has either RST or ACK bits set in the TCP header" 
+         ::= { aclIpv6RuleEntry 31}              
+
+             
+--**************************************************************************************
+    
+    aclVlanTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AclVlanEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of ACL VLAN instances per direction."
+         ::= { fastPathQOSACL 13 }
+
+    aclVlanEntry OBJECT-TYPE
+         SYNTAX      AclVlanEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     ""
+         INDEX       { aclVlanIndex, aclVlanDirection, aclVlanSequence, aclVlanAclType, aclVlanAclId  }
+         ::= { aclVlanTable 1 }
+         
+    AclVlanEntry ::= SEQUENCE {         
+           aclVlanIndex
+               Integer32,
+           aclVlanDirection
+               INTEGER,
+           aclVlanSequence
+               Unsigned32,
+           aclVlanAclType
+               INTEGER,
+           aclVlanAclId
+               Integer32,
+           aclVlanStatus
+               RowStatus
+           }
+    
+    aclVlanIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The Vlan to which this ACL instance applies."
+         ::= { aclVlanEntry 1 }
+         
+    aclVlanDirection OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      inbound(1),
+                      outbound(2)
+                     }
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The Vlan direction to which this ACL instance applies."
+         ::= { aclVlanEntry 2 }
+         
+    aclVlanSequence OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4294967295)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The relative evaluation sequence of this ACL for this
+                      Vlan and direction.  When multiple ACLs are allowed 
+                      for a given Vlan and direction, the sequence number 
+                      determines the order in which the list of ACLs are evaluated,
+                      with lower sequence numbers given higher precedence.  The
+                      sequence number value is arbitrary, but must be a unique
+                      non-zero value for a given Vlan and direction.
+                       
+                      Setting this object to an existing sequence number 
+                      value for a given Vlan and direction causes the 
+                      ACL corresponding to that value to be replaced with
+                      this ACL."
+         ::= { aclVlanEntry 3 }
+         
+    aclVlanAclType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      ip(1),
+                      mac(2),
+                      ipv6(3)
+                     }
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The type of this ACL, which is used to interpret the 
+                      aclVlanId object value. Each type of ACL uses its own
+                      numbering scheme for identification (see aclVlanAclId object
+                      for details).
+
+                      The aclVlanAclId object must be specified along with this 
+                      object."
+         ::= { aclVlanEntry 4 }
+         
+    aclVlanAclId OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The ACL identifier value, which is interpreted based on
+                      the aclVlanType object.
+
+                      For the IP ACLs, the actual ACL number is its identifier
+                      as follows:  IP standard ranges from 1-99, while 
+                      IP extended ranges from 100-199. Here, aclVlanAclId represents 
+                      aclIndex. 
+
+                      The MAC ACLs use an internally-generated index value 
+                      that is assigned when the ACL is created. Here, aclVlanAclId 
+                      represents aclMacIndex.
+
+                      The IPv6 ACLs use an internally-generated index value
+                      that is assigned when the ACL is created.Here, aclVlanAclId 
+                      represents aclIpv6Index.
+
+                      The aclVlanType object must be specified along with
+                      this object."
+         ::= { aclVlanEntry 5 }
+         
+    aclVlanStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Status of this instance.
+                     
+                     active(1)      - this ACL Vlan instance is active
+                     createAndGo(4) - set to this value to assign an ACL to a Vlan and direction
+                     destroy(6)     - set to this value to remove an ACL from a Vlan and direction"
+         ::= { aclVlanEntry 6 }
+
+END

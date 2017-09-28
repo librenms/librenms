@@ -1,4 +1,4 @@
--- ArubaOS 3.2.0.0_16376
+--- ArubaOS 6.5.2.0_59123
 -- ***********************************************************
 --  ARUBA-MGMT-MIB
 --
@@ -36,7 +36,7 @@ ARUBA-MGMT-MIB DEFINITIONS ::= BEGIN
 --                        
 
     arubaMgmtExtensions MODULE-IDENTITY
-    		LAST-UPDATED "0601221834Z"
+    		LAST-UPDATED "0804160206Z"
     		ORGANIZATION "Aruba Wireless Networks"
     		CONTACT-INFO 
 				"Postal: 	1322 Crossman Avenue
@@ -121,7 +121,7 @@ ARUBA-MGMT-MIB DEFINITIONS ::= BEGIN
 						the table.
 			moreTable -- indicates that there are some more rows 
 						 in the table.
-			retrieveError -- indicates an error occured while
+			retrieveError -- indicates an error occurred while
 							processing the getTable request.
 							(Will be expanded ).
 			A Get request on this object returns 0 .

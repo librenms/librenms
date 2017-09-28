@@ -9,7 +9,7 @@ require 'includes/graphs/common.inc.php';
 
 $rrdfilename  = rrd_name($device['hostname'], 'ubnt-airmax-mib');
 
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dbm                      Now      Min     Max\\n'";
     $rrd_options .= " DEF:WlStatSignal=".$rrdfilename.":WlStatSignal:AVERAGE ";
     $rrd_options .= " LINE1:WlStatSignal#CC0000:'Signal            ' ";

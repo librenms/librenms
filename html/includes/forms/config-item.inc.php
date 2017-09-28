@@ -37,7 +37,7 @@ $config_token     = mres($_POST['config_token']);
 $status           = 'error';
 $message          = 'Error with config';
 
-if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-rocket' || $action == 'remove-hipchat' || $action == 'remove-pushover' || $action == 'remove-boxcar' || $action == 'remove-clickatell' || $action == 'remove-playsms') {
+if ($action == 'remove' || preg_match('/^remove-.*$/', $action)) {
     $config_id = mres($_POST['config_id']);
     if (empty($config_id)) {
         $message = 'No config id passed';
@@ -53,10 +53,14 @@ if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-rocke
                 dbDelete('config', "`config_name` LIKE 'alert.transports.pushover.$config_id.%'");
             } elseif ($action == 'remove-boxcar') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.boxcar.$config_id.%'");
+            } elseif ($action == 'remove-telegram') {
+                dbDelete('config', "`config_name` LIKE 'alert.transports.telegram.$config_id.%'");
             } elseif ($action == 'remove-clickatell') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.clickatell.$config_id.%'");
             } elseif ($action == 'remove-playsms') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.playsms.$config_id.%'");
+            } elseif ($action == 'remove-smseagle') {
+                dbDelete('config', "`config_name` LIKE 'alert.transports.smseagle.$config_id.%'");
             }
             $status  = 'ok';
             $message = 'Config item removed';
@@ -167,6 +171,20 @@ if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-rocke
             $message = 'Could not create config item';
         }
     }
+} elseif ($action == 'add-telegram') {
+    if (empty($config_value)) {
+        $message = 'No Telegram chat id provided';
+    } else {
+        $config_id = dbInsert(array('config_name' => 'alert.transports.telegram.', 'config_value' => $config_value, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_value, 'config_descr' => 'Telegram Transport'), 'config');
+        if ($config_id > 0) {
+            dbUpdate(array('config_name' => 'alert.transports.telegram.'.$config_id.'.chat_id'), 'config', 'config_id=?', array($config_id));
+            dbInsert(array('config_name' => 'alert.transports.telegram.'.$config_id.'.token', 'config_value' => $config_extra, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_extra, 'config_descr' => 'Telegram token'), 'config');
+            $status                   = 'ok';
+            $message                  = 'Config item created';
+        } else {
+            $message = 'Could not create config item';
+        }
+    }
 } elseif ($action == 'add-clickatell') {
     if (empty($config_value)) {
         $message = 'No Clickatell token provided';
@@ -211,6 +229,33 @@ if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-rocke
             foreach ($mobiles as $mobile) {
                 if (!empty($mobile)) {
                     dbInsert(array('config_name' => 'alert.transports.playsms.'.$config_id.'.to.'.$x, 'config_value' => $mobile, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'PlaySMS mobile'), 'config');
+                    $x++;
+                }
+            }
+        } else {
+            $message = 'Could not create config item';
+        }
+    }
+} elseif ($action == 'add-smseagle') {
+    if (empty($config_value)) {
+        $message = 'No SMSEagle URL provided';
+    } elseif (empty($config_user)) {
+        $message = 'No SMSEagle User provided';
+    } elseif (empty($config_to)) {
+        $message = 'No mobile numbers provided';
+    } else {
+        $config_id = dbInsert(array('config_name' => 'alert.transports.smseagle.', 'config_value' => $config_value, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_value, 'config_descr' => 'SMSEagle Transport'), 'config');
+        if ($config_id > 0) {
+            dbUpdate(array('config_name' => 'alert.transports.smseagle.'.$config_id.'.url'), 'config', 'config_id=?', array($config_id));
+            $additional_id['user']    = dbInsert(array('config_name' => 'alert.transports.smseagle.'.$config_id.'.user', 'config_value' => $config_user, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_user, 'config_descr' => 'SMSEagle User'), 'config');
+            $additional_id['token']    = dbInsert(array('config_name' => 'alert.transports.smseagle.'.$config_id.'.token', 'config_value' => $config_token, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_token, 'config_descr' => 'SMSEagle Token'), 'config');
+            $status                   = 'ok';
+            $message                  = 'Config item created';
+            $mobiles                   = explode('\n', $config_to);
+            $x=0;
+            foreach ($mobiles as $mobile) {
+                if (!empty($mobile)) {
+                    dbInsert(array('config_name' => 'alert.transports.smseagle.'.$config_id.'.to.'.$x, 'config_value' => $mobile, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'SMSEagle mobile'), 'config');
                     $x++;
                 }
             }

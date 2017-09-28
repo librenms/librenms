@@ -1,0 +1,306 @@
+QUANTA-LB6M-REF-MIB DEFINITIONS ::= BEGIN
+
+-- Netgear Fastpath  Reference MIB
+-- Copyright Netgear Inc (2001-2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+IMPORTS
+    MODULE-IDENTITY                     FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                  FROM SNMPv2-TC
+    enterprises                         FROM RFC1155-SMI;
+    
+    broadcom MODULE-IDENTITY
+        LAST-UPDATED "200705230000Z" -- 23 May 2007 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          ""
+           
+        -- Revision history.      
+        REVISION
+          "200705230000Z" -- 23 May 2007 12:00:00 GMT
+        DESCRIPTION
+          "Netgear branding related changes."
+        REVISION
+          "200311210000Z" -- 21 Nov 2003 12:00:00 GMT
+        DESCRIPTION
+          "Revisions made for new release."
+        REVISION
+          "200302061200Z" -- 6 February 2003 12:00:00 GMT
+        DESCRIPTION
+          "Updated for release"
+          
+    ::= {  enterprises 4413 }
+
+    
+-- New definitions
+quantaProducts         OBJECT IDENTIFIER ::= { broadcom 1 }
+lb6m                 OBJECT IDENTIFIER ::= { quantaProducts 1 }
+ 
+netgear                 OBJECT IDENTIFIER ::= { enterprises 4526 }
+
+--
+-- below are products that defined prior to NMS100 release that they have product code
+-- defined directly above the functions objects
+--
+managedSwitch           OBJECT IDENTIFIER ::= { netgear 1 } 
+vpnrouter               OBJECT IDENTIFIER ::= { netgear 2 }
+carrier                 OBJECT IDENTIFIER ::= { netgear 3 }
+wireless                OBJECT IDENTIFIER ::= { netgear 4 }
+rps                     OBJECT IDENTIFIER ::= { netgear 5 }
+wlanswitch              OBJECT IDENTIFIER ::= { netgear 6 }
+
+---
+--- 700 series L2 managed switch
+---
+fsm726s                 OBJECT IDENTIFIER ::= { managedSwitch 1 }
+fsm750s                 OBJECT IDENTIFIER ::= { managedSwitch 2 }
+gsm712                  OBJECT IDENTIFIER ::= { managedSwitch 3 }
+fsm726                  OBJECT IDENTIFIER ::= { managedSwitch 4 }  
+gsm712f                 OBJECT IDENTIFIER ::= { managedSwitch 5 }
+fsm726v2                OBJECT IDENTIFIER ::= { managedSwitch 10 }
+
+---
+--- AP
+---
+me103                   OBJECT IDENTIFIER ::= { wireless 1 }
+wg302                   OBJECT IDENTIFIER ::= { wireless 2 }
+wg102                   OBJECT IDENTIFIER ::= { wireless 3 }
+wag302                  OBJECT IDENTIFIER ::= { wireless 4 }
+wag102                  OBJECT IDENTIFIER ::= { wireless 5 }
+---
+--- Added by Stephen Tsai 2-06-2006
+---
+wg302v2                 OBJECT IDENTIFIER ::= { wireless 6 }
+wag302v2                OBJECT IDENTIFIER ::= { wireless 7 }
+
+
+
+---
+--- WLAN Switch
+---
+wls538                  OBJECT IDENTIFIER ::= { wlanswitch 1 }
+
+---
+--- 7000 series L2/L3 managed switch
+---
+gsm7312                 OBJECT IDENTIFIER ::= { managedSwitch 6 }
+gsm7324                 OBJECT IDENTIFIER ::= { managedSwitch 7 }
+gsm7224                 OBJECT IDENTIFIER ::= { managedSwitch 8 }
+fsm7326p                OBJECT IDENTIFIER ::= { managedSwitch 9 }
+
+---********************************************************************
+--- new post-NMS100 SNMP products 
+---
+
+--
+-- new post-NMS100 SNMP-enabled products. These products will have their 
+-- functions defined under each generic product category.
+--
+lb6m     OBJECT IDENTIFIER ::= { netgear 10 }
+ng700smartswitch        OBJECT IDENTIFIER ::= { netgear 11 }
+ngrouter                OBJECT IDENTIFIER ::= { netgear 12 }
+ngfirewall              OBJECT IDENTIFIER ::= { netgear 13 }
+ngap                    OBJECT IDENTIFIER ::= { netgear 14 }
+ngwlan                  OBJECT IDENTIFIER ::= { netgear 15 }
+ng9000chassisswitch     OBJECT IDENTIFIER ::= { netgear 16 }
+ng700stacksmartswitch   OBJECT IDENTIFIER ::= { netgear 17 } 
+
+--
+-- and their sysObjectID will be under a branch on their own
+--
+productID               OBJECT IDENTIFIER ::= { netgear 100 }
+
+stackswitch             OBJECT IDENTIFIER ::= { productID 1 }
+l2switch                OBJECT IDENTIFIER ::= { productID 2 }
+l3switch                OBJECT IDENTIFIER ::= { productID 3 }
+smartswitch             OBJECT IDENTIFIER ::= { productID 4 }
+l2Rswitch               OBJECT IDENTIFIER ::= { productID 11 }
+
+router                  OBJECT IDENTIFIER ::= { productID 5 }
+firewall                OBJECT IDENTIFIER ::= { productID 6 }
+accesspoint             OBJECT IDENTIFIER ::= { productID 7 }
+wirelessLAN             OBJECT IDENTIFIER ::= { productID 8 }
+chassisswitch           OBJECT IDENTIFIER ::= { productID 9 }
+stacksmartswitch        OBJECT IDENTIFIER ::= { productID 10 }
+
+--
+-- Managed switches
+--
+fsm7328s                OBJECT IDENTIFIER ::= { stackswitch 1 }
+fsm7352s                OBJECT IDENTIFIER ::= { stackswitch 2 }
+gsm7328s                OBJECT IDENTIFIER ::= { stackswitch 3 }
+gsm7352s                OBJECT IDENTIFIER ::= { stackswitch 4 }
+fsm7352ps               OBJECT IDENTIFIER ::= { stackswitch 5 }
+fsm7328ps               OBJECT IDENTIFIER ::= { stackswitch 8 }
+gsm7328fs               OBJECT IDENTIFIER ::= { stackswitch 7 }
+gsm7228ps               OBJECT IDENTIFIER ::= { stackswitch 9 }
+gsm7252ps               OBJECT IDENTIFIER ::= { stackswitch 10 }
+fsm7226rs               OBJECT IDENTIFIER ::= { stackswitch 11 }
+fsm7250rs               OBJECT IDENTIFIER ::= { stackswitch 12 }
+gsm7328se               OBJECT IDENTIFIER ::= { stackswitch 13 }
+gsm7352se               OBJECT IDENTIFIER ::= { stackswitch 14 }
+xsm7224s                OBJECT IDENTIFIER ::= { stackswitch 15 }
+
+m530028gpoe             OBJECT IDENTIFIER ::= { stackswitch 16 }
+m530052gpoe             OBJECT IDENTIFIER ::= { stackswitch 17 }
+m530028g3               OBJECT IDENTIFIER ::= { stackswitch 18 }
+m530052g3               OBJECT IDENTIFIER ::= { stackswitch 19 }
+m530028gf3              OBJECT IDENTIFIER ::= { stackswitch 20 }
+m530028g                OBJECT IDENTIFIER ::= { stackswitch 21 }
+m530052g                OBJECT IDENTIFIER ::= { stackswitch 22 }
+
+gsm7312v2               OBJECT IDENTIFIER ::= { l3switch 1 }
+gsm7324v2               OBJECT IDENTIFIER ::= { l3switch 2 }
+xsm7312                 OBJECT IDENTIFIER ::= { l3switch 3 }
+gsm7324p                OBJECT IDENTIFIER ::= { l3switch 4 }
+
+gsm7224r                OBJECT IDENTIFIER ::= { l2Rswitch 1 }
+gsm7248r                OBJECT IDENTIFIER ::= { l2Rswitch 2 }
+gsm7224rp               OBJECT IDENTIFIER ::= { l2Rswitch 3 }
+gsm7248rp               OBJECT IDENTIFIER ::= { l2Rswitch 4 }
+gsm7224v2               OBJECT IDENTIFIER ::= { l2Rswitch 5 }
+gsm7248v2               OBJECT IDENTIFIER ::= { l2Rswitch 6 }
+
+gsm7212f                OBJECT IDENTIFIER ::= { l2Rswitch 7 }
+gsm5212p                OBJECT IDENTIFIER ::= { l2Rswitch 8 }
+gsm7212p                OBJECT IDENTIFIER ::= { l2Rswitch 9 }
+gsm7224p                OBJECT IDENTIFIER ::= { l2Rswitch 10 }
+
+m4100-26g               OBJECT IDENTIFIER ::= { l2Rswitch 16 }
+m4100-50g               OBJECT IDENTIFIER ::= { l2Rswitch 17 }
+m4100-26-poe            OBJECT IDENTIFIER ::= { l2Rswitch 18 }
+m4100-26g-poe           OBJECT IDENTIFIER ::= { l2Rswitch 19 }
+m4100-50g-poe           OBJECT IDENTIFIER ::= { l2Rswitch 20 }
+m4100-50-poe            OBJECT IDENTIFIER ::= { l2Rswitch 21 }
+m4100-d12g              OBJECT IDENTIFIER ::= { l2Rswitch 22 }
+m4100-d10-poe           OBJECT IDENTIFIER ::= { l2Rswitch 23 }
+m4100-12gf              OBJECT IDENTIFIER ::= { l2Rswitch 24 }
+m4100-d12g-poe          OBJECT IDENTIFIER ::= { l2Rswitch 25 }
+m4100-12g-poe           OBJECT IDENTIFIER ::= { l2Rswitch 26 }
+m4100-24g-poe           OBJECT IDENTIFIER ::= { l2Rswitch 27 }
+
+-- 
+-- GSM7324, GSM7312, FSM7326P, and GSM7224, are using two different styles
+-- of FP private MIB: dedicate and generic. For those using dedicated one, the sysOID
+-- are assigned to "gsm7324", "gsm7312, "fsm7326p", and "gsm7224". For the one using 
+-- generic MIB, the new OIDs are has a "i" in the end.
+--
+gsm7312i                OBJECT IDENTIFIER ::= { l3switch 5 }
+gsm7324i                OBJECT IDENTIFIER ::= { l3switch 6 }
+fsm7326pi               OBJECT IDENTIFIER ::= { l3switch 7 }
+
+gsm7248                 OBJECT IDENTIFIER ::= { l2switch 1 }
+gsm7212                 OBJECT IDENTIFIER ::= { l2switch 2 }
+gsm7224i                OBJECT IDENTIFIER ::= { l2switch 3 }
+fsm7226                 OBJECT IDENTIFIER ::= { l2switch 4 } 
+
+gcm9000                 OBJECT IDENTIFIER ::= { chassisswitch 1 }
+xcm8903                 OBJECT IDENTIFIER ::= { chassisswitch 6 }
+
+---
+--- new SNMP-enabled smartswitch
+---
+gs748t                  OBJECT IDENTIFIER ::= { smartswitch 1 }
+fs726t                  OBJECT IDENTIFIER ::= { smartswitch 2 }
+gs716t                  OBJECT IDENTIFIER ::= { smartswitch 3 }
+fs750t                  OBJECT IDENTIFIER ::= { smartswitch 4 }
+gs724t                  OBJECT IDENTIFIER ::= { smartswitch 5 }
+fs726tp                 OBJECT IDENTIFIER ::= { smartswitch 6 }
+fs728tp                 OBJECT IDENTIFIER ::= { smartswitch 7 }  
+gs108t                  OBJECT IDENTIFIER ::= { smartswitch 8 }
+gs108tp                 OBJECT IDENTIFIER ::= { smartswitch 9 }
+gs724tp                 OBJECT IDENTIFIER ::= { smartswitch 10 }
+gs748tp                 OBJECT IDENTIFIER ::= { smartswitch 11 }
+gs724tr                 OBJECT IDENTIFIER ::= { smartswitch 12 }
+gs748tr                 OBJECT IDENTIFIER ::= { smartswitch 13 }
+gs716tv2                OBJECT IDENTIFIER ::= { smartswitch 16 }
+gs724tv3                OBJECT IDENTIFIER ::= { smartswitch 17 }
+gs108tv2                OBJECT IDENTIFIER ::= { smartswitch 18 }
+gs110tp                 OBJECT IDENTIFIER ::= { smartswitch 19 }
+fs728tpv2               OBJECT IDENTIFIER ::= { smartswitch 20 }
+gs716tv3                OBJECT IDENTIFIER ::= { smartswitch 31 }
+gs724tv4                OBJECT IDENTIFIER ::= { smartswitch 32 }
+gs748tv5                OBJECT IDENTIFIER ::= { smartswitch 33 }
+xs712t                  OBJECT IDENTIFIER ::= { smartswitch 30 }
+
+
+fs728ts                 OBJECT IDENTIFIER ::= { stacksmartswitch 1 }
+fs752ts                 OBJECT IDENTIFIER ::= { stacksmartswitch 2 }
+fs752tps                OBJECT IDENTIFIER ::= { stacksmartswitch 3 }
+gs724ts                 OBJECT IDENTIFIER ::= { stacksmartswitch 4 }
+gs748ts                 OBJECT IDENTIFIER ::= { stacksmartswitch 5 }
+gs752ts                 OBJECT IDENTIFIER ::= { stacksmartswitch 12 }
+gs728ts                 OBJECT IDENTIFIER ::= { stacksmartswitch 11 }
+gs752tstps              OBJECT IDENTIFIER ::= { stacksmartswitch 8 }
+gs728tps                OBJECT IDENTIFIER ::= { stacksmartswitch 13 }
+gs752tps                OBJECT IDENTIFIER ::= { stacksmartswitch 14 }
+gs752txs                OBJECT IDENTIFIER ::= { stacksmartswitch 10 }
+gs728txs                OBJECT IDENTIFIER ::= { stacksmartswitch 15 }
+s3300-28x		OBJECT IDENTIFIER ::= { stacksmartswitch 16 }
+s3300-28x-poe		OBJECT IDENTIFIER ::= { stacksmartswitch 17 }
+s3300-52x		OBJECT IDENTIFIER ::= { stacksmartswitch 18 }
+s3300-52x-poe		OBJECT IDENTIFIER ::= { stacksmartswitch 19 }
+
+---
+--- new SNMP-enabled business router/firewall
+---
+fvx538                  OBJECT IDENTIFIER ::= { router 1 }
+fvs338                  OBJECT IDENTIFIER ::= { router 2 }
+fvg318                  OBJECT IDENTIFIER ::= { router 3 }
+fvs336g                 OBJECT IDENTIFIER ::= { router 4 }
+
+---
+--- new SNMP-enabled firewall
+---
+fwag114                 OBJECT IDENTIFIER ::= { firewall 3 }
+fvs124g                 OBJECT IDENTIFIER ::= { firewall 4 }
+fvs318v3                OBJECT IDENTIFIER ::= { firewall 5 }
+dgfv338                 OBJECT IDENTIFIER ::= { firewall 6 }
+
+---
+--- new SNMP-enabled AP
+---
+wpn802                  OBJECT IDENTIFIER ::= { accesspoint 1 }
+wg312                   OBJECT IDENTIFIER ::= { accesspoint 2 }
+wag312                  OBJECT IDENTIFIER ::= { accesspoint 3 }
+
+---
+--- new WLAN
+---
+ 
+-- New Textual Conventions
+AgentPortMask ::= TEXTUAL-CONVENTION
+   STATUS  current
+   DESCRIPTION
+       "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying ports 1 through
+        8, the second octet specifying ports 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered port, and the least significant bit
+        represents the highest numbered port.  Thus, each port
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that port is included in the set of ports; the port
+        is not included if its bit has a value of '0'
+             
+        When setting this value, the system will ignore 
+        configuration for ports not between the first and last 
+        valid ports.  Configuration of any port numbers between 
+        this range that are not valid ports return a failure 
+        message, but will still apply configuration for valid 
+        ports."
+   SYNTAX  OCTET STRING
+
+
+END

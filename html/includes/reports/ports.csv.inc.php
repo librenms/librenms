@@ -157,7 +157,7 @@ foreach ($ports as $port) {
         $type             = humanmedia($port['ifType']);
         $port['in_rate']  = formatRates(($port['ifInOctets_rate'] * 8));
         $port['out_rate'] = formatRates(($port['ifOutOctets_rate'] * 8));
-        $port             = ifLabel($port, $device);
+        $port             = cleanPort($port, $device);
         $csv[]            = array(
             $port['hostname'],
             fixIfName($port['label']),

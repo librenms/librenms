@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 // alpha:/home/dev# snmpbulkwalk -v2c -c XXXXX -M mibs -m CISCO-IPSEC-FLOW-MONITOR-MIB cisco.3925  cipSecGlobalStats
 // CISCO-IPSEC-FLOW-MONITOR-MIB::cipSecGlobalActiveTunnels.0 = Gauge32: 10
 // CISCO-IPSEC-FLOW-MONITOR-MIB::cipSecGlobalPreviousTunnels.0 = Counter32: 677 Phase-2 Tunnels
@@ -53,29 +55,28 @@ if ($device['os_group'] == 'cisco') {
     }
 
     if ($data['cipSecGlobalActiveTunnels']) {
-        $rrd_def = array(
-            'DS:Tunnels:GAUGE:600:0:U',
-            'DS:InOctets:COUNTER:600:0:100000000000',
-            'DS:OutOctets:COUNTER:600:0:100000000000',
-            'DS:InDecompOctets:COUNTER:600:0:100000000000',
-            'DS:OutUncompOctets:COUNTER:600:0:100000000000',
-            'DS:InPkts:COUNTER:600:0:100000000000',
-            'DS:OutPkts:COUNTER:600:0:100000000000',
-            'DS:InDrops:COUNTER:600:0:100000000000',
-            'DS:InReplayDrops:COUNTER:600:0:100000000000',
-            'DS:OutDrops:COUNTER:600:0:100000000000',
-            'DS:InAuths:COUNTER:600:0:100000000000',
-            'DS:OutAuths:COUNTER:600:0:100000000000',
-            'DS:InAuthFails:COUNTER:600:0:100000000000',
-            'DS:OutAuthFails:COUNTER:600:0:100000000000',
-            'DS:InDencrypts:COUNTER:600:0:100000000000',
-            'DS:OutEncrypts:COUNTER:600:0:100000000000',
-            'DS:InDecryptFails:COUNTER:600:0:100000000000',
-            'DS:OutEncryptFails:COUNTER:600:0:100000000000',
-            'DS:ProtocolUseFails:COUNTER:600:0:100000000000',
-            'DS:NoSaFails:COUNTER:600:0:100000000000',
-            'DS:SysCapFails:COUNTER:600:0:100000000000'
-        );
+        $rrd_def = RrdDefinition::make()
+            ->addDataset('Tunnels', 'GAUGE', 0)
+            ->addDataset('InOctets', 'COUNTER', 0, 100000000000)
+            ->addDataset('OutOctets', 'COUNTER', 0, 100000000000)
+            ->addDataset('InDecompOctets', 'COUNTER', 0, 100000000000)
+            ->addDataset('OutUncompOctets', 'COUNTER', 0, 100000000000)
+            ->addDataset('InPkts', 'COUNTER', 0, 100000000000)
+            ->addDataset('OutPkts', 'COUNTER', 0, 100000000000)
+            ->addDataset('InDrops', 'COUNTER', 0, 100000000000)
+            ->addDataset('InReplayDrops', 'COUNTER', 0, 100000000000)
+            ->addDataset('OutDrops', 'COUNTER', 0, 100000000000)
+            ->addDataset('InAuths', 'COUNTER', 0, 100000000000)
+            ->addDataset('OutAuths', 'COUNTER', 0, 100000000000)
+            ->addDataset('InAuthFails', 'COUNTER', 0, 100000000000)
+            ->addDataset('OutAuthFails', 'COUNTER', 0, 100000000000)
+            ->addDataset('InDencrypts', 'COUNTER', 0, 100000000000)
+            ->addDataset('OutEncrypts', 'COUNTER', 0, 100000000000)
+            ->addDataset('InDecryptFails', 'COUNTER', 0, 100000000000)
+            ->addDataset('OutEncryptFails', 'COUNTER', 0, 100000000000)
+            ->addDataset('ProtocolUseFails', 'COUNTER', 0, 100000000000)
+            ->addDataset('NoSaFails', 'COUNTER', 0, 100000000000)
+            ->addDataset('SysCapFails', 'COUNTER', 0, 100000000000);
 
         $fields = array(
             'Tunnels'          => $data['cipSecGlobalActiveTunnels'],

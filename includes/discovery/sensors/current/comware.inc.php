@@ -16,7 +16,7 @@ $multiplier    = 1;
 $divisor       = 100000;
 $divisor_alarm = 1000000;
 foreach ($pre_cache['comware_oids'] as $index => $entry) {
-    if (is_numeric($entry['hh3cTransceiverBiasCurrent']) && $entry['hh3cTransceiverBiasCurrent'] != 2147483647) {
+    if (is_numeric($entry['hh3cTransceiverBiasCurrent']) && $entry['hh3cTransceiverBiasCurrent'] != 2147483647 && isset($entry['hh3cTransceiverDiagnostic'])) {
         $oid                       = '.1.3.6.1.4.1.25506.2.70.1.1.1.17.' . $index;
         $dbquery                   = dbFetchRows("SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ? AND `ifAdminStatus` = 'up'", array(
             $index,
@@ -30,7 +30,7 @@ foreach ($pre_cache['comware_oids'] as $index => $entry) {
         $entPhysicalIndex          = $index;
         $entPhysicalIndex_measured = 'ports';
         foreach ($dbquery as $dbindex => $dbresult) {
-            $descr = $dbresult['ifDescr'] . ' Bias Current';
+            $descr = makeshortif($dbresult['ifDescr']) . ' Bias Current';
             discover_sensor($valid['sensor'], 'current', $device, $oid, 'bias-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
         }
     }

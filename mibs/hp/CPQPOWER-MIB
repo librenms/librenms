@@ -1,0 +1,5874 @@
+-- ****************************************************************************
+-- ****************************************************************************
+--
+--            Power Device SNMP Management Card 
+--         Management Information Base for SNMP Network Management
+--
+--
+--      Copyright 2001, 2014 Hewlett-Packard Development Company, L.P.
+--
+--      Hewlett-Packard Company shall not be liable for technical or
+--      editorial errors or omissions contained herein. The information in
+--      this document is provided "as is" without warranty of any kind and
+--      is subject to change without notice. The warranties for HP products
+--      are set forth in the express limited warranty statements
+--      accompanying such products. Nothing herein should be construed as
+--      constituting an additional warranty.
+--
+--      Confidential computer software. Valid license from HP required for
+--      possession, use or copying. Consistent with FAR 12.211 and 12.212,
+--      Commercial Computer Software, Computer Software Documentation, and
+--      Technical Data for Commercial Items are licensed to the U.S.
+--      Government under vendor's standard commercial license.
+--
+--      Refer to the READMIB.RDM file for more information about the
+--      organization of the information in the Compaq Enterprise.
+--
+--      The Compaq Enterprise number is 232.
+--      The ASN.1 prefix to, and including the Compaq Enterprise is:
+--           1.3.6.1.4.1.232
+--
+--      MIB Version 1.80
+--    
+--
+--    *********************************************************************
+--    *********************************************************************
+--
+-- VARIABLES REQUIRED FOR HP MANAGEMENT
+-- ===================================================================================
+--
+-- ===================================================================================
+-- sysDescr (1.3.6.1.2.1.1.1) which is defined in RFC1213.MIB.
+-- sysObjectID (1.3.6.1.2.1.1.2) which is defined in RFC1213.MIB.
+-- sysContact (1.3.6.1.2.1.1.4) which is defined in RFC1213.MIB.
+-- sysName (1.3.6.1.2.1.1.5) is which is defined in RFC1213.MIB.
+-- sysLocation (1.3.6.1.2.1.1.6) which is defined in RFC1213.MIB.
+-- 
+-- sysDescr OBJECT-TYPE
+--     SYNTAX  DisplayString (SIZE (0..255))
+--     ACCESS  read-only
+--     STATUS  mandatory
+--     DESCRIPTION
+--             "A textual description of the entity.  This value
+--             should include the full name, hardware version and
+--             firmware version of management module's.
+--             It is mandatory that this only contain
+--             printable ASCII characters."
+--     ::= { system 1 }
+--
+-- sysObjectID OBJECT-TYPE
+--     SYNTAX  DisplayString (SIZE (0..255))
+--     ACCESS  read-write
+--     STATUS  mandatory
+--     DESCRIPTION
+--             "Return the OID of the management module
+--             for this UPS or PDU defined in the CPQPOWER.MIB
+--             i.e. .1.3.6.1.4.1.232.165.3 is for UPS OIDs."
+--     ::= { system 2 }
+--
+-- sysContact OBJECT-TYPE
+--     SYNTAX  DisplayString (SIZE (0..255))
+--     ACCESS  read-write
+--     STATUS  mandatory
+--     DESCRIPTION
+--             "The textual identification of the contact person
+--             for this managed node, together with information
+--             on how to contact this person."
+--     ::= { system 4 }
+--
+-- sysName OBJECT-TYPE
+--     SYNTAX  DisplayString (SIZE (0..255))
+--     ACCESS  read-write
+--     STATUS  mandatory
+--     DESCRIPTION
+--             "An administratively-assigned name for this
+--             managed node.  By convention, this is the node's
+--             fully-qualified domain name."
+--     ::= { system 5 }
+--
+-- sysLocation OBJECT-TYPE
+--     SYNTAX  DisplayString (SIZE (0..255))
+--     ACCESS  read-write
+--     STATUS  mandatory
+--     DESCRIPTION
+--             "The physical location of this node (e.g.,
+--             `telephone closet, 3rd floor')."
+--     ::= { system 6 }
+--
+-- ====================================================================================
+--
+-- ====================================================================================
+-- cpqSiSysSerialNum (1.3.6.1.4.1.232.2.2.2.1) which is defined in CPQSINFO.MIB.
+-- This is the PDU/UPS serial number (listed but not implemented in SNMP Agent)
+-- 
+-- 
+-- cpqSiSysSerialNum OBJECT-TYPE
+--      SYNTAX  DisplayString (SIZE (0..255))
+--      ACCESS  read-only
+--      STATUS  mandatory
+--      DESCRIPTION
+--          "The serial number of the PDU or UPS.
+--           The string will be empty if the system does not report the
+--          serial number."
+--      ::= { cpqSiAsset 1 }
+-- ===================================================================================
+--
+-- ===================================================================================
+-- cpqSiProductName (1.3.6.1.4.1.232.2.2.4.2) which is defined in CPQSINFO.MIB.
+-- This is the PDU/UPS management module product model name 
+-- 
+--
+--  cpqSiProductName OBJECT-TYPE
+--         SYNTAX  DisplayString (SIZE (0..255))
+--         ACCESS  read-only
+--         STATUS  mandatory
+--         DESCRIPTION
+--             "This device product name i.e. HP UPS Management Module"
+--         ::= { cpqSiSystemBoard 2 }
+-- ====================================================================================
+--
+-- ====================================================================================
+-- cpqHoGUID (1.3.6.1.4.1.232.11.2.10.3) which is defined in CPQHOST.MIB 
+-- This field needs to be filled with the unique ID
+-- P/N of PDU/UPS management module (16 bytes)
+--
+-- cpqHoGUID OBJECT-TYPE
+--         SYNTAX  OCTET STRING (SIZE (16))
+--         ACCESS  read-write
+--         STATUS  mandatory
+--         DESCRIPTION
+--             "The globally unique identifier of this device. P/N of HP Management Module."
+--         ::= { cpqHoSystemStatus 3 }
+-- ====================================================================================
+--
+-- ====================================================================================
+-- cpqHoMibStatusArray (1.3.6.1.4.1.232.11.2.10.1) which is defined in CPQHOST.MIB 
+-- Pretty complicated to decipher if you do not have the guide.  We only use the first 
+-- 4 octets.
+--
+-- Octet 0 = 00000001 (always)
+-- Octet 1 = 00000000 through 00000100 depending on Device H/W Condition below
+-- Octet 2 = 00000001 (always)
+-- Octet 3 = 00010000 (always decimal 16 see table below)
+--
+-- For example: With a UPS device with OK status, the values of the 4 octets would be:
+--
+-- Octet 0 = 0x01 (fixed)
+-- Octet 1 = 0x02 (OK overall status)
+-- Octet 2 = 0x01 (fixed)
+-- Octet 3 = 0x10 (Device type = 16 for UPS)
+--
+-- cpqHoMibStatusArray OBJECT-TYPE
+--         SYNTAX  OCTET STRING (SIZE (4..256))
+--         ACCESS  read-only
+--         STATUS  mandatory
+--         DESCRIPTION
+--             "The MIB Status Array is an array of MIB status structures. Each
+--             structure is made up of 4 octets.
+--
+--             Array element 0 is the status for all MIBs in the Compaq
+--             Enterprise.
+--
+--             Device H/W Condition (Octet 1)
+--                0 - Not available (e.g. Loss/lack of communication between card and device UPS/PDU)  
+--                1 - Other (unknown) (mapped to device unknown status)
+--                2 - OK 		(mapped to device normal status/events)
+--                3 - Degraded 	(UPS: device warning status/events
+--                                   PDU: overload warning, voltage out of tolerance)
+--                4 - Failed 		(UPS: device critical status/events
+--                                   PDU: overload condition)
+--
+--             Detailed Type (octet 3)
+--                Bits 0-7    Detailed Type, only used if bit 0 in octect 2 is 1.
+--
+--             Type Values for Bits 0-4 (maps to CIM7 types)
+--             Unknown                    =  0
+--             Server                     =  1  (yes a duplicate of the server flag)
+--             Desktop                    =  2
+--             Workstation                =  3
+--             Portable                   =  4
+--             Router                     =  5
+--             Cluster                    =  6
+--             Printer                    =  7
+--             Switch                     =  8  (network switch)
+--             Repeater                   =  9
+--             Remote Access Device       = 10
+--             Other                      = 11
+--             Management Processor       = 12  (rib, RILOE, iLo)
+--             Rack                       = 13
+--             Enclosure                  = 14
+--             KVM Switch                 = 15  (IP enabled keyboard video mouse switch).
+--             UPS                        = 16
+--             Power Distribution Unit    = 17  (PDU)
+--             Environmental Monitor      = 18  (eg CMC)
+--             Power Distribution Rack    = 19  (PDR)"
+--         ::= { cpqHoSystemStatus 1 }
+-- ====================================================================================
+-- All Traps, Objects of CPQPOWER.MIB start with  .1.3.6.1.4.1.232.165
+
+CPQPOWER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    compaq        FROM CPQHOST-MIB
+--    enterprises   FROM RFC1155-SMI
+--    IpAddress     FROM RFC1155-SMI
+
+--    Counter, enterprises   FROM RFC1155-SMI
+
+--    TimeTicks     FROM RFC1155-SMI
+--    Gauge         FROM RFC1155-SMI
+    Counter       FROM RFC1155-SMI
+    DisplayString FROM RFC1213-MIB
+    ifIndex       FROM RFC1213-MIB
+    ifDescr       FROM RFC1213-MIB
+    sysName       FROM RFC1213-MIB
+    sysDescr      FROM RFC1213-MIB
+    sysContact    FROM RFC1213-MIB
+    sysLocation   FROM RFC1213-MIB  
+    OBJECT-TYPE   FROM RFC-1212
+    TRAP-TYPE     FROM RFC-1215;
+
+-- Identifiers from CPQSINFO.MIB (no longer used by HP SIM)
+-- cpqSystemInfo           OBJECT IDENTIFIER       ::= {compaq 2}
+-- cpqSiComponent          OBJECT IDENTIFIER       ::= {cpqSystemInfo 2}
+-- cpqSiSystemBoard        OBJECT IDENTIFIER       ::= {cpqSiComponent 4}
+
+-- Identifiers from CPQHOST.MIB (include when compiling)
+-- cpqHostOs               OBJECT IDENTIFIER       ::= {compaq 11}
+-- cpqHoComponent          OBJECT IDENTIFIER       ::= {cpqHostOs 2}
+-- cpqHoSystemStatus       OBJECT IDENTIFIER       ::= {cpqHoComponent 10}
+
+-- compaq                  OBJECT IDENTIFIER 	::= { enterprises 232 }
+cpqPower                OBJECT IDENTIFIER       ::= {compaq 165}
+
+--
+-- Power device object identifiers
+--
+powerDevice             OBJECT IDENTIFIER       ::= {cpqPower 1}  
+
+trapInfo                OBJECT IDENTIFIER       ::= {powerDevice 1}
+managementModuleIdent   OBJECT IDENTIFIER       ::= {powerDevice 2}
+
+--
+-- PDU object identifiers
+--
+pdu                     OBJECT IDENTIFIER       ::= {cpqPower 2}  
+
+pduIdent                OBJECT IDENTIFIER       ::= { pdu 1 }
+pduInput                OBJECT IDENTIFIER       ::= { pdu 2 }
+pduOutput               OBJECT IDENTIFIER       ::= { pdu 3 }
+
+--
+-- UPS object identifiers
+--
+ups                     OBJECT IDENTIFIER       ::= {cpqPower 3}  
+
+upsIdent                OBJECT IDENTIFIER       ::= { ups 1 }
+upsBattery              OBJECT IDENTIFIER       ::= { ups 2 }
+upsInput                OBJECT IDENTIFIER       ::= { ups 3 }
+upsOutput               OBJECT IDENTIFIER       ::= { ups 4 }
+upsBypass               OBJECT IDENTIFIER       ::= { ups 5 }
+upsEnvironment          OBJECT IDENTIFIER       ::= { ups 6 }
+upsTest                 OBJECT IDENTIFIER       ::= { ups 7 }
+upsControl              OBJECT IDENTIFIER       ::= { ups 8 }
+upsConfig               OBJECT IDENTIFIER       ::= { ups 9 }
+upsRecep                OBJECT IDENTIFIER       ::= { ups 10 }
+upsTopology             OBJECT IDENTIFIER       ::= { ups 11 }
+
+--
+-- PDR object identifiers
+--
+pdr                     OBJECT IDENTIFIER       ::= {cpqPower 4}  
+
+pdrIdent                OBJECT IDENTIFIER       ::= { pdr 1 }
+pdrPanel                OBJECT IDENTIFIER       ::= { pdr 2 }
+pdrBreaker              OBJECT IDENTIFIER       ::= { pdr 3 }
+
+--
+-- MPDU object identifiers
+--
+mpdu                     OBJECT IDENTIFIER       ::= {cpqPower 5}  
+
+mpduIdent                OBJECT IDENTIFIER       ::= { mpdu 1 }
+mpduOutput               OBJECT IDENTIFIER       ::= { mpdu 2 }
+mpduDeviceIdent          OBJECT IDENTIFIER       ::= { mpdu 3 }
+mpduSmExtBarOutlet       OBJECT IDENTIFIER       ::= { mpdu 4 }
+
+--
+-- oups (offline UPS) object identifiers
+--
+oups                     OBJECT IDENTIFIER       ::= {cpqPower 6}  
+
+oupsIdent                OBJECT IDENTIFIER       ::= { oups 1 }
+oupsBattery              OBJECT IDENTIFIER       ::= { oups 2 }
+oupsInput                OBJECT IDENTIFIER       ::= { oups 3 }
+oupsOutput               OBJECT IDENTIFIER       ::= { oups 4 }
+oupsMonitor              OBJECT IDENTIFIER       ::= { oups 5 }
+oupsRackDiscovery        OBJECT IDENTIFIER       ::= { oups 6 }
+
+--
+-- PDU Glendore object identifiers
+--
+pdu2                     OBJECT IDENTIFIER       ::= {cpqPower 7}  
+
+pdu2Ident                OBJECT IDENTIFIER       ::= { pdu2 1 }
+pdu2Input                OBJECT IDENTIFIER       ::= { pdu2 2 }
+pdu2Group                OBJECT IDENTIFIER       ::= { pdu2 3 }
+pdu2Environment          OBJECT IDENTIFIER       ::= { pdu2 4 }
+pdu2Outlet               OBJECT IDENTIFIER       ::= { pdu2 5 }
+
+
+
+-- ====================================================================================
+--
+-- powerDevice             OBJECT IDENTIFIER       ::= {cpqPower 1}  
+-- trapInfo                OBJECT IDENTIFIER       ::= {powerDevice 1}
+-- trap information group
+-- OID= .1.3.6.1.4.1.232.165.1.1
+
+trapCode OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"A number identifying the event for the trap that was sent.
+		 Mapped unique trap code per unique event to be used by ISEE's
+		 decoder ring."
+	::= { trapInfo 1 }
+
+trapDescription OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"A string identifying the event for that last trap that was sent."
+	::= { trapInfo 2 }
+
+trapDeviceMgmtUrl OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "A string contains the URL for the management software."
+	::= { trapInfo 3 }
+
+trapDeviceDetails OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"A string details information about the UPS such as SN (serial number), 
+                 PN (part number), and MN (Model Name)."
+	::= { trapInfo 4 }
+
+trapDeviceName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"A string contains the name of the HP Management Module."
+	::= { trapInfo 5 }
+
+
+
+-- ====================================================================================
+--                      HP UPS Management Module
+-- ====================================================================================
+--
+-- powerDevice             OBJECT IDENTIFIER       ::= {cpqPower 1}  
+-- managementModuleIdent   OBJECT IDENTIFIER       ::= {powerDevice 2}
+-- Management module identification group
+-- OID= .1.3.6.1.4.1.232.165.1.2
+
+deviceManufacturer OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The device's manufacturer."
+    ::= { managementModuleIdent 1 }
+
+deviceModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The device's model."
+    ::= { managementModuleIdent 2 }
+
+deviceFirmwareVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The device's firmware version(s)."
+    ::= { managementModuleIdent 3 }
+
+deviceHardwareVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The device's hardware version."
+    ::= { managementModuleIdent 4 }
+
+deviceIdentName OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "A string identifying the device. it came from sysName entered by user"
+    ::= { managementModuleIdent 5 }
+
+devicePartNumber OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The device's part number."
+    ::= { managementModuleIdent 6 }
+
+deviceSerialNumber OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The device's serial number."
+    ::= { managementModuleIdent 7 }
+
+deviceMACAddress OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The device's MAC address."
+    ::= { managementModuleIdent 8 }
+
+
+-- ====================================================================================
+--                                     PDU
+-- ====================================================================================
+--  
+--  pdu                     OBJECT IDENTIFIER       ::= {cpqPower 2}  
+--  pduIdent                OBJECT IDENTIFIER       ::= { pdu 1 }
+--  PDU identification group
+--  OID= .1.3.6.1.4.1.232.165.2.1
+
+numOfPdu OBJECT-TYPE
+    SYNTAX INTEGER (0..63)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of PDUs."
+    ::= { pduIdent 1 }
+    
+pduIdentTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PduIdentEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "The Aggregate Object with number of entries equal to
+	    NumOfPdu and including the PduIdent group."
+    ::= { pduIdent 2 }
+
+pduIdentEntry OBJECT-TYPE
+    SYNTAX PduIdentEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "The ident table entry containing the name,
+	    model, manufacturer, firmware version, part number, etc."
+    INDEX { pduIdentIndex }
+    ::= { pduIdentTable 1 }
+
+PduIdentEntry ::= SEQUENCE {
+      pduIdentIndex         INTEGER,
+      pduName               DisplayString,
+      pduModel              DisplayString,
+      pduManufacturer       DisplayString,
+      pduFirmwareVersion    DisplayString,
+      pduPartNumber         DisplayString,
+      pduSerialNumber       DisplayString,
+      pduStatus             INTEGER,
+      pduControllable       INTEGER
+    }
+
+pduIdentIndex OBJECT-TYPE
+    SYNTAX INTEGER	(0..100)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Index for the PduIdentEntry table."
+    ::= { pduIdentEntry 1 }
+
+pduName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"The string identify the device."
+    ::= { pduIdentEntry 2 }
+
+pduModel OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device Model."
+    ::= { pduIdentEntry 3 }
+
+pduManufacturer OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device Manufacturer Name (e.g. Hewlett-Packard)."
+    ::= { pduIdentEntry 4 }
+
+pduFirmwareVersion OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The firmware revision level of the device."
+    ::= { pduIdentEntry 5 }
+
+pduPartNumber OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The device part number."
+    ::= { pduIdentEntry 6 }
+
+pduSerialNumber OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The device serial number."
+    ::= { pduIdentEntry 7 }
+
+pduStatus OBJECT-TYPE
+    SYNTAX  INTEGER
+    {
+      other(1),    -- default
+      ok(2),
+      degraded(3),
+      failed(4)
+    }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+    "The overall status of the device.  A value of OK(2) indicates the device is operating normally.
+    A value of degraded(3) indicates the device is operating with warning indicators.  A value of
+    failed(4) indicates the device is operating with critical indicators."
+    ::= { pduIdentEntry 8 }
+
+pduControllable OBJECT-TYPE
+    SYNTAX  INTEGER 
+    {
+      yes(1),
+      no(2)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "This object indicates whether or not the device is controllable."
+    ::= { pduIdentEntry 9 }
+
+-- ====================================================================================
+--
+--  pdu                     OBJECT IDENTIFIER       ::= {cpqPower 2}    
+--  pduInput                OBJECT IDENTIFIER       ::= { pdu 2 }
+--  PDU input group
+--  OID= .1.3.6.1.4.1.232.165.2.2
+
+pduInputTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PduInputEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+           "The Aggregate Object with number of entries equal to
+	    NumOfPdu and including the PduInput group."
+    ::= {pduInput 1}
+
+pduInputEntry OBJECT-TYPE
+    SYNTAX PduInputEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION 
+           "The input table entry containing the voltage and 
+	    current for the PDU"
+    INDEX { pduInputIndex }
+    ::= { pduInputTable 1 }
+
+PduInputEntry ::= SEQUENCE {
+    pduInputIndex   INTEGER,
+    inputVoltage    INTEGER,
+    inputCurrent    INTEGER
+    }
+
+pduInputIndex OBJECT-TYPE
+    SYNTAX INTEGER	(0..100)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Index for the PduInputEntry table."
+    ::= { pduInputEntry 1}
+
+inputVoltage OBJECT-TYPE
+    SYNTAX INTEGER  (0..2147483647)  -- UNITS RMS Volts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured input voltage from the PDU meters in volts."
+    ::= {pduInputEntry 2}
+
+inputCurrent OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS RMS 0.01 Amp
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured input current from the PDU meters in hundredths of Amp."
+    ::= {pduInputEntry 3}
+
+-- ====================================================================================
+--
+--  pdu                     OBJECT IDENTIFIER       ::= {cpqPower 2}  
+--  pduOutput               OBJECT IDENTIFIER       ::= { pdu 3 }
+--  PDU Output group
+--  OID= .1.3.6.1.4.1.232.165.2.3
+
+pduOutputTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PduOutputEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "The Aggregate Object with number of entries equal to
+	    NumOfPdu and including the PduInput group."
+    ::= {pduOutput 1}
+
+pduOutputEntry OBJECT-TYPE
+    SYNTAX PduOutputEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION 
+           "The input table entry containing the name,
+	    heat load, current load, power load, firmware, etc."
+    INDEX { pduOutputIndex }
+    ::= { pduOutputTable 1 }
+
+PduOutputEntry ::= SEQUENCE {
+    pduOutputIndex         INTEGER,
+    pduOutputLoad          INTEGER,
+    pduOutputHeat          INTEGER,
+    pduOutputPower         INTEGER,
+    pduOutputNumBreakers   INTEGER
+    }
+
+pduOutputIndex OBJECT-TYPE
+    SYNTAX INTEGER	(0..100)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Index for the PduOutputEntry table."
+    ::= { pduOutputEntry 1}
+
+pduOutputLoad OBJECT-TYPE
+    SYNTAX INTEGER (0..200)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The device output load in percent of rated capacity.  A value of -1 will be
+		returned if the heat load is unable to be measured."
+    ::= { pduOutputEntry 2 }
+
+pduOutputHeat OBJECT-TYPE
+    SYNTAX  INTEGER   -- Units BTU
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    "The total heat load measured on the PDU in BTUs.  A value of -1 will be
+		returned if the heat load is unable to be measured."
+    ::= { pduOutputEntry 3 }
+
+pduOutputPower OBJECT-TYPE
+    SYNTAX  INTEGER   -- Units Watts
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    "The total power load measured on the PDU in watts.  A value of -1 will be
+		returned if the power load is unable to be measured."
+    ::= { pduOutputEntry 4 }
+
+pduOutputNumBreakers OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "The number of breakers for the device.  This variable indicates the number 
+           of rows in the breakers table."
+    ::= { pduOutputEntry 5 }
+
+pduOutputBreakerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PduOutputBreakerEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "List of breaker table entries.  The number of entries is given by pduOutputNumBreakers ."
+    ::= { pduOutput 2 }
+
+pduOutputBreakerEntry OBJECT-TYPE
+    SYNTAX  PduOutputBreakerEntry 
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "An entry containing information applicable to an breaker."
+    INDEX   { pduOutputIndex, breakerIndex }
+    ::= { pduOutputBreakerTable 1 }
+
+PduOutputBreakerEntry ::=
+    SEQUENCE 
+    {
+      breakerIndex       INTEGER,
+      breakerVoltage     INTEGER,
+      breakerCurrent     INTEGER,
+      breakerPercentLoad INTEGER,
+      breakerStatus      INTEGER
+    }
+
+breakerIndex OBJECT-TYPE
+    SYNTAX  INTEGER 	(0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The breaker identifier."
+    ::= { pduOutputBreakerEntry 1 }
+
+breakerVoltage OBJECT-TYPE
+    SYNTAX  INTEGER	-- UNITS Volts
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The breaker voltage in volts."
+    ::= { pduOutputBreakerEntry 2 }
+
+breakerCurrent OBJECT-TYPE
+    SYNTAX  INTEGER	-- UNITS 0.01 Amps
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The breaker current draw in hundredths of Amp."
+    ::= { pduOutputBreakerEntry 3 }
+
+breakerPercentLoad OBJECT-TYPE
+    SYNTAX  INTEGER	-- UNITS Percent
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The breaker load in percent."
+    ::= { pduOutputBreakerEntry 4 }
+
+breakerStatus OBJECT-TYPE
+    SYNTAX  INTEGER 
+    {
+      normal(1),
+      overloadWarning(2),
+      overloadCritical(3),
+      voltageRangeWarning(4),
+      voltageRangeCritical(5)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "This object indicates the status of the breaker.  A value of normal(1)
+		indicates the breaker is operating normally.  A value of overloadWarning(2)
+		indicates the breaker has an overload warning.  A value of overloadCritical(3)
+		indicates the breaker is overloaded.  A value of voltageRangeWarning(4)
+		indicates the breaker voltage is out of tolerance by 10-20%.  A value of
+		voltageRangeCritical(5) indicates the breaker voltage is out of tolerance
+		by more than 20%.  Note: Overload status has priority over voltage tolerance
+		status."
+    ::= { pduOutputBreakerEntry 5 }
+
+
+-- ====================================================================================
+--                            UPS
+-- ====================================================================================
+--
+--  ups                     OBJECT IDENTIFIER       ::= {cpqPower 3}  
+--  upsIdent                OBJECT IDENTIFIER       ::= { ups 1 }
+--  UPS Identification group
+--  OID= .1.3.6.1.4.1.232.165.3.1
+
+upsIdentManufacturer OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..31))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The UPS Manufacturer Name (e.g. Hewlett-Packard)."
+    ::= { upsIdent 1 }
+
+upsIdentModel OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The UPS Model;Part number;Serial number (e.g. HP R5500 XR;204451-B21;B00123456W)."
+    ::= { upsIdent 2 }
+
+upsIdentSoftwareVersions OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The firmware revision level(s) of the UPS microcontroller(s)."
+    ::= { upsIdent 3 }
+
+upsIdentOemCode OBJECT-TYPE
+    SYNTAX INTEGER (0..255)  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"A binary code indicating vendor. This should be a ?0x0c? for HP"
+    ::= { upsIdent 4 }
+
+-- ====================================================================================
+--
+--  ups                     OBJECT IDENTIFIER       ::= {cpqPower 3}  
+--  upsBattery              OBJECT IDENTIFIER       ::= { ups 2 }
+--  UPS Battery group
+--  OID= .1.3.6.1.4.1.232.165.3.2
+
+upsBatTimeRemaining OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS seconds
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Battery run time in seconds before UPS turns off due
+	 to low battery."
+    ::= { upsBattery 1 }
+
+upsBatVoltage OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS Volts DC
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Battery voltage as reported by the UPS meters."
+    ::= { upsBattery 2 }
+
+upsBatCurrent OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)   -- UNITS Amp DC
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Battery Current as reported by the UPS metering.
+	 Current is positive when discharging, negative
+	 when recharging the battery."
+    ::= { upsBattery 3 }
+
+upsBatCapacity OBJECT-TYPE
+    SYNTAX INTEGER (0..100)    -- UNITS percent
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Battery percent charge."
+    ::= { upsBattery 4 }
+
+upsBatteryAbmStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+    batteryCharging(1),
+    batteryDischarging(2),
+    batteryFloating(3),
+    batteryResting(4),
+    unknown(5)
+	}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Gives the status of the Advanced Battery Management;
+	 batteryFloating(3) status means that the charger is temporarily 
+	 charging the battery to its float voltage; batteryResting(4) is the 
+	 state when the battery is fully charged and none of the other actions 
+	 (charging/discharging/floating) is being done."
+    ::= { upsBattery 5 }
+
+-- ====================================================================================
+--
+--  ups                     OBJECT IDENTIFIER       ::= {cpqPower 3}  
+--  upsInput                OBJECT IDENTIFIER       ::= { ups 3 }
+--  UPS Input group
+--  OID= .1.3.6.1.4.1.232.165.3.3
+
+upsInputFrequency OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS 0.1 Hertz
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The utility line frequency in tenths of Hz."
+    ::= { upsInput 1 }
+
+upsInputLineBads OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of times the Input was out of tolerance
+	in voltage or frequency."
+    ::= { upsInput 2 }
+
+upsInputNumPhases OBJECT-TYPE
+    SYNTAX INTEGER (0..6)
+    ACCESS read-only
+    STATUS mandatory
+    ::= { upsInput 3 }
+
+upsInputTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF UpsInputEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "The Aggregate Object with number of entries equal to
+	         NumPhases and including the UpsInput group."
+    ::= { upsInput 4 }
+
+upsInputEntry OBJECT-TYPE
+    SYNTAX UpsInputEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "The input table entry containing the current, voltage, etc."
+    INDEX { upsInputPhase }
+    ::= { upsInputTable 1 }
+
+UpsInputEntry ::= SEQUENCE {
+    upsInputPhase     INTEGER,
+    upsInputVoltage   INTEGER,
+    upsInputCurrent   INTEGER,
+    upsInputWatts     INTEGER
+    }
+
+upsInputPhase OBJECT-TYPE
+    SYNTAX INTEGER  (0..6)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of the phase.  Serves as index for input table."
+    ::= { upsInputEntry 1 }
+
+upsInputVoltage OBJECT-TYPE
+    SYNTAX INTEGER  (0..2147483647)  -- UNITS RMS Volts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured input voltage from the UPS meters in volts."
+    ::= { upsInputEntry 2 }
+
+upsInputCurrent OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Amp
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured input current from the UPS meters in amps."
+    ::= { upsInputEntry 3 }
+
+upsInputWatts OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS Watts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured input real power in watts. Most UPSs do not report
+         this XCP data"
+    ::= { upsInputEntry 4 }
+
+upsInputSource OBJECT-TYPE
+    SYNTAX  INTEGER {
+    other(1),
+
+    none(2),                	-- For example, Utility failure
+    primaryUtility(3),		-- Normal utility feed to the UPS
+    bypassFeed(4),          	-- Bypass utility, separate from primaryUtility
+    secondaryUtility(5),    	-- Secondary utility feed (on a dual AC input UPS)
+    generator(6),			-- Power provided by a generator
+    flywheel(7),			-- Power provided by a flywheel (not necessarily AC)
+    fuelcell(8) 			-- Power provided by fuel cell(s) (not necessarily AC)
+    }
+    ACCESS  read-only
+
+    STATUS  mandatory
+    DESCRIPTION
+	   "The present external source of input power.  The enumeration
+	       none(2) indicates that there is no external source of 
+	       power, for example, the UPS is On Battery (an internal source).
+	       The bypassFeed(4) can only be used when the Bypass source is known
+	       to be a separate utility feed than the primaryUtility(3)."
+    ::= { upsInput 5 }
+
+
+-- ====================================================================================
+--
+--  ups                     OBJECT IDENTIFIER       ::= {cpqPower 3}  
+--  upsOutput               OBJECT IDENTIFIER       ::= { ups 4 }
+--  UPS Output group
+--  OID= .1.3.6.1.4.1.232.165.3.4
+
+upsOutputLoad OBJECT-TYPE
+    SYNTAX INTEGER (0..200)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The UPS output load in percent of rated capacity."
+    ::= { upsOutput 1 }
+
+upsOutputFrequency OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS 0.1 Hertz
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured UPS output frequency in tenths of Hz."
+    ::= { upsOutput 2 }
+
+upsOutputNumPhases OBJECT-TYPE
+    SYNTAX INTEGER  (0..6)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of metered output phases, serves as the table
+	 index."
+    ::= { upsOutput 3 }
+
+upsOutputTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF UpsOutputEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	"The Aggregate Object with number of entries equal to NumPhases
+	and including the UpsOutput group."
+    ::= { upsOutput 4 }
+
+upsOutputEntry OBJECT-TYPE
+    SYNTAX UpsOutputEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	"Output Table Entry containing voltage, current, etc."
+    INDEX { upsOutputPhase }
+    ::= { upsOutputTable 1 }
+
+UpsOutputEntry ::= SEQUENCE {
+    upsOutputPhase       INTEGER,
+    upsOutputVoltage     INTEGER,
+    upsOutputCurrent     INTEGER,
+    upsOutputWatts       INTEGER
+    }
+
+upsOutputPhase OBJECT-TYPE
+    SYNTAX INTEGER (0..6)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number {1..3} of the output phase."
+    ::= { upsOutputEntry 1 }
+
+upsOutputVoltage OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Volts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured output voltage from the UPS metering in volts."
+    ::= { upsOutputEntry 2 }
+
+upsOutputCurrent OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Amp
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured UPS output current in amps."
+    ::= { upsOutputEntry 3 }
+
+upsOutputWatts OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS Watts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured real output power in watts."
+    ::= { upsOutputEntry 4 }
+
+upsOutputSource OBJECT-TYPE
+    SYNTAX  INTEGER {
+    other(1),
+    none(2),
+    normal(3),				-- normal, single UPS module output
+    bypass(4),
+    battery(5),
+    booster(6),				-- Single or Double Boost, line-interactive UPSs only
+    reducer(7),				-- Buck, line-interactive UPSs only
+    parallelCapacity(8),		-- normal enhanced by Parallel for Capacity operation
+    parallelRedundant(9),		-- normal enhanced by Redundant Parallel operation
+    highEfficiencyMode(10)		-- normal enhanced by High Efficiency mode
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The present source of output power.  The enumeration
+	       none(2) indicates that there is no source of output
+	       power (and therefore no output power), for example,
+	       the system has opened the output breaker."
+    ::= { upsOutput  5 }
+
+
+-- ====================================================================================
+--
+--  ups                     OBJECT IDENTIFIER       ::= {cpqPower 3}  
+--  upsBypass               OBJECT IDENTIFIER       ::= { ups 5 }
+--  UPS Bypass group
+--  OID= .1.3.6.1.4.1.232.165.3.5
+
+upsBypassFrequency OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS 0.1 Hertz
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The bypass frequency in tenths of Hz."
+    ::= { upsBypass 1 }
+
+upsBypassNumPhases OBJECT-TYPE
+    SYNTAX INTEGER (0..6)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of lines in the UPS bypass table."
+    ::= { upsBypass 2 }
+
+upsBypassTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF UpsBypassEntry
+    ACCESS not-accessible 
+    STATUS mandatory
+    ::= { upsBypass 3 }
+
+upsBypassEntry OBJECT-TYPE
+    SYNTAX UpsBypassEntry
+    ACCESS not-accessible 
+    STATUS mandatory
+    DESCRIPTION
+	"Entry in the UpsBypassTable."
+    INDEX { upsBypassPhase }
+    ::= { upsBypassTable  1 }
+
+UpsBypassEntry ::= SEQUENCE {
+    upsBypassPhase    INTEGER,
+    upsBypassVoltage  INTEGER
+    }
+
+upsBypassPhase OBJECT-TYPE
+    SYNTAX INTEGER (0..6)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Bypass Phase, index for the table."
+    ::= { upsBypassEntry 1 }
+
+upsBypassVoltage OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Volts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured UPS bypass voltage in volts."
+    ::= { upsBypassEntry 2 }
+
+
+-- ====================================================================================
+--
+--  ups                     OBJECT IDENTIFIER       ::= {cpqPower 3}  
+--  upsEnvironment          OBJECT IDENTIFIER       ::= { ups 6 }
+--  UPS Environment group
+--  OID= .1.3.6.1.4.1.232.165.3.6
+
+upsEnvAmbientTemp OBJECT-TYPE
+    SYNTAX  INTEGER (-100..200)   -- UNITS Degrees Centigrade
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The reading of the ambient temperature in the vicinity of the 
+        UPS or SNMP agent."
+    ::= { upsEnvironment  1 }
+
+upsEnvAmbientLowerLimit OBJECT-TYPE
+    SYNTAX  INTEGER (-100..200)   -- UNITS Degrees Centigrade
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "The Lower Limit of the ambient temperature; if UpsEnvAmbientTemp 
+	falls below this value, the UpsAmbientTempBad alarm will occur."
+    ::= { upsEnvironment  2 }
+
+upsEnvAmbientUpperLimit OBJECT-TYPE
+    SYNTAX  INTEGER (-100..200)   -- UNITS Degrees Centigrade
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "The Upper Limit of the ambient temperature; if UpsEnvAmbientTemp 
+	rises above this value, the UpsAmbientTempBad alarm will occur.
+	This value should be greater than UpsEnvAmbientLowerLimit."
+    ::= { upsEnvironment  3 }
+
+upsEnvAmbientHumidity OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)   -- UNITS %
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The reading of the ambient humidity in the vicinity of the 
+        UPS or SNMP agent."
+    ::= { upsEnvironment  4 }
+
+upsEnvRemoteTemp OBJECT-TYPE
+    SYNTAX  INTEGER (-100..200)   -- UNITS Degrees Centigrade
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The reading of a remote temperature sensor connected to the  
+        UPS or SNMP agent."
+    ::= { upsEnvironment  5 }
+
+upsEnvRemoteHumidity OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)   -- UNITS %
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The reading of a remote humidity sensor connected to the 
+        UPS or SNMP agent."
+    ::= { upsEnvironment  6 }
+
+--
+-- The Environmental Contact Sensing Table
+--      Contains the table for monitoring all contacts (digital 
+--      inputs).
+--
+
+upsEnvNumContacts OBJECT-TYPE
+    SYNTAX  INTEGER (1..1024)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The number of Contacts in the UpsContactsTable.
+		This object indicates the number of rows in the 
+		UpsContactsTable."
+    ::= { upsEnvironment  7 }
+
+upsContactsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF UpsContactsTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	   "A list of Contact Sensing table entries.  
+		The number of entries is given by the value of 
+		UpsEnvNumContacts."
+    ::= { upsEnvironment  8 }
+
+upsContactsTableEntry OBJECT-TYPE
+    SYNTAX  UpsContactsTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	   "An entry containing information applicable 
+		to a particular Contact input."
+    INDEX   { upsContactIndex }
+    ::= { upsContactsTable  1 }
+
+UpsContactsTableEntry ::= SEQUENCE {
+    upsContactIndex     INTEGER,
+    upsContactType      INTEGER,
+    upsContactState     INTEGER,
+    upsContactDescr     DisplayString
+    }
+
+upsContactIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..1024)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The Contact identifier; identical to the Contact Number."
+    ::= { upsContactsTableEntry  1 }
+
+upsContactType OBJECT-TYPE
+    SYNTAX  INTEGER {
+    normallyOpen(1),            -- or Input Normally High
+    normallyClosed(2),          -- or Input Normally Low
+    anyChange(3),               -- No normal Open/Closed state
+    notUsed(4)                  -- Contact not in service
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+	   "The normal state for this contact.  The 'other'
+	    state is the Active state for generating the UpstdContactActiveNotice
+	    trap.  If anyChange(3) is selected, then this trap is sent
+        any time the contact changes to either Open or Closed.
+        No traps are sent if the Contact is set to notUsed(4).
+        In many cases, the configuration for Contacts may be done by other 
+        means, so this object may be read-only."
+    ::= { upsContactsTableEntry  2 }
+
+upsContactState OBJECT-TYPE
+    SYNTAX  INTEGER {
+    open(1),
+    closed(2),
+    openWithNotice(3),
+    closedWithNotice(4)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The current state of the Contact input;
+		the value is based on the open/closed input state 
+		and the setting for UpsContactType.
+		When entering the openWithNotice(3) and closedWithNotice(4) 
+        states, no entries added to the UpsAlarmTable, but
+        the UpstdContactActiveNotice trap is sent."
+    ::= { upsContactsTableEntry  3 }
+
+upsContactDescr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..63))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+	   "A label identifying the Contact.  This object should be
+	    set by the administrator."
+    ::= { upsContactsTableEntry  4 }
+
+upsEnvRemoteTempLowerLimit OBJECT-TYPE
+    SYNTAX  INTEGER (-100..200)   -- UNITS Degrees Centigrade
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "The Lower Limit of the remote temperature; if UpsEnvRemoteTemp 
+	falls below this value, the UpsRemoteTempBad alarm will occur."
+    ::= { upsEnvironment  9 }
+
+upsEnvRemoteTempUpperLimit OBJECT-TYPE
+    SYNTAX  INTEGER (-100..200)   -- UNITS Degrees Centigrade
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "The Upper Limit of the remote temperature; if UpsEnvRemoteTemp 
+	rises above this value, the UpsRemoteTempBad alarm will occur.
+	This value should be greater than UpsEnvRemoteTempLowerLimit."
+    ::= { upsEnvironment  10 }
+
+upsEnvRemoteHumidityLowerLimit OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)   -- UNITS %
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "The Lower Limit of the remote humidity reading; if UpsEnvRemoteHumidity
+	falls below this value, the UpsRemoteHumidityBad alarm will occur."
+    ::= { upsEnvironment  11 }
+
+upsEnvRemoteHumidityUpperLimit OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)   -- UNITS %
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "The Upper Limit of the remote humidity reading; if UpsEnvRemoteHumidity 
+	rises above this value, the UpsRemoteHumidityBad alarm will occur.
+	This value should be greater than UpsEnvRemoteHumidityLowerLimit."
+    ::= { upsEnvironment  12 }
+
+
+-- ====================================================================================
+--
+--  ups                     OBJECT IDENTIFIER       ::= {cpqPower 3}  
+--  upsTest                 OBJECT IDENTIFIER       ::= { ups 7 }
+--  UPS Test group
+--  OID= .1.3.6.1.4.1.232.165.3.7
+
+
+upsTestBattery OBJECT-TYPE
+    SYNTAX INTEGER { startTest (1) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Setting this variable to startTest initiates the
+	 battery test.  All other set values are invalid."
+    ::= { upsTest 1 }
+
+upsTestBatteryStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+    unknown (1),
+    passed (2),
+    failed (3),
+    inProgress (4),
+    notSupported (5),
+    inhibited (6),
+	scheduled (7)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Reading this enumerated value gives an indication of the
+	 UPS Battery test status."
+    ::= { upsTest 2 }
+
+upsTestTrap OBJECT-TYPE
+    SYNTAX INTEGER { startTestTrap (1) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Setting startTestTrap to 1 will initiate a TrapTest
+	 is sent out from HPMM.  All other set values are invalid."
+    ::= { upsTest 3 }
+
+-- ====================================================================================
+--
+--  ups                     OBJECT IDENTIFIER       ::= {cpqPower 3}  
+--  upsControl              OBJECT IDENTIFIER       ::= { ups 8 }
+--  UPS Control group
+--  OID= .1.3.6.1.4.1.232.165.3.8
+
+
+upsControlOutputOffDelay OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)    -- UNITS seconds
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Setting this value to other than zero will cause the UPS
+	 output to turn off after the number of seconds.
+	 Setting it to 0 will cause an attempt to abort a pending
+	 shutdown."
+    ::= { upsControl 1 }
+
+upsControlOutputOnDelay OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)    -- UNITS seconds
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Setting this value to other than zero will cause the UPS
+	 output to turn on after the number of seconds.
+	 Setting it to 0 will cause an attempt to abort a pending
+	 startup."
+    ::= { upsControl 2 }
+
+upsControlOutputOffTrapDelay OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)    -- UNITS seconds
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"When UpsControlOutputOffDelay reaches this value, a trap will
+	 be sent."
+    ::= { upsControl 3 }
+
+upsControlOutputOnTrapDelay OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)    -- UNITS seconds
+    ACCESS read-write
+    STATUS deprecated
+    DESCRIPTION
+	"When UpsControlOutputOnDelay reaches this value, a
+	 UpsOutputOff trap will be sent."
+    ::= { upsControl 4 }
+
+upsControlToBypassDelay OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)    -- UNITS seconds
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Setting this value to other than zero will cause the UPS
+	 output to go to Bypass after the number of seconds.
+		 If the Bypass is unavailable, this may cause the UPS
+		 to not supply power to the load.
+	 Setting it to 0 will cause an attempt to abort a pending
+	 shutdown."
+    ::= { upsControl 5 }
+
+upsLoadShedSecsWithRestart OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)    -- UNITS seconds
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Setting this value will cause the UPS output to turn off 
+	 after the set number of seconds, then restart (after a UPS-defined
+	 'down time') when the utility is again available.  
+	 Unlike UpsControlOutputOffDelay, which might or might not,
+       this object always maps to the XCP 0x8A Load Dump & Restart command,
+       so the desired shutdown and restart behavior is guaranteed to happen.
+	 Once set, this command cannot be aborted.
+       This is the preferred Control object to use when performing an On
+       Battery OS Shutdown."
+    ::= { upsControl 6 }
+
+
+-- ====================================================================================
+--
+--  ups                     OBJECT IDENTIFIER       ::= {cpqPower 3}  
+--  upsConfig               OBJECT IDENTIFIER       ::= { ups 9 }
+--  UPS Config group
+--  OID= .1.3.6.1.4.1.232.165.3.9
+
+
+upsConfigOutputVoltage OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Volts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The nominal UPS Output voltage per phase in volts."
+    ::= { upsConfig 1 }
+
+upsConfigInputVoltage OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Volts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The nominal UPS Input voltage per phase in volts."
+    ::= { upsConfig 2 }
+
+upsConfigOutputWatts OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS Watts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The nominal UPS available real power output in watts."
+    ::= { upsConfig  3}
+
+upsConfigOutputFreq OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS 0.1 Hertz
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The nominal output frequency in tenths of Hz."
+    ::= { upsConfig 4 }
+
+upsConfigDateAndTime OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..22))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Date and time information for the UPS.  Setting this variable
+	 will initiate a set UPS date and time to this value.  Reading
+	 this variable will return the UPS time and date.  This value
+	 is not referenced to sysUpTime.  It is simply the clock value
+	 from the UPS real time clock.
+	 Format is as follows: MM/DD/YYYY:HH:MM:SS."
+    ::= { upsConfig 5 }
+
+upsConfigLowOutputVoltageLimit OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Volts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Lower limit for acceptable Output Voltage, per the UPS
+	 specifications."
+    ::= { upsConfig 6 }
+
+upsConfigHighOutputVoltageLimit OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Volts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Upper limit for acceptable Output Voltage, per the UPS
+	 specifications."
+    ::= { upsConfig 7 }
+
+
+-- ====================================================================================
+--
+--  ups                     OBJECT IDENTIFIER       ::= {cpqPower 3}  
+--  upsRecep                OBJECT IDENTIFIER       ::= { ups 10 }
+--  UPS Recep group
+--
+--  (Note that the terms Receptacle, Outlet, and Load Group are used interchangeably
+--  here and all mean "one of a set of controllable, power-switched outputs")
+--  OID= .1.3.6.1.4.1.232.165.3.10
+
+
+upsNumReceptacles OBJECT-TYPE
+	SYNTAX INTEGER (0..64)
+	ACCESS read-only
+	STATUS mandatory
+    DESCRIPTION
+	"The number of independently controllable Receptacles, as described in the 
+	UpsRecepTable."
+	::= { upsRecep 1 }
+	
+upsRecepTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF UpsRecepEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION "The Aggregate Object with number of entries equal to
+		    NumReceptacles and including the UpsRecep group."
+	::={ upsRecep 2 }
+	
+upsRecepEntry OBJECT-TYPE
+	SYNTAX UpsRecepEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION "The Recep table entry, etc."
+	INDEX { upsRecepIndex }
+	::= { upsRecepTable 1 }
+
+UpsRecepEntry ::= SEQUENCE {
+    upsRecepIndex                   INTEGER,
+    upsRecepStatus                  INTEGER,
+    upsRecepOffDelaySecs            INTEGER,
+    upsRecepOnDelaySecs             INTEGER,
+    upsRecepAutoOffDelay            INTEGER,
+    upsRecepAutoOnDelay             INTEGER,
+    upsRecepShedSecsWithRestart     INTEGER 
+	}
+	
+upsRecepIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..64)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	"The number of the Receptacle. Serves as index for Receptacle table."
+	::= { upsRecepEntry 1 }
+	
+upsRecepStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+		on(1), off(2), pendingOff(3), pendingOn(4), unknown(5) }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+    "The Recep Status 1=On/Close, 2=Off/Open, 3=On w/Pending Off, 
+    4=Off w/Pending ON, 5=Unknown."
+	::={ upsRecepEntry 2 }		
+
+upsRecepOffDelaySecs OBJECT-TYPE
+    SYNTAX INTEGER (-1..2147483647)    -- UNITS seconds
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"The Delay until the Receptacle is turned Off.  Setting 
+	this value to other than -1 will cause the UPS output to 
+	turn off after the number of seconds (0 is immediately).  
+	Setting it to -1 will cause an attempt to abort a pending shutdown.
+	When this object is set while the UPS is On Battery, it is not necessary
+	to set UpsRecepOnDelaySecs, since the outlet will turn back on 
+	automatically when power is available again."
+	::= { upsRecepEntry 3 }
+
+upsRecepOnDelaySecs OBJECT-TYPE
+    SYNTAX INTEGER (-1..2147483647)    -- UNITS seconds
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	" The Delay until the Receptacle is turned On.  Setting 
+	this value to other than -1 will cause the UPS output to 
+	turn on after the number of seconds (0 is immediately).  
+	Setting it to -1 will cause an attempt to abort a pending restart."
+	::={ upsRecepEntry 4 }
+
+
+upsRecepAutoOffDelay OBJECT-TYPE
+    SYNTAX INTEGER (-1..32767)    -- UNITS seconds
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"The delay after going On Battery until the Receptacle is 
+	automatically turned Off.  A value of -1 means that this Output should 
+	never be turned Off automatically, but must be turned Off only by command.
+	Values from 0 to 30 are valid, but probably innappropriate.
+	The AutoOffDelay can be used to prioritize loads in the event of a prolonged 
+	power outage; less critical loads will turn off earlier to extend battery 
+	time for the more critical loads. If the utility power is restored before the 
+	AutoOff delay counts down to 0 on an outlet, that outlet will not turn Off."
+	::= { upsRecepEntry 5 }
+	
+upsRecepAutoOnDelay OBJECT-TYPE
+    SYNTAX INTEGER (-1..32767)    -- UNITS seconds
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Seconds delay after the Outlet is signaled to turn On before the Output is
+	Automatically turned ON. A value of -1 means that this Output should never
+	be turned On automatically, but only when specifically commanded to do so.
+	A value of 0 means that the Receptacle should come On immediately
+	at power-up or for an On command."
+	::= { upsRecepEntry 6 }
+
+-- UpsRecepAutoOnDelay has three purposes: 
+-- 1. To coordinate the automatic startup of various outlets, when the normal 
+-- auto-sequencing of 1 second per outlet is not adequate. For example, they may 
+-- be used to power up hard disk arrays before CPU units are started. 
+-- 2. To force additional 'Down Time' during UpsRecepOffDelaySecs commands, for 
+-- equipment to be reset, when the standard 'Down Time' is not long enough. 
+-- 3. For the -1 value, to ensure that loads won?t be powered until commanded, 
+-- following power-up or a UpsRecepOffDelaySecs command.
+
+upsRecepShedSecsWithRestart OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)    -- UNITS seconds
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Setting this value will cause the UPS output to turn off 
+	 after the set number of seconds, then restart (after a UPS-defined
+	 'down time') when the utility is again available.  
+	 Unlike UpsRecepOffDelaySecs, which might or might not,
+       this object always maps to the XCP 0x8A Load Dump & Restart command,
+       so the desired shutdown and restart behavior is guaranteed to happen.
+	 Once set, this command cannot be aborted."
+    ::= { upsRecepEntry 7 }
+
+
+
+-- ====================================================================================
+--
+--  ups                     OBJECT IDENTIFIER       ::= {cpqPower 3}  
+--  upsTopology             OBJECT IDENTIFIER       ::= { ups 11 }
+--  UPS Topology group
+--  OID= .1.3.6.1.4.1.232.165.3.11
+
+
+upsTopologyType OBJECT-TYPE
+	SYNTAX INTEGER (0..32767)
+	ACCESS read-only
+	STATUS mandatory
+    DESCRIPTION
+	"Value which denotes the type of UPS by its power topology.  Values are the
+	same as those described in the XCP Topology block's Overall Topology field."
+	::= { upsTopology 1 }
+
+upsTopoMachineCode OBJECT-TYPE
+	SYNTAX INTEGER (0..32767)
+	ACCESS read-only
+	STATUS mandatory
+    DESCRIPTION
+  	"ID Value which denotes the Compaq/HP model of the UPS for software.  Values 
+	are the same as those described in the XCP Configuration block's Machine Code 
+	field."
+	::= { upsTopology 2 }
+
+upsTopoUnitNumber OBJECT-TYPE
+	SYNTAX INTEGER (0..64)
+	ACCESS read-only
+	STATUS mandatory
+    DESCRIPTION
+	"Identifies which unit and what type of data is being reported.
+	A value of 0 means that this MIB information comes from the top-level system 
+	view (eg, manifold module or system bypass cabinet reporting total system 
+	output).  Standalone units also use a value of 0, since they are the 'full 
+	system' view.
+	A value of 1 or higher indicates the number of the module in the system
+	which is reporting only its own data in the HP MIB objects."
+	::= { upsTopology 3 }
+
+upsTopoPowerStrategy OBJECT-TYPE
+    SYNTAX INTEGER {
+		highAlert(1), standard(2), enableHighEfficiency(3),
+		immediateHighEfficiency(4) }
+	ACCESS read-write
+	STATUS mandatory
+    DESCRIPTION
+	"Value which denotes which Power Strategy is currently set for the UPS.
+	The values are:
+	highAlert(1) - The UPS shall optimize its operating state to maximize its 
+			power-protection levels.  This mode will be held for at most 24 hours.
+	standard(2) - Balanced, normal power protection strategy. UPS will not enter 
+			HE operating mode from this setting.
+	enableHighEfficiency(3) - The UPS is enabled to enter HE operating mode to 
+			optimize its operating state to maximize its efficiency, when 
+			conditions change to permit it (as determined by the UPS).
+	forceHighEfficiency(4) - If this value is permitted to be Set for this UPS,
+			and if conditions permit, requires the UPS to enter High Efficiency 
+			mode now, without delay (for as long as utility conditions permit).
+			After successfully set to forceHighEfficiency(4), 
+			UpsTopoPowerStrategy changes to value enableHighEfficiency(3).
+	UpsOutputSource will indicate if the UPS status is actually operating in 
+	High Efficiency mode."
+	::= { upsTopology 4 }
+
+-- ====================================================================================
+--                        Power Distribution Rack
+-- ====================================================================================
+-- 
+--  pdr                     OBJECT IDENTIFIER       ::= {cpqPower 4}  
+--  pdrIdent                OBJECT IDENTIFIER       ::= { pdr 1 }
+--  PDR identification group
+--  OID= .1.3.6.1.4.1.232.165.4.1
+
+pdrName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"The string identify the device."
+    ::= { pdrIdent 1 }
+
+pdrModel OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device Model."
+    ::= { pdrIdent 2 }
+
+pdrManufacturer OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device Manufacturer Name (e.g. Hewlett-Packard)."
+    ::= { pdrIdent 3 }
+
+pdrFirmwareVersion OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The firmware revision level of the device."
+    ::= { pdrIdent 4 }
+
+pdrPartNumber OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The device part number."
+    ::= { pdrIdent 5 }
+
+pdrSerialNumber OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The PDR's serial number."
+    ::= { pdrIdent 6 }
+
+pdrVARating OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS Volts-amps
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The VA Rating of this PDR (all phases)"
+    ::= { pdrIdent 7 }
+
+pdrNominalOutputVoltage OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Volts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The nominal Output Voltage may differ from the nominal 
+         Input Voltage if the PDR has an input transformer"
+    ::= { pdrIdent 8 }
+
+pdrNumPhases OBJECT-TYPE
+    SYNTAX INTEGER (1..3)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of phases for this PDR"
+    ::= { pdrIdent 9 }
+
+pdrNumPanels OBJECT-TYPE
+    SYNTAX INTEGER (0..100)  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of panels or subfeeds in this PDR"
+    ::= { pdrIdent 10 }
+
+pdrNumBreakers OBJECT-TYPE
+    SYNTAX INTEGER (0..100)  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of breakers in this PDR"
+    ::= { pdrIdent 11 }
+
+-- ====================================================================================
+--
+--  pdr                     OBJECT IDENTIFIER       ::= {cpqPower 4}  
+--  pdrPanel                OBJECT IDENTIFIER       ::= { pdr 2 }
+--  PDR Panel Meters
+--  OID= .1.3.6.1.4.1.232.165.4.2
+
+pdrPanelTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PdrPanelEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "Aggregate Object with number of entries equal to
+	         pdrNumPanels"
+    ::= { pdrPanel 1 }
+
+pdrPanelEntry OBJECT-TYPE
+    SYNTAX PdrPanelEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION 
+           "The panel table entry containing all power parameters 
+            for each panel."
+    INDEX { pdrPanelIndex }
+    ::= { pdrPanelTable 1 }
+
+PdrPanelEntry ::= SEQUENCE {
+    pdrPanelIndex             INTEGER,
+    pdrPanelFrequency         INTEGER,
+    pdrPanelPower             INTEGER,
+    pdrPanelRatedCurrent      INTEGER,
+    pdrPanelMonthlyKWH        INTEGER,
+    pdrPanelYearlyKWH         INTEGER,
+    pdrPanelTotalKWH          INTEGER,
+    pdrPanelVoltageA          INTEGER,
+    pdrPanelVoltageB          INTEGER,
+    pdrPanelVoltageC          INTEGER,
+    pdrPanelCurrentA          INTEGER,
+    pdrPanelCurrentB          INTEGER,
+    pdrPanelCurrentC          INTEGER,
+    pdrPanelLoadA             INTEGER,
+    pdrPanelLoadB             INTEGER,
+    pdrPanelLoadC             INTEGER
+    }
+
+pdrPanelIndex OBJECT-TYPE
+    SYNTAX INTEGER	(0..10)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Index for the pdrPanelEntry table."
+    ::= { pdrPanelEntry 1}
+
+pdrPanelFrequency OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS  0.1 Hertz
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The present frequency reading for the panel voltage."
+    ::= { pdrPanelEntry 2 }
+
+pdrPanelPower OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)  -- Units 0.1 KW
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The present power of the panel."
+    ::= { pdrPanelEntry 3 }
+
+pdrPanelRatedCurrent OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)  -- Units 0.1 A
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The present rated current of the panel."
+    ::= { pdrPanelEntry 4 }
+
+pdrPanelMonthlyKWH OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)  -- Units 0.01 KWH
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The accumulated KWH for this panel since the beginning of this 
+         calendar month or since the last reset."
+    ::= { pdrPanelEntry 5 }
+
+pdrPanelYearlyKWH OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)  -- Units 0.01 KWH
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The accumulated KWH for this panel since the beginning of this 
+         calendar year or since the last reset."
+    ::= { pdrPanelEntry 6 }
+
+pdrPanelTotalKWH OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)  -- Units 0.01 KWH
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The accumulated KWH for this panel since it was put into service 
+         or since the last reset."
+    ::= { pdrPanelEntry 7 }
+
+pdrPanelVoltageA OBJECT-TYPE
+    SYNTAX INTEGER  (0..2147483647)  -- UNITS 0.1 V
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured panel output voltage."
+    ::= {pdrPanelEntry 8}
+
+pdrPanelVoltageB OBJECT-TYPE
+    SYNTAX INTEGER  (0..2147483647)  -- UNITS 0.1 V
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured panel output voltage."
+    ::= {pdrPanelEntry 9}
+
+pdrPanelVoltageC OBJECT-TYPE
+    SYNTAX INTEGER  (0..2147483647)  -- UNITS 0.1 V
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured panel output voltage."
+    ::= {pdrPanelEntry 10}
+
+pdrPanelCurrentA OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS 0.1 A
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured panel output current."
+    ::= {pdrPanelEntry 11}
+
+pdrPanelCurrentB OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS 0.1 A
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured panel output current."
+    ::= {pdrPanelEntry 12}
+
+pdrPanelCurrentC OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS 0.1 A
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured panel output current."
+    ::= {pdrPanelEntry 13}
+
+pdrPanelLoadA OBJECT-TYPE
+    SYNTAX INTEGER (0..200)  -- UNITS 0.1 percent
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The percentage of load is the ratio of each output 
+         current to the rated output current to the panel."
+    ::= {pdrPanelEntry 14}
+
+pdrPanelLoadB OBJECT-TYPE
+    SYNTAX INTEGER (0..200)  -- UNITS 0.1 percent
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The percentage of load is the ratio of each output  
+         current to the rated output current to the panel."
+    ::= {pdrPanelEntry 15}
+
+pdrPanelLoadC OBJECT-TYPE
+    SYNTAX INTEGER (0..200)  -- UNITS 0.1 percent
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The percentage of load is the ratio of each output  
+         current to the rated output current to the panel."
+    ::= {pdrPanelEntry 16}
+
+
+-- ====================================================================================
+--
+--  pdr                     OBJECT IDENTIFIER       ::= {cpqPower 4}  
+--  pdrBreaker              OBJECT IDENTIFIER       ::= { pdr 3 }
+--  Based on physical installed Breakers
+--  OID= .1.3.6.1.4.1.232.165.4.3
+
+pdrBreakerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PdrBreakerEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "List of breaker table entries.  The number of entries 
+            is given by pdrNumBreakers for this panel."
+    ::= { pdrBreaker 1 }
+
+pdrBreakerEntry OBJECT-TYPE
+    SYNTAX  PdrBreakerEntry 
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "An entry containing information applicable to a
+            particular output breaker of a particular panel."
+    INDEX   { pdrPanelIndex, pdrBreakerIndex }
+    ::= { pdrBreakerTable 1 }
+
+PdrBreakerEntry ::= SEQUENCE {
+    pdrBreakerIndex           	INTEGER,
+    pdrBreakerPanel	      	INTEGER,
+    pdrBreakerNumPosition      	INTEGER,
+    pdrBreakerNumPhases       	INTEGER,
+    pdrBreakerNumSequence      	INTEGER,
+    pdrBreakerRatedCurrent    	INTEGER,
+    pdrBreakerMonthlyKWH      	INTEGER,
+    pdrBreakerYearlyKWH       	INTEGER,
+    pdrBreakerTotalKWH        	INTEGER,
+    pdrBreakerCurrent         	INTEGER,
+    pdrBreakerCurrentPercent  	INTEGER,
+    pdrBreakerPower           	INTEGER,
+    pdrBreakerPercentWarning    INTEGER,
+    pdrBreakerPercentOverload   INTEGER
+    }
+
+pdrBreakerIndex OBJECT-TYPE
+    SYNTAX  INTEGER 	(0..200)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The index of breakers. 42 breakers in each panel,
+            arranged in odd and even columns"
+    ::= { pdrBreakerEntry 1 }
+
+pdrBreakerPanel OBJECT-TYPE
+    SYNTAX  INTEGER	
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The index of panel that these breakers are installed on."
+    ::= { pdrBreakerEntry 2 }
+
+pdrBreakerNumPosition OBJECT-TYPE
+    SYNTAX  INTEGER	
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The position of this breaker in the panel, 1-phase breaker
+	    or n-m breaker for 2-phase or n-m-k breaker for 3-phase."
+    ::= { pdrBreakerEntry 3 }
+
+pdrBreakerNumPhases OBJECT-TYPE
+    SYNTAX  INTEGER	
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The number of phase for this particular breaker."
+    ::= { pdrBreakerEntry 4 }
+
+pdrBreakerNumSequence OBJECT-TYPE
+    SYNTAX  INTEGER	
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The sequence of this breaker. i.e. 1 for single phase
+	    1,2 for 2-phase or 1,2,3 for 3-phase."
+    ::= { pdrBreakerEntry 5 }
+
+pdrBreakerRatedCurrent OBJECT-TYPE
+    SYNTAX  INTEGER	-- UNITS 0.1 A
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The rated current in Amps for this particular breaker."
+    ::= { pdrBreakerEntry 6 }
+
+pdrBreakerMonthlyKWH OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)  -- Units 0.01 KWH
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The accumulated KWH for this breaker since the beginning of this 
+         calendar month or since the last reset."
+    ::= { pdrBreakerEntry 7 }
+
+pdrBreakerYearlyKWH OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)  -- Units 0.01 KWH
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The accumulated KWH for this breaker since the beginning of this 
+         calendar year or since the last reset."
+    ::= { pdrBreakerEntry 8 }
+
+pdrBreakerTotalKWH OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)  -- Units 0.01 KWH
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The accumulated KWH for this breaker since it was put into service 
+         or since the last reset."
+    ::= { pdrBreakerEntry 9 }
+
+pdrBreakerCurrent OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS RMS 0.1 A
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured output current for this breaker Current."
+    ::= { pdrBreakerEntry 10 }
+
+pdrBreakerCurrentPercent OBJECT-TYPE
+    SYNTAX INTEGER (0..200)  -- UNITS 0.1 Percent
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The ratio of output current over rated 
+         current for each breaker."
+    ::= { pdrBreakerEntry 11 }
+
+pdrBreakerPower OBJECT-TYPE
+    SYNTAX INTEGER   -- UNITS Watts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The power for this breaker in Watts."
+    ::= { pdrBreakerEntry 12 }
+
+pdrBreakerPercentWarning OBJECT-TYPE
+    SYNTAX  INTEGER (0..200)	-- UNITS 0.1 Percent
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The percentage of Warning set for this breaker."
+    ::= { pdrBreakerEntry 13 }
+
+pdrBreakerPercentOverload OBJECT-TYPE
+    SYNTAX  INTEGER	-- UNITS 0.1 Percent
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The percentage of Overload set for this breaker."
+    ::= { pdrBreakerEntry 14 }
+
+-- ====================================================================================
+--                         modular smart PDU
+-- ====================================================================================
+--
+--  mpdu                     OBJECT IDENTIFIER       ::= {cpqPower 5}    
+--  mpduIdent                OBJECT IDENTIFIER       ::= { mpdu 1 }
+--  MPDU (or iPDU) identification group
+--  OID= .1.3.6.1.4.1.232.165.5.1
+
+mpduNumMPDU OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of Modular PDUs (Core) detected."
+    ::= { mpduIdent 1 }
+    
+mpduIdentTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MpduIdentEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "Indexed by mpduNumMPDU. So aggregate objects for each entry equal to mpduNumMPDU 
+                 before go to the next entry. i.e if 4 MPDU detected, display 4 indexes, 4 
+                 Manufacturers, 4 Models..., start with 1."
+    ::= { mpduIdent 2 }
+
+mpduIdentEntry OBJECT-TYPE
+    SYNTAX MpduIdentEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "The table entry containing the identifications of each MPDU as well 
+                 as names of PDR panel, location of MPDU in a Data Center."
+    INDEX { mpduIdentIndex }
+    ::= { mpduIdentTable 1 }
+
+MpduIdentEntry ::= SEQUENCE {
+	mpduIdentIndex			INTEGER,
+	mpduManufacturer		DisplayString,
+	mpduModel			DisplayString,
+	mpduName			DisplayString,
+	mpduFirmwareVersion		DisplayString,
+	mpduHardwareVersion		DisplayString,
+	mpduPartNumber			DisplayString,
+	mpduSerialNumber		DisplayString,
+	mpduUUID			DisplayString,
+	mpduIP				DisplayString,
+	mpduMACAddress			DisplayString,
+	mpduControlStatus		DisplayString,
+	mpduRegion			DisplayString,
+	mpduType			DisplayString,
+	mpduPowerRating			DisplayString,
+	mpduInputRating			DisplayString,
+	mpduInputPlug			DisplayString,
+	mpduNumBreakers			INTEGER, 
+	mpduNumOutlet			INTEGER, 
+	mpduUHeight			INTEGER,
+	mpduRedundantStatus		DisplayString,
+	mpduNumSmartExtBar		INTEGER, 
+	mpduPanelName			DisplayString,
+	mpduPanelBreakerName		DisplayString,
+	mpduPanelBreakerRating		DisplayString,
+	mpduACFeedName			DisplayString,
+	mpduFloorName			DisplayString,
+	mpduRoomName			DisplayString,
+	mpduRow				DisplayString,
+	mpduRowPosition			DisplayString,
+	mpduRackName			DisplayString,
+        mpduRackHeight			DisplayString,
+        mpduRackID			DisplayString,
+	mpduUPosition			INTEGER,
+	mpduPairedPDUUUID		DisplayString,
+	mpduPairedPDUIP			DisplayString,
+	mpduInstalledLocation		INTEGER,
+      	mpduTotalPowerWatt		INTEGER,
+      	mpduTotalPowerVA  		INTEGER,
+      	mpduTotalPercentLoad    	INTEGER,
+        mpduRegionalNominalVoltage	DisplayString
+    }
+
+mpduIdentIndex OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Index for the MpduIdentEntry table. Start with 1"
+    ::= { mpduIdentEntry 1 }
+
+mpduManufacturer OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           " The Core PDU manufacturer. StringLength=[21]"
+    ::= { mpduIdentEntry 2 }
+
+mpduModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The Core PDU model, marketing name. StringLength=[40]."
+    ::= { mpduIdentEntry 3 }
+
+mpduName OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The Core PDU name, descriptive name or hostname. StringLength=[16]."
+    ::= { mpduIdentEntry 4 }
+
+mpduFirmwareVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The Core PDU firmware version(s). StringLength=[12]."
+    ::= { mpduIdentEntry 5 }
+
+mpduHardwareVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The Core PDU hardware version. StringLength=[8]."
+    ::= { mpduIdentEntry 6 }
+
+mpduPartNumber OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The Core PDU part number. StringLength=[21]."
+    ::= { mpduIdentEntry 7 }
+
+mpduSerialNumber OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The PDU external serial number. StringLength=[21]."
+    ::= { mpduIdentEntry 8 }
+
+mpduUUID OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The PDU's UUID equals PN add SN. StringLength=[17]."
+    ::= { mpduIdentEntry 9 }
+
+mpduIP OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The PDU's assigned IP. StringLength=[16]."
+    ::= { mpduIdentEntry 10 }
+
+mpduMACAddress OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The Core PDU MAC address. StringLength=[18]."
+    ::= { mpduIdentEntry 11 }
+
+mpduControlStatus OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The Core PDU Control Status: master or slave units.
+              StringLength=[31]."
+    ::= { mpduIdentEntry 12 }
+
+mpduRegion OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The PDU's Region: NA, Intl, Japan... StringLength=[7]."
+    ::= { mpduIdentEntry 13 }
+
+mpduType OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The PDU's Type: Delta, Wye, single, Wye+lowline.
+            StringLength=[24]."
+    ::= { mpduIdentEntry 14 }
+
+mpduPowerRating OBJECT-TYPE
+    SYNTAX  DisplayString  
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The PDU's Power Rating in KVA (Name Plate). Value is presented 
+            in 1/100 of the KVA. i.e. 1750 means 17.50 KVA"
+    ::= { mpduIdentEntry 15 }
+
+mpduInputRating OBJECT-TYPE
+    SYNTAX  DisplayString  
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The PDU's Input Current Rating in A (Name Plate)"
+    ::= { mpduIdentEntry 16 }
+
+mpduInputPlug OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The PDU's Input Plug: IEC60309 516P6,NEMA L15-30P...
+             StringLength=[16]."
+    ::= { mpduIdentEntry 17 }
+
+mpduNumBreakers OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "The number of breakers used in each MPDU (6 by default)."
+    ::= { mpduIdentEntry 18 }
+
+mpduNumOutlet OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "The number of outlets of each MPDU (6 by default)."
+    ::= { mpduIdentEntry 19 }
+
+mpduUHeight OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "The MPDU U Height 1U or 2 U (1U by default)."
+    ::= { mpduIdentEntry 20 }
+
+mpduRedundantStatus OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "Status of Core PDU in paired or not: Stand-alone or Redundant.
+             StringLength=[12]."
+    ::= { mpduIdentEntry 21 }
+
+mpduNumSmartExtBar OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "total number of  detected Smart Sticks connecting to each PDU."
+    ::= { mpduIdentEntry 22 }
+
+mpduPanelName OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "Name of Panel that was entered by customer in GUI.
+             StringLength=[50]."
+    ::= { mpduIdentEntry 23 }
+
+mpduPanelBreakerName OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "Name of breakers or Panel Position entered by customer in GUI.
+             StringLength=[50]."
+    ::= { mpduIdentEntry 24 }
+
+mpduPanelBreakerRating OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "Breaker rating of the PDR Panel."
+    ::= { mpduIdentEntry 25 }
+
+mpduACFeedName OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "it would be A, B, Red, or White...
+             StringLength=[50]."
+    ::= { mpduIdentEntry 26 }
+
+mpduFloorName OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "Name of building floor entered by customer in GUI.
+             StringLength=[50]."
+    ::= { mpduIdentEntry 27 }
+
+mpduRoomName OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "Name of the room entered by customer in GUI. StringLength=[50]."
+    ::= { mpduIdentEntry 28 }
+
+mpduRow OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "Data Center Row entered by customer in GUI.
+             StringLength=[11]."
+    ::= { mpduIdentEntry 29 }
+
+mpduRowPosition OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "Position in Row entered by customer in GUI. Null will be returned 
+            if not detected. StringLength=[11]."
+    ::= { mpduIdentEntry 30 }
+
+mpduRackName OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "Name of the Rack entered by customer in GUI. Null will be returned 
+            if not detected. StringLength=[50]."
+    ::= { mpduIdentEntry 31 }
+
+mpduRackHeight OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "Rack Type (22U, 42U, 50U...). Null will be returned if not detected.
+             StringLength=[3]."
+    ::= { mpduIdentEntry 32 }
+
+mpduRackID OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "An unique ID to identify a rack, i.e. Rack SN. Null will be returned if 
+            not detected. StringLength=[50]."
+    ::= { mpduIdentEntry 33 }
+
+mpduUPosition OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "PDU Rack bottom U Start position, core U position. Null will be returned if not detected."
+    ::= { mpduIdentEntry 34 }
+
+mpduPairedPDUUUID OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "UUID of the PDU paired with this one. Null will be returned if not detected.
+             StringLength=[50]."
+    ::= { mpduIdentEntry 35 }
+
+mpduPairedPDUIP OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "IP address of the PDU paired with this one. Null will be returned if not detected.
+             StringLength=[16]."
+    ::= { mpduIdentEntry 36 }
+
+mpduInstalledLocation OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "0=Left 0U side area or rack frame, 1= Right 0U side area or rack frame, 2= front RETMA rail, 
+            3=back RETMA rail) - spatial location. A value of -1 will be returned if not detected."
+    ::= { mpduIdentEntry 37 }
+
+mpduTotalPowerWatt OBJECT-TYPE
+    SYNTAX  INTEGER   -- Units Watts
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    	"The total power for the whole iPDU in Watts.  A value 
+         of -1 will be returned if the power is unable to be calculated."
+    ::= { mpduIdentEntry 38 }
+
+mpduTotalPowerVA OBJECT-TYPE
+    SYNTAX  INTEGER   -- Units VA
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    	"The total power for the whole iPDU in VA.  A value 
+         of -1 will be returned if the power is unable to be calculated."
+    ::= { mpduIdentEntry 39 }
+
+mpduTotalPercentLoad OBJECT-TYPE
+    SYNTAX INTEGER   --UNITS 0.1 Percents
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The whole iPDU's load in percent of rated capacity. Value is 
+         presented in 1/10 of the percentage i.e. 125 is 12.5%.  A value 
+         of -1 will be returned if the current is unable to be measured."
+    ::= { mpduIdentEntry 40 }
+
+mpduRegionalNominalVoltage OBJECT-TYPE
+    SYNTAX  DisplayString  
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "value is either America(208V), Japan(202V) or blank for International Model"
+    ::= { mpduIdentEntry 41 }
+
+-- ====================================================================================
+--
+--  mpdu                     OBJECT IDENTIFIER       ::= {cpqPower 5}      
+--  mpduOutput               OBJECT IDENTIFIER       ::= { mpdu 2 }
+--  MPDU (or iPDU) Output Measurements (6 Load Segments by default)
+--  OID= .1.3.6.1.4.1.232.165.5.2
+
+mpduOutputTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MpduOutputEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+           "Indexed by mpduNumOutlet. So aggregate objects for each entry equal to (mpduNumMPDU 
+            multiplies mpduNumOutlet) before go to the next entry. i.e if 4 MPDU detected, 
+            display 6x4 indexes, 6x4 OutputStatus, 6x4 OutputBreakerRating...start with 1."
+    ::= { mpduOutput 1 }
+
+mpduOutputEntry OBJECT-TYPE
+    SYNTAX MpduOutputEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION 
+           "The output table entry containing the voltage, current, PF,
+            percent load, VA, Watts for the Modular PDU."
+ 
+    INDEX { mpduIdentIndex, mpduOutputIndex }
+    ::= { mpduOutputTable 1 }
+
+MpduOutputEntry ::= SEQUENCE {
+      mpduOutputIndex  			INTEGER,
+      mpduOutputStatus    		DisplayString,
+      mpduOutputBreakerRating  		INTEGER,
+      mpduOutputSmartDevice		DisplayString,
+      mpduOutputPercentLoad    		INTEGER,
+      mpduOutputVoltage    		INTEGER,
+      mpduOutputCurrent   		INTEGER,
+      mpduOutputPowerVA	    		INTEGER,
+      mpduOutputPowerWatt      		INTEGER,
+      mpduOutputPowerFactor    		INTEGER,
+      mpduOutputWarningThreshold    	INTEGER,
+      mpduOutputCriticalThreshold    	INTEGER,
+      mpduOutputPowerWattHour 		INTEGER
+    }
+
+mpduOutputIndex OBJECT-TYPE
+    SYNTAX INTEGER  (0..100)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Index for the MpduOutputEntry table."
+    ::= { mpduOutputEntry 1 }
+
+mpduOutputStatus OBJECT-TYPE
+    SYNTAX  	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+    "The overall status of the device: off, on, problem. StringLength=[7]."
+    ::= { mpduOutputEntry 2 }
+
+mpduOutputBreakerRating OBJECT-TYPE
+    SYNTAX	INTEGER    --UNITS A
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "The rating of each MPDU Output in Ampere."
+    ::= { mpduOutputEntry 3 }
+
+mpduOutputSmartDevice OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "A smart cord device detected: False, True. StringLength=[5]."
+    ::= { mpduOutputEntry 4 }
+
+mpduOutputPercentLoad OBJECT-TYPE
+    SYNTAX INTEGER	 --UNITS 0.1 Percents
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The MPDU's each output load in percent of rated capacity. Value is 
+         presented in 1/10 of the percentage i.e. 125 is 12.5%.  A value 
+         of -1 will be returned if the current is unable to be measured."
+    ::= { mpduOutputEntry 5 }
+
+mpduOutputVoltage OBJECT-TYPE
+    SYNTAX INTEGER    -- UNITS RMS 0.1 Volts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured output voltage from the PDU meters in volts. Value is 
+         presented in 1/10 of the Volt i.e. 2095 is 209.5 V.  A value 
+         of -1 will be returned if the voltage is unable to be measured."
+    ::= { mpduOutputEntry 6 }
+
+mpduOutputCurrent OBJECT-TYPE
+    SYNTAX INTEGER    -- UNITS RMS 0.01 Amp
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured output current from the PDU meters in amps. Value is 
+         presented in 1/100 of the Ampere i.e. 175 is 1.75 A.  A value 
+         of -1 will be returned if the current is unable to be measured."
+    ::= { mpduOutputEntry 7 }
+
+mpduOutputPowerVA OBJECT-TYPE
+    SYNTAX  INTEGER   -- Units VA
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    	"The total VA load (VI) measured on the PDU in VA.  A value 
+         of -1 will be returned if the power is unable to be calculated."
+    ::= { mpduOutputEntry 8 }
+
+mpduOutputPowerWatt OBJECT-TYPE
+    SYNTAX  INTEGER   -- Units Watts
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    	"The total power load measured on the PDU in Watts.  A value 
+         of -1 will be returned if the power is unable to be calculated."
+    ::= { mpduOutputEntry 9 }
+
+mpduOutputPowerFactor OBJECT-TYPE
+    SYNTAX INTEGER    -- 0.01 UNITS
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The power factor is presented in 1/100 of the unit i.e.
+         98 is 0.98.  A value of -1 will be returned if the power factor is unable 
+         to be measured."
+    ::= { mpduOutputEntry 10 }
+
+mpduOutputWarningThreshold OBJECT-TYPE
+    SYNTAX INTEGER    -- Percents
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Report the User-set threshhold limit for Warning in percentage"
+    ::= { mpduOutputEntry 11 }
+
+mpduOutputCriticalThreshold OBJECT-TYPE
+    SYNTAX INTEGER    -- Percents
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Report the User-set threshhold limit for Critical in percentage"
+    ::= { mpduOutputEntry 12 }
+
+mpduOutputPowerWattHour OBJECT-TYPE
+    SYNTAX  INTEGER   -- Units Watt-Hour (WH)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    	"Support Billing Grade Energy Metering in Watt-Hour.  A value 
+         of -1 will be returned if the power is unable to be calculated."
+    ::= { mpduOutputEntry 13 }
+
+
+-- ====================================================================================
+--  
+--  mpdu                     OBJECT IDENTIFIER       ::= {cpqPower 5}    
+--  mpduDeviceIdent          OBJECT IDENTIFIER       ::= { mpdu 3 }
+--  ID of all Devices (power extension bars, servers) connected to MPDU Core's outlets
+--  Smart Devices are those blades/servers/storage encl with smart power cord
+--  OID= .1.3.6.1.4.1.232.165.5.3
+
+    
+mpduDeviceIdentTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MpduDeviceIdentEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "Indexed by mpduNumOutlet. So aggregate objects for each entry equal 
+                 to (mpduNumMPDU multiplies mpduNumOutlet) before go to the next entry. 
+                 i.e if 4 MPDU detected, display 6x4 indexes, 6x4 mpduDeviceStatus, 6x4 
+                 DeviceUIDStatus...start with 1."
+    ::= { mpduDeviceIdent 1 }
+
+mpduDeviceIdentEntry OBJECT-TYPE
+    SYNTAX MpduDeviceIdentEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "The ident table entry containing the name, model, 
+                 manufacturer, firmware version, part number... for
+                 each smart device, null value for unknown device."
+
+    INDEX { mpduIdentIndex, mpduDeviceIdentIndex }
+    ::= { mpduDeviceIdentTable 1 }
+
+MpduDeviceIdentEntry ::= SEQUENCE {
+      mpduDeviceIdentIndex         INTEGER,
+      mpduDeviceStatus             DisplayString,
+      mpduDeviceUIDStatus          DisplayString,
+      mpduDeviceNumOutlet          INTEGER,
+      mpduDeviceUHeight            INTEGER,
+      mpduDevicePowerRating        DisplayString,
+      mpduDeviceManufacturer       DisplayString,
+      mpduDeviceType		   DisplayString,
+      mpduDeviceModel              DisplayString,
+      mpduDeviceName               DisplayString,
+      mpduDeviceFirmwareVersion    DisplayString,
+      mpduDeviceHardwareVersion    DisplayString,
+      mpduDevicePartNumber         DisplayString,
+      mpduDeviceSerialNumber       DisplayString,
+      mpduDeviceUUID		   DisplayString,
+      mpduDeviceIP	           DisplayString,
+      mpduDeviceMAC	           DisplayString,
+      mpduDevicePSUSlotNo          INTEGER,
+      mpduDeviceUPosition          INTEGER,
+      mpduDeviceDetectionThreshold INTEGER
+     }
+
+mpduDeviceIdentIndex OBJECT-TYPE
+    SYNTAX INTEGER  (0..100)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Index is based on the total number of Smart Extension Bars plus
+         smart devices (with smart power cord i.e. blades) detected."
+    ::= { mpduDeviceIdentEntry 1 }
+
+mpduDeviceStatus OBJECT-TYPE
+    SYNTAX  	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+    "The overall status of the device: off, on, problem. StringLength=[8]."
+    ::= { mpduDeviceIdentEntry 2 }
+
+mpduDeviceUIDStatus OBJECT-TYPE
+    SYNTAX  	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+    "The overall status of the device UID: off, on, blink. StringLength=[8]."
+    ::= { mpduDeviceIdentEntry 3 }
+
+mpduDeviceNumOutlet OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "The number of outlets of detected the device.  This variable 
+            indicates the number of rows in the breakers table. Default is 5"
+    ::= { mpduDeviceIdentEntry 4 }
+
+mpduDeviceUHeight OBJECT-TYPE
+    SYNTAX	INTEGER		--UNITS 0.01
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "The Unit height of ext bar or device. Some device supports non-integer. 
+            Present value x100, when read back, divided by 100 to get 2 decimal points."
+    ::= { mpduDeviceIdentEntry 5 }
+
+mpduDevicePowerRating OBJECT-TYPE
+    SYNTAX DisplayString 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The device's Power Rating in VA. Null will be returned if not detected.
+         StringLength=[8]."
+    ::= { mpduDeviceIdentEntry 6 }
+
+mpduDeviceManufacturer OBJECT-TYPE
+    SYNTAX DisplayString  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device Manufacturer Name (e.g. Hewlett-Packard).
+	 Null will be returned if not detected. StringLength=[16]."
+    ::= { mpduDeviceIdentEntry 7 }
+
+mpduDeviceType OBJECT-TYPE
+    SYNTAX DisplayString  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device's Type: Ext Bar, server, or network device...
+          StringLength=[16]."
+    ::= { mpduDeviceIdentEntry 8 }
+
+mpduDeviceModel OBJECT-TYPE
+    SYNTAX DisplayString  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device Model is Managed or Non-managed Ext Bar. 
+         Null will be returned if not detected. StringLength=[24]."
+    ::= { mpduDeviceIdentEntry 9 }
+
+mpduDeviceName OBJECT-TYPE
+    SYNTAX DisplayString  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The string identify the Device. i.e. 'BAR#1' (descriptive name)
+         Null will be returned if not detected. StringLength=[32]."
+    ::= { mpduDeviceIdentEntry 10 }
+
+mpduDeviceFirmwareVersion OBJECT-TYPE
+    SYNTAX DisplayString  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The firmware revision level of Sm Ext Bar. Null will be returned if 
+         not detected. StringLength=[8]."
+    ::= { mpduDeviceIdentEntry 11 }
+
+mpduDeviceHardwareVersion OBJECT-TYPE
+    SYNTAX DisplayString  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The hardware version of Sm Ext Bar. Null will be returned if not 
+         detected. StringLength=[8]."
+    ::= { mpduDeviceIdentEntry 12 }
+
+mpduDevicePartNumber OBJECT-TYPE
+    SYNTAX DisplayString  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The device's part number. Null will be returned if not detected.
+          StringLength=[21]."
+    ::= { mpduDeviceIdentEntry 13 }
+
+mpduDeviceSerialNumber OBJECT-TYPE
+    SYNTAX DisplayString  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The device's serial number. Null will be returned if not detected.
+          StringLength=[21]."
+    ::= { mpduDeviceIdentEntry 14 }
+
+mpduDeviceUUID OBJECT-TYPE
+    SYNTAX DisplayString  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The device's UUID. Null will be returned if not detected.
+          StringLength=[37]."
+    ::= { mpduDeviceIdentEntry 15 }
+
+mpduDeviceIP OBJECT-TYPE
+    SYNTAX DisplayString  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The device's IP Address. Null will be returned if not detected.
+          StringLength=[16]."
+    ::= { mpduDeviceIdentEntry 16 }
+
+mpduDeviceMAC OBJECT-TYPE
+    SYNTAX DisplayString  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The device mgmt processor MAC Address. Null will be returned if 
+         not detected. StringLength=[18]."
+    ::= { mpduDeviceIdentEntry 17 }
+
+mpduDevicePSUSlotNo OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "Device power supply logical slot number."
+    ::= { mpduDeviceIdentEntry 18 }
+
+mpduDeviceUPosition OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "Device U start position."
+    ::= { mpduDeviceIdentEntry 19 }
+
+mpduDeviceDetectionThreshold OBJECT-TYPE
+    SYNTAX	INTEGER   -- UNITS .001 Amp
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "Read device detection threshold between 10 and 50mA."
+    ::= { mpduDeviceIdentEntry 20 }
+
+
+-- ====================================================================================
+--
+--  mpdu                     OBJECT IDENTIFIER       ::= {cpqPower 5}    
+--  mpduSmExtBarOutlet       OBJECT IDENTIFIER       ::= { mpdu 4 }
+--  Outputs measurements for each Smart Extension Bar's Outlet and
+--  Identification of Smart Device connected to Smart Extension Bar.
+--  OID= .1.3.6.1.4.1.232.165.5.4
+
+
+mpduSmExtBarOutletTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF MpduSmExtBarOutletEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "Indexed by mpduDeviceNumOutlet. So aggregate objects for each entry equal to 
+            (mpduNumMPDU multiplies mpduNumOutlet multiplies mpduDeviceNumOutlet) before 
+            go to the next entry. i.e if 4 MPDU detected, display 5x6x4 indexes, 5x6x4
+            mpduSmExtBarOutletStatus, 5x6x4 mpduSmExtBarOutletUIDStatus...start with 1."
+    ::= { mpduSmExtBarOutlet 1 }
+
+mpduSmExtBarOutletEntry OBJECT-TYPE
+    SYNTAX  MpduSmExtBarOutletEntry 
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "Entries contain status, measurements for each outlet (no PowerVA)
+            Display null if it can't be measured or no device detected."
+    INDEX   { mpduIdentIndex, mpduOutputIndex, mpduSmExtBarOutletIndex }
+    ::= { mpduSmExtBarOutletTable 1 }
+
+MpduSmExtBarOutletEntry ::= SEQUENCE {
+	mpduSmExtBarOutletIndex       		  INTEGER,
+      	mpduSmExtBarOutletStatus      		  DisplayString,
+      	mpduSmExtBarOutletUIDStatus      	  DisplayString,
+      	mpduSmExtBarOutletRating   		  INTEGER,
+      	mpduSmExtBarOutletVoltage     		  INTEGER,
+      	mpduSmExtBarOutletCurrent     		  INTEGER,
+      	mpduSmExtBarOutletPowerWatt     	  INTEGER,
+      	mpduSmExtBarOutletPowerFactor   	  INTEGER,
+      	mpduSmExtBarOutletDeviceName      	  DisplayString,    
+      	mpduSmExtBarOutletDeviceUUID      	  DisplayString,
+      	mpduSmExtBarOutletDeviceProduct   	  DisplayString,
+      	mpduSmExtBarOutletDeviceIP		  DisplayString,
+      	mpduSmExtBarOutletAutoDiscovered  	  INTEGER,
+      	mpduSmExtBarOutletDeviceMAC		  DisplayString,    
+      	mpduSmExtBarOutletDeviceSN        	  DisplayString,    
+      	mpduSmExtBarOutletDevicePSSlotNo  	  INTEGER,
+      	mpduSmExtBarOutletDeviceUPosition	  INTEGER,
+      	mpduSmExtBarOutletDeviceUHeight		  INTEGER,
+      	mpduSmExtBarOutletDeviceInstalledLocation INTEGER,
+        mpduSmExtBarOutletPowerWattHour     	  INTEGER
+    }
+
+mpduSmExtBarOutletIndex OBJECT-TYPE
+    SYNTAX  INTEGER  (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The Index of Smart Extension Bar."
+    ::= { mpduSmExtBarOutletEntry 1 }
+
+mpduSmExtBarOutletStatus OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The overall status of the Smart Extension Bar's outlet: off, on, problem...
+             StringLength=[3]."
+    ::= { mpduSmExtBarOutletEntry 2 }
+
+mpduSmExtBarOutletUIDStatus OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The overall status of the Smart Extension Bar's UID: off, on, blink...
+             StringLength=[8]."
+    ::= { mpduSmExtBarOutletEntry 3 }
+
+mpduSmExtBarOutletRating OBJECT-TYPE
+    SYNTAX  INTEGER	-- UNITS A
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "Sm Ext Bar Outlet's Rating in Amp.  A value of -1 will be returned 
+            if the stick is unable to detect. StringLength=[8]."
+    ::= { mpduSmExtBarOutletEntry 4 }
+
+mpduSmExtBarOutletVoltage OBJECT-TYPE
+    SYNTAX  INTEGER	-- UNITS 0.1 Volts
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The SM Ext Bar voltage in volts. Value is presented 1/10 of the Volt 
+            i.e. 2098 means 209.8 V.  A value of -1 will be returned if the voltage is unable 
+            to be measured."
+    ::= { mpduSmExtBarOutletEntry 5 }
+
+mpduSmExtBarOutletCurrent OBJECT-TYPE
+    SYNTAX  INTEGER	-- UNITS 0.01 Amps
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The SM Ext Bar current draw in Amps. Value is presented in 1/100 of the Ampere
+          i.e. 127 means 1.27 A.  A value of -1 will be returned if the current is unable 
+           to be measured."
+    ::= { mpduSmExtBarOutletEntry 6 }
+
+mpduSmExtBarOutletPowerWatt OBJECT-TYPE
+    SYNTAX  INTEGER	-- UNITS Watts
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The Sm Ext Bar's Power measured in Watts. A value of -1 will be returned if the 
+            power is unable to be measured."
+    ::= { mpduSmExtBarOutletEntry 7 }
+
+mpduSmExtBarOutletPowerFactor OBJECT-TYPE
+    SYNTAX  INTEGER    -- 0.01 UNITS
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The outlet's power factor in 0.01 unit. It is presented in 1/100 of the unit. 
+          i.e. 98 means 0.98.  A value of -1 will be returned if the voltage is unable 
+            to be measured."
+    ::= { mpduSmExtBarOutletEntry 8 }
+
+mpduSmExtBarOutletDeviceName OBJECT-TYPE
+    SYNTAX DisplayString  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device (Blade/Server/Storage) Name that connects to this 
+         Sm Ext Bar Outlet. Null will be returned if not detected. StringLength=[50]."
+    ::= { mpduSmExtBarOutletEntry 9 }
+
+mpduSmExtBarOutletDeviceUUID OBJECT-TYPE
+    SYNTAX DisplayString  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device (Blade/Server/Storage) UUID that connects to this 
+         Sm Ext Bar Outlet. Null will be returned if not detected. StringLength=[37]."
+    ::= { mpduSmExtBarOutletEntry 10 }
+
+mpduSmExtBarOutletDeviceProduct OBJECT-TYPE
+    SYNTAX DisplayString  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device (Blade/Server/Storage) Model that connects to this 
+         Sm Ext Bar Outlet. Null will be returned if not detected. StringLength=[40]."
+    ::= { mpduSmExtBarOutletEntry 11 }
+
+mpduSmExtBarOutletDeviceIP OBJECT-TYPE
+    SYNTAX DisplayString  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device (Blade/Server/Storage) IP of iLO that connects to this 
+         Sm Ext Bar Outlet. Null will be returned if not detected. StringLength=[16]."
+    ::= { mpduSmExtBarOutletEntry 12 }
+
+mpduSmExtBarOutletAutoDiscovered OBJECT-TYPE
+    SYNTAX  INTEGER    
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "Boolean values of 0 or 1. 1 means this Sm Ext Bar Outlet is able to get information 
+            from a blade with smart power supply (auto discovery is enabled)..."
+    ::= { mpduSmExtBarOutletEntry 13 }
+
+mpduSmExtBarOutletDeviceMAC OBJECT-TYPE
+    SYNTAX DisplayString  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device (Blade/Server/Storage) MAC address that connects to this 
+         Sm Ext Bar Outlet. Null will be returned if not detected. StringLength=[18]."
+    ::= { mpduSmExtBarOutletEntry 14 }
+
+mpduSmExtBarOutletDeviceSN OBJECT-TYPE
+    SYNTAX DisplayString  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device (Blade/Server/Storage) Serial Number that connects to this 
+         Sm Ext Bar Outlet. Null will be returned if not detected. StringLength=[21]."
+    ::= { mpduSmExtBarOutletEntry 15 }
+
+mpduSmExtBarOutletDevicePSSlotNo OBJECT-TYPE
+    SYNTAX INTEGER  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device (Blade/Server/Storage) Power Supply' Slot Number that connects to this 
+         Sm Ext Bar Outlet. A value of -1 will be returned if not detected."
+    ::= { mpduSmExtBarOutletEntry 16 }
+
+
+mpduSmExtBarOutletDeviceUPosition OBJECT-TYPE
+    SYNTAX  INTEGER   
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "Device U start position. A value of -1 will be returned if not detected."
+    ::= { mpduSmExtBarOutletEntry 17 }
+
+mpduSmExtBarOutletDeviceUHeight OBJECT-TYPE
+    SYNTAX  INTEGER  	--UNITS 0.01
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "Device U height. Enter -1 if not detected. Some device supports non-integer. 
+            Present value x100, when read back, divided by 100 to get 2 decimal points."
+    ::= { mpduSmExtBarOutletEntry 18 }
+
+mpduSmExtBarOutletDeviceInstalledLocation OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+           "0=Left 0U side area or rack frame, 1= Right 0U side area or rack frame, 2= front RETMA rail, 
+            3=back RETMA rail) - spatial location. A value of -1 will be returned if not detected."
+    ::= { mpduSmExtBarOutletEntry 19 }
+
+mpduSmExtBarOutletPowerWattHour OBJECT-TYPE
+    SYNTAX  INTEGER	-- UNITS Watt-Hour (WH)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The Sm Ext Bar's Power measured in Watt-Hour support Billing Grade Energy Metering. 
+            A value of -1 will be returned if the power is unable to be measured."
+    ::= { mpduSmExtBarOutletEntry 20 }
+
+
+
+-- ====================================================================================
+--				OFFLINE UPS
+-- ====================================================================================
+--
+-- oups                     OBJECT IDENTIFIER       ::= {cpqPower 6}  
+-- oupsIdent                OBJECT IDENTIFIER       ::= { oups 1 }
+-- Offline UPS - UPS Identification
+-- OID= .1.3.6.1.4.1.232.165.6.1
+
+oupsIdentManufacturer OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..31))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The UPS Manufacturer Name (e.g. Hewlett-Packard)."
+    ::= { oupsIdent 1 }
+
+oupsIdentModel OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The UPS Model such as R-1500 G3."
+    ::= { oupsIdent 2 }
+
+oupsIdentSystemFWVersion OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Display System firmware version."
+    ::= { oupsIdent 3 }
+
+oupsIdentPowerModuleFWVersion OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Display Power Module firmware version."
+    ::= { oupsIdent 4 }
+
+oupsIdentOemCode OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"A binary code indicating vendor. This should be a ?0x0c? for HP"
+    ::= { oupsIdent 5 }
+
+oupsIdentSerialNumber OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Get the UPS Serial Number (i.e. B00123456W)."
+    ::= { oupsIdent 6 }
+
+oupsIdentPartNumber OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Get the UPS Part Number (i.e. 204451-B21)."
+    ::= { oupsIdent 7 }
+
+
+-- ====================================================================================
+--
+-- oups                     OBJECT IDENTIFIER       ::= {cpqPower 6}  
+-- oupsBattery              OBJECT IDENTIFIER       ::= { oups 2 }
+-- Offline UPS - Battery Parameters
+-- OID= .1.3.6.1.4.1.232.165.6.2
+
+oupsBatTimeRemaining OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS seconds
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Battery run time in seconds before UPS turns off due
+	 to low battery."
+    ::= { oupsBattery 1 }
+
+oupsBatVoltage OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS Volts DC
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Read the Total Battery voltage."
+    ::= { oupsBattery 2 }
+
+oupsBatCapacity OBJECT-TYPE
+    SYNTAX INTEGER (0..100)    -- UNITS percent
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Battery percent charge."
+    ::= { oupsBattery 3 }
+
+oupsBatAbmStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+      batteryCharging(1),	--(include Battery Boosting and Battery Floating)
+      batteryDischarging(2),
+      batteryResting(3),
+      batteryTesting(4),
+      notAvailable(5)		--(ACC mode, no BP connected)
+	}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Gives the status of the Advanced Battery Management; example:
+	 batteryResting(3) is the state when the battery is fully charged and none of 
+         the other actions (charging/discharging/floating) is being done."
+    ::= { oupsBattery 4 }
+
+oupsBatTestStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+       unknown(1),     
+       passed(2),
+       failed(3),
+       inProgress(4),
+       notSupported(5),
+       inhibited(6)
+          }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Battery Test Status. UPS will support schedule testing only
+         7, 14, 30, or 60 days. Default is 14 days."
+    ::= { oupsBattery 5 }
+
+oupsBatLatestTestDate OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Get time and date of the latest battery test."
+    ::= { oupsBattery  6 }
+
+oupsBatReplacementDateBP1 OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Get the battery replacement date of BP1."
+    ::= { oupsBattery  7 }
+
+oupsBatReplacementDateBP2 OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Get the battery replacement date of BP2."
+    ::= { oupsBattery  8 }
+
+oupsBatToACDelay OBJECT-TYPE
+    SYNTAX INTEGER (0..150)    -- UNITS ms
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Get delay time switching from Battery mode to AC mode in ms.
+        Default is 0ms, unit is increased per 100ms"
+    ::= { oupsBattery  9 }
+
+oupsBatChargeDelay OBJECT-TYPE
+    SYNTAX INTEGER (0..9999)    -- UNITS seconds
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Get battery charge delay in second. Default is 0 (random)
+        unit is increased per 10sec."
+    ::= { oupsBattery  10 }
+
+oupsBatNumModules OBJECT-TYPE
+    SYNTAX INTEGER (0..2)   
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Number of battery modules detected by power unit."
+    ::= { oupsBattery  11 }
+
+oupsBatModel OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))   
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Report 1U, 2U, or 3U Battery Pack, both BPs must be the same model."
+    ::= { oupsBattery  12 }
+
+oupsBatChargingPowerLevelUtility OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))   
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "3 charging power levels: 1100W, 555W, 190W."
+    ::= { oupsBattery  13 }
+
+oupsBatChargingPowerLevelGenerator OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))   
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "4 charging power levels: 1100W, 555W, 190W, No Charge."
+    ::= { oupsBattery  14 }
+
+oupsBatSharedConfig OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))   
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "expect 3 values for shared BP configuration: PU single, PU master, PU slave."
+    ::= { oupsBattery  15 }
+
+oupsBatPackFWVerBP1 OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))   
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Display Battery Pack 1 FW version."
+    ::= { oupsBattery  16 }
+
+oupsBatPackFWVerBP2 OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))   
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Display Battery Pack 2 FW version."
+    ::= { oupsBattery  17 }
+
+
+-- ====================================================================================
+--
+-- oups                     OBJECT IDENTIFIER       ::= {cpqPower 6}  
+-- oupsInput                OBJECT IDENTIFIER       ::= { oups 3 }
+-- Offline UPS - Input Parameters
+-- OID= .1.3.6.1.4.1.232.165.6.3
+
+
+oupsInputFrequency OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS 0.1 Hertz
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The utility line frequency in tenths of Hz."
+    ::= { oupsInput 1 }
+
+oupsInputLineBads OBJECT-TYPE
+    SYNTAX INTEGER (0..6)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of times the Input was out of tolerance
+	in voltage or frequency."
+    ::= { oupsInput 2 }
+
+oupsInputNumPhases OBJECT-TYPE
+    SYNTAX INTEGER (0..6)
+    ACCESS read-only
+    STATUS mandatory
+    ::= { oupsInput 3 }
+
+oupsInputTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF OupsInputEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "Aggregate Object with number of entries equal to
+	         NumPhases and including the UpsInput group."
+    ::= { oupsInput 4 }
+
+oupsInputEntry OBJECT-TYPE
+    SYNTAX OupsInputEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "The input table entry containing the current, voltage, etc."
+    INDEX { oupsInputPhase }
+    ::= { oupsInputTable 1 }
+
+OupsInputEntry ::= SEQUENCE {
+    oupsInputPhase        INTEGER,
+    oupsInputVoltage      INTEGER,
+    oupsInputCurrent      INTEGER,
+    oupsInputWatts        INTEGER
+    }
+
+oupsInputPhase OBJECT-TYPE
+    SYNTAX INTEGER  (0..6)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of the phase. Serves as index for input table."
+    ::= { oupsInputEntry 1 }
+
+oupsInputVoltage OBJECT-TYPE
+    SYNTAX INTEGER  (0..2147483647)  -- UNITS RMS Volts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured input voltage from the UPS meters in volts."
+    ::= { oupsInputEntry 2 }
+
+oupsInputCurrent OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Amp
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured input current from the UPS meters in amps."
+    ::= { oupsInputEntry 3 }
+
+oupsInputWatts OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS Watts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured input power in watts."
+    ::= { oupsInputEntry 4 }
+
+oupsInputPowerFactor OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- 0.01 UNITS
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured real Input power factor with 2 decimals."
+    ::= { oupsInput 5 }
+
+oupsInputDBType OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	 "Read the input Distribution Box type: 1- 480V-Y (US-5W NEMA plugs),
+          2- 480V-V (US-5W IEC plugs), 3- 415V-Y (EURO-5W IEC plugs),
+          4- 415V-Y (US/INTL-5W IEC plugs), 5- 380V-Y (China-5W hardwired)."
+    ::= { oupsInput 6 }
+
+oupsInputUpperVoltage OBJECT-TYPE
+    SYNTAX INTEGER (0..999)  -- UNITS in V
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Read the upper voltage range, 5 to 10 percent above the nominal voltage.
+         Factory default is 10 percent."
+    ::= { oupsInput 7 }
+
+oupsInputLowerVoltage OBJECT-TYPE
+    SYNTAX INTEGER (0..999)  -- UNITS in V
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Read the lower voltage range, 5 to 15 percent below the nominal voltage.
+         Factory default is -15 percent."
+    ::= { oupsInput 8 }
+
+oupsGeneratorDetection OBJECT-TYPE
+    SYNTAX INTEGER { 
+    onGenerator(1),    -- ATS sets 1 to tell generator is switched on
+    offGenerator(2),   -- ATS sets 2 to tell generator is switched off
+    noAction(3)        -- set 3 for no action (default)
+    }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"ATS sets a value of 1 to signal UPS that a generator is started so the UPS will  
+         charge Battery Pack using a different setting while it's on generator (intent to 
+         save all power to back up for the load)."
+    ::= { oupsInput 9 }
+
+oupsInputWithGenerator OBJECT-TYPE
+    SYNTAX INTEGER {
+    woGenerator(1), 		-- Input Source is on Utility only (know for sure no Gen)
+    withGenerator(2)		-- Input Source could be from Utility or Generator
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"A value of 1 when user known for sure Input has no Generator backup; a value
+         of 2 tells Input Source could be from either Utility or Generator."
+    ::= { oupsInput 10 }
+
+
+-- ====================================================================================
+--
+-- oups                     OBJECT IDENTIFIER       ::= {cpqPower 6}  
+-- oupsOutput               OBJECT IDENTIFIER       ::= { oups 4 }
+-- Offline UPS Output Parameters
+-- OID= .1.3.6.1.4.1.232.165.6.4
+
+oupsOutputLoad OBJECT-TYPE
+    SYNTAX INTEGER (0..200)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The total UPS output load in percentage of rated capacity."
+    ::= { oupsOutput 1 }
+
+oupsOutputFrequency OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS 0.1 Hertz
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured UPS output frequency in tenths of Hz."
+    ::= { oupsOutput 2 }
+
+oupsOutputNumPhases OBJECT-TYPE
+    SYNTAX INTEGER  (0..6)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of metered output phases, serves as the table index."
+    ::= { oupsOutput 3 }
+
+oupsOutputTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF OupsOutputEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	"The Aggregate Object with number of entries equal to NumPhases
+	and including the UpsOutput group."
+    ::= { oupsOutput 4 }
+
+oupsOutputEntry OBJECT-TYPE
+    SYNTAX OupsOutputEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	"Output Table Entry containing voltage, current, etc."
+    INDEX { oupsOutputPhase }
+    ::= { oupsOutputTable 1 }
+
+OupsOutputEntry ::= SEQUENCE {
+    oupsOutputPhase       	INTEGER,
+    oupsOutputVoltage     	INTEGER,
+    oupsOutputCurrent     	INTEGER,
+    oupsOutputWatts       	INTEGER,
+    oupsOutputLoadPerPhase	INTEGER
+    }
+
+oupsOutputPhase OBJECT-TYPE
+    SYNTAX INTEGER (0..6)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number {1..3} of the output phase."
+    ::= { oupsOutputEntry 1 }
+
+oupsOutputVoltage OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Volts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured output voltage from the UPS metering in volts."
+    ::= { oupsOutputEntry 2 }
+
+oupsOutputCurrent OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS RMS Amp
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured UPS output current in amps."
+    ::= { oupsOutputEntry 3 }
+
+oupsOutputWatts OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- UNITS Watts
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured real output power in watts."
+    ::= { oupsOutputEntry 4 }
+
+oupsOutputLoadPerPhase OBJECT-TYPE
+    SYNTAX INTEGER (0..200)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The UPS output load per phase in percentage of rated capacity."
+    ::= { oupsOutputEntry 5 }
+
+oupsOutputPowerFactor OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)  -- 0.01 UNITS
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The measured real output power factor with 2 decimals."
+    ::= { oupsOutput 5 }
+
+oupsOutputSource OBJECT-TYPE
+    SYNTAX  INTEGER {
+    acSource(1),           	-- Either from Utility or Generator
+    battery(2)                	-- Power comes from Battery Source
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "Indicate the source that UPS operating from when providing output."
+    ::= { oupsOutput 6 }
+
+
+-- ====================================================================================
+--
+-- oups                     OBJECT IDENTIFIER       ::= {cpqPower 6}  
+-- oupsMonitor              OBJECT IDENTIFIER       ::= { oups 5 }
+-- Offline UPS Control Parameters
+-- OID= .1.3.6.1.4.1.232.165.6.5
+
+oupsMonitorAmbientTemp OBJECT-TYPE
+    SYNTAX  INTEGER (-100..200)   -- UNITS in F
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The reading of the internal PU Ambient temperature."
+    ::= { oupsMonitor  1 }
+
+oupsMonitorBypassSCRTemp OBJECT-TYPE
+    SYNTAX  INTEGER (-100..200)   -- UNITS in F
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The reading of the internal PU Bypass SCR temperature."
+    ::= { oupsMonitor  2 }
+
+oupsMonitorDDTemp OBJECT-TYPE
+    SYNTAX  INTEGER (-100..200)   -- UNITS in F
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The reading of the internal PU DD temperature."
+    ::= { oupsMonitor  3 }
+
+oupsMonitorInverterTemp OBJECT-TYPE
+    SYNTAX  INTEGER (-100..200)   -- UNITS in F
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The reading of the internal PU DD temperature."
+    ::= { oupsMonitor  4 }
+
+oupsMonitorChargerTemp OBJECT-TYPE
+    SYNTAX  INTEGER (-100..200)   -- UNITS in F
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The reading of the internal PU Charger temperature."
+    ::= { oupsMonitor  5 }
+
+oupsMonitorBP1Temp OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..63))   -- UNITS in F
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Display Battery Pack 1 Temeprature in F. If BP1 not connected the PU will
+        return 255 and displayed as -not connect-"
+    ::= { oupsMonitor  6 }
+
+oupsMonitorBP2Temp OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..63))   -- UNITS in F  
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Display Battery Pack 2 Temperature in F. If BP2 not connected the PU will
+        return 255 and displayed as -not connect-"
+    ::= { oupsMonitor  7 }
+
+oupsMonitorRestartDelay OBJECT-TYPE
+    SYNTAX  INTEGER (1..150)  -- UNITS in ms
+    ACCESS  read-only     --the last 2 digit SN is the default ms delay
+    STATUS  mandatory
+    DESCRIPTION
+       "The reading of the AC Turn On Delay (Restart Delay). The value can be
+        changed via front LCD Menu or inserted Module GUI. Default is 0ms, unit is 
+        increased per 100ms."
+    ::= { oupsMonitor  8 }
+
+oupsMonitorACCLoadLevel OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..63))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Read the set load level that ACC would be active from 0 to this percentage. 
+        Default is 20 percent. Select 0 to set it as Always On"
+    ::= { oupsMonitor  9 }
+
+oupsMonitorOperatingMode OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Check if UPS is normal op, or on bypass, on inverter or ACC Active, "
+    ::= { oupsMonitor  10 }
+
+oupsMonitorOperationType OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Check if UPS is operating as an UPS or ACC (PU only, no BP)."
+    ::= { oupsMonitor  11 }
+
+oupsTestTrap OBJECT-TYPE
+    SYNTAX INTEGER { startTestTrap (1) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Setting startTestTrap to 1 will initiate a TrapTest
+	 is sent out from Management Module.  All other set values are invalid."
+    ::= { oupsMonitor 12 }
+
+oupsOnGenDuration OBJECT-TYPE
+    SYNTAX INTEGER {
+                   for30Min (1),
+                   for1Hr (2),
+		   for2Hr (3),			
+                   for4Hr (4)
+                   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"When read, show the current On-Generator Duration set by user on UPS LCD or GUI ."
+    ::= { oupsMonitor 13 }
+
+oupsRuntimeLimitation OBJECT-TYPE
+    SYNTAX INTEGER {
+                   disable (1),
+                   enable (2)
+                   }
+
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"show the current setting for Runtime Limitation. When enable, it can last for 70sec or 3min."
+    ::= { oupsMonitor 14 }
+
+
+-- ====================================================================================
+--
+--  oups                    OBJECT IDENTIFIER       ::= {cpqPower 6}  
+--  oupsRackDiscovery	    OBJECT IDENTIFIER       ::= { ups 6 }
+--  Offline UPS Rack Discovery. Location of the PU and BP installed in a rack
+--  1-wire contact reading the U-Height and U-Position of each enclosure
+--  OID= .1.3.6.1.4.1.232.165.6.6
+
+
+oupsRackTagVersion OBJECT-TYPE
+	SYNTAX INTEGER (0..10)
+	ACCESS read-only
+	STATUS mandatory
+    	DESCRIPTION
+	"Get the 1-wire contact FW version from EEPROM's Tag Version. Initial tag is 01"
+	::= { oupsRackDiscovery 1 }
+
+oupsRackID OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..63))
+	ACCESS read-only
+	STATUS mandatory
+    	DESCRIPTION
+	"Get 10-digit Serial Number from the Location Discovery Strip mount in the front of the rack"
+	::= { oupsRackDiscovery 2 }
+
+oupsRackPartNumber OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..63))
+	ACCESS read-only
+	STATUS mandatory
+    	DESCRIPTION
+	"Get 10 or 12-digit Part Number xxxxxx-001 from the Location Discovery Strip mount in the front of the rack"
+	::= { oupsRackDiscovery 3 }
+
+oupsRackProductDescription OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..63))
+	ACCESS read-only
+	STATUS mandatory
+    	DESCRIPTION
+	"Get spatial data of rack: description of the Rack Name."
+	::= { oupsRackDiscovery 4 }
+
+oupsRackEncULocation OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..63))
+	ACCESS read-only
+	STATUS mandatory
+    	DESCRIPTION
+	"Tell where the Location Discovery Strip is mounted in the rack. B for Back, F for Front, L for Left 
+         and R for Right."
+	::= { oupsRackDiscovery 5 }
+
+oupsRackUHeight OBJECT-TYPE
+	SYNTAX INTEGER (0..50)
+	ACCESS read-only
+	STATUS mandatory
+    	DESCRIPTION
+	"Get spatial data of rack: U-height of the rack can be 36U, 42U, or 47U model."
+	::= { oupsRackDiscovery 6 }
+
+oupsRackPUUPosition OBJECT-TYPE
+	SYNTAX INTEGER (0..50)
+	ACCESS read-only
+	STATUS mandatory
+    	DESCRIPTION
+	"Get the U-position of the PU where it is installed in the rack. The U position range is from 1-50."
+	::= { oupsRackDiscovery 7 }
+
+oupsRackPUUHeight OBJECT-TYPE
+	SYNTAX INTEGER (0..10)
+	ACCESS read-only
+	STATUS mandatory
+    	DESCRIPTION
+	"Get the U-Height of the Power Unit. PU height is either 1U or 2U."
+	::= { oupsRackDiscovery 8 }
+
+oupsRackBP1UPosition OBJECT-TYPE
+	SYNTAX INTEGER (0..50)
+	ACCESS read-only
+	STATUS mandatory
+    	DESCRIPTION
+	"Get the U-Position of the Battery Pack 1, installed right below the PU.
+         Range is from 1 to 50."
+	::= { oupsRackDiscovery 9 }
+
+oupsRackBP1UHeight OBJECT-TYPE
+	SYNTAX INTEGER (0..10)
+	ACCESS read-only
+	STATUS mandatory
+    	DESCRIPTION
+	"Get the U-Height of the BP 1. BP is either 1U, 2U, and 3U"
+	::= { oupsRackDiscovery 10 }
+
+oupsRackBP2UPosition OBJECT-TYPE
+	SYNTAX INTEGER (0..50)
+	ACCESS read-only
+	STATUS mandatory
+    	DESCRIPTION
+	"Get the U-Position of the Battery Pack 2, installed right below the BP1.
+         Range is from 1 to 50."
+	::= { oupsRackDiscovery 11 }
+
+oupsRackBP2UHeight OBJECT-TYPE
+	SYNTAX INTEGER (0..10)
+	ACCESS read-only
+	STATUS mandatory
+    	DESCRIPTION
+	"Get the U-Height of the BP 2. BP is either 1U, 2U, and 3U"
+	::= { oupsRackDiscovery 12 }
+
+
+-- ====================================================================================
+--             PDU2 GLANDORE - Group (breaker) monitored (no outlet monitored)
+--             PDU2 DRAGONWOOD1 (GLANDORE2) - Group (breaker) and Outlet monitored
+-- ====================================================================================
+--  
+--  pdu2                     OBJECT IDENTIFIER       ::= {cpqPower 7}  
+--  pdu2Ident                OBJECT IDENTIFIER       ::= { pdu2 1 }
+--  PDU identification group
+--  OID= .1.3.6.1.4.1.232.165.7.1
+
+pdu2NumberPDU OBJECT-TYPE
+    SYNTAX INTEGER (1..2)	-- pdu(0) master or pdu(1) slave1...
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of PDUs detected (in its daisy chain)."
+    ::= { pdu2Ident 1 }
+    
+pdu2IdentTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Pdu2IdentEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "Aggregate Object with number of entries equal to pdu2NumberPDU ."
+    ::= { pdu2Ident 2 }
+
+pdu2IdentEntry OBJECT-TYPE
+    SYNTAX Pdu2IdentEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "The ident table entry containing the name, model, manufacturer, 
+                 firmware version, part number, etc."
+    INDEX { pdu2IdentIndex }
+    ::= { pdu2IdentTable 1 }
+
+Pdu2IdentEntry ::= SEQUENCE {
+      	pdu2IdentIndex         	INTEGER,
+      	pdu2Name               	DisplayString,
+      	pdu2Model              	DisplayString,
+      	pdu2Manufacturer       	DisplayString,
+      	pdu2FirmwareVersion    	DisplayString,
+      	pdu2PartNumber         	DisplayString,
+      	pdu2SerialNumber       	DisplayString,
+      	pdu2Status             	INTEGER,
+      	pdu2Controllable       	INTEGER,
+      	pdu2InputPhaseCount	INTEGER,
+	pdu2GroupCount		INTEGER,
+        pdu2OutletCount	 	INTEGER    
+    }
+
+pdu2IdentIndex OBJECT-TYPE
+    SYNTAX INTEGER	(0..100)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Index for the Pdu2IdentEntry table."
+    ::= { pdu2IdentEntry 1 }
+
+pdu2Name OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The string identify the device in daisy chain. Example PDU A."
+    ::= { pdu2IdentEntry 2 }
+
+pdu2Model OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device Model."
+    ::= { pdu2IdentEntry 3 }
+
+pdu2Manufacturer OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Device Manufacturer Name (e.g. Hewlett-Packard)."
+    ::= { pdu2IdentEntry 4 }
+
+pdu2FirmwareVersion OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The firmware revision level of the device."
+    ::= { pdu2IdentEntry 5 }
+
+pdu2PartNumber OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The device part number. Example AF400A."
+    ::= { pdu2IdentEntry 6 }
+
+pdu2SerialNumber OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The device serial number, 10- or 16-digit."
+    ::= { pdu2IdentEntry 7 }
+
+pdu2Status OBJECT-TYPE
+    SYNTAX  INTEGER
+    {
+      other(1),    -- default
+      ok(2),
+      degraded(3),
+      failed(4)
+    }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+    "The overall status of the device.  A value of OK(2) indicates the device is operating normally.
+    A value of degraded(3) indicates the device is operating with warning indicators.  A value of
+    failed(4) indicates the device is operating with critical indicators."
+    ::= { pdu2IdentEntry 8 }
+
+pdu2Controllable OBJECT-TYPE
+    SYNTAX  INTEGER 
+    {
+      yes(1),
+      no(2)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "This object indicates whether or not the device is controllable."
+    ::= { pdu2IdentEntry 9 }
+
+pdu2InputPhaseCount  OBJECT-TYPE
+    SYNTAX     INTEGER (0..63)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION 
+     	"The number of input phase on this pdu 1,2,3."
+    ::= { pdu2IdentEntry 10 }
+
+pdu2GroupCount  OBJECT-TYPE
+    SYNTAX     INTEGER (0..63)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION 
+	"The number of groups (breakers) on this pdu."
+    ::= { pdu2IdentEntry 11 }
+
+pdu2OutletCount  OBJECT-TYPE
+    SYNTAX     INTEGER (0..63)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION 
+	"The number of outlets in this PDU."
+         ::= { pdu2IdentEntry 12 }
+
+
+-- ====================================================================================
+--
+--  pdu2                    OBJECT IDENTIFIER       ::= {cpqPower 7}    
+--  pdu2Input               OBJECT IDENTIFIER       ::= { pdu2 2 }
+--  PDU2 input group
+--  OID= .1.3.6.1.4.1.232.165.7.2
+
+pdu2InputTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF Pdu2InputEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+		"Aggregate Object with number of entries equal to pdu2NumberPDU ."
+	::= { pdu2Input 1 }
+
+pdu2InputEntry  OBJECT-TYPE
+	SYNTAX 	Pdu2InputEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+		"The ident table entry containing the VA, Watts, WH, etc."
+	INDEX { pdu2IdentIndex }
+	::= { pdu2InputTable 1 }
+
+Pdu2InputEntry ::= SEQUENCE {
+	pdu2InputType			INTEGER,
+	pdu2InputFrequency		INTEGER,
+	pdu2InputFrequencyStatus	INTEGER,
+	pdu2InputPowerVA		INTEGER,
+	pdu2InputPowerWatts		INTEGER,
+	pdu2InputPowerWattHour		INTEGER,
+	pdu2InputPowerWattHourTimer	DisplayString,
+	pdu2InputPowerFactor		INTEGER,
+	pdu2InputPowerVAR		INTEGER
+}
+
+pdu2InputType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		singlePhase (1),
+		splitPhase (2),
+		threePhaseDelta (3),
+		threePhaseWye (4)
+	}
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Type of input - single phase, split phase, three phase delta, or three
+				phase wye."
+	::= { pdu2InputEntry 1 }
+
+pdu2InputFrequency  OBJECT-TYPE
+	SYNTAX     INTEGER (0..2147483647) -- UNITS RMS 0.1 Hz
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"The measured input frequency from the PDU meters in tenths of Hz."
+	::= { pdu2InputEntry 2 }
+
+pdu2InputFrequencyStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (1),
+		outOfRange (2)
+	}
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Status of the measured input frequency relative to the nominal frequency and the admitted tolerance."
+	::= { pdu2InputEntry 3 }
+
+pdu2InputPowerVA  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A total input VA of all phases.  Units are VA.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2InputEntry 4 }
+
+pdu2InputPowerWatts  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A total input Watts of all phases.  Units are Watts.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2InputEntry 5 }
+
+pdu2InputPowerWattHour  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A total input Watt-Hour value for all phases.  Units are WH. This value can be reset to 0 
+                using GUI. In that case, the pdu2InputPowerWattHourTimer will be reset as well  
+                A negative value indicates that this object is not available."
+	::= { pdu2InputEntry 6 }
+
+pdu2InputPowerWattHourTimer  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..22))  -- display Date Time
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A Timestamp of when the Total Input WH was last reset."
+	::= { pdu2InputEntry 7 }
+
+pdu2InputPowerFactor  OBJECT-TYPE
+	SYNTAX     INTEGER	-- units 0.01
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"An input PF value.  Units are in thousandths, for example a power factor
+		 of 0.958 would be returned as 958, and 0.92 would be returned as 920.  
+                 A negative value indicates that this object is not available."
+	::= { pdu2InputEntry 8 }
+
+pdu2InputPowerVAR  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"An input VAR value.  Units are VAR.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2InputEntry 9 }
+
+
+pdu2InputPhaseTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Pdu2InputPhaseEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+           "Aggregate Object with number of entries equal to number of PDUs (pdu2NumberPDU) and
+            number of input phase (pdu2InputPhaseCount)."
+    ::= {pdu2Input 2}
+
+pdu2InputPhaseEntry OBJECT-TYPE
+    SYNTAX Pdu2InputPhaseEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION 
+           "The input table entry containing the voltage, current, frequency, power for each phase.
+            Entries are given with number of pdu and number of input phase 1, 2, or 3."
+    INDEX { pdu2IdentIndex, pdu2InputPhaseIndex }
+    ::= { pdu2InputPhaseTable 1 }
+
+Pdu2InputPhaseEntry ::= SEQUENCE {
+      pdu2InputPhaseIndex      			INTEGER,
+      pdu2InputPhaseVoltageMeasType  		INTEGER,
+      pdu2InputPhaseVoltage    			INTEGER,
+      pdu2InputPhaseVoltageThStatus  		INTEGER,
+      pdu2InputPhaseVoltageThLowerWarning  	INTEGER,
+      pdu2InputPhaseVoltageThLowerCritical  	INTEGER,
+      pdu2InputPhaseVoltageThUpperWarning  	INTEGER,
+      pdu2InputPhaseVoltageThUpperCritical  	INTEGER,
+      pdu2InputPhaseCurrentMeasType		INTEGER,
+      pdu2InputPhaseCurrentRating		INTEGER,
+      pdu2InputPhaseCurrent    			INTEGER,
+      pdu2InputPhaseCurrentThStatus		INTEGER,
+      pdu2InputPhaseCurrentThLowerWarning	INTEGER,
+      pdu2InputPhaseCurrentThLowerCritical	INTEGER,
+      pdu2InputPhaseCurrentThUpperWarning	INTEGER,
+      pdu2InputPhaseCurrentThUpperCritical	INTEGER,
+      pdu2InputPhaseCurrentCrestFactor		INTEGER,
+      pdu2InputPhaseCurrentPercentLoad		INTEGER,
+      pdu2InputPhasePowerMeasType		INTEGER,
+      pdu2InputPhasePowerVA			INTEGER,
+      pdu2InputPhasePowerWatts 			INTEGER,
+      pdu2InputPhasePowerWattHour		INTEGER,
+      pdu2InputPhasePowerWattHourTimer		DisplayString,
+      pdu2InputPhasePowerFactor			INTEGER,
+      pdu2InputPhasePowerVAR			INTEGER
+    }
+
+pdu2InputPhaseIndex OBJECT-TYPE
+    SYNTAX INTEGER	(0..100)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Index for the Pdu2InputEntry table."
+    ::= { pdu2InputPhaseEntry 1}
+
+pdu2InputPhaseVoltageMeasType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		singlePhase (1),
+		phase1toN (2),
+		phase2toN (3),
+		phase3toN (4),
+		phase1to2 (5),
+		phase2to3 (6),
+		phase3to1 (7)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Value indicates what input voltage is being measured in this table row - single phase
+		voltage, phase 1 to neutral, phase 2 to neutral, phase 3 to neutral, phase 1 to phase 2,
+		phase 2 to phase 3, or phase 3 to phase 1."
+	::= { pdu2InputPhaseEntry 2 }
+
+pdu2InputPhaseVoltage OBJECT-TYPE
+    SYNTAX   INTEGER    -- UNITS RMS 0.001 Volts
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+	"An input voltage measurement value.  Units are millivolts."
+    ::= {pdu2InputPhaseEntry 3}
+
+pdu2InputPhaseVoltageThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (1),
+		lowWarning (2),
+		lowCritical (3),
+		highWarning (4),
+		highCritical (5)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Status of the measured input voltage relative to the configured thresholds."
+	::= { pdu2InputPhaseEntry 4 }
+
+pdu2InputPhaseVoltageThLowerWarning  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..500000)	-- Units in 0.001 V
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"Lower warning threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2InputPhaseEntry 5 }
+
+pdu2InputPhaseVoltageThLowerCritical  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..500000)	-- Units in 0.001 V
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"Lower critical threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2InputPhaseEntry 6 }
+
+pdu2InputPhaseVoltageThUpperWarning  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..500000)	-- Units in 0.001 V
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"Upper warning threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2InputPhaseEntry 7 }
+
+pdu2InputPhaseVoltageThUpperCritical  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..500000)	-- Units in 0.001 V
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"Upper critical threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2InputPhaseEntry 8 }
+
+pdu2InputPhaseCurrentMeasType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		singlePhase (1),
+		neutral (2),
+		phase1 (3),
+		phase2 (4),
+		phase3 (5)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Which input wire is being measured in this table row - single phase, neutral, phase 1,
+		phase 2, or phase 3."
+	::= { pdu2InputPhaseEntry 9 }
+
+pdu2InputPhaseCurrentRating  OBJECT-TYPE
+	SYNTAX   INTEGER		-- Units in 0.001 A
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"Rated current capacity of the input.  A negative value indicates that
+		the hardware current capacity is unknown.  Units are milliamps."
+	::= { pdu2InputPhaseEntry 10 }
+
+pdu2InputPhaseCurrent  OBJECT-TYPE
+	SYNTAX   INTEGER		-- Units in 0.001 A
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"An input current measurement value.  Units are milliamps."
+	::= { pdu2InputPhaseEntry 11 }
+
+pdu2InputPhaseCurrentThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (1),
+		lowWarning (2),
+		lowCritical (3),
+		highWarning (4),
+		highCritical (5)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Status of the measured input current relative to the configured thresholds."
+	::= { pdu2InputPhaseEntry 12 }
+
+pdu2InputPhaseCurrentThLowerWarning  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..100000)		-- Units in 0.001 A
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower warning threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2InputPhaseEntry 13 }
+
+pdu2InputPhaseCurrentThLowerCritical  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..100000)		-- Units in 0.001 A
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower critical threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2InputPhaseEntry 14 }
+
+pdu2InputPhaseCurrentThUpperWarning  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..100000)		-- Units in 0.001 A
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"Upper warning threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2InputPhaseEntry 15 }
+
+pdu2InputPhaseCurrentThUpperCritical  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..100000)		-- Units in 0.001 A
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"Upper critical threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2InputPhaseEntry 16 }
+
+pdu2InputPhaseCurrentCrestFactor  OBJECT-TYPE
+	SYNTAX     INTEGER		-- Units in 0.001
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Current crest factor.  Units are in milli, for example a crest factor of
+                  1.414 will be returned as 1414.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2InputPhaseEntry 17 }
+
+pdu2InputPhaseCurrentPercentLoad  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Current percent load, based on the rated current capacity.  Units are
+                  percentage, for example 80% will be returned as 80.  A negative
+                  value indicates that this object is not available."
+	::= { pdu2InputPhaseEntry 18 }
+
+pdu2InputPhasePowerMeasType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		singlePhase (1),
+		neutral (2),
+		phase1 (3),
+		phase2 (4),
+		phase3 (5)
+	 }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Which input wire is being measured in this table row - single phase, neutral, phase 1,
+		phase 2, or phase 3."
+	::= { pdu2InputPhaseEntry 19 }
+
+pdu2InputPhasePowerVA  OBJECT-TYPE
+	SYNTAX    INTEGER
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"An input VA value.  Units are VA.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2InputPhaseEntry 20 }
+
+pdu2InputPhasePowerWatts  OBJECT-TYPE
+	SYNTAX    INTEGER
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"An input Watts value.  Units are Watts.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2InputPhaseEntry 21 }
+
+pdu2InputPhasePowerWattHour  OBJECT-TYPE
+	SYNTAX     INTEGER 
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A Watt-Hour value for each Input phase.  Units are WH. This value can be reset to 0 
+                 using GUI. In that case, the pdu2InputPhasePowerWattHourTimer will be reset as well    
+                 A negative value indicates that this object is not available."
+	::= { pdu2InputPhaseEntry 22 }
+
+pdu2InputPhasePowerWattHourTimer  OBJECT-TYPE
+	SYNTAX    DisplayString (SIZE (0..22))  -- display Date Time
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Timestamp of when input Watt-hours (inputWh) was last reset."
+	::= { pdu2InputPhaseEntry 23 }
+
+pdu2InputPhasePowerFactor  OBJECT-TYPE
+	SYNTAX    INTEGER		-- units 0.01
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"An input PF value.  Units are in thousandths, for example a power factor
+                 of 0.958 would be returned as 958, and 0.92 would be returned 
+		 as 920.  A negative value indicates that this object is not available."
+	::= { pdu2InputPhaseEntry 24 }
+
+pdu2InputPhasePowerVAR  OBJECT-TYPE
+	SYNTAX    INTEGER
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"An input VAR value.  Units are VAR.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2InputPhaseEntry 25 }
+
+
+
+-- ====================================================================================
+--
+--  pdu2                     OBJECT IDENTIFIER       ::= {cpqPower 7}  
+--  pdu2Group                OBJECT IDENTIFIER       ::= { pdu2 3 }
+--  PDU2 Output groups of outlets 
+--  OID= .1.3.6.1.4.1.232.165.7.3
+
+
+pdu2GroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Pdu2GroupEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "Aggregate Object with number of entries equal to number of PDUs
+                 and number of breakers (pdu2GroupCount)."
+    ::= { pdu2Group 1 }
+
+pdu2GroupEntry OBJECT-TYPE
+    SYNTAX Pdu2GroupEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION 
+           "The input table entry containing the name, voltages, currents, power, etc."
+    INDEX { pdu2IdentIndex, pdu2GroupIndex }
+    ::= { pdu2GroupTable 1 }
+
+Pdu2GroupEntry ::= SEQUENCE {
+      pdu2GroupIndex         		INTEGER,
+      pdu2GroupName	     		DisplayString,
+      pdu2GroupType          		INTEGER,
+      pdu2GroupVoltageMeasType		INTEGER,
+      pdu2GroupVoltage          	INTEGER,
+      pdu2GroupVoltageThStatus		INTEGER,
+      pdu2GroupVoltageThLowerWarning	INTEGER,
+      pdu2GroupVoltageThLowerCritical	INTEGER,
+      pdu2GroupVoltageThUpperWarning	INTEGER,
+      pdu2GroupVoltageThUpperCritical	INTEGER,
+      pdu2groupCurrentRating		INTEGER,
+      pdu2GroupCurrent			INTEGER,
+      pdu2GroupCurrentThStatus		INTEGER,
+      pdu2GroupCurrentThLowerWarning	INTEGER,
+      pdu2GroupCurrentThLowerCritical	INTEGER,
+      pdu2GroupCurrentThUpperWarning	INTEGER,
+      pdu2GroupCurrentThUpperCritical	INTEGER,
+      pdu2GroupCurrentCrestFactor	INTEGER,
+      pdu2GroupCurrentPercentLoad	INTEGER,
+      pdu2GroupPowerVA			INTEGER,
+      pdu2GroupPowerWatts		INTEGER,
+      pdu2GroupPowerWattHour		INTEGER,
+      pdu2GroupPowerWattHourTimer	DisplayString,
+      pdu2GroupPowerFactor		INTEGER,
+      pdu2GroupPowerVAR			INTEGER,
+      pdu2GroupOutletCount	 	INTEGER,
+      pdu2groupBreakerStatus    	INTEGER    
+    }
+
+pdu2GroupIndex OBJECT-TYPE
+    SYNTAX INTEGER	(0..100)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Index for the Pdu2GroupEntry table."
+    ::= { pdu2GroupEntry 1 }
+
+pdu2GroupName  OBJECT-TYPE
+	SYNTAX    DisplayString (SIZE(1..31))
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"A descriptive name for the group."
+	::= { pdu2GroupEntry 2 }
+
+pdu2GroupType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		breaker1pole (2),
+		breaker2pole (3),
+		breaker3pole (4),
+		outletSection (5)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"The type of the group. (5) has no breaker"
+	::= { pdu2GroupEntry 3 }
+
+pdu2GroupVoltageMeasType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		singlePhase (1),
+		phase1toN (2),
+		phase2toN (3),
+		phase3toN (4),
+		phase1to2 (5),
+		phase2to3 (6),
+		phase3to1 (7)
+	}
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Value indicates what input voltage is being measured in this table row - single phase
+		voltage, phase 1 to neutral, phase 2 to neutral, phase 3 to neutral, phase 1 to phase 2,
+		phase 2 to phase 3, or phase 3 to phase 1."
+	::= { pdu2GroupEntry 4 }
+
+pdu2GroupVoltage  OBJECT-TYPE
+	SYNTAX    INTEGER	-- Units 0.001 V
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Units are millivolts."
+	::= { pdu2GroupEntry 5 }
+
+pdu2GroupVoltageThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (1),
+		lowWarning (2),
+		lowCritical (3),
+		highWarning (4),
+		highCritical (5)
+	}
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"Status of the measured group voltage relative to the configured thresholds."
+	::= { pdu2GroupEntry 6 }
+
+pdu2GroupVoltageThLowerWarning  OBJECT-TYPE
+	SYNTAX     INTEGER (-1..500000)		-- Units 0.001 V
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower warning threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2GroupEntry 7 }
+
+pdu2GroupVoltageThLowerCritical  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..500000)		-- Units 0.001 V
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower critical threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2GroupEntry 8 }
+
+pdu2GroupVoltageThUpperWarning  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..500000)		-- Units 0.001 V
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Upper warning threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2GroupEntry 9 }
+
+pdu2GroupVoltageThUpperCritical  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..500000)		-- Units 0.001 V
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Upper critical threshold.  Units are millivolts.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2GroupEntry 10 }
+
+pdu2groupCurrentRating  OBJECT-TYPE
+	SYNTAX    INTEGER	-- Units 0.001 A
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Rated current capacity of the group.  Units are milliamps.  A negative 
+		      value indicates that the hardware current capacity is unknown (it
+		      will always be unknown for custom groups)."
+	::= { pdu2GroupEntry 11 }
+
+pdu2GroupCurrent  OBJECT-TYPE
+	SYNTAX    INTEGER	-- Units 0.001 A
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"A group current measurement value.  Units are milliamps."
+	::= { pdu2GroupEntry 12 }
+
+pdu2GroupCurrentThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (1),
+		lowWarning (2),
+		lowCritical (3),
+		highWarning (4),
+		highCritical (5)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Status of the measured group current relative to the configured thresholds."
+	::= { pdu2GroupEntry 13 }
+
+pdu2GroupCurrentThLowerWarning  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..100000)		-- Units 0.001 A
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower warning threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2GroupEntry 14 }
+
+pdu2GroupCurrentThLowerCritical  OBJECT-TYPE
+	SYNTAX     INTEGER (-1..100000)		-- Units 0.001 A
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Lower critical threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2GroupEntry 15 }
+
+pdu2GroupCurrentThUpperWarning  OBJECT-TYPE
+	SYNTAX     INTEGER (-1..100000)		-- Units 0.001 A
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Upper warning threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2GroupEntry 16 }
+
+pdu2GroupCurrentThUpperCritical  OBJECT-TYPE
+	SYNTAX     INTEGER (-1..100000)		-- Units 0.001 A
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Upper critical threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2GroupEntry 17 }
+
+pdu2GroupCurrentCrestFactor  OBJECT-TYPE
+	SYNTAX     INTEGER		-- units 0.001
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Current crest factor.  Units are in milli, for example a crest factor of
+                  1.414 will be returned as 1414.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2GroupEntry 18 }
+
+pdu2GroupCurrentPercentLoad  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Current percent load, based on the rated current capacity.  Units are
+                  percentage, for example 80% will be returned as 80.  A negative
+                  value indicates that this object is not available."
+	::= { pdu2GroupEntry 19 }
+
+pdu2GroupPowerVA  OBJECT-TYPE
+	SYNTAX     INTEGER  	-- units in VA
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A group VA value.  Units are VA.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2GroupEntry 20 }
+
+pdu2GroupPowerWatts  OBJECT-TYPE
+	SYNTAX     INTEGER	-- units in Watt
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A group Watts value.  Units are Watts.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2GroupEntry 21 }
+
+pdu2GroupPowerWattHour  OBJECT-TYPE
+	SYNTAX     INTEGER 	-- Units in Watt-Hour
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A Watt-Hour value for each section.  Units are WH. This value can be reset to 0 
+                 using GUI. In that case, the pdu2GroupPowerWattHourTimer will be reset as well.    
+                 A negative value indicates that this object is not available."
+	::= { pdu2GroupEntry 22 }
+
+pdu2GroupPowerWattHourTimer  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..22))	-- display Date and Time
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Timestamp of when group Watt-hours (groupWh) was last reset."
+	::= { pdu2GroupEntry 23 }
+
+pdu2GroupPowerFactor  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A group PF value.  Units are in thousandths, for example a power factor
+                  of 0.958 would be returned as 958, and 0.92 would be returned as 920.  
+                 A negative value indicates that this object is not available."
+	::= { pdu2GroupEntry 24 }
+
+pdu2GroupPowerVAR  OBJECT-TYPE
+	SYNTAX     INTEGER		-- Units in VAR
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A group VAR value.  Units are VAR.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2GroupEntry 25 }
+
+pdu2GroupOutletCount  OBJECT-TYPE
+    	SYNTAX     INTEGER (0..63)
+    	ACCESS     read-only
+    	STATUS     mandatory
+    	DESCRIPTION 
+		"The number of outlets in each group (breaker)."
+         ::= { pdu2GroupEntry 26 }
+
+pdu2groupBreakerStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApplicable (1),
+		breakerOn (2),
+		breakerOff (3)
+	}
+	ACCESS 	   read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Only applicable to groups with breaker.  Indicates whether a breaker is turned
+		      off or on."
+	::= { pdu2GroupEntry 27 }
+
+-- ====================================================================================
+--
+--  pdu2                     OBJECT IDENTIFIER       ::= {cpqPower 7}  
+--  pdu2Environment          OBJECT IDENTIFIER       ::= { pdu2 4 }
+--  PDU2 Environment group
+--  OID= .1.3.6.1.4.1.232.165.7.4
+
+pdu2EnvProbeTable  OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF Pdu2EnvProbeEntry
+	ACCESS 	not-accessible
+	STATUS  mandatory
+	DESCRIPTION 
+		"A list of environment probe (1 per PDU) for temperature, humidity, and contacts.  
+                 The number of entries is given by number of PDUs in daisy chain."
+	::= { pdu2Environment 1 }
+
+pdu2EnvProbeEntry  OBJECT-TYPE
+	SYNTAX 	Pdu2EnvProbeEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION 
+		"Aggregate entries equal to number of PDUs."
+	INDEX { pdu2IdentIndex }
+	::= { pdu2EnvProbeTable 1 }
+
+Pdu2EnvProbeEntry ::= SEQUENCE {
+	pdu2TemperatureScale		INTEGER,
+	pdu2TemperatureCount		INTEGER,
+	pdu2HumidityCount		INTEGER,
+	pdu2ContactCount		INTEGER
+}
+
+pdu2TemperatureScale  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		celsius (1),
+		fahrenheit (2)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Scale used to return temperature objects."
+	::= { pdu2EnvProbeEntry 1 }
+
+pdu2TemperatureCount  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS 	read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Max number of temperature measurements (1 per probe)."
+	::= { pdu2EnvProbeEntry 2  }
+
+pdu2HumidityCount  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Max number of humidity measurements  (1 per probe)."
+	::= { pdu2EnvProbeEntry 3 }
+
+pdu2ContactCount  OBJECT-TYPE
+	SYNTAX   INTEGER
+	ACCESS 	 read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"Max number of contact sensors  (1 per probe)."
+	::= { pdu2EnvProbeEntry 4 }
+
+-- ========Temperature Measurements ============
+
+pdu2TemperatureTable  OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF Pdu2TemperatureEntry
+	ACCESS 	not-accessible
+	STATUS  mandatory
+	DESCRIPTION 
+		"A list of temperature probe measurements.  The number of entries are
+		 given by number of pdu and pdu2TemperatureCount."
+	::= { pdu2Environment 2 }
+
+pdu2TemperatureEntry  OBJECT-TYPE
+	SYNTAX 	Pdu2TemperatureEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION 
+		"An entry for a temperature measurement."
+	INDEX { pdu2IdentIndex, pdu2TemperatureIndex }
+	::= { pdu2TemperatureTable 1 }
+
+Pdu2TemperatureEntry ::= SEQUENCE {
+	pdu2TemperatureIndex		INTEGER,
+	pdu2TemperatureName		DisplayString,
+	pdu2TemperatureProbeStatus	INTEGER,
+	pdu2TemperatureValue		INTEGER,
+	pdu2TemperatureThStatus		INTEGER,
+	pdu2TemperatureThLowerWarning	INTEGER,
+	pdu2TemperatureThLowerCritical	INTEGER,
+	pdu2TemperatureThUpperWarning	INTEGER,
+	pdu2TemperatureThUpperCritical	INTEGER
+}
+
+pdu2TemperatureIndex  OBJECT-TYPE
+	SYNTAX   INTEGER (1..2)
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"A unique value for each temperature probe measurement.  Its value
+		      ranges from 1 to temperatureCount."
+	::= { pdu2TemperatureEntry 1 }
+
+pdu2TemperatureName  OBJECT-TYPE
+	SYNTAX   DisplayString (SIZE(1..31))
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"A descriptive name for the temperature probe."
+	::= { pdu2TemperatureEntry 2 }
+
+pdu2TemperatureProbeStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		disconnected (1),
+		connected (2),
+		bad (3)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Indicates whether a probe is connected or not."
+	::= { pdu2TemperatureEntry 3 }
+
+pdu2TemperatureValue  OBJECT-TYPE
+	SYNTAX    INTEGER  --0.1 Fahrenheit or Celsius
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Units are in tenths of a degree (either Fahrenheit or Celsius). 
+                 Divide by ten to get degrees."
+	::= { pdu2TemperatureEntry 4 }
+
+pdu2TemperatureThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (1),
+		lowWarning (2),
+		lowCritical (3),
+		highWarning (4),
+		highCritical (5)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Status of the measured temperature relative to the configured thresholds."
+	::= { pdu2TemperatureEntry 5 }
+
+pdu2TemperatureThLowerWarning  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..150000)  -- 0.1 of a degree
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"Lower warning threshold.  Units are tenths of a degree.  A negative value
+                  indicates that this object is not available."
+	::= { pdu2TemperatureEntry 6 }
+
+pdu2TemperatureThLowerCritical  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..150000)   -- 0.1 of a degree
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower critical threshold.  Units are tenths of a degree.  A negative value
+		          indicates that this object is not available."
+	::= { pdu2TemperatureEntry 7 }
+
+pdu2TemperatureThUpperWarning  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..150000)    -- 0.1 of a degree
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Upper warning threshold.  Units are tenths of a degree.  A negative value
+                  indicates that this object is not available."
+	::= { pdu2TemperatureEntry 8 }
+
+pdu2TemperatureThUpperCritical  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..150000)   -- 0.1 of a degree
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Upper critical threshold.  Units are tenths of a degree.  A negative value
+                  indicates that this object is not available."
+	::= { pdu2TemperatureEntry 9 }
+
+-- ==========Humidity Measurements ==========
+
+pdu2HumidityTable  OBJECT-TYPE
+	SYNTAX   SEQUENCE OF Pdu2HumidityEntry
+	ACCESS   not-accessible
+	STATUS   mandatory
+	DESCRIPTION 
+		"A list of humidity probe measurements.  The number of entries are
+		 given by number of pdu and pdu2HumidityCount."
+	::= { pdu2Environment 3 }
+
+pdu2HumidityEntry  OBJECT-TYPE
+	SYNTAX 	Pdu2HumidityEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION 
+		"An entry for a humidity measurement."
+	INDEX { pdu2IdentIndex, pdu2HumidityIndex }
+	::= { pdu2HumidityTable 1 }
+
+Pdu2HumidityEntry ::= SEQUENCE {
+	pdu2HumidityIndex		INTEGER,
+	pdu2HumidityName		DisplayString,
+	pdu2HumidityProbeStatus		INTEGER,
+	pdu2HumidityValue		INTEGER,
+	pdu2HumidityThStatus		INTEGER,
+	pdu2HumidityThLowerWarning	INTEGER,
+	pdu2HumidityThLowerCritical	INTEGER,
+	pdu2HumidityThUpperWarning	INTEGER,
+	pdu2HumidityThUpperCritical	INTEGER
+}
+
+pdu2HumidityIndex  OBJECT-TYPE
+	SYNTAX     INTEGER (1..2)
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A unique value for each humidity probe measurement.  Its value
+		 ranges from 1 to pdu2HumidityCount per pdu."
+	::= { pdu2HumidityEntry 1 }
+
+pdu2HumidityName  OBJECT-TYPE
+	SYNTAX   DisplayString (SIZE(1..31))
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"A descriptive name for the humidity probe."
+	::= { pdu2HumidityEntry 2 }
+
+pdu2HumidityProbeStatus  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		disconnected (1),
+		connected (2),
+		bad (3)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Indicates whether a probe is connected or not."
+	::= { pdu2HumidityEntry 3 }
+
+pdu2HumidityValue  OBJECT-TYPE
+	SYNTAX    INTEGER   -- 0.1 of %RH
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Units are tenths of a percent relative humidity.  Divide the value by 10 to get %RH."
+	::= { pdu2HumidityEntry 4 }
+
+pdu2HumidityThStatus  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		good (1),
+		lowWarning (2),
+		lowCritical (3),
+		highWarning (4),
+		highCritical (5)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Status of the measured humidity relative to the configured thresholds."
+	::= { pdu2HumidityEntry 5 }
+
+pdu2HumidityThLowerWarning  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..1000)   -- 0.1 of %RH
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower warning threshold.  Units are 0.1 %RH.  A negative value
+                  indicates that this object is not available."
+	::= { pdu2HumidityEntry 6 }
+
+pdu2HumidityThLowerCritical  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..1000)  -- 0.1 of %RH
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower critical threshold.  Units are 0.1 %RH.  A negative value
+                  indicates that this object is not available."
+	::= { pdu2HumidityEntry 7 }
+
+pdu2HumidityThUpperWarning  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..1000)   -- 0.1 of %RH
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"Upper warning threshold.  Units are 0.1 %RH.  A negative value
+                  indicates that this object is not available."
+	::= { pdu2HumidityEntry 8 }
+
+pdu2HumidityThUpperCritical  OBJECT-TYPE
+	SYNTAX   INTEGER (-1..1000)   -- 0.1 of %RH
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"Upper critical threshold.  Units are 0.1 %RH.  A negative value
+                  indicates that this object is not available."
+	::= { pdu2HumidityEntry 9 }
+
+-- ======Dry Contacts Status==========
+
+pdu2ContactTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Pdu2ContactEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION 
+		"A list of contact sensors.  The number of entries are
+		 given by number of pdu and pdu2ContactCount."
+	::= { pdu2Environment 4 }
+
+pdu2ContactEntry  OBJECT-TYPE
+	SYNTAX 	 Pdu2ContactEntry
+	ACCESS   not-accessible
+	STATUS   mandatory
+	DESCRIPTION 
+		"An entry for a contact sensor"
+	INDEX { pdu2IdentIndex, pdu2ContactIndex }
+	::= { pdu2ContactTable 1 }
+
+Pdu2ContactEntry ::= SEQUENCE {
+	pdu2ContactIndex	INTEGER,
+	pdu2ContactName		DisplayString,
+	pdu2ContactProbeStatus	INTEGER,
+	pdu2ContactState	INTEGER
+}
+
+pdu2ContactIndex  OBJECT-TYPE
+	SYNTAX   INTEGER (1..3)
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"A unique value for each contact sensor.  Its value ranges from 1 to
+		      contactCount."
+	::= { pdu2ContactEntry 1 }
+
+pdu2ContactName  OBJECT-TYPE
+	SYNTAX    DisplayString (SIZE(1..31))
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"A descriptive name for the contact sensor."
+	::= { pdu2ContactEntry 2 }
+
+pdu2ContactProbeStatus  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		disconnected (1),
+		connected (2),
+		bad (3)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Indicates whether a probe is connected or not.
+		Will not be returned  if the contact sensor is internal to the ePDU,
+		in that case only contactState should be read."
+	::= { pdu2ContactEntry 3 }
+
+pdu2ContactState  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		contactOpen (1),
+		contactClosed (2),
+		contactBad (3)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"The state of the contact sensor."
+	::= { pdu2ContactEntry 4 }
+
+
+-- ====================================================================================
+--
+--  pdu2                    OBJECT IDENTIFIER       ::= {cpqPower 7}    
+--  pdu2Outlet               OBJECT IDENTIFIER       ::= { pdu2 5 }
+--  PDU2 Outlet group
+--  OID= .1.3.6.1.4.1.232.165.5
+
+pdu2OutletTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF Pdu2OutletEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+		"Aggregate Object with number of entries equal to Number of PDU (pdu2IdentIndex)
+                 and Number of outlet per PDU (pdu2OutletIndex)."
+	::= { pdu2Outlet 1 }
+
+pdu2OutletEntry  OBJECT-TYPE
+	SYNTAX 	Pdu2OutletEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+		"The Outlet table entry containing the type, voltage, current etc."
+  INDEX { pdu2IdentIndex, pdu2OutletIndex }
+	::= { pdu2OutletTable 1 }
+
+Pdu2OutletEntry ::= SEQUENCE {
+	pdu2OutletIndex				INTEGER,
+	pdu2OutletName				DisplayString,
+	pdu2OutletType				INTEGER,
+	pdu2OutletCurrentRating			INTEGER,
+	pdu2OutletCurrent			INTEGER,
+	pdu2OutletCurrentThStatus		INTEGER,
+	pdu2OutletCurrentThLowerWarning		INTEGER,
+	pdu2OutletCurrentThLowerCritical	INTEGER,
+	pdu2OutletCurrentThUpperWarning		INTEGER,
+	pdu2OutletCurrentThUpperCritical	INTEGER,
+	pdu2OutletCurrentCrestFactor		INTEGER,
+	pdu2OutletCurrentPercentLoad		INTEGER,
+	pdu2OutletVA				INTEGER,
+	pdu2OutletWatts				INTEGER,
+	pdu2OutletWh				INTEGER,
+	pdu2OutletWhTimer			DisplayString,
+	pdu2OutletPowerFactor			INTEGER,
+	pdu2OutletVAR				INTEGER
+}
+
+pdu2OutletIndex OBJECT-TYPE
+    	SYNTAX INTEGER	(0..100)
+    	ACCESS read-only
+    	STATUS mandatory
+    	DESCRIPTION
+		"Index for each outlet, value from 1 to the number of outlets per PDU."
+    	::= { pdu2OutletEntry 1 }
+
+pdu2OutletName  OBJECT-TYPE
+	SYNTAX   DisplayString (SIZE(1..31))
+	ACCESS   read-only
+	STATUS   mandatory
+	DESCRIPTION 
+		"A descriptive name for the outlet."
+	::= { pdu2OutletEntry 2 }
+
+pdu2OutletType  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		iecC13 (1),
+		iecC19 (2),
+		uk (10),
+		french (11),
+		schuko (12),
+		nema515 (20),
+		nema51520 (21),
+		nema520 (22),
+		nemaL520 (23),
+		nemaL530 (24),
+		nema615 (25),
+		nema620 (26),
+		nemaL620 (27),
+		nemaL630 (28),
+		nemaL715 (29),
+		rf203p277 (30)
+	}
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Type of this outlet - C13, C19."
+	::= { pdu2OutletEntry 3 }
+
+pdu2OutletCurrentRating  OBJECT-TYPE
+	SYNTAX    INTEGER	-- Units 0.001 A
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Rated current capacity of this outlet.  Units are milliamps.  A negative 
+		 value indicates that the hardware current capacity is unknown."
+	::= { pdu2OutletEntry 4 }
+
+pdu2OutletCurrent  OBJECT-TYPE
+	SYNTAX    INTEGER	-- Units 0.001 A
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"A outlet current measurement value.  Units are milliamps."
+	::= { pdu2OutletEntry 5 }
+
+pdu2OutletCurrentThStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (1),
+		lowWarning (2),
+		lowCritical (3),
+		highWarning (4),
+		highCritical (5)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION 
+		"Status of the measured outlet current relative to the configured thresholds."
+	::= { pdu2OutletEntry 6 }
+
+pdu2OutletCurrentThLowerWarning  OBJECT-TYPE
+	SYNTAX    INTEGER (-1..100000)		-- Units 0.001 A
+	ACCESS    read-only
+	STATUS    mandatory
+	DESCRIPTION 
+		"Lower warning threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2OutletEntry 7 }
+
+pdu2OutletCurrentThLowerCritical  OBJECT-TYPE
+	SYNTAX     INTEGER (-1..100000)		-- Units 0.001 A
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Lower critical threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2OutletEntry 8 }
+
+pdu2OutletCurrentThUpperWarning  OBJECT-TYPE
+	SYNTAX     INTEGER (-1..100000)		-- Units 0.001 A
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Upper warning threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2OutletEntry 9 }
+
+pdu2OutletCurrentThUpperCritical  OBJECT-TYPE
+	SYNTAX     INTEGER (-1..100000)		-- Units 0.001 A
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Upper critical threshold.  Units are milliamps.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2OutletEntry 10 }
+
+pdu2OutletCurrentCrestFactor  OBJECT-TYPE
+	SYNTAX     INTEGER		-- units 0.001
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Current crest factor.  Units are in milli, for example a crest factor of
+                  1.414 will be returned as 1414.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2OutletEntry 11 }
+
+pdu2OutletCurrentPercentLoad  OBJECT-TYPE
+	SYNTAX     INTEGER		-- unit in percentage
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Current percent load, based on the rated current capacity.  Units are
+                  percentage, for example 80% will be returned as 80.  A negative
+                  value indicates that this object is not available."
+	::= { pdu2OutletEntry 12 }
+
+pdu2OutletVA  OBJECT-TYPE
+	SYNTAX     INTEGER  	-- units in VA
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A outlet VA value.  Units are VA.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2OutletEntry 13 }
+
+pdu2OutletWatts  OBJECT-TYPE
+	SYNTAX     INTEGER	-- units in Watt
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A outlet Watts value.  Units are Watts.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2OutletEntry 14 }
+
+pdu2OutletWh  OBJECT-TYPE
+	SYNTAX     INTEGER 	-- Units in Watt-Hour
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"A Watt-Hour value for each outlet.  Units are WH.
+This object is writable so that it can be reset to 0.  When it is
+		written to, the pdu2OutletWhTimer will be reset updated as well    
+      A negative value indicates that this object is not available."
+	::= { pdu2OutletEntry 15 }
+
+pdu2OutletWhTimer  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..22))	-- display Date and Time
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Timestamp (date and time) of outlet Watt-hours was last reset."
+	::= { pdu2OutletEntry 16 }
+
+pdu2OutletPowerFactor  OBJECT-TYPE
+	SYNTAX     INTEGER		-- units are in 0.001
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"An outlet PF value.  Units are in thousandths, for example a power factor
+                  of 0.958 would be returned as 958, and 0.92 would be returned 
+		          as 920.  A negative value indicates that this object is not available."
+	::= { pdu2OutletEntry 17 }
+
+pdu2OutletVAR  OBJECT-TYPE
+	SYNTAX     INTEGER		-- Units in VAR
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"An outlet VAR value.  Units are VAR.  A negative value indicates
+		          that this object is not available."
+	::= { pdu2OutletEntry 18 }
+
+
+
+-- ====================== PDU Outlet Control=====================
+
+pdu2OutletControlTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF Pdu2OutletControlEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+		"Aggregate Object with number of entries equal to Number of PDU (pdu2IdentIndex) 
+                 and Number of outlets per PDU (pdu2OutletIndex)."
+	::= { pdu2Outlet 2 }
+
+pdu2OutletControlEntry  OBJECT-TYPE
+	SYNTAX 	Pdu2OutletControlEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+		"The Outlet table entry containing the type, voltage, current etc."
+  INDEX { pdu2IdentIndex, pdu2OutletIndex }
+	::= { pdu2OutletControlTable 1 }
+
+Pdu2OutletControlEntry ::= SEQUENCE {
+
+	pdu2OutletControlStatus			INTEGER,
+	pdu2OutletControlOffCmd			INTEGER,
+	pdu2OutletControlOnCmd			INTEGER,
+	pdu2OutletControlRebootCmd		INTEGER,
+	pdu2OutletControlPowerOnState		INTEGER,
+	pdu2OutletControlSequenceDelay		INTEGER,
+	pdu2OutletControlRebootOffTime		INTEGER,
+	pdu2OutletControlSwitchable		INTEGER,
+	pdu2OutletControlShutoffDelay		INTEGER
+}
+
+pdu2OutletControlStatus  OBJECT-TYPE
+    	SYNTAX 		INTEGER	{
+			off (1),
+			on (2),
+			pendingOff (3),
+			pendingOn (4)
+			}
+    	ACCESS 		read-only
+    	STATUS 		mandatory
+    	DESCRIPTION
+		"current state of a control outlet."
+    	::= { pdu2OutletControlEntry 1 }
+
+pdu2OutletControlOffCmd  OBJECT-TYPE
+    	SYNTAX 		 INTEGER (-1..99999)		
+    	ACCESS 		 read-write
+    	STATUS 		 mandatory
+    	DESCRIPTION
+		"When write, once issued, the outlet will turn Off immediately.
+                 0-n: Time in seconds until the outlet command is issued
+                 -1: Cancel a pending outlet Off command
+		 When read, returns -1 if no command is pending, or the current downcount in 
+                 seconds of a pending command."
+    	::= { pdu2OutletControlEntry 2 }
+
+pdu2OutletControlOnCmd  OBJECT-TYPE
+    	SYNTAX 		INTEGER (-1..99999)		
+    	ACCESS 		read-write
+    	STATUS 		mandatory
+    	DESCRIPTION
+		"When write, once issued, the outlet will turn On immediately.
+                 0-n: Time in seconds until the outlet command is issued
+                 -1: Cancel a pending outlet On command
+		 When read, returns -1 if no command is pending, or the current downcount in 
+                 seconds of a pending command."
+    	::= { pdu2OutletControlEntry 3 }
+
+pdu2OutletControlRebootCmd  OBJECT-TYPE
+    	SYNTAX 		    INTEGER (-1..99999)		
+    	ACCESS 		    read-write
+    	STATUS 		    mandatory
+    	DESCRIPTION
+		"When write, for outlets that are On prior to this Reboot command, they will 
+                 switch Off immediately when the command is issued, remain Off for 
+                 outletControlRebootOffTime seconds, and then turn back On.
+		 For outlets that are Off prior to the Reboot command, they will turn On after 
+                 a delay of outletControlRebootOffTime seconds from when the command is issued.
+		 0-n : Time in seconds until the Reboot command is issued
+		 -1 : Cancel a pending outlet Reboot command 
+		
+		When read, returns -1 if no command is pending, or the current downcount in 
+                seconds of a pending command."
+    	::= { pdu2OutletControlEntry 4 }
+
+pdu2OutletControlPowerOnState  OBJECT-TYPE
+    	SYNTAX 		    INTEGER {
+		            off (1),
+		            on (2),
+		            lastState (3)
+                            }	
+    	ACCESS 		    read-write
+    	STATUS 		    mandatory
+    	DESCRIPTION
+		"Determines the outlet state when power is applied to the unit.
+		1 : not restart at device startup
+		2 : should sequence back ON in line with outletControlSequenceTime
+		3 : should take the state the outlet had when power was lost.
+		If the state was ON, should sequence back ON in line with outletControlSequenceTime."
+    	::= { pdu2OutletControlEntry 5 }
+
+pdu2OutletControlSequenceDelay  OBJECT-TYPE
+    	SYNTAX 		        INTEGER (-1..99999)		
+    	ACCESS 		        read-write
+    	STATUS 		        mandatory
+    	DESCRIPTION
+		"Time delay in seconds from when a Global Sequence On command is issued to
+		when the command is executed on this outlet.  This delay is also used as a power-on
+		delay. Set to -1 to exclude this outlet from Global Sequence On commands."
+    	::= { pdu2OutletControlEntry 6 }
+
+pdu2OutletControlRebootOffTime  OBJECT-TYPE
+    	SYNTAX 		        INTEGER (-1..99999)		
+    	ACCESS 		        read-write
+    	STATUS 		        mandatory
+    	DESCRIPTION
+		"Time delay in seconds that the outlet should remain in the Off state when executing a Reboot command."
+    	::= { pdu2OutletControlEntry 7 }
+
+pdu2OutletControlSwitchable  OBJECT-TYPE
+    	SYNTAX 		    INTEGER {
+		            switchable (1),
+		            notSwitchable (2)
+                            }	
+    	ACCESS 		    read-write
+    	STATUS 		    mandatory
+    	DESCRIPTION
+		"Determines the outlet capability to be controlled On/Off from the communication channels.
+		1 : control On/Off enabled
+		2 : control On/Off disabled."
+    	::= { pdu2OutletControlEntry 8 }
+
+pdu2OutletControlShutoffDelay  OBJECT-TYPE
+    	SYNTAX 		        INTEGER (-1..99999)		
+    	ACCESS 		        read-write
+    	STATUS 		        mandatory
+    	DESCRIPTION
+		"Time delay in seconds that could be taken in account before shutting of the outlet.
+    An application which need to shutoff properly an outlet will read this parameter first
+    then write it to the command pdu2OutletControlOffCmd."
+    	::= { pdu2OutletControlEntry 9 }
+
+
+-- =======================
+-- Device Traps
+-- =======================
+trapCritical TRAP-TYPE
+	ENTERPRISE cpqPower
+	VARIABLES  { sysName, 
+	             trapCode, 
+	             trapDescription, 
+	             trapDeviceName,
+	             trapDeviceDetails, 
+	             trapDeviceMgmtUrl }
+	DESCRIPTION
+        "A critical alarm has occurred. Action: Check the Trap Details for more information."
+    --#TYPE      "Critical Alarm"
+    --#SEVERITY  CRITICAL
+    --#CATEGORY  "PowerDevice"
+    --#SIMPLE_SEVERITY CRITICAL
+    --#HWSTATUS_CATEGORY POWER
+    --#SUMMARY " %s from %s %s "
+    --#ARGUMENTS {2, 3, 0}
+    
+    -- PDU Critical Alarm trap text:          Description:
+	--		Voltage High Critical				The PDU has detected an input line voltage that is more than 20% ABOVE the expected voltage		
+	--		Voltage Low Critical				The PDU has detected a very low input line voltage more than 20% BELOW the expected voltage, or the breaker may have tripped. 
+	--		Load Critical					The rated capacity of the breaker has been exceeded. There is a high risk of tripping the breaker
+	--		Current Critical				Current has exceeded the breaker rating level. The addition of any new load could overload or trip the breaker
+	--		Total Power Critical				The rated capacity of the PDU has been exceeded. There is a risk of tripping the branch circuit protection
+	--		Total Heat Critical				The heat created by the load attached to this PDU has exceeded the set threshold
+	--		Total Load Critical				The rated capacity of the PDU has been exceeded. There is a risk of tripping the branch circuit protection
+	
+    -- UPS Critical Alarm trap text:          Description:
+    	--		Agent(s) Not Connected				Loss communication with remote shutdown agent(s)
+	--		Battery Failure					ABM reports Battery failure		
+	--		Battery Low					Battery has reached its Low battery threshold
+	--		EPO Initiated					A Remote Emergency-Power-Off initiated to shutdown UPS immediately.
+	--		Fan Failure					The UPS's Fan Failure detected
+	--		Internal Failure				An internal UPS circuit problem is detected
+	--		Loss of Redundant Communication			Remote Agent lost communicating with one of the redudant UPSes 
+	--		Manual Load Dumped				UPS is switched off manually bys user
+	--		Overload					UPS is overloaded
+	--		Temperature Out of Range			UPS operating temperature is out of range
+	--		Charger Fault					Battery Charger is failure (Offline UPS only)
+	--		DC Bus High/Low					DC Bus voltage is out of range (Offline UPS only)
+	--		DC AUX Power Fault				DC AUX Power circuit is failure (Offline UPS only)
+	--		AC AUX Power Fault				AC AUX Power circuit is failure (Offline UPS only)
+	--		Output Fault					Output Circuit is failure (Offline UPS only)
+	--		DC-DC Fault					DC-to-DC is failure	(Offline UPS only)			
+	--		Output Short					Output circuit is shorted (Offline UPS only)
+	--		Shutdown Imminent				Battery is on too low capacity, UPS is shutdown soon (Offline UPS only)
+	--		Utility Failure					Utility Power is lost (Offline UPS only)
+	--		BP Missing					Missing Battery Pack (Offline UPS only)
+	--		DB Missing					Missing IO Distribution Box (Offline UPS only)
+	--		No Battery					Battery not detected (Offline UPS only)	
+	
+	-- iPDU Critical Alarm trap text:         Description:
+	--		Voltage High 					The voltage for the iPDU is above the warning or critical limit
+	--		Voltage Low 					The voltage for the iPDU is below the warning or critical limit
+	--		Total PDU Load 					The total load of the iPDU is above the warning or critical limit
+	--		Phase Load 					The phase load is above the warning or critical limit
+	--		Load Segment Current 				The current for the circuit breaker is above the warning or critical limit
+	--		Managed Ext. Bar Communication 			An Intelligent Extension Bar can no longer communicate with the iPDU
+	--		Display Communication				The Display Module can no longer communicate with the iPDU
+	--		Redundant Communication				The iPDU cannot communicate with the redundant PDU or there is a redundancy configuration error
+	--		Remote PDU IP Mismatch				The redundant PDU is already configured for redundancy with another PDU
+	--		Remote Outlet Control Disabled			The redundant PDU outlet control settings are disabled and will therefore not allow redundant management control of its outlets
+	--		PDU Communication				The Primary iPDU cannot communicate with the Secondary iPDU 
+        ::= 1
+
+trapWarning TRAP-TYPE
+	ENTERPRISE cpqPower
+	VARIABLES  { sysName, 
+	             trapCode, 
+	             trapDescription, 
+	             trapDeviceName,
+	             trapDeviceDetails, 
+	             trapDeviceMgmtUrl }
+	DESCRIPTION
+        "A warning alarm has occurred. Action: Check the Trap Details for more information."
+    --#TYPE      "Warning Alarm"
+    --#SEVERITY  MINOR
+    --#CATEGORY  "PowerDevice"
+    --#SIMPLE_SEVERITY MAJOR
+    --#HWSTATUS_CATEGORY POWER
+    --#SUMMARY " %s from %s %s "
+    --#ARGUMENTS {2, 3, 0}
+
+  	-- PDU Warning Alarm trap text            Description:
+	--		Voltage High Warning				The PDU has detected an input line voltage that is more than 10% ABOVE the expected voltage
+	--		Voltage Low Warning				The PDU has detected an input line voltage that is more than 10% BELOW the expected voltage
+	--		Load Warning					Load has reached the rating level for this breaker, the addition of any new load could overload or trip the breaker
+	--		Current Warning					Current has reached the rating level for this breaker, the addition of any new load could overload or trip the breaker
+	--		Total Power Warning				The rated capacity for PDU has reached rating level. There is a risk of tripping the branch circuit protection
+	--		Total Heat Warning				The heat created by the load attached to this PDU has reached a threshold
+	--		Total Load Warning				The rated capacity for PDU has reached the rating level. There is a risk of tripping the branch circuit protection
+	--		PDU Communication Lost				Connection between the daisy-chained PDUs is lost.
+
+  	-- UPS Warning Alarm trap text            Description:
+  	--		Battery Discharged				The UPS Batteries are completely discharged
+	--		Battery Disconnected				The batteries are not conntected to the UPS
+	--		Bypass On Auto					The UPS is operating on automatic Bypass
+	--		Bypass Not Available				The UPS Bypass is not available due to a Battery test or internal failure
+	--		Input Out of Range				Input voltage is over or under the operating ranges
+	--		Loss of Redundant Power				One of the redundant UPS is switched off
+	--		On Battery					The UPS is operating on-Battery
+	--		Shutdown Pending				The UPS is about to shutdown soon
+	--		Site Wiring Fault				There is a fault in the input wiring other than Phase Rotation
+	--		Input Frequency NOK				Input Frequency is out of range (Offline UPS only)
+	
+	
+  	-- iPDU Warning Alarm trap text            Description:
+	--		Topology Discovery				An outlet device on an Intelligent Extension Bar can no longer communicate with the iPDU
+	--		Remote PDU Model Mismatch			The two PDUs configured for redundancy management are different PDU models
+	::= 2
+
+trapInformation TRAP-TYPE
+	ENTERPRISE cpqPower
+	VARIABLES  { sysName, 
+	             trapCode, 
+	             trapDescription, 
+	             trapDeviceName,
+	             trapDeviceDetails, 
+	             trapDeviceMgmtUrl }
+	DESCRIPTION
+        "An informational alarm has occurred. Action: Check the Trap Details for more information."
+    --#TYPE      "Information Alarm"
+    --#SEVERITY  INFORMATIONAL
+    --#CATEGORY  "PowerDevice"
+    --#SIMPLE_SEVERITY OK
+    --#HWSTATUS_CATEGORY POWER
+    --#SUMMARY " %s from %s %s "
+    --#ARGUMENTS {2, 3, 0}
+
+ 	-- PDU Informational Alarm trap text          Description:
+	--		(none)						(none)
+	
+  	-- UPS Informational Alarm trap text          Description:
+	--		On Boost					Input voltage low, UPS is boosting to keep output voltage at normal level
+	--		On Buck						Input voltage is high, UPS is reducing to keep output voltage at normal level
+	--		UPS Started On Battery				UPS started on battery, there is no utility input.
+ 	--		ACC Active					Active Current Correction mode is active (Offline UPS only)
+ 	
+ 	-- iPDU Information Alarm trap text            Description:
+	--		Managed Ext. Bar Connected			iPDU detects an Extension Bar connected		
+	--		Managed Ext. Bar Disconnected			iPDU detects an Extension Bar disconnected		
+	--		Display Connected				iPDU detects the Display Module connected		
+	--		Display Disconnected				iPDU detects the Display Module disconnected		
+	--		Discovery Capable Device Connected		iPDU detects an IPD capable device was connected
+	--		Discovery Capable Device Disconnected		iPDU detects an IPD capable device was disconnected
+	--		Secondary PDU Connected				The first iDPU detects the second iPDU connected
+	--		Secondary PDU Disconnected			The first iPDU detects the second iPDU disconnected
+	::= 3
+
+trapCleared TRAP-TYPE
+	ENTERPRISE cpqPower
+	VARIABLES  { sysName, 
+	             trapCode, 
+	             trapDescription, 
+	             trapDeviceName,
+	             trapDeviceDetails, 
+	             trapDeviceMgmtUrl }
+	DESCRIPTION
+        "An alarm has cleared. Action: Check the Trap Details for more information."
+    --#TYPE      "Cleared Alarm"
+    --#SEVERITY  INFORMATIONAL
+    --#CATEGORY  "PowerDevice"
+    --#SIMPLE_SEVERITY OK
+    --#HWSTATUS_CATEGORY POWER
+    --#SUMMARY " %s from %s %s "
+    --#ARGUMENTS {2, 3, 0}
+    ::= 4
+
+trapTest TRAP-TYPE
+        ENTERPRISE cpqPower
+        VARIABLES  { sysName, 
+                     trapCode,
+		     trapDescription,
+		     trapDeviceName,
+                     trapDeviceDetails, 
+                     trapDeviceMgmtUrl } 
+        DESCRIPTION
+        "Test trap sent to a trap receiver to check proper reception of traps"
+    --#TYPE         "Test Trap"
+    --#SEVERITY     INFORMATIONAL
+    --#CATEGORY     "PowerDevice"
+    --#SIMPLE_SEVERITY OK
+    --#HWSTATUS_CATEGORY POWER
+    --#SUMMARY " %s from %s %s "
+    --#ARGUMENTS {2, 3, 0}    
+        ::= 5
+
+deviceTrapInitialization TRAP-TYPE
+	ENTERPRISE cpqPower
+	VARIABLES   { sysName, deviceIdentName }
+	DESCRIPTION
+		"This trap is sent each time a power device is initialized."
+    --#TYPE      "Device Initialization"
+    --#SEVERITY  INFORMATIONAL
+    --#CATEGORY  "PowerDevice"	
+	::= 6
+
+
+END

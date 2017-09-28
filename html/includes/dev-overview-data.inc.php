@@ -1,5 +1,8 @@
 <?php
 
+use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\IP;
+
 echo '<div class="container-fluid">';
 echo "<div class='row'>
       <div class='col-md-12'>
@@ -33,7 +36,19 @@ echo '<tr>
 if (!empty($device['ip'])) {
      echo "<tr><td>Resolved IP</td><td>{$device['ip']}</td></tr>";
 } elseif ($config['force_ip_to_sysname'] === true) {
-     echo "<tr><td>IP Address</td><td>{$device['hostname']}</td></tr>";
+    try {
+        $ip = IP::parse($device['hostname']);
+        echo "<tr><td>IP Address</td><td>$ip</td></tr>";
+    } catch (InvalidIpException $e) {
+        // don't add an ip line
+    }
+}
+
+if ($device['purpose']) {
+    echo '<tr>
+        <td>Description</td>
+        <td>'.display($device['purpose']).'</td>
+      </tr>';
 }
 
 if ($device['hardware']) {

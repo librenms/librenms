@@ -1,0 +1,111 @@
+-- *****************************************************************
+-- NMS-EPON-LLID-TRAP.my: NMS EPON LLID TRAP MIB
+--
+-- October 2009
+-- Edit by LIUQIANG
+-- Copyright (c) 2009 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-EPON-LLID-TRAP DEFINITIONS ::= BEGIN
+
+
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsEPONGroup                              	FROM NMS-SMI
+    ifDescr                                     FROM RFC1213-MIB                                                 
+    llidIfIndex,llidToEponPortDiid,llidsequenceNo                                 FROM NMS-EPON-LLID
+    onuID  FROM NMS-EPON-ONU ;
+
+
+               nmsEponLlidTrap         OBJECT IDENTIFIER ::= { nmsEPONGroup 17 }
+               
+               TypeOfLlidOamChange ::= INTEGER
+                	{ Disabled(1),
+                           Linkfault(2),
+                           PassiveWait(3),
+                           ActiveSendLocal(4),
+                           SendLocalAndRemote(5),
+                           SendLocalAndRemoteOk(6),
+                           OamPeeringLocallyRejected(7),
+                           OamPeeringRemotelyRejected(8),
+                           Operational(9),
+                           Unknown(10)
+                         }
+                         
+                         
+               oAMStatusChange OBJECT-TYPE
+                   SYNTAX  TypeOfLlidOamChange
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS EPON LLID status change."
+                   ::= { nmsEponLlidTrap 1 }
+		                
+                         
+             
+
+-- Notifications
+	nmsEponLlidOamChangesNotifications OBJECT IDENTIFIER
+                                ::= { nmsEponLlidTrap 2 }
+
+
+
+	nmsEponLlidOamChangesNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       llidIfIndex,
+                       ifDescr,
+                       oAMStatusChange
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when oam llid change ."
+    		::= { nmsEponLlidOamChangesNotifications 1 }
+
+
+
+               TypeOfLlidChange ::= INTEGER
+                	{ create(1),
+                           delete(2)
+                         }
+
+
+ 
+               llidStatusChange OBJECT-TYPE
+                   SYNTAX  TypeOfLlidChange
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "NMS EPON LLID status change."
+                   ::= { nmsEponLlidTrap 3 }
+ 
+ 
+ 
+-- Notifications
+	nmsEponLlidChangesNotifications OBJECT IDENTIFIER
+                                ::= { nmsEponLlidTrap 4 }
+
+
+	nmsEponLlidChangesNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       llidIfIndex,
+                       llidToEponPortDiid,
+                       llidsequenceNo,
+                       ifDescr,
+                       onuID,
+                       llidStatusChange
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when llid change ."
+    		::= { nmsEponLlidChangesNotifications 1 }
+
+ 
+              
+
+END

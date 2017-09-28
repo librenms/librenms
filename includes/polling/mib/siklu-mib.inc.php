@@ -40,14 +40,14 @@ $mib_oids = array(
         'rfInPkts',
         'In Packets',
         'DERIVE',
-        '600:0:12500000000',
+        array('min' => 0, 'max' => 12500000000),
     ),
     'rfOutPkts'         => array(
         '1',
         'rfOutPkts',
         'Out Packets',
         'DERIVE',
-        '600:0:12500000000',
+        array('min' => 0, 'max' => 12500000000),
     ),
     'rfInGoodPkts'      => array(
         '1',
@@ -72,14 +72,14 @@ $mib_oids = array(
         'rfInOctets',
         'In Packets',
         'DERIVE',
-        '600:0:12500000000',
+        array('min' => 0, 'max' => 12500000000),
     ),
     'rfOutOctets'       => array(
         '1',
         'rfOutOctets',
         'Out Packets',
         'DERIVE',
-        '600:0:12500000000',
+        array('min' => 0, 'max' => 12500000000),
     ),
     'rfInGoodOctets'    => array(
         '1',

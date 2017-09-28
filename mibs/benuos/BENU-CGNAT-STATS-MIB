@@ -1,0 +1,1243 @@
+BENU-CGNAT-STATS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   Integer32, Unsigned32, Counter64, MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, NOTIFICATION-TYPE
+      FROM SNMPv2-SMI
+
+   DisplayString, MacAddress
+      FROM SNMPv2-TC
+
+   InetAddressType, InetAddress
+      FROM INET-ADDRESS-MIB
+
+   benuWAG FROM BENU-WAG-MIB;
+
+benuCgnatStatsMIB  MODULE-IDENTITY
+            LAST-UPDATED "201701240000Z" -- January 24, 2017
+            ORGANIZATION "Benu Networks,Inc"
+            CONTACT-INFO "Benu Networks,Inc
+                          Corporate Headquarters
+                          300 Concord Road, Suite 110
+                          Billerica, MA 01821 USA
+                          Tel: +1 978-223-4700
+                          Fax: +1 978-362-1908
+                          Email: info@benunets.com"
+            DESCRIPTION
+               "This MIB module defines CGNAT statistics of
+                Benu Wireless Access Gateway.
+
+                Copyright (C)  2014 by Benu Networks, Inc.
+                All rights reserved."
+
+            REVISION "201701240000Z" -- January 24, 2017
+            DESCRIPTION "Added scalar for DS-Lite Tunnel port blocks usage rising threshold."
+
+            REVISION "201701040000Z" -- January 4, 2017
+            DESCRIPTION "Added notification for Tunnel CGNAT port block allocation low threshold."
+
+            REVISION "201612220000Z" -- December 22, 2016
+            DESCRIPTION "Added notification for Tunnel CGNAT port block allocation high threshold."
+
+            REVISION "201501270000Z" -- 27 January, 2015
+            DESCRIPTION "Updated notification assignments to comply with standards (RFC 2578)."
+
+            REVISION "201412100000Z" -- 10 December 2014
+            DESCRIPTION "A separate table to show CGNAT subscribers
+                         actively utilizing ports greater than the 
+                         configured threshold."
+
+            REVISION "201411240000Z" -- 24 November 2014
+            DESCRIPTION "Initial Version"
+    ::= { benuWAG 9 }
+
+-- declare top-level MIB objects for each component
+
+bCgnatMIBObjects    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "WAG CGNAT objects are defined in this branch."
+    ::= { benuCgnatStatsMIB 1 }
+
+bCgnatNotifications  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "CGNAT notifications are defined in this branch."
+   ::= { benuCgnatStatsMIB 0 }
+
+bCgnatNotifObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "MIB objects for CGNAT notifications are defined in this branch."
+   ::= { benuCgnatStatsMIB 2 }
+
+-- CGNAT Auth Stats Table
+
+bCgnatAuthStatsTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BCgnatAuthStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of CGNAT statistics for authenticated subscribers."
+   ::= { bCgnatMIBObjects 1 }
+
+bCgnatAuthStatsEntry  OBJECT-TYPE
+   SYNTAX      BCgnatAuthStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bCgnatAuthStatsTable."
+   INDEX {
+     bCgnatAuthStatsIndex 
+   }
+   ::= { bCgnatAuthStatsTable 1 }
+
+BCgnatAuthStatsEntry ::= SEQUENCE {
+    bCgnatAuthStatsIndex                           Integer32,
+    bCgnatAuthProfileName                          DisplayString,
+    bCgnatAuthDomainPublicIpZeroCount              Counter64,
+    bCgnatAuthDomainNoFreePortCount                Counter64,
+    bCgnatAuthFlowAddSuccessCount                  Counter64,
+    bCgnatAuthFlowAddFailureCount                  Counter64,
+    bCgnatAuthTimerAllocFailureCount               Counter64,
+    bCgnatAuthFlowDeleteSuccessCount               Counter64,
+    bCgnatAuthFlowDeleteFailureCount               Counter64,
+    bCgnatAuthUnsupportedL4DropCount               Counter64,
+    bCgnatAuthNatflowSyncFailureCount              Counter64,
+    bCgnatAuthIcmpIdAllocSuccessCount              Counter64,
+    bCgnatAuthTcpPortAllocSuccessCount             Counter64,
+    bCgnatAuthUdpPortAllocSuccessCount             Counter64,
+    bCgnatAuthIcmpIdAllocFailureCount              Counter64,
+    bCgnatAuthTcpPortAllocFailureCount             Counter64,
+    bCgnatAuthUdpPortAllocFailureCount             Counter64,
+    bCgnatAuthIcmpIdReleaseSuccessCount            Counter64,
+    bCgnatAuthTcpPortReleaseSuccessCount           Counter64,
+    bCgnatAuthUdpPortReleaseSuccessCount           Counter64,
+    bCgnatAuthIcmpIdReleaseFailureCount            Counter64,
+    bCgnatAuthTcpPortReleaseFailureCount           Counter64,
+    bCgnatAuthUdpPortReleaseFailureCount           Counter64,
+    bCgnatAuthMaxCgnatPortsExceeded                Counter64,
+    bCgnatAuthMaxIcmpIdsExceeded                   Counter64,
+    bCgnatAuthFlowDeleteRcvd                       Counter64,
+    bCgnatAuthFlowDeleteSent                       Counter64,
+    bCgnatAuthFlowDeleteFindFailure                Counter64,
+    bCgnatAuthDnsFlowAlloc                         Counter64,
+    bCgnatAuthDnsFlowRelease                       Counter64,
+    bCgnatAuthDnsFlowAllocSuccessCount             Counter64,
+    bCgnatAuthDnsFlowReleaseSuccessCount           Counter64,
+    bCgnatAuthDnsFlowAllocFailureCount             Counter64,
+    bCgnatAuthDnsFlowReleaseFailureCount           Counter64,
+    bCgnatAuthPortsThresholdExceededSent           Counter64,
+    bCgnatAuthPortsThresholdExceededRcvd           Counter64,
+    bCgnatAuthPortsThresholdExceededInt            Counter64,
+    bCgnatAuthPortsThresholdExceededErr            Counter64,
+    bCgnatAuthUnsupportedActionIdRcvd              Counter64,
+    bCgnatAuthNonTcpSynPortAllocDrop               Counter64,
+    bCgnatAuthFlowDeletedTimer                     Counter64,
+    bCgnatAuthFlowDeletedSessionEnded              Counter64,
+    bCgnatAuthFlowDeletedSubClear                  Counter64,
+    bCgnatAuthNatFlowDelErrSubIdMismatch           Counter64,
+    bCgnatAuthNatFlowDelErrValidFlagNotSet         Counter64,
+    bCgnatAuthIcmpPortUnreachableSent              Counter64,
+    bCgnatAuthPortsNotAvailableDrop                Counter64,
+    bCgnatAuthUnsupportedPrivatePortDropCount      Counter64
+}
+
+bCgnatAuthStatsIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A number uniquely identifying this row in the CGNAT statistics table."
+   ::= { bCgnatAuthStatsEntry 1 }
+
+bCgnatAuthProfileName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The name of the CGNAT profile."
+   ::= { bCgnatAuthStatsEntry 2 }
+
+bCgnatAuthDomainPublicIpZeroCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Domain Public IP as zero count."
+   ::= { bCgnatAuthStatsEntry 3 }
+
+bCgnatAuthDomainNoFreePortCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Domain no free port count."
+   ::= { bCgnatAuthStatsEntry 4 }
+
+bCgnatAuthFlowAddSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Flow add success count."
+   ::= { bCgnatAuthStatsEntry 5 }
+                 
+bCgnatAuthFlowAddFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Flow add failure count."
+   ::= { bCgnatAuthStatsEntry 6 }
+                 
+bCgnatAuthTimerAllocFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Timer allocation failure count."
+   ::= { bCgnatAuthStatsEntry 7 }
+              
+bCgnatAuthFlowDeleteSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Flow delete success count."
+   ::= { bCgnatAuthStatsEntry 8 }
+              
+bCgnatAuthFlowDeleteFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Flow delete failure count."
+   ::= { bCgnatAuthStatsEntry 9 }
+              
+bCgnatAuthUnsupportedL4DropCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Unsupported L4 Protocol packets drop count."
+   ::= { bCgnatAuthStatsEntry 10 }
+              
+bCgnatAuthNatflowSyncFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "NAT Flow sync failure count."
+   ::= { bCgnatAuthStatsEntry 11 }
+             
+bCgnatAuthIcmpIdAllocSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "ICMP ID Allocation success count."
+   ::= { bCgnatAuthStatsEntry 12 }
+             
+bCgnatAuthTcpPortAllocSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "TCP port allocation success count."
+   ::= { bCgnatAuthStatsEntry 13 }
+            
+bCgnatAuthUdpPortAllocSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "UDP port allocation success count."
+   ::= { bCgnatAuthStatsEntry 14 }
+            
+bCgnatAuthIcmpIdAllocFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "ICMP ID Allocation failure count."
+   ::= { bCgnatAuthStatsEntry 15 }
+             
+bCgnatAuthTcpPortAllocFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "TCP Port allocation falire count."
+   ::= { bCgnatAuthStatsEntry 16 }
+            
+bCgnatAuthUdpPortAllocFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "UDP Port allocation failure count."
+   ::= { bCgnatAuthStatsEntry 17 }
+            
+bCgnatAuthIcmpIdReleaseSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "ICMP ID release success count."
+   ::= { bCgnatAuthStatsEntry 18 }
+           
+bCgnatAuthTcpPortReleaseSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "TCP Port release success count."
+   ::= { bCgnatAuthStatsEntry 19 }
+          
+bCgnatAuthUdpPortReleaseSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "UDP Port release success count."
+   ::= { bCgnatAuthStatsEntry 20 }
+          
+bCgnatAuthIcmpIdReleaseFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "ICMP Id release failure count."
+   ::= { bCgnatAuthStatsEntry 21 }
+           
+bCgnatAuthTcpPortReleaseFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "TCP Port release failure count."
+   ::= { bCgnatAuthStatsEntry 22 }
+          
+bCgnatAuthUdpPortReleaseFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "UDP port release failure count."
+   ::= { bCgnatAuthStatsEntry 23 }
+          
+bCgnatAuthMaxCgnatPortsExceeded  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Maximum CGNAT Ports exceeded count."
+   ::= { bCgnatAuthStatsEntry 24 }
+               
+bCgnatAuthMaxIcmpIdsExceeded  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Maximum ICMP Id exceeded count."
+   ::= { bCgnatAuthStatsEntry 25 }
+                  
+bCgnatAuthFlowDeleteRcvd  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "CGNAT Flow delete received count."
+   ::= { bCgnatAuthStatsEntry 26 }
+                      
+bCgnatAuthFlowDeleteSent  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "CGNAT Flow delete sent count."
+   ::= { bCgnatAuthStatsEntry 27 }
+                      
+bCgnatAuthFlowDeleteFindFailure  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "CGNAT Flow delete find failure count."
+   ::= { bCgnatAuthStatsEntry 28 }
+               
+bCgnatAuthDnsFlowAlloc  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "DNS Flow allocation count."
+   ::= { bCgnatAuthStatsEntry 29 }
+                        
+bCgnatAuthDnsFlowRelease   OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "DNS Flow release count."
+   ::= { bCgnatAuthStatsEntry 30 }
+                     
+bCgnatAuthDnsFlowAllocSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "DNS Flow allocation success count."
+   ::= { bCgnatAuthStatsEntry 31 }
+            
+bCgnatAuthDnsFlowReleaseSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "DNS Flow release success count."
+   ::= { bCgnatAuthStatsEntry 32 }
+          
+bCgnatAuthDnsFlowAllocFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "DNS Flow allocation failure count."
+   ::= { bCgnatAuthStatsEntry 33 }
+            
+bCgnatAuthDnsFlowReleaseFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "DNS Flow release failure count."
+   ::= { bCgnatAuthStatsEntry 34 }
+          
+bCgnatAuthPortsThresholdExceededSent  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Port threshold exceeded sent count."
+   ::= { bCgnatAuthStatsEntry 35 }
+          
+bCgnatAuthPortsThresholdExceededRcvd  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Port threshold exceeded received count."
+   ::= { bCgnatAuthStatsEntry 36 }
+          
+bCgnatAuthPortsThresholdExceededInt  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Port threshold exceeded interrupt count."
+   ::= { bCgnatAuthStatsEntry 37 }
+           
+bCgnatAuthPortsThresholdExceededErr  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Port threshold exceeded error count."
+   ::= { bCgnatAuthStatsEntry 38 }
+           
+bCgnatAuthUnsupportedActionIdRcvd  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Unsupported action Id received count."
+   ::= { bCgnatAuthStatsEntry 39 }
+             
+bCgnatAuthNonTcpSynPortAllocDrop  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Non TCP SYN Port allocation count."
+   ::= { bCgnatAuthStatsEntry 40 }
+              
+bCgnatAuthFlowDeletedTimer  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "CGNAT Flows deleted due to timer."
+   ::= { bCgnatAuthStatsEntry 41 }
+                    
+bCgnatAuthFlowDeletedSessionEnded  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "CGNAT Flows deleted due to session ended."
+   ::= { bCgnatAuthStatsEntry 42 }
+             
+bCgnatAuthFlowDeletedSubClear  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "CGNAT Flow delete due to clearing subescriber."
+   ::= { bCgnatAuthStatsEntry 43 }
+                 
+bCgnatAuthNatFlowDelErrSubIdMismatch  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "CGNAT Flow delete due to subscriber ID mismatch."
+   ::= { bCgnatAuthStatsEntry 44 }
+          
+bCgnatAuthNatFlowDelErrValidFlagNotSet  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Flow delete error due to valid flag not set."
+   ::= { bCgnatAuthStatsEntry 45 }
+        
+bCgnatAuthIcmpPortUnreachableSent  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "ICMP Port unreachable sent."
+   ::= { bCgnatAuthStatsEntry 46 }
+             
+bCgnatAuthPortsNotAvailableDrop  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Packets dropped due to port not available."
+   ::= { bCgnatAuthStatsEntry 47 }
+               
+bCgnatAuthUnsupportedPrivatePortDropCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Unsupported Private port drop count."
+   ::= { bCgnatAuthStatsEntry 48 }
+     
+
+-- CGNAT unauth Stats Table
+
+bCgnatUnauthStatsTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BCgnatUnauthStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of CGNAT statistics for unauthenticated subscribers."
+   ::= { bCgnatMIBObjects 2 }
+
+bCgnatUnauthStatsEntry  OBJECT-TYPE
+   SYNTAX      BCgnatUnauthStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bCgnatUnauthStatsTable."
+   INDEX {
+     bCgnatUnauthStatsIndex 
+   }
+   ::= { bCgnatUnauthStatsTable 1 }
+
+BCgnatUnauthStatsEntry ::= SEQUENCE {
+    bCgnatUnauthStatsIndex                           Integer32,
+    bCgnatUnauthProfileName                          DisplayString,
+    bCgnatUnauthDomainPublicIpZeroCount              Counter64,
+    bCgnatUnauthDomainNoFreePortCount                Counter64,
+    bCgnatUnauthFlowAddSuccessCount                  Counter64,
+    bCgnatUnauthFlowAddFailureCount                  Counter64,
+    bCgnatUnauthTimerAllocFailureCount               Counter64,
+    bCgnatUnauthFlowDeleteSuccessCount               Counter64,
+    bCgnatUnauthFlowDeleteFailureCount               Counter64,
+    bCgnatUnauthUnsupportedL4DropCount               Counter64,
+    bCgnatUnauthNatflowSyncFailureCount              Counter64,
+    bCgnatUnauthIcmpIdAllocSuccessCount              Counter64,
+    bCgnatUnauthTcpPortAllocSuccessCount             Counter64,
+    bCgnatUnauthUdpPortAllocSuccessCount             Counter64,
+    bCgnatUnauthIcmpIdAllocFailureCount              Counter64,
+    bCgnatUnauthTcpPortAllocFailureCount             Counter64,
+    bCgnatUnauthUdpPortAllocFailureCount             Counter64,
+    bCgnatUnauthIcmpIdReleaseSuccessCount            Counter64,
+    bCgnatUnauthTcpPortReleaseSuccessCount           Counter64,
+    bCgnatUnauthUdpPortReleaseSuccessCount           Counter64,
+    bCgnatUnauthIcmpIdReleaseFailureCount            Counter64,
+    bCgnatUnauthTcpPortReleaseFailureCount           Counter64,
+    bCgnatUnauthUdpPortReleaseFailureCount           Counter64,
+    bCgnatUnauthMaxCgnatPortsExceeded                Counter64,
+    bCgnatUnauthMaxIcmpIdsExceeded                   Counter64,
+    bCgnatUnauthFlowDeleteRcvd                       Counter64,
+    bCgnatUnauthFlowDeleteSent                       Counter64,
+    bCgnatUnauthFlowDeleteFindFailure                Counter64,
+    bCgnatUnauthDnsFlowAlloc                         Counter64,
+    bCgnatUnauthDnsFlowRelease                       Counter64,
+    bCgnatUnauthDnsFlowAllocSuccessCount             Counter64,
+    bCgnatUnauthDnsFlowReleaseSuccessCount           Counter64,
+    bCgnatUnauthDnsFlowAllocFailureCount             Counter64,
+    bCgnatUnauthDnsFlowReleaseFailureCount           Counter64,
+    bCgnatUnauthPortsThresholdExceededSent           Counter64,
+    bCgnatUnauthPortsThresholdExceededRcvd           Counter64,
+    bCgnatUnauthPortsThresholdExceededInt            Counter64,
+    bCgnatUnauthPortsThresholdExceededErr            Counter64,
+    bCgnatUnauthUnsupportedActionIdRcvd              Counter64,
+    bCgnatUnauthNonTcpSynPortAllocDrop               Counter64,
+    bCgnatUnauthFlowDeletedTimer                     Counter64,
+    bCgnatUnauthFlowDeletedSessionEnded              Counter64,
+    bCgnatUnauthFlowDeletedSubClear                  Counter64,
+    bCgnatUnauthNatFlowDelErrSubIdMismatch           Counter64,
+    bCgnatUnauthNatFlowDelErrValidFlagNotSet         Counter64,
+    bCgnatUnauthIcmpPortUnreachableSent              Counter64,
+    bCgnatUnauthPortsNotAvailableDrop                Counter64,
+    bCgnatUnauthUnsupportedPrivatePortDropCount      Counter64
+}
+
+bCgnatUnauthStatsIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A number uniquely identifying this row in the CGNAT statistics table."
+   ::= { bCgnatUnauthStatsEntry 1 }
+
+bCgnatUnauthProfileName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The name of the CGNAT profile."
+   ::= { bCgnatUnauthStatsEntry 2 }
+
+bCgnatUnauthDomainPublicIpZeroCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Domain Public IP as zero count."
+   ::= { bCgnatUnauthStatsEntry 3 }
+
+bCgnatUnauthDomainNoFreePortCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Domain no free port count."
+   ::= { bCgnatUnauthStatsEntry 4 }
+
+bCgnatUnauthFlowAddSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Flow add success count."
+   ::= { bCgnatUnauthStatsEntry 5 }
+                 
+bCgnatUnauthFlowAddFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Flow add failure count."
+   ::= { bCgnatUnauthStatsEntry 6 }
+                 
+bCgnatUnauthTimerAllocFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Timer allocation failure count."
+   ::= { bCgnatUnauthStatsEntry 7 }
+              
+bCgnatUnauthFlowDeleteSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Flow delete success count."
+   ::= { bCgnatUnauthStatsEntry 8 }
+              
+bCgnatUnauthFlowDeleteFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Flow delete failure count."
+   ::= { bCgnatUnauthStatsEntry 9 }
+              
+bCgnatUnauthUnsupportedL4DropCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Unsupported L4 Protocol packets drop count."
+   ::= { bCgnatUnauthStatsEntry 10 }
+              
+bCgnatUnauthNatflowSyncFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "NAT Flow sync failure count."
+   ::= { bCgnatUnauthStatsEntry 11 }
+             
+bCgnatUnauthIcmpIdAllocSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "ICMP ID Allocation success count."
+   ::= { bCgnatUnauthStatsEntry 12 }
+             
+bCgnatUnauthTcpPortAllocSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "TCP port allocation success count."
+   ::= { bCgnatUnauthStatsEntry 13 }
+            
+bCgnatUnauthUdpPortAllocSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "UDP port allocation success count."
+   ::= { bCgnatUnauthStatsEntry 14 }
+            
+bCgnatUnauthIcmpIdAllocFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "ICMP ID Allocation failure count."
+   ::= { bCgnatUnauthStatsEntry 15 }
+             
+bCgnatUnauthTcpPortAllocFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "TCP Port allocation falire count."
+   ::= { bCgnatUnauthStatsEntry 16 }
+            
+bCgnatUnauthUdpPortAllocFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "UDP Port allocation failure count."
+   ::= { bCgnatUnauthStatsEntry 17 }
+            
+bCgnatUnauthIcmpIdReleaseSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "ICMP ID release success count."
+   ::= { bCgnatUnauthStatsEntry 18 }
+           
+bCgnatUnauthTcpPortReleaseSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "TCP Port release success count."
+   ::= { bCgnatUnauthStatsEntry 19 }
+          
+bCgnatUnauthUdpPortReleaseSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "UDP Port release success count."
+   ::= { bCgnatUnauthStatsEntry 20 }
+          
+bCgnatUnauthIcmpIdReleaseFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "ICMP Id release failure count."
+   ::= { bCgnatUnauthStatsEntry 21 }
+           
+bCgnatUnauthTcpPortReleaseFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "TCP Port release failure count."
+   ::= { bCgnatUnauthStatsEntry 22 }
+          
+bCgnatUnauthUdpPortReleaseFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "UDP port release failure count."
+   ::= { bCgnatUnauthStatsEntry 23 }
+          
+bCgnatUnauthMaxCgnatPortsExceeded  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Maximum CGNAT Ports exceeded count."
+   ::= { bCgnatUnauthStatsEntry 24 }
+               
+bCgnatUnauthMaxIcmpIdsExceeded  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Maximum ICMP Id exceeded count."
+   ::= { bCgnatUnauthStatsEntry 25 }
+                  
+bCgnatUnauthFlowDeleteRcvd  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "CGNAT Flow delete received count."
+   ::= { bCgnatUnauthStatsEntry 26 }
+                      
+bCgnatUnauthFlowDeleteSent  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "CGNAT Flow delete sent count."
+   ::= { bCgnatUnauthStatsEntry 27 }
+                      
+bCgnatUnauthFlowDeleteFindFailure  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "CGNAT Flow delete find failure count."
+   ::= { bCgnatUnauthStatsEntry 28 }
+               
+bCgnatUnauthDnsFlowAlloc  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "DNS Flow allocation count."
+   ::= { bCgnatUnauthStatsEntry 29 }
+                        
+bCgnatUnauthDnsFlowRelease   OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "DNS Flow release count."
+   ::= { bCgnatUnauthStatsEntry 30 }
+                     
+bCgnatUnauthDnsFlowAllocSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "DNS Flow allocation success count."
+   ::= { bCgnatUnauthStatsEntry 31 }
+            
+bCgnatUnauthDnsFlowReleaseSuccessCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "DNS Flow release success count."
+   ::= { bCgnatUnauthStatsEntry 32 }
+          
+bCgnatUnauthDnsFlowAllocFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "DNS Flow allocation failure count."
+   ::= { bCgnatUnauthStatsEntry 33 }
+            
+bCgnatUnauthDnsFlowReleaseFailureCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "DNS Flow release failure count."
+   ::= { bCgnatUnauthStatsEntry 34 }
+          
+bCgnatUnauthPortsThresholdExceededSent  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Port threshold exceeded sent count."
+   ::= { bCgnatUnauthStatsEntry 35 }
+          
+bCgnatUnauthPortsThresholdExceededRcvd  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Port threshold exceeded received count."
+   ::= { bCgnatUnauthStatsEntry 36 }
+          
+bCgnatUnauthPortsThresholdExceededInt  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Port threshold exceeded interrupt count."
+   ::= { bCgnatUnauthStatsEntry 37 }
+           
+bCgnatUnauthPortsThresholdExceededErr  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Port threshold exceeded error count."
+   ::= { bCgnatUnauthStatsEntry 38 }
+           
+bCgnatUnauthUnsupportedActionIdRcvd  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Unsupported action Id received count."
+   ::= { bCgnatUnauthStatsEntry 39 }
+             
+bCgnatUnauthNonTcpSynPortAllocDrop  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Non TCP SYN Port allocation count."
+   ::= { bCgnatUnauthStatsEntry 40 }
+              
+bCgnatUnauthFlowDeletedTimer  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "CGNAT Flows deleted due to timer."
+   ::= { bCgnatUnauthStatsEntry 41 }
+                    
+bCgnatUnauthFlowDeletedSessionEnded  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "CGNAT Flows deleted due to session ended."
+   ::= { bCgnatUnauthStatsEntry 42 }
+             
+bCgnatUnauthFlowDeletedSubClear  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "CGNAT Flow delete due to clearing subescriber."
+   ::= { bCgnatUnauthStatsEntry 43 }
+                 
+bCgnatUnauthNatFlowDelErrSubIdMismatch  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "CGNAT Flow delete due to subscriber ID mismatch."
+   ::= { bCgnatUnauthStatsEntry 44 }
+          
+bCgnatUnauthNatFlowDelErrValidFlagNotSet  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Flow delete error due to valid flag not set."
+   ::= { bCgnatUnauthStatsEntry 45 }
+        
+bCgnatUnauthIcmpPortUnreachableSent  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "ICMP Port unreachable sent."
+   ::= { bCgnatUnauthStatsEntry 46 }
+             
+bCgnatUnauthPortsNotAvailableDrop  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Packets dropped due to port not available."
+   ::= { bCgnatUnauthStatsEntry 47 }
+               
+bCgnatUnauthUnsupportedPrivatePortDropCount  OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Unsupported Private port drop count."
+   ::= { bCgnatUnauthStatsEntry 48 }
+     
+-- CGNAT Auth Subscriber Port Utilization Table
+
+bCgnatAuthPortUtilTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BCgnatAuthPortUtilEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of CGNAT statistics for each authenticated subscriber that
+      has crossed port utilization threshold."
+   ::= { bCgnatMIBObjects 3 }
+
+bCgnatAuthPortUtilEntry  OBJECT-TYPE
+   SYNTAX      BCgnatAuthPortUtilEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A logical row in the bCgnatAuthPortUtilTable."
+   INDEX {
+     bCgnatAuthPortUtilIndex
+   }
+   ::= { bCgnatAuthPortUtilTable 1 }
+
+BCgnatAuthPortUtilEntry ::= SEQUENCE {
+    bCgnatAuthPortUtilIndex            Unsigned32,
+    bCgnatAuthSubscriberMac            MacAddress,
+    bCgnatAuthSubscriberPortsFree      Unsigned32
+}
+
+bCgnatAuthPortUtilIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The Port utilization table index of the CGNAT subscriber
+       for which the current ports in use has crossed the
+       configured high water mark."
+    ::= { bCgnatAuthPortUtilEntry 1 }
+
+bCgnatAuthSubscriberMac   OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The MAC address of the authenticated CGNAT subscriber
+       for which the current ports in use has crossed the
+       configured high water mark."
+    ::= { bCgnatAuthPortUtilEntry 2 }
+
+bCgnatAuthSubscriberPortsFree   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of free ports for the authenticated CGNAT subscriber
+       for which the current ports in use has crossed the
+       configured high water mark."
+    ::= { bCgnatAuthPortUtilEntry 3 }
+
+-- CGNAT Scalars
+
+bCgnatAuthPortRisingThresholdCrossedSubCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of the total number of authenticated CGNAT subscribers
+      whose port usage is above the configured rising threshold."
+   ::= { bCgnatMIBObjects 4 }
+
+bDslitePortBlockRisingThresholdCrossedTunCount   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of the total number of DS-Lite tunnels
+      whose port blocks usage is above the configured rising threshold."
+   ::= { bCgnatMIBObjects 5 }
+
+-- Notification Definitions
+
+bCgnatSubscriberMac  OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+       "MAC address of the subscriber."
+    ::= { bCgnatNotifObjects 1 }
+
+bCgnatTotalPortBlocksPerSubscriber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+      "Number of port blocks available for the authenticated CGNAT subscriber." 
+    ::= { bCgnatNotifObjects 2 }
+
+bCgnatPortBlocksUsedHighThreshold    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The high threshold for the number of used CGNAT port blocks by authenticated subscribers.
+        If the number of used port blocks exceeds this value, 
+        a bCgnatPortBlocksUsedHighThresholdReached event
+        will be generated. No more bCgnatPortBlocksUsedHighThresholdReached 
+        events will be generated until the value of the number of
+        used CGNAT port blocks becomes equal to or less than
+        the value of bCgnatPortBlocksUsedLowThreshold. The ratio of this
+        value to the total number of port blocks is reported as percentage in
+        this object.
+        Units: Percentage in the range 0 - 100."
+    ::= { bCgnatNotifObjects 3 }
+
+bCgnatPortBlocksUsedLowThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The low threshold for the number of used CGNAT port blocks by authenticated subscribers.
+        If a bCgnatPortBlocksUsedHighThresholdReached 
+        event had previously been generated, and if the number of 
+        used port blocks equals to or falls below this value, a 
+        bCgnatPortBlocksUsedLowThresholdReached event will be generated.
+        No more bCgnatPortBlocksUsedLowThreshold events will be
+        generated until the value of the number of used CGNAT Port
+        blocks exceeds bCgnatPortBlocksUsedHighThresholdReached and a
+        bCgnatPortBlocksUsedHighThresholdReached is first generated.
+        The ratio of this value to the total number of port blocks is
+        reported as percentage in this object.
+        Units: Percentage in the range 0 - 100."
+        ::= { bCgnatNotifObjects 4 }
+
+bCgnatThresholdTunnelId   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+       "The Id of the CGNAT Tunnel using tunnel port blocks,
+       for which the current ports in use has crossed the
+       configured high water mark."
+    ::= { bCgnatNotifObjects 5 }
+
+bCgnatEvenPortsForTunnel   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Number of even free ports available for the tunnel
+       for which the current ports in use has crossed the
+       configured high/low water mark."
+    ::= { bCgnatNotifObjects 6 }
+
+bCgnatOddPortsForTunnel   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Number of odd free ports available for the tunnel
+       for which the current ports in use has crossed the
+       configured high/low water mark."
+    ::= { bCgnatNotifObjects 7 }
+
+bCgnatPortParity   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Port parity which hit the high/low watermark, 1 for odd port and 2 for Even"
+    ::= { bCgnatNotifObjects 8 }
+
+bCgnatTunnelPortBlocksUsedHighThreshold    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The high threshold for the number of used CGNAT port by a Dslite Tunnel.
+        If the number of used ports in the last port block allocated for the tunnel exceeds this value, 
+        a bCgnatTunnelPortsUsedHighThresholdReached event
+        will be generated. No more bCgnatTunnelPortBlocksUsedHighThresholdReached 
+        events will be generated until the value of the total number of
+        CGNAT available ports becomes equal to or less than half of the 
+        the value of bCgnatTunnelPortsUsedHighThreshold. The ratio of this
+        value to the total number of ports is reported as percentage in
+        this object.
+        Units: Percentage in the range 0 - 100."
+    ::= { bCgnatNotifObjects 9 }
+
+bCgnatTunnelPortBlocksUsedLowThreshold    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The Low threshold for the number of used CGNAT port by a Dslite Tunnel.
+        If the total number of free ports from all the port blocks allocated for the tunnel exceeds this value, 
+        a bCgnatTunnelPortsUsedLowThresholdReached event
+        will be generated. No more bCgnatTunnelPortBlocksUsedLowThresholdReached 
+        events will be generated until a bCgnatTunnelPortBlocksUsedHighThresholdReached is generated.
+        Units: Percentage in the range 0 - 100."
+    ::= { bCgnatNotifObjects 10 }
+
+bCgnatPortBlocksUsedHighThresholdReached  NOTIFICATION-TYPE
+    OBJECTS     {
+                     bCgnatSubscriberMac,
+                     bCgnatTotalPortBlocksPerSubscriber,
+                     bCgnatPortBlocksUsedHighThreshold
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the current number of 
+        used CGNAT port blocks used for an authenticated subscriber has risen above 
+        the value of  bCgnatPortBlocksUsedHighThreshold."
+    ::= { bCgnatNotifications 1 }
+
+bCgnatPortBlocksUsedLowThresholdReached NOTIFICATION-TYPE
+    OBJECTS     {
+                     bCgnatSubscriberMac,
+                     bCgnatTotalPortBlocksPerSubscriber,
+                     bCgnatPortBlocksUsedLowThreshold 
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the current number of 
+        used CGNAT Port blocks for an authenticated subscriber has fallen below the value of 
+        bCgnatPortBlocksUsedLowThreshold."
+    ::= { bCgnatNotifications 2 }
+
+bCgnatTunnelPortBlocksUsedHighThresholdReached  NOTIFICATION-TYPE
+    OBJECTS     {
+                     bCgnatThresholdTunnelId,
+                     bCgnatEvenPortsForTunnel,
+                     bCgnatOddPortsForTunnel,
+                     bCgnatPortParity,
+                     bCgnatTunnelPortBlocksUsedHighThreshold
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the current number of 
+        used CGNAT port blocks used for a Tunnel has risen above 
+        the value of  bCgnatTunnelPortBlocksUsedHighThreshold."
+    ::= { bCgnatNotifications 3 }
+
+
+bCgnatTunnelPortBlocksUsedLowThresholdReached  NOTIFICATION-TYPE
+    OBJECTS     {
+                     bCgnatThresholdTunnelId,
+                     bCgnatEvenPortsForTunnel,
+                     bCgnatOddPortsForTunnel,
+                     bCgnatPortParity,
+                     bCgnatTunnelPortBlocksUsedLowThreshold
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the current number of 
+        used CGNAT port blocks used for a Tunnel has fallen below 
+        the value of  bCgnatTunnelPortBlocksUsedLowThreshold."
+    ::= { bCgnatNotifications 4 }
+
+END

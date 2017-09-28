@@ -1,0 +1,1572 @@
+--  ***************************************************************************
+--  ADVA-FSPR7-MODULE-ENCRYPTION-MIB.txt
+--
+--               ADVA AG Optical Networking Module Encryption MIB File
+--
+--
+--  Copyright 2011 ADVA AG Optical Networking.
+--  All rights reserved.
+--  ***************************************************************************
+
+
+--  MIB definitions required for Module Encryption management.
+
+ADVA-FSPR7-MODULE-ENCRYPTION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    TEXTUAL-CONVENTION,
+    DateAndTime,
+    TruthValue
+                                        FROM  SNMPv2-TC
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+                                        FROM  SNMPv2-CONF
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    Unsigned32
+                                        FROM  SNMPv2-SMI
+    SnmpAdminString
+                                        FROM  SNMP-FRAMEWORK-MIB
+    fspR7,
+    EntityIndex,
+    entityIndex
+                                        FROM  ADVA-MIB
+    entityEqptShelfNo,
+    entityEqptSlotNo,
+    entityEqptPortNo,
+    entityEqptExtNo,
+    entityEqptClassName,
+    entityFacilityShelfNo,
+    entityFacilitySlotNo,
+    entityFacilityPortNo,
+    entityFacilityExtNo,
+    entityFacilityClassName
+                                        FROM  ADVA-FSPR7-MIB;
+    
+
+moduleEncryptionMIB MODULE-IDENTITY
+
+    LAST-UPDATED "201308200000Z"
+
+    ORGANIZATION "ADVA Optical Networking"
+
+    CONTACT-INFO "EMEA Support
+                  Phone : +49 89 89 0665 848
+                  Fax   : +49 89 89 0665 22848
+                  Email : support@advaoptical.com
+
+                  North American Support
+                  Phone : 886 442 ADVA (2382) (toll-free within the US, Canada and Mexico)
+                  Fax   : + 1 806 741 8529 (elsewhere)
+                  Email : support-usa@advaoptical.com
+
+                  Asia Pacific Support
+                  Phone : + 1 866 442 2382 (other toll-free numbers available in some countries)
+                  Email : support-asia@advaoptical.com"
+
+    DESCRIPTION   "This is a MIB definition for ADVA AG Optical Networking module encryption management."
+
+    REVISION      "201308200000Z"
+    DESCRIPTION   "FSP3000 F7 Release 12.1.1 MIB."
+
+    REVISION      "201102160000Z"
+    DESCRIPTION   "FSP3000 F7 Release 10.3.1 MIB."
+    ::= { fspR7 5 }
+
+
+encryptionMIB
+    OBJECT IDENTIFIER ::= { moduleEncryptionMIB 1 }
+
+moduleEncryptionObjects
+    OBJECT IDENTIFIER ::= { encryptionMIB 2 }
+
+portEncryptionObjects
+    OBJECT IDENTIFIER ::= { encryptionMIB 3 }
+
+encryptionPerformanceMonitoring
+    OBJECT IDENTIFIER ::= { encryptionMIB 4 }
+
+CryptoFspR7EnableDisable ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Disable/Enable variable." 
+  SYNTAX        INTEGER
+
+                {
+                  undefined(0),
+                  enable(1),
+                  disable(2)
+                }
+
+CryptoFspR7EnableDisableCaps ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Disable/Enable variable." 
+  SYNTAX        BITS
+                {
+                  capUndefined(0),
+                  capEnable(1),
+                  capDisable(2)
+                }
+
+CryptoFspR7EncryptionReset ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Textual-Convention for module 'reset to factory' operation. The rls(1) value
+         means that 'reset to factory' is not happening. Choosing the rtf(2) value executes the
+         'reset to factory' operation immediately." 
+  SYNTAX        INTEGER
+                {
+                  undefined(0),
+                  rls(1),
+                  rtf(2)  --Manual reset,  All passwords are cleared
+                }
+
+CryptoFspR7EncryptionResetCaps ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Textual-Convention for module 'reset to factory' operation. The rls(1) value
+         means that 'reset to factory' is not happening. Choosing the rtf(2) value executes the
+         'reset to factory' operation immediately." 
+  SYNTAX        BITS
+                {
+                  capUndefined(0),
+                  capRls(1),
+                  capRtf(2)
+                }
+
+CryptoFspR7EncryptionSwitch ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Textual-Convention for disabling the encrypted mode." 
+  SYNTAX        INTEGER
+                {
+                  undefined(0),
+                  rls(1),
+                  oprCryptoOff(2)
+                }
+
+CryptoFspR7EncryptionSwitchCaps ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Textual-Convention for disabling the encrypted mode." 
+  SYNTAX        BITS
+                {
+                  capUndefined(0),
+                  capRls(1),
+                  capOprCryptoOff(2)
+                }
+
+CryptoFspR7ForceKeyExchange ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Textual-Convention for forcing the key exchange process between
+         encryption-capable modules. Successful process startup does not mean that
+         whole operation succeeded." 
+  SYNTAX        INTEGER
+                {
+                  undefined(0),
+                  rls(1),
+                  oprKeyExchg(2)
+                }
+
+CryptoFspR7ForceKeyExchangeCaps ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Textual-Convention for forcing the key exchange process between
+         encryption-capable modules. Successful process startup does not mean that
+         whole operation succeeded." 
+  SYNTAX        BITS
+                {
+                  capUndefined(0),
+                  capRls(1),
+                  capOprKeyExchg(2)
+                }
+
+CryptoFspR7KeyExchangeForcedClear ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Textual-Convention for reseting the key exchange failure status." 
+  SYNTAX        INTEGER
+                {
+                  undefined(0),
+                  rls(1),
+                  reset(2)
+                }
+
+CryptoFspR7KeyExchangeForcedClearCaps ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Textual-Convention for reseting the key exchange failure status." 
+  SYNTAX        BITS
+                {
+                  capUndefined(0),
+                  capRls(1),
+                  capReset(2)
+                }
+
+CryptoFspR7SelfTestOperation ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Encryption selftest" 
+  SYNTAX        INTEGER
+                {
+                  undefined(0),
+                  rls(1),
+                  oprSelfTest(2)
+                }
+
+CryptoFspR7SelfTestOperationCaps ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Encryption selftest" 
+  SYNTAX        BITS
+                {
+                  capUndefined(0),
+                  capRls(1),
+                  capOprSelfTest(2)
+                }
+
+CryptoFspR7SessionKeyLifetime ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Textual-Convention presenting available key lifetime periods for an encrypted sessions." 
+  SYNTAX        INTEGER
+                {
+                  undefined(0),
+                  lifetime30min(1),
+                  lifetime1h(2),
+                  lifetime2h(3),
+                  lifetime3h(4),
+                  lifetime6h(5),
+                  lifetime12h(6),
+                  lifetime1d(7),
+                  lifetime2d(8),
+                  lifetime3d(9),
+                  lifetime1w(10),
+                  lifetime2w(11),
+                  lifetime3w(12),
+                  lifetimeMax(13)
+                }
+
+CryptoFspR7SessionKeyLifetimeCaps ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Textual-Convention presenting available key lifetime periods for an encrypted sessions." 
+  SYNTAX        BITS
+                {
+                  capUndefined(0),
+                  capLifetime30min(1),
+                  capLifetime1h(2),
+                  capLifetime2h(3),
+                  capLifetime3h(4),
+                  capLifetime6h(5),
+                  capLifetime12h(6),
+                  capLifetime1d(7),
+                  capLifetime2d(8),
+                  capLifetime3d(9),
+                  capLifetime1w(10),
+                  capLifetime2w(11),
+                  capLifetime3w(12),
+                  capLifetimeMax(13)
+                }
+
+
+--  mib-oriented scalars
+
+cryptoOfficerPassword OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "This object must be present in every set-request regarding encryption functionality."
+    ::=  { moduleEncryptionObjects 1 }
+
+cryptoOfficerPasswordError OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                  undefined(0),
+                  passwdOk(1),
+                  passwdInvalid(2),
+                  passwdRejected(3),
+                  passwdNotInit(4),
+                  passwdTooSimple(5),
+                  passwdValidationAborted(6),
+                  none(7)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Last error related to set-request perform on that table."
+    ::=  { moduleEncryptionObjects 2 }
+
+cryptoOfficerPasswordReqId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Set-Request id for which cryptoOfficerPasswordError contains value."
+    ::=  { moduleEncryptionObjects 3 }
+
+
+--  module encryption configuration
+
+cryptoModuleConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CryptoModuleConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains encryption-related writeable parameters defined per module."
+    ::=  { moduleEncryptionObjects 10 }
+
+cryptoModuleConfigEntry OBJECT-TYPE
+    SYNTAX      CryptoModuleConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents an encryption-capable module."
+    INDEX       {
+                  cryptoModuleConfigIndex
+                }
+    ::=  { cryptoModuleConfigTable 1 }
+
+CryptoModuleConfigEntry ::=  SEQUENCE
+  { cryptoModuleConfigIndex EntityIndex,
+    cryptoModuleConfigCryptoOfficerPassword SnmpAdminString,
+    cryptoModuleConfigResetToFactory CryptoFspR7EncryptionReset,
+    cryptoModuleConfigFirmwareUpdateState CryptoFspR7EnableDisable,
+    cryptoModuleConfigFirmwareVersion SnmpAdminString,
+    cryptoModuleConfigSelfTestOperation CryptoFspR7SelfTestOperation }
+
+cryptoModuleConfigIndex OBJECT-TYPE
+    SYNTAX      EntityIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Address of an encryption capable module."
+    ::=  { cryptoModuleConfigEntry 1 }
+
+cryptoModuleConfigCryptoOfficerPassword OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "The current Crypto Officer password. It may be only modified, but cannot be read. Read attempt
+         of this object will result with noSuchName error.
+        "
+    ::=  { cryptoModuleConfigEntry 2 }
+
+cryptoModuleConfigResetToFactory OBJECT-TYPE
+    SYNTAX      CryptoFspR7EncryptionReset
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Executes 'reset to factory' action."
+    ::=  { cryptoModuleConfigEntry 3 }
+
+cryptoModuleConfigFirmwareUpdateState OBJECT-TYPE
+    SYNTAX      CryptoFspR7EnableDisable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Determines if it is allowed for a module to perform firmware upgrade."
+    ::=  { cryptoModuleConfigEntry 4 }
+
+cryptoModuleConfigFirmwareVersion OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Firmware package version designated for an upgrade."
+    ::=  { cryptoModuleConfigEntry 5 }
+
+cryptoModuleConfigSelfTestOperation OBJECT-TYPE
+    SYNTAX      CryptoFspR7SelfTestOperation
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Starts self-tests."
+    ::=  { cryptoModuleConfigEntry 6 }
+
+
+--  module encryption monitoring
+
+cryptoModuleStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CryptoModuleStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains encryption-related readable parameters defined per module."
+    ::=  { moduleEncryptionObjects 11 }
+
+cryptoModuleStatusEntry OBJECT-TYPE
+    SYNTAX      CryptoModuleStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents an encryption-capable module."
+    INDEX       {
+                  cryptoModuleConfigIndex
+                }
+    ::=  { cryptoModuleStatusTable 1 }
+
+CryptoModuleStatusEntry ::=  SEQUENCE
+  { cryptoModuleStatusIndex EntityIndex,
+    cryptoModuleStatusFailureLoginCount Unsigned32,
+    cryptoModuleStatusSuccessfulLoginDateAndTime DateAndTime,
+    cryptoModuleStatusUnsuccessfulLoginDateAndTime DateAndTime,
+    cryptoModuleStatusResetToFactoryCapability CryptoFspR7EnableDisable }
+
+cryptoModuleStatusIndex OBJECT-TYPE
+    SYNTAX      EntityIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Address of an encryption capable module."
+    ::=  { cryptoModuleStatusEntry 1 }
+
+cryptoModuleStatusFailureLoginCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..3 | 4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Number of unsuccessful Crypto Officer log-in attempts."
+    ::=  { cryptoModuleStatusEntry 2 }
+
+cryptoModuleStatusSuccessfulLoginDateAndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The date and time of a last successful Crypto Officer login."
+    ::=  { cryptoModuleStatusEntry 3 }
+
+cryptoModuleStatusUnsuccessfulLoginDateAndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The date and time of a last unsuccessful Crypto Officer login."
+    ::=  { cryptoModuleStatusEntry 4 }
+
+cryptoModuleStatusResetToFactoryCapability OBJECT-TYPE
+    SYNTAX      CryptoFspR7EnableDisable
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The status of possibility to perform Reset To Factory operation. If disable(2) then
+         cryptoModuleConfigResetToFactory cannot be used, otherwise operation will fail."
+    ::=  { cryptoModuleStatusEntry 5 }
+
+
+--  five index scheme module encryption 
+
+cryptoModuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CryptoModuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains encryption-related parameters defined per module."
+    ::=  { moduleEncryptionObjects 20 }
+
+cryptoModuleEntry OBJECT-TYPE
+    SYNTAX      CryptoModuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents an encryption-capable module."
+    INDEX       {
+                  entityEqptShelfNo,
+                  entityEqptSlotNo,
+                  entityEqptPortNo,
+                  entityEqptExtNo,
+                  entityEqptClassName
+                }
+    ::=  { cryptoModuleTable 1 }
+
+CryptoModuleEntry ::=  SEQUENCE
+  { cryptoModuleCryptoOfficerPassword SnmpAdminString,
+    cryptoModuleResetToFactory CryptoFspR7EncryptionReset,
+    cryptoModuleFirmwareUpdateState CryptoFspR7EnableDisable,
+    cryptoModuleFirmwareVersion SnmpAdminString,
+    cryptoModuleSelfTestOperation CryptoFspR7SelfTestOperation,
+    cryptoModuleFailureLoginCount Unsigned32,
+    cryptoModuleSuccessfulLoginDateAndTime DateAndTime,
+    cryptoModuleUnsuccessfulLoginDateAndTime DateAndTime }
+
+cryptoModuleCryptoOfficerPassword OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "The current Crypto Officer password. It may be only modified, but cannot be read. Read attempt
+         of this object will result with noSuchName error.
+        "
+    ::=  { cryptoModuleEntry 1 }
+
+cryptoModuleResetToFactory OBJECT-TYPE
+    SYNTAX      CryptoFspR7EncryptionReset
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Executes 'reset to factory' action."
+    ::=  { cryptoModuleEntry 2 }
+
+cryptoModuleFirmwareUpdateState OBJECT-TYPE
+    SYNTAX      CryptoFspR7EnableDisable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Determines if it is allowed for a module to perform firmware upgrade."
+    ::=  { cryptoModuleEntry 3 }
+
+cryptoModuleFirmwareVersion OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Firmware package version designated for an upgrade."
+    ::=  { cryptoModuleEntry 4 }
+
+cryptoModuleSelfTestOperation OBJECT-TYPE
+    SYNTAX      CryptoFspR7SelfTestOperation
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Starts self-tests."
+    ::=  { cryptoModuleEntry 5 }
+
+cryptoModuleFailureLoginCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..3 | 4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Number of unsuccessful Crypto Officer log-in attempts."
+    ::=  { cryptoModuleEntry 6 }
+
+cryptoModuleSuccessfulLoginDateAndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The date and time of a last successful Crypto Officer login."
+    ::=  { cryptoModuleEntry 7 }
+
+cryptoModuleUnsuccessfulLoginDateAndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The date and time of a last unsuccessful Crypto Officer login."
+    ::=  { cryptoModuleEntry 8 }
+
+cryptoModuleCapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CryptoModuleCapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains encryption-related parameters defined per module."
+    ::=  { moduleEncryptionObjects 21 }
+
+cryptoModuleCapEntry OBJECT-TYPE
+    SYNTAX      CryptoModuleCapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents an encryption-capable module."
+    INDEX       {
+                  entityEqptShelfNo,
+                  entityEqptSlotNo,
+                  entityEqptPortNo,
+                  entityEqptExtNo,
+                  entityEqptClassName
+                }
+    ::=  { cryptoModuleCapTable 1 }
+
+CryptoModuleCapEntry ::=  SEQUENCE
+  { cryptoModuleCapCryptoOfficerPassword Integer32,
+    cryptoModuleCapResetToFactory CryptoFspR7EncryptionResetCaps,
+    cryptoModuleCapFirmwareUpdateState CryptoFspR7EnableDisableCaps,
+    cryptoModuleCapFirmwareVersion Integer32,
+    cryptoModuleCapSelfTestOperation CryptoFspR7SelfTestOperationCaps }
+
+cryptoModuleCapCryptoOfficerPassword OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The current Crypto Officer password. It may be only modified, but cannot be read. Read attempt
+         of this object will result with noSuchName error.
+        "
+    ::=  { cryptoModuleCapEntry 1 }
+
+cryptoModuleCapResetToFactory OBJECT-TYPE
+    SYNTAX      CryptoFspR7EncryptionResetCaps
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Executes 'reset to factory' action."
+    ::=  { cryptoModuleCapEntry 2 }
+
+cryptoModuleCapFirmwareUpdateState OBJECT-TYPE
+    SYNTAX      CryptoFspR7EnableDisableCaps
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Determines if it is allowed for a module to perform firmware upgrade."
+    ::=  { cryptoModuleCapEntry 3 }
+
+cryptoModuleCapFirmwareVersion OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Firmware package version designated for an upgrade."
+    ::=  { cryptoModuleCapEntry 4 }
+
+cryptoModuleCapSelfTestOperation OBJECT-TYPE
+    SYNTAX      CryptoFspR7SelfTestOperationCaps
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Starts self-tests."
+    ::=  { cryptoModuleCapEntry 5 }
+
+
+--  port encryption configuration
+
+cryptoPortConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CryptoPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains encryption-related writeable parameters defined per port."
+    ::=  { portEncryptionObjects 12 }
+
+cryptoPortConfigEntry OBJECT-TYPE
+    SYNTAX      CryptoPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents an encryption-capable port."
+    INDEX       {
+                  cryptoPortConfigIndex
+                }
+    ::=  { cryptoPortConfigTable 1 }
+
+CryptoPortConfigEntry ::=  SEQUENCE
+  { cryptoPortConfigIndex EntityIndex,
+    cryptoPortConfigAuthKey SnmpAdminString,
+    cryptoPortConfigAuthKeyLifeTime CryptoFspR7SessionKeyLifetime,
+    cryptoPortConfigEncryptionOffState CryptoFspR7EnableDisable,
+    cryptoPortConfigEncryptionOff CryptoFspR7EncryptionSwitch,
+    cryptoPortConfigForceKeyExchange CryptoFspR7ForceKeyExchange,
+    cryptoPortConfigKeyExchangeForcedClear CryptoFspR7KeyExchangeForcedClear }
+
+cryptoPortConfigIndex OBJECT-TYPE
+    SYNTAX      EntityIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Address of an encryption capable port."
+    ::=  { cryptoPortConfigEntry 1 }
+
+cryptoPortConfigAuthKey OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Encryption password being an input to generate an authentication key used to
+         traffic encryption between ports. This object can be write only. Read attempt
+         will fail with noSuchName error."
+    ::=  { cryptoPortConfigEntry 2 }
+
+cryptoPortConfigAuthKeyLifeTime OBJECT-TYPE
+    SYNTAX      CryptoFspR7SessionKeyLifetime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Determines a life period of an introduced authentication key for a traffic encryption."
+    ::=  { cryptoPortConfigEntry 3 }
+
+cryptoPortConfigEncryptionOffState OBJECT-TYPE
+    SYNTAX      CryptoFspR7EnableDisable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Enable/disable possibility of using encryption switch. This is an additional trigger required to
+         make a transition into transparent mode in two steps."
+    ::=  { cryptoPortConfigEntry 4 }
+
+cryptoPortConfigEncryptionOff OBJECT-TYPE
+    SYNTAX      CryptoFspR7EncryptionSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Disable/enable encryption switch."
+    ::=  { cryptoPortConfigEntry 5 }
+
+cryptoPortConfigForceKeyExchange OBJECT-TYPE
+    SYNTAX      CryptoFspR7ForceKeyExchange
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Force key exchange."
+    ::=  { cryptoPortConfigEntry 6 }
+
+cryptoPortConfigKeyExchangeForcedClear OBJECT-TYPE
+    SYNTAX      CryptoFspR7KeyExchangeForcedClear
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Clears on demand the alarmEncryptionPortKeyExchangeForced condition."
+    ::=  { cryptoPortConfigEntry 7 }
+
+
+--  port encryption monitoring
+
+cryptoPortStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CryptoPortStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains encryption-related readable parameters defined per port."
+    ::=  { portEncryptionObjects 13 }
+
+cryptoPortStatusEntry OBJECT-TYPE
+    SYNTAX      CryptoPortStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents an encryption-capable port."
+    INDEX       {
+                  cryptoPortStatusIndex
+                }
+    ::=  { cryptoPortStatusTable 1 }
+
+CryptoPortStatusEntry ::=  SEQUENCE
+  { cryptoPortStatusIndex EntityIndex,
+    cryptoPortStatusEncryptionOffTimeRemaining Unsigned32,
+    cryptoPortStatusFailureKeyExchangeCount Unsigned32,
+    cryptoPortStatusSuccessfulKeyExchangeDateAndTime DateAndTime,
+    cryptoPortStatusUnsuccessfulKeyExchangeDateAndTime DateAndTime,
+    cryptoPortStatusAuthKeyLifeTimeRemaining Unsigned32,
+    cryptoPortStatusEncryptionOffCapability CryptoFspR7EnableDisable }
+
+cryptoPortStatusIndex OBJECT-TYPE
+    SYNTAX      EntityIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Address of an encryption capable module."
+    ::=  { cryptoPortStatusEntry 1 }
+
+cryptoPortStatusEncryptionOffTimeRemaining OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Informs about amount of minutes remaining to restore traffic encryption."
+    ::=  { cryptoPortStatusEntry 2 }
+
+cryptoPortStatusFailureKeyExchangeCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..3 | 4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Numbers of unsuccessful encryption key exchanges since the successful one."
+    ::=  { cryptoPortStatusEntry 3 }
+
+cryptoPortStatusSuccessfulKeyExchangeDateAndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The date and time of a recent successful encryption key exchange."
+    ::=  { cryptoPortStatusEntry 4 }
+
+cryptoPortStatusUnsuccessfulKeyExchangeDateAndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The date and time of a recent unsuccessful encryption key exchange."
+    ::=  { cryptoPortStatusEntry 5 }
+
+cryptoPortStatusAuthKeyLifeTimeRemaining OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Remaining time for cryptoPortConfigAuthKeyLifeTime timer to stop counting."
+    ::=  { cryptoPortStatusEntry 6 }
+
+cryptoPortStatusEncryptionOffCapability OBJECT-TYPE
+    SYNTAX      CryptoFspR7EnableDisable
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Capability for encryption switch."
+    ::=  { cryptoPortStatusEntry 7 }
+
+
+--  five index scheme port encryption 
+
+cryptoPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CryptoPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains encryption-related parameters defined per port."
+    ::=  { portEncryptionObjects 20 }
+
+cryptoPortEntry OBJECT-TYPE
+    SYNTAX      CryptoPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents an encryption-capable port."
+    INDEX       {
+                  entityFacilityShelfNo,
+                  entityFacilitySlotNo,
+                  entityFacilityPortNo,
+                  entityFacilityExtNo,
+                  entityFacilityClassName
+                }
+    ::=  { cryptoPortTable 1 }
+
+CryptoPortEntry ::=  SEQUENCE
+  { cryptoPortAuthKey SnmpAdminString,
+    cryptoPortAuthKeyLifeTime CryptoFspR7SessionKeyLifetime,
+    cryptoPortEncryptionOffState CryptoFspR7EnableDisable,
+    cryptoPortEncryptionOff CryptoFspR7EncryptionSwitch,
+    cryptoPortForceKeyExchange CryptoFspR7ForceKeyExchange,
+    cryptoPortKeyExchangeForcedClear CryptoFspR7KeyExchangeForcedClear,
+    cryptoPortEncryptionOffTimeRemaining Unsigned32,
+    cryptoPortFailureKeyExchangeCount Unsigned32,
+    cryptoPortSuccessfulKeyExchangeDateAndTime DateAndTime,
+    cryptoPortUnsuccessfulKeyExchangeDateAndTime DateAndTime,
+    cryptoPortAuthKeyLifeTimeRemaining Unsigned32 }
+
+cryptoPortAuthKey OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Encryption password being an input to generate an authentication key used to
+         traffic encryption between ports. This object can be write only. Read attempt
+         will fail with noSuchName error."
+    ::=  { cryptoPortEntry 1 }
+
+cryptoPortAuthKeyLifeTime OBJECT-TYPE
+    SYNTAX      CryptoFspR7SessionKeyLifetime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Determines a life period of an introduced authentication key for a traffic encryption."
+    ::=  { cryptoPortEntry 2 }
+
+cryptoPortEncryptionOffState OBJECT-TYPE
+    SYNTAX      CryptoFspR7EnableDisable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Enable/disable possibility of using encryption switch. This is an additional trigger required to
+         make a transition into transparent mode in two steps."
+    ::=  { cryptoPortEntry 3 }
+
+cryptoPortEncryptionOff OBJECT-TYPE
+    SYNTAX      CryptoFspR7EncryptionSwitch
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Disable/enable encryption switch."
+    ::=  { cryptoPortEntry 4 }
+
+cryptoPortForceKeyExchange OBJECT-TYPE
+    SYNTAX      CryptoFspR7ForceKeyExchange
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Force key exchange."
+    ::=  { cryptoPortEntry 5 }
+
+cryptoPortKeyExchangeForcedClear OBJECT-TYPE
+    SYNTAX      CryptoFspR7KeyExchangeForcedClear
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "Clears on demand the alarmEncryptionPortKeyExchangeForced condition."
+    ::=  { cryptoPortEntry 6 }
+
+cryptoPortEncryptionOffTimeRemaining OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Informs about amount of minutes remaining to restore traffic encryption."
+    ::=  { cryptoPortEntry 7 }
+
+cryptoPortFailureKeyExchangeCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..3 | 4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Numbers of unsuccessful encryption key exchanges since the successful one."
+    ::=  { cryptoPortEntry 8 }
+
+cryptoPortSuccessfulKeyExchangeDateAndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The date and time of a recent successful encryption key exchange."
+    ::=  { cryptoPortEntry 9 }
+
+cryptoPortUnsuccessfulKeyExchangeDateAndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The date and time of a recent unsuccessful encryption key exchange."
+    ::=  { cryptoPortEntry 10 }
+
+cryptoPortAuthKeyLifeTimeRemaining OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Remaining time for cryptoPortConfigAuthKeyLifeTime timer to stop counting."
+    ::=  { cryptoPortEntry 11 }
+
+cryptoPortCapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CryptoPortCapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains encryption-related parameters defined per port."
+    ::=  { portEncryptionObjects 21 }
+
+cryptoPortCapEntry OBJECT-TYPE
+    SYNTAX      CryptoPortCapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents an encryption-capable port."
+    INDEX       {
+                  entityFacilityShelfNo,
+                  entityFacilitySlotNo,
+                  entityFacilityPortNo,
+                  entityFacilityExtNo,
+                  entityFacilityClassName
+                }
+    ::=  { cryptoPortCapTable 1 }
+
+CryptoPortCapEntry ::=  SEQUENCE
+  { cryptoPortCapAuthKey Integer32,
+    cryptoPortCapAuthKeyLifeTime CryptoFspR7SessionKeyLifetimeCaps,
+    cryptoPortCapEncryptionOffState CryptoFspR7EnableDisableCaps,
+    cryptoPortCapEncryptionOff CryptoFspR7EncryptionSwitchCaps,
+    cryptoPortCapForceKeyExchange CryptoFspR7ForceKeyExchangeCaps,
+    cryptoPortCapKeyExchangeForcedClear CryptoFspR7KeyExchangeForcedClearCaps }
+
+cryptoPortCapAuthKey OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Encryption password being an input to generate an authentication key used to
+         traffic encryption between ports. This object can be write only. Read attempt
+         will fail with noSuchName error."
+    ::=  { cryptoPortCapEntry 1 }
+
+cryptoPortCapAuthKeyLifeTime OBJECT-TYPE
+    SYNTAX      CryptoFspR7SessionKeyLifetimeCaps
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Determines a life period of an introduced authentication key for a traffic encryption."
+    ::=  { cryptoPortCapEntry 2 }
+
+cryptoPortCapEncryptionOffState OBJECT-TYPE
+    SYNTAX      CryptoFspR7EnableDisableCaps
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Enable/disable possibility of using encryption switch. This is an additional trigger required to
+         make a transition into transparent mode in two steps."
+    ::=  { cryptoPortCapEntry 3 }
+
+cryptoPortCapEncryptionOff OBJECT-TYPE
+    SYNTAX      CryptoFspR7EncryptionSwitchCaps
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Disable/enable encryption switch."
+    ::=  { cryptoPortCapEntry 4 }
+
+cryptoPortCapForceKeyExchange OBJECT-TYPE
+    SYNTAX      CryptoFspR7ForceKeyExchangeCaps
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Force key exchange."
+    ::=  { cryptoPortCapEntry 5 }
+
+cryptoPortCapKeyExchangeForcedClear OBJECT-TYPE
+    SYNTAX      CryptoFspR7KeyExchangeForcedClearCaps
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Clears on demand the alarmEncryptionPortKeyExchangeForced condition."
+    ::=  { cryptoPortCapEntry 6 }
+
+
+--  performance monitoring of an encrypted port
+
+intervalEncryptionSublayerPm15minTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IntervalEncryptionSublayerPm15minEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains encryption-related performance monitoring 15-min
+         values related to channel ports."
+    ::=  { encryptionPerformanceMonitoring 1 }
+
+intervalEncryptionSublayerPm15minEntry OBJECT-TYPE
+    SYNTAX      IntervalEncryptionSublayerPm15minEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents performance monitoring entry."
+    INDEX       {
+                  entityIndex,
+                  intervalEncryptionSublayerPm15minNumber
+                }
+    ::=  { intervalEncryptionSublayerPm15minTable 1 }
+
+IntervalEncryptionSublayerPm15minEntry ::=  SEQUENCE
+  { intervalEncryptionSublayerPm15minNumber Integer32,
+    intervalEncryptionSublayerPm15minEncryptionRunSeconds Unsigned32,
+    intervalEncryptionSublayerPm15minEncryptionRunErrorSeconds Unsigned32,
+    intervalEncryptionSublayerPm15minEncryptionRunDegradeSeconds Unsigned32,
+    intervalEncryptionSublayerPm15minValidFlag TruthValue,
+    intervalEncryptionSublayerPm15minTimeStamp DateAndTime }
+
+intervalEncryptionSublayerPm15minNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..96)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A number between 1 and 96, which identifies the interval for
+         which the set of statistics is available. The interval
+         identified by 1 is the most recently completed 15 minute
+         interval, and the interval identified by N is the interval
+         immediately preceding the one identified by N-1." 
+    ::=  { intervalEncryptionSublayerPm15minEntry 1 }
+
+intervalEncryptionSublayerPm15minEncryptionRunSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Informs about time period (seconds) during encryption mode."
+    ::=  { intervalEncryptionSublayerPm15minEntry 2 }
+
+intervalEncryptionSublayerPm15minEncryptionRunErrorSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Informs about errorous time period (seconds) during encryption mode."
+    ::=  { intervalEncryptionSublayerPm15minEntry 3 }
+
+intervalEncryptionSublayerPm15minEncryptionRunDegradeSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Informs about degraded time period (seconds) during encryption mode."
+    ::=  { intervalEncryptionSublayerPm15minEntry 4 }
+
+intervalEncryptionSublayerPm15minValidFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Valid Flag" 
+    ::=  { intervalEncryptionSublayerPm15minEntry 5 }
+
+intervalEncryptionSublayerPm15minTimeStamp OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Timestamp" 
+    ::=  { intervalEncryptionSublayerPm15minEntry 6 }
+
+intervalEncryptionSublayerPm1dayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IntervalEncryptionSublayerPm1dayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains interval encryption-related performance monitoring 15-min
+         values related to channel ports."
+    ::=  { encryptionPerformanceMonitoring 2 }
+
+intervalEncryptionSublayerPm1dayEntry OBJECT-TYPE
+    SYNTAX      IntervalEncryptionSublayerPm1dayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents performance monitoring entry."
+    INDEX       {
+                  entityIndex,
+                  intervalEncryptionSublayerPm1dayNumber
+                }
+    ::=  { intervalEncryptionSublayerPm1dayTable 1 }
+
+IntervalEncryptionSublayerPm1dayEntry ::=  SEQUENCE
+  { intervalEncryptionSublayerPm1dayNumber Integer32,
+    intervalEncryptionSublayerPm1dayEncryptionRunSeconds Unsigned32,
+    intervalEncryptionSublayerPm1dayEncryptionRunErrorSeconds Unsigned32,
+    intervalEncryptionSublayerPm1dayEncryptionRunDegradeSeconds Unsigned32,
+    intervalEncryptionSublayerPm1dayValidFlag TruthValue,
+    intervalEncryptionSublayerPm1dayTimeStamp DateAndTime }
+
+intervalEncryptionSublayerPm1dayNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..31)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A number, which identifies the interval for
+         which the set of statistics is available. The interval
+         identified by 1 is the most recently completed 1 day
+         interval." 
+    ::=  { intervalEncryptionSublayerPm1dayEntry 1 }
+
+intervalEncryptionSublayerPm1dayEncryptionRunSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Informs about time period (seconds) during encryption mode."
+    ::=  { intervalEncryptionSublayerPm1dayEntry 2 }
+
+intervalEncryptionSublayerPm1dayEncryptionRunErrorSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Informs about errorous time period (seconds) during encryption mode."
+    ::=  { intervalEncryptionSublayerPm1dayEntry 3 }
+
+intervalEncryptionSublayerPm1dayEncryptionRunDegradeSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Informs about degraded time period (seconds) during encryption mode."
+    ::=  { intervalEncryptionSublayerPm1dayEntry 4 }
+
+intervalEncryptionSublayerPm1dayValidFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Valid Flag" 
+    ::=  { intervalEncryptionSublayerPm1dayEntry 5 }
+
+intervalEncryptionSublayerPm1dayTimeStamp OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Timestamp" 
+    ::=  { intervalEncryptionSublayerPm1dayEntry 6 }
+
+currentEncryptionSublayerPm15minTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CurrentEncryptionSublayerPm15minEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains current encryption-related performance monitoring 15-min
+         values related to channel ports."
+    ::=  { encryptionPerformanceMonitoring 3 }
+
+currentEncryptionSublayerPm15minEntry OBJECT-TYPE
+    SYNTAX      CurrentEncryptionSublayerPm15minEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents performance monitoring entry."
+    INDEX       {
+                  entityIndex
+                }
+    ::=  { currentEncryptionSublayerPm15minTable 1 }
+
+CurrentEncryptionSublayerPm15minEntry ::=  SEQUENCE
+  { currentEncryptionSublayerPm15minEncryptionRunSeconds Unsigned32,
+    currentEncryptionSublayerPm15minEncryptionRunErrorSeconds Unsigned32,
+    currentEncryptionSublayerPm15minEncryptionRunDegradeSeconds Unsigned32,
+    currentEncryptionSublayerPm15minElapsedTime Integer32 }
+
+currentEncryptionSublayerPm15minEncryptionRunSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Encryption running seconds" 
+    ::=  { currentEncryptionSublayerPm15minEntry 1 }
+
+currentEncryptionSublayerPm15minEncryptionRunErrorSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Encryption Errored Seconds" 
+    ::=  { currentEncryptionSublayerPm15minEntry 2 }
+
+currentEncryptionSublayerPm15minEncryptionRunDegradeSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Encryption in degrade mode seconds" 
+    ::=  { currentEncryptionSublayerPm15minEntry 3 }
+
+currentEncryptionSublayerPm15minElapsedTime OBJECT-TYPE
+    SYNTAX      Integer32 (0..9000 | -2147483648)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Elapsed 15Min" 
+    ::=  { currentEncryptionSublayerPm15minEntry 4 }
+
+currentEncryptionSublayerPm1dayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CurrentEncryptionSublayerPm1dayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains current encryption-related performance monitoring 1-day
+         values related to channel ports."
+    ::=  { encryptionPerformanceMonitoring 4 }
+
+currentEncryptionSublayerPm1dayEntry OBJECT-TYPE
+    SYNTAX      CurrentEncryptionSublayerPm1dayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents performance monitoring entry."
+    INDEX       {
+                  entityIndex
+                }
+    ::=  { currentEncryptionSublayerPm1dayTable 1 }
+
+CurrentEncryptionSublayerPm1dayEntry ::=  SEQUENCE
+  { currentEncryptionSublayerPm1dayEncryptionRunSeconds Unsigned32,
+    currentEncryptionSublayerPm1dayEncryptionRunErrorSeconds Unsigned32,
+    currentEncryptionSublayerPm1dayEncryptionRunDegradeSeconds Unsigned32,
+    currentEncryptionSublayerPm1dayElapsedTime Integer32 }
+
+currentEncryptionSublayerPm1dayEncryptionRunSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Encryption running seconds" 
+    ::=  { currentEncryptionSublayerPm1dayEntry 1 }
+
+currentEncryptionSublayerPm1dayEncryptionRunErrorSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Encryption Errored Seconds" 
+    ::=  { currentEncryptionSublayerPm1dayEntry 2 }
+
+currentEncryptionSublayerPm1dayEncryptionRunDegradeSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Encryption in degrade mode seconds" 
+    ::=  { currentEncryptionSublayerPm1dayEntry 3 }
+
+currentEncryptionSublayerPm1dayElapsedTime OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400 | -2147483648)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Elapsed 1Day" 
+    ::=  { currentEncryptionSublayerPm1dayEntry 4 }
+
+
+--  five index scheme performance monitoring of an encrypted port 
+
+cryFacilityCurrent15minTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CryFacilityCurrent15minEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains current encryption-related performance monitoring 15-min
+         values related to channel ports."
+    ::=  { encryptionPerformanceMonitoring 10 }
+
+cryFacilityCurrent15minEntry OBJECT-TYPE
+    SYNTAX      CryFacilityCurrent15minEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents performance monitoring entry."
+    INDEX       {
+                  entityFacilityShelfNo,
+                  entityFacilitySlotNo,
+                  entityFacilityPortNo,
+                  entityFacilityExtNo,
+                  entityFacilityClassName
+                }
+    ::=  { cryFacilityCurrent15minTable 1 }
+
+CryFacilityCurrent15minEntry ::=  SEQUENCE
+  { cryFacilityCurrent15minEncryptionRunSeconds Unsigned32,
+    cryFacilityCurrent15minEncryptionRunErrorSeconds Unsigned32,
+    cryFacilityCurrent15minEncryptionRunDegradeSeconds Unsigned32,
+    cryFacilityCurrent15minElapsedTime Integer32 }
+
+cryFacilityCurrent15minEncryptionRunSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Encryption running seconds" 
+    ::=  { cryFacilityCurrent15minEntry 1 }
+
+cryFacilityCurrent15minEncryptionRunErrorSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Encryption Errored Seconds" 
+    ::=  { cryFacilityCurrent15minEntry 2 }
+
+cryFacilityCurrent15minEncryptionRunDegradeSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Encryption in degrade mode seconds" 
+    ::=  { cryFacilityCurrent15minEntry 3 }
+
+cryFacilityCurrent15minElapsedTime OBJECT-TYPE
+    SYNTAX      Integer32 (0..9000 | -2147483648)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Elapsed 15Min" 
+    ::=  { cryFacilityCurrent15minEntry 4 }
+
+cryFacilityCurrent1dayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CryFacilityCurrent1dayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains current encryption-related performance monitoring 1-day
+         values related to channel ports."
+    ::=  { encryptionPerformanceMonitoring 11 }
+
+cryFacilityCurrent1dayEntry OBJECT-TYPE
+    SYNTAX      CryFacilityCurrent1dayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents performance monitoring entry."
+    INDEX       {
+                  entityFacilityShelfNo,
+                  entityFacilitySlotNo,
+                  entityFacilityPortNo,
+                  entityFacilityExtNo,
+                  entityFacilityClassName
+                }
+    ::=  { cryFacilityCurrent1dayTable 1 }
+
+CryFacilityCurrent1dayEntry ::=  SEQUENCE
+  { cryFacilityCurrent1dayEncryptionRunSeconds Unsigned32,
+    cryFacilityCurrent1dayEncryptionRunErrorSeconds Unsigned32,
+    cryFacilityCurrent1dayEncryptionRunDegradeSeconds Unsigned32,
+    cryFacilityCurrent1dayElapsedTime Integer32 }
+
+cryFacilityCurrent1dayEncryptionRunSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Encryption running seconds" 
+    ::=  { cryFacilityCurrent1dayEntry 1 }
+
+cryFacilityCurrent1dayEncryptionRunErrorSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Encryption Errored Seconds" 
+    ::=  { cryFacilityCurrent1dayEntry 2 }
+
+cryFacilityCurrent1dayEncryptionRunDegradeSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Encryption in degrade mode seconds" 
+    ::=  { cryFacilityCurrent1dayEntry 3 }
+
+cryFacilityCurrent1dayElapsedTime OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400 | -2147483648)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Elapsed 1Day" 
+    ::=  { cryFacilityCurrent1dayEntry 4 }
+
+cryFacilityHistorical15minTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CryFacilityHistorical15minEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains historical encryption-related performance monitoring 15-min
+         values related to channel ports."
+    ::=  { encryptionPerformanceMonitoring 12 }
+
+cryFacilityHistorical15minEntry OBJECT-TYPE
+    SYNTAX      CryFacilityHistorical15minEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents performance monitoring entry."
+    INDEX       {
+                  entityFacilityShelfNo,
+                  entityFacilitySlotNo,
+                  entityFacilityPortNo,
+                  entityFacilityExtNo,
+                  entityFacilityClassName,
+                  cryFacilityHistorical15minNumber
+                }
+    ::=  { cryFacilityHistorical15minTable 1 }
+
+CryFacilityHistorical15minEntry ::=  SEQUENCE
+  { cryFacilityHistorical15minNumber Integer32,
+    cryFacilityHistorical15minEncryptionRunSeconds Unsigned32,
+    cryFacilityHistorical15minEncryptionRunErrorSeconds Unsigned32,
+    cryFacilityHistorical15minEncryptionRunDegradeSeconds Unsigned32,
+    cryFacilityHistorical15minValidFlag TruthValue,
+    cryFacilityHistorical15minTimeStamp DateAndTime }
+
+cryFacilityHistorical15minNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..96)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A number between 1 and 96, which identifies the interval for
+         which the set of statistics is available. The interval
+         identified by 1 is the most recently completed 15 minute
+         interval, and the interval identified by N is the interval
+         immediately preceding the one identified by N-1." 
+    ::=  { cryFacilityHistorical15minEntry 1 }
+
+cryFacilityHistorical15minEncryptionRunSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Informs about time period (seconds) during encryption mode."
+    ::=  { cryFacilityHistorical15minEntry 2 }
+
+cryFacilityHistorical15minEncryptionRunErrorSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Informs about errorous time period (seconds) during encryption mode."
+    ::=  { cryFacilityHistorical15minEntry 3 }
+
+cryFacilityHistorical15minEncryptionRunDegradeSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Informs about degraded time period (seconds) during encryption mode."
+    ::=  { cryFacilityHistorical15minEntry 4 }
+
+cryFacilityHistorical15minValidFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Valid Flag" 
+    ::=  { cryFacilityHistorical15minEntry 5 }
+
+cryFacilityHistorical15minTimeStamp OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Timestamp" 
+    ::=  { cryFacilityHistorical15minEntry 6 }
+
+cryFacilityHistorical1dayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CryFacilityHistorical1dayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains historical encryption-related performance monitoring 1-day
+         values related to channel ports."
+    ::=  { encryptionPerformanceMonitoring 13 }
+
+cryFacilityHistorical1dayEntry OBJECT-TYPE
+    SYNTAX      CryFacilityHistorical1dayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents performance monitoring entry."
+    INDEX       {
+                  entityFacilityShelfNo,
+                  entityFacilitySlotNo,
+                  entityFacilityPortNo,
+                  entityFacilityExtNo,
+                  entityFacilityClassName,
+                  cryFacilityHistorical1dayNumber
+                }
+    ::=  { cryFacilityHistorical1dayTable 1 }
+
+CryFacilityHistorical1dayEntry ::=  SEQUENCE
+  { cryFacilityHistorical1dayNumber Integer32,
+    cryFacilityHistorical1dayEncryptionRunSeconds Unsigned32,
+    cryFacilityHistorical1dayEncryptionRunErrorSeconds Unsigned32,
+    cryFacilityHistorical1dayEncryptionRunDegradeSeconds Unsigned32,
+    cryFacilityHistorical1dayValidFlag TruthValue,
+    cryFacilityHistorical1dayTimeStamp DateAndTime }
+
+cryFacilityHistorical1dayNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..31)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A number, which identifies the interval for
+         which the set of statistics is available. The interval
+         identified by 1 is the most recently completed 1 day
+         interval." 
+    ::=  { cryFacilityHistorical1dayEntry 1 }
+
+cryFacilityHistorical1dayEncryptionRunSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Informs about time period (seconds) during encryption mode."
+    ::=  { cryFacilityHistorical1dayEntry 2 }
+
+cryFacilityHistorical1dayEncryptionRunErrorSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Informs about errorous time period (seconds) during encryption mode."
+    ::=  { cryFacilityHistorical1dayEntry 3 }
+
+cryFacilityHistorical1dayEncryptionRunDegradeSeconds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Informs about degraded time period (seconds) during encryption mode."
+    ::=  { cryFacilityHistorical1dayEntry 4 }
+
+cryFacilityHistorical1dayValidFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Valid Flag" 
+    ::=  { cryFacilityHistorical1dayEntry 5 }
+
+cryFacilityHistorical1dayTimeStamp OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Timestamp" 
+    ::=  { cryFacilityHistorical1dayEntry 6 }
+
+
+-- conformance information
+
+encryptionMIBConformance OBJECT IDENTIFIER ::= { encryptionMIB 1 }
+
+encryptionMIBCompliances OBJECT IDENTIFIER ::= { encryptionMIBConformance 1 }
+
+encryptionMIBGroups      OBJECT IDENTIFIER ::= { encryptionMIBConformance 2 }
+
+
+-- compliance statements
+
+encryptionMIBCompliance MODULE-COMPLIANCE
+  STATUS  current
+  DESCRIPTION
+    "The compliance statement for entities implementing the ADVA FspR7 Module Encryption MIB."
+  MODULE  -- this module
+  MANDATORY-GROUPS { encryptionMIBGroup }
+  ::= { encryptionMIBCompliances 1 }
+
+
+-- units of conformance
+
+encryptionMIBGroup OBJECT-GROUP
+  OBJECTS {
+      cryptoOfficerPassword,
+      cryptoModuleConfigCryptoOfficerPassword,
+      cryptoModuleConfigResetToFactory,
+      cryptoModuleConfigFirmwareUpdateState,
+      cryptoModuleConfigFirmwareVersion,
+      cryptoModuleStatusFailureLoginCount,
+      cryptoModuleStatusSuccessfulLoginDateAndTime,
+      cryptoModuleStatusUnsuccessfulLoginDateAndTime,
+      cryptoPortConfigAuthKey,
+      cryptoPortConfigAuthKeyLifeTime,
+      cryptoPortConfigEncryptionOffState,
+      cryptoPortConfigEncryptionOff,
+      cryptoPortConfigForceKeyExchange,
+      cryptoPortConfigKeyExchangeForcedClear,
+      cryptoPortStatusEncryptionOffTimeRemaining,
+      cryptoPortStatusFailureKeyExchangeCount,
+      cryptoPortStatusSuccessfulKeyExchangeDateAndTime,
+      cryptoPortStatusUnsuccessfulKeyExchangeDateAndTime,
+      cryptoPortStatusAuthKeyLifeTimeRemaining,
+      intervalEncryptionSublayerPm15minEncryptionRunSeconds,
+      intervalEncryptionSublayerPm15minEncryptionRunErrorSeconds,
+      intervalEncryptionSublayerPm15minEncryptionRunDegradeSeconds,
+      intervalEncryptionSublayerPm15minValidFlag,
+      intervalEncryptionSublayerPm15minTimeStamp,
+      intervalEncryptionSublayerPm1dayEncryptionRunSeconds,
+      intervalEncryptionSublayerPm1dayEncryptionRunErrorSeconds,
+      intervalEncryptionSublayerPm1dayEncryptionRunDegradeSeconds,
+      intervalEncryptionSublayerPm1dayValidFlag,
+      intervalEncryptionSublayerPm1dayTimeStamp,
+      currentEncryptionSublayerPm15minEncryptionRunSeconds,
+      currentEncryptionSublayerPm15minEncryptionRunErrorSeconds,
+      currentEncryptionSublayerPm15minEncryptionRunDegradeSeconds,
+      currentEncryptionSublayerPm15minElapsedTime,
+      currentEncryptionSublayerPm1dayEncryptionRunSeconds,
+      currentEncryptionSublayerPm1dayEncryptionRunErrorSeconds,
+      currentEncryptionSublayerPm1dayEncryptionRunDegradeSeconds,
+      currentEncryptionSublayerPm1dayElapsedTime
+  }
+  STATUS  current
+  DESCRIPTION
+    "A list of objects used for configuration of an encryption functionality on port and module level."
+  ::= { encryptionMIBGroups 1 }
+
+END
+

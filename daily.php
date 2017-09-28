@@ -8,8 +8,9 @@
 
 $init_modules = array('alerts');
 require __DIR__ . '/includes/init.php';
+include_once __DIR__ . '/includes/notifications.php';
 
-$options = getopt('f:d:o:');
+$options = getopt('f:d:o:t:r:');
 
 if (isset($options['d'])) {
     echo "DEBUG\n";
@@ -97,8 +98,26 @@ if ($options['f'] === 'device_perf') {
     }
 }
 
+if ($options['f'] === 'set_notification') {
+    if ($options['t'] === 'update') {
+        $title = 'Error: Daily update failed';
+
+        if ($options['r']) {
+            remove_notification($title);
+        } else {
+            new_notification(
+                $title,
+                'The daily update script (daily.sh) has failed. Please check output by hand. If you need assistance, '
+                . 'visit the <a href="https://www.librenms.org/#support">LibreNMS Website</a> to find out how.',
+                2,
+                'daily.sh'
+            );
+        }
+    }
+}
+
 if ($options['f'] === 'notifications') {
-    include_once 'includes/notifications.php';
+    post_notifications();
 }
 
 if ($options['f'] === 'bill_data') {
@@ -169,4 +188,8 @@ if ($options['f'] === 'notify') {
             "We just attempted to update your install but failed. The information below should help you fix this.\r\n\r\n" . $options['o']
         );
     }
+}
+
+if ($options['f'] === 'peeringdb') {
+    cache_peeringdb();
 }

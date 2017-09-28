@@ -1,0 +1,1902 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+
+ --
+ -- CIENA-CES-MODULE-MIB.my
+ --
+
+ CIENA-CES-MODULE-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS       
+   Integer32, TimeTicks, Unsigned32, NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY         
+       FROM SNMPv2-SMI        
+   DisplayString, MacAddress, TEXTUAL-CONVENTION
+       FROM SNMPv2-TC 
+   OBJECT-GROUP, NOTIFICATION-GROUP
+       FROM SNMPv2-CONF              
+   cienaGlobalSeverity, cienaGlobalMacAddress
+   		FROM CIENA-GLOBAL-MIB    
+   CienaGlobalState
+   		FROM CIENA-TC
+   cienaCesNotifications, cienaCesConfig
+        FROM CIENA-SMI;
+   
+ cienaCesModuleMIB MODULE-IDENTITY
+			LAST-UPDATED "201401230000Z"
+			ORGANIZATION
+				"Ciena Corp."
+			CONTACT-INFO
+        	"  Mib Meister
+               115 North Sullivan Road
+               Spokane Valley, WA 99037
+               USA            
+               Phone:  +1 509 242 9000
+               Email:  support@ciena.com"        
+	      	DESCRIPTION
+		       "This module defines the module configuration objects and also the objects required for
+		       module related notifications."
+
+            REVISION    "201401230000Z"
+            DESCRIPTION
+            "Augmented TceHealthCategory TEXTUAL-CONVENTION with the following enumerations:
+		powerParams(34), powerOutputVoltage(35)"
+ 
+
+           REVISION    "201312050000Z"
+            DESCRIPTION
+            "Augmented TceHealthCategory TEXTUAL-CONVENTION with the following enumerations:
+              smFabric(30), spi(31), slotResource(32), tempIom(33).
+             Augmented cienaCesModuleResourceHealthSubCategory with the following enumerations:
+              pltfmLmPowerBudget(22), pltfmPpIngressL2Xform(23), pltfmPpEgressL2Xform(24), pltfmPpInternalTcam(25),
+              pltfmNpMaintPoint(26), pltfmNpMaintPointSession(27), pltfmNpFastTimer300Hz(28), pltfmNpFastTimer10msec(29),
+              pltfmNpFastTimer100msec(30), pltfmNpFastTimer1sec(31), pltfmNpSlowTimer(32), pltfmNpWatchdogTimer(33),
+              pltfmNpProtectionGroup(34)."
+
+            REVISION    "201304160000Z"
+            DESCRIPTION
+            " Added cienaCesModuleSlotName to the cienaCesModuleEntry"
+
+            REVISION    "201303280000Z"
+            DESCRIPTION
+            " Added cienaCesModuleIDPTable ."
+
+            REVISION    "201303070000Z"
+            DESCRIPTION
+            " Changed cienaCesModuleHealthStatusNormalNotification to cienaCesModuleHealthStatusGoodNotification."
+
+            REVISION    "201208230000Z"
+            DESCRIPTION
+            " Changed cienaCesModuleOperState enum hitlessReinit to hitlessInit."
+
+            REVISION    "201206280000Z"
+            DESCRIPTION
+            " Added pltfmBscp, pltfmHighRateTokenBucket, pltfmLowRateTokenBucket, pltfmParentMeter, pltfmChildMeter, 
+	      pltfmL2UserTypes, and logicalInterfaces to cienaCesModuleResourceHealthSubCategory."
+
+            REVISION    "201206140000Z"
+            DESCRIPTION
+            " Added usbFlash and linxstats to TceHealthCategory."
+
+            REVISION    "201106060000Z"
+            DESCRIPTION
+            " Added new traps cienaCesModuleSwitchFabricDisruptedUnrecoverableNotification,
+		      cienaCesModuleSwitchFabricDisruptedRecoverableNotification."
+
+		    REVISION    "201012130000Z"
+            DESCRIPTION
+		   		 "cienaCesModulePOSTErrorTable has been modified and new objects were added."
+
+			REVISION "201005100000Z"
+	      	DESCRIPTION
+		       "Initial creation."
+          ::= { cienaCesConfig 2 }
+                  
+ --
+ -- Node definitions
+ --
+   
+ cienaCesModuleMIBObjects OBJECT IDENTIFIER ::= { cienaCesModuleMIB 1 }
+ 
+ cienaCesModuleNotifAttrs OBJECT IDENTIFIER ::= { cienaCesModuleMIBObjects 3 }
+ cienaCesModuleGlobal       OBJECT IDENTIFIER ::= { cienaCesModuleMIBObjects 1 }
+ cienaCesModule       OBJECT IDENTIFIER ::= { cienaCesModuleMIBObjects 2 }  
+ cienaCesSwModule	  OBJECT IDENTIFIER ::= { cienaCesModule 4 }
+ 
+ cienaCesModuleMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 3 } 
+ cienaCesModuleMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { cienaCesModuleMIBNotificationPrefix 0 }
+ 
+ --
+ --Conformance 
+ --
+ cienaCesModuleConformance		OBJECT IDENTIFIER ::= { cienaCesModuleMIB 2 }
+ cienaCesModuleMIBCompliances	OBJECT IDENTIFIER ::= { cienaCesModuleConformance 1 }
+ cienaCesModuleMIBGroups		OBJECT IDENTIFIER ::= { cienaCesModuleConformance 2 }
+ --
+ -- Textual convention
+ --                    
+ 
+ SwPkgStatus ::= TEXTUAL-CONVENTION
+     STATUS          current
+     DESCRIPTION     "Last Xgrade command operational state."
+     SYNTAX          INTEGER  {
+	                     unknown(0),
+	                     good(1),
+	                     invalid(2),
+			     loading(3),
+			     syncing(4),
+			     waiting(5),
+	                     burning(6),
+                             empty(7)
+                     }
+
+ SwModuleState ::= TEXTUAL-CONVENTION
+     STATUS          current
+     DESCRIPTION     "Xgrade state."
+     SYNTAX          INTEGER  {
+	                     installing(1),
+	                     booting(2),
+	                     initializing(3),
+	                     good(4),
+	                     failed(5),
+	                     disabled(6),
+	                     empty(7),
+	                     unsupported(8),
+	                     unknown(9)
+                     }
+ 
+  TceHealthCategory ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "CES system health categories."
+     SYNTAX       INTEGER { 
+                     unknown(1),
+                     cpu(2),
+                     datapath(3),
+                     ethernet(4),
+                     fabric(5), 
+                     sm(6),
+                     tempSm(7),
+                     samplesSm(8),
+                     disk(9),
+                     tempModule(10),
+                     samplesModule(11),
+                     fanTray(12),
+                     fanTraySpeedMismatch(13),
+                     fanSpeedMismatch(14),
+                     tempFan(15),
+                     samplesFan(16),
+		     fanRpm(17),
+		     power(18),
+                     feedPower(19),
+                     systemResource(20),
+                     memory(21),
+                     mac(22),
+                     i2c(23),
+                     flash(24),
+                     transceiver(25),
+                     link(26),
+                     iomStatus(27),
+		     usbFlash(28),
+		     linxstats(29),
+		     smFabric(30),
+		     spi(31),
+		     slotResource(32),
+		     tempIom(33),
+		     powerParams(34),
+		     powerOutputVoltage(35)
+     }
+                       
+ TceHealthStatus ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "CES system health status code."
+     SYNTAX       INTEGER {
+                     unknown(1),
+                     normal(2),
+                     warning(3),
+                     degraded(4),
+                     faulted(5)
+     }         
+                  
+ HealthOriginType ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Origin of the resource."
+     SYNTAX       INTEGER {         
+     						 none(0),
+		                     chassis(1),
+ 							 slot(2),
+ 							 port(3),
+ 							 unit(4)
+     } 
+ 
+ --
+ -- Global parameters
+ --
+ cienaCesModuleGlobalPostState          OBJECT-TYPE
+     SYNTAX         CienaGlobalState                                     
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the global POST state for the system."               
+     ::= { cienaCesModuleGlobal 1 } 
+
+ --
+ --  The Module Table
+ --
+
+ cienaCesModuleTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesModuleEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the modules configured and detected."
+    ::= { cienaCesModule 1 }
+
+ cienaCesModuleEntry OBJECT-TYPE
+    SYNTAX     CienaCesModuleEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the cienaCesModuleTable."
+    INDEX      { cienaCesModuleChassisIndx, cienaCesModuleShelfIndx, cienaCesModuleSlotIndx }
+    ::= { cienaCesModuleTable 1 }
+ 
+ CienaCesModuleEntry ::= SEQUENCE {                  
+    cienaCesModuleChassisIndx           Unsigned32,
+    cienaCesModuleShelfIndx             Unsigned32,
+    cienaCesModuleSlotIndx              Unsigned32,
+    cienaCesModuleModel                 DisplayString,
+    cienaCesModuleType                  INTEGER,
+    cienaCesModuleDescription           DisplayString,    
+    cienaCesModuleAdminState            INTEGER,
+    cienaCesModuleOperState             INTEGER,
+    cienaCesModuleProtectionRole        INTEGER,    
+    cienaCesModuleStandbyStatus	        INTEGER,
+    cienaCesModuleLastRebootReason      INTEGER,    
+    cienaCesModuleAdminPostState        INTEGER,
+    cienaCesModuleOperPostState         INTEGER,
+    cienaCesModuleTrapState				CienaGlobalState,
+    cienaCesModuleChassisNotifIndx		Unsigned32,
+    cienaCesModuleShelfNotifIndx		Unsigned32,
+    cienaCesModuleSlotNotifIndx			Unsigned32,
+    cienaCesModuleSlotName			DisplayString
+    }                                 
+
+ cienaCesModuleChassisIndx          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..1)
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the chassis index for the module."               
+     ::= { cienaCesModuleEntry 1 }
+     
+ cienaCesModuleShelfIndx          OBJECT-TYPE
+     SYNTAX          Unsigned32 (0..992)
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the shelf index for the module."               
+     ::= { cienaCesModuleEntry 2 }
+
+ cienaCesModuleSlotIndx          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..38)	
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the slot index for the module."
+     ::= { cienaCesModuleEntry 3 }
+     
+ cienaCesModuleModel   OBJECT-TYPE
+     SYNTAX          DisplayString
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the module model."               
+     ::= { cienaCesModuleEntry 4 }  
+  
+ cienaCesModuleType   OBJECT-TYPE
+     SYNTAX          INTEGER { 
+     					invalid(0),
+                        unknown(1),
+                        ctm(2),
+                        lm(3),
+                        sm(4)
+                     }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "This object indicates whether this is a single module, control timing module, 
+           I/O module or fabric module."                                  
+     ::= { cienaCesModuleEntry 5 }
+        
+ cienaCesModuleDescription OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This object indicates the description of the module."
+     ::= { cienaCesModuleEntry 6 } 
+     
+  cienaCesModuleAdminState   OBJECT-TYPE
+     SYNTAX          INTEGER {
+                        enabled(1),
+                        disabled(2),
+						shutdown(3)
+                     }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the administrative state of the module."
+     DEFVAL { enabled }               
+     ::= { cienaCesModuleEntry 7 }
+
+
+ cienaCesModuleOperState   OBJECT-TYPE
+     SYNTAX          INTEGER {
+                        uninstalled(1),
+                        unequipped(2),
+                        init(3),
+                        disabled(4),
+                        enabled(5),
+                        faulted(6),
+                        hotswap(7),
+			poweroff(8),
+                        hitlessInit(9),
+			fastReload(10),
+			krnInit(11),
+			unsupported(12),
+			installing(13),
+			failed(14),
+			krnDisable(15),
+			appFault(16),
+			booting(17),
+			powerdown(18)
+			}
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the operational state of the module."               
+     ::= { cienaCesModuleEntry 8 }
+ 
+ cienaCesModuleProtectionRole   OBJECT-TYPE
+     SYNTAX          INTEGER {
+                        none(1),
+                        primary(2),
+                        secondary(3)
+                     }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the redundant administrative state of the module."     
+     ::= { cienaCesModuleEntry 9 }
+      
+ cienaCesModuleStandbyStatus   OBJECT-TYPE
+     SYNTAX          INTEGER {
+                        none(0),
+                        cold(1),
+                        warm(2),
+                        hot(3),
+                        protected(4)
+                     }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the standby status of the module."     
+     ::= { cienaCesModuleEntry 10 }        
+ 
+ cienaCesModuleLastRebootReason  OBJECT-TYPE
+     SYNTAX          INTEGER {
+                        unknown(1),
+                        snmp(2),
+                        pwrFail(3),
+                        appLoad(4),
+                        errorHandler(5),
+                        watchdog(6),
+                        upgrade(7),
+                        cli(8),
+                        resetButton(9),
+                        failOver(10),
+                        faultManager(11),
+                        communicationFailure(12),
+                        configurationRevert(13),
+                        unprotectedFailure(14),
+                        bootFailure(15),
+                        softwareRevert(16),
+                        processorWarmRestart(17),
+                        coldRestart(18),
+                        primaryRestart(19)
+                     }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the last reboot reason of the module."     
+     ::= { cienaCesModuleEntry 11 } 
+     
+ cienaCesModuleAdminPostState          OBJECT-TYPE
+     SYNTAX          CienaGlobalState     
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "This object sets the POST administrative state for the given module."               
+     ::= { cienaCesModuleEntry 12 }
+ 
+ cienaCesModuleOperPostState          OBJECT-TYPE
+     SYNTAX          CienaGlobalState     
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the POST operational state for the given module."               
+     ::= { cienaCesModuleEntry 13}
+
+ cienaCesModuleTrapState		OBJECT-TYPE
+ 	SYNTAX			CienaGlobalState
+ 	MAX-ACCESS		read-write
+ 	STATUS			current
+ 	DESCRIPTION
+ 		"This object indicates whether the device generates notifications for this module."
+    DEFVAL { enabled }
+ 	::= { cienaCesModuleEntry 16 }       
+
+ cienaCesModuleChassisNotifIndx          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..1)
+     MAX-ACCESS      accessible-for-notify
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the chassis index for the module used in trap definition."               
+     ::= { cienaCesModuleEntry 17 }
+     
+ cienaCesModuleShelfNotifIndx          OBJECT-TYPE
+     SYNTAX          Unsigned32 (0..992)
+     MAX-ACCESS      accessible-for-notify
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the shelf index for the module used in trap definition."               
+     ::= { cienaCesModuleEntry 18 }
+
+ cienaCesModuleSlotNotifIndx          OBJECT-TYPE
+     SYNTAX          Unsigned32 (1..38)	
+     MAX-ACCESS      accessible-for-notify
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the slot index for the module used in trap definition."
+     ::= { cienaCesModuleEntry 19 }
+
+ cienaCesModuleSlotName   OBJECT-TYPE
+     SYNTAX          DisplayString
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the slot name that the module is installed in."               
+     ::= { cienaCesModuleEntry 20 }  
+
+ --
+ --  The Module Description Table
+ --
+
+ cienaCesModuleDescriptionTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesModuleDescriptionEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the description of physical attributes of the modules."
+    ::= { cienaCesModule 2 }
+
+ cienaCesModuleDescriptionEntry OBJECT-TYPE
+    SYNTAX     CienaCesModuleDescriptionEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the cienaCesModuleDescriptionTable."
+    INDEX      { cienaCesModuleChassisIndx, cienaCesModuleShelfIndx, cienaCesModuleSlotIndx }
+    ::= { cienaCesModuleDescriptionTable 1 }
+        
+ CienaCesModuleDescriptionEntry ::= SEQUENCE {
+    cienaCesModuleDescriptionBoardName              DisplayString,
+    cienaCesModuleDescriptionBoardPartNum           DisplayString,    
+    cienaCesModuleDescriptionBoardSerialNum	    DisplayString,
+    cienaCesModuleDescriptionBoardDesc              DisplayString,
+    cienaCesModuleDescriptionHwVersion              DisplayString,
+    cienaCesModuleDescriptionMfgDate                DisplayString,
+    cienaCesModuleDescriptionBaseMac                MacAddress,   
+    cienaCesModuleDescriptionUpTime                 TimeTicks,    
+    cienaCesModuleDescriptionTotalNumPorts          Integer32
+ }     
+   
+  cienaCesModuleDescriptionBoardName   OBJECT-TYPE
+     SYNTAX          DisplayString
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the module name."               
+     ::= { cienaCesModuleDescriptionEntry 1 } 
+  
+  cienaCesModuleDescriptionBoardPartNum   OBJECT-TYPE
+     SYNTAX             DisplayString
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the board part number."  
+      ::= { cienaCesModuleDescriptionEntry 2 }
+
+   cienaCesModuleDescriptionBoardSerialNum   OBJECT-TYPE
+     SYNTAX             DisplayString
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the board serial number."  
+      ::= { cienaCesModuleDescriptionEntry 3 }
+
+  cienaCesModuleDescriptionBoardDesc   OBJECT-TYPE
+     SYNTAX          DisplayString
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "This object indicates the board description."               
+     ::= { cienaCesModuleDescriptionEntry 4 }   
+      
+   cienaCesModuleDescriptionHwVersion   OBJECT-TYPE
+     SYNTAX             DisplayString
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the module hardware version."  
+      ::= { cienaCesModuleDescriptionEntry 5 }
+
+   cienaCesModuleDescriptionMfgDate   OBJECT-TYPE
+     SYNTAX             DisplayString
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the module manufacturing date."  
+      ::= { cienaCesModuleDescriptionEntry 6 }
+
+   cienaCesModuleDescriptionBaseMac   OBJECT-TYPE
+     SYNTAX             MacAddress
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the module base MAC address."  
+      ::= { cienaCesModuleDescriptionEntry 7 }
+
+   cienaCesModuleDescriptionUpTime   OBJECT-TYPE
+     SYNTAX             TimeTicks
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the module up time (in hundredths of a second) since the
+              module was last re-initialized."  
+      ::= { cienaCesModuleDescriptionEntry 8 }
+  
+    cienaCesModuleDescriptionTotalNumPorts  OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+        "This object indicates the number of ports on this module." 
+     ::= { cienaCesModuleDescriptionEntry 9 }
+  
+ --
+ --  The Module IDP Table
+ --
+
+ cienaCesModuleIDPTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesModuleIDPEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the description of ID Prom contents of the modules."
+    ::= { cienaCesModule 8 }
+
+ cienaCesModuleIDPEntry OBJECT-TYPE
+    SYNTAX     CienaCesModuleIDPEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the cienaCesModuleIDPTable."
+    INDEX      { cienaCesModuleChassisIndx, cienaCesModuleShelfIndx, cienaCesModuleSlotIndx }
+    ::= { cienaCesModuleIDPTable 1 }
+        
+ CienaCesModuleIDPEntry ::= SEQUENCE {
+    cienaCesModuleIDPEthBaseMac     		MacAddress,
+    cienaCesModuleIDPEthBaseMacRange         	Integer32,    
+    cienaCesModuleIDPModuleSerialNumber		DisplayString,
+    cienaCesModuleIDPModelPartNumber            DisplayString,
+    cienaCesModuleIDPModelRevision              DisplayString,
+    cienaCesModuleIDPProductID              	DisplayString,
+    cienaCesModuleIDPMfgDate                	DisplayString,
+    cienaCesModuleIDPCleiCode                	DisplayString,   
+    cienaCesModuleIDPBarcode                    DisplayString,    
+    cienaCesModuleIDPSWCompat          		Integer32,
+    cienaCesModuleIDPFTC          		Integer32
+ }     
+   
+  cienaCesModuleIDPEthBaseMac   OBJECT-TYPE
+     SYNTAX          	MacAddress
+     MAX-ACCESS      	read-only
+     STATUS          	current
+     DESCRIPTION
+           "This object indicates the module Ethernet Base MAC address stored in the module IDP."               
+     ::= { cienaCesModuleIDPEntry 1 } 
+  
+  cienaCesModuleIDPEthBaseMacRange  OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the Ethernet MAC address range stored in the module IDP."  
+      ::= { cienaCesModuleIDPEntry 2 }
+
+   cienaCesModuleIDPModuleSerialNumber   OBJECT-TYPE
+     SYNTAX             DisplayString
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the Module Serial Number stored in the module IDP."
+      ::= { cienaCesModuleIDPEntry 3 }
+
+  cienaCesModuleIDPModelPartNumber   OBJECT-TYPE
+     SYNTAX          DisplayString
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+        "This object indicates the Model Part Number stored in the module IDP."
+      ::= { cienaCesModuleIDPEntry 4 }   
+      
+   cienaCesModuleIDPModelRevision   OBJECT-TYPE
+     SYNTAX             DisplayString
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the Model Revision stored in the module IDP."
+      ::= { cienaCesModuleIDPEntry 5 }
+
+   cienaCesModuleIDPProductID   OBJECT-TYPE
+     SYNTAX             DisplayString
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the Module Product ID stored in the module IDP."  
+      ::= { cienaCesModuleIDPEntry 6 }
+
+   cienaCesModuleIDPMfgDate   OBJECT-TYPE
+     SYNTAX             DisplayString
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the Manufactured Date stored in the module IDP."
+      ::= { cienaCesModuleIDPEntry 7 }
+
+   cienaCesModuleIDPCleiCode   OBJECT-TYPE
+     SYNTAX             DisplayString
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the CLEI Code stored in the module IDP."  
+      ::= { cienaCesModuleIDPEntry 8 }
+  
+    cienaCesModuleIDPBarcode  OBJECT-TYPE
+     SYNTAX       	DisplayString
+     MAX-ACCESS   	read-only
+     STATUS       	current
+     DESCRIPTION
+        "This object indicates the Barcode stored in the module IDP." 
+     ::= { cienaCesModuleIDPEntry 9 }
+       
+    cienaCesModuleIDPSWCompat  OBJECT-TYPE
+     SYNTAX       	Integer32
+     MAX-ACCESS   	read-only
+     STATUS       	current
+     DESCRIPTION
+        "This object indicates the Software Compatibility Number stored in the module IDP." 
+     ::= { cienaCesModuleIDPEntry 10 }
+     
+    cienaCesModuleIDPFTC  OBJECT-TYPE
+     SYNTAX       	Integer32
+     MAX-ACCESS   	read-only
+     STATUS       	current
+     DESCRIPTION
+        "This object indicates the Functional Test Count stored in the module IDP." 
+     ::= { cienaCesModuleIDPEntry 11 }
+
+  
+ 
+ --
+ -- Module Temperature sensors
+ --
+ cienaCesModuleTempSensorTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesModuleTempSensorEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the temperature sensors of the modules."
+    ::= { cienaCesModule 3 }
+
+ cienaCesModuleTempSensorEntry OBJECT-TYPE
+    SYNTAX     CienaCesModuleTempSensorEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the cienaCesModuleTempSensorTable."
+    INDEX      { cienaCesModuleChassisIndx, cienaCesModuleShelfIndx, cienaCesModuleSlotIndx, cienaCesModuleSensorIndx }
+    ::= { cienaCesModuleTempSensorTable 1 }
+        
+ CienaCesModuleTempSensorEntry ::= SEQUENCE {           
+   cienaCesModuleSensorIndx                Integer32,
+   cienaCesModuleSensorDescription         DisplayString,
+   cienaCesModuleSensorCurrentTemp         Integer32,
+   cienaCesModuleSensorHighTemp            Integer32,
+   cienaCesModuleSensorLowTemp             Integer32,
+   cienaCesModuleSensorHighTempThreshold   Integer32,
+   cienaCesModuleSensorLowTempThreshold    Integer32,
+   cienaCesModuleSensorNotifIndx                Integer32
+
+ }                                          
+ 
+ cienaCesModuleSensorIndx   OBJECT-TYPE
+     SYNTAX             Integer32 (1..65535)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the unique index in the table along with cienaCesModuleIndx."  
+      ::= { cienaCesModuleTempSensorEntry 1 }
+      
+ cienaCesModuleSensorDescription   OBJECT-TYPE
+     SYNTAX             DisplayString
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the sensor description."  
+      ::= { cienaCesModuleTempSensorEntry 2 }
+ 
+ cienaCesModuleSensorCurrentTemp   OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the current temperature of the module."  
+      ::= { cienaCesModuleTempSensorEntry 3 }
+ 
+ cienaCesModuleSensorHighTemp   OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the highest temperature this module 
+         has reached since the last reboot."  
+      ::= { cienaCesModuleTempSensorEntry 4 }
+      
+ cienaCesModuleSensorLowTemp   OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the lowest temperature this module 
+         has reached since the last reboot"  
+      ::= { cienaCesModuleTempSensorEntry 5 } 
+  
+ cienaCesModuleSensorHighTempThreshold   OBJECT-TYPE
+     SYNTAX             Integer32 (0..60)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the high threshold for this module temperature."  
+      ::= { cienaCesModuleTempSensorEntry 6 } 
+      
+ cienaCesModuleSensorLowTempThreshold   OBJECT-TYPE
+     SYNTAX             Integer32 (0..60)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the low threshold for this module temperature."    
+      ::= { cienaCesModuleTempSensorEntry 7 } 
+ 
+  cienaCesModuleSensorNotifIndx   OBJECT-TYPE
+     SYNTAX             Integer32 (1..65535)
+     MAX-ACCESS         accessible-for-notify
+     STATUS             current
+     DESCRIPTION
+        "This object indicates the unique index in the table used for trap definition."  
+      ::= { cienaCesModuleTempSensorEntry 8 }
+       
+ --
+ -- Module Software package
+ --                             
+ 
+ cienaCesGlobalSwState OBJECT-TYPE
+     SYNTAX       INTEGER {
+     			    	idle(1),
+     			    	downloading(2),
+     			    	installing(3),
+     			    	activating(4),
+     			    	validating(5),
+     			    	reverting(6),
+     			    	running(7)
+     			}
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The global software state of the system."
+     ::= { cienaCesSwModule 1 }
+
+ cienaCesModuleSwTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesModuleSwEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the software package attributes on the modules."
+    ::= { cienaCesSwModule 2 }
+
+ cienaCesModuleSwEntry OBJECT-TYPE
+    SYNTAX     CienaCesModuleSwEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the cienaCesModuleSwTable. "
+    INDEX      { cienaCesModuleChassisIndx, cienaCesModuleShelfIndx, cienaCesModuleSlotIndx }
+    ::= { cienaCesModuleSwTable 1 }
+        
+
+ CienaCesModuleSwEntry ::=  SEQUENCE { 
+     cienaCesModuleSwState             				SwModuleState,  
+     cienaCesModuleSwRunningRelease	   				DisplayString,
+     cienaCesModuleSwRunningReleasePartition  		Unsigned32,
+     cienaCesModuleSwReleasePartition0Pkg    		DisplayString, 
+     cienaCesModuleSwReleasePartition0PkgStatus     SwPkgStatus, 
+     cienaCesModuleSwReleasePartition1Pkg    		DisplayString, 
+     cienaCesModuleSwReleasePartition1PkgStatus     SwPkgStatus, 
+     cienaCesModuleSwReleasePartition2Pkg    		DisplayString, 
+     cienaCesModuleSwReleasePartition2PkgStatus     SwPkgStatus, 
+     cienaCesModuleSwBank0KernelVersion				DisplayString, 
+     cienaCesModuleSwBank0KernelStatus			    SwPkgStatus,
+     cienaCesModuleSwBank1KernelVersion		        DisplayString,
+     cienaCesModuleSwBank1KernelStatus			    SwPkgStatus,
+     cienaCesModuleSwBank0UbootVersion       		DisplayString,
+     cienaCesModuleSwBank0UbootStatus			    SwPkgStatus,
+     cienaCesModuleSwBank1UbootVersion       		DisplayString,
+     cienaCesModuleSwBank1UbootStatus			    SwPkgStatus,
+     cienaCesModuleSwUbootGoldVersion       		DisplayString,
+     cienaCesModuleSwUbootGoldStatus			    SwPkgStatus,
+     cienaCesModuleSwMIBVer            				DisplayString
+ }
+ 
+ cienaCesModuleSwState OBJECT-TYPE
+     SYNTAX       SwModuleState
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The software state on the module."
+     ::= { cienaCesModuleSwEntry 1 }
+
+ cienaCesModuleSwRunningRelease OBJECT-TYPE
+     SYNTAX       DisplayString(SIZE(0..256))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Software package version that is currently running on the module."
+     ::= { cienaCesModuleSwEntry 2 }
+     
+ cienaCesModuleSwRunningReleasePartition	OBJECT-TYPE
+ 	 SYNTAX				Unsigned32
+ 	 MAX-ACCESS			read-only
+ 	 STATUS				current
+ 	 DESCRIPTION
+ 	 		"Release partition where the current running release is installed."
+     ::= { cienaCesModuleSwEntry 3 }
+
+ cienaCesModuleSwReleasePartition0Pkg OBJECT-TYPE
+     SYNTAX       DisplayString(SIZE(0..256))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Release partition 0 software package version."
+     ::= { cienaCesModuleSwEntry 4 }
+
+ cienaCesModuleSwReleasePartition0PkgStatus OBJECT-TYPE
+     SYNTAX       SwPkgStatus
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Release partition 0 software package status."
+     ::= { cienaCesModuleSwEntry 5 }  
+     
+ cienaCesModuleSwReleasePartition1Pkg OBJECT-TYPE
+     SYNTAX       DisplayString(SIZE(0..256))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Release partition 1 software package version."
+     ::= { cienaCesModuleSwEntry 6 }
+
+ cienaCesModuleSwReleasePartition1PkgStatus OBJECT-TYPE
+     SYNTAX       SwPkgStatus
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Release partition 1 software package status."
+     ::= { cienaCesModuleSwEntry 7 }     
+     
+ cienaCesModuleSwReleasePartition2Pkg OBJECT-TYPE
+     SYNTAX       DisplayString(SIZE(0..256))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Release partition 2 software package version."
+     ::= { cienaCesModuleSwEntry 8 }
+
+ cienaCesModuleSwReleasePartition2PkgStatus OBJECT-TYPE
+     SYNTAX       SwPkgStatus
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Release partition 2 software package status."
+     ::= { cienaCesModuleSwEntry 9 }
+
+ cienaCesModuleSwBank0KernelVersion OBJECT-TYPE
+     SYNTAX       DisplayString(SIZE(0..256))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Bank0 kernel version."
+     ::= { cienaCesModuleSwEntry 10 }
+
+ cienaCesModuleSwBank0KernelStatus OBJECT-TYPE
+     SYNTAX       SwPkgStatus
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Bank0 kernel software status."
+     ::= { cienaCesModuleSwEntry 11 }
+
+ cienaCesModuleSwBank1KernelVersion OBJECT-TYPE
+     SYNTAX       DisplayString(SIZE(0..256))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Bank1 kernel version."
+     ::= { cienaCesModuleSwEntry 12 }
+
+ cienaCesModuleSwBank1KernelStatus OBJECT-TYPE
+     SYNTAX       SwPkgStatus
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Bank1 kernel status."
+     ::= { cienaCesModuleSwEntry 13 }
+
+ cienaCesModuleSwBank0UbootVersion OBJECT-TYPE
+     SYNTAX       DisplayString(SIZE(0..256))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Bank0 U-boot version."
+     ::= { cienaCesModuleSwEntry 14 }
+
+ cienaCesModuleSwBank0UbootStatus OBJECT-TYPE
+     SYNTAX       SwPkgStatus
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Bank0 U-boot status. "
+     ::= { cienaCesModuleSwEntry 15 }
+
+ cienaCesModuleSwBank1UbootVersion OBJECT-TYPE
+     SYNTAX       DisplayString(SIZE(0..256))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Bank1 U-boot version."
+     ::= { cienaCesModuleSwEntry 16 }
+
+ cienaCesModuleSwBank1UbootStatus OBJECT-TYPE
+     SYNTAX       SwPkgStatus
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Bank0 U-boot status. "
+     ::= { cienaCesModuleSwEntry 17 } 
+     
+ cienaCesModuleSwUbootGoldVersion OBJECT-TYPE
+     SYNTAX       DisplayString(SIZE(0..256))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "U-boot Gold version."
+     ::= { cienaCesModuleSwEntry 18 }
+
+ cienaCesModuleSwUbootGoldStatus OBJECT-TYPE
+     SYNTAX       SwPkgStatus
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "U-boot Gold status. "
+     ::= { cienaCesModuleSwEntry 19 }
+
+ cienaCesModuleSwMIBVer OBJECT-TYPE
+     SYNTAX       DisplayString(SIZE(0..128))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+            "This MIB object shows the MIB version currently supported."
+     ::= { cienaCesModuleSwEntry 20 }
+  
+   
+ --
+ -- Module POST errors
+ --
+ cienaCesModulePOSTErrorTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesModulePOSTErrorEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table for viewing POST error on the modules."
+    ::= { cienaCesModule 5 }
+
+ cienaCesModulePOSTErrorEntry OBJECT-TYPE
+    SYNTAX     CienaCesModulePOSTErrorEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the cienaCesModulePOSTErrorResultsTable. "
+    INDEX      { cienaCesModuleChassisIndx, cienaCesModuleShelfIndx, cienaCesModuleSlotIndx,
+    			cienaCesModulePOSTErrorIndex }
+    ::= { cienaCesModulePOSTErrorTable 1 }
+        
+
+ CienaCesModulePOSTErrorEntry ::=  SEQUENCE { 
+     cienaCesModulePOSTErrorIndex        INTEGER,  
+     cienaCesModulePOSTErrorDescription	 OCTET STRING,
+     cienaCesModulePOSTErrorSeverity     INTEGER,
+     cienaCesModulePOSTErrorScope		 INTEGER,
+     cienaCesModulePOSTScopeIndex        INTEGER
+    }
+
+ cienaCesModulePOSTErrorIndex				OBJECT-TYPE
+ 	 SYNTAX			 INTEGER 
+ 	 MAX-ACCESS		 not-accessible
+ 	 STATUS			 current
+ 	 DESCRIPTION
+ 	 	"Index of the POST error for the module."
+ 	 ::= { cienaCesModulePOSTErrorEntry 1 }	
+ 	 		
+ cienaCesModulePOSTErrorDescription			OBJECT-TYPE
+     SYNTAX          OCTET STRING 
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+     	"A description of the module POST error."
+ 	::= { cienaCesModulePOSTErrorEntry	2 } 
+ 	
+ cienaCesModulePOSTErrorSeverity           OBJECT-TYPE
+     SYNTAX     INTEGER {
+     			unknown(0),
+				fatal(1),
+				severe(2),
+				warning(3)
+				}
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+                "Severity of the POST error for the module." 
+     ::= { cienaCesModulePOSTErrorEntry	3 }  
+  
+   cienaCesModulePOSTErrorScope           OBJECT-TYPE
+     SYNTAX    INTEGER {    
+     			unknown(0),
+				chassis(1),
+				blade(2),
+				port(3)
+				}
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+                "Scope of the POST error for the module."
+     ::= { cienaCesModulePOSTErrorEntry 4 }
+   
+   cienaCesModulePOSTScopeIndex 		OBJECT-TYPE
+   SYNTAX	       INTEGER 
+   MAX-ACCESS      read-only
+   STATUS          current
+   DESCRIPTION
+                " When scope is a port this object identifies the port number."
+     ::= { cienaCesModulePOSTErrorEntry 5 }
+
+ --
+ -- Module Notification attributes
+ --                               
+ 
+  cienaCesModuleSystemProtectionMode		OBJECT-TYPE
+ 	SYNTAX		INTEGER	{
+ 						unprotected(1),
+                        cold(2),
+                        warm(3),
+                        hot(4)
+ 					}
+ 	MAX-ACCESS		accessible-for-notify
+ 	STATUS			current
+ 	DESCRIPTION
+			"This object indicates the protection mode of the system." 
+	::= { cienaCesModuleNotifAttrs	1}  
+
+  cienaCesModuleSwitchOverReason			OBJECT-TYPE
+ 	SYNTAX		INTEGER	{
+ 					coldFailOver(1),
+ 					coldSwitchOver(2),
+ 					hotSwitchOver(3),
+ 					hotFailOver(4)
+ 					}
+ 	MAX-ACCESS		accessible-for-notify
+ 	STATUS			current
+ 	DESCRIPTION
+ 		"This object indicates the reason the SwitchOver happened. The following combinations 
+ 		determine the value of this object:          
+ 		CTM failure	- Deprov mode - Cold FailOver
+ 		User Initiated - Deprov Mode - Cold SwitchOver
+ 		CTM failure	- Audit mode - Hot FailOver
+ 		User initiated - Audit mode - Hot SwitchOver.
+ 		"
+ 	::= { cienaCesModuleNotifAttrs	2}
+
+ cienaCesModuleNotifTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesModuleNotifEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table to define the notification variable bindings."
+    ::= { cienaCesModuleNotifAttrs 3 }
+
+ cienaCesModuleNotifEntry OBJECT-TYPE
+    SYNTAX     CienaCesModuleNotifEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the cienaCesModuleNotifEntryTable. "
+    INDEX      { cienaCesModuleChassisIndx, cienaCesModuleShelfIndx, cienaCesModuleSlotIndx }
+    ::= { cienaCesModuleNotifTable 1 }
+        
+
+ CienaCesModuleNotifEntry ::=  SEQUENCE { 
+    cienaCesModuleHealthCategory        TceHealthCategory,
+    cienaCesModuleHealthSubCategory     Unsigned32,
+    cienaCesModuleHealthStatus          TceHealthStatus,
+    cienaCesModuleHealthStatusLast      TceHealthStatus,
+    cienaCesModuleHealthOriginType		HealthOriginType,
+    cienaCesModuleHealthOriginName		DisplayString,
+    cienaCesModuleHealthOriginUnitId	Unsigned32
+}
+  cienaCesModuleHealthCategory  OBJECT-TYPE
+     SYNTAX           TceHealthCategory
+     MAX-ACCESS       accessible-for-notify
+     STATUS           current
+     DESCRIPTION
+	     "This object indicates the health category that the Health Manager 
+          monitors on the module."      
+     ::= { cienaCesModuleNotifEntry 1 } 
+     
+  cienaCesModuleHealthSubCategory  OBJECT-TYPE
+     SYNTAX           Unsigned32
+     MAX-ACCESS       accessible-for-notify
+     STATUS           current
+     DESCRIPTION
+	     "This object indicates the health sub category that the Health Manager 
+         monitors on the module."      
+     ::= { cienaCesModuleNotifEntry 2 } 
+     
+  cienaCesModuleHealthStatus  OBJECT-TYPE
+     SYNTAX           TceHealthStatus
+     MAX-ACCESS       accessible-for-notify
+     STATUS           current
+     DESCRIPTION
+	     "This object indicates the current health status of health category and
+          its sub category being monitored on the module."      
+     ::= { cienaCesModuleNotifEntry 3 } 
+     
+  cienaCesModuleHealthStatusLast  OBJECT-TYPE
+     SYNTAX           TceHealthStatus
+     MAX-ACCESS       accessible-for-notify
+     STATUS           current
+     DESCRIPTION
+	     "This object indicates the last known health status of health category and
+          its sub category being monitored on the module."      
+          ::= { cienaCesModuleNotifEntry 4 } 
+
+  cienaCesModuleHealthOriginType  OBJECT-TYPE
+     SYNTAX           HealthOriginType
+     MAX-ACCESS       accessible-for-notify
+     STATUS           current
+     DESCRIPTION
+	     "This object indicates the origin of the health status notification."      
+          ::= { cienaCesModuleNotifEntry 5 } 
+
+  cienaCesModuleHealthOriginName  OBJECT-TYPE
+     SYNTAX           DisplayString(SIZE(0..10))
+     MAX-ACCESS       accessible-for-notify
+     STATUS           current
+     DESCRIPTION
+	     "This object indicates the origin name of the health status notification."      
+          ::= { cienaCesModuleNotifEntry 6 } 
+
+  cienaCesModuleHealthOriginUnitId  OBJECT-TYPE
+     SYNTAX           Unsigned32
+     MAX-ACCESS       accessible-for-notify
+     STATUS           current
+     DESCRIPTION
+	     "This object indicates the origin id of the health notification."      
+     ::= { cienaCesModuleNotifEntry 7 } 
+	
+--
+-- CienaCesModuleResourceHealthEntry
+--
+  cienaCesModuleResourceHealthTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF CienaCesModuleResourceHealthEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Table listing the health information of dataplane resources."
+    ::= { cienaCesModule 6 }
+
+ cienaCesModuleResourceHealthEntry OBJECT-TYPE
+        SYNTAX          CienaCesModuleResourceHealthEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An entry in the cienaCesModuleResourceHealthTable."
+        INDEX {  cienaCesModuleResourceHealthSubCategory,
+        	 cienaCesModuleChassisIndx,
+        	 cienaCesModuleShelfIndx,
+        	 cienaCesModuleSlotIndx,
+        	 cienaCesModuleResourceDeviceIndx }
+        ::= { cienaCesModuleResourceHealthTable 1 }
+        
+  CienaCesModuleResourceHealthEntry ::= SEQUENCE {  
+        cienaCesModuleResourceHealthSubCategory              INTEGER,      
+        cienaCesModuleResourceDeviceIndx                     Unsigned32,
+        cienaCesModuleResourceHealthState                    TceHealthStatus,
+        cienaCesModuleResourceHealthCurrMeasurement          Unsigned32,
+        cienaCesModuleResourceHealthMaxMeasurement           Unsigned32,
+        cienaCesModuleResourceHealthMaxThreshold             Unsigned32
+ } 
+  cienaCesModuleResourceHealthSubCategory	OBJECT-TYPE
+ 		SYNTAX		INTEGER	{           
+ 							 none(0),  
+   							 subPort(1),
+   							 qosFlow(2),
+   							 accessFlow(3),
+							 queueGroupInstance(4),
+							 schedulerInstance(5),
+							 pbtTransit(6),
+							 pltfmTokenBucket(7),
+							 pltfmEgressTunnel(8),
+							 pltfmVirtTcamEntries(9),
+							 pltfmAclTcamEntries(10),
+							 pltfmVOQ(11),
+							 pltfmCLScheduler(12),
+							 pltfmFQScheduler(13),
+							 pltfmEgressShapingCIR(14),
+							 pltfmBscp(15),
+							 pltfmHighRateTokenBucket(16),
+							 pltfmLowRateTokenBucket(17),
+							 pltfmParentMeter(18),
+							 pltfmChildMeter(19),
+							 pltfmL2UserTypes(20),
+							 logicalInterfaces(21),
+							 pltfmLmPowerBudget(22),
+							 pltfmPpIngressL2Xform(23),
+							 pltfmPpEgressL2Xform(24),
+							 pltfmPpInternalTcam(25),
+							 pltfmNpMaintPoint(26),
+							 pltfmNpMaintPointSession(27),
+							 pltfmNpFastTimer300Hz(28),
+							 pltfmNpFastTimer10msec(29),
+							 pltfmNpFastTimer100msec(30),
+							 pltfmNpFastTimer1sec(31),
+							 pltfmNpSlowTimer(32),
+							 pltfmNpWatchdogTimer(33),
+							 pltfmNpProtectionGroup(34)
+ }
+
+ 		MAX-ACCESS	not-accessible
+ 		STATUS		current
+ 		DESCRIPTION
+ 			"The sub-category of the dataplane resource being monitored.
+ 			- 'none' is an enumeration placeholder."
+ 		::= { cienaCesModuleResourceHealthEntry 1}
+
+  cienaCesModuleResourceDeviceIndx			OBJECT-TYPE
+ 		SYNTAX		Unsigned32
+ 		MAX-ACCESS	not-accessible
+ 		STATUS		current
+ 		DESCRIPTION
+ 			"Index of the device being monitored."
+ 		::= { cienaCesModuleResourceHealthEntry 2}
+ 
+ cienaCesModuleResourceHealthState            OBJECT-TYPE
+        SYNTAX         TceHealthStatus                                                                            
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+            "Health state of the dataplane resource being monitored."
+        ::= { cienaCesModuleResourceHealthEntry 3}
+ 
+  cienaCesModuleResourceHealthCurrMeasurement OBJECT-TYPE 
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+            "Current value of the dataplane resource being monitored."
+        ::= { cienaCesModuleResourceHealthEntry 4 }
+  
+  cienaCesModuleResourceHealthMaxMeasurement OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+            "The maximum recorded value of the dataplane resource being monitored."
+        ::= { cienaCesModuleResourceHealthEntry 5 }
+   
+    cienaCesModuleResourceHealthMaxThreshold OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum possible value for the dataplane resource being monitored."
+        ::= { cienaCesModuleResourceHealthEntry 6 }
+
+ --
+ -- Notification 
+ --    
+
+ cienaCesModuleStateChangeNotification  NOTIFICATION-TYPE
+        OBJECTS      {  
+        			 	cienaGlobalSeverity, 
+        			 	cienaGlobalMacAddress,
+        			 	cienaCesModuleChassisNotifIndx,
+        			 	cienaCesModuleShelfNotifIndx,
+        			 	cienaCesModuleSlotNotifIndx,
+						cienaCesModuleAdminState,
+                        cienaCesModuleOperState
+         }
+   STATUS      current
+   DESCRIPTION
+      "A cienaCesModuleStateChange notification is sent when the operational
+       state of the module is changed.
+       To enable the device to send this notification:
+        - cienaCesModuleAllModulesTrapState needs to be set to enabled.  
+        - cienaCesModuleTrapState for the module needs to be set to enabled.
+       The above values are set to enabled by default. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesModuleChassisNotifIndx, 
+       cienaCesModuleShelfNotifIndx, cienaCesModuleSlotNotifIndx, 
+       cienaCesModuleAdminState, and cienaCesModuleOperState."
+   ::= { cienaCesModuleMIBNotifications 1 }   
+  
+ cienaCesModuleHealthStatusUnknownNotification NOTIFICATION-TYPE
+	OBJECTS	{  
+     		  cienaGlobalSeverity,
+     		  cienaGlobalMacAddress,
+ 			  cienaCesModuleChassisNotifIndx,
+        	  cienaCesModuleShelfNotifIndx,
+        	  cienaCesModuleSlotNotifIndx, 
+        	  cienaCesModuleHealthOriginType,
+        	  cienaCesModuleHealthOriginName,
+        	  cienaCesModuleHealthOriginUnitId,
+              cienaCesModuleHealthCategory,
+              cienaCesModuleHealthSubCategory,
+              cienaCesModuleHealthStatus,
+              cienaCesModuleHealthStatusLast
+            }
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent whenever the Health Manager detects a status change to unknown.
+       To enable the device to send this notification:
+        - cienaCesModuleAllModulesTrapState needs to be set to enabled.  
+        - cienaCesModuleTrapState for the module needs to be set to enabled.    
+        - cienaCesModuleAllModulesHealthTrapState needs to be set to enabled.
+       The above values are set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
+       cienaGlobalMacAddress, cienaCesModuleChassisNotifIndx, cienaCesModuleShelfNotifIndx, 
+       cienaCesModuleSlotNotifIndx, cienaCesModuleHealthOriginType, cienaCesModuleHealthOriginName, 
+       cienaCesModuleHealthOriginUnitId, cienaCesModuleHealthCategory, cienaCesModuleHealthSubCategory, 
+       cienaCesModuleHealthStatus, and cienaCesModuleHealthStatusLast."
+	::= { cienaCesModuleMIBNotifications 2 }
+
+ cienaCesModuleHealthStatusWarningNotification NOTIFICATION-TYPE
+	OBJECTS	{  
+     		  cienaGlobalSeverity,
+     		  cienaGlobalMacAddress,
+ 			  cienaCesModuleChassisNotifIndx,
+        	  cienaCesModuleShelfNotifIndx,
+        	  cienaCesModuleSlotNotifIndx,
+        	  cienaCesModuleHealthOriginType,
+        	  cienaCesModuleHealthOriginName,
+        	  cienaCesModuleHealthOriginUnitId,
+              cienaCesModuleHealthCategory,
+              cienaCesModuleHealthSubCategory,
+              cienaCesModuleHealthStatus,
+              cienaCesModuleHealthStatusLast
+            }
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent whenever the Health Manager detects a status change to warning.
+       To enable the device to send this notification:
+        - cienaCesModuleAllModulesTrapState needs to be set to enabled.  
+        - cienaCesModuleTrapState for the module needs to be set to enabled.    
+        - cienaCesModuleAllModulesHealthTrapState needs to be set to enabled.
+       The above values are set to enabled by default. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesModuleChassisNotifIndx, 
+       cienaCesModuleShelfNotifIndx, cienaCesModuleSlotNotifIndx, 
+       cienaCesModuleHealthOriginType, cienaCesModuleHealthOriginName, 
+       cienaCesModuleHealthOriginUnitId, cienaCesModuleHealthCategory, 
+       cienaCesModuleHealthSubCategory, cienaCesModuleHealthStatus, and 
+       cienaCesModuleHealthStatusLast."
+	::= { cienaCesModuleMIBNotifications 3 }
+
+ cienaCesModuleHealthStatusFaultedNotification NOTIFICATION-TYPE
+	OBJECTS	{  
+     		  cienaGlobalSeverity,
+     		  cienaGlobalMacAddress,
+ 			  cienaCesModuleChassisNotifIndx,
+        	  cienaCesModuleShelfNotifIndx,
+        	  cienaCesModuleSlotNotifIndx,
+        	  cienaCesModuleHealthOriginType,
+        	  cienaCesModuleHealthOriginName,
+        	  cienaCesModuleHealthOriginUnitId,
+              cienaCesModuleHealthCategory,
+              cienaCesModuleHealthSubCategory,
+              cienaCesModuleHealthStatus,
+              cienaCesModuleHealthStatusLast
+            }
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent whenever the Health Manager detects a status change to faulted.
+       To enable the device to send this notification:
+        - cienaCesModuleAllModulesTrapState needs to be set to enabled. 
+        - cienaCesModuleTrapState for the module needs to be set to enabled.   
+        - cienaCesModuleAllModulesHealthTrapState needs to be set to enabled
+       The above values are set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
+       cienaGlobalMacAddress, cienaCesModuleChassisNotifIndx, cienaCesModuleShelfNotifIndx, 
+       cienaCesModuleSlotNotifIndx, cienaCesModuleHealthOriginType, cienaCesModuleHealthOriginName, 
+       cienaCesModuleHealthOriginUnitId, cienaCesModuleHealthCategory, cienaCesModuleHealthSubCategory, 
+       cienaCesModuleHealthStatus, and cienaCesModuleHealthStatusLast."
+	::= { cienaCesModuleMIBNotifications 4 }
+
+ cienaCesModuleHealthStatusDegradedNotification NOTIFICATION-TYPE
+	OBJECTS	{  
+     		  cienaGlobalSeverity,
+     		  cienaGlobalMacAddress,
+ 			  cienaCesModuleChassisNotifIndx,
+        	  cienaCesModuleShelfNotifIndx,
+        	  cienaCesModuleSlotNotifIndx,
+        	  cienaCesModuleHealthOriginType,
+        	  cienaCesModuleHealthOriginName,
+        	  cienaCesModuleHealthOriginUnitId,
+              cienaCesModuleHealthCategory,
+              cienaCesModuleHealthSubCategory,
+              cienaCesModuleHealthStatus,
+              cienaCesModuleHealthStatusLast
+            }
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent whenever the Health Manager detects a status change to degraded.
+       To enable the device to send this notification:
+        - cienaCesModuleAllModulesTrapState needs to be set to enabled. 
+        - cienaCesModuleTrapState for the module needs to be set to enabled.   
+        - cienaCesModuleAllModulesHealthTrapState needs to be set to enabled
+       The above values are set to enabled by default. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesModuleChassisNotifIndx, 
+       cienaCesModuleShelfNotifIndx, cienaCesModuleSlotNotifIndx, 
+       cienaCesModuleHealthOriginType, cienaCesModuleHealthOriginName, 
+       cienaCesModuleHealthOriginUnitId, cienaCesModuleHealthCategory, 
+       cienaCesModuleHealthSubCategory, cienaCesModuleHealthStatus, 
+       and cienaCesModuleHealthStatusLast."
+	::= { cienaCesModuleMIBNotifications 5 }
+
+ cienaCesModuleHealthStatusGoodNotification NOTIFICATION-TYPE
+	OBJECTS	{  
+     		  cienaGlobalSeverity,
+     		  cienaGlobalMacAddress,
+ 			  cienaCesModuleChassisNotifIndx,
+        	  cienaCesModuleShelfNotifIndx,
+        	  cienaCesModuleSlotNotifIndx,
+        	  cienaCesModuleHealthOriginType,
+        	  cienaCesModuleHealthOriginName, 
+        	  cienaCesModuleHealthOriginUnitId,
+              cienaCesModuleHealthCategory,
+              cienaCesModuleHealthSubCategory,
+              cienaCesModuleHealthStatus,
+              cienaCesModuleHealthStatusLast
+            }
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent whenever the Health Manager detects a status change to normal.
+       To enable the device to send this notification:
+        - cienaCesModuleAllModulesTrapState needs to be set to enabled. 
+        - cienaCesModuleTrapState for the module needs to be set to enabled.   
+        - cienaCesModuleAllModulesHealthTrapState needs to be set to enabled
+       The above values are set to enabled by default. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesModuleChassisNotifIndx, 
+       cienaCesModuleShelfNotifIndx, cienaCesModuleSlotNotifIndx, 
+       cienaCesModuleHealthOriginType, cienaCesModuleHealthOriginName, 
+       cienaCesModuleHealthOriginUnitId, cienaCesModuleHealthCategory, 
+       cienaCesModuleHealthSubCategory, cienaCesModuleHealthStatus, and 
+       cienaCesModuleHealthStatusLast."
+	::= { cienaCesModuleMIBNotifications 6 }
+ 
+ cienaCesModuleSensorHighTempNotification NOTIFICATION-TYPE
+	OBJECTS	{    
+       			 cienaGlobalSeverity,  
+       			 cienaGlobalMacAddress,   
+    			 cienaCesModuleChassisNotifIndx,
+        		 cienaCesModuleShelfNotifIndx,
+        		 cienaCesModuleSlotNotifIndx,
+       			 cienaCesModuleSensorNotifIndx,
+                 cienaCesModuleSensorDescription,
+                 cienaCesModuleSensorCurrentTemp,
+                 cienaCesModuleSensorHighTempThreshold                  
+		    }
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent when the cienaCesModuleSensor temperature exceeds the high
+		temperature threshold for the module.
+       To enable the device to send this notification:
+        - cienaCesModuleAllModulesTrapState needs to be set to enabled. 
+        - cienaCesModuleSensorTrapState needs to be set to enabled.   
+       The above values are set to enabled by default. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesModuleChassisNotifIndx, 
+       cienaCesModuleShelfNotifIndx, cienaCesModuleSlotNotifIndx, 
+       cienaCesModuleSensorNotifIndx, cienaCesModuleSensorDescription, 
+       cienaCesModuleSensorCurrentTemp, and cienaCesModuleSensorHighTempThreshold."
+	::= { cienaCesModuleMIBNotifications 7 }
+ 
+  cienaCesModuleSensorNormalTempNotification NOTIFICATION-TYPE
+	OBJECTS	{ 
+       			 cienaGlobalSeverity,  
+       			 cienaGlobalMacAddress,
+    			 cienaCesModuleChassisNotifIndx,
+        		 cienaCesModuleShelfNotifIndx,
+        		 cienaCesModuleSlotNotifIndx,
+       			 cienaCesModuleSensorNotifIndx,
+	             cienaCesModuleSensorDescription,
+    	         cienaCesModuleSensorCurrentTemp,
+        	     cienaCesModuleSensorLowTemp,
+            	 cienaCesModuleSensorHighTemp                  
+			}
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent if the cienaCesModule temperature changes
+         from previously reported high or low temperature exceeding thresholds to normal temperature.
+       To enable the device to send this notification:
+        - cienaCesModuleAllModulesTrapState needs to be set to enabled. 
+        - cienaCesModuleSensorTrapState needs to be set to enabled.   
+       The above values are set to enabled by default. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesModuleChassisNotifIndx, 
+       cienaCesModuleShelfNotifIndx, cienaCesModuleSlotNotifIndx, 
+       cienaCesModuleSensorNotifIndx, cienaCesModuleSensorDescription, 
+       cienaCesModuleSensorCurrentTemp, cienaCesModuleSensorLowTemp, 
+       and cienaCesModuleSensorHighTemp."
+	::= { cienaCesModuleMIBNotifications 9 }
+
+ cienaCesModuleSensorLowTempNotification NOTIFICATION-TYPE
+	OBJECTS	{  
+       			 cienaGlobalSeverity,  
+       			 cienaGlobalMacAddress,
+    			 cienaCesModuleChassisNotifIndx,
+        		 cienaCesModuleShelfNotifIndx,
+        		 cienaCesModuleSlotNotifIndx,
+       			 cienaCesModuleSensorNotifIndx,
+	             cienaCesModuleSensorDescription,
+    	         cienaCesModuleSensorCurrentTemp,
+        	     cienaCesModuleSensorLowTempThreshold                  
+ 	        }
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent when the cienaCesModuleSensor falls below the low
+		 temperature threshold for the module.
+       To enable the device to send this notification:
+        - cienaCesModuleAllModulesTrapState needs to be set to enabled. 
+        - cienaCesModuleSensorTrapState needs to be set to enabled.   
+       The above values are set to enabled by default. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesModuleChassisNotifIndx, 
+       cienaCesModuleShelfNotifIndx, cienaCesModuleSlotNotifIndx, cienaCesModuleSensorNotifIndx, 
+       cienaCesModuleSensorDescription, cienaCesModuleSensorCurrentTemp, and 
+       cienaCesModuleSensorLowTempThreshold."
+	::= { cienaCesModuleMIBNotifications 8 }
+
+ cienaCesModuleHASwitchOverNotification NOTIFICATION-TYPE
+ OBJECTS { 
+     			 cienaGlobalSeverity,  
+     			 cienaGlobalMacAddress,
+    			 cienaCesModuleChassisNotifIndx,
+        		 cienaCesModuleShelfNotifIndx,
+        		 cienaCesModuleSlotNotifIndx,
+ 				 cienaCesModuleSwitchOverReason,  
+ 				 cienaCesModuleAdminState,
+                 cienaCesModuleOperState
+		}	   
+ 	STATUS	current
+	DESCRIPTION
+		"This notification is sent for CTM switchover.
+       To enable the device to send this notification:
+        - cienaCesModuleAllModulesTrapState needs to be set to enabled. 
+        - cienaCesModuleHATrapState needs to be set to enabled.   
+       The above values are set to enabled by default. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesModuleChassisNotifIndx, 
+       cienaCesModuleShelfNotifIndx, cienaCesModuleSlotNotifIndx, 
+       cienaCesModuleSwitchOverReason, cienaCesModuleAdminState, 
+       and cienaCesModuleOperState."
+	::= { cienaCesModuleMIBNotifications 10 }
+
+cienaCesModuleProtectionModeColdNotification NOTIFICATION-TYPE
+ OBJECTS {      
+       			 cienaGlobalSeverity,  
+       			 cienaGlobalMacAddress,
+	             cienaCesModuleSystemProtectionMode   
+         }
+    STATUS	current
+	DESCRIPTION
+		"This notification is sent when the protection mode of the system changes to cold. 
+		A COLD protection level is the lowest level of protection.  It implies that the secondary CTM is ready to assume the 
+		function of the primary CTM but a failure causing a failover would be service impacting.  The secondary CTM has been 
+		synchronized with the same software package, configuration files, etc such that it will return the same state 
+		as the previous primary CTM.  
+		The protection state of the primary CTM shall not transition from NONE to PROTECTED until the secondary CTM 
+		has completed the synchronization.  In the case of a failure on the primary CTM, the secondary CTM will 
+		immediately assume primary status, finish its initialization and reboot the PSLMs.  The primary CTM will 
+		reapply the configuration to the PSLMs after they have booted. Any unsaved configuration changes will NOT be lost
+		on a failover as configuration changes are propagated to the secondary CTM configuration.
+       To enable the device to send this notification:
+        - cienaCesModuleAllModulesTrapState needs to be set to enabled. 
+        - cienaCesModuleProtectionModeTrapState needs to be set to enabled.   
+       The above values are set to enabled by default. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, and cienaCesModuleSystemProtectionMode."
+	::= { cienaCesModuleMIBNotifications 11}
+
+cienaCesModuleProtectionModeWarmNotification NOTIFICATION-TYPE
+ OBJECTS {      
+       			 cienaGlobalSeverity,  
+       			 cienaGlobalMacAddress,
+	             cienaCesModuleSystemProtectionMode   
+         }
+    STATUS	current
+	DESCRIPTION
+		"This notification is sent when the protection mode of the system changes to warm.
+		This state is not supported on the 5410 platform.
+       To enable the device to send this notification:
+        - cienaCesModuleAllModulesTrapState needs to be set to enabled. 
+        - cienaCesModuleProtectionModeTrapState needs to be set to enabled.   
+       The above values are set to enabled by default. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, and cienaCesModuleSystemProtectionMode."
+	::= { cienaCesModuleMIBNotifications 12 }
+
+cienaCesModuleProtectionModeUnprotectedNotification NOTIFICATION-TYPE
+ OBJECTS {      
+       			 cienaGlobalSeverity,  
+       			 cienaGlobalMacAddress,
+	             cienaCesModuleSystemProtectionMode   
+         }
+    STATUS	current
+	DESCRIPTION
+		"This notification is sent when the protection mode of the system changes to unprotected.
+		A protection level of unprotected implies that there is no secondary CTM present in the system or 
+		that the current secondary CTM is not in a state to provide any protection.  In the case of the CTM failure, 
+		the primary CTM will reboot and subsequently reboot all the PSLMs, causing loss of existing switched traffic patterns.
+       To enable the device to send this notification:
+        - cienaCesModuleAllModulesTrapState needs to be set to enabled. 
+        - cienaCesModuleProtectionModeTrapState needs to be set to enabled.   
+       The above values are set to enabled by default. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, and cienaCesModuleSystemProtectionMode."
+	::= { cienaCesModuleMIBNotifications 13 }
+
+cienaCesModuleProtectionModeHotNotification NOTIFICATION-TYPE
+ OBJECTS {      
+       			 cienaGlobalSeverity,  
+       			 cienaGlobalMacAddress,
+	             cienaCesModuleSystemProtectionMode   
+         }
+    STATUS	current
+	DESCRIPTION
+		"This notification is sent when the protection mode of the system changes to hot.
+		A HOT protection level is the highest level of protection.  It implies that the secondary CTM is ready to assume the 
+		function of the primary CTM and a failure causing a failover would NOT be service impacting.  The secondary CTM has been 
+		synchronized with the same software package, configuration files, etc such that it will return the same state 
+		as the previous primary CTM.  
+		The protection state of the primary CTM shall not transition from NONE to PROTECTED until the secondary CTM 
+		has completed the synchronization.  In the case of a failure on the primary CTM, the secondary CTM will 
+		immediately assume primary status, finish its initialization and audit the PSLMs.  All current established traffic patterns
+		will be maintained with a minimal loss of traffic.  Any unsaved configuration changes will NOT be lost
+		on a failover as configuration changes are propagated to the secondary CTM configuration.
+       To enable the device to send this notification:
+        - cienaCesModuleAllModulesTrapState needs to be set to enabled. 
+        - cienaCesModuleProtectionModeTrapState needs to be set to enabled.   
+       The above values are set to enabled by default. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, and cienaCesModuleSystemProtectionMode."
+	::= { cienaCesModuleMIBNotifications 14 }
+
+cienaCesModulePostErrorNotification NOTIFICATION-TYPE
+ OBJECTS {        
+       			 cienaGlobalSeverity, 
+       			 cienaGlobalMacAddress,
+       			 cienaCesModuleChassisNotifIndx,
+        		 cienaCesModuleShelfNotifIndx,
+        		 cienaCesModuleSlotNotifIndx,
+	             cienaCesModulePOSTErrorDescription
+         }
+    STATUS	current
+	DESCRIPTION
+		"This notification is sent when a module POST error is detected.
+       To enable the device to send this notification:
+        - cienaCesModuleAllModulesTrapState needs to be set to enabled. 
+        - cienaCesModulePOSTErrorTrapState needs to be set to enabled.   
+       The above values are set to enabled by default. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesModuleChassisNotifIndx, 
+       cienaCesModuleShelfNotifIndx, cienaCesModuleSlotNotifIndx, and 
+       cienaCesModulePOSTErrorDescription."
+	::= { cienaCesModuleMIBNotifications 15 }
+ 
+ cienaCesModuleFastReloadUnsuccessfulNotification NOTIFICATION-TYPE
+ OBJECTS { 
+     			 cienaGlobalSeverity,  
+     			 cienaGlobalMacAddress,
+    			 cienaCesModuleChassisNotifIndx,
+        		 cienaCesModuleShelfNotifIndx,
+        		 cienaCesModuleSlotNotifIndx,
+ 				 cienaCesModuleAdminState,
+                 cienaCesModuleOperState
+		}	   
+ 	STATUS	current
+	DESCRIPTION
+		"This notification is sent when the deprov (cold switchover or failover) fails.
+       To enable the device to send this notification:
+        - cienaCesModuleAllModulesTrapState needs to be set to enabled. 
+        - cienaCesModuleHATrapState needs to be set to enabled.   
+       The above values are set to enabled by default. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesModuleChassisNotifIndx, 
+       cienaCesModuleShelfNotifIndx, cienaCesModuleSlotNotifIndx, 
+       cienaCesModuleAdminState, and cienaCesModuleOperState."
+	::= { cienaCesModuleMIBNotifications 16 }
+ 
+  cienaCesModuleHitlessModeUnsuccessfulNotification NOTIFICATION-TYPE
+ OBJECTS { 
+     			 cienaGlobalSeverity,  
+     			 cienaGlobalMacAddress,
+    			 cienaCesModuleChassisNotifIndx,
+        		 cienaCesModuleShelfNotifIndx,
+        		 cienaCesModuleSlotNotifIndx,
+ 				 cienaCesModuleAdminState,
+                 cienaCesModuleOperState
+		}	   
+ 	STATUS	current
+	DESCRIPTION
+		"This notification is sent when the audit (hot failover or switchover) fails.
+       To enable the device to send this notification:
+        - cienaCesModuleAllModulesTrapState needs to be set to enabled. 
+        - cienaCesModuleHATrapState needs to be set to enabled.   
+       The above values are set to enabled by default. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesModuleChassisNotifIndx, 
+       cienaCesModuleShelfNotifIndx, cienaCesModuleSlotNotifIndx, 
+       cienaCesModuleAdminState, and cienaCesModuleOperState."
+	::= { cienaCesModuleMIBNotifications 17 }
+  
+    cienaCesModuleSwitchFabricDisruptedUnrecoverableNotification NOTIFICATION-TYPE
+ OBJECTS { 
+     			 cienaGlobalSeverity,  
+     			 cienaGlobalMacAddress,
+    			 cienaCesModuleChassisNotifIndx,
+        		 cienaCesModuleShelfNotifIndx,
+       		     cienaCesModuleSlotNotifIndx
+		}	   
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent when the switch fabric detects a game-over failure and the system
+		 cannot automatically correct without resetting certain fabric subsystems. This kind of a 
+		 disruption can cause a major service interruption.  
+		 To enable the device to send this notification:
+		 - cienaCesModuleAllModulesTrapState needs to be set to enabled
+         - cienaCesModuleSwitchFabricDisruptedTrapState needs to be set to enabled.   
+        The above values are set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
+        cienaGlobalMacAddress, cienaCesModuleChassisNotifIndx, cienaCesModuleShelfNotifIndx, 
+        and cienaCesModuleSlotNotifIndx."
+	::= { cienaCesModuleMIBNotifications 18 }
+
+      cienaCesModuleSwitchFabricDisruptedRecoverableNotification NOTIFICATION-TYPE
+ OBJECTS { 
+     			 cienaGlobalSeverity,  
+     			 cienaGlobalMacAddress,
+    			 cienaCesModuleChassisNotifIndx,
+        		 cienaCesModuleShelfNotifIndx,
+       		     cienaCesModuleSlotNotifIndx
+		}	   
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent when the switch fabric detects game-over failure and the system
+         can automatically correct it. 
+  	    To enable the device to send this notification:  
+  	    - cienaCesModuleAllModulesTrapState needs to be set to enabled
+        - cienaCesModuleSwitchFabricDisruptedTrapState needs to be set to enabled.   
+       The above values are set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
+       cienaGlobalMacAddress, cienaCesModuleChassisNotifIndx, cienaCesModuleShelfNotifIndx, 
+       and cienaCesModuleSlotNotifIndx."
+	::= { cienaCesModuleMIBNotifications 19 }
+
+ --
+ --Conformance statements
+ --
+ 
+  moduleConfigGroup    OBJECT-GROUP
+       OBJECTS { cienaCesModuleModel,
+       			 cienaCesModuleType,
+       			 cienaCesModuleDescription, 
+                 cienaCesModuleAdminState, 
+                 cienaCesModuleOperState, 
+                 cienaCesModuleProtectionRole,
+                 cienaCesModuleStandbyStatus,
+                 cienaCesModuleLastRebootReason,
+                 cienaCesModuleAdminPostState,
+                 cienaCesModuleOperPostState }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects providing information
+                about configuration table."
+       ::= { cienaCesModuleMIBGroups 1 }
+
+
+ moduleDescriptionGroup    OBJECT-GROUP
+       OBJECTS { 	cienaCesModuleDescriptionBoardName, 
+       			 	cienaCesModuleDescriptionBoardDesc, 
+                	cienaCesModuleDescriptionTotalNumPorts,
+                	cienaCesModuleDescriptionHwVersion, 
+                	cienaCesModuleDescriptionMfgDate,
+                	cienaCesModuleDescriptionBaseMac, 
+                	cienaCesModuleDescriptionBoardSerialNum,
+                	cienaCesModuleDescriptionBoardPartNum,  
+                	cienaCesModuleDescriptionUpTime}
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects providing information
+                about module capabilities."
+       ::= { cienaCesModuleMIBGroups 2 } 
+       
+ moduleSensorGroup    OBJECT-GROUP
+       OBJECTS { cienaCesModuleSensorDescription,
+       			 cienaCesModuleSensorCurrentTemp,
+                 cienaCesModuleSensorHighTemp,
+                 cienaCesModuleSensorLowTemp, 
+                 cienaCesModuleSensorHighTempThreshold,
+                 cienaCesModuleSensorLowTempThreshold}
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects providing information of module temperature sensors."
+       ::= { cienaCesModuleMIBGroups 3 }
+       
+ moduleNotifGroup    NOTIFICATION-GROUP
+       NOTIFICATIONS { 	cienaCesModuleStateChangeNotification,
+						cienaCesModuleHealthStatusUnknownNotification,
+						cienaCesModuleHealthStatusWarningNotification,
+						cienaCesModuleHealthStatusFaultedNotification,
+						cienaCesModuleHealthStatusDegradedNotification,
+						cienaCesModuleHealthStatusGoodNotification,
+						cienaCesModuleSensorHighTempNotification,
+						cienaCesModuleSensorNormalTempNotification,
+						cienaCesModuleSensorLowTempNotification,
+						cienaCesModuleHASwitchOverNotification,
+						cienaCesModuleProtectionModeColdNotification,
+						cienaCesModuleProtectionModeWarmNotification,
+						cienaCesModuleProtectionModeUnprotectedNotification,
+						cienaCesModuleProtectionModeHotNotification,
+						cienaCesModulePostErrorNotification,
+						cienaCesModuleFastReloadUnsuccessfulNotification,
+						cienaCesModuleHitlessModeUnsuccessfulNotification,
+						cienaCesModuleSwitchFabricDisruptedUnrecoverableNotification,
+				        cienaCesModuleSwitchFabricDisruptedRecoverableNotification
+				}
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects providing information
+               about module notifications."
+       ::= { cienaCesModuleMIBGroups 4 }
+
+  modulePostErrorGroup    OBJECT-GROUP
+       OBJECTS { cienaCesModulePOSTErrorDescription,
+       			 cienaCesModulePOSTErrorSeverity,
+                 cienaCesModulePOSTErrorScope,
+                 cienaCesModulePOSTScopeIndex }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects providing information of module POST errors."
+       ::= { cienaCesModuleMIBGroups 5 }
+
+ END  
+ 

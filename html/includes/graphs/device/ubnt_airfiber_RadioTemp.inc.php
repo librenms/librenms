@@ -5,7 +5,7 @@ require 'includes/graphs/common.inc.php';
 // $rrd_options .= " -l 0 -E ";
 $rrdfilename = rrd_name($device['hostname'], 'ubnt-airfiber-mib');
 
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Celcius               Now     Min      Max\\n'";
     $rrd_options .= ' DEF:radio0TempC='.$rrdfilename.':radio0TempC:AVERAGE ';
     $rrd_options .= ' DEF:radio1TempC='.$rrdfilename.':radio1TempC:AVERAGE ';

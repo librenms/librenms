@@ -1,0 +1,159 @@
+-- *****************************************************************
+-- NMS-LOOPBACKDETECT-EXT-MIB.my: NMS LOOPBACKDETECT  MIB
+--
+-- April 2013
+-- Edit by shishuaishuai
+-- Copyright (c) 2013 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+NMS-LOOPBACK-DETECT-MIB DEFINITIONS ::= BEGIN 
+	
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, INTEGER,
+        FROM SNMPv2-SMI
+    nmsMgmt
+        FROM NMS-SMI
+    ifIndex
+        FROM RFC1213-MIB;
+
+nmsLoopbackDetectMIB OBJECT IDENTIFIER ::= { nmsMgmt 252 } 
+				   
+ldEnable OBJECT-TYPE
+    SYNTAX  INTEGER {
+        true(1), 
+        false(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+     "Loopback-detect global enable configuration to set enable or disable the loopback detection."
+    ::= { nmsLoopbackDetectMIB 1 } 
+                   	
+ldPortTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF LDPortTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+     "A table of port's loopback detection configuration."
+    ::= { nmsLoopbackDetectMIB 2 }
+                   	
+ldPortTableEntry OBJECT-TYPE
+    SYNTAX  LDPortTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+    "A collection of port's loopback detection configuration."
+    INDEX { ifIndex }
+    ::= { ldPortTable 1 }
+               		 	
+LDPortTableEntry ::=
+    SEQUENCE {
+        ldPortEnable
+            INTEGER,
+        ldPortControl
+            INTEGER,
+        ldPortDefaultExistence
+            INTEGER,
+        ldPortDestMac
+            OCTET STRING,
+        ldPortVlanContrl
+            OCTET STRING,
+        ldPortHelloTime
+            INTEGER,
+        ldPortRecoverTime                       
+            INTEGER,
+        ldPortBloopbackdetected
+            INTEGER,
+    }
+                  
+    ldPortEnable OBJECT-TYPE
+        SYNTAX INTEGER {
+            true(1), 
+            false(2)
+        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+           "Configuration of enable or disable port's loopback detection."
+        REFERENCE
+           "no"
+        ::= { ldPortTableEntry 1 }
+                   	
+    ldPortControl OBJECT-TYPE
+        SYNTAX INTEGER {
+            warnTrap(1)
+            block(2)
+            learning(3)
+            shutdown(4)
+        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+           "Configuration of port's control function."
+        REFERENCE
+           "no"
+        ::= { ldPortTableEntry 2 }
+                   	
+    ldPortDefaultExistence OBJECT-TYPE
+        SYNTAX INTEGER {
+            true(1), 
+            false(2)
+        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+           "Configure whether there is loopback under the port."
+        REFERENCE
+           "no"
+        ::= { ldPortTableEntry 3 }
+
+    ldPortDestMac OBJECT-TYPE
+        SYNTAX OCTET STRING                  
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+           "Configuration the loopback detection's dest mac address."
+        REFERENCE
+           "no"
+        ::= { ldPortTableEntry 4 }
+
+    ldPortVlanContrl OBJECT-TYPE
+        SYNTAX OCTET STRING 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+           "Configure the vlan to loopback detect."
+        REFERENCE
+           "no"
+        ::= { ldPortTableEntry 5 }
+
+    ldPortHelloTime OBJECT-TYPE
+        SYNTAX INTEGER 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+           "Configure the period of transmit packet."
+        REFERENCE
+           "no"
+        ::= { ldPortTableEntry 6 }
+
+    ldPortRecoverTime OBJECT-TYPE
+        SYNTAX INTEGER 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+           "Configure the period of port's recovery."
+        REFERENCE
+           "no"
+        ::= { ldPortTableEntry 7 }  
+
+    ldPortBloopbackdetected  OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only    
+        STATUS mandatory
+        DESCRIPTION
+           "whether loopback is detected on this port."
+        REFERENCE
+           "no"
+        ::= { ldPortTableEntry 8 }     
+END

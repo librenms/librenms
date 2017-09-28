@@ -1,5 +1,8 @@
 <?php
 
+use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\IPv6;
+
 if ($_SESSION['userlevel'] < '5') {
     include 'includes/error-no-perm.inc.php';
 } else {
@@ -107,7 +110,7 @@ if ($_SESSION['userlevel'] < '5') {
     echo ' | Prefixes: Unicast (';
     if ($vars['graph'] == 'prefixes_ipv4unicast') {
         echo "<span class='pagemenu-selected'>";
-        $extra_sql = " AND `bgpLocalAddr` NOT LIKE '%:%'";
+        $extra_sql = " AND `bgpPeerIdentifier` NOT LIKE '%:%'";
     }
 
     echo generate_link('IPv4', $vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv4unicast'));
@@ -119,7 +122,7 @@ if ($_SESSION['userlevel'] < '5') {
 
     if ($vars['graph'] == 'prefixes_ipv6unicast') {
         echo "<span class='pagemenu-selected'>";
-        $extra_sql = " AND `bgpLocalAddr` LIKE '%:%'";
+        $extra_sql = " AND `bgpPeerIdentifier` LIKE '%:%'";
     }
 
     echo generate_link('IPv6', $vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv6unicast'));
@@ -190,7 +193,7 @@ if ($_SESSION['userlevel'] < '5') {
 
     print_optionbar_end();
 
-    echo "<table border=0 cellspacing=0 cellpadding=5 width=100% class='sortable'>";
+    echo "<table border=0 cellspacing=0 cellpadding=5 width=100% class='table sortable'>";
     echo '<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>State</th><th width=200>Uptime / Updates</th></tr>';
 
     if ($vars['type'] == 'external') {
@@ -240,14 +243,15 @@ if ($_SESSION['userlevel'] < '5') {
             }
         }
 
-        if (filter_var($peer['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
-            $peer_ip = Net_IPv6::compress($peer['bgpLocalAddr']);
-        } else {
+        try {
+            $peer_ip = new IPv6($peer['bgpLocalAddr']);
+        } catch (InvalidIpException $e) {
             $peer_ip = $peer['bgpLocalAddr'];
         }
-        if (filter_var($peer['bgpPeerIdentifier'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
-            $peer_ident = Net_IPv6::compress($peer['bgpPeerIdentifier']);
-        } else {
+
+        try {
+            $peer_ident = new IPv6($peer['bgpPeerIdentifier']);
+        } catch (InvalidIpException $e) {
             $peer_ident = $peer['bgpPeerIdentifier'];
         }
 

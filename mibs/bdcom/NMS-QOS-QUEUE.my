@@ -1,0 +1,93 @@
+-- *****************************************************************
+-- NMS-QOS-QUEUE.MIB:  NMS QOS QUEUE MIB file
+-- NOV 2010
+-- edit by LIUQIANG
+-- *****************************************************************
+--
+
+               NMS-QOS-QUEUE DEFINITIONS ::= BEGIN
+
+               IMPORTS
+		    OBJECT-TYPE
+			FROM RFC-1212
+		    nmstemporary
+			FROM NMS-SMI;
+          
+               nmsQosQueue       OBJECT IDENTIFIER ::= { nmstemporary 7 }
+               
+               
+               nmsQosQueueTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSQosQueueEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of QoS queue related statistics table entries."
+                   ::= { nmsQosQueue 1 }
+
+               nmsQosQueueEntry OBJECT-TYPE
+                   SYNTAX NMSQosQueueEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            Qos queue related statistics table."
+                   INDEX { ifIndex,queueNo }
+               ::= { nmsQosQueueTable 1 }
+
+               NMSQosQueueEntry ::=
+                   SEQUENCE {
+                       ifIndex
+                           INTEGER,
+                       queueNo
+                           INTEGER,
+                       queueLen
+                           INTEGER,
+                       queueDrops
+                           INTEGER,
+                       queueCross
+                           INTEGER
+                   }
+                   
+                   
+
+               ifIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "QoS queue belonged interface id, unique in system."
+                   ::= { nmsQosQueueEntry 1 } 
+              
+               queueNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "QoS queue serial number."
+                   ::= { nmsQosQueueEntry 2 } 
+              
+               queueLen OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "QoS queue length."
+                   ::= { nmsQosQueueEntry 3 } 
+              
+               queueDrops OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "QoS queue discarded package count."
+                   ::= { nmsQosQueueEntry 4 } 
+              
+               queueCross OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "QoS queue crossed package count."
+                   ::= { nmsQosQueueEntry 5 } 
+              
+END

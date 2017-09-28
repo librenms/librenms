@@ -112,6 +112,13 @@ OPTS="$OPTS -j /var/lib/rrdcached/journal/ -F"
 OPTS="$OPTS -b /opt/librenms/rrd -B"
 OPTS="$OPTS -w 1800 -z 900"
 ```
+Ubuntu (/etc/default/rrdcached) - RRDCached 1.5.5 and above.
+```
+OPTS="-l 0:42217"
+OPTS="$OPTS -R -j /var/lib/rrdcached/journal/ -F"
+OPTS="$OPTS -b /opt/librenms/rrd -B"
+OPTS="$OPTS -w 1800 -z 900"
+```
 
 Poller 1:
 Running an install of LibreNMS in /opt/librenms
@@ -122,8 +129,6 @@ $config['distributed_poller_name']           = file_get_contents('/etc/hostname'
 $config['distributed_poller_group']          = '0';
 $config['distributed_poller_memcached_host'] = "example.com";
 $config['distributed_poller_memcached_port'] = 11211;
-$config['distributed_poller_host']           = "example.com";
-$config['distributed_poller_port']           = 11211;
 $config['distributed_poller']                = true;
 $config['rrdcached']                         = "example.com:42217";
 $config['update']                            = 0;
@@ -148,8 +153,6 @@ $config['distributed_poller_name']           = file_get_contents('/etc/hostname'
 $config['distributed_poller_group']          = '0';
 $config['distributed_poller_memcached_host'] = "example.com";
 $config['distributed_poller_memcached_port'] = 11211;
-$config['distributed_poller_host']           = "example.com";
-$config['distributed_poller_port']           = 11211;
 $config['distributed_poller']                = true;
 $config['rrdcached']                         = "example.com:42217";
 $config['update']                            = 0;
@@ -172,8 +175,6 @@ $config['distributed_poller_name']           = file_get_contents('/etc/hostname'
 $config['distributed_poller_group']          = '2,3';
 $config['distributed_poller_memcached_host'] = "example.com";
 $config['distributed_poller_memcached_port'] = 11211;
-$config['distributed_poller_host']           = "example.com";
-$config['distributed_poller_port']           = 11211;
 $config['distributed_poller']                = true;
 $config['rrdcached']                         = "example.com:42217";
 $config['update']                            = 0;

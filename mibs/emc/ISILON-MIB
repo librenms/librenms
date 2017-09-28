@@ -1,0 +1,2020 @@
+ISILON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Gauge32, enterprises
+        FROM SNMPv2-SMI
+    CounterBasedGauge64
+        FROM HCNUM-TC
+    DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF;
+
+isilon MODULE-IDENTITY
+    LAST-UPDATED "201509230000Z"    --23 SEP 2015
+    ORGANIZATION "Isilon Systems LLC"
+    CONTACT-INFO
+        "Isilon Systems LLC
+         Support phone: 1-800.782.4362 
+         Support website: http://support.emc.com
+        "
+    DESCRIPTION
+        "The base MIB module for Isilon Systems OneFS operating system."
+    REVISION "201509230000Z"    --23 SEP 2015
+    DESCRIPTION
+        "Removed support for the iSCSI protocol in nodeProtocolPerfTable"
+    REVISION "201504070000Z"    --07 APR 2015
+    DESCRIPTION
+        "MIB maintenance, using smilint to fix errors and warnings in MIB as
+        well as improving descriptions and fixing spelling and grammar errors.
+        Added compliance groups for SMIv2, and removed unused imports."
+    REVISION "201010210000Z"    --21 OCT 2010
+    DESCRIPTION
+     "The list of protocols supported by OneFS and reported in the
+     nodeProtocolPerfEntry tables has changed: CIFS was
+     renamed to SMB1, SMB2 was added, NFS was renamed to
+     NFS3 (which includes also version 2), and NFS4 was added."
+    REVISION "201006290000Z"    --29 JUN 2010
+    DESCRIPTION
+     "diskPerfOutBytesPerSecond was renamed to diskPerfOutBitsPerSecond.
+     The value returned by the OID was and is bits per second.
+     ifsFreeBytes was added, comparing with ifsAvailableBytes will
+     show space used for Virtual Hot Spares (system reserve)."
+    REVISION "200912150000Z"    --15 DEC 2009
+    DESCRIPTION
+       "iSCSI and SyncIQ protocols were added to nodeProtocolPerfTable."
+    REVISION "200911100000Z"    --10 NOV 2009
+    DESCRIPTION
+       "The following OIDs were obsoleted: clusterNetworkInBytes,
+       clusterNetworkOutBytes, nodeNetworkInBytes, and
+       nodeNetworkOutBytes."
+    REVISION "200905290000Z"    --29 MAY 2009
+    DESCRIPTION
+           "Initial revision."
+    ::= { enterprises 12124 }
+
+
+--ISILON OBJECT--
+-- { isilon 3 } is used by the deprecated ONEFS-SNAPSHOT-MIB.
+-- { isilon 4 } is defined as local, used for non-MIB API identifiers
+cluster                     OBJECT IDENTIFIER ::= { isilon 1 }
+node                        OBJECT IDENTIFIER ::= { isilon 2 }
+local                       OBJECT IDENTIFIER ::= { isilon 4 }
+conformance                 OBJECT IDENTIFIER ::= { isilon 5 }
+
+
+--CLUSTER--
+--CLUSTER GROUPS--
+clusterStatus               OBJECT IDENTIFIER ::= { cluster 1  }
+clusterPerformance          OBJECT IDENTIFIER ::= { cluster 2  }
+ifsFilesystem               OBJECT IDENTIFIER ::= { cluster 3  }
+licenses                    OBJECT IDENTIFIER ::= { cluster 5  }
+quotas                      OBJECT IDENTIFIER ::= { cluster 12 }
+snapshots                   OBJECT IDENTIFIER ::= { cluster 13 }
+
+
+--CLUSTER STATUS OBJECTS--
+clusterName OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The name of the cluster."
+    ::= { clusterStatus 1 }
+
+clusterHealth OBJECT-TYPE 
+    SYNTAX                  INTEGER{ok(0),attn(1),down(2),invalid(3)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The overall health of the cluster."
+    ::= { clusterStatus 2 }
+
+clusterGUID OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The globally unique identifier for the cluster."
+    ::= { clusterStatus 3 }
+
+nodeCount OBJECT-TYPE
+    SYNTAX                  Integer32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The total number of nodes in the cluster."
+    ::={ clusterStatus 4 }
+ 
+configuredNodes OBJECT-TYPE
+    SYNTAX                  DisplayString 
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "A comma-separted list of the logical node numbers
+        of the configured nodes in the cluster."
+    ::= { clusterStatus 5 }
+
+onlineNodes OBJECT-TYPE
+    SYNTAX                  DisplayString 
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "A comma-separted list of the logical node numbers
+        of the online nodes in the cluster."
+    ::= { clusterStatus 6 }
+
+offlineNodes OBJECT-TYPE
+    SYNTAX                  DisplayString 
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "A comma-separted list of the logical node numbers
+        of the offline nodes in the cluster."
+    ::= { clusterStatus 7 }
+
+
+--CLUSTER PREFORMANCE OBJECTS--
+--CLUSTER FILESYSTEM PERFORMANCE OBJECTS--
+clusterIfsPerf             OBJECT IDENTIFIER ::= { clusterPerformance 1 }
+clusterIfsInBytes OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The cumulative number of bytes into /ifs."
+    ::= { clusterIfsPerf 1 }
+
+clusterIfsInBitsPerSecond OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The cumulative throughput rate (bits per second) into /ifs."
+    ::= { clusterIfsPerf 2 }
+
+clusterIfsOutBytes OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The cumulative number of bytes out of /ifs."
+    ::= { clusterIfsPerf 3 }
+
+clusterIfsOutBitsPerSecond OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The cumulative throughput rate (bits per second) out of /ifs."
+    ::= { clusterIfsPerf 4 }
+
+
+--CLUSTER NETWORK PERFORMANCE OBJECT--
+clusterNetworkPerf          OBJECT IDENTIFIER ::= { clusterPerformance 2 }
+clusterNetworkInBytes OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  obsolete
+    DESCRIPTION
+        "The cumulative input bytes for all external interfaces.
+        Obsolete."
+    ::= { clusterNetworkPerf 1 }
+
+clusterNetworkInBitsPerSecond OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The cumulative input rate (bits per second) for
+         all external interfaces."
+    ::= { clusterNetworkPerf 2 }
+
+clusterNetworkOutBytes OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  obsolete
+    DESCRIPTION
+        "The cumulative output bytes for all external interfaces.
+        Obsolete."
+    ::= { clusterNetworkPerf 3 }
+
+clusterNetworkOutBitsPerSecond OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The cumulative output rate (bits per second) for
+         all external interfaces."
+    ::= { clusterNetworkPerf 4 }
+
+
+--CLUSTER CPU PERF TABLE
+clusterCPUPerf              OBJECT IDENTIFIER ::= { clusterPerformance 3 }
+clusterCPUUser OBJECT-TYPE
+    SYNTAX                  Gauge32(0..1000)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Average amount of CPU time (per mil) used by user processes 
+        averaged for all nodes over the last 5 seconds."
+    ::= { clusterCPUPerf 1 }
+ 
+clusterCPUNice OBJECT-TYPE
+    SYNTAX                  Gauge32(0..1000)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Average amount of CPU time (per mil) used by nice processes 
+        averaged for all nodes over the last 5 seconds."
+    ::= { clusterCPUPerf 2 }
+    
+clusterCPUSystem OBJECT-TYPE
+    SYNTAX                  Gauge32(0..1000)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Average amount of CPU time (per mil) used by system processes 
+        averaged for all nodes over the last 5 seconds."
+    ::= { clusterCPUPerf 3 }
+    
+clusterCPUInterrupt OBJECT-TYPE
+    SYNTAX                  Gauge32(0..1000)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Average amount of CPU time (per mil) used by interrupts 
+        averaged for all nodes over the last 5 seconds."
+    ::= { clusterCPUPerf 4 }
+
+clusterCPUIdlePct OBJECT-TYPE
+    SYNTAX                  Gauge32(0..1000)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Average amount of idle CPU time (per mil) averaged for all nodes
+        averaged for all nodes over the last 5 seconds."
+    ::= { clusterCPUPerf 5 }
+
+
+--FILESYSTEM OBJECTS--
+ifsTotalBytes OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The total cluster capacity of the /ifs filesystem in bytes."
+    ::= { ifsFilesystem 1 }
+
+ifsUsedBytes OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The number of bytes used in the /ifs filesystem."
+    ::= { ifsFilesystem 2 }
+
+ifsAvailableBytes OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The number of bytes available for use in the /ifs filesystem."
+    ::= { ifsFilesystem 3 }
+
+ifsFreeBytes OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The number of bytes free in the /ifs filesystem (includes
+        Virtual Hot Spare)."
+    ::= { ifsFilesystem 4 }
+
+accessTimeEnabled OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if access time tracking is enabled on the /ifs filesystem."
+    ::= { ifsFilesystem 10 }
+    
+accessTimeGracePeriod OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Tthe minimum amount of time (in milliseconds) 
+         between updates to a file's last access time."
+    ::= { ifsFilesystem 11 }
+
+
+--LICENSES TABLE--
+licenseTable OBJECT-TYPE
+    SYNTAX                  SEQUENCE OF LicenseEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "Licensing information for OneFS software modules."
+    ::= { licenses 1 }
+
+licenseEntry OBJECT-TYPE
+    SYNTAX                  LicenseEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "A software module's license status."
+    INDEX { licenseIndex }
+    ::= { licenseTable 1 }
+    
+LicenseEntry ::= SEQUENCE {
+    licenseIndex            Integer32,
+    licenseModuleName       DisplayString ,
+    licenseStatus           INTEGER,
+    licenseExpirationDate   Gauge32
+}
+
+licenseIndex OBJECT-TYPE
+    SYNTAX                  Integer32(0..99)
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "Index of a row in the licensed modules table."
+   ::= { licenseEntry 1 }
+
+
+licenseModuleName OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The name of the licensable module."
+    ::= { licenseEntry 2 }
+
+licenseStatus OBJECT-TYPE
+    SYNTAX                  INTEGER{inactive(-2),
+                                    expired(-1),
+                                    activated(0),
+                                    evaluation(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The status of the license. It may be licensed, unlicensed 
+        (inactive or expired), or an evaluation license."
+    ::= { licenseEntry 3 }
+
+licenseExpirationDate OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The UNIX epoch time that the license expires. This value is only
+        present for evaluation licenses as normal licenses do not expire."
+    ::= { licenseEntry 5 }
+
+
+--QUOTAS OBJECTS--
+quotaTable OBJECT-TYPE
+    SYNTAX                  SEQUENCE OF QuotaEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "A table of specific directory, user, and group quotas."
+    ::= { quotas 1 }
+
+quotaEntry OBJECT-TYPE
+    SYNTAX                  QuotaEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "A quota."
+    INDEX { quotaDomainID }
+    ::= { quotaTable 1 }
+  
+QuotaEntry ::= SEQUENCE {
+    quotaDomainID                       DisplayString,
+    quotaType                           INTEGER,
+    quotaID                             Gauge32,
+    quotaIncludesSnapshotUsage          INTEGER,
+    quotaPath                           DisplayString,
+    quotaHardThresholdDefined           INTEGER,
+    quotaHardThreshold                  CounterBasedGauge64,
+    quotaSoftThresholdDefined           INTEGER,
+    quotaSoftThreshold                  CounterBasedGauge64,
+    quotaAdvisoryThresholdDefined       INTEGER,
+    quotaAdvisoryThreshold              CounterBasedGauge64,
+    quotaGracePeriod                    Integer32,
+    quotaUsage                          CounterBasedGauge64,
+    quotaUsageWithOverhead              CounterBasedGauge64,
+    quotaInodeUsage                     CounterBasedGauge64,
+    quotaIncludesOverhead               INTEGER
+}
+
+quotaDomainID OBJECT-TYPE
+    SYNTAX                  DisplayString(SIZE(48))
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "The unique identifier for the quota."
+    ::= { quotaEntry 1 }
+
+quotaType OBJECT-TYPE
+    SYNTAX                  INTEGER{defaultUser(0),
+                                    user(1),
+                                    defaultGroup(2),
+                                    group(3),
+                                    directory(4),
+                                    special(5),
+                                    max(6)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The type of quota."
+   ::= { quotaEntry 2 }
+
+quotaID OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The user or group ID governed by this quota, if this is a 
+        user or group quota; otherwise 0."
+    ::= { quotaEntry 3 }
+
+quotaIncludesSnapshotUsage OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates whether or not snapshot usage is included
+         in the quota usage."
+    ::= { quotaEntry 4 }
+
+quotaPath OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The path governed by this quota."
+    ::= { quotaEntry 5 }
+
+quotaHardThresholdDefined OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if a hard threshold is enforced for the quota."
+    ::= { quotaEntry 6 }
+
+quotaHardThreshold OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The hard threshold in bytes."
+    ::= { quotaEntry 7 }
+
+quotaSoftThresholdDefined OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if a soft threshold is enforced for the quota."
+    ::= { quotaEntry 8 }
+
+quotaSoftThreshold OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The soft threshold in bytes."
+    ::= { quotaEntry 9 }
+
+quotaAdvisoryThresholdDefined OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if an advisory threshold is enforced for the quota."
+    ::= { quotaEntry 10 }
+
+quotaAdvisoryThreshold OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The advisory threshold in bytes."
+    ::= { quotaEntry 11 }
+
+quotaGracePeriod OBJECT-TYPE
+    SYNTAX                  Integer32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The grace period for the soft threshold. If the soft threshold
+        is exceeded for this time period, write access will be denied."
+    ::= { quotaEntry 12 }
+
+quotaUsage OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The current quota usage in bytes."
+    ::= { quotaEntry 13 }
+
+quotaUsageWithOverhead OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The current quota usage in bytes including FlexProtect overhead."
+    ::= { quotaEntry 14 }
+
+quotaInodeUsage OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The number of inodes (directories and files) covered by the quota."
+    ::= { quotaEntry 15}
+
+quotaIncludesOverhead OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if the quota includes data protection overhead."
+    ::= { quotaEntry 16 }
+
+
+--SNAPSHOT OBJECT--
+snapshotSettings            OBJECT IDENTIFIER ::= { snapshots 1 }
+
+--SNAPSHOT SETTINGS--
+snapshotScheduledCreateEnabled OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if the scheduled (automatic) creation of snapshots
+        should occur."
+    ::= { snapshotSettings 1 }
+
+snapshotScheduledDeleteEnabled OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if scheduled (automatic) deletion of snapshots
+        should occur."
+    ::= { snapshotSettings 2 }
+
+snapshotReservedPct OBJECT-TYPE
+    SYNTAX                  Integer32(0..99)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The percent of storage space reserved for snapshots. The value
+        report is a percentage of total cluster storage capacity."
+    ::= { snapshotSettings 3 }
+
+snapshotRootVisibilityNFS OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if the /ifs/.snapshot directory is visible
+        to NFS clients."
+    ::= { snapshotSettings 4 }
+
+snapshotRootAccessNFS OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if the /ifs/.snapshot directory is accessible
+        to NFS clients."
+    ::= { snapshotSettings 5 }
+
+snapshotSubdirAccessNFS OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if .snapshot directories in subdirectories of /ifs are
+        visible to NFS clients."
+    ::= { snapshotSettings 6 }
+
+snapshotRootVisibilityCIFS OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if the /ifs/.snapshot directory is visible
+        to CIFS clients."
+    ::= { snapshotSettings 7 }
+
+snapshotRootAccessCIFS OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if the /ifs/.snapshot directory is accessible
+        to CIFS clients."
+    ::= { snapshotSettings 8 }
+
+snapshotSubdirAccessCIFS OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if .snapshot directories in subdirectories of /ifs are
+        visible to CIFS clients."
+    ::= { snapshotSettings 9 }
+
+snapshotRootVisibilityLocal OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if .snapshot directories in subdirectories of /ifs are
+        visible to local users."
+    ::= { snapshotSettings 10 }
+
+snapshotRootAccessLocal OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if the /ifs/.snapshot directory is visible
+        to local users."
+    ::= { snapshotSettings 11 }
+
+snapshotSubdirAccessLocal OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if the /ifs/.snapshot directory is accessible
+        to local users."
+    ::= { snapshotSettings 12 }
+
+--SNAPSHOT SCHEDULE TABLE--
+snapshotScheduleTable OBJECT-TYPE
+    SYNTAX                  SEQUENCE OF SnapshotScheduleEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "A table of snapshot schedules."
+    ::= { snapshots 2 }
+
+snapshotScheduleEntry OBJECT-TYPE
+    SYNTAX                  SnapshotScheduleEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "A snapshot schedule."
+    INDEX { snapshotScheduleIndex }
+    ::= { snapshotScheduleTable 1 }
+    
+SnapshotScheduleEntry ::= SEQUENCE {
+    snapshotScheduleIndex            Integer32,
+    snapshotScheduleName             DisplayString,
+    snapshotScheduleAlias            DisplayString,
+    snapshotScheduleNamingPattern    DisplayString,
+    snapshotScheduleSchedule         DisplayString,
+    snapshotScheduleExpiration       DisplayString,
+    snapshotSchedulePath             DisplayString
+}
+
+snapshotScheduleIndex OBJECT-TYPE
+    SYNTAX                  Integer32(0..2147483647)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The unique identifier for a snapshot schedule."
+   ::= { snapshotScheduleEntry 1 }
+
+snapshotScheduleName OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The name of the schedule."
+   ::= { snapshotScheduleEntry 2 }
+
+snapshotScheduleAlias OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The alias for snapshots created by the schedule."
+   ::= { snapshotScheduleEntry 3 }
+
+snapshotScheduleNamingPattern OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The naming pattern for snapshots created by the schedule."
+   ::= { snapshotScheduleEntry 4 }
+
+snapshotScheduleSchedule OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The date, time, and frequency that snapshots
+         will be created by this schedule."
+   ::= { snapshotScheduleEntry 5 }
+
+snapshotScheduleExpiration OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Description of when snapshots created by the schedule will expire."
+   ::= { snapshotScheduleEntry 6 }
+
+snapshotSchedulePath OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The paths that snapshots will be created from for the schedule."
+   ::= { snapshotScheduleEntry 7 }
+
+
+--SNAPSHOT TABLE--
+snapshotTable OBJECT-TYPE
+    SYNTAX                  SEQUENCE OF SnapshotEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "A table of snapshots."
+    ::= { snapshots 3 }
+
+snapshotEntry OBJECT-TYPE
+    SYNTAX                  SnapshotEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "A snapshot."
+    INDEX { snapshotIndex }
+    ::= { snapshotTable 1 }
+    
+SnapshotEntry ::= SEQUENCE {
+    snapshotIndex            Integer32,
+    snapshotName             DisplayString,
+    snapshotCreated          Gauge32,
+    snapshotExpires          Gauge32,
+    snapshotSize             CounterBasedGauge64,
+    snapshotPath             DisplayString,
+    snapshotAliasFor         DisplayString,
+    snapshotLocked           INTEGER
+}
+
+snapshotIndex OBJECT-TYPE
+    SYNTAX                  Integer32(0..2147483647)
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "The unique identifier of the snapshot."
+   ::= { snapshotEntry 1 }
+
+snapshotName OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The name of the snapshot."
+   ::= { snapshotEntry 2 }
+
+snapshotCreated OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The UNIX epoch time at which the snapshot was created."
+   ::= { snapshotEntry 3 }
+
+snapshotExpires OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The UNIX epoch time that the snapshot expires in seconds."
+   ::= { snapshotEntry 4 }
+
+snapshotSize OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The amount of storage space consumed by the snapshot in bytes."
+   ::= { snapshotEntry 5 }
+
+snapshotPath OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The path covered by the snapshot."
+   ::= { snapshotEntry 6 }
+
+snapshotAliasFor OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "An alternate name for the snapshot."
+   ::= { snapshotEntry 7 }
+
+snapshotLocked OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if the snapshot is locked."
+   ::= { snapshotEntry 8 }
+
+--NODE OBJECTS--
+--NODE OBJECT GROUPS--
+nodeStatus                  OBJECT IDENTIFIER ::= { node 1 }
+nodePerformance             OBJECT IDENTIFIER ::= { node 2 }
+
+
+--NODE STATUS--
+nodeName  OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The hostname of the node."
+    ::= { nodeStatus 1 }
+
+nodeHealth OBJECT-TYPE
+    SYNTAX                  INTEGER{ok(0),attn(1),down(2),invalid(3)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The overall health of the node."
+    ::= { nodeStatus 2 }
+
+nodeType  OBJECT-TYPE
+    SYNTAX                  INTEGER{storage(0), accelerator(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The general type of the node."
+    ::= { nodeStatus 3 }
+
+readOnly OBJECT-TYPE
+    SYNTAX                  INTEGER{no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if this node in read-only mode."
+    ::= { nodeStatus 4 }
+
+
+--NODE PERFORMANCE GROUP--
+--NODE FILESYSTEM PERFORMANCE GROUP--
+nodeIfsPerf                 OBJECT IDENTIFIER ::= { nodePerformance 1 }
+nodeIfsInBytes OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The number of bytes into /ifs through this node."
+    ::= { nodeIfsPerf 1 }
+
+nodeIfsInBitsPerSecond OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The throughput rate (bytes per second) into /ifs through this node."
+    ::= { nodeIfsPerf 2 }
+
+nodeIfsOutBytes OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The number of bytes out of /ifs through this node."
+    ::= { nodeIfsPerf 3 }
+
+nodeIfsOutBitsPerSecond OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The throughput rate (bytes per second) out of /ifs through this node."
+    ::= { nodeIfsPerf 4 }
+
+
+--NODE NETWORK PERFORMANCE GROUP--
+nodeNetworkPerf             OBJECT IDENTIFIER ::= { nodePerformance 2 }
+nodeNetworkInBytes OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  obsolete
+    DESCRIPTION
+        "Total bytes into the node's external interfaces.
+        Obsolete."
+    ::= { nodeNetworkPerf 1 }
+
+nodeNetworkInBitsPerSecond OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The total input rate (bits per second) into the 
+        node's external interfaces."
+    ::= { nodeNetworkPerf 2 }
+
+nodeNetworkOutBytes OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  obsolete
+    DESCRIPTION
+        "Total bytes out of the node's external interfaces.
+        Obsolete."
+    ::= { nodeNetworkPerf 3 }
+
+nodeNetworkOutBitsPerSecond OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The total output rate (bits per second) from the 
+        node's external interfaces."
+    ::= { nodeNetworkPerf 4 }
+
+--NODE CPU PERF AGGREGATES
+nodeCPUPerf                 OBJECT IDENTIFIER ::= { nodePerformance 3 }
+nodeCPUUser OBJECT-TYPE
+    SYNTAX                  Gauge32(0..1000)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Average amount of CPU (per mil) used by user processes
+        within the last 5 seconds for all CPUs."
+    ::= { nodeCPUPerf 1 }
+
+nodeCPUNice OBJECT-TYPE
+    SYNTAX                  Gauge32(0..1000)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Average amount of CPU (per mil) used by nice processes
+        within the last 5 seconds for all CPUs."
+    ::= { nodeCPUPerf 2 }
+
+nodeCPUSystem OBJECT-TYPE
+    SYNTAX                  Gauge32(0..1000)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Average amount of CPU (per mil) used by system processes
+        within the last 5 seconds for all CPUs."
+    ::= { nodeCPUPerf 3 }
+
+nodeCPUInterrupt OBJECT-TYPE
+    SYNTAX                  Gauge32(0..1000)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Average amount of CPU (per mil) used by interrupts
+        within the last 5 seconds for all CPUs."
+    ::= { nodeCPUPerf 4 }
+
+nodeCPUIdle OBJECT-TYPE
+    SYNTAX                  Gauge32(0..1000)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Average amount of CPU (per mil) used by idle processes
+        within the last 5 seconds for all CPUs."
+    ::= { nodeCPUPerf 5 }
+
+--NODE PER CPU PERF TABLE
+nodeCPUPerfTable OBJECT-TYPE
+    SYNTAX                  SEQUENCE OF NodeCPUPerfEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "Per CPU usage metrics."
+    ::= { nodeCPUPerf 10 }
+
+NodeCPUPerfEntry ::= SEQUENCE {
+    nodePerCPUUser          Gauge32,
+    nodePerCPUNice          Gauge32,
+    nodePerCPUSystem        Gauge32,
+    nodePerCPUInterrupt     Gauge32,
+    nodePerCPUIdle          Gauge32,
+    nodePerCPUID            Integer32
+}
+
+nodeCPUPerfEntry OBJECT-TYPE
+    SYNTAX                  NodeCPUPerfEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "CPU usage metrics for one CPU/core.
+         "
+    INDEX { nodePerCPUID }
+    ::= { nodeCPUPerfTable 1 }
+
+nodePerCPUUser OBJECT-TYPE
+    SYNTAX                  Gauge32(0..1000)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Amount of CPU (per mil) used by user processes
+        within the last 5 seconds for the CPU."
+    ::= { nodeCPUPerfEntry 1 }
+
+nodePerCPUNice OBJECT-TYPE
+    SYNTAX                  Gauge32(0..1000)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Amount of CPU (per mil) used by nice processes
+        within the last 5 seconds for the CPU."
+    ::= { nodeCPUPerfEntry 2 }
+
+nodePerCPUSystem OBJECT-TYPE
+    SYNTAX                  Gauge32(0..1000)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Amount of CPU (per mil) used by system processes
+        within the last 5 seconds for the CPU."
+    ::= { nodeCPUPerfEntry 3 }
+
+nodePerCPUInterrupt OBJECT-TYPE
+    SYNTAX                  Gauge32(0..1000)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Amount of CPU (per mil) used by interrupts
+        within the last 5 seconds for the CPU."
+    ::= { nodeCPUPerfEntry 4 }
+
+nodePerCPUIdle OBJECT-TYPE
+    SYNTAX                  Gauge32(0..1000)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Amount of CPU (per mil) used by idle processes
+        within the last 5 seconds for the CPU."
+    ::= { nodeCPUPerfEntry 5 }
+
+nodePerCPUID OBJECT-TYPE
+    SYNTAX                  Integer32(0..64)
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "ID of the CPU."
+    ::= { nodeCPUPerfEntry 6 }
+
+--PROTOCOL PERFORMANCE TABLE--
+nodeProtocolPerfTable OBJECT-TYPE
+    SYNTAX                  SEQUENCE OF NodeProtocolPerfEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "Per-protocol performance metrics and statistics."
+    ::= { nodePerformance 10 }
+
+NodeProtocolPerfEntry ::= SEQUENCE {
+    protocolName            DisplayString,
+    protocolOpCount         Gauge32,
+    protocolOpsPerSecond    Gauge32,
+    inMinBytes              Gauge32,
+    inMaxBytes              Gauge32,
+    inAvgBytes              Gauge32,
+    inStdDevBytes           Gauge32,
+    inBitsPerSecond         CounterBasedGauge64,
+    outMinBytes             Gauge32,
+    outMaxBytes             Gauge32,
+    outAvgBytes             Gauge32,
+    outStdDevBytes          Gauge32,
+    outBitsPerSecond        CounterBasedGauge64,
+    latencyMin              Gauge32,
+    latencyMax              Gauge32,
+    latencyAverage          Gauge32,
+    latencyStdDev           Gauge32
+}
+
+nodeProtocolPerfEntry OBJECT-TYPE
+    SYNTAX                  NodeProtocolPerfEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "Basic protocol performance metrics and statistics.
+         Each row represents a protocol. The procotols
+         are: SMB1, SMB2, FTP, HTTP, NFS3, NFS4, NLM, SYNCIQ.
+         "
+    INDEX { IMPLIED protocolName }
+    ::= { nodeProtocolPerfTable 1 }
+
+protocolName OBJECT-TYPE
+    SYNTAX                  DisplayString(SIZE(3..4))
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The name of the protocol."
+    ::= { nodeProtocolPerfEntry 1 }
+
+protocolOpCount OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The total number of operations for the protocol.
+         "
+    ::= { nodeProtocolPerfEntry 2 }
+
+protocolOpsPerSecond OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The number of operations per second for the last 5 second."
+    ::= { nodeProtocolPerfEntry 3 }
+
+inMinBytes OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The smallest input size in bytes of all operations for the protocol."
+    ::= { nodeProtocolPerfEntry 4 }
+
+inMaxBytes OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The largest input size in bytes of all operations for the protocol."
+    ::= { nodeProtocolPerfEntry 5 }
+
+inAvgBytes OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The average input size in bytes for all operations for the protocol."
+    ::= { nodeProtocolPerfEntry 6 }
+
+inStdDevBytes OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The standard deviation input size in bytes
+        for all operations for the protocol."
+    ::= { nodeProtocolPerfEntry 7 }
+
+inBitsPerSecond OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The input rate (bits per second) for the protocol."
+    ::= { nodeProtocolPerfEntry 8 }
+
+outMinBytes OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The smallest output size in bytes of all operations for the protocol."
+    ::= { nodeProtocolPerfEntry 9 }
+
+outMaxBytes OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The largest output size in bytes of all operations for the protocol."
+    ::= { nodeProtocolPerfEntry 10 }
+
+outAvgBytes OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The average output size in bytes of all operations for the protocol."
+    ::= { nodeProtocolPerfEntry 11 }
+
+outStdDevBytes OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The standard deviation output size in bytes 
+        for all operations for the protocol."
+    ::= { nodeProtocolPerfEntry 12 }
+
+outBitsPerSecond OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The output rate (bits per second)
+        for all operations for the protocol."
+    ::= { nodeProtocolPerfEntry 13 }
+
+latencyMin OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The minimum latency in microseconds
+        for all operations for the protocol."
+    ::= { nodeProtocolPerfEntry 14 }
+
+latencyMax OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The maximum latency in microseconds
+        for all operations for the protocol."
+    ::= { nodeProtocolPerfEntry 15 }
+
+latencyAverage OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The average latency in microseconds
+        for all operations for the protocol."
+    ::= { nodeProtocolPerfEntry 16 }
+
+latencyStdDev OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The latency standard deviation in microseconds
+        for all operations for the protocol."
+    ::= { nodeProtocolPerfEntry 17 }
+
+
+--DISK PERFORMANCE TABLE--
+diskPerfTable OBJECT-TYPE
+    SYNTAX                  SEQUENCE OF DiskPerfEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "Disk performance metrics and statistics."
+    ::= { nodePerformance 52 }
+    
+DiskPerfEntry ::= SEQUENCE {
+    diskPerfBay                 Integer32,
+    diskPerfDeviceName          DisplayString,
+    diskPerfOpsPerSecond        Gauge32,
+    diskPerfInBitsPerSecond     Gauge32,
+    diskPerfOutBitsPerSecond    Gauge32
+}
+
+diskPerfEntry OBJECT-TYPE
+    SYNTAX                  DiskPerfEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "Performance metrics and statistics for a disk.
+         Each row in the table represents a disk."
+    INDEX { diskPerfBay }
+    ::= { diskPerfTable 1 }
+    
+diskPerfBay OBJECT-TYPE
+    SYNTAX                  Integer32(1..256)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The bay that contains the disk."
+    ::= { diskPerfEntry 1 }
+
+diskPerfDeviceName OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The device name for this disk. This value
+        correspond to the diskBay column in the diskTable."
+    ::= { diskPerfEntry 2 }
+
+diskPerfOpsPerSecond OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The number of disk operations per second."
+    ::= { diskPerfEntry 3 }
+
+diskPerfInBitsPerSecond OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The input rate (bits per second) into this disk."
+    ::= { diskPerfEntry 4 }
+
+diskPerfOutBitsPerSecond OBJECT-TYPE
+    SYNTAX                  Gauge32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The output rate (bits per second) from this disk."
+    ::= { diskPerfEntry 5 }
+
+--CHASSIS HARDWARE TABLE--
+chassisTable OBJECT-TYPE
+    SYNTAX                  SEQUENCE OF ChassisEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "A list of chassis that comprise the node."
+    ::= { node 51 }
+
+ChassisEntry ::= SEQUENCE {
+    chassisNumber           Integer32,
+    chassisConfigNumber     DisplayString ,
+    chassisSerialNumber     DisplayString,
+    chassisModel            DisplayString,
+    chassisUnitIDLEDOn      INTEGER
+}
+
+chassisEntry OBJECT-TYPE
+    SYNTAX                  ChassisEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "A node chassis."
+    INDEX { chassisNumber }
+    ::= { chassisTable 1 }
+
+chassisNumber OBJECT-TYPE
+    SYNTAX                  Integer32(1..5)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "A logical chassis number."
+    ::= { chassisEntry 1 }
+
+chassisConfigNumber OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The chassis configuration number."
+    ::= { chassisEntry 2 }
+
+chassisSerialNumber OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The chassis serial number."
+    ::= { chassisEntry 3 }
+
+chassisModel OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The chassis model name."
+    ::= { chassisEntry 4 }
+
+chassisUnitIDLEDOn OBJECT-TYPE
+    SYNTAX                  INTEGER{na(-1),no(0),yes(1)}
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Indicates if the unit ID light on the chassis is lighted.
+         This is the blue service light on the back of the chassis.
+         A value of NA indicates that no Unit ID LED exists 
+         on the chassis.
+         "
+    ::= { chassisEntry 5 }
+
+
+--DISKS HARDWARE TABLE--
+diskTable OBJECT-TYPE
+    SYNTAX                  SEQUENCE OF DiskEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "A list of disk state and properties for all disk in the node
+        including expansion chassis."
+    ::= { node 52 }
+
+DiskEntry ::= SEQUENCE {
+    diskBay                 Integer32,
+    diskLogicalNumber       Integer32,
+    diskChassisNumber       Integer32,
+    diskDeviceName          DisplayString,
+    diskStatus              DisplayString,
+    diskModel               DisplayString,
+    diskSerialNumber        DisplayString,
+    diskFirmwareVersion     DisplayString,
+    diskSizeBytes           CounterBasedGauge64
+}
+
+diskEntry OBJECT-TYPE
+    SYNTAX                  DiskEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "A disk."
+    INDEX { diskBay }
+    ::= { diskTable 1 }
+
+diskBay OBJECT-TYPE
+    SYNTAX                  Integer32(1..256)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The bay that contains the disk."
+    ::= { diskEntry 1 }
+    
+diskLogicalNumber OBJECT-TYPE
+    SYNTAX                  Integer32(0..255)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The disk logical identification number."
+    ::= { diskEntry 2 }
+ 
+diskChassisNumber OBJECT-TYPE
+    SYNTAX                  Integer32
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The chassis which contains the disk."
+    ::= { diskEntry 3 }
+
+diskDeviceName OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The device name for this disk."
+    ::= { diskEntry 4 }
+
+diskStatus OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The operational status of the disk.
+        Gone drives are considered not part of /ifs.
+        Commonly returned values include (but not limited to):
+        HEALTHY - Drive is healthy
+        L3 - Drive is being used for L3 caching
+        DEAD - Drive is dead
+        SMARTFAIL - Drive is smartfailed"
+    ::= { diskEntry 5 }
+
+diskModel OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The manufacture and model name of the disk."
+    ::= { diskEntry 6 }
+
+diskSerialNumber OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The serial number of the disk."
+    ::= { diskEntry 7 }
+
+diskFirmwareVersion OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The firmware version installed on the disk."
+    ::= { diskEntry 8 }
+
+diskSizeBytes OBJECT-TYPE
+    SYNTAX                  CounterBasedGauge64
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The size of the disk in bytes."
+    ::= { diskEntry 9 }
+
+
+--FAN HARDWARE TABLE--
+fanTable OBJECT-TYPE
+    SYNTAX                  SEQUENCE OF FanEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "A table of fans in the node including expansion chassis."
+    ::= { node 53 }
+
+FanEntry ::= SEQUENCE {
+    fanNumber               Integer32,
+    fanName                 DisplayString,
+    fanDescription          DisplayString,
+    fanSpeed                Integer32
+}
+
+fanEntry OBJECT-TYPE
+    SYNTAX                  FanEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "A fan."
+    INDEX { fanNumber }
+    ::= { fanTable 1 }
+    
+fanNumber OBJECT-TYPE
+    SYNTAX                  Integer32(1..99)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The unique identifer of the fan on this node.
+        Note: Numbers may correspond to different fans on different hardware."
+    ::= { fanEntry 1 }
+    
+fanName OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The name of the fan."
+    ::= { fanEntry 2 }
+
+fanDescription OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The description of the fan."
+    ::= { fanEntry 3 }
+
+fanSpeed OBJECT-TYPE
+    SYNTAX                  Integer32(0..100000)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The current speed of the fan in revolutions per minute."
+    ::= { fanEntry 4 }
+
+
+--TEMPERATURE SENSOR HARDWARE TABLE--
+tempSensorTable OBJECT-TYPE
+    SYNTAX                  SEQUENCE OF TempSensorEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "A list of thermal sensors in the node including expansion chassis."
+    ::= { node 54 }
+
+TempSensorEntry ::= SEQUENCE {
+    tempSensorNumber            Integer32,
+    tempSensorName              DisplayString,
+    tempSensorDescription       DisplayString,
+    tempSensorValue             DisplayString
+}
+
+tempSensorEntry OBJECT-TYPE
+    SYNTAX                  TempSensorEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "A thermometer."
+    INDEX { tempSensorNumber }
+    ::= { tempSensorTable 1 }
+
+tempSensorNumber OBJECT-TYPE
+    SYNTAX                  Integer32(1..99)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The unique identifier of the sensor on this node."
+    ::= { tempSensorEntry 1 }
+
+tempSensorName OBJECT-TYPE
+    SYNTAX                 DisplayString
+    MAX-ACCESS             read-only
+    STATUS                 current
+    DESCRIPTION
+        "The name of the temperature sensor."
+    ::= { tempSensorEntry 2 }
+
+tempSensorDescription OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "Description of the temperature sensor."
+    ::= { tempSensorEntry 3 }
+
+tempSensorValue OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The cuurent reading of the temperature sensor in degrees celsius."
+    ::= { tempSensorEntry 4 }
+
+
+--POWER & ELECTRICAL SENSOR HARDWARE TABLE--
+powerSensorTable OBJECT-TYPE
+    SYNTAX                  SEQUENCE OF PowerSensorEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "A list of all voltage and current sensors in the node
+        including expansion chassis."
+    ::= { node 55 }
+
+PowerSensorEntry ::= SEQUENCE {
+    powerSensorNumber           Integer32,
+    powerSensorName             DisplayString,
+    powerSensorDescription      DisplayString,
+    powerSensorValue            DisplayString
+}
+
+powerSensorEntry OBJECT-TYPE
+    SYNTAX                  PowerSensorEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "A power sensor."
+    INDEX { powerSensorNumber }
+    ::= { powerSensorTable 1 }
+    
+powerSensorNumber OBJECT-TYPE
+    SYNTAX                  Integer32(1..99)
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The unique identifier of the sensor on this node."
+    ::= { powerSensorEntry 1 }
+    
+powerSensorName OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The name of the sensor."
+    ::= { powerSensorEntry 2 }
+
+powerSensorDescription OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The description of the sensor."
+    ::= { powerSensorEntry 3 }
+
+powerSensorValue OBJECT-TYPE
+    SYNTAX                  DisplayString
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The current reading of the sensor in volts or amps."
+    ::= { powerSensorEntry 4 }
+
+--LOCAL--
+--Other non-MIB definitions used for API identifiers
+-- { local 1 } used in gssspi_set_cred_option() to pass binding info
+credentialBindings          OBJECT IDENTIFIER ::= { local 1 }
+
+--Conformance Groups--
+clusterGroups               OBJECT IDENTIFIER ::= { conformance 1 }
+nodeGroups                  OBJECT IDENTIFIER ::= { conformance 2 }
+
+
+--CLUSTER GROUPS--
+clusterStatusGroup OBJECT-GROUP
+    OBJECTS { 
+        clusterName,
+        clusterHealth,
+        clusterGUID,
+        nodeCount,
+        configuredNodes,
+        onlineNodes,
+        offlineNodes }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover the status of a cluster."
+    ::= { clusterGroups 1 }
+
+clusterPerformanceGroups     OBJECT IDENTIFIER ::= { clusterGroups 2 }
+clusterIfsPerfGroup OBJECT-GROUP
+    OBJECTS { 
+        clusterIfsInBytes,
+        clusterIfsInBitsPerSecond,
+        clusterIfsOutBytes,
+        clusterIfsOutBitsPerSecond }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover the cluster IFS performance."
+    ::= { clusterPerformanceGroups 1 }
+clusterNetworkPerfGroup OBJECT-GROUP
+    OBJECTS { 
+        clusterNetworkInBytes,
+        clusterNetworkInBitsPerSecond,
+        clusterNetworkOutBytes,
+        clusterNetworkOutBitsPerSecond }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover the cluster network performance."
+    ::= { clusterPerformanceGroups 2 }
+clusterCPUPerfGroup OBJECT-GROUP
+    OBJECTS {
+        clusterCPUUser,
+        clusterCPUNice,
+        clusterCPUSystem,
+        clusterCPUInterrupt,
+        clusterCPUIdlePct }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover the CPU performance."
+    ::= { clusterPerformanceGroups 3 }
+
+ifsFilesystemGroup OBJECT-GROUP
+    OBJECTS {
+        ifsTotalBytes,
+        ifsUsedBytes,
+        ifsAvailableBytes,
+        ifsFreeBytes,
+        accessTimeEnabled,
+        accessTimeGracePeriod }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover the IFS filesystem."
+    ::= { clusterGroups 3 }
+
+licensesGroup OBJECT-GROUP
+    OBJECTS {
+        licenseModuleName,
+        licenseStatus,
+        licenseExpirationDate }
+    STATUS current
+    DESCRIPTION
+        "A collection of object that cover licenses."
+    ::= { clusterGroups 5 }
+
+quotasGroup OBJECT-GROUP
+    OBJECTS {
+        quotaType,
+        quotaID,
+        quotaIncludesSnapshotUsage,
+        quotaPath,
+        quotaHardThresholdDefined,
+        quotaHardThreshold,
+        quotaSoftThresholdDefined,
+        quotaSoftThreshold,
+        quotaAdvisoryThresholdDefined,
+        quotaAdvisoryThreshold,
+        quotaGracePeriod,
+        quotaUsage,
+        quotaUsageWithOverhead,
+        quotaInodeUsage,
+        quotaIncludesOverhead }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover quotas."
+    ::= { clusterGroups 12 }
+
+snapshotsGroup              OBJECT IDENTIFIER ::= { clusterGroups 13 }
+snapshotSettingsGroup OBJECT-GROUP
+    OBJECTS {
+        snapshotScheduledCreateEnabled,
+        snapshotScheduledDeleteEnabled,
+        snapshotReservedPct,
+        snapshotRootVisibilityNFS,
+        snapshotRootAccessNFS,
+        snapshotSubdirAccessNFS,
+        snapshotRootVisibilityCIFS,
+        snapshotRootAccessCIFS,
+        snapshotSubdirAccessCIFS,
+        snapshotRootVisibilityLocal,
+        snapshotRootAccessLocal,
+        snapshotSubdirAccessLocal }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that covers snapshot settings."
+    ::= { snapshotsGroup 1 }
+snapshotScheduleTableGroup OBJECT-GROUP
+    OBJECTS {
+        snapshotScheduleIndex,
+        snapshotScheduleName,
+        snapshotScheduleAlias,
+        snapshotScheduleNamingPattern,
+        snapshotScheduleSchedule,
+        snapshotScheduleExpiration,
+        snapshotSchedulePath }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover snapshot schedules."
+    ::= { snapshotsGroup 2 }
+snapshotTableGroup OBJECT-GROUP
+    OBJECTS {
+        snapshotName,
+        snapshotCreated,
+        snapshotExpires,
+        snapshotSize,
+        snapshotPath,
+        snapshotAliasFor,
+        snapshotLocked }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that covers the snapshots."
+    ::= { snapshotsGroup 3 }
+
+--NODE GROUPS--
+nodeStatusGroup OBJECT-GROUP
+    OBJECTS {
+        nodeName,
+        nodeHealth,
+        nodeType,
+        readOnly }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover node status."
+    ::= { nodeGroups 1 }
+nodePerformanceGroup    OBJECT IDENTIFIER ::= { nodeGroups 2 }
+nodeIfsPerfGroup OBJECT-GROUP
+    OBJECTS {
+        nodeIfsInBytes,
+        nodeIfsInBitsPerSecond,
+        nodeIfsOutBytes,
+        nodeIfsOutBitsPerSecond }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover node IFS performance."
+    ::= { nodePerformanceGroup 1 }
+nodeNetworkPerfGroup OBJECT-GROUP
+    OBJECTS {
+        nodeNetworkInBytes,
+        nodeNetworkInBitsPerSecond,
+        nodeNetworkOutBytes,
+        nodeNetworkOutBitsPerSecond }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover node network performance."
+    ::= { nodePerformanceGroup 2 }
+nodeCPUPerfGroup OBJECT-GROUP
+    OBJECTS {
+        nodeCPUUser,
+        nodeCPUNice,
+        nodeCPUSystem,
+        nodeCPUInterrupt,
+        nodeCPUIdle,
+        -- nodeCPUPerfEntry
+        nodePerCPUUser,
+        nodePerCPUNice,
+        nodePerCPUSystem,
+        nodePerCPUInterrupt,
+        nodePerCPUIdle }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover node CPU performance."
+    ::= { nodePerformanceGroup 3 }
+nodeProtocolPerfTableGroup OBJECT-GROUP
+    OBJECTS {
+        protocolName,
+        protocolOpCount,
+        protocolOpsPerSecond,
+        inMinBytes,
+        inMaxBytes,
+        inAvgBytes,
+        inStdDevBytes,
+        inBitsPerSecond,
+        outMinBytes,
+        outMaxBytes,
+        outAvgBytes,
+        outStdDevBytes,
+        outBitsPerSecond,
+        latencyMin,
+        latencyMax,
+        latencyAverage,
+        latencyStdDev }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover protocol performance."
+    ::= { nodePerformanceGroup 10 }
+diskPerfTableGroup OBJECT-GROUP
+    OBJECTS {
+        diskPerfBay,
+        diskPerfDeviceName,
+        diskPerfOpsPerSecond,
+        diskPerfInBitsPerSecond,
+        diskPerfOutBitsPerSecond }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover disk performance."
+    ::= { nodePerformanceGroup 52 }
+
+chassisTableGroup OBJECT-GROUP
+    OBJECTS {
+        chassisNumber,
+        chassisConfigNumber,
+        chassisSerialNumber,
+        chassisModel,
+        chassisUnitIDLEDOn }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover chassis information."
+    ::= { nodeGroups 51 }
+
+diskTableGroup OBJECT-GROUP
+    OBJECTS {
+        diskBay,
+        diskLogicalNumber,
+        diskChassisNumber,
+        diskDeviceName,
+        diskStatus,
+        diskModel,
+        diskSerialNumber,
+        diskFirmwareVersion,
+        diskSizeBytes }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover disk information."
+    ::= { nodeGroups 52 }
+
+fanTableGroup OBJECT-GROUP
+    OBJECTS {
+        fanNumber,
+        fanName,
+        fanDescription,
+        fanSpeed }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover fan information."
+    ::= { nodeGroups 53 }
+
+tempSensorTableGroup OBJECT-GROUP
+    OBJECTS {
+        tempSensorNumber,
+        tempSensorName,
+        tempSensorDescription,
+        tempSensorValue }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover temperature sensor information."
+    ::= { nodeGroups 54 }
+
+powerSensorTableGroup OBJECT-GROUP
+    OBJECTS {
+        powerSensorNumber,
+        powerSensorName,
+        powerSensorDescription,
+        powerSensorValue }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects that cover power sensor information."
+    ::= { nodeGroups 55 }
+
+isilonCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for Isilon OneFS."
+    MODULE -- This module
+        MANDATORY-GROUPS {
+            clusterStatusGroup,
+            clusterIfsPerfGroup,
+            clusterNetworkPerfGroup,
+            clusterCPUPerfGroup,
+            ifsFilesystemGroup,
+            licensesGroup,
+            quotasGroup,
+            snapshotSettingsGroup,
+            snapshotScheduleTableGroup,
+            snapshotTableGroup,
+            nodeStatusGroup,
+            nodeIfsPerfGroup,
+            nodeNetworkPerfGroup,
+            nodeCPUPerfGroup,
+            nodeProtocolPerfTableGroup,
+            diskPerfTableGroup,
+            chassisTableGroup,
+            diskTableGroup,
+            fanTableGroup,
+            tempSensorTableGroup,
+            powerSensorTableGroup }
+    ::= { conformance 10 }
+
+END
+
+-- vim: set filetype=mib tabstop=4 expandtab nospell :miv --

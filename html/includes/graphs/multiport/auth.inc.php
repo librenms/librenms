@@ -1,10 +1,11 @@
 <?php
 
-$auth = true;
-
-foreach (explode(',', $vars['id']) as $ifid) {
-    if (!$auth && !port_permitted($ifid)) {
-        $auth = false;
+if (!$auth) {
+    foreach (explode(',', $vars['id']) as $ifid) {
+        $auth = port_permitted($ifid);
+        if (!$auth) {
+            break;
+        }
     }
 }
 

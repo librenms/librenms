@@ -1,0 +1,2898 @@
+--**************************************************************************
+--**************************************************************************
+--
+--    Copyright 2011 Cisco Systems, Inc.
+--    All Rights Reserved
+--    No portions of this material may be reproduced in any
+--    form without the written permission of:
+--        Cisco Systems, Inc.
+--        170 West Tasman Dr.
+--        San Jose, CA 95134
+--        USA
+--
+--**************************************************************************
+
+SA-RG-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        enterprises,
+        Integer32,
+	Unsigned32,
+        IpAddress
+                FROM SNMPv2-SMI
+        ifIndex
+                FROM IF-MIB
+	TEXTUAL-CONVENTION,
+        RowStatus,
+        DisplayString,
+        MacAddress,
+        PhysAddress,
+        TruthValue,
+        DateAndTime
+                FROM SNMPv2-TC
+        InetAddressType,
+        InetAddress,
+                InetAddressIPv6,
+        InetPortNumber
+                FROM INET-ADDRESS-MIB
+        SnmpAdminString
+                FROM SNMP-FRAMEWORK-MIB ;
+
+sa           OBJECT IDENTIFIER ::= { enterprises 1429 }
+saModules    OBJECT IDENTIFIER ::= { sa 79 }
+
+saRg    MODULE-IDENTITY
+        LAST-UPDATED    "201505260000Z"
+        ORGANIZATION    "Cisco Systems, Inc."
+        CONTACT-INFO    "support.cisco.com"
+        DESCRIPTION
+            "Controls the behavior of router/wireless functions.
+             Can be part of CM configuration file."
+
+        -- history
+
+    REVISION "201505260000Z"
+    DESCRIPTION "Initial release of reduced-set module for releases based on BFC 5.7.x."
+
+        ::= { saModules 2 }
+
+
+SaRgTimeZone ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+         "Time zones."
+    SYNTAX INTEGER {
+        gmtMinusTwelveEniwetokKwajalein(1),
+        gmtMinusElevenMidwayIslandSamoa(2),
+        gmtMinusTenHawaii(3),
+        gmtMinusNineAlaska(4),
+        gmtMinusEightPacificTimeCanadaTijuana(5),
+        gmtMinusSevenArizona(6),
+        gmtMinusSevenMountainTimeCanada(7),
+        gmtMinusSixCentralAmerica(8),
+        gmtMinusSixCentralTimeCanada(9),
+        gmtMinusSixMexicoCity(10),
+        gmtMinusSixSaskatchewan(11),
+        gmtMinusFiveBogotaLimaQuito(12),
+        gmtMinusFiveEasternTimeCanada(13),
+        gmtMinusFiveIndianaEast(14),
+        gmtMinusFourAtlanticTimeCanada(15),
+        gmtMinusFourCaracasLaPaz(16),
+        gmtMinusFourSantiago(17),
+        gmtMinusThreeThirtyNewfoundland(18),
+        gmtMinusThreeBrasilia(19),
+        gmtMinusThreeBuenosAiresGeorgetown(20),
+        gmtMinusThreeGreenland(21),
+        gmtMinusTwoMid-Atlantic(22),
+        gmtMinusOneAzores(23),
+        gmtMinusOneCapeVerdeIs(24),
+        gmtZeroCasablancaMonrovia(25),
+        gmtZeroDublinEdinburghLisbonLondon(26),
+        gmtPlusOneAmsterdamBerlinRomeStockholmVienna(27),
+        gmtPlusOneBelgradeBratislavaBudapestLjubljanaPrague(28),
+        gmtPlusOneBrusselsCopenhagenMadridParis(29),
+        gmtPlusOneSarajevoSkopjeSofijaVilniusWarsawZagreb(30),
+        gmtPlusOneWestCentralAfrica(31),
+        gmtPlusTwoAthensIstanbilMinsk(32),
+        gmtPlusTwoBucharest(33),
+        gmtPlusTwoHelsinkiRigaTallinn(34),
+        gmtPlusTwoJerusalem(35),
+        gmtPlusThreeBaghdad(36),
+        gmtPlusThreeMoscowStPetersburgVolgograd(37),
+        gmtPlusThreeNairobi(38),
+        gmtPlusThreeThirtyTehran(39),
+        gmtPlusFourAbuDhabiMuscat(40),
+        gmtPlusFourThirtyKabul(41),
+        gmtPlusFiveEkaterinburg(42),
+        gmtPlusFiveThirtyCalcuttaChennaiMumbaiNewDelhi(43),
+        gmtPlusFiveFourtyFiveKathmandu(44),
+        gmtPlusSixAlmatyNovosibirsk(45),
+        gmtPlusSixAstanaDhaka(46),
+        gmtPlusSixThirtyRangoon(47),
+        gmtPlusSevenBangkokHanoiJakarta(48),
+        gmtPlusSevenKrasnoyarsk(49),
+        gmtPlusEightBeijingChongqingHongKongUrumqi(50),
+        gmtPlusEightIrkustkUlaanBataar(51),
+        gmtPlusEightKualaLumpurSingapore(52),
+        gmtPlusEightTaipei(53),
+        gmtPlusNineOsakaSapporoTokyo(54),
+        gmtPlusNineSeoul(55),
+        gmtPlusNineThirtyAdelaide(56),
+        gmtPlusTenBrisbane(57),
+        gmtPlusTenVladivostok(58),
+        gmtPlusElevenMagadanSolomonIsNewCaledonia(59),
+        gmtPlusTwelveAucklandWellington(60),
+        gmtPlusTwelveFiji(61),
+        gmtPlusThirteenNukuAlofa(62)
+        }
+
+-- RG Device
+
+saRgDevice   OBJECT IDENTIFIER ::=  { saRg 1 }
+
+saRgDeviceBase   OBJECT IDENTIFIER ::=  { saRgDevice 1 }
+
+saRgDeviceMode OBJECT-TYPE
+    SYNTAX INTEGER { 
+    	disable(0),
+        multiSsid(1),
+                ipv4(3),
+                ipv6(4),
+                dualstack(5) }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Defines the mode of operation for the device.
+        This parameter is stored in non-vol and is multiSsid(1) by default.
+        Setting this object via SNMP will cause
+        the unit to reboot.
+                This MIB will be superseded in the config file by TLV202.
+                This MIB will read the proper value if set from TLV202.
+                This MIB will be superseded by saRgIpMgmtLanMode inbridge(1) or mixed(4).
+                disable(0):  Value will reflect when TLV202 is set to 0. Not all platforms have this value implemented.
+                multiSsid(1): Default Value. Value supports IPv4RG with multiple SSID
+                        configuration and bridge mode via saRgIpMgmtLanMode MIB.
+                        Bridge mode is the same as eRouter disabled mode.
+                        IPV4RG is the non eRouter behavior that existed before
+                        in our router products.
+                Ipv4(3): eRouter IPv4 only mode
+                Ipv6(4): eRouter IPv6 only mode
+                Dualstack(5): eRouter IPv4 and IPv6 dualstack
+                Note: cableHome11(2) support is not available."
+    DEFVAL { 1 }
+    ::= { saRgDeviceBase 1 }
+
+saRgDeviceResetDefaultEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object controls the reset to factory default functionality
+         of the gateway. This prevents the local user from using the reset
+         switch to gain access to the setup pages using the default user
+         name and password. The objective is to prevent theft of service
+         from a user who reconfigures the device to add users or change
+         wireless settings.
+         Enable (object set to true):
+          1. Momentary press of the Reset Switch (<5 seconds)
+             DOCSIS restart of the modem (reboot, no reset to factory
+             default values).
+          2. Pressing the reset switch for >5 seconds
+             Reboots and resets of all values (modem and router) to
+             factory default.
+         Disable (object set to false):
+          1. Momentary press of the Reset Switch (<5 seconds)
+             DOCSIS restart of the modem (reboot, no reset to factory
+             default values).
+          2. Pressing the reset switch for >5 seconds
+             Modem reboots and resets only the cable modem settings to
+             factory default values. The router settings should remain and
+             should not NOT reset to factory default."
+    DEFVAL { true }
+    ::= { saRgDeviceBase 2 }
+
+saRgDeviceRemoteWebAccessPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Defines what port to use for the WAN IP address of the gateway
+             to be able to access RG web pages.
+             This value is to be stored in non-vol and will persist across reboots.
+             Only a factory reset would clear it"
+    DEFVAL { 8080 }
+    ::= { saRgDeviceBase 4 }
+
+saRgDeviceLanLanIsolation OBJECT-TYPE
+    SYNTAX INTEGER {
+        disable(0),
+        enable(1)
+        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This MIB is only available in D3.0 products.
+          This MIB does not take effect if the modem is in VLAN mode i.e if saRgIpMgmtLanMode.32=vlan(5).
+        Lan-Lan Isolation allows you block IP access between CPEs connected to the Ethernet ports.
+        Use this mib in conjunction with saRgDeviceLanWlanIsolation and saRgDot11BssApIsolation.x for
+          complete isolation between CPEs connected to the RG.
+        This MIB is written to non-vol and set to disable(0) after a factory reset.
+        disable(0)- No Isolation
+        enable(1)- Enable Isolation feature"
+    DEFVAL { 0 }
+    ::= { saRgDeviceBase 6 }
+
+saRgDeviceLanWlanIsolation OBJECT-TYPE
+    SYNTAX INTEGER {
+        disable(0),
+        enable(1)
+        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This MIB is only available in D3.0 products.
+        This MIB does not take effect if the modem is in VLAN mode i.e if saRgIpMgmtLanMode.32=vlan(5).
+        Lan-Wlan Isolation allows you block IP access between CPEs connected to the Ethernet port and
+        Wireless SSIDs.
+        Use this mib in conjunction with saRgDeviceLanLanIsolation and saRgDot11BssApIsolation.x for
+          complete isolation between CPEs connected to the RG.
+        This MIB is written to non-vol and set to disable(0) after a factory reset.
+        disable(0)- No Isolation
+        enable(1)- Enable Isolation feature"
+    DEFVAL { 0 }
+    ::= { saRgDeviceBase 7 }
+
+saRgDeviceIpv6Trans OBJECT-TYPE
+    SYNTAX INTEGER {
+        disable(0),
+        dslite(1)
+        }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This MIB will control which IPv6 transition technology is enabled on the device.
+        After setting this MIB to disable in the config file, IPv4 traffic will pass normally
+                through the device. When switched to dslite, the DSLite feature will be enabled.
+                If eRouter is in IPv6-only mode, DS Lite will tunnel IPv4 traffic over IPv6 to the AFTR
+                address specified either manually or in the DHCPv6 option-64. See saRgDslite MIB tree
+                for more details.
+        If this setting is changed by the config file, the CM will reboot.
+        This MIB is written to non-vol and set to disable(0) after a factory reset.
+        disable(0) - No technology is enabled
+        enable(1) - DS lite feature is enabled"
+    DEFVAL { 0 }
+    ::= { saRgDeviceBase 8 }
+
+saRgDeviceIpv6Passthrough OBJECT-TYPE
+     SYNTAX INTEGER {
+        disable(0),
+        enable(1)
+        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This MIB controls IPv6 passthrough on the RG and is applicable in bridge and router modes.
+          When disabled the RG will function without any IPv6 passthrough
+          When IPv6 passthrough is enabled in Bridge Mode the RG will drop all IPv4 traffic
+          When IPv6 passthrough is enabled in router mode the RG will operate as normal for IPv4 traffic, but all IPv6 traffic will passthrough
+          This MIB requires CM reboot.
+          This MIB is written to non-vol and set to disable(0) after a factory reset."
+    DEFVAL { 0 }
+    ::= { saRgDeviceBase 9 }
+
+saRgDeviceFactoryReset  OBJECT-TYPE
+    SYNTAX INTEGER {
+                false(0),
+        routerAndWifi(1),
+        routerOnly(2),
+        wifi(3)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+        "Set routerAndWifi(1) to restore default settings of both the router and wifi.
+                Set routerOnly(2) to restore default settings of the router.
+                Set wifi(3) to restore default settings of the wifi.
+                Return false(0) when read."
+        DEFVAL { 0 }
+        ::= { saRgDeviceBase 1002 }
+
+saRgDeviceTimeSetup   OBJECT IDENTIFIER ::=  { saRgDevice 5 }
+
+saRgDeviceTimeSetupNtpEnabled OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Stored in non-vol, disabled after factory reset."
+    ::= { saRgDeviceTimeSetup 1 }
+
+saRgDeviceTimeSetupNtpServerTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF SaRgDeviceTimeSetupNtpServerEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "Up to 3 NTP servers are supported. This table
+                is stored in non-vol. Default entries after factory
+                reset are:
+                1: time.nist.gov
+                2: nist.aol-ca.truetime.com
+                3: nist1-ny.glassey.com"
+    ::= { saRgDeviceTimeSetup 2 }
+
+saRgDeviceTimeSetupNtpServerEntry OBJECT-TYPE
+    SYNTAX      SaRgDeviceTimeSetupNtpServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    INDEX { saRgDeviceTimeSetupNtpServerIndex }
+    ::= { saRgDeviceTimeSetupNtpServerTable 1 }
+
+SaRgDeviceTimeSetupNtpServerEntry ::= SEQUENCE {
+    saRgDeviceTimeSetupNtpServerIndex      INTEGER,
+    saRgDeviceTimeSetupNtpServerAddress    SnmpAdminString
+    }
+
+saRgDeviceTimeSetupNtpServerIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index"
+    ::= { saRgDeviceTimeSetupNtpServerEntry 1 }
+
+saRgDeviceTimeSetupNtpServerAddress OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "IP address or FQDN of the NTP server."
+    ::= { saRgDeviceTimeSetupNtpServerEntry 2 }
+
+saRgDeviceTimeSetupZone OBJECT-TYPE
+    SYNTAX SaRgTimeZone
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Time zone for the gateway.
+         Stored in non-vol, gmtZeroDublinEdinburghLisbonLondon(26)
+         after factory reset."
+    ::= { saRgDeviceTimeSetup 3 }
+
+saRgDeviceTimeSetupDst OBJECT-TYPE
+    SYNTAX INTEGER (0..120)
+    UNITS "Minutes"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Daylight saving time. If set to 0, DST is disabled
+         Stored in non-vol, 0 after factory reset."
+    ::= { saRgDeviceTimeSetup 4 }
+
+-- MIBs to poll IANA / PD info for eRouter interface
+
+saRgDeviceIanaContent   OBJECT IDENTIFIER ::=  { saRgDevice 7 }
+
+saRgDeviceIanaIAID OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Returns the IAID value embedded in the IA_NA for the
+eRouter's DHCPv6 lease."
+        ::= { saRgDeviceIanaContent 1 }
+
+saRgDeviceIanaT1 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Returns the T1 value embedded in the IA_NA for the eRouter's
+DHCPv6 lease."
+        ::= { saRgDeviceIanaContent 2 }
+
+saRgDeviceIanaT2 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Returns the T2 value embedded in the IA_NA for the eRouter's
+DHCPv6 lease."
+        ::= { saRgDeviceIanaContent 3 }
+
+saRgDeviceIanaTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SaRgDeviceIanaEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Table of IA Address entries associated with IA_NA for the
+eRouter's DHCPv6 lease."
+        ::= { saRgDeviceIanaContent 4 }
+
+saRgDeviceIanaEntry OBJECT-TYPE
+    SYNTAX      SaRgDeviceIanaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of IA Address entries associated with IA_NA for the
+eRouter's DHCPv6 lease."
+    INDEX { saRgDeviceIanaIndex }
+    ::= { saRgDeviceIanaTable 1 }
+
+SaRgDeviceIanaEntry ::= SEQUENCE {
+    saRgDeviceIanaIndex              INTEGER,
+    saRgDeviceIanaValue              InetAddress,
+    saRgDeviceIanaPreferredLifetime  Integer32,
+    saRgDeviceIanaValidLifetime      Integer32
+    }
+
+saRgDeviceIanaIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index"
+    ::= { saRgDeviceIanaEntry 1 }
+
+saRgDeviceIanaValue OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IPv6 address provided to the eRouter WAN interface via DHCPv6."
+    ::= { saRgDeviceIanaEntry 2 }
+
+saRgDeviceIanaPreferredLifetime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Preferred Lifetime setting for an IPv6 address assigned to the
+eRouter."
+    ::= { saRgDeviceIanaEntry 3 }
+
+saRgDeviceIanaValidLifetime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Valid Lifetime setting for an IPv6 address assigned to the
+eRouter."
+    ::= { saRgDeviceIanaEntry 4 }
+
+
+
+saRgDeviceIapdContent   OBJECT IDENTIFIER ::=  { saRgDevice 8 }
+
+saRgDeviceIapdIAID OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Returns the IAID value embedded in the IA_PD for the
+eRouter's DHCPv6 lease."
+        ::= { saRgDeviceIapdContent 1 }
+
+saRgDeviceIapdT1 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Returns the T1 value embedded in the IA_PD for the eRouter's
+DHCPv6 lease."
+        ::= { saRgDeviceIapdContent 2 }
+
+saRgDeviceIapdT2 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Returns the T2 value embedded in the IA_PD for the eRouter's
+DHCPv6 lease."
+        ::= { saRgDeviceIapdContent 3 }
+
+saRgDeviceIapdTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SaRgDeviceIapdEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Table of IA Prefix entries associated with IA_PD for the
+eRouter's DHCPv6 lease."
+        ::= { saRgDeviceIapdContent 4 }
+
+saRgDeviceIapdEntry OBJECT-TYPE
+    SYNTAX      SaRgDeviceIapdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Table of IA Address entries associated with IA_PD for the
+eRouter's DHCPv6 lease."
+    INDEX { saRgDeviceIapdIndex }
+    ::= { saRgDeviceIapdTable 1 }
+
+SaRgDeviceIapdEntry ::= SEQUENCE {
+    saRgDeviceIapdIndex              INTEGER,
+    saRgDeviceIapdPreferredLifetime  Integer32,
+    saRgDeviceIapdValidLifetime      Integer32,
+    saRgDeviceIapdPrefixLength       INTEGER,
+    saRgDeviceIapdPrefixValue        InetAddress
+    }
+
+saRgDeviceIapdIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index"
+    ::= { saRgDeviceIapdEntry 1 }
+
+saRgDeviceIapdPreferredLifetime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Preferred Lifetime setting for an IPv6 address assigned to the
+eRouter."
+    ::= { saRgDeviceIapdEntry 2 }
+
+saRgDeviceIapdValidLifetime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Valid Lifetime setting for an IPv6 address assigned to the
+eRouter."
+    ::= { saRgDeviceIapdEntry 3 }
+
+saRgDeviceIapdPrefixLength OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Length (in bits) for this prefix."
+        ::= { saRgDeviceIapdEntry 4 }
+
+saRgDeviceIapdPrefixValue OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Prefix address specified in the IA_PD."
+        ::= { saRgDeviceIapdEntry 5 }
+
+-- ******************
+-- ***** 802.11 *****
+-- ******************
+
+saRgDot11 OBJECT IDENTIFIER ::=  { saRg 2 }
+
+-- *************************
+-- GENERAL AND CHANNEL SETUP
+-- *************************
+
+saRgDot11MgmtBase OBJECT IDENTIFIER ::= { saRgDot11 1 }
+
+saRgDot11OnOffPushButtonTime OBJECT-TYPE
+    SYNTAX      INTEGER (0..11)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies how long to press WPS button to enable or disable
+         the WiFi interface (primary SSID). When set to 11, the feature
+         is disabled.
+         Stored in non-vol, 11 after factory reset."
+    ::= { saRgDot11MgmtBase 20 }
+
+-- =====================
+-- PER BSS CONFIGURATION
+-- =====================
+-- The interface numbers are:
+-- 32: SSID1 + LAN
+-- 33: SSID2
+-- 34: SSID3
+-- 35: SSID4
+-- 36: SSID5
+-- 37: SSID6
+-- 38: SSID7
+-- 39: SSID8
+
+
+saRgDot11Bss OBJECT IDENTIFIER ::= { saRgDot11 2 }
+
+saRgDot11BssTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SaRgDot11BssEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "BSS table"
+    ::= { saRgDot11Bss 1 }
+
+saRgDot11BssEntry OBJECT-TYPE
+    SYNTAX      SaRgDot11BssEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in the table which represents parameters for SSID."
+    INDEX   { ifIndex }
+    ::= { saRgDot11BssTable 1 }
+
+SaRgDot11BssEntry ::=
+    SEQUENCE {
+        saRgDot11BssId            PhysAddress,
+        saRgDot11BssEnable        INTEGER,
+        saRgDot11BssSsid          OCTET STRING,
+        saRgDot11BssSecurityMode  INTEGER,
+        saRgDot11BssClosedNetwork TruthValue,
+        saRgDot11BssAccessMode    INTEGER,
+        saRgDot11BssMaxNumSta     INTEGER,
+        saRgDot11BssUserStatus    INTEGER,
+        saRgDot11BssApIsolation   INTEGER,
+        saRgDot11BssSecSsidTrafficPriority  INTEGER,
+        saRgDot11BssRejectPriSsidSta        TruthValue
+        }
+
+saRgDot11BssId OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Returns the BSSID"
+    ::= { saRgDot11BssEntry 1 }
+
+saRgDot11BssEnable OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2),
+        enableOnline(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls the BSS state.
+         When set to enableOnline(3), the SSID is enabled only
+         when the cable modem is online. When the modem changes
+         state to offline, the AP will send dissasociation messages
+         to the STAs connected to the SSID and then disable.
+         The value of primary BSS is stored in non-vol and is enabled(1)
+         after factory reset.
+         The other BSSs are disabled by default. If other
+         BSS's SSID name is not defined, the BSS will not
+         be enabled."
+    ::= { saRgDot11BssEntry 2 }
+
+saRgDot11BssSsid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls and reflects the service set identifier.
+         The value of primary BSS is stored in non-vol and is
+         empty after factory reset.
+         If other BSS's SSID name is not defined, the BSS
+         will not be enabled."
+    ::= { saRgDot11BssEntry 3 }
+
+saRgDot11BssSecurityMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        disabled(0),
+        wep(1),
+        wpaPsk(2),
+        wpa2Psk(3),
+        wpaEnterprise(4),
+        wpa2Enterprise(5),
+        --radiusWep(6)
+        wpaWpa2Psk(7),
+        wpaWpa2Enterprise(8)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Secrity for BSS.
+         Beacause WPA2 is backwords compatible with WPA, setting this
+         object to wpaWpa2Psk(7) is allowed and has the same effect as
+         setting to wpa2Psk(3). The same is true for wpaWpa2Enterprise(8)
+         and wpa2Enterprise(5).
+         The value for primary BSS is stored in non-vol and is wpaWpa2Psk(7)
+         after factory reset.
+         For each other BSS security has to be included in configuration
+         file or the BSS will be disabled."
+    ::= { saRgDot11BssEntry 4 }
+
+saRgDot11BssClosedNetwork OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls whether the device will operate in closed network mode.  If
+         set to true(1), then the network mode is closed and the SSID will not
+         be broadcast in beacon packets.  If set to false(2), then the network
+         mode is open and the SSID will be broadcast in beacon packets.
+         The value for primary BSS is stored in non-vol.
+         The default value for other BSSs is false."
+    ::= { saRgDot11BssEntry 5 }
+
+saRgDot11BssAccessMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                allowAny(0),
+                allowList(1),
+                denyList(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls what stations will be given access to the device.  If set to
+         allowAny(0), then any station will be allowed to connect.  If set
+         to allowList(1), then only stations whose MAC address appears in
+         the saRgDot11AccessMacTable will be allowed to connect.
+         The value for primary BSS is stored in non-vol.
+         The default value for other BSSs is 0."
+    ::= { saRgDot11BssEntry 6 }
+
+saRgDot11BssMaxNumSta OBJECT-TYPE
+    SYNTAX INTEGER (1..128)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object defines the maximum number of STAs that can connect to
+         this SSID. Note that the maximum number of STA accross all SSIDs in
+         the AP is 128.
+         Default value is 128 for all SSIDs.
+         The value for primary BSS is stored in non-vol."
+    ::= { saRgDot11BssEntry 11 }
+
+saRgDot11BssUserStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Provides the BSS Id Web UI or Wireless ON/OFF (if exist) status that
+                  is set by the user. If the user can press the Wireless ON/OFF (if
+                  exist) button and its status can be seen in BSS ID Web UI. If user
+                  changes access point status in Web UI, it will reflect the status of
+                  Wireless ON/OFF LED."
+    ::= { saRgDot11BssEntry 13 }
+
+saRgDot11BssApIsolation OBJECT-TYPE
+    SYNTAX INTEGER {
+        disable(0),
+        enable(1)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This MIB is only available in D3.0 products.
+        AP Isolation (Access Point Isolation) allows you to isloate traffic between CPEs on
+        the same Wifi SSID. This allows a measure of security to prevent hackers from accessing other CPEs in
+        a public Wifi environment.
+        Ex. When this MIB is enabled you can not ping between CPEs connected to the same SSID.
+        AP Isolation is settable per SSID in either VLAN or non VLAN modes.
+        This MIB is written to non-vol and set to disable(0) after a factory reset.
+        disable(0)- No AP Isolation
+        enable(1)- Enable AP Isolation feature."
+    DEFVAL { 0 }
+    ::= { saRgDot11BssEntry 15 }
+
+saRgDot11BssSecSsidTrafficPriority OBJECT-TYPE
+    SYNTAX INTEGER {
+        disable(0),
+        acBk(1)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This MIB is only available in D3.0 products and applicable for secondary SSID in hotspot
+        environment. When disabled, all the traffic to the secondary SSID in question would have same WMM QoS
+        parameters as the primary SSID. When set to ac_bk(1), the secondary SSID traffic would be classified as
+        AC_BK resulting in better DS prioritization for primary SSID traffic"
+
+    DEFVAL { 0 }
+    ::= { saRgDot11BssEntry 16 }
+
+saRgDot11BssRejectPriSsidSta OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This MIB is only available in D3.0 products and applicable for secondary SSID in hotspot
+        environment. By default, a private SSID STA can associate to hotspot SSID. This MIB can be used
+        to reject private SSID STAs to associate with hotspot SSID if and only if STA has associated with private
+        SSID once before."
+
+    DEFVAL { false }
+    ::= { saRgDot11BssEntry 17 }
+	
+-- PRIMARY BSS SPECIFIC
+
+saRgDot11BssPrimary OBJECT IDENTIFIER ::= { saRgDot11Bss 3 }
+
+saRgDot11BssPrimarySsidType OBJECT-TYPE
+    SYNTAX INTEGER {
+        mac6char(1),
+        mac6char-prefix(2),
+        mac4char-prefix(3),
+        prefix-force(4)
+        -- Value 5 is reserved
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the type of SSID used.
+         mac6char(1): If saRgDot11BssSsid.32 is empty, the SSID is the last
+                      3 bytes of DOCSIS MAC address, displayed as 6 lowercase
+                      hex characters.
+                      If saRgDot11BssSsid.32 is not empty, SSID is the value from
+                      saRgDot11BssSsid.32 (set by SNMP or the user).
+         mac6char-prefix(2): the same as mac6char(2) with the prefix addition
+                             defined in saRgDot11BssPrimarySsidPrefix.
+                             If  saRgDot11BssSsid.32 is not empty, this prefix
+                             does not show.
+         mac4char-prefix(3): the same as mac6char-prefix(2) but 4 MAC characters
+                             instead of 6.
+         prefix-force(4): The prefix is always included, even if saRgDot11BssSsid.32
+                          is empty.
+         Note: stored in non-vol. mac6char(1) after factory reset"
+    ::= { saRgDot11BssPrimary 1 }
+
+saRgDot11BssPrimarySsidPrefix OBJECT-TYPE
+    SYNTAX SnmpAdminString (SIZE(1..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The prefix for primary SSID, if saRgDot11BssSsid.32 is empty
+         and saRgDot11BssPrimarySsidType is set to mac6char-prefix(2).
+         Stored in non-vol. Empty after factory reset."
+    ::= { saRgDot11BssPrimary 2 }
+
+-- ******************
+-- PRIVACY PARAMETERS
+-- ******************
+
+-- saRgDot11MgmtPrivacy contains objects from the 'Privacy' web page
+
+saRgDot11Privacy OBJECT IDENTIFIER ::= { saRgDot11 3 }
+
+
+-- WPA
+
+saRgDot11WpaTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SaRgDot11WpaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "WPA table"
+    ::= { saRgDot11Privacy 1 }
+
+saRgDot11WpaEntry OBJECT-TYPE
+    SYNTAX      SaRgDot11WpaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in the table which represents WPA parameters for BSS."
+    INDEX   { ifIndex }
+    ::= { saRgDot11WpaTable 1 }
+
+SaRgDot11WpaEntry ::=
+    SEQUENCE    {
+        saRgDot11WpaAlgorithm          INTEGER,
+        saRgDot11WpaPreSharedKey       OCTET STRING,
+        saRgDot11WpaGroupRekeyInterval INTEGER
+    }
+
+saRgDot11WpaAlgorithm OBJECT-TYPE
+    SYNTAX INTEGER {
+        tkip(0),
+        aes(1),
+        tkipPlusAes(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tkip(0) is not allowed when security is WPA2.
+         The value for primary BSS is stored in non-vol and tkipPlusAes(2)
+         after factory reset.
+         The default value for other BSSs is tkip."
+    ::= { saRgDot11WpaEntry 1 }
+
+saRgDot11WpaPreSharedKey OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(8..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the WPA Pre-Shared Key (PSK).  This value MUST be either a
+         64-digit hexadecimal number, OR a 8 to 63 character ASCII string.
+         The value for primary BSS is stored in non-vol and is the serial
+         number of the device after factory reset.
+         The default value for other BSSs is 8 0's.
+         This object return an empty string when read."
+    ::= { saRgDot11WpaEntry 2 }
+
+saRgDot11WpaGroupRekeyInterval OBJECT-TYPE
+    SYNTAX      INTEGER
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the WPA Group Rekey Interval in seconds. Set to zero to disable
+         periodic rekeying.
+         The value for primary BSS is stored in non-vol and is 3600 after
+         factory reset.
+         The default value for other BSSs is 3600."
+    ::= { saRgDot11WpaEntry 3 }
+
+
+-- RADIUS
+
+saRgDot11RadiusTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SaRgDot11RadiusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "WPA table"
+    ::= { saRgDot11Privacy 2 }
+
+saRgDot11RadiusEntry OBJECT-TYPE
+    SYNTAX      SaRgDot11RadiusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in the table which represents WPA parameters for BSS."
+    INDEX   { ifIndex }
+    ::= { saRgDot11RadiusTable 1 }
+
+SaRgDot11RadiusEntry ::=
+    SEQUENCE    {
+        saRgDot11RadiusAddressType    InetAddressType,
+        saRgDot11RadiusAddress        InetAddress,
+        saRgDot11RadiusPort           InetPortNumber,
+        saRgDot11RadiusKey            DisplayString,
+        saRgDot11RadiusReAuthInterval INTEGER
+    }
+
+
+saRgDot11RadiusAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Type of RADIUS server IP address."
+    DEFVAL { ipv4 }
+    ::= { saRgDot11RadiusEntry 1 }
+
+
+saRgDot11RadiusAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets RADIUS server IP address.
+         The value for primary BSS is stored in non-vol and is 0.0.0.0
+         after factory reset.
+         The default value for other BSSs is 0.0.0.0."
+    ::= { saRgDot11RadiusEntry 2 }
+
+saRgDot11RadiusPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the UDP port used to communicate with the RADIUS server.
+         The value for primary BSS is stored in non-vol and is 1645
+         after factory reset.
+         The default value for other BSSs is 1645."
+    ::= { saRgDot11RadiusEntry 3 }
+
+saRgDot11RadiusKey OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets or displays the RADIUS key.
+         The value for primary BSS is stored in non-vol and is null
+         after factory reset.
+         The default value for other BSSs is null.
+         This object return an empty string when read."
+    ::= { saRgDot11RadiusEntry 4 }
+
+saRgDot11RadiusReAuthInterval OBJECT-TYPE
+    SYNTAX      INTEGER
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the RADIUS Rekey Interval in seconds.
+         Set to zero to disable periodic rekeying.
+         The value for primary BSS is stored in non-vol and is 3600
+         after factory reset.
+         The default value for other BSSs is 3600."
+    ::= { saRgDot11RadiusEntry 5 }
+
+
+-- WEP
+
+saRgDot11WepTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SaRgDot11WepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "WEP table"
+    ::= { saRgDot11Privacy 3 }
+
+saRgDot11WepEntry OBJECT-TYPE
+    SYNTAX      SaRgDot11WepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in the table which represents WPA parameters for BSS."
+    INDEX   { ifIndex }
+    ::= { saRgDot11WepTable 1 }
+
+SaRgDot11WepEntry ::=
+    SEQUENCE {
+        saRgDot11WepDefaultKey      INTEGER,
+        saRgDot11WepEncryptionMode  INTEGER,
+        saRgDot11WepPassPhrase      DisplayString
+    }
+
+saRgDot11WepDefaultKey OBJECT-TYPE
+    SYNTAX      INTEGER (1..4)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls and reflects the default key which will be used when 64 or
+         128 bit encryption is enabled.  Indicates the entry from the
+         saRgDot1164BitKeyTable if saRgDot11EncryptionMode is set to wep64(1), or
+         the entry from the saRgDot11128BitKeyTable if saRgDot11EncryptionMode is set
+         to wep128(2).
+         The value for primary BSS is stored in non-vol and is 1 after factory reset.
+         The default value for other BSSs is 1."
+    ::= { saRgDot11WepEntry 1 }
+
+saRgDot11WepEncryptionMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        wep64(0),
+        wep128(1)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "The value for primary BSS is stored in non-vol and is wep128(1)
+          after factory reset.
+          The default value for other BSSs is wep128."
+    ::= { saRgDot11WepEntry 2 }
+
+saRgDot11WepPassPhrase OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls and reflects the WEP pass phrase.
+         The value for primary BSS is stored in non-vol and is null
+         after factory reset.
+         The default value for other BSSs is null.
+         This object return an empty string when read."
+    ::= { saRgDot11WepEntry 3 }
+
+
+
+-- WEP 64-bit keys:
+
+saRgDot11Wep64BitKeyTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SaRgDot11Wep64BitKeyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of 40 bit key values used when saRgDot11WepEncryptionMode
+         is set to wep64(0)."
+    ::= { saRgDot11Privacy 4 }
+
+saRgDot11Wep64BitKeyEntry OBJECT-TYPE
+    SYNTAX      SaRgDot11Wep64BitKeyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in the table which represents a single 64 bit key."
+    INDEX   { ifIndex, saRgDot11Wep64BitKeyIndex }
+    ::= { saRgDot11Wep64BitKeyTable 1 }
+
+SaRgDot11Wep64BitKeyEntry ::=
+    SEQUENCE    {
+                saRgDot11Wep64BitKeyIndex       Integer32,
+                saRgDot11Wep64BitKeyValue       OCTET STRING
+    }
+
+saRgDot11Wep64BitKeyIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Identifies the instance of this table row."
+    ::= { saRgDot11Wep64BitKeyEntry 1 }
+
+saRgDot11Wep64BitKeyValue OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(5))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A 40 bit key to be used when saRgDot11WepEncryptionMode is set to wep64(1).
+         The value for primary BSS is stored in non-vol and is all 1's after factory
+         reset.
+         The default value for other BSSs is all 0's.
+         This object return an empty string when read."
+    ::= { saRgDot11Wep64BitKeyEntry 2 }
+
+-- WEP 128-bit keys:
+
+saRgDot11Wep128BitKeyTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SaRgDot11Wep128BitKeyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of 104 bit key values used when saRgDot11WepEncryptionMode
+         is set to wep128(1)."
+    ::= { saRgDot11Privacy 5 }
+
+saRgDot11Wep128BitKeyEntry OBJECT-TYPE
+    SYNTAX      SaRgDot11Wep128BitKeyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in the table which represents a single 128 bit key."
+    INDEX   { ifIndex, saRgDot11Wep128BitKeyIndex }
+    ::= { saRgDot11Wep128BitKeyTable 1 }
+
+SaRgDot11Wep128BitKeyEntry ::=
+    SEQUENCE    {
+                saRgDot11Wep128BitKeyIndex       Integer32,
+                saRgDot11Wep128BitKeyValue       OCTET STRING
+    }
+
+saRgDot11Wep128BitKeyIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Identifies the instance of this table row."
+    ::= { saRgDot11Wep128BitKeyEntry 1 }
+
+saRgDot11Wep128BitKeyValue OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(13))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A 104 bit key to be used when saRgDot11WepEncryptionMode is set to wep128(2).
+         The value for primary BSS is stored in non-vol and is all 1's.
+         The default value for other BSSs is all 0's.
+         This object return an empty string when read."
+    ::= { saRgDot11Wep128BitKeyEntry 2 }
+
+
+saRgDot11PrivacyWps OBJECT IDENTIFIER ::= { saRgDot11Privacy 6 }
+
+saRgDot11PrivacyWpsPushButtonTime OBJECT-TYPE
+    SYNTAX      INTEGER (0..10)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies how long to press WPS button to start the WPS
+         procedure. 0 means disable WPS.
+         Stored in non-vol, 1 after factory reset."
+    ::= { saRgDot11PrivacyWps 1 }
+
+
+-- ASSOCIATED CLIENTS TREE
+
+saRgDot11Client OBJECT IDENTIFIER ::=  { saRgDot11 4 }
+
+saRgDot11ClientTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SaRgDot11ClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of wireless clients that are associated with the BSS."
+    ::= { saRgDot11Client 2 }
+
+saRgDot11ClientEntry OBJECT-TYPE
+    SYNTAX      SaRgDot11ClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in the table that specifies a single station MAC address."
+    INDEX   { ifIndex, saRgDot11ClientIndex }
+    ::= { saRgDot11ClientTable 1 }
+
+SaRgDot11ClientEntry ::=
+    SEQUENCE    {
+                saRgDot11ClientIndex       Integer32,
+                saRgDot11ClientStation     MacAddress
+    }
+
+saRgDot11ClientIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Indicates the instance of this table row."
+    ::= { saRgDot11ClientEntry 1 }
+
+saRgDot11ClientStation OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A MAC address of a client associated with the BSS."
+    ::= { saRgDot11ClientEntry 2 }
+
+----------------------------------------------------------------------
+---  saRgDot11ExtMgmt
+---  Table to support Multiple Radios
+---  Note: Indexes may be set to support specific hardware interfaces.
+---  Index 32 MUST match saRgDot11OperMode and vice versa
+-----------------------------------------------------------------------
+
+saRgDot11ExtMgmt OBJECT IDENTIFIER ::= { saRgDot11 6 }
+
+saRgDot11ExtMgmtTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SaRgDot11ExtMgmtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Multiple Radio Configuration Table"
+    ::= { saRgDot11ExtMgmt 1 }
+
+saRgDot11ExtMgmtEntry OBJECT-TYPE
+    SYNTAX      SaRgDot11ExtMgmtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in the table which represents parameters for a Radio.
+                 Index 32 should be set for Radio 0 -- 2.4 GHz if populated.
+                 Index 112 should be set for Radio 1"
+
+    INDEX   { ifIndex }
+    ::= { saRgDot11ExtMgmtTable 1 }
+
+SaRgDot11ExtMgmtEntry ::=
+    SEQUENCE {
+                saRgDot11ExtOperMode                INTEGER,
+                saRgDot11ExtCurrentChannel          Unsigned32,
+                saRgDot11ExtBeaconInterval          Unsigned32,
+                saRgDot11ExtDTIMInterval            Unsigned32,
+                saRgDot11ExtFragThresh              Unsigned32,
+                saRgDot11ExtRTSThresh               Unsigned32,
+                saRgDot11ExtSRL                     Unsigned32,
+                saRgDot11ExtLRL                     Unsigned32,
+                saRgDot11ExtCtsProtectionEnable     TruthValue,
+                saRgDot11ExtRate                    INTEGER,
+                saRgDot11ExtOutputPower             INTEGER,
+                saRgDot11ExtCountry                 INTEGER,
+                saRgDot11ExtAntenna                 INTEGER,
+                saRgDot11ExtMbssUserControl         INTEGER,
+                saRgDot11ExtMbssUseNonvol           TruthValue,
+                saRgDot11ExtMbssAdminControl        INTEGER,
+                saRgDot11ExtActualChannel           INTEGER,
+                saRgDot11ExtOnOffPushButtonTime     INTEGER,
+                saRgDot11ExtWmm                     INTEGER,
+                saRgDot11ExtWmmNoAck                INTEGER,
+                saRgDot11ExtMulticastRate           INTEGER,
+                saRgDot11ExtWirelessButtonOperation INTEGER,
+                saRgDot11ExtWpsEnable               INTEGER,
+                saRgDot11ExtWpsPin                  Integer32,
+                saRgDot11ExtForceRescan             INTEGER
+
+        }
+
+saRgDot11ExtMbssUserControl OBJECT-TYPE
+    SYNTAX INTEGER (1..8|65536..16711680)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Sets the number of user controlled Wifi networks via web pages.
+         1: The user has control over the primary wireless network only.
+            No guest network page is displayed.
+         2: The user has control over the primary wireless network and
+            one guest network. No drop down menu (or only 1 item in the
+            menu) for additional guest network configuration.
+         3: Same as above with 2 guest networks.
+         4: Same as above with 3 guest networks.
+         5: Same as above with 4 guest networks.
+             6: Same as above with 5 guest networks.
+             7: Same as above with 6 guest networks.
+         8: Same as above with 7 guest networks.
+
+         Bit Mask Control:
+         Bit 16: -- User has control over Primary Wireless Network       :  65536
+         Bit 17: -- User has control over Guest Network 1 (interface 33) : 131072
+         Bit 18: -- User has control over Guest Network 2 (interface 34) : 262144
+         Bit 19: -- User has control over Guest Network 3 (interface 35) : 524288
+         Bit 20: -- User has control over Guest Network 4 (interface 36) :1048576
+         Bit 21: -- User has control over Guest Network 5 (interface 37) :2097152
+         Bit 22: -- User has control over Guest Network 6 (interface 38) :4194304
+         Bit 23: -- User has control over Guest Network 7 (interface 39) :8388608
+
+         This object value is stored in non-vol and set to 1
+         after factory reset."
+    ::= { saRgDot11ExtMgmtEntry 15 }
+
+saRgDot11ExtMbssUseNonvol OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Allows to save additional BSS parameters to non-vol if set to true.
+         Primary BSS parameters are ALWAYS stored in non-vol.
+         This object value is stored in non-vol and set to false
+         after factory reset."
+    ::= { saRgDot11ExtMgmtEntry 16 }
+
+saRgDot11ExtMbssAdminControl OBJECT-TYPE
+    SYNTAX INTEGER (1..8|65536..16711680)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Sets the number of admin controlled Wifi networks via web pages.
+         1: The admin has control over the primary wireless network only.
+            No guest network page is displayed.
+         2: The admin has control over the primary wireless network and
+            one guest network. No drop down menu (or only 1 item in the
+            menu) for additional guest network configuration.
+         3: Same as above with 2 guest networks.
+         4: Same as above with 3 guest networks.
+         5: Same as above with 4 guest networks.
+             6: Same as above with 5 guest networks.
+             7: Same as above with 6 guest networks.
+         8: Same as above with 7 guest networks.
+
+         Bit 16: -- Admin Has control over Primary Wireless Network       :  65536
+         Bit 17: -- Admin Has control over Guest Network 1 (interface 33) : 131072
+         Bit 18: -- Admin Has control over Guest Network 2 (interface 34) : 262144
+         Bit 19: -- Admin Has control over Guest Network 3 (interface 35) : 524288
+         Bit 20: -- Admin Has control over Guest Network 4 (interface 36) :1048576
+         Bit 21: -- Admin Has control over Guest Network 5 (interface 37) :2097152
+         Bit 22: -- Admin Has control over Guest Network 6 (interface 38) :4194304
+         Bit 23: -- Admin Has control over Guest Network 7 (interface 39) :8388608
+
+         This object value is stored in non-vol and set to 1
+         after factory reset."
+
+    ::= { saRgDot11ExtMgmtEntry 17 }
+
+saRgDot11ExtActualChannel OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reports the current channel number that wireless is on.
+         The value of 0 means wireless is disabled."
+    ::= { saRgDot11ExtMgmtEntry 18 }
+
+
+-- saRgDot11ApplySettings: do 'on the fly' config with settings from above.
+-- This scalar object was placed by itself at ieee802saRgDot11Mgmt 100 because
+-- it applies all settings from all current and possibly future 802.11
+-- groups.  Wanted to leave plenty of room to add new groups in the future.
+
+saRgDot11ApplySettings OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to true(1), then all the settings (MIB values)
+         from this MIB tree will be applied to run time configuration,
+         modifying previous RG operation with the new settings.
+         Before setting the value to true, MIBs modified in the MIB
+         tree are stored in non-vol and will not modify RG operation
+         until saRgDot11ApplySettings is set to true or CM resets.
+         Note: this applies only to the MIB objects that are stored
+         in non-vol.
+         Always returns false(2) when read."
+    ::= { saRgDot11 1001 }
+
+
+-- =============
+-- IP management
+-- =============
+
+saRgIpMgmt OBJECT IDENTIFIER ::=  { saRg 3 }
+
+
+-- { saRgIpMgmt 1 } reserved for WAN IP definition (currently only DHCP)
+
+
+-- LAN NETWORK DEFINITIONS
+
+saRgIpMgmtLanTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SaRgIpMgmtLanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+            "Networks on the LAN side.
+             Primary BSS stored in non-vol."
+    ::= { saRgIpMgmt 2 }
+
+saRgIpMgmtLanEntry OBJECT-TYPE
+    SYNTAX      SaRgIpMgmtLanEntry
+    MAX-ACCESS  not-accessible
+    STATUS     current
+    DESCRIPTION
+            "List of networks on the LAN side."
+    INDEX { ifIndex }
+    ::= { saRgIpMgmtLanTable 1 }
+
+SaRgIpMgmtLanEntry ::= SEQUENCE {
+    saRgIpMgmtLanMode              INTEGER,
+    saRgIpMgmtLanNetwork           IpAddress,
+    saRgIpMgmtLanNetworksAllow     INTEGER,
+    saRgIpMgmtLanSubnetMask        IpAddress,
+    saRgIpMgmtLanGateway           IpAddress,
+    saRgIpMgmtLanDhcpServer        INTEGER,
+    saRgIpMgmtLanNapt              INTEGER,
+    saRgIpMgmtLanTypeOfService     INTEGER,
+    saRgIpMgmtLanDhcp125Option     INTEGER,
+    saRgIpMgmtLanUpnp              INTEGER,
+    saRgIpMgmtLanDhcpOption43      SnmpAdminString
+    }
+
+saRgIpMgmtLanMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        bridge(1),
+        router(2),
+        l2tpv2-client(3),
+        mixed(4),
+        vlan(5)
+        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Defines the mode of operation for the device.
+        Setting this object via SNMP for the primary BSS will cause
+        the unit to reboot.
+        Setting this object via SNMP for the secondary BSSs will not
+        cause the unit to reboot.
+        The value for primary BSS is stored in non-vol and is router
+        after factory reset.
+        The default value for other BSSs is router.
+                This MIB supersedes saRgDeviceMode for the .32 interface.
+        l2tpv2-client(3)is obsoleted and NOT supported.
+
+                bridge(1):      Sets individual interface to bridging mode
+                                        (for IPv6 interfaces DHCPv6 is external)
+                router(2):      Sets individual interface to routing mode
+                                        (for IPv6 interfaces DHCPv6 is internal)
+                l2tpv2-client(3): <obsolete>
+                mixed(4):       For mixed mode. This setting is applicable only to
+                                        .32 interface. This value is used on conjunction with
+                                        saRgIpMgmtLanPortControlTable
+                                        *Note: mixed(4) mode NOT Supported by DOCSIS 2.0 products.
+                vlan (5):       Enables the vlan control feature.
+                                        See saRgVlanTable MIBs for VLAN configuration information."
+    DEFVAL { 2 }
+    ::= { saRgIpMgmtLanEntry 1 }
+
+saRgIpMgmtLanNetwork OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The LAN-Trans network number.
+            Default for primary BSS is 192.168.0.0
+            Default for other BSSs is 192.168.ifIndex.0"
+    ::= { saRgIpMgmtLanEntry 3 }
+
+
+saRgIpMgmtLanNetworksAllow OBJECT-TYPE
+                SYNTAX  INTEGER {
+                default(0),
+                anyPrivateClass(1),
+                anyClass(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Allows the user via the internal Web GUI (Lan Setup page
+                to input an IPv4 public or private Local IP address other than a
+                class C Private address (the default Network for the Primary BSS = 192.168.0.0/24, with
+                the default Local Ip address = 192.168.0.1.)
+                In all cases the mask must be 255.255.255.x since the RG is limited to supporting
+                a maximum of 253 IP addresses.
+                (See RFC1918 for a description of private IP addresses and specified ranges.)
+                Available Mib settings:
+                default(0):                     Only the third and fourth octets are editable in
+                                                        the Web GUI for the Local IP address (Ex. 192.168.x.x/24).
+                anyPrivateClass(1):     All 4 octets are editable in the Web GUI for Local IP address, but
+                                                        the network specified must be a Private class A, B or C network address.
+                                                        (Ex. A=10.x.x.x, B=172.16.x.x, C=192.168.x.x).
+                anyClass(2):            All 4 octets are editable in the Web GUI for Local IP address, and
+                                                        the network specified could be any public or private class A, B, or C address.
+
+                If the MSO specifically sets a Local IP address in saRgIpMgmtLanNetwork to a value other than
+                the default value (for example: 192.168.0.1) then these fields will be uneditable by the user (grayed out)."
+        DEFVAL { 0 }
+        ::= { saRgIpMgmtLanEntry 4 }
+
+saRgIpMgmtLanSubnetMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The device MUST provide the value of this MIB
+            object in the Option 1 (Subnet Mask) of
+            DHCP OFFER and ACK messages sent to a LAN IP Device."
+    DEFVAL { 'ffffff00'h }    -- 255.255.255.0
+    ::= { saRgIpMgmtLanEntry 5 }
+
+saRgIpMgmtLanGateway OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The type of this address is specified by
+            saRgIpMgmtLanNetwokRouterType. The PS MUST
+            provide the value of this MIB object in the
+            Option 3 (Router IP address) of the DHCP
+            OFFER and ACK messages sent to the LAN IP Device.
+            Default for primary BSS is 192.168.0.1
+            Default for other BSSs is 192.168.ifIndex.1"
+    ::= { saRgIpMgmtLanEntry 7 }
+
+saRgIpMgmtLanDhcpServer OBJECT-TYPE
+    SYNTAX INTEGER {
+        disable(0),
+        enable(1)
+        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The value for primary BSS is stored in non-vol.
+         The default value for other BSSs is:
+         Enabled by default if interface is in router mode.
+         Always disabled if interface is in bridge mode."
+    ::= { saRgIpMgmtLanEntry 8 }
+
+saRgIpMgmtLanNapt OBJECT-TYPE
+    SYNTAX INTEGER {
+        disable(0),
+        enable(1)
+        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The value for primary BSS is stored in non-vol.
+         The default value for other BSSs is:
+         Enabled by default if interface is in router mode.
+         Always disabled if interface is in bridge mode."
+    ::= { saRgIpMgmtLanEntry 9 }
+
+saRgIpMgmtLanTypeOfService OBJECT-TYPE
+      SYNTAX      INTEGER
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "Definition of the TOS bits for the Network.
+           This object does not apply to primary BSS."
+      DEFVAL { 0 }
+      ::= { saRgIpMgmtLanEntry 10 }
+
+saRgIpMgmtLanDhcp125Option OBJECT-TYPE
+      SYNTAX      INTEGER {
+        disable(0),
+        addSsidName(1)
+        }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "This option controls if the RG adds a Cisco specific
+           suboption (number 17) to DHCP DISCOVER and REQUEST
+           from the clients that are bridged on the BSS:
+         0: do not add the option
+         1: add suboption 17 to Cisco specific enterprise-id
+            (9) within DHCP option 125. The content is the SSID name."
+      DEFVAL { 0 }
+      ::= { saRgIpMgmtLanEntry 11 }
+
+saRgIpMgmtLanUpnp OBJECT-TYPE
+    SYNTAX INTEGER {
+        disable(0),
+        enable(1)
+        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Enable/Disable the UPnP agent.
+             The value is stored in non-vol and is disabled after factory default for the primary SSID.
+                     The UPnP agents for additional networks are enabled by default.
+         "
+    DEFVAL { 0 }
+    ::= { saRgIpMgmtLanEntry 13 }
+
+saRgIpMgmtLanDhcpOption43 OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "If option 60 is set from the CPE then return this value in option 43 of the DHCP Reply.
+         If this value is null then do not reply with option 43 (default is null)
+         This MIB will apply to the Primary SSID (intface .32) only"
+    ::= { saRgIpMgmtLanEntry 14 }
+
+-- LAN DHCP SERVERS DEFINITIONS
+
+saRgIpMgmtLanDhcpServerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SaRgIpMgmtLanDhcpServerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+            "Networks on the LAN side.
+             Stored in non-vol. .10-.128 for primary BSS
+             after factory reset."
+    ::= { saRgIpMgmt 3 }
+
+saRgIpMgmtLanDhcpServerEntry OBJECT-TYPE
+    SYNTAX      SaRgIpMgmtLanDhcpServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS     current
+    DESCRIPTION
+            "List of networks on the LAN side."
+    INDEX { ifIndex }
+    ::= { saRgIpMgmtLanDhcpServerTable 1 }
+
+SaRgIpMgmtLanDhcpServerEntry ::= SEQUENCE {
+    saRgIpMgmtLanDhcpServerPoolStart         IpAddress,
+    saRgIpMgmtLanDhcpServerPoolEnd           IpAddress,
+    saRgIpMgmtLanDhcpServerLeaseTime         Unsigned32,
+    }
+
+
+saRgIpMgmtLanDhcpServerPoolStart OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The start of range LAN Trans IP Addresses. The type of
+            this address is specified by saRgIpMgmtLanDhcpServerPoolStartType.
+            Default value depends on IP network and subnet."
+    ::= { saRgIpMgmtLanDhcpServerEntry 2 }
+
+saRgIpMgmtLanDhcpServerPoolEnd OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The end of range for LAN-Trans IP Addresses. The type of
+            this address is specified by saRgIpMgmtLanDhcpServerPoolEndType.
+            Default value depends on IP network and subnet."
+    ::= { saRgIpMgmtLanDhcpServerEntry 4 }
+
+saRgIpMgmtLanDhcpServerLeaseTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The PS MUST provide the value of this MIB object in the
+            Option 51 (IP Address lease time) of the DHCP OFFER and
+            ACK messages sent to the LAN IP Device."
+    DEFVAL { 3600 }
+    ::= { saRgIpMgmtLanDhcpServerEntry 5 }
+
+--====================================================================
+--
+--    saRgIpMgmtLanAddrTable (CDP LAN Address Table)
+--
+--    The saRgIpMgmtLanAddrTable contains the DHCP parameters
+--    for each IP address served to the LAN-Trans realm.
+--
+--=========================================================================
+
+saRgIpMgmtLanAddrTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF SaRgIpMgmtLanAddrEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "IP addresses of devices served by DHCP servers."
+    ::= { saRgIpMgmt 4 }
+
+saRgIpMgmtLanAddrEntry OBJECT-TYPE
+    SYNTAX      SaRgIpMgmtLanAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "List of general parameters pertaining to LAN-Trans IP
+            address reservations and leases."
+    INDEX { ifIndex, saRgIpMgmtLanAddrIndex }
+    ::= { saRgIpMgmtLanAddrTable 1 }
+
+SaRgIpMgmtLanAddrEntry ::= SEQUENCE {
+    saRgIpMgmtLanAddrIndex              INTEGER,
+    saRgIpMgmtLanAddrIp                 IpAddress,
+    saRgIpMgmtLanAddrPhysAddr           PhysAddress,
+    saRgIpMgmtLanAddrLeaseCreateTime    DateAndTime,
+    saRgIpMgmtLanAddrLeaseExpireTime    DateAndTime,
+    saRgIpMgmtLanAddrHostName           SnmpAdminString,
+    saRgIpMgmtLanAddrClientId           SnmpAdminString,
+    saRgIpMgmtLanAddrInterface          SnmpAdminString,
+        saRgIpMgmtLanAddrClientNotes        SnmpAdminString,
+        saRgIpMgmtLanAddrCpeStatus          INTEGER,
+			saRgIpMgmtLanAddrSignalStrength     Integer32,
+        saRgIpMgmtLanAddrRequestedOptionsList OCTET STRING,
+        saRgIpMgmtLanAddrParameterRequestList OCTET STRING
+
+    }
+
+saRgIpMgmtLanAddrIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index of the the LAN IP Device in the LAN-Trans Realm."
+    ::= { saRgIpMgmtLanAddrEntry 1 }
+
+saRgIpMgmtLanAddrIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { saRgIpMgmtLanAddrEntry 3 }
+
+saRgIpMgmtLanAddrPhysAddr OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The client's (i.e., LAN IP Device's) hardware address as
+            indicated in the chaddr field of its DHCP REQUEST message."
+    ::= { saRgIpMgmtLanAddrEntry 4 }
+
+saRgIpMgmtLanAddrLeaseCreateTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This is the date and time when the LAN IP lease was
+            created (if it has not yet been renewed) or last renewed."
+    ::= { saRgIpMgmtLanAddrEntry 5 }
+
+saRgIpMgmtLanAddrLeaseExpireTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This is the date and time when the LAN IP address lease
+            expired or will expire."
+    ::= { saRgIpMgmtLanAddrEntry 6 }
+
+
+saRgIpMgmtLanAddrHostName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This is the Host Name of the LAN IP address, based on DCHP
+            option 12."
+    ::= { saRgIpMgmtLanAddrEntry 7 }
+
+saRgIpMgmtLanAddrClientId OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This is the Client Class Identifier, based on DHCP option 60."
+    ::= { saRgIpMgmtLanAddrEntry 8 }
+
+saRgIpMgmtLanAddrInterface OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This will show the associated interface (LAN, WiFi or MoCA) of the connected CPE."
+    ::= { saRgIpMgmtLanAddrEntry 9 }
+
+
+--===================================================================
+--
+-- saRgIpMgmtDnsServerTable (CDP WAN DNS Server Table)
+--
+-- The saRgIpMgmtDnsServerTable is a table of 3 cable network
+-- and Internet DNS Servers.
+--
+--===================================================================
+
+saRgIpMgmtDnsServerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SaRgIpMgmtDnsServerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+            "This table contains the IP addresses of cable network and
+            Internet DNS servers, in the order of preference in which
+            the PS's CNP will query them, when it cannot resolve a DNS
+            query using local information. Entries in this table are
+            updated with the information contained in DHCP Option 6,
+            received during both the WAN-Man and WAN-Data IP
+            acquisition processes.
+            Stored in non-vol and 0.0.0.0 for all servers after
+            factory reset."
+    ::= { saRgIpMgmt 5 }
+
+saRgIpMgmtDnsServerEntry OBJECT-TYPE
+    SYNTAX      SaRgIpMgmtDnsServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS     current
+    DESCRIPTION
+            "List of cable network and Internet DNS servers."
+    INDEX { saRgIpMgmtDnsServerOrder }
+    ::= { saRgIpMgmtDnsServerTable 1 }
+
+SaRgIpMgmtDnsServerEntry ::= SEQUENCE {
+    saRgIpMgmtDnsServerOrder  INTEGER,
+    saRgIpMgmtDnsServerIp     IpAddress,
+	saRgIpMgmtDnsServerIpv6   InetAddress
+    }
+
+saRgIpMgmtDnsServerIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This parameter indicates the IP address of a WAN DNS
+            server."
+    ::= { saRgIpMgmtDnsServerEntry 3 }
+
+
+--==============================
+-- LAN DHCP fixed IP assignments
+--==============================
+
+saRgIpMgmtDhcpFixedIpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SaRgIpMgmtDhcpFixedIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Fixed IP address assignments for DHCP server.
+         Table does not return any row if DHCP disabled.
+         The value for primary BSS is stored in non-vol."
+    ::= { saRgIpMgmt 6 }
+
+saRgIpMgmtDhcpFixedIpEntry OBJECT-TYPE
+    SYNTAX      SaRgIpMgmtDhcpFixedIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "List of general parameters pertaining to LAN-Trans IP
+            address reservations and leases."
+    INDEX { ifIndex, saRgIpMgmtDhcpFixedIpIndex }
+    ::= { saRgIpMgmtDhcpFixedIpTable 1 }
+
+SaRgIpMgmtDhcpFixedIpEntry ::= SEQUENCE {
+    saRgIpMgmtDhcpFixedIpIndex              INTEGER,
+    saRgIpMgmtDhcpFixedIpRowStatus          RowStatus,
+    saRgIpMgmtDhcpFixedIpAddress            IpAddress,
+    saRgIpMgmtDhcpFixedIpPhysAddr           PhysAddress,
+    saRgIpMgmtDhcpFixedIpHostName           SnmpAdminString
+    }
+
+saRgIpMgmtDhcpFixedIpIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index of the the LAN IP Device in the LAN-Trans Realm."
+    ::= { saRgIpMgmtDhcpFixedIpEntry 1 }
+
+saRgIpMgmtDhcpFixedIpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The row status. A row can be destroyed."
+    ::= { saRgIpMgmtDhcpFixedIpEntry 2 }
+
+saRgIpMgmtDhcpFixedIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { saRgIpMgmtDhcpFixedIpEntry 4 }
+
+saRgIpMgmtDhcpFixedIpPhysAddr OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The client's (i.e., LAN IP Device's) hardware address as
+            indicated in the chaddr field of its DHCP REQUEST message."
+    ::= { saRgIpMgmtDhcpFixedIpEntry 5 }
+
+saRgIpMgmtDhcpFixedIpHostName OBJECT-TYPE
+    SYNTAX      SnmpAdminString(SIZE(0..80))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This is the Host Name of the LAN IP address, based on DCHP
+            option 12."
+    ::= { saRgIpMgmtDhcpFixedIpEntry 6 }
+
+-- ==============
+-- Static routing
+
+saRgIpMgmtStaticRouteTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SaRgIpMgmtStaticRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Static route entries in the routing table.
+         This table is saved in non-vol and is empty
+         after factory reset."
+    ::= { saRgIpMgmt 8 }
+
+saRgIpMgmtStaticRouteEntry OBJECT-TYPE
+    SYNTAX      SaRgIpMgmtStaticRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS     current
+    DESCRIPTION
+        "List of static route entries in the routing table."
+    INDEX { saRgIpMgmtStaticRouteIndex }
+    ::= { saRgIpMgmtStaticRouteTable 1 }
+
+SaRgIpMgmtStaticRouteEntry ::= SEQUENCE {
+    saRgIpMgmtStaticRouteIndex         INTEGER,
+    saRgIpMgmtStaticRouteRowStatus     RowStatus,
+    saRgIpMgmtStaticRouteNetwork       IpAddress,
+    saRgIpMgmtStaticRouteSubnetMask    IpAddress,
+    saRgIpMgmtStaticRouteGateway       IpAddress,
+    saRgIpMgmtStaticRouteRipAdvertise  TruthValue
+    }
+
+saRgIpMgmtStaticRouteIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of the the table."
+    ::= { saRgIpMgmtStaticRouteEntry 1 }
+
+saRgIpMgmtStaticRouteRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The row status."
+    ::= { saRgIpMgmtStaticRouteEntry 2 }
+
+saRgIpMgmtStaticRouteNetwork OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Static route IP network definition"
+    ::= { saRgIpMgmtStaticRouteEntry 3 }
+
+saRgIpMgmtStaticRouteSubnetMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Static route network mask definition"
+    ::= { saRgIpMgmtStaticRouteEntry 4 }
+
+saRgIpMgmtStaticRouteGateway OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Gateway to the network defined in
+         saRgIpMgmtStaticRouteNetwork and
+         saRgIpMgmtStaticRouteSubnetMask."
+    ::= { saRgIpMgmtStaticRouteEntry 5 }
+
+saRgIpMgmtStaticRouteRipAdvertise OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to true(1), then static route entry
+         will be advertised in RIP."
+    DEFVAL { false }
+    ::= { saRgIpMgmtStaticRouteEntry 6 }
+
+-- WAN interface
+
+saRgIpMgmtWanAddr OBJECT IDENTIFIER ::= { saRgIpMgmt 9 }
+
+saRgIpMgmtWanAddrBase OBJECT IDENTIFIER ::= { saRgIpMgmtWanAddr 1 }
+
+saRgIpMgmtWanMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        dhcp(1),
+        static(2),
+        dualIp(3)
+        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "When dualIp(3) is selected, the second IP stack is used for
+         user operations.
+         Stored in non-vol, dhcp(1) after factory reset."
+    ::= { saRgIpMgmtWanAddrBase 1 }
+
+saRgIpMgmtWanMtu OBJECT-TYPE
+    SYNTAX INTEGER (0..1500)
+    UNITS       "bytes"
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "MTU size for the IP layer. Valid range is 256 to 1500.
+         0 is the default which is 1500.
+         Stored in non-vol, 0 after factory reset."
+    ::= { saRgIpMgmtWanAddrBase 2 }
+
+saRgIpMgmtWanTtl OBJECT-TYPE
+    SYNTAX INTEGER (0..255)
+    UNITS       "hops"
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "TTL for the IP packets forwarded to WAN.
+         0 means no change to the original TTL (after
+         being decreased by 1).
+         Stored in non-vol, 0 after factory reset."
+    ::= { saRgIpMgmtWanAddrBase 3 }
+
+saRgIpMgmtWanAddrStatic OBJECT IDENTIFIER ::= { saRgIpMgmtWanAddr 3 }
+
+saRgIpMgmtWanStaticNetwork OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Stored in non-vol, 0.0.0.0 after factory reset."
+    ::= { saRgIpMgmtWanAddrStatic 1 }
+
+saRgIpMgmtWanStaticSubnetMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Stored in non-vol, 0.0.0.0 after factory reset."
+    ::= { saRgIpMgmtWanAddrStatic 2 }
+
+saRgIpMgmtWanStaticGateway OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Stored in non-vol, 0.0.0.0 after factory reset."
+    ::= { saRgIpMgmtWanAddrStatic 3 }
+
+
+saRgIpMgmtWanAddrDualIp OBJECT IDENTIFIER ::= { saRgIpMgmtWanAddr 4 }
+
+saRgIpMgmtWanDualIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP address for the second IP stack.
+         If not specified and saRgIpMgmtWanMode is set to
+         dualIp(3), DHCP is used to acquire the IP address.
+         Note: this object can only be set from config file."
+    DEFVAL  { '00000000'h }
+    ::= { saRgIpMgmtWanAddrDualIp 1 }
+
+saRgIpMgmtWanDualIpRipAdvertised OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies if the IP address is to be advertised in RIP,
+         if RIP is enabled.
+         Note: this object can only be set from config file."
+    DEFVAL { true }
+    ::= { saRgIpMgmtWanAddrDualIp 2 }
+
+saRgIpMgmtLanExtraSubnetTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SaRgIpMgmtLanExtraSubnetEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+            "Additional IP addresses for primary LAN interface.
+             If RIP is enabled, all subnets are advertised.
+             All objects are stored in non-vol. The table
+             is empty after factory reset."
+    ::= { saRgIpMgmt 11 }
+
+saRgIpMgmtLanExtraSubnetEntry OBJECT-TYPE
+    SYNTAX      SaRgIpMgmtLanExtraSubnetEntry
+    MAX-ACCESS  not-accessible
+    STATUS     current
+    DESCRIPTION
+            "List of networks on the LAN side."
+    INDEX { ifIndex }
+    ::= { saRgIpMgmtLanExtraSubnetTable 1 }
+
+SaRgIpMgmtLanExtraSubnetEntry ::= SEQUENCE {
+    saRgIpMgmtLanExtraSubnetIndex      INTEGER,
+    saRgIpMgmtLanExtraSubnetRowStatus  RowStatus,
+    saRgIpMgmtLanExtraSubnetIpAddress  IpAddress,
+    saRgIpMgmtLanExtraSubnetSubnetMask IpAddress,
+    saRgIpMgmtLanExtraSubnetGateway    IpAddress
+    }
+
+saRgIpMgmtLanExtraSubnetIndex OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        secondSubnet(1),
+        thirdSubnet(2),
+        fourthSubnet(3)
+        }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Indicates the instance of this table row."
+    ::= { saRgIpMgmtLanExtraSubnetEntry 1 }
+
+saRgIpMgmtLanExtraSubnetRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The row status."
+    ::= { saRgIpMgmtLanExtraSubnetEntry 2 }
+
+saRgIpMgmtLanExtraSubnetIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { saRgIpMgmtLanExtraSubnetEntry 3 }
+
+saRgIpMgmtLanExtraSubnetSubnetMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    DEFVAL { 'ffffff00'h }    -- 255.255.255.0
+    ::= { saRgIpMgmtLanExtraSubnetEntry 4 }
+
+saRgIpMgmtLanExtraSubnetGateway OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { saRgIpMgmtLanExtraSubnetEntry 5 }
+
+-- **********************
+-- LAN PORT Control Table
+-- **********************
+saRgIpMgmtLanPortControl   OBJECT IDENTIFIER ::=  { saRgIpMgmt 13 }
+
+
+saRgIpMgmtLanPortControlTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF SaRgIpMgmtLanPortControlEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "Table to control the mode for each LAN PORT.
+               LAN PORTs are numbered 1-4 and are mapped to physical
+               port location. Each port can either be in router or
+               in bridge mode."
+    ::= { saRgIpMgmtLanPortControl 1 }
+
+saRgIpMgmtLanPortControlEntry OBJECT-TYPE
+    SYNTAX      SaRgIpMgmtLanPortControlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    INDEX { saRgIpMgmtLanPortControlIndex }
+    ::= { saRgIpMgmtLanPortControlTable 1 }
+
+SaRgIpMgmtLanPortControlEntry ::= SEQUENCE {
+    saRgIpMgmtLanPortControlIndex       INTEGER,
+    saRgIpMgmtLanPortMode               INTEGER
+    }
+
+saRgIpMgmtLanPortControlIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index for each LAN port"
+    ::= { saRgIpMgmtLanPortControlEntry 1 }
+
+saRgIpMgmtLanPortMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+            bridge (1),
+            router (2)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Each physical LAN port can either be controlled
+            as bridge or router. The saRgIpMgmtLanPortMode MIB only works
+            when SaRgIpMgmtLanMode.32=4(Mixed). Setting this MIB
+            through SNMP will take effect only after
+            saRgIpMgmtApplySettings.0 set to true and this setting will
+            reboot to take effect"
+    ::= { saRgIpMgmtLanPortControlEntry 2 }
+
+-- Apply setting to activate chagnes:
+saRgIpMgmtApplySettings OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to true(1), then all the settings (MIB values)
+         from this MIB tree will be applied to run time configuration,
+         modifying previous RG operation with the new settings.
+         Before setting the value to true, MIBs modified in the MIB
+         tree are stored in non-vol and will not modify RG operation
+         until saRgIpMgmtApplySettings is set to true or CM resets.
+         Note: this applies only to the MIB objects that are stored
+         in non-vol.
+         Always returns false(2) when read."
+    ::= { saRgIpMgmt 1001 }
+
+
+
+-- =============================================
+-- FIREWALL
+--
+-- Also includes port tiggering, forwarding, DMZ
+-- =============================================
+
+saRgFirewall OBJECT IDENTIFIER ::=  { saRg 4 }
+
+saRgFirewallReport OBJECT IDENTIFIER ::=  { saRgFirewall 4 }
+
+saRgFirewallReportEventTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF SaRgFirewallReportEventEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "This table is stored in non-vol and is empty
+                after factory reset."
+    ::= { saRgFirewallReport 1 }
+
+saRgFirewallReportEventEntry OBJECT-TYPE
+    SYNTAX      SaRgFirewallReportEventEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    INDEX { saRgFirewallReportEventIndex }
+    ::= { saRgFirewallReportEventTable 1 }
+
+SaRgFirewallReportEventEntry ::= SEQUENCE {
+    saRgFirewallReportEventIndex          INTEGER,
+    saRgFirewallReportEventDescription    SnmpAdminString,
+    saRgFirewallReportEventCount          INTEGER,
+    saRgFirewallReportEventLastOccurance  SnmpAdminString,
+    saRgFirewallReportEventTarget         SnmpAdminString,
+    saRgFirewallReportEventSource         SnmpAdminString
+    }
+
+saRgFirewallReportEventIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..64)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index"
+    ::= { saRgFirewallReportEventEntry 1 }
+
+saRgFirewallReportEventDescription OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { saRgFirewallReportEventEntry 2 }
+
+saRgFirewallReportEventCount OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { saRgFirewallReportEventEntry 3 }
+
+saRgFirewallReportEventLastOccurance OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { saRgFirewallReportEventEntry 4 }
+
+saRgFirewallReportEventTarget OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { saRgFirewallReportEventEntry 5 }
+
+saRgFirewallReportEventSource OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { saRgFirewallReportEventEntry 6 }
+
+
+saRgFirewallReportMgmt OBJECT IDENTIFIER ::=  { saRgFirewallReport 2 }
+
+saRgFirewallReportMgmtClearLog OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Note: this object does not need saRgFirewallApplySettings
+         to take effect."
+    DEFVAL { false }
+    ::= { saRgFirewallReportMgmt 1 }
+
+saRgFirewallReportEmailLogNow OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Triggers sending currect logs via email. Always returns false.
+         Note: this objects does not need saRgFirewallApplySettings to
+         send the logs."
+    DEFVAL { false }
+    ::= { saRgFirewallReportMgmt 2 }
+
+
+saRgFirewallReportEmail OBJECT IDENTIFIER ::=  { saRgFirewallReport 3 }
+
+saRgFirewallReportEmailEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Enables sending logs via email. Email is sent when an event happens."
+    ::= { saRgFirewallReportEmail 1 }
+
+saRgFirewallReportEmailAddress OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is stored in non-vol and is empty after factory reset."
+    ::= { saRgFirewallReportEmail 2 }
+
+saRgFirewallReportEmailSmtpServer OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "IP address or FQDN.
+         Stored in non-vol. Empty after factory reset."
+    ::= { saRgFirewallReportEmail 3 }
+
+saRgFirewallReportEmailUsername OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is stored in non-vol and is empty after factory reset."
+    ::= { saRgFirewallReportEmail 4 }
+
+saRgFirewallReportEmailPassword OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is stored in non-vol and is empty after factory reset."
+    ::= { saRgFirewallReportEmail 5 }
+
+
+-- Firewall IP filtering
+
+saRgFirewallRules OBJECT IDENTIFIER ::=  { saRgFirewall 5 }
+
+saRgFirewallIpFilterTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF SaRgFirewallIpFilterEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "This table is stored in non-vol and is empty
+                after factory reset."
+    ::= { saRgFirewallRules 1 }
+
+saRgFirewallIpFilterEntry OBJECT-TYPE
+    SYNTAX      SaRgFirewallIpFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    INDEX { saRgFirewallIpFilterIndex }
+    ::= { saRgFirewallIpFilterTable 1 }
+
+SaRgFirewallIpFilterEntry ::= SEQUENCE {
+    saRgFirewallIpFilterIndex              INTEGER,
+    saRgFirewallIpFilterRowStatus          RowStatus,
+    saRgFirewallIpFilterAddressStart       IpAddress,
+    saRgFirewallIpFilterAddressEnd         IpAddress,
+    saRgFirewallIpFilterTrusted            INTEGER,
+    saRgFirewallIpFilterPolicy             INTEGER
+    }
+
+saRgFirewallIpFilterIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..10)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index"
+    ::= { saRgFirewallIpFilterEntry 1 }
+
+saRgFirewallIpFilterRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The row status. A row can be destroyed.
+             If the row is not used, set to notInService."
+    ::= { saRgFirewallIpFilterEntry 2 }
+
+saRgFirewallIpFilterAddressStart OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { saRgFirewallIpFilterEntry 3 }
+
+saRgFirewallIpFilterAddressEnd OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { saRgFirewallIpFilterEntry 4 }
+
+saRgFirewallPortFilterTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF SaRgFirewallPortFilterEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "This table is stored in non-vol and is empty
+                after factory reset."
+    ::= { saRgFirewallRules 2 }
+
+saRgFirewallPortFilterEntry OBJECT-TYPE
+    SYNTAX      SaRgFirewallPortFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    INDEX { saRgFirewallPortFilterIndex }
+    ::= { saRgFirewallPortFilterTable 1 }
+
+SaRgFirewallPortFilterEntry ::= SEQUENCE {
+    saRgFirewallPortFilterIndex              INTEGER,
+    saRgFirewallPortFilterRowStatus          RowStatus,
+    saRgFirewallPortFilterPortStart          InetPortNumber,
+    saRgFirewallPortFilterPortEnd            InetPortNumber,
+    saRgFirewallPortFilterProto              INTEGER,
+    saRgFirewallPortFilterAlwaysBlock        TruthValue,
+    saRgFirewallPortFilterBlockStartTime     OCTET STRING,
+    saRgFirewallPortFilterBlockEndTime       OCTET STRING,
+    saRgFirewallPortFilterBlockDays          BITS
+    }
+
+saRgFirewallPortFilterIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..10)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index"
+    ::= { saRgFirewallPortFilterEntry 1 }
+
+saRgFirewallPortFilterRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The row status. A row can be destroyed.
+             If the row is not used, set to notInService."
+    ::= { saRgFirewallPortFilterEntry 2 }
+
+saRgFirewallPortFilterPortStart OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { saRgFirewallPortFilterEntry 5 }
+
+saRgFirewallPortFilterPortEnd OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { saRgFirewallPortFilterEntry 6 }
+
+saRgFirewallPortFilterProto OBJECT-TYPE
+    SYNTAX  INTEGER {
+        udp(1),
+        tcp(2),
+        udpTcp(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "IP protocol to block."
+    DEFVAL { 3 }
+    ::= { saRgFirewallPortFilterEntry 7 }
+
+saRgFirewallMacFilterTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SaRgFirewallMacFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of clients MAC addresses that are denied from accessing Internet."
+    ::= { saRgFirewallRules 3 }
+
+saRgFirewallMacFilterEntry OBJECT-TYPE
+    SYNTAX      SaRgFirewallMacFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in the table that specifies a single station MAC address."
+    INDEX   { saRgFirewallMacFilterIndex }
+    ::= { saRgFirewallMacFilterTable 1 }
+
+SaRgFirewallMacFilterEntry ::=
+    SEQUENCE    {
+            saRgFirewallMacFilterIndex              INTEGER,
+            saRgFirewallMacFilterRowStatus          RowStatus,
+            saRgFirewallMacFilterAddress          MacAddress,
+            saRgFirewallMacFilterAlwaysBlock      TruthValue,
+            saRgFirewallMacFilterBlockStartTime   OCTET STRING,
+            saRgFirewallMacFilterBlockEndTime     OCTET STRING,
+            saRgFirewallMacFilterBlockDays        BITS
+    }
+
+saRgFirewallMacFilterIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..20)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index"
+    ::= { saRgFirewallMacFilterEntry 1 }
+
+saRgFirewallMacFilterRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The row status. A row can be destroyed.
+             If the row is not used, set to notInService."
+    ::= { saRgFirewallMacFilterEntry 2 }
+
+saRgFirewallMacFilterAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A MAC address of a station that cannot access Internet."
+    ::= { saRgFirewallMacFilterEntry 3 }
+
+saRgFirewallMacFilterEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "True = Enable the Mac address filtering feature. False = disable.
+        this Value is written to non-vol and set to false after a factory reset."
+    DEFVAL { false }
+    ::= { saRgFirewallRules 4 }
+
+saRgFirewallMacFilterMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+        block(0),
+        permit(1)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "block(0)- Macs listed in the saRgFirewallMacFilterEntryTable will be blocked.
+        permit(1)- Macs listed in the saRgFirewallMacFilterEntryTable will be permitted.
+        This value is written to non-vol and is set to block(0) after a factory reset."
+    DEFVAL { 0 }
+    ::= { saRgFirewallRules 5 }
+
+-- Port forwarding
+
+saRgFirewallPortFwdTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF SaRgFirewallPortFwdEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "This table is stored in non-vol and is empty
+                after factory reset."
+    ::= { saRgFirewall 6 }
+
+saRgFirewallPortFwdEntry OBJECT-TYPE
+    SYNTAX      SaRgFirewallPortFwdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    INDEX { saRgFirewallPortFwdIndex }
+    ::= { saRgFirewallPortFwdTable 1 }
+
+SaRgFirewallPortFwdEntry ::= SEQUENCE {
+    saRgFirewallPortFwdIndex              INTEGER,
+    saRgFirewallPortFwdRowStatus          RowStatus,
+    saRgFirewallPortFwdToAddress          IpAddress,
+    saRgFirewallPortFwdPortStart          InetPortNumber,
+    saRgFirewallPortFwdPortEnd            InetPortNumber,
+    saRgFirewallPortFwdProto              INTEGER,
+    saRgFirewallPortFwdSrvcName           SnmpAdminString,
+    saRgFirewallPortFwdExternalPortStart  InetPortNumber,
+    saRgFirewallPortFwdExternalPortEnd    InetPortNumber
+    }
+
+saRgFirewallPortFwdIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..30)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index"
+    ::= { saRgFirewallPortFwdEntry 1 }
+
+saRgFirewallPortFwdRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The row status. A row can be destroyed.
+             If the row is not used, set to notInService."
+    ::= { saRgFirewallPortFwdEntry 2 }
+
+saRgFirewallPortFwdToAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Valid address must be entered for a row to be created."
+    ::= { saRgFirewallPortFwdEntry 3 }
+
+saRgFirewallPortFwdPortStart OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Valid port must be entered for a row to be created."
+    ::= { saRgFirewallPortFwdEntry 4 }
+
+saRgFirewallPortFwdPortEnd OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Valid port must be entered for a row to be created."
+    ::= { saRgFirewallPortFwdEntry 5 }
+
+saRgFirewallPortFwdProto OBJECT-TYPE
+    SYNTAX      INTEGER {
+        udp(1),
+        tcp(2),
+        udpTcp(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    DEFVAL { 2 }
+    ::= { saRgFirewallPortFwdEntry 6 }
+
+saRgFirewallPortFwdExternalPortStart OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Valid port must be entered for a row to be created. This is the outside-facing start port for the portforward."
+    ::= { saRgFirewallPortFwdEntry 8 }
+
+saRgFirewallPortFwdExternalPortEnd OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Valid port must be entered for a row to be created. This is the outside-facing end port for the portforward."
+    ::= { saRgFirewallPortFwdEntry 9 }
+
+-- Port triggering
+
+saRgFirewallPortTrigTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF SaRgFirewallPortTrigEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "This table is stored in non-vol and is empty
+                after factory reset."
+    ::= { saRgFirewall 7 }
+
+saRgFirewallPortTrigEntry OBJECT-TYPE
+    SYNTAX      SaRgFirewallPortTrigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    INDEX { saRgFirewallPortTrigIndex }
+    ::= { saRgFirewallPortTrigTable 1 }
+
+SaRgFirewallPortTrigEntry ::= SEQUENCE {
+    saRgFirewallPortTrigIndex              INTEGER,
+    saRgFirewallPortTrigRowStatus          RowStatus,
+    saRgFirewallPortTrigTriggerPortStart   InetPortNumber,
+    saRgFirewallPortTrigTriggerPortEnd     InetPortNumber,
+    saRgFirewallPortTrigTargetPortStart    InetPortNumber,
+    saRgFirewallPortTrigTargetPortEnd      InetPortNumber,
+    saRgFirewallPortTrigProto              INTEGER,
+    saRgFirewallPortTrigSrvcName           SnmpAdminString
+    }
+
+saRgFirewallPortTrigIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..10)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index"
+    ::= { saRgFirewallPortTrigEntry 1 }
+
+saRgFirewallPortTrigRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The row status. A row can be destroyed.
+             If the row is not used, set to notInService."
+    ::= { saRgFirewallPortTrigEntry 2 }
+
+
+saRgFirewallPortTrigTriggerPortStart OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { saRgFirewallPortTrigEntry 3 }
+
+saRgFirewallPortTrigTriggerPortEnd OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { saRgFirewallPortTrigEntry 4 }
+
+saRgFirewallPortTrigTargetPortStart OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { saRgFirewallPortTrigEntry 5 }
+
+saRgFirewallPortTrigTargetPortEnd OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { saRgFirewallPortTrigEntry 6 }
+
+saRgFirewallPortTrigProto OBJECT-TYPE
+    SYNTAX      INTEGER {
+        udp(1),
+        tcp(2),
+        udpTcp(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    DEFVAL { 2 }
+    ::= { saRgFirewallPortTrigEntry 7 }
+
+saRgFirewallApplySettings OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to true(1), then all the settings (MIB values)
+         from this MIB tree will be applied to run time configuration,
+         modifying previous RG operation with the new settings.
+         Before setting the value to true, MIBs modified in the MIB
+         tree are stored in non-vol and will not modify RG operation
+         until saRgFirewallApplySettings is set to true or CM resets.
+         Note: this applies only to the MIB objects that are stored
+         in non-vol.
+         Always returns false(2) when read."
+    ::= { saRgFirewall 1001 }
+
+-- ==================================
+-- DS Lite specific information
+-- ==================================
+
+saRgDslite OBJECT IDENTIFIER ::=  { saRg 12 }
+
+saRgDsliteOption OBJECT-TYPE
+    SYNTAX INTEGER {
+                disable(0),
+        option-64(1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This MIB will toggle whether DHCPv6 option 64 is requested in the solicit.
+                 The option should only be requested if DS Lite is enabled."
+        DEFVAL { 1 }
+    ::= {  saRgDslite 1 }
+
+saRgDsliteAftrName OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This MIB will read/write the remote IPv6 FQDN of the AFTR router in
+                 the DS Lite tunnel configuration.
+                 This should only have an effect if eRouter is in IPv6 only mode and DS Lite is enabled."
+    ::= {  saRgDslite 2 }
+
+saRgDsliteAftrAddress OBJECT-TYPE
+    SYNTAX InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This MIB will set the remote IPv6 address of the AFTR router manually in
+                 the DS Lite tunnel configuration.
+                 This should only have an effect if eRouter is in IPv6 only mode and DS Lite is enabled."
+    ::= {  saRgDslite 3 }
+
+saRgDsliteTcpMssClamping OBJECT-TYPE
+    SYNTAX      INTEGER (0..1420)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies  whether TCP MSS clamping is enabled on the interface.
+         0 disables clamping, 1 clamps the MSS depending on the
+         interface MTU. A value > 1 will be used as clamping size.
+                 This MIB takes effect immediately and does not require saRgDsliteApplySettings."
+    DEFVAL { 0 }
+    ::= { saRgDslite 4 }
+
+saRgDsliteApplySettings OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to true(1), then all the settings (MIB values)
+         from this MIB tree will be applied to the runtime configuration,
+         This will resolve the AFTR domain name to the AFTR IPv6 address,
+                 and initialize the DSlite tunnel. This will initialize using the AFTR
+                 address if both the address and FQDN are defined.
+                 This should only activate the tunnel if eRouter is in IPv6 only mode
+                 and DS Lite is enabled.
+         Always returns false(2) when read."
+    ::= { saRgDslite 1001 }
+
+END
+

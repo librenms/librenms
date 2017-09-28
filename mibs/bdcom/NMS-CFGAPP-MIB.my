@@ -1,0 +1,57 @@
+--------------------------------------------------------------------
+-- NMS-CFGAPP
+-- Jun 2000
+--------------------------------------------------------------------
+
+            NMS-CFGAPP DEFINITIONS ::= BEGIN
+
+            IMPORTS
+                    TimeTicks
+            FROM RFC1155-SMI
+                    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmstemporary
+			FROM NMS-SMI;
+          
+               nmscfgapp             OBJECT IDENTIFIER ::= { nmstemporary 8 }
+
+   
+
+               nmsCfgAddToBuf OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "add command to buffer"
+                   ::= { nmscfgapp 1 }
+
+               nmsCfgAppAction OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        apply(1),
+                    }
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "apply commands"
+                   ::= { nmscfgapp 2 }
+
+               nmsCfgClearBuf OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        clear(1)
+                    }
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "clear command-buffer"
+                   ::= { nmscfgapp 3 }
+
+               nmsCfgAppResult OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "the result of application"
+                   ::= { nmscfgapp 4 }
+                END

@@ -92,7 +92,7 @@ if (count($sensors)) {
         $link = generate_url($link_array);
 
         if ($sensor['poller_type'] == "ipmi") {
-            $sensor['sensor_descr'] = substr(ipmiSensorName($device['hardware'], $sensor['sensor_descr'], $ipmiSensorsNames), 0, 48);
+            $sensor['sensor_descr'] = substr(ipmiSensorName($device['hardware'], $sensor['sensor_descr']), 0, 48);
         } else {
             $sensor['sensor_descr'] = substr($sensor['sensor_descr'], 0, 48);
         }

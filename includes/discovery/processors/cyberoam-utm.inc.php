@@ -26,7 +26,7 @@
 if ($device['os'] === 'cyberoam-utm') {
     echo 'Cyberoam UTM : ';
 
-    $oid = '.1.3.6.1.4.1.21067.2.1.1.3.0';
+    $oid = '.1.3.6.1.4.1.21067.2.1.2.2.1.0';
     $descr = 'Processor';
     $usage = snmp_get($device, $oid, '-Ovqn');
 

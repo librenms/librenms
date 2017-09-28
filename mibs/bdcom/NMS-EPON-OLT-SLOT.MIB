@@ -1,0 +1,87 @@
+-- *****************************************************************
+-- NMS-EPON-OLT-SLOT.MIB:  NMS OLT-SLOT MIB file
+-- OCT 2009
+-- *****************************************************************
+--
+
+               NMS-EPON-OLT-SLOT DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString, ifIndex
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+		    RowStatus
+		    	FROM SNMPv2-TC;
+          
+               nmsEponOltSlot         OBJECT IDENTIFIER ::= { nmsEPONGroup 21 }
+               
+               nmsEponOltSlotTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOltSlotEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon Olt slot table entries."
+                   ::= { nmsEponOltSlot 1 }
+
+               nmsEponOltSlotEntry OBJECT-TYPE
+                   SYNTAX NMSEponOltSlotEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon Olt slot table."
+                   INDEX { oltSlotIndex }
+               ::= { nmsEponOltSlotTable 1 }
+
+               NMSEponOltSlotEntry ::=
+                   SEQUENCE {
+                       oltSlotIndex
+                           INTEGER,
+                       oltSlotHelloInterval
+                           INTEGER,
+		       oltSlotDeadInterval
+                           INTEGER,
+		       oltSlotChipsRegisteredNumber
+                           INTEGER
+		}          
+          
+          
+               
+          oltSlotIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Slot index, which is the same value as nmscardIfCardIndex in nmscardIfIndexTable."
+              ::= { nmsEponOltSlotEntry 1 }
+               
+          oltSlotHelloInterval OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Package sending interval between OLT chip and card CPU."
+              ::= { nmsEponOltSlotEntry 2 }
+               
+          oltSlotDeadInterval OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Package timeout interval between OLT chip and card CPU."
+              ::= { nmsEponOltSlotEntry 3 }
+               
+          oltSlotChipsRegisteredNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Number of registered OLT chips."
+              ::= { nmsEponOltSlotEntry 4 }
+               
+END

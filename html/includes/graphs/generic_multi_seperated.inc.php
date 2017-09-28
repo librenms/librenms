@@ -162,33 +162,5 @@ if (!$args['nototal']) {
     $rrd_options .= " COMMENT:'\\n'";
 }
 
-if (!$args['nototal'] && $_GET['previous'] == 'yes') {
-    $rrd_options .= ' VDEF:totinX=inBX,TOTAL';
-    $rrd_options .= ' VDEF:totoutX=outBX,TOTAL';
-    $rrd_options .= ' VDEF:totX=octetsX,TOTAL';
-    $rrd_options .= " COMMENT:' \\n'";
-
-    $rrd_options .= " HRULE:999999999999999#aaaaaa:'".str_pad('Total', 11)."In ':";
-    $rrd_options .= ' GPRINT:inbitsX:LAST:%6.2lf%s';
-    $rrd_options .= ' GPRINT:inbitsX:AVERAGE:%6.2lf%s';
-    $rrd_options .= ' GPRINT:inbitsX:MAX:%6.2lf%s';
-    $rrd_options .= " GPRINT:totinX:%6.2lf%s$total_units";
-    $rrd_options .= " COMMENT:'\\n'";
-
-    $rrd_options .= " HRULE:999999999999990#aaaaaa:'".str_pad('', 11)."Out':";
-    $rrd_options .= ' GPRINT:outbitsX:LAST:%6.2lf%s';
-    $rrd_options .= ' GPRINT:outbitsX:AVERAGE:%6.2lf%s';
-    $rrd_options .= ' GPRINT:outbitsX:MAX:%6.2lf%s';
-    $rrd_options .= " GPRINT:totoutX:%6.2lf%s$total_units";
-    $rrd_options .= " COMMENT:'\\n'";
-
-    $rrd_options .= " HRULE:999999999999990#aaaaaa:'".str_pad('', 11)."Agg':";
-    $rrd_options .= ' GPRINT:bitsX:LAST:%6.2lf%s';
-    $rrd_options .= ' GPRINT:bitsX:AVERAGE:%6.2lf%s';
-    $rrd_options .= ' GPRINT:bitsX:MAX:%6.2lf%s';
-    $rrd_options .= " GPRINT:totX:%6.2lf%s$total_units";
-    $rrd_options .= " COMMENT:'\\n'";
-}
-
 $rrd_options .= $rrd_optionsb;
 $rrd_options .= ' HRULE:0#999999';

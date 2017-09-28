@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 // Example snmpwalk with units
 // "Interval" oids have been filtered out
 // adslLineCoding.1 = dmt
@@ -41,31 +43,30 @@
 // adslAturPerfInvalidIntervals.1 = 0
 if (isset($this_port['adslLineCoding'])) {
     $rrd_name = getPortRrdName($port_id, 'adsl');
-    $rrd_def = array(
-        'DS:AtucCurrSnrMgn:GAUGE:600:0:635',
-        'DS:AtucCurrAtn:GAUGE:600:0:635',
-        'DS:AtucCurrOutputPwr:GAUGE:600:0:635',
-        'DS:AtucCurrAttainableR:GAUGE:600:0:U',
-        'DS:AtucChanCurrTxRate:GAUGE:600:0:U',
-        'DS:AturCurrSnrMgn:GAUGE:600:0:635',
-        'DS:AturCurrAtn:GAUGE:600:0:635',
-        'DS:AturCurrOutputPwr:GAUGE:600:0:635',
-        'DS:AturCurrAttainableR:GAUGE:600:0:U',
-        'DS:AturChanCurrTxRate:GAUGE:600:0:U',
-        'DS:AtucPerfLofs:COUNTER:600:U:100000000000',
-        'DS:AtucPerfLoss:COUNTER:600:U:100000000000',
-        'DS:AtucPerfLprs:COUNTER:600:U:100000000000',
-        'DS:AtucPerfESs:COUNTER:600:U:100000000000',
-        'DS:AtucPerfInits:COUNTER:600:U:100000000000',
-        'DS:AturPerfLofs:COUNTER:600:U:100000000000',
-        'DS:AturPerfLoss:COUNTER:600:U:100000000000',
-        'DS:AturPerfLprs:COUNTER:600:U:100000000000',
-        'DS:AturPerfESs:COUNTER:600:U:100000000000',
-        'DS:AtucChanCorrectedBl:COUNTER:600:U:100000000000',
-        'DS:AtucChanUncorrectBl:COUNTER:600:U:100000000000',
-        'DS:AturChanCorrectedBl:COUNTER:600:U:100000000000',
-        'DS:AturChanUncorrectBl:COUNTER:600:U:100000000000',
-    );
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('AtucCurrSnrMgn', 'GAUGE', 0, 635)
+        ->addDataset('AtucCurrAtn', 'GAUGE', 0, 635)
+        ->addDataset('AtucCurrOutputPwr', 'GAUGE', 0, 635)
+        ->addDataset('AtucCurrAttainableR', 'GAUGE', 0)
+        ->addDataset('AtucChanCurrTxRate', 'GAUGE', 0)
+        ->addDataset('AturCurrSnrMgn', 'GAUGE', 0, 635)
+        ->addDataset('AturCurrAtn', 'GAUGE', 0, 635)
+        ->addDataset('AturCurrOutputPwr', 'GAUGE', 0, 635)
+        ->addDataset('AturCurrAttainableR', 'GAUGE', 0)
+        ->addDataset('AturChanCurrTxRate', 'GAUGE', 0)
+        ->addDataset('AtucPerfLofs', 'COUNTER', null, 100000000000)
+        ->addDataset('AtucPerfLoss', 'COUNTER', null, 100000000000)
+        ->addDataset('AtucPerfLprs', 'COUNTER', null, 100000000000)
+        ->addDataset('AtucPerfESs', 'COUNTER', null, 100000000000)
+        ->addDataset('AtucPerfInits', 'COUNTER', null, 100000000000)
+        ->addDataset('AturPerfLofs', 'COUNTER', null, 100000000000)
+        ->addDataset('AturPerfLoss', 'COUNTER', null, 100000000000)
+        ->addDataset('AturPerfLprs', 'COUNTER', null, 100000000000)
+        ->addDataset('AturPerfESs', 'COUNTER', null, 100000000000)
+        ->addDataset('AtucChanCorrectedBl', 'COUNTER', null, 100000000000)
+        ->addDataset('AtucChanUncorrectBl', 'COUNTER', null, 100000000000)
+        ->addDataset('AturChanCorrectedBl', 'COUNTER', null, 100000000000)
+        ->addDataset('AturChanUncorrectBl', 'COUNTER', null, 100000000000);
 
     $adsl_oids = array(
         'AtucCurrSnrMgn',

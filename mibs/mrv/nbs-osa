@@ -1,0 +1,500 @@
+NBS-OSA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, TimeTicks, OBJECT-TYPE,
+    MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    InterfaceIndex, ifAlias
+        FROM IF-MIB
+    NbsCmmcChannelBand
+        FROM NBS-CMMCENUM-MIB
+    nbs, NbsTcMHz
+        FROM NBS-MIB;
+
+nbsOsaMib  MODULE-IDENTITY
+    LAST-UPDATED "201503190000Z"
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+
+    DESCRIPTION
+      "MIB for controlling and monitoring optical spectrum analyzers"
+
+    ::= { nbs 207 }
+
+-- *******************************************************************
+-- NBS-OSA-MIB local defines
+-- *******************************************************************
+
+nbsOsaPortGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "OSA Card information"
+    ::= { nbsOsaMib 1 }
+
+nbsOsaSpectrumGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Info and settings for channels"
+    ::= { nbsOsaMib 2 }
+
+nbsOsaChannelGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Info and settings for channels"
+    ::= { nbsOsaMib 3 }
+
+nbsOsaTraps  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "SNMP Traps or Notifications"
+    ::= { nbsOsaMib 4 }
+
+-- *******************************************************************
+--
+-- the nbsOsaPortTable
+--
+-- *******************************************************************
+
+nbsOsaPortTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of entries in nbsOsaPortTable."
+
+        ::= { nbsOsaPortGrp 1 }
+
+nbsOsaPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsOsaPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          ""
+        ::= { nbsOsaPortGrp 2 }
+
+NbsOsaPortEntry ::= SEQUENCE {
+        nbsOsaPortIfIndex      InterfaceIndex,
+        nbsOsaPortAttenuation  INTEGER,
+        nbsOsaPortChannels     INTEGER
+}
+
+nbsOsaPortEntry      OBJECT-TYPE
+        SYNTAX      NbsOsaPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          ""
+        INDEX { nbsOsaPortIfIndex }
+        ::= { nbsOsaPortTable 1 }
+
+nbsOsaPortIfIndex   OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The Mib2 ifIndex of the optical spectrum analyzer port"
+        ::= { nbsOsaPortEntry 2 }
+
+nbsOsaPortAttenuation OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Attenuation subtracted from RxPower readings, in millidecibels (mdB).
+
+           When SET, agent immediately clears nbsOsaChannelTable and
+           nbsOsaSpectrumTable entries for this ifIndex."
+        DEFVAL { 0 }
+        ::= { nbsOsaPortEntry 3 }
+
+nbsOsaPortChannels OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of nbsOsaChannelTable entries for this port."
+        DEFVAL { 0 }
+        ::= { nbsOsaPortEntry 4 }
+
+-- *******************************************************************
+--
+-- the nbsOsaSpectrumTable
+--
+-- *******************************************************************
+
+nbsOsaSpectrumTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of entries in nbsOsaSpectrumTable."
+
+        ::= { nbsOsaSpectrumGrp 1 }
+
+nbsOsaSpectrumTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsOsaSpectrumEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Table of supported channels, their signal strength, and
+           user-configured thresholds."
+
+        ::= { nbsOsaSpectrumGrp 2 }
+
+NbsOsaSpectrumEntry ::= SEQUENCE {
+        nbsOsaSpectrumIfIndex      InterfaceIndex,
+        nbsOsaSpectrumWavelength   INTEGER,
+        nbsOsaSpectrumTimestamp    TimeTicks,
+        nbsOsaSpectrumRxPowerOper  INTEGER
+}
+
+nbsOsaSpectrumEntry      OBJECT-TYPE
+        SYNTAX      NbsOsaSpectrumEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Reports status of monitored frequencies."
+        INDEX { nbsOsaSpectrumIfIndex, nbsOsaSpectrumWavelength }
+        ::= { nbsOsaSpectrumTable 1 }
+
+nbsOsaSpectrumIfIndex   OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The Mib2 ifIndex of the optical spectrum analyzer port"
+        ::= { nbsOsaSpectrumEntry 2 }
+
+nbsOsaSpectrumWavelength OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The measured wavelength, in picometers (pm)."
+        ::= { nbsOsaSpectrumEntry 3 }
+
+nbsOsaSpectrumTimestamp OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Value of sysUptime when this table row was last updated."
+        ::= { nbsOsaSpectrumEntry 4 }
+
+nbsOsaSpectrumRxPowerOper OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The last known signal strength, in millidecibels (mdBm), of this
+           channel."
+        ::= { nbsOsaSpectrumEntry 5 }
+
+-- *******************************************************************
+--
+-- the nbsOsaChannelTable
+--
+-- *******************************************************************
+
+nbsOsaChannelTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of entries in nbsOsaChannelTable."
+
+        ::= { nbsOsaChannelGrp 1 }
+
+nbsOsaChannelTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsOsaChannelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Table of supported channels, their signal strength, and
+           user-configured thresholds."
+
+        ::= { nbsOsaChannelGrp 2 }
+
+NbsOsaChannelEntry ::= SEQUENCE {
+        nbsOsaChannelIfIndex           InterfaceIndex,
+        nbsOsaChannelFrequencyNominal  NbsTcMHz,
+        nbsOsaChannelBand              NbsCmmcChannelBand,
+        nbsOsaChannelNumber            INTEGER,
+
+        nbsOsaChannelStatus            INTEGER,
+        nbsOsaChannelTimestamp         TimeTicks,
+        nbsOsaChannelFrequencyOper     NbsTcMHz,
+
+        nbsOsaChannelRxPowerOper       INTEGER,
+        nbsOsaChannelRxPowerMin        INTEGER,
+        nbsOsaChannelRxPowerMax        INTEGER,
+
+        nbsOsaChannelOSNROper          INTEGER,
+        nbsOsaChannelOSNRMin           INTEGER,
+        nbsOsaChannelOSNRMax           INTEGER
+}
+
+nbsOsaChannelEntry      OBJECT-TYPE
+        SYNTAX      NbsOsaChannelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Reports status of monitored frequencies."
+        INDEX { nbsOsaChannelIfIndex, nbsOsaChannelFrequencyNominal }
+        ::= { nbsOsaChannelTable 1 }
+
+nbsOsaChannelIfIndex   OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The Mib2 ifIndex of the optical spectrum analyzer port"
+        ::= { nbsOsaChannelEntry 1 }
+
+nbsOsaChannelFrequencyNominal OBJECT-TYPE
+        SYNTAX      NbsTcMHz
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The nominal frequency, in MHz, of this channel."
+        ::= { nbsOsaChannelEntry 2 }
+
+nbsOsaChannelBand OBJECT-TYPE
+        SYNTAX      NbsCmmcChannelBand
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The ITU grid labels DWDM channels with a letter 'band' and a
+           numeric channel.  Within this mib, the band is indicated by
+           this object, and the channel number is shown in the object
+           nbsOsaChannelNumber.
+
+           Frequencies of at least 180100 GHz but less than 190100 GHz
+           are considered the L spectrum, and frequencies of at least
+           190100 but less than 200100 GHz are considered the C spectrum.
+
+           Frequencies evenly divisible by 100 GHz are designated with
+           a 'C' or 'L' prepended to the channel number.  Frequencies
+           that are offset by 50 GHz are designated 'H' within the C
+           spectrum, and 'Q' within the L spectrum."
+        ::= { nbsOsaChannelEntry 3 }
+
+nbsOsaChannelNumber OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The channel number can be derived by extracting the two middle
+           digits from the six digit frequency in GHz."
+        ::= { nbsOsaChannelEntry 4 }
+
+nbsOsaChannelStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                absent   (1),
+                present  (2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "If the OSA thinks the channel is there or not."
+        ::= { nbsOsaChannelEntry 5 }
+
+nbsOsaChannelTimestamp OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Value of sysUptime when this table row was last updated."
+        ::= { nbsOsaChannelEntry 6 }
+
+nbsOsaChannelFrequencyOper OBJECT-TYPE
+        SYNTAX      NbsTcMHz
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The measured frequency, in MHz, of this channel."
+        ::= { nbsOsaChannelEntry 7 }
+
+nbsOsaChannelRxPowerOper OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The last known signal strength, in millidecibels (mdBm), of this
+           channel.
+
+           Not supported value: -100001"
+        DEFVAL { -100000 }
+        ::= { nbsOsaChannelEntry 8 }
+
+nbsOsaChannelRxPowerMin OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The user-specified minimum signal strength, in millidecibels
+           (mdBm), of this channel.
+
+           Not supported value: -100001"
+        DEFVAL { 0 }
+        ::= { nbsOsaChannelEntry 9 }
+
+nbsOsaChannelRxPowerMax OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The user-specified maximum signal strength, in millidecibels
+           (mdBm), of this channel.
+
+           Not supported value: -100001"
+        DEFVAL { 0 }
+        ::= { nbsOsaChannelEntry 10 }
+
+nbsOsaChannelOSNROper OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The last known OSNR, in permil, of this channel."
+        ::= { nbsOsaChannelEntry 11 }
+
+nbsOsaChannelOSNRMin OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The user-specified minimum OSNR of this channel"
+        DEFVAL { 1000 }
+        ::= { nbsOsaChannelEntry 12 }
+
+nbsOsaChannelOSNRMax OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The user-specified maximum OSNR of this channel"
+        DEFVAL { 1000 }
+        ::= { nbsOsaChannelEntry 13 }
+
+-- *******************************************************************
+
+--
+-- nbsOsaChannelTraps (Notifications)
+--
+
+nbsOsaTrapPortChannelAdded  NOTIFICATION-TYPE
+        OBJECTS   { nbsOsaChannelIfIndex,
+                    ifAlias,
+                    nbsOsaChannelBand,
+                    nbsOsaChannelNumber,
+                    nbsOsaChannelFrequencyNominal }
+        STATUS      current
+        DESCRIPTION
+                "Sent when optical spectrum analyser first detects a channel.
+
+                 This Notification should be of Severity ERROR."
+        ::= { nbsOsaTraps 1 }
+
+nbsOsaTrapPortChannelDropped  NOTIFICATION-TYPE
+        OBJECTS   { nbsOsaChannelIfIndex,
+                    ifAlias,
+                    nbsOsaChannelBand,
+                    nbsOsaChannelNumber,
+                    nbsOsaChannelFrequencyNominal }
+        STATUS      current
+        DESCRIPTION
+                "Sent when optical spectrum analyser stops detecting a channel.
+
+                 This Notification should be of Severity ERROR."
+        ::= { nbsOsaTraps 2 }
+
+nbsOsaTrapPortRxPowerTooLow  NOTIFICATION-TYPE
+        OBJECTS   { nbsOsaChannelIfIndex,
+                    ifAlias,
+                    nbsOsaChannelBand,
+                    nbsOsaChannelNumber,
+                    nbsOsaChannelRxPowerMin,
+                    nbsOsaChannelRxPowerOper }
+        STATUS      current
+        DESCRIPTION
+                "Sent when RxPower is lower than nbsOsaChannelRxPowerMin.
+
+                 This Notification should be of Severity ERROR.
+
+                 Note: mdBm"
+        ::= { nbsOsaTraps 3 }
+
+nbsOsaTrapPortRxPowerOK  NOTIFICATION-TYPE
+        OBJECTS   { nbsOsaChannelIfIndex,
+                    ifAlias,
+                    nbsOsaChannelBand,
+                    nbsOsaChannelNumber,
+                    nbsOsaChannelRxPowerOper }
+        STATUS      current
+        DESCRIPTION
+                "Sent when RxPower returns to a level between
+                 nbsOsaChannelRxPowerMin and nbsOsaChannelRxPowerMax.
+
+                 This Notification should be of Severity ERROR.
+
+                 Note: mdBm"
+        ::= { nbsOsaTraps 4 }
+
+nbsOsaTrapPortRxPowerTooHigh  NOTIFICATION-TYPE
+        OBJECTS   { nbsOsaChannelIfIndex,
+                    ifAlias,
+                    nbsOsaChannelBand,
+                    nbsOsaChannelNumber,
+                    nbsOsaChannelRxPowerMax,
+                    nbsOsaChannelRxPowerOper }
+        STATUS      current
+        DESCRIPTION
+                "Sent when RxPower is higher than nbsOsaChannelRxPowerMax.
+
+                 This Notification should be of Severity ERROR.
+
+                 Note: mdBm"
+        ::= { nbsOsaTraps 5 }
+
+nbsOsaTrapPortOSNRTooLow  NOTIFICATION-TYPE
+        OBJECTS   { nbsOsaChannelIfIndex,
+                    ifAlias,
+                    nbsOsaChannelBand,
+                    nbsOsaChannelNumber,
+                    nbsOsaChannelOSNRMin,
+                    nbsOsaChannelOSNROper }
+        STATUS      current
+        DESCRIPTION
+                "Sent when OSNR is lower then the configured threshold.
+
+                 This Notification should be of Severity ERROR."
+        ::= { nbsOsaTraps 6 }
+
+nbsOsaTrapPortOSNROk  NOTIFICATION-TYPE
+        OBJECTS   { nbsOsaChannelIfIndex,
+                    ifAlias,
+                    nbsOsaChannelBand,
+                    nbsOsaChannelNumber,
+                    nbsOsaChannelOSNROper }
+        STATUS      current
+        DESCRIPTION
+                "Sent when OSNR is ok.
+
+                 This Notification should be of Severity ERROR."
+        ::= { nbsOsaTraps 7 }
+
+nbsOsaTrapPortOSNRTooHigh  NOTIFICATION-TYPE
+        OBJECTS   { nbsOsaChannelIfIndex,
+                    ifAlias,
+                    nbsOsaChannelBand,
+                    nbsOsaChannelNumber,
+                    nbsOsaChannelOSNRMax,
+                    nbsOsaChannelOSNROper }
+        STATUS      current
+        DESCRIPTION
+                "Sent when OSNR is higher then the configured threshold.
+
+                 This Notification should be of Severity ERROR."
+        ::= { nbsOsaTraps 8 }
+END

@@ -11,10 +11,6 @@ $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";
 $rrd_options .= " DEF:sensor_max=$rrd_filename:sensor:MAX";
 $rrd_options .= " DEF:sensor_min=$rrd_filename:sensor:MIN";
 
-$rrd_options .= ' AREA:sensor_max#c5c5c5';
-$rrd_options .= ' AREA:sensor_min#ffffffff';
-
-// $rrd_options .= " AREA:sensor#FFFF99";
 $rrd_options .= " LINE1.5:sensor#cc0000:'".rrdtool_escape($sensor['sensor_descr'], 22)."'";
 $rrd_options .= ' GPRINT:sensor:LAST:%6.2lfV';
 $rrd_options .= ' GPRINT:sensor:MAX:%6.2lfV\l';

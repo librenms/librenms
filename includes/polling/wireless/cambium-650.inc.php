@@ -9,9 +9,11 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\RRD\RrdDefinition;
+
 $transmitPower = snmp_get($device, "transmitPower.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
 if (is_numeric($transmitPower)) {
-    $rrd_def = 'DS:transmitPower:GAUGE:600:0:100';
+    $rrd_def = RrdDefinition::make()->addDataset('transmitPower', 'GAUGE', 0, 100);
     $fields = array(
         'transmitPower' => $transmitPower / 10,
     );
@@ -22,7 +24,7 @@ if (is_numeric($transmitPower)) {
 
 $rawReceivePower = snmp_get($device, "rawReceivePower.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
 if (is_numeric($rawReceivePower)) {
-    $rrd_def = 'DS:rawReceivePower:GAUGE:600:-100:0';
+    $rrd_def = RrdDefinition::make()->addDataset('rawReceivePower', 'GAUGE', -100, 0);
     $fields = array(
         'rawReceivePower' => $rawReceivePower / 10,
     );
@@ -35,10 +37,9 @@ if (is_numeric($rawReceivePower)) {
 $txModulation = snmp_get($device, ".1.3.6.1.4.1.17713.7.12.15.0", "-Ovqn", "");
 $rxModulation = snmp_get($device, ".1.3.6.1.4.1.17713.7.12.14.0", "-Ovqn", "");
 if (is_numeric($txModulation) && is_numeric($rxModulation)) {
-    $rrd_def = array(
-        'DS:txModulation:GAUGE:600:0:24',
-        'DS:rxModulation:GAUGE:600:0:24'
-    );
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('txModulation', 'GAUGE', 0, 24)
+        ->addDataset('rxModulation', 'GAUGE', 0, 24);
     $fields = array(
         'txModuation' => $txModulation,
         'rxModulation' => $rxModulation,
@@ -52,11 +53,10 @@ $receiveDataRate = snmp_get($device, "receiveDataRate.0", "-Ovqn", "CAMBIUM-PTP6
 $transmitDataRate = snmp_get($device, "transmitDataRate.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
 $aggregateDataRate = snmp_get($device, "aggregateDataRate.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
 if (is_numeric($receiveDataRate) && is_numeric($transmitDataRate) && is_numeric($aggregateDataRate)) {
-    $rrd_def = array(
-        'DS:receiveDataRate:GAUGE:600:0:10000',
-        'DS:transmitDataRate:GAUGE:600:0:10000',
-        'DS:aggregateDataRate:GAUGE:600:0:10000'
-    );
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('receiveDataRate', 'GAUGE', 0, 10000)
+        ->addDataset('transmitDataRate', 'GAUGE', 0, 10000)
+        ->addDataset('aggregateDataRate', 'GAUGE', 0, 10000);
     $fields = array(
         'receiveDataRate' => $receiveDataRate / 100,
         'transmitDataRate' => $transmitDataRate / 100,
@@ -69,7 +69,7 @@ if (is_numeric($receiveDataRate) && is_numeric($transmitDataRate) && is_numeric(
 
 $ssr = snmp_get($device, "signalStrengthRatio.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
 if (is_numeric($ssr)) {
-    $rrd_def = 'DS:ssr:GAUGE:600:-150:150';
+    $rrd_def = RrdDefinition::make()->addDataset('ssr', 'GAUGE', -150, 150);
     $fields = array(
         'ssr' => $ssr,
     );
@@ -101,7 +101,7 @@ if ($gps == 'locked') {
     $gps = 9;
 }
 if (is_numeric($gps)) {
-    $rrd_def = 'DS:gps:GAUGE:600:0:10';
+    $rrd_def = RrdDefinition::make()->addDataset('gps', 'GAUGE', 0, 10);
     $fields = array(
     'gps' => $gps,
         );

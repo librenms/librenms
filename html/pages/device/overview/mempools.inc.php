@@ -24,7 +24,7 @@ if (count($mempools)) {
         $total      = formatStorage($mempool['mempool_total']);
         $used       = formatStorage($mempool['mempool_used']);
         $free       = formatStorage($mempool['mempool_free']);
-        $background = get_percentage_colours($percent);
+        $background = get_percentage_colours($percent, $mempool['mempool_perc_warn']);
 
         $graph_array           = array();
         $graph_array['height'] = '100';
