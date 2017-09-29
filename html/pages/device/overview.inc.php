@@ -70,6 +70,8 @@ require 'overview/sensors/state.inc.php';
 require 'overview/sensors/signal.inc.php';
 require 'overview/sensors/airflow.inc.php';
 require 'overview/sensors/snr.inc.php';
+require 'overview/sensors/pressure.inc.php';
+require 'overview/sensors/cooling.inc.php';
 require 'overview/eventlog.inc.php';
 require 'overview/services.inc.php';
 require 'overview/syslog.inc.php';
