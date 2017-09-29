@@ -1,6 +1,12 @@
 mib: PowerNet-MIB
 modules:
     sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - airIRG2RDT2ThresholdsRackInletHighTempMetric
+                    - airIRG2RDT2ThresholdsSupplyAirHighTempMetric
+                    - airIRG2RDT2ThresholdsReturnAirHighTempMetric
         state:
             data:
                 -
@@ -199,6 +205,33 @@ modules:
                     index: 'airIRRP500UnitStatusRackInletTemperature3Metric.{{ $index }}'
                     descr: 'Inlet #3'
                     divisor: 10
+                -
+                    oid: airIRG2RDT2StatusRackInletTempMetric
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.7.
+                    index: 'airIRG2RDT2StatusRackInletTempMetric.{{ $index }}'
+                    descr: 'Rack Inlet'
+                    divisor: 10
+                    high_limit: airIRG2RDT2ThresholdsRackInletHighTempMetric
+                -
+                    oid: airIRG2RDT2StatusSupplyAirTempMetric
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.9.
+                    index: 'airIRG2RDT2StatusSupplyAirTempMetric.{{ $index }}'
+                    descr: 'Supply Air'
+                    divisor: 10
+                    high_limit: airIRG2RDT2ThresholdsSupplyAirHighTempMetric
+                -
+                    oid: airIRG2RDT2StatusReturnAirTempMetric
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.11.
+                    index: 'airIRG2RDT2StatusReturnAirTempMetric.{{ $index }}'
+                    descr: 'Return Air'
+                    divisor: 10
+                    high_limit: airIRG2RDT2ThresholdsReturnAirHighTempMetric
+                -
+                    oid: airIRG2RDT2StatusSuctionTempMetric
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.13.
+                    index: 'airIRG2RDT2StatusSuctionTempMetric.{{ $index }}'
+                    descr: 'Suction'
+                    divisor: 10
         humidity:
             data:
                 -
@@ -239,6 +272,11 @@ modules:
                     index: 'airIRRP500UnitStatusAirFlowMetric.{{ $index }}'
                     descr: Air Flow
                     divisor: 10
+                -
+                    oid: airIRG2RDT2StatusAirFlowMetric
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.5.
+                    index: 'airIRG2RDT2StatusAirFlowMetric.{{ $index }}'
+                    descr: Air Flow
         voltage:
             data:
                 -
@@ -346,3 +384,29 @@ modules:
                     multiplier: 10
                     index: 'rPDU2DeviceStatusPower.{{ $index }}'
                     descr: 'Power, Total'
+        pressure:
+            data:
+                -
+                    oid: airIRG2RDT2StatusSuctionPressureMetric
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.19.
+                    index: 'airIRG2RDT2StatusSuctionPressureMetric.{{ $index }}'
+                    descr: Suction Pressure
+                -
+                    oid: airIRG2RDT2StatusDischargePressureMetric
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.21.
+                    index: 'airIRG2RDT2StatusDischargePressureMetric.{{ $index }}'
+                    descr: Discharge Pressure
+        cooling:
+            data:
+                -
+                    oid: airIRG2RDT2StatusCoolOutput
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.2.
+                    index: 'airIRG2RDT2StatusCoolOutput.{{ $index }}'
+                    descr: Output
+                    multiplier: 100
+                -
+                    oid: airIRG2RDT2StatusCoolDemand
+                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.3.
+                    index: 'airIRG2RDT2StatusCoolDemand.{{ $index }}'
+                    descr: Demand
+                    multiplier: 100
