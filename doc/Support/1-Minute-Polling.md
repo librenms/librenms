@@ -9,7 +9,7 @@ We now have support for polling data at intervals to fit your needs.
   - Your polling _MUST_ complete in the time you configure for the heartbeat step value. See `/pollers/tab=pollers/` in your WebUI for your current value.
   - This will only affect RRD files created from the moment you change your settings.
   - This change will affect all data storage mechanisms such as MySQL, RRD and InfluxDB. If you decrease the values then please be aware of the increase in space use for MySQL and InfluxDB.
-  - It's **highly recommended** to configure some [performance optimizations](https://docs.librenms.org/Support/Performance/). Keep in mind that all your devices will write all graphs every minute to the disk and that every device has many graphs. The must important thing is probably the [RRDCached](https://docs.librenms.org/Extensions/RRDCached/) configuration that can save a lot of write IOPS.
+  - It's **highly recommended** to configure some [performance optimizations](https://docs.librenms.org/Support/Performance/). Keep in mind that all your devices will write all graphs every minute to the disk and that every device has many graphs. The most important thing is probably the [RRDCached](https://docs.librenms.org/Extensions/RRDCached/) configuration that can save a lot of write IOPS.
   
 To make the changes, please navigate to `/settings/sub=external/` within your WebUI. Select RRDTool Setup and then update the two values for step and heartbeat intervals:
 
