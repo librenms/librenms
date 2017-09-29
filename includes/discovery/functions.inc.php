@@ -373,7 +373,6 @@ function sensor_low_limit($class, $current)
         case 'temperature':
             $limit = ($current * 0.7);
             break;
-
         case 'voltage':
             if ($current < 0) {
                 $limit = ($current * (1 + (sgn($current) * 0.15)));
@@ -381,33 +380,27 @@ function sensor_low_limit($class, $current)
                 $limit = ($current * (1 - (sgn($current) * 0.15)));
             }
             break;
-
         case 'humidity':
             $limit = '30';
             break;
-
-        case 'frequency':
-            $limit = ($current * 0.95);
-            break;
-
         case 'current':
             $limit = null;
             break;
-
         case 'fanspeed':
             $limit = ($current * 0.80);
             break;
-
         case 'power':
             $limit = null;
             break;
-
         case 'signal':
             $limit = -80;
             break;
         case 'airflow':
         case 'dbm':
         case 'snr':
+        case 'frequency':
+        case 'pressure':
+        case 'cooling':
             $limit = ($current * 0.95);
             break;
     }//end switch
@@ -425,7 +418,6 @@ function sensor_limit($class, $current)
         case 'temperature':
             $limit = ($current * 1.60);
             break;
-
         case 'voltage':
             if ($current < 0) {
                 $limit = ($current * (1 - (sgn($current) * 0.15)));
@@ -433,37 +425,28 @@ function sensor_limit($class, $current)
                 $limit = ($current * (1 + (sgn($current) * 0.15)));
             }
             break;
-
         case 'humidity':
             $limit = '70';
             break;
-
-        case 'frequency':
-            $limit = ($current * 1.05);
-            break;
-
         case 'current':
-            $limit = ($current * 1.50);
-            break;
-
-        case 'fanspeed':
-            $limit = ($current * 1.80);
-            break;
-
         case 'power':
             $limit = ($current * 1.50);
             break;
-
+        case 'fanspeed':
+            $limit = ($current * 1.80);
+            break;
         case 'signal':
             $limit = -30;
             break;
-
         case 'load':
             $limit = 80;
             break;
         case 'airflow':
         case 'dbm':
         case 'snr':
+        case 'frequency':
+        case 'pressure':
+        case 'cooling':
             $limit = ($current * 1.05);
             break;
     }//end switch
