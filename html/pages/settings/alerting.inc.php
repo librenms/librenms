@@ -1000,6 +1000,27 @@ echo '<div id="telegram_chat_id_template" class="hide">
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#opsgenie_transport_expand"><i class="fa fa-caret-down"></i> OpsGenie</a> <button name="test-alert" id="test-alert" type="button" data-transport="opsgenie" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+        </div>
+        <div id="opsgenie_transport_expand" class="panel-collapse collapse">
+            <div class="panel-body">
+                <div class="form-group has-feedback">
+                    <label for="opsgenie" class="col-sm-4 control-label">OpsGenie URL </label>
+                    <div data-toggle="tooltip" title="' . $config_groups['alert.transports.opsgenie.url']['config_descr'] . '" class="toolTip fa fa-question-circle"></div>
+                    <div class="col-sm-4">
+                        <input id="opsgenie" class="form-control" type="text" name="global-config-input" value="' . $config_groups['alert.transports.opsgenie.url']['config_value'] . '" data-config_id="' . $config_groups['alert.transports.opsgenie.url']['config_id'] . '">
+                        <span class="form-control-feedback">
+                            <i class="fa" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    </div>
+                </div>
+            </div>
         </div>';
 
 $clickatell   = get_config_by_name('alert.transports.clickatell.token');

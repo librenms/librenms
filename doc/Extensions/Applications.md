@@ -271,7 +271,7 @@ extend mailscanner /etc/snmp/mailscanner.php
 4. Restart snmpd on your host
 
 
-### GSPD
+### GPSD
 A small shell script that reports GPSD status.
 
 ##### Agent
