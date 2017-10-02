@@ -1,8 +1,9 @@
 source: General/Acknowledgement.md
-LibreNMS 3rd party acknowledgements
------------------------------------
 
-#### 3rd Party GPLv3 Compliant
+LibreNMS would't be what it is today without the use of some other amazing projects.
+We list below what we make use of including the license compliance. 
+
+## 3rd Party GPLv3 Compliant
 
   - [Bootstrap](http://getbootstrap.com/): MIT
   - [Font Awesome](http://fontawesome.io/icons/): MIT License
@@ -27,13 +28,17 @@ LibreNMS 3rd party acknowledgements
   - [Pure PHP radius class](http://developer.sysco.ch/php/): GPLv3
   - [GeSHi - Generic Syntax Highlighter](http://qbnz.com/highlighter/): GPLv2+
   - MalaysiaMap.svg - By Exiang [CC BY 3.0 (http://creativecommons.org/licenses/by/3.0)], via Wikimedia Commons
+  - Code for UBNT Devices Mark Gibbons <mgibbons@oemcomp.com> Initial code base submitted via PR721
+  - [Jquery LazyLoad](http://www.appelsiini.net/projects/lazyload): MIT License
+  - [influxdb-php](https://github.com/influxdb/influxdb-php): MIT License
   - [HTML Purifier](http://htmlpurifier.org/): LGPL v2.1
   - [Symfony Yaml](https://github.com/symfony/yaml): MIT
   - [PHPMailer](https://github.com/PHPMailer/PHPMailer): LGPL v2.1
   - [pbin](https://github.com/glensc/pbin): GPLv2 (or later - see script header)
   - [CorsSlim](https://github.com/palanik/CorsSlim): MIT
 
-#### 3rd Party GPLv3 Non-compliant
+
+## 3rd Party GPLv3 Non-compliant
 
   - JpGraph (html/includes/jpgraph): QPL 1.0 license
   - MIBS (mibs): unknown/various
