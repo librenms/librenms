@@ -1,6 +1,7 @@
 source: Extensions/Oxidized.md
-# Oxidized integration
 
+# Oxidized intro
+---
 Integrating LibreNMS with [Oxidized](https://github.com/ytti/oxidized-web) brings the following benefits:
 
   - Config viewing: Current, History, and Diffs all under the Configs tab of each device
@@ -13,9 +14,8 @@ Then you can procede to the LibreNMS Web UI and go to Oxidized Settings in the E
 
 To have devices automatically added, you will need to configure oxidized to pull them from LibreNMS [Feeding Oxidized](#feeding-oxidized)
 
-## Detailed integration information
-
-### Config viewing
+### Detailed integration information
+---
 
 This is a straight forward use of Oxidized, it relies on you having a working Oxidized setup which is already taking config snapshots for your devices.
 When you have that, you only need the following config to enable the display of device configs within the device page itself:
@@ -43,15 +43,15 @@ You can set a default group that devices will fall back to with:
 $config['oxidized']['default_group'] = 'default';
 ```
 
-##### SELinux
+#### SELinux
 If you're runnng SELinux, you'll need to allow httpd to connect outbound to the network, otherwise Oxidized integration in the web UI will silently fail:
 
 ```
 setsebool -P httpd_can_network_connect 1
 ```
 
-
 ### Feeding Oxidized
+----
 
 Oxidized has support for feeding devices into it via an API call, support for Oxidized has been added to the LibreNMS API. A sample config for Oxidized is provided below.
 
@@ -79,7 +79,7 @@ $config['oxidized']['reload_nodes'] = true;
 
 ```
 
-#### Using Groups
+### Working with groups
 
 To return a group to Oxidized you can do this by matching a regex for either `hostname`, `os` or `location`. The order is `hostname` is matched first, if nothing is found then `os` is tried and then `location` is attempted.
 The first match found will be used. To match on the device hostnames that contain 'lon-sw' or if the location contains 'London' then you would place the following within config.php:
@@ -110,7 +110,7 @@ groups:
     password: <password>
 ```
 
-#### Miscellaneous
+### Miscellaneous
 
 If you have devices which you do not wish to appear in Oxidized then you can edit those devices in Device -> Edit -> Misc and enable "Exclude from Oxidized?"
 
@@ -121,7 +121,7 @@ $config['oxidized']['ignore_types'] = array('server');
 $config['oxidized']['ignore_os'] = array('linux');
 ```
 
-### Trigger configuration downloads
+### Trigger configuration backups
 
 Using the Oxidized REST API and [Syslog Hooks](/Extensions/Syslog/#external-hooks), Oxidized can trigger configuration downloads whenever a configuration change event has been logged. An example script to do this is included in `./scripts/syslog-notify-oxidized.php`. Oxidized can spawn a new worker thread and perform the download immediately with the following configuration
 
