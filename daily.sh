@@ -116,7 +116,7 @@ set_notifiable_result() {
     local arg_type=$1;
     local arg_result=$2;
 
-    php "${LIBRENMS_DIR}/daily.php" -f handle_notification -t ${arg_type} -r ${arg_result};
+    php "${LIBRENMS_DIR}/daily.php" -f handle_notifiable -t ${arg_type} -r ${arg_result};
 }
 
 #######################################

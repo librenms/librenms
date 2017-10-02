@@ -106,15 +106,15 @@ if ($options['f'] === 'device_perf') {
     }
 }
 
-if ($options['f'] === 'handle_notification') {
+if ($options['f'] === 'handle_notifiable') {
     if ($options['t'] === 'update') {
         $title = 'Error: Daily update failed';
 
         if ($options['r']) {
-            // result was a success, remove the notification
+            // result was a success (1), remove the notification
             remove_notification($title);
         } else {
-            // result was a failure, create the notification
+            // result was a failure (0), create the notification
             new_notification(
                 $title,
                 'The daily update script (daily.sh) has failed. Please check output by hand. If you need assistance, '
@@ -126,10 +126,10 @@ if ($options['f'] === 'handle_notification') {
     } elseif ($options['t'] === 'php_ver') {
         $title = 'Warning: PHP version too low';
         if ($options['r']) {
-            // result was a success, remove the notification
+            // result was a success (1), remove the notification
             remove_notification($title);
         } else {
-            // result was a failure, create the notification
+            // result was a failure (0), create the notification
             new_notification(
                 $title,
                 'PHP version 5.6 will soon be the minimum supported version.  We suggest you update to PHP the latest version of PHP (7.1 at this time) to continue to receive updates.  If you do not update, LibreNMS will continue to function but stop receiving bug fixes and updates.',
