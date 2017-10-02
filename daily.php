@@ -30,6 +30,14 @@ if ($options['f'] === 'update') {
     exit(0);
 }
 
+if ($options['f'] === 'check_php_ver') {
+    $min_version = '5.6.4';
+    if (version_compare(PHP_VERSION, $min_version, '>=')) {
+        exit(0);
+    }
+    exit(1);
+}
+
 if ($options['f'] === 'rrd_purge') {
     if (is_numeric($config['rrd_purge']) && $config['rrd_purge'] > 0) {
         $cmd = "find ".$config['rrd_dir']." -type f -mtime +".$config['rrd_purge']." -print -exec rm -f {} +";
@@ -98,18 +106,34 @@ if ($options['f'] === 'device_perf') {
     }
 }
 
-if ($options['f'] === 'set_notification') {
+if ($options['f'] === 'handle_notification') {
     if ($options['t'] === 'update') {
         $title = 'Error: Daily update failed';
 
         if ($options['r']) {
+            // result was a success, remove the notification
             remove_notification($title);
         } else {
+            // result was a failure, create the notification
             new_notification(
                 $title,
                 'The daily update script (daily.sh) has failed. Please check output by hand. If you need assistance, '
                 . 'visit the <a href="https://www.librenms.org/#support">LibreNMS Website</a> to find out how.',
                 2,
+                'daily.sh'
+            );
+        }
+    } elseif ($options['t'] === 'php_ver') {
+        $title = 'Warning: PHP version too low';
+        if ($options['r']) {
+            // result was a success, remove the notification
+            remove_notification($title);
+        } else {
+            // result was a failure, create the notification
+            new_notification(
+                $title,
+                'PHP version 5.6 will soon be the minimum supported version.  We suggest you update to PHP the latest version of PHP (7.1 at this time) to continue to receive updates.  If you do not update, LibreNMS will continue to function but stop receiving bug fixes and updates.',
+                1,
                 'daily.sh'
             );
         }
