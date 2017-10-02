@@ -1,8 +1,9 @@
+source: General/Changelog.md
 ## 1.32
 *(2017-10-01)*
 
 #### Features
-* Added more rules to the collection of alert rules ([#7363](https://github.com/librenms/librenms/issues/7363))
+* Added more rules to the collection of alert rules ([#7363](https://github.com/librenms/librenms/issues/763))
 * Allow ignore_mount, ignore_mount_string, ignore_mount_regex per OS ([#7304](https://github.com/librenms/librenms/issues/7304))
 * Added script to generate config for new OS ([#7161](https://github.com/librenms/librenms/issues/7161))
 * Added Syslog hook for ASA support ([#7268](https://github.com/librenms/librenms/issues/7268))
@@ -93,7 +94,6 @@
 
 ---
 
-source: General/Changelog.md
 ## 1.31
 *(2017-08-26)*
 

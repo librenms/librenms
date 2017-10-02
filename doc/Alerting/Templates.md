@@ -58,18 +58,6 @@ Limit: %value.sensor_limit_low / %value.sensor_limit
 
 The Default Template is a 'one-size-fit-all'. We highly recommend defining your own templates for your rules to include more specific information.
 
-## Testing
-
-It's possible to test your new template before assigning it to a rule. To do so you can run `./scripts/test-template.php`. The script will provide the help 
-info when ran without any parameters.
-
-As an example, if you wanted to test template ID 10 against localhost running rule ID 2 then you would run:
-
-`./scripts/test-template.php -t 10 -d -h localhost -r 2`
-
-If the rule is currently alerting for localhost then you will get the full template as expected to see on email, if it's not then you will just see the 
-template without any fault information.
-
 ## Examples
 
 Default Template:
