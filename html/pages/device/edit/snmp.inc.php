@@ -59,47 +59,39 @@ if ($_POST['editing']) {
         if ($no_checks === true || $_POST['snmp'] != 'on' || isSNMPable($device_tmp)) {
             $rows_updated = dbUpdate($update, 'devices', '`device_id` = ?', array($device['device_id']));
             
-            $max_repeaters_set = false;
-            $max_oid_set = false;
+            $max_repeaters_set = 0;
+            $max_oid_set = 0;
 
             if (is_numeric($max_repeaters) && $max_repeaters != 0) {
-                set_dev_attrib($device, 'snmp_max_repeaters', $max_repeaters);
-                $max_repeaters_set = true;
+                $max_repeaters_set = set_dev_attrib($device, 'snmp_max_repeaters', $max_repeaters);
             } else {
-                del_dev_attrib($device, 'snmp_max_repeaters');
-                $max_repeaters_set = true;
+                $max_repeaters_set = del_dev_attrib($device, 'snmp_max_repeaters');
             }
 
             if (is_numeric($max_oid) && $max_oid != 0) {
-                set_dev_attrib($device, 'snmp_max_oid', $max_oid);
-                $max_oid_set = true;
+                $max_oid_set = set_dev_attrib($device, 'snmp_max_oid', $max_oid);
             } else {
-                del_dev_attrib($device, 'snmp_max_oid');
-                $max_oid_set = true;
+                $max_oid_set = del_dev_attrib($device, 'snmp_max_oid');
             }
 
             if ($rows_updated > 0) {
-                $update_message = $rows_updated.' Device record updated.';
-                $updated        = 1;
-            } elseif ($rows_updated = '-1') {
-                if ($max_repeaters_set === true || $max_repeaters_set === true) {
-                    if ($max_repeaters_set === true) {
-                        $update_message = 'SNMP Max repeaters updated, no other changes made';
-                    }
-                    if ($max_oid_set === true) {
-                        $update_message .= '<br />SNMP Max OID updated, no other changes made';
-                    }
-                } else {
-                    $update_message = 'Device record unchanged. No update necessary.';
-                }
-                $updated        = -1;
-            } else {
-                $update_message = 'Device record update error.';
-                $updated        = 0;
+                $update_message[] = $rows_updated.' Device record updated.';
+            }
+            if ($max_repeaters_set) {
+                $update_message[] = 'SNMP Max repeaters updated.';
+            } elseif ($max_repeaters_set === false) {
+                $update_failed_message[] = 'SNMP Max repeaters update failed.';
+            }
+            if ($max_oid_set) {
+                $update_message[] = 'SNMP Max OID updated updated.';
+            } elseif ($max_oid_set === false) {
+                $update_failed_message[] = 'SNMP Max OID updated failed.';
+            }
+            if (!$update_message && !$update_failed_message) {
+                $update_message[] = 'Device record unchanged. No update necessary.';
             }
         } else {
-            $update_message = 'Could not connect to device with new SNMP details';
-            $updated        = 0;
+            $update_failed_message[] = 'Could not connect to device with new SNMP details';
         }
     }//end if
 }//end if
@@ -107,10 +99,11 @@ if ($_POST['editing']) {
 $device = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', array($device['device_id']));
 $descr  = $device['purpose'];
 
-if ($updated && $update_message) {
-    print_message($update_message);
-} elseif ($update_message) {
-    print_error($update_message);
+if ($update_message) {
+    print_message(join("<br />", $update_message));
+}
+if ($update_failed_message) {
+    print_error(join("<br />", $update_failed_message));
 }
 
 $max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
@@ -121,7 +114,7 @@ echo "
     <div class='form-group'>
     <label for='hardware' class='col-sm-2 control-label'>SNMP</label>
     <div class='col-sm-4'>
-    <input type='checkbox' id='snmp' name='snmp' data-attrib='test' data-size='small' onChange='disableSnmp(this);'".($device['snmp_disable'] ? "" : " checked").">
+    <input type='checkbox' id='snmp' name='snmp' data-size='small' onChange='disableSnmp(this);'".($device['snmp_disable'] ? "" : " checked").">
     </div>
     </div>
     <div id='snmp_override' style='display: ".($device['snmp_disable'] ? "block" : "none").";'>
