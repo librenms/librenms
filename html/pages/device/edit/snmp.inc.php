@@ -3,7 +3,7 @@
 if ($_POST['editing']) {
     if ($_SESSION['userlevel'] > '7') {
         $poller_group = isset($_POST['poller_group']) ? mres($_POST['poller_group']) : 0;
-        if ($_POST['no_snmp'] != 'on') {
+        if ($_POST['snmp'] == 'on') {
             $no_checks    = ($_POST['no_checks'] == 'on');
             $community    = mres($_POST['community']);
             $snmpver      = mres($_POST['snmpver']);
@@ -56,7 +56,7 @@ if ($_POST['editing']) {
         }
 
         $device_tmp = deviceArray($device['hostname'], $community, $snmpver, $port, $transport, $v3, $port_assoc_mode);
-        if ($no_checks === true || $_POST['no_snmp'] == 'on' || isSNMPable($device_tmp)) {
+        if ($no_checks === true || $_POST['snmp'] != 'on' || isSNMPable($device_tmp)) {
             $rows_updated = dbUpdate($update, 'devices', '`device_id` = ?', array($device['device_id']));
             
             $max_repeaters_set = false;
@@ -119,23 +119,20 @@ $max_oid = get_dev_attrib($device, 'snmp_max_oid');
 echo "
     <form id='edit' name='edit' method='post' action='' role='form' class='form-horizontal'>
     <div class='form-group'>
-    <div class='col-sm-offset-2 col-sm-9'>
-    <div class='checkbox'>
-    <label>
-    <input type='checkbox' name='no_snmp' id='no_snmp' onChange='disableSnmp(this);'".($device['snmp_disable'] ? " checked" : "")."> Disable SNMP?
-    </label>
-    </div>
+    <label for='hardware' class='col-sm-2 control-label'>SNMP</label>
+    <div class='col-sm-4'>
+    <input type='checkbox' id='snmp' name='snmp' data-attrib='test' data-size='small' onChange='disableSnmp(this);'".($device['snmp_disable'] ? "" : " checked").">
     </div>
     </div>
     <div id='snmp_override' style='display: ".($device['snmp_disable'] ? "block" : "none").";'>
     <div class='form-group'>
-    <label for='hardware' class='col-sm-2 control-label'> Hardware</label>
+    <label for='hardware' class='col-sm-2 control-label'>Hardware</label>
     <div class='col-sm-4'>
     <input id='hardware' class='form-control' name='hardware' value='".$device['hardware']."'/>
     </div>
     </div>
     <div class='form-group'>
-    <label for='hardware' class='col-sm-2 control-label'> OS</label>
+    <label for='hardware' class='col-sm-2 control-label'>OS</label>
     <div class='col-sm-4'>
     <input id='os' class='form-control' name='os' value='".$config['os'][$device['os']]['text']."'/>
     <input type='hidden' id='os_id' class='form-control' name='os_id' value='".$device['os']."'/>
@@ -338,11 +335,11 @@ function changeForm() {
 }
 function disableSnmp(e) {
     if(e.checked) {
-        $('#snmp_conf').hide();
-        $('#snmp_override').show();
-    } else {
         $('#snmp_conf').show();
         $('#snmp_override').hide();
+    } else {
+        $('#snmp_conf').hide();
+        $('#snmp_override').show();
     }
 }
 
@@ -386,6 +383,8 @@ $("#os").on("typeahead:selected typeahead:autocompleted", function(e,datum) {
     $("#os_id").val(datum.os);
     $("#os").html('<mark>' + datum.text + '</mark>');
 });
+
+$("[name='snmp']").bootstrapSwitch('offColor','danger');
 
 <?php
 if ($snmpver == 'v3' || $device['snmpver'] == 'v3') {
