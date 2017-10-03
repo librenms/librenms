@@ -12,5 +12,7 @@ discovery:
       sysObjectId:
           - .1.3.6.1.4.1.890.1.6
           - .1.3.6.1.4.1.890.1.15
-      sysDescr_regex_except:
-          - '/^NWA/'
+      sysDescr_regex:
+          - '/^ZyWALL/'
+          - '/^USG60/'
+    - sysDescr_regex: '/^ZyWALL 2X/'
