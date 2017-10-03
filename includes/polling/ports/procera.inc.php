@@ -48,7 +48,7 @@ $required = array(
 
 foreach ($packetlogic_stats as $index => $port) {
     $procera_port = [];
-    foreach ($channelTypes as $cType) { 
+    foreach ($channelTypes as $cType) {
         foreach ($required as $ifEntry => $IfxStat) {
             $procera_port[$ifEntry] = $packetlogic_stats[$index][$cType['type'].$IfxStat];
         }
@@ -57,8 +57,8 @@ foreach ($packetlogic_stats as $index => $port) {
         $procera_port['ifConnectorPresent'] = ($packetlogic_info[$index]['NegotiatedMedia'] != 'linkdown' ? "true" : "false");
         $procera_port['ifOperStatus'] = ($packetlogic_info[$index]['channelActive'] === 'active' ? "up" : "down");
         $procera_port['ifType'] = 'ethernetCsmacd';
-        array_push($port_stats ,$procera_port);
+        array_push($port_stats, $procera_port);
     }
 }
 
-unset($packetlogic_info,$channelTypes,$packetlogic_stats,$procera_port);
+unset($packetlogic_info, $channelTypes, $packetlogic_stats, $procera_port);
