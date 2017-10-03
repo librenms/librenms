@@ -1,6 +1,6 @@
 source: Extensions/Applications.md
-Applications
-------------
+## Introduction
+
 You can use Application support to graph performance statistics from many applications.
 
 Different applications support a variety of ways collect data: by direct connection to the application, snmpd extend, or [the agent](Agent-Setup.md).
@@ -271,7 +271,7 @@ extend mailscanner /etc/snmp/mailscanner.php
 4. Restart snmpd on your host
 
 
-### GSPD
+### GPSD
 A small shell script that reports GPSD status.
 
 ##### Agent

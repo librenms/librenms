@@ -61,9 +61,3 @@ Alert when:
 
 ## Procedure
 You can associate a rule to a procedure by giving the URL of the procedure when creating the rule. Only links like "http://" are supported, otherwise an error will be returned. Once configured, procedure can be opened from the Alert widget through the "Open" button, which can be shown/hidden from the widget configuration box.
-
-## Testing alerts
-
-You can test your transports by forcing an actual active alert to run regardless of the interval or delay values.
-
-`./scripts/test-alert.php`. This script accepts -r for the rule id, -h for the device id or hostname and -d for debug.

@@ -1,6 +1,6 @@
 site_name: LibreNMS Docs
 docs_dir: doc
-theme_dir: 'librenms_theme'
+theme_dir: 'theme_v2'
 theme: null
 site_dir: out
 site_url: http://docs.librenms.org
@@ -9,7 +9,6 @@ markdown_extensions:
     - pymdownx.tilde
 extra_css:
     - librenms.css
-include_next_prev: false
 site_author: LibreNMS
 site_description: LibreNMS user and developer documentation
 repo_url: https://github.com/librenms/librenms
@@ -17,18 +16,13 @@ repo_name: GitHub
 google_analytics: ['UA-79149977-2', 'docs.librenms.org']
 pages:
   - Home: index.md
-  - General:
-      - General/Acknowledgement.md
-      - General/Callback-Stats-and-Privacy.md
+  - 1. General:
+      - Acknowledgements: General/Acknowledgement.md
       - General/Changelog.md
       - Code of Conduct: General/CODE_OF_CONDUCT.md
-      - General/Contributing.md
-      - General/Credits.md
-      - General/Updating.md
-      - General/Releases.md
-      - General/Security.md
+      - Support/Features.md
       - General/Welcome-to-Observium-users.md
-  - Installation:
+  - 2. Installing:
       - Installing LibreNMS: Installation/Installing-LibreNMS.md
       - Ubuntu VM Image: Installation/Ubuntu-image.md
       - CentOS VM Image: Installation/CentOS-image.md
@@ -36,72 +30,85 @@ pages:
       - Ubuntu 16.04 (Apache): Installation/Installation-Ubuntu-1604-Apache.md
       - CentOS 7 (Nginx): Installation/Installation-CentOS-7-Nginx.md
       - CentOS 7 (Apache): Installation/Installation-CentOS-7-Apache.md
-      - Older Docs: Installation/Installing-LibreNMS.md
       - Migrating from Observium: Installation/Migrating-from-Observium.md
-  - Extensions:
+  - 3. Getting started:
+      - Choosing a release: General/Releases.md
+      - Adding a device: Support/Adding-a-Device.md
+      - Grouping Devices: Extensions/Device-Groups.md
+      - Submitting stats: General/Callback-Stats-and-Privacy.md
+      - Updating an install: General/Updating.md
+  - 4. Basic Setup:
       - Extensions/Applications.md
-      - Extensions/Authentication.md
-      - Extensions/Auto-Discovery.md
-      - Extensions/Agent-Setup.md
+      - Check_MK Setup: Extensions/Agent-Setup.md
       - Extensions/Billing-Module.md
-      - Extensions/Component.md
       - Extensions/Dell-OpenManage.md
-      - Extensions/Device-Groups.md
-      - Extensions/Distributed-Poller.md
-      - Extensions/Email-Alerting.md
       - Extensions/Globe-Frontpage.md
-      - Extensions/Graylog.md
+      - Extensions/Interface-Description-Parsing.md
+      - Extensions/Network-Map.md
+      - Extensions/Syslog.md
+  - 5. Advanced Setup:
+      - Support/1-Minute-Polling.md
+      - Configuration docs: Support/Configuration.md
+      - Authentication Options: Extensions/Authentication.md
+      - Two-Factor Auth: Extensions/Two-Factor-Auth.md
+      - Auto-discovery Setup: Extensions/Auto-Discovery.md
+      - Scaling LibreNMS: Extensions/Distributed-Poller.md
+      - Extensions/RRDCached.md
+      - Memcached Config: Extensions/Memcached.md
+      - Sub-directory Support: Extensions/Sub-Directory.md
+      - Extensions/Varnish.md
+      - Poller Service (BETA): Extensions/Poller-Service.md
+      - Extensions/RRDTune.md
       - Extensions/IRC-Bot.md
       - Extensions/IRC-Bot-Extensions.md
-      - Extensions/Interface-Description-Parsing.md
-      - Extensions/MIB-based-polling.md
-      - Extensions/Memcached.md
-      - Extensions/Metric-Storage.md
-      - Extensions/Network-Map.md
+      - Extensions/SNMP-Proxy.md
+      - Extensions/SNMP-Trap-Handler.md
+  - 6. 3rd Party Integration:
+      - Extensions/Graylog.md
+      - Nagios Plugins: Extensions/Services.md
       - Extensions/NFSen.md
       - Extensions/Oxidized.md
       - Extensions/PeeringDB.md
-      - Extensions/Plugin-System.md
-      - Extensions/Poller-Service.md
-      - Extensions/Port-Description-Parser.md
       - Extensions/Proxmox.md
-      - Extensions/RRDCached.md
-      - Extensions/RRDTune.md
-      - Extensions/SNMP-Proxy.md
-      - Extensions/SNMP-Trap-Handler.md
-      - Extensions/Services.md
+      - Storing Metrics: Extensions/Metric-Storage.md
       - Extensions/Smokeping.md
-      - Extensions/Sub-Directory.md
-      - Extensions/Syslog.md
-      - Extensions/Two-Factor-Auth.md
-      - Extensions/Varnish.md
-  - API: API/index.md
-  - Alerting: Alerting/index.md
-  - Support:
-      - Support/1-Minute-Polling.md
-      - Support/Configuration.md
-      - Support/Discovery Support.md
-      - Support/Example-Hardware-Setup.md
+  - 7. API:
+      - API/index.md
+  - 8. Alerting:
+      - Alerting/Rules.md
+      - Alerting/Templates.md
+      - Alerting/Transports.md
+      - Alerting/Entities.md
+      - Alerting/Macros.md
+      - Alerting/Testing.md
+  - 9. Getting help:
       - Support/FAQ.md
-      - Support/Features.md
       - Support/Install Validation.md
       - Support/Performance.md
+      - Support/Discovery Support.md
       - Support/Poller Support.md
+      - Support/Example-Hardware-Setup.md
       - Support/Remote-Monitoring-VPN.md
       - Support/SNMP-Configuration-Examples.md
       - Support/SSL-Configuration.md
-  - Developing:
+  - 10. Contributing + Developing:
+      - General/Contributing.md
       - Developing/Using-Git.md
       - Developing/Code-Guidelines.md
       - Developing/Style-Guidelines.md
       - Developing/Validating-Code.md
       - Developing/Code-Structure.md
       - Developing/Creating-Documentation.md
+      - Extensions/Component.md
+      - Mib Based Polling (ALPHA): Extensions/MIB-based-polling.md
       - Adding support for a new OS: Developing/Support-New-OS.md
       - Developing/Dynamic-Config.md
       - Developing/Sensor-State-Support.md
       - Developing/Merging-Pull-Requests.md
       - Developing/Creating-Release.md
+      - Extensions/Plugin-System.md
+  - 11. Misc:
+      - Security information: General/Security.md
   - hidden:
       - Alerting/Rules.md
       - Alerting/Templates.md
@@ -118,10 +125,13 @@ pages:
       - Developing/os/Settings.md
       - Extensions/Agent-Setup.md
       - Extensions/Alerting.md
+      - Extensions/Email-Alerting.md
       - Extensions/metrics/InfluxDB.md
       - Extensions/metrics/Graphite.md
       - Extensions/metrics/OpenTSDB.md
+      - Parsing Port Descriptions: Extensions/Port-Description-Parser.md
       - Extensions/RRDCached-Security.md
+      - General/Credits.md
       - Installation/Installation-Ubuntu-1404-Nginx.md
       - Installation/Installation-Ubuntu-1404-Apache.md
       - Installation/Installation-Ubuntu-1404-Lighttpd.md
@@ -129,3 +139,4 @@ pages:
       - Installation/Installation-(Debian-Ubuntu).md
       - Installation/Installation-(RHEL-CentOS).md
       - Support/Support-New-OS.md
+

@@ -10,6 +10,7 @@ $stage = isset($_POST['stage']) ? $_POST['stage'] : 0;
 
 // Before we do anything, if we see config.php, redirect back to the homepage.
 if (file_exists('../config.php') && $stage != 6) {
+    unset($_SESSION['stage']);
     header("Location: /");
     exit;
 }
