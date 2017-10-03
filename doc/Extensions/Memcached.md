@@ -1,6 +1,8 @@
 source: Extensions/Memcached.md
 # Memcached
 
+> At this present moment, it is not advisable to run memcached other than for Distributed Polling.
+
 LibreNMS can store SQL results in memcached to achieve performance advantages of in-memory value storage and removing work load for frequent queries off the MySQL backend.
 
 To enable memcached in your install you need to have `memcached` installed and the PHP extension `php5-memcached` or `php-memcached` and add the following lines to your `config.php`:
