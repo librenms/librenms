@@ -47,7 +47,7 @@ $required = array(
 );
 
 foreach ($packetlogic_stats as $index => $port) {
-    $procera_port = [];
+    $procera_port = array();
     foreach ($channelTypes as $cType) {
         foreach ($required as $ifEntry => $IfxStat) {
             $procera_port[$ifEntry] = $packetlogic_stats[$index][$cType['type'].$IfxStat];
