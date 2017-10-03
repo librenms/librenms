@@ -957,7 +957,7 @@ function enable_graphs($device, &$graph_enable)
     if (!$device['snmp_disable']) {
         $graph_enable['poller']['poller_modules_perf'] = 'device_poller_modules_perf';
     }
-    if (can_ping_device($device) === true) {
+    if (get_dev_attrib($device, "override_icmp_disable") != "true" && can_ping_device($device) === true) {
         $graph_enable['poller']['ping_perf'] = 'device_ping_perf';
     }
 
