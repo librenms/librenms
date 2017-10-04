@@ -16,7 +16,7 @@ use LibreNMS\Exceptions\HostUnreachableException;
 $init_modules = array();
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('g:p:f::');
+$options = getopt('Pg:p:f::');
 
 if (isset($options['g']) && $options['g'] >= 0) {
     $cmd = array_shift($argv);
@@ -55,6 +55,12 @@ if (isset($options['p'])) {
     array_unshift($argv, $cmd);
 }
 
+if (isset($options['P'])) {
+    $cmd = array_shift($argv);
+    array_shift($argv);
+    array_unshift($argv, $cmd);
+}
+
 if (!empty($argv[1])) {
     $host      = strtolower($argv[1]);
     $community = $argv[2];
@@ -63,7 +69,16 @@ if (!empty($argv[1])) {
     $port      = 161;
     $transport = 'udp';
 
-    if ($snmpver === 'v3') {
+    $additional = array();
+    if (isset($options['P'])) {
+        $community = '';
+        $snmpver   = 'v2c';
+        $additional = array(
+            'snmp_disable' => 1,
+            'os'           => $argv[2] ? mres($argv[2]) : "ping",
+            'hardware'     => $argv[3] ? mres($argv[3]) : '',
+        );
+    } elseif ($snmpver === 'v3') {
         $seclevel = $community;
 
         // These values are the same as in defaults.inc.php
@@ -163,7 +178,7 @@ if (!empty($argv[1])) {
     }//end if
 
     try {
-        $device_id = addHost($host, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode);
+        $device_id = addHost($host, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode, $additional);
         $device = device_by_id_cache($device_id);
         echo "Added device {$device['hostname']} ($device_id)\n";
         exit(0);
@@ -181,6 +196,7 @@ if (!empty($argv[1])) {
     c_echo(
         "\n".$config['project_name_version'].' Add Host Tool
 
+    Usage (ICMP)     : ./addhost.php [-g <poller group>] [-f] -P <%Whostname%n> [os] [hardware]
     Usage (SNMPv1/2c): ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> [community] [v1|v2c] [port] ['.implode('|', $config['snmp']['transports']).']
     Usage (SNMPv3)   :  Config Defaults : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> any v3 [user] [port] ['.implode('|', $config['snmp']['transports']).']
     No Auth, No Priv : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> nanp v3 [user] [port] ['.implode('|', $config['snmp']['transports']).']

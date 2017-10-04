@@ -687,6 +687,7 @@ function createHost(
         'hostname' => $host,
         'sysName' => $host,
         'os' => $additional['os'] ? $additional['os'] : 'generic',
+        'hardware' => $additional['hardware'] ? $additional['hardware'] : null,
         'community' => $community,
         'port' => $port,
         'transport' => $transport,
