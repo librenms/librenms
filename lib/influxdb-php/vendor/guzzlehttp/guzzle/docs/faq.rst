@@ -48,7 +48,7 @@ of the returned promise.
 How can I add custom cURL options?
 ==================================
 
-cURL offer a huge number of `customizable options <http://us1.php.net/curl_setopt>`_.
+cURL offers a huge number of `customizable options <http://us1.php.net/curl_setopt>`_.
 While Guzzle normalizes many of these options across different handlers, there
 are times when you need to set custom cURL options. This can be accomplished
 by passing an associative array of cURL settings in the **curl** key of a
@@ -59,7 +59,7 @@ used with a client.
 
 .. code-block:: php
 
-    $client->get('/', [
+    $client->request('GET', '/', [
         'curl' => [
             CURLOPT_INTERFACE => 'xxx.xxx.xxx.xxx'
         ]
@@ -79,7 +79,7 @@ used with a client and allow self-signed certificates.
 
 .. code-block:: php
 
-    $client->get('/', [
+    $client->request('GET', '/', [
         'stream' => true,
         'stream_context' => [
             'ssl' => [
@@ -125,7 +125,52 @@ setting the ``expect`` request option to ``false``:
     $client = new GuzzleHttp\Client();
 
     // Disable the expect header on a single request
-    $response = $client->put('/', ['expect' => false]);
+    $response = $client->request('PUT', '/', ['expect' => false]);
 
     // Disable the expect header on all client requests
     $client = new GuzzleHttp\Client(['expect' => false]);
+
+How can I track a redirected requests?
+======================================
+
+You can enable tracking of redirected URIs and status codes via the
+`track_redirects` option. Each redirected URI and status code will be stored in the
+``X-Guzzle-Redirect-History`` and the ``X-Guzzle-Redirect-Status-History``
+header respectively.
+
+The initial request's URI and the final status code will be excluded from the results.
+With this in mind you should be able to easily track a request's full redirect path.
+
+For example, let's say you need to track redirects and provide both results
+together in a single report:
+
+.. code-block:: php
+
+    // First you configure Guzzle with redirect tracking and make a request
+    $client = new Client([
+        RequestOptions::ALLOW_REDIRECTS => [
+            'max'             => 10,        // allow at most 10 redirects.
+            'strict'          => true,      // use "strict" RFC compliant redirects.
+            'referer'         => true,      // add a Referer header
+            'track_redirects' => true,
+        ],
+    ]);
+    $initialRequest = '/redirect/3'; // Store the request URI for later use
+    $response = $client->request('GET', $initialRequest); // Make your request
+
+    // Retrieve both Redirect History headers
+    $redirectUriHistory = $response->getHeader('X-Guzzle-Redirect-History'); // retrieve Redirect URI history
+    $redirectCodeHistory = $response->getHeader('X-Guzzle-Redirect-Status-History'); // retrieve Redirect HTTP Status history
+
+    // Add the initial URI requested to the (beginning of) URI history
+    array_unshift($redirectUriHistory, $initialRequest);
+
+    // Add the final HTTP status code to the end of HTTP response history
+    array_push($redirectCodeHistory, $response->getStatusCode());
+
+    // (Optional) Combine the items of each array into a single result set
+    $fullRedirectReport = [];
+    foreach ($redirectUriHistory as $key => $value) {
+        $fullRedirectReport[$key] = ['location' => $value, 'code' => $redirectCodeHistory[$key]];
+    }
+    echo json_encode($fullRedirectReport);

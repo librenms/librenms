@@ -25,7 +25,15 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
         $vlan_id = $tagoruntag[$vlan_id][$tmp_tag];
         d_echo(" $vlan_id");
         if (is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
-            echo '.';
+            $vlan_data = $vlans_db[$vtpdomain_id][$vlan_id];
+            if ($vlan_data['vlan_name'] != $vlan[$tmp_name]) {
+                $vlan_upd['vlan_name'] = $vlan[$tmp_name];
+                dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', array($vlan_data['vlan_id']));
+                log_event("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> {$vlan[$tmp_name]} ", $device, 'vlan', 3, $vlan_data['vlan_id']);
+                echo 'U';
+            } else {
+                echo '.';
+            }
         } else {
             dbInsert(array(
                 'device_id' => $device['device_id'],

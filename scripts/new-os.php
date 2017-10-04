@@ -39,28 +39,29 @@ sysObjectID: $full_sysObjectId
 ");
 
         $os = getHostOS($device);
+        $continue = 'n';
         if ($os != 'generic') {
-            c_echo("We already detect this device as OS $os type");
-            exit(1);
+            $continue = get_user_input("We already detect this device as OS $os type, do you want to continue to add sensors? (Y/n)");
         }
 
-        $descr = get_user_input('Enter the description for this OS, i.e Cisco IOS:');
-        $icon = get_user_input('Enter the logo to use, this can be the name of an existing one (i.e: cisco) or the url to retrieve one:');
+        if (!str_contains($continue, 'y', true)) {
+            $descr = get_user_input('Enter the description for this OS, i.e Cisco IOS:');
+            $icon = get_user_input('Enter the logo to use, this can be the name of an existing one (i.e: cisco) or the url to retrieve one:');
 
-        if (filter_var($icon, FILTER_VALIDATE_URL)) {
-            $icon_data = file_get_contents($icon);
-            file_put_contents($config['temp_dir'] . "/{$options['o']}", $icon_data);
-            $file_info = mime_content_type($config['temp_dir'] . "/{$options['o']}");
-            if ($file_info === 'image/png') {
-                $ext = '.png';
-            } elseif ($file_info === 'image/svg+xml') {
-                $ext = '.svg';
+            if (filter_var($icon, FILTER_VALIDATE_URL)) {
+                $icon_data = file_get_contents($icon);
+                file_put_contents($config['temp_dir'] . "/{$options['o']}", $icon_data);
+                $file_info = mime_content_type($config['temp_dir'] . "/{$options['o']}");
+                if ($file_info === 'image/png') {
+                    $ext = '.png';
+                } elseif ($file_info === 'image/svg+xml') {
+                    $ext = '.svg';
+                }
+                rename($config['temp_dir'] . "/{$options['o']}", $config['install_dir'] . "/html/images/os/$vendor$ext");
+                $icon = $vendor;
             }
-            rename($config['temp_dir'] . "/{$options['o']}", $config['install_dir'] . "/html/images/os/$vendor$ext");
-            $icon = $vendor;
-        }
 
-        $disco = "os: {$options['o']}
+            $disco = "os: {$options['o']}
 text: '$descr'
 type: $type
 icon: $icon
@@ -73,16 +74,22 @@ discovery:
     - sysObjectId:
         - $sysObjectId
 ";
-        file_put_contents($definition_file, $disco);
+            file_put_contents($definition_file, $disco);
 
-        $snmprec = "1.3.6.1.2.1.1.1.0|4|$sysDescr
+            $snmprec = "1.3.6.1.2.1.1.1.0|4|$sysDescr
 1.3.6.1.2.1.1.2.0|6|$full_sysObjectId
 ";
 
-        file_put_contents($test_file, $snmprec);
+            file_put_contents($test_file, $snmprec);
+        }
+
+        if ($os === 'generic') {
+            c_echo("Base discovery file created,");
+        }
     }
-    
-    $mib_name = get_user_input("Base discovery file created, ctrl+c to exit now otherwise please enter the MIB name including path (url is also fine) for us to check for sensors:");
+
+    $mib_name = get_user_input("ctrl+c to exit now otherwise please enter the MIB name including path (url is also fine) for us to check for sensors:");
+
     if (filter_var($mib_name, FILTER_VALIDATE_URL)) {
         $mib_data = file_get_contents($mib_name);
         file_put_contents($config['temp_dir'] . "/{$options['o']}.mib", $mib_data);
@@ -120,7 +127,7 @@ discovery:
                     $discovery[$type] .= "
                 -
                     oid: $table_name
-                    value: $value,
+                    value: $value
                     num_oid: {$tmp_table[$value]}.
                     descr: $descr";
                     if ($multiplier) {

@@ -11,6 +11,8 @@ To enable this set the following config:
 $config['rrdtool_version'] = '1.5.5';
 ```
 
+NOTE: This feature requires your client version of rrdtool to be 1.5.5 or over, in addition to your rrdcached version.
+
 ### Distributed Poller Support Matrix
 
 Shared FS: Is a shared filesystem required?

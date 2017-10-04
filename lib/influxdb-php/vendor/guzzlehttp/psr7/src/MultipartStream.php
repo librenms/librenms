@@ -27,7 +27,7 @@ class MultipartStream implements StreamInterface
      */
     public function __construct(array $elements = [], $boundary = null)
     {
-        $this->boundary = $boundary ?: uniqid();
+        $this->boundary = $boundary ?: sha1(uniqid('', true));
         $this->stream = $this->createStream($elements);
     }
 
@@ -108,12 +108,12 @@ class MultipartStream implements StreamInterface
     /**
      * @return array
      */
-    private function createElement($name, $stream, $filename, array $headers)
+    private function createElement($name, StreamInterface $stream, $filename, array $headers)
     {
         // Set a default content-disposition header if one was no provided
         $disposition = $this->getHeader($headers, 'content-disposition');
         if (!$disposition) {
-            $headers['Content-Disposition'] = $filename
+            $headers['Content-Disposition'] = ($filename === '0' || $filename)
                 ? sprintf('form-data; name="%s"; filename="%s"',
                     $name,
                     basename($filename))
@@ -130,7 +130,7 @@ class MultipartStream implements StreamInterface
 
         // Set a default Content-Type if one was not supplied
         $type = $this->getHeader($headers, 'content-type');
-        if (!$type && $filename) {
+        if (!$type && ($filename === '0' || $filename)) {
             if ($type = mimetype_from_filename($filename)) {
                 $headers['Content-Type'] = $type;
             }

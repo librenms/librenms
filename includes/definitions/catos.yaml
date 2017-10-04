@@ -32,3 +32,5 @@ discovery_modules:
 discovery:
     - sysDescr:
         - Cisco Catalyst Operating System Software
+bad_if:
+    - vlan

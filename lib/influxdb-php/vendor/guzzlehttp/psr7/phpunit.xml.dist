@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="./tests/bootstrap.php"
+<phpunit bootstrap="vendor/autoload.php"
          colors="true">
   <testsuites>
     <testsuite>
@@ -9,9 +9,6 @@
   <filter>
     <whitelist>
       <directory suffix=".php">src</directory>
-      <exclude>
-        <directory suffix="Interface.php">src/</directory>
-      </exclude>
     </whitelist>
   </filter>
 </phpunit>

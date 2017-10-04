@@ -134,7 +134,7 @@ function discover_device(&$device, $options = null)
 
     load_os($device);
     load_discovery($device);
-    register_mibs($device, Config::getOsSetting($device, 'register_mibs', array()), 'includes/discovery/os/' . $device['os'] . '.inc.php');
+    register_mibs($device, Config::getOsSetting($device['os'], 'register_mibs', array()), 'includes/discovery/os/' . $device['os'] . '.inc.php');
 
     echo "\n";
 
@@ -154,7 +154,7 @@ function discover_device(&$device, $options = null)
         Config::set('discovery_modules', array());
     }
     foreach (Config::get('discovery_modules', array()) as $module => $module_status) {
-        $os_module_status = Config::getOsSetting($device, "discovery_modules.$module");
+        $os_module_status = Config::getOsSetting($device['os'], "discovery_modules.$module");
         d_echo("Modules status: Global" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
         d_echo("OS" . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
         d_echo("Device" . (isset($attribs['discover_' . $module]) ? ($attribs['discover_' . $module] ? '+ ' : '- ') : '  '));
@@ -802,7 +802,7 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
 */
 function check_entity_sensor($string, $device)
 {
-    $fringe = array_merge(Config::get('bad_entity_sensor_regex', array()), Config::getOsSetting($device, 'bad_entity_sensor_regex', array()));
+    $fringe = array_merge(Config::get('bad_entity_sensor_regex', array()), Config::getOsSetting($device['os'], 'bad_entity_sensor_regex', array()));
 
     foreach ($fringe as $bad) {
         if (preg_match($bad . "i", $string)) {
@@ -982,6 +982,16 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         return 1;
     }
 
+    if ($sensor_type == 'runtime') {
+        if (starts_with($oid, '.1.3.6.1.2.1.33.1.2.2.')) {
+            return 60;
+        }
+
+        if (starts_with($oid, '.1.3.6.1.2.1.33.1.2.3.')) {
+            return 1;
+        }
+    }
+
     return 10;
 }
 
@@ -999,28 +1009,31 @@ function get_toner_capacity($raw_capacity)
 }
 
 /**
- * @param string $descr
- * @return bool
+ * Should we ignore this storage device based on teh description? (usually the mount path or drive)
+ *
+ * @param string $os The OS of the device
+ * @param string $descr The description of the storage
+ * @return boolean
  */
-function ignore_storage($descr)
+function ignore_storage($os, $descr)
 {
-    foreach (Config::get('ignore_mount', array()) as $bi) {
-        if ($bi == $descr) {
-            d_echo("$bi == $descr \n");
+    foreach (Config::getOsSetting($os, 'ignore_mount') as $im) {
+        if ($im == $descr) {
+            d_echo("ignored $descr (matched: $im)\n");
             return true;
         }
     }
 
-    foreach (Config::get('ignore_mount_string', array()) as $bi) {
-        if (str_contains($descr, $bi)) {
-            d_echo("strpos: $descr, $bi \n");
+    foreach (Config::getOsSetting($os, 'ignore_mount_string') as $ims) {
+        if (str_contains($descr, $ims)) {
+            d_echo("ignored $descr (matched: $ims)\n");
             return true;
         }
     }
 
-    foreach (Config::get('ignore_mount_regexp', array()) as $bi) {
-        if (preg_match($bi, $descr)) {
-            d_echo("preg_match $bi, $descr \n");
+    foreach (Config::getOsSetting($os, 'ignore_mount_regexp') as $imr) {
+        if (preg_match($imr, $descr)) {
+            d_echo("ignored $descr (matched: $imr)\n");
             return true;
         }
     }
@@ -1110,10 +1123,10 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         $tmp_vars = $tmp_var[0];
                         foreach ($tmp_vars as $k => $tmp_var) {
                             $tmp_var = preg_replace('/({{ | }}|\$)/', '', $tmp_var);
-                            if ($snmp_data[$tmp_var]) {
+                            if (isset($snmp_data[$tmp_var])) {
                                 $descr = str_replace("{{ \$$tmp_var }}", $snmp_data[$tmp_var], $descr);
                             }
-                            if ($cached_data[$index][$tmp_var]) {
+                            if (isset($cached_data[$index][$tmp_var])) {
                                 $descr = str_replace("{{ \$$tmp_var }}", $cached_data[$index][$tmp_var], $descr);
                             }
                         }
@@ -1167,7 +1180,7 @@ function sensors($types, $device, $valid, $pre_cache = array())
         if (is_file($dir . $device['os'] . '.inc.php')) {
             include $dir . $device['os'] . '.inc.php';
         }
-        if (Config::getOsSetting($device, 'rfc1628_compat', false)) {
+        if (Config::getOsSetting($device['os'], 'rfc1628_compat', false)) {
             if (is_file($dir  . '/rfc1628.inc.php')) {
                 include $dir . '/rfc1628.inc.php';
             }
