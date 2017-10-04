@@ -406,7 +406,7 @@ function delete_device($id)
  * @throws InvalidPortAssocModeException The given port association mode was invalid
  * @throws SnmpVersionUnsupportedException The given snmp version was invalid
  */
-function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex')
+function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = array())
 {
     global $config;
 
@@ -446,6 +446,9 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         $snmpvers = array($snmp_version);
     }
 
+    if (isset($additional['snmp_disable']) && $additional['snmp_disable'] == 1) {
+        return createHost($host, '', $snmp_version, $port, $transport, array(), $poller_group, 1, true, $additional);
+    }
     $host_unreachable_exception = new HostUnreachableException("Could not connect to $host, please check the snmp details and snmp reachability");
     // try different snmp variables to add the device
     foreach ($snmpvers as $snmpver) {
@@ -667,7 +670,8 @@ function createHost(
     $v3 = array(),
     $poller_group = 0,
     $port_assoc_mode = 'ifIndex',
-    $force_add = false
+    $force_add = false,
+    $additional = array()
 ) {
     $host = trim(strtolower($host));
 
@@ -682,7 +686,7 @@ function createHost(
     $device = array(
         'hostname' => $host,
         'sysName' => $host,
-        'os' => 'generic',
+        'os' => $additional['os'] ? $additional['os'] : 'generic',
         'community' => $community,
         'port' => $port,
         'transport' => $transport,
@@ -691,6 +695,7 @@ function createHost(
         'poller_group' => $poller_group,
         'status_reason' => '',
         'port_association_mode' => $port_assoc_mode,
+        'snmp_disable' => $additional['snmp_disable'] ? $additional['snmp_disable'] : 0,
     );
 
     $device = array_merge($device, $v3);  // merge v3 settings
