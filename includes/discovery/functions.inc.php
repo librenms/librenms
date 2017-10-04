@@ -1099,9 +1099,11 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                 $data_name = isset($data['value']) ? $data['value'] : $data['oid'];  // fallback to oid if value is not set
 
                 $tmp_value = $snmp_data[$data_name];
-                preg_match('/[\d\.\-]+/', $tmp_value, $temp_response);
-                if (!empty($temp_response[0])) {
-                    $tmp_value = $temp_response[0];
+                if (!is_numeric($tmp_value)) {
+                    preg_match('/-?\d*\.?\d+/', $tmp_value, $temp_response);
+                    if (!empty($temp_response[0])) {
+                        $tmp_value = $temp_response[0];
+                    }
                 }
 
                 if (is_numeric($tmp_value)) {
