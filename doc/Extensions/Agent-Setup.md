@@ -1,5 +1,4 @@
-
-# Agent Setup
+source: Extensions/Agent-Setup.md
 
 The agent can be used to gather data from remote systems you can use LibreNMS in combination with check_mk (found [here](https://github.com/librenms/librenms-agent)).
 The agent can be extended to include data about [applications](Applications.md) on the remote system.

@@ -124,17 +124,31 @@ Enabled by default.
 
 This module is invoked from bgp-peers discovery module.
 
-## SNMP Scan
-This isn't actually an auto-discovery mechanism, but manually invoked.
-
-It's designed to scan through all of the subnets in your config or what you have manually specified
-to automatically add devices.
+### SNMP Scan
+Apart from the aforementioned Auto-Discovery options, LibreNMS is also able to proactively scan a network for SNMP-enabled devices using the configured version/credentials.
 
 SNMP Scan will scan `$config['nets']` by default and respects `$config['autodiscovery']['nets-exclude']`.
 
-An example of it's usage is:
+To run the SNMP-Scanner you need to execute the `snmp-scan.py` from within your LibreNMS installation directory.
 
-```bash
-./snmp-scan.py -r 192.168.0.0/24
+Here the script's help-page for reference:
+```text
+usage: snmp-scan.py [-h] [-r NETWORK] [-t THREADS] [-l] [-v]
+
+Scan network for snmp hosts and add them to LibreNMS.
+
+optional arguments:
+  -h, --help     show this help message and exit
+  -r NETWORK     CIDR noted IP-Range to scan. Can be specified multiple times
+                 This argument is only required if $config['nets'] is not set
+                 Example: 192.168.0.0/24 Example: 192.168.0.0/31 will be
+                 treated as an RFC3021 p-t-p network with two addresses,
+                 192.168.0.0 and 192.168.0.1 Example: 192.168.0.1/32 will be
+                 treated as a single host address
+  -t THREADS     How many IPs to scan at a time. More will increase the scan
+                 speed, but could overload your system. Default: 32
+  -l, --legend   Print the legend.
+  -v, --verbose  Show debug output. Specifying multiple times increases the
+                 verbosity.
+
 ```
-

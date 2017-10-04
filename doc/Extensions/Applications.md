@@ -1,6 +1,6 @@
 source: Extensions/Applications.md
-Applications
-------------
+## Introduction
+
 You can use Application support to graph performance statistics from many applications.
 
 Different applications support a variety of ways collect data: by direct connection to the application, snmpd extend, or [the agent](Agent-Setup.md).

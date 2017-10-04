@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 GH_REPO="@github.com/librenms-docs/librenms-docs.github.io.git"
 FULL_REPO="https://${GH_TOKEN}$GH_REPO"
-THEME_REPO="https://github.com/librenms-docs/librenms_theme.git"
+THEME_REPO="https://github.com/librenms-docs/theme_v2.git"
 
 pip install --user 'jinja2<2.9'
 pip install --user mkdocs
