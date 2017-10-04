@@ -120,7 +120,7 @@ def scan_host(ip):
             pass
 
         try:
-            add_output = check_output(['/usr/bin/env', 'php', 'addhost.php', hostname or ip])
+            add_output = check_output(['/usr/bin/env', 'php', 'addhost.php', args.ping, hostname or ip])
             return Result(ip, hostname, Outcome.ADDED, add_output)
         except CalledProcessError as err:
             output = err.output.decode().rstrip()
@@ -147,6 +147,7 @@ if __name__ == '__main__':
     Example: 192.168.0.0/24
     Example: 192.168.0.0/31 will be treated as an RFC3021 p-t-p network with two addresses, 192.168.0.0 and 192.168.0.1
     Example: 192.168.0.1/32 will be treated as a single host address""")
+    parser.add_argument('-P', '--ping', action='store_const', const="-P", default="", help="Only try to ping the device.")
     parser.add_argument('-t', dest='threads', type=int,
                         help="How many IPs to scan at a time.  More will increase the scan speed," +
                              " but could overload your system. Default: {}".format(THREADS))
