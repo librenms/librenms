@@ -205,5 +205,5 @@
    {
     "rule": "%applications.app_type = \"os-updates\" && %applications.app_status >= \"10\"",
     "name": "Applications OS-Updates, New Updates Available"
-  },
+  }
 ]
