@@ -3,7 +3,7 @@
 if ($device['os'] === 'dlinkap') {
     echo 'Dlink AP : ';
 
-    $processor_oid=$device['sysObjectID'].'.5.1.3.0';
+    $processor_oid = $device['sysObjectID'].'.5.1.3.0';
     $descr = 'Processor';
     $usage = snmp_get($device, $processor_oid, '-OvQ');
 
