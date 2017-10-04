@@ -682,7 +682,7 @@ links:
     protocol: { Field: protocol, Type: varchar(11), 'Null': true, Default: 'NULL', Extra: '' }
     remote_device_id: { Field: remote_device_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
     remote_hostname: { Field: remote_hostname, Type: varchar(128), 'Null': false, Default: 'NULL', Extra: '' }
-    remote_platform: { Field: remote_platform, Type: varchar(128), 'Null': false, Default: 'NULL', Extra: '' }
+    remote_platform: { Field: remote_platform, Type: varchar(256), 'Null': true, Default: 'NULL', Extra: '' }
     remote_port: { Field: remote_port, Type: varchar(128), 'Null': false, Default: 'NULL', Extra: '' }
     remote_port_id: { Field: remote_port_id, Type: int(11), 'Null': true, Default: 'NULL', Extra: '' }
     remote_version: { Field: remote_version, Type: varchar(256), 'Null': false, Default: 'NULL', Extra: '' }
