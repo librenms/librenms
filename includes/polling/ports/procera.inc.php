@@ -23,8 +23,8 @@
 * @author     Paul Heinrichs <pdheinrichs@gmail.com>
 */
 
-$packetlogic_stats = snmpwalk_cache_oid($device, 'netDeviceTable', array(), 'PACKETLOGIC-CHANNEL-MIB');
-$packetlogic_info = snmpwalk_cache_oid($device, 'channelInfoTable', array(), 'PACKETLOGIC-CHANNEL-MIB');
+$packetlogic_stats = snmpwalk_group($device, 'netDeviceTable', 'PACKETLOGIC-CHANNEL-MIB',2, array());
+$packetlogic_stats = snmpwalk_group($device, 'channelInfoTable', 'PACKETLOGIC-CHANNEL-MIB', 2, $packetlogic_stats);
 
 $channelTypes = array(
     array(
@@ -50,15 +50,15 @@ foreach ($packetlogic_stats as $index => $port) {
     $procera_port = array();
     foreach ($channelTypes as $cType) {
         foreach ($required as $ifEntry => $IfxStat) {
-            $procera_port[$ifEntry] = $packetlogic_stats[$index][$cType['type'].$IfxStat];
+            $procera_port[$ifEntry] = $packetlogic_stats[$index][0][$cType['type'].$IfxStat];
         }
-        $procera_port['ifName'] = $packetlogic_info[$index]['channelName']. ' '.$cType['name'];
-        $procera_port['ifDescr'] = $packetlogic_info[$index]['channelName']. ' '.$cType['name'];
-        $procera_port['ifConnectorPresent'] = ($packetlogic_info[$index]['NegotiatedMedia'] != 'linkdown' ? "true" : "false");
-        $procera_port['ifOperStatus'] = ($packetlogic_info[$index]['channelActive'] === 'active' ? "up" : "down");
+        $procera_port['ifName'] = $packetlogic_stats[$index][0]['channelName']. ' '.$cType['name'];
+        $procera_port['ifDescr'] = $packetlogic_stats[$index][0]['channelName']. ' '.$cType['name'];
+        $procera_port['ifConnectorPresent'] = ($packetlogic_stats[$index][0]['NegotiatedMedia'] != 'linkdown' ? "true" : "false");
+        $procera_port['ifOperStatus'] = ($packetlogic_stats[$index][0]['channelActive'] === 'active' ? "up" : "down");
         $procera_port['ifType'] = 'ethernetCsmacd';
         array_push($port_stats, $procera_port);
     }
 }
 
-unset($packetlogic_info, $channelTypes, $packetlogic_stats, $procera_port);
+unset($channelTypes, $packetlogic_stats, $procera_port);
