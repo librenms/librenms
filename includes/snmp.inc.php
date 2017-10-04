@@ -552,6 +552,11 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array())
         $parts = $parts[1];
         array_splice($parts, $depth, 0, array_shift($parts)); // move the oid name to the correct depth
 
+        // some tables don't use entries so they end with .0
+        if (end($parts) == '.0') {
+            array_pop($parts);
+        }
+
         $line = strtok("\n"); // get the next line and concatenate multi-line values
         while ($line !== false && !str_contains($line, '=')) {
             $value .= $line . PHP_EOL;
@@ -561,7 +566,7 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array())
         // merge the parts into an array, creating keys if they don't exist
         $tmp = &$array;
         foreach ($parts as $part) {
-            $tmp = &$tmp[trim($part, '"')];
+            $tmp = &$tmp[trim($part, '".')];
         }
         $tmp = trim($value, "\" \n\r"); // assign the value as the leaf
     }
