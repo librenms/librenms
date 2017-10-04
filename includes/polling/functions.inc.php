@@ -257,11 +257,11 @@ function poll_device($device, $options)
         $graphs    = array();
         $oldgraphs = array();
 
+        $force_module = false;
         if ($device['snmp_disable'] != '1') {
             // we always want the core module to be included
             include 'includes/polling/core.inc.php';
 
-            $force_module = false;
             if ($options['m']) {
                 $config['poller_modules'] = array();
                 foreach (explode(',', $options['m']) as $module) {

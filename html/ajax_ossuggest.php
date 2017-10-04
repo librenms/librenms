@@ -31,10 +31,11 @@ set_debug($_REQUEST['debug']);
  * @param array  $obj  Object to sort
  * @return array
  */
-function levsort($base, $obj, $keys)
+function levsortos($base, $obj, $keys)
 {
     $ret = array();
     foreach ($obj as $elem) {
+        $lev = 0;
         foreach ($keys as $key) {
             $levnew = levenshtein(strtolower($base), strtolower($elem[$key]), 1, 10, 10);
             if (!isset($lev) || $levnew < $lev) {
@@ -56,7 +57,7 @@ function levsort($base, $obj, $keys)
 header('Content-type: application/json');
 if (isset($_GET['term'])) {
     $_GET['term'] = mres($_GET['term']);
-    $sortos = levsort($_GET['term'], $config['os'], array("text", "os"));
+    $sortos = levsortos($_GET['term'], $config['os'], array("text", "os"));
     $sortos = array_chunk($sortos, 20, true);
     $sortos = $sortos[0];
     foreach ($sortos as $lev => $os) {

@@ -87,7 +87,7 @@ if ($_POST['editing']) {
             } elseif ($max_oid_set === false) {
                 $update_failed_message[] = 'SNMP Max OID updated failed.';
             }
-            if (!$update_message && !$update_failed_message) {
+            if (!isset($update_message) && !isset($update_failed_message)) {
                 $update_message[] = 'Device record unchanged. No update necessary.';
             }
         } else {
@@ -99,10 +99,10 @@ if ($_POST['editing']) {
 $device = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', array($device['device_id']));
 $descr  = $device['purpose'];
 
-if ($update_message) {
+if (isset($update_message)) {
     print_message(join("<br />", $update_message));
 }
-if ($update_failed_message) {
+if (isset($update_failed_message)) {
     print_error(join("<br />", $update_failed_message));
 }
 

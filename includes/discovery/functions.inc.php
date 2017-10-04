@@ -138,9 +138,9 @@ function discover_device(&$device, $options = null)
 
     echo "\n";
 
+    $force_module = false;
     if ($device['snmp_disable'] != '1') {
         // If we've specified modules, use them, else walk the modules array
-        $force_module = false;
         if ($options['m']) {
             Config::set('discovery_modules', array());
             foreach (explode(',', $options['m']) as $module) {
