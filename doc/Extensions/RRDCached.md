@@ -76,6 +76,17 @@ SOCKFILE=/var/run/rrdcached.sock
 SOCKGROUP=librenms
 BASE_OPTIONS="-B -F -R"
 ```
+- Set ownership and permissions.
+```ssh
+chown librenms:librenms /var/run/rrdcached*
+chmod 755 /var/run/rrdcached*
+```
+
+- Start RRDCached and enable RRDCached so the service will run at start up.
+```ssh
+systemctl start rrdcached
+systemctl enable rrdcached
+```
 
 ### RRDCached installation CentOS 6
 This example is based on a fresh LibreNMS install, on a minimal CentOS 6 installation.
