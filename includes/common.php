@@ -627,7 +627,7 @@ function is_valid_hostname($hostname)
     // white space are permitted. While a hostname may not contain other characters,
     // such as the underscore character (_), other DNS names may contain the underscore
 
-    return ctype_alnum(str_replace('_', '', str_replace('-', '', str_replace('.', '', $hostname))));
+    return ctype_alnum(str_replace(array('_', '-', '.'), '', $hostname));
 }
 
 /*
