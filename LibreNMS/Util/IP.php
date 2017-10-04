@@ -139,6 +139,23 @@ abstract class IP
     abstract public function inNetwork($network);
 
     /**
+     * Check if this IP is in one of multiple networks
+     *
+     * @param array $networks
+     * @return bool
+     */
+    public function inNetworks($networks)
+    {
+        foreach ((array)$networks as $network) {
+            if ($this->inNetwork($network)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Check if this IP is in the reserved range.
      * @return bool
      */
@@ -165,6 +182,16 @@ abstract class IP
     public function uncompressed()
     {
         return (string)$this->ip;
+    }
+
+    /**
+     * Packed address for storage in database
+     *
+     * return string
+     */
+    public function packed()
+    {
+        return inet_pton((string)$this->ip);
     }
 
     /**
