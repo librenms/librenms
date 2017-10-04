@@ -188,7 +188,7 @@ function get_userlist()
                         get_membername($username)
                     );
                     if (!Config::has('auth_ldap_group') || $ldap_comparison === true) {
-                        $userlist[] = array(
+                        $userlist[$username] = array(
                             'username' => $username,
                             'realname' => $realname,
                             'user_id' => $user_id,
