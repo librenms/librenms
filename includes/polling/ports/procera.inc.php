@@ -23,7 +23,7 @@
 * @author     Paul Heinrichs <pdheinrichs@gmail.com>
 */
 
-$packetlogic_stats = snmpwalk_group($device, 'netDeviceTable', 'PACKETLOGIC-CHANNEL-MIB',2, array());
+$packetlogic_stats = snmpwalk_group($device, 'netDeviceTable', 'PACKETLOGIC-CHANNEL-MIB', 2, array());
 $packetlogic_stats = snmpwalk_group($device, 'channelInfoTable', 'PACKETLOGIC-CHANNEL-MIB', 2, $packetlogic_stats);
 
 $channelTypes = array(
