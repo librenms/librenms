@@ -35,10 +35,10 @@ function levsortos($base, $obj, $keys)
 {
     $ret = array();
     foreach ($obj as $elem) {
-        $lev = 0;
+        $lev = false;
         foreach ($keys as $key) {
             $levnew = levenshtein(strtolower($base), strtolower($elem[$key]), 1, 10, 10);
-            if (!isset($lev) || $levnew < $lev) {
+            if ($lev === false || $levnew < $lev) {
                 $lev = $levnew;
             }
         }
@@ -47,7 +47,6 @@ function levsortos($base, $obj, $keys)
         }
 
         $ret["$lev"] = $elem;
-        unset($lev);
     }
 
     ksort($ret);
