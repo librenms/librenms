@@ -235,7 +235,8 @@ foreach (dbFetchRows($sql, array($device['device_id'])) as $test) {
 }
 
 // remove orphaned links
-$deleted = dbQuery('DELETE `l` FROM `links` `l` LEFT JOIN `devices` `d` ON `d`.`device_id` = `l`.`local_device_id` WHERE `d`.`device_id` IS NULL');
+$del_result = dbQuery('DELETE `l` FROM `links` `l` LEFT JOIN `devices` `d` ON `d`.`device_id` = `l`.`local_device_id` WHERE `d`.`device_id` IS NULL');
+$deleted = mysqli_affected_rows($del_result);
 echo str_repeat('-', $deleted);
 d_echo(" $deleted orphaned links deleted\n");
 
@@ -244,5 +245,7 @@ unset(
     $sql,
     $fdp_array,
     $cdp_array,
-    $lldp_array
+    $lldp_array,
+    $del_result,
+    $deleted
 );
