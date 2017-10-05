@@ -25,10 +25,6 @@
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\Util\IP;
-use LibreNMS\Util\IPv4;
-use LibreNMS\Util\IPv6;
-
 class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
 {
     public function testStrContains()
@@ -121,5 +117,29 @@ class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('DashName', str_to_class('dash-name'));
         $this->assertSame('UnderscoreName', str_to_class('underscore_name'));
         $this->assertSame('LibreNMS\\AllOfThemName', str_to_class('all OF-thEm_NaMe', 'LibreNMS\\'));
+    }
+
+    public function testIsValidHostname()
+    {
+        $this->assertTrue(is_valid_hostname('a'), 'a');
+        $this->assertTrue(is_valid_hostname('a.'), 'a.');
+        $this->assertTrue(is_valid_hostname('0'), '0');
+        $this->assertTrue(is_valid_hostname('a.b'), 'a.b');
+        $this->assertTrue(is_valid_hostname('localhost'), 'localhost');
+        $this->assertTrue(is_valid_hostname('google.com'), 'google.com');
+        $this->assertTrue(is_valid_hostname('news.google.co.uk'), 'news.google.co.uk');
+        $this->assertTrue(is_valid_hostname('xn--fsqu00a.xn--0zwm56d'), 'xn--fsqu00a.xn--0zwm56d');
+        $this->assertFalse(is_valid_hostname('goo gle.com'), 'goo gle.com');
+        $this->assertFalse(is_valid_hostname('google..com'), 'google..com');
+        $this->assertFalse(is_valid_hostname('google.com '), 'google.com ');
+        $this->assertFalse(is_valid_hostname('google-.com'), 'google-.com');
+        $this->assertFalse(is_valid_hostname('.google.com'), '.google.com');
+        $this->assertFalse(is_valid_hostname('<script'), '<script');
+        $this->assertFalse(is_valid_hostname('alert('), 'alert(');
+        $this->assertFalse(is_valid_hostname('.'), '.');
+        $this->assertFalse(is_valid_hostname('..'), '..');
+        $this->assertFalse(is_valid_hostname(' '), 'Just a space');
+        $this->assertFalse(is_valid_hostname('-'), '-');
+        $this->assertFalse(is_valid_hostname(''), 'Empty string');
     }
 }
