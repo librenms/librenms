@@ -124,6 +124,10 @@ $config['rrdcached']    = "unix:/var/run/rrdcached/rrdcached.sock";
 ```
 ### RRDCached installation CentOS 7
 
+- Update RRDtool
+```ssh
+yum update rrdtool
+```
 - Create /etc/systemd/system/rrdcached.service with this content:
 ```ssh
 [Unit]
