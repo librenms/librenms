@@ -1,8 +1,8 @@
 <?php
 /**
- * AuthenticationException.php
+ * tgos.inc.php
  *
- * Throw this when authentication fails.  Sets the default message to 'Invalid credentials' so we don't leak any info.
+ * LibreNMS os poller module for Technicolor TG MediaAccess devices
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,21 +19,7 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2017 Thomas GAGNIERE
+ * @author     Thomas GAGNIERE <tgagniere@reseau-concept.com>
  */
-
-namespace LibreNMS\Exceptions;
-
-class AuthenticationException extends \Exception
-{
-    // Redefine the exception so message defaults to a generic 'Invalid credentials'
-    public function __construct($message = 'Invalid credentials', $hide_message = false, $code = 0, \Exception $previous = null)
-    {
-        if ($hide_message) {
-            $message = '';
-        }
-
-        parent::__construct($message, $code, $previous);
-    }
-}
+$hardware = $poll_device['sysDescr'];
