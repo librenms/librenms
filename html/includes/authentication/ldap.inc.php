@@ -145,7 +145,7 @@ function get_userid($username)
         $entries = ldap_get_entries($connection, $search);
 
         if ($entries['count']) {
-            return $entries[0][Config::get('auth_ldap_uid_attribute' . 'uidnumber')][0];
+            return $entries[0][Config::get('auth_ldap_uid_attribute', 'uidNumber')][0];
         }
     } catch (AuthenticationException $e) {
         echo $e->getMessage() . PHP_EOL;
@@ -177,7 +177,7 @@ function get_userlist()
             foreach ($entries as $entry) {
                 $username = $entry['uid'][0];
                 $realname = $entry['cn'][0];
-                $user_id = $entry[Config::get('auth_ldap_uid_attribute' . 'uidnumber')][0];
+                $user_id = $entry[Config::get('auth_ldap_uid_attribute', 'uidNumber')][0];
                 $email = $entry[Config::get('auth_ldap_emailattr', 'mail')][0];
                 $ldap_groups = get_group_list();
                 foreach ($ldap_groups as $ldap_group) {
