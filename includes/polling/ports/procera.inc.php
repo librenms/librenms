@@ -48,13 +48,13 @@ $required = array(
 
 // Media Types as per PACKETLOGIC-CHANNEL-MIB
 $mediaType = array(
-    array('ifDuplex' => null,'ifSpeed' => 0, 'label'=> 'linkdown'),
-    array('ifDuplex' => 'halfDuplex', 'ifSpeed' => '10000000', 'label' => 'hd10'),
-    array('ifDuplex' => 'fullDuplex', 'ifSpeed' => '10000000', 'label' => 'fd10'),
-    array('ifDuplex' => 'halfDuplex', 'ifSpeed' => '100000000', 'label' => 'hd100'),
-    array('ifDuplex' => 'fullDuplex', 'ifSpeed' => '100000000', 'label' => 'fd100'),
-    array('ifDuplex' => 'fullDuplex', 'ifSpeed' => '1000000000', 'label' => 'fd1000'),
-    array('ifDuplex' => 'fullDuplex', 'ifSpeed' => '10000000000', 'label' => 'fd10000')
+    0 => array('ifDuplex' => null,'ifSpeed' => 0, 'label'=> 'linkdown'),
+    1 => array('ifDuplex' => 'halfDuplex', 'ifSpeed' => '10000000', 'label' => 'hd10'),
+    2 => array('ifDuplex' => 'fullDuplex', 'ifSpeed' => '10000000', 'label' => 'fd10'),
+    3 => array('ifDuplex' => 'halfDuplex', 'ifSpeed' => '100000000', 'label' => 'hd100'),
+    4 => array('ifDuplex' => 'fullDuplex', 'ifSpeed' => '100000000', 'label' => 'fd100'),
+    5 => array('ifDuplex' => 'fullDuplex', 'ifSpeed' => '1000000000', 'label' => 'fd1000'),
+    6 => array('ifDuplex' => 'fullDuplex', 'ifSpeed' => '10000000000', 'label' => 'fd10000')
 );
 
 
@@ -64,15 +64,16 @@ foreach ($packetlogic_stats as $index => $port) {
         foreach ($required as $ifEntry => $IfxStat) {
             $procera_port[$ifEntry] = $packetlogic_stats[$index][$cType['type'].$IfxStat];
         }
+        $negotiatedMedia = $packetlogic_stats[$index][$cType['type']."NegotiatedMedia"];
         $procera_port['ifName'] = $packetlogic_stats[$index]['channelName']. ' '.$cType['name'];
         $procera_port['ifDescr'] = $packetlogic_stats[$index]['channelName']. ' '.$cType['name'];
-        $procera_port['ifConnectorPresent'] = ($packetlogic_stats[$index][$cType['type']."NegotiatedMedia"] != '0' ? "true" : "false");
-        $procera_port['ifOperStatus'] = ($packetlogic_stats[$index]['channelActive'] == true ? "up" : "down");
-        $procera_port['ifSpeed'] = $mediaType[$packetlogic_stats[$index][$cType['type']."NegotiatedMedia"]]['ifSpeed'];
-        $procera_port['ifDuplex'] = $mediaType[$packetlogic_stats[$index][$cType['type']."NegotiatedMedia"]]['ifDuplex'];
+        $procera_port['ifConnectorPresent'] = ($negotiatedMedia != '0' ? "true" : "false");
+        $procera_port['ifOperStatus'] = ($packetlogic_stats[$index]['channelActive'] == 1 ? "up" : "down");
+        $procera_port['ifSpeed'] = $mediaType[$negotiatedMedia]['ifSpeed'];
+        $procera_port['ifDuplex'] = $mediaType[$negotiatedMedia]['ifDuplex'];
         $procera_port['ifType'] = 'ethernetCsmacd';
         array_push($port_stats, $procera_port);
     }
 }
 
-unset($channelTypes, $packetlogic_stats, $procera_port,$mediaType);
+unset($channelTypes, $packetlogic_stats, $procera_port, $mediaType, $negotiatedMedia);
