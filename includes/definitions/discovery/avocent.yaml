@@ -1,0 +1,22 @@
+mib: PM-MIB
+modules:
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: pmPowerMgmtPDUTableVoltageValue
+                    num_oid: .1.3.6.1.4.1.10418.17.2.5.3.1.70.
+                    descr: PDU
+                    index: 'pmPowerMgmtPDUTableVoltageValue.{{ $index }}'
+                -
+                    oid: pmPowerMgmtOutletsTable
+                    num_oid: .1.3.6.1.4.1.10418.17.2.5.5.1.70.
+                    value: pmPowerMgmtOutletsTableVoltageValue
+                    descr: pmPowerMgmtOutletsTableName
+                    index: 'pmPowerMgmtOutletsTableName.{{ $index }}'
+                -
+                    oid: pmPowerMgmtBanksTable
+                    num_oid: .1.3.6.1.4.1.10418.17.2.5.11.1.70.
+                    value: pmPowerMgmtBanksTableVoltageValue
+                    descr: pmPowerMgmtBanksTableName
+                    index: 'pmPowerMgmtBanksTableVoltageValue.{{ $index }}'
