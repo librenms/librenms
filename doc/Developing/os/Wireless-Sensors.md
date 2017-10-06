@@ -29,12 +29,13 @@ Your new OS class should extend LibreNMS\OS and implement the interfaces for the
 ```php
 namespace LibreNMS\OS;
 
+use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\OS;
 
 class Airos extends OS implements WirelessClientsDiscovery
 {
-    public functon discoverWirelessClients()
+    public function discoverWirelessClients()
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.5.1.15.1'; //UBNT-AirMAX-MIB::ubntWlStatStaCount.1
         return array(
