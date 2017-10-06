@@ -103,9 +103,9 @@ if (!$nototal) {
     $rrd_options .= ' CDEF:outbits=outoctets,8,*';
     $rrd_options .= ' CDEF:doutbits=doutoctets,8,*';
 
-    $rrd_options .= ' VDEF:95thin=inbits,95,PERCENT';
-    $rrd_options .= ' VDEF:95thout=outbits,95,PERCENT';
-    $rrd_options .= ' CDEF:d95thoutn=doutbits,-1,* VDEF:d95thoutn95=d95thoutn,95,PERCENT CDEF:d95thoutn95n=doutbits,doutbits,-,d95thoutn95,-1,*,+ VDEF:d95thout=d95thoutn95n,FIRST';
+    $rrd_options .= ' VDEF:percentile_in=inbits,'.$config['percentile_value'].',PERCENT';
+    $rrd_options .= ' VDEF:percentile_out=outbits,'.$config['percentile_value'].',PERCENT';
+    $rrd_options .= ' CDEF:dpercentile_outn=doutbits,-1,* VDEF:dpercentile_outnp=dpercentile_outn,'.$config['percentile_value'].',PERCENT CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,-1,*,+ VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
 
     $rrd_options .= ' VDEF:totin=inoctets,TOTAL';
     $rrd_options .= ' VDEF:totout=outoctets,TOTAL';

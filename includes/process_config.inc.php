@@ -38,3 +38,7 @@ if (empty($config['rrdtool_version'])) {
 if ($config['secure_cookies']) {
     ini_set('session.cookie_secure', 1);
 }
+
+if ($config['rrdgraph_real_95th']) {
+    $config['rrdgraph_real_percentile'] = $config['rrdgraph_real_95th'];
+}
