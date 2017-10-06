@@ -1,0 +1,1988 @@
+SESSION-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      RADWARE
+--             This Private MIB supports the WSD/CSD/FP/LP
+-- Version:    2.9
+-- Date:       5/13/2003
+-- By:         RMA (Radware MIB Authority)
+-- E-mail:     US:            support@radware.com
+--             International: support_int@radware.com
+--
+IMPORTS
+       Ipv6Address 
+              FROM IPV6-TC
+       NetworkAddress,
+       IpAddress,
+       Counter,
+       Gauge,
+       enterprises
+              FROM RFC1155-SMI
+       Integer32
+              FROM SNMPv2-SMI
+       OBJECT-TYPE
+              FROM RFC-1212
+       DisplayString,
+       PhysAddress,
+       ipAddrEntry
+              FROM RFC1213-MIB
+       TRAP-TYPE
+              FROM RFC-1215
+       rsSESSION,
+       rndErrorDesc,
+       rndErrorSeverity,
+       TruthValue,
+       RowStatus,
+       FeatureStatus
+              FROM RADWARE-MIB;
+
+    NetNumber ::=  OCTET STRING (SIZE(4))
+
+-- Some MIB compilers require that the following 7 lines which define the path
+-- to RND MIB are commented out:
+
+-- mib            OBJECT IDENTIFIER ::= { mgmt 1  }
+-- directory      OBJECT IDENTIFIER ::= { internet 1  }
+-- experimental   OBJECT IDENTIFIER ::= { internet 3  }
+-- private        OBJECT IDENTIFIER ::= { internet 4  }
+-- enterprises    OBJECT IDENTIFIER ::= { private 1  }
+
+rsSESSIONSessionTableStatus OBJECT-TYPE
+    SYNTAX FeatureStatus
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Whether the session table is active or not."
+    ::= {rsSESSION  1}
+
+rsSESSIONSessionTableLookupMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        fullLayer4(1),
+        fullLayer3(2),
+        destLayer4Port(3)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The lookup mode of the session table."
+    ::= {rsSESSION 2}
+
+rsSESSIONRemoveEntryAtSessionEnd OBJECT-TYPE
+    SYNTAX FeatureStatus
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Whether the entries will be deleted when the session is over."
+    ::= {rsSESSION 3}
+
+rsSESSIONSynProtectionStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2),
+		standby(3)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The operation status of the SYN flood protection mechanism."
+    ::= {rsSESSION 4}
+
+rsSESSIONSynProtectionTimeout OBJECT-TYPE
+    SYNTAX INTEGER (0..10)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The timeout, in seconds, before aging a session entry that hasn't completed the TCP handshake."
+    DEFVAL { 5 }
+    ::= {rsSESSION 5}
+
+rsSESSIONSynProtectionActivationBound OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "SYN attack report threshold. If percentage of incomplete sessions for a protected destination (enable or triggered policy) 
+		is above this ratio - the attack will be reported periodically."
+    DEFVAL { 30 }
+    ::= {rsSESSION 6}
+
+rsSESSIONSynProtectionDeactivationBound OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Old - not in use"
+    ::= {rsSESSION 7}
+
+rsSESSIONSynProtectionTrackingTime OBJECT-TYPE
+    SYNTAX INTEGER (1..10)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Terminate SYN protection if SYN threshold is passed for more than this defined time interval (in seconds)."
+    DEFVAL { 5 }
+    ::= {rsSESSION 8}
+
+rsSESSIONSynProtectionMinSynForTrigger OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Old - not in use."
+    ::= {rsSESSION 9}
+
+rsSESSIONSynTriggerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsSESSIONSynTriggerEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "OLD Table containing the SYN protection triggers."
+    ::=  {rsSESSION 10}
+
+rsSESSIONSynTriggerEntry OBJECT-TYPE
+    SYNTAX RsSESSIONSynTriggerEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "OLD The row definition for this table. Each trigger protects all communication 
+	    to a specific dest IP, det L$ port and from a specific RX port"
+    INDEX {rsSESSIONSynTriggerIP,
+	   rsSESSIONSynTriggerPort,
+	   rsSESSIONSynTriggerRxport}
+    ::=  { rsSESSIONSynTriggerTable 1 }
+
+RsSESSIONSynTriggerEntry ::= SEQUENCE {
+    rsSESSIONSynTriggerIP IpAddress,
+    rsSESSIONSynTriggerPort INTEGER,
+    rsSESSIONSynTriggerRxport INTEGER,
+    rsSESSIONSynTriggerTime INTEGER,
+    rsSESSIONSynTriggerLastSecSYN INTEGER,
+    rsSESSIONSynTriggerLastSecRqst INTEGER,
+    rsSESSIONSynTriggerAvrgSYN INTEGER,
+    rsSESSIONSynTriggerAvrgRqst INTEGER
+}
+
+rsSESSIONSynTriggerIP OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "OLD SYN trigger destination IP address"
+    DEFVAL  { 0 }
+    ::=  { rsSESSIONSynTriggerEntry 1 }
+
+rsSESSIONSynTriggerPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "OLD SYN trigger destination L4-port"
+    DEFVAL  { 0 }
+    ::=  { rsSESSIONSynTriggerEntry 2 }
+
+rsSESSIONSynTriggerRxport OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "OLD SYN trigger RX physical port"
+    DEFVAL  { 0 }
+    ::=  { rsSESSIONSynTriggerEntry 3 }
+
+rsSESSIONSynTriggerTime OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "OLD Number of seconds since this trigger was created"
+    DEFVAL  { 0 }
+    ::=  { rsSESSIONSynTriggerEntry 4 }
+
+rsSESSIONSynTriggerLastSecSYN OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "OLD SYN trigger number of SYN packets in the last second"
+    DEFVAL  { 0 }
+    ::=  { rsSESSIONSynTriggerEntry 5 }
+
+rsSESSIONSynTriggerLastSecRqst OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "OLD SYN trigger number of verified request packets in the last second"
+    DEFVAL  { 0 }
+    ::=  { rsSESSIONSynTriggerEntry 6 }
+
+rsSESSIONSynTriggerAvrgSYN OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "OLD SYN trigger average number of SYN packets per second since the trigger was activated"
+    DEFVAL  { 0 }
+    ::=  { rsSESSIONSynTriggerEntry 7 }
+
+rsSESSIONSynTriggerAvrgRqst OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "OLD SYN trigger average number of verified request packets per second since the trigger was activated"
+    DEFVAL  { 0 }
+    ::=  { rsSESSIONSynTriggerEntry 8 }
+
+rsSESSIONTuning OBJECT IDENTIFIER ::= { rsSESSION 11 }
+
+rsSESSIONSynProtectionTuning OBJECT IDENTIFIER ::= { rsSESSIONTuning 1 }
+
+rsSESSIONSynProtectionEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum number of syn protection entries."
+    ::= { rsSESSIONSynProtectionTuning 1 }
+
+rsSESSIONSynProtectionEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximum number of of syn protection entries."
+    ::=  { rsSESSIONSynProtectionTuning 2 }
+
+rsSESSIONSynProtectionRqstsTuning OBJECT IDENTIFIER ::= { rsSESSIONTuning 2 }
+
+rsSESSIONSynProtectionRqstsEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum number of syn protection requests entries."
+    ::= { rsSESSIONSynProtectionRqstsTuning 1 }
+
+rsSESSIONSynProtectionRqstsEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximum number of syn protection requests entries."
+    ::=  { rsSESSIONSynProtectionRqstsTuning 2 }
+
+rsSESSIONSynProtectionTriggerTuning OBJECT IDENTIFIER ::= { rsSESSIONTuning 3 }
+
+rsSESSIONSynProtectionTriggerEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum number of syn protection triggers (destination IPs and ports)."
+    ::= { rsSESSIONSynProtectionTriggerTuning 1 }
+
+rsSESSIONSynProtectionTriggerEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximum number of syn protection triggers (destination IPs and ports)."
+    ::=  { rsSESSIONSynProtectionTriggerTuning 2 }
+
+rsSESSIONSynProtectionPolicyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsSESSIONSynProtectionPolicyEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing the SYN protection triggers policies."
+    ::=  {rsSESSION 12}
+
+rsSESSIONSynProtectionPolicyEntry OBJECT-TYPE
+    SYNTAX RsSESSIONSynProtectionPolicyEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "The row definition for this table. Each trigger policy defines the way the matching 
+	    sessions should be protected against SYN flood"
+    INDEX {rsSESSIONSynTriggerPolicyName}
+    ::=  { rsSESSIONSynProtectionPolicyTable 1 }
+
+RsSESSIONSynProtectionPolicyEntry ::= SEQUENCE {
+    rsSESSIONSynTriggerPolicyName DisplayString,
+    rsSESSIONSynTriggerPolicyIndex INTEGER,
+    rsSESSIONSynTriggerPolicyDescription DisplayString,
+    rsSESSIONSynTriggerPolicyDestination DisplayString,
+    rsSESSIONSynTriggerPolicyPhysicalPortGroup DisplayString,
+    rsSESSIONSynTriggerPolicyService DisplayString,
+    rsSESSIONSynTriggerPolicyProtectionMode INTEGER,
+    rsSESSIONSynTriggerPolicyOperationalStatus INTEGER,
+    rsSESSIONSynTriggerPolicyStatus RowStatus,
+	rsSESSIONSynTriggerPolicyVerificationType INTEGER,
+	rsSESSIONSynTriggerPolicyActivationThreshold INTEGER,
+	rsSESSIONSynTriggerPolicyDeactivationThreshold INTEGER,
+	rsSESSIONSynTriggerPolicyCountStatistics FeatureStatus
+}
+
+rsSESSIONSynTriggerPolicyName OBJECT-TYPE
+    SYNTAX DisplayString  (SIZE(0..19))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger policy name"
+    ::=  { rsSESSIONSynProtectionPolicyEntry 1 }
+
+rsSESSIONSynTriggerPolicyIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger policy index"
+    ::=  { rsSESSIONSynProtectionPolicyEntry 2 }
+
+rsSESSIONSynTriggerPolicyDescription OBJECT-TYPE
+    SYNTAX DisplayString  (SIZE(0..19))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The description of this policy. "
+    ::=  { rsSESSIONSynProtectionPolicyEntry 3 }
+	
+rsSESSIONSynTriggerPolicyDestination OBJECT-TYPE
+    SYNTAX DisplayString  (SIZE(0..46))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The destination address / range of address for the packet, the name is
+      defined in the Objects table or can be an IP address."
+    DEFVAL { "any" }
+    ::=  { rsSESSIONSynProtectionPolicyEntry 4 }
+
+rsSESSIONSynTriggerPolicyPhysicalPortGroup OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..29))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "The name of the physical port group for this policy."
+	::=  { rsSESSIONSynProtectionPolicyEntry 5 }
+
+rsSESSIONSynTriggerPolicyService OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..29))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "The name of the service (basic filter) for this policy."
+	::=  { rsSESSIONSynProtectionPolicyEntry 6 }
+
+rsSESSIONSynTriggerPolicyProtectionMode OBJECT-TYPE
+    SYNTAX INTEGER {
+		enabled(1),
+        triggered(2),
+        disabled(3)
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "The protection mode of this policy."
+    DEFVAL { 2 }
+	::=  { rsSESSIONSynProtectionPolicyEntry 7 }
+
+rsSESSIONSynTriggerPolicyOperationalStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        active (1),
+        inactive (2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates if the policy is active or inactive."
+    DEFVAL { 1 }
+	::=  { rsSESSIONSynProtectionPolicyEntry 8 }
+
+rsSESSIONSynTriggerPolicyStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry.
+        Used to delete an entry of this table."
+    ::=  { rsSESSIONSynProtectionPolicyEntry 9 }
+
+rsSESSIONSynTriggerPolicyVerificationType OBJECT-TYPE
+    SYNTAX INTEGER {
+        ack (1),
+        request (2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates if the handshake with the server should start after clients 
+	    first Ack packet or after the first request."
+    DEFVAL { 1 }
+    ::=  { rsSESSIONSynProtectionPolicyEntry 10 }
+
+rsSESSIONSynTriggerPolicyActivationThreshold OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "Maximum SYNs per destination (IP + L4 port) per second above which the traffic is 
+	   considered as an attack." 
+    DEFVAL { 2500 }
+    ::=  { rsSESSIONSynProtectionPolicyEntry 11 }
+
+rsSESSIONSynTriggerPolicyDeactivationThreshold OBJECT-TYPE
+    SYNTAX INTEGER (0..2147483647)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "Minimum SYNs per destination (IP + L4 port) per second below which the attack is 
+	   considered to be over."
+    DEFVAL { 1500 }
+    ::=  { rsSESSIONSynProtectionPolicyEntry 12 }
+
+rsSESSIONSynTriggerPolicyCountStatistics OBJECT-TYPE
+    SYNTAX FeatureStatus
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "If flag is set, statistics for the destinations of this policy will be counted."
+    DEFVAL { 1 }
+    ::=  { rsSESSIONSynProtectionPolicyEntry 13 }
+
+rsSESSIONSynProtectionPolicyDummy OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Dummy entry after syn protection policies table."
+    ::=  {rsSESSION  13}
+    
+rsSESSIONSynProtectionAttackAgingTime OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The number of seconds after IDS reported SYN attack to the session table becomes inactive,
+		 until the session table reports the end of the attack."
+    ::= {rsSESSION 14}
+
+rsSESSIONSendResetToServer OBJECT-TYPE
+    SYNTAX FeatureStatus
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Whether to send reset to server when session table entry was aged because of short syn timeout."
+    ::= {rsSESSION 15}
+
+rsSESSIONSynProtectionGlobalStatisticsStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Ols Mib - not in use"
+    ::= {rsSESSION 16}
+
+rsSESSIONL3SynFloodReportTuning OBJECT IDENTIFIER ::= { rsSESSIONTuning 6 }
+
+rsSESSIONL3SynFloodReportEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum number of entries for keeping track of application security reporting SYN flood
+	   attacks for Session Table in Layer 3."
+    ::= { rsSESSIONL3SynFloodReportTuning 1 }
+
+rsSESSIONL3SynFloodReportEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximum number of entries for keeping track of application security reporting SYN flood
+	   attacks for Session Table in Layer 3."
+    ::=  { rsSESSIONL3SynFloodReportTuning 2 }
+
+rsSESSIONTableSynFloodTriggersTuning OBJECT IDENTIFIER ::= { rsSESSIONTuning 7 }
+
+rsSESSIONTableSynFloodTriggersEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum number of entries for counting new tcp sessions for detecting syn flood attacks 
+	   and creating triggers."
+    ::= { rsSESSIONTableSynFloodTriggersTuning 1 }
+
+rsSESSIONTableSynFloodTriggersEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximum number of entries for counting new tcp sessions for detecting syn flood attacks 
+	   and creating triggers."
+    ::=  { rsSESSIONTableSynFloodTriggersTuning 2 }
+
+rsSESSIONSessionAgingTime OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The aging time for the session table."
+    DEFVAL { 100 }
+    ::= {rsSESSION 17}
+
+rsSESSIONSessionTuning OBJECT IDENTIFIER ::= { rsSESSIONTuning 8 }
+
+rsSESSIONSessionEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum number of session table."
+    ::= { rsSESSIONSessionTuning 1 }
+
+rsSESSIONSessionEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximum maximum number of session table entries."
+    ::=  { rsSESSIONSessionTuning 2 }
+
+rsSESSIONSessionEntriesNum OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The number of used entries in the session table."
+    ::= {rsSESSION 18}
+
+rsSESSIONSessionMaxDisplayEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Maximum number of entries to display."
+    DEFVAL { 100 }
+    ::= {rsSESSION 19}
+
+rsSESSIONDisplayFiltersTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsSESSIONDisplayFilterEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing the filters for queries on the session table."
+    ::=  {rsSESSION 20}
+
+rsSESSIONDisplayFilterEntry OBJECT-TYPE
+    SYNTAX RsSESSIONDisplayFilterEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "The row definition for this table. Each filter contains the condition for displaying 
+	    session table entries."
+    INDEX {rsSESSIONDisplayFilterName}
+    ::=  { rsSESSIONDisplayFiltersTable 1 }
+
+RsSESSIONDisplayFilterEntry ::= SEQUENCE {
+    rsSESSIONDisplayFilterName DisplayString,
+    rsSESSIONDisplayFilterSrcIP IpAddress,
+    rsSESSIONDisplayFilterSrcIPMask IpAddress,
+    rsSESSIONDisplayFilterDstIP IpAddress,
+    rsSESSIONDisplayFilterDstIPMask IpAddress,
+    rsSESSIONDisplayFilterSrcPort INTEGER,
+    rsSESSIONDisplayFilterDstPort INTEGER,
+    rsSESSIONDisplayFilterPhysicalPort INTEGER,
+    rsSESSIONDisplayFilterStatus RowStatus
+}
+
+rsSESSIONDisplayFilterName OBJECT-TYPE
+    SYNTAX DisplayString  (SIZE(0..19))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Display filter name"
+    ::=  { rsSESSIONDisplayFilterEntry 1 }
+
+rsSESSIONDisplayFilterSrcIP OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Display filter source IP"
+    DEFVAL  { 0 }
+    ::=  { rsSESSIONDisplayFilterEntry 2 }
+
+rsSESSIONDisplayFilterSrcIPMask OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Display filter source IP mask"
+    DEFVAL  { 0 }
+    ::=  { rsSESSIONDisplayFilterEntry 3 }
+
+rsSESSIONDisplayFilterDstIP OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Display filter destination IP"
+    DEFVAL  { 0 }
+    ::=  { rsSESSIONDisplayFilterEntry 4 }
+
+rsSESSIONDisplayFilterDstIPMask OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Display filter destination IP mask"
+    DEFVAL  { 0 }
+    ::=  { rsSESSIONDisplayFilterEntry 5 }
+
+rsSESSIONDisplayFilterSrcPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Display filter Application (L4) Src port"
+    DEFVAL  { 0 }
+    ::=  { rsSESSIONDisplayFilterEntry 6 }
+
+rsSESSIONDisplayFilterDstPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Display filter Application (L4) Dest port"
+    DEFVAL  { 0 }
+    ::=  { rsSESSIONDisplayFilterEntry 7 }
+
+rsSESSIONDisplayFilterPhysicalPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Display filter phisical port"
+    DEFVAL  { 65535 }
+    ::=  { rsSESSIONDisplayFilterEntry 8 }
+
+rsSESSIONDisplayFilterStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry.
+        Used to delete and update an entry of this table."
+    ::=  { rsSESSIONDisplayFilterEntry 9 }
+
+rsSESSIONSessionTableEntriesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsSESSIONSessionTableEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing the query result of the session table."
+    ::=  {rsSESSION 21}
+
+rsSESSIONSessionTableEntry OBJECT-TYPE
+    SYNTAX RsSESSIONSessionTableEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "The row definition for this table. Each entry contains one session entry."
+    INDEX {rsSESSIONSessionTableEntryIndex}
+    ::=  { rsSESSIONSessionTableEntriesTable 1 }
+
+RsSESSIONSessionTableEntry ::= SEQUENCE {
+    rsSESSIONSessionTableEntryIndex INTEGER,
+    rsSESSIONSessionTableEntrySrcIP IpAddress,
+    rsSESSIONSessionTableEntryDstIP IpAddress,
+    rsSESSIONSessionTableEntrySrcPort INTEGER,
+    rsSESSIONSessionTableEntryDstPort INTEGER,
+    rsSESSIONSessionTableEntryPhysicalPort INTEGER,
+    rsSESSIONSessionTableEntryLifetime INTEGER,
+    rsSESSIONSessionTableEntryAgingType INTEGER,
+    rsSESSIONSessionTableEntrySYNData DisplayString,
+    rsSESSIONSessionTableEntryRplyPhysicalPort INTEGER,
+    rsSESSIONSessionTableEntryIPProtocol INTEGER
+}
+
+rsSESSIONSessionTableEntryIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The index of the entry"
+    ::=  { rsSESSIONSessionTableEntry 1 }
+
+rsSESSIONSessionTableEntrySrcIP OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Source IP of the entry"
+    ::=  { rsSESSIONSessionTableEntry 2 }
+
+rsSESSIONSessionTableEntryDstIP OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Destination IP of the entry"
+    ::=  { rsSESSIONSessionTableEntry 3 }
+
+rsSESSIONSessionTableEntrySrcPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Source L4 Port of the entry"
+    ::=  { rsSESSIONSessionTableEntry 4 }
+
+rsSESSIONSessionTableEntryDstPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Destination L4 Port of the entry"
+    ::=  { rsSESSIONSessionTableEntry 5 }
+
+rsSESSIONSessionTableEntryPhysicalPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Phisical Port of the entry"
+    ::=  { rsSESSIONSessionTableEntry 6 }
+
+rsSESSIONSessionTableEntryLifetime OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Lifetime of the entry"
+    ::=  { rsSESSIONSessionTableEntry 7 }
+
+rsSESSIONSessionTableEntryAgingType OBJECT-TYPE
+    SYNTAX INTEGER {
+        default(1),
+        app(2),
+	syn(3),
+	end(4),
+	unknown(5),
+	delete(6),
+	short(7)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Aging Type of the entry"
+    ::=  { rsSESSIONSessionTableEntry 8 }
+
+rsSESSIONSessionTableEntrySYNData OBJECT-TYPE
+    SYNTAX DisplayString  (SIZE(0..19))
+	ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The SYN protection data of the entry"
+    ::=  { rsSESSIONSessionTableEntry 9 }
+
+rsSESSIONSessionTableEntryRplyPhysicalPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Phisical Port of the entry (of reply packets)"
+    ::=  { rsSESSIONSessionTableEntry 10 }
+
+rsSESSIONSessionTableEntryIPProtocol OBJECT-TYPE
+    SYNTAX INTEGER {
+        ip(1),
+        tcp(2),
+        udp(3),
+        icmp(4),
+        gre(5),
+        icmpv6(6)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The IP Protocol of the entry (IP for unsupported protcols)"
+    ::=  { rsSESSIONSessionTableEntry 11 }
+
+rsSESSIONSessionTableEntryDummy OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Dummy entry after session table entries table."
+    ::=  {rsSESSION 22}
+
+rsSESSIONSynProtectionPolicyTuning OBJECT IDENTIFIER ::= { rsSESSIONTuning 4 }
+
+rsSESSIONSynProtectionPolicyEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum number of syn protection policies."
+    ::= { rsSESSIONSynProtectionPolicyTuning 1 }
+
+rsSESSIONSynProtectionPolicyEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximum number of syn protection policies."
+    ::=  { rsSESSIONSynProtectionPolicyTuning 2 }
+
+rsSESSIONPasvProtocolsTuning OBJECT IDENTIFIER ::= { rsSESSIONTuning 5 }
+
+rsSESSIONPasvProtocolsEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum number of passive protocols port commands entries."
+    ::= { rsSESSIONPasvProtocolsTuning 1 }
+
+rsSESSIONPasvProtocolsEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximum number of passive protocols port commands entries."
+    ::=  { rsSESSIONPasvProtocolsTuning 2 }
+
+rsSESSIONAckReflectionProtectionMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        reportOnly(2),
+        disable(3)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Whether the the ACK reflection protection is enabled or not."
+    ::= {rsSESSION  23}
+
+rsSESSIONAckReflectionSamplingPerSecond OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Maximum number of sampled SYN packets per second for ACK reflection protection."
+    ::= {rsSESSION 24}
+
+rsSESSIONAckReflectionDropThreshold OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Maximum number of SYN cookie sent per SrcIP per second."
+    ::= {rsSESSION 25}
+
+rsSESSIONSynProtectionMaxTrapsPerTimeUnit OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Maximum number of SYN Flood and ACK reflection traps per defined time unit."
+    ::= {rsSESSION 26}
+
+rsSESSIONSynProtectionTrapsTimeUnit OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "User defined time unit for limiting traps."
+    ::= {rsSESSION 27}
+
+rsSESSIONAckReflectionTableTuning OBJECT IDENTIFIER ::= { rsSESSIONTuning 9 }
+
+rsSESSIONAckReflectionTableEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum number of ack reflection src IP entries."
+    ::= { rsSESSIONAckReflectionTableTuning 1 }
+
+rsSESSIONAckReflectionTableEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximum number of ack reflection src IP entries."
+    ::=  { rsSESSIONAckReflectionTableTuning 2 }
+
+rsSESSIONNewSynTriggerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsSESSIONNewSynTriggerEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing the SYN protection triggers. Table is obsolete!!
+       Use rsSESSIONSynActivationTable instead."
+    ::=  {rsSESSION 28}
+
+rsSESSIONNewSynTriggerEntry OBJECT-TYPE
+    SYNTAX RsSESSIONNewSynTriggerEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "The row definition for this table. Each trigger protects all communication 
+	    to a specific dest IP, dest L4 port and from a specific RX port"
+    INDEX {rsSESSIONNewSynTriggerType,
+	   rsSESSIONNewSynTriggerIP,
+	   rsSESSIONNewSynTriggerPort,
+	   rsSESSIONNewSynTriggerRxport}
+    ::=  { rsSESSIONNewSynTriggerTable 1 }
+
+RsSESSIONNewSynTriggerEntry ::= SEQUENCE {
+    rsSESSIONNewSynTriggerType INTEGER,
+    rsSESSIONNewSynTriggerIP IpAddress,
+    rsSESSIONNewSynTriggerPort INTEGER,
+    rsSESSIONNewSynTriggerRxport INTEGER,
+    rsSESSIONNewSynTriggerTime INTEGER,
+    rsSESSIONNewSynTriggerLastSecSYN INTEGER,
+    rsSESSIONNewSynTriggerLastSecRqst INTEGER,
+    rsSESSIONNewSynTriggerAvrgSYN INTEGER,
+    rsSESSIONNewSynTriggerAvrgRqst INTEGER,
+    rsSESSIONNewSynTriggerTotalSYN DisplayString,
+    rsSESSIONNewSynTriggerTotalDropped DisplayString
+}
+
+rsSESSIONNewSynTriggerType OBJECT-TYPE
+    SYNTAX INTEGER {
+        synProtectionTrigger(1),
+        synProtectionEnable(2),
+        synProtectionTotal(3),
+        ackReflection(4)
+   }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The type of trigger - SYN flood protection or ACK reflection protection."
+    ::=  { rsSESSIONNewSynTriggerEntry 1 }
+
+rsSESSIONNewSynTriggerIP OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger destination IP address"
+    ::=  { rsSESSIONNewSynTriggerEntry 2 }
+
+rsSESSIONNewSynTriggerPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger destination L4-port"
+    ::=  { rsSESSIONNewSynTriggerEntry 3 }
+
+rsSESSIONNewSynTriggerRxport OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger RX physical port"
+    ::=  { rsSESSIONNewSynTriggerEntry 4 }
+
+rsSESSIONNewSynTriggerTime OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of seconds since this trigger was created"
+    ::=  { rsSESSIONNewSynTriggerEntry 5 }
+
+rsSESSIONNewSynTriggerLastSecSYN OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger number of SYN packets in the last second"
+    ::=  { rsSESSIONNewSynTriggerEntry 6 }
+
+rsSESSIONNewSynTriggerLastSecRqst OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger number of verified request packets in the last second"
+    ::=  { rsSESSIONNewSynTriggerEntry 7 }
+
+rsSESSIONNewSynTriggerAvrgSYN OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger average number of SYN packets per second since the trigger was activated"
+    ::=  { rsSESSIONNewSynTriggerEntry 8 }
+
+rsSESSIONNewSynTriggerAvrgRqst OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger average number of verified request packets per second since the trigger was activated"
+    ::=  { rsSESSIONNewSynTriggerEntry 9 }
+
+rsSESSIONNewSynTriggerTotalSYN OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger total number of SYN packets since the trigger was activated."
+    ::=  { rsSESSIONNewSynTriggerEntry 10 }
+
+rsSESSIONNewSynTriggerTotalDropped OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger total number of dropped connections (unverified sessions) since the trigger was activated."
+    ::=  { rsSESSIONNewSynTriggerEntry 11 }
+
+rsSESSIONSynStatsMaxDestPerPolicy OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+		"Maximum number of destination (IP + L4 port) per policy that we will keep statistics for."
+    DEFVAL { 5 }
+    ::= {rsSESSION 29}
+
+rsSESSIONSynStatsTimePeriod OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+		"Number of seconds for calculating average values for SYN protection statistics."
+    DEFVAL { 60 }	
+    ::= {rsSESSION 30}
+
+rsSESSIONSynStatsDisplayPolicyName OBJECT-TYPE
+    SYNTAX DisplayString 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+		"Name of the policy the user wish to display statistics for (if empty - all statistics will be displayed)."
+    ::= {rsSESSION 31}
+
+rsSESSIONSynStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsSESSIONSynStatisticsEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table keeping statistics for SYN protection policies. Table is obsolete!!
+       Use rsSESSIONSynProtectionStatisticsTable instead."
+    ::=  {rsSESSION 32}
+
+rsSESSIONSynStatisticsEntry OBJECT-TYPE
+    SYNTAX RsSESSIONSynStatisticsEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "The row definition for this table. Each entry holds long term statistics of SYN one destination." 
+    INDEX {rsSESSIONSynStatisticsPolicy,
+	   rsSESSIONSynStatisticsIP,
+	   rsSESSIONSynStatisticsPort,
+	   rsSESSIONSynStatisticsRxPort}
+    ::=  { rsSESSIONSynStatisticsTable 1 }
+
+RsSESSIONSynStatisticsEntry ::= SEQUENCE {
+    rsSESSIONSynStatisticsPolicy DisplayString,
+    rsSESSIONSynStatisticsIP IpAddress,
+    rsSESSIONSynStatisticsPort INTEGER,
+    rsSESSIONSynStatisticsRxPort INTEGER,
+    rsSESSIONSynStatisticsCurrentAttackStatus INTEGER,
+    rsSESSIONSynStatisticsLastSecSynCount INTEGER,
+    rsSESSIONSynStatisticsLastSecGoodCount INTEGER,
+    rsSESSIONSynStatisticsAverageSynCount INTEGER,
+    rsSESSIONSynStatisticsAverageGoodCount INTEGER,
+    rsSESSIONSynStatisticsPeakSynCount INTEGER,
+    rsSESSIONSynStatisticsPeakGoodCount INTEGER,
+    rsSESSIONSynStatisticsActivityTime INTEGER,
+    rsSESSIONSynStatisticsLastAttackStartTime DisplayString,
+    rsSESSIONSynStatisticsLastAttackTermTime DisplayString
+}
+
+rsSESSIONSynStatisticsPolicy OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The name of the SYN protection policy of this statistics entry."
+    ::=  { rsSESSIONSynStatisticsEntry 1 }
+
+rsSESSIONSynStatisticsIP OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The destination IP of this statistics entry."
+    ::=  { rsSESSIONSynStatisticsEntry 2 }
+
+rsSESSIONSynStatisticsPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The destination L4 port of this statistics entry."
+    ::=  { rsSESSIONSynStatisticsEntry 3 }
+
+rsSESSIONSynStatisticsRxPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The rx port of this statistics entry."
+    ::=  { rsSESSIONSynStatisticsEntry 4 }
+
+rsSESSIONSynStatisticsCurrentAttackStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        protectedUnderAttack(1),
+        protectedNoAttack(2),
+        monitorNoAttack(3),
+        unprotected(4)
+	}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Current attack status of this entry"
+    ::=  { rsSESSIONSynStatisticsEntry 5 }
+
+rsSESSIONSynStatisticsLastSecSynCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Number of new SYN packets matching this entry last second"
+    ::=  { rsSESSIONSynStatisticsEntry 6 }
+
+rsSESSIONSynStatisticsLastSecGoodCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Number of new good sessions matching this entry last second"
+    ::=  { rsSESSIONSynStatisticsEntry 7 }
+
+rsSESSIONSynStatisticsAverageSynCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Average number of new SYN packets matching this entry last time period"
+    ::=  { rsSESSIONSynStatisticsEntry 8 }
+
+rsSESSIONSynStatisticsAverageGoodCount OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Average number of new good sessions matching this entry last time period"
+    ::=  { rsSESSIONSynStatisticsEntry 9 }
+
+rsSESSIONSynStatisticsPeakSynCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Peak value of new SYN packets per second matching this entry"
+    ::=  { rsSESSIONSynStatisticsEntry 10 }
+
+rsSESSIONSynStatisticsPeakGoodCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "number of good sessions in the second of SYN peak value matching this entry"
+    ::=  { rsSESSIONSynStatisticsEntry 11 }
+
+rsSESSIONSynStatisticsActivityTime OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Number of seconds since this entry was created"
+    ::=  { rsSESSIONSynStatisticsEntry 12 }
+
+
+rsSESSIONSynStatisticsLastAttackStartTime OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The start time and date of last attack matching this entry."
+    ::=  { rsSESSIONSynStatisticsEntry 13 }
+
+
+rsSESSIONSynStatisticsLastAttackTermTime OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The termination time and date of last attack matching this entry."
+    ::=  { rsSESSIONSynStatisticsEntry 14 }
+
+rsSESSIONSynStatisticsTableDummy OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Dummy entry after syn protection statistics table."
+    ::=  {rsSESSION  33}
+
+rsSESSIONSynStatisticsReset OBJECT-TYPE
+    SYNTAX INTEGER {
+        resetStatistics(1)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION "Allows the application to reset SYN protection statistics"
+    ::= {rsSESSION 34}
+
+rsSESSIONSynProtectionStatsTuning OBJECT IDENTIFIER ::= { rsSESSIONTuning 10 }
+
+rsSESSIONSynProtectionStatsEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum number of syn protection statistics entries."
+    DEFVAL { 100 }
+    ::= { rsSESSIONSynProtectionStatsTuning 1 }
+
+rsSESSIONSynProtectionStatsEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximum number of of syn protection statistics entries."
+    DEFVAL { 100 }
+    ::=  { rsSESSIONSynProtectionStatsTuning 2 }
+
+rsSESSIONSessionResetsTableTuning OBJECT IDENTIFIER ::= { rsSESSIONTuning 11 }
+
+rsSESSIONSessionResetsEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum number of reset entries kept for the session table (to enable sending resets to servers for uncomplete tcp sessions)."
+    ::= { rsSESSIONSessionResetsTableTuning 1 }
+
+rsSESSIONSessionResetsEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximum number of reset entries kept for the session table (to enable sending resets to servers for uncomplete tcp sessions)."
+    ::=  { rsSESSIONSessionResetsTableTuning 2 }
+
+rsSESSIONH225AgingTime OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION "Special aging time for H225 TCP sessions (including H245 related sessions)."
+    DEFVAL { 20000 }
+    ::= {rsSESSION 35}
+
+rsSESSIONNoAgingMode OBJECT-TYPE
+    SYNTAX FeatureStatus
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION "If enabled - the session table will not be aged. Relevant only fot dest-port only lookup mode."
+    ::= {rsSESSION 36}
+
+rsSESSIONProtectionMode OBJECT-TYPE
+    SYNTAX FeatureStatus
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION "If enabled - the session table will protect itself against sessions overload."
+    ::= {rsSESSION 37}
+
+rsSESSIONProtectionShortLifetime OBJECT-TYPE
+    SYNTAX INTEGER (0..10)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "In session table protection mode - The timeout, in seconds, before aging a non-tcp session entry that didn't recive a second packt."
+    ::= {rsSESSION 38}
+
+rsSESSIONProtectionMaxSessions OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "In session table protection mode - The maximum number of new non-tcp sessions created in a second."
+    ::= {rsSESSION 39}
+
+rsSESSIONFiltersTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsSESSIONFilterEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing the filters for queries on the session table."
+    ::=  {rsSESSION 40}
+
+rsSESSIONFilterEntry OBJECT-TYPE
+    SYNTAX RsSESSIONFilterEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "The row definition for this table. Each filter contains the condition for displaying 
+	    session table entries."
+    INDEX {rsSESSIONFilterName}
+    ::=  { rsSESSIONFiltersTable 1 }
+
+RsSESSIONFilterEntry ::= SEQUENCE {
+    rsSESSIONFilterName DisplayString,
+    rsSESSIONFilterSrcIP Ipv6Address,
+    rsSESSIONFilterSrcIPMask Ipv6Address,
+    rsSESSIONFilterDstIP Ipv6Address,
+    rsSESSIONFilterDstIPMask Ipv6Address,
+    rsSESSIONFilterSrcPort INTEGER,
+    rsSESSIONFilterDstPort INTEGER,
+    rsSESSIONFilterPhysicalPort INTEGER,
+    rsSESSIONFilterStatus RowStatus
+}
+
+rsSESSIONFilterName OBJECT-TYPE
+    SYNTAX DisplayString  (SIZE(0..19))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Display filter name"
+    ::=  { rsSESSIONFilterEntry 1 }
+
+rsSESSIONFilterSrcIP OBJECT-TYPE
+    SYNTAX Ipv6Address
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Display filter source IP"
+    ::=  { rsSESSIONFilterEntry 2 }
+
+rsSESSIONFilterSrcIPMask OBJECT-TYPE
+    SYNTAX Ipv6Address
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Display filter source IP mask"
+    ::=  { rsSESSIONFilterEntry 3 }
+
+rsSESSIONFilterDstIP OBJECT-TYPE
+    SYNTAX Ipv6Address
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Display filter destination IP"
+    ::=  { rsSESSIONFilterEntry 4 }
+
+rsSESSIONFilterDstIPMask OBJECT-TYPE
+    SYNTAX Ipv6Address
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Display filter destination IP mask"
+    ::=  { rsSESSIONFilterEntry 5 }
+
+rsSESSIONFilterSrcPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Display filter Application (L4) Src port"
+    DEFVAL  { 0 }
+    ::=  { rsSESSIONFilterEntry 6 }
+
+rsSESSIONFilterDstPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Display filter Application (L4) Dest port"
+    DEFVAL  { 0 }
+    ::=  { rsSESSIONFilterEntry 7 }
+
+rsSESSIONFilterPhysicalPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Display filter phisical port"
+    DEFVAL  { 65535 }
+    ::=  { rsSESSIONFilterEntry 8 }
+
+rsSESSIONFilterStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry.
+        Used to delete and update an entry of this table."
+    ::=  { rsSESSIONFilterEntry 9 }
+
+rsSESSIONTableEntriesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsSESSIONTableEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing the query result of the session table."
+    ::=  {rsSESSION 41}
+
+rsSESSIONTableEntry OBJECT-TYPE
+    SYNTAX RsSESSIONTableEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "The row definition for this table. Each entry contains one session entry."
+    INDEX {rsSESSIONTableEntryIndex}
+    ::=  { rsSESSIONTableEntriesTable 1 }
+
+RsSESSIONTableEntry ::= SEQUENCE {
+    rsSESSIONTableEntryIndex INTEGER,
+    rsSESSIONTableEntrySrcIP Ipv6Address,
+    rsSESSIONTableEntryDstIP Ipv6Address,
+    rsSESSIONTableEntrySrcPort INTEGER,
+    rsSESSIONTableEntryDstPort INTEGER,
+    rsSESSIONTableEntryPhysicalPort INTEGER,
+    rsSESSIONTableEntryLifetime INTEGER,
+    rsSESSIONTableEntryAgingType INTEGER,
+    rsSESSIONTableEntrySYNData DisplayString,
+    rsSESSIONTableEntryRplyPhysicalPort INTEGER,
+    rsSESSIONTableEntryIPProtocol INTEGER,
+    rsSESSIONTableEntryPolicyName DisplayString
+}
+
+rsSESSIONTableEntryIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The index of the entry"
+    ::=  { rsSESSIONTableEntry 1 }
+
+rsSESSIONTableEntrySrcIP OBJECT-TYPE
+    SYNTAX Ipv6Address
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Source IP of the entry"
+    ::=  { rsSESSIONTableEntry 2 }
+
+rsSESSIONTableEntryDstIP OBJECT-TYPE
+    SYNTAX Ipv6Address
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Destination IP of the entry"
+    ::=  { rsSESSIONTableEntry 3 }
+
+rsSESSIONTableEntrySrcPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Source L4 Port of the entry"
+    ::=  { rsSESSIONTableEntry 4 }
+
+rsSESSIONTableEntryDstPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Destination L4 Port of the entry"
+    ::=  { rsSESSIONTableEntry 5 }
+
+rsSESSIONTableEntryPhysicalPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Phisical Port of the entry"
+    ::=  { rsSESSIONTableEntry 6 }
+
+rsSESSIONTableEntryLifetime OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Lifetime of the entry"
+    ::=  { rsSESSIONTableEntry 7 }
+
+rsSESSIONTableEntryAgingType OBJECT-TYPE
+    SYNTAX INTEGER {
+        default(1),
+        app(2),
+	syn(3),
+	end(4),
+	unknown(5),
+	delete(6),
+	short(7)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Aging Type of the entry"
+    ::=  { rsSESSIONTableEntry 8 }
+
+rsSESSIONTableEntrySYNData OBJECT-TYPE
+    SYNTAX DisplayString  (SIZE(0..20))
+	ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The SYN protection data of the entry"
+    ::=  { rsSESSIONTableEntry 9 }
+
+rsSESSIONTableEntryRplyPhysicalPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Phisical Port of the entry (of reply packets)"
+    ::=  { rsSESSIONTableEntry 10 }
+
+rsSESSIONTableEntryIPProtocol OBJECT-TYPE
+    SYNTAX INTEGER {
+        ip(1),
+        tcp(2),
+        udp(3),
+        icmp(4),
+        gre(5),
+        icmpv6(6)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The IP Protocol of the entry (IP for unsupported protcols)"
+    ::=  { rsSESSIONTableEntry 11 }
+
+rsSESSIONTableEntryPolicyName OBJECT-TYPE
+    SYNTAX DisplayString  (SIZE(0..19))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Session table policy  name"
+    ::=  { rsSESSIONTableEntry 12 }
+
+rsSESSIONSynActivationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsSESSIONSynActivationEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing the SYN protection triggers."
+    ::=  {rsSESSION 42}
+
+rsSESSIONSynActivationEntry OBJECT-TYPE
+    SYNTAX RsSESSIONSynActivationEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "The row definition for this table. Each trigger protects all communication 
+	    to a specific dest IP, dest L4 port and from a specific RX port"
+    INDEX {rsSESSIONSynActivationType,
+           rsSESSIONSynActivationIP,
+           rsSESSIONSynActivationPort,
+           rsSESSIONSynActivationRxport}
+    ::=  { rsSESSIONSynActivationTable 1 }
+
+RsSESSIONSynActivationEntry ::= SEQUENCE {
+    rsSESSIONSynActivationType INTEGER,
+    rsSESSIONSynActivationIP Ipv6Address,
+    rsSESSIONSynActivationPort INTEGER,
+    rsSESSIONSynActivationRxport INTEGER,
+    rsSESSIONSynActivationTime INTEGER,
+    rsSESSIONSynActivationLastSecSYN INTEGER,
+    rsSESSIONSynActivationLastSecRqst INTEGER,
+    rsSESSIONSynActivationAvrgSYN INTEGER,
+    rsSESSIONSynActivationAvrgRqst INTEGER,
+    rsSESSIONSynActivationTotalSYN DisplayString,
+    rsSESSIONSynActivationTotalDropped DisplayString
+}
+
+rsSESSIONSynActivationType OBJECT-TYPE
+    SYNTAX INTEGER {
+        synProtectionTrigger(1),
+        synProtectionEnable(2),
+        synProtectionTotal(3),
+        ackReflection(4)
+   }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The type of trigger - SYN flood protection or ACK reflection protection."
+    ::=  { rsSESSIONSynActivationEntry 1 }
+
+rsSESSIONSynActivationIP OBJECT-TYPE
+    SYNTAX Ipv6Address
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger destination IP address"
+    ::=  { rsSESSIONSynActivationEntry 2 }
+
+rsSESSIONSynActivationPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger destination L4-port"
+    ::=  { rsSESSIONSynActivationEntry 3 }
+
+rsSESSIONSynActivationRxport OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger RX physical port"
+    ::=  { rsSESSIONSynActivationEntry 4 }
+
+rsSESSIONSynActivationTime OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of seconds since this trigger was created"
+    ::=  { rsSESSIONSynActivationEntry 5 }
+
+rsSESSIONSynActivationLastSecSYN OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger number of SYN packets in the last second"
+    ::=  { rsSESSIONSynActivationEntry 6 }
+
+rsSESSIONSynActivationLastSecRqst OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger number of verified request packets in the last second"
+    ::=  { rsSESSIONSynActivationEntry 7 }
+
+rsSESSIONSynActivationAvrgSYN OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger average number of SYN packets per second since the trigger was activated"
+    ::=  { rsSESSIONSynActivationEntry 8 }
+
+rsSESSIONSynActivationAvrgRqst OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger average number of verified request packets per second since the trigger was activated"
+    ::=  { rsSESSIONSynActivationEntry 9 }
+
+rsSESSIONSynActivationTotalSYN OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger total number of SYN packets since the trigger was activated."
+    ::=  { rsSESSIONSynActivationEntry 10 }
+
+rsSESSIONSynActivationTotalDropped OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "SYN trigger total number of dropped connections (unverified sessions) since the trigger was activated."
+    ::=  { rsSESSIONSynActivationEntry 11 }
+
+rsSESSIONSynProtectionStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsSESSIONSynProtectionStatisticsEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table keeping statistics for SYN protection policies."
+    ::=  {rsSESSION 43}
+
+rsSESSIONSynProtectionStatisticsEntry OBJECT-TYPE
+    SYNTAX RsSESSIONSynProtectionStatisticsEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "The row definition for this table. Each entry holds long term statistics of SYN one destination." 
+    INDEX {rsSESSIONSynProtectionStatisticsPolicy,
+           rsSESSIONSynProtectionStatisticsIP,
+           rsSESSIONSynProtectionStatisticsPort,
+           rsSESSIONSynProtectionStatisticsRxPort}
+    ::=  { rsSESSIONSynProtectionStatisticsTable 1 }
+
+RsSESSIONSynProtectionStatisticsEntry ::= SEQUENCE {
+    rsSESSIONSynProtectionStatisticsPolicy DisplayString,
+    rsSESSIONSynProtectionStatisticsIP Ipv6Address,
+    rsSESSIONSynProtectionStatisticsPort INTEGER,
+    rsSESSIONSynProtectionStatisticsRxPort INTEGER,
+    rsSESSIONSynProtectionStatisticsCurrentAttackStatus INTEGER,
+    rsSESSIONSynProtectionStatisticsLastSecSynCount INTEGER,
+    rsSESSIONSynProtectionStatisticsLastSecGoodCount INTEGER,
+    rsSESSIONSynProtectionStatisticsAverageSynCount INTEGER,
+    rsSESSIONSynProtectionStatisticsAverageGoodCount INTEGER,
+    rsSESSIONSynProtectionStatisticsPeakSynCount INTEGER,
+    rsSESSIONSynProtectionStatisticsPeakGoodCount INTEGER,
+    rsSESSIONSynProtectionStatisticsActivityTime INTEGER,
+    rsSESSIONSynProtectionStatisticsLastAttackStartTime DisplayString,
+    rsSESSIONSynProtectionStatisticsLastAttackTermTime DisplayString
+}
+
+rsSESSIONSynProtectionStatisticsPolicy OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The name of the SYN protection policy of this statistics entry."
+    ::=  { rsSESSIONSynProtectionStatisticsEntry 1 }
+
+rsSESSIONSynProtectionStatisticsIP OBJECT-TYPE
+    SYNTAX Ipv6Address
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The destination IP of this statistics entry."
+    ::=  { rsSESSIONSynProtectionStatisticsEntry 2 }
+
+rsSESSIONSynProtectionStatisticsPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The destination L4 port of this statistics entry."
+    ::=  { rsSESSIONSynProtectionStatisticsEntry 3 }
+
+rsSESSIONSynProtectionStatisticsRxPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The rx port of this statistics entry."
+    ::=  { rsSESSIONSynProtectionStatisticsEntry 4 }
+
+rsSESSIONSynProtectionStatisticsCurrentAttackStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        protectedUnderAttack(1),
+        protectedNoAttack(2),
+        monitorNoAttack(3),
+        unprotected(4)
+	}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Current attack status of this entry"
+    ::=  { rsSESSIONSynProtectionStatisticsEntry 5 }
+
+rsSESSIONSynProtectionStatisticsLastSecSynCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Number of new SYN packets matching this entry last second"
+    ::=  { rsSESSIONSynProtectionStatisticsEntry 6 }
+
+rsSESSIONSynProtectionStatisticsLastSecGoodCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Number of new good sessions matching this entry last second"
+    ::=  { rsSESSIONSynProtectionStatisticsEntry 7 }
+
+rsSESSIONSynProtectionStatisticsAverageSynCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Average number of new SYN packets matching this entry last time period"
+    ::=  { rsSESSIONSynProtectionStatisticsEntry 8 }
+
+rsSESSIONSynProtectionStatisticsAverageGoodCount OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Average number of new good sessions matching this entry last time period"
+    ::=  { rsSESSIONSynProtectionStatisticsEntry 9 }
+
+rsSESSIONSynProtectionStatisticsPeakSynCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Peak value of new SYN packets per second matching this entry"
+    ::=  { rsSESSIONSynProtectionStatisticsEntry 10 }
+
+rsSESSIONSynProtectionStatisticsPeakGoodCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "number of good sessions in the second of SYN peak value matching this entry"
+    ::=  { rsSESSIONSynProtectionStatisticsEntry 11 }
+
+rsSESSIONSynProtectionStatisticsActivityTime OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Number of seconds since this entry was created"
+    ::=  { rsSESSIONSynProtectionStatisticsEntry 12 }
+
+
+rsSESSIONSynProtectionStatisticsLastAttackStartTime OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The start time and date of last attack matching this entry."
+    ::=  { rsSESSIONSynProtectionStatisticsEntry 13 }
+
+
+rsSESSIONSynProtectionStatisticsLastAttackTermTime OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The termination time and date of last attack matching this entry."
+    ::=  { rsSESSIONSynProtectionStatisticsEntry 14 }
+
+
+rsSESSIONTableFullAction OBJECT-TYPE
+    SYNTAX INTEGER {
+		allow(1),
+		block(2)
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Whether the device will forward or block additional traffic when the session table is full."
+    DEFVAL { 2 }        
+    ::= { rsSESSION 44 }
+
+rsSESSIONTableFullActiveThreshold OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Activation threshold for the session table getting full notification."
+    DEFVAL { 95 }        
+    ::= { rsSESSION 45 }
+
+rsSESSIONTableFullDeactiveThreshold OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Deactivation threshold for the session table getting full notification."
+    DEFVAL { 90 }        
+    ::= { rsSESSION 46 }
+
+
+rsSESSIONSessionTCPAgingTime OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The TCP aging time for the session table."
+    DEFVAL { 100 }
+    ::= {rsSESSION 47}
+
+rsSESSIONSessionUDPAgingTime OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The UDP aging time for the session table."
+    DEFVAL { 100 }
+    ::= {rsSESSION 48}
+
+rsSESSIONSessionSCTPAgingTime OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The SCTP aging time for the session table."
+    DEFVAL { 100 }
+    ::= {rsSESSION 49}
+
+rsSESSIONSessionICMPAgingTime OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The ICMP aging time for the session table."
+    DEFVAL { 100 }
+    ::= {rsSESSION 50}
+
+rsSESSIONSessionGREAgingTime OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The GRE aging time for the session table."
+    DEFVAL { 100 }
+    ::= {rsSESSION 51}
+
+rsSESSIONRemoveEntryAtSessionEndTimeout OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Remove Session Entry at Session End after aging time."
+    DEFVAL { 5 }
+    ::= {rsSESSION 52}
+
+rsSESSIONAddEntryWithAckNoData OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Whether to add session entry with ack no data"
+    ::= {rsSESSION 53}
+
+
+-- Application-specific traps for SESS
+-- Each enterprise-specific trap has two bound variables describing the exact nature of
+-- the trap. rndErrorDesc provides a detailed description of the problem, including the
+-- related interface number, board number or any other applicable variable.
+-- rndErrorSeverity describes the severity of this problem.
+
+-- Trap template
+-- -------------
+--    TRAP-TYPE
+--       ENTERPRISE  rsServerDispatcher
+--       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+--       DESCRIPTION
+--             ""
+--       ::=
+-- -------------
+
+rsSESSIONTablesFull   TRAP-TYPE
+       ENTERPRISE  rsSESSION
+        VARIABLES  { rndErrorDesc, rndErrorSeverity }
+        DESCRIPTION
+             "This trap is sent to inform the user about one of the session tables being full."
+       ::=  1
+
+rsSESSIONSynTriggerUpdate   TRAP-TYPE
+       ENTERPRISE  rsSESSION
+        VARIABLES  { rndErrorDesc, rndErrorSeverity }
+        DESCRIPTION
+             "This trap is sent to inform the user about change in a SYN attacks status."
+       ::=  2
+
+END

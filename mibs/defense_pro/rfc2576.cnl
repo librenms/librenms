@@ -1,0 +1,48 @@
+
+SNMP-COMMUNITY-CNL DEFINITIONS ::= BEGIN
+
+IMPORTS
+    IpAddress,
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    snmpModules
+        FROM SNMPv2-SMI
+    RowStatus,
+    StorageType
+        FROM SNMPv2-TC
+    SnmpAdminString,
+    SnmpEngineID
+        FROM SNMP-FRAMEWORK-MIB
+    SnmpTagValue,
+    snmpTargetAddrEntry
+        FROM SNMP-TARGET-MIB
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF;
+
+snmpCommunityMIB OBJECT IDENTIFIER ::= { snmpModules 18 }
+
+-- Administrative assignments ****************************************
+
+snmpCommunityMIBObjects     OBJECT IDENTIFIER ::= { snmpCommunityMIB 1 }
+snmpCommunityMIBConformance OBJECT IDENTIFIER ::= { snmpCommunityMIB 2 }
+
+--
+-- The snmpCommunityTable contains a database of community strings.
+-- This table provides mappings between community strings, and the
+
+
+-- parameters required for View-based Access Control.
+--
+
+snmpCommunityTable OBJECT-TYPE
+    ::= { snmpCommunityMIBObjects 1 }
+
+snmpCommunityEntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME snmpCommunityStatus
+    ::= { snmpCommunityTable 1 }
+
+END
+

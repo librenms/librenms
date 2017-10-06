@@ -1,0 +1,45 @@
+#-------------------------------------------------------------------------
+# Mib-Dependencies for Vision
+#
+# This file is used when creating/editing vision screens
+#-------------------------------------------------------------------------
+[required radware mibs]
+radwaremib.txt
+genericmib.txt
+accmib.txt
+cckmib.txt
+statisticsmib.txt
+sessionmib.txt
+vrrpmib.txt
+apmmib.mib
+vgate.txt
+bwmmib.txt
+cdemib.txt
+
+dosmib.txt
+idsmib.txt
+statemib.txt
+dpmib.txt
+
+[required external mibs]
+rfc1442v.smi
+ipv6-tc.mib
+# this mib file was downloaded from the web, don't use Radware's mib
+rfc1213.asn
+rfc1286.asn
+rfc1442v.smi
+rfc1451.mi1
+cidr.mib
+rfc1389.mib
+iana.mib
+# this mib file was downloaded from the web, don't use Radware's mib
+rfc1850.mib
+rfc1907.mib
+rfc2233.mib
+rfc2571.mib
+rfc2572.mib
+rfc2573.mib
+rfc2574.mib
+rfc2575.mib
+rfc2576.mib
+lacp.txt

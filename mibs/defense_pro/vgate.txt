@@ -1,0 +1,5405 @@
+RND-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      RAD Network Devices (RND)
+--             This Private MIB supports the Vgate
+-- Version:    2.9
+-- Date:       27 Oct 1995
+-- By:         Rina Nethaniel.
+-- E-mail:         rina@rnd-gate.rad.co.il
+--
+IMPORTS
+       NetworkAddress,
+       IpAddress,
+       Counter,
+       Gauge,
+       enterprises
+              FROM RFC1155-SMI
+      OBJECT-TYPE
+              FROM RFC-1212
+       DisplayString,
+       PhysAddress,
+       ipAddrEntry
+              FROM RFC1213-MIB
+       TRAP-TYPE
+                    FROM RFC-1215;
+
+    TruthValue ::= INTEGER {
+         true (1),
+         false (2)
+        }
+    RowStatus ::= INTEGER {
+        active(1),
+        notInService(2),
+        notReady(3),
+        createAndGo(4),
+        createAndWait(5),
+        destroy(6)
+        }
+    NetNumber ::=  OCTET STRING (SIZE(4))
+
+-- Some MIB compilers require that the following 7 lines which define the path
+-- to RND MIB are commented out:
+
+-- mib            OBJECT IDENTIFIER ::= { mgmt 1  }
+-- directory      OBJECT IDENTIFIER ::= { internet 1  }
+-- experimental   OBJECT IDENTIFIER ::= { internet 3  }
+-- private        OBJECT IDENTIFIER ::= { internet 4  }
+-- enterprises    OBJECT IDENTIFIER ::= { private 1  }
+ rnd            OBJECT IDENTIFIER ::= { enterprises 89  }
+
+--   Objects in this MIB are arranged into groups:
+--   rndMng        - Management/Action
+--   rndDeviceParams- General parameters
+--   rndBridge     - RND Bridge/Route parameters (Level 2)
+--   rndInterface  - Interface table and RS232 interface parameters
+--   rndSlot       - Structure of OpenGate (modular device)
+--   rndIpRoute    - Routing Parameters (Level 3)
+--   rndRouteSpf   - RND SPF Routing algorith
+--   rndMaskTable  - RND Masking tables
+--   rndBackup     - RND backup feature, Dial-up parameters.
+--   rndFddi       - RND FDDI parameters
+--   rndDECnet     - RND DECnet Router parameters
+--   rndIPX        - Parameters for management of IPX router
+--   rndTR         - Parameters for additional Token Ring support
+--   rndTranslation- Parameters for translation between Ethernet, Token Ring
+--                   and FDDI
+--   rndPCDevices  - Parameters for management for RND PC-based devices
+--   rndFACS       - Facility for Access Control and Security
+--   rndSNAR       - SDLC/SNA Routing parameters
+--   rndSRE        - Parameters for configuration of Source Routing and
+--                   Source Routing Encapsulation algorithms
+--   rndCOD        - Connect On Demande parameters.
+--   rndSPS        - Parameters for configuration of SPS
+--   rndBrgHub     _ Remot Bridge HUB paramenets
+--   rndAdapter    - parameters for R_dapter, OG-Van
+--   rndBootP      - BootP configurgaration.
+--   rndOGLoadBalance - Load Balance configuration.
+--   ipSpec        IP Specific for VGate, MRT and LRE
+--   virtualLan    Virtual LAN definition
+--   rsConf        Router Server Configuration
+--   rsTunning     Tunning sub group
+--   rndISDN       ISDN Parameters for  OG_RAN and Radptor,VAN ans WANgate.
+--   rndPPP        PPP Parameters for IPX.
+--   rndDial       Dial Parameters for V25 of OpenGate
+
+
+-- At the end of the MIB there is a definition of all RND-specific traps.
+
+
+-- rndMng group contains Management Variables for RND devices
+
+rndMng   OBJECT IDENTIFIER ::= { rnd 1  }
+
+rndSysId OBJECT-TYPE
+    SYNTAX  INTEGER {
+       reb(1),
+       ceb(2),
+       ceblb(3),
+       xeb(4),
+       xeb1(5),
+       rebsx(6),
+       rtb(7),
+       ltb(8),
+       lte(9),
+       iprouter(10),
+       ielb(11),
+       leb(12),
+       openGate12(13),
+       openGate4(14),
+       ran(15),
+       itlb(16),
+       gatelinx(17),
+       openGate2(18),
+       ogRanTR(19),
+       stc(20),
+       ftc(21),
+       armon(22),
+       fccs1004(23),    -- RADway
+       fccs1012(24),    -- RADway
+       rdapter(25),
+       ogvan(26),
+       wanGate(27),
+       ogRubE(28),
+       ogRubT(29),
+       elX(30),
+       vGate4(31),
+       mrt(32),
+       ogSrubET(33),
+       vanXS(34),
+       lre(35),
+       vGate2(36),
+       serverDispatcher4(37),
+       serverDispatcher2(38),
+       vGate2Fast(39),
+       serverDispatcher2Fast(40),
+       prt(41),
+       mlm(42),
+       prt11(43),
+       quickOffice(44),
+       apollo(45)
+
+
+     }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Identification of an RND device. The device type for each
+      integer clarifies the sysObjectID in MIB - II."
+    ::= { rndMng 1  }
+
+rndAction OBJECT-TYPE
+    SYNTAX  INTEGER {
+       reset(1),
+       sendNetworkTab(2),
+       deleteNetworkTab(3),
+       sendRoutingTab(4),    -- Level II
+       deleteRoutingTab(5),
+       sendLanTab(6),
+       deleteLanTab(7),
+       deleteArpTab(8),
+       sendArpTab(9),
+       deleteRouteTab(10),   -- Level III
+       sendRouteTab(11),
+       backupSPFRoutingTab(12),
+       backupIPRoutingTab(13),
+       backupNetworkTab(14),
+       backupLanTab(15),
+       backupArpTab(16),
+       backupIPXRipTab(17),
+       backupIPXSAPTab(18),
+       resetCDB(19),
+       eraseCDB(20),
+       deleteZeroHopRoutingAllocTab(21)
+     }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable enables the operator to perform one of the
+      specified actions on the tables maintained by the network device.
+      Send actions require support of proprietery File exchange
+      protocol."
+   ::= { rndMng 2  }
+
+
+rndFileName OBJECT-TYPE
+    SYNTAX OCTET STRING -- SIZE 256
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The name of the file used internally by RND for transferring
+      tables maintained by network devices, using a prorietary File
+      exchange protocol."
+    ::=  { rndMng 3  }
+
+
+-- rndDeviceParams group contains a number of general variables
+
+rndDeviceParams       OBJECT IDENTIFIER ::= { rnd 2  }
+
+rndBridgeType  OBJECT-TYPE
+    SYNTAX  INTEGER {
+       reb(1),
+       ceb(2),
+       ceblb(3),
+       xeb(4),
+       xeb1(5),
+       rebsx(6),
+       rtb(7),
+       ltb(8),
+       tre(9),
+       rtre(10),      -- remote TRE
+       xtb(11),
+       ete(12),
+       rete(13),      -- remote ETE
+       ielb(30),
+       leb(31),
+       openGate12(32),
+       openGate4(33),
+       ran(34),
+       itlb(35),
+       gatelinx(36),
+       openGate2(37),
+       ogRanTR(38),
+       rdapter(39),
+       ogVan(40),
+       wanGate(41),
+       ogRubE(42),
+       ogRubT(43),
+       wanGateI(44),
+       vGate4(45),
+       lre(46),
+       mrt(47),
+       vGate2(48)
+     }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Identification of the RND bridge type."
+    ::= { rndDeviceParams 1  }
+
+
+rndInactiveArpTimeOut OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable defines the maximum time period that can pass
+       between ARP requests concerning an entry in the ARP table.
+       After this time period, the entry is deleted from the table."
+    ::= { rndDeviceParams 2  }
+
+-- The following two variables define the format of RND specific
+-- error messages issued by the RND devices
+
+rndBridgeAlarm  OBJECT IDENTIFIER ::= { rndDeviceParams 3  }
+
+rndErrorDesc OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "A textual description of the enterprise-specific trap sent
+        to the Network Management Station by the RND managed device."
+    ::= { rndBridgeAlarm 1  }
+
+rndErrorSeverity OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The severity type of the enterprise-specific trap sent to the
+      Network Management Station by the RND managed device."
+    ::= { rndBridgeAlarm 2  }
+
+rndBrgVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The bridge version."
+   ::= { rndDeviceParams 4  }
+
+rndBrgFeatures OBJECT-TYPE
+    SYNTAX   OCTET STRING  -- SIZE 20
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "A bit mask that defines the features supported by a particular configuration
+       of this network element:
+       __________________________________________
+       |  Byte 1|Byte 2 |Byte 3 | ....|Byte 20  |
+       |87654321|                     | 87654321|
+       |________|_______________________________|
+
+ Byte1 :
+      bit1: TX Block mask
+      bit2: Source Routing Encapulation
+      bit3: SNA/SDLC
+      bit4: Frame Relay
+      bit5: SNMP
+      bit6: LAN Manager
+      bit7: High Performance
+      bit8: Translation
+ Byte2 :
+      bit1: DEC Router
+      bit2: IPX Router
+      bit3: IP  Router
+ Byte3 :
+      bit1: Dial Up Backup
+      bit2: COD
+      bit3: FACS
+      bit4: Load Balance
+      bit5: Remote Configuration
+      bit6: RIP 2
+      bit7: OSPF
+      bit8: IPX RIP/SAP Filter
+ Byte4 :
+      bit1: BootP Server
+      bit2: BootP Client
+      bit3: Compression
+      bit4: V25.bis
+      bit5: ISDN
+      bit6: CODv2
+      bit7: NSPF
+      bit8: UDP Relay
+
+ Byte5
+      bit1:VirtualLAN
+      bit2:Static IP Multicast
+      bit3:IP Redundancy
+      bit4:CCM2
+      bit5:ISDN Bonding
+      bit6:Backup Link Selection -- for the  VAN/Rdapter ver 4.0
+      bit7:IP/IPX Forwarding     -- for the  WANgate ver 4.0
+      bit8:Improved COD
+
+ Byte6
+      bit1: Server Disptacher
+      bit2: ISDN_US               -- for the  VANSX/WANGATE ver 5.0
+      bit3: PPP
+      bit4: IP Rip Filter       -- for Vgate3
+      bit5: Zero Hop Routing    -- for Vgate3
+      bit6: ISDN Japan
+
+ Byte7
+     bit1: With unmanaged Switch
+     bit2: 2 LANs
+     bit3: OSPF Ver 2.0
+     bit4: FACS Ver 2.0
+     bit5: Multiple WEB Farm
+     bit6: Backup Server"
+
+   ::= { rndDeviceParams 5  }
+
+rndBrgLicense OBJECT-TYPE
+    SYNTAX   OCTET STRING  -- SIZE 20
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This parameter is used for entering a s/w license number for a device.
+        A separate license number is supplied for each device."
+   ::= { rndDeviceParams 6  }
+
+-- IP Host Parameters
+
+--All the new parameters under this section will be added to the
+-- rndMng group, as rndIpHost sub-group.
+--
+rndIpHost  OBJECT IDENTIFIER   ::= { rndDeviceParams 7 }
+--
+--ICMP Transmission Enable\Disable
+--The new variable will be
+
+
+rndICMPTransmitionEnable   OBJECT-TYPE
+   SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+   }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+    "This variable controlls the ability to transmit ICMP frames"
+    ::= { rndIpHost 1 }
+
+rndCommunityTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RndCommunityEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+    "The community table of the agent"
+     ::= { rndIpHost 2 }
+
+rndCommunityEntry  OBJECT-TYPE
+   SYNTAX RndCommunityEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rndCommunityMngStationAddr,
+           IMPLIED rndCommunityString }
+   ::= { rndCommunityTable 1 }
+
+RndCommunityEntry ::= SEQUENCE {
+  rndCommunityMngStationAddr   IpAddress,
+  rndCommunityString           DisplayString,
+  rndCommunityAccess           INTEGER,
+  rndCommunityTrapsEnable      INTEGER,
+  rndCommunityStatus           INTEGER
+  }
+
+
+rndCommunityMngStationAddr OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS   read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The management station that will be allowed to
+    communicate with the agent IP address"
+     ::=  { rndCommunityEntry 1 }
+
+rndCommunityString OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(1..20))
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The community string with which the management
+     station will communicate with the agent"
+     ::= { rndCommunityEntry 2 }
+
+rndCommunityAccess OBJECT-TYPE
+   SYNTAX INTEGER {
+    readOnly(1),
+    readWrite(2),
+    super(3)
+      }
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The allowed access to this management station"
+     ::= { rndCommunityEntry 3}
+
+rndCommunityTrapsEnable OBJECT-TYPE
+   SYNTAX INTEGER {
+    trapsEnable(1),
+    trapsDisable(2)
+     }
+   ACCESS   read-write
+   STATUS mandatory
+   DESCRIPTION
+    "Should the agent send traps to the management station"
+      ::= { rndCommunityEntry 4 }
+
+rndCommunityStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+    enable(1),
+    invalid(2)
+     }
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The status of this entry. If the status is invalid the
+    community entry will be deleted"
+    ::= { rndCommunityEntry 5 }
+
+rndManagedTime  OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(6))
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The time will be sent in the format hhmmss"
+   ::= { rndDeviceParams 8 }
+
+rndManagedDate  OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(6..8))
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The date will be sent in the format ddmmyyyy"
+    ::= { rndDeviceParams 9 }
+
+
+genGroup  OBJECT IDENTIFIER   ::= { rndDeviceParams 11 }
+genGroupHWVersion OBJECT-TYPE
+   SYNTAX  DisplayString
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "Defines the HW version of the product."
+   ::= { genGroup 1 }
+
+genGroupConfigurationSymbol OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE(1))
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Defines the Configuration Symbol attached to any hardware module
+      manufactured by LANNET. One single character A..Z defines the CS
+      version."
+      ::= { genGroup 2 }
+
+genGroupHWStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+        ok(1),
+        hardwareProblems(2),
+        notSupported(255)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "This attribute describes the status of the group hardware as detected
+      by the sensors software."
+      ::= { genGroup 3 }
+
+rndInterface OBJECT IDENTIFIER ::= { rnd 4  }
+
+-- Channel & LAN Configuration
+
+rndIfTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF  RndIfEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "RND-specific interface table.  Each table entry includes an
+      index, Board number, Network Address, interface status, clock
+      indicator and interface cost."
+    ::= {  rndInterface 1  }
+
+
+rndIfEntry  OBJECT-TYPE
+    SYNTAX RndIfEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+    INDEX   { rndIfIndex  }
+    ::= {  rndIfTable 1  }
+
+
+RndIfEntry ::= SEQUENCE {
+  rndIfIndex
+     INTEGER,
+  rndIfBoardNum
+     INTEGER,
+  rndIfNetAddress
+     NetworkAddress,
+  rndIfStatus
+     INTEGER,
+  rndIfClockType
+     INTEGER,
+ rndIfBaudRate
+     INTEGER,
+  rndIfCost
+     INTEGER,
+  rndIfCompression
+     INTEGER,
+  rndIfCompressionStatus
+     INTEGER,
+  rndIfCompressionRate
+     INTEGER,
+  rndIfLATCompression
+     INTEGER,
+  rndIfCompressionType
+     INTEGER,
+rndIfFilterMode
+     INTEGER,
+rndIfChannelType
+     INTEGER,
+rndIfBridge
+     INTEGER,
+rndHighPriorityIf    -- New Parameters
+     INTEGER,
+rndWanHeader   -- New Parameters
+     INTEGER,
+rndDuplexMode  -- New Parameters
+     INTEGER
+  }
+
+rndIfIndex OBJECT-TYPE
+    SYNTAX   INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "Index to the RND Interface Table. The interface defined by a
+     particular value of this index is the same interface as
+     identified by the same value of ifIndex (MIBII)."
+         ::= {  rndIfEntry 1  }
+
+rndIfBoardNum OBJECT-TYPE
+    SYNTAX   INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "The interface defined by this entry correspTnds to the board
+     defined by the same value of rndSlotBoardNum in the rndSlotTab."
+    ::= {  rndIfEntry 2  }
+
+rndIfNetAddress OBJECT-TYPE
+    SYNTAX   NetworkAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "The IP address of the interface defined by the particular value of
+     rndIfIndex."
+    ::= {  rndIfEntry 3  }
+
+rndIfStatus  OBJECT-TYPE
+    SYNTAX   INTEGER  {
+       ok (1),
+       okSingleBrg(2),
+       okMultiBrg(3),
+       connctFault(4),
+       rxFault(5),
+       txFault(6),
+       channelLoopback(7),
+       rxClockFault(8),
+       t1Alarm(9)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "The current status of the interface."
+     ::= {  rndIfEntry 4  }
+
+rndIfClockType   OBJECT-TYPE
+    SYNTAX  INTEGER {
+       external(1),
+       internal(2),
+       t1(3),
+       g703(4)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+     "rndIfClockType defines the type of clock each interface
+     uses: internal or external."
+    ::= {  rndIfEntry 5  }
+
+rndIfBaudRate    OBJECT-TYPE          -- Level II routing
+    SYNTAX   INTEGER   -- word
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+     " Defines the baud rate of use by the interface. The valid
+      rates are determined by the type of the media for which this
+      baud rate is defined."
+    ::= { rndIfEntry 6  }
+
+
+rndIfCost    OBJECT-TYPE          -- Level II routing
+    SYNTAX   INTEGER   -- word
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable assigns a transmission cost to the interface
+        (channel or LAN). These costs are used in Level II routing. The
+        costs aretypically inversly proportional to the channel quality."
+    ::= { rndIfEntry 7  }
+
+rndIfCompression   OBJECT-TYPE
+    SYNTAX  INTEGER {
+       enable(1),
+       disable(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "Defines whether data compression is enabled or disabled for the
+       interface."
+    ::= {  rndIfEntry 8  }
+
+  rndIfCompressionStatus  OBJECT-TYPE
+  SYNTAX  INTEGER {
+       not-inserted(1),
+       active(2),
+       not-active(3),
+       disable(4)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Defines the status of the compression component:
+        not-inserted - Compression component is not in the device
+        active -     Compression is enabled and operates correctly
+        not-active - Compression is enables but does not operate.
+                     The reason may be that there is no compression
+                     component on the device connected to this interface.
+        disabled   - Compression was disabled by management, using
+                     variable rndCompression."
+    ::= {  rndIfEntry 9  }
+
+  rndIfCompressionRate  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+  "Percentage of compression. This variable applies only
+  if rndCompressionStatus is active."
+    ::= {  rndIfEntry 10  }
+
+  rndIfLATCompression  OBJECT-TYPE
+    SYNTAX  INTEGER {
+       enable(1),
+       disable(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+  "Enable/Disable the LAT Compression."
+    ::= {  rndIfEntry 11  }
+
+  rndIfCompressionType  OBJECT-TYPE
+    SYNTAX  INTEGER {
+       none(1),
+       lowSpeed(2),
+       highSpeed(3)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This parameter indicates the type of compression option available in the device.
+         none(1)     - indicates that there is no compression option in the device
+         lowSpeed(2) - indicates a compression option which is  operational up
+                       to line speed sof 64 kbps.
+         highSpeed(3)- indicates a compression option which is  operational up
+                       to line speeds of 2 Mbps."
+    ::= {  rndIfEntry 12  }
+
+rndIfFilterMode  OBJECT-TYPE
+    SYNTAX  INTEGER {
+       destinationOnly(1),
+       sourceAndDestination(2),
+       none(3)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+         "This parameter indicates the type of filtering in the device. "
+    ::= {  rndIfEntry 13 }
+
+    rndIfChannelType OBJECT-TYPE
+      SYNTAX  INTEGER {
+         wanChannel(1),
+         ogRanPort(2),
+         routerToBridge(3),
+         spsFramRelay(4),         -- Frame Relay with external SPS.
+         dialBackup(5),
+         snar(6),
+         lan(7),
+         spsX25(8),
+         frameRelay1490(9),       -- Frame Relay with full  RFC1490 support.
+         frameRelay1490CAR(10),   -- Frame Relay with CAR RFC1490 bridge encapsulation.
+         frameRelayCAR(11),       -- Frame Relay with CAR and RND's encapsulation
+         ppp(12)        -- New Value
+        }
+      ACCESS   read-write
+      STATUS   mandatory
+      DESCRIPTION
+        " The type of the WAN channel "
+   ::= { rndIfEntry 14 }
+
+    rndIfBridge OBJECT-TYPE
+      SYNTAX  INTEGER {
+         enable(1),
+         disable(2)
+        }
+      ACCESS   read-write
+      STATUS   mandatory
+      DESCRIPTION
+        " This variable indicates  whether this interface forward Layer II pakages."
+   ::= { rndIfEntry 15 }
+
+    rndHighPriorityIf  OBJECT-TYPE
+      SYNTAX  INTEGER {
+         enable(1),
+         disable(2)
+        }
+      ACCESS   read-write
+      STATUS   mandatory
+      DESCRIPTION
+        " This variable indicates  whether this interface will forward pakages
+        that fit HighPriority set by the manager."
+       ::= { rndIfEntry 16}
+
+    rndWanHeader  OBJECT-TYPE
+      SYNTAX  INTEGER {
+         regular(1),
+         short(2)
+        }
+      ACCESS   read-write
+      STATUS   mandatory
+      DESCRIPTION
+        " This variable indicates the RND WAN header type used for frames
+          which pass through this interface. 'regular' specifies a 14 bytes
+          header compatible with older OG versions and 'short' a 4 byte header
+          compatible with the RND adapter product family."
+       ::= { rndIfEntry 17}
+
+    rndDuplexMode  OBJECT-TYPE
+      SYNTAX  INTEGER {
+         half(1),
+         full(2)
+        }
+      ACCESS   read-write
+      STATUS   mandatory
+      DESCRIPTION
+        " This variable indicates whether this interface operates in half duplex
+          full duplex or auto negotiation mode."
+       ::= { rndIfEntry 18}
+
+
+-- rndIPX group defines the parameters for the IPX Router
+
+rndIPX   OBJECT IDENTIFIER ::= { rnd 12 }
+
+rndIPXdriver      OBJECT IDENTIFIER ::=  { rndIPX 1 }
+rndIPXRip         OBJECT IDENTIFIER ::=  { rndIPX 2 }
+
+-- Global RIP filter is defined per IPX router.
+
+rndIPXRipFilterGlbTable OBJECT-TYPE
+SYNTAX SEQUENCE OF RndIPXRipFilterGlbEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+      "The table of RIP global filters per IPX router."
+::= { rndIPXRip 10 }
+
+rndIPXRipFilterGlbEntry  OBJECT-TYPE
+SYNTAX   RndIPXRipFilterGlbEntry
+ACCESS    not-accessible
+STATUS    mandatory
+DESCRIPTION
+      " An entry in the RIP global filter table "
+INDEX  { rndIPXRipFilterGlbFLtype,
+         rndIPXRipFilterGlbFLnumber }
+::= { rndIPXRipFilterGlbTable 1 }
+
+RndIPXRipFilterGlbEntry  ::= SEQUENCE {
+      rndIPXRipFilterGlbFLtype          INTEGER,
+      rndIPXRipFilterGlbFLnumber        INTEGER,
+      rndIPXRipFilterGlbFLStatus        INTEGER,
+      rndIPXRipFilterGlbFLnetworkPatern OCTET STRING (SIZE(4)),
+      rndIPXRipFilterGlbFLnetworkMask   OCTET STRING (SIZE(4)),
+      rndIPXRipFilterGlbFLaction        INTEGER
+}
+
+rndIPXRipFilterGlbFLtype  OBJECT-TYPE
+SYNTAX INTEGER  {
+    input(1),
+    output(2)
+}
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+    " Type of filter - input/output "
+::= {rndIPXRipFilterGlbEntry 1}
+
+rndIPXRipFilterGlbFLnumber OBJECT-TYPE
+SYNTAX  INTEGER
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+   " Number of RIP filter. "
+::= {rndIPXRipFilterGlbEntry  2}
+
+rndIPXRipFilterGlbFLStatus OBJECT-TYPE
+SYNTAX INTEGER  {
+    valid (1),
+    invalid (2),
+    underCreation (3)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+   " The validity of this entry. An entry with this value set
+   to invalid  may be deleted from the table with IPX
+   implementation's discretion."
+  DEFVAL  { valid }
+::= {rndIPXRipFilterGlbEntry 3}
+
+rndIPXRipFilterGlbFLnetworkPatern OBJECT-TYPE
+SYNTAX  OCTET STRING (SIZE(4))
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+   "Number of filtered network. Value 0xFFFFFFFF  applies for
+   any network. "
+  DEFVAL {'FFFFFFFF'H}
+::= {rndIPXRipFilterGlbEntry  4}
+
+rndIPXRipFilterGlbFLnetworkMask  OBJECT-TYPE
+SYNTAX  OCTET STRING (SIZE(4))
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+   "Network mask"
+   DEFVAL {'FFFFFFFF'H}
+::= {rndIPXRipFilterGlbEntry 5}
+
+rndIPXRipFilterGlbFLaction OBJECT-TYPE
+SYNTAX INTEGER {
+   deny(1),
+   permit(2)
+}
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+   " Filter action - permit/deny for this network"
+   DEFVAL { permit }
+::= {rndIPXRipFilterGlbEntry  6}
+
+
+-- Circuit RIP filter is defined per IPX circuit number
+--            (Ifindex plus type of L2 encapsulation).
+
+rndIPXRipFilterCircuitTable OBJECT-TYPE
+SYNTAX SEQUENCE OF RndIPXRipFilterCircuitEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+   "Table of input/output  RIP filters used per IPX circuit number."
+::= { rndIPXRip 11 }
+
+rndIPXRipFilterCircuitEntry  OBJECT-TYPE
+SYNTAX RndIPXRipFilterCircuitEntry
+ACCESS not-accessible
+STATUS mandatory
+DESCRIPTION
+   " An entry in the Circuit RIP filter table"
+INDEX  {rndIPXRipFilterCircFLIfIndex ,
+        rndIPXRipFilterCircFLType,
+        rndIPXRipFilterCircFLnumber}
+::= { rndIPXRipFilterCircuitTable 1 }
+
+RndIPXRipFilterCircuitEntry  ::= SEQUENCE {
+      rndIPXRipFilterCircFLIfIndex       INTEGER,
+      rndIPXRipFilterCircFLType          INTEGER,
+      rndIPXRipFilterCircFLnumber        INTEGER,
+      rndIPXRipFilterCircFLStatus        INTEGER,
+      rndIPXRipFilterCircFLnetworkPatern OCTET STRING (SIZE(4)),
+      rndIPXRipFilterCircFLnetworkMask   OCTET STRING (SIZE(4)),
+      rndIPXRipFilterCircFLaction        INTEGER
+}
+
+rndIPXRipFilterCircFLIfIndex  OBJECT-TYPE
+SYNTAX  INTEGER
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+   " The Interface identifier for this filter. This value
+   correspond to rndIPXIfIndex or ipxCircIndex for ET16"
+::= {rndIPXRipFilterCircuitEntry 1}
+
+
+rndIPXRipFilterCircFLType  OBJECT-TYPE
+SYNTAX INTEGER  {
+   input(1),
+   output(2)
+}
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+   " Type of filter - input/output "
+::= {rndIPXRipFilterCircuitEntry 2}
+
+rndIPXRipFilterCircFLnumber OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+   " Number of RIP filter for this circuit"
+::= {rndIPXRipFilterCircuitEntry  3}
+
+rndIPXRipFilterCircFLStatus   OBJECT-TYPE
+SYNTAX INTEGER  {
+   valid (1),
+   invalid (2),
+   underCreation (3)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+   " The validity of this entry. An entry with this value set
+   to invalid  may be deleted from the table with IPX
+   implementation's discretion."
+  DEFVAL  { valid }
+::= {rndIPXRipFilterCircuitEntry  4}
+
+rndIPXRipFilterCircFLnetworkPatern  OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE(4))
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+   "Number of filtered network. Value 0xFFFFFFFF applies for
+   any network. "
+  DEFVAL {'FFFFFFFF'H}
+::= {rndIPXRipFilterCircuitEntry  5}
+
+rndIPXRipFilterCircFLnetworkMask  OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE(4))
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+   "Network mask"
+  DEFVAL {  'FFFFFFFF'H }
+::= {rndIPXRipFilterCircuitEntry 6}
+
+rndIPXRipFilterCircFLaction OBJECT-TYPE
+SYNTAX INTEGER  {
+   deny(1),
+   permit(2)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+   " Filter action - permit/deny "
+  DEFVAL { permit }
+::= {rndIPXRipFilterCircuitEntry  7}
+
+
+-- Service Advertising Protocol
+
+rndIPXSap         OBJECT IDENTIFIER ::=  { rndIPX 3 }
+
+rndIPXSapFilterGlbTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RndIPXSapFilterGlbEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+       "The table of SAP global filter susedper IPX router."
+::= {rndIPXSap 10}
+
+rndIPXSapFilterGlbEntry  OBJECT-TYPE
+   SYNTAX RndIPXSapFilterGlbEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+      "An entry in the SAP global filter table"
+   INDEX{rndIPXSapFilterGlbFLtype,
+         rndIPXSapFilterGlbFLnumber}
+   ::= {rndIPXSapFilterGlbTable 1}
+
+RndIPXSapFilterGlbEntry ::= SEQUENCE{
+   rndIPXSapFilterGlbFLtype           INTEGER,
+   rndIPXSapFilterGlbFLnumber         INTEGER,
+   rndIPXSapFilterGlbFLStatus         INTEGER,
+   rndIPXSapFilterGlbFLnetworkPatern  OCTET STRING (SIZE(4)),
+   rndIPXSapFilterGlbFLnetworkMask    OCTET STRING (SIZE(4)),
+   rndIPXSapFilterGlbFLserviceType    INTEGER,
+   rndIPXSapFilterGlbFLserviceName    OCTET STRING (SIZE(1..48)),
+   rndIPXSapFilterGlbFLaction         INTEGER
+   }
+
+rndIPXSapFilterGlbFLtype OBJECT-TYPE
+   SYNTAX INTEGER{
+      input(1),
+      output(2)
+   }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Type of filter-input/output"
+   ::= {rndIPXSapFilterGlbEntry 1}
+
+rndIPXSapFilterGlbFLnumber OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Number of SAP filter."
+   ::= {rndIPXSapFilterGlbEntry 2}
+
+
+rndIPXSapFilterGlbFLStatus OBJECT-TYPE
+   SYNTAX INTEGER{
+      valid(1),
+      invalid(2),
+      underCreation(3)
+   }
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "The validity of this entry. An entry with this value set
+       to invalid may be deleted from the table with IPX
+       implementation's discretion."
+   DEFVAL { 1 }
+::= {rndIPXSapFilterGlbEntry 3}
+
+rndIPXSapFilterGlbFLnetworkPatern OBJECT-TYPE
+   SYNTAX OCTET STRING (SIZE(4))
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Number network of the filter edservice. Value
+       0xFFFFFFFF applies for any network."
+   DEFVAL {'FFFFFFFF'H}
+::= {rndIPXSapFilterGlbEntry 4}
+
+rndIPXSapFilterGlbFLnetworkMask OBJECT-TYPE
+   SYNTAX OCTET STRING (SIZE(4))
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+       "Network mask"
+   DEFVAL {'FFFFFFFF'H}
+::= {rndIPXSapFilterGlbEntry 5}
+
+rndIPXSapFilterGlbFLserviceType OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "The type of the service which may be filtered ;value0xFFFF
+       applies for all types of service and it's default"
+   DEFVAL {'FFFF'H}
+::= {rndIPXSapFilterGlbEntry 6}
+
+
+
+rndIPXSapFilterGlbFLserviceName OBJECT-TYPE
+   SYNTAX OCTET STRING (SIZE(1..48))
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "The name of the service which may be filtered; wild
+      cardas * may be used in end of the name."
+   DEFVAL {"*"}
+::= {rndIPXSapFilterGlbEntry 7}
+
+rndIPXSapFilterGlbFLaction OBJECT-TYPE
+   SYNTAX INTEGER{
+      deny(1),
+      permit(2)
+   }
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Filter mode - permit/deny for this service"
+   DEFVAL {permit}
+::= {rndIPXSapFilterGlbEntry 8}
+
+
+-- Circuit SAP filter is defined per IPX circuit (interface identifier (Ifindex) plus
+-- type of L2 encapsulation).
+
+rndIPXSapFilterCircuitTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RndIPXSapFilterCircuitEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+      "Table of input/output SAP filter susedper IPX circuit number."
+   ::= {rndIPXSap 11 }
+
+rndIPXSapFilterCircuitEntry  OBJECT-TYPE
+   SYNTAX RndIPXSapFilterCircuitEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+       "An entry in the Circuit SAP filter table"
+   INDEX { rndIPXSapFilterCircFLIfIndex,
+           rndIPXSapFilterCircFLtype,
+           rndIPXSapFilterCircFLnumber}
+   ::= {rndIPXSapFilterCircuitTable 1 }
+
+RndIPXSapFilterCircuitEntry ::= SEQUENCE{
+   rndIPXSapFilterCircFLIfIndex       INTEGER,
+   rndIPXSapFilterCircFLtype          INTEGER,
+   rndIPXSapFilterCircFLnumber        INTEGER,
+   rndIPXSapFilterCircFLStatus        INTEGER,
+   rndIPXSapFilterCircFLnetworkPatern OCTET STRING (SIZE(4)),
+   rndIPXSapFilterCircFLnetworkMask   OCTET STRING (SIZE(4)),
+   rndIPXSapFilterCircFLserviceType   INTEGER,
+   rndIPXSapFilterCircFLserviceName   OCTET STRING (SIZE(1..48)),
+   rndIPXSapFilterCircFLaction        INTEGER
+}
+
+rndIPXSapFilterCircFLIfIndex OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "The Interface identifier for this filter.  This value
+      correspondtornd IPXIfIndex or ipxCircIndex for ET16"
+   ::= {rndIPXSapFilterCircuitEntry 1}
+
+
+rndIPXSapFilterCircFLtype OBJECT-TYPE
+   SYNTAX INTEGER{
+      input(1),
+      output(2)
+   }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Type of filter-input/output"
+   ::= {rndIPXSapFilterCircuitEntry  2}
+
+rndIPXSapFilterCircFLnumber OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Number of SAP filter. Th is value correspondto rndIPXSapFilterNumber"
+   ::= {rndIPXSapFilterCircuitEntry  3}
+
+rndIPXSapFilterCircFLStatus OBJECT-TYPE
+   SYNTAX INTEGER{
+      valid(1),
+      invalid(2),
+      underCreation(3)
+   }
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "The validity of this entry. An entry with this value set
+      to invalid may be deleted from the table with IPX implementation's discretion."
+  DEFVAL { 1 }
+::= {rndIPXSapFilterCircuitEntry  4}
+
+rndIPXSapFilterCircFLnetworkPatern OBJECT-TYPE
+   SYNTAX OCTET STRING (SIZE(4))
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Number network of the filtered service. Value
+      0xFFFFFFFF  applies for any network."
+   DEFVAL {'FFFFFFFF'H}
+::= {rndIPXSapFilterCircuitEntry  5}
+
+rndIPXSapFilterCircFLnetworkMask OBJECT-TYPE
+   SYNTAX OCTET STRING (SIZE(4))
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Network mask"
+   DEFVAL {'FFFFFFFF'H}
+::= {rndIPXSapFilterCircuitEntry  6}
+
+rndIPXSapFilterCircFLserviceType OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "The type of the service which may be filtered; value 0xFFFF
+       applies for all types of service and it's default"
+   DEFVAL {'FFFF'H}
+::= {rndIPXSapFilterCircuitEntry 7}
+
+rndIPXSapFilterCircFLserviceName OBJECT-TYPE
+   SYNTAX OCTET STRING (SIZE(1..48))
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "The name of the service which may be filtered; wild
+       cardas * may be used i n end of the name."
+   DEFVAL {"*"}
+::= {rndIPXSapFilterCircuitEntry 8}
+
+rndIPXSapFilterCircFLaction OBJECT-TYPE
+   SYNTAX INTEGER{
+       deny(1),
+       permit(2)
+}
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Filter mode-permit/deny"
+   DEFVAL {permit}
+::= {rndIPXSapFilterCircuitEntry 9}
+
+--
+-- This MIB defines the management information for a system using the IPX
+-- protocol.  The MIB consists of four groups:
+--
+--    1.  System Group - contains general information about all instances
+--                       of IPX on the system
+--
+--    2.  Circuit Group - contains information about all circuits used by
+--                        IPX on the system
+--
+--    3.  Forwarding Group - contains generic routing information that
+--                           must be provided by any IPX routing protocol.
+--
+--    4.  Services Group - contains information about all known services.
+--
+-- The MIB is designed to support multiple instances of the IPX
+-- protocol on one system via a system instance identifier which is the
+-- primary index for every table in this MIB.
+--
+-- This MIB is designed to provide a basic framework for the management
+-- of systems implementing the IPX protocol.  Additional MIBs may be
+-- created (especially in the area of IPX routing protocols) to contain
+-- more specific information.  Whenever possible, these additional MIBs
+-- should follow the format of this IPX MIB.  Information in these MIBs
+-- should be linked to this MIB via the use of the system instance
+-- identifier mentioned above.
+--
+-- System Group
+--   This group contains global information about each instance of IPX
+--   running on one system.
+ipxSystem     OBJECT IDENTIFIER ::= {rndIPX 4}
+-- Basic System Table
+--   This table contains one entry for each instance of IPX running on
+--   the system.  It contains the management information that should
+--   be made available by all implementations of the IPX protocol.
+
+ipxBasicSysTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF IpxBasicSysEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION "The IPX System table - basic information."
+   ::= {ipxSystem 1}
+
+ipxBasicSysEntry OBJECT-TYPE
+   SYNTAX  IpxBasicSysEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION "Each entry corresponds to one instance of IPX running
+                on the system."
+   INDEX   {ipxBasicSysInstance}
+   ::= {ipxBasicSysTable 1}
+
+IpxBasicSysEntry ::= SEQUENCE {
+   ipxBasicSysInstance             INTEGER,
+   ipxBasicSysExistState           INTEGER,
+   ipxBasicSysInReceives           Counter,
+   ipxBasicSysInHdrErrors          Counter,
+   ipxBasicSysInUnknownSockets     Counter,
+   ipxBasicSysInDiscards           Counter,
+   ipxBasicSysInDelivers           Counter,
+   ipxBasicSysNoRoutes             Counter,
+   ipxBasicSysOutRequests          Counter,
+   ipxBasicSysOutMalformedRequests Counter,
+   ipxBasicSysOutDiscards          Counter,
+   ipxBasicSysOutPackets           Counter
+   }
+
+ipxBasicSysInstance OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The unique identifier of the instance of IPX to which this
+                row corresponds.  This value may be written only when
+                creating a new entry in the table."
+   ::= {ipxBasicSysEntry 1}
+
+ipxBasicSysExistState OBJECT-TYPE
+   SYNTAX  INTEGER {
+      off(1),
+      on(2)
+      }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The validity of this entry in the IPX system table.
+                Setting this field to off indicates that this entry may be
+                deleted from the system table at the IPX implementation's
+                discretion."
+   ::= {ipxBasicSysEntry 2}
+
+ipxBasicSysInReceives OBJECT-TYPE
+   SYNTAX  Counter
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The total number of IPX packets received, including
+                those received in error."
+   ::= {ipxBasicSysEntry 3}
+
+ipxBasicSysInHdrErrors OBJECT-TYPE
+   SYNTAX  Counter
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The number of IPX packets discarded due to errors in
+                their headers, including any IPX packet with a size less
+                than the minimum of 30 bytes."
+   ::= {ipxBasicSysEntry 4}
+
+ipxBasicSysInUnknownSockets OBJECT-TYPE
+   SYNTAX  Counter
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The number of IPX packets discarded because the
+                destination socket was not open."
+   ::= {ipxBasicSysEntry 5}
+
+ipxBasicSysInDiscards OBJECT-TYPE
+   SYNTAX  Counter
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The number of IPX packets received but discarded due to
+                reasons other than those accounted for by
+                ipxBasicSysInHdrErrors, ipxBasicSysInUnknownSockets,
+                ipxAdvSysInDiscards, and ipxAdvSysInCompressDiscards."
+   ::= {ipxBasicSysEntry 6}
+
+ipxBasicSysInDelivers OBJECT-TYPE
+   SYNTAX  Counter
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The total number of IPX packets delivered locally,
+                including packets from local applications."
+   ::= {ipxBasicSysEntry 7}
+
+ipxBasicSysNoRoutes OBJECT-TYPE
+   SYNTAX  Counter
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The number of times no route to a destination was
+                found."
+   ::= {ipxBasicSysEntry 8}
+
+ipxBasicSysOutRequests OBJECT-TYPE
+   SYNTAX  Counter
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The number of IPX packets supplied locally for
+                transmission, not including any packets counted in
+                ipxAdvForwPackets."
+   ::= {ipxBasicSysEntry 9}
+
+ipxBasicSysOutMalformedRequests OBJECT-TYPE
+   SYNTAX  Counter
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The number of IPX packets supplied locally that contained
+                errors in their structure."
+   ::= {ipxBasicSysEntry 10}
+
+ipxBasicSysOutDiscards OBJECT-TYPE
+   SYNTAX  Counter
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The number of outgoing IPX packets discarded due to
+                reasons other than those accounted for in
+                ipxBasicSysOutMalformedRequests, ipxAdvSysOutFiltered,
+                and ipxAdvSysOutCompressDiscards."
+   ::= {ipxBasicSysEntry 11}
+
+ipxBasicSysOutPackets OBJECT-TYPE
+   SYNTAX  Counter
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The total number of IPX packets transmitted."
+   ::= {ipxBasicSysEntry 12}
+
+
+-- Circuit Group
+--   This group contains management information for each circuit known
+--   to this system.
+
+ipxCircuit    OBJECT IDENTIFIER ::= {rndIPX 5}
+
+-- Circuit Table
+--   The Circuit table contains an entry for each circuit known to the
+--   system.
+
+ipxCircTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF IpxCircEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION "The Circuit table."
+   ::= {ipxCircuit 1}
+
+ipxCircEntry OBJECT-TYPE
+   SYNTAX  IpxCircEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION "Each entry corresponds to one circuit known to the
+                system."
+   INDEX   {ipxCircSysInstance,
+            ipxCircIndex }
+   ::= {ipxCircTable 1}
+
+IpxCircEntry ::= SEQUENCE {
+   ipxCircSysInstance    INTEGER,
+   ipxCircIndex          INTEGER,
+   ipxCircExistState     INTEGER,
+   ipxCircOperState      INTEGER,
+   ipxCircIfIndex        INTEGER,
+   ipxCircNetNumber      NetNumber,
+   ipxCircTimeToNet      INTEGER,
+   ipxCircEncaps         INTEGER,
+   ipxCircNetbiosDeliver INTEGER
+   }
+
+ipxCircSysInstance OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The unique identifier of the instance of IPX
+                to which this entry corresponds.  This value may be
+                written only when creating a new entry in the table."
+   ::= {ipxCircEntry 1}
+
+ipxCircIndex OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The identifier of this circuit, unique within the
+                instance of IPX.  This value may be written
+                only when creating a new entry in the table."
+   ::= {ipxCircEntry 2}
+
+ipxCircExistState OBJECT-TYPE
+   SYNTAX  INTEGER {
+      off(1),
+      on(2),
+      sleeping(3)
+      }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The validity of this circuit entry.  A circuit with this
+                value set to off may be deleted from the table at the
+                IPX implementation's discretion."
+   ::= {ipxCircEntry 3}
+
+ipxCircOperState OBJECT-TYPE
+   SYNTAX  INTEGER {
+      down(1),
+      up(2)
+      }
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The operational state of the circuit."
+   ::= {ipxCircEntry 4}
+
+ipxCircIfIndex OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The value of ifIndex for the interface used by this
+                circuit.  This value may be written only when creating
+                a new entry in the table."
+   ::= {ipxCircEntry 5}
+
+ipxCircNetNumber OBJECT-TYPE
+   SYNTAX  NetNumber
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The IPX network number of this circuit.  This value may
+                be written only when creating a new entry in the table."
+   ::= {ipxCircEntry 6}
+
+ipxCircTimeToNet OBJECT-TYPE
+    SYNTAX  INTEGER  (1..65535)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "The time to net value associated with this interface, in
+    term of 1/18ths of a second."
+    ::= {ipxCircEntry 7}
+
+ipxCircEncaps OBJECT-TYPE
+    SYNTAX  INTEGER  {
+       novell(1),
+       ethernet(2),
+       llc(3),
+       snap(4),
+       none(10)
+       }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+            " The encapsulation method associated with this interface."
+    ::= {ipxCircEntry 8}
+
+ipxCircNetbiosDeliver OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        " Deliver NetBios All Networks Broadcast Packets "
+    DEFVAL  { enabled }
+    ::= {ipxCircEntry 9}
+
+-- Forwarding Group
+--   This group provides a representation of the forwarding database used
+--   by all instances of IPX on the system.
+
+ipxForwarding OBJECT IDENTIFIER ::= {rndIPX 6}
+
+-- Destination Table
+--   The Destination table contains information about all known
+--   destinations.  The routing information shown in this table represents
+--   the path currently being used to reach the destination.
+
+ipxDestTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF IpxDestEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION "The Destination table contains information about all
+                known destinations."
+   ::= {ipxForwarding 1}
+
+ipxDestEntry OBJECT-TYPE
+   SYNTAX  IpxDestEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION "Each entry corresponds to one destination."
+   INDEX { ipxDestSysInstance,
+           ipxDestNetNum,
+           ipxDestNextHopCircIndex}
+   ::= {ipxDestTable 1}
+
+IpxDestEntry ::= SEQUENCE {
+   ipxDestSysInstance        INTEGER,
+   ipxDestNetNum             NetNumber,
+   ipxDestNextHopCircIndex   INTEGER,
+   ipxDestProtocol           INTEGER,
+   ipxDestTicks              INTEGER,
+   ipxDestHopCount           INTEGER,
+   ipxDestNextHopNICAddress  PhysAddress,
+   ipxDestNextHopNetNum      NetNumber,
+   ipxDestExistState         INTEGER
+   }
+
+ipxDestSysInstance OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The unique identifier of the instance of IPX
+                to which this row corresponds."
+   ::= {ipxDestEntry 1}
+
+ipxDestNetNum OBJECT-TYPE
+   SYNTAX  NetNumber
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The IPX network number of the destination."
+   ::= {ipxDestEntry 2}
+
+ipxDestNextHopCircIndex OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The unique identifier of the circuit used to reach the
+                next hop."
+   ::= {ipxDestEntry 3}
+
+ipxDestProtocol OBJECT-TYPE
+   SYNTAX  INTEGER {
+      other(1),
+      local(2),
+      rip(3),
+      nlsp(4),
+      static(5)
+      }
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The routing protocol from which knowledge of this
+                destination was obtained."
+   ::= {ipxDestEntry 4}
+
+ipxDestTicks OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The delay in ticks to reach this destination."
+   ::= {ipxDestEntry 5}
+
+ipxDestHopCount OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The number of hops necessary to reach the destination."
+   ::= {ipxDestEntry 6}
+
+ipxDestNextHopNICAddress OBJECT-TYPE
+   SYNTAX  PhysAddress
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The NIC address of the next hop."
+   DEFVAL  {'A102B304C506'H}
+   ::= {ipxDestEntry 7}
+
+ipxDestNextHopNetNum OBJECT-TYPE
+   SYNTAX  NetNumber
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The IPX network number of the next hop."
+   ::= {ipxDestEntry 8}
+
+ipxDestExistState OBJECT-TYPE
+   SYNTAX  INTEGER {
+      off(1),
+      on(2)
+      }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The validity of this entry.  An entry with this
+                value set to off may be deleted from the table at the
+                IPX implementation's discretion."
+   ::= {ipxDestEntry 9}
+
+-- Services Group
+--   The Services group contains management information for all known
+--   services.
+
+ipxServices   OBJECT IDENTIFIER ::= {rndIPX 7}
+
+-- Services Table
+--    This table contains the services information indexed by service
+--    name and type.
+
+ipxServTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF IpxServEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION "The table of services, indexed by name and type."
+   ::= {ipxServices 1}
+
+ipxServEntry OBJECT-TYPE
+   SYNTAX  IpxServEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION "Each entry corresponds to one service."
+   INDEX  {
+      ipxServSysInstance,
+      ipxServType,
+      IMPLIED ipxServName
+      }
+   ::= {ipxServTable 1}
+
+IpxServEntry ::= SEQUENCE {
+   ipxServSysInstance   INTEGER,
+   ipxServType          OCTET STRING,
+   ipxServName          OCTET STRING,
+   ipxServProtocol      INTEGER,
+   ipxServNetNum        NetNumber,
+   ipxServNode          OCTET STRING,
+   ipxServSocket        OCTET STRING,
+   ipxServHopCount      INTEGER,
+   ipxServExistState    INTEGER
+   }
+
+ipxServSysInstance OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The unique identifier of the instance of IPX
+                to which this entry corresponds."
+   ::= {ipxServEntry 1}
+
+ipxServType OBJECT-TYPE
+   SYNTAX  OCTET STRING (SIZE(2))
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The service type."
+   ::= {ipxServEntry 2}
+
+ipxServName OBJECT-TYPE
+   SYNTAX  OCTET STRING (SIZE(1..48))
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The service name."
+   ::= {ipxServEntry 3}
+
+ipxServProtocol OBJECT-TYPE
+   SYNTAX  INTEGER {
+      other(1),
+      local(2),
+      nlsp(4),
+      static(5),
+      sap(6)
+      }
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The protocol from which knowledge of this service was
+                obtained."
+   ::= {ipxServEntry 4}
+
+ipxServNetNum OBJECT-TYPE
+   SYNTAX  NetNumber
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The IPX network number portion of the IPX address of the
+                service."
+   ::= {ipxServEntry 5}
+
+ipxServNode OBJECT-TYPE
+   SYNTAX  OCTET STRING (SIZE(6))
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The node portion of the IPX address of the service."
+   ::= {ipxServEntry 6}
+
+ipxServSocket OBJECT-TYPE
+   SYNTAX  OCTET STRING (SIZE(2))
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The socket portion of the IPX address of the service."
+   ::= {ipxServEntry 7}
+
+ipxServHopCount OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The number of hops to the service."
+   ::= {ipxServEntry 8}
+
+ipxServExistState OBJECT-TYPE
+   SYNTAX  INTEGER {
+      off(1),
+      on(2)
+      }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The validity of this entry.  An entry with this
+                value set to off may be deleted from the table at the
+                IPX implementation's discretion."
+   ::= {ipxServEntry 9}
+
+
+-- This sub-tree defines the management information for the RIP and SAP
+-- protocols running in an IPX enviroment.  It provides information in
+-- addition to that contained in the IPX MIB itself.  All tables in this
+-- MIB are linked to an instance of IPX via the system instance
+-- identifier as defined in the IPX MIB.
+
+ripsap        OBJECT IDENTIFIER ::= {rndIPX 8}
+
+-- System Group
+--   This group contains global information about each instance of
+--   RIP/SAP running on one system.
+
+ripsapSystem  OBJECT IDENTIFIER ::= {ripsap 1}
+
+-- RIP System Table
+--   This table contains an entry for each instance of RIP
+--   running on the system.
+
+ripSysTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RipSysEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION "The RIP system table."
+   ::= {ripsapSystem 1}
+
+ripSysEntry OBJECT-TYPE
+   SYNTAX  RipSysEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION "Each entry corresponds to one instance of RIP
+                running on the system."
+   INDEX   {ripSysInstance}
+   ::= {ripSysTable 1}
+
+RipSysEntry ::= SEQUENCE {
+   ripSysInstance         INTEGER,
+   ripSysState            INTEGER,
+   ripSysIncorrectPackets Counter
+   }
+
+ripSysInstance OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The unique identifier of the instance of RIP to
+                which this row corresponds.  This value links the
+                instance of RIP to an instance of IPX running on the
+                system  (i.e. the value of ripSysInstance should be the
+                same as a value of ipxSysInstance).  This value may be
+                written only when creating a new entry in the table."
+   ::= {ripSysEntry 1}
+
+ripSysState OBJECT-TYPE
+   SYNTAX  INTEGER {
+      off(1),
+      on(2)
+      }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "Indicates the operational state of this instance of RIP."
+   ::= {ripSysEntry 2}
+
+ripSysIncorrectPackets OBJECT-TYPE
+   SYNTAX  Counter
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The number of times that an incorrectly formatted RIP
+                packet was received."
+   ::= {ripSysEntry 3}
+
+
+-- SAP System Table
+--   This table contains an entry for each instance of SAP
+--   running on the system.
+
+sapSysTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF SapSysEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION "The SAP system table."
+   ::= {ripsapSystem 2}
+
+sapSysEntry OBJECT-TYPE
+   SYNTAX  SapSysEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION "Each entry corresponds to one instance of SAP
+                running on the system."
+   INDEX   {sapSysInstance}
+   ::= {sapSysTable 1}
+
+SapSysEntry ::= SEQUENCE {
+   sapSysInstance          INTEGER,
+   sapSysState             INTEGER,
+   sapSysIncorrectPackets  Counter
+   }
+
+sapSysInstance OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The unique identifier of the instance of SAP to
+                which this row corresponds.  This value links the
+                instance of SAP to an instance of IPX running on the
+                system  (i.e. the value of SApSysInstance should be the
+                same as a value of ipxSysInstance).  This value may be
+                written only when creating a new entry in the table."
+   ::= {sapSysEntry 1}
+
+sapSysState OBJECT-TYPE
+   SYNTAX  INTEGER {
+      off(1),
+      on(2)
+      }
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "Indicates the operational state of this instance of SAP."
+   ::= {sapSysEntry 2}
+
+sapSysIncorrectPackets OBJECT-TYPE
+   SYNTAX  Counter
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The number of times that an incorrectly formatted SAP
+                packet was received."
+   ::= {sapSysEntry 3}
+
+
+-- Circuit Group
+--   This group contains RIP and SAP management information for each
+--   circuit known to this system.
+
+ripsapCircuit OBJECT IDENTIFIER ::= {ripsap 2}
+
+-- RIP Circuit Table
+--   The RIP Circuit table contains an entry for the RIP information for
+--   each circuit known to the system.
+
+ripCircTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RipCircEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION "The RIP Circuit table."
+   ::= {ripsapCircuit 1}
+
+ripCircEntry OBJECT-TYPE
+   SYNTAX  RipCircEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION "Each entry corresponds to one circuit known to the
+                system."
+   INDEX   {ripCircSysInstance,
+            ripCircIndex
+            }
+   ::= {ripCircTable 1}
+
+RipCircEntry ::= SEQUENCE {
+   ripCircSysInstance    INTEGER,
+   ripCircIndex          INTEGER,
+   ripCircState          INTEGER,
+   ripCircUpdate         INTEGER,
+   ripCircAgeMultiplier  INTEGER,
+   ripCircOutPackets     Counter,
+   ripCircInPackets      Counter
+   }
+
+ripCircSysInstance OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The unique identifier of the instance of RIP and IPX
+                (via ipxSysInstance) to which this entry corresponds.
+                This value may be written only when creating a new entry in
+                the table."
+   ::= {ripCircEntry 1}
+
+ripCircIndex OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The identifier of this circuit, unique within the
+                instance of RIP.  This value corresponds to the circuit
+                identifier found in ipxCircIndex.   This value may be
+                written only when creating a new entry in the table."
+   ::= {ripCircEntry 2}
+
+ripCircState OBJECT-TYPE
+   SYNTAX  INTEGER {
+      off(1),
+      on(2)
+      }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "Indicates whether RIP information may be sent/received
+                over this circuit."
+   DEFVAL  { on }
+   ::= {ripCircEntry 3}
+
+ripCircUpdate OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The RIP periodic update interval, in seconds."
+   DEFVAL  { 60 }
+   ::= {ripCircEntry 4}
+
+ripCircAgeMultiplier OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The holding multiplier for information received in RIP
+                periodic updates."
+   DEFVAL  { 4 }
+   ::= {ripCircEntry 5}
+
+ripCircOutPackets OBJECT-TYPE
+   SYNTAX  Counter
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The number of RIP packets sent on this circuit."
+   ::= {ripCircEntry 6}
+
+ripCircInPackets OBJECT-TYPE
+   SYNTAX  Counter
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The number of RIP packets received on this circuit."
+   ::= {ripCircEntry 7}
+
+
+-- SAP Circuit Table
+--   The SAP Circuit table contains an entry for the SAP information for
+--   each circuit known to the system.
+
+sapCircTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF SapCircEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION "The SAP Circuit table."
+   ::= {ripsapCircuit 2}
+
+sapCircEntry OBJECT-TYPE
+   SYNTAX  SapCircEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION "Each entry corresponds to one circuit known to the
+                system."
+   INDEX   {sapCircSysInstance,
+            sapCircIndex }
+   ::= {sapCircTable 1}
+
+SapCircEntry ::= SEQUENCE {
+   sapCircSysInstance           INTEGER,
+   sapCircIndex                 INTEGER,
+   sapCircState                 INTEGER,
+   sapCircUpdate                INTEGER,
+   sapCircAgeMultiplier         INTEGER,
+   sapCircGetNearestServerReply INTEGER,
+   sapCircOutPackets            Counter,
+   sapCircInPackets             Counter
+   }
+
+sapCircSysInstance OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The unique identifier of the instance of SAP and IPX
+                (via ipxSysInstance) to which this entry corresponds.
+                This value may be written only when creating a new entry in
+                the table."
+   ::= {sapCircEntry 1}
+
+sapCircIndex OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The identifier of this circuit, unique within the
+                instance of SAP.  This value corresponds to the circuit
+                identifier found in ipxCircIndex.   This value may be
+                written only when creating a new entry in the table."
+   ::= {sapCircEntry 2}
+
+sapCircState OBJECT-TYPE
+   SYNTAX  INTEGER {
+      off(1),
+      on(2)
+      }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "Indicates whether SAP information may be sent/received
+                over this circuit."
+   DEFVAL      { off }
+   ::= {sapCircEntry 3}
+
+sapCircUpdate OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The SAP periodic update interval, in seconds."
+   DEFVAL  { 60 }
+   ::= {sapCircEntry 4}
+
+sapCircAgeMultiplier OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "The holding multiplier for information received in SAP
+                periodic updates."
+   DEFVAL  { 4 }
+   ::= {sapCircEntry 5}
+
+sapCircGetNearestServerReply OBJECT-TYPE
+   SYNTAX  INTEGER {
+      no(1),
+      yes(2)
+      }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION "Indicates whether to respond to SAP get nearest server
+                requests received on this circuit."
+   DEFVAL  { yes }
+   ::= {sapCircEntry 6}
+
+sapCircOutPackets OBJECT-TYPE
+   SYNTAX  Counter
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The number of SAP packets sent on this circuit."
+   ::= {sapCircEntry 7}
+
+sapCircInPackets OBJECT-TYPE
+   SYNTAX  Counter
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION "The number of SAP packets received on this circuit."
+   ::= {sapCircEntry 8}
+
+-- This describes the - Facility for Access Control and Security
+-- NEW VERSION  OF FACS MIB WITHOUT APP AND WITH SOKET Upgrade
+--
+rndFACS    OBJECT IDENTIFIER ::=  { rnd 16 }
+
+rndFACSDefaultAction OBJECT-TYPE
+  SYNTAX  INTEGER {
+    block(1),
+    forward(2),
+    enable(3),
+    disable(4),
+    blockAndReport(129)
+  }
+  ACCESS  read-write
+  STATUS  mandatory
+  DESCRIPTION
+         "Used to define the default action for the device, when no
+                FACS statements applicable to a given frame are defined."
+
+ DEFVAL  { 1 }
+  ::= { rndFACS 1 }
+
+rndFACSActTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF RndFACSActEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+               "The table of  FACS action."
+        ::= { rndFACS 2 }
+
+rndFACSActEntry OBJECT-TYPE
+        SYNTAX  RndFACSActEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+          "Each rndFACSActEntry consist of the following parameters"
+        INDEX   {rndFACSActType,
+                 rndFACSActIfIndex}
+        ::= { rndFACSActTable 1 }
+
+RndFACSActEntry ::= SEQUENCE {
+        rndFACSActType
+           INTEGER,
+        rndFACSActIfIndex
+           INTEGER,
+        rndFACSAction
+           INTEGER
+                }
+
+rndFACSActType OBJECT-TYPE
+        SYNTAX  INTEGER {
+              tx(1),
+              rx(2),
+              activeDB(4),
+              tempDB(5)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This parameter indicate on which FACS Table the FACS
+                 action will preform."
+        ::= { rndFACSActEntry 1 }
+
+rndFACSActIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+               "The interface to which this FACS entry is applicable."
+        ::= { rndFACSActEntry 2 }
+
+
+rndFACSAction OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                eraseIP(2),
+                eraseDECnet(3),
+                eraseIPX(4),
+                eraseBrg(5),
+                replaceIP(6),
+                replaceIPX(8),
+                replaceBrg(9),
+                backupIP(10),
+                backupIPX(12),
+                backupBrg(13)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "The management station that sends a SET request for one of these actions
+                with indexes  rndFACSType and rndFACSIfIndex defines the type and the
+                interface  Id for which all FACS statements are to be erased.
+                If no interface or no type  is specified, all FACS statements for a
+                protocol are erased."
+      DEFVAL  { 1 }
+        ::= { rndFACSActEntry 3 }
+
+
+rndFACSTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF RndFACSEntry
+  ACCESS  not-accessible
+  STATUS  mandatory
+  DESCRIPTION
+         "The table of  FACS statment."
+  ::= { rndFACS 3 }
+
+rndFACSEntry OBJECT-TYPE
+  SYNTAX  RndFACSEntry
+  ACCESS  not-accessible
+  STATUS  mandatory
+  DESCRIPTION
+         "Each FACS statment consist of the following parameters"
+  INDEX  {rndFACSIfIndex,
+          rndFACSProtocolType,
+          rndFACSType,
+          rndFACSIndex }
+  ::= { rndFACSTable 1 }
+
+RndFACSEntry ::= SEQUENCE {
+     rndFACSIfIndex
+        INTEGER,
+     rndFACSProtocolType
+        INTEGER,
+     rndFACSType
+        INTEGER,
+     rndFACSIndex
+        INTEGER,
+     rndFACSSrcAdd
+        OCTET STRING ,
+     rndFACSSrcAddMask
+        OCTET STRING,
+     rndFACSDesAdd
+        OCTET STRING,
+     rndFACSDesAddMask
+        OCTET STRING,
+     rndFACSOperation
+        INTEGER,
+     rndFACSNetFiltering
+        INTEGER,
+     rndFACSSoketNum
+        INTEGER,
+     rndFACSMask1Id
+        INTEGER,
+     rndFACSMask2Id
+        INTEGER,
+     rndFACSStatus
+        INTEGER
+  }
+
+rndFACSIfIndex OBJECT-TYPE
+  SYNTAX  INTEGER
+  ACCESS  read-only
+  STATUS  mandatory
+  DESCRIPTION
+         "The interface to which this FACS entry is applicable."
+  ::= { rndFACSEntry 1 }
+
+rndFACSProtocolType OBJECT-TYPE
+  SYNTAX  INTEGER{
+                ip(1),
+                ipx(2),
+                dec(3),
+                bridge(4)
+        }
+  ACCESS  read-only
+  STATUS  mandatory
+  DESCRIPTION
+               "This parameter define the protocol the Security  Access Control
+                is applicable."
+  ::= { rndFACSEntry 2 }
+
+rndFACSType OBJECT-TYPE
+  SYNTAX  INTEGER {
+              tx(1),
+              rx(2),
+              cod(3),
+              activeDB(4),
+              tempDB(5)
+            }
+  ACCESS  read-only
+  STATUS  mandatory
+  DESCRIPTION
+                " The Mode of in which this FACS statement operates."
+  ::= { rndFACSEntry 3 }
+
+rndFACSIndex OBJECT-TYPE
+  SYNTAX  INTEGER
+  ACCESS  read-only
+  STATUS  mandatory
+  DESCRIPTION
+               "Index to the FACS  Table. "
+  ::= { rndFACSEntry 4 }
+
+rndFACSSrcAdd OBJECT-TYPE
+  SYNTAX  OCTET STRING
+  ACCESS  read-write
+  STATUS  mandatory
+  DESCRIPTION
+         "The size of the octet string will be according to the protocol type define in
+          rndFACSProtocolType."
+  ::= { rndFACSEntry 5 }
+
+rndFACSSrcAddMask OBJECT-TYPE
+  SYNTAX   OCTET STRING
+  ACCESS  read-write
+  STATUS  mandatory
+  DESCRIPTION
+         "Source-address mask ."
+  ::= { rndFACSEntry 6 }
+
+rndFACSDesAdd OBJECT-TYPE
+        SYNTAX   OCTET STRING
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+           "Destination-address The size of the octet string will be according to the
+           protocol type define in rndFACSProtocolType ."
+        ::= { rndFACSEntry 7 }
+
+
+rndFACSDesAddMask OBJECT-TYPE
+        SYNTAX   OCTET STRING
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Destination-address mask ."
+        ::= { rndFACSEntry 8 }
+
+
+rndFACSOperation OBJECT-TYPE
+        SYNTAX  INTEGER {
+               block(1),
+               forward(2),
+               permit(3),        -- For Connect On demand Only
+               deny(4),          -- For Connect On demand Only
+               blockZHRP(5),     -- Disable Zhrp for this FAXCS statement
+               blockAndReport(129)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "... ."
+        ::= { rndFACSEntry 9 }
+
+rndFACSNetFiltering OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                l2multicast(2), --applicable for Bridge protocol
+                arp(3),      --applicable for ip protocol
+                icmp(4),     --applicable for ip protocol
+                ip(5),       --applicable for ip protocol
+                udp(6),      --applicable for ip protocol
+                tcp(7),      --applicable for ip protocol
+                decnet(8),   --applicable for decnet protocol
+                ipx(9)      --applicable for ipx protocol
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "... ."
+        ::= { rndFACSEntry 10 }
+
+
+rndFACSSoketNum OBJECT-TYPE   --applicable for ip,ipx protocol
+        SYNTAX  INTEGER
+         --   {none(1),
+         --    ftp(21),
+         --    telenet(23),
+         --    smtp(25),
+         --    tftp(69),
+         --    snmp(161),
+         --    snmpTrape(162),
+         --    rip(520),
+         --    saPipx(1106),
+         --    ripIPX(1107)
+         --  }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            " Port/socket  number for different applications
+              0 is default meaning not applicable."
+        ::= { rndFACSEntry 11}
+
+rndFACSMask1Id OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            " Index into RND mask table FACS/COD Type) ."
+        ::= { rndFACSEntry 12}
+
+rndFACSMask2Id OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+       " Index into RND mask table FACS/COD according to
+       the value of rndFACSType ."
+   ::= { rndFACSEntry 13}
+
+
+rndFACSStatus OBJECT-TYPE
+   SYNTAX  INTEGER {
+     valid(1),
+     createRequest(2),   --  future use
+     underCreation(3),
+     invalid(4)          -- logically deleted
+   }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+       "The status of a table entry."
+   ::= { rndFACSEntry 14}
+
+rndBootP    OBJECT IDENTIFIER ::=  { rnd 24 }
+
+rndBootPServerAddress  OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+     " The IPAddress of the BOOTP server. the OpenGate will act as a BootP relay if
+       this parameter is not equale to 0.0.0.0."
+    DEFVAL  {'00000000'H}
+      ::= { rndBootP 1 }
+
+rndBootPRelaySecThreshold OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "BootP requests are relayed only if their SEC field is greater or
+        equal to the threshold value in order to allow local BootP Servers
+        to answer first."
+    ::= { rndBootP 2 }
+
+-- ip Specific group  Addition parameters to ip group in MIB-2
+
+ipSpec      OBJECT IDENTIFIER ::= { rnd 26 }
+
+rsIpAddrTable OBJECT-TYPE
+    SYNTAX  SEQUENCE  OF RsIpAddrEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "This table is parralel to MIB II IpAddrTable, and is used to
+        add/delete entries to/from that table. In addition it contains
+        private objects."
+    ::=  { ipSpec 1 }
+
+rsIpAddrEntry   OBJECT-TYPE
+    SYNTAX  RsIpAddrEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "The addressing information for one of this
+            entity's IP addresses."
+    INDEX  {rsIpAdEntAddr}
+    ::=  { rsIpAddrTable 1 }
+
+RsIpAddrEntry ::= SEQUENCE {
+    rsIpAdEntAddr                IpAddress,
+    rsIpAdEntIfIndex             INTEGER,
+    rsIpAdEntNetMask             IpAddress,
+    rsIpAdEntForwardIpBroadcast  INTEGER,
+    rsIpAdEntBackupAddr          IpAddress, -- obsolete
+    rsIpAdEntStatus              INTEGER,
+    rsIpAdEntBcastAddr           INTEGER
+    }
+
+rsIpAdEntAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The IP address to which this entry's addressing
+            information pertains."
+    ::= { rsIpAddrEntry 1 }
+
+rsIpAdEntIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+            "The index value which uniquely identifies the
+            interface to which this entry is applicable.  The
+            interface identified by a particular value of this
+            index is the same interface as identified by the
+            same value of ifIndex."
+    ::= { rsIpAddrEntry 2 }
+
+rsIpAdEntNetMask OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+            "The subnet mask associated with the IP address of
+            this entry.  The value of the mask is an IP
+            address with all the network bits set to 1 and all
+            the hosts bits set to 0."
+    ::= { rsIpAddrEntry 3 }
+
+rsIpAdEntForwardIpBroadcast OBJECT-TYPE
+    SYNTAX INTEGER {
+       enable(1),
+       disable(2)
+       }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        " This variable controls forwarding of IP (sub)net-directed
+          broadcasts destined for an attached sub(net). "
+    DEFVAL  { enable }
+    ::=   { rsIpAddrEntry 4 }
+
+rsIpAdEntBackupAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+            " "
+    ::= { rsIpAddrEntry 5 }
+
+rsIpAdEntStatus OBJECT-TYPE
+    SYNTAX INTEGER{
+       valid(1),
+       invalid(2)
+       }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        " The validity of this entry. Invalid indicates that this entry is
+          invalid in IpAddrTable (MIB II)."
+    DEFVAL  { valid }
+    ::=   { rsIpAddrEntry 6 }
+
+rsIpAdEntBcastAddr OBJECT-TYPE
+    SYNTAX INTEGER (0..1)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        " Indicates how the host part of ip subnet broadcast messages will be
+          filled:
+           0 - host part will be filled by 0
+           1 - host part will be filled by 1."
+    ::=   { rsIpAddrEntry 7 }
+
+icmpSpec               OBJECT IDENTIFIER ::= { ipSpec 2 }
+
+rsIcmpGenErrMsgEnable   OBJECT-TYPE
+    SYNTAX INTEGER {
+       enable(1),
+       disable(2)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "This variable controlls the ability to generate ICMP error messages"
+    DEFVAL  { enable }
+    ::= { icmpSpec 1 }
+
+rsIcmpRdTable OBJECT-TYPE
+    SYNTAX  SEQUENCE  OF RsIcmpRdEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "This table contains ICMP Router Discovery parameters
+        configurated per IP interface."
+    ::=  {icmpSpec 2}
+
+rsIcmpRdEntry   OBJECT-TYPE
+    SYNTAX  RsIcmpRdEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "The ICMP parameters configurated for IP interface."
+    INDEX  {rsIcmpRdIpAddr}
+    ::=  {rsIcmpRdTable 1}
+
+RsIcmpRdEntry ::= SEQUENCE {
+    rsIcmpRdIpAddr             IpAddress,
+    rsIcmpRdIpAdvertAddr       IpAddress,
+    rsIcmpRdMaxAdvertInterval  INTEGER,
+    rsIcmpRdMinAdvertInterval  INTEGER,
+    rsIcmpRdAdvertLifetime     INTEGER,
+    rsIcmpRdAdvertise          INTEGER,
+    rsIcmpRdPreferenceLevel    INTEGER,
+    rsIcmpRdEntStatus          INTEGER
+    }
+
+rsIcmpRdIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The IP address to which this entry's information pertains."
+    ::= {rsIcmpRdEntry 1}
+
+rsIcmpRdIpAdvertAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+            " The IP destination address to be used for multicast
+              Router Advertisements sent from the interface. The
+              only permissible values are the all-systems multicast
+              address, 224.0.0.1, or the limited-broadcast address,
+              255.255.255.255."
+    DEFVAL  {'E0000001'H}
+    ::= {rsIcmpRdEntry 2}
+
+rsIcmpRdMaxAdvertInterval OBJECT-TYPE
+    SYNTAX  INTEGER (4..1800)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+            "The maximum time allowed between sending multicast
+             Router Advertisements from the interface, in seconds.
+             Must be no less than 4 seconds and no greater than 1800
+             seconds."
+    DEFVAL  {600}
+    ::= {rsIcmpRdEntry 3}
+
+rsIcmpRdMinAdvertInterval OBJECT-TYPE
+    SYNTAX  INTEGER (3..1800)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+            "The minimum time allowed between sending unsolicited
+             multicast Router Advertisements from the interface, in
+             seconds.  Must be no less than 3 seconds and no greater
+             than rsIcmpRdMaxAdvertInterval.
+             Default: 0.75 * rsIcmpRdMaxAdvertInterval."
+    ::= {rsIcmpRdEntry 4}
+
+rsIcmpRdAdvertLifetime OBJECT-TYPE
+    SYNTAX  INTEGER (4..9000)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+             "The maximum length of time that the advertised addresses
+             are to be considered as valid. Must be no less than
+             rsIcmpRdMaxAdvertInterval and no greater than 9000 seconds.
+             Default: 3 * rsIcmpRdMaxAdvertInterval."
+    ::= {rsIcmpRdEntry 5}
+
+rsIcmpRdAdvertise OBJECT-TYPE
+    SYNTAX  INTEGER {
+       enable  (1),
+       disable (2)
+       }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+             "A flag indicating whether or not the address is to be
+              advertised."
+    DEFVAL  {enable}
+    ::= {rsIcmpRdEntry 6}
+
+rsIcmpRdPreferenceLevel OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+             "The preferability of the address as a default router
+             address, relative to other router addresses on the same
+             subnet."
+    DEFVAL  {0}
+    ::= {rsIcmpRdEntry 7}
+
+rsIcmpRdEntStatus  OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+            "Setting of any value to this object set values of
+             all fields to the default values."
+    ::=   {rsIcmpRdEntry 8}
+
+
+rip2Spec              OBJECT IDENTIFIER ::= { ipSpec  3 }
+
+rsRip2IfConfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE  OF RsRip2IfConfEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "This table is extension of rip2IfConfTable (RFC 1389 ,RIP 2)"
+    ::=  { rip2Spec 1  }
+
+rsRip2IfConfEntry   OBJECT-TYPE
+    SYNTAX  RsRip2IfConfEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION " "
+    INDEX  { rsRip2IfConfAddress }
+    ::=  {  rsRip2IfConfTable 1  }
+
+RsRip2IfConfEntry  ::= SEQUENCE {
+    rsRip2IfConfAddress    IpAddress,
+    rsRip2IfConfVirtualDis INTEGER,
+    rsRip2IfConfAutoSend   INTEGER
+    }
+
+rsRip2IfConfAddress  OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      " The IP Address of this system on the indicated subnet. "
+    ::=  { rsRip2IfConfEntry 1 }
+
+
+rsRip2IfConfVirtualDis OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+         "This variable defines the virtual number of hops assigned to
+          the interface specified by rsIfIpAddrIndex. This enables
+          fine-tuning of the RIP routing algorithm."
+    DEFVAL  { 1 }
+    ::=   { rsRip2IfConfEntry  2  }
+
+rsRip2IfConfAutoSend OBJECT-TYPE
+    SYNTAX  INTEGER {
+       enable  (1),
+       disable (2)
+       }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+         "This variable controls RIP automatic send behavior. If enabled
+          and no routers were heard on the interface, RIP will only send
+          default route with high metric. Otherwise RIP will send updates
+          according to configuration. "
+    DEFVAL  {enable}
+     ::=   { rsRip2IfConfEntry  3  }
+
+
+arpSpec                OBJECT IDENTIFIER ::= { ipSpec 4 }
+
+rsArpDeleteTable OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+         "Setting this object to any not-null value has the effect of deleting
+          all entries of the ARP table."
+    ::= { arpSpec 1  }
+
+rsArpInactiveTimeOut OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+         "This variable defines the maximum time period (in second) that can
+          pass between ARP requests concerning an entry in the ARP table.
+          After this time period, the entry is deleted from the table."
+    DEFVAL  { 60000 }
+    ::= { arpSpec 2  }
+
+rsArpProxy OBJECT-TYPE
+    SYNTAX INTEGER {
+       enable(1),
+       disable(2)
+    }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+         "When ARP Proxy is enabled, the router can respond to
+          ARP requests for nodes located on a different sub-net,
+          provided they are it its network table. The router responds
+          with its own MAC address.
+          When ARP Proxy is disabled, the router responds only
+          to ARP requests for its own IP addresses."
+    DEFVAL  { disable }
+    ::= { arpSpec 3  }
+
+tftp     OBJECT IDENTIFIER ::= { ipSpec 5 }
+
+rsTftpRetryTimeOut OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        " General Retransmission time-out value (seconds) "
+    DEFVAL  { 15 }
+    ::= { tftp 1 }
+
+rsTftpTotalTimeOut OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        " Total Retransmission time-out value (seconds) "
+    DEFVAL  { 60 }
+    ::= { tftp 2 }
+
+rsSendConfigFile OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The file name include path where the Router Server will put the full
+         configuration. The default destination address will be the sender 
+         address."
+    ::= { tftp 3 }
+
+rsGetConfigFile OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The file name include path where the Router Server will get the
+         configuration. The default source address will be the sender address."
+    ::= { tftp 4 }
+
+rsLoadSoftware OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The file name include path where the Router Server will get the
+         software. The source address will the sender address."
+    ::= { tftp 5 }
+
+rsFileServerAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The IP address of the configuration / sw server."
+        ::= { tftp 6 }
+
+
+ipRedundancy    OBJECT IDENTIFIER ::= { ipSpec 6 }
+
+ipRedundAdminStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+       }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This parameter controle the IP Redundancy in the device.
+          In case the the parameter in Enable and second router down.
+          all the traffic hendle by this element."
+    DEFVAL {disable }
+    ::= { ipRedundancy 1 }
+
+ipRedundOperStatus   OBJECT-TYPE
+    SYNTAX INTEGER {
+       active(1),
+       inactive(2)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        " obsolete "
+    DEFVAL  {inactive}
+    ::= { ipRedundancy 2 }
+
+ipRedundRoutersTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF IpRedundRoutersEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+    "List of IP addresses backed up by this router."
+     ::= {ipRedundancy 3 }
+
+ipRedundRoutersEntry  OBJECT-TYPE
+   SYNTAX IpRedundRoutersEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX {ipRedundRoutersIfAddr, ipRedundRoutersMainRouterAddr}
+   ::= {ipRedundRoutersTable  1 }
+
+IpRedundRoutersEntry ::= SEQUENCE {
+      ipRedundRoutersIfAddr          IpAddress,
+      ipRedundRoutersMainRouterAddr  IpAddress,
+      ipRedundRoutersOperStatus      INTEGER,
+      ipRedundRoutersPollInterval    INTEGER,
+      ipRedundRoutersTimeout         INTEGER,
+      ipRedundRoutersStatus          INTEGER
+  }
+
+ipRedundRoutersIfAddr OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+    "The Ip address of the IP interface on which the redundancy feature
+     is operational."
+     ::=  { ipRedundRoutersEntry  1}
+
+ipRedundRoutersMainRouterAddr OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+    "The Ip address of the polled main router."
+     ::=  { ipRedundRoutersEntry 2}
+
+ipRedundRoutersOperStatus OBJECT-TYPE
+   SYNTAX INTEGER { active(1), inactive(2) }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+    "If active, the main router is considered inoperational and the IP
+    interface operates as its backup."
+     ::=  { ipRedundRoutersEntry 3 }
+
+ipRedundRoutersPollInterval OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "Polling interval for this router (in seconds). If 0 the router is not
+     polled."
+     DEFVAL  { 3 }
+     ::=  { ipRedundRoutersEntry 4 }
+
+ipRedundRoutersTimeout OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "Interval in seconds during which the backed-up router must signal.
+     If it does not signal, it is considered inoperational and the IP
+     interface starts operating as backup."
+     DEFVAL  { 12 }
+     ::=  { ipRedundRoutersEntry  5}
+
+ipRedundRoutersStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+     active(1),
+     notInService(2),
+     notReady(3),
+     createAndGo(4),
+     createAndWait(5),
+     destroy(6)
+     }
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "Entry status"
+     ::=  { ipRedundRoutersEntry 6}
+
+ipRouteLeaking    OBJECT IDENTIFIER ::= { ipSpec 7 }
+
+ipLeakStaticToRip   OBJECT-TYPE
+    SYNTAX  INTEGER {
+       enable  (1),
+       disable (2)
+       }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This parameter controls leaking (redistribution) of static routes
+         to RIP. When enabled, all routes inserted to the IP routing table
+         via SNMP are advertised into RIP."
+    DEFVAL  {enable}
+    ::= { ipRouteLeaking 1 }
+
+ipLeakStaticToOspf   OBJECT-TYPE
+    SYNTAX  INTEGER {
+       enable  (1),
+       disable (2)
+       }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This parameter controls leaking (redistribution) of static routes
+         into OSPF. When enabled, all routes inserted to the IP routing table
+         via SNMP are advertised into OSPF as external routes."
+    DEFVAL  {enable}
+    ::= { ipRouteLeaking 2 }
+
+ipLeakOspfToRip   OBJECT-TYPE
+    SYNTAX  INTEGER {
+       enable  (1),
+       disable (2)
+       }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This parameter controls leaking (redistribution) of routes
+         from OSPF to RIP. If enabled, all routes learned via OSPF
+         are advertised into RIP."
+    DEFVAL  {disable}
+    ::= { ipRouteLeaking 3 }
+
+ipLeakRipToOspf   OBJECT-TYPE
+    SYNTAX  INTEGER {
+       enable  (1),
+       disable (2)
+       }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This parameter controls leaking (redistribution) of routes
+         from RIP to OSPF. If enabled, all routes learned via RIP
+         are advertised into OSPF as external routes."
+    DEFVAL  {disable}
+    ::= { ipRouteLeaking 4 }
+
+ipLeakExtDirectToOspf   OBJECT-TYPE
+    SYNTAX  INTEGER {
+       enable  (1),
+       disable (2)
+       }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This parameter controls leaking (redistribution) into OSPF of
+         direct routes external to OSPF, i.e. routes to local network
+         corresponding to IP interfaces on which OSPF is disabled.
+         When enabled, all such direct routes are advertised into OSPF
+         as external routes."
+    DEFVAL  {enable}
+    ::= { ipRouteLeaking 5 }
+
+ipRipFilter    OBJECT IDENTIFIER ::= { ipSpec 8 }
+
+-- Global RIP filter is defined per IP router.
+
+rsIpRipFilterGlbTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RsIpRipFilterGlbEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+      "The table of RIP global filters per IP router."
+::= { ipRipFilter 1 }
+
+rsIpRipFilterGlbEntry  OBJECT-TYPE
+SYNTAX    RsIpRipFilterGlbEntry
+ACCESS    not-accessible
+STATUS    mandatory
+DESCRIPTION
+      " An entry in the RIP global filter table "
+INDEX  { rsIpRipFilterGlbType,
+         rsIpRipFilterGlbNumber }
+::= { rsIpRipFilterGlbTable 1 }
+
+RsIpRipFilterGlbEntry  ::= SEQUENCE {
+      rsIpRipFilterGlbType            INTEGER,
+      rsIpRipFilterGlbNumber          INTEGER,
+      rsIpRipFilterGlbStatus          INTEGER,
+      rsIpRipFilterGlbIpAddr          IpAddress,
+      rsIpRipFilterGlbNetworkMaskBits INTEGER,
+      rsIpRipFilterGlbMatchBits       INTEGER,
+      rsIpRipFilterGlbAction          INTEGER
+}
+
+rsIpRipFilterGlbType  OBJECT-TYPE
+SYNTAX INTEGER  {
+    input(1),
+    output(2)
+}
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+    " Type of filter - input/output "
+::= {rsIpRipFilterGlbEntry 1}
+
+rsIpRipFilterGlbNumber OBJECT-TYPE
+SYNTAX  INTEGER
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+   " Number of RIP filter. "
+::= {rsIpRipFilterGlbEntry  2}
+
+rsIpRipFilterGlbStatus OBJECT-TYPE
+SYNTAX INTEGER  {
+    valid (1),
+    invalid (2),
+    underCreation (3)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+   " The validity of this entry. Setting this value to invalid deletes
+   the entry, and the entry may be actualy removed from the table."
+DEFVAL  { valid }
+::= {rsIpRipFilterGlbEntry 3}
+
+rsIpRipFilterGlbIpAddr OBJECT-TYPE
+SYNTAX IpAddress
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+   " network prefix IP address, as in the forwarding table. "
+DEFVAL {'00000000'H}
+::= {rsIpRipFilterGlbEntry  4}
+
+rsIpRipFilterGlbNetworkMaskBits  OBJECT-TYPE
+SYNTAX  INTEGER
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+   " the number of bits in the IP Network mask, called network-prefix-length
+   in Router Requirements terminology. for example: the value 16 means
+   mask 255.255.0.0 "
+   DEFVAL {0}
+::= {rsIpRipFilterGlbEntry 5}
+
+rsIpRipFilterGlbMatchBits  OBJECT-TYPE
+SYNTAX  INTEGER
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+   " the number of bits to match in the Network IP address. A value
+   smaller than 32 defines a wildcard. for example: the value 8 means
+   all routes whose leftmost 8 bits are equal to those of the network IP
+   address. If this variable has a value other than 32, than
+   rsIpRipFilterGlbNetworkMaskBits must be 0 and is ignored. "
+   DEFVAL {32}
+::= {rsIpRipFilterGlbEntry 6}
+
+rsIpRipFilterGlbAction OBJECT-TYPE
+SYNTAX INTEGER {
+   deny(1),
+   permit(2)
+}
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+   " Filter action - permit/deny for this network"
+DEFVAL { permit }
+::= {rsIpRipFilterGlbEntry  7}
+
+
+-- Intf RIP filter is defined per IP Interface
+
+rsIpRipFilterLclTable OBJECT-TYPE
+SYNTAX SEQUENCE OF RsIpRipFilterLclEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+   "Table of input/output  RIP filters used per IP Interface."
+::= { ipRipFilter 2 }
+
+rsIpRipFilterLclEntry  OBJECT-TYPE
+SYNTAX RsIpRipFilterLclEntry
+ACCESS not-accessible
+STATUS mandatory
+DESCRIPTION
+   " An entry in the Intf RIP filter table"
+INDEX  {rsIpRipFilterLclIpIntf,
+        rsIpRipFilterLclType,
+        rsIpRipFilterLclNumber}
+::= { rsIpRipFilterLclTable 1 }
+
+RsIpRipFilterLclEntry  ::= SEQUENCE {
+      rsIpRipFilterLclIpIntf          IpAddress,
+      rsIpRipFilterLclType            INTEGER,
+      rsIpRipFilterLclNumber          INTEGER,
+      rsIpRipFilterLclStatus          INTEGER,
+      rsIpRipFilterLclIpAddr          IpAddress,
+      rsIpRipFilterLclNetworkMaskBits INTEGER,
+      rsIpRipFilterLclMatchBits       INTEGER,
+      rsIpRipFilterLclAction          INTEGER
+}
+
+rsIpRipFilterLclIpIntf  OBJECT-TYPE
+SYNTAX IpAddress
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+   " The IP address identifying the RIP interface for this filter.
+   This value corresponds to rsIpAdEntAddr. "
+::= {rsIpRipFilterLclEntry 1}
+
+
+rsIpRipFilterLclType  OBJECT-TYPE
+SYNTAX INTEGER  {
+   input(1),
+   output(2)
+}
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+   " Type of filter - input/output "
+::= {rsIpRipFilterLclEntry 2}
+
+rsIpRipFilterLclNumber OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION
+   " Number of RIP filter for this Interface"
+::= {rsIpRipFilterLclEntry  3}
+
+rsIpRipFilterLclStatus   OBJECT-TYPE
+SYNTAX INTEGER  {
+   valid (1),
+   invalid (2),
+   underCreation (3)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+   " The validity of this entry. Setting this value to invalid deletes
+   the entry, and the entry may be actualy removed from the table."
+DEFVAL  { valid }
+::= {rsIpRipFilterLclEntry  4}
+
+rsIpRipFilterLclIpAddr OBJECT-TYPE
+SYNTAX IpAddress
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+   " network prefix IP address, as in the forwarding table. "
+DEFVAL {'00000000'H}
+::= {rsIpRipFilterLclEntry  5}
+
+rsIpRipFilterLclNetworkMaskBits  OBJECT-TYPE
+SYNTAX  INTEGER
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+   " the number of bits in the IP Network mask, called network-prefix-length
+   in Router Requirements terminology. for example: the value 16 means
+   mask 255.255.0.0 "
+DEFVAL {0}
+::= {rsIpRipFilterLclEntry 6}
+
+rsIpRipFilterLclMatchBits  OBJECT-TYPE
+SYNTAX  INTEGER
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+   " the number of bits to match in the Network IP address. A value
+   smaller than 32 defines a wildcard. for example: the value 8 means
+   all routes whose leftmost 8 bits are equal to those of the network IP
+   address. If this variable has a value other than 32, than
+   rsIpRipFilterLclNetworkMaskBits must be 0 and is ignored. "
+DEFVAL {32}
+::= {rsIpRipFilterLclEntry 7}
+
+rsIpRipFilterLclAction OBJECT-TYPE
+SYNTAX INTEGER  {
+   deny(1),
+   permit(2)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+   " Filter action - permit/deny "
+DEFVAL { permit }
+::= {rsIpRipFilterLclEntry  8}
+
+
+rsRipEnable OBJECT-TYPE
+    SYNTAX  INTEGER {
+      enable(1),
+      disable(2)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "Enables or disables RIP."
+    ::=  { ipSpec 9 }
+
+lreBoxAgentIP OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           ""
+    ::=  { ipSpec 10 }
+
+virtualLan  OBJECT IDENTIFIER ::= { rnd 27 }
+
+--
+--  virtualLanTable
+--
+virtualLanTable  OBJECT-TYPE
+   SYNTAX  SEQUENCE OF VirtualLanEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+         "An entry of this table specifies an new ifIndex with a type of
+          propVirtual(53)."
+   ::= { virtualLan 1 }
+
+virtualLanEntry OBJECT-TYPE
+   SYNTAX  VirtualLanEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+         "A list of information for each virtual LAN."
+   INDEX  { vlIfIndex}
+   ::= { virtualLanTable 1 }
+
+VirtualLanEntry   ::= SEQUENCE {
+     vlIfIndex          INTEGER,
+     vlProto            INTEGER,
+     vlAutoConfigEnable TruthValue,
+     vlStatus           RowStatus,
+     vlType             INTEGER
+   }
+
+vlIfIndex OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+         "An logical interface number, corresponded this VL"
+   ::= { virtualLanEntry 1 }
+
+vlProto  OBJECT-TYPE
+   SYNTAX  INTEGER {
+      other(1),
+      ip(2),
+      ipmulticast(3),
+      ipxRaw(4),
+      ipxET(5),
+      ipxLLC(6),
+      ipxSNAP(7),
+      decNET(8),
+      decLAT(9),
+      netBios(10),
+      appleTalk(11),
+      xns(12),
+      sna(13),
+      userDefined(14)
+      }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+         "The protocol, supported by this VL. The meanings of the values are:
+      other: none of the following. This VL includes any protocol except the
+             following protocols. It  is a bridging VL. RS relies on
+             a third-party router to exchange traffic between nodes on different
+             virtual LANs of this type.
+      IP:    This is a routing VL, RS will route between nodes on
+             different virtual LANs.
+      IPmulticast: RS will broadcast the message to all  the VL's ports. Used for
+             video-conferencing applications.
+      ipxRaw: This is a Routing VL, RS will route between nodes on
+             different virtual LANs.
+      ipxET: This is a routing VL, RS will route between nodes on
+             different virtual LANs.
+      ipxLLC: This is a routing VL, RS will route between nodes on
+             different virtual LANs.
+      ipxSNAP: This is a routing VL, RS will route between nodes on
+             different virtual LANs.
+      decNET: This is a bridging VL, RS relies on a third-party router
+             to exchange traffic between nodes on different DECnet virtual
+             LANs of this type.
+      netBios: This is a Bridging VL, RS relies on a third-party router
+             to exchange traffic between nodes on different NetBIOS virtual
+             LANs of this type.
+      appleTalk: This is a bridging VL, RS relies on a third-party router
+             to exchange traffic between nodes on different AppleTalk virtual
+             LANs of this type."
+   ::= { virtualLanEntry 2 }
+
+vlAutoConfigEnable  OBJECT-TYPE
+   SYNTAX  TruthValue
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+         "It is used only in the case of IP. The meanings of the values are:
+      true(1):  Autolearning is used for this VL
+      false(2): Autolearning isn't used for this VL from ports, specified in 
+                the table virtualLanAutoConfTable."
+   ::= { virtualLanEntry 3 }
+
+vlStatus  OBJECT-TYPE
+   SYNTAX  RowStatus
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+         "It is used to delete an entry"
+   ::= { virtualLanEntry 4 }
+
+vlType OBJECT-TYPE
+   SYNTAX INTEGER {
+        regular(1),
+        specBroadcast(2),
+        specArpReq(3),
+        specBroadcastAndUnicast(4),
+        specArpReqAndUnicast(5)
+        }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+       "regular       - ordinary type
+        specBroadcast - for switches that support VLANs as a set of ports and
+                        only as a broadcast domain: broadcast frames do not
+                        cross VLAN's bounders, but unicast frames may be
+                        transmitted between different VLANs. Permits passing
+                        of broadcast frames between Vgate's VLANs.
+        specArpReq -    for switches that support VLANs as a set of ports and
+                        only as a broadcast domain: broadcast frames do not
+                        cross VLAN's bounders, but unicast frames may be
+                        transmitted between different VLANs. Permits passing
+                        of ARP request frames between Vgate's VLANs.
+        specBroadcastAndUnicast -
+                        for switches that support VLANs as a set of ports
+                        but no frame crosses VLAN's bounders. Permits passing
+                        of IP/ARP request broadcast and IP unicast frames
+                        between Vgate's VLANs.
+        specArpReqAndUnicast -
+                        for switches that support VLANs as a set of ports
+                        but no frame crosses VLAN's bounders. Permits passing
+                        of ARP request broadcast and IP unicast frames between
+                        Vgate's VLANs. This type can be used only for IP VLANs."
+   ::= { virtualLanEntry 5 }
+
+--
+--   virtualLanPortsTable
+--
+virtualLanPortsTable  OBJECT-TYPE
+   SYNTAX SEQUENCE OF VirtualLanPortEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+         "For each VL (a ifIndex with a type of propVirtual(53)) an entry of  this
+           table specifies a set of ports, which it contains."
+   ::= { virtualLan 2 }
+
+virtualLanPortEntry   OBJECT-TYPE
+   SYNTAX  VirtualLanPortEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+         "A entry of this table specifies a  VL and a port belonging to it"
+   INDEX  { vLIfIndex, vLPortIfIndex}
+   ::= { virtualLanPortsTable 1 }
+
+VirtualLanPortEntry  ::= SEQUENCE {
+     vLIfIndex      INTEGER,
+     vLPortIfIndex  INTEGER,
+     vLPortType     INTEGER,
+     vLPortStatus   RowStatus
+   }
+
+vLIfIndex  OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+        "An logical interface number, corresponding to this VL"
+   ::= { virtualLanPortEntry 1 }
+
+vLPortIfIndex  OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+         "A physical port belonging to the VL specified by vlIfIndex."
+   ::= { virtualLanPortEntry 2 }
+
+vLPortType   OBJECT-TYPE
+   SYNTAX  INTEGER {static(1), dynamic(2) }
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+         "static means configured by user dynamic means autoconfigured by the RS"
+   ::= { virtualLanPortEntry 3}
+
+vLPortStatus  OBJECT-TYPE
+   SYNTAX  RowStatus
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+         "It is used to delete an entry"
+   ::= { virtualLanPortEntry 4}
+
+--
+--   virtualLanAutoConfTable
+--
+virtualLanAutoConfTable  OBJECT-TYPE
+   SYNTAX SEQUENCE OF VirtualLanAutoConfEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+         "This table specifies per a routing protocol a set of ports, from which
+           RS will automatically  learning VL in accordance with rules, defined
+           by the protocol."
+   ::= { virtualLan 3 }
+
+virtualLanAutoConfEntry   OBJECT-TYPE
+   SYNTAX  VirtualLanAutoConfEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+       "One port, specified by vlAutoConfPortIfIndex, for which the RS will
+        automatically  learn its VL in accordance with rules, defined
+        by  the protocol specified in vlAutoConfProto."
+   INDEX  {vlAutoConfPortIfIndex,
+           vlAutoConfProto}
+   ::= { virtualLanAutoConfTable 1 }
+
+VirtualLanAutoConfEntry ::= SEQUENCE {
+   vlAutoConfProto        INTEGER,
+   vlAutoConfPortIfIndex  INTEGER,
+   vlAutoConfStatus       RowStatus
+   }
+vlAutoConfPortIfIndex OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+         "Port on which the autoconfig option should be supported"
+   ::= { virtualLanAutoConfEntry 1 }
+
+vlAutoConfProto OBJECT-TYPE
+   SYNTAX  INTEGER {
+      ip(2)
+      }
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+         "Protocol for which the autoconfig option is supported for the port
+          specified by vlAutoConfPortIfIndex  "
+   ::= {virtualLanAutoConfEntry 2 }
+
+vlAutoConfStatus  OBJECT-TYPE
+   SYNTAX  RowStatus
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+         "It is used to delete an entry"
+   ::= { virtualLanAutoConfEntry 3 }
+
+virtualLanAutoConfAgingTimeout  OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+         "The units of this MIB object is seconds.
+          Its value can be either 0 or in range 10..65535 ."
+   DEFVAL  { 3600 }
+   ::= { virtualLan 4 }
+
+virtualLanProtocolVlan  OBJECT IDENTIFIER ::= { virtualLan 5 }
+
+virtualLanUserEtherType  OBJECT-TYPE
+   SYNTAX OCTET STRING(SIZE(2))
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+         ""
+   ::= { virtualLanProtocolVlan 1}
+
+virtualLanUserMask  OBJECT-TYPE
+   SYNTAX OCTET STRING(SIZE(2))
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+         ""
+   ::= { virtualLanProtocolVlan 2}
+
+--
+
+rsConf  OBJECT IDENTIFIER ::= { rnd 28 }
+
+-- The following MIB group is used by the Management/Configuration
+-- station to configure the device interfaces,
+-- physicals as well as virtuals Networks..
+-- Each entry in the rsConfTable should have one of
+-- the extended rsIfType.
+-- It will also have a corresponding entry in the standard iftable.
+-- The implementation uses these inputs to build the interface
+-- layer of the device. The output is reflected in the
+-- ifTable and ifStackTable which are implementation dependent.
+
+RsIfType ::= INTEGER
+--      STATUS  current
+--       DESCRIPTION
+--           "This type defines what type of sub-layer is used
+--            in each entry of rsIfConfTable.
+--            It should contain values from IANAifType
+--            type for standard sub-layer, and values (starting from 500
+--            decimal) for private sub-layers.
+--            The values of ifType field in ifTable should be taken
+--            from this type for ifTable entries which have full correlation
+--            with entries in rsIfConfTable.
+--            Other entries in ifTable should have other
+--            ifType values (defined by other type) depend on the specific
+--            implementation."
+           {
+            ppp(23),             -- From IANAifType
+            frameRelay(32),      --     "
+            virtualNet(500),
+            rndWan(1000),        -- Rad/Rnd private
+            cod(1001),               --      "
+            backup(1002),         --      "
+            fr1490(1003),          --      "
+            b1isdn(1010),
+            b2isdn(1011),
+            unknown(1100)
+           }
+
+
+rsIfConfTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RsIfConfEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+        "This table enable the user to add interface  to the RS.
+           RS will automatically  add the new interface to the interface Table "
+   ::= { rsConf 1 }
+
+rsIfConfEntry OBJECT-TYPE
+       SYNTAX RsIfConfEntry
+       ACCESS  not-accessible
+       STATUS  mandatory
+       DESCRIPTION
+           "Each entry defines a configured interface."
+       INDEX { rsIfConfIndex }
+      ::= { rsIfConfTable 1 }
+
+
+RsIfConfEntry ::= SEQUENCE {
+   rsIfConfIndex  INTEGER,
+   rsIfConfType   RsIfType,
+   rsIfConfName   DisplayString,
+   rsIfConfStatus RowStatus
+      }
+rsIfConfIndex OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+       "This variable uniquely identifies the interface.
+       It is used as a cross reference in other system tables"
+   ::= { rsIfConfEntry 1 }
+
+rsIfConfType  OBJECT-TYPE
+   SYNTAX  RsIfType
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+       "This variable identifies the type of the specific
+       entry in the rsIfConfTable.
+       This field is writable only at creation time
+       (i.e., when value of status is underCreation)."
+   ::= { rsIfConfEntry 2 }
+
+rsIfConfName  OBJECT-TYPE
+   SYNTAX  DisplayString
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+       "This variable provides a logical name to a specific entry in
+       rsIfConfTable"
+   ::= { rsIfConfEntry 3 }
+
+rsIfConfStatus  OBJECT-TYPE
+   SYNTAX  RowStatus
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+       "The status of the ConfigEntry.  The choices are those
+       defined in SNMPv2-TC. Only: active, createAndWait, and destroy
+       will be used.
+       active - The conceptual row is available for use by the managed device.
+       createAndWait - A new instance of a conceptual row is desired, but
+       not to have it available for use by the managed device.
+       destroy - Delete all instances associated with an existing conceptual row."
+   ::= { rsIfConfEntry 4 }
+
+rsTunning  OBJECT IDENTIFIER ::= { rnd 29 }
+
+rsHighPriority OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable indicates the time interval the forwarding task inside the
+      RS works in High Priority Mode."
+    ::=  { rsTunning 1  }
+
+rsLowPriority OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable indicates the time interval the forwarding task inside the
+      RS works in Low Priority Mode."
+    ::=  { rsTunning 2  }
+
+rsDbgLevel OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable indicates the debug level the Router Server works.
+       the range of this variable is 1..100 "
+    ::=  { rsTunning 3  }
+
+rsDiagnostic  OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable  will contain some dignostic information in case on a
+       problem ocurs in the RS functinality."
+    ::=  { rsTunning 4 }
+
+rsConfirmMessagTab  OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable  enables the operator to confirm all the message in the
+       event Message Table."
+    ::=  { rsTunning 5 }
+
+eventMessageTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF EventMessageEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+    "The Event Message table of the agent"
+     ::= { rsTunning 6 }
+
+eventMessageEntry  OBJECT-TYPE
+   SYNTAX EventMessageEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { eventNum }
+   ::= {eventMessageTable 1}
+
+EventMessageEntry  ::= SEQUENCE {
+   eventNum        INTEGER,
+   eventDesc       DisplayString
+   }
+
+eventNum OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "The event number,the index of this table."
+   ::= {eventMessageEntry 1}
+
+eventDesc  OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "The event discription, this text will include time and severity."
+  ::= {eventMessageEntry 2}
+
+reaTunning OBJECT IDENTIFIER ::= { rsTunning 7 }
+
+reaIpRemoteAgingTime OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable specifies aging time used by the REA for remote
+       entries in the Ip Fast Forwarding Table."
+    ::=  { reaTunning 1 }
+
+reaFftHashMaxChain OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable specifies the maximum length of hash chains in
+       the Fast Forwarding Tables."
+    ::=  { reaTunning 2 }
+
+reaMltcstBitOn OBJECT-TYPE
+    SYNTAX INTEGER {
+        on  (1),
+        off (2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      ""
+    ::=  { reaTunning 3 }
+
+reaIpForwardEnable OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable  (1),
+        disable (2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Platform will perform fast IP forwarding if only if this
+       variable's value is enable."
+    ::=  { reaTunning 4 }
+
+reaIpxForwardEnable OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable  (1),
+        disable (2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Platform will perform fast IPX forwarding if only if this
+       variable's value is enable."
+    ::=  { reaTunning 5 }
+
+reaBridgeEnable OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable  (1),
+        disable (2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Platform will perform bridging if only if this
+       variable's value is enable."
+    ::=  { reaTunning 6 }
+
+reaFacsEnable OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable  (1),
+        disable (2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The RS and Platform will perform FASC if only if this
+       variable's value is enable."
+    ::=  { reaTunning 7 }
+
+reaIpForwardDatagrams OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The number of IP datagrams have been forwarded by the Platform."
+    ::=  { reaTunning 8 }
+
+reaIpInDiscards OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The number of IP datagrams have been dicarded by the Platform."
+    ::=  { reaTunning 9 }
+
+reaIpxForwardDatagrams OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The number of IPX datagrams have been forwarded by the Platform."
+    ::=  { reaTunning 10 }
+
+reaIpxInDiscards OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The number of IP datagrams have been dicarded by the Platform."
+    ::=  { reaTunning 11 }
+
+reaBridgeFftTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF ReaBridgeFftEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "The Bridge Fast Forwarding Table"
+    ::=  { reaTunning 12 }
+
+reaBridgeFftEntry  OBJECT-TYPE
+   SYNTAX ReaBridgeFftEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { reaBrgFftEntryNum }
+   ::= { reaBridgeFftTable 1 }
+
+ReaBridgeFftEntry ::= SEQUENCE {
+        reaBrgFftEntryNum           INTEGER,
+        reaBrgFftMacAddr            PhysAddress,    -- from RFC1213
+        reaBrgFftReNum              INTEGER,        -- 1..N
+        reaBrgFftPortNum            INTEGER,        -- 1..N
+        reaBrgFftFacsSrcIndex       INTEGER,
+        reaBrgFftFacsDstIndex       INTEGER
+   }
+
+reaBrgFftEntryNum OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaBridgeFftEntry 1 }
+
+reaBrgFftMacAddr OBJECT-TYPE
+   SYNTAX PhysAddress
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaBridgeFftEntry 2 }
+
+reaBrgFftReNum OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaBridgeFftEntry 3 }
+
+reaBrgFftPortNum OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaBridgeFftEntry 4 }
+
+reaBrgFftFacsSrcIndex OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaBridgeFftEntry 5 }
+
+reaBrgFftFacsDstIndex OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaBridgeFftEntry 6 }
+
+reaBrgDiscards OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The number of bridging datagrams have been discarded by the Platform."
+    ::=  { reaTunning 13 }
+
+reaBrgForwards OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The number of bridging datagrams have been forwarded by the Platform."
+    ::=  { reaTunning 14 }
+
+reaIpFftTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF ReaIpFftEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "The IP Fast Forwarding Table"
+    ::=  { reaTunning 15 }
+
+reaIpFftEntry  OBJECT-TYPE
+   SYNTAX ReaIpFftEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { reaIpFftEntryNum }
+   ::= { reaIpFftTable 1 }
+
+ReaIpFftEntry ::= SEQUENCE {
+        reaIpFftEntryNum            INTEGER,
+        reaIpFftDstIpAddr           IpAddress,
+        reaIpFftDstIpMask           IpAddress,
+        reaIpFftRangeType           INTEGER,
+        reaIpFftSrcMacAddr          PhysAddress,
+        reaIpFftDstMacAddr          PhysAddress,
+        reaIpFftReNum               INTEGER,        -- 1..N
+        reaIpFftPortNum             INTEGER,        -- 1..N
+        reaIpFftFacsSrcIndex        INTEGER,
+        reaIpFftFacsDstIndex        INTEGER,
+        reaIpFftApplFlags           OCTET STRING
+   }
+
+reaIpFftEntryNum OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpFftEntry 1 }
+
+reaIpFftDstIpAddr OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpFftEntry 2 }
+
+reaIpFftDstIpMask OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpFftEntry 3 }
+
+reaIpFftRangeType OBJECT-TYPE
+   SYNTAX INTEGER {
+        direct (1),
+        remote (2)
+   }
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpFftEntry 4 }
+
+reaIpFftSrcMacAddr OBJECT-TYPE
+   SYNTAX PhysAddress
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpFftEntry 5 }
+
+reaIpFftDstMacAddr OBJECT-TYPE
+   SYNTAX PhysAddress
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpFftEntry 6 }
+
+reaIpFftReNum OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpFftEntry 7 }
+
+reaIpFftPortNum OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpFftEntry 8 }
+
+reaIpFftFacsSrcIndex OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpFftEntry 9 }
+
+reaIpFftFacsDstIndex OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpFftEntry 10 }
+
+reaIpFftApplFlags OBJECT-TYPE
+   SYNTAX OCTET STRING (SIZE(4))
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "A bit mask that defines the applications associated with this entry:
+       __________________________________________
+       |  Byte 1|Byte 2 |Byte 3 | ....|Byte 20  |
+       |87654321|                     | 87654321|
+       |________|_______________________________|
+
+ Byte1 :
+      bit1: Server Dispatcher Client"
+   ::=  { reaIpFftEntry 11 }
+
+reaIpxFftTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF ReaIpxFftEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "The IPX Fast Forwarding Table"
+    ::=  { reaTunning 16 }
+
+reaIpxFftEntry  OBJECT-TYPE
+   SYNTAX ReaIpxFftEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { reaIpxFftEntryNum }
+   ::= { reaIpxFftTable 1 }
+
+ReaIpxFftEntry ::= SEQUENCE {
+        reaIpxFftEntryNum             INTEGER,
+        reaIpxFftDstNetid             INTEGER,
+        reaIpxFftRangeType            INTEGER,
+        reaIpxFftSrcMacAddr           PhysAddress,
+        reaIpxFftDstMacAddr           PhysAddress,
+        reaIpxFftReNum                INTEGER,        -- 1..N
+        reaIpxFftPortNum              INTEGER,        -- 1..N
+        reaIpxFftFacsSrcIndex         INTEGER,
+        reaIpxFftFacsDstIndex         INTEGER
+   }
+
+reaIpxFftEntryNum OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpxFftEntry 1 }
+
+reaIpxFftDstNetid OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpxFftEntry 2 }
+
+reaIpxFftRangeType OBJECT-TYPE
+   SYNTAX INTEGER {
+        direct (1),
+        remote (2)
+   }
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpxFftEntry 3 }
+
+reaIpxFftSrcMacAddr OBJECT-TYPE
+   SYNTAX PhysAddress
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpxFftEntry 4 }
+
+reaIpxFftDstMacAddr OBJECT-TYPE
+   SYNTAX PhysAddress
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpxFftEntry 5 }
+
+reaIpxFftReNum OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpxFftEntry 6 }
+
+reaIpxFftPortNum OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpxFftEntry 7 }
+
+reaIpxFftFacsSrcIndex OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpxFftEntry 8 }
+
+reaIpxFftFacsDstIndex OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS   read-only
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { reaIpxFftEntry 9 }
+
+lreVnResposibilityTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF LreVnResposibilityEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "The Bridge Responsibility Table"
+    ::=  { reaTunning 17 }
+
+lreVnResposibilityEntry  OBJECT-TYPE
+   SYNTAX LreVnResposibilityEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { lreVnRespVn }
+   ::= { lreVnResposibilityTable 1 }
+
+LreVnResposibilityEntry ::= SEQUENCE {
+        lreVnRespVn             INTEGER,
+        lreVnRespStatus         RowStatus
+   }
+
+lreVnRespVn OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS   read-write
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { lreVnResposibilityEntry 1 }
+
+lreVnRespStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+       ""
+   ::=  { lreVnResposibilityEntry 2 }
+
+reaSrcViolationEnable OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable  (1),
+        disable (2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Platform will perform the Source Port Violation Procedure
+       if only if this variable's value is enable."
+    ::=  { reaTunning 18 }
+
+reaSrcViolationTrapEnable OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable  (1),
+        disable (2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The RS will send the Source Port Violation TRAP messages
+       if only if this variable's value is enable."
+    ::=  { reaTunning 19 }
+
+reaSrcAddrValidationEnable OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable  (1),
+        disable (2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Platform will verify the source address of incoming
+       IP datagram."
+    ::=  { reaTunning 20 }
+
+reaRsQueueDiscards OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      ""
+    ::=  { reaTunning 21 }
+
+reaBufFree OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The number of free buffers."
+    ::=  { reaTunning 22 }
+
+lreResetDstMacBit46 OBJECT-TYPE
+    SYNTAX  INTEGER {
+      enable(1),
+      disable(2)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      ""
+    ::=  { reaTunning 23 }
+
+lreQueSourceSelect OBJECT-TYPE
+    SYNTAX  INTEGER {
+      vNET(1),
+      dstMac(2)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      ""
+    ::=  { reaTunning 24 }
+
+lreResetDstMacBit47 OBJECT-TYPE
+    SYNTAX  INTEGER {
+      enable(1),
+      disable(2)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      ""
+    ::=  { reaTunning 25 }
+
+rsMaxEntriesTuning OBJECT IDENTIFIER ::= { rsTunning 8 }
+
+rsMaxBridgeForwardingEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 1}
+
+rsMaxBrgFrwEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in bridge forwarding table."
+    ::=  { rsMaxBridgeForwardingEntriesTuning 1 }
+
+rsMaxBrgFrwEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in bridge forwarding table."
+    ::=  { rsMaxBridgeForwardingEntriesTuning 2 }
+
+rsMaxIpForwardingEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 2}
+
+rsMaxIpFrwEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in Ip forwarding table."
+    ::=  { rsMaxIpForwardingEntriesTuning 1 }
+
+rsMaxIpFrwEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in Ip forwarding table."
+    ::=  { rsMaxIpForwardingEntriesTuning 2 }
+
+rsMaxArpEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 3}
+
+rsMaxArpEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in Arp forwarding table."
+    ::=  { rsMaxArpEntriesTuning 1 }
+
+rsMaxArpEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in Arp forwarding table."
+    ::=  { rsMaxArpEntriesTuning 2 }
+
+rsMaxIpxForwardingEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 4}
+
+rsMaxIpxFrwEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in Ipx forwarding table."
+    ::=  { rsMaxIpxForwardingEntriesTuning 1 }
+
+rsMaxIpxFrwEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in Ipx forwarding table."
+    ::=  { rsMaxIpxForwardingEntriesTuning 2 }
+
+rsMaxIpxSapEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 5}
+
+rsMaxIpxSapEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in IpxSap table."
+    ::=  { rsMaxIpxSapEntriesTuning 1 }
+
+rsMaxIpxSapEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in IpxSap table."
+    ::=  { rsMaxIpxSapEntriesTuning 2 }
+
+rsMaxDspClntEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 6}
+
+rsMaxDspClntEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in rsSdClientsTable."
+    ::=  { rsMaxDspClntEntriesTuning 1 }
+
+rsMaxDspClntEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in rsSdClientsTable."
+    ::=  { rsMaxDspClntEntriesTuning 2 }
+
+rsMaxZeroHopRoutEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 7}
+
+rsMaxZhrConns OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The current maximal number of direct Zero-hop routing
+       connections."
+    ::= { rsMaxZeroHopRoutEntriesTuning 1 }
+
+rsMaxZhrConnsAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The future (after reset) maximal number of direct Zero-hop routing
+       connections."
+    ::= { rsMaxZeroHopRoutEntriesTuning 2 }
+
+rsMaxDspFrmEntriesTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 8}
+
+rsMaxDspFrmEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in rsSdClientsTable."
+    ::=  { rsMaxDspFrmEntriesTuning 1 }
+
+rsMaxDspFrmEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in rsSdClientsTable."
+    ::=  { rsMaxDspFrmEntriesTuning 2 }
+
+
+rndApplications  OBJECT IDENTIFIER ::= { rnd 35 }
+rsServerDispatcher  OBJECT IDENTIFIER ::= { rndApplications 1}
+
+
+-- rndMidLevelManagement group contains variables which direct the mid-level
+-- management stations how to monitor and manage their domains.
+
+rndMidLevelManagement  OBJECT IDENTIFIER ::= { rndApplications 2} -- NEW Group
+
+-- rndHighLevelNms  OBJECT IDENTIFIER ::= { rndMidLevelManagement 1}
+
+-- rndHighLevelNmsIpAddress OBJECT-TYPE
+--    SYNTAX IpAddress
+--    ACCESS read-write
+--    STATUS mandatory
+--    DESCRIPTION
+--     "The IP address of the high-level network management station to which the
+--      mid-level management station should report"
+--      ::=  { rndHighLevelNms 1 }
+
+-- rndHighLevelNmsCommunity OBJECT-TYPE
+--    SYNTAX OCTET STRING(SIZE(1..20))
+--    ACCESS read-write
+--    STATUS mandatory
+--    DESCRIPTION
+--     "The community of the high-level network management station that should be used
+--      by the mid-level management station when reporting"
+--  ::=  { rndHighLevelNms 2 }
+
+rndAlarmOptions  OBJECT IDENTIFIER ::= { rndMidLevelManagement 2}
+
+rndAlarmEnabling OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Indicates whether alarms should be issued to the high-level
+         NMS "
+     ::=  { rndAlarmOptions 1 }
+
+rndAlarmInterval OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Indicates the minimal period of time which must pass after issuing
+         an alarm before issuing the same alarm again."
+     ::=  { rndAlarmOptions 2 }
+
+rndMonitoredElementsTable  OBJECT-TYPE
+   SYNTAX SEQUENCE OF RndMonitoredElementEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+    "The table of monitored elements of the network"
+    ::= {rndMidLevelManagement 3}
+
+rndMonitoredElementEntry  OBJECT-TYPE
+   SYNTAX RndMonitoredElementEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rndMonitoredElementAddress }
+    ::= {rndMonitoredElementsTable 1}
+
+RndMonitoredElementEntry ::= SEQUENCE {
+
+rndMonitoredElementAddress    IpAddress,
+rndMonitoredElementCommunity  DisplayString(SIZE(1..20)),
+rndMonitoredElementLabel      DisplayString(SIZE(1..20)),
+rndDefaultPollingInterval     INTEGER,
+rndDefaultLogFile             DisplayString,
+rndMonitoredElementStatus     RowStatus
+}
+rndMonitoredElementAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+    "The IP address of the monitored element"
+     ::=  {rndMonitoredElementEntry  1 }
+
+rndMonitoredElementCommunity OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(1..20))
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The community of the monitored element"
+     ::=  {rndMonitoredElementEntry 2  }
+
+rndMonitoredElementLabel OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(1..20))
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The label assigned by the network manager to the monitored element"
+     ::=  {rndMonitoredElementEntry 3}
+
+rndDefaultPollingInterval OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The default period of time between two consecutive pollings of the
+     monitored element for the value of an object instance. If no other polling
+     interval is specifically assigned to the monitored object instance, this
+     one will be used"
+     ::=  {rndMonitoredElementEntry 4}
+
+rndDefaultLogFile OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The default file path of the log-file which will contain the polling
+     results for the monitored element. If no other file path is specifically
+     assigned to the monitored object instance, this log-file will be used."
+
+     ::=  {rndMonitoredElementEntry  5}
+
+rndMonitoredElementStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+         "It is used to manage the monitored elements table and indicates
+          the current monitoring status of an element."
+     ::=  {rndMonitoredElementEntry  6}
+
+rndMonitoringTable  OBJECT-TYPE
+   SYNTAX SEQUENCE OF RndMonitoringEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+    "The table of monitored object instances. Each monitored object instance
+     belongs to a monitored element previously entered in the
+     rndMonitoredElementsTable. "
+    ::= {rndMidLevelManagement 4}
+
+rndMonitoringEntry OBJECT-TYPE
+   SYNTAX RndMonitoringEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rndMonitoredElement, rndMonitoredObjectInstanceLabel }
+    ::= {rndMonitoringTable 1}
+
+RndMonitoringEntry ::= SEQUENCE {
+
+rndMonitoredElement             DisplayString(SIZE(1..20)),
+rndMonitoredObjectInstanceLabel DisplayString,
+rndMonitoredObjectName          DisplayString,
+rndMonitoredObjectIdentifier    OBJECT IDENTIFIER,
+rndMonitoredObjectInstance      OBJECT IDENTIFIER,
+rndMonitoredObjectSyntax        INTEGER,
+rndMonitoringInterval           INTEGER,
+rndAlarmMaxTreshold             INTEGER,
+rndAlarmMinTreshold             INTEGER,
+rndMonitoringLogfile            DisplayString,
+rndMonitoringEntryStatus        RowStatus
+}
+
+rndMonitoredElement OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(1..20))
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+    "A label assigned by the network manager to a monitored element to
+     which this monitored object instance belongs. This label must have
+     been previously entered in an instance of rndMonitoredElementLabel"
+    ::=  {rndMonitoringEntry  1}
+
+rndMonitoredObjectInstanceLabel OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(1..20))
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+    "The label assigned by the network manager to the monitored object instance"
+    ::=  {rndMonitoringEntry  2}
+
+rndMonitoredObjectName OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..20))
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The symbolic object type name of the object to which the monitored object
+     instance belongs (as it appears the MIB module definition). In case of
+     ambiguity the <MIB module name> : <object type name> format should be used.
+     An instance of rndMonitoredObjectName need not be assigned any value, if
+     the corresponding instance of rndMonitoredObjectIdentifier is assigned a
+     value, since any one of these, together with the object instance
+     identifier, suffices to unambigously identify the monitored object
+     instance."
+
+    ::=  {rndMonitoringEntry  3}
+
+rndMonitoredObjectIdentifier OBJECT-TYPE
+   SYNTAX OBJECT IDENTIFIER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The object identifier of the object to which the monitored object
+     instance belongs.
+     An instance of rndMonitoredObjectIdentifier need not be assigned any value, if
+     the corresponding instance of rndMonitoredObjectName is assigned a value,
+     since any one of these, together with the object instance identifier,
+     suffices to unambigously identify the monitored object instance."
+
+    ::=  {rndMonitoringEntry  4}
+
+rndMonitoredObjectInstance OBJECT-TYPE
+   SYNTAX OBJECT IDENTIFIER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+        "The instance identifier (key) of the monitored object instance."
+    ::=  {rndMonitoringEntry  5}
+
+rndMonitoredObjectSyntax OBJECT-TYPE
+   SYNTAX INTEGER {
+       integer(1),
+       octet-string(2),
+       ip-address(3),
+       object-identifier(4)
+     }
+
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The syntax of the monitored object instance (i.e., the syntax of the object
+     type of the object to which the monitored instance belongs).
+     Need not be assigned any value if the corresponding instance of
+     rndMonitoredObjectName has been assigned a value"
+    ::=  {rndMonitoringEntry  6}
+
+rndMonitoringInterval OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The period of time between two consecutive retrievals of the monitored
+     object instance's value."
+    ::=  {rndMonitoringEntry  7}
+
+
+rndAlarmMaxTreshold OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The value of the monitored object instance, the exceeding of which
+     will cause the generation of an alarm to the high-level management
+     station."
+    ::=  {rndMonitoringEntry 8}
+
+rndAlarmMinTreshold OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "If the value of the monitored object instance falls below the value
+     assigned to rndAlarmMinTreshold, an alarm to the high-level management
+     station will be issued."
+    ::=  {rndMonitoringEntry  9}
+
+
+rndMonitoringLogfile OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The entire path of the file in which the results of the monitoring
+     of this object instance should be recorded."
+    ::=  {rndMonitoringEntry  10}
+
+rndMonitoringEntryStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+         "It is used to manage the monitored object instances table and
+          indicates the current monitoring status of an object instance."
+    ::=  {rndMonitoringEntry  11}
+
+rndMibFilesTable  OBJECT-TYPE
+   SYNTAX SEQUENCE OF RndMibFileEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+    "The table of monitored object instances. Each monitored object instance
+     belongs to a monitored element previously entered in the
+     rndMonitoredElementsTable. "
+    ::= {rndMidLevelManagement 5}
+
+rndMibFileEntry OBJECT-TYPE
+   SYNTAX RndMibFileEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rndMibFileIndex }
+    ::= {rndMibFilesTable 1}
+
+RndMibFileEntry ::= SEQUENCE {
+
+rndMibFileIndex                 INTEGER,
+rndMibFilePath                  DisplayString,
+rndMibFileRefresh               INTEGER,
+rndMibFileEntryStatus           RowStatus
+}
+rndMibFileIndex OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+    "The number of the MIB file in the list MIB files supported by the
+     Mid-Level management station. The order of the MIB files in this
+     list must reflect the the IMPORT relation between the MIBS contained
+     in the MIB files, i.e., if MIB A IMPORTS FROM MIB B, the file containing
+     MIB A must have a lesser index in this table than the file containing
+     MIB B."
+    ::=  {rndMibFileEntry  1}
+
+
+rndMibFilePath OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The path of the MIB file in the MIB file server."
+    ::=  {rndMibFileEntry  2}
+
+rndMibFileRefresh OBJECT-TYPE
+   SYNTAX INTEGER {
+      no(1),
+      yes(2)
+   }
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "Indicates if the file should be fetched after setting this entry from the
+     MIB file server."
+    ::=  {rndMibFileEntry  3}
+
+rndMibFileEntryStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+         "It is used to manage the MIB files table."
+    ::=  {rndMibFileEntry  4}
+
+rndHardwareConfiguration OBJECT-TYPE
+    SYNTAX TruthValue
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Indicates whether the current SET SNMP PDU contains hardware
+         configuration (i.e., normally read-only variables). SET of such
+         variables in the Mid-level management station will be allowed only
+         if this variable is included in the SNMP PDU and its value is true.
+         Its value as returned in  a GET SNMP PDU will always be false."
+    ::= {rndMidLevelManagement 6}
+
+rndEraseSimulatedConfiguration OBJECT-TYPE
+    SYNTAX INTEGER {
+        eraseSimulatedConfiguration(1),
+        simulatedConfigurationPresent(2),
+        simulatedConfigurationErased(3)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "eraseSimulatedConfiguration instructs the MLNMS to erase all the
+         simulated configuration from its configuration data-base (CDB). This
+         the only accepted value for SNMP SET statements and will never be
+         returned in SNMP GET statements.
+         simulatedConfigurationPresent indicates that the MLNMS currently has
+         a simulated configuration.
+         simulatedConfigurationErased indicates that the MLNMS currently has
+         no simulated configuration."
+    ::= {rndMidLevelManagement 7}
+
+rndDeleteValuesTable  OBJECT-TYPE
+   SYNTAX SEQUENCE OF RndDeleteValuesEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+    "This table indicates which MIB variables are row status fields which
+     control the status of the entry to which they belong. This table also
+     indicates which (integer!) value of these MIB variables will cause, if
+     present in a SNMP SET PDU, the deletion of the conceptual row instance
+     to which the SET MIB variable instance belongs."
+    ::= {rndMidLevelManagement 8}
+
+rndDeleteValuesEntry  OBJECT-TYPE
+   SYNTAX RndDeleteValuesEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+       " The row definition for the rndDeleteValuesTable table."
+   INDEX { IMPLIED rndRowStatusVariableName }
+    ::= {rndDeleteValuesTable 1}
+
+RndDeleteValuesEntry ::= SEQUENCE {
+
+rndRowStatusVariableName    DisplayString,
+rndRowStatusObjectId        OBJECT IDENTIFIER,
+rndRowDeleteValue           INTEGER,
+rndDeleteValueEntryStatus   RowStatus
+}
+
+rndRowStatusVariableName OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(1..80))
+--   ACCESS read-only
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The name of the row status field. This name may not necessarily be any
+     name which is present in the MIBs loaded into the MLNMS station."
+
+     ::=  {rndDeleteValuesEntry 1}
+
+rndRowStatusObjectId OBJECT-TYPE
+   SYNTAX OBJECT IDENTIFIER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The object id of the row status field. If the rndRowStatusVariableName is
+     a name present in the MIBs loaded into the MLNMS, this MIB
+     variable is not required, but if given, it must match the object id known
+     to the MLNMS.
+     The variable identified by rndRowStatusVariableName and/or rndRowStatusObjectId
+     must be a read-write MIB variable of type INTEGER which belongs to an
+     entry (i.e, is a child of a MIB variable of type SEQUENCE)."
+
+     ::=  {rndDeleteValuesEntry 2}
+
+rndRowDeleteValue OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+    "The value of the variable identified by rndRowStatusVariableName and/or
+     rndRowStatusObjectId, which, if present in a SNMP SET PDU, will cause
+     the deletion of the conceptual row instance which the SET MIB variable
+     instance belongs."
+     ::=  {rndDeleteValuesEntry 3}
+
+rndDeleteValueEntryStatus  OBJECT-TYPE
+   SYNTAX  RowStatus
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+         "It is used to delete an entry from this table."
+     ::=  {rndDeleteValuesEntry 4}
+
+rsIpZeroHopRouting  OBJECT IDENTIFIER ::= { rndApplications 3} -- NEW Group
+
+rsIpZhrGeneralStatus  OBJECT-TYPE
+    SYNTAX  INTEGER  {
+   enable(1),
+   disable(2)
+}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This parameter enables or disables the IP Zero Hop Routing feature
+         for all IP interfaces. The IP Zero Hop Routing feature can also be
+         enabled or disabled on each IP interface through the
+         rsIpZhrStatusTable."
+    DEFVAL  {2}
+    ::= { rsIpZeroHopRouting 1 }
+
+rsIpZhrAgingTimeout   OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This parameter controls the aging time-out in seconds of direct
+         connections which were allocated. The virtual IP address of a direct
+         connection whose time-out has expired is eligible for allocation to a
+         different connection."
+    DEFVAL  {600}
+    ::= { rsIpZeroHopRouting 2 }
+
+rsIpZhrStatusTable OBJECT-TYPE
+SYNTAX SEQUENCE OF RsIpZhrStatusEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+      "The administrative status of the ZHR feature per ip interface."
+::= { rsIpZeroHopRouting 3 }
+
+
+rsIpZhrStatusEntry  OBJECT-TYPE
+SYNTAX    RsIpZhrStatusEntry
+ACCESS    not-accessible
+STATUS    mandatory
+DESCRIPTION
+      " An entry in the ZHR status table.  "
+INDEX  { rsIpZhrStatusIpIntf}
+::= { rsIpZhrStatusTable 1 }
+
+
+RsIpZhrStatusEntry  ::= SEQUENCE {
+      rsIpZhrStatusIpIntf                    IpAddress,
+      rsIpZhrAdminStatus                     INTEGER
+}
+
+
+rsIpZhrStatusIpIntf       OBJECT-TYPE
+SYNTAX IpAddress
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+   " The Ip interface whose ZHR feature status is accessed. "
+::= {rsIpZhrStatusEntry  1}
+
+ rsIpZhrAdminStatus OBJECT-TYPE
+ SYNTAX INTEGER {
+    enable (1),
+    disable(2)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+         "It is used to control whether ZHR will operate on the interface. "
+DEFVAL {1}
+::=  {rsIpZhrStatusEntry  2}
+
+
+rsIpZhrVirtAddressTable OBJECT-TYPE
+SYNTAX SEQUENCE OF RsIpZhrVirtAddressEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+      "The table of free virtual IP addresses which may be allocated
+       to establish direct connections   -  Per IP Interface."
+::= { rsIpZeroHopRouting 4 }
+
+rsIpZhrVirtAddressEntry  OBJECT-TYPE
+SYNTAX    RsIpZhrVirtAddressEntry
+ACCESS    not-accessible
+STATUS    mandatory
+DESCRIPTION
+      " An entry in the ZHR virtual IP addresses table "
+INDEX  { rsIpZhrVirtAddressIpIntf,
+         rsIpZhrVirtAddressTo }
+::= { rsIpZhrVirtAddressTable 1 }
+
+RsIpZhrVirtAddressEntry  ::= SEQUENCE {
+      rsIpZhrVirtAddressIpIntf         IpAddress,
+      rsIpZhrVirtAddressTo             IpAddress,
+      rsIpZhrVirtAddressFrom           IpAddress,
+      rsIpZhrVirtAddressStatus         RowStatus
+}
+
+rsIpZhrVirtAddressIpIntf OBJECT-TYPE
+SYNTAX IpAddress
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+   " The Ip Interface to which the IP addresses in this entry are allocated."
+::= {rsIpZhrVirtAddressEntry  1}
+
+rsIpZhrVirtAddressTo OBJECT-TYPE
+SYNTAX IpAddress
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+   " The last free IP address in the block. "
+::= {rsIpZhrVirtAddressEntry  2}
+
+rsIpZhrVirtAddressFrom OBJECT-TYPE
+SYNTAX IpAddress
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+   " The first free IP address in the block. "
+::= {rsIpZhrVirtAddressEntry  3}
+
+ rsIpZhrVirtAddressStatus OBJECT-TYPE
+ SYNTAX RowStatus
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+         "It is used to manage the virtual address table.
+          The supported actions will be active, createAndGo and destroy. "
+::=  {rsIpZhrVirtAddressEntry  4}
+
+rsIpZhrConnectionsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF RsIpZhrConnectionEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+   "Table of the currently active direct connections."
+::= { rsIpZeroHopRouting 5}
+
+rsIpZhrConnectionEntry  OBJECT-TYPE
+SYNTAX RsIpZhrConnectionEntry
+ACCESS not-accessible
+STATUS mandatory
+DESCRIPTION
+   " An entry in the ZHR Connection table"
+INDEX  {rsIpZhrConnectionIpIntf,
+        rsIpZhrConnectionSrcIp,
+        rsIpZhrConnectionDestIp}
+::= { rsIpZhrConnectionsTable 1 }
+
+RsIpZhrConnectionEntry  ::= SEQUENCE {
+      rsIpZhrConnectionIpIntf          IpAddress,
+      rsIpZhrConnectionSrcIp           IpAddress,
+      rsIpZhrConnectionDestIp          IpAddress,
+      rsIpZhrConnectionVirtualIp       IpAddress,
+      rsIpZhrConnectionType            INTEGER,
+      rsIpZhrConnectionAge             INTEGER,
+      rsIpZhrConnectionStatus          RowStatus
+}
+
+rsIpZhrConnectionIpIntf  OBJECT-TYPE
+SYNTAX IpAddress
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+   " The IP Interface for which this direct connection was established. "
+::= {rsIpZhrConnectionEntry 1}
+
+rsIpZhrConnectionSrcIp   OBJECT-TYPE
+SYNTAX IpAddress
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+   " The source IP Address of this direct connection. "
+::= {rsIpZhrConnectionEntry 2}
+
+
+rsIpZhrConnectionDestIp  OBJECT-TYPE
+SYNTAX IpAddress
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+   " The destination IP Address of this direct connection. "
+::= {rsIpZhrConnectionEntry 3}
+
+rsIpZhrConnectionVirtualIp OBJECT-TYPE
+SYNTAX IpAddress
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+   " The virtual IP address allocated for this direct connection. "
+::= {rsIpZhrConnectionEntry 4}
+
+
+rsIpZhrConnectionType   OBJECT-TYPE
+SYNTAX INTEGER  {
+   static(1),
+   dynamic(2),
+   disabled(3)
+    }
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+   " The type of this direct connection.
+     dynamic  - established by the RS.
+     disabled - established by the RS.
+                The RS detected that the virtual address is already used as
+                destination by the source BEFORE its allocation, and therefore
+                marked this connection as 'disabled' to prevent a future
+                allocation of this virtual address to this source.
+     static   - established by user."
+ ::= {rsIpZhrConnectionEntry 5}
+
+rsIpZhrConnectionAge   OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+   " The age of the connection in seconds."
+::= {rsIpZhrConnectionEntry 6}
+
+rsIpZhrConnectionStatus OBJECT-TYPE
+ SYNTAX RowStatus
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION
+         "It is used to manage the connections table.
+          The supported actions will be active, createAndGo and destroy. "
+::=  {rsIpZhrConnectionEntry  7}
+
+
+-- Enterprise-specific traps for RND
+-- Each enterprise-specific trap has two bound variables describing the exact nature of
+-- the trap. rndErrorDesc provides a detailed description of the problem, including the
+-- related interface number, board number or any other applicable variable.
+-- rndErrorSeverity describes the severity of this problem.
+
+-- Trap template
+-- -------------
+--    TRAP-TYPE
+--       ENTERPRISE  rnd
+--       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+--       DESCRIPTION
+--             ""
+--       ::=
+-- -------------
+
+routeTableOverflow TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+             "An overflow condition has occurred in the Routing Table. The Routing
+              Table is used for IP routing algorithm (RIP)."
+       ::= 5
+
+resetRequired TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+             "This trap indicates that in order to perform the last SET request, a reset operation
+              of the router/bridge is required. This occurs when the layer 2 routing algorithm is
+              changed between SPF and Spanning Tree. The reset can be performed manually or
+              using the variable rndAction."
+       ::=  10
+
+endTftp  TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+             "This trap indicates that in the device finished a TFTP
+             transaction with the management station.
+             variable rndErrorDesc and rndErrorSeverity provides the actual message
+             text and severity respectively."
+       ::= 12
+
+abortTftp TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+             "This trap indicates that in the device aborted a TFTP session with the management station.
+              variable rndErrorDesc  and rndErrorSeverity  provides the actual  message text  and
+              severity  respectively."
+       ::= 13
+
+startTftp TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+             "Informational trap indicating that the device has intiated a
+             TFTP session. rndErrorDesc will contain the file type in
+             question"
+       ::=  14
+
+ipxRipTblOverflow    TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+             "This trap indicates that in an OpenGate IPX RIP table overflow.
+             The bound variable rndErrorDesc, rndErrorSeverity
+             provides the actual  message text and severity respectively."
+       ::=  36
+
+ipxSapTblOverflow  TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+             "This trap indicates that in an OpenGate IPX SAP table overflow.
+             The bound variable rndErrorDesc, rndErrorSeverity
+             provides the actual  message text and severity respectively."
+       ::= 37
+
+ facsAccessVoilation TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+           "This trap indicates that message that fits FACS statenebt with operation
+            blockAndReport was forward to the interface.The bound variable rndErrorDesc,
+               rndErrorSeverity(== info ) and interface Number."
+           ::= 49
+
+ autoConfigurationCompleted TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+         "This trap indicates that auto comfiguration completetd succssefully.
+           The bound variable rndErrorDesc, rndErrorSeverity(== info )"
+           ::= 50
+
+ forwardingTabOverflow  TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+         "This trap indicates that an overflow condition has occurred in the
+           layer II Forward Table.
+           The bound variable rndErrorDesc, rndErrorSeverity(== warning )"
+           ::= 51
+
+errorsDuringInit  TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+             ""
+       ::=  61
+
+vlanDynPortAdded  TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+             ""
+       ::=  66
+
+vlanDynPortRemoved  TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+             ""
+       ::=  67
+
+rsSDclientsTableOverflow  TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+             "This warning is generated when an overflow occurs in the clients table."
+       ::=  68
+
+rsSDinactiveServer  TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+             "This warning is generated when a server does not respond to the dispatchers polling
+              and is thought to be inactive."
+       ::=  69
+
+rsIpZhrConnectionsTableOverflow TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+             "The Zero Hop Routing connections Table has been overflown."
+       ::= 70
+
+rsIpZhrReqStaticConnNotAccepted TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+             "The requested static connection was not accepted because there is
+              no available IP virtual address to allocate to it."
+       ::= 71
+
+rsIpZhrVirtualIpAsSource TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+             "The virtual IP address appeared as a source IP.
+              All the connections using it will be deleted and
+              it will not be further allocated to new connections."
+       ::=  72
+
+rsIpZhrNotAllocVirtualIp TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+             "The source IP address sent an ARP specifying a virtual IP
+              which was not allocated for this source.
+              This virtual IP will not be allocated to connections of this
+              specific source IP."
+       ::= 73
+
+rsSnmpSetRequestInSpecialCfgState TRAP-TYPE
+       ENTERPRISE  rnd
+       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+       DESCRIPTION
+             "An incoming SNMP SET request was rejected because no such
+              requests (except action requests) are accepted after start of
+              new configuration reception or during sending the current
+              configuration to an NMS."
+       ::= 74
+
+rsWSDRedundancySwitch TRAP-TYPE
+  ENTERPRISE rnd
+  VARIABLES   { rndErrorDesc, rndErrorSeverity }
+  DESCRIPTION "Whenever main server fails and backup takes over or server comes
+               up after failure a trap of this type is issued."
+     ::= 141
+   END
+

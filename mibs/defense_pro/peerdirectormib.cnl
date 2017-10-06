@@ -1,0 +1,129 @@
+-- Built from file conproofmib.txt
+
+CP-MIB-A
+
+DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE
+        FROM RFC-1212
+    TRAP-TYPE
+        FROM RFC-1215
+    rsCP
+        FROM RADWARE-MIB;
+
+rsCPCIDRsTable OBJECT-TYPE ::= {rsCP 1}
+
+rsCPCIDREntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME rsCPCIDRStatus 
+    ::=  {rsCPCIDRsTable 1}
+
+rsCPPeersTable OBJECT-TYPE ::= {rsCP 2}
+
+rsCPPeerEntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME rsCPPeerStatus 
+    ::= {rsCPPeersTable 1}
+
+rsCPPeersPhysicalInterfaceTable OBJECT-TYPE ::= {rsCP 3}
+
+rsCPPeerPhysicalInterfaceEntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME rsCPPeerPhysicalInterfaceStatus
+    ::=  {rsCPPeersPhysicalInterfaceTable 1}
+
+rsCPPeriodStartTimesTable OBJECT-TYPE ::= {rsCP 14}
+
+rsCPPeriodStartTimeEntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME rsCPPeriodStartTimeStatus
+    ::=  {rsCPPeriodStartTimesTable 1}
+
+rsCPRouterConnectionsTable OBJECT-TYPE ::= {rsCP 18}
+
+rsCPRouterConnectionEntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME rsCPRouterConnectionStatus
+    ::=  {rsCPRouterConnectionsTable 1}
+
+rsCPUserNamePromptsTable OBJECT-TYPE ::= {rsCP 21}
+
+rsCPUserNamePromptEntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME rsCPUserNamePromptStatus
+    ::=  {rsCPUserNamePromptsTable 1}
+
+rsCPPasswordPromptsTable OBJECT-TYPE ::= {rsCP 22}
+
+rsCPPasswordPromptEntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME rsCPPasswordPromptStatus
+    ::=  {rsCPPasswordPromptsTable 1}
+
+rsCPLegalStringsTable OBJECT-TYPE ::= {rsCP 23}
+
+rsCPLegalStringEntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME rsCPLegalStringStatus
+    ::=  {rsCPLegalStringsTable 1}
+
+rsCPTerminalHostnamesTable OBJECT-TYPE ::= {rsCP 24}
+
+rsCPTerminalHostnameEntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME rsCPTerminalHostnameStatus
+    ::=  {rsCPTerminalHostnamesTable 1}
+
+rsCPCIDRPeerProhibitedMatchTable OBJECT-TYPE ::= {rsCP 29}
+
+rsCPCIDRPeerProhibitedMatchEntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME rsCPCIDRPeerProhibitedMatchStatus 
+    ::=  {rsCPCIDRPeerProhibitedMatchTable 1}
+
+
+rsCPPriceTable OBJECT-TYPE ::= {rsCP 31}
+
+rsCPPriceEntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME rsCPPriceStatus 
+    ::=  {rsCPPriceTable 1}
+
+
+
+
+-- PeerDirector specific traps
+
+rsPDGeneralError  TRAP-TYPE
+       ENTERPRISE  rsCP
+       ERRCODE     RSG_ErrMsg_code_rsPDGeneralError_E
+       SEVERITY    INFO
+       ::=  1
+
+rsPDGeneralError  TRAP-TYPE
+       ENTERPRISE  rsCP
+       ERRCODE     RSG_ErrMsg_code_rsPDInfoTrap_E
+       SEVERITY    INFO
+       ::=  2
+
+rsPDGeneralError  TRAP-TYPE
+       ENTERPRISE  rsCP
+       ERRCODE     RSG_ErrMsg_code_rsPDWarningTrap_E
+       SEVERITY    WARNING
+       ::=  3
+
+rsPDGeneralError  TRAP-TYPE
+       ENTERPRISE  rsCP
+       ERRCODE     RSG_ErrMsg_code_rsPDErrorTrap_E
+       SEVERITY    ERROR
+       ::=  4
+
+rsPDGeneralError  TRAP-TYPE
+       ENTERPRISE  rsCP
+       ERRCODE     RSG_ErrMsg_code_rsPDFatalErrorTrap_E
+       SEVERITY    FATAL
+       ::=  5
+
+
+END

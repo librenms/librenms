@@ -1,0 +1,5279 @@
+MLB-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      FireProof
+-- Date:       2/4/2001
+-- By:         RMA (Radware MIB Authority)
+-- E-mail:     US:   support@radware.com
+--             International: support_int@radware.com
+--
+IMPORTS
+       IpAddress,
+       Counter
+              FROM RFC1155-SMI
+       OBJECT-TYPE
+              FROM RFC-1212
+       DisplayString
+              FROM RFC1213-MIB
+       rsMLB,
+       rndErrorDesc,
+       rndErrorSeverity
+              FROM RADWARE-MIB;
+
+RowStatus ::= INTEGER {
+        active(1),
+        notInService(2),
+        notReady(3),
+        createAndGo(4),
+        createAndWait(5),
+        destroy(6)
+        }
+
+-- Some MIB compilers require that the following 7 lines which define the path
+-- to RND MIB are commented out:
+
+-- mib            OBJECT IDENTIFIER ::= { mgmt 1  }
+-- directory      OBJECT IDENTIFIER ::= { internet 1  }
+-- experimental   OBJECT IDENTIFIER ::= { internet 3  }
+-- private        OBJECT IDENTIFIER ::= { internet 4  }
+-- enterprises    OBJECT IDENTIFIER ::= { private 1  }
+
+rsMLBApplicationServersTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBApplicationServerEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Table containing the list of application servers to which the
+      clients requested are dispatched."
+    ::=  { rsMLB 1}
+
+rsMLBApplicationServerEntry OBJECT-TYPE
+    SYNTAX RsMLBApplicationServerEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX { rsMLBServerAddr }
+    ::=  {rsMLBApplicationServersTable 1}
+
+RsMLBApplicationServerEntry ::= SEQUENCE {
+  rsMLBServerAddr                IpAddress,
+  rsMLBServerName                DisplayString,
+  rsMLBServerOperStatus          INTEGER,
+  rsMLBServerWeight              INTEGER,
+  rsMLBServerAttachedUsersNumber INTEGER,
+  rsMLBServerPeakLoad            INTEGER,
+  rsMLBServerFramesRate          INTEGER,
+  rsMLBServerFramesLoad          Counter,
+  rsMLBServerStatus              INTEGER,
+  rsMLBServerOperMode            INTEGER,
+  rsMLBServerConnectionLimit     INTEGER,
+  rsMLBServerAdminStatus         INTEGER,
+  rsMLBServerType                INTEGER,
+  rsMLBServerMacStatus	     	 INTEGER,
+  rsMLBServerPortNumber		     INTEGER,
+  rsMLBServerPeakBytesLoad       INTEGER,
+  rsMLBServerBytesRate           INTEGER,
+  rsMLBServerBytesLoad           Counter,
+  rsMLBServerRecoveryTime        INTEGER,
+  rsMLBServerWarmUpTime          INTEGER,
+  rsMLBServerTotalFramesLoad     Counter,
+  rsMLBServerProximityCheck      INTEGER,
+  rsMLBServerInBytesRate         INTEGER,
+  rsMLBServerOutBytesRate        INTEGER,
+  rsMLBServerInBytesLoad         Counter,
+  rsMLBServerOutBytesLoad        Counter,
+  rsMLBServerBytesLimit          INTEGER,
+  rsMLBServerInBytesLimit        INTEGER,
+  rsMLBServerOutBytesLimit       INTEGER,
+  rsMLBServerTos	             INTEGER,
+  rsMLBServerCCKId		         INTEGER,
+  rsMLBServerDiscardFlag		 INTEGER,
+  rsMLBServerDiscardedPacketNum  INTEGER,
+  rsMLBServerBillingMode	     INTEGER
+ 
+  }
+
+rsMLBServerAddr  OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "Application  IP address"
+ ::=  {rsMLBApplicationServerEntry 1 }
+
+rsMLBServerName  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..20))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The name assigned by the user to the server."
+ ::=  {rsMLBApplicationServerEntry 2}
+
+rsMLBServerOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      active(1),
+      notInService(2),
+      noNewSessions(3)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Operational status of application on  server.
+       active        - server is active
+       notInService  - server is or will become inactive. Existing sessions
+                       will be redirected to other servers.
+       noNewSessions - server will receive no new sessions. Existing sessions
+                       are allowed to complete."
+ ::=  {rsMLBApplicationServerEntry 3 }
+
+rsMLBServerWeight OBJECT-TYPE
+    SYNTAX  INTEGER  (1..100)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "A numerical weight assigned by the user in order to impose some
+       priority mechanism on the server dispatchers considerations of which
+       server to choose for attaching a client ."
+ ::=  {rsMLBApplicationServerEntry 4}
+
+rsMLBServerAttachedUsersNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of currently active users attached to this server."
+    ::=  {rsMLBApplicationServerEntry 5 }
+
+rsMLBServerPeakLoad OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of frames per second dispatched to server
+       since last reset."
+    ::=  {rsMLBApplicationServerEntry 6}
+
+rsMLBServerFramesRate OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of frames per second dispatched to server."
+    ::=  {rsMLBApplicationServerEntry 7}
+
+rsMLBServerFramesLoad OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of frames per second dispatched to server."
+    ::=  {rsMLBApplicationServerEntry 8}
+
+rsMLBServerStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        active(1),
+        notInService(2),
+        notReady(3),
+        createAndGo(4),
+        createAndWait(5),
+        destroy(6) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Administative status of appliaction on  server."
+    ::=  {rsMLBApplicationServerEntry 9}
+
+rsMLBServerOperMode OBJECT-TYPE
+    SYNTAX INTEGER { regular(1), backup(2) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable indicate the status of the server,
+      the MLB will not send any messages to a backup server
+      unless all other server are down  status.
+      In case of more then one backup server, the MLB will decide  to which
+      backup server to send the massages acordinf to rsMLBWeight."
+    ::=  { rsMLBApplicationServerEntry 10}
+
+rsMLBServerConnectionLimit OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The maximal number of client sessions which can be opened on this sever."
+-- DEFVAL {0}
+    ::= { rsMLBApplicationServerEntry 11 }
+
+rsMLBServerAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      disable(2),
+      shutdown(3)
+          }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Administrative status of application on server.
+       enable -   activates the server.
+                  The rsMLBServerOperStatus will change to active.
+       disable -  stops the server.
+                  The rsMLBServerOperStatus will change to notInService.
+       shutdown - gracefully shuts down the server.
+                  The rsMLBServerOperStatus will change to noNewSessions."
+
+ ::=  {rsMLBApplicationServerEntry 12 }
+
+rsMLBServerType OBJECT-TYPE
+    SYNTAX INTEGER {
+      regular(1),
+      nextHopRouter(2)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The type of Firewall.
+       regular -   indicates that the firewall is a regular server.
+       nextHopRouter - the Firewall is a next hop in the router table."
+
+--  DEFVAL  { 1 }
+ ::=  {rsMLBApplicationServerEntry 13 }
+
+rsMLBServerMacStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      found(1),
+      notFound(2)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Indicates if the Mac address of the server was obtained. THe mac
+       address is retrieve either from the Arp table or by sending Arp request.
+       found - mac address was found
+       notFound - mac address was not found "
+
+--  DEFVAL  { 2 }
+ ::=  {rsMLBApplicationServerEntry 14 }
+
+rsMLBServerPortNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The FireProof port this server is connected to"
+    ::=  {rsMLBApplicationServerEntry 15 }
+
+rsMLBServerPeakBytesLoad OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of bytes per second dispatched to server
+       since last reset."
+    ::=  {rsMLBApplicationServerEntry 16}
+
+rsMLBServerBytesRate OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of bytes per second dispatched to server."
+    ::=  {rsMLBApplicationServerEntry 17}
+
+rsMLBServerBytesLoad OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of bytes dispatched to server."
+    ::=  {rsMLBApplicationServerEntry 18}
+
+rsMLBServerRecoveryTime OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of seconds after server initialization during which ISD won't
+       send any requests."
+   ::= {rsMLBApplicationServerEntry 19}
+
+rsMLBServerWarmUpTime OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of seconds after server recovery during which the server will get
+       less requests than permitted by his weight and load."
+   ::= {rsMLBApplicationServerEntry 20}
+
+
+rsMLBServerTotalFramesLoad OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Total number of frames dispatched to server."
+    ::=  {rsMLBApplicationServerEntry 21}
+
+
+rsMLBServerProximityCheck OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+          }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Enable\Disable proximity check through this router."
+-- DEFVAL { 1 }
+ ::=  {rsMLBApplicationServerEntry 22 }
+
+rsMLBServerInBytesRate OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of inbound bytes per second dispatched to server."
+    ::=  {rsMLBApplicationServerEntry 23}
+
+rsMLBServerOutBytesRate OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of outbound bytes per second dispatched to server."
+    ::=  {rsMLBApplicationServerEntry 24}
+
+rsMLBServerInBytesLoad OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of inbound bytes dispatched to server."
+    ::=  {rsMLBApplicationServerEntry 25}
+
+rsMLBServerOutBytesLoad OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of outbound bytes dispatched to server."
+    ::=  {rsMLBApplicationServerEntry 26}
+
+rsMLBServerBytesLimit OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The maximal number of bytes per second dispatched to server."
+-- DEFVAL {0}
+    ::= { rsMLBApplicationServerEntry 27 }
+
+rsMLBServerInBytesLimit OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The maximal number of inbound bytes per second dispatched to server."
+-- DEFVAL {0}
+    ::= { rsMLBApplicationServerEntry 28 }
+
+rsMLBServerOutBytesLimit OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The maximal number of outbound bytes per second dispatched to server."
+-- DEFVAL {0}
+    ::= { rsMLBApplicationServerEntry 29 }
+
+rsMLBServerTos OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "TOS/precedence value, 255 signifies no TOS/precedence mechanism."
+-- DEFVAL { 255}
+ ::=  {rsMLBApplicationServerEntry 30 }
+ 
+
+rsMLBServerCCKId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Server type of support to http."
+    DEFVAL {3}
+ ::=  {rsMLBApplicationServerEntry 31 }
+
+rsMLBServerDiscardFlag OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+          }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Whether to discard packets of that NHR if this NHR reached it upper threshold.
+	   The upper threshold will hold the BW limit if the price faeture is disabled or the highest price level's 
+	   upper threshold if the price feature is enabled."
+    DEFVAL {2}
+ ::=  {rsMLBApplicationServerEntry 32 }
+
+rsMLBServerDiscardedPacketNum OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of discarded packets for that NHR since the last device reboot.
+	   The packet were discarded since DiscardFlag was enabled and the NHR reached its limit"
+    ::=  {rsMLBApplicationServerEntry 33}
+
+rsMLBServerBillingMode OBJECT-TYPE
+    SYNTAX INTEGER {
+      inbound(1),
+      outbound(2),
+	  max(3),
+	  total(4)
+          }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This flag tells the device if the price levels that were configured regards inbound,outbound,
+	   their max or total load ."
+    DEFVAL {4}
+ ::=  {rsMLBApplicationServerEntry 34 }
+
+
+
+rsMLBAdminStatus  OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Enable/Disable server dispatcher."
+    ::=  {rsMLB 2}
+
+rsMLBClientsLifeTime OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal period of time in seconds a non-active client is kept
+      in the clients table."
+--  DEFVAL  { 60 }
+    ::=  {rsMLB 3}
+
+  rsMLBDispatchMethod OBJECT-TYPE
+    SYNTAX INTEGER {
+      cyclic(1),
+      leastTraffic(2),
+      leastUsersNumber(3),
+      nt-1(4),
+      nt-2(5),
+      private-1(6),
+      private-2(7),
+      leastBytesNumber(8),
+      hash(9),
+	  cck-stats(10)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Type of dispatching required."
+    ::=  {rsMLB 4}
+
+  rsMLBCheckConnectivityStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      disable(2),
+      healthMonitoring(3)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Enable or Disable servers polling."
+--  DEFVAL  { enable }
+    ::=  {rsMLB 5}
+
+  rsMLBCheckConnectivityMethod OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicate the method the MLB check the connectivity.
+        where the value 1 means check connectiotivity by ping, other value serve
+        as a tcp port number."
+    ::=  {rsMLB 6}
+
+  rsMLBCheckConnectivityInterval OBJECT-TYPE
+    SYNTAX  INTEGER  (1..3600)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Polling interval in seconds for servers polling."
+--  DEFVAL  { 10 }
+    ::=  {rsMLB 7}
+
+  rsMLBCheckConnectivityRetries OBJECT-TYPE
+    SYNTAX  INTEGER  (1..20)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable indicate the Minimal number of unsuccessful polling
+       attempts before considering a server disconnected."
+--  DEFVAL  { 5 }
+    ::=  {rsMLB 8}
+
+  rsMLBClientsConnectDenials OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable indicate the Number of connection requests from clients
+       that were denied by the the server dispatcher."
+    ::=  {rsMLB 9}
+
+rsMLBClientsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBClientEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing the list of clients currently attached to a server."
+    ::=  {rsMLB 10}
+
+rsMLBClientEntry OBJECT-TYPE
+    SYNTAX RsMLBClientEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX { rsMLBClientAddr,
+           rsMLBDestinationAddr,
+		   rsMLBSourcePort,
+		   rsMLBDestPort }
+    ::=  {rsMLBClientsTable 1}
+
+RsMLBClientEntry ::= SEQUENCE {
+  rsMLBClientAddr                IpAddress,
+  rsMLBDestinationAddr           IpAddress,
+  rsMLBSourcePort                INTEGER,
+  rsMLBDestPort                  INTEGER,
+  rsMLBAttachedServerAddr        IpAddress,
+  rsMLBClientLastActivityTime    INTEGER,
+  rsMLBClientAttachmentTime      INTEGER,
+  rsMLBClientStatus              INTEGER,
+  rsMLBSessionType				 INTEGER
+  }
+
+rsMLBClientAddr  OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Client IP Address."
+    ::=  {rsMLBClientEntry 1}
+
+rsMLBDestinationAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "IP Address of server currently serving this client."
+    ::=  {rsMLBClientEntry 2}
+
+rsMLBSourcePort OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Source Port"
+    ::= {rsMLBClientEntry 3}
+
+rsMLBDestPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Source Port"
+    ::= {rsMLBClientEntry 4}
+
+rsMLBAttachedServerAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "IP Address of server currently serving this client."
+    ::=  {rsMLBClientEntry 5}
+
+rsMLBClientLastActivityTime  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Indicates when the last frame from the client was dispatched.
+       Measured in seconds since device re-initialization."
+    ::=  {rsMLBClientEntry 6}
+
+rsMLBClientAttachmentTime OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Indicates when the client was attached.
+       Measured in seconds since device re-initialization."
+    ::=  {rsMLBClientEntry 7}
+
+rsMLBClientStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                    active(1),
+                    notInService(2),
+                    notReady(3),
+                    createAndGo(4),
+                    createAndWait(5),
+                    destroy(6)
+                   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry.
+        Used to delete an entry of this table."
+    ::=  { rsMLBClientEntry 8}
+
+rsMLBSessionType OBJECT-TYPE
+    SYNTAX  INTEGER {
+					regular(1),
+					virtual(2),
+					dynamicNat(3),
+					staticNat(4),
+					basicNat(5),
+					noNat(6),
+					remoteNatSnat(7),
+					remoteNatNonat(8)
+					}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Indicates the session type."
+    ::=  {rsMLBClientEntry 9}
+
+
+  rsMLBSessionTracking OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Enable or Disable session tracking. Usually, when working with Firewall
+	we need to send the whole traffic of a specific session through the same Firewall.
+	For this purpose we should keep track of the session and use the enable option.
+	When working with routers, sending the whole traffic through the same Firewall
+	is not necessary. Therefor there is no need to keep track of the sessions and
+	we can use the disable option."
+--  DEFVAL  { enable }
+    ::=  {rsMLB 11}
+
+
+rsMLBRemoteConnectivityTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBRemoteConnectivityEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Table containing the list of IPs which the connectivity check is performed on them."
+    ::=  { rsMLB 12}
+
+rsMLBRemoteConnectivityEntry OBJECT-TYPE
+    SYNTAX RsMLBRemoteConnectivityEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX {rsMLBRmtConSrvrAddr,
+           rsMLBRmtConIpAddr }
+    ::=  {rsMLBRemoteConnectivityTable 1}
+
+
+RsMLBRemoteConnectivityEntry ::= SEQUENCE {
+  rsMLBRmtConSrvrAddr            IpAddress,
+  rsMLBRmtConIpAddr              IpAddress,
+  rsMLBRmtConStatus              INTEGER,
+  rsMLBRmtConOperStatus		 INTEGER
+
+  }
+
+rsMLBRmtConSrvrAddr  OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "Server  IP address"
+ ::=  {rsMLBRemoteConnectivityEntry 1 }
+
+rsMLBRmtConIpAddr  OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "The IP address that the connectivity check will be performed on."
+ ::=  {rsMLBRemoteConnectivityEntry 2 }
+
+rsMLBRmtConStatus  OBJECT-TYPE
+    SYNTAX INTEGER {
+        active(1),
+        notInService(2),
+        notReady(3),
+        createAndGo(4),
+        createAndWait(5),
+        destroy(6) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Administative status of appliaction on the concection check IP address."
+ ::=  {rsMLBRemoteConnectivityEntry 3 }
+
+
+rsMLBRmtConOperStatus OBJECT-TYPE
+	SYNTAX  INTEGER{
+		active(1),
+		notInService(2)
+	}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	"Hold the operational status of the checked IP address."
+	DEFVAL {1}
+::= {rsMLBRemoteConnectivityEntry 4}
+
+
+  rsMLBClientTableMode OBJECT-TYPE
+    SYNTAX INTEGER {
+      layer3(1),
+      layer4(2),
+      clientOnly(3),
+      destinationOnly(4)
+
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Determine the mode of keep entries in the client table.
+       layer 3 means that entries are kept according to source Ip and destination IP
+       layer 4 means that entries are kept according to source Ip, destination IP and ports"
+--  DEFVAL  { Layer3 }
+    ::=  {rsMLB 13}
+
+
+rsMLBRulesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBRulesEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Table containing the list of "
+    ::=  { rsMLB 14}
+
+rsMLBRulesEntry OBJECT-TYPE
+    SYNTAX RsMLBRulesEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX {rsMLBRulesPortNumber }
+    ::=  {rsMLBRulesTable 1}
+
+
+RsMLBRulesEntry ::= SEQUENCE {
+    rsMLBRulesPortNumber    INTEGER,
+    rsMLBRulesLeavingPort     INTEGER,
+    rsMLBRulesNumOfServers    INTEGER
+    }
+
+rsMLBRulesPortNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      ""
+    ::= {rsMLBRulesEntry 1}
+
+rsMLBRulesLeavingPort  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      ""
+    ::= {rsMLBRulesEntry 2}
+
+rsMLBRulesNumOfServers    OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      ""
+    ::= {rsMLBRulesEntry 3}
+
+
+rsMLBTranslateOutBoundMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION "Translate FW NAT IP address to a virtual IP address
+		for traffic that originated inside"
+--  DEFVAL  { disable }
+    ::= {rsMLB 15}
+
+rsMLBVirtualIPTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBVirtualIPEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "The table for storing the VIP's"
+    ::= {rsMLB 16}
+
+rsMLBVirtualIPEntry OBJECT-TYPE
+    SYNTAX RsMLBVirtualIPEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "The row definition for the VIP table"
+    INDEX {rsMLBVirtualIPAddress}
+    ::= {rsMLBVirtualIPTable 1}
+
+RsMLBVirtualIPEntry ::= SEQUENCE {
+    rsMLBVirtualIPAddress IpAddress,
+    rsMLBVirtualMode INTEGER,
+    rsMLBVirtualStatus INTEGER
+}
+
+rsMLBVirtualIPAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "The Virtual IP entry"
+    ::= {rsMLBVirtualIPEntry 1}
+
+rsMLBVirtualMode OBJECT-TYPE
+    SYNTAX INTEGER {
+           regular(1),
+           backup(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The virtual IP mode - either backup/regular"
+--  DEFVAL { 1 }
+    ::= {rsMLBVirtualIPEntry 2}
+
+rsMLBVirtualStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+              active(1),
+              notInService(2),
+              notReady(3),
+              createAndGo(4),
+              createAndWait(5),
+              destroy(6) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry."
+    ::=  {rsMLBVirtualIPEntry 3}
+
+rsMLBMappedIPTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBMappedIPEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "The table for storing the mapped VIP entries"
+    ::= {rsMLB 17}
+
+rsMLBMappedIPEntry OBJECT-TYPE
+    SYNTAX RsMLBMappedIPEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION "The row definition for the mapped table"
+    INDEX {rsMLBMappedVirtualAddress, 
+rsMLBMappedFirewallIP}
+    ::= {rsMLBMappedIPTable 1}
+
+RsMLBMappedIPEntry ::= SEQUENCE {
+    rsMLBMappedVirtualAddress IpAddress,
+    rsMLBMappedFirewallIP IpAddress,
+    rsMLBMappedFirewallNAT IpAddress,
+    rsMLBMappedStatus INTEGER
+}
+
+rsMLBMappedVirtualAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "The Virtual IP entry"
+    ::= {rsMLBMappedIPEntry 1}
+
+rsMLBMappedFirewallIP OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "The firewall IP address"
+    ::= {rsMLBMappedIPEntry 2}
+
+rsMLBMappedFirewallNAT OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION "The firewall NAT IP address"
+    ::= {rsMLBMappedIPEntry 3}
+
+rsMLBMappedStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+              active(1),
+              notInService(2),
+              notReady(3),
+              createAndGo(4),
+              createAndWait(5),
+              destroy(6) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry."
+    ::=  {rsMLBMappedIPEntry 4}
+
+
+rsMLBVirtualConnectivityIP OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION "The virtual connectivity IP address"
+    ::= {rsMLB 18}
+
+rsMLBVirtualConnectivityMode OBJECT-TYPE
+    SYNTAX INTEGER {
+           regular(1),
+           backup(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The virtual IP mode - either backup/regular"
+--  DEFVAL { 1 }
+    ::= {rsMLB 19}
+
+rsMLBRemoveEntryAtSessionEnd OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Remove client entry at session end."
+-- DEFVAL  { disable }
+    ::= {rsMLB 20}
+
+rsMLBFirewallPortID OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION "Identify Firewall not only by Mac but also by port"
+    ::= {rsMLB 21}
+
+
+rsMLBSubnetGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBSubnetGroupEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+    "Table containing the list of FW which belong to a particular destination subnet   group."
+    ::=  { rsMLB 23}
+
+rsMLBSubnetGroupEntry OBJECT-TYPE
+    SYNTAX RsMLBSubnetGroupEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX {rsMLBDestSubnetAddr,
+	  rsMLBDestSubnetMask,
+          rsMLBSubnetSrvrAddr}
+    ::=  {rsMLBSubnetGroupTable 1}
+
+RsMLBSubnetGroupEntry ::= SEQUENCE {
+  rsMLBDestSubnetAddr            	 IpAddress,
+  rsMLBDestSubnetMask            	 IpAddress,
+  rsMLBSubnetSrvrAddr                    IpAddress,
+  rsMLBSubnetSrvrStatus                  INTEGER,
+  rsMLBSubnetSrvrOperMode	         INTEGER
+  }
+
+rsMLBDestSubnetAddr  OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "Destination subnet address"
+ ::=  {rsMLBSubnetGroupEntry 1 }
+
+rsMLBDestSubnetMask OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "Destination subnet mask."
+ ::=  {rsMLBSubnetGroupEntry 2 }
+
+rsMLBSubnetSrvrAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "The IP address of the server that belong to the destination subnet group."
+ ::=  {rsMLBSubnetGroupEntry 3 }
+
+rsMLBSubnetSrvrStatus  OBJECT-TYPE
+    SYNTAX INTEGER {
+        active(1),
+        notInService(2),
+        notReady(3),
+        createAndGo(4),
+        createAndWait(5),
+        destroy(6) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Administrative status of the server."
+ ::=  {rsMLBSubnetGroupEntry 4 }
+
+rsMLBSubnetSrvrOperMode  OBJECT-TYPE
+    SYNTAX INTEGER { regular(1), backup(2) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+     "define the operational mode (regular or backup) of the server in the subnet group"
+ ::=  {rsMLBSubnetGroupEntry 5 }
+
+
+rsMLBApplicationPortGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBApplPortGroupEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+    "Table containing the list of FW which belong to a particular application port group."
+    ::=  { rsMLB 24}
+
+rsMLBApplPortGroupEntry OBJECT-TYPE
+    SYNTAX RsMLBApplPortGroupEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX {rsMLBApplPort,
+      rsMLBApplPortSrvrAddr}
+    ::=  {rsMLBApplicationPortGroupTable 1}
+
+
+RsMLBApplPortGroupEntry ::= SEQUENCE {
+  rsMLBApplPort            		    INTEGER,
+  rsMLBApplPortSrvrAddr                    IpAddress,
+  rsMLBApplPortSrvrStatus                  INTEGER,
+  rsMLBApplPortSrvrOperMode		   INTEGER
+  }
+
+rsMLBApplPort  OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "The application port of the group"
+ ::=  {rsMLBApplPortGroupEntry 1 }
+
+rsMLBApplPortSrvrAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "The IP address of the server that belong to the application port group."
+ ::=  {rsMLBApplPortGroupEntry 2 }
+
+rsMLBApplPortSrvrStatus  OBJECT-TYPE
+    SYNTAX INTEGER {
+        active(1),
+        notInService(2),
+        notReady(3),
+        createAndGo(4),
+        createAndWait(5),
+        destroy(6) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Administrative status of the server."
+ ::=  {rsMLBApplPortGroupEntry 3 }
+
+rsMLBApplPortSrvrOperMode  OBJECT-TYPE
+    SYNTAX INTEGER { regular(1), backup(2) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+     "define the operational mode (regular or backup) of the server in the subnet group."
+ ::=  {rsMLBApplPortGroupEntry 4 }
+
+
+rsMLBSrcSbntGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBSrcSbntGroupEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+    "Table containing the list of FW which belong to a particular source subnet group."
+    ::=  { rsMLB 25}
+
+rsMLBSrcSbntGroupEntry OBJECT-TYPE
+    SYNTAX RsMLBSrcSbntGroupEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX {rsMLBSrcSbntAddr,
+  	  rsMLBSrcSbntMask,
+          rsMLBSrcSbntSrvrAddr}
+    ::=  {rsMLBSrcSbntGroupTable 1}
+
+RsMLBSrcSbntGroupEntry ::= SEQUENCE {
+  rsMLBSrcSbntAddr            	IpAddress,
+  rsMLBSrcSbntMask            	IpAddress,
+  rsMLBSrcSbntSrvrAddr          IpAddress,
+  rsMLBSrcSbntSrvrStatus        INTEGER,
+  rsMLBSrcSbntSrvrOperMode	INTEGER
+  }
+
+rsMLBSrcSbntAddr  OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "Source subnet address"
+ ::=  {rsMLBSrcSbntGroupEntry 1 }
+
+rsMLBSrcSbntMask OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "source subnet mask."
+ ::=  {rsMLBSrcSbntGroupEntry 2 }
+
+rsMLBSrcSbntSrvrAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "The IP address of the server that belong to the source subnet group."
+ ::=  {rsMLBSrcSbntGroupEntry 3 }
+
+rsMLBSrcSbntSrvrStatus  OBJECT-TYPE
+    SYNTAX INTEGER {
+        active(1),
+        notInService(2),
+        notReady(3),
+        createAndGo(4),
+        createAndWait(5),
+        destroy(6) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Administrative status of the server."
+ ::=  {rsMLBSrcSbntGroupEntry 4 }
+
+rsMLBSrcSbntSrvrOperMode  OBJECT-TYPE
+    SYNTAX INTEGER { regular(1), backup(2) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+     "define the operational mode (regular or backup) of the server in the source subnet group"
+ ::=  {rsMLBSrcSbntGroupEntry 5 }
+
+
+rsMLBNatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBNatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "In this table the FP saves the NAT addresses."
+    ::= {rsMLB 26}
+
+rsMLBNatEntry OBJECT-TYPE
+    SYNTAX RsMLBNatEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX  {rsMLBNatFromLclAddress, 
+rsMLBNatToLclAddress, 
+rsMLBNatRouterAddress, 
+rsMLBNatAddress}
+   ::= {rsMLBNatTable 1}
+
+RsMLBNatEntry  ::= SEQUENCE {
+   rsMLBNatFromLclAddress				 IpAddress, 
+   rsMLBNatToLclAddress					 IpAddress,
+   rsMLBNatRouterAddress                 IpAddress,
+   rsMLBNatAddress                       IpAddress,
+   rsMLBNatStatus                        INTEGER,
+   rsMLBNatMode                          INTEGER
+   }
+
+rsMLBNatFromLclAddress    OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+     "IP Address of the local machine whose IP address should be translated."
+   ::= {rsMLBNatEntry 1}
+
+rsMLBNatToLclAddress    OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+     "IP Address of the local machine whose IP address should be translated."
+   ::= {rsMLBNatEntry 2}
+
+
+rsMLBNatRouterAddress    OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+     "The Router IP Address."
+   ::= {rsMLBNatEntry 3}
+
+
+rsMLBNatAddress    OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+     "The NAT IP Address."
+   ::= {rsMLBNatEntry 4}
+
+
+rsMLBNatStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+              active(1),
+              notInService(2),
+              notReady(3),
+              createAndGo(4),
+              createAndWait(5),
+              destroy(6) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry."
+--  DEFVAL  { 2 }
+    ::=  {rsMLBNatEntry 5}
+
+rsMLBNatMode OBJECT-TYPE
+    SYNTAX INTEGER {
+           regular(1),
+           backup(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The  NAT mode - either backup/regular"
+--  DEFVAL { 1 }
+    ::= {rsMLBNatEntry 6}
+
+rsMLBFpNatStatus  OBJECT-TYPE
+   SYNTAX  INTEGER {
+            enable(1),
+            disable(2)
+   }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+      "Nat Status."
+--  DEFVAL  { 2 }
+    ::=  {rsMLB 27}
+
+
+
+rsMLBStaticNatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBStaticNatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "In this table the FP saves the static NAT addresses."
+    ::= {rsMLB 28}
+
+rsMLBStaticNatEntry OBJECT-TYPE
+    SYNTAX RsMLBStaticNatEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX  {rsMLBStaticNatFromLclServerAddress,
+           rsMLBStaticNatToLclServerAddress, 
+           rsMLBStaticNatRouterAddress }
+   ::= {rsMLBStaticNatTable 1}
+
+RsMLBStaticNatEntry  ::= SEQUENCE {
+   rsMLBStaticNatFromLclServerAddress                IpAddress,
+   rsMLBStaticNatToLclServerAddress                IpAddress,
+   rsMLBStaticNatRouterAddress                  IpAddress,
+   rsMLBStaticFromNatAddress                  IpAddress,
+   rsMLBStaticToNatAddress                  IpAddress,
+   rsMLBStaticNatStatus                      INTEGER,
+   rsMLBStaticNatMode                      INTEGER
+   }
+
+
+rsMLBStaticNatFromLclServerAddress    OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+     "IP Address of the local machine whost IP address should be translated."
+   ::= {rsMLBStaticNatEntry 1}
+
+
+rsMLBStaticNatToLclServerAddress    OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+     "IP Address of the local machine whost IP address should be translated."
+   ::= {rsMLBStaticNatEntry 2}
+
+
+rsMLBStaticNatRouterAddress    OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+     "The Router IP Address."
+   ::= {rsMLBStaticNatEntry 3}
+
+rsMLBStaticFromNatAddress    OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+     "The Static NAT IP Address who is related to the local machine and router."
+   ::= {rsMLBStaticNatEntry 4}
+
+
+rsMLBStaticToNatAddress    OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+     "The Static NAT IP Address who is related to the local machine and router."
+   ::= {rsMLBStaticNatEntry 5}
+
+
+
+rsMLBStaticNatStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+              active(1),
+              notInService(2),
+              notReady(3),
+              createAndGo(4),
+              createAndWait(5),
+              destroy(6) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry."
+--  DEFVAL  { 2 }
+    ::=  {rsMLBStaticNatEntry 6}
+
+rsMLBStaticNatMode OBJECT-TYPE
+    SYNTAX INTEGER {
+           regular(1),
+           backup(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The Static NAT mode - either backup/regular"
+--  DEFVAL { 1 }
+    ::= {rsMLBStaticNatEntry 7}
+
+rsMLBProximity  OBJECT IDENTIFIER ::= { rsMLB 29 }
+
+rsMLBStaticProximityTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RsMLBStaticProximityEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+          "In this table the MLB saves the static proximity ranges per server farm IP Address"
+   ::= {rsMLBProximity 1}
+
+
+rsMLBStaticProximityEntry OBJECT-TYPE
+    SYNTAX RsMLBStaticProximityEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX  {rsMLBStaticProximityRangeFrom }
+   ::= {rsMLBStaticProximityTable 1}
+
+
+RsMLBStaticProximityEntry  ::= SEQUENCE {
+  rsMLBStaticProximityRangeFrom                 IpAddress,
+  rsMLBStaticProximityRangeTo                   IpAddress,
+  rsMLBStaticProximityStatus                    INTEGER,
+  rsMLBStaticProximityServer1                   IpAddress,
+  rsMLBStaticProximityServer2                   IpAddress,
+  rsMLBStaticProximityServer3                   IpAddress
+  }
+
+
+rsMLBStaticProximityRangeFrom OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The IP Address of the low boundary of the interval."
+    ::= {rsMLBStaticProximityEntry 1}
+
+rsMLBStaticProximityRangeTo OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The IP Address of the high boundary of the interval."
+    ::= {rsMLBStaticProximityEntry 2}
+
+rsMLBStaticProximityStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+        active(1),
+        notInService(2),
+        notReady(3),
+        createAndGo(4),
+        createAndWait(5),
+        destroy(6) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable indicate the Administative status of this entry.
+       Use for delete an entry in this table."
+  ::= {rsMLBStaticProximityEntry 3}
+
+rsMLBStaticProximityServer1 OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+"The first priority server that this range of clients will be redirected to"
+    ::= {rsMLBStaticProximityEntry 4}
+
+rsMLBStaticProximityServer2 OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+"The second priority server that this range of clients will be redirected to"
+       ::= {rsMLBStaticProximityEntry 5}
+
+rsMLBStaticProximityServer3 OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+" The third priority server that this range of clients will be redirected to "
+    ::= {rsMLBStaticProximityEntry 6}
+
+rsMLBProximityOperationMode  OBJECT-TYPE
+   SYNTAX INTEGER {
+        noProximity(1),
+        staticProximity(2),
+	fullProximityInbound(3),
+	fullProximityOutbound(4),
+	fullProximityBoth(5)
+   }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+       "Allow proximity operation, and choose between operating only static proximity or dynamic proximity as well "
+-- DEFVAL { 1 }
+   ::=  {rsMLBProximity 2}
+
+rsMLBProximityMainDNS OBJECT-TYPE
+SYNTAX IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The IP Address of the main DNS to be ignored in the proximity operation"
+    ::= { rsMLBProximity 3}
+
+rsMLBProximityBackupDNS OBJECT-TYPE
+SYNTAX IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The IP Address of the backup DNS to be ignored in the proximity operation"
+    ::= { rsMLBProximity 4}
+
+rsMLBProximityAgingPeriod OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The time in hours after which an old dynamic entry is invalid."
+--     DEFVAL   { 48 }
+    ::=  { rsMLBProximity 5}
+
+rsMLBProximityRetries  OBJECT-TYPE
+   SYNTAX INTEGER (1..5)
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+       "The number of tries for checking the client distance"
+-- DEFVAL { 2 }
+   ::=  {rsMLBProximity 6}
+
+rsMLBProximityTimeout  OBJECT-TYPE
+   SYNTAX INTEGER (1..10)
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+       "The timeout between proximity checks"
+-- DEFVAL { 5 }
+   ::=  {rsMLBProximity 7}
+
+rsMLBProximityTuning OBJECT IDENTIFIER ::= { rsMLBProximity 8}
+
+rsMLBMaxDynEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in the dynamic proximity table."
+    ::=  { rsMLBProximityTuning 1 }
+
+rsMLBMaxDynEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in the dynamic proximity table."
+    ::=  { rsMLBProximityTuning 2 }
+
+
+rsMLBProximityHopsWeight  OBJECT-TYPE
+   SYNTAX INTEGER (0..100)
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+       "The weight given to the clients hops distance in the dispatching decision"
+-- DEFVAL { 50 }
+   ::=  {rsMLBProximity 9}
+
+rsMLBProximityLatencyWeight  OBJECT-TYPE
+   SYNTAX INTEGER (0..100)
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+       "The weight given to the clients latency in the dispatching decision"
+-- DEFVAL { 50 }
+   ::=  {rsMLBProximity 10}
+
+rsMLBProximityLoadWeight  OBJECT-TYPE
+   SYNTAX INTEGER (0..100)
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+       "The weight given to the site load in the dispatching decision"
+-- DEFVAL { 50 }
+   ::=  {rsMLBProximity 11}
+
+
+rsMLBPrxyCheckFPIPTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBPrxyCheckFPIPEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+    "Table containing FP IP address for each server. This FP IP serves as the source IP for the proximity check packet which is send through this server."
+    ::=  {rsMLBProximity 12}
+
+rsMLBPrxyCheckFPIPEntry OBJECT-TYPE
+    SYNTAX RsMLBPrxyCheckFPIPEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX {rsMLBRouterAddr }
+    ::=  {rsMLBPrxyCheckFPIPTable 1}
+
+RsMLBPrxyCheckFPIPEntry ::= SEQUENCE {
+  rsMLBRouterAddr            	IpAddress,
+  rsMLBFPIPAddr            	IpAddress,
+  rsMLBPrxyCheckFPIPStatus        INTEGER
+}
+
+rsMLBRouterAddr   OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "Server address"
+ ::=  {rsMLBPrxyCheckFPIPEntry 1 }
+
+rsMLBFPIPAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS read-write
+    STATUS  mandatory
+    DESCRIPTION
+     "FP IP address."
+ ::=  {rsMLBPrxyCheckFPIPEntry 2 }
+
+rsMLBPrxyCheckFPIPStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        active(1),
+        notInService(2),
+        notReady(3),
+        createAndGo(4),
+        createAndWait(5),
+        destroy(6) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Administrative status of the row."
+ ::=  {rsMLBPrxyCheckFPIPEntry 4 }
+
+
+rsMLBProximityBasicStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+     both(1),
+     outbound(2),
+	 inbound(3),
+	 none(4)
+          }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Enable\Disable proximity check via Ping method."
+-- DEFVAL { 1 }
+ ::=  {rsMLBProximity 13 }
+
+rsMLBProximityAdvancedStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+     both(1),
+     outbound(2),
+	 inbound(3),
+	 none(4)
+          }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Enable\Disable proximity check via Udp port unreachable method."
+-- DEFVAL { 1 }
+ ::=  {rsMLBProximity 14 }
+
+rsMLBProximityServerSideStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+     both(1),
+     outbound(2),
+	 inbound(3),
+	 none(4)
+          }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Enable\Disable proximity check via tcp port 80 method."
+-- DEFVAL { 1 }
+ ::=  {rsMLBProximity 15 }
+
+rsMLBProximityClientSideStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+     both(1),
+     outbound(2),
+	 inbound(3),
+	 none(4)
+          }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Enable\Disable proximity check via tcp same port method."
+-- DEFVAL { 1 }
+ ::=  {rsMLBProximity 16 }
+
+rsMLBProximityStatisticsStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+     enable(1),
+     disable(2)
+          }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Enable\Disable proximity Statistics."
+-- DEFVAL { 2 }
+ ::=  {rsMLBProximity 17 }
+
+rsMLBPrxyStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBPrxyStatisticsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+    "Table containing hops and latenct info of 3 best NHRs for top 10 destination subnets."
+    ::=  {rsMLBProximity 18}
+
+rsMLBPrxyStatisticsEntry OBJECT-TYPE
+    SYNTAX RsMLBPrxyStatisticsEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX {rsMLBPrxyStatisticsSubnet }
+    ::=  {rsMLBPrxyStatisticsTable 1}
+
+RsMLBPrxyStatisticsEntry ::= SEQUENCE {
+  rsMLBPrxyStatisticsSubnet            	IpAddress,
+  rsMLBPrxyStatisticsFirstNhr           IpAddress,
+  rsMLBPrxyStatisticsFirstLatency       INTEGER,
+  rsMLBPrxyStatisticsFirstHops          INTEGER,
+  rsMLBPrxyStatisticsSecondNhr          IpAddress,
+  rsMLBPrxyStatisticsSecondLatency      INTEGER,
+  rsMLBPrxyStatisticsSecondHops         INTEGER,
+  rsMLBPrxyStatisticsThirdNhr           IpAddress,
+  rsMLBPrxyStatisticsThirdLatency       INTEGER,
+  rsMLBPrxyStatisticsThirdHops          INTEGER,
+  rsMLBPrxyStatisticsCounter	        INTEGER
+}
+
+rsMLBPrxyStatisticsSubnet   OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "Destination subnet address"
+ ::=  {rsMLBPrxyStatisticsEntry 1 }
+
+rsMLBPrxyStatisticsFirstNhr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "First NHR IP address."
+ ::=  {rsMLBPrxyStatisticsEntry 2 }
+
+rsMLBPrxyStatisticsFirstLatency OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Latency to that destination using first NHR."
+ ::=  {rsMLBPrxyStatisticsEntry 3 }
+
+ rsMLBPrxyStatisticsFirstHops OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Relative Hops to that destination using first NHR."
+ ::=  {rsMLBPrxyStatisticsEntry 4 }
+
+rsMLBPrxyStatisticsSecondNhr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "Second NHR IP address."
+ ::=  {rsMLBPrxyStatisticsEntry 5 }
+
+rsMLBPrxyStatisticsSecondLatency OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Latency to that destination using Second NHR."
+ ::=  {rsMLBPrxyStatisticsEntry 6 }
+
+rsMLBPrxyStatisticsSecondHops OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Relative Hops to that destination using Second NHR."
+ ::=  {rsMLBPrxyStatisticsEntry 7 }
+
+rsMLBPrxyStatisticsThirdNhr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "Third NHR IP address."
+ ::=  {rsMLBPrxyStatisticsEntry 8 }
+
+rsMLBPrxyStatisticsThirdLatency OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Latency to that destination using Third NHR."
+ ::=  {rsMLBPrxyStatisticsEntry 9 }
+
+rsMLBPrxyStatisticsThirdHops OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Relative Hops to that destination using Third NHR."
+ ::=  {rsMLBPrxyStatisticsEntry 10 }
+
+rsMLBPrxyStatisticsCounter OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of hits to that destination subnet."
+ ::=  {rsMLBPrxyStatisticsEntry 11 }
+
+
+rsMLBProximityUseGroupingInProximity OBJECT-TYPE
+    SYNTAX INTEGER {
+	  enable(1),
+	  disable(2)
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Enable\Disable Should grouping descisions considerd in proximity."
+-- DEFVAL  {enable}
+ ::=  {rsMLBProximity 19}
+
+rsMLBDNS OBJECT IDENTIFIER ::= { rsMLB 30 }
+
+rsMLBDNSURLtoIPTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBURLtoIPEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+    "The table for storing the IPs for URLs"
+    ::= {rsMLBDNS 1}
+
+rsMLBURLtoIPEntry OBJECT-TYPE
+    SYNTAX RsMLBURLtoIPEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "The row definition for IPs for URLs table"
+    INDEX {rsMLBURL}
+    ::= { rsMLBDNSURLtoIPTable 1}
+
+RsMLBURLtoIPEntry ::= SEQUENCE {
+ rsMLBURL                        DisplayString,
+ rsMLBURLLocDeviceIP           IpAddress,
+ rsMLBURLStatus             INTEGER
+}
+
+rsMLBURL     OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..80))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    "The URL address"
+    ::= { rsMLBURLtoIPEntry 1}
+
+rsMLBURLLocDeviceIP OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+    "The local device's IP "
+    ::= { rsMLBURLtoIPEntry 2}
+
+rsMLBURLStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                    active(1),
+                    notInService(2),
+                    notReady(3),
+                    createAndGo(4),
+                    createAndWait(5),
+                    destroy(6)
+                   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry.
+        Used to delete an entry of this table."
+    ::=  { rsMLBURLtoIPEntry 3}
+
+rsMLBDNSttl OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "DNS time to live"
+-- DEFVAL  {0}
+    ::= {rsMLBDNS 2}
+
+rsMLBDNSTwoAnswers OBJECT-TYPE
+ SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "Sending two DNS answers"
+-- DEFVAL  {disable}
+    ::= {rsMLBDNS 3}
+
+
+rsMLBDNSVirtualTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBDNSVirtualEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+    "The table for DNS virtual IPs "
+    ::= {rsMLBDNS 4}
+
+rsMLBDNSVirtualEntry OBJECT-TYPE
+    SYNTAX RsMLBDNSVirtualEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+    "The row definition for DNS virtual IPs table"
+    INDEX {rsMLBDNSVirtualIP}
+    ::= { rsMLBDNSVirtualTable 1}
+
+RsMLBDNSVirtualEntry ::= SEQUENCE {
+ rsMLBDNSVirtualIP      IpAddress,
+ rsMLBDNSVirIPMode      INTEGER,
+ rsMLBDNSStatus         INTEGER
+}
+
+rsMLBDNSVirtualIP OBJECT-TYPE
+ SYNTAX   IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+    "The DNS Virtual IP status"
+::= { rsMLBDNSVirtualEntry 1}
+
+rsMLBDNSVirIPMode OBJECT-TYPE
+ SYNTAX INTEGER {
+      regular(1),
+      backup(2)
+   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+    "The DNS Virtual IP mode (regular/backup)"
+--  DEFVAL  {regular}
+    ::= { rsMLBDNSVirtualEntry 2}
+
+rsMLBDNSStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                    active(1),
+                    notInService(2),
+                    notReady(3),
+                    createAndGo(4),
+                    createAndWait(5),
+                    destroy(6)
+                   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry.
+        Used to delete an entry of this table."
+    ::=  { rsMLBDNSVirtualEntry 3}
+
+
+rsMLBSrcPortInClientHash OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "enable - client's source port is used in client table hashing, disable
+      - only client IP and destination IP are used."
+    DEFVAL  { 2 }
+    ::=  { rsMLB 31 }
+
+
+rsMLBAgingTimeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBAgingTimeEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+    "This table determine the aging time for specific applications."
+    ::=  { rsMLB 32}
+
+rsMLBAgingTimeEntry OBJECT-TYPE
+    SYNTAX RsMLBAgingTimeEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX {rsMLBAgingTimeApplPort}
+    ::=  {rsMLBAgingTimeTable 1}
+
+RsMLBAgingTimeEntry  ::= SEQUENCE {
+  rsMLBAgingTimeApplPort            	 INTEGER,
+  rsMLBAgingTime            	 	 INTEGER,
+  rsMLBAgingTimeStatus                   INTEGER
+  }
+
+rsMLBAgingTimeApplPort  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "Application port"
+ ::=  {rsMLBAgingTimeEntry 1 }
+
+rsMLBAgingTime  OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+     "define the aging time for the aplication port in seconds"
+    DEFVAL  { 60 }
+ ::=  {rsMLBAgingTimeEntry 2 }
+
+
+rsMLBAgingTimeStatus  OBJECT-TYPE
+    SYNTAX INTEGER {
+        active(1),
+        notInService(2),
+        notReady(3),
+        createAndGo(4),
+        createAndWait(5),
+        destroy(6) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Administrative status of the entry."
+ ::=  {rsMLBAgingTimeEntry 3 }
+
+rsMLBNoNatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBNoNatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "In this table the FP saves the NO NAT addresses."
+    ::= {rsMLB 33}
+
+rsMLBNoNatEntry OBJECT-TYPE
+    SYNTAX RsMLBNoNatEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX  {rsMLBNoNatFromLclServerAddress,
+           rsMLBNoNatToLclServerAddress, 
+           rsMLBNoNatPortNumber,
+		   rsMLBNoNatRouterAddress		  
+		  }
+   ::= {rsMLBNoNatTable 1}
+
+RsMLBNoNatEntry  ::= SEQUENCE {
+   rsMLBNoNatFromLclServerAddress                IpAddress,
+   rsMLBNoNatToLclServerAddress                  IpAddress,
+   rsMLBNoNatPortNumber                          INTEGER, 
+   rsMLBNoNatRouterAddress                       IpAddress,
+   rsMLBNoNatStatus                              INTEGER
+  }
+
+
+rsMLBNoNatFromLclServerAddress    OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+     "IP Address of the local machine whost IP address should be translated."
+   ::= {rsMLBNoNatEntry 1}
+ 
+
+rsMLBNoNatToLclServerAddress    OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+     "IP Address of the local machine whost IP address should be translated."
+   ::= {rsMLBNoNatEntry 2}
+
+
+rsMLBNoNatPortNumber  OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "NO NAT source Port number"
+    DEFVAL  { 0 }
+ ::=  {rsMLBNoNatEntry 3}
+
+
+rsMLBNoNatRouterAddress    OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+     "The Router IP Address."
+   ::= {rsMLBNoNatEntry 4}
+
+
+rsMLBNoNatStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+              active(1),
+              notInService(2),
+              notReady(3),
+              createAndGo(4),
+              createAndWait(5),
+              destroy(6) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry."
+    ::=  {rsMLBNoNatEntry 5}
+
+
+
+rsMLBBasicNatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBBasicNatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "In this table the FP saves the BASIC NAT addresses."
+    ::= {rsMLB 34}
+
+rsMLBBasicNatEntry OBJECT-TYPE
+    SYNTAX RsMLBBasicNatEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX  {rsMLBBasicNatFromLclAddress,
+           rsMLBBasicNatToLclAddress,
+           rsMLBBasicNatPortNumber,
+		   rsMLBBasicNatRouterAddress,
+		   rsMLBBasicNatFromNatAddress, 
+           rsMLBBasicNatToNatAddress}
+   ::= {rsMLBBasicNatTable 1}
+
+RsMLBBasicNatEntry  ::= SEQUENCE {
+   rsMLBBasicNatFromLclAddress						IpAddress,
+   rsMLBBasicNatToLclAddress						IpAddress,
+   rsMLBBasicNatPortNumber                          INTEGER, 
+   rsMLBBasicNatRouterAddress                       IpAddress,
+   rsMLBBasicNatFromNatAddress                      IpAddress, 
+   rsMLBBasicNatToNatAddress                        IpAddress,
+   rsMLBBasicNatStatus                              INTEGER,
+   rsMLBBasicNatMode                                INTEGER
+  }
+
+rsMLBBasicNatFromLclAddress    OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+     "IP Address of the local machine whose IP address should be translated."
+   ::= {rsMLBBasicNatEntry 1}
+ 
+
+rsMLBBasicNatToLclAddress    OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+     "IP Address of the local machine whose IP address should be translated."
+   ::= {rsMLBBasicNatEntry 2}
+
+
+rsMLBBasicNatPortNumber  OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "BASIC NAT dst Port number"
+    DEFVAL  { 0 }
+ ::=  {rsMLBBasicNatEntry 3}
+
+
+rsMLBBasicNatRouterAddress    OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+     "The Router IP Address."
+   ::= {rsMLBBasicNatEntry 4}
+
+
+rsMLBBasicNatFromNatAddress    OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+     "NAT IP Address of the local machine  ."
+   ::= {rsMLBBasicNatEntry 5}
+ 
+
+rsMLBBasicNatToNatAddress    OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+     "NAT IP Address of the local machine  ."
+   ::= {rsMLBBasicNatEntry 6}
+
+
+
+rsMLBBasicNatStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+              active(1),
+              notInService(2),
+              notReady(3),
+              createAndGo(4),
+              createAndWait(5),
+              destroy(6) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry."
+    ::=  {rsMLBBasicNatEntry 7}
+
+
+
+rsMLBBasicNatMode OBJECT-TYPE
+    SYNTAX INTEGER {
+           regular(1),
+           backup(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The  BASIC NAT mode - either backup/regular"
+--  DEFVAL { 1 }
+    ::= {rsMLBBasicNatEntry 8}
+
+rsMLBMaxStaticNatEntriesTuning OBJECT IDENTIFIER ::= { rsMLB 35}
+
+
+rsMLBMaxStaticNatEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in the static NAT table."
+    ::=  { rsMLBMaxStaticNatEntriesTuning 1 }
+
+rsMLBMaxStaticNatEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in the Static NAT table."
+    ::=  { rsMLBMaxStaticNatEntriesTuning 2 }
+
+rsMLBMaxNoNatEntriesTuning OBJECT IDENTIFIER ::= { rsMLB 36}
+
+rsMLBMaxNoNatEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in the No NAT table."
+    ::=  { rsMLBMaxNoNatEntriesTuning 1 }
+
+rsMLBMaxNoNatEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in the No NAT table."
+    ::=  { rsMLBMaxNoNatEntriesTuning 2 }
+
+rsMLBMaxAllNatEntriesTuning OBJECT IDENTIFIER ::= { rsMLB 37}
+
+rsMLBMaxAllNatEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in the All NAT table."
+    ::=  { rsMLBMaxAllNatEntriesTuning 1 }
+
+rsMLBMaxAllNatEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in the All NAT table."
+    ::=  { rsMLBMaxAllNatEntriesTuning 2 }
+
+rsMLBMaxBasicNatEntriesTuning OBJECT IDENTIFIER ::= { rsMLB 38}
+
+rsMLBMaxBasicNatEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in the Mapped Basic NAT table."
+    ::=  { rsMLBMaxBasicNatEntriesTuning 1 }
+
+rsMLBMaxBasicNatEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in the Mapped Basic NAT table."
+    ::=  { rsMLBMaxBasicNatEntriesTuning 2 }
+
+rsMLBTimeoutForSYN OBJECT-TYPE
+    SYNTAX INTEGER  (0..10)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The initial aging time that a client entry will use when a he want protection
+      agains SYN attack. 0 means use the regular aging time."
+--    DEFVAL  { 5 }
+    ::=  { rsMLB 39 }
+
+
+rsMLBTosOrPrecedence OBJECT-TYPE
+    SYNTAX INTEGER {
+      tos(1),
+      precedence(2),
+	  disable (3)
+      }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Which bits are used in the TOS field in IP header by the mechanism 
+	   that signals the router which NHR was chosen."
+
+ ::=  {rsMLB 40 }
+
+rsMLBRemoteVIPsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBRemoteVIPEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing the list of Remote Virtual IPs."
+    ::=  {rsMLB 41}
+
+rsMLBRemoteVIPEntry OBJECT-TYPE
+    SYNTAX RsMLBRemoteVIPEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table. The table is made of two fields:
+	 1) The remote virtal ip address.
+	 2) The connectivity mode of the device [(1)regular, (2)backup].
+	 The table's key is made of the ip address only,
+	 since no similar remote ips can co-exist on different modes.
+	 The mode is neccessary in case in the future FP/LP works in Active<->Active mode. "
+   INDEX { rsMLBRemoteVIPAddr }
+    ::=  {rsMLBRemoteVIPsTable 1}
+
+RsMLBRemoteVIPEntry ::= SEQUENCE {
+  rsMLBRemoteVIPAddr	IpAddress,
+  rsMLBRemoteVIPMode	INTEGER,
+  rsMLBRemoteVIPStatus	INTEGER
+  }
+
+rsMLBRemoteVIPAddr  OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Remote Virtual IP Address."
+    ::=  {rsMLBRemoteVIPEntry 1}
+
+rsMLBRemoteVIPMode OBJECT-TYPE
+    SYNTAX  INTEGER {regular(1), backup(2)}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Remote device's mode - (1)regular, (2)backup"
+    ::=  {rsMLBRemoteVIPEntry 2}
+
+rsMLBRemoteVIPStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+              active(1),
+              notInService(2),
+              notReady(3),
+              createAndGo(4),
+              createAndWait(5),
+              destroy(6) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry."
+    ::=  {rsMLBRemoteVIPEntry 3}
+
+rsMLBCheckConnectivitySnmpOid OBJECT-TYPE
+   SYNTAX OBJECT IDENTIFIER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+       "This MIB variable indicates the Object Identifier should be get when using
+	the SNMP connectivity check."
+   ::= {rsMLB 42}
+
+
+rsMLBCheckConnectivitySnmpComm OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..20))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+    "The SNMP community name with which we access the servers when using the SNMP
+     connectivity check."
+    ::= {rsMLB 43}
+
+
+rsMLBNoAvailableBasicNatAction OBJECT-TYPE
+    SYNTAX INTEGER {
+      useDynamic(1),
+      discard(2),
+	  useLocal(3)
+      }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Determines what to do in case of no more available basic nat addresses:
+	   1 - Try to allocate a dynamic nat ip.
+	   2 - Discard packet (don't want to initiate an outbound traffic without basic nat.
+	   3 - Use original local address."
+
+ ::=  {rsMLB 44}
+
+rsMLBVIPReservedPortsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBVIPReservedPortsEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing the reserved ports"
+    ::= {rsMLB 45}
+
+rsMLBVIPReservedPortsEntry OBJECT-TYPE
+    SYNTAX RsMLBVIPReservedPortsEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "The row definition for this table."
+    INDEX {rsMLBVIPReservedPort}
+    ::=  {rsMLBVIPReservedPortsTable 1}
+
+RsMLBVIPReservedPortsEntry ::= SEQUENCE {
+    rsMLBVIPReservedPort INTEGER,
+    rsMLBVIPReservedPortStatus RowStatus
+}
+
+rsMLBVIPReservedPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The port taht is reserved"
+    ::=  {rsMLBVIPReservedPortsEntry 1}
+
+rsMLBVIPReservedPortStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "The row status of the entry."
+    ::=  {rsMLBVIPReservedPortsEntry 2}
+
+rsMLBClientTableHashLimit OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Limits the amount of client entries with the same hash"
+ ::=  {rsMLB 46}
+
+
+rsMLBCheckConnectivityHttpUrl OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..80))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The absolute path of the web page to be requested in the extended
+         connectivity check. Example: ~smith/home.html    "
+--  DEFVAL  ( "" )
+    ::= {rsMLB 47}
+
+rsMLBHTTPContentCheckString OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..64))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The string to look for in the HTTP response."
+    ::= {rsMLB 48}
+
+rsMLBHTTPContentCheckMode OBJECT-TYPE
+      SYNTAX INTEGER {
+        stringExists(1),
+        stringIsAbsent(2)}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Type of checks - should the check be that the string exists or that it is absent."
+    DEFVAL  { 1 }
+  ::=  {rsMLB 49}
+
+rsMLBHTTPContentCheckStatus OBJECT-TYPE
+	SYNTAX INTEGER {
+		enable(1),
+		disable(2)
+	}
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+    "status for the content check (enable / disable)."
+--  DEFVAL  { disable }
+  ::=  {rsMLB 50}
+
+rsMLBAcceptableHTTPCodesTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RsMLBAcceptableHTTPCodeEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+       "A table for managing the acceptable HTTP codes received by extended
+        connectivity check."
+   ::= {rsMLB 51}
+
+rsMLBAcceptableHTTPCodeEntry OBJECT-TYPE
+   SYNTAX RsMLBAcceptableHTTPCodeEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX  {rsMLBAcceptableHTTPCode}
+   ::= {rsMLBAcceptableHTTPCodesTable 1}
+
+RsMLBAcceptableHTTPCodeEntry ::= SEQUENCE {
+  rsMLBAcceptableHTTPCode         INTEGER,
+  rsMLBAcceptableHTTPCodeStatus   RowStatus
+}
+
+rsMLBAcceptableHTTPCode  OBJECT-TYPE
+  SYNTAX INTEGER
+  ACCESS read-write
+  STATUS mandatory
+  DESCRIPTION
+     "The HTTP code acceptable in that farm."
+  ::=  {rsMLBAcceptableHTTPCodeEntry 1}
+
+rsMLBAcceptableHTTPCodeStatus OBJECT-TYPE
+  SYNTAX RowStatus
+  ACCESS read-write
+  STATUS mandatory
+  DESCRIPTION
+    "Row status for the code."
+  ::=  {rsMLBAcceptableHTTPCodeEntry 2}
+
+rsMLBFarmTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RsMLBFarmEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+          "In this table the FP saves the general parameters per
+           server farm ID number."
+   ::= {rsMLB 52}
+
+rsMLBFarmEntry OBJECT-TYPE
+    SYNTAX RsMLBFarmEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX  {rsMLBFarmName}
+   ::= {rsMLBFarmTable 1}
+
+
+RsMLBFarmEntry  ::= SEQUENCE {
+  rsMLBFarmName                          DisplayString,
+  rsMLBFarmAdminStatus                       INTEGER,
+  rsMLBFarmType                              INTEGER,
+  rsMLBFarmDispatchMethod                    INTEGER,
+  rsMLBFarmClientsLifeTime                   INTEGER,
+  rsMLBFarmCheckConnectivityStatus           INTEGER,
+  rsMLBFarmCheckConnectivityMethod           INTEGER,
+  rsMLBFarmCheckConnectivityInterval         INTEGER,
+  rsMLBFarmCheckConnectivityRetries          INTEGER,
+  rsMLBFarmClientsConnectDenials             Counter,
+  rsMLBFarmDirectionInChain                  INTEGER,
+  rsMLBFarmBypassInChain                     INTEGER,
+  rsMLBFarmStatus                            RowStatus
+}
+
+rsMLBFarmName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..20))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The name assigned by the user to this farm."
+    ::= {rsMLBFarmEntry 1}
+
+
+rsMLBFarmAdminStatus  OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Enable/Disable the farm."
+    ::=  {rsMLBFarmEntry 2}
+
+rsMLBFarmType  OBJECT-TYPE    
+    SYNTAX INTEGER {
+      nhr(1),
+      ids(2),
+      remoteIds(3)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The type of the devices in the farm can be one of the following: firewall, ids and security-device
+        such as anti-virus "
+    ::=  {rsMLBFarmEntry 3}
+
+
+  rsMLBFarmDispatchMethod OBJECT-TYPE
+    SYNTAX INTEGER {
+      cyclic(1),
+      leastTraffic(2),
+      leastUsersNumber(3),
+      nt-1(4),
+      nt-2(5),
+      private-1(6),
+      private-2(7),
+      leastBytesNumber(8),
+      hash(9),
+      localLeastTraffic(10),
+      localLeastUsersNumber(11),
+      localLeastBytesNumber(12)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Type of dispatching required."
+    ::=  {rsMLBFarmEntry 4}
+
+
+rsMLBFarmClientsLifeTime OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal period of time in seconds a non-active client is kept
+      in the clients table."
+ -- DEFVAL  { 60 }
+::=  {rsMLBFarmEntry 5}
+
+rsMLBFarmCheckConnectivityStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Enable or Disable servers polling."
+--  DEFVAL  { enable }
+    ::=  {rsMLBFarmEntry 6}
+
+rsMLBFarmCheckConnectivityMethod OBJECT-TYPE
+
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicate the method the MLB check the connectivity.
+        where the value 1 means check connectiotivity by ping, other value serve
+        as a tcp port number."
+    ::=  {rsMLBFarmEntry 7}
+
+rsMLBFarmCheckConnectivityInterval OBJECT-TYPE
+    SYNTAX  INTEGER  (1..3600)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Polling interval in seconds for servers polling."
+--  DEFVAL  { 10 }
+   ::=  {rsMLBFarmEntry 8}
+
+rsMLBFarmCheckConnectivityRetries OBJECT-TYPE
+
+    SYNTAX  INTEGER  (1..20)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable indicate the Minimal number of unsuccessful polling
+       attempts before considering a server disconnected."
+--  DEFVAL  { 5 }
+    ::=  {rsMLBFarmEntry 9}
+
+ rsMLBFarmClientsConnectDenials OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable indicate the Number of connection requests from clients
+       that were denied by the the server dispatcher."
+
+    ::=  {rsMLBFarmEntry 10}
+
+rsMLBFarmDirectionInChain  OBJECT-TYPE    
+    SYNTAX INTEGER {
+      both(1),
+      inbound(2),
+      outbound(3)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The direction of the farm when it is in a chain, if to use it only for inbound traffic
+	   only for outbound traffic or both "
+ --  DEFVAL  { both }
+   ::=  {rsMLBFarmEntry 11}
+
+
+rsMLBFarmBypassInChain  OBJECT-TYPE    
+    SYNTAX INTEGER {
+      stop(1),
+      continue(2)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This is a flag that identifies, when trying to select a server in this farm 
+	   and there is no server available, wether to stop the chain and discard the pkt or continue 
+	   to the next farm in the chain. For nhr and ids farms it will always be continue "
+--  DEFVAL  { continue }
+    ::=  {rsMLBFarmEntry 12}
+
+  rsMLBFarmStatus OBJECT-TYPE
+    SYNTAX  RowStatus 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable indicate the Administative status of this entry.
+       Use for delete an entry in this table."
+  ::=  {rsMLBFarmEntry 13}
+
+rsMLBLogicalIDSServersTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBLogicalIDSServerEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Table containing the list of Logical IDS devices to which 
+      parts of the traffic will be copied."
+    ::=  { rsMLB 53}
+
+rsMLBLogicalIDSServerEntry OBJECT-TYPE
+    SYNTAX RsMLBLogicalIDSServerEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX { rsMLBLogicalIDSServerFarm ,
+                   rsMLBLogicalIDSServerName }
+    ::=  {rsMLBLogicalIDSServersTable 1}
+
+
+RsMLBLogicalIDSServerEntry ::= SEQUENCE {
+  rsMLBLogicalIDSServerFarm                     DisplayString,   
+  rsMLBLogicalIDSServerName                     DisplayString,
+  rsMLBLogicalIDSServerConnectedToPort          INTEGER, 
+  rsMLBLogicalIDSServerIPAddr                   IpAddress, 
+  rsMLBLogicalIDSServerOperStatus               INTEGER,
+  rsMLBLogicalIDSServerWeight                   INTEGER,
+  rsMLBLogicalIDSServerOperMode                 INTEGER,
+  rsMLBLogicalIDSServerAdminStatus              INTEGER,
+  rsMLBLogicalIDSServerConnectivityCheckId      INTEGER,
+  rsMLBLogicalIDSServerConnectivityCheckStatus  INTEGER,
+  rsMLBLogicalIDSServerStatus                   RowStatus,
+  rsMLBLogicalIDSServerAttachedUsersNumber      INTEGER,
+  rsMLBLogicalIDSServerPeakLoad					INTEGER, 
+  rsMLBLogicalIDSServerFramesRate				INTEGER,
+  rsMLBLogicalIDSServerFramesLoad				Counter,
+  rsMLBLogicalIDSServerConnectionLimit			INTEGER,
+  rsMLBLogicalIDSServerPeakBytesLoad			INTEGER, 
+  rsMLBLogicalIDSServerBytesRate				INTEGER,
+  rsMLBLogicalIDSServerBytesLoad				Counter,
+  rsMLBLogicalIDSServerBytesLimit				INTEGER,
+  rsMLBLogicalIDSServerMacStatus	     		INTEGER
+  }
+
+rsMLBLogicalIDSServerFarm  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..20))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "The name of the farm which this IDS is in it"
+ ::=  {rsMLBLogicalIDSServerEntry 1 } 
+
+rsMLBLogicalIDSServerName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..20))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "The Name of the IDS-server"
+ ::=  {rsMLBLogicalIDSServerEntry 2 } 
+
+rsMLBLogicalIDSServerConnectedToPort  OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+     "The physical port that the IDS is connected to - has no meaning for FW-type devices"
+ ::=  {rsMLBLogicalIDSServerEntry 3 }  
+
+rsMLBLogicalIDSServerIPAddr  OBJECT-TYPE
+    SYNTAX IpAddress  
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+     "The IP-address of the monitoring port of the IDS"
+ ::=  {rsMLBLogicalIDSServerEntry 4 }  
+
+rsMLBLogicalIDSServerOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      active(1),
+      notInService(2),
+      noNewSessions(3)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Operational status of application on  server.
+       active        - server is active
+       notInService  - server is or will become inactive. Existing sessions
+                       will be redirected to other servers.
+       noNewSessions - server will receive no new sessions. Existing sessions
+                       are allowed to complete."
+ ::=  { rsMLBLogicalIDSServerEntry 5 }
+
+rsMLBLogicalIDSServerWeight OBJECT-TYPE
+    SYNTAX  INTEGER  (1..100)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "A numerical weight assigned by the user in order to impose some
+       priority mechanism on the server dispatchers considerations of which
+       server to choose for attaching a client ."
+ ::=  { rsMLBLogicalIDSServerEntry 6 }
+
+
+rsMLBLogicalIDSServerOperMode OBJECT-TYPE
+    SYNTAX INTEGER { regular(1), backup(2) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable indicate the status of the server,
+      the MLB will not send any messages to a backup server
+      unless all other server are down  status.
+      In case of more then one backup server, the MLB will decide  to which
+      backup server to send the massages acordinf to rsMLBWeight."
+    ::=  { rsMLBLogicalIDSServerEntry 7}
+
+rsMLBLogicalIDSServerAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      shutdown(2),
+	  disable(3)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Administrative status of application on server.
+       enable -   activates the server.
+                  The rsMLBServerOperStatus will change to active.
+       disable -  stops the server.
+                  The rsMLBServerOperStatus will change to notInService.
+       shutdown - gracefully shuts down the server.
+                  The rsMLBServerOperStatus will change to noNewSessions."
+-- DEFVAL {enable}
+ ::=  { rsMLBLogicalIDSServerEntry 8}
+
+
+rsMLBLogicalIDSServerConnectivityCheckId OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The id given by the connectivity check moudule for the server."
+    ::=  { rsMLBLogicalIDSServerEntry 9}
+
+rsMLBLogicalIDSServerConnectivityCheckStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      active(1),
+      portDown(2),
+      checkIDSFail(3),
+      checkIDSFailAndPortDown(4),
+      none(5)
+	}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The status of the ids-server according to the connectivity 
+	   checks or physical port check, this field will have an undefined value 
+	   for other types of servers, where there is only connectivity checks"
+    ::=  { rsMLBLogicalIDSServerEntry 10}
+
+rsMLBLogicalIDSServerStatus OBJECT-TYPE
+    SYNTAX  RowStatus 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Administative status of appliaction on  server."
+    ::=  { rsMLBLogicalIDSServerEntry 11}
+
+
+rsMLBLogicalIDSServerAttachedUsersNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of currently active users attached to this IDS."
+    ::=  { rsMLBLogicalIDSServerEntry 12 }
+
+rsMLBLogicalIDSServerPeakLoad OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of frames per second dispatched to server
+       since last reset."
+    ::=  { rsMLBLogicalIDSServerEntry 13}
+
+rsMLBLogicalIDSServerFramesRate OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of frames per second dispatched to server."
+    ::=  { rsMLBLogicalIDSServerEntry 14}
+
+rsMLBLogicalIDSServerFramesLoad OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of frames per second dispatched to server."
+    ::=  { rsMLBLogicalIDSServerEntry 15}
+
+
+rsMLBLogicalIDSServerConnectionLimit OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The maximal number of client sessions which can be opened on this sever."
+-- DEFVAL {0}
+    ::= { rsMLBLogicalIDSServerEntry 16 }
+
+rsMLBLogicalIDSServerPeakBytesLoad OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of bytes per second dispatched to server
+       since last reset."
+    ::=  { rsMLBLogicalIDSServerEntry 17}
+
+
+rsMLBLogicalIDSServerBytesRate OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of bytes per second dispatched to server."
+    ::=  { rsMLBLogicalIDSServerEntry 18}
+
+
+rsMLBLogicalIDSServerBytesLoad OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of bytes dispatched to server."
+    ::=  { rsMLBLogicalIDSServerEntry 19}
+
+
+rsMLBLogicalIDSServerBytesLimit OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The maximal number of bytes per second dispatched to server."
+-- DEFVAL {0}
+    ::= { rsMLBLogicalIDSServerEntry 20 }
+
+rsMLBLogicalIDSServerMacStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+	found(1),
+    notFound(2)
+	}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Indicates if the Mac address of the IDS (if it is a remote one) was obtained. The mac
+       address is retrieved either from the Arp table or by sending Arp request.
+       found - mac address was found
+       notFound - mac address was not found "
+-- DEFVAL {0}1
+   ::=  { rsMLBLogicalIDSServerEntry 21 }
+
+
+rsMLBPhysicalIDSServersTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBPhysicalIDSServerEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Table containing the list of Physical IDS devices to which 
+      parts of the traffic will be copied."
+    ::=  { rsMLB 54}
+
+rsMLBPhysicalIDSServerEntry OBJECT-TYPE
+    SYNTAX RsMLBPhysicalIDSServerEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX { rsMLBPhysicalIDSServerName }
+    ::=  {rsMLBPhysicalIDSServersTable 1}
+
+
+
+RsMLBPhysicalIDSServerEntry ::= SEQUENCE {
+  rsMLBPhysicalIDSServerName                DisplayString,
+  rsMLBPhysicalIDSServerAttachedUsersNumber INTEGER,
+  rsMLBPhysicalIDSServerPeakLoad            INTEGER, 
+  rsMLBPhysicalIDSServerFramesRate          INTEGER,
+  rsMLBPhysicalIDSServerFramesLoad          Counter,
+  rsMLBPhysicalIDSServerConnectionLimit     INTEGER,
+  rsMLBPhysicalIDSServerPeakBytesLoad       INTEGER, 
+  rsMLBPhysicalIDSServerRecoveryTime        INTEGER,
+  rsMLBPhysicalIDSServerWarmUpTime          INTEGER,
+  rsMLBPhysicalIDSServerBytesRate         INTEGER,
+  rsMLBPhysicalIDSServerBytesLoad         Counter,
+  rsMLBPhysicalIDSServerBytesLimit        INTEGER,
+  rsMLBPhysicalIDSServerStatus            RowStatus,
+  rsMLBPhysicalIDSServerAdminStatus       INTEGER
+  }
+
+rsMLBPhysicalIDSServerName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..20))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "The Name of the IDS-server"
+ ::=  {rsMLBPhysicalIDSServerEntry 1 } 
+
+rsMLBPhysicalIDSServerAttachedUsersNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of currently active users attached to this IDS."
+    ::=  { rsMLBPhysicalIDSServerEntry 2 }
+
+rsMLBPhysicalIDSServerPeakLoad OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of frames per second dispatched to server
+       since last reset."
+    ::=  { rsMLBPhysicalIDSServerEntry 3}
+
+rsMLBPhysicalIDSServerFramesRate OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of frames per second dispatched to server."
+    ::=  { rsMLBPhysicalIDSServerEntry 4}
+
+rsMLBPhysicalIDSServerFramesLoad OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of frames per second dispatched to server."
+    ::=  { rsMLBPhysicalIDSServerEntry 5}
+
+
+rsMLBPhysicalIDSServerConnectionLimit OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The maximal number of client sessions which can be opened on this sever."
+-- DEFVAL {0}
+    ::= { rsMLBPhysicalIDSServerEntry 6 }
+
+rsMLBPhysicalIDSServerPeakBytesLoad OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of bytes per second dispatched to server
+       since last reset."
+    ::=  { rsMLBPhysicalIDSServerEntry 7}
+
+
+rsMLBPhysicalIDSServerRecoveryTime OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of seconds after server initialization during which ISD won't
+       send any requests."
+   ::= { rsMLBPhysicalIDSServerEntry 8}
+
+rsMLBPhysicalIDSServerWarmUpTime OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of seconds after server recovery during which the server will get
+       less requests than permitted by his weight and load."
+   ::= { rsMLBPhysicalIDSServerEntry 9}
+
+rsMLBPhysicalIDSServerBytesRate OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of bytes per second dispatched to server."
+    ::=  { rsMLBPhysicalIDSServerEntry 10}
+
+
+rsMLBPhysicalIDSServerBytesLoad OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of bytes dispatched to server."
+    ::=  { rsMLBPhysicalIDSServerEntry 11}
+
+
+rsMLBPhysicalIDSServerBytesLimit OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The maximal number of bytes per second dispatched to server."
+-- DEFVAL {0}
+    ::= { rsMLBPhysicalIDSServerEntry 12 }
+
+rsMLBPhysicalIDSServerStatus OBJECT-TYPE
+    SYNTAX RowStatus 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Administative status of appliaction on  server."
+    ::=  { rsMLBPhysicalIDSServerEntry 13}
+
+rsMLBPhysicalIDSServerAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      shutdown(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Administrative status of application on server.
+       enable -   activates the server.
+       shutdown - gracefully shuts down the server.
+                  The rsMLBServerOperStatus of each related logical srvr 
+				  will be changed to noNewSessions."
+-- DEFVAL {enable}
+ ::=  { rsMLBPhysicalIDSServerEntry 14}
+
+
+rsMLBChainTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBChainEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+    "Table containing the list of chains for Traffic Mirroring and Chaining."
+    ::=  { rsMLB 55}
+
+rsMLBChainEntry OBJECT-TYPE
+    SYNTAX RsMLBChainEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX { rsMLBChainName }
+    ::=  { rsMLBChainTable 1}
+
+
+RsMLBChainEntry ::= SEQUENCE {
+  rsMLBChainName     DisplayString (SIZE(1..20)),
+  rsMLBChainType 	 INTEGER,
+  rsMLBChainStatus	 RowStatus
+  }
+
+rsMLBChainName OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(1..20))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "The name of the chain"
+ ::=  { rsMLBChainEntry 1 }
+
+
+
+rsMLBChainType OBJECT-TYPE
+    SYNTAX INTEGER {
+     single(1),
+     chain(2)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "A flag which indicates if the Action is a chain or single, when single means only one
+      forwarding stage in the chain"
+ ::=  { rsMLBChainEntry 2 }
+
+rsMLBChainStatus OBJECT-TYPE
+   SYNTAX  RowStatus 
+   ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+     "The Status of the Entry"
+ ::=  { rsMLBChainEntry 3 }
+
+
+rsMLBChainActionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBChainActionEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+    "Table containing the list of actions of a chain for Traffic Mirroring and Chaining."
+    ::=  { rsMLB 56}
+
+rsMLBChainActionEntry OBJECT-TYPE
+    SYNTAX RsMLBChainActionEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX { rsMLBChainActionChainName, 
+           rsMLBChainActionName }
+    ::=  { rsMLBChainActionTable 1}
+
+
+RsMLBChainActionEntry ::= SEQUENCE {
+  rsMLBChainActionChainName      DisplayString (SIZE(1..20)),
+  rsMLBChainActionName 	         DisplayString (SIZE(1..20)),
+  rsMLBChainActionIndex 	     INTEGER,
+  rsMLBChainActionStatus	     RowStatus
+  }
+
+rsMLBChainActionChainName OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(1..20))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "The name of the chain"
+ ::=  { rsMLBChainActionEntry 1 }
+
+
+
+rsMLBChainActionName OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(1..20))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "The name of the action"
+ ::=  { rsMLBChainActionEntry 2 }
+
+rsMLBChainActionIndex OBJECT-TYPE
+  SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+     "The index of the action in the order of the actions in the chain list"
+ ::=  { rsMLBChainActionEntry 3 }
+
+
+rsMLBChainActionStatus OBJECT-TYPE
+   SYNTAX  RowStatus 
+   ACCESS  read-write
+   STATUS  mandatory
+    DESCRIPTION
+     "The Status of the Entry"
+ ::=  { rsMLBChainActionEntry 4 }
+
+
+rsMLBProximityMirrorPercentage  OBJECT-TYPE
+   SYNTAX INTEGER (1..100)
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+       "The percent of the proximity table to back up"
+-- DEFVAL { 100 }
+   ::=  {rsMLB 57}
+
+rsMLBProximityMirrorPollingTime  OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+       "The polling time of the proximity mirror messages"
+-- DEFVAL { 10 }
+   ::=  {rsMLB 58}
+
+rsMLBProximityMirrorProtocolMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+      enable(1),
+      disable(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Enable/Disable of the mirror protocol mode."
+        ::=  {rsMLB 59}
+
+
+rsMLBTransparentLoadBalancingMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+      useClientTable(1),
+      noClientTableRegularClassify(2),
+      noClientTableDestHashClassify(3),
+      noClientTableOMPCHashClassify(4)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Enable/Disable of the flag which indicates if we use the client table
+	   when working in the transparent forwarding mode, and if we don't use
+	   the client table, we can choose between the regular chain classification,
+	   and a chain classification that does hashing according to the dest IP."
+        ::=  {rsMLB 60}
+
+
+rsMLBMaxFragmentTableEntriesTuning OBJECT IDENTIFIER ::= { rsMLB 61}
+
+rsMLBMaxFragmentTableSize OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in the Fragmentation Table table."
+    ::=  { rsMLBMaxFragmentTableEntriesTuning 1 }
+
+rsMLBMaxFragmentTableSizeAfterReset  OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in the Fragmentation Table table."
+    ::=  { rsMLBMaxFragmentTableEntriesTuning 2 }
+
+
+rsMLBFragmentTableAgingTime OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The life time in seconds of an entry in the fragmentation table."
+-- DEFVAL { 60 }
+        ::=  {rsMLB 62}
+
+rsMLBIdentifyServerByNameMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+      enable(1),
+      disable(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Indicates weather the mode is identify server by its name."
+        ::=  {rsMLB 63}
+
+rsMLBExcludeStaticNatForLocalNetwork OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+      }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Determines what to do in case we have static NAT on serve and a destination is not beyond a NHR when wanting to change src IP to static NAT"
+-- DEFVAL { 2 }
+	::=  {rsMLB 64}
+
+rsMLBIDSAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      classifyFirewallTraffic(1),
+      classifyAllTraffic(2),
+	  disable(3)
+      }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Determines whether to LB the traffic for IDS or not, and if we do, which traffic to LB, 
+	   only traffic which is LB for FWs or all the traffic."
+-- DEFVAL { 3 }
+	::=  {rsMLB 65}
+
+rsMLBResetFromIDSStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+	  enable(1),
+	  disable(2),
+	  backToSource(3)
+      }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Determines what should we do with a reset packet from the IDS device. The packets can be discarded,
+	  forwarded back to the IDSs or can be forwarded to the port from which the session was originated."
+-- DEFVAL { 2 }
+	::=  {rsMLB 66}
+
+rsMLBStaticNATClassificationMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+      nat(1),
+      local(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Indicates the mode of static NAT classification: per NAT address or per local address."
+        ::=  {rsMLB 67}
+
+rsMLBDynamicNATClassificationMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+      nat(1),
+      local(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Indicates the mode of dynamic NAT classification: per NAT address or per local address."
+        ::=  {rsMLB 68}
+
+rsMLBBasicNATClassificationMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+      nat(1),
+      local(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Indicates the mode of basic NAT classification: per NAT address or per local address."
+        ::=  {rsMLB 69}
+
+
+rsMLBOverrideOSPFLeakonFailure OBJECT-TYPE
+    SYNTAX  INTEGER {
+      enable(1),
+      disable(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "In case of OSPF:
+	don't advertise the FP\LP as the NHR in case all FW are down."
+        ::=  {rsMLB 70}
+
+
+rsMLBOverrideRIPLeakonFailure OBJECT-TYPE
+    SYNTAX  INTEGER {
+      enable(1),
+      disable(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "In case of RIP:
+	don't advertise the FP\LP as the NHR in case all FW are down."
+        ::=  {rsMLB 71}
+
+rsMLBCost  OBJECT IDENTIFIER ::= { rsMLB 72 }
+
+rsMLBDailyStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBDailyStatisticsEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing the numbers of discarded sessions per day"
+    ::=  {rsMLBCost 1}
+
+rsMLBDailyStatisticsEntry OBJECT-TYPE
+    SYNTAX RsMLBDailyStatisticsEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table. the table containing the numbers of discarded sessions per day.
+	 	 The table's key is made of the sequential numbers of the the month and the day. "
+   INDEX { rsMLBDailyStatisticsMonth,
+rsMLBDailyStatisticsDay }
+    ::=  {rsMLBDailyStatisticsTable 1}
+
+RsMLBDailyStatisticsEntry ::= SEQUENCE {
+  rsMLBDailyStatisticsMonth	INTEGER,
+  rsMLBDailyStatisticsDay	    INTEGER,
+  rsMLBDailyStatisticsDiscardedSessionsNumber  INTEGER,
+  rsMLBDailyStatisticsStatus	INTEGER
+  }
+
+rsMLBDailyStatisticsMonth  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Sequential number of the month."
+    ::=  {rsMLBDailyStatisticsEntry 1}
+
+rsMLBDailyStatisticsDay OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Sequential number of the day."
+    ::=  {rsMLBDailyStatisticsEntry 2}
+
+rsMLBDailyStatisticsDiscardedSessionsNumber OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of discarded sessions in that day.
+	   The sessions were discarded since no server was available for any reason."
+    ::=  {rsMLBDailyStatisticsEntry 3}
+
+rsMLBDailyStatisticsStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+              active(1),
+              notInService(2),
+              notReady(3),
+              createAndGo(4),
+              createAndWait(5),
+              destroy(6) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry."
+    ::=  {rsMLBDailyStatisticsEntry 4}
+
+
+rsMLBNHRDailyStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBNHRDailyStatisticsEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing the statistics of a given NHR per a given day"
+    ::=  {rsMLBCost 2}
+
+rsMLBNHRDailyStatisticsEntry OBJECT-TYPE
+    SYNTAX RsMLBNHRDailyStatisticsEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table. the table containing the statistics of a given NHR per a given day.
+	 	 The table's key is made of the sequential numbers of the the month,the day and the address of the NHR. "
+   INDEX { rsMLBNHRDailyStatisticsMonth,
+rsMLBNHRDailyStatisticsDay,
+rsMLBNHRDailyStatisticsNHRAddr }
+    ::=  {rsMLBNHRDailyStatisticsTable 1}
+
+RsMLBNHRDailyStatisticsEntry ::= SEQUENCE {
+  rsMLBNHRDailyStatisticsMonth					INTEGER,
+  rsMLBNHRDailyStatisticsDay					INTEGER,
+  rsMLBNHRDailyStatisticsNHRAddr				IpAddress,
+  rsMLBNHRDailyStatisticsDiscardZonePrcnt		INTEGER,
+  rsMLBNHRDailyStatisticsMinBW					INTEGER,
+  rsMLBNHRDailyStatisticsMaxBW					INTEGER,
+  rsMLBNHRDailyStatisticsForwardedPacketNum	    INTEGER,
+  rsMLBNHRDailyStatisticsDiscardedPacketNum		INTEGER,
+  rsMLBNHRDailyStatisticsBytesNum				INTEGER,
+  rsMLBNHRDailyStatisticsSessionsNum			INTEGER,
+  rsMLBNHRDailyStatisticsStatus					INTEGER
+  }
+
+rsMLBNHRDailyStatisticsMonth  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Sequential number of the month."
+    ::=  {rsMLBNHRDailyStatisticsEntry 1}
+
+rsMLBNHRDailyStatisticsDay OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Sequential number of the day."
+    ::=  {rsMLBNHRDailyStatisticsEntry 2}
+
+rsMLBNHRDailyStatisticsNHRAddr  OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "NHR address"
+ ::=  {rsMLBNHRDailyStatisticsEntry 3 }
+
+rsMLBNHRDailyStatisticsDiscardZonePrcnt OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Percentage of time in which we reached the zone in which discards are done in that day for that NHR.
+	   We discard packets that cause us to pass the upper threshold limit.
+	   The upper threshold limit is the BW limit of the NHR if the price feature is disabled 
+	   or the higest BW level upper threshold if the price feature is enabled"
+    ::=  {rsMLBNHRDailyStatisticsEntry 4}
+
+
+rsMLBNHRDailyStatisticsMinBW OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Minimum BW in Kbps in that day for that NHR.
+	   We calculate the BW of each 10 minutes interval and remember the min BW of that day"
+    ::=  {rsMLBNHRDailyStatisticsEntry 5}
+
+rsMLBNHRDailyStatisticsMaxBW OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum BW in Kbps in that day for that NHR
+	   We calculate the BW of each 10 minutes interval and remember the max BW of that day"
+    ::=  {rsMLBNHRDailyStatisticsEntry 6}
+
+rsMLBNHRDailyStatisticsForwardedPacketNum OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number (in thousands) of forwarded packets in that day for that NHR"
+    ::=  {rsMLBNHRDailyStatisticsEntry 7}
+
+rsMLBNHRDailyStatisticsDiscardedPacketNum OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of discarded packets in that day for that NHR"
+    ::=  {rsMLBNHRDailyStatisticsEntry 8}
+
+rsMLBNHRDailyStatisticsBytesNum OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number (in Megas = 10**6) of forwarded bytes in that day for that NHR"
+    ::=  {rsMLBNHRDailyStatisticsEntry 9}
+
+rsMLBNHRDailyStatisticsSessionsNum OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number (in K) of forwarded sessions in that day for that NHR"
+    ::=  {rsMLBNHRDailyStatisticsEntry 10}
+
+rsMLBNHRDailyStatisticsStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+              active(1),
+              notInService(2),
+              notReady(3),
+              createAndGo(4),
+              createAndWait(5),
+              destroy(6) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry."
+    ::=  {rsMLBNHRDailyStatisticsEntry 11}
+
+
+rsMLBNHRPriceDailyStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBNHRPriceDailyStatisticsEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing the statistics of the percentage of time that was spent in each price level for 
+	   a given NHR per a given day"
+    ::=  {rsMLBCost 3}
+
+rsMLBNHRPriceDailyStatisticsEntry OBJECT-TYPE
+    SYNTAX RsMLBNHRPriceDailyStatisticsEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table. the table containing the statistics of a given NHR per a given day.
+	 	 The table's key is made of the sequential numbers of the the month,the day,the address of the NHR and the upper
+		 threshold of BW for that price level. "
+   INDEX { rsMLBNHRPriceDailyStatisticsMonth,
+rsMLBNHRPriceDailyStatisticsDay,
+rsMLBNHRPriceDailyStatisticsNHRAddr,
+           rsMLBNHRPriceDailyStatisticsThreshold }
+    ::=  {rsMLBNHRPriceDailyStatisticsTable 1}
+
+RsMLBNHRPriceDailyStatisticsEntry ::= SEQUENCE {
+  rsMLBNHRPriceDailyStatisticsMonth					INTEGER,
+  rsMLBNHRPriceDailyStatisticsDay					INTEGER,
+  rsMLBNHRPriceDailyStatisticsNHRAddr				IpAddress,
+  rsMLBNHRPriceDailyStatisticsThreshold				INTEGER,
+  rsMLBNHRPriceDailyStatisticsLevelPrcnt			INTEGER,
+  rsMLBNHRPriceDailyStatisticsStatus				INTEGER
+  }
+
+rsMLBNHRPriceDailyStatisticsMonth  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Sequential number of the month."
+    ::=  {rsMLBNHRPriceDailyStatisticsEntry 1}
+
+rsMLBNHRPriceDailyStatisticsDay OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Sequential number of the day."
+    ::=  {rsMLBNHRPriceDailyStatisticsEntry 2}
+
+rsMLBNHRPriceDailyStatisticsNHRAddr  OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+     "NHR address"
+ ::=  {rsMLBNHRPriceDailyStatisticsEntry 3 }
+
+rsMLBNHRPriceDailyStatisticsThreshold OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      " The upper threshold of capcity of that BW level in Kbps"
+    ::=  {rsMLBNHRPriceDailyStatisticsEntry 4}
+
+rsMLBNHRPriceDailyStatisticsLevelPrcnt OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Percentage of time in which we reached this BW level in that day for that NHR"
+    ::=  {rsMLBNHRPriceDailyStatisticsEntry 5}
+
+
+rsMLBNHRPriceDailyStatisticsStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+              active(1),
+              notInService(2),
+              notReady(3),
+              createAndGo(4),
+              createAndWait(5),
+              destroy(6) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry."
+    ::=  {rsMLBNHRPriceDailyStatisticsEntry 6}
+
+
+rsMLBPriceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBPriceEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing the  price levels for a given NHR"
+    ::=  {rsMLBCost 4}
+
+rsMLBPriceEntry OBJECT-TYPE
+    SYNTAX RsMLBPriceEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table. the table containing the  price levels for a given NHR.
+	 	 The table's key is made of the address of the NHR and the upper threshold of BW for that price level. "
+   INDEX {rsMLBPriceNHRAddr, 
+rsMLBPriceThreshold  }
+    ::=  {rsMLBPriceTable 1}
+
+RsMLBPriceEntry ::= SEQUENCE {
+  rsMLBPriceNHRAddr				IpAddress,
+  rsMLBPriceThreshold			INTEGER,
+  rsMLBPriceMethod				INTEGER,
+  rsMLBPriceBWUnit				INTEGER,
+  rsMLBPricePrice				INTEGER,
+  rsMLBPriceStatus				INTEGER,
+  rsMLBPriceLevelPrcnt          INTEGER			
+  }
+
+rsMLBPriceNHRAddr  OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "IP address of a given NHR."
+    ::=  {rsMLBPriceEntry 1}
+
+rsMLBPriceThreshold OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The upper BW threshold of that price level in Kbps"
+    ::=  {rsMLBPriceEntry 2}
+
+rsMLBPriceMethod  OBJECT-TYPE
+    SYNTAX INTEGER {
+      absolute(1),
+      perKbps(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+     "Whether the price is in Absolute price units or price units per Kbps"
+-- DEFVAL {2}
+ ::=  {rsMLBPriceEntry 3 }
+
+rsMLBPriceBWUnit OBJECT-TYPE
+    SYNTAX  INTEGER {
+      tenKbps(1),
+      hundredKbps(2),
+	  thousandKbps(3)
+    } 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      " For how many Kbps this price refer to "
+-- DEFVAL {1}
+    ::=  {rsMLBPriceEntry 4}
+
+rsMLBPricePrice OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The price of this level"
+    ::=  {rsMLBPriceEntry 5}
+
+
+rsMLBPriceStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+              active(1),
+              notInService(2),
+              notReady(3),
+              createAndGo(4),
+              createAndWait(5),
+              destroy(6) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry."
+    ::=  {rsMLBPriceEntry 6}
+
+rsMLBPriceLevelPrcnt OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Percentage of time in which we reached this BW level today for that NHR.
+	   It becomes zero when a new day begins"
+    ::=  {rsMLBPriceEntry 7}
+
+
+rsMLBCostAdminStatus  OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Enable/Disable cost feature."
+    ::=  {rsMLBCost 5}
+
+rsMLBCostWeight  OBJECT-TYPE
+   SYNTAX INTEGER (0..100)
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+       "The weight given to the price of the NHR in the dispatching decision"
+-- DEFVAL { 1 }
+   ::=  {rsMLBCost 6}
+
+rsMLBTotalDiscardedSessionsNumber  OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Number of discarded sessions since the device last reboot.
+	   The sessions were discarded since no server was available for any reason."
+    ::=  {rsMLBCost 7}
+
+rsMLBCostLoadSamplesNumber  OBJECT-TYPE
+   SYNTAX INTEGER (1..300)
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+       "The number of load samples for which we calculate average load with which we go to the prices ladder in order 
+	     to determine the price for the next second LB"
+-- DEFVAL { 1 }
+   ::=  {rsMLBCost 8}
+
+
+rsMLBAdvertiseOSPFAccordingtoPortRules OBJECT-TYPE
+    SYNTAX  INTEGER {
+      enable(1),
+      disable(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+	"in OPSF: advertise routing according to the port rules"
+        ::=  {rsMLB 73}
+
+rsMLBAdvertiseRIPAccordingtoPortRules OBJECT-TYPE
+    SYNTAX  INTEGER {
+      enable(1),
+      disable(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+	"in RIP: advertise routing according to the port rules"
+        ::=  {rsMLB 74}
+
+
+rsMLBDNSRegexpURLtoIPTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBDNSRegexpURLtoIPEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+    "The table for storing the IPs for regular expressions URLs"
+    ::= {rsMLBDNS 5}
+
+rsMLBDNSRegexpURLtoIPEntry OBJECT-TYPE
+    SYNTAX RsMLBDNSRegexpURLtoIPEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "The row definition for IPs for regular expressions URLs table"
+    INDEX {rsMLBDNSRegexpURL}
+    ::= { rsMLBDNSRegexpURLtoIPTable 1}
+
+RsMLBDNSRegexpURLtoIPEntry ::= SEQUENCE {
+ rsMLBDNSRegexpURL							DisplayString,
+ rsMLBDNSRegexpURLLocDeviceIP				IpAddress,
+ rsMLBDNSRegexpURLIndex						INTEGER,
+ rsMLBDNSRegexpURLStatus					INTEGER
+}
+
+rsMLBDNSRegexpURL     OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..80))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    "The regular expression URL"
+    ::= { rsMLBDNSRegexpURLtoIPEntry 1}
+
+rsMLBDNSRegexpURLLocDeviceIP OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+    "The local device's IP "
+    ::= { rsMLBDNSRegexpURLtoIPEntry 2}
+
+rsMLBDNSRegexpURLIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+    "The index of the entry according, specify the order of the search. "
+    ::= { rsMLBDNSRegexpURLtoIPEntry 3}
+
+rsMLBDNSRegexpURLStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                    active(1),
+                    notInService(2),
+                    notReady(3),
+                    createAndGo(4),
+                    createAndWait(5),
+                    destroy(6)
+                   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry.
+        Used to delete an entry of this table."
+    ::=  { rsMLBDNSRegexpURLtoIPEntry 4}
+
+rsMLBDNSURLToIPSearchMode OBJECT-TYPE
+ SYNTAX INTEGER {
+      	nameToIP(1),
+      	dynamicNameToIP(2),
+		both(3)
+   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "Define the search mode, when searching in the DNS URL to IP table."
+-- DEFVAL  {both}
+    ::= {rsMLBDNS 6}
+    
+
+rsMLBMaxURLtoIPTableEntriesTuning OBJECT IDENTIFIER ::= { rsMLB 75}
+
+rsMLBMaxURLtoIPTableSize OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in the URL to IP table."
+    ::=  { rsMLBMaxURLtoIPTableEntriesTuning 1 }
+
+rsMLBMaxURLtoIPTableSizeAfterReset  OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in the URL to IP table."
+    ::=  { rsMLBMaxURLtoIPTableEntriesTuning 2 }
+
+
+rsMLBMaxTrackNHRTableEntriesTuning OBJECT IDENTIFIER ::= { rsMLB 76}
+
+rsMLBMaxTrackNHRTableSize OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in the IP NHR Table table."
+    ::=  { rsMLBMaxTrackNHRTableEntriesTuning 1 }
+
+rsMLBMaxTrackNHRTableSizeAfterReset  OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in the IP NHR Table table."
+    ::=  { rsMLBMaxTrackNHRTableEntriesTuning 2 }
+
+
+rsMLBTrackNHRTableAgingTime OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The life time in seconds of an entry in the IP NHR table."
+-- DEFVAL { 60 }
+
+        ::=  {rsMLB 77}
+
+rsMLBFtpCtrlPort    OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "Ftp control port mapping - only for load balanced traffic "
+-- DEFVAL  {21}
+    ::= {rsMLB  78}					
+
+rsMLBFtpDataPort    OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "FTP data port mapping - only for load balanced traffic"
+-- DEFVAL  {20}
+    ::= {rsMLB  79}				          
+
+
+rsMLBUplink  OBJECT IDENTIFIER ::= { rsMLB 80 }
+
+
+rsMLBLinkTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBLinkEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Table containing the list of Links."
+    ::=  { rsMLBUplink 1}
+
+rsMLBLinkEntry OBJECT-TYPE
+    SYNTAX RsMLBLinkEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       " The row definition for this table."
+   INDEX { rsMLBLinkNo }
+    ::=  {rsMLBLinkTable 1}
+
+RsMLBLinkEntry ::= SEQUENCE {
+  rsMLBLinkNo          		 INTEGER,
+  rsMLBLinkIPAddress             IpAddress,
+  rsMLBLinkType                  DisplayString,
+  rsMLBLinkStatus 		 INTEGER,
+  rsMLBLinkVirtDnsIP             IpAddress
+  }
+
+rsMLBLinkNo OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Link No"
+ ::=  {rsMLBLinkEntry 1 }
+
+rsMLBLinkIPAddress  OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+     "The IP address of the Link NHR. "
+ ::=  {rsMLBLinkEntry 2 }
+
+rsMLBLinkType  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..20))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Link Type."
+ ::=  {rsMLBLinkEntry 3}
+
+rsMLBLinkStatus  OBJECT-TYPE
+    SYNTAX INTEGER {
+        active(1),
+        notInService(2),
+        notReady(3),
+        createAndGo(4),
+        createAndWait(5),
+        destroy(6) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Administrative status of the Link."
+ ::=  {rsMLBLinkEntry 4 }
+
+rsMLBLinkVirtDnsIP  OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+     "The virutal DNS IP address. "
+ ::=  {rsMLBLinkEntry 5 }
+
+rsMLBGroupSrvrOperModeMethod OBJECT-TYPE
+    SYNTAX  INTEGER {
+      destination(1),
+      application(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This item indicate how the server operation mode in grouping is determined.
+       It can be taken from each of the 3 groups: destiantion , application or source"
+-- DEFVAL { 1 }
+        ::=  {rsMLB 81}
+
+rsMLBLogicalServersArpForMacEnable  OBJECT-TYPE
+    SYNTAX  INTEGER {
+      enable(1),
+      disable(2)
+   }    
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+		"Enable/Disable of Arp request transmition to FW and  remote IDS"
+--  DEFVAL  { enable }
+	::= { rsMLB 82 }
+
+rsMLBLogicalServersArpForMacTime OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+		"The time between Arp request retransmition to FW and  remote IDS in seconds"
+-- DEFVAL { 300}
+	::= { rsMLB 83 }
+
+
+rsMLBIDSLbSessionClassifyMode OBJECT-TYPE
+   SYNTAX  INTEGER {
+      byFirstPacket(1),
+      bestRule(2),
+      firstMatch(3) }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+        "Classification mode - determines  when and how sessions packets are classified 
+		 when ids load balancing"
+-- DEFVAL { 1}
+	::= { rsMLB 84 }
+       
+
+rsMLBRemoteNat OBJECT IDENTIFIER ::= { rsMLB 85 }
+
+rsMLBRemoteNatGlobalCnfg OBJECT IDENTIFIER ::= { rsMLBRemoteNat 1 }
+
+rsMLBTrpPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"TRP protocol port number"
+    DEFVAL {2090}
+    ::= { rsMLBRemoteNatGlobalCnfg 1}				
+
+rsMLBTrpRegularInterval OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"The interval (in seconds) between regular TRP messages"
+    DEFVAL {10}
+    ::= { rsMLBRemoteNatGlobalCnfg 2}				
+
+rsMLBTrpCompleteInterval OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"The interval (in minutes) between complete TRP messages"
+    DEFVAL {60}
+    ::= { rsMLBRemoteNatGlobalCnfg 3}				
+
+rsMLBTrpRetries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Number of TRP retries before site failure "
+    DEFVAL {3}
+    ::= { rsMLBRemoteNatGlobalCnfg 4}				
+
+rsMLBTunnelCheckInterval OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Tunnel check interval in seconds"
+    DEFVAL {3}
+    ::= { rsMLBRemoteNatGlobalCnfg 5}				
+
+rsMLBTunnelWeight OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Tunnel weight for tunnel load balancing calculation (0-100)"
+    DEFVAL {10}
+    ::= { rsMLBRemoteNatGlobalCnfg 6}				
+
+rsMLBLocalLinkWeight OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Local link weight for load balancing calculation (0-100)"
+    DEFVAL {10}
+    ::= { rsMLBRemoteNatGlobalCnfg 7}				
+
+rsMLBRemoteLinkWeight OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Remote link weight for load balancing calculation (0-100)"
+    DEFVAL {10}
+    ::= { rsMLBRemoteNatGlobalCnfg 8}				
+
+rsMLBTunnelChecksRetries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"For The health monitoring checks entry. Number of HM retries (in seconds)"
+    DEFVAL {5}
+    ::= { rsMLBRemoteNatGlobalCnfg 9}				
+
+rsMLBTunnelChecksTimeout OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"For The health monitoring checks entry. Timeout for health monitoring check (in seconds)"
+    DEFVAL {5}
+    ::= { rsMLBRemoteNatGlobalCnfg 10}				
+
+rsMLBRemoteNatOperStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+     enable (1),
+     disable (2)
+     }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Remote nat operation status"
+    DEFVAL {2}
+    ::= { rsMLBRemoteNat 2}				
+
+rsMLBTrpProtocolOperStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+         enable (1),
+         disable (2)
+         }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+    "TRP protocol operation status"
+    DEFVAL {2}
+    ::= { rsMLBRemoteNat 3}				
+
+rsMLBRNatHealthMonitorOperStatus OBJECT-TYPE
+  SYNTAX INTEGER {
+     enable (1),
+     disable (2)
+     }
+  ACCESS read-write
+  STATUS mandatory
+  DESCRIPTION
+	"Health monitoring operation status"
+  DEFVAL {2}
+  ::= { rsMLBRemoteNat 4}				
+
+rsMLBLocalServiceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBLocalServiceEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	"The local services that available for external users"
+    ::= {rsMLBRemoteNat 5}				
+
+rsMLBLocalServiceEntry OBJECT-TYPE
+    SYNTAX RsMLBLocalServiceEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	"The local services that available for external users"
+    INDEX {rsMLBLocalServiceName}
+   ::= { rsMLBLocalServiceTable 1}				
+
+  RsMLBLocalServiceEntry ::=  SEQUENCE {
+	rsMLBLocalServiceName			DisplayString,
+	rsMLBLocalServicePassword		DisplayString,
+	rsMLBLocalServiceDnsDomain		DisplayString,
+	rsMLBLocalServicePersistenceMode	INTEGER,
+	rsMLBLocalServiceEntryStatus 		INTEGER
+  }
+
+rsMLBLocalServiceName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..20)) 
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"The local services that available for external users"
+   ::= { rsMLBLocalServiceEntry 1}				
+
+rsMLBLocalServicePassword OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..20))
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+	"Password of the local service"
+   ::= { rsMLBLocalServiceEntry 2}				
+
+rsMLBLocalServiceDnsDomain OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..80))
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+	"local service Domain name for the DNS resolution"
+   ::= { rsMLBLocalServiceEntry 3}				
+
+rsMLBLocalServicePersistenceMode OBJECT-TYPE
+   SYNTAX INTEGER{
+      clientTable (1),
+      packetByPacket (2)
+   }
+   ACCESS read-write
+   STATUS mandatory
+      DESCRIPTION
+	"Local Service redirection persistence mode (Distribution mode)"  
+	DEFVAL {1}
+   ::= { rsMLBLocalServiceEntry 4}				
+
+
+rsMLBLocalServiceEntryStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+	    active (1),
+	    notInService (2),
+	    notReady (3),
+	    createAndGo (4),
+	    createAndWait (5),
+	    destroy (6)
+	   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       " This variable indicates the administrative status of this entry."
+    ::=  { rsMLBLocalServiceEntry 5} 
+
+rsMLBLocalStationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBLocalStationEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	"The local station table (VPN/VoIP servers etc) of the local services"
+    ::= { rsMLBRemoteNat 6}				
+
+rsMLBLocalStationEntry OBJECT-TYPE
+    SYNTAX RsMLBLocalStationEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	"The local station entry (VPN/VoIP servers etc) of the local services"
+    INDEX {rsMLBLocalStationServiceName, 
+rsMLBLocalStationInternalStationAddr}
+   ::= {rsMLBLocalStationTable 1}				
+
+      RsMLBLocalStationEntry ::=  SEQUENCE {
+	rsMLBLocalStationServiceName		DisplayString,
+	rsMLBLocalStationInternalStationAddr	IpAddress,
+	rsMLBIocalStationEntryStatus 		INTEGER
+      }
+
+rsMLBLocalStationServiceName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..20))
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"The local service that available for external users"
+  ::= { rsMLBLocalStationEntry 1}				
+
+rsMLBLocalStationInternalStationAddr OBJECT-TYPE
+   SYNTAX IpAddress 
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"Internal station (VPN/VoIP servers) ip address"
+   ::= { rsMLBLocalStationEntry 2}				
+
+rsMLBIocalStationEntryStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+	    active (1),
+	    notInService (2),
+	    notReady (3),
+	    createAndGo (4),
+	    createAndWait (5),
+	    destroy (6)
+	   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       " This variable indicates the administrative status of this entry."
+    ::=  { rsMLBLocalStationEntry 3} 
+
+rsMLBRemoteServiceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBRemoteServiceEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+"Table of the remote services in the remote sites that need access"
+    ::= { rsMLBRemoteNat 7}				
+
+rsMLBRemoteServiceEntry OBJECT-TYPE
+    SYNTAX RsMLBRemoteServiceEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	"Entry of the remote services in the remote sites that need access"
+    INDEX {rsMLBRemoteServiceName}
+   ::= { rsMLBRemoteServiceTable 1}				
+
+      RsMLBRemoteServiceEntry ::=  SEQUENCE {
+	rsMLBRemoteServiceName				DisplayString,
+	rsMLBRemoteServicePassword			DisplayString,
+	rsMLBRemoteServiceDomainName			DisplayString,
+	rsMLBRemoteServiceLoadBalanceMethod		INTEGER,
+	rsMLBRemoteServiceLocalServiceName		DisplayString,
+	rsMLBRemoteServiceOperStatus			INTEGER,
+	rsMLBRemoteServiceTrpOperationStatus		INTEGER,
+	rsMLBRemoteServiceHMOperationStatus		INTEGER,
+	rsMLBRemoteServiceEntryStatus			INTEGER
+	}
+
+rsMLBRemoteServiceName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..20))
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"Remote service name"
+   ::= { rsMLBRemoteServiceEntry 1}				
+
+rsMLBRemoteServicePassword OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..20))
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+	"Remote service password"
+   ::= { rsMLBRemoteServiceEntry 2}				
+
+rsMLBRemoteServiceDomainName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..80))
+   ACCESS read-write
+   STATUS mandatory
+      DESCRIPTION
+	"Remote service domain"  
+	DEFVAL  {""}
+   ::= { rsMLBRemoteServiceEntry 3}				
+
+rsMLBRemoteServiceLoadBalanceMethod OBJECT-TYPE
+   SYNTAX INTEGER {
+       hash (1),
+       cyclic (2),
+       remoteWeight (3)}
+   ACCESS read-only
+   STATUS mandatory
+      DESCRIPTION
+	"Remote service load balancing method"  
+	DEFVAL {2}
+   ::= { rsMLBRemoteServiceEntry 4}
+
+rsMLBRemoteServiceLocalServiceName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..20))
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+	"Local service name"
+   ::= { rsMLBRemoteServiceEntry 5}
+
+rsMLBRemoteServiceOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+	    active (1),
+	    notInService (2)
+	  }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"The remote service status"
+   ::= { rsMLBRemoteServiceEntry 6}
+
+
+rsMLBRemoteServiceTrpOperationStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+     enable (1),
+     disable (2)
+   }
+   ACCESS read-write
+   STATUS mandatory
+      DESCRIPTION
+	"TRP Operation status of the specific remote service"   
+	DEFVAL {1}
+   ::= { rsMLBRemoteServiceEntry 7}			
+
+rsMLBRemoteServiceHMOperationStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+     enable (1),
+     disable (2)
+   }
+   ACCESS read-write
+   STATUS mandatory
+     DESCRIPTION
+	"Health monitoring Operation status of the specific remote service" 
+	 DEFVAL {1}
+   ::= { rsMLBRemoteServiceEntry 8}	
+
+rsMLBRemoteServiceEntryStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+	    active (1),
+	    notInService (2),
+	    notReady (3),
+	    createAndGo (4),
+	    createAndWait (5),
+	    destroy (6)
+	   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       " This variable indicates the administrative status of this entry."
+    ::=  { rsMLBRemoteServiceEntry 9} 
+
+
+rsMLBRemoteLinkTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBRemoteLinkEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	"Table of the remote links that in the remote sites"
+    ::= { rsMLBRemoteNat 8}				
+
+rsMLBRemoteLinkEntry OBJECT-TYPE
+    SYNTAX RsMLBRemoteLinkEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	"Entry of the remote services in the remote sites that need access"
+    INDEX {rsMLBRemoteLinkRemoteServiceName, 
+rsMLBRemoteLinkAddress}
+   ::= { rsMLBRemoteLinkTable 1}				
+
+      RsMLBRemoteLinkEntry ::=  SEQUENCE {
+	rsMLBRemoteLinkRemoteServiceName	DisplayString,
+	rsMLBRemoteLinkAddress			IpAddress,
+	rsMLBRemoteLinkName			DisplayString,	
+	rsMLBRemoteLinkOperStatus		INTEGER,
+	rsMLBRemoteLinkMode			INTEGER,
+	rsMLBRemoteLinkDynamicLinkWeight	INTEGER,
+	rsMLBRemoteLinkEntrySetMode		INTEGER,
+	rsMLBRemoteLinkEntryStatus 		INTEGER
+}
+
+rsMLBRemoteLinkRemoteServiceName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..20))
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"Remote service name"
+   ::= { rsMLBRemoteLinkEntry 1}				
+
+rsMLBRemoteLinkAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"Remote link address"
+   ::= { rsMLBRemoteLinkEntry 2}				
+
+rsMLBRemoteLinkName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..20))
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+	"The remote NHR name"
+   ::= { rsMLBRemoteLinkEntry 3}				
+
+rsMLBRemoteLinkOperStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+     active (1),
+     notInService (2),
+     noNewSessions (3)
+    }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"Remote link status: Active/not-in-service - update only using the TRP"
+   ::= { rsMLBRemoteLinkEntry 4}				
+
+rsMLBRemoteLinkMode OBJECT-TYPE
+   SYNTAX INTEGER {
+        regular (1),
+	backup (2)
+	}
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+	"Remote link mode: Regular/backup"
+   ::= { rsMLBRemoteLinkEntry 5}				
+
+rsMLBRemoteLinkDynamicLinkWeight OBJECT-TYPE
+   SYNTAX INTEGER 
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+	"Dynamic remote link weight - calculated by the remote device and used in the local device (0-100)"
+   ::= { rsMLBRemoteLinkEntry 6}				
+
+rsMLBRemoteLinkEntrySetMode OBJECT-TYPE
+   SYNTAX INTEGER {
+        dynamic (1),
+	static (2)
+	}
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"Entry set statically by the user or automatically by the TRP protocol. Refer only to relevant member variables"
+   ::= { rsMLBRemoteLinkEntry 7}				
+
+rsMLBRemoteLinkEntryStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+	    active (1),
+	    notInService (2),
+	    notReady (3),
+	    createAndGo (4),
+	    createAndWait (5),
+	    destroy (6)
+	   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       " This variable indicates the administrative status of this entry."
+    ::=  { rsMLBRemoteLinkEntry 8} 
+
+rsMLBRemoteStationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBRemoteStationEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	"Table of the remote stations that in the remote sites"
+    ::= { rsMLBRemoteNat 9}				
+
+rsMLBRemoteStationEntry OBJECT-TYPE
+    SYNTAX RsMLBRemoteStationEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	"Entry of the remote stations in the remote sites that need to be nat (remote-Nat)"
+    INDEX {rsMLBRemoteStationRemoteServiceName, 
+rsMLBRemoteStationRemoteLinkAddress, 
+rsMLBRemoteStationInternalAddress}
+   ::= { rsMLBRemoteStationTable 1}				
+
+      RsMLBRemoteStationEntry ::=  SEQUENCE {
+	rsMLBRemoteStationRemoteServiceName		DisplayString,
+	rsMLBRemoteStationRemoteLinkAddress		IpAddress,
+	rsMLBRemoteStationInternalAddress		IpAddress,
+	rsMLBRemoteStationExternalAddress		IpAddress,
+	rsMLBRemoteStationEntrySetMode			INTEGER,
+	rsMLBRemoteStationEntryStatus 			INTEGER
+	}
+
+rsMLBRemoteStationRemoteServiceName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..20))
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"Remote service name"
+   ::= { rsMLBRemoteStationEntry 1}				
+
+rsMLBRemoteStationRemoteLinkAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"Remote link ip address"
+   ::= { rsMLBRemoteStationEntry 2}				
+
+rsMLBRemoteStationInternalAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"Internal address of the remote station"
+   ::= { rsMLBRemoteStationEntry 3}				
+
+rsMLBRemoteStationExternalAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+	"External address of the remote station (the Remote-Nat address)"
+   ::= { rsMLBRemoteStationEntry 4}				
+
+rsMLBRemoteStationEntrySetMode OBJECT-TYPE
+     SYNTAX INTEGER {
+        dynamic (1),
+	static (2)
+	}
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Indicates if entry set statically by the user or automatically by the TRP protocol. Refer only to the relevant member variables"
+    ::= { rsMLBRemoteStationEntry 5}				
+
+rsMLBRemoteStationEntryStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+	    active (1),
+	    notInService (2),
+	    notReady (3),
+	    createAndGo (4),
+	    createAndWait (5),
+	    destroy (6)
+	   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       " This variable indicates the administrative status of this entry."
+    ::=  { rsMLBRemoteStationEntry 6} 
+
+
+rsMLBTunnelTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBTunnelEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	"Tunnels table information"
+    ::= { rsMLBRemoteNat 10}				
+
+rsMLBTunnelEntry OBJECT-TYPE
+    SYNTAX RsMLBTunnelEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	"Entry of the tunnel table (remote-Nat)"
+    INDEX {rsMLBTunnelRemoteServiceName, 
+rsMLBTunnelRemoteLinkAddress, 
+	   rsMLBTunnelLocalLinkAddress }
+   ::= { rsMLBTunnelTable 1}				
+
+      RsMLBTunnelEntry ::=  SEQUENCE {
+	rsMLBTunnelRemoteServiceName		DisplayString,
+	rsMLBTunnelRemoteLinkAddress		IpAddress,
+	rsMLBTunnelLocalLinkAddress		IpAddress,
+	rsMLBTunnelOperStatus			INTEGER,
+	rsMLBTunnelMode				INTEGER,
+	rsMLBTunnelLatency			INTEGER
+	}
+
+rsMLBTunnelRemoteServiceName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..20))
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"Remote service name"
+   ::= { rsMLBTunnelEntry 1}
+
+rsMLBTunnelRemoteLinkAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"Remote link address - Physical Ip of the remote device link"
+   ::= { rsMLBTunnelEntry 2}
+
+rsMLBTunnelLocalLinkAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"Local link address - Physical Ip of the local device link"
+   ::= { rsMLBTunnelEntry 3}
+
+rsMLBTunnelOperStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+        active (1),
+        notInService (2),
+        noNewSessions (3)
+	}
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"Tunnel status - Received by the health checks"
+   ::= { rsMLBTunnelEntry 4}
+		
+rsMLBTunnelMode OBJECT-TYPE
+     SYNTAX INTEGER {
+      	   regularRegular (1),
+	   regularBackup (2),
+           backupRegular (3),
+           backupBackup (4)
+	}
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"Tunnel operation mode: Local Link Mode - Remote Link Mode"
+   ::= { rsMLBTunnelEntry 5}
+
+rsMLBTunnelLatency OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"Tunnel latency in milliseconds (reported by the health checks)"
+   ::= { rsMLBTunnelEntry 6}
+
+
+rsMLBServiceLinkBindTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBServiceLinkBindEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	"Local/Remote-service local-link bind Table"
+    ::= {rsMLBRemoteNat 11}				
+
+rsMLBServiceLinkBindEntry OBJECT-TYPE
+    SYNTAX RsMLBServiceLinkBindEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+	"remote service and local nhr (link) bind Entry"
+    INDEX {rsMLBServiceLinkBindRemoteServiceName, 
+ rsMLBServiceLinkBindLclNhrAddr}
+   ::= {rsMLBServiceLinkBindTable 1}				
+
+      RsMLBServiceLinkBindEntry ::=  SEQUENCE{
+	rsMLBServiceLinkBindRemoteServiceName	DisplayString,
+	rsMLBServiceLinkBindLclNhrAddr		IpAddress,
+	rsMLBServiceLinkBindLclLinkNhrMode	INTEGER,
+	rsMLBServiceLinkBindStatus		INTEGER,
+ 	rsMLBServiceLinkBindEntrySetMode	INTEGER,
+	rsMLBServiceLinkBindRowStatus		INTEGER
+	}
+
+rsMLBServiceLinkBindRemoteServiceName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..20))
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"Remote service name"
+   ::= { rsMLBServiceLinkBindEntry 1}
+
+rsMLBServiceLinkBindLclNhrAddr OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+	"Ip address of the local LP interface in the subnet of NHR (Link Address)"
+  ::= { rsMLBServiceLinkBindEntry 2}
+
+rsMLBServiceLinkBindLclLinkNhrMode OBJECT-TYPE
+   SYNTAX INTEGER {
+             regular (1),
+             backup (2)
+	}
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+	"Service local Link (local link = local nhr ) bind mode"
+   ::= { rsMLBServiceLinkBindEntry 3}
+				
+rsMLBServiceLinkBindStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+             enable (1),
+	     disable (2)
+	}
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+	"Service-Link bind status"
+   ::= { rsMLBServiceLinkBindEntry 4}
+
+rsMLBServiceLinkBindEntrySetMode OBJECT-TYPE
+     SYNTAX INTEGER {
+        dynamic (1),
+	static (2)
+	}
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Indicates if entry set statically by the user or automatically by the TRP protocol. Refer only to the relevant member variables"
+    ::= { rsMLBServiceLinkBindEntry 5}				
+
+rsMLBServiceLinkBindRowStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+	    active (1),
+	    notInService (2),
+	    notReady (3),
+	    createAndGo (4),
+	    createAndWait (5),
+	    destroy (6)
+	   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       " This variable indicates the administrative status of this entry."
+    ::=  { rsMLBServiceLinkBindEntry 6} 
+
+rsMLBExecAutoRemoteNatUpdate OBJECT-TYPE
+   SYNTAX INTEGER {
+             enable (1)
+		  }
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+	"Execute automatic update to sends the remote nat configuration to all the relevant remote services. 
+	The command sends TRP message that indicates the remote service to send back complete TRP message ??"
+   ::= {rsMLBRemoteNat 12}
+
+rsMLBRemoteNatEntriesTuning OBJECT IDENTIFIER ::= { rsMLBRemoteNat 13}
+
+rsRNatMaxLclServiceEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in the local service table."
+    ::=  { rsMLBRemoteNatEntriesTuning 1 }
+
+rsRNatMaxLclServiceEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in the local service table."
+    ::=  { rsMLBRemoteNatEntriesTuning 2 }
+
+rsRNatMaxRemServiceEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in the remote service table."
+    ::=  { rsMLBRemoteNatEntriesTuning 3 }
+
+rsRNatMaxRemServiceEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in the remote service table."
+    ::=  { rsMLBRemoteNatEntriesTuning 4 }
+
+rsRNatMaxTunnelEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in the tunnel table."
+    ::=  { rsMLBRemoteNatEntriesTuning 5 }
+
+rsRNatMaxTunnelEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in the tunnel table."
+    ::=  { rsMLBRemoteNatEntriesTuning 6 }
+
+rsRNatMaxLclStationEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in the local station table."
+    ::=  { rsMLBRemoteNatEntriesTuning 7 }
+
+rsRNatMaxLclStationEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in the local station table."
+    ::=  { rsMLBRemoteNatEntriesTuning 8 }
+
+rsRNatMaxRemStationEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximal number of entries in the remote station table."
+    ::=  { rsMLBRemoteNatEntriesTuning 9 }
+
+rsRNatMaxRemStationEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximal number of entries in the remote station table."
+    ::=  { rsMLBRemoteNatEntriesTuning 10 }
+
+rsMLBPingStaticNatStatus  OBJECT-TYPE
+   SYNTAX  INTEGER {
+            enable(1),
+            disable(2)
+   }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+      "Allow Ping to multiple Static NATs from the same location."
+--  DEFVAL  { 2 }
+    ::=  {rsMLB 86}
+
+rsMLBIDSLbHashMethod OBJECT-TYPE
+   SYNTAX  INTEGER {
+      srcIp(1),
+      destIp(2),
+      srcDestIp(3),
+      srcDestAndPorts(4),
+      automatic(5)
+ }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+        "When using hash function for selecting server in transparent forwarding 
+         this variable determines which hash method is used"
+    ::= { rsMLB 87 }
+
+rsMLBTrackNHRTableStatus  OBJECT-TYPE
+   SYNTAX  INTEGER {
+            enable(1),
+            disable(2)
+   }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+      "indicates weather to use the nhr tracking table or not."
+--  DEFVAL  { 2 }
+    ::=  {rsMLB 88}
+
+
+rsMLBDNSLocation OBJECT-TYPE
+    SYNTAX INTEGER {
+      none(1),
+      internal(2),
+	  external(3)      
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable indicates the location of the DNS, which supports the local network."
+
+ ::=  {rsMLBDNS 7}
+
+
+rsMLBDNSIPAddressTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsMLBDNSIPAddressEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+    "The table which indicates what are the IP's of the DNS that knows the internal network "
+    ::= {rsMLBDNS 8}
+
+rsMLBDNSIPAddressEntry OBJECT-TYPE
+    SYNTAX RsMLBDNSIPAddressEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+    "The row definition for DNS IPs table"
+    INDEX {rsMLBDNSIPAddress}
+    ::= { rsMLBDNSIPAddressTable 1}
+
+RsMLBDNSIPAddressEntry ::= SEQUENCE {
+ rsMLBDNSIPAddress				IpAddress,
+ rsMLBDNSIPAddressStatus		INTEGER
+}
+
+rsMLBDNSIPAddress OBJECT-TYPE
+	SYNTAX   IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+    "The DNS IP Address"
+::= { rsMLBDNSIPAddressEntry 1}
+
+
+rsMLBDNSIPAddressStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                    active(1),
+                    notInService(2),
+                    notReady(3),
+                    createAndGo(4),
+                    createAndWait(5),
+                    destroy(6)
+                   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry.
+        Used to delete an entry of this table."
+    ::=  { rsMLBDNSIPAddressEntry 2}
+
+
+rsMLBDNSNatResponseMode OBJECT-TYPE
+    SYNTAX INTEGER {
+      useNatFlag(1),
+      alwaysLocal(2),
+	  alwaysNat(3)      
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "This variable indicates how the device will respond to DNS queries. It can answer with
+	  the local IP address, or the NAT IP address or decide according to smartnat flag."
+
+ ::=  {rsMLBDNS 9}
+
+rsMLBAccLookupModeExtension OBJECT-TYPE
+    SYNTAX INTEGER {
+        destMac(1),
+        none(2),
+		rxPort(3)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates whether to enable the accelerator lookups to consider the MAC address of the packet
+		 or the port from which the packet received."
+    DEFVAL { 2 }
+    ::=  { rsMLB 89}
+
+-- Application-specific traps for LP/FP
+-- Each enterprise-specific trap has two bound variables describing the exact nature of
+-- the trap. rndErrorDesc provides a detailed description of the problem, including the
+-- related interface number, board number or any other applicable variable.
+-- rndErrorSeverity describes the severity of this problem.
+
+-- Trap template
+-- -------------
+--    TRAP-TYPE
+--       ENTERPRISE  rsServerDispatcher
+--       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+--       DESCRIPTION
+--             ""
+--       ::=
+-- -------------
+
+rsWSDBasicNatOccupied TRAP-TYPE
+         ENTERPRISE rsMLB
+         VARIABLES { rndErrorDesc, rndErrorSeverity }
+         DESCRIPTION
+             "This informational trap is sent when all the basic NAT IPs are occupied."
+     ::=  1
+
+dsrntEntSetMode TRAP-TYPE
+         ENTERPRISE rsMLB
+         VARIABLES { rndErrorDesc, rndErrorSeverity }
+         DESCRIPTION
+             "sent when entry could not be update (set) due to the entry set mode."
+     ::=  2
+          
+dsrntHostName TRAP-TYPE
+         ENTERPRISE rsMLB
+         VARIABLES { rndErrorDesc, rndErrorSeverity }
+         DESCRIPTION
+             "sent when there is a problem to resolve service host name."
+     ::=  3
+
+dsrntNoPassToLclService TRAP-TYPE
+         ENTERPRISE rsMLB
+         VARIABLES { rndErrorDesc, rndErrorSeverity }
+         DESCRIPTION
+             "sent when the local service does not have relevant password"
+     ::=  4
+
+dsrntTrpPassNotMatch TRAP-TYPE
+         ENTERPRISE rsMLB
+         VARIABLES { rndErrorDesc, rndErrorSeverity }
+         DESCRIPTION
+             "sent when the local service password not match the TRP message password."
+     ::=  5
+
+dsrntTrpNoResponse TRAP-TYPE
+         ENTERPRISE rsMLB
+         VARIABLES { rndErrorDesc, rndErrorSeverity }
+         DESCRIPTION
+             "sent when TRP requst message (on the init) is not geeting any response after few retries."
+     ::=  6
+
+END
+
+
+
+
+
+

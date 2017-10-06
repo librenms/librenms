@@ -1,0 +1,68 @@
+SNMP-VIEW-BASED-ACM-CNL DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP       FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE,
+    snmpModules                           FROM SNMPv2-SMI
+    TestAndIncr,
+    RowStatus, StorageType                FROM SNMPv2-TC
+    SnmpAdminString,
+    SnmpSecurityLevel,
+    SnmpSecurityModel                     FROM SNMP-FRAMEWORK-MIB
+    snmpVacmMIB                           FROM SNMP-VIEW-BASED-ACM-MIB;
+
+
+-- Administrative assignments ****************************************
+
+vacmMIBObjects      OBJECT IDENTIFIER ::= { snmpVacmMIB 1 }
+
+-- Information about Local Contexts **********************************
+
+vacmContextTable OBJECT-TYPE
+    ::= { vacmMIBObjects 1 }
+
+vacmContextEntry OBJECT-TYPE
+    ROW-STATUS-TYPE no-status-field
+    ::= { vacmContextTable 1 }
+
+-- Information about Groups ******************************************
+
+vacmSecurityToGroupTable OBJECT-TYPE
+    ::= { vacmMIBObjects 2 }
+
+vacmSecurityToGroupEntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME vacmSecurityToGroupStatus
+    ::= { vacmSecurityToGroupTable 1 }
+
+
+-- Information about Access Rights ***********************************
+
+vacmAccessTable  OBJECT-TYPE
+    ::= { vacmMIBObjects 4 }
+
+vacmAccessEntry  OBJECT-TYPE
+     ROW-STATUS-TYPE v2-status-field
+     STATUS-FIELD-NAME vacmAccessStatus
+    ::= { vacmAccessTable 1 }
+
+
+-- Information about MIB views ***************************************
+
+-- Support for instance-level granularity is optional.
+--
+-- In some implementations, instance-level access control
+-- granularity may come at a high performance cost.  Managers
+-- should avoid requesting such configurations unnecessarily.
+
+vacmMIBViews     OBJECT IDENTIFIER ::= { vacmMIBObjects 5 }
+
+vacmViewTreeFamilyTable OBJECT-TYPE
+    ::= { vacmMIBViews 2 }
+
+vacmViewTreeFamilyEntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME  vacmViewTreeFamilyStatus
+    ::= { vacmViewTreeFamilyTable 1 }
+
+END

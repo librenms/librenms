@@ -1,0 +1,38 @@
+SNMP-USER-BASED-SM-CNL DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    OBJECT-IDENTITY,
+    snmpModules, Counter32                FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TestAndIncr,
+    RowStatus, RowPointer,
+    StorageType, AutonomousType           FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP       FROM SNMPv2-CONF
+    SnmpAdminString, SnmpEngineID,
+    snmpAuthProtocols, snmpPrivProtocols  FROM SNMP-FRAMEWORK-MIB
+    snmpUsmMIB                            FROM SNMP-USER-BASED-SM-MIB;
+
+-- Administrative assignments ****************************************
+
+usmMIBObjects     OBJECT IDENTIFIER ::= { snmpUsmMIB 1 }
+
+
+
+-- The usmUser Group ************************************************
+
+usmUser          OBJECT IDENTIFIER ::= { usmMIBObjects 2 }
+
+
+-- The table of valid users for the User-based Security Model ********
+
+usmUserTable     OBJECT-TYPE
+    ::= { usmUser 2 }
+
+usmUserEntry     OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME usmUserStatus
+    ::= { usmUserTable 1 }
+
+
+
+END

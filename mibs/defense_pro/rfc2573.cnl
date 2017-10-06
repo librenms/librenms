@@ -1,0 +1,125 @@
+   SNMP-TARGET-CNL DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       snmpModules,
+       Counter32,
+       Integer32
+
+           FROM SNMPv2-SMI
+
+       TEXTUAL-CONVENTION,
+       TDomain,
+       TAddress,
+       TimeInterval,
+       RowStatus,
+       StorageType,
+       TestAndIncr
+           FROM SNMPv2-TC
+
+       SnmpSecurityModel,
+       SnmpMessageProcessingModel,
+       SnmpSecurityLevel,
+       SnmpAdminString
+           FROM SNMP-FRAMEWORK-MIB
+
+       MODULE-COMPLIANCE,
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+
+       snmpTargetMIB
+           FROM SNMP-TARGET-MIB;
+
+
+   snmpTargetObjects       OBJECT IDENTIFIER ::= { snmpTargetMIB 1 }
+
+
+   --
+   --
+   -- The snmpTargetObjects group
+   --
+   --
+
+
+   snmpTargetAddrTable OBJECT-TYPE
+       ::= { snmpTargetObjects 2 }
+
+   snmpTargetAddrEntry OBJECT-TYPE
+   ROW-STATUS-TYPE v2-status-field
+   STATUS-FIELD-NAME snmpTargetAddrRowStatus
+       ::= { snmpTargetAddrTable 1 }
+
+   snmpTargetParamsTable OBJECT-TYPE
+       ::= { snmpTargetObjects 3 }
+
+   snmpTargetParamsEntry OBJECT-TYPE
+   ROW-STATUS-TYPE v2-status-field
+   STATUS-FIELD-NAME       snmpTargetParamsRowStatus
+       ::= { snmpTargetParamsTable 1 }
+
+   END
+
+
+   SNMP-NOTIFICATION-CNL DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       snmpModules
+           FROM SNMPv2-SMI
+
+       RowStatus,
+       StorageType
+           FROM SNMPv2-TC
+
+       SnmpAdminString
+           FROM SNMP-FRAMEWORK-MIB
+
+       SnmpTagValue,
+       snmpTargetParamsName
+           FROM SNMP-TARGET-MIB
+
+       MODULE-COMPLIANCE,
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+
+       snmpNotificationMIB
+           FROM SNMP-NOTIFICATION-MIB;
+
+   snmpNotifyObjects       OBJECT IDENTIFIER ::=
+                                             { snmpNotificationMIB 1 }
+   --
+   --
+   -- The snmpNotifyObjects group
+   --
+   --
+
+   snmpNotifyTable OBJECT-TYPE
+       ::= { snmpNotifyObjects 1 }
+
+   snmpNotifyEntry OBJECT-TYPE
+          ROW-STATUS-TYPE v2-status-field
+          STATUS-FIELD-NAME snmpNotifyRowStatus
+       ::= { snmpNotifyTable 1 }
+
+
+   snmpNotifyFilterProfileTable OBJECT-TYPE
+       ::= { snmpNotifyObjects 2 }
+
+   snmpNotifyFilterProfileEntry OBJECT-TYPE
+          ROW-STATUS-TYPE v2-status-field
+          STATUS-FIELD-NAME snmpNotifyFilterProfileRowStatus
+       ::= { snmpNotifyFilterProfileTable 1 }
+
+
+   snmpNotifyFilterTable OBJECT-TYPE
+       ::= { snmpNotifyObjects 3 }
+
+   snmpNotifyFilterEntry OBJECT-TYPE
+          ROW-STATUS-TYPE v2-status-field
+          STATUS-FIELD-NAME snmpNotifyFilterRowStatus
+    ::= { snmpNotifyFilterTable 1 }
+
+
+  END

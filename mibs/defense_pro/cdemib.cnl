@@ -1,0 +1,32 @@
+CDE-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      RADWARE
+--             This Private MIB supports the configuration auto sync.
+-- Version:    1.0
+-- Date:       Mar 2009
+-- By:         RMA (Radware MIB Authority)
+-- E-mail:     US:            support@radware.com
+--             International: support_int@radware.com
+--
+IMPORTS
+       IpAddress
+              FROM RFC1155-SMI
+       Unsigned32
+              FROM SNMPv2-SMI
+       OBJECT-TYPE
+              FROM RFC-1212
+       PhysAddress
+              FROM RFC1213-MIB
+       TRAP-TYPE
+                    FROM RFC-1215
+       TruthValue,
+       rdwrConfigurationSync
+                    FROM RADWARE-MIB;
+
+-- rdwrConfigurationSync OBJECT IDENTIFIER ::= {rsServerDispatcher 161 }
+
+rdwrConfigurationSyncMonitor OBJECT IDENTIFIER ::= {rdwrConfigurationSync 1 }
+
+rdwrConfigurationSyncConf OBJECT IDENTIFIER ::= { rdwrConfigurationSync 2 }
+
+END

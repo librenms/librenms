@@ -1,0 +1,632 @@
+STATISTICS-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      RADWARE
+--             This Private MIB supports the WSD/CSD/FP/LP
+-- Version:    2.9
+-- Date:       2/4/2001
+-- By:         RMA (Radware MIB Authority)
+-- E-mail:     US:            support@radware.com
+--             International: support_int@radware.com
+--
+IMPORTS
+       NetworkAddress,
+       IpAddress,
+       Counter,
+       Gauge,
+       enterprises
+              FROM RFC1155-SMI
+       OBJECT-TYPE
+              FROM RFC-1212
+       DisplayString,
+       PhysAddress,
+       ipAddrEntry
+              FROM RFC1213-MIB
+       TRAP-TYPE
+                    FROM RFC-1215
+       rsStatistics,
+       rndErrorDesc,
+       rndErrorSeverity,
+       TruthValue,
+       RowStatus
+                    FROM RADWARE-MIB;
+
+    NetNumber ::=  OCTET STRING (SIZE(4))
+
+-- Some MIB compilers require that the following 7 lines which define the path
+-- to RND MIB are commented out:
+
+-- mib            OBJECT IDENTIFIER ::= { mgmt 1  }
+-- directory      OBJECT IDENTIFIER ::= { internet 1  }
+-- experimental   OBJECT IDENTIFIER ::= { internet 3  }
+-- private        OBJECT IDENTIFIER ::= { internet 4  }
+-- enterprises    OBJECT IDENTIFIER ::= { private 1  }
+
+
+rsStatisticsProtocolTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsStatisticsProtocolEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing statistics data for protocols"
+    ::=  {rsStatistics 1}
+
+rsStatisticsProtocolEntry OBJECT-TYPE
+    SYNTAX RsStatisticsProtocolEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "The row definition for this table."
+    INDEX { rsStatisticsProtocol, 
+            rsStatisticsProtocolPort }
+    ::=  { rsStatisticsProtocolTable 1 }
+
+RsStatisticsProtocolEntry ::= SEQUENCE {
+    rsStatisticsProtocol INTEGER,
+    rsStatisticsProtocolPort INTEGER,
+    rsStatisticsProtocolLastPeriodUsedBW Counter,
+    rsStatisticsProtocolLastPeriodPeakBW Counter,
+    rsStatisticsProtocolLastPeriodMatchedPackets Counter
+}
+
+rsStatisticsProtocol OBJECT-TYPE
+    SYNTAX INTEGER {
+ 		tcp(6),
+		udp(17),
+		other(255) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates L4 protocol."
+    ::=  { rsStatisticsProtocolEntry 1}
+
+rsStatisticsProtocolPort OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates protocol's port (for TCP and UDP)."
+    ::=  { rsStatisticsProtocolEntry 2 }
+
+rsStatisticsProtocolLastPeriodUsedBW OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The bandwidth used by the protocol in the last sampling period defined 
+	    in rsStatisticsProtocolSamplingPeriod."
+    ::=  { rsStatisticsProtocolEntry 3}
+
+rsStatisticsProtocolLastPeriodPeakBW OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The peak bandwidth of the protocol in the last sampling period defined 
+	    in rsStatisticsProtocolSamplingPeriod."
+    ::=  { rsStatisticsProtocolEntry 4}
+
+rsStatisticsProtocolLastPeriodMatchedPackets OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The number of packets of  the protocol in the last sampling period defined 
+	    in rsStatisticsProtocolSamplingPeriod."
+    ::=  { rsStatisticsProtocolEntry 5}
+
+
+rsStatisticsProtocolReportingPeriod OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This variable indicates protocol statistics reporting frequency (in seconds) using SRP."
+    DEFVAL  { 60 } 
+    ::=  { rsStatisticsProtocolTable 2 }
+
+rsStatisticsProtocolTableUseSRP OBJECT-TYPE
+    SYNTAX TruthValue
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This variable indicates whether the device will send the data to ConfigWare using SRP."
+    DEFVAL  { false }
+    ::=  { rsStatisticsProtocolTable 3 }
+    
+rsStatisticsMonitorProtocols OBJECT-TYPE
+    SYNTAX INTEGER {
+		enabled(1),
+		disabled(2) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This variable indicates whether the device will gather protocols' statistics."
+    DEFVAL  { 2 }
+    ::= { rsStatisticsProtocolTable 4 }
+
+rsStatisticsSRPDstIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Statistics Destination Ip Address, the statistics will be sent to this address in 
+       SRP mode"
+    ::=  {rsStatistics 2}
+
+
+rsStatisticsProbeStatusMessagePeriod OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The frequency of status messages (probe)."
+    ::=  {rsStatistics 3}
+
+rsStatisticsProbeMaxBufferingTime OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The maximal time for buffering session information in probe memory."
+    ::=  {rsStatistics 4}
+
+rsStatisticsProbePostVariablesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsStatisticsProbePostVariablesEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing the list of POST variables to be added to the URL"
+    ::=  {rsStatistics 5}
+
+rsStatisticsProbePostVariablesEntry OBJECT-TYPE
+    SYNTAX RsStatisticsProbePostVariablesEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "The row definition for this table."
+    INDEX {rsStatisticsProbePostVariable}
+    ::=  {rsStatisticsProbePostVariablesTable 1}
+
+RsStatisticsProbePostVariablesEntry ::= SEQUENCE {
+    rsStatisticsProbePostVariable DisplayString,
+    rsStatisticsProbePostVariablesRowStatus RowStatus 
+}
+
+rsStatisticsProbePostVariable OBJECT-TYPE
+    SYNTAX DisplayString 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "Variable name."
+    ::=  { rsStatisticsProbePostVariablesEntry 1}
+
+rsStatisticsProbePostVariablesRowStatus OBJECT-TYPE
+    SYNTAX RowStatus 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry."
+    ::=  { rsStatisticsProbePostVariablesEntry 2}
+
+rsStatisticsNMSDstPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Statistics Destination NMS port"
+    ::=  {rsStatistics 6}
+
+rsStatisticsProbeURLMaxLength OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum length of URL string"
+    ::=  {rsStatistics 7}
+
+rsStatisticsProbeRefererURLMaxLength OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum length of referer URL string"
+    ::=  {rsStatistics 8}
+
+rsStatisticsProbeHostMaxLength OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum length of host string"
+    ::=  {rsStatistics 9}
+
+rsStatisticsProbeMimeTypeMaxLength OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum length of mime type string"
+    ::=  {rsStatistics 10}
+
+rsStatisticsProbeBrowserMaxLength OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum length of browser string"
+    ::=  {rsStatistics 11}
+
+rsStatisticsProbeTCPTableSize OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The size of the TCP statistics table."
+    ::=  {rsStatistics 12}
+
+rsStatisticsProbeHTTPTableSize OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The size of the HTTP statistics table."
+    ::=  {rsStatistics 13}
+
+rsStatisticsNMSDstIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Statistics Destination NMS Ip Address"
+    ::=  {rsStatistics 14}
+
+rsProbe OBJECT IDENTIFIER ::= {rsStatistics 15}
+
+rsStatisticsDiscoveryTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsStatisticsDiscoveryEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table for the policies for protocol discovery"
+    ::=  {rsStatistics 16}
+
+rsStatisticsDiscoveryEntry OBJECT-TYPE
+    SYNTAX RsStatisticsDiscoveryEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "The row definition for this table."
+    INDEX {rsStatisticsDiscoveryName}
+    ::=  {rsStatisticsDiscoveryTable 1}
+
+RsStatisticsDiscoveryEntry ::= SEQUENCE {
+    rsStatisticsDiscoveryName DisplayString,
+    rsStatisticsDiscoveryIndex INTEGER,
+    rsStatisticsDiscoveryDestination DisplayString,
+    rsStatisticsDiscoverySource DisplayString,
+	rsStatisticsDiscoveryDestinationMACGroup DisplayString,
+	rsStatisticsDiscoverySourceMACGroup DisplayString,
+	rsStatisticsDiscoveryPhysicalPortGroup DisplayString,
+	rsStatisticsDiscoveryVLANTagGroup DisplayString,
+	rsStatisticsDiscoveryDirection INTEGER,
+	rsStatisticsDiscoveryOperationalStatus INTEGER,
+    rsStatisticsDiscoveryStatus RowStatus,
+    rsStatisticsDiscoveryFromFarm DisplayString,
+    rsStatisticsDiscoveryToFarm DisplayString,
+    rsStatisticsDiscoveryClassificationPoint INTEGER
+}
+
+rsStatisticsDiscoveryName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..19))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The name of the policy"
+    ::=  {rsStatisticsDiscoveryEntry 1}
+
+rsStatisticsDiscoveryIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "Determines the order of the policies."
+    ::=  {rsStatisticsDiscoveryEntry 2}
+
+
+rsStatisticsDiscoveryDestination OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..46))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Destination IP or network."
+    ::=  {rsStatisticsDiscoveryEntry 3}
+
+rsStatisticsDiscoverySource OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..46))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Source IP or network."
+    ::=  {rsStatisticsDiscoveryEntry 4}
+
+rsStatisticsDiscoveryDestinationMACGroup OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..19))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Name of the destination MAC group."
+    ::=  {rsStatisticsDiscoveryEntry 5}
+
+rsStatisticsDiscoverySourceMACGroup OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..19))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Name of the source MAC group."
+    ::=  {rsStatisticsDiscoveryEntry 6}
+
+rsStatisticsDiscoveryPhysicalPortGroup OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..19))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Name of physical port group."
+    ::=  {rsStatisticsDiscoveryEntry 7}
+
+rsStatisticsDiscoveryVLANTagGroup OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..19))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Name of VLAN tag group."
+    ::=  {rsStatisticsDiscoveryEntry 8}
+
+rsStatisticsDiscoveryDirection OBJECT-TYPE
+    SYNTAX INTEGER {
+              oneway(1),
+              twoway(2) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the direction of the incoming packet."
+    DEFVAL { 1 }
+    ::=  {rsStatisticsDiscoveryEntry 9}
+
+rsStatisticsDiscoveryOperationalStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        active (1),
+        inactive (2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates if the policy is active or inactive."
+    DEFVAL { 1 }
+    ::= { rsStatisticsDiscoveryEntry 10 }
+
+rsStatisticsDiscoveryStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "Administrative row status."
+    ::=  {rsStatisticsDiscoveryEntry 11}
+
+rsStatisticsDiscoveryFromFarm OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..19))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The source farm of the packet for classification."
+    ::=  {rsStatisticsDiscoveryEntry 12}
+
+rsStatisticsDiscoveryToFarm OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..19))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The destination farm of the packet for classification."
+    ::=  {rsStatisticsDiscoveryEntry 13}
+
+rsStatisticsDiscoveryClassificationPoint OBJECT-TYPE
+    SYNTAX INTEGER {
+        beforeChanges (1),
+        afterChanges (2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Whether the classification will be performed on the original packet, or on the packet 
+		after all changes."
+    DEFVAL { 2 }	
+    ::=  {rsStatisticsDiscoveryEntry 14}
+
+rsStatisticsDiscoveryProtocolTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsStatisticsDiscoveryProtocolEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing statistics data for protocols"
+    ::=  {rsStatistics 17}
+
+rsStatisticsDiscoveryProtocolEntry OBJECT-TYPE
+    SYNTAX RsStatisticsDiscoveryProtocolEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "The row definition for this table."
+    INDEX {rsStatisticsDiscoveryProtocolName,
+      rsStatisticsDiscoveryProtocol,
+      rsStatisticsDiscoveryProtocolPort}
+    ::=  {rsStatisticsDiscoveryProtocolTable 1}
+
+RsStatisticsDiscoveryProtocolEntry ::= SEQUENCE {
+    rsStatisticsDiscoveryProtocolName DisplayString,
+    rsStatisticsDiscoveryProtocol INTEGER,
+    rsStatisticsDiscoveryProtocolPort INTEGER,
+    rsStatisticsDiscoveryProtocolLastPeriodUsedBW Counter,
+    rsStatisticsDiscoveryProtocolLastPeriodPeakBW Counter,
+    rsStatisticsDiscoveryProtocolLastPeriodMatchedPackets Counter
+}
+
+rsStatisticsDiscoveryProtocolName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..19))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The name of the policy"
+    ::=  {rsStatisticsDiscoveryProtocolEntry 1}
+
+rsStatisticsDiscoveryProtocol OBJECT-TYPE
+    SYNTAX INTEGER {
+                tcp(6),
+                udp(17),
+                other(255) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates L4 protocol."
+    ::=  {rsStatisticsDiscoveryProtocolEntry 2}
+
+rsStatisticsDiscoveryProtocolPort OBJECT-TYPE
+    SYNTAX INTEGER (0..65536)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates protocol's port (for TCP and UDP)."
+    ::=  {rsStatisticsDiscoveryProtocolEntry 3}
+
+rsStatisticsDiscoveryProtocolLastPeriodUsedBW OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The bandwidth used by the protocol in the last sampling period defined 
+            in rsStatisticsProtocolSamplingPeriod."
+    ::=  {rsStatisticsDiscoveryProtocolEntry 4}
+
+rsStatisticsDiscoveryProtocolLastPeriodPeakBW OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The peak bandwidth of the protocol in the last sampling period defined 
+            in rsStatisticsProtocolSamplingPeriod."
+    ::=  {rsStatisticsDiscoveryProtocolEntry 5}
+
+rsStatisticsDiscoveryProtocolLastPeriodMatchedPackets OBJECT-TYPE
+    SYNTAX Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "The number of packets of  the protocol in the last sampling period defined 
+            in rsStatisticsProtocolSamplingPeriod."
+    ::=  { rsStatisticsDiscoveryProtocolEntry 6}
+
+rsStatisticsTuning OBJECT IDENTIFIER ::= {rsStatistics 18}
+
+rsStatisticsProtocolPolicyTuning OBJECT IDENTIFIER ::= {rsStatisticsTuning 1}
+
+rsStatisticsProtocolPolicyEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum number of policy entries."
+    ::= { rsStatisticsProtocolPolicyTuning 1 }
+
+rsStatisticsProtocolPolicyEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximum number of policy entries."
+    ::=  { rsStatisticsProtocolPolicyTuning 2 }
+
+rsStatisticsProtocolReportTuning OBJECT IDENTIFIER ::= {rsStatisticsTuning 2}
+
+rsStatisticsProtocolReportEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum number of protocols reports entries."
+    ::= { rsStatisticsProtocolReportTuning 1 }
+
+rsStatisticsProtocolReportEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximum number of protocols reports entries."
+    ::=  { rsStatisticsProtocolReportTuning 2 }
+
+rsStatisticsProtocolPortsTuning OBJECT IDENTIFIER ::= {rsStatisticsTuning 3}
+
+rsStatisticsProtocolPortsEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Maximum number of special protocols entries for protocols discovery."
+    ::= { rsStatisticsProtocolPortsTuning 1 }
+
+rsStatisticsProtocolPortsEntriesAfterReset OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Future maximum number of special protocols entries for protocols discovery."
+    ::=  { rsStatisticsProtocolPortsTuning 2 }
+
+rsStatisticsProtocolsDiscoveryAgingTime OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "Lifetime for protocol discovery entries."
+    ::=  {rsStatistics 19}
+
+rsStatisticsDefaultGatewayClassificatiomMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable (1),
+        disable (2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "If enabled, Protocol discovery classification will be performed only on traffic to/from 
+		the configured default gateway."
+    ::= {rsStatistics 20}
+
+-- Application-specific traps for Statistics Module
+-- Each enterprise-specific trap has two bound variables describing the exact nature of
+-- the trap. rndErrorDesc provides a detailed description of the problem, including the
+-- related interface number, board number or any other applicable variable.
+-- rndErrorSeverity describes the severity of this problem.
+
+-- Trap template
+-- -------------
+--    TRAP-TYPE
+--       ENTERPRISE  rsServerDispatcher
+--       VARIABLES   { rndErrorDesc, rndErrorSeverity }
+--       DESCRIPTION
+--             ""
+--       ::=
+-- -------------
+
+rsStatisticsReportingProblems TRAP-TYPE
+        ENTERPRISE rsStatistics
+        VARIABLES  { rndErrorDesc, rndErrorSeverity }
+        DESCRIPTION
+             "This trap is sent to inform the user about problems in statistics' reporting."
+		::=  1
+
+rsStatisticsTablesFull   TRAP-TYPE
+       ENTERPRISE  rsStatistics
+        VARIABLES  { rndErrorDesc, rndErrorSeverity }
+        DESCRIPTION
+             "This trap is sent to inform the user about one of the protocol discovery tables being full."
+       ::=  2
+
+END

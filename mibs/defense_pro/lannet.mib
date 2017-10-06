@@ -1,0 +1,248 @@
+LANNET-MIB DEFINITIONS ::= BEGIN
+
+-- Title:       MADGE ESD MIB
+-- Version:     7.2
+-- Date:        6-May-1996
+-- By:   Lucia Smilovici
+-- Last Update :  
+-- Comments:   Some of  MADGE ESD agents support also 
+-- relevant sections of the standard mibs:
+--              - MIB-II  ( RFC1213-MIB )
+--              - dot5    ( RFC1231-MIB, updated by RFC1239 )
+--              FDDI MIB (RFC1271-MIB)
+--              RMON MIB (RFC1271-MIB)
+
+
+-- Copyright 1992,1993, 1994, 1995 MADGE NETWORKS, Ltd.  
+-- All Rights Reserved.  
+
+-- Reproduction of this document is authorized on condition 
+-- that the foregoing copyright notice is included.
+
+-- This MADGE ESD SNMP Management Information Base Specification
+-- (Specification) embodies MADGE ESD confidential and
+-- proprietary intellectual property.  MADGE retains all
+-- title and ownership in the Specification, including any 
+-- revisions.  
+
+-- It is MADGE's intent to encourage the widespread use of
+-- this Specification in connection with the management of
+-- MADGE products. MADGE grants vendors, end-users,
+-- and other interested parties a non-exclusive license to
+-- use this Specification in connection with the management
+-- of MADGE products.
+
+-- This Specification is supplied "as is," and MADGE makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+
+
+IMPORTS
+      IpAddress, Counter, enterprises, TimeTicks
+    FROM RFC1155-SMI
+      OBJECT-TYPE
+    FROM RFC-1212
+      DisplayString
+    FROM RFC1213-MIB;
+--      OwnerString
+--    FROM RFC1271-MIB;
+  
+
+-- Some MIB Compilers need these two lines:
+--  enterprises  OBJECT IDENTIFIER ::= 
+--                { iso org(3) dod(6) internet(1) private(4) 1 }
+
+lannet  OBJECT IDENTIFIER ::= { enterprises 81 }
+lntBoxIdent OBJECT IDENTIFIER ::= { lannet 17 1 5 }
+lntLanSwitch   OBJECT IDENTIFIER ::= { lannet 19 } -- switch group
+vnsPacket   OBJECT IDENTIFIER ::=  { lntLanSwitch 7 }
+
+vnsPacketTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF VnsPacketEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+    "VNS packets data table. Implementation of this table is
+    mandatory for LRE module."
+    ::= { vnsPacket 1 }
+
+vnsPacketEntry OBJECT-TYPE
+    SYNTAX  VnsPacketEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+    "Entry in the table."
+    INDEX           { vnsPacketMACAddress }
+    ::= { vnsPacketTable 1 }
+
+VnsPacketEntry ::=
+    SEQUENCE {
+         vnsPacketMACAddress 
+        OCTET STRING,
+         vnsPacketProtocolTypeMask 
+        OCTET STRING,
+         vnsPacketIPAddress
+        IpAddress,
+         vnsPacketIPNetMask
+        IpAddress,
+         vnsPacketIPXnetwork
+        OCTET STRING,
+         vnsPacketStationType
+        INTEGER,
+         vnsPacketPortGroupId
+        INTEGER,
+         vnsPacketPortId
+        INTEGER,
+         vnsPacketBackbonePort
+        INTEGER,
+         vnsPacketExpectedVLAN
+        INTEGER,
+         vnsPacketDetectedVLAN
+        INTEGER,
+         vnsPacketBoxAgentIP
+        IpAddress 
+    }
+
+vnsPacketMACAddress OBJECT-TYPE
+    SYNTAX  OCTET STRING ( SIZE (6))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    "The Mac Address of the sending station."
+    ::= { vnsPacketEntry 1 }
+
+vnsPacketProtocolTypeMask   OBJECT-TYPE
+    SYNTAX OCTET STRING ( SIZE (1))  
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This is a mask of the exising protocols. 
+         Bit(0)='1' when IP protocol exist and '0' otherwise,
+         Bit(1)='1' when IPX protocol exist and '0' otherwise,
+         all other bits are '0' for the moment."
+    ::= { vnsPacketEntry 2 }
+
+vnsPacketIPAddress OBJECT-TYPE
+    SYNTAX IpAddress 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The IP address of the packet's sending station.
+        In case the typeaddress is not IP this field will be 0.0.0.0."
+    ::= { vnsPacketEntry 3 }
+
+vnsPacketIPNetMask OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    "The IP Address Mask from the IP Interface Table."
+    ::= { vnsPacketEntry 4 }
+
+vnsPacketIPXnetwork OBJECT-TYPE
+    SYNTAX OCTET STRING ( SIZE (4))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    "The IPX NetWork Address of the packet's sending station.
+    In case that the typeaddress is not IPX this field will be 0.0.0.0."
+    ::= { vnsPacketEntry 5 }
+
+vnsPacketStationType OBJECT-TYPE
+    SYNTAX INTEGER  {
+        unknown(1),
+        client(2),
+        server(3),  
+        notSupported(255)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The Station Type indicates from where comes the packets 
+         in the case of the IPX protocol."
+    DEFVAL { notSupported }
+    ::= { vnsPacketEntry 6 }
+
+vnsPacketPortGroupId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Index which identifies the group inside the chassis for which this
+      entry contains information. It equals with the slot number." 
+      ::= { vnsPacketEntry 7 }
+      
+vnsPacketPortId OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Index which identifies the port inside the group for which this
+      entry contains information. It equals  with the port number."
+      ::= { vnsPacketEntry 8 }
+      
+ vnsPacketBackbonePort  OBJECT-TYPE
+    SYNTAX INTEGER  {
+        unknown(1),
+        backbone(2),
+        noBackbone(3),  
+        notSupported(255)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value 2 indicates that the port source of the packet is a 
+          backbone port."
+    ::= { vnsPacketEntry 9 }
+ 
+vnsPacketExpectedVLAN OBJECT-TYPE 
+    SYNTAX  INTEGER 
+    ACCESS read-only
+    STATUS  mandatory 
+    DESCRIPTION 
+    "The value of this item is the VLAN number that the packet had to have 
+     according to it's address." 
+    ::= { vnsPacketEntry 10 } 
+
+vnsPacketDetectedVLAN OBJECT-TYPE 
+    SYNTAX  INTEGER 
+    ACCESS read-only
+    STATUS  mandatory 
+    DESCRIPTION 
+    "The value of this item is the detected VLAN number of the arrived packet."
+    ::= { vnsPacketEntry 11 }
+
+ vnsPacketBoxAgentIP OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    "The IP Address of the Hub's BoxAgent where the LRE exist."
+    ::= { vnsPacketEntry 12 }
+
+-- Traps  version 7.2
+-- Trap for LRE regarding the VLAN viloation
+
+    lreVLANViolationTrap TRAP-TYPE
+        ENTERPRISE  lntBoxIdent
+        VARIABLES   {
+                vnsPacketMACAddress,
+                vnsPacketProtocolTypeMask,
+                vnsPacketIPAddress,
+                vnsPacketIPNetMask,
+                vnsPacketIPXnetwork,
+                vnsPacketPortGroupId,
+                vnsPacketPortId,
+                vnsPacketBackbonePort,
+                vnsPacketExpectedVLAN,
+                vnsPacketDetectedVLAN,
+                vnsPacketBoxAgentIP
+                }
+        DESCRIPTION
+            "This trap reports to VNS a VLAN violation. 
+             LRE verify the VLAN of the incoming packets. 
+             If there is any inconsistency between the incoming and 
+             expected VLAN number then the LRE will issue a SNMP trap."
+        ::= 26
+END

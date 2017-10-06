@@ -1,0 +1,104 @@
+GENERIC-MIB-A
+
+-- put your FORCE-INCLUDE's here
+--
+-- put your global DEFAULT's here
+--
+-- put your EXCLUDE's here
+--
+--
+DEFINITIONS ::= BEGIN
+
+IMPORTS
+    IpAddress, Counter, enterprises
+        FROM RFC1155-SMI
+    OBJECT-TYPE, OBJECT-TYPE
+        FROM RFC-1212
+    DisplayString, PhysAddress, ipAddrEntry
+        FROM RFC1213-MIB
+    ifXEntry
+        FROM IF-MIB
+    rip2IfConfEntry
+        FROM RFC1389-MIB
+    rsServerDispatcher, rsGeneric
+        FROM RADWARE-MIB;
+
+
+-- Below is an OBJECT-TYPE entry for every object in the
+-- RND-MIB MIB module.
+-- You may position DEFAULT statements at any point in the MIB tree
+-- by putting them inside the appropriate OBJECT-TYPE declaration.
+-- You need not modify any to which you don't want to add DEFAULTs.
+-- (Or, you may remove any OBJECT-TYPE declaration to which you
+-- don't add DEFAULT statements, as long as you don't add DEFAULT
+-- statements to any of its descendants that reference its
+-- descriptor, directly or indirectly.)
+
+rdwrMngmntPortDisabled  TRAP-TYPE
+ENTERPRISE  rsServerDispatcher
+       ERRCODE     RSG_ErrMsg_code_rdwrMngmntPortDisabled_E
+       SEVERITY    INFO
+     ::=  18
+
+rdwrUnauthorizedSourceIP  TRAP-TYPE
+ENTERPRISE  rsServerDispatcher
+       ERRCODE     RSG_ErrMsg_code_rdwrUnauthorizedSourceIP_E
+       SEVERITY    INFO
+     ::=  19
+
+rsDEBUGPolicyTable OBJECT-TYPE ::= {rsGeneric 32}
+rsDEBUGPolicyEntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME rsDEBUGPolicyStatus
+    ::= {rsDEBUGPolicyTable  1}
+
+
+rsDebugTraceApplTable OBJECT-TYPE ::= {rsGeneric 50}
+rsDebugTraceApplEntry OBJECT-TYPE
+    ROW-STATUS-TYPE no-status-field    
+    ::= {rsDebugTraceApplTable  1}
+
+
+rsDebugFilesTable OBJECT-TYPE ::= {rsGeneric 52}    
+rsDebugFileEntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME rsDebugFileRowStatus
+    ::=  { rsDebugFilesTable 1 }
+
+
+
+rsDebugFilesFlashTable OBJECT-TYPE ::= {rsGeneric 71}    
+rsDebugFileFlashEntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME rsDebugFileFlashRowStatus
+    ::=  { rsDebugFilesFlashTable 1 }
+
+
+rsDebugFilesRamTable OBJECT-TYPE ::= {rsGeneric 72}    
+rsDebugFileRamEntry OBJECT-TYPE
+    ROW-STATUS-TYPE v2-status-field
+    STATUS-FIELD-NAME rsDebugFileRamRowStatus
+    ::=  { rsDebugFilesRamTable 1 }
+
+
+rsDebugTraceApplTableInternal OBJECT-TYPE ::= {rsGeneric 57}
+rsDebugTraceApplEntryInternal OBJECT-TYPE
+    ROW-STATUS-TYPE no-status-field    
+    ::= {rsDebugTraceApplTableInternal  1}
+
+-- Traps
+
+rsGenericTablesFull   TRAP-TYPE
+ENTERPRISE  rsGeneric
+       ERRCODE     RSG_ErrMsg_code_rsGenericTablesFull_E
+       SEVERITY    WARNING
+       ::=  1
+
+
+rsDebugTrace TRAP-TYPE
+       ENTERPRISE  rsGeneric
+       ERRCODE     RSG_ErrMsg_code_rsDebugTrace_E
+       SEVERITY    INFO
+       ::=  2
+
+END

@@ -1,0 +1,585 @@
+STATEFUL-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      RADWARE
+--             This Private MIB supports the Vgate
+-- Version:    2.9
+-- Date:       9 Apr 2000
+-- By:         RMA (Radware MIB Authority)
+-- E-mail:     US:            support@radware.com
+--             International: support_int@radware.com
+--
+IMPORTS
+       NetworkAddress,
+       IpAddress,
+       Counter,
+       Gauge,
+       enterprises
+              FROM RFC1155-SMI
+       OBJECT-TYPE
+              FROM RFC-1212
+       DisplayString,
+       PhysAddress,
+       ipAddrEntry
+              FROM RFC1213-MIB
+       TRAP-TYPE
+                    FROM RFC-1215
+       rsSTATEFUL
+                    FROM RADWARE-MIB;
+
+    TruthValue ::= INTEGER {
+         true (1),
+         false (2)
+        }
+    RowStatus ::= INTEGER {
+        active(1),
+        notInService(2),
+        notReady(3),
+        createAndGo(4),
+        createAndWait(5),
+        destroy(6)
+        }
+    NetNumber ::=  OCTET STRING (SIZE(4))
+
+-- Some MIB compilers require that the following 7 lines which define the path
+-- to RND MIB are commented out:
+
+-- mib            OBJECT IDENTIFIER ::= { mgmt 1  }
+-- directory      OBJECT IDENTIFIER ::= { internet 1  }
+-- experimental   OBJECT IDENTIFIER ::= { internet 3  }
+-- private        OBJECT IDENTIFIER ::= { internet 4  }
+-- enterprises    OBJECT IDENTIFIER ::= { private 1  }
+
+rsStatefulInspectionStatus OBJECT-TYPE
+ SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "the Statful inspection Security trigger"
+   DEFVAL  {disable}
+    ::= {rsSTATEFUL 1}
+
+
+rsStatefulInspectionActionMode OBJECT-TYPE
+ SYNTAX INTEGER {
+		forward(1),
+		block(2)
+   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "the Stateful inspection defualt action mode"
+   DEFVAL  {block}
+    ::= {rsSTATEFUL 2}
+
+-- obsolete
+rsStatefulPolicyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsStatefulPolicyEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing the list of policies params for the stateful inspection"
+    ::=  {rsSTATEFUL 3}
+
+rsStatefulPolicyEntry OBJECT-TYPE
+    SYNTAX RsStatefulPolicyEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "The row definition for this table."
+    INDEX { rsSTATFULPolicyName }
+    ::=  { rsStatefulPolicyTable 1 }
+
+RsStatefulPolicyEntry ::= SEQUENCE {
+    rsSTATFULPolicyName DisplayString,
+    rsSTATFULPolicyProfileName DisplayString,
+    rsSTATFULPolicySourceNet DisplayString,
+    rsSTATFULPolicyDestinationNet DisplayString,
+    rsSTATFULPolicyPhysicalPortGroup DisplayString,
+	rsSTATFULPolicyVlanTagGroup DisplayString,
+    rsSTATFULPolicyOperationalStatus INTEGER,
+    rsSTATFULPolicyStatus  RowStatus,
+    rsSTATFULPolicyAction INTEGER,
+	rsSTATFULPolicyPacketReport INTEGER
+}
+
+rsSTATFULPolicyName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..20))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The Name for the stateful inspection Policy."
+    ::=  {rsStatefulPolicyEntry 1 }
+
+rsSTATFULPolicyProfileName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..20))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Name of the stateful inspection Profile."
+    ::=  {rsStatefulPolicyEntry 2 }
+
+rsSTATFULPolicySourceNet OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..20))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The source address / range of address for the packet, the name is
+      defined in the Objects table or can be an IP address."
+    ::=  {rsStatefulPolicyEntry 3 }
+
+rsSTATFULPolicyDestinationNet OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..20))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The destination address / range of address for the packet, the name is
+      defined in the Objects table or can be an IP address."
+    ::=  {rsStatefulPolicyEntry 4 }
+
+rsSTATFULPolicyPhysicalPortGroup OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..20))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "The Port Group"
+    ::=  { rsStatefulPolicyEntry 5 }
+
+rsSTATFULPolicyVlanTagGroup OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..20))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "The Port Group"
+    ::=  { rsStatefulPolicyEntry 6 }
+
+ rsSTATFULPolicyOperationalStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+              active(1),
+              inactive(2) }
+
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the operational status of the policy."
+    DEFVAL { 1  }
+    ::=  { rsStatefulPolicyEntry 7 }
+
+
+
+rsSTATFULPolicyStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry.
+        Used to delete an entry of this table."
+    ::=  { rsStatefulPolicyEntry 8 }
+
+rsSTATFULPolicyAction OBJECT-TYPE
+    SYNTAX INTEGER {
+        report(0),
+        block(1) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the policy action"
+    ::=  { rsStatefulPolicyEntry 9 }
+
+
+
+rsSTATFULPolicyPacketReport OBJECT-TYPE
+    SYNTAX INTEGER {
+		enable(1),
+		disable(2)
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable represents the packet reporting status"
+    ::=  { rsStatefulPolicyEntry 10 }
+
+
+
+rsStatefulProfileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsStatefulProfileEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table containing the list of profiles params for the stateful inspection"
+    ::=  {rsSTATEFUL 4}
+
+rsStatefulProfileEntry OBJECT-TYPE
+    SYNTAX RsStatefulProfileEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+       "The row definition for this table."
+    INDEX { rsSTATFULProfileName }
+    ::=  { rsStatefulProfileTable 1 }
+
+RsStatefulProfileEntry ::= SEQUENCE {
+    rsSTATFULProfileName DisplayString,
+    rsSTATFULProfileStatus  RowStatus,
+	rsSTATFULProfileactThreshold INTEGER,
+	rsSTATFULProfiletermThreshold INTEGER,
+	rsSTATFULProfilesynAckAllow INTEGER,
+	rsSTATFULProfilePacketTraceStatus INTEGER,
+	rsSTATFULProfilePacketReportStatus INTEGER,
+	rsSTATFULProfileRisk INTEGER,
+	rsSTATFULProfileAction INTEGER
+}
+
+rsSTATFULProfileName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..20))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The Name for the Profile."
+    ::=  {rsStatefulProfileEntry 1}
+
+
+rsSTATFULProfileStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the administrative status of this entry.
+        Used to delete an entry of this table."
+    ::=  { rsStatefulProfileEntry 2 }
+
+rsSTATFULProfileactThreshold OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable sets Activation threshold of the profile."
+    DEFVAL { 5000 }
+    ::=  { rsStatefulProfileEntry 3 }
+
+rsSTATFULProfiletermThreshold OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable sets Termination threshold of the profile."
+    DEFVAL { 4000 }
+    ::=  { rsStatefulProfileEntry 4 }
+
+rsSTATFULProfilesynAckAllow OBJECT-TYPE
+    SYNTAX INTEGER {
+              enable(1),
+              disable(2) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates whether SYN-ACK allow is configured."
+    DEFVAL { 1 }
+    ::=  { rsStatefulProfileEntry 5 }
+
+
+rsSTATFULProfilePacketTraceStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+              enable(1),
+              disable(2) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates whether packet trace action should be performed."
+    DEFVAL { 2 }
+    ::=  { rsStatefulProfileEntry 6 }
+
+rsSTATFULProfilePacketReportStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+            enable(1),
+             disable(2) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates whether packet report action should be performed."
+    DEFVAL { 2 }
+    ::=  { rsStatefulProfileEntry 7 }
+
+rsSTATFULProfileRisk OBJECT-TYPE
+    SYNTAX INTEGER {
+ 		  info(1),
+		  low(2),
+          medium(3),
+		  high(4)
+   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates whether packet report action should be performed."
+    DEFVAL { low }
+    ::=  { rsStatefulProfileEntry 8 }
+
+rsSTATFULProfileAction OBJECT-TYPE
+    SYNTAX INTEGER  {
+        report(0),
+        block(1) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates whether packet report action should be performed."
+    DEFVAL { block }
+    ::=  { rsStatefulProfileEntry 9 }
+
+rsStatefulProtocolAgingTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsStatefulProtocolAgingEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table of aging time for specific protocols is stateful inspection module."
+    ::= { rsSTATEFUL 5 }
+
+rsStatefulProtocolAgingEntry OBJECT-TYPE
+    SYNTAX RsStatefulProtocolAgingEntry 
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "The row definition for this table."
+    INDEX {rsSTATFULProtocolAgingIndex }
+    ::=  { rsStatefulProtocolAgingTable 1 }
+
+RsStatefulProtocolAgingEntry ::= SEQUENCE {
+    rsSTATFULProtocolAgingIndex INTEGER,
+    rsSTATFULProtocolName DisplayString,
+    rsSTATFULProtocolAgingValue INTEGER
+}
+
+rsSTATFULProtocolAgingIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the index of this protocol "
+    ::=  { rsStatefulProtocolAgingEntry 1 }
+
+
+rsSTATFULProtocolName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..20))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Name for the Protocol."
+    ::=  {rsStatefulProtocolAgingEntry 2}
+
+
+rsSTATFULProtocolAgingValue OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the aging value of this protocol "
+    ::=  { rsStatefulProtocolAgingEntry 3 }
+
+rsStatefulStartupMode OBJECT-TYPE
+ SYNTAX INTEGER {
+		off(1),
+		on(2),
+		graceful(3)
+   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "the Stateful inspection operational state"
+   DEFVAL  {graceful}
+    ::= {rsSTATEFUL 6}
+
+rsStatefulStartupTimer OBJECT-TYPE
+	SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+		"the Stateful inspection timer for graceful startup"
+    ::= {rsSTATEFUL 7}
+
+rsStatefulInspectionState OBJECT-TYPE
+ SYNTAX INTEGER {
+		on(1),
+		off(2)
+   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "the Stateful inspection current operational state"
+   DEFVAL  {on}
+    ::= {rsSTATEFUL 8}
+
+
+rsStatefulStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsStatefulStatisticsEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table of stateful inspection statistics in the last minute ."
+    ::= {rsSTATEFUL 9}
+
+rsStatefulStatisticsEntry OBJECT-TYPE
+    SYNTAX RsStatefulStatisticsEntry 
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "The row definition for this table."
+    INDEX {rsSTATFULStatisticsIndex }
+    ::=  { rsStatefulStatisticsTable 1 }
+
+RsStatefulStatisticsEntry ::= SEQUENCE {
+    rsSTATFULStatisticsIndex INTEGER,
+    rsSTATFULStatisticsProtocolName DisplayString,
+    rsSTATFULStatisticsEstablished INTEGER,
+	rsSTATFULStatisticsTainted INTEGER
+}
+
+rsSTATFULStatisticsIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the index of this protocol "
+    ::=  { rsStatefulStatisticsEntry 1 }
+
+
+rsSTATFULStatisticsProtocolName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..20))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "The Name for the Protocol."
+    ::=  {rsStatefulStatisticsEntry 2}
+
+
+rsSTATFULStatisticsEstablished OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "This number of established session"
+    ::=  { rsStatefulStatisticsEntry 3 }
+
+rsSTATFULStatisticsTainted OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "This number of tainted session"
+    ::=  { rsStatefulStatisticsEntry 4 }
+
+
+rsStatefulReportThresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsStatefulReportThresholdEntry
+    ACCESS not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+      "Table of reporting thresholds by risk in the stateful inspection module."
+    ::= { rsSTATEFUL 10 }
+
+rsStatefulReportThresholdEntry OBJECT-TYPE
+    SYNTAX RsStatefulReportThresholdEntry 
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "The row definition for this table."
+    INDEX {rsSTATFULReportThresholdRisk }
+    ::=  { rsStatefulReportThresholdTable 1 }
+
+RsStatefulReportThresholdEntry ::= SEQUENCE {
+    rsSTATFULReportThresholdRisk DisplayString,
+    rsSTATFULReportThresholdValue INTEGER
+}
+
+
+rsSTATFULReportThresholdRisk OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..20))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The Risk level."
+    ::=  {rsStatefulReportThresholdEntry 1}
+
+
+rsSTATFULReportThresholdValue OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "This variable indicates the aging value of this protocol "
+    ::=  { rsStatefulReportThresholdEntry 2 }
+
+rsStatefulMidflowStatus OBJECT-TYPE
+     SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "Stateful Inspection midflow status"
+   DEFVAL  {enable}
+    ::= {rsSTATEFUL 11}
+
+rsStatefulMidflowAction OBJECT-TYPE
+	SYNTAX INTEGER {
+        report-only(0),
+        drop(1) 
+    }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "Stateful Inspection midflow action"
+    DEFVAL {drop}
+    ::= {rsSTATEFUL 12}
+
+rsStatefulMidflowTermThreshold OBJECT-TYPE
+	SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+		"Stateful Inspection midflow termination threshold"
+	DEFVAL {0}
+    ::= {rsSTATEFUL 13}
+
+rsStatefulMidflowActThreshold OBJECT-TYPE
+	SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+		"Stateful Inspection midflow activation threshold"
+	DEFVAL {0}
+    ::= {rsSTATEFUL 14}
+
+rsStatefulMidflowPacketTraceStatus OBJECT-TYPE
+     SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "Stateful Inspection midflow packet trace status"
+   DEFVAL  {enable}
+    ::= {rsSTATEFUL 15}
+	
+rsStatefulMidflowAttackRisk OBJECT-TYPE
+     SYNTAX INTEGER {
+ 		  info(1),
+		  low(2),
+       		  medium(3),
+		  high(4)
+   }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+       "configures the attack risk of out of state"
+
+   DEFVAL  {low}
+    ::= {rsSTATEFUL 16}
+	
+
+
+
+END
+
