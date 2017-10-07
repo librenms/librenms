@@ -21,14 +21,13 @@
  * @subpackage Alerts
  */
 
-$data = array("api_id" => $opts['api_id'], "user" => $opts['user'], "password" => $opts['password'], "to" => implode(',',$opts['to']), "text" => $obj['title']);
+$url  = 'https://platform.clickatell.com/messages/http/send?apiKey='.$opts['token'].'&to='.implode(',',$opts['to']).'&content='.urlencode($obj['title']);
 if (!empty($opts['from'])) {
-    $data['from'] = $opts['from'];
+   $url .= '&from='.$opts['from'];
 }
-$url  = 'https://api.clickatell.com/http/sendmsg?'.http_build_query($data);
 $curl = curl_init($url);
 set_curl_proxy($curl);
-curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
 $ret  = curl_exec($curl);
