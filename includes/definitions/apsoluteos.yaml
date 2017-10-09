@@ -4,7 +4,7 @@ type: network
 icon: radware
 group: radware
 mib_dir:
-    - defense_pro
+    - radware
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
