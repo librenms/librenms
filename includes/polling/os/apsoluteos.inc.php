@@ -22,8 +22,6 @@
  * @copyright  2017 Simone Fini
  * @author     Simone Fini<tomfordfirst@gmail.com>
  */
-
-
 $hardware = trim(snmp_get($device, '1.3.6.1.4.1.89.2.11.1.0', '-OQv', '', ''), '"');
 $version = trim(snmp_get($device, '1.3.6.1.4.1.89.2.13.0', '-OQv', '', ''), '"');
 $features = 'Ver. '.trim(snmp_get($device, '1.3.6.1.4.1.89.2.16.0', '-OQv', '', ''), '"');
