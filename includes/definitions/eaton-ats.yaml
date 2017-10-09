@@ -1,0 +1,14 @@
+os: eaton-ats
+text: 'Eaton ATS'
+type: power
+icon: eaton
+mib_dir:
+    - eaton
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.705.1
+    - sysDescr_regex:
+        - '/^Eaton ATS/'
