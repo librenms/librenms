@@ -22,7 +22,9 @@
  * @copyright  2017 Simone Fini
  * @author     Simone Fini<tomfordfirst@gmail.com>
  */
-$hardware = trim(snmp_get($device, '1.3.6.1.4.1.89.2.11.1.0', '-OQv', '', ''), '"');
-$version = trim(snmp_get($device, '1.3.6.1.4.1.89.2.13.0', '-OQv', '', ''), '"');
-$features = 'Ver. '.trim(snmp_get($device, '1.3.6.1.4.1.89.2.16.0', '-OQv', '', ''), '"');
-$serial = trim(snmp_get($device, '1.3.6.1.4.1.89.2.12.0', '-OQv', '', ''), '"');
+$oids = 'genGroupHWVersion.0 rndSerialNumber.0 rndApsoluteOSVersion.0 rdwrDevicePortsConfig.0';
+$data = snmp_get_multi($device, $oids, '-OQs', 'RADWARE-MIB');
+$serial = trim($data[0]['rndSerialNumber'], '"');
+$version = trim($data[0]['rndApsoluteOSVersion'], '"');
+$hardware = trim($data[0]['genGroupHWVersion'], '"');
+$features = 'Ver. '.trim($data[0]['rdwrDevicePortsConfig'], '"');
