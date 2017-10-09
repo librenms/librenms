@@ -746,6 +746,7 @@ For SNMP v3
 
 For ICMP only
 
+  - snmp_disable: Boolean, set to true for ICMP only.
   - os: OS short name for the device (defaults to ping).
   - hardware: Device hardware.
 
