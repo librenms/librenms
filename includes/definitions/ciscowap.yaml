@@ -1,5 +1,5 @@
 os: ciscowap
-text: 'Cisco Wireless Acess Point'
+text: 'Cisco Wireless Access Point'
 type: wireless
 group: unix
 icon: cisco
