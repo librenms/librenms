@@ -49,8 +49,8 @@ if (is_numeric($state)) {
     discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, 'Operation Mode', '1', '1', null, null, null, null, $state, 'snmp', $index);
 
     //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $index);}
-
+    create_sensor_to_state_index($device, $state_name, $index);
+}
 
 $state = snmp_get($device, "ats2InputStatusDephasing.0", "-Ovqe", 'EATON-ATS2-MIB');
 $cur_oid = '.1.3.6.1.4.1.534.10.2.3.1.1.0';
@@ -82,5 +82,5 @@ if (is_numeric($state)) {
     discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, 'Dephasing Status', '1', '1', null, null, null, null, $state, 'snmp', $index);
 
     //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $index);}
-
+    create_sensor_to_state_index($device, $state_name, $index);
+}

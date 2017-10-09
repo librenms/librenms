@@ -24,7 +24,7 @@ foreach ($oids as $volt_id => $data) {
     $index = ".1.3.6.1.4.1.534.10.2.2.2.1.1.".$num_id;
     $descr    = 'Input';
     if (count($oids) > 1) {
-	$source = snmp_get($device, $source_oid , '-Oqv');
+        $source = snmp_get($device, $source_oid, '-Oqv');
         $descr .= " $source";
     }
     $type    = 'eaton-ats';
