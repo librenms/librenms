@@ -351,12 +351,12 @@ config:
     config_descr: { Field: config_descr, Type: varchar(100), 'Null': false, Default: 'NULL', Extra: '' }
     config_disabled: { Field: config_disabled, Type: 'enum(''0'',''1'')', 'Null': false, Default: '0', Extra: '' }
     config_group: { Field: config_group, Type: varchar(50), 'Null': false, Default: 'NULL', Extra: '' }
-    config_group_order: { Field: config_group_order, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
+    config_group_order: { Field: config_group_order, Type: int(11), 'Null': false, Default: '0', Extra: '' }
     config_hidden: { Field: config_hidden, Type: 'enum(''0'',''1'')', 'Null': false, Default: '0', Extra: '' }
     config_id: { Field: config_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
     config_name: { Field: config_name, Type: varchar(255), 'Null': false, Default: 'NULL', Extra: '' }
     config_sub_group: { Field: config_sub_group, Type: varchar(50), 'Null': false, Default: 'NULL', Extra: '' }
-    config_sub_group_order: { Field: config_sub_group_order, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
+    config_sub_group_order: { Field: config_sub_group_order, Type: int(11), 'Null': false, Default: '0', Extra: '' }
     config_value: { Field: config_value, Type: varchar(512), 'Null': false, Default: 'NULL', Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [config_id], Unique: true, Type: BTREE }
@@ -414,6 +414,7 @@ devices:
     notes: { Field: notes, Type: text, 'Null': true, Default: 'NULL', Extra: '' }
     os: { Field: os, Type: varchar(32), 'Null': true, Default: 'NULL', Extra: '' }
     override_sysLocation: { Field: override_sysLocation, Type: tinyint(1), 'Null': true, Default: '0', Extra: '' }
+    parent_id: { Field: parent_id, Type: 'int(11) unsigned', 'Null': true, Default: 'NULL', Extra: '' }
     poller_group: { Field: poller_group, Type: int(11), 'Null': false, Default: '0', Extra: '' }
     port: { Field: port, Type: 'smallint(5) unsigned', 'Null': false, Default: '161', Extra: '' }
     port_association_mode: { Field: port_association_mode, Type: int(11), 'Null': false, Default: '1', Extra: '' }
@@ -421,6 +422,7 @@ devices:
     retries: { Field: retries, Type: int(11), 'Null': true, Default: 'NULL', Extra: '' }
     serial: { Field: serial, Type: text, 'Null': true, Default: 'NULL', Extra: '' }
     snmpver: { Field: snmpver, Type: varchar(4), 'Null': false, Default: v2c, Extra: '' }
+    snmp_disable: { Field: snmp_disable, Type: tinyint(1), 'Null': false, Default: '0', Extra: '' }
     status: { Field: status, Type: tinyint(4), 'Null': false, Default: '0', Extra: '' }
     status_reason: { Field: status_reason, Type: varchar(50), 'Null': false, Default: 'NULL', Extra: '' }
     sysContact: { Field: sysContact, Type: text, 'Null': true, Default: 'NULL', Extra: '' }
@@ -440,6 +442,7 @@ devices:
     os: { Name: os, Columns: [os], Unique: false, Type: BTREE }
     last_polled: { Name: last_polled, Columns: [last_polled], Unique: false, Type: BTREE }
     last_poll_attempted: { Name: last_poll_attempted, Columns: [last_poll_attempted], Unique: false, Type: BTREE }
+    parent_id_idx: { Name: parent_id_idx, Columns: [parent_id], Unique: false, Type: BTREE }
 devices_attribs:
   Columns:
     attrib_id: { Field: attrib_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
@@ -999,10 +1002,12 @@ perf_times:
     devices: { Field: devices, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
     doing: { Field: doing, Type: varchar(64), 'Null': false, Default: 'NULL', Extra: '' }
     duration: { Field: duration, Type: 'double(8,2)', 'Null': false, Default: 'NULL', Extra: '' }
+    id: { Field: id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
     poller: { Field: poller, Type: varchar(255), 'Null': false, Default: 'NULL', Extra: '' }
     start: { Field: start, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
     type: { Field: type, Type: varchar(8), 'Null': false, Default: 'NULL', Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     type: { Name: type, Columns: [type], Unique: false, Type: BTREE }
 plugins:
   Columns:

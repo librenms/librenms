@@ -22,9 +22,7 @@
  */
 
 $url  = 'https://platform.clickatell.com/messages/http/send?apiKey='.$opts['token'].'&to='.implode(',',$opts['to']).'&content='.urlencode($obj['title']);
-if (!empty($opts['from'])) {
-   $url .= '&from='.$opts['from'];
-}
+
 $curl = curl_init($url);
 set_curl_proxy($curl);
 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
