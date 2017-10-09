@@ -86,6 +86,7 @@ function shorthost($hostname, $len = 12)
     if (filter_var($hostname, FILTER_VALIDATE_IP)) {
         return $hostname;
     }
+    $len = Config::get('shorthost_target_length', $len);
 
     $parts = explode(".", $hostname);
     $shorthost = $parts[0];
