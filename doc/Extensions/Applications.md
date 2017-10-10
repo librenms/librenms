@@ -3,7 +3,7 @@ source: Extensions/Applications.md
 
 You can use Application support to graph performance statistics from many applications.
 
-Different applications support a variety of ways collect data: by direct connection to the application, snmpd extend, or [the agent](Agent-Setup.md).
+Different applications support a variety of ways to collect data: by direct connection to the application, snmpd extend, or [the agent](Agent-Setup.md).
 
 1. [Apache](#apache) - SNMP extend, Agent
 1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
