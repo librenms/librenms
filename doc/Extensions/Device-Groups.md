@@ -4,10 +4,10 @@ LibreNMS supports grouping your devices together in much the same way as you can
 
 ### Patterns
 
-Patterns work in the same was as Entities within the alerting system, the format of the pattern is based on the MySQL structure your data is in such
-as __tablename.columnname__. If you are ensure of what the entity is you want then have a browse around inside MySQL using `show tables` and `desc <tablename>`.
+Patterns work in the same way as Entities within the alerting system, the format of the pattern is based on the MySQL structure your data is in. Such
+as __tablename.columnname__. If you already know the entity you want, you can browse around inside MySQL using `show tables` and `desc <tablename>`.
 
-As a working example and a common question, let's assume you want to group devices by hostname. If you hostname format is dcX.[devicetype].example.com. You would use the pattern
+As a working example and a common question, let's assume you want to group devices by hostname. If your hostname format is dcX.[devicetype].example.com. You would use the pattern
 `devices.hostname`. Select the condition which in this case would be `Like` and then enter `dc1\..*\.example.com`. This would then match dc1.sw01.example.com, dc1.rtr01.example.com but not
  dc2.sw01.example.com.
 
