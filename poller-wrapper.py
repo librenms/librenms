@@ -83,7 +83,7 @@ if config['db_host'][:5].lower() == 'unix:':
     db_server = config['db_host']
     db_port = 0
 elif config['db_socket']:
-    db_server = config['db_socket']
+    db_server = config['db_host']
     db_port = 0
 else:
     db_server = config['db_host']
