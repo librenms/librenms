@@ -1,6 +1,6 @@
 source: General/Welcome-to-Observium-users.md
 
-LibreNMS is a fork of Observium.  The reason for the fork is nothing to do
+LibreNMS is a fork of Observium.  The reason for the fork has nothing to do
 with Observium's [move to community vs. paid versions][1].  It is simply
 that we have different priorities and values to the Observium development
 team.  We decided to fork (reluctantly) because we like using Observium,
@@ -10,7 +10,7 @@ information about the kind of community we're trying to promote.
 
 LibreNMS was forked from [the last GPL-licensed version of Observium][3].
 
-Thanks to one of our users Dan Brown who has written a migration script to be able move your Observium install over to LibreNMS [Dan Brown][10]. This also takes care of moving from one cpu architect to another. Give it a try :)
+Thanks to one of our users, Dan Brown, who has written a [migration script][10], you can easily move your Observium install over to LibreNMS. This also takes care of moving from one CPU architecture to another. Give it a try :)
 
 How LibreNMS will be different from Observium:
 
