@@ -2,7 +2,7 @@
 /*
  * LibreNMS
  *
- * Copyright (c) 2017 Aldemir Akpinar <aldemir.akpinar@gmail.com>
+ * Copyright (c) 2017 Aldemir Akpinar <aldemir.akpinar@gmail.com> 
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -10,12 +10,14 @@
  * the source code distribution for details.
  */
 
-
+$descr = 'Power Usage';
 // Moxa people enjoy creating MIBs for each model!
 if ($device['sysDescr'] == 'IKS-6726A-2GTXSFP-T') {
-    $mibmod = 'MOXA-IKS6726A-MIB';
+    $value = snmp_get($device, 'powerConsumption.0', '-Ovq', 'MOXA-IKS6726A-MIB');
 } else if ($device['sysDescr'] == 'EDS-G508E-T') {
-    $mibmod = 'MOXA-EDSG508E-MIB';
+    $value = snmp_get($device, 'powerConsumption.0', '-Ovq', 'MOXA-EDSG508E-MIB');
 }
-$version = snmp_get($device, "firmwareVersion.0", "-OQvs", $mibmod);
-$hardware =  $poll_device['sysDescr'];
+
+if (is_numeric($value)) {
+    discover_sensor($valid['sensor'], 'power', $device, "powerConsumption.0", '0', 'moxa-etherdevice', $descr, '1', '1', null, null, null, null, $value);
+}
