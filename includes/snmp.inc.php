@@ -202,8 +202,16 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
         $oid               = trim($oid);
         $value             = trim($value, "\" \n\r");
         list($oid, $index) = explode('.', $oid, 2);
-        if (!strstr($value, 'at this OID') && isset($oid) && isset($index)) {
-            $array[$index][$oid] = $value;
+
+        if (!str_contains($value, 'at this OID')) {
+            if (is_null($index)) {
+                if (empty($oid)) {
+                    continue; // no index or oid
+                }
+                $array[$oid] = $value;
+            } else {
+                $array[$index][$oid] = $value;
+            }
         }
     }
 
