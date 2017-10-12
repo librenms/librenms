@@ -95,6 +95,12 @@ To match on a device os of edgeos then please use the following:
 $config['oxidized']['group']['os'][] = array('match' => 'edgeos', 'group' => 'wireless');
 ```
 
+If you do not have good hostnames in Librenms (i.e. you added devices by IP), you can add the following to your config.php to use the sysname instead.
+
+```php
+$config['oxidized']['sysname_as_hostname'] = true;
+```
+
 Verify the return of groups by querying the API:
 
 ```
