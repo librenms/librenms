@@ -132,7 +132,7 @@ if ($options['f'] === 'handle_notifiable') {
             // result was a failure (0), create the notification
             new_notification(
                 $title,
-                'PHP version 5.6 will soon be the minimum supported version.  We suggest you update to PHP the latest version of PHP (7.1 at this time) to continue to receive updates.  If you do not update, LibreNMS will continue to function but stop receiving bug fixes and updates.',
+                'PHP version 5.6.4 will be the minimum supported version on January 10, 2018.  We suggest you update to PHP a supported version of PHP (7.1 suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.',
                 1,
                 'daily.sh'
             );
