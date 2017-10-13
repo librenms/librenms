@@ -145,7 +145,8 @@ function get_userid($username)
         $entries = ldap_get_entries($connection, $search);
 
         if ($entries['count']) {
-            return $entries[0][Config::get('auth_ldap_uid_attribute', 'uidNumber')][0];
+            $uid_attr = strtolower(Config::get('auth_ldap_uid_attribute', 'uidnumber'));
+            return $entries[0][$uid_attr][0];
         }
     } catch (AuthenticationException $e) {
         echo $e->getMessage() . PHP_EOL;
@@ -177,7 +178,8 @@ function get_userlist()
             foreach ($entries as $entry) {
                 $username = $entry['uid'][0];
                 $realname = $entry['cn'][0];
-                $user_id = $entry[Config::get('auth_ldap_uid_attribute', 'uidNumber')][0];
+                $uid_attr = strtolower(Config::get('auth_ldap_uid_attribute', 'uidnumber'));
+                $user_id = $entry[$uid_attr][0];
                 $email = $entry[Config::get('auth_ldap_emailattr', 'mail')][0];
                 $ldap_groups = get_group_list();
                 foreach ($ldap_groups as $ldap_group) {
@@ -323,10 +325,18 @@ function get_ldap_connection($skip_bind = false)
     ldap_set_option($ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, Config::get('auth_ldap_timeout', 5));
 
     // With specified bind user
-    if (Config::has('auth_ldap_binduser') && Config::has('auth_ldap_bindpassword')) {
+    if ((Config::has('auth_ldap_binduser') || Config::has('auth_ldap_binddn'))
+        && Config::has('auth_ldap_bindpassword')
+    ) {
+        if (Config::has('auth_ldap_binddn')) {
+            $bind_dn = Config::get('auth_ldap_binddn');
+        } else {
+            $bind_dn = get_full_dn(Config::get('auth_ldap_binduser'));
+        }
+
         if (ldap_bind(
             $ldap_connection,
-            get_full_dn(Config::get('auth_ldap_binduser')),
+            $bind_dn,
             Config::get('auth_ldap_bindpassword')
         )) {
             ldap_set_option($ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout

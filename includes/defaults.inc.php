@@ -621,7 +621,7 @@ $config['auth_ldap_port']   = 389;
 $config['auth_ldap_prefix'] = 'uid=';
 $config['auth_ldap_suffix'] = ',ou=People,dc=example,dc=com';
 $config['auth_ldap_group']  = 'cn=groupname,ou=groups,dc=example,dc=com';
-$config['auth_ldap_uid_attribute'] = 'uidNumber';
+$config['auth_ldap_uid_attribute'] = 'uidnumber';
 
 $config['auth_ldap_attr']['uid'] = "uid";
 $config['auth_ldap_groupbase']                  = 'ou=group,dc=example,dc=com';
