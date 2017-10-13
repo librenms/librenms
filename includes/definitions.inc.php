@@ -377,12 +377,27 @@ $config['graph_types']['device']['screenos_sessions']['order']     = '0';
 $config['graph_types']['device']['screenos_sessions']['descr']     = 'Active Sessions';
 
 //PAN OS Graphs
-$config['graph_types']['device']['panos_sessions']['section']      = 'firewall';
-$config['graph_types']['device']['panos_sessions']['order']        = '0';
-$config['graph_types']['device']['panos_sessions']['descr']        = 'Active Sessions';
-$config['graph_types']['device']['panos_activetunnels']['section'] = 'firewall';
-$config['graph_types']['device']['panos_activetunnels']['order']   = '1';
-$config['graph_types']['device']['panos_activetunnels']['descr']   = 'Active GlobalProtect Tunnels';
+$config['graph_types']['device']['panos_sessions']['section']           = 'firewall';
+$config['graph_types']['device']['panos_sessions']['order']             = '0';
+$config['graph_types']['device']['panos_sessions']['descr']             = 'Active Sessions';
+$config['graph_types']['device']['panos_sessions_tcp']['section']       = 'firewall';
+$config['graph_types']['device']['panos_sessions_tcp']['order']         = '0';
+$config['graph_types']['device']['panos_sessions_tcp']['descr']         = 'Active TCP Sessions';
+$config['graph_types']['device']['panos_sessions_udp']['section']       = 'firewall';
+$config['graph_types']['device']['panos_sessions_udp']['order']         = '0';
+$config['graph_types']['device']['panos_sessions_udp']['descr']         = 'Active UDP Sessions';
+$config['graph_types']['device']['panos_sessions_icmp']['section']      = 'firewall';
+$config['graph_types']['device']['panos_sessions_icmp']['order']        = '0';
+$config['graph_types']['device']['panos_sessions_icmp']['descr']        = 'Active ICMP Sessions';
+$config['graph_types']['device']['panos_sessions_ssl']['section']       = 'firewall';
+$config['graph_types']['device']['panos_sessions_ssl']['order']         = '0';
+$config['graph_types']['device']['panos_sessions_ssl']['descr']         = 'Active SSL Proxy Sessions';
+$config['graph_types']['device']['panos_sessions_sslutil']['section']   = 'firewall';
+$config['graph_types']['device']['panos_sessions_sslutil']['order']     = '0';
+$config['graph_types']['device']['panos_sessions_sslutil']['descr']     = 'Active SSL Proxy Utilization';
+$config['graph_types']['device']['panos_activetunnels']['section']      = 'firewall';
+$config['graph_types']['device']['panos_activetunnels']['order']        = '0';
+$config['graph_types']['device']['panos_activetunnels']['descr']        = 'Active GlobalProtect Tunnels';
 
 //Pulse Secure Graphs
 $config['graph_types']['device']['pulse_users']['section']         = 'firewall';
