@@ -28,6 +28,7 @@
 
 namespace LibreNMS\Authentication;
 
+use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 
 class TwoFactor
@@ -129,8 +130,6 @@ class TwoFactor
      */
     public static function getForm($form_tags = true)
     {
-        global $config;
-
         $ret = '';
 
         if ($form_tags) {
@@ -140,7 +139,7 @@ class TwoFactor
           <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">
-                <img src="' . $config['title_image'] . '">
+                <img src="' . Config::get('title_image') . '">
               </h3>
             </div>
             <div class="panel-body">
@@ -179,7 +178,7 @@ class TwoFactor
      */
     public static function showForm()
     {
-        global $twofactorform, $config;
+        global $twofactorform;
 
         $twofactor = get_user_pref('twofactor');
 
@@ -191,10 +190,10 @@ class TwoFactor
 
         // lockout the user if there are too many failures
         if ($twofactor['fails'] >= 3) {
-            if (!$config['twofactor_lock']) {
+            if (!Config::get('twofactor_lock')) {
                 throw new AuthenticationException('Too many two-factor failures, please contact administrator.');
-            } elseif ((time() - $twofactor['last']) < $config['twofactor_lock']) {
-                $msg = "Too many two-factor failures, please wait " . $config['twofactor_lock'] . " seconds";
+            } elseif ((time() - $twofactor['last']) < Config::get('twofactor_lock')) {
+                $msg = "Too many two-factor failures, please wait " . Config::get('twofactor_lock') . " seconds";
                 throw new AuthenticationException($msg);
             }
         }

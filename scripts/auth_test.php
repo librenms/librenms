@@ -1,6 +1,7 @@
 #!/usr/bin/php
 <?php
 
+use LibreNMS\Authentication\AuthorizerFactory;
 use Phpass\PasswordHash;
 
 $options = getopt('u:rdvh');
@@ -43,9 +44,9 @@ if ($config['auth_mechanism'] = 'ldap' || $config['auth_mechanism'] = "active_di
     }
 }
 
-if (function_exists('ad_bind')) {
+if (method_exists(AuthorizerFactory::get(), 'adBind')) {
     if (isset($config['auth_ad_binduser']) && isset($config['auth_ad_bindpassword'])) {
-        if (!ad_bind($ldap_connection, false)) {
+        if (!AuthorizerFactory::get()->adBind($ldap_connection, false)) {
             $ldap_error = ldap_error($ldap_connection);
             echo $ldap_error . PHP_EOL;
             if ($ldap_error == 'Invalid credentials') {
@@ -56,7 +57,7 @@ if (function_exists('ad_bind')) {
             print_message('AD bind success');
         }
     } else {
-        if (!ad_bind($ldap_connection)) {
+        if (!AuthorizerFactory::get()->adBind($ldap_connection)) {
             echo ldap_error($ldap_connection) . PHP_EOL;
             print_message("Could not anonymous bind to AD");
         } else {
@@ -79,7 +80,7 @@ if (isset($options['r'])) {
     $hasher   = new PasswordHash(8, false);
     $token = $session['session_username'] . '|' . $hasher->HashPassword($session['session_username'] . $session['session_token']);
 
-    $auth = reauthenticate($session['session_value'], $token);
+    $auth = AuthorizerFactory::get()->reauthenticate($session['session_value'], $token);
     if ($auth) {
         print_message("Reauthentication successful.\n");
     } else {
@@ -93,7 +94,7 @@ if (isset($options['r'])) {
     echo PHP_EOL;
 
     echo "Authenticate user $test_username: \n";
-    $auth = authenticate($test_username, $test_password);
+    $auth = AuthorizerFactory::get()->authenticate($test_username, $test_password);
     unset($test_password);
 
     if ($auth) {
@@ -107,11 +108,11 @@ if (isset($options['r'])) {
 }
 
 if ($auth) {
-    $user_id = get_userid($test_username);
+    $user_id = AuthorizerFactory::get()->getUserid($test_username);
 
     echo "User ($user_id):\n";
-    if (function_exists('get_user')) {
-        $user = get_user($user_id);
+    if (method_exists(AuthorizerFactory::get(), 'getUser')) {
+        $user = AuthorizerFactory::get()->getUser($user_id);
 
         unset($user['password']);
         unset($user['remember_token']);
@@ -120,7 +121,7 @@ if ($auth) {
         }
     }
 
-    if (function_exists('get_group_list')) {
-        echo 'Groups: ' . implode('; ', get_group_list()) . PHP_EOL;
+    if (method_exists(AuthorizerFactory::get(), 'getGroupList')) {
+        echo 'Groups: ' . implode('; ', AuthorizerFactory::get()->getGroupList()) . PHP_EOL;
     }
 }
