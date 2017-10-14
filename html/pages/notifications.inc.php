@@ -30,7 +30,8 @@ $notifications = new ObjectCache('notifications');
   <div class="row">
     <div class="col-md-12">
       <h1><a href="/notifications">Notifications</a></h1>
-      <h4><strong class="count-notif"><?php echo $notifications['count']; ?></strong> Unread Notifications <?php echo ($_SESSION['userlevel'] == 10 ? '<button class="btn btn-success pull-right new-notif" style="margin-top:-10px;">New</button>' : ''); ?></h4>
+      <h4><strong class="count-notif"><?php echo $notifications['count']; ?></strong> Unread Notifications <?php echo ($_SESSION['userlevel'] == 10 ? '<button class="btn btn-success pull-right fa fa-plus new-notif" data-toggle="tooltip" data-placement="bottom" title="Create new notification" style="margin-top:-10px;"></button>' : ''); ?><?php echo ($_SESSION['userlevel'] == 10 ? '<button class="btn btn-success pull-right fa fa-eye read-all-notif" data-toggle="tooltip" data-placement="bottom" title="Mark all as Read" style="margin-top:-10px;"></button>' : ''); ?>
+        </h4>
       <hr/>
     </div>
   </div>
@@ -227,6 +228,24 @@ $(function() {
         else {
           $(this).attr("disabled", false);
           $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+        }
+      }
+    });
+  });
+
+  $(document).on( "click", ".read-all-notif", function() {
+    $(this).attr("disabled", true);
+    $.ajax({
+      type: 'POST',
+      url: 'ajax_form.php',
+      data: {type: 'notifications', action: 'read-all-notif'},
+      dataType: "json",
+      success: function (data) {
+        if( data.status == "ok" ) {
+          window.location.reload()
+        }
+        else {
+          $(this).attr("disabled", false);
         }
       }
     });

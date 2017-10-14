@@ -41,6 +41,12 @@ if (isset($_REQUEST['notification_id']) && isset($_REQUEST['action'])) {
         $status  = 'ok';
         $message = 'Created';
     }
+} elseif (isset($_REQUEST['action']) && $_REQUEST['action'] == 'read-all-notif') {
+    foreach (dbFetchRows('SELECT notifications_id FROM notifications') as $notifications) {
+        dbInsert(array('notifications_id'=>$notifications['notifications_id'],'user_id'=>$_SESSION['user_id'],'key'=>'read','value'=>1), 'notifications_attribs');
+    }
+    $status = 'ok';
+    $message = 'All notifications set as read';
 } else {
     $status  = 'error';
     $message = 'ERROR: Missing Params';
