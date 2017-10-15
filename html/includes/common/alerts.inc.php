@@ -10,7 +10,7 @@ $alert_states = array(
     'alerted' => 1,
     'acknowledged' => 2,
     'worse' => 3,
-    'better' => 4
+    'better' => 4,
 );
 
 $alert_severities = array(
@@ -20,7 +20,7 @@ $alert_severities = array(
     'critical' => 3,
     'ok only' => 4,
     'warning only' => 5,
-    'critical only' => 6
+    'critical only' => 6,
 );
 
 //if( defined('SHOW_SETTINGS') || empty($widget_settings) ) {
