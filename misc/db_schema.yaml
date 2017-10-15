@@ -351,12 +351,12 @@ config:
     config_descr: { Field: config_descr, Type: varchar(100), 'Null': false, Default: 'NULL', Extra: '' }
     config_disabled: { Field: config_disabled, Type: 'enum(''0'',''1'')', 'Null': false, Default: '0', Extra: '' }
     config_group: { Field: config_group, Type: varchar(50), 'Null': false, Default: 'NULL', Extra: '' }
-    config_group_order: { Field: config_group_order, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
+    config_group_order: { Field: config_group_order, Type: int(11), 'Null': false, Default: '0', Extra: '' }
     config_hidden: { Field: config_hidden, Type: 'enum(''0'',''1'')', 'Null': false, Default: '0', Extra: '' }
     config_id: { Field: config_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
     config_name: { Field: config_name, Type: varchar(255), 'Null': false, Default: 'NULL', Extra: '' }
     config_sub_group: { Field: config_sub_group, Type: varchar(50), 'Null': false, Default: 'NULL', Extra: '' }
-    config_sub_group_order: { Field: config_sub_group_order, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
+    config_sub_group_order: { Field: config_sub_group_order, Type: int(11), 'Null': false, Default: '0', Extra: '' }
     config_value: { Field: config_value, Type: varchar(512), 'Null': false, Default: 'NULL', Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [config_id], Unique: true, Type: BTREE }
@@ -999,10 +999,12 @@ perf_times:
     devices: { Field: devices, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
     doing: { Field: doing, Type: varchar(64), 'Null': false, Default: 'NULL', Extra: '' }
     duration: { Field: duration, Type: 'double(8,2)', 'Null': false, Default: 'NULL', Extra: '' }
+    id: { Field: id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
     poller: { Field: poller, Type: varchar(255), 'Null': false, Default: 'NULL', Extra: '' }
     start: { Field: start, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
     type: { Field: type, Type: varchar(8), 'Null': false, Default: 'NULL', Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     type: { Name: type, Columns: [type], Unique: false, Type: BTREE }
 plugins:
   Columns:
