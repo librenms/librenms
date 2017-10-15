@@ -414,7 +414,6 @@ devices:
     notes: { Field: notes, Type: text, 'Null': true, Default: 'NULL', Extra: '' }
     os: { Field: os, Type: varchar(32), 'Null': true, Default: 'NULL', Extra: '' }
     override_sysLocation: { Field: override_sysLocation, Type: tinyint(1), 'Null': true, Default: '0', Extra: '' }
-    parent_id: { Field: parent_id, Type: 'int(11) unsigned', 'Null': true, Default: 'NULL', Extra: '' }
     poller_group: { Field: poller_group, Type: int(11), 'Null': false, Default: '0', Extra: '' }
     port: { Field: port, Type: 'smallint(5) unsigned', 'Null': false, Default: '161', Extra: '' }
     port_association_mode: { Field: port_association_mode, Type: int(11), 'Null': false, Default: '1', Extra: '' }
@@ -422,7 +421,6 @@ devices:
     retries: { Field: retries, Type: int(11), 'Null': true, Default: 'NULL', Extra: '' }
     serial: { Field: serial, Type: text, 'Null': true, Default: 'NULL', Extra: '' }
     snmpver: { Field: snmpver, Type: varchar(4), 'Null': false, Default: v2c, Extra: '' }
-    snmp_disable: { Field: snmp_disable, Type: tinyint(1), 'Null': false, Default: '0', Extra: '' }
     status: { Field: status, Type: tinyint(4), 'Null': false, Default: '0', Extra: '' }
     status_reason: { Field: status_reason, Type: varchar(50), 'Null': false, Default: 'NULL', Extra: '' }
     sysContact: { Field: sysContact, Type: text, 'Null': true, Default: 'NULL', Extra: '' }
@@ -442,7 +440,6 @@ devices:
     os: { Name: os, Columns: [os], Unique: false, Type: BTREE }
     last_polled: { Name: last_polled, Columns: [last_polled], Unique: false, Type: BTREE }
     last_poll_attempted: { Name: last_poll_attempted, Columns: [last_poll_attempted], Unique: false, Type: BTREE }
-    parent_id_idx: { Name: parent_id_idx, Columns: [parent_id], Unique: false, Type: BTREE }
 devices_attribs:
   Columns:
     attrib_id: { Field: attrib_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
