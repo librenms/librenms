@@ -19,7 +19,7 @@ $divisor = 1000;
 
 foreach ($pre_cache['ironware_optic_oids'] as $index => $entry) {
     if ($entry['snIfOpticalMonitoringRxPower']) {
-        if (strpos($entry['snIfOpticalMonitoringRxPower'],'N\/A') !== true) {
+        if (strpos($entry['snIfOpticalMonitoringRxPower'], 'N\/A') !== true) {
             return_num($entry);
             $oid = '.1.3.6.1.4.1.1991.1.1.3.3.6.1.3.' . $index;
             $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' Rx Power';
@@ -44,7 +44,7 @@ foreach ($pre_cache['ironware_optic_oids'] as $index => $entry) {
     }
 
     if ($entry['snIfOpticalMonitoringTxPower']) {
-        if (strpos($entry['snIfOpticalMonitoringTxPower'],'N\/A') !== true) {
+        if (strpos($entry['snIfOpticalMonitoringTxPower'], 'N\/A') !== true) {
             return_num($entry);
             $oid = '.1.3.6.1.4.1.1991.1.1.3.3.6.1.2.' . $index;
             $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' Tx Power';
