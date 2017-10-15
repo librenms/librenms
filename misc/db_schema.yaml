@@ -999,12 +999,10 @@ perf_times:
     devices: { Field: devices, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
     doing: { Field: doing, Type: varchar(64), 'Null': false, Default: 'NULL', Extra: '' }
     duration: { Field: duration, Type: 'double(8,2)', 'Null': false, Default: 'NULL', Extra: '' }
-    id: { Field: id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
     poller: { Field: poller, Type: varchar(255), 'Null': false, Default: 'NULL', Extra: '' }
     start: { Field: start, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
     type: { Field: type, Type: varchar(8), 'Null': false, Default: 'NULL', Extra: '' }
   Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     type: { Name: type, Columns: [type], Unique: false, Type: BTREE }
 plugins:
   Columns:
