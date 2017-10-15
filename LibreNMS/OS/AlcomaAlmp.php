@@ -32,7 +32,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
 
-class Alcoma extends OS implements
+class AlcomaAlmp extends OS implements
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
     WirelessRssiDiscovery,
