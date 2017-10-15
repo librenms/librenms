@@ -50,3 +50,15 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
         discover_sensor($valid['sensor'], 'humidity', $device, $cur_oid, 'memSensorsHumidity.' . $index, 'apc', $descr, $divisor, $multiplier, null, null, null, null, $value);
     }
 }
+foreach ($pre_cache['r2pdu_humidity_temp_table'] as $index => $data) {
+    if ($data['rPDU2SensorTempHumidityStatusType'] != 'notInstalled') {
+        $cur_oid    = '.1.3.6.1.4.1.318.1.1.26.10.2.2.1.10.' . $index;
+        $descr      = $data['rPDU2SensorTempHumidityStatusName'];
+        $divisor    = 1;
+        $multiplier = 1;
+        $value      = $data['rPDU2SensorTempHumidityStatusRelativeHumidity'];
+        if (is_numeric($value)) {
+            discover_sensor($valid['sensor'], 'humidity', $device, $cur_oid, 'rPDU2SensorTempHumidityStatusRelativeHumidity.' . $index, 'apc', $descr, $divisor, $multiplier, null, null, null, null, $value);
+        }
+    }
+}
