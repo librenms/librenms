@@ -1,6 +1,6 @@
 <?php
 /**
- * Alcoma.php
+ * AlcomaAlmp.php
  *
  * Alcoma.cz
  *
