@@ -81,7 +81,7 @@ if (Config::get('autodiscovery.xdp') === true) {
     echo PHP_EOL;
 }//end if
 
-if ($device['os'] == 'pbn' && Config::get('autodiscovery.xdp') === true) {
+if (($device['os'] == 'pbn' || $device['os'] == 'bdcom') && Config::get('autodiscovery.xdp') === true) {
     echo ' NMS-LLDP-MIB: ';
     $lldp_array  = snmpwalk_group($device, 'lldpRemoteSystemsData', 'NMS-LLDP-MIB');
 
