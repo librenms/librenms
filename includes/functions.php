@@ -2333,7 +2333,8 @@ function get_device_oid_limit($device)
  */
 function return_num($entry)
 {
-    $str_value = $entry;
-    preg_match('/-?\d*\.?\d+/', $str_value, $num_response);
-    $entry = $num_response[0];
+    if (!is_numeric($entry)) {
+        preg_match('/-?\d*\.?\d+/', $entry, $num_response);
+        return $num_response[0];
+    }
 }
