@@ -98,24 +98,31 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     foreach ($ospf_instances_poll as $ospf_instance_id => $ospf_entry) {
         // If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
         if (empty($ospf_instances_db[$ospf_instance_id][$device['context_name']])) {
-            dbInsert(array('device_id' => $device['device_id'], 'ospf_instance_id' => $ospf_instance_id, 'context_name' => $device['context_name']), 'ospf_instances');
+            $tmp_insert = array(
+                    'device_id' => $device['device_id'],
+                    'ospf_instance_id' => $ospf_instance_id,
+                    'context_name' => $device['context_name'],
+            );
+            foreach ($ospf_oids_db as $oid_db) {
+                $tmp_insert[$oid_db] = $ospf_entry[$oid_db];
+            }
+            dbInsert($tmp_insert, 'ospf_instances');
+            unset($tmp_insert);
             echo '+';
             $entry = dbFetchRow('SELECT * FROM `ospf_instances` WHERE `device_id` = ? AND `ospf_instance_id` = ? AND `context_name` = ?', array($device['device_id'], $ospf_instance_id, $device['context_name']));
             $ospf_instances_db[$ospf_instance_id][$device['context_name']] = $entry;
         }
     }
 
-    if ($debug) {
-        echo "\nPolled: ";
-        print_r($ospf_instances_poll);
-        echo 'Database: ';
-        print_r($ospf_instances_db);
-        echo "\n";
-    }
+    d_echo("\nPolled: ");
+    d_echo($ospf_instances_poll);
+    d_echo('Database: ');
+    d_echo($ospf_instances_db);
 
     // Loop array of entries and update
     if (is_array($ospf_instances_db)) {
         foreach ($ospf_instances_db as $ospf_instance_id => $ospf_instance_db) {
+            $ospf_instance_db = $ospf_instances_db[$device['context_name']];
             if (is_array($ospf_instances_poll[$ospf_instance_id])) {
                 $ospf_instance_poll = $ospf_instances_poll[$ospf_instance_id];
                 foreach ($ospf_oids_db as $oid) {
@@ -159,24 +166,27 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     foreach ($ospf_areas_poll as $ospf_area_id => $ospf_area) {
         // If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
         if (empty($ospf_areas_db[$ospf_area_id][$device['context_name']])) {
-            dbInsert(array('device_id' => $device['device_id'], 'ospfAreaId' => $ospf_area_id, 'context_name' => $device['context_name']), 'ospf_areas');
+            $tmp_insert = array('device_id' => $device['device_id'], 'ospfAreaId' => $ospf_area_id, 'context_name' => $device['context_name']);
+            foreach ($ospf_area_oids as $oid_db) {
+                $tmp_insert[$oid_db] = $ospf_area[$oid_db];
+            }
+            dbInsert($tmp_insert, 'ospf_areas');
+            unset($tmp_insert);
             echo '+';
             $entry = dbFetchRows('SELECT * FROM `ospf_areas` WHERE `device_id` = ? AND `ospfAreaId` = ? AND `context_name` = ?', array($device['device_id'], $ospf_area_id, $device['context_name']));
             $ospf_areas_db[$ospf_area_id][$device['context_name']] = $entry;
         }
     }
 
-    if ($debug) {
-        echo "\nPolled: ";
-        print_r($ospf_areas_poll);
-        echo 'Database: ';
-        print_r($ospf_areas_db);
-        echo "\n";
-    }
+    d_echo("\nPolled: ");
+    d_echo($ospf_areas_poll);
+    d_echo('Database: ');
+    d_echo($ospf_areas_db);
 
     // Loop array of entries and update
     if (is_array($ospf_areas_db)) {
         foreach ($ospf_areas_db as $ospf_area_id => $ospf_area_db) {
+            $ospf_area_db = $ospf_area_db[$device['context_name']];
             if (is_array($ospf_areas_poll[$ospf_area_id])) {
                 $ospf_area_poll = $ospf_areas_poll[$ospf_area_id];
                 foreach ($ospf_area_oids as $oid) {
@@ -224,23 +234,28 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     foreach ($ospf_ports_poll as $ospf_port_id => $ospf_port) {
         // If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
         if (empty($ospf_ports_db[$ospf_port_id][$device['context_name']])) {
-            dbInsert(array('device_id' => $device['device_id'], 'ospf_port_id' => $ospf_port_id, 'context_name' => $device['context_name']), 'ospf_ports');
+            $tmp_insert = array('device_id' => $device['device_id'], 'ospf_port_id' => $ospf_port_id, 'context_name' => $device['context_name']);
+            foreach ($ospf_port_oids as $oid_db) {
+                $tmp_insert[$oid_db] = $ospf_port[$oid_db];
+            }
+            // Set port_id temporarily for mysql strict mode
+            $tmp_insert['port_id'] = 0;
+            dbInsert($tmp_insert, 'ospf_ports');
+            unset($tmp_insert);
             echo '+';
             $ospf_ports_db[$ospf_port_id][$device['context_name']] = dbFetchRow('SELECT * FROM `ospf_ports` WHERE `device_id` = ? AND `ospf_port_id` = ? AND `context_name` = ?', array($device['device_id'], $ospf_port_id, $device['context_name']));
         }
     }
 
-    if ($debug) {
-        echo "\nPolled: ";
-        print_r($ospf_ports_poll);
-        echo 'Database: ';
-        print_r($ospf_ports_db);
-        echo "\n";
-    }
+    d_echo("\nPolled: ");
+    d_echo($ospf_ports_poll);
+    d_echo('Database: ');
+    d_echo($ospf_ports_db);
 
     // Loop array of entries and update
     if (is_array($ospf_ports_db)) {
         foreach ($ospf_ports_db as $ospf_port_id => $ospf_port_db) {
+            $ospf_port_db = $ospf_port_db[$device['context_name']];
             if (is_array($ospf_ports_poll[$ospf_port_id])) {
                 $ospf_port_poll = $ospf_ports_poll[$ospf_port_id];
 
@@ -279,20 +294,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     }//end if
     unset($ospf_ports_poll);
 
-// OSPF-MIB::ospfNbrIpAddr.172.22.203.98.0 172.22.203.98
-// OSPF-MIB::ospfNbrAddressLessIndex.172.22.203.98.0 0
-// OSPF-MIB::ospfNbrRtrId.172.22.203.98.0 172.22.203.128
-// OSPF-MIB::ospfNbrOptions.172.22.203.98.0 2
-// OSPF-MIB::ospfNbrPriority.172.22.203.98.0 0
-// OSPF-MIB::ospfNbrState.172.22.203.98.0 full
-// OSPF-MIB::ospfNbrEvents.172.22.203.98.0 6
-// OSPF-MIB::ospfNbrLsRetransQLen.172.22.203.98.0 1
-// OSPF-MIB::ospfNbmaNbrStatus.172.22.203.98.0 active
-// OSPF-MIB::ospfNbmaNbrPermanence.172.22.203.98.0 dynamic
-// OSPF-MIB::ospfNbrHelloSuppressed.172.22.203.98.0 false
     echo ' Neighbours: ';
-
-    
 
     // Build array of existing entries
     foreach (dbFetchRows('SELECT * FROM `ospf_nbrs` WHERE `device_id` = ? AND `context_name` = ?', array($device['device_id'], $device['context_name'])) as $nbr_entry) {
@@ -305,24 +307,27 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     foreach ($ospf_nbrs_poll as $ospf_nbr_id => $ospf_nbr) {
         // If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
         if (!isset($ospf_nbrs_db[$ospf_nbr_id][$device['context_name']])) {
-            dbInsert(array('device_id' => $device['device_id'], 'ospf_nbr_id' => $ospf_nbr_id, 'context_name' => $device['context_name']), 'ospf_nbrs');
+            $tmp_insert = array('device_id' => $device['device_id'], 'port_id' => 0, 'ospf_nbr_id' => $ospf_nbr_id, 'context_name' => $device['context_name']);
+            foreach ($ospf_nbr_oids_db as $oid_db) {
+                $tmp_insert[$oid_db] = $ospf_nbr[$oid_db];
+            }
+            dbInsert($tmp_insert, 'ospf_nbrs');
+            unset($tmp_insert);
             echo '+';
             $entry = dbFetchRow('SELECT * FROM `ospf_nbrs` WHERE `device_id` = ? AND `ospf_nbr_id` = ? AND `context_name` = ?', array($device['device_id'], $ospf_nbr_id,$device['context_name']));
             $ospf_nbrs_db[$ospf_nbr_id][$device['context_name']] = $entry;
         }
     }
 
-    if ($debug) {
-        echo "\nPolled: ";
-        print_r($ospf_nbrs_poll);
-        echo 'Database: ';
-        print_r($ospf_nbrs_db);
-        echo "\n";
-    }
+    d_echo("\nPolled: ");
+    d_echo($ospf_nbrs_poll);
+    d_echo('Database: ');
+    d_echo($ospf_nbrs_db);
 
     // Loop array of entries and update
     if (is_array($ospf_nbrs_db)) {
         foreach ($ospf_nbrs_db as $ospf_nbr_id => $ospf_nbr_db) {
+            $ospf_nbr_db = $ospf_nbr_db[$device['context_name']];
             if (is_array($ospf_nbrs_poll[$ospf_nbr_id])) {
                 $ospf_nbr_poll = $ospf_nbrs_poll[$ospf_nbr_id];
 
