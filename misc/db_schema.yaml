@@ -514,8 +514,8 @@ device_perf:
     timestamp: { Field: timestamp, Type: datetime, 'Null': false, Default: 'NULL', Extra: '' }
     xmt: { Field: xmt, Type: float, 'Null': false, Default: 'NULL', Extra: '' }
   Indexes:
-    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
     id: { Name: id, Columns: [id], Unique: false, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
 entPhysical:
   Columns:
     device_id: { Field: device_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
