@@ -58,12 +58,15 @@ class Database implements ValidationGroup
         if ($lc_mode != 0) {
             $validator->fail(
                 'You have lower_case_table_names set to 1 or true in mysql config.',
-                'Set lower_case_table_names=0 in your mysql config file'
+                'Set lower_case_table_names=0 in your mysql config file in the [mysqld] section'
             );
         }
 
         if (empty($strict_mode) === false) {
-            $validator->fail("You have not set sql_mode='' in your mysql config");
+            $validator->fail(
+                "You have not set sql_mode='' in your mysql config",
+                "Set sql-mode='' in your mysql config file in the [mysqld] section"
+            );
         }
     }
 
@@ -78,7 +81,7 @@ class Database implements ValidationGroup
         if (empty($collation) !== true) {
             $validator->fail(
                 'MySQL Database collation is wrong: ' . implode(' ', $collation[0]),
-                'https://t.libren.ms/-zdwk'
+                'Check https://t.libren.ms/-zdwk for info on how to fix.'
             );
         }
 
@@ -89,7 +92,7 @@ class Database implements ValidationGroup
         $collation_tables = dbFetchRows($table_collation_sql);
         if (empty($collation_tables) !== true) {
             $result = ValidationResult::fail('MySQL tables collation is wrong: ')
-                ->setFix('http://bit.ly/2lAG9H8')
+                ->setFix('Check http://bit.ly/2lAG9H8 for info on how to fix.')
                 ->setList('Tables', $collation_tables);
             $validator->result($result);
         }
@@ -100,7 +103,7 @@ FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . Config::get('db_name'
         $collation_columns = dbFetchRows($column_collation_sql);
         if (empty($collation_columns) !== true) {
             $result = ValidationResult::fail('MySQL column collation is wrong: ')
-                ->setFix('https://t.libren.ms/-zdwk')
+                ->setFix('Check https://t.libren.ms/-zdwk for info on how to fix.')
                 ->setList('Columns', $collation_columns);
             $validator->result($result);
         }
