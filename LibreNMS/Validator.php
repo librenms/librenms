@@ -69,12 +69,14 @@ class Validator
 
                 $group->validate($this);
 
-                if ($print_group_status && $this->cli) {
-                    $status = ValidationResult::getStatusText($this->getGroupStatus($group_name));
-                    c_echo(" $status\n");
-                }
+                if ($this->cli) {
+                    if ($print_group_status) {
+                        $status = ValidationResult::getStatusText($this->getGroupStatus($group_name));
+                        c_echo(" $status\n");
+                    }
 
-                $this->printResults($group_name);
+                    $this->printResults($group_name);
+                }
             }
         }
     }
