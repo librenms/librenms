@@ -1,6 +1,6 @@
 <?php
 /**
- * Config.php
+ * Configuration.php
  *
  * Checks various config settings are correct.
  *
@@ -25,11 +25,11 @@
 
 namespace LibreNMS\Validations;
 
-use LibreNMS\Config as Configuration;
+use LibreNMS\Config;
 use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\Validator;
 
-class Config implements ValidationGroup
+class Configuration implements ValidationGroup
 {
     /**
      * Validate this module.
@@ -52,7 +52,7 @@ class Config implements ValidationGroup
         }
 
         // Test transports
-        if (Configuration::get('alerts.email.enable') == true) {
+        if (Config::get('alerts.email.enable') == true) {
             $validator->warn('You have the old alerting system enabled - this is to be deprecated on the 1st of June 2015: https://groups.google.com/forum/#!topic/librenms-project/1llxos4m0p4');
         }
     }

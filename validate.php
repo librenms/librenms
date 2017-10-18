@@ -37,7 +37,7 @@ if (isset($options['h'])) {
           - distributedpoller: this will test for the install running as a distributed poller
           - rrdcheck: this will check to see if your rrd files are corrupt
           Default groups:
-          - config: checks various config settings are correct
+          - configuration: checks various config settings are correct
           - database: checks the database for errors
           - disk: checks for disk space and other disk related issues
           - php: check that various PHP modules and functions exist
