@@ -306,6 +306,12 @@ $config['graph_types']['device']['panos_activetunnels']['section']      = 'firew
 $config['graph_types']['device']['panos_activetunnels']['order']        = '0';
 $config['graph_types']['device']['panos_activetunnels']['descr']        = 'Active GlobalProtect Tunnels';
 
+//OpenBSD Graphs
+$config['graph_types']['device']['pf_states']['section']           = 'firewall';
+$config['graph_types']['device']['pf_states']['order']             = '0';
+$config['graph_types']['device']['pf_states']['descr']             = 'States';
+
+
 //Pulse Secure Graphs
 $config['graph_types']['device']['pulse_users']['section']         = 'firewall';
 $config['graph_types']['device']['pulse_users']['order']           = '0';
