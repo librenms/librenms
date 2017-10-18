@@ -7,7 +7,7 @@ source: Installation/Installation-CentOS-7-Apache.md
     
     rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 
-    yum install composer cronie fping git httpd ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nmap php71w php71w-cli php71w-common php71w-curl php71w-gd php71w-mcrypt php71w-mysql php71w-snmp php70w-xml php71w-zip python-memcached rrdtool
+    yum install cronie fping git httpd ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nmap php71w php71w-cli php71w-common php71w-curl php71w-gd php71w-mcrypt php71w-mysql php71w-snmp php71w-xml php71w-zip python-memcached rrdtool
 
 #### Add librenms user
 
@@ -23,8 +23,8 @@ source: Installation/Installation-CentOS-7-Apache.md
 
 #### Configure MySQL
 
-    systemctl restart mariadb
-    mysql -uroot
+    systemctl start mariadb
+    mysql -u root
 
 > NOTE: Please change the 'password' below to something secure.
 ```sql
@@ -85,7 +85,11 @@ Add the following config, edit `ServerName` as required:
 
 #### SELinux
 
+Install the policy tool for SELinux:
+
     yum install policycoreutils-python
+ 
+Configure the contexts needed by LibreNMS:
 
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/logs(/.*)?'
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/logs(/.*)?'
@@ -136,7 +140,6 @@ LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large an
 Now head to the web installer and follow the on-screen instructions.
 
     http://librenms.example.com/install.php
-
 
 ### Final steps
 
