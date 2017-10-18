@@ -42,7 +42,7 @@ $config['db_socket']             = null;
 $config['own_hostname'] = 'localhost';
 
 // Location of executables
-$config['fping']                    = '/usr/bin/fping';
+$config['fping']                    = 'fping';
 $config['fping6']                   = 'fping6';
 $config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
