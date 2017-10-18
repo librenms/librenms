@@ -132,6 +132,7 @@ Configure the contexts needed by LibreNMS:
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/rrd(/.*)?'
     restorecon -RFvv /opt/librenms/rrd/
     setsebool -P httpd_can_sendmail=1
+    setsebool -P httpd_execmem 1
 
 #### Allow access through firewall
 
