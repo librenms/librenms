@@ -9,11 +9,6 @@ source: Installation/Installation-CentOS-7-Apache.md
 
     yum install cronie fping git httpd ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nmap php71w php71w-cli php71w-common php71w-curl php71w-gd php71w-mcrypt php71w-mysql php71w-snmp php71w-xml php71w-zip python-memcached rrdtool
 
-#### Add directories
-
-    mkdir rrd logs
-    chmod 775 rrd
-
 #### Add librenms user
 
     useradd librenms -d /opt/librenms -M -r
@@ -23,6 +18,11 @@ source: Installation/Installation-CentOS-7-Apache.md
 
     cd /opt
     git clone https://github.com/librenms/librenms.git librenms
+
+#### Add directories
+
+    mkdir rrd logs
+    chmod 775 rrd
 
 ## DB Server ##
 
