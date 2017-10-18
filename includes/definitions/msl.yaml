@@ -16,5 +16,3 @@ poller_modules:
 discovery_modules:
     bgp-peers: 0
     stp: 0
-    vmware-vminfo: 1
-    libvirt-vminfo: 1
