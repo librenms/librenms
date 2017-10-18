@@ -21,6 +21,7 @@ source: Installation/Installation-CentOS-7-Apache.md
 
 #### Add directories
 
+    cd /opt/librenms
     mkdir rrd logs
     chmod 775 rrd
 
