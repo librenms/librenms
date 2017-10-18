@@ -95,21 +95,6 @@ if (!file_exists('vendor/autoload.php')) {
     $pre_checks_failed = true;
 }
 
-// Check php modules we use to make sure they are loaded
-$extensions = array('mysqli','pcre','curl','session','snmp','mcrypt', 'xml');
-foreach ($extensions as $extension) {
-    if (extension_loaded($extension) == false) {
-        $missing_extensions[] = $extension;
-    }
-}
-if (!empty($missing_extensions)) {
-    print_fail("We couldn't find the following php extensions, please ensure they are installed:");
-    foreach ($missing_extensions as $extension) {
-        echo "$extension\n";
-    }
-    $pre_checks_failed = true;
-}
-
 if ($pre_checks_failed) {
     exit;
 }
@@ -120,22 +105,25 @@ require 'includes/init.php';
 // make sure install_dir is set correctly, or the next includes will fail
 if (!file_exists(Config::get('install_dir').'/config.php')) {
     $suggested = realpath(__DIR__ . '/../..');
-    print_fail('$config[\'install_dir\'] is not set correctly.  It should probably be set to: ' . $suggested);
+    print_fail('$config[\'install_dir\'] is not set correctly.', "It should probably be set to: $suggested");
     exit;
 }
+
+$validator = new Validator();
+
 
 // Connect to MySQL
 try {
     dbConnect();
-    print_ok('Database connection successful');
+
+    // pull in the database config settings
+    mergedb();
+    require 'includes/process_config.inc.php';
+
+    $validator->ok('Database connection successful', null, 'database');
 } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
-    print_fail('Error connecting to your database '.$e->getMessage());
+    $validator->fail('Error connecting to your database. '.$e->getMessage(), null, 'database');
 }
-// pull in the database config settings
-mergedb();
-
-
-$validator = new Validator();
 
 $precheck_complete = true; // disable shutdown function
 print_header($validator->getVersions());
@@ -154,12 +142,8 @@ $validator->validate($modules, isset($options['s'])||!empty($modules));
 
 function print_header($versions)
 {
-    if (!isset($versions)) {
-        $versions = version_info();
-    }
-
     $output = ob_get_clean();
-    @ob_end_clean();
+    ob_end_clean();
 
     echo <<< EOF
 ====================================
@@ -177,36 +161,14 @@ $output
 EOF;
 }
 
-function print_ok($msg)
-{
-    c_echo("[%gOK%n]    $msg\n");
-}//end print_ok()
-
-
+// output matches that of ValidationResult
 function print_fail($msg, $fix = null)
 {
     c_echo("[%RFAIL%n]  $msg");
     if ($fix && strlen($msg) > 72) {
         echo PHP_EOL . "       ";
     }
-    print_fix($fix);
-}
 
-
-function print_warn($msg, $fix = null)
-{
-    c_echo("[%YWARN%n]  $msg");
-    if ($fix && strlen($msg) > 72) {
-        echo PHP_EOL . "       ";
-    }
-    print_fix($fix);
-}
-
-/**
- * @param $fix
- */
-function print_fix($fix)
-{
     if (!empty($fix)) {
         c_echo(" [%BFIX%n] %B$fix%n");
     }

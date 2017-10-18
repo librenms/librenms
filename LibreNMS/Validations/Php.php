@@ -38,25 +38,23 @@ class Php implements ValidationGroup
      */
     public function validate(Validator $validator)
     {
-        $ini_tz = ini_get('date.timezone');
-        $sh_tz = rtrim(shell_exec('date +%Z'));
-        $php_tz = date('T');
-        if (empty($ini_tz)) {
-            $validator->fail(
-                'You have no timezone set for php.',
-                'http://php.net/manual/en/datetime.configuration.php#ini.date.timezone'
-            );
-        } elseif ($sh_tz !== $php_tz) {
-            $validator->fail("You have a different system timezone ($sh_tz) specified to the php configured timezone ($php_tz), please correct this.");
-        }
+        $this->checkExtensions($validator);
+        $this->checkFunctions($validator);
+        $this->checkTimezone($validator);
+    }
 
-        $required_modules = array('gd','mysqli','mcrypt');
+    private function checkExtensions(Validator $validator)
+    {
+        $required_modules = array('mysqli','pcre','curl','session','snmp','mcrypt', 'xml', 'gd');
         foreach ($required_modules as $extension) {
             if (!extension_loaded($extension)) {
                 $validator->fail("Missing PHP extension: $extension", "Please install $extension");
             }
         }
+    }
 
+    private function checkFunctions(Validator $validator)
+    {
         $disabled_functions = explode(',', ini_get('disable_functions'));
         $required_functions = array(
             'exec',
@@ -80,6 +78,21 @@ class Php implements ValidationGroup
             if (!is_readable('/dev/urandom')) {
                 $validator->warn("It also looks like we can't use /dev/urandom for user password hashing. We will fall back to generating our own hash - be warned");
             }
+        }
+    }
+
+    private function checkTimezone(Validator $validator)
+    {
+        $ini_tz = ini_get('date.timezone');
+        $sh_tz = rtrim(shell_exec('date +%Z'));
+        $php_tz = date('T');
+        if (empty($ini_tz)) {
+            $validator->fail(
+                'You have no timezone set for php.',
+                'http://php.net/manual/en/datetime.configuration.php#ini.date.timezone'
+            );
+        } elseif ($sh_tz !== $php_tz) {
+            $validator->fail("You have a different system timezone ($sh_tz) specified to the php configured timezone ($php_tz), please correct this.");
         }
     }
 

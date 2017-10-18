@@ -27,11 +27,12 @@ namespace LibreNMS;
 
 class Validator
 {
-    /**
-     * @var array
-     */
     private $validation_groups = array();
     private $results = array();
+
+    // data cache
+    private $username;
+    private $versions;
 
     /**
      * Validator constructor.
@@ -48,8 +49,6 @@ class Validator
             $this->validation_groups[$validation_name] = new $class();
             $this->results[$validation_name] = array();
         }
-
-        $this->cli = isCli();
     }
 
 
@@ -63,13 +62,13 @@ class Validator
     {
         foreach ($this->validation_groups as $group_name => $group) {
             if ((empty($validation_groups) && $group->isDefault()) || in_array($group_name, $validation_groups)) {
-                if ($print_group_status && $this->cli) {
+                if ($print_group_status && isCli()) {
                     echo "Checking $group_name:";
                 }
 
                 $group->validate($this);
 
-                if ($this->cli) {
+                if (isCli()) {
                     if ($print_group_status) {
                         $status = ValidationResult::getStatusText($this->getGroupStatus($group_name));
                         c_echo(" $status\n");
@@ -150,20 +149,23 @@ class Validator
      * This allows customizing ValidationResults before submitting.
      *
      * @param ValidationResult $result
+     * @param string $group manually specify the group, otherwise this will be inferred from the callers class name
      */
-    public function result(ValidationResult $result)
+    public function result(ValidationResult $result, $group = null)
     {
         // get the name of the validation that submitted this result
-        $class_name = 'unknown';
-        $bt = debug_backtrace();
-        foreach ($bt as $entry) {
-            if (starts_with($entry['class'], 'LibreNMS\Validations')) {
-                $class_name = str_replace('LibreNMS\Validations\\', '', $entry['class']);
-                break;
+        if (empty($group)) {
+            $group = 'unknown';
+            $bt = debug_backtrace();
+            foreach ($bt as $entry) {
+                if (starts_with($entry['class'], 'LibreNMS\Validations')) {
+                    $group = str_replace('LibreNMS\Validations\\', '', $entry['class']);
+                    break;
+                }
             }
         }
 
-        $this->results[strtolower($class_name)][] = $result;
+        $this->results[strtolower($group)][] = $result;
     }
 
     /**
@@ -171,10 +173,12 @@ class Validator
      *
      * @param string $message
      * @param string $fix
+     * @param string $group manually specify the group, otherwise this will be inferred from the callers class name
+
      */
-    public function ok($message, $fix = null)
+    public function ok($message, $fix = null, $group = null)
     {
-        $this->result(new ValidationResult($message, ValidationResult::SUCCESS, $fix));
+        $this->result(new ValidationResult($message, ValidationResult::SUCCESS, $fix), $group);
     }
 
     /**
@@ -182,10 +186,11 @@ class Validator
      *
      * @param string $message
      * @param string $fix
+     * @param string $group manually specify the group, otherwise this will be inferred from the callers class name
      */
-    public function warn($message, $fix = null)
+    public function warn($message, $fix = null, $group = null)
     {
-        $this->result(new ValidationResult($message, ValidationResult::WARNING, $fix));
+        $this->result(new ValidationResult($message, ValidationResult::WARNING, $fix), $group);
     }
 
     /**
@@ -193,10 +198,11 @@ class Validator
      *
      * @param string $message
      * @param string $fix
+     * @param string $group manually specify the group, otherwise this will be inferred from the callers class name
      */
-    public function fail($message, $fix = null)
+    public function fail($message, $fix = null, $group = null)
     {
-        $this->result(new ValidationResult($message, ValidationResult::FAILURE, $fix));
+        $this->result(new ValidationResult($message, ValidationResult::FAILURE, $fix), $group);
     }
 
     /**
@@ -223,10 +229,10 @@ class Validator
      * Arguments match exec()
      *
      * @param string $command the command to run
-     * @param string $output will hold the output of the command
+     * @param array $output will hold the output of the command
      * @param int $code will hold the return code from the command
      */
-    public function execAsUser($command, &$output, &$code)
+    public function execAsUser($command, &$output = null, &$code = null)
     {
         if (self::getUsername() === 'root') {
             $command = 'su ' . Config::get('user') . ' -c "' . $command . '"';

@@ -46,10 +46,10 @@ class Mail implements ValidationGroup
                 $validator->fail('default_mail config option needs to be specified to test email');
                 $run_test = 0;
             } elseif (Config::get('email_backend') == 'sendmail') {
-                if (empty($config['email_sendmail_path'])) {
+                if (Config::has('email_sendmail_path')) {
                     $validator->fail("You have selected sendmail but not configured email_sendmail_path");
                     $run_test = 0;
-                } elseif (!file_exists($config['email_sendmail_path'])) {
+                } elseif (!file_exists(Config::get('email_sendmail_path'))) {
                     $validator->fail("The configured email_sendmail_path is not valid");
                     $run_test = 0;
                 }

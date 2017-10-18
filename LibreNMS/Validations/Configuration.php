@@ -39,18 +39,6 @@ class Configuration implements ValidationGroup
      */
     public function validate(Validator $validator)
     {
-        $ini_tz = ini_get('date.timezone');
-        $sh_tz = rtrim(shell_exec('date +%Z'));
-        $php_tz = date('T');
-
-        if (empty($ini_tz)) {
-            $validator->fail(
-                'You have no timezone set for php.'
-            );
-        } elseif ($sh_tz !== $php_tz) {
-            $validator->fail("You have a different system timezone ($sh_tz) specified to the php configured timezone ($php_tz), please correct this.");
-        }
-
         // Test transports
         if (Config::get('alerts.email.enable') == true) {
             $validator->warn('You have the old alerting system enabled - this is to be deprecated on the 1st of June 2015: https://groups.google.com/forum/#!topic/librenms-project/1llxos4m0p4');

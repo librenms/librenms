@@ -2202,11 +2202,12 @@ function dump_db_schema()
                 'Field'   => $data['COLUMN_NAME'],
                 'Type'    => $data['COLUMN_TYPE'],
                 'Null'    => $data['IS_NULLABLE'] === 'YES',
-                'Extra'   => $data['EXTRA'],
+                'Extra'   => str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $data['EXTRA']),
             );
 
             if (isset($data['COLUMN_DEFAULT'])) {
-                $def['Default'] = trim($data['COLUMN_DEFAULT'], "'");
+                $default = trim($data['COLUMN_DEFAULT'], "'");
+                $def['Default'] = str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $default);
             }
 
             $output[$table]['Columns'][] = $def;

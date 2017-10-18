@@ -259,7 +259,7 @@ FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . Config::get('db_name'
             || ($null == 'NOT NULL' && $column_data['Default'] == 'NULL')
         ) {
             $default = '';
-        } elseif ($column_data['Default'] === 'current_timestamp()') {
+        } elseif ($column_data['Default'] === 'CURRENT_TIMESTAMP') {
             $default = 'DEFAULT CURRENT_TIMESTAMP';
         } elseif ($column_data['Default'] == 'NULL') {
             $default = 'DEFAULT NULL';
