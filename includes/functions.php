@@ -2205,7 +2205,7 @@ function dump_db_schema()
                 'Extra'   => str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $data['EXTRA']),
             );
 
-            if (isset($data['COLUMN_DEFAULT'])) {
+            if (isset($data['COLUMN_DEFAULT']) && $data['COLUMN_DEFAULT'] != 'NULL') {
                 $default = trim($data['COLUMN_DEFAULT'], "'");
                 $def['Default'] = str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $default);
             }
