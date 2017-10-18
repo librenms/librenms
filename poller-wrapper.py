@@ -84,6 +84,7 @@ if config['db_socket']:
     db_socket = config['db_socket']
 else:
     db_server = config['db_host']
+    db_socket = None
 
 db_dbname = config['db_name']
 
