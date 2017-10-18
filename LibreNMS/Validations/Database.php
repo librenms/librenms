@@ -60,7 +60,6 @@ class Database implements ValidationGroup
 
         $this->checkCollation($validator);
         $this->checkSchema($validator);
-
     }
 
     private function checkMode(Validator $validator)
