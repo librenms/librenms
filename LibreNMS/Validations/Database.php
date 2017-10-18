@@ -274,9 +274,7 @@ FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '" . Config::get('db_name'
 
         $null = $column_data['Null'] ? 'NULL' : 'NOT NULL';
 
-        if ($column_data['Default'] == ''
-            || ($null == 'NOT NULL' && $column_data['Default'] == 'NULL')
-        ) {
+        if (!isset($column_data['Default'])) {
             $default = '';
         } elseif ($column_data['Default'] === 'CURRENT_TIMESTAMP') {
             $default = 'DEFAULT CURRENT_TIMESTAMP';
