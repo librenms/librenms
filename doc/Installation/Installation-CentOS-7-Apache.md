@@ -147,6 +147,9 @@ Now head to the web installer and follow the on-screen instructions.
 
     http://librenms.example.com/install.php
 
+Once you have completed the web installer steps. Please add the following to config.php
+
+    $config['fping'] = "/usr/sbin/fping";
 
 ### Final steps
 
