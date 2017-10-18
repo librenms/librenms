@@ -39,7 +39,7 @@ $config['db_port']=$dbport;
 $config['db_socket']=$dbsocket;
 
 if (!empty($config['db_socket'])) {
-    $config['db_host'] = '';
+    $config['db_host'] = 'localhost';
     $config['db_port'] = null;
 } else {
     $config['db_socket'] = null;
