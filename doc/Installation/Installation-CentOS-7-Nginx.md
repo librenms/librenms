@@ -7,7 +7,12 @@ source: Installation/Installation-CentOS-7-Nginx.md
 
     rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 
-    yum install composer cronie fping git ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nginx nmap php71w php71w-cli php71w-common php71w-curl php71w-fpm php71w-gd php71w-mcrypt php71w-mysql php71w-snmp php70w-xml php71w-zip python-memcached rrdtool
+    yum install cronie fping git ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nginx nmap php71w php71w-cli php71w-common php71w-curl php71w-fpm php71w-gd php71w-mcrypt php71w-mysql php71w-snmp php71w-xml php71w-zip python-memcached rrdtool
+
+#### Add directories
+
+    mkdir rrd logs
+    chmod 775 rrd
 
 #### Add librenms user
 
@@ -119,7 +124,11 @@ Delete the `server` section from `/etc/nginx/nginx.conf`
 
 #### SELinux
 
+Install the policy tool for SELinux:
+
     yum install policycoreutils-python
+
+Configure the contexts nedeed by LibreNMS:
 
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/logs(/.*)?'
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/logs(/.*)?'
@@ -128,7 +137,6 @@ Delete the `server` section from `/etc/nginx/nginx.conf`
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/rrd(/.*)?'
     restorecon -RFvv /opt/librenms/rrd/
     setsebool -P httpd_can_sendmail=1
-    setsebool -P httpd_execmem 1
 
 #### Allow access through firewall
 
