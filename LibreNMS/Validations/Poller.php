@@ -40,7 +40,16 @@ class Poller implements ValidationGroup
     public function validate(Validator $validator)
     {
         if (dbFetchCell('SELECT COUNT(*) FROM `devices`') == 0) {
-            $validator->warn("You have not added any devices yet.");
+            $result = ValidationResult::warn("You have not added any devices yet.");
+
+            if (isCli()) {
+                $result->setFix("You can add a device in the webui or with ./addhost.php");
+            } else {
+                $base_url = $validator->getBaseURL();
+                $result->setFix("You can add a device by visiting $base_url/addhost");
+            }
+
+            $validator->result($result);
             return; // can't check poller/discovery if there are no devices.
         }
 

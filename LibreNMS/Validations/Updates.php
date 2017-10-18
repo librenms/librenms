@@ -37,7 +37,7 @@ class Updates implements ValidationGroup
     public function validate(Validator $validator)
     {
         // if git is not available, we cannot do the other tests
-        if (!$this->gitExists()) {
+        if (!check_git_exists()) {
             $validator->warn('Unable to locate git. This should probably be installed.');
             return;
         }
@@ -76,16 +76,6 @@ class Updates implements ValidationGroup
             );
             $result->setList('Modified Files', $cmdoutput);
             $validator->result($result);
-        }
-    }
-
-    private function gitExists()
-    {
-        exec('git > /dev/null 2>&1', $response, $exit_code);
-        if ($exit_code === 1) {
-            return true;
-        } else {
-            return false;
         }
     }
 

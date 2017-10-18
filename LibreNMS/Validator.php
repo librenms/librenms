@@ -258,4 +258,16 @@ class Validator
 
         return $this->username;
     }
+
+    /**
+     * Get the base url for this LibreNMS install, this will only work from web pages.
+     * (unless base_url is set)
+     *
+     * @return string the base url without a trailing /
+     */
+    public function getBaseURL()
+    {
+        $url = Config::get('base_url', get_url());
+        return rtrim(str_replace('validate', '', $url), '/');
+    }
 }

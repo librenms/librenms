@@ -40,8 +40,27 @@ class Database implements ValidationGroup
         }
 
         $this->checkMode($validator);
+
+        // check database schema version
+        $current = get_db_schema();
+
+        $schemas = get_schema_list();
+        end($schemas);
+        $latest = key($schemas);
+
+        if ($current < $latest) {
+            $validator->fail(
+                "Your database schema ($current) is older than the latest ($latest).",
+                "Manually run ./daily.sh, and check for any errors."
+            );
+            return;
+        } elseif ($current > $latest) {
+            $validator->warn("Your schema ($current) is newer than than expected ($latest).  If you just switch to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.");
+        }
+
         $this->checkCollation($validator);
         $this->checkSchema($validator);
+
     }
 
     private function checkMode(Validator $validator)
@@ -58,14 +77,14 @@ class Database implements ValidationGroup
         if ($lc_mode != 0) {
             $validator->fail(
                 'You have lower_case_table_names set to 1 or true in mysql config.',
-                'Set lower_case_table_names=0 in your mysql config file in the [mysqld] section'
+                'Set lower_case_table_names=0 in your mysql config file in the [mysqld] section.'
             );
         }
 
         if (empty($strict_mode) === false) {
             $validator->fail(
-                "You have not set sql_mode='' in your mysql config",
-                "Set sql-mode='' in your mysql config file in the [mysqld] section"
+                "You have not set sql_mode='' in your mysql config.",
+                "Set sql-mode='' in your mysql config file in the [mysqld] section."
             );
         }
     }
