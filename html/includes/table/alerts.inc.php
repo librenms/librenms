@@ -10,14 +10,17 @@ $alert_states = array(
     'alerted' => 1,
     'acknowledged' => 2,
     'worse' => 3,
-    'better' => 4
+    'better' => 4,
 );
 
 $alert_severities = array(
     // alert_rules.status is enum('ok','warning','critical')
     'ok' => 1,
     'warning' => 2,
-    'critical' => 3
+    'critical' => 3,
+    'ok only' => 4,
+    'warning only' => 5,
+    'critical only' => 6,
 );
 
 $show_recovered = false;
@@ -45,7 +48,7 @@ if (isset($_POST['min_severity'])) {
         $min_severity_id = $alert_severities[$_POST['min_severity']];
     }
     if (isset($min_severity_id)) {
-        $where .= " AND `alert_rules`.`severity` >= ".$min_severity_id;
+        $where .= " AND `alert_rules`.`severity` ".($min_severity_id > 3 ? "" :">")."= ".($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
     }
 }
 

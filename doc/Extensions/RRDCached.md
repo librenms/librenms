@@ -34,35 +34,42 @@ Features: Supported features in the version indicated.
 | >=1.5.5 | No        | G,C,U    |
 | >=1.6.x | No        | G,C,U    |
 
-### RRDCached installation Debian Jessie (rrdcached 1.4.8)
-```ssh
-sudo apt-get install rrdcached
+It is recommended that you monitor your LibreNMS server with LibreNMS so you can view the disk I/O usage delta.
+
+### RRDCached installation CentOS 7
+1. Create `/etc/systemd/system/rrdcached.service` with this content:
+```
+[Unit]
+Description=Data caching daemon for rrdtool
+After=network.service
+
+[Service]
+Type=forking
+PIDFile=/run/rrdcached.pid
+ExecStart=/usr/bin/rrdcached -w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -B -R -j /var/tmp -l unix:/run/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/
+
+[Install]
+WantedBy=default.target
 ```
 
-- Edit /opt/librenms/config.php to include:
-```php
-$config['rrdcached']    = "unix:/var/run/rrdcached.sock";
+2. Start rrdcached
+```bash
+systemctl enable --now rrdcached.service
 ```
-- Edit /etc/default/rrdcached to include:
-```ssh
-OPTS="-s librenms"
-OPTS="$OPTS -l unix:/var/run/rrdcached.sock"
-OPTS="$OPTS -j /var/lib/rrdcached/journal/ -F"
-OPTS="$OPTS -b /opt/librenms/rrd/ -B"
-OPTS="$OPTS -w 1800 -z 1800 -f 3600 -t 4"
+
+3. Edit `/opt/librenms/config.php` to include:
+```php
+$config['rrdcached'] = "unix:/run/rrdcached.sock";
 ```
 
 ### RRDCached installation Ubuntu 16
-```ssh
+1. Install rrdcached
+```bash
 sudo apt-get install rrdcached
 ```
 
-- Edit /opt/librenms/config.php to include:
-```php
-$config['rrdcached']    = "unix:/var/run/rrdcached.sock";
+2. Edit `/etc/default/rrdcached` to include:
 ```
-- Edit /etc/default/rrdcached to include:
-```ssh
 DAEMON=/usr/bin/rrdcached
 DAEMON_USER=librenms
 DAEMON_GROUP=librenms
@@ -71,10 +78,51 @@ WRITE_TIMEOUT=1800
 WRITE_JITTER=1800
 BASE_PATH=/opt/librenms/rrd/
 JOURNAL_PATH=/var/lib/rrdcached/journal/
-PIDFILE=/var/run/rrdcached.pid
-SOCKFILE=/var/run/rrdcached.sock
+PIDFILE=/run/rrdcached.pid
+SOCKFILE=/run/rrdcached.sock
 SOCKGROUP=librenms
 BASE_OPTIONS="-B -F -R"
+```
+
+2. Fix permissions
+```bash
+chown librenms:librenms /var/lib/rrdcached/journal/
+```
+
+3. Restart the rrdcached service
+```bash
+systemctl restart rrdcached.service
+```
+
+5. Edit `/opt/librenms/config.php` to include:
+```php
+$config['rrdcached'] = "unix:/var/run/rrdcached.sock";
+```
+
+### RRDCached installation Debian Jessie (rrdcached 1.4.8)
+
+1. Install rrdcached
+```bash
+sudo apt-get install rrdcached
+```
+
+2. Edit /etc/default/rrdcached to include:
+```bash
+OPTS="-s librenms"
+OPTS="$OPTS -l unix:/var/run/rrdcached.sock"
+OPTS="$OPTS -j /var/lib/rrdcached/journal/ -F"
+OPTS="$OPTS -b /opt/librenms/rrd/ -B"
+OPTS="$OPTS -w 1800 -z 1800 -f 3600 -t 4"
+```
+
+3. Restart the rrdcached service
+```bash
+    systemctl restart rrdcached.service
+```
+
+4. Edit /opt/librenms/config.php to include:
+```php
+$config['rrdcached'] = "unix:/var/run/rrdcached.sock";
 ```
 
 ### RRDCached installation CentOS 6
@@ -112,55 +160,9 @@ service rrdcached start
 ```php
 $config['rrdcached']    = "unix:/var/run/rrdcached/rrdcached.sock";
 ```
-### RRDCached installation CentOS 7
-This example is based on a fresh LibreNMS install, on a minimal CentOS 7.x installation.
-We'll use the epel-release and setup a RRDCached as a service.
-It is recommended that you monitor your LibreNMS server with LibreNMS so you can view the disk I/O usage delta.
-See [Installation (RHEL CentOS)][1] for localhost monitoring.
 
-- Install the EPEL and update the repos and RRDtool.
-```ssh
-yum install epel-release
-yum update
-yum update rrdtool
-```
+## Verify
 
-- Create the needed directories, set ownership and permissions.
-```ssh
-mkdir /var/run/rrdcached
-chown librenms:librenms /var/run/rrdcached
-chmod 755 /var/run/rrdcached
-```
-
-- Create an rrdcached service for easy daemon management.
-```ssh
-touch /etc/systemd/system/rrdcached.service
-```
-- Edit rrdcached.service and paste the example config:
-```ssh
-[Unit]
-Description=Data caching daemon for rrdtool
-After=network.service
-
-[Service]
-Type=forking
-PIDFile=/run/rrdcached.pid
-ExecStart=/usr/bin/rrdcached -w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -B -R -j /var/tmp -l unix:/var/run/rrdcached/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/
-
-[Install]
-WantedBy=default.target
-```
-
-- Reload the systemd unit files from disk, so it can recognize the newly created rrdcached.service. Enable the rrdcached.service on boot and start the service.
-```ssh
-systemctl daemon-reload
-systemctl enable --now rrdcached.service
-```
-
-- Edit /opt/librenms/config.php to include:
-```ssh
-$config['rrdcached']    = "unix:/var/run/rrdcached/rrdcached.sock";
-```
 Check to see if the graphs are being drawn in LibreNMS. This might take a few minutes.
 After at least one poll cycle (5 mins), check the LibreNMS disk I/O performance delta.
 Disk I/O can be found under the menu Devices>All Devices>[localhost hostname]>Health>Disk I/O.
