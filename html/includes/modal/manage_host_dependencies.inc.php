@@ -25,6 +25,7 @@ if (is_admin() === false) {
                 <h5 class="modal-title" id="mandeps">Host Dependency for multiple hosts</h5>
             </div>
             <div class="modal-body">
+                <div id="mandeps-msg"></div>
                 <p>Here you can modify multiple hosts dependencies. Setting the parent host to "None" will clear the dependency.</p>
                 <br />
                 <div class="form-group">
@@ -69,7 +70,7 @@ $('#manavailableparents').on('change', '', function(e) {
             });
         },
         error: function(output) {
-            console.log(output);
+            $("#mandeps-msg").html('<div class="alert alert-info"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Host dependencies could not be retrieved from the database</div>');
         }
     });
 });
@@ -88,6 +89,7 @@ $('#manage-dependencies').on('hide.bs.modal', function() {
 $('#manage-dependencies').on('show.bs.modal', function() {
     // So that we'll see all devices. 
     var device_id = 0;
+    $('#message').empty();
 
     $.ajax({
         type: 'POST',
@@ -113,10 +115,13 @@ $('#manage-dependencies').on('show.bs.modal', function() {
 $('#manhostdep-save').click('', function(event) {
     event.preventDefault();
     var device_ids = [];
+    var children = [];
     var parent_id = $("#manavailableparents").find(":selected").val();
+    var parent_host = $("#manavailableparents").find(":selected").text();
     $("#manalldevices option:selected").each( function() {
         if ($(this).length) {
             device_ids.push($(this).val());
+            children.push($(this).text());
         }
     });
 
@@ -128,16 +133,23 @@ $('#manhostdep-save').click('', function(event) {
         success: function(msg) {
             $("#message").html('<div class="alert alert-info"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+msg+'</div>');
             $("#manage-dependencies").modal('hide');
-            setTimeout(function() {
-               location.reload(1);
-            }, 1000);
+            var arrayLength = device_ids.length;
+            console.log(arrayLength);
+            for (var i = 0; i < arrayLength; i++) {
+                $('#hostdeps').find('td.childhost').each(function() { 
+                    if ($(this).text() == children[i]) {
+                        $(this).next().text(parent_host);
+
+                    }
+                });
+            }
         },
         error: function() {
             $("#message").html('<div class="alert alert-info"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span><button>The host dependency could not be saved.</div>');
             $("#manage-dependencies").modal('hide');
             setTimeout(function() {
                location.reload(1);
-            }, 1000);
+            }, 5000);
         }
     });
 });

@@ -45,6 +45,7 @@ if (is_admin() === false) {
                 <form role="form" class="remove_token_form">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-success" id="hostdep-save" data-target="hostdep-save">Save</button>
+                    <input type="hidden" name="row_id" id="edit-row_id" value="">
                     <input type="hidden" name="device_id" id="edit-device_id" value="">
                     <input type="hidden" name="orig_parent_id" id="edit-parent_id" value="">
                 </form>
@@ -63,7 +64,6 @@ $('#edit-dependency').on('show.bs.modal', function() {
         data: { type: "get-host-dependencies", "device_id": device_id },
         dataType: "json",
         success: function(output) {
-            console.log($('#edit-parent_id').val());
             $.each(output, function (i, elem) {
                 if(elem.device_id == $('#edit-parent_id').val()) {
                     var select_line = "<option value=" + elem.device_id + " selected='selected'>" + elem.hostname + "</option>";
@@ -78,7 +78,9 @@ $('#edit-dependency').on('show.bs.modal', function() {
 
 $('#hostdep-save').click('', function(event) {
     event.preventDefault();
+    var row_id = $("#edit-row_id").val();
     var parent_id = $("#availableparents").find(":selected").val();
+    var parent_host = $("#availableparents").find(":selected").text();
     var device_id = $("#edit-device_id").val();
     var device_ids = [];
     device_ids.push(device_id);
@@ -98,9 +100,7 @@ $('#hostdep-save').click('', function(event) {
                     .end()
                     .append('<option value="0">None</option>')
                     .val('0');
-               setTimeout(function() {
-                   location.reload(1);
-               }, 1000);
+                $('[data-row-id='+row_id+']').find('.parenthost').text(parent_host);
             }
         },
         error: function() {

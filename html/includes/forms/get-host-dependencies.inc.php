@@ -17,11 +17,11 @@ if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
-syslog(LOG_INFO, 'alo');
 if (isset($_POST['viewtype'])) {
     if ($_POST['viewtype'] == 'fulllist') {
-        $device_deps = dbFetchRows("SELECT a.device_id as id, a.hostname as child, b.hostname as parent, b.device_id as parentid from devices as a LEFT JOIN devices as b ON a.parent_id = b.device_id ORDER BY a.hostname");
-        echo json_encode($device_deps);
+        $deps_query = "SELECT a.device_id as id, a.hostname as hostname, b.hostname as parent, b.device_id as parentid from devices as a LEFT JOIN devices as b ON a.parent_id = b.device_id ORDER BY a.hostname";
+        $device_deps = dbFetchRows($deps_query);
+        echo json_encode($device_depts);
         exit;
     } else if ($_POST['viewtype'] == 'fromparent' && is_numeric($_POST['parent_id'])) {
         // Another awful hack

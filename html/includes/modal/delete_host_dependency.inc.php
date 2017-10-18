@@ -31,6 +31,7 @@ if (is_admin() === false) {
                 <form role="form" class="remove_token_form">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-danger danger" id="hostdep-removal" data-target="hostdep-removal">Delete</button>
+                    <input type="hidden" name="row_id" id="delete-row_id" value="">
                     <input type="hidden" name="device_id" id="delete-device_id" value="">
                     <input type="hidden" name="parent_id" id="delete-parent_id" value="">
                     <input type="hidden" name="confirm" id="confirm" value="yes">
@@ -45,6 +46,7 @@ $('#hostdep-removal').click('', function(event) {
     event.preventDefault();
     var parent_id = $("#delete-parent_id").val();
     var device_id = $("#delete-device_id").val();
+    var row_id = $("#delete-row_id").val();
     $("#modal_hostname").text();
     $.ajax({
         type: 'POST',
@@ -52,18 +54,17 @@ $('#hostdep-removal').click('', function(event) {
         data: { type: "delete-host-dependency", device_id: device_id },
         dataType: "html",
         success: function(msg) {
-            $("#message").html('<div class="alert alert-info">'+msg+'</div>');
+            $("#message").html('<div class="alert alert-info"><button type="" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+msg+'</div>');
             $("#confirm-delete").modal('hide');
-            setTimeout(function() {
-               location.reload(1);
-            }, 1000);
+            // Clear the host association from html
+            $('[data-row-id='+row_id+']').find('.parenthost').text('None');
         },
         error: function() {
             $("#message").html('<div class="alert alert-info">The host dependency could not be deleted.</div>');
             $("#confirm-delete").modal('hide');
             setTimeout(function() {
                location.reload(1);
-            }, 1000);
+            }, 5000);
         }
     });
 });

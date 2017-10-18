@@ -804,6 +804,7 @@ function RunAlerts()
 
         if (IsParentDown($alert['device_id'])) {
             $noiss = true;
+            log_event('Skipped alerts because parent device is down', $alert['device_id'], 'alert', 1);
         }
 
         if (IsMaintenance($alert['device_id']) > 0) {
