@@ -1,6 +1,8 @@
 <?php
 
 // Build SNMP Cache Array
+use LibreNMS\Config;
+
 $port_stats = array();
 $port_stats = snmpwalk_cache_oid($device, 'ifDescr', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifName', $port_stats, 'IF-MIB');
@@ -17,7 +19,7 @@ d_echo($port_stats);
 // The port association configuration allows to choose between association via ifIndex, ifName,
 // or maybe other means in the future. The default port association mode still is ifIndex for
 // compatibility reasons.
-$port_association_mode = $config['default_port_association_mode'];
+$port_association_mode = Config::get('default_port_association_mode');
 if ($device['port_association_mode']) {
     $port_association_mode = get_port_assoc_mode_name($device['port_association_mode']);
 }

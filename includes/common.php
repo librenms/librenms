@@ -626,8 +626,13 @@ function is_valid_hostname($hostname)
     // labels to start with digits. No other symbols, punctuation characters, or
     // white space are permitted. While a hostname may not contain other characters,
     // such as the underscore character (_), other DNS names may contain the underscore
+    // maximum length is 253 characters, maximum segment size is 63
 
-    return ctype_alnum(str_replace('_', '', str_replace('-', '', str_replace('.', '', $hostname))));
+    return (
+        preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*\.?$/i", $hostname) //valid chars check
+        && preg_match("/^.{1,253}$/", $hostname) //overall length check
+        && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*\.?$/", $hostname)
+    );
 }
 
 /*
@@ -1691,7 +1696,11 @@ function uw_to_dbm($value)
  */
 function set_null($value, $default = null, $min = null)
 {
-    if (!is_numeric($value)) {
+    if (is_nan($value)) {
+        return $default;
+    } elseif (is_infinite($value)) {
+        return $default;
+    } elseif (!is_numeric($value)) {
         return $default;
     } elseif (isset($min) && $value < $min) {
         return $default;
@@ -1705,7 +1714,11 @@ function set_null($value, $default = null, $min = null)
  */
 function set_numeric($value, $default = 0)
 {
-    if (!isset($value) || !is_numeric($value)) {
+    if (is_nan($value) ||
+        is_infinite($value) ||
+        !isset($value) ||
+        !is_numeric($value)
+    ) {
         $value = $default;
     }
     return $value;

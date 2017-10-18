@@ -493,6 +493,42 @@ function list_bgp()
 }
 
 
+function list_ospf()
+{
+    global $config;
+    $app        = \Slim\Slim::getInstance();
+    $code       = 500;
+    $status     = 'error';
+    $message    = 'Error retrieving ospf_nbrs';
+    $sql        = '';
+    $sql_params = array();
+    $hostname   = $_GET['hostname'];
+    $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        $sql        = ' AND `device_id`=?';
+        $sql_params = array($device_id);
+    }
+
+    $ospf_neighbours       = dbFetchRows("SELECT * FROM ospf_nbrs WHERE `ospfNbrState` IS NOT NULL AND `ospfNbrState` != '' $sql", $sql_params);
+    $total_ospf_neighbours = count($ospf_neighbours);
+    if (is_numeric($total_ospf_neighbours)) {
+        $code    = 200;
+        $status  = 'ok';
+        $message = '';
+    }
+
+    $output = array(
+        'status'       => "$status",
+        'err-msg'      => $message,
+        'count'        => $total_ospf_neighbours,
+        'ospf_neighbours' => $ospf_neighbours,
+    );
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
+
+
 function get_graph_by_portgroup()
 {
     global $config;

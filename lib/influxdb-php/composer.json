@@ -25,6 +25,10 @@
             "email": "gianarb92@gmail.com"
         }
     ],
+    "prefer-stable": true,
+    "config": {
+        "platform": {"php": "5.5"}
+    },
     "require": {
         "php": "^5.5 | ^7.0",
         "guzzlehttp/guzzle": "6.*",

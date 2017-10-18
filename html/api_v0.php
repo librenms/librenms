@@ -15,7 +15,21 @@
 $init_modules = array('web', 'alerts');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
+use LibreNMS\Config;
+
 $app = new \Slim\Slim();
+
+if (Config::get('api.cors.enabled') === true) {
+    $corsOptions = array(
+        "origin" => Config::get('api.cors.origin'),
+        "maxAge" => Config::get('api.cors.maxage'),
+        "allowMethods" => Config::get('api.cors.allowmethods'),
+        "allowHeaders" => Config::get('api.cors.allowheaders'),
+    );
+    $cors = new \CorsSlim\CorsSlim($corsOptions);
+    $app->add($cors);
+}
+
 require $config['install_dir'] . '/html/includes/api_functions.inc.php';
 $app->setName('api');
 
@@ -26,6 +40,7 @@ $app->group(
             '/v0',
             function () use ($app) {
                 $app->get('/bgp', 'authToken', 'list_bgp')->name('list_bgp');
+                $app->get('/ospf', 'authToken', 'list_ospf')->name('list_ospf');
                 // api/v0/bgp
                 $app->get('/oxidized', 'authToken', 'list_oxidized')->name('list_oxidized');
                 $app->group(

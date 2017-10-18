@@ -10,6 +10,7 @@ During all of these examples we will be using the OS of `pulse` as the example O
 >  - [Adding Wireless Sensor information.](os/Wireless-Sensors.md)
 >  - [Adding custom graphs.](os/Custom-Graphs.md)
 >  - [Adding Unit tests (required).](os/Test-Units.md)
+>  - [Optional Settings](os/Settings.md)
 
 We currently have a script in pre-beta stages that can help speed up the process of deploying a new OS.
 It has support for add sensors in a basic form (except state sensors).

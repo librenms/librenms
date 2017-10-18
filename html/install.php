@@ -10,6 +10,7 @@ $stage = isset($_POST['stage']) ? $_POST['stage'] : 0;
 
 // Before we do anything, if we see config.php, redirect back to the homepage.
 if (file_exists('../config.php') && $stage != 6) {
+    unset($_SESSION['stage']);
     header("Location: /");
     exit;
 }
@@ -183,7 +184,7 @@ foreach ($modules as $extension) {
     echo "<tr class='$row_class'><td>PHP module <strong>$extension</strong></td><td>$status</td><td></td></tr>";
 }
 
-if (is_writable(session_save_path())) {
+if (is_writable(session_save_path() === '' ? '/tmp' : session_save_path())) {
     $status = 'yes';
     $row_class = 'success';
 } else {
@@ -312,7 +313,7 @@ echo "</td></tr>";
             output.innerHTML = e.currentTarget.responseText;
             output.scrollTop = output.scrollHeight - output.clientHeight; // scrolls the output area
         };
-        xhr.timeout = 40000; // if no response for 40s, allow the user to retry
+        xhr.timeout = 90000; // if no response for 90s, allow the user to retry
         xhr.ontimeout = function (e) {
             $("#retry-btn").css("display", "");
         };

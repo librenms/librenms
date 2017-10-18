@@ -11,12 +11,12 @@ Now onto the bit you're interested in, what is submitted and what we do with tha
 
 #### What is submitted ####
 - All data is anonymous.
-- Generic statistics are taken from the database, these include things like device total, type and os, port types, speeds and total, total bgp peers. Take a look at the code for full details.
+- Generic statistics are taken from the database, these include things like total devices, type and os, port types, speeds and total BGP peers. Take a look at the code for full details.
 - Pairs of sysDescr and sysObjectID from devices with a small amount of sanitation to prevent things like hostnames from being submitted.
 - We record version numbers of php, mysql, net-snmp and rrdtool
 - A random UUID is generated on your own install.
 - That's it!
-- Your IP isn't logged, even via our web service accepting the data. We don't need to know who you are so don't ask.
+- Your IP isn't logged, even via our web service accepting the data. We don't need to know who you are so we don't ask.
 
 #### What we do with the data ####
 - We store it, not for long - 3 months at the moment although this could change.

@@ -29,5 +29,7 @@ if (starts_with($sysDescr, 'Linux') || starts_with($sysObjectId, '.1.3.6.1.4.1.8
         }
     } elseif (preg_match('/^QNAP Systems/', snmp_get($device, "entPhysicalMfgName.1", "-Ovqn", "ENTITY-MIB"))) {
         $os = 'qnap';
+    } elseif (str_contains(snmp_get($device, 'upsIdentAgentSoftwareVersion.0', '-Osqnv', 'UPS-MIB'), 'RemotEye4')) {
+        $os = 'remoteye4';
     }
 }
