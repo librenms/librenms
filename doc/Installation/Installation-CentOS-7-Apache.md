@@ -19,12 +19,6 @@ source: Installation/Installation-CentOS-7-Apache.md
     cd /opt
     git clone https://github.com/librenms/librenms.git librenms
 
-#### Add directories
-
-    cd /opt/librenms
-    mkdir rrd logs
-    chmod 775 rrd
-
 ## DB Server ##
 
 #### Configure MySQL
@@ -95,7 +89,7 @@ Install the policy tool for SELinux:
 
     yum install policycoreutils-python
  
-Configure the contexts nedeed by LibreNMS:
+Configure the contexts needed by LibreNMS:
 
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/logs(/.*)?'
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/logs(/.*)?'
@@ -146,10 +140,6 @@ LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large an
 Now head to the web installer and follow the on-screen instructions.
 
     http://librenms.example.com/install.php
-
-Once you have completed the web installer steps. Please add the following to config.php
-
-    $config['fping'] = "/usr/sbin/fping";
 
 ### Final steps
 
