@@ -134,7 +134,6 @@ $('#manhostdep-save').click('', function(event) {
             $("#message").html('<div class="alert alert-info"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+msg+'</div>');
             $("#manage-dependencies").modal('hide');
             var arrayLength = device_ids.length;
-            console.log(arrayLength);
             for (var i = 0; i < arrayLength; i++) {
                 $('#hostdeps').find('td.childhost').each(function() { 
                     if ($(this).text() == children[i]) {
