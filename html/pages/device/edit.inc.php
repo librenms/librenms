@@ -12,7 +12,7 @@ if ($_SESSION['userlevel'] < '7') {
 } else {
     $panes['device']   = 'Device Settings';
     $panes['snmp']     = 'SNMP';
-    if(!$device['snmp_disable']) {
+    if (!$device['snmp_disable']) {
         $panes['ports']    = 'Port Settings';
     }
 
@@ -20,12 +20,12 @@ if ($_SESSION['userlevel'] < '7') {
         $panes['icon']  = 'Icon';
     }
 
-    if(!$device['snmp_disable']) {
+    if (!$device['snmp_disable']) {
         $panes['apps']     = 'Applications';
     }
     $panes['alerts']   = 'Alert Settings';
     $panes['alert-rules'] = 'Alert Rules';
-    if(!$device['snmp_disable']) {
+    if (!$device['snmp_disable']) {
         $panes['modules']  = 'Modules';
     }
 
@@ -43,7 +43,7 @@ if ($_SESSION['userlevel'] < '7') {
         $panes['wireless-sensors'] = 'Wireless Sensors';
     }
 
-    if(!$device['snmp_disable']) {
+    if (!$device['snmp_disable']) {
         $panes['storage']  = 'Storage';
         $panes['processors']  = 'Processors';
         $panes['mempools']  = 'Memory';
