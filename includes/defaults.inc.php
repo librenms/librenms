@@ -815,6 +815,8 @@ $config['update'] = 1;
 // Purge syslog and eventlog
 $config['syslog_purge'] = 30;
 // Number in days of how long to keep syslog entries for.
+$config['syslog_future_purge'] = 7;
+// Number in days of how far into the future we should be checking to delete syslog entries.
 $config['eventlog_purge'] = 30;
 // Number in days of how long to keep eventlog entries for.
 $config['authlog_purge'] = 30;

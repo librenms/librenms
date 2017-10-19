@@ -59,6 +59,23 @@ if ($options['f'] === 'syslog') {
         }
 
         dbDelete('syslog', 'seq >= ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $config['syslog_purge']));
+
+        $rows = (int)dbFetchCell('SELECT MIN(seq) FROM syslog');
+        while (true) {
+            $limit = dbFetchRow('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', array($rows));
+            if (empty($limit)) {
+                break;
+            }
+
+            if (dbDelete('syslog', 'seq >= ? AND seq < ? AND timestamp > DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $limit, $config['syslog_future_purge'])) > 0) {
+                $rows = $limit;
+                echo "Syslog cleared for entries from more than ".$config['syslog_future_purge']." days in the future 1000 limit\n";
+            } else {
+                break;
+            }
+        }
+
+        dbDelete('syslog', 'seq >= ? AND timestamp > DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $config['syslog_future_purge']));
     }
 }
 
