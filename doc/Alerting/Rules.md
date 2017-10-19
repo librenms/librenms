@@ -7,6 +7,11 @@ The GUI provides a simple way of creating basic rules.
 Creating more complicated rules which may include maths calculations and MySQL queries can be 
 done using [macros](Macros.md)
 
+#### Video on how the alert rules work in LibreNMS 
+[Alert Rules](https://youtu.be/ryv0j8GEkhM)
+#### Video on how to use alert rule with wildcards
+[Alert Rules wildcard](https://youtu.be/eYYioFNcrAk)
+
 ## Syntax
 
 Rules must consist of at least 3 elements: An __Entity__, a __Condition__ and a __Value__.
