@@ -44,7 +44,7 @@ $cmd = $config['install_dir'] . '/build-base.php -l';
 
 foreach ($db_vars as $var => $opt) {
     if ($_SESSION[$var]) {
-        $cmd .= " -$opt {$_SESSION[$var]}";
+        $cmd .= " -$opt " . escapeshellarg($_SESSION[$var]);
     }
 }
 

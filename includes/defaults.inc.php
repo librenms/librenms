@@ -42,7 +42,7 @@ $config['db_socket']             = null;
 $config['own_hostname'] = 'localhost';
 
 // Location of executables
-$config['fping']                    = '/usr/bin/fping';
+$config['fping']                    = 'fping';
 $config['fping6']                   = 'fping6';
 $config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
@@ -231,7 +231,8 @@ $config['uptime_warning'] = '84600';
 // Cosmetics
 $config['rrdgraph_def_text']  = '-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c FONT#000000 -c CANVAS#FFFFFF00 -c GRID#a5a5a5';
 $config['rrdgraph_def_text'] .= ' -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal';
-$config['rrdgraph_real_95th'] = false;
+$config['rrdgraph_real_percentile'] = false;
+$config['percentile_value'] = 95;
 // Set to TRUE if you want to display the 95% based on the highest value. (aka real 95%)
 $config['overlib_defaults'] = ",FGCOLOR,'#ffffff', BGCOLOR, '#e5e5e5', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#555555', TEXTCOLOR, '#3e3e3e'";
 $config['web_mouseover']    = true;

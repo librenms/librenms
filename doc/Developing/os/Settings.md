@@ -33,6 +33,13 @@ good_if: # ignore all other bad_if settings ifDescr (substring, case insensitive
 
 ```
 
+### Disable snmpbulkwalk
+Some devices have buggy snmp implementations and don't respond well to the more efficient snmpbulkwalk.
+To disable snmpbulkwalk and only use snmpwalk for an os set the following.
+
+```yaml
+nobulk: true
+```
 
 ### Storage Settings
 See also: [Global Storage Config](../../Support/Configuration.md#storage-configuration)

@@ -1,0 +1,147 @@
+PACKETLOGIC-RAID-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE,
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64,
+	Unsigned32, TimeTicks FROM SNMPv2-SMI
+	packetlogic2 FROM PACKETLOGIC-MIB
+	hw FROM PACKETLOGIC-HW-MIB
+	DisplayString, DateAndTime FROM SNMPv2-TC
+	CounterBasedGauge64 FROM HCNUM-TC;
+
+raid MODULE-IDENTITY
+	LAST-UPDATED "201212131322Z"
+	ORGANIZATION "Procera Networks, Inc."
+	CONTACT-INFO "support@proceranetworks.com"
+	DESCRIPTION "MIB for PacketLogic2 RAID devices"
+	REVISION "201212131322Z"
+	DESCRIPTION " Latest version at the revision date for version GET VERSION HERE"
+
+	::={hw 1}
+raidCfg	OBJECT IDENTIFIER ::={raid 1}
+
+
+
+
+
+LdEntry ::= SEQUENCE {
+	ldId DisplayString,
+	ldState DisplayString,
+	ldEntryIndex Integer32
+}
+
+ld	OBJECT-TYPE
+	SYNTAX SEQUENCE OF LdEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	::= {raid 3}
+
+ldEntry	OBJECT-TYPE
+	SYNTAX LdEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	INDEX { ldEntryIndex }
+	::= {ld 1}
+
+ldEntryIndex	OBJECT-TYPE
+	SYNTAX Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Unique Row Index for Conceptual Table"
+	::={ldEntry 999}
+
+
+
+
+DiskEntry ::= SEQUENCE {
+	diskId DisplayString,
+	diskState DisplayString,
+	diskEntryIndex Integer32
+}
+
+disk	OBJECT-TYPE
+	SYNTAX SEQUENCE OF DiskEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	::= {raid 4}
+
+diskEntry	OBJECT-TYPE
+	SYNTAX DiskEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	INDEX { diskEntryIndex }
+	::= {disk 1}
+
+diskEntryIndex	OBJECT-TYPE
+	SYNTAX Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Unique Row Index for Conceptual Table"
+	::={diskEntry 999}
+
+
+
+
+adpNumber	OBJECT-TYPE
+	SYNTAX	 Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of available adapters in system"
+
+	::={raidCfg 1}
+
+ldNumber	OBJECT-TYPE
+	SYNTAX	 Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of available logical devices in system"
+
+	::={raidCfg 2}
+
+diskNumber	OBJECT-TYPE
+	SYNTAX	 Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of available disks in system"
+
+	::={raidCfg 3}
+
+ldId	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "LD Index"
+
+	::={ldEntry 1}
+
+ldState	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "LD State"
+
+	::={ldEntry 2}
+
+diskId	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Disk Index"
+
+	::={diskEntry 1}
+
+diskState	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Disk State"
+
+	::={diskEntry 2}
+
+
+
+END

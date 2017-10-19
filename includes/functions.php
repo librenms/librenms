@@ -1920,25 +1920,6 @@ function get_toner_levels($device, $raw_value, $capacity)
 }
 
 /**
- * check if we should skip this device from discovery
- * @param $needles
- * @param $haystack
- * @param $name
- * @return bool
- */
-function can_skip_discovery($needles, $haystack, $name)
-{
-    foreach ((array)$needles as $needle) {
-        if (preg_match($needle ."i", $haystack)) {
-            d_echo("{$name} - regexp '{$needle}' matches '{$haystack}' - skipping device discovery \n");
-            return true;
-        }
-    }
-    return false;
-}
-
-
-/**
  * Intialize global stat arrays
  */
 function initStats()
@@ -2344,5 +2325,16 @@ function get_device_oid_limit($device)
         return $config['snmp']['max_oid'];
     } else {
         return 10;
+    }
+}
+
+/**
+ * Strip out non-numeric characters
+ */
+function return_num($entry)
+{
+    if (!is_numeric($entry)) {
+        preg_match('/-?\d*\.?\d+/', $entry, $num_response);
+        return $num_response[0];
     }
 }

@@ -10,14 +10,17 @@ $alert_states = array(
     'alerted' => 1,
     'acknowledged' => 2,
     'worse' => 3,
-    'better' => 4
+    'better' => 4,
 );
 
 $alert_severities = array(
     // alert_rules.status is enum('ok','warning','critical')
     'ok' => 1,
     'warning' => 2,
-    'critical' => 3
+    'critical' => 3,
+    'ok only' => 4,
+    'warning only' => 5,
+    'critical only' => 6,
 );
 
 //if( defined('SHOW_SETTINGS') || empty($widget_settings) ) {
@@ -47,14 +50,14 @@ if (defined('SHOW_SETTINGS')) {
   </div>
   <div class="form-group row">
     <div class="col-sm-4">
-      <label for="min_severity" class="control-label">Minimum displayed severity:</label>
+      <label for="min_severity" class="control-label">Displayed severity:</label>
     </div>
     <div class="col-sm-8">
       <select class="form-control" name="min_severity">
         <option value="">any severity</option>';
 
     foreach ($alert_severities as $name => $val) {
-        $common_output[] = "<option value=\"$val\"".($current_severity == $name || $current_severity == $val ? ' selected' : '').">$name or higher</option>";
+        $common_output[] = "<option value=\"$val\"".($current_severity == $name || $current_severity == $val ? ' selected' : '').">$name".($val > 3 ? "" : " or higher")."</option>";
     }
 
     $common_output[] = '
@@ -154,7 +157,7 @@ if (defined('SHOW_SETTINGS')) {
         $sev_name = $min_severity;
         if (is_numeric($min_severity)) {
             $sev_name = array_search($min_severity, $alert_severities);
-            $title = "$title >=$sev_name";
+            $title = "$title ".($min_severity > 3 ? "" :">")."=$sev_name";
         }
     }
 
