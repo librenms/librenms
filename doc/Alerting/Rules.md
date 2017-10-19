@@ -7,9 +7,9 @@ The GUI provides a simple way of creating basic rules.
 Creating more complicated rules which may include maths calculations and MySQL queries can be 
 done using [macros](Macros.md)
 
-# Video on how the alert rules work in LibreNMS 
+#### Video on how the alert rules work in LibreNMS 
 [Alert Rules](https://youtu.be/ryv0j8GEkhM)
-# Video on how to use alert rule with wildcards
+#### Video on how to use alert rule with wildcards
 [Alert Rules wildcard](https://youtu.be/eYYioFNcrAk)
 
 ## Syntax
