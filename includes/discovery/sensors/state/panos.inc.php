@@ -4,16 +4,12 @@ $temp = snmp_get($device, "panSysHAMode.0", "-Ovqe", "PAN-COMMON-MIB");
 $cur_oid = '.1.3.6.1.4.1.25461.2.1.2.1.13.0';
 $index = '0';
 
-echo $temp;
-
 #Convert string to integer
 if ($temp == 'active-passive') {
     $temp = 1;
 } elseif ($temp == 'active-active') {
     $temp = 2;
 }
-
-echo $temp;
 
 if (is_numeric($temp)) {
     //Create State Index
@@ -50,16 +46,12 @@ $temp = snmp_get($device, "panSysHAState.0", "-Ovqe", "PAN-COMMON-MIB");
 $cur_oid = '.1.3.6.1.4.1.25461.2.1.2.1.11.0';
 $index = '0';
 
-echo $temp;
-
 #Convert string to integer
 if ($temp == 'active') {
     $temp = 1;
 } elseif ($temp == 'passive') {
     $temp = 2;
 }
-
-echo $temp;
 
 if (is_numeric($temp)) {
     //Create State Index
@@ -96,16 +88,12 @@ $temp = snmp_get($device, "panSysHAPeerState.0", "-Ovqe", "PAN-COMMON-MIB");
 $cur_oid = '.1.3.6.1.4.1.25461.2.1.2.1.12.0';
 $index = '0';
 
-echo $temp;
-
 #Convert string to integer
 if ($temp == 'active') {
     $temp = 1;
 } elseif ($temp == 'passive') {
     $temp = 2;
 }
-
-echo $temp;
 
 if (is_numeric($temp)) {
     //Create State Index
