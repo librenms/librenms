@@ -142,6 +142,8 @@ function record_sensor_data($device, $all_sensors)
         'signal'      => 'dBm',
         'airflow'     => 'cfm',
         'snr'         => 'SNR',
+        'pressure'    => 'kPa',
+        'cooling'     => 'W',
     );
 
     foreach ($all_sensors as $sensor) {

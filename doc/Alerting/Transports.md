@@ -168,6 +168,9 @@ $config['alert']['transports']['hipchat'][] = array("url" => "https://api.hipcha
                                                     "message_format" => "text");
 ```
 
+These settings can also be configured from the WebUI, here's an example used for the HipChat V2 API:
+![HipChat V2 WebUI Example](/img/hipchatv2-webui.png)
+
 > Note: The default message format for HipChat messages is HTML.  It is
 > recommended that you specify the `text` message format to prevent unexpected
 > results, such as HipChat attempting to interpret angled brackets (`<` and

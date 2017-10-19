@@ -1,5 +1,4 @@
 source: General/Security.md
-# Security
 
 ### General
 Like any good software we take security seriously. However, bugs do make it into the software 
@@ -10,7 +9,7 @@ that should show that we take things seriously.
 As with any system of this nature, we highly recommend that you restrict access to the install via 
 a firewall or VPN.
 
-It is also highly recommended that the Web interface is protected with an SSL certificate such as one 
+It is also highly recommended that the Web interface is protected with an SSL certificate such as ones 
 provided by [LetsEncrypt](http://www.letsencrypt.org).
 
 When using HTTPS, it is recommended that you use secure, encrypted cookies to prevent session

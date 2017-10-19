@@ -626,8 +626,13 @@ function is_valid_hostname($hostname)
     // labels to start with digits. No other symbols, punctuation characters, or
     // white space are permitted. While a hostname may not contain other characters,
     // such as the underscore character (_), other DNS names may contain the underscore
+    // maximum length is 253 characters, maximum segment size is 63
 
-    return ctype_alnum(str_replace('_', '', str_replace('-', '', str_replace('.', '', $hostname))));
+    return (
+        preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*\.?$/i", $hostname) //valid chars check
+        && preg_match("/^.{1,253}$/", $hostname) //overall length check
+        && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*\.?$/", $hostname)
+    );
 }
 
 /*

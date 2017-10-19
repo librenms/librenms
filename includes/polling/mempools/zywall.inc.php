@@ -11,10 +11,22 @@
  */
 
 d_echo('Zywall');
-$perc = snmp_get($device, ".1.3.6.1.4.1.890.1.6.22.1.2.0", '-OvQ');
-if (is_numeric($perc)) {
-    $mempool['perc'] = $perc;
-    $mempool['used'] = $perc;
-    $mempool['total'] = 100;
-    $mempool['free'] = 100 - $perc;
+if ($mempool['mempool_index'] == 0) {
+    $perc = snmp_get($device, ".1.3.6.1.4.1.890.1.6.22.1.2.0", '-OvQ');
+    if (is_numeric($perc)) {
+        $mempool['perc'] = $perc;
+        $mempool['used'] = $perc;
+        $mempool['total'] = 100;
+        $mempool['free'] = 100 - $perc;
+    }
+}
+
+if ($mempool['mempool_index'] == 1) {
+    $perc = snmp_get($device, ".1.3.6.1.4.1.890.1.15.3.2.6.0", '-OvQ');
+    if (is_numeric($perc)) {
+        $mempool['perc'] = $perc;
+        $mempool['used'] = $perc;
+        $mempool['total'] = 100;
+        $mempool['free'] = 100 - $perc;
+    }
 }

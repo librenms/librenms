@@ -30,91 +30,65 @@ if (is_admin() === false) {
 ?>
 
 <div class="modal fade" id="search_rule_modal" tabindex="-1" role="dialog" aria-labelledby="search_rule" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h5 class="modal-title" id="search_rule">Search alert rule collection</h5>
+                <h5 class="modal-title" id="search_rule">Alert rule collection</h5>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <input type="hidden" name="template_rule_id" id="template_rule_id" value="">
-                        <input type="text" id="rule_suggest" name="rule_suggest" class="form-control" placeholder="Start typing..."/>
-                    </div>
-                    <div class="col-md-2">
-                        <input type="submit" id="rule_from_collection" name="rule_from_collection" value="Create" class="btn btn-sm btn-primary">
-                    </div>
+                <div class="table-responsive">
+                    <table id="rule_collection" class="table table-condensed table-hover">
+                        <thead>
+                            <tr>
+                                <th data-column-id="name" data-width="200px">Name</th>
+                                <th data-column-id="rule">Rule</th>
+                                <td data-column-id="action" data-formatter="action"></td>
+                            </tr>
+                        </thead>
+                        <?php
+                        $tmp_rule_id = 0;
+                        foreach (get_rules_from_json() as $rule) {
+                            $rule['rule_id'] = $tmp_rule_id;
+                            echo "
+                                <tr>
+                                    <td>{$rule['name']}</td>
+                                    <td>{$rule['rule']}</td>
+                                    <td>{$rule['rule_id']}</td>
+                                </tr>
+                            ";
+                            $tmp_rule_id++;
+                        }
+                        ?>
+                    </table>
+                    <script>
+                        var grid = $("#rule_collection").bootgrid({
+                            formatters: {
+                                "action": function (column, row) {
+                                    return "<button type=\"button\" id=\"rule_from_collection\" name=\"rule_from_collection\" data-rule_id=\"" + row.action + "\" class=\"btn btn-sm btn-primary rule_from_collection\">Select</button";
+                                }
+                            }
+                        }).on("loaded.rs.jquery.bootgrid", function()
+                        {
+                            grid.find(".rule_from_collection").on("click", function(e)
+                            {
+                                var template_rule_id = $(this).data("rule_id");
+                                    $("#template_id").val(template_rule_id);
+                                    $("#search_rule_modal").modal('hide');
+                                    $("#create-alert").modal('show');
+                            }).end();
+                        });
+                    </script>
                 </div>
-                <hr>
-                <div class="row">
-                    <div class="col-md-2">
-                        Rule:
-                    </div>
-                    <div class="col-md-8">
-                        <div id="rule_display"></div>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    var rule_suggestions = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        remote: {
-            url: "ajax_rulesuggest.php?type=alert_rule_collection&term=%QUERY",
-            filter: function (output) {
-                return $.map(output, function (item) {
-                    return {
-                        name: item.name,
-                        id: item.id,
-                        rule: item.rule,
-                    };
-                });
-            },
-            wildcard: "%QUERY"
-        }
-    });
-    rule_suggestions.initialize();
-    $('#rule_suggest').typeahead({
-            hint: true,
-            highlight: true,
-            minLength: 1,
-            classNames: {
-                menu: 'typeahead-left'
-            }
-        },
-        {
-            source: rule_suggestions.ttAdapter(),
-            async: true,
-            displayKey: 'name',
-            valueKey: 'id',
-            templates: {
-                suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
-            },
-            limit: 20
-        });
-
-    $("#rule_suggest").on("typeahead:selected typeahead:autocompleted", function(e,datum) {
-        $("#template_rule_id").val(datum.id);
-        $("#rule_display").html('<mark>' + datum.rule + '</mark>');
-    });
-
-    $("#rule_from_collection").click('', function(e) {
-        e.preventDefault();
-        $("#template_id").val($("#template_rule_id").val());
-        $("#search_rule_modal").modal('hide');
-        $("#create-alert").modal('show');
-    });
-
     $("#search_rule_modal").on('hidden.bs.modal', function(e) {
         $("#template_rule_id").val('');
         $("#rule_suggest").val('');
         $("#rule_display").html('');
     });
-
 </script>

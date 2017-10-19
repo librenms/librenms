@@ -351,12 +351,12 @@ config:
     config_descr: { Field: config_descr, Type: varchar(100), 'Null': false, Default: 'NULL', Extra: '' }
     config_disabled: { Field: config_disabled, Type: 'enum(''0'',''1'')', 'Null': false, Default: '0', Extra: '' }
     config_group: { Field: config_group, Type: varchar(50), 'Null': false, Default: 'NULL', Extra: '' }
-    config_group_order: { Field: config_group_order, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
+    config_group_order: { Field: config_group_order, Type: int(11), 'Null': false, Default: '0', Extra: '' }
     config_hidden: { Field: config_hidden, Type: 'enum(''0'',''1'')', 'Null': false, Default: '0', Extra: '' }
     config_id: { Field: config_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
     config_name: { Field: config_name, Type: varchar(255), 'Null': false, Default: 'NULL', Extra: '' }
     config_sub_group: { Field: config_sub_group, Type: varchar(50), 'Null': false, Default: 'NULL', Extra: '' }
-    config_sub_group_order: { Field: config_sub_group_order, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
+    config_sub_group_order: { Field: config_sub_group_order, Type: int(11), 'Null': false, Default: '0', Extra: '' }
     config_value: { Field: config_value, Type: varchar(512), 'Null': false, Default: 'NULL', Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [config_id], Unique: true, Type: BTREE }
@@ -683,7 +683,7 @@ links:
     protocol: { Field: protocol, Type: varchar(11), 'Null': true, Default: 'NULL', Extra: '' }
     remote_device_id: { Field: remote_device_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
     remote_hostname: { Field: remote_hostname, Type: varchar(128), 'Null': false, Default: 'NULL', Extra: '' }
-    remote_platform: { Field: remote_platform, Type: varchar(128), 'Null': false, Default: 'NULL', Extra: '' }
+    remote_platform: { Field: remote_platform, Type: varchar(256), 'Null': true, Default: 'NULL', Extra: '' }
     remote_port: { Field: remote_port, Type: varchar(128), 'Null': false, Default: 'NULL', Extra: '' }
     remote_port_id: { Field: remote_port_id, Type: int(11), 'Null': true, Default: 'NULL', Extra: '' }
     remote_version: { Field: remote_version, Type: varchar(256), 'Null': false, Default: 'NULL', Extra: '' }
@@ -1374,7 +1374,7 @@ session:
     session_expiry: { Field: session_expiry, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
     session_id: { Field: session_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
     session_token: { Field: session_token, Type: varchar(60), 'Null': false, Default: 'NULL', Extra: '' }
-    session_username: { Field: session_username, Type: varchar(30), 'Null': false, Default: 'NULL', Extra: '' }
+    session_username: { Field: session_username, Type: varchar(255), 'Null': false, Default: 'NULL', Extra: '' }
     session_value: { Field: session_value, Type: varchar(60), 'Null': false, Default: 'NULL', Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [session_id], Unique: true, Type: BTREE }
@@ -1523,7 +1523,7 @@ users:
     realname: { Field: realname, Type: varchar(64), 'Null': false, Default: 'NULL', Extra: '' }
     remember_token: { Field: remember_token, Type: varchar(100), 'Null': true, Default: 'NULL', Extra: '' }
     updated_at: { Field: updated_at, Type: timestamp, 'Null': false, Default: CURRENT_TIMESTAMP, Extra: '' }
-    username: { Field: username, Type: char(30), 'Null': false, Default: 'NULL', Extra: '' }
+    username: { Field: username, Type: varchar(255), 'Null': false, Default: 'NULL', Extra: '' }
     user_id: { Field: user_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [user_id], Unique: true, Type: BTREE }
