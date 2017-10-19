@@ -43,14 +43,13 @@ class User implements ValidationGroup
         // Check we are running this as the root user
         $username = $validator->getUsername();
         $lnms_username = Config::get('user');
+        $lnms_groupname = Config::get('group', $lnms_username); // if group isn't set, fall back to user
 
         if (!($username === 'root' || $username === $lnms_username)) {
             if (isCli()) {
                 $validator->fail('You need to run this script as root' .
                     (Config::has('user') ? ' or ' . $lnms_username : ''));
             } else {
-                // if group isn't set, fall back to user
-                $lnms_groupname = Config::get('group', $lnms_username);
                 $lnms_group = posix_getgrnam($lnms_groupname);
                 if (!in_array($username, $lnms_group['members'])) {
                     $validator->fail(
@@ -64,22 +63,22 @@ class User implements ValidationGroup
 
         // Let's test the user configured if we have it
         if (Config::has('user')) {
-            $user = $lnms_username;
             $dir = Config::get('install_dir');
 
-            $find_result = rtrim(`find $dir \! -user $user`);
+            $find_result = rtrim(`find $dir \! -user $lnms_username -o \! -group $lnms_groupname &> /dev/null`);
             if (!empty($find_result)) {
-                // This isn't just the log directory, let's print the list to the user
+                // Ignore the two logs that may be created by the
                 $files = array_diff(explode(PHP_EOL, $find_result), array(
                     "$dir/logs/error_log",
                     "$dir/logs/access_log",
                 ));
+
                 if (!empty($files)) {
                     $result = ValidationResult::fail(
-                        "We have found some files that are owned by a different user than $user, this " .
+                        "We have found some files that are owned by a different user than $lnms_username, this " .
                         'will stop you updating automatically and / or rrd files being updated causing graphs to fail.'
                     )
-                        ->setFix("chown -R $user:$user $dir")
+                        ->setFix("chown -R $lnms_username:$lnms_groupname $dir")
                         ->setList('Files', $files);
 
                     $validator->result($result);
@@ -88,6 +87,34 @@ class User implements ValidationGroup
         } else {
             $validator->warn("You don't have \$config['user'] set, this most likely needs to be set to librenms");
         }
+
+        // check permissions
+        $rrd_dir = Config::get('rrd_dir');
+        if (!$this->checkFilePermissions($rrd_dir, '660')) {
+            $validator->fail("The rrd folder has improper permissions.", "chmod ug+rw $rrd_dir");
+        }
+
+        $log_dir = Config::get('log_dir');
+        if (!$this->checkFilePermissions($log_dir, '660')) {
+            $validator->fail("The log folder has improper permissions.", "chmod ug+rw $log_dir");
+        }
+    }
+
+    /**
+     * Checks file permissions against a minimum permissions mask.
+     * This only check that bits are enabled, not disabled.
+     * The mask is in the same format as posix permissions. For example, 600 means user read and write.
+     *
+     * @param string $file the name of the file to check
+     * @param $mask
+     * @return bool
+     */
+    private function checkFilePermissions($file, $mask)
+    {
+        $perms = fileperms($file);
+        $mask = octdec($mask);
+
+        return ($perms & $mask) === $mask;
     }
 
     /**
