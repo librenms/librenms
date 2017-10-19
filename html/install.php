@@ -3,7 +3,12 @@ session_start();
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_POST = $_SESSION;
 } elseif (!file_exists("../config.php")) {
-    $_SESSION = array_replace($_SESSION, $_POST);
+    $allowed_vars = array('stage','build-ok','dbhost','dbuser','dbpass','dbname','dbport','dbsocket','add_user','add_pass','add_email');
+    foreach ($allowed_vars as $allowed) {
+        if (isset($_POST[$allowed])) {
+            $_SESSION[$allowed] = $_POST[$allowed];
+        }
+    }
 }
 
 $stage = isset($_POST['stage']) ? $_POST['stage'] : 0;
@@ -39,7 +44,7 @@ $config['db_port']=$dbport;
 $config['db_socket']=$dbsocket;
 
 if (!empty($config['db_socket'])) {
-    $config['db_host'] = '';
+    $config['db_host'] = 'localhost';
     $config['db_port'] = null;
 } else {
     $config['db_socket'] = null;

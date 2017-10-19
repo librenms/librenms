@@ -1424,6 +1424,10 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
  */
 function find_port_id($description, $identifier = '', $device_id = 0, $mac_address = null)
 {
+    if (!($device_id || $mac_address)) {
+        return 0;
+    }
+
     $sql = 'SELECT `port_id` FROM `ports` WHERE (0';
     $params = array();
 

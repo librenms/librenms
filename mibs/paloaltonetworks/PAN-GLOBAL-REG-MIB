@@ -1,0 +1,84 @@
+-- ***********************************************
+-- PAN-GLOBAL-REG-MIB.my
+--
+-- Palo Alto Networks Global Definitions.
+-- ***********************************************
+
+PAN-GLOBAL-REG DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-IDENTITY,
+		enterprises
+			FROM SNMPv2-SMI;
+
+	panGlobalRegModule MODULE-IDENTITY
+		LAST-UPDATED			"201106271040Z"
+		ORGANIZATION			"Palo Alto Networks"
+		CONTACT-INFO			"
+					Customer Support
+					Palo Alto Networks
+					4401 Great America Pkwy
+					Santa Clara, CA 95054-1211
+
+					+1 866-898-9087
+					support at paloaltonetworks dot com"
+
+		DESCRIPTION				"
+			A MIB module containing top-level OID definitions
+			for various sub-trees for Palo Alto Networks' enterprise MIB modules."
+
+		REVISION				"201102091610Z"
+		DESCRIPTION				"
+			Rev 1.0
+			Initial version of MIB module PAN-GLOBAL-REG."
+
+		::= { panModules 1 }
+
+	panRoot OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			The root of the OID sub-tree assigned to Palo Alto Networks assigned by
+			the Internet Assigned Numbers Authority (IANA)."
+		::= { enterprises 25461 }
+
+	panReg OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for registrations - identification of modules and logical and
+			physical components."
+		::= { panRoot 1 }
+
+	panModules OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for module registrations."
+		::= { panReg 1 }
+
+	panMibs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for all Palo Alto object and event definitions."
+		::= { panRoot 2 }
+
+	-- Sub-trees for Palo Alto managed objects
+
+	panCommonMib OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common Palo Alto object and event definitions.
+			These would be implemented by all Palo Alto products."
+		::= { panMibs 1 }
+
+	panSpecificMib OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for specific Palo Alto object and event definitions."
+		::= { panMibs 2 }
+
+	panProductsMibs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for all Palo Alto product specific definitions."
+		::= { panMibs 3 }
+
+END

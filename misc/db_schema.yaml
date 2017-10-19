@@ -351,12 +351,12 @@ config:
     config_descr: { Field: config_descr, Type: varchar(100), 'Null': false, Default: 'NULL', Extra: '' }
     config_disabled: { Field: config_disabled, Type: 'enum(''0'',''1'')', 'Null': false, Default: '0', Extra: '' }
     config_group: { Field: config_group, Type: varchar(50), 'Null': false, Default: 'NULL', Extra: '' }
-    config_group_order: { Field: config_group_order, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
+    config_group_order: { Field: config_group_order, Type: int(11), 'Null': false, Default: '0', Extra: '' }
     config_hidden: { Field: config_hidden, Type: 'enum(''0'',''1'')', 'Null': false, Default: '0', Extra: '' }
     config_id: { Field: config_id, Type: int(11), 'Null': false, Default: 'NULL', Extra: auto_increment }
     config_name: { Field: config_name, Type: varchar(255), 'Null': false, Default: 'NULL', Extra: '' }
     config_sub_group: { Field: config_sub_group, Type: varchar(50), 'Null': false, Default: 'NULL', Extra: '' }
-    config_sub_group_order: { Field: config_sub_group_order, Type: int(11), 'Null': false, Default: 'NULL', Extra: '' }
+    config_sub_group_order: { Field: config_sub_group_order, Type: int(11), 'Null': false, Default: '0', Extra: '' }
     config_value: { Field: config_value, Type: varchar(512), 'Null': false, Default: 'NULL', Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [config_id], Unique: true, Type: BTREE }

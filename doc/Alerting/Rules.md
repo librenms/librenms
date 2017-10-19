@@ -26,7 +26,7 @@ __Conditions__ can be any of:
 - Smaller or Equal `<=`
 
 __Values__ can be an entity or any single-quoted data.
-__Glues__ can be either `&&` for `AND` or `||` for `OR`.
+__Glues__ can be either `&&` for `AND`.  or `||` for `OR`. Note if you need to use `OR` `||` please use a macro. 
 
 __Note__: The difference between `Equals` and `Like` (and its negation) is that `Equals` does a strict comparison and `Like` allows the usage of MySQL RegExp.
 
