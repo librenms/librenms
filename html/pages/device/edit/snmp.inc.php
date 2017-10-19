@@ -119,13 +119,13 @@ echo "
     </div>
     <div id='snmp_override' style='display: ".($device['snmp_disable'] ? "block" : "none").";'>
     <div class='form-group'>
-    <label for='hardware' class='col-sm-2 control-label'>Hardware</label>
+    <label for='hardware' class='col-sm-2 control-label'>Hardware (optional)</label>
     <div class='col-sm-4'>
     <input id='hardware' class='form-control' name='hardware' value='".$device['hardware']."'/>
     </div>
     </div>
     <div class='form-group'>
-    <label for='os' class='col-sm-2 control-label'>OS</label>
+    <label for='os' class='col-sm-2 control-label'>OS (optional)</label>
     <div class='col-sm-4'>
     <input id='os' class='form-control' name='os' value='".$config['os'][$device['os']]['text']."'/>
     <input type='hidden' id='os_id' class='form-control' name='os_id' value='".$device['os']."'/>

@@ -113,15 +113,15 @@ $pagetitle[] = 'Add host';
     </div>
     <div id='snmp_override' style="display: none;">
         <div class='form-group'>
-            <label for='hardware' class='col-sm-3 control-label'>Hardware</label>
+            <label for='hardware' class='col-sm-3 control-label'>Hardware (optional)</label>
             <div class='col-sm-9'>
-                <input id='hardware' class='form-control' name='hardware' placeholder="Hardware"/>
+                <input id='hardware' class='form-control' name='hardware' placeholder="Hardware (optional)"/>
             </div>
         </div>
         <div class='form-group'>
-            <label for='os' class='col-sm-3 control-label'>OS</label>
+            <label for='os' class='col-sm-3 control-label'>OS (optional)</label>
             <div class='col-sm-9'>
-                <input id='os' class='form-control' name='os' placeholder="OS"/>
+                <input id='os' class='form-control' name='os' placeholder="OS (optional)"/>
                 <input type='hidden' id='os_id' class='form-control' name='os_id' />
             </div>
         </div>
