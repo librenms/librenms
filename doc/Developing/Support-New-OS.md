@@ -21,4 +21,4 @@ It will be of the type network and belongs to the vendor, Cisco:
 `./scripts/new-os.php -h 101 -o test-os -t network -v cisco`
 
 The process will then step you through the process with some more questions. Please be warned, this is 
-currently pre-beta and may cause some issues. Please let us know of any on IRC.
+currently pre-beta and may cause some issues. Please let us know of any on [Discord](https://t.libren.ms/discord).
