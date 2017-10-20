@@ -157,7 +157,7 @@ Run `./validate.php` as root from within your install.
 
 Re-run `./validate.php` once you've resolved any issues raised.
 
-You have an odd issue - we'd suggest you join our [discord channel](https://t.libren.ms/discord) to discuss.
+You have an odd issue - we'd suggest you join our [discord server](https://t.libren.ms/discord) to discuss.
 
 #### <a name="faq21"> What do the values mean in my graphs?</a>
 
