@@ -3,8 +3,8 @@ source: Extensions/RRDCached.md
 
 This document will explain how to setup RRDCached for LibreNMS.
 
-> If you are using rrdtool / rrdcached version 1.5 or above then this now supports creating rrd files over rrdcached. 
-If you have rrdcached 1.5.5 or above, we can also tune over rrdcached.
+> Since version 1.5, rrdtool / rrdcached now supports creating rrd files over rrdcached. 
+If you have rrdcached 1.5.5 or above, you can also tune over rrdcached.
 To enable this set the following config:
 
 ```php
