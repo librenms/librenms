@@ -75,7 +75,7 @@ Supported is quite a strong word :) The 'officially' supported distros are:
  - Red Hat / CentOS
  - Gentoo
 
-However we will always aim to help wherever possible so if you are running a distro that isn't one of the above then give it a try anyway and if you need help then jump on the [discord channel](https://t.libren.ms/discord).
+However we will always aim to help wherever possible so if you are running a distro that isn't one of the above then give it a try anyway and if you need help then jump on the [discord server](https://t.libren.ms/discord).
 
 #### <a name="faq5"> Do you have a demo available?</a>
 
