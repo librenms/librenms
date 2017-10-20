@@ -24,7 +24,7 @@ Now onto the bit you're interested in, what is submitted and what we do with tha
 - We use it to help prioritise issues and features that need to be worked on.
 - We use sysDescr and sysObjectID to create unit tests and improve OS discovery
 
-#### Questions and Answers ####
+#### Questions? ####
 - **Q.** How often is data submitted? **A.** We submit the data once a day according to running daily.sh via cron. If you disable this then opting in will not have any affect.
 - **Q.** Where can I see the data I submitted? **A.** You can't see the data raw, but we collate all of the data together and provide a dynamic site so you can see the results of all contributed stats [here](https://stats.librenms.org)
 - **Q.** I want my data removed. **A.** That's easy, simply press 'Clear remote stats' in the About LibreNMS page of your control panel, the next time the call back script is run it will remove all the data we have.
