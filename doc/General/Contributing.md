@@ -95,11 +95,9 @@ General Guidelines
   you need to reformat it after making the change, do so in a separate
   commit.
 
-- Please join us in IRC at irc.freenode.net in channel ##librenms if you're
+- Please join us in [discord](https://t.libren.ms/discord) if you're
   able.  Collaborating in real time makes the coordination of contributions
-  easier.  If you're not a regular IRC user, just browse to [Freenode
-  web chat](http://webchat.freenode.net/) and follow the prompts to chat
-  via the web client.
+  easier.
 
 - Ensure you read the Code Guidelines documentation and understand the code
   style that should be adhered to [6].
