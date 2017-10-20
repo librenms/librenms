@@ -1,0 +1,10 @@
+mib: UPS-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: upsBatteryTemperature
+                    num_oid: .1.3.6.1.2.1.33.1.2.7.
+                    index: 'upsBatteryTemperature.{{ $index }}'
+                    descr: Battery Temperature
