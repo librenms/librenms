@@ -14,7 +14,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     }
 
     foreach (Config::get('ipmi.type', array()) as $ipmi_type) {
-        $results = external_exec(Config::get('ipmitool')." -I $ipmi_type".$remote.' sensor 2>/dev/null|sort');
+        $results = external_exec(Config::get('ipmitool')." -I $ipmi_type".$remote.' sensor 2>/dev/null|sort|sed \'/discrete/d\'');
         if ($results != '') {
             set_dev_attrib($device, 'ipmi_type', $ipmi_type);
             echo "$ipmi_type ";
