@@ -312,6 +312,14 @@ By default we allow hosts to be added with duplicate sysName's, you can disable 
 $config['allow_duplicate_sysName'] = false;
 ```
 
+### Global poller and discovery modules
+Generally, it is a better to set these [per OS](../Developing/os/Settings.md#poller-and-discovery-modules) or device.
+
+```php
+$config['discovery_modules]['arp-table'] = 1;
+$config['poller_modules]['bgp-peers'] = 0;
+```
+
 ### SNMP Settings
 
 ```php
