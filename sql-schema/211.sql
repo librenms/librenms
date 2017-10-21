@@ -1,2 +1,2 @@
-TRUNCATE `perf_times`;
-ALTER TABLE `perf_times` ADD COLUMN `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;
+ALTER TABLE `config` CHANGE `config_group_order` `config_group_order` INT(11) NOT NULL DEFAULT 0;
+ALTER TABLE `config` CHANGE `config_sub_group_order` `config_sub_group_order` INT(11) NOT NULL DEFAULT 0;

@@ -2327,3 +2327,14 @@ function get_device_oid_limit($device)
         return 10;
     }
 }
+
+/**
+ * Strip out non-numeric characters
+ */
+function return_num($entry)
+{
+    if (!is_numeric($entry)) {
+        preg_match('/-?\d*\.?\d+/', $entry, $num_response);
+        return $num_response[0];
+    }
+}

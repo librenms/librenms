@@ -79,22 +79,20 @@ db_username = config['db_user']
 db_password = config['db_pass']
 db_port = int(config['db_port'])
 
-if config['db_host'][:5].lower() == 'unix:':
+if config['db_socket']:
     db_server = config['db_host']
-    db_port = 0
-elif config['db_socket']:
-    db_server = config['db_socket']
-    db_port = 0
+    db_socket = config['db_socket']
 else:
     db_server = config['db_host']
+    db_socket = None
 
 db_dbname = config['db_name']
 
 
 def db_open():
     try:
-        if db_port == 0:
-            db = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname)
+        if db_socket:
+            db = MySQLdb.connect(host=db_server, unix_socket=db_socket, user=db_username, passwd=db_password, db=db_dbname)
         else:
             db = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
         return db
