@@ -331,7 +331,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
             if (is_array($ospf_nbrs_poll[$ospf_nbr_id])) {
                 $ospf_nbr_poll = $ospf_nbrs_poll[$ospf_nbr_id];
 
-                $ospf_nbr_poll['port_id'] = @dbFetchCell('SELECT A.`port_id` FROM ipv4_addresses AS A, ospf_nbrs AS I WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND I.device_id = ? AND A.context_name = ?', array($ospf_nbr_poll['ospfNbrIpAddr'], $device['device_id'], $device['context_name']));
+                $ospf_nbr_poll['port_id'] = (int)dbFetchCell('SELECT A.`port_id` FROM ipv4_addresses AS A, ospf_nbrs AS I WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND I.device_id = ? AND A.context_name = ?', array($ospf_nbr_poll['ospfNbrIpAddr'], $device['device_id'], $device['context_name']));
 
                 if ($ospf_nbr_db['port_id'] != $ospf_nbr_poll['port_id']) {
                     if (!empty($ospf_nbr_poll['port_id'])) {
