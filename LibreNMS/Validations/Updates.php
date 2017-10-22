@@ -27,6 +27,7 @@ namespace LibreNMS\Validations;
 
 use DateTime;
 use DateTimeZone;
+use Exception;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\ValidationResult;
@@ -47,12 +48,16 @@ class Updates implements ValidationGroup
         // check if users on master update channel are up to date
         if (Config::get('update_channel') == 'master') {
             if ($versions['local_sha'] != $versions['github']['sha']) {
-                $commit_date = new DateTime('@' . $versions['local_date'], new DateTimeZone(date_default_timezone_get()));
-                if ($commit_date->diff(new DateTime())->days > 0) {
-                    $validator->warn(
-                        "Your install is over 24 hours out of date, last update: " . $commit_date->format('r'),
-                        'Make sure your daily.sh cron is running and run ./daily.sh by hand to see if there are any errors.'
-                    );
+                try {
+                    $commit_date = new DateTime('@' . $versions['local_date'], new DateTimeZone(date_default_timezone_get()));
+                    if ($commit_date->diff(new DateTime())->days > 0) {
+                        $validator->warn(
+                            "Your install is over 24 hours out of date, last update: " . $commit_date->format('r'),
+                            'Make sure your daily.sh cron is running and run ./daily.sh by hand to see if there are any errors.'
+                        );
+                    }
+                } catch (Exception $e) {
+                    $validator->fail($e->getMessage());
                 }
             }
 

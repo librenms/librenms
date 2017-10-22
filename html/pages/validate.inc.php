@@ -73,21 +73,20 @@ foreach ($validator->getAllResults() as $group => $results) {
 
         echo '<div class="panel"><div class="panel-heading';
         if ($result->getStatus() == ValidationResult::SUCCESS) {
-            echo ' bg-success';
+            echo ' bg-success"> Ok: ';
         } elseif ($result->getStatus() == ValidationResult::WARNING) {
-            echo ' bg-warning';
+            echo ' bg-warning"> Warning: ';
         } elseif ($result->getStatus() == ValidationResult::FAILURE) {
-            echo ' bg-danger';
+            echo ' bg-danger"> Fail: ';
         }
 
-        echo '"> ';
         echo $result->getMessage();
         echo '</div>';
 
         if ($result->hasFix() || $result->hasList()) {
             echo '<div class="panel-body">';
             if ($result->hasFix()) {
-                echo '<p class="bg-info">' . linkify($result->getFix()) . '</p>';
+                echo '<p class="bg-danger text-danger">' . linkify($result->getFix()) . '</p>';
                 if ($result->hasList()) {
                     echo '<br />';
                 }
