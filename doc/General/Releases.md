@@ -18,7 +18,9 @@ We appreciate everyone that runs this branch as you are in essence secondary tes
 the automation and manually testing that is done during the merge stages.
 
 You can configure your install (this is the default) to use this branch by setting `$config['update_channel'] = 'master';` 
-in `config.php` and ensuring you switch to the master branch with `git checkout master`.
+in `config.php` and ensuring you switch to the master branch with:
+
+`cd /opt/librenms && git checkout master`
 
 #### Stable branch
 With this in mind, we provide a monthly stable release which is released on or around 
@@ -29,4 +31,6 @@ The changelog is also updated and will reference the release number and date so 
 what changes have been made since the last release.
 
 To switch to using stable branches you can set `$config['update_channel'] = 'release';` 
-in config.php and then switch to the latest release branch with `git fetch --tags && git checkout $(git describe --tags $(git rev-list --tags --max-count=1))`.
+in config.php and then switch to the latest release branch with:
+
+`cd /opt/librenms && git fetch --tags && git checkout $(git describe --tags $(git rev-list --tags --max-count=1))`
