@@ -6,6 +6,8 @@
  * (c) 2013 LibreNMS Contributors
  */
 
+use LibreNMS\Config;
+
 $init_modules = array('alerts');
 require __DIR__ . '/includes/init.php';
 include_once __DIR__ . '/includes/notifications.php';
@@ -32,10 +34,21 @@ if ($options['f'] === 'update') {
 
 if ($options['f'] === 'check_php_ver') {
     $min_version = '5.6.4';
-    if (version_compare(PHP_VERSION, $min_version, '>=')) {
-        exit(0);
+    $warn_title = 'Warning: PHP version too low';
+
+    // if update is not set to false and version is min or newer
+    if (Config::get('update') && version_compare(PHP_VERSION, $min_version, '<')) {
+        new_notification(
+            $warn_title,
+            'PHP version 5.6.4 will be the minimum supported version on January 10, 2018.  We recommend you update to PHP a supported version of PHP (7.1 suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.',
+            1,
+            'daily.sh'
+        );
+        exit(1);
     }
-    exit(1);
+
+    remove_notification($warn_title);
+    exit(0);
 }
 
 if ($options['f'] === 'rrd_purge') {
@@ -120,20 +133,6 @@ if ($options['f'] === 'handle_notifiable') {
                 'The daily update script (daily.sh) has failed. Please check output by hand. If you need assistance, '
                 . 'visit the <a href="https://www.librenms.org/#support">LibreNMS Website</a> to find out how.',
                 2,
-                'daily.sh'
-            );
-        }
-    } elseif ($options['t'] === 'php_ver') {
-        $title = 'Warning: PHP version too low';
-        if ($options['r']) {
-            // result was a success (1), remove the notification
-            remove_notification($title);
-        } else {
-            // result was a failure (0), create the notification
-            new_notification(
-                $title,
-                'PHP version 5.6.4 will be the minimum supported version on January 10, 2018.  We suggest you update to PHP a supported version of PHP (7.1 suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.',
-                1,
                 'daily.sh'
             );
         }

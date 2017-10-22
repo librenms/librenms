@@ -152,20 +152,13 @@ main () {
     fi
 
     if [[ -z "$arg" ]]; then
+        status_run 'Checking PHP version' "php ${LIBRENMS_DIR}/daily.php -f check_php_ver" 'check_php_ver'
+
         up=$(php daily.php -f update >&2; echo $?)
         if [[ "$up" == "0" ]]; then
             ${DAILY_SCRIPT} no-code-update
             set_notifiable_result update 1  # make sure there are no update notifications if update is disabled
             exit
-        fi
-
-        status_run 'Checking PHP version' "php ${LIBRENMS_DIR}/daily.php -f check_php_ver" 'check_php_ver'
-        if [[ $? -ne 0 && ${up} -ne 0 ]]; then
-            # php version too low
-            set_notifiable_result php_ver 0
-            # up=0
-        else
-            set_notifiable_result php_ver 1
         fi
 
         # make sure the vendor directory is clean
