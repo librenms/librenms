@@ -63,7 +63,7 @@ Follow the rest of the tutorial, especially if you have the server's firewall en
 # CentOS
 ### Enabling HTTPS - Apache
 This example is specifically for CentOS 7 with Apache
-Please follow [this](https://wiki.centos.org/HowTos/Https) excellent tutorial on setting up Apache with an SSL cert.
+Please follow [this](https://wiki.centos.org/HowTos/Https) How To from CentOS wiki on setting up Apache with an SSL cert.
 
 #### Step 1
 Follow the How to until you get to step 3. This is going to be little diffrent with LibreNMS. 
