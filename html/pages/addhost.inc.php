@@ -13,7 +13,7 @@ if ($_SESSION['userlevel'] < 10) {
 $hostname = isset($_POST['hostname']) ? clean($_POST['hostname']) : false;
 $snmp_enabled = isset($_POST['snmp']);
 
-if ($hostname) {
+if ($hostname !== false) {
     echo '<div class="row">
             <div class="col-sm-3">
             </div>
@@ -347,7 +347,7 @@ if ($config['distributed_poller'] === true) {
 
     $("[name='snmp']").bootstrapSwitch('offColor','danger');
 <?php
-if ($hostname && !$snmp_enabled) {
+if ($hostname !== false && !$snmp_enabled) {
     echo '  $("[name=\'snmp\']").trigger(\'click\');';
 }
 ?>
