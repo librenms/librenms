@@ -63,14 +63,14 @@ Follow the rest of the tutorial, especially if you have the server's firewall en
 # CentOS
 ### Enabling HTTPS - Apache
 This example is specifically for CentOS 7 with Apache
-Please follow [this](https://wiki.centos.org/HowTos/Https) How To from CentOS wiki on setting up Apache with an SSL cert.
+Please follow [this](https://wiki.centos.org/HowTos/Https) How To from CentOS wiki on setting up Apache with a SSL cert.
 
 #### Step 1
-Follow the How to until you get to step 3. This is going to be little diffrent with LibreNMS. 
-You will need to make changes in here `vi /etc/httpd/conf.d/librenms.conf`
+Follow the How to until you get to step 3. This is going to be little different with LibreNMS. 
+You will need to make changes in here `sudo vi /etc/httpd/conf.d/librenms.conf`
 
 Your VirtualHost for 443 will need to look something like this for LibreNMS
-(obviously changing librenms.example.com to your actual domain name):
+(obviously changing librenms.example.com to your actual domain name)
 ```
 <VirtualHost *:443>
         SSLEngine on
