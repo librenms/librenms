@@ -117,12 +117,19 @@ if (($device['os'] == 'pbn' || $device['os'] == 'bdcom') && Config::get('autodis
     echo ' LLDP-MIB: ';
     $lldp_array  = snmpwalk_group($device, 'lldpRemTable', 'LLDP-MIB', 3);
     if (!empty($lldp_array)) {
+        $dot1d_array = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
         $lldp_ports = snmpwalk_group($device, 'lldpLocPortId', 'LLDP-MIB');
     }
 
     foreach ($lldp_array as $key => $lldp_if_array) {
         foreach ($lldp_if_array as $entry_key => $lldp_instance) {
-            $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'], $entry_key, $device['device_id']);
+            if (is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex'])) {
+                $ifIndex = $dot1d_array[$entry_key]['dot1dBasePortIfIndex'];
+            } else {
+                $ifIndex = $entry_key;
+            }
+
+            $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'], $ifIndex, $device['device_id']);
             $interface = get_port_by_id($local_port_id);
 
             d_echo($lldp_instance);
