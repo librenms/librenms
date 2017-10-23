@@ -69,7 +69,7 @@ Please follow [this](https://wiki.centos.org/HowTos/Https) How To from CentOS wi
 Follow the How to until you get to step 3. This is going to be little diffrent with LibreNMS. 
 You will need to make changes in here `vi /etc/httpd/conf.d/librenms.conf`
 
-Your VirtualHost for 443 will need to look somnthing like this for LibreNMS
+Your VirtualHost for 443 will need to look something like this for LibreNMS
 (obviously changing librenms.example.com to your actual domain name):
 ```
 <VirtualHost *:443>
