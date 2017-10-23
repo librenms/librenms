@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Validations;
 
+use LibreNMS\Config;
 use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\Validator;
 
@@ -38,9 +39,20 @@ class Php implements ValidationGroup
      */
     public function validate(Validator $validator)
     {
+        $this->checkVersion($validator);
         $this->checkExtensions($validator);
         $this->checkFunctions($validator);
         $this->checkTimezone($validator);
+    }
+
+    private function checkVersion(Validator$validator)
+    {
+        $min_version = '5.6.4';
+
+         // if update is not set to false and version is min or newer
+        if (Config::get('update') && version_compare(PHP_VERSION, $min_version, '<')) {
+            $validator->warn( 'PHP version 5.6.4 will be the minimum supported version on January 10, 2018.  We recommend you update to PHP a supported version of PHP (7.1 suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.');
+        }
     }
 
     private function checkExtensions(Validator $validator)
