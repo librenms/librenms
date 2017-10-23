@@ -61,7 +61,7 @@ Then restart Nginx
 Follow the rest of the tutorial, especially if you have the server's firewall enabled.
 
 # CentOS
-### Enabling HTTPS - Apache
+#### Enabling HTTPS - Apache
 This example is specifically for CentOS 7 with Apache
 Please follow [this](https://wiki.centos.org/HowTos/Https) How To from CentOS wiki on setting up Apache with a SSL cert.
 
@@ -93,5 +93,5 @@ Your VirtualHost for 443 will need to look something like this for LibreNMS
 #### Step 2
 Then restart Apache `sudo systemctl restart httpd`
 
-### Step 3
+#### Step 3
 Follow the rest of the How To, especially if you have the server's firewall enabled.
