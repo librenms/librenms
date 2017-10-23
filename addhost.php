@@ -196,19 +196,21 @@ if (!empty($argv[1])) {
     c_echo(
         "\n".$config['project_name_version'].' Add Host Tool
 
-    Usage (ICMP)     : ./addhost.php [-g <poller group>] [-f] -P <%Whostname%n> [os] [hardware]
-    Usage (SNMPv1/2c): ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> [community] [v1|v2c] [port] ['.implode('|', $config['snmp']['transports']).']
-    Usage (SNMPv3)   :  Config Defaults : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> any v3 [user] [port] ['.implode('|', $config['snmp']['transports']).']
-    No Auth, No Priv : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> nanp v3 [user] [port] ['.implode('|', $config['snmp']['transports']).']
-       Auth, No Priv : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> anp v3 <user> <password> [md5|sha] [port] ['.implode('|', $config['snmp']['transports']).']
-       Auth,    Priv : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> ap v3 <user> <password> <enckey> [md5|sha] [aes|dsa] [port] ['.implode('|', $config['snmp']['transports']).']
+    Usage (SNMPv1/2c)    : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> [community] [v1|v2c] [port] ['.implode('|', $config['snmp']['transports']).']
+    Usage (SNMPv3)       :
+        Config Defaults  : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> any v3 [user] [port] ['.implode('|', $config['snmp']['transports']).']
+        No Auth, No Priv : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> nanp v3 [user] [port] ['.implode('|', $config['snmp']['transports']).']
+        Auth, No Priv    : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> anp v3 <user> <password> [md5|sha] [port] ['.implode('|', $config['snmp']['transports']).']
+        Auth,    Priv    : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> ap v3 <user> <password> <enckey> [md5|sha] [aes|dsa] [port] ['.implode('|', $config['snmp']['transports']).']
+    Usage (ICMP only)    : ./addhost.php [-g <poller group>] [-f] -P <%Whostname%n> [os] [hardware]
 
-        -g <poller group> allows you to add a device to be pinned to a specific poller when using distributed polling. X can be any number associated with a poller group
-        -f forces the device to be added by skipping the icmp and snmp check against the host.
-	-p <port assoc mode> allow you to set a port association mode for this device. By default ports are associated by \'ifIndex\'.
-	                     For Linux/Unix based devices \'ifName\' or \'ifDescr\' might be useful for a stable iface mapping.
-	                     The default for this installation is \'' . $config['default_port_association_mode'] . '\'
-	                     Valid port assoc modes are: ' . join(', ', $valid_assoc_modes) . '
+    -g <poller group> allows you to add a device to be pinned to a specific poller when using distributed polling. X can be any number associated with a poller group
+    -f forces the device to be added by skipping the icmp and snmp check against the host.
+    -p <port assoc mode> allow you to set a port association mode for this device. By default ports are associated by \'ifIndex\'.
+        For Linux/Unix based devices \'ifName\' or \'ifDescr\' might be useful for a stable iface mapping.
+        The default for this installation is \'' . $config['default_port_association_mode'] . '\'
+        Valid port assoc modes are: ' . join(', ', $valid_assoc_modes) . '
+    -P Add the host with only ping check, no SNMP or OS discovery.
 
     %rRemember to run discovery for the host afterwards.%n
 '

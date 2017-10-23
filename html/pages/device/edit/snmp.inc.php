@@ -2,25 +2,26 @@
 
 if ($_POST['editing']) {
     if ($_SESSION['userlevel'] > '7') {
-        $poller_group = isset($_POST['poller_group']) ? mres($_POST['poller_group']) : 0;
-        if ($_POST['snmp'] == 'on') {
+        $poller_group = isset($_POST['poller_group']) ? clean($_POST['poller_group']) : 0;
+        $snmp_enabled = ($_POST['snmp'] == 'on');
+        if ($snmp_enabled) {
             $no_checks    = ($_POST['no_checks'] == 'on');
-            $community    = mres($_POST['community']);
-            $snmpver      = mres($_POST['snmpver']);
-            $transport    = $_POST['transport'] ? mres($_POST['transport']) : $transport = 'udp';
-            $port         = $_POST['port'] ? mres($_POST['port']) : $config['snmp']['port'];
-            $timeout      = mres($_POST['timeout']);
-            $retries      = mres($_POST['retries']);
-            $port_assoc_mode = mres($_POST['port_assoc_mode']);
-            $max_repeaters = mres($_POST['max_repeaters']);
-            $max_oid      = mres($_POST['max_oid']);
+            $community    = clean($_POST['community']);
+            $snmpver      = clean($_POST['snmpver']);
+            $transport    = $_POST['transport'] ? clean($_POST['transport']) : $transport = 'udp';
+            $port         = $_POST['port'] ? clean($_POST['port']) : $config['snmp']['port'];
+            $timeout      = clean($_POST['timeout']);
+            $retries      = clean($_POST['retries']);
+            $port_assoc_mode = clean($_POST['port_assoc_mode']);
+            $max_repeaters = clean($_POST['max_repeaters']);
+            $max_oid      = clean($_POST['max_oid']);
             $v3           = array(
-                'authlevel'  => mres($_POST['authlevel']),
-                'authname'   => mres($_POST['authname']),
-                'authpass'   => mres($_POST['authpass']),
-                'authalgo'   => mres($_POST['authalgo']),
-                'cryptopass' => mres($_POST['cryptopass']),
-                'cryptoalgo' => mres($_POST['cryptoalgo']),
+                'authlevel'  => clean($_POST['authlevel']),
+                'authname'   => clean($_POST['authname']),
+                'authpass'   => clean($_POST['authpass']),
+                'authalgo'   => clean($_POST['authalgo']),
+                'cryptopass' => clean($_POST['cryptopass']),
+                'cryptoalgo' => clean($_POST['cryptoalgo']),
             );
 
             // FIXME needs better feedback
@@ -34,13 +35,13 @@ if ($_POST['editing']) {
                 'snmp_disable' => 0,
             );
 
-            if ($_POST['timeout']) {
+            if ($timeout) {
                 $update['timeout'] = $timeout;
             } else {
                 $update['timeout'] = array('NULL');
             }
 
-            if ($_POST['retries']) {
+            if ($retries) {
                 $update['retries'] = $retries;
             } else {
                 $update['retries'] = array('NULL');
@@ -48,15 +49,15 @@ if ($_POST['editing']) {
             $update = array_merge($update, $v3);
         } else {
             $update['snmp_disable'] = 1;
-            $update['os']           = $_POST['os'] ? mres($_POST['os_id']) : "ping";
-            $update['hardware']     = mres($_POST['hardware']);
+            $update['os']           = $_POST['os'] ? clean($_POST['os_id']) : "ping";
+            $update['hardware']     = clean($_POST['hardware']);
             $update['features']     = null;
             $update['version']      = null;
             $update['icon']         = null;
         }
 
         $device_tmp = deviceArray($device['hostname'], $community, $snmpver, $port, $transport, $v3, $port_assoc_mode);
-        if ($no_checks === true || $_POST['snmp'] != 'on' || isSNMPable($device_tmp)) {
+        if ($no_checks === true || !$snmp_enabled || isSNMPable($device_tmp)) {
             $rows_updated = dbUpdate($update, 'devices', '`device_id` = ?', array($device['device_id']));
             
             $max_repeaters_set = 0;

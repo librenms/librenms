@@ -10,28 +10,30 @@ if ($_SESSION['userlevel'] < 10) {
     exit;
 }
 
-if ($_POST['hostname']) {
+$hostname = isset($_POST['hostname']) ? clean($_POST['hostname']) : false;
+$snmp_enabled = isset($_POST['snmp']);
+
+if ($hostname) {
     echo '<div class="row">
             <div class="col-sm-3">
             </div>
             <div class="col-sm-6">';
     if ($_SESSION['userlevel'] > '5') {
         // Settings common to SNMPv2 & v3
-        $hostname = mres($_POST['hostname']);
         if ($_POST['port']) {
-            $port = mres($_POST['port']);
+            $port = clean($_POST['port']);
         } else {
             $port = $config['snmp']['port'];
         }
 
         if ($_POST['transport']) {
-            $transport = mres($_POST['transport']);
+            $transport = clean($_POST['transport']);
         } else {
             $transport = 'udp';
         }
 
         $additional = array();
-        if ($_POST['snmp'] != 'on') {
+        if (!$snmp_enabled) {
             $snmpver = 'v2c';
             $additional = array(
                 'snmp_disable' => 1,
@@ -40,19 +42,19 @@ if ($_POST['hostname']) {
             );
         } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
             if ($_POST['community']) {
-                $config['snmp']['community'] = array($_POST['community']);
+                $config['snmp']['community'] = array(clean($_POST['community']));
             }
 
-            $snmpver = mres($_POST['snmpver']);
+            $snmpver = clean($_POST['snmpver']);
             print_message("Adding host $hostname communit".(count($config['snmp']['community']) == 1 ? 'y' : 'ies').' '.implode(', ', $config['snmp']['community'])." port $port using $transport");
         } elseif ($_POST['snmpver'] === 'v3') {
             $v3 = array(
-                   'authlevel'  => mres($_POST['authlevel']),
-                   'authname'   => mres($_POST['authname']),
-                   'authpass'   => mres($_POST['authpass']),
-                   'authalgo'   => mres($_POST['authalgo']),
-                   'cryptopass' => mres($_POST['cryptopass']),
-                   'cryptoalgo' => mres($_POST['cryptoalgo']),
+                   'authlevel'  => clean($_POST['authlevel']),
+                   'authname'   => clean($_POST['authname']),
+                   'authpass'   => clean($_POST['authpass']),
+                   'authalgo'   => clean($_POST['authalgo']),
+                   'cryptopass' => clean($_POST['cryptopass']),
+                   'cryptoalgo' => clean($_POST['cryptoalgo']),
                   );
 
             array_push($config['snmp']['v3'], $v3);
@@ -62,10 +64,10 @@ if ($_POST['hostname']) {
         } else {
             print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
         }//end if
-        $poller_group = $_POST['poller_group'];
+        $poller_group = clean($_POST['poller_group']);
         $force_add    = ($_POST['force_add'] == 'on');
 
-        $port_assoc_mode = $_POST['port_assoc_mode'];
+        $port_assoc_mode = clean($_POST['port_assoc_mode']);
         try {
             $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode, $additional);
             $link = generate_device_url(array('device_id' => $device_id));
@@ -345,7 +347,7 @@ if ($config['distributed_poller'] === true) {
 
     $("[name='snmp']").bootstrapSwitch('offColor','danger');
 <?php
-if ($_POST['hostname'] && $_POST['snmp'] != 'on') {
+if ($hostname && !$snmp_enabled) {
     echo '  $("[name=\'snmp\']").trigger(\'click\');';
 }
 ?>

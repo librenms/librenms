@@ -55,7 +55,7 @@ function levsortos($base, $obj, $keys)
 
 header('Content-type: application/json');
 if (isset($_GET['term'])) {
-    $_GET['term'] = mres($_GET['term']);
+    $_GET['term'] = clean($_GET['term']);
     $sortos = levsortos($_GET['term'], $config['os'], array("text", "os"));
     $sortos = array_chunk($sortos, 20, true);
     $sortos = $sortos[0];

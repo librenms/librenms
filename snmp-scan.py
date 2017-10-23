@@ -25,6 +25,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import argparse
+from argparse import RawTextHelpFormatter
 import json
 from collections import namedtuple
 from multiprocessing import Pool
@@ -141,13 +142,14 @@ if __name__ == '__main__':
     ###################
     # Parse arguments #
     ###################
-    parser = argparse.ArgumentParser(description='Scan network for snmp hosts and add them to LibreNMS.')
+    parser = argparse.ArgumentParser(description='Scan network for snmp hosts and add them to LibreNMS.', formatter_class=RawTextHelpFormatter)
     parser.add_argument('network', action='append', nargs='*', type=str, help="""CIDR noted IP-Range to scan. Can be specified multiple times
-    This argument is only required if $config['nets'] is not set
-    Example: 192.168.0.0/24
-    Example: 192.168.0.0/31 will be treated as an RFC3021 p-t-p network with two addresses, 192.168.0.0 and 192.168.0.1
-    Example: 192.168.0.1/32 will be treated as a single host address""")
-    parser.add_argument('-P', '--ping', action='store_const', const="-P", default="", help="Only try to ping the device.")
+This argument is only required if $config['nets'] is not set
+Example: 192.168.0.0/24
+Example: 192.168.0.0/31 will be treated as an RFC3021 p-t-p network with two addresses, 192.168.0.0 and 192.168.0.1
+Example: 192.168.0.1/32 will be treated as a single host address""")
+    parser.add_argument('-P', '--ping', action='store_const', const="-P", default="", help="""Only try to ping the device.
+Example: """ + __file__ + """ -P 192.168.0.0/24""")
     parser.add_argument('-t', dest='threads', type=int,
                         help="How many IPs to scan at a time.  More will increase the scan speed," +
                              " but could overload your system. Default: {}".format(THREADS))

@@ -285,7 +285,7 @@ function add_device()
     $transport    = $data['transport'] ? mres($data['transport']) : 'udp';
     $poller_group = $data['poller_group'] ? mres($data['poller_group']) : 0;
     $force_add    = $data['force_add'] ? true : false;
-    $snmp_disable = $data['snmp_disable'] ? true : false;
+    $snmp_disable = ($data['snmp_disable']);
     if ($snmp_disable) {
         $additional = array(
             'os'           => $data['os'] ? mres($data['os']) : 'ping',
@@ -317,7 +317,7 @@ function add_device()
     }
     if (empty($message)) {
         try {
-            $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode = 'ifIndex', $additional);
+            $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add, 'ifIndex', $additional);
             $code    = 201;
             $status  = 'ok';
             $message = "Device $hostname ($device_id) has been added successfully";
