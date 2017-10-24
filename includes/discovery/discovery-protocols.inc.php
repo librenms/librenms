@@ -81,7 +81,7 @@ if (Config::get('autodiscovery.xdp') === true) {
     echo PHP_EOL;
 }//end if
 
-if ($device['os'] == 'pbn' && Config::get('autodiscovery.xdp') === true) {
+if (($device['os'] == 'pbn' || $device['os'] == 'bdcom') && Config::get('autodiscovery.xdp') === true) {
     echo ' NMS-LLDP-MIB: ';
     $lldp_array  = snmpwalk_group($device, 'lldpRemoteSystemsData', 'NMS-LLDP-MIB');
 
@@ -118,6 +118,7 @@ if ($device['os'] == 'pbn' && Config::get('autodiscovery.xdp') === true) {
     $lldp_array  = snmpwalk_group($device, 'lldpRemTable', 'LLDP-MIB', 3);
     if (!empty($lldp_array)) {
         $dot1d_array = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
+        $lldp_ports = snmpwalk_group($device, 'lldpLocPortId', 'LLDP-MIB');
     }
 
     foreach ($lldp_array as $key => $lldp_if_array) {
@@ -127,7 +128,10 @@ if ($device['os'] == 'pbn' && Config::get('autodiscovery.xdp') === true) {
             } else {
                 $ifIndex = $entry_key;
             }
-            $interface = get_port_by_ifIndex($device['device_id'], $ifIndex);
+
+            $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'], $ifIndex, $device['device_id']);
+            $interface = get_port_by_id($local_port_id);
+
             d_echo($lldp_instance);
 
             foreach ($lldp_instance as $entry_instance => $lldp) {
@@ -157,6 +161,11 @@ if ($device['os'] == 'pbn' && Config::get('autodiscovery.xdp') === true) {
                     }
                 }
 
+                $remote_device = device_by_id_cache($remote_device_id);
+                if ($remote_device['os'] == 'calix') {
+                    $lldp['lldpRemPortId'] = 'EthPort ' . $lldp['lldpRemPortId'];
+                }
+
                 $remote_port_id = find_port_id(
                     $lldp['lldpRemPortDesc'],
                     $lldp['lldpRemPortId'],
@@ -165,7 +174,6 @@ if ($device['os'] == 'pbn' && Config::get('autodiscovery.xdp') === true) {
                 );
 
                 if (empty($lldp['lldpRemSysName'])) {
-                    $remote_device = device_by_id_cache($remote_device_id);
                     $lldp['lldpRemSysName'] = $remote_device['sysName'] ?: $remote_device['hostname'];
                 }
 

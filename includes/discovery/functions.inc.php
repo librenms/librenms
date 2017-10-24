@@ -1439,7 +1439,7 @@ function find_port_id($description, $identifier = '', $device_id = 0, $mac_addre
 
     if ($identifier) {
         if (is_numeric($identifier)) {
-            $sql .= ' OR `ifAlias`=? OR `ifIndex`=?';
+            $sql .= ' OR `ifIndex`=? OR `ifAlias`=?';
         } else {
             $sql .= ' OR `ifDescr`=? OR `ifName`=?';
         }
