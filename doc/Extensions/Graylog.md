@@ -17,7 +17,7 @@ standalone appliance.
 Config is simple, here's an example:
 
 ```php
-$config['graylog']['server']   = 'http://127.0.0.1';
+$config['graylog']['server']   = 'http://yourserver/search/universal/relative';
 $config['graylog']['port']     = 12900;
 $config['graylog']['username'] = 'admin';
 $config['graylog']['password'] = 'admin';
