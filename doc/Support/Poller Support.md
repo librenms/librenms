@@ -89,7 +89,7 @@ $config['poller_modules']['tnms-nbi']                    = 0;
 
 #### OS based Poller config
 
-You can enable or disable modules for a specific OS by add corresponding line in `includes/definitions/$os.yaml`
+You can enable or disable modules for a specific OS by add corresponding line in `config.php`
 OS based settings have preference over global. Device based settings have preference over all others
 
 Poller performance improvement can be achieved by deactivating all modules that are not supported by specific OS.
