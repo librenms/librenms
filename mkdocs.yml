@@ -75,6 +75,7 @@ pages:
       - Extensions/Syslog.md
       - Extensions/Two-Factor-Auth.md
       - Extensions/Varnish.md
+      - Extensions/Weathermap.md
   - API: API/index.md
   - Alerting: Alerting/index.md
   - Support:
