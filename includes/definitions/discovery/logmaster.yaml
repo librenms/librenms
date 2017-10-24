@@ -4,92 +4,19 @@ modules:
         temperature:
             data:
                 -
-                    oid: upsSmartBatteryTemperature
-                    num_oid: .1.3.6.1.4.1.935.1.1.1.2.2.3.
-                    index: 'upsSmartBatteryTemperature.{{ $index }}'
-                    descr: Battery Temperature
-                    divisor: 10
-                -
                     oid: upsEnvTemperature
                     num_oid: .1.3.6.1.4.1.935.1.1.1.9.1.1.
                     index: 'upsEnvTemperature.{{ $index }}'
-                    descr: Environment Temperature
-        current:
-            data:
-                -
-                    oid: upsSmartBatteryCurrent
-                    num_oid: .1.3.6.1.4.1.935.1.1.1.2.2.7.
-                    index: 'upsSmartBatteryCurrent.{{ $index }}'
-                    descr: Battery Current
+                    descr: Environment
         humidity:
             data:
                 -
                     oid: upsEnvHumidity
                     num_oid: .1.3.6.1.4.1.935.1.1.1.9.1.2.
                     index: 'upsEnvHumidity.{{ $index }}'
-                    descr: Environment Humidity
-        voltage:
-            data:
-                -
-                    oid: upsSmartBatteryVoltage
-                    num_oid: .1.3.6.1.4.1.935.1.1.1.2.2.2.
-                    index: 'upsSmartBatteryVoltage.{{ $index }}'
-                    descr: Battery Voltage
-                    divisor: 10
-                -
-                    oid: upsSmartInputLineVoltage
-                    num_oid: .1.3.6.1.4.1.935.1.1.1.3.2.1.
-                    index: 'upsSmartInputLineVoltage.{{ $index }}'
-                    descr: Input Voltage
-                    divisor: 10
-                -
-                    oid: upsSmartOutputVoltage
-                    num_oid: .1.3.6.1.4.1.935.1.1.1.4.2.1.
-                    index: 'upsSmartOutputVoltage.{{ $index }}'
-                    descr: Output Voltage
-                    divisor: 10
-        charge:
-            data:
-                -
-                    oid: upsSmartBatteryCapacity
-                    num_oid: .1.3.6.1.4.1.935.1.1.1.2.2.1.
-                    index: 'upsSmartBatteryCapacity.{{ $index }}'
-                    descr: 'Battery Charge'
-
-        load:
-            data:
-                -
-                    oid: upsSmartOutputLoad
-                    num_oid: .1.3.6.1.4.1.935.1.1.1.4.2.3.
-                    index: 'upsSmartOutputLoad.{{ $index }}'
-                    descr: 'Output Load'
-        runtime:
-            data:
-                -
-                    oid: upsBaseBatteryTimeOnBattery
-                    num_oid: .1.3.6.1.4.1.935.1.1.1.2.1.2.
-                    index: 'upsBaseBatteryTimeOnBattery.{{ $index }}'
-                    descr: 'Time running on battery'
-                    divisor: 60
-                -
-                    oid: upsSmartBatteryRunTimeRemaining
-                    num_oid: .1.3.6.1.4.1.935.1.1.1.2.2.4.
-                    index: 'upsSmartBatteryRunTimeRemaining.{{ $index }}'
-                    descr: 'Time on battery remaining'
-                    divisor: 60
-
+                    descr: Environment
         state:
             data:
-                -
-                    oid: upsBaseBatteryStatus
-                    num_oid: .1.3.6.1.4.1.935.1.1.1.2.1.1.
-                    descr: Battery Status
-                    index: 'upsBaseBatteryStatus.{{ $index }}'
-                    state_name: upsBaseBatteryStatus
-                    states:
-                        - { descr: unknown, graph: 0, value: 1, generic: 3 }
-                        - { descr: BatteryNormal, graph: 0, value: 2, generic: 0 }
-                        - { descr: BatteryLow, graph: 0, value: 3, generic: 1 }
                 -
                     oid: upsSmartBatteryReplaceIndicator
                     num_oid: .1.3.6.1.4.1.935.1.1.1.2.2.5.
@@ -99,22 +26,6 @@ modules:
                     states:
                         - { descr: noBatteryNeedsReplacing, graph: 0, value: 1, generic: 0 }
                         - { descr: batteryNeedsReplacing, graph: 0, value: 2, generic: 2 }
-                -
-                    oid: upsBaseOutputStatus
-                    num_oid: .1.3.6.1.4.1.935.1.1.1.4.1.1.
-                    descr: Ups Status
-                    index: 'upsBaseOutputStatus.{{ $index }}'
-                    state_name: upsBaseOutputStatus
-                    states:
-                        - { descr: unknown, graph: 0, value: 1, generic: 3 }
-                        - { descr: onLine, graph: 0, value: 2, generic: 0 }
-                        - { descr: onBattery, graph: 0, value: 3, generic: 1 }
-                        - { descr: onBoost, graph: 0, value: 4, generic: 1 }
-                        - { descr: sleeping, graph: 0, value: 5, generic: 1 }
-                        - { descr: onBypass, graph: 0, value: 6, generic: 3 }
-                        - { descr: rebooting, graph: 0, value: 7, generic: 3 }
-                        - { descr: standBy, graph: 0, value: 8, generic: 1 }
-                        - { descr: onBuck, graph: 0, value: 9, generic: 1 }
                 -
                     oid: upsEnvWater
                     num_oid: .1.3.6.1.4.1.935.1.1.1.9.1.3.
