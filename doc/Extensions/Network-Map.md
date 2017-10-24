@@ -53,3 +53,13 @@ $config['network_map_vis_options'] = '{
   }
 }';
 ```
+
+You may also access the dyanamic configuraiton interface (example here: http://visjs.org/examples/network/other/configuration.html) from within LibreNMS by adding the following as the first line of the network_map_vis_options parameters:
+```php
+$config['network_map_vis_options'] = '{
+  "configure": { "enabled": true},
+```
+
+Note that you may want to disable the automatic page refresh while you're tweaking your configuration, as the refresh will reset the dynamic configuration UI to the values currently saved in librenms/config.php.
+
+Once you've achieved your desired map appearance, click the generate options button at the bottom to be given the necessary parameters to add to your librenms/config.php file.
