@@ -1,7 +1,7 @@
 source: Extensions/Weathermap.md
 
 # WeatherMap with LibreNMS
-Intergarting LibreNMS with Weathermap, always you to build network maps and visulaize network traffic rates.
+Intergarting LibreNMS with Weathermap, allows you to build network maps to visulaize network traffic rates.
 [Link](https://network-weathermap.com/) to Wearthermap Offical Website
 
 ### Installing WeatherMap
