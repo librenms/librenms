@@ -12,12 +12,19 @@
  * the source code distribution for details.
  */
 
-// SNMPv2-MIB::sysDescr.0 = STRING: VerAg:05.05.57.00.01;VerHw:x86_64;VerSw:10.05.19.00.00
-// Use preg_replace to strip out everything but the VerHW value, e.g. "x86_64"
-$mslhw = snmp_get($device, "sysDescr.0", "-OQv", "SNMPv2-MIB");
+$mslhw            = $poll_device['sysDescr'];
+$version_oid      = '.1.3.6.1.4.1.1027.4.1.2.1.1.1.4.10.1.3.6.1.4.1.1027.1.6.1';
+$features_oid     = '.1.3.6.1.4.1.1027.4.1.2.1.1.1.5.10.1.3.6.1.4.1.1027.1.6.1';
+$oids             = array("mitelAppTblProductVersion.10.1.3.6.1.4.1.1027.1.6.1", "mitelAppTblProductDescr.10.1.3.6.1.4.1.1027.1.6.1");
+$mitelapptbl_data = snmp_get_multi_oid($device, $oids, "-OUQnt", "MITEL-APPCMN-MIB");
+
 $hardware = preg_replace('/;VerSw.*$/', '', (preg_replace('/^.*VerHw:/', '', $mslhw)));
-// MITEL-APPCMN-MIB::mitelAppTblProductName.10.1.3.6.1.4.1.1027.1.6.1 = STRING: Mitel Standard Linux
-// MITEL-APPCMN-MIB::mitelAppTblProductVersion.10.1.3.6.1.4.1.1027.1.6.1 = STRING: 10.5.19.0
-$version = snmp_get($device, "mitelAppTblProductVersion.10.1.3.6.1.4.1.1027.1.6.1", "-OQv", "MITEL-APPCMN-MIB");
-// MITEL-APPCMN-MIB::mitelAppTblProductDescr.10.1.3.6.1.4.1.1027.1.6.1 = STRING: Mitel Linux distribution platform to host Mitel solutions.
-$features = snmp_get($device, "mitelAppTblProductDescr.10.1.3.6.1.4.1.1027.1.6.1", "-OQv", "MITEL-APPCMN-MIB");
+$version  = trim($mitelapptbl_data[$version_oid], '"');
+$features = trim($mitelapptbl_data[$features_oid], '"');
+
+unset(
+    $mslhw,
+    $mitelapptbl_data,
+    $version_oid,
+    $features_oid
+);
