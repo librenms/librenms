@@ -22,5 +22,5 @@ $usage = snmp_get($device, 'cpuLoading30s.0', '-Ovq', $mibmod);
 
 d_echo($usage."\n");
 if (is_numeric($usage)) {
-    $proc = ($usage * 100);
+    $proc = $usage;
 }
