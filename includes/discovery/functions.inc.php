@@ -1088,8 +1088,17 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
             foreach ($raw_data as $index => $snmp_data) {
                 // get the value for this sensor, check 'value' and 'oid', if state string, translate to a number
                 $data_name = isset($data['value']) ? $data['value'] : $data['oid'];  // fallback to oid if value is not set
-                if (is_numeric($snmp_data[$data_name])) {
-                    $value = $snmp_data[$data_name];
+
+                $tmp_value = $snmp_data[$data_name];
+                if (!is_numeric($tmp_value)) {
+                    preg_match('/-?\d*\.?\d+/', $tmp_value, $temp_response);
+                    if (!empty($temp_response[0])) {
+                        $tmp_value = $temp_response[0];
+                    }
+                }
+
+                if (is_numeric($tmp_value)) {
+                    $value = $tmp_value;
                 } elseif ($sensor_type === 'state') {
                     // translate string states to values (poller does this as well)
                     $states = array_column($data['states'], 'value', 'descr');
