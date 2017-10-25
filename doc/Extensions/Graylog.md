@@ -23,6 +23,9 @@ $config['graylog']['username'] = 'admin';
 $config['graylog']['password'] = 'admin';
 $config['graylog']['version']  = '2.1';
 ```
+Note that For Graylog 2.2.3 version you need to manually add the following variable, otherwise you'll get a 404 reply:
+
+`$config[‘graylog’][‘base_uri’] = ‘/search/universal/relative’;`
 
 > Since Graylog 2.1, the default API path is /api/
 
