@@ -72,6 +72,7 @@ pages:
       - Extensions/Proxmox.md
       - Storing Metrics: Extensions/Metric-Storage.md
       - Extensions/Smokeping.md
+      - Extensions/Weathermap.md
   - 7. API:
       - API/index.md
   - 8. Alerting:
