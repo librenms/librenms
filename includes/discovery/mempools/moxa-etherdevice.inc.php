@@ -21,8 +21,9 @@ if ($device['os'] == 'moxa-etherdevice') {
         $mibmod = 'MOXA-EDSG508E-MIB';
     }
 
-    $total = snmp_get($device, "totalMemory.0", '-OvQ', $mibmod);
-    $avail = snmp_get($device, "freeMemory.0", '-OvQ', $mibmod);
+    $memres = snmp_get_multi_oid($device, 'totalMemory.0 freeMemory.0', '-OQUs', $mibmod);
+    $total = $mem_res['totalMemory.0'];
+    $avail = $mem_res['freeMemory.0'];
 
     if ((is_numeric($total)) && (is_numeric($avail))) {
         discover_mempool($valid_mempool, $device, 0, 'moxa-etherdevice-mem', 'Memory', '1', null, null);
