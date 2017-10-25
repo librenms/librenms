@@ -4,7 +4,7 @@ type: wireless
 icon: saf
 over:
     - { graph: device_bits, text: Traffic }
-    - { graph: device_saf_radioRxLevel, text: 'Rx Level' }
+    - { graph: device_wireless_power, text: 'Power Levels' }
     - { graph: device_ping_perf, text: 'Ping Times' }
 discovery:
     - sysObjectId:
