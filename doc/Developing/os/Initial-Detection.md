@@ -66,7 +66,6 @@ mib_dir:
 
 ```yaml
 poller_modules:
-    wifi: 1
     cisco-ace-serverfarms: 0
     cisco-ace-loadbalancer: 0
 ```
