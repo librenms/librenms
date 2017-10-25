@@ -58,6 +58,7 @@ You may also access the dyanamic configuraiton interface (example here: http://v
 ```php
 $config['network_map_vis_options'] = '{
   "configure": { "enabled": true},
+}';
 ```
 
 Note that you may want to disable the automatic page refresh while you're tweaking your configuration, as the refresh will reset the dynamic configuration UI to the values currently saved in librenms/config.php.
