@@ -1,6 +1,6 @@
 os: dell-ups
 text: 'Dell UPS'
-type: power 
+type: power
 icon: dell
 over:
     - { graph: device_current, text: Current }

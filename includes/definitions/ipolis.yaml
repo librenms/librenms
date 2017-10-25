@@ -2,7 +2,7 @@ os: ipolis
 text: 'Hanwha Techwin'
 type: camera
 icon: hanwhatechwin
-over: 
+over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:
     - sysObjectId:
