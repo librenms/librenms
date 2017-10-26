@@ -56,40 +56,49 @@ These are the default discovery config items. You can globally disable a module 
 disable it for one device then you can do this within the WebUI -> Device -> Settings -> Modules.
 
 ```php
-$config['discovery_modules']['os']                        = 1;
-$config['discovery_modules']['ports']                     = 1;
-$config['discovery_modules']['ports-stack']               = 1;
-$config['discovery_modules']['entity-physical']           = 1;
-$config['discovery_modules']['processors']                = 1;
-$config['discovery_modules']['mempools']                  = 1;
-$config['discovery_modules']['cisco-vrf-lite']            = 1;
-$config['discovery_modules']['ipv4-addresses']            = 1;
-$config['discovery_modules']['ipv6-addresses']            = 1;
-$config['discovery_modules']['route']                     = 0;
-$config['discovery_modules']['sensors']                   = 1;
-$config['discovery_modules']['storage']                   = 1;
-$config['discovery_modules']['hr-device']                 = 1;
-$config['discovery_modules']['discovery-protocols']       = 1;
-$config['discovery_modules']['arp-table']                 = 1;
-$config['discovery_modules']['discovery-arp']             = 0;
-$config['discovery_modules']['junose-atm-vp']             = 1;
-$config['discovery_modules']['bgp-peers']                 = 1;
-$config['discovery_modules']['vlans']                     = 1;
-$config['discovery_modules']['cisco-mac-accounting']      = 1;
-$config['discovery_modules']['cisco-pw']                  = 1;
-$config['discovery_modules']['cisco-vrf']                 = 1;
-#$config['discovery_modules']['cisco-cef']                = 1;
-$config['discovery_modules']['cisco-sla']                 = 1;
-$config['discovery_modules']['vmware-vminfo']             = 1;
-$config['discovery_modules']['libvirt-vminfo']            = 1;
-$config['discovery_modules']['toner']                     = 1;
-$config['discovery_modules']['ucd-diskio']                = 1;
-$config['discovery_modules']['services']                  = 1;
+$config['discovery_modules']['os']                   = 1;
+$config['discovery_modules']['ports']                = 1;
+$config['discovery_modules']['ports-stack']          = 1;
+$config['discovery_modules']['entity-physical']      = 1;
+$config['discovery_modules']['processors']           = 1;
+$config['discovery_modules']['mempools']             = 1;
+$config['discovery_modules']['cisco-vrf-lite']       = 1;
+$config['discovery_modules']['cisco-mac-accounting'] = 0;
+$config['discovery_modules']['cisco-pw']             = 0;
+$config['discovery_modules']['cisco-vrf']            = 0;
+$config['discovery_modules']['cisco-cef']            = 0;
+$config['discovery_modules']['cisco-sla']            = 0;
+$config['discovery_modules']['cisco-cbqos']          = 0;
+$config['discovery_modules']['cisco-otv']            = 0;
+$config['discovery_modules']['ipv4-addresses']       = 1;
+$config['discovery_modules']['ipv6-addresses']       = 1;
+$config['discovery_modules']['route']                = 0;
+$config['discovery_modules']['sensors']              = 1;
+$config['discovery_modules']['storage']              = 1;
+$config['discovery_modules']['hr-device']            = 1;
+$config['discovery_modules']['discovery-protocols']  = 1;
+$config['discovery_modules']['arp-table']            = 1;
+$config['discovery_modules']['discovery-arp']        = 0;
+$config['discovery_modules']['junose-atm-vp']        = 0;
+$config['discovery_modules']['bgp-peers']            = 1;
+$config['discovery_modules']['vlans']                = 1;
+$config['discovery_modules']['vmware-vminfo']        = 0;
+$config['discovery_modules']['libvirt-vminfo']       = 0;
+$config['discovery_modules']['toner']                = 0;
+$config['discovery_modules']['ucd-diskio']           = 1;
+$config['discovery_modules']['applications']         = 0;
+$config['discovery_modules']['services']             = 1;
+$config['discovery_modules']['stp']                  = 1;
+$config['discovery_modules']['ntp']                  = 1;
+$config['discovery_modules']['loadbalancers']        = 0;
+$config['discovery_modules']['mef']                  = 0;
+$config['discovery_modules']['wireless']             = 1;
+$config['discovery_modules']['fdb-table']            = 1;
 ```
 
 #### OS based Discovery config
 
-You can enable or disable modules for a specific OS by add corresponding line in `includes/definitions/$os.yaml`
+You can enable or disable modules for a specific OS by add corresponding line in `config.php`
 OS based settings have preference over global. Device based settings have preference over all others
 
 Discover performance improvement can be achieved by deactivating all modules that are not supported by specific OS.
