@@ -11,9 +11,16 @@
  */
 
 echo 'Moxa EtherDevice CPU Usage';
+// Moxa people enjoy creating MIBs for each model!
+if ($device['sysDescr'] == 'IKS-6726A-2GTXSFP-T') {
+    $mibmod = 'MOXA-IKS6726A-MIB';
+} else if ($device['sysDescr'] == 'EDS-G508E-T') {
+    $mibmod = 'MOXA-EDSG508E-MIB';
+}
 
-$usage = snmp_get($device, 'cpuLoading30s.0', '-OvQ', 'MOXA-IKS6726A-MIB');
+$usage = snmp_get($device, 'cpuLoading30s.0', '-Ovq', $mibmod);
 
+d_echo($usage."\n");
 if (is_numeric($usage)) {
-    $proc = ($usage * 100);
+    $proc = $usage;
 }
