@@ -2196,15 +2196,20 @@ function dump_db_schema()
 
     foreach (dbFetchRows("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{$config['db_name']}' ORDER BY TABLE_NAME;") as $table) {
         $table = $table['TABLE_NAME'];
-        foreach (dbFetchRows("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$config['db_name']}' AND TABLE_NAME='$table' ORDER BY COLUMN_NAME") as $data) {
-            $column = $data['COLUMN_NAME'];
-            $output[$table]['Columns'][$column] = array(
+        foreach (dbFetchRows("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$config['db_name']}' AND TABLE_NAME='$table'") as $data) {
+            $def = array(
                 'Field'   => $data['COLUMN_NAME'],
                 'Type'    => $data['COLUMN_TYPE'],
                 'Null'    => $data['IS_NULLABLE'] === 'YES',
-                'Default' => isset($data['COLUMN_DEFAULT']) ? trim($data['COLUMN_DEFAULT'], "'") : 'NULL',
-                'Extra'   => $data['EXTRA'],
+                'Extra'   => str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $data['EXTRA']),
             );
+
+            if (isset($data['COLUMN_DEFAULT']) && $data['COLUMN_DEFAULT'] != 'NULL') {
+                $default = trim($data['COLUMN_DEFAULT'], "'");
+                $def['Default'] = str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $default);
+            }
+
+            $output[$table]['Columns'][] = $def;
         }
 
         foreach (dbFetchRows("SHOW INDEX FROM `$table`") as $key) {
@@ -2222,45 +2227,6 @@ function dump_db_schema()
         }
     }
     return $output;
-}
-
-/**
- * Generate an SQL segment to create the column based on data from dump_db_schema()
- *
- * @param array $column_data The array of data for the column
- * @return string sql fragment, for example: "`ix_id` int(10) unsigned NOT NULL"
- */
-function column_schema_to_sql($column_data)
-{
-    $null = $column_data['Null'] ? 'NULL' : 'NOT NULL';
-    $default = $column_data['Default'] == '' ? '' : "DEFAULT '{$column_data['Default']}'";
-    if (str_contains($default, 'CURRENT_TIMESTAMP')) {
-        $default = str_replace("'", "", $default);
-    }
-    return trim("`{$column_data['Field']}` {$column_data['Type']} $null $default {$column_data['Extra']}");
-}
-
-/**
- * Generate an SQL segment to create the index based on data from dump_db_schema()
- *
- * @param array $index_data The array of data for the index
- * @return string sql fragment, for example: "PRIMARY KEY (`device_id`)"
- */
-function index_schema_to_sql($index_data)
-{
-    if ($index_data['Name'] == 'PRIMARY') {
-        $index = 'PRIMARY KEY (%s)';
-    } elseif ($index_data['Unique']) {
-        $index = "UNIQUE `{$index_data['Name']}` (%s)";
-    } else {
-        $index = "INDEX `{$index_data['Name']}` (%s)";
-    }
-
-    $columns = implode(',', array_map(function ($col) {
-        return "`$col`";
-    }, $index_data['Columns']));
-
-    return sprintf($index, $columns);
 }
 
 /**
