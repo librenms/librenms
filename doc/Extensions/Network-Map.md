@@ -20,7 +20,8 @@ A global map will be drawn from the information in the database, it is worth not
 Network maps for individual devices are available showing the relationship with other devices.
 Also you can Build Device Groups and those Device Groups can drawn with Network Map.
 
-### Network Map configurator. 
+### Network Map Configurator. 
+This link will show you all the options and explain what they do. [Link](http://visjs.org/docs/network/)  
 You may also access the dyanamic configuraiton interface [example here](http://visjs.org/examples/network/other/configuration.html) from within LibreNMS by adding the following to config.php
 ```php
 $config['network_map_vis_options'] = '{
