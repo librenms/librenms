@@ -1,5 +1,7 @@
 source: Extensions/Network-Map.md
 
+# Network Map
+
 LibreNMS has the ability to show you a network map based on:
 
 - xDP Discovery
@@ -20,21 +22,19 @@ Also you can Build Device Groups and those Device Groups can drawn with Network 
 
 ### Network Map configurator. 
 You may also access the dyanamic configuraiton interface [example here](http://visjs.org/examples/network/other/configuration.html) from within LibreNMS by adding the following to config.php
-Add this into your config.php
 ```php
 $config['network_map_vis_options'] = '{
   "configure": { "enabled": true},
 }';
 ```
-
 ### Note 
-You may want to disable the automatic page refresh while you're tweaking your configuration, as the refresh will reset the dynamic configuration UI to the values currently saved in librenms/config.php.
+You may want to disable the automatic page refresh while you're tweaking your configuration, as the refresh will reset the dynamic configuration UI to the values currently saved in config.php
 This can be done by going clicking on the Settings Icon then Refresh Pause.
 
-Once you've achieved your desired map appearance, click the generate options button at the bottom to be given the necessary parameters to add to your librenms/config.php file.
-
-You will need to paste the genrated config into config.php the format will need to look like this 
-
+### Configurator Output
+Once you've achieved your desired map appearance, click the generate options button at the bottom to be given the necessary parameters to add to your config.php file.
+You will need to paste the genrated config into config.php the format will need to look something like this. 
+Note that the configuartor will output the config with `var options` you will need strip that out and at the end of the config you need to add in `}';` see the example below. 
 ```php
 $config['network_map_vis_options'] = '{
   "nodes": {
