@@ -12,7 +12,7 @@
  */
 
 if ($device['os'] == 'moxa-etherdevice') {
-    echo 'Moxa EtherDevice';
+    d_echo('Moxa EtherDevice');
 
     // Moxa people enjoy creating similar MIBs for each model!
     if ($device['sysDescr'] == 'IKS-6726A-2GTXSFP-T') {
@@ -21,11 +21,11 @@ if ($device['os'] == 'moxa-etherdevice') {
         $mibmod = 'MOXA-EDSG508E-MIB';
     }
 
-    $memres = snmp_get_multi_oid($device, 'totalMemory.0 freeMemory.0', '-OQUs', $mibmod);
+    $mem_res = snmp_get_multi_oid($device, 'totalMemory.0 freeMemory.0', '-OQUs', $mibmod);
     $total = $mem_res['totalMemory.0'];
     $avail = $mem_res['freeMemory.0'];
 
     if ((is_numeric($total)) && (is_numeric($avail))) {
-        discover_mempool($valid_mempool, $device, 0, 'moxa-etherdevice-mem', 'Memory', '1', null, null);
+        discover_mempool($valid_mempool, $device, 0, 'moxa-etherdevice', 'Memory', '1', null, null);
     }
 }
