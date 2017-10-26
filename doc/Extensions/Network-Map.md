@@ -18,7 +18,7 @@ XDP is based on FDP, CDP and LLDP support based on the device type.
 
 A global map will be drawn from the information in the database, it is worth noting that this could lead to a large network map.
 Network maps for individual devices are available showing the relationship with other devices.
-Also you can Build Device Groups and those Device Groups can drawn with Network Map.
+Also you can Build Device Groups and those Device Groups can be drawn with Network Map.
 
 ### Network Map Configurator. 
 This link will show you all the options and explain what they do. [Link](http://visjs.org/docs/network/)  
