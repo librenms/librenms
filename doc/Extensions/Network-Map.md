@@ -1,5 +1,7 @@
 source: Extensions/Network-Map.md
 
+# Network Map
+
 LibreNMS has the ability to show you a network map based on:
 
 - xDP Discovery
@@ -12,55 +14,59 @@ $config['network_map_items'] = array('mac','xdp');
 ```
 
 Either remove mac or xdp depending on which you want.
+XDP is based on FDP, CDP and LLDP support based on the device type.
 
 A global map will be drawn from the information in the database, it is worth noting that this could lead to a large network map.
 Network maps for individual devices are available showing the relationship with other devices.
+Also you can Build Device Groups and those Device Groups can be drawn with Network Map.
 
-One can also specify the parameters to be used for drawing and updating the network map.
-Please see http://visjs.org/docs/network/ for details on the configuration parameters.
-```php
-$config['network_map_vis_options'] = '{
-  layout:{
-      randomSeed:2
-  },
-  "edges": {
-    "smooth": {
-        enabled: false
-    },
-    font: {
-        size: 12,
-        color: "red",
-        face: "sans",
-        background: "white",
-        strokeWidth:3,
-        align: "middle",
-        strokeWidth: 2
-    }
-  },
-  "physics": {
-    "forceAtlas2Based": {
-      "gravitationalConstant": -800,
-      "centralGravity": 0.03,
-      "springLength": 50,
-      "springConstant": 0,
-      "damping": 1,
-      "avoidOverlap": 1
-    },
-    "maxVelocity": 50,
-    "minVelocity": 0.01,
-    "solver": "forceAtlas2Based",
-    "timestep": 0.30
-  }
-}';
-```
-
-You may also access the dyanamic configuraiton interface (example here: http://visjs.org/examples/network/other/configuration.html) from within LibreNMS by adding the following as the first line of the network_map_vis_options parameters:
+### Network Map Configurator. 
+This link will show you all the options and explain what they do. [Link](http://visjs.org/docs/network/)  
+You may also access the dyanamic configuraiton interface [example here](http://visjs.org/examples/network/other/configuration.html) from within LibreNMS by adding the following to config.php
 ```php
 $config['network_map_vis_options'] = '{
   "configure": { "enabled": true},
 }';
 ```
+### Note 
+You may want to disable the automatic page refresh while you're tweaking your configuration, as the refresh will reset the dynamic configuration UI to the values currently saved in config.php
+This can be done by going clicking on the Settings Icon then Refresh Pause.
 
-Note that you may want to disable the automatic page refresh while you're tweaking your configuration, as the refresh will reset the dynamic configuration UI to the values currently saved in librenms/config.php.
+### Configurator Output
+Once you've achieved your desired map appearance, click the generate options button at the bottom to be given the necessary parameters to add to your config.php file.
+You will need to paste the genrated config into config.php the format will need to look something like this. 
+Note that the configuartor will output the config with `var options` you will need strip that out and at the end of the config you need to add in `}';` see the example below. 
+```php
+$config['network_map_vis_options'] = '{
+  "nodes": {
+    "color": {
+      "background": "rgba(20,252,18,1)"
+    },
+    "font": {
+      "face": "tahoma"
+    },
+    "physics": false
+  },
+  "edges": {
+    "smooth": {
+      "forceDirection": "none"
+    }
+  },
+  "interaction": {
+    "hover": true,
+    "multiselect": true,
+    "navigationButtons": true
+  },
+  "manipulation": {
+    "enabled": true
+  },
+  "physics": {
+    "barnesHut": {
+      "avoidOverlap": 0.11
+    },
+    "minVelocity": 0.75
+  }
+}';
+```
 
-Once you've achieved your desired map appearance, click the generate options button at the bottom to be given the necessary parameters to add to your librenms/config.php file.
+![Example Network Map](/img/networkmap.PNG)
