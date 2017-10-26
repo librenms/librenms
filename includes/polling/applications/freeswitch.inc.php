@@ -8,8 +8,11 @@ if (!empty($agent_data[$name])) {
     $rawdata = $agent_data[$name];
     update_application($app, $rawdata);
 } else {
-    echo "Freeswitch Missing";
-    return;
+    $options = '-O qv';
+    $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.10.102.114.101.101.115.119.105.116.99.104';
+    $rawdata = snmp_walk($device, $oid, $options);
+    $rawdata  = str_replace("<<<freeswitch>>>\n", '', $rawdata);
+    update_application($app, $rawdata);
 }
 # Format Data
 $lines = explode("\n", $rawdata);
