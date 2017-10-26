@@ -118,7 +118,7 @@ function getHostOS($device)
         if (isset($tmp['discovery']) && is_array($tmp['discovery'])) {
             foreach ($tmp['discovery'] as $item) {
                 // check each item individually, if all the conditions in that item are true, we have a match
-                if (checkDiscovery($item, $sysObjectId, $sysDescr)) {
+                if (checkDiscovery($device, $item, $sysObjectId, $sysDescr)) {
                     return $tmp['os'];
                 }
             }
@@ -143,13 +143,17 @@ function getHostOS($device)
  * sysObjectId if sysObjectId starts with any of the values under this item
  * sysDescr if sysDescr contains any of the values under this item
  * sysDescr_regex if sysDescr matches any of the regexes under this item
+ * snmpget perform an snmpget on `oid` and check if the result contains `value`. Other subkeys: options, mib, mibdir
  *
+ * Appending _except to any condition will invert the match.
+ *
+ * @param array $device
  * @param array $array Array of items, keys should be sysObjectId, sysDescr, or sysDescr_regex
  * @param string $sysObjectId The sysObjectId to check against
  * @param string $sysDescr the sysDesr to check against
  * @return bool the result (all items passed return true)
  */
-function checkDiscovery($array, $sysObjectId, $sysDescr)
+function checkDiscovery($device, $array, $sysObjectId, $sysDescr)
 {
     // all items must be true
     foreach ($array as $key => $value) {
@@ -173,6 +177,17 @@ function checkDiscovery($array, $sysObjectId, $sysDescr)
             if (preg_match_any($sysObjectId, $value) == $check) {
                 return false;
             }
+        } elseif ($key == 'snmpget') {
+            $options = isset($value['options']) ? $value['options'] : '-Oqv';
+            $mib = isset($value['mib']) ? $value['mib'] : null;
+            $mib_dir = isset($value['mibdir']) ? $value['mibdir'] : null;
+            $op = isset($value['op']) ? $value['op'] : 'contains';
+
+            $get_value = snmp_get($device, $value['oid'], $options, $mib, $mib_dir);
+
+            if (compare_var($get_value, $value['value'], $op) == $check) {
+                return false;
+            }
         }
     }
 
@@ -194,6 +209,49 @@ function preg_match_any($subject, $regexes)
         }
     }
     return false;
+}
+
+/**
+ * Perform comparison of two items based on give comparison method
+ * Valid comparisons: =, !=, ==, !==, >=, <=, >, <, contains, starts, ends, regex
+ * contains, starts, ends: $a haystack, $b needle(s)
+ * regex: $a subject, $b regex
+ *
+ * @param mixed $a
+ * @param mixed $b
+ * @param string $comparison =, !=, ==, !== >=, <=, >, <, contains, starts, ends, regex
+ * @return bool
+ */
+function compare_var($a, $b, $comparison = '=')
+{
+    switch ($comparison) {
+        case "=":
+            return $a == $b;
+        case "!=":
+            return $a != $b;
+        case "==":
+            return $a === $b;
+        case "!==":
+            return $a !== $b;
+        case ">=":
+            return $a >= $b;
+        case "<=":
+            return $a <= $b;
+        case ">":
+            return $a > $b;
+        case "<":
+            return $a < $b;
+        case "contains":
+            return str_contains($a, $b);
+        case "starts":
+            return starts_with($a, $b);
+        case "ends":
+            return ends_with($a, $b);
+        case "regex":
+            return (bool)preg_match($b, $a);
+        default:
+            return false;
+    }
 }
 
 function percent_colour($perc)
