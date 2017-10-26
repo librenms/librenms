@@ -10,3 +10,19 @@ over:
 mib_dir:
     - synology
 processor_stacked: 1
+discovery:
+    -
+      sysDescr_regex: '/^Linux /'
+      snmpget:
+          oid: systemStatus.0
+          mib: SYNOLOGY-SYSTEM-MIB
+          mibdir: synology
+          op: '!=='
+          value: false
+    -
+      sysDescr_regex: '/^Linux /'
+      snmpget:
+          oid: HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0
+          value:
+              - 'syno_hw_version'
+              - 'syno_dyn_module'

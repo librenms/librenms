@@ -218,11 +218,11 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
             $result = '.' . $data[1];
         }
 
-        d_echo("[SNMP] snmpget $community $num_oid: $result\n");
+        d_echo("[SNMP] snmpget $community $oid ($num_oid): $result\n");
 
         return $result;
     } catch (Exception $e) {
-        d_echo("[SNMP] snmpget $community $num_oid: no data\n");
+        d_echo("[SNMP] snmpget $community $oid ($num_oid): no data\n");
         return false;
     }
 }
