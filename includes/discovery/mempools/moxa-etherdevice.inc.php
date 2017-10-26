@@ -26,6 +26,6 @@ if ($device['os'] == 'moxa-etherdevice') {
     $avail = $mem_res['freeMemory.0'];
 
     if ((is_numeric($total)) && (is_numeric($avail))) {
-        discover_mempool($valid_mempool, $device, 0, 'moxa-etherdevice', 'Memory', '1', null, null);
+        discover_mempool($valid_mempool, $device, 0, 'moxa-etherdevice-mem', 'Memory', '1', null, null);
     }
 }
