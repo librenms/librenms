@@ -29,6 +29,6 @@ I'd recommend you use the output folder as this is excluded from git updates (i.
 
 Optional: If your install is in another directory than standard, set `$basehref` within `map-poller.php`.
 
-source How To from [Link](https://github.com/librenms-plugins/Weathermap/edit/master/INSTALL.md)
+Automatically generate weathermaps from a LibreNMS database [Link](https://github.com/pblasquez/weathermapper)
 
 ![Example Network Weather Map](/img/network-weather-map.PNG)
