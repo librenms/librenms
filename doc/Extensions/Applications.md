@@ -13,6 +13,7 @@ Different applications support a variety of ways to collect data: by direct conn
 1. [Fail2ban](#fail2ban) - SNMP extend
 1. [FreeBSD NFS Client](#freebsd-nfs-client) - SNMP extend
 1. [FreeBSD NFS Server](#freebsd-nfs-server) - SNMP extend
+1. [Freeswitch](#freeswitch) - SNMP extend, Agent
 1. [GPSD](#gpsd) - Agent
 1. [Mailscanner](#mailscanner) - SNMP extend
 1. [Memcached](#memcached) - SNMP extend
