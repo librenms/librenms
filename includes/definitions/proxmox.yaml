@@ -21,7 +21,8 @@ discovery_modules:
     libvirt-vminfo: 0
 processor_stacked: 1
 discovery:
-    - sysObjectId:
+    -
+      sysObjectId:
             - .1.3.6.1.4.1.8072.3.2.10
-    - sysDescr:
+      sysDescr:
             - PVE
