@@ -6,3 +6,14 @@ over:
 icon: servertech
 mib_dir:
     - sentry
+discovery:
+    -
+      sysDescr:
+        - Switched
+        - Smart
+      snmpget:
+        oid: serverTech.4.1.1.1.3.0
+        mib: Sentry3-MIB
+        mibdir: sentry
+        op: regex
+        value: '/[^\s]* [0-7]/'
