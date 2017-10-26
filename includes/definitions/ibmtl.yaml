@@ -4,3 +4,7 @@ type: storage
 icon: generic
 over:
     - { graph: device_bits, text: Traffic }
+discovery:
+    - snmpget:
+        oid: SML-MIB::product-Name.0
+        value: IBM System Storage TS3500 Tape Library
