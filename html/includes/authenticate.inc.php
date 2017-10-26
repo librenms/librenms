@@ -58,6 +58,8 @@ try {
             if (isset($_REQUEST['username']) && isset($_REQUEST['password'])) {
                 $username = clean($_REQUEST['username']);
                 $password = $_REQUEST['password'];
+            } elseif ($authorizer->authIsExternal()) {
+                $username = $authorizer->getExternalUsername();
             } elseif (isset($_SERVER['REMOTE_USER'])) {
                 $username = clean($_SERVER['REMOTE_USER']);
             } elseif (isset($_SERVER['PHP_AUTH_USER']) && $config['auth_mechanism'] === 'http-auth') {
