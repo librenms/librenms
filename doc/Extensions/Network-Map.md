@@ -29,6 +29,7 @@ $config['network_map_vis_options'] = '{
 
 ### Note 
 You may want to disable the automatic page refresh while you're tweaking your configuration, as the refresh will reset the dynamic configuration UI to the values currently saved in librenms/config.php.
+This can be done by going clicking on the Settings Icon then Refresh Pause.
 
 Once you've achieved your desired map appearance, click the generate options button at the bottom to be given the necessary parameters to add to your librenms/config.php file.
 
