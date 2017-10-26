@@ -66,3 +66,5 @@ $config['network_map_vis_options'] = '{
   }
 }';
 ```
+
+![Example Network Map](/img/networkmap.png)
