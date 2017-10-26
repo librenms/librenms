@@ -1,0 +1,225 @@
+-- Copyright 2004, 2005, 2006 MITEL Networks Corporation
+-- All rights reserved.
+-- This MITEL SNMP Management Information Base Specification
+-- (Specification) embodies MITEL's confidential and
+-- proprietary intellectual property. MITEL retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+
+-- This Specification is supplied "AS IS", and MITEL makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+MITEL-APPCMN-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE 
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DisplayString
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        mitelIdentification, mitelPropApplications, mitelConfGroups,
+        mitelConfCompliances
+           FROM MITEL-MIB
+        ItuPerceivedSeverity
+           FROM MITEL-CMNALM-MIB;
+
+    mitelAppCommon        MODULE-IDENTITY
+        LAST-UPDATED      "201402111200Z"
+        ORGANIZATION      "MITEL Networks Corporation"
+        CONTACT-INFO      "Standards Group,
+                           Postal:    MITEL Networks Corporation
+                           350 Legget Drive, PO Box 13089
+                           Kanata, Ontario
+                           Canada  K2K 2W7
+                           Tel: +1 613 592 2122
+                           Fax: +1 613 592 4784
+                           URL: www.mitel.com"
+        DESCRIPTION       "Replaced E-Mail: std@mitel.com with URL: www.mitel.com."
+        REVISION          "201402111200Z"
+        DESCRIPTION       "The MITEL Application-Specific Common MIB module."
+        REVISION          "200502212134Z"
+        DESCRIPTION       "Some additional attributes added to the Applications table." 
+        REVISION          "200401300000Z"
+        DESCRIPTION       "MITEL Application-Specific Common MIB Version 1.0.0.1 - Draft" 
+    ::= { mitelPropApplications 2 }
+
+    -- ****************************************************************
+    -- MITEL Common Application-specific Textual Conventions
+    -- ****************************************************************
+
+    -- ****************************************************************
+    -- The mitelAppCommon  subtree... Common information for Manageable 
+    -- Applications. 
+    -- ****************************************************************
+
+    mitelAppCmnObjects    OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Manageable Application Common Objects."
+    ::= { mitelAppCommon 1 }
+
+    mitelAppTable OBJECT-TYPE
+        SYNTAX           SEQUENCE OF MitelAppTableEntry
+        MAX-ACCESS       not-accessible
+        STATUS           current
+        DESCRIPTION      "A list of the MITEL-defined manageable applications 
+                          supported by this agent. This table is typically 
+                          maintained in non-volatile memory, and is re-built 
+                          upon agent restart."
+        ::= { mitelAppCmnObjects 1 }
+
+    mitelAppTableEntry OBJECT-TYPE
+        SYNTAX           MitelAppTableEntry
+        MAX-ACCESS       not-accessible
+        STATUS           current
+        DESCRIPTION      "An entry containing application information."
+        INDEX            { mitelAppTblProductOid }
+        ::= { mitelAppTable     1 }
+
+    MitelAppTableEntry ::=
+        SEQUENCE {
+            mitelAppTblProductOid          OBJECT IDENTIFIER,
+            mitelAppTblProductManufacturer DisplayString ,
+            mitelAppTblProductName         DisplayString,
+            mitelAppTblProductVersion      DisplayString, 
+            mitelAppTblProductDescr        DisplayString,
+            mitelAppTblAppAlrmStatus       ItuPerceivedSeverity
+        }
+
+    -- Size of DisplayString will be set to a maximum value.
+
+    mitelAppTblProductOid OBJECT-TYPE
+        SYNTAX            OBJECT IDENTIFIER
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "The OID value of the application."
+        ::= { mitelAppTableEntry 1 }
+
+    mitelAppTblProductManufacturer OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "Product Manufacturer of this application."
+        ::= { mitelAppTableEntry 2 }
+
+    mitelAppTblProductName OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "Product Name of this application."
+        ::= { mitelAppTableEntry 3 }
+
+    mitelAppTblProductVersion OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "Product Version of this application. The format is 
+                          described in document xxx."
+        ::= { mitelAppTableEntry 4 }
+
+    mitelAppTblProductDescr OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "Product description of this application that may not be 
+                          contained in of the MIB-variables. If the description is 
+                          not available then this should return an empty string '' as
+                          its value."
+        ::= { mitelAppTableEntry 5 }
+
+    mitelAppTblAppAlrmStatus OBJECT-TYPE
+        SYNTAX            ItuPerceivedSeverity
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "Indicates the application's alarm level severity."
+        ::= { mitelAppTableEntry 6 }
+
+    -- mitelAppTblAppStatus OBJECT-TYPE
+    --     SYNTAX         INTEGER {
+    --                        online (1),
+    --                        offline (2),
+    --                        error (3),
+    --                        unknown(4)
+    --                    }
+    --     MAX-ACCESS        read-only
+    --     STATUS            current
+    --     DESCRIPTION       "Indicates the application's operational state."
+    --     ::= { mitelAppTableEntry .n. }
+
+    mitelAppNumberOfApps OBJECT-TYPE
+        SYNTAX       INTEGER (0..65535)
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "Indicates the number of applications installed
+                      on this platform registered with the Applications 
+                      Table."
+        ::= { mitelAppCmnObjects 2 }
+
+    -- ****************************************************************
+    -- The mitelConformance subtree.
+    -- ****************************************************************
+
+    mitelGrpAppCommon   OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "The groups associated with the Applications Common MIB."
+        ::= { mitelConfGroups 3 }
+
+    -- ****************************************************************
+    -- The mitelComplMitelAppCmn subtree.... Compliance Statement
+    -- ****************************************************************
+
+    mitelComplAppCommon   OBJECT-IDENTITY
+          STATUS          current
+          DESCRIPTION     "The groups associated with the Applications Common MIB."
+          ::= { mitelConfCompliances 5 }
+
+    mitelComplAppCmn MODULE-COMPLIANCE
+        STATUS            current
+        DESCRIPTION       "The compliance statement for SNMPv2 entities which
+                           implement the MITEL Applications Common MIB."
+        MODULE -- compliance to the MITEL Applications Common MIB module
+          MANDATORY-GROUPS { mitelGrpAppCmn }
+              OBJECT       mitelAppTblProductOid
+                  MIN-ACCESS  read-only
+                  DESCRIPTION "Read-only."
+              OBJECT       mitelAppTblProductManufacturer
+                  MIN-ACCESS  read-only
+                  DESCRIPTION "Read-only. Cannot be an empty string."
+              OBJECT       mitelAppTblProductName
+                  MIN-ACCESS  read-only
+                  DESCRIPTION "Read-only. Cannot be an empty string."
+              OBJECT       mitelAppTblProductVersion
+                  MIN-ACCESS  read-only
+                  DESCRIPTION "Read-only. Cannot be an empty string and must follow the 
+                              rules as outlined in Reference xxx."
+              OBJECT       mitelAppTblProductDescr
+                  MIN-ACCESS  read-only
+                  DESCRIPTION "Read-only. Can be an empty string."
+              OBJECT       mitelAppTblAppAlrmStatus
+                  MIN-ACCESS  read-only
+                  DESCRIPTION "Read-only."
+
+        ::= { mitelComplAppCommon 1 }
+
+    -- ****************************************************************
+    -- The mitelConfGroups Application Common subtree.
+    -- ****************************************************************
+
+    mitelGrpAppCmn    OBJECT-GROUP
+        OBJECTS           {
+                            mitelAppTblProductOid, 
+                            mitelAppTblProductManufacturer,
+                            mitelAppTblProductName,
+                            mitelAppTblProductVersion,
+                            mitelAppTblProductDescr,
+                            mitelAppTblAppAlrmStatus                        
+                          }
+        STATUS            current
+        DESCRIPTION       "The collection of objects providing information on
+                          the applications on the current agent platform."
+        ::= { mitelGrpAppCommon 1 }
+
+-- MITEL-APPCMN-MIB
+
+END 

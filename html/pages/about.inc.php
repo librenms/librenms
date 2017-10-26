@@ -147,7 +147,7 @@ echo "
 
     <h3>LibreNMS is an autodiscovering PHP/MySQL-based network monitoring system.</h3>
 <?php
-$versions = version_info(false);
+$versions = version_info();
 $project_name    = $config['project_name'];
 $webserv_version = $_SERVER['SERVER_SOFTWARE'];
 $php_version     = $versions['php_ver'];

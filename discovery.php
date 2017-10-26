@@ -63,7 +63,7 @@ if (isset($options['i']) && $options['i'] && isset($options['n'])) {
 }
 
 if (isset($options['d']) || isset($options['v'])) {
-    $versions = version_info(false);
+    $versions = version_info();
     echo <<<EOH
 ===================================
 Version info:
