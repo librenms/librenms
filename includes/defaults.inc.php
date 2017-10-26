@@ -767,7 +767,6 @@ $config['poller_modules']['ntp']                         = 1;
 $config['poller_modules']['services']                    = 1;
 $config['poller_modules']['loadbalancers']               = 0;
 $config['poller_modules']['mef']                         = 0;
-$config['poller_modules']['tnms-nbi']                    = 0;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
