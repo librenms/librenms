@@ -282,6 +282,35 @@ You may need to configure `$server` or `$port`.
 Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
 
 
+### Freeswitch
+A small shell script that reports various Freeswitch call status.
+
+##### Agent
+1. [Install the agent](Agent-Setup.md) on your Freeswitch server if it isn't already
+
+2. Copy the [freeswitch script](https://github.com/librenms/librenms-agent/blob/master/agent-local/freeswitch) to `/usr/lib/check_mk_agent/local/`
+
+3. Configure `FSCLI` in the script. You may also have to create an `/etc/fs_cli.conf` file if your `fs_cli` command requires authentication.
+
+4. Verify it is working by running `/usr/lib/check_mk_agent/local/freeswitch`
+
+##### SNMP Extend
+1. Copy the [freeswitch script](https://github.com/librenms/librenms-agent/blob/master/agent-local/freeswitch) to `/etc/snmp/` on your Freeswitch server.
+
+2. Make the script executable: `chmod +x /etc/snmp/freeswitch`
+
+3. Configure `FSCLI` in the script. You may also have to create an `/etc/fs_cli.conf` file if your `fs_cli` command requires authentication.
+
+4. Verify it is working by running `/etc/snmp/freeswitch`
+
+5. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+```
+extend freeswitch /etc/snmp/freeswitch
+```
+
+6. Restart snmpd on your host
+
+
 ### Memcached
 ##### SNMP Extend
 1. Copy the [memcached script](https://github.com/librenms/librenms-agent/blob/master/agent-local/memcached) to `/etc/snmp/` on your remote server.
