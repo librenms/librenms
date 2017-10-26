@@ -11,12 +11,13 @@ Extract to your LibreNMS plugins directory `html/plugins` so you should see some
 The best way to do this is via git. Go to your install directory and then `html/plugins`.
 Enter:
     `git clone https://github.com/librenms-plugins/Weathermap.git`
-### Step 2. 
+### Step 2.
+Inside the librenms/html/plugins directory, change the ownership of the Weathermap directory by typing `chown -R librenms:librenms Weathermap/`
 Make the configs directory writeable by your web server, either `chown apache:apache configs/` or `chmod 777 configs`.
 I'd highly advise you choose the first option, replace `apache:apache` with your web servers user and group.
 ### Step 3. 
 Enable the cron process by editing your current LibreNMS cron file (typically /etc/cron.d/librenms) and add the following:
-LibreNMS:  `*/5 * * * * root /opt/librenms/html/plugins/Weathermap/map-poller.php >> /dev/null 2>&1`
+LibreNMS:  `*/5 * * * * librenms /opt/librenms/html/plugins/Weathermap/map-poller.php >> /dev/null 2>&1`
 ### Step 4. 
 Enable the plugin from LibreNMS Web UI in OverView ->Plugins -> Plugin Admin menu.
 
