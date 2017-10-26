@@ -208,6 +208,7 @@ LibreNMS contributors:
 - Mike Williams <mike@mgww.net> (network-guy)
 - Rob J. Epping <librenms@renf.us> (robje)
 - Frank Petrilli <frank@petril.li> (frankpetrilli)
+- Joel Kociolek <joel@kociolek.org> (lejoko)
 
 Observium was written by:
 - Adam Armstrong

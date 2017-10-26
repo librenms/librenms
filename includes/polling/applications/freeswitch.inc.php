@@ -13,8 +13,6 @@ if (!empty($agent_data[$name])) {
     $rawdata = snmp_walk($device, $oid, $options);
     $rawdata  = str_replace("<<<freeswitch>>>\n", '', $rawdata);
     update_application($app, $rawdata);
-    //echo "Freeswitch Missing";
-    //return;
 }
 # Format Data
 $lines = explode("\n", $rawdata);
