@@ -171,7 +171,7 @@ class IRCBot
             if ($this->config['irc_alert']) {
                 $this->alertData();
             }
-            
+
             if ($this->config['irc_conn_timeout']) {
                 $inactive_seconds = time() - $this->last_activity;
                 $max_inactive = $this->config['irc_conn_timeout'];
@@ -677,7 +677,7 @@ class IRCBot
 
     private function _version($params)
     {
-        $versions       = version_info(false);
+        $versions       = version_info();
         $schema_version = $versions['db_schema'];
         $version        = substr($versions['local_sha'], 0, 7);
 

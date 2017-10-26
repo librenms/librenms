@@ -1104,9 +1104,10 @@ function parse_location($location)
 
 /**
  * Returns version info
+ * @param bool $remote fetch remote version info from github
  * @return array
-**/
-function version_info($remote = true)
+ */
+function version_info($remote = false)
 {
     global $config;
     $output = array();
