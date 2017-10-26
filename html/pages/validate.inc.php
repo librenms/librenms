@@ -26,6 +26,8 @@
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
+$no_refresh = true;
+
 ?>
 
 <div class="container-fluid" id="messagebox">
@@ -71,13 +73,13 @@ foreach ($validator->getAllResults() as $group => $results) {
     foreach ($results as $rnum => $result) {
         /** @var ValidationResult $result */
 
-        echo '<div class="panel"><div class="panel-heading';
+        echo '<div class="panel';
         if ($result->getStatus() == ValidationResult::SUCCESS) {
-            echo ' bg-success"> Ok: ';
+            echo ' panel-success"><div class="panel-heading bg-success"> Ok: ';
         } elseif ($result->getStatus() == ValidationResult::WARNING) {
-            echo ' bg-warning"> Warning: ';
+            echo ' panel-warning"><div class="panel-heading bg-warning"> Warning: ';
         } elseif ($result->getStatus() == ValidationResult::FAILURE) {
-            echo ' bg-danger"> Fail: ';
+            echo ' panel-danger"><div class="panel-heading bg-danger"> Fail: ';
         }
 
         echo $result->getMessage();
@@ -86,7 +88,7 @@ foreach ($validator->getAllResults() as $group => $results) {
         if ($result->hasFix() || $result->hasList()) {
             echo '<div class="panel-body">';
             if ($result->hasFix()) {
-                echo '<p class="bg-danger text-danger">' . linkify($result->getFix()) . '</p>';
+                echo '<code>' . linkify($result->getFix()) . '</code>';
                 if ($result->hasList()) {
                     echo '<br />';
                 }
