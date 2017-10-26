@@ -853,7 +853,7 @@ $config['api_demo'] = 0;
 // Set this to 1 if you want to disable some untrusting features for the API
 // Distributed Poller-Settings
 $config['distributed_poller']                = false;
-$config['distributed_poller_name']           = file_get_contents('/proc/sys/kernel/hostname');
+$config['distributed_poller_name']           = trim(file_get_contents('/proc/sys/kernel/hostname'));
 $config['distributed_poller_group']          = 0;
 $config['distributed_poller_memcached_host'] = 'example.net';
 $config['distributed_poller_memcached_port'] = '11211';

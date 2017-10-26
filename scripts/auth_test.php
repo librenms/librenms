@@ -58,7 +58,7 @@ if (function_exists('ad_bind')) {
     } else {
         if (!ad_bind($ldap_connection)) {
             echo ldap_error($ldap_connection) . PHP_EOL;
-            print_warn("Could not anonymous bind to AD");
+            print_message("Could not anonymous bind to AD");
         } else {
             print_message('AD bind anonymous successful');
         }
