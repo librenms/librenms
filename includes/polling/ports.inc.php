@@ -230,6 +230,10 @@ if ($device['os'] != 'asa') {
     $port_stats = snmpwalk_cache_oid($device, 'dot3StatsDuplexStatus', $port_stats, 'EtherLike-MIB');
 }
 
+if ($device['os'] == 'procera') {
+    require_once 'ports/procera.inc.php';
+}
+
 if ($config['enable_ports_adsl']) {
     $device['adsl_count'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `ifType` = 'adsl'", array($device['device_id']));
 }

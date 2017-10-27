@@ -641,6 +641,7 @@ if ($_SESSION['authenticated']) {
 <?php
 if ($_SESSION['userlevel'] >= '10') {
     echo('<li><a href="settings/"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> Global Settings</a></li>');
+    echo('<li><a href="validate/"><i class="fa fa-check-circle fa-fw fa-lg" aria-hidden="true"></i> Validate Config</a></li>');
 }
 
 ?>

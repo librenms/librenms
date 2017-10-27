@@ -50,4 +50,21 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(isHexString('a5 fj 53'));
         $this->assertFalse(isHexString('a5fe53'));
     }
+
+    public function testLinkify()
+    {
+        $input = 'foo@demo.net	bar.ba@test.co.uk
+www.demo.com	http://foo.co.uk/
+sdfsd
+http://regexr.com/foo.html?q=bar
+https://mediatemple.net.';
+
+        $expected = 'foo@demo.net	bar.ba@test.co.uk
+www.demo.com	<a href="http://foo.co.uk/">http://foo.co.uk/</a>
+sdfsd
+<a href="http://regexr.com/foo.html?q=bar">http://regexr.com/foo.html?q=bar</a>
+<a href="https://mediatemple.net">https://mediatemple.net</a>.';
+
+        $this->assertSame($expected, linkify($input));
+    }
 }

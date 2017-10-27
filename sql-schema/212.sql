@@ -1,1 +1,1 @@
-ALTER TABLE `devices` ADD `snmp_disable` TINYINT(1) NOT NULL DEFAULT 0 AFTER `port_association_mode`;
+DELETE FROM `pollers` WHERE `poller_name` LIKE '%\n';

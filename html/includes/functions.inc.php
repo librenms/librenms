@@ -72,7 +72,7 @@ function nicecase($item)
 
         case 'nfs-v3-stats':
             return 'NFS v3 Stats';
-            
+
         case 'nfs-server':
             return 'NFS Server';
 
@@ -111,7 +111,7 @@ function nicecase($item)
 
         case 'fbsd-nfs-server':
             return 'FreeBSD NFS Server';
-        
+
         case 'php-fpm':
             return 'PHP-FPM';
 
@@ -161,6 +161,20 @@ function toner2colour($descr, $percent)
 
     return $colour;
 }//end toner2colour()
+
+
+/**
+ * Find all links in some text and turn them into html links.
+ *
+ * @param string $text
+ * @return string
+ */
+function linkify($text)
+{
+    $regex = "/(http|https|ftp|ftps):\/\/[a-z0-9\-.]+\.[a-z]{2,5}(\/\S*)?/i";
+
+    return preg_replace($regex, '<a href="$0">$0</a>', $text);
+}
 
 
 function generate_link($text, $vars, $new_vars = array())

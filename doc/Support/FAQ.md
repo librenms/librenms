@@ -63,7 +63,7 @@ We have a few methods for you to get in touch to ask for help.
 
 [Community Forum](https://community.librenms.org)
 
-[IRC](https://webchat.freenode.net/) Freenode ##librenms
+[Discord](https://t.libren.ms/discord)
 
 [Bug Reports](https://github.com/librenms/librenms/issues)
 
@@ -75,7 +75,7 @@ Supported is quite a strong word :) The 'officially' supported distros are:
  - Red Hat / CentOS
  - Gentoo
 
-However we will always aim to help wherever possible so if you are running a distro that isn't one of the above then give it a try anyway and if you need help then jump on the irc channel.
+However we will always aim to help wherever possible so if you are running a distro that isn't one of the above then give it a try anyway and if you need help then jump on the [discord server](https://t.libren.ms/discord).
 
 #### <a name="faq5"> Do you have a demo available?</a>
 
@@ -157,7 +157,7 @@ Run `./validate.php` as root from within your install.
 
 Re-run `./validate.php` once you've resolved any issues raised.
 
-You have an odd issue - we'd suggest you join our irc channel to discuss.
+You have an odd issue - we'd suggest you join our [discord server](https://t.libren.ms/discord) to discuss.
 
 #### <a name="faq21"> What do the values mean in my graphs?</a>
 
