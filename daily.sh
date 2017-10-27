@@ -226,6 +226,7 @@ main () {
             cleanup)
                 # Cleanups
                 local options=("refresh_alert_rules"
+                               "refresh_os_cache"
                                "syslog"
                                "eventlog"
                                "authlog"

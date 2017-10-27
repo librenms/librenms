@@ -216,3 +216,8 @@ if ($options['f'] === 'notify') {
 if ($options['f'] === 'peeringdb') {
     cache_peeringdb();
 }
+
+if ($options['f'] === 'refresh_os_cache') {
+    echo 'Refreshing OS cache' . PHP_EOL;
+    update_os_cache(true);
+}
