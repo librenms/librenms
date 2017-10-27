@@ -1663,7 +1663,14 @@ function update_os_cache($force = false)
 
     if ($force === true || !is_file($cache_file) || time() - filemtime($cache_file) > $cache_keep_time) {
         d_echo('Updating os_def.cache... ');
+
+        // remove pre-loaded os and pull in user settings
+        $user_config = json_decode(`${config['install_dir']}/config_to_json.php`, true);
+        $config['os'] = $user_config['os'];
+
+        // load the os defs fresh from cache (merges with existing $config['os'])
         load_all_os(false, false);
+
         file_put_contents($cache_file, serialize($config['os']));
         d_echo("Done\n");
     }
