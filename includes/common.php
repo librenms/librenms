@@ -1657,21 +1657,21 @@ function load_all_os($existing = false, $cached = true)
  */
 function update_os_cache($force = false)
 {
-    global $config;
-    $cache_file = $config['install_dir'] . '/cache/os_defs.cache';
-    $cache_keep_time = $config['os_def_cache_time'] - 7200; // 2hr buffer
+    $install_dir = Config::get('install_dir');
+    $cache_file = "$install_dir/cache/os_defs.cache";
+    $cache_keep_time = Config::get('os_def_cache_time', 86400) - 7200; // 2hr buffer
 
     if ($force === true || !is_file($cache_file) || time() - filemtime($cache_file) > $cache_keep_time) {
         d_echo('Updating os_def.cache... ');
 
-        // remove pre-loaded os and pull in user settings
-        $user_config = json_decode(`${config['install_dir']}/config_to_json.php`, true);
-        $config['os'] = $user_config['os'];
+        // remove previously cached os settings and replace with user settings
+        $user_config = json_decode(`$install_dir/config_to_json.php`, true);
+        Config::set('os', $user_config['os']);
 
-        // load the os defs fresh from cache (merges with existing $config['os'])
+        // load the os defs fresh from cache (merges with existing OS settings)
         load_all_os(false, false);
 
-        file_put_contents($cache_file, serialize($config['os']));
+        file_put_contents($cache_file, serialize(Config::get('os')));
         d_echo("Done\n");
     }
 }
