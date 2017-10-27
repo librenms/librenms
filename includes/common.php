@@ -1665,8 +1665,9 @@ function update_os_cache($force = false)
         d_echo('Updating os_def.cache... ');
 
         // remove previously cached os settings and replace with user settings
-        $user_config = json_decode(`$install_dir/config_to_json.php`, true);
-        Config::set('os', $user_config['os']);
+        $config = array('os' => array()); // local $config variable, not global
+        include "$install_dir/config.php";
+        Config::set('os', $config['os']);
 
         // load the os defs fresh from cache (merges with existing OS settings)
         load_all_os(false, false);
