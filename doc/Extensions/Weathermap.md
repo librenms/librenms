@@ -7,13 +7,13 @@ Integrating LibreNMS with Network-Weathermap, allows you to build network maps t
 ### Installing Network-WeatherMap
 
 ### Step 1. 
-Extract to your LibreNMS plugins directory `html/plugins` so you should see something like `/opt/librenms/html/plugins/Weathermap/`
-The best way to do this is via git. Go to your install directory and then `html/plugins`
+Extract to your LibreNMS plugins directory `/opt/librenms/html/plugins` so you should see something like `/opt/librenms/html/plugins/Weathermap/`
+The best way to do this is via git. Go to your install directory and then `/opt/librenms/html/plugins`
 Enter:
     `git clone https://github.com/librenms-plugins/Weathermap.git`
 ### Step 2.
-Inside the librenms/html/plugins directory, change the ownership of the Weathermap directory by typing `chown -R librenms:librenms Weathermap/`
-Make the configs directory writeable `chmod 775 librenms/html/plugins/Weathermap/configs`
+Inside the html/plugins directory, change the ownership of the Weathermap directory by typing `chown -R librenms:librenms Weathermap/`
+Make the configs directory writeable `chmod 775 /opt/librenms/html/plugins/Weathermap/configs`
 ### Step 3. 
 Enable the cron process by editing your current LibreNMS cron file (typically /etc/cron.d/librenms) and add the following:
 LibreNMS:  `*/5 * * * * librenms /opt/librenms/html/plugins/Weathermap/map-poller.php >> /dev/null 2>&1`
