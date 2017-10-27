@@ -82,6 +82,7 @@ Your VirtualHost for 443 will need to look something like this for LibreNMS
         Options FollowSymLinks MultiViews
         </Directory>
         DocumentRoot /opt/librenms/html/
+        AllowEncodedSlashes NoDecode
         ServerName librenms.example.com
         CustomLog /opt/librenms/logs/access_log combined
         ErrorLog /opt/librenms/logs/error_log
