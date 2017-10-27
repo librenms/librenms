@@ -48,7 +48,6 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL & ~E_WARNING);
 
 update_os_cache(true); // Force update of OS Cache
-load_all_os();  // pre-load OS so we don't keep loading them
 
 if (getenv('DBTEST')) {
     global $schema, $sql_mode;
