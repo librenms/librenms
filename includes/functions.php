@@ -397,6 +397,7 @@ function delete_device($id)
  * @param string $poller_group the poller group this device will belong to
  * @param boolean $force_add add even if the device isn't reachable
  * @param string $port_assoc_mode snmp field to use to determine unique ports
+ * @param array $additional an array with additional parameters to take into consideration when adding devices
  *
  * @return int returns the device_id of the added device
  *
@@ -478,7 +479,11 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
             throw new SnmpVersionUnsupportedException("Unsupported SNMP Version \"$snmpver\", must be v1, v2c, or v3");
         }
     }
-
+    if (isset($additional['ping_fallback']) && $additional['ping_fallback'] == 1) {
+        $additional['snmp_disable'] = 1;
+        $additional['os'] = "ping";
+        return createHost($host, '', $snmp_version, $port, $transport, array(), $poller_group, 1, true, $additional);
+    }
     throw $host_unreachable_exception;
 }
 
@@ -658,6 +663,7 @@ function getpollergroup($poller_group = '0')
  * @param int $poller_group distributed poller group to assign this host to
  * @param string $port_assoc_mode field to use to identify ports: ifIndex, ifName, ifDescr, ifAlias
  * @param bool $force_add Do not detect the host os
+ * @param array $additional an array with additional parameters to take into consideration when adding devices
  * @return int the id of the added host
  * @throws HostExistsException Throws this exception if the host already exists
  * @throws Exception Throws this exception if insertion into the database fails
@@ -2058,10 +2064,7 @@ function device_is_up($device, $record_perf = false)
     $response              = array();
     $response['ping_time'] = $ping_response['last_ping_timetaken'];
     if ($ping_response['result']) {
-        if ($device['snmp_disable']) {
-            $response['status']        = '1';
-            $response['status_reason'] = '';
-        } elseif (isSNMPable($device)) {
+        if ($device['snmp_disable'] || isSNMPable($device)) {
             $response['status']        = '1';
             $response['status_reason'] = '';
         } else {

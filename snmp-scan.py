@@ -148,7 +148,7 @@ This argument is only required if $config['nets'] is not set
 Example: 192.168.0.0/24
 Example: 192.168.0.0/31 will be treated as an RFC3021 p-t-p network with two addresses, 192.168.0.0 and 192.168.0.1
 Example: 192.168.0.1/32 will be treated as a single host address""")
-    parser.add_argument('-P', '--ping', action='store_const', const="-P", default="", help="""Only try to ping the device.
+    parser.add_argument('-P', '--ping', action='store_const', const="-b", default="", help="""Add the device as an ICMP only device if it replies to ping but not SNMP.
 Example: """ + __file__ + """ -P 192.168.0.0/24""")
     parser.add_argument('-t', dest='threads', type=int,
                         help="How many IPs to scan at a time.  More will increase the scan speed," +

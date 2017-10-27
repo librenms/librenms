@@ -260,7 +260,7 @@ function poll_device($device, $options)
         $oldgraphs = array();
 
         $force_module = false;
-        if ($device['snmp_disable'] != '1') {
+        if (!$device['snmp_disable']) {
             // we always want the core module to be included
             include 'includes/polling/core.inc.php';
 

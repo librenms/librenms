@@ -16,7 +16,7 @@ use LibreNMS\Exceptions\HostUnreachableException;
 $init_modules = array();
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('Pg:p:f::');
+$options = getopt('Pbg:p:f::');
 
 if (isset($options['g']) && $options['g'] >= 0) {
     $cmd = array_shift($argv);
@@ -61,6 +61,12 @@ if (isset($options['P'])) {
     array_unshift($argv, $cmd);
 }
 
+if (isset($options['b'])) {
+    $cmd = array_shift($argv);
+    array_shift($argv);
+    array_unshift($argv, $cmd);
+}
+
 if (!empty($argv[1])) {
     $host      = strtolower($argv[1]);
     $community = $argv[2];
@@ -70,6 +76,11 @@ if (!empty($argv[1])) {
     $transport = 'udp';
 
     $additional = array();
+    if (isset($options['b'])) {
+        $additional = array(
+            'ping_fallback' => 1,
+        );
+    }
     if (isset($options['P'])) {
         $community = '';
         $snmpver   = 'v2c';
@@ -196,12 +207,12 @@ if (!empty($argv[1])) {
     c_echo(
         "\n".$config['project_name_version'].' Add Host Tool
 
-    Usage (SNMPv1/2c)    : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> [community] [v1|v2c] [port] ['.implode('|', $config['snmp']['transports']).']
+    Usage (SNMPv1/2c)    : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname%n> [community] [v1|v2c] [port] ['.implode('|', $config['snmp']['transports']).']
     Usage (SNMPv3)       :
-        Config Defaults  : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> any v3 [user] [port] ['.implode('|', $config['snmp']['transports']).']
-        No Auth, No Priv : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> nanp v3 [user] [port] ['.implode('|', $config['snmp']['transports']).']
-        Auth, No Priv    : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> anp v3 <user> <password> [md5|sha] [port] ['.implode('|', $config['snmp']['transports']).']
-        Auth,    Priv    : ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> ap v3 <user> <password> <enckey> [md5|sha] [aes|dsa] [port] ['.implode('|', $config['snmp']['transports']).']
+        Config Defaults  : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname%n> any v3 [user] [port] ['.implode('|', $config['snmp']['transports']).']
+        No Auth, No Priv : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname%n> nanp v3 [user] [port] ['.implode('|', $config['snmp']['transports']).']
+        Auth, No Priv    : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname%n> anp v3 <user> <password> [md5|sha] [port] ['.implode('|', $config['snmp']['transports']).']
+        Auth,    Priv    : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname%n> ap v3 <user> <password> <enckey> [md5|sha] [aes|dsa] [port] ['.implode('|', $config['snmp']['transports']).']
     Usage (ICMP only)    : ./addhost.php [-g <poller group>] [-f] -P <%Whostname%n> [os] [hardware]
 
     -g <poller group> allows you to add a device to be pinned to a specific poller when using distributed polling. X can be any number associated with a poller group
@@ -210,7 +221,8 @@ if (!empty($argv[1])) {
         For Linux/Unix based devices \'ifName\' or \'ifDescr\' might be useful for a stable iface mapping.
         The default for this installation is \'' . $config['default_port_association_mode'] . '\'
         Valid port assoc modes are: ' . join(', ', $valid_assoc_modes) . '
-    -P Add the host with only ping check, no SNMP or OS discovery.
+    -b Add the host with SNMP if it replies to it, otherwise only ICMP.
+    -P Add the host with only ICMP, no SNMP or OS discovery.
 
     %rRemember to run discovery for the host afterwards.%n
 '
