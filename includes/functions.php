@@ -95,31 +95,24 @@ function getHostOS($device)
 {
     global $config;
 
+    $deferred_os = array(
+        'freebsd',
+        'linux',
+        'ibmtl'  //only has snmpget check
+    );
+
     $sysDescr    = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
     $sysObjectId = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
 
     d_echo("| $sysDescr | $sysObjectId | \n");
 
     // check yaml files
-    $pattern = $config['install_dir'] . '/includes/definitions/*.yaml';
-    foreach (glob($pattern) as $file) {
-        $os = basename($file, '.yaml');
-        if (isset($config['os'][$os]['os'])) {
-            $tmp = $config['os'][$os];
-        } else {
-            $tmp = Symfony\Component\Yaml\Yaml::parse(
-                file_get_contents($file)
-            );
-            // pull in user overrides
-            if (isset($config['os'][$os])) {
-                $tmp = array_replace_recursive($tmp, $config['os'][$os]);
-            }
-        }
-        if (isset($tmp['discovery']) && is_array($tmp['discovery'])) {
-            foreach ($tmp['discovery'] as $item) {
-                // check each item individually, if all the conditions in that item are true, we have a match
+    $os_defs = Config::get('os');
+    foreach ($os_defs as $os => $def) {
+        if (isset($def['discovery'])  && !in_array($os, $deferred_os)) {
+            foreach ($def['discovery'] as $item) {
                 if (checkDiscovery($device, $item, $sysObjectId, $sysDescr)) {
-                    return $tmp['os'];
+                    return $os;
                 }
             }
         }
@@ -132,6 +125,17 @@ function getHostOS($device)
         include $file;
         if (isset($os)) {
             return $os;
+        }
+    }
+
+    // check deferred os
+    foreach ($deferred_os as $os) {
+        if (isset($os_defs[$os]['discovery'])) {
+            foreach ($os_defs[$os]['discovery'] as $item) {
+                if (checkDiscovery($device, $item, $sysObjectId, $sysDescr)) {
+                    return $os;
+                }
+            }
         }
     }
 
