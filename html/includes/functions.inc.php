@@ -283,7 +283,9 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
 
     $text = format_hostname($device, $text);
 
-    if (isset($config['os'][$device['os']]['over'])) {
+    if ($device['snmp_disable']) {
+        $graphs = $config['os']['ping']['over'];
+    } elseif (isset($config['os'][$device['os']]['over'])) {
         $graphs = $config['os'][$device['os']]['over'];
     } elseif (isset($device['os_group']) && isset($config['os'][$device['os_group']]['over'])) {
         $graphs = $config['os'][$device['os_group']]['over'];

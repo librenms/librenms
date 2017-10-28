@@ -957,10 +957,12 @@ function enable_os_graphs($os, &$graph_enable)
  */
 function enable_graphs($device, &$graph_enable)
 {
-    // These are standard graphs we should have for all systems
+    // These are standard graphs we should have for (almost) all systems
     $graph_enable['poller']['poller_perf']         = 'device_poller_perf';
-    $graph_enable['poller']['poller_modules_perf'] = 'device_poller_modules_perf';
-    if (can_ping_device($device) === true) {
+    if (!$device['snmp_disable']) {
+        $graph_enable['poller']['poller_modules_perf'] = 'device_poller_modules_perf';
+    }
+    if (get_dev_attrib($device, "override_icmp_disable") != "true" && can_ping_device($device) === true) {
         $graph_enable['poller']['ping_perf'] = 'device_ping_perf';
     }
 
@@ -1657,14 +1659,22 @@ function load_all_os($existing = false, $cached = true)
  */
 function update_os_cache($force = false)
 {
-    global $config;
-    $cache_file = $config['install_dir'] . '/cache/os_defs.cache';
-    $cache_keep_time = $config['os_def_cache_time'] - 7200; // 2hr buffer
+    $install_dir = Config::get('install_dir');
+    $cache_file = "$install_dir/cache/os_defs.cache";
+    $cache_keep_time = Config::get('os_def_cache_time', 86400) - 7200; // 2hr buffer
 
     if ($force === true || !is_file($cache_file) || time() - filemtime($cache_file) > $cache_keep_time) {
         d_echo('Updating os_def.cache... ');
+
+        // remove previously cached os settings and replace with user settings
+        $config = array('os' => array()); // local $config variable, not global
+        include "$install_dir/config.php";
+        Config::set('os', $config['os']);
+
+        // load the os defs fresh from cache (merges with existing OS settings)
         load_all_os(false, false);
-        file_put_contents($cache_file, serialize($config['os']));
+
+        file_put_contents($cache_file, serialize(Config::get('os')));
         d_echo("Done\n");
     }
 }
