@@ -14,6 +14,7 @@ Enter:
 ### Step 2.
 Inside the html/plugins directory, change the ownership of the Weathermap directory by typing `chown -R librenms:librenms Weathermap/`
 Make the configs directory writeable `chmod 775 /opt/librenms/html/plugins/Weathermap/configs`
+Note if you are using SELinux you need to input the following command `chcon -R -t httpd_cache_t Weathermap/`
 ### Step 3. 
 Enable the cron process by editing your current LibreNMS cron file (typically /etc/cron.d/librenms) and add the following:
 LibreNMS:  `*/5 * * * * librenms /opt/librenms/html/plugins/Weathermap/map-poller.php >> /dev/null 2>&1`
