@@ -1,3 +1,4 @@
+```ssh
 @version:3.5
 @include "scl.conf"
 
@@ -71,3 +72,4 @@ log {
 
 
 # vim:ft=syslog-ng:ai:si:ts=4:sw=4:et:
+```
