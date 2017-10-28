@@ -77,18 +77,17 @@ Your VirtualHost for 443 will need to look something like this for LibreNMS
         SSLCertificateFile /etc/pki/tls/certs/ca.crt
         SSLCertificateKeyFile /etc/pki/tls/private/ca.key
         <Directory "/opt/librenms/html/">
-        DocumentRoot /opt/librenms/html/
         AllowOverride All
-        AllowEncodedSlashes NoDecode
         Require all granted
         Options FollowSymLinks MultiViews
         </Directory>
         DocumentRoot /opt/librenms/html/
+        AllowEncodedSlashes NoDecode
         ServerName librenms.example.com
         CustomLog /opt/librenms/logs/access_log combined
         ErrorLog /opt/librenms/logs/error_log
-
 </VirtualHost>
+
 ```
 #### Step 2
 Then restart Apache `sudo systemctl restart httpd`
