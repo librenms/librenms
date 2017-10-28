@@ -11,15 +11,14 @@ if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     }
 }
 
-//$stage = isset($_POST['stage']) ? $_POST['stage'] : 0;
-$stage = 6;
+$stage = isset($_POST['stage']) ? $_POST['stage'] : 0;
 
 // Before we do anything, if we see config.php, redirect back to the homepage.
-//if (file_exists('../config.php') && $stage != 6) {
-//    unset($_SESSION['stage']);
-//    header("Location: /");
-//    exit;
-//}
+if (file_exists('../config.php') && $stage != 6) {
+    unset($_SESSION['stage']);
+    header("Location: /");
+    exit;
+}
 
 // do not use the DB in init, we'll bring it up ourselves
 $init_modules = array('web', 'nodb');
