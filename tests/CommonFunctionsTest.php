@@ -122,13 +122,14 @@ class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
     public function testIsValidHostname()
     {
         $this->assertTrue(is_valid_hostname('a'), 'a');
-        $this->assertTrue(is_valid_hostname('a.'), 'a.');
         $this->assertTrue(is_valid_hostname('0'), '0');
         $this->assertTrue(is_valid_hostname('a.b'), 'a.b');
         $this->assertTrue(is_valid_hostname('localhost'), 'localhost');
         $this->assertTrue(is_valid_hostname('google.com'), 'google.com');
         $this->assertTrue(is_valid_hostname('news.google.co.uk'), 'news.google.co.uk');
         $this->assertTrue(is_valid_hostname('xn--fsqu00a.xn--0zwm56d'), 'xn--fsqu00a.xn--0zwm56d');
+        $this->assertTrue(is_valid_hostname('cisco-3750x'), 'cisco-3750x');
+        $this->assertFalse(is_valid_hostname('cisco_3750x'), 'cisco_3750x');
         $this->assertFalse(is_valid_hostname('goo gle.com'), 'goo gle.com');
         $this->assertFalse(is_valid_hostname('google..com'), 'google..com');
         $this->assertFalse(is_valid_hostname('google.com '), 'google.com ');
