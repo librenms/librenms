@@ -271,13 +271,13 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
                 </a>
                 </li>';
         }
-
-        echo '<li role="presentation" '.$select['neighbours'].'>
-                <a href="'.generate_device_url($device, array('tab' => 'neighbours')).'">
-                  <i class="fa fa-sitemap fa-lg icon-theme"  aria-hidden="true"></i> Neighbours
-                </a>
-              </li>';
-
+        if (!$device['snmp_disable']) {
+            echo '<li role="presentation" '.$select['neighbours'].'>
+                    <a href="'.generate_device_url($device, array('tab' => 'neighbours')).'">
+                      <i class="fa fa-sitemap fa-lg icon-theme"  aria-hidden="true"></i> Neighbours
+                    </a>
+                  </li>';
+        }
         if (@dbFetchCell("SELECT 1 FROM stp WHERE device_id = '".$device['device_id']."'")) {
             echo '<li role="presentation" '.$select['stp'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'stp')).'">
