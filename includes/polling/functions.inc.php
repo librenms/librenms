@@ -259,18 +259,22 @@ function poll_device($device, $options)
         $graphs    = array();
         $oldgraphs = array();
 
-        // we always want the core module to be included
-        include 'includes/polling/core.inc.php';
-
         $force_module = false;
-        if ($options['m']) {
-            $config['poller_modules'] = array();
-            foreach (explode(',', $options['m']) as $module) {
-                if (is_file('includes/polling/'.$module.'.inc.php')) {
-                    $config['poller_modules'][$module] = 1;
-                    $force_module = true;
+        if (!$device['snmp_disable']) {
+            // we always want the core module to be included
+            include 'includes/polling/core.inc.php';
+
+            if ($options['m']) {
+                $config['poller_modules'] = array();
+                foreach (explode(',', $options['m']) as $module) {
+                    if (is_file('includes/polling/'.$module.'.inc.php')) {
+                        $config['poller_modules'][$module] = 1;
+                        $force_module = true;
+                    }
                 }
             }
+        } else {
+            $config['poller_modules'] = array();
         }
         foreach ($config['poller_modules'] as $module => $module_status) {
             $os_module_status = $config['os'][$device['os']]['poller_modules'][$module];
