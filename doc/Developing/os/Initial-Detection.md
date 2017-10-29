@@ -29,9 +29,7 @@ Other options are available:
 
  - `sysObjectId` The preferred operator. Checks if the sysObjectID starts with one of the strings under this item
  - `sysDescr` Use this in addition to sysObjectId if required. Check that the sysDescr contains one of the strings under this item
- - `sysObjectId_regex` Please avoid use of this. Checks if the sysObjectId matches one of the regex statements under this item
  - `sysDescr_regex` Please avoid use of this. Checks if the sysDescr matches one of the regex statements under this item
- - `snmpget` Do not use this unless none of the other methods work. Fetch an oid and compare it against a value.
  - `_except` You can add this to any of the above to exclude that element. As an example:
 
 ```yaml
