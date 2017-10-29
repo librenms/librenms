@@ -1441,36 +1441,48 @@ function find_port_id($description, $identifier = '', $device_id = 0, $mac_addre
         return 0;
     }
 
-    $sql = 'SELECT `port_id` FROM `ports` WHERE (0';
+    $statements = array();
     $params = array();
 
-    if ($description) {
-        $sql .= ' OR `ifDescr`=? OR `ifName`=?';
-        $params[] = $description;
-        $params[] = $description;
-    }
+    if ($device_id) {
+        if ($description) {
+            $statements[] = "SELECT `port_id` FROM `ports` WHERE `device_id`=? AND (`ifDescr`=? OR `ifName`=?)";
 
-    if ($identifier) {
-        if (is_numeric($identifier)) {
-            $sql .= ' OR `ifIndex`=? OR `ifAlias`=?';
-        } else {
-            $sql .= ' OR `ifDescr`=? OR `ifName`=?';
+            $params[] = $device_id;
+            $params[] = $description;
+            $params[] = $description;
         }
-        $params[] = $identifier;
-        $params[] = $identifier;
+
+        if ($identifier) {
+            if (is_numeric($identifier)) {
+                $statements[] = 'SELECT `port_id` FROM `ports` WHERE `device_id`=? AND (`ifIndex`=? OR `ifAlias`=?)';
+            } else {
+                $statements[] = 'SELECT `port_id` FROM `ports` WHERE `device_id`=? AND (`ifDescr`=? OR `ifName`=?)';
+            }
+            $params[] = $device_id;
+            $params[] = $identifier;
+            $params[] = $identifier;
+        }
     }
 
     if ($mac_address) {
-        $sql .= ' OR `ifPhysAddress`=?';
+        $mac_statement = 'SELECT `port_id` FROM `ports` WHERE ';
+        if ($device_id) {
+            $mac_statement .= '`device_id`=? AND ';
+            $params[] = $device_id;
+        }
+        $mac_statement .= '`ifPhysAddress`=?';
+
+        $statements[] = $mac_statement;
         $params[] = $mac_address;
     }
 
-    $sql .= ')';
-
-    if ($device_id) {
-        $sql .= ' AND `device_id`=?';
-        $params[] = $device_id;
+    if (empty($statements)) {
+        return 0;
     }
+
+    $queries = implode(' UNION ', $statements);
+    $sql = "SELECT * FROM ($queries LIMIT 1) p";
 
     return (int)dbFetchCell($sql, $params);
 }
