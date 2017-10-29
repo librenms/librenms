@@ -8,5 +8,3 @@ over:
     - { graph: device_ucd_memory, text: 'Memory Usage' }
 discovery_modules:
     applications: 1
-discovery:
-    - sysDescr: FreeBSD

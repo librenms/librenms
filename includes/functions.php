@@ -95,25 +95,31 @@ function getHostOS($device)
 {
     global $config;
 
-    $res = snmp_get_multi_oid($device, array('SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysObjectID.0'));
-    $sysDescr = isset($res['.1.3.6.1.2.1.1.1.0']) ? $res['.1.3.6.1.2.1.1.1.0'] : '';
-    $sysObjectId = isset($res['.1.3.6.1.2.1.1.2.0']) ? $res['.1.3.6.1.2.1.1.2.0'] : '';
+    $sysDescr    = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
+    $sysObjectId = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
 
     d_echo("| $sysDescr | $sysObjectId | \n");
 
-    $deferred_os = array(
-        'freebsd',
-        'linux',
-        'ibmtl'  //only has snmpget check
-    );
-  
     // check yaml files
-    $os_defs = Config::get('os');
-    foreach ($os_defs as $os => $def) {
-        if (isset($def['discovery'])  && !in_array($os, $deferred_os)) {
-            foreach ($def['discovery'] as $item) {
-                if (checkDiscovery($device, $item, $sysObjectId, $sysDescr)) {
-                    return $os;
+    $pattern = $config['install_dir'] . '/includes/definitions/*.yaml';
+    foreach (glob($pattern) as $file) {
+        $os = basename($file, '.yaml');
+        if (isset($config['os'][$os]['os'])) {
+            $tmp = $config['os'][$os];
+        } else {
+            $tmp = Symfony\Component\Yaml\Yaml::parse(
+                file_get_contents($file)
+            );
+            // pull in user overrides
+            if (isset($config['os'][$os])) {
+                $tmp = array_replace_recursive($tmp, $config['os'][$os]);
+            }
+        }
+        if (isset($tmp['discovery']) && is_array($tmp['discovery'])) {
+            foreach ($tmp['discovery'] as $item) {
+                // check each item individually, if all the conditions in that item are true, we have a match
+                if (checkDiscovery($item, $sysObjectId, $sysDescr)) {
+                    return $tmp['os'];
                 }
             }
         }
@@ -129,17 +135,6 @@ function getHostOS($device)
         }
     }
 
-    // check deferred os
-    foreach ($deferred_os as $os) {
-        if (isset($os_defs[$os]['discovery'])) {
-            foreach ($os_defs[$os]['discovery'] as $item) {
-                if (checkDiscovery($device, $item, $sysObjectId, $sysDescr)) {
-                    return $os;
-                }
-            }
-        }
-    }
-
     return 'generic';
 }
 
@@ -148,17 +143,13 @@ function getHostOS($device)
  * sysObjectId if sysObjectId starts with any of the values under this item
  * sysDescr if sysDescr contains any of the values under this item
  * sysDescr_regex if sysDescr matches any of the regexes under this item
- * snmpget perform an snmpget on `oid` and check if the result contains `value`. Other subkeys: options, mib, mibdir
  *
- * Appending _except to any condition will invert the match.
- *
- * @param array $device
  * @param array $array Array of items, keys should be sysObjectId, sysDescr, or sysDescr_regex
  * @param string $sysObjectId The sysObjectId to check against
  * @param string $sysDescr the sysDesr to check against
  * @return bool the result (all items passed return true)
  */
-function checkDiscovery($device, $array, $sysObjectId, $sysDescr)
+function checkDiscovery($array, $sysObjectId, $sysDescr)
 {
     // all items must be true
     foreach ($array as $key => $value) {
@@ -182,17 +173,6 @@ function checkDiscovery($device, $array, $sysObjectId, $sysDescr)
             if (preg_match_any($sysObjectId, $value) == $check) {
                 return false;
             }
-        } elseif ($key == 'snmpget') {
-            $options = isset($value['options']) ? $value['options'] : '-Oqv';
-            $mib = isset($value['mib']) ? $value['mib'] : null;
-            $mib_dir = isset($value['mibdir']) ? $value['mibdir'] : null;
-            $op = isset($value['op']) ? $value['op'] : 'contains';
-
-            $get_value = snmp_get($device, $value['oid'], $options, $mib, $mib_dir);
-
-            if (compare_var($get_value, $value['value'], $op) == $check) {
-                return false;
-            }
         }
     }
 
@@ -214,49 +194,6 @@ function preg_match_any($subject, $regexes)
         }
     }
     return false;
-}
-
-/**
- * Perform comparison of two items based on give comparison method
- * Valid comparisons: =, !=, ==, !==, >=, <=, >, <, contains, starts, ends, regex
- * contains, starts, ends: $a haystack, $b needle(s)
- * regex: $a subject, $b regex
- *
- * @param mixed $a
- * @param mixed $b
- * @param string $comparison =, !=, ==, !== >=, <=, >, <, contains, starts, ends, regex
- * @return bool
- */
-function compare_var($a, $b, $comparison = '=')
-{
-    switch ($comparison) {
-        case "=":
-            return $a == $b;
-        case "!=":
-            return $a != $b;
-        case "==":
-            return $a === $b;
-        case "!==":
-            return $a !== $b;
-        case ">=":
-            return $a >= $b;
-        case "<=":
-            return $a <= $b;
-        case ">":
-            return $a > $b;
-        case "<":
-            return $a < $b;
-        case "contains":
-            return str_contains($a, $b);
-        case "starts":
-            return starts_with($a, $b);
-        case "ends":
-            return ends_with($a, $b);
-        case "regex":
-            return (bool)preg_match($b, $a);
-        default:
-            return false;
-    }
 }
 
 function percent_colour($perc)
