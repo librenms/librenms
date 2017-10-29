@@ -126,7 +126,7 @@ if (($device['os'] == 'pbn' || $device['os'] == 'bdcom') && Config::get('autodis
             if (is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex'])) {
                 $ifIndex = $dot1d_array[$entry_key]['dot1dBasePortIfIndex'];
             } else {
-                $ifIndex = $entry_key;
+                $ifIndex = null;
             }
 
             $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'], $ifIndex, $device['device_id']);
