@@ -440,6 +440,10 @@ foreach ($ports as $port) {
         $port['update_extended'] = array();
         $port['state']  = array();
 
+        if ($port_association_mode != "ifIndex") {
+            $port['update']['ifIndex'] = $ifIndex;
+        }
+
         if ($config['slow_statistics'] == true) {
             $port['update']['poll_time']   = $polled;
             $port['update']['poll_prev']   = $port['poll_time'];
