@@ -2,6 +2,7 @@
 
 use LibreNMS\Authentication\Auth;
 use LibreNMS\Authentication\TwoFactor;
+use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 
 ini_set('session.use_only_cookies', 1);
@@ -30,7 +31,7 @@ session_start();
 $authorizer =  Auth::get();
 if ($vars['page'] == 'logout' && $authorizer->sessionAuthenticated()) {
     $authorizer->logOutUser();
-    header('Location: ' . $config['base_url']);
+    header('Location: ' . Config::get('post_logout_action', Config::get('base_url')));
     exit;
 }
 
