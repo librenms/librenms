@@ -231,12 +231,22 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
     $data = trim(external_exec($cmd));
 
     $array = array();
+    $oid = '';
     foreach (explode("\n", $data) as $entry) {
-        list($oid,$value)  = explode('=', $entry, 2);
-        $oid               = trim($oid);
-        $value             = trim($value, "\" \n\r");
-        if (!strstr($value, 'at this OID') && isset($oid)) {
-            $array[$oid] = $value;
+        if (str_contains($entry, '=')) {
+            list($oid,$value)  = explode('=', $entry, 2);
+            $oid               = trim($oid);
+            $value             = trim($value, "\" \n\r");
+            if (!strstr($value, 'at this OID') && isset($oid)) {
+                $array[$oid] = $value;
+            }
+        } else {
+            if (isset($array[$oid])) {
+                // if appending, add a line return
+                $array[$oid] .= PHP_EOL . $entry;
+            } else {
+                $array[$oid] = $entry;
+            }
         }
     }
 
