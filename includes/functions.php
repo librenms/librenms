@@ -118,7 +118,7 @@ function getHostOS($device)
         if (isset($tmp['discovery']) && is_array($tmp['discovery'])) {
             foreach ($tmp['discovery'] as $item) {
                 // check each item individually, if all the conditions in that item are true, we have a match
-                if (checkDiscovery($device, $item, $sysObjectId, $sysDescr)) {
+                if (checkDiscovery($item, $sysObjectId, $sysDescr)) {
                     return $tmp['os'];
                 }
             }
@@ -143,17 +143,13 @@ function getHostOS($device)
  * sysObjectId if sysObjectId starts with any of the values under this item
  * sysDescr if sysDescr contains any of the values under this item
  * sysDescr_regex if sysDescr matches any of the regexes under this item
- * snmpget perform an snmpget on `oid` and check if the result contains `value`. Other subkeys: options, mib, mibdir
  *
- * Appending _except to any condition will invert the match.
- *
- * @param array $device
  * @param array $array Array of items, keys should be sysObjectId, sysDescr, or sysDescr_regex
  * @param string $sysObjectId The sysObjectId to check against
  * @param string $sysDescr the sysDesr to check against
  * @return bool the result (all items passed return true)
  */
-function checkDiscovery($device, $array, $sysObjectId, $sysDescr)
+function checkDiscovery($array, $sysObjectId, $sysDescr)
 {
     // all items must be true
     foreach ($array as $key => $value) {
@@ -177,17 +173,6 @@ function checkDiscovery($device, $array, $sysObjectId, $sysDescr)
             if (preg_match_any($sysObjectId, $value) == $check) {
                 return false;
             }
-        } elseif ($key == 'snmpget') {
-            $options = isset($value['options']) ? $value['options'] : '-Oqv';
-            $mib = isset($value['mib']) ? $value['mib'] : null;
-            $mib_dir = isset($value['mibdir']) ? $value['mibdir'] : null;
-            $op = isset($value['op']) ? $value['op'] : 'contains';
-
-            $get_value = snmp_get($device, $value['oid'], $options, $mib, $mib_dir);
-
-            if (compare_var($get_value, $value['value'], $op) == $check) {
-                return false;
-            }
         }
     }
 
@@ -209,49 +194,6 @@ function preg_match_any($subject, $regexes)
         }
     }
     return false;
-}
-
-/**
- * Perform comparison of two items based on give comparison method
- * Valid comparisons: =, !=, ==, !==, >=, <=, >, <, contains, starts, ends, regex
- * contains, starts, ends: $a haystack, $b needle(s)
- * regex: $a subject, $b regex
- *
- * @param mixed $a
- * @param mixed $b
- * @param string $comparison =, !=, ==, !== >=, <=, >, <, contains, starts, ends, regex
- * @return bool
- */
-function compare_var($a, $b, $comparison = '=')
-{
-    switch ($comparison) {
-        case "=":
-            return $a == $b;
-        case "!=":
-            return $a != $b;
-        case "==":
-            return $a === $b;
-        case "!==":
-            return $a !== $b;
-        case ">=":
-            return $a >= $b;
-        case "<=":
-            return $a <= $b;
-        case ">":
-            return $a > $b;
-        case "<":
-            return $a < $b;
-        case "contains":
-            return str_contains($a, $b);
-        case "starts":
-            return starts_with($a, $b);
-        case "ends":
-            return ends_with($a, $b);
-        case "regex":
-            return (bool)preg_match($b, $a);
-        default:
-            return false;
-    }
 }
 
 function percent_colour($perc)
@@ -455,6 +397,7 @@ function delete_device($id)
  * @param string $poller_group the poller group this device will belong to
  * @param boolean $force_add add even if the device isn't reachable
  * @param string $port_assoc_mode snmp field to use to determine unique ports
+ * @param array $additional an array with additional parameters to take into consideration when adding devices
  *
  * @return int returns the device_id of the added device
  *
@@ -465,7 +408,7 @@ function delete_device($id)
  * @throws InvalidPortAssocModeException The given port association mode was invalid
  * @throws SnmpVersionUnsupportedException The given snmp version was invalid
  */
-function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex')
+function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = array())
 {
     global $config;
 
@@ -505,6 +448,9 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         $snmpvers = array($snmp_version);
     }
 
+    if (isset($additional['snmp_disable']) && $additional['snmp_disable'] == 1) {
+        return createHost($host, '', $snmp_version, $port, $transport, array(), $poller_group, 1, true, $additional);
+    }
     $host_unreachable_exception = new HostUnreachableException("Could not connect to $host, please check the snmp details and snmp reachability");
     // try different snmp variables to add the device
     foreach ($snmpvers as $snmpver) {
@@ -533,7 +479,11 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
             throw new SnmpVersionUnsupportedException("Unsupported SNMP Version \"$snmpver\", must be v1, v2c, or v3");
         }
     }
-
+    if (isset($additional['ping_fallback']) && $additional['ping_fallback'] == 1) {
+        $additional['snmp_disable'] = 1;
+        $additional['os'] = "ping";
+        return createHost($host, '', $snmp_version, $port, $transport, array(), $poller_group, 1, true, $additional);
+    }
     throw $host_unreachable_exception;
 }
 
@@ -713,6 +663,7 @@ function getpollergroup($poller_group = '0')
  * @param int $poller_group distributed poller group to assign this host to
  * @param string $port_assoc_mode field to use to identify ports: ifIndex, ifName, ifDescr, ifAlias
  * @param bool $force_add Do not detect the host os
+ * @param array $additional an array with additional parameters to take into consideration when adding devices
  * @return int the id of the added host
  * @throws HostExistsException Throws this exception if the host already exists
  * @throws Exception Throws this exception if insertion into the database fails
@@ -726,7 +677,8 @@ function createHost(
     $v3 = array(),
     $poller_group = 0,
     $port_assoc_mode = 'ifIndex',
-    $force_add = false
+    $force_add = false,
+    $additional = array()
 ) {
     $host = trim(strtolower($host));
 
@@ -741,7 +693,8 @@ function createHost(
     $device = array(
         'hostname' => $host,
         'sysName' => $host,
-        'os' => 'generic',
+        'os' => $additional['os'] ? $additional['os'] : 'generic',
+        'hardware' => $additional['hardware'] ? $additional['hardware'] : null,
         'community' => $community,
         'port' => $port,
         'transport' => $transport,
@@ -750,6 +703,7 @@ function createHost(
         'poller_group' => $poller_group,
         'status_reason' => '',
         'port_association_mode' => $port_assoc_mode,
+        'snmp_disable' => $additional['snmp_disable'] ? $additional['snmp_disable'] : 0,
     );
 
     $device = array_merge($device, $v3);  // merge v3 settings
@@ -2110,7 +2064,7 @@ function device_is_up($device, $record_perf = false)
     $response              = array();
     $response['ping_time'] = $ping_response['last_ping_timetaken'];
     if ($ping_response['result']) {
-        if (isSNMPable($device)) {
+        if ($device['snmp_disable'] || isSNMPable($device)) {
             $response['status']        = '1';
             $response['status_reason'] = '';
         } else {
@@ -2124,7 +2078,7 @@ function device_is_up($device, $record_perf = false)
         $response['status_reason'] = 'icmp';
     }
 
-    if ($device['status'] != $response['status']) {
+    if ($device['status'] != $response['status'] || $device['status_reason'] != $response['status_reason']) {
         dbUpdate(
             array('status' => $response['status'], 'status_reason' => $response['status_reason']),
             'devices',
