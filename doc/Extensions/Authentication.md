@@ -137,7 +137,7 @@ $config['auth_ldap_port']   = 389;
 $config['auth_ldap_prefix'] = "uid=";
 $config['auth_ldap_suffix'] = ",ou=People,dc=example,dc=com";
 $config['auth_ldap_group']  = "cn=groupname,ou=groups,dc=example,dc=com";
-$config['auth_ldap_groupbase'] = "ou=group,dc=example,dc=com";
+$config['auth_ldap_groupbase'] = "ou=groups,dc=example,dc=com";
 $config['auth_ldap_groups']['admin']['level'] = 10;
 $config['auth_ldap_groups']['pfy']['level'] = 7;
 $config['auth_ldap_groups']['support']['level'] = 1;
@@ -146,6 +146,14 @@ $config['auth_ldap_uid_attribute'] = 'uidnumber';
 ```
 
 Typically auth_ldap_suffix, auth_ldap_group, auth_ldap_groupbase, auth_ldap_groups are what's required to be configured.
+
+### LDAP bind user (optional)
+If your ldap server does not allow anonymous bind, it is highly suggested to create a bind user, otherwise "remember me", alerting users, and the API will not work.
+```php
+$config['auth_ldap_binduser'] = 'ldapbind'; // will use auth_ldap_prefix and auth_ldap_suffix
+#$config['auth_ldap_binddn'] = 'CN=John.Smith,CN=Users,DC=MyDomain,DC=com'; // overrides binduser
+$config['auth_ldap_bindpassword'] = 'password';
+```
 
 ### LDAP server redundancy
 
