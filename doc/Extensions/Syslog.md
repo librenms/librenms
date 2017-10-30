@@ -129,12 +129,12 @@ Add the following to your LibreNMS `config.php` file to enable the Syslog extens
 ```ssh
 $config['enable_syslog'] = 1;
 ```
-#### Syslog Clean Up Option 
-Can be set inside of  ```config.php``` 
-```ssh
-$config['syslog_purge']                                   = 30;
+#### Syslog Clean Up 
+Can be set inside of  `config.php`
+```php
+$config['syslog_purge'] = 30;
 ```
-This option relys on daily.sh running, and over X days old is automatically purged. Values are in days.
+The cleanup is run by daily.sh and any entries over X days old are automatically purged. Values are in days.
 See here for more Clean Up Options [Link](https://docs.librenms.org/#Support/Configuration/#cleanup-options)
 
 ### Client configuration
