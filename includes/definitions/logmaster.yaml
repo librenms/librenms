@@ -1,7 +1,6 @@
 os: logmaster
 text: 'LogMaster'
 type: power
-rfc1628_compat: 1
 icon: logmaster
 mib_dir:
     - logmaster
