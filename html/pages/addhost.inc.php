@@ -11,12 +11,12 @@ if ($_SESSION['userlevel'] < 10) {
 }
 
 if (!isset($_POST['hostname'])) {
-	$hostname = false;
+    $hostname = false;
 } elseif (!is_valid_hostname($_POST['hostname'])) {
-	$hostname = false;
-	print_error('Invalid hostname.');
+    $hostname = false;
+    print_error('Invalid hostname.');
 } else {
-	$hostname = clean($_POST['hostname']);
+    $hostname = clean($_POST['hostname']);
 }
 $snmp_enabled = isset($_POST['snmp']);
 
