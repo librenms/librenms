@@ -997,6 +997,7 @@ pdb_ix_peers:
     PRIMARY: { Name: PRIMARY, Columns: [pdb_ix_peers_id], Unique: true, Type: BTREE }
 perf_times:
   Columns:
+    - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
     - { Field: type, Type: varchar(8), 'Null': false, Extra: '' }
     - { Field: doing, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: start, Type: int(11), 'Null': false, Extra: '' }
@@ -1004,6 +1005,7 @@ perf_times:
     - { Field: devices, Type: int(11), 'Null': false, Extra: '' }
     - { Field: poller, Type: varchar(255), 'Null': false, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     type: { Name: type, Columns: [type], Unique: false, Type: BTREE }
 plugins:
   Columns:
