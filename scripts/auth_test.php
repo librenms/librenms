@@ -109,7 +109,7 @@ if (isset($options['r'])) {
 if ($auth) {
     $user_id = get_userid($test_username);
 
-    echo "User:\n";
+    echo "User ($user_id):\n";
     if (function_exists('get_user')) {
         $user = get_user($user_id);
 
