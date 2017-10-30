@@ -44,7 +44,7 @@ You can enable support for this within cron by replacing:
 
 With:
 
-`33  */6   * * *   librenms    /opt/librenms/discovery-wrapper.php 1 >> /dev/null 2>&1`
+`33  */6   * * *   librenms    /opt/librenms/discovery-wrapper.py 1 >> /dev/null 2>&1`
 
 The default is for discovery wrapper to only use 1 thread so that it mimics the current behaviour. However if your
 system is powerful enough and the devices can cope then you can increase the thread count from 1 to a value of your
