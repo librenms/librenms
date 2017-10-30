@@ -1370,6 +1370,7 @@ function fping($host, $params, $address_family = AF_INET)
     $process = proc_open($fping_path . ' -e -q ' .$params . ' ' .$host.' 2>&1', $descriptorspec, $pipes);
     $read = '';
 
+    $proc_status = 0;
     if (is_resource($process)) {
         fclose($pipes[0]);
 
@@ -1397,7 +1398,6 @@ function fping($host, $params, $address_family = AF_INET)
     $min      = set_numeric($min);
     $max      = set_numeric($max);
     $avg      = set_numeric($avg);
-    $response = array('xmt'=>$xmt,'rcv'=>$rcv,'loss'=>$loss,'min'=>$min,'max'=>$max,'avg'=>$avg);
     $response = array('db' => array('xmt'=>$xmt,'rcv'=>$rcv,'loss'=>$loss,'min'=>$min,'max'=>$max,'avg'=>$avg), 'exitcode'=>$proc_status['exitcode']);
     return $response;
 }
