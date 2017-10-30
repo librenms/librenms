@@ -1,8 +1,21 @@
 mib: UPS-MIB:XPPC-MIB
 modules:
     sensors:
+        charge:
+            data:
+                -
+                    oid: upsSmartBatteryCapacity
+                    num_oid: .1.3.6.1.4.1.935.1.1.1.2.2.1.
+                    index: 'upsSmartBatteryCapacity.{{ $index }'
+                    descr: Battery charge remaining
         temperature:
             data:
+                -
+                    oid: upsSmartBatteryTemperature
+                    num_oid: .1.3.6.1.4.1.935.1.1.1.2.2.3.
+                    index: 'upsSmartBatteryTemperature.{{ $index }}'
+                    descr: Battery
+                    divisor: 10
                 -
                     oid: upsEnvTemperature
                     num_oid: .1.3.6.1.4.1.935.1.1.1.9.1.1.
@@ -15,8 +28,60 @@ modules:
                     num_oid: .1.3.6.1.4.1.935.1.1.1.9.1.2.
                     index: 'upsEnvHumidity.{{ $index }}'
                     descr: Environment
+        voltage:
+            data:
+                -
+                    oid: upsSmartBatteryVoltage
+                    num_oid: .1.3.6.1.4.1.935.1.1.1.2.2.2.
+                    index: 'upsSmartBatteryVoltage.{{ $index }}'
+                    descr: Battery Voltage
+                    divisor: 10
+                -
+                    oid: upsSmartInputLineVoltage
+                    num_oid: .1.3.6.1.4.1.935.1.1.1.3.2.1.
+                    index: 'upsSmartInputLineVoltage.{{ $index }}'
+                    descr: Input Voltage
+                    divisor: 10
+                -
+                    oid: upsSmartOutputVoltage
+                    num_oid: .1.3.6.1.4.1.935.1.1.1.4.2.1.
+                    index: 'upsSmartOutputVoltage.{{ $index }}'
+                    descr: Output Voltage
+                    divisor: 10
+        load:
+            data:
+                -
+                    oid: upsSmartOutputLoad
+                    num_oid: .1.3.6.1.4.1.935.1.1.1.4.2.3.
+                    index: 'upsSmartOutputLoad.{{ $index }}'
+                    descr: 'Output Load'
+        runtime:
+            data:
+                -
+                    oid: upsSecondsOnBattery
+                    num_oid: .1.3.6.1.2.1.33.1.2.2.
+                    index: 'upsSecondsOnBattery.{{ $index }}'
+                    descr: 'Time running on battery'
+                    divisor: 60
+        current:
+            data:
+                -
+                    oid: upsSmartBatteryCurrent
+                    num_oid: .1.3.6.1.4.1.935.1.1.1.2.2.7.
+                    index: 'upsSmartBatteryCurrent.{{ $index }}'
+                    descr: Battery Current
         state:
             data:
+                -
+                    oid: upsBaseBatteryStatus
+                    num_oid: .1.3.6.1.4.1.935.1.1.1.2.1.1.
+                    descr: Battery Status
+                    index: 'upsBaseBatteryStatus.{{ $index }}'
+                    state_name: upsBaseBatteryStatus
+                    states:
+                        - { descr: unknown, graph: 0, value: 1, generic: 3 }
+                        - { descr: BatteryNormal, graph: 0, value: 2, generic: 0 }
+                        - { descr: BatteryLow, graph: 0, value: 3, generic: 1 }
                 -
                     oid: upsSmartBatteryReplaceIndicator
                     num_oid: .1.3.6.1.4.1.935.1.1.1.2.2.5.
