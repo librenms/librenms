@@ -1,0 +1,1393 @@
+--  ============================================================================
+-- AT-ENVMONv2-MIB, Allied Telesis enterprise MIB:
+-- Environment Monitoring MIB objects.
+--
+-- Copyright (c) 2008 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-ENVMONv2-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            DisplayStringUnsized
+                FROM AT-SMI-MIB
+            sysinfo
+                FROM AT-SYSINFO-MIB
+            Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            TEXTUAL-CONVENTION
+                FROM SNMPv2-TC;
+
+
+        atEnvMonv2 MODULE-IDENTITY
+            LAST-UPDATED "201610300000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc"
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "The AT Environment Monitoring v2 MIB for managing and
+                reporting data relating to voltage rails, fan speeds,
+                temperature sensors and power supply units."
+            REVISION "201610300000Z"
+            DESCRIPTION
+                "Swapped external PSU status failed/good states"
+            REVISION "201606280000Z"
+            DESCRIPTION
+                "Added support for level 1 and level 2 critical temperature events."
+            REVISION "201406070000Z"
+            DESCRIPTION
+                "Additions for Industrial Ethernet support (i.e. contact input, contact output, external PSU status)."
+            REVISION "201406060000Z"
+            DESCRIPTION
+                "Added more descriptions to FanStackMemberId, VoltageStackMemberId,
+                TemperatureStackMemberId, PsbHostStackMemberId, PsbSensorStackMemberId,
+                and FaultLedStackMemberId."
+            REVISION "201403310000Z"
+            DESCRIPTION
+                "Added support for critical temperature events"
+            REVISION "201209210000Z"
+            DESCRIPTION
+                "Added chassis switch (e.g. SBx8100) descriptions to stack-related MIB objects"
+            REVISION "201009150000Z"
+            DESCRIPTION
+                "Add atEnvMonv2PsbSensorReading field to atEnvMonv2PsbSensorEntry"
+            REVISION "201009070000Z"
+            DESCRIPTION
+                "Generic syntax tidy up"
+            REVISION "201006140450Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "201005240119Z"
+            DESCRIPTION
+                "OID of atEnvMonv2Traps reverted to 5 but deprecated. Added atEnvMonv2Notifications"
+            REVISION "201001150039Z"
+            DESCRIPTION
+                "Changed the OID value of atEnvMonv2Traps from 5 to 0 to meet RFC 3584 3.1"
+            REVISION "200811260000Z"
+            DESCRIPTION
+                "Removed recently added MIB objects that went against the
+                original intent of the environment monitoring MIB."
+            REVISION "200809240000Z"
+            DESCRIPTION
+                "Appended v2 to all object names to clarify
+                version number of this mib."
+            REVISION "200802070000Z"
+            DESCRIPTION
+                "Initial Revision"
+            ::= { sysinfo 12 }
+
+
+
+--
+-- Textual conventions
+--
+
+        AtEnvMonv2PsbSensorType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "Indicates the type of a Power Supply Bay Device sensor."
+            SYNTAX INTEGER
+                {
+                psbSensorTypeInvalid(0),
+                fanSpeedDiscrete(1),
+                temperatureDiscrete(2),
+                voltageDiscrete(3)
+                }
+
+
+--
+-- Node definitions
+--
+--  ---------------------------------------------------------- --
+-- The Environment Monitoring Notifications Objects
+-- ---------------------------------------------------------- --
+
+        atEnvMonv2Notifications OBJECT IDENTIFIER ::= { atEnvMonv2 0 }
+
+
+        atEnvMonv2FanAlarmSetNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2FanStackMemberId, atEnvMonv2FanBoardIndex, atEnvMonv2FanIndex, atEnvMonv2FanDescription, atEnvMonv2FanLowerThreshold,
+                atEnvMonv2FanCurrentSpeed }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when the monitored speed of a fan
+                drops below its lower threshold."
+            ::= { atEnvMonv2Notifications 1 }
+
+
+        atEnvMonv2FanAlarmClearedNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2FanStackMemberId, atEnvMonv2FanBoardIndex, atEnvMonv2FanIndex, atEnvMonv2FanDescription, atEnvMonv2FanLowerThreshold,
+                atEnvMonv2FanCurrentSpeed }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when the monitored speed of a fan
+                returns to an acceptable value, the fan
+                having previously been in an alarm condition."
+            ::= { atEnvMonv2Notifications 2 }
+
+
+        atEnvMonv2VoltAlarmSetNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2VoltageStackMemberId, atEnvMonv2VoltageBoardIndex, atEnvMonv2VoltageIndex, atEnvMonv2VoltageDescription, atEnvMonv2VoltageUpperThreshold,
+                atEnvMonv2VoltageLowerThreshold, atEnvMonv2VoltageCurrent }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when the voltage of a monitored
+                voltage rail goes out of tolerance, either by
+                dropping below its lower threshold, or exceeding
+                its upper threshold."
+            ::= { atEnvMonv2Notifications 3 }
+
+
+        atEnvMonv2VoltAlarmClearedNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2VoltageStackMemberId, atEnvMonv2VoltageBoardIndex, atEnvMonv2VoltageIndex, atEnvMonv2VoltageDescription, atEnvMonv2VoltageUpperThreshold,
+                atEnvMonv2VoltageLowerThreshold, atEnvMonv2VoltageCurrent }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when the voltage of a monitored
+                voltage rail returns to an acceptable value,
+                having previously been in an alarm condition."
+            ::= { atEnvMonv2Notifications 4 }
+
+
+        atEnvMonv2TempAlarmSetNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2TemperatureStackMemberId, atEnvMonv2TemperatureBoardIndex, atEnvMonv2TemperatureIndex, atEnvMonv2TemperatureDescription, atEnvMonv2TemperatureUpperThreshold,
+                atEnvMonv2TemperatureCurrent }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when a monitored temperature
+                exceeds its upper threshold."
+            ::= { atEnvMonv2Notifications 5 }
+
+
+        atEnvMonv2TempAlarmClearedNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2TemperatureStackMemberId, atEnvMonv2TemperatureBoardIndex, atEnvMonv2TemperatureIndex, atEnvMonv2TemperatureDescription, atEnvMonv2TemperatureUpperThreshold
+                 }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when a monitored temperature
+                returns to an acceptable value, having
+                previously been in an alarm condition."
+            ::= { atEnvMonv2Notifications 6 }
+
+
+        atEnvMonv2PsbAlarmSetNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2PsbSensorStackMemberId, atEnvMonv2PsbSensorBoardIndex, atEnvMonv2PsbSensorIndex, atEnvMonv2PsbSensorType, atEnvMonv2PsbSensorDescription
+                 }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when a monitored parameter of
+                a power supply bay device goes out of
+                tolerance."
+            ::= { atEnvMonv2Notifications 7 }
+
+
+        atEnvMonv2PsbAlarmClearedNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2PsbSensorStackMemberId, atEnvMonv2PsbSensorBoardIndex, atEnvMonv2PsbSensorIndex, atEnvMonv2PsbSensorType, atEnvMonv2PsbSensorDescription
+                 }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when a monitored parameter of
+                a power supply bay device returns to an
+                acceptable value, having previously been
+                in an alarm condition."
+            ::= { atEnvMonv2Notifications 8 }
+
+
+        atEnvMonv2ContactInputOpenNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2ContactInputStackMemberId, atEnvMonv2ContactInputBoardIndex, atEnvMonv2ContactInputIndex, atEnvMonv2ContactInputDescription
+                 }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when a monitored contact input opens."
+            ::= { atEnvMonv2Notifications 9 }
+
+
+        atEnvMonv2ContactInputCloseNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2ContactInputStackMemberId, atEnvMonv2ContactInputBoardIndex, atEnvMonv2ContactInputIndex, atEnvMonv2ContactInputDescription
+                 }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when a monitored contact input closes."
+            ::= { atEnvMonv2Notifications 10 }
+
+
+        atEnvMonv2ExternalPSUAlarmSetNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2ExternalPSUStackMemberId, atEnvMonv2ExternalPSUBoardIndex, atEnvMonv2ExternalPSUIndex, atEnvMonv2ExternalPSUDescription
+                 }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when supply potential of 
+                a monitored external power supply is not present."
+            ::= { atEnvMonv2Notifications 11 }
+
+
+        atEnvMonv2ExternalPSUAlarmClearedNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2ExternalPSUStackMemberId, atEnvMonv2ExternalPSUBoardIndex, atEnvMonv2ExternalPSUIndex, atEnvMonv2ExternalPSUDescription
+                 }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when supply potential of
+                a monitored external power supply returns to an
+                acceptable value, having previously been in an
+                alarm condition."
+            ::= { atEnvMonv2Notifications 12 }
+
+
+        atEnvMonv2TempCriticalSetNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2TemperatureStackMemberId }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when a monitored temperature
+                exceeds its upper threshold."
+            ::= { atEnvMonv2Notifications 13 }
+
+
+        atEnvMonv2TempCriticalClearedNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2TemperatureStackMemberId }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when a monitored temperature
+                returns to an acceptable value, having
+                previously been in an alarm condition."
+            ::= { atEnvMonv2Notifications 14 }
+
+
+        atEnvMonv2TempCriticalLevel1SetNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2TemperatureStackMemberId }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when a monitored temperature
+                exceeds the level 1 threshold."
+            ::= { atEnvMonv2Notifications 15 }
+
+
+        atEnvMonv2TempCriticalLevel1ClearedNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2TemperatureStackMemberId }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when a monitored temperature
+                returns to an acceptable value, having previously been in
+                critical temperature level 1 condition."
+            ::= { atEnvMonv2Notifications 16 }
+
+
+        atEnvMonv2TempCriticalLevel2SetNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2TemperatureStackMemberId }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when a monitored temperature
+                exceeds the level 2 threshold."
+            ::= { atEnvMonv2Notifications 17 }
+
+
+        atEnvMonv2TempCriticalLevel2ClearedNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2TemperatureStackMemberId }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when a monitored temperature
+                returns to an acceptable value, having previously been in
+                critical temperature level 2 condition."
+            ::= { atEnvMonv2Notifications 18 }
+
+-- ---------------------------------------------------------- --
+-- The Environment Monitoring Fan Table
+-- ---------------------------------------------------------- --
+
+        atEnvMonv2FanTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtEnvMonv2FanEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of information about fans installed in the device
+                that have their fan speeds monitored by environment
+                monitoring hardware."
+            ::= { atEnvMonv2 1 }
+
+
+        atEnvMonv2FanEntry OBJECT-TYPE
+            SYNTAX AtEnvMonv2FanEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The description, current speed, lower threshold speed and
+                current status of a fan."
+            INDEX { atEnvMonv2FanStackMemberId, atEnvMonv2FanBoardIndex, atEnvMonv2FanIndex }
+            ::= { atEnvMonv2FanTable 1 }
+
+
+        AtEnvMonv2FanEntry ::=
+            SEQUENCE {
+                atEnvMonv2FanStackMemberId
+                    Unsigned32,
+                atEnvMonv2FanBoardIndex
+                    Unsigned32,
+                atEnvMonv2FanIndex
+                    Unsigned32,
+                atEnvMonv2FanDescription
+                    DisplayStringUnsized,
+                atEnvMonv2FanCurrentSpeed
+                    Unsigned32,
+                atEnvMonv2FanLowerThreshold
+                    Unsigned32,
+                atEnvMonv2FanStatus
+                    INTEGER
+             }
+
+        atEnvMonv2FanStackMemberId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the stack member hosting this fan. For a chassis
+                switch, it corresponds to the card ID of the controller that
+                is monitoring the chassis hardware, e.g. 5 or 6. In a VCStack
+                Plus, the second chassis uses controller IDs 17 or 18. Refer
+                to chassisMappingTable for more details."
+            ::= { atEnvMonv2FanEntry 1 }
+
+
+        atEnvMonv2FanBoardIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the board hosting this fan in the board table."
+            ::= { atEnvMonv2FanEntry 2 }
+
+
+        atEnvMonv2FanIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The numeric identifier of this fan on its host board."
+            ::= { atEnvMonv2FanEntry 3 }
+
+
+        atEnvMonv2FanDescription OBJECT-TYPE
+            SYNTAX DisplayStringUnsized (SIZE (0..30))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The description of this fan."
+            ::= { atEnvMonv2FanEntry 4 }
+
+
+        atEnvMonv2FanCurrentSpeed OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current speed of this fan in revolutions per
+                minute."
+            ::= { atEnvMonv2FanEntry 5 }
+
+
+        atEnvMonv2FanLowerThreshold OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The minimum acceptable speed of the fan in revolutions
+                per minute."
+            ::= { atEnvMonv2FanEntry 6 }
+
+
+        atEnvMonv2FanStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                failed(1),
+                good(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "An indication of whether this fan is currently in an
+                alarm condition. A value of 'failed(1)' indicates that its
+                current speed is too low, 'good(2)' indicates that the
+                current speed is acceptable."
+            ::= { atEnvMonv2FanEntry 7 }
+
+
+--  ---------------------------------------------------------- --
+-- The Environment Monitoring Voltage Table
+-- ---------------------------------------------------------- --
+        atEnvMonv2VoltageTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtEnvMonv2VoltageEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of information about voltage rails in the device
+                that are monitored by environment monitoring hardware."
+            ::= { atEnvMonv2 2 }
+
+
+        atEnvMonv2VoltageEntry OBJECT-TYPE
+            SYNTAX AtEnvMonv2VoltageEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The description, current value, upper & lower threshold
+                settings and current status of a voltage rail."
+            INDEX { atEnvMonv2VoltageStackMemberId, atEnvMonv2VoltageBoardIndex, atEnvMonv2VoltageIndex }
+            ::= { atEnvMonv2VoltageTable 1 }
+
+
+        AtEnvMonv2VoltageEntry ::=
+            SEQUENCE {
+                atEnvMonv2VoltageStackMemberId
+                    Unsigned32,
+                atEnvMonv2VoltageBoardIndex
+                    Unsigned32,
+                atEnvMonv2VoltageIndex
+                    Unsigned32,
+                atEnvMonv2VoltageDescription
+                    DisplayStringUnsized,
+                atEnvMonv2VoltageCurrent
+                    INTEGER,
+                atEnvMonv2VoltageUpperThreshold
+                    INTEGER,
+                atEnvMonv2VoltageLowerThreshold
+                    INTEGER,
+                atEnvMonv2VoltageStatus
+                    INTEGER
+             }
+
+        atEnvMonv2VoltageStackMemberId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the stack member hosting this voltage sensor. For
+                a chassis switch, it corresponds to the card ID of the controller
+                that is monitoring the chassis hardware, e.g. 5 or 6. In a VCStack
+                Plus, the second chassis uses controller IDs 17 or 18. Refer to
+                chassisMappingTable for more details."
+            ::= { atEnvMonv2VoltageEntry 1 }
+
+
+        atEnvMonv2VoltageBoardIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the board hosting this voltage sensor in the board table."
+            ::= { atEnvMonv2VoltageEntry 2 }
+
+
+        atEnvMonv2VoltageIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The numeric identifier of this voltage rail on its host board."
+            ::= { atEnvMonv2VoltageEntry 3 }
+
+
+        atEnvMonv2VoltageDescription OBJECT-TYPE
+            SYNTAX DisplayStringUnsized (SIZE (0..30))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The description of this voltage rail."
+            ::= { atEnvMonv2VoltageEntry 4 }
+
+
+        atEnvMonv2VoltageCurrent OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current reading of this voltage rail in millivolts."
+            ::= { atEnvMonv2VoltageEntry 5 }
+
+
+        atEnvMonv2VoltageUpperThreshold OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum acceptable reading of this voltage rail in millivolts."
+            ::= { atEnvMonv2VoltageEntry 6 }
+
+
+        atEnvMonv2VoltageLowerThreshold OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The minimum acceptable reading of this voltage rail in millivolts."
+            ::= { atEnvMonv2VoltageEntry 7 }
+
+
+        atEnvMonv2VoltageStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                outOfRange(1),
+                inRange(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "An indication of whether this voltage rail is currently
+                in an alarm condition. A value of 'outOfRange' indicates that
+                its current reading is outside its threshold range,
+                'inRange' indicates that the current reading is acceptable."
+            ::= { atEnvMonv2VoltageEntry 8 }
+
+
+--  ---------------------------------------------------------- --
+-- The Environment Monitoring Temperature Table
+-- ---------------------------------------------------------- --
+        atEnvMonv2TemperatureTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtEnvMonv2TemperatureEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of information about temperature sensors in the device
+                that are monitored by environment monitoring hardware."
+            ::= { atEnvMonv2 3 }
+
+
+        atEnvMonv2TemperatureEntry OBJECT-TYPE
+            SYNTAX AtEnvMonv2TemperatureEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The description, current value, upper threshold setting
+                and current status of a temperature sensor."
+            INDEX { atEnvMonv2TemperatureStackMemberId, atEnvMonv2TemperatureBoardIndex, atEnvMonv2TemperatureIndex }
+            ::= { atEnvMonv2TemperatureTable 1 }
+
+
+        AtEnvMonv2TemperatureEntry ::=
+            SEQUENCE {
+                atEnvMonv2TemperatureStackMemberId
+                    Unsigned32,
+                atEnvMonv2TemperatureBoardIndex
+                    Unsigned32,
+                atEnvMonv2TemperatureIndex
+                    Unsigned32,
+                atEnvMonv2TemperatureDescription
+                    DisplayStringUnsized,
+                atEnvMonv2TemperatureCurrent
+                    INTEGER,
+                atEnvMonv2TemperatureUpperThreshold
+                    INTEGER,
+                atEnvMonv2TemperatureStatus
+                    INTEGER
+             }
+
+        atEnvMonv2TemperatureStackMemberId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the stack member hosting this temperature sensor. For
+                a chassis switch, it corresponds to the card ID of the controller
+                that is monitoring the chassis hardware, e.g. 5 or 6. In a VCStack
+                Plus, the second chassis uses controller IDs 17 or 18. Refer to
+                chassisMappingTable for more details."
+            ::= { atEnvMonv2TemperatureEntry 1 }
+
+
+        atEnvMonv2TemperatureBoardIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the board hosting this temperature sensor in the board table."
+            ::= { atEnvMonv2TemperatureEntry 2 }
+
+
+        atEnvMonv2TemperatureIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The numeric identifier of this temperature sensor on its host board."
+            ::= { atEnvMonv2TemperatureEntry 3 }
+
+
+        atEnvMonv2TemperatureDescription OBJECT-TYPE
+            SYNTAX DisplayStringUnsized (SIZE (0..30))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The description of this temperature sensor."
+            ::= { atEnvMonv2TemperatureEntry 4 }
+
+
+        atEnvMonv2TemperatureCurrent OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current reading of this temperature sensor in tenths of a degree Celsius."
+            ::= { atEnvMonv2TemperatureEntry 5 }
+
+
+        atEnvMonv2TemperatureUpperThreshold OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum acceptable reading of this temperature
+                sensor in tenths of a degree Celsius."
+            ::= { atEnvMonv2TemperatureEntry 6 }
+
+
+        atEnvMonv2TemperatureStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                outOfRange(1),
+                inRange(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "An indication of whether this temperature sensor is
+                currently in an alarm condition. A value of 'outOfRange'
+                indicates that its current reading is outside its threshold
+                range, 'inRange' indicates that the current reading is
+                acceptable."
+            ::= { atEnvMonv2TemperatureEntry 7 }
+
+
+--  ---------------------------------------------------------- --
+-- The Environment Monitoring Power Supply Bay Device Table
+-- ---------------------------------------------------------- --
+        atEnvMonv2PsbObjects OBJECT IDENTIFIER ::= { atEnvMonv2 4 }
+
+
+        atEnvMonv2PsbTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtEnvMonv2PsbEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of information about power supply bays in the system and
+                any devices that are installed."
+            ::= { atEnvMonv2PsbObjects 1 }
+
+
+        atEnvMonv2PsbEntry OBJECT-TYPE
+            SYNTAX AtEnvMonv2PsbEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The description and current status of a power supply
+                bay device."
+            INDEX { atEnvMonv2PsbHostStackMemberId, atEnvMonv2PsbHostBoardIndex, atEnvMonv2PsbHostSlotIndex }
+            ::= { atEnvMonv2PsbTable 1 }
+
+
+        AtEnvMonv2PsbEntry ::=
+            SEQUENCE {
+                atEnvMonv2PsbHostStackMemberId
+                    Unsigned32,
+                atEnvMonv2PsbHostBoardIndex
+                    Unsigned32,
+                atEnvMonv2PsbHostSlotIndex
+                    Unsigned32,
+                atEnvMonv2PsbHeldBoardIndex
+                    Unsigned32,
+                atEnvMonv2PsbHeldBoardId
+                    OBJECT IDENTIFIER,
+                atEnvMonv2PsbDescription
+                    DisplayStringUnsized
+             }
+
+        atEnvMonv2PsbHostStackMemberId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the stack member hosting this power supply bay. For
+                a chassis switch, it corresponds to the card ID of the controller
+                that is monitoring the chassis hardware, e.g. 5 or 6. In a VCStack
+                Plus, the second chassis uses controller IDs 17 or 18. Refer to
+                chassisMappingTable for more details."
+            ::= { atEnvMonv2PsbEntry 1 }
+
+
+        atEnvMonv2PsbHostBoardIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the board hosting this power supply bay in the board table."
+            ::= { atEnvMonv2PsbEntry 2 }
+
+
+        atEnvMonv2PsbHostSlotIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of this power supply bay on its host board.
+                This index is fixed for each slot, on each type of board."
+            ::= { atEnvMonv2PsbEntry 3 }
+
+
+        atEnvMonv2PsbHeldBoardIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of a board installed in this power supply bay.
+                This value corresponds to atEnvMonv2PsbSensorBoardIndex for
+                each sensor on this board. A value of 0 indicates that a
+                board is is either not present or not supported."
+            ::= { atEnvMonv2PsbEntry 4 }
+
+
+        atEnvMonv2PsbHeldBoardId OBJECT-TYPE
+            SYNTAX OBJECT IDENTIFIER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of board installed in this power supply bay. The
+                values of this object are taken from the pprXxx object IDs
+                under the boards sub-tree in the parent MIB. A value of 0
+                indicates that a board is either not present or not
+                supported."
+            ::= { atEnvMonv2PsbEntry 5 }
+
+
+        atEnvMonv2PsbDescription OBJECT-TYPE
+            SYNTAX DisplayStringUnsized (SIZE (0..30))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The description of this power supply bay."
+            ::= { atEnvMonv2PsbEntry 6 }
+
+
+        atEnvMonv2PsbSensorTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtEnvMonv2PsbSensorEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of information about environment monitoring sensors
+                on devices installed in power supply bays."
+            ::= { atEnvMonv2PsbObjects 2 }
+
+
+        atEnvMonv2PsbSensorEntry OBJECT-TYPE
+            SYNTAX AtEnvMonv2PsbSensorEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The description and current status of a device installed
+                in a power supply bay."
+            INDEX { atEnvMonv2PsbSensorStackMemberId, atEnvMonv2PsbSensorBoardIndex, atEnvMonv2PsbSensorIndex }
+            ::= { atEnvMonv2PsbSensorTable 1 }
+
+
+        AtEnvMonv2PsbSensorEntry ::=
+            SEQUENCE {
+                atEnvMonv2PsbSensorStackMemberId
+                    Unsigned32,
+                atEnvMonv2PsbSensorBoardIndex
+                    Unsigned32,
+                atEnvMonv2PsbSensorIndex
+                    Unsigned32,
+                atEnvMonv2PsbSensorType
+                    AtEnvMonv2PsbSensorType,
+                atEnvMonv2PsbSensorDescription
+                    DisplayStringUnsized,
+                atEnvMonv2PsbSensorStatus
+                    INTEGER,
+                atEnvMonv2PsbSensorReading
+                    INTEGER
+             }
+
+        atEnvMonv2PsbSensorStackMemberId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the stack member hosting this sensor. For a
+                chassis switch, it corresponds to the card ID of the controller
+                that is monitoring the chassis hardware, e.g. 5 or 6. In a VCStack
+                Plus, the second chassis uses controller IDs 17 or 18. Refer to
+                chassisMappingTable for more details."
+            ::= { atEnvMonv2PsbSensorEntry 1 }
+
+
+        atEnvMonv2PsbSensorBoardIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the board hosting this sensor in the board table."
+            ::= { atEnvMonv2PsbSensorEntry 2 }
+
+
+        atEnvMonv2PsbSensorIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of this power supply bay environmental sensor on
+                its host board."
+            ::= { atEnvMonv2PsbSensorEntry 3 }
+
+
+        atEnvMonv2PsbSensorType OBJECT-TYPE
+            SYNTAX AtEnvMonv2PsbSensorType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of environmental variable this sensor detects."
+            ::= { atEnvMonv2PsbSensorEntry 4 }
+
+
+        atEnvMonv2PsbSensorDescription OBJECT-TYPE
+            SYNTAX DisplayStringUnsized (SIZE (0..30))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The description of this power supply bay environmental sensor."
+            ::= { atEnvMonv2PsbSensorEntry 5 }
+
+
+        atEnvMonv2PsbSensorStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                failed(1),
+                good(2),
+                notPowered(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "An indication of whether this environmental sensor is currently
+                in an alarm condition. A value of 'failed(1)' indicates that
+                the device is in a failure condition, 'good(2)' indicates that
+                the device is functioning normally."
+            ::= { atEnvMonv2PsbSensorEntry 6 }
+
+
+        atEnvMonv2PsbSensorReading OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                no(1),
+                yes(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "An indication of whether this environmental sensor is
+                currently reading a value for the monitored device. A value
+                of 'no' indicates that there is no current reading, 'yes' indicates
+                that the monitored device is supplying a reading."
+            ::= { atEnvMonv2PsbSensorEntry 7 }
+
+--  ---------------------------------------------------------- --
+-- The Environment Monitoring SNMP Trap Objects (Deprecated)
+-- ---------------------------------------------------------- --
+        atEnvMonv2Traps OBJECT IDENTIFIER ::= { atEnvMonv2 5 }
+
+
+        atEnvMonv2FanAlarmSetEvent NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2FanStackMemberId, atEnvMonv2FanBoardIndex, atEnvMonv2FanIndex, atEnvMonv2FanDescription, atEnvMonv2FanLowerThreshold,
+                atEnvMonv2FanCurrentSpeed }
+            STATUS deprecated
+            DESCRIPTION
+                "A trap generated when the monitored speed of a fan
+                drops below its lower threshold."
+            ::= { atEnvMonv2Traps 1 }
+
+
+        atEnvMonv2FanAlarmClearedEvent NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2FanStackMemberId, atEnvMonv2FanBoardIndex, atEnvMonv2FanIndex, atEnvMonv2FanDescription, atEnvMonv2FanLowerThreshold,
+                atEnvMonv2FanCurrentSpeed }
+            STATUS deprecated
+            DESCRIPTION
+                "A trap generated when the monitored speed of a fan
+                returns to an acceptable value, the fan
+                having previously been in an alarm condition."
+            ::= { atEnvMonv2Traps 2 }
+
+
+        atEnvMonv2VoltAlarmSetEvent NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2VoltageStackMemberId, atEnvMonv2VoltageBoardIndex, atEnvMonv2VoltageIndex, atEnvMonv2VoltageDescription, atEnvMonv2VoltageUpperThreshold,
+                atEnvMonv2VoltageLowerThreshold, atEnvMonv2VoltageCurrent }
+            STATUS deprecated
+            DESCRIPTION
+                "A trap generated when the voltage of a monitored
+                voltage rail goes out of tolerance, either by
+                dropping below its lower threshold, or exceeding
+                its upper threshold."
+            ::= { atEnvMonv2Traps 3 }
+
+
+        atEnvMonv2VoltAlarmClearedEvent NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2VoltageStackMemberId, atEnvMonv2VoltageBoardIndex, atEnvMonv2VoltageIndex, atEnvMonv2VoltageDescription, atEnvMonv2VoltageUpperThreshold,
+                atEnvMonv2VoltageLowerThreshold, atEnvMonv2VoltageCurrent }
+            STATUS deprecated
+            DESCRIPTION
+                "A trap generated when the voltage of a monitored
+                voltage rail returns to an acceptable value,
+                having previously been in an alarm condition."
+            ::= { atEnvMonv2Traps 4 }
+
+
+        atEnvMonv2TempAlarmSetEvent NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2TemperatureStackMemberId, atEnvMonv2TemperatureBoardIndex, atEnvMonv2TemperatureIndex, atEnvMonv2TemperatureDescription, atEnvMonv2TemperatureUpperThreshold,
+                atEnvMonv2TemperatureCurrent }
+            STATUS deprecated
+            DESCRIPTION
+                "A trap generated when a monitored temperature
+                exceeds its upper threshold."
+            ::= { atEnvMonv2Traps 5 }
+
+
+        atEnvMonv2TempAlarmClearedEvent NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2TemperatureStackMemberId, atEnvMonv2TemperatureBoardIndex, atEnvMonv2TemperatureIndex, atEnvMonv2TemperatureDescription, atEnvMonv2TemperatureUpperThreshold
+                 }
+            STATUS deprecated
+            DESCRIPTION
+                "A trap generated when a monitored temperature
+                returns to an acceptable value, having
+                previously been in an alarm condition."
+            ::= { atEnvMonv2Traps 6 }
+
+
+        atEnvMonv2PsbAlarmSetEvent NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2PsbSensorStackMemberId, atEnvMonv2PsbSensorBoardIndex, atEnvMonv2PsbSensorIndex, atEnvMonv2PsbSensorType, atEnvMonv2PsbSensorDescription
+                 }
+            STATUS deprecated
+            DESCRIPTION
+                "A trap generated when a monitored parameter of
+                a power supply bay device goes out of
+                tolerance."
+            ::= { atEnvMonv2Traps 7 }
+
+
+        atEnvMonv2PsbAlarmClearedEvent NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2PsbSensorStackMemberId, atEnvMonv2PsbSensorBoardIndex, atEnvMonv2PsbSensorIndex, atEnvMonv2PsbSensorType, atEnvMonv2PsbSensorDescription
+                 }
+            STATUS deprecated
+            DESCRIPTION
+                "A trap generated when a monitored parameter of
+                a power supply bay device returns to an
+                acceptable value, having previously been
+                in an alarm condition."
+            ::= { atEnvMonv2Traps 8 }
+
+
+-- ---------------------------------------------------------- --
+-- The Environment Monitoring Fault LED Table
+-- ---------------------------------------------------------- --
+        atEnvMonv2FaultLedTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtEnvMonv2FaultLedEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of information detailing any LED fault indications on
+                the device."
+            ::= { atEnvMonv2 6 }
+
+
+        atEnvMonv2FaultLedEntry OBJECT-TYPE
+            SYNTAX AtEnvMonv2FaultLedEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry pertaining to a given fault LED."
+            INDEX { atEnvMonv2FaultLedStackMemberId }
+            ::= { atEnvMonv2FaultLedTable 1 }
+
+
+        AtEnvMonv2FaultLedEntry ::=
+            SEQUENCE {
+                atEnvMonv2FaultLedStackMemberId
+                    Unsigned32,
+                atEnvMonv2FaultLed1Flash
+                    INTEGER,
+                atEnvMonv2FaultLed2Flashes
+                    INTEGER,
+                atEnvMonv2FaultLed3Flashes
+                    INTEGER,
+                atEnvMonv2FaultLed4Flashes
+                    INTEGER,
+                atEnvMonv2FaultLed5Flashes
+                    INTEGER,
+                atEnvMonv2FaultLed6Flashes
+                    INTEGER
+             }
+
+        atEnvMonv2FaultLedStackMemberId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the stack member hosting this fault LED. For a
+                chassis switch, it corresponds to the card ID of the controller
+                that is monitoring the chassis hardware, e.g. 5 or 6. In a VCStack
+                Plus, the second chassis uses controller IDs 17 or 18. Refer to
+                chassisMappingTable for more details."
+            ::= { atEnvMonv2FaultLedEntry 1 }
+
+
+        atEnvMonv2FaultLed1Flash OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                heatsinkFanFailure(1),
+                noFault(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether a fault LED is currently showing
+                a system failure by flashing once. It indicates that one or
+                more heatsink fans have failed, or are operating below the
+                recommended speed."
+            ::= { atEnvMonv2FaultLedEntry 2 }
+
+
+        atEnvMonv2FaultLed2Flashes OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                chassisFanFailure(1),
+                noFault(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether a fault LED is currently showing
+                a system failure by flashing twice. It indicates that one or
+                both of the chassis fans are not installed, or the fans are
+                operating below the recommended speed."
+            ::= { atEnvMonv2FaultLedEntry 3 }
+
+
+        atEnvMonv2FaultLed3Flashes OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                sensorFailure(1),
+                noFault(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether a fault LED is currently showing
+                a system failure by flashing three times. It indicates that the
+                ability to monitor temperature or fans has failed."
+            ::= { atEnvMonv2FaultLedEntry 4 }
+
+
+        atEnvMonv2FaultLed4Flashes OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                xemInitialisationFailure(1),
+                noFault(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether a fault LED is currently showing
+                a system failure by flashing four times. It indicates that an
+                XEM failed to initialise or is incompatible."
+            ::= { atEnvMonv2FaultLedEntry 5 }
+
+
+        atEnvMonv2FaultLed5Flashes OBJECT-TYPE
+            SYNTAX INTEGER { noFault(2) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether a fault LED is currently showing
+                a system failure by flashing five times. This flashing
+                sequence is not currently in use."
+            ::= { atEnvMonv2FaultLedEntry 6 }
+
+
+        atEnvMonv2FaultLed6Flashes OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                temperatureFailure(1),
+                noFault(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether a fault LED is currently showing
+                a system failure by flashing six times. It indicates that the
+                device's temperature has exceeded the recommended threshold."
+            ::= { atEnvMonv2FaultLedEntry 7 }
+
+
+--  ---------------------------------------------------------- --
+-- The Environment Monitoring Contact Input Table
+-- ---------------------------------------------------------- --
+
+        atEnvMonv2ContactInputTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtEnvMonv2ContactInputEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of information about contact inputs available in the
+                device that are monitored by environment monitoring hardware."
+            ::= { atEnvMonv2 7 }
+
+
+        atEnvMonv2ContactInputEntry OBJECT-TYPE
+            SYNTAX AtEnvMonv2ContactInputEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The description and current state of a contact input."
+            INDEX { atEnvMonv2ContactInputStackMemberId, atEnvMonv2ContactInputBoardIndex, atEnvMonv2ContactInputIndex }
+            ::= { atEnvMonv2ContactInputTable 1 }
+
+
+        AtEnvMonv2ContactInputEntry ::=
+            SEQUENCE {
+                atEnvMonv2ContactInputStackMemberId
+                    Unsigned32,
+                atEnvMonv2ContactInputBoardIndex
+                    Unsigned32,
+                atEnvMonv2ContactInputIndex
+                    Unsigned32,
+                atEnvMonv2ContactInputDescription
+                    DisplayStringUnsized,
+                atEnvMonv2ContactInputState
+                    INTEGER
+             }
+
+        atEnvMonv2ContactInputStackMemberId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the stack member hosting this contact input."
+            ::= { atEnvMonv2ContactInputEntry 1 }
+
+
+        atEnvMonv2ContactInputBoardIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the board hosting this contact input in the board table."
+            ::= { atEnvMonv2ContactInputEntry 2 }
+
+
+        atEnvMonv2ContactInputIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The numeric identifier of this contact input on its host board."
+            ::= { atEnvMonv2ContactInputEntry 3 }
+
+
+        atEnvMonv2ContactInputDescription OBJECT-TYPE
+            SYNTAX DisplayStringUnsized (SIZE (0..30))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The description of this contact input."
+            ::= { atEnvMonv2ContactInputEntry 4 }
+
+
+        atEnvMonv2ContactInputState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                closed(1),
+                open(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "An indication of whether this contact input is currently
+                open or closed."
+            ::= { atEnvMonv2ContactInputEntry 5 }
+
+
+-- ---------------------------------------------------------- --
+-- The Environment Monitoring Contact Output Table
+-- ---------------------------------------------------------- --
+
+        atEnvMonv2ContactOutputTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtEnvMonv2ContactOutputEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of information about contact outputs available in the
+                device that are managed by environment monitoring hardware."
+            ::= { atEnvMonv2 8 }
+
+
+        atEnvMonv2ContactOutputEntry OBJECT-TYPE
+            SYNTAX AtEnvMonv2ContactOutputEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The description and current state of a contact output."
+            INDEX { atEnvMonv2ContactOutputStackMemberId, atEnvMonv2ContactOutputBoardIndex, atEnvMonv2ContactOutputIndex }
+            ::= { atEnvMonv2ContactOutputTable 1 }
+
+
+        AtEnvMonv2ContactOutputEntry ::=
+            SEQUENCE {
+                atEnvMonv2ContactOutputStackMemberId
+                    Unsigned32,
+                atEnvMonv2ContactOutputBoardIndex
+                    Unsigned32,
+                atEnvMonv2ContactOutputIndex
+                    Unsigned32,
+                atEnvMonv2ContactOutputDescription
+                    DisplayStringUnsized,
+                atEnvMonv2ContactOutputState
+                    INTEGER
+             }
+
+        atEnvMonv2ContactOutputStackMemberId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the stack member hosting this contact output."
+            ::= { atEnvMonv2ContactOutputEntry 1 }
+
+
+        atEnvMonv2ContactOutputBoardIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the board hosting this contact output in the board table."
+            ::= { atEnvMonv2ContactOutputEntry 2 }
+
+
+        atEnvMonv2ContactOutputIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The numeric identifier of this contact output on its host board."
+            ::= { atEnvMonv2ContactOutputEntry 3 }
+
+
+        atEnvMonv2ContactOutputDescription OBJECT-TYPE
+            SYNTAX DisplayStringUnsized (SIZE (0..30))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The description of this contact output."
+            ::= { atEnvMonv2ContactOutputEntry 4 }
+
+
+        atEnvMonv2ContactOutputState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                closed(1),
+                open(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "An indication of whether this contact output is currently
+                open or closed."
+            ::= { atEnvMonv2ContactOutputEntry 5 }
+
+
+--  ---------------------------------------------------------- --
+-- The Environment Monitoring External Power Supply Status Table
+-- ---------------------------------------------------------- --
+
+        atEnvMonv2ExternalPSUTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtEnvMonv2ExternalPSUEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table of external PSU status."
+            ::= { atEnvMonv2 9 }
+
+
+        atEnvMonv2ExternalPSUEntry OBJECT-TYPE
+            SYNTAX AtEnvMonv2ExternalPSUEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The description and current status of an external power supply."
+            INDEX { atEnvMonv2ExternalPSUStackMemberId, atEnvMonv2ExternalPSUBoardIndex, atEnvMonv2ExternalPSUIndex }
+            ::= { atEnvMonv2ExternalPSUTable 1 }
+
+
+        AtEnvMonv2ExternalPSUEntry ::=
+            SEQUENCE {
+                atEnvMonv2ExternalPSUStackMemberId
+                    Unsigned32,
+                atEnvMonv2ExternalPSUBoardIndex
+                    Unsigned32,
+                atEnvMonv2ExternalPSUIndex
+                    Unsigned32,
+                atEnvMonv2ExternalPSUDescription
+                    DisplayStringUnsized,
+                atEnvMonv2ExternalPSUState
+                    INTEGER
+             }
+
+        atEnvMonv2ExternalPSUStackMemberId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the stack member hosting this external PSU."
+            ::= { atEnvMonv2ExternalPSUEntry 1 }
+
+
+        atEnvMonv2ExternalPSUBoardIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the board hosting this external PSU in the board table."
+            ::= { atEnvMonv2ExternalPSUEntry 2 }
+
+
+        atEnvMonv2ExternalPSUIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The numeric identifier of this external PSU on its host board."
+            ::= { atEnvMonv2ExternalPSUEntry 3 }
+
+
+        atEnvMonv2ExternalPSUDescription OBJECT-TYPE
+            SYNTAX DisplayStringUnsized (SIZE (0..30))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The description of this external PSU."
+            ::= { atEnvMonv2ExternalPSUEntry 4 }
+
+
+        atEnvMonv2ExternalPSUState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                failed(1),
+                good(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "An indication of whether the supply potential of the external power
+                supply is present or not. A value of 'failed(1)' indicates that
+                no power is being received on this input, 'good(2)' indicates that
+                this input is receiving power from the external power supply."
+            ::= { atEnvMonv2ExternalPSUEntry 5 }
+
+    END
+
+--
+-- at-envmonv2.mib
+--
