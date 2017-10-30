@@ -612,15 +612,15 @@ function isPingable($hostname, $address_family = AF_INET, $attribs = array())
             $fping_params .= ' -p ' . $config['fping_options']['millisec'];
         }
         $status = fping($hostname, $fping_params, $address_family);
-        if ($status['exitcode'] > 0 || $status['db']['loss'] == 100) {
+        if ($status['exitcode'] > 0 || $status['loss'] == 100) {
             $response['result'] = false;
         } else {
             $response['result'] = true;
         }
-        if (is_numeric($status['db']['avg'])) {
-            $response['last_ping_timetaken'] = $status['db']['avg'];
+        if (is_numeric($status['avg'])) {
+            $response['last_ping_timetaken'] = $status['avg'];
         }
-        $response['db'] = $status['db'];
+        $response['db'] = array_intersect_key($status, array_flip(array('xmt','rcv','loss','min','max','avg')));
     } else {
         $response['result'] = true;
         $response['last_ping_timetaken'] = 0;
@@ -1398,7 +1398,7 @@ function fping($host, $params, $address_family = AF_INET)
     $min      = set_numeric($min);
     $max      = set_numeric($max);
     $avg      = set_numeric($avg);
-    $response = array('db' => array('xmt'=>$xmt,'rcv'=>$rcv,'loss'=>$loss,'min'=>$min,'max'=>$max,'avg'=>$avg), 'exitcode'=>$proc_status['exitcode']);
+    $response = array('xmt'=>$xmt,'rcv'=>$rcv,'loss'=>$loss,'min'=>$min,'max'=>$max,'avg'=>$avg,'exitcode'=>$proc_status['exitcode']);
     return $response;
 }
 
