@@ -209,7 +209,7 @@ if (defined('SHOW_SETTINGS')) {
                 $deviceLabel = "label-default";
                 $host_ignored_count++;
             } elseif ($device['status'] == '1') {
-                if (($device['uptime'] < $config['uptime_warning']) && ($device['uptime'] != '0')) {
+                if (($device['uptime'] < $config['uptime_warning']) && ($device['uptime'] != 0)) {
                     $deviceState = 'warn';
                     $deviceLabel = 'label-warning';
                     $deviceLabelOld = 'availability-map-oldview-box-warn';
