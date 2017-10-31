@@ -53,35 +53,81 @@ class Poller implements ValidationGroup
             return; // can't check poller/discovery if there are no devices.
         }
 
-        // FIXME pollers table is only updated by poller-wrapper.py
-        // check poller
+        $this->checkDuplicatePollerEntries($validator);
+        $this->checkLastPolled($validator);
+        $this->checkDeviceLastPolled($validator);
+        $this->checkDevicePollDuration($validator);
+        $this->checkLastDiscovered($validator);
+    }
+
+    private function checkDuplicatePollerEntries(Validator $validator)
+    {
+        $sql = "SELECT TRIM(TRAILING '\n' FROM `poller_name`) as `name`, COUNT(*) as `count` FROM `pollers` GROUP BY `name`;";
+        foreach (dbFetchRows($sql) as $poller) {
+            if ($poller['count'] > 1) {
+                $validator->warn(
+                    'Duplicate poller entries',
+                    "Remove duplicates manually or with: DELETE FROM `pollers` WHERE `poller_name` LIKE '%\\n'"
+                );
+            }
+        }
+    }
+
+    private function checkLastPolled(Validator $validator)
+    {
+        // pollers table is only updated by poller-wrapper.py
         if (dbFetchCell('SELECT COUNT(*) FROM `pollers`')) {
-            $pollers = dbFetchColumn('SELECT `poller_name` FROM `pollers` WHERE `last_polled` <= DATE_ADD(NOW(), INTERVAL - 5 MINUTE)');
+            $dedupe_sql = "SELECT TRIM(TRAILING '\\n' FROM `poller_name`) AS `name`, MAX(`last_polled`) AS `polled` FROM `pollers` GROUP BY `name`";
+            $sql = "SELECT `name` FROM ($dedupe_sql) AS pt WHERE `polled` <= DATE_ADD(NOW(), INTERVAL - 5 MINUTE)";
+
+            $pollers = dbFetchColumn($sql);
             if (count($pollers) > 0) {
                 foreach ($pollers as $poller) {
-                    $validator->fail("The poller ($poller) has not complete within the last 5 minutes, check the cron job");
+                    $validator->fail("The poller ($poller) has not completed within the last 5 minutes, check the cron job");
                 }
             }
         } else {
-            $validator->fail('The poller has never run, check the cron job');
+            $validator->fail('The poller has never run or you are not using poller-wrapper.py, check the cron job');
         }
+    }
 
-        // check devices polling
+    private function checkDeviceLastPolled(Validator $validator)
+    {
         if (count($devices = dbFetchColumn("SELECT `hostname` FROM `devices` WHERE (`last_polled` < DATE_ADD(NOW(), INTERVAL - 5 MINUTE) OR `last_polled` IS NULL) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1")) > 0) {
             $result = ValidationResult::warn("Some devices have not been polled in the last 5 minutes. You may have performance issues.")
-                ->setFix('Check your poll log and see: http://docs.librenms.org/Support/Performance/')
                 ->setList('Devices', $devices);
+
+            if (isCli()) {
+                $result->setFix('Check your poll log and see: http://docs.librenms.org/Support/Performance/');
+            } else {
+                $base_url = $validator->getBaseURL();
+                $result->setFix("Check $base_url/poll-log/ and see: http://docs.librenms.org/Support/Performance/");
+            }
+
             $validator->result($result);
         }
+    }
 
+
+    private function checkDevicePollDuration(Validator $validator)
+    {
         if (count($devices = dbFetchColumn('SELECT `hostname` FROM `devices` WHERE last_polled_timetaken > 300 AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1')) > 0) {
             $result = ValidationResult::fail("Some devices have not completed their polling run in 5 minutes, this will create gaps in data.")
-                ->setFix("Check your poll log and refer to http://docs.librenms.org/Support/Performance/")
                 ->setList('Devices', $devices);
+
+            if (isCli()) {
+                $result->setFix('Check your poll log and see: http://docs.librenms.org/Support/Performance/');
+            } else {
+                $base_url = $validator->getBaseURL();
+                $result->setFix("Check $base_url/poll-log/ and see: http://docs.librenms.org/Support/Performance/");
+            }
+
             $validator->result($result);
         }
+    }
 
-        // check discovery last run
+    private function checkLastDiscovered(Validator $validator)
+    {
         if (dbFetchCell('SELECT COUNT(*) FROM `devices` WHERE `last_discovered` IS NOT NULL') == 0) {
             $validator->fail('Discovery has never run.", "Check the cron job');
         } elseif (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_discovered` <= DATE_ADD(NOW(), INTERVAL - 24 HOUR) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {

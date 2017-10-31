@@ -110,6 +110,10 @@ function load_discovery(&$device)
 
 function discover_device(&$device, $options = null)
 {
+    if ($device['snmp_disable'] == '1') {
+        return;
+    }
+
     global $valid;
 
     $valid = array();
@@ -145,19 +149,15 @@ function discover_device(&$device, $options = null)
     echo "\n";
 
     $force_module = false;
-    if ($device['snmp_disable'] != '1') {
-        // If we've specified modules, use them, else walk the modules array
-        if ($options['m']) {
-            Config::set('discovery_modules', array());
-            foreach (explode(',', $options['m']) as $module) {
-                if (is_file("includes/discovery/$module.inc.php")) {
-                    Config::set("discovery_modules.$module", 1);
-                    $force_module = true;
-                }
+    // If we've specified modules, use them, else walk the modules array
+    if ($options['m']) {
+        Config::set('discovery_modules', array());
+        foreach (explode(',', $options['m']) as $module) {
+            if (is_file("includes/discovery/$module.inc.php")) {
+                Config::set("discovery_modules.$module", 1);
+                $force_module = true;
             }
         }
-    } else {
-        Config::set('discovery_modules', array());
     }
     foreach (Config::get('discovery_modules', array()) as $module => $module_status) {
         $os_module_status = Config::getOsSetting($device['os'], "discovery_modules.$module");
