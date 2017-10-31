@@ -425,7 +425,16 @@ foreach (array_keys($menu_sensors) as $item) {
     $sep++;
 }
 
+
+$toner = new ObjectCache('toner');
+if ($toner) {
+    echo '<li role="presentation" class="divider"></li>';
+    echo '<li><a href="health/metric=toner/"><i class="fa fa-print fa-fw fa-lg"></i> Toner</a></li>';
+    $used_sensors['toner'] = $toner;
+}
 ?>
+
+
           </ul>
         </li>
 <?php
