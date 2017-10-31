@@ -11,10 +11,14 @@ if ($_SESSION['userlevel'] < 10) {
     exit;
 }
 
-$hostname = (isset($_POST['hostname']) && clean($_POST['hostname']) != "") ? clean($_POST['hostname']) : false;
+if (isset($_POST['hostname']) && clean($_POST['hostname']) != "") {
+    $hostname = clean($_POST['hostname']);
+} else {
+    $hostname = false;
+}
 if ($hostname !== false && !is_valid_hostname($hostname) && !IP::isValid($hostname)) {
     $hostname = false;
-    print_error('Invalid hostname.');
+    print_error('Invalid hostname or IP.');
 }
 $snmp_enabled = isset($_POST['snmp']);
 
