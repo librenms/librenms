@@ -267,7 +267,7 @@ class Validator
      */
     public function getBaseURL()
     {
-        $url = Config::get('base_url', get_url());
-        return rtrim(str_replace('validate', '', $url), '/');
+        $url = function_exists('get_url') ? get_url() : Config::get('base_url');
+        return rtrim(str_replace('validate', '', $url), '/');  // get base_url from current url
     }
 }
