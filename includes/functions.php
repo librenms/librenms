@@ -612,7 +612,7 @@ function isPingable($hostname, $address_family = AF_INET, $attribs = array())
             $fping_params .= ' -p ' . $config['fping_options']['millisec'];
         }
         $status = fping($hostname, $fping_params, $address_family);
-        if ($status['loss'] == 100) {
+        if ($status['exitcode'] > 0 || $status['loss'] == 100) {
             $response['result'] = false;
         } else {
             $response['result'] = true;
@@ -620,7 +620,7 @@ function isPingable($hostname, $address_family = AF_INET, $attribs = array())
         if (is_numeric($status['avg'])) {
             $response['last_ping_timetaken'] = $status['avg'];
         }
-        $response['db'] = $status;
+        $response['db'] = array_intersect_key($status, array_flip(array('xmt','rcv','loss','min','max','avg')));
     } else {
         $response['result'] = true;
         $response['last_ping_timetaken'] = 0;
@@ -1370,6 +1370,7 @@ function fping($host, $params, $address_family = AF_INET)
     $process = proc_open($fping_path . ' -e -q ' .$params . ' ' .$host.' 2>&1', $descriptorspec, $pipes);
     $read = '';
 
+    $proc_status = 0;
     if (is_resource($process)) {
         fclose($pipes[0]);
 
@@ -1377,6 +1378,7 @@ function fping($host, $params, $address_family = AF_INET)
             $read .= fgets($pipes[1], 1024);
         }
         fclose($pipes[1]);
+        $proc_status = proc_get_status($process);
         proc_close($process);
     }
 
@@ -1396,7 +1398,7 @@ function fping($host, $params, $address_family = AF_INET)
     $min      = set_numeric($min);
     $max      = set_numeric($max);
     $avg      = set_numeric($avg);
-    $response = array('xmt'=>$xmt,'rcv'=>$rcv,'loss'=>$loss,'min'=>$min,'max'=>$max,'avg'=>$avg);
+    $response = array('xmt'=>$xmt,'rcv'=>$rcv,'loss'=>$loss,'min'=>$min,'max'=>$max,'avg'=>$avg,'exitcode'=>$proc_status['exitcode']);
     return $response;
 }
 
