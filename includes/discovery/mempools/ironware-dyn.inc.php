@@ -1,7 +1,6 @@
 <?php
 
 if ($device['os'] == 'ironware' || $device['os_type'] == 'ironware') {
-
     if (str_contains($device['sysDescr'], array('NetIron', 'MLX', 'CER')) === false) {
         echo 'Ironware Dynamic: ';
 
