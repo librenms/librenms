@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Util\IP;
 
 $no_refresh = true;
 
@@ -10,7 +11,16 @@ if ($_SESSION['userlevel'] < 10) {
     exit;
 }
 
-$hostname = isset($_POST['hostname']) ? clean($_POST['hostname']) : false;
+if (isset($_POST['hostname'])) {
+    $hostname = clean($_POST['hostname']);
+    if (!is_valid_hostname($hostname) && !IP::isValid($hostname)) {
+        print_error('Invalid hostname or IP.');
+        $hostname = false;
+    }
+} else {
+    $hostname = false;
+}
+
 $snmp_enabled = isset($_POST['snmp']);
 
 if ($hostname !== false) {
