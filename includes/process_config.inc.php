@@ -48,6 +48,6 @@ if ($config['rrdgraph_real_95th']) {
 // make sure we have full path to binaries in case PATH isn't set
 foreach (array('fping', 'fping6') as $bin) {
     if (!is_executable(Config::get($bin))) {
-        Config::set($bin, locate_binary($bin), true);
+        Config::set($bin, locate_binary($bin), true, $bin, "Path to $bin", 'external', 'paths');
     }
 }

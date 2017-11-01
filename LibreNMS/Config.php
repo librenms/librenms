@@ -158,8 +158,12 @@ class Config
      * @param mixed $key period separated config variable name
      * @param mixed $value
      * @param bool $persist set the setting in the database so it persists across runs
+     * @param string $default default (only set when initially created)
+     * @param string $descr webui description (only set when initially created)
+     * @param string $group webui group (only set when initially created)
+     * @param string $sub_group webui subgroup (only set when initially created)
      */
-    public static function set($key, $value, $persist = false)
+    public static function set($key, $value, $persist = false, $default ='', $descr='', $group='', $sub_group='')
     {
         global $config;
 
@@ -169,10 +173,10 @@ class Config
                 $insert = array(
                     'config_name' => $key,
                     'config_value' => $value,
-                    'config_default' => '',
-                    'config_descr' => '',
-                    'config_group' => '',
-                    'config_sub_group' => '',
+                    'config_default' => $default,
+                    'config_descr' => $descr,
+                    'config_group' => $group,
+                    'config_sub_group' => $sub_group,
                 );
                 dbInsert($insert, 'config');
             }
