@@ -11,7 +11,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -83,11 +83,11 @@ class Poller implements ValidationGroup
             $pollers = dbFetchColumn($sql);
             if (count($pollers) > 0) {
                 foreach ($pollers as $poller) {
-                    $validator->fail("The poller ($poller) has not completed within the last 5 minutes, check the cron job");
+                    $validator->fail("The poller ($poller) has not completed within the last 5 minutes, check the cron job.");
                 }
             }
         } else {
-            $validator->fail('The poller has never run or you are not using poller-wrapper.py, check the cron job');
+            $validator->fail('The poller has never run or you are not using poller-wrapper.py, check the cron job.');
         }
     }
 
@@ -129,7 +129,7 @@ class Poller implements ValidationGroup
     private function checkLastDiscovered(Validator $validator)
     {
         if (dbFetchCell('SELECT COUNT(*) FROM `devices` WHERE `last_discovered` IS NOT NULL') == 0) {
-            $validator->fail('Discovery has never run.", "Check the cron job');
+            $validator->fail('Discovery has never run. Check the cron job');
         } elseif (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_discovered` <= DATE_ADD(NOW(), INTERVAL - 24 HOUR) AND `ignore` = 0 AND `disabled` = 0 AND `status` = 1") > 0) {
             $validator->fail(
                 "Discovery has not completed in the last 24 hours.",
