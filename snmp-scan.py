@@ -121,7 +121,10 @@ def scan_host(ip):
             pass
 
         try:
-            add_output = check_output(['/usr/bin/env', 'php', 'addhost.php', args.ping, hostname or ip])
+            arguments = ['/usr/bin/env', 'php', 'addhost.php', hostname or ip]
+            if args.ping:
+                arguments.insert(3, args.ping)
+            add_output = check_output(arguments)
             return Result(ip, hostname, Outcome.ADDED, add_output)
         except CalledProcessError as err:
             output = err.output.decode().rstrip()
