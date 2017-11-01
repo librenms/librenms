@@ -157,10 +157,27 @@ class Config
      *
      * @param mixed $key period separated config variable name
      * @param mixed $value
+     * @param bool $persist set the setting in the database so it persists across runs
      */
-    public static function set($key, $value)
+    public static function set($key, $value, $persist = false)
     {
         global $config;
+
+        if ($persist) {
+            $res = dbUpdate(array('config_value' => $value), 'config', '`config_name`=?', array($key));
+            if (!$res && !dbFetchCell('SELECT 1 FROM `config` WHERE `config_name`=?', array($key))) {
+                $insert = array(
+                    'config_name' => $key,
+                    'config_value' => $value,
+                    'config_default' => '',
+                    'config_descr' => '',
+                    'config_group' => '',
+                    'config_sub_group' => '',
+                );
+                dbInsert($insert, 'config');
+            }
+        }
+
         $keys = explode('.', $key);
 
         $curr = &$config;

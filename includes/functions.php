@@ -2318,3 +2318,23 @@ function return_num($entry)
         return $num_response[0];
     }
 }
+
+/**
+ * Locate the actual path of a binary
+ *
+ * @param $binary
+ * @return mixed
+ */
+function locate_binary($binary)
+{
+    if (!str_contains($binary, '/')) {
+        $output = `whereis -b $binary`;
+        $target = trim(substr($output, strpos($output, ':') + 1));
+
+        if (file_exists($target)) {
+            return $target;
+        }
+    }
+
+    return $binary;
+}
