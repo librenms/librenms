@@ -4,9 +4,9 @@ $oid = $mempool['mempool_index'];
 
 d_echo('Ironware Mempool'."\n");
 
-$is_netiron = snmp_get($device, 'sysObjectID.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
+$is_netiron = $poll_device['sysDescr'];
 
-if (strpos($is_netiron, 'NI') === false && strpos($is_netiron, 'MLX') === false && strpos($is_netiron, 'Cer') === false) {
+if (strpos($is_netiron, 'NetIron') === false && strpos($is_netiron, 'MLX') === false && strpos($is_netiron, 'CER') === false) {
     $mempool['total'] = snmp_get($device, 'snAgGblDynMemTotal.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
     $mempool['free']  = snmp_get($device, 'snAgGblDynMemFree.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
     $mempool['used']  = ($mempool['total'] - $mempool['free']);
