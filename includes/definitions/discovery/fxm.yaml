@@ -1,4 +1,4 @@
-mib: mibs/alpha/Argus-Power-System-MIB
+mib: Argus-Power-System-MIB
 modules:
     sensors:
         voltage:
