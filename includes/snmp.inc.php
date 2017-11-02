@@ -231,12 +231,22 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
     $data = trim(external_exec($cmd));
 
     $array = array();
+    $oid = '';
     foreach (explode("\n", $data) as $entry) {
-        list($oid,$value)  = explode('=', $entry, 2);
-        $oid               = trim($oid);
-        $value             = trim($value, "\" \n\r");
-        if (!strstr($value, 'at this OID') && isset($oid)) {
-            $array[$oid] = $value;
+        if (str_contains($entry, '=')) {
+            list($oid,$value)  = explode('=', $entry, 2);
+            $oid               = trim($oid);
+            $value             = trim($value, "\" \n\r");
+            if (!strstr($value, 'at this OID') && isset($oid)) {
+                $array[$oid] = $value;
+            }
+        } else {
+            if (isset($array[$oid])) {
+                // if appending, add a line return
+                $array[$oid] .= PHP_EOL . $entry;
+            } else {
+                $array[$oid] = $entry;
+            }
         }
     }
 
@@ -253,11 +263,10 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     }
 
     $cmd = gen_snmpget_cmd($device, $oid, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd));
-    $data = trim($data, "\" \n\r");
+    $data = trim(external_exec($cmd), "\" \n\r");
 
     recordSnmpStatistic('snmpget', $time_start);
-    if (is_string($data) && (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data))) {
+    if (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data)) {
         return false;
     } elseif ($data || $data === '0') {
         return $data;
