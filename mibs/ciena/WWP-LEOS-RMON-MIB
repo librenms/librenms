@@ -1,0 +1,365 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-RMON-MIB.my
+ --
+
+ WWP-LEOS-RMON-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS                
+   OBJECT-TYPE, MODULE-IDENTITY                  
+            FROM SNMPv2-SMI
+   DisplayString, TruthValue
+        FROM SNMPv2-TC                                                     
+   wwpModulesLeos                   
+            FROM WWP-SMI;
+
+ wwpLeosRmonMIB MODULE-IDENTITY
+            LAST-UPDATED "201206270000Z"
+            ORGANIZATION "Ciena, Inc"
+            CONTACT-INFO
+                    "   Mib Meister
+                                        115 North Sullivan Road
+                                        Spokane Valley, WA 99037
+                                USA                             
+                                Phone:  +1 509 242 9000
+                                        Email:  support@ciena.com"
+            DESCRIPTION
+                    "The MIB module for the ciena proprietary rmon configuration."
+
+            REVISION    "201206270000Z"
+            DESCRIPTION
+                    "Corrected string lengths."
+            REVISION    "201108011700Z"
+            DESCRIPTION
+                    "Added xftp server configuration."
+            REVISION    "201006201700Z"
+            DESCRIPTION
+                    "Initial creation."
+            ::= { wwpModulesLeos 41 }
+                                                
+ --
+ -- Node definitions
+ --
+        
+ wwpLeosRmonMIBObjects OBJECT IDENTIFIER ::= { wwpLeosRmonMIB 1 }
+ 
+
+ -- Ciena Rmon Config
+ --
+ wwpLeosRmon OBJECT IDENTIFIER ::= { wwpLeosRmonMIBObjects 1 }
+
+  
+ -- Notifications 
+  
+ wwpLeosRmonMIBNotificationPrefix OBJECT IDENTIFIER ::= { wwpLeosRmonMIB 2 }
+ wwpLeosRmonMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { wwpLeosRmonMIBNotificationPrefix 0 }
+ -- Conformance information 
+ 
+ wwpLeosRmonMIBConformance OBJECT IDENTIFIER ::= { wwpLeosRmonMIB 3 } 
+ wwpLeosRmonsMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosRmonMIBConformance 1 }              
+ wwpLeosRmonMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosRmonMIBConformance 2 }
+
+--
+-- Ciena RMON configuration
+--
+ wwpLeosRmonFileTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosRmonFileEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The table specifying rmon file configuration."
+     ::= { wwpLeosRmon 1 }  
+ 
+ wwpLeosRmonFileEntry OBJECT-TYPE
+     SYNTAX       WwpLeosRmonFileEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "An entry in the port stats table."
+     INDEX{wwpLeosRmonFileIndex}
+     ::= { wwpLeosRmonFileTable 1 }       
+   
+     WwpLeosRmonFileEntry ::= SEQUENCE {
+     wwpLeosRmonFileIndex                             INTEGER,
+     wwpLeosRmonFileName                              DisplayString,
+     wwpLeosRmonFileRemoteDir                         DisplayString,
+     wwpLeosRmonFileServer                            DisplayString,
+     wwpLeosRmonFileInterval                          INTEGER,
+     wwpLeosRmonFilePushLastFile                      TruthValue,
+     wwpLeosRmonFileState                             INTEGER,
+     wwpLeosRmonFileLastRemoteName                    DisplayString,
+     wwpLeosRmonFileLastPushTime                      DisplayString,
+     wwpLeosRmonFileLastPushStatus                    DisplayString,
+     wwpLeosRmonFileUserFilesKept		               INTEGER,
+     wwpLeosRmonFileMaxFiles	          	            INTEGER,
+     wwpLeosRmonFileXftpTransferMode                  INTEGER,
+     wwpLeosRmonFileXftpLoginId                       DisplayString,
+     wwpLeosRmonFileXftpPassword                      DisplayString,
+     wwpLeosRmonFileXftpSecret                        DisplayString
+ }
+
+
+  wwpLeosRmonFileIndex OBJECT-TYPE
+    SYNTAX        INTEGER (0..10)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "placeholder for index"
+    ::= { wwpLeosRmonFileEntry 1 }
+
+ wwpLeosRmonFileName OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE(0..16))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+            "The rmon file name"
+    ::= { wwpLeosRmonFileEntry 2 }
+
+ wwpLeosRmonFileRemoteDir OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE(0..127))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+            "The location on the remote server to place the file"
+    ::= { wwpLeosRmonFileEntry 3 }
+
+ wwpLeosRmonFileServer OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE(0..64))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+            "The servers name"
+    ::= { wwpLeosRmonFileEntry 4 }
+
+  wwpLeosRmonFileInterval OBJECT-TYPE
+    SYNTAX        INTEGER (3600..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "retransmit the last rmon file to the server"
+    ::= { wwpLeosRmonFileEntry 5 }
+
+  wwpLeosRmonFilePushLastFile OBJECT-TYPE
+    SYNTAX        TruthValue
+
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "retransmit the last rmon file to the server"
+    ::= { wwpLeosRmonFileEntry 6 }
+
+  wwpLeosRmonFileState OBJECT-TYPE
+    SYNTAX        INTEGER {   disable(1),
+                              enable(2)}
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "the current operational state of the file push"
+    ::= { wwpLeosRmonFileEntry 7 }
+
+
+ wwpLeosRmonFileLastRemoteName OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE(0..127))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "The name and location on the remote server of the last file"
+    ::= { wwpLeosRmonFileEntry 8 }
+
+ wwpLeosRmonFileLastPushTime OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "The Time of the last file push"
+    ::= { wwpLeosRmonFileEntry 9 }
+
+ wwpLeosRmonFileLastPushStatus OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE(0..127))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "the status of the last rmon file push"
+    ::= { wwpLeosRmonFileEntry 10 }
+
+ wwpLeosRmonFileUserFilesKept OBJECT-TYPE
+    SYNTAX        INTEGER (1..4)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "Must be less than or equal to wwpLeosRmonFileMaxFiles"
+    ::= { wwpLeosRmonFileEntry 11 }
+
+ wwpLeosRmonFileMaxFiles OBJECT-TYPE
+    SYNTAX        INTEGER (1..4)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "Only 1 file is supported on leos 4.x devices and the 3902, 3911 and 3920"
+    ::= { wwpLeosRmonFileEntry 12 }
+
+  wwpLeosRmonFileXftpTransferMode  OBJECT-TYPE
+     SYNTAX               INTEGER {
+			                    tftp(1),                            
+                             ftp(2),
+                             sftp(3),
+                             defaultTftp(4),
+                             defaultFtp(5),
+                             defaultSftp(6),
+                             default(7)      
+                          }
+     MAX-ACCESS           read-write
+     STATUS               current
+     DESCRIPTION
+    	     "The type of server to use."               
+       ::= { wwpLeosRmonFileEntry 13  }      
+
+
+  wwpLeosRmonFileXftpLoginId OBJECT-TYPE
+     SYNTAX      DisplayString(SIZE(0..32))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "The username to use for xftp downloads."
+     DEFVAL { "" }        
+     ::= { wwpLeosRmonFileEntry 14 }
+
+  wwpLeosRmonFileXftpPassword OBJECT-TYPE
+     SYNTAX      DisplayString(SIZE(0..128))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "The password to use for xftp downloads."
+     DEFVAL { "" }        
+     ::= { wwpLeosRmonFileEntry 15  }
+
+  wwpLeosRmonFileXftpSecret OBJECT-TYPE
+     SYNTAX      DisplayString(SIZE(0..256))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "The secret to use for xftp downloads."
+     DEFVAL { "" }        
+     ::= { wwpLeosRmonFileEntry 16 }
+
+
+
+ wwpLeosRmonHistoryTable OBJECT-TYPE 
+     SYNTAX       SEQUENCE OF WwpLeosRmonHistoryEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The table specifying rmon History configuration."
+     ::= { wwpLeosRmon 2 }  
+ 
+ wwpLeosRmonHistoryEntry OBJECT-TYPE
+     SYNTAX       WwpLeosRmonHistoryEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "An entry in the port stats table."
+     INDEX{wwpLeosRmonHistoryIndex}
+     ::= { wwpLeosRmonHistoryTable 1 }       
+   
+     WwpLeosRmonHistoryEntry ::= SEQUENCE {
+     wwpLeosRmonHistoryIndex                             INTEGER,
+     wwpLeosRmonHistoryAutoConfig                        INTEGER,
+     wwpLeosRmonHistoryFileLogging                       INTEGER,
+     wwpLeosRmonHistoryInterval                          INTEGER,
+     wwpLeosRmonHistoryNumBuckets                        INTEGER,
+     wwpLeosRmonHistoryOwner                             DisplayString,
+     wwpLeosRmonHistoryStatistics                        INTEGER
+ }
+
+ wwpLeosRmonHistoryIndex OBJECT-TYPE
+    SYNTAX        INTEGER (0..1)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "placeholder for index"
+    ::= { wwpLeosRmonHistoryEntry 1 }
+
+  wwpLeosRmonHistoryAutoConfig OBJECT-TYPE
+    SYNTAX        INTEGER {   enable(1),
+                              disable(2)}
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "auto create rmon history entries when ports go operationally enabled"
+    ::= { wwpLeosRmonHistoryEntry 2 }
+
+ wwpLeosRmonHistoryFileLogging OBJECT-TYPE
+    SYNTAX        INTEGER {   on(1),
+                              off(2)}
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "file logging setting to use when creating the next autogenerated etherHistory entry"
+    ::= { wwpLeosRmonHistoryEntry 3 }
+
+ wwpLeosRmonHistoryInterval OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "interval to use when creating the next autogenerated etherHistory entry"
+    ::= { wwpLeosRmonHistoryEntry 4 }
+
+ wwpLeosRmonHistoryNumBuckets OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "number of buckets to request when creating the next autogenerated etherHistory entry"
+    ::= { wwpLeosRmonHistoryEntry 5 }
+
+ wwpLeosRmonHistoryOwner OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..127))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+            "the owner to use when creating the next autogenerated etherHistory entry"
+    ::= { wwpLeosRmonHistoryEntry 6 }
+
+  wwpLeosRmonHistoryStatistics OBJECT-TYPE
+    SYNTAX        INTEGER  {none (0),
+                           basicTx(1),
+                           basicRx(2),
+                           basicRxBasicTx(3),
+                           basicError(4),
+                           basicTxBasicError(5),
+                           basicRxBasicError(6),
+                           basicAll(7),
+                           txAll(9),
+                           rxAll(10),
+                           txAllBasicError(13),
+                           rxAllBasicError(22),
+                           errorAll(36),
+                           basicTxErrorAll(37),
+                           basicRxErrorAll(38),
+                           basicRxBasicTxErroAll(39),
+                           txAllErrorAll(45),
+                           txAllRxBasicErrorAll(47),
+                           rxTxAll(51),
+                           rxAllErrorAll(54),
+                           rxAllTxBasicErrorAll(55),
+                           allStatsNoStandard(63),
+                           standardRmon(71),
+                           standardRxAll(87),
+                           standardTxAll(79),
+                           standardRxAllTxAll(95),
+                           standardErrorAll(103),
+                           standardTxAllErrorAll(111),
+                           standardRxAllErrorAll(119),
+                           allStatsWithStandard(127)}
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "The statistics to gather when using the etherhistory"
+    ::= { wwpLeosRmonHistoryEntry 7 }
+   
+END     
+
+ 
+

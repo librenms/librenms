@@ -1,0 +1,600 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+--
+ -- WWP-LEOS-IP-INTERFACE-MIB.my
+ --
+ --
+
+ WWP-LEOS-IP-INTERFACE-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   Integer32, Unsigned32, Counter32, IpAddress, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+	    FROM SNMPv2-SMI			
+   RowStatus, DisplayString, MacAddress, TruthValue, TEXTUAL-CONVENTION			
+	    FROM SNMPv2-TC						
+   wwpModulesLeos		
+	    FROM WWP-SMI;
+	
+	
+ wwpLeosIpInterfaceMIB MODULE-IDENTITY
+	    LAST-UPDATED "200805140000Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+	    DESCRIPTION
+		    "Added the operational gateway and a trap for gateway changes"
+            REVISION     "200805140000Z"  -- 14nd May. 2008  
+	    DESCRIPTION
+		    "The MIB module for the WWP IpInterface IP interfaces configuration. This MIB provide
+                    additional configuration to whatever is provided by the standard ip group."
+            REVISION     "200305020000Z"  -- 2nd May. 2003  
+	    DESCRIPTION
+		    "A new object for management packet priority is added."       
+	    REVISION    "200104031700Z"
+	    DESCRIPTION
+		    "Initial creation."
+	    ::= { wwpModulesLeos 24 }
+
+ VlanId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A 12-bit VLAN ID used in the VLAN Tag header."
+    SYNTAX      INTEGER (1..4094)
+
+ --
+ -- Node definitions
+ --
+	
+ wwpLeosIpInterfaceMIBObjects OBJECT IDENTIFIER ::= { wwpLeosIpInterfaceMIB 1 }
+ 
+ 
+ --
+ -- IP Interface Node
+ --
+ wwpLeosIpInterface OBJECT IDENTIFIER ::= { wwpLeosIpInterfaceMIBObjects 1 } 
+ wwpLeosIpAclGlobal OBJECT IDENTIFIER ::= { wwpLeosIpInterfaceMIBObjects 2 }
+ wwpLeosIpAclRules OBJECT IDENTIFIER ::= { wwpLeosIpInterfaceMIBObjects 3 }
+		
+
+ -- Notifications 
+  
+ wwpLeosIpInterfaceMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpLeosIpInterfaceMIB 2 } 
+ wwpLeosIpInterfaceMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { wwpLeosIpInterfaceMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpLeosIpInterfaceMIBConformance OBJECT IDENTIFIER ::= { wwpLeosIpInterfaceMIB 3 } 
+ wwpLeosIpInterfaceMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosIpInterfaceMIBConformance 1 } 		
+ wwpLeosIpInterfaceMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosIpInterfaceMIBConformance 2 }
+
+
+ wwpLeosIpInterfaceTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF WwpLeosIpInterfaceEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of IP addresses and associated subnet mask."
+     ::= { wwpLeosIpInterface 1 }
+		
+ wwpLeosIpInterfaceEntry OBJECT-TYPE
+     SYNTAX     WwpLeosIpInterfaceEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+	     "Interface IP and subnet mask entry.
+	     These interfaces are used to cause the switch CPU to
+	     become involved with the IP traffic. By default, a 
+	     minimum of two interfaces must always exist, one for
+	     the local management interface, one for the remote management
+	     interface, and one or more for voice over IP."
+     INDEX { wwpLeosIpInterfaceIndex }
+	    ::= { wwpLeosIpInterfaceTable 1 }
+		
+ WwpLeosIpInterfaceEntry ::=  SEQUENCE { 
+      wwpLeosIpInterfaceIndex       Integer32,
+      wwpLeosIpInterfaceName        DisplayString,
+      wwpLeosIpInterfaceIpAddr      IpAddress,
+      wwpLeosIpInterfaceSubnet      IpAddress,
+      wwpLeosIpInterfaceIfIndexXref INTEGER
+ }
+
+ wwpLeosIpInterfaceIndex OBJECT-TYPE
+      SYNTAX Integer32 (1..4096)
+      MAX-ACCESS       read-only
+      STATUS           current
+      DESCRIPTION
+	      "Unique index into the table."
+      ::= { wwpLeosIpInterfaceEntry 1 }
+		
+ wwpLeosIpInterfaceName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..32))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	     "The friendly name for the IP interface."
+     ::= { wwpLeosIpInterfaceEntry 2 }
+		
+ wwpLeosIpInterfaceIpAddr OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "IP address associated with this interface. "
+     ::= { wwpLeosIpInterfaceEntry 3 }
+		 
+ wwpLeosIpInterfaceSubnet OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	     "The subnet mask associated with this ip address/interface."
+     ::= { wwpLeosIpInterfaceEntry 4 }
+		
+		
+ wwpLeosIpInterfaceIfIndexXref OBJECT-TYPE
+     SYNTAX       INTEGER (1..4096)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Cross reference to MIB-2 Interfaces ifIndex."
+     ::= { wwpLeosIpInterfaceEntry 5 }
+
+ wwpLeosIpExtInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WwpLeosIpExtInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains Interface Specific
+         information maintained by each interface."
+    ::= { wwpLeosIpInterface 2 }
+
+ wwpLeosIpExtInterfaceEntry OBJECT-TYPE
+    SYNTAX      WwpLeosIpExtInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of interfaces additional configuration parameters 
+        maintained by each interface."
+    AUGMENTS    { wwpLeosIpInterfaceEntry }
+    ::= { wwpLeosIpExtInterfaceTable 1 }
+
+ WwpLeosIpExtInterfaceEntry ::=
+    SEQUENCE {
+        wwpLeosIpInterfaceEnable             TruthValue,
+        wwpLeosIpInterfaceVlanId             VlanId,
+        wwpLeosIpInterfaceMgmtPktPriority    INTEGER
+    }
+
+ wwpLeosIpInterfaceEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The status of each interface. A value of true(1) indicates 
+        that this interface is enabled and a value of 
+        false(2) indicates that this interface is disabled.
+        The device shouldn't allow the Management Station to disable
+        all the interfaces available on the box."
+    ::= { wwpLeosIpExtInterfaceEntry 1 }
+
+ wwpLeosIpInterfaceVlanId  OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The vlanId associated with this IP interface. The vlan indicated by 
+        wwpLeosIpInterfaceVlanId should exist in the Vlan Table. If an interface
+        has no VLAN associated, then any read on this object should return
+        'noSuchInstance'."
+    ::= { wwpLeosIpExtInterfaceEntry 2 }
+
+ wwpLeosIpInterfaceMgmtPktPriority  OBJECT-TYPE
+    SYNTAX      INTEGER (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The 802.1p Priority value for the management traffic on this interface."
+    ::= { wwpLeosIpExtInterfaceEntry 3 }
+ 
+ wwpLeosIpInterfaceAddrNotifEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "This variable  indicates  whether  the  system
+             generates the wwpLeosIpInterfaceAddrChgNotification. 
+             A false value prevents this notifications
+             from being generated by this system."
+    DEFVAL { true }
+    ::= { wwpLeosIpInterface 3 }
+    
+ wwpLeosIpInterfaceAddrChgNotification NOTIFICATION-TYPE
+	OBJECTS	{
+	           wwpLeosIpInterfaceName,
+		   wwpLeosIpInterfaceIpAddr,
+		   wwpLeosIpInterfaceSubnet
+                }
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosIpInterfaceAddrChgNotification is sent whenever the 
+		ip address of an interface changes." 
+	::= { wwpLeosIpInterfaceMIBNotifications 1 }
+ 
+ --
+ -- Data Interface MIB definitions 
+ -- 		
+ wwpLeosIpDataInterfaceTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF WwpLeosIpDataInterfaceEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Data Interface IP and subnet mask entry.
+	      To create a loopback interface in this table, following attributes must be specified.
+	       wwpLeosIpDataInterfaceIndex
+	       wwpLeosIpDataInterfaceName
+	       wwpLeosIpDataInterfaceIpAddr
+	       wwpLeosIpDataInterfaceType must be set to 'loopback'.
+           wwpLeosIpDataInterfaceVlanId defaults to 1 and cannot be set or changed.              
+           No other MIB object should be set otherwise error will be returned.
+                
+	      To create a regular Data interface the following
+              attributes must be specified.
+	       wwpLeosIpDataInterfaceIndex
+	       wwpLeosIpDataInterfaceName
+	       wwpLeosIpDataInterfaceIpAddr
+	       wwpLeosIpDataInterfaceMask
+	       wwpLeosIpDataInterfaceVlanId must be specified when
+                the interface is created. It cannot be changed after
+                creation.
+	       wwpLeosIpDataRowStatus must be set to 'createAndGo'."   
+        
+     ::= { wwpLeosIpInterface 4 }
+		
+ wwpLeosIpDataInterfaceEntry OBJECT-TYPE
+     SYNTAX     WwpLeosIpDataInterfaceEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+	     "Each entry represents a Data interface 
+	      configuration parameter."
+     INDEX { wwpLeosIpDataInterfaceIndex }
+	    ::= { wwpLeosIpDataInterfaceTable 1 }
+		
+ WwpLeosIpDataInterfaceEntry ::=  SEQUENCE { 
+      wwpLeosIpDataInterfaceIndex       INTEGER,
+      wwpLeosIpDataInterfaceName        DisplayString,
+      wwpLeosIpDataInterfaceIpAddr      IpAddress,
+      wwpLeosIpDataInterfaceMask        IpAddress,
+      wwpLeosIpDataInterfaceVlanId      VlanId,
+      wwpLeosIpDataInterfaceType        INTEGER,
+      wwpLeosIpDataInterfaceIfIndex     Integer32,  
+      wwpLeosIpDataInterfaceMac         MacAddress,
+      wwpLeosIpDataInterfaceIfMtu       Integer32,
+      wwpLeosIpDataInterfaceRowStatus	RowStatus
+ }
+ wwpLeosIpDataInterfaceIndex OBJECT-TYPE
+      SYNTAX      INTEGER (1..4096)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION                                                                     
+	      "Unique index into the table."
+      ::= { wwpLeosIpDataInterfaceEntry 1 }
+		
+ wwpLeosIpDataInterfaceName OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE (0..15))
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+	     "The name for this Data IP interface."
+     ::= { wwpLeosIpDataInterfaceEntry 2 }
+		
+ wwpLeosIpDataInterfaceIpAddr OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+	     "IP address associated with this interface. "
+     ::= { wwpLeosIpDataInterfaceEntry 3 }
+		 
+ wwpLeosIpDataInterfaceMask OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+	     "The subnet mask associated with this ip address/interface."
+     ::= { wwpLeosIpDataInterfaceEntry 4 }
+		
+ wwpLeosIpDataInterfaceVlanId  OBJECT-TYPE
+    SYNTAX        VlanId
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The vlanId associated with this Data IP interface. This vlan must already 
+         exist on the device. The vlanId must be specified when the interface is
+         created. It cannot be set after creation. The vlanId cannot be specified 
+         and defaults to 1 for a loopback interface."
+    ::= { wwpLeosIpDataInterfaceEntry 5 }
+
+ wwpLeosIpDataInterfaceType OBJECT-TYPE
+     SYNTAX        INTEGER {
+                        broadcast(1),
+                        pointToPoint(2),
+                        loopBack(3)
+                   }
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+	 	"The type of Data IP interface."
+     DEFVAL      { broadcast }
+     ::= { wwpLeosIpDataInterfaceEntry 6 }
+
+ wwpLeosIpDataInterfaceIfIndex OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The unique interface index assigned by INET."
+     ::= { wwpLeosIpDataInterfaceEntry 7 }
+
+ wwpLeosIpDataInterfaceMac OBJECT-TYPE
+     SYNTAX       MacAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "MAC address assigned by the device to this Data interface."
+     ::= { wwpLeosIpDataInterfaceEntry 8 }    
+ 
+ wwpLeosIpDataInterfaceIfMtu OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+             "The size of the largest packet which can be
+             sent/received on the interface, specified in octets.
+             For interfaces that are used for transmitting network
+             datagrams, this is the size of the largest network
+             datagram that can be sent on the interface."
+     DEFVAL      { 1500 }
+       ::= { wwpLeosIpDataInterfaceEntry 9 }
+ 
+ wwpLeosIpDataInterfaceRowStatus OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the 
+             conceptual rows in this table.
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'. To delete a row in this
+             table, a manager must set this object to 'destroy'.
+             If the entry exists, it will be displayed as 'active'."
+     ::= { wwpLeosIpDataInterfaceEntry 10 }
+--
+-- Gateway
+--
+ wwpLeosIpInterfaceOperationalGateway OBJECT-TYPE
+     SYNTAX      IpAddress
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	     "Operational gateway IP address."
+     ::= { wwpLeosIpInterface  5 }
+
+
+ wwpLeosIpInterfaceOperationalGatewayChgNotification  NOTIFICATION-TYPE
+	OBJECTS	   {  wwpLeosIpInterfaceOperationalGateway  }
+	STATUS	   current
+	DESCRIPTION  
+		"A wwpLeosIpOperationalGatewayChgNotification notification will be sent out whenever the operational gateway is changed."  
+	::= { wwpLeosIpInterfaceMIBNotifications 2 }
+           
+ --
+ -- IP ACL Items
+ --
+ 
+  wwpLeosIpAclState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     		disabled(1),
+                            enabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows to globally configure IP ACL state."
+    ::= { wwpLeosIpAclGlobal 1 } 
+    
+  wwpLeosIpAclCacheHit OBJECT-TYPE
+  	SYNTAX		Counter32
+  	MAX-ACCESS	read-only
+  	STATUS		current
+  	DESCRIPTION
+  		"Count of the number of lookups satisfied by a cache hit."
+  	::= { wwpLeosIpAclGlobal 2 }
+  	
+  wwpLeosIpAclNoHit OBJECT-TYPE
+  	SYNTAX		Counter32
+  	MAX-ACCESS	read-only
+  	STATUS		current
+  	DESCRIPTION
+  		"Count of the number of lookups which failed because the source
+  		ip address did not match a table entry."
+  	::= { wwpLeosIpAclGlobal 3 }
+  	
+  wwpLeosIpAclBadPort OBJECT-TYPE
+  	SYNTAX		Counter32
+  	MAX-ACCESS	read-only
+  	STATUS		current
+  	DESCRIPTION
+  		"Count of the number of lookups which failed because the ingress
+  		port was disallowed by a table entry."
+  	::= { wwpLeosIpAclGlobal 4 }
+  	
+  wwpLeosIpAclClearStats OBJECT-TYPE
+   	SYNTAX		RowStatus
+   	MAX-ACCESS	read-write
+   	STATUS		current
+   	DESCRIPTION
+   		"Set this object to 'destroy' to clear the global and table
+   		entry statistics counters."
+   	::= { wwpLeosIpAclGlobal 5 }
+                                   
+  wwpLeosIpAclBadDscp OBJECT-TYPE
+  	SYNTAX		Counter32
+  	MAX-ACCESS	read-only
+  	STATUS		current
+  	DESCRIPTION
+  		"Count of the number of lookups which failed because the ingress
+  		DSCP value was disallowed by a table entry."
+  	::= { wwpLeosIpAclGlobal 6 }
+  	
+   wwpLeosIpAclOperState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     		disabled(1),
+                            enabled(2)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current operational state of the IP ACL system."
+    ::= { wwpLeosIpAclGlobal 7 } 
+ 
+   wwpLeosIpAclInUseEntries OBJECT-TYPE
+  	SYNTAX		Counter32
+  	MAX-ACCESS	read-only
+  	STATUS		current
+  	DESCRIPTION
+  		"Count of the number of IP ACL rules that are currently configured."
+  	::= { wwpLeosIpAclGlobal 8 }
+  
+  wwpLeosIpAclMaxEntries OBJECT-TYPE
+  	SYNTAX		Counter32
+  	MAX-ACCESS	read-only
+  	STATUS		current
+  	DESCRIPTION
+  		"Count of the max number of IP ACL rules that can be configured."
+  	::= { wwpLeosIpAclGlobal 9 }
+                                  
+  --
+  --  IP ACL Table
+  --                                   
+  wwpLeosIpAclTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosIpAclEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the display 
+             parameters for the IP ACL table."  
+     ::= { wwpLeosIpAclRules 1 }
+                
+  wwpLeosIpAclEntry OBJECT-TYPE
+     SYNTAX      WwpLeosIpAclEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the wwpLeosIpAclTable."
+     INDEX {wwpLeosIpAclEntryIpAddr, wwpLeosIpAclEntryIpMask}
+     ::= { wwpLeosIpAclTable 1 }
+                
+  WwpLeosIpAclEntry ::=  SEQUENCE { 
+     wwpLeosIpAclEntryIpAddr					IpAddress,
+     wwpLeosIpAclEntryIpMask					IpAddress,
+     wwpLeosIpAclEntryPortMask					Unsigned32,
+     wwpLeosIpAclEntryHits				        Counter32,
+     wwpLeosIpAclEntryBadPort					Counter32,
+     wwpLeosIpAclEntryStatus					RowStatus,
+     wwpLeosIpAclEntryDscpMask					OCTET STRING,
+     wwpLeosIpAclEntryBadDscp					Counter32,
+     wwpLeosIpAclEntryPortBitMask                               OCTET STRING
+  }
+
+  wwpLeosIpAclEntryIpAddr OBJECT-TYPE
+     SYNTAX      IpAddress
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+             "This object is the IP network which will be authorized."
+     ::= { wwpLeosIpAclEntry 1 }
+  
+  wwpLeosIpAclEntryIpMask OBJECT-TYPE
+     SYNTAX      IpAddress
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+             "This object is the netmask for the IP network which will be authorized."
+     ::= { wwpLeosIpAclEntry 2 }
+     
+  wwpLeosIpAclEntryPortMask OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      deprecated 
+     DESCRIPTION
+             "This object is used to specify the physical ports which frames will
+             be allowed to ingress from.  The mask is big endian and each bit,
+             numbered from 0 to 27, represents a physical port numbered from
+             1 to 28.  A value of 0xFFFFFFFF may be used to specify all ports."
+     ::= { wwpLeosIpAclEntry 3 }        
+     
+  wwpLeosIpAclEntryHits OBJECT-TYPE
+  	SYNTAX		Counter32
+  	MAX-ACCESS	read-only
+  	STATUS		current
+  	DESCRIPTION
+  		"Count of the number of lookups which matched the table entry."
+  	::= { wwpLeosIpAclEntry 4 }
+
+  wwpLeosIpAclEntryBadPort OBJECT-TYPE
+  	SYNTAX		Counter32
+  	MAX-ACCESS	read-only
+  	STATUS		current
+  	DESCRIPTION
+  		"Count of the number of lookups which failed because the ingress
+  		port was disallowed by the table entry."
+  	::= { wwpLeosIpAclEntry 5 }
+
+  wwpLeosIpAclEntryStatus OBJECT-TYPE
+  	SYNTAX		RowStatus
+  	MAX-ACCESS	read-create
+  	STATUS		current
+  	DESCRIPTION
+  		"Set this object to 'CreateAndGo' to create a new table entry, set it
+  		to 'destroy' to remove an existing entry."
+    ::= { wwpLeosIpAclEntry 6 }
+  	
+  wwpLeosIpAclEntryDscpMask OBJECT-TYPE
+     SYNTAX      OCTET STRING(SIZE(8))
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+             "This object is used to specify the DSCP values for which IP packets 
+             will be allowed to ingress.  The mask is big endian and each bit,
+             numbered from 0 to 63, represents a DSCP value numbered from
+             0 to 63.  A value of 0xFFFFFFFFFFFFFFFF may be used to specify all."
+     ::= { wwpLeosIpAclEntry 7 }        
+     
+  wwpLeosIpAclEntryBadDscp OBJECT-TYPE
+  	SYNTAX		Counter32
+  	MAX-ACCESS	read-only
+  	STATUS		current
+  	DESCRIPTION
+  		"Count of the number of lookups which failed because the ingress
+  		DSCP value was disallowed by the table entry."
+  	::= { wwpLeosIpAclEntry 8 }
+
+  wwpLeosIpAclEntryPortBitMask OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE(8)) 
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+             "This object is used to specify the physical ports which frames will
+             be allowed to ingress from.  The mask is big endian and each bit,
+             numbered from 0 to 63, represents a physical port numbered from
+             1 to 64.  A value of 0xFFFFFFFFFFFFFFFF may be used to specify all ports."
+     ::= { wwpLeosIpAclEntry 9 }
+
+ END
+

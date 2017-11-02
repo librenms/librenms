@@ -1,0 +1,3858 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-VPLS-MIB.my
+ --
+ --
+
+ WWP-LEOS-VPLS-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+   Integer32, Unsigned32, Counter32, IpAddress, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+   TruthValue, DisplayString, MacAddress, TEXTUAL-CONVENTION, RowStatus
+        FROM SNMPv2-TC
+   wwpModulesLeos
+        FROM WWP-SMI;
+
+ wwpLeosVplsMIB MODULE-IDENTITY
+            LAST-UPDATED "201106060000Z"
+            ORGANIZATION "Ciena, Inc"
+            CONTACT-INFO
+                    "   Mib Meister
+                    115 North Sullivan Road
+                    Spokane Valley, WA 99037
+                    USA
+                    Phone:  +1 509 242 9000
+                    Email:  support@ciena.com"
+           DESCRIPTION
+                  "Added a new object wwpLeosVplsVirtualSwitchEthEvplMemberServiceVlanTpid."
+            REVISION
+               "201106060000Z"
+             DESCRIPTION
+                  " changed the range for wwpLeosVplsVirtualSwitchEthEvplMemberVlan  to (0..4095)."
+            REVISION
+               "201003231700Z"
+            DESCRIPTION
+                  "Added port-inherit(6) option to  wwpLeosVplsVirtualSwitchMplsMemberEncapCosPolicy and 
+                   wwpLeosVplsVirtualSwitchMplsEvplMemberEncapCosPolicy."
+            REVISION
+               "201002101700Z"
+            DESCRIPTION 
+            	"Added wwpLeosVplsVirtualSwitchEthL2CftProtocolTable"
+            REVISION
+            	"201001270425Z" 
+            DESCRIPTION
+            		"Added wwpLeosVplsVirtualCircuitStatsClear under wwpLeosVplsGlobalAttrs.
+            		 Added wwpLeosVirtualCircuitEthStatsClear under wwpLeosVplsVirtualCircuitEthStatsEntry table." 
+            REVISION   "200908240424Z"
+            DESCRIPTION
+            		"Added port-inherit(6) option to wwpLeosVplsEthVirtualSwitchMemberEncapPolicy of
+            		wwpLeosVplsEthVirtualSwitchMemberEntry table"
+            REVISION	"200811140000Z"
+            DESCRIPTION
+                    "Added virtual-switch member settings for EncpCosPolicy,
+                     EncapCosFixedDot1DPri and SubscriberDot1dPri for each
+                     variation of the Ethernet and MPLS virtual-switch types."
+            REVISION    "200809030839Z"
+            DESCRIPTION
+                    "Added Honor Priority setting to select between c-vlan or s-vlan
+                     priorities."
+            REVISION    "200806110050Z"
+            DESCRIPTION
+                    "Added VS CFT support."
+            REVISION    "200805150050Z"
+            DESCRIPTION
+                    "This MIB module defines the managed objects for the VPLS feature
+                     for LEOS based WWP products."
+            REVISION    "200609220050Z"
+            DESCRIPTION
+                    "Added wwpLeosVplsVirtualSwitchEtypeTranslationTable to remap
+                     default Ethertype to alternate values (for NTL services)."
+            REVISION    "200605041700Z"
+            DESCRIPTION
+                    "Modified wwpLeosVplsEncapTunnelTable to support primary / backup tunnels."
+            REVISION    "200508151700Z"
+            DESCRIPTION
+                    "Initial creation."
+            ::= { wwpModulesLeos 28 }
+
+ --
+ -- Textual conventions
+ --
+
+ VlanId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "A Vlan Id represents a Broadcast Domain."
+    SYNTAX      INTEGER (1..24576)
+
+ EtherType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "Ethernet v2 framing identifies upper layer protocol."
+    SYNTAX      Integer32 (2048..65535)
+
+ --
+ -- Node definitions
+ --
+
+ wwpLeosVplsMIBObjects OBJECT IDENTIFIER ::= { wwpLeosVplsMIB 1 }
+ wwpLeosVpls  OBJECT IDENTIFIER ::= { wwpLeosVplsMIBObjects 1 }
+
+ -- Notifications
+ wwpLeosVplsMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpLeosVplsMIB 2 }
+ wwpLeosVplsMIBNotifications       OBJECT IDENTIFIER ::=  { wwpLeosVplsMIBNotificationPrefix 0 }
+
+ -- Conformance information
+ wwpLeosVplsMIBConformance OBJECT IDENTIFIER ::= { wwpLeosVplsMIB 3 }
+ wwpLeosVplsMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosVplsMIBConformance 1 }
+ wwpLeosVplsMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosVplsMIBConformance 2 }
+
+ --
+ -- VPLS VC Table
+ --
+ wwpLeosVplsVirtualCircuitTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsVirtualCircuitEntry
+     MAX-ACCESS not-accessible
+     STATUS     deprecated
+     DESCRIPTION
+            "The (conceptual) table listing the virtual circuit table.
+             To create entry use SNMP, multiple set operation must
+             be used because following MIB objects needs to be set
+             while creating entry in the table.
+             - wwpLeosVplsVirtualCircuitIndex
+             - wwpLeosVplsVirtualCircuitProviderVlanId (should exist on the device)
+             - wwpLeosVplsVirtualCircuitType
+             - wwpLeosVplsVirtualCircuitStatus.
+             - wwpLeosVplsVirtualCircuitName.
+             "
+     ::= { wwpLeosVpls 1 }
+
+ wwpLeosVplsVirtualCircuitEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualCircuitEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "The virtual circuit table entry index by
+              wwpLeosVplsVirtualCircuitIndex."
+     INDEX { wwpLeosVplsVirtualCircuitIndex }
+     ::= { wwpLeosVplsVirtualCircuitTable 1 }
+
+ WwpLeosVplsVirtualCircuitEntry ::=  SEQUENCE {
+     wwpLeosVplsVirtualCircuitIndex                                                     INTEGER,
+     wwpLeosVplsVirtualCircuitProviderVlanId                    VlanId,
+     wwpLeosVplsVirtualCircuitType                              INTEGER,
+     wwpLeosVplsVirtualCircuitName                              DisplayString,
+     wwpLeosVplsVirtualCircuitIngressVcLabel                INTEGER,
+     wwpLeosVplsVirtualCircuitEgressVcLabel                 INTEGER,
+     wwpLeosVplsVirtualCircuitTunnelIndx                                        INTEGER,
+     wwpLeosVplsVirtualCircuitStatus                            RowStatus
+ }
+
+ wwpLeosVplsVirtualCircuitIndex OBJECT-TYPE
+     SYNTAX      INTEGER (1..65535)
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "This represents the virtual circuit index in the table.
+         This number should be unique in the table."
+     ::= { wwpLeosVplsVirtualCircuitEntry 1 }
+
+ wwpLeosVplsVirtualCircuitProviderVlanId OBJECT-TYPE
+     SYNTAX      VlanId
+     MAX-ACCESS  read-write
+     STATUS      deprecated
+     DESCRIPTION
+        "This represents the provider vlan id associated with the virtual circuit for
+         a given wwpLeosVplsVirtualCircuitIndex."
+     ::= { wwpLeosVplsVirtualCircuitEntry 2 }
+
+ wwpLeosVplsVirtualCircuitType OBJECT-TYPE
+     SYNTAX      INTEGER {
+                        ethernet(1),
+                        mpls(2)
+                 }
+     MAX-ACCESS  read-create
+     STATUS      deprecated
+     DESCRIPTION
+        "This represents the type of virtual circuit associated with
+         the given virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitEntry 3 }
+
+ wwpLeosVplsVirtualCircuitName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..31))
+     MAX-ACCESS  read-create
+     STATUS      deprecated
+     DESCRIPTION
+        "This represents the name of the virtual circuit associated
+         with the given virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitEntry 4 }
+
+ wwpLeosVplsVirtualCircuitIngressVcLabel OBJECT-TYPE
+     SYNTAX      INTEGER (16..1048575)
+     MAX-ACCESS  read-write
+     STATUS      deprecated
+     DESCRIPTION
+        "This represents the vc label to be used for given virtual circuit.
+         This mib object can only be set for virtual circuit entries which has
+         wwpLeosCircuitType = mpls."
+     ::= { wwpLeosVplsVirtualCircuitEntry 5 }
+
+ wwpLeosVplsVirtualCircuitEgressVcLabel OBJECT-TYPE
+     SYNTAX      INTEGER (16..1048575)
+     MAX-ACCESS  read-write
+     STATUS      deprecated
+     DESCRIPTION
+        "This represents the vc label to be used for given virtual circuit.
+         This mib object can only be set for virtual circuit entries which has
+          wwpLeosCircuitType = mpls."
+     ::= { wwpLeosVplsVirtualCircuitEntry 6 }
+
+ wwpLeosVplsVirtualCircuitTunnelIndx OBJECT-TYPE
+     SYNTAX      INTEGER (1..65535)
+     MAX-ACCESS  read-write
+     STATUS      deprecated
+     DESCRIPTION
+        "This represents the tunnel associated with this virtual circuit.
+         This mib object can only be set for virtual circuit entries which has
+         wwpLeosCircuitType = mpls."
+     ::= { wwpLeosVplsVirtualCircuitEntry 7 }
+
+ wwpLeosVplsVirtualCircuitStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      deprecated
+     DESCRIPTION
+        "Setting this object to 'createAndGo' will create the entry
+         and by default will enable control frame and data frame tunnel
+         .
+         Setting this object to 'destroy' will delete the entry
+         from the table for given vlan."
+     ::= { wwpLeosVplsVirtualCircuitEntry 8 }
+
+--
+ --  Virtual Switch Table
+ --
+ wwpLeosVplsVirtualSwitchTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosVplsVirtualSwitchEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "This table is used to manage virtual switch entries
+              on the device."
+     ::= { wwpLeosVpls 5 }
+
+ wwpLeosVplsVirtualSwitchEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "This entry corresponds to single entry in wwpLeosVplsVirtualSwitchTable table.
+              To create an entry in the table following criteria must be met.
+              - wwpLeosVplsVirtualSwitchIndx must be specified.
+              - wwpLeosVplsVirtualSwitchStatus must be specified.
+              - wwpLeosVplsVirtualSwitchType must be specified.
+              - wwpLeosVplsVirtualSwitchName must be specified"
+     INDEX { wwpLeosVplsVirtualSwitchIndx }
+     ::= { wwpLeosVplsVirtualSwitchTable 1 }
+
+ WwpLeosVplsVirtualSwitchEntry ::= SEQUENCE {
+     wwpLeosVplsVirtualSwitchIndx                       INTEGER,
+     wwpLeosVplsVirtualSwitchName                       OCTET STRING,
+     wwpLeosVplsVirtualSwitchPriVc                      INTEGER,
+     wwpLeosVplsVirtualSwitchSecVc                      INTEGER,
+     wwpLeosVplsVirtualSwitchActiveVc                   INTEGER,
+     wwpLeosVplsVirtualSwitchEncapCosPolicy             INTEGER,
+     wwpLeosVplsVirtualSwitchEncapFixedDot1dPri         INTEGER,
+     wwpLeosVplsVirtualSwitchDecapCosPolicy             INTEGER,
+     wwpLeosVplsVirtualSwitchDecapFixedDot1dPri         INTEGER,
+     wwpLeosVplsVirtualSwitchSubscriberVlan             INTEGER,
+     wwpLeosVplsVirtualSwitchCtrlProtocolTunnelState    INTEGER,
+     wwpLeosVplsVirtualSwitchType                       INTEGER,
+     wwpLeosVplsVirtualSwitchStatus                     RowStatus
+}
+
+ wwpLeosVplsVirtualSwitchIndx    OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         deprecated
+     DESCRIPTION
+             "This object specifies the virtual switch index which is used as unique
+              index in the table."
+     ::= { wwpLeosVplsVirtualSwitchEntry 1 }
+
+ wwpLeosVplsVirtualSwitchName    OBJECT-TYPE
+     SYNTAX         OCTET STRING (SIZE (0..31))
+     MAX-ACCESS     read-write
+     STATUS         deprecated
+     DESCRIPTION
+             "This object specifies the virtual switch name. this object can only be specified at the
+              time of creation and cannot be modified later."
+     ::= { wwpLeosVplsVirtualSwitchEntry 2 }
+
+ wwpLeosVplsVirtualSwitchPriVc    OBJECT-TYPE
+     SYNTAX         INTEGER (0..65535)
+     MAX-ACCESS     read-write
+     STATUS         deprecated
+     DESCRIPTION
+             "This object specifies the primary virtual circuit ID associated with this virtual switch.
+              To unset it set this to 0."
+     ::= { wwpLeosVplsVirtualSwitchEntry 3 }
+
+ wwpLeosVplsVirtualSwitchSecVc    OBJECT-TYPE
+     SYNTAX         INTEGER (0..65535)
+     MAX-ACCESS     read-write
+     STATUS         deprecated
+     DESCRIPTION
+             "This object specifies the secondary virtual circuit ID associated with this virtual switch.
+              To unset it set this to 0. This object is applicable if wwpLeosVplsVirtualSwitchType = mpls."
+     ::= { wwpLeosVplsVirtualSwitchEntry 4 }
+
+ wwpLeosVplsVirtualSwitchActiveVc    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                                        none(1),
+                                        primVc(2),
+                                        secVc(3)
+                                }
+     MAX-ACCESS     read-only
+     STATUS         deprecated
+     DESCRIPTION
+             "This object specifies the virtual circuit which is currently used by
+              this virtual switch instance."
+     ::= { wwpLeosVplsVirtualSwitchEntry 5 }
+
+ wwpLeosVplsVirtualSwitchEncapCosPolicy    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        fixed(1),
+                        inheritDot1dPri(2),
+                        inheritIpPrec(3),
+                        inheritPhbg(4)
+                        }
+     MAX-ACCESS     read-write
+     STATUS         deprecated
+     DESCRIPTION
+             "This object specifies the ingress cos policy for given virtual switch."
+     ::= { wwpLeosVplsVirtualSwitchEntry 6 }
+
+ wwpLeosVplsVirtualSwitchEncapFixedDot1dPri    OBJECT-TYPE
+     SYNTAX         INTEGER (0..7)
+     MAX-ACCESS     read-write
+     STATUS         deprecated
+     DESCRIPTION
+             "This object specifies the ingress fixed cos attributes for given virtual switch."
+     ::= { wwpLeosVplsVirtualSwitchEntry 7 }
+
+ wwpLeosVplsVirtualSwitchDecapCosPolicy    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        fixed(1),
+                        inheritVc(2),
+                        inheritTunnel(3),
+                        leave(4)
+                        }
+     MAX-ACCESS     read-write
+     STATUS         deprecated
+     DESCRIPTION
+             "This object specifies the egress cos policy for given virtual switch."
+     ::= { wwpLeosVplsVirtualSwitchEntry 8 }
+
+ wwpLeosVplsVirtualSwitchDecapFixedDot1dPri    OBJECT-TYPE
+     SYNTAX         INTEGER (0..7)
+     MAX-ACCESS     read-write
+     STATUS         deprecated
+     DESCRIPTION
+             "This object specifies the egress cos attributes for given virtual switch."
+     ::= { wwpLeosVplsVirtualSwitchEntry 9 }
+
+ wwpLeosVplsVirtualSwitchSubscriberVlan    OBJECT-TYPE
+     SYNTAX         INTEGER (0..4094)
+     MAX-ACCESS     read-write
+     STATUS         deprecated
+     DESCRIPTION
+             "This object specifies the subscriber vlan Id for given virtual switch."
+     ::= { wwpLeosVplsVirtualSwitchEntry 10 }
+
+ wwpLeosVplsVirtualSwitchCtrlProtocolTunnelState    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+     MAX-ACCESS     read-write
+     STATUS         deprecated
+     DESCRIPTION
+             "This object enables or disables control protocol tunneling for a given
+              virtual switch."
+     ::= { wwpLeosVplsVirtualSwitchEntry 11 }
+
+ wwpLeosVplsVirtualSwitchType    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        ethernet(1),
+                        mpls(2)
+                        }
+     MAX-ACCESS     read-create
+     STATUS         deprecated
+     DESCRIPTION
+             "This object specifies the type of virtual witch."
+     ::= { wwpLeosVplsVirtualSwitchEntry 12 }
+
+ wwpLeosVplsVirtualSwitchStatus    OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         deprecated
+     DESCRIPTION
+             "This object can be set to 'createAndGo' to create entry in the table.
+              This object can be set to 'destroy' to delete entry in the table.
+              Following objects must be set to valid values to create entry in the table."
+     ::= { wwpLeosVplsVirtualSwitchEntry 13 }
+--
+ --  Virtual Switch Membership Table
+ --
+ wwpLeosVplsVirtualSwitchMemberTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosVplsVirtualSwitchMemberEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "This table is used to create virtual switch membership entry."
+     ::= { wwpLeosVpls 6 }
+
+ wwpLeosVplsVirtualSwitchMemberEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchMemberEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "This entry corresponds to single entry in wwpLeosVplsVirtualSwitchMemberTable table."
+     INDEX { wwpLeosVplsVirtualSwitchIndx, wwpLeosVplsVirtualSwitchMemberPortId }
+     ::= { wwpLeosVplsVirtualSwitchMemberTable 1 }
+
+ WwpLeosVplsVirtualSwitchMemberEntry ::= SEQUENCE {
+     wwpLeosVplsVirtualSwitchMemberPortId               INTEGER,
+     wwpLeosVplsVirtualSwitchMemberStatus               RowStatus
+ }
+
+ wwpLeosVplsVirtualSwitchMemberPortId    OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         deprecated
+     DESCRIPTION
+             "This object specifies the port id associated with
+              wwpLeosVplsVirtualSwitchIndx."
+     ::= { wwpLeosVplsVirtualSwitchMemberEntry 1 }
+
+  wwpLeosVplsVirtualSwitchMemberStatus    OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         deprecated
+     DESCRIPTION
+             "This object can be set to 'createandgo' to add entry in the table.
+              This object can be set to 'destroy' to delete entry in the table.
+              Refer to description of table entry to see how to create entries
+              in the table."
+     ::= { wwpLeosVplsVirtualSwitchMemberEntry 2 }
+
+ --
+ -- Virtual switch  control protocol table
+ --
+ wwpLeosVplsSwitchCtrlProtocolTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsSwitchCtrlProtocolEntry
+     MAX-ACCESS not-accessible
+     STATUS     deprecated
+     DESCRIPTION
+            "The (conceptual) table listing the l2 virtual switch control frame
+             protocol status tunnel for a given Vpls."
+     ::= { wwpLeosVpls 7 }
+
+ wwpLeosVplsSwitchCtrlProtocolEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsSwitchCtrlProtocolEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "The layer 2 virtual switch control frame protocol tunnel
+              entry for the Vpls."
+     INDEX {wwpLeosVplsVirtualSwitchIndx, wwpLeosVplsSwitchCtrlProtocolNum}
+     ::= { wwpLeosVplsSwitchCtrlProtocolTable 1 }
+
+ WwpLeosVplsSwitchCtrlProtocolEntry ::=  SEQUENCE {
+     wwpLeosVplsSwitchCtrlProtocolNum     INTEGER,
+     wwpLeosVplsSwitchCtrlType            INTEGER
+ }
+
+  wwpLeosVplsSwitchCtrlProtocolNum OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     l28021x(1),
+                     rstp(2),
+                     ciscoCdp(3),
+                     ciscoDtp(4),
+                     ciscoPagp(5),
+                     ciscoPvst(6),
+                     ciscoUplinkFast(7),
+                     ciscoUdlp(8),
+                     ciscoVtp(9),
+                     gvrp(10),
+                     lacp(11),
+                     lacpMarker(12),
+                     oam(13),
+                     lldp(14),
+                     vlanBridge(15)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      deprecated
+     DESCRIPTION
+        "This object represent the list of protocols the device
+         can support."
+     ::= { wwpLeosVplsSwitchCtrlProtocolEntry 1 }
+
+  wwpLeosVplsSwitchCtrlType OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     discard(1),
+                     peer(2),
+                     tunnel(3)
+                 }
+     MAX-ACCESS  read-create
+     STATUS      deprecated
+     DESCRIPTION
+        "Setting this object to 'discard' will cause wwpLeosVplsSwitchCtrlProtocolNum
+         frames arriving at the specified UNI to be discarded.
+         Setting this to 'peer' will cause the wwpLeosVplsSwitchCtrlProtocolNum frame
+         to be processed by the provider network and cause the provider
+         network to behave as a peer.
+         Setting this to 'tunnel' will cause the wwpLeosVplsSwitchCtrlProtocolNum frame to be
+         tunneled."
+     ::= { wwpLeosVplsSwitchCtrlProtocolEntry 2 }
+
+ --
+ -- Reserved Vlans
+ --
+ wwpLeosVplsSwitchReservedVlanTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsSwitchReservedVlanEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the reserved Vlans used for virtual
+             switch."
+     ::= { wwpLeosVpls 8 }
+
+ wwpLeosVplsSwitchReservedVlanEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsSwitchReservedVlanEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The entry to reserve vlans for vlan switch."
+     INDEX {wwpLeosVplsSwitchReservedVlanId}
+     ::= { wwpLeosVplsSwitchReservedVlanTable 1 }
+
+ WwpLeosVplsSwitchReservedVlanEntry ::=  SEQUENCE {
+     wwpLeosVplsSwitchReservedVlanId            INTEGER,
+     wwpLeosVplsSwitchReservedVlanStatus    RowStatus
+ }
+
+ wwpLeosVplsSwitchReservedVlanId OBJECT-TYPE
+     SYNTAX      INTEGER (1..24576)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This object is used to specify the vlan ID to be reserved for virtual switch.
+         Reserved vlans are used when virtual switch is created."
+     ::= { wwpLeosVplsSwitchReservedVlanEntry 1 }
+
+ wwpLeosVplsSwitchReservedVlanStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Setting this object to 'createandgo' will reserve the vlan
+         for virtual switch.
+         Setting this object to 'destroy will no longer be
+         reserved for virtual switch."
+     ::= { wwpLeosVplsSwitchReservedVlanEntry 2 }
+
+ --
+ --  Global VPLS Attrs Table
+ --
+ wwpLeosVplsGlobalAttrs  OBJECT IDENTIFIER ::= { wwpLeosVpls 9 }
+
+ wwpLeosVplsTunnelFixedTTL    OBJECT-TYPE
+     SYNTAX         INTEGER (2..255)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the fixed TTL value for all tunnels."
+     DEFVAL { 255 }
+     ::= { wwpLeosVplsGlobalAttrs 1 }
+
+ wwpLeosVplsResolverTimeout    OBJECT-TYPE
+     SYNTAX         INTEGER (10..255)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Setting this object will set the PE resolver timeout.
+              This timeout value decides how frequently PE resolver will arp
+              for the destination IP specified by wwpLeosVplsEncapTunnelDestAddr."
+     DEFVAL { 10 }
+     ::= { wwpLeosVplsGlobalAttrs 2 }
+
+ wwpLeosVplsStaticLabelRangeStart    OBJECT-TYPE
+     SYNTAX         Unsigned32 (0 | 16..1048575)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Setting this object will set the lowest label that can be assigned to
+              static encap / decap tunnels or virtual circuits. Multiple set operation can be used to set both
+              wwpLeosVplsStaticLabelRangeStart and wwpLeosVplsStaticLabelRangeEnd. wwpLeosVplsStaticLabelRangeStart
+              must always be less than wwpLeosVplsStaticLabelRangeEnd. The value of 0 means label range is not available.
+              Attempting to set this object to 0 will return COMMIT FAILED."
+     DEFVAL { 1024 }
+     ::= { wwpLeosVplsGlobalAttrs 3 }
+
+ wwpLeosVplsStaticLabelRangeEnd    OBJECT-TYPE
+     SYNTAX         Unsigned32 (0 | 16..1048575)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Setting this object will set the maximum label that can be assigned to
+              static encap / decap tunnels or virtual circuits. Multiple set operation can be used to set both
+              wwpLeosVplsStaticLabelRangeStart and wwpLeosVplsStaticLabelRangeEnd. wwpLeosVplsStaticLabelRangeStart
+              must always be less than wwpLeosVplsStaticLabelRangeEnd.The value of 0 means label range is not available.
+              Attempting to set this object to 0 will return COMMIT FAILED."
+     DEFVAL { 2047 }
+     ::= { wwpLeosVplsGlobalAttrs 4 }
+
+ wwpLeosVplsDynamicLabelRangeStart    OBJECT-TYPE
+     SYNTAX         Unsigned32 (0 | 16..1048575)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Setting this object will set the lowest label that can be assigned to
+              dynamic encap / decap tunnels or virtual circuits. Multiple set operation can be used to set both
+              wwpLeosVplsDynamicLabelRangeStart and wwpLeosVplsDynamicLabelRangeEnd. wwpLeosVplsDynamicLabelRangeStart
+              must always be less than wwpLeosVplsDynamicLabelRangeEnd.The value of 0 means label range is not available.
+              Attempting to set this object to 0 will return COMMIT FAILED."
+     DEFVAL { 2048 }
+     ::= { wwpLeosVplsGlobalAttrs 5 }
+
+ wwpLeosVplsDynamicLabelRangeEnd    OBJECT-TYPE
+     SYNTAX         Unsigned32 (0 | 16..1048575)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Setting this object will set the maximum label that will be assigned to
+              encap tunnels or virtual circuits. Multiple set operation can be used to set both
+              wwpLeosVplsDynamicLabelRangeStart and wwpLeosVplsDynamicLabelRangeEnd.
+              wwpLeosVplsDynamicLabelRangeStart must always be less than wwpLeosVplsDynamicLabelRangeEnd.
+              The value of 0 means label range is not available. Attempting to set this object to 0 will return COMMIT FAILED."
+     DEFVAL { 1048575 }
+     ::= { wwpLeosVplsGlobalAttrs 6 } 
+ 
+ wwpLeosVplsVirtualCircuitStatsClear  OBJECT-TYPE
+ 	SYNTAX INTEGER {
+ 			clear(1),
+ 			none(2)
+ 		}
+ 	MAX-ACCESS read-write
+ 	STATUS current
+ 	DESCRIPTION 
+ 		"Setting this object to clear will reset statistics for all virtual circuits"
+ 	::= { wwpLeosVplsGlobalAttrs 7 }
+
+--
+-- Path Table
+--
+  wwpLeosVplsMplsPathTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosVplsMplsPathEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Mpls Path table used to represent the explicit path for
+              RSVP tunnels."
+     ::= { wwpLeosVpls 10 }
+
+ wwpLeosVplsMplsPathEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsMplsPathEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Entry in the MPLS Path table."
+     INDEX { wwpLeosVplsMplsPathIndex }
+     ::= { wwpLeosVplsMplsPathTable 1 }
+
+ WwpLeosVplsMplsPathEntry ::= SEQUENCE {
+     wwpLeosVplsMplsPathIndex                       INTEGER,
+     wwpLeosVplsMplsPathName                        DisplayString,
+     wwpLeosVplsMplsPathRowStatus                   RowStatus
+}
+
+ wwpLeosVplsMplsPathIndex    OBJECT-TYPE
+     SYNTAX         INTEGER (1..32)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This mib specifies the unique entry in the Mpls path table.
+              This is the primary index into this table identifying a particular explicit
+              route object"
+     ::= { wwpLeosVplsMplsPathEntry 1 }
+
+ wwpLeosVplsMplsPathName    OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (1..31))
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This mib specifies the name for the path."
+     ::= { wwpLeosVplsMplsPathEntry 2 }
+
+ wwpLeosVplsMplsPathRowStatus    OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the
+              conceptual rows in this table.
+              To create a row in this table, a manager must
+              set this object to 'createAndGo'. To delete a row in this
+              table, a manager must set this object to 'destroy'.
+              If the entry exists, it will be displayed as 'active'."
+     ::= { wwpLeosVplsMplsPathEntry 3 }
+
+--
+-- List of IP address in the mpls path
+--
+ wwpLeosVplsMplsPathMemberTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosVplsMplsPathMemberEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table specifies the list of IP addresses (Hops)
+              to get to the destination PE."
+     ::= { wwpLeosVpls 11 }
+
+ wwpLeosVplsMplsPathMemberEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsMplsPathMemberEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Represents the entry in the table."
+     INDEX { wwpLeosVplsMplsPathIndex, wwpLeosVplsMplsPathOptionIndex, wwpLeosVplsMplsPathMemberIpIndex }
+     ::= { wwpLeosVplsMplsPathMemberTable 1 }
+
+ WwpLeosVplsMplsPathMemberEntry ::= SEQUENCE {
+     wwpLeosVplsMplsPathOptionIndex                   INTEGER,
+     wwpLeosVplsMplsPathMemberIpIndex                 INTEGER,
+     wwpLeosVplsMplsPathMemberIp                      IpAddress,
+     wwpLeosVplsMplsPathMemberRowStatus               RowStatus
+ }
+
+ wwpLeosVplsMplsPathOptionIndex    OBJECT-TYPE
+     SYNTAX         INTEGER (1..5)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "Secondary index into this table identifying a
+              particular group of hops representing a particular
+              configured path. This is otherwise known as a path
+              option."
+     ::= { wwpLeosVplsMplsPathMemberEntry 1 }
+
+ wwpLeosVplsMplsPathMemberIpIndex    OBJECT-TYPE
+     SYNTAX         INTEGER (1..5)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "Unique index to identify the IP address within the path specifies by
+              wwpLeosVplsMplsPathIndex."
+     ::= { wwpLeosVplsMplsPathMemberEntry 2 }
+
+ wwpLeosVplsMplsPathMemberIp    OBJECT-TYPE
+     SYNTAX         IpAddress
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Specifies the IP address of the Hop that the tunnel
+              the tunnel should traverse."
+     ::= { wwpLeosVplsMplsPathMemberEntry 3 }
+
+ wwpLeosVplsMplsPathMemberRowStatus    OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the
+              conceptual rows in this table.
+              To create a row in this table, a manager must
+              set this object to 'createAndGo'. To delete a row in this
+              table, a manager must set this object to 'destroy'.
+              If the entry exists, it will be displayed as 'active'."
+     ::= { wwpLeosVplsMplsPathMemberEntry 4 }
+
+--
+-- RSVP Attrs Table
+--
+ wwpLeosVplsRsvpAttrTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosVplsRsvpAttrEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "RSVP Attr Table used by MPLS wwpLeosVplsEncapTunnelTable Tunnels
+              when wwpLeosVplsEncapTunnelProtType = rsvp.
+              Whenever entry is created in the wwpLeosVplsEncapTunnelTable table
+              with wwpLeosVplsEncapTunnelProtType = rsvp and wwpLeosVplsEncapTunnelType
+              = dynamic then corresponding entry will be created in this table with
+              the same index as wwpLeosVplsEncapTunnelId."
+      ::= { wwpLeosVpls 12 }
+
+ wwpLeosVplsRsvpAttrEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsRsvpAttrEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Entry in wwpLeosVplsRsvpAttrTable table."
+     INDEX { wwpLeosVplsRsvpAttrIndex }
+     ::= { wwpLeosVplsRsvpAttrTable 1 }
+
+ WwpLeosVplsRsvpAttrEntry ::= SEQUENCE {
+     wwpLeosVplsRsvpAttrIndex                            INTEGER,
+     wwpLeosVplsRsvpAttrHoldPri                          INTEGER,
+     wwpLeosVplsRsvpAttrSetupPri                         INTEGER,
+     wwpLeosVplsRsvpAttrRecordRoute                      TruthValue
+ }
+
+ wwpLeosVplsRsvpAttrIndex    OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "Unique index into the table."
+     ::= { wwpLeosVplsRsvpAttrEntry 1 }
+
+ wwpLeosVplsRsvpAttrHoldPri    OBJECT-TYPE
+     SYNTAX         INTEGER (0..7)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "The Hold priority used by RSVP protocol when signaling
+              for tunnels."
+     DEFVAL { 0 }
+     ::= { wwpLeosVplsRsvpAttrEntry 2 }
+
+ wwpLeosVplsRsvpAttrSetupPri    OBJECT-TYPE
+     SYNTAX         INTEGER (0..7)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "The setup priority used by RSVP protocol when signaling
+              for tunnels."
+     DEFVAL { 0 }
+     ::= { wwpLeosVplsRsvpAttrEntry 3 }
+
+ wwpLeosVplsRsvpAttrRecordRoute    OBJECT-TYPE
+     SYNTAX         TruthValue
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "The object specifies if record route feature is enabled
+              when RSVP protocol is used to signal tunnel LSP."
+     DEFVAL { false }
+     ::= { wwpLeosVplsRsvpAttrEntry 4 }
+
+ --
+ --  Encap Tunnel Table
+ --
+  wwpLeosVplsEncapTunnelTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosVplsEncapTunnelEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This table represents the encap tunnels for VPLS.
+              To create STATIC encap tunnel following objects must be set
+              Encap and Decap Tunnel name cannot be same but indexes can be
+              wwpLeosVplsEncapTunnelName                must be specified.
+              wwpLeosVplsEncapTunnelEncapLabel      must be specified (0, 32..1023)
+              wwpLeosVplsEncapTunnelType                must be set to static
+              wwpLeosVplsEncapTunnelRowStatus           must be set to createAndGo
+
+              To create DYNAMIC encap tunnel following objects must be set
+              wwpLeosVplsEncapTunnelName                must be specified
+              wwpLeosVplsEncapTunnelType                must be set to dynamic
+              wwpLeosVplsEncapTunnelProtType            must be set to rsvp
+              wwpLeosVplsEncapTunnelPathName            must be specified, this path must
+                                                        exist in wwpLeosVplsMplsPathTable
+              wwpLeosVplsEncapTunnelRowStatus           must be set to createAndGo.
+              wwpLeosVplsEncapTunnelFastReroute         must be set if wanted to use fast reroute
+              wwpLeosVplsEncapTunnelLspType             must be specified, if not specified then it will be assumed primary
+
+
+              To create DYNAMIC encap backup tunnel following objects must be set
+              wwpLeosVplsEncapTunnelName                must be set to primary tunnel name that this tunnel is backing up.
+              wwpLeosVplsEncapTunnelType                must be set to dynamic
+              wwpLeosVplsEncapTunnelProtType            must be set to rsvp
+              wwpLeosVplsEncapTunnelPathName            must be specified, this path must
+                                                        exist in wwpLeosVplsMplsPathTable
+              wwpLeosVplsEncapTunnelRowStatus           must be set to createAndGo.
+
+              To create static PBT encap tunnel following objects must be set
+              wwpLeosVplsEncapTunnelName                must be specified
+              wwpLeosVplsEncapTunnelType                must be set to staticPbt
+              wwpLeosVplsEncapTunnelBVID                must be specified
+              wwpLeosVplsEncapTunnelRowStatus           must be set to createAndGo.
+              wwpLeosVplsEncapTunnelDestBridgeIndex     must be set
+              wwpLeosVplsEncapTunnelEgressPort          must be specified"
+     ::= { wwpLeosVpls 13 }
+
+  wwpLeosVplsEncapTunnelEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsEncapTunnelEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Represents each entry in wwpLeosVplsEncapTunnelTable."
+     INDEX { wwpLeosVplsEncapTunnelId }
+     ::= { wwpLeosVplsEncapTunnelTable 1 }
+
+  WwpLeosVplsEncapTunnelEntry ::= SEQUENCE {
+     wwpLeosVplsEncapTunnelId                       INTEGER,
+     wwpLeosVplsEncapTunnelName                     DisplayString,
+     wwpLeosVplsEncapTunnelType                     INTEGER,
+     wwpLeosVplsEncapTunnelDestAddr                 IpAddress,
+     wwpLeosVplsEncapTunnelPathIndex                Integer32,
+     wwpLeosVplsEncapTunnelEncapCosPolicy           INTEGER,
+     wwpLeosVplsEncapTunnelEncapFixedExp            INTEGER,
+     wwpLeosVplsEncapTunnelTTLPolicy                INTEGER,
+     wwpLeosVplsEncapTunnelEncapLabel               Unsigned32,
+     wwpLeosVplsEncapTunnelProtType                 INTEGER,
+     wwpLeosVplsEncapTunnelDestResolvedMac          MacAddress,
+     wwpLeosVplsEncapTunnelOperStatus               INTEGER,
+     wwpLeosVplsEncapTunnelAdminStatus              INTEGER,
+     wwpLeosVplsEncapTunnelDestResolvedPort         INTEGER,
+     wwpLeosVplsEncapTunnelDestResolvedVlan         INTEGER,
+     wwpLeosVplsEncapTunnelRowStatus                RowStatus,
+     wwpLeosVplsEncapTunnelFastReroute              INTEGER,
+     wwpLeosVplsEncapTunnelLspType                  INTEGER,
+     wwpLeosVplsEncapTunnelPartnerTunnelId          INTEGER,
+     wwpLeosVplsEncapTunnelBVID                     VlanId,
+     wwpLeosVplsEncapTunnelDestBridgeIndex          Integer32,
+     wwpLeosVplsEncapTunnelEgressPort               Integer32,
+     wwpLeosVplsEncapTunnelEncapFixedPCP            INTEGER,
+     wwpLeosVplsEncapTunnelActive               INTEGER
+  }
+
+ wwpLeosVplsEncapTunnelId    OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the unique index used in the table."
+     ::= { wwpLeosVplsEncapTunnelEntry 1 }
+
+ wwpLeosVplsEncapTunnelName    OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (1..31))
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specfies the name assigned to this tunnel.
+              This object can only be specified while creating entry in the table
+              and cannot be modified after the entry has been created.
+              Encap and Decap Tunnel name cannot be same but indexes can be.
+              When creating backup tunnel this name should be set to same name that is also
+              used by primary tunnel."
+     ::= { wwpLeosVplsEncapTunnelEntry 2 }
+
+ wwpLeosVplsEncapTunnelType    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                                        static(1),
+                                        dynamic(2),
+                                        staticPbt(3)
+                                        }
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the type of tunnel.
+              This object can only be specified while creating entry in the table
+              and cannot be modified after the entry has been created."
+     ::= { wwpLeosVplsEncapTunnelEntry 3 }
+
+ wwpLeosVplsEncapTunnelDestAddr    OBJECT-TYPE
+     SYNTAX         IpAddress
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the IP address used to resolve this tunnel.
+              This object is only applicable if wwpLeosVplsEncapTunnelType not equal to
+              staticPbt."
+     ::= { wwpLeosVplsEncapTunnelEntry 4 }
+
+ wwpLeosVplsEncapTunnelPathIndex    OBJECT-TYPE
+     SYNTAX         Integer32
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the path that this tunnel is supposed to use
+              signal labels for this tunnel.
+              This object is only used if wwpLeosVplsEncapTunnelType is set to dynamic."
+     ::= { wwpLeosVplsEncapTunnelEntry 5 }
+
+ wwpLeosVplsEncapTunnelEncapCosPolicy    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        fixed(1),
+                        inheritVc(2),
+                        inheritVs(3),
+                        rcosMapped(4)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the PBT encapsulated cos policy assigned to this tunnel. inheritVC
+             and inheritVs options are deprecated and should not be used. rcos-mapped option should
+             be used in place of inheritVc"
+     DEFVAL { rcosMapped }
+     ::= { wwpLeosVplsEncapTunnelEntry 6 }
+
+ wwpLeosVplsEncapTunnelEncapFixedExp    OBJECT-TYPE
+     SYNTAX         INTEGER (0..7)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the encap fixed EXP assigned to this tunnel."
+     DEFVAL { 2 }
+     ::= { wwpLeosVplsEncapTunnelEntry 7 }
+
+ wwpLeosVplsEncapTunnelTTLPolicy    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        pipe(1),
+                        uniform(2)
+                        }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the TTL policy for given tunnel."
+     DEFVAL { pipe }
+     ::= { wwpLeosVplsEncapTunnelEntry 8 }
+
+ wwpLeosVplsEncapTunnelEncapLabel    OBJECT-TYPE
+     SYNTAX         Unsigned32 (0..1048576)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This mib object specifies the encap label assigned to this tunnel.
+              If the label is not yet known (signaling in process), the
+              object should return a value of 0xFFFF."
+     ::= { wwpLeosVplsEncapTunnelEntry 9 }
+
+ wwpLeosVplsEncapTunnelProtType    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        none (1),
+                        rsvp (2)
+                        }
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Setting this object at the time of entry creation will specify the type of Protocol
+              to be used for this tunnel. This object is only used if wwpLeosVplsEncapTunnelType
+              is set to dynamic. This object cannot be modified after the entry has been created."
+     DEFVAL { none }
+     ::= { wwpLeosVplsEncapTunnelEntry 10 }
+
+ wwpLeosVplsEncapTunnelDestResolvedMac    OBJECT-TYPE
+     SYNTAX         MacAddress
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the resolved mac address for given destination IP
+              (wwpLeosVplsEncapTunnelDestIp)."
+     ::= { wwpLeosVplsEncapTunnelEntry 11 }
+
+ wwpLeosVplsEncapTunnelOperStatus OBJECT-TYPE
+         SYNTAX         INTEGER {
+                                  enabled(1),
+                                  disabled(2)
+                                }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "This mib object represents the operational status of tunnel."
+     ::= { wwpLeosVplsEncapTunnelEntry 12 }
+
+  wwpLeosVplsEncapTunnelAdminStatus OBJECT-TYPE
+     SYNTAX         INTEGER {
+                              enabled(1),
+                              disabled(2)
+                            }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This mib object represents the administrative status of tunnel."
+     DEFVAL { enabled }
+     ::= { wwpLeosVplsEncapTunnelEntry 13 }
+
+  wwpLeosVplsEncapTunnelDestResolvedPort OBJECT-TYPE
+     SYNTAX         INTEGER (0..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This mib object represents the resolved port number
+         to destination."
+     ::= { wwpLeosVplsEncapTunnelEntry 14 }
+
+ wwpLeosVplsEncapTunnelDestResolvedVlan OBJECT-TYPE
+     SYNTAX         INTEGER (0..4094)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This mib object represents the resolved transport vlan
+         to destination."
+     ::= { wwpLeosVplsEncapTunnelEntry 15 }
+
+  wwpLeosVplsEncapTunnelRowStatus    OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Setting this object to 'createAndGo' will create the entry
+              in the table.
+              Setting this object to 'destroy' will delete the entry
+              from the table.
+              Refer to description of wwpLeosVplsEncapTunnelTable for details of
+              creating and deleting entries in the table."
+     ::= { wwpLeosVplsEncapTunnelEntry 16 }
+
+  wwpLeosVplsEncapTunnelFastReroute        OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        linkProtect(1),
+                        nodeProtect(2)
+                    }
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies if the backup tunnel should provide link or node protection.
+              This object should only be specified if wwpLeosVplsEncapTunnelType = dynamic and
+              wwpLeosVplsEncapTunnelLspType = backup.
+              This object cannot be modified once created."
+     DEFVAL {linkProtect}
+     ::= { wwpLeosVplsEncapTunnelEntry 17 }
+
+  wwpLeosVplsEncapTunnelLspType        OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        primary(1),
+                        backup(2)
+                    }
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies if the tunnel lsp is primary or backup tunnel."
+     DEFVAL {primary}
+     ::= { wwpLeosVplsEncapTunnelEntry 18 }
+
+  wwpLeosVplsEncapTunnelPartnerTunnelId        OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies if the partner tunnel ID."
+     ::= { wwpLeosVplsEncapTunnelEntry 19 }
+
+  wwpLeosVplsEncapTunnelBVID        OBJECT-TYPE
+     SYNTAX         VlanId
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the provider backbone bridge vlan.
+              This object is only applicable if wwpLeosVplsEncapTunnelType is set to staticPbt otherwise this object
+              will be ignored."
+     ::= { wwpLeosVplsEncapTunnelEntry 20 }
+
+  wwpLeosVplsEncapTunnelDestBridgeIndex        OBJECT-TYPE
+     SYNTAX         Integer32 (0..64)
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the provider backbone bridge index.
+              This object is only applicable if wwpLeosVplsEncapTunnelType is set to staticPbt otherwise this object
+              will be ignored.
+
+              This object must be set to one of the values specified by wwpLeosPbtBridgeNameMacMapIndex.
+              If this object is set to 0 then this value will be ignored."
+     ::= { wwpLeosVplsEncapTunnelEntry 21 }
+
+  wwpLeosVplsEncapTunnelEgressPort        OBJECT-TYPE
+     SYNTAX         Integer32
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the provider backbone bridge port.
+              This object is only applicable if wwpLeosVplsEncapTunnelType is set to staticPbt otherwise this object
+              will be ignored."
+     ::= { wwpLeosVplsEncapTunnelEntry 22 }
+
+  wwpLeosVplsEncapTunnelEncapFixedPCP    OBJECT-TYPE
+     SYNTAX         INTEGER (0..7)
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the encap fixed PCP assigned to this tunnel."
+     DEFVAL { 0 }
+     ::= { wwpLeosVplsEncapTunnelEntry 23 }
+  
+  wwpLeosVplsEncapTunnelActive         OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        yes(1),
+                        no(2)
+                    }
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifes if the tunnel is active, and it is only valid
+             if TunnelType is staticPbt."
+     ::= { wwpLeosVplsEncapTunnelEntry 24 }
+
+
+ --
+ --  Decap Tunnel Table
+ --
+ wwpLeosVplsDecapTunnelTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosVplsDecapTunnelEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This table represents the Decap tunnels for VPLS
+
+              wwpLeosVplsDecapTunnelType If not set will default to static
+
+              To create STATIC Decap tunnel following objects must be set
+              Encap and Decap Tunnel name cannot be same but indexes can be
+              wwpLeosVplsDecapTunnelName                must be specified
+              wwpLeosVplsDecapTunnelLabel               must be specified (0, 32..1023)
+              wwpLeosVplsDecapTunnelRowStatus must be set to createAndGo.
+
+              To create STATIC Decap PBT tunnel following objects must be set
+              Encap and Decap Tunnel name cannot be same but indexes can be
+              wwpLeosVplsDecapTunnelType                must be set to staticPbt
+              wwpLeosVplsDecapTunnelName                must be specified
+              wwpLeosVplsDecapTunnelBVID                must be specified
+              wwpLeosVplsDecapTunnelBridgeIndex         must be specified
+              wwpLeosVplsDecapTunnelPort                must be specified
+              wwpLeosVplsDecapTunnelRowStatus   must be set to createAndGo."
+
+     ::= { wwpLeosVpls 14 }
+
+ wwpLeosVplsDecapTunnelEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsDecapTunnelEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "represents each entry in wwpLeosVplsDecapTunnelTable."
+     INDEX { wwpLeosVplsDecapTunnelId }
+     ::= { wwpLeosVplsDecapTunnelTable 1 }
+
+ WwpLeosVplsDecapTunnelEntry ::= SEQUENCE {
+     wwpLeosVplsDecapTunnelId                                   INTEGER,
+     wwpLeosVplsDecapTunnelName                                 DisplayString,
+     wwpLeosVplsDecapTunnelLabel                                Unsigned32,
+     wwpLeosVplsDecapTunnelType                                 INTEGER,
+     wwpLeosVplsDecapTunnelRowStatus                            RowStatus,
+     wwpLeosVplsDecapTunnelBVID                                 Integer32,
+     wwpLeosVplsDecapTunnelBridgeIndex                          Integer32,
+     wwpLeosVplsDecapTunnelPort                                 Integer32,
+     wwpLeosVplsDecapTunnelMac                                  MacAddress,
+     wwpLeosVplsDecapTunnelOperStatus                    INTEGER
+ }
+
+ wwpLeosVplsDecapTunnelId    OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the unique index used in the table."
+     ::= { wwpLeosVplsDecapTunnelEntry 1 }
+
+ wwpLeosVplsDecapTunnelName    OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (1..31))
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specfies the name assigned to the tunnel.
+              This object can only be specified while creating entry in the table
+              and cannot be modified after the entry has been created."
+     ::= { wwpLeosVplsDecapTunnelEntry 2 }
+
+ wwpLeosVplsDecapTunnelLabel    OBJECT-TYPE
+     SYNTAX         Unsigned32 (0..1048576)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This mib object specifies the Decap label assigned to this tunnel.
+              If the label is not yet known (signaling in process), the
+              object should return a value of 0xFFFF."
+     ::= { wwpLeosVplsDecapTunnelEntry 3 }
+
+  wwpLeosVplsDecapTunnelType    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                               static(1),
+                               dynamic(2),
+                               staticPbt(3)
+                            }
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies if the tunnel is created because
+              of remote PE request (dynamic tunnel) or it is created by the
+              user on the device (Decap tunnel).
+
+              This object cannot be set to dynamic."
+     DEFVAL    {static}
+     ::= { wwpLeosVplsDecapTunnelEntry 4 }
+
+  wwpLeosVplsDecapTunnelRowStatus    OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Setting this object to 'createAndGo' will create the entry
+              in the table.
+              Setting this object to 'destroy' will delete the entry
+              from the table.
+              Refer to description of wwpLeosVplsDecapTunnelTable for details of
+              creating and deleting entries in the table."
+     ::= { wwpLeosVplsDecapTunnelEntry 5 }
+
+  wwpLeosVplsDecapTunnelBVID    OBJECT-TYPE
+     SYNTAX         Integer32
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the provider bridge vlan ID expected in the mac
+              in mac frames ingressing the device from provider bridge facing side."
+     ::= { wwpLeosVplsDecapTunnelEntry 6 }
+
+  wwpLeosVplsDecapTunnelBridgeIndex    OBJECT-TYPE
+     SYNTAX         Integer32 (0..64)
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the provider bridge host index which will be used
+              to query wwpLeosPbtHostNameMacMapTable to find out corresponding mac address
+              expected in the pbt frames ingressing the device from provider bridge facing side."
+     ::= { wwpLeosVplsDecapTunnelEntry 7 }
+
+  wwpLeosVplsDecapTunnelPort    OBJECT-TYPE
+     SYNTAX         Integer32
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the incoming port on which
+              the pbt frames are expected."
+     ::= { wwpLeosVplsDecapTunnelEntry 8 }
+
+ wwpLeosVplsDecapTunnelMac    OBJECT-TYPE
+     SYNTAX         MacAddress
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the source mac address expected in
+              the pbt frames coming from provider network facing side.
+              This mac address is derived from wwpLeosPbtHostNameMacMapTable table using
+              the value specified by wwpLeosVplsDecapTunnelBridgeName.
+              "
+     ::= { wwpLeosVplsDecapTunnelEntry 9 }
+     
+ wwpLeosVplsDecapTunnelOperStatus OBJECT-TYPE
+   SYNTAX      INTEGER {
+                           enabled(1),
+                              disabled(2)
+                            }
+   MAX-ACCESS     read-only
+   STATUS         current
+      DESCRIPTION
+            "This object represents the operational status of tunnel."
+   ::= { wwpLeosVplsDecapTunnelEntry 10 }
+
+
+ --
+ -- Virtual circuit mpls table
+ --
+ wwpLeosVplsVirtualCircuitMplsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsVirtualCircuitMplsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the mpls virtual circuit table.
+             To create entry use SNMP, multiple set operation must
+             be used.
+             Following Mib objects must be specified while creating MPLS
+             virtual circuit
+             Mpls and Ethernet virtual circuit name cannot be same but indexes can be
+             - wwpLeosVplsVirtualCircuitMplsType  must be set to dynamic
+             - wwpLeosVplsVirtualCircuitMplsStatus must be set to createAndGo
+             - wwpLeosVplsVirtualCircuitMplsName must be specified
+             - wwpLeosVplsVirtualCircuitMplsDestAddr must be specified
+
+             Following MIB objects must be specified while creating static
+             MPLS virtual circuit
+             - wwpLeosVplsVirtualCircuitMplsType  must be set to static
+             - wwpLeosVplsVirtualCircuitMplsStatus must be set to createAndGo
+             - wwpLeosVplsVirtualCircuitMplsName must be specified
+             - wwpLeosVplsVirtualCircuitMplsDestAddr must be specified
+             - wwpLeosVplsVirtualCircuitMplsEncapLabel must be specified (2048..18431)
+             - wwpLeosVplsVirtualCircuitMplsDecapLabel must be specified (2048..18431)"
+
+     ::= { wwpLeosVpls 15 }
+
+ wwpLeosVplsVirtualCircuitMplsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualCircuitMplsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The virtual circuit table entry index by
+              wwpLeosVplsVirtualCircuitMplsIndex."
+     INDEX { wwpLeosVplsVirtualCircuitMplsIndex }
+     ::= { wwpLeosVplsVirtualCircuitMplsTable 1 }
+
+ WwpLeosVplsVirtualCircuitMplsEntry ::=  SEQUENCE {
+     wwpLeosVplsVirtualCircuitMplsIndex                         INTEGER,
+     wwpLeosVplsVirtualCircuitMplsName                          DisplayString,
+     wwpLeosVplsVirtualCircuitMplsType                          INTEGER,
+     wwpLeosVplsVirtualCircuitMplsDestAddr                      IpAddress,
+     wwpLeosVplsVirtualCircuitMplsTunnelPolicy                  INTEGER,
+     wwpLeosVplsVirtualCircuitMplsFixedTunnelId                 INTEGER,
+     wwpLeosVplsVirtualCircuitMplsActiveTunnelId                INTEGER,
+     wwpLeosVplsVirtualCircuitMplsOperStatus                    INTEGER,
+     wwpLeosVplsVirtualCircuitMplsEncapLabel                    Unsigned32,
+     wwpLeosVplsVirtualCircuitMplsDecapLabel                    Unsigned32,
+     wwpLeosVplsVirtualCircuitMplsGroupId                       Unsigned32,
+     wwpLeosVplsVirtualCircuitMplsProtectionType                INTEGER,
+     wwpLeosVplsVirtualCircuitMplsStatusTlv                     INTEGER,
+     wwpLeosVplsVirtualCircuitMplsMtu                           INTEGER,
+     wwpLeosVplsVirtualCircuitMplsStatus                        RowStatus
+ }
+
+  wwpLeosVplsVirtualCircuitMplsIndex OBJECT-TYPE
+     SYNTAX      INTEGER (1..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the virtual circuit index in the table.
+         This number should be unique in the table."
+     ::= { wwpLeosVplsVirtualCircuitMplsEntry 1 }
+
+  wwpLeosVplsVirtualCircuitMplsName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..31))
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the name of the virtual circuit associated
+         with the given virtual circuit.
+         Mpls and Ethernet virtual circuit name cannot be same
+         but indexes can be."
+     ::= { wwpLeosVplsVirtualCircuitMplsEntry 2 }
+
+  wwpLeosVplsVirtualCircuitMplsType OBJECT-TYPE
+     SYNTAX      INTEGER {
+                                dynamic(1),
+                                static(2)
+                        }
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the type of the virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitMplsEntry 3 }
+
+  wwpLeosVplsVirtualCircuitMplsDestAddr OBJECT-TYPE
+     SYNTAX      IpAddress
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the destination address used
+         by the signaling protocol if wwpLeosVplsVirtualCircuitMplsType is
+         set to dynamic.
+         This object cannot be modified once entry is created."
+     ::= { wwpLeosVplsVirtualCircuitMplsEntry 4 }
+
+  wwpLeosVplsVirtualCircuitMplsTunnelPolicy OBJECT-TYPE
+     SYNTAX      INTEGER {
+                                fixed(1),
+                                firstAvailable(2)
+                         }
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This object represents that this virtual circuit should select the tunnel
+         as fixed or use the first active tunnel available on the outgoing port.
+         If this object is set to fixed then wwpLeosVplsVirtualCircuitMplsTunnelIndx must
+         be specified."
+     DEFVAL { firstAvailable }
+     ::= { wwpLeosVplsVirtualCircuitMplsEntry 5 }
+
+  wwpLeosVplsVirtualCircuitMplsFixedTunnelId OBJECT-TYPE
+     SYNTAX      INTEGER (0..65535)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the tunnel that this virtual circuit should be mapped to.
+         This object is only used if wwpLeosVplsVirtualCircuitMplsTunnelPolicy is set
+         to fixed."
+     DEFVAL { 0 }
+     ::= { wwpLeosVplsVirtualCircuitMplsEntry 6 }
+
+  wwpLeosVplsVirtualCircuitMplsActiveTunnelId OBJECT-TYPE
+     SYNTAX      INTEGER (0..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the tunnel that this virtual circuit is currently using.
+         This object is equal to wwpLeosVplsVirtualCircuitMplsFixedTunnelId if
+         wwpLeosVplsVirtualCircuitMplsTunnelPolicy is set to fixed."
+     ::= { wwpLeosVplsVirtualCircuitMplsEntry 7 }
+
+  wwpLeosVplsVirtualCircuitMplsOperStatus OBJECT-TYPE
+     SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                         }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the operational status of the virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitMplsEntry 8 }
+
+  wwpLeosVplsVirtualCircuitMplsEncapLabel OBJECT-TYPE
+     SYNTAX      Unsigned32  (0..1048576)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "If wwpLeosVplsVirtualCircuitMplsType is set to static
+         then this object specifies the encap label the should be used
+         for this virtual circuit. Label should be in the range 2048..18431.
+         If the label is not yet known (signaling in process), the
+         object should return a value of 0xFFFF."
+     ::= { wwpLeosVplsVirtualCircuitMplsEntry 9 }
+
+  wwpLeosVplsVirtualCircuitMplsDecapLabel OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..1048576)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "If wwpLeosVplsVirtualCircuitMplsType is set to static
+         then this object specifies the decap label the should be used
+         for this virtual circuit. Label should be in the range 2048..18431.
+         If the label is not yet known (signaling in process), the
+         object should return a value of 0xFFFF."
+     ::= { wwpLeosVplsVirtualCircuitMplsEntry 10 }
+
+  wwpLeosVplsVirtualCircuitMplsGroupId OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the group ID advertised in the LDP signaling
+         if wwpLeosVplsVirtualCircuitMplsType is set to dynamic."
+     DEFVAL { 0 }
+     ::= { wwpLeosVplsVirtualCircuitMplsEntry 11 }
+
+  wwpLeosVplsVirtualCircuitMplsProtectionType OBJECT-TYPE
+     SYNTAX      INTEGER {
+                    primary(1),
+                    secondary(2)
+                    }
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents that this virtual circuit is primary or secondary
+         virtual circuit. If primary virtual circuit goes down that secondary
+         virtual circuit will be used."
+     DEFVAL { secondary }
+     ::= { wwpLeosVplsVirtualCircuitMplsEntry 12 }
+
+  wwpLeosVplsVirtualCircuitMplsStatusTlv OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Specifies whether the Status TLV in LDP signaling should be advertised or not.
+         This mib object is only used if wwpLeosVplsVirtualCircuitMplsType is set to dynamic.
+         This field cannot be modified while wwpLeosVplsVirtualCircuitMplsStatus is active"
+     DEFVAL { false }
+     ::= { wwpLeosVplsVirtualCircuitMplsEntry 13 }
+
+  wwpLeosVplsVirtualCircuitMplsMtu    OBJECT-TYPE
+     SYNTAX         INTEGER (1500..9216)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Setting this object will set the MTU for this VC.
+              This MTU is advertised to the peer if wwpLeosVplsVirtualCircuitMplsType
+              is set to dynamic."
+     DEFVAL { 9190 }
+     ::= { wwpLeosVplsVirtualCircuitMplsEntry 14 }
+
+  wwpLeosVplsVirtualCircuitMplsStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Used to manage the creation and deletion of the
+         conceptual rows in this table.
+         To create a row in this table, a manager must
+         set this object to 'createAndGo'. To delete a row in this
+         table, a manager must set this object to 'destroy'.
+         If the entry exists, it will be displayed as 'active'."
+     ::= { wwpLeosVplsVirtualCircuitMplsEntry 15 }
+
+ --
+ -- VPLS MPLS VC Stats Table
+ --
+ wwpLeosVplsVirtualCircuitMplsStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsVirtualCircuitMplsStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the mpls virtual circuit stats
+             table."
+     ::= { wwpLeosVpls 16 }
+
+ wwpLeosVplsVirtualCircuitMplsStatsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualCircuitMplsStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The mpls virtual circuit stats table entry index by
+              wwpLeosVplsVirtualCircuitMplsIndex."
+     INDEX { wwpLeosVplsVirtualCircuitMplsIndex }
+     ::= { wwpLeosVplsVirtualCircuitMplsStatsTable 1 }
+
+ WwpLeosVplsVirtualCircuitMplsStatsEntry ::=  SEQUENCE {
+         wwpLeosVplsVirtualCircuitMplsTxBytesHi Counter32,
+         wwpLeosVplsVirtualCircuitMplsTxBytesLo Counter32,
+         wwpLeosVplsVirtualCircuitMplsRxBytesHi Counter32,
+         wwpLeosVplsVirtualCircuitMplsRxBytesLo Counter32
+ }
+
+ wwpLeosVplsVirtualCircuitMplsTxBytesHi OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of higher 32 bits transmitted for
+         given virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitMplsStatsEntry 1 }
+
+ wwpLeosVplsVirtualCircuitMplsTxBytesLo OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of lower 32 bits transmitted for
+         given virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitMplsStatsEntry 2 }
+
+ wwpLeosVplsVirtualCircuitMplsRxBytesHi OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of higher 32 bits received for
+         given mpls virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitMplsStatsEntry 3 }
+
+ wwpLeosVplsVirtualCircuitMplsRxBytesLo OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of lower 32 bits received for
+         given virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitMplsStatsEntry 4 }
+
+ --
+ -- Virtual circuit ethernet table
+ --
+ wwpLeosVplsVirtualCircuitEthTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsVirtualCircuitEthEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the virtual circuit table.
+             To create entry use SNMP, multiple set operation must
+             be usedd because following mib objects needs to be set
+             while creating entry in the table.
+             Mpls and Ethernet virtual circuit name cannot be same but indexes can be
+             - wwpLeosVplsVirtualCircuitEthName must be specified
+             - wwpLeosVplsVirtualCircuitEthProviderVlanId must be specified and must exist
+               on the device.
+             - wwpLeosVplsVirtualCircuitEthStatus must be specified."
+     ::= { wwpLeosVpls 17 }
+
+ wwpLeosVplsVirtualCircuitEthEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualCircuitEthEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The virtual circuit table entry index by
+              wwpLeosVplsVirtualCircuitMplsIndex."
+     INDEX { wwpLeosVplsVirtualCircuitEthIndex }
+     ::= { wwpLeosVplsVirtualCircuitEthTable 1 }
+
+ WwpLeosVplsVirtualCircuitEthEntry ::=  SEQUENCE {
+     wwpLeosVplsVirtualCircuitEthIndex                         INTEGER,
+     wwpLeosVplsVirtualCircuitEthName                          DisplayString,
+     wwpLeosVplsVirtualCircuitEthProviderVlanId                VlanId,
+     wwpLeosVplsVirtualCircuitEthRowStatus                     RowStatus,
+     wwpLeosVplsVirtualCircuitEthStatsMonitor				   INTEGER
+ }
+
+ wwpLeosVplsVirtualCircuitEthIndex OBJECT-TYPE
+     SYNTAX      INTEGER (1..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the virtual circuit index in the table.
+         This number should be unique in the table."
+     ::= { wwpLeosVplsVirtualCircuitEthEntry 1 }
+
+ wwpLeosVplsVirtualCircuitEthName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..31))
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This represents the name of the virtual circuit associated
+         with the given virtual circuit.
+         Mpls and Ethernet virtual circuit name cannot be same but indexes can be "
+     ::= { wwpLeosVplsVirtualCircuitEthEntry 2 }
+
+ wwpLeosVplsVirtualCircuitEthProviderVlanId OBJECT-TYPE
+     SYNTAX      VlanId
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This represents the provider vlan id associated with the virtual circuit for
+         a given wwpLeosVplsVirtualCircuitMplsIndex."
+     ::= { wwpLeosVplsVirtualCircuitEthEntry 3 }
+
+  wwpLeosVplsVirtualCircuitEthRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Used to manage the creation and deletion of the
+             conceptual rows in this table.
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'. To delete a row in this
+             table, a manager must set this object to 'destroy'
+             If the entry exists, it will be displayed as 'active'."
+     ::= { wwpLeosVplsVirtualCircuitEthEntry 4 }
+  
+  wwpLeosVplsVirtualCircuitEthStatsMonitor OBJECT-TYPE
+  	SYNTAX   INTEGER {
+  				on(1),
+  				off(2)
+  			}
+  	MAX-ACCESS read-create
+  	STATUS current
+  	DESCRIPTION
+  		"To disable stats collection, set this object to off(2).
+  		To enable stats collection, set this object to on(1)."
+  ::= { wwpLeosVplsVirtualCircuitEthEntry  5}
+
+ --
+ -- Ether Type Table
+ --
+ wwpLeosVplsVirtualCircuitEtherTypeTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsVirtualCircuitEtherTypeEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the ether type to be used
+             for each port."
+     ::= { wwpLeosVpls 18 }
+
+ wwpLeosVplsVirtualCircuitEtherTypeEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualCircuitEtherTypeEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The entry to assign ether type for each port."
+     INDEX {wwpLeosVplsVirtualCircuitPortId}
+     ::= { wwpLeosVplsVirtualCircuitEtherTypeTable 1 }
+
+ WwpLeosVplsVirtualCircuitEtherTypeEntry ::=  SEQUENCE {
+     wwpLeosVplsVirtualCircuitPortId              INTEGER,
+     wwpLeosVplsVirtualCircuitEtherType           INTEGER,
+     wwpLeosVplsVirtualCircuitEtherTypePolicy     INTEGER
+ }
+
+ wwpLeosVplsVirtualCircuitPortId OBJECT-TYPE
+     SYNTAX           INTEGER (1..65535)
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+             "This object specifies the port number used as index in the
+              table."
+     ::= { wwpLeosVplsVirtualCircuitEtherTypeEntry 1 }
+
+ wwpLeosVplsVirtualCircuitEtherType OBJECT-TYPE
+     SYNTAX           INTEGER {
+                           type8100(1),
+                           type9100(2),
+                           type88A8(3)
+                      }
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+             "This object specifies the ethertype of the outer VLAN tag
+              for given port."
+         DEFVAL { type8100 }
+     ::= { wwpLeosVplsVirtualCircuitEtherTypeEntry 2 }
+
+ wwpLeosVplsVirtualCircuitEtherTypePolicy OBJECT-TYPE
+     SYNTAX           INTEGER {
+                           all(1),
+                           encapOnly(2),
+                           vlanTpid(3)
+                      }
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+             "This object specifies the policy for the ethertype of the outer VLAN tag
+              for given port.  All means all frames will have the type set in wwpLeosVplsVirtualCircuitEtherType.
+              encapOnly means only Q-in-Q encapsulated frames will use that value.
+              If wwpLeosVplsVirtualCircuitEtherType is set to type 8100 then ALL will always
+              be the operational value for this item.  vlanTpid means that the port will use the TPID configured
+              for the vlan at egress."
+         DEFVAL { encapOnly }
+     ::= { wwpLeosVplsVirtualCircuitEtherTypeEntry 3 }
+
+ --
+ -- VPLS VC Stats Table
+ --
+ wwpLeosVplsVirtualCircuitEthStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsVirtualCircuitEthStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the virtual circuit stats
+             table."
+     ::= { wwpLeosVpls 19 }
+
+ wwpLeosVplsVirtualCircuitEthStatsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualCircuitEthStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The ethernet virtual circuit stats table entry index by
+              wwpLeosVplsVirtualCircuitMplsIndex."
+     INDEX { wwpLeosVplsVirtualCircuitEthIndex }
+     ::= { wwpLeosVplsVirtualCircuitEthStatsTable 1 }
+
+ WwpLeosVplsVirtualCircuitEthStatsEntry ::=  SEQUENCE {
+         wwpLeosVplsVirtualCircuitEthTxBytesHi 		Counter32,
+         wwpLeosVplsVirtualCircuitEthTxBytesLo 		Counter32,
+         wwpLeosVplsVirtualCircuitEthRxBytesHi 		Counter32,
+         wwpLeosVplsVirtualCircuitEthRxBytesLo 		Counter32,
+         wwpLeosVirtualCircuitEthStatsClear		 	INTEGER
+ }
+
+ wwpLeosVplsVirtualCircuitEthTxBytesHi OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of higher 32 bits transmitted for
+         given virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitEthStatsEntry 1 }
+
+ wwpLeosVplsVirtualCircuitEthTxBytesLo OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of lower 32 bits transmitted for
+         given virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitEthStatsEntry 2 }
+
+ wwpLeosVplsVirtualCircuitEthRxBytesHi OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of higher 32 bits received for
+         given virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitEthStatsEntry 3 }
+
+ wwpLeosVplsVirtualCircuitEthRxBytesLo OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of lower 32 bits received for
+         given virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitEthStatsEntry 4 }
+ 
+ wwpLeosVirtualCircuitEthStatsClear OBJECT-TYPE
+ 	SYNTAX INTEGER {
+ 			clear(1),
+ 			none(2)
+ 		}
+ 	MAX-ACCESS read-write
+ 	STATUS current
+ 	DESCRIPTION
+ 		"To clear the statistics for the given virtual circuit, set this object to 
+ 		clear(1)"
+ 	::= { wwpLeosVplsVirtualCircuitEthStatsEntry 5 } 
+ 
+ 		
+ --
+ --  Virtual Switch Mpls Table
+ --
+ wwpLeosVplsVirtualSwitchMplsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosVplsVirtualSwitchMplsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This table is used to manage virtual switch entries
+              on the device."
+     ::= { wwpLeosVpls 20 }
+
+ wwpLeosVplsVirtualSwitchMplsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchMplsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This entry corresponds to single entry in wwpLeosVplsVirtualSwitchMplsTable
+              table.
+              To create an entry in the table following criteria must be met.
+              Mpls and Ethernet virtual switch name cannot be same but indexes can be
+              - wwpLeosVplsVirtualSwitchMplsVpnId must be specified.
+              - wwpLeosVplsVirtualSwitchMplsType must be specified.
+              - wwpLeosVplsVirtualSwitchMplsName must be specified.
+              - wwpLeosVplsVirtualSwitchMplsStatus must be specified."
+     INDEX { wwpLeosVplsVirtualSwitchMplsIndx }
+     ::= { wwpLeosVplsVirtualSwitchMplsTable 1 }
+
+ WwpLeosVplsVirtualSwitchMplsEntry ::= SEQUENCE {
+     wwpLeosVplsVirtualSwitchMplsIndx                           INTEGER,
+     wwpLeosVplsVirtualSwitchMplsName                           DisplayString,
+     wwpLeosVplsVirtualSwitchMplsVpnId                          Unsigned32,
+     wwpLeosVplsVirtualSwitchMplsEncapCosPolicy                 INTEGER,
+     wwpLeosVplsVirtualSwitchMplsEncapFixedDot1dPri             INTEGER,
+     wwpLeosVplsVirtualSwitchMplsDecapCosPolicy                 INTEGER,
+     wwpLeosVplsVirtualSwitchMplsDecapFixedDot1dPri             INTEGER,
+     wwpLeosVplsVirtualSwitchMplsCtrlProtocolTunnelState        INTEGER,
+     wwpLeosVplsVirtualSwitchMplsDecapTTLPolicy                 INTEGER,
+     wwpLeosVplsVirtualSwitchMplsType                           INTEGER,
+     wwpLeosVplsVirtualSwitchMplsRowStatus                      RowStatus,
+     wwpLeosVplsVirtualSwitchMplsMacLrnState                    INTEGER,
+     wwpLeosVplsVirtualSwitchMplsTunnelMethod                   INTEGER,
+     wwpLeosVplsVirtualSwitchMplsCtrlProtocolDot1dPri           INTEGER,
+     wwpLeosVplsVirtualSwitchMplsSubscriberDot1dPolicy          INTEGER,
+     wwpLeosVplsVirtualSwitchMplsCtrlProtTransFrameValidate     INTEGER,
+     wwpLeosVplsVirtualSwitchMplsHonorPriority                  INTEGER
+ }
+
+ wwpLeosVplsVirtualSwitchMplsIndx    OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the virtual switch index which is used as unique
+              index in the table."
+     ::= { wwpLeosVplsVirtualSwitchMplsEntry 1 }
+
+ wwpLeosVplsVirtualSwitchMplsName    OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (1..31))
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the virtual switch name. this object can only be specified at the
+              time of creation and cannot be modified later.
+              Mpls and Ethernet virtual switch name cannot be same but indexes can be."
+     ::= { wwpLeosVplsVirtualSwitchMplsEntry 2 }
+
+  wwpLeosVplsVirtualSwitchMplsVpnId    OBJECT-TYPE
+     SYNTAX         Unsigned32
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the subscriber vlan Id for given virtual switch."
+     ::= { wwpLeosVplsVirtualSwitchMplsEntry 3 }
+
+  wwpLeosVplsVirtualSwitchMplsEncapCosPolicy    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        fixed(1),
+                        inheritDot1dPri(2),
+                        inheritIpPrec(3),
+                        inheritPhbg(4)
+                        }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the ingress cos policy for given virtual switch."
+     DEFVAL { fixed }
+     ::= { wwpLeosVplsVirtualSwitchMplsEntry 4 }
+
+ wwpLeosVplsVirtualSwitchMplsEncapFixedDot1dPri    OBJECT-TYPE
+     SYNTAX         INTEGER (0..7)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the ingress fixed cos attributes for given virtual switch."
+     DEFVAL { 2 }
+     ::= { wwpLeosVplsVirtualSwitchMplsEntry 5 }
+
+ wwpLeosVplsVirtualSwitchMplsDecapCosPolicy    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        fixed(1),
+                        inheritVc(2),
+                        inheritTunnel(3),
+                        leave(4)
+                        }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the egress cos policy for given virtual switch."
+     DEFVAL { leave }
+     ::= { wwpLeosVplsVirtualSwitchMplsEntry 6 }
+
+ wwpLeosVplsVirtualSwitchMplsDecapFixedDot1dPri    OBJECT-TYPE
+     SYNTAX         INTEGER (0..7)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the egress cos attributes for given virtual switch."
+     DEFVAL { 2 }
+     ::= { wwpLeosVplsVirtualSwitchMplsEntry 7 }
+
+ wwpLeosVplsVirtualSwitchMplsCtrlProtocolTunnelState    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object enables or disables control protocol tunneling for a given
+              virtual switch."
+     DEFVAL { disabled }
+     ::= { wwpLeosVplsVirtualSwitchMplsEntry 8 }
+
+ wwpLeosVplsVirtualSwitchMplsDecapTTLPolicy    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        pipe(1),
+                        uniform(2)
+                        }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the TTL policy for a given virtual switch."
+     DEFVAL { pipe }
+     ::= { wwpLeosVplsVirtualSwitchMplsEntry 9 }
+
+ wwpLeosVplsVirtualSwitchMplsType    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        static(1),
+                        dynamic(2)
+                        }
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the type of virtual switch."
+     ::= { wwpLeosVplsVirtualSwitchMplsEntry 10 }
+
+ wwpLeosVplsVirtualSwitchMplsRowStatus    OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object can be set to 'createAndGo' to create entry in the table.
+              This object can be set to 'destroy' to delete entry in the table.
+              Following objects must be set to valid values to create entry in the table."
+     ::= { wwpLeosVplsVirtualSwitchMplsEntry 11 }
+
+ wwpLeosVplsVirtualSwitchMplsMacLrnState    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        enabled (1),
+                        disabled (2)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Setting this object will set the Mac learning state for a given mpls virtual switch."
+     DEFVAL         { enabled }
+     ::= { wwpLeosVplsVirtualSwitchMplsEntry 12 }
+
+ wwpLeosVplsVirtualSwitchMplsTunnelMethod    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        l2pt (1),
+                        transparent (2)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Setting this object will set the tunneling method for a given mpls virtual switch."
+     DEFVAL         { l2pt }
+     ::= { wwpLeosVplsVirtualSwitchMplsEntry 13 }
+
+ wwpLeosVplsVirtualSwitchMplsCtrlProtocolDot1dPri    OBJECT-TYPE
+     SYNTAX         INTEGER (0..7)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the .1d priority to use when encapsulation control frames."
+     DEFVAL { 6 }
+     ::= { wwpLeosVplsVirtualSwitchMplsEntry 14 }
+
+ wwpLeosVplsVirtualSwitchMplsSubscriberDot1dPolicy   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        leave (1),
+                        provider-inherit (2)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Setting this object will configure the policy used to decide whether or not the
+              subscriber frame .1d priorty should be left alone, or remarked to the computed provider priority."
+     DEFVAL { leave }
+     ::= { wwpLeosVplsVirtualSwitchMplsEntry 15 }
+
+ wwpLeosVplsVirtualSwitchMplsCtrlProtTransFrameValidate    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        enabled (1),
+                        disabled (2)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Setting this object will set the transparent-mode validate for a given mpls virtual switch."
+     DEFVAL         { disabled }
+     ::= { wwpLeosVplsVirtualSwitchMplsEntry 16 }
+
+ wwpLeosVplsVirtualSwitchMplsHonorPriority    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        c-vlan (1),
+                        s-vlan (2)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Setting this object will select either the c-vlan or s-vlan
+              priority to use through the Virtual Switch and it's associated
+              MPLS Tunnel. "
+     DEFVAL         { c-vlan }
+     ::= { wwpLeosVplsVirtualSwitchMplsEntry 17 }
+
+ --
+ --  virtual switch mpls membership Table
+ --
+ wwpLeosVplsVirtualSwitchMplsMemberTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosVplsVirtualSwitchMplsMemberEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "This table is used to create mpls virtual switch subscriber port-vlan membership entry."
+     ::= { wwpLeosVpls 21 }
+
+wwpLeosVplsVirtualSwitchMplsMemberEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchMplsMemberEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "This entry corresponds to single port-vlan subscriber entry in
+              wwpLeosVplsVirtualSwitchMplsMemberTable table."
+     INDEX { wwpLeosVplsVirtualSwitchMplsIndx, wwpLeosVplsVirtualSwitchMplsMemberPortId }
+     ::= { wwpLeosVplsVirtualSwitchMplsMemberTable 1 }
+
+ WwpLeosVplsVirtualSwitchMplsMemberEntry ::= SEQUENCE {
+     wwpLeosVplsVirtualSwitchMplsMemberPortId                   INTEGER,
+     wwpLeosVplsVirtualSwitchMplsMemberVlanId                   INTEGER,
+     wwpLeosVplsVirtualSwitchMplsMemberRowStatus                RowStatus,
+     wwpLeosVplsVirtualSwitchMplsMemberEncapCosPolicy           INTEGER,
+     wwpLeosVplsVirtualSwitchMplsMemberEncapCosFixedDot1DPri    INTEGER,
+     wwpLeosVplsVirtualSwitchMplsMemberSubscriberDot1dPolicy    INTEGER
+ }
+
+ wwpLeosVplsVirtualSwitchMplsMemberPortId    OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the port number which is to be added as
+              a customer facing port for the mpls virtual switch index
+              wwpLeosVplsVirtualSwitchMplsIndx."
+     ::= { wwpLeosVplsVirtualSwitchMplsMemberEntry 1 }
+
+ wwpLeosVplsVirtualSwitchMplsMemberVlanId    OBJECT-TYPE
+     SYNTAX         INTEGER (0..4094)
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the subscriber vlan attached to this
+              mpls virtual switch index wwpLeosVplsVirtualSwitchMplsIndx.
+              This object cannot be modified one entry is created in this table.
+              This object can only be specified when creating entries in this table."
+     ::= { wwpLeosVplsVirtualSwitchMplsMemberEntry 2 }
+
+  wwpLeosVplsVirtualSwitchMplsMemberRowStatus    OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the
+             conceptual rows in this table.
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'. To delete a row in this
+             table, a manager must set this object to 'destroy'.
+             If the entry exists, it will be displayed as 'active'."
+     ::= { wwpLeosVplsVirtualSwitchMplsMemberEntry 3 }
+
+ wwpLeosVplsVirtualSwitchMplsMemberEncapCosPolicy    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        fixed (1),
+                        inheritDot1dPri (2),
+                        inheritIpPrec (3),
+                        inheritPhbg (4),
+                        inheritVs (5),
+                        port-inherit (6)
+                        }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the ingress cos policy for given member entry.
+             By default 'inheritVs' the encap CoS policy is inherited from the parent 
+             virtual-switch settings"
+     DEFVAL { inheritVs }
+     ::= { wwpLeosVplsVirtualSwitchMplsMemberEntry 4 }
+
+ wwpLeosVplsVirtualSwitchMplsMemberEncapCosFixedDot1DPri    OBJECT-TYPE
+     SYNTAX         INTEGER (0..7)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the ingress fixed cos attributes for given
+              member entry. This attribute is only valid when the member 
+              EncapCosPolicy is set to 'fixed'"
+     DEFVAL { 2 }
+     ::= { wwpLeosVplsVirtualSwitchMplsMemberEntry 5 }
+
+ wwpLeosVplsVirtualSwitchMplsMemberSubscriberDot1dPolicy   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        leave (1),
+                        provider-inherit (2),
+                        inheritVs (3)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object configures the member policy used to decide if the subscriber
+              frame's 'c-vlan' .1d priorty should be left alone 'leave', or remarked
+              'provider-inherit' to the resolved provider 's-vlan' priority. This
+              attribute is valid when the member's SubscriberDot1Policy is 'leave' or
+              'provider-inherit'. If stt to 'inheritVs' the attribute is inherited from
+              the parent virtual-switch"
+     DEFVAL { inheritVs }
+     ::= { wwpLeosVplsVirtualSwitchMplsMemberEntry 6 }
+
+
+ --
+ -- VPLS MPLS VS Member stats Table
+ --
+ wwpLeosVplsVirtualSwitchMplsMemberStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsVirtualSwitchMplsMemberStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     deprecated
+     DESCRIPTION
+            "The (conceptual) table listing the virtual switch member stats
+             table."
+     ::= { wwpLeosVpls 22 }
+
+ wwpLeosVplsVirtualSwitchMplsMemberStatsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchMplsMemberStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "The virtual switch member stats table entry index by
+              wwpLeosVplsVirtualSwitchMplsIndx and wwpLeosVplsVirtualSwitchMplsMemberPortId."
+     INDEX { wwpLeosVplsVirtualSwitchMplsIndx, wwpLeosVplsVirtualSwitchMplsMemberPortId }
+     ::= { wwpLeosVplsVirtualSwitchMplsMemberStatsTable 1 }
+
+ WwpLeosVplsVirtualSwitchMplsMemberStatsEntry ::=  SEQUENCE {
+         wwpLeosVplsVirtualSwitchMplsMemberRxBytesHi        Counter32,
+         wwpLeosVplsVirtualSwitchMplsMemberRxBytesLo        Counter32
+ }
+
+ wwpLeosVplsVirtualSwitchMplsMemberRxBytesHi OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of higher 32 bits received for
+         given mpls virtual switch member port."
+     ::= { wwpLeosVplsVirtualSwitchMplsMemberStatsEntry 1 }
+
+ wwpLeosVplsVirtualSwitchMplsMemberRxBytesLo OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of lower 32 bits received for
+         given virtual switch member port."
+     ::= { wwpLeosVplsVirtualSwitchMplsMemberStatsEntry 2 }
+
+ --
+ --  virtual switch mpls mesh-vc membership Table
+ --
+ wwpLeosVplsVirtualSwitchMplsMemberMeshVcTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosVplsVirtualSwitchMplsMemberMeshVcEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This table is used to create mpls virtual switch mesh-vc membership entry."
+     ::= { wwpLeosVpls 23 }
+
+ wwpLeosVplsVirtualSwitchMplsMemberMeshVcEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchMplsMemberMeshVcEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This entry corresponds to single mesh-vc entry in
+              wwpLeosVplsVirtualSwitchMplsMemberMeshVcTable table."
+     INDEX { wwpLeosVplsVirtualSwitchMplsIndx, wwpLeosVplsVirtualSwitchMplsMemberMeshVcMeshVc }
+     ::= { wwpLeosVplsVirtualSwitchMplsMemberMeshVcTable 1 }
+
+ WwpLeosVplsVirtualSwitchMplsMemberMeshVcEntry ::= SEQUENCE {
+     wwpLeosVplsVirtualSwitchMplsMemberMeshVcMeshVc      INTEGER,
+     wwpLeosVplsVirtualSwitchMplsMemberMeshVcRowStatus   RowStatus
+ }
+
+ wwpLeosVplsVirtualSwitchMplsMemberMeshVcMeshVc    OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the mesh virtual circuit for this mpls
+              virtual switch."
+     ::= { wwpLeosVplsVirtualSwitchMplsMemberMeshVcEntry 1 }
+
+  wwpLeosVplsVirtualSwitchMplsMemberMeshVcRowStatus    OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the
+             conceptual rows in this table.
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'. To delete a row in this
+             table, a manager must set this object to 'destroy'.
+             If the entry exists, it will be displayed as 'active'."
+     ::= { wwpLeosVplsVirtualSwitchMplsMemberMeshVcEntry 2 }
+
+ --
+ --  virtual switch mpls ac-vc membership Table
+ --
+ wwpLeosVplsVirtualSwitchMplsMemberAcVcTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosVplsVirtualSwitchMplsMemberAcVcEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This table is used to create mpls virtual switch mesh-vc membership entry."
+     ::= { wwpLeosVpls 24 }
+
+ wwpLeosVplsVirtualSwitchMplsMemberAcVcEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchMplsMemberAcVcEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This entry corresponds to single mesh-vc entry in
+              wwpLeosVplsVirtualSwitchMplsMemberAcVcTable table."
+     INDEX { wwpLeosVplsVirtualSwitchMplsIndx, wwpLeosVplsVirtualSwitchMplsMemberAcVcAcVc}
+     ::= { wwpLeosVplsVirtualSwitchMplsMemberAcVcTable 1 }
+
+ WwpLeosVplsVirtualSwitchMplsMemberAcVcEntry ::= SEQUENCE {
+     wwpLeosVplsVirtualSwitchMplsMemberAcVcAcVc        INTEGER,
+     wwpLeosVplsVirtualSwitchMplsMemberAcVcRowStatus     RowStatus
+ }
+
+ wwpLeosVplsVirtualSwitchMplsMemberAcVcAcVc    OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the attachment virtual circuit for this mpls
+              virtual switch."
+     ::= { wwpLeosVplsVirtualSwitchMplsMemberAcVcEntry 1 }
+
+  wwpLeosVplsVirtualSwitchMplsMemberAcVcRowStatus    OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the
+             conceptual rows in this table.
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'. To delete a row in this
+             table, a manager must set this object to 'destroy'.
+             If the entry exists, it will be displayed as 'active'."
+     ::= { wwpLeosVplsVirtualSwitchMplsMemberAcVcEntry 2 }
+
+ --
+ -- MPLS VS Control protocol table
+ --
+ wwpLeosVplsSwitchMplsCtrlProtocolTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsSwitchMplsCtrlProtocolEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the l2 virtual switch control frame
+             protocol status tunnel for a given Vpls."
+     ::= { wwpLeosVpls 25 }
+
+ wwpLeosVplsSwitchMplsCtrlProtocolEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsSwitchMplsCtrlProtocolEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The layer 2 virtual switch control frame protocol tunnel
+              entry for the Vpls."
+     INDEX {wwpLeosVplsVirtualSwitchMplsIndx, wwpLeosVplsSwitchMplsCtrlProtocolNum}
+     ::= { wwpLeosVplsSwitchMplsCtrlProtocolTable 1 }
+
+ WwpLeosVplsSwitchMplsCtrlProtocolEntry ::=  SEQUENCE {
+     wwpLeosVplsSwitchMplsCtrlProtocolNum     INTEGER,
+     wwpLeosVplsSwitchMplsCtrlType            INTEGER
+ }
+
+  wwpLeosVplsSwitchMplsCtrlProtocolNum OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     l28021x(1),
+                     rstp(2),
+                     ciscoCdp(3),
+                     ciscoDtp(4),
+                     ciscoPagp(5),
+                     ciscoPvst(6),
+                     ciscoUplinkFast(7),
+                     ciscoUdlp(8),
+                     ciscoVtp(9),
+                     gvrp(10),
+                     lacp(11),
+                     lacpMarker(12),
+                     oam(13),
+                     lldp(14),
+                     vlanBridge(15)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This object represent the list of protocols the device
+         can support."
+     ::= { wwpLeosVplsSwitchMplsCtrlProtocolEntry 1 }
+
+  wwpLeosVplsSwitchMplsCtrlType OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     discard(1),
+                     peer(2),
+                     tunnel(3)
+                 }
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Setting this object to 'discard' will cause wwpLeosVplsSwitchMplsCtrlProtocolNum
+         frames arriving at the specified UNI to be discarded.
+         Setting this to 'peer' will cause the wwpLeosVplsSwitchMplsCtrlProtocolNum frame
+         to be processed by the provider network and cause the provider
+         network to behave as a peer.
+         Setting this to 'tunnel' will cause the wwpLeosVplsSwitchMplsCtrlProtocolNum frame to be
+         tunneled."
+     ::= { wwpLeosVplsSwitchMplsCtrlProtocolEntry 2 }
+
+ --
+ --  Virtual  Switch Ether Table
+ --
+ wwpLeosVplsVirtualSwitchEthTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosVplsVirtualSwitchEthEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This table is used to manage virtual switch entries
+              on the device."
+     ::= { wwpLeosVpls 26 }
+
+ wwpLeosVplsVirtualSwitchEthEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchEthEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This entry corresponds to single entry in wwpLeosVplsVirtualSwitchEthernetTable table.
+              To create an entry in the table following criteria must be met.
+              - wwpLeosVplsVirtualSwitchEthRowStatus must be specified.
+              - wwpLeosVplsVirtualSwitchEthernetName must be specified"
+     INDEX { wwpLeosVplsVirtualSwitchEthIndx }
+     ::= { wwpLeosVplsVirtualSwitchEthTable 1 }
+
+ WwpLeosVplsVirtualSwitchEthEntry ::= SEQUENCE {
+     wwpLeosVplsVirtualSwitchEthIndx                            INTEGER,
+     wwpLeosVplsVirtualSwitchEthName                            DisplayString,
+     wwpLeosVplsVirtualSwitchEthVc                              INTEGER,
+     wwpLeosVplsVirtualSwitchEthEncapCosPolicy                  INTEGER,
+     wwpLeosVplsVirtualSwitchEthEncapFixedDot1dPri              INTEGER,
+     wwpLeosVplsVirtualSwitchEthDecapCosPolicy                  INTEGER,
+     wwpLeosVplsVirtualSwitchEthDecapFixedDot1dPri              INTEGER,
+     wwpLeosVplsVirtualSwitchEthCtrlProtocolTunnelState         INTEGER,
+     wwpLeosVplsVirtualSwitchEthRowStatus                       RowStatus,
+     wwpLeosVplsVirtualSwitchEthMacLrnState                     INTEGER,
+     wwpLeosVplsVirtualSwitchEthTunnelMethod                    INTEGER,
+     wwpLeosVplsVirtualSwitchEthCtrlProtocolDot1dPri            INTEGER,
+     wwpLeosVplsVirtualSwitchEthSubscriberDot1dPolicy           INTEGER,
+     wwpLeosVplsVirtualSwitchEthCtrlProtTransFrameValidate      INTEGER,
+     wwpLeosVplsVirtualSwitchEthVcType                          INTEGER,
+     wwpLeosVplsVirtualSwitchEthHonorPriority                   INTEGER,
+     wwpLeosVplsVirtualSwitchEthDescription                     OCTET STRING,
+     wwpLeosVplsVirtualSwitchEthReservedVlan					INTEGER
+ }
+
+ wwpLeosVplsVirtualSwitchEthIndx    OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the virtual switch index which is used as unique
+              index in the table."
+     ::= { wwpLeosVplsVirtualSwitchEthEntry 1 }
+
+ wwpLeosVplsVirtualSwitchEthName    OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (1..31))
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the virtual switch name. this object can only be specified at the
+              time of creation and cannot be modified later.
+              Mpls and Ethernet virtual switch name cannot be same but indexes can be."
+     ::= { wwpLeosVplsVirtualSwitchEthEntry 2 }
+
+ wwpLeosVplsVirtualSwitchEthVc    OBJECT-TYPE
+     SYNTAX         INTEGER (0..65535)
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the primary virtual circuit ID associated with this virtual switch.
+              To unset it set this to 0.
+              If this object represents PBT virtual circuit then wwpLeosVplsVirtualSwitchEthVcType must also
+              be set to pbt."
+     ::= { wwpLeosVplsVirtualSwitchEthEntry 3 }
+
+ wwpLeosVplsVirtualSwitchEthEncapCosPolicy    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        fixed(1),
+                        inheritDot1dPri(2),
+                        inheritIpPrec(3),
+                        inheritPhbg(4),
+                        port-inherit (5)
+                        }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the ingress cos policy for given virtual switch."
+     DEFVAL { fixed }
+     ::= { wwpLeosVplsVirtualSwitchEthEntry 4 }
+
+ wwpLeosVplsVirtualSwitchEthEncapFixedDot1dPri    OBJECT-TYPE
+     SYNTAX         INTEGER (0..7)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the ingress fixed cos attributes for given virtual switch."
+     DEFVAL { 2 }
+     ::= { wwpLeosVplsVirtualSwitchEthEntry 5 }
+
+ wwpLeosVplsVirtualSwitchEthDecapCosPolicy    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        fixed(1),
+                        inheritVc(2),
+                        inheritTunnel(3),
+                        leave(4)
+                        }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the egress cos policy for given virtual switch."
+     DEFVAL { leave }
+     ::= { wwpLeosVplsVirtualSwitchEthEntry 6 }
+
+ wwpLeosVplsVirtualSwitchEthDecapFixedDot1dPri    OBJECT-TYPE
+     SYNTAX         INTEGER (0..7)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the egress cos attributes for given virtual switch."
+     DEFVAL { 2 }
+     ::= { wwpLeosVplsVirtualSwitchEthEntry 7 }
+
+ wwpLeosVplsVirtualSwitchEthCtrlProtocolTunnelState    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object enables or disables control protocol tunneling for a given
+              virtual switch."
+     DEFVAL { disabled }
+     ::= { wwpLeosVplsVirtualSwitchEthEntry 8 }
+
+ wwpLeosVplsVirtualSwitchEthRowStatus    OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object can be set to 'createAndGo' to create entry in the table.
+              This object can be set to 'destroy' to delete entry in the table.
+              Following objects must be set to valid values to create entry in the table."
+     ::= { wwpLeosVplsVirtualSwitchEthEntry 9 }
+
+ wwpLeosVplsVirtualSwitchEthMacLrnState    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        enabled (1),
+                        disabled (2)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Setting this object will set the Mac learning state for each ethernet virtual switch."
+     DEFVAL         { enabled }
+     ::= { wwpLeosVplsVirtualSwitchEthEntry 10 }
+
+ wwpLeosVplsVirtualSwitchEthTunnelMethod    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        l2pt (1),
+                        transparent (2)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Setting this object will set the tunneling method for each ethernet virtual switch."
+     DEFVAL         { l2pt }
+     ::= { wwpLeosVplsVirtualSwitchEthEntry 11 }
+
+ wwpLeosVplsVirtualSwitchEthCtrlProtocolDot1dPri    OBJECT-TYPE
+     SYNTAX         INTEGER (0..7)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the .1d priority to use when encapsulation control frames."
+     DEFVAL { 6 }
+     ::= { wwpLeosVplsVirtualSwitchEthEntry 12 }
+
+ wwpLeosVplsVirtualSwitchEthSubscriberDot1dPolicy   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        leave (1),
+                        provider-inherit (2)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Setting this object will configure the policy used to decide whether or not the
+              subscriber frame .1d priorty should be left alone, or remarked to the computed provider priority."
+     DEFVAL { leave }
+     ::= { wwpLeosVplsVirtualSwitchEthEntry 13 }
+
+ wwpLeosVplsVirtualSwitchEthCtrlProtTransFrameValidate    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        enabled (1),
+                        disabled (2)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Setting this object will set the transparent-mode validate for a given eth virtual switch."
+     DEFVAL         { disabled }
+     ::= { wwpLeosVplsVirtualSwitchEthEntry 14 }
+
+  wwpLeosVplsVirtualSwitchEthVcType    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        none(1),
+                        ethernet(2),
+                        pbt(3)
+                        }
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the type of vc to be attached to this virtual switch.
+              This object must be set (using SNMP multiple set operation) to pbt type if
+              wwpLeosVplsVirtualSwitchEthVc specifies the pbt vc.
+              Setting only wwpLeosVplsVirtualSwitchEthVcType will return error.
+              Also setting wwpLeosVplsVirtualSwitchEthVcType to none will return error."
+     DEFVAL         { ethernet }
+     ::= { wwpLeosVplsVirtualSwitchEthEntry 15 }
+
+  wwpLeosVplsVirtualSwitchEthHonorPriority    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        c-vlan(1),
+                        s-vlan(2)
+                        }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies which Vlan priority to use on a Virtual
+              Switch. Honor either the c-vlan or the s-vlan priority through
+              the Virtual Switch and it's associated VC or Tunnel."
+     DEFVAL         { c-vlan }
+     ::= { wwpLeosVplsVirtualSwitchEthEntry 16 }
+
+ wwpLeosVplsVirtualSwitchEthDescription    OBJECT-TYPE
+     SYNTAX         OCTET STRING (SIZE (0..128))
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the virtual switch description."
+     ::= { wwpLeosVplsVirtualSwitchEthEntry 17 }  
+     
+ wwpLeosVplsVirtualSwitchEthReservedVlan	OBJECT-TYPE
+ 	SYNTAX		INTEGER (1..4094)       
+ 	MAX-ACCESS	read-create
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"Reserved vlan for the virtual-switch."
+ 	::= { wwpLeosVplsVirtualSwitchEthEntry 18 } 
+ 	
+
+ --
+ --  virtual switch ethernet membership Table
+ --
+ wwpLeosVplsVirtualSwitchEthMemberTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosVplsVirtualSwitchEthMemberEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "This table is used to create virtual switch membership entry."
+     ::= { wwpLeosVpls 27 }
+
+ wwpLeosVplsVirtualSwitchEthMemberEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchEthMemberEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "This entry corresponds to single entry in wwpLeosVplsVirtualSwitchEthernetMemberTable table."
+     INDEX { wwpLeosVplsVirtualSwitchEthIndx, wwpLeosVplsVirtualSwitchEthMemberPortId }
+     ::= { wwpLeosVplsVirtualSwitchEthMemberTable 1 }
+
+ WwpLeosVplsVirtualSwitchEthMemberEntry ::= SEQUENCE {
+     wwpLeosVplsVirtualSwitchEthMemberPortId                    INTEGER,
+     wwpLeosVplsVirtualSwitchEthMemberVlan                      INTEGER,
+     wwpLeosVplsVirtualSwitchEthMemberRowStatus                 RowStatus,
+     wwpLeosVplsVirtualSwitchEthMemberEncapCosPolicy            INTEGER,
+     wwpLeosVplsVirtualSwitchEthMemberEncapCosFixedDot1DPri     INTEGER,
+     wwpLeosVplsVirtualSwitchEthMemberSubscriberDot1dPolicy     INTEGER
+ }
+
+ wwpLeosVplsVirtualSwitchEthMemberPortId    OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the port id associated with
+              wwpLeosVplsVirtualSwitchEthIndx."
+     ::= { wwpLeosVplsVirtualSwitchEthMemberEntry 1 }
+
+ wwpLeosVplsVirtualSwitchEthMemberVlan    OBJECT-TYPE
+     SYNTAX         INTEGER (0..4094)
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the subscriber vlan attached to this
+              eth virtual switch index wwpLeosVplsVirtualSwitchEthIndx.
+              This object cannot be modified one entry is created.
+              This object can only be specified when entry is created in this table."
+     ::= { wwpLeosVplsVirtualSwitchEthMemberEntry 2 }
+
+  wwpLeosVplsVirtualSwitchEthMemberRowStatus    OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object can be set to 'createandgo' to add entry in the table.
+              This object can be set to 'destroy' to delete entry in the table.
+              Refer to description of table entry to see how to create entries
+              in the table."
+     ::= { wwpLeosVplsVirtualSwitchEthMemberEntry 3 }
+
+ wwpLeosVplsVirtualSwitchEthMemberEncapCosPolicy    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        fixed (1),
+                        inheritDot1dPri (2),
+                        inheritIpPrec (3),
+                        inheritPhbg (4),
+                        inheritVs (5),
+                        port-inherit(6)
+                        }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the ingress cos policy for given member entry."
+     DEFVAL { inheritVs }
+     ::= { wwpLeosVplsVirtualSwitchEthMemberEntry 4 }
+
+ wwpLeosVplsVirtualSwitchEthMemberEncapCosFixedDot1DPri    OBJECT-TYPE
+     SYNTAX         INTEGER (0..7)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the ingress fixed cos attributes for given
+              member entry. This attribute is only valid when the EncapCosPolicy
+              is set to 'fixed'"
+     DEFVAL { 2 }
+     ::= { wwpLeosVplsVirtualSwitchEthMemberEntry 5 }
+
+ wwpLeosVplsVirtualSwitchEthMemberSubscriberDot1dPolicy   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        leave (1),
+                        provider-inherit (2),
+                        inheritVs (3)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object configures the member policy used to decide if the subscriber
+              frame's 'c-vlan' .1d priorty should be left alone 'leave', or remarked
+              'provider-inherit' to the resolved provider 's-vlan' priority. This
+              attribute is valid when the member's SubscriberDot1Policy is 'leave' or
+              'provider-inherit'. If stt to 'inheritVs' the attribute is inherited from
+              the parent virtual-switch"
+     DEFVAL { inheritVs }
+     ::= { wwpLeosVplsVirtualSwitchEthMemberEntry 6 }
+
+
+ --
+ -- VPLS MPLS VS Member stats Table
+ --
+ wwpLeosVplsVirtualSwitchEthMemberStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsVirtualSwitchEthMemberStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     deprecated
+     DESCRIPTION
+            "The (conceptual) table listing the virtual switch member stats
+             table."
+     ::= { wwpLeosVpls 28 }
+
+ wwpLeosVplsVirtualSwitchEthMemberStatsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchEthMemberStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "The virtual switch member stats table entry index by
+              wwpLeosVplsVirtualSwitchEthIndx and wwpLeosVplsVirtualSwitchEthMemberPortId."
+     INDEX { wwpLeosVplsVirtualSwitchEthIndx, wwpLeosVplsVirtualSwitchEthMemberPortId }
+     ::= { wwpLeosVplsVirtualSwitchEthMemberStatsTable 1 }
+
+ WwpLeosVplsVirtualSwitchEthMemberStatsEntry ::=  SEQUENCE {
+         wwpLeosVplsVirtualSwitchEthMemberRxBytesHi        Counter32,
+         wwpLeosVplsVirtualSwitchEthMemberRxBytesLo        Counter32
+ }
+
+ wwpLeosVplsVirtualSwitchEthMemberRxBytesHi OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of higher 32 bits received for
+         given virtual switch member port."
+     ::= { wwpLeosVplsVirtualSwitchEthMemberStatsEntry 1 }
+
+ wwpLeosVplsVirtualSwitchEthMemberRxBytesLo OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of lower 32 bits received for
+         given virtual switch member port."
+     ::= { wwpLeosVplsVirtualSwitchEthMemberStatsEntry 2 }
+
+ --
+ -- Eth VS Control protocol table
+ --
+ wwpLeosVplsSwitchEthCtrlProtocolTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsSwitchEthCtrlProtocolEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the l2 virtual switch control frame
+             protocol status tunnel for a given Vpls."
+     ::= { wwpLeosVpls 29 }
+
+ wwpLeosVplsSwitchEthCtrlProtocolEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsSwitchEthCtrlProtocolEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The layer 2 virtual switch control frame protocol tunnel
+              entry for the Vpls."
+     INDEX {wwpLeosVplsVirtualSwitchEthIndx, wwpLeosVplsSwitchEthCtrlProtocolNum}
+     ::= { wwpLeosVplsSwitchEthCtrlProtocolTable 1 }
+
+ WwpLeosVplsSwitchEthCtrlProtocolEntry ::=  SEQUENCE {
+     wwpLeosVplsSwitchEthCtrlProtocolNum     INTEGER,
+     wwpLeosVplsSwitchEthCtrlType            INTEGER
+ }
+
+  wwpLeosVplsSwitchEthCtrlProtocolNum OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     l28021x(1),
+                     rstp(2),
+                     ciscoCdp(3),
+                     ciscoDtp(4),
+                     ciscoPagp(5),
+                     ciscoPvst(6),
+                     ciscoUplinkFast(7),
+                     ciscoUdlp(8),
+                     ciscoVtp(9),
+                     gvrp(10),
+                     lacp(11),
+                     lacpMarker(12),
+                     oam(13),
+                     lldp(14),
+                     vlanBridge(15)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This object represent the list of protocols the device
+         can support."
+     ::= { wwpLeosVplsSwitchEthCtrlProtocolEntry 1 }
+
+  wwpLeosVplsSwitchEthCtrlType OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     discard(1),
+                     peer(2),
+                     tunnel(3)
+                 }
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Setting this object to 'discard' will cause wwpLeosVplsSwitchEthCtrlProtocolNum
+         frames arriving at the specified UNI to be discarded.
+         Setting this to 'peer' will cause the wwpLeosVplsSwitchEthCtrlProtocolNum frame
+         to be processed by the provider network and cause the provider
+         network to behave as a peer.
+         Setting this to 'tunnel' will cause the wwpLeosVplsSwitchEthCtrlProtocolNum frame to be
+         tunneled."
+     ::= { wwpLeosVplsSwitchEthCtrlProtocolEntry 2 }
+
+ --
+ -- Eth Etype Translation table
+ --
+ wwpLeosVplsVirtualSwitchEtypeTranslationTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsVirtualSwitchEtypeTranslationEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "This table controls the global Ethertype translation functions.  Only two
+             entries are allowed.  Creating more than two entries will return an error.
+             The control is bi-directional.  Creating one entry will enable translation
+             as the packet egresses the NNI and as it egresses the UNI port."
+     ::= { wwpLeosVpls 30 }
+
+ wwpLeosVplsVirtualSwitchEtypeTranslationEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchEtypeTranslationEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Each entry contains the Ethertype being translated and the new Ethertype that
+              will be copied over the old Ethertype."
+     INDEX {wwpLeosVplsVirtualSwitchEtypeTranslationOriginalEtype}
+     ::= { wwpLeosVplsVirtualSwitchEtypeTranslationTable 1 }
+
+ WwpLeosVplsVirtualSwitchEtypeTranslationEntry ::= SEQUENCE {
+     wwpLeosVplsVirtualSwitchEtypeTranslationOriginalEtype     EtherType,
+     wwpLeosVplsVirtualSwitchEtypeTranslationMappedEtype       EtherType,
+     wwpLeosVplsVirtualSwitchEtypeTranslationRowStatus         RowStatus
+ }
+
+  wwpLeosVplsVirtualSwitchEtypeTranslationOriginalEtype OBJECT-TYPE
+     SYNTAX      EtherType
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This object represent the original Ethertype of the frame."
+     ::= { wwpLeosVplsVirtualSwitchEtypeTranslationEntry 1 }
+
+  wwpLeosVplsVirtualSwitchEtypeTranslationMappedEtype OBJECT-TYPE
+     SYNTAX      EtherType
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This object represent the Ethertype that will be stamped on the frame on egress
+         and removed on ingress."
+     ::= { wwpLeosVplsVirtualSwitchEtypeTranslationEntry 2 }
+
+  wwpLeosVplsVirtualSwitchEtypeTranslationRowStatus    OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object can be set to 'createandgo' to add entry in the table.
+              This object can be set to 'destroy' to delete entry in the table.
+              Refer to description of table entry to see how to create entries
+              in the table."
+     ::= { wwpLeosVplsVirtualSwitchEtypeTranslationEntry 3 }
+
+ --
+ -- Tunnel pair
+ --
+ wwpLeosVplsTunnelPairTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsTunnelPairEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "This table allows creating tunnel pairs. Having a tunnel pair will
+             force the device to accept pbt encapsulated frames on given pair of tunnels ports
+             and not on any port. This table is only accessible in PBT mode."
+     ::= { wwpLeosVpls 31 }
+
+ wwpLeosVplsTunnelPairEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsTunnelPairEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Each entry contains the tunnel pair."
+     INDEX {wwpLeosVplsTunnelPairIndx}
+     ::= { wwpLeosVplsTunnelPairTable 1 }
+
+ WwpLeosVplsTunnelPairEntry ::= SEQUENCE {
+     wwpLeosVplsTunnelPairIndx              INTEGER,
+     wwpLeosVplsTunnelPairName              DisplayString,
+     wwpLeosVplsTunnelPairEncapTunnelIndx   Integer32,
+     wwpLeosVplsTunnelPairDecapTunnelIndx   Integer32,
+     wwpLeosVplsTunnelPairRowStatus         RowStatus
+ }
+
+  wwpLeosVplsTunnelPairIndx OBJECT-TYPE
+     SYNTAX      INTEGER (1..65535)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object represent the index in the table."
+     ::= { wwpLeosVplsTunnelPairEntry 1 }
+
+  wwpLeosVplsTunnelPairName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..31))
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This object represent the name of the pair and must be unique.
+         This object cannot be modified once entry is created."
+     ::= { wwpLeosVplsTunnelPairEntry 2 }
+
+
+  wwpLeosVplsTunnelPairEncapTunnelIndx OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This object represent the encap tunnel that is part of this tunnel pair.
+         This tunnel index should be valid and must exist in wwpLeosVplsEncapTunnelTable.
+         This object cannot be modified once entry is created."
+     ::= { wwpLeosVplsTunnelPairEntry 3 }
+
+  wwpLeosVplsTunnelPairDecapTunnelIndx OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This object represent the decap tunnel that is part of this tunnel pair.
+         This tunnel index should be valid and must exist in wwpLeosVplsDecapTunnelTable.
+         This object cannot be modified once entry is created."
+     ::= { wwpLeosVplsTunnelPairEntry 4 }
+
+  wwpLeosVplsTunnelPairRowStatus    OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object can be set to 'createandgo' to add entry in the table.
+              This object can be set to 'destroy' to delete entry in the table.
+              Refer to description of table entry to see how to create entries
+              in the table."
+     ::= { wwpLeosVplsTunnelPairEntry 5 }
+
+ --
+ -- MPLS EVPL
+ --
+ wwpLeosVplsVirtualSwitchMplsEvplMemberTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosVplsVirtualSwitchMplsEvplMemberEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This table is used to create mpls virtual switch subscriber port-vlan membership entry."
+     ::= { wwpLeosVpls 32 }
+
+ wwpLeosVplsVirtualSwitchMplsEvplMemberEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchMplsEvplMemberEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This entry corresponds to single port-vlan subscriber entry in
+              wwpLeosVplsVirtualSwitchMplsEvplMemberTable table."
+     INDEX { wwpLeosVplsVirtualSwitchMplsIndx, wwpLeosVplsVirtualSwitchMplsEvplMemberPortId, wwpLeosVplsVirtualSwitchMplsEvplMemberVlanId }
+     ::= { wwpLeosVplsVirtualSwitchMplsEvplMemberTable 1 }
+
+ WwpLeosVplsVirtualSwitchMplsEvplMemberEntry ::= SEQUENCE {
+     wwpLeosVplsVirtualSwitchMplsEvplMemberPortId                   INTEGER,
+     wwpLeosVplsVirtualSwitchMplsEvplMemberVlanId                   INTEGER,
+     wwpLeosVplsVirtualSwitchMplsEvplMemberRowStatus                RowStatus,
+     wwpLeosVplsVirtualSwitchMplsEvplMemberEncapCosPolicy           INTEGER,
+     wwpLeosVplsVirtualSwitchMplsEvplMemberEncapFixedDot1dPri       INTEGER,
+     wwpLeosVplsVirtualSwitchMplsEvplMemberSubscriberDot1dPolicy    INTEGER
+ }
+
+ wwpLeosVplsVirtualSwitchMplsEvplMemberPortId    OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the port number which is to be added as
+              a customer facing port for the mpls virtual switch index
+              wwpLeosVplsVirtualSwitchMplsIndx."
+     ::= { wwpLeosVplsVirtualSwitchMplsEvplMemberEntry 1 }
+
+ wwpLeosVplsVirtualSwitchMplsEvplMemberVlanId    OBJECT-TYPE
+     SYNTAX         INTEGER (0..4094)
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the subscriber vlan attached to this
+              mpls virtual switch index wwpLeosVplsVirtualSwitchMplsIndx.
+              This object cannot be modified once entry is created in this table.
+              This object can only be specified when creating entries in this table."
+     ::= { wwpLeosVplsVirtualSwitchMplsEvplMemberEntry 2 }
+
+  wwpLeosVplsVirtualSwitchMplsEvplMemberRowStatus    OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the
+             conceptual rows in this table.
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'. To delete a row in this
+             table, a manager must set this object to 'destroy'.
+             If the entry exists, it will be displayed as 'active'."
+     ::= { wwpLeosVplsVirtualSwitchMplsEvplMemberEntry 3 }
+
+ wwpLeosVplsVirtualSwitchMplsEvplMemberEncapCosPolicy    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        fixed (1),
+                        inheritDot1dPri (2),
+                        inheritIpPrec (3),
+                        inheritPhbg (4),
+                        inheritVs (5),
+                        port-inherit (6)
+                        }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the ingress cos policy for given EVPL entry."
+     DEFVAL { inheritVs }
+     ::= { wwpLeosVplsVirtualSwitchMplsEvplMemberEntry 4 }
+
+ wwpLeosVplsVirtualSwitchMplsEvplMemberEncapFixedDot1dPri    OBJECT-TYPE
+     SYNTAX         INTEGER (0..7)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the ingress fixed cos attributes for given
+              member entry. This attribute is only valid when the EncapCosPolicy
+              is set to 'fixed'"
+     DEFVAL { 2 }
+     ::= { wwpLeosVplsVirtualSwitchMplsEvplMemberEntry 5 }
+
+ wwpLeosVplsVirtualSwitchMplsEvplMemberSubscriberDot1dPolicy   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        leave (1),
+                        provider-inherit (2),
+                        inheritVs (3)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object configures the member policy used to decide if the subscriber
+              frame's 'c-vlan' .1d priorty should be left alone 'leave', or remarked
+              'provider-inherit' to the resolved provider 's-vlan' priority. This
+              attribute is valid when the member's SubscriberDot1Policy is 'leave' or
+              'provider-inherit'. If stt to 'inheritVs' the attribute is inherited from
+              the parent virtual-switch"
+     DEFVAL { inheritVs }
+     ::= { wwpLeosVplsVirtualSwitchMplsEvplMemberEntry 6 }
+
+ wwpLeosVplsVirtualSwitchMplsEvplMemberStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsVirtualSwitchMplsEvplMemberStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the virtual switch member stats
+             table."
+     ::= { wwpLeosVpls 33 }
+
+ wwpLeosVplsVirtualSwitchMplsEvplMemberStatsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchMplsEvplMemberStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The virtual switch member stats table entry index by
+              wwpLeosVplsVirtualSwitchMplsIndx, wwpLeosVplsVirtualSwitchMplsMemberPortId and VlanId."
+     INDEX { wwpLeosVplsVirtualSwitchMplsIndx, wwpLeosVplsVirtualSwitchMplsEvplMemberPortId, wwpLeosVplsVirtualSwitchMplsEvplMemberVlanId }
+     ::= { wwpLeosVplsVirtualSwitchMplsEvplMemberStatsTable 1 }
+
+  WwpLeosVplsVirtualSwitchMplsEvplMemberStatsEntry ::=  SEQUENCE {
+         wwpLeosVplsVirtualSwitchMplsEvplMemberRxBytesHi        Counter32,
+         wwpLeosVplsVirtualSwitchMplsEvplMemberRxBytesLo        Counter32
+ }
+
+ wwpLeosVplsVirtualSwitchMplsEvplMemberRxBytesHi OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of higher 32 bits received for
+         given mpls virtual switch member port."
+     ::= { wwpLeosVplsVirtualSwitchMplsEvplMemberStatsEntry 1 }
+
+ wwpLeosVplsVirtualSwitchMplsEvplMemberRxBytesLo OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of lower 32 bits received for
+         given virtual switch member port."
+     ::= { wwpLeosVplsVirtualSwitchMplsEvplMemberStatsEntry 2 }
+
+ --
+ -- ETH EVPL
+ --
+ wwpLeosVplsVirtualSwitchEthEvplMemberTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosVplsVirtualSwitchEthEvplMemberEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This table is used to create virtual switch membership entry."
+     ::= { wwpLeosVpls 34 }
+
+ wwpLeosVplsVirtualSwitchEthEvplMemberEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchEthEvplMemberEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This entry corresponds to single entry in wwpLeosVplsVirtualSwitchEthernetEvplMemberTable table."
+     INDEX { wwpLeosVplsVirtualSwitchEthIndx, wwpLeosVplsVirtualSwitchEthEvplMemberPortId, wwpLeosVplsVirtualSwitchEthEvplMemberVlan }
+     ::= { wwpLeosVplsVirtualSwitchEthEvplMemberTable 1 }
+
+ WwpLeosVplsVirtualSwitchEthEvplMemberEntry ::= SEQUENCE {
+     wwpLeosVplsVirtualSwitchEthEvplMemberPortId                INTEGER,
+     wwpLeosVplsVirtualSwitchEthEvplMemberVlan                  INTEGER,
+     wwpLeosVplsVirtualSwitchEthEvplMemberRowStatus             RowStatus,
+     wwpLeosVplsVirtualSwitchEthEvplMemberEncapCosPolicy        INTEGER,
+     wwpLeosVplsVirtualSwitchEthEvplMemberEncapFixedDot1dPri    INTEGER,
+     wwpLeosVplsVirtualSwitchEthEvplMemberSubscriberDot1dPolicy INTEGER,
+     wwpLeosVplsVirtualSwitchEthEvplMemberTranslateTag			INTEGER,
+     wwpLeosVplsVirtualSwitchEthEvplMemberServiceVlanTpid       INTEGER
+ }
+
+ wwpLeosVplsVirtualSwitchEthEvplMemberPortId    OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the port id associated with
+              wwpLeosVplsVirtualSwitchEthIndx."
+     ::= { wwpLeosVplsVirtualSwitchEthEvplMemberEntry 1 }
+
+ wwpLeosVplsVirtualSwitchEthEvplMemberVlan    OBJECT-TYPE
+     SYNTAX         INTEGER (0..4095)
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the subscriber vlan attached to this
+              eth virtual switch index wwpLeosVplsVirtualSwitchEthIndx.
+              This object cannot be modified one entry is created.
+              This object can only be specified when entry is created in this table."
+     ::= { wwpLeosVplsVirtualSwitchEthEvplMemberEntry 2 }
+
+  wwpLeosVplsVirtualSwitchEthEvplMemberRowStatus    OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object can be set to 'createandgo' to add entry in the table.
+              This object can be set to 'destroy' to delete entry in the table.
+              Refer to description of table entry to see how to create entries
+              in the table."
+     ::= { wwpLeosVplsVirtualSwitchEthEvplMemberEntry 3 }
+
+ wwpLeosVplsVirtualSwitchEthEvplMemberEncapCosPolicy    OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        fixed (1),
+                        inheritDot1dPri (2),
+                        inheritIpPrec (3),
+                        inheritPhbg (4),
+                        inheritVs (5),
+                        port-inherit(6)
+                        }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the ingress cos policy for given EVPL entry."
+     DEFVAL { inheritVs }
+     ::= { wwpLeosVplsVirtualSwitchEthEvplMemberEntry 4 }
+
+ wwpLeosVplsVirtualSwitchEthEvplMemberEncapFixedDot1dPri    OBJECT-TYPE
+     SYNTAX         INTEGER (0..7)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the ingress fixed cos attributes for given
+              member entry. This attribute is only valid when the EncapCosPolicy
+              is set to 'fixed'"
+     DEFVAL { 2 }
+     ::= { wwpLeosVplsVirtualSwitchEthEvplMemberEntry 5 }
+
+ wwpLeosVplsVirtualSwitchEthEvplMemberSubscriberDot1dPolicy   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        leave (1),
+                        provider-inherit (2),
+                        inheritVs (3)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object configures the member policy used to decide if the subscriber
+              frame's 'c-vlan' .1d priorty should be left alone 'leave', or remarked
+              'provider-inherit' to the resolved provider 's-vlan' priority. This
+              attribute is valid when the member's SubscriberDot1Policy is 'leave' or
+              'provider-inherit'. If stt to 'inheritVs' the attribute is inherited from
+              the parent virtual-switch"
+     DEFVAL { inheritVs }
+     ::= { wwpLeosVplsVirtualSwitchEthEvplMemberEntry 6 }  
+     
+ wwpLeosVplsVirtualSwitchEthEvplMemberTranslateTag	OBJECT-TYPE
+ 		SYNTAX			INTEGER(1..4094)
+ 		MAX-ACCESS		read-create
+ 		STATUS			current
+ 		DESCRIPTION
+ 			"Subscriber VLAN translate stamp."
+ 		::= { wwpLeosVplsVirtualSwitchEthEvplMemberEntry 7 }
+ 
+ wwpLeosVplsVirtualSwitchEthEvplMemberServiceVlanTpid    OBJECT-TYPE
+ 		SYNTAX INTEGER {
+                           tpid8100(1),
+                           tpid9100(2),
+                           tpid88A8(3),
+                           none(99)
+                      }
+ 		MAX-ACCESS		read-create
+ 		STATUS			current
+ 		DESCRIPTION
+ 			"This object specifies the service VLAN TPID.It is currently only applicable for VS 
+ 			instances associated with an MPLS enabled VS "
+ 		::= { wwpLeosVplsVirtualSwitchEthEvplMemberEntry 8 }
+
+ wwpLeosVplsVirtualSwitchEthEvplMemberStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsVirtualSwitchEthEvplMemberStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the virtual switch member stats
+             table."
+     ::= { wwpLeosVpls 35 }
+
+ wwpLeosVplsVirtualSwitchEthEvplMemberStatsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchEthEvplMemberStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The virtual switch member stats table entry index by
+              wwpLeosVplsVirtualSwitchEthIndx, wwpLeosVplsVirtualSwitchEthMemberPortId and VlanId."
+     INDEX { wwpLeosVplsVirtualSwitchEthIndx, wwpLeosVplsVirtualSwitchEthEvplMemberPortId, wwpLeosVplsVirtualSwitchEthEvplMemberVlan }
+     ::= { wwpLeosVplsVirtualSwitchEthEvplMemberStatsTable 1 }
+
+ WwpLeosVplsVirtualSwitchEthEvplMemberStatsEntry ::=  SEQUENCE {
+         wwpLeosVplsVirtualSwitchEthEvplMemberRxBytesHi        Counter32,
+         wwpLeosVplsVirtualSwitchEthEvplMemberRxBytesLo        Counter32
+ }
+
+ wwpLeosVplsVirtualSwitchEthEvplMemberRxBytesHi OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of higher 32 bits received for
+         given virtual switch member port."
+     ::= { wwpLeosVplsVirtualSwitchEthEvplMemberStatsEntry 1 }
+
+ wwpLeosVplsVirtualSwitchEthEvplMemberRxBytesLo OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of lower 32 bits received for
+         given virtual switch member port."
+     ::= { wwpLeosVplsVirtualSwitchEthEvplMemberStatsEntry 2 }
+
+ --
+ -- VPLS VC Stats Table
+ --
+ wwpLeosVplsVirtualCircuitEthTotalStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsVirtualCircuitEthTotalStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the virtual circuit stats
+             table."
+     ::= { wwpLeosVpls 36 }
+
+ wwpLeosVplsVirtualCircuitEthTotalStatsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualCircuitEthTotalStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The ethernet virtual circuit stats table entry index by
+              wwpLeosVplsVirtualCircuitMplsIndex."
+     INDEX { wwpLeosVplsVirtualCircuitEthIndex }
+     ::= { wwpLeosVplsVirtualCircuitEthTotalStatsTable 1 }
+
+ WwpLeosVplsVirtualCircuitEthTotalStatsEntry ::=  SEQUENCE {
+         wwpLeosVplsVirtualCircuitEthTotalTxBytesHi Counter32,
+         wwpLeosVplsVirtualCircuitEthTotalTxBytesLo Counter32,
+         wwpLeosVplsVirtualCircuitEthTotalRxBytesHi Counter32,
+         wwpLeosVplsVirtualCircuitEthTotalRxBytesLo Counter32
+ }
+
+ wwpLeosVplsVirtualCircuitEthTotalTxBytesHi OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of higher 32 bits transmitted for
+         given virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitEthTotalStatsEntry 1 }
+
+ wwpLeosVplsVirtualCircuitEthTotalTxBytesLo OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of lower 32 bits transmitted for
+         given virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitEthTotalStatsEntry 2 }
+
+ wwpLeosVplsVirtualCircuitEthTotalRxBytesHi OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of higher 32 bits received for
+         given virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitEthTotalStatsEntry 3 }
+
+ wwpLeosVplsVirtualCircuitEthTotalRxBytesLo OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of lower 32 bits received for
+         given virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitEthTotalStatsEntry 4 }
+
+
+
+ --
+ -- VPLS MPLS VC Stats Table
+ --
+ wwpLeosVplsVirtualCircuitMplsTotalStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsVirtualCircuitMplsTotalStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the mpls virtual circuit stats
+             table."
+     ::= { wwpLeosVpls 37 }
+
+ wwpLeosVplsVirtualCircuitMplsTotalStatsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualCircuitMplsTotalStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The mpls virtual circuit stats table entry index by
+              wwpLeosVplsVirtualCircuitMplsTotalIndex."
+     INDEX { wwpLeosVplsVirtualCircuitMplsIndex }
+     ::= { wwpLeosVplsVirtualCircuitMplsTotalStatsTable 1 }
+
+ WwpLeosVplsVirtualCircuitMplsTotalStatsEntry ::=  SEQUENCE {
+         wwpLeosVplsVirtualCircuitMplsTotalTxBytesHi Counter32,
+         wwpLeosVplsVirtualCircuitMplsTotalTxBytesLo Counter32,
+         wwpLeosVplsVirtualCircuitMplsTotalRxBytesHi Counter32,
+         wwpLeosVplsVirtualCircuitMplsTotalRxBytesLo Counter32
+ }
+
+ wwpLeosVplsVirtualCircuitMplsTotalTxBytesHi OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of higher 32 bits transmitted for
+         given virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitMplsTotalStatsEntry 1 }
+
+ wwpLeosVplsVirtualCircuitMplsTotalTxBytesLo OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of lower 32 bits transmitted for
+         given virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitMplsTotalStatsEntry 2 }
+
+ wwpLeosVplsVirtualCircuitMplsTotalRxBytesHi OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of higher 32 bits received for
+         given mpls virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitMplsTotalStatsEntry 3 }
+
+ wwpLeosVplsVirtualCircuitMplsTotalRxBytesLo OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This represents the total number of lower 32 bits received for
+         given virtual circuit."
+     ::= { wwpLeosVplsVirtualCircuitMplsTotalStatsEntry 4 } 
+     
+     
+ --
+ -- Virtual Switch L2CFT Protocols
+ --
+ wwpLeosVplsVirtualSwitchEthL2CftProtocolTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosVplsVirtualSwitchEthL2CftProtocolEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of Virtual Switch L2 CFT protocols."
+     ::= { wwpLeosVpls 49 }
+ 		
+ wwpLeosVplsVirtualSwitchEthL2CftProtocolEntry OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchEthL2CftProtocolEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Virtual Switch L2CFT protocol entry in the Virtual Switch L2CFT Protocol Table."
+     INDEX { wwpLeosVplsVirtualSwitchEthIndx, wwpLeosVplsVirtualSwitchEthL2CftProtocolType }
+     ::= { wwpLeosVplsVirtualSwitchEthL2CftProtocolTable 1 } 
+
+ WwpLeosVplsVirtualSwitchEthL2CftProtocolEntry ::= SEQUENCE {
+     wwpLeosVplsVirtualSwitchEthL2CftProtocolType               INTEGER, 
+     wwpLeosVplsVirtualSwitchEthL2CftProtocolDisposition        INTEGER, 
+     wwpLeosVplsVirtualSwitchEthL2CftProtocolRowStatus         RowStatus
+ }
+
+ wwpLeosVplsVirtualSwitchEthL2CftProtocolType OBJECT-TYPE
+      SYNTAX        INTEGER {
+                              ciscoCdp(1),
+                              ciscoDtp(2),
+                              ciscoPagp(3),
+                              ciscoUdld(4),
+                              ciscoVtp(5),
+                              ciscoPvst(6),
+                              ciscoStpUplinkFast(7),
+                              vlanBridge(8),
+                              rstp(9),
+                              lacp(10),
+                              lacpMarker(11),
+                              oam(12),
+                              lldp(13),
+                              i8021x(14),
+                              gmrp(15),
+                              gvrp(16),
+                              brigeBlock(32),
+                              allBridgesBlock(33),
+                              garpBlock(34),
+                              unknown(99)
+                    }
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies a unique protocol type-index into the table."
+      ::= { wwpLeosVplsVirtualSwitchEthL2CftProtocolEntry 1 }
+
+ wwpLeosVplsVirtualSwitchEthL2CftProtocolDisposition OBJECT-TYPE
+      SYNTAX        INTEGER {
+                        forward(1),
+                        discard(2)
+                    }
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies the virtual switch L2 CFT protocol action.  May forward
+         or drop frames that match this protocol at the virtual switch + RLAN layer"
+      DEFVAL        {forward}
+      ::= { wwpLeosVplsVirtualSwitchEthL2CftProtocolEntry 2 }
+
+ wwpLeosVplsVirtualSwitchEthL2CftProtocolRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+	     "To create a row in this table, a manager must
+	      set this object to 'createAndGo'. To delete the 
+	      entry set this to destroy. To update this entry
+	      this object may not be set."
+     ::= { wwpLeosVplsVirtualSwitchEthL2CftProtocolEntry 64 }
+
+
+--
+-- l2 control frame protocol Tunnle table stats
+--
+
+ wwpLeosVplsVirtualSwitchCFTProtoStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsVirtualSwitchCFTProtoStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the l2 control frame protocol stats
+             for a given vlan."
+     ::= { wwpLeosVpls 50 }
+
+ wwpLeosVplsVirtualSwitchCFTProtoStatsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchCFTProtoStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The layer 2 control frame protocol stats entry for the vlan."
+     INDEX { wwpLeosVplsVirtualSwitchCFTProtoStatsEntryVirtualSwitchIndx,
+                wwpLeosVplsVirtualSwitchCFTProtol2ProtocolNum}
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoStatsTable 1 }
+
+ WwpLeosVplsVirtualSwitchCFTProtoStatsEntry ::=  SEQUENCE {
+     wwpLeosVplsVirtualSwitchCFTProtoStatsEntryVirtualSwitchIndx     INTEGER,
+     wwpLeosVplsVirtualSwitchCFTProtol2RxPkts                        Counter32,
+     wwpLeosVplsVirtualSwitchCFTProtol2TunneledPkts                  Counter32,
+     wwpLeosVplsVirtualSwitchCFTProtol2PeerPkts                      Counter32,
+     wwpLeosVplsVirtualSwitchCFTProtol2DiscardedPkts                 Counter32,
+     wwpLeosVplsVirtualSwitchCFTProtol2DecodedPkts                   Counter32,
+     wwpLeosVplsVirtualSwitchCFTProtol2DecodedFailures               Counter32,
+     wwpLeosVplsVirtualSwitchCFTProtol2TunneledSubcriberPortPkts     Counter32,
+     wwpLeosVplsVirtualSwitchCFTProtol2ProtocolNum                   INTEGER
+ }
+
+ wwpLeosVplsVirtualSwitchCFTProtoStatsEntryVirtualSwitchIndx    OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the virtual switch index which is used as unique
+              index in the table."
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoStatsEntry 1 }
+
+ wwpLeosVplsVirtualSwitchCFTProtol2RxPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Specifies number of packets ingressed matching protocol."
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoStatsEntry 2 }
+
+ wwpLeosVplsVirtualSwitchCFTProtol2TunneledPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Specifies the number of packets that were made tunneled."
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoStatsEntry 3 }
+
+ wwpLeosVplsVirtualSwitchCFTProtol2PeerPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Specifies the number of peered packets."
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoStatsEntry 4 }
+
+ wwpLeosVplsVirtualSwitchCFTProtol2DiscardedPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Specifies the number of discarded packets."
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoStatsEntry 5}
+
+ wwpLeosVplsVirtualSwitchCFTProtol2DecodedPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Specifies the number of packets that came in
+         tunneled and then restored."
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoStatsEntry 6 }
+
+ wwpLeosVplsVirtualSwitchCFTProtol2DecodedFailures OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Specifies the number of packets that failed to 'untunnel'."
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoStatsEntry 7 }
+
+ wwpLeosVplsVirtualSwitchCFTProtol2TunneledSubcriberPortPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Specifies the number of tunneled packets received
+         on subscriber port.. "
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoStatsEntry 8 }
+
+  wwpLeosVplsVirtualSwitchCFTProtol2ProtocolNum OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     l28021x(1),
+                     rstp(2),
+                     ciscoCdp(3),
+                     ciscoDtp(4),
+                     ciscoPagp(5),
+                     ciscoPvst(6),
+                     ciscoUplinkFast(7),
+                     ciscoUdlp(8),
+                     ciscoVtp(9),
+                     gvrp(10),
+                     lacp(11),
+                     lacpMarker(12),
+                     lldp(13),
+                     oam(14),
+                     vlanBridge(15)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This object represent the list of protocols supported by
+         the device."
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoStatsEntry 9 }
+
+--
+-- l2 control frame protocol Tunnle table total stats
+--
+
+ wwpLeosVplsVirtualSwitchCFTProtoTotalStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosVplsVirtualSwitchCFTProtoTotalStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the l2 control frame protocol stats
+             for a given vlan."
+     ::= { wwpLeosVpls 51  }
+
+ wwpLeosVplsVirtualSwitchCFTProtoTotalStatsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosVplsVirtualSwitchCFTProtoTotalStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "The layer 2 control frame protocol stats entry for the vlan."
+     INDEX { wwpLeosVplsVirtualSwitchCFTProtoTotalStatsEntryVirtualSwitchIndx,
+                wwpLeosVplsVirtualSwitchCFTProtoTotall2ProtocolNum}
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoTotalStatsTable 1 }
+
+ WwpLeosVplsVirtualSwitchCFTProtoTotalStatsEntry ::=  SEQUENCE {
+     wwpLeosVplsVirtualSwitchCFTProtoTotalStatsEntryVirtualSwitchIndx     INTEGER,
+     wwpLeosVplsVirtualSwitchCFTProtoTotall2RxPkts                        Counter32,
+     wwpLeosVplsVirtualSwitchCFTProtoTotall2TunneledPkts                  Counter32,
+     wwpLeosVplsVirtualSwitchCFTProtoTotall2PeerPkts                      Counter32,
+     wwpLeosVplsVirtualSwitchCFTProtoTotall2DiscardedPkts                 Counter32,
+     wwpLeosVplsVirtualSwitchCFTProtoTotall2DecodedPkts                   Counter32,
+     wwpLeosVplsVirtualSwitchCFTProtoTotall2DecodedFailures               Counter32,
+     wwpLeosVplsVirtualSwitchCFTProtoTotall2TunneledSubcriberPortPkts     Counter32,
+     wwpLeosVplsVirtualSwitchCFTProtoTotall2ProtocolNum                   INTEGER
+ }
+
+ wwpLeosVplsVirtualSwitchCFTProtoTotalStatsEntryVirtualSwitchIndx    OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the virtual switch index which is used as unique
+              index in the table."
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoTotalStatsEntry 1 }
+
+ wwpLeosVplsVirtualSwitchCFTProtoTotall2RxPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Specifies number of packets ingressed matching protocol."
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoTotalStatsEntry 2 }
+
+ wwpLeosVplsVirtualSwitchCFTProtoTotall2TunneledPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Specifies the number of packets that were made tunneled."
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoTotalStatsEntry 3 }
+
+ wwpLeosVplsVirtualSwitchCFTProtoTotall2PeerPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Specifies the number of peered packets."
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoTotalStatsEntry 4 }
+
+ wwpLeosVplsVirtualSwitchCFTProtoTotall2DiscardedPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Specifies the number of discarded packets."
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoTotalStatsEntry 5}
+
+ wwpLeosVplsVirtualSwitchCFTProtoTotall2DecodedPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Specifies the number of packets that came in
+         tunneled and then restored."
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoTotalStatsEntry 6 }
+
+ wwpLeosVplsVirtualSwitchCFTProtoTotall2DecodedFailures OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Specifies the number of packets that failed to 'untunnel'."
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoTotalStatsEntry 7 }
+
+ wwpLeosVplsVirtualSwitchCFTProtoTotall2TunneledSubcriberPortPkts OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Specifies the number of tunneled packets received
+         on subscriber port.. "
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoTotalStatsEntry 8 }
+
+  wwpLeosVplsVirtualSwitchCFTProtoTotall2ProtocolNum OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     l28021x(1),
+                     rstp(2),
+                     ciscoCdp(3),
+                     ciscoDtp(4),
+                     ciscoPagp(5),
+                     ciscoPvst(6),
+                     ciscoUplinkFast(7),
+                     ciscoUdlp(8),
+                     ciscoVtp(9),
+                     gvrp(10),
+                     lacp(11),
+                     lacpMarker(12),
+                     lldp(13),
+                     oam(14),
+                     vlanBridge(15)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This object represent the list of protocols supported by
+         the device."
+     ::= { wwpLeosVplsVirtualSwitchCFTProtoTotalStatsEntry 9 }
+
+  END
+

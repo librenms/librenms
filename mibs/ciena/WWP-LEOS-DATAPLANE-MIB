@@ -1,0 +1,1206 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-DATAPLANE-MIB.my
+ --
+ --
+
+ WWP-LEOS-DATAPLANE-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+   Unsigned32, Counter64, Integer32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+   TruthValue, DisplayString, TEXTUAL-CONVENTION, RowStatus
+        FROM SNMPv2-TC
+   wwpModulesLeos
+        FROM WWP-SMI;
+
+ wwpLeosDataplaneMIB MODULE-IDENTITY
+            LAST-UPDATED "201206080050Z"
+            ORGANIZATION "Ciena, Inc"
+            CONTACT-INFO
+                    "   Mib Meister
+                    115 North Sullivan Road
+                    Spokane Valley, WA 99037
+                    USA
+                    Phone:  +1 509 242 9000
+                    Email:  support@ciena.com"
+	   	DESCRIPTION
+		      	"Changed port shaper burst size limits and per COS cbs and ebs limits "
+   		REVISION 	"201206080050Z"
+	   	DESCRIPTION
+		      	"Added Mpls Tc via wwpLeosDpTsMplsTcCosMapTable and wwpLeosDpTsFrameCosMap"
+
+   		REVISION 	"201106130050Z"
+	   	DESCRIPTION
+		      	"Added Egress Queue stats via wwpLeosDpTsQEgressPortQueueGroupQStatsTable "
+
+   		REVISION 	"201105100050Z"
+	   	DESCRIPTION
+		      	"Added Egress Frame Cos Map OBJECTS like wwpLeosDpTsFrameCosMapProfileTable wwpLeosDpTsFrameCosMapEntry to MIB"
+   		REVISION 	"201007280000Z"
+	   	DESCRIPTION
+		      	"Added green and yellow simple WRED curves for 5150"
+   		REVISION 	"201002120000Z"
+
+        	DESCRIPTION
+	          		"This MIB module is the Dataplane Management for WWP Products"
+	    	REVISION    "200811111700Z"
+            DESCRIPTION
+                    "Initial creation."
+            ::= { wwpModulesLeos 500 }
+ 
+ --
+ -- Textual convention
+ --
+ DpTsQSredDropProbability ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Drop Probability for Raven SRED platform. Numbers below indicate % value "
+     SYNTAX       INTEGER {
+                    drop-100-percent(1),
+                    drop-6-25-percent(2),
+                    drop-3-125-percent(3),
+                    drop-1-5625-percent(4),
+                    drop-0-78125-percent(5),
+                    drop-0-390625-percent(6),
+                    drop-0-1953125-percent(7),
+                    drop-0-0976562-percent(8)
+                 }                  
+  
+  DpTsQWredSimpleMaxDropProbability ::= TEXTUAL-CONVENTION
+  	STATUS			current
+  	DESCRIPTION		"Max Drop probability for Triumph Weighted RED platform. Numbers below indicate
+  					percentage value."
+  	SYNTAX			INTEGER {
+  					drop-100-percent(1),
+  					drop-75-percent(2),
+  					drop-50-percent(3),
+  					drop-25-percent(4),
+  					drop-10-percent(5),
+  					drop-9-percent(6),
+  					drop-8-percent(7),
+  					drop-7-percent(8),
+  					drop-6-percent(9),
+  					drop-5-percent(10),
+  					drop-4-percent(11),
+  					drop-3-percent(12),
+  					drop-2-percent(13),
+  					drop-1-percent(14),
+  					drop-0-percent(15)
+  				}
+  
+  DpTsRCosMappingColor ::= TEXTUAL-CONVENTION
+  	STATUS			current
+  	DESCRIPTION		"Resolved Color for use in ingress and egress table settings
+  					percentage value."
+  	SYNTAX			INTEGER {
+  					green (1),
+  					yellow (2)
+  				}
+  
+ --
+ -- Node definitions
+ --
+
+ wwpLeosDpMIBObjects                     OBJECT IDENTIFIER ::= { wwpLeosDataplaneMIB 1 }
+ wwpLeosDpTs                             OBJECT IDENTIFIER ::= { wwpLeosDpMIBObjects 1 }
+ wwpLeosDpTsQueuing                      OBJECT IDENTIFIER ::= { wwpLeosDpTs 1 }    
+ wwpLeosDpTsQCongestionAvoidanceProfile  OBJECT IDENTIFIER ::= { wwpLeosDpTsQueuing 1 }
+ wwpLeosDpTsQEgressPortQueueGroup        OBJECT IDENTIFIER ::= { wwpLeosDpTsQueuing 2 }
+ wwpLeosDpTsQRcosToCosQueueMap           OBJECT IDENTIFIER ::= { wwpLeosDpTsQueuing 3 }
+ wwpLeosDpTsCosMapping                   OBJECT IDENTIFIER ::= { wwpLeosDpTs 2 }
+ wwpLeosDpTsFrameCosMapping		 OBJECT IDENTIFIER ::= { wwpLeosDpTs 3 }
+ 
+  
+ --
+ -- Traffic Services Queuing Congestion Avoidance Profile Table  
+ -- for Raven 
+ --
+ wwpLeosDpTsQCAProfileSREDTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosDpTsQCAProfileSREDEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            " The (conceptual) table listing configuration parameters of congestion Avoidance profile
+             for SRED type of congestion Avoidance Profile type."
+     ::= { wwpLeosDpTsQCongestionAvoidanceProfile 1 }
+
+ wwpLeosDpTsQCAProfileSREDEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosDpTsQCAProfileSREDEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "An entry (conceptual row) in the wwpLeosDpTsQCAProfileSREDTable."
+     INDEX { wwpLeosDpTsQCAProfileSREDId }
+     ::= { wwpLeosDpTsQCAProfileSREDTable 1 }
+                                                    
+ WwpLeosDpTsQCAProfileSREDEntry ::=  SEQUENCE {
+     wwpLeosDpTsQCAProfileSREDId                          INTEGER, 
+     wwpLeosDpTsQCAProfileSREDName						   DisplayString,
+     wwpLeosDpTsQCAProfileSREDGreenThreshold              INTEGER,
+     wwpLeosDpTsQCAProfileSREDGreenDropProbability        DpTsQSredDropProbability,
+     wwpLeosDpTsQCAProfileSREDYellowThreshold			   INTEGER,
+     wwpLeosDpTsQCAProfileSREDYellowDropProbability       DpTsQSredDropProbability,
+     wwpLeosDpTsQCAProfileSREDRowStatus				   RowStatus			   
+ }
+
+ wwpLeosDpTsQCAProfileSREDId OBJECT-TYPE
+     SYNTAX      INTEGER (1..65535)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "The Profile Id"
+     ::= { wwpLeosDpTsQCAProfileSREDEntry 1 } 
+     
+ wwpLeosDpTsQCAProfileSREDName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..15))
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The congestion Avoidance Profile name."
+     ::= { wwpLeosDpTsQCAProfileSREDEntry 2 } 
+     
+ wwpLeosDpTsQCAProfileSREDGreenThreshold OBJECT-TYPE
+     SYNTAX      INTEGER 
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The green threshold value for this profile above which all green frames would be dropped."
+     ::= { wwpLeosDpTsQCAProfileSREDEntry 4 } 
+ 
+ wwpLeosDpTsQCAProfileSREDGreenDropProbability OBJECT-TYPE
+     SYNTAX      DpTsQSredDropProbability 
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The drop probability value in percentage. This indicates the percentage of green frames to be dropped."
+     ::= { wwpLeosDpTsQCAProfileSREDEntry 5 } 
+ 
+ wwpLeosDpTsQCAProfileSREDYellowThreshold OBJECT-TYPE
+     SYNTAX      INTEGER 
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The yellow threshold value for this profile above which all green frames would be dropped."
+     ::= { wwpLeosDpTsQCAProfileSREDEntry 6 } 
+ 
+ wwpLeosDpTsQCAProfileSREDYellowDropProbability OBJECT-TYPE
+     SYNTAX      DpTsQSredDropProbability 
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The drop probability value in percentage. This indicates the percentage of yellow frames to be dropped."
+     ::= { wwpLeosDpTsQCAProfileSREDEntry 7 } 
+ 
+ wwpLeosDpTsQCAProfileSREDRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus 
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Used to manage the creation and deletion of the 
+             conceptual rows in this table.
+
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'. To delete a row in this
+             table, set this object to 'destroy'."
+     ::= { wwpLeosDpTsQCAProfileSREDEntry 9 } 
+ 
+ 
+ --
+ -- Traffic Services Queuing Congestion Avoidance Profile Table  
+ -- for Triumph WRED  - SWRED stands for Simple WRED 
+ --
+
+ wwpLeosDpTsQCAProfileWREDSimpleTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosDpTsQCAProfileWREDSimpleEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            " The (conceptual) table listing configuration parameters of congestion Avoidance profile
+             for Simple WRED type of congestion Avoidance Profile type."
+     ::= { wwpLeosDpTsQCongestionAvoidanceProfile 2 }
+
+ wwpLeosDpTsQCAProfileWREDSimpleEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosDpTsQCAProfileWREDSimpleEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "An entry (conceptual row in the wwpLeosDpTsQCAProfileWREDSimpleEntry."
+     INDEX { wwpLeosDpTsQCAProfileWREDSimpleId }
+     ::= { wwpLeosDpTsQCAProfileWREDSimpleTable 1 }
+
+ 
+ WwpLeosDpTsQCAProfileWREDSimpleEntry ::=  SEQUENCE {
+     wwpLeosDpTsQCAProfileWREDSimpleId                            INTEGER, 
+     wwpLeosDpTsQCAProfileWREDSimpleName						         DisplayString,
+     wwpLeosDpTsQCAProfileWREDSimpleTCPGreenThreshold			      INTEGER,
+     wwpLeosDpTsQCAProfileWREDSimpleTCPGreenUpperThreshold		   INTEGER,
+     wwpLeosDpTsQCAProfileWREDSimpleTCPGreenMaxDropProbability	   DpTsQWredSimpleMaxDropProbability,
+     wwpLeosDpTsQCAProfileWREDSimpleTCPYellowThreshold			   INTEGER,
+     wwpLeosDpTsQCAProfileWREDSimpleTCPYellowUpperThreshold		   INTEGER,
+     wwpLeosDpTsQCAProfileWREDSimpleTCPYellowMaxDropProbability	DpTsQWredSimpleMaxDropProbability,
+     wwpLeosDpTsQCAProfileWREDSimpleRowStatus				         RowStatus,
+     wwpLeosDpTsQCAProfileWREDSimpleNonTCPThreshold				   INTEGER,
+     wwpLeosDpTsQCAProfileWREDSimpleNonTCPUpperThreshold		      INTEGER,				   
+     wwpLeosDpTsQCAProfileWREDSimpleNonTCPMaxDropProbability	   DpTsQWredSimpleMaxDropProbability,
+     wwpLeosDpTsQCAProfileWREDSimpleGreenLowerThreshold		      INTEGER,
+     wwpLeosDpTsQCAProfileWREDSimpleGreenUpperThreshold  		   INTEGER,
+     wwpLeosDpTsQCAProfileWREDSimpleGreenMaxDropProbability	      DpTsQWredSimpleMaxDropProbability,
+     wwpLeosDpTsQCAProfileWREDSimpleYellowLowerThreshold		      INTEGER,
+     wwpLeosDpTsQCAProfileWREDSimpleYellowUpperThreshold  		   INTEGER,
+     wwpLeosDpTsQCAProfileWREDSimpleYellowMaxDropProbability      DpTsQWredSimpleMaxDropProbability,
+     wwpLeosDpTsQCAProfileWREDSimpleYellowAdmitLimit              INTEGER
+ }
+
+ wwpLeosDpTsQCAProfileWREDSimpleId OBJECT-TYPE
+     SYNTAX      INTEGER (1..65535)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "Unique identifier for the WREDSimple profile entry. "
+     ::= { wwpLeosDpTsQCAProfileWREDSimpleEntry 1 } 
+     
+ wwpLeosDpTsQCAProfileWREDSimpleName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..16))
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Profile name associated with this index."
+     ::= { wwpLeosDpTsQCAProfileWREDSimpleEntry 2 } 
+     
+ wwpLeosDpTsQCAProfileWREDSimpleTCPGreenThreshold	OBJECT-TYPE
+ 	 SYNTAX		INTEGER
+ 	 MAX-ACCESS	read-create
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 		"Specifies the threshold to begin dropping TCP green frames. "
+ 	 ::= { wwpLeosDpTsQCAProfileWREDSimpleEntry 3}
+ 
+ wwpLeosDpTsQCAProfileWREDSimpleTCPGreenUpperThreshold		OBJECT-TYPE
+ 	 SYNTAX		INTEGER
+ 	 MAX-ACCESS read-create
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 		"Specifies the threshold above which all the TCP green frames will be dropped."
+ 	 ::= { wwpLeosDpTsQCAProfileWREDSimpleEntry 4 }
+
+ wwpLeosDpTsQCAProfileWREDSimpleTCPGreenMaxDropProbability	OBJECT-TYPE
+ 	SYNTAX		DpTsQWredSimpleMaxDropProbability
+ 	MAX-ACCESS	read-create
+ 	STATUS		current
+ 	DESCRIPTION
+ 		" Specifies the maximum drop probability for TCP green frames before hitting the 
+ 			TCP green upper threshold."
+ 	::= { wwpLeosDpTsQCAProfileWREDSimpleEntry 5 }
+ 	
+ wwpLeosDpTsQCAProfileWREDSimpleTCPYellowThreshold	OBJECT-TYPE
+ 	SYNTAX		INTEGER
+ 	MAX-ACCESS	read-create
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"Specifies the threshold to begin dropping the TCP yellow frames."
+ 	::= { wwpLeosDpTsQCAProfileWREDSimpleEntry	6 }
+ 
+ wwpLeosDpTsQCAProfileWREDSimpleTCPYellowUpperThreshold		OBJECT-TYPE
+ 	 SYNTAX		INTEGER
+ 	 MAX-ACCESS read-create
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 		"Specifies the threshold above which all the TCP yellow frames will be dropped."
+ 	 ::= { wwpLeosDpTsQCAProfileWREDSimpleEntry 7 }
+
+ wwpLeosDpTsQCAProfileWREDSimpleTCPYellowMaxDropProbability	OBJECT-TYPE
+ 	SYNTAX		DpTsQWredSimpleMaxDropProbability
+ 	MAX-ACCESS	read-create
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"Specifies the max drop probability for TCP yellow frames before hitting the 
+ 			TCP yellow upper threshold."
+ 	::= { wwpLeosDpTsQCAProfileWREDSimpleEntry	8	}
+ 
+ wwpLeosDpTsQCAProfileWREDSimpleRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Used to manage the creation and deletion of the 
+             conceptual rows in this table.
+
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'. To delete a row in this
+             table, set this object to 'destroy'."
+     ::= { wwpLeosDpTsQCAProfileWREDSimpleEntry 9 } 
+ 
+ wwpLeosDpTsQCAProfileWREDSimpleNonTCPThreshold	OBJECT-TYPE
+ 	 SYNTAX		INTEGER
+ 	 MAX-ACCESS	read-create
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 		"Specifies the threshold to begin dropping non-TCP frames. "
+ 	 ::= { wwpLeosDpTsQCAProfileWREDSimpleEntry 10}
+
+ wwpLeosDpTsQCAProfileWREDSimpleNonTCPUpperThreshold		OBJECT-TYPE
+ 	 SYNTAX		INTEGER
+ 	 MAX-ACCESS read-create
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 		"Specifies the threshold above which all the non-TCP frames will be dropped."
+ 	 ::= { wwpLeosDpTsQCAProfileWREDSimpleEntry 11 }
+
+ wwpLeosDpTsQCAProfileWREDSimpleNonTCPMaxDropProbability	OBJECT-TYPE
+ 	SYNTAX		DpTsQWredSimpleMaxDropProbability
+ 	MAX-ACCESS	read-create
+ 	STATUS		current
+ 	DESCRIPTION
+ 		" Specifies the maximum drop probability for non-TCP frames before hitting the 
+ 			non-TCP upper threshold."
+ 	::= { wwpLeosDpTsQCAProfileWREDSimpleEntry 12 }      
+
+ wwpLeosDpTsQCAProfileWREDSimpleGreenLowerThreshold	OBJECT-TYPE
+ 	 SYNTAX		INTEGER
+ 	 MAX-ACCESS	read-create
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 		"Specifies the threshold to begin dropping green frames. "
+ 	 ::= { wwpLeosDpTsQCAProfileWREDSimpleEntry 13}
+ 
+ wwpLeosDpTsQCAProfileWREDSimpleGreenUpperThreshold		OBJECT-TYPE
+ 	 SYNTAX		INTEGER
+ 	 MAX-ACCESS read-create
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 		"Specifies the threshold above which all the green frames will be dropped."
+ 	 ::= { wwpLeosDpTsQCAProfileWREDSimpleEntry 14 }
+
+ wwpLeosDpTsQCAProfileWREDSimpleGreenMaxDropProbability	OBJECT-TYPE
+ 	SYNTAX		DpTsQWredSimpleMaxDropProbability
+ 	MAX-ACCESS	read-create
+ 	STATUS		current
+ 	DESCRIPTION
+ 		" Specifies the maximum drop probability for green frames before hitting the 
+ 			green upper threshold."
+ 	::= { wwpLeosDpTsQCAProfileWREDSimpleEntry 15 }
+
+ wwpLeosDpTsQCAProfileWREDSimpleYellowLowerThreshold	OBJECT-TYPE
+ 	 SYNTAX		INTEGER
+ 	 MAX-ACCESS	read-create
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 		"Specifies the threshold to begin dropping yellow frames. "
+ 	 ::= { wwpLeosDpTsQCAProfileWREDSimpleEntry 16}
+ 
+ wwpLeosDpTsQCAProfileWREDSimpleYellowUpperThreshold		OBJECT-TYPE
+ 	 SYNTAX		INTEGER
+ 	 MAX-ACCESS read-create
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 		"Specifies the threshold above which all the yellow frames will be dropped."
+ 	 ::= { wwpLeosDpTsQCAProfileWREDSimpleEntry 17 }
+
+ wwpLeosDpTsQCAProfileWREDSimpleYellowMaxDropProbability	OBJECT-TYPE
+ 	SYNTAX		DpTsQWredSimpleMaxDropProbability
+ 	MAX-ACCESS	read-create
+ 	STATUS		current
+ 	DESCRIPTION
+ 		" Specifies the maximum drop probability for yellow frames before hitting the 
+ 			yellow upper threshold."
+ 	::= { wwpLeosDpTsQCAProfileWREDSimpleEntry 18 }
+ 	
+ wwpLeosDpTsQCAProfileWREDSimpleYellowAdmitLimit	OBJECT-TYPE
+ 	SYNTAX		INTEGER
+ 	MAX-ACCESS	read-create
+ 	STATUS		current
+ 	DESCRIPTION
+ 		" Specifies queue limit above which yellow frames will be dropped and below which
+        they will not be touched. This should not be confused with the yellow curve 
+        above."
+ 	::= { wwpLeosDpTsQCAProfileWREDSimpleEntry 19 }
+   
+   
+ --
+ -- Egress Port Queue Group Table
+ --
+ 
+ wwpLeosDpTsQEgressPortQueueGroupTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosDpTsQEgressPortQueueGroupEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing configuration parameters of Egress Port Queue."
+     ::= { wwpLeosDpTsQEgressPortQueueGroup 1 }
+
+ wwpLeosDpTsQEgressPortQueueGroupEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosDpTsQEgressPortQueueGroupEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "An entry (conceptual row) in the wwpLeosDpTsQEgressPortQueueGroupTable."
+     INDEX { wwpLeosDpTsQEgressPortQueueGroupId }
+     ::= { wwpLeosDpTsQEgressPortQueueGroupTable 1 }
+
+                   
+ WwpLeosDpTsQEgressPortQueueGroupEntry ::=  SEQUENCE {
+     wwpLeosDpTsQEgressPortQueueGroupId                       INTEGER, 
+     wwpLeosDpTsQEgressPortQueueGroupQCount		      INTEGER,
+     wwpLeosDpTsQEgressPortQueueGroupSchedulerAlgorithm	      INTEGER,
+     wwpLeosDpTsQEgressPortQueueGroupShaperBandwidth	      Unsigned32,
+     wwpLeosDpTsQEgressPortQueueGroupBurstSize		      Unsigned32,
+     wwpLeosDpTsQEgressPortQueueGroupWdrrSchedulerGranularity Unsigned32
+ }
+ 
+ wwpLeosDpTsQEgressPortQueueGroupId OBJECT-TYPE
+     SYNTAX      INTEGER (1..65535)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "Group Id of the egress port queue group. This is the same as the pgid of the port."
+     ::= { wwpLeosDpTsQEgressPortQueueGroupEntry 1 }
+ 
+ wwpLeosDpTsQEgressPortQueueGroupQCount OBJECT-TYPE
+     SYNTAX      INTEGER (1..8)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Number of queues in the egress port group."
+     ::= { wwpLeosDpTsQEgressPortQueueGroupEntry 2 }
+
+ 
+ wwpLeosDpTsQEgressPortQueueGroupSchedulerAlgorithm OBJECT-TYPE
+     SYNTAX      INTEGER		{
+     							strictpriority(1),
+     							weightedfairqueuing(2),
+     							roundrobin(3),
+     							weighteddeficitroundrobin(4),
+     							weightedroundrobin(5),
+     							unknown(99)
+     					} 
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Scheduler Algorithm for the egress port queue."
+     ::= { wwpLeosDpTsQEgressPortQueueGroupEntry 3 }
+
+ wwpLeosDpTsQEgressPortQueueGroupShaperBandwidth OBJECT-TYPE
+     SYNTAX      Unsigned32 
+     UNITS		 "kbps"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Shaper Bandwidth associated with the egress port group."
+     ::= { wwpLeosDpTsQEgressPortQueueGroupEntry 4 }  
+     
+ wwpLeosDpTsQEgressPortQueueGroupBurstSize 		OBJECT-TYPE
+ 	 SYNTAX		 Unsigned32 (4..262144)
+ 	 UNITS		 "kb"
+ 	 MAX-ACCESS	 read-write
+ 	 STATUS		 current
+ 	 DESCRIPTION
+ 	 	"The burst size associated with the egress port group."
+ 	 ::= { wwpLeosDpTsQEgressPortQueueGroupEntry 5 }
+     
+wwpLeosDpTsQEgressPortQueueGroupWdrrSchedulerGranularity 		OBJECT-TYPE
+ 	 SYNTAX		 Unsigned32 (50..1600)
+ 	 UNITS		 "kb"
+ 	 MAX-ACCESS	 read-write
+ 	 STATUS		 current
+ 	 DESCRIPTION
+ 	 	"The WDRR scheduling granularity in K Bytes"
+ 	 ::= { wwpLeosDpTsQEgressPortQueueGroupEntry 6 }
+  
+ 
+ --
+ -- Egress Port Queue Group Queue Configuration Table
+ --
+ 
+ wwpLeosDpTsQEgressPortQueueGroupQConfigTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosDpTsQEgressPortQueueGroupQConfigEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing configuration parameters of an egress Queue."
+     ::= { wwpLeosDpTsQEgressPortQueueGroup 2 }
+
+ wwpLeosDpTsQEgressPortQueueGroupQConfigEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosDpTsQEgressPortQueueGroupQConfigEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "An entry (conceptual row) in the wwpLeosDpTsQEgressPortQueueGroupQConfigTable."
+     INDEX { wwpLeosDpTsQEgressPortQueueGroupId,
+             wwpLeosDpTsQEgressPortQueueGroupQueueId }
+     ::= { wwpLeosDpTsQEgressPortQueueGroupQConfigTable 1 }
+
+ 
+ WwpLeosDpTsQEgressPortQueueGroupQConfigEntry ::=  SEQUENCE {
+     wwpLeosDpTsQEgressPortQueueGroupQueueId                 INTEGER, 
+     wwpLeosDpTsQEgressPortQueueGroupQueueCAPId  	     INTEGER,
+     wwpLeosDpTsQEgressPortQueueGroupQueuePriorityId	     Unsigned32,	
+     wwpLeosDpTsQEgressPortQueueGroupQueueSchedulerWeight    Unsigned32,
+     wwpLeosDpTsQEgressPortQueueGroupQueueSize		     Unsigned32,
+     wwpLeosDpTsQEgressPortQueueGroupQueueCIR		     Unsigned32,
+     wwpLeosDpTsQEgressPortQueueGroupQueueCBS		     Unsigned32,
+     wwpLeosDpTsQEgressPortQueueGroupQueueEIR		     Unsigned32,
+     wwpLeosDpTsQEgressPortQueueGroupQueueEBS		     Unsigned32
+ }
+ 
+ wwpLeosDpTsQEgressPortQueueGroupQueueId OBJECT-TYPE
+     SYNTAX      INTEGER (0..7)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "The per port per group queue Id."
+     ::= { wwpLeosDpTsQEgressPortQueueGroupQConfigEntry 1 }
+
+ wwpLeosDpTsQEgressPortQueueGroupQueueCAPId OBJECT-TYPE
+     SYNTAX      INTEGER 
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "The Congestion Avoidance Profile Id associated with the queue."
+     ::= { wwpLeosDpTsQEgressPortQueueGroupQConfigEntry 2 }
+
+ wwpLeosDpTsQEgressPortQueueGroupQueuePriorityId OBJECT-TYPE
+     SYNTAX      Unsigned32 
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Relative priority id of the queue."
+     ::= { wwpLeosDpTsQEgressPortQueueGroupQConfigEntry 3 }
+ 
+ wwpLeosDpTsQEgressPortQueueGroupQueueSchedulerWeight OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..1000)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Scheduler weight of the queue."
+     ::= { wwpLeosDpTsQEgressPortQueueGroupQConfigEntry 4 }
+
+ wwpLeosDpTsQEgressPortQueueGroupQueueSize OBJECT-TYPE
+     SYNTAX      Unsigned32 
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Queue size of teh queue."
+     ::= { wwpLeosDpTsQEgressPortQueueGroupQConfigEntry 5 }
+
+ wwpLeosDpTsQEgressPortQueueGroupQueueCIR OBJECT-TYPE
+     SYNTAX      Unsigned32 
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "CIR for the queue."
+     ::= { wwpLeosDpTsQEgressPortQueueGroupQConfigEntry 6 }
+ 
+ wwpLeosDpTsQEgressPortQueueGroupQueueCBS OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..262144)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "CBS for the queue."
+     ::= { wwpLeosDpTsQEgressPortQueueGroupQConfigEntry 7 }
+ 
+ wwpLeosDpTsQEgressPortQueueGroupQueueEIR OBJECT-TYPE
+     SYNTAX      Unsigned32 
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "EIR for the queue."
+     ::= { wwpLeosDpTsQEgressPortQueueGroupQConfigEntry 8 }
+ 
+ wwpLeosDpTsQEgressPortQueueGroupQueueEBS OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..262144)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "EBS for the queue."
+     ::= { wwpLeosDpTsQEgressPortQueueGroupQConfigEntry 9 }
+
+--
+-- Egress Port Queue Group Queue Stats Table
+--
+
+wwpLeosDpTsQEgressPortQueueGroupQStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosDpTsQEgressPortQueueGroupQStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing statistics for an egress Queue."
+     ::= { wwpLeosDpTsQEgressPortQueueGroup 3 }
+
+ wwpLeosDpTsQEgressPortQueueGroupQStatsEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosDpTsQEgressPortQueueGroupQStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "An entry (conceptual row) in the wwpLeosDpTsQEgressPortQueueGroupQStatsTable."
+     INDEX { wwpLeosDpTsQEgressPortQueueGroupId,
+             wwpLeosDpTsQEgressPortQueueGroupStatsQueueId }
+     ::= { wwpLeosDpTsQEgressPortQueueGroupQStatsTable 1 }
+
+
+ WwpLeosDpTsQEgressPortQueueGroupQStatsEntry ::=  SEQUENCE {
+     wwpLeosDpTsQEgressPortQueueGroupStatsQueueId                 INTEGER, 
+     wwpLeosDpTsQEgressPortQueueGroupQueueStatsTxBytes            Counter64,
+     wwpLeosDpTsQEgressPortQueueGroupQueueStatsTxPkts             Counter64,
+     wwpLeosDpTsQEgressPortQueueGroupQueueStatsDroppedBytes       Counter64,
+     wwpLeosDpTsQEgressPortQueueGroupQueueStatsDroppedPkts        Counter64,
+     wwpLeosDpTsQEgressPortQueueGroupQueueStatsClear              TruthValue
+ }
+
+ wwpLeosDpTsQEgressPortQueueGroupStatsQueueId OBJECT-TYPE
+     SYNTAX      INTEGER (0..7)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "The per port per group queue Id."
+     ::= { wwpLeosDpTsQEgressPortQueueGroupQStatsEntry 1 }
+
+ wwpLeosDpTsQEgressPortQueueGroupQueueStatsTxBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Tx bytes for this queue"
+     ::= { wwpLeosDpTsQEgressPortQueueGroupQStatsEntry 2 }
+
+ wwpLeosDpTsQEgressPortQueueGroupQueueStatsTxPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Tx packets for this queue."
+     ::= { wwpLeosDpTsQEgressPortQueueGroupQStatsEntry 3 }
+
+ wwpLeosDpTsQEgressPortQueueGroupQueueStatsDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Dropped bytes for this queue."
+     ::= { wwpLeosDpTsQEgressPortQueueGroupQStatsEntry 4 }
+
+ wwpLeosDpTsQEgressPortQueueGroupQueueStatsDroppedPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Dropped packets for this queue."
+     ::= { wwpLeosDpTsQEgressPortQueueGroupQStatsEntry 5 }
+
+ wwpLeosDpTsQEgressPortQueueGroupQueueStatsClear OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "When this value is set to true, this queue's stats will be reset to 0. When
+	 read, this always returns false "
+     ::= { wwpLeosDpTsQEgressPortQueueGroupQStatsEntry 6 }
+
+--
+-- RCOStoCos Queue Map Table 
+--
+ 
+ wwpLeosDpTsQueueMapTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosDpTsQueueMapEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing configuration parameters of RCOS to COS Queue mapping."
+     ::= { wwpLeosDpTsQRcosToCosQueueMap 2 }
+
+ wwpLeosDpTsQueueMapEntry  OBJECT-TYPE
+     SYNTAX       WwpLeosDpTsQueueMapEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "An entry (conceptual row) in the wwpLeosDpTsQueueMapTable."
+     INDEX { wwpLeosDpTsQueueMapId}
+     ::= { wwpLeosDpTsQueueMapTable 1 }
+
+ 
+ WwpLeosDpTsQueueMapEntry ::=  SEQUENCE {
+     wwpLeosDpTsQueueMapId                   INTEGER,
+     wwpLeosDpTsQueueMapName				 DisplayString,
+     wwpLeosDpTsQueueMapQCount				 INTEGER,
+     wwpLeosDpTsQueueMapRCOS0				 INTEGER,
+     wwpLeosDpTsQueueMapRCOS1				 INTEGER,
+     wwpLeosDpTsQueueMapRCOS2				 INTEGER,
+     wwpLeosDpTsQueueMapRCOS3				 INTEGER,
+     wwpLeosDpTsQueueMapRCOS4				 INTEGER,
+     wwpLeosDpTsQueueMapRCOS5				 INTEGER,
+     wwpLeosDpTsQueueMapRCOS6				 INTEGER,
+     wwpLeosDpTsQueueMapRCOS7				 INTEGER,
+     wwpLeosDpTsQueueMapRowStatus			 RowStatus  
+  }
+  
+  
+ wwpLeosDpTsQueueMapId OBJECT-TYPE
+     SYNTAX      INTEGER (1..65535)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "Unique index for the queue map."
+     ::= { wwpLeosDpTsQueueMapEntry 1 }
+
+ wwpLeosDpTsQueueMapName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE(1..31) )
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Queue map name."
+     ::= { wwpLeosDpTsQueueMapEntry 2 }
+ 
+ wwpLeosDpTsQueueMapQCount OBJECT-TYPE
+     SYNTAX      INTEGER 
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "number of queues associated with the map."
+     ::= { wwpLeosDpTsQueueMapEntry 3 }
+
+ wwpLeosDpTsQueueMapRCOS0 OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The COS queue value for RCOS[0]."
+     ::= { wwpLeosDpTsQueueMapEntry 4 }
+
+ wwpLeosDpTsQueueMapRCOS1 OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The COS queue value for RCOS[1]."
+     ::= { wwpLeosDpTsQueueMapEntry 5 }
+ 
+ wwpLeosDpTsQueueMapRCOS2 OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The COS queue value for RCOS[2]."
+     ::= { wwpLeosDpTsQueueMapEntry 6 }
+
+ wwpLeosDpTsQueueMapRCOS3 OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The COS queue value for RCOS[3]."
+     ::= { wwpLeosDpTsQueueMapEntry 7 }
+
+ wwpLeosDpTsQueueMapRCOS4 OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The COS queue value for RCOS[4]."
+     ::= { wwpLeosDpTsQueueMapEntry 8 }
+
+ wwpLeosDpTsQueueMapRCOS5 OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The COS queue value for RCOS[5]."
+     ::= { wwpLeosDpTsQueueMapEntry 9 }
+ 
+ wwpLeosDpTsQueueMapRCOS6 OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The COS queue value for RCOS[6]."
+     ::= { wwpLeosDpTsQueueMapEntry 10 }
+
+ wwpLeosDpTsQueueMapRCOS7 OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The COS queue value for RCOS[7]."
+     ::= { wwpLeosDpTsQueueMapEntry 11 }
+ 
+ wwpLeosDpTsQueueMapRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Used to manage the creation and deletion of the 
+             conceptual rows in this table.
+
+             To create a row in this table, a manager must
+             set this object to 'createAndGo'. To delete a row in this
+             table, set this object to 'destroy'."
+     ::= { wwpLeosDpTsQueueMapEntry 12 }     
+     
+     
+ --
+ -- COS Mapping tables (Ingress tables)
+ --
+ 
+ wwpLeosDpTsCosMapProfileTable OBJECT-TYPE
+ 	SYNTAX		SEQUENCE OF WwpLeosDpTsCosMapProfileEntry
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"The (conceptual) table listing the resolved cos map profiles."
+ 	::= { wwpLeosDpTsCosMapping 1 }
+ 	
+ wwpLeosDpTsCosMapProfileEntry	OBJECT-TYPE
+ 	SYNTAX		WwpLeosDpTsCosMapProfileEntry
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current       
+ 	DESCRIPTION
+ 		"An entry in the wwpLeosDpTsCosMapProfileTable."
+ 	INDEX {     wwpLeosDpTsCosMapProfileId }
+ 	::= { wwpLeosDpTsCosMapProfileTable 1 }
+ 	
+ WwpLeosDpTsCosMapProfileEntry	::= SEQUENCE {
+ 	wwpLeosDpTsCosMapProfileId		INTEGER,
+ 	wwpLeosDpTsCosMapProfileName	DisplayString,
+ 	wwpLeosDpTsCosMapRowStatus		RowStatus
+ }
+ 
+ wwpLeosDpTsCosMapProfileId		OBJECT-TYPE
+ 	SYNTAX		INTEGER	(1..65535)
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"Unique identifier for the resolved cos map profile. The maximum allowed profiles 
+ 		on the device is equal to the number of ports + 1 (Default COS map)."
+ 	::= { wwpLeosDpTsCosMapProfileEntry 1 }
+ 	
+ wwpLeosDpTsCosMapProfileName	OBJECT-TYPE
+ 	SYNTAX		DisplayString (SIZE (1..15))
+ 	MAX-ACCESS	read-create
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"Name of the COS map profile." 			
+ 	::= { wwpLeosDpTsCosMapProfileEntry 2 }
+ 	
+ wwpLeosDpTsCosMapRowStatus		OBJECT-TYPE
+ 	SYNTAX		RowStatus
+ 	MAX-ACCESS	read-create
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"Setting this object to createAndGo creates a COS map profile. Setting the object
+ 		to destroy deletes a COS map profile."
+ 	::= { wwpLeosDpTsCosMapProfileEntry 3 }       
+ 	
+wwpLeosDpTsDot1dCosMapTable		OBJECT-TYPE
+ 	SYNTAX		SEQUENCE OF WwpLeosDpTsDot1dCosMapEntry
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		deprecated
+ 	DESCRIPTION
+ 		"Conceptual table which represents the dot1d cos map to internal RCOS values for
+ 		 a given profile."
+ 	::= { wwpLeosDpTsCosMapping 2 }
+ 	
+ wwpLeosDpTsDot1dCosMapEntry	OBJECT-TYPE
+ 	SYNTAX		WwpLeosDpTsDot1dCosMapEntry
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		deprecated
+ 	DESCRIPTION
+ 		"An entry in the wwpLeosDpTsDot1dCosMapTable."    
+ 	INDEX	{ wwpLeosDpTsCosMapProfileId, wwpLeosDpTsDot1dCosMapDot1dValue }
+ 	::= { wwpLeosDpTsDot1dCosMapTable 1 }
+ 	
+ WwpLeosDpTsDot1dCosMapEntry	::= SEQUENCE {
+ 	wwpLeosDpTsDot1dCosMapDot1dValue	      INTEGER,
+ 	wwpLeosDpTsDot1dCosMapRCOS		      INTEGER
+ }
+ 
+ wwpLeosDpTsDot1dCosMapDot1dValue	OBJECT-TYPE
+ 	SYNTAX		INTEGER (0..7)
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"The dot1d cos value."
+ 	::= { wwpLeosDpTsDot1dCosMapEntry 1 }
+ 	
+ wwpLeosDpTsDot1dCosMapRCOS		OBJECT-TYPE
+ 	SYNTAX		INTEGER (0..7)
+ 	MAX-ACCESS	read-write
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"The corresponding RCOS value mapped to the dot1d cos value."
+ 	::= { wwpLeosDpTsDot1dCosMapEntry 2 }
+ 
+ wwpLeosDpTsDscpCosMapTable		OBJECT-TYPE
+ 	SYNTAX		SEQUENCE OF WwpLeosDpTsDscpCosMapEntry
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"Conceptual table which represents the DSCP cos map to internal RCOS values for
+ 		 a given profile."
+ 	::= { wwpLeosDpTsCosMapping 3 }
+ 	
+ wwpLeosDpTsDscpCosMapEntry	OBJECT-TYPE
+ 	SYNTAX		WwpLeosDpTsDscpCosMapEntry
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"An entry in the wwpLeosDpTsDscpCosMapTable."    
+ 	INDEX	{ wwpLeosDpTsCosMapProfileId, wwpLeosDpTsDscpCosMapDscpValue }
+ 	::= { wwpLeosDpTsDscpCosMapTable 1 }
+ 	
+ WwpLeosDpTsDscpCosMapEntry	::= SEQUENCE {
+ 	wwpLeosDpTsDscpCosMapDscpValue	INTEGER,
+ 	wwpLeosDpTsDscpCosMapRCOS	      INTEGER,
+   wwpLeosDpTsDscpCosMapRColorValue DpTsRCosMappingColor
+ }
+ 
+ wwpLeosDpTsDscpCosMapDscpValue	OBJECT-TYPE
+ 	SYNTAX		INTEGER (0..63)
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"The DSCP cos value."
+ 	::= { wwpLeosDpTsDscpCosMapEntry 1 }
+ 	
+ wwpLeosDpTsDscpCosMapRCOS		OBJECT-TYPE
+ 	SYNTAX		INTEGER (0..7)
+ 	MAX-ACCESS	read-write
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"The RCOS value to which the DSCP cos is mapped to."
+ 	::= { wwpLeosDpTsDscpCosMapEntry 2 }
+
+ wwpLeosDpTsDscpCosMapRColorValue		OBJECT-TYPE
+ 	SYNTAX		DpTsRCosMappingColor
+ 	MAX-ACCESS	read-write
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"The internal resolved color R-Color of the frame. 
+       Green (1), Yellow(2) represents frame's internal R-Color."
+ 	::= { wwpLeosDpTsDscpCosMapEntry 3 }
+ 
+wwpLeosDpTsDot1dDeiCosMapTable		OBJECT-TYPE
+ 	SYNTAX		SEQUENCE OF WwpLeosDpTsDot1dDeiCosMapEntry
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"Conceptual table which represents the dot1d/dot1d-dei cos/color map to internal 
+       RCOS/Rcolor values for a given profile. This table is the new Extendedended version of the 
+       deprecated wpLeosDpTsDot1dCosMapTable above. It has color attributes now."
+ 	::= { wwpLeosDpTsCosMapping 4 }
+
+ wwpLeosDpTsDot1dDeiCosMapEntry	OBJECT-TYPE
+ 	SYNTAX		WwpLeosDpTsDot1dDeiCosMapEntry
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"An entry in the wwpLeosDpTsDot1dDeiCosMapTable which is an extended version 
+       of wwpLeosDpTsDot1dCosMapTable."
+ 	INDEX	{ wwpLeosDpTsCosMapProfileId, wwpLeosDpTsDot1dDeiCosMapDot1dValue, wwpLeosDpTsDot1dDeiCosMapDeiValue }
+ 	::= { wwpLeosDpTsDot1dDeiCosMapTable 1 }
+ 	
+ WwpLeosDpTsDot1dDeiCosMapEntry  ::= SEQUENCE {
+ 	wwpLeosDpTsDot1dDeiCosMapDot1dValue	       INTEGER,
+	wwpLeosDpTsDot1dDeiCosMapDeiValue          INTEGER,
+ 	wwpLeosDpTsDot1dDeiCosMapRCosValue         INTEGER,
+	wwpLeosDpTsDot1dDeiCosMapRColorValue       DpTsRCosMappingColor
+ }
+
+ wwpLeosDpTsDot1dDeiCosMapDot1dValue	OBJECT-TYPE
+ 	SYNTAX		INTEGER (0..7)
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"The dot1d COS value."
+ 	::= { wwpLeosDpTsDot1dDeiCosMapEntry 1 }
+ 	
+ wwpLeosDpTsDot1dDeiCosMapDeiValue  	OBJECT-TYPE
+ 	SYNTAX		INTEGER (0..1)
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"The dot1d DEI value (0) green (1) yellow at ingress."
+ 	::= { wwpLeosDpTsDot1dDeiCosMapEntry 2 }
+ 	
+ wwpLeosDpTsDot1dDeiCosMapRCosValue		OBJECT-TYPE
+ 	SYNTAX		INTEGER (0..7)
+ 	MAX-ACCESS	read-write
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"The corresponding RCos value mapped to the dot1d COS and dot1d DEI value."
+ 	::= { wwpLeosDpTsDot1dDeiCosMapEntry 3 }
+
+ wwpLeosDpTsDot1dDeiCosMapRColorValue		OBJECT-TYPE
+ 	SYNTAX		DpTsRCosMappingColor
+ 	MAX-ACCESS	read-write
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"The corresponding RColor value mapped to the dot1d cos and dot1dei value."
+ 	::= { wwpLeosDpTsDot1dDeiCosMapEntry 4 }
+
+wwpLeosDpTsMplsTcCosMapTable            OBJECT-TYPE
+        SYNTAX          SEQUENCE OF WwpLeosDpTsMplsTcCosMapEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Conceptual table which represents the MPLS-TC COS/color map to internal RCOS/Rcolor values for a given profile. "
+        ::= { wwpLeosDpTsCosMapping 5 }
+
+ wwpLeosDpTsMplsTcCosMapEntry   OBJECT-TYPE
+        SYNTAX          WwpLeosDpTsMplsTcCosMapEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "An entry in the wwpLeosDpTsMplsTcCosMapTable. "
+        INDEX   { wwpLeosDpTsCosMapProfileId, wwpLeosDpTsMplsTcCosMapMplsTcValue}
+        ::= { wwpLeosDpTsMplsTcCosMapTable 1 }
+
+ WwpLeosDpTsMplsTcCosMapEntry  ::= SEQUENCE {
+        wwpLeosDpTsMplsTcCosMapMplsTcValue             Integer32,
+        wwpLeosDpTsMplsTcCosMapRCosValue               Integer32,
+        wwpLeosDpTsMplsTcCosMapRColorValue       DpTsRCosMappingColor
+ }
+
+ wwpLeosDpTsMplsTcCosMapMplsTcValue     OBJECT-TYPE
+        SYNTAX          Integer32 (0..7)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The MPLS-TC value."
+        ::= { wwpLeosDpTsMplsTcCosMapEntry 1 }
+
+
+ wwpLeosDpTsMplsTcCosMapRCosValue               OBJECT-TYPE
+        SYNTAX          Integer32 (0..7)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "The corresponding RCos value mapped to the MPLS-TC value."
+        ::= { wwpLeosDpTsMplsTcCosMapEntry 2 }
+
+ wwpLeosDpTsMplsTcCosMapRColorValue             OBJECT-TYPE
+        SYNTAX          DpTsRCosMappingColor
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "The corresponding RColor value mapped to the MPLS-TC value."
+        ::= { wwpLeosDpTsMplsTcCosMapEntry 3 }
+
+ --
+ -- Egress RCOS to FCOS Mapping tables
+ --
+ wwpLeosDpTsFrameCosMapProfileTable OBJECT-TYPE
+ 	SYNTAX		SEQUENCE OF WwpLeosDpTsFrameCosMapProfileEntry
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"The (conceptual) table listing the frame cos map profiles."
+ 	::= { wwpLeosDpTsFrameCosMapping 1 }
+ 	
+ wwpLeosDpTsFrameCosMapProfileEntry	OBJECT-TYPE
+ 	SYNTAX		WwpLeosDpTsFrameCosMapProfileEntry
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current       
+ 	DESCRIPTION
+ 		"An entry in the wwpLeosDpTsFrameCosMapProfileTable."
+ 	INDEX { wwpLeosDpTsFrameCosMapProfileId }
+ 	::= { wwpLeosDpTsFrameCosMapProfileTable 1 }
+ 	
+ WwpLeosDpTsFrameCosMapProfileEntry	::= SEQUENCE {
+ 	wwpLeosDpTsFrameCosMapProfileId	INTEGER,
+ 	wwpLeosDpTsFrameCosMapProfileName	DisplayString,
+	wwpLeosDpTsFrameCosMapRowStatus	RowStatus
+ }
+ 
+ wwpLeosDpTsFrameCosMapProfileId		OBJECT-TYPE
+ 	SYNTAX		INTEGER	(1..65535)
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"Unique identifier for the frame cos map profile. The maximum allowed profiles 
+ 		on the device is equal to 4 at this time."
+ 	::= { wwpLeosDpTsFrameCosMapProfileEntry 1 }
+ 	
+ wwpLeosDpTsFrameCosMapProfileName	OBJECT-TYPE
+ 	SYNTAX		DisplayString (SIZE (1..15))
+ 	MAX-ACCESS	read-create
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"Name of the frame cos map profile." 			
+ 	::= { wwpLeosDpTsFrameCosMapProfileEntry 2 }
+ 	
+ wwpLeosDpTsFrameCosMapRowStatus		OBJECT-TYPE
+ 	SYNTAX		RowStatus
+ 	MAX-ACCESS	read-create
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"Setting this object to createAndGo creates a frame cos map profile. Setting the object
+ 		to destroy deletes a frame cos map profile."
+ 	::= { wwpLeosDpTsFrameCosMapProfileEntry 3 }       
+
+wwpLeosDpTsFrameCosMapTable		OBJECT-TYPE
+ 	SYNTAX		SEQUENCE OF WwpLeosDpTsFrameCosMapEntry
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"Conceptual table which represents the resolved cos to dot1d cos map for a given profile."
+ 	::= { wwpLeosDpTsFrameCosMapping 2 }
+ 	
+ wwpLeosDpTsFrameCosMapEntry	OBJECT-TYPE
+ 	SYNTAX		WwpLeosDpTsFrameCosMapEntry
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"An entry in the wwpLeosDpTsRCosToFrameCosMapTable."    
+ 	INDEX	{ wwpLeosDpTsFrameCosMapProfileId, wwpLeosDpTsFrameCosMapRCosValue, wwpLeosDpTsFrameCosMapRColorValue } 
+ 	::= { wwpLeosDpTsFrameCosMapTable 1 }
+ 	
+ WwpLeosDpTsFrameCosMapEntry	::= SEQUENCE {
+   wwpLeosDpTsFrameCosMapRCosValue        Integer32,
+   wwpLeosDpTsFrameCosMapRColorValue      DpTsRCosMappingColor,
+   wwpLeosDpTsFrameCosMapDot1dValue       Integer32,
+   wwpLeosDpTsFrameCosMapDot1dDeiValue    Integer32,
+   wwpLeosDpTsFrameCosMapMplsTcValue      Integer32
+ }
+ 
+ wwpLeosDpTsFrameCosMapRCosValue	OBJECT-TYPE
+ 	SYNTAX		Integer32 (0..7)
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"The resolved COS value."
+ 	::= { wwpLeosDpTsFrameCosMapEntry 1 }
+ 	
+ wwpLeosDpTsFrameCosMapRColorValue	OBJECT-TYPE
+ 	SYNTAX		DpTsRCosMappingColor
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 	"The corresponding resolved color value. Green (1) and Yellow(2) get 
+	 mapped to the dot1d COS/CFI/DEI value."
+ 	::= { wwpLeosDpTsFrameCosMapEntry 2 }
+ 
+ wwpLeosDpTsFrameCosMapDot1dValue		OBJECT-TYPE
+ 	SYNTAX		Integer32 (0..7)
+ 	MAX-ACCESS	read-write
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"The dot1d COS value for the outgoing frame"
+ 	::= { wwpLeosDpTsFrameCosMapEntry 3 }
+ 
+ wwpLeosDpTsFrameCosMapDot1dDeiValue		OBJECT-TYPE
+ 	SYNTAX		Integer32 (0..1)
+ 	MAX-ACCESS	read-write
+ 	STATUS		current
+ 	DESCRIPTION
+ 	"The outgoing frame CFI/DEI frame marking. Green (0), Yellow(1) in the CFI/DEI bit position 
+	  of the frame represents the frame's outgoing color"
+ 	::= { wwpLeosDpTsFrameCosMapEntry 4 }
+
+ wwpLeosDpTsFrameCosMapMplsTcValue		OBJECT-TYPE
+ 	SYNTAX		Integer32 (0..7)
+ 	MAX-ACCESS	read-write
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"The MPLS TC value for the outgoing frame"
+ 	::= { wwpLeosDpTsFrameCosMapEntry 5 }
+
+
+  END

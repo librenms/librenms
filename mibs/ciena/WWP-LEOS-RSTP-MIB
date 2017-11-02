@@ -1,0 +1,561 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-RSTP-MIB.my
+ --
+ --
+
+ WWP-LEOS-RSTP-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY			
+	    FROM SNMPv2-SMI			
+   TruthValue, RowStatus, TEXTUAL-CONVENTION, DisplayString, MacAddress		
+	    FROM SNMPv2-TC
+   dot1dStpPort
+            FROM BRIDGE-MIB 						
+   dot1dStpPortOperEdgePort
+   			FROM RSTP-MIB
+   wwpModules, wwpModulesLeos		
+	    FROM WWP-SMI;
+	
+	
+ wwpLeosRstpMIB MODULE-IDENTITY
+	    LAST-UPDATED "201108020000Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "  Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+            DESCRIPTION
+		    "Deprecated wwpLeosRstpPvstBpduReceivedNotification."
+            REVISION    "201108020000Z"
+	    DESCRIPTION
+		    "The MIB module for the WWP RstpMib specific information."
+	    REVISION    "200104031700Z"
+	    DESCRIPTION
+		    "Initial creation."
+	    ::= { wwpModulesLeos 13 }
+						
+ --
+ -- Node definitions
+ --
+	
+ wwpLeosRstpMIBObjects OBJECT IDENTIFIER ::= { wwpLeosRstpMIB 1 }
+
+ wwpLeosRstpDomain OBJECT IDENTIFIER ::= { wwpLeosRstpMIBObjects 1 }
+ wwpLeosRstpPortExt OBJECT IDENTIFIER ::= { wwpLeosRstpMIBObjects 2 }
+ wwpLeosRstpLocalPortExt OBJECT IDENTIFIER ::= { wwpLeosRstpMIBObjects 3 }
+ 
+ -- Notifications 
+  
+ wwpLeosRstpMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpLeosRstpMIB 2 } 
+ wwpLeosRstpMIBNotifications    OBJECT IDENTIFIER ::=    { wwpLeosRstpMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpLeosRstpMIBConformance OBJECT IDENTIFIER ::= { wwpLeosRstpMIB 3 } 
+ wwpLeosRstpMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosRstpMIBConformance 1 } 		
+ wwpLeosRstpMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosRstpMIBConformance 2 } 
+
+ wwpLeosRstpMode   OBJECT-TYPE
+     SYNTAX         INTEGER {	
+			unknown(1),
+			rstp(2),
+			domain(3),
+			mstp(4)
+		    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "This object sets the mode to rstp, domain, or mstp mode.
+	      If the selected mode is not supported by the device, an
+	      SNMP error will be returned and the value of this object
+	      will remain unchanged."
+     ::= { wwpLeosRstpDomain 1 }
+
+  wwpLeosRstpDomainTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosRstpDomainEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of Rstp Domain."
+     ::= { wwpLeosRstpDomain 2 }
+		
+ wwpLeosRstpDomainEntry OBJECT-TYPE
+     SYNTAX       WwpLeosRstpDomainEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Rstp domain entry in the rstp domain table."
+     INDEX { wwpLeosRstpDomainId }
+     ::= { wwpLeosRstpDomainTable 1 } 
+
+ WwpLeosRstpDomainEntry ::= SEQUENCE { 
+     wwpLeosRstpDomainId        INTEGER,
+     wwpLeosRstpDomainName	   DisplayString,
+     wwpLeosRstpDomainStatus   RowStatus
+  }
+
+ wwpLeosRstpDomainId   OBJECT-TYPE
+     SYNTAX         INTEGER (0..65535) 
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "Domain Id used as an index in the rstp domain. Domain id starts at 0."
+     ::= { wwpLeosRstpDomainEntry 1 }
+ 
+ wwpLeosRstpDomainName   OBJECT-TYPE
+     SYNTAX         DisplayString
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+	     "The name of the domain."
+     ::= { wwpLeosRstpDomainEntry 2 }
+ 
+ wwpLeosRstpDomainStatus   OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+	     "To create a row in this table, the snmp manager must
+	      set this object to 'createAndGo'. To delete the entry 
+	      set it to delete."
+     ::= { wwpLeosRstpDomainEntry 3 }
+ 
+ --
+ -- RSTP Port Membership table 
+ --
+ wwpLeosRstpDomainMemTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosRstpDomainMemEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of Rstp Domain."
+     ::= { wwpLeosRstpDomain 3 }
+		
+ wwpLeosRstpDomainMemEntry OBJECT-TYPE
+     SYNTAX       WwpLeosRstpDomainMemEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Rstp domain member entry."
+     INDEX { wwpLeosRstpDomainId, wwpLeosRstpDomainPortId}
+     ::= { wwpLeosRstpDomainMemTable 1 } 
+
+ WwpLeosRstpDomainMemEntry ::= SEQUENCE { 
+     wwpLeosRstpDomainPortId	INTEGER,     
+     wwpLeosRstpDomainMemStatus	RowStatus
+ }
+
+ wwpLeosRstpDomainPortId   OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535) 
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "Port ID for the instance.  Port ID's start at 1, 
+	      and may not be consecutive for each additional port. 
+	      This port Id should refer to the dot1dBasePort in the 
+	      Dot1dBasePortEntry."
+     ::= { wwpLeosRstpDomainMemEntry 1 } 
+ 
+ wwpLeosRstpDomainMemStatus   OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+	     "To add a port to the domain create a row in this table, 
+	      by setting this object to 'createAndGo'. To remove the port
+	      from the domain set this object to delete."
+     ::= { wwpLeosRstpDomainMemEntry 2 }
+
+ --
+ -- RSTP domain attributes table table 
+ --
+
+ wwpLeosRstpBridgeDomainAttrs OBJECT IDENTIFIER ::= { wwpLeosRstpDomain 4 }
+
+ wwpLeosRstpDomainAttrsForceVer   OBJECT-TYPE
+     SYNTAX         INTEGER {
+			stp(0),
+			notDefined(1),
+			rstp(2) 
+		    }
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This attribute specifies the domain version to rstp or stp."
+     ::= { wwpLeosRstpBridgeDomainAttrs 1 } 
+
+ wwpLeosRstpDomainAttrsForwardDelay   OBJECT-TYPE
+     SYNTAX         INTEGER (4..30)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "This attribute specifies the forward delay for rstp domain."
+     ::= { wwpLeosRstpBridgeDomainAttrs 2 }
+ 
+ wwpLeosRstpDomainAttrsHelloTime   OBJECT-TYPE
+     SYNTAX         INTEGER (1..10)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "This attribute specifies the hello time for the rstp domain."
+     ::= { wwpLeosRstpBridgeDomainAttrs 3 }
+ 
+ wwpLeosRstpDomainAttrsLoopBackBlock   OBJECT-TYPE
+     SYNTAX         INTEGER {
+			disable(1),
+			enable(2)
+		    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "This object specifies if loopback port blocking feature is 
+	      enabled/disabled."
+     ::= { wwpLeosRstpBridgeDomainAttrs 4 }
+    
+ wwpLeosRstpDomainAttrsMaxAge   OBJECT-TYPE
+     SYNTAX         INTEGER (6..40)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "This object specifies the max age time for the rstp domain."
+     ::= { wwpLeosRstpBridgeDomainAttrs 5 }
+ 
+ wwpLeosRstpDomainAttrsPathCostDef   OBJECT-TYPE
+     SYNTAX         INTEGER (1..2)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "This object specifies the path cost. if it is 1 then it is 8021d 
+	      else it is 8021t."
+     ::= { wwpLeosRstpBridgeDomainAttrs 6 }
+
+wwpLeosRstpDomainAttrsPriority   OBJECT-TYPE
+     SYNTAX         INTEGER (0..15)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "Setting this object will set the rstp domain priority."
+     ::= { wwpLeosRstpBridgeDomainAttrs 7 }
+ 
+wwpLeosRstpDomainAttrsTxHoldCount   OBJECT-TYPE
+     SYNTAX         INTEGER (1..10)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "This object specifies the tx hold count for a domain."
+     ::= { wwpLeosRstpBridgeDomainAttrs 8 }
+ --
+ -- Domain Attributes
+ --
+  wwpLeosRstpDomainAttrTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosRstpDomainAttrEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of each Rstp Domain."
+     ::= { wwpLeosRstpDomain 5 }
+		
+ wwpLeosRstpDomainAttrEntry OBJECT-TYPE
+     SYNTAX       WwpLeosRstpDomainAttrEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Rstp domain attributes entry."
+     INDEX { wwpLeosRstpDomainId }
+     ::= { wwpLeosRstpDomainAttrTable 1 } 
+
+ WwpLeosRstpDomainAttrEntry ::= SEQUENCE { 
+     wwpLeosRstpDomainAttrDesignatedBridgePri	INTEGER,
+     wwpLeosRstpDomainAttrDesignatedBridgeMac	MacAddress,
+     wwpLeosRstpDomainAttrDesignatedRootPri	INTEGER,
+     wwpLeosRstpDomainAttrDesignatedRootMac	MacAddress,
+     wwpLeosRstpDomainAttrRootCost		INTEGER,
+     wwpLeosRstpDomainAttrRootPort		INTEGER,
+     wwpLeosRstpDomainAttrMaxAge		INTEGER,
+     wwpLeosRstpDomainAttrHelloTime		INTEGER,
+     wwpLeosRstpDomainAttrHoldTime		INTEGER,
+     wwpLeosRstpDomainAttrForwardDelay		INTEGER,
+     wwpLeosRstpDomainAttrPriority		INTEGER
+ }
+
+ wwpLeosRstpDomainAttrDesignatedBridgePri   OBJECT-TYPE
+     SYNTAX         INTEGER (0..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This attribute specifies the designated bridge priority for specified domain.
+	      This attribute represents the first two octets of the (8 octet
+ 	      long) designated bridge ID. The writable portion of these two octets is the first 3 bits 
+	      starting from least significant bit."
+     ::= { wwpLeosRstpDomainAttrEntry 1 } 
+ 
+ wwpLeosRstpDomainAttrDesignatedBridgeMac   OBJECT-TYPE
+     SYNTAX         MacAddress
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This attribute specifies the designated bridge mac address for specified domain."
+     ::= { wwpLeosRstpDomainAttrEntry 2 } 
+
+ wwpLeosRstpDomainAttrDesignatedRootPri   OBJECT-TYPE
+     SYNTAX         INTEGER (0..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This attribute specifies the designated root priority for specified domain.
+	      This attribute represents the first two octets of the (8 octet
+ 	      long) designated root bridge ID. The writable portion of these two octets 
+	      is the first 3 bits starting from least significant bit."
+     ::= { wwpLeosRstpDomainAttrEntry 3 }
+ 
+ wwpLeosRstpDomainAttrDesignatedRootMac   OBJECT-TYPE
+     SYNTAX         MacAddress
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This attribute specifies the designated root mac address for specified domain."
+     ::= { wwpLeosRstpDomainAttrEntry 4 }
+
+ wwpLeosRstpDomainAttrRootCost   OBJECT-TYPE
+     SYNTAX         INTEGER (0..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This attribute specifies the root cost for specified domain."
+     ::= { wwpLeosRstpDomainAttrEntry 5 }
+ 
+ wwpLeosRstpDomainAttrRootPort   OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This attribute specifies the designated port for specified domain."
+     ::= { wwpLeosRstpDomainAttrEntry 6 }
+
+  wwpLeosRstpDomainAttrMaxAge   OBJECT-TYPE
+     SYNTAX         INTEGER (6..40)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This attribute specifies the max age for specified domain."
+     ::= { wwpLeosRstpDomainAttrEntry 7 }
+
+  wwpLeosRstpDomainAttrHelloTime   OBJECT-TYPE
+     SYNTAX         INTEGER (1..10)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This attribute specifies the hello time for specified domain."
+     ::= { wwpLeosRstpDomainAttrEntry 8 }
+
+   wwpLeosRstpDomainAttrHoldTime   OBJECT-TYPE
+     SYNTAX         INTEGER (0..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This attribute specifies the hold time for specified domain."
+     ::= { wwpLeosRstpDomainAttrEntry 9 }
+
+   wwpLeosRstpDomainAttrForwardDelay   OBJECT-TYPE
+     SYNTAX         INTEGER (4..30)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This attribute specifies the forward delay for specified domain."
+     ::= { wwpLeosRstpDomainAttrEntry 10 } 
+ 
+ wwpLeosRstpDomainAttrPriority   OBJECT-TYPE
+     SYNTAX         INTEGER (0..15)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "This attribute specifies the domain priority for given domain."
+     ::= { wwpLeosRstpDomainAttrEntry 11 }  
+     
+--
+-- Rstp Max Age Event Interval
+--
+  wwpLeosRstpMaxAgeEventInterval   OBJECT-TYPE
+     SYNTAX         INTEGER (60..3600)	
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "This object defines how often the events relating to
+	     Max Age BPDU's being Sent or Received will be generated.
+	     It is the number of seconds that must pass between events."
+     ::= { wwpLeosRstpDomain 6 }
+
+--
+-- Rstp PortInfo
+--
+  wwpLeosRstpPortInfoTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosRstpPortInfoEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table that contains additional information about each port.
+	      This table is extension of dot1dStpPortTable."
+     ::= { wwpLeosRstpPortExt 1 }
+		
+ wwpLeosRstpPortInfoEntry OBJECT-TYPE
+     SYNTAX       WwpLeosRstpPortInfoEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Rstp port information entry."
+     INDEX { wwpLeosRstpPortId }
+     ::= { wwpLeosRstpPortInfoTable 1 } 
+
+ WwpLeosRstpPortInfoEntry ::= SEQUENCE { 
+     wwpLeosRstpPortId			INTEGER,
+     wwpLeosRstpPortDesiginatedId	MacAddress,
+     wwpLeosRstpPortDesiginatedPid	OCTET STRING,
+     wwpLeosRstpPortDynPathCostState	INTEGER
+ }
+ 
+ wwpLeosRstpPortId   OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This is the port num used as index in the table. Value of this port id is same 
+	      as dot1dStpPort."
+     ::= { wwpLeosRstpPortInfoEntry 1 } 
+
+ wwpLeosRstpPortDesiginatedId   OBJECT-TYPE
+     SYNTAX         MacAddress
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This attribute specifies the designated id for the given port."
+     ::= { wwpLeosRstpPortInfoEntry 2 } 
+
+ wwpLeosRstpPortDesiginatedPid   OBJECT-TYPE
+     SYNTAX         OCTET STRING (SIZE (2))
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "This attribute specifies the designated id for the given port."
+     ::= { wwpLeosRstpPortInfoEntry 3 }   
+--
+-- Rstp Ext PortInfo
+--
+  wwpLeosRstpLocalPortInfoTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosRstpLocalPortInfoEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table that contains additional local information about 
+	      each port. This table is also extension of dot1dStpPortTable."
+     ::= { wwpLeosRstpLocalPortExt 1 }
+		
+ wwpLeosRstpLocalPortInfoEntry OBJECT-TYPE
+     SYNTAX       WwpLeosRstpLocalPortInfoEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Rstp local port information entry."
+     INDEX { wwpLeosRstpPortId }
+     ::= { wwpLeosRstpLocalPortInfoTable 1 } 
+
+ WwpLeosRstpLocalPortInfoEntry ::= SEQUENCE {      
+     wwpLeosRstpPortDynPathCostState	INTEGER
+ }
+ 
+ wwpLeosRstpPortDynPathCostState OBJECT-TYPE
+     SYNTAX         INTEGER {
+			 disabled(1),
+			 enabled(2)
+			 }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+	     "This attribute enable | disable dynamic path cost for the given port.
+	      Before setting dot1dStpPortPathCost user must set 
+	      wwpLeosRstpPortDynPathCostState = disabled."
+     ::= { wwpLeosRstpLocalPortInfoEntry 1 }
+
+ --
+ -- Notifications
+ --
+ wwpLeosRstpPortBackupNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     dot1dStpPort		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosRstpPortBackupNotification is sent whenever 
+		 device detects self loop i.e. same cable connected to 
+		 two ports on the same device."		 
+	::= { wwpLeosRstpMIBNotifications 1 }
+ 
+ wwpLeosRstpPvstBpduReceivedNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     dot1dStpPort		
+		}
+	STATUS	deprecated
+	DESCRIPTION
+		"A wwpLeosRstpPvstBpduReceivedNotification is sent whenever 
+		 PVST BPDU is received on the port. This trap is sent out 
+		 every minute."
+	::= { wwpLeosRstpMIBNotifications 2 }
+
+ wwpLeosRstpSelfLoopNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     dot1dStpPort		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosRstpSelfLoopNotification is sent whenever 
+		 device detects same cable connected to a port in a loop back.
+		 Also if loop-back blocking is enabled on the device then
+		 rstp will block this port (self disable)."
+	::= { wwpLeosRstpMIBNotifications 3 }
+
+ wwpLeosRstpPortOperEdgeNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     dot1dStpPort,
+		     dot1dStpPortOperEdgePort		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosRstpPortOperEdgeNotification trap is sent whenever 
+		 device detects a port Rstp OperEdge change."
+	::= { wwpLeosRstpMIBNotifications 4 }
+ 
+ wwpLeosRstpPortFlapNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     dot1dStpPort		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosRstpPortFlapNotification trap is sent whenever 
+		 device detects a port flapping. 
+		 
+		 Trap is generated under following criteria.
+		 If device detects port flapped more than once within 1 minute timer period and 
+		 it has not sent trap within last 5 minutes then it will generate this trap."
+	::= { wwpLeosRstpMIBNotifications 5 }
+               
+ wwpLeosRstpBridgeRootPortLostNotification NOTIFICATION-TYPE
+	OBJECTS	{                
+		     dot1dStpPort		
+		}
+	STATUS	current
+	DESCRIPTION
+		"A wwpLeosRstpBridgeRootPortLostNotification trap is sent whenever 
+		 device detects that bridge root port is lost. 
+		 
+		 This trap will indicate either the link failure or link partner RSTP disabled."
+	::= { wwpLeosRstpMIBNotifications 6 }
+
+ END
+
+ --
+ -- WWP-RSTP-MIB
+ --

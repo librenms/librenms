@@ -1,0 +1,371 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+
+ --
+ -- WWP-LEOS-BLADE-MIB.my
+ --
+
+ WWP-LEOS-BLADE-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   Unsigned32, TimeTicks, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+	    FROM SNMPv2-SMI			
+   DisplayString, MacAddress, RowStatus, DateAndTime			
+	    FROM SNMPv2-TC						
+   wwpModulesLeos			
+	    FROM WWP-SMI;
+	
+	
+ wwpLeosBladeMIB MODULE-IDENTITY
+	    LAST-UPDATED "201110190000Z"
+	    ORGANIZATION "Ciena, Inc"
+	    CONTACT-INFO
+		    "   Mib Meister
+		  			115 North Sullivan Road
+					Spokane Valley, WA 99037
+		        	USA		 		
+		        	Phone:  +1 509 242 9000
+					Email:  support@ciena.com"
+       DESCRIPTION
+		    "Added new last reset reasons."
+	    REVISION    "201110190000Z"
+	    DESCRIPTION
+		    "The MIB module defines the managed objects for the blades 
+		    available on the WWP specific products."
+	    REVISION    "200203160000Z"
+	    DESCRIPTION
+		    "Initial creation."
+	    ::= { wwpModulesLeos 1 }
+						
+ --
+ -- Node definitions
+ --
+	
+ wwpLeosBladeMIBObjects OBJECT IDENTIFIER ::= { wwpLeosBladeMIB 1 }
+ 
+ -- 
+ --
+ wwpLeosBlade OBJECT IDENTIFIER ::= { wwpLeosBladeMIBObjects 1 }
+
+
+ -- Notifications 
+  
+ wwpLeosBladeMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpLeosBladeMIB 2 } 
+ wwpLeosBladeMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { wwpLeosBladeMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpLeosBladeMIBConformance OBJECT IDENTIFIER ::= { wwpLeosBladeMIB 3 } 
+ wwpLeosBladeMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosBladeMIBConformance 1 } 		
+ wwpLeosBladeMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosBladeMIBConformance 2 }
+
+ --
+ --  The Blade Table
+ --
+
+ wwpLeosBladeTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosBladeEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the Blades configured/detected."
+    ::= { wwpLeosBlade 1 }
+
+ wwpLeosBladeEntry OBJECT-TYPE
+    SYNTAX     WwpLeosBladeEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the wwpLeosBladeTable."
+    INDEX      { wwpLeosBladeId }
+    ::= { wwpLeosBladeTable 1 }
+ 
+ WwpLeosBladeEntry ::= SEQUENCE {   
+    wwpLeosBladeId                INTEGER,
+    wwpLeosBladeType              INTEGER,
+    wwpLeosBladeCapFilename       DisplayString,
+    wwpLeosBladeAdminState        INTEGER,
+    wwpLeosBladeOperState         INTEGER,
+    wwpLeosBladeStartMacAddr      MacAddress,
+    wwpLeosBladeNumPorts          INTEGER,
+    wwpLeosBladeStatus            RowStatus
+ }
+
+ wwpLeosBladeId          OBJECT-TYPE
+     SYNTAX          INTEGER (1..65535)
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The object indicates the unique id for the blade."               
+     ::= { wwpLeosBladeEntry 1 }
+ 
+ wwpLeosBladeType   OBJECT-TYPE
+     SYNTAX          INTEGER {
+                        control(1),
+                        io(2),
+			fabric(3),
+			single(4)   
+                     }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The object indicates whether this is a control blade,
+	     a line blade or an uplink blade."               
+     ::= { wwpLeosBladeEntry 2 }
+ 
+ wwpLeosBladeCapFilename OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+	     "The capability file name (including the path, 
+	     if applicable) to be read from.
+             This is the file describing capabilities of the blade
+	     and is required to configure un unequipped blade or
+	     to add a new blade. Length of filename string must 
+             not exceed 255 alpha-numeric characters, no spaces 
+	     in filenames."
+     ::= { wwpLeosBladeEntry 3 }
+           
+ wwpLeosBladeAdminState   OBJECT-TYPE
+     SYNTAX          INTEGER {
+                        enable(1),
+                        disable(2)
+                     }
+     MAX-ACCESS      read-write
+     STATUS          current
+     DESCRIPTION
+    	     "The object indicates the desired state of the blade.
+	     The administrative state for control blades can be set to disabled
+	     only if the control blade has a functioning backup."
+     DEFVAL { enable }               
+     ::= { wwpLeosBladeEntry 4 }
+
+
+ wwpLeosBladeOperState   OBJECT-TYPE
+     SYNTAX          INTEGER {
+                        init(1),
+                        enabled(2),
+                        disabled(3),
+			faulted(4),
+			unequipped(5)
+                     }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The object indicates the operational state of the blade.
+	     If the blade is detected and the administrative state for 
+	     that blade is enabled, then the operational state of the 
+	     blade is 'enabled'. If the blade is detected, but the 
+	     administrative state is 'disabled', then the operational state 
+	     is also 'disabled'. A faulted state occurs when a fault or 
+	     communication failure is detected on a that is in either the 
+	     'enabled' or 'disabled' operation state. 
+             Any time a blade is removed, then the blade state transitions 
+	     to 'unequipped'. If a new blade replaces that blade state then 
+	     the state is determined by its administrative state once it is 
+	     detected ('enabled' or 'disabled')."               
+     ::= { wwpLeosBladeEntry 5 }
+ 
+ wwpLeosBladeStartMacAddr OBJECT-TYPE
+     SYNTAX       MacAddress		
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Base MAC address for the Blade, from which the
+ 	      mac addresses for the ports on this blade are derived."
+     ::= { wwpLeosBladeEntry 6 }
+ 
+ wwpLeosBladeNumPorts  OBJECT-TYPE
+     SYNTAX       INTEGER (1..65535)		
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+	     "The total number of physical ports present on this Blade." 
+     ::= { wwpLeosBladeEntry 7 }
+ 
+ wwpLeosBladeStatus  OBJECT-TYPE
+     SYNTAX       RowStatus		
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+	     "Used to manage the creation and deletion of the 
+	     conceptual rows in this table.
+	     
+	     To create a row in this table, a manager must
+             set this object to 'createAndGo'. 
+	     Object in the entry cannot be modified once the 
+	     wwpLeosBladeStatus is set to 'active'." 
+     ::= { wwpLeosBladeEntry 8 }
+
+ --
+ --  The Physical Blade Table
+ --
+
+ wwpLeosPhyBladeTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosPhyBladeEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the Blades detected(physically present)."
+    ::= { wwpLeosBlade 2 }
+
+ wwpLeosPhyBladeEntry OBJECT-TYPE
+    SYNTAX     WwpLeosPhyBladeEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the wwpLeosPhyBladeTable."
+    INDEX      { wwpLeosBladeId }
+    ::= { wwpLeosPhyBladeTable 1 }
+        
+ WwpLeosPhyBladeEntry ::= SEQUENCE { 
+    wwpLeosPhyBladeSysUpTime         TimeTicks,
+    wwpLeosPhyBladeSerialNum         DisplayString,
+    wwpLeosPhyBladeBoardRevision     DisplayString,
+    wwpLeosPhyBladePostResults       DisplayString,
+    wwpLeosPhyBladePostCode          Unsigned32,    
+    wwpLeosPhyBladeMfgDate           DateAndTime,
+    wwpLeosPhyBladeBoardDesc         DisplayString,
+    wwpLeosPhyBladeNumResets         Unsigned32,    
+    wwpLeosPhyBladeLastRebootReason  INTEGER,
+    wwpLeosPhyBladeRebootOperation   INTEGER    
+ }
+ 
+ wwpLeosPhyBladeSysUpTime   OBJECT-TYPE
+     SYNTAX             TimeTicks
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+	     "The time (in hundredths of a second) since the
+              blade was last re-initialized."  
+      ::= { wwpLeosPhyBladeEntry 1 }
+         
+ wwpLeosPhyBladeSerialNum  OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (0..127))
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+	     "Serial number of the blade, represented as a string."
+     ::= { wwpLeosPhyBladeEntry 2 }
+				
+ wwpLeosPhyBladeBoardRevision OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..127))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	     "Module board hardware revision represented as a string."
+     ::= { wwpLeosPhyBladeEntry 3 }		
+ 		  
+ wwpLeosPhyBladePostResults OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "The test result string generated by the POST tests for the blade."
+     ::= { wwpLeosPhyBladeEntry 4 }
+		
+ wwpLeosPhyBladePostCode OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	     "The result code returned by the device POST test."
+     ::= { wwpLeosPhyBladeEntry 5 }	
+ 		
+ wwpLeosPhyBladeMfgDate OBJECT-TYPE
+     SYNTAX      DateAndTime
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION	
+	     "The date that the blade was manufactured."
+     ::= { wwpLeosPhyBladeEntry 6 }
+		
+ wwpLeosPhyBladeBoardDesc OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "Board Description for the blade."
+     ::= { wwpLeosPhyBladeEntry 7 }
+		
+ 		
+ wwpLeosPhyBladeNumResets OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+	     "This object defines the number of times that the blade has
+	      been restarted."
+     ::= { wwpLeosPhyBladeEntry 8 }
+ 
+ wwpLeosPhyBladeLastRebootReason OBJECT-TYPE
+      SYNTAX            INTEGER {
+			     			unknown(1),
+			     			snmp(2),
+			     			pwrFail(3),
+			     			appLoad(4),
+			     			errorHandler(5),
+			     			watchdog(6),
+			     			upgrade(7),
+			     			cli(8),
+			     			resetButton(9),
+			     			serviceModeChange(10), 
+			     			guardianReboot(11),
+			     			guardianSaosRestart(12)
+			}
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+	      "Indicates the reason for the last reboot."
+      ::= { wwpLeosPhyBladeEntry 9 }
+      
+ wwpLeosPhyBladeRebootOperation OBJECT-TYPE
+     SYNTAX       	INTEGER {
+		       			none(1),
+		       			reboot(2),
+		       			rebootReinit(3),
+		       			rebootCustReinit(4)
+	          		}
+     MAX-ACCESS   	read-write
+     STATUS 		current
+     DESCRIPTION
+	     "Writing one of the specified values to this field causes
+	      the specified type of reboot to occur.  
+				
+	      none is the value returned when this leaf is queried.
+	      writing this value to the leaf will have no effect.
+				
+	      'reboot' option causes the system to reboot and restart using
+	      its current configuration.
+				
+	      'rebootReinit' option causes the module to erase all user configuration 
+	       data and reset to factory default settings.							
+	       			 
+	       'rebootCustReinit' option causes the module to replace the current
+	        configuration with a customer supplied default, then reboot."							
+      DEFVAL { none }
+      ::= { wwpLeosPhyBladeEntry 10 } 
+
+ wwpLeosBladeStateChange  NOTIFICATION-TYPE
+        OBJECTS	   {	wwpLeosBladeId, 
+                        wwpLeosBladeOperState                         
+		   }
+	STATUS	   current
+	DESCRIPTION
+		"A wwpLeosPhyBladeUpDown notification is sent whenever the operational
+                state of the blade is changed."
+	::= { wwpLeosBladeMIBNotifications 1 }
+	
+ wwpLeosBladePostFail  NOTIFICATION-TYPE
+        OBJECTS	   {	wwpLeosBladeId,
+	                wwpLeosPhyBladePostCode                         
+		   }
+	STATUS	   current
+	DESCRIPTION
+		"A wwpLeosBladePostFail notification is sent if the
+                blade post tests are failed."
+	::= { wwpLeosBladeMIBNotifications 2 }
+
+ END	
+ 

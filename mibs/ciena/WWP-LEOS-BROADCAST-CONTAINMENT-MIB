@@ -1,0 +1,373 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-BROADCAST-CONTAINMENT-MIB.my
+ --
+ --
+
+ WWP-LEOS-BROADCAST-CONTAINMENT-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+   Integer32, Unsigned32, Counter32, Counter64, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+	FROM SNMPv2-SMI			
+   DisplayString, TEXTUAL-CONVENTION, TruthValue, RowStatus			
+	FROM SNMPv2-TC
+   wwpModulesLeos			
+	FROM WWP-SMI;
+
+	
+ wwpLeosBroadcastContainmentMIB MODULE-IDENTITY
+	 LAST-UPDATED "201203080000Z"
+	 ORGANIZATION "Ciena, Inc"
+	 CONTACT-INFO
+		  "   Mib Meister
+		      115 North Sullivan Road
+		      Spokane Valley, WA 99037
+		      USA		 		
+		      Phone:  +1 509 242 9000
+		      Email:  support@ciena.com"
+	  DESCRIPTION
+	          "This MIB module is for the Broadcast containment for WWP Products"
+
+      REVISION    "201203080000Z"
+      DESCRIPTION
+              "Added wwpLeosBroadcastContainmentIgnoreRapsMessages"
+      REVISION    "201203020000Z"               
+      DESCRIPTION
+              "Added wwpLeosBroadcastContainmentResourceMode and
+               wwpLeosBroadcastContainmentBytesDroppedStats"
+      REVISION    "200902050000Z"               
+      DESCRIPTION
+              "Added wwpLeosBroadcastContainmentFilterName to the notification for 
+               wwpLeosBcastThresholdExceed and  wwpLeosBcastThresholdNormal."
+	  REVISION    "200806250000Z"
+	  DESCRIPTION
+      	       "Defect 25528 - Increase wwpLeosBroadcastContainmentFilterName octet
+      	        length to 16 characters (15 plus a null byte)."
+      REVISION    "200806182100Z"
+      DESCRIPTION
+               "Add new objects to support global enable/disable and time setting"
+      REVISION    "200706022100Z"
+	  DESCRIPTION
+      	          "Initial creation."
+
+	  ::= { wwpModulesLeos 8 }
+
+
+ --
+ -- Node definitions
+ --
+	
+ wwpLeosBroadcastContainmentMIBObjects OBJECT IDENTIFIER ::= { wwpLeosBroadcastContainmentMIB 1 }
+ 
+  -- Notifications 
+  
+ wwpLeosBroadcastContainmentMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpLeosBroadcastContainmentMIB 2 } 
+ wwpLeosBroadcastContainmentMIBNotifications  OBJECT IDENTIFIER ::= { wwpLeosBroadcastContainmentMIBNotificationPrefix 1 } 
+ 
+ -- Conformance information 
+ 
+ wwpLeosBroadcastContainmentMIBConformance OBJECT IDENTIFIER ::= { wwpLeosBroadcastContainmentMIB 3 } 
+ wwpLeosBroadcastContainmentMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosBroadcastContainmentMIBConformance 1 } 		
+ wwpLeosBroadcastContainmentMIGroups      OBJECT IDENTIFIER ::= { wwpLeosBroadcastContainmentMIBConformance 2 }
+
+ WwpLeosBroadcastContainmentCapabilitiesMap ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+		"This bit mask shows the capability of the device. It shows that which index is valid
+		 wwpLeosBroadcastContainmentVlanId or wwpLeosBroadcastContainmentPortId"
+	SYNTAX BITS {
+			wwpLeosBroadcastContainmentVlanId(0),
+			wwpLeosBroadcastContainmentPortId(1)			
+	}
+
+--
+-- Global information
+-- 
+ 
+ wwpLeosBroadcastContainmentCapability OBJECT-TYPE
+      SYNTAX		WwpLeosBroadcastContainmentCapabilitiesMap
+      MAX-ACCESS	read-only
+      STATUS		current
+      DESCRIPTION
+	      "It shows which of the following (wwpLeosBroadcastContainmentPortId or wwpLeosBroadcastContainmentVlanId or both) can
+	       be used as an index in wwpLeosBroadcastContainmentFilterMemTable. If bit 0 of the bit mask (starting from right to left) 
+	       is set to 1 then wwpLeosBroadcastContainmentVlanId can be used as index. If bit 1 of the bit mask is set to 1 then 
+	       wwpLeosBroadcastContainmentPortId can be used as index. If both bits are set to 1 then both can be used as index."
+      ::= { wwpLeosBroadcastContainmentMIBObjects 1 }
+
+ wwpLeosBroadcastContainmentPktDroppedStats	OBJECT-TYPE
+      SYNTAX		Counter32
+      MAX-ACCESS	read-only
+      STATUS		current
+      DESCRIPTION
+	      "Displays the global dropped packets statistics for all VLANs and ports."
+      ::= { wwpLeosBroadcastContainmentMIBObjects 2 }
+
+ wwpLeosBroadcastContainmentGlobalStatus     OBJECT-TYPE
+     SYNTAX          INTEGER {
+                         enable(1),
+		         disable(2)
+		     }
+     MAX-ACCESS      read-write
+     STATUS          current
+     DESCRIPTION
+    	     "Setting this object to 'enable' will globally enable
+    	      broadcast-containment on the device. The default is enabled."
+     ::= { wwpLeosBroadcastContainmentMIBObjects 6  } 
+      
+ wwpLeosBroadcastContainmentGlobalTime  OBJECT-TYPE
+     SYNTAX          Integer32(10..2560)
+     UNITS           "milli-seconds"
+     MAX-ACCESS      read-write
+     STATUS          current     
+     DESCRIPTION
+             "The global broadcast containment sample or 
+              integration time. The default is 100ms."
+     ::= { wwpLeosBroadcastContainmentMIBObjects 7 }
+
+ wwpLeosBroadcastContainmentIgnoreRapsMessages     OBJECT-TYPE
+     SYNTAX          INTEGER {
+                         enable(1),
+                         disable(2)
+		     }
+     MAX-ACCESS      read-write
+     STATUS          current
+     DESCRIPTION
+            "When this object is enabled, all configured broadcast
+             containment filters will ignore R-APS messages when
+             filtering PDUs.  The default setting is disabled."
+     ::= { wwpLeosBroadcastContainmentMIBObjects 8  } 
+
+ wwpLeosBroadcastContainmentResourceMode  OBJECT-TYPE
+     SYNTAX          INTEGER {
+                         enable(1),
+                         disable(2)
+                     }     
+     MAX-ACCESS      read-write
+     STATUS          current     
+     DESCRIPTION
+             "Selects whether broadcast containment uses resource manager
+              resources. The selection of containment classification is
+              more limited when resource mode is disabled."
+     ::= { wwpLeosBroadcastContainmentMIBObjects 9 }
+
+ wwpLeosBroadcastContainmentBytesDroppedStats OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Displays the global dropped bytes statistics for all VLANs and
+           ports. Not supported by SAOS 4.x or earlier releases."
+      ::= { wwpLeosBroadcastContainmentMIBObjects 10 }
+
+--
+-- Filter table information
+-- 
+  
+ wwpLeosBroadcastContainmentFilterTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosBroadcastContainmentFilterEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of broadcast containment configuration."
+     ::= { wwpLeosBroadcastContainmentMIBObjects 4 }
+ 		
+ wwpLeosBroadcastContainmentFilterEntry OBJECT-TYPE
+     SYNTAX       WwpLeosBroadcastContainmentFilterEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Broadcast containment entry in the Broadcast Containment Table."
+     INDEX { wwpLeosBroadcastContainmentIndex }
+     ::= { wwpLeosBroadcastContainmentFilterTable 1 } 
+
+ WwpLeosBroadcastContainmentFilterEntry ::= SEQUENCE { 
+     wwpLeosBroadcastContainmentIndex			Integer32,
+     wwpLeosBroadcastContainmentFilterName		DisplayString,
+     wwpLeosBroadcastContainmentPktLimit			Integer32,     
+     wwpLeosBroadcastContainmentPktDropState		TruthValue,
+     wwpLeosBroadcastContainmentStatus			RowStatus,
+     wwpLeosBroadcastContainmentKbps			Integer32,
+     wwpLeosBroadcastContainmentClassifier      Unsigned32
+ }
+ 
+ wwpLeosBroadcastContainmentIndex OBJECT-TYPE
+      SYNTAX		Integer32 (1..4095)
+      MAX-ACCESS	read-only
+      STATUS		current
+      DESCRIPTION
+	      "Unique index into the table."
+      ::= { wwpLeosBroadcastContainmentFilterEntry 1 }
+ 
+ wwpLeosBroadcastContainmentFilterName OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE (1..15))
+      MAX-ACCESS	read-create
+      STATUS		current
+      DESCRIPTION
+	      "Specifies the name of the filter. If wwpLeosBroadcastContainmentFilterName is not set during  
+	       filter creation then filter will be created with no name. 
+	       Filter name can be set later by setting this object."
+      ::= { wwpLeosBroadcastContainmentFilterEntry 2 }
+  
+ wwpLeosBroadcastContainmentPktLimit OBJECT-TYPE
+     SYNTAX      Integer32 (0..104856000)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+             "The maximum number of broadcast packets which can be 
+	     received by this device. Setting this object to 0 will make the
+	     broadcast pkt limit as unlimited."
+     DEFVAL { 0 }
+     ::= { wwpLeosBroadcastContainmentFilterEntry 3 }
+ 
+ wwpLeosBroadcastContainmentPktDropState OBJECT-TYPE
+      SYNTAX		TruthValue
+      MAX-ACCESS	read-only
+      STATUS		current
+      DESCRIPTION
+	      "This object if True, specifies that packets were dropped for the 
+	       given filter since it was last read. If this object reads false 
+	       then no packet was dropped since it was last read."
+      ::= { wwpLeosBroadcastContainmentFilterEntry 4 }
+
+ wwpLeosBroadcastContainmentStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+	     "To create a row in this table, a manager must
+	      set this object to 'createAndGo'. To delete the 
+	      entry set this to destroy. To update this entry
+	      this object may not be set."
+     ::= { wwpLeosBroadcastContainmentFilterEntry 5 }
+     
+  wwpLeosBroadcastContainmentKbps  OBJECT-TYPE
+     SYNTAX      Integer32 (0..10000000)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+	     "The maximum number of broadcast packets which can be 
+	     received by this device."
+     ::= { wwpLeosBroadcastContainmentFilterEntry 6 }   
+     
+  wwpLeosBroadcastContainmentClassifier   OBJECT-TYPE
+  	 SYNTAX			Unsigned32
+  	 MAX-ACCESS		read-create
+  	 STATUS			current
+  	 DESCRIPTION
+        "The classifier type for the filter. The value of this object could be
+         any of the below or addition of any of the below:
+
+            ClassifierType_Unknown(0)
+            ClassifierType_Broadcast(1)
+            ClassifierType_UnknownL2Multicast(2)
+            ClassifierType_UnknownUnicast(4)
+            ClassifierType_UnknownIpMulticast(8)
+            ClassifierType_AllMultcast(16)
+
+        For example, if the user wants to set the classifier type for the
+        filter as broadcast+unknown_unicast, the value of the
+        object should be set as 5 (1 + 4). Similary if the preferred classifier
+        type is All_flooding, the value would be 15 (1+2+4+8).  By default, the
+        classifier type is 3 (broadcast + unknownL2Multicast).
+        
+        When resource mode is disabled, the only supported multicast option
+        is ClassifierType_AllMulticast. The L2 and IP multicast options are
+        controlled individually if resource mode is enabled."
+  	 DEFVAL			{3}
+  	 ::= { wwpLeosBroadcastContainmentFilterEntry	7 }
+
+--
+-- Filter member table
+-- 
+
+ wwpLeosBroadcastContainmentFilterMemTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosBroadcastContainmentFilterMemEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of broadcast containment membership."
+     ::= { wwpLeosBroadcastContainmentMIBObjects 5 }
+ 		
+ wwpLeosBroadcastContainmentFilterMemEntry OBJECT-TYPE
+     SYNTAX       WwpLeosBroadcastContainmentFilterMemEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Broadcast containment entry in the Broadcast Containment Table."
+     INDEX { wwpLeosBroadcastContainmentIndex, wwpLeosBroadcastContainmentVlanId, wwpLeosBroadcastContainmentPortId }
+     ::= { wwpLeosBroadcastContainmentFilterMemTable 1 } 
+
+ WwpLeosBroadcastContainmentFilterMemEntry ::= SEQUENCE { 
+     wwpLeosBroadcastContainmentVlanId		Integer32,
+     wwpLeosBroadcastContainmentPortId		Integer32,     
+     wwpLeosBroadcastContainmentFilterMemStatus	RowStatus
+ }
+ 
+ wwpLeosBroadcastContainmentVlanId OBJECT-TYPE
+      SYNTAX 		Integer32 (0..4095)
+      MAX-ACCESS	not-accessible
+      STATUS		current
+      DESCRIPTION
+	      "Unique index into the table. Depending on the capability of device 
+	       set this index to valid VLAN id or 0 for all vlans."
+      ::= { wwpLeosBroadcastContainmentFilterMemEntry 1 }
+ 
+ wwpLeosBroadcastContainmentPortId OBJECT-TYPE
+      SYNTAX Integer32 (0..4095)
+      MAX-ACCESS       not-accessible
+      STATUS           current
+      DESCRIPTION
+	      "Unique index into the table. Depending on the capability of device 
+	       set this index to valid port id or 0 for all ports."
+      ::= { wwpLeosBroadcastContainmentFilterMemEntry 2 }  
+ 
+ wwpLeosBroadcastContainmentFilterMemStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+	     "To create a row in this table, a manager must
+	      set this object to 'createAndGo'. To delete the 
+	      entry set this to destroy. To update this entry
+	      this object may not be set."
+     ::= { wwpLeosBroadcastContainmentFilterMemEntry 3 }
+
+--
+-- Notifications
+-- 
+
+ wwpLeosBcastThresholdExceed  NOTIFICATION-TYPE
+        OBJECTS	   {
+			wwpLeosBroadcastContainmentIndex,
+                        wwpLeosBroadcastContainmentFilterName
+
+		   }
+        STATUS	   current
+	DESCRIPTION
+		"A wwpLeosBcastThresholdExceed notification is sent 
+		when for given filter index, the number of broadcast 
+		packet received becomes greater than or equal to the 
+		configured packet limit, and the value of broadcast packet 
+		received at the last sampling interval was less than 
+		the configured packet limit."
+	::= { wwpLeosBroadcastContainmentMIBNotifications 1 }
+	
+ wwpLeosBcastThresholdNormal  NOTIFICATION-TYPE
+	OBJECTS	   {
+			wwpLeosBroadcastContainmentIndex,
+                        wwpLeosBroadcastContainmentFilterName
+		   }
+        STATUS	   current
+	DESCRIPTION
+	        "A wwpLeosBcastThresholdNormal notification is sent 
+		when for given filter index, the total number of 
+		broadcast packet received becomes less than the 
+		configured packet limit, and the value of broadcast 
+		packet received at the last sampling interval 
+		was greater than or equal to the configured packet limit." 
+	::= { wwpLeosBroadcastContainmentMIBNotifications 2 }
+	
+
+ END
+ 

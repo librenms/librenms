@@ -1,0 +1,652 @@
+-- This file was included in WWP MIB release 04-10-01-0027
+ --
+ -- WWP-LEOS-NTP-CLIENT-MIB.my
+ --
+ --
+
+ WWP-LEOS-NTP-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS                
+   IpAddress, Integer32, Unsigned32, OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY
+            FROM SNMPv2-SMI                     
+   TruthValue, DisplayString, RowStatus, TEXTUAL-CONVENTION             
+            FROM SNMPv2-TC
+   AddressFamilyNumbers
+            FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB
+   InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB
+   wwpModulesLeos                   
+            FROM WWP-SMI;
+        
+        
+ wwpLeosNtpClientMIB MODULE-IDENTITY
+            LAST-UPDATED "201209120000Z"
+            ORGANIZATION "Ciena, Inc"
+            CONTACT-INFO
+                    "   Mib Meister
+                        115 North Sullivan Road
+                        Spokane Valley, WA 99037
+                        USA                             
+                        Phone:  +1 509 242 9000
+                        Email:  support@ciena.com"
+            DESCRIPTION
+                    "This MIB module defines the managed objects
+                    for the NTP client on LEOS based WWP devices."
+            REVISION    "201209120000Z"
+            DESCRIPTION
+                    "Added the wwpLeosNtpClientSyncChangeNotifAdminState. 
+		    Changed wwpLeosNtpClientSyncState to read-only."
+            REVISION    "201205310000Z"
+            DESCRIPTION
+                    "Added the wwpLeosNtpMulticastTable."
+            REVISION    "201203270000Z"
+            DESCRIPTION
+                    "Add new MIB OIDs to support IP protocol version 
+                     independent Inet addressing.
+                     New attributes include: wwpLeosNtpServerResolvedInetAddr,
+                     wwpLeosNtpServerResolvedInetAddrType."
+	    REVISION  "201107050000Z"
+	    DESCRIPTION
+	            " Added new objects wwpLeosNtpClientDrift, wwpLeosNtpClientFastOffset,
+		      wwpLeosNtpClientSlowOffset, wwpLeosNtpClientNtpOffset, wwpLeosNtpServerState
+		      wwpLeosNtpClientNtpFastStartMode
+		      and deprecated wwpLeosNtpClientOffset."		
+            REVISION   "201103291200Z"
+            DESCRIPTION
+                    "Added client offset, delay and jitter attributes"
+            REVISION   "200805200000Z"  
+            DESCRIPTION
+                    "updated key to be non-accessible"
+            REVISION   "200712200000Z"
+            DESCRIPTION
+                    "Added the wwpLeosNtpAuthTable and  other objects 
+                    used for MD5 authentication"
+            REVISION    "200707151000Z" 
+            DESCRIPTION
+                    "Deprecated the wwpLeosNtpServerUserPri and the 
+                     wwpLeosNtpServerDhcpPri objects."
+            REVISION    "200304111700Z" 
+            DESCRIPTION
+                     "Initial creation."   
+            ::= { wwpModulesLeos 18 }
+
+
+ --
+ -- TextualConversions
+ --     
+                
+ Md5Key ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+            "Represents the textual convention which defines the 
+             name string and display hint"
+    SYNTAX       OCTET STRING (SIZE (1..32))    
+                
+ --
+ -- Node definitions
+ --
+        
+ wwpLeosNtpClientMIBObjects OBJECT IDENTIFIER ::= { wwpLeosNtpClientMIB 1 }
+ wwpLeosNtpClient OBJECT IDENTIFIER ::= { wwpLeosNtpClientMIBObjects 1 }   
+ wwpLeosNtpClientNotifAttrs OBJECT IDENTIFIER ::= { wwpLeosNtpClientMIBObjects 2 }
+ 
+
+ -- Notifications 
+  
+ wwpLeosNtpClientMIBNotificationPrefix  OBJECT IDENTIFIER ::= { wwpLeosNtpClientMIB 2 } 
+ wwpLeosNtpClientMIBNotifications    OBJECT IDENTIFIER ::=  
+                       { wwpLeosNtpClientMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ wwpLeosNtpClientMIBConformance OBJECT IDENTIFIER ::= { wwpLeosNtpClientMIB 3 } 
+ wwpLeosNtpClientMIBCompliances OBJECT IDENTIFIER ::= { wwpLeosNtpClientMIBConformance 1 }              
+ wwpLeosNtpClientMIBGroups      OBJECT IDENTIFIER ::= { wwpLeosNtpClientMIBConformance 2 }
+
+ wwpLeosNtpClientState OBJECT-TYPE
+     SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "Setting this object to 'enable' will enable the 
+              NTP client on Ciena devices."
+     ::= { wwpLeosNtpClient 1 }
+
+ wwpLeosNtpClientMode OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     polling(1),
+                     broadcast(2)                    
+                 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "Setting this object to 'broadcast' will cause the
+              client not to poll the NTP server at all. Instead, it 
+              will wait for configured NTP servers to broadcast 
+              their current time. When the client receives the first 
+              message, it will retrieve a reliable time from that 
+              server. If it is set to polling then device will
+              poll the NTP server."
+     ::= { wwpLeosNtpClient 2 } 
+     
+ wwpLeosNtpClientPollFreq        OBJECT-TYPE
+     SYNTAX      Integer32 (16..4096)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "The polling frequency at which NTP server will be polled
+             if the NTP client is configured to be in polling mode.
+             The value of this object should be multiple of 16.
+             The change in the NTP mode will only be effective 
+             when NTP client is enabled and should not be set at
+             the same time either Min or Max polling frequency is set."
+     ::= { wwpLeosNtpClient 3 }
+--
+-- NTP client table indexed
+--
+
+ wwpLeosNtpClientTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosNtpClientEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of NTP server information indexed by wwpLeosNtpServerIndex.
+              To create an entry in the table, use SNMP multiple set operation
+              and following objects must be set:
+              wwpLeosNtpServerAddr and wwpLeosNtpServerStatus.
+              To use MD5 authentication, wwpLeosNtpServerKeyId must be set at the time
+              of creation along with wwpLeosNtpServerAddr and wwpLeosNtpServerStatus,
+              otherwise no MD5 authentication will be used."
+     ::= { wwpLeosNtpClient 4 }
+                
+ wwpLeosNtpClientEntry OBJECT-TYPE
+     SYNTAX       WwpLeosNtpClientEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "An entry for each NTP server."
+     INDEX { wwpLeosNtpServerIndex }
+     ::= { wwpLeosNtpClientTable 1 }
+                 
+ WwpLeosNtpClientEntry ::= SEQUENCE {      
+     wwpLeosNtpServerIndex              Integer32,
+     wwpLeosNtpServerAddrType           AddressFamilyNumbers,
+     wwpLeosNtpServerAddr               DisplayString,
+     wwpLeosNtpServerResolvedAddr       IpAddress,
+     wwpLeosNtpServerUserPri            Integer32,
+     wwpLeosNtpServerDhcpPri            Integer32,
+     wwpLeosNtpServerUserAdminState     INTEGER,
+     wwpLeosNtpServerScope              INTEGER,     
+     wwpLeosNtpServerOperState          INTEGER,
+     wwpLeosNtpServerStatus             RowStatus,
+     wwpLeosNtpServerKeyId              Unsigned32,
+     wwpLeosNtpServerState              INTEGER,
+     wwpLeosNtpServerResolvedInetAddrType    InetAddressType,
+     wwpLeosNtpServerResolvedInetAddr        InetAddress
+ }
+
+ wwpLeosNtpServerIndex OBJECT-TYPE
+     SYNTAX       Integer32 (1..10)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Specifies the unique index of the entry."
+     ::= { wwpLeosNtpClientEntry 1 }
+ 
+  wwpLeosNtpServerAddrType OBJECT-TYPE
+     SYNTAX       AddressFamilyNumbers
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Specifies the type of address wwpLeosNtpServerAddr belongs to."
+     ::= { wwpLeosNtpClientEntry 2 }
+
+ wwpLeosNtpServerAddr OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "The IP address or host name of the NTP server."
+     ::= { wwpLeosNtpClientEntry 3 }     
+
+ wwpLeosNtpServerResolvedAddr OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specifies the resolved IP address if wwpLeosNtpServerAddr is set to host name.
+              If wwpLeosNtpServerAddr is set to IP address then wwpLeosNtpServerResolvedAddr 
+              will be the same as wwpLeosNtpServerAddr.
+              If the IP address is an IPv6, this OID will be set to 0.0.0.0 and the
+              wwpLeosNtpServerAddrType will be set to other(0)."
+     ::= { wwpLeosNtpClientEntry 4 }
+
+ wwpLeosNtpServerUserPri OBJECT-TYPE
+     SYNTAX       Integer32 (1..10)
+     MAX-ACCESS   read-write
+     STATUS       deprecated
+     DESCRIPTION
+             "This object is no longer implemented as the NTP client determines the server's
+              relative priority or preference relative to other configured servers. Reads will
+              always return 1 and writes will be quietly ignored. This object was once used to
+              specify the user priority of the wwpLeosNtpServerAddr."
+     ::= { wwpLeosNtpClientEntry 5 } 
+
+ wwpLeosNtpServerDhcpPri OBJECT-TYPE
+     SYNTAX       Integer32 (1..10)
+     MAX-ACCESS   read-only
+     STATUS       deprecated
+     DESCRIPTION
+             "This object is no longer implemented as the NTP client determines the server's
+              relative priority or preference relative to other configured servers. Reads will
+              always return 1 and writes will quietly be ignored. This object was once used to
+              specify the dhcp priority of the wwpLeosNtpServerAddr."
+     ::= { wwpLeosNtpClientEntry 6 }
+ 
+ wwpLeosNtpServerUserAdminState OBJECT-TYPE
+     SYNTAX       INTEGER {
+                                enabled(1),
+                                disabled(2)
+                        }
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "This object is used to specify the user admin state of the 
+              wwpLeosNtpServerAddr."
+     ::= { wwpLeosNtpClientEntry 7 }
+
+  wwpLeosNtpServerScope OBJECT-TYPE
+     SYNTAX       INTEGER {
+                        user(1),
+                        dhcp(2),
+                        both(3)
+                        }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object is used to specify the scope for the entry.
+              It specifies if the entry is configured by dhcp/user/both."
+     ::= { wwpLeosNtpClientEntry 8 }
+  
+  wwpLeosNtpServerOperState OBJECT-TYPE
+     SYNTAX       INTEGER {
+                        enabled(1),
+                        disabled(2),
+                        notConfigured(3)
+                        }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object is used to specify the operational state of the 
+              wwpLeosNtpServerAddr."
+     ::= { wwpLeosNtpClientEntry 9 }
+ 
+  wwpLeosNtpServerStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+             "To create a row in this table, a manager must
+             set this object to 'createAndGo'. The server 
+             added will only be effective when NTP client is 
+             enabled.
+             To create entry in the table use SNMP multiple set operation
+             and following objects must be set 
+             wwpLeosNtpServerAddr and wwpLeosNtpServerStatus."
+     ::= { wwpLeosNtpClientEntry 10 }
+
+   wwpLeosNtpServerKeyId OBJECT-TYPE
+     SYNTAX       Unsigned32 (0..4294967295)
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "This object is used to specify the MD5 key ID that that the server 
+	     will use.  A 0 key ID implies no MD5 key."
+     ::= { wwpLeosNtpClientEntry 11 }  
+   wwpLeosNtpServerState OBJECT-TYPE
+   	SYNTAX			INTEGER {
+   						reject(1),
+   						insane(2),
+   						correct(3),
+   						standby(4),
+   						candidate(5),
+   						selected(6),
+   						syspeer(7),
+   						ppspeer(8),
+   						reaching(255),
+   						error(256)
+   					}
+   	MAX-ACCESS		read-only
+   	STATUS			current
+   	DESCRIPTION   	"This object reflects the current connection status of
+   					the server."
+   	::= { wwpLeosNtpClientEntry 12 }
+
+   wwpLeosNtpServerResolvedInetAddrType OBJECT-TYPE
+     SYNTAX       InetAddressType
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specifies the type of address wwpLeosNtpServerResolvedInetAddr belongs to.
+              When set to:
+                ipv4 : wwpLeosNtpServerResolvedInetAddr should be compliant with 
+                       InetAddressIPv4 from RFC 4001
+                ipv6 : wwpLeosNtpServerResolvedInetAddr should be compliant with
+                       InetAddressIPv6 from RFC 4001."
+     ::= { wwpLeosNtpClientEntry 13 }
+
+   wwpLeosNtpServerResolvedInetAddr OBJECT-TYPE
+     SYNTAX       InetAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specifies the resolved IP address if wwpLeosNtpServerAddr is set to host name.
+              If wwpLeosNtpServerAddr is set to IP address then wwpLeosNtpServerResInetAddr 
+              will be the same as wwpLeosNtpServerAddr.
+              The InetAddress specified here will be compliant with RFC 4001."
+     ::= { wwpLeosNtpClientEntry 14 }
+
+
+--
+-- NTP client authentication table indexed
+-- 
+ wwpLeosNtpAuthTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF WwpLeosNtpAuthEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the key-id and MD5 key."  
+     ::= { wwpLeosNtpClient 5  }
+                
+ wwpLeosNtpAuthEntry OBJECT-TYPE
+     SYNTAX      WwpLeosNtpAuthEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the wwpLeosNtpAuthTable."
+     INDEX { wwpLeosNtpAuthKeyId }
+     ::= { wwpLeosNtpAuthTable 1 }
+                
+ WwpLeosNtpAuthEntry ::=  SEQUENCE {      
+     wwpLeosNtpAuthKeyId                Unsigned32,
+     wwpLeosNtpAuthMd5Key               Md5Key,
+     wwpLeosNtpAuthRowStatus            RowStatus,
+     wwpLeosNtpAuthMD5KeyEnc            Md5Key
+ }
+
+ wwpLeosNtpAuthKeyId OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..4294967295)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the key ID.
+            It is also used as index in the table." 
+     ::= { wwpLeosNtpAuthEntry 1 }
+
+ wwpLeosNtpAuthMd5Key OBJECT-TYPE
+     SYNTAX       Md5Key  (SIZE(1..31))
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+              "Used to specify the MD5 key to use with this key identifier."
+     ::= {wwpLeosNtpAuthEntry 2 }
+
+ wwpLeosNtpAuthRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+             "To create a row in this table, a manager must
+             set this object to 'createAndGo'. The server 
+             added will only be effective when NTP client is 
+             enabled.
+             To create entry in the table use SNMP multiple set operation
+             and following objects must be set: 
+             wwpLeosNtpAuthKeyId and either wwpLeosNtpAuthMd5Key or wwpLeosNtpAuthMD5KeyEnc."
+     ::= { wwpLeosNtpAuthEntry 3 }
+
+ wwpLeosNtpAuthMD5KeyEnc OBJECT-TYPE
+     SYNTAX       Md5Key  (SIZE(1..64))
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+              "Used to specify the encrypted MD5 key to use with this key identifier."
+     ::= {wwpLeosNtpAuthEntry 4 }
+
+ wwpLeosNtpClientMD5State        OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "Set to true to use MD5 authentication for NTP"
+     ::= { wwpLeosNtpClient 6 }
+      
+ wwpLeosNtpClientDrift        OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The Drift in micro-seconds of the local clock.  This value
+             is only valid when NTP is enabled and has a valid peer."
+     ::= { wwpLeosNtpClient 7 }
+--OID 8 is deprecated in 5305 MIB
+     
+ wwpLeosNtpClientFastOffset    OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The Fastest Offset seen in micro-seconds of the local clock.  This value
+             is only valid when NTP is enabled and has a valid peer."
+     ::= { wwpLeosNtpClient 9 }
+
+ wwpLeosNtpClientSlowOffset    OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The Slowest Offset seen in micro-seconds of the local clock.  This value
+             is only valid when NTP is enabled and has a valid peer."
+     ::= { wwpLeosNtpClient 10 }
+         
+  wwpLeosNtpClientMinPollFreq        OBJECT-TYPE
+     SYNTAX      Integer32 (16..4096)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "The polling freq at which NTP server will be polled
+             if the NTP client is configured to be in polling mode
+             and is not currently synchronized to an NTP server.
+             The value of this object should be multiple of 16.
+             The change in the ntp mode will only be affective 
+             when ntp client is enabled and should not be set
+             at the same time PollFreq is set."
+     ::= { wwpLeosNtpClient 11 }
+     
+wwpLeosNtpClientMaxPollFreq        OBJECT-TYPE
+     SYNTAX      Integer32 (16..4096)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "The polling freq at which NTP server will be polled
+             if the NTP client is configured to be in polling mode
+             and is currently synchronized to an NTP server.
+             The value of this object should be multiple of 16.
+             The change in the ntp mode will only be affective 
+             when ntp client is enabled and should not be set
+             at the same time PollFreq is set."
+     ::= { wwpLeosNtpClient 12 }
+
+wwpLeosNtpClientOffset             OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+             "When NTP is synchronized, this contains the difference between
+             the reference clock and the system clock micro-seconds."
+    ::= { wwpLeosNtpClient 13 }
+
+wwpLeosNtpClientDelay              OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "When NTP is synchronized, this indicates the round trip time
+             in micro-seconds taken by the reply packet to return in response,
+             to a query sent by the server."
+    ::= { wwpLeosNtpClient 14 }
+
+wwpLeosNtpClientJitter             OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "When NTP is synchronized, it indicates the magnitude of 
+              jitter between several time queries in micro-seconds."
+    ::= { wwpLeosNtpClient 15 }
+
+wwpLeosNtpClientNtpOffset             OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "When NTP is synchronized, this contains the difference between
+             the reference clock and the system clock micro-seconds."
+    ::= { wwpLeosNtpClient 16 }
+
+ wwpLeosNtpClientNtpFastStartMode OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     on(1),
+                     off(2)                    
+                 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "Setting this object to 'on' will cause the
+              NTP client to set it's time to the first reply
+              received from a synchronized NTP server, the
+              first time this occurs after the NTP client
+              is enabled.  After that, the normal rules
+              for selecting and synchronizing to a server
+              are used."
+     ::= { wwpLeosNtpClient 17 } 
+
+--
+-- NTP multicast table indexed
+--
+
+ wwpLeosNtpMulticastTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF WwpLeosNtpMulticastEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of NTP Multicast Addresses indexed by wwpLeosNtpMulticastIndex.
+              To create an entry in the table, use SNMP multiple set operation
+              and following objects must be set:
+              wwpLeosNtpMulticastInetAddrType and wwpLeosNtpMulticastInetAddr."
+     ::= { wwpLeosNtpClient 18 }
+                
+ wwpLeosNtpMulticastEntry OBJECT-TYPE
+     SYNTAX       WwpLeosNtpMulticastEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "An entry for each NTP multicast addresses."
+     INDEX { wwpLeosNtpMulticastIndex }
+     ::= { wwpLeosNtpMulticastTable 1 }
+                 
+ WwpLeosNtpMulticastEntry ::= SEQUENCE {      
+     wwpLeosNtpMulticastIndex           Integer32,
+     wwpLeosNtpMulticastInetAddrType    InetAddressType,
+     wwpLeosNtpMulticastInetAddr        InetAddress,
+     wwpLeosNtpMulticastRowStatus       RowStatus
+ }
+
+ wwpLeosNtpMulticastIndex OBJECT-TYPE
+     SYNTAX       Integer32 (1..10)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Specifies the unique index of the entry."
+     ::= { wwpLeosNtpMulticastEntry 1 }
+ 
+ wwpLeosNtpMulticastInetAddrType OBJECT-TYPE
+     SYNTAX       InetAddressType
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Specifies the type of address wwpLeosNtpMulticastInetAddr belongs to.
+              When set to:
+                ipv4 : wwpLeosNtpMulticastInetAddr should be compliant with 
+                       InetAddressIPv4 from RFC 4001
+                ipv6 : wwpLeosNtpMulticastInetAddr should be compliant with
+                       InetAddressIPv6 from RFC 4001."
+     ::= { wwpLeosNtpMulticastEntry 2 }
+
+ wwpLeosNtpMulticastInetAddr OBJECT-TYPE
+     SYNTAX       InetAddress
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Specifies the NTP multicast address.
+              The InetAddress specified here will be compliant with RFC 4001."
+     ::= { wwpLeosNtpMulticastEntry 3 }
+
+ wwpLeosNtpMulticastRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+             "To create a row in this table, a manager must
+             set this object to 'createAndGo'.
+             To create entry in the table use SNMP multiple set operation
+             and following objects must be set: wwpLeosNtpMulticastInetAddrType, 
+             wwpLeosNtpMulticastInetAddr and wwpLeosNtpMulticastRowStatus."
+     ::= { wwpLeosNtpMulticastEntry 4 }
+
+
+wwpLeosNtpClientSyncChangeNotifAdminState        OBJECT-TYPE
+     SYNTAX      INTEGER {
+                        on(1),
+                        off(2)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "Set to on to turn on sync change notifications."
+     ::= { wwpLeosNtpClient 19}
+
+
+wwpLeosNtpClientSyncState		OBJECT-TYPE
+		SYNTAX	INTEGER {
+						synchronized(1),
+						not-synchronized(2)
+				}                          
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"This object indicates the synchronized state of the NTP client."
+		::= { wwpLeosNtpClientNotifAttrs 1 }  
+		
+	  	
+---
+---Notifications
+---
+
+wwpLeosNtpClientSyncStatusChangeNotification	NOTIFICATION-TYPE
+	OBJECTS	{
+				wwpLeosNtpClientSyncState
+			}
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent whenever there is a change in the synchronization state for the
+		 NTP client. wwpLeosNtpClientSyncChangeNotifAdminState should be enabled to receive this trap."
+	::= { wwpLeosNtpClientMIBNotifications 1 }
+END   
+
+
+ 
