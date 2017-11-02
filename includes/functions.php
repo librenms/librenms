@@ -189,11 +189,6 @@ function checkDiscovery($device, $array, $sysObjectId, $sysDescr)
             $op = isset($value['op']) ? $value['op'] : 'contains';
 
             $get_value = snmp_get($device, $value['oid'], $options, $mib, $mib_dir);
-
-            if (is_string($get_value)) {
-                $get_value = trim($get_value, '"');
-            }
-
             if (compare_var($get_value, $value['value'], $op) == $check) {
                 return false;
             }
