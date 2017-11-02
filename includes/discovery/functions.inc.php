@@ -964,7 +964,6 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
         foreach ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['data'] as $data) {
             $tmp_name = $data['oid'];
             $raw_data = (array)$pre_cache[$tmp_name];
-            $cached_data = $pre_cache['__cached'] ?: array();
 
             d_echo("Data $tmp_name: ");
             d_echo($raw_data);
@@ -986,7 +985,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                 } elseif ($sensor_type === 'state') {
                     // translate string states to values (poller does this as well)
                     $states = array_column($data['states'], 'value', 'descr');
-                    $value = isset($states[$snmp_data[$data_name]]) ? $states[$snmp_data[$data_name]] : false;
+                    $value = isset($states[$tmp_value]) ? $states[$tmp_value] : false;
                 } else {
                     $value = false;
                 }
@@ -995,28 +994,26 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                 if (can_skip_sensor($value, $data, $sensor_options) === false && is_numeric($value)) {
                     $oid = $data['num_oid'] . $index;
-                    if (isset($snmp_data[$data['descr']])) {
-                        $descr = $snmp_data[$data['descr']];
-                    } else {
+
+                    // process the description
+                    $descr = dynamic_discovery_get_value('descr', $index, $data, $pre_cache);
+                    if (is_null($descr)) {
                         $descr = str_replace('{{ $index }}', $index, $data['descr']);
-                        preg_match_all('/({{ [\$a-zA-Z0-9]+ }})/', $descr, $tmp_var, PREG_PATTERN_ORDER);
-                        $tmp_vars = $tmp_var[0];
-                        foreach ($tmp_vars as $k => $tmp_var) {
-                            $tmp_var = preg_replace('/({{ | }}|\$)/', '', $tmp_var);
-                            if (isset($snmp_data[$tmp_var])) {
-                                $descr = str_replace("{{ \$$tmp_var }}", $snmp_data[$tmp_var], $descr);
-                            }
-                            if (isset($cached_data[$index][$tmp_var])) {
-                                $descr = str_replace("{{ \$$tmp_var }}", $cached_data[$index][$tmp_var], $descr);
+                        preg_match_all('/{{ \$([a-zA-Z0-9.]+) }}/', $descr, $matches);
+                        foreach ($matches[1] as $tmp_var) {
+                            $replace = dynamic_discovery_get_value($tmp_var, $index, $data, $pre_cache, null);
+                            if (!is_null($replace)) {
+                                $descr = str_replace("{{ \$$tmp_var }}", $replace, $descr);
                             }
                         }
                     }
+
                     $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
                     $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
-                    $low_limit = is_numeric($data['low_limit']) ? $data['low_limit'] : ($snmp_data[$data['low_limit']] ?: 'null');
-                    $low_warn_limit = is_numeric($data['low_warn_limit']) ? $data['low_warn_limit'] : ($snmp_data[$data['low_warn_limit']] ?: 'null');
-                    $warn_limit = is_numeric($data['warn_limit']) ? $data['warn_limit'] : ($snmp_data[$data['warn_limit']] ?: 'null');
-                    $high_limit = is_numeric($data['high_limit']) ? $data['high_limit'] : ($snmp_data[$data['high_limit']] ?: 'null');
+                    $low_limit = is_numeric($data['low_limit']) ? $data['low_limit'] : dynamic_discovery_get_value('low_limit', $index, $data, $pre_cache, 'null');
+                    $low_warn_limit = is_numeric($data['low_warn_limit']) ? $data['low_warn_limit'] : dynamic_discovery_get_value('low_warn_limit', $index, $data, $pre_cache, 'null');
+                    $warn_limit = is_numeric($data['warn_limit']) ? $data['warn_limit'] : dynamic_discovery_get_value('warn_limit', $index, $data, $pre_cache, 'null');
+                    $high_limit = is_numeric($data['high_limit']) ? $data['high_limit'] : dynamic_discovery_get_value('high_limit', $index, $data, $pre_cache, 'null');
 
                     $sensor_name = $device['os'];
                     if ($sensor_type === 'state') {
@@ -1041,6 +1038,41 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
             }
         }
     }
+}
+
+/**
+ * Helper function for dynamic discovery to search for data from pre_cached snmp data
+ *
+ * @param string $name The name of the field from the discovery data or just an oid
+ * @param int $index The index of the current sensor
+ * @param array $discovery_data The discovery data for the current sensor
+ * @param array $pre_cache all pre-cached snmp data
+ * @param mixed $default The default value to return if data is not found
+ * @return mixed
+ */
+function dynamic_discovery_get_value($name, $index, $discovery_data, $pre_cache, $default = null)
+{
+    if (isset($discovery_data[$name])) {
+        $name = $discovery_data[$name];
+    }
+
+    if (isset($pre_cache[$discovery_data['oid']][$index][$name])) {
+        return $pre_cache[$discovery_data['oid']][$index][$name];
+    }
+
+    if (isset($pre_cache[$name])) {
+        if (is_array($pre_cache[$name])) {
+            if (count($pre_cache[$name]) === 1) {
+                return current($pre_cache[$name]);
+            } elseif(isset($pre_cache[$index][$name])) {
+                return $pre_cache[$index][$name];
+            }
+        } else {
+            return $pre_cache[$name];
+        }
+    }
+
+    return $default;
 }
 
 /**
