@@ -20,6 +20,10 @@ if (strstr($cambium_type, 'Cambium PTP 50650')) {
     $masterSlaveMode = ucfirst(snmp_get($device, 'masterSlaveMode.0', '-Oqv', "CAMBIUM-PTP250-MIB"));
     $hardware = 'PTP 250 '.$masterSlaveMode;
     include 'includes/polling/wireless/cambium-250.inc.php';
+} elseif (strstr($cambium_type, 'PTP 58600')) {
+    $masterSlaveMode = ucfirst(snmp_get($device, 'masterSlaveMode.0', '-Oqv', "CANOPY-SYS-MIB"));
+    $hardware = 'PTP 58600 '.$masterSlaveMode;
+    include 'includes/polling/wireless/motorola58600.inc.php';
 } elseif (strstr($is_epmp, '.17713.21')) {
     $epmp_ap = snmp_get($device, 'wirelessInterfaceMode.0', '-Oqv', 'CAMBIUM-PMP80211-MIB');
     $epmp_number = snmp_get($device, 'cambiumSubModeType.0', '-Oqv', 'CAMBIUM-PMP80211-MIB');
