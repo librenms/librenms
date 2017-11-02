@@ -33,6 +33,43 @@ use Symfony\Component\Yaml\Yaml;
 class YamlTest extends \PHPUnit_Framework_TestCase
 {
 
+    private $valid_keys = array(
+        'sysDescr',
+        'sysDescr_except',
+        'sysObjectId',
+        'sysObjectId_except',
+        'sysDescr_regex',
+        'sysDescr_regex_except',
+        'sysObjectId_regex',
+        'sysObjectId_regex_except',
+        'snmpget',
+        'snmpget_except'
+    );
+
+    private $valid_snmpget_keys = array(
+        'oid',
+        'options',
+        'mib',
+        'mibdir',
+        'op',
+        'value',
+    );
+
+    private $valid_comparisons = array(
+        '=',
+        '!=',
+        '==',
+        '!==',
+        '<=',
+        '>=',
+        '<',
+        '>',
+        'starts',
+        'ends',
+        'contains',
+        'regex',
+    );
+
     public function testOSYaml()
     {
         $pattern = Config::get('install_dir') . '/includes/definitions/*.yaml';
@@ -46,6 +83,26 @@ class YamlTest extends \PHPUnit_Framework_TestCase
             $this->assertArrayHasKey('os', $data, $file);
             $this->assertArrayHasKey('type', $data, $file);
             $this->assertArrayHasKey('text', $data, $file);
+
+            // test discovery keys
+            if (isset($data['discovery'])) {
+                foreach ((array)$data['discovery'] as $group) {
+                    foreach ((array)$group as $key => $item) {
+                        $this->assertContains($key, $this->valid_keys, "$file: invalid discovery type $key");
+
+                        if (starts_with($key, 'snmpget')) {
+                            foreach ($item as $get_key => $get_val) {
+                                $this->assertContains($get_key, $this->valid_snmpget_keys, "$file: invalid snmpget option $get_key");
+                            }
+                            $this->assertArrayHasKey('oid', $item, "$file: snmpget discovery must specify oid");
+                            $this->assertArrayHasKey('value', $item, "$file: snmpget discovery must specify value");
+                            if (isset($item['op'])) {
+                                $this->assertContains($item['op'], $this->valid_comparisons, "$file: invalid op ${item['op']}");
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
