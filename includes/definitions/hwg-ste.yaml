@@ -4,7 +4,6 @@ type: environment
 icon: hwg
 over:
     - { graph: device_temperature, text: Temperature }
-    - { graph: device_humidity, text: Humidity }
 mib_dir:
     - hwg
 nobulk: 1
