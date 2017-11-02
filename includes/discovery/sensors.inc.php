@@ -12,7 +12,8 @@ if (is_file($pre_cache_file)) {
     d_echo($pre_cache);
 }
 
-if (isset($device['dynamic_discovery']['modules']['sensors'])) {
+// TODO change to exclude os with pre-cache php file, but just exclude them by hand for now (like avtech)
+if (isset($device['dynamic_discovery']['modules']['sensors']) && $device['os'] != 'avtech') {
     foreach ($device['dynamic_discovery']['modules']['sensors'] as $key => $data_array) {
         foreach ($data_array['data'] as $data) {
             foreach ((array)$data['oid'] as $oid) {
