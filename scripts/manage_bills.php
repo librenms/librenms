@@ -63,7 +63,8 @@ function create_bill($devs, $intf_glob, $id)
 ##   - Option to empty a bill
 ##   - Merge a bill
 ##   - Probably tons of bug fixes and safety checks. 
-
+## Note:
+##   - Current, this cannot create a new bill. To do this, you need to use the GUI. 
 
 
 ## Setup options:
@@ -84,6 +85,9 @@ if (empty($bill_name)) {
     echo "-l <bill name glob>    Bill name to match\n";
     echo "-d <hostname glob>    Hostname to match\n";
     echo "-c <Interface description glob>    Interface description to match\n";
+    echo "Example:\n";
+    echo "If I wanted to add all interfaces containing the description Telia to a bill called 'My Lovely Transit Provider'\n";
+    echo "php manage_bills.php -l 'My Lovely Transit Provider' -d all -c Telia";
     echo "\n";
     exit;
 }
