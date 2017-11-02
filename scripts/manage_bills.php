@@ -10,8 +10,13 @@ function list_bills($bill_name)
 {
     $bill = dbFetchRows("SELECT `bill_id`,`bill_name` FROM `bills` WHERE `bill_name` LIKE ?", array('%'.$bill_name.'%'));
     $res = count($bill);
-    if ($res != 1) { echo("Did not find exactly 1 bill, exiting\n"); exit(1);}
-    if ($res == 1) { echo("Found bill " . $bill[0]['bill_name'] . " (" . $bill[0]['bill_id'] . ")\n"); }
+    if ($res != 1) {
+        echo("Did not find exactly 1 bill, exiting\n");
+        exit(1);
+    }
+    if ($res == 1) {
+        echo("Found bill " . $bill[0]['bill_name'] . " (" . $bill[0]['bill_id'] . ")\n");
+    }
     return $bill[0]['bill_id'];
 }
 
@@ -28,10 +33,13 @@ function get_devices($host_glob)
 
 function create_bill($devs, $intf_glob, $id)
 {
-    # Abort mission if no bill id is passed. 
-    if (empty($id)) { echo ("No bill ID passed, exiting...\n"); exit(1); }
+    # Abort mission if no bill id is passed.
+    if (empty($id)) {
+        echo ("No bill ID passed, exiting...\n");
+        exit(1);
+    }
 
-    # Empty the existing bill since we dont want to duplicate ports. 
+    # Empty the existing bill since we dont want to duplicate ports.
     echo("Removing ports from bill ID ".$id."\n");
     dbDelete('bill_ports', '`bill_id` = ?', array($id));
     # Expected interface glob:
@@ -40,21 +48,20 @@ function create_bill($devs, $intf_glob, $id)
     $device_ids = array_column($devs, "device_id");
     $ids = implode(",", $device_ids);
 
-    # Find the devices which match the list of IDS and also the interface glob 
+    # Find the devices which match the list of IDS and also the interface glob
     $query = "SELECT ports.port_id,ports.ifName,ports.ifAlias FROM ports INNER JOIN devices ON ports.device_id = devices.device_id WHERE ifType = 'ethernetCsmacd' AND ports.ifAlias LIKE '%".$intf_glob."%' AND ports.device_id in (".$ids.")";
     echo("Query: " .$query . "\n");
     foreach (dbFetchRows($query) as $ports) {
         echo("Inserting ".$ports['ifName']." (" . $ports['ifAlias'] . " ) into bill ".$id."\n");
-        $insert = array ( 
+        $insert = array (
             'bill_id' => $id,
             'port_id' => $ports['port_id'],
             'bill_port_autoadded' => '1'
         );
-        ## insert 
+        ## insert
         dbInsert($insert, 'bill_ports');
-        }
-    return False;
-
+    }
+    return false;
 }
 
 ## Bill management tool
@@ -105,6 +112,4 @@ if ($host_glob == 'all') {
 $devices = get_devices($host_glob);
 
 $id = list_bills($bill_name);
-$ret = create_bill($devices,$intf_glob, $id);
-
-
+$ret = create_bill($devices, $intf_glob, $id);
