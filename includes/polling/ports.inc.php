@@ -176,7 +176,7 @@ $data       = array();
 if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=') && version_compare($device['version'], '11.7', '<'))) {
     require_once 'ports/f5.inc.php';
 } else {
-    if ($config['polling']['selected_ports'] === true || $device['attribs']['selected_ports'] == 'true') {
+    if ($config['polling']['selected_ports'] === true || $device['attribs']['selected_ports'] == 'true' && dbFetchRow("SELECT (count(*) / (SELECT count(*) from `ports` WHERE `device_id` = ?))> 0.33 FROM `ports` WHERE `device_id`= ? AND `deleted` = 1 HAVING count(*) > 10", array($device['device_id'],$device['device_id']))) {
         echo('Select ports polling');
         $lports = dbFetchRows("SELECT * FROM `ports` where `device_id` = ? AND `deleted` = 0 AND `disabled` = 0", array($device['device_id']));
         foreach ($lports as $lport) {
