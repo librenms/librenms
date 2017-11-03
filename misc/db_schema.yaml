@@ -1514,6 +1514,22 @@ ucd_diskio:
     PRIMARY: { Name: PRIMARY, Columns: [diskio_id], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
     device_id_2: { Name: device_id_2, Columns: [device_id], Unique: false, Type: BTREE }
+ups_nut:
+  Columns:
+    - { Field: nut_id, Type: int(11), 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: charge, Type: float, 'Null': false, Extra: '' }
+    - { Field: battery_low, Type: float, 'Null': false, Extra: '' }
+    - { Field: time_remaining, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: battery_voltage, Type: float, 'Null': false, Extra: '' }
+    - { Field: battery_nominal, Type: float, 'Null': false, Extra: '' }
+    - { Field: line_nominal, Type: float, 'Null': false, Extra: '' }
+    - { Field: input_voltage, Type: float, 'Null': false, Extra: '' }
+    - { Field: load_ups, Type: float, 'Null': false, Extra: '' }
+    - { Field: timestamp, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [nut_id], Unique: true, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id], Unique: true, Type: BTREE }
 users:
   Columns:
     - { Field: user_id, Type: int(11), 'Null': false, Extra: auto_increment }
