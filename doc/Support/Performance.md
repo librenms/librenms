@@ -69,7 +69,7 @@ This can be changed by going to the cron job for librenms. Usually in /etc/cron.
 
 */5  *    * * *   librenms    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
 
-KEEP in MIND that this dosnt always help, it depnds on your system and CPU. So Be careful.
+KEEP in MIND that this doesn't always help, it depends on your system and CPU. So Be careful.
 
 
 #### Recursive DNS
