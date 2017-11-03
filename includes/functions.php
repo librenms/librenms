@@ -93,8 +93,6 @@ function logfile($string)
  */
 function getHostOS($device)
 {
-    global $config;
-
     $res = snmp_get_multi_oid($device, array('SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysObjectID.0'));
     $sysDescr = isset($res['.1.3.6.1.2.1.1.1.0']) ? $res['.1.3.6.1.2.1.1.1.0'] : '';
     $sysObjectId = isset($res['.1.3.6.1.2.1.1.2.0']) ? $res['.1.3.6.1.2.1.1.2.0'] : '';
@@ -104,13 +102,12 @@ function getHostOS($device)
     $deferred_os = array(
         'freebsd',
         'linux',
-        'ibmtl'  //only has snmpget check
     );
 
     // check yaml files
     $os_defs = Config::get('os');
     foreach ($os_defs as $os => $def) {
-        if (isset($def['discovery'])  && !in_array($os, $deferred_os)) {
+        if (isset($def['discovery']) && !in_array($os, $deferred_os)) {
             foreach ($def['discovery'] as $item) {
                 if (checkDiscovery($device, $item, $sysObjectId, $sysDescr)) {
                     return $os;
@@ -121,7 +118,7 @@ function getHostOS($device)
 
     // check include files
     $os = null;
-    $pattern = $config['install_dir'] . '/includes/discovery/os/*.inc.php';
+    $pattern = Config::get('install_dir') . '/includes/discovery/os/*.inc.php';
     foreach (glob($pattern) as $file) {
         include $file;
         if (isset($os)) {

@@ -114,8 +114,6 @@ if (!$where) {
     exit;
 }
 
-update_os_cache(); // will only update if needed
-
 $discovered_devices = 0;
 
 if (!empty($config['distributed_poller_group'])) {

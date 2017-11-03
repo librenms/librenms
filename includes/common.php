@@ -1656,6 +1656,7 @@ function load_all_os($existing = false, $cached = true)
 /**
  * * Update the OS cache file cache/os_defs.cache
  * @param bool $force
+ * @return bool true if the cache was updated
  */
 function update_os_cache($force = false)
 {
@@ -1676,7 +1677,10 @@ function update_os_cache($force = false)
 
         file_put_contents($cache_file, serialize(Config::get('os')));
         d_echo("Done\n");
+        return true;
     }
+
+    return false;
 }
 
 /**
