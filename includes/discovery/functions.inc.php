@@ -805,126 +805,6 @@ function check_entity_sensor($string, $device)
     return true;
 }
 
-
-/**
- * Helper function to improve readability
- * Can't use mib based polling, because the snmp implentation and mibs are terrible
- *
- * @param array $device device array
- * @param array $sensor array(id, oid, type, descr, descr_oid, min, max, divisor)
- * @param array $valid valid sensors array
- * @return bool
- */
-function avtech_add_sensor($device, $sensor, &$valid)
-{
-    // set the id, must be unique
-    if (isset($sensor['id'])) {
-        $id = $sensor['id'];
-    } else {
-        d_echo('Error: No id set for this sensor' . "\n");
-        return false;
-    }
-    d_echo('Sensor id: ' . $id . "\n");
-
-
-    // set the sensor oid
-    if ($sensor['oid']) {
-        $oid = $sensor['oid'];
-    } else {
-        d_echo('Error: No oid set for this sensor' . "\n");
-        return false;
-    }
-    d_echo('Sensor oid: ' . $oid . "\n");
-
-    // get the type
-    $type = $sensor['type'] ? $sensor['type'] : 'temperature';
-    d_echo('Sensor type: ' . $type . "\n");
-
-    // get the sensor value
-    $value = snmp_get($device, $oid, '-OvQ');
-    // if the sensor doesn't exist abort
-    if ($value === false || ($type == 'temperature' && $value == 0)) {
-        //issue unfortunately some non-existant sensors return 0
-        d_echo('Error: sensor returned no data, skipping' . "\n");
-        return false;
-    }
-    d_echo('Sensor value: ' . $value . "\n");
-
-    $type_name = $device['os'];
-    if ($type == 'switch') {
-        // set up state sensor
-        $type_name .= ucfirst($type);
-        $type = 'state';
-        $state_index_id = create_state_index($type_name);
-
-        //Create State Translation
-        if (isset($state_index_id)) {
-            $states = array(
-                 array($state_index_id,'Off',1,0,-1),
-                 array($state_index_id,'On',1,1,0),
-             );
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
-    }
-
-    // set the description
-    if ($sensor['descr_oid']) {
-        $descr = trim(snmp_get($device, $sensor['descr_oid'], '-OvQ'), '"');
-    } elseif ($sensor['descr']) {
-        $descr = $sensor['descr'];
-    } else {
-        d_echo('Error: No description set for this sensor' . "\n");
-        return false;
-    }
-    d_echo('Sensor description: ' . $descr . "\n");
-
-    // set divisor
-    if ($sensor['divisor']) {
-        $divisor = $sensor['divisor'];
-    } elseif ($type == 'temperature') {
-        $divisor = 100;
-    } else {
-        $divisor = 1;
-    }
-    d_echo('Sensor divisor: ' . $divisor . "\n");
-
-
-    // set min for alarm
-    if ($sensor['min_oid']) {
-        $min = snmp_get($device, $sensor['min_oid'], '-OvQ') / $divisor;
-    } else {
-        $min = null;
-    }
-    d_echo('Sensor alarm min: ' . $min . "\n");
-
-    // set max for alarm
-    if ($sensor['max_oid']) {
-        $max = snmp_get($device, $sensor['max_oid'], '-OvQ') / $divisor;
-    } else {
-        $max = null;
-    }
-    d_echo('Sensor alarm max: ' . $max . "\n");
-
-    // add the sensor
-    discover_sensor($valid['sensor'], $type, $device, $oid, $id, $type_name, $descr, $divisor, '1', $min, null, null, $max, $value/$divisor);
-
-    if ($type == 'state') {
-        create_sensor_to_state_index($device, $type_name, $id);
-    }
-
-    return true;
-}
-
-
 /**
  * Get the device divisor, account for device specific quirks
  * The default divisor is 10
@@ -1084,7 +964,6 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
         foreach ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['data'] as $data) {
             $tmp_name = $data['oid'];
             $raw_data = (array)$pre_cache[$tmp_name];
-            $cached_data = $pre_cache['__cached'] ?: array();
 
             d_echo("Data $tmp_name: ");
             d_echo($raw_data);
@@ -1106,7 +985,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                 } elseif ($sensor_type === 'state') {
                     // translate string states to values (poller does this as well)
                     $states = array_column($data['states'], 'value', 'descr');
-                    $value = isset($states[$snmp_data[$data_name]]) ? $states[$snmp_data[$data_name]] : false;
+                    $value = isset($states[$tmp_value]) ? $states[$tmp_value] : false;
                 } else {
                     $value = false;
                 }
@@ -1115,28 +994,26 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                 if (can_skip_sensor($value, $data, $sensor_options) === false && is_numeric($value)) {
                     $oid = $data['num_oid'] . $index;
-                    if (isset($snmp_data[$data['descr']])) {
-                        $descr = $snmp_data[$data['descr']];
-                    } else {
+
+                    // process the description
+                    $descr = dynamic_discovery_get_value('descr', $index, $data, $pre_cache);
+                    if (is_null($descr)) {
                         $descr = str_replace('{{ $index }}', $index, $data['descr']);
-                        preg_match_all('/({{ [\$a-zA-Z0-9]+ }})/', $descr, $tmp_var, PREG_PATTERN_ORDER);
-                        $tmp_vars = $tmp_var[0];
-                        foreach ($tmp_vars as $k => $tmp_var) {
-                            $tmp_var = preg_replace('/({{ | }}|\$)/', '', $tmp_var);
-                            if (isset($snmp_data[$tmp_var])) {
-                                $descr = str_replace("{{ \$$tmp_var }}", $snmp_data[$tmp_var], $descr);
-                            }
-                            if (isset($cached_data[$index][$tmp_var])) {
-                                $descr = str_replace("{{ \$$tmp_var }}", $cached_data[$index][$tmp_var], $descr);
+                        preg_match_all('/{{ \$([a-zA-Z0-9.]+) }}/', $descr, $matches);
+                        foreach ($matches[1] as $tmp_var) {
+                            $replace = dynamic_discovery_get_value($tmp_var, $index, $data, $pre_cache, null);
+                            if (!is_null($replace)) {
+                                $descr = str_replace("{{ \$$tmp_var }}", $replace, $descr);
                             }
                         }
                     }
+
                     $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
                     $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
-                    $low_limit = is_numeric($data['low_limit']) ? $data['low_limit'] : ($snmp_data[$data['low_limit']] ?: 'null');
-                    $low_warn_limit = is_numeric($data['low_warn_limit']) ? $data['low_warn_limit'] : ($snmp_data[$data['low_warn_limit']] ?: 'null');
-                    $warn_limit = is_numeric($data['warn_limit']) ? $data['warn_limit'] : ($snmp_data[$data['warn_limit']] ?: 'null');
-                    $high_limit = is_numeric($data['high_limit']) ? $data['high_limit'] : ($snmp_data[$data['high_limit']] ?: 'null');
+                    $low_limit = is_numeric($data['low_limit']) ? $data['low_limit'] : dynamic_discovery_get_value('low_limit', $index, $data, $pre_cache, 'null');
+                    $low_warn_limit = is_numeric($data['low_warn_limit']) ? $data['low_warn_limit'] : dynamic_discovery_get_value('low_warn_limit', $index, $data, $pre_cache, 'null');
+                    $warn_limit = is_numeric($data['warn_limit']) ? $data['warn_limit'] : dynamic_discovery_get_value('warn_limit', $index, $data, $pre_cache, 'null');
+                    $high_limit = is_numeric($data['high_limit']) ? $data['high_limit'] : dynamic_discovery_get_value('high_limit', $index, $data, $pre_cache, 'null');
 
                     $sensor_name = $device['os'];
                     if ($sensor_type === 'state') {
@@ -1161,6 +1038,41 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
             }
         }
     }
+}
+
+/**
+ * Helper function for dynamic discovery to search for data from pre_cached snmp data
+ *
+ * @param string $name The name of the field from the discovery data or just an oid
+ * @param int $index The index of the current sensor
+ * @param array $discovery_data The discovery data for the current sensor
+ * @param array $pre_cache all pre-cached snmp data
+ * @param mixed $default The default value to return if data is not found
+ * @return mixed
+ */
+function dynamic_discovery_get_value($name, $index, $discovery_data, $pre_cache, $default = null)
+{
+    if (isset($discovery_data[$name])) {
+        $name = $discovery_data[$name];
+    }
+
+    if (isset($pre_cache[$discovery_data['oid']][$index][$name])) {
+        return $pre_cache[$discovery_data['oid']][$index][$name];
+    }
+
+    if (isset($pre_cache[$name])) {
+        if (is_array($pre_cache[$name])) {
+            if (count($pre_cache[$name]) === 1) {
+                return current($pre_cache[$name]);
+            } elseif (isset($pre_cache[$index][$name])) {
+                return $pre_cache[$index][$name];
+            }
+        } else {
+            return $pre_cache[$name];
+        }
+    }
+
+    return $default;
 }
 
 /**
