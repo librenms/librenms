@@ -39,6 +39,7 @@ if (isset($device['dynamic_discovery']['modules']['sensors'])) {
 // Run custom sensors
 require 'includes/discovery/sensors/cisco-entity-sensor.inc.php';
 require 'includes/discovery/sensors/entity-sensor.inc.php';
+require 'includes/discovery/sensors/entity-state.inc.php';
 require 'includes/discovery/sensors/ipmi.inc.php';
 
 if ($device['os'] == 'netscaler') {
