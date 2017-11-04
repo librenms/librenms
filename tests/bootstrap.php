@@ -27,7 +27,7 @@ global $config;
 
 $install_dir = realpath(__DIR__ . '/..');
 
-$init_modules = array('web');
+$init_modules = array('web', 'discovery');
 
 if (!getenv('SNMPSIM')) {
     $init_modules[] = 'mocksnmp';
