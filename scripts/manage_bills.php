@@ -126,10 +126,8 @@ $id = list_bills($bill_name);
 
 $devices = get_devices($host_glob);
 
-
 if (!$retain) {
     $flush_ret = flush_bill($id);
 }
 
 $ret = create_bill($devices, $intf_glob, $id);
-
