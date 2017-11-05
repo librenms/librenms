@@ -31,3 +31,13 @@ OK - This is a good thing, you can skip over these :)
 WARN - You probably want to check this out.
 
 FAIL - This is going to need your attention!
+
+ ### Validate from the WebUI
+ 
+ You can validate your LibreNMS install from the Web UI, using the nav bar and clicking on the little Gear Icon -> Validate Config.
+ ![Validate Config Icon](/img/validate-config-icon.png)
+ 
+ Then You should see the results of validate. 
+ Below is just example of the results.
+ 
+ ![Validate results](/img/validate-results.png)
