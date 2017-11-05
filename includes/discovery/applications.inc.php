@@ -85,6 +85,9 @@ foreach ($results as $extend => $result) {
             echo '+';
             log_event("Application enabled by discovery: $app", $device, 'application', 1);
         }
+        if (file_exists(Config::get('install_dir') . '/includes/discovery/sensors/applications/'.$name.'.inc.php')) {
+              include Config::get('install_dir') . '/includes/discovery/sensors/applications/'.$name.'.inc.php';
+        }
     }
 }
 

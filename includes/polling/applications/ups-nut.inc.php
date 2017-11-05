@@ -70,28 +70,3 @@ $fields = array(
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
-
-if (dbFetchCell('SELECT COUNT(*) FROM `ups_nut` WHERE `device_id` = ? ', array($device['device_id'])) == '0') {
-    dbInsert(array(
-        'device_id' => $device['device_id'],
-        'charge' => $charge,
-        'battery_low' => $battery_low,
-        'time_remaining' => $remaining/60,
-        'battery_voltage' => $bat_volt,
-        'battery_nominal' => $bat_nom,
-        'line_nominal' => $line_nom,
-        'input_voltage' => $input_volt,
-        'load_ups' => $load
-        ), 'ups_nut');
-} else {
-    dbUpdate(array(
-        'charge' => $charge,
-        'battery_low' => $battery_low,
-        'time_remaining' => $remaining/60,
-        'battery_voltage' => $bat_volt,
-        'battery_nominal' => $bat_nom,
-        'line_nominal' => $line_nom,
-        'input_voltage' => $input_volt,
-        'load_ups' => $load
-        ), 'ups_nut', '`device_id` = ? ', array($device['device_id']));
-}
