@@ -41,11 +41,10 @@ Once you have created your Network Weather Map you can add it to a dashboard pag
 ### Step 1 
 When you create the Weathermap make sure to export as HTML and PNG you will need this for the out to the dashboard.
 
-In the Weathermap Plugin page, you will see the output. If you click on one of the maps it will show the image. In your URL bar, you see the entire URL, we will need to copy that.
+In the Weathermap Plugin page, you will see the output maps. `Right click` on one of the maps and click on `copy image address`.
 
 Example URL: `http://yourlibrenms.org/plugins/Weathermap/output/yourmap.html`
 
-Copy the URL. 
 
 ### Step 2
 Then go back to your Dashboard, create a new dashboard and give it a name. select the widget as *External Images*. 
