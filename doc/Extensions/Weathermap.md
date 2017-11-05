@@ -38,6 +38,7 @@ Automatically generate weathermaps from a LibreNMS database using WeatherMapper 
 
 Once you have created your Network Weather Map you can add it to a dashboard page by doing the following.
 
+### Step 1 
 When you create the Weathermap make sure to export as HTML and PNG you will need this for the out to the dashboard.
 
 In the Weathermap Plugin page, you will see the output. If you click on one of the maps it will show the image. In your URL bar, you see the entire URL, we will need to copy that.
@@ -46,13 +47,14 @@ Example URL: `http://yourlibrenms.org/plugins/Weathermap/output/yourmap.html`
 
 Copy the URL. 
 
+### Step 2
 Then go back to your Dashboard, create a new dashboard and give it a name. select the widget as *External Images*. 
 
 Give the Widget a Title.
 
 The *Image URL* will need to be you address you copied, but at the end remove the `.html` and replace it with `.png` 
 
-Exmaple  *Image URL* `http://yourlibrenms.org/plugins/Weathermap/output/yourmap.png`
+Example  *Image URL* `http://yourlibrenms.org/plugins/Weathermap/output/yourmap.png`
 
 The *Target URL* will be the URL you copied but with the `.html` at the end of the URL. 
 
@@ -60,6 +62,6 @@ Example *Target URL* `http://yourlibrenms.org/plugins/Weathermap/output/yourmap.
 
 Then Click on Set
 
-You should now be able to see the Weathermap you have created in your list of dashboards. You could also add this to existing dashboards 
+You should now be able to see the Weathermap you have created in your list of dashboards. You could also add this to existing dashboards. 
 
 ![Example Network Weathermap Dashboard](/img/network-weathermap-dashboard.PNG)
