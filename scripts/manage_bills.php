@@ -4,102 +4,89 @@
 $init_modules = array();
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-## Bill management tool
-## Todo:
-##   - Actually create a bill
-##   - Option to empty a bill
-##   - Probably tons of bug fixes and safety checks.
-## Note:
-##   - Current, this cannot create a new bill. To do this, you need to use the GUI.
+/** Bill management tool
+    Todo:
+      - Actually create a bill
+      - Option to empty a bill
+      - Probably tons of bug fixes and safety checks.
+    Note:
+      - Current, this cannot create a new bill. To do this, you need to use the GUI.
+**/
 
-
-## Find the correct bill, exit if we get anything other than 1 result.
+// Find the correct bill, exit if we get anything other than 1 result.
 function list_bills($bill_name)
 {
-    $bill = dbFetchRows("SELECT `bill_id`,`bill_name` FROM `bills` WHERE `bill_name` LIKE ?", array('%'.$bill_name.'%'));
-    $res = count($bill);
-    if ($res != 1) {
+    $bill = dbFetchRows("SELECT `bill_id`,`bill_name` FROM `bills` WHERE `bill_name` LIKE ?", array("%$bill_name%"));
+    if (count($bill) != 1) {
         echo("Did not find exactly 1 bill, exiting\n");
         exit(1);
-    }
-    if ($res == 1) {
-        echo("Found bill " . $bill[0]['bill_name'] . " (" . $bill[0]['bill_id'] . ")\n");
+    } else {
+        echo("Found bill {$bill[0]['bill_name']} ({$bill[0]['bill_id']})\n");
     }
     return $bill[0]['bill_id'];
 }
 
-# This will get an array of devices we are interested in from the CLI glob
+// This will get an array of devices we are interested in from the CLI glob
 function get_devices($host_glob)
 {
-    $devices = dbFetchRows("SELECT `device_id`,`hostname`,`sysName` FROM `devices` WHERE `sysName` LIKE ?", array('%'.$host_glob.'%'));
-    #foreach ($devices as $device) {
-    #    echo "Found device " . $device['sysName'] . "(hostname:" . $device['hostname'] . ")\n";
-    #    }
-    return $devices;
+    return dbFetchRows("SELECT `device_id`,`hostname`,`sysName` FROM `devices` WHERE `sysName` LIKE ?", array("%$host_glob%"));
 }
 
-# This will flush bill ports if -r is set on cli
+// This will flush bill ports if -r is set on cli
 function flush_bill($id)
 {
-    # Flush ports from the bill
-    echo("Removing ports from bill ID ".$id."\n");
-    $success = dbDelete('bill_ports', '`bill_id` = ?', array($id));
-    return $success;
+    echo("Removing ports from bill ID $id\n");
+    return dbDelete('bill_ports', '`bill_id` = ?', array($id));
 }
 
 
 function create_bill($devs, $intf_glob, $id)
 {
-    # Abort mission if no bill id is passed.
+    // Abort mission if no bill id is passed.
     if (empty($id)) {
         echo ("No bill ID passed, exiting...\n");
         exit(1);
     }
 
-    # Expected interface glob:
-    echo("Interface glob: " . $intf_glob . "\n");
-    # Devices IDS exploded to string
+    // Expected interface glob:
+    echo("Interface glob: $intf_glob\n");
     $device_ids = array_column($devs, "device_id");
     $ids = implode(",", $device_ids);
 
-    # Find the devices which match the list of IDS and also the interface glob
-    $query = "SELECT ports.port_id,ports.ifName,ports.ifAlias FROM ports INNER JOIN devices ON ports.device_id = devices.device_id WHERE ifType = 'ethernetCsmacd' AND ports.ifAlias LIKE '%".$intf_glob."%' AND ports.device_id in (".$ids.")";
-    echo("Query: " .$query . "\n");
+    // Find the devices which match the list of IDS and also the interface glob
+    $query = "SELECT ports.port_id,ports.ifName,ports.ifAlias FROM ports INNER JOIN devices ON ports.device_id = devices.device_id WHERE ifType = 'ethernetCsmacd' AND ports.ifAlias LIKE '%$intf_glob%' AND ports.device_id in ($ids)";
+    echo("Query: $query\n");
     foreach (dbFetchRows($query) as $ports) {
-        echo("Inserting ".$ports['ifName']." (" . $ports['ifAlias'] . " ) into bill ".$id."\n");
+        echo("Inserting {$ports['ifName']} ({$ports['ifAlias']}) into bill $id\n");
         $insert = array (
             'bill_id' => $id,
             'port_id' => $ports['port_id'],
             'bill_port_autoadded' => '1'
         );
-        ## insert
         dbInsert($insert, 'bill_ports');
     }
     return true;
 }
 
+/** Setup options:
+    l - bill_name - bill glob
+    c - circuit_id - interface glob
+    d - device_id - device glob
+    f - flush - boolean
+**/
 
-
-## Setup options:
-# l - bill_name - bill glob
-# c - circuit_id - interface glob
-# d - device_id - device glob
-# r - retain - boolean
-$options = getopt('l:c:d:r');
-
-# Replace "*" with SQL wildcard %.
+$options = getopt('l:c:d:f');
 
 $bill_name = str_replace('*', '%', mres($options['l']));
 $intf_glob = str_replace('*', '%', mres($options['c']));
 $host_glob = str_replace('*', '%', mres($options['d']));
 
-
 if (empty($bill_name)) {
     echo "Usage:\n";
-    echo "-l <bill name glob>    Bill name to match\n";
+    echo "-l <bill name glob>   Bill name to match\n";
     echo "-d <hostname glob>    Hostname to match\n";
-    echo "-c <Interface description glob>    Interface description to match\n";
-    echo "-r Retain ports in the bill (default behaviour is to flush all ports from a given bill)\n";
+    echo "-c <Interface description glob>   Interface description to match\n";
+    echo "-f Flush all ports from a bill before adding adding ports\n";
     echo "Example:\n";
     echo "If I wanted to add all interfaces containing the description Telia to a bill called 'My Lovely Transit Provider'\n";
     echo "php manage_bills.php -l 'My Lovely Transit Provider' -d all -c Telia";
@@ -116,17 +103,22 @@ if ($intf_glob == 'all') {
 if ($host_glob == 'all') {
     $host_glob = '%';
 }
-if (isset($options['r'])) {
-    $retain = true;
+if (isset($options['f'])) {
+    $flush = true;
 } else {
-    $retain = false;
+    $flush = false;
 }
 
 $id = list_bills($bill_name);
 
 $devices = get_devices($host_glob);
 
-if (!$retain) {
+if (empty($devices)) {
+    echo "No devices found\n";
+    exit(1);
+}
+
+if ($flush) {
     $flush_ret = flush_bill($id);
 }
 
