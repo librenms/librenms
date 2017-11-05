@@ -52,7 +52,7 @@ Then go back to your Dashboard, create a new dashboard and give it a name. selec
 
 Give the Widget a Title.
 
-The *Image URL* will need to be you address you copied, but at the end remove the `.html` and replace it with `.png` 
+The *Image URL* will need to be the address you copied but at the end remove the `.html` and replace it with `.png` 
 
 Example  *Image URL* `http://yourlibrenms.org/plugins/Weathermap/output/yourmap.png`
 
