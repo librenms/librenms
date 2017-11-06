@@ -8,7 +8,7 @@ mib_dir:
 discovery:
     -
       snmpget:
-          oid: 1.3.6.1.4.1.12148.10.2.6.0
+          oid: .1.3.6.1.4.1.12148.10.2.6.0
           value:
             - 'Micropack System'
 poller_modules:
