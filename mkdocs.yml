@@ -92,6 +92,7 @@ pages:
       - Support/Remote-Monitoring-VPN.md
       - Support/SNMP-Configuration-Examples.md
       - Support/SSL-Configuration.md
+      - Support/Device-Troubleshooting.md
   - 10. Contributing + Developing:
       - General/Contributing.md
       - Developing/Using-Git.md
