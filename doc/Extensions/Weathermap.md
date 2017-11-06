@@ -33,7 +33,7 @@ Automatically generate weathermaps from a LibreNMS database using WeatherMapper 
 
 ![Example Network Weather Map](/img/network-weather-map.PNG)
 
-### Adding your Network Weathermps to the Dashboards
+### Adding your Network Weathermaps to the Dashboards
 
 Once you have created your Network Weather Map you can add it to a dashboard page by doing the following.
 
