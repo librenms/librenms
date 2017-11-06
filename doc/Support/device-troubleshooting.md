@@ -1,3 +1,4 @@
+source: Support/device-troubleshooting.md
 # Capture Debug Information
 
 You can use this feature to run Debug on Discovery, Poller, SNMP, Alerts.
