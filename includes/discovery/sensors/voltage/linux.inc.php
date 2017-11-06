@@ -149,4 +149,3 @@ if (!empty($value)) {
 
     discover_sensor($valid['sensor'], 'ups_nut', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
 }
-
