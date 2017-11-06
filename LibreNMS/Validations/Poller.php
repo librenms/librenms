@@ -39,6 +39,11 @@ class Poller implements ValidationGroup
      */
     public function validate(Validator $validator)
     {
+        if (!dbIsConnected()) {
+            $validator->warn("Could not check poller/discovery, db is not connected.");
+            return;
+        }
+
         if (dbFetchCell('SELECT COUNT(*) FROM `devices`') == 0) {
             $result = ValidationResult::warn("You have not added any devices yet.");
 

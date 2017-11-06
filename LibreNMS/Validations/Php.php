@@ -61,6 +61,8 @@ class Php implements ValidationGroup
         foreach ($required_modules as $extension) {
             if (!extension_loaded($extension)) {
                 $validator->fail("Missing PHP extension: $extension", "Please install $extension");
+            } elseif (shell_exec("php -r \"var_export(extension_loaded('$extension'));\"") == 'false') {
+                $validator->fail("Missing CLI PHP extension: $extension", "Please install $extension");
             }
         }
     }
