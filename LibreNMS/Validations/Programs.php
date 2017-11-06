@@ -59,8 +59,8 @@ class Programs implements ValidationGroup
                 } elseif (!(fileperms($cmd) & 2048)) {
                     $msg = "$bin should be suid!";
                     $fix = "chmod u+s $cmd";
-                    if ($validator->getUsername() == 'root') {
-                        $msg .= ' (Note: suid may not be needed if CAP_NET_RAW is set, which requires root to check)';
+                    if ($validator->getUsername() != 'root') {
+                        $msg .= ' (Note: suid may not be needed if CAP_NET_RAW is set, getcap requires root to check)';
                         $validator->warn($msg, $fix);
                     } else {
                         $validator->fail($msg, $fix);
