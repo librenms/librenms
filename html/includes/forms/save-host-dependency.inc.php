@@ -34,11 +34,10 @@ foreach ($_POST['device_ids'] as $dev) {
     }
     $device_arr[] = $dev;
 }
-$clause = implode(',', array_fill(0, count($device_arr), '?'));
 
-// So mysql_string should be something like IN('?','?','?') and device_arr is an array of devices_ids.
-// Mysql query should be like this: UPDATE devices set parent_id = $_POST['parent_id'] WHERE device_id IN ('<int>','<int>','<int>'); 
-if (dbQuery('UPDATE `devices` set parent_id = '.$_POST['parent_id'].' WHERE `device_id` IN('.$clause.')', $device_arr)) {
+$clause = dbGenPlaceholders(count($device_arr));
+
+if (dbQuery('UPDATE `devices` set parent_id = '.$_POST['parent_id'].' WHERE `device_id` IN'.$clause, $device_arr)) {
     echo 'Host dependencies have been set';
     exit;
 } else {

@@ -146,9 +146,6 @@ $('#manhostdep-save').click('', function(event) {
         error: function() {
             $("#message").html('<div class="alert alert-info"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span><button>The host dependency could not be saved.</div>');
             $("#manage-dependencies").modal('hide');
-            setTimeout(function() {
-               location.reload(1);
-            }, 5000);
         }
     });
 });

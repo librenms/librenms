@@ -62,9 +62,6 @@ $('#hostdep-removal').click('', function(event) {
         error: function() {
             $("#message").html('<div class="alert alert-info">The host dependency could not be deleted.</div>');
             $("#confirm-delete").modal('hide');
-            setTimeout(function() {
-               location.reload(1);
-            }, 5000);
         }
     });
 });
