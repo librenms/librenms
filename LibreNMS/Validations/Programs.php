@@ -49,22 +49,37 @@ class Programs implements ValidationGroup
                     "\$config['$bin'] = '/path/to/$bin';"
                 );
             } elseif (in_array($bin, array('fping', 'fping6'))) {
-                if ($validator->getUsername() == 'root' && ($getcap = $this->findExecutable('getcap'))) {
-                    if (!str_contains(shell_exec("$getcap $cmd"), "$cmd = cap_net_raw+ep")) {
-                        $validator->fail(
-                            "$bin should have CAP_NET_RAW!",
-                            "getcap c $cmd"
-                        );
-                    }
-                } elseif (!(fileperms($cmd) & 2048)) {
-                    $msg = "$bin should be suid!";
-                    $fix = "chmod u+s $cmd";
-                    if ($validator->getUsername() == 'root') {
-                        $msg .= ' (Note: suid may not be needed if CAP_NET_RAW is set, which requires root to check)';
-                        $validator->warn($msg, $fix);
-                    } else {
-                        $validator->fail($msg, $fix);
-                    }
+                $this->extraFpingChecks($validator, $bin, $cmd);
+            }
+        }
+    }
+
+    public function extraFpingChecks(Validator $validator, $bin, $cmd) {
+        $target = ($bin == 'fping' ? '127.0.0.1' : '::1');
+        $validator->execAsUser("$cmd $target 2>&1", $output, $return);
+        $output = implode(" ", $output);
+
+        if ($return !== 0 || $output != "$target is alive") {
+            $validator->fail(
+                "$bin could not be executed. ($output)",
+                "$bin must have CAP_NET_RAW capability (getcap) or be suid and exclusions with selinux if applicable."
+            );
+
+            if ($validator->getUsername() == 'root' && ($getcap = $this->findExecutable('getcap'))) {
+                if (!str_contains(shell_exec("$getcap $cmd"), "$cmd = cap_net_raw+ep")) {
+                    $validator->fail(
+                        "$bin should have CAP_NET_RAW!",
+                        "getcap c $cmd"
+                    );
+                }
+            } elseif (!(fileperms($cmd) & 2048)) {
+                $msg = "$bin should be suid!";
+                $fix = "chmod u+s $cmd";
+                if ($validator->getUsername() == 'root') {
+                    $msg .= ' (Note: suid may not be needed if CAP_NET_RAW is set, which requires root to check)';
+                    $validator->warn($msg, $fix);
+                } else {
+                    $validator->fail($msg, $fix);
                 }
             }
         }
