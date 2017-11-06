@@ -2,7 +2,7 @@ source: Support/Device-Troubleshooting.md
 # Capture Debug Information
 
 You can use this feature to run Debug on Discovery, Poller, SNMP, Alerts.
-This output information could helpful for you in troubleshooting a device or when requesting help.
+This output information could be helpful for you in troubleshooting a device or when requesting help.
 
 This feautre can be found by going to the deivce that you are troubleshooting in the web ui, clicking on the settings icon menu on far right and selecting 
 Capture.
