@@ -36,6 +36,8 @@ We list below what we make use of including the license compliance.
   - [PHPMailer](https://github.com/PHPMailer/PHPMailer): LGPL v2.1
   - [pbin](https://github.com/glensc/pbin): GPLv2 (or later - see script header)
   - [CorsSlim](https://github.com/palanik/CorsSlim): MIT
+  - [Confluence HTTP Authenticator](https://github.com/chauth/confluence_http_authenticator)
+  - [Graylog SSO Authentication Plugin](https://github.com/Graylog2/graylog-plugin-auth-sso)
 
 
 ## 3rd Party GPLv3 Non-compliant
