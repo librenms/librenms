@@ -1,5 +1,5 @@
-os: stormshield
-text: 'Stormshield'
+os: ns-bsd
+text: 'Stormshield NS-BSD'
 type: firewall
 over:
     - { graph: device_bits, text: Traffic }
