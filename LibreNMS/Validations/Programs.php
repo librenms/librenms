@@ -49,23 +49,34 @@ class Programs implements ValidationGroup
                     "\$config['$bin'] = '/path/to/$bin';"
                 );
             } elseif (in_array($bin, array('fping', 'fping6'))) {
-                if ($validator->getUsername() == 'root' && ($getcap = $this->findExecutable('getcap'))) {
-                    if (!str_contains(shell_exec("$getcap $cmd"), "$cmd = cap_net_raw+ep")) {
-                        $validator->fail(
-                            "$bin should have CAP_NET_RAW!",
-                            "getcap c $cmd"
-                        );
-                    }
-                } elseif (!(fileperms($cmd) & 2048)) {
-                    $msg = "$bin should be suid!";
-                    $fix = "chmod u+s $cmd";
-                    if ($validator->getUsername() == 'root') {
-                        $msg .= ' (Note: suid may not be needed if CAP_NET_RAW is set, which requires root to check)';
-                        $validator->warn($msg, $fix);
-                    } else {
-                        $validator->fail($msg, $fix);
-                    }
+                $this->extraFpingChecks($validator, $bin, $cmd);
+            }
+        }
+    }
+
+    public function extraFpingChecks(Validator $validator, $bin, $cmd)
+    {
+        $target = ($bin == 'fping' ? '127.0.0.1' : '::1');
+        $validator->execAsUser("$cmd $target 2>&1", $output, $return);
+        $output = implode(" ", $output);
+
+        if ($return !== 0 || $output != "$target is alive") {
+            $validator->fail(
+                "$bin could not be executed. $bin must have CAP_NET_RAW capability (getcap) or suid. Selinux exlusions may be required.\n ($output)"
+            );
+
+            if ($getcap = $this->findExecutable('getcap')) {
+                $getcap_out = shell_exec("$getcap $cmd");
+                preg_match("#^$cmd = (.*)$#", $getcap_out, $matches);
+
+                if (is_null($matches) || !str_contains($matches[1], 'cap_net_raw+ep')) {
+                    $validator->fail(
+                        "$bin should have CAP_NET_RAW!",
+                        "setcap cap_net_raw+ep $cmd"
+                    );
                 }
+            } elseif (!(fileperms($cmd) & 2048)) {
+                $validator->fail("$bin should be suid!", "chmod u+s $cmd");
             }
         }
     }
@@ -76,15 +87,7 @@ class Programs implements ValidationGroup
             return Config::get($bin);
         }
 
-        $path_dirs = explode(':', getenv('PATH'));
-        foreach ($path_dirs as $dir) {
-            $file = "$dir/$bin";
-            if (is_executable($file)) {
-                return $file;
-            }
-        }
-
-        return false;
+        return is_executable(locate_binary($bin));
     }
 
     /**
