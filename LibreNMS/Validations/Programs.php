@@ -62,26 +62,21 @@ class Programs implements ValidationGroup
 
         if ($return !== 0 || $output != "$target is alive") {
             $validator->fail(
-                "$bin could not be executed. ($output)",
-                "$bin must have CAP_NET_RAW capability (getcap) or suid. Selinux exlusions may be required."
+                "$bin could not be executed. $bin must have CAP_NET_RAW capability (getcap) or suid. Selinux exlusions may be required.\n ($output)"
             );
 
-            if ($validator->getUsername() == 'root' && ($getcap = $this->findExecutable('getcap'))) {
-                if (!str_contains(shell_exec("$getcap $cmd"), "$cmd = cap_net_raw+ep")) {
+            if ($getcap = $this->findExecutable('getcap')) {
+                $getcap_out = shell_exec("$getcap $cmd");
+                preg_match("#^$cmd = (.*)$#", $getcap_out, $matches);
+
+                if (is_null($matches) || !str_contains($matches[1], 'cap_net_raw+ep')) {
                     $validator->fail(
                         "$bin should have CAP_NET_RAW!",
-                        "setcap CAP_NET_RAW $cmd"
+                        "setcap cap_net_raw+ep $cmd"
                     );
                 }
             } elseif (!(fileperms($cmd) & 2048)) {
-                $msg = "$bin should be suid!";
-                $fix = "chmod u+s $cmd";
-                if ($validator->getUsername() != 'root') {
-                    $msg .= ' (Note: suid may not be needed if CAP_NET_RAW is set, getcap requires root to check)';
-                    $validator->warn($msg, $fix);
-                } else {
-                    $validator->fail($msg, $fix);
-                }
+                $validator->fail("$bin should be suid!", "chmod u+s $cmd");
             }
         }
     }
@@ -92,15 +87,7 @@ class Programs implements ValidationGroup
             return Config::get($bin);
         }
 
-        $path_dirs = explode(':', getenv('PATH'));
-        foreach ($path_dirs as $dir) {
-            $file = "$dir/$bin";
-            if (is_executable($file)) {
-                return $file;
-            }
-        }
-
-        return false;
+        return is_executable(locate_binary($bin));
     }
 
     /**
