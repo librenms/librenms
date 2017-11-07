@@ -4,6 +4,8 @@ type: wireless
 icon: siklu
 over:
     - { graph: device_bits, text: Traffic }
+    - { graph: device_wireless_rssi, text: RSSI }
+    - { graph: device_wireless_snr, text: CINR }
 poller_modules:
     wifi: 1
 discovery:

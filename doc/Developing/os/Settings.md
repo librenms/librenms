@@ -33,6 +33,25 @@ good_if: # ignore all other bad_if settings ifDescr (substring, case insensitive
 
 ```
 
+### Disable snmpbulkwalk
+Some devices have buggy snmp implementations and don't respond well to the more efficient snmpbulkwalk.
+To disable snmpbulkwalk and only use snmpwalk for an os set the following.
+
+```yaml
+nobulk: true
+```
+
+### Poller and Discovery Modules
+The various discovery and poller modules can be enabled or disabled per OS.  The defaults are usually reasonable, so likely you won't want to change more than a few.
+These modules can be enabled or disabled per-device in the webui and per os or globally in config.php.
+Usually, a poller module will not work if it's corresponding discovery module is not enabled.
+
+```yaml
+poller_modules:
+    bgp-peers: 1
+discovery_modules:
+    arp-table: 0
+```
 
 ### Storage Settings
 See also: [Global Storage Config](../../Support/Configuration.md#storage-configuration)

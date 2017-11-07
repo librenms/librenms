@@ -1,0 +1,24 @@
+PACKETLOGIC-HW-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE,
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64,
+	Unsigned32, TimeTicks FROM SNMPv2-SMI
+	packetlogic2 FROM PACKETLOGIC-MIB
+	DisplayString, DateAndTime FROM SNMPv2-TC
+	CounterBasedGauge64 FROM HCNUM-TC;
+
+hw MODULE-IDENTITY
+	LAST-UPDATED "201212131322Z"
+	ORGANIZATION "Procera Networks, Inc."
+	CONTACT-INFO "support@proceranetworks.com"
+	DESCRIPTION "MIB for PacketLogic2 Hardware"
+	REVISION "201212131322Z"
+	DESCRIPTION " Latest version at the revision date for version GET VERSION HERE"
+
+	::={packetlogic2 30}
+
+
+
+
+END

@@ -12,24 +12,19 @@ if (is_file($pre_cache_file)) {
     d_echo($pre_cache);
 }
 
-if (isset($device['dynamic_discovery']['modules']['sensors'])) {
+// TODO change to exclude os with pre-cache php file, but just exclude them by hand for now (like avtech)
+if (isset($device['dynamic_discovery']['modules']['sensors']) && $device['os'] != 'avtech') {
     foreach ($device['dynamic_discovery']['modules']['sensors'] as $key => $data_array) {
         foreach ($data_array['data'] as $data) {
             foreach ((array)$data['oid'] as $oid) {
-                $tmp_name = $oid;
-                if (!isset($pre_cache[$tmp_name])) {
+                if (!isset($pre_cache[$oid])) {
                     if (isset($data['snmp_flags'])) {
                         $snmp_flag = $data['snmp_flags'];
                     } else {
                         $snmp_flag = '-OeQUs';
                     }
                     $snmp_flag .= ' -Ih';
-                    if ($key === 'pre-cache') {
-                        $array_data = '__cached';
-                    } else {
-                        $array_data = $tmp_name;
-                    }
-                    $pre_cache[$array_data] = snmpwalk_cache_oid($device, $oid, $pre_cache[$array_data], $device['dynamic_discovery']['mib'], null, $snmp_flag);
+                    $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$array_data], $device['dynamic_discovery']['mib'], null, $snmp_flag);
                 }
             }
         }

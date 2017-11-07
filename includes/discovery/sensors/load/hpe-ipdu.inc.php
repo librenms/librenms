@@ -31,7 +31,7 @@ foreach ($pre_cache['hpe_ipdu'] as $index => $item) {
     if (isset($item['mpduOutputPercentLoad'])) {
         $oid = '.1.3.6.1.4.1.232.165.5.2.1.1.5.' . $index;
         $current = $item['mpduOutputPercentLoad'];
-        discover_sensor($valid['sensor'], 'load', $device, $oid, 'mpduOutputPercentLoad.'.$index, 'hpe-ipdu', "MPDU #$x Load", 1, 1, null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'load', $device, $oid, 'mpduOutputPercentLoad.'.$index, 'hpe-ipdu', "MPDU #$x Load", 10, 1, null, null, null, null, $current);
         $x++;
     }
 }//end foreach

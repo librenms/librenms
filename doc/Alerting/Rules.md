@@ -7,6 +7,11 @@ The GUI provides a simple way of creating basic rules.
 Creating more complicated rules which may include maths calculations and MySQL queries can be 
 done using [macros](Macros.md)
 
+#### Video on how the alert rules work in LibreNMS 
+[Alert Rules](https://youtu.be/ryv0j8GEkhM)
+#### Video on how to use alert rule with wildcards
+[Alert Rules wildcard](https://youtu.be/eYYioFNcrAk)
+
 ## Syntax
 
 Rules must consist of at least 3 elements: An __Entity__, a __Condition__ and a __Value__.
@@ -26,7 +31,7 @@ __Conditions__ can be any of:
 - Smaller or Equal `<=`
 
 __Values__ can be an entity or any single-quoted data.
-__Glues__ can be either `&&` for `AND` or `||` for `OR`.
+__Glues__ can be either `&&` for `AND`.  or `||` for `OR`. Note if you need to use `OR` `||` please use a macro. 
 
 __Note__: The difference between `Equals` and `Like` (and its negation) is that `Equals` does a strict comparison and `Like` allows the usage of MySQL RegExp.
 

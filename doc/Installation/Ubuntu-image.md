@@ -8,7 +8,7 @@ We have available for download a pre-built image based on Ubuntu 16.04 LTS. Deta
 The image is built with VirtualBox, a vmdk is provided along with an ova which was exported using OFV 1.0 version. 
 These should be supported in VMWare Fusion, Workstation, Player and VirtualBox.
 
-Any issues with these images should be reported via [Github](https://github.com/librenms/librenms/issues) or our IRC channel ##librenms on the Freenode network.
+Any issues with these images should be reported via [Github](https://github.com/librenms/librenms/issues) or our [Discord server](https://t.libren.ms/discord)
 
 #### Setup
 
