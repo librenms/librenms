@@ -32,8 +32,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class YamlTest extends \PHPUnit_Framework_TestCase
 {
-
-    private $valid_keys = array(
+    private $valid_os_discovery_keys = array(
         'sysDescr',
         'sysDescr_except',
         'sysObjectId',
@@ -87,8 +86,16 @@ class YamlTest extends \PHPUnit_Framework_TestCase
             // test discovery keys
             if (isset($data['discovery'])) {
                 foreach ((array)$data['discovery'] as $group) {
+                    // make sure we have at least one valid discovery key
+                    $keys = array_keys($group);
+                    $this->assertNotEmpty($keys, "$file: contains no os discovery keys");
+                    $this->assertNotEmpty(
+                        array_intersect($keys, $this->valid_os_discovery_keys),
+                        "$file: contains no valid os discovery keys: " . var_export($keys, true)
+                    );
+
                     foreach ((array)$group as $key => $item) {
-                        $this->assertContains($key, $this->valid_keys, "$file: invalid discovery type $key");
+                        $this->assertContains($key, $this->valid_os_discovery_keys, "$file: invalid discovery type $key");
 
                         if (starts_with($key, 'snmpget')) {
                             foreach ($item as $get_key => $get_val) {
