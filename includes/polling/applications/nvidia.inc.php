@@ -13,7 +13,9 @@ $gpuArray = explode("\n", $gpus);
 $gpus=0;
 $sm_total=0;
 while (isset($gpuArray[$gpus])) {
-    $sm_total = $sm_total+explode(",", $gpuArray[$gpus])[3];
+    $gpu_values = explode(",", $gpuArray[$gpus]);
+    $sm_current = gpu_values[3];
+    $sm_total = $sm_total + $sm_current;
     $gpus++;
 }
 $sm_average = $sm_total/$gpus;
