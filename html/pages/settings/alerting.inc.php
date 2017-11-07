@@ -248,7 +248,7 @@ if (isset($vars['del_pagerduty']) && $vars['del_pagerduty'] == true && is_admin(
 
 $config_groups = get_config_by_group('alerting');
 
-if (isset($config['base_url'])) {
+if (isset($config['base_url']) && filter_var($config['base_url'].'/'.$_SERVER['REQUEST_URI'], FILTER_VALIDATE_URL)) {
     $callback = $config['base_url'].'/'.$_SERVER['REQUEST_URI'].'/';
 } else {
     $callback = get_url().'/';
