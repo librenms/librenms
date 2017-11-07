@@ -851,19 +851,34 @@ class IRCBot
             case 'srv':
                 $srvcount = array_pop(dbFetchRow('SELECT count(service_id) FROM services'.$d_w));
                 $srvup    = array_pop(dbFetchRow("SELECT count(service_id) FROM services  WHERE service_status = '0' AND service_ignore ='0'".$d_a));
-                $srvdown  = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_status = '1' AND service_ignore = '0'".$d_a));
+                $srvdown  = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_status = '2' AND service_ignore = '0'".$d_a));
+                $srvwarn  = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_status = '1' AND service_ignore = '0'".$d_a));
+                $srvunknown = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_status = '3' AND service_ignore = '0'".$d_a));
                 $srvign   = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_ignore = '1'".$d_a));
                 $srvdis   = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_disabled = '1'".$d_a));
+                $srvcountcolor = array($srvdown, $srvwarn, $srvunknown);
                 if ($srvup > 0) {
                     $srvup = $this->_color($srvup, 'green');
                 }
                 if ($srvdown > 0) {
                     $srvdown = $this->_color($srvdown, 'red');
+                }
+                if ($srvwarn > 0) {
+                    $srvwarn = $this->_color($srvwarn, 'yellow');
+                }
+                if ($srvunknown > 0) {
+                    $srvunknown = $this->_color($srvunknown, 'lightblue');
+                }
+                if ($srvcountcolor[0] > 0) {
+                    $srvcount = $this->_color($srvcount, 'red', null, 'bold');
+                } elseif ($srvcountcolor[1] > 0) {
                     $srvcount = $this->_color($srvcount, 'yellow', null, 'bold');
+                } elseif ($srvcountcolor[2] > 0) {
+                    $srvcount = $this->_color($srvcount, 'lightblue', null, 'bold');
                 } else {
                     $srvcount = $this->_color($srvcount, 'green', null, 'bold');
                 }
-                $msg      = 'Services: '.$srvcount.' ('.$srvup.' up, '.$srvdown.' down, '.$srvign.' ignored, '.$srvdis.' disabled'.')';
+                $msg      = 'Services: '.$srvcount.' ('.$srvup.' up, '.$srvdown.' down, '.$srvwarn.' warning, '.$srvunknown.' unknown, '.$srvign.' ignored, '.$srvdis.' disabled'.')';
                 break;
 
             default:
