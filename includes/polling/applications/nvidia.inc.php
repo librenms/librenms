@@ -8,19 +8,8 @@ $app_id = $app['app_id'];
 $options      = '-O qv';
 $oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.6.110.118.105.100.105.97';
 $gpus = snmp_walk($device, $oid, $options);
+
 $gpuArray = explode("\n", $gpus);
-
-$gpus=0;
-$sm_total=0;
-while (isset($gpuArray[$gpus])) {
-    $gpu_values = explode(",", $gpuArray[$gpus]);
-    $sm_current = gpu_values[3];
-    $sm_total = $sm_total + $sm_current;
-    $gpus++;
-}
-$sm_average = $sm_total/$gpus;
-
-update_application($app, $gpus, $sm_average);
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('pwr', 'GAUGE', 0)
@@ -42,6 +31,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('txpci', 'GAUGE', 0);
 
 $int=0;
+$sm_total=0;
 while (isset($gpuArray[$int])) {
     list($gpu, $pwr, $temp, $sm, $mem, $enc, $dec, $mclk, $pclk, $pviol, $tviol,
         $fb, $bar1, $sbecc, $dbecc, $pci, $rxpci, $txpci)=explode(",", $gpuArray[$int]);
@@ -73,3 +63,7 @@ while (isset($gpuArray[$int])) {
 
     $int++;
 }
+
+$sm_average = $sm_total/$int;
+
+update_application($app, $gpus, $sm_average);
