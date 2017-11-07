@@ -95,16 +95,33 @@ class Php implements ValidationGroup
 
     private function checkTimezone(Validator $validator)
     {
+        // collect data
         $ini_tz = ini_get('date.timezone');
         $sh_tz = rtrim(shell_exec('date +%Z'));
         $php_tz = date('T');
+        $php_cli_tz = rtrim(shell_exec('php -r "echo date(\'T\');"'));
+
         if (empty($ini_tz)) {
+            // make sure timezone is set
             $validator->fail(
                 'You have no timezone set for php.',
                 'http://php.net/manual/en/datetime.configuration.php#ini.date.timezone'
             );
         } elseif ($sh_tz !== $php_tz) {
-            $validator->fail("You have a different system timezone ($sh_tz) specified to the php configured timezone ($php_tz), please correct this.");
+            // check if system timezone matches the timezone of the current running php
+            $validator->fail(
+                "You have a different system timezone ($sh_tz) than the php configured timezone ($php_tz)",
+                "Please correct either your system timezone or your timezone set in php.ini."
+            );
+        } elseif ($php_tz !== $php_cli_tz) {
+            // check if web and cli timezones match (this does nothing if validate.php is run on cli)
+            // some distros have different php.ini for cli and the web server
+            if ($sh_tz !== $php_cli_tz) {
+                $validator->fail(
+                    "The CLI php.ini ($php_cli_tz) timezone is different than your system's timezone ($sh_tz)",
+                    "Edit your CLI php.ini file and set the correct timezone ($sh_tz)."
+                );
+            }
         }
     }
 
