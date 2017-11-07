@@ -63,14 +63,14 @@ class Programs implements ValidationGroup
         if ($return !== 0 || $output != "$target is alive") {
             $validator->fail(
                 "$bin could not be executed. ($output)",
-                "$bin must have CAP_NET_RAW capability (getcap) or be suid and exclusions with selinux if applicable."
+                "$bin must have CAP_NET_RAW capability (getcap) or suid. Selinux exlusions may be required."
             );
 
             if ($validator->getUsername() == 'root' && ($getcap = $this->findExecutable('getcap'))) {
                 if (!str_contains(shell_exec("$getcap $cmd"), "$cmd = cap_net_raw+ep")) {
                     $validator->fail(
                         "$bin should have CAP_NET_RAW!",
-                        "getcap c $cmd"
+                        "setcap CAP_NET_RAW $cmd"
                     );
                 }
             } elseif (!(fileperms($cmd) & 2048)) {
