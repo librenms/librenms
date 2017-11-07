@@ -11,4 +11,4 @@ Capture.
 ### Alerts
 Debug Capture is handy when you are creating alerts and need to see if your alert rule matches.
 
-![device-troubleshooting](/img/device-troubleshootingn.png)
+![device-troubleshooting](/img/device-troubleshooting.png)
