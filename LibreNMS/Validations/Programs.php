@@ -54,7 +54,8 @@ class Programs implements ValidationGroup
         }
     }
 
-    public function extraFpingChecks(Validator $validator, $bin, $cmd) {
+    public function extraFpingChecks(Validator $validator, $bin, $cmd)
+    {
         $target = ($bin == 'fping' ? '127.0.0.1' : '::1');
         $validator->execAsUser("$cmd $target 2>&1", $output, $return);
         $output = implode(" ", $output);
