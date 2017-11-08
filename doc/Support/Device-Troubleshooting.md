@@ -9,10 +9,10 @@ Capture.
 ![Capture-Debug-Icon](/img/capture-debug-icon.png)
 
 ### Discovery
-`./discovery.php` will run and output debug infomation.
+Discovery will run and output debug infomation.
 
 ### Poller
-`./poller.php` will run and output debug information.
+Poller will run and output debug information.
 
 ### SNMP
  SNMP will run SNMP Bulk Walk on the device and output the information.
