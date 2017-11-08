@@ -26,9 +26,7 @@ foreach (explode("\n", $tempoids) as $data) {
         $descr_oid       = ".1.3.6.1.4.1.3052.12.1.1.1.1.4.$oid";
         $descr           = snmp_get($device, $descr_oid, '-Oqv', '');
         $temperature     = str_replace('"', '', snmp_get($device, $temperature_oid, '-Oqv', ''));
-        $temperature     = fahrenheit_to_celsius($temperature);
-        $current         = $temperature;
 
-        discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'siteboss', $descr, '1', '1', null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'siteboss', $descr, '1', '1', null, null, null, null, fahrenheit_to_celsius($temperature);
     }
 }
