@@ -8,6 +8,8 @@ select Capture. From this new screen choose Alerts and click run.
 The output will cycle through all alerts applicable to this device and show you the Rule name, rule, 
 MySQL query and if the rule matches.
 
+See [Device Troubleshooting](Support/Device-Troubleshooting.md)
+
 ---
 
 ### Transports
@@ -29,6 +31,3 @@ As an example, if you wanted to test template ID 10 against localhost running ru
 
 If the rule is currently alerting for localhost then you will get the full template as expected to see on email, if it's not then you will just see the 
 template without any fault information.
-
-## Check to see if your alert rule matches
- See [Device Troubleshooting](https://docs.librenms.org/#Support/Device-Troubleshooting/)
