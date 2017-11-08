@@ -259,3 +259,9 @@ To disabled this caching (highly discourage) set this option to 0.
 ```php
 $config['auth_ldap_cache_ttl'] = 300;
 ```
+
+## View/embedded graphs without being logged into LibreNMS
+```php
+$config['allow_unauth_graphs'] = 1;
+$config['allow_unauth_graphs_cidr'] = 1;
+```
