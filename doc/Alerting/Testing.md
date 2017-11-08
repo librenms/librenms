@@ -31,4 +31,4 @@ If the rule is currently alerting for localhost then you will get the full templ
 template without any fault information.
 
 ## Check to see if your alert rule matches
- See [Device Troubleshooting](Support/Device-Troubleshooting.md)
+ See [Device Troubleshooting](https://docs.librenms.org/#Support/Device-Troubleshooting/)
