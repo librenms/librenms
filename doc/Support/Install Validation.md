@@ -1,6 +1,6 @@
 source: Install Validation.md
-Install validation
-------------------
+
+# Install validation
 
 With a lot of configuration possibilities, manually editing config.php means it's not
 uncommon that mistakes get made. It's also impossible to validate user input in config.php when you're just using a text editor :)
@@ -34,7 +34,7 @@ FAIL - This is going to need your attention!
 
  ### Validate from the WebUI
  
- You can validate your LibreNMS install from the Web UI, using the nav bar and clicking on the little Gear Icon -> Validate Config.
+ You can validate your LibreNMS install from the WebUI, using the nav bar and clicking on the little Gear Icon -> Validate Config.
  ![Validate Config Icon](/img/validate-config-icon.png)
  
  Then You should see the results of validate. 
