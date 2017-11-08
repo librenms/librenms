@@ -35,7 +35,7 @@ Device will be added into LibreNMS as Ping Only Device and will show ICMP Respon
 
 - Hostname: IP address or DNS name.
 - Hardware: Optional you can type in whatever you like.
-- OS: Optional, this will add the Device's OS Icon.
+- OS: Optional this will add the Device's OS Icon.
 
 ![Ping Only](/img/add-ping-only.png)
 
