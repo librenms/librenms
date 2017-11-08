@@ -31,7 +31,7 @@ As an example, if your device is configured to use the community `my_company` us
 ### Ping Only Device
 
 You can add ping only device into LibreNMS through the WebUI. When adding the device switch the SNMP button to "off".
-These Device will be added into LibreNMS as Ping Only Device and will show ICMP Response Graph. 
+Device will be added into LibreNMS as Ping Only Device and will show ICMP Response Graph. 
 
 - Hostname: IP address or DNS name.
 - Hardware: Optional you can type in whatever you like.
