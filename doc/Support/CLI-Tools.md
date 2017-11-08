@@ -1,4 +1,4 @@
-source: Support/Features.md
+source: Support/CLI-Tools.md
 ### Command line tools
 
 Here's a brief list of command line tools, some might be missing.
@@ -24,14 +24,14 @@ One simple way to obtain port IDs is by querying the SQL database.
 If you wanted to query all deleted ports from the database, you could to
 this with the following query:
 
-<pre><code>
+```bash
 echo 'SELECT port_id, hostname, ifDescr FROM ports, devices WHERE devices.device_id = ports.device_id AND deleted = 1' | mysql -h your_DB_server -u your_DB_user -p --skip-column-names your_DB_name
-</pre></code>
+```
 
 When you are sure that the list of ports is correct and you want to delete all of them,
 you can write the list into a file and call purge-ports.php with that file as input:
 
-<pre><code>
+```
 echo 'SELECT port_id FROM ports, devices WHERE devices.device_id = ports.device_id AND deleted = 1' | mysql -h your_DB_server -u your_DB_user -p --skip-column-names your_DB_name > ports_to_delete
 ./purge-ports.php -f ports_to_delete
-</pre></code>
+```
