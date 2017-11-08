@@ -1,0 +1,13 @@
+STORMSHIELD-SMI-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      enterprises FROM RFC1155-SMI;
+
+   stormshield OBJECT IDENTIFIER ::= { enterprises 11256 }
+
+   stormshieldMIB OBJECT IDENTIFIER ::= { stormshield 1 }
+
+-- stormshield notification
+   snsNotifications OBJECT IDENTIFIER ::= { stormshieldMIB 6 }
+
+END
