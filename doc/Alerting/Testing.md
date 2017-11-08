@@ -29,3 +29,6 @@ As an example, if you wanted to test template ID 10 against localhost running ru
 
 If the rule is currently alerting for localhost then you will get the full template as expected to see on email, if it's not then you will just see the 
 template without any fault information.
+
+## Check to see if your alert rule matches
+ See [Device Troubleshooting](https://docs.librenms.org/#Support/Device-Troubleshooting/)
