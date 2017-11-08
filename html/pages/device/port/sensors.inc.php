@@ -33,4 +33,4 @@ foreach ($sensors as $sensor) {
 
     $row++;
 }
-unset ($row);
+unset($row);
