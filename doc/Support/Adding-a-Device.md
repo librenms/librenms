@@ -30,7 +30,7 @@ As an example, if your device is configured to use the community `my_company` us
 
 ### Ping Only Device
 
-You can add ping only device into LibreNMS through the WebUI. When adding the device switch the SNMP button to "off".
+You can add ping only devices into LibreNMS through the WebUI. When adding the device switch the SNMP button to "off".
 Device will be added into LibreNMS as Ping Only Device and will show ICMP Response Graph. 
 
 - Hostname: IP address or DNS name.
@@ -39,8 +39,6 @@ Device will be added into LibreNMS as Ping Only Device and will show ICMP Respon
 
 ![Ping Only](/img/add-ping-only.png)
 
-
-
 If you would like to add devices automatically then you will probably want to read the [Auto-discovery Setup](/Extensions/Auto-Discovery.md) guide.
 
-You may also want to add devices programatically, if so, take a look at our [API documentation](/API/#function-add_device)
+You may also want to add devices programatically, if so, take a look at our [API documentation](../API/index.md#function-add_device)
