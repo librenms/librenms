@@ -2003,6 +2003,8 @@ function initStats()
         $snmp_stats = array(
             'snmpget' => 0,
             'snmpget_sec' => 0.0,
+            'snmpgetnext' => 0,
+            'snmpgetnext_sec' => 0.0,
             'snmpwalk' => 0,
             'snmpwalk_sec' => 0.0,
         );
@@ -2036,9 +2038,11 @@ function printStats()
     global $snmp_stats, $db_stats;
 
     printf(
-        "SNMP: Get[%d/%.2fs] Walk [%d/%.2fs]\n",
+        "SNMP: Get[%d/%.2fs] Getnext [%d/%.2fs] Walk [%d/%.2fs]\n",
         $snmp_stats['snmpget'],
         $snmp_stats['snmpget_sec'],
+        $snmp_stats['snmpgetnext'],
+        $snmp_stats['snmpgetnext_sec'],
         $snmp_stats['snmpwalk'],
         $snmp_stats['snmpwalk_sec']
     );
