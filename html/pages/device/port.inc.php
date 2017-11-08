@@ -76,7 +76,7 @@ $menu_options['fdb']    = 'FDB Table';
 $menu_options['events'] = 'Eventlog';
 $menu_options['notes'] = 'Notes';
 
-if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `entPhysicalIndex` = ? ", array($device['device_id'],$port['ifIndex']))) {
+if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `entPhysicalIndex` = ?  AND entPhysicalIndex_measured = 'ports'", array($device['device_id'],$port['ifIndex']))) {
     $menu_options['sensors'] = 'Health';
 }
 

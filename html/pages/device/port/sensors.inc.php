@@ -1,6 +1,6 @@
 <?php
 
-$sensors = dbFetchRows("SELECT * FROM `sensors` WHERE `device_id` = ? AND `entPhysicalIndex` = ? ORDER BY `sensor_type` ASC", array($device['device_id'],$port['ifIndex']));
+$sensors = dbFetchRows("SELECT * FROM `sensors` WHERE `device_id` = ? AND `entPhysicalIndex` = ? AND entPhysicalIndex_measured = 'ports' ORDER BY `sensor_type` ASC", array($device['device_id'],$port['ifIndex']));
 
 $row = 0;
 foreach ($sensors as $sensor) {
@@ -33,3 +33,4 @@ foreach ($sensors as $sensor) {
 
     $row++;
 }
+unset ($row);
