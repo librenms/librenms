@@ -62,6 +62,6 @@ foreach ($gpuArray as $gpu) {
         $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
         data_update($device, 'app', $tags, $fields);
 }
-$sm_average = ($sm_total ? 0 : ($sm_total / count($gpuArray)));
+$sm_average = ($sm_total ? ($sm_total / count($gpuArray)) : 0);
 
 update_application($app, $gpus, $sm_average);
