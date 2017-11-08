@@ -25,7 +25,7 @@
 
 $data = snmp_get_multi_oid($device, 'snsModel.0 snsVersion.0 snsSerialNumber.0 snsSystemName.0', '-OUQs', 'STORMSHIELD-PROPERTY-MIB');
 
-$hardware = trim($data['snsModel.0'], '"');
-$version = trim($data['snsVersion.0'], '"');
-$serial = trim($data['snsSerialNumber.0'], '"');
-$sysName = trim($data['snsSystemName.0'], '"');
+$hardware = $data['snsModel.0'];
+$version = $data['snsVersion.0'];
+$serial = $data['snsSerialNumber.0'];
+$sysName = $data['snsSystemName.0'];
