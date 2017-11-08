@@ -82,10 +82,11 @@ LibreNMS server. Something like pdns-recursor can be used and then configure `/e
 By default the polling ports module will walk ifXEntry + some items from ifEntry regardless of the port. So if a port is marked as deleted because you don't want to see them 
 or it's disabled then we still collect data. For the most part this is fine as the walks are quite quick. However for devices with a lot of ports and good % of those are 
 either deleted or disabled then this approach isn't optimal. So to counter this you can enable 'selected port polling' per device within the edit device -> misc section or by
-globally enabling it (not recommended): `$config['polling']['selected_ports'] = true;`.
+globally enabling it (not recommended): `$config['polling']['selected_ports'] = true;`. You can also set it for a specific OS: `$config['os']['ios']['polling']['selected_ports'] = true;`. 
 
 If you would like to see if you should turn this on then run this query in MySQL: `select device_id, count(*) as total from ports where deleted=1 group by device_id order by total desc;`. You will see output like the following:
 
+```
 +-----------+-------+
 | device_id | total |
 +-----------+-------+
@@ -94,6 +95,8 @@ If you would like to see if you should turn this on then run this query in MySQL
 |        41 |    41 |
 |        38 |     3 |
 |        81 |     2 |
++-----------+-------+
+```
 
 Here device id 128 and potentially 92 and 41 are likely candidates for this feature to be enabled on. Turn it on and then closely monitor the device for the next 15-30 minutes.
 
