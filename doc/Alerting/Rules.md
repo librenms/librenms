@@ -63,6 +63,10 @@ Alert when:
 - High memory usage: `%macros.device_up = "1" && %mempools.mempool_perc >= "90" && %mempools.mempool_descr = "Virtual@"`
 - High CPU usage(per core usage, not overall): `%macros.device_up = "1" && %processors.processor_usage >= "90"`
 - High port usage, where description is not client & ifType is not softwareLoopback: `%macros.port_usage_perc >= "80" && %port.port_descr_type != "client" && %ports.ifType != "softwareLoopback"`
+- Alert when mac address is located on your network `%ipv4_mac.mac_address = "2c233a756912"`
 
 ## Procedure
 You can associate a rule to a procedure by giving the URL of the procedure when creating the rule. Only links like "http://" are supported, otherwise an error will be returned. Once configured, procedure can be opened from the Alert widget through the "Open" button, which can be shown/hidden from the widget configuration box.
+
+## Check to see if your alert rule matches
+See [Device Troubleshooting](Support/Device-Troubleshooting.md)
