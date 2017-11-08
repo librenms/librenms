@@ -68,5 +68,5 @@ Alert when:
 ## Procedure
 You can associate a rule to a procedure by giving the URL of the procedure when creating the rule. Only links like "http://" are supported, otherwise an error will be returned. Once configured, procedure can be opened from the Alert widget through the "Open" button, which can be shown/hidden from the widget configuration box.
 
-## Check to see if your alert matches
+## Check to see if your alert rule matches
 See [Device Troubleshooting](Support/Device-Troubleshooting.md)
