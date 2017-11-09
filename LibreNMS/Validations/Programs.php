@@ -40,7 +40,7 @@ class Programs implements ValidationGroup
     public function validate(Validator $validator)
     {
         // Check programs
-        $bins = array('fping', 'fping6', 'rrdtool', 'snmpwalk', 'snmpget', 'snmpbulkwalk');
+        $bins = array('fping', 'fping6', 'rrdtool', 'snmpwalk', 'snmpget', 'snmpgetnext', 'snmpbulkwalk');
         foreach ($bins as $bin) {
             if (!($cmd = $this->findExecutable($bin))) {
                 $validator->fail(
@@ -60,24 +60,31 @@ class Programs implements ValidationGroup
         $validator->execAsUser("$cmd $target 2>&1", $output, $return);
         $output = implode(" ", $output);
 
-        if ($return !== 0 || $output != "$target is alive") {
-            $validator->fail(
-                "$bin could not be executed. $bin must have CAP_NET_RAW capability (getcap) or suid. Selinux exlusions may be required.\n ($output)"
-            );
+        if ($return === 0 && $output == "$target is alive") {
+            return; // fping is working
+        }
 
-            if ($getcap = $this->findExecutable('getcap')) {
-                $getcap_out = shell_exec("$getcap $cmd");
-                preg_match("#^$cmd = (.*)$#", $getcap_out, $matches);
+        if ($output == '::1 address not found') {
+            $validator->warn("fping6 does not have IPv6 support?!?!");
+            return;
+        }
 
-                if (is_null($matches) || !str_contains($matches[1], 'cap_net_raw+ep')) {
-                    $validator->fail(
-                        "$bin should have CAP_NET_RAW!",
-                        "setcap cap_net_raw+ep $cmd"
-                    );
-                }
-            } elseif (!(fileperms($cmd) & 2048)) {
-                $validator->fail("$bin should be suid!", "chmod u+s $cmd");
+        $validator->fail(
+            "$bin could not be executed. $bin must have CAP_NET_RAW capability (getcap) or suid. Selinux exlusions may be required.\n ($output)"
+        );
+
+        if ($getcap = $this->findExecutable('getcap')) {
+            $getcap_out = shell_exec("$getcap $cmd");
+            preg_match("#^$cmd = (.*)$#", $getcap_out, $matches);
+
+            if (is_null($matches) || !str_contains($matches[1], 'cap_net_raw+ep')) {
+                $validator->fail(
+                    "$bin should have CAP_NET_RAW!",
+                    "setcap cap_net_raw+ep $cmd"
+                );
             }
+        } elseif (!(fileperms($cmd) & 2048)) {
+            $validator->fail("$bin should be suid!", "chmod u+s $cmd");
         }
     }
 
