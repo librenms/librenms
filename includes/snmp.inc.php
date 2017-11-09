@@ -293,7 +293,7 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
 {
     $time_start = microtime(true);
 
-    $snmpcmd  = Config::get('snmpgetnext');
+    $snmpcmd  = Config::get('snmpgetnext', 'snmpgetnext');
     $cmd = gen_snmp_cmd($snmpcmd, $device, $oid, $options, $mib, $mibdir);
     $data = trim(external_exec($cmd), "\" \n\r");
 
