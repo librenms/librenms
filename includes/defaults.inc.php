@@ -946,5 +946,3 @@ $config['api']['cors']['origin'] = '*';
 $config['api']['cors']['maxage'] = '86400';
 $config['api']['cors']['allowmethods'] = array('POST', 'GET', 'PUT', 'DELETE', 'PATCH');
 $config['api']['cors']['allowheaders'] = array('Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Auth-Token');
-
-// $config['shorthost_target_length'] = 12;
