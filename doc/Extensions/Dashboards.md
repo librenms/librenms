@@ -8,7 +8,7 @@ Example Dashboard
 ![Example Dashboard](/img/example-dashboard.png)
 
 ### Widgets
-LibreNMS has a host of Widgets to select from. 
+LibreNMS has a whole list of Widgets to select from. 
 ![List Of Widgets](/img/list-widgets.png)
 - Alerts Widget: show all alert not notifications.
 - Availability Map: Shows all devices with colored tiles, green up, yellow for warning (device has been restarted in last 24 hours),red for
