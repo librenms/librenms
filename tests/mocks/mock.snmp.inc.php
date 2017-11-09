@@ -97,6 +97,30 @@ function snmprec_get_oid($community, $oid)
 }
 
 /**
+ * Get next oid after $oid from the specified $community
+ *
+ * @param string $community the community to fetch data from
+ * @param string $oid numeric oid of data to fetch
+ * @return array array of the data containing: [$type, $data]
+ * @throws Exception this $oid is not cached
+ */
+function snmprec_get_next_oid($community, $oid)
+{
+    global $snmpMockCache;
+    cache_snmprec($community);
+
+    if (isset($snmpMockCache[$community])) {
+        foreach ($snmpMockCache[$community] as $cur_oid => $data) {
+            if (starts_with($cur_oid, $oid) && $cur_oid != $oid) {
+                return $data;
+            }
+        }
+    }
+
+    throw new Exception("SNMPREC: oid $community:$oid next not cached");
+}
+
+/**
  * Get the numeric oid of an oid
  * The leading dot is ommited by default to be compatible with snmpsim
  *
@@ -227,6 +251,27 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     }
 }
 
+function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = null)
+{
+    $community = $device['community'];
+    $num_oid = snmp_translate_number($oid, $mib, $mibdir);
+
+    try {
+        $data = snmprec_get_next_oid($community, $num_oid);
+
+        $result = $data[1];
+        if ($data[0] == 6) {
+            $result = '.' . $data[1];
+        }
+
+        d_echo("[SNMP] snmpget $community $oid ($num_oid): $result\n");
+
+        return $result;
+    } catch (Exception $e) {
+        d_echo("[SNMP] snmpget $community $oid ($num_oid): no data\n");
+        return false;
+    }
+}
 
 function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mibdir = null)
 {
