@@ -658,16 +658,28 @@ function isPingable($hostname, $address_family = AF_INET, $attribs = array())
     $response = array();
     if (can_ping_device($attribs) === true) {
         $fping_params = '';
-        if (is_numeric($config['fping_options']['retries']) || $config['fping_options']['retries'] > 1) {
+        if (is_numeric($config['fping_options']['retries']) && $config['fping_options']['retries'] > 0) {
+            if ($config['fping_options']['retries'] > 20) {
+                $config['fping_options']['retries'] = 20;
+            }
             $fping_params .= ' -r ' . $config['fping_options']['retries'];
         }
-        if (is_numeric($config['fping_options']['timeout']) || $config['fping_options']['timeout'] > 1) {
+        if (is_numeric($config['fping_options']['timeout'])) {
+            if ($config['fping_options']['timeout'] < 50) {
+                $config['fping_options']['timeout'] = 50;
+            }
+            if ($config['fping_options']['millisec'] < $config['fping_options']['timeout']) {
+                $config['fping_options']['millisec'] = $config['fping_options']['timeout'];
+            }
             $fping_params .= ' -t ' . $config['fping_options']['timeout'];
         }
-        if (is_numeric($config['fping_options']['count']) || $config['fping_options']['count'] > 0) {
+        if (is_numeric($config['fping_options']['count']) && $config['fping_options']['count'] > 0) {
             $fping_params .= ' -c ' . $config['fping_options']['count'];
         }
-        if (is_numeric($config['fping_options']['millisec']) || $config['fping_options']['millisec'] > 0) {
+        if (is_numeric($config['fping_options']['millisec'])) {
+            if ($config['fping_options']['millisec'] < 20) {
+                $config['fping_options']['millisec'] = 20;
+            }
             $fping_params .= ' -p ' . $config['fping_options']['millisec'];
         }
         $status = fping($hostname, $fping_params, $address_family);
