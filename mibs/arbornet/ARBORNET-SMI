@@ -1,0 +1,91 @@
+--
+--   
+-- ARBOR NETWORKS (c) 2001-2011
+-- 
+--
+--
+--   File:		ARBORNET-SMI.txt
+--   Created:		May, 2001
+--   Purpose:
+--	arbornet smi... defined major subcomponents
+--
+--	 This is the MIB extentions used by arbor networks
+--       to describe generated traps.  It will be further
+--       modified to include new traps, and also to possibly
+--	 provide snmp agent responses.
+--
+--
+
+ARBOR-SMI	DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+
+arbornetworks MODULE-IDENTITY
+	LAST-UPDATED "201311140000Z" -- November 14, 2013
+	ORGANIZATION "Arbor Networks, Inc."
+	CONTACT-INFO	"	Arbor Networks, Inc.
+				Arbor Technical Assistance Center
+
+				Postal: 76 Blanchard Road
+					Burlington, MA 01803
+					USA
+
+				Tel: +1 866 212 7267 (toll free)
+				     +1 781 362 4300
+				Email: support@arbor.net "
+
+	DESCRIPTION
+		"The Structure of Management Information for the
+		Arbor Networks enterprise."
+
+	-- Revision log, reverse chrono
+	REVISION    "201311140000Z" -- November 14, 2013
+	DESCRIPTION "Add peakflowMobile product."
+
+	REVISION    "201308190000Z" -- August 19, 2013
+	DESCRIPTION "Updated contact information"
+
+	REVISION    "201107200000Z" -- July 20, 2011
+	DESCRIPTION "Added pravail productid."
+
+	REVISION    "200903300000Z" -- March 30, 2009
+	DESCRIPTION "Update contact group name."
+
+	REVISION    "200811130000Z" -- September 13, 2005
+	DESCRIPTION "Update company address. Add arborExperimental."
+
+	REVISION    "200509120000Z" -- September 12, 2005
+	DESCRIPTION "Apply fixes from validation."
+
+	::= { enterprises 9694 }
+
+arbornetworksProducts OBJECT-IDENTITY
+	STATUS  current
+	DESCRIPTION
+		"arbornetworksProducts provides a root object identifier
+		from which MODULE-IDENTITY values may be assigned."
+	::= { arbornetworks 1 }
+
+arborExperimental OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"arborExperimental provides a root object identifier
+		 from which MODULE-IDENTITY for experimental purposes
+		 may be assigned."
+	::= { arbornetworks 2 }
+
+-- peakflowDosMIB  OBJECT IDENTIFIER  ::= { arbornetworksProducts 1 }
+-- peakflowTrafficMIB  OBJECT IDENTIFIER  ::= { arbornetworksProducts 2 }
+-- peakflowMowMIB  OBJECT IDENTIFIER  ::= { arbornetworksProducts 3 }
+-- peakflowSPMIB  OBJECT IDENTIFIER  ::= { arbornetworksProducts 4 }
+-- peakflowTmsMIB  OBJECT IDENTIFIER  ::= { arbornetworksProducts 5 }
+-- pravailMIB  OBJECT IDENTIFIER  ::= { arbornetworksProducts 6 }
+-- slsMIB  OBJECT IDENTIFIER  ::= { arbornetworksProducts 9 }
+-- peakflowMobileMIB  OBJECT IDENTIFIER  ::= { arbornetworksProducts 10 }
+-- arbuxMIB OBJECT IDENTIFIER ::= { arbornetworksProducts 11 }
+
+END

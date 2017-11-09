@@ -519,6 +519,11 @@ $config['graph_types']['device']['secureplatform_sessions']['section'] = 'firewa
 $config['graph_types']['device']['secureplatform_sessions']['order'] = 0;
 $config['graph_types']['device']['secureplatform_sessions']['descr'] = 'Active connections';
 
+//arbos specific graphs
+$config['graph_types']['device']['arbos_flows']['section']         = 'graphs';
+$config['graph_types']['device']['arbos_flows']['order']           = '0';
+$config['graph_types']['device']['arbos_flows']['descr']           = 'Accumulative flow count per SP device';
+
 // Device Types
 $i = 0;
 $config['device_types'][$i]['text'] = 'Servers';
