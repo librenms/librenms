@@ -14,23 +14,23 @@ LibreNMS has a whole list of Widgets to select from.
 - Availability Map: Shows all devices with colored tiles, green up, yellow for warning (device has been restarted in last 24 hours),red for
 down. You can also list all services and ignored/disabled devcies in this widget.
 - Componet Status: List all componets Ok state, Warning state, Critical state.
-- Device Summary horizontal: List device totals,up,down,ignored,disabled. Same for ports and services. 
-- Device Summary vertical: List device totals,up,down,ignored,disabled. Same for ports and services.
+- Device Summary horizontal: List device totals, up, down, ignored, disabled. Same for ports and services. 
+- Device Summary vertical: List device totals, up, down, ignored, disabled. Same for ports and services.
 - Eventlog: Shows all events with your devices and LibreNMS. 
-- External Image: can be sued show external images on your dashboard. 
+- External Image: can be used to show external images on your dashboard. 
 - Globe Map: Will display map of the globe.
 - Graph: Can be used to display graphs from devices. 
-- Graylog: List all Graylog's syslog entries.
-- Notes: Can use html tags,embed links and external websites.
-- Syslog list all syslog entries.
+- Graylog: Lists all Graylog's syslog entries.
+- Notes: use for html tags, embed links and external web pages.
+- Syslog: lists all syslog entries.
 - Top Devices: By Traffic, or  Uptime, or Response time, or Poller Duration, or Procssor load, or Memory Usage.
-- Top Interfaces: List top interfaces.
-- Worldmap: Will display all your devices locations.
+- Top Interfaces: Lists top interfaces.
+- Worldmap: displays all your devices locations. From syslocation or from override sysLocation.
 
 ### Dashboard Permissions
-- Private: Sets the dashabord to only the user that created the dashboard can view and edit it.
+- Private: Sets the dashabord to only the user that created the dashboard can view and edit.
 - Shared Read: Sets the dashboard to allow other users to view the dashboard, but cant make changes to the dashboard.
-- Shared: Allows all users to view the dashboard and makes changes.
+- Shared: Allows all users to view the dashboard and make changes.
 
 ### Setting a global default dashboard
 Step 1: Set the dashboard to either shared read or shared, depending on what you want the users access to change. 
