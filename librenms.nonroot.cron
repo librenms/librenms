@@ -1,6 +1,6 @@
 # Using this cron file requires an additional user on your system, please see install docs.
 
-33  */6   * * *   librenms    /opt/librenms/discovery.php -h all >> /dev/null 2>&1
+33   */6  * * *   librenms    /opt/librenms/cronic /opt/librenms/discovery-wrapper.py 1
 */5  *    * * *   librenms    /opt/librenms/discovery.php -h new >> /dev/null 2>&1
 */5  *    * * *   librenms    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
 15   0    * * *   librenms    /opt/librenms/daily.sh >> /dev/null 2>&1
@@ -8,4 +8,3 @@
 */5  *    * * *   librenms    /opt/librenms/poll-billing.php >> /dev/null 2>&1
 01   *    * * *   librenms    /opt/librenms/billing-calculate.php >> /dev/null 2>&1
 */5  *    * * *   librenms    /opt/librenms/check-services.php >> /dev/null 2>&1
-
