@@ -30,14 +30,14 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('rxpci', 'GAUGE', 0)
     ->addDataset('txpci', 'GAUGE', 0);
 
-foreach ($gpuArray as $gpu) {
+foreach ($gpuArray as $index => $gpu) {
     $stats = explode(",", $gpu);
     $sm_total += $stats[3];
 
     list($gpu, $pwr, $temp, $sm, $mem, $enc, $dec, $mclk, $pclk, $pviol, $tviol,
         $fb, $bar1, $sbecc, $dbecc, $pci, $rxpci, $txpci)=$stats;
 
-        $rrd_name = array('app', $name, $app_id, $int);
+        $rrd_name = array('app', $name, $app_id, $index);
 
         $fields = array(
             'pwr' => $pwr,
