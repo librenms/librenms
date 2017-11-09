@@ -86,17 +86,13 @@ globally enabling it (not recommended): `$config['polling']['selected_ports'] = 
 
 If you would like to see if you should turn this on then run this query in MySQL: `select device_id, count(*) as total from ports where deleted=1 group by device_id order by total desc;`. You will see output like the following:
 
-```
-+-----------+-------+
 | device_id | total |
-+-----------+-------+
+| --------: | ----: |
 |       128 |   339 |
 |        92 |    56 |
 |        41 |    41 |
 |        38 |     3 |
 |        81 |     2 |
-+-----------+-------+
-```
 
 Here device id 128 and potentially 92 and 41 are likely candidates for this feature to be enabled on. Turn it on and then closely monitor the device for the next 15-30 minutes.
 
