@@ -46,6 +46,7 @@ pages:
       - Extensions/Interface-Description-Parsing.md
       - Extensions/Network-Map.md
       - Extensions/Syslog.md
+      - Extensions/Dashboards.md
   - 5. Advanced Setup:
       - Support/1-Minute-Polling.md
       - Configuration docs: Support/Configuration.md
