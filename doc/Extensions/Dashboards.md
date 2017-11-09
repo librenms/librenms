@@ -9,10 +9,9 @@ Example Dashboard
 
 ### Widgets
 LibreNMS has a whole list of Widgets to select from. 
-![List Of Widgets](/img/list-widgets.png)
+--------------------------------------------------------------
 - Alerts Widget: show all alert not notifications.
-- Availability Map: Shows all devices with colored tiles, green up, yellow for warning (device has been restarted in last 24 hours),red for
-down. You can also list all services and ignored/disabled devcies in this widget.
+- Availability Map: Shows all devices with colored tiles, green up, yellow for warning (device has been restarted in last 24 hours),red   for down. You can also list all services and ignored/disabled devcies in this widget.
 - Componet Status: List all componets Ok state, Warning state, Critical state.
 - Device Summary horizontal: List device totals, up, down, ignored, disabled. Same for ports and services. 
 - Device Summary vertical: List device totals, up, down, ignored, disabled. Same for ports and services.
@@ -26,6 +25,9 @@ down. You can also list all services and ignored/disabled devcies in this widget
 - Top Devices: By Traffic, or  Uptime, or Response time, or Poller Duration, or Procssor load, or Memory Usage.
 - Top Interfaces: Lists top interfaces.
 - Worldmap: displays all your devices locations. From syslocation or from override sysLocation.
+--------------------------------------------------------------------
+![List Of Widgets](/img/list-widgets.png)
+
 
 ### Dashboard Permissions
 - Private: Sets the dashabord to only the user that created the dashboard can view and edit.
