@@ -112,6 +112,7 @@ pages:
       - Extensions/Plugin-System.md
   - 11. Misc:
       - Security information: General/Security.md
+      - CLI Scripts: Support/CLI-Tools.md
   - hidden:
       - Alerting/Rules.md
       - Alerting/Templates.md
