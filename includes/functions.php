@@ -182,7 +182,7 @@ function checkDiscovery($device, $array, $sysObjectId, $sysDescr)
         } elseif ($key == 'snmpget') {
             $options = isset($value['options']) ? $value['options'] : '-Oqv';
             $mib = isset($value['mib']) ? $value['mib'] : null;
-            $mib_dir = isset($value['mibdir']) ? $value['mibdir'] : null;
+            $mib_dir = isset($value['mib_dir']) ? $value['mib_dir'] : null;
             $op = isset($value['op']) ? $value['op'] : 'contains';
 
             $get_value = snmp_get($device, $value['oid'], $options, $mib, $mib_dir);
