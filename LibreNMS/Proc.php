@@ -197,7 +197,10 @@ class Proc
 
         if (!$closed) {
             // try harder
-            $killed = posix_kill($status['pid'], 9); //9 is the SIGKILL signal
+            $killed = false;
+            if (function_exists('posix_kill')) {
+                $killed = posix_kill($status['pid'], 9); //9 is the SIGKILL signal
+            }
             proc_close($this->_process);
 
             if (!$killed && $this->isRunning()) {

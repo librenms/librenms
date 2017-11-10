@@ -65,6 +65,13 @@ class Php implements ValidationGroup
                 $validator->fail("Missing CLI PHP extension: $extension", "Please install $extension");
             }
         }
+
+        $suggested_extensions = array('posix' => 'php-process');
+        foreach ($suggested_extensions as $extension => $packages) {
+            if (!extension_loaded($extension)) {
+                $validator->warn("Missing optional PHP extension: $extension", "It is suggested you install $packages or the one that matches your php version");
+            }
+        }
     }
 
     private function checkFunctions(Validator $validator)
