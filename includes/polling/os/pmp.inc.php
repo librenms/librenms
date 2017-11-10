@@ -28,19 +28,19 @@ $models = array(
 );
 
 foreach ($models as $desc => $model) {
-    if (strstr($cambium_type, $desc)) {
+    if (str_contains($cambium_type, $desc)) {
         $hardware = $model;
 
-        if (strstr($model, 'PTP')) {
+        if (str_contains($model, 'PTP')) {
             $masterSlaveMode = str_replace($filtered_words, "", snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB'));
             $hardware = $model . ' '. $masterSlaveMode;
             $version = snmp_get($device, 'boxDeviceTypeID.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
         }
 
-        if (strstr($model, 'PMP')) {
-            if (strstr($version, "AP")) {
+        if (str_contains($model, 'PMP')) {
+            if (str_contains($version, "AP")) {
                 $hardware = $model . ' AP';
-            } elseif (strstr($version, "SM")) {
+            } elseif (str_contains($version, "SM")) {
                 $hardware = $model . ' SM';
             }
         }
