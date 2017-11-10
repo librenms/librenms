@@ -201,11 +201,13 @@ if (is_writable(session_save_path() === '' ? '/tmp' : session_save_path())) {
 echo "<tr class='$row_class'><td>Session directory writable</td><td>$status</td><td>";
 if ($status == 'no') {
     echo session_save_path() . " is not writable";
-    $group_info = posix_getgrgid(filegroup(session_save_path()));
-    if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
-        $group = $group_info['name'];
-        $user = get_current_user();
-        echo ", suggested fix <strong>usermod -a -G $group $user</strong>";
+    if (function_exists('posix_getgrgid')) {
+        $group_info = posix_getgrgid(filegroup(session_save_path()));
+        if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
+            $group = $group_info['name'];
+            $user = get_current_user();
+            echo ", suggested fix <strong>usermod -a -G $group $user</strong>";
+        }
     }
 }
 echo "</td></tr>";
