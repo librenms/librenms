@@ -22,7 +22,6 @@ $models = array(
     'BHUL450'   => 'PTP 450',
     'BHUL'      => 'PTP 230',
     'BH20'      => 'PTP 100',
-    'CMM'       => 'CMM',
     'MIMO OFDM' => 'PMP 450',
     'OFDM'      => 'PMP 430',
     'AP'        => 'PMP 100'
@@ -30,7 +29,6 @@ $models = array(
 
 foreach ($models as $desc => $model) {
     if (strstr($cambium_type, $desc)) {
-
         $hardware = $model;
 
         if (strstr($model, 'PTP')) {
