@@ -768,7 +768,7 @@ Output:
 
 List devices for use with Oxidized. If you have group support enabled then a group will also be returned based on your config.
 
-Route: `/api/v0/oxidized`
+Route: `/api/v0/oxidized(/:hostname)`
 
 Input (JSON):
 

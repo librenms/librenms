@@ -42,7 +42,7 @@ $app->group(
                 $app->get('/bgp', 'authToken', 'list_bgp')->name('list_bgp');
                 $app->get('/ospf', 'authToken', 'list_ospf')->name('list_ospf');
                 // api/v0/bgp
-                $app->get('/oxidized', 'authToken', 'list_oxidized')->name('list_oxidized');
+                $app->get('/oxidized(/:hostname)', 'authToken', 'list_oxidized')->name('list_oxidized');
                 $app->group(
                     '/devices',
                     function () use ($app) {
