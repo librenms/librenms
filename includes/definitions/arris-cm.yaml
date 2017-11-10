@@ -2,6 +2,8 @@ os: arris-cm
 text: ARRIS DOCSIS
 type: network
 icon: arris
+mib_dir:
+    - arris
 discovery:
     -
       sysObjectId:
