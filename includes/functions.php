@@ -2009,7 +2009,7 @@ function get_toner_levels($device, $raw_value, $capacity)
  */
 function initStats()
 {
-    global $snmp_stats, $db_stats;
+    global $snmp_stats, $db_stats, $rrd_stats;
 
     if (!isset($snmp_stats)) {
         $snmp_stats = array(
@@ -2040,6 +2040,17 @@ function initStats()
             'fetchrows_sec' => 0.0,
         );
     }
+
+    if (!isset($rrd_stats)) {
+        $rrd_stats = array(
+            'update' => 0,
+            'update_sec' => 0.0,
+            'create' => 0,
+            'create_sec' => 0.0,
+            'other' => 0,
+            'other_sec' => 0.0,
+        );
+    }
 }
 
 /**
@@ -2047,10 +2058,11 @@ function initStats()
  */
 function printStats()
 {
-    global $snmp_stats, $db_stats;
+    global $snmp_stats, $db_stats, $rrd_stats;
 
     printf(
-        "SNMP: Get[%d/%.2fs] Getnext [%d/%.2fs] Walk [%d/%.2fs]\n",
+        "SNMP %.2fs: Get[%d/%.2fs] Getnext [%d/%.2fs] Walk [%d/%.2fs]\n",
+        $snmp_stats['snmpget_sec'] + $snmp_stats['snmpgetnext_sec'] + $snmp_stats['snmpwalk_sec'],
         $snmp_stats['snmpget'],
         $snmp_stats['snmpget_sec'],
         $snmp_stats['snmpgetnext'],
@@ -2059,7 +2071,8 @@ function printStats()
         $snmp_stats['snmpwalk_sec']
     );
     printf(
-        "MySQL: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
+        "MySQL %.2fs: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
+        $db_stats['fetchcell_sec'] + $db_stats['fetchrow_sec'] + $db_stats['fetchrows_sec'] + $db_stats['fetchcolumn_sec'] + $db_stats['update_sec'] + $db_stats['insert_sec'] + $db_stats['delete_sec'],
         $db_stats['fetchcell'],
         $db_stats['fetchcell_sec'],
         $db_stats['fetchrow'],
@@ -2075,6 +2088,36 @@ function printStats()
         $db_stats['delete'],
         $db_stats['delete_sec']
     );
+    printf(
+        "RRD %.2fs: Update [%d/%.2fs] Create [%d/%.2fs] Other [%d/%.2fs]\n",
+        $rrd_stats['update_sec'] + $rrd_stats['create_sec'] + $rrd_stats['other_sec'],
+        $rrd_stats['update'],
+        $rrd_stats['update_sec'],
+        $rrd_stats['create'],
+        $rrd_stats['create_sec'],
+        $rrd_stats['other'],
+        $rrd_stats['other_sec']
+    );
+}
+
+/**
+ * Update statistics for rrd operations
+ *
+ * @param string $stat create, update, and other
+ * @param float $start_time The time the operation started with 'microtime(true)'
+ * @return float  The calculated run time
+ */
+function recordRrdStatistic($stat, $start_time)
+{
+    global $rrd_stats;
+    initStats();
+
+    $stat = ($stat == 'update' || $stat == 'create') ? $stat : 'other';
+    $runtime = microtime(true) - $start_time;
+    $rrd_stats[$stat]++;
+    $rrd_stats["${stat}_sec"] += $runtime;
+
+    return $runtime;
 }
 
 /**
