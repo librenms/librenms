@@ -16,16 +16,26 @@ use LibreNMS\Authentication\Auth;
 
 function authToken(\Slim\Route $route)
 {
+    global $permissions;
+    
     $app   = \Slim\Slim::getInstance();
     $token = $app->request->headers->get('X-Auth-Token');
     if (isset($token) && !empty($token)) {
         if (!method_exists(Auth::get(), 'getUser')) {
-            $username = dbFetchCell('SELECT `U`.`username` FROM `api_tokens` AS AT JOIN `users` AS U ON `AT`.`user_id`=`U`.`user_id` WHERE `AT`.`token_hash`=?', array($token));
+            $username = dbFetchCell('SELECT `U`.`username`, `U`.`user_id`, `U`.`level` FROM `api_tokens` AS AT JOIN `users` AS U ON `AT`.`user_id`=`U`.`user_id` WHERE `AT`.`token_hash`=?', array($token));
         } else {
             $username = Auth::get()->getUser(dbFetchCell('SELECT `AT`.`user_id` FROM `api_tokens` AS AT WHERE `AT`.`token_hash`=?', array($token)));
         }
         if (!empty($username)) {
             $authenticated = true;
+
+            // Fake session so the standard auth/permissions checks work
+            $_SESSION = array(
+                'username' => $username['username'],
+                'user_id' => $username['user_id'],
+                'userlevel' => $username['level']
+            );
+            $permissions = permissions_cache($_SESSION['user_id']);
         } else {
             $authenticated = false;
         }
@@ -34,17 +44,43 @@ function authToken(\Slim\Route $route)
     }
 
     if ($authenticated === false) {
-        $app->response->setStatus(401);
-        $output = array(
-            'status'  => 'error',
-            'message' => 'API Token is missing or invalid; please supply a valid token',
-        );
-        echo _json_encode($output);
-        $app->stop();
+        api_error(401, 'API Token is missing or invalid; please supply a valid token');
     }
 }
 
+function api_error($statusCode, $message)
+{
+    $app  = \Slim\Slim::getInstance();
+    $app->response->headers->set('Content-Type', 'application/json');
+    $app->response->setStatus($statusCode);
+    $output = array(
+        'status'  => 'error',
+        'message' => $message
+    );
+    echo _json_encode($output);
+    $app->stop();
+} // end api_error()
 
+function check_device_permission($device_id)
+{
+    if (!device_permitted($device_id)) {
+        api_error(403, 'Insufficient permissions to access this device');
+    }
+}
+
+function check_port_permission($port_id, $device_id)
+{
+    if (!device_permitted($device_id) && !port_permitted($port_id, $device_id)) {
+        api_error(403, 'Insufficient permissions to access this port');
+    }
+}
+
+function check_is_admin()
+{
+    if (!is_admin()) {
+        api_error(403, 'Insufficient privileges');
+    }
+}
 
 function get_graph_by_port_hostname()
 {
@@ -75,6 +111,8 @@ function get_graph_by_port_hostname()
     $vars['height'] = $_GET['height'] ?: 300;
     $auth           = '1';
     $vars['id']     = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `P`.`$port`=? AND `deleted` = 0 LIMIT 1", array($device_id, $vars['port']));
+    
+    check_port_permission($vars['id'], $device_id);
     $app->response->headers->set('Content-Type', get_image_type());
     rrdtool_initialize(false);
     include 'includes/graphs/graph.inc.php';
@@ -92,6 +130,8 @@ function get_port_stats_by_port_hostname()
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $ifName    = urldecode($router['ifname']);
     $port     = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=? AND `deleted` = 0', array($device_id, $ifName));
+    
+    check_port_permission($port['port_id'], $device_id);
 
     $in_rate = $port['ifInOctets_rate'] * 8;
     $out_rate = $port['ifOutOctets_rate'] * 8;
@@ -140,6 +180,8 @@ function get_graph_generic_by_hostname()
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $device = device_by_id_cache($device_id);
 
+    check_device_permission($device_id);
+
     if (!empty($_GET['from'])) {
         $vars['from'] = $_GET['from'];
     }
@@ -173,14 +215,10 @@ function get_device()
     // find device matching the id
     $device = device_by_id_cache($device_id);
     if (!$device) {
-        $app->response->setStatus(404);
-        $output = array(
-            'status'  => 'error',
-            'message' => "Device $hostname does not exist",
-        );
-        echo _json_encode($output);
-        $app->stop();
+        api_error(404, "Device $hostname does not exist");
     } else {
+        check_device_permission($device_id);
+        
         $host_id = get_vm_parent_id($device);
         if (is_numeric($host_id)) {
             $device = array_merge($device, array('parent_id' => $host_id));
@@ -243,6 +281,10 @@ function list_devices()
     }
     $devices = array();
     foreach (dbFetchRows("SELECT * FROM `devices` $join WHERE $sql ORDER by $order", $param) as $device) {
+        if (!device_permitted($device['device_id'])) {
+            continue;
+        }
+
         $host_id = get_vm_parent_id($device);
         $device['ip'] = inet6_ntop($device['ip']);
         if (is_numeric($host_id)) {
@@ -265,6 +307,8 @@ function list_devices()
 
 function add_device()
 {
+    check_is_admin();
+
     // This will add a device using the data passed encoded with json
     // FIXME: Execution flow through this function could be improved
     global $config;
@@ -340,6 +384,8 @@ function add_device()
 
 function del_device()
 {
+    check_is_admin();
+
     // This will add a device using the data passed encoded with json
     global $config;
     $app      = \Slim\Slim::getInstance();
@@ -424,6 +470,8 @@ function get_vlans()
         }
 
         if ($device) {
+            check_device_permission($device_id);
+            
             $vlans       = dbFetchRows('SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_mtu FROM vlans WHERE `device_id` = ?', array($device_id));
             $total_vlans = count($vlans);
             $code        = 200;
@@ -464,6 +512,8 @@ function show_endpoints()
 
 function list_bgp()
 {
+    check_is_admin();
+
     global $config;
     $app        = \Slim\Slim::getInstance();
     $code       = 500;
@@ -505,6 +555,8 @@ function list_bgp()
 
 function list_ospf()
 {
+    check_is_admin();
+
     global $config;
     $app        = \Slim\Slim::getInstance();
     $code       = 500;
@@ -541,6 +593,7 @@ function list_ospf()
 
 function get_graph_by_portgroup()
 {
+    check_is_admin();
     global $config;
     $app    = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
@@ -609,6 +662,7 @@ function get_components()
 
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    check_device_permission($device_id);
     $COMPONENT = new LibreNMS\Component();
     $components = $COMPONENT->getComponents($device_id, $options);
 
@@ -626,6 +680,8 @@ function get_components()
 
 function add_components()
 {
+    check_is_admin();
+
     global $config;
     $code     = 200;
     $status   = 'ok';
@@ -654,6 +710,8 @@ function add_components()
 
 function edit_components()
 {
+    check_is_admin();
+
     global $config;
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
@@ -690,6 +748,8 @@ function edit_components()
 
 function delete_components()
 {
+    check_is_admin();
+
     global $config;
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
@@ -732,6 +792,7 @@ function get_graphs()
     // FIXME: this has some overlap with html/pages/device/graphs.inc.php
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    check_device_permission($device_id);
     $graphs    = array();
     $graphs[]  = array(
         'desc' => 'Poller Time',
@@ -771,6 +832,7 @@ function list_available_health_graphs()
     $router   = $app->router()->getCurrentRoute()->getParams();
     $hostname = $router['hostname'];
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    check_device_permission($device_id);
     if (isset($router['type'])) {
         list($dump, $type) = explode('_', $router['type']);
     }
@@ -824,7 +886,14 @@ function get_port_graphs()
 
     // use hostname as device_id if it's all digits
     $device_id   = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $ports       = dbFetchRows("SELECT $columns FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' ORDER BY `ifIndex` ASC", array($device_id));
+    $sql = '';
+    $params = array($device_id);
+    if (!device_permitted($device_id)) {
+        $sql = 'AND `port_id` IN (select `port_id` from `ports_perms` where `user_id` = ?)';
+        array_push($params, $_SESSION['user_id']);
+    }
+    
+    $ports       = dbFetchRows("SELECT $columns FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' $sql ORDER BY `ifIndex` ASC", $params);
     $total_ports = count($ports);
     $output      = array(
         'status'  => 'ok',
@@ -846,10 +915,12 @@ function get_ip_addresses()
         $hostname = $router['hostname'];
         // use hostname as device_id if it's all digits
         $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+        check_device_permission($device_id);
         $ipv4   = dbFetchRows("SELECT `ipv4_addresses`.* FROM `ipv4_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
         $ipv6   = dbFetchRows("SELECT `ipv6_addresses`.* FROM `ipv6_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
     } elseif (isset($router['portid'])) {
         $port_id = urldecode($router['portid']);
+        check_port_permission($port_id, null);
         $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `port_id` = ?", array($port_id));
         $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?", array($port_id));
     }
@@ -871,6 +942,7 @@ function get_port_info()
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
     $port_id  = urldecode($router['portid']);
+    check_port_permission($port_id, null);
 
     // use hostname as device_id if it's all digits
     $port   = dbFetchRows("SELECT * FROM `ports` WHERE `port_id` = ? AND `deleted` = 0", array($port_id));
@@ -891,10 +963,17 @@ function get_all_ports()
     if (isset($_GET['columns'])) {
         $columns = $_GET['columns'];
     } else {
-        $columns = 'ifName';
+        $columns = 'port_id, ifName';
     }
     validate_column_list($columns, 'ports');
-    $ports = dbFetchRows("SELECT $columns FROM `ports` WHERE `deleted` = 0");
+    $params = array();
+    $sql = '';
+    if (!is_admin()) {
+        $sql = ' AND (device_id IN (SELECT device_id FROM devices_perms WHERE user_id = ?) OR port_id IN (SELECT port_id FROM ports_perms WHERE user_id = ?))';
+        array_push($params, $_SESSION['user_id']);
+        array_push($params, $_SESSION['user_id']);
+    }
+    $ports = dbFetchRows("SELECT $columns FROM `ports` WHERE `deleted` = 0 $sql", $params);
 
     $output = array(
         'status'  => 'ok',
@@ -914,6 +993,7 @@ function get_port_stack()
     $hostname = $router['hostname'];
     // use hostname as device_id if it's all digits
     $device_id      = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    check_device_permission($device_id);
 
     if (isset($_GET['valid_mappings'])) {
         $mappings       = dbFetchRows("SELECT * FROM `ports_stack` WHERE (`device_id` = ? AND `ifStackStatus` = 'active' AND (`port_id_high` != '0' AND `port_id_low` != '0')) ORDER BY `port_id_high` ASC", array($device_id));
@@ -935,6 +1015,7 @@ function get_port_stack()
 
 function list_alert_rules()
 {
+    check_is_admin();
     global $config;
     $app    = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
@@ -962,6 +1043,7 @@ function list_alert_rules()
 
 function list_alerts()
 {
+    check_is_admin();
     global $config;
     $app    = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
@@ -994,6 +1076,7 @@ function list_alerts()
 
 function add_edit_rule()
 {
+    check_is_admin();
     global $config;
     $app  = \Slim\Slim::getInstance();
     $data = json_decode(file_get_contents('php://input'), true);
@@ -1091,6 +1174,7 @@ function add_edit_rule()
 
 function delete_rule()
 {
+    check_is_admin();
     global $config;
     $app     = \Slim\Slim::getInstance();
     $router  = $app->router()->getCurrentRoute()->getParams();
@@ -1124,6 +1208,7 @@ function delete_rule()
 
 function ack_alert()
 {
+    check_is_admin();
     global $config;
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
@@ -1156,6 +1241,7 @@ function ack_alert()
 
 function unmute_alert()
 {
+    check_is_admin();
     global $config;
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
@@ -1198,6 +1284,7 @@ function get_inventory()
     $hostname = $router['hostname'];
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    check_device_permission($device_id);
     $sql       = '';
     $params    = array();
     if (isset($_GET['entPhysicalClass']) && !empty($_GET['entPhysicalClass'])) {
@@ -1239,6 +1326,7 @@ function get_inventory()
 
 function list_oxidized()
 {
+    check_is_admin();
     global $config;
     $app = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
@@ -1332,6 +1420,10 @@ function list_bills()
     }
 
     foreach (dbFetchRows("SELECT `bills`.*,COUNT(port_id) AS `ports_total` FROM `bills` LEFT JOIN `bill_ports` ON `bill_ports`.`bill_id`=`bills`.`bill_id` $sql GROUP BY `bill_name`,`bill_ref` ORDER BY `bill_name`", $param) as $bill) {
+        if (!bill_permitted($bill['bill_id'])) {
+            continue;
+        }
+
         $rate_data    = $bill;
         $allowed = '';
         $used = '';
@@ -1375,6 +1467,7 @@ function list_bills()
 
 function update_device()
 {
+    check_is_admin();
     global $config;
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
@@ -1429,6 +1522,7 @@ function update_device()
 
 function get_device_groups()
 {
+    check_is_admin();
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $status   = 'error';
@@ -1462,6 +1556,7 @@ function get_device_groups()
 
 function get_devices_by_group()
 {
+    check_is_admin();
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
     $status   = 'error';
@@ -1498,6 +1593,7 @@ function get_devices_by_group()
 
 function list_ipsec()
 {
+    check_is_admin();
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
     $status   = 'error';
@@ -1529,6 +1625,7 @@ function list_ipsec()
 
 function list_arp()
 {
+    check_is_admin();
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
     $status   = 'error';
@@ -1571,6 +1668,7 @@ function list_arp()
 
 function list_services()
 {
+    check_is_admin();
     global $config;
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
@@ -1636,6 +1734,7 @@ function list_services()
 
 function list_logs()
 {
+    check_is_admin();
     global $config;
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
