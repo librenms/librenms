@@ -2112,7 +2112,6 @@ function recordRrdStatistic($stat, $start_time)
     global $rrd_stats;
     initStats();
 
-    var_dump($stat);
     $stat = ($stat == 'update' || $stat == 'create') ? $stat : 'other';
     $runtime = microtime(true) - $start_time;
     $rrd_stats[$stat]++;
