@@ -37,6 +37,8 @@ Device will be added into LibreNMS as Ping Only Device and will show ICMP Respon
 - Hardware: Optional you can type in whatever you like.
 - OS: Optional this will add the Device's OS Icon.
 
+[How to add ping only devices](https://youtu.be/cjuByubg-uk)
+
 ![Ping Only](/img/add-ping-only.png)
 
 If you would like to add devices automatically then you will probably want to read the [Auto-discovery Setup](/Extensions/Auto-Discovery.md) guide.
