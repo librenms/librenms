@@ -223,7 +223,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         if (Config::get('auth_ldap_groupmembertype') == 'fulldn') {
             $membername = Config::get('auth_ldap_prefix') . $username . Config::get('auth_ldap_suffix');
         } elseif (Config::get('auth_ldap_groupmembertype') == 'puredn') {
-            $filter  = '(' . Config::get('auth_ldap_attr')['uid'] . '=' . $username . ')';
+            $filter  = '(' . Config::get('auth_ldap_attr.uid') . '=' . $username . ')';
             $search  = ldap_search($this->ldap_connection, Config::get('auth_ldap_groupbase'), $filter);
             $entries = ldap_get_entries($this->ldap_connection, $search);
             $membername = $entries[0]['dn'];

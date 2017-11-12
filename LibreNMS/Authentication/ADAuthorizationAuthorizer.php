@@ -135,8 +135,9 @@ class ADAuthorizationAuthorizer extends AuthorizerBase
         // Loop the list and find the highest level
         foreach ($entries[0]['memberof'] as $entry) {
             $group_cn = $this->getCn($entry);
-            if (Config::get('auth_ad_groups')[$group_cn]['level'] > $userlevel) {
-                $userlevel = Config::get('auth_ad_groups')[$group_cn]['level'];
+            $auth_ad_groups = Config::get('auth_ad_groups');
+            if ($auth_ad_groups[$group_cn]['level'] > $userlevel) {
+                $userlevel = $auth_ad_groups[$group_cn]['level'];
             }
         }
 
