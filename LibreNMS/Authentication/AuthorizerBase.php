@@ -231,7 +231,7 @@ abstract class AuthorizerBase implements Authorizer
         return 0;
     }
 
-    abstract public function userExists($username);
+    abstract public function userExists($username, $throw_exception = false);
 
     abstract public function getUserlevel($username);
 

@@ -41,7 +41,7 @@ class HttpAuthAuthorizer extends AuthorizerBase
     }
 
 
-    public function userExists($username)
+    public function userExists($username, $throw_exception = false)
     {
         $query  = 'SELECT COUNT(*) FROM `users` WHERE `username`=?';
         $params = array($username);

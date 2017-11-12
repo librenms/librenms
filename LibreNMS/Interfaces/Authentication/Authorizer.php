@@ -16,7 +16,7 @@ interface Authorizer
 
     public function adduser($username, $password, $level = 0, $email = '', $realname = '', $can_modify_passwd = 0, $description = '');
 
-    public function userExists($username);
+    public function userExists($username, $throw_exception = false);
 
     public function getUserlevel($username);
 

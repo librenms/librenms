@@ -143,7 +143,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         return $return;
     }
 
-    public function userExists($username)
+    public function userExists($username, $throw_exception = false)
     {
         $this->adBind(); // make sure we called bind
 

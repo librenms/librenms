@@ -90,7 +90,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         throw new AuthenticationException();
     }
 
-    public function userExists($username)
+    public function userExists($username, $throw_exception = false)
     {
         if ($this->authLdapSessionCacheGet('user_exists')) {
             return 1;

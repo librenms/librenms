@@ -63,7 +63,7 @@ class RadiusAuthorizer extends AuthorizerBase
         }
     }
 
-    public function userExists($username)
+    public function userExists($username, $throw_exception = false)
     {
         return dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username), true);
     }
