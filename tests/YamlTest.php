@@ -49,7 +49,7 @@ class YamlTest extends \PHPUnit_Framework_TestCase
         'oid',
         'options',
         'mib',
-        'mibdir',
+        'mib_dir',
         'op',
         'value',
     );

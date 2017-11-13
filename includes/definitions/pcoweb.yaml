@@ -16,6 +16,6 @@ discovery:
       snmpget:
           oid: roomTemp.0
           mib: CAREL-ug40cdz-MIB
-          mibdir: carel
+          mib_dir: carel
           op: '!=='
           value: false
