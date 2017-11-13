@@ -8,14 +8,25 @@ chdir($install_dir);
 
 $init_modules = array();
 require $install_dir . '/includes/init.php';
-$options = getopt('dh:e:');
+$options = getopt('dh:e:', array("help"));
 
 Config::set('norrd', true);
 Config::set('noinfluxdb', true);
 Config::set('nographite', true);
 
+function print_help() {
+    echo "-h <device id> | <device hostname wildcard>  Poll single device or wildcard hostname\n";
+    echo "-e <percentage>                              Enable/disable selected ports polling for devices which would benefit <percentage> from a change.\n";
+    echo "\n";
+}
+
 if (isset($options['d'])) {
     $debug = true;
+}
+
+if (isset($options['help'])) {
+    print_help();
+    exit(0);
 }
 
 if (isset($options['h'])) {
@@ -30,6 +41,10 @@ if (isset($options['h'])) {
 }
 
 if (isset($options['e'])) {
+    if (!is_numeric($options['e']) || $options['e'] < 0) {
+        print_help();
+        exit(1);
+    }
     $enable_sel_value = $options['e'];
 }
 
