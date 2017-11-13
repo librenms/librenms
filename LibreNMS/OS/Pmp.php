@@ -30,7 +30,6 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
-
 use LibreNMS\OS;
 
 class Pmp extends OS implements
@@ -47,7 +46,7 @@ class Pmp extends OS implements
      */
     public function discoverWirelessRssi()
     {
-        $rssi_oid = '.1.3.6.1.4.1.161.19.3.2.2.2.0'; 
+        $rssi_oid = '.1.3.6.1.4.1.161.19.3.2.2.2.0';
         return array(
             new WirelessSensor(
                 'rssi',
@@ -68,21 +67,21 @@ class Pmp extends OS implements
      *
      * @return array Sensors
      */
-     public function discoverWirelessSnr()
-     {
-         $snr_horizontal = '.1.3.6.1.4.1.161.19.3.1.4.1.84.2'; // signalToNoiseRatioHorizontal.2", "-Ovqn", "WHISP-APS-MIB"
-         $snr_vertical = '.1.3.6.1.4.1.161.19.3.1.4.1.74.2'; //"signalToNoiseRatioVertical.2", "-Ovqn", "WHISP-APS-MIB"
-         return array(
-             new WirelessSensor(
-                 'snr',
-                 $this->getDeviceId(),
-                 $snr_horizontal,
-                 'pmp-h',
-                 0,
-                 'Cambium SNR Horizontal',
-                 null
-             ),
-             new WirelessSensor(
+    public function discoverWirelessSnr()
+    {
+        $snr_horizontal = '.1.3.6.1.4.1.161.19.3.1.4.1.84.2'; // signalToNoiseRatioHorizontal.2", "-Ovqn", "WHISP-APS-MIB"
+        $snr_vertical = '.1.3.6.1.4.1.161.19.3.1.4.1.74.2'; //"signalToNoiseRatioVertical.2", "-Ovqn", "WHISP-APS-MIB"
+        return array(
+            new WirelessSensor(
+                'snr',
+                $this->getDeviceId(),
+                $snr_horizontal,
+                'pmp-h',
+                0,
+                'Cambium SNR Horizontal',
+                null
+            ),
+            new WirelessSensor(
                 'snr',
                 $this->getDeviceId(),
                 $snr_vertical,
@@ -90,9 +89,9 @@ class Pmp extends OS implements
                 0,
                 'Cambium SNR Vertical',
                 null
-             )
-         );
-     }
+            )
+        );
+    }
 
     /**
      * Discover wireless frequency.  This is in MHz. Type is frequency.
@@ -136,7 +135,7 @@ class Pmp extends OS implements
                 'pmp-downlink',
                 0,
                 'Downlink Utilization',
-                null      
+                null
             ),
             new WirelessSensor(
                 'utilization',
@@ -145,11 +144,8 @@ class Pmp extends OS implements
                 'pmp-uplink',
                 0,
                 'Uplink Utilization',
-                null    
+                null
             )
         );
     }
 }
-
-
-
