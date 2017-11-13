@@ -76,13 +76,25 @@ function only_alphanumeric($string)
     return preg_replace('/[^a-zA-Z0-9]/', '', $string);
 }
 
-function logfile($string)
+function logfile($string, $level = 'error')
 {
-    global $config;
+    $levels = array(
+        'none'  => 0,
+        'info'  => 3,
+        'error' => 7,
+        'debug' => 9,
+    );
+    // Replace human readable values with numeric
+    $level = $levels[$level];
 
-    $fd = fopen($config['log_file'], 'a');
-    fputs($fd, $string . "\n");
-    fclose($fd);
+    $log_level = Config::get('logging.level', '0');
+    if ($log_level !== '0') {
+        if ($level <= $log_level) {
+            $fd = fopen(Config::get('log_file'), 'a');
+            fputs($fd, $string . "\n");
+            fclose($fd);
+        }
+    }
 }
 
 /**
