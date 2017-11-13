@@ -1702,7 +1702,11 @@ function validate_column_list($columns, $tableName)
     $app = \Slim\Slim::getInstance();
 
     $column_names = explode(',', $columns);
-    $valid_columns = dbFetchColumn("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$config['db_name']}' AND TABLE_NAME=?", array($tableName));
+    $db_schema = Symfony\Component\Yaml\Yaml::parse(file_get_contents($config['install_dir'] . '/misc/db_schema.yaml'));
+    $valid_columns = array();
+    foreach ($db_schema[$tableName]['Columns'] as $col) {
+        $valid_columns[] = $col['Field'];
+    }
     $invalid_columns = array();
 
     foreach ($column_names as $col) {
