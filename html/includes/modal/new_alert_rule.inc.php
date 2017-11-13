@@ -357,7 +357,7 @@ $('#and').click('', function(e) {
            strategy: 'array',
            tagFieldName: 'rules[]'
         });
-        if(value.indexOf("%") < 0) {
+        if(value.indexOf("%") < 0 && isNaN(value)) {
           value = '"'+value+'"';
         }
         if(entity.indexOf("%") < 0) {

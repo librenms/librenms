@@ -49,7 +49,7 @@ class User implements ValidationGroup
             if (isCli()) {
                 $validator->fail('You need to run this script as root' .
                     (Config::has('user') ? ' or ' . $lnms_username : ''));
-            } else {
+            } elseif (function_exists('posix_getgrnam')) {
                 $lnms_group = posix_getgrnam($lnms_groupname);
                 if (!in_array($username, $lnms_group['members'])) {
                     $validator->fail(

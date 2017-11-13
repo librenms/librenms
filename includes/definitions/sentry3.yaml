@@ -6,3 +6,6 @@ over:
 icon: servertech
 mib_dir:
     - sentry
+discovery:
+    - sysObjectId:
+        - .1.3.6.1.4.1.1718.3

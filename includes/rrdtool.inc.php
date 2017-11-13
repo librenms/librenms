@@ -135,6 +135,8 @@ function rrdtool($command, $filename, $options)
     /** @var Proc $rrd_sync_process */
     /** @var Proc $rrd_async_process */
 
+    $start_time = microtime(true);
+
     try {
         $cmd = rrdtool_build_command($command, $filename, $options);
     } catch (FileExistsException $e) {
@@ -168,6 +170,7 @@ function rrdtool($command, $filename, $options)
         echo $output[1];
     }
 
+    recordRrdStatistic($command, $start_time);
     return $output;
 }
 

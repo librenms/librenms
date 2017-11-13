@@ -86,6 +86,7 @@ function shorthost($hostname, $len = 12)
     if (filter_var($hostname, FILTER_VALIDATE_IP)) {
         return $hostname;
     }
+    $len = Config::get('shorthost_target_length', $len);
 
     $parts = explode(".", $hostname);
     $shorthost = $parts[0];
@@ -1131,7 +1132,7 @@ function version_info($remote = false)
         $output['local_date']   = $local_date;
         $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
     }
-    $output['db_schema']   = get_db_schema() ?: '?';
+    $output['db_schema']   = dbIsConnected() ? get_db_schema() : '?';
     $output['php_ver']     = phpversion();
     $output['mysql_ver']   = dbIsConnected() ? dbFetchCell('SELECT version()') : '?';
     $output['rrdtool_ver'] = str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
@@ -1656,6 +1657,7 @@ function load_all_os($existing = false, $cached = true)
 /**
  * * Update the OS cache file cache/os_defs.cache
  * @param bool $force
+ * @return bool true if the cache was updated
  */
 function update_os_cache($force = false)
 {
@@ -1676,7 +1678,10 @@ function update_os_cache($force = false)
 
         file_put_contents($cache_file, serialize(Config::get('os')));
         d_echo("Done\n");
+        return true;
     }
+
+    return false;
 }
 
 /**

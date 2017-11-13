@@ -265,5 +265,28 @@
   {
   "rule": "%devices.os = \"nxos\" && %sensors.sensor_type = \"cefcFanTrayOperStatus\" && %sensors.sensor_current = \"[3-4]\"",
   "name": "Cisco NX-OS device has a bad fan"
+  },
+  {
+    "rule": "%devices.os = \"panos\" & %sensors.type = \"panSysHAState\" && %sensors.sensor_current = \"1\" && %sensors.sensor_prev = \"2\"",
+    "name": "Palo Alto Networks passive firewall changed to active"
+  },
+  {
+    "rule": "%sensors.sensor_current ~ \"[2|6]\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10893.1.20.130.15.1.4.1\"",
+    "name": "Dell Server Raid Battery Failed/Degraded"
+  },
+  {
+    "rule": "%sensors.sensor_current = \"2\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.1.1100.32.1.5\"",
+    "name": "Dell Server CPU Status Critical"
+  },
+  {
+    "rule": "%sensors.sensor_current ~ \"[2|6]\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10893.1.20.130.1.1.5\"",
+    "name": "Dell Server Disk Controller State Failed/Degraded"
+  },
+  {
+    "rule": "%sensors.sensor_current ~ \"[2|5]\" && %sensors.sensor_oid = \".1.3.6.1.4.1.674.10893.1.20.130.4.1.4\"",
+    "name": "Dell Server Disk Array State Failed/Degraded"
   }
-]
+  
+  ]
+  
+

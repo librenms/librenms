@@ -1,4 +1,4 @@
-mib: mibs/alpha/Argus-Power-System-MIB
+mib: Argus-Power-System-MIB
 modules:
     sensors:
         voltage:
@@ -75,6 +75,8 @@ modules:
                     index: 'upsBatteryTemperature.{{ $index }}'
                     descr: Battery
         runtime:
+            options:
+              divisor: 60
             data:
                 -
                     oid: upsMinutesOnBattery

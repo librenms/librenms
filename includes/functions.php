@@ -93,33 +93,24 @@ function logfile($string)
  */
 function getHostOS($device)
 {
-    global $config;
-
-    $sysDescr    = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
-    $sysObjectId = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
+    $res = snmp_get_multi_oid($device, array('SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysObjectID.0'));
+    $sysDescr = isset($res['.1.3.6.1.2.1.1.1.0']) ? $res['.1.3.6.1.2.1.1.1.0'] : '';
+    $sysObjectId = isset($res['.1.3.6.1.2.1.1.2.0']) ? $res['.1.3.6.1.2.1.1.2.0'] : '';
 
     d_echo("| $sysDescr | $sysObjectId | \n");
 
+    $deferred_os = array(
+        'freebsd',
+        'linux',
+    );
+
     // check yaml files
-    $pattern = $config['install_dir'] . '/includes/definitions/*.yaml';
-    foreach (glob($pattern) as $file) {
-        $os = basename($file, '.yaml');
-        if (isset($config['os'][$os]['os'])) {
-            $tmp = $config['os'][$os];
-        } else {
-            $tmp = Symfony\Component\Yaml\Yaml::parse(
-                file_get_contents($file)
-            );
-            // pull in user overrides
-            if (isset($config['os'][$os])) {
-                $tmp = array_replace_recursive($tmp, $config['os'][$os]);
-            }
-        }
-        if (isset($tmp['discovery']) && is_array($tmp['discovery'])) {
-            foreach ($tmp['discovery'] as $item) {
-                // check each item individually, if all the conditions in that item are true, we have a match
-                if (checkDiscovery($item, $sysObjectId, $sysDescr)) {
-                    return $tmp['os'];
+    $os_defs = Config::get('os');
+    foreach ($os_defs as $os => $def) {
+        if (isset($def['discovery']) && !in_array($os, $deferred_os)) {
+            foreach ($def['discovery'] as $item) {
+                if (checkDiscovery($device, $item, $sysObjectId, $sysDescr)) {
+                    return $os;
                 }
             }
         }
@@ -127,11 +118,22 @@ function getHostOS($device)
 
     // check include files
     $os = null;
-    $pattern = $config['install_dir'] . '/includes/discovery/os/*.inc.php';
+    $pattern = Config::get('install_dir') . '/includes/discovery/os/*.inc.php';
     foreach (glob($pattern) as $file) {
         include $file;
         if (isset($os)) {
             return $os;
+        }
+    }
+
+    // check deferred os
+    foreach ($deferred_os as $os) {
+        if (isset($os_defs[$os]['discovery'])) {
+            foreach ($os_defs[$os]['discovery'] as $item) {
+                if (checkDiscovery($device, $item, $sysObjectId, $sysDescr)) {
+                    return $os;
+                }
+            }
         }
     }
 
@@ -143,13 +145,17 @@ function getHostOS($device)
  * sysObjectId if sysObjectId starts with any of the values under this item
  * sysDescr if sysDescr contains any of the values under this item
  * sysDescr_regex if sysDescr matches any of the regexes under this item
+ * snmpget perform an snmpget on `oid` and check if the result contains `value`. Other subkeys: options, mib, mibdir
  *
+ * Appending _except to any condition will invert the match.
+ *
+ * @param array $device
  * @param array $array Array of items, keys should be sysObjectId, sysDescr, or sysDescr_regex
  * @param string $sysObjectId The sysObjectId to check against
  * @param string $sysDescr the sysDesr to check against
  * @return bool the result (all items passed return true)
  */
-function checkDiscovery($array, $sysObjectId, $sysDescr)
+function checkDiscovery($device, $array, $sysObjectId, $sysDescr)
 {
     // all items must be true
     foreach ($array as $key => $value) {
@@ -173,6 +179,16 @@ function checkDiscovery($array, $sysObjectId, $sysDescr)
             if (preg_match_any($sysObjectId, $value) == $check) {
                 return false;
             }
+        } elseif ($key == 'snmpget') {
+            $options = isset($value['options']) ? $value['options'] : '-Oqv';
+            $mib = isset($value['mib']) ? $value['mib'] : null;
+            $mib_dir = isset($value['mibdir']) ? $value['mibdir'] : null;
+            $op = isset($value['op']) ? $value['op'] : 'contains';
+
+            $get_value = snmp_get($device, $value['oid'], $options, $mib, $mib_dir);
+            if (compare_var($get_value, $value['value'], $op) == $check) {
+                return false;
+            }
         }
     }
 
@@ -194,6 +210,49 @@ function preg_match_any($subject, $regexes)
         }
     }
     return false;
+}
+
+/**
+ * Perform comparison of two items based on give comparison method
+ * Valid comparisons: =, !=, ==, !==, >=, <=, >, <, contains, starts, ends, regex
+ * contains, starts, ends: $a haystack, $b needle(s)
+ * regex: $a subject, $b regex
+ *
+ * @param mixed $a
+ * @param mixed $b
+ * @param string $comparison =, !=, ==, !== >=, <=, >, <, contains, starts, ends, regex
+ * @return bool
+ */
+function compare_var($a, $b, $comparison = '=')
+{
+    switch ($comparison) {
+        case "=":
+            return $a == $b;
+        case "!=":
+            return $a != $b;
+        case "==":
+            return $a === $b;
+        case "!==":
+            return $a !== $b;
+        case ">=":
+            return $a >= $b;
+        case "<=":
+            return $a <= $b;
+        case ">":
+            return $a > $b;
+        case "<":
+            return $a < $b;
+        case "contains":
+            return str_contains($a, $b);
+        case "starts":
+            return starts_with($a, $b);
+        case "ends":
+            return ends_with($a, $b);
+        case "regex":
+            return (bool)preg_match($b, $a);
+        default:
+            return false;
+    }
 }
 
 function percent_colour($perc)
@@ -362,7 +421,7 @@ function delete_device($id)
     // Remove sensors manually due to constraints
     foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `device_id` = ?", array($id)) as $sensor) {
         $sensor_id = $sensor['sensor_id'];
-        dbDelete('sensors_to_state_indexes', "`sensor_id` = ?", array($sensor));
+        dbDelete('sensors_to_state_indexes', "`sensor_id` = ?", array($sensor_id));
     }
     $fields = array('device_id','host');
     foreach ($fields as $field) {
@@ -599,16 +658,28 @@ function isPingable($hostname, $address_family = AF_INET, $attribs = array())
     $response = array();
     if (can_ping_device($attribs) === true) {
         $fping_params = '';
-        if (is_numeric($config['fping_options']['retries']) || $config['fping_options']['retries'] > 1) {
+        if (is_numeric($config['fping_options']['retries']) && $config['fping_options']['retries'] > 0) {
+            if ($config['fping_options']['retries'] > 20) {
+                $config['fping_options']['retries'] = 20;
+            }
             $fping_params .= ' -r ' . $config['fping_options']['retries'];
         }
-        if (is_numeric($config['fping_options']['timeout']) || $config['fping_options']['timeout'] > 1) {
+        if (is_numeric($config['fping_options']['timeout'])) {
+            if ($config['fping_options']['timeout'] < 50) {
+                $config['fping_options']['timeout'] = 50;
+            }
+            if ($config['fping_options']['millisec'] < $config['fping_options']['timeout']) {
+                $config['fping_options']['millisec'] = $config['fping_options']['timeout'];
+            }
             $fping_params .= ' -t ' . $config['fping_options']['timeout'];
         }
-        if (is_numeric($config['fping_options']['count']) || $config['fping_options']['count'] > 0) {
+        if (is_numeric($config['fping_options']['count']) && $config['fping_options']['count'] > 0) {
             $fping_params .= ' -c ' . $config['fping_options']['count'];
         }
-        if (is_numeric($config['fping_options']['millisec']) || $config['fping_options']['millisec'] > 0) {
+        if (is_numeric($config['fping_options']['millisec'])) {
+            if ($config['fping_options']['millisec'] < 20) {
+                $config['fping_options']['millisec'] = 20;
+            }
             $fping_params .= ' -p ' . $config['fping_options']['millisec'];
         }
         $status = fping($hostname, $fping_params, $address_family);
@@ -1938,12 +2009,14 @@ function get_toner_levels($device, $raw_value, $capacity)
  */
 function initStats()
 {
-    global $snmp_stats, $db_stats;
+    global $snmp_stats, $db_stats, $rrd_stats;
 
     if (!isset($snmp_stats)) {
         $snmp_stats = array(
             'snmpget' => 0,
             'snmpget_sec' => 0.0,
+            'snmpgetnext' => 0,
+            'snmpgetnext_sec' => 0.0,
             'snmpwalk' => 0,
             'snmpwalk_sec' => 0.0,
         );
@@ -1967,6 +2040,17 @@ function initStats()
             'fetchrows_sec' => 0.0,
         );
     }
+
+    if (!isset($rrd_stats)) {
+        $rrd_stats = array(
+            'update' => 0,
+            'update_sec' => 0.0,
+            'create' => 0,
+            'create_sec' => 0.0,
+            'other' => 0,
+            'other_sec' => 0.0,
+        );
+    }
 }
 
 /**
@@ -1974,17 +2058,21 @@ function initStats()
  */
 function printStats()
 {
-    global $snmp_stats, $db_stats;
+    global $snmp_stats, $db_stats, $rrd_stats;
 
     printf(
-        "SNMP: Get[%d/%.2fs] Walk [%d/%.2fs]\n",
+        "SNMP %.2fs: Get[%d/%.2fs] Getnext [%d/%.2fs] Walk [%d/%.2fs]\n",
+        $snmp_stats['snmpget_sec'] + $snmp_stats['snmpgetnext_sec'] + $snmp_stats['snmpwalk_sec'],
         $snmp_stats['snmpget'],
         $snmp_stats['snmpget_sec'],
+        $snmp_stats['snmpgetnext'],
+        $snmp_stats['snmpgetnext_sec'],
         $snmp_stats['snmpwalk'],
         $snmp_stats['snmpwalk_sec']
     );
     printf(
-        "MySQL: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
+        "MySQL %.2fs: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
+        $db_stats['fetchcell_sec'] + $db_stats['fetchrow_sec'] + $db_stats['fetchrows_sec'] + $db_stats['fetchcolumn_sec'] + $db_stats['update_sec'] + $db_stats['insert_sec'] + $db_stats['delete_sec'],
         $db_stats['fetchcell'],
         $db_stats['fetchcell_sec'],
         $db_stats['fetchrow'],
@@ -2000,6 +2088,36 @@ function printStats()
         $db_stats['delete'],
         $db_stats['delete_sec']
     );
+    printf(
+        "RRD %.2fs: Update [%d/%.2fs] Create [%d/%.2fs] Other [%d/%.2fs]\n",
+        $rrd_stats['update_sec'] + $rrd_stats['create_sec'] + $rrd_stats['other_sec'],
+        $rrd_stats['update'],
+        $rrd_stats['update_sec'],
+        $rrd_stats['create'],
+        $rrd_stats['create_sec'],
+        $rrd_stats['other'],
+        $rrd_stats['other_sec']
+    );
+}
+
+/**
+ * Update statistics for rrd operations
+ *
+ * @param string $stat create, update, and other
+ * @param float $start_time The time the operation started with 'microtime(true)'
+ * @return float  The calculated run time
+ */
+function recordRrdStatistic($stat, $start_time)
+{
+    global $rrd_stats;
+    initStats();
+
+    $stat = ($stat == 'update' || $stat == 'create') ? $stat : 'other';
+    $runtime = microtime(true) - $start_time;
+    $rrd_stats[$stat]++;
+    $rrd_stats["${stat}_sec"] += $runtime;
+
+    return $runtime;
 }
 
 /**
@@ -2317,4 +2435,24 @@ function return_num($entry)
         preg_match('/-?\d*\.?\d+/', $entry, $num_response);
         return $num_response[0];
     }
+}
+
+/**
+ * Locate the actual path of a binary
+ *
+ * @param $binary
+ * @return mixed
+ */
+function locate_binary($binary)
+{
+    if (!str_contains($binary, '/')) {
+        $output = `whereis -b $binary`;
+        $target = trim(substr($output, strpos($output, ':') + 1));
+
+        if (file_exists($target)) {
+            return $target;
+        }
+    }
+
+    return $binary;
 }

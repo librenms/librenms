@@ -67,4 +67,41 @@ sdfsd
 
         $this->assertSame($expected, linkify($input));
     }
+
+    public function testDynamicDiscoveryGetValue()
+    {
+        $pre_cache = array(
+            'firstdata' => array(
+                0 => array('temp' => 1),
+                1 => array('temp'=> 2),
+            ),
+            'high' => array(
+                0 => array('high' => 3),
+                1 => array('high' => 4),
+            ),
+            'table' => array(
+                0 => array('first' => 5, 'second' => 6),
+                1 => array('first' => 7, 'second' => 8),
+            ),
+            'single' => array('something' => 9),
+            'oneoff' => 10,
+        );
+
+        $data = array('value' => 'temp', 'oid' => 'firstdata');
+        $this->assertNull(dynamic_discovery_get_value('missing', 0, $data, $pre_cache));
+        $this->assertSame('yar', dynamic_discovery_get_value('default', 0, $data, $pre_cache, 'yar'));
+        $this->assertSame(2, dynamic_discovery_get_value('value', 1, $data, $pre_cache));
+
+        $data = array('oid' => 'high');
+        $this->assertSame(3, dynamic_discovery_get_value('high', 0, $data, $pre_cache));
+
+        $data = array('oid' => 'table');
+        $this->assertSame(5, dynamic_discovery_get_value('first', 0, $data, $pre_cache));
+        $this->assertSame(7, dynamic_discovery_get_value('first', 1, $data, $pre_cache));
+        $this->assertSame(6, dynamic_discovery_get_value('second', 0, $data, $pre_cache));
+        $this->assertSame(8, dynamic_discovery_get_value('second', 1, $data, $pre_cache));
+
+        $this->assertSame(9, dynamic_discovery_get_value('single', 0, $data, $pre_cache));
+        $this->assertSame(10, dynamic_discovery_get_value('oneoff', 3, $data, $pre_cache));
+    }
 }
