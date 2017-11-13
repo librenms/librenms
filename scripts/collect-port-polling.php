@@ -114,7 +114,6 @@ call_user_func_array('printf', array_merge(array($header), $stats));
 
 $mask = "| %9.9s | %-11.11s | %10.10s | %14.3f | %10.3f | %14.3f | @@@colstart@@@%+9.3fs@@@colend@@@ | @@@colstart@@@%+4.0f%%@@@colend@@@ | %5.5s |\n";
 foreach ($devices as $device) {
-
     if ($device['diff_sec'] > 0) {
         $mask_temp = str_replace(array("@@@colstart@@@", "@@@colend@@@"), array("\033[0;31m", "\033[0m"), $mask);
     } else {
