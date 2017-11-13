@@ -41,3 +41,26 @@ foreach ($pre_cache['junos_oids'] as $index => $entry) {
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'rx-'.$index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }
 }
+foreach ($pre_cache['junos_ifoptics_oids'] as $index => $entry) {
+    if (is_numeric($entry['jnxPMCurTemperature'])) {
+        $oid = '.1.3.6.1.4.1.2636.3.71.1.2.1.1.39.'.$index;
+        $interface = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id']));
+        $descr = $interface . ' Temperature';
+        # create ifoptioc_aternative index et-0/0/0 eq 1.1.1.1
+        $t = explode('/', $interface, 3);
+        $t0 = explode('-', $t[0], 2);
+        $t1 = $t0[1] + 1;
+        $t2 = $t[1] + 1;
+        $t3 = $t[2] + 1;
+        $alt_index = '1.' . $t1 . '.' . $t2 . '.' . $t3;
+
+        $limit_low = $pre_cache['junos_ifoptics2_oids'][$alt_index]['jnxModuleTempLowThresh']*$multiplier;
+        $warn_limit_low = null;
+        $limit = $pre_cache['junos_ifoptics2_oids'][$alt_index]['jnxModuleTempHighThresh']*$multiplier;
+        $warn_limit = null;
+        $current = $entry['jnxPMCurTemperature']*$multiplier;
+        $entPhysicalIndex = $index;
+        $entPhysicalIndex_measured = 'ports';
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+    }
+}

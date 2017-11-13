@@ -22,6 +22,10 @@ $airflow      = dbFetchCell("select count(*) from sensors WHERE sensor_class='ai
 $snr          = dbFetchCell("select count(*) from sensors WHERE sensor_class='snr' AND device_id = ?", array($device['device_id']));
 $pressure     = dbFetchCell("select count(*) from sensors WHERE sensor_class='pressure' AND device_id = ?", array($device['device_id']));
 $cooling      = dbFetchCell("select count(*) from sensors WHERE sensor_class='cooling' AND device_id = ?", array($device['device_id']));
+$delay        = dbFetchCell("select count(*) from sensors WHERE sensor_class='delay' AND device_id = ?", array($device['device_id']));
+$q_factor     = dbFetchCell("select count(*) from sensors WHERE sensor_class='q_factor' AND device_id = ?", array($device['device_id']));
+$chromatic_dispersion  = dbFetchCell("select count(*) from sensors WHERE sensor_class='chromatic_dispersion' AND device_id = ?", array($device['device_id']));
+$prefec_ber   = dbFetchCell("select count(*) from sensors WHERE sensor_class='prefec_ber' AND device_id = ?", array($device['device_id']));
 
 unset($datas);
 $datas[] = 'overview';
@@ -109,6 +113,22 @@ if ($cooling) {
     $datas[] = 'cooling';
 }
 
+if ($delay) {
+    $datas[] = 'delay';
+}
+
+if ($q_factor) {
+    $datas[] = 'q_factor';
+}
+
+if ($chromatic_dispersion) {
+    $datas[] = 'chromatic_dispersion';
+}
+
+if ($prefec_ber) {
+    $datas[] = 'prefec_ber';
+}
+
 $type_text['overview']    = 'Overview';
 $type_text['charge']      = 'Battery Charge';
 $type_text['temperature'] = 'Temperature';
@@ -131,6 +151,10 @@ $type_text['airflow']     = 'Airflow';
 $type_text['snr']         = 'SNR';
 $type_text['pressure']    = 'Pressure';
 $type_text['cooling']     = 'Cooling';
+$type_text['delay']       = 'Delay';
+$type_text['q_factor']    = 'Q-factor';
+$type_text['chromatic_dispersion']     = 'Chromatic Dispersion';
+$type_text['prefec_ber']     = 'preFEC BER';
 
 $link_array = array(
     'page'   => 'device',
@@ -149,7 +173,6 @@ if (!$vars['metric']) {
 unset($sep);
 foreach ($datas as $type) {
     echo $sep;
-
     if ($vars['metric'] == $type) {
         echo '<span class="pagemenu-selected">';
     }

@@ -17,7 +17,7 @@ $divisor    = 1000000;
 foreach ($pre_cache['junos_oids'] as $index => $entry) {
     if (is_numeric($entry['jnxDomCurrentTxLaserBiasCurrent']) && $entry['jnxDomCurrentTxLaserBiasCurrent'] != 0 && $entry['jnxDomCurrentTxLaserBiasCurrentLowAlarmThreshold'] != 0) {
         $oid = '.1.3.6.1.4.1.2636.3.60.1.1.1.1.6.' . $index;
-        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' Rx Current';
+        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' Tx Current';
         $limit_low = $entry['jnxDomCurrentTxLaserBiasCurrentLowAlarmThreshold'] / $divisor;
         $warn_limit_low = $entry['jnxDomCurrentTxLaserBiasCurrentLowWarningThreshold'] / $divisor;
         $limit = $entry['jnxDomCurrentTxLaserBiasCurrentHighAlarmThreshold'] / $divisor;
@@ -25,6 +25,24 @@ foreach ($pre_cache['junos_oids'] as $index => $entry) {
         $current = $entry['jnxDomCurrentTxLaserBiasCurrent'];
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        discover_sensor($valid['sensor'], 'current', $device, $oid, 'rx-' . $index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+        discover_sensor($valid['sensor'], 'current', $device, $oid, 'tx-' . $index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+    }
+}
+$multiplier = 1;
+$divisor    = 1000;
+foreach ($pre_cache['junos_ifoptics_oids'] as $index => $entry) {
+    if (is_numeric($entry['jnxPMCurTxLaserBiasCurrent'])) {
+        $oid = '.1.3.6.1.4.1.2636.3.71.1.2.1.1.35.'.$index;
+        $interface = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id']));
+        $descr = $interface . ' Tx Bias';
+
+        $limit_low = $null;
+        $warn_limit_low = null;
+        $limit = null;
+        $warn_limit = null;
+        $current = $entry['jnxPMCurTxLaserBiasCurrent']*$multiplier;
+        $entPhysicalIndex = $index;
+        $entPhysicalIndex_measured = 'ports';
+        discover_sensor($valid['sensor'], 'current', $device, $oid, $index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }
 }
