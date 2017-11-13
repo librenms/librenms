@@ -1714,8 +1714,7 @@ function validate_column_list($columns, $tableName)
     if (count($invalid_columns) > 0) {
         $output = array(
             'status'  => 'error',
-            'err-msg' => 'Invalid columns: ' . join(',', $invalid_columns),
-            'ports'   => $ports,
+            'message' => 'Invalid columns: ' . join(',', $invalid_columns),
         );
         $app->response->setStatus(400);     // Bad request
         $app->response->headers->set('Content-Type', 'application/json');
