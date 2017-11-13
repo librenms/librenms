@@ -16,7 +16,7 @@ Config::set('nographite', true);
 
 function print_help()
 {
-    echo "-h <device id> | <device hostname wildcard>  Poll single device or wildcard hostname\n";
+    echo "-h <device id> | <device hostname wildcard>  Poll single device, wildcard hostname, or comma separated list\n";
     echo "-e <percentage>                              Enable/disable selected ports polling for devices which would benefit <percentage> from a change\n";
     echo "\n";
 }
@@ -32,11 +32,18 @@ if (isset($options['help'])) {
 
 if (isset($options['h'])) {
     if (is_numeric($options['h'])) {
-        $where = "AND `device_id` = '".$options['h']."'";
+        $where = "AND `device_id` = ?";
+        $params = array($options['h']);
+    } elseif (str_contains($options['h'], ',')) {
+        $device_ids = array_map('trim', explode(',', $options['h']));
+        $device_ids = array_filter($device_ids, 'is_numeric');
+        $where = 'AND `device_id` in ' . dbGenPlaceholders(count($device_ids));
+        $params = $device_ids;
     } else {
-        $where = "AND `hostname` LIKE '".str_replace('*', '%', mres($options['h']))."'";
+        $where = "AND `hostname` LIKE ?";
+        $params = array(str_replace('*', '%', mres($options['h'])));
     }
-    $devices = dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC");
+    $devices = dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY `hostname` ASC", $params);
 } else {
     $devices = get_all_devices();
 }
@@ -109,7 +116,7 @@ foreach ($devices as &$device) {
         $set_count++;
     }
 }
-
+unset($device);  // will edit the wrong thing after using $device by reference
 
 // print out the results
 $stats = array(
@@ -125,25 +132,23 @@ $stats = array(
 );
 
 echo PHP_EOL;
-$header = "| %9.9s | %-11.11s | %10.10s | %14.14s | %10.10s | %14.14s | %10.10s | %5.9s | %5.5s |\n";
+$header = "| %9.9s | %-11.11s | %10.10s | %14.14s | %10.10s | %14.14s | %8.10s | %5.9s | %5.5s |\n";
 call_user_func_array('printf', array_merge(array($header), $stats));
 
-$mask = "| %9.9s | %-11.11s | %10.10s | %14.3f | %10.3f | %14.3f | @@@colstart@@@%+9.3fs@@@colend@@@ | @@@colstart@@@%+4.0f%%@@@colend@@@ | %5.5s |\n";
+$mask = "| %9.9s | %-11.11s | %10.10s | %14.3f | %9.3fs | %13.3fs | %s%+7.3fs\e[0m | %s%+4.0f%%\e[0m | %5.5s |\n";
 foreach ($devices as $device) {
-    if ($device['diff_sec'] > 0) {
-        $mask_temp = str_replace(array("@@@colstart@@@", "@@@colend@@@"), array("\033[0;31m", "\033[0m"), $mask);
-    } else {
-        $mask_temp = str_replace(array("@@@colstart@@@", "@@@colend@@@"), array("\033[0;32m", "\033[0m"), $mask);
-    }
+    $diff_color = ($device['diff_sec'] > 0 ? "\033[0;31m" : "\033[0;32m");
     printf(
-        $mask_temp,
+        $mask,
         $device['device_id'],
         $device['os'],
         $device['port_count'],
         $device['inactive_ratio'],
         $device['full_time_sec'],
         $device['selective_time_sec'],
+        $diff_color,
         $device['diff_sec'],
+        $diff_color,
         $device['diff_perc'],
         $device['set']
     );
@@ -155,11 +160,19 @@ $total_full_time = array_sum(array_column($devices, 'full_time_sec'));
 $total_selective_time = array_sum(array_column($devices, 'selective_time_sec'));
 $difference = $total_selective_time - $total_full_time;
 $difference_perc = ($difference / $total_full_time) * 100;
+$total_diff_color = ($difference > 0 ? "\033[0;31m" : "\033[0;32m");
 
-if ($difference > 0) {
-    $mask_temp = str_replace(array("@@@colstart@@@", "@@@colend@@@"), array("\033[0;31m", "\033[0m"), $mask);
-} else {
-    $mask_temp = str_replace(array("@@@colstart@@@", "@@@colend@@@"), array("\033[0;32m", "\033[0m"), $mask);
-}
-
-printf($mask_temp, 'Totals:', '', $total_ports, $inactive_ratio, $total_full_time, $total_selective_time, $difference, $difference_perc, $set_count);
+printf(
+    $mask,
+    'Totals:',
+    '',
+    $total_ports,
+    $inactive_ratio,
+    $total_full_time,
+    $total_selective_time,
+    $total_diff_color,
+    $difference,
+    $total_diff_color,
+    $difference_perc,
+    $set_count
+);
