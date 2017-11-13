@@ -8,6 +8,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+ use LibreNMS\RRD\RrdDefinition;
 
 $cambium_type = $poll_device['sysDescr'];
 $PMP = snmp_get($device, 'boxDeviceType.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
