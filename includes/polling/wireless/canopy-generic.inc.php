@@ -130,24 +130,25 @@ if (strstr($hardware, 'CMM') == false) {
 }
 // Convert to: https://docs.librenms.org/#Developing/Sensor-State-Support/
 if (strstr($hardware, 'AP') || strstr($hardware, 'Master') || strstr($hardware, 'CMM')) {
-    $gpsStatus = snmp_get($device, "whispGPSStats.0", "-Ovqn", "WHISP-APS-MIB");
-    if ($gpsStatus == 'generatingSync') {
-        $gpsStatus = 3;
-    } elseif ($gpsStatus == 'gpsLostSync') {
-        $gpsStatus = 2;
-    } elseif ($gpsStatus == 'gpsSynchronized') {
-        $gpsStatus = 1;
-    }
-    if (is_numeric($gpsStatus)) {
-        $rrd_def = RrdDefinition::make()->addDataset('whispGPSStats', 'GAUGE', 0, 4);
-        $fields = array(
-            'whispGPSStats' => $gpsStatus,
-        );
-        $tags = compact('rrd_def');
-        data_update($device, 'canopy-generic-whispGPSStats', $tags, $fields);
-        $graphs['canopy_generic_whispGPSStats'] = true;
-        unset($rrd_filename, $gpsStatus);
-    }
+    // Implemented
+    // $gpsStatus = snmp_get($device, "whispGPSStats.0", "-Ovqn", "WHISP-APS-MIB");
+    // if ($gpsStatus == 'generatingSync') {
+    //     $gpsStatus = 3;
+    // } elseif ($gpsStatus == 'gpsLostSync') {
+    //     $gpsStatus = 2;
+    // } elseif ($gpsStatus == 'gpsSynchronized') {
+    //     $gpsStatus = 1;
+    // }
+    // if (is_numeric($gpsStatus)) {
+    //     $rrd_def = RrdDefinition::make()->addDataset('whispGPSStats', 'GAUGE', 0, 4);
+    //     $fields = array(
+    //         'whispGPSStats' => $gpsStatus,
+    //     );
+    //     $tags = compact('rrd_def');
+    //     data_update($device, 'canopy-generic-whispGPSStats', $tags, $fields);
+    //     $graphs['canopy_generic_whispGPSStats'] = true;
+    //     unset($rrd_filename, $gpsStatus);
+    // }
 
     $visible = str_replace('"', "", snmp_get($device, ".1.3.6.1.4.1.161.19.3.4.4.7.0", "-Ovqn", ""));
     $tracked = str_replace('"', "", snmp_get($device, ".1.3.6.1.4.1.161.19.3.4.4.8.0", "-Ovqn", ""));
@@ -199,8 +200,8 @@ if (strstr($version, 'AP') == false) {
     // $horizontal = str_replace('"', "", snmp_get($device, "signalToNoiseRatioHorizontal.2", "-Ovqn", "WHISP-APS-MIB"));
     // $vertical = str_replace('"', "", snmp_get($device, "signalToNoiseRatioVertical.2", "-Ovqn", "WHISP-APS-MIB"));
     // if (is_numeric($horizontal) && is_numeric($vertical)) {
-    //     $rrd_def = RrdDefinition::make()
-    //         ->addDataset('horizontal', 'GAUGE', 0, 100)
+    //     $rrd_def = RrdDefinition::m    //         ->addDataset('horizontal', 'GAUGE', 0, 100)ake()
+
     //         ->addDataset('vertical', 'GAUGE', 0, 100);
     //     $fields = array(
     //         'horizontal' => $horizontal,

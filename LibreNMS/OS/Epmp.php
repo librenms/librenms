@@ -1,6 +1,6 @@
 <?php
 /**
- * Pmp.php
+ * Epmp.php
  *
  * Cambium
  *
@@ -29,14 +29,14 @@ use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\OS;
 
-class Pmp extends OS implements
+class Epmp extends OS implements
     WirelessRssiDiscovery,
     WirelessSnrDiscovery,
     WirelessFrequencyDiscovery,
-    WirelessUtilizationDiscovery
+    WirelessClientsDiscovery
 {
     /**
      * Discover wireless bit/packet error ratio.  This is in percent. Type is error-ratio.
@@ -46,15 +46,15 @@ class Pmp extends OS implements
      */
     public function discoverWirelessRssi()
     {
-        $rssi_oid = '.1.3.6.1.4.1.161.19.3.2.2.2.0';
+        $rssi_oid = '.1.3.6.1.4.1.17713.21.1.2.3.0'; //CAMBIUM-PMP80211-MIB::cambiumSTADLRSSI.0
         return array(
             new WirelessSensor(
                 'rssi',
                 $this->getDeviceId(),
                 $rssi_oid,
-                'pmp',
+                'epmp',
                 0,
-                'Cambium RSSI',
+                'Cambium ePMP RSSI',
                 null
             )
         );
@@ -69,25 +69,15 @@ class Pmp extends OS implements
      */
     public function discoverWirelessSnr()
     {
-        $snr_horizontal = '.1.3.6.1.4.1.161.19.3.1.4.1.84.2'; // WHISP-APS-MIB::signalToNoiseRatioHorizontal.2
-        $snr_vertical = '.1.3.6.1.4.1.161.19.3.1.4.1.74.2'; //WHISP-APS-MIB::signalToNoiseRatioVertical.2
+        $snr = '.1.3.6.1.4.1.17713.21.1.2.18.0'; //CAMBIUM-PMP80211-MIB::cambiumSTADLSNR.0
         return array(
             new WirelessSensor(
                 'snr',
                 $this->getDeviceId(),
                 $snr_horizontal,
-                'pmp-h',
+                'epmp',
                 0,
-                'Cambium SNR Horizontal',
-                null
-            ),
-            new WirelessSensor(
-                'snr',
-                $this->getDeviceId(),
-                $snr_vertical,
-                'pmp-v',
-                0,
-                'Cambium SNR Vertical',
+                'Cambium ePMP SNR',
                 null
             )
         );
@@ -101,50 +91,39 @@ class Pmp extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        $frequency = '.1.3.6.1.4.1.161.19.3.1.7.37.0'; //WHISP-APS-MIB::currentRadioFreqCarrier
+        $frequency = '.1.3.6.1.4.1.17713.21.1.2.1.0'; //CAMBIUM-PMP80211-MIB::cambiumSTAConnectedRFFrequency"
         return array(
             new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
                 $frequency,
-                'pmp',
+                'epmp',
                 0,
-                'Frequency',
-                null,
-                1,
-                10000
+                'Cambium ePMP Frequency',
+                null
             )
         );
     }
 
 
+
     /**
-     * Discover wireless utilization.  This is in %. Type is utilization.
+     * Discover wireless client counts. Type is clients.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors
      */
-    public function discoverWirelessUtilization()
+    public function discoverWirelessClients()
     {
-        $downlink = '.1.3.6.1.4.1.161.19.3.1.12.1.1.0'; //WHISP-APS-MIB::frUtlLowTotalDownlinkUtilization
-        $uplink = '.1.3.6.1.4.1.161.19.3.1.12.1.2.0'; //WHISP-APS-MIB::frUtlLowTotalUplinkUtilization
+        $registeredSM = '.1.3.6.1.4.1.17713.21.1.2.10.0'; //CAMBIUM-PMP80211-MIB::cambiumAPNumberOfConnectedSTA.0
         return array(
             new WirelessSensor(
-                'utilization',
+                'clients',
                 $this->getDeviceId(),
                 $downlink,
-                'pmp-downlink',
+                'epmp',
                 0,
-                'Downlink Utilization',
-                null
-            ),
-            new WirelessSensor(
-                'utilization',
-                $this->getDeviceId(),
-                $uplink,
-                'pmp-uplink',
-                0,
-                'Uplink Utilization',
+                'Client Count',
                 null
             )
         );
