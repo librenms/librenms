@@ -671,11 +671,11 @@ if ($_SESSION['userlevel'] >= '10') {
            <li class="dropdown-submenu">
                <a href="#"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a>
                <ul class="dropdown-menu scrollable-menu">
-               <li><a href="poll-log/"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> Poller History</a></li>');
+               <li><a href="poll-log/"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> Poller History</a></li>
+               <li><a href="pollers/tab=pollers/"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a></li>');
 
     if ($config['distributed_poller'] === true) {
         echo ('
-                    <li><a href="pollers/tab=pollers/"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a></li>
                     <li><a href="pollers/tab=groups/"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Poller Groups</a></li>');
     }
     echo ('
