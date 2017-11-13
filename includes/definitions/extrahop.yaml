@@ -15,5 +15,6 @@ discovery:
       snmpget:
           oid: extrahopInfoVersionString
           mib: EXTRAHOP-MIB
+          mib_dir: extrahop
           op: '!=='
           value: false

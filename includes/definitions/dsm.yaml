@@ -16,6 +16,7 @@ discovery:
       snmpget:
           oid: systemStatus.0
           mib: SYNOLOGY-SYSTEM-MIB
+          mib_dir: synology
           op: '!=='
           value: false
     -
