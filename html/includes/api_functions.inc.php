@@ -818,6 +818,7 @@ function get_port_graphs()
     } else {
         $columns = 'ifName';
     }
+    validate_column_list($columns, 'ports');
 
     // use hostname as device_id if it's all digits
     $device_id   = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
@@ -890,6 +891,7 @@ function get_all_ports()
     } else {
         $columns = 'ifName';
     }
+    validate_column_list($columns, 'ports');
     $ports = dbFetchRows("SELECT $columns FROM `ports` WHERE `deleted` = 0");
 
     $output = array(
@@ -1692,4 +1694,32 @@ function list_logs()
     $app->response->setStatus($code);
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
+}
+
+function validate_column_list($columns, $tableName)
+{
+    global $config;
+    $app = \Slim\Slim::getInstance();
+
+    $column_names = explode(',', $columns);
+    $valid_columns = dbFetchColumn("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$config['db_name']}' AND TABLE_NAME=?", array($tableName));
+    $invalid_columns = array();
+
+    foreach ($column_names as $col) {
+        $col = trim($col);
+        if (!in_array($col, $valid_columns)) {
+            $invalid_columns[] = $col;
+        }
+    }
+    if (count($invalid_columns) > 0) {
+        $output = array(
+            'status'  => 'error',
+            'err-msg' => 'Invalid columns: ' . join(',', $invalid_columns),
+            'ports'   => $ports,
+        );
+        $app->response->setStatus(400);     // Bad request
+        $app->response->headers->set('Content-Type', 'application/json');
+        echo _json_encode($output);
+        $app->stop();
+    }
 }
