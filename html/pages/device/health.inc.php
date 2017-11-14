@@ -23,9 +23,9 @@ $snr          = dbFetchCell("select count(*) from sensors WHERE sensor_class='sn
 $pressure     = dbFetchCell("select count(*) from sensors WHERE sensor_class='pressure' AND device_id = ?", array($device['device_id']));
 $cooling      = dbFetchCell("select count(*) from sensors WHERE sensor_class='cooling' AND device_id = ?", array($device['device_id']));
 $delay        = dbFetchCell("select count(*) from sensors WHERE sensor_class='delay' AND device_id = ?", array($device['device_id']));
-$q_factor     = dbFetchCell("select count(*) from sensors WHERE sensor_class='q_factor' AND device_id = ?", array($device['device_id']));
+$quality_factor     = dbFetchCell("select count(*) from sensors WHERE sensor_class='quality_factor' AND device_id = ?", array($device['device_id']));
 $chromatic_dispersion  = dbFetchCell("select count(*) from sensors WHERE sensor_class='chromatic_dispersion' AND device_id = ?", array($device['device_id']));
-$prefec_ber   = dbFetchCell("select count(*) from sensors WHERE sensor_class='prefec_ber' AND device_id = ?", array($device['device_id']));
+$ber          = dbFetchCell("select count(*) from sensors WHERE sensor_class='ber' AND device_id = ?", array($device['device_id']));
 
 unset($datas);
 $datas[] = 'overview';
@@ -117,16 +117,16 @@ if ($delay) {
     $datas[] = 'delay';
 }
 
-if ($q_factor) {
-    $datas[] = 'q_factor';
+if ($quality_factor) {
+    $datas[] = 'quality_factor';
 }
 
 if ($chromatic_dispersion) {
     $datas[] = 'chromatic_dispersion';
 }
 
-if ($prefec_ber) {
-    $datas[] = 'prefec_ber';
+if ($ber) {
+    $datas[] = 'ber';
 }
 
 $type_text['overview']    = 'Overview';
@@ -152,9 +152,9 @@ $type_text['snr']         = 'SNR';
 $type_text['pressure']    = 'Pressure';
 $type_text['cooling']     = 'Cooling';
 $type_text['delay']       = 'Delay';
-$type_text['q_factor']    = 'Q-factor';
+$type_text['quality_factor']    = 'Quality factor';
 $type_text['chromatic_dispersion']     = 'Chromatic Dispersion';
-$type_text['prefec_ber']     = 'preFEC BER';
+$type_text['ber']     = 'Bit Error Rate';
 
 $link_array = array(
     'page'   => 'device',

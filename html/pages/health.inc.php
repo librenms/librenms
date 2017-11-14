@@ -55,14 +55,14 @@ if ($used_sensors['toner']) {
 if ($used_sensors['delay']) {
     $datas[] = 'delay';
 }
-if ($used_sensors['q_factor']) {
-    $datas[] = 'q_factor';
+if ($used_sensors['quality_factor']) {
+    $datas[] = 'quality_factor';
 }
 if ($used_sensors['chromatic_dispersion']) {
     $datas[] = 'chromatic_dispersion';
 }
-if ($used_sensors['prefec_ber']) {
-    $datas[] = 'prefec_ber';
+if ($used_sensors['ber']) {
+    $datas[] = 'ber';
 }
 
 // FIXME generalize -> static-config ?
@@ -90,9 +90,9 @@ $type_text['pressure'] = "Pressure";
 $type_text['cooling'] = "Cooling";
 $type_text['toner'] = 'Toner';
 $type_text['delay'] = 'Delay';
-$type_text['q_factor'] = 'Q-factor';
+$type_text['quality_factor'] = 'Quality factor';
 $type_text['chromatic_dispersion'] = 'Chromatic Dispersion';
-$type_text['prefec_ber'] = 'preFEC BER';
+$type_text['ber'] = 'Bit Error Rate';
 
 if (!$vars['metric']) {
     $vars['metric'] = "processor";

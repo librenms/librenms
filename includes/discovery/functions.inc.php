@@ -414,9 +414,9 @@ function sensor_low_limit($class, $current)
             $limit = ($current * 0.95);
             break;
         case 'delay':
-        case 'q_factor':
+        case 'quality_factor':
         case 'chromatic_dispersion':
-        case 'prefec_ber':
+        case 'ber':
     }//end switch
 
     return $limit;

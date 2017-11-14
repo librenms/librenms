@@ -394,8 +394,8 @@ $icons = array(
     'airflow' => 'angle-double-right',
     'delay' => 'clock-o',
     'chromatic_dispersion' => 'indent',
-    'prefec_ber' => 'sort-amount-desc',
-    'q_factor' => 'arrows',
+    'ber' => 'sort-amount-desc',
+    'quality_factor' => 'arrows',
 
 );
 foreach (array('fanspeed','humidity','temperature','signal') as $item) {

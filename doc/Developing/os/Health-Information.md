@@ -26,9 +26,9 @@ Currently we have support for the following health metrics along with the values
 | temperature                     | C                           |
 | voltage                         | V                           |
 | delay                           | s                           |
-| q_factor                        | dB                          |
+| quality_factor                  | dB                          |
 | chromatic_disperision           | ps/nm                       |
-| prefec_BER                      | ratio                       |
+| ber                             | ratio                       |
 
 #### Simple health discovery
 

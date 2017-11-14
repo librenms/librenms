@@ -1,6 +1,6 @@
 <?php
 
-$class     = 'q_factor';
+$class     = 'quality_factor';
 $unit      = 'dB';
 $unit_long = 'dB';
 

@@ -1,6 +1,6 @@
 <?php
 
-$class     = 'prefec_ber';
+$class     = 'er';
 $unit      = '';
 $unit_long = '';
 

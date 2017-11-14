@@ -12,13 +12,13 @@
 
 echo 'JunOS ';
 
-$multiplier = 1000000;
+$multiplier = 1;
 $divisor    = 1;
 foreach ($pre_cache['junos_ifoptics_oids'] as $index => $entry) {
     if (is_numeric($entry['jnxPMCurCarFreqOffset'])) {
         $oid = '.1.3.6.1.4.1.2636.3.71.1.2.1.1.43.'.$index;
         $interface = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id']));
-        $descr = $interface . ' Carrier Freq Offset';
+        $descr = $interface . ' Carrier Freq Offset MHz';
         # create ifoptioc_aternative index et-0/0/0 eq 1.1.1.1
         $t = explode('/', $interface, 3);
         $t0 = explode('-', $t[0], 2);
