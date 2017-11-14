@@ -70,7 +70,7 @@ function external_exec($command)
     $output = shell_exec($command);
 
     if ($debug && !$vdebug) {
-        $ip_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
+        $ip_regex = '/(?<!(\d\.|\d\d|\.\d))(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
         $debug_output = preg_replace($ip_regex, '*', $output);
         d_echo($debug_output . PHP_EOL);
     } elseif ($vdebug) {
