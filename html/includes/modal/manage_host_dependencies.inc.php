@@ -141,9 +141,10 @@ $('#manhostdep-save').click('', function(event) {
         url: 'ajax_form.php',
         data: { type: "save-host-dependency", device_ids: device_ids, parent_id: parent_id },
         dataType: "json",
-        success: function(msg) {
+        success: function(output) {
             $("#manage-dependencies").modal('hide');
             if (output.status == 0) {
+                toastr.success('Host dependencies saved successfully');
                 var arrayLength = device_ids.length;
                 for (var i = 0; i < arrayLength; i++) {
                     $('#hostdeps').find('td.childhost').each(function() { 
