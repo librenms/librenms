@@ -81,6 +81,8 @@ class Ptp650 extends OS implements
         $receive = '.1.3.6.1.4.1.17713.7.20.1.0'; //CAMBIUM-PTP650-MIB::receiveDataRate.0
         $transmit = '.1.3.6.1.4.1.17713.7.20.2.0'; //CAMBIUM-PTP650-MIB::transmitDataRate.0
         $aggregate = '.1.3.6.1.4.1.17713.7.20.3.0'; //CAMBIUM-PTP650-MIB::aggregateDataRate.0
+        $txModulation = ".1.3.6.1.4.1.17713.7.12.15.0";
+        $rxModulation = ".1.3.6.1.4.1.17713.7.12.14.0";
         return array(
             new WirelessSensor(
                 'rate',
@@ -88,7 +90,7 @@ class Ptp650 extends OS implements
                 $receive,
                 'ptp650-rx-rate',
                 0,
-                'ptp650 Receive Rate',
+                'PTP650 Receive Rate',
                 null,
                 1,
                 100
@@ -99,7 +101,7 @@ class Ptp650 extends OS implements
                 $transmit,
                 'ptp650-tx-rate',
                 0,
-                'ptp650 Transmit Rate',
+                'PTP650 Transmit Rate',
                 null,
                 1,
                 100
@@ -110,11 +112,29 @@ class Ptp650 extends OS implements
                 $aggregate,
                 'ptp650-ag-rate',
                 0,
-                'ptp650 Aggragate Rate',
+                'PTP650 Aggragate Rate',
                 null,
                 1,
                 100
-            )
+            ),
+            new WirelessSensor(
+                'rate',
+                $this->getDeviceId(),
+                $txModulation,
+                'ptp650-tx-mod',
+                0,
+                'PTP650 Transmit Modulation Rate',
+                null
+            ),
+            new WirelessSensor(
+                'rate',
+                $this->getDeviceId(),
+                $rxModulation,
+                'ptp650-rx-mod',
+                0,
+                'PTP650 Receive Modulation Rate',
+                null
+            ),
         );
     }
 }

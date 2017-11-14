@@ -15,21 +15,6 @@ $version = $poll_device['sysDescr'];
 $masterSlaveMode = ucfirst(snmp_get($device, 'masterSlaveMode.0', '-Oqv', "CAMBIUM-PTP650-MIB"));
 $hardware = 'PTP 650 '. $masterSlaveMode;
 
-$txModulation = snmp_get($device, ".1.3.6.1.4.1.17713.7.12.15.0", "-Ovqn", "");
-$rxModulation = snmp_get($device, ".1.3.6.1.4.1.17713.7.12.14.0", "-Ovqn", "");
-if (is_numeric($txModulation) && is_numeric($rxModulation)) {
-    $rrd_def = RrdDefinition::make()
-        ->addDataset('txModulation', 'GAUGE', 0, 24)
-        ->addDataset('rxModulation', 'GAUGE', 0, 24);
-    $fields = array(
-        'txModuation' => $txModulation,
-        'rxModulation' => $rxModulation,
-    );
-    $tags = compact('rrd_def');
-    data_update($device, 'cambium-650-modulationMode', $tags, $fields);
-    $graphs['cambium_650_modulationMode'] = true;
-}
-
 $ssr = snmp_get($device, "signalStrengthRatio.0", "-Ovqn", "CAMBIUM-PTP650-MIB");
 if (is_numeric($ssr)) {
     $rrd_def = RrdDefinition::make()->addDataset('ssr', 'GAUGE', -150, 150);

@@ -106,6 +106,8 @@ class Ptp250 extends OS implements
         $receive = '.1.3.6.1.4.1.17713.250.11.1.0'; //"CAMBIUM-PTP250-MIB::receiveDataRate.0"
         $transmit = '.1.3.6.1.4.1.17713.250.11.2.0'; //"CAMBIUM-PTP250-MIB::transmitDataRate.0"
         $aggregate = '.1.3.6.1.4.1.17713.250.11.3.0'; //"CAMBIUM-PTP250-MIB::aggregateDataRate.0"
+        $txModulation = ".1.3.6.1.4.1.17713.250.5.9.0";
+        $rxModulation = ".1.3.6.1.4.1.17713.250.5.8.0";
         return array(
             new WirelessSensor(
                 'rate',
@@ -139,7 +141,25 @@ class Ptp250 extends OS implements
                 null,
                 1,
                 100
-            )
+            ),
+            new WirelessSensor(
+                'rate',
+                $this->getDeviceId(),
+                $txModulation,
+                'ptp250-tx-mod',
+                0,
+                'PTP250 Transmit Modulation Rate',
+                null
+            ),
+            new WirelessSensor(
+                'rate',
+                $this->getDeviceId(),
+                $rxModulation,
+                'ptp250-rx-mod',
+                0,
+                'PTP250 Receive Modulation Rate',
+                null
+            ),
         );
     }
 }
