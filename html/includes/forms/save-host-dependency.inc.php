@@ -31,7 +31,7 @@ if (is_admin() === false) {
         $device_arr[] = $dev;
     }
 
-    if (!$status) {
+    if (!isset($status) || empty($status)) {
         $clause = dbGenPlaceholders(count($device_arr));
  
         if (dbQuery('UPDATE `devices` set parent_id = ' . $_POST['parent_id'] . ' WHERE `device_id` IN' . $clause, $device_arr)) {
