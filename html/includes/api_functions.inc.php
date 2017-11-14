@@ -1699,27 +1699,18 @@ function list_logs()
 function validate_column_list($columns, $tableName)
 {
     global $config;
-    $app = \Slim\Slim::getInstance();
 
     $column_names = explode(',', $columns);
     $db_schema = Symfony\Component\Yaml\Yaml::parse(file_get_contents($config['install_dir'] . '/misc/db_schema.yaml'));
-    $valid_columns = array();
-    foreach ($db_schema[$tableName]['Columns'] as $col) {
-        $valid_columns[] = $col['Field'];
-    }
-    $invalid_columns = array();
+    $valid_columns = array_column($db_schema[$tableName]['Columns'], 'Field');
+    $invalid_columns = array_diff(array_map('trim', $column_names), $valid_columns);
 
-    foreach ($column_names as $col) {
-        $col = trim($col);
-        if (!in_array($col, $valid_columns)) {
-            $invalid_columns[] = $col;
-        }
-    }
     if (count($invalid_columns) > 0) {
         $output = array(
             'status'  => 'error',
             'message' => 'Invalid columns: ' . join(',', $invalid_columns),
         );
+        $app = \Slim\Slim::getInstance();
         $app->response->setStatus(400);     // Bad request
         $app->response->headers->set('Content-Type', 'application/json');
         echo _json_encode($output);
