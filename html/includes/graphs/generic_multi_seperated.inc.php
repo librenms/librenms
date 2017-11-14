@@ -16,7 +16,7 @@
 require 'includes/graphs/common.inc.php';
 
 if (return_stacked_graphs() == 1) {
-    $transparency = 45;
+    $transparency = 95;
     $mrtg_style = 1;
 } else {
     $transparency = '';
@@ -62,7 +62,7 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= ' CDEF:octets' . $i . '=inB' . $i . ',outB' . $i . ',+';
     $rrd_options .= ' CDEF:inbits' . $i . '=inB' . $i . ",$multiplier,* ";
     $rrd_options .= ' CDEF:outbits' . $i . '=outB' . $i . ",$multiplier,*";
-    $rrd_options .= ' CDEF:outbits' . $i . '_neg=outbits' . $i . ',-1,*';
+    $rrd_options .= ' CDEF:outbits' . $i . '_neg=outbits' . $i . ','.$mrtg_style.',*';
     $rrd_options .= ' CDEF:bits' . $i . '=inbits' . $i . ',outbits' . $i . ',+';
 
     if ($_GET['previous']) {

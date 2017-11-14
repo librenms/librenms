@@ -1,8 +1,28 @@
 <?php
+/*
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage graphs
+ * @link       http://librenms.org
+ * @copyright  2017 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
-// Draw generic bits graph
-// args: ds_in, ds_out, rrd_filename, bg, legend, from, to, width, height, inverse, $percentile
 require 'includes/graphs/common.inc.php';
+
+if (return_stacked_graphs() == 1) {
+    $transparency = 95;
+    $mrtg_style = 1;
+} else {
+    $transparency = '';
+    $mrtg_style = -1;
+}
+
 
 $length = '10';
 
@@ -26,8 +46,8 @@ $rrd_options .= ' DEF:'.$out.'='.$rrd_filename.':'.$ds_out.':AVERAGE';
 $rrd_options .= ' DEF:'.$in.'='.$rrd_filename.':'.$ds_in.':AVERAGE';
 $rrd_options .= ' DEF:'.$out.'_max='.$rrd_filename.':'.$ds_out.':MAX';
 $rrd_options .= ' DEF:'.$in.'_max='.$rrd_filename.':'.$ds_in.':MAX';
-$rrd_options .= ' CDEF:dout_max=out_max,-1,*';
-$rrd_options .= ' CDEF:dout=out,-1,*';
+$rrd_options .= ' CDEF:dout_max=out_max,'.$mrtg_style.',*';
+$rrd_options .= ' CDEF:dout=out,'.$mrtg_style.',*';
 $rrd_options .= ' CDEF:both=in,out,+';
 if ($print_total) {
     $rrd_options .= ' VDEF:totin=in,TOTAL';
@@ -42,8 +62,8 @@ if ($percentile) {
 }
 
 if ($graph_max) {
-    $rrd_options .= ' AREA:in_max#'.$colour_area_in_max.':';
-    $rrd_options .= ' AREA:dout_max#'.$colour_area_out_max.':';
+    $rrd_options .= ' AREA:in_max#'.$colour_area_in_max.$transparency.':';
+    $rrd_options .= ' AREA:dout_max#'.$colour_area_out_max.$transparency.':';
 }
 
 if ($_GET['previous'] == 'yes') {
@@ -55,8 +75,9 @@ if ($_GET['previous'] == 'yes') {
     $rrd_options .= ' SHIFT:'.$in."X:$period";
     $rrd_options .= ' SHIFT:'.$out."_maxX:$period";
     $rrd_options .= ' SHIFT:'.$in."_maxX:$period";
-    $rrd_options .= ' CDEF:dout_maxX=out_maxX,-1,*';
-    $rrd_options .= ' CDEF:doutX=outX,-1,*';
+
+    $rrd_options .= ' CDEF:dout_maxX=out_maxX,'.$mrtg_style.',*';
+    $rrd_options .= ' CDEF:doutX=outX,'.$mrtg_style.',*';
     $rrd_options .= ' CDEF:bothX=inX,outX,+';
     if ($print_total) {
         $rrd_options .= ' VDEF:totinX=inX,TOTAL';
@@ -76,7 +97,7 @@ if ($_GET['previous'] == 'yes') {
     }
 }//end if
 
-$rrd_options .= ' AREA:in#'.$colour_area_in.':';
+$rrd_options .= ' AREA:in#'.$colour_area_in.$transparency.':';
 $rrd_options .= " COMMENT:'".$unit_text.'      Now       Ave      Max';
 
 if ($percentile) {
@@ -94,7 +115,7 @@ if ($percentile) {
 }
 
 $rrd_options .= " COMMENT:\\n";
-$rrd_options .= ' AREA:dout#'.$colour_area_out.':';
+$rrd_options .= ' AREA:dout#'.$colour_area_out.$transparency.':';
 $rrd_options .= ' LINE1.25:dout#'.$colour_line_out.":'".$out_text."'";
 $rrd_options .= ' GPRINT:out:LAST:%6.2lf%s';
 $rrd_options .= ' GPRINT:out:AVERAGE:%6.2lf%s';
@@ -119,9 +140,9 @@ if ($percentile) {
 
 if ($_GET['previous'] == 'yes') {
     $rrd_options .= ' LINE1.25:in'.$format."X#666666:'Prev In \\\\n'";
-    $rrd_options .= ' AREA:in'.$format.'X#99999966:';
+    $rrd_options .= ' AREA:in'.$format.'X#99999966'.$transparency.':';
     $rrd_options .= ' LINE1.25:dout'.$format."X#666666:'Prev Out'";
-    $rrd_options .= ' AREA:dout'.$format.'X#99999966:';
+    $rrd_options .= ' AREA:dout'.$format.'X#99999966'.$transparency.':';
 }
 
 $rrd_options .= ' HRULE:0#999999';
