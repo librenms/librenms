@@ -136,7 +136,7 @@ foreach ($tables as $tablevalue) {
         }
 
         foreach ($temp as $index => $entry) {
-            if ($tablevalue[2] == 'ciscoEnvMonTemperatureState' && (is_null($temp[$index][$tablevalue[3]]) or empty($temp[$index][$tablevalue[3]]))) {
+            if ($tablevalue[2] == 'ciscoEnvMonTemperatureState' && (empty($temp[$index][$tablevalue[3]]))) {
                 $process_sensor = false;
             }
             if ($process_sensor == true) {
