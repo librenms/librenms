@@ -81,11 +81,12 @@ $config['oxidized']['reload_nodes'] = true;
 
 ### Working with groups
 
-To return a group to Oxidized you can do this by matching a regex for either `hostname`, `os` or `location`. The order is `hostname` is matched first, if nothing is found then `os` is tried and then `location` is attempted.
-The first match found will be used. To match on the device hostnames that contain 'lon-sw' or if the location contains 'London' then you would place the following within config.php:
+To return a group to Oxidized you can do this by matching a regex for either `hostname`, `sysname`, `os` or `location`. The order is `hostname` is matched first, if nothing is found then `sysname` is tried, then `os`, and finally `location` is attempted.
+The first match found will be used. To match on the device hostnames or sysnames that contain 'lon-sw' or if the location contains 'London' then you would place the following within config.php:
 
 ```php
 $config['oxidized']['group']['hostname'][] = array('regex' => '/^lon-sw/', 'group' => 'london-switches');
+$config['oxidized']['group']['sysname'][] = array('regex' => '/^lon-sw/', 'group' => 'london-switches');
 $config['oxidized']['group']['location'][] = array('regex' => '/london/', 'group' => 'london-switches');
 ```
 

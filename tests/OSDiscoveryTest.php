@@ -151,6 +151,7 @@ class OSDiscoveryTest extends \PHPUnit_Framework_TestCase
         $excluded_os = array(
             'default',
             'generic',
+            'ping',
         );
         $all_os = array_diff(array_keys($config['os']), $excluded_os);
 

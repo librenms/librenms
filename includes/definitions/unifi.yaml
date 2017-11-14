@@ -6,5 +6,5 @@ nobulk: 1
 group: ubnt
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-    - { graph: device_processor, text: 'Processor Usage' }
-    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_wireless_clients, text: 'Connected Clients' }
+    - { graph: device_wireless_ccq, text: 'Connection Quality' }

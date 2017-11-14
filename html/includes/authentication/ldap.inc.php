@@ -1,46 +1,29 @@
 <?php
 
+use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 
 function init_auth()
 {
-    global $config, $ldap_connection;
-
-    $ldap_connection = @ldap_connect($config['auth_ldap_server'], $config['auth_ldap_port']);
-
-    if ($config['auth_ldap_starttls'] && ($config['auth_ldap_starttls'] == 'optional' || $config['auth_ldap_starttls'] == 'require')) {
-        $tls = ldap_start_tls($ldap_connection);
-        if ($config['auth_ldap_starttls'] == 'require' && $tls === false) {
-            echo '<h2>Fatal error: LDAP TLS required but not successfully negotiated:'.ldap_error($ldap_connection).'</h2>';
-            exit;
-        }
-    }
+    // deferred
 }
 
 
 function authenticate($username, $password)
 {
-    global $config, $ldap_connection;
-
-    if (!$ldap_connection) {
-        throw new AuthenticationException('Unable to connect to ldap server');
-    }
+    $connection = get_ldap_connection(true);
 
     if ($username) {
-        if ($config['auth_ldap_version']) {
-            ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, $config['auth_ldap_version']);
-        }
-
-        if ($password && ldap_bind($ldap_connection, $config['auth_ldap_prefix'].$username.$config['auth_ldap_suffix'], $password)) {
-            if (!$config['auth_ldap_group']) {
+        if ($password && ldap_bind($connection, get_full_dn($username), $password)) {
+            if (!Config::has('auth_ldap_group')) {
                 return true;
             } else {
                 $ldap_groups = get_group_list();
                 foreach ($ldap_groups as $ldap_group) {
                     $ldap_comparison = ldap_compare(
-                        $ldap_connection,
+                        $connection,
                         $ldap_group,
-                        $config['auth_ldap_groupmemberattr'],
+                        Config::get('auth_ldap_groupmemberattr', 'memberUid'),
                         get_membername($username)
                     );
                     if ($ldap_comparison === true) {
@@ -54,7 +37,7 @@ function authenticate($username, $password)
             throw new AuthenticationException('A password is required');
         }
 
-        throw new AuthenticationException(ldap_error($ldap_connection));
+        throw new AuthenticationException(ldap_error($connection));
     }
 
     throw new AuthenticationException();
@@ -63,7 +46,16 @@ function authenticate($username, $password)
 
 function reauthenticate($sess_id, $token)
 {
-    return false;
+    $sess_id = clean($sess_id);
+    $token = clean($token);
+
+    list($username, $hash) = explode('|', $token);
+
+    if (!user_exists($username, true)) {
+        throw new AuthenticationException();
+    }
+
+    return check_remember_me($sess_id, $token);
 }
 
 
@@ -92,15 +84,23 @@ function adduser($username, $password, $level, $email = '', $realname = '', $can
 }
 
 
-function user_exists($username)
+function user_exists($username, $throw_exception = false)
 {
-    global $config, $ldap_connection;
+    try {
+        $connection = get_ldap_connection();
 
-    $filter  = '('.$config['auth_ldap_prefix'].$username.')';
-    $search  = ldap_search($ldap_connection, trim($config['auth_ldap_suffix'], ','), $filter);
-    $entries = ldap_get_entries($ldap_connection, $search);
-    if ($entries['count']) {
-        return 1;
+        $filter = '(' . Config::get('auth_ldap_prefix') . $username . ')';
+        $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
+        $entries = ldap_get_entries($connection, $search);
+        if ($entries['count']) {
+            return 1;
+        }
+    } catch (AuthenticationException $e) {
+        if ($throw_exception) {
+            throw $e;
+        } else {
+            echo $e->getMessage() . PHP_EOL;
+        }
     }
 
     return 0;
@@ -109,21 +109,26 @@ function user_exists($username)
 
 function get_userlevel($username)
 {
-    global $config, $ldap_connection;
-
     $userlevel = 0;
 
-    // Find all defined groups $username is in
-    $filter  = '(&(|(cn='.join(')(cn=', array_keys($config['auth_ldap_groups'])).'))('.$config['auth_ldap_groupmemberattr'].'='.get_membername($username).'))';
-    $search  = ldap_search($ldap_connection, $config['auth_ldap_groupbase'], $filter);
-    $entries = ldap_get_entries($ldap_connection, $search);
+    try {
+        $connection = get_ldap_connection();
+        $groups = Config::get('auth_ldap_groups');
 
-    // Loop the list and find the highest level
-    foreach ($entries as $entry) {
-        $groupname = $entry['cn'][0];
-        if ($config['auth_ldap_groups'][$groupname]['level'] > $userlevel) {
-            $userlevel = $config['auth_ldap_groups'][$groupname]['level'];
+        // Find all defined groups $username is in
+        $filter = '(&(|(cn=' . join(')(cn=', array_keys($groups)) . '))(' . Config::get('auth_ldap_groupmemberattr', 'memberUid') . '=' . get_membername($username) . '))';
+        $search = ldap_search($connection, Config::get('auth_ldap_groupbase'), $filter);
+        $entries = ldap_get_entries($connection, $search);
+
+        // Loop the list and find the highest level
+        foreach ($entries as $entry) {
+            $groupname = $entry['cn'][0];
+            if ($groups[$groupname]['level'] > $userlevel) {
+                $userlevel = $groups[$groupname]['level'];
+            }
         }
+    } catch (AuthenticationException $e) {
+        echo $e->getMessage() . PHP_EOL;
     }
 
     return $userlevel;
@@ -132,14 +137,19 @@ function get_userlevel($username)
 
 function get_userid($username)
 {
-    global $config, $ldap_connection;
+    try {
+        $connection = get_ldap_connection();
 
-    $filter  = '('.$config['auth_ldap_prefix'].$username.')';
-    $search  = ldap_search($ldap_connection, trim($config['auth_ldap_suffix'], ','), $filter);
-    $entries = ldap_get_entries($ldap_connection, $search);
+        $filter = '(' . Config::get('auth_ldap_prefix') . $username . ')';
+        $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
+        $entries = ldap_get_entries($connection, $search);
 
-    if ($entries['count']) {
-        return $entries[0][$config['auth_ldap_uid_attribute']][0];
+        if ($entries['count']) {
+            $uid_attr = strtolower(Config::get('auth_ldap_uid_attribute', 'uidnumber'));
+            return $entries[0][$uid_attr][0];
+        }
+    } catch (AuthenticationException $e) {
+        echo $e->getMessage() . PHP_EOL;
     }
 
     return -1;
@@ -155,39 +165,45 @@ function deluser($username)
 
 function get_userlist()
 {
-    global $config, $ldap_connection;
     $userlist = array();
 
-    $filter = '('.$config['auth_ldap_prefix'].'*)';
+    try {
+        $connection = get_ldap_connection();
 
-    $search  = ldap_search($ldap_connection, trim($config['auth_ldap_suffix'], ','), $filter);
-    $entries = ldap_get_entries($ldap_connection, $search);
+        $filter = '(' . Config::get('auth_ldap_prefix') . '*)';
+        $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
+        $entries = ldap_get_entries($connection, $search);
 
-    if ($entries['count']) {
-        foreach ($entries as $entry) {
-            $username    = $entry['uid'][0];
-            $realname    = $entry['cn'][0];
-            $user_id     = $entry[$config['auth_ldap_uid_attribute']][0];
-            $email       = $entry[$config['auth_ldap_emailattr']][0];
-            $ldap_groups = get_group_list();
-            foreach ($ldap_groups as $ldap_group) {
-                $ldap_comparison = ldap_compare(
-                    $ldap_connection,
-                    $ldap_group,
-                    $config['auth_ldap_groupmemberattr'],
-                    get_membername($username)
-                );
-                if (!isset($config['auth_ldap_group']) || $ldap_comparison === true) {
-                    $userlist[] = array(
-                                   'username' => $username,
-                                   'realname' => $realname,
-                                   'user_id'  => $user_id,
-                                   'email'    => $email,
-                                  );
+        if ($entries['count']) {
+            foreach ($entries as $entry) {
+                $username = $entry['uid'][0];
+                $realname = $entry['cn'][0];
+                $uid_attr = strtolower(Config::get('auth_ldap_uid_attribute', 'uidnumber'));
+                $user_id = $entry[$uid_attr][0];
+                $email = $entry[Config::get('auth_ldap_emailattr', 'mail')][0];
+                $ldap_groups = get_group_list();
+                foreach ($ldap_groups as $ldap_group) {
+                    $ldap_comparison = ldap_compare(
+                        $connection,
+                        $ldap_group,
+                        Config::get('auth_ldap_groupmemberattr', 'memberUid'),
+                        get_membername($username)
+                    );
+                    if (!Config::has('auth_ldap_group') || $ldap_comparison === true) {
+                        $userlist[$username] = array(
+                            'username' => $username,
+                            'realname' => $realname,
+                            'user_id' => $user_id,
+                            'email' => $email,
+                        );
+                    }
                 }
             }
         }
+    } catch (AuthenticationException $e) {
+        echo $e->getMessage() . PHP_EOL;
     }
+
     return $userlist;
 }
 
@@ -201,9 +217,9 @@ function can_update_users()
 
 function get_user($user_id)
 {
-    foreach (get_userlist() as $users) {
-        if ($users['user_id'] === $user_id) {
-            return $users;
+    foreach (get_userlist() as $user) {
+        if ($user['user_id'] === $user_id) {
+            return $user;
         }
     }
     return 0;
@@ -219,38 +235,118 @@ function update_user($user_id, $realname, $level, $can_modify_passwd, $email)
 
 function get_membername($username)
 {
-    global $config, $ldap_connection;
-    if ($config['auth_ldap_groupmembertype'] == 'fulldn') {
-        $membername = $config['auth_ldap_prefix'].$username.$config['auth_ldap_suffix'];
-    } elseif ($config['auth_ldap_groupmembertype'] == 'puredn') {
-        $filter  = '('.$config['auth_ldap_attr']['uid'].'='.$username.')';
-        $search  = ldap_search($ldap_connection, $config['auth_ldap_groupbase'], $filter);
-        $entries = ldap_get_entries($ldap_connection, $search);
-        $membername = $entries[0]['dn'];
-    } else {
-        $membername = $username;
+    $type = Config::get('auth_ldap_groupmembertype');
+
+    if ($type == 'fulldn') {
+        return get_full_dn($username);
     }
 
-    return $membername;
+    if ($type == 'puredn') {
+        try {
+            $connection = get_ldap_connection();
+            $filter = '(' . Config::get('auth_ldap_attr.uid') . '=' . $username . ')';
+            $search = ldap_search($connection, Config::get('auth_ldap_groupbase'), $filter);
+            $entries = ldap_get_entries($connection, $search);
+            return $entries[0]['dn'];
+        } catch (AuthenticationException $e) {
+            echo $e->getMessage() . PHP_EOL;
+        }
+    }
+
+    return $username;
 }
 
 
 function get_group_list()
 {
-    global $config;
+    $ldap_groups = array();
 
-    $ldap_groups   = array();
-    $default_group = 'cn=groupname,ou=groups,dc=example,dc=com';
-    if (isset($config['auth_ldap_group'])) {
-        if ($config['auth_ldap_group'] !== $default_group) {
-            $ldap_groups[] = $config['auth_ldap_group'];
-        }
+    $default_group = 'cn=groupname,ou=groups,dc=example,dc=com';  // in the documentation
+    if (Config::get('auth_ldap_group', $default_group) !== $default_group) {
+        $ldap_groups[] = Config::get('auth_ldap_group');
     }
 
-    foreach ($config['auth_ldap_groups'] as $key => $value) {
-        $dn            = "cn=$key,".$config['auth_ldap_groupbase'];
-        $ldap_groups[] = $dn;
+    foreach (Config::get('auth_ldap_groups') as $key => $value) {
+        $ldap_groups[] = "cn=$key,".Config::get('auth_ldap_groupbase');
     }
 
     return $ldap_groups;
+}
+
+/**
+ * Get the full dn with auth_ldap_prefix and auth_ldap_suffix
+ * @internal
+ *
+ * @return string
+ */
+function get_full_dn($username)
+{
+    return Config::get('auth_ldap_prefix', '') . $username . Config::get('auth_ldap_suffix', '');
+}
+
+/**
+ * Get the ldap connection. If it hasn't been established yet, connect and try to bind.
+ * @internal
+ *
+ * @param bool $skip_bind do not attempt to bind on connection
+ * @return false|resource
+ * @throws AuthenticationException
+ */
+function get_ldap_connection($skip_bind = false)
+{
+    global $ldap_connection;
+
+    if ($ldap_connection) {
+        return $ldap_connection; // bind already attempted
+    }
+
+    $ldap_connection = @ldap_connect(Config::get('auth_ldap_server'), Config::get('auth_ldap_port', 389));
+
+    if (!$ldap_connection) {
+        throw new AuthenticationException('Unable to connect to ldap server');
+    }
+
+    ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, Config::get('auth_ldap_version', 2));
+
+    $use_tls = Config::get('auth_ldap_starttls');
+    if ($use_tls == 'optional'||$use_tls == 'require') {
+        $tls_success = ldap_start_tls($ldap_connection);
+        if ($use_tls == 'require' && $tls_success === false) {
+            $error = ldap_error($ldap_connection);
+            throw new AuthenticationException("Fatal error: LDAP TLS required but not successfully negotiated: $error");
+        }
+    }
+
+    if ($skip_bind) {
+        return $ldap_connection;
+    }
+
+    // set timeout
+    ldap_set_option($ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, Config::get('auth_ldap_timeout', 5));
+
+    // With specified bind user
+    if ((Config::has('auth_ldap_binduser') || Config::has('auth_ldap_binddn'))
+        && Config::has('auth_ldap_bindpassword')
+    ) {
+        if (Config::has('auth_ldap_binddn')) {
+            $bind_dn = Config::get('auth_ldap_binddn');
+        } else {
+            $bind_dn = get_full_dn(Config::get('auth_ldap_binduser'));
+        }
+
+        if (ldap_bind(
+            $ldap_connection,
+            $bind_dn,
+            Config::get('auth_ldap_bindpassword')
+        )) {
+            ldap_set_option($ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
+            return $ldap_connection;
+        }
+    }
+
+    // Anonymous
+    ldap_bind($ldap_connection);
+
+    ldap_set_option($ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
+    return $ldap_connection;
 }

@@ -11,7 +11,7 @@ Now onto the bit you're interested in, what is submitted and what we do with tha
 
 #### What is submitted ####
 - All data is anonymous.
-- Generic statistics are taken from the database, these include things like total devices, type and os, port types, speeds and total BGP peers. Take a look at the code for full details.
+- Generic statistics are taken from the database, these include things like device count, device type, device OS, port types, port speeds, port count and BGP peer count. Take a look at the code for full details.
 - Pairs of sysDescr and sysObjectID from devices with a small amount of sanitation to prevent things like hostnames from being submitted.
 - We record version numbers of php, mysql, net-snmp and rrdtool
 - A random UUID is generated on your own install.
@@ -25,12 +25,12 @@ Now onto the bit you're interested in, what is submitted and what we do with tha
 - We use sysDescr and sysObjectID to create unit tests and improve OS discovery
 
 #### Questions? ####
-- Q. How often is data submitted? A. We submit the data once a day according to running daily.sh via cron. If you disable this then opting in will not have any affect.
-- Q. Where can I see the data I submitted? A. You can't see the data raw, but we collate all of the data together and provide a dynamic site so you can see the results of all contributed stats [here](https://stats.librenms.org)
-- Q. I want my data removed. A. That's easy, simply press 'Clear remote stats' in the About LibreNMS page of your control panel, the next time the call back script is run it will remove all the data we have.
-- Q. I clicked the 'Clear remote stats' button by accident. A. No problem, before daily.sh runs again - just opt back in, all of your existing data will stay.
+- **Q.** How often is data submitted? **A.** We submit the data once a day according to running daily.sh via cron. If you disable this then opting in will not have any affect.
+- **Q.** Where can I see the data I submitted? **A.** You can't see the data raw, but we collate all of the data together and provide a dynamic site so you can see the results of all contributed stats [here](https://stats.librenms.org)
+- **Q.** I want my data removed. **A.** That's easy, simply press 'Clear remote stats' in the About LibreNMS page of your control panel, the next time the call back script is run it will remove all the data we have.
+- **Q.** I clicked the 'Clear remote stats' button by accident. **A.** No problem, before daily.sh runs again - just opt back in, all of your existing data will stay.
 
-Hopefully this answers the questions you might have on why and what we are doing here, if not, please pop into our irc channel or google mailing list and ask any questions you like.
+Hopefully this answers the questions you might have on why and what we are doing here, if not, please pop into our [discord server](https://t.libren.ms/discord) or community forum and ask any questions you like.
 
 #### How do I enable stats submission? ####
 If you're happy with all of this - please consider switching the call back system on, you can do this within the About LibreNMS page within your control panel. In the Statistics section you will find a toggle switch to enable / disable the feature. If you've previously had it switched on and want to opt out and remove your data, click the 'Clear remote stats' button and on the next submission all the data you've sent us will be removed!

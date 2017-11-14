@@ -7,7 +7,7 @@ source: Installation/Installation-CentOS-7-Nginx.md
 
     rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 
-    yum install composer cronie fping git ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nginx nmap php71w php71w-cli php71w-common php71w-curl php71w-fpm php71w-gd php71w-mcrypt php71w-mysql php71w-snmp php70w-xml php71w-zip python-memcached rrdtool
+    yum install cronie fping git ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nginx nmap php71w php71w-cli php71w-common php71w-curl php71w-fpm php71w-gd php71w-mcrypt php71w-mysql php71w-snmp php71w-xml php71w-zip python-memcached rrdtool
 
 #### Add librenms user
 
@@ -23,8 +23,8 @@ source: Installation/Installation-CentOS-7-Nginx.md
 
 #### Configure MySQL
 
-    systemctl restart mariadb
-    mysql -uroot
+    systemctl start mariadb
+    mysql -u root
 
 > NOTE: Please change the 'password' below to something secure.
 ```sql
@@ -119,7 +119,11 @@ Delete the `server` section from `/etc/nginx/nginx.conf`
 
 #### SELinux
 
+Install the policy tool for SELinux:
+
     yum install policycoreutils-python
+
+Configure the contexts needed by LibreNMS:
 
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/logs(/.*)?'
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/logs(/.*)?'
@@ -172,19 +176,22 @@ Now head to the web installer and follow the on-screen instructions.
 
     http://librenms.example.com/install.php
 
-
 ### Final steps
 
-Run validate.php as root in the librenms directory:
+That's it!  You now should be able to log in to http://librenms.example.com/.  Please note that we have not covered HTTPS setup in this example, so your LibreNMS install is not secure by default.  Please do not expose it to the public Internet unless you have configured HTTPS and taken appropriate web server hardening steps.
+
+#### Add the first device
+
+We now suggest that you add localhost as your first device from within the WebUI.
+
+#### Troubleshooting
+
+If you ever have issues with your install, run validate.php as root in the librenms directory:
 
     cd /opt/librenms
     ./validate.php
 
-That's it!  You now should be able to log in to http://librenms.example.com/.  Please note that we have not covered HTTPS setup in this example, so your LibreNMS install is not secure by default.  Please do not expose it to the public Internet unless you have configured HTTPS and taken appropriate web server hardening steps.
-
-#### Add first device
-
-We now suggest that you add localhost as your first device from within the WebUI.
+There are various options for getting help listed on the LibreNMS web site: https://www.librenms.org/#support
 
 ### What next?
 
@@ -199,4 +206,4 @@ Now that you've installed LibreNMS, we'd suggest that you have a read of a few o
 
 We hope you enjoy using LibreNMS. If you do, it would be great if you would consider opting into the stats system we have, please see [this page](http://docs.librenms.org/General/Callback-Stats-and-Privacy/) on what it is and how to enable it.
 
-If you would like to help make LibreNMS better there are [many ways to help](http://docs.librenms.org/Support/FAQ/#what-can-i-do-to-help). You can also [support our Collective](https://t.libren.ms/donations). 
+If you would like to help make LibreNMS better there are [many ways to help](http://docs.librenms.org/Support/FAQ/#what-can-i-do-to-help). You can also [back LibreNMS on Open Collective](https://t.libren.ms/donations). 

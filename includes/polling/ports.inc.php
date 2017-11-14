@@ -230,6 +230,10 @@ if ($device['os'] != 'asa') {
     $port_stats = snmpwalk_cache_oid($device, 'dot3StatsDuplexStatus', $port_stats, 'EtherLike-MIB');
 }
 
+if ($device['os'] == 'procera') {
+    require_once 'ports/procera.inc.php';
+}
+
 if ($config['enable_ports_adsl']) {
     $device['adsl_count'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `ifType` = 'adsl'", array($device['device_id']));
 }
@@ -435,6 +439,10 @@ foreach ($ports as $port) {
         $port['update'] = array();
         $port['update_extended'] = array();
         $port['state']  = array();
+
+        if ($port_association_mode != "ifIndex") {
+            $port['update']['ifIndex'] = $ifIndex;
+        }
 
         if ($config['slow_statistics'] == true) {
             $port['update']['poll_time']   = $polled;

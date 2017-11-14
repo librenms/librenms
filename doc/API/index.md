@@ -744,6 +744,12 @@ For SNMP v3
   - cryptopass: SNMP Crypto Password
   - cryptoalgo: SNMP Crypto algorithm (AES, DES)
 
+For ICMP only
+
+  - snmp_disable: Boolean, set to true for ICMP only.
+  - os: OS short name for the device (defaults to ping).
+  - hardware: Device hardware.
+
 Example:
 ```curl
 curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":"public"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices

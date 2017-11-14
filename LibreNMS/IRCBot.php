@@ -171,7 +171,7 @@ class IRCBot
             if ($this->config['irc_alert']) {
                 $this->alertData();
             }
-            
+
             if ($this->config['irc_conn_timeout']) {
                 $inactive_seconds = time() - $this->last_activity;
                 $max_inactive = $this->config['irc_conn_timeout'];
@@ -677,7 +677,7 @@ class IRCBot
 
     private function _version($params)
     {
-        $versions       = version_info(false);
+        $versions       = version_info();
         $schema_version = $versions['db_schema'];
         $version        = substr($versions['local_sha'], 0, 7);
 
@@ -850,8 +850,8 @@ class IRCBot
             case 'service':
             case 'srv':
                 $srvcount = array_pop(dbFetchRow('SELECT count(service_id) FROM services'.$d_w));
-                $srvup    = array_pop(dbFetchRow("SELECT count(service_id) FROM services  WHERE service_status = '1' AND service_ignore ='0'".$d_a));
-                $srvdown  = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_status = '0' AND service_ignore = '0'".$d_a));
+                $srvup    = array_pop(dbFetchRow("SELECT count(service_id) FROM services  WHERE service_status = '0' AND service_ignore ='0'".$d_a));
+                $srvdown  = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_status = '1' AND service_ignore = '0'".$d_a));
                 $srvign   = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_ignore = '1'".$d_a));
                 $srvdis   = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_disabled = '1'".$d_a));
                 if ($srvup > 0) {

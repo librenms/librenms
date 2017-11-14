@@ -427,7 +427,16 @@ foreach (array_keys($menu_sensors) as $item) {
     $sep++;
 }
 
+
+$toner = new ObjectCache('toner');
+if ($toner) {
+    echo '<li role="presentation" class="divider"></li>';
+    echo '<li><a href="health/metric=toner/"><i class="fa fa-print fa-fw fa-lg"></i> Toner</a></li>';
+    $used_sensors['toner'] = $toner;
+}
 ?>
+
+
           </ul>
         </li>
 <?php
@@ -643,6 +652,7 @@ if ($_SESSION['authenticated']) {
 <?php
 if ($_SESSION['userlevel'] >= '10') {
     echo('<li><a href="settings/"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> Global Settings</a></li>');
+    echo('<li><a href="validate/"><i class="fa fa-check-circle fa-fw fa-lg" aria-hidden="true"></i> Validate Config</a></li>');
 }
 
 ?>

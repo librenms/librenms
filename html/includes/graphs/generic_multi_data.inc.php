@@ -61,9 +61,12 @@ if ($i) {
     $rrd_options .= ' CDEF:inbits=inoctets,8,*';
     $rrd_options .= ' CDEF:outbits=outoctets,8,*';
     $rrd_options .= ' CDEF:doutbits=doutoctets,8,*';
-    $rrd_options .= ' VDEF:95thin=inbits,95,PERCENT';
-    $rrd_options .= ' VDEF:95thout=outbits,95,PERCENT';
-    $rrd_options .= ' CDEF:d95thoutn=doutbits,-1,* VDEF:d95thoutn95=d95thoutn,95,PERCENT CDEF:d95thoutn95n=doutbits,doutbits,-,d95thoutn95,-1,*,+ VDEF:d95thout=d95thoutn95n,FIRST';
+    $rrd_options .= ' VDEF:percentile_in=inbits,'.$config['percentile_value'].',PERCENT';
+    $rrd_options .= ' VDEF:percentile_out=outbits,'.$config['percentile_value'].',PERCENT';
+    $rrd_options .= ' CDEF:dpercentile_outn=doutbits,-1,*';
+    $rrd_options .= ' VDEF:dpercentile_outp=dpercentile_outn,'.$config['percentile_value'].',PERCENT';
+    $rrd_options .= ' CDEF:dpercentile_outpn=doutbits,doutbits,-,dpercentile_outp,-1,*,+';
+    $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outpn,FIRST';
 
     if ($_GET['previous'] == 'yes') {
         $rrd_options .= ' CDEF:'.$in.'octetsX='.$in_thingX.$pluses;
@@ -72,9 +75,12 @@ if ($i) {
         $rrd_options .= ' CDEF:inbitsX=inoctetsX,8,*';
         $rrd_options .= ' CDEF:outbitsX=outoctetsX,8,*';
         $rrd_options .= ' CDEF:doutbitsX=doutoctetsX,8,*';
-        $rrd_options .= ' VDEF:95thinX=inbitsX,95,PERCENT';
-        $rrd_options .= ' VDEF:95thoutX=outbitsX,95,PERCENT';
-        $rrd_options .= ' CDEF:d95thoutXn=doutbitsX,-1,* VDEF:d95thoutXn95=d95thoutXn,95,PERCENT CDEF:d95thoutXn95n=doutbitsX,doutbitsX,-,d95thoutXn95,-1,*,+ VDEF:d95thoutX=d95thoutXn95n,FIRST';
+        $rrd_options .= ' VDEF:percentile_inX=inbitsX,'.$config['percentile_value'].',PERCENT';
+        $rrd_options .= ' VDEF:percentile_outX=outbitsX,'.$config['percentile_value'].',PERCENT';
+        $rrd_options .= ' CDEF:dpercentile_outXn=doutbitsX,-1,*';
+        $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outXn,'.$config['percentile_value'].',PERCENT';
+        $rrd_options .= ' CDEF:dpercentile_outXn=doutbitsX,doutbitsX,-,dpercentile_outX,-1,*,+';
+        $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outXn,FIRST';
     }
 
     if ($legend == 'no' || $legend == '1') {
@@ -83,23 +89,23 @@ if ($i) {
         $rrd_options .= ' AREA:dout'.$format.'#'.$colour_area_out.':';
         // $rrd_options .= " LINE1.25:dout".$format."#".$colour_line_out.":";
     } else {
-        $rrd_options .= " COMMENT:'bps      Now       Ave      Max      95th %\\n'";
+        $rrd_options .= " COMMENT:'bps      Now       Ave      Max      ".$config['percentile_value']."th %\\n'";
         $rrd_options .= ' AREA:in'.$format.'#'.$colour_area_in.':In ';
         // $rrd_options .= " LINE1.25:in".$format."#".$colour_line_in.":In\ ";
         $rrd_options .= ' GPRINT:in'.$format.':LAST:%6.2lf%s';
         $rrd_options .= ' GPRINT:in'.$format.':AVERAGE:%6.2lf%s';
         $rrd_options .= ' GPRINT:in'.$format.':MAX:%6.2lf%s';
-        $rrd_options .= " GPRINT:95thin:%6.2lf%s\\\\n";
+        $rrd_options .= " GPRINT:percentile_in:%6.2lf%s\\\\n";
         $rrd_options .= ' AREA:dout'.$format.'#'.$colour_area_out.':Out';
         // $rrd_options .= " LINE1.25:dout".$format."#".$colour_line_out.":Out";
         $rrd_options .= ' GPRINT:out'.$format.':LAST:%6.2lf%s';
         $rrd_options .= ' GPRINT:out'.$format.':AVERAGE:%6.2lf%s';
         $rrd_options .= ' GPRINT:out'.$format.':MAX:%6.2lf%s';
-        $rrd_options .= " GPRINT:95thout:%6.2lf%s\\\\n";
+        $rrd_options .= " GPRINT:percentile_out:%6.2lf%s\\\\n";
     }
 
-    $rrd_options .= ' LINE1:95thin#aa0000';
-    $rrd_options .= ' LINE1:d95thout#aa0000';
+    $rrd_options .= ' LINE1:percentile_in#aa0000';
+    $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 
     if ($_GET['previous'] == 'yes') {
         $rrd_options .= ' AREA:in'.$format.'X#99999999:';
