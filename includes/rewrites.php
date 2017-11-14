@@ -1520,7 +1520,7 @@ function parse_entity_state_alarm($bits)
         6 => array('text' => 'indeterminate', 'color' => 'default'),
     );
 
-    $alarms = str_split($bits);
+    $alarms = str_split(base_convert($bits, 16, 2));
     $active_alarms = array_filter($alarms);
     return array_intersect_key($data, $active_alarms);
 }

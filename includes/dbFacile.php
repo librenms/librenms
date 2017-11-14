@@ -210,7 +210,11 @@ function dbBulkInsert($data, $table)
             if ($rowvalues != '') {
                 $rowvalues .= ',';
             }
-            $rowvalues .= "'".mres($value)."'";
+            if (is_null($value)) {
+                $rowvalues .= 'NULL';
+            } else {
+                $rowvalues .= "'" . mres($value) . "'";
+            }
         }
         $values .= "(".$rowvalues.")";
     }
