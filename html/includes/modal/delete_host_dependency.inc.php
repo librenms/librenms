@@ -52,15 +52,19 @@ $('#hostdep-removal').click('', function(event) {
         type: 'POST',
         url: 'ajax_form.php',
         data: { type: "delete-host-dependency", device_id: device_id },
-        dataType: "html",
-        success: function(msg) {
-            $("#message").html('<div class="alert alert-info"><button type="" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+msg+'</div>');
-            $("#confirm-delete").modal('hide');
-            // Clear the host association from html
-            $('[data-row-id='+row_id+']').find('.parenthost').text('None');
+        dataType: "json",
+        success: function(output) {
+            if (output.status == 0) {
+                toastr.success(output.message);
+                $("#confirm-delete").modal('hide');
+                // Clear the host association from html
+                $('[data-row-id=' + row_id + ']').find('.parenthost').text('None');
+            } else {
+                toastr.error(output.message);
+            }
         },
         error: function() {
-            $("#message").html('<div class="alert alert-info">The host dependency could not be deleted.</div>');
+            toastr.error('The host dependency could not be deleted.');
             $("#confirm-delete").modal('hide');
         }
     });

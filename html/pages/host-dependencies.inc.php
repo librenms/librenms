@@ -60,7 +60,7 @@ var grid = $("#hostdeps").bootgrid({
     templates: {
         header: '<div id="{{ctx.id}}" class="{{css.header}}"> \
                     <div class="row"> \
-<?php if ($_SESSION['userlevel'] >= '10') { ?>
+<?php if (is_admin()) { ?>
                         <div class="col-sm-8 actionBar"> \
                             <span class="pull-left"> \
                             <button type="button" class="btn btn-primary btn-sm command-manage" data-toggle="modal" data-target="#manage-dependencies" data-template_id="">Manage Host Dependencies</button> \

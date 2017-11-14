@@ -64,14 +64,22 @@ $('#edit-dependency').on('show.bs.modal', function() {
         data: { type: "get-host-dependencies", "device_id": device_id },
         dataType: "json",
         success: function(output) {
-            $.each(output, function (i, elem) {
-                if(elem.device_id == $('#edit-parent_id').val()) {
-                    var select_line = "<option value=" + elem.device_id + " selected='selected'>" + elem.hostname + "</option>";
-                } else {
-                    var select_line = "<option value=" + elem.device_id + ">" + elem.hostname + "</option>";
-                }
-                $('#availableparents').append(select_line);
-            });
+            if (output.status == 0) {
+                $.each(output.deps, function (i, elem) {
+                    if (elem.device_id == $('#edit-parent_id').val()) {
+                        var select_line = "<option value=" + elem.device_id + " selected='selected'>" + elem.hostname + "</option>";
+                    } else {
+                        var select_line = "<option value=" + elem.device_id + ">" + elem.hostname + "</option>";
+                    }
+                    $('#availableparents').append(select_line);
+                });
+            } else {
+                toastr.error(output.message);
+            }
+        },
+        error: function() {
+            toastr.error('The host dependency could not be fetched.');
+            $("#manage-dependencies").modal('hide');
         }
     })
 });
@@ -89,10 +97,10 @@ $('#hostdep-save').click('', function(event) {
         type: 'POST',
         url: 'ajax_form.php',
         data: { type: "save-host-dependency", device_ids: device_ids, parent_id: parent_id },
-        dataType: "html",
-        success: function(msg) {
-            if(msg.indexOf("ERROR:") <= -1) {
-                $("#message").html('<div class="alert alert-info"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+msg+'</div>');
+        dataType: "json",
+        success: function(output) {
+            if (output.status == 0) {
+                toastr.success(output.message);
                 $("#edit-dependency").modal('hide');
                 $('#availableparents')
                     .find('option')
@@ -101,10 +109,12 @@ $('#hostdep-save').click('', function(event) {
                     .append('<option value="0">None</option>')
                     .val('0');
                 $('[data-row-id='+row_id+']').find('.parenthost').text(parent_host);
+            } else {
+                toastr.error(output.message);
             }
         },
         error: function() {
-            $("#message").html('<div class="alert alert-info"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>The host dependency could not be saved.</div>');
+            toastr.error('The host dependency could not be saved.');
             $("#edit-dependency").modal('hide');
             $('#availableparents')
                 .find('option')

@@ -11,21 +11,20 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-header('Content-type: application/json');
 
 if (is_admin() === false) {
-    die('ERROR: You need to be admin');
-}
-
-if (!is_numeric($_POST['device_id'])) {
-    echo 'ERROR: Wrong device id!';
-    exit;
+    $status = array('status' => 1, 'message' => 'You need to be admin');
 } else {
-    if (dbUpdate(array('parent_id' => 0), 'devices', '`device_id` =  ?', array($_POST['device_id']))) {
-        echo 'Host dependency has been deleted.';
-        exit;
+    if (!is_numeric($_POST['device_id'])) {
+        $status = array('status' => 1, 'message' => 'Wrong device id!');
     } else {
-        echo 'ERROR: Host Dependency cannot be deleted.';
-        exit;
-    }
-}
+        if (dbUpdate(array('parent_id' => 0), 'devices', '`device_id` =  ?', array($_POST['device_id']))) {
+            $status = array('status' => 0, 'message' => 'Host dependency has been deleted.');
+        } else {
+            $status = array('status' => 1, 'message' => 'Host Dependency cannot be deleted.');
+        }
+     }
+ }
+
+header('Content-Type: application/json');
+echo _json_encode($status);
