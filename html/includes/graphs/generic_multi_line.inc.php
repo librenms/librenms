@@ -15,17 +15,6 @@
 
 require 'includes/graphs/common.inc.php';
 
-use LibreNMS\Config;
-
-if (Config::get('graph.stacked') == true) {
-    $transparency = 45;
-    $mrtg_style = 1;
-} else {
-    $transparency = '';
-    $mrtg_style = -1;
-}
-
-
 $descr_len = 12;
 
 if ($nototal) {
@@ -72,16 +61,16 @@ foreach ($rrd_list as $rrd) {
     }
 
     if ($rrd['invert']) {
-        $rrd_options .= ' CDEF:' . $id . 'i=' . $id . ',' . $mrtg_style . ',*';
+        $rrd_options .= ' CDEF:' . $id . 'i=' . $id . ',' . generate_stacked_graphs()[1] . ',*';
 
         $rrd_optionsb .= ' LINE1.25:' . $id . 'i#' . $colour . ":'$descr'";
         if (!empty($rrd['areacolour'])) {
-            $rrd_optionsb .= ' AREA:' . $id . 'i#' . $rrd['areacolour'] . $transparency;
+            $rrd_optionsb .= ' AREA:' . $id . 'i#' . $rrd['areacolour'] . generate_stacked_graphs()[0];
         }
     } else {
         $rrd_optionsb .= ' LINE1.25:' . $id . '#' . $colour . ":'$descr'";
         if (!empty($rrd['areacolour'])) {
-            $rrd_optionsb .= ' AREA:' . $id . '#' . $rrd['areacolour'] . $transparency;
+            $rrd_optionsb .= ' AREA:' . $id . '#' . $rrd['areacolour'] . generate_stacked_graphs()[0];
         }
     }
 

@@ -15,17 +15,6 @@
 
 require 'includes/graphs/common.inc.php';
 
-use LibreNMS\Config;
-
-if (Config::get('graph.stacked') == true) {
-    $transparency = 45;
-    $mrtg_style = 1;
-} else {
-    $transparency = '';
-    $mrtg_style = -1;
-}
-
-
 if ($format == 'octets' || $format == 'bytes') {
     $units = 'Bps';
     $format = 'octets';
@@ -79,43 +68,43 @@ if ($i) {
 
     $rrd_options .= ' CDEF:' . $in . 'octets=' . $in_thing . $pluses;
     $rrd_options .= ' CDEF:' . $out . 'octets=' . $out_thing . $pluses;
-    $rrd_options .= ' CDEF:doutoctets=outoctets,' . $mrtg_style . ',*';
+    $rrd_options .= ' CDEF:doutoctets=outoctets,' . generate_stacked_graphs()[1] . ',*';
     $rrd_options .= ' CDEF:inbits=inoctets,8,*';
     $rrd_options .= ' CDEF:outbits=outoctets,8,*';
     $rrd_options .= ' CDEF:doutbits=doutoctets,8,*';
     $rrd_options .= ' VDEF:percentile_in=inbits,' . $config['percentile_value'] . ',PERCENT';
     $rrd_options .= ' VDEF:percentile_out=outbits,' . $config['percentile_value'] . ',PERCENT';
-    $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $mrtg_style . ',*';
+    $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . generate_stacked_graphs()[1] . ',*';
     $rrd_options .= ' VDEF:dpercentile_outp=dpercentile_outn,' . $config['percentile_value'] . ',PERCENT';
-    $rrd_options .= ' CDEF:dpercentile_outpn=doutbits,doutbits,-,dpercentile_outp,' . $mrtg_style . ',*,+';
+    $rrd_options .= ' CDEF:dpercentile_outpn=doutbits,doutbits,-,dpercentile_outp,' . generate_stacked_graphs()[1] . ',*,+';
     $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outpn,FIRST';
 
     if ($_GET['previous'] == 'yes') {
         $rrd_options .= ' CDEF:' . $in . 'octetsX=' . $in_thingX . $pluses;
         $rrd_options .= ' CDEF:' . $out . 'octetsX=' . $out_thingX . $pluses;
-        $rrd_options .= ' CDEF:doutoctetsX=outoctetsX,' . $mrtg_style . ',*';
+        $rrd_options .= ' CDEF:doutoctetsX=outoctetsX,' . generate_stacked_graphs()[1] . ',*';
         $rrd_options .= ' CDEF:inbitsX=inoctetsX,8,*';
         $rrd_options .= ' CDEF:outbitsX=outoctetsX,8,*';
         $rrd_options .= ' CDEF:doutbitsX=doutoctetsX,8,*';
         $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . $config['percentile_value'] . ',PERCENT';
         $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . $config['percentile_value'] . ',PERCENT';
-        $rrd_options .= ' CDEF:dpercentile_outXn=doutbitsX,' . $mrtg_style . ',*';
+        $rrd_options .= ' CDEF:dpercentile_outXn=doutbitsX,' . generate_stacked_graphs()[1] . ',*';
         $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outXn,' . $config['percentile_value'] . ',PERCENT';
-        $rrd_options .= ' CDEF:dpercentile_outXn=doutbitsX,doutbitsX,-,dpercentile_outX,' . $mrtg_style . ',*,+';
+        $rrd_options .= ' CDEF:dpercentile_outXn=doutbitsX,doutbitsX,-,dpercentile_outX,' . generate_stacked_graphs()[1] . ',*,+';
         $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outXn,FIRST';
     }
 
     if ($legend == 'no' || $legend == '1') {
-        $rrd_options .= ' AREA:in' . $format . '#' . $colour_area_in . $transparency . ':';
-        $rrd_options .= ' AREA:dout' . $format . '#' . $colour_area_out . $transparency . ':';
+        $rrd_options .= ' AREA:in' . $format . '#' . $colour_area_in . generate_stacked_graphs()[0] . ':';
+        $rrd_options .= ' AREA:dout' . $format . '#' . $colour_area_out . generate_stacked_graphs()[0] . ':';
     } else {
         $rrd_options .= " COMMENT:'bps      Now       Ave      Max      " . $config['percentile_value'] . "th %\\n'";
-        $rrd_options .= ' AREA:in' . $format . '#' . $colour_area_in . $transparency . ':In ';
+        $rrd_options .= ' AREA:in' . $format . '#' . $colour_area_in . generate_stacked_graphs()[0] . ':In ';
         $rrd_options .= ' GPRINT:in' . $format . ':LAST:%6.2lf%s';
         $rrd_options .= ' GPRINT:in' . $format . ':AVERAGE:%6.2lf%s';
         $rrd_options .= ' GPRINT:in' . $format . ':MAX:%6.2lf%s';
         $rrd_options .= " GPRINT:percentile_in:%6.2lf%s\\n";
-        $rrd_options .= ' AREA:dout' . $format . '#' . $colour_area_out . $transparency . ':Out';
+        $rrd_options .= ' AREA:dout' . $format . '#' . $colour_area_out . generate_stacked_graphs()[0] . ':Out';
         $rrd_options .= ' GPRINT:out' . $format . ':LAST:%6.2lf%s';
         $rrd_options .= ' GPRINT:out' . $format . ':AVERAGE:%6.2lf%s';
         $rrd_options .= ' GPRINT:out' . $format . ':MAX:%6.2lf%s';
@@ -126,8 +115,8 @@ if ($i) {
     $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 
     if ($_GET['previous'] == 'yes') {
-        $rrd_options .= ' AREA:in' . $format . 'X#99999999' . $transparency . ':';
-        $rrd_options .= ' AREA:dout' . $format . 'X#99999999' . $transparency . ':';
+        $rrd_options .= ' AREA:in' . $format . 'X#99999999' . generate_stacked_graphs()[0] . ':';
+        $rrd_options .= ' AREA:dout' . $format . 'X#99999999' . generate_stacked_graphs()[0] . ':';
         $rrd_options .= ' LINE1:in' . $format . 'X#666666:';
         $rrd_options .= ' LINE1:dout' . $format . 'X#666666:';
     }

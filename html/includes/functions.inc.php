@@ -1636,3 +1636,17 @@ function generate_fill_select_js($list_type, $selector, $selected = null)
     });
 });';
 }
+
+/**
+ * Return stacked graphs informations
+ *
+ * @return array containing transparency and stacked setup
+ */
+use LibreNMS\config;
+function generate_stacked_graphs($transparency = '45') {
+    if (Config::get('graph.stacked') == true) {
+        return array($transparency, '1');
+    } else {
+        return array('', '-1');
+    }
+}

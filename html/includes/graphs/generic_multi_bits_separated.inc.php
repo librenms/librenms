@@ -15,17 +15,6 @@
 
 require 'includes/graphs/common.inc.php';
 
-use LibreNMS\Config;
-
-if (Config::get('graph.stacked') == true) {
-    $transparency = 45;
-    $mrtg_style = 1;
-} else {
-    $transparency = '';
-    $mrtg_style = -1;
-}
-
-
 $i = 0;
 if ($width > '500') {
     $descr_len = 18;
@@ -75,7 +64,7 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= ' DEF:' . $out . $i . '=' . $rrd['filename'] . ':' . $ds_out . ':AVERAGE ';
     $rrd_options .= ' CDEF:inB' . $i . '=in' . $i . ",$multiplier,* ";
     $rrd_options .= ' CDEF:outB' . $i . '=out' . $i . ",$multiplier,*";
-    $rrd_options .= ' CDEF:outB' . $i . '_neg=outB' . $i . ',' . $mrtg_style . ',*';
+    $rrd_options .= ' CDEF:outB' . $i . '_neg=outB' . $i . ',' . generate_stacked_graphs()[1] . ',*';
     $rrd_options .= ' CDEF:octets' . $i . '=inB' . $i . ',outB' . $i . ',+';
 
     if (!$nototal) {
@@ -88,7 +77,7 @@ foreach ($rrd_list as $rrd) {
         $stack = ':STACK';
     }
 
-    $rrd_options .= ' AREA:inB' . $i . '#' . $colour_in . $transparency . ":'" . $descr . "'$stack";
+    $rrd_options .= ' AREA:inB' . $i . '#' . $colour_in . generate_stacked_graphs()[0] . ":'" . $descr . "'$stack";
     if (!$nodetails) {
         $rrd_options .= ' GPRINT:inB' . $i . ":LAST:%6.2lf%s$units";
         $rrd_options .= ' GPRINT:inB' . $i . ":AVERAGE:%6.2lf%s$units";
@@ -101,7 +90,7 @@ foreach ($rrd_list as $rrd) {
     }
 
     $rrd_options .= " 'HRULE:0#" . $colour_out . ':' . $descr_out . "'";
-    $rrd_optionsb .= " 'AREA:outB" . $i . '_neg#' . $colour_out . $transparency . ":$stack'";
+    $rrd_optionsb .= " 'AREA:outB" . $i . '_neg#' . $colour_out . generate_stacked_graphs()[0] . ":$stack'";
 
     if (!$nodetails) {
         $rrd_options .= ' GPRINT:outB' . $i . ":LAST:%6.2lf%s$units";
