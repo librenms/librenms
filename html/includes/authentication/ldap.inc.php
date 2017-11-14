@@ -217,6 +217,7 @@ function can_update_users()
 
 function get_user($user_id)
 {
+    $user = array();
     try {
         $connection = get_ldap_connection();
 
@@ -240,7 +241,7 @@ function get_user($user_id)
                         get_membername($username)
                     );
                     if (!Config::has('auth_ldap_group') || $ldap_comparison === true) {
-                        $userlist[$username] = array(
+                        $user[] = array(
                             'username' => $username,
                             'realname' => $realname,
                             'user_id' => $user_id,
