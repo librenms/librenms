@@ -33,17 +33,20 @@ $filtered_words = array(
     'timeing'
 );
 
-$models = array(
-    'BHUL450'   => 'PTP 450',
-    'BHUL'      => 'PTP 230',
-    'BH20'      => 'PTP 100',
-    'MIMO OFDM' => 'PMP 450',
-    'OFDM'      => 'PMP 430',
-    'AP'        => 'PMP 100'
+$ptp = array(
+    'BHUL450'       => 'PTP 450',
+    'BHUL'          => 'PTP 230',
+    'BH20'          => 'PTP 100'
 );
 
-foreach ($models as $desc => $model) {
-    if (strstr($PMP, $desc)) {
+$pmp = array(
+    'MIMO OFDM'     => 'PMP 450',
+    'OFDM'          => 'PMP 430',
+    '*'             => 'PMP 100' // Adding this wildcard becuase there are no defining strings of pmp 100, so it should be a last resort
+);
+
+foreach ($ptp as $desc => $model) {
+    if (str_contains($cambium_type, $desc)) {
         $hardware = $model;
 
         if (str_contains($model, 'PTP')) {
@@ -51,15 +54,24 @@ foreach ($models as $desc => $model) {
             $hardware = $model . ' '. $masterSlaveMode;
             $version = snmp_get($device, 'boxDeviceTypeID.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
         }
-
-        if (str_contains($model, 'PMP')) {
-            if (str_contains($version, "AP")) {
-                $hardware = $model . ' AP';
-            } elseif (str_contains($version, "SM")) {
-                $hardware = $model . ' SM';
-            }
-        }
         break;
+    }
+}
+
+if (!isset($hardware)) {
+    foreach ($pmp as $desc => $model) {
+        if (str_contains($PMP, $desc) || $desc === '*') {
+            $hardware = $model;
+
+            if (str_contains($model, 'PMP')) {
+                if (str_contains($version, "AP")) {
+                    $hardware = $model . ' AP';
+                } elseif (str_contains($version, "SM")) {
+                    $hardware = $model . ' SM';
+                }
+            }
+            break;
+        }
     }
 }
 
