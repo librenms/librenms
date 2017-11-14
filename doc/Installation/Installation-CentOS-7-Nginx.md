@@ -1,6 +1,8 @@
 source: Installation/Installation-CentOS-7-Nginx.md
 > NOTE: These instructions assume you are the **root** user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
 
+**Please note the minimum supported PHP version is 5.6.4**
+
 ## Install Required Packages ##
 
     yum install epel-release
@@ -206,4 +208,4 @@ Now that you've installed LibreNMS, we'd suggest that you have a read of a few o
 
 We hope you enjoy using LibreNMS. If you do, it would be great if you would consider opting into the stats system we have, please see [this page](http://docs.librenms.org/General/Callback-Stats-and-Privacy/) on what it is and how to enable it.
 
-If you would like to help make LibreNMS better there are [many ways to help](http://docs.librenms.org/Support/FAQ/#what-can-i-do-to-help). You can also [back LibreNMS on Open Collective](https://t.libren.ms/donations). 
+If you would like to help make LibreNMS better there are [many ways to help](http://docs.librenms.org/Support/FAQ/#what-can-i-do-to-help). You can also [back LibreNMS on Open Collective](https://t.libren.ms/donations).
