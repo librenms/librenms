@@ -15,7 +15,9 @@
 
 require 'includes/graphs/common.inc.php';
 
-if (return_stacked_graphs() == 1) {
+use LibreNMS\Config;
+
+if (Config::get('graphs.port.stacked') == true) {
     $transparency = 45;
     $mrtg_style = 1;
 } else {

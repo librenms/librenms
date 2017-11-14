@@ -1636,18 +1636,3 @@ function generate_fill_select_js($list_type, $selector, $selected = null)
     });
 });';
 }
-
-/**
- * Returns the desired display of graphs based on config settings
- *
- * @return int -1 if inverted graphs or 1 for mrtg style graphs
- */
-function return_stacked_graphs()
-{
-    global $config;
-    if ($config['graphs']['port']['stacked'] == false) {
-        return -1;
-    } else {
-        return 1;
-    }
-}
