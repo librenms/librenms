@@ -133,7 +133,23 @@ If you ever have issues with your install, run validate.php as root in the libre
     cd /opt/librenms
     ./validate.php
 
-There are various options for getting help listed on the LibreNMS web site: https://www.librenms.org/#support
+##### Running LibreNMS with Apache2 and PHP-FPM
+
+In case you're running the above setup you might face the prolem that you're API is not working. When a curl on the API presents you a 404 or the index.php, you need to adjust your .htaccess file.
+
+vim /opt/librenms/html/.htaccess
+
+And change:
+
+    RewriteRule ^api/v0/(.*)$ api_v0.php/$1 [L]
+
+to:
+
+    RewriteRule ^api/v0/(.*)$ fcgi://127.0.0.1:9000/opt/librenms/html/api_v0.php/$1 [P,L]
+
+
+
+If you couldn't solve your issue here, there are various options for getting help listed on the LibreNMS web site: https://www.librenms.org/#support
 
 ### What next?
 
