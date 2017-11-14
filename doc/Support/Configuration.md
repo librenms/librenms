@@ -39,6 +39,14 @@ $config['db_port']   = NULL;
 $config['db_socket'] = '/run/mysqld/mysqld.sock';
 ```
 
+### Core
+
+#### PHP Settings
+
+You can change the memory limits for php within `config.php`. The value is in Megabytes and should just be an int value:
+
+`$config['php_memory_limit'] = 128;`
+
 ### Programs
 
 A lot of these are self explanatory so no further information may be provided. Any extensions that have dedicated 
