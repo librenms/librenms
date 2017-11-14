@@ -43,7 +43,7 @@ if (is_numeric($perc)) {
 
 Detection for processors is done via yaml for basic processor detection or a single script unless custom processing of data is required (as in this example).
 
-All yaml files are located in `includes/definitions/discovery/$os.yaml`. Defining the information hear is not always 
+All yaml files are located in `includes/definitions/discovery/$os.yaml`. Defining the information here is not always 
 possible and is heavily reliant on vendors being sensible with the MIBs they generate. Only snmp walks are supported 
 and you must provide a sane table that can be traversed and contains all of the data you need. We will use junos-mss as 
 an example here.
