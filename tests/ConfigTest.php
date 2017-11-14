@@ -97,6 +97,12 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $config['os']['nullos']['num'] = array('two', 'three');
         $config['assoc'] = array('a' => 'same', 'b' => 'same');
         $config['os']['nullos']['assoc'] = array('b' => 'different', 'c' => 'still same');
+        $config['os']['nullos']['osset'] = true;
+        $config['gset'] = true;
+
+        $this->assertTrue(Config::getCombined('nullos', 'non-existent', true), 'Did not return default value on non-existent key');
+        $this->assertTrue(Config::getCombined('nullos', 'osset', false), 'Did not return OS value when global value is not set');
+        $this->assertTrue(Config::getCombined('nullos', 'gset', false), 'Did not return global value when OS value is not set');
 
         $combined =  Config::getCombined('nullos', 'num');
         sort($combined);
@@ -111,6 +117,29 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         Config::set('you.and.me', "I'll be there");
 
         $this->assertEquals("I'll be there", $config['you']['and']['me']);
+    }
+
+    public function testSetPersist()
+    {
+        if (getenv('DBTEST')) {
+            dbConnect();
+            dbBeginTransaction();
+        } else {
+            $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
+        }
+
+        $key = 'testing.persist';
+
+        dbDelete('config', '`config_name`=?', array($key)); // FIXME dbInsert breaks transactions
+        $this->assertNull(dbFetchCell('SELECT `config_value` FROM `config` WHERE `config_name`=?', array($key)), "$key should not be set, clean database");
+        Config::set($key, 'one', true);
+        $this->assertEquals('one', dbFetchCell('SELECT `config_value` FROM `config` WHERE `config_name`=?', array($key)));
+        Config::set($key, 'two', true);
+        $this->assertEquals('two', dbFetchCell('SELECT `config_value` FROM `config` WHERE `config_name`=?', array($key)));
+
+        if (getenv('DBTEST')) {
+            dbRollbackTransaction();
+        }
     }
 
     public function testHas()

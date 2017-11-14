@@ -95,6 +95,9 @@ require $install_dir . '/includes/definitions.inc.php';
 $display_bak = ini_get('display_errors');
 ini_set('display_errors', 1);
 include $install_dir . '/config.php';
+if (isset($config['php_memory_limit']) && is_numeric($config['php_memory_limit']) && $config['php_memory_limit'] > 128) {
+    ini_set('memory_limit', $config['php_memory_limit'].'M');
+}
 ini_set('display_errors', $display_bak);
 
 // init memcached
@@ -155,17 +158,19 @@ if (file_exists($install_dir . '/html/includes/authentication/'.$config['auth_me
     exit();
 }
 
+if (module_selected('discovery', $init_modules) && !update_os_cache()) {
+    // load_all_os() is called by update_os_cache() if updated, no need to call twice
+    load_all_os();
+} elseif (module_selected('web', $init_modules)) {
+    load_all_os(!module_selected('nodb', $init_modules));
+}
+
 if (module_selected('web', $init_modules)) {
     umask(0002);
     if (!isset($config['title_image'])) {
         $config['title_image'] = 'images/librenms_logo_'.$config['site_style'].'.svg';
     }
     require $install_dir . '/html/includes/vars.inc.php';
-    if (module_selected('nodb', $init_modules)) {
-        load_all_os(false);
-    } else {
-        load_all_os(true);
-    }
 }
 
 $console_color = new Console_Color2();

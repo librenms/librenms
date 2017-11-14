@@ -103,8 +103,7 @@ repo. Now select the branch you have just been working on (issue-123) from the d
 
 Thanks for your first pull request :)
 
-Ok, that should get you started on the contributing path. If you have any other questions then stop by our IRC Channel
-on Freenode ##librenms.
+Ok, that should get you started on the contributing path. If you have any other questions then stop by our [Discord Server](https://t.libren.ms/discord)
 
 ### Hints and tips
 

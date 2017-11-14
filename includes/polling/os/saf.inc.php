@@ -12,6 +12,8 @@
  * the source code distribution for details.
 */
 
-list(,$version,,$hardware,$serial,,) = explode(";", $poll_device['sysDescr']);
-list(,$hardware) = explode(":", $hardware);
-list(,$serial) = explode(":", $serial);
+preg_match('/ radio;(.*) v([0-9.]*);.*;SN: ([0-9]+);/', $poll_device['sysDescr'], $matches);
+
+$hardware = $matches[1];
+$version = $matches[2];
+$serial = $matches[3];

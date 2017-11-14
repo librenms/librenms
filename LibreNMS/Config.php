@@ -37,6 +37,15 @@ class Config
     public static function get($key, $default = null)
     {
         global $config;
+
+        if (isset($config[$key])) {
+            return $config[$key];
+        }
+
+        if (!str_contains($key, '.')) {
+            return $default;
+        }
+
         $keys = explode('.', $key);
 
         $curr = &$config;
@@ -90,9 +99,18 @@ class Config
      */
     public static function getOsSetting($os, $key, $default = null)
     {
-        if ($os) {
-            $os_key = "os.$os.$key";
+        global $config;
 
+        if ($os) {
+            if (isset($config['os'][$os][$key])) {
+                return $config['os'][$os][$key];
+            }
+
+            if (!str_contains($key, '.')) {
+                return self::get($key, $default);
+            }
+
+            $os_key = "os.$os.$key";
             if (self::has($os_key)) {
                 return self::get($os_key);
             }
@@ -113,6 +131,21 @@ class Config
      */
     public static function getCombined($os, $key, $default = array())
     {
+        global $config;
+
+        if (!self::has($key)) {
+            return self::get("os.$os.$key", $default);
+        }
+
+        if (!isset($config['os'][$os][$key])) {
+            if (!str_contains($key, '.')) {
+                return self::get($key, $default);
+            }
+            if (!self::has("os.$os.$key")) {
+                return self::get($key, $default);
+            }
+        }
+
         return array_unique(array_merge(
             (array)self::get($key, $default),
             (array)self::getOsSetting($os, $key, $default)
@@ -124,10 +157,31 @@ class Config
      *
      * @param mixed $key period separated config variable name
      * @param mixed $value
+     * @param bool $persist set the setting in the database so it persists across runs
+     * @param string $default default (only set when initially created)
+     * @param string $descr webui description (only set when initially created)
+     * @param string $group webui group (only set when initially created)
+     * @param string $sub_group webui subgroup (only set when initially created)
      */
-    public static function set($key, $value)
+    public static function set($key, $value, $persist = false, $default ='', $descr='', $group='', $sub_group='')
     {
         global $config;
+
+        if ($persist) {
+            $res = dbUpdate(array('config_value' => $value), 'config', '`config_name`=?', array($key));
+            if (!$res && !dbFetchCell('SELECT 1 FROM `config` WHERE `config_name`=?', array($key))) {
+                $insert = array(
+                    'config_name' => $key,
+                    'config_value' => $value,
+                    'config_default' => $default,
+                    'config_descr' => $descr,
+                    'config_group' => $group,
+                    'config_sub_group' => $sub_group,
+                );
+                dbInsert($insert, 'config');
+            }
+        }
+
         $keys = explode('.', $key);
 
         $curr = &$config;
@@ -147,6 +201,15 @@ class Config
     public static function has($key)
     {
         global $config;
+
+        if (isset($config[$key])) {
+            return true;
+        }
+
+        if (!str_contains($key, '.')) {
+            return false;
+        }
+
         $keys = explode('.', $key);
         $last = array_pop($keys);
 

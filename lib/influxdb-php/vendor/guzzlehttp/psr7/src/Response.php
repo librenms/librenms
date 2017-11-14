@@ -2,6 +2,7 @@
 namespace GuzzleHttp\Psr7;
 
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * PSR-7 response implementation.
@@ -59,6 +60,7 @@ class Response implements ResponseInterface
         428 => 'Precondition Required',
         429 => 'Too Many Requests',
         431 => 'Request Header Fields Too Large',
+        451 => 'Unavailable For Legal Reasons',
         500 => 'Internal Server Error',
         501 => 'Not Implemented',
         502 => 'Bad Gateway',
@@ -71,18 +73,18 @@ class Response implements ResponseInterface
         511 => 'Network Authentication Required',
     ];
 
-    /** @var null|string */
+    /** @var string */
     private $reasonPhrase = '';
 
     /** @var int */
     private $statusCode = 200;
 
     /**
-     * @param int    $status  Status code for the response, if any.
-     * @param array  $headers Headers for the response, if any.
-     * @param mixed  $body    Stream body.
-     * @param string $version Protocol version.
-     * @param string $reason  Reason phrase (a default will be used if possible).
+     * @param int                                  $status  Status code
+     * @param array                                $headers Response headers
+     * @param string|null|resource|StreamInterface $body    Response body
+     * @param string                               $version Protocol version
+     * @param string|null                          $reason  Reason phrase (when empty a default will be used based on the status code)
      */
     public function __construct(
         $status = 200,
@@ -93,13 +95,13 @@ class Response implements ResponseInterface
     ) {
         $this->statusCode = (int) $status;
 
-        if ($body) {
+        if ($body !== '' && $body !== null) {
             $this->stream = stream_for($body);
         }
 
         $this->setHeaders($headers);
-        if (!$reason && isset(self::$phrases[$this->statusCode])) {
-            $this->reasonPhrase = self::$phrases[$status];
+        if ($reason == '' && isset(self::$phrases[$this->statusCode])) {
+            $this->reasonPhrase = self::$phrases[$this->statusCode];
         } else {
             $this->reasonPhrase = (string) $reason;
         }
@@ -121,7 +123,7 @@ class Response implements ResponseInterface
     {
         $new = clone $this;
         $new->statusCode = (int) $code;
-        if (!$reasonPhrase && isset(self::$phrases[$new->statusCode])) {
+        if ($reasonPhrase == '' && isset(self::$phrases[$new->statusCode])) {
             $reasonPhrase = self::$phrases[$new->statusCode];
         }
         $new->reasonPhrase = $reasonPhrase;

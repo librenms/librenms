@@ -1,10 +1,15 @@
 os: ciscowap
-text: 'Cisco Wireless Acess Point'
+text: 'Cisco Wireless Access Point'
 type: wireless
+group: unix
 icon: cisco
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     - sysObjectId:
-        - .1.3.6.1.4.1.9.6.1.32.321.1
+        - .1.3.6.1.4.1.9.6.1.32.
     - sysDescr:
         - 'Cisco Small Business WAP'
 poller_modules:
@@ -16,12 +21,15 @@ poller_modules:
     cisco-sla: 1
     cisco-ipsec-flow-monitor: 1
     cipsec-tunnels: 1
+    cisco-otv: 1
 discovery_modules:
     cisco-cef: 1
     cisco-sla: 1
     cisco-mac-accounting: 1
+    cisco-otv: 1
     cisco-pw: 1
     cisco-vrf: 1
     cisco-vrf-lite: 1
 mib_dir:
     - cisco
+processor_stacked: 1

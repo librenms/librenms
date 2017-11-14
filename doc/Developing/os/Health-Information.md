@@ -10,6 +10,7 @@ Currently we have support for the following health metrics along with the values
 | ------------------------------- | --------------------------- |
 | airflow                         | cfm                         |
 | charge                          | %                           |
+| cooling                         | W                           |
 | current                         | A                           |
 | dbm                             | dBm                         |
 | fanspeed                        | rpm                         |
@@ -17,6 +18,7 @@ Currently we have support for the following health metrics along with the values
 | humidity                        | %                           |
 | load                            | %                           |
 | power                           | W                           |
+| pressure                        | kPa                         |
 | runtime                         | Min                         |
 | signal                          | dBm                         |
 | snr                             | SNR                         |
