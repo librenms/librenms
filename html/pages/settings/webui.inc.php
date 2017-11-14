@@ -24,6 +24,10 @@ $graph_conf = array(
             'svg' => 'svg',
         ),
     ),
+    array('name' => 'webui.graph_stacked',
+          'descr' => 'Set display of stacked graphs',
+          'type' => 'checkbox',
+    ),
 );
 
 $availability_map_conf = array(
