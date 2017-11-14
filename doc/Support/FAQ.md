@@ -85,7 +85,7 @@ We do indeed, you can find access to the demo [here](https://demo.librenms.org)
 
 The first thing to do is to add /debug=yes/ to the end of the URI (I.e /devices/debug=yes/).
 
-If the page you are trying to load has a substantial amount of data in it then it could be that the php memory limit needs to be increased in php.ini and then your web service reloaded.
+If the page you are trying to load has a substantial amount of data in it then it could be that the php memory limit needs to be increased in [config.php](Configuration.md#core).
 
 #### <a name="faq10"> Why do I not see any graphs?</a>
 

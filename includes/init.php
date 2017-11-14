@@ -95,6 +95,9 @@ require $install_dir . '/includes/definitions.inc.php';
 $display_bak = ini_get('display_errors');
 ini_set('display_errors', 1);
 include $install_dir . '/config.php';
+if (isset($config['php_memory_limit']) && is_numeric($config['php_memory_limit']) && $config['php_memory_limit'] > 128) {
+    ini_set('memory_limit', $config['php_memory_limit'].'M');
+}
 ini_set('display_errors', $display_bak);
 
 // init memcached
