@@ -11,6 +11,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use LibreNMS\Util\FileLock;
+
 $init_modules = array('discovery');
 require __DIR__ . '/includes/init.php';
 
@@ -33,7 +35,7 @@ if (isset($options['h'])) {
         $where = ' ';
         $doing = 'all';
     } elseif ($options['h'] == 'new') {
-        $new_discovery_lock = \LibreNMS\FileLock::lockOrDie('new-discovery');
+        $new_discovery_lock = FileLock::lockOrDie('new-discovery');
         $where = 'AND `last_discovered` IS NULL';
         $doing = 'new';
     } elseif ($options['h']) {

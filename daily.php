@@ -7,12 +7,14 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Exceptions\LockException;
+use LibreNMS\Util\MemcacheLock;
 
 $init_modules = array('alerts');
 require __DIR__ . '/includes/init.php';
 include_once __DIR__ . '/includes/notifications.php';
 
-$options = getopt('f:d:o:t:r:');
+$options = getopt('df:o:t:r:');
 
 if (isset($options['d'])) {
     echo "DEBUG\n";
@@ -52,59 +54,72 @@ if ($options['f'] === 'check_php_ver') {
 }
 
 if ($options['f'] === 'rrd_purge') {
-    if (is_numeric($config['rrd_purge']) && $config['rrd_purge'] > 0) {
-        $cmd = "find ".$config['rrd_dir']." -type f -mtime +".$config['rrd_purge']." -print -exec rm -f {} +";
-        $purge = `$cmd`;
-        if (!empty($purge)) {
-            echo "Purged the following RRD files due to old age (over ".$config['rrd_purge']." days old):\n";
-            echo $purge;
+    try {
+        if (Config::get('distributed_poller')) {
+            MemcacheLock::lock('rrd_purge', 0, 86000);
         }
+
+        $rrd_purge = Config::get('rrd_purge');
+        $rrd_dir = Config::get('rrd_dir');
+
+        if (is_numeric($rrd_purge) && $rrd_purge > 0) {
+            $cmd = "find $rrd_dir -type f -mtime +$rrd_purge -print -exec rm -f {} +";
+            $purge = `$cmd`;
+            if (!empty($purge)) {
+                echo "Purged the following RRD files due to old age (over $rrd_purge days old):\n";
+                echo $purge;
+            }
+        }
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        exit(-1);
     }
 }
 
 if ($options['f'] === 'syslog') {
-    if (is_numeric($config['syslog_purge'])) {
-        $rows = (int)dbFetchCell('SELECT MIN(seq) FROM syslog');
-        while (true) {
-            $limit = dbFetchRow('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', array($rows));
-            if (empty($limit)) {
-                break;
-            }
-
-            if (dbDelete('syslog', 'seq >= ? AND seq < ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $limit, $config['syslog_purge'])) > 0) {
-                $rows = $limit;
-                echo 'Syslog cleared for entries over '.$config['syslog_purge']." days 1000 limit\n";
-            } else {
-                break;
-            }
+    try {
+        if (Config::get('distributed_poller')) {
+            MemcacheLock::lock('syslog_purge', 0, 86000);
         }
+        $syslog_purge = Config::get('syslog_purge');
 
-        dbDelete('syslog', 'seq >= ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $config['syslog_purge']));
+        if (is_numeric($syslog_purge)) {
+            $rows = (int)dbFetchCell('SELECT MIN(seq) FROM syslog');
+            while (true) {
+                $limit = dbFetchRow('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', array($rows));
+                if (empty($limit)) {
+                    break;
+                }
+
+                if (dbDelete('syslog', 'seq >= ? AND seq < ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $limit, $syslog_purge)) > 0) {
+                    $rows = $limit;
+                    echo "Syslog cleared for entries over $syslog_purge days 1000 limit\n";
+                } else {
+                    break;
+                }
+            }
+
+            dbDelete('syslog', 'seq >= ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $syslog_purge));
+        }
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        exit(-1);
     }
 }
 
 if ($options['f'] === 'eventlog') {
-    if (is_numeric($config['eventlog_purge'])) {
-        if (dbDelete('eventlog', 'datetime < DATE_SUB(NOW(), INTERVAL ? DAY)', array($config['eventlog_purge']))) {
-            echo 'Eventlog cleared for entries over '.$config['eventlog_purge']." days\n";
-        }
-    }
+    $ret = lock_and_purge('eventlog', 'datetime < DATE_SUB(NOW(), INTERVAL ? DAY)');
+    exit($ret);
 }
 
 if ($options['f'] === 'authlog') {
-    if (is_numeric($config['authlog_purge'])) {
-        if (dbDelete('authlog', 'datetime < DATE_SUB(NOW(), INTERVAL ? DAY)', array($config['authlog_purge']))) {
-            echo 'Authlog cleared for entries over '.$config['authlog_purge']." days\n";
-        }
-    }
+    $ret = lock_and_purge('authlog', 'datetime < DATE_SUB(NOW(), INTERVAL ? DAY)');
+    exit($ret);
 }
 
 if ($options['f'] === 'perf_times') {
-    if (is_numeric($config['perf_times_purge'])) {
-        if (dbDelete('perf_times', 'start < UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL ? DAY))', array($config['perf_times_purge']))) {
-            echo 'Performance poller times cleared for entries over '.$config['perf_times_purge']." days\n";
-        }
-    }
+    $ret = lock_and_purge('perf_times', 'start < UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL ? DAY))');
+    exit($ret);
 }
 
 if ($options['f'] === 'callback') {
@@ -112,11 +127,8 @@ if ($options['f'] === 'callback') {
 }
 
 if ($options['f'] === 'device_perf') {
-    if (is_numeric($config['device_perf_purge'])) {
-        if (dbDelete('device_perf', 'timestamp < DATE_SUB(NOW(),INTERVAL ? DAY)', array($config['device_perf_purge']))) {
-            echo 'Device performance times cleared for entries over '.$config['device_perf_purge']." days\n";
-        }
-    }
+    $ret = lock_and_purge('device_perf', 'timestamp < DATE_SUB(NOW(),INTERVAL ? DAY)');
+    exit($ret);
 }
 
 if ($options['f'] === 'handle_notifiable') {
@@ -144,32 +156,37 @@ if ($options['f'] === 'notifications') {
 }
 
 if ($options['f'] === 'bill_data') {
-    if (is_numeric($config['billing_data_purge']) && $config['billing_data_purge'] > 0) {
-        # Deletes data older than XX months before the start of the last complete billing period
-        $months = $config['billing_data_purge'];
-        echo "Deleting billing data more than $months month before the last completed billing cycle\n";
-        $sql = "DELETE bill_data
-                FROM bill_data
-                    INNER JOIN (SELECT bill_id, 
-                        SUBDATE(
+    try {
+        if (Config::get('distributed_poller')) {
+            MemcacheLock::lock('syslog_purge', 0, 86000);
+        }
+        $billing_data_purge = Config::get('billing_data_purge');
+        if (is_numeric($billing_data_purge) && $billing_data_purge > 0) {
+            # Deletes data older than XX months before the start of the last complete billing period
+            echo "Deleting billing data more than $billing_data_purge month before the last completed billing cycle\n";
+            $sql = "DELETE bill_data
+                    FROM bill_data
+                        INNER JOIN (SELECT bill_id, 
                             SUBDATE(
-                                ADDDATE(
-                                    subdate(curdate(), (day(curdate())-1)),             # Start of this month
-                                    bill_day - 1),                                      # Billing anniversary
-                                INTERVAL IF(bill_day > DAY(curdate()), 1, 0) MONTH),    # Deal with anniversary not yet happened this month
-                            INTERVAL ? MONTH) AS threshold                              # Adjust based on config threshold
-                FROM bills) q
-                ON bill_data.bill_id = q.bill_id AND bill_data.timestamp < q.threshold;";
-        dbQuery($sql, array($months));
+                                SUBDATE(
+                                    ADDDATE(
+                                        subdate(curdate(), (day(curdate())-1)),             # Start of this month
+                                        bill_day - 1),                                      # Billing anniversary
+                                    INTERVAL IF(bill_day > DAY(curdate()), 1, 0) MONTH),    # Deal with anniversary not yet happened this month
+                                INTERVAL ? MONTH) AS threshold                              # Adjust based on config threshold
+                    FROM bills) q
+                    ON bill_data.bill_id = q.bill_id AND bill_data.timestamp < q.threshold;";
+            dbQuery($sql, array($billing_data_purge));
+        }
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        exit(-1);
     }
 }
 
 if ($options['f'] === 'alert_log') {
-    if (is_numeric($config['alert_log_purge']) && $config['alert_log_purge'] > 0) {
-        if (dbDelete('alert_log', 'time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)', array($config['alert_log_purge']))) {
-            echo 'Alert log data cleared for entries over '.$config['alert_log_purge']." days\n";
-        }
-    }
+    $ret = lock_and_purge('alert_log', 'time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)');
+    exit($ret);
 }
 
 if ($options['f'] === 'purgeusers') {
@@ -214,7 +231,15 @@ if ($options['f'] === 'notify') {
 }
 
 if ($options['f'] === 'peeringdb') {
-    cache_peeringdb();
+    try {
+        if (Config::get('distributed_poller')) {
+            MemcacheLock::lock('peeringdb', 0, 86000);
+        }
+        cache_peeringdb();
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        exit(-1);
+    }
 }
 
 if ($options['f'] === 'refresh_os_cache') {
