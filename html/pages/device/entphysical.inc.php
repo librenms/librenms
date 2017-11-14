@@ -78,14 +78,16 @@ function printEntPhysical($ent, $level, $class)
                 'entStateStandby'
             );
             foreach ($display_states as $state_name) {
-                $display = parse_entity_state($state_name, $entState[$state_name]);
-                echo " <span class='label label-{$display['color']}' data-toggle='tooltip' title='$state_name'>";
+                $value = $entState[$state_name];
+                $display = parse_entity_state($state_name, $value);
+                echo " <span class='label label-{$display['color']}' data-toggle='tooltip' title='$state_name ($value)'>";
                 echo $display['text'];
                 echo "</span> ";
             }
 
-            $alarms = parse_entity_state_alarm($entState['entStateAlarm']);
-            if (!empty($alarms)) {
+            // ignore none and unavailable alarms
+            if ($entState['entStateAlarm'] != '00' && $entState['entStateAlarm'] != '80') {
+                $alarms = parse_entity_state_alarm($entState['entStateAlarm']);
                 echo '<br />';
                 echo "<span style='margin-left: 20px;'>Alarms: ";
                 foreach ($alarms as $alarm) {
