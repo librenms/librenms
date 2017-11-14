@@ -1647,8 +1647,7 @@ use LibreNMS\config;
 
 function generate_stacked_graphs($transparency = '45')
 {
-    if (Config::get('graph.stacked') == true)
-    {
+    if (Config::get('graph.stacked') == true) {
         return array($transparency, '1');
     } else {
         return array('', '-1');
