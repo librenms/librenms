@@ -43,7 +43,7 @@ $models = array(
 );
 
 foreach ($models as $desc => $model) {
-    if (str_contains($cambium_type, $desc)) {
+    if (strstr($PMP, $desc)) {
         $hardware = $model;
 
         if (str_contains($model, 'PTP')) {
@@ -59,6 +59,7 @@ foreach ($models as $desc => $model) {
                 $hardware = $model . ' SM';
             }
         }
+        break;
     }
 }
 
