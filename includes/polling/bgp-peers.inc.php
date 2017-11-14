@@ -192,12 +192,8 @@ if ($config['enable_bgp']) {
                 'bgpPeerOutUpdates'         => $bgpPeerOutUpdates,
             );
 
-            foreach ($bgpPeers_fields as $db_field => $value) {
-                if ($peer[$db_field] != $value) {
-                    $peer['update'][$db_field] = $value;
-                }
-            }
-
+            $peer['update'] = array_diff($bgpPeers_fields, $peer);
+            
             if ($peer['update']) {
                 dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
             }
