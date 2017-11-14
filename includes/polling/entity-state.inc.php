@@ -42,32 +42,45 @@ if (!empty($entPhysical)) {
     foreach ($state_data as $index => $state) {
         if (isset($entPhysical[$index])) {
             $id = $entPhysical[$index];
-            if (isset($db_states[$id])) { // update the db
-                // format date
+
+            // format datetime
+            if (empty($state['entStateLastChanged'])) {
+                $state['entStateLastChanged'] = null;
+            } else {
                 list($date, $time, $tz) = explode(',', $state['entStateLastChanged']);
-                $lastChanged = new DateTime("$date $time", new DateTimeZone($tz));
-                $state['entStateLastChanged'] = $lastChanged->format('Y-m-d H:i:s');
+                try {
+                    $lastChanged = new DateTime("$date $time", new DateTimeZone($tz));
+                    $state['entStateLastChanged'] = $lastChanged
+                            ->setTimezone(new DateTimeZone(date_default_timezone_get()))
+                        ->format('Y-m-d H:i:s');
+                } catch (Exception $e) {
+                    // no update
+                }
+            }
 
-                // format the db state for comparison
+            if (isset($db_states[$id])) { // update the db
                 $db_state = $db_states[$id];
-                unset($db_state['device_id']);
-                unset($db_state['entPhysical_id']);
-                unset($db_state['entity_state_id']);
+                $update = array_diff($state, $db_state);
 
-                if ($db_state != $state) {
-                    dbUpdate($state, 'entityState', 'entity_state_id=?', array($id));
+                if (!empty($update)) {
+                    if (array_key_exists('entStateLastChanged', $update) && is_null($update['entStateLastChanged'])) {
+                        $update['entStateLastChanged'] = array('NULL');
+                    }
+
+                    dbUpdate($update, 'entityState', 'entity_state_id=?', array($db_state['entity_state_id']));
                     d_echo("Updating entity state: ", 'U');
-                    d_echo($state);
+                    d_echo($update);
                 } else {
                     echo '.';
                 }
 
-                unset($state_data[$index]); // remove so we don't  insert later
+                unset($state_data[$index]); // remove so we don't insert later
                 unset($db_states[$id]); // remove so we don't delete later
             } else {
                 // prep for insert later
                 $state_data[$index]['device_id'] = $device['device_id'];
                 $state_data[$index]['entPhysical_id'] = $id;
+                $state_data[$index]['entStateLastChanged'] = $state['entStateLastChanged'];
                 d_echo("Inserting entity state:: ", '+');
                 d_echo($state);
             }
@@ -75,6 +88,7 @@ if (!empty($entPhysical)) {
     }
 
     if (!empty($state_data)) {
+        var_dump($state_data);
         dbBulkInsert($state_data, 'entityState');
     }
 
@@ -89,4 +103,4 @@ if (!empty($entPhysical)) {
 
 echo PHP_EOL;
 
-unset($entPhysical, $state_data, $db_states);
+unset($entPhysical, $state_data, $db_states, $update);
