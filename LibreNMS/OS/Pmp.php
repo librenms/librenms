@@ -38,6 +38,7 @@ class Pmp extends OS implements
     WirelessFrequencyDiscovery,
     WirelessUtilizationDiscovery
 {
+
     /**
      * Discover wireless bit/packet error ratio.  This is in percent. Type is error-ratio.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -69,8 +70,14 @@ class Pmp extends OS implements
      */
     public function discoverWirelessSnr()
     {
-        $snr_horizontal = '.1.3.6.1.4.1.161.19.3.1.4.1.84.2'; // WHISP-APS-MIB::signalToNoiseRatioHorizontal.2
-        $snr_vertical = '.1.3.6.1.4.1.161.19.3.1.4.1.74.2'; //WHISP-APS-MIB::signalToNoiseRatioVertical.2
+        if ($this->isAp()) {
+            $snr_horizontal = '.1.3.6.1.4.1.161.19.3.1.4.1.84.2'; // WHISP-APS-MIB::signalToNoiseRatioHorizontal.2
+            $snr_vertical = '.1.3.6.1.4.1.161.19.3.1.4.1.74.2'; //WHISP-APS-MIB::signalToNoiseRatioVertical.2
+        } else {
+            $snr_horizontal = '.1.3.6.1.4.1.161.19.3.2.2.106.0'; // WHISP-SMS-MIB::signalToNoiseRatioSMHorizontal.0
+            $snr_vertical = '.1.3.6.1.4.1.161.19.3.2.2.95.0'; //WHISP-SMS-MIB::signalToNoiseRatioSMVertical.0
+        }
+
         return array(
             new WirelessSensor(
                 'snr',
@@ -148,5 +155,16 @@ class Pmp extends OS implements
                 null
             )
         );
+    }
+
+    /**
+     * Private method to declare if device is an AP
+     *
+     * @return boolean
+     */
+    private function isAp()
+    {
+        $device = $this->getDevice();
+        return str_contains($device['hardware'], 'AP');
     }
 }
