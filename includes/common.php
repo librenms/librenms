@@ -572,7 +572,7 @@ function format_si($value, $round = '2', $sf = '3')
             $ext  = $sizes[$i];
         }
     } else {
-        $sizes = array('', 'm', 'u', 'n');
+        $sizes = array('', 'm', 'u', 'n', 'p');
         $ext = $sizes[0];
         for ($i = 1; (($i < count($sizes)) && ($value != 0) && ($value <= 0.1)); $i++) {
             $value = $value * 1000;
