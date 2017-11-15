@@ -1638,16 +1638,17 @@ function generate_fill_select_js($list_type, $selector, $selected = null)
 }
 
 /**
- * Return stacked graphs informations
+ * Return stacked graphs information
  *
+ * @param string $transparency value of desired transparency applied to rrdtool options (values 01 - 99)
  * @return array containing transparency and stacked setup
  */
 
-use LibreNMS\config;
+use LibreNMS\Config;
 
 function generate_stacked_graphs($transparency = '45')
 {
-    if (Config::get('graph.stacked') == true) {
+    if (Config::get('webui.graph_stacked') == true) {
         return array($transparency, '1');
     } else {
         return array('', '-1');

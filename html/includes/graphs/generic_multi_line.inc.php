@@ -15,6 +15,8 @@
 
 require 'includes/graphs/common.inc.php';
 
+$stacked = generate_stacked_graphs();
+
 $descr_len = 12;
 
 if ($nototal) {
@@ -61,16 +63,16 @@ foreach ($rrd_list as $rrd) {
     }
 
     if ($rrd['invert']) {
-        $rrd_options .= ' CDEF:' . $id . 'i=' . $id . ',' . generate_stacked_graphs()[1] . ',*';
+        $rrd_options .= ' CDEF:' . $id . 'i=' . $id . ',' . $stacked[1] . ',*';
 
         $rrd_optionsb .= ' LINE1.25:' . $id . 'i#' . $colour . ":'$descr'";
         if (!empty($rrd['areacolour'])) {
-            $rrd_optionsb .= ' AREA:' . $id . 'i#' . $rrd['areacolour'] . generate_stacked_graphs()[0];
+            $rrd_optionsb .= ' AREA:' . $id . 'i#' . $rrd['areacolour'] . $stacked[0];
         }
     } else {
         $rrd_optionsb .= ' LINE1.25:' . $id . '#' . $colour . ":'$descr'";
         if (!empty($rrd['areacolour'])) {
-            $rrd_optionsb .= ' AREA:' . $id . '#' . $rrd['areacolour'] . generate_stacked_graphs()[0];
+            $rrd_optionsb .= ' AREA:' . $id . '#' . $rrd['areacolour'] . $stacked[0];
         }
     }
 
@@ -82,3 +84,5 @@ foreach ($rrd_list as $rrd) {
 
 $rrd_options .= $rrd_optionsb;
 $rrd_options .= ' HRULE:0#555555';
+
+unset($stacked);

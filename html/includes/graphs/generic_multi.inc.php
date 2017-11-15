@@ -15,6 +15,8 @@
 
 require 'includes/graphs/common.inc.php';
 
+$stacked = generate_stacked_graphs();
+
 if ($width > '500') {
     $descr_len = 24;
 } else {
@@ -70,13 +72,13 @@ foreach ($rrd_list as $rrd) {
     }
 
     if ($rrd['invert']) {
-        $rrd_options .= ' CDEF:' . $id . 'i=' . $id . ',' . generate_stacked_graphs()[1] . ',*';
-        $rrd_optionsc .= ' AREA:' . $id . 'i#' . $colour . generate_stacked_graphs()[0] . ":'$descr'" . $cstack;
+        $rrd_options .= ' CDEF:' . $id . 'i=' . $id . ',' . $stacked[1] . ',*';
+        $rrd_optionsc .= ' AREA:' . $id . 'i#' . $colour . $stacked[0] . ":'$descr'" . $cstack;
         $rrd_optionsc .= ' GPRINT:' . $id . ':LAST:%5.1lf%s GPRINT:' . $id . 'min:MIN:%5.1lf%s';
         $rrd_optionsc .= ' GPRINT:' . $id . 'max:MAX:%5.1lf%s GPRINT:' . $id . ":AVERAGE:'%5.1lf%s\\n'";
         $cstack = ':STACK';
     } else {
-        $rrd_optionsb .= ' AREA:' . $id . '#' . $colour . generate_stacked_graphs()[0] . ":'$descr'" . $bstack;
+        $rrd_optionsb .= ' AREA:' . $id . '#' . $colour . $stacked[0] . ":'$descr'" . $bstack;
         $rrd_optionsb .= ' GPRINT:' . $id . ':LAST:%5.1lf%s GPRINT:' . $id . 'min:MIN:%5.1lf%s';
         $rrd_optionsb .= ' GPRINT:' . $id . 'max:MAX:%5.1lf%s GPRINT:' . $id . ":AVERAGE:'%5.1lf%s\\n'";
         $bstack = ':STACK';
@@ -102,3 +104,5 @@ if ($print_total) {
 $rrd_options .= $rrd_optionsb;
 $rrd_options .= ' HRULE:0#555555';
 $rrd_options .= $rrd_optionsc;
+
+unset($stacked);

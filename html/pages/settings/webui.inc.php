@@ -25,7 +25,7 @@ $graph_conf = array(
         ),
     ),
     array('name' => 'webui.graph_stacked',
-          'descr' => 'Set display of stacked graphs',
+          'descr' => 'Use stacked graphs',
           'type' => 'checkbox',
     ),
 );
