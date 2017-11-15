@@ -88,7 +88,6 @@ if (!empty($entPhysical)) {
     }
 
     if (!empty($state_data)) {
-        var_dump($state_data);
         dbBulkInsert($state_data, 'entityState');
     }
 
