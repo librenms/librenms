@@ -54,9 +54,9 @@ if (is_admin() === false) {
             }
 
             if (isset($_POST['format'])) {
-                $res_arr = array(); 
-                foreach($device_deps as $myrow) {
-                    if($myrow['parent'] == null || $myrow['parent'] == '') {
+                $res_arr = array();
+                foreach ($device_deps as $myrow) {
+                    if ($myrow['parent'] == null || $myrow['parent'] == '') {
                         $parent = 'None';
                     } else {
                         $parent = $myrow['parent'];
