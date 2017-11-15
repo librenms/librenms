@@ -28,7 +28,6 @@ $tables = array(
 foreach ($tables as $tablevalue) {
     $temp = snmpwalk_cache_multi_oid($device, $tablevalue[0], array(), $tablevalue[4]);
     $cur_oid = $tablevalue[1];
-    $process_sensor = true;
 
     if (is_array($temp)) {
         if ($temp[0][$tablevalue[2]] == 'nonRedundant' || $temp[0]['cswMaxSwitchNum'] == '1') {
@@ -137,9 +136,8 @@ foreach ($tables as $tablevalue) {
 
         foreach ($temp as $index => $entry) {
             if ($tablevalue[2] == 'ciscoEnvMonTemperatureState' && (empty($temp[$index][$tablevalue[3]]))) {
-                $process_sensor = false;
-            }
-            if ($process_sensor == true) {
+                d_echo('Invalid sensor, skipping..');
+            } else {
                 //Discover Sensors
                 $descr = ucwords($temp[$index][$tablevalue[3]]);
                 if ($state_name == 'cRFStatusUnitState' || $state_name == 'cRFStatusPeerUnitState' || $state_name == 'cRFCfgRedundancyOperMode' || $state_name == 'cswRingRedundant') {
