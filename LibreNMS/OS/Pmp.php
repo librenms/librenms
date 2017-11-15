@@ -193,6 +193,6 @@ class Pmp extends OS implements
     private function isAp()
     {
         $device = $this->getDevice();
-        return str_contains($device['hardware'], 'AP');
+        return str_contains($device['hardware'], 'AP') || str_contains($device['hardware'], 'Master');
     }
 }
