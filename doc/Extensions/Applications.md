@@ -670,9 +670,18 @@ This script uses `rec_control get-all` to collect stats.
 
 4. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 `extend proxmox /usr/local/bin/proxmox`
-(Note: if your snmpd doesn't run as root, you might have to invoke the script using sudo. `extend proxmox /usr/bin/sudo /usr/local/bin/proxmox`)
 
-5. Restart snmpd on your host
+5. Note: if your snmpd doesn't run as root, you might have to invoke the script using sudo and modify the "extend" line
+```
+extend proxmox /usr/bin/sudo /usr/local/bin/proxmox 
+```
+
+after, edit your sudo users (usually `visudo`) and add at the bottom:
+```
+snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
+```
+
+6. Restart snmpd on your host
 
 
 ### Raspberry PI
