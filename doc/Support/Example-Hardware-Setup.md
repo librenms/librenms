@@ -47,3 +47,37 @@ Running in Proxmox.
 | Ports          | 26745               | -                   |
 | Health sensors | 6238                | -                   |
 | Load           | < 0.5               | < 0.5               |
+
+#### [KKrumm](https://github.com/kkrumm1)
+
+> Home
+
+|                | LibreNMS            | MySQL               |
+| -------------- | ------------------- | ------------------- |
+| Type           | VM                  | Same Server         |
+| OS             | CentOS 7            |                     |
+| CPU            | 2 Sockets, 4 Cores  |                     |
+| Memory         | 4GB                 |                     |
+| Disk Type      | Raid 10, SAS Drives |                     |
+| Disk Space     | 40 GB               |                     |
+| Devices        | 12                  |                     |
+| Ports          | 130                 |                     |
+| Health sensors | 44                  |                     |
+| Load           | < 2.5               |                     |
+
+#### [KKrumm](https://github.com/kkrumm1)
+
+> Work
+
+|                | LibreNMS            | MySQl               |
+| -------------- | ------------------- | ------------------- |
+| Type           | HP Proliantdl380gen8| Same Server         |
+| OS             | CentOS 7            |                     |
+| CPU            | 2 Sockets, 24 Cores |                     |
+| Memory         | 32GB                |                     |
+| Disk Type      | Raid 10, SAS Drives |                     |
+| Disk Space     | 250 GB              |                     |
+| Devices        | 390                 |                     |
+| Ports          | 16167               |                     |
+| Health sensors | 3223                |                     |
+| Load           | < 14.5              |                     |

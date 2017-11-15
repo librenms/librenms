@@ -42,8 +42,8 @@ $config['db_socket']             = null;
 $config['own_hostname'] = 'localhost';
 
 // Location of executables
-$config['fping']                    = '/usr/bin/fping';
-$config['fping6']                   = 'fping6';
+//$config['fping']                    = '/usr/sbin/fping';
+//$config['fping6']                   = '/usr/sbin/fping6';
 $config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count']   = 3;
@@ -767,7 +767,6 @@ $config['poller_modules']['ntp']                         = 1;
 $config['poller_modules']['services']                    = 1;
 $config['poller_modules']['loadbalancers']               = 0;
 $config['poller_modules']['mef']                         = 0;
-$config['poller_modules']['tnms-nbi']                    = 0;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
@@ -853,7 +852,7 @@ $config['api_demo'] = 0;
 // Set this to 1 if you want to disable some untrusting features for the API
 // Distributed Poller-Settings
 $config['distributed_poller']                = false;
-$config['distributed_poller_name']           = file_get_contents('/proc/sys/kernel/hostname');
+$config['distributed_poller_name']           = trim(file_get_contents('/proc/sys/kernel/hostname'));
 $config['distributed_poller_group']          = 0;
 $config['distributed_poller_memcached_host'] = 'example.net';
 $config['distributed_poller_memcached_port'] = '11211';

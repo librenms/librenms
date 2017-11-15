@@ -14,7 +14,15 @@
 if ($device['os'] == 'moxa-etherdevice') {
     echo 'Moxa EtherDevice Switch : ';
     $descr = 'Processor';
-    $usage = snmp_get($device, 'cpuLoading30s.0', '-Ovq', 'MOXA-IKS6726A-MIB');
+    // Moxa people enjoy creating MIBs for each model!
+    if ($device['sysDescr'] == 'IKS-6726A-2GTXSFP-T') {
+        $mibmod = 'MOXA-IKS6726A-MIB';
+    } else if ($device['sysDescr'] == 'EDS-G508E-T') {
+        $mibmod = 'MOXA-EDSG508E-MIB';
+    }
+
+    $usage = snmp_get($device, 'cpuLoading30s.0', '-Ovq', $mibmod);
+
     d_echo($usage."\n");
     if (is_numeric($usage)) {
         discover_processor($valid['processor'], $device, 'cpuLoading30s.0', '0', 'moxa-etherdevice', $descr, '1', $usage, null, null);

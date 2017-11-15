@@ -181,11 +181,13 @@ $('#and, #or').click('', function(e) {
            strategy: 'array',
            tagFieldName: 'patterns[]'
         });
-        if(entity.indexOf("%") >= 0) {
-            $('#response').data('tagmanager').populate([ entity+' '+condition+' '+value+' '+glue ]);
-        } else {
-            $('#response').data('tagmanager').populate([ '%'+entity+' '+condition+' "'+value+'" '+glue ]);
+        if(value.indexOf("%") < 0 && isNaN(value)) {
+            value = '"'+value+'"';
         }
+        if(entity.indexOf("%") < 0) {
+            entity = '%'+entity;
+        }
+        $('#response').data('tagmanager').populate([ entity+' '+condition+' '+value+' '+glue ]);
     }
 });
 

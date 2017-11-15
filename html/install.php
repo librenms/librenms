@@ -3,7 +3,12 @@ session_start();
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_POST = $_SESSION;
 } elseif (!file_exists("../config.php")) {
-    $_SESSION = array_replace($_SESSION, $_POST);
+    $allowed_vars = array('stage','build-ok','dbhost','dbuser','dbpass','dbname','dbport','dbsocket','add_user','add_pass','add_email');
+    foreach ($allowed_vars as $allowed) {
+        if (isset($_POST[$allowed])) {
+            $_SESSION[$allowed] = $_POST[$allowed];
+        }
+    }
 }
 
 $stage = isset($_POST['stage']) ? $_POST['stage'] : 0;
@@ -39,7 +44,7 @@ $config['db_port']=$dbport;
 $config['db_socket']=$dbsocket;
 
 if (!empty($config['db_socket'])) {
-    $config['db_host'] = '';
+    $config['db_host'] = 'localhost';
     $config['db_port'] = null;
 } else {
     $config['db_socket'] = null;
@@ -196,11 +201,13 @@ if (is_writable(session_save_path() === '' ? '/tmp' : session_save_path())) {
 echo "<tr class='$row_class'><td>Session directory writable</td><td>$status</td><td>";
 if ($status == 'no') {
     echo session_save_path() . " is not writable";
-    $group_info = posix_getgrgid(filegroup(session_save_path()));
-    if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
-        $group = $group_info['name'];
-        $user = get_current_user();
-        echo ", suggested fix <strong>usermod -a -G $group $user</strong>";
+    if (function_exists('posix_getgrgid')) {
+        $group_info = posix_getgrgid(filegroup(session_save_path()));
+        if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
+            $group = $group_info['name'];
+            $user = get_current_user();
+            echo ", suggested fix <strong>usermod -a -G $group $user</strong>";
+        }
     }
 }
 echo "</td></tr>";
@@ -502,16 +509,19 @@ if (auth_usermanagement()) {
 ?>
     <div class="row">
         <div class="col-md-offset-3 col-md-6">
-            <div class="alert alert-danger">You haven't quite finished yet - please go back to the install docs and carry on the necessary steps to finish the setup!</div>
+            <div class="alert alert-danger">
+                <p>You haven't quite finished yet!</p>
+                <p>First, you need to <a href="validate/">validate your install and fix any issues.</a></p>
+            </div>
         </div>
     </div>
     <div class="row">
       <div class="col-md-3">
       </div>
       <div class="col-md-6">
-        <div class="alert alert-success">Thank you for setting up LibreNMS.<br />
-        It would be great if you would consider contributing to our statistics, you can do this on the <a href="about/">/about/</a> page and check the box under Statistics.<br />
-        You can now click <a href="/">here to login to your new install.</a></div>
+        <div class="alert alert-success">
+            <p>Thank you for setting up LibreNMS.</p>
+            <p>It would be great if you would consider contributing to our statistics, you can do this on the <a href="about/">About LibreNMS Page</a> and check the box under Statistics.</p>
       </div>
       <div class="col-md-3">
       </div>

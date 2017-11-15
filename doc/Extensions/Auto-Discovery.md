@@ -6,7 +6,7 @@ source: Extensions/Auto-Discovery.md
 LibreNMS provides the ability to automatically add devices on your network, we can do this via
 a few methods which will be explained below and also indicate if they are enabled by default.
 
-All discovery methods run when discovery.php runs (every 6 hours by default and within 5 minutes for new devices).
+All discovery methods run when discovery runs (every 6 hours by default and within 5 minutes for new devices).
 
 > Please note that you need at least ONE device added before auto-discovery will work.
 

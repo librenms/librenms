@@ -58,7 +58,7 @@ if (function_exists('ad_bind')) {
     } else {
         if (!ad_bind($ldap_connection)) {
             echo ldap_error($ldap_connection) . PHP_EOL;
-            print_warn("Could not anonymous bind to AD");
+            print_message("Could not anonymous bind to AD");
         } else {
             print_message('AD bind anonymous successful');
         }
@@ -109,7 +109,7 @@ if (isset($options['r'])) {
 if ($auth) {
     $user_id = get_userid($test_username);
 
-    echo "User:\n";
+    echo "User ($user_id):\n";
     if (function_exists('get_user')) {
         $user = get_user($user_id);
 

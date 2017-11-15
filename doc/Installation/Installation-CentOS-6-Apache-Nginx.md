@@ -1,7 +1,7 @@
 source: Installation/Installation-CentOS-6-Apache-Nginx.md
-NOTE: What follows is a very rough list of commands.  This works on a fresh install of CentOS 6.x.
+> NOTE: These instructions assume you are the **root** user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
 
-NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to all shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s`.
+**Please note the minimum supported PHP version is 5.6.4**
 
 ### On the DB Server ###
 
@@ -9,7 +9,6 @@ This host is where the MySQL database runs.  It could be the same machine as you
 
 > ** Whilst we are working on ensuring LibreNMS is compatible with MySQL strict mode, for now, please disable this after mysql is installed.
 
-**CentOS 6**:
 You are free to choose between using MySQL or MariaDB:
 
 **MySQL**
@@ -26,30 +25,11 @@ chkconfig mariadb on
 service mariadb start
 ```
 
-**CentOS 7**
-(NOTE: In CentOS 7 there is only mariadb in official repo)
-
-**MariaDB**
-```bash
-yum install net-snmp mariadb-server mariadb-client
-systemctl enable mariadb
-systemctl start mariadb
-```
-
 Now continue with the installation:
 
-**CentOS 6**
 ```bash
 chkconfig snmpd on
 service snmpd start
-mysql_secure_installation
-mysql -uroot -p
-```
-
-**CentOS 7**
-```bash
-systemctl enable snmpd
-systemctl start snmpd
 mysql_secure_installation
 mysql -uroot -p
 ```
@@ -93,11 +73,10 @@ or
 
 ### On the NMS ###
 
-Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of CentOS 6.4 or 7.  It also requires the EPEL repository. Net_IPv6 is required even if your network environment does not support IPv6.
+Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of CentOS 6.x.  It also requires the EPEL repository. Net_IPv6 is required even if your network environment does not support IPv6.
 
 Note if not using HTTPd (Apache): RHEL requires `httpd` to be installed regardless of of `nginx`'s (or any other web-server's) presence.
 
-**CentOS 6**
 ```bash
     yum install epel-release
     yum install php php-cli php-gd php-mysql php-snmp php-pear php-curl httpd net-snmp graphviz graphviz-php mysql ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils vixie-cron php-mcrypt fping git
@@ -105,19 +84,12 @@ Note if not using HTTPd (Apache): RHEL requires `httpd` to be installed regardle
     pear install Net_IPv6-1.2.2b2
 ```
 
-**CentOS 7**
-```bash
-    yum install epel-release
-    yum install php php-cli php-gd php-mysql php-snmp php-pear php-curl httpd net-snmp graphviz graphviz-php mariadb ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils cronie php-mcrypt fping git
-    pear install Net_IPv4-1.3.4
-    pear install Net_IPv6-1.2.2b2
-```
 ### Configure SNMPD on localhost ###
 Edit `/etc/snmp/snmpd.conf` to enable self-polling.  An absolute minimal config for snmpd is:
 
     rocommunity public 127.0.0.1
 
-You may either edit the default configuration file to your liking, or backup the default config file and replace it entirely with your own. To apply your changes, run `service snmpd restart` for Centos 6, or `systemctl restart snmpd` for Centos 7 (w/ systemd). If you have deployed a separate database server, you will likely want to configure snmpd on that host as well.
+You may either edit the default configuration file to your liking, or backup the default config file and replace it entirely with your own. To apply your changes, run `service snmpd restart` for Centos 6.x. If you have deployed a separate database server, you will likely want to configure snmpd on that host as well.
 
 
 ### Adding the librenms-user for Apache ###
@@ -136,14 +108,8 @@ You may either edit the default configuration file to your liking, or backup the
 
 Set `httpd` to start on system boot.
 
-**CentOS 6: **
 ```bash
 chkconfig --levels 235 httpd on
-```
-
-**CentOS 7 (with Systemd): **
-```bash
-systemctl enable httpd
 ```
 
 In `/etc/php.ini`, ensure `date.timezone` is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid
@@ -168,7 +134,7 @@ If you are running Apache below version 2.2.18:
 ```
 
 
-If you are running Apache 2.2.18 or higher (current version in Centos 7 official repo):
+If you are running Apache 2.2.18 or higher:
 ```apache
 <VirtualHost *:80>
   DocumentRoot /opt/librenms/html/
@@ -192,18 +158,10 @@ rn /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf.bak
 
 If you choose to run Nginx, you will need to install necessary extra software and let it start on system boot.
 
-**CentOS 6**
 ```bash
     yum install nginx php-fpm
     chkconfig nginx on
     chkconfig php-fpm on
-```
-
-**CentOS 7**
-```bash
-    yum install nginx php-fpm
-    systemctl enable nginx
-    systemctl enable php-fpm
 ```
 
 Modify permissions and configuration for `php-fpm` to use nginx credentials.
@@ -268,7 +226,7 @@ First, create and chown the `rrd` directory and create the `logs` directory
 If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
 
 **SELinux**
-> if you're using SELinux (in Centos 7 this is the defualt) you need to allow web server user to write into logs directory.
+> if you're using SELinux you need to allow web server user to write into logs directory.
 > semanage tool is a part of policycoreutils-python, so if don't have it, you can install it
 > **Please note that running LibreNMS with SELinux is still experimental and we cannot guarantee that everything will be working fine for now.**
 
@@ -289,21 +247,11 @@ Set selinux to allow httpd to sendmail
 
 ### Start the web-server: ###
 
-**CentOS 6**
-
     # For HTTPd (Apache):
     service httpd restart
 
     # For Nginx:
     service nginx restart
-
-**CentOS 7**
-
-    # For HTTPd (Apache):
-    systemctl restart httpd
-
-    # For Nginx:
-    systemctl restart nginx
 
 ### Web Installer ###
 

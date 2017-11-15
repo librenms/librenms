@@ -63,7 +63,7 @@ if (isset($options['i']) && $options['i'] && isset($options['n'])) {
 }
 
 if (isset($options['d']) || isset($options['v'])) {
-    $versions = version_info(false);
+    $versions = version_info();
     echo <<<EOH
 ===================================
 Version info:
@@ -113,8 +113,6 @@ if (!$where) {
     echo "Invalid arguments!\n";
     exit;
 }
-
-update_os_cache(); // will only update if needed
 
 $discovered_devices = 0;
 

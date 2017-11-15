@@ -1,15 +1,17 @@
 source: Installation/Installing-LibreNMS.md
 # Installing LibreNMS
 
-We have some pre-built VirtualBox images you can use to get started:
+##Images
+We have some pre-built VirtualBox images you can use to get started. Please note that these images are pre-built for VirtualBox, hence they might not work with other hypervisors without converting them:
 
 [Ubuntu 16.04](http://docs.librenms.org/Installation/Ubuntu-image/)
 
 [CentOS 7](http://docs.librenms.org/Installation/CentOS-image/)
 
-If you want to install yourself then we have some new documentation which should make it easy.
+##Manually
+If you want to install manually then we have some documentation which should make it easy.
 
-> Please note the following docs are new and may not be 100% complete, please provide feedback on your experience.
+**Please note the minimum supported PHP version is 5.6.4**
 
 [Ubuntu 16.04 Apache](http://docs.librenms.org/Installation/Installation-Ubuntu-1604-Apache/)
 

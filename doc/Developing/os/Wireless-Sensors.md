@@ -61,8 +61,8 @@ All discovery interfaces will require you to return an array of WirelessSensor o
   - $current = Defaults to null. Can be used to set the current value on discovery.
   If this is null the values will be polled right away and if they do not return valid value(s), the sensor will not be discovered.
   Supplying a value here implies you have already verified this sensor is valid.
-  - $divisor = Defaults to 1. This is used to divided the returned value.
   - $multiplier = Defaults to 1. This is used to multiply the returned value.
+  - $divisor = Defaults to 1. This is used to divided the returned value.
   - $aggregator = Defaults to sum. Valid values: sum, avg. This will combine multiple values from multiple oids into one.
   - $access_point_id = Defaults to null. If this is a wireless controller, you can link sensors to entries in the access_points table.
   - $high_limit = Defaults to null. Sets the high limit for the sensor, used in alerting to report out range sensors.

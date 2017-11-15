@@ -158,18 +158,10 @@ foreach ($list as $items) {
     }
 
     $speed = $items['local_ifspeed']/1000/1000;
-    if ($speed == 100) {
-        $width = 3;
-    } elseif ($speed == 1000) {
-        $width = 5;
-    } elseif ($speed == 10000) {
-        $width = 10;
-    } elseif ($speed == 40000) {
-        $width = 15;
-    } elseif ($speed == 100000) {
+    if ($speed > 500000) {
         $width = 20;
     } else {
-        $width = 1;
+        $width = round(0.77 * pow($speed, 0.25));
     }
     $link_in_used = ($items['local_ifinoctets_rate'] * 8) / $items['local_ifspeed'] * 100;
     $link_out_used = ($items['local_ifoutoctets_rate'] * 8) / $items['local_ifspeed'] * 100;
@@ -239,7 +231,7 @@ echo $edges;
     var network = new vis.Network(container, data, options);
     network.on('click', function (properties) {
         if (properties.nodes > 0) {
-            window.location.href = "device/device="+properties.nodes+"/tab=map/"
+            window.location.href = "device/device="+properties.nodes+"/tab=neighbours/selection=map/"
         }
     });
 </script>

@@ -3,6 +3,7 @@
 use LibreNMS\Config;
 
 $os = getHostOS($device);
+
 if ($os != $device['os']) {
     log_event('Device OS changed ' . $device['os'] . " => $os", $device, 'system', 3);
     $device['os'] = $os;
@@ -12,7 +13,9 @@ if ($os != $device['os']) {
         load_os($device);
     }
 
-    echo "Changed OS! : $os\n";
+    echo "Changed ";
 }
+
+echo "OS: " . Config::getOsSetting($os, 'text') . " ($os)\n";
 
 update_device_logo($device);

@@ -20,6 +20,17 @@
             "The usage of memory size in %."
 */
 
-$mempool['total'] = snmp_get($device, "totalMemory.0", '-OvQ', 'MOXA-IKS6726A-MIB');
-$mempool['used'] = snmp_get($device, "usedMemory.0", '-OvQ', 'MOXA-IKS6726A-MIB');
-$mempool['free'] = snmp_get($device, "freeMemory.0", '-OvQ', 'MOXA-IKS6726A-MIB');
+// Moxa people enjoy creating similar MIBs for each model!
+if ($device['sysDescr'] == 'IKS-6726A-2GTXSFP-T') {
+    $mibmod = 'MOXA-IKS6726A-MIB';
+} else if ($device['sysDescr'] == 'EDS-G508E-T') {
+    $mibmod = 'MOXA-EDSG508E-MIB';
+}
+
+$mem_res = snmp_get_multi_oid($device, 'totalMemory.0 usedMemory.0 freeMemory.0', '-OQUs', $mibmod);
+
+d_echo(serialize($mem_res));
+
+$mempool['total'] = $mem_res['totalMemory.0'];
+$mempool['used'] = $mem_res['usedMemory.0'];
+$mempool['free'] = $mem_res['freeMemory.0'];
