@@ -734,6 +734,15 @@ If you have a large number of more than one or two disks on a system, you should
  */3 * * * * /etc/snmp/smart -u
 ```
 
+6. If your snmp agent runs as user "snmp", edit your sudo users (usually `visudo`) and add at the bottom:
+```
+snmp ALL=(ALL) NOPASSWD: /etc/snmp/smart, /usr/sbin/smartctl
+```
+and modify your snmpd.conf file accordingly:
+```
+extend smart /usr/bin/sudo /etc/snmp/smart
+``` 
+
 ### Squid
 
 #### SNMP Proxy
