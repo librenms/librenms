@@ -9,8 +9,10 @@ The image is built with VirtualBox, a vmdk is provided along with an ova which w
 These should be supported in VMWare Fusion, Workstation, Player and VirtualBox.
 
 * NOTE: It's highly recommended that you update by doing the follwoing. 
-`cd /opt/librenms ./daily.sh`
-
+```bash
+cd /opt/librenms
+./daily.sh
+```
 * Any issues and or help with these images should be reported via [Community Fourm](https://community.librenms.org) or our [Discord server](https://t.libren.ms/discord)
 
 #### Setup
