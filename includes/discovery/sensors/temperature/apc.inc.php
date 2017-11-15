@@ -172,16 +172,3 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
         discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid, 'memSensorsTemperature.' . $index, 'apc', $descr, $divisor, $multiplier, null, null, null, null, $value, 'snmp', null, null, $user_func);
     }
 }
-
-foreach ($pre_cache['r2pdu_humidity_temp_table'] as $index => $data) {
-    if ($data['rPDU2SensorTempHumidityStatusType'] != 'notInstalled') {
-        $cur_oid    = '.1.3.6.1.4.1.318.1.1.26.10.2.2.1.8.' . $index;
-        $descr      = $data['rPDU2SensorTempHumidityStatusName'];
-        $divisor    = 10;
-        $multiplier = 1;
-        $value      = $data['rPDU2SensorTempHumidityStatusTempC'] / $divisor;
-        if (is_numeric($value)) {
-            discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid, 'rPDU2SensorTempHumidityStatusTempC.' . $index, 'apc', $descr, $divisor, $multiplier, null, null, null, null, $value);
-        }
-    }
-}

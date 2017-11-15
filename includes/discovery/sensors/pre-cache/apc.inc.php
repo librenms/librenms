@@ -33,6 +33,3 @@ $pre_cache['mem_sensors_status'] = snmpwalk_cache_oid($device, 'memSensorsStatus
 
 echo 'memSensorsStatusSysTempUnits ';
 $pre_cache['memSensorsStatusSysTempUnits'] = snmp_get($device, 'memSensorsStatusSysTempUnits.0', '-OQv', 'PowerNet-MIB');
-
-echo 'rPDU2SensorTempHumidityStatusTable ';
-$pre_cache['r2pdu_humidity_temp_table'] = snmpwalk_cache_oid($device, 'rPDU2SensorTempHumidityStatusTable', array(), 'PowerNet-MIB');
