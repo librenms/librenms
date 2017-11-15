@@ -333,7 +333,7 @@ Generally, it is a better to set these [per OS](../Developing/os/Settings.md#pol
 
 ```php
 $config['discovery_modules]['arp-table'] = 1;
-$config['poller_modules]['bgp-peers'] = 0;
+$config['poller_modules']['bgp-peers'] = 0;
 ```
 
 ### SNMP Settings
