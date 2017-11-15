@@ -86,8 +86,8 @@ if (Config::get('enable_bgp')) {
                         d_echo($j_bgp);
                         foreach ($j_bgp as $index => $entry) {
                             $ip = IP::fromHexString($entry['jnxBgpM2PeerRemoteAddr'], true);
-                            d_echo("peerindex for '.$ip->getFamily().' $ip is ".$entry['jnxBgpM2PeerIndex']."\n");
-                            $j_peerIndexes[$ip] = $entry['jnxBgpM2PeerIndex'];
+                            d_echo("peerindex for ".$ip->getFamily() ." $ip is ".$entry['jnxBgpM2PeerIndex']."\n");
+                            $j_peerIndexes[(string)$ip] = $entry['jnxBgpM2PeerIndex'];
                         }
                     }
 
