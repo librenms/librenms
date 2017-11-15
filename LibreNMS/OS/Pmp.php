@@ -30,13 +30,15 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSsrDiscovery;
 use LibreNMS\OS;
 
 class Pmp extends OS implements
     WirelessRssiDiscovery,
     WirelessSnrDiscovery,
     WirelessFrequencyDiscovery,
-    WirelessUtilizationDiscovery
+    WirelessUtilizationDiscovery,
+    WirelessSsrDiscovery
 {
 
     /**
@@ -152,6 +154,32 @@ class Pmp extends OS implements
                 'pmp-uplink',
                 0,
                 'Uplink Utilization',
+                null
+            )
+        );
+    }
+
+    /**
+     * Discover wireless SSR.  This is in dB. Type is ssr.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessSsr()
+    {
+        if ($this->isAp()) {
+            $ssr = '.1.3.6.1.4.1.161.19.3.1.4.1.86.2'; //WHISP-APS-MIB::signalStrengthRatio.2
+        } else {
+            $ssr = '.1.3.6.1.4.1.161.19.3.2.2.108.0'; //WHISP-SMSSM-MIB::signalStrengthRatio.0
+        }
+        return array(
+            new WirelessSensor(
+                'ssr',
+                $this->getDeviceId(),
+                $ssr,
+                'pmp',
+                0,
+                'Cambium Signal Strength Ratio',
                 null
             )
         );

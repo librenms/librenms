@@ -116,19 +116,6 @@ if (is_numeric($jitter)) {
     unset($rrd_filename, $jitter);
 }
 
-$ssr = str_replace('"', "", snmp_get($device, "signalStrengthRatio.0", "-Ovqn", "WHISP-SM-MIB"));
-if (is_numeric($ssr)) {
-    $rrd_def = RrdDefinition::make()->addDataset('ssr', 'GAUGE', -150, 150);
-    $fields = array(
-        'ssr' => $ssr,
-    );
-    $tags = compact('rrd_def');
-    data_update($device, 'canopy-generic-450-slaveSSR', $tags, $fields);
-    $graphs['canopy_generic_450_slaveSSR'] = true;
-    unset($rrd_filename, $ssr);
-}
-
-
 $multi_get_array = snmp_get_multi($device, "regCount.0 regFailureCount.0", "-OQU", "WHISP-APS-MIB");
 d_echo($multi_get_array);
 $registered = $multi_get_array[0]["WHISP-APS-MIB::regCount"];
@@ -214,18 +201,6 @@ if (is_numeric($lastLevel)) {
     data_update($device, 'canopy-generic-450-powerlevel', $tags, $fields);
     $graphs['canopy_generic_450_powerlevel'] = true;
     unset($lastLevel);
-}
-
-$ssr = str_replace('"', "", snmp_get($device, "linkSignalStrengthRatio.2", "-Ovqn", "WHISP-APS-MIB"));
-if (is_numeric($ssr)) {
-    $rrd_def = RrdDefinition::make()->addDataset('ssr', 'GAUGE', -150, 150);
-    $fields = array(
-        'ssr' => $ssr,
-    );
-    $tags = compact('rrd_def');
-    data_update($device, 'canopy-generic-450-masterSSR', $tags, $fields);
-    $graphs['canopy_generic_450_masterSSR'] = true;
-    unset($rrd_filename, $ssr);
 }
 
 $vertical = str_replace('"', "", snmp_get($device, ".1.3.6.1.4.1.161.19.3.2.2.117.0", "-Ovqn", ""));

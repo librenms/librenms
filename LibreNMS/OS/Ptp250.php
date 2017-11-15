@@ -29,12 +29,14 @@ use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSsrDiscovery;
 use LibreNMS\OS;
 
 class Ptp250 extends OS implements
     WirelessPowerDiscovery,
     WirelessNoiseFloorDiscovery,
-    WirelessRateDiscovery
+    WirelessRateDiscovery,
+    WirelessSsrDiscovery
 {
     /**
      * Discover wireless tx or rx power. This is in dBm. Type is power.
@@ -160,6 +162,28 @@ class Ptp250 extends OS implements
                 'PTP250 Receive Modulation Rate',
                 null
             ),
+        );
+    }
+
+    /**
+     * Discover wireless SSR.  This is in dB. Type is ssr.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessSsr()
+    {
+        $ssr = '.1.3.6.1.4.1.17713.250.5.13.0'; // CAMBIUM-PTP250-MIB::signalStrengthRatio.0
+        return array(
+            new WirelessSensor(
+                'ssr',
+                $this->getDeviceId(),
+                $ssr,
+                'ptp250',
+                0,
+                'PTP250 Signal Strength Ratio',
+                null
+            )
         );
     }
 }

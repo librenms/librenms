@@ -14,14 +14,3 @@ use LibreNMS\RRD\RrdDefinition;
 $version = $poll_device['sysDescr'];
 $masterSlaveMode = ucfirst(snmp_get($device, 'masterSlaveMode.0', '-Oqv', "CAMBIUM-PTP250-MIB"));
 $hardware = 'PTP 250 '. $masterSlaveMode;
-
-$ssr = snmp_get($device, "signalStrengthRatio.0", "-Ovqn", "CAMBIUM-PTP250-MIB");
-if (is_numeric($ssr)) {
-    $rrd_def = RrdDefinition::make()->addDataset('ssr', 'GAUGE', -150, 150);
-    $fields = array(
-        'ssr' => $ssr,
-    );
-    $tags = compact('rrd_def');
-    data_update($device, 'cambium-250-ssr', $tags, $fields);
-    $graphs['cambium_250_ssr'] = true;
-}

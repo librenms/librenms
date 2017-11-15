@@ -28,11 +28,14 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSsrDiscovery;
+
 use LibreNMS\OS;
 
 class Ptp650 extends OS implements
     WirelessPowerDiscovery,
-    WirelessRateDiscovery
+    WirelessRateDiscovery,
+    WirelessSsrDiscovery
 {
     /**
      * Discover wireless tx or rx power. This is in dBm. Type is power.
@@ -135,6 +138,28 @@ class Ptp650 extends OS implements
                 'PTP650 Receive Modulation Rate',
                 null
             ),
+        );
+    }
+
+    /**
+     * Discover wireless SSR.  This is in dB. Type is ssr.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessSsr()
+    {
+        $ssr = '.1.3.6.1.4.1.17713.7.12.9.0'; // CAMBIUM-PTP650-MIB::signalStrengthRatio.0
+        return array(
+            new WirelessSensor(
+                'ssr',
+                $this->getDeviceId(),
+                $ssr,
+                'ptp650',
+                0,
+                'PTP650 Signal Strength Ratio',
+                null
+            )
         );
     }
 }
