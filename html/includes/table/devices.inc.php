@@ -82,14 +82,14 @@ if (!empty($_POST['location'])) {
 
 if (!empty($_POST['group'])) {
     include_once '../includes/device-groups.inc.php';
-    $sql .= ' AND ( ';
-    foreach (GetDevicesFromGroup($_POST['group']) as $dev) {
-        $sql .= '`devices`.`device_id` = ? OR ';
-        $param[] = $dev;
+    $group_devices = GetDevicesFromGroup($_POST['group']);
+    if ($group_devices) {
+        $sql .= ' AND `devices`.`device_id` IN ';
+        $sql .= dbGenPlaceholders(count($group_devices));
+        $param += $group_devices;
+    } else {
+        $sql .= ' AND 0';  // no devices in group
     }
-
-    $sql = substr($sql, 0, (strlen($sql) - 3));
-    $sql .= ' )';
 }
 
 $count_sql = "SELECT COUNT(`devices`.`device_id`) $sql";
