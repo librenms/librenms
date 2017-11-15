@@ -1005,7 +1005,7 @@ function sensors_discovery(&$valid, $device, $sensor_type, $pre_cache)
 
                 d_echo("Final sensor value: $value\n");
 
-                if (can_skip_values($value, $data, $sensor_options, $raw_data[$index]) === false && is_numeric($value)) {
+                if (can_skip_values($value, $data, $options, $raw_data[$index]) === false && is_numeric($value)) {
                     $oid = $data['num_oid'] . $index;
 
                     $descr = format_descr($index, $data, $snmp_data, $pre_cache);
