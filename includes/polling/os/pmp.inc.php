@@ -39,10 +39,10 @@ $ptp = array(
     'BH20'          => 'PTP 100'
 );
 
+// PMP 100 is defaulted to
 $pmp = array(
     'MIMO OFDM'     => 'PMP 450',
-    'OFDM'          => 'PMP 430',
-    '*'             => 'PMP 100' // Adding this wildcard becuase there are no defining strings of pmp 100, so it should be a last resort
+    'OFDM'          => 'PMP 430'
 );
 
 foreach ($ptp as $desc => $model) {
@@ -59,18 +59,18 @@ foreach ($ptp as $desc => $model) {
 }
 
 if (!isset($hardware)) {
+    $hardware = 'PMP 100';
     foreach ($pmp as $desc => $model) {
-        if (str_contains($PMP, $desc) || $desc === '*') {
+        if (str_contains($PMP, $desc)) {
             $hardware = $model;
-
-            if (str_contains($model, 'PMP')) {
-                if (str_contains($version, "AP")) {
-                    $hardware = $model . ' AP';
-                } elseif (str_contains($version, "SM")) {
-                    $hardware = $model . ' SM';
-                }
-            }
             break;
+        }
+    }
+    if (str_contains($hardware, 'PMP')) {
+        if (str_contains($version, "AP")) {
+            $hardware .= ' AP';
+        } elseif (str_contains($version, "SM")) {
+            $hardware .= ' SM';
         }
     }
 }
