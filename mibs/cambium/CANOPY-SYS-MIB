@@ -1,0 +1,463 @@
+CANOPY-SYS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   IpAddress, Counter, Gauge, TimeTicks, NetworkAddress, enterprises
+      FROM RFC1155-SMI
+   OBJECT-TYPE
+      FROM RFC-1212
+   DisplayString, PhysAddress
+      FROM SNMPv2-TC
+   NOTIFICATION-TYPE
+      FROM SNMPv2-SMI;
+
+-- Define the Motorola Canopy object identifier
+motorola           OBJECT IDENTIFIER ::= { enterprises 17713 }
+
+-- Groups in motorola
+p2p                OBJECT IDENTIFIER ::= { motorola 1 }
+p2mp               OBJECT IDENTIFIER ::= { motorola 2 }
+
+-- Groups in p2p
+configuration      OBJECT IDENTIFIER ::= { p2p 5 }
+licence            OBJECT IDENTIFIER ::= { p2p 8 }
+mgmt               OBJECT IDENTIFIER ::= { p2p 9 }
+phyControl         OBJECT IDENTIFIER ::= { p2p 10 }
+phyStatus          OBJECT IDENTIFIER ::= { p2p 12 }
+reset              OBJECT IDENTIFIER ::= { p2p 18 }
+versions           OBJECT IDENTIFIER ::= { p2p 19 }
+pubStats           OBJECT IDENTIFIER ::= { p2p 20 }
+encryption         OBJECT IDENTIFIER ::= { p2p 22 }
+p2pTraps           OBJECT IDENTIFIER ::= { p2p 99 }
+
+-- Configuration group attribute definitions
+--
+iPAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Internet protocol (IP) address. This address is used by
+          the family of Internet protocols to uniquely this
+          identify the unit on a network"
+   ::= { configuration 1 }
+
+subnetMask OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "A subnet allows the flow of network traffic between
+          hosts to be segregated based on a network
+          configuration. By organizing hosts into
+          logical groups, subnetting can improve network
+          security and performance."
+   ::= { configuration 2 }
+
+gatewayIPAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "The IP address of a computer on the current network that
+          is currently acting as a network gateway. A gateway
+          acts as an entrance / exit to packets from / to
+          other networks."
+   ::= { configuration 3 }
+
+targetMACAddress OBJECT-TYPE
+   SYNTAX OCTET STRING (SIZE(6))
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "MAC address of the PTP wireless unit forming the other
+          end of the PTP link"
+   ::= { configuration 4 }
+
+masterSlaveMode OBJECT-TYPE
+   SYNTAX INTEGER {
+                    master(0),
+                    slave(1)
+                  }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "The PTP wireless link operates using a master and slave
+          relationship."
+   ::= { configuration 5 }
+
+maximumTransmitPower OBJECT-TYPE
+   SYNTAX INTEGER (-15..27)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Maximum transmit power the wireless unit is permitted to
+          use when establishing and maintaining the wireless
+          link"
+   ::= { configuration 6 }
+
+-- Licence group attribute definitions
+--
+regionCode OBJECT-TYPE
+   SYNTAX INTEGER (0..31)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "The region code prohibits the wireless unit from
+          operating outside the regulated limits"
+   ::= { licence 1 }
+
+productVariant OBJECT-TYPE
+   SYNTAX INTEGER {
+                    motorola-canopy-60mbps-backhaul(0),
+                    motorola-canopy-60mbps-backhaul(1),
+                    motorola-canopy-60mbps-backhaul(2),
+                    motorola-canopy-30mbps-backhaul(3),
+                    spare-1(4),
+                    spare-2(5),
+                    spare-3(6),
+                    spare-4(7),
+                    spare-5(8),
+                    spare-6(9),
+                    spare-7(10),
+                    motorola-canopy-150mbps-backhaul(11),
+                    motorola-canopy-300mbps-backhaul(12)
+                  }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "The product variant"
+   ::= { licence 2 }
+
+productName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..255))
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Name of the product variant"
+   ::= { licence 3 }
+
+ethernetFibreSupport OBJECT-TYPE
+   SYNTAX INTEGER (0..1)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "null"
+   ::= { licence 4 }
+
+frequencyVariant OBJECT-TYPE
+   SYNTAX INTEGER {
+                    freq-5800-mhz(0),
+                    freq-5400-mhz(1)
+                  }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Frequency variant of the wireless unit"
+   ::= { licence 5 }
+
+-- Mgmt group attribute definitions
+--
+targetRange OBJECT-TYPE
+   SYNTAX INTEGER (0..2000)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Initial target range used in installation +/-1,
+          expressed in tenths of a kilometer. When
+          Auto-Ranging this must be set to 0"
+   ::= { mgmt 1 }
+
+rangingMode OBJECT-TYPE
+   SYNTAX INTEGER {
+                    auto-0-40-km(0),
+                    auto-0-100-km(1),
+                    auto-0-200-km(2),
+                    target-range(3)
+                  }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Type of ranging to use during installation, either
+          Auto-Ranging or use a selectable Target
+          Range"
+   ::= { mgmt 2 }
+
+-- PhyControl group attribute definitions
+--
+asymmetricTDD OBJECT-TYPE
+   SYNTAX INTEGER {
+                    symmetric-data-rate-1-to-1(0),
+                    asymmetric-data-rate-2-to-1(1)
+                  }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Control TDD Structure"
+   ::= { phyControl 1 }
+
+-- PhyStatus group attribute definitions
+--
+receivePower OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Receive power expressed in tenths of a dBm"
+   ::= { phyStatus 1 }
+
+vectorError OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "The vector error measurement compares the received
+          signal's IQ modulation characteristics to an
+          ideal signal to determine the composite error
+          vector magnitude. The value represented by this
+          attribute is the average vector error over the
+          previous second expressed in tenths of a dB"
+   ::= { phyStatus 2 }
+
+transmitPower OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Transmit power expressed in tenths of a dBm"
+   ::= { phyStatus 3 }
+
+range OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Distance between the two peer wireless units expressed
+          in tenths of a kilometer"
+   ::= { phyStatus 4 }
+
+linkLoss OBJECT-TYPE
+   SYNTAX INTEGER (-500..500)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "The wireless link loss expressed in tenths of a dB"
+   ::= { phyStatus 5 }
+
+receiveChannel OBJECT-TYPE
+   SYNTAX INTEGER (0..31)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Current active receive channel"
+   ::= { phyStatus 6 }
+
+transmitChannel OBJECT-TYPE
+   SYNTAX INTEGER (0..31)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Current active transmit channel"
+   ::= { phyStatus 7 }
+
+receiveModulationMode OBJECT-TYPE
+   SYNTAX INTEGER {
+                    mod-acquisition(0),
+                    mod-bpsk-0-63(1),
+                    mod-qpsk-0-63-single(2),
+                    mod-transient-1(3),
+                    mod-qpsk-0-87-single(4),
+                    mod-transient-2(5),
+                    mod-16qam-0-63-single-a(6),
+                    mod-transient-3(7),
+                    mod-16qam-0-87-single(8),
+                    mod-transient-5(9),
+                    mod-64qam-0-75-single(10),
+                    mod-transient-5(11),
+                    mod-64qam-0-92-single(12),
+                    mod-transient-6(13),
+                    mod-256qam-0-81-single(14),
+                    mod-16qam-0-63-single-b(15),
+                    mod-16qam-0-63-dual(16),
+                    mod-transient-7(17),
+                    mod-16qam-0-87-dual(18),
+                    mod-transient-8(19),
+                    mod-64qam-0-75-dual(20),
+                    mod-transient-9(21),
+                    mod-64qam-0-92-dual(22),
+                    mod-transient-10(23),
+                    mod-256qam-0-81-dual(24)
+                  }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Current active receive modulation mode"
+   ::= { phyStatus 8 }
+
+transmitModulationMode OBJECT-TYPE
+   SYNTAX INTEGER {
+                    mod-acquisition(0),
+                    mod-bpsk-0-63(1),
+                    mod-qpsk-0-63-single(2),
+                    mod-transient-1(3),
+                    mod-qpsk-0-87-single(4),
+                    mod-transient-2(5),
+                    mod-16qam-0-63-single-a(6),
+                    mod-transient-3(7),
+                    mod-16qam-0-87-single(8),
+                    mod-transient-5(9),
+                    mod-64qam-0-75-single(10),
+                    mod-transient-5(11),
+                    mod-64qam-0-92-single(12),
+                    mod-transient-6(13),
+                    mod-256qam-0-81-single(14),
+                    mod-16qam-0-63-single-b(15),
+                    mod-16qam-0-63-dual(16),
+                    mod-transient-7(17),
+                    mod-16qam-0-87-dual(18),
+                    mod-transient-8(19),
+                    mod-64qam-0-75-dual(20),
+                    mod-transient-9(21),
+                    mod-64qam-0-92-dual(22),
+                    mod-transient-10(23),
+                    mod-256qam-0-81-dual(24)
+                  }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Current active transmit modulation mode"
+   ::= { phyStatus 9 }
+
+receiveFreq OBJECT-TYPE
+   SYNTAX INTEGER (0..5875)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Current receive frequency expressed in MHz"
+   ::= { phyStatus 11 }
+
+transmitFreq OBJECT-TYPE
+   SYNTAX INTEGER (0..5875)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Current transmit frequency expressed in MHz"
+   ::= { phyStatus 12 }
+
+signalStrengthRatio OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Signal strength ratio (Vertical / Horizontal) expressed
+          in tenths of a dB"
+   ::= { phyStatus 13 }
+
+-- Reset group attribute definitions
+--
+systemReset OBJECT-TYPE
+   SYNTAX INTEGER {
+                    running(0),
+                    console-reboot(1)
+                  }
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+          "Setting this attribute to '1' will cause a system
+          reboot"
+   ::= { reset 1 }
+
+-- Versions group attribute definitions
+--
+softwareVersion OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..255))
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Current software version"
+   ::= { versions 1 }
+
+hardwareVersion OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..255))
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Hardware platform version."
+   ::= { versions 2 }
+
+secondarySoftwareVersion OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..255))
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Secondary software version, used when the primary
+          software image is invalid or erased"
+   ::= { versions 3 }
+
+bootVersion OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..255))
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Boot code sofwtare version"
+   ::= { versions 4 }
+
+-- PubStats group attribute definitions
+--
+receiveDataRate OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Average data rate over the last one second interval
+          expressed in kbps"
+   ::= { pubStats 1 }
+
+transmitDataRate OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Average data rate over the last one second interval
+          expressed in kbps"
+   ::= { pubStats 2 }
+
+aggregateDataRate OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "Average data rate over the last one second interval
+          (kbps)."
+   ::= { pubStats 3 }
+
+-- Encryption group attribute definitions
+--
+encryptionAlgorithm OBJECT-TYPE
+   SYNTAX INTEGER {
+                    none(0),
+                    aes-rijndael(1)
+                  }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+          "The Encryption Algorithm used by the wireless link.nnYou
+          should be aware that enabling encryption results
+          in a reduction in available data bandwidthnnN.B. The
+          same Encryption Algorithm must be configured at BOTH
+          ends of the link for it to function correctly."
+   ::= { encryption 1 }
+
+-- Enterprise NOTIFICATION definitions
+--
+dfsChannelChangeTrap NOTIFICATION-TYPE
+   OBJECTS { receiveChannel }
+   STATUS current
+   DESCRIPTION "DFS channel change event"
+   ::= { p2pTraps 1 }
+
+dfsImpulsiveInterferenceDetectedTrap NOTIFICATION-TYPE
+   OBJECTS { receiveChannel }
+   STATUS current
+   DESCRIPTION "DFS impulsive interference detected event"
+   ::= { p2pTraps 2 }
+END
