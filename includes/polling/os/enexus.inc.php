@@ -1,8 +1,8 @@
 <?php
 /**
- * hpe-ipdu.inc.php
+ * enexus.inc.php
  *
- * LibreNMS sensors power discovery module for HPE iPDU
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,27 +19,9 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @copyright  2017 Barry O'Donovan
+ * @author     BArry O'Donovan <barry@lightnet.ie>
  */
 
-
-echo 'HPE iPDU Power ';
-
-$x=1;
-foreach ($pre_cache['hpe_ipdu'] as $index => $item) {
-    if (isset($item['mpduOutputPowerFactor'])) {
-        $oid = '.1.3.6.1.4.1.232.165.5.2.1.1.10.' . $index;
-        $current = $item['mpduOutputPowerFactor'];
-        discover_sensor($valid['sensor'], 'power', $device, $oid, 'mpduOutputPowerFactor.'.$index, 'hpe-ipdu', "MPDU #$x Power", 100, 1, null, null, null, null, $current);
-        $x++;
-    }
-}//end foreach
-
-unset(
-    $item,
-    $oid,
-    $index,
-    $item,
-    $x
-);
+$hardware = snmp_get($device, 'powerSystem.powerSystemModel.0', '-Ovqa', 'SP2-MIB');
+$version = snmp_get($device, 'controlSystem.controlSystemInventory.controlUnitTable.controlUnitEntry.controlUnitSwVersion.1', '-Ovqa', 'SP2-MIB');

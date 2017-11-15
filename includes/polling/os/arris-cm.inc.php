@@ -1,8 +1,8 @@
 <?php
 /**
- * hpe-ipdu.inc.php
+ * arris-cm.inc.php
  *
- * LibreNMS sensors voltage discovery module for HPE iPDU
+ * LibreNMS os polling module for Arris Cable Modem (DOCSIS)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,27 +19,11 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @copyright  2017 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
+preg_match('/<<HW_REV: (.+); VENDOR:.*SW_REV: (.+); MODEL: (.+)>>/', $poll_device['sysDescr'], $matches);
 
-echo 'HPE iPDU Voltage ';
-
-$x=1;
-foreach ($pre_cache['hpe_ipdu'] as $index => $item) {
-    if (isset($item['mpduOutputVoltage'])) {
-        $oid = '.1.3.6.1.4.1.232.165.5.2.1.1.6.' . $index;
-        $current = $item['mpduOutputVoltage'];
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, 'mpduOutputVoltage.'.$index, 'hpe-ipdu', "MPDU #$x Voltage", 10, 1, null, null, null, null, $current);
-        $x++;
-    }
-}//end foreach
-
-unset(
-    $item,
-    $oid,
-    $index,
-    $item,
-    $x
-);
+$hardware = $matches[3] . " (Rev: " . $matches[1] . ")";
+$version = $matches[2];

@@ -1,8 +1,8 @@
 <?php
 /**
- * hpe-ipdu.inc.php
+ * ns-bsd.inc.php
  *
- * LibreNMS sensors pre-cache discovery module for HPE iPDU
+ * LibreNMS os poller module for Technicolor TG MediaAccess devices
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,13 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @copyright  2017 Thomas GAGNIERE
+ * @author     Thomas GAGNIERE <tgagniere@reseau-concept.com>
  */
 
-echo 'mpduOutputEntry ';
-$pre_cache['hpe_ipdu'] = snmpwalk_cache_oid($device, 'mpduOutputEntry', array(), 'CPQPOWER-MIB');
+$data = snmp_get_multi_oid($device, 'snsModel.0 snsVersion.0 snsSerialNumber.0 snsSystemName.0', '-OUQs', 'STORMSHIELD-PROPERTY-MIB');
+
+$hardware = $data['snsModel.0'];
+$version = $data['snsVersion.0'];
+$serial = $data['snsSerialNumber.0'];
+$sysName = $data['snsSystemName.0'];

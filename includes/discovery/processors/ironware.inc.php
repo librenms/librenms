@@ -8,14 +8,14 @@ if ($device['os'] == 'ironware' || $device['os_group'] == 'ironware') {
     foreach ($processors_array as $index => $entry) {
         if (($entry['snAgentCpuUtilValue'] || $entry['snAgentCpuUtil100thPercent']) && $entry['snAgentCpuUtilInterval'] == '300') {
             // $entPhysicalIndex = $entry['cpmCPUTotalPhysicalIndex'];
-            if ($entry['snAgentCpuUtil100thPercent']) {
+            if (is_numeric($entry['snAgentCpuUtil100thPercent'])) {
                 $usage_oid = '.1.3.6.1.4.1.1991.1.1.2.11.1.1.6.'.$index;
-                $usage     = $entry['snAgentCpuUtil100thPercent'];
                 $precision = 100;
-            } elseif ($entry['snAgentCpuUtilValue']) {
+                $usage     = $entry['snAgentCpuUtil100thPercent'] / $precision;
+            } elseif (is_numeric($entry['snAgentCpuUtilValue'])) {
                 $usage_oid = '.1.3.6.1.4.1.1991.1.1.2.11.1.1.4.'.$index;
-                $usage     = $entry['snAgentCpuUtilValue'];
-                $precision = 100;
+                $precision = 1;
+                $usage     = $entry['snAgentCpuUtilValue'] / $precision;
             }
 
             list($slot, $instance, $interval) = explode('.', $index);

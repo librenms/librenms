@@ -85,7 +85,7 @@ We do indeed, you can find access to the demo [here](https://demo.librenms.org)
 
 The first thing to do is to add /debug=yes/ to the end of the URI (I.e /devices/debug=yes/).
 
-If the page you are trying to load has a substantial amount of data in it then it could be that the php memory limit needs to be increased in php.ini and then your web service reloaded.
+If the page you are trying to load has a substantial amount of data in it then it could be that the php memory limit needs to be increased in [config.php](Configuration.md#core).
 
 #### <a name="faq10"> Why do I not see any graphs?</a>
 
@@ -124,6 +124,12 @@ Before this all rrd files were set to 100G max values, now you can enable suppor
 
 
 rrdtool tune will change the max value when the interface speed is detected as being changed (min value will be set for anything 10M or over) or when you run the included script (./scripts/tune_port.php) - see [RRDTune doc](../Extensions/RRDTune.md)
+
+ SNMP ifInOctets and ifOutOctets are counters, which means they start at 0 (at device boot) and count up from there. LibreNMS records the value every 5 minutes and uses the difference between the previous value and the current value to calculate rate. (Also, this value resets to 0 when it hits the max value)
+
+Now, when the value is not recorded for awhile RRD (our time series storage) does not record a 0, it records the last value, otherwise, there would be even worse problems. Then finally we get the current ifIn/OutOctets value and record that. Now, it appears as though all of the traffic since it stopped getting values have occurred in the last 5 minute interval.
+
+So whenever you see spikes like this, it means we have not received data from the device for several polling intervals. The cause can vary quite a bit: bad snmp implementations, intermittant network connectivity, broken poller, and more.
 
 #### <a name="faq17"> Why do I see gaps in my graphs?</a>
 
