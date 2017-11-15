@@ -93,9 +93,8 @@ function logfile($string)
  */
 function getHostOS($device)
 {
-    $res = snmp_get_multi_oid($device, array('SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysObjectID.0'));
-    $sysDescr = isset($res['.1.3.6.1.2.1.1.1.0']) ? $res['.1.3.6.1.2.1.1.1.0'] : '';
-    $sysObjectId = isset($res['.1.3.6.1.2.1.1.2.0']) ? $res['.1.3.6.1.2.1.1.2.0'] : '';
+    $sysDescr    = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
+    $sysObjectId = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
 
     d_echo("| $sysDescr | $sysObjectId | \n");
 
