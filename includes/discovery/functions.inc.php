@@ -1008,7 +1008,7 @@ function sensors_discovery(&$valid, $device, $sensor_type, $pre_cache)
                 if (can_skip_values($value, $data, $options, $raw_data[$index]) === false && is_numeric($value)) {
                     $oid = $data['num_oid'] . $index;
 
-                    $descr = format_descr($index, $data, $snmp_data, $pre_cache);
+                    $descr = format_descr($index, $data, $pre_cache);
                     $divisor = get_divisor($data, $options);
                     $multiplier = get_multiplier($data, $options);
                     $low_limit = is_numeric($data['low_limit']) ? $data['low_limit'] : dynamic_discovery_get_value('low_limit', $index, $data, $pre_cache, 'null');
@@ -1189,7 +1189,6 @@ function precache_discovery(&$pre_cache, $type, $device)
             }
             foreach ($data_array['data'] as $data) {
                 foreach ((array)$data['oid'] as $oid) {
-                    $tmp_name = $oid;
                     if (!isset($pre_cache[$oid])) {
                         if (isset($data['snmp_flags'])) {
                             $snmp_flag = $data['snmp_flags'];
