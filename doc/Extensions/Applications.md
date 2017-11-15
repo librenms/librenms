@@ -168,6 +168,9 @@ A small shell script that reports current DHCP leases stats.
 
 ##### SNMP Extend
 1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp-status.sh -O /etc/snmp/dhcp-status.sh
+```
 
 2. Make the script executable (chmod +x /etc/snmp/dhcp-status.sh)
 
