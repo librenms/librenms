@@ -23,8 +23,8 @@ if (is_admin() === false) {
         } else {
             $status = array('status' => 1, 'message' => 'Host Dependency cannot be deleted.');
         }
-     }
- }
+    }
+}
 
 header('Content-Type: application/json');
 echo _json_encode($status);

@@ -66,7 +66,7 @@ $('#manavailableparents').on('change', '', function(e) {
         dataType: "json",
         success: function(output) {
             if (output.status == 0) {
-                $.each(output, function (i, elem) {
+                $.each(output.deps, function (i, elem) {
                     $('#manalldevices option[value="'+ elem.device_id + '"').prop("selected", true);
                 });
             } else {
@@ -102,7 +102,7 @@ $('#manage-dependencies').on('show.bs.modal', function() {
         dataType: "json",
         success: function(output) {
             if (output.status == 0) {
-                $.each(output, function (i, elem) {
+                $.each(output.deps, function (i, elem) {
                     var select_line = "<option value=" + elem.device_id + ">" + elem.hostname + "</option>";
                     var select_line_selected = "<option value=" + elem.device_id + " selected='selected'>" + elem.hostname + "</option>";
 

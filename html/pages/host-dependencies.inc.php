@@ -31,32 +31,28 @@ require_once 'includes/modal/manage_host_dependencies.inc.php';
         <thead>
             <tr>
                 <th data-column-id="deviceid" data-visible="false" data-css-class="deviceid">No</th>
-                <th data-column-id="hostname" data-type="string" data-css-class="childhost">Hostname</th>
-                <th data-column-id="parent" data-type="string" data-css-class="parenthost">Parent Host</th>
+                <th data-column-id="hostname" data-type="string" data-css-class="childhost" data-formatter="hostname">Hostname</th>
+                <th data-column-id="parent" data-type="string" data-css-class="parenthost" data-formatter="parent">Parent Host</th>
                 <th data-column-id="parentid" data-visible="false">Parent ID</th>
                 <th data-column-id="actions" data-searchable="false" data-formatter="actions">Actions</th>
             </tr>
         </thead>
         <tbody>
-<?php
-$result = dbFetchRows("SELECT a.device_id as deviceid, a.hostname as child, b.hostname as parent, b.device_id as parentid from devices as a LEFT JOIN devices as b ON a.parent_id = b.device_id ORDER BY a.hostname");
-foreach ($result as $dev) {
-    if ($dev['parent'] == null || $dev['parentid'] == 0) {
-        $parent = 'None';
-        $parentid = 0;
-    } else {
-        $parent = $dev['parent'];
-        $parentid = $dev['parentid'];
-    }
-    echo "<tr><td>".$dev['deviceid']."</td><td>".$dev['child']."</td><td>".$parent."</td><td>".$parentid."</td><td></td></tr>";
-}
-?>
         </tbody>
     </table>
 </div>
 <script>
 var grid = $("#hostdeps").bootgrid({
     rowCount: [50, 100, 250, -1],
+    ajax: true,
+    post: function() {
+        return {
+            type: "get-host-dependencies",
+            viewtype: "fulllist",
+            format: "mainpage"
+        };
+    },
+    url: "ajax_form.php",
     templates: {
         header: '<div id="{{ctx.id}}" class="{{css.header}}"> \
                     <div class="row"> \
@@ -83,6 +79,17 @@ var grid = $("#hostdeps").bootgrid({
             }
             response += "<button type='button' class='"+buttonClass+"' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-device_id='"+row.deviceid+"' data-device_parent ='"+row.parentid+"' data-host_name='"+row.hostname+"' name='delete-host-dependency'><i class='fa fa-trash' aria-hidden='true'></i></button>";
             return response;
+        },
+        "hostname": function(column, row) {
+            return '<a href="device/device='+row.deviceid+'/">'+row.hostname+'</a>';
+        },
+        "parent": function(column, row) {
+            if (row.parent == 'None') {
+                return 'None';
+            } else {
+                console.log(row);
+                return '<a href="device/device='+row.parentid+'/">'+row.parent+'</a>';
+            }
         }
     },
 }).on("loaded.rs.jquery.bootgrid", function(e) {
