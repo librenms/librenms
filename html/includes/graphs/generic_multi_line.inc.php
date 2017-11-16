@@ -63,16 +63,16 @@ foreach ($rrd_list as $rrd) {
     }
 
     if ($rrd['invert']) {
-        $rrd_options .= ' CDEF:' . $id . 'i=' . $id . ',' . $stacked[1] . ',*';
+        $rrd_options .= ' CDEF:' . $id . 'i=' . $id . ',' . $stacked['stacked'] . ',*';
 
         $rrd_optionsb .= ' LINE1.25:' . $id . 'i#' . $colour . ":'$descr'";
         if (!empty($rrd['areacolour'])) {
-            $rrd_optionsb .= ' AREA:' . $id . 'i#' . $rrd['areacolour'] . $stacked[0];
+            $rrd_optionsb .= ' AREA:' . $id . 'i#' . $rrd['areacolour'] . $stacked['transparency'];
         }
     } else {
         $rrd_optionsb .= ' LINE1.25:' . $id . '#' . $colour . ":'$descr'";
         if (!empty($rrd['areacolour'])) {
-            $rrd_optionsb .= ' AREA:' . $id . '#' . $rrd['areacolour'] . $stacked[0];
+            $rrd_optionsb .= ' AREA:' . $id . '#' . $rrd['areacolour'] . $stacked['transparency'];
         }
     }
 

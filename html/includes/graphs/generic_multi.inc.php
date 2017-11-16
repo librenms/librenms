@@ -72,13 +72,13 @@ foreach ($rrd_list as $rrd) {
     }
 
     if ($rrd['invert']) {
-        $rrd_options .= ' CDEF:' . $id . 'i=' . $id . ',' . $stacked[1] . ',*';
-        $rrd_optionsc .= ' AREA:' . $id . 'i#' . $colour . $stacked[0] . ":'$descr'" . $cstack;
+        $rrd_options .= ' CDEF:' . $id . 'i=' . $id . ',' . $stacked['stacked'] . ',*';
+        $rrd_optionsc .= ' AREA:' . $id . 'i#' . $colour . $stacked['transparency'] . ":'$descr'" . $cstack;
         $rrd_optionsc .= ' GPRINT:' . $id . ':LAST:%5.1lf%s GPRINT:' . $id . 'min:MIN:%5.1lf%s';
         $rrd_optionsc .= ' GPRINT:' . $id . 'max:MAX:%5.1lf%s GPRINT:' . $id . ":AVERAGE:'%5.1lf%s\\n'";
         $cstack = ':STACK';
     } else {
-        $rrd_optionsb .= ' AREA:' . $id . '#' . $colour . $stacked[0] . ":'$descr'" . $bstack;
+        $rrd_optionsb .= ' AREA:' . $id . '#' . $colour . $stacked['transparency'] . ":'$descr'" . $bstack;
         $rrd_optionsb .= ' GPRINT:' . $id . ':LAST:%5.1lf%s GPRINT:' . $id . 'min:MIN:%5.1lf%s';
         $rrd_optionsb .= ' GPRINT:' . $id . 'max:MAX:%5.1lf%s GPRINT:' . $id . ":AVERAGE:'%5.1lf%s\\n'";
         $bstack = ':STACK';

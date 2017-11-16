@@ -1649,8 +1649,8 @@ use LibreNMS\Config;
 function generate_stacked_graphs($transparency = '45')
 {
     if (Config::get('webui.graph_stacked') == true) {
-        return array($transparency, '1');
+        return array('transparency' => $transparency, 'stacked' => '1');
     } else {
-        return array('', '-1');
+        return array('transparency' => '', 'stacked' => '-1');
     }
 }

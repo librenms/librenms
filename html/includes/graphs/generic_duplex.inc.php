@@ -39,8 +39,8 @@ $rrd_options .= ' DEF:' . $out . '=' . $rrd_filename . ':' . $ds_out . ':AVERAGE
 $rrd_options .= ' DEF:' . $in . '=' . $rrd_filename . ':' . $ds_in . ':AVERAGE';
 $rrd_options .= ' DEF:' . $out . '_max=' . $rrd_filename . ':' . $ds_out . ':MAX';
 $rrd_options .= ' DEF:' . $in . '_max=' . $rrd_filename . ':' . $ds_in . ':MAX';
-$rrd_options .= ' CDEF:dout_max=out_max,' . $stacked[1] . ',*';
-$rrd_options .= ' CDEF:dout=out,' . $stacked[1] . ',*';
+$rrd_options .= ' CDEF:dout_max=out_max,' . $stacked['stacked'] . ',*';
+$rrd_options .= ' CDEF:dout=out,' . $stacked['stacked'] . ',*';
 $rrd_options .= ' CDEF:both=in,out,+';
 if ($print_total) {
     $rrd_options .= ' VDEF:totin=in,TOTAL';
@@ -55,8 +55,8 @@ if ($percentile) {
 }
 
 if ($graph_max) {
-    $rrd_options .= ' AREA:in_max#' . $colour_area_in_max . $stacked[0] . ':';
-    $rrd_options .= ' AREA:dout_max#' . $colour_area_out_max . $stacked[0] . ':';
+    $rrd_options .= ' AREA:in_max#' . $colour_area_in_max . $stacked['transparency'] . ':';
+    $rrd_options .= ' AREA:dout_max#' . $colour_area_out_max . $stacked['transparency'] . ':';
 }
 
 if ($_GET['previous'] == 'yes') {
@@ -69,8 +69,8 @@ if ($_GET['previous'] == 'yes') {
     $rrd_options .= ' SHIFT:' . $out . "_maxX:$period";
     $rrd_options .= ' SHIFT:' . $in . "_maxX:$period";
 
-    $rrd_options .= ' CDEF:dout_maxX=out_maxX,' . $stacked[1] . ',*';
-    $rrd_options .= ' CDEF:doutX=outX,' . $stacked[1] . ',*';
+    $rrd_options .= ' CDEF:dout_maxX=out_maxX,' . $stacked['stacked'] . ',*';
+    $rrd_options .= ' CDEF:doutX=outX,' . $stacked['stacked'] . ',*';
     $rrd_options .= ' CDEF:bothX=inX,outX,+';
     if ($print_total) {
         $rrd_options .= ' VDEF:totinX=inX,TOTAL';
@@ -90,7 +90,7 @@ if ($_GET['previous'] == 'yes') {
     }
 }//end if
 
-$rrd_options .= ' AREA:in#' . $colour_area_in . $stacked[0] . ':';
+$rrd_options .= ' AREA:in#' . $colour_area_in . $stacked['transparency'] . ':';
 $rrd_options .= " COMMENT:'" . $unit_text . '      Now       Ave      Max';
 
 if ($percentile) {
@@ -108,7 +108,7 @@ if ($percentile) {
 }
 
 $rrd_options .= " COMMENT:\\n";
-$rrd_options .= ' AREA:dout#' . $colour_area_out . $stacked[0] . ':';
+$rrd_options .= ' AREA:dout#' . $colour_area_out . $stacked['transparency'] . ':';
 $rrd_options .= ' LINE1.25:dout#' . $colour_line_out . ":'" . $out_text . "'";
 $rrd_options .= ' GPRINT:out:LAST:%6.2lf%s';
 $rrd_options .= ' GPRINT:out:AVERAGE:%6.2lf%s';
@@ -133,9 +133,9 @@ if ($percentile) {
 
 if ($_GET['previous'] == 'yes') {
     $rrd_options .= ' LINE1.25:in' . $format . "X#666666:'Prev In \\\\n'";
-    $rrd_options .= ' AREA:in' . $format . 'X#99999966' . $stacked[0] . ':';
+    $rrd_options .= ' AREA:in' . $format . 'X#99999966' . $stacked['transparency'] . ':';
     $rrd_options .= ' LINE1.25:dout' . $format . "X#666666:'Prev Out'";
-    $rrd_options .= ' AREA:dout' . $format . 'X#99999966' . $stacked[0] . ':';
+    $rrd_options .= ' AREA:dout' . $format . 'X#99999966' . $stacked['transparency'] . ':';
 }
 
 $rrd_options .= ' HRULE:0#999999';

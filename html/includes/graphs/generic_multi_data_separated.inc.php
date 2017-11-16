@@ -62,7 +62,7 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= ' DEF:' . $out . $i . '=' . $rrd['filename'] . ':' . $ds_out . ':AVERAGE ';
     $rrd_options .= ' CDEF:inB' . $i . '=in' . $i . ",$multiplier,* ";
     $rrd_options .= ' CDEF:outB' . $i . '=out' . $i . ",$multiplier,*";
-    $rrd_options .= ' CDEF:outB' . $i . '_neg=outB' . $i . ',' . $stacked[1] . ',*';
+    $rrd_options .= ' CDEF:outB' . $i . '_neg=outB' . $i . ',' . $stacked['stacked'] . ',*';
     $rrd_options .= ' CDEF:octets' . $i . '=inB' . $i . ',outB' . $i . ',+';
 
     if (!$args['nototal']) {
@@ -81,7 +81,7 @@ foreach ($rrd_list as $rrd) {
         $stack = ':STACK';
     }
 
-    $rrd_options .= ' AREA:inB' . $i . '#' . $colour_in . $stacked[0] . ":'" . $descr . "'$stack";
+    $rrd_options .= ' AREA:inB' . $i . '#' . $colour_in . $stacked['transparency'] . ":'" . $descr . "'$stack";
     $rrd_options .= ' GPRINT:inB' . $i . ":LAST:%6.2lf%s$units";
     $rrd_options .= ' GPRINT:inB' . $i . ":AVERAGE:%6.2lf%s$units";
     $rrd_options .= ' GPRINT:inB' . $i . ":MAX:%6.2lf%s$units\l";
@@ -91,7 +91,7 @@ foreach ($rrd_list as $rrd) {
     }
 
     $rrd_options .= " 'HRULE:0#" . $colour_out . ':' . $descr_out . "'";
-    $rrd_optionsb .= " 'AREA:outB" . $i . '_neg#' . $colour_out . $stacked[0] . ":$stack'";
+    $rrd_optionsb .= " 'AREA:outB" . $i . '_neg#' . $colour_out . $stacked['transparency'] . ":$stack'";
     $rrd_options .= ' GPRINT:outB' . $i . ":LAST:%6.2lf%s$units";
     $rrd_options .= ' GPRINT:outB' . $i . ":AVERAGE:%6.2lf%s$units";
     $rrd_options .= ' GPRINT:outB' . $i . ":MAX:%6.2lf%s$units\l";
@@ -113,13 +113,13 @@ if (!$nototal) {
     $rrd_options .= ' CDEF:' . $in . 'octets=' . $in_thing . $pluses;
     $rrd_options .= ' CDEF:' . $out . 'octets=' . $out_thing . $pluses;
     $rrd_options .= ' CDEF:octets=inoctets,outoctets,+';
-    $rrd_options .= ' CDEF:doutoctets=outoctets,' . $stacked[1] . ',*';
+    $rrd_options .= ' CDEF:doutoctets=outoctets,' . $stacked['stacked'] . ',*';
     $rrd_options .= ' CDEF:inbits=inoctets,8,*';
     $rrd_options .= ' CDEF:outbits=outoctets,8,*';
     $rrd_options .= ' CDEF:doutbits=doutoctets,8,*';
     $rrd_options .= ' VDEF:percentile_in=inbits,' . $config['percentile_value'] . ',PERCENT';
     $rrd_options .= ' VDEF:percentile_out=outbits,' . $config['percentile_value'] . ',PERCENT';
-    $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $stacked[1] . ',* VDEF:dpercentile_outnp=dpercentile_outn,' . $config['percentile_value'] . ',PERCENT CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,' . $stacked[1] . ',*,+ VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
+    $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'] . ',* VDEF:dpercentile_outnp=dpercentile_outn,' . $config['percentile_value'] . ',PERCENT CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,' . $stacked['stacked'] . ',*,+ VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
     $rrd_options .= ' VDEF:totin=inoctets,TOTAL';
     $rrd_options .= ' VDEF:totout=outoctets,TOTAL';
     $rrd_options .= ' VDEF:tot=octets,TOTAL';

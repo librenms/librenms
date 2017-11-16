@@ -66,7 +66,7 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= ' DEF:' . $out . $i . '=' . $rrd['filename'] . ':' . $ds_out . ':AVERAGE ';
     $rrd_options .= ' CDEF:inB' . $i . '=in' . $i . ",$multiplier,* ";
     $rrd_options .= ' CDEF:outB' . $i . '=out' . $i . ",$multiplier,*";
-    $rrd_options .= ' CDEF:outB' . $i . '_neg=outB' . $i . ',' . $stacked[1] . ',*';
+    $rrd_options .= ' CDEF:outB' . $i . '_neg=outB' . $i . ',' . $stacked['stacked'] . ',*';
     $rrd_options .= ' CDEF:octets' . $i . '=inB' . $i . ',outB' . $i . ',+';
 
     if (!$nototal) {
@@ -79,7 +79,7 @@ foreach ($rrd_list as $rrd) {
         $stack = ':STACK';
     }
 
-    $rrd_options .= ' AREA:inB' . $i . '#' . $colour_in . $stacked[0] . ":'" . $descr . "'$stack";
+    $rrd_options .= ' AREA:inB' . $i . '#' . $colour_in . $stacked['transparency'] . ":'" . $descr . "'$stack";
     if (!$nodetails) {
         $rrd_options .= ' GPRINT:inB' . $i . ":LAST:%6.2lf%s$units";
         $rrd_options .= ' GPRINT:inB' . $i . ":AVERAGE:%6.2lf%s$units";
@@ -92,7 +92,7 @@ foreach ($rrd_list as $rrd) {
     }
 
     $rrd_options .= " 'HRULE:0#" . $colour_out . ':' . $descr_out . "'";
-    $rrd_optionsb .= " 'AREA:outB" . $i . '_neg#' . $colour_out . $stacked[0] . ":$stack'";
+    $rrd_optionsb .= " 'AREA:outB" . $i . '_neg#' . $colour_out . $stacked['transparency'] . ":$stack'";
 
     if (!$nodetails) {
         $rrd_options .= ' GPRINT:outB' . $i . ":LAST:%6.2lf%s$units";
