@@ -83,6 +83,7 @@ pages:
       - Alerting/Entities.md
       - Alerting/Macros.md
       - Alerting/Testing.md
+      - Alerting/Rule-Mapping.md
   - 9. Getting help:
       - Support/FAQ.md
       - Support/Install Validation.md
@@ -120,7 +121,6 @@ pages:
       - Alerting/Entities.md
       - Alerting/Macros.md
       - Alerting/Rules.md
-      - Alerting/Rule-Mapping.md
       - Developing/os/Initial-Detection.md
       - Developing/os/Mem-CPU-Information.md
       - Developing/os/Test-Units.md
