@@ -123,7 +123,7 @@ if ($device['os_group'] == 'cisco') {
 
                 // Set thresholds to null
                 $limit          = null;
-                $low_limit      = null;
+                $limit_low      = null;
                 $warn_limit     = null;
                 $warn_limit_low = null;
 
@@ -153,13 +153,9 @@ if ($device['os_group'] == 'cisco') {
                 // End Threshold code
                 $ok = true;
 
-                if ($current == '-127') {
+                if ($current == '-127' || $descr == '') {
                     $ok = false;
-                }                              //end if
-                // if ($type == "temperature" && $current < 1) { $ok = FALSE; }        // False reading. Temperature <1 :)
-                if ($descr == '') {
-                    $ok = false;
-                }                                //end if
+                }
 
                 if ($ok) {
                     $phys_index = $entity_array[$index]['entPhysicalContainedIn'];
