@@ -9,7 +9,7 @@ Example Dashboard
 
 ### Widgets
 LibreNMS has a whole list of Widgets to select from. 
---------------------------------------------------------------
+
 + Alerts Widget: Displays all alert notifications.
 + Availability Map: Displays all devices with colored tiles, green up, yellow for warning (device has been restarted in last 24 hours),red   for down. You can also list all services and ignored/disabled devcies in this widget.
 + Componet Status: List all componets Ok state, Warning state, Critical state.
@@ -25,7 +25,6 @@ LibreNMS has a whole list of Widgets to select from.
 + Top Devices: By Traffic, or  Uptime, or Response time, or Poller Duration, or Procssor load, or Memory Usage.
 + Top Interfaces: Lists top interfaces by traffic utilization.
 + Worldmap: displays all your devices locations. From syslocation or from override sysLocation.
---------------------------------------------------------------------
 
 List of Widgets: 
 ![List of Widgets][image of widgets]
@@ -54,5 +53,11 @@ Note you may need to play with the width and height and also size your widget pr
 Also some web pages may not support html embeded or iframe.
 ![Example embed webpage](/img/example-embed-website.png)
 
+### How to create ports graph
+In the dashboard, you want to create an interface graph select the widget called "Graph" 
+* Graph: select "Port" "Bits"
+![port-bits-graph](/img/port-bits-graph.png)
 
+* Note: you can map the port by description or the alias or by port id. You will need to know this in order to map the port to the graph. 
 
+![port-bits-graph](/img/port-bits-port.png)
