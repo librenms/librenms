@@ -53,4 +53,3 @@ discovery_modules:
     stp: 0
     vlans: 0
     ports: 0
-    os: 0
