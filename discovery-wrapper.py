@@ -162,7 +162,7 @@ if ('distributed_poller' in config and
             else:
                 print "Registered as Node joining Master %s" % memc.get("discovery.master")
                 IsNode = True
-                if memc.get("discovery.master") is None:
+                if memc.get("discovery.nodes") is None:
                     memc.set("discovery.nodes", 0, 300)
                 else:
                     memc.incr("discovery.nodes")
