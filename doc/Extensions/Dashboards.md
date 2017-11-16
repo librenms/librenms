@@ -54,8 +54,8 @@ Also some web pages may not support html embeded or iframe.
 ![Example embed webpage](/img/example-embed-website.png)
 
 ### How to create ports graph
-In the dashboard, you want to create an interface graph select the widget called `graph` 
-* Graph: select `Port` `Bits`
+In the dashboard, you want to create an interface graph select the widget called "Graph" 
+* Graph: select "Port" "Bits"
 ![port-bits-graph](/img/port-bits-graph.png)
 
 * Note: you can map the port by description or the alias or by port id. You will need to know this in order to map the port to the graph. 
