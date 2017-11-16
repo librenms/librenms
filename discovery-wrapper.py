@@ -162,7 +162,10 @@ if ('distributed_poller' in config and
             else:
                 print "Registered as Node joining Master %s" % memc.get("discovery.master")
                 IsNode = True
-                memc.incr("discovery.nodes")
+                if memc.get("discovery.master") is None:
+                    memc.set("discovery.nodes", 0, 300)
+                else:
+                    memc.incr("discovery.nodes")
             distdisco = True
         else:
             print "Could not connect to memcached, disabling distributed discovery."
