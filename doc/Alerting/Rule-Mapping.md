@@ -9,7 +9,7 @@ Example: Alert Rule Mapping
 ![Example Rule Mapping](/img/example-alert-rule-mapping.png)
 
 
-We have an alert rule that checks HPE iLo Power Supply Failure. You probably don't want this alert rule being checked on none HPE iLo devices.  So in the picture below you can see the Alert rule is mapped to a Device group that was created just for HPE iLo devices.
+In this example we have an alert rule that checks HPE iLo Power Supply Failure. You probably don't want this alert rule being checked on none HPE iLo devices.  So in the picture below you can see the Alert rule is mapped to a Device group that was created just for HPE iLo devices.
 
 Example: HPE iLo Rule map
 ![Example Rule Mapping](/img/example-hpe-rule-map.png)
