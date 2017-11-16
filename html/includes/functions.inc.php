@@ -1646,7 +1646,7 @@ function generate_fill_select_js($list_type, $selector, $selected = null)
 
 use LibreNMS\Config;
 
-function generate_stacked_graphs($transparency = '45')
+function generate_stacked_graphs($transparency = '88')
 {
     if (Config::get('webui.graph_stacked') == true) {
         return array('transparency' => $transparency, 'stacked' => '1');

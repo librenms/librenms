@@ -132,7 +132,7 @@ if ($_GET['previous'] == 'yes') {
 
 if ($_GET['previous'] == 'yes') {
     $rrd_options .= ' AREA:in' . $format . 'X#99999999' . $stacked['transparency'] . ':';
-    $rrd_optionsb .= ' AREA:dout' . $format . 'X#99999999' . $stacked['transparency'] . ':';
+    $rrd_optionsb .= ' AREA:dout' . $format . 'X#99999999' . $transparency . ':';
     $rrd_options .= ' LINE1.25:in' . $format . 'X#666666:';
     $rrd_optionsb .= ' LINE1.25:dout' . $format . 'X#666666:';
 }
@@ -184,5 +184,3 @@ if (!$args['nototal']) {
 
 $rrd_options .= $rrd_optionsb;
 $rrd_options .= ' HRULE:0#999999';
-
-unset($stacked);
