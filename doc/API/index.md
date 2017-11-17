@@ -1,7 +1,4 @@
 source: API/index.md
-[TOC]
-        
-Describes the API structure.
 
 # Structure
 
