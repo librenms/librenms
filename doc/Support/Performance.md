@@ -67,9 +67,11 @@ The default 16 threads that `poller-wrapper.py` runs as isn't necessarily the op
 
 This can be changed by going to the cron job for librenms. Usually in /etc/cron.d/librenms and changing the "16"
 
+```
 */5  *    * * *   librenms    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
+```
 
-KEEP in MIND that this dosnt always help, it depnds on your system and CPU. So Be careful. 
+KEEP in MIND that this doesn't always help, it depends on your system and CPU. So be careful. 
 
 
 #### Recursive DNS
@@ -84,17 +86,13 @@ or it's disabled then we still collect data. For the most part this is fine as t
 either deleted or disabled then this approach isn't optimal. So to counter this you can enable 'selected port polling' per device within the edit device -> misc section or by
 globally enabling it (not recommended): `$config['polling']['selected_ports'] = true;`. You can also set it for a specific OS: `$config['os']['ios']['polling']['selected_ports'] = true;`. 
 
-If you would like to see if you should turn this on then run this query in MySQL: `select device_id, count(*) as total from ports where deleted=1 group by device_id order by total desc;`. You will see output like the following:
+Running `./scripts/collect-port-polling.php` will poll your devices with both full and selective polling, display a table with the difference and optionally enable or disable selected ports polling for devices which would benefit from a change.
+Note that it doesn't continously re-evaluate this, it will only be updated when the script is run. There are a number of options:
 
-| device_id | total |
-| --------: | ----: |
-|       128 |   339 |
-|        92 |    56 |
-|        41 |    41 |
-|        38 |     3 |
-|        81 |     2 |
-
-Here device id 128 and potentially 92 and 41 are likely candidates for this feature to be enabled on. Turn it on and then closely monitor the device for the next 15-30 minutes.
+```
+-h <device id> | <device hostname wildcard>  Poll single device or wildcard hostname
+-e <percentage>                              Enable/disable selected ports polling for devices which would benefit <percentage> from a change
+```
 
 ### Web interface
 
