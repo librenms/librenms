@@ -381,7 +381,7 @@ function sensor_low_limit($class, $current)
 
     switch ($class) {
         case 'temperature':
-            $limit = ($current * 0.7);
+            $limit = $current - 10;
             break;
         case 'voltage':
             if ($current < 0) {
@@ -426,7 +426,7 @@ function sensor_limit($class, $current)
 
     switch ($class) {
         case 'temperature':
-            $limit = ($current * 1.60);
+            $limit = $current + 20;
             break;
         case 'voltage':
             if ($current < 0) {
