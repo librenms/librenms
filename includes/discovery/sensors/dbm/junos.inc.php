@@ -25,7 +25,9 @@ foreach ($pre_cache['junos_oids'] as $index => $entry) {
         $current = $entry['jnxDomCurrentRxLaserPower'];
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'rx-'.$index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+        $entity_link_type = 'port';
+        $entity_link_index = dbFetchCell('SELECT `ifIndex` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id']));
+        discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'rx-'.$index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, null, $entity_link_type, $entity_link_index);
     }
 
     if (is_numeric($entry['jnxDomCurrentTxLaserOutputPower']) && $entry['jnxDomCurrentTxLaserOutputPower'] && $entry['jnxDomCurrentRxLaserPower']) {
@@ -38,7 +40,9 @@ foreach ($pre_cache['junos_oids'] as $index => $entry) {
         $current = $entry['jnxDomCurrentTxLaserOutputPower'];
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'tx-'.$index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+        $entity_link_type = 'port';
+        $entity_link_index = dbFetchCell('SELECT `ifIndex` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id']));
+        discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'tx-'.$index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, null, $entity_link_type, $entity_link_index);
     }
     if (is_numeric($entry['jnxDomCurrentModuleLaneCount']) && $entry['jnxDomCurrentModuleLaneCount'] > 1) {
         for ($x=0; $x<$entry['jnxDomCurrentModuleLaneCount']; $x++) {
@@ -53,7 +57,9 @@ foreach ($pre_cache['junos_oids'] as $index => $entry) {
                 $current = $lane['jnxDomCurrentLaneRxLaserPower']/$divisor;
                 $entPhysicalIndex = $index;
                 $entPhysicalIndex_measured = 'ports';
-                discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'rx-'.$index.'.'.$x, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+                $entity_link_type = 'port';
+                $entity_link_index = dbFetchCell('SELECT `ifIndex` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id']));
+                discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'rx-'.$index.'.'.$x, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, null, $entity_link_type, $entity_link_index);
             }
             if (is_numeric($lane['jnxDomCurrentLaneTxLaserOutputPower']) && $lane['jnxDomCurrentLaneTxLaserOutputPower'] && $lane['jnxDomCurrentLaneRxLaserPower']) {
                 $oid = '.1.3.6.1.4.1.2636.3.60.1.2.1.1.8.'.$index.'.'.$x;
@@ -65,7 +71,9 @@ foreach ($pre_cache['junos_oids'] as $index => $entry) {
                 $current = $lane['jnxDomCurrentLaneTxLaserOutputPower']/$divisor;
                 $entPhysicalIndex = $index;
                 $entPhysicalIndex_measured = 'ports';
-                discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'tx-'.$index.'.'.$x, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+                $entity_link_type = 'port';
+                $entity_link_index = dbFetchCell('SELECT `ifIndex` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id']));
+                discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'tx-'.$index.'.'.$x, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, null, $entity_link_type, $entity_link_index);
             }
         }
     }
