@@ -210,8 +210,10 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
             $port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $port_stats, 'IF-MIB');
         }
         $hc_test = array_slice($port_stats, 0, 1);
-        if ((!isset($hc_test[0]['ifHCInOctets']) && !is_numeric($hc_test[0]['ifHCInOctets'])) ||
-            ((!isset($hc_test[0]['ifHighSpeed']) && !is_numeric($hc_test[0]['ifHighSpeed'])))) {
+        if (!isset($hc_test[0]['ifHCInOctets'])    || !is_numeric($hc_test[0]['ifHCInOctets'])    ||
+            !isset($hc_test[0]['ifHighSpeed'])     || !is_numeric($hc_test[0]['ifHighSpeed'])     ||
+            !isset($hc_test[0]['ifHCInUcastPkts']) || !is_numeric($hc_test[0]['ifHCInUcastPkts']) ||
+            $hc_test[0]['ifHCInUcastPkts'] <= 0) {
             $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB', null, '-OQUst');
         } else {
             foreach ($ifmib_oids as $oid) {
