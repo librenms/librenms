@@ -19,7 +19,7 @@ function authToken(\Slim\Route $route)
     $app   = \Slim\Slim::getInstance();
     $token = $app->request->headers->get('X-Auth-Token');
     if (isset($token) && !empty($token)) {
-        if (!method_exists(AuthorizerFactory::get(), 'get_user')) {
+        if (!method_exists(AuthorizerFactory::get(), 'getUser')) {
             $username = dbFetchCell('SELECT `U`.`username` FROM `api_tokens` AS AT JOIN `users` AS U ON `AT`.`user_id`=`U`.`user_id` WHERE `AT`.`token_hash`=?', array($token));
         } else {
             $username = AuthorizerFactory::get()->getUser(dbFetchCell('SELECT `AT`.`user_id` FROM `api_tokens` AS AT WHERE `AT`.`token_hash`=?', array($token)));
