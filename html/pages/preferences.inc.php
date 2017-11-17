@@ -18,7 +18,7 @@ if ($_SESSION['userlevel'] == 11) {
             if ($_POST['new_pass'] == '' || $_POST['new_pass2'] == '') {
                 $changepass_message = 'Password must not be blank.';
             } elseif ($_POST['new_pass'] == $_POST['new_pass2']) {
-                Auth::get()->changepassword($_SESSION['username'], $_POST['new_pass']);
+                Auth::get()->changePassword($_SESSION['username'], $_POST['new_pass']);
                 $changepass_message = 'Password Changed.';
             } else {
                 $changepass_message = "Passwords don't match.";
@@ -36,7 +36,7 @@ if ($_SESSION['userlevel'] == 11) {
 
     include 'includes/update-preferences-password.inc.php';
 
-    if (Auth::get()->passwordscanchange($_SESSION['username'])) {
+    if (Auth::get()->canUpdatePasswords($_SESSION['username'])) {
         echo '<h3>Change Password</h3>';
         echo '<hr>';
         echo "<div class='well'>";

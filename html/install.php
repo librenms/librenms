@@ -475,9 +475,9 @@ if (!file_exists("../config.php")) {
       </div>
       <div class="col-md-6">
 <?php
-if (Auth::get()->authUsermanagement()) {
+if (Auth::get()->canManageUsers()) {
     if (!Auth::get()->userExists($add_user)) {
-        if (Auth::get()->adduser($add_user, $add_pass, '10', $add_email)) {
+        if (Auth::get()->addUser($add_user, $add_pass, '10', $add_email)) {
             echo("<div class='alert alert-success'>User has been added successfully</div>");
             $proceed = 0;
         } else {

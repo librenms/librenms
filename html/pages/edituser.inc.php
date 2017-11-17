@@ -253,8 +253,8 @@ if ($_SESSION['userlevel'] != '10') {
 
                 Auth::get()->updateUser($vars['user_id'], $vars['new_realname'], $vars['new_level'], $vars['can_modify_passwd'], $vars['new_email']);
                 print_message('User has been updated');
-                if (!empty($vars['new_pass1']) && $vars['new_pass1'] == $vars['new_pass2'] && Auth::get()->passwordscanchange($vars['cur_username'])) {
-                    if (Auth::get()->changepassword($vars['cur_username'], $vars['new_pass1']) == 1) {
+                if (!empty($vars['new_pass1']) && $vars['new_pass1'] == $vars['new_pass2'] && Auth::get()->canUpdatePasswords($vars['cur_username'])) {
+                    if (Auth::get()->changePassword($vars['cur_username'], $vars['new_pass1']) == 1) {
                         print_message("User password has been updated");
                     } else {
                         print_error("Password couldn't be updated");
@@ -337,7 +337,7 @@ if ($_SESSION['userlevel'] != '10') {
     </div>
   </div>";
 
-                    if (Auth::get()->passwordscanchange($users_details['username'])) {
+                    if (Auth::get()->canUpdatePasswords($users_details['username'])) {
                         echo "
         <div class='form-group'>
             <label for='new_pass1' class='col-sm-2 control-label'>Password</label>

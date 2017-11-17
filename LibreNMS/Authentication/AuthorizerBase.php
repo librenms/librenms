@@ -209,23 +209,23 @@ abstract class AuthorizerBase implements Authorizer
         return false;
     }
 
-    public function passwordscanchange($username = '')
+    public function canUpdatePasswords($username = '')
     {
         return 0;
     }
 
-    public function changepassword($username, $newpassword)
+    public function changePassword($username, $newpassword)
     {
         //not supported by default
         return 0;
     }
 
-    public function authUsermanagement()
+    public function canManageUsers()
     {
         return static::$HAS_AUTH_USERMANAGEMENT;
     }
 
-    public function adduser($username, $password, $level = 0, $email = '', $realname = '', $can_modify_passwd = 0, $description = '')
+    public function addUser($username, $password, $level = 0, $email = '', $realname = '', $can_modify_passwd = 0, $description = '')
     {
         //not supported by default
         return 0;
@@ -239,7 +239,7 @@ abstract class AuthorizerBase implements Authorizer
 
     abstract public function getUser($user_id);
 
-    public function deluser($userid)
+    public function deleteUser($userid)
     {
         //not supported by default
         return 0;

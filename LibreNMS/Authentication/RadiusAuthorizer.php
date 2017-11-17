@@ -33,14 +33,14 @@ class RadiusAuthorizer extends AuthorizerBase
         }
 
         if ($this->radius->accessRequest($username, $password) === true) {
-            $this->adduser($username, $password);
+            $this->addUser($username, $password);
             return true;
         }
 
         throw new AuthenticationException();
     }
 
-    public function adduser($username, $password, $level = 1, $email = '', $realname = '', $can_modify_passwd = 0, $description = '')
+    public function addUser($username, $password, $level = 1, $email = '', $realname = '', $can_modify_passwd = 0, $description = '')
     {
         // Check to see if user is already added in the database
         if (!$this->userExists($username)) {
@@ -81,7 +81,7 @@ class RadiusAuthorizer extends AuthorizerBase
     }
 
 
-    public function deluser($userid)
+    public function deleteUser($userid)
     {
         dbDelete('bill_perms', '`user_id` =  ?', array($userid));
         dbDelete('devices_perms', '`user_id` =  ?', array($userid));

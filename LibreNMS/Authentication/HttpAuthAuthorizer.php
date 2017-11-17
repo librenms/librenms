@@ -21,7 +21,7 @@ class HttpAuthAuthorizer extends AuthorizerBase
     }
 
 
-    public function adduser($username, $password, $level = 0, $email = '', $realname = '', $can_modify_passwd = 1, $description = '')
+    public function addUser($username, $password, $level = 0, $email = '', $realname = '', $can_modify_passwd = 1, $description = '')
     {
         if (!$this->userExists($username)) {
             $hasher    = new PasswordHash(8, false);

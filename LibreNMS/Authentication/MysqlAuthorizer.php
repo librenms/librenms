@@ -19,7 +19,7 @@ class MysqlAuthorizer extends AuthorizerBase
             if ($row['password'] == $encrypted_old) {
                 $row_type = dbFetchRow('DESCRIBE users password');
                 if ($row_type['Type'] == 'varchar(34)') {
-                    $this->changepassword($username, $password);
+                    $this->changePassword($username, $password);
                 }
 
                 return true;
@@ -27,7 +27,7 @@ class MysqlAuthorizer extends AuthorizerBase
                 $row_type = dbFetchRow('DESCRIBE users password');
                 if ($row_type['Type'] == 'varchar(60)') {
                     if ($row['password'] == crypt($password, $row['password'])) {
-                        $this->changepassword($username, $password);
+                        $this->changePassword($username, $password);
                     }
                 }
             }
@@ -48,7 +48,7 @@ class MysqlAuthorizer extends AuthorizerBase
     }//end reauthenticate()
 
 
-    public function passwordscanchange($username = '')
+    public function canUpdatePasswords($username = '')
     {
         /*
          * By default allow the password to be modified, unless the existing
@@ -84,14 +84,14 @@ class MysqlAuthorizer extends AuthorizerBase
     }//end generateSalt()
 
 
-    public function changepassword($username, $password)
+    public function changePassword($username, $password)
     {
         $hasher    = new PasswordHash(8, false);
         $encrypted = $hasher->HashPassword($password);
         return dbUpdate(array('password' => $encrypted), 'users', '`username` = ?', array($username));
     }//end changepassword()
 
-    public function adduser($username, $password, $level = 0, $email = '', $realname = '', $can_modify_passwd = 1, $description = '')
+    public function addUser($username, $password, $level = 0, $email = '', $realname = '', $can_modify_passwd = 1, $description = '')
     {
         if (!$this->userExists($username)) {
             $hasher    = new PasswordHash(8, false);
@@ -130,7 +130,7 @@ class MysqlAuthorizer extends AuthorizerBase
     }//end getUserid()
 
 
-    public function deluser($userid)
+    public function deleteUser($userid)
     {
         dbDelete('bill_perms', '`user_id` =  ?', array($userid));
         dbDelete('devices_perms', '`user_id` =  ?', array($userid));

@@ -244,7 +244,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         return array();
     }
 
-    public function deluser($userid)
+    public function deleteUser($userid)
     {
         dbDelete('bill_perms', '`user_id` =  ?', array($userid));
         dbDelete('devices_perms', '`user_id` =  ?', array($userid));
@@ -298,8 +298,6 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             'descr' => '',
             'level' => $this->getUserlevel($entry['samaccountname'][0]),
             'can_modify_passwd' => 0,
-            'twofactor' => 0,
-            // 'dashboard' => 'broken!',
         );
     }
 

@@ -658,7 +658,7 @@ if ($_SESSION['userlevel'] >= '10') {
           <li role="presentation" class="divider"></li>
 
 <?php if ($_SESSION['userlevel'] >= '10') {
-    if (Auth::get()->authUsermanagement()) {
+    if (Auth::get()->canManageUsers()) {
         echo('
            <li><a href="adduser/"><i class="fa fa-user-plus fa-fw fa-lg" aria-hidden="true"></i> Add User</a></li>
            <li><a href="deluser/"><i class="fa fa-user-times fa-fw fa-lg" aria-hidden="true"></i> Remove User</a></li>

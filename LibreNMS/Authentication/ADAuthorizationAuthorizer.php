@@ -52,8 +52,8 @@ class ADAuthorizationAuthorizer extends AuthorizerBase
             $_SESSION['username'] = mres($_SERVER['REMOTE_USER']);
 
             if ($this->userExists($_SESSION['username'])) {
-                $this->adduser($username, null);
-                return 1;
+                $this->addUser($username, null);
+                return true;
             }
 
             $_SESSION['username'] = Config::get('http_auth_guest');
@@ -63,7 +63,7 @@ class ADAuthorizationAuthorizer extends AuthorizerBase
         throw new AuthenticationException();
     }
 
-    public function adduser($username, $password, $level = 0, $email = '', $realname = '', $can_modify_passwd = 0, $description = '')
+    public function addUser($username, $password, $level = 0, $email = '', $realname = '', $can_modify_passwd = 0, $description = '')
     {
         // Check to see if user is already added in the database
         if (!$this->userExists($username)) {
@@ -173,7 +173,7 @@ class ADAuthorizationAuthorizer extends AuthorizerBase
     }
 
 
-    public function deluser($userid)
+    public function deleteUser($userid)
     {
         dbDelete('bill_perms', '`user_id` =  ?', array($userid));
         dbDelete('devices_perms', '`user_id` =  ?', array($userid));
