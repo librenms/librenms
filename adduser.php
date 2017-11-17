@@ -12,7 +12,7 @@
  *
  */
 
-use LibreNMS\Authentication\AuthorizerFactory;
+use LibreNMS\Authentication\Auth;
 
 $init_modules = array();
 if (php_sapi_name() != 'cli') {
@@ -20,10 +20,10 @@ if (php_sapi_name() != 'cli') {
 }
 require __DIR__ . '/includes/init.php';
 
-if (AuthorizerFactory::get()->authUsermanagement()) {
+if (Auth::get()->authUsermanagement()) {
     if (isset($argv[1]) && isset($argv[2]) && isset($argv[3])) {
-        if (!AuthorizerFactory::get()->userExists($argv[1])) {
-            if (AuthorizerFactory::get()->adduser($argv[1], $argv[2], $argv[3], @$argv[4])) {
+        if (!Auth::get()->userExists($argv[1])) {
+            if (Auth::get()->adduser($argv[1], $argv[2], $argv[3], @$argv[4])) {
                 echo 'User '.$argv[1]." added successfully\n";
             }
         } else {

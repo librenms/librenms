@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Authentication\AuthorizerFactory;
+use LibreNMS\Authentication\Auth;
 use LibreNMS\Authentication\TwoFactor;
 use LibreNMS\Exceptions\AuthenticationException;
 
@@ -27,7 +27,7 @@ dbDelete('session', '`session_expiry` <  ?', array(time()));
 
 session_start();
 
-$authorizer =  AuthorizerFactory::get();
+$authorizer =  Auth::get();
 if ($vars['page'] == 'logout' && $authorizer->sessionAuthenticated()) {
     $authorizer->logOutUser();
     header('Location: ' . $config['base_url']);

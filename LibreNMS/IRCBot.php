@@ -20,7 +20,7 @@
 
 namespace LibreNMS;
 
-use LibreNMS\Authentication\AuthorizerFactory;
+use LibreNMS\Authentication\Auth;
 use LibreNMS\Exceptions\DatabaseConnectException;
 
 class IRCBot
@@ -545,11 +545,11 @@ class IRCBot
             foreach ($hosts as $host) {
                 $host = preg_replace("/\*/", ".*", $host);
                 if (preg_match("/$host/", $this->getUserHost($this->data))) {
-                    $user_id = AuthorizerFactory::get()->getUserid(mres($nms_user));
-                    $user = AuthorizerFactory::get()->getUser($user_id);
+                    $user_id = Auth::get()->getUserid(mres($nms_user));
+                    $user = Auth::get()->getUser($user_id);
                     $this->user['name'] = $user['username'];
                     $this->user['id']   = $user_id;
-                    $this->user['level'] = AuthorizerFactory::get()->getUserlevel($user['username']);
+                    $this->user['level'] = Auth::get()->getUserlevel($user['username']);
                     $this->user['expire'] = (time() + ($this->config['irc_authtime'] * 3600));
                     if ($this->user['level'] < 5) {
                         foreach (dbFetchRows('SELECT device_id FROM devices_perms WHERE user_id = ?', array($this->user['id'])) as $tmp) {
@@ -584,8 +584,8 @@ class IRCBot
         if (strlen($params[0]) == 64) {
             if ($this->tokens[$this->getUser($this->data)] == $params[0]) {
                 $this->user['expire'] = (time() + ($this->config['irc_authtime'] * 3600));
-                $tmp_user = AuthorizerFactory::get()->getUser($this->user['id']);
-                $tmp = AuthorizerFactory::get()->getUserlevel($tmp_user['username']);
+                $tmp_user = Auth::get()->getUser($this->user['id']);
+                $tmp = Auth::get()->getUserlevel($tmp_user['username']);
                 $this->user['level'] = $tmp;
                 if ($this->user['level'] < 5) {
                     foreach (dbFetchRows('SELECT device_id FROM devices_perms WHERE user_id = ?', array($this->user['id'])) as $tmp) {
@@ -602,8 +602,8 @@ class IRCBot
                 return $this->respond('Nope.');
             }
         } else {
-            $user_id = AuthorizerFactory::get()->getUserid(mres($params[0]));
-            $user = AuthorizerFactory::get()->getUser($user_id);
+            $user_id = Auth::get()->getUserid(mres($params[0]));
+            $user = Auth::get()->getUser($user_id);
             if ($user['email'] && $user['username'] == $params[0]) {
                 $token = hash('gost', openssl_random_pseudo_bytes(1024));
                 $this->tokens[$this->getUser($this->data)] = $token;

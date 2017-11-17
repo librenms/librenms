@@ -12,7 +12,7 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
-use LibreNMS\Authentication\AuthorizerFactory;
+use LibreNMS\Authentication\Auth;
 
 /**
  * Compare $t with the value of $vars[$v], if that exists
@@ -1603,7 +1603,7 @@ function get_dashboards($user_id = null)
     foreach ($dashboards as $dashboard) {
         $duid = $dashboard['user_id'];
         if (!isset($usernames[$duid])) {
-            $user = AuthorizerFactory::get()->getUser($duid);
+            $user = Auth::get()->getUser($duid);
             $usernames[$duid] = $user['username'];
         }
 

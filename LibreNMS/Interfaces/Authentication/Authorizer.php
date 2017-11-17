@@ -31,4 +31,10 @@ interface Authorizer
     public function canUpdateUsers();
 
     public function updateUser($user_id, $realname, $level, $can_modify_passwd, $email);
+
+    public function logOutUser($message = 'Logged Out');
+
+    public function logInUser();
+
+    public function sessionAuthenticated();
 }

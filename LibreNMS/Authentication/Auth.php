@@ -5,7 +5,7 @@ namespace LibreNMS\Authentication;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Authentication\Authorizer;
 
-class AuthorizerFactory
+class Auth
 {
     protected static $_instance;
 
@@ -27,11 +27,12 @@ class AuthorizerFactory
                 'ldap-authorization' => 'LibreNMS\Authentication\LdapAuthorizationAuthorizer',
             );
 
-            if (!isset($configToClassMap[Config::get('auth_mechanism')])) {
-                throw new \RuntimeException(Config::get('auth_mechanism') . ' not found as auth_mechanism');
+            $auth_mechanism = Config::get('auth_mechanism');
+            if (!isset($configToClassMap[$auth_mechanism])) {
+                throw new \RuntimeException($auth_mechanism . ' not found as auth_mechanism');
             }
 
-            static::$_instance = new $configToClassMap[Config::get('auth_mechanism')]();
+            static::$_instance = new $configToClassMap[$auth_mechanism]();
         }
         return static::$_instance;
     }

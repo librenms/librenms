@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Authentication\AuthorizerFactory;
+use LibreNMS\Authentication\Auth;
 use LibreNMS\Authentication\TwoFactor;
 
 $no_refresh = true;
@@ -14,11 +14,11 @@ if ($_SESSION['userlevel'] == 11) {
     demo_account();
 } else {
     if ($_POST['action'] == 'changepass') {
-        if (AuthorizerFactory::get()->authenticate($_SESSION['username'], $_POST['old_pass'])) {
+        if (Auth::get()->authenticate($_SESSION['username'], $_POST['old_pass'])) {
             if ($_POST['new_pass'] == '' || $_POST['new_pass2'] == '') {
                 $changepass_message = 'Password must not be blank.';
             } elseif ($_POST['new_pass'] == $_POST['new_pass2']) {
-                AuthorizerFactory::get()->changepassword($_SESSION['username'], $_POST['new_pass']);
+                Auth::get()->changepassword($_SESSION['username'], $_POST['new_pass']);
                 $changepass_message = 'Password Changed.';
             } else {
                 $changepass_message = "Passwords don't match.";
@@ -36,7 +36,7 @@ if ($_SESSION['userlevel'] == 11) {
 
     include 'includes/update-preferences-password.inc.php';
 
-    if (AuthorizerFactory::get()->passwordscanchange($_SESSION['username'])) {
+    if (Auth::get()->passwordscanchange($_SESSION['username'])) {
         echo '<h3>Change Password</h3>';
         echo '<hr>';
         echo "<div class='well'>";

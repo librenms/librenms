@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Authentication\AuthorizerFactory;
+use LibreNMS\Authentication\Auth;
 
 echo '<div style="margin: 10px;">';
 
@@ -11,12 +11,12 @@ if ($_SESSION['userlevel'] < 10 || $_SESSION['userlevel'] > 10) {
 
     $pagetitle[] = 'Delete user';
 
-    if (AuthorizerFactory::get()->authUsermanagement()) {
+    if (Auth::get()->authUsermanagement()) {
         if ($vars['action'] == 'del') {
             $delete_username = dbFetchCell('SELECT username FROM users WHERE user_id = ?', array($vars['id']));
 
             if ($vars['confirm'] == 'yes') {
-                if (AuthorizerFactory::get()->deluser($vars['id']) >= 0) {
+                if (Auth::get()->deluser($vars['id']) >= 0) {
                     print_message('<div class="infobox">User "'.$delete_username.'" deleted!');
                 } else {
                     print_error('Error deleting user "'.$delete_username.'"!');

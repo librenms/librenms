@@ -27,7 +27,7 @@
  * @param array $modules Which modules to initialize
  */
 
-use LibreNMS\Authentication\AuthorizerFactory;
+use LibreNMS\Authentication\Auth;
 
 global $config;
 
@@ -149,7 +149,7 @@ if (!module_selected('nodb', $init_modules)) {
 }
 
 try {
-    AuthorizerFactory::get();
+    Auth::get();
 } catch (Exception $exception) {
     print_error('ERROR: no valid auth_mechanism defined!');
     exit();
