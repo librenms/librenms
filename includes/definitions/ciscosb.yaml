@@ -7,16 +7,6 @@ icon: cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
-bad_ifXEntry:
-    - SF300-24
-    - SF300-24P
-    - SF300-48
-    - SF302-08
-    - SG300-10
-    - SG300-10SFP
-    - SG300-20
-    - SG300-28
-    - SG300-28MP
 poller_modules:
     bgp-peers: 0
     hr-mib: 0
