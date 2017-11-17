@@ -18,7 +18,7 @@ foreach (explode("\n", $oids) as $data) {
         $oid              = '.1.3.6.1.4.1.14988.1.1.3.10.'.$index;
         $temperature      = (snmp_get($device, $oid, '-Oqv') / $divisor);
 
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $insert_index, $type, $descr, $divisor, '1', null, null, null, null, $temperature);
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $insert_index, $type, $descr, $divisor, '1', -40, -35, 65, 70, $temperature);
         $insert_index++;
     }
 }
