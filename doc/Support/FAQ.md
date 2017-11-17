@@ -59,13 +59,7 @@ You have two options for adding a new device into LibreNMS.
 
 #### <a name="faq3"> How do I get help?</a>
 
-We have a few methods for you to get in touch to ask for help.
-
-[Community Forum](https://community.librenms.org)
-
-[Discord](https://t.libren.ms/discord)
-
-[Bug Reports](https://github.com/librenms/librenms/issues)
+[Getting Help](index.md)
 
 #### <a name="faq4"> What are the supported OSes for installing LibreNMS on?</a>
 
@@ -268,7 +262,7 @@ There is a known issue for net-snmp, which causes it to report incorrect disk si
 
 #### <a name="faq8"> How do I add support for a new OS?</a>
 
-Please see [Supporting a new OS](../Developing/Support-New-OS.md)
+Please see [Supporting a new OS](/#Support-for-a-New-OS)
 
 #### <a name="faq20"> What information do you need to add a new OS?</a>
 
