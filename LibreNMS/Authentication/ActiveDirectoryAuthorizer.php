@@ -264,7 +264,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         foreach ($ldap_groups as $ldap_group) {
             $search_filter = "(memberOf=$ldap_group)";
             if (Config::get('auth_ad_user_filter')) {
-                $search_filter = "(&{Config::get('auth_ad_user_filter')}$search_filter)";
+                $search_filter = "(&" . Config::get('auth_ad_user_filter') . $search_filter .")";
             }
             $attributes = array('samaccountname', 'displayname', 'objectsid', 'mail');
             $search = ldap_search($this->ldap_connection, Config::get('auth_ad_base_dn'), $search_filter, $attributes);
