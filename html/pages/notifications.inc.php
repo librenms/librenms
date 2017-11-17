@@ -221,7 +221,14 @@ $(function() {
           $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
           $("#"+notif).parent().parent().parent().fadeOut();
           $(".count-notif").each(function(){
-            this.innerHTML = this.innerHTML-1;
+              var new_count = this.innerHTML-1;
+              this.innerHTML = new_count;
+              if (new_count == 0) {
+                  $this = $(this);
+                  if ($this.hasClass('badge-danger')) {
+                      $this.removeClass('badge-danger');
+                  }
+              }
           });
         }
         else {
