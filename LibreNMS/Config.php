@@ -163,7 +163,7 @@ class Config
      * @param string $group webui group (only set when initially created)
      * @param string $sub_group webui subgroup (only set when initially created)
      */
-    public static function set($key, $value, $persist = false, $default ='', $descr='', $group='', $sub_group='')
+    public static function set($key, $value, $persist = false, $default = '', $descr = '', $group = '', $sub_group = '')
     {
         global $config;
 

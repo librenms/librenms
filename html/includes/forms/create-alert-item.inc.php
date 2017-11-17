@@ -80,7 +80,7 @@ if (empty($rule)) {
                     $_POST['target'] = $target;
                     $_POST['map_id'] = '';
                     include 'create-map-item.inc.php';
-                    unset($ret,$target,$raw,$rule,$msg,$map_id);
+                    unset($ret, $target, $raw, $rule, $msg, $map_id);
                 }
             }
         } else {

@@ -50,7 +50,7 @@ if (file_exists($config['install_dir']."/includes/alerts/transport.".$transport.
     $opts = $config['alert']['transports'][$transport];
     if ($opts) {
         eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' return false; };');
-        $tmp = $tmp($obj,$opts);
+        $tmp = $tmp($obj, $opts);
         if ($tmp) {
             $status = 'ok';
         }
