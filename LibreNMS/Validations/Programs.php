@@ -58,6 +58,12 @@ class Programs implements ValidationGroup
     {
         $target = ($bin == 'fping' ? '127.0.0.1' : '::1');
         $validator->execAsUser("$cmd $target 2>&1", $output, $return);
+
+        if ($output[count($output) -1] == '::1 is unreachable') {
+            $validator->warn("fping6 available, but ipv6 seems disabled");
+            return;
+        }
+
         $output = implode(" ", $output);
 
         if ($return === 0 && $output == "$target is alive") {
