@@ -217,10 +217,43 @@ function can_update_users()
 
 function get_user($user_id)
 {
-    foreach (get_userlist() as $user) {
-        if ($user['user_id'] === $user_id) {
+    $user = array();
+    try {
+        $connection = get_ldap_connection();
+
+        $filter = '(' . Config::get('auth_ldap_uid_attribute') . '=' . $user_id . ')';
+        $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
+        $entries = ldap_get_entries($connection, $search);
+
+        if ($entries['count']) {
+            foreach ($entries as $entry) {
+                $username = $entry['uid'][0];
+                $realname = $entry['cn'][0];
+                $uid_attr = strtolower(Config::get('auth_ldap_uid_attribute', 'uidnumber'));
+                $user_id = $entry[$uid_attr][0];
+                $email = $entry[Config::get('auth_ldap_emailattr', 'mail')][0];
+                $ldap_groups = get_group_list();
+                foreach ($ldap_groups as $ldap_group) {
+                    $ldap_comparison = ldap_compare(
+                        $connection,
+                        $ldap_group,
+                        Config::get('auth_ldap_groupmemberattr', 'memberUid'),
+                        get_membername($username)
+                    );
+                    if (!Config::has('auth_ldap_group') || $ldap_comparison === true) {
+                        $user[] = array(
+                            'username' => $username,
+                            'realname' => $realname,
+                            'user_id' => $user_id,
+                            'email' => $email,
+                        );
+                    }
+                }
+            }
             return $user;
         }
+    } catch (AuthenticationException $e) {
+        echo $e->getMessage() . PHP_EOL;
     }
     return 0;
 }
