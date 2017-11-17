@@ -1,8 +1,6 @@
 source: API/Routing.md
 
-## Routing
-
-#### Function: `list_bgp`
+### `list_bgp`
 
 List the current BGP sessions.
 
@@ -31,7 +29,7 @@ Output:
 }
 ```
 
-#### Function: `list_ipsec`
+### `list_ipsec`
 
 List the current IPSec tunnels which are active.
 

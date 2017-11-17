@@ -1,8 +1,6 @@
 source: API/Alerts.md
 
-## Alerts
-
-#### Function: `get_alert`
+### `get_alert`
 
 Get details of an alert
 
@@ -39,7 +37,7 @@ Output:
 }
 ```
 
-#### Function: `ack_alert`
+### `ack_alert`
 
 Acknowledge an alert
 
@@ -65,7 +63,7 @@ Output:
 }
 ```
 
-#### Function: `unmute_alert`
+### `unmute_alert`
 
 Unmute an alert
 
@@ -92,7 +90,7 @@ Output:
 ```
 
 
-#### Function: `list_alerts`
+### `list_alerts`
 
 List all alerts
 
@@ -128,7 +126,7 @@ Output:
 
 ## Rules
 
-#### Function: `get_alert_rule`
+### `get_alert_rule`
 
 Get the alert rule details.
 
@@ -165,7 +163,7 @@ Output:
 }
 ```
 
-#### Function: `delete_rule`
+### `delete_rule`
 
 Delete an alert rule by id
 
@@ -191,7 +189,7 @@ Output:
 }
 ```
 
-#### Function: `list_alert_rules`
+### `list_alert_rules`
 
 List the alert rules.
 
@@ -227,7 +225,7 @@ Output:
 }
 ```
 
-#### Function: `add_rule`
+### `add_rule`
 
 Add a new alert rule.
 
@@ -261,7 +259,7 @@ rules
 }
 ```
 
-#### Function: `edit_rule`
+### `edit_rule`
 
 Edit an existing alert rule
 

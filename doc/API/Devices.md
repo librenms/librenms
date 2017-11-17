@@ -1,8 +1,6 @@
 source: API/Devices.md
 
-## Devices
-
-#### Function: `del_device`
+### `del_device`
 
 Delete a given device.
 
@@ -36,7 +34,7 @@ Output:
 }
 ```
 
-#### Function: `get_device`
+### `get_device`
 
 Get details of a given device.
 
@@ -69,7 +67,7 @@ Output:
 }
 ```
 
-#### Function: `get_graphs`
+### `get_graphs`
 
 Get a list of available graphs for a device, this does not include ports.
 
@@ -109,7 +107,7 @@ Output:
 }
 ```
 
-#### Function: `list_available_health_graphs`
+### `list_available_health_graphs`
 This function allows to do three things:
 
   - Get a list of overall health graphs available.
@@ -214,7 +212,7 @@ Output:
 }
 ```
 
-#### Function: `get_health_graph`
+### `get_health_graph`
 
 Get a particular health class graph for a device, if you provide a sensor_id as well then a single sensor graph
 will be provided. If no sensor_id value is provided then you will be sent a stacked sensor graph.
@@ -249,7 +247,7 @@ Output is the graph of the particular health type sensor provided.
 
 
 
-#### Function: `get_graph_generic_by_hostname`
+### `get_graph_generic_by_hostname`
 
 Get a specific graph for a device, this does not include ports.
 
@@ -274,7 +272,7 @@ Output:
 
 Output is an image.
 
-#### Function: `get_port_graphs`
+### `get_port_graphs`
 
 Get a list of ports for a particular device.
 
@@ -311,7 +309,7 @@ Output:
     ]
 }
 ```
-#### Function: `get_device_ip_addresses`
+### `get_device_ip_addresses`
 
 Get a list of IP addresses (v4 and v6) associated with a device.
 
@@ -343,7 +341,7 @@ Output:
 }
 ```
 
-#### Function: `get_port_stack`
+### `get_port_stack`
 
 Get a list of port mappings for a device.  This is useful for showing physical ports that are in a virtual port-channel.
 
@@ -384,7 +382,7 @@ Output:
 }
 ```
 
-#### Function: `get_components`
+### `get_components`
 
 Get a list of components for a particular device.
 
@@ -448,7 +446,7 @@ Output:
 }
 ```
 
-#### Function: `add_components`
+### `add_components`
 
 Create a new component of a type on a particular device.
 
@@ -482,7 +480,7 @@ Output:
 }
 ```
 
-#### Function: `edit_components`
+### `edit_components`
 
 Edit an existing component on a particular device.
 
@@ -507,7 +505,7 @@ Output:
 
 Just take the JSON array from add_components or edit_components, edit as you wish and submit it back to edit_components.
 
-#### Function: `delete_components`
+### `delete_components`
 
 Delete an existing component on a particular device.
 
@@ -530,7 +528,7 @@ Output:
 }
 ```
 
-#### Function: `get_port_stats_by_port_hostname`
+### `get_port_stats_by_port_hostname`
 
 Get information about a particular port for a device.
 
@@ -563,7 +561,7 @@ Output:
 }
 ```
 
-#### Function: `get_graph_by_port_hostname`
+### `get_graph_by_port_hostname`
 
 Get a graph of a port for a particular device.
 
@@ -590,7 +588,7 @@ Output:
 
 Output is an image.
 
-#### Function: `list_devices`
+### `list_devices`
 
 Return a list of devices.
 
@@ -657,7 +655,7 @@ Output:
 }
 ```
 
-#### Function: `add_device`
+### `add_device`
 
 Add a new device.
 
@@ -705,7 +703,7 @@ Output:
 }
 ```
 
-#### Function: `list_oxidized`
+### `list_oxidized`
 
 List devices for use with Oxidized. If you have group support enabled then a group will also be returned based on your config.
 
@@ -735,7 +733,7 @@ Output:
 ]
 ```
 
-#### Function: `update_device_field`
+### `update_device_field`
 
 Update devices field in the database.
 
@@ -779,7 +777,7 @@ Output:
 ]
 ```
 
-#### Function: `get_device_groups`
+### `get_device_groups`
 
 List the device groups that a device is matched on.
 
@@ -794,42 +792,6 @@ Input (JSON):
 Examples:
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/groups
-```
-
-Output:
-```json
-[
-    {
-        "status": "ok",
-        "message": "Found 1 device groups",
-        "count": 1,
-        "groups": [
-        {
-            "id": "1",
-            "name": "Testing",
-            "desc": "Testing",
-            "pattern": "%devices.status = \"1\" &&"
-        }
-        ]
-    }
-]
-```
-
-## Device Groups
-
-#### Function: `get_devicegroups`
-
-List all device groups.
-
-Route: `/api/v0/devicegroups`
-
-Input (JSON):
-
-  -
-
-Examples:
-```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devicegroups
 ```
 
 Output:

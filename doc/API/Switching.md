@@ -1,8 +1,6 @@
 source: API/Switching.md
 
-## Switching
-
-#### Function: `get_vlans`
+### `get_vlans`
 
 Get a list of all VLANs for a given device.
 

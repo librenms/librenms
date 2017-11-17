@@ -1,8 +1,6 @@
 source: API/ARP.md
 
-## ARP
-
-#### Function: `list_arp`
+### `list_arp`
 
 Retrieve a specific ARP entry or all ARP enties for a device
 

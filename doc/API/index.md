@@ -55,7 +55,9 @@ Output from the API currently is via two output types.
 ## Endpoint Categories
 
 - [Devices](Devices.md)
+- [DeviceGroups](DeviceGroups.md)
 - [Ports](Ports.md)
+- [PortGroups](PortGroups.md)
 - [Alerts](Alerts.md)
 - [Routing](Routing.md)
 - [Switching](Switching.md)

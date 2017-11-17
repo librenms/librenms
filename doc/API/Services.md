@@ -1,8 +1,6 @@
 source: API/Services.md
 
-## Services
-
-#### Function: `list_services`
+### `list_services`
 
 Retrieve all services
 
@@ -62,7 +60,7 @@ Output:
     ]
 }
 ```
-#### Function: `get_service_for_host`
+### `get_service_for_host`
 
 Retrieve services for device
 

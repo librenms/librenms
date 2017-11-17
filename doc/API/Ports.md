@@ -1,8 +1,6 @@
 source: API/Devices.md
 
-## Ports
-
-#### Function: `get_all_ports`
+### `get_all_ports`
 
 Get info for all ports on all devices.
 Strongly recommend that you use the `columns` parameter to avoid pulling too much data.
@@ -45,7 +43,7 @@ Output:
 }
 ```
 
-#### Function: `get_port_info`
+### `get_port_info`
 
 Get all info for a particular port.
 
@@ -147,7 +145,7 @@ Output:
 }
 ```
 
-#### Function: `get_port_info`
+### `get_port_info`
 
 Get all IP info (v4 and v6) for a given port id.
 
@@ -183,7 +181,7 @@ Output:
 }
 ```
 
-#### Function: `get_devices_by_group`
+### `get_devices_by_group`
 
 List all devices matching the group provided.
 
@@ -221,54 +219,3 @@ Output:
      }
 ]
 ```
-
-## Port Groups
-
-#### Function: `get_graph_by_portgroup`
-
-Get the graph based on the group type.
-
-Route: `/api/v0/devices/portgroups/:group`
-
-  - group is the type of port group graph you want, I.e Transit, Peering, etc. You can specify multiple types comma separated.
-
-Input:
-
-  - from: This is the date you would like the graph to start - See http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html for more information.
-  - to: This is the date you would like the graph to end - See http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html for more information.
-  - width: The graph width, defaults to 1075.
-  - height: The graph height, defaults to 300.
-
-Example:
-```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/portgroups/transit,peering
-```
-
-Output:
-
-Output is an image.
-
-#### Function: `get_graph_by_portgroup_multiport_bits`
-
-Get the graph based on the multiple port id separated by commas `,`.
-
-Route: `/api/v0/devices/portgroups/multiport/bits/:id`
-
-  - id is a comma separated list of port ids you want, I.e 1,2,3,4, etc. You can specify multiple IDs comma separated.
-
-Input:
-
-  - from: This is the date you would like the graph to start - See http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html for more information.
-  - to: This is the date you would like the graph to end - See http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html for more information.
-  - width: The graph width, defaults to 1075.
-  - height: The graph height, defaults to 300.
-
-Example:
-```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/portgroups/multiport/bits/1,2,3
-```
-
-Output:
-
-Output is an image.
-

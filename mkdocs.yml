@@ -85,7 +85,9 @@ pages:
   - 7. API:
       - Using the API: API/index.md
       - API/Devices.md
+      - API/DeviceGroups.md
       - API/Ports.md
+      - API/PortGroups.md
       - API/Alerts.md
       - API/Routing.md
       - API/Switching.md

@@ -1,6 +1,5 @@
 source: API/Logs.md
 
-## Logs
 All the `list_*logs` calls are aliased to `list_logs`.
 
 Retrieve all logs or logs for a specific device.
@@ -14,16 +13,16 @@ Input:
   - from: The date and time to search from.
   - to: The data and time to search to.
 
-#### Function: `list_eventlog`
+### `list_eventlog`
 Route: `/api/v0/logs/eventlog/:hostname`
 
-#### Function: `list_syslog`
+### `list_syslog`
 Route: `/api/v0/logs/syslog/:hostname`
 
-#### Function: `list_alertlog`
+### `list_alertlog`
 Route: `/api/v0/logs/alertlog/:hostname`
 
-#### Function: `list_authlog`
+### `list_authlog`
 Route: `/api/v0/logs/authlog/:hostname`
 
 

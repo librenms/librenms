@@ -1,8 +1,6 @@
 source: API/Bills.md
 
-## Bills
-
-#### Function: `list_bills`
+### `list_bills`
 
 Retrieve the list of bills currently in the system.
 
@@ -61,7 +59,7 @@ Output:
 }
 ```
 
-#### Function: `get_bill`
+### `get_bill`
 
 Retrieve a specific bill
 
