@@ -86,8 +86,10 @@ try {
     if (isset($options['r'])) {
         echo "Reauthenticate Test\n";
 
-        $session = dbFetchRow('SELECT * FROM `session` WHERE `session_username`=? ORDER BY `session_id` DESC LIMIT 1',
-            array($test_username));
+        $session = dbFetchRow(
+            'SELECT * FROM `session` WHERE `session_username`=? ORDER BY `session_id` DESC LIMIT 1',
+            array($test_username)
+        );
         d_echo($session);
         if (empty($session)) {
             print_error('Requires previous login with \'Remember me\' box checked on the webui');
