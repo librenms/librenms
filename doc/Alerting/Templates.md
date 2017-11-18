@@ -72,6 +72,25 @@ Rule: {if %name}%name{else}%rule{/if}
 {foreach %faults}  #%key: %value.string{/foreach}{/if}
 Alert sent to: {foreach %contacts}%value <%key> {/foreach}
 ```
+Ports Utilization Template:
+```text
+%title
+Device Name: %sysName
+Severity: %severity
+{if %state == 0}Time elapsed: %elapsed{/if}
+Timestamp: %timestamp
+Rule: {if %name}%name{else}%rule{/if}
+{if %faults}
+{foreach %faults}
+Device: %value.sysname
+Physical Interface: %value.ifDescr
+Interface Description: %value.ifAlias
+Interface Speed in Bits: %value.ifSpeed
+Inbound Utilization: {calc (((%value.ifInOctets_rte8)/%value.ifSpeed)100)}%
+Outbound Utilization: {calc (((%value.ifOutOctets_rate8)/%value.ifSpeed)100)}%
+{/foreach}
+{/if}
+```
 
 Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:
 ```text
