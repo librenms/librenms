@@ -145,6 +145,7 @@ pages:
       - Security information: General/Security.md
       - CLI Scripts: Support/CLI-Tools.md
   - hidden:
+      - API/API-Docs.md
       - Installation/Installing-LibreNMS.md
       - Extensions/Alerting.md
       - Extensions/Email-Alerting.md
