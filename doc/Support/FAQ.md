@@ -262,7 +262,7 @@ There is a known issue for net-snmp, which causes it to report incorrect disk si
 
 #### <a name="faq8"> How do I add support for a new OS?</a>
 
-Please see [Supporting a new OS](/#Support-for-a-New-OS)
+Please see [Supporting a new OS](../Developing/Support-New-OS.md)
 
 #### <a name="faq20"> What information do you need to add a new OS?</a>
 
