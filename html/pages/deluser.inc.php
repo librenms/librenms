@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 echo '<div style="margin: 10px;">';
 
 if ($_SESSION['userlevel'] < 10 || $_SESSION['userlevel'] > 10) {
@@ -9,12 +11,12 @@ if ($_SESSION['userlevel'] < 10 || $_SESSION['userlevel'] > 10) {
 
     $pagetitle[] = 'Delete user';
 
-    if (auth_usermanagement()) {
+    if (Auth::get()->canManageUsers()) {
         if ($vars['action'] == 'del') {
             $delete_username = dbFetchCell('SELECT username FROM users WHERE user_id = ?', array($vars['id']));
 
             if ($vars['confirm'] == 'yes') {
-                if (deluser($vars['id']) >= 0) {
+                if (Auth::get()->deleteUser($vars['id']) >= 0) {
                     print_message('<div class="infobox">User "'.$delete_username.'" deleted!');
                 } else {
                     print_error('Error deleting user "'.$delete_username.'"!');

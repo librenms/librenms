@@ -1,4 +1,6 @@
 <?php
+use LibreNMS\Authentication\Auth;
+
 session_start();
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_POST = $_SESSION;
@@ -473,9 +475,9 @@ if (!file_exists("../config.php")) {
       </div>
       <div class="col-md-6">
 <?php
-if (auth_usermanagement()) {
-    if (!user_exists($add_user)) {
-        if (adduser($add_user, $add_pass, '10', $add_email)) {
+if (Auth::get()->canManageUsers()) {
+    if (!Auth::get()->userExists($add_user)) {
+        if (Auth::get()->addUser($add_user, $add_pass, '10', $add_email)) {
             echo("<div class='alert alert-success'>User has been added successfully</div>");
             $proceed = 0;
         } else {

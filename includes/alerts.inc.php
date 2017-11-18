@@ -22,6 +22,7 @@
  * @subpackage Alerts
  */
 
+use LibreNMS\Authentication\Auth;
 
 /**
  * Generate SQL from Rule
@@ -231,14 +232,14 @@ function RunRules($device)
  */
 function GetContacts($results)
 {
-    global $config;
+    global $config, $authorizer;
     if (sizeof($results) == 0) {
         return array();
     }
     if ($config['alert']['default_only'] === true || $config['alerts']['email']['default_only'] === true) {
         return array(''.($config['alert']['default_mail'] ? $config['alert']['default_mail'] : $config['alerts']['email']['default']) => 'NOC');
     }
-    $users = get_userlist();
+    $users = Auth::get()->getUserlist();
     $contacts = array();
     $uids = array();
     foreach ($results as $result) {
@@ -280,7 +281,7 @@ function GetContacts($results)
             $user['realname'] = $user['username'];
         }
         if (empty($user['level'])) {
-            $user['level'] = get_userlevel($user['username']);
+            $user['level'] = Auth::get()->getUserlevel($user['username']);
         }
         if ($config['alert']['globals'] && ( $user['level'] >= 5 && $user['level'] < 10 )) {
             $contacts[$user['email']] = $user['realname'];
