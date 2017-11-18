@@ -12,6 +12,8 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
+use LibreNMS\Authentication\Auth;
+
 /**
  * Compare $t with the value of $vars[$v], if that exists
  * @param string $v Name of the var to test
@@ -1586,6 +1588,7 @@ function get_disks_with_smart($device, $app_id)
  */
 function get_dashboards($user_id = null)
 {
+    global $authorizer;
     $default = get_user_pref('dashboard');
     $dashboards = dbFetchRows(
         "SELECT * FROM `dashboards` WHERE dashboards.access > 0 || dashboards.user_id = ?",
@@ -1600,7 +1603,7 @@ function get_dashboards($user_id = null)
     foreach ($dashboards as $dashboard) {
         $duid = $dashboard['user_id'];
         if (!isset($usernames[$duid])) {
-            $user = get_user($duid);
+            $user = Auth::get()->getUser($duid);
             $usernames[$duid] = $user['username'];
         }
 

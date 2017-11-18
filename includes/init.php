@@ -27,6 +27,8 @@
  * @param array $modules Which modules to initialize
  */
 
+use LibreNMS\Authentication\Auth;
+
 global $config;
 
 $install_dir = realpath(__DIR__ . '/..');
@@ -149,11 +151,9 @@ if (!module_selected('nodb', $init_modules)) {
     require $install_dir . '/includes/process_config.inc.php';
 }
 
-if (file_exists($install_dir . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
-    require_once $install_dir . '/html/includes/authentication/functions.php';
-    require_once $install_dir . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php';
-    init_auth();
-} else {
+try {
+    Auth::get();
+} catch (Exception $exception) {
     print_error('ERROR: no valid auth_mechanism defined!');
     exit();
 }

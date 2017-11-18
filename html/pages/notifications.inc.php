@@ -22,6 +22,7 @@
  * @subpackage Notifications
  */
 
+use LibreNMS\Authentication\Auth;
 use LibreNMS\ObjectCache;
 
 $notifications = new ObjectCache('notifications');
@@ -75,7 +76,7 @@ foreach ($notifications['sticky'] as $notif) {
     echo "<span class='pull-right'>";
 
     if ($notif['user_id'] != $_SESSION['user_id']) {
-        $sticky_user = get_user($notif['user_id']);
+        $sticky_user = Auth::get()->getUser($notif['user_id']);
         echo "<code>Sticky by ${sticky_user['username']}</code>";
     } else {
         echo '<button class="btn btn-primary fa fa-bell-slash-o unstick-notif" data-toggle="tooltip" data-placement="bottom" title="Remove Sticky" style="margin-top:-10px;"></button>';
@@ -101,7 +102,7 @@ foreach ($notifications['sticky'] as $notif) {
 <?php
 foreach ($notifications['unread'] as $notif) {
     if (is_numeric($notif['source'])) {
-        $source_user = get_user($notif['source']);
+        $source_user = Auth::get()->getUser($notif['source']);
         $notif['source'] = $source_user['username'];
     }
     echo '<div class="well"><div class="row"> <div class="col-md-12">';
