@@ -69,6 +69,11 @@ class Programs implements ValidationGroup
             return;
         }
 
+        if (str_contains($output, '::1 is unreachable')) {
+            $validator->warn("IPv6 is disabled on your server, you will not be able to add IPv6 devices.");
+            return;
+        }
+
         $validator->fail(
             "$bin could not be executed. $bin must have CAP_NET_RAW capability (getcap) or suid. Selinux exlusions may be required.\n ($output)"
         );
