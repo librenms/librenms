@@ -149,7 +149,7 @@ class LdapAuthorizer extends AuthorizerBase
                     $email = $entry[Config::get('auth_ldap_emailattr', 'mail')][0];
                     $ldap_groups = $this->getGroupList();
                     foreach ($ldap_groups as $ldap_group) {
-                        $ldap_comparison = $this->ldap_compare(
+                        $ldap_comparison = ldap_compare(
                             $connection,
                             $ldap_group,
                             Config::get('auth_ldap_groupmemberattr', 'memberUid'),
