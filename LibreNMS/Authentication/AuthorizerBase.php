@@ -143,7 +143,7 @@ abstract class AuthorizerBase implements Authorizer
             $db_entry['session_token'] = $token;
             $db_entry['session_auth'] = $auth;
             dbInsert($db_entry, 'session');
-        }\
+        }
 
         setcookie('sess_id', $sess_id, $expiration, '/', null, Config::get('secure_cookies'), true);
         setcookie('token', $token_id, $expiration, '/', null, Config::get('secure_cookies'), true);
@@ -200,9 +200,6 @@ abstract class AuthorizerBase implements Authorizer
         setcookie('auth', '', $time, '/', null, Config::get('secure_cookies'));
     }
 
-
-    abstract public function authenticate($username, $password);
-
     public function reauthenticate($sess_id, $token)
     {
         //not supported by default
@@ -231,21 +228,11 @@ abstract class AuthorizerBase implements Authorizer
         return 0;
     }
 
-    abstract public function userExists($username, $throw_exception = false);
-
-    abstract public function getUserlevel($username);
-
-    abstract public function getUserid($username);
-
-    abstract public function getUser($user_id);
-
     public function deleteUser($userid)
     {
         //not supported by default
         return 0;
     }
-
-    abstract public function getUserlist();
 
     public function canUpdateUsers()
     {
