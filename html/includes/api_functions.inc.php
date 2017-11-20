@@ -1662,7 +1662,7 @@ function list_logs()
     $message = '';
     $status = 'ok';
     $code = 200;
-    $start = mres($_GET['start']) ?: 1;
+    $start = mres($_GET['start']) ?: 0;
     $limit = mres($_GET['limit']) ?: 50;
     $from = mres($_GET['from']);
     $to = mres($_GET['to']);
