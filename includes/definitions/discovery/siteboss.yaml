@@ -1,8 +1,3 @@
-# Just adding comments because I have no idea how to open an empty PR
-# Action items: 1) Find way to call fahrenheit_to_celsius PHP function from YAML file to convert temp value to C from F
-# Action items: 2) Based on value of substring in esPointValueStr (F or C),  dynamically call that previous function 
-# Example output for string search: SITEBOSS-530-STD-MIB::esPointValueStr.16.1.1 = STRING: 69 F
-
 mib: SITEBOSS-530-STD-MIB
 modules:
     sensors:
@@ -10,8 +5,8 @@ modules:
             data:
                 -
                     oid: esPointTable
-                    value: esPointValueInt
-                    num_oid: .1.3.6.1.4.1.3052.12.1.1.1.1.6.
+                    value: esPointValueStr
+                    num_oid: .1.3.6.1.4.1.3052.12.1.1.1.1.7.
                     descr: esPointName
                     skip_values:
                            -
