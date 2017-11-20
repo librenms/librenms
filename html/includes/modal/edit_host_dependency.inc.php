@@ -108,7 +108,7 @@ $('#hostdep-save').click('', function(event) {
                     .end()
                     .append('<option value="0">None</option>')
                     .val('0');
-                $('[data-row-id='+row_id+']').find('.parenthost').text(parent_host);
+                $('[data-row-id='+row_id+']').find('.parenthost').html('<a href="device/device='+ parent_id + '/">' + parent_host + '</a>');
             } else {
                 toastr.error(output.message);
             }
