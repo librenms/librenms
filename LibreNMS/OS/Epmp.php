@@ -74,7 +74,7 @@ class Epmp extends OS implements
             new WirelessSensor(
                 'snr',
                 $this->getDeviceId(),
-                $snr_horizontal,
+                $snr,
                 'epmp',
                 0,
                 'Cambium ePMP SNR',
@@ -120,7 +120,7 @@ class Epmp extends OS implements
             new WirelessSensor(
                 'clients',
                 $this->getDeviceId(),
-                $downlink,
+                $registeredSM,
                 'epmp',
                 0,
                 'Client Count',
