@@ -193,7 +193,6 @@ if (defined('SHOW_SETTINGS')) {
                 <th data-column-id="rule">Rule</th>
                 <th data-column-id="details" data-sortable="false">&nbsp;</th>
                 <th data-column-id="hostname">Hostname</th>
-                <th data-column-id="status" data-sortable="false">Status</th>
                 <th data-column-id="ack_ico" data-sortable="false">ACK</th>';
 
     if ($proc == '1') {

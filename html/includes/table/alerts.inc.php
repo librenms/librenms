@@ -117,25 +117,21 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', array($alert['rule_id'], $alert['device_id']));
     $fault_detail = alert_details($log);
 
-    $alert_to_ack = '<i class="command-ack-alert fa fa-eye" style="font-size:20px;" aria-hidden="true" title="MARK AS ACKNOWLEDGED" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" name="ack-alert"></i>';
-    $alert_to_nack = '<i class="command-ack-alert fa fa-eye-slash" style="font-size:20px;" aria-hidden="true" title="MARK AS NOT ACKNOWLEDGED" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" name="ack-alert"></i>';
-    $alert_status_running = '<i class="fa fa-microphone" style="font-size:20px;" aria-hidden="true" title="NOTIFICATIONS ARE RUNNING"></i>';
-    $alert_status_suspended = '<i class="fa fa-microphone-slash" style="font-size:20px;" aria-hidden="true" title="NOTIFICATIONS ARE SUSPENDED"></i>';
+    $alert_to_ack = '<button type="button" class="btn btn-success command-ack-alert fa fa-eye" aria-hidden="true" title="Mark as acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" name="ack-alert"></button>';
+    $alert_to_nack = '<button type="button" class="btn btn-danger command-ack-alert fa fa-eye-slash" aria-hidden="true" title="Mark as not acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" name="ack-alert"></button>';
 
     if ((int)$alert['state'] === 0) {
         $ico = '';
         $msg = '';
     } elseif ((int)$alert['state'] === 1 || (int)$alert['state'] === 3 || (int)$alert['state'] === 4) {
         $ico = $alert_to_ack;
-        $msg = $alert_status_running;
         if ((int)$alert['state'] === 3) {
-            $msg = '<i class="fa fa-angle-double-down" style="font-size:20px;" aria-hidden="true" title="STATUS GOT WORST"></i>';
+            $msg = '<i class="fa fa-angle-double-down" style="font-size:20px;" aria-hidden="true" title="Status got worse"></i>';
         } elseif ((int)$alert['state'] === 4) {
-            $msg = '<i class="fa fa-angle-double-up" style="font-size:20px;" aria-hidden="true" title="STATUS GOT BETTER"></i>';
+            $msg = '<i class="fa fa-angle-double-up" style="font-size:20px;" aria-hidden="true" title="Status got better"></i>';
         }
     } elseif ((int)$alert['state'] === 2) {
         $ico = $alert_to_nack;
-        $msg = $alert_status_suspended;
     }
 
     $severity = $alert['severity'];
@@ -155,16 +151,16 @@ foreach (dbFetchRows($sql, $param) as $alert) {
 
     switch ($severity) {
         case 'critical':
-            $severity_ico = '<p class="text-danger"><i class="fa fa-times-circle-o" style="font-size:20px;" aria-hidden="true" data-label="critical" title="CRITICAL"></i></p>';
+            $severity_ico = '<span class="alert-status label label-danger"> </span>';
             break;
         case 'warning':
-            $severity_ico = '<p class="text-warning"><i class="fa fa-exclamation-circle" style="font-size:20px;" aria-hidden="true" data-label="warning" title="WARNING"></i></p>';
+            $severity_ico = '<span class="alert-status label label-warning"> </span>';
             break;
         case 'ok':
-            $severity_ico = '<p class="text-success"><i class="fa fa-check-circle-o" style="font-size:20px;" aria-hidden="true" data-label="ok" title="OK"></i></p>';
+            $severity_ico = '<span class="alert-status label label-success"> </span>';
             break;
         default:
-            $severity_ico = '';
+            $severity_ico = '<span class="alert-status label label-info"> </span>';
             break;
     }
 
@@ -175,7 +171,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         if (!preg_match('/^http[s]*:\/\//', $proc)) {
             $has_proc = '';
         } else {
-            $has_proc = '<a href="' . $proc . '" target="_blank"><i class="fa fa-external-link" style="font-size:20px;" aria-hidden="true"></i></a>';
+            $has_proc = '<a href="' . $proc . '" target="_blank"><button type="button" class="btn btn-info fa fa-external-link" aria-hidden="true"></button></a>';
         }
     }
 
@@ -189,7 +185,6 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         'state' => $alert['state'],
         'alert_id' => $alert['id'],
         'ack_ico' => $ack_ico,
-        'status' => $msg,
         'proc' => $has_proc,
     );
 }
