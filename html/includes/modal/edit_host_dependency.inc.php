@@ -34,7 +34,7 @@ if (is_admin() === false) {
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <select class="form-control" name="parent_id" id="availableparents">
+                            <select class="form-control" name="parent_id" id="availableparents" style="width: 100%">
                                 <option value="0">None</option>
                             </select>
                         </div>
@@ -123,6 +123,12 @@ $('#hostdep-save').click('', function(event) {
                 .append('<option value="0">None</option>')
                 .val('0');
         }
+    });
+});
+
+$(document).ready(function() {
+    $('#availableparents').select2({
+        width: 'resolve'
     });
 });
 </script>

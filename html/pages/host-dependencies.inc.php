@@ -87,7 +87,6 @@ var grid = $("#hostdeps").bootgrid({
             if (row.parent == 'None') {
                 return 'None';
             } else {
-                console.log(row);
                 return '<a href="device/device='+row.parentid+'/">'+row.parent+'</a>';
             }
         }

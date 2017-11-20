@@ -30,14 +30,14 @@ if (is_admin() === false) {
                 <br />
                 <div class="form-group">
                     <label for="manavailableparents">Parent Host:</label>
-                    <select name="parent_id" class="form-control" id="manavailableparents">
+                    <select name="parent_id" class="form-control" id="manavailableparents" style='width: 100%'>
                         <option value="0">None</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="manalldevices">Child Hosts:</label>
-                    <select multiple name="device_ids" class="form-control" id="manalldevices">
+                    <select multiple name="device_ids" class="form-control" id="manalldevices" style='width: 100%'>
                     </select>
                 </div>
             </div>
@@ -69,6 +69,7 @@ $('#manavailableparents').on('change', '', function(e) {
                 $.each(output.deps, function (i, elem) {
                     $('#manalldevices option[value="'+ elem.device_id + '"').prop("selected", true);
                 });
+                $('#manalldevices').trigger('change');
             } else {
                 toastr.error(output.message);
             }
@@ -162,6 +163,15 @@ $('#manhostdep-save').click('', function(event) {
             toastr.error('The host dependency could not be saved.');
             $("#manage-dependencies").modal('hide');
         }
+    });
+});
+
+$(document).ready(function() {
+    $('#manavailableparents').select2({
+        width: 'resolve'
+    });
+    $('#manalldevices').select2({
+        width: 'resolve'
     });
 });
 </script>

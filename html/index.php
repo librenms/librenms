@@ -129,6 +129,7 @@ if (empty($config['favicon'])) {
   <link href="css/MarkerCluster.css" rel="stylesheet" type="text/css" />
   <link href="css/MarkerCluster.Default.css" rel="stylesheet" type="text/css" />
   <link href="css/leaflet.awesome-markers.css" rel="stylesheet" type="text/css" />
+  <link href="css/select2.min.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>?ver=291727421" rel="stylesheet" type="text/css" />
   <link href="css/<?php echo $config['site_style']; ?>.css?ver=632417639" rel="stylesheet" type="text/css" />
 <?php
@@ -162,6 +163,7 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
     <?php
     }
     ?>
+  <script src="js/select2.min.js">
   <script src="js/librenms.js"></script>
   <script type="text/javascript">
 
