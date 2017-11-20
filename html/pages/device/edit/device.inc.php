@@ -166,7 +166,7 @@ if ($updated && $update_message) {
 <div class="form-group">
     <label for="parent_id" class="col-sm-2 control-label">This host depends on:</label>
     <div class="col-sm-6">
-        <select name="parent_id" id="parent_id">
+        <select name="parent_id" id="parent_id" class="form-control">
             <option value="0">None</option>
             <?php
             $available_devs = dbFetchRows('SELECT `device_id`,`hostname` FROM `devices` WHERE `device_id` <> ? ORDER BY `hostname` ASC', array($device['device_id']));
