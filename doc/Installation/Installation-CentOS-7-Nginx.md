@@ -158,7 +158,7 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 
 ### Cron job
 
-    cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms`
+    cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
 
 #### Copy logrotate config
 
