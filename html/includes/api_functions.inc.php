@@ -509,9 +509,6 @@ function list_ospf()
     check_is_read();
 
     $app        = \Slim\Slim::getInstance();
-    $code       = 500;
-    $status     = 'error';
-    $message    = 'Error retrieving ospf_nbrs';
     $sql        = '';
     $sql_params = array();
     $hostname   = $_GET['hostname'];
@@ -653,11 +650,11 @@ function delete_components()
     $cid = $router['component'];
 
     $COMPONENT = new LibreNMS\Component();
-    if (!$COMPONENT->deleteComponent($cid)) {
+    if ($COMPONENT->deleteComponent($cid)) {
+        api_success_noresult(200);
+    } else {
         api_error(500, 'Components could not be deleted.');
     }
-    
-    api_success_noresult(200);
 }
 
 
@@ -757,6 +754,8 @@ function get_ip_addresses()
 {
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
+    $ipv4 = array();
+    $ipv6 = array();
     if (isset($router['hostname'])) {
         $hostname = $router['hostname'];
         // use hostname as device_id if it's all digits
@@ -1183,7 +1182,7 @@ function update_device()
                 api_error(500, 'Device field is not allowed to be updated');
             }
         }
-        if ($message == '' && count($data['field']) == count($data['data'])) {
+        if (count($data['field']) == count($data['data'])) {
             for ($x=0; $x<count($data['field']); $x++) {
                 $update[mres($data['field'][$x])] = mres($data['data'][$x]);
             }
@@ -1192,7 +1191,7 @@ function update_device()
             } else {
                 api_error(500, 'Device fields failed to be updated');
             }
-        } elseif ($message == '') {
+        } else {
             api_error(500, 'Device fields failed to be updated as the number of fields ('.count($data['field']).') does not match the supplied data ('.count($data['data']).')');
         }
     } elseif (dbUpdate(array(mres($data['field']) => mres($data['data'])), 'devices', '`device_id`=?', array($device_id)) >= 0) {
@@ -1307,8 +1306,7 @@ function list_services()
         $where[] = "`service_ignore`='0'";
 
         if (!is_numeric($_GET['state'])) {
-            $status   = 'error';
-            $message = "No valid service state provided, valid option is 0=Ok, 1=Warning, 2=Critical";
+            api_error(400, "No valid service state provided, valid option is 0=Ok, 1=Warning, 2=Critical");
         }
     }
 
