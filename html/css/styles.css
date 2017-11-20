@@ -2182,9 +2182,9 @@ label {
 }
 
 .alert-status {
-  width:10px;
-  height:26px;
-  display: block;
-  margin: 0;
-  border-radius: 0;
+  width: 5px;
+  height: 28px;
+  min-height: 28px;
+  font-size: 28px;
+  line-height: 28px;
 }

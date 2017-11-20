@@ -147,20 +147,20 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         $ack_ico = $alert_to_nack;
     }
 
-    $hostname = '<div class="incident">' . generate_device_link($alert) . '<div id="incident' . ($rulei + 1) . '" class="collapse">' . $fault_detail . '</div></div>';
+    $hostname = '<div class="incident">' . generate_device_link($alert, shorthost($alert['hostname'])) . '<div id="incident' . ($rulei + 1) . '" class="collapse">' . $fault_detail . '</div></div>';
 
     switch ($severity) {
         case 'critical':
-            $severity_ico = '<span class="alert-status label label-danger"> </span>';
+            $severity_ico = '<span class="alert-status label-danger">&nbsp;</span>';
             break;
         case 'warning':
-            $severity_ico = '<span class="alert-status label label-warning"> </span>';
+            $severity_ico = '<span class="alert-status label-warning">&nbsp;</span>';
             break;
         case 'ok':
-            $severity_ico = '<span class="alert-status label label-success"> </span>';
+            $severity_ico = '<span class="alert-status label-success">&nbsp;</span>';
             break;
         default:
-            $severity_ico = '<span class="alert-status label label-info"> </span>';
+            $severity_ico = '<span class="alert-status label-info">&nbsp;</span>';
             break;
     }
 
