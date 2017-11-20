@@ -172,6 +172,7 @@ function discover_device(&$device, $options = null)
             $module_start = microtime(true);
             $start_memory = memory_get_usage();
             echo "\n#### Load disco module $module ####\n";
+            precache_discovery($pre_cache, $module, $device);
             include "includes/discovery/$module.inc.php";
             $module_time = microtime(true) - $module_start;
             $module_time = substr($module_time, 0, 5);
@@ -920,7 +921,7 @@ function ignore_storage($os, $descr)
  * @param array $pre_cache
  * @return bool
  */
-function can_skip_sensor($value, $data, $group, $pre_cache = array())
+function can_skip_values($value, $data, $group, $pre_cache = array())
 {
     $skip_values = array_replace((array)$group['skip_values'], (array)$data['skip_values']);
     foreach ($skip_values as $skip_value) {
@@ -962,15 +963,15 @@ function can_skip_sensor($value, $data, $group, $pre_cache = array())
  * @param $sensor_type
  * @param $pre_cache
  */
-function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
+function sensors_discovery(&$valid, $device, $sensor_type, $pre_cache)
 {
     if ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]) {
-        $sensor_options = array();
+        $options = array();
         if (isset($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'])) {
-            $sensor_options = $device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'];
+            $options = $device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'];
         }
 
-        d_echo("Dynamic Discovery ($sensor_type): ");
+        d_echo("Dynamic Sensor Discovery ($sensor_type): ");
         d_echo($device['dynamic_discovery']['modules']['sensors'][$sensor_type]);
 
         foreach ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['data'] as $data) {
@@ -1004,24 +1005,12 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                 d_echo("Final sensor value: $value\n");
 
-                if (can_skip_sensor($value, $data, $sensor_options, $raw_data[$index]) === false && is_numeric($value)) {
+                if (can_skip_values($value, $data, $options, $raw_data[$index]) === false && is_numeric($value)) {
                     $oid = $data['num_oid'] . $index;
 
-                    // process the description
-                    $descr = dynamic_discovery_get_value('descr', $index, $data, $pre_cache);
-                    if (is_null($descr)) {
-                        $descr = str_replace('{{ $index }}', $index, $data['descr']);
-                        preg_match_all('/{{ \$([a-zA-Z0-9.]+) }}/', $descr, $matches);
-                        foreach ($matches[1] as $tmp_var) {
-                            $replace = dynamic_discovery_get_value($tmp_var, $index, $data, $pre_cache, null);
-                            if (!is_null($replace)) {
-                                $descr = str_replace("{{ \$$tmp_var }}", $replace, $descr);
-                            }
-                        }
-                    }
-
-                    $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
-                    $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
+                    $descr = format_descr($index, $data, $pre_cache);
+                    $divisor = get_divisor($data, $options);
+                    $multiplier = get_multiplier($data, $options);
                     $low_limit = is_numeric($data['low_limit']) ? $data['low_limit'] : dynamic_discovery_get_value('low_limit', $index, $data, $pre_cache, 'null');
                     $low_warn_limit = is_numeric($data['low_warn_limit']) ? $data['low_warn_limit'] : dynamic_discovery_get_value('low_warn_limit', $index, $data, $pre_cache, 'null');
                     $warn_limit = is_numeric($data['warn_limit']) ? $data['warn_limit'] : dynamic_discovery_get_value('warn_limit', $index, $data, $pre_cache, 'null');
@@ -1032,15 +1021,10 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         $sensor_name = $data['state_name'] ?: $data['oid'];
                         create_state_index($sensor_name, $data['states']);
                     } else {
-                        if (is_numeric($divisor)) {
-                            $value = $value / $divisor;
-                        }
-                        if (is_numeric($multiplier)) {
-                            $value = $value * $multiplier;
-                        }
+                        $value = calc_value($value, $divisor, $multiplier);
                     }
 
-                    $uindex = str_replace('{{ $index }}', $index, $data['index'] ?: $index);
+                    $uindex = generate_index($index, $data);
                     discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value);
 
                     if ($sensor_type === 'state') {
@@ -1053,7 +1037,174 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 }
 
 /**
- * Helper function for dynamic discovery to search for data from pre_cached snmp data
+ *
+ * Discovery processors from yaml config
+ *
+ * @param $valid
+ * @param $device
+ * @param $pre_cache
+ */
+function processor_discovery(&$valid, $device, $pre_cache)
+{
+    $options = array();
+    if (isset($device['dynamic_discovery']['modules']['processors']['options'])) {
+        $options = $device['dynamic_discovery']['modules']['processors']['options'];
+    }
+    d_echo("Dynamic Processor Discovery: ");
+    d_echo($device['dynamic_discovery']['modules']['processors']);
+
+    foreach ($device['dynamic_discovery']['modules']['processors']['data'] as $data) {
+        $tmp_name = $data['oid'];
+        $raw_data = (array)$pre_cache[$tmp_name];
+
+        d_echo("Data $tmp_name: ");
+        d_echo($raw_data);
+
+        foreach ($raw_data as $index => $snmp_data) {
+            // get the value for this processor, check 'value' and 'oid'
+            $data_name = isset($data['value']) ? $data['value'] : $data['oid'];  // fallback to oid if value is not set
+            if (is_numeric($snmp_data[$data_name])) {
+                $value = $snmp_data[$data_name];
+            } else {
+                $value = false;
+            }
+
+            d_echo("Final processor value: $value\n");
+
+            if (can_skip_values($value, $data, $options, $raw_data[$index]) === false && is_numeric($value)) {
+                $oid = $data['num_oid'] . $index;
+                $descr = dynamic_discovery_get_value('descr', $index, $data, $pre_cache, $data['descr']);
+
+                $divisor = get_divisor($data, $options);
+                $value   = calc_value($value, $divisor);
+
+                $uindex = generate_index($index, $data);
+                discover_processor($valid['processor'], $device, $oid, $uindex, $device['os'], $descr, $divisor, $value, null, null);
+            }
+        }
+    }
+}
+
+/**
+ *
+ * Generates the index for discovery
+ *
+ * @param $index
+ * @param $data
+ * @return mixed
+ */
+function generate_index($index, $data)
+{
+    return str_replace('{{ $index }}', $index, $data['index'] ?: $index);
+}
+
+/**
+ *
+ * Calculates the value given a divisor / multiplier
+ *
+ * @param $value
+ * @param null $divisor
+ * @param null $multiplier
+ * @return float|int
+ */
+function calc_value($value, $divisor = null, $multiplier = null)
+{
+    if (is_numeric($divisor)) {
+        $value = $value / $divisor;
+    }
+    if (is_numeric($multiplier)) {
+        $value = $value * $multiplier;
+    }
+    return $value;
+}
+
+/**
+ *
+ * Get a divisor value from provided data
+ *
+ * @param $data
+ * @param $options
+ * @return int
+ */
+function get_divisor($data, $options)
+{
+    return $data['divisor'] ?: ($options['divisor'] ?: 1);
+}
+
+/**
+ *
+ * Get a multiplier value from provided data
+ *
+ * @param $data
+ * @param $options
+ * @return int
+ */
+function get_multiplier($data, $options)
+{
+    return $data['multiplier'] ?: ($options['multiplier'] ?: 1);
+}
+
+/**
+ *
+ * Format the description from provided data
+ *
+ * @param $index
+ * @param $data
+ * @param $snmp_data
+ * @param $cached_data
+ * @return mixed
+ */
+function format_descr($index, $data, $pre_cache)
+{
+    $descr = dynamic_discovery_get_value('descr', $index, $data, $pre_cache);
+    if (is_null($descr)) {
+        $descr = str_replace('{{ $index }}', $index, $data['descr']);
+        preg_match_all('/{{ \$([a-zA-Z0-9.]+) }}/', $descr, $matches);
+        foreach ($matches[1] as $tmp_var) {
+            $replace = dynamic_discovery_get_value($tmp_var, $index, $data, $pre_cache, null);
+            if (!is_null($replace)) {
+                $descr = str_replace("{{ \$$tmp_var }}", $replace, $descr);
+            }
+        }
+    }
+    return $descr;
+}
+
+/**
+ *
+ * Pre-caches snmp data for use in discovery modules
+ *
+ * @param $pre_cache
+ * @param $type
+ * @param $device
+ */
+function precache_discovery(&$pre_cache, $type, $device)
+{
+    // TODO change to exclude os with pre-cache php file, but just exclude them by hand for now (like avtech)
+    if (isset($device['dynamic_discovery']['modules'][$type]) && $device['os'] != 'avtech') {
+        foreach ($device['dynamic_discovery']['modules'][$type] as $key => $data_array) {
+            if (!is_array($data_array['data'])) {
+                // If we aren't sensors then we need to populate data key
+                $data_array['data'] = $data_array;
+            }
+            foreach ($data_array['data'] as $data) {
+                foreach ((array)$data['oid'] as $oid) {
+                    if (!isset($pre_cache[$oid])) {
+                        if (isset($data['snmp_flags'])) {
+                            $snmp_flag = $data['snmp_flags'];
+                        } else {
+                            $snmp_flag = '-OeQUs';
+                        }
+                        $snmp_flag .= ' -Ih';
+                        $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid], $device['dynamic_discovery']['mib'], null, $snmp_flag);
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** Helper function for dynamic discovery to search for data from pre_cached snmp data
  *
  * @param string $name The name of the field from the discovery data or just an oid
  * @param int $index The index of the current sensor
@@ -1109,7 +1260,7 @@ function sensors($types, $device, $valid, $pre_cache = array())
                 include $dir . '/rfc1628.inc.php';
             }
         }
-        discovery_process($valid, $device, $sensor_type, $pre_cache);
+        sensors_discovery($valid, $device, $sensor_type, $pre_cache);
         d_echo($valid['sensor'][$sensor_type]);
         check_valid_sensors($device, $sensor_type, $valid['sensor']);
         echo "\n";
