@@ -119,7 +119,7 @@ function check_is_admin()
 
 function check_is_read()
 {
-    if (!is_admin && !is_read()) {
+    if (!is_admin() && !is_read()) {
         api_error(403, 'Insufficient privileges');
     }
 }
@@ -1122,15 +1122,15 @@ function list_bills()
         $sql    .= '`bill_ref` = ?';
         $param[] = $bill_ref;
     } elseif (is_numeric($bill_id)) {
-        $sql    .= '`bills`.`bill_id` = ?';
+        $sql    .= '`bill_id` = ?';
         $param[] = $bill_id;
     }
     if (!is_admin() && !is_read()) {
-        $sql    .= ' AND `bills`.`bill_id` IN (SELECT `bill_id` FROM `bills_perms` WHERE `user_id` = ?)';
+        $sql    .= ' AND `bill_id` IN (SELECT `bill_id` FROM `bill_perms` WHERE `user_id` = ?)';
         $param[] = $_SESSION['user_id'];
     }
 
-    foreach (dbFetchRows("SELECT `bills`.*,COUNT(port_id) AS `ports_total` FROM `bills` LEFT JOIN `bill_ports` ON `bill_ports`.`bill_id`=`bills`.`bill_id` WHERE $sql GROUP BY `bill_name`,`bill_ref` ORDER BY `bill_name`", $param) as $bill) {
+    foreach (dbFetchRows("SELECT * FROM `bills` WHERE $sql ORDER BY `bill_name`", $param) as $bill) {
         $rate_data    = $bill;
         $allowed = '';
         $used = '';
@@ -1206,7 +1206,6 @@ function update_device()
 
 function get_device_groups()
 {
-    check_is_read();
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $status   = 'error';
