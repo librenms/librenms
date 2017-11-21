@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
 if (Config::get('enable_bgp')) {
@@ -85,9 +86,14 @@ if (Config::get('enable_bgp')) {
                         $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerEntry', $jbgp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                         d_echo($j_bgp);
                         foreach ($j_bgp as $index => $entry) {
-                            $ip = IP::fromHexString($entry['jnxBgpM2PeerRemoteAddr'], true);
-                            d_echo("peerindex for ".$ip->getFamily() ." $ip is ".$entry['jnxBgpM2PeerIndex']."\n");
-                            $j_peerIndexes[(string)$ip] = $entry['jnxBgpM2PeerIndex'];
+                            $peer_index = $entry['jnxBgpM2PeerIndex'];
+                            try {
+                                $ip = IP::fromHexString($entry['jnxBgpM2PeerRemoteAddr']);
+                                d_echo("peerindex for " . $ip->getFamily() . " $ip is $peer_index\n");
+                                $j_peerIndexes[(string)$ip] = $peer_index;
+                            } catch (InvalidIpException $e) {
+                                d_echo("Unable to parse IP for peer $peer_index: " . $entry['jnxBgpM2PeerRemoteAddr'] . PHP_EOL);
+                            }
                         }
                     }
 
