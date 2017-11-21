@@ -25,6 +25,7 @@ As an example, if your device is configured to use the community `my_company` us
 
 Using the web interface, go to Devices and click Add Device. Enter the details required for the device that you want to add and then click 'Add Host'.
 As an example, if your device is configured to use the community `my_company` using snmp `v2c` then you would enter:
+SNMP Port defaults to 161
 
 ![Add device](/img/webui_add_device.png)
 
