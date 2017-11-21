@@ -135,6 +135,7 @@ function check_not_demo()
 function get_graph_by_port_hostname()
 {
     // This will return a graph for a given port by the ifName
+    global $config;
     $app          = \Slim\Slim::getInstance();
     $router       = $app->router()->getCurrentRoute()->getParams();
     $hostname     = $router['hostname'];
@@ -207,6 +208,7 @@ function get_port_stats_by_port_hostname()
 function get_graph_generic_by_hostname()
 {
     // This will return a graph type given a device id.
+    global $config;
     $app          = \Slim\Slim::getInstance();
     $router       = $app->router()->getCurrentRoute()->getParams();
     $hostname     = $router['hostname'];
@@ -531,6 +533,7 @@ function list_ospf()
 function get_graph_by_portgroup()
 {
     check_is_read();
+    global $config;
     $app    = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $group  = $router['group'] ?: '';
