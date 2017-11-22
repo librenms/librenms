@@ -17,5 +17,5 @@ discovery:
           oid: roomTemp.0
           mib: CAREL-ug40cdz-MIB
           mib_dir: carel
-          op: '!=='
+          op: '!='
           value: false
