@@ -26,13 +26,15 @@
 if (is_admin() === false) {
     $status = array('status' =>1, 'message' => 'ERROR: You need to be admin to delete poller entries');
 } else {
-    if (!is_numeric($vars['id'])) {
+    $id = $vars['id'];
+    if (!is_numeric($id)) {
         $status = array('status' =>1, 'message' => 'No poller has been selected');
     } else {
-        if (dbDelete('pollers', 'id=?', array($vars['id']))) {
-            $status = array('status' =>0, 'message' => 'Poller: <i>'.$vars['id'].', has been deleted.</i>');
+        $poller_name = dbFetchCell('SELECT `poller_name` FROM `pollers` WHERE `id`=?', array($id));
+        if (dbDelete('pollers', 'id=?', array($id))) {
+            $status = array('status' => 0, 'message' => "Poller: <i>$poller_name ($id), has been deleted.</i>");
         } else {
-            $status = array('status' =>1, 'message' => 'Poller: <i>'.$vars['id'].', has NOT been deleted.</i>');
+            $status = array('status' => 1, 'message' => "Poller: <i>$poller_name ($id), has NOT been deleted.</i>");
         }
     }
 }

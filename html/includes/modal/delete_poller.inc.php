@@ -64,19 +64,16 @@ if (is_admin() !== false) {
                 data: {type: "delete-poller", id: id},
                 success: function (result) {
                     if (result.status == 0) {
-                        // Yay.
-                        $('#message').html('<div class="alert alert-info">' + result.message + '</div>');
+                        toastr.success(result.message);
                         $("#row_" + id).remove();
-                        $("#confirm-delete").modal('hide');
                     }
                     else {
-                        // Nay.
-                        $("#message").html('<div class="alert alert-danger">' + result.message + '</div>');
-                        $("#confirm-delete").modal('hide');
+                        toastr.error(result.message);
                     }
+                    $("#confirm-delete").modal('hide');
                 },
                 error: function () {
-                    $("#message").html('<div class="alert alert-info">An error occurred deleting this poller.</div>');
+                    toastr.error('An error occurred deleting this poller.');
                     $("#confirm-delete").modal('hide');
                 }
             });
