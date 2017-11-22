@@ -49,7 +49,6 @@ $sql = "SELECT D.device_id,name AS alert,rule_id, state,time_logged,DATE_FORMAT(
 $rulei = 0;
 foreach (dbFetchRows($sql, $param) as $alertlog) {
     $dev          = device_by_id_cache($alertlog['device_id']);
-    logfile($alertlog['rule_id']);
     $log          = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? AND `state` = 1 ORDER BY id DESC LIMIT 1', array($alertlog['rule_id'], $alertlog['device_id']));
     $fault_detail = alert_details($log);
     if (empty($fault_detail)) {

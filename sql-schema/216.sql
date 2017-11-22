@@ -1,0 +1,1 @@
+INSERT INTO config (config_name,config_value,config_default,config_descr,config_group,config_group_order,config_sub_group,config_sub_group_order,config_hidden,config_disabled) values ('logging.level','3','3','Logging level','logging',0,'misc',0,'0','0');

@@ -31,8 +31,6 @@ $config['log_dir']     = $config['install_dir'].'/logs';
 
 // MySQL extension to use
 $config['db']['extension']       = 'mysqli';
-// MySQL Debug level
-$config['mysql_log_level']       = 'ERROR';
 
 //MySQL port
 $config['db_port']               = 3306;

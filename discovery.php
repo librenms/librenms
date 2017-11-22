@@ -148,4 +148,4 @@ if (!isset($options['q'])) {
     printStats();
 }
 
-logfile($string);
+logfile($string, 'info');

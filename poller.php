@@ -176,7 +176,7 @@ if (!isset($options['q'])) {
     printStats();
 }
 
-logfile($string);
+logfile($string, 'info');
 rrdtool_close();
 unset($config);
 // Remove this for testing
