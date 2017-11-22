@@ -9,9 +9,8 @@ if ($os != $device['os']) {
     $device['os'] = $os;
     $sql = dbUpdate(array('os' => $os), 'devices', 'device_id=?', array($device['device_id']));
 
-    if (!Config::has("os.{$device['os']}")) {
-        load_os($device);
-    }
+    load_os($device);
+    load_discovery($device);
 
     echo "Changed ";
 }
