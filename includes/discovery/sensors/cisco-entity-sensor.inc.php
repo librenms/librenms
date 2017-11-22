@@ -168,8 +168,8 @@ if ($device['os_group'] == 'cisco') {
                                 list(, $tmp_ifindex) = explode(".", $entity_array[$phys_index][0]['entAliasMappingIdentifier']);
                                 $tmp_port = get_port_by_index_cache($device['device_id'], $tmp_ifindex);
                                 if (is_array($tmp_port)) {
-                                    $entity_link_type = 'port';
-                                    $entity_link_index = $tmp_ifindex;
+                                    $entPhysicalIndex                 = $tmp_ifindex;
+                                    $entry['entSensorMeasuredEntity'] = 'ports';
                                 }
                             }
                             break;
@@ -177,7 +177,7 @@ if ($device['os_group'] == 'cisco') {
                             $phys_index = $entity_array[$phys_index]['entPhysicalContainedIn'];
                         }
                     }
-                    discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', ucwords($descr), $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null, $entity_link_type, $entity_link_index);
+                    discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', ucwords($descr), $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null);
                     #Cisco IOS-XR : add a fake sensor to graph as dbm
                     if ($type == "power" and $device['os'] == "iosxr" and (preg_match("/power (R|T)x/i", $descr) or preg_match("/(R|T)x Power/i", $descr))) {
                             // convert Watts to dbm
@@ -190,7 +190,7 @@ if ($device['os_group'] == 'cisco') {
                             $multiplier = 1;
                             $divisor = 1;
                             //echo("\n".$valid['sensor'].", $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current");
-                            discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null, $entity_link_type, $entity_link_index);
+                            discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null);
                     }
                 }
 
