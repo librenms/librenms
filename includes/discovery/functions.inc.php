@@ -1038,6 +1038,11 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     $high_limit = is_numeric($data['high_limit']) ? $data['high_limit'] : dynamic_discovery_get_value('high_limit', $index, $data, $pre_cache, 'null');
 
                     $sensor_name = $device['os'];
+
+                    if (isset($user_function) && function_exists($user_function)) {
+                        $value = $user_function($value);
+                    }
+
                     if ($sensor_type === 'state') {
                         $sensor_name = $data['state_name'] ?: $data['oid'];
                         create_state_index($sensor_name, $data['states']);
