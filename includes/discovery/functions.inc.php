@@ -1068,10 +1068,12 @@ function dynamic_discovery_get_value($name, $index, $discovery_data, $pre_cache,
 
     if (isset($pre_cache[$name])) {
         if (is_array($pre_cache[$name])) {
-            if (count($pre_cache[$name]) === 1) {
-                return current($pre_cache[$name]);
+            if (isset($pre_cache[$name][$index][$name])) {
+                return $pre_cache[$name][$index][$name];
             } elseif (isset($pre_cache[$index][$name])) {
                 return $pre_cache[$index][$name];
+            } elseif (count($pre_cache[$name]) === 1) {
+                return current($pre_cache[$name]);
             }
         } else {
             return $pre_cache[$name];
