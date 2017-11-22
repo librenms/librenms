@@ -73,7 +73,7 @@ sdfsd
         $pre_cache = array(
             'firstdata' => array(
                 0 => array('temp' => 1),
-                1 => array('temp'=> 2),
+                1 => array('temp' => 2),
             ),
             'high' => array(
                 0 => array('high' => 3),
@@ -85,6 +85,13 @@ sdfsd
             ),
             'single' => array('something' => 9),
             'oneoff' => 10,
+            'singletable' => array(
+                11 => array('singletable' => 'Pickle')
+            ),
+            'doubletable' => array(
+                12 => array('doubletable' => 'Mustard'),
+                13 => array('doubletable' => 'BBQ')
+            ),
         );
 
         $data = array('value' => 'temp', 'oid' => 'firstdata');
@@ -103,5 +110,7 @@ sdfsd
 
         $this->assertSame(9, dynamic_discovery_get_value('single', 0, $data, $pre_cache));
         $this->assertSame(10, dynamic_discovery_get_value('oneoff', 3, $data, $pre_cache));
+        $this->assertSame('Pickle', dynamic_discovery_get_value('singletable', 11, $data, $pre_cache));
+        $this->assertSame('BBQ', dynamic_discovery_get_value('doubletable', 13, $data, $pre_cache));
     }
 }
