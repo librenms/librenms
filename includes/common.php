@@ -1162,8 +1162,8 @@ function inet6_ntop($ip)
 
 /**
  * If hostname is an ip, use return sysName
- * @param array device
- * @param string hostname
+ * @param array $device
+ * @param string $hostname
  * @return string
 **/
 function format_hostname($device, $hostname = '')
@@ -1607,6 +1607,8 @@ function load_os(&$device)
 
     if ($config['os'][$device['os']]['group']) {
         $device['os_group'] = $config['os'][$device['os']]['group'];
+    } else {
+        unset($device['os_group']);
     }
 }
 
