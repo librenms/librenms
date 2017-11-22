@@ -34,6 +34,7 @@ pages:
       - Ubuntu 16.04 (Apache): Installation/Installation-Ubuntu-1604-Apache.md
       - CentOS 7 (Nginx): Installation/Installation-CentOS-7-Nginx.md
       - CentOS 7 (Apache): Installation/Installation-CentOS-7-Apache.md
+      - Installation/SELinux.md
       - Migrating from Observium: Installation/Migrating-from-Observium.md
   - 3. Getting started:
       - Choosing a release: General/Releases.md
