@@ -104,8 +104,9 @@ function load_discovery(&$device)
         $device['dynamic_discovery'] = Symfony\Component\Yaml\Yaml::parse(
             file_get_contents($yaml_discovery)
         );
+    } else {
+        unset($device['dynamic_discovery']);
     }
-    unset($yaml_discovery);
 }
 
 function discover_device(&$device, $options = null)
