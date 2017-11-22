@@ -17,7 +17,7 @@ discovery:
           oid: systemStatus.0
           mib: SYNOLOGY-SYSTEM-MIB
           mib_dir: synology
-          op: '!=='
+          op: '!='
           value: false
     -
       sysDescr_regex: '/^Linux /'
