@@ -1849,3 +1849,20 @@ function str_to_class($name, $namespace = null)
     $class = str_replace(' ', '', ucwords(strtolower($pre_format)));
     return $namespace . $class;
 }
+
+/**
+ * Checks file permissions against a minimum permissions mask.
+ * This only check that bits are enabled, not disabled.
+ * The mask is in the same format as posix permissions. For example, 600 means user read and write.
+ *
+ * @param string $file the name of the file to check
+ * @param $mask
+ * @return bool
+ */
+function check_file_permissions($file, $mask)
+{
+    $perms = fileperms($file);
+    $mask = octdec($mask);
+
+    return ($perms & $mask) === $mask;
+}

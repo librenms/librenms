@@ -27,6 +27,7 @@ namespace LibreNMS\Validations;
 
 use LibreNMS\Config;
 use LibreNMS\Interfaces\ValidationGroup;
+use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
 class Php implements ValidationGroup
@@ -40,6 +41,7 @@ class Php implements ValidationGroup
     public function validate(Validator $validator)
     {
         $this->checkVersion($validator);
+        $this->checkSessionDirWritable($validator);
         $this->checkExtensions($validator);
         $this->checkFunctions($validator);
         $this->checkTimezone($validator);
@@ -49,9 +51,30 @@ class Php implements ValidationGroup
     {
         $min_version = '5.6.4';
 
-         // if update is not set to false and version is min or newer
+        // if update is not set to false and version is min or newer
         if (Config::get('update') && version_compare(PHP_VERSION, $min_version, '<')) {
             $validator->warn('PHP version 5.6.4 will be the minimum supported version on January 10, 2018.  We recommend you update to PHP a supported version of PHP (7.1 suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.');
+        }
+    }
+
+    private function checkSessionDirWritable(Validator $validator)
+    {
+        $path = session_save_path() === '' ? '/tmp' : session_save_path();
+        if (!is_writable($path)) {
+            $result = ValidationResult::fail("The session directory ($path) is not writable.");
+
+            $group_id = filegroup($path);
+            if ($group_id !== 0 && check_file_permissions($path, '060')) {
+                // don't suggest adding users to the root group or a group that doesn't have write permission.
+                if (function_exists('posix_getgrgid')) {
+                    $group_info = posix_getgrgid($group_id);
+                    $group = $group_info['name'];
+                    $user = $validator->getUsername();
+                    $result->setFix("usermod -a -G $group $user");
+                }
+            }
+
+            $validator->result($result);
         }
     }
 
