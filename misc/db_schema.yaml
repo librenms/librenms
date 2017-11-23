@@ -1418,7 +1418,7 @@ storage:
     - { Field: storage_id, Type: int(11), 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: int(11), 'Null': false, Extra: '' }
     - { Field: storage_mib, Type: varchar(16), 'Null': false, Extra: '' }
-    - { Field: storage_index, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: storage_index, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: storage_type, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: storage_descr, Type: text, 'Null': false, Extra: '' }
     - { Field: storage_size, Type: bigint(20), 'Null': false, Extra: '' }
