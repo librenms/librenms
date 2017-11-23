@@ -42,7 +42,7 @@ if (isset($_REQUEST['notification_id']) && isset($_REQUEST['action'])) {
         $message = 'Created';
     }
 } elseif (isset($_REQUEST['action']) && $_REQUEST['action'] == 'read-all-notif') {
-    foreach (dbFetchRows('SELECT notifications_id FROM notifications') as $notifications) {
+    foreach (dbFetchRows("SELECT `notifications_id` FROM `notifications` LEFT JOIN `notifications_attribs` A USING (`notifications_id`) WHERE A.`notifications_id` IS NULL OR (`user_id` = 1 AND NOT (`key`='read' AND `value`=1));") as $notifications) {
         dbInsert(array('notifications_id'=>$notifications['notifications_id'],'user_id'=>$_SESSION['user_id'],'key'=>'read','value'=>1), 'notifications_attribs');
     }
     $status = 'ok';
