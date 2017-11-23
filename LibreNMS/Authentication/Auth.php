@@ -37,4 +37,15 @@ class Auth
         }
         return static::$_instance;
     }
+
+    /**
+     * Destroy the existing instance and get a new one - required for tests.
+     *
+     * @return Authorizer
+     */
+    public static function reset()
+    {
+        static::$_instance = null;
+        return static::get();
+    }
 }
