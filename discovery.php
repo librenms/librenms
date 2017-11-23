@@ -121,7 +121,7 @@ if (!empty($config['distributed_poller_group'])) {
 }
 
 global $device;
-foreach (dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
+foreach (dbFetch("SELECT * FROM `devices` WHERE disabled = 0 AND snmp_disable = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
     discover_device($device, $options);
 }
 
