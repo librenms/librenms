@@ -1,7 +1,6 @@
 source: Alerting/Rules.md
 
 # Rules
-
 Rules are defined using a logical language.
 The GUI provides a simple way of creating basic rules.
 Creating more complicated rules which may include maths calculations and MySQL queries can be 
@@ -13,12 +12,10 @@ done using [macros](Macros.md)
 [Alert Rules wildcard](https://youtu.be/eYYioFNcrAk)
 
 ## Syntax
-
 Rules must consist of at least 3 elements: An __Entity__, a __Condition__ and a __Value__.
 Rules can contain braces and __Glues__.
 __Entities__ are provided from Table and Field from the database. For Example: `%ports.ifOperStatus`.
 > Please note that % is not required when adding alert rules via the WebUI. 
-
 __Conditions__ can be any of:
 
 - Equals `=`
@@ -38,7 +35,6 @@ __Note__: The difference between `Equals` and `Like` (and its negation) is that 
 Arithmetics are allowed as well.
 
 # Options
-
 Here are some of the other options available when adding an alerting rule:
 
 - Rule name: The name associated with the rule.
@@ -49,10 +45,11 @@ Here are some of the other options available when adding an alerting rule:
 - Mute alerts: Disable sending alerts for this rule.
 - Invert match: Invert the matching rule (ie. alert on items that _don't_ match the rule).
 
+## Procedure
+You can associate a rule to a procedure by giving the URL of the procedure when creating the rule. Only links like "http://" are supported, otherwise an error will be returned. Once configured, procedure can be opened from the Alert widget through the "Open" button, which can be shown/hidden from the widget configuration box.
+
 ## Examples
-
 Alert when:
-
 - Device goes down: `%devices.status != '1'`
 - Any port changes: `%ports.ifOperStatus != 'up'`
 - Root-directory gets too full: `%storage.storage_descr = '/' && %storage.storage_perc >= '75'`
@@ -69,6 +66,3 @@ Alert when:
 You can also select Alert Rule from the Alerts Collection. These Alert Rules are submitted by users in the community :)
 If would like to submit your alert rules to the collection, please submit them here [Alert Rules Collection](https://github.com/librenms/librenms/blob/master/misc/alert_rules.json)
 ![Alert Rules Collection](/img/alert-rules-collection.png)
-
-## Procedure
-You can associate a rule to a procedure by giving the URL of the procedure when creating the rule. Only links like "http://" are supported, otherwise an error will be returned. Once configured, procedure can be opened from the Alert widget through the "Open" button, which can be shown/hidden from the widget configuration box.
