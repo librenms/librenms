@@ -51,7 +51,6 @@ pages:
       - Extensions/Network-Map.md
       - Extensions/Syslog.md
       - Extensions/Dashboards.md
-      - Cleanup Options: Support/Configuration.md/#cleanup-options
   - 5. Advanced Setup:
       - Support/1-Minute-Polling.md
       - Configuration docs: Support/Configuration.md
