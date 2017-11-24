@@ -28,7 +28,7 @@ __Conditions__ can be any of:
 - Smaller or Equal `<=`
 
 __Values__ can be an entity or any single-quoted data.
-__Glues__ can be either `&&` for `AND`.  or `||` for `OR`. 
+__Glues__ can be either `&&` for `AND`.
 
 **Note** if you need to use `OR` `||` please use a [macros](Macros.md)
 
@@ -40,13 +40,13 @@ Arithmetics are allowed as well.
 
 Here are some of the other options available when adding an alerting rule:
 
-+ Rule name: The name associated with the rule.
-+ Severity: How "important" the rule is.
-+ Max alerts: The maximum number of alerts sent for the event.  `-1` means unlimited.
-+ Delay: The amount of time in seconds to wait after a rule is matched before sending an alert out transport.
-+ Interval: The interval of time in seconds between alerts for an event until Max alert is reached.
-+ Mute alerts: Disables sending alert rule through alert transport. But will still show the alert in the Web UI.
-+ Invert match: Invert the matching rule (ie. alert on items that _don't_ match the rule).
+- Rule name: The name associated with the rule.
+- Severity: How "important" the rule is.
+- Max alerts: The maximum number of alerts sent for the event.  `-1` means unlimited.
+- Delay: The amount of time in seconds to wait after a rule is matched before sending an alert out transport.
+- Interval: The interval of time in seconds between alerts for an event until Max alert is reached.
+- Mute alerts: Disables sending alert rule through alert transport. But will still show the alert in the Web UI.
+- Invert match: Invert the matching rule (ie. alert on items that _don't_ match the rule).
 
 ## Procedure
 You can associate a rule to a procedure by giving the URL of the procedure when creating the rule. Only links like "http://" are supported, otherwise an error will be returned. Once configured, procedure can be opened from the Alert widget through the "Open" button, which can be shown/hidden from the widget configuration box.
@@ -55,17 +55,17 @@ You can associate a rule to a procedure by giving the URL of the procedure when 
 
 Alert when:
 
-+ Device goes down: `%devices.status != '1'`
-+ Any port changes: `%ports.ifOperStatus != 'up'`
-+ Root-directory gets too full: `%storage.storage_descr = '/' && %storage.storage_perc >= '75'`
-+ Any storage gets fuller than the 'warning': `%storage.storage_perc >= %storage_perc_warn`
-+ If device is a server and the used storage is above the warning level, but ignore /boot partitions: `%storage.storage_perc > %storage.storage_perc_warn && %devices.type = "server" && %storage.storage_descr !~ "/boot"`
-+ VMware LAG is not using "Source ip address hash" load balancing: `%devices.os = "vmware" && %ports.ifType = "ieee8023adLag" && %ports.ifDescr !~ "Link Aggregation @, load balancing algorithm: Source ip address hash"`
-+ Syslog, authentication failure during the last 5m: `%syslog.timestamp >= %macros.past_5m && %syslog.msg ~ "@authentication failure@"`
-+ High memory usage: `%macros.device_up = "1" && %mempools.mempool_perc >= "90" && %mempools.mempool_descr = "Virtual@"`
-+ High CPU usage(per core usage, not overall): `%macros.device_up = "1" && %processors.processor_usage >= "90"`
-+ High port usage, where description is not client & ifType is not softwareLoopback: `%macros.port_usage_perc >= "80" && %port.port_descr_type != "client" && %ports.ifType != "softwareLoopback"`
-+ Alert when mac address is located on your network `%ipv4_mac.mac_address = "2c233a756912"`
+- Device goes down: `%devices.status != '1'`
+- Any port changes: `%ports.ifOperStatus != 'up'`
+- Root-directory gets too full: `%storage.storage_descr = '/' && %storage.storage_perc >= '75'`
+- Any storage gets fuller than the 'warning': `%storage.storage_perc >= %storage_perc_warn`
+- If device is a server and the used storage is above the warning level, but ignore /boot partitions: `%storage.storage_perc > %storage.storage_perc_warn && %devices.type = "server" && %storage.storage_descr !~ "/boot"`
+- VMware LAG is not using "Source ip address hash" load balancing: `%devices.os = "vmware" && %ports.ifType = "ieee8023adLag" && %ports.ifDescr !~ "Link Aggregation @, load balancing algorithm: Source ip address hash"`
+- Syslog, authentication failure during the last 5m: `%syslog.timestamp >= %macros.past_5m && %syslog.msg ~ "@authentication failure@"`
+- High memory usage: `%macros.device_up = "1" && %mempools.mempool_perc >= "90" && %mempools.mempool_descr = "Virtual@"`
+- High CPU usage(per core usage, not overall): `%macros.device_up = "1" && %processors.processor_usage >= "90"`
+- High port usage, where description is not client & ifType is not softwareLoopback: `%macros.port_usage_perc >= "80" && %port.port_descr_type != "client" && %ports.ifType != "softwareLoopback"`
+- Alert when mac address is located on your network `%ipv4_mac.mac_address = "2c233a756912"`
 
 ### Alert Rules Collection
 You can also select Alert Rule from the Alerts Collection. These Alert Rules are submitted by users in the community :)
