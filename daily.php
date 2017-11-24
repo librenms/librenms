@@ -134,6 +134,7 @@ if ($options['f'] === 'device_perf') {
 if ($options['f'] === 'handle_notifiable') {
     if ($options['t'] === 'update') {
         $title = 'Error: Daily update failed';
+        $poller_name = Config::get('distributed_poller_name');
 
         if ($options['r']) {
             // result was a success (1), remove the notification
@@ -142,7 +143,8 @@ if ($options['f'] === 'handle_notifiable') {
             // result was a failure (0), create the notification
             new_notification(
                 $title,
-                'The daily update script (daily.sh) has failed. Please check output by hand. If you need assistance, '
+                "The daily update script (daily.sh) has failed on $poller_name."
+                . 'Please check output by hand. If you need assistance, '
                 . 'visit the <a href="https://www.librenms.org/#support">LibreNMS Website</a> to find out how.',
                 2,
                 'daily.sh'
@@ -152,7 +154,16 @@ if ($options['f'] === 'handle_notifiable') {
 }
 
 if ($options['f'] === 'notifications') {
-    post_notifications();
+    try {
+        if (Config::get('distributed_poller')) {
+            MemcacheLock::lock('notifications', 0, 86000);
+        }
+
+        post_notifications();
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        exit(-1);
+    }
 }
 
 if ($options['f'] === 'bill_data') {
@@ -190,33 +201,51 @@ if ($options['f'] === 'alert_log') {
 }
 
 if ($options['f'] === 'purgeusers') {
-    $purge = 0;
-    if (is_numeric($config['radius']['users_purge']) && $config['auth_mechanism'] === 'radius') {
-        $purge = $config['radius']['users_purge'];
-    }
-    if (is_numeric($config['active_directory']['users_purge']) && $config['auth_mechanism'] === 'active_directory') {
-        $purge = $config['active_directory']['users_purge'];
-    }
-    if ($purge > 0) {
-        foreach (dbFetchRows("SELECT DISTINCT(`user`) FROM `authlog` WHERE `datetime` >= DATE_SUB(NOW(), INTERVAL ? DAY)", array($purge)) as $user) {
-            $users[] = $user['user'];
+    try {
+        if (Config::get('distributed_poller')) {
+            MemcacheLock::lock('purgeusers', 0, 86000);
         }
-        $del_users = '"'.implode('","', $users).'"';
-        if (dbDelete('users', "username NOT IN ($del_users)", array($del_users))) {
-            echo "Removed users that haven't logged in for $purge days";
+
+        $purge = 0;
+        if (is_numeric($config['radius']['users_purge']) && $config['auth_mechanism'] === 'radius') {
+            $purge = $config['radius']['users_purge'];
         }
+        if (is_numeric($config['active_directory']['users_purge']) && $config['auth_mechanism'] === 'active_directory') {
+            $purge = $config['active_directory']['users_purge'];
+        }
+        if ($purge > 0) {
+            foreach (dbFetchRows("SELECT DISTINCT(`user`) FROM `authlog` WHERE `datetime` >= DATE_SUB(NOW(), INTERVAL ? DAY)", array($purge)) as $user) {
+                $users[] = $user['user'];
+            }
+            $del_users = '"'.implode('","', $users).'"';
+            if (dbDelete('users', "username NOT IN ($del_users)", array($del_users))) {
+                echo "Removed users that haven't logged in for $purge days";
+            }
+        }
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        exit(-1);
     }
 }
 
 if ($options['f'] === 'refresh_alert_rules') {
-    echo 'Refreshing alert rules queries' . PHP_EOL;
-    $rules = dbFetchRows('SELECT `id`, `rule` FROM `alert_rules`');
-    foreach ($rules as $rule) {
-        $data['query'] = GenSQL($rule['rule']);
-        if (!empty($data['query'])) {
-            dbUpdate($data, 'alert_rules', 'id=?', array($rule['id']));
-            unset($data);
+    try {
+        if (Config::get('distributed_poller')) {
+            MemcacheLock::lock('refresh_alert_rules', 0, 86000);
         }
+
+        echo 'Refreshing alert rules queries' . PHP_EOL;
+        $rules = dbFetchRows('SELECT `id`, `rule` FROM `alert_rules`');
+        foreach ($rules as $rule) {
+            $data['query'] = GenSQL($rule['rule']);
+            if (!empty($data['query'])) {
+                dbUpdate($data, 'alert_rules', 'id=?', array($rule['id']));
+                unset($data);
+            }
+        }
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        exit(-1);
     }
 }
 
