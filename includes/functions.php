@@ -18,8 +18,10 @@ use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
+use LibreNMS\Exceptions\LockException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\MemcacheLock;
 
 function set_debug($debug)
 {
@@ -2454,4 +2456,34 @@ function locate_binary($binary)
     }
 
     return $binary;
+}
+
+/**
+ * If Distributed, create a lock, then purge the mysql table
+ *
+ * @param string $table
+ * @param string $sql
+ * @return int exit code
+ */
+function lock_and_purge($table, $sql)
+{
+    try {
+        $purge_name = $table . '_purge';
+
+        if (Config::get('distributed_poller')) {
+            MemcacheLock::lock($purge_name, 0, 86000);
+        }
+        $purge_days = Config::get($purge_name);
+
+        $name = str_replace('_', ' ', ucfirst($table));
+        if (is_numeric($purge_days)) {
+            if (dbDelete($table, $sql, array($purge_days))) {
+                echo "$name cleared for entries over $purge_days days\n";
+            }
+        }
+        return 0;
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        return -1;
+    }
 }
