@@ -27,7 +27,7 @@ A standard configuration for a distributed poller would look like:
 ```php
 // Distributed Poller-Settings
 $config['distributed_poller']                            = true;
-$config['distributed_poller_name']                       = file_get_contents('/proc/sys/kernel/hostname');
+#$config['distributed_poller_name']                      = 'custom'; // optional: defaults to hostname
 $config['distributed_poller_group']                      = 0;
 $config['distributed_poller_memcached_host']             = 'example.net';
 $config['distributed_poller_memcached_port']             = '11211';
