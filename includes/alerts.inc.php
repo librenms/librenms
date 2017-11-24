@@ -885,7 +885,7 @@ function IsParentDown($device)
         return false;
     }
 
-    $result = dbFetchCell("SELECT 1 from devices as a LEFT JOIN devices_attribs as b ON a.device_id=b.device_id WHERE a.status = 0 AND a.device_id = ? AND  (a.status_reason = 'icmp' OR (b.attrib_type='override_icmp_disable' AND b.attrib_value=true))", array($parent_id))
+    $result = dbFetchCell("SELECT 1 from devices as a LEFT JOIN devices_attribs as b ON a.device_id=b.device_id WHERE a.status = 0 AND a.device_id = ? AND  (a.status_reason = 'icmp' OR (b.attrib_type='override_icmp_disable' AND b.attrib_value=true))", array($parent_id));
     if ($result) {
         return true;
     }
