@@ -28,7 +28,7 @@ __Conditions__ can be any of:
 - Smaller or Equal `<=`
 
 __Values__ can be an entity or any single-quoted data.
-__Glues__ can be either `&&` for `AND`.
+__Glues__ can be `&&` for `AND`.
 
 **Note** if you need to use `OR` `||` please use a [macros](Macros.md)
 
