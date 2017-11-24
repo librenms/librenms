@@ -196,17 +196,8 @@ main () {
             fi
         fi
 
-        cnf=$(echo $(grep '\[.distributed_poller.\]' config.php | egrep -v -e '^//' -e '^#' | cut -d = -f 2 | sed 's/;//g'))
-        if ((${BASH_VERSINFO[0]} < 4)); then
-            cnf=`echo $cnf|tr [:upper:] [:lower:]`
-        else
-            cnf=${cnf,,}
-        fi
-
-        if [[ -z "$cnf" ]] || [[ "$cnf" == "0" ]] || [[ "$cnf" == "false" ]]; then
-            # Call ourself again in case above pull changed or added something to daily.sh
-            ${DAILY_SCRIPT} post-pull
-        fi
+        # Call ourself again in case above pull changed or added something to daily.sh
+        ${DAILY_SCRIPT} post-pull
     else
         case $arg in
             no-code-update)
