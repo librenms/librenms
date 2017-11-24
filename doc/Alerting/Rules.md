@@ -28,28 +28,33 @@ __Conditions__ can be any of:
 - Smaller or Equal `<=`
 
 __Values__ can be an entity or any single-quoted data.
-__Glues__ can be either `&&` for `AND`.  or `||` for `OR`. Note if you need to use `OR` `||` please use a macro. 
+__Glues__ can be `&&` for `AND`.
+
+**Note** if you need to use `OR` `||` please use a [macros](Macros.md)
 
 __Note__: The difference between `Equals` and `Like` (and its negation) is that `Equals` does a strict comparison and `Like` allows the usage of MySQL RegExp.
 
 Arithmetics are allowed as well.
 
 # Options
+
 Here are some of the other options available when adding an alerting rule:
 
 - Rule name: The name associated with the rule.
 - Severity: How "important" the rule is.
 - Max alerts: The maximum number of alerts sent for the event.  `-1` means unlimited.
-- Delay: The amount of time in seconds to wait after a rule is matched before sending an alert.
-- Interval: The interval of time in seconds between alerts for an event until Max is reached.
-- Mute alerts: Disable sending alerts for this rule.
+- Delay: The amount of time in seconds to wait after a rule is matched before sending an alert out transport.
+- Interval: The interval of time in seconds between alerts for an event until Max alert is reached.
+- Mute alerts: Disables sending alert rule through alert transport. But will still show the alert in the Web UI.
 - Invert match: Invert the matching rule (ie. alert on items that _don't_ match the rule).
 
 ## Procedure
 You can associate a rule to a procedure by giving the URL of the procedure when creating the rule. Only links like "http://" are supported, otherwise an error will be returned. Once configured, procedure can be opened from the Alert widget through the "Open" button, which can be shown/hidden from the widget configuration box.
 
 ## Examples
+
 Alert when:
+
 - Device goes down: `%devices.status != '1'`
 - Any port changes: `%ports.ifOperStatus != 'up'`
 - Root-directory gets too full: `%storage.storage_descr = '/' && %storage.storage_perc >= '75'`
