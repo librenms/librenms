@@ -24,15 +24,15 @@ To enable a particular authentication module you need to set this up in config.p
 $config['auth_mechanism'] = "mysql";
 ```
 
-### User levels
+### User levels and User account type
 
-- 1: Normal User. You will need to assign device / port permissions for users at this level.
+- 1: **Normal User**: You will need to assign device / port permissions for users at this level.
 
-- 5: Global Read.
+- 5: **Global Read**: Global view but with restrictions, cant view any settings menus. 
 
-- 10: This is a global read/write admin account
+- 10: **Administartor**: This is a global read/write admin account.
 
-- 11: Demo Account. Provides full read/write with certain restrictions (i.e can't delete devices).
+- 11: **Demo Account**: Provides full read/write with certain restrictions (i.e can't delete devices).
 
 ### Note for SELinux users
 When using SELinux on the LibreNMS server, you need to allow Apache (httpd) to connect LDAP/Active Directory server, this is disabled by default. You can use SELinux Booleans to allow network access to LDAP resources with this command:
