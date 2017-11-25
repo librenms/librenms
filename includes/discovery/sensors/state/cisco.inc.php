@@ -2,7 +2,7 @@
 /*
  * LibreNMS
  *
- * Copyright (c) 2016 Søren Friis Rosiak <sorenrosiak@gmail.com> 
+ * Copyright (c) 2016 Søren Friis Rosiak <sorenrosiak@gmail.com>
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -135,26 +135,30 @@ foreach ($tables as $tablevalue) {
         }
 
         foreach ($temp as $index => $entry) {
-            //Discover Sensors
-            $descr = ucwords($temp[$index][$tablevalue[3]]);
-            if ($state_name == 'cRFStatusUnitState' || $state_name == 'cRFStatusPeerUnitState' || $state_name == 'cRFCfgRedundancyOperMode' || $state_name == 'cswRingRedundant') {
-                $descr = $tablevalue[3];
-            } elseif ($state_name == 'cswSwitchRole') {
-                $swrolenumber++;
-                $descr = $tablevalue[3] . $swrolenumber;
-            } elseif ($state_name == 'cswSwitchState') {
-                $swstatenumber++;
-                $descr = $tablevalue[3] . $swstatenumber;
-            } elseif ($state_name == 'cswStackPortOperStatus') {
-                $stack_port_descr = get_port_by_index_cache($device, $index);
-                $descr = $tablevalue[3] . $stack_port_descr['ifDescr'];
-            } elseif ($state_name == 'cefcFRUPowerOperStatus') {
-                $descr = snmp_get($device, 'entPhysicalName.'.$index, '-Oqv', 'ENTITY-MIB');
-            }
-            discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, '1', '1', null, null, null, null, $temp[$index][$tablevalue[2]], 'snmp', $index);
+            if ($tablevalue[2] == 'ciscoEnvMonTemperatureState' && (empty($temp[$index][$tablevalue[3]]))) {
+                d_echo('Invalid sensor, skipping..');
+            } else {
+                //Discover Sensors
+                $descr = ucwords($temp[$index][$tablevalue[3]]);
+                if ($state_name == 'cRFStatusUnitState' || $state_name == 'cRFStatusPeerUnitState' || $state_name == 'cRFCfgRedundancyOperMode' || $state_name == 'cswRingRedundant') {
+                    $descr = $tablevalue[3];
+                } elseif ($state_name == 'cswSwitchRole') {
+                    $swrolenumber++;
+                    $descr = $tablevalue[3] . $swrolenumber;
+                } elseif ($state_name == 'cswSwitchState') {
+                    $swstatenumber++;
+                    $descr = $tablevalue[3] . $swstatenumber;
+                } elseif ($state_name == 'cswStackPortOperStatus') {
+                    $stack_port_descr = get_port_by_index_cache($device, $index);
+                    $descr = $tablevalue[3] . $stack_port_descr['ifDescr'];
+                } elseif ($state_name == 'cefcFRUPowerOperStatus') {
+                    $descr = snmp_get($device, 'entPhysicalName.'.$index, '-Oqv', 'ENTITY-MIB');
+                }
+                discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, '1', '1', null, null, null, null, $temp[$index][$tablevalue[2]], 'snmp', $index);
 
-            //Create Sensor To State Index
-            create_sensor_to_state_index($device, $state_name, $index);
+                //Create Sensor To State Index
+                create_sensor_to_state_index($device, $state_name, $index);
+            }
         }
     }
 }

@@ -24,7 +24,7 @@ if (isset($device['dynamic_discovery']['modules']['sensors']) && $device['os'] !
                         $snmp_flag = '-OeQUs';
                     }
                     $snmp_flag .= ' -Ih';
-                    $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$array_data], $device['dynamic_discovery']['mib'], null, $snmp_flag);
+                    $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid], $device['dynamic_discovery']['mib'], null, $snmp_flag);
                 }
             }
         }

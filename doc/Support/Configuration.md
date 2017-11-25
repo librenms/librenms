@@ -39,6 +39,14 @@ $config['db_port']   = NULL;
 $config['db_socket'] = '/run/mysqld/mysqld.sock';
 ```
 
+### Core
+
+#### PHP Settings
+
+You can change the memory limits for php within `config.php`. The value is in Megabytes and should just be an int value:
+
+`$config['php_memory_limit'] = 128;`
+
 ### Programs
 
 A lot of these are self explanatory so no further information may be provided. Any extensions that have dedicated 
@@ -325,7 +333,7 @@ Generally, it is a better to set these [per OS](../Developing/os/Settings.md#pol
 
 ```php
 $config['discovery_modules]['arp-table'] = 1;
-$config['poller_modules]['bgp-peers'] = 0;
+$config['poller_modules']['bgp-peers'] = 0;
 ```
 
 ### SNMP Settings
@@ -380,7 +388,7 @@ The varying options after that are to support the different transports.
 
 ### Alerting
 
-[Alerting](../Alerting/index.md)
+[Alerting](../Alerting/Rules.md)
 
 ### Billing
 

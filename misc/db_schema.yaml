@@ -1337,8 +1337,6 @@ sensors:
     - { Field: lastupdate, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
     - { Field: sensor_prev, Type: float, 'Null': true, Extra: '' }
     - { Field: user_func, Type: varchar(100), 'Null': true, Extra: '' }
-    - { Field: entity_link_type, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: entity_link_index, Type: 'int(11) unsigned', 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sensor_id], Unique: true, Type: BTREE }
     sensor_host: { Name: sensor_host, Columns: [device_id], Unique: false, Type: BTREE }
@@ -1420,7 +1418,7 @@ storage:
     - { Field: storage_id, Type: int(11), 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: int(11), 'Null': false, Extra: '' }
     - { Field: storage_mib, Type: varchar(16), 'Null': false, Extra: '' }
-    - { Field: storage_index, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: storage_index, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: storage_type, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: storage_descr, Type: text, 'Null': false, Extra: '' }
     - { Field: storage_size, Type: bigint(20), 'Null': false, Extra: '' }

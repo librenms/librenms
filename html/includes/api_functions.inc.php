@@ -12,15 +12,17 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Authentication\Auth;
+
 function authToken(\Slim\Route $route)
 {
     $app   = \Slim\Slim::getInstance();
     $token = $app->request->headers->get('X-Auth-Token');
     if (isset($token) && !empty($token)) {
-        if (!function_exists('get_user')) {
+        if (!method_exists(Auth::get(), 'getUser')) {
             $username = dbFetchCell('SELECT `U`.`username` FROM `api_tokens` AS AT JOIN `users` AS U ON `AT`.`user_id`=`U`.`user_id` WHERE `AT`.`token_hash`=?', array($token));
         } else {
-            $username = get_user(dbFetchCell('SELECT `AT`.`user_id` FROM `api_tokens` AS AT WHERE `AT`.`token_hash`=?', array($token)));
+            $username = Auth::get()->getUser(dbFetchCell('SELECT `AT`.`user_id` FROM `api_tokens` AS AT WHERE `AT`.`token_hash`=?', array($token)));
         }
         if (!empty($username)) {
             $authenticated = true;
@@ -818,6 +820,7 @@ function get_port_graphs()
     } else {
         $columns = 'ifName';
     }
+    validate_column_list($columns, 'ports');
 
     // use hostname as device_id if it's all digits
     $device_id   = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
@@ -890,6 +893,7 @@ function get_all_ports()
     } else {
         $columns = 'ifName';
     }
+    validate_column_list($columns, 'ports');
     $ports = dbFetchRows("SELECT $columns FROM `ports` WHERE `deleted` = 0");
 
     $output = array(
@@ -1237,12 +1241,21 @@ function list_oxidized()
 {
     global $config;
     $app = \Slim\Slim::getInstance();
-    $app->response->headers->set('Content-Type', 'application/json');
+    $router   = $app->router()->getCurrentRoute()->getParams();
 
+    $hostname = $router['hostname'];
     $devices = array();
     $device_types = "'".implode("','", $config['oxidized']['ignore_types'])."'";
     $device_os    = "'".implode("','", $config['oxidized']['ignore_os'])."'";
-    foreach (dbFetchRows("SELECT hostname,sysname,os,location FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os))") as $device) {
+
+    $sql = '';
+    $params = array();
+    if ($hostname) {
+        $sql = " AND hostname = ?";
+        $params = array($hostname);
+    }
+
+    foreach (dbFetchRows("SELECT hostname,sysname,os,location FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
         if ($config['oxidized']['group_support'] == "true") {
             foreach ($config['oxidized']['group']['hostname'] as $host_group) {
                 if (preg_match($host_group['regex'].'i', $device['hostname'])) {
@@ -1649,7 +1662,7 @@ function list_logs()
     $message = '';
     $status = 'ok';
     $code = 200;
-    $start = mres($_GET['start']) ?: 1;
+    $start = mres($_GET['start']) ?: 0;
     $limit = mres($_GET['limit']) ?: 50;
     $from = mres($_GET['from']);
     $to = mres($_GET['to']);
@@ -1692,4 +1705,26 @@ function list_logs()
     $app->response->setStatus($code);
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
+}
+
+function validate_column_list($columns, $tableName)
+{
+    global $config;
+
+    $column_names = explode(',', $columns);
+    $db_schema = Symfony\Component\Yaml\Yaml::parse(file_get_contents($config['install_dir'] . '/misc/db_schema.yaml'));
+    $valid_columns = array_column($db_schema[$tableName]['Columns'], 'Field');
+    $invalid_columns = array_diff(array_map('trim', $column_names), $valid_columns);
+
+    if (count($invalid_columns) > 0) {
+        $output = array(
+            'status'  => 'error',
+            'message' => 'Invalid columns: ' . join(',', $invalid_columns),
+        );
+        $app = \Slim\Slim::getInstance();
+        $app->response->setStatus(400);     // Bad request
+        $app->response->headers->set('Content-Type', 'application/json');
+        echo _json_encode($output);
+        $app->stop();
+    }
 }

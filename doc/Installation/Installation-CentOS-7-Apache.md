@@ -1,10 +1,12 @@
 source: Installation/Installation-CentOS-7-Apache.md
 > NOTE: These instructions assume you are the **root** user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
 
+**Please note the minimum supported PHP version is 5.6.4**
+
 ## Install Required Packages ##
 
     yum install epel-release
-    
+
     rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 
     yum install cronie fping git httpd ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nmap php71w php71w-cli php71w-common php71w-curl php71w-gd php71w-mcrypt php71w-mysql php71w-process php71w-snmp php71w-xml php71w-zip python-memcached rrdtool
@@ -88,7 +90,7 @@ Add the following config, edit `ServerName` as required:
 Install the policy tool for SELinux:
 
     yum install policycoreutils-python
- 
+
 Configure the contexts needed by LibreNMS:
 
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/logs(/.*)?'
@@ -171,4 +173,4 @@ Now that you've installed LibreNMS, we'd suggest that you have a read of a few o
 
 We hope you enjoy using LibreNMS. If you do, it would be great if you would consider opting into the stats system we have, please see [this page](http://docs.librenms.org/General/Callback-Stats-and-Privacy/) on what it is and how to enable it.
 
-If you would like to help make LibreNMS better there are [many ways to help](http://docs.librenms.org/Support/FAQ/#what-can-i-do-to-help). You can also [back LibreNMS on Open Collective](https://t.libren.ms/donations). 
+If you would like to help make LibreNMS better there are [many ways to help](http://docs.librenms.org/Support/FAQ/#what-can-i-do-to-help). You can also [back LibreNMS on Open Collective](https://t.libren.ms/donations).

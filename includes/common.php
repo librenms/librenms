@@ -1162,8 +1162,8 @@ function inet6_ntop($ip)
 
 /**
  * If hostname is an ip, use return sysName
- * @param array device
- * @param string hostname
+ * @param array $device
+ * @param string $hostname
  * @return string
 **/
 function format_hostname($device, $hostname = '')
@@ -1607,6 +1607,8 @@ function load_os(&$device)
 
     if ($config['os'][$device['os']]['group']) {
         $device['os_group'] = $config['os'][$device['os']]['group'];
+    } else {
+        unset($device['os_group']);
     }
 }
 
@@ -1846,4 +1848,21 @@ function str_to_class($name, $namespace = null)
     $pre_format = str_replace(array('-', '_'), ' ', $name);
     $class = str_replace(' ', '', ucwords(strtolower($pre_format)));
     return $namespace . $class;
+}
+
+/**
+ * Checks file permissions against a minimum permissions mask.
+ * This only check that bits are enabled, not disabled.
+ * The mask is in the same format as posix permissions. For example, 600 means user read and write.
+ *
+ * @param string $file the name of the file to check
+ * @param $mask
+ * @return bool
+ */
+function check_file_permissions($file, $mask)
+{
+    $perms = fileperms($file);
+    $mask = octdec($mask);
+
+    return ($perms & $mask) === $mask;
 }

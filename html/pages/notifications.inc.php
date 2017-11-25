@@ -22,6 +22,7 @@
  * @subpackage Notifications
  */
 
+use LibreNMS\Authentication\Auth;
 use LibreNMS\ObjectCache;
 
 $notifications = new ObjectCache('notifications');
@@ -75,7 +76,7 @@ foreach ($notifications['sticky'] as $notif) {
     echo "<span class='pull-right'>";
 
     if ($notif['user_id'] != $_SESSION['user_id']) {
-        $sticky_user = get_user($notif['user_id']);
+        $sticky_user = Auth::get()->getUser($notif['user_id']);
         echo "<code>Sticky by ${sticky_user['username']}</code>";
     } else {
         echo '<button class="btn btn-primary fa fa-bell-slash-o unstick-notif" data-toggle="tooltip" data-placement="bottom" title="Remove Sticky" style="margin-top:-10px;"></button>';
@@ -101,7 +102,7 @@ foreach ($notifications['sticky'] as $notif) {
 <?php
 foreach ($notifications['unread'] as $notif) {
     if (is_numeric($notif['source'])) {
-        $source_user = get_user($notif['source']);
+        $source_user = Auth::get()->getUser($notif['source']);
         $notif['source'] = $source_user['username'];
     }
     echo '<div class="well"><div class="row"> <div class="col-md-12">';
@@ -221,7 +222,14 @@ $(function() {
           $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
           $("#"+notif).parent().parent().parent().fadeOut();
           $(".count-notif").each(function(){
-            this.innerHTML = this.innerHTML-1;
+              var new_count = this.innerHTML-1;
+              this.innerHTML = new_count;
+              if (new_count == 0) {
+                  $this = $(this);
+                  if ($this.hasClass('badge-danger')) {
+                      $this.removeClass('badge-danger');
+                  }
+              }
           });
         }
         else {
