@@ -1,3 +1,128 @@
+## 1.34
+*(2017-11-25)*
+
+#### Features
+* Added additional sensors for ups-nut
+* Track rrdtool time for poller ([#7706](https://github.com/librenms/librenms/issues/7706))
+* Implement snmp_getnext() ([#7678](https://github.com/librenms/librenms/issues/7678))
+* LDAP auth update: alerts, api, remember me ([#7335](https://github.com/librenms/librenms/issues/7335))
+* Support a wider range of link speeds in network maps ([#7533](https://github.com/librenms/librenms/issues/7533))
+* Allow snmpget in os discovery yaml ([#7587](https://github.com/librenms/librenms/issues/7587))
+* Check cli timezone from the validation webpage ([#7648](https://github.com/librenms/librenms/issues/7648))
+* Selected ports polling per OS ([#7674](https://github.com/librenms/librenms/issues/7674))
+* Added purge-port scipt to allow deleting of ports from the CLI. ([#7528](https://github.com/librenms/librenms/issues/7528))
+* Extra fping checks in validation ([#7651](https://github.com/librenms/librenms/pull/7651))
+* Added support for setting php memory_limit in config.php ([#7704](https://github.com/librenms/librenms/pull/7704))
+* Script to collect port polling data and compare full walk vs selective port polling ([#7626](https://github.com/librenms/librenms/pull/7626))
+* Allow discovery to check if devices are down before skipping ([#7780](https://github.com/librenms/librenms/pull/7780))
+
+#### Bugfixes
+* Fixed precache data ([#7782](https://github.com/librenms/librenms/issues/7782))
+* Authentication on CentOS6 ([#7771](https://github.com/librenms/librenms/issues/7771))
+* Fixed empty group query for devices ([#7760](https://github.com/librenms/librenms/issues/7760))
+* Notification read count doesn't decrement in menu bar ([#7750](https://github.com/librenms/librenms/issues/7750))
+* Do not add invalid Cisco senors seen in IOS 15.6(3)M1 ([#7629](https://github.com/librenms/librenms/issues/7629))
+* Revert to two gets for sysDescr and sysObjectID ([#7741](https://github.com/librenms/librenms/issues/7741))
+* Fixed Brocade ironware processor precision ([#7730](https://github.com/librenms/librenms/issues/7730))
+* Basic input validation for screen width and height ([#7713](https://github.com/librenms/librenms/issues/7713))
+* Better sanity checks of fping options.
+* Devices detected as ibmtl or generic ([#7618](https://github.com/librenms/librenms/issues/7618))
+* Added primary key to perf_times to improve DELETE performance on replicas using ROW based replication ([#7493](https://github.com/librenms/librenms/issues/7493))
+* Fail isPingable() if fping fails, take 2 ([#7585](https://github.com/librenms/librenms/issues/7585))
+* Update ifIndex update on polling when ifIndex is not the port association mode ([#7574](https://github.com/librenms/librenms/issues/7574)) ([#7575](https://github.com/librenms/librenms/issues/7575))
+* Fix Services container alignment ([#7583](https://github.com/librenms/librenms/pull/7583))
+* Availability-map showed ping devices as warning ([#7592](https://github.com/librenms/librenms/pull/7592))
+* discovery.php -h all stops working after ping only device ([#7593](https://github.com/librenms/librenms/pull/7593))
+* Improve poller validation ([#7586](https://github.com/librenms/librenms/pull/7586))
+* Only show the neighbour tab if there are neighbors to show ([#7591](https://github.com/librenms/librenms/pull/7591))
+* Updated hpe iPdu to remove power and fix load values ([#7596](https://github.com/librenms/librenms/pull/7596))
+* Function snmp_get delete quotes in snmp query ([#7467](https://github.com/librenms/librenms/pull/7467))
+* Better sanity check of hostname when adding device. ([#7582](https://github.com/librenms/librenms/pull/7582))
+* github-apply sometimes fails on PRs with lots of commits ([#7604](https://github.com/librenms/librenms/pull/7604))
+* PING fails on servers that don't set PATH in cron ([#7603](https://github.com/librenms/librenms/pull/7603))
+* Correct sensor ID when removing device. ([#7611](https://github.com/librenms/librenms/pull/7611))
+* Fixed status services up/down inverse values ([#7657](https://github.com/librenms/librenms/pull/7657))
+* Better validation on callback url for Pagerduty integration ([#7658](https://github.com/librenms/librenms/pull/7658))
+* Fixed number comparisons in alerts and device groups ([#7695](https://github.com/librenms/librenms/pull/7695))
+* Fallback to snmpgetnext if db is unavailable ([#7698](https://github.com/librenms/librenms/pull/7698))
+* Errors with missing posix extension ([#7666](https://github.com/librenms/librenms/pull/7666))
+* Fixed component status log ([#7723](https://github.com/librenms/librenms/pull/7723))
+* Fixed bgpPeers_cbgp discovery for junos ([#7743](https://github.com/librenms/librenms/pull/7743))
+* Fixed incorrect mail validation if ([#7755](https://github.com/librenms/librenms/pull/7755))
+* Fixed discovery-wrapper.py discovery.nodes can sometimes be None when not master ([#7747](https://github.com/librenms/librenms/pull/7747))
+* Fixed bgp-peers fails when ip parsing fails ([#7773](https://github.com/librenms/librenms/pull/7773))
+* Fixed poller-wrapper.py keeps running when a poller takes too long ([#7722](https://github.com/librenms/librenms/pull/7722))
+* Use correct entity columns for sensors ([#7775](https://github.com/librenms/librenms/pull/7775))
+* Discovery os changes weren't properly reflected if os changed ([#7779](https://github.com/librenms/librenms/pull/7779))
+
+#### Documentation
+* Minor changes and fixes to Alert Rules ([#7789](https://github.com/librenms/librenms/issues/7789))
+* Added Web UI rename device. ([#7769](https://github.com/librenms/librenms/issues/7769))
+* SNMP config for Mac OSX ([#7767](https://github.com/librenms/librenms/issues/7767))
+* Continue to reorganize docs ([#7762](https://github.com/librenms/librenms/issues/7762))
+* Fix for rule mapping ([#7751](https://github.com/librenms/librenms/issues/7751))
+* Added sudo guidelines for Proxmox ([#7739](https://github.com/librenms/librenms/issues/7739))
+* Added sudo suggestion for SMART monitoring ([#7738](https://github.com/librenms/librenms/issues/7738))
+* VM images recommended user update ([#7737](https://github.com/librenms/librenms/issues/7737))
+* Install Docs Update for min PHP ver ([#7630](https://github.com/librenms/librenms/issues/7630))
+* Added video link showing how to add ping only device ([#7711](https://github.com/librenms/librenms/issues/7711))
+* Fix layout changes to dashboard. ([#7693](https://github.com/librenms/librenms/issues/7693))
+* Create new docs on using dashboards ([#7688](https://github.com/librenms/librenms/issues/7688))
+* Added Ping Only Device ([#7687](https://github.com/librenms/librenms/issues/7687))
+* Added allow graphs without login ([#7675](https://github.com/librenms/librenms/issues/7675))
+* Added device-troubleshooting page ([#7638](https://github.com/librenms/librenms/issues/7638))
+* Added WebUI to Validate docs ([#7635](https://github.com/librenms/librenms/issues/7635))
+* Minor spelling fix for device-troubleshooting ([#7689](https://github.com/librenms/librenms/issues/7689))
+* Fix for VM images doc. ([#7740](https://github.com/librenms/librenms/issues/7740))
+* Added syslog cleanup option ([#7581](https://github.com/librenms/librenms/issues/7581))
+* How to add Weathermaps to Dashboards ([#7636](https://github.com/librenms/librenms/issues/7636))
+* Added command to fetch shell script for DHCP Stats ([#7736](https://github.com/librenms/librenms/issues/7736))
+* Added ports template to alert rules doc ([#7763](https://github.com/librenms/librenms/issues/7763)) 
+
+#### Refactoring
+* Better default temperature sensor limits ([#7754](https://github.com/librenms/librenms/issues/7754))
+* Switch to using discovery-wrapper.py by default ([#7661](https://github.com/librenms/librenms/issues/7661))
+* Rewrite a bit of the irc bot ([#7667](https://github.com/librenms/librenms/issues/7667))
+* Added the Nvidia SM average as app_status ([#7671](https://github.com/librenms/librenms/issues/7671))
+* Refactored authorizers to classes ([#7497](https://github.com/librenms/librenms/issues/7497))
+* Only update sensor/bgp tables when values are changed ([#7707](https://github.com/librenms/librenms/issues/7707))
+
+#### Devices
+* Updated Checkpoint Gaia detection and added storage ([#7656](https://github.com/librenms/librenms/issues/7656))
+* Added additional APC rPDU2 Sensors ([#7490](https://github.com/librenms/librenms/issues/7490))
+* Initial detection for Arris Cable Modem devices ([#7677](https://github.com/librenms/librenms/issues/7677))
+* Removed unused poller/discovery modules for Arista EOS ([#7709](https://github.com/librenms/librenms/issues/7709))
+* Update hwg-ste and add hwg-ste-plus support ([#7610](https://github.com/librenms/librenms/issues/7610))
+* Added state sensors for Palo Alto Networks firewall ([#7482](https://github.com/librenms/librenms/issues/7482))
+* Added additional sensors for logmaster Os
+* Added Temp and Humidity support for ServersCheck devices ([#7588](https://github.com/librenms/librenms/issues/7588))
+* Added support for Avtech RoomAlert 32E/W and RoomAlert 11E ([#7614](https://github.com/librenms/librenms/issues/7614))
+* Added support for Eltek enexus ([#7552](https://github.com/librenms/librenms/issues/7552))
+* Added support for Stormshield devices ([#7646](https://github.com/librenms/librenms/issues/7646))
+* Added support for Asentria SiteBoss ([#7655](https://github.com/librenms/librenms/issues/7655))
+* Added humidity sensors for hwg-ste ([#7728](https://github.com/librenms/librenms/issues/7728))
+* Addedd sensor support for UPS NUT devices ([#7622](https://github.com/librenms/librenms/issues/7622))
+
+#### WebUI
+* Don't disable the applications check boxes in settings if the discovery module is disabled. ([#7615](https://github.com/librenms/librenms/issues/7615))
+* Added toner support in health metrics list ([#7595](https://github.com/librenms/librenms/issues/7595))
+* Hide rediscover button for ping only devices ([#7594](https://github.com/librenms/librenms/issues/7594))
+* Added Health/sensor view for specific device/ports/port ([#7684](https://github.com/librenms/librenms/issues/7684))
+* Updated poll-log page to honour force_ip_to_sysname ([#7712](https://github.com/librenms/librenms/issues/7712))
+* Expose pollers link to show total poll time for all devices per poller ([#7699](https://github.com/librenms/librenms/issues/7699))
+* Updated sensors overview header to be consistent with others ([#7761](https://github.com/librenms/librenms/issues/7761))
+* Allow deletion of dead poller nodes ([#7721](https://github.com/librenms/librenms/issues/7721))
+
+#### API
+* Added support for Oxidized asking for a single host ([#7705](https://github.com/librenms/librenms/issues/7705))
+* Validate columns parameter against fields in table ([#7717](https://github.com/librenms/librenms/issues/7717))
+* Stop list_logs skipping first row ([#7772](https://github.com/librenms/librenms/issues/7772))
+
+#### Alerting
+* Added in dell server sensors alert rules to the collection ([#7647](https://github.com/librenms/librenms/issues/7647))
+
+---
+
 ## 1.33
 *(2017-10-29)*
 
@@ -90,7 +215,6 @@
 
 ---
 
-source: General/Changelog.md
 ## 1.32
 *(2017-10-01)*
 
