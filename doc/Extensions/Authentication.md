@@ -28,7 +28,7 @@ $config['auth_mechanism'] = "mysql";
 
 - 1: **Normal User**: You will need to assign device / port permissions for users at this level.
 
-- 5: **Global Read**: Global view but with restrictions, cant view any settings menus. 
+- 5: **Global Read**: Read only Administrator. 
 
 - 10: **Administartor**: This is a global read/write admin account.
 
