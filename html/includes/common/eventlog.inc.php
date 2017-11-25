@@ -6,9 +6,9 @@ $common_output[] = '
         <thead>
             <tr>
                 <th data-column-id="eventicon"></th>
-                <th data-column-id="datetime" data-order="desc">Datetime</th>
-                <th data-column-id="hostname">Hostname</th>
+                <th data-column-id="datetime" data-order="desc">Timestamp</th>
                 <th data-column-id="type">Type</th>
+                <th data-column-id="hostname">Hostname</th>
                 <th data-column-id="message">Message</th>
                 <th data-column-id="username">User</th>
             </tr>

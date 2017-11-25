@@ -1435,17 +1435,17 @@ function eventlog_severity($eventlog_severity)
 {
     switch ($eventlog_severity) {
         case 1:
-            return "severity-ok"; //OK
+            return "label-success"; //OK
         case 2:
-            return "severity-info"; //Informational
+            return "label-info"; //Informational
         case 3:
-            return "severity-notice"; //Notice
+            return "label-primary"; //Notice
         case 4:
-            return "severity-warning"; //Warning
+            return "label-warning"; //Warning
         case 5:
-            return "severity-critical"; //Critical
+            return "label-danger"; //Critical
         default:
-            return "severity-unknown"; //Unknown
+            return "label-default"; //Unknown
     }
 } // end eventlog_severity
 
