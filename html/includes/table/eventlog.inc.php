@@ -74,6 +74,10 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
     }
     $severity_colour = $eventlog['severity'];
 
+    if ($eventlog['username'] == '') {
+        $eventlog['username']  = 'System';
+    }
+
     $response[] = array(
         'eventicon' => "<span class='alert-status ".eventlog_severity($severity_colour)."'>&nbsp;</span>",
         'datetime'  => $eventlog['humandate'],
