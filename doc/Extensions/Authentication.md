@@ -34,6 +34,8 @@ $config['auth_mechanism'] = "mysql";
 
 - 11: **Demo Account**: Provides full read/write with certain restrictions (i.e can't delete devices).
 
+**Note** Oxidized configs can often contain sensitive data. Because of that only Administrator account type can see configs.
+
 ### Note for SELinux users
 When using SELinux on the LibreNMS server, you need to allow Apache (httpd) to connect LDAP/Active Directory server, this is disabled by default. You can use SELinux Booleans to allow network access to LDAP resources with this command:
 
