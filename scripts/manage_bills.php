@@ -16,9 +16,10 @@ require realpath(__DIR__ . '/..') . '/includes/init.php';
 // Find the correct bill, exit if we get anything other than 1 result.
 function list_bills($bill_name)
 {
-    $bill = dbFetchRows("SELECT `bill_id`,`bill_name` FROM `bills` WHERE `bill_name` LIKE ?", array("%$bill_name%"));
+    $bill = dbFetchRows("SELECT `bill_id`,`bill_name` FROM `bills` WHERE `bill_name` LIKE ?", array("$bill_name"));
     if (count($bill) != 1) {
         echo("Did not find exactly 1 bill, exiting\n");
+        echo("Query:".$bill."\n");
         exit(1);
     } else {
         echo("Found bill {$bill[0]['bill_name']} ({$bill[0]['bill_id']})\n");
@@ -27,9 +28,9 @@ function list_bills($bill_name)
 }
 
 // This will get an array of devices we are interested in from the CLI glob
-function get_devices($host_glob)
+function get_devices($host_glob,$nameType)
 {
-    return dbFetchRows("SELECT `device_id`,`hostname`,`sysName` FROM `devices` WHERE `sysName` LIKE ?", array("%$host_glob%"));
+    return dbFetchRows("SELECT `device_id`,`hostname`,`sysName` FROM `devices` WHERE `".$nameType."` LIKE ?", array("%$host_glob%"));
 }
 
 // This will flush bill ports if -r is set on cli
@@ -71,20 +72,39 @@ function create_bill($devs, $intf_glob, $id)
 /** Setup options:
     l - bill_name - bill glob
     c - circuit_id - interface glob
-    d - device_id - device glob
+    s - sysName - device glob
+    h - hostname - device glob
     f - flush - boolean
 **/
 
-$options = getopt('l:c:d:f');
+$options = getopt('l:c:s:h:f');
+
+if (empty($options['s']) && empty($options['h'])) { 
+    echo "Please set -s or -h\n";
+    exit(1);
+}
+else if (!empty($options['s']) && !empty($options['h'])) { 
+    echo "Please set either -s or -h, not both\n";
+    exit(1);
+}
+if (!empty($options['s'])) { 
+    $host_glob = str_replace('*', '%', mres($options['s']));
+    $nameType = "sysName";
+}
+if (!empty($options['h'])) { 
+    $host_glob = str_replace('*', '%', mres($options['h']));
+    $nameType = "hostname";
+}
+
 
 $bill_name = str_replace('*', '%', mres($options['l']));
 $intf_glob = str_replace('*', '%', mres($options['c']));
-$host_glob = str_replace('*', '%', mres($options['d']));
 
 if (empty($bill_name)) {
     echo "Usage:\n";
     echo "-l <bill name glob>   Bill name to match\n";
-    echo "-d <hostname glob>    Hostname to match\n";
+    echo "-s <sysName glob>     sysName to match (Cannot be used with -h)\n";
+    echo "-h <hostname glob>    Hostname to match (Cannot be used with -s)\n";
     echo "-c <Interface description glob>   Interface description to match\n";
     echo "-f Flush all ports from a bill before adding adding ports\n";
     echo "Example:\n";
@@ -111,7 +131,7 @@ if (isset($options['f'])) {
 
 $id = list_bills($bill_name);
 
-$devices = get_devices($host_glob);
+$devices = get_devices($host_glob, $nameType);
 
 if (empty($devices)) {
     echo "No devices found\n";
@@ -123,3 +143,4 @@ if ($flush) {
 }
 
 $ret = create_bill($devices, $intf_glob, $id);
+
