@@ -23,28 +23,18 @@ use LibreNMS\Util\IP;
 function generate_priority_label($priority)
 {
     $map = array(
-        //"emerg"     => "fa-plus-circle text-danger",
         "emerg"     => "label-danger",
-        //"alert"     => "fa-ban text-danger",
         "alert"     => "label-danger",
-        //"crit"      => "fa-minus-circle text-danger",
         "crit"      => "label-danger",
-        //"err"       => "fa-times-circle text-warning",
         "err"       => "label-danger",
-        //"warning"   => "fa-exclamation-triangle text-warning",
         "warning"   => "label-warning",
-        //"notice"    => "fa-info-circle text-info",
         "notice"    => "label-info",
-        //"info"      => "fa-info-circle text-info",
         "info"      => "label-info",
-        //"debug"     => "fa-bug text-muted",
         "debug"     => "label-default",
-        //""          => "fa-info-circle text-info",
         ""          => "label-info",
     );
 
     $barColor = isset($map[$priority]) ? $map[$priority] : 'label-info';
-    //return '<i class="fa '. $fa_icon.' fa-lg" title="'.$priority.'" aria-hidden="true"></i>';
     return '<span class="alert-status '.$barColor .'">&nbsp;</span>';
 }
 
