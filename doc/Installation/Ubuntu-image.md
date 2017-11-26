@@ -8,7 +8,7 @@ We have available for download a pre-built image based on Ubuntu 16.04 LTS. Deta
 The image is built with VirtualBox, a vmdk is provided along with an ova which was exported using OFV 1.0 version. 
 These should be supported in VMWare Fusion, Workstation, Player and VirtualBox.
 
-* NOTE: It's highly recommended that you update by doing the follwoing. 
+* NOTE: It's highly recommended that you update by doing the following. 
 ```bash
 cd /opt/librenms
 ./daily.sh
