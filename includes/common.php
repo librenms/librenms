@@ -23,19 +23,29 @@ use LibreNMS\Util\IP;
 function generate_priority_icon($priority)
 {
     $map = array(
-        "emerg"     => "fa-plus-circle text-danger",
-        "alert"     => "fa-ban text-danger",
-        "crit"      => "fa-minus-circle text-danger",
-        "err"       => "fa-times-circle text-warning",
-        "warning"   => "fa-exclamation-triangle text-warning",
-        "notice"    => "fa-info-circle text-info",
-        "info"      => "fa-info-circle text-info",
-        "debug"     => "fa-bug text-muted",
-        ""          => "fa-info-circle text-info",
+        //"emerg"     => "fa-plus-circle text-danger",
+        "emerg"     => "label-danger",
+        //"alert"     => "fa-ban text-danger",
+        "alert"     => "label-danger",
+        //"crit"      => "fa-minus-circle text-danger",
+        "crit"      => "label-danger",
+        //"err"       => "fa-times-circle text-warning",
+        "err"       => "label-danger",
+        //"warning"   => "fa-exclamation-triangle text-warning",
+        "warning"   => "label-warning",
+        //"notice"    => "fa-info-circle text-info",
+        "notice"    => "label-info",
+        //"info"      => "fa-info-circle text-info",
+        "info"      => "label-info",
+        //"debug"     => "fa-bug text-muted",
+        "debug"     => "label-default",
+        //""          => "fa-info-circle text-info",
+        ""          => "label-info",
     );
 
-    $fa_icon = isset($map[$priority]) ? $map[$priority] : 'fa-info-circle text-info';
-    return '<i class="fa '. $fa_icon.' fa-lg" title="'.$priority.'" aria-hidden="true"></i>';
+    $barColor = isset($map[$priority]) ? $map[$priority] : 'label-info';
+    //return '<i class="fa '. $fa_icon.' fa-lg" title="'.$priority.'" aria-hidden="true"></i>';
+    return '<span class="alert-status '.$barColor .'"><i class="hidden" title="'.$priority.'">&nbsp;</i></span>';
 }
 
 function generate_priority_status($priority)

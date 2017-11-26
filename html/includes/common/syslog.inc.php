@@ -5,12 +5,12 @@ $common_output[] = '
     <table id="syslog" class="table table-hover table-condensed table-striped">
         <thead>
             <tr>
-                <th data-column-id="priority">&nbsp;</th>
-                <th data-column-id="timestamp" data-order="desc">Datetime</th>
+                <th data-column-id="priority"></th>
+                <th data-column-id="timestamp" data-order="desc">Timestamp</th>
                 <th data-column-id="device_id">Hostname</th>
                 <th data-column-id="program">Program</th>
                 <th data-column-id="msg">Message</th>
-                <th data-column-id="status">Message</th>
+                <th data-column-id="status">Priority</th>
             </tr>
         </thead>
     </table>
@@ -32,14 +32,6 @@ var syslog_grid = $("#syslog").bootgrid({
         };
     },
     url: "ajax_table.php",
-    statusMappings: {
-        // Nagios style
-        0: "text-muted",
-        1: "warning",
-        2: "danger",
-        3: "info"
-    }
 });
-
 </script>
 ';

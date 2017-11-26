@@ -69,7 +69,8 @@ foreach (dbFetchRows($sql, $param) as $syslog) {
     $dev        = device_by_id_cache($syslog['device_id']);
     $response[] = array(
         'priority'  => generate_priority_icon($syslog['priority']),
-        'timestamp' => '<div style="white-space:nowrap;">'.$syslog['date'].'</div>',
+        //'priority'  => $syslog['priority'],
+        'timestamp' => $syslog['date'],
         'device_id' => generate_device_link($dev, shorthost($dev['hostname'])),
         'program'   => $syslog['program'],
         'msg'       => display($syslog['msg']),
