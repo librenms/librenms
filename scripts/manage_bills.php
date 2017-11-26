@@ -28,7 +28,7 @@ function list_bills($bill_name)
 }
 
 // This will get an array of devices we are interested in from the CLI glob
-function get_devices($host_glob,$nameType)
+function get_devices($host_glob, $nameType)
 {
     return dbFetchRows("SELECT `device_id`,`hostname`,`sysName` FROM `devices` WHERE `".$nameType."` LIKE ?", array("%$host_glob%"));
 }
@@ -79,19 +79,18 @@ function create_bill($devs, $intf_glob, $id)
 
 $options = getopt('l:c:s:h:f');
 
-if (empty($options['s']) && empty($options['h'])) { 
+if (empty($options['s']) && empty($options['h'])) {
     echo "Please set -s or -h\n";
     exit(1);
-}
-else if (!empty($options['s']) && !empty($options['h'])) { 
+} else if (!empty($options['s']) && !empty($options['h'])) {
     echo "Please set either -s or -h, not both\n";
     exit(1);
 }
-if (!empty($options['s'])) { 
+if (!empty($options['s'])) {
     $host_glob = str_replace('*', '%', mres($options['s']));
     $nameType = "sysName";
 }
-if (!empty($options['h'])) { 
+if (!empty($options['h'])) {
     $host_glob = str_replace('*', '%', mres($options['h']));
     $nameType = "hostname";
 }
@@ -143,4 +142,3 @@ if ($flush) {
 }
 
 $ret = create_bill($devices, $intf_glob, $id);
-
