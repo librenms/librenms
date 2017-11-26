@@ -24,6 +24,13 @@ $config['graylog']['password'] = 'admin';
 $config['graylog']['version']  = '2.1';
 ```
 
+Graylog messages are stored using GMT timezone. You can display graylog messages in LibreNMS webui using your desired timezone by setting following option in config.php:
+
+```php
+$config['graylog']['timezone'] = 'Europe/Bucharest';
+```
+> Timezone must be PHP supported timezones, available at: <a href="http://php.net/manual/en/timezones.php">http://php.net/manual/en/timezones.php</a>
+
 > Since Graylog 2.1, the default API path is /api/
 
 If you are running a version earlier than Graylog then please set `$config['graylog']['version']` to the version 
