@@ -20,7 +20,7 @@ use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
-function generate_priority_icon($priority)
+function generate_priority_label($priority)
 {
     $map = array(
         //"emerg"     => "fa-plus-circle text-danger",
@@ -45,7 +45,7 @@ function generate_priority_icon($priority)
 
     $barColor = isset($map[$priority]) ? $map[$priority] : 'label-info';
     //return '<i class="fa '. $fa_icon.' fa-lg" title="'.$priority.'" aria-hidden="true"></i>';
-    return '<span class="alert-status '.$barColor .'"><i class="hidden" title="'.$priority.'">&nbsp;</i></span>';
+    return '<span class="alert-status '.$barColor .'">&nbsp;</span>';
 }
 
 function generate_priority_status($priority)

@@ -68,13 +68,13 @@ $sql = "SELECT S.*, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['co
 foreach (dbFetchRows($sql, $param) as $syslog) {
     $dev        = device_by_id_cache($syslog['device_id']);
     $response[] = array(
-        'priority'  => generate_priority_icon($syslog['priority']),
-        //'priority'  => $syslog['priority'],
+        'label'  => generate_priority_label($syslog['priority']),
         'timestamp' => $syslog['date'],
+        'level'      => $syslog['priority'],
         'device_id' => generate_device_link($dev, shorthost($dev['hostname'])),
         'program'   => $syslog['program'],
         'msg'       => display($syslog['msg']),
-        'status'    => generate_priority_status($syslog['priority']),
+        'priority'   => generate_priority_status($syslog['priority']),
     );
 }
 
