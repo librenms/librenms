@@ -1,7 +1,7 @@
 source: Support/Cleanup-options.md
 
 #  Cleanup Options
-As the number of devices starts to grow in your LibreNMS install, such as the database RRD files, event log, Syslog, system performance and timing logs etc. Your LibreNMS install could become quite large so it becomes necessary to clean up those entries. With Cleanup Options, you can keep in crontrol. 
+As the number of devices starts to grow in your LibreNMS install, so will things such as the RRD files, MySQL database containing eventlogs, Syslogs and performance data etc. Your LibreNMS install could become quite large so it becomes necessary to clean up those entries. With Cleanup Options, you can keep in crontrol. 
 
 These options rely on ```daily.sh``` running from cron as per the installation instructions.
 
