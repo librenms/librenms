@@ -1,5 +1,4 @@
-
-# Agent Setup
+source: Extensions/Agent-Setup.md
 
 The agent can be used to gather data from remote systems you can use LibreNMS in combination with check_mk (found [here](https://github.com/librenms/librenms-agent)).
 The agent can be extended to include data about [applications](Applications.md) on the remote system.
@@ -8,7 +7,7 @@ Make sure that systemd or xinetd is installed on the host you want to run the ag
 
 The agent uses TCP-Port 6556, please allow access from the **LibreNMS host** and **poller nodes** if you're using the [Distributed Polling](http://docs.librenms.org/Extensions/Distributed-Poller/) setup.
 
-On each of the hosts you would like to use the agent on then you need to do the following:
+On each of the hosts you would like to use the agent on, you need to do the following:
 
 1. Clone the `librenms-agent` repository:
 

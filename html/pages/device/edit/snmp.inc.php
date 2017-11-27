@@ -2,95 +2,97 @@
 
 if ($_POST['editing']) {
     if ($_SESSION['userlevel'] > '7') {
-        $no_checks    = ($_POST['no_checks'] == 'on');
-        $community    = mres($_POST['community']);
-        $snmpver      = mres($_POST['snmpver']);
-        $transport    = $_POST['transport'] ? mres($_POST['transport']) : $transport = 'udp';
-        $port         = $_POST['port'] ? mres($_POST['port']) : $config['snmp']['port'];
-        $timeout      = mres($_POST['timeout']);
-        $retries      = mres($_POST['retries']);
-        $poller_group = isset($_POST['poller_group']) ? mres($_POST['poller_group']) : 0;
-        $port_assoc_mode = mres($_POST['port_assoc_mode']);
-        $max_repeaters = mres($_POST['max_repeaters']);
-        $max_oid      = mres($_POST['max_oid']);
-        $v3           = array(
-            'authlevel'  => mres($_POST['authlevel']),
-            'authname'   => mres($_POST['authname']),
-            'authpass'   => mres($_POST['authpass']),
-            'authalgo'   => mres($_POST['authalgo']),
-            'cryptopass' => mres($_POST['cryptopass']),
-            'cryptoalgo' => mres($_POST['cryptoalgo']),
-        );
+        $poller_group = isset($_POST['poller_group']) ? clean($_POST['poller_group']) : 0;
+        $snmp_enabled = ($_POST['snmp'] == 'on');
+        if ($snmp_enabled) {
+            $no_checks    = ($_POST['no_checks'] == 'on');
+            $community    = clean($_POST['community']);
+            $snmpver      = clean($_POST['snmpver']);
+            $transport    = $_POST['transport'] ? clean($_POST['transport']) : $transport = 'udp';
+            $port         = $_POST['port'] ? clean($_POST['port']) : $config['snmp']['port'];
+            $timeout      = clean($_POST['timeout']);
+            $retries      = clean($_POST['retries']);
+            $port_assoc_mode = clean($_POST['port_assoc_mode']);
+            $max_repeaters = clean($_POST['max_repeaters']);
+            $max_oid      = clean($_POST['max_oid']);
+            $v3           = array(
+                'authlevel'  => clean($_POST['authlevel']),
+                'authname'   => clean($_POST['authname']),
+                'authpass'   => clean($_POST['authpass']),
+                'authalgo'   => clean($_POST['authalgo']),
+                'cryptopass' => clean($_POST['cryptopass']),
+                'cryptoalgo' => clean($_POST['cryptoalgo']),
+            );
 
-        // FIXME needs better feedback
-        $update = array(
-            'community'    => $community,
-            'snmpver'      => $snmpver,
-            'port'         => $port,
-            'transport'    => $transport,
-            'poller_group' => $poller_group,
-            'port_association_mode' => $port_assoc_mode,
-        );
+            // FIXME needs better feedback
+            $update = array(
+                'community'    => $community,
+                'snmpver'      => $snmpver,
+                'port'         => $port,
+                'transport'    => $transport,
+                'poller_group' => $poller_group,
+                'port_association_mode' => $port_assoc_mode,
+                'snmp_disable' => 0,
+            );
 
-        if ($_POST['timeout']) {
-            $update['timeout'] = $timeout;
+            if ($timeout) {
+                $update['timeout'] = $timeout;
+            } else {
+                $update['timeout'] = array('NULL');
+            }
+
+            if ($retries) {
+                $update['retries'] = $retries;
+            } else {
+                $update['retries'] = array('NULL');
+            }
+            $update = array_merge($update, $v3);
         } else {
-            $update['timeout'] = array('NULL');
+            $update['snmp_disable'] = 1;
+            $update['os']           = $_POST['os'] ? clean($_POST['os_id']) : "ping";
+            $update['hardware']     = clean($_POST['hardware']);
+            $update['features']     = null;
+            $update['version']      = null;
+            $update['icon']         = null;
         }
-
-        if ($_POST['retries']) {
-            $update['retries'] = $retries;
-        } else {
-            $update['retries'] = array('NULL');
-        }
-
-        $update = array_merge($update, $v3);
 
         $device_tmp = deviceArray($device['hostname'], $community, $snmpver, $port, $transport, $v3, $port_assoc_mode);
-        if ($no_checks === true || isSNMPable($device_tmp)) {
+        if ($no_checks === true || !$snmp_enabled || isSNMPable($device_tmp)) {
             $rows_updated = dbUpdate($update, 'devices', '`device_id` = ?', array($device['device_id']));
             
-            $max_repeaters_set = false;
-            $max_oid_set = false;
+            $max_repeaters_set = 0;
+            $max_oid_set = 0;
 
             if (is_numeric($max_repeaters) && $max_repeaters != 0) {
-                set_dev_attrib($device, 'snmp_max_repeaters', $max_repeaters);
-                $max_repeaters_set = true;
+                $max_repeaters_set = set_dev_attrib($device, 'snmp_max_repeaters', $max_repeaters);
             } else {
-                del_dev_attrib($device, 'snmp_max_repeaters');
-                $max_repeaters_set = true;
+                $max_repeaters_set = del_dev_attrib($device, 'snmp_max_repeaters');
             }
 
             if (is_numeric($max_oid) && $max_oid != 0) {
-                set_dev_attrib($device, 'snmp_max_oid', $max_oid);
-                $max_oid_set = true;
+                $max_oid_set = set_dev_attrib($device, 'snmp_max_oid', $max_oid);
             } else {
-                del_dev_attrib($device, 'snmp_max_oid');
-                $max_oid_set = true;
+                $max_oid_set = del_dev_attrib($device, 'snmp_max_oid');
             }
 
             if ($rows_updated > 0) {
-                $update_message = $rows_updated.' Device record updated.';
-                $updated        = 1;
-            } elseif ($rows_updated = '-1') {
-                if ($max_repeaters_set === true || $max_repeaters_set === true) {
-                    if ($max_repeaters_set === true) {
-                        $update_message = 'SNMP Max repeaters updated, no other changes made';
-                    }
-                    if ($max_oid_set === true) {
-                        $update_message .= '<br />SNMP Max OID updated, no other changes made';
-                    }
-                } else {
-                    $update_message = 'Device record unchanged. No update necessary.';
-                }
-                $updated        = -1;
-            } else {
-                $update_message = 'Device record update error.';
-                $updated        = 0;
+                $update_message[] = $rows_updated.' Device record updated.';
+            }
+            if ($max_repeaters_set) {
+                $update_message[] = 'SNMP Max repeaters updated.';
+            } elseif ($max_repeaters_set === false) {
+                $update_failed_message[] = 'SNMP Max repeaters update failed.';
+            }
+            if ($max_oid_set) {
+                $update_message[] = 'SNMP Max OID updated updated.';
+            } elseif ($max_oid_set === false) {
+                $update_failed_message[] = 'SNMP Max OID updated failed.';
+            }
+            if (!isset($update_message) && !isset($update_failed_message)) {
+                $update_message[] = 'Device record unchanged. No update necessary.';
             }
         } else {
-            $update_message = 'Could not connect to device with new SNMP details';
-            $updated        = 0;
+            $update_failed_message[] = 'Could not connect to device with new SNMP details';
         }
     }//end if
 }//end if
@@ -98,10 +100,11 @@ if ($_POST['editing']) {
 $device = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', array($device['device_id']));
 $descr  = $device['purpose'];
 
-if ($updated && $update_message) {
-    print_message($update_message);
-} elseif ($update_message) {
-    print_error($update_message);
+if (isset($update_message)) {
+    print_message(join("<br />", $update_message));
+}
+if (isset($update_failed_message)) {
+    print_error(join("<br />", $update_failed_message));
 }
 
 $max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
@@ -109,6 +112,28 @@ $max_oid = get_dev_attrib($device, 'snmp_max_oid');
 
 echo "
     <form id='edit' name='edit' method='post' action='' role='form' class='form-horizontal'>
+    <div class='form-group'>
+    <label for='hardware' class='col-sm-2 control-label'>SNMP</label>
+    <div class='col-sm-4'>
+    <input type='checkbox' id='snmp' name='snmp' data-size='small' onChange='disableSnmp(this);'".($device['snmp_disable'] ? "" : " checked").">
+    </div>
+    </div>
+    <div id='snmp_override' style='display: ".($device['snmp_disable'] ? "block" : "none").";'>
+    <div class='form-group'>
+    <label for='hardware' class='col-sm-2 control-label'>Hardware (optional)</label>
+    <div class='col-sm-4'>
+    <input id='hardware' class='form-control' name='hardware' value='".$device['hardware']."'/>
+    </div>
+    </div>
+    <div class='form-group'>
+    <label for='os' class='col-sm-2 control-label'>OS (optional)</label>
+    <div class='col-sm-4'>
+    <input id='os' class='form-control' name='os' value='".$config['os'][$device['os']]['text']."'/>
+    <input type='hidden' id='os_id' class='form-control' name='os_id' value='".$device['os']."'/>
+    </div>
+    </div>
+    </div>
+    <div id='snmp_conf' style='display: ".($device['snmp_disable'] ? "none" : "block").";'>
     <input type=hidden name='editing' value='yes'>
     <div class='form-group'>
     <label for='snmpver' class='col-sm-2 control-label'>SNMP Details</label>
@@ -251,6 +276,7 @@ echo "        </select>
         </div>
     </div>
 </div>
+</div>
 <?php
 
 if ($config['distributed_poller'] === true) {
@@ -301,6 +327,59 @@ function changeForm() {
         $('#snmpv3').show();
     }
 }
+function disableSnmp(e) {
+    if(e.checked) {
+        $('#snmp_conf').show();
+        $('#snmp_override').hide();
+    } else {
+        $('#snmp_conf').hide();
+        $('#snmp_override').show();
+    }
+}
+
+var os_suggestions = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    remote: {
+        url: "ajax_ossuggest.php?term=%QUERY",
+        filter: function (output) {
+            return $.map(output, function (item) {
+                return {
+                    text: item.text,
+                    os: item.os,
+                };
+            });
+        },
+        wildcard: "%QUERY"
+    }
+});
+os_suggestions.initialize();
+$('#os').typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 1,
+        classNames: {
+            menu: 'typeahead-left'
+        }
+    },
+    {
+        source: os_suggestions.ttAdapter(),
+        async: true,
+        displayKey: 'text',
+        valueKey: 'os',
+        templates: {
+            suggestion: Handlebars.compile('<p>&nbsp;{{text}}</p>')
+        },
+        limit: 20
+    });
+
+$("#os").on("typeahead:selected typeahead:autocompleted", function(e,datum) {
+    $("#os_id").val(datum.os);
+    $("#os").html('<mark>' + datum.text + '</mark>');
+});
+
+$("[name='snmp']").bootstrapSwitch('offColor','danger');
+
 <?php
 if ($snmpver == 'v3' || $device['snmpver'] == 'v3') {
     echo "$('#snmpv1_2').toggle();";

@@ -1,4 +1,191 @@
+## 1.33
+*(2017-10-29)*
+
+#### Features
+* Support for up/down detection of ping only devices.
+* Improve Device Neighbour WebUI ([#7487](https://github.com/librenms/librenms/issues/7487))
+* Configurable 95th percentile ([#7442](https://github.com/librenms/librenms/issues/7442))
+* Added AD support nested groups (resubmit #7175) ([#7259](https://github.com/librenms/librenms/pull/7259))
+* Added configurable 95th percentile for graphs ([#7442](https://github.com/librenms/librenms/pull/7442))
+* Added  sysname as filtering group for oxidized ([#7485](https://github.com/librenms/librenms/pull/7485))
+* CDP matching incorrect ports ([#7491](https://github.com/librenms/librenms/pull/7491))
+* Issue warning notification if php version is less than 5.6.4 ([#7418](https://github.com/librenms/librenms/pull/7418))
+* Added Web validation support ([#7474](https://github.com/librenms/librenms/pull/7474))
+* Support for up/down detection of ping only devices ([#7323](https://github.com/librenms/librenms/pull/7323))
+
+#### Bugfixes
+* rfc1628 state sensor translations ([#7416](https://github.com/librenms/librenms/pull/7416))
+* snmpwalk_group tables not using entries ([#7427](https://github.com/librenms/librenms/pull/7427))
+* Improve accuracy of is_valid_hostname() ([#7435](https://github.com/librenms/librenms/pull/7435))
+* snmp_get_multi returns no data if the oid doesn't contain a period ([#7456](https://github.com/librenms/librenms/pull/7456))
+* Fixed clickatell alert transport ([#7446](https://github.com/librenms/librenms/pull/7446))
+* Escape sql credentials during install ([#7494](https://github.com/librenms/librenms/pull/7494))
+* Fixed OEM ipmi sensors that returns unreadable values ([#7518](https://github.com/librenms/librenms/pull/7518))
+* Fixed ospf polling not removing stale data ([#7503](https://github.com/librenms/librenms/pull/7503))
+* LLDP discovery change local port resolution ([#7443](https://github.com/librenms/librenms/pull/7443))
+
+#### Documentation
+* Include Freeswitch in applications doc ([#7556](https://github.com/librenms/librenms/issues/7556))
+* Added more example hardware ([#7542](https://github.com/librenms/librenms/issues/7542))
+* Update syslog docs to prevent dates in the future/past ([#7519](https://github.com/librenms/librenms/issues/7519))
+* Alerts glues ([#7480](https://github.com/librenms/librenms/issues/7480))
+* Improve CentOS 7 and Ubuntu 16 rrdcached installation instructions ([#7473](https://github.com/librenms/librenms/issues/7473))
+* Re-organize install docs ([#7424](https://github.com/librenms/librenms/pull/7424))
+* Added HipChat V2 WebUI Config Example ([#7486](https://github.com/librenms/librenms/pull/7486))
+* Alert rules, added in the alert rules videos ([#7512](https://github.com/librenms/librenms/pull/7512))
+* Updated references for ##librenms to discord ([#7523](https://github.com/librenms/librenms/pull/7523))
+* Document discovery and poller module enable/disable support ([#7505](https://github.com/librenms/librenms/pull/7505))
+* OpenManage including info for windows ([#7534](https://github.com/librenms/librenms/pull/7534))
+* Added SSL config for CentOS 7 with Apache ([#7529](https://github.com/librenms/librenms/pull/7529))
+* Added Dynamic Configuration UI for Network-Map.md ([#7540](https://github.com/librenms/librenms/pull/7540))
+* New doc for weathermap ([#7536](https://github.com/librenms/librenms/pull/7536))
+
+#### Devices
+* Always allow empty ifDescr on fortigate ([#7547](https://github.com/librenms/librenms/issues/7547))
+* Added temperature sensor to datacom switches. ([#7522](https://github.com/librenms/librenms/issues/7522))
+* Added more Procera interfaces ([#7422](https://github.com/librenms/librenms/issues/7422))
+* Added firewall graphs for Palo Alto Networks firewall ([#7483](https://github.com/librenms/librenms/issues/7483))
+* Added support for Alcoma wireless devices ([#7476](https://github.com/librenms/librenms/issues/7476))
+* Added detection for SmartOptics T-Series devices ([#7433](https://github.com/librenms/librenms/issues/7433))
+* Added more support for Avocent devices ([#7444](https://github.com/librenms/librenms/issues/7444))
+* Added Dlink dap2660 add processors and mempools ([#7428](https://github.com/librenms/librenms/issues/7428))
+* Added additional zywall-usg support ([#7405](https://github.com/librenms/librenms/pull/7405))
+* Added Dlink dap2660 processors and mempools ([#7428](https://github.com/librenms/librenms/pull/7428))
+* Added technicolor TG650S and TG670S ([#7420](https://github.com/librenms/librenms/pull/7420))
+* Added support for alternate Equallogic SNMP sysObjectId ([#7394](https://github.com/librenms/librenms/pull/7394))
+* Added zyxelnwa storage, mempools and wireless metrics ([#7441](https://github.com/librenms/librenms/pull/7441))
+* Added Storage, Memory pools, new status (Array Controller, Logical Drive) for HP ILO4 ([#7436](https://github.com/librenms/librenms/pull/7436))
+* Added Support for ApsoluteOS / Defense Pro Hw ([#7440](https://github.com/librenms/librenms/pull/7440))
+* Added support for Huawei OceanStor devices ([#7445](https://github.com/librenms/librenms/pull/7445))
+* Added detection for Racom OS RAy (#[7466](https://github.com/librenms/librenms/pull/7466)) 
+* Improved Zhone MXK Discovery ([#7488](https://github.com/librenms/librenms/pull/7488))
+* Added support for EATON-ATS devices ([#7448](https://github.com/librenms/librenms/pull/7448))
+* Added support for Alcoma devices ([#7476](https://github.com/librenms/librenms/pull/7476))
+* Added support for zywall usg vpn state and flash usage ([#7500](https://github.com/librenms/librenms/pull/7500))
+* Added Brocade IronWare interface dBm sensor support ([#7434](https://github.com/librenms/librenms/pull/7434))
+* Added Unifi AC HD detection ([#7516](https://github.com/librenms/librenms/pull/7516))
+* Added initial detection for netmodule NB1600 ([#7514](https://github.com/librenms/librenms/pull/7514))
+* Added support for new Fiberhome OLT Models ([#7499](https://github.com/librenms/librenms/pull/7499))
+* Added support for logmaster(ups vendors) os/devices ([#7524](https://github.com/librenms/librenms/pull/7524))
+* Added poller modules to ceraos ([#7470](https://github.com/librenms/librenms/pull/7470))
+* Added more detection for IgniteNet FusionSwitch ([#7384](https://github.com/librenms/librenms/pull/7384))
+* Added Mitel Standard Linux OS Support ([#7513](https://github.com/librenms/librenms/pull/7513))
+* Updated Cisco WAP detection and merged in ciscosmblinux OS ([#7447](https://github.com/librenms/librenms/pull/7447))
+* Added detection for Proxmox ([#7543](https://github.com/librenms/librenms/pull/7543)) 
+
+#### Alerting
+* Added alert rules for RFC1628 UPS to the collection ([#7415](https://github.com/librenms/librenms/pull/7415))
+* Added HP iLo and OS-updates rules to the collection ([#7423](https://github.com/librenms/librenms/pull/7423))
+* Added more simple rules for the alert collection ([#7430](https://github.com/librenms/librenms/pull/7430))
+
+#### Refactor
+* Discovery protocols re-write ([#7380](https://github.com/librenms/librenms/pull/7380))
+
+#### WebUI
+* Show only authorized services in availability map ([#7498](https://github.com/librenms/librenms/issues/7498))
+* Allow user to display ok/warning/critical alerts only ([#7484](https://github.com/librenms/librenms/issues/7484))
+
+#### Security
+* Stop accepting other variables in install that we do not use ([#7511](https://github.com/librenms/librenms/pull/7511))
+
+---
+
 source: General/Changelog.md
+## 1.32
+*(2017-10-01)*
+
+#### Features
+* Added more rules to the collection of alert rules ([#7363](https://github.com/librenms/librenms/issues/763))
+* Allow ignore_mount, ignore_mount_string, ignore_mount_regex per OS ([#7304](https://github.com/librenms/librenms/issues/7304))
+* Added script to generate config for new OS ([#7161](https://github.com/librenms/librenms/issues/7161))
+* Added Syslog hook for ASA support ([#7268](https://github.com/librenms/librenms/issues/7268))
+
+#### Bugfixes
+* If session save path is "", php will use /tmp ([#7359](https://github.com/librenms/librenms/issues/7359))
+* rfc1628 runtime - allow os quirks ([#7340](https://github.com/librenms/librenms/issues/7340))
+* Small error when checking ios for wireless rssi ([#7300](https://github.com/librenms/librenms/issues/7300))
+* Use Netscaler vserver full names ([#7279](https://github.com/librenms/librenms/issues/7279))
+* Slower hardware can hit the schema update response timeout ([#7296](https://github.com/librenms/librenms/issues/7296))
+* Do not issue non-master warning if on the release update channel ([#7297](https://github.com/librenms/librenms/issues/7297))
+* Fixed quotes breaking powerdns app data ([#7111](https://github.com/librenms/librenms/issues/7111))
+* Updated graph_types table so graph_subtype has no default value ([#7285](https://github.com/librenms/librenms/issues/7285))
+* Fixed IPv6 host renaming ([#7275](https://github.com/librenms/librenms/issues/7275))
+* Fixed Comware Processor Discovery && Hardware Info ([#7206](https://github.com/librenms/librenms/issues/7206))
+* Added Extreme OS mapping to 'gen_rancid' ([#7261](https://github.com/librenms/librenms/issues/7261))
+* Reverted previous active directory changes [#7254](https://github.com/librenms/librenms/issues/7254) ([#7257](https://github.com/librenms/librenms/issues/7257))
+* Fixed Avtech sensor discovery ([#7244](https://github.com/librenms/librenms/issues/7244))
+* Corrected variable for timeout messages in unix-agent.inc.php ([#7246](https://github.com/librenms/librenms/issues/7246))
+* Update notification for users with updates disabled ([#7253](https://github.com/librenms/librenms/issues/7253))
+* Fixed the empty() vlan detection check ([#7241](https://github.com/librenms/librenms/issues/7241))
+* Re-added changes for [#6959](https://github.com/librenms/librenms/issues/6959) removed by accident in [#7128](https://github.com/librenms/librenms/issues/7128) ([#7240](https://github.com/librenms/librenms/issues/7240))
+* Issues with Geist Watchdog sensors
+* Issues with Geist Watchdog miss-named variable in sensor pre-caching internal humidity and temperature was discovered twice humidity was mis-spelled in yaml discovery temperature and current had incorrect divisor in yaml
+
+#### Documentation
+* Added new faq Why would alert un-mute itself? ([#7403](https://github.com/librenms/librenms/issues/7403))
+* Added performance suggestion for 1min polling documentation
+* Updated Distributed poller doc as rrdcached needs -R to work properly ([#7393](https://github.com/librenms/librenms/issues/7393))
+* Updated docs to include installing xml php modules + updated validate ([#7349](https://github.com/librenms/librenms/issues/7349))
+* Reorganize authentication documentation ([#7329](https://github.com/librenms/librenms/issues/7329))
+* Update RRDCached.md to clarify version for client/server ([#7320](https://github.com/librenms/librenms/issues/7320))
+* Elaborated on permission issues with dmidecode for snmp ([#7288](https://github.com/librenms/librenms/issues/7288))
+* Update Distributed-Poller.md to remove distributed_poller_host
+* Added debug to services.md ([#7238](https://github.com/librenms/librenms/issues/7238))
+* Fixed API-Docs Link in webui ([#7242](https://github.com/librenms/librenms/issues/7242))
+* Updated Services.md include chmod +x ([#7230](https://github.com/librenms/librenms/issues/7230))
+
+#### Refactoring
+* Rewrite is_valid_port() ([#7360](https://github.com/librenms/librenms/issues/7360))
+* rfc1628 sensor tidy up ([#7341](https://github.com/librenms/librenms/issues/7341))
+* Added detection of vlan name changes ([#7348](https://github.com/librenms/librenms/issues/7348))
+* Rewrite is_valid_port() ([#7337](https://github.com/librenms/librenms/issues/7337))
+* Use the Config class includes/discovery ([#7299](https://github.com/librenms/librenms/issues/7299))
+* Updated ldap auth to allow configurable uidnumber field ([#7302](https://github.com/librenms/librenms/issues/7302))
+* Improve yaml state discovery ([#7221](https://github.com/librenms/librenms/issues/7221))
+* Added IOS-XR Bundle-Ether shortened/corrected forms ([#7283](https://github.com/librenms/librenms/issues/7283))
+
+#### Devices
+* Added basic detection for  hanwha techwin devices ([#7397](https://github.com/librenms/librenms/issues/7397))
+* Added sensor detection for APC In Row RD devices ([#7385](https://github.com/librenms/librenms/issues/7385))
+* Added better hardware and version identification for SAF ([#7378](https://github.com/librenms/librenms/issues/7378))
+* Added basic os for EricssonLG ES switches ([#7289](https://github.com/librenms/librenms/issues/7289))
+* Updated Engenius OS detection ([#7365](https://github.com/librenms/librenms/issues/7365))
+* Added detection for DPS Telecom NetGuardian ([#7326](https://github.com/librenms/librenms/issues/7326))
+* Added support for Alpha FXM UPS devices ([#7324](https://github.com/librenms/librenms/issues/7324))
+* Added detection for IgniteNet FusionSwitch devices
+* Added support for A10 ACOS devices ([#7327](https://github.com/librenms/librenms/issues/7327))
+* Added more detection for Cisco SB devices
+* Added support for routeros to pull UPS info
+* Added additional detection for Cisco small business switches ([#7317](https://github.com/librenms/librenms/issues/7317))
+* Added sensor support for Himoinsa Gensets ([#7315](https://github.com/librenms/librenms/issues/7315))
+* Added support for SmartOptics M-Series ([#7314](https://github.com/librenms/librenms/issues/7314))
+* Added DHCP Leases Graph for Mikrotik ([#7333](https://github.com/librenms/librenms/issues/7333))
+* Added support for Toshiba RemotEye4 devices ([#7312](https://github.com/librenms/librenms/issues/7312))
+* Added additional Quanta detection ([#7316](https://github.com/librenms/librenms/issues/7316))
+* Added additional detection for Calix devices ([#7325](https://github.com/librenms/librenms/issues/7325))
+* Added detection for Himoinsa Gensets ([#7295](https://github.com/librenms/librenms/issues/7295))
+* Added detection for ServerChecks ([#7308](https://github.com/librenms/librenms/issues/7308))
+* Added support for Saf Integra Access points ([#7292](https://github.com/librenms/librenms/issues/7292))
+* Added basic Open-E detection ([#7301](https://github.com/librenms/librenms/issues/7301))
+* Updated Arista entity-physical support to use high/low values from device ([#7156](https://github.com/librenms/librenms/issues/7156))
+* Added support for Mimosa A5 ([#7287](https://github.com/librenms/librenms/issues/7287))
+* Updated state sensor code for Netonix
+* Added support for Radware / AlteonOS OS/Mem/Proc ([#7220](https://github.com/librenms/librenms/issues/7220))
+* Added support for DragonWave Horizon ([#7264](https://github.com/librenms/librenms/issues/7264))
+
+#### WebUI
+* Updated alert rule collection to be table ([#7371](https://github.com/librenms/librenms/issues/7371))
+* Show how long a device has been down if it is down ([#7336](https://github.com/librenms/librenms/issues/7336))
+* Makes the .availability-label border-radius fit in with the border a bit better
+* Added device description to overview page ([#7328](https://github.com/librenms/librenms/issues/7328))
+* Greatly reduces application memory leak for dashboard ([#7215](https://github.com/librenms/librenms/issues/7215))
+
+#### API
+* Added ability to supports CORS for API ([#7357](https://github.com/librenms/librenms/issues/7357))
+* Added simple OSPF API route ([#7298](https://github.com/librenms/librenms/pull/7298))
+
+---
+
 ## 1.31
 *(2017-08-26)*
 

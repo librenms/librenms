@@ -16,7 +16,13 @@ if ($config['overview_show_sysDescr']) {
 echo '</div>
       <table class="table table-hover table-condensed table-striped">';
 
-$uptime = $device['uptime'];
+$uptime = formatUptime($device['uptime']);
+$uptime_text = 'Uptime';
+if ($device['status'] == 0) {
+    // Rewrite $uptime to be downtime if device is down
+    $uptime = formatUptime(time() - strtotime($device['last_polled']));
+    $uptime_text = 'Downtime';
+}
 
 if ($device['os'] == 'ios') {
     formatCiscoHardware($device);
@@ -42,6 +48,13 @@ if (!empty($device['ip'])) {
     } catch (InvalidIpException $e) {
         // don't add an ip line
     }
+}
+
+if ($device['purpose']) {
+    echo '<tr>
+        <td>Description</td>
+        <td>'.display($device['purpose']).'</td>
+      </tr>';
 }
 
 if ($device['hardware']) {
@@ -111,10 +124,10 @@ if (is_array($loc)) {
 }
 
 if ($uptime) {
-    echo '<tr>
-        <td>Uptime</td>
-        <td>'.formatUptime($uptime).'</td>
-      </tr>';
+    echo "<tr>
+        <td>$uptime_text</td>
+        <td>".$uptime."</td>
+      </tr>";
 }
 
 echo '</table>

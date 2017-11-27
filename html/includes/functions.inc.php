@@ -12,6 +12,8 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
+use LibreNMS\Authentication\Auth;
+
 /**
  * Compare $t with the value of $vars[$v], if that exists
  * @param string $v Name of the var to test
@@ -72,7 +74,7 @@ function nicecase($item)
 
         case 'nfs-v3-stats':
             return 'NFS v3 Stats';
-            
+
         case 'nfs-server':
             return 'NFS Server';
 
@@ -111,7 +113,7 @@ function nicecase($item)
 
         case 'fbsd-nfs-server':
             return 'FreeBSD NFS Server';
-        
+
         case 'php-fpm':
             return 'PHP-FPM';
 
@@ -161,6 +163,20 @@ function toner2colour($descr, $percent)
 
     return $colour;
 }//end toner2colour()
+
+
+/**
+ * Find all links in some text and turn them into html links.
+ *
+ * @param string $text
+ * @return string
+ */
+function linkify($text)
+{
+    $regex = "/(http|https|ftp|ftps):\/\/[a-z0-9\-.]+\.[a-z]{2,5}(\/\S*)?/i";
+
+    return preg_replace($regex, '<a href="$0">$0</a>', $text);
+}
 
 
 function generate_link($text, $vars, $new_vars = array())
@@ -269,7 +285,9 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
 
     $text = format_hostname($device, $text);
 
-    if (isset($config['os'][$device['os']]['over'])) {
+    if ($device['snmp_disable']) {
+        $graphs = $config['os']['ping']['over'];
+    } elseif (isset($config['os'][$device['os']]['over'])) {
         $graphs = $config['os'][$device['os']]['over'];
     } elseif (isset($device['os_group']) && isset($config['os'][$device['os_group']]['over'])) {
         $graphs = $config['os'][$device['os_group']]['over'];
@@ -1570,6 +1588,7 @@ function get_disks_with_smart($device, $app_id)
  */
 function get_dashboards($user_id = null)
 {
+    global $authorizer;
     $default = get_user_pref('dashboard');
     $dashboards = dbFetchRows(
         "SELECT * FROM `dashboards` WHERE dashboards.access > 0 || dashboards.user_id = ?",
@@ -1584,7 +1603,7 @@ function get_dashboards($user_id = null)
     foreach ($dashboards as $dashboard) {
         $duid = $dashboard['user_id'];
         if (!isset($usernames[$duid])) {
-            $user = get_user($duid);
+            $user = Auth::get()->getUser($duid);
             $usernames[$duid] = $user['username'];
         }
 

@@ -11,5 +11,11 @@
  */
 
 
-$version = snmp_get($device, "firmwareVersion.0", "-OQvs", "MOXA-IKS6726A-MIB");
+// Moxa people enjoy creating MIBs for each model!
+if ($device['sysDescr'] == 'IKS-6726A-2GTXSFP-T') {
+    $mibmod = 'MOXA-IKS6726A-MIB';
+} else if ($device['sysDescr'] == 'EDS-G508E-T') {
+    $mibmod = 'MOXA-EDSG508E-MIB';
+}
+$version = snmp_get($device, "firmwareVersion.0", "-OQvs", $mibmod);
 $hardware =  $poll_device['sysDescr'];

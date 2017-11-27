@@ -1,8 +1,7 @@
 source: Installation/Installation-Ubuntu-1404-Nginx.md
+> NOTE: These instructions assume you are the **root** user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
 
-> NOTE: These instructions have been tested on a fresh install of Ubuntu 12.04 and 14.04.
-
-> NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
+**Please note the minimum supported PHP version is 5.6.4**
 
 ### On the DB Server ###
 

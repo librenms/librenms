@@ -29,12 +29,13 @@ Your new OS class should extend LibreNMS\OS and implement the interfaces for the
 ```php
 namespace LibreNMS\OS;
 
+use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\OS;
 
 class Airos extends OS implements WirelessClientsDiscovery
 {
-    public functon discoverWirelessClients()
+    public function discoverWirelessClients()
     {
         $oid = '.1.3.6.1.4.1.41112.1.4.5.1.15.1'; //UBNT-AirMAX-MIB::ubntWlStatStaCount.1
         return array(
@@ -60,8 +61,8 @@ All discovery interfaces will require you to return an array of WirelessSensor o
   - $current = Defaults to null. Can be used to set the current value on discovery.
   If this is null the values will be polled right away and if they do not return valid value(s), the sensor will not be discovered.
   Supplying a value here implies you have already verified this sensor is valid.
-  - $divisor = Defaults to 1. This is used to divided the returned value.
   - $multiplier = Defaults to 1. This is used to multiply the returned value.
+  - $divisor = Defaults to 1. This is used to divided the returned value.
   - $aggregator = Defaults to sum. Valid values: sum, avg. This will combine multiple values from multiple oids into one.
   - $access_point_id = Defaults to null. If this is a wireless controller, you can link sensors to entries in the access_points table.
   - $high_limit = Defaults to null. Sets the high limit for the sensor, used in alerting to report out range sensors.

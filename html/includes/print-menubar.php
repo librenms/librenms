@@ -1,6 +1,7 @@
 <?php
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
+use LibreNMS\Authentication\Auth;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\ObjectCache;
 
@@ -374,7 +375,25 @@ if ($menu_sensors) {
     echo('            <li role="presentation" class="divider"></li>');
 }
 
-$icons = array('fanspeed'=>'tachometer','humidity'=>'tint','temperature'=>'thermometer-full','current'=>'bolt','frequency'=>'line-chart','power'=>'power-off','voltage'=>'bolt','charge'=>'battery-half','dbm'=>'sun-o', 'load'=>'percent', 'runtime' => 'hourglass-half', 'state'=>'bullseye','signal'=>'wifi', 'snr'=>'signal');
+$icons = array(
+    'fanspeed' => 'tachometer',
+    'humidity' => 'tint',
+    'temperature' => 'thermometer-full',
+    'current' => 'bolt',
+    'frequency' => 'line-chart',
+    'power' => 'power-off',
+    'voltage' => 'bolt',
+    'charge' => 'battery-half',
+    'dbm' => 'sun-o',
+    'load' => 'percent',
+    'runtime' => 'hourglass-half',
+    'state' => 'bullseye',
+    'signal' => 'wifi',
+    'snr' => 'signal',
+    'pressure' => 'thermometer-empty',
+    'cooling' => 'thermometer-full',
+    'airflow' => 'angle-double-right',
+);
 foreach (array('fanspeed','humidity','temperature','signal') as $item) {
     if (isset($menu_sensors[$item])) {
         echo('            <li><a href="health/metric='.$item.'/"><i class="fa fa-'.$icons[$item].' fa-fw fa-lg" aria-hidden="true"></i> '.nicecase($item).'</a></li>');
@@ -407,7 +426,16 @@ foreach (array_keys($menu_sensors) as $item) {
     $sep++;
 }
 
+
+$toner = new ObjectCache('toner');
+if ($toner) {
+    echo '<li role="presentation" class="divider"></li>';
+    echo '<li><a href="health/metric=toner/"><i class="fa fa-print fa-fw fa-lg"></i> Toner</a></li>';
+    $used_sensors['toner'] = $toner;
+}
 ?>
+
+
           </ul>
         </li>
 <?php
@@ -599,7 +627,7 @@ if (empty($notifications['count']) && empty($notifications['sticky_count'])) {
 } else {
     $class = 'badge-danger';
 }
-    echo('<a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span class="visible-xs-inline-block">User</span><span class="badge badge-navbar-user '.$class.'">'.($notifications['sticky_count']+$notifications['count']).'</span></a>');
+    echo('<a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span class="visible-xs-inline-block">User</span><span class="badge badge-navbar-user count-notif '.$class.'">'.($notifications['sticky_count']+$notifications['count']).'</span></a>');
 ?>
         <ul class="dropdown-menu">
           <li><a href="preferences/"><i class="fa fa-cog fa-fw fa-lg" aria-hidden="true"></i> My Settings</a></li>
@@ -623,13 +651,14 @@ if ($_SESSION['authenticated']) {
 <?php
 if ($_SESSION['userlevel'] >= '10') {
     echo('<li><a href="settings/"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> Global Settings</a></li>');
+    echo('<li><a href="validate/"><i class="fa fa-check-circle fa-fw fa-lg" aria-hidden="true"></i> Validate Config</a></li>');
 }
 
 ?>
           <li role="presentation" class="divider"></li>
 
 <?php if ($_SESSION['userlevel'] >= '10') {
-    if (auth_usermanagement()) {
+    if (Auth::get()->canManageUsers()) {
         echo('
            <li><a href="adduser/"><i class="fa fa-user-plus fa-fw fa-lg" aria-hidden="true"></i> Add User</a></li>
            <li><a href="deluser/"><i class="fa fa-user-times fa-fw fa-lg" aria-hidden="true"></i> Remove User</a></li>
@@ -643,11 +672,11 @@ if ($_SESSION['userlevel'] >= '10') {
            <li class="dropdown-submenu">
                <a href="#"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a>
                <ul class="dropdown-menu scrollable-menu">
-               <li><a href="poll-log/"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> Poller History</a></li>');
+               <li><a href="poll-log/"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> Poller History</a></li>
+               <li><a href="pollers/tab=pollers/"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a></li>');
 
     if ($config['distributed_poller'] === true) {
         echo ('
-                    <li><a href="pollers/tab=pollers/"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a></li>
                     <li><a href="pollers/tab=groups/"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Poller Groups</a></li>');
     }
     echo ('

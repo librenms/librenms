@@ -1,9 +1,9 @@
 source: Extensions/Applications.md
-Applications
-------------
+## Introduction
+
 You can use Application support to graph performance statistics from many applications.
 
-Different applications support a variety of ways collect data: by direct connection to the application, snmpd extend, or [the agent](Agent-Setup.md).
+Different applications support a variety of ways to collect data: by direct connection to the application, snmpd extend, or [the agent](Agent-Setup.md).
 
 1. [Apache](#apache) - SNMP extend, Agent
 1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
@@ -13,6 +13,7 @@ Different applications support a variety of ways collect data: by direct connect
 1. [Fail2ban](#fail2ban) - SNMP extend
 1. [FreeBSD NFS Client](#freebsd-nfs-client) - SNMP extend
 1. [FreeBSD NFS Server](#freebsd-nfs-server) - SNMP extend
+1. [Freeswitch](#freeswitch) - SNMP extend, Agent
 1. [GPSD](#gpsd) - Agent
 1. [Mailscanner](#mailscanner) - SNMP extend
 1. [Memcached](#memcached) - SNMP extend
@@ -167,6 +168,9 @@ A small shell script that reports current DHCP leases stats.
 
 ##### SNMP Extend
 1. Copy the shell script to the desired host (the host must be added to LibreNMS devices)
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp-status.sh -O /etc/snmp/dhcp-status.sh
+```
 
 2. Make the script executable (chmod +x /etc/snmp/dhcp-status.sh)
 
@@ -271,7 +275,7 @@ extend mailscanner /etc/snmp/mailscanner.php
 4. Restart snmpd on your host
 
 
-### GSPD
+### GPSD
 A small shell script that reports GPSD status.
 
 ##### Agent
@@ -280,6 +284,35 @@ A small shell script that reports GPSD status.
 You may need to configure `$server` or `$port`.
 
 Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
+
+
+### Freeswitch
+A small shell script that reports various Freeswitch call status.
+
+##### Agent
+1. [Install the agent](Agent-Setup.md) on your Freeswitch server if it isn't already
+
+2. Copy the [freeswitch script](https://github.com/librenms/librenms-agent/blob/master/agent-local/freeswitch) to `/usr/lib/check_mk_agent/local/`
+
+3. Configure `FSCLI` in the script. You may also have to create an `/etc/fs_cli.conf` file if your `fs_cli` command requires authentication.
+
+4. Verify it is working by running `/usr/lib/check_mk_agent/local/freeswitch`
+
+##### SNMP Extend
+1. Copy the [freeswitch script](https://github.com/librenms/librenms-agent/blob/master/agent-local/freeswitch) to `/etc/snmp/` on your Freeswitch server.
+
+2. Make the script executable: `chmod +x /etc/snmp/freeswitch`
+
+3. Configure `FSCLI` in the script. You may also have to create an `/etc/fs_cli.conf` file if your `fs_cli` command requires authentication.
+
+4. Verify it is working by running `/etc/snmp/freeswitch`
+
+5. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+```
+extend freeswitch /etc/snmp/freeswitch
+```
+
+6. Restart snmpd on your host
 
 
 ### Memcached
@@ -637,9 +670,18 @@ This script uses `rec_control get-all` to collect stats.
 
 4. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 `extend proxmox /usr/local/bin/proxmox`
-(Note: if your snmpd doesn't run as root, you might have to invoke the script using sudo. `extend proxmox /usr/bin/sudo /usr/local/bin/proxmox`)
 
-5. Restart snmpd on your host
+5. Note: if your snmpd doesn't run as root, you might have to invoke the script using sudo and modify the "extend" line
+```
+extend proxmox /usr/bin/sudo /usr/local/bin/proxmox 
+```
+
+after, edit your sudo users (usually `visudo`) and add at the bottom:
+```
+snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
+```
+
+6. Restart snmpd on your host
 
 
 ### Raspberry PI
@@ -700,6 +742,15 @@ If you have a large number of more than one or two disks on a system, you should
 ```
  */3 * * * * /etc/snmp/smart -u
 ```
+
+6. If your snmp agent runs as user "snmp", edit your sudo users (usually `visudo`) and add at the bottom:
+```
+snmp ALL=(ALL) NOPASSWD: /etc/snmp/smart, /usr/sbin/smartctl
+```
+and modify your snmpd.conf file accordingly:
+```
+extend smart /usr/bin/sudo /etc/snmp/smart
+``` 
 
 ### Squid
 

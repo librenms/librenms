@@ -15,6 +15,12 @@ if (!empty($_POST['location'])) {
     $sql .= " LEFT JOIN `devices_attribs` AS `DB` ON `DB`.`device_id`=`devices`.`device_id` AND `DB`.`attrib_type`='override_sysLocation_bool' AND `DB`.`attrib_value`='1' LEFT JOIN `devices_attribs` AS `DA` ON `devices`.`device_id`=`DA`.`device_id`";
 }
 
+if (!empty($_POST['group']) && is_numeric($_POST['group'])) {
+    $sql .= " LEFT JOIN `device_group_device` AS `DG` ON `DG`.`device_id`=`devices`.`device_id`";
+    $where .= " AND `DG`.`device_group_id`=?";
+    $param[] = $_POST['group'];
+}
+
 $sql .= " WHERE $where ";
 
 if (!empty($_POST['hostname'])) {
@@ -80,24 +86,9 @@ if (!empty($_POST['location'])) {
     $param[] = $_POST['location'];
 }
 
-if (!empty($_POST['group'])) {
-    include_once '../includes/device-groups.inc.php';
-    $sql .= ' AND ( ';
-    foreach (GetDevicesFromGroup($_POST['group']) as $dev) {
-        $sql .= '`devices`.`device_id` = ? OR ';
-        $param[] = $dev;
-    }
-
-    $sql = substr($sql, 0, (strlen($sql) - 3));
-    $sql .= ' )';
-}
-
 $count_sql = "SELECT COUNT(`devices`.`device_id`) $sql";
 
-$total = dbFetchCell($count_sql, $param);
-if (empty($total)) {
-    $total = 0;
-}
+$total = (int)dbFetchCell($count_sql, $param);
 
 if (!isset($sort) || empty($sort)) {
     $sort = '`hostname` DESC';

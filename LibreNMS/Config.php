@@ -37,6 +37,15 @@ class Config
     public static function get($key, $default = null)
     {
         global $config;
+
+        if (isset($config[$key])) {
+            return $config[$key];
+        }
+
+        if (!str_contains($key, '.')) {
+            return $default;
+        }
+
         $keys = explode('.', $key);
 
         $curr = &$config;
@@ -81,20 +90,66 @@ class Config
 
     /**
      * Get a setting from the $config['os'] array using the os of the given device
-     * The sames as Config::get("os.{$device['os']}.$key")
+     * If that is not set, fallback to the same global config key
      *
-     * @param array $device Device array
+     * @param string $os The os name
      * @param string $key period separated config variable name
      * @param mixed $default optional value to return if the setting is not set
      * @return mixed
      */
-    public static function getOsSetting($device, $key, $default = null)
+    public static function getOsSetting($os, $key, $default = null)
     {
-        if (!isset($device['os'])) {
-            return $default;
+        global $config;
+
+        if ($os) {
+            if (isset($config['os'][$os][$key])) {
+                return $config['os'][$os][$key];
+            }
+
+            if (!str_contains($key, '.')) {
+                return self::get($key, $default);
+            }
+
+            $os_key = "os.$os.$key";
+            if (self::has($os_key)) {
+                return self::get($os_key);
+            }
         }
 
-        return self::get("os.{$device['os']}.$key", $default);
+        return self::get($key, $default);
+    }
+
+    /**
+     * Get the merged array from the global and os settings for the specified key.
+     * Removes any duplicates.
+     * When the arrays have keys, os settings take precedence over global settings
+     *
+     * @param string $os The os name
+     * @param string $key period separated config variable name
+     * @param array $default optional array to return if the setting is not set
+     * @return array
+     */
+    public static function getCombined($os, $key, $default = array())
+    {
+        global $config;
+
+        if (!self::has($key)) {
+            return self::get("os.$os.$key", $default);
+        }
+
+        if (!isset($config['os'][$os][$key])) {
+            if (!str_contains($key, '.')) {
+                return self::get($key, $default);
+            }
+            if (!self::has("os.$os.$key")) {
+                return self::get($key, $default);
+            }
+        }
+
+        return array_unique(array_merge(
+            (array)self::get($key, $default),
+            (array)self::getOsSetting($os, $key, $default)
+        ));
     }
 
     /**
@@ -102,10 +157,31 @@ class Config
      *
      * @param mixed $key period separated config variable name
      * @param mixed $value
+     * @param bool $persist set the setting in the database so it persists across runs
+     * @param string $default default (only set when initially created)
+     * @param string $descr webui description (only set when initially created)
+     * @param string $group webui group (only set when initially created)
+     * @param string $sub_group webui subgroup (only set when initially created)
      */
-    public static function set($key, $value)
+    public static function set($key, $value, $persist = false, $default ='', $descr='', $group='', $sub_group='')
     {
         global $config;
+
+        if ($persist) {
+            $res = dbUpdate(array('config_value' => $value), 'config', '`config_name`=?', array($key));
+            if (!$res && !dbFetchCell('SELECT 1 FROM `config` WHERE `config_name`=?', array($key))) {
+                $insert = array(
+                    'config_name' => $key,
+                    'config_value' => $value,
+                    'config_default' => $default,
+                    'config_descr' => $descr,
+                    'config_group' => $group,
+                    'config_sub_group' => $sub_group,
+                );
+                dbInsert($insert, 'config');
+            }
+        }
+
         $keys = explode('.', $key);
 
         $curr = &$config;
@@ -125,6 +201,15 @@ class Config
     public static function has($key)
     {
         global $config;
+
+        if (isset($config[$key])) {
+            return true;
+        }
+
+        if (!str_contains($key, '.')) {
+            return false;
+        }
+
         $keys = explode('.', $key);
         $last = array_pop($keys);
 

@@ -1,12 +1,15 @@
 <?php
 namespace GuzzleHttp\Test\Handler;
 
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Handler\StreamHandler;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\FnStream;
+use GuzzleHttp\RequestOptions;
 use GuzzleHttp\Tests\Server;
+use GuzzleHttp\TransferStats;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -125,6 +128,58 @@ class StreamHandlerTest extends \PHPUnit_Framework_TestCase
         unlink($tmpfname);
     }
 
+    public function testDrainsResponseIntoSaveToBodyAtNonExistentPath()
+    {
+        $tmpfname = tempnam('/tmp', 'save_to_path');
+        unlink($tmpfname);
+        $this->queueRes();
+        $handler = new StreamHandler();
+        $request = new Request('GET', Server::$url);
+        $response = $handler($request, ['sink' => $tmpfname])->wait();
+        $body = $response->getBody();
+        $this->assertEquals($tmpfname, $body->getMetadata('uri'));
+        $this->assertEquals('hi', $body->read(2));
+        $body->close();
+        unlink($tmpfname);
+    }
+
+    public function testDrainsResponseAndReadsOnlyContentLengthBytes()
+    {
+        Server::flush();
+        Server::enqueue([
+            new Response(200, [
+                'Foo' => 'Bar',
+                'Content-Length' => 8,
+            ], 'hi there... This has way too much data!')
+        ]);
+        $handler = new StreamHandler();
+        $request = new Request('GET', Server::$url);
+        $response = $handler($request, [])->wait();
+        $body = $response->getBody();
+        $stream = $body->detach();
+        $this->assertEquals('hi there', stream_get_contents($stream));
+        fclose($stream);
+    }
+
+    public function testDoesNotDrainWhenHeadRequest()
+    {
+        Server::flush();
+        // Say the content-length is 8, but return no response.
+        Server::enqueue([
+            new Response(200, [
+                'Foo' => 'Bar',
+                'Content-Length' => 8,
+            ], '')
+        ]);
+        $handler = new StreamHandler();
+        $request = new Request('HEAD', Server::$url);
+        $response = $handler($request, [])->wait();
+        $body = $response->getBody();
+        $stream = $body->detach();
+        $this->assertEquals('', stream_get_contents($stream));
+        fclose($stream);
+    }
+
     public function testAutomaticallyDecompressGzip()
     {
         Server::flush();
@@ -141,6 +196,30 @@ class StreamHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', (string) $response->getBody());
         $this->assertFalse($response->hasHeader('content-encoding'));
         $this->assertTrue(!$response->hasHeader('content-length') || $response->getHeaderLine('content-length') == $response->getBody()->getSize());
+    }
+
+    public function testReportsOriginalSizeAndContentEncodingAfterDecoding()
+    {
+        Server::flush();
+        $content = gzencode('test');
+        Server::enqueue([
+            new Response(200, [
+                'Content-Encoding' => 'gzip',
+                'Content-Length'   => strlen($content),
+            ], $content)
+        ]);
+        $handler = new StreamHandler();
+        $request = new Request('GET', Server::$url);
+        $response = $handler($request, ['decode_content' => true])->wait();
+
+        $this->assertSame(
+            'gzip',
+            $response->getHeaderLine('x-encoded-content-encoding')
+        );
+        $this->assertSame(
+            strlen($content),
+            (int) $response->getHeaderLine('x-encoded-content-length')
+        );
     }
 
     public function testDoesNotForceGzipDecode()
@@ -191,9 +270,22 @@ class StreamHandlerTest extends \PHPUnit_Framework_TestCase
     public function testAddsProxyByProtocol()
     {
         $url = str_replace('http', 'tcp', Server::$url);
+        // Workaround until #1823 is fixed properly
+        $url = rtrim($url, '/');
         $res = $this->getSendResult(['proxy' => ['http' => $url]]);
         $opts = stream_context_get_options($res->getBody()->detach());
         $this->assertEquals($url, $opts['http']['proxy']);
+    }
+
+    public function testAddsProxyButHonorsNoProxy()
+    {
+        $url = str_replace('http', 'tcp', Server::$url);
+        $res = $this->getSendResult(['proxy' => [
+            'http' => $url,
+            'no'   => ['*']
+        ]]);
+        $opts = stream_context_get_options($res->getBody()->detach());
+        $this->assertTrue(empty($opts['http']['proxy']));
     }
 
     public function testAddsTimeout()
@@ -232,6 +324,7 @@ class StreamHandlerTest extends \PHPUnit_Framework_TestCase
         $res = $this->getSendResult(['verify' => $path]);
         $opts = stream_context_get_options($res->getBody()->detach());
         $this->assertEquals(true, $opts['ssl']['verify_peer']);
+        $this->assertEquals(true, $opts['ssl']['verify_peer_name']);
         $this->assertEquals($path, $opts['ssl']['cafile']);
         $this->assertTrue(file_exists($opts['ssl']['cafile']));
     }
@@ -369,6 +462,26 @@ class StreamHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, $req->getHeaderLine('Content-Length'));
     }
 
+    public function testAddsContentLengthByDefault()
+    {
+        $this->queueRes();
+        $handler = new StreamHandler();
+        $request = new Request('PUT', Server::$url, [], 'foo');
+        $handler($request, []);
+        $req = Server::received()[0];
+        $this->assertEquals(3, $req->getHeaderLine('Content-Length'));
+    }
+
+    public function testAddsContentLengthEvenWhenEmpty()
+    {
+        $this->queueRes();
+        $handler = new StreamHandler();
+        $request = new Request('PUT', Server::$url, [], '');
+        $handler($request, []);
+        $req = Server::received()[0];
+        $this->assertEquals(0, $req->getHeaderLine('Content-Length'));
+    }
+
     public function testSupports100Continue()
     {
         Server::flush();
@@ -455,5 +568,115 @@ class StreamHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('bar', $response->getHeaderLine('X-Foo'));
         $this->assertEquals('abc 123', (string) $response->getBody());
+    }
+
+    public function testInvokesOnStatsOnSuccess()
+    {
+        Server::flush();
+        Server::enqueue([new Psr7\Response(200)]);
+        $req = new Psr7\Request('GET', Server::$url);
+        $gotStats = null;
+        $handler = new StreamHandler();
+        $promise = $handler($req, [
+            'on_stats' => function (TransferStats $stats) use (&$gotStats) {
+                $gotStats = $stats;
+            }
+        ]);
+        $response = $promise->wait();
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(200, $gotStats->getResponse()->getStatusCode());
+        $this->assertEquals(
+            Server::$url,
+            (string) $gotStats->getEffectiveUri()
+        );
+        $this->assertEquals(
+            Server::$url,
+            (string) $gotStats->getRequest()->getUri()
+        );
+        $this->assertGreaterThan(0, $gotStats->getTransferTime());
+    }
+
+    public function testInvokesOnStatsOnError()
+    {
+        $req = new Psr7\Request('GET', 'http://127.0.0.1:123');
+        $gotStats = null;
+        $handler = new StreamHandler();
+        $promise = $handler($req, [
+            'connect_timeout' => 0.001,
+            'timeout' => 0.001,
+            'on_stats' => function (TransferStats $stats) use (&$gotStats) {
+                $gotStats = $stats;
+            }
+        ]);
+        $promise->wait(false);
+        $this->assertFalse($gotStats->hasResponse());
+        $this->assertEquals(
+            'http://127.0.0.1:123',
+            (string) $gotStats->getEffectiveUri()
+        );
+        $this->assertEquals(
+            'http://127.0.0.1:123',
+            (string) $gotStats->getRequest()->getUri()
+        );
+        $this->assertInternalType('float', $gotStats->getTransferTime());
+        $this->assertInstanceOf(
+            ConnectException::class,
+            $gotStats->getHandlerErrorData()
+        );
+    }
+
+    public function testStreamIgnoresZeroTimeout()
+    {
+        Server::flush();
+        Server::enqueue([new Psr7\Response(200)]);
+        $req = new Psr7\Request('GET', Server::$url);
+        $gotStats = null;
+        $handler = new StreamHandler();
+        $promise = $handler($req, [
+            'connect_timeout' => 10,
+            'timeout' => 0
+        ]);
+        $response = $promise->wait();
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testDrainsResponseAndReadsAllContentWhenContentLengthIsZero()
+    {
+        Server::flush();
+        Server::enqueue([
+            new Response(200, [
+                'Foo' => 'Bar',
+                'Content-Length' => '0',
+            ], 'hi there... This has a lot of data!')
+        ]);
+        $handler = new StreamHandler();
+        $request = new Request('GET', Server::$url);
+        $response = $handler($request, [])->wait();
+        $body = $response->getBody();
+        $stream = $body->detach();
+        $this->assertEquals('hi there... This has a lot of data!', stream_get_contents($stream));
+        fclose($stream);
+    }
+
+    public function testHonorsReadTimeout()
+    {
+        Server::flush();
+        $handler = new StreamHandler();
+        $response = $handler(
+            new Request('GET', Server::$url . 'guzzle-server/read-timeout'),
+            [
+                RequestOptions::READ_TIMEOUT => 1,
+                RequestOptions::STREAM => true,
+            ]
+        )->wait();
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK', $response->getReasonPhrase());
+        $body = $response->getBody()->detach();
+        $line = fgets($body);
+        $this->assertEquals("sleeping 60 seconds ...\n", $line);
+        $line = fgets($body);
+        $this->assertFalse($line);
+        $this->assertTrue(stream_get_meta_data($body)['timed_out']);
+        $this->assertFalse(feof($body));
     }
 }

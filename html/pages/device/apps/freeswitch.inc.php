@@ -4,6 +4,8 @@ global $config;
 
 $graphs = array(
         'freeswitch_peak' => 'Freeswitch - Peak Calls',
+        'freeswitch_calls' => 'Freeswitch - Calls',
+        'freeswitch_channels' => 'Freeswitch - Channels',
         'freeswitch_callsIn' => 'Freeswitch - Inbound Calls',
         'freeswitch_callsOut' => 'Freeswitch - Outbound Calls'
     );

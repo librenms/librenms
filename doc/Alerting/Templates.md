@@ -58,18 +58,6 @@ Limit: %value.sensor_limit_low / %value.sensor_limit
 
 The Default Template is a 'one-size-fit-all'. We highly recommend defining your own templates for your rules to include more specific information.
 
-## Testing
-
-It's possible to test your new template before assigning it to a rule. To do so you can run `./scripts/test-template.php`. The script will provide the help 
-info when ran without any parameters.
-
-As an example, if you wanted to test template ID 10 against localhost running rule ID 2 then you would run:
-
-`./scripts/test-template.php -t 10 -d -h localhost -r 2`
-
-If the rule is currently alerting for localhost then you will get the full template as expected to see on email, if it's not then you will just see the 
-template without any fault information.
-
 ## Examples
 
 Default Template:
@@ -83,6 +71,25 @@ Rule: {if %name}%name{else}%rule{/if}
 {if %faults}Faults:
 {foreach %faults}  #%key: %value.string{/foreach}{/if}
 Alert sent to: {foreach %contacts}%value <%key> {/foreach}
+```
+Ports Utilization Template:
+```text
+%title
+Device Name: %sysName
+Severity: %severity
+{if %state == 0}Time elapsed: %elapsed{/if}
+Timestamp: %timestamp
+Rule: {if %name}%name{else}%rule{/if}
+{if %faults}
+{foreach %faults}
+Device: %value.sysname
+Physical Interface: %value.ifDescr
+Interface Description: %value.ifAlias
+Interface Speed in Bits: %value.ifSpeed
+Inbound Utilization: {calc (((%value.ifInOctets_rte8)/%value.ifSpeed)100)}%
+Outbound Utilization: {calc (((%value.ifOutOctets_rate8)/%value.ifSpeed)100)}%
+{/foreach}
+{/if}
 ```
 
 Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:

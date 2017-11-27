@@ -15,7 +15,7 @@ $config['graph_types']['device']['pulse_sessions']['descr']        = 'Active Ses
 
 #### Polling OS
 
-OS polling is not necessarily where custom polling should be done, please speak to one of the core devs in irc for guidance.
+OS polling is not necessarily where custom polling should be done, please speak to one of the core devs in [Discord](https://t.libren.ms/discord) for guidance.
 
 Let's update our example file to add additional polling:
 
