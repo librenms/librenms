@@ -92,6 +92,9 @@ if (empty($options['s']) && empty($options['h'])) {
 } else if (!empty($options['s']) && !empty($options['h'])) {
     echo "Please set either -s or -h, not both\n";
 }
+if (!empty($options['i']) && !empty($options['h'])) {
+    echo "Please set -i\n";
+}
 
 $bill_name = str_replace('*', '%', mres($options['b']));
 $intf_glob = str_replace('*', '%', mres($options['i']));
