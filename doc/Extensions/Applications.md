@@ -13,6 +13,7 @@ Different applications support a variety of ways to collect data: by direct conn
 1. [Fail2ban](#fail2ban) - SNMP extend
 1. [FreeBSD NFS Client](#freebsd-nfs-client) - SNMP extend
 1. [FreeBSD NFS Server](#freebsd-nfs-server) - SNMP extend
+1. [FreeRADIUS](#freeradius) - SNMP extend, Agent
 1. [Freeswitch](#freeswitch) - SNMP extend, Agent
 1. [GPSD](#gpsd) - Agent
 1. [Mailscanner](#mailscanner) - SNMP extend
@@ -258,32 +259,37 @@ extend fbsdnfsserver /etc/snmp/fbsdnfsserver
 4: Restart snmpd on your host
 
 
-### Mailscanner
+### FreeRADIUS
+
+1: 
+2: 
+3: 
+4: 
+5: On the device page in Librenms, edit your host and check `FreeRADIUS` under the Applications tab.
+
 ##### SNMP Extend
-1. Download the script onto the desired host (the host must be added to LibreNMS devices)
-```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mailscanner.php -O /etc/snmp/mailscanner.php
-```
 
-2. Make the script executable (chmod +x /etc/snmp/mailscanner.php)
-
-3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+1: Copy the freeradius shell script, to the desired host (the host must be added to LibreNMS devices)
 ```
-extend mailscanner /etc/snmp/mailscanner.php
+wget 
 ```
 
-4. Restart snmpd on your host
+2: Make the script executable (chmod +x /etc/snmp/freeradius)
 
+3: Edit your snmpd.conf file and add:
+```
+extend bind /etc/snmp/freeradius
+```
 
-### GPSD
-A small shell script that reports GPSD status.
+4: Restart snmpd on the host in question.
 
 ##### Agent
-[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `gpsd` script to `/usr/lib/check_mk_agent/local/`
 
-You may need to configure `$server` or `$port`.
+1: [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the script to `/usr/lib/check_mk_agent/local/freeradius` via `wget `
 
-Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
+2: Run `chmod +x /usr/lib/check_mk_agent/local/freeradius`
+
+3: Set the variable 'agent' to '1' in the config.
 
 
 ### Freeswitch
@@ -313,6 +319,34 @@ extend freeswitch /etc/snmp/freeswitch
 ```
 
 6. Restart snmpd on your host
+
+
+### GPSD
+A small shell script that reports GPSD status.
+
+##### Agent
+[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `gpsd` script to `/usr/lib/check_mk_agent/local/`
+
+You may need to configure `$server` or `$port`.
+
+Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
+
+
+### Mailscanner
+##### SNMP Extend
+1. Download the script onto the desired host (the host must be added to LibreNMS devices)
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mailscanner.php -O /etc/snmp/mailscanner.php
+```
+
+2. Make the script executable (chmod +x /etc/snmp/mailscanner.php)
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend mailscanner /etc/snmp/mailscanner.php
+```
+
+4. Restart snmpd on your host
 
 
 ### Memcached
