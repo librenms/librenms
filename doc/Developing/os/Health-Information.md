@@ -78,6 +78,9 @@ The only sensor we have defined here is airflow. The available options are as fo
   - `skip_values` (optional): This is an array of values we should skip over (see note below).
   - `skip_value_lt` (optional): If sensor value is less than this, skip the discovery.
   - `skip_value_gt` (optional): If sensor value is greater than this, skip the discovery.
+  - `entPhysicalIndex` (optional): If the sensor belongs to a physical entity then you can specify the index here.
+  - `entPhysicalIndex_measured` (optional): If the sensor belongs to a physical entity then you can specify the entity type here.
+  - `user_func` (optional): You can provide a function name for the sensors value to be processed through (i.e. Convert fahrenheit to celsius use `fahrenheit_to_celsius`)
 
 For `options:` you have the following available:
 
