@@ -267,3 +267,11 @@ $(document).ready(function() {
         }
     });
 });
+
+$(document).ajaxComplete(function(){
+    if($('.alert-status').length !== 0) {
+        $('.alert-status').each(function() {
+            $(this).height($(this).parent().height());
+        })
+    }
+});
