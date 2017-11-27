@@ -1,0 +1,11 @@
+os: iboss
+text: 'Iboss Web Filter'
+type: firewall
+icon: iboss
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysDescr:
+        - Iboss Web Filter
