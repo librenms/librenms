@@ -861,7 +861,7 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
             }
         }
     }
- 
+
     return 10;
 }
 
