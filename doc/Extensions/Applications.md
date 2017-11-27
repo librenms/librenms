@@ -260,12 +260,18 @@ extend fbsdnfsserver /etc/snmp/fbsdnfsserver
 
 
 ### FreeRADIUS
+The FreeRADIUS application extension requires that status_server be enabled in your FreeRADIUS config.  For more information see: https://wiki.freeradius.org/config/Status
 
-1: 
-2: 
-3: 
-4: 
-5: On the device page in Librenms, edit your host and check `FreeRADIUS` under the Applications tab.
+1: Go to your FreeRADIUS configuration directory (usually /etc/raddb or /etc/freeradius).
+2: `cd sites-enabled`
+3: `ln -s ../sites-available/status status`
+4: Restart FreeRADIUS.
+5: You should be able to test with the radclient as follows...
+```
+echo "Message-Authenticator = 0x00, FreeRADIUS-Statistics-Type = 1, Response-Packet-Type = Access-Accept" | \
+radclient -x localhost:18121 status adminsecret
+```
+Note that adminsecret is the default secret key in status_server.  Change if you've modified this.
 
 ##### SNMP Extend
 
