@@ -259,8 +259,8 @@ if ($format == "graph") {
     }
 
 
-    $os_options = '<select name="os" id="os" class="form-control input-sm">';
-    $os_options .= '<option value="">All OSes</option>';
+    $os_options = "<select name='os' id='os' class='form-control input-sm'>";
+    $os_options .= "<option value=''>All OSes</option>";
     foreach (dbFetch($os, $param) as $data) {
         if ($data['os']) {
             $tmp_os = clean_bootgrid($data['os']);
@@ -269,13 +269,13 @@ if ($format == "graph") {
             } else {
                 $os_selected = '';
             }
-            $os_options .= '<option value="' . $tmp_os . '" ' . $os_selected . '>' . $config['os'][$tmp_os]['text'] . '</option>';
+            $os_options .= "<option value='" . $tmp_os . "' " . $os_selected . ">" . $config['os'][$tmp_os]['text'] . "</option>";
         }
     }
-    $os_options .= '<select>';
+    $os_options .= "<select>";
 
-    $ver_options = '<select name="version" id="version" class="form-control input-sm">';
-    $ver_options .= '<option value="">All Versions</option>';
+    $ver_options = "<select name='version' id='version' class='form-control input-sm'>";
+    $ver_options .= "<option value=''>All Versions</option>";
     foreach (dbFetch($ver, $param) as $data) {
         if ($data['version']) {
             $tmp_version = clean_bootgrid($data['version']);
@@ -284,13 +284,13 @@ if ($format == "graph") {
             } else {
                 $ver_selected = '';
             }
-            $ver_options .= '<option value="' . $tmp_version . '" ' . $ver_selected . '> ' . $tmp_version . '</option>';
+            $ver_options .= "<option value='" . $tmp_version . "' " . $ver_selected . ">" . $tmp_version . "</option>";
         }
     }
-    $ver_options .= '</select>';
+    $ver_options .= "</select>";
 
-    $platform_options = '<select name="hardware" id="hardware" class="form-control input-sm">';
-    $platform_options .= '<option value="">All Platforms</option>';
+    $platform_options = "<select name='hardware' id='hardware' class='form-control input-sm'>";
+    $platform_options .= "<option value=''>All Platforms</option>";
     foreach (dbFetch($platform, $param) as $data) {
         if ($data['hardware']) {
             $tmp_hardware = clean_bootgrid($data['hardware']);
@@ -299,14 +299,14 @@ if ($format == "graph") {
             } else {
                 $platform_selected = '';
             }
-            $platform_options .= '<option value="' . $tmp_hardware . '" ' . $platform_selected . '>' . $tmp_hardware . '</option>';
+            $platform_options .= "<option value='" . $tmp_hardware . "' " . $platform_selected . ">" . $tmp_hardware . "</option>";
         }
     }
-    $platform_options .= '</select>';
+    $platform_options .= "</select>";
 
 
-    $features_options = '<select name="features" id="features" class="form-control input-sm">';
-    $features_options .= '<option value="">All Featuresets</option>';
+    $features_options = "<select name='features' id='features' class='form-control input-sm'>";
+    $features_options .= "<option value=''>All Featuresets</option>";
     foreach (dbFetch($features, $param) as $data) {
         if ($data['features']) {
             $tmp_features = clean_bootgrid($data['features']);
@@ -315,13 +315,13 @@ if ($format == "graph") {
             } else {
                 $feature_selected = '';
             }
-            $features_options .= '<option value="' . $tmp_features . '" ' . $feature_selected . '>' . $tmp_features . '</option>';
+            $features_options .= "<option value='" . $tmp_features . "' " . $feature_selected . ">" . $tmp_features . "</option>";
         }
     }
-    $features_options .= '</select>';
+    $features_options .= "</select>";
 
-    $locations_options = '<select name="location" id="location" class="form-control input-sm">';
-    $locations_options .= '<option value="">All Locations</option>';
+    $locations_options = "<select name='location' id='location' class='form-control input-sm'>";
+    $locations_options .= "<option value=''>All Locations</option>";
     foreach (getlocations() as $location) {
         if ($location) {
             $location = clean_bootgrid($location);
@@ -330,13 +330,13 @@ if ($format == "graph") {
             } else {
                 $location_selected = '';
             }
-            $locations_options .= '<option value="' . $location . '" ' . $location_selected . '>' . $location . '</option>';
+            $locations_options .= "<option value='" . $location . "' " . $location_selected . ">" . $location . "</option>";
         }
     }
-    $locations_options .= '</select>';
+    $locations_options .= "</select>";
 
-    $types_options = '<select name="type" id="type" class="form-control input-sm">';
-    $types_options .= '<option value="">All Device Types</option>';
+    $types_options = "<select name='type' id='type' class='form-control input-sm'>";
+    $types_options .= "<option value=''>All Device Types</option>";
     foreach (dbFetch($types, $param) as $data) {
         if ($data['type']) {
             if ($data['type'] == $vars['type']) {
@@ -344,42 +344,23 @@ if ($format == "graph") {
             } else {
                 $type_selected = '';
             }
-            $types_options .= '<option value="' . $data['type'] . '" ' . $type_selected . '> ' . ucfirst($data['type']) . '</option>';
+            $types_options .= "<option value='" . $data['type'] . "' " . $type_selected . ">" . ucfirst($data['type']) . "</option>";
         }
     }
-    $types_options .= '</select>';
+    $types_options .= "</select>";
 
-    if (isset($vars['searchbar']) && $vars['searchbar'] == "hide") {
-        $searchbar = '';
-    } else {
-        $searchbar = '
-            <div class="panel panel-default panel-condensed">
-                <form method="post" action="" class="form-inline devices-search-header" role="form">
-                        <div class="form-group">
-                            <input type="text" name="hostname" id="hostname" value="' . $vars['hostname'] . '" class="form-control input-sm" placeholder="Hostname">
-                        </div>
-                        <div class="form-group">' . $os_options . '</div>
-                        <div class="form-group">' . $ver_options . '</div>
-                        <div class="form-group">' . $platform_options . '</div>
-                        <div class="form-group">' . $features_options . '</div>
-                        <div class="form-group">' . $locations_options . '</div>
-                        <div class="form-group">' . $types_options . '</div>
-                        <input type="submit" class="btn btn-default input-sm devices-input-small" value="Search">
-                        <a href="' . generate_url($vars) . '" title="Update the browser URL to reflect the search criteria." class="btn btn-default input-sm devices-input-small">Update URL</a>
-                        <a href="' . generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare'])) . '" title="Reset critera to default." class="btn btn-default input-sm devices-input-small">Reset</a>               
-                </form>
-            </div>
-        ';
-    }
-
-    echo $searchbar;
 
     echo '
+    <div class="panel panel-default panel-condensed">
+    <div class="panel-heading">
+        <strong>Devices</strong>
+    </div>
     <div class="table-responsive">
-        <table id="devices" class="table table-condensed table-hover">    
+        <table id="devices" class="table table-hover table-condensed table-striped">  
             <thead>
                 <tr>
-                    <th data-column-id="status" data-width="100px" data-searchable="false" data-formatter="status">Status</th>
+                    <th data-column-id="status" data-searchable="false" data-formatter="status"></th>
+                    <th data-column-id="msg" data-width="40px" data-searchable="true" data-formatter="msg">Status</th>
     ';
 
     if ($subformat == "detail") {
@@ -408,6 +389,7 @@ if ($format == "graph") {
             </thead>
         </table>
     </div>
+    </div>
     ';
 
     ?>
@@ -419,14 +401,17 @@ if ($format == "graph") {
             columnSelection: true,
             formatters: {
                 "status": function (column, row) {
-                    return "<span class=\"label label-" + row.extra + " devices-status-box-" + row.list_type + "\">" + row.msg + "</span>";
+                    return "<span class=\"alert-status " + row.extra + "\"></span>";
+                },
+                "msg": function (column, row) {
+                    return "<span class=\"alert-status\">" + row.msg + "</span>";
                 },
                 "icon": function (column, row) {
                     return "<span class=\"device-table-icon\">" + row.icon + "</span>";
                 }
             },
             templates: {
-                header: "<div class=\"devices-headers-table-menu\"><p class=\"{{css.actions}}\"></p></div><div class=\"row\"></div>"
+                header: "<div class=\"devices-headers-table-menu\" style=\"padding:6px 6px 0px 0px;\"><p class=\"{{css.actions}}\"></p></div><div class=\"row\"></div>"
 
             },
             post: function () {
@@ -449,7 +434,30 @@ if ($format == "graph") {
             url: "ajax_table.php"
         });
 
+        <?php
+        if (!isset($vars['searchbar']) && $vars['searchbar'] != "hide") {
+        ?>
+            $(".devices-headers-table-menu").append(
+                "<div class='pull-left'>" +
+                "<form method='post' action='' class='form-inline devices-search-header' role='form'>" +
+                "<div class='form-group'>" +
+                "<input type='text' name='hostname' id='hostname' value=''<?php echo $vars['hostname']; ?>'' class='form-control input-sm' placeholder='Hostname'>" +
+                "</div>" +
+                "<div class='form-group'><?php echo $os_options; ?></div>" +
+                "<div class='form-group'><?php echo $ver_options; ?></div>" +
+                "<div class='form-group'><?php echo $platform_options; ?></div>" +
+                "<div class='form-group'><?php echo $features_options; ?></div>" +
+                "<div class='form-group'><?php echo $locations_options; ?></div>" +
+                "<div class='form-group'><?php echo $types_options; ?></div>" +
+                "<input type='submit' class='btn btn-default input-sm devices-input-small' value='Search'>" +
+                "<a href=''<?php generate_url($vars) ?>'' title='Update the browser URL to reflect the search criteria.' class='btn btn-default input-sm devices-input-small'>Update URL</a>" +
+                "<a href=''<?php generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare'])) ?>'' title='Reset critera to default.' class='btn btn-default input-sm devices-input-small'>Reset</a>" +
+                "</form>" +
+                "</div>"
+            );
+        <?php
+        }
+        ?>
     </script>
-
-    <?php
+<?php
 }

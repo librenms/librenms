@@ -121,24 +121,24 @@ foreach (dbFetchRows($sql, $param) as $device) {
     }
 
     if ($device['status'] == '0') {
-        $extra = 'danger';
+        $extra = 'label-danger';
         $msg = $device['status_reason'];
     } else {
-        $extra = 'success';
+        $extra = 'label-success';
         $msg = 'up';
     }
 
     if ($device['ignore'] == '1') {
-        $extra = 'default';
+        $extra = 'label-default';
         $msg = 'ignored';
         if ($device['status'] == '1') {
-            $extra = 'warning';
+            $extra = 'label-warning';
             $msg = 'ignored';
         }
     }
 
     if ($device['disabled'] == '1') {
-        $extra = 'default';
+        $extra = 'label-default';
         $msg = 'disabled';
     }
 
