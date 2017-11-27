@@ -99,7 +99,7 @@ if (!empty($options['i']) && !empty($options['h'])) {
 $bill_name = str_replace('*', '%', mres($options['b']));
 $intf_glob = str_replace('*', '%', mres($options['i']));
 
-if (empty($bill_name) or !(empty($options['h']) and empty($options['s'])) ) {
+if (empty($bill_name) or !(empty($options['h']) and empty($options['s']))) {
     echo "Usage:\n";
     echo "-b <bill name glob>   Bill name to match\n";
     echo "-s <sysName glob>     sysName to match (Cannot be used with -h)\n";
