@@ -8,5 +8,4 @@ over:
 discovery:
     - sysDescr:
         - AT-8000
-        - '48-port 10/100/1000 Ethernet Switch'
 

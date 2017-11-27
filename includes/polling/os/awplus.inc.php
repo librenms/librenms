@@ -1,8 +1,5 @@
 <?php
 
-//OS info - https://www.alliedtelesis.com/products/software/AlliedWare-Plus
-//OS Datasheet - https://www.alliedtelesis.com/documents/datasheet-alliedware-plus
-
 //$hardware and $serial use snmp_getnext as the OID for these is not always fixed.
 //However, the first OID is the device baseboard. 
 

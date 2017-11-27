@@ -1,5 +1,0 @@
-This folder contains MIBs for Allied Telesis products running AW+ 5.x.x
-
-MIB version: AW+ 5.4.7-2.1
-
-Legacy Allied Telesis/Telesyn mib files can be found in "mibs/allied".
