@@ -854,14 +854,14 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         }
 
         if (starts_with($oid, '.1.3.6.1.2.1.33.1.2.3.')) {
-             if ($device['os'] == 'routeros'){
+            if ($device['os'] == 'routeros') {
                 return 60;
             } else {
                 return 1;
             }
         }
     }
-
+ 
     return 10;
 }
 
