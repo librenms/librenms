@@ -145,6 +145,9 @@ if (!empty($options['t'])) {
 if (!empty($options['q'])) {
     $bill_cdr = mres($options['q']);
 }
+if (!empty($options['i']) && !empty($options['h'])) {
+    echo "Please set -i\n";
+}
 
 $bill_name = str_replace('*', '%', mres($options['b']));
 $intf_glob = str_replace('*', '%', mres($options['i']));
