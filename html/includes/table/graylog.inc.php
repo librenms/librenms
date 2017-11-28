@@ -62,15 +62,21 @@ $context = stream_context_create(array(
 $messages = json_decode(file_get_contents($graylog_url, false, $context), true);
 
 foreach ($messages['messages'] as $message) {
-    $userTimezone = new DateTimeZone($config['graylog']['timezone']);
-    $graylogTime = new DateTime($message['message']['timestamp']);
-    $offset = $userTimezone->getOffset($graylogTime);
+    if (isset($config['graylog']['timezone'])) {
+        $userTimezone = new DateTimeZone($config['graylog']['timezone']);
+        $graylogTime = new DateTime($message['message']['timestamp']);
+        $offset = $userTimezone->getOffset($graylogTime);
 
-    $timeInterval = DateInterval::createFromDateString((string)$offset . 'seconds');
-    $graylogTime->add($timeInterval);
+        $timeInterval = DateInterval::createFromDateString((string)$offset . 'seconds');
+        $graylogTime->add($timeInterval);
+        $displayTime = $graylogTime->format('Y-m-d H:i:s');
+    } else {
+        $displayTime = $message['message']['timestamp'];
+    }
+
 
     $response[] = array(
-        'timestamp' => $graylogTime->format('Y-m-d H:i:s'),
+        'timestamp' => $displayTime,
         'source'    => '<a href="'.generate_url(array('page'=>'device', 'device'=>$message['message']['source'])).'">'.$message['message']['source'].'</a>',
         'message'    => $message['message']['message'],
         'facility'  => $message['message']['facility'],
