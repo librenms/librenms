@@ -4,9 +4,9 @@ $graphs = array(
     'freeradius_access'       => 'FreeRADIUS - Access',
     'freeradius_auth'         => 'FreeRADIUS - Auth',
     'freeradius_acct'         => 'FreeRADIUS - Acct',
-    'freeradius_proxy_access' => 'FreeRADIUS - Access',
-    'freeradius_proxy_auth'   => 'FreeRADIUS - Auth',
-    'freeradius_proxy_acct'   => 'FreeRADIUS - Acct',
+    'freeradius_proxy_access' => 'FreeRADIUS - Proxy Access',
+    'freeradius_proxy_auth'   => 'FreeRADIUS - Proxy Auth',
+    'freeradius_proxy_acct'   => 'FreeRADIUS - Proxy Acct',
     'freeradius_queue'        => 'FreeRADIUS - Queue'
     );
 foreach ($graphs as $key => $text) {
