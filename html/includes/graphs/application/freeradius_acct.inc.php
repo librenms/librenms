@@ -3,7 +3,7 @@ require 'includes/graphs/common.inc.php';
 $i            = 0;
 $scale_min    = 0;
 $nototal      = 1;
-$rrd_filename = rrd_name($device['hostname'], array('app', 'freeradius-accounting', $app['app_id']));
+$rrd_filename = rrd_name($device['hostname'], array('app', 'freeradius-acct', $app['app_id']));
 $array        = array(
     'requests',
     'responses',
