@@ -155,6 +155,7 @@ try {
     Auth::get();
 } catch (Exception $exception) {
     print_error('ERROR: no valid auth_mechanism defined!');
+    echo $exception->getMessage() . PHP_EOL;
     exit();
 }
 
