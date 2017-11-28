@@ -276,7 +276,7 @@ $graphs['pi-hole'] = array(
 $graphs['freeradius'] = array(
     'access',
     'auth',
-    'accounting',
+    'acct',
     'proxy_access',
     'proxy_auth',
     'proxy_acct',
