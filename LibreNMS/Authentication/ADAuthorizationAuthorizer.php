@@ -15,6 +15,10 @@ class ADAuthorizationAuthorizer extends AuthorizerBase
             $_SESSION['username'] = '';
         }
 
+        if (!function_exists('ldap_connect')) {
+            throw new AuthenticationException("PHP does not support LDAP, please install or enable the PHP LDAP extension.");
+        }
+
         // Disable certificate checking before connect if required
         if (Config::has('auth_ad_check_certificates') &&
             Config::get('auth_ad_check_certificates') == 0) {
@@ -24,8 +28,7 @@ class ADAuthorizationAuthorizer extends AuthorizerBase
         // Set up connection to LDAP server
         $this->ldap_connection = @ldap_connect(Config::get('auth_ad_url'));
         if (! $this->ldap_connection) {
-            echo '<h2>Fatal error while connecting to AD url ' . Config::get('auth_ad_url') . ': ' . ldap_error($this->ldap_connection) . '</h2>';
-            exit;
+            throw new AuthenticationException('Fatal error while connecting to AD url ' . Config::get('auth_ad_url') . ': ' . ldap_error($this->ldap_connection));
         }
 
         // disable referrals and force ldap version to 3
