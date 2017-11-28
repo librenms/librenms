@@ -262,7 +262,7 @@ extend fbsdnfsserver /etc/snmp/fbsdnfsserver
 ### FreeRADIUS
 The FreeRADIUS application extension requires that status_server be enabled in your FreeRADIUS config.  For more information see: https://wiki.freeradius.org/config/Status
 
-You should note also that running the status requests causes the FreeRADIUS-Total-Access-Requests counter to increment by 1 so each LibreNMS poll will be reflected in your stats/charts.
+You should note that status requests increment the FreeRADIUS requests and responses stats.  So LibreNMS polls will ultimately be reflected in your stats/charts.
 
 1: Go to your FreeRADIUS configuration directory (usually /etc/raddb or /etc/freeradius).
 
