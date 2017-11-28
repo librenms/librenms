@@ -157,7 +157,7 @@ class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
         }
 
-        $this->assertFalse(ResolveGlues('dbSchema', 'device_id'));
+        $this->assertFalse(ResolveGlues(array('dbSchema'), 'device_id'));
 
         $this->assertSame(array('devices.device_id'), ResolveGlues(array('devices'), 'device_id'));
         $this->assertSame(array('sensors.device_id'), ResolveGlues(array('sensors'), 'device_id'));
