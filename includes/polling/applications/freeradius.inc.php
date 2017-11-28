@@ -21,10 +21,10 @@ foreach ($lines as $line) {
 #FreeRADIUS-Total-Access
 $rrd_name =  array('app', $name,'access',$app_id);
 $rrd_def = RrdDefinition::make()
-    ->addDataset('access-requests', 'DERIVE', 0, 125000000000)
-    ->addDataset('access-accepts', 'DERIVE', 0, 125000000000)
-    ->addDataset('access-rejects', 'DERIVE', 0, 125000000000)
-    ->addDataset('access-challenges', 'DERIVE', 0, 125000000000);
+    ->addDataset('requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('accepts', 'DERIVE', 0, 125000000000)
+    ->addDataset('rejects', 'DERIVE', 0, 125000000000)
+    ->addDataset('challenges', 'DERIVE', 0, 125000000000);
 $fields = array (
     'access-requests' => $unbound['FreeRADIUS-Total-Access-Requests'],
     'access-accepts' => $unbound['FreeRADIUS-Total-Access-Accepts'],
@@ -80,10 +80,10 @@ unset($lines , $unbound, $rrd_name, $rrd_def, $fields, $tags);
 #FreeRADIUS-Total-Proxy-Access
 $rrd_name =  array('app', $name,'proxy_access',$app_id);
 $rrd_def = RrdDefinition::make()
-    ->addDataset('access-requests', 'DERIVE', 0, 125000000000)
-    ->addDataset('access-accepts', 'DERIVE', 0, 125000000000)
-    ->addDataset('access-rejects', 'DERIVE', 0, 125000000000)
-    ->addDataset('access-challenges', 'DERIVE', 0, 125000000000);
+    ->addDataset('requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('accepts', 'DERIVE', 0, 125000000000)
+    ->addDataset('rejects', 'DERIVE', 0, 125000000000)
+    ->addDataset('challenges', 'DERIVE', 0, 125000000000);
 $fields = array (
     'access-requests' => $unbound['FreeRADIUS-Total-Access-Requests'],
     'access-accepts' => $unbound['FreeRADIUS-Total-Access-Accepts'],
