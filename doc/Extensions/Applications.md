@@ -262,6 +262,8 @@ extend fbsdnfsserver /etc/snmp/fbsdnfsserver
 ### FreeRADIUS
 The FreeRADIUS application extension requires that status_server be enabled in your FreeRADIUS config.  For more information see: https://wiki.freeradius.org/config/Status
 
+You should note also that running the status requests causes the FreeRADIUS-Total-Access-Requests counter to increment by 1 so each LibreNMS poll will be reflected in your stats/charts.
+
 1: Go to your FreeRADIUS configuration directory (usually /etc/raddb or /etc/freeradius).
 
 2: `cd sites-enabled`
@@ -276,8 +278,6 @@ echo "Message-Authenticator = 0x00, FreeRADIUS-Statistics-Type = 1, Response-Pac
 radclient -x localhost:18121 status adminsecret
 ```
 Note that adminsecret is the default secret key in status_server.  Change if you've modified this.
-
-Note also that running the status requests causes the FreeRADIUS-Total-Access-Requests counter to increment by 1 so LibreNMS polls will be reflected in your stats/charts.
 
 ##### SNMP Extend
 
@@ -301,7 +301,7 @@ extend bind /etc/snmp/freeradius
 
 2: Run `chmod +x /usr/lib/check_mk_agent/local/freeradius`
 
-3: Set the variable 'agent' to '1' in the config.
+3: Edite the freeradius script and set the variable 'AGENT' to '1' in the config.
 
 
 ### Freeswitch
