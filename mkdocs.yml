@@ -126,6 +126,7 @@ pages:
       - Developing/Validating-Code.md
       - Developing/Code-Structure.md
       - Developing/Creating-Documentation.md
+      - Developing/Licensing.md
       - Extensions/Component.md
       - Mib Based Polling (ALPHA): Extensions/MIB-based-polling.md
       - Support for a new OS:
