@@ -1,0 +1,12 @@
+This folder contains MIBs for legacy Allied Telesis products. 
+
+This includes:
+- Alliedware
+-- AT-x-MIB files
+- Alliedware Plus version 2
+-- AtiEdgeSwitch-MIB
+-- AtiL2-MIB
+-- AtiStackInfo-MIB
+-- AtiSwitch-MIB
+
+Alliedware Plus version 5.x.x mibs can be found under "mibs/awplus"

@@ -1,6 +1,9 @@
 <?php
 
-// Allied Telesis have somewhat messy MIBs. It's often hard to work out what is where. :)
+//Configuration file for Allied Telesis/Telesyn products NOT running Alliedware Plus 5.x.x.
+//See awplus.inc.php for Alliedware Plus 5.x.x OS configuration. 
+
+
 $hardware = snmp_get($device, 'atiswitchProductType.0', '-OsvQU', '+AtiSwitch-MIB');
 $version  = snmp_get($device, 'atiswitchSwVersion.0', '-OsvQU', '+AtiSwitch-MIB');
 $software = snmp_get($device, 'atiswitchSw.0', '-OsvQU', '+AtiSwitch-MIB');

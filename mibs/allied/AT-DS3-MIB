@@ -1,0 +1,147 @@
+-- ============================================================================
+-- AT-ETH.MIB, Allied Telesis enterprise MIB: DS3 module
+--
+-- Extracted from ATROUTER.MIB of pre 2.9.1 release
+--
+-- June 2006, Stan Xiang
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-DS3-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    NOTIFICATION-TYPE
+    	FROM SNMPv2-SMI
+
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+
+	ifIndex
+		FROM IF-MIB
+
+	modules,
+	DisplayStringUnsized
+		FROM AT-SMI-MIB
+;
+                                 
+ds3	MODULE-IDENTITY
+	    LAST-UPDATED "200606281222Z"
+    	ORGANIZATION "Allied Telesis, Inc"
+		CONTACT-INFO
+		    "http://www.alliedtelesis.com"
+		DESCRIPTION
+		    "This MIB file contains definitions of managed objects for the
+	    	DS3 module. "
+
+	    REVISION "200606281222Z"
+		DESCRIPTION
+			"Initial Revision"
+
+::= { modules 109 }
+									  
+
+ds3TrapTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF Ds3TrapEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"The ATR enterprise DS3 trap table."
+		::= { ds3 1 }
+
+ds3TrapEntry OBJECT-TYPE
+	SYNTAX     Ds3TrapEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"An entry in the ATR enterprise DS3 trap table."
+	INDEX { ifIndex }
+		::= { ds3TrapTable 1 }
+
+Ds3TrapEntry ::=
+	SEQUENCE {
+		ds3TcaTrapEnable		INTEGER,
+		ds3TrapError			INTEGER,
+		ds3TrapLoc				INTEGER,
+		ds3TrapInterval			INTEGER
+	}
+
+ds3TcaTrapEnable  OBJECT-TYPE
+	SYNTAX     INTEGER {
+				enabled (1),
+				disabled (2)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	        "Indicates whether the threshold crossing alert traps
+			 should be generated for this interface."
+	DEFVAL { disabled }
+	::= { ds3TrapEntry 1 }
+
+-- All ATR specific DS3 traps
+
+ds3TrapError OBJECT-TYPE
+    SYNTAX      INTEGER {ds3NoError (1), ds3PES (2), ds3PSES (3), ds3SEFs (4), ds3UAS (5),
+	                 ds3LCVs (6), ds3PCVs (7), ds3LESs (8), ds3CCVs (9),
+					 ds3CESs (10), ds3CSESs (11)
+			        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This variable shows which kind of parameter or primitive caused 
+            the trap. This variable is really just a placeholder for the 
+            object sent in the DS3 TRAP, but can be read independently if 
+            required. The variable will hold the value at the latest trap.
+            A value of ds3NoError shows no trap has occured"
+	DEFVAL { ds3NoError }
+    ::= { ds3TrapEntry 2 }
+
+
+	ds3TrapLoc OBJECT-TYPE
+		SYNTAX      INTEGER {ds3NoLoc (1), ds3Near (2), ds3Far (3) }
+ MAX-ACCESS  read-only
+ STATUS      current
+ DESCRIPTION
+            "This variable shows whether the trap was caused by a problem at the local or 
+            remote end. This variable is really just a placeholder for the 
+            object sent in the DS3 TRAP, but can be read independently if 
+            required. The variable will hold the value at the latest trap.
+            A value of ds3NoLoc shows no trap had occured."
+	DEFVAL { ds3NoLoc }
+ ::= { ds3TrapEntry 3 }
+
+
+ds3TrapInterval OBJECT-TYPE
+ SYNTAX     INTEGER {ds3NoInt (1), ds3Fifteen (2), ds3Twentyfour (3) }
+ MAX-ACCESS  read-only
+ STATUS      current
+ DESCRIPTION
+            "This variable shows whether the counter which has crossed the
+             threshold is a twenty four hour or fifteen minute counter. 
+             This variable is really just a placeholder for the 
+             object sent in the DS3 TRAP, but can be read independently if 
+             required. The variable will hold the value at the latest trap.
+             A value of ds3NoInt shows no trap has occured."
+ DEFVAL { ds3NoInt }
+ ::= { ds3TrapEntry 4 }
+
+
+ds3Traps	OBJECT IDENTIFIER ::= { ds3 0 }
+tcaTrap 	NOTIFICATION-TYPE
+    OBJECTS		{ ds3TrapError, ds3TrapLoc, ds3TrapInterval }
+	STATUS		current
+    DESCRIPTION
+                "A DS3 trap is generated when a threshold crossing alert 
+                 occurs. This happens when an error count exceeds a pre 
+                 determined value. The values are counted over 15 minute and 
+                 24 hour periods. Once a trap has occured in a given period 
+                 it may not occur again within the same period."
+    ::= { ds3Traps 1 }
+
+END
