@@ -3,7 +3,7 @@ require 'includes/graphs/common.inc.php';
 $i            = 0;
 $scale_min    = 0;
 $nototal      = 1;
-$unit_text = 'Per Sec.';
+$unit_text    = 'Per Sec.';
 $rrd_filename = rrd_name($device['hostname'], array('app', 'freeradius-access', $app['app_id']));
 $array        = array(
     'requests',
