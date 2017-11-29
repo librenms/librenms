@@ -25,6 +25,7 @@ class Auth
                 'http-auth' => 'LibreNMS\Authentication\HttpAuthAuthorizer',
                 'ad-authorization' => 'LibreNMS\Authentication\ADAuthorizationAuthorizer',
                 'ldap-authorization' => 'LibreNMS\Authentication\LdapAuthorizationAuthorizer',
+                'sso' => 'LibreNMS\Authentication\SSOAuthorizer',
             );
 
             $auth_mechanism = Config::get('auth_mechanism');
@@ -35,5 +36,16 @@ class Auth
             static::$_instance = new $configToClassMap[$auth_mechanism]();
         }
         return static::$_instance;
+    }
+
+    /**
+     * Destroy the existing instance and get a new one - required for tests.
+     *
+     * @return Authorizer
+     */
+    public static function reset()
+    {
+        static::$_instance = null;
+        return static::get();
     }
 }

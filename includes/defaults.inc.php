@@ -637,6 +637,11 @@ $config['auth_ldap_cache_ttl'] = 300;
 $config['auth_ad_user_filter'] = "(objectclass=user)";
 $config['auth_ad_group_filter'] = "(objectclass=group)";
 
+// Single sign-on defaults
+$config['sso']['create_users'] = true;
+$config['sso']['update_users'] = true;
+$config['sso']['user_attr'] = 'REMOTE_USER';
+
 // Sensors
 $config['allow_entity_sensor']['amperes']     = 1;
 $config['allow_entity_sensor']['celsius']     = 1;
