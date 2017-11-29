@@ -64,9 +64,9 @@ modules:
                 index: 'dryContactSensor.{{ $index }}'
                 state_name: dryContactSensor
                 states:
-                    - { descr: 'null', graph: 0, value: -1, generic: 3 }
-                    - { descr: open, graph: 0, value: 0, generic: 0 }
-                    - { descr: closed, graph: 0, value: 1, generic: 2 }
+                    - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                    - { value:  0, generic: 0, graph: 0, descr: open }
+                    - { value:  1, generic: 2, graph: 0, descr: closed }
             -
                 oid: doorSwitchSensorTable
                 value: doorSwitchSensorValue
@@ -75,9 +75,9 @@ modules:
                 index: 'doorSwitchSensor.{{ $index }}'
                 state_name: doorSwitchSensor
                 states:
-                    - { descr: 'null', graph: 0, value: -1, generic: 3 }
-                    - { descr: open, graph: 0, value: 0, generic: 0 }
-                    - { descr: closed, graph: 0, value: 1, generic: 2 }
+                    - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                    - { value:  0, generic: 0, graph: 0, descr: open }
+                    - { value:  1, generic: 2, graph: 0, descr: closed }
             -
                 oid: cameraMotionSensorTable
                 value: cameraMotionSensorValue
@@ -86,9 +86,9 @@ modules:
                 index: 'cameraMotionSensor.{{ $index }}'
                 state_name: cameraMotionSensor
                 states:
-                    - { descr: 'null', graph: 0, value: -1, generic: 3 }
-                    - { descr: noMotion, graph: 0, value: 0, generic: 0 }
-                    - { descr: motionDetected, graph: 0, value: 1, generic: 2 }
+                    - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                    - { value:  0, generic: 0, graph: 0, descr: noMotion }
+                    - { value:  1, generic: 2, graph: 0, descr: motionDetected }
             -
                 oid: otherStateSensorTable
                 value: otherStateSensorErrorStatus
