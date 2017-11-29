@@ -283,25 +283,25 @@ Note that adminsecret is the default secret key in status_server.  Change if you
 
 1: Copy the freeradius shell script, to the desired host (the host must be added to LibreNMS devices)
 ```
-wget 
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/freeradius.sh -O /etc/snmp/freeradius.sh
 ```
 
 2: Make the script executable (chmod +x /etc/snmp/freeradius)
 
 3: Edit your snmpd.conf file and add:
 ```
-extend bind /etc/snmp/freeradius
+extend freeradius /etc/snmp/freeradius.sh
 ```
 
 4: Restart snmpd on the host in question.
 
 ##### Agent
 
-1: [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the script to `/usr/lib/check_mk_agent/local/freeradius` via `wget `
+1: [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the script to `/usr/lib/check_mk_agent/local/freeradius.sh` via `wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/freeradius.sh -O /usr/lib/check_mk_agent/local/freeradius.sh`
 
-2: Run `chmod +x /usr/lib/check_mk_agent/local/freeradius`
+2: Run `chmod +x /usr/lib/check_mk_agent/local/freeradius.sh`
 
-3: Edite the freeradius script and set the variable 'AGENT' to '1' in the config.
+3: Edit the freeradius.sh script and set the variable 'AGENT' to '1' in the config.
 
 
 ### Freeswitch
