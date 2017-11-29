@@ -47,5 +47,5 @@ foreach ($db_info_list as $db_info) {
  * Finished discovering MEF Links information.
  */
 
-unset($db_info_list,$current_mefinfo);
+unset($db_info_list, $current_mefinfo);
 echo PHP_EOL;

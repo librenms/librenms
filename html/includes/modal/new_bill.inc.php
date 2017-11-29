@@ -12,7 +12,7 @@
  */
 if (is_admin() !== false) {
     require 'includes/javascript-interfacepicker.inc.php';
-    
+
     $port_device_id = -1;
     if (is_numeric($vars['port'])) {
         $port = dbFetchRow('SELECT * FROM `ports` AS P, `devices` AS D WHERE `port_id` = ? AND D.device_id = P.device_id', array($vars['port']));
@@ -53,7 +53,8 @@ if (is_admin() !== false) {
                     <label class="col-sm-4 control-label" for="port_id">Port</label>
                     <div class="col-sm-8">
                         <select class="form-control input-sm" id="port_id" name="port_id">
-                        <?php if (is_array($port)) {
+                        <?php
+                        if (is_array($port)) {
                             // Need to pre-populate port as we've got a port pre-selected
                             foreach (dbFetch('SELECT * FROM ports WHERE device_id = ?', array($port_device_id)) as $interface) {
                                 $interface  = cleanPort($interface);
@@ -61,11 +62,12 @@ if (is_admin() !== false) {
                                 $selected = $interface['port_id'] === $port['port_id'] ? " selected" : "";
                                 echo "<option value='${interface['port_id']}' $selected>$string</option>\n";
                             }
-}   ?>
+                        }
+                        ?>
                         </select>
                     </div>
-                </div>                
-                
+                </div>
+
 <?php
 
     $bill_data['bill_type'] = 'cdr';
