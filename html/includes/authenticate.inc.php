@@ -2,6 +2,7 @@
 
 use LibreNMS\Authentication\Auth;
 use LibreNMS\Authentication\TwoFactor;
+use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 
 ini_set('session.use_only_cookies', 1);
@@ -30,7 +31,7 @@ session_start();
 $authorizer =  Auth::get();
 if ($vars['page'] == 'logout' && $authorizer->sessionAuthenticated()) {
     $authorizer->logOutUser();
-    header('Location: ' . $config['base_url']);
+    header('Location: ' . Config::get('post_logout_action', Config::get('base_url')));
     exit;
 }
 
@@ -57,10 +58,8 @@ try {
             if (isset($_REQUEST['username']) && isset($_REQUEST['password'])) {
                 $username = clean($_REQUEST['username']);
                 $password = $_REQUEST['password'];
-            } elseif (isset($_SERVER['REMOTE_USER'])) {
-                $username = clean($_SERVER['REMOTE_USER']);
-            } elseif (isset($_SERVER['PHP_AUTH_USER']) && $config['auth_mechanism'] === 'http-auth') {
-                $username = clean($_SERVER['PHP_AUTH_USER']);
+            } elseif ($authorizer->authIsExternal()) {
+                $username = $authorizer->getExternalUsername();
             }
 
             // form authentication
