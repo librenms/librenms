@@ -47,7 +47,6 @@ class AlcomaAlmp extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        // ALCOMA-MIB::alMPTuneTX.0
         return array(
             // ALCOMA-MIB::alMPTuneTX.0
             new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.12140.2.3.1.0', 'alcoma-tx', 1, 'TX Frequency', null, 1, 1),
