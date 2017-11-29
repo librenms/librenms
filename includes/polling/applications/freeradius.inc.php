@@ -1,15 +1,22 @@
 <?php
+
 use LibreNMS\RRD\RrdDefinition;
+
 $name = 'freeradius';
 $app_id = $app['app_id'];
+
+echo " $name";
+
 if (!empty($agent_data['app'][$name])) {
     $rawdata = $agent_data['app'][$name];
-    update_application($app, $rawdata);
 } else {
     $options = '-O qv';
     $oid     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.102.114.101.101.114.97.100.105.117.115';
     $rawdata  = snmp_get($device, $oid, $options);
 }
+update_application($app, $rawdata);
+
+
 #Format Data
 $lines = explode("\n", $rawdata);
 $freeradius = array();
