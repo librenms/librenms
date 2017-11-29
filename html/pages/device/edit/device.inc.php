@@ -145,33 +145,45 @@ if ($updated && $update_message) {
 <div class="form-group">
     <label for="sysLocation" class="col-sm-2 control-label">Override sysLocation:</label>
     <div class="col-sm-6">
-      <input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked" type="checkbox" name="override_sysLocation"<?php if ($override_sysLocation) {
-            echo(' checked="1"');
-} ?> />
+      <input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked" type="checkbox" name="override_sysLocation"
+            <?php
+            if ($override_sysLocation) {
+                echo(' checked="1"');
+            }
+            ?> />
     </div>
 </div>
 <div class="form-group">
     <div class="col-sm-2"></div>
     <div class="col-sm-6">
-      <input id="sysLocation" name="sysLocation" class="form-control" <?php if (!$override_sysLocation) {
-            echo(' disabled="1"');
-} ?> value="<?php echo($override_sysLocation_string); ?>" />
+      <input id="sysLocation" name="sysLocation" class="form-control"
+            <?php
+            if (!$override_sysLocation) {
+                echo(' disabled="1"');
+            }
+            ?> value="<?php echo($override_sysLocation_string); ?>" />
     </div>
 </div>
 <div class="form-group">
     <label for="disabled" class="col-sm-2 control-label">Disable:</label>
     <div class="col-sm-6">
-      <input name="disabled" type="checkbox" id="disabled" value="1" <?php if ($device["disabled"]) {
-            echo("checked=checked");
-} ?> />
+      <input name="disabled" type="checkbox" id="disabled" value="1"
+            <?php
+            if ($device["disabled"]) {
+                echo("checked=checked");
+            }
+            ?> />
     </div>
 </div>
 <div class="form-group">
     <label for="ignore" class="col-sm-2 control-label">Ignore</label>
     <div class="col-sm-6">
-       <input name="ignore" type="checkbox" id="ignore" value="1" <?php if ($device['ignore']) {
-            echo("checked=checked");
-} ?> />
+       <input name="ignore" type="checkbox" id="ignore" value="1"
+            <?php
+            if ($device['ignore']) {
+                echo("checked=checked");
+            }
+            ?> />
     </div>
 </div>
 <div class="row">

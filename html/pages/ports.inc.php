@@ -114,22 +114,37 @@ foreach ($results as $data) {
 
 ?>
       </select>
-      <input type="text" name="hostname" id="hostname" title="Hostname" class="form-control input-sm" <?php if (strlen($vars['hostname'])) {
-            echo('value="'.$vars['hostname'].'"');
-} ?> placeholder="Hostname" />
+      <input type="text" name="hostname" id="hostname" title="Hostname" class="form-control input-sm"
+            <?php
+            if (strlen($vars['hostname'])) {
+                echo('value="' . $vars['hostname'] . '"');
+            }
+            ?> placeholder="Hostname"/>
     </div>
     <div class="form-group">
       <select name="state" id="state" class="form-control input-sm">
         <option value="">All States</option>
-        <option value="up" <?php if ($vars['state'] == "up") {
-            echo("selected");
-} ?>>Up</option>
-        <option value="down"<?php if ($vars['state'] == "down") {
-            echo("selected");
-} ?>>Down</option>
-        <option value="admindown" <?php if ($vars['state'] == "admindown") {
-            echo("selected");
-} ?>>Shutdown</option>
+        <option value="up"
+            <?php
+            if ($vars['state'] == "up") {
+                echo("selected");
+            }
+            ?>>Up
+        </option>
+        <option value="down"
+            <?php
+            if ($vars['state'] == "down") {
+                echo("selected");
+            }
+            ?>>Down
+        </option>
+        <option value="admindown"
+            <?php
+            if ($vars['state'] == "admindown") {
+                echo("selected");
+            }
+            ?>>Shutdown
+        </option>
       </select>
 
       <select name="ifSpeed" id="ifSpeed" class="form-control input-sm">
@@ -201,9 +216,12 @@ foreach ($ports as $data) {
       </select>
     </div>
     <div class="form-group">
-      <input title="Port Description" type="text" name="ifAlias" id="ifAlias" class="form-control input-sm" <?php if (strlen($vars['ifAlias'])) {
-            echo('value="'.$vars['ifAlias'].'"');
-} ?> placeholder="Port Description"/>
+      <input title="Port Description" type="text" name="ifAlias" id="ifAlias" class="form-control input-sm"
+            <?php
+            if (strlen($vars['ifAlias'])) {
+                echo('value="' . $vars['ifAlias'] . '"');
+            }
+            ?> placeholder="Port Description"/>
         <select title="Location" name="location" id="location" class="form-control input-sm">
           <option value="">All Locations</option>
 <?php
@@ -223,17 +241,26 @@ foreach (getlocations() as $location) {
       </div>
       <div class="form-group">
         <label for="ignore">Ignored</label>
-        <input type=checkbox id="ignore" name="ignore" value="1" <?php if ($vars['ignore']) {
-            echo("checked");
-} ?> >
+        <input type=checkbox id="ignore" name="ignore" value="1"
+            <?php
+            if ($vars['ignore']) {
+                echo("checked");
+            }
+            ?> >
         <label for="disabled">Disabled</label>
-        <input type=checkbox id="disabled" name="disabled" value=1 <?php if ($vars['disabled']) {
-            echo("checked");
-} ?> >
+        <input type=checkbox id="disabled" name="disabled" value=1
+            <?php
+            if ($vars['disabled']) {
+                echo("checked");
+            }
+            ?> >
         <label for="deleted">Deleted</label>
-        <input type=checkbox id="deleted" name="deleted" value=1 <?php if ($vars['deleted']) {
-            echo("checked");
-} ?> >
+        <input type=checkbox id="deleted" name="deleted" value=1
+            <?php
+            if ($vars['deleted']) {
+                echo("checked");
+            }
+            ?> >
       </div>
       <button type="submit" class="btn btn-default btn-sm">Search</button>
       <a class="btn btn-default btn-sm" href="<?php echo(generate_url(array('page' => 'ports', 'section' => $vars['section'], 'bare' => $vars['bare']))); ?>" title="Reset critera to default." >Reset</a>
