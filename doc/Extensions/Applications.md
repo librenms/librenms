@@ -274,7 +274,7 @@ You should note that status requests increment the FreeRADIUS request stats.  So
 
 5: You should be able to test with the radclient as follows...
 ```
-echo "Message-Authenticator = 0x00, FreeRADIUS-Statistics-Type = 1, Response-Packet-Type = Access-Accept" | \
+echo "Message-Authenticator = 0x00, FreeRADIUS-Statistics-Type = 31, Response-Packet-Type = Access-Accept" | \
 radclient -x localhost:18121 status adminsecret
 ```
 Note that adminsecret is the default secret key in status_server.  Change if you've modified this.
@@ -286,14 +286,16 @@ Note that adminsecret is the default secret key in status_server.  Change if you
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/freeradius.sh -O /etc/snmp/freeradius.sh
 ```
 
-2: Make the script executable (chmod +x /etc/snmp/freeradius)
+2: Make the script executable (chmod +x /etc/snmp/freeradius.sh)
 
-3: Edit your snmpd.conf file and add:
+3: If you've made any changes to the FreeRADIUS status_server config (secret key, port, etc.) edit freeradius.sh and adjust the config variable accordingly.
+
+4: Edit your snmpd.conf file and add:
 ```
 extend freeradius /etc/snmp/freeradius.sh
 ```
 
-4: Restart snmpd on the host in question.
+5: Restart snmpd on the host in question.
 
 ##### Agent
 
@@ -301,7 +303,9 @@ extend freeradius /etc/snmp/freeradius.sh
 
 2: Run `chmod +x /usr/lib/check_mk_agent/local/freeradius.sh`
 
-3: Edit the freeradius.sh script and set the variable 'AGENT' to '1' in the config.
+3: If you've made any changes to the FreeRADIUS status_server config (secret key, port, etc.) edit freeradius.sh and adjust the config variable accordingly.
+
+4: Edit the freeradius.sh script and set the variable 'AGENT' to '1' in the config.
 
 
 ### Freeswitch
