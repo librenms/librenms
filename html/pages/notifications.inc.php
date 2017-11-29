@@ -30,8 +30,19 @@ $notifications = new ObjectCache('notifications');
   <div class="row">
     <div class="col-md-12">
       <h1><a href="/notifications">Notifications</a></h1>
-      <h4><strong class="count-notif"><?php echo $notifications['count']; ?></strong> Unread Notifications <?php echo ($_SESSION['userlevel'] == 10 ? '<button class="btn btn-success pull-right fa fa-plus new-notif" data-toggle="tooltip" data-placement="bottom" title="Create new notification" style="margin-top:-10px;"></button>' : ''); ?><?php echo ($_SESSION['userlevel'] == 10 ? '<button class="btn btn-success pull-right fa fa-eye read-all-notif" data-toggle="tooltip" data-placement="bottom" title="Mark all as Read" style="margin-top:-10px;"></button>' : ''); ?>
-        </h4>
+      <h4>
+<?php
+echo '<strong class="count-notif">' . $notifications['count'] . '</strong> Unread Notifications ';
+
+if (is_admin()) {
+    echo '<button class="btn btn-success pull-right fa fa-plus new-notif" data-toggle="tooltip" data-placement="bottom" title="Create new notification" style="margin-top:-10px;"></button>';
+}
+
+if ($notifications['count'] > 0 && !isset($vars['archive'])) {
+    echo '<button class="btn btn-success pull-right fa fa-eye read-all-notif" data-toggle="tooltip" data-placement="bottom" title="Mark all as Read" style="margin-top:-10px;"></button>';
+}
+?>
+      </h4>
       <hr/>
     </div>
   </div>
