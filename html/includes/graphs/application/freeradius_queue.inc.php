@@ -10,6 +10,7 @@ $array        = array(
     'len_proxy',
     'len_auth',
     'len_acct',
+    'len_detail',
     'pps_in',
     'pps_out'
 );
