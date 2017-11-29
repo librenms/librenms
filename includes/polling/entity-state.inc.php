@@ -23,13 +23,17 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-$entityStates = dbFetchRows('SELECT entityState.*, entPhysical.entPhysicalIndex FROM entityState LEFT JOIN entPhysical USING (entPhysical_id) WHERE entityState.device_id=?',array($device['device_id']));
+$entityStatesIndexes = dbFetchRows(
+    'SELECT S.entity_state_id, S.entStateLastChanged, P.entPhysicalIndex FROM entityState AS S ' .
+    'LEFT JOIN entPhysical AS P USING (entPhysical_id) WHERE S.device_id=?',
+    array($device['device_id'])
+);
 
-if (!empty($entityStates)) {
+if (!empty($entityStatesIndexes)) {
     echo "\nEntity States: ";
 
     // index by entPhysicalIndex
-    $entityStates = array_combine(array_column($entityStates, 'entPhysicalIndex'), $entityStates);
+    $entityStatesIndexes = array_combine(array_column($entityStatesIndexes, 'entPhysicalIndex'), $entityStatesIndexes);
 
     $entLC = snmpwalk_group($device, 'entStateLastChanged', 'ENTITY-STATE-MIB', 0);
 
@@ -38,10 +42,10 @@ if (!empty($entityStates)) {
             try {
                 list($date, $time, $tz) = explode(',', $changed);
                 $lastChanged = new DateTime("$date $time", new DateTimeZone($tz));
-                $dbLastChanged = new DateTime($entityStates[$index]['entStateLastChanged']);
+                $dbLastChanged = new DateTime($entityStatesIndexes[$index]['entStateLastChanged']);
                 if ($lastChanged != $dbLastChanged) {
                     // data has changed, fetch it
-                    $state_data = snmp_get_multi(
+                    $new_states = snmp_get_multi(
                         $device,
                         array(
                             "entStateAdmin.$index",
@@ -53,20 +57,31 @@ if (!empty($entityStates)) {
                         '-OQUse',
                         'ENTITY-STATE-MIB'
                     );
-                    $state_data = $state_data[$index]; // just get values
+                    $new_states = $new_states[$index]; // just get values
 
                     // add entStateLastChanged and update
-                    $state_data['entStateLastChanged'] = $lastChanged
+                    $new_states['entStateLastChanged'] = $lastChanged
                         ->setTimezone(new DateTimeZone(date_default_timezone_get()))
                         ->format('Y-m-d H:i:s');
 
                     // check if anything has changed
-                    $update = array_diff($state_data, $entityStates[$index]);
+                    $update = array_diff(
+                        $new_states,
+                        dbFetchRow(
+                            'SELECT * FROM entityState WHERE entity_state_id=?',
+                            array($entityStatesIndexes[$index]['entity_state_id'])
+                        )
+                    );
+
                     if (!empty($update)) {
-                        dbUpdate($update, 'entityState', 'entity_state_id=?',
-                            array($entityStates[$index]['entity_state_id']));
+                        dbUpdate(
+                            $update,
+                            'entityState',
+                            'entity_state_id=?',
+                            array($entityStatesIndexes[$index]['entity_state_id'])
+                        );
                         d_echo("Updating $index: ", 'U');
-                        d_echo($state_data[$index]);
+                        d_echo($new_states[$index]);
                         continue;
                     }
                 }
@@ -81,4 +96,4 @@ if (!empty($entityStates)) {
     echo PHP_EOL;
 }
 
-unset($entityStates, $entLC, $lastChanged, $dbLastChanged, $state_data, $update);
+unset($entityStatesIndexes, $entLC, $lastChanged, $dbLastChanged, $new_states, $update);
