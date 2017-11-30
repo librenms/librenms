@@ -799,7 +799,7 @@ function get_all_ports()
     validate_column_list($columns, 'ports');
     $params = array();
     $sql = '';
-    if (!is_read()) {
+    if (!is_read() && !is_admin()) {
         $sql = ' AND (device_id IN (SELECT device_id FROM devices_perms WHERE user_id = ?) OR port_id IN (SELECT port_id FROM ports_perms WHERE user_id = ?))';
         array_push($params, $_SESSION['user_id']);
         array_push($params, $_SESSION['user_id']);
