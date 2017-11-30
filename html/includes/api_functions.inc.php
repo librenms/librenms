@@ -518,7 +518,7 @@ function get_bgp()
         api_error(400, 'Invalid id has been provided');
     }
 
-    $bgp_session       = dbFetchRows("SELECT `bgpPeers`.* FROM `bgpPeers` LEFT JOIN `devices` ON `bgpPeers`.`device_id` = `devices`.`device_id` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' AND bgpPeer_id = ?", array($bgpPeerId));
+    $bgp_session       = dbFetchRows("SELECT * FROM `bgpPeers` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' AND bgpPeer_id = ?", array($bgpPeerId));
     $bgp_session_count = count($bgp_session);
     if (!is_numeric($bgp_session_count)) {
         api_error(500, 'Error retrieving BGP peer');
