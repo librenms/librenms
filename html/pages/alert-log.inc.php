@@ -1,4 +1,18 @@
 <?php
+/*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the
+* Free Software Foundation, either version 3 of the License, or (at your
+* option) any later version.  Please see LICENSE.txt at the top level of
+* the source code distribution for details.
+*
+* @package    LibreNMS
+* @subpackage graphs
+* @link       http://librenms.org
+* @copyright  2017 LibreNMS
+* @author     LibreNMS Contributors
+*/
+
 $param = array();
 
 $pagetitle[] = 'Alert Log';
@@ -21,11 +35,12 @@ $pagetitle[] = 'Alert Log';
 <table id="alertlog" class="table table-hover table-condensed table-striped">
     <thead>
         <tr>
-            <th data-column-id="time_logged" data-order="desc">Time logged</th>
+            <th data-column-id="status" data-sortable="false"></th>
+            <th data-column-id="info" data-sortable="true">Status</th>
+            <th data-column-id="time_logged" data-order="desc">Timestamp</th>
             <th data-column-id="details" data-sortable="false">&nbsp;</th>
             <th data-column-id="hostname">Device</th>
             <th data-column-id="alert">Alert</th>
-            <th data-column-id="status" data-sortable="false">Status</th>
         </tr>
     </thead>
 </table>

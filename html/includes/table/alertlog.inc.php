@@ -1,4 +1,17 @@
 <?php
+/*
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage graphs
+ * @link       http://librenms.org
+ * @copyright  2017 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
 $where = 1;
 
@@ -57,33 +70,31 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
     }
     $alert_state  = $alertlog['state'];
     if ($alert_state == '0') {
-        $fa_icon  = 'check';
-        $fa_color = 'success';
-        $text     = 'Ok';
+        $status = 'label-success';
+        $status_text = 'Ok';
     } elseif ($alert_state == '1') {
-        $fa_icon  = 'times';
-        $fa_color = 'danger';
-        $text     = 'Alert';
+        $status = 'label-danger';
+        $status_text = 'Alert';
     } elseif ($alert_state == '2') {
-        $fa_icon  = 'info-circle';
-        $fa_color = 'muted';
-        $text     = 'Ack';
+        $status = 'label-info';
+        $status_text = 'Ack';
     } elseif ($alert_state == '3') {
-        $fa_icon  = 'arrow-down';
-        $fa_color = 'warning';
-        $text     = 'Worse';
+        $status = 'label-warning';
+        $status_text = 'Got worse';
     } elseif ($alert_state == '4') {
-        $fa_icon  = 'arrow-up';
-        $fa_color = 'info';
-        $text     = 'Better';
+        $status = 'label-primary';
+        $status_text = 'Got better';
     }//end if
+
+
     $response[] = array(
         'id'          => $rulei++,
         'time_logged' => $alertlog['humandate'],
         'details'     => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident'.($rulei).'" data-parent="#alerts"></a>',
         'hostname'    => '<div class="incident">'.generate_device_link($dev, shorthost($dev['hostname'])).'<div id="incident'.($rulei).'" class="collapse">'.$fault_detail.'</div></div>',
         'alert'       => htmlspecialchars($alertlog['alert']),
-        'status'      => "<b><i class='fa fa-".$fa_icon." text-".$fa_color."'></i> $text</b>",
+        'status'      => "<i class='alert-status ".$status."'></i>",
+        'info'        => $status_text,
     );
 }//end foreach
 
