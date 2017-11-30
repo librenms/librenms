@@ -106,6 +106,8 @@ class OS
         return new Generic($device);
     }
 
+
+
     /**
      * Poll a channel based OID, but return data in MHz
      *

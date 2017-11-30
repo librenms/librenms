@@ -1,8 +1,13 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Device\Processor;
+use LibreNMS\OS;
 
-foreach (dbFetchRows('SELECT * FROM processors WHERE device_id = ?', array($device['device_id'])) as $processor) {
+Processor::poll(OS::make($device));
+
+
+foreach (array() as $processor) {
     echo 'Processor '.$processor['processor_descr'].'... ';
 
     $processor_type = $processor['processor_type'];
