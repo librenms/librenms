@@ -506,6 +506,30 @@ function list_bgp()
 }
 
 
+function get_bgp()
+{
+    check_is_read();
+
+    $app        = \Slim\Slim::getInstance();
+
+    $bgpPeerId        = $_GET['id']
+    if (!is_numeric($bgpPeerId)) {
+        api_error(400, 'Invalid id has been provided');
+    }
+
+    $bgp_session       = dbFetchRows("SELECT `bgpPeers`.* FROM `bgpPeers` LEFT JOIN `devices` ON `bgpPeers`.`device_id` = `devices`.`device_id` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' AND bgpPeer_id = ?", array($bgpPeerId));
+    $bgp_session_count = count($bgp_session);
+    if (!is_numeric($bgp_session_count)) {
+        api_error(500, 'Error retrieving BGP peer');
+    }
+    if (count($bgp_session_count) == 0) {
+        api_error(404, 'BGP peer $bgpPeerId does not exist');
+    }
+
+    api_success($bgp_session, 'bgp_session');
+}
+
+
 function list_ospf()
 {
     check_is_read();
