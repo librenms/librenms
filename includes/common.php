@@ -55,7 +55,8 @@ function generate_priority_status($priority)
     return isset($map[$priority]) ? $map[$priority] : 0;
 }
 
-function graylog_severity_label($severity) {
+function graylog_severity_label($severity)
+{
     $map = array(
         "0" => "label-danger",
         "1" => "label-danger",
