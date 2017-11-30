@@ -143,14 +143,23 @@ foreach (dbFetchRows($query, $param) as $port) {
 
     // FIXME what actions should we have?
     $actions = '<div class="container-fluid"><div class="row">';
-    $actions .= '<div class="col-xs-1"><a href="';
-    $actions .= generate_device_url($device, array('tab' => 'alerts'));
-    $actions .= '"><i class="fa fa-exclamation-circle fa-lg icon-theme" title="View alerts" aria-hidden="true"></i></a></div>';
 
-    if ($_SESSION['userlevel'] >= '7') {
+    if ($_POST['deleted'] !== 'yes') {
         $actions .= '<div class="col-xs-1"><a href="';
-        $actions .= generate_device_url($device, array('tab' => 'edit', 'section' => 'ports'));
-        $actions .= '"><i class="fa fa-pencil fa-lg icon-theme" title="Edit ports" aria-hidden="true"></i></a></div>';
+        $actions .= generate_device_url($device, array('tab' => 'alerts'));
+        $actions .= '" title="View alerts"><i class="fa fa-exclamation-circle fa-lg icon-theme" aria-hidden="true"></i></a></div>';
+
+        if ($_SESSION['userlevel'] >= '7') {
+            $actions .= '<div class="col-xs-1"><a href="';
+            $actions .= generate_device_url($device, array('tab' => 'edit', 'section' => 'ports'));
+            $actions .= '" title="Edit ports"><i class="fa fa-pencil fa-lg icon-theme" aria-hidden="true"></i></a></div>';
+        }
+    }
+
+    if ($_POST['deleted'] === 'yes') {
+        if (port_permitted($port['port_id'], $device['device_id'])) {
+            $actions .= '<div class="col-xs-1"><a href="ports/deleted=yes/purge='.$port['port_id'].'" title="Delete port"><i class="fa fa-times fa-lg icon-theme"></i></a></div>';
+        }
     }
 
     $actions .= '</div></div>';

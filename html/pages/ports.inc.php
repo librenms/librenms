@@ -377,6 +377,13 @@ foreach ($vars as $var => $value) {
                     $param[] = "down";
                 }
                 break;
+            case 'purge':
+                $interface = dbFetchRow('SELECT * from `ports` AS P, `devices` AS D WHERE `port_id` = ? AND D.device_id = P.device_id', array($vars['purge']));
+                $interface = cleanPort($interface);
+                if (port_permitted($interface['port_id'], $interface['device_id'])) {
+                    delete_port($interface['port_id']);
+                }
+                break;
         }
     }
 }
