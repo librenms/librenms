@@ -1,3 +1,4 @@
+<?php
 /* Copyright (C) 2015 Daniel Preussker <f0o@librenms.org>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,36 +14,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /**
- * Pushbullet API Transport
+ * Clickatell REST-API Transport
  * @author f0o <f0o@librenms.org>
  * @copyright 2015 f0o, LibreNMS
  * @license GPL
  * @package LibreNMS
  * @subpackage Alerts
  */
+namespace LibreNMS\Alert\Transport;
 
-// Note: At this point it might be useful to iterate through $obj['contacts'] and send each of them a note ?
+use LibreNMS\Interfaces\Alert\Transport;
 
-$data = array("type" => "note", "title" => $obj['title'], "body" => $obj['msg']);
-$data = json_encode($data);
+class Clickatell implements Transport{
+    public function call($obj, $opts) {
+        $url = 'https://platform.clickatell.com/messages/http/send?apiKey=' . $opts['token'] . '&to=' . implode(',', $opts['to']) . '&content=' . urlencode($obj['title']);
 
-$curl = curl_init('https://api.pushbullet.com/v2/pushes');
-set_curl_proxy($curl);
-curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
-curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-    'Content-Type: application/json',
-    'Content-Length: '.strlen($data),
-    'Authorization: Bearer '.$opts,
-));
+        $curl = curl_init($url);
+        set_curl_proxy($curl);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
-$ret = curl_exec($curl);
-$code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-if( $code > 201 ) {
-    if( $debug ) {
-        var_dump($ret);
+        $ret  = curl_exec($curl);
+        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        if ($code > 200) {
+            if ($debug) {
+                var_dump($ret);
+            }
+            return false;
+        }
+        return true;
     }
-    return 'HTTP Status code '.$code;
 }
-return true;

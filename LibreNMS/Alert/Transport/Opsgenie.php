@@ -1,3 +1,4 @@
+<?php
 /* Copyright (C) 2017 Celal Emre CICEK <celal.emre@opsgenie.com>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,24 +21,31 @@
  * @package LibreNMS
  * @subpackage Alerts
  */
+namespace LibreNMS\Alert\Transport;
 
-$url = $opts['url'];
+use LibreNMS\Interfaces\Alert\Transport;
 
-$curl = curl_init();
+class Opsgenie implements Transport{
+    public function call($obj, $opts) {
+        $url = $opts['url'];
 
-set_curl_proxy($curl);
-curl_setopt($curl, CURLOPT_URL, $url );
-curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST"); 
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($obj));
+        $curl = curl_init();
 
-$ret = curl_exec($curl);
-$code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        set_curl_proxy($curl);
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($obj));
 
-if($code != 200) {
-    var_dump("Error when sending post request to OpsGenie. Response code: " . $code . " Response body: " . $ret); //FIXME: proper debugging
-    return false;
+        $ret  = curl_exec($curl);
+        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        if ($code != 200) {
+            var_dump("Error when sending post request to OpsGenie. Response code: " . $code . " Response body: " . $ret); //FIXME: proper debugging
+            return false;
+        }
+
+        return true;
+    }
 }
-
-return true;

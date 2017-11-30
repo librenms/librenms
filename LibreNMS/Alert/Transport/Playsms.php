@@ -1,3 +1,4 @@
+<?php
 /* Copyright (C) 2015 Daniel Preussker <f0o@librenms.org>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,24 +21,31 @@
  * @package LibreNMS
  * @subpackage Alerts
  */
+namespace LibreNMS\Alert\Transport;
 
-$data = array("u" => $opts['user'], "h" => $opts['token'], "to" => implode(',',$opts['to']), "msg" => $obj['title']);
-if (!empty($opts['from'])) {
-    $data["from"] = $opts['from'];
-}
-$url  = $opts['url'].'&op=pv&'.http_build_query($data);
-$curl = curl_init($url);
+use LibreNMS\Interfaces\Alert\Transport;
 
-set_curl_proxy($curl);
-curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+class Playsms implements Transport{
+    public function call($obj, $opts) {
+        $data = array("u" => $opts['user'], "h" => $opts['token'], "to" => implode(',', $opts['to']), "msg" => $obj['title']);
+        if (!empty($opts['from'])) {
+            $data["from"] = $opts['from'];
+        }
+        $url  = $opts['url'] . '&op=pv&' . http_build_query($data);
+        $curl = curl_init($url);
 
-$ret  = curl_exec($curl);
-$code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-if( $code > 202 ) {
-    if( $debug ) {
-        var_dump($ret);
+        set_curl_proxy($curl);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+        $ret  = curl_exec($curl);
+        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        if ($code > 202) {
+            if ($debug) {
+                var_dump($ret);
+            }
+            return false;
+        }
+        return true;
     }
-    return false;
 }
-return true;
