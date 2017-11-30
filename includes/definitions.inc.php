@@ -513,6 +513,11 @@ $config['graph_types']['device']['routeros_leases']['section'] = 'network';
 $config['graph_types']['device']['routeros_leases']['order'] = 0;
 $config['graph_types']['device']['routeros_leases']['descr'] = 'DHCP Lease Count';
 
+//pCOweb - RITTAL IT CHILLER
+$config['graph_types']['device']['pcoweb-rittalchiller_eer']['section'] = 'chiller';
+$config['graph_types']['device']['pcoweb-rittalchiller_eer']['order'] = 0;
+$config['graph_types']['device']['pcoweb-rittalchiller_eer']['descr'] = 'E.E.R.';
+
 // Device Types
 $i = 0;
 $config['device_types'][$i]['text'] = 'Servers';

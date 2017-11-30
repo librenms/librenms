@@ -1,5 +1,0 @@
-INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'panos_sessions_tcp',  'firewall',  'Active Users',  0);
-INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'panos_sessions_udp',  'firewall',  'Active Users',  0);
-INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'panos_sessions_icmp',  'firewall',  'Active Users',  0);
-INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'panos_sessions_ssl',  'firewall',  'Active Users',  0);
-INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'panos_sessions_sslutil',  'firewall',  'Active Users',  0);
