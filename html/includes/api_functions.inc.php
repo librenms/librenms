@@ -523,8 +523,8 @@ function get_bgp()
     if (!is_numeric($bgp_session_count)) {
         api_error(500, 'Error retrieving BGP peer');
     }
-    if (count($bgp_session_count) == 0) {
-        api_error(404, 'BGP peer $bgpPeerId does not exist');
+    if ($bgp_session_count == 0) {
+        api_error(404, "BGP peer $bgpPeerId does not exist");
     }
 
     api_success($bgp_session, 'bgp_session');
