@@ -1,4 +1,18 @@
 <?php
+/*
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2017 LibreNMS
+ * @author     LibreNMS Contributors
+*/
+
 $details_visible = var_export($vars['format'] == 'list_detail', 1);
 $errors_visible = var_export($vars['format'] == 'list_detail' || $vars['errors'], 1);
 $no_refresh = true;
@@ -12,9 +26,13 @@ if ($vars['errors']) {
 }
 ?>
 <div class="panel panel-default panel-condensed">
-    <div class="table-responsive">
-        <table id="ports" class="table table-condensed table-hover">
-            <thead>
+    <div class="panel-heading">
+        <strong>Ports</strong>
+    </div>
+    <div class="panel panel-default panel-condensed">
+        <div class="table-responsive">
+            <table id="ports" class="table table-condensed table-hover">
+                <thead>
                 <tr>
                     <th data-column-id="device">Device</th>
                     <th data-column-id="port"<?php echo $sort ?>>Port</th>
@@ -32,8 +50,9 @@ if ($vars['errors']) {
                     <th data-column-id="description">Description</th>
                     <th data-column-id="actions" data-sortable="false" data-searchable="false">Actions</th>
                 </tr>
-            </thead>
-        </table>
+                </thead>
+            </table>
+        </div>
     </div>
 </div>
 <script>
@@ -87,5 +106,7 @@ var grid = $("#ports").bootgrid({
     },
     url: "ajax_table.php"
 });
+
+$(".actionBar").append("<?php echo $output; ?>");
 
 </script>
