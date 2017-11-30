@@ -10,7 +10,7 @@ First you need to configure your SNMP card using the admin interface. An SNMP ta
 
 ![pCOweb](/img/carelpcowebsystemoid.png)
 
-The base Carel OID is 1.3.6.1.4.1.9839. To this OID we will add the final manufacturer Enterprise OID. You can find all enterprise OID [following this link]https://www.iana.org/assignments/enterprise-numbers/enterprise-numbers. This will allow us to create a specific support for this device.
+The base Carel OID is 1.3.6.1.4.1.9839. To this OID we will add the final manufacturer Enterprise OID. You can find all enterprise OID [following this link](https://www.iana.org/assignments/enterprise-numbers/enterprise-numbers). This will allow us to create a specific support for this device.
 
 Example for the Rittal IT Chiller that uses a pCOweb card:
 1. Base Carel OID : **1.3.6.1.4.1.9839**
