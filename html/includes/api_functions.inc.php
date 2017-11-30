@@ -511,8 +511,9 @@ function get_bgp()
     check_is_read();
 
     $app        = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
 
-    $bgpPeerId        = $_GET['id']
+    $bgpPeerId        = $router['id'];
     if (!is_numeric($bgpPeerId)) {
         api_error(400, 'Invalid id has been provided');
     }
