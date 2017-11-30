@@ -29,30 +29,42 @@ if ($vars['errors']) {
     <div class="panel-heading">
         <strong>Ports</strong>
     </div>
-    <div class="panel panel-default panel-condensed">
-        <div class="table-responsive">
-            <table id="ports" class="table table-condensed table-hover">
-                <thead>
-                <tr>
-                    <th data-column-id="device">Device</th>
-                    <th data-column-id="port"<?php echo $sort ?>>Port</th>
-                    <th data-column-id="ifLastChange" data-converter="duration">Status Changed</th>
-                    <th data-column-id="ifConnectorPresent" data-visible="false">Connected</th>
-                    <th data-column-id="ifSpeed" data-converter="human-bps">Speed</th>
-                    <th data-column-id="ifMtu" data-visible="false">MTU</th>
-                    <th data-column-id="ifInOctets_rate" data-searchable="false" data-css-class="green" data-converter="human-bps">Down</th>
-                    <th data-column-id="ifOutOctets_rate" data-searchable="false" data-css-class="blue" data-converter="human-bps">Up</th>
-                    <th data-column-id="ifInUcastPkts_rate" data-searchable="false" data-visible="<?php echo $details_visible ?>" data-css-class="green" data-converter="human-pps">Packets In</th>
-                    <th data-column-id="ifOutUcastPkts_rate" data-searchable="false" data-visible="<?php echo $details_visible ?>" data-css-class="blue" data-converter="human-pps">Packets Out</th>
-                    <th data-column-id="ifInErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>" data-css-class="red"<?php echo $error_sort ?>>Errors In</th>
-                    <th data-column-id="ifOutErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>" data-css-class="red">Errors Out</th>
-                    <th data-column-id="ifType">Media</th>
-                    <th data-column-id="description">Description</th>
-                    <th data-column-id="actions" data-sortable="false" data-searchable="false">Actions</th>
-                </tr>
-                </thead>
-            </table>
-        </div>
+    <div class="table-responsive">
+        <table id="ports" class="table table-condensed table-hover">
+            <thead>
+            <tr>
+                <th data-column-id="device">Device</th>
+                <th data-column-id="port"<?php echo $sort ?>>Port</th>
+                <th data-column-id="ifLastChange" data-converter="duration">Status Changed</th>
+                <th data-column-id="ifConnectorPresent" data-visible="false">Connected</th>
+                <th data-column-id="ifSpeed" data-converter="human-bps">Speed</th>
+                <th data-column-id="ifMtu" data-visible="false">MTU</th>
+                <th data-column-id="ifInOctets_rate" data-searchable="false" data-css-class="green"
+                    data-converter="human-bps">Down
+                </th>
+                <th data-column-id="ifOutOctets_rate" data-searchable="false" data-css-class="blue"
+                    data-converter="human-bps">Up
+                </th>
+                <th data-column-id="ifInUcastPkts_rate" data-searchable="false"
+                    data-visible="<?php echo $details_visible ?>" data-css-class="green" data-converter="human-pps">
+                    Packets In
+                </th>
+                <th data-column-id="ifOutUcastPkts_rate" data-searchable="false"
+                    data-visible="<?php echo $details_visible ?>" data-css-class="blue" data-converter="human-pps">
+                    Packets Out
+                </th>
+                <th data-column-id="ifInErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>"
+                    data-css-class="red"<?php echo $error_sort ?>>Errors In
+                </th>
+                <th data-column-id="ifOutErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>"
+                    data-css-class="red">Errors Out
+                </th>
+                <th data-column-id="ifType">Media</th>
+                <th data-column-id="description">Description</th>
+                <th data-column-id="actions" data-sortable="false" data-searchable="false">Actions</th>
+            </tr>
+            </thead>
+        </table>
     </div>
 </div>
 <script>
