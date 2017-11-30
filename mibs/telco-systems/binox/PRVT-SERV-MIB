@@ -1,0 +1,1151 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-SERV-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-SERV-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InterfaceIndex
+        FROM IF-MIB
+    serviceAccessSwitch
+        FROM PRVT-SWITCH-MIB
+    Integer32, IpAddress, MODULE-IDENTITY, NOTIFICATION-TYPE, 
+    OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    MacAddress, RowStatus, TimeStamp, TruthValue
+        FROM SNMPv2-TC;
+
+prvtServicesMIB MODULE-IDENTITY
+    LAST-UPDATED "201307150000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "This document is the SNMP MIB module to manage and provision
+         the various services of the system."
+    REVISION    "201307150000Z"
+    DESCRIPTION 
+        "Added support for TLS ethertype"
+    REVISION    "201302040000Z"
+    DESCRIPTION 
+        "Update description for sapEncapValue."
+    REVISION    "201110190000Z"
+    DESCRIPTION 
+        "Change serviceAdminStatus, sapAdminStatus, sdpAdminStatus
+         enumeration. Now down (1), up (2)."
+    REVISION    "200901190000Z"
+    DESCRIPTION 
+        "Sync to internal implementation"
+    ::= { serviceAccessSwitch 2 }
+
+
+prvtServicesMIBNotifications OBJECT IDENTIFIER
+    ::= { prvtServicesMIB 0 }
+
+prvtServicesMIBObjects OBJECT IDENTIFIER
+    ::= { prvtServicesMIB 1 }
+
+customerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CustomerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that contains customer information."
+    ::= { prvtServicesMIBObjects 1 }
+
+customerEntry OBJECT-TYPE
+    SYNTAX      CustomerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information about a specific customer."
+    INDEX       { customerName }
+    ::= { customerTable 1 }
+
+CustomerEntry ::= SEQUENCE {
+    customerName        OCTET STRING,
+    customerRowStatus   RowStatus,
+    customerContact     OCTET STRING,
+    customerPhone       OCTET STRING
+}
+
+customerName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..29))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The name of this customer."
+    ::= { customerEntry 1 }
+
+customerRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object indicates the status of this row."
+    ::= { customerEntry 2 }
+
+customerContact OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..29))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The name of the primary contact person for
+         this customer."
+    ::= { customerEntry 3 }
+
+customerPhone OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..29))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The phone/pager number used to reach the
+         primary contact person."
+    ::= { customerEntry 4 }
+
+serviceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that contains basic service information."
+    ::= { prvtServicesMIBObjects 2 }
+
+serviceEntry OBJECT-TYPE
+    SYNTAX      ServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Basic information about a specific service."
+    INDEX       { serviceId }
+    ::= { serviceTable 1 }
+
+ServiceEntry ::= SEQUENCE {
+    serviceId                       Unsigned32,
+    serviceRowStatus                RowStatus,
+    serviceVpnId                    Unsigned32,
+    serviceType                     INTEGER,
+    serviceDescription              OCTET STRING,
+    serviceMtu                      Integer32,
+    serviceAdminStatus              INTEGER,
+    serviceOperStatus               INTEGER,
+    serviceNumSaps                  Integer32,
+    serviceNumSdps                  Integer32,
+    serviceLastMgmtChange           TimeStamp,
+    serviceEnableSecureSaps         TruthValue,
+    serviceRevertTimer              Unsigned32,
+    servicePwRedundOperModeMesh     INTEGER,
+    servicePwRedundOperModeSpoke    INTEGER,
+    serviceCustName                 OCTET STRING,
+    serviceVlanEtherType            INTEGER,
+    serviceBackupVlanEtherType      INTEGER,
+    serviceVlanAction               INTEGER
+}
+
+serviceId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967294)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The service ID."
+    ::= { serviceEntry 1 }
+
+serviceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object indicates the status of this row. The
+         values supported during a set operation are 
+         createAndWait(5), destroy(6), active(1), notInSertvice(2). 
+         Service can not be deleted or changed to notInService if there are
+         SDPs/SAPs belonging to it. "
+    ::= { serviceEntry 2 }
+
+serviceVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object specifies the ID used by Service Provider(SP). 
+         It will have different format according to the type of 
+         service. 
+         This filed is mandatory. If all mandatory fields are 
+         set, the row status object is automatically changed from notReady(3)
+         to notInService(2) state.
+         For TLS services must be the same as sdpBindVlanTag."
+    ::= { serviceEntry 3 }
+
+serviceType OBJECT-TYPE
+    SYNTAX      INTEGER { epipe(1), p3pipe(2), tls(3), vprn(4), ies(5), 
+                    mirror(6), apipe(7), fpipe(8), vpws(9), vplsPe(10), 
+                    vplsMtu(11), dot1q(12) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The service type: e.g. EtherPipe, TLS, etc. Currently only 
+         vpls-pe(11), vpls-mtu(12), vpws-pe(9) and vpws-mtu(10) types 
+         are supported. 
+         This field is mandatory."
+    ::= { serviceEntry 4 }
+
+serviceDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..29))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Generic information about this service."
+    ::= { serviceEntry 5 }
+
+serviceMtu OBJECT-TYPE
+    SYNTAX      Integer32 (512..9216)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Not supported object"
+    ::= { serviceEntry 6 }
+
+serviceAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER { down(1), up(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Administrative state of the service."
+    ::= { serviceEntry 7 }
+
+serviceOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER { up(1), down(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The operating state of this service."
+    ::= { serviceEntry 8 }
+
+serviceNumSaps OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of SAPs defined on this service."
+    ::= { serviceEntry 9 }
+
+serviceNumSdps OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of SDPs bound to this service."
+    ::= { serviceEntry 10 }
+
+serviceLastMgmtChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value of sysUpTime at the time of the
+         most recent management-initiated change to
+         this service."
+    ::= { serviceEntry 11 }
+
+serviceEnableSecureSaps OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Used to configure the SAPs to forward only traffic from the uplink ports."
+    ::= { serviceEntry 13 }
+
+serviceRevertTimer OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7200)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "serviceRevertTimer"
+    ::= { serviceEntry 14 }
+
+servicePwRedundOperModeMesh OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), independent(1), master(2), slave(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "servicePwRedundOperModeMesh"
+    ::= { serviceEntry 15 }
+
+servicePwRedundOperModeSpoke OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), independent(1), master(2), slave(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "servicePwRedundOperModeSpoke"
+    ::= { serviceEntry 16 }
+
+serviceCustName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..29))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The name of the customer this service belongs to."
+    ::= { serviceEntry 17 }
+
+serviceVlanEtherType OBJECT-TYPE
+    SYNTAX      INTEGER { vlan(33024), dot1ad(34984), qinq(37120) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The ethertype for service vlan."
+    ::= { serviceEntry 18 }
+
+serviceBackupVlanEtherType OBJECT-TYPE
+    SYNTAX      INTEGER { vlan(33024), dot1ad(34984), qinq(37120) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The ethertype for service backup vlan."
+    ::= { serviceEntry 19 }
+
+serviceVlanAction OBJECT-TYPE
+    SYNTAX      INTEGER { replace(0), add(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Vlan action for vlan services"
+    ::= { serviceEntry 20 }
+
+sapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that contains basic SAP information."
+    ::= { prvtServicesMIBObjects 3 }
+
+sapEntry OBJECT-TYPE
+    SYNTAX      SapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information about a specific SAP."
+    INDEX       { serviceId, sapPortId, sapEncapValue }
+    ::= { sapTable 1 }
+
+SapEntry ::= SEQUENCE {
+    sapPortId                           Integer32,
+    sapEncapValue                       Unsigned32,
+    sapRowStatus                        RowStatus,
+    sapType                             INTEGER,
+    sapDescription                      OCTET STRING,
+    sapAdminStatus                      INTEGER,
+    sapOperStatus                       INTEGER,
+    sapLastMgmtChange                   TimeStamp,
+    sapOperFlags                        BITS,
+    sapCustMultSvcSiteName              OCTET STRING,
+    sapIngressQosPolicyId               Unsigned32,
+    sapEgressQosPolicyId                Unsigned32,
+    sapIngressQosSchedulerPolicy        OCTET STRING,
+    sapEgressQosSchedulerPolicy         OCTET STRING,
+    sapLearnMode                        INTEGER,
+    sapLearnEnable                      TruthValue,
+    sapUntaggedMode                     TruthValue,
+    sapProfileName                      OCTET STRING,
+    sapCurrentMacCount                  Unsigned32,
+    sapMacLearningProfileState          INTEGER,
+    prvtSapEventPropagationProfile      OCTET STRING,
+    prvtTlsSapEventPropagationProfile   OCTET STRING
+}
+
+sapPortId OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The ID of the access port where this SAP
+         is defined."
+    ::= { sapEntry 1 }
+
+sapEncapValue OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The value of the label used to identify this
+         SAP on the access port specified by sapPortId. Value 4095
+         is used for unqualified SAP, value 4096 is used for untagged
+         SAP."
+    ::= { sapEntry 2 }
+
+sapRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object indicates the status of this row.
+         Saps can be deleted any time."
+    ::= { sapEntry 3 }
+
+sapType OBJECT-TYPE
+    SYNTAX      INTEGER { epipe(1), p3pipe(2), tls(3), vprn(4), ies(5), 
+                    mirror(6), apipe(7), fpipe(8), vpws(9), vplsPe(10), 
+                    vplsMtu(11), dot1q(12) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This object indicates the type of service where
+         this SAP is defined."
+    ::= { sapEntry 4 }
+
+sapDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..29))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Generic information about this SAP."
+    ::= { sapEntry 5 }
+
+sapAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER { down(1), up(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Administrative state of the sap"
+    ::= { sapEntry 6 }
+
+sapOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER { up(1), down(2), ingressQosMismatch(3), 
+                    egressQosMismatch(4), svcAdminDown(5), 
+                    portMtuTooSmall(6) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The operating state of this SAP, showing also the reason for the
+         current operation state
+         
+         Values ingressQosMismatch(3),egressQosMismatch(4),svcAdminDown(5) 
+         and portMtuTooSmall(6) are not supported"
+    ::= { sapEntry 7 }
+
+sapLastMgmtChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value of sysUpTime at the time of the
+         most recent management-initiated change to
+         this SAP."
+    ::= { sapEntry 8 }
+
+sapOperFlags OBJECT-TYPE
+    SYNTAX      BITS { sapAdminDown(0), svcAdminDown(1), portOperDown(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This object specifies all the conditions that
+         affect the operating status of this SAP."
+    ::= { sapEntry 9 }
+
+sapCustMultSvcSiteName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..9))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The value of this object, when not null, indicates
+         the Multi-Service Site this SAP is a member of. This
+         information is used to configure the ingress and
+         egress QoS schedulers for this SAP."
+    ::= { sapEntry 11 }
+
+sapIngressQosPolicyId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The row index in the tSapIngressTable
+         corresponding to this ingress QoS
+         policy, or zero if no policy is specified."
+    ::= { sapEntry 12 }
+
+sapEgressQosPolicyId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The row index in the tSapEgressTable
+         corresponding to this egress QoS policy,
+         or zero if no policy is specified."
+    ::= { sapEntry 13 }
+
+sapIngressQosSchedulerPolicy OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object can be set only when sapCustMultSvcSite
+         is null. It indicates the ingress QoS scheduler for
+         this SAP."
+    ::= { sapEntry 14 }
+
+sapEgressQosSchedulerPolicy OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object can be set only when sapCustMultSvcSite
+         is null. It indicates the egress QoS scheduler for
+         this SAP."
+    ::= { sapEntry 15 }
+
+sapLearnMode OBJECT-TYPE
+    SYNTAX      INTEGER { qualified(1), unqualified(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Sap learning mode. Currently supported as read-only."
+    ::= { sapEntry 16 }
+
+sapLearnEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Sap learning enable."
+    ::= { sapEntry 17 }
+
+sapUntaggedMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Sap untagged mode."
+    ::= { sapEntry 18 }
+
+sapProfileName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..30))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Mac Learning profile name to apply."
+    ::= { sapEntry 19 }
+
+sapCurrentMacCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current count of MAC Addresses
+         learnt on sapProfileName profile."
+    ::= { sapEntry 20 }
+
+sapMacLearningProfileState OBJECT-TYPE
+    SYNTAX      INTEGER { noViolation(1), watermarkReached(2), 
+                    maxMacCountReached(3), errorState(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "State of the secured entry."
+    ::= { sapEntry 21 }
+
+prvtSapEventPropagationProfile OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Event propagation profile name, applied on this service SAP."
+    ::= { sapEntry 22 }
+
+prvtTlsSapEventPropagationProfile OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Event propagation profile name, applied on this service TLS SAP."
+    ::= { sapEntry 23 }
+
+sdpNextFreeId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The next available value for sdpId."
+    ::= { prvtServicesMIBObjects 4 }
+
+sdpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that contains SDP information.
+         Available sdpId can be obtained from sdpNextFreeId."
+    ::= { prvtServicesMIBObjects 5 }
+
+sdpEntry OBJECT-TYPE
+    SYNTAX      SdpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information about a specific SDP."
+    INDEX       { serviceId, sdpId }
+    ::= { sdpTable 1 }
+
+SdpEntry ::= SEQUENCE {
+    sdpId                       Unsigned32,
+    sdpRowStatus                RowStatus,
+    sdpDelivery                 INTEGER,
+    sdpFarEndIpAddress          IpAddress,
+    sdpDescription              OCTET STRING,
+    sdpLabelSignaling           INTEGER,
+    sdpAdminStatus              INTEGER,
+    sdpOperStatus               INTEGER,
+    sdpLastMgmtChange           TimeStamp,
+    sdpLdpEnabled               TruthValue,
+    sdpOperFlags                BITS,
+    sdpAdminIngressLabel        Unsigned32,
+    sdpAdminEgressLabel         Unsigned32,
+    sdpOutInterface             InterfaceIndex,
+    sdpGroupIdentifier          Unsigned32,
+    sdpTransportTunnelName      OCTET STRING,
+    sdpVCType                   INTEGER,
+    sdpType                     INTEGER,
+    sdpMtu                      Integer32,
+    sdpBindVlanTag              Unsigned32,
+    sdpLearnEnable              TruthValue,
+    sdpSecuredEnable            TruthValue,
+    sdpSignalPwStatus           TruthValue,
+    sdpPwRedundancyEnable       TruthValue,
+    sdpPwPrecedence             Integer32,
+    sdpPwActivate               TruthValue,
+    sdpDynamicVcIngressLabel    Unsigned32,
+    sdpDynamicVcEgressLabel     Unsigned32
+}
+
+sdpId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "SDP identifier."
+    ::= { sdpEntry 1 }
+
+sdpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object indicates the status of this row. 
+         The values supported during a set operation are 
+         createAndWait(5), destroy(6), active(1), notInSertvice(2)."
+    ::= { sdpEntry 2 }
+
+sdpDelivery OBJECT-TYPE
+    SYNTAX      INTEGER { gre(1), mpls(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object specifies the type of delivery used
+         by this SDP.
+         NOTE! Currently we support only mpls. The modification 
+         of this obect will be rejected. "
+    ::= { sdpEntry 3 }
+
+sdpFarEndIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object specifies the IP address of the
+         remote end of the GRE or MPLS tunnel defined
+         by this SDP. 
+         
+         This field is mandatory. If all mandatory fields are set, the 
+         row status object is automatically changed from notReady(3)
+         to notInService(2) state."
+    ::= { sdpEntry 4 }
+
+sdpDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..29))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Generic information about this SDP."
+    ::= { sdpEntry 5 }
+
+sdpLabelSignaling OBJECT-TYPE
+    SYNTAX      INTEGER { none(1), tldp(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object specifies the signaling protocol
+         used to obtain the ingress and egress labels
+         used in frames transmitted and received on
+         this SDP. When the value of this object is
+         none(1) then the labels are manually assigned
+         at the time the SDP is configured. The
+         value of this object can only be changed while
+         the admin status of the SDP is down(2).
+         
+         This field is mandatory. If all mandatory fields are set, the 
+         row status object is automatically changed from notReady(3)
+         to notInService(2) state"
+    ::= { sdpEntry 6 }
+
+sdpAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER { down(1), up(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Administrative state of the sdp."
+    ::= { sdpEntry 7 }
+
+sdpOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER { up(1), down(2), goingUp(3), tunnelDown(4), 
+                    transportSelected(5), supressed(6) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The operating state of this SDP. 
+         1. Sdp is up and running.
+         2. Initial state. Entry is inactive.
+         3. Peers are ready to select transport.
+         4. There is no suitable transport.
+         5. SDP is not operational due to local/remote SAP down or remote SDP has no transport.
+         6. Sdp is up and ready to carry user traffic but it is not used at the moment (backup)."
+    ::= { sdpEntry 8 }
+
+sdpLastMgmtChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value of sysUpTime at the time of the
+         most recent management-initiated change to
+         this SDP."
+    ::= { sdpEntry 9 }
+
+sdpLdpEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "When the value of this object is true(1)
+         the transport LSP's are signalled by LDP,
+         as opposed to being provisioned static or
+         RSVP-signalled LSP's. This object applies
+         only to MPLS SDP's."
+    ::= { sdpEntry 10 }
+
+sdpOperFlags OBJECT-TYPE
+    SYNTAX      BITS { sdpAdminDown(0), signalingSessionDown(1), 
+                    transportTunnelDown(2), invalidEgressInterface(3), 
+                    noSystemIpAddress(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This object specifies all the conditions that
+         affect the operating status of this SDP."
+    ::= { sdpEntry 11 }
+
+sdpAdminIngressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The static MPLS VC label used by the far-end device
+         to send packets to this device in this service via
+         this SDP."
+    ::= { sdpEntry 13 }
+
+sdpAdminEgressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The static MPLS VC label used by this device to send
+         packets to the far-end device in this service via
+         this SDP."
+    ::= { sdpEntry 14 }
+
+sdpOutInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object is valid only if the type of service is tls(3). 
+         The ifIndex of the desired outbound interface for this SDP.
+         
+         This field is currently not supported. Its modification 
+         will be rejected. 
+         
+         The default value is 0"
+    ::= { sdpEntry 15 }
+
+sdpGroupIdentifier OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object is valid only if the type of service is tls(3). 
+         The Group ID for this SDP. SDP's bound to the same service must have the same Group ID's."
+    ::= { sdpEntry 16 }
+
+sdpTransportTunnelName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Optional transport tunnel name. For the SDP to be operational an entry must exist in 
+         mplsTunnelTable with this name."
+    ::= { sdpEntry 17 }
+
+sdpVCType OBJECT-TYPE
+    SYNTAX      INTEGER { ethernetVlan(4), ethernet(5) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "VC Type of the service."
+    ::= { sdpEntry 18 }
+
+sdpType OBJECT-TYPE
+    SYNTAX      INTEGER { invalidType(0), generic(1), spoke(2), mesh(3), 
+                    hub(4) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The type of this SDP.
+         
+         Currently the only supported sdp types are spoke(2) and mesh(3)
+         
+         This field is mandatory. If serviceType is set to vpls-mtu(12) or vpws-mtu(10), 
+         trying to set sdpType to mesh(3) will be rejected(Wring configuration). 
+         If all mandatory fields are set, the row status object is automatically 
+         changed from notReady(3) to notInService(2) state."
+    ::= { sdpEntry 19 }
+
+sdpMtu OBJECT-TYPE
+    SYNTAX      Integer32 (512..9190)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The largest frame size (in octets) that this
+         SDP can handle"
+    ::= { sdpEntry 20 }
+
+sdpBindVlanTag OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4092)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Outgoing vlan. For TLS services must be the same as serviceVpnId"
+    ::= { sdpEntry 21 }
+
+sdpLearnEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Sdp learn."
+    ::= { sdpEntry 22 }
+
+sdpSecuredEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The Secured setting to manage split-horizon rules for the SDP."
+    ::= { sdpEntry 23 }
+
+sdpSignalPwStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Sdp signal pw status."
+    ::= { sdpEntry 24 }
+
+sdpPwRedundancyEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "sdpPwRedundancyEnable"
+    ::= { sdpEntry 25 }
+
+sdpPwPrecedence OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Value of this object determines the role of
+         this sdp entry. The entry with highest sdpPwPrecedence acts as
+         primary, all other sdps are backup."
+    ::= { sdpEntry 26 }
+
+sdpPwActivate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "sdpPwActivate"
+    ::= { sdpEntry 27 }
+
+sdpDynamicVcIngressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Sdp dynamic vc ingress label."
+    ::= { sdpEntry 28 }
+
+sdpDynamicVcEgressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Sdp dynamic vc egress label."
+    ::= { sdpEntry 29 }
+
+serviceMacAddressSapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ServiceMacAddressSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that contains FDB entries per service and sap."
+    ::= { prvtServicesMIBObjects 7 }
+
+serviceMacAddressSapEntry OBJECT-TYPE
+    SYNTAX      ServiceMacAddressSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information FDB entries per service and sap."
+    INDEX       { serviceMacAddressSapServiceId, 
+                  serviceMacAddressSapMacAddress, 
+                  serviceMacAddressSapPortId, 
+                  serviceMacAddressSapEncapValue }
+    ::= { serviceMacAddressSapTable 1 }
+
+ServiceMacAddressSapEntry ::= SEQUENCE {
+    serviceMacAddressSapServiceId   Unsigned32,
+    serviceMacAddressSapMacAddress  MacAddress,
+    serviceMacAddressSapPortId      Integer32,
+    serviceMacAddressSapEncapValue  Unsigned32,
+    serviceMacAddressSapRowStatus   RowStatus,
+    serviceMacAddressSapPriority    Integer32
+}
+
+serviceMacAddressSapServiceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service."
+    ::= { serviceMacAddressSapEntry 1 }
+
+serviceMacAddressSapMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Static MacAddress."
+    ::= { serviceMacAddressSapEntry 2 }
+
+serviceMacAddressSapPortId OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Static MacAddress port id."
+    ::= { serviceMacAddressSapEntry 3 }
+
+serviceMacAddressSapEncapValue OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4095)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Static MacAddress encap value."
+    ::= { serviceMacAddressSapEntry 4 }
+
+serviceMacAddressSapRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Static MacAddress row status."
+    ::= { serviceMacAddressSapEntry 5 }
+
+serviceMacAddressSapPriority OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Static MacAddress priority."
+    ::= { serviceMacAddressSapEntry 6 }
+
+serviceMacAddressSdpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ServiceMacAddressSdpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that contains FDB entries per service and sdp."
+    ::= { prvtServicesMIBObjects 8 }
+
+serviceMacAddressSdpEntry OBJECT-TYPE
+    SYNTAX      ServiceMacAddressSdpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information FDB entries per service and sdp."
+    INDEX       { serviceMacAddressSdpServiceId, 
+                  serviceMacAddressSdpMacAddress, serviceMacAddressSdpId }
+    ::= { serviceMacAddressSdpTable 1 }
+
+ServiceMacAddressSdpEntry ::= SEQUENCE {
+    serviceMacAddressSdpServiceId   Unsigned32,
+    serviceMacAddressSdpMacAddress  MacAddress,
+    serviceMacAddressSdpId          Unsigned32,
+    serviceMacAddressSdpRowStatus   RowStatus,
+    serviceMacAddressSdpPriority    Integer32
+}
+
+serviceMacAddressSdpServiceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Id."
+    ::= { serviceMacAddressSdpEntry 1 }
+
+serviceMacAddressSdpMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Static MacAddress."
+    ::= { serviceMacAddressSdpEntry 2 }
+
+serviceMacAddressSdpId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Static MacAddress sdp id."
+    ::= { serviceMacAddressSdpEntry 3 }
+
+serviceMacAddressSdpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Static MacAddress row status."
+    ::= { serviceMacAddressSdpEntry 4 }
+
+serviceMacAddressSdpPriority OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Static MacAddress priority."
+    ::= { serviceMacAddressSdpEntry 5 }
+
+customerCreated NOTIFICATION-TYPE
+    OBJECTS     { customerName }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when a new row is created
+         in the customerTable."
+    ::= { prvtServicesMIBNotifications 1 }
+
+customerDeleted NOTIFICATION-TYPE
+    OBJECTS     { customerName }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when an existing row is
+         deleted from the customerTable."
+    ::= { prvtServicesMIBNotifications 2 }
+
+serviceCreated NOTIFICATION-TYPE
+    OBJECTS     { serviceId }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when a new row is created
+         in the serviceTable."
+    ::= { prvtServicesMIBNotifications 3 }
+
+serviceDeleted NOTIFICATION-TYPE
+    OBJECTS     { serviceId }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when an existing row is
+         deleted from the serviceTable."
+    ::= { prvtServicesMIBNotifications 4 }
+
+sapCreated NOTIFICATION-TYPE
+    OBJECTS     { serviceId, sapPortId, sapEncapValue }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when a new row is created
+         in the sapTable."
+    ::= { prvtServicesMIBNotifications 5 }
+
+sapDeleted NOTIFICATION-TYPE
+    OBJECTS     { serviceId, sapPortId, sapEncapValue }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when an existing row is
+         deleted from the sapTable."
+    ::= { prvtServicesMIBNotifications 6 }
+
+sdpCreated NOTIFICATION-TYPE
+    OBJECTS     { serviceId, sdpId }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when a new row is created
+         in the sdpTable."
+    ::= { prvtServicesMIBNotifications 7 }
+
+sdpDeleted NOTIFICATION-TYPE
+    OBJECTS     { serviceId, sdpId }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when an existing row is
+         deleted from the sdpTable."
+    ::= { prvtServicesMIBNotifications 8 }
+
+END -- end of module PRVT-SERV-MIB.

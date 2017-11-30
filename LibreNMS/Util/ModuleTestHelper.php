@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use LibreNMS\Config;
+use LibreNMS\Exceptions\FileNotFoundException;
 use Symfony\Component\Yaml\Yaml;
 
 class ModuleTestHelper
@@ -56,16 +57,19 @@ class ModuleTestHelper
      * @param array|string $modules
      * @param string $os
      * @param string $variant
+     * @throws FileNotFoundException
      */
     public function __construct($modules, $os, $variant = '')
     {
+        global $influxdb;
+
         $this->modules = $this->resolveModuleDependencies((array)$modules);
-        $this->os = $os;
-        $this->variant = $variant;
+        $this->os = strtolower($os);
+        $this->variant = strtolower($variant);
 
         // preset the file names
         if ($variant) {
-            $variant = '_' . $variant;
+            $variant = '_' . $this->variant;
         }
         $install_dir = Config::get('install_dir');
         $this->file_name = $os . $variant;
@@ -74,9 +78,15 @@ class ModuleTestHelper
         $this->json_dir = "$install_dir/tests/data/";
         $this->json_file = $this->json_dir . $this->file_name . ".json";
 
+        if (!is_file($this->snmprec_file)) {
+            throw new FileNotFoundException("$this->snmprec_file does not exist!");
+        }
+
         // never store time series data
         Config::set('norrd', true);
+        Config::set('hide_rrd_disabled', true);
         Config::set('noinfluxdb', true);
+        $influxdb = false;
         Config::set('nographite', true);
 
         $this->module_tables = Yaml::parse($install_dir . '/tests/module_tables.yaml');
@@ -471,7 +481,7 @@ class ModuleTestHelper
             $device_id = addHost($snmpsim->getIp(), 'v2c', $snmpsim->getPort());
             $this->qPrint("Added device: $device_id\n");
         } catch (\Exception $e) {
-            echo $this->file_name . ': ' . $e->getMessage() . PHP_EOL;
+            $this->qPrint($this->file_name . ': ' . $e->getMessage() . PHP_EOL);
             return null;
         }
 
@@ -549,7 +559,7 @@ class ModuleTestHelper
                 }
             }
 
-            file_put_contents($this->json_file, _json_encode($existing_data));
+            file_put_contents($this->json_file, _json_encode($existing_data) . PHP_EOL);
             $this->qPrint("Saved to $this->json_file\nReady for testing!\n");
         }
 

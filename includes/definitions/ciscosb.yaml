@@ -1,9 +1,10 @@
 os: ciscosb
-group: cisco
 text: 'Cisco Small Business'
 ifname: 1
 type: network
 icon: cisco
+mib_dir:
+    - cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

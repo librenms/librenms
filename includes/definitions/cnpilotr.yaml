@@ -2,10 +2,11 @@ os: cnpilotr
 text: Cambium cnPilot Router
 type: network
 icon: cambium
-mib_dir: cambium\cnpilotr
+group: cambium
+mib_dir:
+    - cambium/cnpilotr
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-group: cambium
 discovery:
     -
         sysDescr_regex:
