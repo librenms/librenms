@@ -27,10 +27,12 @@ namespace LibreNMS;
 
 use LibreNMS\Device\Discovery\Sensors\WirelessSensorDiscovery;
 use LibreNMS\Device\Discovery\Sensors\WirelessSensorPolling;
+use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS\Generic;
 
-class OS
+class OS implements ProcessorDiscovery
 {
     private $device; // annoying use of references to make sure this is in sync with global $device variable
 
@@ -140,5 +142,104 @@ class OS
         }
 
         return $data;
+    }
+
+    /**
+     * Discover processors.
+     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
+     *
+     * @return array Processors
+     */
+    public function discoverProcessors()
+    {
+        $device = $this->getDevice();
+        $processors = array();
+
+        echo ' hrDevice: ';
+        $hrDevice_array = snmpwalk_cache_oid($device, 'hrDeviceType', array(), 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
+
+        if (empty($hrDevice_array)) {
+            return array();
+        }
+
+        $hrDevice_array = snmpwalk_cache_oid($device, 'hrDeviceDescr', $hrDevice_array, 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
+        $hrDevice_array = snmpwalk_cache_oid($device, 'hrProcessorLoad', $hrDevice_array, 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
+
+        foreach ($hrDevice_array as $index => $entry) {
+            // Workaround bsnmpd reporting CPUs as hrDeviceOther (fuck you, FreeBSD.)
+            if ($entry['hrDeviceType'] == 'hrDeviceOther' && preg_match('/^cpu[0-9]+:/', $entry['hrDeviceDescr'])) {
+                $entry['hrDeviceType'] = 'hrDeviceProcessor';
+            }
+
+            if ($entry['hrDeviceType'] == 'hrDeviceProcessor') {
+                $usage_oid = '.1.3.6.1.2.1.25.3.3.1.2.' . $index;
+                $usage = $entry['hrProcessorLoad'];
+
+                // What is this for? I have forgotten. What has : in its hrDeviceDescr?
+                // Set description to that found in hrDeviceDescr, first part only if containing a :
+                $descr_array = explode(':', $entry['hrDeviceDescr']);
+                if ($descr_array['1']) {
+                    $descr = $descr_array['1'];
+                } else {
+                    $descr = $descr_array['0'];
+                }
+
+                // Workaround to set fake description for Mikrotik who don't populate hrDeviceDescr
+                if ($device['os'] == 'routeros' && (!isset($entry['hrDeviceDescr']) || empty($entry['hrDeviceDescr']))) {
+                    $descr = 'Processor';
+                }
+
+                // Workaround to set fake description for Engenius who don't populate hrDeviceDescr
+                if ($device['os'] == 'engenius' && empty($entry['hrDeviceDescr'])) {
+                    $descr = 'Processor';
+                }
+
+                // Workaround to set fake description for Ubiquiti EdgeOS who don't populate hrDeviceDescr
+                if ($device['os'] == 'edgeos' && empty($entry['hrDeviceDescr'])) {
+                    $descr = 'Processor';
+                }
+
+                // Workaround to set fake description for Windows who use Unknown Processor Type
+                if ($device['os'] == 'windows' && $entry['hrDeviceDescr'] == 'Unknown Processor Type') {
+                    $descr = 'Processor';
+                }
+
+                // Workaround for Linux where some CPUs don't have a description
+                if ($device['os'] == 'linux' && empty($entry['hrDeviceDescr'])) {
+                    $descr = 'Processor';
+                }
+
+
+                $descr = str_replace('CPU ', '', $descr);
+                $descr = str_replace('(TM)', '', $descr);
+                $descr = str_replace('(R)', '', $descr);
+
+                $old_name = array('hrProcessor', $index);
+                $new_name = array('processor', 'hr', $index);
+                rrd_file_rename($device, $old_name, $new_name);
+
+                if ($device['os'] == 'arista-eos' && $index == '1') {
+                    unset($descr);
+                }
+
+                if (isset($descr) && $descr != 'An electronic chip that makes the computer work.') {
+
+                    $processors[] = new Processor(
+                        'hr',
+                        $this->getDeviceId(),
+                        $usage_oid,
+                        $index,
+                        $descr,
+                        1,
+                        $usage,
+                        '',
+                        $index
+                    );
+                }
+
+            }//end if
+        }//end foreach
+
+        return $processors;
     }
 }
