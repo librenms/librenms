@@ -1,4 +1,20 @@
 <?php
+/*
+ * LibreNMS
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2017 LibreNMS
+ * @author     LibreNMS Contributors
+*/
+
 $datas = array('mempool','processor','storage');
 if ($used_sensors['temperature']) {
     $datas[] = 'temperature';
@@ -52,33 +68,6 @@ if ($used_sensors['toner']) {
     $datas[] = 'toner';
 }
 
-/*
-// FIXME generalize -> static-config ?
-$type_text['overview'] = "Overview";
-$type_text['temperature'] = "Temperature";
-$type_text['charge'] = "Battery Charge";
-$type_text['humidity'] = "Humidity";
-$type_text['mempool'] = "Memory";
-$type_text['storage'] = "Storage";
-$type_text['diskio'] = "Disk I/O";
-$type_text['processor'] = "Processor";
-$type_text['voltage'] = "Voltage";
-$type_text['fanspeed'] = "Fanspeed";
-$type_text['frequency'] = "Frequency";
-$type_text['runtime'] = "Runtime";
-$type_text['current'] = "Current";
-$type_text['power'] = "Power";
-$type_text['toner'] = "Toner";
-$type_text['dbm'] = "dBm";
-$type_text['load'] = "Load";
-$type_text['state'] = "State";
-$type_text['signal'] = "Signal";
-$type_text['snr'] = "SNR";
-$type_text['pressure'] = "Pressure";
-$type_text['cooling'] = "Cooling";
-$type_text['toner'] = 'Toner';
-*/
-
 if (!$vars['metric']) {
     $vars['metric'] = "processor";
 }
@@ -87,33 +76,6 @@ if (!$vars['view']) {
 }
 
 $link_array = array('page'    => 'health');
-
-/*
-$pagetitle[] = "Health";
-
-print_optionbar_start('', '');
-
-echo('<span style="font-weight: bold;">Health</span> &#187; ');
-
-$sep = "";
-foreach ($datas as $texttype) {
-    $metric = strtolower($texttype);
-    echo($sep);
-    if ($vars['metric'] == $metric) {
-        echo("<span class='pagemenu-selected'>");
-    }
-
-    echo(generate_link($type_text[$metric], $link_array, array('metric'=> $metric, 'view' => $vars['view'])));
-
-    if ($vars['metric'] == $metric) {
-        echo("</span>");
-    }
-
-    $sep = ' | ';
-}
-
-unset($sep);
-*/
 
 $displayoptions = '<div style="float: right;">';
 
