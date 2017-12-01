@@ -85,7 +85,7 @@ try {
                 printf('%03d -> %03d ...', $db_rev, $file_rev);
 
                 $err = 0;
-                if ($data = file_get_contents($file)) {
+                if (($data = file_get_contents($file)) !== false) {
                     foreach (explode("\n", $data) as $line) {
                         if (trim($line)) {
                             d_echo("$line \n");
