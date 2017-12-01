@@ -2,7 +2,7 @@
 /**
  * entity-state.inc.php
  *
- * -Description-
+ * ENTITY-STATE-MIB polling module
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,83 +23,77 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-$entPhysical = dbFetchRows(
-    'SELECT entPhysical_id, entPhysicalIndex FROM entPhysical WHERE device_id=?',
+$entityStatesIndexes = dbFetchRows(
+    'SELECT S.entity_state_id, S.entStateLastChanged, P.entPhysicalIndex FROM entityState AS S ' .
+    'LEFT JOIN entPhysical AS P USING (entPhysical_id) WHERE S.device_id=?',
     array($device['device_id'])
 );
 
-if (!empty($entPhysical)) {
+if (!empty($entityStatesIndexes)) {
     echo "\nEntity States: ";
 
-    $entPhysical = array_combine(
-        array_column($entPhysical, 'entPhysicalIndex'),
-        array_column($entPhysical, 'entPhysical_id')
-    );
-    $state_data = snmpwalk_group($device, 'entStateTable', 'ENTITY-STATE-MIB');
-    $db_states = dbFetchRows('SELECT * FROM entityState WHERE device_id=?', array($device['device_id']));
-    $db_states = array_combine(array_column($db_states, 'entPhysical_id'), $db_states);
+    // index by entPhysicalIndex
+    $entityStatesIndexes = array_combine(array_column($entityStatesIndexes, 'entPhysicalIndex'), $entityStatesIndexes);
 
-    foreach ($state_data as $index => $state) {
-        if (isset($entPhysical[$index])) {
-            $id = $entPhysical[$index];
+    $entLC = snmpwalk_group($device, 'entStateLastChanged', 'ENTITY-STATE-MIB', 0);
 
-            // format datetime
-            if (empty($state['entStateLastChanged'])) {
-                $state['entStateLastChanged'] = null;
-            } else {
-                list($date, $time, $tz) = explode(',', $state['entStateLastChanged']);
-                try {
-                    $lastChanged = new DateTime("$date $time", new DateTimeZone($tz));
-                    $state['entStateLastChanged'] = $lastChanged
-                            ->setTimezone(new DateTimeZone(date_default_timezone_get()))
+    foreach (current($entLC) as $index => $changed) {
+        if ($changed) { // skip empty entries
+            try {
+                list($date, $time, $tz) = explode(',', $changed);
+                $lastChanged = new DateTime("$date $time", new DateTimeZone($tz));
+                $dbLastChanged = new DateTime($entityStatesIndexes[$index]['entStateLastChanged']);
+                if ($lastChanged != $dbLastChanged) {
+                    // data has changed, fetch it
+                    $new_states = snmp_get_multi(
+                        $device,
+                        array(
+                            "entStateAdmin.$index",
+                            "entStateOper.$index",
+                            "entStateUsage.$index",
+                            "entStateAlarm.$index",
+                            "entStateStandby.$index"
+                        ),
+                        '-OQUse',
+                        'ENTITY-STATE-MIB'
+                    );
+                    $new_states = $new_states[$index]; // just get values
+
+                    // add entStateLastChanged and update
+                    $new_states['entStateLastChanged'] = $lastChanged
+                        ->setTimezone(new DateTimeZone(date_default_timezone_get()))
                         ->format('Y-m-d H:i:s');
-                } catch (Exception $e) {
-                    // no update
-                }
-            }
 
-            if (isset($db_states[$id])) { // update the db
-                $db_state = $db_states[$id];
-                $update = array_diff($state, $db_state);
+                    // check if anything has changed
+                    $update = array_diff(
+                        $new_states,
+                        dbFetchRow(
+                            'SELECT * FROM entityState WHERE entity_state_id=?',
+                            array($entityStatesIndexes[$index]['entity_state_id'])
+                        )
+                    );
 
-                if (!empty($update)) {
-                    if (array_key_exists('entStateLastChanged', $update) && is_null($update['entStateLastChanged'])) {
-                        $update['entStateLastChanged'] = array('NULL');
+                    if (!empty($update)) {
+                        dbUpdate(
+                            $update,
+                            'entityState',
+                            'entity_state_id=?',
+                            array($entityStatesIndexes[$index]['entity_state_id'])
+                        );
+                        d_echo("Updating $index: ", 'U');
+                        d_echo($new_states[$index]);
+                        continue;
                     }
-
-                    dbUpdate($update, 'entityState', 'entity_state_id=?', array($db_state['entity_state_id']));
-                    d_echo("Updating entity state: ", 'U');
-                    d_echo($update);
-                } else {
-                    echo '.';
                 }
-
-                unset($state_data[$index]); // remove so we don't insert later
-                unset($db_states[$id]); // remove so we don't delete later
-            } else {
-                // prep for insert later
-                $state_data[$index]['device_id'] = $device['device_id'];
-                $state_data[$index]['entPhysical_id'] = $id;
-                $state_data[$index]['entStateLastChanged'] = $state['entStateLastChanged'];
-                d_echo("Inserting entity state:: ", '+');
-                d_echo($state);
+            } catch (Exception $e) {
+                // no update
+                d_echo("Error: " . $e->getMessage() . PHP_EOL);
             }
         }
+        echo '.';
     }
 
-    if (!empty($state_data)) {
-        dbBulkInsert($state_data, 'entityState');
-    }
-
-    if (!empty($db_states)) {
-        dbDelete(
-            'entityState',
-            'entity_state_id IN ' . dbGenPlaceholders(count($db_states)),
-            array_column($db_states, 'entity_state_id')
-        );
-    }
+    echo PHP_EOL;
 }
 
-echo PHP_EOL;
-
-unset($entPhysical, $state_data, $db_states, $update);
+unset($entityStatesIndexes, $entLC, $lastChanged, $dbLastChanged, $new_states, $update);

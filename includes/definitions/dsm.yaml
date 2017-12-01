@@ -16,8 +16,8 @@ discovery:
       snmpget:
           oid: systemStatus.0
           mib: SYNOLOGY-SYSTEM-MIB
-          mibdir: synology
-          op: '!=='
+          mib_dir: synology
+          op: '!='
           value: false
     -
       sysDescr_regex: '/^Linux /'

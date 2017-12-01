@@ -61,7 +61,7 @@ class Ray extends OS implements
      */
     public function discoverWirelessPower()
     {
-        $oid = '.1.3.6.1.4.1.33555.1.2.1.12'; // RAY-MIB::rfPowerConfigured.0
+        $oid = '.1.3.6.1.4.1.33555.1.2.1.17'; // RAY-MIB::rfPowerCurrent.0
         return array(
             new WirelessSensor('power', $this->getDeviceId(), $oid, 'racom', 1, 'Tx Power'),
         );

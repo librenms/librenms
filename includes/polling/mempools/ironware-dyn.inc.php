@@ -4,13 +4,15 @@ $oid = $mempool['mempool_index'];
 
 d_echo('Ironware Mempool'."\n");
 
-if (str_contains($device['sysDescr'], array('NetIron', 'MLX', 'CER'))) {
+if (str_contains($device['sysDescr'], array('NetIron', 'MLX', 'CER')) === false) {
+    echo 'Ironware Dynamic: ';
     $mempool['total'] = snmp_get($device, 'snAgGblDynMemTotal.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
     $mempool['free']  = snmp_get($device, 'snAgGblDynMemFree.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
     $mempool['used']  = ($mempool['total'] - $mempool['free']);
 } //end_if
 
 else {
+    echo 'NetIron: ';
     d_echo('caching');
     $mempool_cache['ironware-dyn'] = array();
     $mempool_cache['ironware-dyn'] = snmpwalk_cache_multi_oid($device, 'snAgentBrdMemoryUtil100thPercent', $mempool_cache['ironware-dyn'], 'FOUNDRY-SN-AGENT-MIB');

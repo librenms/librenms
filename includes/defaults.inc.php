@@ -775,6 +775,7 @@ $config['discovery_modules']['os']                   = 1;
 $config['discovery_modules']['ports']                = 1;
 $config['discovery_modules']['ports-stack']          = 1;
 $config['discovery_modules']['entity-physical']      = 1;
+$config['discovery_modules']['entity-state']         = 1;
 $config['discovery_modules']['processors']           = 1;
 $config['discovery_modules']['mempools']             = 1;
 $config['discovery_modules']['cisco-vrf-lite']       = 1;

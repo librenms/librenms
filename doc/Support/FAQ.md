@@ -59,13 +59,7 @@ You have two options for adding a new device into LibreNMS.
 
 #### <a name="faq3"> How do I get help?</a>
 
-We have a few methods for you to get in touch to ask for help.
-
-[Community Forum](https://community.librenms.org)
-
-[Discord](https://t.libren.ms/discord)
-
-[Bug Reports](https://github.com/librenms/librenms/issues)
+[Getting Help](index.md)
 
 #### <a name="faq4"> What are the supported OSes for installing LibreNMS on?</a>
 
@@ -85,7 +79,7 @@ We do indeed, you can find access to the demo [here](https://demo.librenms.org)
 
 The first thing to do is to add /debug=yes/ to the end of the URI (I.e /devices/debug=yes/).
 
-If the page you are trying to load has a substantial amount of data in it then it could be that the php memory limit needs to be increased in php.ini and then your web service reloaded.
+If the page you are trying to load has a substantial amount of data in it then it could be that the php memory limit needs to be increased in [config.php](Configuration.md#core).
 
 #### <a name="faq10"> Why do I not see any graphs?</a>
 
@@ -125,6 +119,12 @@ Before this all rrd files were set to 100G max values, now you can enable suppor
 
 rrdtool tune will change the max value when the interface speed is detected as being changed (min value will be set for anything 10M or over) or when you run the included script (./scripts/tune_port.php) - see [RRDTune doc](../Extensions/RRDTune.md)
 
+ SNMP ifInOctets and ifOutOctets are counters, which means they start at 0 (at device boot) and count up from there. LibreNMS records the value every 5 minutes and uses the difference between the previous value and the current value to calculate rate. (Also, this value resets to 0 when it hits the max value)
+
+Now, when the value is not recorded for awhile RRD (our time series storage) does not record a 0, it records the last value, otherwise, there would be even worse problems. Then finally we get the current ifIn/OutOctets value and record that. Now, it appears as though all of the traffic since it stopped getting values have occurred in the last 5 minute interval.
+
+So whenever you see spikes like this, it means we have not received data from the device for several polling intervals. The cause can vary quite a bit: bad snmp implementations, intermittant network connectivity, broken poller, and more.
+
 #### <a name="faq17"> Why do I see gaps in my graphs?</a>
 
 This is most commonly due to the poller not being able to complete it's run within 300 seconds. Check which devices are causing this by going to /poll-log/ within the Web interface.
@@ -136,12 +136,12 @@ If you poll a large number of devices / ports then it's recommended to run a loc
 Running RRDCached is also highly advised in larger installs but has benefits no matter the size.
 
 #### <a name="faq16"> How do I change the IP / hostname of a device?</a>
-
 There is a host rename tool called renamehost.php in your librenms root directory. When renaming you are also changing the device's IP / hostname address for monitoring.
 Usage:
 ```bash
 ./renamehost.php <old hostname> <new hostname>
 ```
+You can also rename a device in the Web UI by going to the device, then clicking settings Icon -> Edit.
 
 #### <a name="faq19"> My device doesn't finish polling within 300 seconds</a>
 

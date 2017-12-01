@@ -25,12 +25,14 @@
  * @subpackage Alerts
  */
 
+use LibreNMS\Util\FileLock;
+
 $init_modules = array('alerts');
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('d::');
 
-$alerts_lock = \LibreNMS\FileLock::lockOrDie('alerts');
+$alerts_lock = FileLock::lockOrDie('alerts');
 
 if (isset($options['d'])) {
     echo "DEBUG!\n";

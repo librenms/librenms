@@ -86,6 +86,7 @@ function shorthost($hostname, $len = 12)
     if (filter_var($hostname, FILTER_VALIDATE_IP)) {
         return $hostname;
     }
+    $len = Config::get('shorthost_target_length', $len);
 
     $parts = explode(".", $hostname);
     $shorthost = $parts[0];
@@ -1131,7 +1132,7 @@ function version_info($remote = false)
         $output['local_date']   = $local_date;
         $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
     }
-    $output['db_schema']   = get_db_schema() ?: '?';
+    $output['db_schema']   = dbIsConnected() ? get_db_schema() : '?';
     $output['php_ver']     = phpversion();
     $output['mysql_ver']   = dbIsConnected() ? dbFetchCell('SELECT version()') : '?';
     $output['rrdtool_ver'] = str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
@@ -1161,8 +1162,8 @@ function inet6_ntop($ip)
 
 /**
  * If hostname is an ip, use return sysName
- * @param array device
- * @param string hostname
+ * @param array $device
+ * @param string $hostname
  * @return string
 **/
 function format_hostname($device, $hostname = '')
@@ -1606,6 +1607,8 @@ function load_os(&$device)
 
     if ($config['os'][$device['os']]['group']) {
         $device['os_group'] = $config['os'][$device['os']]['group'];
+    } else {
+        unset($device['os_group']);
     }
 }
 
@@ -1845,4 +1848,21 @@ function str_to_class($name, $namespace = null)
     $pre_format = str_replace(array('-', '_'), ' ', $name);
     $class = str_replace(' ', '', ucwords(strtolower($pre_format)));
     return $namespace . $class;
+}
+
+/**
+ * Checks file permissions against a minimum permissions mask.
+ * This only check that bits are enabled, not disabled.
+ * The mask is in the same format as posix permissions. For example, 600 means user read and write.
+ *
+ * @param string $file the name of the file to check
+ * @param $mask
+ * @return bool
+ */
+function check_file_permissions($file, $mask)
+{
+    $perms = fileperms($file);
+    $mask = octdec($mask);
+
+    return ($perms & $mask) === $mask;
 }

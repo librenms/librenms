@@ -11,6 +11,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use LibreNMS\Util\FileLock;
+
 $init_modules = array('discovery');
 require __DIR__ . '/includes/init.php';
 
@@ -33,7 +35,7 @@ if (isset($options['h'])) {
         $where = ' ';
         $doing = 'all';
     } elseif ($options['h'] == 'new') {
-        $new_discovery_lock = \LibreNMS\FileLock::lockOrDie('new-discovery');
+        $new_discovery_lock = FileLock::lockOrDie('new-discovery');
         $where = 'AND `last_discovered` IS NULL';
         $doing = 'new';
     } elseif ($options['h']) {
@@ -121,7 +123,7 @@ if (!empty($config['distributed_poller_group'])) {
 }
 
 global $device;
-foreach (dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
+foreach (dbFetch("SELECT * FROM `devices` WHERE disabled = 0 AND snmp_disable = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
     discover_device($device, $options);
 }
 

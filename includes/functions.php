@@ -18,8 +18,10 @@ use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
+use LibreNMS\Exceptions\LockException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\MemcacheLock;
 
 function set_debug($debug)
 {
@@ -93,9 +95,8 @@ function logfile($string)
  */
 function getHostOS($device)
 {
-    $res = snmp_get_multi_oid($device, array('SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysObjectID.0'));
-    $sysDescr = isset($res['.1.3.6.1.2.1.1.1.0']) ? $res['.1.3.6.1.2.1.1.1.0'] : '';
-    $sysObjectId = isset($res['.1.3.6.1.2.1.1.2.0']) ? $res['.1.3.6.1.2.1.1.2.0'] : '';
+    $sysDescr    = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
+    $sysObjectId = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
 
     d_echo("| $sysDescr | $sysObjectId | \n");
 
@@ -182,7 +183,7 @@ function checkDiscovery($device, $array, $sysObjectId, $sysDescr)
         } elseif ($key == 'snmpget') {
             $options = isset($value['options']) ? $value['options'] : '-Oqv';
             $mib = isset($value['mib']) ? $value['mib'] : null;
-            $mib_dir = isset($value['mibdir']) ? $value['mibdir'] : null;
+            $mib_dir = isset($value['mib_dir']) ? $value['mib_dir'] : null;
             $op = isset($value['op']) ? $value['op'] : 'contains';
 
             $get_value = snmp_get($device, $value['oid'], $options, $mib, $mib_dir);
@@ -658,16 +659,28 @@ function isPingable($hostname, $address_family = AF_INET, $attribs = array())
     $response = array();
     if (can_ping_device($attribs) === true) {
         $fping_params = '';
-        if (is_numeric($config['fping_options']['retries']) || $config['fping_options']['retries'] > 1) {
+        if (is_numeric($config['fping_options']['retries']) && $config['fping_options']['retries'] > 0) {
+            if ($config['fping_options']['retries'] > 20) {
+                $config['fping_options']['retries'] = 20;
+            }
             $fping_params .= ' -r ' . $config['fping_options']['retries'];
         }
-        if (is_numeric($config['fping_options']['timeout']) || $config['fping_options']['timeout'] > 1) {
+        if (is_numeric($config['fping_options']['timeout'])) {
+            if ($config['fping_options']['timeout'] < 50) {
+                $config['fping_options']['timeout'] = 50;
+            }
+            if ($config['fping_options']['millisec'] < $config['fping_options']['timeout']) {
+                $config['fping_options']['millisec'] = $config['fping_options']['timeout'];
+            }
             $fping_params .= ' -t ' . $config['fping_options']['timeout'];
         }
-        if (is_numeric($config['fping_options']['count']) || $config['fping_options']['count'] > 0) {
+        if (is_numeric($config['fping_options']['count']) && $config['fping_options']['count'] > 0) {
             $fping_params .= ' -c ' . $config['fping_options']['count'];
         }
-        if (is_numeric($config['fping_options']['millisec']) || $config['fping_options']['millisec'] > 0) {
+        if (is_numeric($config['fping_options']['millisec'])) {
+            if ($config['fping_options']['millisec'] < 20) {
+                $config['fping_options']['millisec'] = 20;
+            }
             $fping_params .= ' -p ' . $config['fping_options']['millisec'];
         }
         $status = fping($hostname, $fping_params, $address_family);
@@ -1997,12 +2010,14 @@ function get_toner_levels($device, $raw_value, $capacity)
  */
 function initStats()
 {
-    global $snmp_stats, $db_stats;
+    global $snmp_stats, $db_stats, $rrd_stats;
 
     if (!isset($snmp_stats)) {
         $snmp_stats = array(
             'snmpget' => 0,
             'snmpget_sec' => 0.0,
+            'snmpgetnext' => 0,
+            'snmpgetnext_sec' => 0.0,
             'snmpwalk' => 0,
             'snmpwalk_sec' => 0.0,
         );
@@ -2026,6 +2041,17 @@ function initStats()
             'fetchrows_sec' => 0.0,
         );
     }
+
+    if (!isset($rrd_stats)) {
+        $rrd_stats = array(
+            'update' => 0,
+            'update_sec' => 0.0,
+            'create' => 0,
+            'create_sec' => 0.0,
+            'other' => 0,
+            'other_sec' => 0.0,
+        );
+    }
 }
 
 /**
@@ -2033,17 +2059,21 @@ function initStats()
  */
 function printStats()
 {
-    global $snmp_stats, $db_stats;
+    global $snmp_stats, $db_stats, $rrd_stats;
 
     printf(
-        "SNMP: Get[%d/%.2fs] Walk [%d/%.2fs]\n",
+        "SNMP %.2fs: Get[%d/%.2fs] Getnext [%d/%.2fs] Walk [%d/%.2fs]\n",
+        $snmp_stats['snmpget_sec'] + $snmp_stats['snmpgetnext_sec'] + $snmp_stats['snmpwalk_sec'],
         $snmp_stats['snmpget'],
         $snmp_stats['snmpget_sec'],
+        $snmp_stats['snmpgetnext'],
+        $snmp_stats['snmpgetnext_sec'],
         $snmp_stats['snmpwalk'],
         $snmp_stats['snmpwalk_sec']
     );
     printf(
-        "MySQL: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
+        "MySQL %.2fs: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
+        $db_stats['fetchcell_sec'] + $db_stats['fetchrow_sec'] + $db_stats['fetchrows_sec'] + $db_stats['fetchcolumn_sec'] + $db_stats['update_sec'] + $db_stats['insert_sec'] + $db_stats['delete_sec'],
         $db_stats['fetchcell'],
         $db_stats['fetchcell_sec'],
         $db_stats['fetchrow'],
@@ -2059,6 +2089,36 @@ function printStats()
         $db_stats['delete'],
         $db_stats['delete_sec']
     );
+    printf(
+        "RRD %.2fs: Update [%d/%.2fs] Create [%d/%.2fs] Other [%d/%.2fs]\n",
+        $rrd_stats['update_sec'] + $rrd_stats['create_sec'] + $rrd_stats['other_sec'],
+        $rrd_stats['update'],
+        $rrd_stats['update_sec'],
+        $rrd_stats['create'],
+        $rrd_stats['create_sec'],
+        $rrd_stats['other'],
+        $rrd_stats['other_sec']
+    );
+}
+
+/**
+ * Update statistics for rrd operations
+ *
+ * @param string $stat create, update, and other
+ * @param float $start_time The time the operation started with 'microtime(true)'
+ * @return float  The calculated run time
+ */
+function recordRrdStatistic($stat, $start_time)
+{
+    global $rrd_stats;
+    initStats();
+
+    $stat = ($stat == 'update' || $stat == 'create') ? $stat : 'other';
+    $runtime = microtime(true) - $start_time;
+    $rrd_stats[$stat]++;
+    $rrd_stats["${stat}_sec"] += $runtime;
+
+    return $runtime;
 }
 
 /**
@@ -2396,4 +2456,34 @@ function locate_binary($binary)
     }
 
     return $binary;
+}
+
+/**
+ * If Distributed, create a lock, then purge the mysql table
+ *
+ * @param string $table
+ * @param string $sql
+ * @return int exit code
+ */
+function lock_and_purge($table, $sql)
+{
+    try {
+        $purge_name = $table . '_purge';
+
+        if (Config::get('distributed_poller')) {
+            MemcacheLock::lock($purge_name, 0, 86000);
+        }
+        $purge_days = Config::get($purge_name);
+
+        $name = str_replace('_', ' ', ucfirst($table));
+        if (is_numeric($purge_days)) {
+            if (dbDelete($table, $sql, array($purge_days))) {
+                echo "$name cleared for entries over $purge_days days\n";
+            }
+        }
+        return 0;
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        return -1;
+    }
 }

@@ -1,4 +1,6 @@
 <?php
+use LibreNMS\Authentication\Auth;
+
 session_start();
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_POST = $_SESSION;
@@ -201,11 +203,13 @@ if (is_writable(session_save_path() === '' ? '/tmp' : session_save_path())) {
 echo "<tr class='$row_class'><td>Session directory writable</td><td>$status</td><td>";
 if ($status == 'no') {
     echo session_save_path() . " is not writable";
-    $group_info = posix_getgrgid(filegroup(session_save_path()));
-    if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
-        $group = $group_info['name'];
-        $user = get_current_user();
-        echo ", suggested fix <strong>usermod -a -G $group $user</strong>";
+    if (function_exists('posix_getgrgid')) {
+        $group_info = posix_getgrgid(filegroup(session_save_path()));
+        if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
+            $group = $group_info['name'];
+            $user = get_current_user();
+            echo ", suggested fix <strong>usermod -a -G $group $user</strong>";
+        }
     }
 }
 echo "</td></tr>";
@@ -471,9 +475,9 @@ if (!file_exists("../config.php")) {
       </div>
       <div class="col-md-6">
 <?php
-if (auth_usermanagement()) {
-    if (!user_exists($add_user)) {
-        if (adduser($add_user, $add_pass, '10', $add_email)) {
+if (Auth::get()->canManageUsers()) {
+    if (!Auth::get()->userExists($add_user)) {
+        if (Auth::get()->addUser($add_user, $add_pass, '10', $add_email)) {
             echo("<div class='alert alert-success'>User has been added successfully</div>");
             $proceed = 0;
         } else {

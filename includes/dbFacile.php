@@ -50,6 +50,10 @@ function dbConnect($host = null, $user = '', $password = '', $database = '', $po
         return $database_link;
     }
 
+    if (!function_exists('mysqli_connect')) {
+        throw new DatabaseConnectException("mysqli extension not loaded!");
+    }
+
     $host = empty($host) ? $config['db_host'] : $host;
     $user = empty($user) ? $config['db_user'] : $user;
     $password = empty($password) ? $config['db_pass'] : $password;
