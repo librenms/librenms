@@ -2012,46 +2012,82 @@ function initStats()
 {
     global $snmp_stats, $db_stats, $rrd_stats;
 
-    if (!isset($snmp_stats)) {
+    if (!isset($snmp_stats, $db_stats, $rrd_stats)) {
         $snmp_stats = array(
-            'snmpget' => 0,
-            'snmpget_sec' => 0.0,
-            'snmpgetnext' => 0,
-            'snmpgetnext_sec' => 0.0,
-            'snmpwalk' => 0,
-            'snmpwalk_sec' => 0.0,
+            'ops' => array(
+                'snmpget' => 0,
+                'snmpgetnext' => 0,
+                'snmpwalk' => 0,
+            ),
+            'time' => array(
+                'snmpget' => 0.0,
+                'snmpgetnext' => 0.0,
+                'snmpwalk' => 0.0,
+            )
         );
-    }
 
-    if (!isset($db_stats)) {
         $db_stats = array(
-            'insert' => 0,
-            'insert_sec' => 0.0,
-            'update' => 0,
-            'update_sec' => 0.0,
-            'delete' => 0,
-            'delete_sec' => 0.0,
-            'fetchcell' => 0,
-            'fetchcell_sec' => 0.0,
-            'fetchcolumn' => 0,
-            'fetchcolumn_sec' => 0.0,
-            'fetchrow' => 0,
-            'fetchrow_sec' => 0.0,
-            'fetchrows' => 0,
-            'fetchrows_sec' => 0.0,
+            'ops' => array(
+                'insert' => 0,
+                'update' => 0,
+                'delete' => 0,
+                'fetchcell' => 0,
+                'fetchcolumn' => 0,
+                'fetchrow' => 0,
+                'fetchrows' => 0,
+            ),
+            'time' => array(
+                'insert' => 0.0,
+                'update' => 0.0,
+                'delete' => 0.0,
+                'fetchcell' => 0.0,
+                'fetchcolumn' => 0.0,
+                'fetchrow' => 0.0,
+                'fetchrows' => 0.0,
+            ),
+        );
+
+        $rrd_stats = array(
+            'ops' => array(
+                'update' => 0,
+                'create' => 0,
+                'other' => 0,
+            ),
+            'time' => array(
+                'update' => 0.0,
+                'create' => 0.0,
+                'other' => 0.0,
+            ),
+        );
+    }
+}
+
+/**
+ * Print out the stats totals since the last time this function was called
+ *
+ * @param bool $update_only Only update the stats checkpoint, don't print them
+ */
+function printChangedStats($update_only = false)
+{
+    global $snmp_stats, $db_stats, $rrd_stats;
+    global $snmp_stats_last, $db_stats_last, $rrd_stats_last;
+
+    if (!$update_only) {
+        printf(
+            ">> SNMP: [%d/%.2fs] MySQL: [%d/%.2fs] RRD: [%d/%.2fs]\n",
+            array_sum($snmp_stats['ops']) - array_sum($snmp_stats_last['ops']),
+            array_sum($snmp_stats['time']) - array_sum($snmp_stats_last['time']),
+            array_sum($db_stats['ops']) - array_sum($db_stats_last['ops']),
+            array_sum($db_stats['time']) - array_sum($db_stats_last['time']),
+            array_sum($rrd_stats['ops']) - array_sum($rrd_stats_last['ops']),
+            array_sum($rrd_stats['time']) - array_sum($rrd_stats_last['time'])
         );
     }
 
-    if (!isset($rrd_stats)) {
-        $rrd_stats = array(
-            'update' => 0,
-            'update_sec' => 0.0,
-            'create' => 0,
-            'create_sec' => 0.0,
-            'other' => 0,
-            'other_sec' => 0.0,
-        );
-    }
+    // make a new checkpoint
+    $snmp_stats_last = $snmp_stats;
+    $db_stats_last = $db_stats;
+    $rrd_stats_last = $rrd_stats;
 }
 
 /**
@@ -2062,42 +2098,45 @@ function printStats()
     global $snmp_stats, $db_stats, $rrd_stats;
 
     printf(
-        "SNMP %.2fs: Get[%d/%.2fs] Getnext [%d/%.2fs] Walk [%d/%.2fs]\n",
-        $snmp_stats['snmpget_sec'] + $snmp_stats['snmpgetnext_sec'] + $snmp_stats['snmpwalk_sec'],
-        $snmp_stats['snmpget'],
-        $snmp_stats['snmpget_sec'],
-        $snmp_stats['snmpgetnext'],
-        $snmp_stats['snmpgetnext_sec'],
-        $snmp_stats['snmpwalk'],
-        $snmp_stats['snmpwalk_sec']
+        "SNMP [%d/%.2fs]: Get[%d/%.2fs] Getnext[%d/%.2fs] Walk[%d/%.2fs]\n",
+        array_sum($snmp_stats['ops']),
+        array_sum($snmp_stats['time']),
+        $snmp_stats['ops']['snmpget'],
+        $snmp_stats['time']['snmpget'],
+        $snmp_stats['ops']['snmpgetnext'],
+        $snmp_stats['time']['snmpgetnext'],
+        $snmp_stats['ops']['snmpwalk'],
+        $snmp_stats['time']['snmpwalk']
     );
     printf(
-        "MySQL %.2fs: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
-        $db_stats['fetchcell_sec'] + $db_stats['fetchrow_sec'] + $db_stats['fetchrows_sec'] + $db_stats['fetchcolumn_sec'] + $db_stats['update_sec'] + $db_stats['insert_sec'] + $db_stats['delete_sec'],
-        $db_stats['fetchcell'],
-        $db_stats['fetchcell_sec'],
-        $db_stats['fetchrow'],
-        $db_stats['fetchrow_sec'],
-        $db_stats['fetchrows'],
-        $db_stats['fetchrows_sec'],
-        $db_stats['fetchcolumn'],
-        $db_stats['fetchcolumn_sec'],
-        $db_stats['update'],
-        $db_stats['update_sec'],
-        $db_stats['insert'],
-        $db_stats['insert_sec'],
-        $db_stats['delete'],
-        $db_stats['delete_sec']
+        "MySQL [%d/%.2fs]: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
+        array_sum($db_stats['ops']),
+        array_sum($db_stats['time']),
+        $db_stats['ops']['fetchcell'],
+        $db_stats['time']['fetchcell'],
+        $db_stats['ops']['fetchrow'],
+        $db_stats['time']['fetchrow'],
+        $db_stats['ops']['fetchrows'],
+        $db_stats['time']['fetchrows'],
+        $db_stats['ops']['fetchcolumn'],
+        $db_stats['time']['fetchcolumn'],
+        $db_stats['ops']['update'],
+        $db_stats['time']['update'],
+        $db_stats['ops']['insert'],
+        $db_stats['time']['insert'],
+        $db_stats['ops']['delete'],
+        $db_stats['time']['delete']
     );
     printf(
-        "RRD %.2fs: Update [%d/%.2fs] Create [%d/%.2fs] Other [%d/%.2fs]\n",
-        $rrd_stats['update_sec'] + $rrd_stats['create_sec'] + $rrd_stats['other_sec'],
-        $rrd_stats['update'],
-        $rrd_stats['update_sec'],
-        $rrd_stats['create'],
-        $rrd_stats['create_sec'],
-        $rrd_stats['other'],
-        $rrd_stats['other_sec']
+        "RRD [%d/%.2fs]: Update[%d/%.2fs] Create [%d/%.2fs] Other[%d/%.2fs]\n",
+        array_sum($rrd_stats['ops']),
+        array_sum($rrd_stats['time']),
+        $rrd_stats['ops']['update'],
+        $rrd_stats['time']['update'],
+        $rrd_stats['ops']['create'],
+        $rrd_stats['time']['create'],
+        $rrd_stats['ops']['other'],
+        $rrd_stats['time']['other']
     );
 }
 
@@ -2114,9 +2153,10 @@ function recordRrdStatistic($stat, $start_time)
     initStats();
 
     $stat = ($stat == 'update' || $stat == 'create') ? $stat : 'other';
+
     $runtime = microtime(true) - $start_time;
-    $rrd_stats[$stat]++;
-    $rrd_stats["${stat}_sec"] += $runtime;
+    $rrd_stats['ops'][$stat]++;
+    $rrd_stats['time'][$stat] += $runtime;
 
     return $runtime;
 }
@@ -2134,17 +2174,17 @@ function recordDbStatistic($stat, $start_time)
     initStats();
 
     $runtime = microtime(true) - $start_time;
-    $db_stats[$stat]++;
-    $db_stats["${stat}_sec"] += $runtime;
+    $db_stats['ops'][$stat]++;
+    $db_stats['time'][$stat] += $runtime;
 
     //double accounting corrections
     if ($stat == 'fetchcolumn') {
-        $db_stats['fetchrows']--;
-        $db_stats['fetchrows_sec'] -= $runtime;
+        $db_stats['ops']['fetchrows']--;
+        $db_stats['time']['fetchrows'] -= $runtime;
     }
     if ($stat == 'fetchcell') {
-        $db_stats['fetchrow']--;
-        $db_stats['fetchrow_sec'] -= $runtime;
+        $db_stats['ops']['fetchrow']--;
+        $db_stats['time']['fetchrow'] -= $runtime;
     }
 
     return $runtime;
@@ -2161,8 +2201,8 @@ function recordSnmpStatistic($stat, $start_time)
     initStats();
 
     $runtime = microtime(true) - $start_time;
-    $snmp_stats[$stat]++;
-    $snmp_stats["${stat}_sec"] += $runtime;
+    $snmp_stats['ops'][$stat]++;
+    $snmp_stats['time'][$stat] += $runtime;
     return $runtime;
 }
 
