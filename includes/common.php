@@ -1866,3 +1866,15 @@ function check_file_permissions($file, $mask)
 
     return ($perms & $mask) === $mask;
 }
+
+/**
+ * Index an array by a column
+ *
+ * @param array $array
+ * @param string|int $column
+ * @return array
+ */
+function array_by_column($array, $column)
+{
+    return array_combine(array_column($array, $column), $array);
+}

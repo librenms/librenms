@@ -105,6 +105,9 @@ if ($num > 0) {
     }
 }
 
+// clean application_metrics
+dbDeleteOrphans('applications', 'application_metrics', 'app_id');
+
 echo PHP_EOL;
 
 unset(
