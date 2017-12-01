@@ -349,6 +349,7 @@ function poll_device($device, $options)
 
                 echo $graph.' ';
             }
+            echo PHP_EOL;
         }//end if
 
         // Ping response
