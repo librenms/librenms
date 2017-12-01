@@ -233,6 +233,7 @@ function RunRules($device)
 function GetContacts($results)
 {
     global $config, $authorizer;
+
     if (sizeof($results) == 0) {
         return array();
     }
@@ -303,6 +304,16 @@ function GetContacts($results)
             }
         } else {
             $tmp_contacts[$email] = $name;
+        }
+    }
+
+    if (!empty($tmp_contacts)) {
+        // Validate contacts so we can fall back to default if configured.
+        $mail = new PHPMailer();
+        foreach ($tmp_contacts as $tmp_email => $tmp_name) {
+            if ($mail->validateAddress($tmp_email) != true) {
+                unset($tmp_contacts[$tmp_email]);
+            }
         }
     }
 
