@@ -1,5 +1,6 @@
 <?php
 
+$pagetitle[] = "Health :: SNR";
 $graph_type = 'sensor_snr';
 $class      = 'snr';
 $unit       = 'dB';

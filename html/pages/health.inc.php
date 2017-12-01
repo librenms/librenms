@@ -1,5 +1,4 @@
 <?php
-
 $datas = array('mempool','processor','storage');
 if ($used_sensors['temperature']) {
     $datas[] = 'temperature';
@@ -53,6 +52,7 @@ if ($used_sensors['toner']) {
     $datas[] = 'toner';
 }
 
+/*
 // FIXME generalize -> static-config ?
 $type_text['overview'] = "Overview";
 $type_text['temperature'] = "Temperature";
@@ -77,6 +77,7 @@ $type_text['snr'] = "SNR";
 $type_text['pressure'] = "Pressure";
 $type_text['cooling'] = "Cooling";
 $type_text['toner'] = 'Toner';
+*/
 
 if (!$vars['metric']) {
     $vars['metric'] = "processor";
@@ -87,6 +88,7 @@ if (!$vars['view']) {
 
 $link_array = array('page'    => 'health');
 
+/*
 $pagetitle[] = "Health";
 
 print_optionbar_start('', '');
@@ -111,32 +113,33 @@ foreach ($datas as $texttype) {
 }
 
 unset($sep);
+*/
 
-echo('<div style="float: right;">');
+$displayoptions = '<div style="float: right;">';
 
 if ($vars['view'] == "graphs") {
-    echo('<span class="pagemenu-selected">');
+    $displayoptions .= '<span class="pagemenu-selected">';
 }
-echo(generate_link("Graphs", $link_array, array('metric'=> $vars['metric'], 'view' => "graphs")));
+
+$displayoptions .= generate_link("Graphs", $link_array, array('metric'=> $vars['metric'], 'view' => "graphs"));
+
 if ($vars['view'] == "graphs") {
-    echo('</span>');
+    $displayoptions .= '</span>';
 }
 
-echo(' | ');
+$displayoptions .= ' | ';
 
 if ($vars['view'] != "graphs") {
-    echo('<span class="pagemenu-selected">');
+    $displayoptions .= '<span class="pagemenu-selected">';
 }
 
-echo(generate_link("No Graphs", $link_array, array('metric'=> $vars['metric'], 'view' => "detail")));
+$displayoptions .= generate_link("No Graphs", $link_array, array('metric'=> $vars['metric'], 'view' => "detail"));
 
 if ($vars['view'] != "graphs") {
-    echo('</span>');
+    $displayoptions .= '</span>';
 }
 
-echo('</div>');
-
-print_optionbar_end();
+$displayoptions .= '</div>';
 
 if (in_array($vars['metric'], array_keys($used_sensors))
     || $vars['metric'] == 'processor'

@@ -1,5 +1,6 @@
 <?php
 
+$pagetitle[] = "Health :: Signal";
 $graph_type = 'sensor_signal';
 $class      = 'signal';
 $unit       = 'dBm';

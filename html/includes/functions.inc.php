@@ -592,13 +592,13 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
     }
 
     $output = '
-        <div class="container" style="width:' . $width . 'px; height:' . $height . 'px;">
-        <div class="progress" style="min-width: 2em; background-color:#' . $right_background . '; height:' . $height . 'px;">
-        <div class="progress-bar" role="progressbar" aria-valuenow="' . $size_percent . '" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:' . $size_percent . '%; background-color: #' . $left_background . ';">
+        <div class="container" style="width:'.$width.'px; height:'.$height.'px;">
+        <div class="progress" style="min-width: 2em; background-color:#'.$right_background.'; height:'.$height.'px;margin-bottom:-'.$height.'px;">
+        <div class="progress-bar" role="progressbar" aria-valuenow="'.$size_percent.'" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:'.$size_percent.'%; background-color: #'.$left_background.';">
         </div>
         </div>
-        <b class="pull-left" style="padding-left: 4px; height: ' . $height . 'px;margin-top:-' . ($height * 2) . 'px; color:#' . $left_colour . ';">' . $left_text . '</b>
-        <b class="pull-right" style="padding-right: 4px; height: ' . $height . 'px;margin-top:-' . ($height * 2) . 'px; color:#' . $right_colour . ';">' . $right_text . '</b>
+        <b class="pull-left" style="padding-left: 4px; height: '.$height.'px;color:#'.$left_colour.';">'.$left_text.'</b>
+        <b class="pull-right" style="padding-right: 4px; height: '.$height.'px;color:#'.$right_colour.';">'.$right_text.'</b>
         </div>
         ';
 
