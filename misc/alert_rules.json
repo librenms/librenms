@@ -59,6 +59,16 @@
     "default": true
   },
   {
+    "rule": "%macros.state_sensor_critical",
+    "name": "State Sensor Critical",
+    "default": true
+  },
+  {
+    "rule": "%macros.state_sensor_warning",
+    "name": "State Sensor Warning",
+    "default": false
+  },
+  {
     "rule": "%macros.bill_quota_over_quota >= \"75\"",
     "name": "Quota bills over 75% used"
   },
@@ -306,5 +316,5 @@
     "rule": "%sensors.sensor_current = \"3\" && %sensors.sensor_oid = \".1.3.6.1.4.1.4413.1.1.43.1.15.1.2.1\"",
     "name": "UBNT EdgeSwitch Chassis state failed"
   }
-  
+
   ]
