@@ -592,7 +592,7 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
     }
 
     $output = '
-        <div class="container" style="width:'.$width.'px; height:'.$height.'px;">
+        <div style="width:'.$width.'px; height:'.$height.'px;">
         <div class="progress" style="min-width: 2em; background-color:#'.$right_background.'; height:'.$height.'px;margin-bottom:-'.$height.'px;">
         <div class="progress-bar" role="progressbar" aria-valuenow="'.$size_percent.'" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:'.$size_percent.'%; background-color: #'.$left_background.';">
         </div>
