@@ -133,6 +133,14 @@ applications:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [app_id], Unique: true, Type: BTREE }
     unique_index: { Name: unique_index, Columns: [device_id, app_type], Unique: true, Type: BTREE }
+application_metrics:
+  Columns:
+    - { Field: app_id, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: metric, Type: varchar(18), 'Null': false, Extra: '' }
+    - { Field: value, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: value_prev, Type: int(11), 'Null': true, Extra: '' }
+  Indexes:
+    application_metrics_app_id_metric_uindex: { Name: application_metrics_app_id_metric_uindex, Columns: [app_id, metric], Unique: true, Type: BTREE }
 authlog:
   Columns:
     - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
@@ -517,6 +525,20 @@ device_perf:
   Indexes:
     id: { Name: id, Columns: [id], Unique: false, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+entityState:
+  Columns:
+    - { Field: entity_state_id, Type: int(11), 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: entPhysical_id, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: entStateLastChanged, Type: datetime, 'Null': true, Extra: '' }
+    - { Field: entStateAdmin, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: entStateOper, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: entStateUsage, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: entStateAlarm, Type: text, 'Null': true, Extra: '' }
+    - { Field: entStateStandby, Type: int(11), 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [entity_state_id], Unique: true, Type: BTREE }
+    entityState_device_id_index: { Name: entityState_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 entPhysical:
   Columns:
     - { Field: entPhysical_id, Type: int(11), 'Null': false, Extra: auto_increment }

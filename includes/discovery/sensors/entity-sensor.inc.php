@@ -1,7 +1,7 @@
 <?php
 echo ' ENTITY-SENSOR: ';
 echo 'Caching OIDs:';
-if (!is_array($entity_array)) {
+if (empty($entity_array)) {
     $entity_array = array();
     echo ' entPhysicalDescr';
     $entity_array = snmpwalk_cache_multi_oid($device, 'entPhysicalDescr', $entity_array, 'CISCO-ENTITY-SENSOR-MIB');

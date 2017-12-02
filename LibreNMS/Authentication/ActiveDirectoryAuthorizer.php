@@ -11,33 +11,16 @@ use LibreNMS\Exceptions\AuthenticationException;
 class ActiveDirectoryAuthorizer extends AuthorizerBase
 {
     protected $ldap_connection;
-    protected $ad_init;
-
-    public function __construct()
-    {
-        if (Config::has('auth_ad_check_certificates') &&
-            !Config::get('auth_ad_check_certificates')) {
-            putenv('LDAPTLS_REQCERT=never');
-        };
-
-        if (Config::has('auth_ad_check_certificates') && Config::get('auth_ad_debug')) {
-            ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
-        }
-
-        $this->ad_init = false;  // this variable tracks if bind has been called so we don't call it multiple times
-        $this->ldap_connection = @ldap_connect(Config::get('auth_ad_url'));
-
-        // disable referrals and force ldap version to 3
-        ldap_set_option($this->ldap_connection, LDAP_OPT_REFERRALS, 0);
-        ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
-    }
+    protected $is_bound = false; // this variable tracks if bind has been called so we don't call it multiple times
 
     public function authenticate($username, $password)
     {
+        $this->connect();
+
         if ($this->ldap_connection) {
             // bind with sAMAccountName instead of full LDAP DN
             if ($username && $password && ldap_bind($this->ldap_connection, $username . '@' . Config::get('auth_ad_domain'), $password)) {
-                $this->ad_init = true;
+                $this->is_bound = true;
                 // group membership in one of the configured groups is required
                 if (Config::get('auth_ad_require_groupmembership', true)) {
                     // cycle through defined groups, test for memberOf-ship
@@ -72,7 +55,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
     public function reauthenticate($sess_id, $token)
     {
-        if ($this->adBind(false, true)) {
+        if ($this->bind(false, true)) {
             $sess_id = clean($sess_id);
             $token = clean($token);
             list($username, $hash) = explode('|', $token);
@@ -145,7 +128,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
     public function userExists($username, $throw_exception = false)
     {
-        $this->adBind(); // make sure we called bind
+        $this->bind(); // make sure we called bind
 
         $search = ldap_search(
             $this->ldap_connection,
@@ -166,7 +149,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
     public function getUserlevel($username)
     {
-        $this->adBind(); // make sure we called bind
+        $this->bind(); // make sure we called bind
 
         $userlevel = 0;
         if (!Config::get('auth_ad_require_groupmembership', true)) {
@@ -191,7 +174,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
     public function getUserid($username)
     {
-        $this->adBind(); // make sure we called bind
+        $this->bind(); // make sure we called bind
 
         $attributes = array('objectsid');
         $search = ldap_search(
@@ -211,7 +194,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
     protected function getDomainSid()
     {
-        $this->adBind(); // make sure we called bind
+        $this->bind(); // make sure we called bind
 
         // Extract only the domain components
         $dn_candidate = preg_replace('/^.*?DC=/i', 'DC=', Config::get('auth_ad_base_dn'));
@@ -228,7 +211,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
     public function getUser($user_id)
     {
-        $this->adBind(); // make sure we called bind
+        $this->bind(); // make sure we called bind
 
         $domain_sid = $this->getDomainSid();
 
@@ -256,7 +239,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
     public function getUserlist()
     {
-        $this->adBind(); // make sure we called bind
+        $this->bind(); // make sure we called bind
 
         $userlist = array();
         $ldap_groups = $this->getGroupList();
@@ -303,7 +286,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
     protected function getEmail($username)
     {
-        $this->adBind(); // make sure we called bind
+        $this->bind(); // make sure we called bind
 
         $attributes = array('mail');
         $search = ldap_search(
@@ -319,7 +302,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
     protected function getFullname($username)
     {
-        $this->adBind(); // make sure we called bind
+        $this->bind(); // make sure we called bind
 
         $attributes = array('name');
         $result = ldap_search(
@@ -365,7 +348,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
     protected function getDn($samaccountname)
     {
-        $this->adBind(); // make sure we called bind
+        $this->bind(); // make sure we called bind
 
         $attributes = array('dn');
         $result = ldap_search(
@@ -412,11 +395,13 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
      * @param bool $force force rebind
      * @return bool success or failure
      */
-    protected function adBind($allow_anonymous = true, $force = false)
+    protected function bind($allow_anonymous = true, $force = false)
     {
-        if ($this->ad_init && !$force) {
+        if ($this->is_bound && !$force) {
             return true; // bind already attempted
         }
+
+        $this->connect();  // make sure we are connected
 
         // set timeout
         ldap_set_option(
@@ -427,7 +412,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
         // With specified bind user
         if (Config::has('auth_ad_binduser') && Config::has('auth_ad_bindpassword')) {
-            $this->ad_init = true;
+            $this->is_bound = true;
             $bind = ldap_bind(
                 $this->ldap_connection,
                 Config::get('auth_ad_binduser') . '@' . Config::get('auth_ad_domain'),
@@ -441,11 +426,38 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
         // Anonymous
         if ($allow_anonymous) {
-            $this->ad_init = true;
+            $this->is_bound = true;
             $bind = ldap_bind($this->ldap_connection);
         }
 
         ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
         return $bind;
+    }
+
+    protected function connect()
+    {
+        if ($this->ldap_connection) {
+            // no need to re-connect
+            return;
+        }
+
+        if (!function_exists('ldap_connect')) {
+            throw new AuthenticationException("PHP does not support LDAP, please install or enable the PHP LDAP extension.");
+        }
+
+        if (Config::has('auth_ad_check_certificates') &&
+            !Config::get('auth_ad_check_certificates')) {
+            putenv('LDAPTLS_REQCERT=never');
+        };
+
+        if (Config::has('auth_ad_check_certificates') && Config::get('auth_ad_debug')) {
+            ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
+        }
+
+        $this->ldap_connection = @ldap_connect(Config::get('auth_ad_url'));
+
+        // disable referrals and force ldap version to 3
+        ldap_set_option($this->ldap_connection, LDAP_OPT_REFERRALS, 0);
+        ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
     }
 }

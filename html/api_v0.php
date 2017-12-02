@@ -40,6 +40,7 @@ $app->group(
             '/v0',
             function () use ($app) {
                 $app->get('/bgp', 'authToken', 'list_bgp')->name('list_bgp');
+                $app->get('/bgp/:id', 'authToken', 'get_bgp')->name('get_bgp');
                 $app->get('/ospf', 'authToken', 'list_ospf')->name('list_ospf');
                 // api/v0/bgp
                 $app->get('/oxidized(/:hostname)', 'authToken', 'list_oxidized')->name('list_oxidized');

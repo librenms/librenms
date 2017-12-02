@@ -74,7 +74,7 @@ if (is_array($hrDevice_array)) {
                 discover_processor($valid['processor'], $device, $usage_oid, $index, 'hr', $descr, '1', $usage, null, $hrDeviceIndex);
             }
 
-            unset($old_rrd,$new_rrd,$descr,$entry,$usage_oid,$index,$usage,$hrDeviceIndex,$descr_array);
+            unset($old_rrd, $new_rrd, $descr, $entry, $usage_oid, $index, $usage, $hrDeviceIndex, $descr_array);
         }//end if
 
         unset($entry);

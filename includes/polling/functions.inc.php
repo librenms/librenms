@@ -574,9 +574,10 @@ function location_to_latlng($device)
  *
  * @param array $app app from the db, including app_id
  * @param string $response This should be the full output
- * @param string $current This is the current value we store in rrd for graphing
+ * @param string $status This is the current value for alerting
+ * @param array $metrics an array of additional metrics to store in the database for alerting
  */
-function update_application($app, $response, $current = '')
+function update_application($app, $response, $status = '', $metrics = array())
 {
     if (!is_numeric($app['app_id'])) {
         d_echo('$app does not contain app_id, could not update');
@@ -585,7 +586,7 @@ function update_application($app, $response, $current = '')
 
     $data = array(
         'app_state'  => 'UNKNOWN',
-        'app_status' => $current,
+        'app_status' => $status,
         'timestamp'  => array('NOW()'),
     );
 
@@ -603,6 +604,53 @@ function update_application($app, $response, $current = '')
         $data['app_state_prev'] = $app['app_state'];
     }
     dbUpdate($data, 'applications', '`app_id` = ?', array($app['app_id']));
+
+    // update metrics
+    if (!empty($metrics)) {
+        $db_metrics = dbFetchRows('SELECT * FROM `application_metrics` WHERE app_id=?', array($app['app_id']));
+        $db_metrics = array_by_column($db_metrics, 'metric');
+
+        echo ': ';
+        foreach ($metrics as $metric_name => $value) {
+            if (!isset($db_metrics[$metric_name])) {
+                // insert new metric
+                dbInsert(
+                    array(
+                        'app_id' => $app['app_id'],
+                        'metric' => $metric_name,
+                        'value' => $value,
+                    ),
+                    'application_metrics'
+                );
+                echo '+';
+            } elseif ($value != $db_metrics[$metric_name]['value']) {
+                dbUpdate(
+                    array(
+                        'value' => $value,
+                        'value_prev' => $db_metrics[$metric_name]['value'],
+                    ),
+                    'application_metrics',
+                    'app_id=? && metric=?',
+                    array($app['app_id'], $metric_name)
+                );
+                echo 'U';
+            } else {
+                echo '.';
+            }
+
+            unset($db_metrics[$metric_name]);
+        }
+
+        // remove no longer existing metrics (generally should not happen
+        foreach ($db_metrics as $db_metric) {
+            dbDelete(
+                'application_metrics',
+                'app_id=? && metric=?',
+                array($app['app_id'], $db_metric['metric'])
+            );
+            echo '-';
+        }
+    }
 }
 
 function convert_to_celsius($value)

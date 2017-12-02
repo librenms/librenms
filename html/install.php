@@ -221,9 +221,12 @@ echo "</td></tr>";
       <div class="col-md-6 col-md-offset-3">
         <form class="form-inline" role="form" method="post">
           <input type="hidden" name="stage" value="1">
-          <button type="submit" class="btn btn-success pull-right" <?php if (!$complete) {
+          <button type="submit" class="btn btn-success pull-right"
+            <?php
+            if (!$complete) {
                 echo "disabled='disabled'";
-} ?>>Next Stage</button>
+            }
+            ?>>Next Stage</button>
         </form>
       </div>
     </div>
@@ -498,9 +501,12 @@ if (Auth::get()->canManageUsers()) {
           <input type="hidden" name="dbpass" value="<?php echo $dbpass; ?>">
           <input type="hidden" name="dbname" value="<?php echo $dbname; ?>">
           <input type="hidden" name="dbsocket" value="<?php echo $dbsocket; ?>">
-          <button type="submit" class="btn btn-success pull-right" <?php if ($proceed == "1") {
+          <button type="submit" class="btn btn-success pull-right"
+            <?php
+            if ($proceed == "1") {
                 echo "disabled='disabled'";
-} ?>>Generate Config</button>
+            }
+            ?>>Generate Config</button>
         </form>
       </div>
       <div class="col-md-3">
