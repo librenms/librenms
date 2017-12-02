@@ -262,22 +262,24 @@ function poll_device($device, $options)
         $oldgraphs = array();
 
         $force_module = false;
-        if (!$device['snmp_disable']) {
-            // we always want the core module to be included
-            include 'includes/polling/core.inc.php';
-
+        if ($device['snmp_disable']) {
+            $config['poller_modules'] = array();
+        } else {
             if ($options['m']) {
                 $config['poller_modules'] = array();
                 foreach (explode(',', $options['m']) as $module) {
-                    if (is_file('includes/polling/'.$module.'.inc.php')) {
+                    if (is_file('includes/polling/' . $module . '.inc.php')) {
                         $config['poller_modules'][$module] = 1;
                         $force_module = true;
                     }
                 }
             }
-        } else {
-            $config['poller_modules'] = array();
+
+            // we always want the core module to be included, prepend it
+            $config['poller_modules'] = array('core' => true) + $config['poller_modules'];
         }
+
+        printChangedStats(true); // don't count previous stats
         foreach ($config['poller_modules'] as $module => $module_status) {
             $os_module_status = $config['os'][$device['os']]['poller_modules'][$module];
             d_echo("Modules status: Global" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
@@ -294,6 +296,7 @@ function poll_device($device, $options)
                 $module_time = microtime(true) - $module_start;
                 $module_mem  = (memory_get_usage() - $start_memory);
                 printf("\n>> Runtime for poller module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
+                printChangedStats();
                 echo "#### Unload poller module $module ####\n\n";
 
                 // save per-module poller stats
@@ -346,6 +349,7 @@ function poll_device($device, $options)
 
                 echo $graph.' ';
             }
+            echo PHP_EOL;
         }//end if
 
         // Ping response
