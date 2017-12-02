@@ -210,7 +210,11 @@ function dbBulkInsert($data, $table)
             if ($rowvalues != '') {
                 $rowvalues .= ',';
             }
-            $rowvalues .= "'".mres($value)."'";
+            if (is_null($value)) {
+                $rowvalues .= 'NULL';
+            } else {
+                $rowvalues .= "'" . mres($value) . "'";
+            }
         }
         $values .= "(".$rowvalues.")";
     }
@@ -291,6 +295,33 @@ function dbDelete($table, $where = null, $parameters = array())
     }
 }//end dbDelete()
 
+
+/**
+ * Delete orphaned entries from a table that no longer have a parent in parent_table
+ *
+ * @param string $parent_table
+ * @param string $child_table
+ * @param string $id_column
+ * @return bool|int
+ */
+function dbDeleteOrphans($parent_table, $child_table, $id_column)
+{
+    global $database_link;
+    $time_start = microtime(true);
+
+    $sql = "DELETE C FROM `$child_table` C";
+    $sql .= " LEFT JOIN `$parent_table` P USING (`$id_column`)";
+    $sql .= " WHERE P.`$id_column` IS NULL";
+
+    $result = dbQuery($sql, array());
+
+    recordDbStatistic('delete', $time_start);
+    if ($result) {
+        return mysqli_affected_rows($database_link);
+    } else {
+        return false;
+    }
+}
 
 /*
  * Fetches all of the rows (associatively) from the last performed query.

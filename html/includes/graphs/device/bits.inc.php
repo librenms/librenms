@@ -43,7 +43,7 @@ $units       = 'b';
 $total_units = 'B';
 $colours_in  = 'greens';
 $multiplier  = '8';
-$colours_out = 'blues';
+$colours_out = 'purples';
 
 // $nototal = 1;
 $ds_in  = 'INOCTETS';

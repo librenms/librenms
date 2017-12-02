@@ -42,4 +42,4 @@ $fields = array (
     );
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
-unset($lines , $freeswitch, $rrd_name, $rrd_def, $fields, $tags);
+unset($lines, $freeswitch, $rrd_name, $rrd_def, $fields, $tags);

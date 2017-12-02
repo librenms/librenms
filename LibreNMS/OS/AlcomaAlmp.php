@@ -47,9 +47,11 @@ class AlcomaAlmp extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        $oid = '.1.3.6.1.4.1.12140.2.3.1.0'; // ALCOMA-MIB::alMPTuneTX.0
         return array(
-            new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'alcoma', 1, 'Frequency', null, 1, 1),
+            // ALCOMA-MIB::alMPTuneTX.0
+            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.12140.2.3.1.0', 'alcoma-tx', 1, 'TX Frequency', null, 1, 1),
+            // ALCOMA-MIB::alMPTuneRX.0
+            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.12140.2.3.2.0', 'alcoma-rx', 1, 'RX Frequency', null, 1, 1),
         );
     }
 
@@ -61,9 +63,11 @@ class AlcomaAlmp extends OS implements
      */
     public function discoverWirelessPower()
     {
-        $oid = '.1.3.6.1.4.1.12140.2.3.3.0'; // ALCOMA-MIB::alMPTX-PWR.0
         return array(
-            new WirelessSensor('power', $this->getDeviceId(), $oid, 'alcoma', 1, 'Tx Power'),
+            // ALCOMA-MIB::alMPTX-PWR.0
+            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.12140.2.3.3.0', 'alcoma-pow-cur', 1, 'Tx Power Current'),
+            // ALCOMA-MIB::alMPPTX.0
+            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.12140.2.3.13.0', 'alcoma-pow-conf', 1, 'Tx Power Configured'),
         );
     }
 

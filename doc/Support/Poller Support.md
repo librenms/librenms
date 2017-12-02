@@ -76,6 +76,7 @@ $config['poller_modules']['cisco-vpdn']                  = 0;
 $config['poller_modules']['netscaler-vsvr']              = 0;
 $config['poller_modules']['aruba-controller']            = 0;
 $config['poller_modules']['entity-physical']             = 1;
+$config['poller_modules']['entity-state']                = 0;
 $config['poller_modules']['applications']                = 1;
 $config['poller_modules']['mib']                         = 0;
 $config['poller_modules']['stp']                         = 1;
