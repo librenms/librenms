@@ -39,8 +39,7 @@ if (!empty($db_info_list)) {
                 // FIXME - this should loop building a query and then run the query after the loop (bad geert!)
                 dbUpdate(array($property => mres($mef_info[$property])), 'mefinfo', '`id` = ?', array($db_info['id']));
                 if ($db_info['mefIdent'] != null) {
-                    log_event("MEF Link : " . mres($db_info['mefIdent']) . ' (' . preg_replace('/^mef/', '',
-                            mres($db_info[$property])) . ') -> ' . $mef_info[$property], $device);
+                    log_event("MEF Link : " . mres($db_info['mefIdent']) . ' (' . preg_replace('/^mef/', '', mres($db_info[$property])) . ') -> ' . $mef_info[$property], $device);
                 }
             }
         }
