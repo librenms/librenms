@@ -17,35 +17,25 @@ use LibreNMS\Authentication\Auth;
 function authToken(\Slim\Route $route)
 {
     global $permissions;
-    
+
     $app   = \Slim\Slim::getInstance();
     $token = $app->request->headers->get('X-Auth-Token');
-    if (isset($token) && !empty($token)) {
-        if (!method_exists(Auth::get(), 'getUser')) {
-            $username = dbFetchCell('SELECT `U`.`username`, `U`.`user_id`, `U`.`level` FROM `api_tokens` AS AT JOIN `users` AS U ON `AT`.`user_id`=`U`.`user_id` WHERE `AT`.`token_hash`=?', array($token));
-        } else {
-            $username = Auth::get()->getUser(dbFetchCell('SELECT `AT`.`user_id` FROM `api_tokens` AS AT WHERE `AT`.`token_hash`=?', array($token)));
-        }
-        if (!empty($username)) {
-            $authenticated = true;
+    if (!empty($token)
+        && ($user_id = dbFetchCell('SELECT `AT`.`user_id` FROM `api_tokens` AS AT WHERE `AT`.`token_hash`=? && `AT`.`disabled`=0', array($token)))
+        && ($username = Auth::get()->getUser($user_id))
+    ) {
+        // Fake session so the standard auth/permissions checks work
+        $_SESSION = array(
+            'username' => $username['username'],
+            'user_id' => $username['user_id'],
+            'userlevel' => $username['level']
+        );
+        $permissions = permissions_cache($_SESSION['user_id']);
 
-            // Fake session so the standard auth/permissions checks work
-            $_SESSION = array(
-                'username' => $username['username'],
-                'user_id' => $username['user_id'],
-                'userlevel' => $username['level']
-            );
-            $permissions = permissions_cache($_SESSION['user_id']);
-        } else {
-            $authenticated = false;
-        }
-    } else {
-        $authenticated = false;
+        return;
     }
 
-    if ($authenticated === false) {
-        api_error(401, 'API Token is missing or invalid; please supply a valid token');
-    }
+    api_error(401, 'API Token is missing or invalid; please supply a valid token');
 }
 
 function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null)
@@ -53,12 +43,12 @@ function api_success($result, $result_name, $message = null, $code = 200, $count
     if (isset($result) && !isset($result_name)) {
         api_error(500, 'Result name not specified');
     }
-    
+
     $app  = \Slim\Slim::getInstance();
     $app->response->setStatus($code);
     $app->response->headers->set('Content-Type', 'application/json');
     $output = array('status'  => 'ok');
-    
+
     if (isset($result)) {
         $output[$result_name] = $result;
     }
@@ -161,7 +151,7 @@ function get_graph_by_port_hostname()
     $vars['height'] = $_GET['height'] ?: 300;
     $auth           = '1';
     $vars['id']     = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `P`.`$port`=? AND `deleted` = 0 LIMIT 1", array($device_id, $vars['port']));
-    
+
     check_port_permission($vars['id'], $device_id);
     $app->response->headers->set('Content-Type', get_image_type());
     rrdtool_initialize(false);
@@ -179,7 +169,7 @@ function get_port_stats_by_port_hostname()
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $ifName    = urldecode($router['ifname']);
     $port     = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=? AND `deleted` = 0', array($device_id, $ifName));
-    
+
     check_port_permission($port['port_id'], $device_id);
 
     $in_rate = $port['ifInOctets_rate'] * 8;
@@ -773,7 +763,7 @@ function get_port_graphs()
         $sql = 'AND `port_id` IN (select `port_id` from `ports_perms` where `user_id` = ?)';
         array_push($params, $_SESSION['user_id']);
     }
-    
+
     $ports       = dbFetchRows("SELECT $columns FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' $sql ORDER BY `ifIndex` ASC", $params);
     api_success($ports, 'ports');
 }
@@ -904,7 +894,7 @@ function add_edit_rule()
     if (empty($device_id) && !isset($rule_id)) {
         api_error(400, 'Missing the device id or global device id (-1)');
     }
-    
+
     if ($device_id == 0) {
         $device_id = '-1';
     }
