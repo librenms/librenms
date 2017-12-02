@@ -271,7 +271,6 @@ class Processor implements DiscoveryModule, PollerModule
         $valid_ids = array();
         foreach ($processors as $processor) {
             /** @var $this $processor */
-            echo "Checking ID: " . $processor->id . PHP_EOL;
             if ($processor->isValid()) {
                 $valid_ids[] = $processor->save();
             }
