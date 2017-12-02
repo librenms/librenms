@@ -147,4 +147,33 @@ class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(is_valid_hostname('-'), '-');
         $this->assertFalse(is_valid_hostname(''), 'Empty string');
     }
+
+    public function testResolveGlues()
+    {
+        if (getenv('DBTEST')) {
+            dbConnect();
+            dbBeginTransaction();
+        } else {
+            $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
+        }
+
+        $this->assertFalse(ResolveGlues(array('dbSchema'), 'device_id'));
+
+        $this->assertSame(array('devices.device_id'), ResolveGlues(array('devices'), 'device_id'));
+        $this->assertSame(array('sensors.device_id'), ResolveGlues(array('sensors'), 'device_id'));
+
+        // does not work right with current code
+//        $expected = array('bill_data.bill_id', 'bill_ports.port_id', 'ports.device_id');
+//        $this->assertSame($expected, ResolveGlues(array('bill_data'), 'device_id'));
+
+        $expected = array('state_translations.state_index_id', 'sensors_to_state_indexes.sensor_id', 'sensors.device_id');
+        $this->assertSame($expected, ResolveGlues(array('state_translations'), 'device_id'));
+
+        $expected = array('ipv4_addresses.port_id', 'ports.device_id');
+        $this->assertSame($expected, ResolveGlues(array('ipv4_addresses'), 'device_id'));
+
+        if (getenv('DBTEST')) {
+            dbRollbackTransaction();
+        }
+    }
 }

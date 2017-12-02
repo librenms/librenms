@@ -1353,7 +1353,7 @@ function get_port_id($ports_mapped, $port, $port_association_mode)
  * @param int $x Recursion Anchor
  * @param array $hist History of processed tables
  * @param array $last Glues on the fringe
- * @return string|boolean
+ * @return array|false
  */
 function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array())
 {
@@ -1370,6 +1370,16 @@ function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array()
             return false;
         }
         foreach ($tables as $table) {
+            if ($table == 'state_translations' && ($target == 'device_id' || $target == 'sensor_id')) {
+                // workaround for state_translations
+                $st_tables = array(
+                    'state_translations.state_index_id',
+                    'sensors_to_state_indexes.sensor_id',
+                    "sensors.$target",
+                );
+                return array_merge($last, $st_tables);
+            }
+
             $glues = dbFetchRows('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME LIKE "%\_id"', array($table));
             if (sizeof($glues) == 1 && $glues[0]['COLUMN_NAME'] != $target) {
                 //Search for new candidates to expand
