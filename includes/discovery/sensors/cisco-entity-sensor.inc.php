@@ -6,7 +6,7 @@ if ($device['os_group'] == 'cisco') {
     $oids = array();
     echo 'Caching OIDs:';
 
-    if (!is_array($entity_array)) {
+    if (empty($entity_array)) {
         $tmp_oids = array('entPhysicalDescr', 'entPhysicalName', 'entPhysicalClass', 'entPhysicalContainedIn', 'entPhysicalParentRelPos');
         $entity_array = array();
         foreach ($tmp_oids as $tmp_oid) {

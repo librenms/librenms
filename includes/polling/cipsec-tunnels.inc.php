@@ -5,7 +5,9 @@ use LibreNMS\RRD\RrdDefinition;
 if ($device['os_group'] == 'cisco') {
 // FIXME - seems to be broken. IPs appear with leading zeroes.
     $ipsec_array = snmpwalk_cache_oid($device, 'cipSecTunnelEntry', array(), 'CISCO-IPSEC-FLOW-MONITOR-MIB');
-    $ike_array = snmpwalk_cache_oid($device, 'cikeTunnelEntry', array(), 'CISCO-IPSEC-FLOW-MONITOR-MIB');
+    if (!empty($ipsec_array)) {
+        $ike_array = snmpwalk_cache_oid($device, 'cikeTunnelEntry', array(), 'CISCO-IPSEC-FLOW-MONITOR-MIB');
+    }
 
     $tunnels_db = dbFetchRows('SELECT * FROM `ipsec_tunnels` WHERE `device_id` = ?', array($device['device_id']));
     foreach ($tunnels_db as $tunnel) {
