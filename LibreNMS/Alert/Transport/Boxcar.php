@@ -39,8 +39,11 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
-class Boxcar implements Transport{
-    public function call($obj, $opts) {
+
+class Boxcar implements Transport
+{
+    public function call($obj, $opts)
+    {
         global $config;
         foreach ($opts as $api) {
             $data                              = array();

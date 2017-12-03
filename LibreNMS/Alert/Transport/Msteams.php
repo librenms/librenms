@@ -13,8 +13,10 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Msteams implements Transport{
-    public function call($obj, $opts) {
+class Msteams implements Transport
+{
+    public function call($obj, $opts)
+    {
         $url   = $opts['url'];
         $color = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
         $data  = array(

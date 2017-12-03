@@ -25,8 +25,10 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Rocket implements Transport{
-    public function call($obj, $opts) {
+class Rocket implements Transport
+{
+    public function call($obj, $opts)
+    {
         foreach ($opts as $tmp_api) {
             $host          = $tmp_api['url'];
             $curl          = curl_init();
@@ -47,9 +49,7 @@ class Rocket implements Transport{
                 'icon_emoji' => $tmp_api['icon_emoji'],
             );
             $alert_message = json_encode($data);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-                    'Content-Type: application/json')
-            );
+            curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
             set_curl_proxy($curl);
             curl_setopt($curl, CURLOPT_URL, $host);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);

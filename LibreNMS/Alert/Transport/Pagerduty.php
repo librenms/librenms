@@ -25,8 +25,10 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Pagerduty implements Transport{
-    public function call($obj, $opts) {
+class Pagerduty implements Transport
+{
+    public function call($obj, $opts)
+    {
         $protocol = array(
             'service_key' => $opts,
             'incident_key' => ($obj['id'] ? $obj['id'] : $obj['uid']),

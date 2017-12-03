@@ -25,8 +25,10 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Clickatell implements Transport{
-    public function call($obj, $opts) {
+class Clickatell implements Transport
+{
+    public function call($obj, $opts)
+    {
         $url = 'https://platform.clickatell.com/messages/http/send?apiKey=' . $opts['token'] . '&to=' . implode(',', $opts['to']) . '&content=' . urlencode($obj['title']);
 
         $curl = curl_init($url);

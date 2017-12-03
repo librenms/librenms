@@ -25,8 +25,10 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Irc implements Transport{
-    public function call($obj, $opts) {
+class Irc implements Transport
+{
+    public function call($obj, $opts)
+    {
         global $config;
         $f = $config['install_dir'] . "/.ircbot.alert";
         if (file_exists($f) && filetype($f) == "fifo") {

@@ -18,8 +18,10 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Elasticsearch implements Transport{
-    public function call($obj, $opts) {
+class Elasticsearch implements Transport
+{
+    public function call($obj, $opts)
+    {
         $es_host  = '127.0.0.1';
         $es_port  = 9200;
         $index    = strftime("librenms-%Y.%m.%d");
@@ -147,9 +149,7 @@ class Elasticsearch implements Transport{
                         break;
                 }
                 $alert_message = json_encode($data);
-                curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-                        'Content-Type: application/json')
-                );
+                curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
                 if ($opts['es_proxy'] === true) {
                     set_curl_proxy($curl);
                 }
@@ -167,9 +167,7 @@ class Elasticsearch implements Transport{
         } else {
             $curl          = curl_init();
             $alert_message = json_encode($data);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-                    'Content-Type: application/json')
-            );
+            curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
             if ($opts['es_proxy'] === true) {
                 set_curl_proxy($curl);
             }

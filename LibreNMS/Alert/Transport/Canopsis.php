@@ -3,8 +3,10 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Canopsis implements Transport{
-    public function call($obj, $opts) {
+class Canopsis implements Transport
+{
+    public function call($obj, $opts)
+    {
         // Configurations
         $host     = $opts["host"];
         $port     = $opts["port"];
@@ -51,10 +53,11 @@ class Canopsis implements Transport{
         $msg_raw  = json_encode($msg_body);
 
         // Build routing key
-        if ($msg_body['source_type'] == "resource")
+        if ($msg_body['source_type'] == "resource") {
             $msg_rk = $msg_rk . "." . $msg_body['resource'];
-        else
+        } else {
             $msg_rk = $msg_body['connector'] . "." . $msg_body['connector_name'] . "." . $msg_body['event_type'] . "." . $msg_body['source_type'] . "." . $msg_body['component'];
+        }
 
         // Publish Event
         $msg = new \PhpAmqpLib\Message\AMQPMessage($msg_raw, array('content_type' => 'application/json', 'delivery_mode' => 2));

@@ -26,8 +26,10 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Victorops implements Transport{
-    public function call($obj, $opts) {
+class Victorops implements Transport
+{
+    public function call($obj, $opts)
+    {
         $url = $opts['url'];
 
         $protocol = array(

@@ -47,7 +47,7 @@ $obj = array(
 $status = 'error';
 
 $class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
-if(class_exists($class)) {
+if (class_exists($class)) {
     $opts = $config['alert']['transports'][$transport];
     if ($opts) {
         $instance = new $class;

@@ -13,8 +13,10 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Ciscospark implements Transport{
-    public function call($obj, $opts) {
+class Ciscospark implements Transport
+{
+    public function call($obj, $opts)
+    {
         $token  = $opts['token'];
         $roomId = $opts['roomid'];
         $text   = strip_tags($obj['msg']);

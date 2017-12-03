@@ -25,11 +25,13 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Jira implements Transport{
-    public function call($obj, $opts) {
+class Jira implements Transport
+{
+    public function call($obj, $opts)
+    {
         // Don't create tickets for resolutions
         if ($obj['severity'] == 'recovery' && $obj['msg'] != 'This is a test alert') {
-            return True;
+            return true;
         }
 
         $device = device_by_id_cache($obj['device_id']); // for event logging

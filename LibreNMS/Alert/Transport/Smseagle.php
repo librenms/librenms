@@ -25,8 +25,10 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Smseagle implements Transport{
-    public function call($obj, $opts) {
+class Smseagle implements Transport
+{
+    public function call($obj, $opts)
+    {
         $params = array(
             'login' => $opts['user'],
             'pass' => $opts['token'],

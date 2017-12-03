@@ -26,8 +26,10 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Telegram implements Transport{
-    public function call($obj, $opts) {
+class Telegram implements Transport
+{
+    public function call($obj, $opts)
+    {
         foreach ($opts as $chat_id => $data) {
             $curl = curl_init();
             set_curl_proxy($curl);

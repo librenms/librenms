@@ -13,8 +13,10 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Osticket implements Transport{
-    public function call($obj, $opts) {
+class Osticket implements Transport
+{
+    public function call($obj, $opts)
+    {
         global $config;
 
         $url   = $opts['url'];

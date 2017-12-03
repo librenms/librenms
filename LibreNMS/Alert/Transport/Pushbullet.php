@@ -25,8 +25,10 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Pushbullet implements Transport{
-    public function call($obj, $opts) {
+class Pushbullet implements Transport
+{
+    public function call($obj, $opts)
+    {
         // Note: At this point it might be useful to iterate through $obj['contacts'] and send each of them a note ?
 
         $data = array("type" => "note", "title" => $obj['title'], "body" => $obj['msg']);

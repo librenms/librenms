@@ -18,8 +18,10 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Syslog implements Transport{
-    public function call($obj, $opts) {
+class Syslog implements Transport
+{
+    public function call($obj, $opts)
+    {
         $syslog_host = '127.0.0.1';
         $syslog_port = 514;
         $state       = "Unknown";

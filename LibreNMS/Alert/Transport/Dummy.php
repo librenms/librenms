@@ -25,8 +25,10 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Dummy implements Transport{
-    public function call($obj, $opts) {
+class Dummy implements Transport
+{
+    public function call($obj, $opts)
+    {
         var_dump($obj);
         return true;
     }

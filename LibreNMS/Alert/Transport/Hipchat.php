@@ -25,8 +25,10 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Hipchat implements Transport{
-    public function call($obj, $opts) {
+class Hipchat implements Transport
+{
+    public function call($obj, $opts)
+    {
         // loop through each room
         foreach ($opts as $option) {
             $version = 1;

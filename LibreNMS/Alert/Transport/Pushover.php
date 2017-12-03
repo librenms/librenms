@@ -39,8 +39,10 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Interfaces\Alert\Transport;
 
-class Pushover implements Transport{
-    public function call($obj, $opts) {
+class Pushover implements Transport
+{
+    public function call($obj, $opts)
+    {
         foreach ($opts as $api) {
             $data          = array();
             $data['token'] = $api['appkey'];
