@@ -41,7 +41,7 @@ class Slack implements Transport
                         'color' => $color,
                         'title' => $obj['title'],
                         'text' => $slack_msg,
-                        'mrkdwn_in' => ['text', 'fallback']
+                        'mrkdwn_in' => array('text', 'fallback')
                     )
                 ),
                 'channel' => $tmp_api['channel'],
