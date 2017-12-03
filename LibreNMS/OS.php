@@ -25,8 +25,6 @@
 
 namespace LibreNMS;
 
-use LibreNMS\Device\Discovery\Sensors\WirelessSensorDiscovery;
-use LibreNMS\Device\Discovery\Sensors\WirelessSensorPolling;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
@@ -184,7 +182,7 @@ class OS implements ProcessorDiscovery
             return $hrProcs;
         }
 
-        return array();
+        return $this->discoverUcdProcessors();
     }
 
     /**
@@ -193,7 +191,7 @@ class OS implements ProcessorDiscovery
      *
      * @return array Processors
      */
-    public function discoverHrProcessors()
+    private function discoverHrProcessors()
     {  // TODO PHP 5.4 extract to trait
         $processors = array();
 
@@ -253,5 +251,28 @@ class OS implements ProcessorDiscovery
         }
 
         return $processors;
+    }
+
+    private function discoverUcdProcessors()
+    {
+        $device = $this->getDevice();
+        echo 'UCD: ';
+//
+//        $idle   = snmp_get($device, 'ssCpuIdle.0', '-OvQ', 'UCD-SNMP-MIB');
+//
+//        if (!is_numeric($idle)) {
+//            return array();
+//        }
+
+        return array(
+            new Processor(
+                'ucd-old',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.2021.11.11.0',
+                0,
+                'CPU',
+                -1
+            )
+        );
     }
 }

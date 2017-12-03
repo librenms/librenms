@@ -76,7 +76,6 @@ class Processor implements DiscoveryModule, PollerModule
         $entPhysicalIndex = null,
         $hrDeviceIndex = null)
     {
-
         $this->type = $type;
         $this->device_id = $device_id;
         $this->oid = '.' . ltrim($oid, '.'); // ensure leading dot
@@ -89,9 +88,12 @@ class Processor implements DiscoveryModule, PollerModule
 
         // validity not checked yet
         if (is_null($this->usage)) {
-            $data = snmp_get(device_by_id_cache($device_id), '-Ovq');
-            $this->current = static::processData($data, $precision);
-            $this->valid = is_numeric($this->usage);
+            $data = snmp_get(device_by_id_cache($device_id), $this->oid, '-Ovq');
+            $this->valid = ($data !== false);
+            if (!$this->valid) {
+                return;
+            }
+            $this->usage = static::processData($data, $precision);
         }
 
         d_echo('Discovered ' . get_called_class() . ' ' . print_r($this->toArray(), true));
@@ -292,6 +294,7 @@ class Processor implements DiscoveryModule, PollerModule
         if ($db_proc) {
             $new_proc = $this->toArray(array('processor_id', 'processor_usage'));
             $update = array_diff($new_proc, $db_proc);
+            var_dump($db_proc, $new_proc, $update);
 
             if (empty($update)) {
                 echo '.';
@@ -365,7 +368,7 @@ class Processor implements DiscoveryModule, PollerModule
         $array = array(
             'processor_id' => $this->id,
             'entPhysicalIndex' => (int)$this->entPhysicalIndex,
-            'hrDeviceIndex' => $this->hrDeviceIndex,
+            'hrDeviceIndex' => (int)$this->hrDeviceIndex,
             'device_id' => $this->device_id,
             'processor_oid' => $this->oid,
             'processor_index' => $this->index,
