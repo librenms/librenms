@@ -67,12 +67,12 @@ foreach ($rrd_list as $rrd) {
 
         $rrd_optionsb .= ' LINE1.25:' . $id . 'i#' . $colour . ":'$descr'";
         if (!empty($rrd['areacolour'])) {
-            $rrd_optionsb .= ' AREA:' . $id . 'i#' . $rrd['areacolour'] . $stacked['transparency'];
+            $rrd_optionsb .= ' AREA:' . $id . 'i#' . $rrd['areacolour'];
         }
     } else {
         $rrd_optionsb .= ' LINE1.25:' . $id . '#' . $colour . ":'$descr'";
         if (!empty($rrd['areacolour'])) {
-            $rrd_optionsb .= ' AREA:' . $id . '#' . $rrd['areacolour'] . $stacked['transparency'];
+            $rrd_optionsb .= ' AREA:' . $id . '#' . $rrd['areacolour'] ;
         }
     }
 
