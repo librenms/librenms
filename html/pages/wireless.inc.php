@@ -23,6 +23,8 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+$pagetitle[] = "Wireless";
+
 use LibreNMS\Device\WirelessSensor;
 
 $sensors = dbFetchColumn('SELECT `sensor_class` FROM `wireless_sensors` GROUP BY `sensor_class`');
@@ -36,7 +38,28 @@ if (!$vars['view']) {
     $vars['view'] = "nographs";
 }
 
-$displayoptions = '<div class="pull-right">';
+
+$link_array = array('page' => 'wireless');
+
+$linkoptions = '<span style="font-weight: bold;">Wireless</span> &#187; ';
+$sep = '';
+foreach ($valid_wireless_types as $type => $details) {
+    $linkoptions .= $sep;
+    if ($class == $type) {
+        $linkoptions .= '<span class="pagemenu-selected">';
+    }
+
+    $linkoptions .= generate_link($details['short'], $link_array, array('metric'=> $type, 'view' => $vars['view']));
+
+    if ($class == $type) {
+        $linkoptions .= '</span>';
+    }
+
+    $sep = ' | ';
+}
+unset($sep);
+
+$displayoptions = '';
 if ($vars['view'] == "graphs") {
     $displayoptions .= '<span class="pagemenu-selected">';
 }
@@ -56,8 +79,6 @@ $displayoptions .= generate_link("No Graphs", $link_array, array("metric"=> $cla
 if ($vars['view'] != "graphs") {
     $displayoptions .= '</span>';
 }
-
-$displayoptions .= '</div>';
 
 if (isset($valid_wireless_types[$class])) {
     $graph_type = 'wireless_' . $class;

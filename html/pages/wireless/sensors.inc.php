@@ -18,9 +18,13 @@
 ?>
 <div class="panel panel-default panel-condensed">
     <div class="panel-heading">
-        <strong><?php echo $pagetitle[0]; ?></strong>
+        <div class="row" style="padding:0px 10px 0px 10px;">
+        <div class="pull-left">
+            <?php echo $linkoptions; ?>
+        </div>
         <div class="pull-right">
             <?php echo $displayoptions; ?>
+        </div>
         </div>
     </div>
     <div class="table-responsive">
