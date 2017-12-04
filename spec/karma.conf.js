@@ -1,6 +1,6 @@
 // Karma configuration
 var libSources = require(__dirname+'/../build/build.js').getFiles();
-var leafletSources = require(__dirname+'/../node_modules/leaflet/build/build.js').getFiles();
+var leafletSources = require(__dirname+'/../node_modules/leaflet/build/build.js').getFiles(); // Caution Leaflet 1.0.0-beta.2 build needs magic-string
 
 // base path, that will be used to resolve files and exclude
 basePath = '';
