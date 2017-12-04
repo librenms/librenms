@@ -68,6 +68,30 @@ if ($used_sensors['toner']) {
     $datas[] = 'toner';
 }
 
+$type_text['overview'] = "Overview";
+$type_text['temperature'] = "Temperature";
+$type_text['charge'] = "Battery Charge";
+$type_text['humidity'] = "Humidity";
+$type_text['mempool'] = "Memory";
+$type_text['storage'] = "Storage";
+$type_text['diskio'] = "Disk I/O";
+$type_text['processor'] = "Processor";
+$type_text['voltage'] = "Voltage";
+$type_text['fanspeed'] = "Fanspeed";
+$type_text['frequency'] = "Frequency";
+$type_text['runtime'] = "Runtime";
+$type_text['current'] = "Current";
+$type_text['power'] = "Power";
+$type_text['toner'] = "Toner";
+$type_text['dbm'] = "dBm";
+$type_text['load'] = "Load";
+$type_text['state'] = "State";
+$type_text['signal'] = "Signal";
+$type_text['snr'] = "SNR";
+$type_text['pressure'] = "Pressure";
+$type_text['cooling'] = "Cooling";
+$type_text['toner'] = 'Toner';
+
 if (!$vars['metric']) {
     $vars['metric'] = "processor";
 }
@@ -77,10 +101,26 @@ if (!$vars['view']) {
 
 $link_array = array('page'    => 'health');
 
-$displayoptions = '<div style="float: right;">';
+$navbar = '<div class="pull-left">';
+$navbar .= '<span style="font-weight: bold;">Health</span> &#187; ';
+$sep = "";
+foreach ($datas as $texttype) {
+    $metric = strtolower($texttype);
+    $navbar .= $sep;
+    if ($vars['metric'] == $metric) {
+        $navbar .= '<span class="pagemenu-selected">';
+    }
+    $navbar .= generate_link($type_text[$metric], $link_array, array('metric'=> $metric, 'view' => $vars['view']));
+    if ($vars['metric'] == $metric) {
+        $navbar .= '</span>';
+    }
+    $sep = ' | ';
+}
+$navbar .= '</div>';
+unset($sep);
 
 if ($vars['view'] == "graphs") {
-    $displayoptions .= '<span class="pagemenu-selected">';
+    $displayoptions = '<span class="pagemenu-selected">';
 }
 
 $displayoptions .= generate_link("Graphs", $link_array, array('metric'=> $vars['metric'], 'view' => "graphs"));
@@ -100,8 +140,6 @@ $displayoptions .= generate_link("No Graphs", $link_array, array('metric'=> $var
 if ($vars['view'] != "graphs") {
     $displayoptions .= '</span>';
 }
-
-$displayoptions .= '</div>';
 
 if (in_array($vars['metric'], array_keys($used_sensors))
     || $vars['metric'] == 'processor'

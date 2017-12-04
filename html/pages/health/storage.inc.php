@@ -52,4 +52,6 @@ $pagetitle[] = "Health :: Storage";
         },
         url: "ajax_table.php"
     });
+
+    $(".actionBar").append('<?php echo $navbar; ?>');
 </script>
