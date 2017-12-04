@@ -13,22 +13,40 @@
 if ($device['os'] == 'edgecos') {
     d_echo('EdgeCore Memory:');
 
-    if (!empty(snmp_get($device, '.1.3.6.1.4.1.259.10.1.24.1.39.3.1.0', '-Ovqn'))) { //ECS4510
+    $temp_total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.24.1.39.3.1.0', '-Ovqn');//ECS4510
+    if (!empty($temp_total)) {
          $total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.24.1.39.3.1.0', '-Ovqn');
          $avail = snmp_get($device, '.1.3.6.1.4.1.259.10.1.24.1.39.3.3.0', '-Oqvn');
-    } elseif (!empty(snmp_get($device, '.1.3.6.1.4.1.259.10.1.22.1.39.3.1.0', '-Ovqn'))) { //ECS3528
+    };
+    unset($temp_total);
+
+    $temp_total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.22.1.39.3.1.0', '-Ovqn');//ECS3528
+    if (!empty($temp_total)) {
          $total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.22.1.39.3.1.0', '-Ovqn');
          $avail = snmp_get($device, '.1.3.6.1.4.1.259.10.1.22.1.39.3.3.0', '-Oqvn');
-    } elseif (!empty(snmp_get($device, '.1.3.6.1.4.1.259.10.1.45.1.39.3.1.0', '-Ovqn'))) { //ECS4120
+    };
+    unset($temp_total);
+
+    $temp_total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.45.1.39.3.1.0', '-Ovqn');//ECS4120
+    if (!empty($temp_total)) {
          $total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.45.1.39.3.1.0', '-Ovqn');
          $avail = snmp_get($device, '.1.3.6.1.4.1.259.10.1.45.1.39.3.3.0', '-Oqvn');
-    } elseif (!empty(snmp_get($device, '.1.3.6.1.4.1.259.10.1.42.101.1.39.3.1.0', '-Ovqn'))) { //ECS4210
+    };
+    unset($temp_total);
+
+    $temp_total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.42.101.1.39.3.1.0', '-Ovqn');//ECS4210
+    if (!empty($temp_total)) {
          $total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.42.101.1.39.3.1.0', '-Ovqn');
          $avail = snmp_get($device, '.1.3.6.1.4.1.259.10.1.42.101.1.39.3.3.0', '-Oqvn');
-    } else {
-         $total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.27.1.39.3.1.0', '-Oqvn'); //ECS3510
+    };
+    unset($temp_total);
+
+    $temp_total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.27.1.39.3.1.0', '-Ovqn');//ECS4510
+    if (!empty($temp_total)) {
+         $total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.27.1.39.3.1.0', '-Ovqn');
          $avail = snmp_get($device, '.1.3.6.1.4.1.259.10.1.27.1.39.3.3.0', '-Oqvn');
     };
+    unset($temp_total);
 
     $used = $total - $avail;
     $percent = ($used / $total * 100);
