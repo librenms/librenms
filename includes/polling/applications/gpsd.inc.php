@@ -32,7 +32,6 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
     echo ' '.$name;
     $gpsd = $agent_data['app'][$name];
     $gpsd_parsed  = array();
-    update_application($app, $gpsd);
 
     foreach (explode("\n", $gpsd) as $line) {
         list ($field, $data) = explode(':', $line);
@@ -65,4 +64,5 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
 
     $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
     data_update($device, 'app', $tags, $fields);
+    update_application($app, $gpsd, $fields);
 }

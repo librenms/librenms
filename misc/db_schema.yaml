@@ -136,7 +136,7 @@ applications:
 application_metrics:
   Columns:
     - { Field: app_id, Type: int(11), 'Null': false, Extra: '' }
-    - { Field: metric, Type: varchar(18), 'Null': false, Extra: '' }
+    - { Field: metric, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: value, Type: int(11), 'Null': true, Extra: '' }
     - { Field: value_prev, Type: int(11), 'Null': true, Extra: '' }
   Indexes:
