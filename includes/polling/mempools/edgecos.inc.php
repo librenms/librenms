@@ -10,40 +10,30 @@
  * the source code distribution for details.
  */
 
-$temp_total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.24.1.39.3.1.0', '-Ovqn');//ECS4510
-if (!empty($temp_total)) {
-     $total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.24.1.39.3.1.0', '-Ovqn');
-     $avail = snmp_get($device, '.1.3.6.1.4.1.259.10.1.24.1.39.3.3.0', '-Oqvn');
+if (starts_with($device['sysObjectID'], 'enterprises.259.10.1.24.')) { //ECS4510
+    $total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.24.1.39.3.1.0', '-Ovqn');
+    $avail = snmp_get($device, '.1.3.6.1.4.1.259.10.1.24.1.39.3.3.0', '-Oqvn');
 };
-unset($temp_total);
 
-$temp_total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.22.1.39.3.1.0', '-Ovqn');//ECS3528
-if (!empty($temp_total)) {
-     $total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.22.1.39.3.1.0', '-Ovqn');
-     $avail = snmp_get($device, '.1.3.6.1.4.1.259.10.1.22.1.39.3.3.0', '-Oqvn');
+if (starts_with($device['sysObjectID'], 'enterprises.259.10.1.22.')) { //ECS3528
+    $total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.22.1.39.3.1.0', '-Ovqn');
+    $avail = snmp_get($device, '.1.3.6.1.4.1.259.10.1.22.1.39.3.3.0', '-Oqvn');
 };
-unset($temp_total);
 
-$temp_total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.45.1.39.3.1.0', '-Ovqn');//ECS4120
-if (!empty($temp_total)) {
-     $total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.45.1.39.3.1.0', '-Ovqn');
-     $avail = snmp_get($device, '.1.3.6.1.4.1.259.10.1.45.1.39.3.3.0', '-Oqvn');
+if (starts_with($device['sysObjectID'], 'enterprises.259.10.1.45.')) { //ECS4120
+    $total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.45.1.39.3.1.0', '-Ovqn');
+    $avail = snmp_get($device, '.1.3.6.1.4.1.259.10.1.45.1.39.3.3.0', '-Oqvn');
 };
-unset($temp_total);
 
-$temp_total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.42.101.1.39.3.1.0', '-Ovqn');//ECS4210
-if (!empty($temp_total)) {
-     $total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.42.101.1.39.3.1.0', '-Ovqn');
-     $avail = snmp_get($device, '.1.3.6.1.4.1.259.10.1.42.101.1.39.3.3.0', '-Oqvn');
+if (starts_with($device['sysObjectID'], 'enterprises.259.10.1.42.')) { //ECS4210
+    $total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.42.101.1.39.3.1.0', '-Ovqn');
+    $avail = snmp_get($device, '.1.3.6.1.4.1.259.10.1.42.101.1.39.3.3.0', '-Oqvn');
 };
-unset($temp_total);
 
-$temp_total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.27.1.39.3.1.0', '-Ovqn');//ECS4510
-if (!empty($temp_total)) {
-     $total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.27.1.39.3.1.0', '-Ovqn');
-     $avail = snmp_get($device, '.1.3.6.1.4.1.259.10.1.27.1.39.3.3.0', '-Oqvn');
+if (starts_with($device['sysObjectID'], 'enterprises.259.10.1.27.')) { //ECS3510
+    $total = snmp_get($device, '.1.3.6.1.4.1.259.10.1.27.1.39.3.1.0', '-Ovqn');
+    $avail = snmp_get($device, '.1.3.6.1.4.1.259.10.1.27.1.39.3.3.0', '-Oqvn');
 };
-unset($temp_total);
 
 $mempool['total'] = $total;
 $mempool['free'] = $avail;
