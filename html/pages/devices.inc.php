@@ -13,32 +13,30 @@
  * @author     LibreNMS Contributors
 */
 
+$pagetitle[] = "Devices";
+
 if (!isset($vars['format'])) {
     $vars['format'] = "list_detail";
 }
 
-$pagetitle[] = "Devices";
-
-print_optionbar_start();
-
-echo '<span class="devices-font-bold">Lists: </span>';
+$listoptions ='<span class="devices-font-bold">Lists: </span>';
 
 $menu_options = array('basic' => 'Basic', 'detail' => 'Detail');
 
 $sep = "";
 foreach ($menu_options as $option => $text) {
-    echo($sep);
+    $listoptions .= $sep;
     if ($vars['format'] == "list_" . $option) {
-        echo '<span class="pagemenu-selected">';
+        $listoptions .= '<span class="pagemenu-selected">';
     }
-    echo '<a href="' . generate_url($vars, array('format' => "list_" . $option)) . '">' . $text . '</a>';
+    $listoptions .= '<a href="' . generate_url($vars, array('format' => "list_" . $option)) . '">' . $text . '</a>';
     if ($vars['format'] == "list_" . $option) {
-        echo '</span>';
+        $listoptions .= '</span>';
     }
     $sep = " | ";
 }
 
-echo ' | <span class="devices-font-bold">Graphs: </span>';
+$listoptions .= '&nbsp;&nbsp;&nbsp;<span class="devices-font-bold">Graphs: </span>';
 
 $menu_options = array('bits' => 'Bits',
     'processor' => 'CPU',
@@ -53,20 +51,18 @@ $menu_options = array('bits' => 'Bits',
 );
 $sep = "";
 foreach ($menu_options as $option => $text) {
-    echo $sep;
+    $listoptions .= $sep;
     if ($vars['format'] == 'graph_' . $option) {
-        echo '<span class="pagemenu-selected">';
+        $listoptions .= '<span class="pagemenu-selected">';
     }
-    echo '<a href="' . generate_url($vars, array('format' => 'graph_' . $option, 'from' => '-24h', 'to' => 'now')) . '">' . $text . '</a>';
+    $listoptions .= '<a href="' . generate_url($vars, array('format' => 'graph_' . $option, 'from' => '-24h', 'to' => 'now')) . '">' . $text . '</a>';
     if ($vars['format'] == 'graph_' . $option) {
-        echo '</span>';
+        $listoptions .= '</span>';
     }
     $sep = " | ";
 }
 
-echo '<div class="devices-float-right">';
-
-$graphs_types = '<select name="type" id="type" onchange="window.open(this.options[this.selectedIndex].value,\'_top\')" class="devices-graphs-select">';
+$headeroptions = '<select name="type" id="type" onchange="window.open(this.options[this.selectedIndex].value,\'_top\')" class="devices-graphs-select">';
 $type = 'device';
 foreach (get_graph_subtypes($type) as $avail_type) {
     $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
@@ -75,29 +71,23 @@ foreach (get_graph_subtypes($type) as $avail_type) {
     } else {
         $is_selected = '';
     }
-    $graphs_types .= '<option value="' . generate_url($vars, array('format' => 'graph_' . $avail_type, 'from' => $vars['from'] ?: $config['time']['day'], 'to' => $vars['to'] ?: $config['time']['now'])) . '" ' . $is_selected . '>' . $display_type . '</option>';
+    $headeroptions .= '<option value="' . generate_url($vars, array('format' => 'graph_' . $avail_type, 'from' => $vars['from'] ?: $config['time']['day'], 'to' => $vars['to'] ?: $config['time']['now'])) . '" ' . $is_selected . '>' . $display_type . '</option>';
 }
-$graphs_types .= '</select>';
-
-echo $graphs_types;
+$headeroptions .= '</select>';
 
 if (isset($vars['searchbar']) && $vars['searchbar'] == "hide") {
-    echo('<a href="' . generate_url($vars, array('searchbar' => '')) . '">Restore Search</a>');
+    $headeroptions .= '<a href="' . generate_url($vars, array('searchbar' => '')) . '">Restore Search</a>';
 } else {
-    echo('<a href="' . generate_url($vars, array('searchbar' => 'hide')) . '">Remove Search</a>');
+    $headeroptions .= '<a href="' . generate_url($vars, array('searchbar' => 'hide')) . '">Remove Search</a>';
 }
 
-echo("  | ");
+$headeroptions .= ' | ';
 
 if (isset($vars['bare']) && $vars['bare'] == "yes") {
-    echo('<a href="' . generate_url($vars, array('bare' => '')) . '">Restore Header</a>');
+    $headeroptions .= '<a href="' . generate_url($vars, array('bare' => '')) . '">Restore Header</a>';
 } else {
-    echo('<a href="' . generate_url($vars, array('bare' => 'yes')) . '">Remove Header</a>');
+    $headeroptions .= '<a href="' . generate_url($vars, array('bare' => 'yes')) . '">Remove Header</a>';
 }
-
-print_optionbar_end();
-
-echo '</div>';
 
 list($format, $subformat) = explode("_", $vars['format'], 2);
 
@@ -360,11 +350,17 @@ if ($format == "graph") {
     }
     $types_options .= "</select>";
 
-
     echo '
     <div class="panel panel-default panel-condensed">
     <div class="panel-heading">
-        <strong>Devices</strong>
+        <div class="row" style="padding: 0px 10px 0px 10px;">
+            <div class="pull-left">
+            '.$listoptions .'
+            </div>
+            <div class="pull-right">
+            '.$headeroptions.'
+            </div>
+        </div>
     </div>
     <div class="table-responsive">
         <table id="devices" class="table table-hover table-condensed table-striped">  
