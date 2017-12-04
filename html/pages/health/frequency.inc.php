@@ -15,7 +15,6 @@
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = "Health :: Frequency";
 $graph_type = 'sensor_frequency';
 $class      = 'frequency';
 $unit       = 'Hz';

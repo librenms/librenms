@@ -19,9 +19,14 @@ $pagetitle[] = "Health :: Toner";
 ?>
 <div class="panel panel-default panel-condensed">
     <div class="panel-heading">
-        <strong>Health :: Toner</strong>
-        <div class="pull-right">
-            <?php echo $displayoptions; ?>
+        <div class="row" style="padding:0px 10px 0px 10px;">
+            <div class="pull-left">
+                <?php echo $navbar; ?>
+            </div>
+
+            <div class="pull-right">
+                <?php echo $displayoptions; ?>
+            </div>
         </div>
     </div>
     <div class="table-responsive">

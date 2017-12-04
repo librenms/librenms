@@ -15,7 +15,6 @@
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = "Health :: Charge";
 $graph_type = "sensor_charge";
 $unit = "%";
 $class = "charge";

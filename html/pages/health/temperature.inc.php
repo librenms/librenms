@@ -15,7 +15,6 @@
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = "Health :: Temperature";
 $graph_type = 'sensor_temperature';
 $unit       = '&deg;C';
 $class      = 'temperature';

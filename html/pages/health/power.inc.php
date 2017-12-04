@@ -15,7 +15,6 @@
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = "Health :: Power";
 $graph_type = 'sensor_power';
 $unit       = 'W';
 $class      = 'power';

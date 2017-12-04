@@ -101,8 +101,7 @@ if (!$vars['view']) {
 
 $link_array = array('page'    => 'health');
 
-$navbar = '<div class="pull-left">';
-$navbar .= '<span style="font-weight: bold;">Health</span> &#187; ';
+$navbar = '<span style="font-weight: bold;">Health</span> &#187; ';
 $sep = "";
 foreach ($datas as $texttype) {
     $metric = strtolower($texttype);
@@ -116,7 +115,6 @@ foreach ($datas as $texttype) {
     }
     $sep = ' | ';
 }
-$navbar .= '</div>';
 unset($sep);
 
 if ($vars['view'] == "graphs") {

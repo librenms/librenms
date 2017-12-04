@@ -15,7 +15,6 @@
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = "Health :: State";
 $graph_type = 'sensor_state';
 $unit       = '';
 $class      = 'state';

@@ -15,7 +15,6 @@
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = "Health :: Runtime";
 $graph_type = 'sensor_runtime';
 $class      = 'runtime';
 $unit       = 'Min';

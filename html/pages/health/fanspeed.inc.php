@@ -15,7 +15,6 @@
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = "Health :: Fanspeed";
 $graph_type = 'sensor_fanspeed';
 $class      = 'fanspeed';
 $unit       = 'rpm';

@@ -15,7 +15,6 @@
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = "Health :: Pressure";
 $graph_type = 'sensor_pressure';
 $class      = 'pressure';
 $unit       = 'kpa';

@@ -15,7 +15,6 @@
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = "Health :: Current";
 $graph_type = 'sensor_current';
 $class      = 'current';
 $unit       = 'A';

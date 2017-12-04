@@ -15,7 +15,6 @@
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = "Health :: Voltage";
 $graph_type = 'sensor_voltage';
 $class      = 'voltage';
 $unit       = 'V';
