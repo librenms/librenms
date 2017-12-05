@@ -14,7 +14,6 @@ Location resolution happens as follows (when `$config['geoloc']['latlng'] == tru
  1. If `device['location']` contains `[lat, lng]` (note the square brackets), that is used
  1. If there is a location overide for the device in the WebUI and it contains `[lat, lng]` (note the square brackets), that is used.
  1. Attempt to resolve lat, lng using `$config['geoloc']['engine']`
- or
  1. Having a properly formatted addresses in sysLocation or sysLocation override under device settings.
  
  ### World Map Widget Settings.
