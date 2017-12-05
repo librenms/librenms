@@ -3,9 +3,127 @@ Leaflet.markercluster
 
 (all changes without author notice are by [@danzel](https://github.com/danzel))
 
-## Master
+## 1.2.0 (2017-11-06)
 
-##0.4 (2013-12-19)
+### Improvements
+
+ * Move `clusterPane` option in to `options` field (by [@ghybs](https://github.com/ghybs)) [#832](https://github.com/Leaflet/Leaflet.markercluster/pull/832)
+
+### Bugfixes
+
+ * Fix very small `maxClusterRadius` hanging the browser (by [@lucaswerkmeister](https://github.com/lucaswerkmeister)) [#838](https://github.com/Leaflet/Leaflet.markercluster/pull/838)
+
+## 1.1.0 (2017-08-27)
+
+### Improvements
+
+ * Add `clusterPane` option to allow putting clusters in a different pane (by [@ckrahe](https://github.com/ckrahe)) [#819](https://github.com/Leaflet/Leaflet.markercluster/issues/819)
+ 
+## 1.0.6 (2017-06-19)
+
+### Bugfixes
+
+ * Fix some issues when used with non-integer zoom [#789](https://github.com/Leaflet/Leaflet.markercluster/issues/789)
+ * Change examples to use https (by [@ghybs](https://github.com/ghybs)) [#794](https://github.com/Leaflet/Leaflet.markercluster/pull/794)
+
+## 1.0.5 (2017-04-26)
+
+### Improvements
+
+ * Allow passing fitBounds options to zoomToBounds (by [@timkelty](https://github.com/timkelty)) [#779](https://github.com/Leaflet/Leaflet.markercluster/pull/779)
+
+### Bugfixes
+
+ * Fixed bug where disableClusteringAtZoom being 0 is treated the same as null (by [@MrCheeze](https://github.com/MrCheeze)) [#773](https://github.com/Leaflet/Leaflet.markercluster/pull/773)
+
+## 1.0.4 (2017-03-14)
+
+### Bugfixes
+
+ * Fix errors removing a MarkerClusterGroup from the map during an animation [#758](https://github.com/Leaflet/Leaflet.markercluster/issues/758)
+
+## 1.0.3 (2017-02-02)
+
+### Bugfixes
+
+ * Fix moving markers while the MarkerClusterGroup is not on the map [#753](https://github.com/Leaflet/Leaflet.markercluster/issues/753)
+
+## 1.0.2 (2017-01-27)
+
+### Improvements
+
+ * Support `layeradd` and `layerremove` events [#647](https://github.com/Leaflet/Leaflet.markercluster/issues/647)
+
+### Bugfixes
+
+ * Add support for maps with negative minZoom [#704](https://github.com/Leaflet/Leaflet.markercluster/issues/704)
+ * Fixed zoomToShowLayer() markers disappearing bug (by [@z3ut](https://github.com/z3ut)) [#739](https://github.com/Leaflet/Leaflet.markercluster/issues/739)
+ * Fix an issue when opening a popup inside of zoomToShowLayer
+ * If a marker is moved with an open popup on it, re-open the popup after moving it. [#651](https://github.com/Leaflet/Leaflet.markercluster/issues/651)
+
+
+## 1.0.1 (2017-01-25)
+
+### Improvements
+
+ * Add install and build steps with jake (by [@kazes](https://github.com/kazes)) [#733](https://github.com/Leaflet/Leaflet.markercluster/pull/733)
+ * Readme improvements (by [@ghybs](https://github.com/ghybs), [@bertyhell](https://github.com/bertyhell)) [#734](https://github.com/Leaflet/Leaflet.markercluster/pull/738), [#734](https://github.com/Leaflet/Leaflet.markercluster/pull/738
+ * Bump all examples to leaflet 1.0.3
+
+### Bugfixes
+
+ * Fixed leaflet 1.0.2 bug where clearLayers would throw an exception (by [@marcianoviereck92](https://github.com/marcianoviereck92)) [#746](https://github.com/Leaflet/Leaflet.markercluster/pull/746)
+
+
+## 1.0.0 (2016-10-03)
+
+### Improvements
+
+ * Compatibility with Leaflet 1.0.0 (by [@danzel](https://githum.com/danzel), [@Eschon](https://github.com/Eschon), [@ghybs](https://github.com/ghybs), [@IvanSanchez](https://github.com/IvanSanchez))
+ * Support moving markers [#57](https://github.com/Leaflet/Leaflet.markercluster/issues/57)
+ * chunkedLoading option to keep browser more responsive during larging a load data set [#292](https://github.com/Leaflet/Leaflet.markercluster/issues/292)
+ * maxClusterRadius can be a function (by [@Schwanksta](https://github.com/Schwanksta)) [#298](https://github.com/Leaflet/Leaflet.markercluster/issues/298)
+ * Spiderfy without zooming when all markers at same location (by [@rdenniston](https://github.com/rdenniston), [@ghybs](https://github.com/ghybs)) [#415](https://github.com/Leaflet/Leaflet.markercluster/issues/415), [#606](https://github.com/Leaflet/Leaflet.markercluster/issues/606)
+ * On becoming visible, markers retain their original opacity. (by [@IvanSanchez](https://github.com/IvanSanchez)) [#444](https://github.com/Leaflet/Leaflet.markercluster/issues/444)
+ * Spiderleg Polyline options (by [@mikeatlas](https://github.com/mikeatlas)) [#466](https://github.com/Leaflet/Leaflet.markercluster/issues/466)
+ * Extra methods to allow refreshing cluster icons (by [@ghybs](https://github.com/ghybs)) [#564](https://github.com/Leaflet/Leaflet.markercluster/issues/564)
+ * Ability to disable animations (by [@ghybs](https://github.com/ghybs)) [#578](https://github.com/Leaflet/Leaflet.markercluster/issues/578)
+ * Optimized performance of bulk addLayers and removeLayers (by [@ghybs](https://github.com/ghybs)) [#584](https://github.com/Leaflet/Leaflet.markercluster/issues/584)
+ * Replaced spiderfy legs animation from SMIL to CSS transition (by [@ghybs](https://github.com/ghybs)) [#585](https://github.com/Leaflet/Leaflet.markercluster/issues/585)
+ * Provide more detailed context information on the spiderfied event (by [@evanvosberg](https://github.com/evanvosberg)) [#421](https://github.com/Leaflet/Leaflet.markercluster/issues/421)
+ * Add unspiderfied event
+ * Readme updates (by [@ghybs](https://github.com/ghybs), [@tomchadwin](https://github.com/tomchadwin) [@Cyrille37](https://github.com/Cyrille37) [@franckl](https://github.com/franckl) [@mikeatlas](https://github.com/mikeatlas) 
+ [@rdenniston](https://github.com/rdenniston) [@maackle](https://github.com/maackle) [@fureigh](https://github.com/fureigh) [@Wildhoney](https://github.com/Wildhoney) [@Schwanksta](https://github.com/Schwanksta) [@frankrowe](https://github.com/frankrowe))
+ * Improve adding and removing nested LayerGroups (by [@ghybs](https://github.com/ghybs)) [#624](https://github.com/Leaflet/Leaflet.markercluster/pull/624)
+ * Add public unspiderfy method (by [@zverev](https://github.com/zverev)) [#617](https://github.com/Leaflet/Leaflet.markercluster/pull/617)
+ * Optimized performance of bulk add with complex icon create function (by [@mlazowik](https://github.com/mlazowik)) [#697](https://github.com/Leaflet/Leaflet.markercluster/pull/697)
+ * Remove leaflet from peerDependencies (by [@tyleralves](https://github.com/tyleralves)) [#703](https://github.com/Leaflet/Leaflet.markercluster/pull/703)
+ * Simplified _recursively (by [@ghybs](https://github.com/ghybs)) [#656](https://github.com/Leaflet/Leaflet.markercluster/pull/656)
+
+### Bugfixes
+
+ * Fix getBounds when removeOutsideVisibleBounds: false is set. [#321](https://github.com/Leaflet/Leaflet.markercluster/issues/321)
+ * Fix zoomToShowLayer fails after initial spiderfy [#286](https://github.com/Leaflet/Leaflet.markercluster/issues/286)
+ * Fix cluster not disappearing on Android [#344](https://github.com/Leaflet/Leaflet.markercluster/issues/344)
+ * Fix RemoveLayers() when spiderified (by [@Grsmto](https://github.com/Grsmto)) [#358](https://github.com/Leaflet/Leaflet.markercluster/issues/358)
+ * Remove lines from map when removing cluster (by [@olive380](https://github.com/olive380)) [#532](https://github.com/Leaflet/Leaflet.markercluster/issues/532)
+ * Fix getConvexHull when all markers are located at same latitude (by [@olive380](https://github.com/olive380)) [#533](https://github.com/Leaflet/Leaflet.markercluster/issues/533)
+ * Fix removeLayers when cluster is not on the map (by [@eschon](https://github.com/eschon)) [#556](https://github.com/Leaflet/Leaflet.markercluster/issues/556)
+ * Improved zoomToShowLayer with callback check (by [@ghybs](https://github.com/ghybs)) [#572](https://github.com/Leaflet/Leaflet.markercluster/issues/572)
+ * Improved reliability of RefreshSpec test suite for PhantomJS (by [@ghybs](https://github.com/ghybs)) [#577](https://github.com/Leaflet/Leaflet.markercluster/issues/577)
+ * Corrected effect of removeOutsideVisibleBounds option (by [@ghybs](https://github.com/ghybs)) [#575](https://github.com/Leaflet/Leaflet.markercluster/issues/575)
+ * Fix getLayer when provided a string [#531](https://github.com/Leaflet/Leaflet.markercluster/issues/531)
+ * Documentation improvements (by [@ghybs](https://github.com/ghybs)) [#579](https://github.com/Leaflet/Leaflet.markercluster/issues/579)
+ * Correct _getExpandedVisibleBounds for Max Latitude (by [@ghybs](https://github.com/ghybs)) [#587](https://github.com/Leaflet/Leaflet.markercluster/issues/587)
+ * Correct unspiderfy vector (by [@ghybs](https://github.com/ghybs)) [#604](https://github.com/Leaflet/Leaflet.markercluster/issues/604)
+ * Remove "leaflet-cluster-anim" class on map remove while spiderfied (by [@ghybs](https://github.com/ghybs)) [#607](https://github.com/Leaflet/Leaflet.markercluster/issues/607)
+ * Fix disableClusteringAtZoom maxZoom troubles (by [@OriginalSin](https://github.com/OriginalSin)) [#609](https://github.com/Leaflet/Leaflet.markercluster/issues/609)
+ * Fix clusters not disappearing when they were near the edge on mobile (by [@ghybs](https://github.com/ghybs)) [#529](https://github.com/Leaflet/Leaflet.markercluster/issues/529)
+ * Remove leaflet from dependencies (by [@ghybs](https://github.com/ghybs)) [#639](https://github.com/Leaflet/Leaflet.markercluster/issues/639)
+ * Fix interaction between zoomOrSpiderfy and disableClusteringAtZoom (by [@ghybs](https://github.com/ghybs)) [#633](https://github.com/Leaflet/Leaflet.markercluster/issues/633) [#648](https://github.com/Leaflet/Leaflet.markercluster/issues/648)
+
+
+## 0.4 (2013-12-19)
 
 ### Improvements
 
@@ -16,7 +134,8 @@ Leaflet.markercluster
 
  * Fix some cases zoomToShowLayer wouldn't work  (Reported by [@absemetov](https://github.com/absemetov)) [#203](https://github.com/Leaflet/Leaflet.markercluster/issues/203) [#228](https://github.com/Leaflet/Leaflet.markercluster/issues/228) [#286](https://github.com/Leaflet/Leaflet.markercluster/issues/286)
 
-##0.3 (2013-12-18)
+
+## 0.3 (2013-12-18)
 
 ### Improvements
 
