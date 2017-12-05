@@ -1,38 +1,33 @@
 source: Extensions/Globe-Frontpage.md
-# Globe Frontpage Configuration
+# Globe/World Map Configuration
 
 LibreNMS comes with a configurable geochart based widget to visualize where your equipment is located geographically.
 
-### World Map
+An new map is available, this requires you to have properly formatted addresses in sysLocation or sysLocation override. As part of the standard poller these addresses will be Geocoded by Google and stored in the database.
 
-An new map is available, this requires you to have properly formatted addresses in sysLocation or sysLocation override. As part of the standard poller these addresses will be Geocoded by Google and stored in the database. To enable this please set the following config:
+**These config settings are already in enabled by default.**
 
 ```php
 $config['geoloc']['latlng'] = true;
 $config['geoloc']['engine'] = "google";//Only one available at present
 ```
 
-Location resolution happens as follows (when `$config['geoloc']['latlng'] == true;`):
+Location resolution happens as follows
  1. If `device['location']` contains `[lat, lng]` (note the square brackets), that is used
  1. If there is a location overide for the device in the WebUI and it contains `[lat, lng]` (note the square brackets), that is used.
  1. Attempt to resolve lat, lng using `$config['geoloc']['engine']`
+ 1. Having a properly formatted addresses in sysLocation or sysLocation override under device settings.
+ 
+ ### World Map Widget Settings.
+Leaflet config inside the widget. Below is example of the world map widget settings. 
+
+![Example World Map Settings](/img/world-map-widget-settings.png)
+
 
 We have two current mapping engines available:
 
 - Leaflet (default)
 - Jquery-Mapael
-
-
-### Leaflet config
-
-This is a simple engine to use yet is quite powerful, here you can see how to enable this engine and zoom to a default place.
-
-```php
-$config['map']['engine']                                = "leaflet";
-$config['leaflet']['default_lat']                       = "50.898482";
-$config['leaflet']['default_lng']                       = "-3.401402";
-$config['leaflet']['default_zoom']                       = 8;
-```
 
 If you can't access OpenStreet map directly you can run a local [tile server](http://wiki.openstreetmap.org/wiki/Tile_servers). To specify a different url you can set:
 
