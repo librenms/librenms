@@ -332,7 +332,7 @@ function dbDeleteOrphans($target_table, $parents)
 
         $sql .= " LEFT JOIN `$parent_table` ON `$parent_table`.`$parent_column` = T.`$target_column`";
         $where[] = " `$parent_table`.`$parent_column` IS NULL";
-   }
+    }
 
     $query = "$sql WHERE" . implode(' AND', $where);
     $result = dbQuery($query, array());
