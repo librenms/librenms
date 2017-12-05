@@ -9,43 +9,37 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-
 if ($device['os'] == 'edgecos') {
     echo 'Edgecos : ';
 
-    $usage = snmp_get($device, '.1.3.6.1.4.1.259.10.1.24.1.39.2.1.0', '-Ovqn');//ECS4510
-    if (!empty($usage)) {
+
+    $temp_id = snmp_get($device, 'sysObjectID.0', '-Oqv', 'SNMPv2-MIB');
+
+    if (starts_with($temp_id, 'SNMPv2-SMI::enterprises.259.10.1.24.')) { //ECS4510
         $oid = '.1.3.6.1.4.1.259.10.1.24.1.39.2.1.0';
     };
-    unset($usage);
 
-    $usage = snmp_get($device, '.1.3.6.1.4.1.259.10.1.22.1.39.2.1.0', '-Ovqn'); //ECS3528
-    if (!empty($usage)) {
+    if (starts_with($temp_id, 'SNMPv2-SMI::enterprises.259.10.1.22.')) { //ECS3528
         $oid = '.1.3.6.1.4.1.259.10.1.22.1.39.2.1.0';
     };
-    unset($usage);
- 
-    $usage = snmp_get($device, '.1.3.6.1.4.1.259.10.1.45.1.39.2.1.0', '-Ovqn'); //ECS4120
-    if (!empty($usage)) {
+
+    if (starts_with($temp_id, 'SNMPv2-SMI::enterprises.259.10.1.45.')) { //ECS4120
         $oid = '.1.3.6.1.4.1.259.10.1.45.1.39.2.1.0';
     };
-    unset($usage);
 
-    $usage = snmp_get($device, '.1.3.6.1.4.1.259.10.1.42.101.1.39.2.1.0', '-Ovqn'); //ECS4210
-    if (!empty($usage)) {
+    if (starts_with($temp_id, 'SNMPv2-SMI::enterprises.259.10.1.42.')) { //ECS4210
         $oid = '.1.3.6.1.4.1.259.10.1.42.101.1.39.2.1.0';
     };
-    unset($usage);
 
-    $usage = snmp_get($device, '.1.3.6.1.4.1.259.10.1.27.1.39.2.1.0', '-Ovqn'); //ECS3510
-    if (!empty($usage)) {
+    if (starts_with($temp_id, 'SNMPv2-SMI::enterprises.259.10.1.27.')) { //ECS3510
         $oid = '.1.3.6.1.4.1.259.10.1.27.1.39.2.1.0';
     };
-    unset($usage);
 
-    $usage = snmp_get($device, $oid, '-Ovqn');
+    
     $descr = 'Processor';
+    $usage = snmp_get($device, $oid, '-Ovq');
     if (is_numeric($usage)) {
         discover_processor($valid['processor'], $device, $oid, '0', 'edgecos', $descr, '1', $usage);
     }
+    unset($temp_id);
 }
