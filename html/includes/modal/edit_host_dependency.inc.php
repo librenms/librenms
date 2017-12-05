@@ -34,8 +34,7 @@ if (is_admin() === false) {
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <select class="form-control" name="parent_id" id="availableparents" style="width: 100%">
-                                <option value="0">None</option>
+                            <select multiple class="form-control" name="parent_id" id="availableparents" style="width: 100%">
                             </select>
                         </div>
                     </div>
@@ -65,8 +64,11 @@ $('#edit-dependency').on('show.bs.modal', function() {
         dataType: "json",
         success: function(output) {
             if (output.status == 0) {
+                var parents = $('#edit-parent_id').val();
                 $.each(output.deps, function (i, elem) {
-                    if (elem.device_id == $('#edit-parent_id').val()) {
+                    parents = $('#edit-parent_id').val();
+                    parentArr = parents.split(',');
+                    if ($.inArray(elem.device_id, parentArr) >= 0) {
                         var select_line = "<option value=" + elem.device_id + " selected='selected'>" + elem.hostname + "</option>";
                     } else {
                         var select_line = "<option value=" + elem.device_id + ">" + elem.hostname + "</option>";
@@ -87,28 +89,29 @@ $('#edit-dependency').on('show.bs.modal', function() {
 $('#hostdep-save').click('', function(event) {
     event.preventDefault();
     var row_id = $("#edit-row_id").val();
-    var parent_id = $("#availableparents").find(":selected").val();
-    var parent_host = $("#availableparents").find(":selected").text();
     var device_id = $("#edit-device_id").val();
     var device_ids = [];
+    var parent_ids = [];
+    var parent_hosts = [];
     device_ids.push(device_id);
+    $("#availableparents option:selected").each( function() {
+        if ($(this).length) {
+            parent_ids.push($(this).val());
+            parent_hosts.push($(this).text());
+        }
+    });
+
     $("#modal_hostname").text();
     $.ajax({
         type: 'POST',
         url: 'ajax_form.php',
-        data: { type: "save-host-dependency", device_ids: device_ids, parent_id: parent_id },
+        data: { type: "save-host-dependency", device_ids: device_ids, parent_ids: parent_ids },
         dataType: "json",
         success: function(output) {
             if (output.status == 0) {
                 toastr.success(output.message);
                 $("#edit-dependency").modal('hide');
-                $('#availableparents')
-                    .find('option')
-                    .remove()
-                    .end()
-                    .append('<option value="0">None</option>')
-                    .val('0');
-                $('[data-row-id='+row_id+']').find('.parenthost').html('<a href="device/device='+ parent_id + '/">' + parent_host + '</a>');
+                $('#hostdeps').bootgrid('reload');
             } else {
                 toastr.error(output.message);
             }
@@ -125,6 +128,15 @@ $('#hostdep-save').click('', function(event) {
         }
     });
 });
+
+$('#edit-dependency').on('hide.bs.modal', function() {
+    $('#availableparents')
+        .find('option')
+        .remove()
+        .end()
+        .val('0');
+});
+
 
 $(document).ready(function() {
     $('#availableparents').select2({

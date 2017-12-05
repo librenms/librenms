@@ -30,7 +30,7 @@ if (is_admin() === false) {
                 <br />
                 <div class="form-group">
                     <label for="manavailableparents">Parent Host:</label>
-                    <select name="parent_id" class="form-control" id="manavailableparents" style='width: 100%'>
+                    <select multiple name="parent_id" class="form-control" id="manavailableparents" style='width: 100%'>
                         <option value="0">None</option>
                     </select>
                 </div>
@@ -50,25 +50,47 @@ if (is_admin() === false) {
 </div>
 
 <script>
-$('#manavailableparents').on('change', '', function(e) {
+function changeParents(e) 
+{
     e.preventDefault();
-    var cur_option = $("option:selected", this);
-    var parent_id = this.value;
+    var cur_option = $('#manavailableparents').select2('data');
     // So that we'll see all devices. 
     var device_id = 0;
-    $("#manalldevices option").attr("selected", false);
-    var dev_array = [];
+    var parent_ids = '';
+    // This is needed to remove the None option if it is with another parent id
+    var temp_arr = [];
+
+    for (var i=0;i<cur_option.length;i++) {
+        if (cur_option.length > 1 && cur_option[i].id == 0) {
+            continue;
+        }
+        temp_arr.push(cur_option[i].id);
+        parent_ids = parent_ids + cur_option[i].id + ',';
+    }
+
+    // Set parents to new value
+    $('#manavailableparents').val(temp_arr).trigger('change');
+
+    // Remove the trailing ,
+    parent_ids = parent_ids.slice(0,-1);
+    
 
     $.ajax({
         type: 'POST',
         url: 'ajax_form.php',
-        data: { type: "get-host-dependencies", "parent_id": parent_id, "viewtype": "fromparent" },
+        data: { type: "get-host-dependencies", "parent_ids": parent_ids, "viewtype": "fromparent" },
         dataType: "json",
         success: function(output) {
             if (output.status == 0) {
-                $.each(output.deps, function (i, elem) {
-                    $('#manalldevices option[value="'+ elem.device_id + '"').prop("selected", true);
-                });
+                if (output.deps != null && output.deps != '') {
+                    var temp_arr2 = [];
+                    $.each(output.deps, function (i, elem) {
+                        temp_arr2.push(elem.device_id);
+                    });
+                    $('#manalldevices').val(temp_arr2);
+                } else {
+                    $('#manalldevices').val(null);
+                }
                 $('#manalldevices').trigger('change');
             } else {
                 toastr.error(output.message);
@@ -78,7 +100,7 @@ $('#manavailableparents').on('change', '', function(e) {
             toastr.error('Host dependencies could not be retrieved from the database');
         }
     });
-});
+}
 
 $('#manage-dependencies').on('hide.bs.modal', function() {
     $('#manavailableparents')
@@ -114,6 +136,9 @@ $('#manage-dependencies').on('show.bs.modal', function() {
                         $('#manalldevices').append(select_line);
                     }
                 });
+                $('#manalldevices').trigger('change');
+                $('#manavailableparents').val(device_id);
+                $('#manavailableparents').trigger('change');
             } else {
                 toastr.error(output.message);
             }
@@ -128,33 +153,33 @@ $('#manhostdep-save').click('', function(event) {
     event.preventDefault();
     var device_ids = [];
     var children = [];
-    var parent_id = $("#manavailableparents").find(":selected").val();
-    var parent_host = $("#manavailableparents").find(":selected").text();
-    $("#manalldevices option:selected").each( function() {
-        if ($(this).length) {
-            device_ids.push($(this).val());
-            children.push($(this).text());
-        }
-    });
+    var parent_id = [];
+    var parent_host = '';
+
+    // Get selections
+    var parents = $('#manavailableparents').select2('data');
+    var devices = $('#manalldevices').select2('data');
+
+    for (var i=0;i<parents.length;i++) {
+        parent_id.push(parents[i].id);
+        parent_host = parent_host + '<a href="device/device='+ parents[i].id +'/">' + parents[i].text + '</a>, ';
+    }
+    for (var i=0;i<devices.length;i++) {
+        device_ids.push(devices[i].id);
+        children.push(devices[i].text);
+    }
+    parent_host = parent_host.slice(0, -2);
 
     $.ajax({
         type: 'POST',
         url: 'ajax_form.php',
-        data: { type: "save-host-dependency", device_ids: device_ids, parent_id: parent_id },
+        data: { type: "save-host-dependency", device_ids: device_ids, parent_ids: parent_id },
         dataType: "json",
         success: function(output) {
             $("#manage-dependencies").modal('hide');
+            $('#hostdeps').bootgrid('reload');
             if (output.status == 0) {
                 toastr.success('Host dependencies saved successfully');
-                var arrayLength = device_ids.length;
-                for (var i = 0; i < arrayLength; i++) {
-                    $('#hostdeps').find('td.childhost').each(function() { 
-                        if ($(this).text() == children[i]) {
-                            $(this).next().text(parent_host);
-
-                        }
-                    });
-                }
             } else {
                 toastr.error('The host dependency could not be saved.');
             }
@@ -173,5 +198,7 @@ $(document).ready(function() {
     $('#manalldevices').select2({
         width: 'resolve'
     });
+    $('#manavailableparents').on('select2:select', function(e) {changeParents(e)});
+    $('#manavailableparents').on('select2:unselect', function(e) {changeParents(e)});
 });
 </script>

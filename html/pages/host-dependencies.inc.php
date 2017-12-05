@@ -32,7 +32,7 @@ require_once 'includes/modal/manage_host_dependencies.inc.php';
             <tr>
                 <th data-column-id="deviceid" data-visible="false" data-css-class="deviceid">No</th>
                 <th data-column-id="hostname" data-type="string" data-css-class="childhost" data-formatter="hostname">Hostname</th>
-                <th data-column-id="parent" data-type="string" data-css-class="parenthost" data-formatter="parent">Parent Host</th>
+                <th data-column-id="parent" data-type="string" data-css-class="parenthost" data-formatter="parent">Parent Host(s)</th>
                 <th data-column-id="parentid" data-visible="false">Parent ID</th>
                 <th data-column-id="actions" data-searchable="false" data-formatter="actions">Actions</th>
             </tr>
@@ -87,7 +87,16 @@ var grid = $("#hostdeps").bootgrid({
             if (row.parent == 'None') {
                 return 'None';
             } else {
-                return '<a href="device/device='+row.parentid+'/">'+row.parent+'</a>';
+                var temp = Array();
+                var tempids = Array();
+                var counter = 0;
+                temp = row.parent.split(',');
+                tempids = row.parentid.split(',');
+                var retstr = '';
+                for (i=0; i < temp.length; i++) {
+                    retstr = retstr + '<a href="device/device='+tempids[i]+'/">'+temp[i]+'</a>, ';
+                }
+                return retstr.slice(0, -2);
             }
         }
     },

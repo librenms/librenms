@@ -19,7 +19,7 @@ if (is_admin() === false) {
         if ($_POST['viewtype'] == 'fulllist') {
             $count_query = "SELECT count(device_id) from devices";
 
-            $deps_query = "SELECT a.device_id as id, a.hostname as hostname, b.hostname as parent, b.device_id as parentid from devices as a LEFT JOIN devices as b ON a.parent_id = b.device_id ";
+            $deps_query = "SELECT  a.device_id as id, a.hostname as hostname, GROUP_CONCAT(b.hostname ORDER BY b.device_id) parents, a.parent_id as parentid FROM devices a LEFT JOIN devices b ON FIND_IN_SET(b.device_id, a.parent_id) > 0 GROUP BY a.device_id";
 
             if (isset($_POST['format'])) {
                 if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
@@ -56,10 +56,10 @@ if (is_admin() === false) {
             if (isset($_POST['format'])) {
                 $res_arr = array();
                 foreach ($device_deps as $myrow) {
-                    if ($myrow['parent'] == null || $myrow['parent'] == '') {
+                    if ($myrow['parents'] == null || $myrow['parents'] == '') {
                         $parent = 'None';
                     } else {
-                        $parent = $myrow['parent'];
+                        $parent = $myrow['parents'];
                     }
                     
                     array_push($res_arr, array( "deviceid" => $myrow['id'], "hostname" => $myrow['hostname'], "parent" => $parent, "parentid" => $myrow['parentid'] ));
@@ -70,15 +70,16 @@ if (is_admin() === false) {
             }
         } else {
             $device_deps = dbFetchRows('SELECT `device_id`,`hostname` from `devices` WHERE `parent_id` = ? ORDER BY `hostname` ASC', array($_POST['parent_id']));
-            if ($_POST['viewtype'] == 'fromparent' && is_numeric($_POST['parent_id'])) {
-                if ($_POST['parent_id'] == 0) {
+            if ($_POST['viewtype'] == 'fromparent') {
+                if ($_POST['parent_ids'] == 0) {
                     $device_deps = dbFetchRows('SELECT `device_id`,`hostname` from `devices` WHERE `parent_id` = 0 OR `parent_id` is null ORDER BY `hostname` ASC');
                 } else {
                     $device_deps = dbFetchRows(
                         'SELECT `device_id`,`hostname` from `devices` WHERE `parent_id` = ? ORDER BY `hostname` ASC',
-                        array($_POST['parent_id'])
+                        array($_POST['parent_ids'])
                     );
                 }
+
                 $status = array('status' => 0, 'deps' => $device_deps);
             }
         }
