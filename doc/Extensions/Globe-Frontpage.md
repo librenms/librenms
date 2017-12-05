@@ -3,14 +3,16 @@ source: Extensions/Globe-Frontpage.md
 
 LibreNMS comes with a configurable geochart based widget to visualize where your equipment is located geographically.
 
-An new map is available, this requires you to have properly formatted addresses in sysLocation or sysLocation override. As part of the standard poller these addresses will be Geocoded by Google and stored in the database. To enable this please set the following config:
+An new map is available, this requires you to have properly formatted addresses in sysLocation or sysLocation override. As part of the standard poller these addresses will be Geocoded by Google and stored in the database.
+
+**These config settings are already in enabled by default.**
 
 ```php
 $config['geoloc']['latlng'] = true;
 $config['geoloc']['engine'] = "google";//Only one available at present
 ```
 
-Location resolution happens as follows (when `$config['geoloc']['latlng'] == true;`):
+Location resolution happens as follows
  1. If `device['location']` contains `[lat, lng]` (note the square brackets), that is used
  1. If there is a location overide for the device in the WebUI and it contains `[lat, lng]` (note the square brackets), that is used.
  1. Attempt to resolve lat, lng using `$config['geoloc']['engine']`
