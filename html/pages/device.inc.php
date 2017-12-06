@@ -454,7 +454,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
               <span class="caret"></span></button>
               <ul class="dropdown-menu">
                 <li><a href="https://'.$device['hostname'].'" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme"  aria-hidden="true"></i> Web</a></li>
-                <li><a href="ssh://'.$device['hostname'].'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme"  aria-hidden="true"></i> SSH</a></li>
+                <li><a href="https://networkmonitor.nottel.co.uk/gateone/?ssh=ssh://' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" aria-hidden="true"></i> SSH</a></li>
                  <li><a href="telnet://'.$device['hostname'].'" target="_blank" rel="noopener"><i class="fa fa-terminal fa-lg icon-theme"  aria-hidden="true"></i> Telnet</a></li>';
         if (is_admin()) {
             echo '<li>
