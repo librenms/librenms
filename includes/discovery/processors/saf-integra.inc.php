@@ -32,7 +32,7 @@ if ($device['os'] === 'saf-integra') {
 
     if (is_numeric($usage)) {
         $usage = 100 - ($usage / 10);
-        discover_processor($valid['processor'], $device, $oid, '0', 'saf-integra', $descr, '1', $usage);
+        discover_processor($valid['processor'], $device, $oid, '0', 'saf-integra', $descr, -10, $usage);
     }
 }
 

@@ -17,14 +17,16 @@ if ($device['os'] == 'moxa-etherdevice') {
     // Moxa people enjoy creating MIBs for each model!
     if ($device['sysDescr'] == 'IKS-6726A-2GTXSFP-T') {
         $mibmod = 'MOXA-IKS6726A-MIB';
+        $oid = '.1.3.6.1.4.1.8691.7.116.1.54.0';
     } else if ($device['sysDescr'] == 'EDS-G508E-T') {
         $mibmod = 'MOXA-EDSG508E-MIB';
+        $oid = '.1.3.6.1.4.1.8691.7.69.1.54.0';
     }
 
     $usage = snmp_get($device, 'cpuLoading30s.0', '-Ovq', $mibmod);
 
     d_echo($usage."\n");
     if (is_numeric($usage)) {
-        discover_processor($valid['processor'], $device, 'cpuLoading30s.0', '0', 'moxa-etherdevice', $descr, '1', $usage, null, null);
+        discover_processor($valid['processor'], $device, $oid, '0', 'moxa-etherdevice', $descr, '1', $usage, null, null);
     }
 }

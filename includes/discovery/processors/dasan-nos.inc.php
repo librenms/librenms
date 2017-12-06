@@ -28,6 +28,6 @@ if ($device['os'] === 'dasan-nos') {
     $descr = 'Processor';
     $usage = snmp_get($device, 'dsCpuLoad5s.0', '-Ovq', 'DASAN-SWITCH-MIB', 'dasan');
     if (is_numeric($usage)) {
-        discover_processor($valid['processor'], $device, 'dsCpuLoad5s.0', '0', 'dasan-nos', $descr, '1', $usage);
+        discover_processor($valid['processor'], $device, '.1.3.6.1.4.1.6296.9.1.1.1.8.0', '0', 'dasan-nos', $descr, '1', $usage);
     }
 }

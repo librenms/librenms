@@ -27,6 +27,6 @@ if ($device['os'] === 'eltex-olt') {
     $descr = 'Processor';
     $proc_usage = snmp_get($device, 'ltp8xCPULoadAverage5Minutes.0', '-Ovq', 'ELTEX-LTP8X-STANDALONE') / 10;
     if (is_numeric($proc_usage)) {
-        discover_processor($valid['processor'], $device, '.1.3.6.1.4.1.35265.1.22.1.10.4.0', '0', 'eltex-olt', $descr, '1', $proc_usage);
+        discover_processor($valid['processor'], $device, '.1.3.6.1.4.1.35265.1.22.1.10.4.0', '0', 'eltex-olt', $descr, 10, $proc_usage);
     }
 }

@@ -10,7 +10,7 @@ if ($device['os'] == 'viprinux') {
         discover_processor(
             $valid['processor'],
             $device,
-            'VIPRINET-MIB::vpnRouterCPULoad.0',
+            '.1.3.6.1.4.1.35424.1.2.1.0',
             '0',
             'viprinet-cpu',
             $descr,
