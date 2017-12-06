@@ -35,12 +35,12 @@
   },
   {
     "rule": "%sensors.sensor_current > %sensors.sensor_limit && %sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
-    "name": "Sensor over limit",
+    "name": "Sensor over limit - Check Device Health Settings",
     "default": true
   },
   {
     "rule": "%sensors.sensor_current < %sensors.sensor_limit_low && %sensors.sensor_alert = \"1\" && %macros.device_up = \"1\"",
-    "name": "Sensor under limit",
+    "name": "Sensor under limit - Check Device Health Settings",
     "default": true
   },
   {
