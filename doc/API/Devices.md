@@ -118,7 +118,7 @@ Route: `/api/v0/devices/:hostname/health(/:type)(/:sensor_id)`
 
   - hostname can be either the device hostname or id
   - type (optional) is health type / sensor class
-  - sensor_id (optional) is the sensor id to retreive specific information.
+  - sensor_id (optional) is the sensor id to retrieve specific information.
 
 Input:
 
@@ -212,6 +212,109 @@ Output:
 }
 ```
 
+### `list_available_wireless_graphs`
+This function allows to do three things:
+
+  - Get a list of overall wireless graphs available.
+  - Get a list of wireless graphs based on provided class.
+  - Get the wireless sensors information based on ID.
+
+Route: `/api/v0/devices/:hostname/wireless(/:type)(/:sensor_id)`
+
+  - hostname can be either the device hostname or id
+  - type (optional) is wireless type / wireless class
+  - sensor_id (optional) is the sensor id to retrieve specific information.
+
+Input:
+
+  -
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/wireless
+```
+
+Output:
+```
+{
+    "status": "ok",
+    "graphs": [
+        {
+            "desc": "Ccq",
+            "name": "device_wireless_ccq"
+        },
+        {
+            "desc": "Clients",
+            "name": "device_wireless_clients"
+        }
+    ],
+    "count": 2
+}
+```
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/wireless/device_wireless_ccq
+```
+
+Output:
+```
+{
+    "status": "ok",
+    "graphs": [
+        {
+            "sensor_id": "791",
+            "desc": "SSID: bast (ng)"
+        },
+        {
+            "sensor_id": "792",
+            "desc": "SSID: bast (na)"
+        }
+    ],
+    "count": 2
+}
+```
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/health/device_wireless_ccq/1
+```
+
+Output:
+```
+{
+    "status": "ok",
+    "graphs": [
+        {
+            "sensor_id": "791",
+            "sensor_deleted": "0",
+            "sensor_class": "ccq",
+            "device_id": "381",
+            "sensor_index": "0",
+            "sensor_type": "unifi",
+            "sensor_descr": "SSID: bast (ng)",
+            "sensor_divisor": "10",
+            "sensor_multiplier": "1",
+            "sensor_aggregator": "sum",
+            "sensor_current": "100",
+            "sensor_prev": "100",
+            "sensor_limit": null,
+            "sensor_limit_warn": null,
+            "sensor_limit_low": null,
+            "sensor_limit_low_warn": null,
+            "sensor_alert": "1",
+            "sensor_custom": "No",
+            "entPhysicalIndex": null,
+            "entPhysicalIndex_measured": null,
+            "lastupdate": "2017-12-06 21:26:29",
+            "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.3.0\"]",
+            "access_point_id": null
+        }
+    ],
+    "count": 1
+}
+```
+
 ### `get_health_graph`
 
 Get a particular health class graph for a device, if you provide a sensor_id as well then a single sensor graph
@@ -245,7 +348,38 @@ Output:
 
 Output is the graph of the particular health type sensor provided.
 
+### `get_wireless_graph`
 
+Get a particular wireless class graph for a device, if you provide a sensor_id as well then a single sensor graph
+will be provided. If no sensor_id value is provided then you will be sent a stacked wireless graph.
+
+Route: `/api/v0/devices/:hostname/graphs/wireless/:type(/:sensor_id)`
+
+  - hostname can be either the device hostname or id
+  - type is the name of the wireless graph as returned by [`list_available_wireless_graphs`](#function-list_available_wireless_graphs)
+  - sensor_id (optional) restricts the graph to return a particular wireless sensor graph.
+
+Input:
+
+  -
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/graphs/wireless/device_wireless_ccq
+```
+
+Output:
+
+Output is a stacked graph for the wireless type provided.
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/graphs/wireless/device_wireless_ccq/1
+```
+
+Output:
+
+Output is the graph of the particular wireless type sensor provided.
 
 ### `get_graph_generic_by_hostname`
 
