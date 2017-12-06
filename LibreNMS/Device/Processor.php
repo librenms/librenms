@@ -37,23 +37,22 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Processor extends Model implements DiscoveryModule, PollerModule, DiscoveryItem
 {
-    protected static $name = 'Processor';
-    protected static $data_name = 'processor';
+    protected static $table = 'processors';
     protected static $primaryKey = 'processor_id';
 
     private $valid = true;
 
-    private $processor_id;
-    private $device_id;
-    private $processor_type;
-    private $processor_usage;
-    private $processor_oid;
-    private $processor_index;
-    private $processor_descr;
-    private $processor_precision;
-    private $entPhysicalIndex;
-    private $hrDeviceIndex;
-    private $processor_perc_warn = 75;
+    public $processor_id;
+    public $device_id;
+    public $processor_type;
+    public $processor_usage;
+    public $processor_oid;
+    public $processor_index;
+    public $processor_descr;
+    public $processor_precision;
+    public $entPhysicalIndex;
+    public $hrDeviceIndex;
+    public $processor_perc_warn = 75;
 
     /**
      * Processor constructor.
@@ -66,8 +65,9 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
      * @param int $current_usage
      * @param int $entPhysicalIndex
      * @param int $hrDeviceIndex
+     * @return Processor
      */
-    public function __construct(
+    public static function make(
         $type,
         $device_id,
         $oid,
@@ -78,32 +78,34 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         $entPhysicalIndex = null,
         $hrDeviceIndex = null)
     {
-        $this->processor_type = $type;
-        $this->device_id = $device_id;
-        $this->processor_oid = '.' . ltrim($oid, '.'); // ensure leading dot
-        $this->processor_index = $index;
-        $this->processor_descr = $description;
-        $this->processor_precision = $precision;
-        $this->processor_usage = $current_usage;
-        $this->entPhysicalIndex = $entPhysicalIndex;
-        $this->hrDeviceIndex = $hrDeviceIndex;
+        $proc = new static();
+        $proc->processor_type = $type;
+        $proc->device_id = $device_id;
+        $proc->processor_oid = '.' . ltrim($oid, '.'); // ensure leading dot
+        $proc->processor_index = $index;
+        $proc->processor_descr = $description;
+        $proc->processor_precision = $precision;
+        $proc->processor_usage = $current_usage;
+        $proc->entPhysicalIndex = $entPhysicalIndex;
+        $proc->hrDeviceIndex = $hrDeviceIndex;
 
         // validity not checked yet
-        if (is_null($this->processor_usage)) {
-            $data = snmp_get(device_by_id_cache($device_id), $this->processor_oid, '-Ovq');
-            $this->valid = ($data !== false);
-            if (!$this->valid) {
-                return;
+        if (is_null($proc->processor_usage)) {
+            $data = snmp_get(device_by_id_cache($device_id), $proc->processor_oid, '-Ovq');
+            $proc->valid = ($data !== false);
+            if (!$proc->valid) {
+                return $proc;
             }
-            $this->processor_usage = static::processData($data, $precision);
+            $proc->processor_usage = static::processData($data, $precision);
         }
 
-        d_echo('Discovered ' . get_called_class() . ' ' . print_r($this->toArray(), true));
+        d_echo('Discovered ' . get_called_class() . ' ' . print_r($proc->toArray(), true));
+        return $proc;
     }
 
-    public static function fromYaml(OS $os, $data)
+    public static function fromYaml(OS $os, array $data)
     {
-        return new static(
+        return static::make(
             $data['type'],
             $os->getDeviceId(),
             $data['num_oid'],
@@ -120,9 +122,16 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             $processors = $os->discoverProcessors();
 
             if (is_array($processors)) {
-                self::sync($os->getDeviceId(), $processors);
+                self::sync(
+                    $os->getDeviceId(),
+                    $processors,
+                    array('processor_index', 'processor_type'),
+                    array('processor_usage')
+                );
             }
         }
+
+        dbDeleteOrphans('devices', static::$table, 'device_id');
     }
 
     public static function poll(OS $os)

@@ -228,7 +228,7 @@ class OS implements ProcessorDiscovery
             $new_name = array('processor', 'hr', $index);
             rrd_file_rename($this->getDevice(), $old_name, $new_name);
 
-            $processors[] = new Processor(
+            $processors[] = Processor::make(
                 'hr',
                 $this->getDeviceId(),
                 $usage_oid,
@@ -249,7 +249,7 @@ class OS implements ProcessorDiscovery
         echo 'UCD: ';
 
         return array(
-            new Processor(
+            Processor::make(
                 'ucd-old',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2021.11.11.0',
