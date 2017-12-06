@@ -166,6 +166,10 @@ class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
 //        $expected = array('bill_data.bill_id', 'bill_ports.port_id', 'ports.device_id');
 //        $this->assertSame($expected, ResolveGlues(array('bill_data'), 'device_id'));
 
+        $expected = array('application_metrics.app_id', "applications.device_id");
+        $this->assertSame($expected, ResolveGlues(array('application_metrics'), 'device_id'));
+
+
         $expected = array('state_translations.state_index_id', 'sensors_to_state_indexes.sensor_id', 'sensors.device_id');
         $this->assertSame($expected, ResolveGlues(array('state_translations'), 'device_id'));
 
