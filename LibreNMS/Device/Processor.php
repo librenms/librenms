@@ -31,28 +31,29 @@ use LibreNMS\Interfaces\Discovery\DiscoveryModule;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\PollerModule;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
+use LibreNMS\Model;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
-class Processor implements DiscoveryModule, PollerModule, DiscoveryItem
+class Processor extends Model implements DiscoveryModule, PollerModule, DiscoveryItem
 {
     protected static $name = 'Processor';
-    protected static $table = 'processors';
     protected static $data_name = 'processor';
+    protected static $primaryKey = 'processor_id';
 
     private $valid = true;
 
-    private $id;
-    private $type;
-    private $usage;
+    private $processor_id;
     private $device_id;
-    private $oid;
-    private $index;
-    private $description;
-    private $precision;
+    private $processor_type;
+    private $processor_usage;
+    private $processor_oid;
+    private $processor_index;
+    private $processor_descr;
+    private $processor_precision;
     private $entPhysicalIndex;
     private $hrDeviceIndex;
-    private $perc_warn = 75;
+    private $processor_perc_warn = 75;
 
     /**
      * Processor constructor.
@@ -77,24 +78,24 @@ class Processor implements DiscoveryModule, PollerModule, DiscoveryItem
         $entPhysicalIndex = null,
         $hrDeviceIndex = null)
     {
-        $this->type = $type;
+        $this->processor_type = $type;
         $this->device_id = $device_id;
-        $this->oid = '.' . ltrim($oid, '.'); // ensure leading dot
-        $this->index = $index;
-        $this->description = $description;
-        $this->precision = $precision;
-        $this->usage = $current_usage;
+        $this->processor_oid = '.' . ltrim($oid, '.'); // ensure leading dot
+        $this->processor_index = $index;
+        $this->processor_descr = $description;
+        $this->processor_precision = $precision;
+        $this->processor_usage = $current_usage;
         $this->entPhysicalIndex = $entPhysicalIndex;
         $this->hrDeviceIndex = $hrDeviceIndex;
 
         // validity not checked yet
-        if (is_null($this->usage)) {
-            $data = snmp_get(device_by_id_cache($device_id), $this->oid, '-Ovq');
+        if (is_null($this->processor_usage)) {
+            $data = snmp_get(device_by_id_cache($device_id), $this->processor_oid, '-Ovq');
             $this->valid = ($data !== false);
             if (!$this->valid) {
                 return;
             }
-            $this->usage = static::processData($data, $precision);
+            $this->processor_usage = static::processData($data, $precision);
         }
 
         d_echo('Discovered ' . get_called_class() . ' ' . print_r($this->toArray(), true));
@@ -217,118 +218,6 @@ class Processor implements DiscoveryModule, PollerModule, DiscoveryItem
 
 
     /**
-     * Fetch the sensor from the database.
-     * If it doesn't exist, returns null.
-     *
-     * @return array|null
-     */
-    private function fetch()
-    {
-        $table = static::$table;
-        $id = 'processor_id';
-        if (isset($this->id)) {
-            return dbFetchRow(
-                "SELECT `$table` FROM ? WHERE `$id`=?",
-                array($this->id)
-            );
-        }
-
-        $row = dbFetchRow(
-            "SELECT * FROM `$table` " .
-            "WHERE `device_id`=? AND `processor_index`=? AND `processor_type`=?",
-            array($this->device_id, $this->index, $this->type)
-        );
-        $this->id = $row[$id];
-        return $row;
-    }
-
-    /**
-     * Save processors and remove invalid processors
-     * This the sensors array should contain all the sensors of a specific class
-     * It may contain sensors from multiple tables and devices, but that isn't the primary use
-     *
-     * @param int $device_id
-     * @param array $processors
-     */
-    final public static function sync($device_id, array $processors)
-    {
-        // save and collect valid ids
-        $valid_ids = array();
-        foreach ($processors as $processor) {
-            /** @var $this $processor */
-            if ($processor->isValid()) {
-                $valid_ids[] = $processor->save();
-            }
-        }
-
-        // delete invalid sensors
-        self::clean($device_id, $valid_ids);
-    }
-
-    /**
-     * Save this processor to the database.
-     *
-     * @return int the processor_id of this processor in the database
-     */
-    final public function save()
-    {
-        $db_proc = $this->fetch();
-
-        if ($db_proc) {
-            $new_proc = $this->toArray(array('processor_id', 'processor_usage'));
-            $update = array_diff($new_proc, $db_proc);
-
-            if (empty($update)) {
-                echo '.';
-            } else {
-                dbUpdate($update, static::$table, '`processor_id`=?', array($this->id));
-                echo 'U';
-            }
-        } else {
-            $new_proc = $this->toArray(array('processor_id'));
-            $this->id = dbInsert($new_proc, static::$table);
-            if ($this->id !== null) {
-                $name = static::$name;
-                $message = "$name Discovered: {$this->type} {$this->index} {$this->description}";
-                log_event($message, $this->device_id, static::$table, 3, $this->id);
-                echo '+';
-            }
-        }
-
-        return $this->id;
-    }
-
-    /**
-     * Remove invalid processors.  Passing an empty array will remove all processors
-     *
-     * @param int $device_id
-     * @param array $processor_ids valid processor ids
-     */
-    private static function clean($device_id, $processor_ids)
-    {
-        $table = static::$table;
-        $params = array($device_id);
-        $where = '`device_id`=?';
-
-        if (!empty($processor_ids)) {
-            $where .= ' AND `processor_id` NOT IN ' . dbGenPlaceholders(count($processor_ids));
-            $params = array_merge($params, $processor_ids);
-        }
-
-        $delete = dbFetchRows("SELECT * FROM `$table` WHERE $where", $params);
-        foreach ($delete as $processor) {
-            echo '-';
-
-            $message = static::$name;
-            $message .= " Deleted: {$processor['processor_type']} {$processor['processor_index']} {$processor['processor_descr']}";
-            log_event($message, $device_id, static::$table, 3, $processor['processor_id']);
-        }
-        if (!empty($delete)) {
-            dbDelete($table, $where, $params);
-        }
-    }
-
-    /**
      * Is this sensor valid?
      * If not, it should not be added to or in the database
      *
@@ -348,19 +237,35 @@ class Processor implements DiscoveryModule, PollerModule, DiscoveryItem
     public function toArray($exclude = array())
     {
         $array = array(
-            'processor_id' => $this->id,
+            'processor_id' => $this->processor_id,
             'entPhysicalIndex' => (int)$this->entPhysicalIndex,
             'hrDeviceIndex' => (int)$this->hrDeviceIndex,
             'device_id' => $this->device_id,
-            'processor_oid' => $this->oid,
-            'processor_index' => $this->index,
-            'processor_type' => $this->type,
-            'processor_usage' => $this->usage,
-            'processor_descr' => $this->description,
-            'processor_precision' => (int)$this->precision,
-            'processor_perc_warn' => (int)$this->perc_warn,
+            'processor_oid' => $this->processor_oid,
+            'processor_index' => $this->processor_index,
+            'processor_type' => $this->processor_type,
+            'processor_usage' => $this->processor_usage,
+            'processor_descr' => $this->processor_descr,
+            'processor_precision' => (int)$this->processor_precision,
+            'processor_perc_warn' => (int)$this->processor_perc_warn,
         );
 
         return array_diff_key($array, array_flip($exclude));
+    }
+
+    public static function onCreate($processor)
+    {
+        $message = "Processor Discovered: {$processor->processor_type} {$processor->processor_index} {$processor->processor_descr}";
+        log_event($message, $processor->device_id, static::$table, 3, $processor->processor_id);
+
+        parent::onCreate($processor);
+    }
+
+    public static function onDelete($processor)
+    {
+        $message = "Processor Deleted: {$processor->processor_type} {$processor->processor_index} {$processor->processor_descr}";
+        log_event($message, $processor->device_id, static::$table, 3, $processor->processor_id);
+
+        parent::onDelete($processor); // TODO: Change the autogenerated stub
     }
 }

@@ -32,7 +32,7 @@ class YamlDiscovery
 {
     /**
      * @param OS $os
-     * @param DiscoveryItem $class
+     * @param DiscoveryItem|string $class
      * @param $yaml_data
      * @return array
      */
