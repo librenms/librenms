@@ -9,4 +9,4 @@ Only knows about the physical port to mac address mappings. (on supported L2 or 
 ### ARP Tables
 Knows about mac address to ip address and port mappings (only on supported L3 devices)
 
-![Example Dashboard](/img/IP-MAC-Address-Search-Feature.png)
+![Example](/img/IP-MAC-Address-Search-Feature.png)
