@@ -34,7 +34,8 @@ Drive Status, Memory Status, Power Supply Status.
 
 ### Alerting Sensors
 
-These alert rules can be found inside the Alert Rules Collection.
+These alert rules can be found inside the Alert Rules Collection. The alert rules below are
+the default alert rules, there are more device-specific alert rules in the alerts collection. 
 
 Sensor Over Limit Alert Rule:  Will alert on any sensor value that is over the limit.
 
