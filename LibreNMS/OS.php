@@ -118,9 +118,10 @@ class OS implements ProcessorDiscovery
         return new Generic($device);
     }
 
-    public function newYaml($class, $data, $value)
+    public function newYaml($class, $data)
     {
         d_echo($class);
+        d_echo($data);
 
         return new Processor(
             $data['type'],
@@ -129,7 +130,7 @@ class OS implements ProcessorDiscovery
             $data['index'],
             $data['descr'],
             $data['precision'],
-            $value
+            $data['value']
         );
     }
 

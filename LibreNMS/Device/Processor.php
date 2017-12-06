@@ -297,7 +297,7 @@ class Processor implements DiscoveryModule, PollerModule
         $where = '`device_id`=?';
 
         if (!empty($processor_ids)) {
-            $where .= ' AND `sensor_id` NOT IN ' . dbGenPlaceholders(count($processor_ids));
+            $where .= ' AND `processor_id` NOT IN ' . dbGenPlaceholders(count($processor_ids));
             $params = array_merge($params, $processor_ids);
         }
 

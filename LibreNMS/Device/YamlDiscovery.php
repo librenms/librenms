@@ -54,10 +54,12 @@ class YamlDiscovery
                 d_echo($raw_data);
 
                 foreach ($raw_data as $index => $snmp_data) {
-                    $data_name = isset($data['value']) ? $data['value'] : $data['oid'];  // fallback to oid if value is not set
-                    $snmp_value = $snmp_data[$data_name];
-
                     $current_data = array();
+
+                    if (!isset($data['value'])) {
+                        $data['value'] = $data['oid'];
+                    }
+
                     foreach ($data as $name => $value) {
                         if ($name == '$oid') {
                             $current_data[$name] = $value;
@@ -68,7 +70,7 @@ class YamlDiscovery
                         }
                     }
 
-                    $obj = $os->newYaml($class, $current_data, $snmp_value);
+                    $obj = $os->newYaml($class, $current_data);
 
                     if ($obj->isValid()) {
                         $objects[] = $obj;
