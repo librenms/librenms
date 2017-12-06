@@ -22,7 +22,6 @@
 # define DAILY_SCRIPT as the full path to this script and LIBRENMS_DIR as the directory this script is in
 DAILY_SCRIPT=$(readlink -f "$0")
 LIBRENMS_DIR=$(dirname "$DAILY_SCRIPT")
-COMPOSER="php ${LIBRENMS_DIR}/scripts/composer_wrapper.php"
 
 # set log_file, using librenms $config['log_dir'], if set
 # otherwise we default to <LibreNMS Install Directory>/logs
@@ -146,11 +145,6 @@ main () {
         fi
     fi
 
-    # make sure autoload.php exists before trying to run any php that may require it
-    if [ ! -f "${LIBRENMS_DIR}/vendor/autoload.php" ]; then
-        ${COMPOSER} install --no-dev
-    fi
-
     if [[ -z "$arg" ]]; then
         status_run 'Checking PHP version' "php ${LIBRENMS_DIR}/daily.php -f check_php_ver" 'check_php_ver'
 
@@ -184,16 +178,8 @@ main () {
         fi
 
         if [[ "$old_ver" != "$new_ver" ]]; then
-#            status_run 'Updating Composer packages' "${COMPOSER} install --no-dev" 'update'
-
-            # Run post update checks
-            if [ ! -f "${LIBRENMS_DIR}/vendor/autoload.php" ]; then
-                status_run "Reverting update, check the output of composer diagnose" "git checkout $old_ver" 'update'
-                set_notifiable_result update 0
-            else
-                status_run "Updated from $old_ver to $new_ver" ''
-                set_notifiable_result update 1  # only clear the error if update was a success
-            fi
+            status_run "Updated from $old_ver to $new_ver" ''
+            set_notifiable_result update 1  # only clear the error if update was a success
         fi
 
         # Call ourself again in case above pull changed or added something to daily.sh
