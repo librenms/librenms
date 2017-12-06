@@ -31,13 +31,10 @@ $entPhysical = dbFetchRows(
 if (!empty($entPhysical)) {
     echo "\nEntity States: ";
 
-    $entPhysical = array_combine(
-        array_column($entPhysical, 'entPhysicalIndex'),
-        array_column($entPhysical, 'entPhysical_id')
-    );
+    $entPhysical = array_column($entPhysical, 'entPhysical_id', 'entPhysicalIndex');
     $state_data = snmpwalk_group($device, 'entStateTable', 'ENTITY-STATE-MIB');
     $db_states = dbFetchRows('SELECT * FROM entityState WHERE device_id=?', array($device['device_id']));
-    $db_states = array_combine(array_column($db_states, 'entPhysical_id'), $db_states);
+    $db_states = array_by_column($db_states, 'entPhysical_id');
 
     foreach ($state_data as $index => $state) {
         if (isset($entPhysical[$index])) {
