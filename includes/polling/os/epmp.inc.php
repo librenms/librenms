@@ -1,27 +1,34 @@
 <?php
 /*
+ * LibreNMS Pulse Secure OS information module
+ *
+ * Copyright (c) 2015 Christophe Martinet Chrisgfx <martinet.christophe@gmail.com>
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
- */
+*/
 use LibreNMS\RRD\RrdDefinition;
 
-// $cambiumSTADLRSSI = snmp_get($device, "cambiumSTADLRSSI.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
-// $cambiumSTADLSNR = snmp_get($device, "cambiumSTADLSNR.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
-// if (is_numeric($cambiumSTADLRSSI) && is_numeric($cambiumSTADLSNR)) {
-//     $rrd_def = RrdDefinition::make()
-//         ->addDataset('cambiumSTADLRSSI', 'GAUGE', -150, 0)
-//         ->addDataset('cambiumSTADLSNR', 'GAUGE', 0, 150);
-//     $fields = array(
-//         'cambiumSTADLRSSI' => $cambiumSTADLRSSI,
-//         'cambiumSTADLSNR' => $cambiumSTADLSNR
-//     );
-//     $tags = compact('rrd_def');
-//     data_update($device, 'cambium-epmp-RFStatus', $tags, $fields);
-//     $graphs['cambium_epmp_RFStatus'] = true;
-// }
+$epmp_ap = snmp_get($device, 'wirelessInterfaceMode.0', '-Oqv', 'CAMBIUM-PMP80211-MIB');
+$epmp_number = snmp_get($device, 'cambiumSubModeType.0', '-Oqv', 'CAMBIUM-PMP80211-MIB');
+
+if ($epmp_ap == 1) {
+    if ($epmp_number == 5) {
+        $hardware = 'ePTP Master';
+    } else {
+        $hardware = 'ePMP AP';
+    }
+} elseif ($epmp_ap == 2) {
+    if ($epmp_number == 4) {
+        $hardware = 'ePTP Slave';
+    } else {
+        $hardware = 'ePMP SM';
+    }
+}
+
+$version = snmp_get($device, 'cambiumCurrentuImageVersion.0', '-Oqv', 'CAMBIUM-PMP80211-MIB');
 
 $cambiumGPSNumTrackedSat = snmp_get($device, "cambiumGPSNumTrackedSat.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
 $cambiumGPSNumVisibleSat = snmp_get($device, "cambiumGPSNumVisibleSat.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
@@ -53,17 +60,6 @@ if (is_numeric($cambiumSTAUplinkMCSMode) && is_numeric($cambiumSTADownlinkMCSMod
     $graphs['cambium_epmp_modulation'] = true;
 }
 
-// $registeredSM = snmp_get($device, "cambiumAPNumberOfConnectedSTA.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
-// if (is_numeric($registeredSM)) {
-//     $rrd_def = RrdDefinition::make()->addDataset('regSM', 'GAUGE', 0, 10000);
-//     $fields = array(
-//         'regSM' => $registeredSM,
-//     );
-//     $tags = compact('rrd_def');
-//     data_update($device, 'cambium-epmp-registeredSM', $tags, $fields);
-//     $graphs['cambium_epmp_registeredSM'] = true;
-// }
-
 $sysNetworkEntryAttempt = snmp_get($device, "sysNetworkEntryAttempt.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
 $sysNetworkEntrySuccess = snmp_get($device, "sysNetworkEntrySuccess.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
 $sysNetworkEntryAuthenticationFailure = snmp_get($device, "sysNetworkEntryAuthenticationFailure.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
@@ -82,27 +78,6 @@ if (is_numeric($sysNetworkEntryAttempt) && is_numeric($sysNetworkEntrySuccess) &
     $graphs['cambium_epmp_access'] = true;
 }
 
-$gpsSync = snmp_get($device, "cambiumEffectiveSyncSource.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
-if (is_numeric($gpsSync)) {
-    $rrd_def = RrdDefinition::make()->addDataset('gpsSync', 'GAUGE', 0, 4);
-    $fields = array(
-        'gpsSync' => $gpsSync,
-    );
-    $tags = compact('rrd_def');
-    data_update($device, 'cambium-epmp-gpsSync', $tags, $fields);
-    $graphs['cambium_epmp_gpsSync'] = true;
-}
-
-// $freq = snmp_get($device, "cambiumSTAConnectedRFFrequency.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
-// if (is_numeric($freq)) {
-//     $rrd_def = RrdDefinition::make()->addDataset('freq', 'GAUGE', 0, 100000);
-//     $fields = array(
-//         'freq' => $freq,
-//     );
-//     $tags = compact('rrd_def');
-//     data_update($device, 'cambium-epmp-freq', $tags, $fields);
-//     $graphs['cambium_epmp_freq'] = true;
-// }
 
 $multi_get_array = snmp_get_multi($device, "ulWLanTotalAvailableFrameTimePerSecond.0 ulWLanTotalUsedFrameTimePerSecond.0 dlWLanTotalAvailableFrameTimePerSecond.0 dlWLanTotalUsedFrameTimePerSecond.0", "-OQU", "CAMBIUM-PMP80211-MIB");
 
