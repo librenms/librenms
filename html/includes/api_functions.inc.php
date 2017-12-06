@@ -207,7 +207,12 @@ function get_graph_generic_by_hostname()
     $vars['type'] = $router['type'] ?: 'device_uptime';
     if (isset($sensor_id)) {
         $vars['id']   = $sensor_id;
-        $vars['type'] = str_replace('device_', 'sensor_', $vars['type']);
+        if (str_contains($vars['type'], '_wireless')) {
+            $vars['type'] = str_replace('device_', '', $vars['type']);
+        } else {
+            // If this isn't a wireless graph we need to fix the name.
+            $vars['type'] = str_replace('device_', 'sensor_', $vars['type']);
+        }
     }
 
     // use hostname as device_id if it's all digits
@@ -736,6 +741,42 @@ function list_available_health_graphs()
             $graphs[] = array(
                 'desc' => ucfirst($graph['sensor_class']),
                 'name' => 'device_'.$graph['sensor_class'],
+            );
+        }
+    }
+
+    return api_success($graphs, 'graphs');
+}
+
+function list_available_wireless_graphs()
+{
+    $app      = \Slim\Slim::getInstance();
+    $router   = $app->router()->getCurrentRoute()->getParams();
+    $hostname = $router['hostname'];
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    check_device_permission($device_id);
+    if (isset($router['type'])) {
+        list(, , $type) = explode('_', $router['type']);
+    }
+    $sensor_id = $router['sensor_id'] ?: null;
+    $graphs    = array();
+
+    if (isset($type)) {
+        if (isset($sensor_id)) {
+            $graphs = dbFetchRows('SELECT * FROM `wireless_sensors` WHERE `sensor_id` = ?', array($sensor_id));
+        } else {
+            foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', array($device_id, $type)) as $graph) {
+                $graphs[] = array(
+                    'sensor_id' => $graph['sensor_id'],
+                    'desc'      => $graph['sensor_descr'],
+                );
+            }
+        }
+    } else {
+        foreach (dbFetchRows('SELECT `sensor_class` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', array($device_id)) as $graph) {
+            $graphs[] = array(
+                'desc' => ucfirst($graph['sensor_class']),
+                'name' => 'device_wireless_'.$graph['sensor_class'],
             );
         }
     }

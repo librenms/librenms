@@ -57,7 +57,7 @@ $app->group(
                         $app->get('/:hostname/graphs', 'authToken', 'get_graphs')->name('get_graphs');
                         // api/v0/devices/$hostname/graphs
                         $app->get('/:hostname/health(/:type)(/:sensor_id)', 'authToken', 'list_available_health_graphs')->name('list_available_health_graphs');
-                        // api/v0/devices/$hostname/health
+                        $app->get('/:hostname/wireless(/:type)(/:sensor_id)', 'authToken', 'list_available_wireless_graphs')->name('list_available_wireless_graphs');
                         $app->get('/:hostname/ports', 'authToken', 'get_port_graphs')->name('get_port_graphs');
                         $app->get('/:hostname/ip', 'authToken', 'get_ip_addresses')->name('get_device_ip_addresses');
                         $app->get('/:hostname/port_stack', 'authToken', 'get_port_stack')->name('get_port_stack');
@@ -68,6 +68,7 @@ $app->group(
                         $app->delete('/:hostname/components/:component', 'authToken', 'delete_components')->name('delete_components');
                         $app->get('/:hostname/groups', 'authToken', 'get_device_groups')->name('get_device_groups');
                         $app->get('/:hostname/graphs/health/:type(/:sensor_id)', 'authToken', 'get_graph_generic_by_hostname')->name('get_health_graph');
+                        $app->get('/:hostname/graphs/wireless/:type(/:sensor_id)', 'authToken', 'get_graph_generic_by_hostname')->name('get_wireless_graph');
                         $app->get('/:hostname/:type', 'authToken', 'get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');
                         // api/v0/devices/$hostname/$type
                         $app->get('/:hostname/ports/:ifname', 'authToken', 'get_port_stats_by_port_hostname')->name('get_port_stats_by_port_hostname');
