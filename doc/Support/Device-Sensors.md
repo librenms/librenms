@@ -1,0 +1,47 @@
+source: Support/Device-Sensors.md
+
+## Device Sensors 
+
+LibreNMS has a standard for device sensors they are split into groups.
+
+### Health Sensors
+
+The High and Low values of these sensors can be edited in Web UI by going to the device settings -> Health. There you can set your own custom
+High and Low values. List of these sensors can be found here [Link](../Developing/os/Health-Information.md)
+
+**Note** Some values are defined by the manufactures and other calculated when you add the device into librenms and some are set to null leaving it up
+the user define the values, every environment is different and may require user input. 
+
+
+### Wireless Sensors
+
+Some Wireless have  High and Low values of these sensors can be edited in Web UI by going to the device settings -> Health. There you can set your own custom
+High and Low values. List of these sensors can be found here [Link](../Developing/os/Wireless-Sensors.md)
+
+
+### State Sensors
+
+Return states of device entries sensors states. For example. 
+
+Drive Status, Memory Status, Power Supply Status. 
+
+```
+0 = OK
+1 = Warning
+2 = Critical
+3 = Unknown
+````
+
+### Alerting Sensors
+
+These alert rules can be found inside the Alert Rules Collection.
+
+Sensor Over Limit Alert Rule:  Will alert on any sensor value that is over the limit.
+
+Sensor Under Limit Alert Rule: Will alert on any sensor value that is under the limit.
+
+**Remember** you can set these limits inside device settings in the Web UI.
+
+State Sensor Critical: Will alert on any state that returns critical = 2
+
+State Sensor Warning: Will alert on any state that returns warning = 1
