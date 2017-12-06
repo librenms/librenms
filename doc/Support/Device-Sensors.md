@@ -2,7 +2,8 @@ source: Support/Device-Sensors.md
 
 ## Device Sensors 
 
-LibreNMS has a standard for device sensors they are split into groups.
+LibreNMS has a standard for device sensors they are split into categories.
+This doc is to help users understand device sensors in general, if you need help with developing sensors for a device please see the Contributing + Developing section. 
 
 ### Health Sensors
 
