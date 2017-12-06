@@ -35,7 +35,7 @@ $fields = array(
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
-update_application($app, $nginx, '', $fields);
+update_application($app, $nginx, $fields);
 
 // Unset the variables we set here
 unset($nginx, $active, $reading, $writing, $waiting, $req, $rrd_name, $rrd_def, $tags);
