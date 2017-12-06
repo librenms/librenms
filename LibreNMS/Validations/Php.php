@@ -80,7 +80,7 @@ class Php implements ValidationGroup
 
     private function checkExtensions(Validator $validator)
     {
-        $required_modules = array('mysqli','pcre','curl','session','snmp','mcrypt', 'xml', 'gd');
+        $required_modules = array('mysqli','pcre','curl','session','snmp', 'xml', 'gd');
 
         if (Config::get('distributed_poller')) {
             $required_modules[] = 'memcached';
