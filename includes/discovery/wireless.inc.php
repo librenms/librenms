@@ -26,4 +26,4 @@
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\OS;
 
-WirelessSensor::discover($os);
+WirelessSensor::runDiscovery($os);

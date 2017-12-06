@@ -63,11 +63,12 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
      * @param string $description
      * @param int $precision The returned value will be divided by this number (should be factor of 10) If negative this oid returns idle cpu
      * @param int $current_usage
+     * @param int $warn_percent
      * @param int $entPhysicalIndex
      * @param int $hrDeviceIndex
      * @return Processor
      */
-    public static function make(
+    public static function discover(
         $type,
         $device_id,
         $oid,
@@ -75,13 +76,14 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         $description,
         $precision = 1,
         $current_usage = null,
+        $warn_percent = 75,
         $entPhysicalIndex = null,
         $hrDeviceIndex = null)
     {
         $proc = new static();
         $proc->processor_type = $type;
         $proc->device_id = $device_id;
-        $proc->processor_oid = '.' . ltrim($oid, '.'); // ensure leading dot
+        $proc->processor_oid = $oid;
         $proc->processor_index = $index;
         $proc->processor_descr = $description;
         $proc->processor_precision = $precision;
@@ -89,34 +91,40 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         $proc->entPhysicalIndex = $entPhysicalIndex;
         $proc->hrDeviceIndex = $hrDeviceIndex;
 
+        if (!is_null($warn_percent)) {
+            $proc->processor_perc_warn = $warn_percent;
+        }
+
         // validity not checked yet
         if (is_null($proc->processor_usage)) {
-            $data = snmp_get(device_by_id_cache($device_id), $proc->processor_oid, '-Ovq');
+            $data = snmp_get(device_by_id_cache($proc->device_id), $proc->processor_oid, '-Ovq');
             $proc->valid = ($data !== false);
             if (!$proc->valid) {
                 return $proc;
             }
-            $proc->processor_usage = static::processData($data, $precision);
+            $proc->processor_usage = static::processData($data, $proc->processor_precision);
         }
 
         d_echo('Discovered ' . get_called_class() . ' ' . print_r($proc->toArray(), true));
+
         return $proc;
     }
 
     public static function fromYaml(OS $os, array $data)
     {
-        return static::make(
+        return static::discover(
             $data['type'],
             $os->getDeviceId(),
             $data['num_oid'],
             $data['index'],
             $data['descr'] ?: 'Processor',
             $data['precision'] ?: 1,
-            $data['value']
+            $data['value'],
+            $data['warn_percent']
         );
     }
 
-    public static function discover(OS $os)
+    public static function runDiscovery(OS $os)
     {
         if ($os instanceof ProcessorDiscovery) {
             $processors = $os->discoverProcessors();
@@ -132,6 +140,8 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         }
 
         dbDeleteOrphans('devices', static::$table, 'device_id');
+
+        echo PHP_EOL;
     }
 
     public static function poll(OS $os)

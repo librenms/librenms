@@ -161,18 +161,20 @@ class OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        echo "Yaml: ";
+        echo " yaml: ";
         $yamlProcs = Processor::processYaml($this);
 
         if (!empty($yamlProcs)) {
             return $yamlProcs;
         }
 
+        echo "\n hrDevice: ";
         $hrProcs = $this->discoverHrProcessors();
         if (!empty($hrProcs)) {
             return $hrProcs;
         }
 
+        echo "\n UCD: ";
         return $this->discoverUcdProcessors();
     }
 
@@ -186,15 +188,18 @@ class OS implements ProcessorDiscovery
     {  // TODO PHP 5.4 extract to trait
         $processors = array();
 
-        echo ' hrDevice: ';
-        $hrDeviceDescr = $this->getCacheByIndex('hrDeviceDescr', 'HOST-RESOURCES-MIB');
+        try {
+            $hrDeviceDescr = $this->getCacheByIndex('hrDeviceDescr', 'HOST-RESOURCES-MIB');
 
-        if (empty($hrDeviceDescr)) {
-            // no hr data, return
+            if (empty($hrDeviceDescr)) {
+                // no hr data, return
+                return array();
+            }
+
+            $hrProcessorLoad = $this->getCacheByIndex('hrProcessorLoad', 'HOST-RESOURCES-MIB');
+        } catch (\Exception $e) {
             return array();
         }
-
-        $hrProcessorLoad = $this->getCacheByIndex('hrProcessorLoad', 'HOST-RESOURCES-MIB');
 
         foreach ($hrProcessorLoad as $index => $usage) {
             $usage_oid = '.1.3.6.1.2.1.25.3.3.1.2.' . $index;
@@ -228,7 +233,7 @@ class OS implements ProcessorDiscovery
             $new_name = array('processor', 'hr', $index);
             rrd_file_rename($this->getDevice(), $old_name, $new_name);
 
-            $processors[] = Processor::make(
+            $processors[] = Processor::discover(
                 'hr',
                 $this->getDeviceId(),
                 $usage_oid,
@@ -246,10 +251,8 @@ class OS implements ProcessorDiscovery
 
     private function discoverUcdProcessors()
     {
-        echo 'UCD: ';
-
         return array(
-            Processor::make(
+            Processor::discover(
                 'ucd-old',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2021.11.11.0',

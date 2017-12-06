@@ -3,7 +3,7 @@
 use LibreNMS\Device\Processor;
 use LibreNMS\OS;
 
-Processor::discover($os);
+Processor::runDiscovery($os);
 
 //// Include all discovery modules
 //$include_dir = 'includes/discovery/processors';

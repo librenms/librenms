@@ -7,11 +7,7 @@ abstract class Model
     protected static $table;
     protected static $primaryKey = 'id';
 
-    protected function __construct()
-    {
-    }
-
-    public static function withData(array $data) {
+    public static function create(array $data) {
         $instance = new static();
         $instance->fill($data);
         return $instance;
@@ -70,7 +66,7 @@ abstract class Model
 
         $rows = dbFetchRows("SELECT * FROM `$table` WHERE $where", $params);
         foreach ($rows as $row) {
-            static::onDelete(static::withData($row));
+            static::onDelete(static::create($row));
         }
         if (!empty($rows)) {
             dbDelete($table, $where, $params);
