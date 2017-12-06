@@ -516,7 +516,7 @@ $config['graph_types']['device']['routeros_leases']['descr'] = 'DHCP Lease Count
 //pCOweb - RITTAL IT CHILLER
 $config['graph_types']['device']['pcoweb-rittalchiller_eer']['section'] = 'chiller';
 $config['graph_types']['device']['pcoweb-rittalchiller_eer']['order'] = 0;
-$config['graph_types']['device']['pcoweb-rittalchiller_eer']['descr'] = 'E.E.R.';
+$config['graph_types']['device']['pcoweb-rittalchiller_eer']['descr'] = 'Energy Efficiency Ratio';
 
 // Device Types
 $i = 0;
