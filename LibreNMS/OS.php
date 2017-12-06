@@ -70,6 +70,8 @@ class OS implements ProcessorDiscovery
         if (is_null($this->cache)) {
             $this->cache = YamlDiscovery::preCache($this);
         }
+
+        return $this->cache;
     }
 
 
@@ -116,6 +118,20 @@ class OS implements ProcessorDiscovery
         return new Generic($device);
     }
 
+    public function newYaml($class, $data, $value)
+    {
+        d_echo($class);
+
+        return new Processor(
+            $data['type'],
+            $this->getDeviceId(),
+            $data['num_oid'],
+            $data['index'],
+            $data['descr'],
+            $data['precision'],
+            $value
+        );
+    }
 
 
     /**
@@ -160,22 +176,12 @@ class OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        $device = $this->getDevice();
-        if (isset($device['dynamic_discovery']['modules']['processors'])) {
-            $processors = array();
-            foreach ($device['dynamic_discovery']['modules']['processors'] as $processor_discovery) {
-                $processors[] = new Processor(
-                    $processor_discovery['type'],
-                    $this->getDeviceId(),
-                    $processor_discovery['num_oid'],
-                    $processor_discovery['index'],
-                    $processor_discovery['descr'],
-                    $processor_discovery['precision']
-                );
-            }
-            return $processors;
-        }
+        echo "Yaml: ";
+        $yamlProcs = Processor::processYaml($this);
 
+        if (!empty($yamlProcs)) {
+            return $yamlProcs;
+        }
 
         $hrProcs = $this->discoverHrProcessors();
         if (!empty($hrProcs)) {
@@ -255,14 +261,7 @@ class OS implements ProcessorDiscovery
 
     private function discoverUcdProcessors()
     {
-        $device = $this->getDevice();
         echo 'UCD: ';
-//
-//        $idle   = snmp_get($device, 'ssCpuIdle.0', '-OvQ', 'UCD-SNMP-MIB');
-//
-//        if (!is_numeric($idle)) {
-//            return array();
-//        }
 
         return array(
             new Processor(

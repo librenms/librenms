@@ -5,8 +5,8 @@ use LibreNMS\OS;
 
 $valid['sensor'] = array();
 
-// Pre-cache data for later use
-$pre_cache = YamlDiscovery::preCache(OS::make($device)); //FIXME don't double fetch
+/** @var OS $os */
+$pre_cache = $os->preCache();
 
 // Run custom sensors
 require 'includes/discovery/sensors/cisco-entity-sensor.inc.php';
