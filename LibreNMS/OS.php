@@ -25,13 +25,11 @@
 
 namespace LibreNMS;
 
-use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS\Generic;
 
-class OS implements ProcessorDiscovery
+class OS
 {
     private $device; // annoying use of references to make sure this is in sync with global $device variable
     private $cache; // data cache
@@ -85,7 +83,7 @@ class OS implements ProcessorDiscovery
      * @return array array indexed by the snmp index with the value as the data returned by snmp
      * @throws \Exception
      */
-    protected function getCacheByIndex($oid, $mib = null)
+    public function getCacheByIndex($oid, $mib = null)
     {
         if (str_contains($oid, '.')) {
             throw new \Exception('Error: don\'t use this with numeric oids');
@@ -118,6 +116,19 @@ class OS implements ProcessorDiscovery
         return new Generic($device);
     }
 
+    public function getName()
+    {
+        if (isset($this->device['os'])) {
+            return $this->device['os'];
+        }
+
+        $rf = new \ReflectionClass($this);
+        $name = $rf->getShortName();
+        var_dump($name);
+        preg_match_all("/[A-Z][a-z]*/", $name, $segments);
+
+        return implode('-', array_map('strtolower', $segments[0]));
+    }
 
     /**
      * Poll a channel based OID, but return data in MHz
@@ -151,115 +162,5 @@ class OS implements ProcessorDiscovery
         }
 
         return $data;
-    }
-
-    /**
-     * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
-     *
-     * @return array Processors
-     */
-    public function discoverProcessors()
-    {
-        echo " yaml: ";
-        $yamlProcs = Processor::processYaml($this);
-
-        if (!empty($yamlProcs)) {
-            return $yamlProcs;
-        }
-
-        echo "\n hrDevice: ";
-        $hrProcs = $this->discoverHrProcessors();
-        if (!empty($hrProcs)) {
-            return $hrProcs;
-        }
-
-        echo "\n UCD: ";
-        return $this->discoverUcdProcessors();
-    }
-
-    /**
-     * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
-     *
-     * @return array Processors
-     */
-    private function discoverHrProcessors()
-    {  // TODO PHP 5.4 extract to trait
-        $processors = array();
-
-        try {
-            $hrDeviceDescr = $this->getCacheByIndex('hrDeviceDescr', 'HOST-RESOURCES-MIB');
-
-            if (empty($hrDeviceDescr)) {
-                // no hr data, return
-                return array();
-            }
-
-            $hrProcessorLoad = $this->getCacheByIndex('hrProcessorLoad', 'HOST-RESOURCES-MIB');
-        } catch (\Exception $e) {
-            return array();
-        }
-
-        foreach ($hrProcessorLoad as $index => $usage) {
-            $usage_oid = '.1.3.6.1.2.1.25.3.3.1.2.' . $index;
-            $descr = $hrDeviceDescr[$index];
-
-            if (!is_numeric($usage)) {
-                continue;
-            }
-
-            $device = $this->getDevice();
-            if ($device['os'] == 'arista-eos' && $index == '1') {
-                continue;
-            }
-
-            if (empty($descr)
-                || $descr == 'Unknown Processor Type' // Windows: Unknown Processor Type
-                || $descr == 'An electronic chip that makes the computer work.'
-            ) {
-                $descr = 'Processor';
-            } else {
-                // Make the description a bit shorter
-                $remove_strings = array(
-                    'CPU ',
-                    '(TM)',
-                    '(R)',
-                );
-                $descr = str_replace($remove_strings, '', $descr);
-            }
-
-            $old_name = array('hrProcessor', $index);
-            $new_name = array('processor', 'hr', $index);
-            rrd_file_rename($this->getDevice(), $old_name, $new_name);
-
-            $processors[] = Processor::discover(
-                'hr',
-                $this->getDeviceId(),
-                $usage_oid,
-                $index,
-                $descr,
-                1,
-                $usage,
-                '',
-                $index
-            );
-        }
-
-        return $processors;
-    }
-
-    private function discoverUcdProcessors()
-    {
-        return array(
-            Processor::discover(
-                'ucd-old',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.2021.11.11.0',
-                0,
-                'CPU',
-                -1
-            )
-        );
     }
 }
