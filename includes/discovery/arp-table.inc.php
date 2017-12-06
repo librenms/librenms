@@ -117,10 +117,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
     }
 
     // remove entries that no longer have an owner
-    dbQuery('DELETE `ipv4_mac` FROM `ipv4_mac`
- LEFT JOIN `ports` ON `ipv4_mac`.`port_id` = `ports`.`port_id` 
- LEFT JOIN `devices` ON `ipv4_mac`.`device_id` = `devices`.`device_id` 
- WHERE `ports`.`port_id` IS NULL OR `devices`.`device_id` IS NULL');
+    dbDeleteOrphans('ipv4_mac', array('ports.port_id', 'devices.device_id'));
 
     echo PHP_EOL;
     unset(
