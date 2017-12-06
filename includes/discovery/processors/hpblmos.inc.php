@@ -13,7 +13,7 @@
 if ($device['os'] == 'hpblmos') {
     d_echo('HP OA CPU info:');
 
-    //TODO just UCD
+    //TODO just UCD, but the type is wrong
 
     $descr = 'CPU';
     $idle = snmp_get($device, '.1.3.6.1.4.1.2021.11.11.0', '-Ovqn');
