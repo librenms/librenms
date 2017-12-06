@@ -118,22 +118,6 @@ class OS implements ProcessorDiscovery
         return new Generic($device);
     }
 
-    public function newYaml($class, $data)
-    {
-        d_echo($class);
-        d_echo($data);
-
-        return new Processor(
-            $data['type'],
-            $this->getDeviceId(),
-            $data['num_oid'],
-            $data['index'],
-            $data['descr'],
-            $data['precision'],
-            $data['value']
-        );
-    }
-
 
     /**
      * Poll a channel based OID, but return data in MHz

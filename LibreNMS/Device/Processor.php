@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Device;
 
+use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\Interfaces\Discovery\DiscoveryModule;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\PollerModule;
@@ -33,7 +34,7 @@ use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
-class Processor implements DiscoveryModule, PollerModule
+class Processor implements DiscoveryModule, PollerModule, DiscoveryItem
 {
     protected static $name = 'Processor';
     protected static $table = 'processors';
@@ -97,6 +98,19 @@ class Processor implements DiscoveryModule, PollerModule
         }
 
         d_echo('Discovered ' . get_called_class() . ' ' . print_r($this->toArray(), true));
+    }
+
+    public static function fromYaml(OS $os, $data)
+    {
+        return new static(
+            $data['type'],
+            $os->getDeviceId(),
+            $data['num_oid'],
+            $data['index'],
+            $data['descr'] ?: 'Processor',
+            $data['precision'] ?: 1,
+            $data['value']
+        );
     }
 
     public static function discover(OS $os)

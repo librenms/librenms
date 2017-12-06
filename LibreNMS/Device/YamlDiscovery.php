@@ -25,14 +25,26 @@
 
 namespace LibreNMS\Device;
 
+use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 
 class YamlDiscovery
 {
+    /**
+     * @param OS $os
+     * @param DiscoveryItem $class
+     * @param $yaml_data
+     * @return array
+     */
     public static function discover(OS $os, $class, $yaml_data)
     {
         $pre_cache = $os->preCache();
-        $objects = array();
+        $items = array();
+
+        // convert to class name for static call below
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
 
         foreach ($yaml_data as $first_key => $first_yaml) {
             if ($first_key == 'pre-cache') {
@@ -70,15 +82,15 @@ class YamlDiscovery
                         }
                     }
 
-                    $obj = $os->newYaml($class, $current_data);
+                    $item = $class::fromYaml($os, $current_data);
 
-                    if ($obj->isValid()) {
-                        $objects[] = $obj;
+                    if ($item->isValid()) {
+                        $items[] = $item;
                     }
                 }
             }
         }
-        return $objects;
+        return $items;
     }
 
 
