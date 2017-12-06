@@ -10,15 +10,14 @@ This doc is to help users understand device sensors in general, if you need help
 The High and Low values of these sensors can be edited in Web UI by going to the device settings -> Health. There you can set your own custom
 High and Low values. List of these sensors can be found here [Link](../Developing/os/Health-Information.md)
 
-**Note** Some values are defined by the manufactures and other calculated when you add the device into librenms and some are set to null leaving it up
-the user define the values, every environment is different and may require user input. 
+**Note** Some values are defined by the manufactures and others are auto calculated when you add the device into librenms. Keep in mind every environment is different and may require user input.
 
 
 ### Wireless Sensors
 
-Some Wireless have  High and Low values of these sensors can be edited in Web UI by going to the device settings -> Health. There you can set your own custom
-High and Low values. List of these sensors can be found here [Link](../Developing/os/Wireless-Sensors.md)
+Some Wireless have  High and Low values of these sensors can be edited in Web UI by going to the device settings -> Health. There you can set your own custom High and Low values. List of these sensors can be found here [Link](../Developing/os/Wireless-Sensors.md)
 
+**Note** Some values are defined by the manufactures and others are auto calculated when you add the device into librenms. Keep in mind every environment is different and may require user input.
 
 ### State Sensors
 
