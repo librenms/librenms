@@ -576,12 +576,17 @@ function location_to_latlng($device)
 /**
  * Update the application status and output in the database.
  *
+ * Metric values should have key for of the matching name.
+ * If you have multiple groups of metrics, you can group them with multiple sub arrays
+ * The group name (key) will be prepended to each metric in that group, separated by an underscore
+ * The special group "none" will not be prefixed.
+ *
  * @param array $app app from the db, including app_id
  * @param string $response This should be the full output
- * @param string $status This is the current value for alerting
  * @param array $metrics an array of additional metrics to store in the database for alerting
+ * @param string $status This is the current value for alerting
  */
-function update_application($app, $response, $status = '', $metrics = array())
+function update_application($app, $response, $metrics = array(), $status = '')
 {
     if (!is_numeric($app['app_id'])) {
         d_echo('$app does not contain app_id, could not update');
@@ -614,6 +619,26 @@ function update_application($app, $response, $status = '', $metrics = array())
         $db_metrics = dbFetchRows('SELECT * FROM `application_metrics` WHERE app_id=?', array($app['app_id']));
         $db_metrics = array_by_column($db_metrics, 'metric');
 
+        // allow two level metrics arrays, flatten them and prepend the group name
+        if (is_array(current($metrics))) {
+            $metrics = array_reduce(
+                array_keys($metrics),
+                function ($carry, $metric_group) use ($metrics) {
+                    if ($metric_group == 'none') {
+                        $prefix = '';
+                    } else {
+                        $prefix = $metric_group . '_';
+                    }
+
+                    foreach ($metrics[$metric_group] as $metric_name => $value) {
+                        $carry[$prefix . $metric_name] = $value;
+                    }
+                    return $carry;
+                },
+                array()
+            );
+        }
+
         echo ': ';
         foreach ($metrics as $metric_name => $value) {
             if (!isset($db_metrics[$metric_name])) {
@@ -622,15 +647,15 @@ function update_application($app, $response, $status = '', $metrics = array())
                     array(
                         'app_id' => $app['app_id'],
                         'metric' => $metric_name,
-                        'value' => $value,
+                        'value' => (int)$value,
                     ),
                     'application_metrics'
                 );
                 echo '+';
-            } elseif ($value != $db_metrics[$metric_name]['value']) {
+            } elseif ((int)$value != (int)$db_metrics[$metric_name]['value']) {
                 dbUpdate(
                     array(
-                        'value' => $value,
+                        'value' => (int)$value,
                         'value_prev' => $db_metrics[$metric_name]['value'],
                     ),
                     'application_metrics',
@@ -654,6 +679,8 @@ function update_application($app, $response, $status = '', $metrics = array())
             );
             echo '-';
         }
+
+        echo PHP_EOL;
     }
 }
 
