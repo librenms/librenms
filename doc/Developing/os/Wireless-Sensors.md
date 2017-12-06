@@ -4,22 +4,23 @@ This document will guide you through adding wireless sensors for your new wirele
  
 Currently we have support for the following wireless metrics along with the values we expect to see the data in:
 
-| Type             | Measurement   | Interface                     | Description                                                  |
-| ---------------- | ------------- | ----------------------------- | ------------------------------------------------------------ |
-| ap-count         | %             | WirelessApCountDiscovery      | The number of APs attached to this controller                |
-| capacity         | %             | WirelessCapacityDiscovery     | The % of operating rate vs theoretical max                   |
-| ccq              | %             | WirelessCcqDiscovery          | The Client Connection Quality                                |
-| clients          | count         | WirelessClientsDiscovery      | The number of clients connected to/managed by this device    |
-| distance         | km            | WirelessDistanceDiscovery     | The distance of a radio link in Kilometers                   |
-| error-ratio      | %             | WirelessErrorRatioDiscovery   | The percent of errored packets or bits, etc                  |
-| frequency        | MHz           | WirelessFrequencyDiscovery    | The frequency of the radio in MHz, channels can be converted |
-| noise-floor      | dBm/Hz        | WirelessNoiseFloorDiscovery   | The amount of noise received by the radio                    |
-| power            | dBm           | WirelessPowerDiscovery        | The power of transmit or receive, including signal level     |
-| quality          | %             | WirelessQualityDiscovery      | The % of quality of the link, 100% = perfect link            |
-| rate             | bps           | WirelessRateDiscovery         | The negotiated rate of the connection (not data transfer)    |
-| rssi             | dBm           | WirelessRssiDiscovery         | The Received Signal Strength Indicator                       |
-| snr              | dBm           | WirelessSnrDiscovery          | The Signal to Noise ratio, which is signal - noise floor     |
-| utilization      | %             | WirelessUtilizationDiscovery  | The % of utilization compared to the current rate            |
+| Type        | Measurement | Interface                    | Description                                                                                     |
+| ----------- | ----------- | ---------------------------- | ----------------------------------------------------------------------------------------------- |
+| ap-count    | %           | WirelessApCountDiscovery     | The number of APs attached to this controller                                                   |
+| capacity    | %           | WirelessCapacityDiscovery    | The % of operating rate vs theoretical max                                                      |
+| ccq         | %           | WirelessCcqDiscovery         | The Client Connection Quality                                                                   |
+| clients     | count       | WirelessClientsDiscovery     | The number of clients connected to/managed by this device                                       |
+| distance    | km          | WirelessDistanceDiscovery    | The distance of a radio link in Kilometers                                                      |
+| error-ratio | %           | WirelessErrorRatioDiscovery  | The percent of errored packets or bits, etc                                                     |
+| frequency   | MHz         | WirelessFrequencyDiscovery   | The frequency of the radio in MHz, channels can be converted                                    |
+| noise-floor | dBm/Hz      | WirelessNoiseFloorDiscovery  | The amount of noise received by the radio                                                       |
+| power       | dBm         | WirelessPowerDiscovery       | The power of transmit or receive, including signal level                                        |
+| quality     | %           | WirelessQualityDiscovery     | The % of quality of the link, 100% = perfect link                                               |
+| rate        | bps         | WirelessRateDiscovery        | The negotiated rate of the connection (not data transfer)                                       |
+| rssi        | dBm         | WirelessRssiDiscovery        | The Received Signal Strength Indicator                                                          |
+| snr         | dBm         | WirelessSnrDiscovery         | The Signal to Noise ratio, which is signal - noise floor                                        |
+| ssr         | dBm         | WirelessSsrDiscovery         | The Signal strength ratio, the ratio(or difference) of Vertical rx power to Horizontal rx power |
+| utilization | %           | WirelessUtilizationDiscovery | The % of utilization compared to the current rate                                               |
 
 You will need to create a new OS class for your os if one doen't exist under `LibreNMS/OS`.  The name of this file
 should be the os name in camel case for example `airos -> Airos`, `ios-wlc -> IosWlc`.
