@@ -70,7 +70,6 @@ pages:
       - Extensions/SNMP-Trap-Handler.md
       - Support/Cleanup-options.md
   - 6. 3rd Party Integration:
-      - Extensions/Carel-pCOweb-Devices.md
       - Extensions/Graylog.md
       - Nagios Plugins: Extensions/Services.md
       - Extensions/NFSen.md
@@ -147,6 +146,8 @@ pages:
   - 11. Misc:
       - Security information: General/Security.md
       - CLI Scripts: Support/CLI-Tools.md
+      - Device Notes: Support/Device-Notes.md
+          - Carel pCOweb: Support/Carel-pCOweb-Devices.md
   - hidden:
       - API/API-Docs.md
       - Installation/Installing-LibreNMS.md

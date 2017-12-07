@@ -1,6 +1,0 @@
-INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'pcoweb-rittalchiller_eer',  'Chiller',  'Energy Efficiency Ratio',  0);
-INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'panos_sessions_tcp',  'firewall',  'Active TCP Sessions',  0);
-INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'panos_sessions_udp',  'firewall',  'Active UDP Sessions',  0);
-INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'panos_sessions_icmp',  'firewall',  'Active ICMP Sessions',  0);
-INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'panos_sessions_ssl',  'firewall',  'Active SSL Proxy Sessions',  0);
-INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'panos_sessions_sslutil',  'firewall',  'Active SSL Proxy Utilization',  0);
