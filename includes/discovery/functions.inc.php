@@ -149,7 +149,6 @@ function discover_device(&$device, $options = null)
     register_mibs($device, Config::getOsSetting($device['os'], 'register_mibs', array()), 'includes/discovery/os/' . $device['os'] . '.inc.php');
 
     $os = OS::make($device);
-    $os->preCache();  // always pre-cache or wait for first use?
 
     echo "\n";
 

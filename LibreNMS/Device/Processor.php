@@ -389,7 +389,8 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
                 $descr,
                 1,
                 $usage,
-                '',
+                null,
+                null,
                 $index
             );
         }
