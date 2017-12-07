@@ -372,6 +372,8 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             } else {
                 // Make the description a bit shorter
                 $remove_strings = array(
+                    'GenuineIntel: ',
+                    'AuthenticAMD: ',
                     'CPU ',
                     '(TM)',
                     '(R)',
