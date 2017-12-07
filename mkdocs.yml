@@ -46,7 +46,7 @@ pages:
       - Check_MK Setup: Extensions/Agent-Setup.md
       - Extensions/Billing-Module.md
       - Extensions/Dell-OpenManage.md
-      - Extensions/Globe-Frontpage.md
+      - Extensions/World-Map.md
       - Extensions/Interface-Description-Parsing.md
       - Extensions/Network-Map.md
       - Extensions/Syslog.md
