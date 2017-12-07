@@ -118,6 +118,7 @@ pages:
       - Support/SNMP-Configuration-Examples.md
       - Support/SSL-Configuration.md
       - Support/Device-Troubleshooting.md
+      - Support/Device-Sensors.md
   - 10. Contributing + Developing:
       - Contributing: Developing/index.md
       - Developing/Using-Git.md
