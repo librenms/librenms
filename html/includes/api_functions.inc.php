@@ -1170,7 +1170,7 @@ function list_bills()
     $bill_ref = mres($_GET['ref']);
     $bill_custid = mres($_GET['custid']);
     $param = array();
-    $sql = '1';
+    
     if (!empty($bill_custid)) {
         $sql    .= '`bill_custid` = ?';
         $param[] = $bill_custid;
@@ -1180,6 +1180,8 @@ function list_bills()
     } elseif (is_numeric($bill_id)) {
         $sql    .= '`bill_id` = ?';
         $param[] = $bill_id;
+    } else {
+        $sql = '1';
     }
     if (!is_admin() && !is_read()) {
         $sql    .= ' AND `bill_id` IN (SELECT `bill_id` FROM `bill_perms` WHERE `user_id` = ?)';
