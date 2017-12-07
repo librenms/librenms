@@ -30,7 +30,7 @@ source: Support/FAQ.md
  - [What is the Demo User for?](#faq30)
  - [Why does modifying 'Default Alert Template' fail?](#faq31)
  - [Why would alert un-mute itself](#faq32)
- - [Where can I find LibreNMS DataBase Map?](#faq33)
+ 
  
 ### Developing
  - [How do I add support for a new OS?](#faq8)
@@ -353,6 +353,4 @@ mysql -u librenms -p < sql-schema/202.sql
 If alert un-mutes itself then it most likely means that the alert cleared and is then triggered again.
 Please review eventlog as it will tell you in there.
 
-#### <a name="faq33"> Where can I find LibreNMS DataBase Map?</a>
-[Link Here](https://github.com/librenms/librenms/blob/master/misc/db_schema.yaml)
 
