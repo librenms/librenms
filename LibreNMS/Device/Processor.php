@@ -121,7 +121,9 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             $data['descr'] ?: 'Processor',
             $data['precision'] ?: 1,
             $data['value'],
-            $data['warn_percent']
+            $data['warn_percent'],
+            $data['entPhysicalIndex'],
+            $data['hrDeviceIndex']
         );
     }
 
