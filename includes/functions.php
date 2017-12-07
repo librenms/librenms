@@ -2403,6 +2403,57 @@ function dump_db_schema()
 }
 
 /**
+ * Dump the current database data for a module to an array
+ * Mostly used for testing
+ *
+ * @param int $device_id The test device id
+ * @param string $module
+ * @return array
+ */
+function dump_module_data($device_id, $module)
+{
+    // TODO a bit naive for now
+    $where = "WHERE `device_id`=?";
+    $params = array($device_id);
+    $data = array();
+
+    $tables = get_module_tables($module);
+    foreach ($tables as $table => $excluded_fields) {
+        $rows = dbFetchRows("SELECT * FROM `$table` $where", $params);
+        $keys = array_flip($excluded_fields);
+        $data[$table] = array_map(function($row) use ($keys){
+            return array_diff_key($row, $keys);
+        }, $rows);
+    }
+
+    return $data;
+}
+
+
+/**
+ * Get list of tables used by a module
+ * Includes a list of fields that will not be considered for testing
+ * "all" returns all known tables
+ *
+ * @param string $module
+ * @return array
+ */
+function get_module_tables($module)
+{
+    $tables = array(
+        'processors' => array(
+            'processors' => array('device_id', 'processor_id'),
+        ),
+    );
+
+    if ($module == 'all') {
+        return call_user_func_array('array_merge', $tables);
+    }
+
+    return $tables[$module];
+}
+
+/**
  * Get an array of the schema files.
  * schema_version => full_file_name
  *

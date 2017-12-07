@@ -23,11 +23,13 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Proc;
+
 global $config;
 
 $install_dir = realpath(__DIR__ . '/..');
 
-$init_modules = array('web', 'discovery');
+$init_modules = array('web', 'discovery', 'polling');
 
 if (!getenv('SNMPSIM')) {
     $init_modules[] = 'mocksnmp';
@@ -45,9 +47,21 @@ require $install_dir . '/includes/init.php';
 chdir($install_dir);
 
 ini_set('display_errors', 1);
-error_reporting(E_ALL & ~E_WARNING);
+//error_reporting(E_ALL & ~E_WARNING);
 
 update_os_cache(true); // Force update of OS Cache
+
+if (getenv('SNMPSIM')) {
+    $snmpsim_cmd = 'snmpsimd.py --data-dir=./tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1161 --logging-method=file:/tmp/snmpsimd.log';
+
+    echo "Starting snmpsimd...\n";
+    $proc_snmpsimd = new Proc($snmpsim_cmd);
+
+    // make PHP hold on a reference to $proc_snmpsimd so it doesn't get destructed
+    register_shutdown_function(function (Proc $proc) {
+        $proc->terminate();
+    }, $proc_snmpsimd);
+}
 
 if (getenv('DBTEST')) {
     global $schema, $sql_mode;

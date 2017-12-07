@@ -210,30 +210,18 @@ function check_unit($passthru = false, $command_only = false, $fail_fast = false
     $phpunit_bin = check_exec('phpunit');
 
     if ($snmpsim) {
-        $phpunit_cmd = "SNMPSIM=1 $phpunit_bin --colors=always";
-        $snmpsim_cmd = "snmpsimd.py --data-dir=./tests/snmpsim --agent-udpv4-endpoint=127.0.0.1:11161 --logging-method=file:/tmp/snmpsimd.log";
-    } else {
-        $phpunit_cmd = "$phpunit_bin --colors=always";
-        $snmpsim_cmd = '';
+        putenv('SNMPSIM=1');
     }
+
+    $phpunit_cmd = "$phpunit_bin --colors=always";
 
     if ($fail_fast) {
         $phpunit_cmd .= ' --stop-on-error --stop-on-failure';
     }
 
-
     if ($command_only) {
         echo $phpunit_cmd . PHP_EOL;
-        if ($snmpsim) {
-            echo $snmpsim_cmd . PHP_EOL;
-        }
         return 250;
-    }
-
-    $proc_snmpsimd = null;
-    if ($snmpsim) {
-        echo 'Starting snmpsimd...' .  PHP_EOL;
-        $proc_snmpsimd = new Proc($snmpsim_cmd);
     }
 
     echo 'Running unit tests... ';

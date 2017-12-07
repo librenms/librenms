@@ -27,7 +27,7 @@ namespace LibreNMS\Tests;
 
 use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
-class OSDiscoveryTest extends \PHPUnit_Framework_TestCase
+class OSDiscoveryTest extends TestCase
 {
     private static $unchecked_files;
 
@@ -122,9 +122,9 @@ class OSDiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             'device_id' => 1,
-            'hostname' => '127.0.0.1',
+            'hostname' => $this->snmpsimIp,
             'snmpver' => 'v2c',
-            'port' => 11161,
+            'port' => $this->snmpsimPort,
             'timeout' => 3,
             'retries' => 0,
             'snmp_max_repeaters' => 10,
