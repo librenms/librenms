@@ -31,6 +31,7 @@ source: Support/FAQ.md
  - [Why does modifying 'Default Alert Template' fail?](#faq31)
  - [Why would alert un-mute itself](#faq32)
  
+ 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
  - [What information do you need to add a new OS?](#faq20)
@@ -351,3 +352,5 @@ mysql -u librenms -p < sql-schema/202.sql
 ### <a name="faq32"> Why would alert un-mute itself?</a> 
 If alert un-mutes itself then it most likely means that the alert cleared and is then triggered again.
 Please review eventlog as it will tell you in there.
+
+
