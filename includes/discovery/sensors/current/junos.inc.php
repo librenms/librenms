@@ -28,21 +28,3 @@ foreach ($pre_cache['junos_oids'] as $index => $entry) {
         discover_sensor($valid['sensor'], 'current', $device, $oid, 'tx-' . $index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }
 }
-$multiplier = 1;
-$divisor    = 1000;
-foreach ($pre_cache['junos_ifoptics_oids'] as $index => $entry) {
-    if (is_numeric($entry['jnxPMCurTxLaserBiasCurrent'])) {
-        $oid = '.1.3.6.1.4.1.2636.3.71.1.2.1.1.35.'.$index;
-        $interface = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id']));
-        $descr = $interface . ' Tx Bias';
-
-        $limit_low = $null;
-        $warn_limit_low = null;
-        $limit = null;
-        $warn_limit = null;
-        $current = $entry['jnxPMCurTxLaserBiasCurrent']*$multiplier;
-        $entPhysicalIndex = $index;
-        $entPhysicalIndex_measured = 'ports';
-        discover_sensor($valid['sensor'], 'current', $device, $oid, $index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
-    }
-}

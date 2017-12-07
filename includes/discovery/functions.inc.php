@@ -1019,6 +1019,10 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         }
                     }
 
+
+                    $entPhysicalIndex = str_replace('{{ $index }}', $index, $data['entPhysicalIndex']) ?: null;
+                    $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
+
                     $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
                     $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
                     $low_limit = is_numeric($data['low_limit']) ? $data['low_limit'] : dynamic_discovery_get_value('low_limit', $index, $data, $pre_cache, 'null');
@@ -1038,9 +1042,16 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                             $value = $value * $multiplier;
                         }
                     }
+                    
+                    if (isset($data['user_func']) && function_exists($data['user_func'])) {
+                        $user_func = $data['user_func'];
+                        $value = $user_func($value);
+                    } else {
+                        $user_func = null;
+                    }
 
                     $uindex = str_replace('{{ $index }}', $index, $data['index'] ?: $index);
-                    discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value);
+                    discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_func);
 
                     if ($sensor_type === 'state') {
                         create_sensor_to_state_index($device, $sensor_name, $uindex);

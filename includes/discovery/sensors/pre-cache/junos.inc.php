@@ -16,12 +16,6 @@ $pre_cache['junos_oids'] = snmpwalk_cache_multi_oid($device, 'JnxDomCurrentEntry
 echo 'JnxDomCurrentLaneEntry ';
 $pre_cache['junos_multilane_oids'] = snmpwalk_cache_multi_oid($device, 'JnxDomCurrentLaneEntry', array(), 'JUNIPER-DOM-MIB', 'junos');
 
-echo 'jnxOpticsPMCurrentEntry ';
-$pre_cache['junos_ifoptics_oids'] = snmpwalk_cache_multi_oid($device, 'jnxOpticsPMCurrentEntry', array(), 'JUNIPER-IFOPTICS-MIB', 'junos');
-
-echo 'jnxOptics ';
-$pre_cache['junos_ifoptics2_oids'] = snmpwalk_cache_multi_oid($device, 'jnxOptics', array(), 'JUNIPER-IFOPTICS-MIB', 'junos');
-
 echo 'jnxoptIfOTNPMFECCurrentTable';
 $pre_cache['junos_ifotn_oids'] = snmpwalk_cache_multi_oid($device, 'jnxoptIfOTNPMFECCurrentTable', array(), 'JNX-OPT-IF-EXT-MIB', 'junos', '-OQUsb');
 
