@@ -96,7 +96,7 @@ class ProcessorTest extends DBTestCase
     public function dumpedDataProvider()
     {
         $install_dir = Config::get('install_dir');
-        $dump_files = glob( "$install_dir/tests/data/*.json");
+        $dump_files = glob("$install_dir/tests/data/*.json");
         $data = array();
 
         foreach ($dump_files as $file) {

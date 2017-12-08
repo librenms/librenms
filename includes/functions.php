@@ -2421,7 +2421,7 @@ function dump_module_data($device_id, $module)
     foreach ($tables as $table => $excluded_fields) {
         $rows = dbFetchRows("SELECT * FROM `$table` $where", $params);
         $keys = array_flip($excluded_fields);
-        $data[$table] = array_map(function($row) use ($keys){
+        $data[$table] = array_map(function ($row) use ($keys) {
             return array_diff_key($row, $keys);
         }, $rows);
     }

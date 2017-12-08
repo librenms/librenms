@@ -75,7 +75,7 @@ if (isset($options['v'])) {
 $output_file = $install_dir . "/tests/data/$target_os$variant.json";
 if (isset($options['f'])) {
     $output_file = $options['f'];
-} elseif(isset($options['file'])) {
+} elseif (isset($options['file'])) {
     $output_file = $options['file'];
 }
 
@@ -206,7 +206,8 @@ if (isset($options['no-save'])) {
 }
 
 
-function convert_snmpwalk_to_snmprec(array $snmp_data) {
+function convert_snmpwalk_to_snmprec(array $snmp_data)
+{
     $snmpTypes = array(
         'STRING' => '4',
         'OID' => '6',
@@ -302,7 +303,7 @@ function compareOid($a, $b)
     $a_oid = explode('.', $a);
     $b_oid = explode('.', $b);
 
-    foreach ($a_oid as $index =>$a_part) {
+    foreach ($a_oid as $index => $a_part) {
         $b_part = $b_oid[$index];
         if ($a_part > $b_part) {
             return 1; // a is higher
