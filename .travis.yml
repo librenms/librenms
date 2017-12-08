@@ -33,7 +33,7 @@ cache:
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y snmp
+  - sudo apt-get install -y snmp fping
   - mysql -e 'CREATE DATABASE librenms_phpunit_78hunjuybybh;'
 
 install:
