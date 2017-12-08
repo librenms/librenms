@@ -107,7 +107,10 @@ if ($device) {
     preg_match_all('/SNMP\[.*snmp(bulk)?([a-z]+) .+:HOSTNAME:[0-9]+ ([0-9.a-zA-Z:\-]+)\]/', $discover_output, $snmp_matches);
 
     // extract mibs and group with oids
-    $snmp_oids = array();
+    $snmp_oids = array(
+        array('oid' => 'sysDescr', 'mib' => 'SNMPv2-MIB', 'method' => 'getnext'),
+        array('oid' => 'sysObjectID', 'mib' => 'SNMPv2-MIB', 'method' => 'getnext'),
+    );
     foreach ($snmp_matches[0] as $index => $line) {
         preg_match('/-m ([a-zA-Z:\-]+)/', $line, $mib_matches);
         $snmp_oids[] = array(
@@ -130,15 +133,16 @@ if ($device) {
             $data = snmp_getnext($device, $oid_data['oid'], $options, $oid_data['mib']);
         }
         if (isset($data) && $data !== false) {
-            $snmprec_data[] = convert_snmpwalk_to_snmprec($data);
+            $snmprec_data[] = convert_snmpwalk_to_snmprec(explode(PHP_EOL, $data));
         }
     }
     echo PHP_EOL . PHP_EOL;
 
     save_snmprec_data($snmprec_file, $snmprec_data);
+
+    echo PHP_EOL;
 }
 
-echo PHP_EOL;
 
 // Now use the saved data to update the saved database data
 $snmpsim_log = "/tmp/snmpsimd.log";
@@ -202,7 +206,7 @@ if (isset($options['no-save'])) {
 }
 
 
-function convert_snmpwalk_to_snmprec($data) {
+function convert_snmpwalk_to_snmprec(array $snmp_data) {
     $snmpTypes = array(
         'STRING' => '4',
         'OID' => '6',
@@ -222,16 +226,32 @@ function convert_snmpwalk_to_snmprec($data) {
         'Network Address' => '4'
     );
 
-    $result = preg_replace_callback('/^\.?([0-9.]+) = (.+): (.*)$/', function ($matches) use ($snmpTypes) {
-        $type_code = $snmpTypes[$matches[2]];
+    $result = array();
+    foreach ($snmp_data as $line) {
+        if (str_contains($line, ' = ')) {
+            preg_match('/^\.?([0-9.]+) = (.+): (.*)$/', $line, $matches);
+            $oid = $matches[1];
+            $type = $snmpTypes[$matches[2]];
+            $data = $matches[3];
 
-        // remove leading . from oid data
-        if ($type_code == '6') {
-            $matches[3] = ltrim($matches[3], '.');
+            // remove leading . from oid data
+            if ($type == '6') {
+                $data = ltrim($data, '.');
+            }
+
+            $result[] = "$oid|$type|$data";
+        } else {
+            // multi-line data, append to last
+            $last = end($result);
+
+            list($oid, $type, $data) = explode('|', $last, 3);
+            if ($type == '4x') {
+                $result[key($result)] .= bin2hex(PHP_EOL . $line);
+            } else {
+                $result[key($result)] = "$oid|4x|" . bin2hex($data . PHP_EOL . $line);
+            }
         }
-
-        return "{$matches[1]}|$type_code|{$matches[3]}";
-    }, $data);
+    }
 
     return $result;
 }
@@ -240,7 +260,7 @@ function convert_snmpwalk_to_snmprec($data) {
 function save_snmprec_data($file, array $data, $write = true)
 {
     if (is_file($file)) {
-        $existing_data = index_snmprec(file_get_contents($file));
+        $existing_data = index_snmprec(explode(PHP_EOL, file_get_contents($file)));
     } else {
         $existing_data = array();
     }
@@ -262,12 +282,11 @@ function save_snmprec_data($file, array $data, $write = true)
     return $output;
 }
 
-function index_snmprec($snmprec_data)
+function index_snmprec(array $snmprec_data)
 {
     $result = array();
 
-    $lines = explode("\n", $snmprec_data);
-    foreach ($lines as $line) {
+    foreach ($snmprec_data as $line) {
         if (!empty($line)) {
             list($oid, $type, $data) = explode('|', $line, 3);
             $result[$oid] = $line;
