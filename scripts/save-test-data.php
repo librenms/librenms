@@ -122,13 +122,16 @@ if ($device) {
         array('oid' => 'sysObjectID', 'mib' => 'SNMPv2-MIB', 'method' => 'getnext'),
     );
     foreach ($snmp_matches[0] as $index => $line) {
-        preg_match('/-m ([a-zA-Z:\-]+)/', $line, $mib_matches);
+        preg_match('/-m ([a-zA-Z0-9:\-]+)/', $line, $mib_matches);
         $snmp_oids[] = array(
             'oid' => $snmp_matches[3][$index],
             'mib' => $mib_matches[1],
             'method' => $snmp_matches[2][$index],
         );
     }
+
+    d_echo("Data to capture ");
+    d_echo($snmp_oids);
 
     echo "Capturing Data:";
     $snmprec_data = array();
@@ -244,18 +247,27 @@ function convert_snmp_to_snmprec(array $snmp_data)
 
     $result = array();
     foreach ($snmp_data as $line) {
+        if(empty($line)) {
+            continue;
+        }
+
         if (str_contains($line, ' = ')) {
-            preg_match('/^\.?([0-9.]+) = (.+): (.*)$/', $line, $matches);
-            $oid = $matches[1];
-            $type = $snmpTypes[$matches[2]];
-            $data = $matches[3];
+            list($oid, $raw_data) = explode(' = ', $line,2);
+            $oid = ltrim($oid, '.');
 
-            // remove leading . from oid data
-            if ($type == '6') {
-                $data = ltrim($data, '.');
+            if (empty($raw_data)) {
+                $result[] = "$oid|4|"; // empty data, we don't know type, put string
+            } else {
+                list($raw_type, $data) = explode(': ', $raw_data, 2);
+                $type = $snmpTypes[$raw_type];
+
+                // remove leading . from oid data
+                if ($type == '6') {
+                    $data = ltrim($data, '.');
+                }
+
+                $result[] = "$oid|$type|$data";
             }
-
-            $result[] = "$oid|$type|$data";
         } else {
             // multi-line data, append to last
             $last = end($result);
