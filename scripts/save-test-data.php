@@ -22,12 +22,11 @@ $options = getopt(
     )
 );
 
-$debug = (isset($options['d']) || isset($options['debug']));
-$vdebug = $debug;
-$snmpsim_ip = '127.1.6.1';
-
 $init_modules = array('discovery');
 require $install_dir . '/includes/init.php';
+
+$debug = (isset($options['d']) || isset($options['debug']));
+$vdebug = $debug;
 
 if (isset($options['h'])) {
     $hostname = $options['h'];
@@ -158,6 +157,7 @@ if ($device) {
 
 
 // Now use the saved data to update the saved database data
+$snmpsim_ip = '127.1.6.1';
 $snmpsim_log = "/tmp/snmpsimd.log";
 $snmpsim_cmd = "snmpsimd.py --data-dir=./tests/snmpsim --agent-udpv4-endpoint=$snmpsim_ip:1161 --logging-method=file:$snmpsim_log";
 echo "Starting snmpsimd... ";
@@ -197,6 +197,8 @@ $data = dump_module_data($device['device_id'], $module);
 
 if ($device['hostname'] == $snmpsim_ip) {
     // Remove the test device
+    $debug = false;
+    $vdebug = false;
     echo delete_device($device['device_id'])."\n";
 }
 
