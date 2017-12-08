@@ -54,7 +54,17 @@ if (isset($hostname)) {
 }
 
 if (isset($options['help']) || !isset($target_os)) {
-    echo "Insert help here\n";
+    echo "Script to extract test data from devices or update test data
+
+Usage:
+  You must specify hostname or os.
+  -h, --hostname   ID, IP, or hostname of the device to extract data from
+                   If this is not given, the existing snmp data will be used
+  -o, --os         Name of the OS to save test data for
+  -v, --variant    The variant of the OS to use, usually the device model
+  -m, --module     The discovery/poller module to collect data for
+  -f, --file       File to save the database entries to.  Default is in tests/data/
+";
     exit;
 }
 
@@ -123,8 +133,9 @@ if ($device) {
     echo "Capturing Data:";
     $snmprec_data = array();
     foreach ($snmp_oids as $oid_data) {
-        $options = '-OUneb';
         echo " " . $oid_data['oid'];
+
+        $options = '-OUneb';
         if ($oid_data['method'] == 'walk') {
             $data = snmp_walk($device, $oid_data['oid'], $options, $oid_data['mib']);
         } elseif ($oid_data['method'] == 'get') {
@@ -132,8 +143,9 @@ if ($device) {
         } elseif ($oid_data['method'] == 'getnext') {
             $data = snmp_getnext($device, $oid_data['oid'], $options, $oid_data['mib']);
         }
+
         if (isset($data) && $data !== false) {
-            $snmprec_data[] = convert_snmpwalk_to_snmprec(explode(PHP_EOL, $data));
+            $snmprec_data[] = convert_snmp_to_snmprec(explode(PHP_EOL, $data));
         }
     }
     echo PHP_EOL . PHP_EOL;
@@ -206,7 +218,7 @@ if (isset($options['no-save'])) {
 }
 
 
-function convert_snmpwalk_to_snmprec(array $snmp_data)
+function convert_snmp_to_snmprec(array $snmp_data)
 {
     $snmpTypes = array(
         'STRING' => '4',
