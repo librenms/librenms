@@ -259,6 +259,7 @@ function convert_snmp_to_snmprec(array $snmp_data)
                 $result[] = "$oid|4|"; // empty data, we don't know type, put string
             } else {
                 list($raw_type, $data) = explode(':', $raw_data, 2);
+                $data = ltrim($data, ' ');
                 $type = $snmpTypes[$raw_type];
 
                 // remove leading . from oid data
