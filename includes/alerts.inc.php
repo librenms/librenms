@@ -880,14 +880,13 @@ function ExtTransports($obj)
  */
 function IsParentDown($device)
 {
-    $parent_id = dbFetchCell("SELECT `parent_id` from `devices` WHERE device_id = ?", array($device));
+    $parent_id = dbFetchRows("SELECT `parent_device_id` from `device_relationships` WHERE `child_device_id` = ?", array($device));
     if (!$parent_id || $parent_id == null || $parent_id == 0) {
         return false;
     }
 
-    $device_arr = explode(',', $parent_id);
-    foreach ($device_arr as $i) {
-        $result = dbFetchCell("SELECT 1 from devices as a LEFT JOIN devices_attribs as b ON a.device_id=b.device_id WHERE a.status = 0 AND a.device_id = ? AND  (a.status_reason = 'icmp' OR (b.attrib_type='override_icmp_disable' AND b.attrib_value=true))", array($i));
+    foreach ($parent_id as $i) {
+        $result = dbFetchCell("SELECT 1 from devices as a LEFT JOIN devices_attribs as b ON a.device_id=b.device_id WHERE a.status = 0 AND a.device_id = ? AND  (a.status_reason = 'icmp' OR (b.attrib_type='override_icmp_disable' AND b.attrib_value=true))", array($i['parent_device_id']));
         if (!$result) {
             // If any of the parents is up just return false
             // No need to execute more db queries

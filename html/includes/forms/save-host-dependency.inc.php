@@ -36,20 +36,13 @@ if (is_admin() === false) {
             $status = array('status' => 1, 'message' => 'A device cannot depend itself');
             break;
         }
-        $device_arr[] = $dev;
-    }
-
-    if (!isset($status) || empty($status)) {
-        $devclause = dbGenPlaceholders(count($device_arr));
-        $parent_arr = implode(',', $_POST['parent_ids']);
- 
-        if (dbQuery('UPDATE `devices` SET `parent_id` = ?  WHERE `device_id` IN' . $devclause, array($parent_arr, $device_arr))) {
-            $status = array('status' => 0, 'message' => 'Host dependencies have been set');
-        } else {
-            $status = array('status' => 1, 'message' => 'Host dependencies cannot be set.');
+        foreach ($_POST['parent_ids'] as $parent) {
+            if (is_numeric($parent)) {
+                dbInsert(array('parent_device_id' => $parent, 'child_device_id' => $dev), 'device_relationships');
+            }
         }
+        $status = array('status' => 0, 'message' => 'Host dependencies have been saved');
     }
 }
-
 header('Content-Type: application/json');
 echo _json_encode($status);

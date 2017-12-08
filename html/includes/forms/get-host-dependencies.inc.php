@@ -19,7 +19,7 @@ if (is_admin() === false) {
         if ($_POST['viewtype'] == 'fulllist') {
             $count_query = "SELECT count(device_id) from devices";
 
-            $deps_query = "SELECT  a.device_id as id, a.hostname as hostname, GROUP_CONCAT(b.hostname ORDER BY b.device_id) parents, a.parent_id as parentid FROM devices a LEFT JOIN devices b ON FIND_IN_SET(b.device_id, a.parent_id) > 0 GROUP BY a.device_id";
+            $deps_query = "SELECT  a.device_id as id, a.hostname as hostname, GROUP_CONCAT(b.hostname) as parents, GROUP_CONCAT(b.device_id) as parentid FROM devices as a LEFT JOIN device_relationships a1 ON a.device_id=a1.child_device_id LEFT JOIN devices b ON b.device_id=a1.parent_device_id GROUP BY a.device_id, a.hostname";
 
             if (isset($_POST['format'])) {
                 if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {

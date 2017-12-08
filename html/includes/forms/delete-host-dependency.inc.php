@@ -18,7 +18,7 @@ if (is_admin() === false) {
     if (!is_numeric($_POST['device_id'])) {
         $status = array('status' => 1, 'message' => 'Wrong device id!');
     } else {
-        if (dbUpdate(array('parent_id' => 0), 'devices', '`device_id` =  ?', array($_POST['device_id']))) {
+        if (dbDelete('device_relationships', '`child_device_id` = ?', array($_POST['device_id']))) {
             $status = array('status' => 0, 'message' => 'Host dependency has been deleted.');
         } else {
             $status = array('status' => 1, 'message' => 'Host Dependency cannot be deleted.');
