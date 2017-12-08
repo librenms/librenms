@@ -17,6 +17,7 @@ $long_opts = array(
     'fail-fast',
     'passthru',
     'snmpsim',
+    'db',
     'commands',
     'help',
 );
@@ -30,7 +31,8 @@ Running $filename without options runs all checks.
   -u, --unit      Run phpunit tests
   -f, --fail-fast Quit when any failure is encountered
   -p, --passthru  Display output from checks as it comes
-      --snmpsim   Use snmpsim on 127.0.0.1:11161 for unit tests
+      --db        Run unit tests that require a database
+      --snmpsim   Use snmpsim for unit tests
   -c, --commands  Print commands only, no checks
   -h, --help      Show this help text.\n";
     exit();
@@ -39,7 +41,6 @@ Running $filename without options runs all checks.
 // set up some variables
 $passthru = check_opt($options, 'p', 'passthru');
 $command_only = check_opt($options, 'c', 'commands');
-$snmpsim = check_opt($options, 'snmpsim');
 $fail_fast = check_opt($options, 'f', 'fail-fast');
 $return = 0;
 $completed_tests = array(
@@ -54,6 +55,14 @@ if ($all) {
     $options += array('u' => false, 's' => false, 'l' => false);
 }
 
+if (check_opt($options, 'snmpsim')) {
+    putenv('SNMPSIM=1');
+}
+
+if (check_opt($options, 'db')) {
+    putenv('DBTEST=1');
+}
+
 // run tests in the order they were specified
 foreach (array_keys($options) as $opt) {
     $ret = 0;
@@ -62,7 +71,7 @@ foreach (array_keys($options) as $opt) {
     } elseif ($opt == 's' || $opt == 'style') {
         $ret = run_check('style', $passthru, $command_only);
     } elseif ($opt == 'u' || $opt == 'unit') {
-        $ret = run_check('unit', $passthru, $command_only, $fail_fast, $snmpsim);
+        $ret = run_check('unit', $passthru, $command_only, $fail_fast);
     }
 
     if ($fail_fast && $ret !== 0 && $ret !== 250) {
@@ -202,16 +211,11 @@ function check_style($passthru = false, $command_only = false)
  * @param bool $passthru display the output as comes in
  * @param bool $command_only only display the intended command, no checks
  * @param bool $fail_fast Stop when any error or failure is encountered
- * @param bool $snmpsim send snmp requests to snmpsim listening on 127.0.0.1:11161
  * @return int the return value from phpunit (0 = success)
  */
-function check_unit($passthru = false, $command_only = false, $fail_fast = false, $snmpsim = false)
+function check_unit($passthru = false, $command_only = false, $fail_fast = false)
 {
     $phpunit_bin = check_exec('phpunit');
-
-    if ($snmpsim) {
-        putenv('SNMPSIM=1');
-    }
 
     $phpunit_cmd = "$phpunit_bin --colors=always";
 

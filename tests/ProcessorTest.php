@@ -79,13 +79,13 @@ class ProcessorTest extends DBTestCase
         // Remove the test device
         delete_device($device_id);
 
-        $this->assertSame(
+        $this->assertEquals(
             $expected_data,
             $discover_data,
             "OS $target_os: Discovered {$this->module} data does not match that found in $filename"
         );
 
-        $this->assertSame(
+        $this->assertEquals(
             $expected_data,
             $poll_data,
             "OS $target_os: Polled {$this->module} data does not match that found in $filename"

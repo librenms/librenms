@@ -12,6 +12,7 @@ $options = getopt(
     'h:dm:o:v:f:',
     array(
         'debug',
+        'no-save',
         'hostname:',
         'help',
         'module:',
@@ -132,38 +133,41 @@ if ($device) {
 
     }
 
-    merge_snmprec_data($snmprec_file, $snmprec_data);
-} else {
-    $snmpsim_log = "/tmp/snmpsimd.log";
-    $snmpsim_cmd = "snmpsimd.py --data-dir=./tests/snmpsim --agent-udpv4-endpoint=$snmpsim_ip:1161 --logging-method=file:$snmpsim_log";
-    echo "Starting snmpsimd...\n";
-    d_echo($snmpsim_cmd);
-    $proc_snmpsimd = new Proc($snmpsim_cmd);
-    echo "Logfile: $snmpsim_log\n";
-
-    // Remove existing device in case it didn't get removed previously
-    if ($existing_device = device_by_name($snmpsim_ip)) {
-        delete_device($existing_device['device_id']);
-    }
-
-    try {
-        // Add the test device
-        $config['snmp']['community'] = array($target_os . $variant);
-        $device_id = addHost($snmpsim_ip, 'v2c', 1161);
-        echo "Added device: $device_id\n";
-    } catch (Exception $e) {
-        echo $e->getMessage() . PHP_EOL;
-        exit;
-    }
-
-    // Populate the device variable
-    $device = device_by_id_cache($device_id);
-
-    // Run discovery
-    discover_device($device, $module == 'all' ? array() : array('m' => $module));
-
+    save_snmprec_data($snmprec_file, $snmprec_data);
 }
 
+// Now use the saved data to update the saved database data
+$snmpsim_log = "/tmp/snmpsimd.log";
+$snmpsim_cmd = "snmpsimd.py --data-dir=./tests/snmpsim --agent-udpv4-endpoint=$snmpsim_ip:1161 --logging-method=file:$snmpsim_log";
+echo "Starting snmpsimd...\n";
+d_echo($snmpsim_cmd);
+$proc_snmpsimd = new Proc($snmpsim_cmd);
+echo "Logfile: $snmpsim_log\n";
+if (!$proc_snmpsimd->isRunning()) {
+    echo `tail -5 $snmpsim_log` . PHP_EOL;
+}
+
+
+// Remove existing device in case it didn't get removed previously
+if ($existing_device = device_by_name($snmpsim_ip)) {
+    delete_device($existing_device['device_id']);
+}
+
+try {
+    // Add the test device
+    $config['snmp']['community'] = array($target_os . $variant);
+    $device_id = addHost($snmpsim_ip, 'v2c', 1161);
+    echo "Added device: $device_id\n";
+} catch (Exception $e) {
+    echo $e->getMessage() . PHP_EOL;
+    exit;
+}
+
+// Populate the device variable
+$device = device_by_id_cache($device_id);
+
+// Run discovery
+discover_device($device, $module == 'all' ? array() : array('m' => $module));
 
 // Dump the discovered data
 $data = dump_module_data($device['device_id'], $module);
@@ -173,12 +177,23 @@ if ($device['hostname'] == $snmpsim_ip) {
     echo delete_device($device['device_id'])."\n";
 }
 
-d_echo($data);
+if (isset($options['no-save'])) {
+    echo "Result: ";
+    print_r($data);
+} else {
+    d_echo($data);
 
-// Save the data to the default test data location (or elsewhere if specified)
-file_put_contents($output_file, _json_encode($data));
-echo "Saved to $output_file\n";
-echo "Ready for testing!\n";
+    // Save the data to the default test data location (or elsewhere if specified)
+    $existing_data = json_decode(file_get_contents($output_file), true);
+
+    foreach ($data as $module_name => $module_data) {
+        $existing_data[$module_name] = $module_data;
+    }
+
+    file_put_contents($output_file, _json_encode($data));
+    echo "Saved to $output_file\n";
+    echo "Ready for testing!\n";
+}
 
 
 function convert_snmpwalk_to_snmprec($data) {
@@ -216,7 +231,7 @@ function convert_snmpwalk_to_snmprec($data) {
 }
 
 
-function merge_snmprec_data($file, array $data, $write = true)
+function save_snmprec_data($file, array $data, $write = true)
 {
     if (is_file($file)) {
         $existing_data = index_snmprec(file_get_contents($file));
@@ -229,10 +244,12 @@ function merge_snmprec_data($file, array $data, $write = true)
     }
 
     usort($existing_data, 'compareOid');
+
     $output = implode(PHP_EOL, $existing_data) . PHP_EOL;
 
     if ($write) {
         echo "Updated snmprec data $file\n";
+        echo "Verify these files do not contain any private data before submitting\n";
         file_put_contents($file, $output);
     }
 
@@ -245,8 +262,10 @@ function index_snmprec($snmprec_data)
 
     $lines = explode("\n", $snmprec_data);
     foreach ($lines as $line) {
-        list($oid, $type, $data) = explode('|', $line, 3);
-        $result[$oid] = $line;
+        if (!empty($line)) {
+            list($oid, $type, $data) = explode('|', $line, 3);
+            $result[$oid] = $line;
+        }
     }
 
     return $result;
