@@ -117,9 +117,11 @@ if ($device) {
         );
     }
 
+    echo "Capturing Data:";
     $snmprec_data = array();
     foreach ($snmp_oids as $oid_data) {
         $options = '-OUneb';
+        echo " " . $oid_data['oid'];
         if ($oid_data['method'] == 'walk') {
             $data = snmp_walk($device, $oid_data['oid'], $options, $oid_data['mib']);
         } elseif ($oid_data['method'] == 'get') {
@@ -127,19 +129,21 @@ if ($device) {
         } elseif ($oid_data['method'] == 'getnext') {
             $data = snmp_getnext($device, $oid_data['oid'], $options, $oid_data['mib']);
         }
-        if (isset($data) && $data) {
+        if (isset($data) && $data !== false) {
             $snmprec_data[] = convert_snmpwalk_to_snmprec($data);
         }
-
     }
+    echo PHP_EOL . PHP_EOL;
 
     save_snmprec_data($snmprec_file, $snmprec_data);
 }
 
+echo PHP_EOL;
+
 // Now use the saved data to update the saved database data
 $snmpsim_log = "/tmp/snmpsimd.log";
 $snmpsim_cmd = "snmpsimd.py --data-dir=./tests/snmpsim --agent-udpv4-endpoint=$snmpsim_ip:1161 --logging-method=file:$snmpsim_log";
-echo "Starting snmpsimd...\n";
+echo "Starting snmpsimd... ";
 d_echo($snmpsim_cmd);
 $proc_snmpsimd = new Proc($snmpsim_cmd);
 echo "Logfile: $snmpsim_log\n";
@@ -168,6 +172,8 @@ $device = device_by_id_cache($device_id);
 
 // Run discovery
 discover_device($device, $module == 'all' ? array() : array('m' => $module));
+
+echo PHP_EOL;
 
 // Dump the discovered data
 $data = dump_module_data($device['device_id'], $module);
@@ -240,7 +246,7 @@ function save_snmprec_data($file, array $data, $write = true)
     }
 
     foreach ($data as $part) {
-        array_merge($existing_data, index_snmprec($part));
+        $existing_data = array_merge($existing_data, index_snmprec($part));
     }
 
     usort($existing_data, 'compareOid');
