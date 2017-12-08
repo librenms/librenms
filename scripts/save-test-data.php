@@ -64,6 +64,8 @@ Usage:
   -v, --variant    The variant of the OS to use, usually the device model
   -m, --module     The discovery/poller module to collect data for
   -f, --file       File to save the database entries to.  Default is in tests/data/
+  -d, --debug      Enable debug output
+      --no-save    Don't save database entries, print them out instead
 ";
     exit;
 }
@@ -89,8 +91,7 @@ if (isset($options['f'])) {
     $output_file = $options['file'];
 }
 
-// capture data
-
+// Capture snmp data
 if ($device) {
     $snmprec_file = $install_dir . "/tests/snmpsim/$target_os$variant.snmprec";
 
