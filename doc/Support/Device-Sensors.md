@@ -30,19 +30,19 @@ Drive Status, Memory Status, Power Supply Status.
 1 = Warning
 2 = Critical
 3 = Unknown
-````
+```
 
 ### Alerting Sensors
 
 These alert rules can be found inside the Alert Rules Collection. The alert rules below are
 the default alert rules, there are more device-specific alert rules in the alerts collection. 
 
-Sensor Over Limit Alert Rule:  Will alert on any sensor value that is over the limit.
+**Sensor Over Limit Alert Rule:**  Will alert on any sensor value that is over the limit.
 
-Sensor Under Limit Alert Rule: Will alert on any sensor value that is under the limit.
+**Sensor Under Limit Alert Rule:** Will alert on any sensor value that is under the limit.
 
 **Remember** you can set these limits inside device settings in the Web UI.
 
-State Sensor Critical: Will alert on any state that returns critical = 2
+**State Sensor Critical:** Will alert on any state that returns critical = 2
 
-State Sensor Warning: Will alert on any state that returns warning = 1
+**State Sensor Warning:** Will alert on any state that returns warning = 1
