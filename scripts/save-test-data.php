@@ -297,7 +297,7 @@ function save_snmprec_data($file, array $data, $write = true)
         $existing_data = array_merge($existing_data, index_snmprec($part));
     }
 
-    usort($existing_data, 'compareOid');
+    uksort($existing_data, 'compareOid');
 
     $output = implode(PHP_EOL, $existing_data) . PHP_EOL;
 
