@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests;
 
-class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
+class CommonFunctionsTest extends TestCase
 {
     public function testStrContains()
     {
