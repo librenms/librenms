@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests;
 
-class TestCase extends \PHPUnit_Framework_TestCase
+abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
     protected $snmpsimIp = '127.1.6.2';
     protected $snmpsimPort = 1161;
