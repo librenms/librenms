@@ -247,12 +247,12 @@ function convert_snmp_to_snmprec(array $snmp_data)
 
     $result = array();
     foreach ($snmp_data as $line) {
-        if(empty($line)) {
+        if (empty($line)) {
             continue;
         }
 
         if (str_contains($line, ' = ')) {
-            list($oid, $raw_data) = explode(' = ', $line,2);
+            list($oid, $raw_data) = explode(' = ', $line, 2);
             $oid = ltrim($oid, '.');
 
             if (empty($raw_data)) {
