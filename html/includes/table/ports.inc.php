@@ -141,6 +141,24 @@ foreach (dbFetchRows($query, $param) as $port) {
     $device = device_by_id_cache($port['device_id']);
     $port = cleanPort($port, $device);
 
+    switch($port['ifOperStatus']) {
+        case 'up':
+            $status = '<span class="alert-status label-success">&nbsp;</span>';
+            break;
+        case 'down':
+            switch($port['ifAdminStatus']) {
+                case 'up':
+                    $status = '<span class="alert-status label-danger">&nbsp;</span>';
+                    break;
+                case 'down':
+                    $status = '<span class="alert-status label-warning">&nbsp;</span>';
+                    break;
+            }
+            break;
+    }
+
+    //print_r($port['ifOperStatus']);
+
     // FIXME what actions should we have?
     $actions = '<div class="container-fluid"><div class="row">';
 
@@ -165,6 +183,7 @@ foreach (dbFetchRows($query, $param) as $port) {
     $actions .= '</div></div>';
 
     $response[] = array(
+        'status' => $status,
         'device' => generate_device_link($device),
         'port' => generate_port_link($port),
         'ifLastChange' => ceil($port['secondsIfLastChange']),

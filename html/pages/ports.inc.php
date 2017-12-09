@@ -21,31 +21,24 @@ if (!isset($vars['format'])) {
     $vars['format'] = "list_basic";
 }
 
-print_optionbar_start();
-
-echo('<span style="font-weight: bold;">Lists</span> &#187; ');
+$displayLists = '';
+$displayLists .= '<span style="font-weight: bold;">Ports lists</span> &#187; ';
 
 $menu_options = array('basic' => 'Basic', 'detail' => 'Detail');
 
 $sep = "";
 foreach ($menu_options as $option => $text) {
-    echo($sep);
+    $displayLists .= $sep;
     if ($vars['format'] == "list_" . $option) {
-        echo("<span class='pagemenu-selected'>");
+        $displayLists .= '<span class="pagemenu-selected">';
     }
-    echo('<a href="' . generate_url($vars, array('format' => "list_" . $option)) . '">' . $text . '</a>');
+    $displayLists .= '<a href="' . generate_url($vars, array('format' => "list_" . $option)) . '">' . $text . '</a>';
     if ($vars['format'] == "list_" . $option) {
-        echo("</span>");
+        $displayLists .= '</span>';
     }
     $sep = " | ";
 }
-?>
-
-    |
-
-    <span style="font-weight: bold;">Graphs</span> &#187;
-
-<?php
+$displayLists .= '&nbsp;&nbsp;<span style="font-weight: bold;">Graphs</span> &#187';
 
 $menu_options = array('bits' => 'Bits',
     'upkts' => 'Unicast Packets',
@@ -54,43 +47,35 @@ $menu_options = array('bits' => 'Bits',
 
 $sep = "";
 foreach ($menu_options as $option => $text) {
-    echo($sep);
+    $displayLists .= $sep;
     if ($vars['format'] == 'graph_' . $option) {
-        echo('<span class="pagemenu-selected">');
+        $displayLists .= '<span class="pagemenu-selected">';
     }
-    echo('<a href="' . generate_url($vars, array('format' => 'graph_' . $option)) . '">' . $text . '</a>');
+    $displayLists .= '<a href="' . generate_url($vars, array('format' => 'graph_' . $option)) . '">' . $text . '</a>';
     if ($vars['format'] == 'graph_' . $option) {
-        echo("</span>");
+        $displayLists .= '</span>';
     }
     $sep = " | ";
 }
 
-echo('<div style="float: right;">');
-?>
+$displayLists .= '<div style="float: right;">';
+$displayLists .= '<a href="csv.php/report=' . generate_url($vars, array('format' => '')) . '" title="Export as CSV" target="_blank" rel="noopener">Export CSV</a> | <a href="' . generate_url($vars) . '" title="Update the browser URL to reflect the search criteria.">Update URL</a>';
 
-    <a href="csv.php/report=<?php echo generate_url($vars, array('format' => '')); ?>" title="Export as CSV" target="_blank"
-       rel="noopener">Export CSV</a> |
-    <a href="<?php echo(generate_url($vars)); ?>" title="Update the browser URL to reflect the search criteria.">Update
-        URL</a> |
-
-<?php
 if (isset($vars['searchbar']) && $vars['searchbar'] == "hide") {
-    echo('<a href="' . generate_url($vars, array('searchbar' => '')) . '">Search</a>');
+    $displayLists .= '<a href="' . generate_url($vars, array('searchbar' => '')) . '">Search</a>';
 } else {
-    echo('<a href="' . generate_url($vars, array('searchbar' => 'hide')) . '">Search</a>');
+    $displayLists .= '<a href="' . generate_url($vars, array('searchbar' => 'hide')) . '">Search</a>';
 }
 
-echo("  | ");
+$displayLists .= ' | ';
 
 if (isset($vars['bare']) && $vars['bare'] == "yes") {
-    echo('<a href="' . generate_url($vars, array('bare' => '')) . '">Header</a>');
+    $displayLists .= '<a href="' . generate_url($vars, array('bare' => '')) . '">Header</a>';
 } else {
-    echo('<a href="' . generate_url($vars, array('bare' => 'yes')) . '">Header</a>');
+    $displayLists .= '<a href="' . generate_url($vars, array('bare' => 'yes')) . '">Header</a>';
 }
 
-echo('</div>');
-
-print_optionbar_end();
+$displayLists .= '</div>';
 
 if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars['searchbar'])) {
     $output = "<div class='pull-left'>";
@@ -110,7 +95,8 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
         } else {
             $deviceselected = "";
         }
-        $output .= "<option value='" . $data['device_id'] . "' ".$deviceselected.">".format_hostname($data)."</option>";
+        $ui_device = strlen(format_hostname($data)) > 25 ? substr(format_hostname($data),0,25)."..." : format_hostname($data);
+        $output .= "<option value='" . $data['device_id'] . "' " . $deviceselected . ">" . $ui_device . "</option>";
     }
 
     if ($_SESSION['userlevel'] < 5) {
@@ -125,7 +111,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
         } else {
             $deviceselected = "";
         }
-        $output .= "<option value='" . $data['device_id'] . "' ".$deviceselected.">".format_hostname($data)."</option>";
+        $output .= "<option value='" . $data['device_id'] . "' " . $deviceselected . ">" . format_hostname($data) . "</option>";
     }
 
     $output .= "</select>&nbsp;";
@@ -136,7 +122,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
         $hasvalue = "";
     }
 
-    $output .= "<input type='text' name='hostname' id='hostname' title='Hostname' class='form-control input-sm' ".$hasvalue." placeholder='Hostname'>";
+    $output .= "<input type='text' name='hostname' id='hostname' title='Hostname' class='form-control input-sm' " . $hasvalue . " placeholder='Hostname'>";
 
     $output .= "</div>&nbsp;";
 
@@ -242,7 +228,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
         $ifaliasvalue = "value='" . $vars['ifAlias'] . "'";
     }
 
-    $output .= "<input title='Port Description' type='text' name='ifAlias' id='ifAlias' class='form-control input-sm' " . $ifaliasvalue . " placeholder='Port Description'>";
+    $output .= "<input title='Port Description' type='text' name='ifAlias' id='ifAlias' class='form-control input-sm' " . $ifaliasvalue . " placeholder='Port Description'>&nbsp;";
 
     $output .= "<select title='Location' name='location' id='location' class='form-control input-sm'>&nbsp;";
     $output .= "<option value=''>All Locations</option>";
@@ -254,12 +240,12 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
             } else {
                 $locationselected = "";
             }
-            $output .= "<option value='" . $location . "' ". $locationselected .">".$location."</option>";
+            $ui_location = strlen($location) > 25 ? substr($location,0,25)."..." : $location;
+            $output .= "<option value='" . $location . "' " . $locationselected . ">" . $ui_location . "</option>";
         }
     }
 
     $output .= "</select>&nbsp;";
-    $output .= "</div>";
 
     if ($vars['ignore']) {
         $ignorecheck = "checked";
@@ -279,17 +265,15 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
         $deletedcheck = "";
     }
 
-    $output .= "<div class='form-group'>";
     $output .= "<label for='ignore'>Ignored</label>&nbsp;";
-    $output .= "<input type='checkbox' id='ignore' name='ignore' value='1' ".$ignorecheck.">&nbsp;";
+    $output .= "<input type='checkbox' id='ignore' name='ignore' value='1' " . $ignorecheck . ">&nbsp;";
     $output .= "<label for='disabled'>Disabled</label>&nbsp;";
-    $output .= "<input type='checkbox' id='disabled' name='disabled' value='1' ".$disabledcheck.">&nbsp;";
+    $output .= "<input type='checkbox' id='disabled' name='disabled' value='1' " . $disabledcheck . ">&nbsp;";
     $output .= "<label for='deleted'>Deleted</label>&nbsp;";
-    $output .= "<input type='checkbox' id='deleted' name='deleted' value='1' ".$deletedcheck.">&nbsp;";
-    $output .= "</div>";
+    $output .= "<input type='checkbox' id='deleted' name='deleted' value='1' " . $deletedcheck . ">&nbsp;";
 
     $output .= "<button type='submit' class='btn btn-default btn-sm'>Search</button>&nbsp;";
-    $output .= "<a class='btn btn-default btn-sm' href='".generate_url(array('page' => 'ports', 'section' => $vars['section'], 'bare' => $vars['bare']))."' title='Reset critera to default.'>Reset</a>";
+    $output .= "<a class='btn btn-default btn-sm' href='" . generate_url(array('page' => 'ports', 'section' => $vars['section'], 'bare' => $vars['bare'])) . "' title='Reset critera to default.'>Reset</a>";
     $output .= "</form>";
     $output .= "</div>";
 }

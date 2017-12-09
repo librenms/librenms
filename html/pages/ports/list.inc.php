@@ -27,12 +27,13 @@ if ($vars['errors']) {
 ?>
 <div class="panel panel-default panel-condensed">
     <div class="panel-heading">
-        <strong>Ports</strong>
+        <?php echo $displayLists; ?>
     </div>
     <div class="table-responsive">
         <table id="ports" class="table table-condensed table-hover">
             <thead>
             <tr>
+                <th data-column-id="status"></th>
                 <th data-column-id="device">Device</th>
                 <th data-column-id="port"<?php echo $sort ?>>Port</th>
                 <th data-column-id="ifLastChange" data-converter="duration">Status Changed</th>
@@ -102,6 +103,7 @@ var grid = $("#ports").bootgrid({
     {
         return {
             id: "ports",
+            status:
             device_id: '<?php echo mres($vars['device_id']); ?>',
             hostname: '<?php echo htmlspecialchars($vars['hostname']); ?>',
             state: '<?php echo mres($vars['state']); ?>',
