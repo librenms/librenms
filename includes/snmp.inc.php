@@ -592,7 +592,7 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array())
 
     $line = strtok($data, "\n");
     while ($line !== false) {
-        if (str_contains($line, 'at this OID')) {
+        if (str_contains($line, 'at this OID')||str_contains($line, 'this MIB View')) {
             $line = strtok("\n");
             continue;
         }
