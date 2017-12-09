@@ -2184,4 +2184,5 @@ label {
 .alert-status {
   display: inline-block;
   width: 7px;
+  min-height: 27px;
 }
