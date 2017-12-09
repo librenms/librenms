@@ -127,7 +127,8 @@ if ($device) {
     $discover_output = preg_replace('/\033\[[\d;]+m/', '', $discover_output);
 
     // extract snmp queries
-    preg_match_all('/SNMP\[.*snmp(bulk)?([a-z]+) .+:HOSTNAME:[0-9]+ ([0-9.a-zA-Z:\-]+)\]/', $discover_output, $snmp_matches);
+    $snmp_query_regex = '/SNMP\[.*snmp(bulk)?([a-z]+) .+:HOSTNAME:[0-9]+ ([0-9.a-zA-Z:\-]+)\]/';
+    preg_match_all($snmp_query_regex, $discover_output, $snmp_matches);
 
     // extract mibs and group with oids
     $snmp_oids = array(
@@ -212,7 +213,7 @@ if ($device['hostname'] == $snmpsim_ip) {
     // Remove the test device
     $debug = false;
     $vdebug = false;
-    echo delete_device($device['device_id'])."\n";
+    echo delete_device($device['device_id']) . "\n";
 }
 
 if (isset($options['no-save'])) {
@@ -234,9 +235,8 @@ if (isset($options['no-save'])) {
 }
 
 
-
-
-function get_module_with_deps($module) {
+function get_module_with_deps($module)
+{
     if ($module == 'all') {
         return array();
     }
