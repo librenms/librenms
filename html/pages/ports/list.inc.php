@@ -103,7 +103,6 @@ var grid = $("#ports").bootgrid({
     {
         return {
             id: "ports",
-            status:
             device_id: '<?php echo mres($vars['device_id']); ?>',
             hostname: '<?php echo htmlspecialchars($vars['hostname']); ?>',
             state: '<?php echo mres($vars['state']); ?>',

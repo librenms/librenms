@@ -157,8 +157,6 @@ foreach (dbFetchRows($query, $param) as $port) {
             break;
     }
 
-    //print_r($port['ifOperStatus']);
-
     // FIXME what actions should we have?
     $actions = '<div class="container-fluid"><div class="row">';
 
