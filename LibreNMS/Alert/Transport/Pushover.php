@@ -41,7 +41,7 @@ use LibreNMS\Interfaces\Alert\Transport;
 
 class Pushover implements Transport
 {
-    public function call($obj, $opts)
+    public function deliverAlert($obj, $opts)
     {
         foreach ($opts as $api) {
             $data          = array();

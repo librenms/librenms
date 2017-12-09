@@ -51,7 +51,7 @@ if (class_exists($class)) {
     $opts = $config['alert']['transports'][$transport];
     if ($opts) {
         $instance = new $class;
-        $tmp = $instance->call($obj, $opts);
+        $tmp = $instance->deliverAlert($obj, $opts);
         if ($tmp) {
             $status = 'ok';
         }

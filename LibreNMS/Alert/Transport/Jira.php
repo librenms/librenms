@@ -27,7 +27,7 @@ use LibreNMS\Interfaces\Alert\Transport;
 
 class Jira implements Transport
 {
-    public function call($obj, $opts)
+    public function deliverAlert($obj, $opts)
     {
         // Don't create tickets for resolutions
         if ($obj['severity'] == 'recovery' && $obj['msg'] != 'This is a test alert') {

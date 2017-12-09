@@ -850,7 +850,7 @@ function ExtTransports($obj)
             $obj['msg'] = $msg;
             echo $transport.' => ';
             $instance = new $class;
-            $tmp = $instance->call($obj, $opts);
+            $tmp = $instance->deliverAlert($obj, $opts);
             $prefix = array( 0=>"recovery", 1=>$obj['severity']." alert", 2=>"acknowledgment" );
             $prefix[3] = &$prefix[0];
             $prefix[4] = &$prefix[0];

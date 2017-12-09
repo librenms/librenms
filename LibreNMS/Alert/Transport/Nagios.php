@@ -27,7 +27,7 @@ use LibreNMS\Interfaces\Alert\Transport;
 
 class Nagios implements Transport
 {
-    public function call($obj, $opts)
+    public function deliverAlert($obj, $opts)
     {
         /*
         host_perfdata_file_template=

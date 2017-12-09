@@ -27,7 +27,7 @@ use LibreNMS\Interfaces\Alert\Transport;
 
 class Dummy implements Transport
 {
-    public function call($obj, $opts)
+    public function deliverAlert($obj, $opts)
     {
         var_dump($obj);
         return true;

@@ -28,7 +28,7 @@ use LibreNMS\Interfaces\Alert\Transport;
 
 class Telegram implements Transport
 {
-    public function call($obj, $opts)
+    public function deliverAlert($obj, $opts)
     {
         foreach ($opts as $chat_id => $data) {
             $curl = curl_init();

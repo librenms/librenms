@@ -20,7 +20,7 @@ use LibreNMS\Interfaces\Alert\Transport;
 
 class Syslog implements Transport
 {
-    public function call($obj, $opts)
+    public function deliverAlert($obj, $opts)
     {
         $syslog_host = '127.0.0.1';
         $syslog_port = 514;

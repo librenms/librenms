@@ -15,7 +15,7 @@ use LibreNMS\Interfaces\Alert\Transport;
 
 class Ciscospark implements Transport
 {
-    public function call($obj, $opts)
+    public function deliverAlert($obj, $opts)
     {
         $token  = $opts['token'];
         $roomId = $opts['roomid'];

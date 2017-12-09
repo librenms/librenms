@@ -27,7 +27,7 @@ use LibreNMS\Interfaces\Alert\Transport;
 
 class Pagerduty implements Transport
 {
-    public function call($obj, $opts)
+    public function deliverAlert($obj, $opts)
     {
         $protocol = array(
             'service_key' => $opts,

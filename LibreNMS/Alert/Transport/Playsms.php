@@ -27,7 +27,7 @@ use LibreNMS\Interfaces\Alert\Transport;
 
 class Playsms implements Transport
 {
-    public function call($obj, $opts)
+    public function deliverAlert($obj, $opts)
     {
         $data = array("u" => $opts['user'], "h" => $opts['token'], "to" => implode(',', $opts['to']), "msg" => $obj['title']);
         if (!empty($opts['from'])) {

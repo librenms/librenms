@@ -27,7 +27,7 @@ use LibreNMS\Interfaces\Alert\Transport;
 
 class Pushbullet implements Transport
 {
-    public function call($obj, $opts)
+    public function deliverAlert($obj, $opts)
     {
         // Note: At this point it might be useful to iterate through $obj['contacts'] and send each of them a note ?
 

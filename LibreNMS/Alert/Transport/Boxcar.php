@@ -42,7 +42,7 @@ use LibreNMS\Interfaces\Alert\Transport;
 
 class Boxcar implements Transport
 {
-    public function call($obj, $opts)
+    public function deliverAlert($obj, $opts)
     {
         global $config;
         foreach ($opts as $api) {

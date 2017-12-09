@@ -28,7 +28,7 @@ use LibreNMS\Interfaces\Alert\Transport;
 
 class Api implements Transport
 {
-    public function call($obj, $opts)
+    public function deliverAlert($obj, $opts)
     {
         foreach ($opts as $method => $apis) {
             //	var_dump($method); //FIXME: propper debuging

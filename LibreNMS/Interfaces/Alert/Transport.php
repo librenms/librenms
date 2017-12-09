@@ -1,6 +1,6 @@
 <?php
 /**
- * ValidationGroup.php
+ * Transport.php
  *
  * An interface for the transport of alerts.
  *
@@ -19,8 +19,8 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2017 Robrecht Plaisier
+ * @author     Robbrecht Plaisier <librenms@mcq8.be>
  */
 
 namespace LibreNMS\Interfaces\Alert;
@@ -30,9 +30,9 @@ interface Transport
     /**
      * Gets called when an alert is sent
      *
-     * @param $obj array An array created by DescribeAlert
+     * @param $alert_data array An array created by DescribeAlert
      * @param $opts array|true The options from $config['alert']['transports'][$transport]
      * @return bool Returns if the call was successful
      */
-    public function call($obj, $opts);
+    public function deliverAlert($alert_data, $opts);
 }

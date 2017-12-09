@@ -15,7 +15,7 @@ use LibreNMS\Interfaces\Alert\Transport;
 
 class Osticket implements Transport
 {
-    public function call($obj, $opts)
+    public function deliverAlert($obj, $opts)
     {
         global $config;
 
