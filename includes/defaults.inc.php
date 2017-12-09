@@ -62,12 +62,6 @@ $config['virsh']          = '/usr/bin/virsh';
 $config['dot']            = '/usr/bin/dot';
 $config['sfdp']           = '/usr/bin/sfdp';
 
-// Memcached - Keep immediate statistics
-$config['memcached']['enable'] = false;
-$config['memcached']['host']   = 'localhost';
-$config['memcached']['port']   = 11211;
-$config['memcached']['ttl']    = 240;
-
 $config['slow_statistics'] = true;
 // THIS WILL CHANGE TO FALSE IN FUTURE
 // RRD Format Settings
