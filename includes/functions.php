@@ -2412,15 +2412,21 @@ function dump_db_schema()
  */
 function dump_module_data($device_id, $module)
 {
-    // TODO a bit naive for now
     $where = "WHERE `device_id`=?";
     $params = array($device_id);
     $data = array();
 
     $tables = get_module_tables($module);
-    foreach ($tables as $table => $excluded_fields) {
-        $rows = dbFetchRows("SELECT * FROM `$table` $where", $params);
-        $keys = array_flip($excluded_fields);
+    foreach ($tables as $table => $info) {
+        $join = '';
+        foreach ($info['joins'] as $join_info) {
+            $join .= " LEFT JOIN `{$join_info['right']}` ON (`{$join_info['left']}`.`{$join_info['key']}` = `{$join_info['right']}`.`{$join_info['key']}`)";
+        }
+
+        $rows = dbFetchRows("SELECT `$table`.* FROM `$table` $join $where", $params);
+
+        // remove unwanted fields
+        $keys = array_flip($info['excluded_fields']);
         $data[$table] = array_map(function ($row) use ($keys) {
             return array_diff_key($row, $keys);
         }, $rows);
@@ -2442,8 +2448,15 @@ function get_module_tables($module)
 {
     $tables = array(
         'processors' => array(
-            'processors' => array('device_id', 'processor_id'),
+            'processors' => array(
+                'excluded_fields' => array('device_id', 'processor_id'),
+            ),
         ),
+        'arp-table' => array(
+            'ipv4_mac' => array(
+                'excluded_fields' => array('device_id', 'port_id'),
+            ),
+        )
     );
 
     if ($module == 'all') {

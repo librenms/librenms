@@ -19,6 +19,7 @@ $options = getopt(
         'os:',
         'variant:',
         'file:',
+        'snmpsim',
     )
 );
 
@@ -27,6 +28,17 @@ require $install_dir . '/includes/init.php';
 
 $debug = (isset($options['d']) || isset($options['debug']));
 $vdebug = $debug;
+
+$snmpsim_ip = '127.1.6.1';
+$snmpsim_port = '1161';
+$snmpsim_log = "/tmp/snmpsimd.log";
+$snmpsim_cmd = "snmpsimd.py --data-dir=./tests/snmpsim --agent-udpv4-endpoint=$snmpsim_ip:$snmpsim_port";
+
+if (isset($options['snmpsim'])) {
+    echo "Starting snmpsim listening on $snmpsim_ip:$snmpsim_port... \n";
+    shell_exec($snmpsim_cmd);
+    exit;
+}
 
 if (isset($options['h'])) {
     $hostname = $options['h'];
@@ -65,6 +77,7 @@ Usage:
   -f, --file       File to save the database entries to.  Default is in tests/data/
   -d, --debug      Enable debug output
       --no-save    Don't save database entries, print them out instead
+      --snmpsim    Just run snmpsimd.py. Listening on $snmpsim_ip:$snmpsim_port.
 ";
     exit;
 }
@@ -100,7 +113,7 @@ if ($device) {
     $save_vedbug = $vdebug;
     $debug = true;
     $vdebug = false;
-    discover_device($device, $module == 'all' ? array() : array('m' => $module));
+    discover_device($device, get_module_with_deps($module));
     $debug = $save_debug;
     $vdebug = $save_vedbug;
     $discover_output = ob_get_contents();
@@ -138,7 +151,7 @@ if ($device) {
     foreach ($snmp_oids as $oid_data) {
         echo " " . $oid_data['oid'];
 
-        $options = '-OUneb';
+        $options = '-OUneb -Ih';
         if ($oid_data['method'] == 'walk') {
             $data = snmp_walk($device, $oid_data['oid'], $options, $oid_data['mib']);
         } elseif ($oid_data['method'] == 'get') {
@@ -160,13 +173,10 @@ if ($device) {
 
 
 // Now use the saved data to update the saved database data
-$snmpsim_ip = '127.1.6.1';
-$snmpsim_log = "/tmp/snmpsimd.log";
-$snmpsim_cmd = "snmpsimd.py --data-dir=./tests/snmpsim --agent-udpv4-endpoint=$snmpsim_ip:1161 --logging-method=file:$snmpsim_log";
 echo "Starting snmpsimd... ";
 d_echo($snmpsim_cmd);
-$proc_snmpsimd = new Proc($snmpsim_cmd);
-echo "Logfile: $snmpsim_log\n";
+$proc_snmpsimd = new Proc("$snmpsim_cmd --logging-method=file:$snmpsim_log");
+echo " Logfile: $snmpsim_log\n";
 if (!$proc_snmpsimd->isRunning()) {
     echo `tail -5 $snmpsim_log` . PHP_EOL;
 }
@@ -191,7 +201,7 @@ try {
 $device = device_by_id_cache($device_id);
 
 // Run discovery
-discover_device($device, $module == 'all' ? array() : array('m' => $module));
+discover_device($device, get_module_with_deps($module));
 
 echo PHP_EOL;
 
@@ -218,11 +228,29 @@ if (isset($options['no-save'])) {
         $existing_data[$module_name] = $module_data;
     }
 
-    file_put_contents($output_file, _json_encode($data));
+    file_put_contents($output_file, _json_encode($existing_data));
     echo "Saved to $output_file\n";
     echo "Ready for testing!\n";
 }
 
+
+
+
+function get_module_with_deps($module) {
+    if ($module == 'all') {
+        return array();
+    }
+
+    $module_deps = array(
+        'arp-table' => 'ports,arp-table',
+    );
+
+    if (isset($module_deps[$module])) {
+        return array('m' => $module_deps[$module]);
+    }
+
+    return array('m' => $module);
+}
 
 function convert_snmp_to_snmprec(array $snmp_data)
 {
@@ -265,6 +293,11 @@ function convert_snmp_to_snmprec(array $snmp_data)
                 // remove leading . from oid data
                 if ($type == '6') {
                     $data = ltrim($data, '.');
+                }
+
+                // remove spaces from hex-strings
+                if ($type == '4x') {
+                    $data = str_replace(' ', '', $data);
                 }
 
                 $result[] = "$oid|$type|$data";
