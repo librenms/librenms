@@ -226,6 +226,10 @@ main () {
                 local options=("notifications");
                 call_daily_php "${options[@]}";
             ;;
+            peeringdb)
+                local options=("peeringdb");
+                call_daily_php "${options[@]}";
+            ;;
         esac
     fi
 }
