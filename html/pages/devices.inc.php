@@ -285,7 +285,8 @@ if ($format == "graph") {
             } else {
                 $ver_selected = '';
             }
-            $ver_options .= "<option value='" . $tmp_version . "' " . $ver_selected . ">" . $tmp_version . "</option>";
+            $ui_version = strlen($tmp_version) > 15 ? substr($tmp_version, 0, 15) . "..." : $tmp_version;
+            $ver_options .= "<option value='" . $tmp_version . "' " . $ver_selected . ">" . $ui_version . "</option>";
         }
     }
     $ver_options .= "</select>";
@@ -331,7 +332,9 @@ if ($format == "graph") {
             } else {
                 $location_selected = '';
             }
-            $locations_options .= "<option value='" . $location . "' " . $location_selected . ">" . $location . "</option>";
+
+            $ui_location = strlen($location) > 15 ? substr($location, 0, 15) . "..." : $location;
+            $locations_options .= "<option value='" . $location . "' " . $location_selected . ">" . $ui_location . "</option>";
         }
     }
     $locations_options .= "</select>";
