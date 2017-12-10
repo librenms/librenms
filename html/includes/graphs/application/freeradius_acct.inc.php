@@ -17,7 +17,7 @@ $fr_acct_array = array(
 $colours      = 'mixed';
 $rrd_list     = array();
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    foreach ($fr_acct_array as $ds) {
+    foreach ($fr_acct_array as $ds => $descr) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr']    = $descr;
         $rrd_list[$i]['ds']       = $ds;
