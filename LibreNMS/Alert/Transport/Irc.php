@@ -1,3 +1,4 @@
+<?php
 /* Copyright (C) 2014 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,12 +14,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /**
- * Mail Transport
+ * IRC Transport
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
  * @package LibreNMS
  * @subpackage Alerts
  */
+namespace LibreNMS\Alert\Transport;
 
-return send_mail($obj['contacts'], $obj['title'], $obj['msg'], ($config['email_html'] == 'true') ? true : false );
+use LibreNMS\Interfaces\Alert\Transport;
+
+class Irc implements Transport
+{
+    public function deliverAlert($obj, $opts)
+    {
+        global $config;
+        $f = $config['install_dir'] . "/.ircbot.alert";
+        if (file_exists($f) && filetype($f) == "fifo") {
+            $f = fopen($f, "w+");
+            $r = fwrite($f, json_encode($obj) . "\n");
+            $f = fclose($f);
+            if ($r === false) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+}
