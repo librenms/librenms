@@ -1,3 +1,4 @@
+<?php
 /* Copyright (C) 2015 Daniel Preussker <f0o@librenms.org>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,20 +21,29 @@
  * @package LibreNMS
  * @subpackage Alerts
  */
+namespace LibreNMS\Alert\Transport;
 
-$url  = 'https://platform.clickatell.com/messages/http/send?apiKey='.$opts['token'].'&to='.implode(',',$opts['to']).'&content='.urlencode($obj['title']);
+use LibreNMS\Interfaces\Alert\Transport;
 
-$curl = curl_init($url);
-set_curl_proxy($curl);
-curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+class Clickatell implements Transport
+{
+    public function deliverAlert($obj, $opts)
+    {
+        $url = 'https://platform.clickatell.com/messages/http/send?apiKey=' . $opts['token'] . '&to=' . implode(',', $opts['to']) . '&content=' . urlencode($obj['title']);
 
-$ret  = curl_exec($curl);
-$code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-if( $code > 200 ) {
-    if( $debug ) {
-        var_dump($ret);
+        $curl = curl_init($url);
+        set_curl_proxy($curl);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+        $ret  = curl_exec($curl);
+        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        if ($code > 200) {
+            if ($debug) {
+                var_dump($ret);
+            }
+            return false;
+        }
+        return true;
     }
-    return false;
 }
-return true;

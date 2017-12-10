@@ -1,4 +1,5 @@
-/* Copyright (C) 2015 Daniel Preussker <f0o@librenms.org>
+<?php
+/* Copyright (C) 2014 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -13,30 +14,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /**
- * SMSEagle API Transport
- * @author Barry O'Donovan <barry@lightnet.ie>
- * @copyright 2017 Barry O'Donovan, LibreNMS
+ * Mail Transport
+ * @author f0o <f0o@devilcode.org>
+ * @copyright 2014 f0o, LibreNMS
  * @license GPL
  * @package LibreNMS
  * @subpackage Alerts
  */
+namespace LibreNMS\Alert\Transport;
 
-$params = array(
-		'login' => $opts['user'],
-		'pass' => $opts['token'],
-		'to'       => implode(',',$opts['to']),
-		'message'  => $obj['title'],
-);
-$url  = 'http://'.$opts['url'].'/index.php/http_api/send_sms?'.http_build_query($params);
-$curl = curl_init($url);
+use LibreNMS\Interfaces\Alert\Transport;
 
-set_curl_proxy($curl);
-curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-
-$ret  = curl_exec($curl);
-if (substr($ret,0,2) == "OK") {
-	return true;
-} else {
-    return false;
+class Mail implements Transport
+{
+    public function deliverAlert($obj, $opts)
+    {
+        global $config;
+        return send_mail($obj['contacts'], $obj['title'], $obj['msg'], ($config['email_html'] == 'true') ? true : false);
+    }
 }
