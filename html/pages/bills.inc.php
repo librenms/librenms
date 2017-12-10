@@ -7,7 +7,7 @@ if ($_POST['addbill'] == 'yes') {
         include 'includes/error-no-perm.inc.php';
         exit;
     }
-    
+
     $updated = '1';
 
     if (isset($_POST['bill_quota']) or isset($_POST['bill_cdr'])) {
@@ -78,7 +78,7 @@ if ($_POST['addbill'] == 'yes') {
     if (is_numeric($bill_id) && is_numeric($_POST['port_id'])) {
         dbInsert(array('bill_id' => $bill_id, 'port_id' => $_POST['port_id']), 'bill_ports');
     }
-    
+
     header('Location: ' . generate_url(array('page' => 'bill', 'bill_id' => $bill_id, 'view' => 'edit')));
     exit();
 }
@@ -109,14 +109,14 @@ include 'includes/modal/new_bill.inc.php';
         </table>
     </div>
 </div>
-    
+
 <script type="text/html" id="table-header">
     <div id="{{ctx.id}}" class="{{css.header}}">
         <div class="row">
             <div class="col-sm-4">
             <?php if ($_SESSION['userlevel'] >= 10) {  ?>
                 <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create-bill"><i class="fa fa-plus"></i> Create Bill</button>
-            <?php } ?>     
+            <?php } ?>
             </div>
             <div class="col-sm-8 actionBar">
                 <span class="form-inline" id="table-filters">
@@ -127,21 +127,33 @@ include 'includes/modal/new_bill.inc.php';
                     </select>
                     <select name='bill_type' id='bill_type' class="form-control input-sm">
                       <option value=''>All Types</option>
-                      <option value='cdr' <?php if ($_GET['bill_type'] === 'cdr') {
-                            echo 'selected';
-} ?>>CDR</option>
-                      <option value='quota' <?php if ($_GET['bill_type'] === 'quota') {
-                            echo 'selected';
-} ?>>Quota</option>
+                      <option value='cdr'
+                            <?php
+                            if ($_GET['bill_type'] === 'cdr') {
+                                echo 'selected';
+                            }
+                            ?>>CDR</option>
+                      <option value='quota'
+                            <?php
+                            if ($_GET['bill_type'] === 'quota') {
+                                echo 'selected';
+                            }
+                            ?>>Quota</option>
                     </select>
                     <select name='state' id='state' class="form-control input-sm">
                       <option value=''>All States</option>
-                      <option value='under' <?php if ($_GET['state'] === 'under') {
-                            echo 'selected';
-} ?>>Under Quota</option>
-                      <option value='over' <?php if ($_GET['state'] === 'over') {
-                            echo 'selected';
-} ?>>Over Quota</option>
+                      <option value='under'
+                            <?php
+                            if ($_GET['state'] === 'under') {
+                                echo 'selected';
+                            }
+                            ?>>Under Quota</option>
+                      <option value='over'
+                            <?php
+                            if ($_GET['state'] === 'over') {
+                                echo 'selected';
+                            }
+                            ?>>Over Quota</option>
                     </select>
                   </fieldset>
                 </span>
@@ -151,7 +163,7 @@ include 'includes/modal/new_bill.inc.php';
         </div>
     </div>
 </script>
-    
+
 <script type="text/javascript">
     var grid = $('#bills-list').bootgrid({
        ajax: true,
@@ -172,12 +184,12 @@ include 'includes/modal/new_bill.inc.php';
     }).on("loaded.rs.jquery.bootgrid", function() {
     });
     $('#table-filters select').on('change', function() { grid.bootgrid('reload'); });
-        
+
 <?php
 if ($vars['view'] == 'add') {
 ?>
 $(function() {
-    $('#create-bill').modal('show');    
+    $('#create-bill').modal('show');
 });
 <?php
 }

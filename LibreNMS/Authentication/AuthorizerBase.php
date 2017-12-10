@@ -33,6 +33,7 @@ abstract class AuthorizerBase implements Authorizer
 {
     protected static $HAS_AUTH_USERMANAGEMENT = 0;
     protected static $CAN_UPDATE_USER = 0;
+    protected static $AUTH_IS_EXTERNAL = 0;
 
     /**
      * Log out the user, unset cookies, destroy the session
@@ -164,8 +165,7 @@ abstract class AuthorizerBase implements Authorizer
         list($uname, $hash) = explode('|', $token);
         $session = dbFetchRow(
             "SELECT * FROM `session` WHERE `session_username`=? AND `session_value`=?",
-            array($uname, $sess_id),
-            true
+            array($uname, $sess_id)
         );
 
         $hasher = new PasswordHash(8, false);
@@ -243,5 +243,15 @@ abstract class AuthorizerBase implements Authorizer
     {
         //not supported by default
         return 0;
+    }
+
+    public function authIsExternal()
+    {
+        return static::$AUTH_IS_EXTERNAL;
+    }
+
+    public function getExternalUsername()
+    {
+        return null;
     }
 }

@@ -44,6 +44,11 @@ class Proc
     private $_synchronous;
 
     /**
+     * @var int|null hold the exit code, we can only get this on the first process_status after exit
+     */
+    private $_exitcode = null;
+
+    /**
      * Create and run a new process
      * Most arguments match proc_open()
      *
@@ -217,7 +222,13 @@ class Proc
      */
     public function getStatus()
     {
-        return proc_get_status($this->_process);
+        $status = proc_get_status($this->_process);
+
+        if ($status['running'] === false && is_null($this->_exitcode)) {
+            $this->_exitcode = $status['exitcode'];
+        }
+
+        return $status;
     }
 
     /**
@@ -231,7 +242,18 @@ class Proc
             return false;
         }
         $st = $this->getStatus();
-        return isset($st['running']);
+        return isset($st['running']) && $st['running'];
+    }
+
+    /**
+     * Returns the exit code from the process.
+     * Will return null unless isRunning() or getStatus() has been run and returns false.
+     *
+     * @return int|null
+     */
+    public function getExitCode()
+    {
+        return $this->_exitcode;
     }
 
     /**

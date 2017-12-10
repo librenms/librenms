@@ -9,14 +9,20 @@
   <label class="col-sm-4 control-label" for="bill_type">Billing Type</label>
   <div class="col-sm-8">
     <label class="radio-inline">
-      <input type="radio" name="bill_type" id="bill_type_cdr" value="cdr" <?php if ($bill_data['bill_type'] == 'cdr') {
-            echo "checked";
-} ?> onchange="javascript: billType();" /> CDR 95th
+      <input type="radio" name="bill_type" id="bill_type_cdr" value="cdr"
+            <?php
+            if ($bill_data['bill_type'] == 'cdr') {
+                echo "checked";
+            }
+            ?> onchange="javascript: billType();" /> CDR 95th
     </label>
     <label class="radio-inline">
-      <input type="radio" name="bill_type" id="bill_type_quota" value="quota" <?php if ($bill_data['bill_type'] == 'quota') {
-            echo "checked";
-} ?> onchange="javascript: billType();" /> Quota
+      <input type="radio" name="bill_type" id="bill_type_quota" value="quota"
+            <?php
+            if ($bill_data['bill_type'] == 'quota') {
+                echo "checked";
+            }
+            ?> onchange="javascript: billType();" /> Quota
     </label>
   </div>
 </div>
@@ -86,7 +92,7 @@
 <script type="text/javascript">
 function billType() {
     var selected = $('input[name=bill_type]:checked').val();
-    
+
     $('#cdrDiv').toggle(selected === 'cdr');
     $('#quotaDiv').toggle(selected === 'quota');
 }

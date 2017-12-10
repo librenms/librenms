@@ -210,7 +210,11 @@ function dbBulkInsert($data, $table)
             if ($rowvalues != '') {
                 $rowvalues .= ',';
             }
-            $rowvalues .= "'".mres($value)."'";
+            if (is_null($value)) {
+                $rowvalues .= 'NULL';
+            } else {
+                $rowvalues .= "'" . mres($value) . "'";
+            }
         }
         $values .= "(".$rowvalues.")";
     }
@@ -292,23 +296,63 @@ function dbDelete($table, $where = null, $parameters = array())
 }//end dbDelete()
 
 
+/**
+ * Delete orphaned entries from a table that no longer have a parent in parent_table
+ * Format of parents array is as follows table.table_key_column<.target_key_column>
+ *
+ * @param string $target_table The table to delete entries from
+ * @param array $parents an array of parent tables to check.
+ * @return bool|int
+ */
+function dbDeleteOrphans($target_table, $parents)
+{
+    global $database_link;
+    $time_start = microtime(true);
+
+    if (empty($parents)) {
+        // don't delete all entries if parents is missing
+        return false;
+    }
+
+    $target_table = mres($target_table);
+    $sql = "DELETE T FROM `$target_table` T";
+    $where = array();
+
+    foreach ((array)$parents as $parent) {
+        $parent_parts = explode('.', mres($parent));
+        if (count($parent_parts) == 2) {
+            list($parent_table, $parent_column) = $parent_parts;
+            $target_column = $parent_column;
+        } elseif (count($parent_parts) == 3) {
+            list($parent_table, $parent_column, $target_column) = $parent_parts;
+        } else {
+            // invalid input
+            return false;
+        }
+
+        $sql .= " LEFT JOIN `$parent_table` ON `$parent_table`.`$parent_column` = T.`$target_column`";
+        $where[] = " `$parent_table`.`$parent_column` IS NULL";
+    }
+
+    $query = "$sql WHERE" . implode(' AND', $where);
+    $result = dbQuery($query, array());
+
+    recordDbStatistic('delete', $time_start);
+    if ($result) {
+        return mysqli_affected_rows($database_link);
+    } else {
+        return false;
+    }
+}
+
 /*
  * Fetches all of the rows (associatively) from the last performed query.
  * Most other retrieval functions build off this
  * */
 
 
-function dbFetchRows($sql, $parameters = array(), $nocache = false)
+function dbFetchRows($sql, $parameters = array())
 {
-    global $config;
-
-    if ($config['memcached']['enable'] && $nocache === false) {
-        $result = $config['memcached']['resource']->get(hash('sha512', $sql.'|'.serialize($parameters)));
-        if (!empty($result)) {
-            return $result;
-        }
-    }
-
     $time_start = microtime(true);
     $result         = dbQuery($sql, $parameters);
 
@@ -319,9 +363,7 @@ function dbFetchRows($sql, $parameters = array(), $nocache = false)
         }
 
         mysqli_free_result($result);
-        if ($config['memcached']['enable'] && $nocache === false) {
-            $config['memcached']['resource']->set(hash('sha512', $sql.'|'.serialize($parameters)), $rows, $config['memcached']['ttl']);
-        }
+
         recordDbStatistic('fetchrows', $time_start);
         return $rows;
     }
@@ -341,9 +383,9 @@ function dbFetchRows($sql, $parameters = array(), $nocache = false)
  * */
 
 
-function dbFetch($sql, $parameters = array(), $nocache = false)
+function dbFetch($sql, $parameters = array())
 {
-    return dbFetchRows($sql, $parameters, $nocache);
+    return dbFetchRows($sql, $parameters);
     /*
         // for now, don't do the iterator thing
         $result = dbQuery($sql, $parameters);
@@ -363,17 +405,8 @@ function dbFetch($sql, $parameters = array(), $nocache = false)
  * */
 
 
-function dbFetchRow($sql = null, $parameters = array(), $nocache = false)
+function dbFetchRow($sql = null, $parameters = array())
 {
-    global $config;
-
-    if (isset($config['memcached']['enable']) && $config['memcached']['enable'] && $nocache === false) {
-        $result = $config['memcached']['resource']->get(hash('sha512', $sql.'|'.serialize($parameters)));
-        if (!empty($result)) {
-            return $result;
-        }
-    }
-
     $time_start = microtime(true);
     $result         = dbQuery($sql, $parameters);
     if ($result) {
@@ -381,10 +414,6 @@ function dbFetchRow($sql = null, $parameters = array(), $nocache = false)
         mysqli_free_result($result);
 
         recordDbStatistic('fetchrow', $time_start);
-
-        if (isset($config['memcached']['enable']) && $config['memcached']['enable'] && $nocache === false) {
-            $config['memcached']['resource']->set(hash('sha512', $sql.'|'.serialize($parameters)), $row, $config['memcached']['ttl']);
-        }
         return $row;
     } else {
         return null;
@@ -397,10 +426,10 @@ function dbFetchRow($sql = null, $parameters = array(), $nocache = false)
  * */
 
 
-function dbFetchCell($sql, $parameters = array(), $nocache = false)
+function dbFetchCell($sql, $parameters = array())
 {
     $time_start = microtime(true);
-    $row = dbFetchRow($sql, $parameters, $nocache);
+    $row = dbFetchRow($sql, $parameters);
 
     recordDbStatistic('fetchcell', $time_start);
     if ($row) {
@@ -417,11 +446,11 @@ function dbFetchCell($sql, $parameters = array(), $nocache = false)
  * */
 
 
-function dbFetchColumn($sql, $parameters = array(), $nocache = false)
+function dbFetchColumn($sql, $parameters = array())
 {
     $time_start = microtime(true);
     $cells          = array();
-    foreach (dbFetch($sql, $parameters, $nocache) as $row) {
+    foreach (dbFetch($sql, $parameters) as $row) {
         $cells[] = array_shift($row);
     }
 
@@ -437,10 +466,10 @@ function dbFetchColumn($sql, $parameters = array(), $nocache = false)
  */
 
 
-function dbFetchKeyValue($sql, $parameters = array(), $nocache = false)
+function dbFetchKeyValue($sql, $parameters = array())
 {
     $data = array();
-    foreach (dbFetch($sql, $parameters, $nocache) as $row) {
+    foreach (dbFetch($sql, $parameters) as $row) {
         $key = array_shift($row);
         if (sizeof($row) == 1) {
             // if there were only 2 fields in the result

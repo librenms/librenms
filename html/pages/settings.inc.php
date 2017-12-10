@@ -24,7 +24,6 @@
  * @author     f0o <f0o@devilcode.org>
  */
 
-$config['memcached']['enable'] = false;
 ?>
 
 <div class="container-fluid">

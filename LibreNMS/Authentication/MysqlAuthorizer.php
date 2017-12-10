@@ -13,7 +13,7 @@ class MysqlAuthorizer extends AuthorizerBase
     public function authenticate($username, $password)
     {
         $encrypted_old = md5($password);
-        $row           = dbFetchRow('SELECT username,password FROM `users` WHERE `username`= ?', array($username), true);
+        $row           = dbFetchRow('SELECT username,password FROM `users` WHERE `username`= ?', array($username));
         if ($row['username'] && $row['username'] == $username) {
             // Migrate from old, unhashed password
             if ($row['password'] == $encrypted_old) {
@@ -58,7 +58,7 @@ class MysqlAuthorizer extends AuthorizerBase
         if (empty($username) || !$this->userExists($username)) {
             return 1;
         } else {
-            return dbFetchCell('SELECT can_modify_passwd FROM users WHERE username = ?', array($username), true);
+            return dbFetchCell('SELECT can_modify_passwd FROM users WHERE username = ?', array($username));
         }
     }//end passwordscanchange()
 
@@ -113,20 +113,20 @@ class MysqlAuthorizer extends AuthorizerBase
 
     public function userExists($username, $throw_exception = false)
     {
-        $return = @dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username), true);
+        $return = @dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username));
         return $return;
     }//end userExists()
 
 
     public function getUserlevel($username)
     {
-        return dbFetchCell('SELECT `level` FROM `users` WHERE `username` = ?', array($username), true);
+        return dbFetchCell('SELECT `level` FROM `users` WHERE `username` = ?', array($username));
     }//end getUserlevel()
 
 
     public function getUserid($username)
     {
-        return dbFetchCell('SELECT `user_id` FROM `users` WHERE `username` = ?', array($username), true);
+        return dbFetchCell('SELECT `user_id` FROM `users` WHERE `username` = ?', array($username));
     }//end getUserid()
 
 
@@ -150,7 +150,7 @@ class MysqlAuthorizer extends AuthorizerBase
 
     public function getUser($user_id)
     {
-        return dbFetchRow('SELECT * FROM `users` WHERE `user_id` = ?', array($user_id), true);
+        return dbFetchRow('SELECT * FROM `users` WHERE `user_id` = ?', array($user_id));
     }//end getUser()
 
 

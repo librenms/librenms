@@ -24,9 +24,6 @@ echo ' ' . $name;
 // get data through snmp
 $ogs_data = snmp_get($device, $oid, '-Oqv');
 
-// let librenms know that we got good data
-update_application($app, $ogs_data);
-
 // define the rrd
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
@@ -47,6 +44,8 @@ $fields = array(
 // push the data in an array and into the rrd
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
+update_application($app, $ogs_data, $fields);
+
 
 // cleanup
 unset($ogs_data, $rrd_name, $rrd_def, $data, $fields, $tags);

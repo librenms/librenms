@@ -1,7 +1,6 @@
 <?php
-$chip = snmp_get($device, '.1.3.6.1.2.1.1.1.0', '-Oqv');
 
-if (preg_match("/(Linux).+(ntc)/", $chip)) {
+if (preg_match("/(Linux).+(ntc)/", $poll_device['sysDescr'])) {
     $sensor_type = "chip_battery_charge";
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.10.112.111.119.101.114.45.115.116.97.';
     $lowlimit     = 5;
