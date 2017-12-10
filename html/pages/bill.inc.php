@@ -99,41 +99,41 @@ if (bill_permitted($bill_id)) {
         'transfer' => 'Transfer Graphs',
         'history' => 'Historical Graphs'
     );
-if ($_SESSION['userlevel'] >= '10') {
-    $menu_options['edit'] = 'Edit';
-    $menu_options['delete'] = 'Delete';
-    $menu_options['reset'] = 'Reset';
-}
+    if ($_SESSION['userlevel'] >= '10') {
+        $menu_options['edit'] = 'Edit';
+        $menu_options['delete'] = 'Delete';
+        $menu_options['reset'] = 'Reset';
+    }
     $sep = '';
-foreach ($menu_options as $option => $text) {
-    echo $sep;
-    if ($vars['view'] == $option) {
-        echo "<span class='pagemenu-selected'>";
-    }
+    foreach ($menu_options as $option => $text) {
+        echo $sep;
+        if ($vars['view'] == $option) {
+            echo "<span class='pagemenu-selected'>";
+        }
 
-    echo generate_link($text, $vars, array('view' => $option));
-    if ($vars['view'] == $option) {
-        echo '</span>';
-    }
+        echo generate_link($text, $vars, array('view' => $option));
+        if ($vars['view'] == $option) {
+            echo '</span>';
+        }
 
-    $sep = ' | ';
-}
+        $sep = ' | ';
+    }
     
     echo '<div style="font-weight: bold; float: right;"><a href="'.generate_url(array('page' => 'bills')).'/"><i class="fa fa-arrow-left fa-lg icon-theme" aria-hidden="true"></i> Back to Bills</a></div>';
 
     print_optionbar_end();
 
-if ($vars['view'] == 'edit' && $_SESSION['userlevel'] >= '10') {
-    include 'pages/bill/edit.inc.php';
-} elseif ($vars['view'] == 'delete' && $_SESSION['userlevel'] >= '10') {
-    include 'pages/bill/delete.inc.php';
-} elseif ($vars['view'] == 'reset' && $_SESSION['userlevel'] >= '10') {
-    include 'pages/bill/reset.inc.php';
-} elseif ($vars['view'] == 'history') {
-    include 'pages/bill/history.inc.php';
-} elseif ($vars['view'] == 'transfer') {
-    include 'pages/bill/transfer.inc.php';
-} elseif ($vars['view'] == 'quick' || $vars['view'] == 'accurate') {
+    if ($vars['view'] == 'edit' && $_SESSION['userlevel'] >= '10') {
+        include 'pages/bill/edit.inc.php';
+    } elseif ($vars['view'] == 'delete' && $_SESSION['userlevel'] >= '10') {
+        include 'pages/bill/delete.inc.php';
+    } elseif ($vars['view'] == 'reset' && $_SESSION['userlevel'] >= '10') {
+        include 'pages/bill/reset.inc.php';
+    } elseif ($vars['view'] == 'history') {
+        include 'pages/bill/history.inc.php';
+    } elseif ($vars['view'] == 'transfer') {
+        include 'pages/bill/transfer.inc.php';
+    } elseif ($vars['view'] == 'quick' || $vars['view'] == 'accurate') {
 ?>
 
 <?php   if ($bill_data['bill_type'] == 'quota') { ?>
@@ -276,7 +276,7 @@ if ($vars['view'] == 'accurate') {
 <?php echo $mi ?>
 </div>    
 <?php
-} //end if
+    } //end if
 } else {
     include 'includes/error-no-perm.inc.php';
 }//end if
