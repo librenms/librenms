@@ -52,13 +52,16 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
             $_SESSION['username'] = '';
         }
 
+        if (!function_exists('ldap_connect')) {
+            throw new AuthenticationException("PHP does not support LDAP, please install or enable the PHP LDAP extension.");
+        }
+
         /**
          * Set up connection to LDAP server
          */
         $this->ldap_connection = @ldap_connect(Config::get('auth_ldap_server'), Config::get('auth_ldap_port'));
         if (! $this->ldap_connection) {
-            echo '<h2>Fatal error while connecting to LDAP server ' . Config::get('auth_ldap_server') . ':' . Config::get('auth_ldap_port') . ': ' . ldap_error($this->ldap_connection) . '</h2>';
-            exit;
+            throw new AuthenticationException('Fatal error while connecting to LDAP server ' . Config::get('auth_ldap_server') . ':' . Config::get('auth_ldap_port') . ': ' . ldap_error($this->ldap_connection));
         }
         if (Config::get('auth_ldap_version')) {
             ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, Config::get('auth_ldap_version'));
@@ -67,8 +70,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         if (Config::get('auth_ldap_starttls') && (Config::get('auth_ldap_starttls') == 'optional' || Config::get('auth_ldap_starttls') == 'require')) {
             $tls = ldap_start_tls($this->ldap_connection);
             if (Config::get('auth_ldap_starttls') == 'require' && $tls === false) {
-                echo '<h2>Fatal error: LDAP TLS required but not successfully negotiated:' . ldap_error($this->ldap_connection) . '</h2>';
-                exit;
+                throw new AuthenticationException('Fatal error: LDAP TLS required but not successfully negotiated:' . ldap_error($this->ldap_connection));
             }
         }
     }

@@ -1,0 +1,251 @@
+-- ============================================================================
+-- AT-ETH.MIB, Allied Telesis enterprise MIB: PRI module
+--
+-- Extracted from ATROUTER.MIB of pre 2.9.1 release
+--
+-- June 2006, Stan Xiang
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-PRI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    NOTIFICATION-TYPE
+    	FROM SNMPv2-SMI
+
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+
+	ifIndex
+		FROM IF-MIB
+
+	modules,
+	DisplayStringUnsized
+		FROM AT-SMI-MIB
+;
+                                 
+pri MODULE-IDENTITY
+    LAST-UPDATED "200606281222Z"
+    ORGANIZATION "Allied Telesis, Inc"
+	CONTACT-INFO
+	    "http://www.alliedtelesis.com"
+	DESCRIPTION
+	    "This MIB file contains definitions of managed objects for the
+	    PRI module. "
+
+    REVISION "200606281222Z"
+DESCRIPTION
+	"Initial Revision"
+
+::= { modules 42 }
+
+-- The PRI module. This group consists of a table of PRI interfaces indexed
+-- by ifIndex which provide MIB objects not given in a convenient form by
+-- other standard MIBs. There is also a PRI channel MIB indexed by ifIndex
+-- and channel index which gives information about the channels on the
+-- interface.
+
+-- The PRI interface table. Each entry is a PRI interface on the router.
+
+priIntTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PriIntEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table of PRI interfaces."
+    ::= { pri 1 }
+
+priIntEntry OBJECT-TYPE
+    SYNTAX      PriIntEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A single entry in the PRI interfaces table."
+    INDEX   { priIntIndex }
+    ::= { priIntTable 1 }
+
+PriIntEntry ::=
+    SEQUENCE {
+        priIntIndex
+            INTEGER,
+        priIntBoardIndex
+            INTEGER,
+        priIntBoardPosition
+            INTEGER,
+        priIntMode
+            INTEGER,
+        priIntTdmChannelMap
+            INTEGER,
+        priIntIsdnChannelMap
+            INTEGER,
+        priIntType
+            INTEGER
+    }
+
+priIntIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The ifIndex of the PRI interface."
+    ::= { priIntEntry 1 }
+
+priIntBoardIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index in the arBoardTable of the board on which this PRI
+            interface resides."
+    ::= { priIntEntry 2 }
+
+priIntBoardPosition OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The position on this PRI interface's board of this PRI
+            interface."
+    ::= { priIntEntry 3 }
+
+priIntMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                isdn (1),
+                tdm (2),
+                mixed (3)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The mode of operation of this PRI interface. The value isdn
+            means that the entire interface is operating as an ISDN
+            interface, the value tdm means that the entire interface is
+            operating as TDM groups and the value mixed means that some
+            channels in the interface are dedicated to ISDN and some to TDM
+            groups."
+    ::= { priIntEntry 4 }
+
+priIntTdmChannelMap OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A bit map of the channels in the PRI interface which are
+            dedicated to TDM. PRI channels are numbered from 0 to 31, 0 is
+            unused, 16 (E1) or 24 (T1) is the D channel. The map values are
+            2 to the power of the channel number."
+    ::= { priIntEntry 5 }
+
+priIntIsdnChannelMap OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A bit map of the channels in the PRI interface which are
+            dedicated to ISDN. PRI channels are numbered from 0 to 31, 0 is
+            unused, 16 (E1) or 24 (T1) is the D channel. The map values are
+            2 to the power of the channel number."
+    ::= { priIntEntry 6 }
+
+priIntType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                e1 (1),
+                t1 (2),
+                unknown (3)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The type of primary rate interface. E1 has 30 B + D channel,
+            T1 has 23 B + D channel. If the value unknown is returned for
+            this object, the exact PRI type has not yet been determined."
+    ::= { priIntEntry 7 }
+
+-- The PRI channel table. Each entry is a channel on a PRI interface.
+
+priChanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PriChanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table of channels on PRI interfaces."
+    ::= { pri 2 }
+
+priChanEntry OBJECT-TYPE
+    SYNTAX      PriChanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A single entry in the PRI channels table."
+    INDEX   { priChanIntIndex, priChanChannelIndex }
+    ::= { priChanTable 1 }
+
+PriChanEntry ::=
+    SEQUENCE {
+        priChanIntIndex
+            INTEGER,
+        priChanChannelIndex
+            INTEGER,
+        priChanMode
+            INTEGER,
+        priChanState
+            INTEGER
+    }
+
+priChanIntIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The ifIndex of the PRI interface."
+    ::= { priChanEntry 1 }
+
+priChanChannelIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..31)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The channel index of the PRI channel. Valid channels have
+            indices from 1 to 31. The D channel on an E1 interface has
+            index 16, the D channel on a T1 interface has index 24."
+    ::= { priChanEntry 2 }
+
+priChanMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                isdn (1),
+                tdm (2),
+                neither (3)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The mode of this PRI channel. The value isdn means that the
+            channel is reserved for use in ISDN calls. The value tdm
+            means that the channel is reserved for use by TDM. For the D
+            channel, this object will usually have the value isdn. An
+            exception is if the interface is running common D channel mode
+            and the D channel is reserved for TDM."
+    ::= { priChanEntry 3 }
+
+priChanState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                inactive (1),
+                active (2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The state of this PRI channel. The value inactive means that
+            the channel does not currently have an active user, either an
+            ISDN call or an active TDM group. The value active means that
+            the channel is in use, either by an ISDN call or an active TDM
+            group."
+    ::= { priChanEntry 4 }
+
+END

@@ -10,6 +10,7 @@ class HttpAuthAuthorizer extends AuthorizerBase
 {
     protected static $HAS_AUTH_USERMANAGEMENT = 1;
     protected static $CAN_UPDATE_USER = 1;
+    protected static $AUTH_IS_EXTERNAL = 1;
 
     public function authenticate($username, $password)
     {
@@ -102,5 +103,14 @@ class HttpAuthAuthorizer extends AuthorizerBase
     public function updateUser($user_id, $realname, $level, $can_modify_passwd, $email)
     {
         dbUpdate(array('realname' => $realname, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'email' => $email), 'users', '`user_id` = ?', array($user_id));
+    }
+
+    public function getExternalUsername()
+    {
+        if (isset($_SERVER['REMOTE_USER'])) {
+            return clean($_SERVER['REMOTE_USER']);
+        } elseif (isset($_SERVER['PHP_AUTH_USER'])) {
+            return clean($_SERVER['PHP_AUTH_USER']);
+        }
     }
 }

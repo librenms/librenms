@@ -97,13 +97,16 @@ if ($num > 0) {
     array_unshift($vars, $device['device_id']);
     dbDelete(
         'applications',
-        '`device_id`=? AND `app_type` IN (' . implode(',', array_fill(0, $num, '?')) . ')',
+        '`device_id`=? AND `app_type` IN ' . dbGenPlaceholders($num),
         $vars
     );
     foreach ($apps_to_remove as $app) {
         log_event("Application disabled by discovery: $app", $device, 'application', 3);
     }
 }
+
+// clean application_metrics
+dbDeleteOrphans('application_metrics', array('applications.app_id'));
 
 echo PHP_EOL;
 

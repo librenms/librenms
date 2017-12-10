@@ -30,6 +30,8 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('rxpci', 'GAUGE', 0)
     ->addDataset('txpci', 'GAUGE', 0);
 
+$sm_total = 0;
+$metrics = array();
 foreach ($gpuArray as $index => $gpu) {
     $stats = explode(",", $gpu);
     $sm_total += $stats[3];
@@ -58,10 +60,11 @@ foreach ($gpuArray as $index => $gpu) {
             'rxpci' => $rxpci,
             'txpci' => $txpci
         );
+        $metrics[$index] = $fields;
 
         $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
         data_update($device, 'app', $tags, $fields);
 }
 $sm_average = ($sm_total ? ($sm_total / count($gpuArray)) : 0);
 
-update_application($app, $gpus, $sm_average);
+update_application($app, $gpus, $metrics, $sm_average);

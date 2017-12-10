@@ -210,7 +210,11 @@ function dbBulkInsert($data, $table)
             if ($rowvalues != '') {
                 $rowvalues .= ',';
             }
-            $rowvalues .= "'".mres($value)."'";
+            if (is_null($value)) {
+                $rowvalues .= 'NULL';
+            } else {
+                $rowvalues .= "'" . mres($value) . "'";
+            }
         }
         $values .= "(".$rowvalues.")";
     }
@@ -291,6 +295,55 @@ function dbDelete($table, $where = null, $parameters = array())
     }
 }//end dbDelete()
 
+
+/**
+ * Delete orphaned entries from a table that no longer have a parent in parent_table
+ * Format of parents array is as follows table.table_key_column<.target_key_column>
+ *
+ * @param string $target_table The table to delete entries from
+ * @param array $parents an array of parent tables to check.
+ * @return bool|int
+ */
+function dbDeleteOrphans($target_table, $parents)
+{
+    global $database_link;
+    $time_start = microtime(true);
+
+    if (empty($parents)) {
+        // don't delete all entries if parents is missing
+        return false;
+    }
+
+    $target_table = mres($target_table);
+    $sql = "DELETE T FROM `$target_table` T";
+    $where = array();
+
+    foreach ((array)$parents as $parent) {
+        $parent_parts = explode('.', mres($parent));
+        if (count($parent_parts) == 2) {
+            list($parent_table, $parent_column) = $parent_parts;
+            $target_column = $parent_column;
+        } elseif (count($parent_parts) == 3) {
+            list($parent_table, $parent_column, $target_column) = $parent_parts;
+        } else {
+            // invalid input
+            return false;
+        }
+
+        $sql .= " LEFT JOIN `$parent_table` ON `$parent_table`.`$parent_column` = T.`$target_column`";
+        $where[] = " `$parent_table`.`$parent_column` IS NULL";
+    }
+
+    $query = "$sql WHERE" . implode(' AND', $where);
+    $result = dbQuery($query, array());
+
+    recordDbStatistic('delete', $time_start);
+    if ($result) {
+        return mysqli_affected_rows($database_link);
+    } else {
+        return false;
+    }
+}
 
 /*
  * Fetches all of the rows (associatively) from the last performed query.

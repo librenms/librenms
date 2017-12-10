@@ -46,7 +46,7 @@ pages:
       - Check_MK Setup: Extensions/Agent-Setup.md
       - Extensions/Billing-Module.md
       - Extensions/Dell-OpenManage.md
-      - Extensions/Globe-Frontpage.md
+      - Extensions/World-Map.md
       - Extensions/Interface-Description-Parsing.md
       - Extensions/Network-Map.md
       - Extensions/Syslog.md
@@ -68,6 +68,7 @@ pages:
       - Extensions/IRC-Bot-Extensions.md
       - Extensions/SNMP-Proxy.md
       - Extensions/SNMP-Trap-Handler.md
+      - Support/Cleanup-options.md
   - 6. 3rd Party Integration:
       - Extensions/Graylog.md
       - Nagios Plugins: Extensions/Services.md
@@ -117,6 +118,7 @@ pages:
       - Support/SNMP-Configuration-Examples.md
       - Support/SSL-Configuration.md
       - Support/Device-Troubleshooting.md
+      - Support/Device-Sensors.md
   - 10. Contributing + Developing:
       - Contributing: Developing/index.md
       - Developing/Using-Git.md
@@ -125,6 +127,7 @@ pages:
       - Developing/Validating-Code.md
       - Developing/Code-Structure.md
       - Developing/Creating-Documentation.md
+      - Developing/Licensing.md
       - Extensions/Component.md
       - Mib Based Polling (ALPHA): Extensions/MIB-based-polling.md
       - Support for a new OS:

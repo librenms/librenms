@@ -51,7 +51,7 @@ try {
         // peek inside the class
         $lc_rp = new ReflectionProperty($authorizer, 'ldap_connection');
         $lc_rp->setAccessible(true);
-        $adbind_rm = new ReflectionMethod($authorizer, 'adBind');
+        $adbind_rm = new ReflectionMethod($authorizer, 'bind');
         $adbind_rm->setAccessible(true);
 
         $bind_success = false;
