@@ -135,10 +135,8 @@ foreach (dbFetchRows($sql, $param) as $device) {
 
     if ($device['status'] == '0') {
         $extra = 'label-danger';
-        $msg = $device['status_reason'];
     } else {
         $extra = 'label-success';
-        $msg = 'up';
     }
 
     if ($device['ignore'] == '1') {
@@ -146,13 +144,11 @@ foreach (dbFetchRows($sql, $param) as $device) {
         $msg = 'ignored';
         if ($device['status'] == '1') {
             $extra = 'label-warning';
-            $msg = 'ignored';
         }
     }
 
     if ($device['disabled'] == '1') {
         $extra = 'label-default';
-        $msg = 'disabled';
     }
 
     $type = strtolower($device['os']);
@@ -243,7 +239,6 @@ foreach (dbFetchRows($sql, $param) as $device) {
 
     $response[] = array(
         'extra' => $extra,
-        'msg' => $msg,
         'list_type' => $subformat,
         'icon' => $image,
         'hostname' => $hostname,

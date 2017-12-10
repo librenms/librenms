@@ -367,7 +367,6 @@ if ($format == "graph") {
             <thead>
                 <tr>
                     <th data-column-id="status" data-searchable="false" data-formatter="status"></th>
-                    <th data-column-id="msg" data-width="40px" data-searchable="true" data-formatter="msg">Status</th>
     ';
 
     if ($subformat == "detail") {
