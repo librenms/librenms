@@ -38,7 +38,7 @@ modules:
                     oid: mtxrPOETable
                     value: mtxrPOECurrent
                     num_oid: .1.3.6.1.4.1.14988.1.1.15.1.1.5.
-                    divisor: 10
+                    divisor: 1000
                     descr: '{{ $mtxrPOEName }} POE'
                     index: 'mtxrPOECurrent.{{ $index }}'
         dbm:
