@@ -59,7 +59,6 @@ pages:
       - Auto-discovery Setup: Extensions/Auto-Discovery.md
       - Scaling LibreNMS: Extensions/Distributed-Poller.md
       - Extensions/RRDCached.md
-      - Memcached Config: Extensions/Memcached.md
       - Sub-directory Support: Extensions/Sub-Directory.md
       - Extensions/Varnish.md
       - Poller Service (BETA): Extensions/Poller-Service.md
