@@ -165,8 +165,7 @@ abstract class AuthorizerBase implements Authorizer
         list($uname, $hash) = explode('|', $token);
         $session = dbFetchRow(
             "SELECT * FROM `session` WHERE `session_username`=? AND `session_value`=?",
-            array($uname, $sess_id),
-            true
+            array($uname, $sess_id)
         );
 
         $hasher = new PasswordHash(8, false);

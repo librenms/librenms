@@ -87,7 +87,7 @@ class SSOAuthorizer extends AuthorizerBase
     public function userExists($username, $throw_exception = false)
     {
         // A local user is always created, so we query this, as in the event of an admin choosing to manually administer user creation we should return false.
-        $user = dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($this->getExternalUsername()), true);
+        $user = dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($this->getExternalUsername()));
 
         if ($throw_exception) {
             // Hopefully the caller knows what they're doing
@@ -101,14 +101,14 @@ class SSOAuthorizer extends AuthorizerBase
     public function getUserLevel($username)
     {
         // The user level should always be persisted to the database (and may be managed there) so we again query the database.
-        return dbFetchCell('SELECT `level` FROM `users` WHERE `username` = ?', array($this->getExternalUsername()), true);
+        return dbFetchCell('SELECT `level` FROM `users` WHERE `username` = ?', array($this->getExternalUsername()));
     }
 
 
     public function getUserid($username)
     {
         // User ID is obviously unique to LibreNMS, this must be resolved via the database
-        return dbFetchCell('SELECT `user_id` FROM `users` WHERE `username` = ?', array($this->getExternalUsername()), true);
+        return dbFetchCell('SELECT `user_id` FROM `users` WHERE `username` = ?', array($this->getExternalUsername()));
     }
 
 
@@ -133,7 +133,7 @@ class SSOAuthorizer extends AuthorizerBase
 
     public function getUser($user_id)
     {
-        return dbFetchRow('SELECT * FROM `users` WHERE `user_id` = ?', array($user_id), true);
+        return dbFetchRow('SELECT * FROM `users` WHERE `user_id` = ?', array($user_id));
     }
 
     public function updateUser($user_id, $realname, $level, $can_modify_passwd, $email)

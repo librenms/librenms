@@ -86,7 +86,7 @@ class ADAuthorizationAuthorizer extends AuthorizerBase
 
     protected function userExistsInDb($username)
     {
-        $return = dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username), true);
+        $return = dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username));
         return $return;
     }
 
@@ -235,7 +235,7 @@ class ADAuthorizationAuthorizer extends AuthorizerBase
     public function getUser($user_id)
     {
         // not supported so return 0
-        return dbFetchRow('SELECT * FROM `users` WHERE `user_id` = ?', array($user_id), true);
+        return dbFetchRow('SELECT * FROM `users` WHERE `user_id` = ?', array($user_id));
     }
 
 

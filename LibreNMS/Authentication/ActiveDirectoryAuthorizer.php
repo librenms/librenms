@@ -122,7 +122,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
     protected function userExistsInDb($username)
     {
-        $return = dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username), true);
+        $return = dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username));
         return $return;
     }
 
