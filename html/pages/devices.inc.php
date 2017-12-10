@@ -19,7 +19,7 @@ if (!isset($vars['format'])) {
     $vars['format'] = "list_detail";
 }
 
-$listoptions ='<span class="devices-font-bold">Lists: </span>';
+$listoptions = '<span class="devices-font-bold">Lists: </span>';
 
 $menu_options = array('basic' => 'Basic', 'detail' => 'Detail');
 
@@ -229,7 +229,7 @@ if ($format == "graph") {
                 $graph_array_zoom['width'] = '400';
                 $graph_array_zoom['legend'] = 'yes';
 
-                $link_array         = $graph_array;
+                $link_array = $graph_array;
                 $link_array['page'] = 'graphs';
                 $link_array['type'] = $graph_type;
                 $link_array['device'] = $device['device_id'];
@@ -355,10 +355,10 @@ if ($format == "graph") {
     <div class="panel-heading">
         <div class="row" style="padding: 0px 10px 0px 10px;">
             <div class="pull-left">
-            '.$listoptions .'
+            ' . $listoptions . '
             </div>
             <div class="pull-right">
-            '.$headeroptions.'
+            ' . $headeroptions . '
             </div>
         </div>
     </div>
@@ -443,27 +443,27 @@ if ($format == "graph") {
         <?php
         if (!isset($vars['searchbar']) && $vars['searchbar'] != "hide") {
         ?>
-            $(".devices-headers-table-menu").append(
-                "<div class='pull-left'>" +
-                "<form method='post' action='' class='form-inline devices-search-header' role='form'>" +
-                "<div class='form-group'>" +
-                "<input type='text' name='hostname' id='hostname' value=''<?php echo $vars['hostname']; ?>'' class='form-control input-sm' placeholder='Hostname'>" +
-                "</div>" +
-                "<div class='form-group'><?php echo $os_options; ?></div>" +
-                "<div class='form-group'><?php echo $ver_options; ?></div>" +
-                "<div class='form-group'><?php echo $platform_options; ?></div>" +
-                "<div class='form-group'><?php echo $features_options; ?></div>" +
-                "<div class='form-group'><?php echo $locations_options; ?></div>" +
-                "<div class='form-group'><?php echo $types_options; ?></div>" +
-                "<input type='submit' class='btn btn-default input-sm devices-input-small' value='Search'>" +
-                "<a href=''<?php generate_url($vars) ?>'' title='Update the browser URL to reflect the search criteria.' class='btn btn-default input-sm devices-input-small'>Update URL</a>" +
-                "<a href=''<?php generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare'])) ?>'' title='Reset critera to default.' class='btn btn-default input-sm devices-input-small'>Reset</a>" +
-                "</form>" +
-                "</div>"
-            );
+        $(".devices-headers-table-menu").append(
+            "<div class='pull-left'>" +
+            "<form method='post' action='' class='form-inline devices-search-header' role='form'>" +
+            "<div class='form-group'>" +
+            "<input type='text' name='hostname' id='hostname' value=''<?php echo $vars['hostname']; ?>'' class='form-control input-sm' placeholder='Hostname'>" +
+            "</div>" +
+            "<div class='form-group'><?php echo $os_options; ?></div>" +
+            "<div class='form-group'><?php echo $ver_options; ?></div>" +
+            "<div class='form-group'><?php echo $platform_options; ?></div>" +
+            "<div class='form-group'><?php echo $features_options; ?></div>" +
+            "<div class='form-group'><?php echo $locations_options; ?></div>" +
+            "<div class='form-group'><?php echo $types_options; ?></div>" +
+            "<input type='submit' class='btn btn-default input-sm devices-input-small' value='Search'>" +
+            "<a href=''<?php generate_url($vars) ?>'' title='Update the browser URL to reflect the search criteria.' class='btn btn-default input-sm devices-input-small'>Update URL</a>" +
+            "<a href=''<?php generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare'])) ?>'' title='Reset critera to default.' class='btn btn-default input-sm devices-input-small'>Reset</a>" +
+            "</form>" +
+            "</div>"
+        );
         <?php
         }
         ?>
     </script>
-<?php
+    <?php
 }
