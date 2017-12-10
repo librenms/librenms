@@ -75,6 +75,11 @@ if (isset($vars['bare']) && $vars['bare'] == "yes") {
     $displayLists .= '<a href="' . generate_url($vars, array('bare' => 'yes')) . '">Header</a>';
 }
 
+$displayLists .= ' | ';
+$displayLists .= '<span style="font-weight: bold;">Bulk actions</span> &#187';
+
+$displayLists .= '<a href="ports/deleted=yes/purge=all" title="Delete ports"> Purge all deleted</a>';
+
 $displayLists .= '</div>';
 
 if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars['searchbar'])) {
@@ -95,7 +100,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
         } else {
             $deviceselected = "";
         }
-        $ui_device = strlen(format_hostname($data)) > 25 ? substr(format_hostname($data),0,25)."..." : format_hostname($data);
+        $ui_device = strlen(format_hostname($data)) > 15 ? substr(format_hostname($data), 0, 15) . "..." : format_hostname($data);
         $output .= "<option value='" . $data['device_id'] . "' " . $deviceselected . ">" . $ui_device . "</option>";
     }
 
@@ -240,7 +245,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
             } else {
                 $locationselected = "";
             }
-            $ui_location = strlen($location) > 25 ? substr($location,0,25)."..." : $location;
+            $ui_location = strlen($location) > 15 ? substr($location, 0, 15) . "..." : $location;
             $output .= "<option value='" . $location . "' " . $locationselected . ">" . $ui_location . "</option>";
         }
     }
@@ -362,10 +367,20 @@ foreach ($vars as $var => $value) {
                 }
                 break;
             case 'purge':
-                $interface = dbFetchRow('SELECT * from `ports` AS P, `devices` AS D WHERE `port_id` = ? AND D.device_id = P.device_id', array($vars['purge']));
-                $interface = cleanPort($interface);
-                if (port_permitted($interface['port_id'], $interface['device_id'])) {
-                    delete_port($interface['port_id']);
+                if ($vars['purge'] === 'all') {
+                    $interfaces = dbFetchRow('SELECT * from `ports` AS P, `devices` AS D WHERE `deleted` = 1 AND D.device_id = P.device_id');
+                    foreach ($interfaces as $interface) {
+                        $interface = cleanPort($interface);
+                        if (port_permitted($interface['port_id'], $interface['device_id'])) {
+                            delete_port($interface['port_id']);
+                        }
+                    }
+                } else {
+                    $interface = dbFetchRow('SELECT * from `ports` AS P, `devices` AS D WHERE `port_id` = ? AND D.device_id = P.device_id', array($vars['purge']));
+                    $interface = cleanPort($interface);
+                    if (port_permitted($interface['port_id'], $interface['device_id'])) {
+                        delete_port($interface['port_id']);
+                    }
                 }
                 break;
         }
@@ -426,4 +441,3 @@ switch ($vars['sort']) {
 if (file_exists('pages/ports/' . $format . '.inc.php')) {
     require 'pages/ports/' . $format . '.inc.php';
 }
-

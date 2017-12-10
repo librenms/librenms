@@ -141,12 +141,12 @@ foreach (dbFetchRows($query, $param) as $port) {
     $device = device_by_id_cache($port['device_id']);
     $port = cleanPort($port, $device);
 
-    switch($port['ifOperStatus']) {
+    switch ($port['ifOperStatus']) {
         case 'up':
             $status = '<span class="alert-status label-success">&nbsp;</span>';
             break;
         case 'down':
-            switch($port['ifAdminStatus']) {
+            switch ($port['ifAdminStatus']) {
                 case 'up':
                     $status = '<span class="alert-status label-danger">&nbsp;</span>';
                     break;
@@ -174,7 +174,7 @@ foreach (dbFetchRows($query, $param) as $port) {
 
     if ($_POST['deleted'] === 'yes') {
         if (port_permitted($port['port_id'], $device['device_id'])) {
-            $actions .= '<div class="col-xs-1"><a href="ports/deleted=yes/purge='.$port['port_id'].'" title="Delete port"><i class="fa fa-times fa-lg icon-theme"></i></a></div>';
+            $actions .= '<div class="col-xs-1"><a href="ports/deleted=yes/purge=' . $port['port_id'] . '" title="Delete port"><i class="fa fa-times fa-lg icon-theme"></i></a></div>';
         }
     }
 
