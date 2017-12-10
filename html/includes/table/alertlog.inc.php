@@ -16,7 +16,7 @@
 $where = 1;
 
 if (is_numeric($_POST['device_id'])) {
-    $where  .= ' AND E.device_id = ?';
+    $where .= ' AND E.device_id = ?';
     $param[] = $_POST['device_id'];
 }
 
@@ -28,7 +28,7 @@ if ($_POST['state'] >= 0) {
 if ($_SESSION['userlevel'] >= '5') {
     $sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where";
 } else {
-    $sql     = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id RIGHT JOIN devices_perms AS P ON E.device_id = P.device_id WHERE $where AND P.user_id = ?";
+    $sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id RIGHT JOIN devices_perms AS P ON E.device_id = P.device_id WHERE $where AND P.user_id = ?";
     $param[] = array($_SESSION['user_id']);
 }
 
@@ -37,7 +37,7 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
 }
 
 $count_sql = "SELECT COUNT(`E`.`id`) $sql";
-$total     = dbFetchCell($count_sql, $param);
+$total = dbFetchCell($count_sql, $param);
 if (empty($total)) {
     $total = 0;
 }
@@ -49,7 +49,7 @@ if (!isset($sort) || empty($sort)) {
 $sql .= " ORDER BY $sort";
 
 if (isset($current)) {
-    $limit_low  = (($current * $rowCount) - ($rowCount));
+    $limit_low = (($current * $rowCount) - ($rowCount));
     $limit_high = $rowCount;
 }
 
@@ -57,51 +57,45 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT D.device_id,name AS alert,rule_id, state,time_logged,DATE_FORMAT(time_logged, '".$config['dateformat']['mysql']['compact']."') as humandate,details $sql";
+$sql = "SELECT D.device_id,name AS alert,rule_id, state,time_logged,DATE_FORMAT(time_logged, '" . $config['dateformat']['mysql']['compact'] . "') as humandate,details $sql";
 
 $rulei = 0;
 foreach (dbFetchRows($sql, $param) as $alertlog) {
-    $dev          = device_by_id_cache($alertlog['device_id']);
+    $dev = device_by_id_cache($alertlog['device_id']);
     logfile($alertlog['rule_id']);
-    $log          = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? AND `state` = 1 ORDER BY id DESC LIMIT 1', array($alertlog['rule_id'], $alertlog['device_id']));
+    $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? AND `state` = 1 ORDER BY id DESC LIMIT 1', array($alertlog['rule_id'], $alertlog['device_id']));
     $fault_detail = alert_details($log);
     if (empty($fault_detail)) {
         $fault_detail = 'Rule created, no faults found';
     }
-    $alert_state  = $alertlog['state'];
+    $alert_state = $alertlog['state'];
     if ($alert_state == '0') {
         $status = 'label-success';
-        $status_text = 'Ok';
     } elseif ($alert_state == '1') {
         $status = 'label-danger';
-        $status_text = 'Alert';
     } elseif ($alert_state == '2') {
         $status = 'label-info';
-        $status_text = 'Ack';
     } elseif ($alert_state == '3') {
         $status = 'label-warning';
-        $status_text = 'Got worse';
     } elseif ($alert_state == '4') {
         $status = 'label-primary';
-        $status_text = 'Got better';
     }//end if
 
 
     $response[] = array(
-        'id'          => $rulei++,
+        'id' => $rulei++,
         'time_logged' => $alertlog['humandate'],
-        'details'     => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident'.($rulei).'" data-parent="#alerts"></a>',
-        'hostname'    => '<div class="incident">'.generate_device_link($dev, shorthost($dev['hostname'])).'<div id="incident'.($rulei).'" class="collapse">'.$fault_detail.'</div></div>',
-        'alert'       => htmlspecialchars($alertlog['alert']),
-        'status'      => "<i class='alert-status ".$status."'></i>",
-        'info'        => $status_text,
+        'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . ($rulei) . '" data-parent="#alerts"></a>',
+        'hostname' => '<div class="incident">' . generate_device_link($dev, shorthost($dev['hostname'])) . '<div id="incident' . ($rulei) . '" class="collapse">' . $fault_detail . '</div></div>',
+        'alert' => htmlspecialchars($alertlog['alert']),
+        'status' => "<i class='alert-status " . $status . "'></i>"
     );
 }//end foreach
 
 $output = array(
-    'current'  => $current,
+    'current' => $current,
     'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
+    'rows' => $response,
+    'total' => $total,
 );
 echo _json_encode($output);
