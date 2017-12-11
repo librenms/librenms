@@ -156,8 +156,8 @@ if ('distributed_poller' in config and
         if memc_alive():
             if memc.get("discovery.master") is None:
                 print "Registered as Master"
-                memc.set("discovery.master", config['distributed_poller_name'], 10)
-                memc.set("discovery.nodes", 0, 300)
+                memc.set("discovery.master", config['distributed_poller_name'], 30)
+                memc.set("discovery.nodes", 0, 3600)
                 IsNode = False
             else:
                 print "Registered as Node joining Master %s" % memc.get("discovery.master")
@@ -246,7 +246,7 @@ def printworker():
         global distdisco
         if distdisco:
             if not IsNode:
-                memc_touch('discovery.master', 10)
+                memc_touch('discovery.master', 30)
                 nodes = memc.get('discovery.nodes')
                 if nodes is None and not memc_alive():
                     print "WARNING: Lost Memcached. Taking over all devices. Nodes will quit shortly."
@@ -256,7 +256,7 @@ def printworker():
                     print "INFO: %s Node(s) Total" % (nodes)
                     nodeso = nodes
             else:
-                memc_touch('discovery.nodes', 10)
+                memc_touch('discovery.nodes', 30)
             try:
                 worker_id, device_id, elapsed_time = print_queue.get(False)
             except:

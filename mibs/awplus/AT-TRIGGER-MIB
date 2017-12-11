@@ -1,0 +1,460 @@
+-- ============================================================================
+-- at-trigger.mib Allied Telesis enterprise MIB: trigger
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-TRIGGER-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            modules
+                FROM AT-SMI-MIB
+            ifIndex
+                FROM IF-MIB
+            Unsigned32, Counter32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            DisplayString, TruthValue
+                FROM SNMPv2-TC;
+
+
+        trigger MODULE-IDENTITY
+            LAST-UPDATED "201501050000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc"
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "This MIB file contains definitions of managed objects for the
+                TRIGGER module. "
+            REVISION "201501050000Z"
+            DESCRIPTION
+                "Add ATMF node trigger MIB"
+            REVISION "201009070000Z"
+            DESCRIPTION
+                "Generic syntax tidy up"
+            REVISION "201006150015Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "200711281600Z"
+            DESCRIPTION
+                "Added trigger configuration details for AW+"
+            ::= { modules 53 }
+
+
+
+
+--
+-- Node definitions
+--
+
+        triggerTraps OBJECT IDENTIFIER ::= { trigger 0 }
+
+
+        triggerTrap NOTIFICATION-TYPE
+            OBJECTS { triggerLastTriggerActivated }
+            STATUS current
+            DESCRIPTION
+                "A trigger trap is generated a trigger is activated. The number of the trigger
+                activated is given by the variable triggerLastTriggerActivated."
+            ::= { triggerTraps 1 }
+
+
+-- The trigger group. This group contains information pertinent to triggers in the router.
+-- The last trigger activated on the router/switch.
+        triggerLastTriggerActivated OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The trigger number of the most recent trigger activated on this router. This is
+                also the variable sent in the trigger trap below. If no triggers have been activated
+                yet since the last restart of this router, this variable will read as 0."
+            ::= { trigger 1 }
+
+
+--   The trigger configuration information table
+--
+        triggerConfigInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF TriggerConfigInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The (conceptual) table listing entries of trigger configuration details."
+            ::= { trigger 9 }
+
+
+        triggerConfigInfoEntry OBJECT-TYPE
+            SYNTAX TriggerConfigInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry (conceptual row) in the triggerConfigInfoTable."
+            INDEX { triggerNumber }
+            ::= { triggerConfigInfoTable 1 }
+
+
+        TriggerConfigInfoEntry ::=
+            SEQUENCE {
+                triggerNumber
+                    Unsigned32,
+                triggerName
+                    DisplayString,
+                triggerTypeDetail
+                    DisplayString,
+                triggerActiveDaysOrDate
+                    DisplayString,
+                triggerActivateAfter
+                    DisplayString,
+                triggerActivateBefore
+                    DisplayString,
+                triggerActiveStatus
+                    TruthValue,
+                triggerTestMode
+                    TruthValue,
+                triggerSnmpTrap
+                    TruthValue,
+                triggerRepeatTimes
+                    DisplayString,
+                triggerLasttimeModified
+                    DisplayString,
+                triggerNumberOfActivation
+                    Counter32,
+                triggerLasttimeActivation
+                    DisplayString,
+                triggerNumberOfScripts
+                    Unsigned32,
+                triggerScript1
+                    DisplayString,
+                triggerScript2
+                    DisplayString,
+                triggerScript3
+                    DisplayString,
+                triggerScript4
+                    DisplayString,
+                triggerScript5
+                    DisplayString
+             }
+
+        triggerNumber OBJECT-TYPE
+            SYNTAX Unsigned32 (1..250)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The object represents the ID number of the trigger."
+            ::= { triggerConfigInfoEntry 1 }
+
+
+        triggerName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the name and description
+                of the trigger."
+            ::= { triggerConfigInfoEntry 2 }
+
+
+        triggerTypeDetail OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the trigger type and
+                its activation conditions."
+            ::= { triggerConfigInfoEntry 3 }
+
+
+        triggerActiveDaysOrDate OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects indicates either the days of a week or the date,
+                on which the trigger is permitted to activate."
+            ::= { triggerConfigInfoEntry 4 }
+
+
+        triggerActivateAfter OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the time when the trigger will
+                be activated afterwards."
+            ::= { triggerConfigInfoEntry 5 }
+
+
+        triggerActivateBefore OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the time when the trigger will
+                be activated before."
+            ::= { triggerConfigInfoEntry 6 }
+
+
+        triggerActiveStatus OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether or not the trigger is
+                permitted to activate.
+                "
+            ::= { triggerConfigInfoEntry 7 }
+
+
+        triggerTestMode OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether or not the trigger is
+                operating in diagnostic mode.
+                "
+            ::= { triggerConfigInfoEntry 8 }
+
+
+        triggerSnmpTrap OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether or not a snmp trap will
+                be sent when the trigger is activated."
+            ::= { triggerConfigInfoEntry 9 }
+
+
+        triggerRepeatTimes OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects indicates whether the trigger repeats
+                an unlimited number of times (continuous) or for a
+                set of times.
+                When the trigger can repeat only a set
+                of times, then the number of times the trigger has
+                been activated is displayed in brackets."
+            ::= { triggerConfigInfoEntry 10 }
+
+
+        triggerLasttimeModified OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the date and time of the last
+                time that the trigger was modified."
+            ::= { triggerConfigInfoEntry 11 }
+
+
+        triggerNumberOfActivation OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The objects represents the number of times the trigger
+                has been activated since the last restart of the device.
+                "
+            ::= { triggerConfigInfoEntry 12 }
+
+
+        triggerLasttimeActivation OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the date and time of the last
+                time that the trigger was activated."
+            ::= { triggerConfigInfoEntry 13 }
+
+
+        triggerNumberOfScripts OBJECT-TYPE
+            SYNTAX Unsigned32 (0..5)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the number of scripts that are
+                associated with this trigger."
+            ::= { triggerConfigInfoEntry 14 }
+
+
+        triggerScript1 OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the name of the 1st script
+                that is associated with the trigger.
+                "
+            ::= { triggerConfigInfoEntry 15 }
+
+
+        triggerScript2 OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the name of the 2nd script
+                that is associated with the trigger.
+                "
+            ::= { triggerConfigInfoEntry 16 }
+
+
+        triggerScript3 OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the name of the 3rd script
+                that is associated with the trigger.
+                "
+            ::= { triggerConfigInfoEntry 17 }
+
+
+        triggerScript4 OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the name of the 4th script
+                that is associated with the trigger.
+                "
+            ::= { triggerConfigInfoEntry 18 }
+
+
+        triggerScript5 OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the name of the 5th script
+                that is associated with the trigger.
+                "
+            ::= { triggerConfigInfoEntry 19 }
+
+
+--   The trigger counters table
+--
+        triggerCounters OBJECT IDENTIFIER ::= { trigger 10 }
+
+
+        triggerNumOfActivation OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the number of times a trigger
+                has been activated."
+            ::= { triggerCounters 1 }
+
+
+        triggerNumOfActivationToday OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the number of times a trigger
+                has been activated today."
+            ::= { triggerCounters 2 }
+
+
+        triggerNumOfPerodicActivationToday OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the number of times a periodic
+                trigger has been activated today."
+            ::= { triggerCounters 3 }
+
+
+        triggerNumOfInterfaceActivationToday OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the number of times an interface
+                trigger has been activated today."
+            ::= { triggerCounters 4 }
+
+
+        triggerNumOfResourceActivationToday OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the number of times a CPU or
+                memory trigger has been activated today."
+            ::= { triggerCounters 5 }
+
+
+        triggerNumOfRebootActivationToday OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the number of times a reboot
+                trigger has been activated today."
+            ::= { triggerCounters 6 }
+
+
+        triggerNumOfPingPollActivationToday OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the number of times a ping-poll
+                trigger has been activated today."
+            ::= { triggerCounters 7 }
+
+
+        triggerNumOfStackMasterFailActivationToday OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the number of times a stack master
+                fail trigger has been activated today."
+            ::= { triggerCounters 8 }
+
+
+        triggerNumOfStackMemberActivationToday OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the number of times a stack member
+                trigger has been activated today."
+            ::= { triggerCounters 9 }
+
+
+        triggerNumOfStackXemStkActivationToday OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the number of times a stack
+                xem-stack trigger has been activated today."
+            ::= { triggerCounters 10 }
+
+
+        triggerNumOfATMFNodeActivationToday OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the number of times a ATMF
+                node trigger has been activated today."
+            ::= { triggerCounters 11 }
+
+    END
+
+--
+-- at-trigger.mib
+--
+

@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 $no_refresh = true;
 
 require 'includes/javascript-interfacepicker.inc.php';
@@ -12,7 +14,7 @@ if ($_SESSION['userlevel'] != '10') {
     include 'includes/error-no-perm.inc.php';
 } else {
     if ($vars['user_id'] && !$vars['edit']) {
-        $user_data = get_user($vars['user_id']);
+        $user_data = Auth::get()->getUser($vars['user_id']);
         echo '<p><h2>'.$user_data['realname']."</h2><a href='edituser/'>Change...</a></p>";
         // Perform actions if requested
         if ($vars['action'] == 'deldevperm') {
@@ -249,10 +251,10 @@ if ($_SESSION['userlevel'] != '10') {
                     $vars['can_modify_passwd'] = '1';
                 }
 
-                update_user($vars['user_id'], $vars['new_realname'], $vars['new_level'], $vars['can_modify_passwd'], $vars['new_email']);
+                Auth::get()->updateUser($vars['user_id'], $vars['new_realname'], $vars['new_level'], $vars['can_modify_passwd'], $vars['new_email']);
                 print_message('User has been updated');
-                if (!empty($vars['new_pass1']) && $vars['new_pass1'] == $vars['new_pass2'] && passwordscanchange($vars['cur_username'])) {
-                    if (changepassword($vars['cur_username'], $vars['new_pass1']) == 1) {
+                if (!empty($vars['new_pass1']) && $vars['new_pass1'] == $vars['new_pass2'] && Auth::get()->canUpdatePasswords($vars['cur_username'])) {
+                    if (Auth::get()->changePassword($vars['cur_username'], $vars['new_pass1']) == 1) {
                         print_message("User password has been updated");
                     } else {
                         print_error("Password couldn't be updated");
@@ -262,7 +264,7 @@ if ($_SESSION['userlevel'] != '10') {
                 }
             }
 
-            $users_details = get_user($vars['user_id']);
+            $users_details = Auth::get()->getUser($vars['user_id']);
             if (!empty($users_details)) {
                 if (!empty($vars['dashboard']) && $vars['dashboard'] != $users_details['dashboard']) {
                     set_user_pref('dashboard', $vars['dashboard']);
@@ -273,7 +275,7 @@ if ($_SESSION['userlevel'] != '10') {
   <input type='hidden' name='cur_username' value='" . $users_details['username'] . "'>
   <input type='hidden' name='edit' value='yes'>
 ";
-                if (can_update_users() == '1') {
+                if (Auth::get()->canUpdateUsers() == '1') {
                     if (empty($vars['new_realname'])) {
                         $vars['new_realname'] = $users_details['realname'];
                     }
@@ -335,7 +337,7 @@ if ($_SESSION['userlevel'] != '10') {
     </div>
   </div>";
 
-                    if (passwordscanchange($users_details['username'])) {
+                    if (Auth::get()->canUpdatePasswords($users_details['username'])) {
                         echo "
         <div class='form-group'>
             <label for='new_pass1' class='col-sm-2 control-label'>Password</label>
@@ -430,7 +432,7 @@ if ($_SESSION['userlevel'] != '10') {
             }//end if !empty($users_details)
         }//end if
     } else {
-        $user_list = get_userlist();
+        $user_list = Auth::get()->getUserlist();
 
         echo '<h3>Select a user to edit</h3>';
 

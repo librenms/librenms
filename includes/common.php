@@ -86,6 +86,7 @@ function shorthost($hostname, $len = 12)
     if (filter_var($hostname, FILTER_VALIDATE_IP)) {
         return $hostname;
     }
+    $len = Config::get('shorthost_target_length', $len);
 
     $parts = explode(".", $hostname);
     $shorthost = $parts[0];
@@ -1131,7 +1132,7 @@ function version_info($remote = false)
         $output['local_date']   = $local_date;
         $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
     }
-    $output['db_schema']   = get_db_schema() ?: '?';
+    $output['db_schema']   = dbIsConnected() ? get_db_schema() : '?';
     $output['php_ver']     = phpversion();
     $output['mysql_ver']   = dbIsConnected() ? dbFetchCell('SELECT version()') : '?';
     $output['rrdtool_ver'] = str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
@@ -1161,8 +1162,8 @@ function inet6_ntop($ip)
 
 /**
  * If hostname is an ip, use return sysName
- * @param array device
- * @param string hostname
+ * @param array $device
+ * @param string $hostname
  * @return string
 **/
 function format_hostname($device, $hostname = '')
@@ -1181,30 +1182,11 @@ function format_hostname($device, $hostname = '')
 
 /**
  * Return valid port association modes
- * @param bool $no_cache No-Cache flag (optional, default false)
  * @return array
  */
-function get_port_assoc_modes($no_cache = false)
+function get_port_assoc_modes()
 {
-    global $config;
-
-    if ($config['memcached']['enable'] && $no_cache === false) {
-        $assoc_modes = $config['memcached']['resource']->get(hash('sha512', "port_assoc_modes"));
-        if (! empty($assoc_modes)) {
-            return $assoc_modes;
-        }
-    }
-
-    $assoc_modes = null;
-    foreach (dbFetchRows("SELECT `name` FROM `port_association_mode` ORDER BY pom_id") as $row) {
-        $assoc_modes[] = $row['name'];
-    }
-
-    if ($config['memcached']['enable'] && $no_cache === false) {
-        $config['memcached']['resource']->set(hash('sha512', "port_assoc_modes"), $assoc_modes, $config['memcached']['ttl']);
-    }
-
-    return $assoc_modes;
+    return dbFetchColumn("SELECT `name` FROM `port_association_mode` ORDER BY pom_id");
 }
 
 /**
@@ -1220,58 +1202,21 @@ function is_valid_port_assoc_mode($port_assoc_mode)
 /**
  * Get DB id of given port association mode name
  * @param string $port_assoc_mode
- * @param bool $no_cache No-Cache flag (optional, default false)
+ * @return int
  */
-function get_port_assoc_mode_id($port_assoc_mode, $no_cache = false)
+function get_port_assoc_mode_id($port_assoc_mode)
 {
-    global $config;
-
-    if ($config['memcached']['enable'] && $no_cache === false) {
-        $id = $config['memcached']['resource']->get(hash('sha512', "port_assoc_mode_id|$port_assoc_mode"));
-        if (! empty($id)) {
-            return $id;
-        }
-    }
-
-    $id = null;
-    $row = dbFetchRow("SELECT `pom_id` FROM `port_association_mode` WHERE name = ?", array ($port_assoc_mode));
-    if ($row) {
-        $id = $row['pom_id'];
-        if ($config['memcached']['enable'] && $no_cache === false) {
-            $config['memcached']['resource']->set(hash('sha512', "port_assoc_mode_id|$port_assoc_mode"), $id, $config['memcached']['ttl']);
-        }
-    }
-
-    return $id;
+    return (int)dbFetchCell("SELECT `pom_id` FROM `port_association_mode` WHERE name = ?", array ($port_assoc_mode));
 }
 
 /**
  * Get name of given port association_mode ID
  * @param int $port_assoc_mode_id Port association mode ID
- * @param bool $no_cache No-Cache flag (optional, default false)
  * @return bool
  */
-function get_port_assoc_mode_name($port_assoc_mode_id, $no_cache = false)
+function get_port_assoc_mode_name($port_assoc_mode_id)
 {
-    global $config;
-
-    if ($config['memcached']['enable'] && $no_cache === false) {
-        $name = $config['memcached']['resource']->get(hash('sha512', "port_assoc_mode_name|$port_assoc_mode_id"));
-        if (! empty($name)) {
-            return $name;
-        }
-    }
-
-    $name = null;
-    $row = dbFetchRow("SELECT `name` FROM `port_association_mode` WHERE pom_id = ?", array ($port_assoc_mode_id));
-    if ($row) {
-        $name = $row['name'];
-        if ($config['memcached']['enable'] && $no_cache === false) {
-            $config['memcached']['resource']->set(hash('sha512', "port_assoc_mode_name|$port_assoc_mode_id"), $name, $config['memcached']['ttl']);
-        }
-    }
-
-    return $name;
+    return dbFetchCell("SELECT `name` FROM `port_association_mode` WHERE pom_id = ?", array ($port_assoc_mode_id));
 }
 
 /**
@@ -1352,7 +1297,7 @@ function get_port_id($ports_mapped, $port, $port_association_mode)
  * @param int $x Recursion Anchor
  * @param array $hist History of processed tables
  * @param array $last Glues on the fringe
- * @return string|boolean
+ * @return array|false
  */
 function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array())
 {
@@ -1369,6 +1314,20 @@ function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array()
             return false;
         }
         foreach ($tables as $table) {
+            if ($table == 'state_translations' && ($target == 'device_id' || $target == 'sensor_id')) {
+                // workaround for state_translations
+                return array_merge($last, array(
+                    'state_translations.state_index_id',
+                    'sensors_to_state_indexes.sensor_id',
+                    "sensors.$target",
+                ));
+            } elseif ($table == 'application_metrics' && $target = 'device_id') {
+                return array_merge($last, array(
+                    'application_metrics.app_id',
+                    "applications.$target",
+                ));
+            }
+
             $glues = dbFetchRows('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME LIKE "%\_id"', array($table));
             if (sizeof($glues) == 1 && $glues[0]['COLUMN_NAME'] != $target) {
                 //Search for new candidates to expand
@@ -1606,6 +1565,8 @@ function load_os(&$device)
 
     if ($config['os'][$device['os']]['group']) {
         $device['os_group'] = $config['os'][$device['os']]['group'];
+    } else {
+        unset($device['os_group']);
     }
 }
 
@@ -1845,4 +1806,33 @@ function str_to_class($name, $namespace = null)
     $pre_format = str_replace(array('-', '_'), ' ', $name);
     $class = str_replace(' ', '', ucwords(strtolower($pre_format)));
     return $namespace . $class;
+}
+
+/**
+ * Checks file permissions against a minimum permissions mask.
+ * This only check that bits are enabled, not disabled.
+ * The mask is in the same format as posix permissions. For example, 600 means user read and write.
+ *
+ * @param string $file the name of the file to check
+ * @param $mask
+ * @return bool
+ */
+function check_file_permissions($file, $mask)
+{
+    $perms = fileperms($file);
+    $mask = octdec($mask);
+
+    return ($perms & $mask) === $mask;
+}
+
+/**
+ * Index an array by a column
+ *
+ * @param array $array
+ * @param string|int $column
+ * @return array
+ */
+function array_by_column($array, $column)
+{
+    return array_combine(array_column($array, $column), $array);
 }

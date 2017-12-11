@@ -1,35 +1,44 @@
 <?php
 echo ' ENTITY-SENSOR: ';
 echo 'Caching OIDs:';
-if (!is_array($entity_array)) {
+if (empty($entity_array)) {
     $entity_array = array();
     echo ' entPhysicalDescr';
     $entity_array = snmpwalk_cache_multi_oid($device, 'entPhysicalDescr', $entity_array, 'CISCO-ENTITY-SENSOR-MIB');
-    echo ' entPhysicalName';
-    $entity_array = snmpwalk_cache_multi_oid($device, 'entPhysicalName', $entity_array, 'CISCO-ENTITY-SENSOR-MIB');
+    if (!empty($entity_array)) {
+        echo ' entPhysicalName';
+        $entity_array = snmpwalk_cache_multi_oid($device, 'entPhysicalName', $entity_array, 'CISCO-ENTITY-SENSOR-MIB');
+    }
 }
-$oids = array();
-echo ' entPhySensorType';
-$oids = snmpwalk_cache_multi_oid($device, 'entPhySensorType', $oids, 'ENTITY-SENSOR-MIB');
-echo ' entPhySensorScale';
-$oids = snmpwalk_cache_multi_oid($device, 'entPhySensorScale', $oids, 'ENTITY-SENSOR-MIB');
-echo ' entPhySensorPrecision';
-$oids = snmpwalk_cache_multi_oid($device, 'entPhySensorPrecision', $oids, 'ENTITY-SENSOR-MIB');
-echo ' entPhySensorValue';
-$oids = snmpwalk_cache_multi_oid($device, 'entPhySensorValue', $oids, 'ENTITY-SENSOR-MIB');
-if ($device['os'] === 'arista_eos') {
-    require 'includes/discovery/sensors/misc/arista-eos-limits.inc.php';
+
+if (!empty($entity_array)) {
+    $oids = array();
+    echo ' entPhySensorType';
+    $oids = snmpwalk_cache_multi_oid($device, 'entPhySensorType', $oids, 'ENTITY-SENSOR-MIB');
+    echo ' entPhySensorScale';
+    $oids = snmpwalk_cache_multi_oid($device, 'entPhySensorScale', $oids, 'ENTITY-SENSOR-MIB');
+    echo ' entPhySensorPrecision';
+    $oids = snmpwalk_cache_multi_oid($device, 'entPhySensorPrecision', $oids, 'ENTITY-SENSOR-MIB');
+    echo ' entPhySensorValue';
+    $oids = snmpwalk_cache_multi_oid($device, 'entPhySensorValue', $oids, 'ENTITY-SENSOR-MIB');
+    if ($device['os'] === 'arista_eos') {
+        require 'includes/discovery/sensors/misc/arista-eos-limits.inc.php';
+    }
 }
-$entitysensor['voltsDC']   = 'voltage';
-$entitysensor['voltsAC']   = 'voltage';
-$entitysensor['amperes']   = 'current';
-$entitysensor['watts']     = 'power';
-$entitysensor['hertz']     = 'freq';
-$entitysensor['percentRH'] = 'humidity';
-$entitysensor['rpm']       = 'fanspeed';
-$entitysensor['celsius']   = 'temperature';
-$entitysensor['dBm']       = 'dbm';
-if (is_array($oids)) {
+
+if (!empty($oids)) {
+    $entitysensor = array(
+        'voltsDC'   => 'voltage',
+        'voltsAC'   => 'voltage',
+        'amperes'   => 'current',
+        'watts'     => 'power',
+        'hertz'     => 'freq',
+        'percentRH' => 'humidity',
+        'rpm'       => 'fanspeed',
+        'celsius'   => 'temperature',
+        'dBm'       => 'dbm',
+    );
+
     foreach ($oids as $index => $entry) {
         $low_limit      = null;
         $low_warn_limit = null;

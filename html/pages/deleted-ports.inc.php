@@ -23,7 +23,7 @@ if ($vars['purge'] == 'all') {
 echo '<table class="table table-hover table-condensed">';
 echo "<tr><td>Device</td><td>Port</td><td></td><td><a href='deleted-ports/purge=all/'><i class='fa fa-times'></i> Purge All</a></td></tr>";
 
-foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id", array(), true) as $interface) {
+foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id", array()) as $interface) {
     $interface = cleanPort($interface, $interface);
     if (port_permitted($interface['port_id'], $interface['device_id'])) {
         echo '<tr class=list>';

@@ -24,6 +24,7 @@ Table of Content:
     - [Linux (snmpd v3)](#linux-snmpd-v3)
     - [Windows Server 2008 R2](#windows-server-2008-r2)
     - [Windows Server 2012 R2 and 2016](#windows-server-2012-r2-and-2016)
+    - [Mac OSX](#Mac-OSX)
 
 ## Devices
 
@@ -274,3 +275,29 @@ service snmpd restart
 9. In "Accepted community name" click "Add" to add your community string and permission
 10. In "Accept SNMP packets from these hosts" click "Add" and add your LibreNMS server IP address
 11. Validate change by clicking "Apply"
+
+### Mac OSX
+Step 1: ```sudo nano /etc/snmp/snmpd.conf```
+```bash
+#Allow read-access with the following SNMP Community String:
+rocommunity public
+
+# all other settings are optional but recommended.
+
+# Location of the device
+syslocation data centre A
+
+# Human Contact for the device
+syscontact SysAdmin
+
+# System Name of the device
+sysName SystemName
+
+# the system OID for this device. This is optional but recommended,
+# to identify this as a MAC OS system.
+sysobjectid 1.3.6.1.4.1.8072.3.2.16
+```
+Step 2: 
+``` bash 
+sudo launchctl load -w /System/Library/LaunchDaemons/org.net-snmp.snmpd.plist
+```

@@ -47,9 +47,11 @@ class Ray extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        $oid = '.1.3.6.1.4.1.33555.1.2.1.4'; // RAY-MIB::txFreq.0
         return array(
-            new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'racom', 1, 'Frequency', null, 1, 1000),
+            // RAY-MIB::txFreq.0
+            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.4', 'racom-tx', 1, 'TX Frequency', null, 1, 1000),
+            // RAY-MIB::rxFreq.0
+            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.3', 'racom-rx', 1, 'RX Frequency', null, 1, 1000),
         );
     }
 
@@ -61,9 +63,11 @@ class Ray extends OS implements
      */
     public function discoverWirelessPower()
     {
-        $oid = '.1.3.6.1.4.1.33555.1.2.1.12'; // RAY-MIB::rfPowerConfigured.0
         return array(
-            new WirelessSensor('power', $this->getDeviceId(), $oid, 'racom', 1, 'Tx Power'),
+            // RAY-MIB::rfPowerCurrent.0
+            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.17', 'racom-pow-cur', 1, 'Tx Power Current'),
+            //RAY-MIB::rfPowerConfigured.0
+            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.12', 'racom-pow-conf', 1, 'Tx Power Configured'),
         );
     }
 

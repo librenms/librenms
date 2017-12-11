@@ -13,5 +13,5 @@ discovery:
       sysDescr_regex: '/^Linux/'
       snmpget:
           oid: GANDI-MIB::rxCounter.0
-          op: '!=='
+          op: '!='
           value: false

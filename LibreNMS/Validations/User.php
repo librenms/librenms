@@ -49,7 +49,7 @@ class User implements ValidationGroup
             if (isCli()) {
                 $validator->fail('You need to run this script as root' .
                     (Config::has('user') ? ' or ' . $lnms_username : ''));
-            } else {
+            } elseif (function_exists('posix_getgrnam')) {
                 $lnms_group = posix_getgrnam($lnms_groupname);
                 if (!in_array($username, $lnms_group['members'])) {
                     $validator->fail(
@@ -90,32 +90,17 @@ class User implements ValidationGroup
 
         // check permissions
         $rrd_dir = Config::get('rrd_dir');
-        if (!$this->checkFilePermissions($rrd_dir, '660')) {
+        if (!check_file_permissions($rrd_dir, '660')) {
             $validator->fail("The rrd folder has improper permissions.", "chmod ug+rw $rrd_dir");
         }
 
         $log_dir = Config::get('log_dir');
-        if (!$this->checkFilePermissions($log_dir, '660')) {
+        if (!check_file_permissions($log_dir, '660')) {
             $validator->fail("The log folder has improper permissions.", "chmod ug+rw $log_dir");
         }
     }
 
-    /**
-     * Checks file permissions against a minimum permissions mask.
-     * This only check that bits are enabled, not disabled.
-     * The mask is in the same format as posix permissions. For example, 600 means user read and write.
-     *
-     * @param string $file the name of the file to check
-     * @param $mask
-     * @return bool
-     */
-    private function checkFilePermissions($file, $mask)
-    {
-        $perms = fileperms($file);
-        $mask = octdec($mask);
 
-        return ($perms & $mask) === $mask;
-    }
 
     /**
      * Returns if this test should be run by default or not.
