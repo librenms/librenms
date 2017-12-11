@@ -161,6 +161,7 @@ class LdapAuthorizer extends AuthorizerBase
                                 'realname' => $realname,
                                 'user_id' => $user_id,
                                 'email' => $email,
+                                'level' => $this->getUserlevel($username),
                             );
                         }
                     }
