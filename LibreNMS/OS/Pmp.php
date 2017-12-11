@@ -219,7 +219,9 @@ class Pmp extends OS implements
         $boxType = snmp_get($device, 'boxDeviceType.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
 
         foreach ($types as $key => $value) {
-            if (str_contains($boxType, $key) ) return $value;
+            if (str_contains($boxType, $key)) {
+                return $value;
+            }
         }
 
         return 1;
