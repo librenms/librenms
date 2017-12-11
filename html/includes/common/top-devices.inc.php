@@ -289,7 +289,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
 
     $common_output[] = '
     <div class="table-responsive">
-        <table class="table table-hover table-condensed table-striped">
+        <table class="table table-hover table-condensed table-striped bootgrid-table">
         <thead>
             <tr>
                 <th class="text-left">Device</th>';
@@ -335,5 +335,6 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
     }
     $common_output[] = '
         </tbody>
-    </table>';
+    </table>
+    </div>';
 }
