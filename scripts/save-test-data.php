@@ -68,7 +68,7 @@ if (isset($options['help']) || !isset($target_os)) {
     echo "Script to extract test data from devices or update test data
 
 Usage:
-  You must specify hostname or os.
+  You must specify a valid hostname or os.
   -h, --hostname   ID, IP, or hostname of the device to extract data from
                    If this is not given, the existing snmp data will be used
   -o, --os         Name of the OS to save test data for
@@ -287,7 +287,7 @@ function convert_snmp_to_snmprec(array $snmp_data)
                 $result[] = "$oid|4|"; // empty data, we don't know type, put string
             } else {
                 list($raw_type, $data) = explode(':', $raw_data, 2);
-                $data = ltrim($data, ' ');
+                $data = ltrim($data, ' "');
                 $type = $snmpTypes[$raw_type];
 
                 // remove leading . from oid data

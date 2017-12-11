@@ -2412,18 +2412,30 @@ function dump_db_schema()
  */
 function dump_module_data($device_id, $module)
 {
-    $where = "WHERE `device_id`=?";
-    $params = array($device_id);
+;
     $data = array();
 
     $tables = get_module_tables($module);
     foreach ($tables as $table => $info) {
-        $join = '';
-        foreach ($info['joins'] as $join_info) {
-            $join .= " LEFT JOIN `{$join_info['right']}` ON (`{$join_info['left']}`.`{$join_info['key']}` = `{$join_info['right']}`.`{$join_info['key']}`)";
+        // check for custom where
+        if (isset($info['custom_where'])) {
+            list($where, $params) = $info['custom_where'];
+        } else {
+            $where = "WHERE `device_id`=?";
+            $params = array($device_id);
         }
 
-        $rows = dbFetchRows("SELECT `$table`.* FROM `$table` $join $where", $params);
+        // build joins
+        $join = '';
+        foreach ($info['joins'] as $join_info) {
+            if (isset($join_info['custom'])) {
+                $join .= ' ' . $join_info['custom'];
+            } else {
+                $join .= " LEFT JOIN `{$join_info['right']}` ON (`{$join_info['left']}`.`{$join_info['key']}` = `{$join_info['right']}`.`{$join_info['key']}`)";
+            }
+        }
+
+        $rows = dbFetchRows("SELECT * FROM `$table` $join $where", $params);
 
         // remove unwanted fields
         $keys = array_flip($info['excluded_fields']);
@@ -2447,16 +2459,46 @@ function dump_module_data($device_id, $module)
 function get_module_tables($module)
 {
     $tables = array(
+        'arp-table' => array(
+            'ipv4_mac' => array(
+                'excluded_fields' => array('device_id', 'port_id'),
+            ),
+        ),
+        'mempools' => array(
+            'mempools' => array(
+                'excluded_fields' => array('device_id', 'mempool_id'),
+            ),
+        ),
+        'ports' => array(
+            'ports' => array(
+                'excluded_fields' => array('device_id', 'port_id'),
+                'joins' => array(
+                    array('left' => 'ports', 'right' => 'ports_statistics', 'key' => 'port_id'),
+                ),
+            ),
+        ),
         'processors' => array(
             'processors' => array(
                 'excluded_fields' => array('device_id', 'processor_id'),
             ),
         ),
-        'arp-table' => array(
-            'ipv4_mac' => array(
-                'excluded_fields' => array('device_id', 'port_id'),
+        'sensors' => array(
+            'sensors' => array(
+                'excluded_fields' => array('device_id', 'sensor_id', 'state_translation_id', 'state_index_id', 'sensors_to_state_translations_id', 'lastupdate'),
+                'joins' => array(
+                    array('left' => 'sensors', 'right' => 'sensors_to_state_indexes', 'key' => 'sensor_id'),
+                    array('left' => 'sensors_to_state_indexes', 'right' => 'state_indexes', 'key' => 'state_index_id'),
+                ),
             ),
-        )
+            'state_indexes' => array(
+                'excluded_fields' => array('device_id', 'sensor_id', 'state_translation_id', 'state_index_id', 'state_lastupdated'),
+                'joins' => array(
+                    array('left' => 'state_indexes', 'right' => 'state_translations', 'key' => 'state_index_id'),
+                    array('custom' => "INNER JOIN ( SELECT i.state_index_id FROM `sensors_to_state_indexes` i LEFT JOIN `sensors` s ON (i.`sensor_id` = s.`sensor_id`)  WHERE `device_id`='77' GROUP BY i.state_index_id) d ON d.state_index_id = state_indexes.state_index_id"),
+                ),
+                'custom_where' => array('', array()),
+            ),
+        ),
     );
 
     if ($module == 'all') {
