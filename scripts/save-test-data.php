@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use LibreNMS\Config;
 use LibreNMS\Proc;
 
 global $device;
@@ -24,7 +25,7 @@ $options = getopt(
     )
 );
 
-$init_modules = array('discovery');
+$init_modules = array('discovery', 'polling');
 require $install_dir . '/includes/init.php';
 
 $debug = (isset($options['d']) || isset($options['debug']));
@@ -105,6 +106,10 @@ if (isset($options['f'])) {
     $output_file = $options['file'];
 }
 
+Config::set('norrd', true);
+Config::set('noinfluxdb', true);
+Config::set('nographite', true);
+
 // Capture snmp data
 if ($device) {
     $snmprec_file = $install_dir . "/tests/snmpsim/$target_os$variant.snmprec";
@@ -116,33 +121,37 @@ if ($device) {
     $debug = true;
     $vdebug = false;
     discover_device($device, get_module_with_deps($module));
+    poll_device($device, get_module_with_deps($module));
     $debug = $save_debug;
     $vdebug = $save_vedbug;
-    $discover_output = ob_get_contents();
+    $collection_output = ob_get_contents();
     ob_end_clean();
 
     if ($debug) {
-        echo $discover_output . PHP_EOL;
+        echo $collection_output . PHP_EOL;
     }
 
     // remove color
-    $discover_output = preg_replace('/\033\[[\d;]+m/', '', $discover_output);
+    $collection_output = preg_replace('/\033\[[\d;]+m/', '', $collection_output);
 
     // extract snmp queries
     $snmp_query_regex = '/SNMP\[.*snmp(bulk)?([a-z]+) .+:HOSTNAME:[0-9]+ ([0-9.a-zA-Z:\-]+)\]/';
-    preg_match_all($snmp_query_regex, $discover_output, $snmp_matches);
+    preg_match_all($snmp_query_regex, $collection_output, $snmp_matches);
 
     // extract mibs and group with oids
     $snmp_oids = array(
-        array('oid' => 'sysDescr', 'mib' => 'SNMPv2-MIB', 'method' => 'getnext'),
-        array('oid' => 'sysObjectID', 'mib' => 'SNMPv2-MIB', 'method' => 'getnext'),
+        'sysDescr.0_get' => array('oid' => 'sysDescr.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'),
+        'sysObjectID.0_get' => array('oid' => 'sysObjectID.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'),
     );
     foreach ($snmp_matches[0] as $index => $line) {
         preg_match('/-m ([a-zA-Z0-9:\-]+)/', $line, $mib_matches);
-        $snmp_oids[] = array(
-            'oid' => $snmp_matches[3][$index],
-            'mib' => $mib_matches[1],
-            'method' => $snmp_matches[2][$index],
+        $oid = $snmp_matches[3][$index];
+        $mib = $mib_matches[1];
+        $method = $snmp_matches[2][$index];
+        $snmp_oids["{$oid}_$method"] = array(
+            'oid' => $oid,
+            'mib' => $mib,
+            'method' => $method,
         );
     }
 
@@ -210,13 +219,32 @@ discover_device($device, get_module_with_deps($module));
 echo PHP_EOL;
 
 // Dump the discovered data
-$data = dump_module_data($device['device_id'], $module);
+$data = array();
+$data[$module]['discovery'] = dump_module_data($device['device_id'], $module);
+
+// Run the poller
+ob_start();
+poll_device($device, get_module_with_deps($module));
+$poller_output = ob_get_contents();
+ob_end_clean();
+
+if ($debug) {
+    echo $poller_output;
+    echo PHP_EOL;
+}
+
+// Dump polled data
+$data[$module]['poller'] = dump_module_data($device['device_id'], $module);
+
+// don't store duplicate data
+if ($data[$module]['discovery'] == $data[$module]['poller']) {
+    $data[$module]['poller'] = 'matches discovery';
+}
 
 if ($device['hostname'] == $snmpsim_ip) {
     // Remove the test device
     $debug = false;
-    $vdebug = false;
-    echo delete_device($device['device_id']) . "\n";
+    delete_device($device['device_id']);
 }
 
 if (isset($options['no-save'])) {
@@ -228,9 +256,7 @@ if (isset($options['no-save'])) {
     // Save the data to the default test data location (or elsewhere if specified)
     $existing_data = json_decode(file_get_contents($output_file), true);
 
-    foreach ($data as $module_name => $module_data) {
-        $existing_data[$module_name] = $module_data;
-    }
+    $existing_data[$module] = $data[$module];
 
     file_put_contents($output_file, _json_encode($existing_data));
     echo "Saved to $output_file\n";

@@ -56,6 +56,11 @@ class ProcessorTest extends DBTestCase
         global $device;
         $device = device_by_id_cache($device_id);
 
+        // never save data
+        Config::set('norrd', true);
+        Config::set('noinfluxdb', true);
+        Config::set('nographite', true);
+
         // Run discovery
         ob_start();
         discover_device($device, array('m' => $this->module));
@@ -65,10 +70,6 @@ class ProcessorTest extends DBTestCase
         $discover_data = dump_module_data($device_id, $this->module);
 
         // Run poller
-        Config::set('norrd', true);
-        Config::set('noinfluxdb', true);
-        Config::set('nographite', true);
-
         ob_start();
         poll_device($device, array('m' => $this->module));
         ob_end_clean();
@@ -80,13 +81,13 @@ class ProcessorTest extends DBTestCase
         delete_device($device_id);
 
         $this->assertEquals(
-            $expected_data,
+            $expected_data['discovery'],
             $discover_data,
             "OS $target_os: Discovered {$this->module} data does not match that found in $filename"
         );
 
         $this->assertEquals(
-            $expected_data,
+            $expected_data['poller'] == 'matches discovery' ? $expected_data['discovery'] : $expected_data['poller'],
             $poll_data,
             "OS $target_os: Polled {$this->module} data does not match that found in $filename"
         );
@@ -107,7 +108,7 @@ class ProcessorTest extends DBTestCase
                 $data[$os] = array(
                     $os,
                     $short_file,
-                    array($this->module => $dumped_data[$this->module])
+                    $dumped_data[$this->module]
                 );
             }
         }
