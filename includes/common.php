@@ -1182,30 +1182,11 @@ function format_hostname($device, $hostname = '')
 
 /**
  * Return valid port association modes
- * @param bool $no_cache No-Cache flag (optional, default false)
  * @return array
  */
-function get_port_assoc_modes($no_cache = false)
+function get_port_assoc_modes()
 {
-    global $config;
-
-    if ($config['memcached']['enable'] && $no_cache === false) {
-        $assoc_modes = $config['memcached']['resource']->get(hash('sha512', "port_assoc_modes"));
-        if (! empty($assoc_modes)) {
-            return $assoc_modes;
-        }
-    }
-
-    $assoc_modes = null;
-    foreach (dbFetchRows("SELECT `name` FROM `port_association_mode` ORDER BY pom_id") as $row) {
-        $assoc_modes[] = $row['name'];
-    }
-
-    if ($config['memcached']['enable'] && $no_cache === false) {
-        $config['memcached']['resource']->set(hash('sha512', "port_assoc_modes"), $assoc_modes, $config['memcached']['ttl']);
-    }
-
-    return $assoc_modes;
+    return dbFetchColumn("SELECT `name` FROM `port_association_mode` ORDER BY pom_id");
 }
 
 /**
@@ -1221,58 +1202,21 @@ function is_valid_port_assoc_mode($port_assoc_mode)
 /**
  * Get DB id of given port association mode name
  * @param string $port_assoc_mode
- * @param bool $no_cache No-Cache flag (optional, default false)
+ * @return int
  */
-function get_port_assoc_mode_id($port_assoc_mode, $no_cache = false)
+function get_port_assoc_mode_id($port_assoc_mode)
 {
-    global $config;
-
-    if ($config['memcached']['enable'] && $no_cache === false) {
-        $id = $config['memcached']['resource']->get(hash('sha512', "port_assoc_mode_id|$port_assoc_mode"));
-        if (! empty($id)) {
-            return $id;
-        }
-    }
-
-    $id = null;
-    $row = dbFetchRow("SELECT `pom_id` FROM `port_association_mode` WHERE name = ?", array ($port_assoc_mode));
-    if ($row) {
-        $id = $row['pom_id'];
-        if ($config['memcached']['enable'] && $no_cache === false) {
-            $config['memcached']['resource']->set(hash('sha512', "port_assoc_mode_id|$port_assoc_mode"), $id, $config['memcached']['ttl']);
-        }
-    }
-
-    return $id;
+    return (int)dbFetchCell("SELECT `pom_id` FROM `port_association_mode` WHERE name = ?", array ($port_assoc_mode));
 }
 
 /**
  * Get name of given port association_mode ID
  * @param int $port_assoc_mode_id Port association mode ID
- * @param bool $no_cache No-Cache flag (optional, default false)
  * @return bool
  */
-function get_port_assoc_mode_name($port_assoc_mode_id, $no_cache = false)
+function get_port_assoc_mode_name($port_assoc_mode_id)
 {
-    global $config;
-
-    if ($config['memcached']['enable'] && $no_cache === false) {
-        $name = $config['memcached']['resource']->get(hash('sha512', "port_assoc_mode_name|$port_assoc_mode_id"));
-        if (! empty($name)) {
-            return $name;
-        }
-    }
-
-    $name = null;
-    $row = dbFetchRow("SELECT `name` FROM `port_association_mode` WHERE pom_id = ?", array ($port_assoc_mode_id));
-    if ($row) {
-        $name = $row['name'];
-        if ($config['memcached']['enable'] && $no_cache === false) {
-            $config['memcached']['resource']->set(hash('sha512', "port_assoc_mode_name|$port_assoc_mode_id"), $name, $config['memcached']['ttl']);
-        }
-    }
-
-    return $name;
+    return dbFetchCell("SELECT `name` FROM `port_association_mode` WHERE pom_id = ?", array ($port_assoc_mode_id));
 }
 
 /**
