@@ -37,8 +37,11 @@ if (is_admin() === false) {
             break;
         }
         foreach ($_POST['parent_ids'] as $parent) {
-            if (is_numeric($parent)) {
+            if (is_numeric($parent) && $parent != 0) {
                 dbInsert(array('parent_device_id' => $parent, 'child_device_id' => $dev), 'device_relationships');
+            } else if ($parent == 0) {
+                // If we receive the parent as 0 delete parents for the said device
+                dbDelete('device_relationships', '`child_device_id` = ?', array($dev));
             }
         }
         $status = array('status' => 0, 'message' => 'Host dependencies have been saved');

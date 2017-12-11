@@ -64,17 +64,12 @@ $('#edit-dependency').on('show.bs.modal', function() {
         dataType: "json",
         success: function(output) {
             if (output.status == 0) {
-                var parents = $('#edit-parent_id').val();
+                var tempArr = [];
                 $.each(output.deps, function (i, elem) {
-                    parents = $('#edit-parent_id').val();
-                    parentArr = parents.split(',');
-                    if ($.inArray(elem.device_id, parentArr) >= 0) {
-                        var select_line = "<option value=" + elem.device_id + " selected='selected'>" + elem.hostname + "</option>";
-                    } else {
-                        var select_line = "<option value=" + elem.device_id + ">" + elem.hostname + "</option>";
-                    }
-                    $('#availableparents').append(select_line);
+                    tempArr.push(elem.device_id);
                 });
+                $('#availableparents').val(tempArr);
+                $('#availableparents').trigger('change');
             } else {
                 toastr.error(output.message);
             }
@@ -119,28 +114,22 @@ $('#hostdep-save').click('', function(event) {
         error: function() {
             toastr.error('The host dependency could not be saved.');
             $("#edit-dependency").modal('hide');
-            $('#availableparents')
-                .find('option')
-                .remove()
-                .end()
-                .append('<option value="0">None</option>')
-                .val('0');
+            $('#availableparents').val(null);
+            $('#availableparents').trigger('change');
         }
     });
 });
 
 $('#edit-dependency').on('hide.bs.modal', function() {
-    $('#availableparents')
-        .find('option')
-        .remove()
-        .end()
-        .val('0');
+    $('#availableparents').val(null);
+    $('#availableparents').trigger('change');
+
 });
 
-
-$(document).ready(function() {
-    $('#availableparents').select2({
-        width: 'resolve'
-    });
+$('#availableparents').on('select2:select', function(e) {
+    if (e.params.data.id == 0) {
+        $('#availableparents').val(0);
+        $('#availableparents').trigger('change');
+    }
 });
 </script>

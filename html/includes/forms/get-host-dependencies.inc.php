@@ -25,7 +25,7 @@ if (is_admin() === false) {
                 if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
                     #This is a bit ugly
                     $deps_query = "SELECT * FROM (".$deps_query;
-                    $deps_query .= " ) as t WHERE t.hostname LIKE ? OR t.parent LIKE ? ";
+                    $deps_query .= " ) as t WHERE t.hostname LIKE ? OR t.parents LIKE ? ";
                     $deps_query .= " ORDER BY t.hostname";
                 } else {
                     $deps_query .= " ORDER BY a.hostname";
@@ -69,28 +69,30 @@ if (is_admin() === false) {
                 $status = array('status' => 0, 'deps' => $device_deps);
             }
         } else {
-            $device_deps = dbFetchRows('SELECT `device_id`,`hostname` from `devices` WHERE `parent_id` = ? ORDER BY `hostname` ASC', array($_POST['parent_id']));
+            // Get childs from parent id(s)
             if ($_POST['viewtype'] == 'fromparent') {
                 if ($_POST['parent_ids'] == 0) {
-                    $device_deps = dbFetchRows('SELECT `device_id`,`hostname` from `devices` WHERE `parent_id` = 0 OR `parent_id` is null ORDER BY `hostname` ASC');
+                    $device_deps = dbFetchRows('SELECT `device_id`,`hostname` from `devices` as a LEFT JOIN `device_relationships` as b ON b.`child_device_id` =  a.`device_id` WHERE b.`child_device_id` is null ORDER BY `hostname`');
                 } else {
-                    $device_deps = dbFetchRows(
-                        'SELECT `device_id`,`hostname` from `devices` WHERE `parent_id` = ? ORDER BY `hostname` ASC',
-                        array($_POST['parent_ids'])
-                    );
+                    $parents = implode(',', $_POST['parent_ids']);
+                    $device_deps = dbFetchRows("SELECT  a.device_id as device_id, a.hostname as hostname, GROUP_CONCAT(b.hostname) as parents, GROUP_CONCAT(b.device_id) as parentid FROM devices as a LEFT JOIN device_relationships a1 ON a.device_id=a1.child_device_id LEFT JOIN devices b ON b.device_id=a1.parent_device_id GROUP BY a.device_id, a.hostname HAVING parentid = ?", array($parents));
                 }
 
                 $status = array('status' => 0, 'deps' => $device_deps);
             }
         }
     } else {
+        // Find devices by child.
         if (!is_numeric($_POST['device_id'])) {
             $status = array('status' => 1, 'message' => 'Wrong device id!');
         } else {
-            $device_deps = dbFetchRows(
-                'SELECT `device_id`,`hostname`,`parent_id` from `devices` WHERE `device_id` <>  ? ORDER BY `hostname` ASC',
-                array($_POST['device_id'])
-            );
+            $deps_query = 'SELECT `device_id`, `hostname` FROM `devices` AS a INNER JOIN `device_relationships` AS b ON a.`device_id` = b.`parent_device_id` WHERE ';
+            // device_id == 0 is the case where we have no parents.
+            if ($_POST['device_id'] == 0) {
+                $device_deps = dbFetchRows($deps_query. ' b.`parent_device_id` is null OR b.`parent_device_id` = 0 ');
+            } else {
+                $device_deps = dbFetchRows($deps_query. ' b.`child_device_id` = ?', array($_POST['device_id']));
+            }
             $status = array('status' => 0, 'deps' => $device_deps);
         }
     }

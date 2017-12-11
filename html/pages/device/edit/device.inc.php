@@ -247,6 +247,10 @@ if ($updated && $update_message) {
             document.getElementById('edit-hostname-input').disabled = true;
         }
     });
+    $('#parent_id').select2({
+        width: 'resolve',
+        tags: true,
+    });
 </script>
 <?php
 print_optionbar_start();

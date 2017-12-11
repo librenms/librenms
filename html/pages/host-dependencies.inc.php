@@ -119,4 +119,48 @@ var grid = $("#hostdeps").bootgrid({
         $('#manage-dependencies').modal('show');
     });
 });
+
+$(document).ready(function() { 
+    var editSelect = $('#availableparents').select2({
+        dropdownParent: $('#edit-dependency'),
+        width: 'resolve',
+        tags: true,
+
+    });
+
+    var manParentDevs = $('#manavailableparents').select2({
+        dropdownParent: $('#manage-dependencies'),
+        width: 'resolve',
+        tags: true
+    });
+
+    var manAllDevs = $('#manalldevices').select2({
+        dropdownParent: $('#manage-dependencies'),
+        width: 'resolve',
+        tags: true
+    });
+
+    $.ajax({
+        type: "POST",
+        url: 'ajax_form.php',
+        data: {type: 'get-host-dependencies', "viewtype": 'fulllist' }, 
+        dataType: "json",
+        success: function(output) {
+            if (output.status == 0) {
+                manParentDevs.append($('<option>', { value: 0, text: 'None'}));
+                editSelect.append($('<option>', { value: 0, text: 'None'}));
+                $.each(output.deps, function (i,elem) {
+                    manParentDevs.append($('<option>',{value:elem.id, text:elem.hostname}));
+                    editSelect.append($('<option>',{value:elem.id, text:elem.hostname}));
+                    manAllDevs.append($('<option>',{value:elem.id, text:elem.hostname}));
+                });
+            } else {
+                toastr.error('Host dependencies could not be retrieved from the database');
+            }
+        },
+        error: function() {
+            toastr.error('Host dependencies could not be retrieved from the database');
+        }
+    });
+});
 </script>

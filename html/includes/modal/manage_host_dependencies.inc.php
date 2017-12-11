@@ -31,7 +31,6 @@ if (is_admin() === false) {
                 <div class="form-group">
                     <label for="manavailableparents">Parent Host:</label>
                     <select multiple name="parent_id" class="form-control" id="manavailableparents" style='width: 100%'>
-                        <option value="0">None</option>
                     </select>
                 </div>
 
@@ -50,30 +49,29 @@ if (is_admin() === false) {
 </div>
 
 <script>
-function changeParents(e) 
+function changeParents(e, evttype) 
 {
     e.preventDefault();
+    if (evttype == 'select' && e.params.data.id == 0) {
+        $('#manavailableparents').val(0);
+        $('#manavailableparents').trigger('change');
+    }
+
     var cur_option = $('#manavailableparents').select2('data');
     // So that we'll see all devices. 
     var device_id = 0;
-    var parent_ids = '';
+    var parent_ids = [];
     // This is needed to remove the None option if it is with another parent id
-    var temp_arr = [];
 
     for (var i=0;i<cur_option.length;i++) {
         if (cur_option.length > 1 && cur_option[i].id == 0) {
             continue;
         }
-        temp_arr.push(cur_option[i].id);
-        parent_ids = parent_ids + cur_option[i].id + ',';
+        parent_ids.push(cur_option[i].id);
     }
 
     // Set parents to new value
     $('#manavailableparents').val(temp_arr).trigger('change');
-
-    // Remove the trailing ,
-    parent_ids = parent_ids.slice(0,-1);
-    
 
     $.ajax({
         type: 'POST',
@@ -103,39 +101,27 @@ function changeParents(e)
 }
 
 $('#manage-dependencies').on('hide.bs.modal', function() {
-    $('#manavailableparents')
-        .find('option')
-        .remove()
-        .end()
-        .append('<option value="0">None</option>')
-        .val('0');
+    $('#manavailableparents').val('0');
+    $('#manavailableparents').trigger('change');
 
-    $('#manalldevices').find('option').remove();
+    $('#manalldevices').val(null);
+    $('#manalldevices').trigger('change');
 });
 
 $('#manage-dependencies').on('show.bs.modal', function() {
-    // So that we'll see all devices. 
     var device_id = 0;
-    $('#message').empty();
-
     $.ajax({
         type: 'POST',
         url: 'ajax_form.php',
-        data: { type: "get-host-dependencies", "device_id": device_id },
+        data: { type: "get-host-dependencies", "viewtype": 'fromparent', "parent_ids": 0},
         dataType: "json",
         success: function(output) {
             if (output.status == 0) {
+                var tempArr = [];
                 $.each(output.deps, function (i, elem) {
-                    var select_line = "<option value=" + elem.device_id + ">" + elem.hostname + "</option>";
-                    var select_line_selected = "<option value=" + elem.device_id + " selected='selected'>" + elem.hostname + "</option>";
-
-                    $('#manavailableparents').append(select_line);
-                    if (elem.parent_id == 0 || elem.parent_id == null) {
-                        $('#manalldevices').append(select_line_selected);
-                    } else {
-                        $('#manalldevices').append(select_line);
-                    }
+                    tempArr.push(elem.device_id);
                 });
+                $('#manalldevices').val(tempArr);
                 $('#manalldevices').trigger('change');
                 $('#manavailableparents').val(device_id);
                 $('#manavailableparents').trigger('change');
@@ -192,13 +178,7 @@ $('#manhostdep-save').click('', function(event) {
 });
 
 $(document).ready(function() {
-    $('#manavailableparents').select2({
-        width: 'resolve'
-    });
-    $('#manalldevices').select2({
-        width: 'resolve'
-    });
-    $('#manavailableparents').on('select2:select', function(e) {changeParents(e)});
-    $('#manavailableparents').on('select2:unselect', function(e) {changeParents(e)});
+    $('#manavailableparents').on('select2:select', function(e) {changeParents(e, 'select')});
+    $('#manavailableparents').on('select2:unselect', function(e) {changeParents(e, 'unselect')});
 });
 </script>
