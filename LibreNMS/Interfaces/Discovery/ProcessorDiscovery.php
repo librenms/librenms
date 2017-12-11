@@ -1,8 +1,8 @@
 <?php
 /**
- * netonix.inc.php
+ * ProcessorDiscovery.php
  *
- * LibreNMS processors module for Netonix
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,16 +19,19 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2016 Tony Murray
+ * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-if ($device['os'] == 'netonix') {
-    echo 'NETONIX : ';
+namespace LibreNMS\Interfaces\Discovery;
 
-    $idle   = snmp_get($device, 'UCD-SNMP-MIB::ssCpuIdle.0', '-OvQ');
-
-    if (is_numeric($idle)) {
-        discover_processor($valid['processor'], $device, 0, 0, 'ucd-old', 'CPU', '1', (100 - $idle));
-    }
+interface ProcessorDiscovery
+{
+    /**
+     * Discover processors.
+     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
+     *
+     * @return array Processors
+     */
+    public function discoverProcessors();
 }

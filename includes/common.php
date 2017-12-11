@@ -1836,3 +1836,11 @@ function array_by_column($array, $column)
 {
     return array_combine(array_column($array, $column), $array);
 }
+
+/**
+ * Dump and die
+ */
+function dd() {
+    var_dump(func_get_args());
+    die();
+}

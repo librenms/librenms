@@ -1,8 +1,8 @@
 <?php
 /**
- * eltex-olt.inc.php
+ * ProcessorPolling.php
  *
- * LibreNMS processor poller module for Eltex OLT
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,19 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @copyright  2017 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-$proc = snmp_get($device, 'ltp8xCPULoadAverage5Minutes.0', '-Ovq', 'ELTEX-LTP8X-STANDALONE') / 10;
+namespace LibreNMS\Interfaces\Polling;
+
+interface ProcessorPolling
+{
+    /**
+     * Poll processor data.  This can be implemented if custom polling is needed.
+     *
+     * @param array $processors Array of processor entries from the database that need to be polled
+     * @return array of polled data
+     */
+    public function pollProcessors(array $processors);
+}

@@ -25,14 +25,14 @@
 
 namespace LibreNMS;
 
-use LibreNMS\Device\Discovery\Sensors\WirelessSensorDiscovery;
-use LibreNMS\Device\Discovery\Sensors\WirelessSensorPolling;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\OS\Generic;
 
 class OS
 {
     private $device; // annoying use of references to make sure this is in sync with global $device variable
+    private $cache; // data cache
 
     /**
      * OS constructor. Not allowed to be created directly.  Use OS::make()
@@ -63,6 +63,16 @@ class OS
         return (int)$this->device['device_id'];
     }
 
+    public function preCache()
+    {
+        if (is_null($this->cache)) {
+            $this->cache = YamlDiscovery::preCache($this);
+        }
+
+        return $this->cache;
+    }
+
+
     /**
      * Snmpwalk the specified oid and return an array of the data indexed by the oid index.
      * If the data is cached, return the cached data.
@@ -73,18 +83,18 @@ class OS
      * @return array array indexed by the snmp index with the value as the data returned by snmp
      * @throws \Exception
      */
-    protected function getCacheByIndex($oid, $mib = null)
+    public function getCacheByIndex($oid, $mib = null)
     {
         if (str_contains($oid, '.')) {
             throw new \Exception('Error: don\'t use this with numeric oids');
         }
 
-        if (!isset($this->$oid)) {
+        if (!isset($this->cache[$oid])) {
             $data = snmpwalk_cache_oid($this->getDevice(), $oid, array(), $mib);
-            $this->$oid = array_map('current', $data);
+            $this->cache[$oid] = array_map('current', $data);
         }
 
-        return $this->$oid;
+        return $this->cache[$oid];
     }
 
     /**
@@ -104,6 +114,20 @@ class OS
         }
 
         return new Generic($device);
+    }
+
+    public function getName()
+    {
+        if (isset($this->device['os'])) {
+            return $this->device['os'];
+        }
+
+        $rf = new \ReflectionClass($this);
+        $name = $rf->getShortName();
+        var_dump($name);
+        preg_match_all("/[A-Z][a-z]*/", $name, $segments);
+
+        return implode('-', array_map('strtolower', $segments[0]));
     }
 
     /**
