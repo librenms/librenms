@@ -9,10 +9,11 @@ $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
 
 $options = getopt(
-    'h:dm:o:v:f:',
+    'h:dnm:o:v:f:',
     array(
         'debug',
         'no-save',
+        'prefer-new',
         'hostname:',
         'help',
         'module:',
@@ -69,15 +70,16 @@ if (isset($options['help']) || !isset($target_os)) {
 
 Usage:
   You must specify a valid hostname or os.
-  -h, --hostname   ID, IP, or hostname of the device to extract data from
-                   If this is not given, the existing snmp data will be used
-  -o, --os         Name of the OS to save test data for
-  -v, --variant    The variant of the OS to use, usually the device model
-  -m, --module     The discovery/poller module to collect data for
-  -f, --file       File to save the database entries to.  Default is in tests/data/
-  -d, --debug      Enable debug output
-      --no-save    Don't save database entries, print them out instead
-      --snmpsim    Just run snmpsimd.py. Listening on $snmpsim_ip:$snmpsim_port.
+  -h, --hostname    ID, IP, or hostname of the device to extract data from
+                    If this is not given, the existing snmp data will be used
+  -o, --os          Name of the OS to save test data for
+  -v, --variant     The variant of the OS to use, usually the device model
+  -m, --module      The discovery/poller module to collect data for
+  -f, --file        File to save the database entries to.  Default is in tests/data/
+  -d, --debug       Enable debug output
+  -n, --prefer-new  Prefer new snmprec data over existing data
+      --no-save     Don't save database entries, print them out instead
+      --snmpsim     Just run snmpsimd.py. Listening on $snmpsim_ip:$snmpsim_port.
 ";
     exit;
 }
@@ -152,13 +154,13 @@ if ($device) {
     foreach ($snmp_oids as $oid_data) {
         echo " " . $oid_data['oid'];
 
-        $options = '-OUneb -Ih';
+        $snmp_options = '-OUneb -Ih';
         if ($oid_data['method'] == 'walk') {
-            $data = snmp_walk($device, $oid_data['oid'], $options, $oid_data['mib']);
+            $data = snmp_walk($device, $oid_data['oid'], $snmp_options, $oid_data['mib']);
         } elseif ($oid_data['method'] == 'get') {
-            $data = snmp_get($device, $oid_data['oid'], $options, $oid_data['mib']);
+            $data = snmp_get($device, $oid_data['oid'], $snmp_options, $oid_data['mib']);
         } elseif ($oid_data['method'] == 'getnext') {
-            $data = snmp_getnext($device, $oid_data['oid'], $options, $oid_data['mib']);
+            $data = snmp_getnext($device, $oid_data['oid'], $snmp_options, $oid_data['mib']);
         }
 
         if (isset($data) && $data !== false) {
@@ -167,7 +169,8 @@ if ($device) {
     }
     echo PHP_EOL . PHP_EOL;
 
-    save_snmprec_data($snmprec_file, $snmprec_data);
+    $prefer_new_snmprec = isset($options['n']) || isset($options['prefer-new']);
+    save_snmprec_data($snmprec_file, $snmprec_data, $prefer_new_snmprec);
 
     echo PHP_EOL;
 }
@@ -319,7 +322,7 @@ function convert_snmp_to_snmprec(array $snmp_data)
 }
 
 
-function save_snmprec_data($file, array $data, $write = true)
+function save_snmprec_data($file, array $data, $prefer_new = false, $write = true)
 {
     if (is_file($file)) {
         $existing_data = index_snmprec(explode(PHP_EOL, file_get_contents($file)));
@@ -327,13 +330,21 @@ function save_snmprec_data($file, array $data, $write = true)
         $existing_data = array();
     }
 
+    $new_data = array();
     foreach ($data as $part) {
-        $existing_data = array_merge($existing_data, index_snmprec($part));
+        $new_data = array_merge($new_data, index_snmprec($part));
     }
 
-    uksort($existing_data, 'compareOid');
+    // merge new and existing data
+    if ($prefer_new) {
+        $results = array_merge($existing_data, $new_data);
+    } else {
+        $results = array_merge($new_data, $existing_data);
+    }
 
-    $output = implode(PHP_EOL, $existing_data) . PHP_EOL;
+    uksort($results, 'compareOid');
+
+    $output = implode(PHP_EOL, $results) . PHP_EOL;
 
     if ($write) {
         echo "Updated snmprec data $file\n";
