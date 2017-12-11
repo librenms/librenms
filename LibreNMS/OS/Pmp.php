@@ -207,14 +207,14 @@ class Pmp extends OS implements
     {
         $device = $this->getDevice();
 
-        $types = [
+        $types = array(
             'OFDM' => 1000,
             '5.4GHz' => 1,
             '5.2Ghz' => 1,
             '5.7Ghz' => 1,
             '2.4Ghz' => 10,
             '900Mhz' => 10
-        ];
+        );
 
         $boxType = snmp_get($device, 'boxDeviceType.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
 
