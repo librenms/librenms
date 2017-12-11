@@ -25,6 +25,6 @@ foreach ($pre_cache['junos_oids'] as $index => $entry) {
         $current = $entry['jnxDomCurrentTxLaserBiasCurrent'];
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        discover_sensor($valid['sensor'], 'current', $device, $oid, 'tx-' . $index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+        discover_sensor($valid['sensor'], 'current', $device, $oid, 'rx-' . $index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }
 }
