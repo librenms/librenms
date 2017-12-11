@@ -1,6 +1,6 @@
 <?php
 /**
- * Pmp.php
+ * Cnpilote.php
  *
  * Cambium
  *
@@ -32,7 +32,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\OS;
 
-class Pmp extends OS implements
+class Cnpilote extends OS implements
     WirelessClientsDiscovery,
     WirelessSnrDiscovery,
     WirelessPowerDiscovery,
