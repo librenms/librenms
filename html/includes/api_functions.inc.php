@@ -1262,6 +1262,30 @@ function update_device()
     }
 }
 
+function rename_device()
+{
+    check_is_admin();
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $hostname = $router['hostname'];
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $new_hostname = $router['new_hostname'];
+    $new_device = getidbyname($new_hostname);
+
+    if (empty($new_hostname)) {
+        api_error(500, 'Missing new hostname');
+    } elseif ($new_device) {
+        api_error(500, 'Device failed to rename, new hostname already exists');
+    } else {
+        if (renamehost($device_id, $new_hostname, 'api') == '') {
+            api_success_noresult(200, 'Device has been renamed');
+        } else {
+            api_success_noresult(200, 'Device failed to be renamed');
+        }
+    }
+}
+
 function get_device_groups()
 {
     $app = \Slim\Slim::getInstance();
