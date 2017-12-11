@@ -47,3 +47,20 @@ if ($oids) {
         }
     }
 }
+
+$temp_unit = snmp_get($device, 'tempUnit.0', '-OevTQUs', 'T3610-MIB');
+$user_func = '';
+
+if (str_contains($temp_unit, 'F')) {
+    $user_func = 'fahrenheit_to_celsius';
+}
+
+if (is_numeric($pre_cache['websensor_valuesInt']['tempInt.0'])) {
+    $temperature_oid = '.1.3.6.1.4.1.22626.1.2.3.1.0';
+    $temperature_index = 'tempInt.0';
+    $descr = 'Temperature';
+    $temperature = $pre_cache['websensor_valuesInt']['tempInt.0'] / 10;
+    $high_limit = $pre_cache['websensor_settings']['tempHighInt.0'] / 10;
+    $low_limit = $pre_cache['websensor_settings']['tempLowInt.0'] / 10;
+    discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_index, 'websensor', $descr, '10', '1', $low_limit, null, null, $high_limit, $temperature, 'snmp', null, null, $user_func);
+}
