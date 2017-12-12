@@ -84,8 +84,10 @@ if (Config::get('autodiscovery.xdp') === true) {
 if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) {
     echo ' LLDP-MIB: ';
     $lldp_array  = snmpwalk_group($device, 'lldpRemEntry', 'LLDP-MIB', 3);
-    $lldp_ports = snmpwalk_group($device, 'mtxrInterfaceStatsName', 'MIKROTIK-MIB');
-    $lldp_ports_num = snmpwalk_group($device, 'mtxrNeighborInterfaceID', 'MIKROTIK-MIB');
+    if (!empty($lldp_array)) {
+        $lldp_ports = snmpwalk_group($device, 'mtxrInterfaceStatsName', 'MIKROTIK-MIB');
+        $lldp_ports_num = snmpwalk_group($device, 'mtxrNeighborInterfaceID', 'MIKROTIK-MIB');
+    }
 
     foreach ($lldp_array as $key => $lldp) {
         $local_port_ifName = $lldp_ports[$lldp_ports_num[$key]['mtxrNeighborInterfaceID']]['mtxrInterfaceStatsName'];
