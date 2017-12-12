@@ -2,7 +2,7 @@ os: cnpilote
 text: Cambium cnPilot
 type: wireless
 icon: cambium
-mib_dir: cambium
+mib_dir: cambium\cnpilote
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_wireless_clients, text: 'Number of Clients' }
