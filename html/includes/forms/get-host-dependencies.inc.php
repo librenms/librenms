@@ -41,7 +41,7 @@ if (is_admin() === false) {
             }
 
             if (isset($_POST['format']) && !empty($_POST['searchPhrase'])) {
-                $searchphrase = '%'.$_POST['searchPhrase'].'%';
+                $searchphrase = '%'.mres($_POST['searchPhrase']).'%';
                 $device_deps = dbFetchRows($deps_query, array($searchphrase, $searchphrase));
             } else {
                 $device_deps = dbFetchRows($deps_query);
