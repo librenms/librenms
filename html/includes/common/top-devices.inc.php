@@ -307,7 +307,6 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             <td class="text-left">' . generate_device_link($result, shorthost($result['hostname'])) . '</td>
             <td class="text-left">';
         if ($top_query == 'storage') {
-
             $graph_array = array();
             $graph_array['height'] = '100';
             $graph_array['width'] = '210';
