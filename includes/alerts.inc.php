@@ -814,11 +814,6 @@ function RunAlerts()
             $noacc = false;
         }
 
-        if (IsParentDown($alert['device_id'])) {
-            $noiss = true;
-            log_event('Skipped alerts because parent device is down', $alert['device_id'], 'alert', 1);
-        }
-
         if (IsMaintenance($alert['device_id']) > 0) {
             $noiss = true;
             $noacc = true;
@@ -831,6 +826,11 @@ function RunAlerts()
         if (!empty($rextra['mute'])) {
             echo 'Muted Alert-UID #'.$alert['id']."\r\n";
             $noiss = true;
+        }
+
+        if (IsParentDown($alert['device_id'])) {
+            $noiss = true;
+            log_event('Skipped alerts because all parent devices are down', $alert['device_id'], 'alert', 1);
         }
 
         if (!$noiss) {
@@ -897,6 +897,7 @@ function IsParentDown($device)
     if (!$parent_id || $parent_id == null || $parent_id == 0) {
         return false;
     }
+
 
     foreach ($parent_id as $i) {
         $result = dbFetchCell("SELECT 1 from devices as a LEFT JOIN devices_attribs as b ON a.device_id=b.device_id WHERE a.status = 0 AND a.device_id = ? AND  (a.status_reason = 'icmp' OR (b.attrib_type='override_icmp_disable' AND b.attrib_value=true))", array($i['parent_device_id']));
