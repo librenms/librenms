@@ -179,12 +179,12 @@ if ($updated && $update_message) {
     <div class="col-sm-6">
         <select multiple name="parent_id[]" id="parent_id" class="form-control">
             <?php
-                $dev_parents = dbFetchColumn('SELECT device_id from devices WHERE device_id IN (SELECT dr.parent_device_id from devices as d, device_relationships as dr WHERE d.device_id = dr.child_device_id AND d.device_id = ?)', array($device['device_id']));
-                if (!$dev_parents) {
-                    $selected = 'selected="selected"';
-                } else {
-                    $selected = '';
-                }
+            $dev_parents = dbFetchColumn('SELECT device_id from devices WHERE device_id IN (SELECT dr.parent_device_id from devices as d, device_relationships as dr WHERE d.device_id = dr.child_device_id AND d.device_id = ?)', array($device['device_id']));
+            if (!$dev_parents) {
+                $selected = 'selected="selected"';
+            } else {
+                $selected = '';
+            }
             ?>
             <option value="0" <?=$selected?>>None</option>
             <?php
