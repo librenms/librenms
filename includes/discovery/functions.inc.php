@@ -104,8 +104,9 @@ function load_discovery(&$device)
         $device['dynamic_discovery'] = Symfony\Component\Yaml\Yaml::parse(
             file_get_contents($yaml_discovery)
         );
+    } else {
+        unset($device['dynamic_discovery']);
     }
-    unset($yaml_discovery);
 }
 
 function discover_device(&$device, $options = null)
@@ -177,6 +178,7 @@ function discover_device(&$device, $options = null)
             $module_time = substr($module_time, 0, 5);
             $module_mem = (memory_get_usage() - $start_memory);
             printf("\n>> Runtime for discovery module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
+            printChangedStats();
             echo "#### Unload disco module $module ####\n\n";
         } elseif (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
             echo "Module [ $module ] disabled on host.\n\n";
@@ -206,7 +208,7 @@ function discover_device(&$device, $options = null)
 //end discover_device()
 
 // Discover sensors
-function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $entity_link_type = null, $entity_link_index = 0)
+function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null)
 {
     $low_limit      = set_null($low_limit);
     $low_warn_limit = set_null($low_warn_limit);
@@ -260,8 +262,6 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             'entPhysicalIndex' => $entPhysicalIndex,
             'entPhysicalIndex_measured' => $entPhysicalIndex_measured,
             'user_func' => $user_func,
-            'entity_link_type' => $entity_link_type,
-            'entity_link_index' => $entity_link_index,
         );
 
         foreach ($insert as $key => $val_check) {
@@ -346,9 +346,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             $divisor == $sensor_entry['sensor_divisor'] &&
             $entPhysicalIndex_measured == $sensor_entry['entPhysicalIndex_measured'] &&
             $entPhysicalIndex == $sensor_entry['entPhysicalIndex'] &&
-            $user_func == $sensor_entry['user_func'] &&
-            $entity_link_type == $sensor_entry['entity_link_type'] &&
-            $entity_link_index == $sensor_entry['entity_link_index']
+            $user_func == $sensor_entry['user_func']
 
         ) {
             echo '.';
@@ -361,8 +359,6 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
                 'entPhysicalIndex' => $entPhysicalIndex,
                 'entPhysicalIndex_measured' => $entPhysicalIndex_measured,
                 'user_func' => $user_func,
-                'entity_link_type' => $entity_link_type,
-                'entity_link_index' => $entity_link_index,
             );
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
             echo 'U';
@@ -381,7 +377,7 @@ function sensor_low_limit($class, $current)
 
     switch ($class) {
         case 'temperature':
-            $limit = ($current * 0.7);
+            $limit = $current - 10;
             break;
         case 'voltage':
             if ($current < 0) {
@@ -426,7 +422,7 @@ function sensor_limit($class, $current)
 
     switch ($class) {
         case 'temperature':
-            $limit = ($current * 1.60);
+            $limit = $current + 20;
             break;
         case 'voltage':
             if ($current < 0) {
@@ -859,7 +855,11 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         }
 
         if (starts_with($oid, '.1.3.6.1.2.1.33.1.2.3.')) {
-            return 1;
+            if ($device['os'] == 'routeros') {
+                return 60;
+            } else {
+                return 1;
+            }
         }
     }
 
@@ -916,12 +916,22 @@ function ignore_storage($os, $descr)
  * @param $value
  * @param $data
  * @param $group
+ * @param null $index
+ * @param array $pre_cache
  * @return bool
  */
-function can_skip_sensor($value, $data, $group)
+function can_skip_sensor($value, $data, $group, $pre_cache = array())
 {
     $skip_values = array_replace((array)$group['skip_values'], (array)$data['skip_values']);
     foreach ($skip_values as $skip_value) {
+        if (is_array($skip_value) && $pre_cache) {
+            // Dynamic skipping of data
+            $op = isset($skip_value['op']) ? $skip_value['op'] : '!=';
+            $tmp_value = $pre_cache[$skip_value['oid']];
+            if (compare_var($tmp_value, $skip_value['value'], $op) == true) {
+                return true;
+            }
+        }
         if ($value == $skip_value) {
             return true;
         }
@@ -940,6 +950,8 @@ function can_skip_sensor($value, $data, $group)
             return true;
         }
     }
+
+
 
     return false;
 }
@@ -969,11 +981,21 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
             d_echo($raw_data);
 
             foreach ($raw_data as $index => $snmp_data) {
+                $user_function = null;
+                if (isset($data['user_function'])) {
+                    $user_function = $data['user_function'];
+                }
                 // get the value for this sensor, check 'value' and 'oid', if state string, translate to a number
                 $data_name = isset($data['value']) ? $data['value'] : $data['oid'];  // fallback to oid if value is not set
 
                 $tmp_value = $snmp_data[$data_name];
                 if (!is_numeric($tmp_value)) {
+                    if ($sensor_type === 'temperature') {
+                        // For temp sensors, try and detect fahrenheit values
+                        if (ends_with($tmp_value, 'f', true)) {
+                            $user_function = 'fahrenheit_to_celsius';
+                        }
+                    }
                     preg_match('/-?\d*\.?\d+/', $tmp_value, $temp_response);
                     if (!empty($temp_response[0])) {
                         $tmp_value = $temp_response[0];
@@ -992,7 +1014,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                 d_echo("Final sensor value: $value\n");
 
-                if (can_skip_sensor($value, $data, $sensor_options) === false && is_numeric($value)) {
+                if (can_skip_sensor($value, $data, $sensor_options, $raw_data[$index]) === false && is_numeric($value)) {
                     $oid = $data['num_oid'] . $index;
 
                     // process the description
@@ -1015,7 +1037,15 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     $warn_limit = is_numeric($data['warn_limit']) ? $data['warn_limit'] : dynamic_discovery_get_value('warn_limit', $index, $data, $pre_cache, 'null');
                     $high_limit = is_numeric($data['high_limit']) ? $data['high_limit'] : dynamic_discovery_get_value('high_limit', $index, $data, $pre_cache, 'null');
 
+                    $entPhysicalIndex = str_replace('{{ $index }}', $index, $data['entPhysicalIndex']) ?: null;
+                    $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
+
                     $sensor_name = $device['os'];
+
+                    if (isset($user_function) && function_exists($user_function)) {
+                        $value = $user_function($value);
+                    }
+
                     if ($sensor_type === 'state') {
                         $sensor_name = $data['state_name'] ?: $data['oid'];
                         create_state_index($sensor_name, $data['states']);
@@ -1029,7 +1059,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     }
 
                     $uindex = str_replace('{{ $index }}', $index, $data['index'] ?: $index);
-                    discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value);
+                    discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function);
 
                     if ($sensor_type === 'state') {
                         create_sensor_to_state_index($device, $sensor_name, $uindex);
@@ -1062,10 +1092,12 @@ function dynamic_discovery_get_value($name, $index, $discovery_data, $pre_cache,
 
     if (isset($pre_cache[$name])) {
         if (is_array($pre_cache[$name])) {
-            if (count($pre_cache[$name]) === 1) {
-                return current($pre_cache[$name]);
+            if (isset($pre_cache[$name][$index][$name])) {
+                return $pre_cache[$name][$index][$name];
             } elseif (isset($pre_cache[$index][$name])) {
                 return $pre_cache[$index][$name];
+            } elseif (count($pre_cache[$name]) === 1) {
+                return current($pre_cache[$name]);
             }
         } else {
             return $pre_cache[$name];

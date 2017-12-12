@@ -93,4 +93,4 @@ if ($num_radios > 1) {
     );
 }
 poll_mib_def($device, "MWRM-RADIO-MIB:ceragon-radio", "ceraos", $mib_oids, $mib_graphs, $graphs);
-unset($feature, $num_radios, $radioNumber, $ifIndex, $ifIndex_array, $ifName, $ifDescr,  $mib_graphs, $mib_oids, $snmp_get_oids);
+unset($feature, $num_radios, $radioNumber, $ifIndex, $ifIndex_array, $ifName, $ifDescr, $mib_graphs, $mib_oids, $snmp_get_oids);

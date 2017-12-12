@@ -15,7 +15,6 @@ if ($agent_data['app'][$name]) {
     $powerdns = snmp_get($device, $oid, $options);
     $powerdns = trim($powerdns, '"');
 }
-update_application($app, $powerdns);
 
 echo ' powerdns';
 
@@ -77,3 +76,4 @@ $fields = array(
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
+update_application($app, $powerdns, $fields);

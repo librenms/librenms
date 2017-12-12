@@ -125,6 +125,14 @@ Description: Only selects sensors that have a port linked to them, the port is u
 
 Source: `(%sensors.entity_link_type = 'port' && %sensors.entity_link_index = %ports.ifIndex && %macros.port_up && %macros.device_up))`
 
+## State Sensors (Boolean)
+
+Entity: `%macros.state_sensor_ok`, `%macros.state_sensor_warning`, `%macros.state_sensor_critical`, `%macros.state_sensor_unknown`
+
+Description: Select state sensors by their generic status ok (0), warning (1), critical (2), unknown (3)
+
+Source: `(%sensors.sensor_current = %state_translations.state_value && %state_translations.state_generic_value = 2)`
+
 ## Misc (Boolean)
 
 ### Packet Loss

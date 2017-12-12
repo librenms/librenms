@@ -11,3 +11,8 @@ discovery:
     - sysDescr_regex:
         - '/^EdgeOS/'
         - '/^EdgeRouter/'
+bad_if_regexp:
+    - '/^npi[0-9]/'
+    - '/^loop[0-9]/'
+    - '/^gre[0-9]/'
+    - '/^gretap[0-9]/'

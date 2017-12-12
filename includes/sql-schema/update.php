@@ -12,32 +12,38 @@
  * See COPYING for more details.
  */
 
-if (!isset($init_modules)  && php_sapi_name() == 'cli') {
+use LibreNMS\Config;
+use LibreNMS\Exceptions\LockException;
+use LibreNMS\Util\FileLock;
+use LibreNMS\Util\MemcacheLock;
+
+global $database_link;
+
+if (!isset($init_modules) && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
     $init_modules = array();
     require realpath(__DIR__ . '/../..') . '/includes/init.php';
 }
 
-if (isset($skip_schema_lock) && $skip_schema_lock) {
-    $schemaLock = true;
-} else {
-    $schemaLock = \LibreNMS\FileLock::lock('schema', 30);
-}
+$return = 0;
 
-if ($schemaLock === false) {
-    echo "Failed to acquire lock, skipping schema update\n";
-    $return = 1;
-} else {
-    $return = 0;
+try {
+    if (isset($skip_schema_lock) && !$skip_schema_lock) {
+        if (Config::get('distributed_poller')) {
+            $schemaLock = MemcacheLock::lock('schema', 30, 86000);
+        } else {
+            $schemaLock = FileLock::lock('schema', 30);
+        }
+    }
 
     // only import build.sql to an empty database
-    $tables = dbFetchRows("SHOW TABLES FROM {$config['db_name']}");
+    $tables = dbFetchRows("SHOW TABLES FROM " . Config::get('db_name'));
     if (empty($tables)) {
         echo "-- Creating base database structure\n";
         $step = 0;
         $sql_fh = fopen('build.sql', 'r');
         if ($sql_fh === false) {
-            echo 'ERROR: Cannot open SQL build script ' . $sql_file . PHP_EOL;
+            echo 'ERROR: Cannot open SQL build script build.sql' . PHP_EOL;
             $return = 1;
         }
 
@@ -64,7 +70,7 @@ if ($schemaLock === false) {
         d_echo("DB Schema already up to date.\n");
     } else {
         // Set Database Character set and Collation
-        dbQuery('ALTER DATABASE ? CHARACTER SET utf8 COLLATE utf8_unicode_ci;', array(array($config['db_name'])));
+        dbQuery('ALTER DATABASE ? CHARACTER SET utf8 COLLATE utf8_unicode_ci;', array(array(Config::get('db_name'))));
 
         $db_rev = get_db_schema();
         $insert = ($db_rev == 0); // if $db_rev == 0, insert the first update
@@ -79,13 +85,14 @@ if ($schemaLock === false) {
                 printf('%03d -> %03d ...', $db_rev, $file_rev);
 
                 $err = 0;
-                if ($data = file_get_contents($file)) {
+                if (($data = file_get_contents($file)) !== false) {
                     foreach (explode("\n", $data) as $line) {
                         if (trim($line)) {
                             d_echo("$line \n");
 
                             if ($line[0] != '#') {
                                 if (!mysqli_query($database_link, $line)) {
+                                    $return = 2;
                                     $err++;
                                     d_echo(mysqli_error($database_link) . PHP_EOL);
                                 }
@@ -115,7 +122,10 @@ if ($schemaLock === false) {
         }
     }
 
-    if (is_a($schemaLock, '\LibreNMS\FileLock')) {
+    if (isset($schemaLock)) {
         $schemaLock->release();
     }
+} catch (LockException $e) {
+    echo $e->getMessage() . PHP_EOL;
+    $return = 1;
 }

@@ -1,0 +1,127 @@
+ARRIS-C3-IF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    ifEntry
+        FROM IF-MIB  -- RFC2233
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    cmtsC3
+        FROM ARRIS-MIB;
+
+    cmtsC3IfMIB  MODULE-IDENTITY
+        LAST-UPDATED "200308200000Z" -- 20th August 2003
+        ORGANIZATION "Arris International"
+        CONTACT-INFO
+            "   Network Management
+                Postal: Arris International.
+                        4400 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+
+        DESCRIPTION
+            "This MIB manages the proprietary interface
+            table on the Arris CMTS C3"
+        ::= { cmtsC3 12 }
+
+    dcxIfObjects OBJECT IDENTIFIER ::= { cmtsC3IfMIB 1 }
+
+    dcxIfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DcxIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Proprietary ifTable additions."
+        ::= { dcxIfObjects 1 }
+    
+    dcxIfEntry OBJECT-TYPE
+            SYNTAX      DcxIfEntry
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                "Additional columns to each ifEntry for monitoring
+                average bit and packet rates per interface."
+            AUGMENTS { ifEntry }
+            ::= { dcxIfTable 1 }
+    
+    DcxIfEntry ::= SEQUENCE {
+                dcxIfLoadInterval     Unsigned32,
+                dcxIfInputBitRate     Unsigned32,
+                dcxIfInputPacketRate  Unsigned32,
+                dcxIfOutputBitRate    Unsigned32,
+                dcxIfOutputPacketRate Unsigned32
+            }
+    
+    dcxIfLoadInterval OBJECT-TYPE
+           SYNTAX      Unsigned32
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+                "Number of seconds from 30 to 600 over which
+                the average input/output bit/packet rate is
+                calculated for the interface. This is not
+                writeable for upstream channels that have a
+                corresponding upstream interface entry. Such
+                channels will mirror the values on the interface."
+        ::= { dcxIfEntry 1 }
+        
+    dcxIfInputBitRate OBJECT-TYPE
+           SYNTAX      Unsigned32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+                "Average bit rate per second received on the
+                interface over the configured load interval.
+                If one load interval has not yet passed, this
+                represents the average bit rate over the
+                interval so far. Measurements are only made
+                if the interface is operational and are reset
+                if the load interval is changed."
+        ::= { dcxIfEntry 2 }
+
+    dcxIfInputPacketRate OBJECT-TYPE
+           SYNTAX      Unsigned32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+                "Average packet rate per second received on the
+                interface over the configured load interval.
+                If one load interval has not expired, this
+                represents the average packet rate over the
+                interval so far. Measurements are only made
+                if the interface is operational and are reset
+                if the load interval is changed."
+        ::= { dcxIfEntry 3 }
+        
+    dcxIfOutputBitRate OBJECT-TYPE
+           SYNTAX      Unsigned32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+                "Average bit rate per second sent from the
+                interface over the configured load interval.
+                If one load interval has not expired, this
+                represents the average bit rate over the
+                interval so far. Measurements are only made
+                if the interface is operational and are reset
+                if the load interval is changed."
+        ::= { dcxIfEntry 4 }
+
+    dcxIfOutputPacketRate OBJECT-TYPE
+           SYNTAX      Unsigned32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+                "Average packet rate per second sent from the
+                interface over the configured load interval.
+                If one load interval has not expired, this
+                represents the average packet rate over the
+                interval so far. Measurements are only made
+                if the interface is operational and are reset
+                if the load interval is changed."
+        ::= { dcxIfEntry 5 }
+        
+END

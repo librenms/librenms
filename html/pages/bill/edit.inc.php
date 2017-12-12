@@ -128,7 +128,7 @@ if ($bill_data['bill_type'] == 'cdr') {
         <?php   }
 if (!$emptyCheck) { ?>
                 <div class="alert alert-info">There are no ports assigned to this bill</alert>
-        <?php                   } ?>
+<?php                   } ?>
             
             </div>
                 

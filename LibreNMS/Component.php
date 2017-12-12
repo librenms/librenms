@@ -218,11 +218,11 @@ class Component
         return $count;
     }
 
-    public function getComponentStatusLog($component = null, $start = null, $end = null)
+    public function getComponentStatusLog($component_id, $start, $end)
     {
-        if (($component == null) || ($start == null) || ($end == null)) {
+        if (($component_id == null) || ($start == null) || ($end == null)) {
             // Error...
-            d_echo("Required arguments are missing. Component: ".$component.", Start: ".$start.", End: ".$end."\n");
+            d_echo("Required arguments are missing. Component ID: ".$component_id.", Start: ".$start.", End: ".$end."\n");
             return false;
         }
 
@@ -230,8 +230,8 @@ class Component
         $return = array();
 
         // 1. find the previous value, this is the value when $start occurred.
-        $sql_query = "SELECT status FROM component_statuslog WHERE `component` = ? AND time < ? ORDER BY `id` desc LIMIT 1";
-        $sql_param = array($component,$start);
+        $sql_query = "SELECT status FROM `component_statuslog` WHERE `component_id` = ? AND `timestamp` < ? ORDER BY `id` desc LIMIT 1";
+        $sql_param = array($component_id, $start);
         $result = dbFetchRow($sql_query, $sql_param);
         if ($result == false) {
             $return['initial'] = false;
@@ -240,8 +240,8 @@ class Component
         }
 
         // 2. Then we just need a list of all the entries for the time period.
-        $sql_query = "SELECT status, time, message FROM component_statuslog WHERE `component` = ? AND time >= ? AND time < ? ORDER BY `time`";
-        $sql_param = array($component,$start,$end);
+        $sql_query = "SELECT status, `timestamp`, message FROM `component_statuslog` WHERE `component_id` = ? AND `timestamp` >= ? AND `timestamp` < ? ORDER BY `timestamp`";
+        $sql_param = array($component_id, $start,$end);
         $return['data'] = dbFetchRows($sql_query, $sql_param);
 
         d_echo("Status Log Data: ".print_r($return, true)."\n");
@@ -270,11 +270,11 @@ class Component
         return $ARRAY;
     }
 
-    public function createStatusLogEntry($component, $status, $message)
+    public function createStatusLogEntry($component_id, $status, $message)
     {
         // Add an entry to the statuslog table for a particular component.
         $DATA = array(
-            'component'     => $component,
+            'component_id'  => $component_id,
             'status'        => $status,
             'message'       => $message,
         );
@@ -302,12 +302,12 @@ class Component
             }
 
             // Ignore type, we cant change that.
-            unset($AVP['type'],$OLD[$device_id][$COMPONENT]['type']);
+            unset($AVP['type'], $OLD[$device_id][$COMPONENT]['type']);
 
             // If the Status has changed we need to add a log entry
             if ($AVP['status'] != $OLD[$device_id][$COMPONENT]['status']) {
                 d_echo("Status Changed - Old: ".$OLD[$device_id][$COMPONENT]['status'].", New: ".$AVP['status']."\n");
-                $this->createStatusLogEntry($COMPONENT, $AVP['status'], $AVP['error']);
+                $this->createStatusLogEntry($COMPONENT['id'], $AVP['status'], $AVP['error']);
             }
 
             // Process our reserved components first.
@@ -322,7 +322,7 @@ class Component
                     }
 
                     // Unset the reserved field. We don't want to insert it below.
-                    unset($AVP[$k],$OLD[$device_id][$COMPONENT][$k]);
+                    unset($AVP[$k], $OLD[$device_id][$COMPONENT][$k]);
                 }
             }
 

@@ -58,8 +58,6 @@ if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php') {
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-$config['memcached']['ttl'] = $config['time']['now']+300;
-
 LibreNMS\Plugins::start();
 
 $runtime_start = microtime(true);

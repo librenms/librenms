@@ -27,6 +27,7 @@ namespace LibreNMS\Validations;
 
 use LibreNMS\Config;
 use LibreNMS\Interfaces\ValidationGroup;
+use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
 class Php implements ValidationGroup
@@ -40,6 +41,7 @@ class Php implements ValidationGroup
     public function validate(Validator $validator)
     {
         $this->checkVersion($validator);
+        $this->checkSessionDirWritable($validator);
         $this->checkExtensions($validator);
         $this->checkFunctions($validator);
         $this->checkTimezone($validator);
@@ -49,18 +51,53 @@ class Php implements ValidationGroup
     {
         $min_version = '5.6.4';
 
-         // if update is not set to false and version is min or newer
+        // if update is not set to false and version is min or newer
         if (Config::get('update') && version_compare(PHP_VERSION, $min_version, '<')) {
             $validator->warn('PHP version 5.6.4 will be the minimum supported version on January 10, 2018.  We recommend you update to PHP a supported version of PHP (7.1 suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.');
         }
     }
 
+    private function checkSessionDirWritable(Validator $validator)
+    {
+        $path = session_save_path() === '' ? '/tmp' : session_save_path();
+        if (!is_writable($path)) {
+            $result = ValidationResult::fail("The session directory ($path) is not writable.");
+
+            $group_id = filegroup($path);
+            if ($group_id !== 0 && check_file_permissions($path, '060')) {
+                // don't suggest adding users to the root group or a group that doesn't have write permission.
+                if (function_exists('posix_getgrgid')) {
+                    $group_info = posix_getgrgid($group_id);
+                    $group = $group_info['name'];
+                    $user = $validator->getUsername();
+                    $result->setFix("usermod -a -G $group $user");
+                }
+            }
+
+            $validator->result($result);
+        }
+    }
+
     private function checkExtensions(Validator $validator)
     {
-        $required_modules = array('mysqli','pcre','curl','session','snmp','mcrypt', 'xml', 'gd');
+        $required_modules = array('mysqli','pcre','curl','session','snmp', 'xml', 'gd');
+
+        if (Config::get('distributed_poller')) {
+            $required_modules[] = 'memcached';
+        }
+
         foreach ($required_modules as $extension) {
             if (!extension_loaded($extension)) {
                 $validator->fail("Missing PHP extension: $extension", "Please install $extension");
+            } elseif (shell_exec("php -r \"var_export(extension_loaded('$extension'));\"") == 'false') {
+                $validator->fail("Missing CLI PHP extension: $extension", "Please install $extension");
+            }
+        }
+
+        $suggested_extensions = array('posix' => 'php-process');
+        foreach ($suggested_extensions as $extension => $packages) {
+            if (!extension_loaded($extension)) {
+                $validator->warn("Missing optional PHP extension: $extension", "It is suggested you install $packages or the one that matches your php version");
             }
         }
     }
@@ -95,16 +132,33 @@ class Php implements ValidationGroup
 
     private function checkTimezone(Validator $validator)
     {
+        // collect data
         $ini_tz = ini_get('date.timezone');
         $sh_tz = rtrim(shell_exec('date +%Z'));
         $php_tz = date('T');
+        $php_cli_tz = rtrim(shell_exec('php -r "echo date(\'T\');"'));
+
         if (empty($ini_tz)) {
+            // make sure timezone is set
             $validator->fail(
                 'You have no timezone set for php.',
                 'http://php.net/manual/en/datetime.configuration.php#ini.date.timezone'
             );
         } elseif ($sh_tz !== $php_tz) {
-            $validator->fail("You have a different system timezone ($sh_tz) specified to the php configured timezone ($php_tz), please correct this.");
+            // check if system timezone matches the timezone of the current running php
+            $validator->fail(
+                "You have a different system timezone ($sh_tz) than the php configured timezone ($php_tz)",
+                "Please correct either your system timezone or your timezone set in php.ini."
+            );
+        } elseif ($php_tz !== $php_cli_tz) {
+            // check if web and cli timezones match (this does nothing if validate.php is run on cli)
+            // some distros have different php.ini for cli and the web server
+            if ($sh_tz !== $php_cli_tz) {
+                $validator->fail(
+                    "The CLI php.ini ($php_cli_tz) timezone is different than your system's timezone ($sh_tz)",
+                    "Edit your CLI php.ini file and set the correct timezone ($sh_tz)."
+                );
+            }
         }
     }
 
