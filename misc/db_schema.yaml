@@ -1668,4 +1668,4 @@ device_relationships:
         - { Field: parent_device_id, Type: 'int(11) unsigned', 'Null': false, Extra: '', Default: '0' }
         - { Field: child_device_id, Type: 'int(11) unsigned', 'Null': false, Extra: ''}
     Indexes:
-        PRIMARY: { Name: PRIMARY, Columns: [parent_device_id, child_device_id], Unique: ture, Type: BTREE }
+        PRIMARY: { Name: PRIMARY, Columns: [parent_device_id, child_device_id], Unique: true, Type: BTREE }
