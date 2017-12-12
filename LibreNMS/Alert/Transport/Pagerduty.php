@@ -43,7 +43,13 @@ class Pagerduty implements Transport
             $protocol['event_type'] = 'trigger';
         }
         foreach ($obj['faults'] as $fault => $data) {
-            $protocol['details'][] = $data['string'];
+            $rough_details = array_filter(explode('; ', $data['string']));
+            $details = array();
+            foreach ($rough_details as $r) {
+                $kv_pair = explode(' => ', $r);
+                $details[$kv_pair[0]] = $kv_pair[1];
+            }
+            $protocol['details'] = $details;
         }
         $curl = curl_init();
         set_curl_proxy($curl);
