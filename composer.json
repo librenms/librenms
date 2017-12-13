@@ -34,7 +34,7 @@
         "palanik/corsslim": "^1.1"
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "2.6.*",
+        "squizlabs/php_codesniffer": "^2.9.1",
         "phpunit/phpunit": "4.*",
         "jakub-onderka/php-parallel-lint": "*",
         "jakub-onderka/php-console-highlighter": "*",

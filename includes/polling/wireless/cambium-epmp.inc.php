@@ -8,20 +8,20 @@
  */
 use LibreNMS\RRD\RrdDefinition;
 
-$cambiumSTADLRSSI = snmp_get($device, "cambiumSTADLRSSI.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
-$cambiumSTADLSNR = snmp_get($device, "cambiumSTADLSNR.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
-if (is_numeric($cambiumSTADLRSSI) && is_numeric($cambiumSTADLSNR)) {
-    $rrd_def = RrdDefinition::make()
-        ->addDataset('cambiumSTADLRSSI', 'GAUGE', -150, 0)
-        ->addDataset('cambiumSTADLSNR', 'GAUGE', 0, 150);
-    $fields = array(
-        'cambiumSTADLRSSI' => $cambiumSTADLRSSI,
-        'cambiumSTADLSNR' => $cambiumSTADLSNR
-    );
-    $tags = compact('rrd_def');
-    data_update($device, 'cambium-epmp-RFStatus', $tags, $fields);
-    $graphs['cambium_epmp_RFStatus'] = true;
-}
+// $cambiumSTADLRSSI = snmp_get($device, "cambiumSTADLRSSI.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
+// $cambiumSTADLSNR = snmp_get($device, "cambiumSTADLSNR.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
+// if (is_numeric($cambiumSTADLRSSI) && is_numeric($cambiumSTADLSNR)) {
+//     $rrd_def = RrdDefinition::make()
+//         ->addDataset('cambiumSTADLRSSI', 'GAUGE', -150, 0)
+//         ->addDataset('cambiumSTADLSNR', 'GAUGE', 0, 150);
+//     $fields = array(
+//         'cambiumSTADLRSSI' => $cambiumSTADLRSSI,
+//         'cambiumSTADLSNR' => $cambiumSTADLSNR
+//     );
+//     $tags = compact('rrd_def');
+//     data_update($device, 'cambium-epmp-RFStatus', $tags, $fields);
+//     $graphs['cambium_epmp_RFStatus'] = true;
+// }
 
 $cambiumGPSNumTrackedSat = snmp_get($device, "cambiumGPSNumTrackedSat.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
 $cambiumGPSNumVisibleSat = snmp_get($device, "cambiumGPSNumVisibleSat.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
@@ -53,16 +53,16 @@ if (is_numeric($cambiumSTAUplinkMCSMode) && is_numeric($cambiumSTADownlinkMCSMod
     $graphs['cambium_epmp_modulation'] = true;
 }
 
-$registeredSM = snmp_get($device, "cambiumAPNumberOfConnectedSTA.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
-if (is_numeric($registeredSM)) {
-    $rrd_def = RrdDefinition::make()->addDataset('regSM', 'GAUGE', 0, 10000);
-    $fields = array(
-        'regSM' => $registeredSM,
-    );
-    $tags = compact('rrd_def');
-    data_update($device, 'cambium-epmp-registeredSM', $tags, $fields);
-    $graphs['cambium_epmp_registeredSM'] = true;
-}
+// $registeredSM = snmp_get($device, "cambiumAPNumberOfConnectedSTA.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
+// if (is_numeric($registeredSM)) {
+//     $rrd_def = RrdDefinition::make()->addDataset('regSM', 'GAUGE', 0, 10000);
+//     $fields = array(
+//         'regSM' => $registeredSM,
+//     );
+//     $tags = compact('rrd_def');
+//     data_update($device, 'cambium-epmp-registeredSM', $tags, $fields);
+//     $graphs['cambium_epmp_registeredSM'] = true;
+// }
 
 $sysNetworkEntryAttempt = snmp_get($device, "sysNetworkEntryAttempt.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
 $sysNetworkEntrySuccess = snmp_get($device, "sysNetworkEntrySuccess.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
@@ -93,16 +93,16 @@ if (is_numeric($gpsSync)) {
     $graphs['cambium_epmp_gpsSync'] = true;
 }
 
-$freq = snmp_get($device, "cambiumSTAConnectedRFFrequency.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
-if (is_numeric($freq)) {
-    $rrd_def = RrdDefinition::make()->addDataset('freq', 'GAUGE', 0, 100000);
-    $fields = array(
-        'freq' => $freq,
-    );
-    $tags = compact('rrd_def');
-    data_update($device, 'cambium-epmp-freq', $tags, $fields);
-    $graphs['cambium_epmp_freq'] = true;
-}
+// $freq = snmp_get($device, "cambiumSTAConnectedRFFrequency.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
+// if (is_numeric($freq)) {
+//     $rrd_def = RrdDefinition::make()->addDataset('freq', 'GAUGE', 0, 100000);
+//     $fields = array(
+//         'freq' => $freq,
+//     );
+//     $tags = compact('rrd_def');
+//     data_update($device, 'cambium-epmp-freq', $tags, $fields);
+//     $graphs['cambium_epmp_freq'] = true;
+// }
 
 $multi_get_array = snmp_get_multi($device, "ulWLanTotalAvailableFrameTimePerSecond.0 ulWLanTotalUsedFrameTimePerSecond.0 dlWLanTotalAvailableFrameTimePerSecond.0 dlWLanTotalUsedFrameTimePerSecond.0", "-OQU", "CAMBIUM-PMP80211-MIB");
 

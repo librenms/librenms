@@ -177,6 +177,7 @@ class LdapAuthorizer extends AuthorizerBase
     {
         foreach ($this->getUserlist() as $user) {
             if ($user['user_id'] === $user_id) {
+                $user['level'] = $this->getUserlevel($user['username']);
                 return $user;
             }
         }
@@ -247,6 +248,10 @@ class LdapAuthorizer extends AuthorizerBase
 
         if ($this->ldap_connection) {
             return $this->ldap_connection; // bind already attempted
+        }
+
+        if (!function_exists('ldap_connect')) {
+            throw new AuthenticationException("PHP does not support LDAP, please install or enable the PHP LDAP extension.");
         }
 
         $this->ldap_connection = @ldap_connect(Config::get('auth_ldap_server'), Config::get('auth_ldap_port', 389));

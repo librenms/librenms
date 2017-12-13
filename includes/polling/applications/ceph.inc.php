@@ -4,15 +4,16 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'ceph';
 if (!empty($agent_data['app'][$name])) {
+    $ceph_data = $agent_data['app'][$name];
     $app_id = $app['app_id'];
 
-    foreach (explode('<', $agent_data['app'][$name]) as $section) {
+    $metrics = array();
+    foreach (explode('<', $ceph_data) as $section) {
         if (empty($section)) {
             continue;
         }
         list($section, $data) = explode('>', $section);
 
-        update_application($app, $section);
         if ($section == "poolstats") {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('ops', 'GAUGE', 0)
@@ -32,6 +33,7 @@ if (!empty($agent_data['app'][$name])) {
                     'wrbytes' => $wrbytes,
                     'rbytes' => $rbytes
                 );
+                $metrics["pool_$pool"] = $fields;
                 $tags = compact('name', 'app_id', 'pool', 'rrd_name', 'rrd_def');
                 data_update($device, 'app', $tags, $fields);
             }
@@ -52,6 +54,7 @@ if (!empty($agent_data['app'][$name])) {
                     'apply_ms' => $apply,
                     'commit_ms' => $commit
                 );
+                $metrics["osd_$osd"] = $fields;
                 $tags = compact('name', 'app_id', 'osd', 'rrd_name', 'rrd_def');
                 data_update($device, 'app', $tags, $fields);
             }
@@ -68,16 +71,19 @@ if (!empty($agent_data['app'][$name])) {
                 list($df,$avail,$used,$objects) = explode(':', $line);
                 $rrd_name = array('app', $name, $app_id, 'df', $df);
 
-                print "Ceph Pool DF: $pool, Avail: $avail, Used: $used, Objects: $objects\n";
+                print "Ceph Pool DF: $df, Avail: $avail, Used: $used, Objects: $objects\n";
                 $fields = array(
                     'avail' => $avail,
                     'used' => $used,
                     'objects' => $objects
                 );
-
+                $metrics["df_$df"] = $fields;
                 $tags = compact('name', 'app_id', 'df', 'rrd_name', 'rrd_def');
                 data_update($device, 'app', $tags, $fields);
             }
         }
     }
+    update_application($app, $ceph_data, $metrics);
 }
+
+unset($ceph_data, $metrics);

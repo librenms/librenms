@@ -1,0 +1,661 @@
+-- ============================================================================
+-- AT-PLUGGABLE-DIAGNOSTICS-MIB, Allied Telesis enterprise MIB:
+-- Diagnostic objects related to Optical Pluggable modules.
+--
+-- Copyright (c) 2015 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+AT-PLUGGABLE-DIAGNOSTICS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    DisplayStringUnsized
+        FROM AT-SMI-MIB
+    sysinfo
+        FROM AT-SYSINFO-MIB
+    Integer32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    InterfaceIndex
+        FROM IF-MIB;
+
+
+atPluggableDiag MODULE-IDENTITY
+    LAST-UPDATED    "201507170000Z"
+    ORGANIZATION    "Allied Telesis, Inc"
+    CONTACT-INFO    "http://www.alliedtelesis.com"
+    DESCRIPTION
+        "The AT Pluggbale Diagnostics MIB contains objects to retrieve the standard
+        diagnostic information from installed SFP modules."
+    REVISION        "201507170000Z"
+    DESCRIPTION     "Initial revision"
+    ::= { sysinfo 28 }
+
+----------------------------------------------------------------
+-- The Digital Diagnostic monitoring for optical pluggables
+----------------------------------------------------------------
+
+atPluggableDiagTable OBJECT IDENTIFIER ::= { atPluggableDiag 1 }
+
+----------------------------------------------------------------
+-- Temperature table for Digital Diagnostic monitoring
+----------------------------------------------------------------
+
+atPluggableDiagTempTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AtPluggableDiagTempEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+           "A table of information regarding the various temperature parameters observed
+           as a part of Digital diagnostics monitoring, for all the optical pluggables
+           installed in the devices."
+    ::= { atPluggableDiagTable 1 }
+
+atPluggableDiagTempEntry OBJECT-TYPE
+    SYNTAX        AtPluggableDiagTempEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The information about various temperature parameters of pluggables
+        such as current status reading, current alarm status, higher and lower
+        alarm threshold, current warning, higher and lower warning threshold."
+    INDEX { atPluggableDiagTempIfIndex, atPluggableDiagTempChannel }
+    ::= { atPluggableDiagTempTable 1 }
+
+AtPluggableDiagTempEntry ::= SEQUENCE {
+      atPluggableDiagTempIfIndex            InterfaceIndex,
+      atPluggableDiagTempChannel            Integer32,
+      atPluggableDiagTempStatusReading      Integer32,
+      atPluggableDiagTempCurrentAlarm       OCTET STRING,
+      atPluggableDiagTempAlarmMax           Integer32,
+      atPluggableDiagTempAlarmMin           Integer32,
+      atPluggableDiagTempCurrentWarning     OCTET STRING,
+      atPluggableDiagTempWarningMax         Integer32,
+      atPluggableDiagTempWarningMin         Integer32 }
+
+atPluggableDiagTempIfIndex OBJECT-TYPE
+    SYNTAX        InterfaceIndex
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The ifindex of the pluggable."
+    ::= { atPluggableDiagTempEntry 1 }
+
+atPluggableDiagTempChannel OBJECT-TYPE
+    SYNTAX        Integer32(1..16)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The channel number of the pluggable."
+    ::= { atPluggableDiagTempEntry 2 }
+
+atPluggableDiagTempStatusReading OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.001 degree C"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current temperature status reading."
+    ::= { atPluggableDiagTempEntry 3 }
+
+atPluggableDiagTempCurrentAlarm OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current temperature alarm reading."
+    ::= { atPluggableDiagTempEntry 4 }
+
+atPluggableDiagTempAlarmMax OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.001 degree C"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum temperature alarm threshold value."
+    ::= { atPluggableDiagTempEntry 5 }
+
+atPluggableDiagTempAlarmMin OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.001 degree C"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The minimum temperature alarm threshold value."
+    ::= { atPluggableDiagTempEntry 6 }
+
+atPluggableDiagTempCurrentWarning OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current temperature warnings."
+    ::= { atPluggableDiagTempEntry 7 }
+
+atPluggableDiagTempWarningMax OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.001 degree C"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum temperature warning threshold value."
+    ::= { atPluggableDiagTempEntry 8 }
+
+atPluggableDiagTempWarningMin OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.001 degree C"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The minimum temperature warning threshold value."
+    ::= { atPluggableDiagTempEntry 9 }
+
+----------------------------------------------------------------
+-- Voltage (Vcc) table for Digital Diagnostic monitoring
+----------------------------------------------------------------
+
+atPluggableDiagVccTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AtPluggableDiagVccEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table of information regarding the various Voltage (Vcc) parameters observed
+        as a part of Digital diagnostics monitoring, for all the optical pluggables
+        installed in the devices."
+    ::= { atPluggableDiagTable 2 }
+
+atPluggableDiagVccEntry OBJECT-TYPE
+    SYNTAX        AtPluggableDiagVccEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The information about various Voltage (Vcc) parameters of pluggables
+        such as current status reading, current alarm status, higher and lower
+        alarm threshold, current warning, higher and lower warning threshold."
+    INDEX { atPluggableDiagVccIfIndex, atPluggableDiagVccChannel }
+    ::= { atPluggableDiagVccTable 1 }
+
+AtPluggableDiagVccEntry ::= SEQUENCE {
+      atPluggableDiagVccIfIndex             InterfaceIndex,
+      atPluggableDiagVccChannel             Integer32,
+      atPluggableDiagVccStatusReading       Integer32,
+      atPluggableDiagVccCurrentAlarm        OCTET STRING,
+      atPluggableDiagVccAlarmMax            Integer32,
+      atPluggableDiagVccAlarmMin            Integer32,
+      atPluggableDiagVccCurrentWarning      OCTET STRING,
+      atPluggableDiagVccWarningMax          Integer32,
+      atPluggableDiagVccWarningMin          Integer32 }
+
+atPluggableDiagVccIfIndex OBJECT-TYPE
+    SYNTAX        InterfaceIndex
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The ifindex of the pluggable."
+    ::= { atPluggableDiagVccEntry 1 }
+
+atPluggableDiagVccChannel OBJECT-TYPE
+    SYNTAX        Integer32(1..16)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The channel number of the pluggable."
+    ::= { atPluggableDiagVccEntry 2 }
+
+atPluggableDiagVccStatusReading OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.0001 volts"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current Voltage (Vcc) status reading."
+    ::= { atPluggableDiagVccEntry 3 }
+
+atPluggableDiagVccCurrentAlarm OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current Voltage (Vcc) alarm reading."
+    ::= { atPluggableDiagVccEntry 4 }
+
+atPluggableDiagVccAlarmMax OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.0001 volts"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum Voltage (Vcc) alarm threshold value."
+    ::= { atPluggableDiagVccEntry 5 }
+
+atPluggableDiagVccAlarmMin OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.0001 volts"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The minimum Voltage (Vcc) alarm threshold value."
+    ::= { atPluggableDiagVccEntry 6 }
+
+atPluggableDiagVccCurrentWarning OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current Voltage (Vcc) warnings."
+    ::= { atPluggableDiagVccEntry 7 }
+
+atPluggableDiagVccWarningMax OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.0001 volts"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum Voltage (Vcc) warning threshold value."
+    ::= { atPluggableDiagVccEntry 8 }
+
+atPluggableDiagVccWarningMin OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.0001 volts"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The minimum Voltage (Vcc) warning threshold value."
+    ::= { atPluggableDiagVccEntry 9 }
+
+----------------------------------------------------------------
+-- Tx Bias Current (mA) table for Digital Diagnostic monitoring
+----------------------------------------------------------------
+
+atPluggableDiagTxBiasTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AtPluggableDiagTxBiasEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table of information regarding the various Tx Bias Current (mA)
+        parameters observed as a part of Digital diagnostics monitoring,
+        for all the optical pluggables installed in the devices."
+    ::= { atPluggableDiagTable 3 }
+
+atPluggableDiagTxBiasEntry OBJECT-TYPE
+    SYNTAX        AtPluggableDiagTxBiasEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The information about various Tx Bias Current (mA)
+        parameters of pluggables such as current status reading,
+        current alarm status, higher and lower alarm threshold,
+        current warning, higher and lower warning threshold."
+    INDEX { atPluggableDiagTxBiasIfIndex, atPluggableDiagTxBiasChannel }
+    ::= { atPluggableDiagTxBiasTable 1 }
+
+AtPluggableDiagTxBiasEntry ::= SEQUENCE {
+      atPluggableDiagTxBiasIfIndex          InterfaceIndex,
+      atPluggableDiagTxBiasChannel          Integer32,
+      atPluggableDiagTxBiasStatusReading    Integer32,
+      atPluggableDiagTxBiasCurrentAlarm     OCTET STRING,
+      atPluggableDiagTxBiasAlarmMax         Integer32,
+      atPluggableDiagTxBiasAlarmMin         Integer32,
+      atPluggableDiagTxBiasCurrentWarning   OCTET STRING,
+      atPluggableDiagTxBiasWarningMax       Integer32,
+      atPluggableDiagTxBiasWarningMin       Integer32 }
+
+atPluggableDiagTxBiasIfIndex OBJECT-TYPE
+    SYNTAX        InterfaceIndex
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The ifindex of the pluggable."
+    ::= { atPluggableDiagTxBiasEntry 1 }
+
+atPluggableDiagTxBiasChannel OBJECT-TYPE
+    SYNTAX        Integer32(1..16)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The channel number of the pluggable."
+    ::= { atPluggableDiagTxBiasEntry 2 }
+
+atPluggableDiagTxBiasStatusReading OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.001 mA"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current Tx Bias (mA) status reading."
+    ::= { atPluggableDiagTxBiasEntry 3 }
+
+atPluggableDiagTxBiasCurrentAlarm OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current Tx Bias (mA) alarm reading."
+    ::= { atPluggableDiagTxBiasEntry 4 }
+
+atPluggableDiagTxBiasAlarmMax OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.001 mA"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum Tx Bias (mA) alarm threshold value."
+    ::= { atPluggableDiagTxBiasEntry 5 }
+
+atPluggableDiagTxBiasAlarmMin OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.001 mA"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The minimum Tx Bias (mA) alarm threshold value."
+    ::= { atPluggableDiagTxBiasEntry 6 }
+
+atPluggableDiagTxBiasCurrentWarning OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current Tx Bias (mA) warnings."
+    ::= { atPluggableDiagTxBiasEntry 7 }
+
+atPluggableDiagTxBiasWarningMax OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.001 mA"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum Tx Bias (mA) warning threshold value."
+    ::= { atPluggableDiagTxBiasEntry 8 }
+
+atPluggableDiagTxBiasWarningMin OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.001 mA"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The minimum Tx Bias (mA) warning threshold value."
+    ::= { atPluggableDiagTxBiasEntry 9 }
+
+----------------------------------------------------------------
+-- Tx Power (mW) table for Digital Diagnostic monitoring
+----------------------------------------------------------------
+
+atPluggableDiagTxPowerTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AtPluggableDiagTxPowerEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table of information regarding the various Tx Power (mW)
+        parameters observed as a part of Digital diagnostics monitoring,
+        for all the optical pluggables installed in the devices."
+    ::= { atPluggableDiagTable 4 }
+
+atPluggableDiagTxPowerEntry OBJECT-TYPE
+    SYNTAX        AtPluggableDiagTxPowerEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The information about various Tx Power (mW)
+        parameters of pluggables such as current status reading,
+        current alarm status, higher and lower alarm threshold,
+        current warning, higher and lower warning threshold."
+    INDEX { atPluggableDiagTxPowerIfIndex, atPluggableDiagTxPowerChannel }
+    ::= { atPluggableDiagTxPowerTable 1 }
+
+AtPluggableDiagTxPowerEntry ::= SEQUENCE {
+      atPluggableDiagTxPowerIfIndex         InterfaceIndex,
+      atPluggableDiagTxPowerChannel         Integer32,
+      atPluggableDiagTxPowerStatusReading   Integer32,
+      atPluggableDiagTxPowerCurrentAlarm    OCTET STRING,
+      atPluggableDiagTxPowerAlarmMax        Integer32,
+      atPluggableDiagTxPowerAlarmMin        Integer32,
+      atPluggableDiagTxPowerCurrentWarning  OCTET STRING,
+      atPluggableDiagTxPowerWarningMax      Integer32,
+      atPluggableDiagTxPowerWarningMin      Integer32 }
+
+atPluggableDiagTxPowerIfIndex OBJECT-TYPE
+    SYNTAX        InterfaceIndex
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The ifindex of the pluggable."
+    ::= { atPluggableDiagTxPowerEntry 1 }
+
+atPluggableDiagTxPowerChannel OBJECT-TYPE
+    SYNTAX        Integer32(1..16)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The channel number of the pluggable."
+    ::= { atPluggableDiagTxPowerEntry 2 }
+
+atPluggableDiagTxPowerStatusReading OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.0001 mW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current Tx Power (mW) status reading."
+    ::= { atPluggableDiagTxPowerEntry 3 }
+
+atPluggableDiagTxPowerCurrentAlarm OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current Tx Power (mW) alarm reading."
+    ::= { atPluggableDiagTxPowerEntry 4 }
+
+atPluggableDiagTxPowerAlarmMax OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.0001 mW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum Tx Power (mW) alarm threshold value."
+    ::= { atPluggableDiagTxPowerEntry 5 }
+
+atPluggableDiagTxPowerAlarmMin OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.0001 mW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The minimum Tx Power (mW) alarm threshold value."
+    ::= { atPluggableDiagTxPowerEntry 6 }
+
+atPluggableDiagTxPowerCurrentWarning OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current Tx Power (mW) warnings."
+    ::= { atPluggableDiagTxPowerEntry 7 }
+
+atPluggableDiagTxPowerWarningMax OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.0001 mW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum Tx Power (mW) warning threshold value."
+    ::= { atPluggableDiagTxPowerEntry 8 }
+
+atPluggableDiagTxPowerWarningMin OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.0001 mW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The minimum Tx Power (mW) warning threshold value."
+    ::= { atPluggableDiagTxPowerEntry 9 }
+
+----------------------------------------------------------------
+-- Rx Power (mW) table for Digital Diagnostic monitoring
+----------------------------------------------------------------
+
+atPluggableDiagRxPowerTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AtPluggableDiagRxPowerEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table of information regarding the various Rx Power (mW)
+        parameters observed as a part of Digital diagnostics monitoring,
+        for all the optical pluggables installed in the devices."
+    ::= { atPluggableDiagTable 5 }
+
+atPluggableDiagRxPowerEntry OBJECT-TYPE
+    SYNTAX        AtPluggableDiagRxPowerEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The information about various Rx Power (mW)
+        parameters of pluggables such as current status reading,
+        current alarm status, higher and lower alarm threshold,
+        current warning, higher and lower warning threshold."
+    INDEX { atPluggableDiagRxPowerIfIndex, atPluggableDiagRxPowerChannel }
+    ::= { atPluggableDiagRxPowerTable 1 }
+
+AtPluggableDiagRxPowerEntry ::= SEQUENCE {
+      atPluggableDiagRxPowerIfIndex         InterfaceIndex,
+      atPluggableDiagRxPowerChannel         Integer32,
+      atPluggableDiagRxPowerStatusReading   Integer32,
+      atPluggableDiagRxPowerCurrentAlarm    OCTET STRING,
+      atPluggableDiagRxPowerAlarmMax        Integer32,
+      atPluggableDiagRxPowerAlarmMin        Integer32,
+      atPluggableDiagRxPowerCurrentWarning  OCTET STRING,
+      atPluggableDiagRxPowerWarningMax      Integer32,
+      atPluggableDiagRxPowerWarningMin      Integer32 }
+
+atPluggableDiagRxPowerIfIndex OBJECT-TYPE
+    SYNTAX        InterfaceIndex
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The ifindex of the pluggable."
+    ::= { atPluggableDiagRxPowerEntry 1 }
+
+atPluggableDiagRxPowerChannel OBJECT-TYPE
+    SYNTAX        Integer32(1..16)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The channel number of the pluggable."
+    ::= { atPluggableDiagRxPowerEntry 2 }
+
+atPluggableDiagRxPowerStatusReading OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.0001 mW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current Rx Power (mW) status reading."
+    ::= { atPluggableDiagRxPowerEntry 3 }
+
+atPluggableDiagRxPowerCurrentAlarm OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current Rx Power (mW) alarm reading."
+    ::= { atPluggableDiagRxPowerEntry 4 }
+
+atPluggableDiagRxPowerAlarmMax OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.0001 mW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum Rx Power (mW) alarm threshold value."
+    ::= { atPluggableDiagRxPowerEntry 5 }
+
+atPluggableDiagRxPowerAlarmMin OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.0001 mW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The minimum Rx Power (mW) alarm threshold value."
+    ::= { atPluggableDiagRxPowerEntry 6 }
+
+atPluggableDiagRxPowerCurrentWarning OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current Rx Power (mW) warnings."
+    ::= { atPluggableDiagRxPowerEntry 7 }
+
+atPluggableDiagRxPowerWarningMax OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.0001 mW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum Rx Power (mW) warning threshold value."
+    ::= { atPluggableDiagRxPowerEntry 8 }
+
+atPluggableDiagRxPowerWarningMin OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "0.0001 mW"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The minimum Rx Power (mW) warning threshold value."
+    ::= { atPluggableDiagRxPowerEntry 9 }
+
+-----------------------------------------------------------------------
+-- Rx Loss of Signal (LOS) table for Digital Diagnostic monitoring
+-----------------------------------------------------------------------
+
+atPluggableDiagRxLosTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AtPluggableDiagRxLosEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table of information regarding the Rx Loss of Singal (Los)
+        parameters observed as a part of Digital diagnostics monitoring,
+        for all the optical pluggables installed in the devices."
+    ::= { atPluggableDiagTable 6 }
+
+atPluggableDiagRxLosEntry OBJECT-TYPE
+    SYNTAX        AtPluggableDiagRxLosEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The information about various Rx Loss of Singal (Los) parameters
+        of pluggables such as current status reading."
+    INDEX { atPluggableDiagRxLosIfIndex, atPluggableDiagRxLosChannel }
+    ::= { atPluggableDiagRxLosTable 1 }
+
+AtPluggableDiagRxLosEntry ::= SEQUENCE {
+      atPluggableDiagRxLosIfIndex           InterfaceIndex,
+      atPluggableDiagRxLosChannel           Integer32,
+      atPluggableDiagRxLosStatusReading     OCTET STRING }
+
+atPluggableDiagRxLosIfIndex OBJECT-TYPE
+    SYNTAX        InterfaceIndex
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The ifindex of the pluggable."
+    ::= { atPluggableDiagRxLosEntry 1 }
+
+atPluggableDiagRxLosChannel OBJECT-TYPE
+    SYNTAX        Integer32(1..16)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The channel number of the pluggable."
+    ::= { atPluggableDiagRxLosEntry 2 }
+
+atPluggableDiagRxLosStatusReading OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current Rx Los status reading."
+    ::= { atPluggableDiagRxLosEntry 3 }
+
+END
