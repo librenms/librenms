@@ -161,7 +161,7 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
     <?php
     }
     ?>
-  <script src="js/select2.min.js">
+  <script src="js/select2.min.js"></script>
   <script src="js/librenms.js"></script>
   <script type="text/javascript">
 
