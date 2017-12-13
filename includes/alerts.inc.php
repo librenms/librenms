@@ -886,8 +886,8 @@ function ExtTransports($obj)
 }//end ExtTransports()
 
 /**
- * Check if a device's parent is down
- * Returns true if parent is down
+ * Check if a device's all parent are down
+ * Returns true if all parents are down
  * @param int $device Device-ID
  * @return bool
  */
