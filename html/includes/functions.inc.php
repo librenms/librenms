@@ -125,6 +125,9 @@ function nicecase($item)
 
         case 'pi-hole':
             return 'Pi-hole';
+            
+        case 'freeradius':
+            return 'FreeRADIUS';
 
         default:
             return ucfirst($item);
