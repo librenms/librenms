@@ -531,7 +531,6 @@ device_relationships:
     - { Field: child_device_id, Type: 'int(11) unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [parent_device_id, child_device_id], Unique: true, Type: BTREE }
-    device_relationship_parent_device_id_fk: { Name: device_relationship_parent_device_id_fk, Columns: [parent_device_id], Unique: false, Type: BTREE }
     device_relationship_child_device_id_fk: { Name: device_relationship_child_device_id_fk, Columns: [child_device_id], Unique: false, Type: BTREE }
 entityState:
   Columns:
