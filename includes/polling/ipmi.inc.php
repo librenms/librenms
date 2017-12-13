@@ -38,23 +38,23 @@ if (is_array($ipmi_rows)) {
         foreach ($ipmi_rows as $ipmisensors) {
             echo 'Updating IPMI sensor ' . $ipmisensors['sensor_descr'] . '... ';
 
-            $sensor = $ipmi_sensor[$ipmisensors['sensor_descr']][$ipmisensors['sensor_class']]['value'];
+            $sensor_value = $ipmi_sensor[$ipmisensors['sensor_descr']][$ipmisensors['sensor_class']]['value'];
             $unit = $ipmi_sensor[$ipmisensors['sensor_descr']][$ipmisensors['sensor_class']]['unit'];
 
-            echo $sensor . " $unit\n";
+            echo "$sensor_value $unit\n";
 
             $rrd_name = get_sensor_rrd_name($device, $ipmisensors);
             $rrd_def = RrdDefinition::make()->addDataset('sensor', 'GAUGE', -20000, 20000);
 
             $fields = array(
-                'sensor' => $sensor,
+                'sensor' => $sensor_value,
             );
 
             $tags = array(
-                'sensor_class' => $sensor['sensor_class'],
-                'sensor_type' => $sensor['sensor_type'],
-                'sensor_descr' => $sensor['sensor_descr'],
-                'sensor_index' => $sensor['sensor_index'],
+                'sensor_class' => $ipmisensors['sensor_class'],
+                'sensor_type' => $ipmisensors['sensor_type'],
+                'sensor_descr' => $ipmisensors['sensor_descr'],
+                'sensor_index' => $ipmisensors['sensor_index'],
                 'rrd_name' => $rrd_name,
                 'rrd_def' => $rrd_def
             );
@@ -62,7 +62,7 @@ if (is_array($ipmi_rows)) {
 
             // FIXME warnings in event & mail not done here yet!
             dbUpdate(
-                array('sensor_current' => $sensor,
+                array('sensor_current' => $sensor_value,
                     'lastupdate' => array('NOW()')),
                 'sensors',
                 'poller_type = ? AND sensor_class = ? AND sensor_id = ?',
