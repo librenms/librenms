@@ -893,20 +893,16 @@ function ExtTransports($obj)
  */
 function IsParentDown($device)
 {
-    $parent_id = dbFetchRows("SELECT `parent_device_id` from `device_relationships` WHERE `child_device_id` = ?", array($device));
+    $parent_count = dbFetchCell("SELECT count(`parent_device_id`) from `device_relationships` WHERE `child_device_id` = ?", array($device));
     if (!$parent_id || $parent_id == null || $parent_id == 0) {
         return false;
     }
 
 
-    foreach ($parent_id as $i) {
-        $result = dbFetchCell("SELECT 1 from devices as a LEFT JOIN devices_attribs as b ON a.device_id=b.device_id WHERE a.status = 0 AND a.device_id = ? AND  (a.status_reason = 'icmp' OR (b.attrib_type='override_icmp_disable' AND b.attrib_value=true))", array($i['parent_device_id']));
-        if (!$result) {
-            // If any of the parents is up just return false
-            // No need to execute more db queries
-            return false;
-        }
+    $down_parent_count = dbFetchCell("SELECT count(1) from devices as LEFT JOIN devices_attribs as a USING (device_id) LEFT JOIN device_relationships as r ON d.device_id=r.parent_device_id WHERE d.status=0 AND d.ignore=0 AND d.disabled=0 AND r.child_device_id=? AND (d.status_reason='icmp' OR (a.attrib_type='override_icmp_disable' AND a.attrib_value=true))", array($device));
+    if ($down_parent_count == $parent_count) {
+        return true;
     }
 
-    return true;
+    return false;
 } //end IsParentDown()
