@@ -42,15 +42,12 @@ class Pagerduty implements Transport
         } else {
             $protocol['event_type'] = 'trigger';
         }
+        $details = array();
         foreach ($obj['faults'] as $fault => $data) {
-            $rough_details = array_filter(explode('; ', $data['string']));
-            $details = array();
-            foreach ($rough_details as $r) {
-                $kv_pair = explode(' => ', $r);
-                $details[$kv_pair[0]] = $kv_pair[1];
-            }
-            $protocol['details'] = $details;
+            $details = $data;
+            unset($details['string']);
         }
+        $protocol['details'] = $details;
         $curl = curl_init();
         set_curl_proxy($curl);
         curl_setopt($curl, CURLOPT_URL, 'https://events.pagerduty.com/generic/2010-04-15/create_event.json');
