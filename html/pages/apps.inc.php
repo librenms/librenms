@@ -273,6 +273,16 @@ $graphs['pi-hole'] = array(
     'blocklist',
 );
 
+$graphs['freeradius'] = array(
+    'access',
+    'auth',
+    'acct',
+    'proxy_access',
+    'proxy_auth',
+    'proxy_acct',
+    'queue',
+);
+
 print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
