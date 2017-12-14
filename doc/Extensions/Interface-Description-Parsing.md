@@ -45,11 +45,11 @@ Unix / Linux:
 
 The following config options can be set to enable more custom types:
 ```php
-$config['customers_descr'][]         = 'cust';
-$config['transit_descr'][]           = "transit";
-$config['peering_descr'][]           = "peering";
-$config['core_descr'][]              = "core";
-$config['custom_descr'][]            = "something_made_up";
+$config['customers_descr']         = 'cust';
+$config['transit_descr']           = "transit";
+$config['peering_descr']           = "peering";
+$config['core_descr']              = "core";
+$config['custom_descr']            = "something_made_up";
 ```
 
 ## Custom interface parser
