@@ -27,6 +27,7 @@ namespace LibreNMS\Tests;
 
 use LibreNMS\Config;
 use LibreNMS\Device\Processor;
+use LibreNMS\Util\ModuleTestHelper;
 
 class ProcessorTest extends DBTestCase
 {
@@ -41,54 +42,22 @@ class ProcessorTest extends DBTestCase
     public function testProcessor($target_os, $filename, $expected_data)
     {
         $this->requreSnmpsim();  // require snmpsim for now
+        global $snmpsim;
 
-        // Remove existing device in case it didn't get removed previously
-        if ($existing_device = device_by_name($this->snmpsimIp)) {
-            delete_device($existing_device['device_id']);
-        }
+        $helper = new ModuleTestHelper($this->module, $target_os);
+        $helper->setQuiet();
 
-
-        // Add the test device
-        Config::set('snmp.community', array($target_os));
-        $device_id = addHost($this->snmpsimIp, 'v2c', $this->snmpsimPort);
-
-        // Populate the device variable
-        global $device;
-        $device = device_by_id_cache($device_id);
-
-        // never save data
-        Config::set('norrd', true);
-        Config::set('noinfluxdb', true);
-        Config::set('nographite', true);
-
-        // Run discovery
-        ob_start();
-        discover_device($device, array('m' => $this->module));
-        ob_end_clean();
-
-        // Dump the discovered data
-        $discover_data = dump_module_data($device_id, $this->module);
-
-        // Run poller
-        ob_start();
-        poll_device($device, array('m' => $this->module));
-        ob_end_clean();
-
-        // Dump the discovered data
-        $poll_data = dump_module_data($device_id, $this->module);
-
-        // Remove the test device
-        delete_device($device_id);
+        $result = $helper->generateTestData($snmpsim, $target_os, '', true);
 
         $this->assertEquals(
             $expected_data['discovery'],
-            $discover_data,
+            $result['discovery'],
             "OS $target_os: Discovered {$this->module} data does not match that found in $filename"
         );
 
         $this->assertEquals(
             $expected_data['poller'] == 'matches discovery' ? $expected_data['discovery'] : $expected_data['poller'],
-            $poll_data,
+            $result['poller'],
             "OS $target_os: Polled {$this->module} data does not match that found in $filename"
         );
     }

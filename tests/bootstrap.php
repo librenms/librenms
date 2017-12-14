@@ -24,6 +24,7 @@
  */
 
 use LibreNMS\Proc;
+use LibreNMS\Util\Snmpsim;
 
 global $config;
 
@@ -52,15 +53,13 @@ ini_set('display_errors', 1);
 update_os_cache(true); // Force update of OS Cache
 
 if (getenv('SNMPSIM')) {
-    $snmpsim_cmd = 'snmpsimd.py --data-dir=./tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1161 --logging-method=file:/tmp/snmpsimd.log';
+    $snmpsim = new Snmpsim('127.1.6.2');
+    $snmpsim->fork();
 
-    echo "Starting snmpsimd...\n";
-    $proc_snmpsimd = new Proc($snmpsim_cmd);
-
-    // make PHP hold on a reference to $proc_snmpsimd so it doesn't get destructed
-    register_shutdown_function(function (Proc $proc) {
-        $proc->terminate();
-    }, $proc_snmpsimd);
+    // make PHP hold on a reference to $snmpsim so it doesn't get destructed
+    register_shutdown_function(function (Snmpsim $ss) {
+        $ss->stop();
+    }, $snmpsim);
 }
 
 if (getenv('DBTEST')) {
