@@ -42,9 +42,8 @@ class Pagerduty implements Transport
         } else {
             $protocol['event_type'] = 'trigger';
         }
-        foreach ($obj['faults'] as $fault => $data) {
-            $protocol['details'][] = $data['string'];
-        }
+        $protocol['details'] = end($obj['faults']);
+        unset($protocol['details']['string']);
         $curl = curl_init();
         set_curl_proxy($curl);
         curl_setopt($curl, CURLOPT_URL, 'https://events.pagerduty.com/generic/2010-04-15/create_event.json');
