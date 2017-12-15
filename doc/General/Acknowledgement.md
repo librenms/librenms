@@ -38,6 +38,7 @@ We list below what we make use of including the license compliance.
   - [CorsSlim](https://github.com/palanik/CorsSlim): MIT
   - [Confluence HTTP Authenticator](https://github.com/chauth/confluence_http_authenticator)
   - [Graylog SSO Authentication Plugin](https://github.com/Graylog2/graylog-plugin-auth-sso)
+  - [Select2](https://select2.org): MIT License
 
 
 ## 3rd Party GPLv3 Non-compliant
