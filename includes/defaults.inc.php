@@ -62,12 +62,6 @@ $config['virsh']          = '/usr/bin/virsh';
 $config['dot']            = '/usr/bin/dot';
 $config['sfdp']           = '/usr/bin/sfdp';
 
-// Memcached - Keep immediate statistics
-$config['memcached']['enable'] = false;
-$config['memcached']['host']   = 'localhost';
-$config['memcached']['port']   = 11211;
-$config['memcached']['ttl']    = 240;
-
 $config['slow_statistics'] = true;
 // THIS WILL CHANGE TO FALSE IN FUTURE
 // RRD Format Settings
@@ -765,6 +759,7 @@ $config['poller_modules']['cisco-vpdn']                  = 0;
 $config['poller_modules']['netscaler-vsvr']              = 0;
 $config['poller_modules']['aruba-controller']            = 0;
 $config['poller_modules']['entity-physical']             = 1;
+$config['poller_modules']['entity-state']                = 0;
 $config['poller_modules']['applications']                = 1;
 $config['poller_modules']['mib']                         = 0;
 $config['poller_modules']['stp']                         = 1;
@@ -779,6 +774,7 @@ $config['discovery_modules']['os']                   = 1;
 $config['discovery_modules']['ports']                = 1;
 $config['discovery_modules']['ports-stack']          = 1;
 $config['discovery_modules']['entity-physical']      = 1;
+$config['discovery_modules']['entity-state']         = 0;
 $config['discovery_modules']['processors']           = 1;
 $config['discovery_modules']['mempools']             = 1;
 $config['discovery_modules']['cisco-vrf-lite']       = 1;

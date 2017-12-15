@@ -233,6 +233,7 @@ function RunRules($device)
 function GetContacts($results)
 {
     global $config, $authorizer;
+
     if (sizeof($results) == 0) {
         return array();
     }
@@ -303,6 +304,16 @@ function GetContacts($results)
             }
         } else {
             $tmp_contacts[$email] = $name;
+        }
+    }
+
+    if (!empty($tmp_contacts)) {
+        // Validate contacts so we can fall back to default if configured.
+        $mail = new PHPMailer();
+        foreach ($tmp_contacts as $tmp_email => $tmp_name) {
+            if ($mail->validateAddress($tmp_email) != true) {
+                unset($tmp_contacts[$tmp_email]);
+            }
         }
     }
 
@@ -843,13 +854,14 @@ function ExtTransports($obj)
         if (is_array($opts)) {
             $opts = array_filter($opts);
         }
-        if (($opts === true || !empty($opts)) && $opts != false && file_exists($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php')) {
+        $class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
+        if (($opts === true || !empty($opts)) && $opts != false && class_exists($class)) {
             $obj['transport'] = $transport;
             $msg        = FormatAlertTpl($obj);
             $obj['msg'] = $msg;
             echo $transport.' => ';
-            eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' return false; };');
-            $tmp = $tmp($obj, $opts);
+            $instance = new $class;
+            $tmp = $instance->deliverAlert($obj, $opts);
             $prefix = array( 0=>"recovery", 1=>$obj['severity']." alert", 2=>"acknowledgment" );
             $prefix[3] = &$prefix[0];
             $prefix[4] = &$prefix[0];

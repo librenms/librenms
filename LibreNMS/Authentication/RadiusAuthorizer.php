@@ -65,19 +65,19 @@ class RadiusAuthorizer extends AuthorizerBase
 
     public function userExists($username, $throw_exception = false)
     {
-        return dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username), true);
+        return dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username));
     }
 
 
     public function getUserlevel($username)
     {
-        return dbFetchCell('SELECT `level` FROM `users` WHERE `username` = ?', array($username), true);
+        return dbFetchCell('SELECT `level` FROM `users` WHERE `username` = ?', array($username));
     }
 
 
     public function getUserid($username)
     {
-        return dbFetchCell('SELECT `user_id` FROM `users` WHERE `username` = ?', array($username), true);
+        return dbFetchCell('SELECT `user_id` FROM `users` WHERE `username` = ?', array($username));
     }
 
 
@@ -100,7 +100,7 @@ class RadiusAuthorizer extends AuthorizerBase
 
     public function getUser($user_id)
     {
-        return dbFetchRow('SELECT * FROM `users` WHERE `user_id` = ?', array($user_id), true);
+        return dbFetchRow('SELECT * FROM `users` WHERE `user_id` = ?', array($user_id));
     }
 
 

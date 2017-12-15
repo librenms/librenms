@@ -190,7 +190,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
                     echo 'port is still down';
                 } else {
                     echo 'valid';
-                    if (is_numeric($data[$i]['ifHighSpeed'])) {
+                    if (is_numeric($data[$i]['ifHighSpeed']) && $data[$i]['ifHighSpeed'] > 0) {
                         $full_oids = array_merge($hc_oids, $shared_oids);
                     } else {
                         $full_oids = array_merge($nonhc_oids, $shared_oids);

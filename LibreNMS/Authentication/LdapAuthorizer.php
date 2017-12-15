@@ -177,6 +177,7 @@ class LdapAuthorizer extends AuthorizerBase
     {
         foreach ($this->getUserlist() as $user) {
             if ($user['user_id'] === $user_id) {
+                $user['level'] = $this->getUserlevel($user['username']);
                 return $user;
             }
         }

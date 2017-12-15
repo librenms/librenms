@@ -17,35 +17,25 @@ use LibreNMS\Authentication\Auth;
 function authToken(\Slim\Route $route)
 {
     global $permissions;
-    
+
     $app   = \Slim\Slim::getInstance();
     $token = $app->request->headers->get('X-Auth-Token');
-    if (isset($token) && !empty($token)) {
-        if (!method_exists(Auth::get(), 'getUser')) {
-            $username = dbFetchCell('SELECT `U`.`username`, `U`.`user_id`, `U`.`level` FROM `api_tokens` AS AT JOIN `users` AS U ON `AT`.`user_id`=`U`.`user_id` WHERE `AT`.`token_hash`=?', array($token));
-        } else {
-            $username = Auth::get()->getUser(dbFetchCell('SELECT `AT`.`user_id` FROM `api_tokens` AS AT WHERE `AT`.`token_hash`=?', array($token)));
-        }
-        if (!empty($username)) {
-            $authenticated = true;
+    if (!empty($token)
+        && ($user_id = dbFetchCell('SELECT `AT`.`user_id` FROM `api_tokens` AS AT WHERE `AT`.`token_hash`=? && `AT`.`disabled`=0', array($token)))
+        && ($username = Auth::get()->getUser($user_id))
+    ) {
+        // Fake session so the standard auth/permissions checks work
+        $_SESSION = array(
+            'username' => $username['username'],
+            'user_id' => $username['user_id'],
+            'userlevel' => $username['level']
+        );
+        $permissions = permissions_cache($_SESSION['user_id']);
 
-            // Fake session so the standard auth/permissions checks work
-            $_SESSION = array(
-                'username' => $username['username'],
-                'user_id' => $username['user_id'],
-                'userlevel' => $username['level']
-            );
-            $permissions = permissions_cache($_SESSION['user_id']);
-        } else {
-            $authenticated = false;
-        }
-    } else {
-        $authenticated = false;
+        return;
     }
 
-    if ($authenticated === false) {
-        api_error(401, 'API Token is missing or invalid; please supply a valid token');
-    }
+    api_error(401, 'API Token is missing or invalid; please supply a valid token');
 }
 
 function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null)
@@ -53,12 +43,12 @@ function api_success($result, $result_name, $message = null, $code = 200, $count
     if (isset($result) && !isset($result_name)) {
         api_error(500, 'Result name not specified');
     }
-    
+
     $app  = \Slim\Slim::getInstance();
     $app->response->setStatus($code);
     $app->response->headers->set('Content-Type', 'application/json');
     $output = array('status'  => 'ok');
-    
+
     if (isset($result)) {
         $output[$result_name] = $result;
     }
@@ -161,7 +151,7 @@ function get_graph_by_port_hostname()
     $vars['height'] = $_GET['height'] ?: 300;
     $auth           = '1';
     $vars['id']     = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `P`.`$port`=? AND `deleted` = 0 LIMIT 1", array($device_id, $vars['port']));
-    
+
     check_port_permission($vars['id'], $device_id);
     $app->response->headers->set('Content-Type', get_image_type());
     rrdtool_initialize(false);
@@ -179,7 +169,7 @@ function get_port_stats_by_port_hostname()
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $ifName    = urldecode($router['ifname']);
     $port     = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=? AND `deleted` = 0', array($device_id, $ifName));
-    
+
     check_port_permission($port['port_id'], $device_id);
 
     $in_rate = $port['ifInOctets_rate'] * 8;
@@ -217,7 +207,12 @@ function get_graph_generic_by_hostname()
     $vars['type'] = $router['type'] ?: 'device_uptime';
     if (isset($sensor_id)) {
         $vars['id']   = $sensor_id;
-        $vars['type'] = str_replace('device_', 'sensor_', $vars['type']);
+        if (str_contains($vars['type'], '_wireless')) {
+            $vars['type'] = str_replace('device_', '', $vars['type']);
+        } else {
+            // If this isn't a wireless graph we need to fix the name.
+            $vars['type'] = str_replace('device_', 'sensor_', $vars['type']);
+        }
     }
 
     // use hostname as device_id if it's all digits
@@ -506,6 +501,31 @@ function list_bgp()
 }
 
 
+function get_bgp()
+{
+    check_is_read();
+
+    $app        = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+
+    $bgpPeerId        = $router['id'];
+    if (!is_numeric($bgpPeerId)) {
+        api_error(400, 'Invalid id has been provided');
+    }
+
+    $bgp_session       = dbFetchRows("SELECT * FROM `bgpPeers` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' AND bgpPeer_id = ?", array($bgpPeerId));
+    $bgp_session_count = count($bgp_session);
+    if (!is_numeric($bgp_session_count)) {
+        api_error(500, 'Error retrieving BGP peer');
+    }
+    if ($bgp_session_count == 0) {
+        api_error(404, "BGP peer $bgpPeerId does not exist");
+    }
+
+    api_success($bgp_session, 'bgp_session');
+}
+
+
 function list_ospf()
 {
     check_is_read();
@@ -728,6 +748,42 @@ function list_available_health_graphs()
     return api_success($graphs, 'graphs');
 }
 
+function list_available_wireless_graphs()
+{
+    $app      = \Slim\Slim::getInstance();
+    $router   = $app->router()->getCurrentRoute()->getParams();
+    $hostname = $router['hostname'];
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    check_device_permission($device_id);
+    if (isset($router['type'])) {
+        list(, , $type) = explode('_', $router['type']);
+    }
+    $sensor_id = $router['sensor_id'] ?: null;
+    $graphs    = array();
+
+    if (isset($type)) {
+        if (isset($sensor_id)) {
+            $graphs = dbFetchRows('SELECT * FROM `wireless_sensors` WHERE `sensor_id` = ?', array($sensor_id));
+        } else {
+            foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', array($device_id, $type)) as $graph) {
+                $graphs[] = array(
+                    'sensor_id' => $graph['sensor_id'],
+                    'desc'      => $graph['sensor_descr'],
+                );
+            }
+        }
+    } else {
+        foreach (dbFetchRows('SELECT `sensor_class` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', array($device_id)) as $graph) {
+            $graphs[] = array(
+                'desc' => ucfirst($graph['sensor_class']),
+                'name' => 'device_wireless_'.$graph['sensor_class'],
+            );
+        }
+    }
+
+    return api_success($graphs, 'graphs');
+}
+
 function get_port_graphs()
 {
     $app      = \Slim\Slim::getInstance();
@@ -748,7 +804,7 @@ function get_port_graphs()
         $sql = 'AND `port_id` IN (select `port_id` from `ports_perms` where `user_id` = ?)';
         array_push($params, $_SESSION['user_id']);
     }
-    
+
     $ports       = dbFetchRows("SELECT $columns FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' $sql ORDER BY `ifIndex` ASC", $params);
     api_success($ports, 'ports');
 }
@@ -799,7 +855,7 @@ function get_all_ports()
     validate_column_list($columns, 'ports');
     $params = array();
     $sql = '';
-    if (!is_read()) {
+    if (!is_read() && !is_admin()) {
         $sql = ' AND (device_id IN (SELECT device_id FROM devices_perms WHERE user_id = ?) OR port_id IN (SELECT port_id FROM ports_perms WHERE user_id = ?))';
         array_push($params, $_SESSION['user_id']);
         array_push($params, $_SESSION['user_id']);
@@ -879,7 +935,7 @@ function add_edit_rule()
     if (empty($device_id) && !isset($rule_id)) {
         api_error(400, 'Missing the device id or global device id (-1)');
     }
-    
+
     if ($device_id == 0) {
         $device_id = '-1';
     }
@@ -1114,7 +1170,7 @@ function list_bills()
     $bill_ref = mres($_GET['ref']);
     $bill_custid = mres($_GET['custid']);
     $param = array();
-    $sql = '1';
+    
     if (!empty($bill_custid)) {
         $sql    .= '`bill_custid` = ?';
         $param[] = $bill_custid;
@@ -1124,6 +1180,8 @@ function list_bills()
     } elseif (is_numeric($bill_id)) {
         $sql    .= '`bill_id` = ?';
         $param[] = $bill_id;
+    } else {
+        $sql = '1';
     }
     if (!is_admin() && !is_read()) {
         $sql    .= ' AND `bill_id` IN (SELECT `bill_id` FROM `bill_perms` WHERE `user_id` = ?)';

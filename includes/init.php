@@ -102,19 +102,6 @@ if (isset($config['php_memory_limit']) && is_numeric($config['php_memory_limit']
 }
 ini_set('display_errors', $display_bak);
 
-// init memcached
-if ($config['memcached']['enable'] === true) {
-    if (class_exists('Memcached')) {
-        $config['memcached']['ttl'] = 60;
-        $config['memcached']['resource'] = new Memcached();
-        $config['memcached']['resource']->addServer($config['memcached']['host'], $config['memcached']['port']);
-    } else {
-        echo "WARNING: You have enabled memcached but have not installed the PHP bindings. Disabling memcached support.\n";
-        echo "Try 'apt-get install php5-memcached' or 'pecl install memcached'. You will need the php5-dev and libmemcached-dev packages to use pecl.\n\n";
-        $config['memcached']['enable'] = 0;
-    }
-}
-
 if (!module_selected('nodb', $init_modules)) {
     // Check for testing database
     if (getenv('DBTEST')) {
