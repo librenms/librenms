@@ -69,6 +69,22 @@ function add_ports_to_bill($devs, $intf_glob, $id)
     return true;
 }
 
+function print_help()
+{
+    echo "Usage:\n";
+    echo "-b <bill name glob>   Bill name to match\n";
+    echo "-s <sysName glob>     sysName to match (Cannot be used with -h)\n";
+    echo "-h <hostname glob>    Hostname to match (Cannot be used with -s)\n";
+    echo "-i <Interface description glob>   Interface description to match\n";
+    echo "-f Flush all ports from a bill before adding adding ports\n";
+    echo "Example:\n";
+    echo "If I wanted to add all interfaces containing the description Telia to a bill called 'My Lovely Transit Provider'\n";
+    echo "php manage_bills.php -b 'My Lovely Transit Provider' -s all -i Telia";
+    echo "\n";
+    exit;
+}
+
+
 /** Setup options:
     l - bill_name - bill glob
     c - circuit_id - interface glob
@@ -87,30 +103,27 @@ if (!empty($options['h'])) {
     $host_glob = str_replace('*', '%', mres($options['h']));
     $nameType = "hostname";
 }
-if (empty($options['s']) && empty($options['h'])) {
-    echo "Please set -s or -h\n";
-} else if (!empty($options['s']) && !empty($options['h'])) {
-    echo "Please set either -s or -h, not both\n";
-}
-if (!empty($options['i']) && !empty($options['h'])) {
-    echo "Please set -i\n";
-}
 
 $bill_name = str_replace('*', '%', mres($options['b']));
 $intf_glob = str_replace('*', '%', mres($options['i']));
 
-if (empty($bill_name) or !(empty($options['h']) and empty($options['s']))) {
-    echo "Usage:\n";
-    echo "-b <bill name glob>   Bill name to match\n";
-    echo "-s <sysName glob>     sysName to match (Cannot be used with -h)\n";
-    echo "-h <hostname glob>    Hostname to match (Cannot be used with -s)\n";
-    echo "-i <Interface description glob>   Interface description to match\n";
-    echo "-f Flush all ports from a bill before adding adding ports\n";
-    echo "Example:\n";
-    echo "If I wanted to add all interfaces containing the description Telia to a bill called 'My Lovely Transit Provider'\n";
-    echo "php manage_bills.php -l 'My Lovely Transit Provider' -d all -c Telia";
-    echo "\n";
-    exit;
+# Exit if no bill
+if (empty($bill_name)) {
+    echo "Please set -b (bill name)\n";
+    print_help();
+}
+# Exit if missing hostname or sysName (or both set
+if (empty($options['s']) && empty($options['h'])) {
+    echo "Please set -s (sysName) or -h (hosthame)\n";
+    print_help();
+} else if (!empty($options['s']) && !empty($options['h'])) {
+    echo "Please set either -s or -h, not both\n";
+    print_help();
+}
+# Exit if missing hostname or sysName
+if (empty($options['i'])) {
+    echo "Please set -i (interface glob)\n";
+    print_help();
 }
 
 if ($bill_name == 'all') {
