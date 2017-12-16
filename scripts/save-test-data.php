@@ -128,4 +128,9 @@ $snmpsim_ip = $snmpsim->getIp();
 $snmpsim_port = $snmpsim->getPort();
 
 
-$tester->generateTestData($snmpsim, $target_os, $variant, isset($options['no-save']));
+$no_save = isset($options['no-save']);
+$test_data = $tester->generateTestData($snmpsim, $target_os, $variant, $no_save);
+
+if ($no_save) {
+    print_r($test_data);
+}

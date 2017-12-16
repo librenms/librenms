@@ -76,6 +76,8 @@ if (getenv('DBTEST')) {
         global $config;
         dbConnect();
 
+        echo "Cleaning database...\n";
+
         // restore sql_mode
         dbQuery("SET GLOBAL sql_mode='$sql_mode'");
 
