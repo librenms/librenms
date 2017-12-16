@@ -44,7 +44,7 @@ if (is_admin() === false) {
                 dbDelete('device_relationships', '`child_device_id` = ?', array($dev));
             }
         }
-        $status = array('status' => 0, 'message' => 'Host dependencies have been saved');
+        $status = array('status' => 0, 'message' => 'Device dependencies have been saved');
     }
 }
 header('Content-Type: application/json');

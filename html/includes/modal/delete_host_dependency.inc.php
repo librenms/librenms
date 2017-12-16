@@ -25,7 +25,7 @@ if (is_admin() === false) {
                 <h5 class="modal-title" id="Delete">Confirm Delete</h5>
             </div>
             <div class="modal-body">
-                <p>Clicking Delete will remove host dependency from <strong class="modalhostname"></strong></p>
+                <p>Clicking Delete will remove device dependency from <strong class="modalhostname"></strong></p>
             </div>
             <div class="modal-footer">
                 <form role="form" class="remove_token_form">
@@ -64,7 +64,7 @@ $('#hostdep-removal').click('', function(event) {
             }
         },
         error: function() {
-            toastr.error('The host dependency could not be deleted.');
+            toastr.error('The device dependency could not be deleted.');
             $("#confirm-delete").modal('hide');
         }
     });

@@ -27,7 +27,7 @@ if (is_admin() === false) {
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <p>Please choose a parent host for <strong class="modalhostname"></strong> and click Save</p>
+                        <p>Please choose a parent device for <strong class="modalhostname"></strong> and click Save</p>
                     </div>
                 </div>
                 <br />
@@ -75,7 +75,7 @@ $('#edit-dependency').on('show.bs.modal', function() {
             }
         },
         error: function() {
-            toastr.error('The host dependency could not be fetched.');
+            toastr.error('The device dependency could not be fetched.');
             $("#manage-dependencies").modal('hide');
         }
     })
@@ -112,7 +112,7 @@ $('#hostdep-save').click('', function(event) {
             }
         },
         error: function() {
-            toastr.error('The host dependency could not be saved.');
+            toastr.error('The device dependency could not be saved.');
             $("#edit-dependency").modal('hide');
             $('#availableparents').val(null);
             $('#availableparents').trigger('change');

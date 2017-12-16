@@ -22,11 +22,11 @@ if (is_admin() === false) {
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h5 class="modal-title" id="mandeps">Host Dependency for multiple hosts</h5>
+                <h5 class="modal-title" id="mandeps">Device Dependency for Multiple Devices</h5>
             </div>
             <div class="modal-body">
                 <div id="mandeps-msg"></div>
-                <p>Here you can modify multiple hosts dependencies. Setting the parent host to "None" will clear the dependency.</p>
+                <p>Here you can modify multiple device dependencies. Setting the parent device to "None" will clear the dependency.</p>
                 <br />
                 <div class="form-group">
                     <label for="manavailableparents">Parent Host:</label>
@@ -95,7 +95,7 @@ function changeParents(e, evttype)
             }
         },
         error: function() {
-            toastr.error('Host dependencies could not be retrieved from the database');
+            toastr.error('Device dependencies could not be retrieved from the database');
         }
     });
 }
@@ -130,7 +130,7 @@ $('#manage-dependencies').on('show.bs.modal', function() {
             }
         },
         error: function() {
-            toastr.error('Host dependencies could not be retrieved from the database');
+            toastr.error('Device dependencies could not be retrieved from the database');
         }
     })
 });
@@ -165,13 +165,13 @@ $('#manhostdep-save').click('', function(event) {
             $("#manage-dependencies").modal('hide');
             $('#hostdeps').bootgrid('reload');
             if (output.status == 0) {
-                toastr.success('Host dependencies saved successfully');
+                toastr.success('Device dependencies saved successfully');
             } else {
-                toastr.error('The host dependency could not be saved.');
+                toastr.error('The device dependency could not be saved.');
             }
         },
         error: function() {
-            toastr.error('The host dependency could not be saved.');
+            toastr.error('The device dependency could not be saved.');
             $("#manage-dependencies").modal('hide');
         }
     });

@@ -14,7 +14,7 @@
 
 $no_refresh = true;
 
-$pagetitle[] = 'Host Dependencies';
+$pagetitle[] = 'Device Dependencies';
 
 require_once 'includes/modal/delete_host_dependency.inc.php';
 require_once 'includes/modal/edit_host_dependency.inc.php';
@@ -32,7 +32,7 @@ require_once 'includes/modal/manage_host_dependencies.inc.php';
             <tr>
                 <th data-column-id="deviceid" data-visible="false" data-css-class="deviceid">No</th>
                 <th data-column-id="hostname" data-type="string" data-css-class="childhost" data-formatter="hostname">Hostname</th>
-                <th data-column-id="parent" data-type="string" data-css-class="parenthost" data-formatter="parent">Parent Host(s)</th>
+                <th data-column-id="parent" data-type="string" data-css-class="parenthost" data-formatter="parent">Parent Device(s)</th>
                 <th data-column-id="parentid" data-visible="false">Parent ID</th>
                 <th data-column-id="actions" data-searchable="false" data-formatter="actions">Actions</th>
             </tr>
@@ -59,7 +59,7 @@ var grid = $("#hostdeps").bootgrid({
 <?php if (is_admin()) { ?>
                         <div class="col-sm-8 actionBar"> \
                             <span class="pull-left"> \
-                            <button type="button" class="btn btn-primary btn-sm command-manage" data-toggle="modal" data-target="#manage-dependencies" data-template_id="">Manage Host Dependencies</button> \
+                            <button type="button" class="btn btn-primary btn-sm command-manage" data-toggle="modal" data-target="#manage-dependencies" data-template_id="">Manage Device Dependencies</button> \
                             </span> \
                         </div> \
                 <div class="col-sm-4 actionBar"><p class="{{css.search}}"></p><p class="{{css.actions}}"></p></div></div></div>'
@@ -155,11 +155,11 @@ $(document).ready(function() {
                     manAllDevs.append($('<option>',{value:elem.id, text:elem.hostname}));
                 });
             } else {
-                toastr.error('Host dependencies could not be retrieved from the database');
+                toastr.error('Device dependencies could not be retrieved from the database');
             }
         },
         error: function() {
-            toastr.error('Host dependencies could not be retrieved from the database');
+            toastr.error('Device dependencies could not be retrieved from the database');
         }
     });
 });

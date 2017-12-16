@@ -175,7 +175,7 @@ if ($updated && $update_message) {
     </div>
 </div>
 <div class="form-group">
-    <label for="parent_id" class="col-sm-2 control-label">This host depends on:</label>
+    <label for="parent_id" class="col-sm-2 control-label">This device depends on:</label>
     <div class="col-sm-6">
         <select multiple name="parent_id[]" id="parent_id" class="form-control">
             <?php
