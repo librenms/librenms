@@ -36,13 +36,20 @@ if (is_admin() === false) {
             $status = array('status' => 1, 'message' => 'A device cannot depend itself');
             break;
         }
+        $insert = array();
         foreach ($_POST['parent_ids'] as $parent) {
             if (is_numeric($parent) && $parent != 0) {
-                dbInsert(array('parent_device_id' => $parent, 'child_device_id' => $dev), 'device_relationships');
+                $insert[] = array('parent_device_id' => $parent, 'child_device_id' => $dev);
             } else if ($parent == 0) {
-                // If we receive the parent as 0 delete parents for the said device
-                dbDelete('device_relationships', '`child_device_id` = ?', array($dev));
+                // In case we receive a mixed array with $parent = 0 (which shouldn't happen)
+                // Empty the insert array so we remove any previous dependency so 'None' takes precedence
+                $insert = array();
+                break;
             }
+        }
+        dbDelete('device_relationships', '`child_device_id` = ?', array($dev));
+        if (!empty($insert)) {
+            dbBulkInsert($insert, 'device_relationships');
         }
         $status = array('status' => 0, 'message' => 'Device dependencies have been saved');
     }
