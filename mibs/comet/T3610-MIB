@@ -1,0 +1,526 @@
+ ----------------------------------------------------------------------
+-- MIB table for T3610
+--
+-- v3.0 for firmware 1-5-7-2, 2016-04-11
+-----------------------------------------------------------------------
+T3610-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	enterprises
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212
+	TRAP-TYPE
+		FROM RFC-1215;
+
+  DisplayString ::= OCTET STRING
+
+
+comet      OBJECT IDENTIFIER ::= { enterprises 22626 }
+products   OBJECT IDENTIFIER ::= { comet 1 }
+t3610      OBJECT IDENTIFIER ::= { products 2 }
+values     OBJECT IDENTIFIER ::= { t3610 1 }
+global     OBJECT IDENTIFIER ::= { t3610 2 }
+valuesInt  OBJECT IDENTIFIER ::= { t3610 3 }
+settings   OBJECT IDENTIFIER ::= { t3610 4 }
+traps      OBJECT IDENTIFIER ::= { t3610 5 }
+tables	   OBJECT IDENTIFIER ::= { t3610 6 }
+
+
+-----------------------------------------------------------------------
+-- Measured values - String
+-----------------------------------------------------------------------
+temp OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..8))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature"
+::= { values 1 }
+
+hum OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..8))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Relative humidity"
+::= { values 2 }
+
+compVal OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..8))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Computed value"
+::= { values 3 }
+
+tempAlarm OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..8))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm on Temperature; none, high, low"
+::= { values 5 }
+
+humAlarm OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..8))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm on Relative humidity; none, high, low"
+::= { values 6 }
+
+compValAlarm OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..8))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm on Computed value; none, high, low"
+::= { values 7 }
+
+tempUnit OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..8))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Unit"
+::= { values 9 }
+
+humUnit OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..8))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Relative humidity Unit"
+::= { values 10 }
+
+compValUnit OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..8))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Computed value Unit"
+::= { values 11 }
+
+tempMin OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..8))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Minimal temperature"
+::= { values 13 }
+
+humMin OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..8))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Minimal relative humidity"
+::= { values 14 }
+
+compValMin OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..8))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Minimal computed value"
+::= { values 15 }
+
+tempMax OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..8))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Maximal temperature"
+::= { values 17 }
+
+humMax OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..8))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Maximal relative humidity"
+::= { values 18 }
+
+compValMax OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..8))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Maximal computed value"
+::= { values 19 }
+
+
+-----------------------------------------------------------------------
+-- Device informations
+-----------------------------------------------------------------------
+sensorName OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..68))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Device name"
+::= { global 1 }
+
+serialNumber OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..16))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Serial number"
+::= { global 2 }
+
+deviceType OBJECT-TYPE
+	SYNTAX		INTEGER (0..65534)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Device type"
+::= { global 3 }
+
+
+-----------------------------------------------------------------------
+-- Measured values - Integer
+-----------------------------------------------------------------------
+tempInt OBJECT-TYPE
+	SYNTAX		INTEGER (-5000..20000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature (value*10)"
+::= { valuesInt 1 }
+
+humInt OBJECT-TYPE
+	SYNTAX		INTEGER (-5000..20000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Relative humidity (value*10)"
+::= { valuesInt 2 }
+
+compValInt OBJECT-TYPE
+	SYNTAX		INTEGER (-5000..20000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Computed value (value*10)"
+::= { valuesInt 3 }
+
+tempAlarmInt OBJECT-TYPE
+	SYNTAX		INTEGER (0..2)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm on Temperature; 0 - No, 1 - High, 2 - Low"
+::= { valuesInt 5 }
+
+humAlarmInt OBJECT-TYPE
+	SYNTAX		INTEGER (0..2)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm on Relative humidity; 0 - No, 1 - High, 2 - Low"
+::= { valuesInt 6 }
+
+compValAlarmInt OBJECT-TYPE
+	SYNTAX		INTEGER (0..2)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm on Computed value; 0 - No, 1 - High, 2 - Low"
+::= { valuesInt 7 }
+
+
+-----------------------------------------------------------------------
+-- Alarm settings
+-----------------------------------------------------------------------
+tempLowInt OBJECT-TYPE
+	SYNTAX		INTEGER (-5000..20000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Limit Low (value*10)"
+::= { settings 1 }
+
+tempHighInt OBJECT-TYPE
+	SYNTAX		INTEGER (-5000..20000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Limit High (value*10)"
+::= { settings 2 }
+
+humLowInt OBJECT-TYPE
+	SYNTAX		INTEGER (-5000..20000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Humidity Limit Low (value*10)"
+::= { settings 3 }
+
+humHighInt OBJECT-TYPE
+	SYNTAX		INTEGER (-5000..20000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Humidity Limit High (value*10)"
+::= { settings 4 }
+
+compValLowInt OBJECT-TYPE
+	SYNTAX		INTEGER (-5000..20000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Computed value Limit Low (value*10)"
+::= { settings 5 }
+
+compValHighInt OBJECT-TYPE
+	SYNTAX		INTEGER (-5000..20000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Computed value Limit High (value*10)"
+::= { settings 6 }
+
+tempDelayInt OBJECT-TYPE
+	SYNTAX		INTEGER (0..4500)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature alaram delay [sec]"
+::= { settings 7 }
+
+humDelayInt OBJECT-TYPE
+	SYNTAX		INTEGER (0..4500)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Humidity alaram delay [sec]"
+::= { settings 8 }
+
+compValDelayInt OBJECT-TYPE
+	SYNTAX		INTEGER (0..4500)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Computed value alaram delay [sec]"
+::= { settings 9 }
+
+tempHystInt OBJECT-TYPE
+	SYNTAX		INTEGER (0..10000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature hysteresis (value*10)"
+::= { settings 10 }
+
+humHystInt OBJECT-TYPE
+	SYNTAX		INTEGER (0..10000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Humidity hysteresis (value*10)"
+::= { settings 11 }
+
+compValHystInt OBJECT-TYPE
+	SYNTAX		INTEGER (0..10000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Computed value hysteresis (value*10)"
+::= { settings 12 }
+
+
+-----------------------------------------------------------------------
+-- Trap message
+-----------------------------------------------------------------------
+messageString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..32))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Message giving more detailed information on alarms"
+::= { traps 1 }
+
+
+-----------------------------------------------------------------------
+-- Tables
+-----------------------------------------------------------------------
+historyTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF HistoryEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION	"Table of the history values"
+::= { tables 1 }
+
+historyEntry OBJECT-TYPE
+	SYNTAX		HistoryEntry
+	ACCESS		not-accessible
+	STATUS		optional
+	DESCRIPTION	"History values entries"
+	INDEX		{ histTemp }
+::= { historyTable 1 }
+
+HistoryEntry ::=
+	SEQUENCE {
+		histTemp
+			INTEGER,
+		histHum
+			INTEGER,
+		histCompVal
+			INTEGER
+		}
+
+histTemp OBJECT-TYPE
+	SYNTAX		INTEGER(-5000..20000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature reading"
+::= { historyEntry 1 }
+
+histHum OBJECT-TYPE
+	SYNTAX		INTEGER(-5000..20000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Humidity reading"
+::= { historyEntry 2 }
+
+histCompVal OBJECT-TYPE
+	SYNTAX		INTEGER (-5000..20000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Computed value reading"
+::= { historyEntry 3 }
+
+
+-----------------------------------------------------------------------
+-- Traps definition
+-----------------------------------------------------------------------
+
+trapTest TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString }
+	DESCRIPTION
+		"Testing trap, testing trap by TSensor software"
+	::= 0
+
+trapNTPError TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString }
+	DESCRIPTION
+		"Error on time synchronisation via NTP"
+	::= 1
+
+trapEmailErrLogin TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString }
+	DESCRIPTION
+		"SMTP error - unknown server"
+	::= 2
+
+trapEmailErrAuth TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString }
+	DESCRIPTION
+		"SMTP error - authentication error"
+	::= 3
+
+trapEmailErrSome TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString }
+	DESCRIPTION
+		"SMTP error - error during communication with server, unexpected return code"
+	::= 4
+
+trapEmailErrSocket TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString }
+	DESCRIPTION
+		"SMTP error - socket error, server is not available"
+	::= 5
+
+trapEmailErrDNS TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString }
+	DESCRIPTION
+		"SMTP error - DNS error"
+	::= 6
+
+trapSOAPErrFile TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString }
+	DESCRIPTION
+		"SOAP error - file SOAP not found"
+	::= 7
+
+trapSOAPErrDNS TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString }
+	DESCRIPTION
+		"SOAP error - DNS error"
+	::= 8
+
+trapSOAPErrSocket TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString }
+	DESCRIPTION
+		"SOAP error - socket error, server is not available"
+	::= 9
+
+trapSOAPErrDelivery TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString }
+	DESCRIPTION
+		"SOAP error - delivery error, wrong return code from server"
+	::= 10
+
+trapTempHighAlarm TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString, temp, tempAlarmInt }
+	DESCRIPTION
+		"Trap for high alarm on temperature"
+	::= 11
+
+trapHumHighAlarm TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString, hum, humAlarmInt }
+	DESCRIPTION
+		"Trap for high alarm on relative humidity"
+	::= 12
+
+trapCompValHighAlarm TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString, compVal, compValAlarmInt }
+	DESCRIPTION
+		"Trap for high alarm on computed value"
+	::= 13
+
+trapTempLowAlarm TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString, temp, tempAlarmInt }
+	DESCRIPTION
+		"Trap for low alarm on temperature"
+	::= 21
+
+trapHumLowAlarm TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString, hum, humAlarmInt }
+	DESCRIPTION
+		"Trap for low alarm on relative humidity"
+	::= 22
+
+trapCompValLowAlarm TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString, compVal, compValAlarmInt }
+	DESCRIPTION
+		"Trap for low alarm on computed value"
+	::= 23
+
+trapTempClrAlarm TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString, temp, tempAlarmInt }
+	DESCRIPTION
+		"Trap for clearing alarm on temperature"
+	::= 31
+
+trapHumClrAlarm TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString, hum, humAlarmInt }
+	DESCRIPTION
+		"Trap for clearing alarm on relative humidity"
+	::= 32
+
+trapCompValClrAlarm TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString, compVal, compValAlarmInt }
+	DESCRIPTION
+		"Trap for clearing alarm on computed value"
+	::= 33
+
+trapTempError TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString, temp, tempAlarmInt }
+	DESCRIPTION
+		"Trap for error on temperature"
+	::= 41
+
+trapHumError TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString, hum, humAlarmInt }
+	DESCRIPTION
+		"Trap for error on relative humidity"
+	::= 42
+
+trapCompValError TRAP-TYPE
+	ENTERPRISE	comet
+	VARIABLES	{ sensorName, messageString, compVal, compValAlarmInt }
+	DESCRIPTION
+		"Trap for error on computed value"
+	::= 43
+
+
+END

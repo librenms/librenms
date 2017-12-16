@@ -74,6 +74,10 @@ $run_sensors = array(
     'snr',
     'pressure',
     'cooling',
+    'delay',
+    'quality_factor',
+    'chromatic_dispersion',
+    'ber',
 );
 sensors($run_sensors, $device, $valid, $pre_cache);
 unset(

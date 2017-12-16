@@ -393,6 +393,11 @@ $icons = array(
     'pressure' => 'thermometer-empty',
     'cooling' => 'thermometer-full',
     'airflow' => 'angle-double-right',
+    'delay' => 'clock-o',
+    'chromatic_dispersion' => 'indent',
+    'ber' => 'sort-amount-desc',
+    'quality_factor' => 'arrows',
+
 );
 foreach (array('fanspeed','humidity','temperature','signal') as $item) {
     if (isset($menu_sensors[$item])) {

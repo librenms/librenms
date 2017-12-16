@@ -125,6 +125,9 @@ function nicecase($item)
 
         case 'pi-hole':
             return 'Pi-hole';
+            
+        case 'freeradius':
+            return 'FreeRADIUS';
 
         default:
             return ucfirst($item);
@@ -592,13 +595,13 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
     }
 
     $output = '
-        <div class="container" style="width:' . $width . 'px; height:' . $height . 'px;">
+        <div class="container" style="width:' . $width . 'px; height:' . $height . 'px; position: relative;">
         <div class="progress" style="min-width: 2em; background-color:#' . $right_background . '; height:' . $height . 'px;">
         <div class="progress-bar" role="progressbar" aria-valuenow="' . $size_percent . '" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:' . $size_percent . '%; background-color: #' . $left_background . ';">
         </div>
         </div>
-        <b class="pull-left" style="padding-left: 4px; height: ' . $height . 'px;margin-top:-' . ($height * 2) . 'px; color:#' . $left_colour . ';">' . $left_text . '</b>
-        <b class="pull-right" style="padding-right: 4px; height: ' . $height . 'px;margin-top:-' . ($height * 2) . 'px; color:#' . $right_colour . ';">' . $right_text . '</b>
+        <b style="padding-left: 10%; position: absolute; top: 0px; left: 0px; color:#' . $left_colour . ';">' . $left_text . '</b>
+        <b style="padding-right: 10%; position: absolute; top: 0px; right: 0px; color:#' . $right_colour . ';">' . $right_text . '</b>
         </div>
         ';
 
