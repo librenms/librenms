@@ -83,13 +83,12 @@ class OSDiscoveryTest extends TestCase
 
     /**
      * Test that all files have been tested (removed from self::$unchecked_files
-     * Except skel.snmprec, the example file.
      *
      * @depends testOS
      */
     public function testAllFilesTested()
     {
-        $this->assertEquals(array('skel'), array_keys(self::$unchecked_files));
+        $this->assertEmpty(self::$unchecked_files);
     }
 
     /**

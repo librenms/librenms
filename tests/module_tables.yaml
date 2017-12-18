@@ -32,4 +32,9 @@ sensors:
             - { left: state_indexes.state_index_id, right: state_translations.state_index_id }
             - { custom: 'INNER JOIN ( SELECT i.state_index_id FROM `sensors_to_state_indexes` i LEFT JOIN `sensors` s ON (i.`sensor_id` = s.`sensor_id`)  WHERE `device_id`=? GROUP BY i.state_index_id) d ON d.state_index_id = state_indexes.state_index_id' }
         custom_where: ''
-
+storage:
+    storage:
+        excluded_fields: [device_id, storage_id]
+wireless:
+    wireless_sensors:
+        excluded_fields: [device_id, sensor_id, access_point_id, lastupdate]

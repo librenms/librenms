@@ -13,21 +13,30 @@ We utilise [snmpsim](http://snmpsim.sourceforge.net/) to do unit testing. For OS
 for other tests you will need it installed and functioning.  We run snmpsim during our integration tests, but not by
 default when running `./scripts/pre-commit.php`.
 
-### Capturing test data
+## Capturing test data
 
 `./scripts/save-tests-data.php` is provided to make it easy to collect data for tests.  Running save-tests-data.php with
 the --hostname (-h) allows you to capture all data used to discover and poll a device already added to LibreNMS.  Make sure to
 re-run the script if you add additional support. Check the command-line help for more options.
 
-#### OS Variants
+### OS Variants
 
 If test data already exists, but is for a different device/configuration then you should use the --variant (-v) option to
 specify a different variant of the os, this will be tested completely separate from other variants.  If there is only
 one variant, please do not specify one.
 
-### Running tests
+## Running tests
 
 After you have saved your test data, you should run `./scripts/pre-commit.php -p -u` verify they pass.
+
+## Using snmpsim for testing
+
+You can run snmpsim to access test data by running `./scripts/save-tests-data.php --snmpsim`
+
+You may then run snmp queries against it using the os (and variant) as the community and 127.1.6.1:1161 as the host.
+```
+snmpget -v 2c -c ios_c3560e 127.1.6.1:1161 sysDescr.0
+```
 
 ## Snmprec format
 
@@ -48,7 +57,6 @@ To look up the numeric OID and type of an string OID with snmptranslate:
 snmptranslate -On -Td SNMPv2-MIB::sysDescr.0
 ```
 
-
 List of SNMP data types:
 
 | Type              | Value         |
@@ -66,3 +74,7 @@ List of SNMP data types:
 | Counter64         | 70            |
 
 Hex encoded strings (4x) should be used for any strings that contain line returns.
+
+## New discovery/poller modules
+
+New discovery or poller modules should define database capture parameters in `/tests/module_tables.yaml`.
