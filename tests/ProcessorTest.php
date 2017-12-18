@@ -31,7 +31,7 @@ use LibreNMS\Util\ModuleTestHelper;
 
 class ProcessorTest extends DBTestCase
 {
-    private $module = 'processors';
+    private $module = 'ports';
 
     /**
      * @dataProvider dumpedDataProvider
@@ -44,7 +44,6 @@ class ProcessorTest extends DBTestCase
         $this->requreSnmpsim();  // require snmpsim for now
         global $snmpsim;
 
-        var_dump($this->module);
         $helper = new ModuleTestHelper(array($this->module), $target_os);
         $helper->setQuiet();
 
