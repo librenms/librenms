@@ -26,11 +26,12 @@
 namespace LibreNMS\Util;
 
 use LibreNMS\Config;
+use Symfony\Component\Yaml\Yaml;
 
 class ModuleTestHelper
 {
     private $quiet = false;
-    private $module;
+    private $modules;
     private $variant;
     private $os;
     private $snmprec_file;
@@ -38,17 +39,18 @@ class ModuleTestHelper
     private $snmprec_dir;
     private $json_dir;
     private $file_name;
+    private $module_tables;
 
 
     /**
      * ModuleTester constructor.
-     * @param string $module
+     * @param array|string $modules
      * @param string $os
      * @param string $variant
      */
-    public function __construct($module, $os, $variant = '')
+    public function __construct($modules, $os, $variant = '')
     {
-        $this->module = $module;
+        $this->modules = $this->resolveModuleDependencies((array)$modules);
         $this->os = $os;
         $this->variant = $variant;
 
@@ -67,6 +69,8 @@ class ModuleTestHelper
         Config::set('norrd', true);
         Config::set('noinfluxdb', true);
         Config::set('nographite', true);
+
+        $this->module_tables = Yaml::parse($install_dir . '/tests/module_tables.yaml');
     }
 
     private static function compareOid($a, $b)
@@ -136,8 +140,8 @@ class ModuleTestHelper
         $save_vedbug = $vdebug;
         $debug = true;
         $vdebug = false;
-        discover_device($device, $this->prepOptions());
-        poll_device($device, $this->prepOptions());
+        discover_device($device, $this->getArgs());
+        poll_device($device, $this->getArgs());
         $debug = $save_debug;
         $vdebug = $save_vedbug;
         $collection_output = ob_get_contents();
@@ -178,17 +182,40 @@ class ModuleTestHelper
         return $snmp_oids;
     }
 
-    private function prepOptions()
+
+    /**
+     * Generate a module list.  Try to take dependencies into account.
+     * Probably needs to be more robust
+     *
+     * @param array $modules
+     * @return array
+     */
+    private function resolveModuleDependencies($modules)
     {
         $module_deps = array(
-            'arp-table' => 'ports,arp-table',
+            'arp-table' => array('ports', 'arp-table'),
         );
 
-        if (isset($module_deps[$this->module])) {
-            return array('m' => $module_deps[$this->module]);
+        // generate a full list of modules
+        $full_list = array();
+        foreach ($modules as $module) {
+            if (isset($module_deps[$module])) {
+                array_merge($full_list, $module_deps[$module]);
+            } else {
+                $full_list[] = $module;
+            }
         }
 
-        return array('m' => $this->module);
+        return array_unique($full_list);
+    }
+
+    private function getArgs()
+    {
+        if (empty($this->modules)) {
+            return array();
+        }
+
+        return array('m' => implode(',', $this->modules));
     }
 
     private function qPrint($var)
@@ -220,6 +247,10 @@ class ModuleTestHelper
                     $result[] = "$oid|4|"; // empty data, we don't know type, put string
                 } else {
                     list($raw_type, $data) = explode(':', $raw_data, 2);
+                    if (starts_with ($raw_type, 'Wrong Type (should be ')) {
+                        // device returned the wrong type, save the wrong type to emulate the device behavior
+                        list($raw_type, $data) = explode(':', ltrim($data), 2);
+                    }
                     $data = ltrim($data, ' "');
                     $type = $this->getSnmprecType($raw_type);
 
@@ -234,7 +265,10 @@ class ModuleTestHelper
                         preg_match('/\((\d+)\)/', $data, $match);
                         $data = $match[1];
                     }
-
+                    if (starts_with($data, 'Counter32: ')) {
+                        var_dump($line, $raw_type, $type, $data);
+                        exit;
+                    }
                     $result[] = "$oid|$type|$data";
                 }
             } else {
@@ -344,7 +378,7 @@ class ModuleTestHelper
         }
     }
 
-    public function generateTestData(Snmpsim $snmpsim, $target_os, $variant = '', $no_save = false)
+    public function generateTestData(Snmpsim $snmpsim, $no_save = false)
     {
         global $device;
 
@@ -373,7 +407,7 @@ class ModuleTestHelper
             ob_start();
         }
 
-        discover_device($device, $this->prepOptions());
+        discover_device($device, $this->getArgs());
 
         if ($this->quiet) {
             $discovery_output = ob_get_contents();
@@ -386,11 +420,11 @@ class ModuleTestHelper
         $this->qPrint(PHP_EOL);
 
         // Dump the discovered data
-        $discovered_data = $this->dumpDb($device['device_id']);
+        $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], 'discovery'));
 
         // Run the poller
         ob_start();
-        poll_device($device, $this->prepOptions());
+        poll_device($device, $this->getArgs());
         $poller_output = ob_get_contents();
         ob_end_clean();
 
@@ -398,7 +432,7 @@ class ModuleTestHelper
         d_echo(PHP_EOL);
 
         // Dump polled data
-        $polled_data = $this->dumpDb($device['device_id']);
+        $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], 'poller'));
 
         // Remove the test device, we don't need the debug from this
         if ($device['hostname'] == $snmpsim->getIp()) {
@@ -407,12 +441,6 @@ class ModuleTestHelper
             delete_device($device['device_id']);
         }
 
-        // don't store duplicate data
-        $data[$this->module] = array(
-            'discovery' => $discovered_data,
-            'poller' => ($discovered_data == $polled_data ? 'matches discovery' : $polled_data),
-        );
-
 
         if (!$no_save) {
             d_echo($data);
@@ -420,16 +448,23 @@ class ModuleTestHelper
             // Save the data to the default test data location (or elsewhere if specified)
             $existing_data = json_decode(file_get_contents($this->json_file), true);
 
-            $existing_data[$this->module] = $data[$this->module];
+            // insert new data, don't store duplicate data
+            foreach ($data as $module => $module_data) {
+                if ($module_data['discovery'] == $module_data['poller']) {
+                    $existing_data[$module] = array(
+                        'discovery' => $module_data['discovery'],
+                        'poller' => 'matches discovery',
+                    );
+                } else {
+                    $existing_data[$module] = $module_data;
+                }
+            }
 
             file_put_contents($this->json_file, _json_encode($existing_data));
             $this->qPrint("Saved to $this->json_file\nReady for testing!\n");
         }
 
-        return array(
-            'discovery' => $discovered_data,
-            'poller' => $polled_data,
-        );
+        return $data;
     }
 
     /**
@@ -437,36 +472,45 @@ class ModuleTestHelper
      * Mostly used for testing
      *
      * @param int $device_id The test device id
+     * @param string $key a key to store the data under the module key (usually discovery or poller)
      * @return array The dumped data keyed by module -> table
      */
-    private function dumpDb($device_id)
+    public function dumpDb($device_id, $key = null)
     {
         $data = array();
 
-        foreach ($this->getTables() as $table => $info) {
-            // check for custom where
-            $where = isset($info['custom_where']) ? $info['custom_where'] : "WHERE `device_id`=?";
-            $params = array($device_id);
+        foreach ($this->getTableData() as $module => $module_tables) {
+            foreach ($module_tables as $table => $info) {
+                // check for custom where
+                $where = isset($info['custom_where']) ? $info['custom_where'] : "WHERE `device_id`=?";
+                $params = array($device_id);
 
-            // build joins
-            $join = '';
-            foreach ($info['joins'] as $join_info) {
-                if (isset($join_info['custom'])) {
-                    $join .= ' ' . $join_info['custom'];
+                // build joins
+                $join = '';
+                foreach ($info['joins'] as $join_info) {
+                    if (isset($join_info['custom'])) {
+                        $join .= ' ' . $join_info['custom'];
+                    } else {
+                        list($left, $lkey) = explode('.', $join_info['left']);
+                        list($right, $rkey) = explode('.', $join_info['right']);
+                        $join .= " LEFT JOIN `$right` ON (`$left`.`$lkey` = `$right`.`$rkey`)";
+                    }
+                }
+
+                $rows = dbFetchRows("SELECT * FROM `$table` $join $where", $params);
+
+                // remove unwanted fields
+                $keys = array_flip($info['excluded_fields']);
+                $formatted_data = array_map(function ($row) use ($keys) {
+                    return array_diff_key($row, $keys);
+                }, $rows);
+
+                if (isset($key)) {
+                    $data[$module][$key][$table] = $formatted_data;
                 } else {
-                    list($left, $lkey) = explode('.', $join_info['left']);
-                    list($right, $rkey) = explode('.', $join_info['right']);
-                    $join .= " LEFT JOIN `$left` ON (`$left`.`$lkey` = `$right`.`$rkey`)";
+                    $data[$module][$table] = $formatted_data;
                 }
             }
-
-            $rows = dbFetchRows("SELECT * FROM `$table` $join $where", $params);
-
-            // remove unwanted fields
-            $keys = array_flip($info['excluded_fields']);
-            $data[$table] = array_map(function ($row) use ($keys) {
-                return array_diff_key($row, $keys);
-            }, $rows);
         }
 
         return $data;
@@ -478,68 +522,30 @@ class ModuleTestHelper
      *
      * @return array
      */
-    private function getTables()
+    public function getTableData()
     {
-        $tables = array(
-            'applications' => array(
-                'applications' => array(
-                    'excluded_fields' => array('device_id', 'app_id', 'timestamp'),
-                ),
-                'application_metrics' => array(
-                    'excluded_fields' => array('app_id'),
-                    'joins' => array(
-                        array('custom' => 'INNER JOIN (SELECT app_id, app_type FROM applications WHERE `device_id`=?) I USING (app_id)'),
-                    ),
-                    'custom_where' => '',
-                ),
-            ),
-            'arp-table' => array(
-                'ipv4_mac' => array(
-                    'excluded_fields' => array('device_id', 'port_id'),
-                ),
-            ),
-            'mempools' => array(
-                'mempools' => array(
-                    'excluded_fields' => array('device_id', 'mempool_id'),
-                ),
-            ),
-            'ports' => array(
-                'ports' => array(
-                    'excluded_fields' => array('device_id', 'port_id'),
-                    'joins' => array(
-                        array('left' => 'ports.port_id', 'right' => 'ports_statistics.port_id'),
-                    ),
-                ),
-            ),
-            'processors' => array(
-                'processors' => array(
-                    'excluded_fields' => array('device_id', 'processor_id'),
-                ),
-            ),
-            'sensors' => array(
-                'sensors' => array(
-                    'excluded_fields' => array('device_id', 'sensor_id', 'state_translation_id', 'state_index_id', 'sensors_to_state_translations_id', 'lastupdate'),
-                    'joins' => array(
-                        array('left' => 'sensors.sensor_id', 'right' => 'sensors_to_state_indexes.sensor_id'),
-                        array('left' => 'sensors_to_state_indexes.state_index_id', 'right' => 'state_indexes.state_index_id'),
-                    ),
-                ),
-                'state_indexes' => array(
-                    'excluded_fields' => array('device_id', 'sensor_id', 'state_translation_id', 'state_index_id', 'state_lastupdated'),
-                    'joins' => array(
-                        array('left' => 'state_indexes.state_index_id', 'right' => 'state_translations.state_index_id'),
-                        array('custom' => "INNER JOIN ( SELECT i.state_index_id FROM `sensors_to_state_indexes` i LEFT JOIN `sensors` s ON (i.`sensor_id` = s.`sensor_id`)  WHERE `device_id`=? GROUP BY i.state_index_id) d ON d.state_index_id = state_indexes.state_index_id"),
-                    ),
-                    'custom_where' => '',
-                ),
-            ),
-        );
+        return array_intersect_key($this->module_tables, array_flip($this->getModules()));
+    }
 
-        if (isset($tables[$this->module])) {
-            return $tables[$this->module];
-        }
+    /**
+     * Get a list of all modules that support capturing data
+     *
+     * @return array
+     */
+    public function getSupportedModules()
+    {
+        return array_keys($this->module_tables);
+    }
 
-        return array();
+    /**
+     * Get a list of modules to capture data for
+     * If modules is empty, returns all supported modules
+     *
+     * @return array
+     */
+    private function getModules()
+    {
+        return empty($this->modules) ? $this->getSupportedModules() : $this->modules;
     }
 
     public function fetchTestData()

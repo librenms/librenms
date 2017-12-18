@@ -44,20 +44,21 @@ class ProcessorTest extends DBTestCase
         $this->requreSnmpsim();  // require snmpsim for now
         global $snmpsim;
 
-        $helper = new ModuleTestHelper($this->module, $target_os);
+        var_dump($this->module);
+        $helper = new ModuleTestHelper(array($this->module), $target_os);
         $helper->setQuiet();
 
-        $result = $helper->generateTestData($snmpsim, $target_os, '', true);
+        $results = $helper->generateTestData($snmpsim,  true);
 
         $this->assertEquals(
             $expected_data['discovery'],
-            $result['discovery'],
+            $results[$this->module]['discovery'],
             "OS $target_os: Discovered {$this->module} data does not match that found in $filename"
         );
 
         $this->assertEquals(
             $expected_data['poller'] == 'matches discovery' ? $expected_data['discovery'] : $expected_data['poller'],
-            $result['poller'],
+            $results[$this->module]['poller'],
             "OS $target_os: Polled {$this->module} data does not match that found in $filename"
         );
     }

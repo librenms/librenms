@@ -76,7 +76,7 @@ Usage:
                     If this is not given, the existing snmp data will be used
   -o, --os          Name of the OS to save test data for
   -v, --variant     The variant of the OS to use, usually the device model
-  -m, --module      The discovery/poller module to collect data for
+  -m, --modules     The discovery/poller module(s) to collect data for, comma delimited
   -f, --file        File to save the database entries to.  Default is in tests/data/
   -d, --debug       Enable debug output
   -n, --prefer-new  Prefer new snmprec data over existing data
@@ -86,11 +86,11 @@ Usage:
     exit;
 }
 
-$module = 'all';
+$module = array();
 if (isset($options['m'])) {
-    $module = $options['m'];
-} elseif (isset($options['module'])) {
-    $module = $options['module'];
+    $modules = $options['m'];
+} elseif (isset($options['modules'])) {
+    $modules = $options['modules'];
 }
 
 $variant = '';
@@ -101,14 +101,14 @@ if (isset($options['v'])) {
 }
 
 echo "OS: $target_os\n";
-echo "Module: $module\n";
+echo "Module: $modules\n";
 if ($variant) {
     echo "Variant: $variant\n";
 }
 echo PHP_EOL;
 
-
-$tester = new ModuleTestHelper($module, $target_os, $variant);
+$modules = isset($modules) ? explode(',', $modules) : array();
+$tester = new ModuleTestHelper($modules, $target_os, $variant);
 
 
 // Capture snmp data
@@ -129,7 +129,7 @@ $snmpsim_port = $snmpsim->getPort();
 
 
 $no_save = isset($options['no-save']);
-$test_data = $tester->generateTestData($snmpsim, $target_os, $variant, $no_save);
+$test_data = $tester->generateTestData($snmpsim, $no_save);
 
 if ($no_save) {
     print_r($test_data);
