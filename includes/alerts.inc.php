@@ -238,7 +238,7 @@ function GetContacts($results)
         return array();
     }
     if ($config['alert']['default_only'] === true || $config['alerts']['email']['default_only'] === true) {
-        return array(''.($config['alert']['default_mail'] ? $config['alert']['default_mail'] : $config['alerts']['email']['default']) => 'NOC');
+        return array(''.($config['alert']['default_mail'] ? $config['alert']['default_mail'] : $config['alerts']['email']['default']) => '');
     }
     $users = Auth::get()->getUserlist();
     $contacts = array();
@@ -265,7 +265,7 @@ function GetContacts($results)
                     $tmpa = dbFetchCell("SELECT sysContact FROM devices WHERE device_id = ?", array($result["device_id"]));
                 }
                 if (!empty($tmpa)) {
-                    $contacts[$tmpa] = "NOC";
+                    $contacts[$tmpa] = '';
                 }
             }
             $tmpa = dbFetchRows("SELECT user_id FROM devices_perms WHERE access_level >= 0 AND device_id = ?", array($result["device_id"]));
@@ -319,7 +319,7 @@ function GetContacts($results)
 
     # Send email to default contact if no other contact found
     if ((count($tmp_contacts) == 0) && ($config['alert']['default_if_none']) && (!empty($config['alert']['default_mail']))) {
-        $tmp_contacts[$config['alert']['default_mail']] = 'NOC';
+        $tmp_contacts[$config['alert']['default_mail']] = '';
     }
 
     return $tmp_contacts;
