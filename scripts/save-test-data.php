@@ -46,6 +46,7 @@ if (isset($options['h'])) {
     $hostname = $options['hostname'];
 }
 
+$target_os = '';
 if (isset($options['o'])) {
     $target_os = $options['o'];
 } elseif (isset($options['os'])) {
@@ -86,11 +87,15 @@ Usage:
     exit;
 }
 
-$module = array();
 if (isset($options['m'])) {
-    $modules = $options['m'];
+    $modules_input = $options['m'];
+    $modules = explode(',', $modules_input);
 } elseif (isset($options['modules'])) {
-    $modules = $options['modules'];
+    $modules_input = $options['modules'];
+    $modules = explode(',', $modules_input);
+} else {
+    $modules_input = 'all';
+    $modules = array();
 }
 
 $variant = '';
@@ -101,13 +106,13 @@ if (isset($options['v'])) {
 }
 
 echo "OS: $target_os\n";
-echo "Module: $modules\n";
+echo "Module: $modules_input\n";
 if ($variant) {
     echo "Variant: $variant\n";
 }
 echo PHP_EOL;
 
-$modules = isset($modules) ? explode(',', $modules) : array();
+
 $tester = new ModuleTestHelper($modules, $target_os, $variant);
 
 
