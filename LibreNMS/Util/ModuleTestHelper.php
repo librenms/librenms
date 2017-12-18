@@ -497,7 +497,7 @@ class ModuleTestHelper
                     }
                 }
 
-                $rows = dbFetchRows("SELECT * FROM `$table` $join $where", $params);
+                $rows = dbFetchRows("SELECT * FROM `$table` $join $where $order", $params);
 
                 // remove unwanted fields
                 $keys = array_flip($info['excluded_fields']);

@@ -1,8 +1,8 @@
 <?php
 /**
- * OSDiscoveryTest.php
+ * OSModulesTest.php
  *
- * Test all discovery for all OS
+ * Test discovery and poller modules
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,37 +29,41 @@ use LibreNMS\Config;
 use LibreNMS\Device\Processor;
 use LibreNMS\Util\ModuleTestHelper;
 
-class ProcessorTest extends DBTestCase
+class OSModulesTest extends DBTestCase
 {
-    private $module = 'ports';
-
     /**
      * @dataProvider dumpedDataProvider
-     * @param $target_os
-     * @param $filename
-     * @param $expected_data
+     * @param string $target_os
+     * @param string $filename
      */
-    public function testProcessor($target_os, $filename, $expected_data)
+    public function testOS($target_os, $filename)
     {
-        $this->requreSnmpsim();  // require snmpsim for now
+        $this->requreSnmpsim();  // require snmpsim for tests
         global $snmpsim;
 
-        $helper = new ModuleTestHelper(array($this->module), $target_os);
+        $file = Config::get('install_dir') . '/' . $filename;
+        $expected_data = json_decode(file_get_contents($file), true);
+
+        list($os, $variant) = explode('_', $target_os, 2);
+        $modules = array_keys($expected_data);
+        $helper = new ModuleTestHelper($modules, $os, $variant);
         $helper->setQuiet();
 
         $results = $helper->generateTestData($snmpsim,  true);
 
-        $this->assertEquals(
-            $expected_data['discovery'],
-            $results[$this->module]['discovery'],
-            "OS $target_os: Discovered {$this->module} data does not match that found in $filename"
-        );
+        foreach ($expected_data as $module => $data) {
+            $this->assertEquals(
+                $data['discovery'],
+                $results[$module]['discovery'],
+                "OS $target_os: Discovered $module data does not match that found in $filename"
+            );
 
-        $this->assertEquals(
-            $expected_data['poller'] == 'matches discovery' ? $expected_data['discovery'] : $expected_data['poller'],
-            $results[$this->module]['poller'],
-            "OS $target_os: Polled {$this->module} data does not match that found in $filename"
-        );
+            $this->assertEquals(
+                $data['poller'] == 'matches discovery' ? $data['discovery'] : $data['poller'],
+                $results[$module]['poller'],
+                "OS $target_os: Polled $module data does not match that found in $filename"
+            );
+        }
     }
 
 
@@ -72,14 +76,11 @@ class ProcessorTest extends DBTestCase
         foreach ($dump_files as $file) {
             $os = basename($file, '.json');
             $short_file = str_replace($install_dir.'/', '', $file);
-            $dumped_data = json_decode(file_get_contents($file), true);
-            if (isset($dumped_data[$this->module])) {
-                $data[$os] = array(
-                    $os,
-                    $short_file,
-                    $dumped_data[$this->module]
-                );
-            }
+
+            $data[$os] = array(
+                $os,
+                $short_file
+            );
         }
 
         return $data;
