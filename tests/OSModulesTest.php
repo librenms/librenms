@@ -49,7 +49,7 @@ class OSModulesTest extends DBTestCase
         $helper = new ModuleTestHelper($modules, $os, $variant);
         $helper->setQuiet();
 
-        $results = $helper->generateTestData($snmpsim,  true);
+        $results = $helper->generateTestData($snmpsim, true);
 
         foreach ($expected_data as $module => $data) {
             $this->assertEquals(
