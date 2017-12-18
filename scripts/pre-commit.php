@@ -1,8 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-use LibreNMS\Proc;
-
 $filename = basename(__FILE__);
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);

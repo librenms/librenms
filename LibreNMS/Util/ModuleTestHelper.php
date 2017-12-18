@@ -265,10 +265,7 @@ class ModuleTestHelper
                         preg_match('/\((\d+)\)/', $data, $match);
                         $data = $match[1];
                     }
-                    if (starts_with($data, 'Counter32: ')) {
-                        var_dump($line, $raw_type, $type, $data);
-                        exit;
-                    }
+
                     $result[] = "$oid|$type|$data";
                 }
             } else {
@@ -353,7 +350,7 @@ class ModuleTestHelper
 
         foreach ($snmprec_data as $line) {
             if (!empty($line)) {
-                list($oid, $type, $data) = explode('|', $line, 3);
+                list($oid,) = explode('|', $line, 2);
                 $result[$oid] = $line;
             }
         }
@@ -497,7 +494,7 @@ class ModuleTestHelper
                     }
                 }
 
-                $rows = dbFetchRows("SELECT * FROM `$table` $join $where $order", $params);
+                $rows = dbFetchRows("SELECT * FROM `$table` $join $where", $params);
 
                 // remove unwanted fields
                 $keys = array_flip($info['excluded_fields']);
