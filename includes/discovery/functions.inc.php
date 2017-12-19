@@ -160,7 +160,11 @@ function discover_device(&$device, $options = null)
             }
         }
     }
-    foreach (Config::get('discovery_modules', array()) as $module => $module_status) {
+
+    $discovery_modules = Config::get('discovery_modules', array());
+    $discovery_modules = array('core' => true) + $discovery_modules;
+
+    foreach ($discovery_modules as $module => $module_status) {
         $os_module_status = Config::getOsSetting($device['os'], "discovery_modules.$module");
         d_echo("Modules status: Global" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
         d_echo("OS" . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
@@ -409,10 +413,6 @@ function sensor_low_limit($class, $current)
         case 'cooling':
             $limit = ($current * 0.95);
             break;
-        case 'delay':
-        case 'quality_factor':
-        case 'chromatic_dispersion':
-        case 'ber':
     }//end switch
 
     return $limit;
@@ -986,8 +986,8 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
             foreach ($raw_data as $index => $snmp_data) {
                 $user_function = null;
-                if (isset($data['user_func'])) {
-                    $user_function = $data['user_func'];
+                if (isset($data['user_function'])) {
+                    $user_function = $data['user_function'];
                 }
                 // get the value for this sensor, check 'value' and 'oid', if state string, translate to a number
                 $data_name = isset($data['value']) ? $data['value'] : $data['oid'];  // fallback to oid if value is not set

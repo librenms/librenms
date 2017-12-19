@@ -5,12 +5,12 @@
 if ($device['os'] == 'dnos' || $device['os'] == 'ftos') {
     echo 'DNOS-MEMORY-POOL:  ';
 
-    if (preg_match('/.6027.1.3.[0-9]+$/', $device['sysObjectID'])) {
+    if (preg_match('/.6027.1.3.[0-9]+$/', $disco_device['sysObjectID'])) {
         $total = snmp_get($device, 'chSysProcessorMemSize.1', '-OvQU', 'F10-S-SERIES-CHASSIS-MIB');
         if (is_numeric($total)) {
             discover_mempool($valid_mempool, $device, 0, $device['os'], 'Memory Utilization', '1', null, null);
         }
-    } elseif (preg_match('/.6027.1.2.[0-9]+$/', $device['sysObjectID'])) {
+    } elseif (preg_match('/.6027.1.2.[0-9]+$/', $disco_device['sysObjectID'])) {
         $total = snmp_get($device, 'chSysProcessorMemSize.1', '-OvQU', 'F10-C-SERIES-CHASSIS-MIB');
         if (is_numeric($total)) {
             discover_mempool($valid_mempool, $device, 0, $device['os'], 'Memory Utilization', '1', null, null);

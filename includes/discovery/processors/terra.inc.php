@@ -9,7 +9,7 @@ if ($device["os"] === "terra") {
     );
 
     foreach ($query as $row) {
-        if (strpos($device["sysDescr"], $row[0]) !== false) {
+        if (strpos($disco_device["sysDescr"], $row[0]) !== false) {
             $proc_usage = snmp_get($device, $row[1], "-Ovq");
             if (is_numeric($proc_usage)) {
                 discover_processor($valid["processor"], $device, $row[1], "0", "cpu", $descr, "1", $proc_usage);
