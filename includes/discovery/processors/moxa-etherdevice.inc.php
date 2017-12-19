@@ -15,9 +15,9 @@ if ($device['os'] == 'moxa-etherdevice') {
     echo 'Moxa EtherDevice Switch : ';
     $descr = 'Processor';
     // Moxa people enjoy creating MIBs for each model!
-    if ($disco_device['sysDescr'] == 'IKS-6726A-2GTXSFP-T') {
+    if ($device['sysDescr'] == 'IKS-6726A-2GTXSFP-T') {
         $mibmod = 'MOXA-IKS6726A-MIB';
-    } else if ($disco_device['sysDescr'] == 'EDS-G508E-T') {
+    } else if ($device['sysDescr'] == 'EDS-G508E-T') {
         $mibmod = 'MOXA-EDSG508E-MIB';
     }
 

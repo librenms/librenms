@@ -14,7 +14,7 @@
 
 
 if ($device['os'] == 'binox') {
-    if (strpos($disco_device['sysObjectID'], 'enterprises.738.10.5.100') !== false) {
+    if (strpos($device['sysObjectID'], 'enterprises.738.10.5.100') !== false) {
         if ($device['version'] == '2.4.R3.1.1') {
             echo 'Telco Systems:';
             $descr = 'Processor';

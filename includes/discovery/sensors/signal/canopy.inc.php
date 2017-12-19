@@ -1,6 +1,6 @@
 <?php
 
-$cambium_type = snmp_get($disco_device, 'sysDescr.0', '-Oqv', '');
+$cambium_type = snmp_get($device, 'sysDescr.0', '-Oqv', '');
 $divisor = 1;
 if (strstr($cambium_type, 'BHUL450')) {
     $masterSlaveMode = snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');

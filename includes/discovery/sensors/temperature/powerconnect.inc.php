@@ -1,6 +1,6 @@
 <?php
 
-switch ($disco_device['sysObjectID']) {
+switch ($device['sysObjectID']) {
     /**
         * Dell Powerconnect 5548
         * Operating Temperature: 0º C to 45º C

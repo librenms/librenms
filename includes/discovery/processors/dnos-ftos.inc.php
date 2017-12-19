@@ -3,13 +3,13 @@ if ($device['os'] == 'dnos' || $device['os'] == 'ftos') {
     echo 'DNOS CPU: ';
     $descr = 'CPU';
 
-    if (preg_match('/.6027.1.3.[0-9]+$/', $disco_device['sysObjectID'])) {
+    if (preg_match('/.6027.1.3.[0-9]+$/', $device['sysObjectID'])) {
         echo 'Dell S Series Chassis';
         $usage = str_replace(' percent', '', snmp_get($device, 'chStackUnitCpuUtil5Sec.1', '-OvQ', 'F10-S-SERIES-CHASSIS-MIB'));
         if (is_numeric($usage)) {
             discover_processor($valid['processor'], $device, '.1.3.6.1.4.1.6027.3.10.1.2.9.1.2.1', '0', $device['os'], $descr, '1', $usage);
         }
-    } elseif (preg_match('/.6027.1.2.[0-9]+$/', $disco_device['sysObjectID'])) {
+    } elseif (preg_match('/.6027.1.2.[0-9]+$/', $device['sysObjectID'])) {
         echo 'Dell C Series Chassis';
         $usage = str_replace(' percent', '', snmp_get($device, 'chRpmCpuUtil5Sec.1', '-OvQ', 'F10-C-SERIES-CHASSIS-MIB'));
         if (is_numeric($usages)) {
