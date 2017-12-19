@@ -103,7 +103,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             max: ".$d['total'].",
             label: 'Mbytes',
             valueFontSize: '2px',
-            title: '".substr($d['storage_descr'], 0, 30)." Usage'
+            title: '".substr($d['storage_descr'], 0, 20)." Usage'
         });\n";
         $i++;
 
