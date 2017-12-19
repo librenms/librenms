@@ -23,7 +23,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             </div>
             <div class="col-sm-6">
                 <select id="device" name="device" class="form-control">';
-    foreach(dbFetchRows("SELECT `device_id`, `hostname` FROM `devices` WHERE disabled = 0 and `type` = 'server' ORDER BY `hostname` ASC") as $dev) {
+    foreach (dbFetchRows("SELECT `device_id`, `hostname` FROM `devices` WHERE disabled = 0 and `type` = 'server' ORDER BY `hostname` ASC") as $dev) {
         if ($dev['device_id'] == $cur_dev) {
             $selected = 'selected';
         } else {
@@ -87,7 +87,6 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             valueFontSize: '2px',
             title: '".$m['mempool_descr']." Usage'
         });\n";
-
         $i++;
     }
 
@@ -106,8 +105,8 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             title: '".substr($d['storage_descr'], 0, 20)." Usage'
         });\n";
         $i++;
-
     }
+
     $common_output[] = "<script>
     var cpugauge = new JustGage({
         id: 'cpu',
