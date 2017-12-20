@@ -2402,6 +2402,11 @@ function dump_db_schema()
     return $output;
 }
 
+
+
+
+
+
 /**
  * Get an array of the schema files.
  * schema_version => full_file_name

@@ -1,0 +1,8 @@
+{
+    "processors": {
+        "discovery": {
+            "processors": []
+        },
+        "poller": "matches discovery"
+    }
+}
