@@ -1,8 +1,8 @@
 <?php
 /**
- * DBTestCase.php
+ * TestCase.php
  *
- * Base Test Case for Database tests
+ * Base Test Case for all tests
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,17 +25,32 @@
 
 namespace LibreNMS\Tests;
 
-class DBTestCase extends TestCase
+abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
-    public function setUp()
+    protected $snmpsimIp = '127.1.6.2';
+    protected $snmpsimPort = 1161;
+
+    public function dbSetUp()
     {
-        parent::setUp();
-        $this->dbSetUp();
+        if (getenv('DBTEST')) {
+            dbConnect();
+            dbBeginTransaction();
+        } else {
+            $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
+        }
     }
 
-    public function tearDown()
+    public function dbTearDown()
     {
-        $this->dbTearDown();
-        parent::tearDown();
+        if (getenv('DBTEST')) {
+            dbRollbackTransaction();
+        }
+    }
+
+    public function requreSnmpsim()
+    {
+        if (!getenv('SNMPSIM')) {
+            $this->markTestSkipped('Snmpsim required for this test.  Set SNMPSIM=1 to enable.');
+        }
     }
 }

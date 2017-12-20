@@ -33,7 +33,7 @@ cache:
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y snmp
+  - sudo apt-get install -y snmp fping
   - mysql -e 'CREATE DATABASE librenms_phpunit_78hunjuybybh;'
 
 install:
@@ -42,9 +42,6 @@ install:
   - pip install --user snmpsim==0.3.1
   - pip install --user pylint
   - pip install --user mysql-python
-
-before_script:
-  - python2 $HOME/.local/bin/snmpsimd.py --data-dir=$TRAVIS_BUILD_DIR/tests/snmpsim --agent-udpv4-endpoint=127.0.0.1:11161 --logging-method=file:/tmp/snmpsimd.log --daemon --pid-file=/tmp/snmpsimd.pid
 
 after_success:
   - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $EXECUTE_BUILD_SCHEMA == "true" && bash scripts/deploy-schema.sh
