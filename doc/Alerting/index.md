@@ -59,3 +59,4 @@ Table of Content:
     - [Time](Macros.md#macros-time)
     - [Sensors](Macros.md#macros-sensors)
     - [Misc](Macros.md#macros-misc)
+ - [Host Dependencies](Hostdependencies.md)
