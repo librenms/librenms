@@ -120,6 +120,11 @@ So, considering the example:
  - `sysObjectId: bar, sysDescr: exodar` matches 
  - `sysObjectId: bar, sysDescr: snafu` matches 
 
+#### Discovery helpers
+Within the discovery code base if you are using php then the following helpers are available:
+
+`$device['sysObjectID]`: This will contain the full numerical sysObjectID for this device.
+`$device['sysDescr']`: This will contain the full sysDescr for this device.
 
 ### Poller
 
