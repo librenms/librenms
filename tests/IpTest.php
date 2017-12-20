@@ -29,7 +29,7 @@ use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 
-class IpTest extends \PHPUnit\Framework\TestCase
+class IpTest extends TestCase
 {
     public function testIsValid()
     {

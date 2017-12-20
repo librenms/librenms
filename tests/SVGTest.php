@@ -30,7 +30,7 @@ use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use RegexIterator;
 
-class SVGTest extends \PHPUnit_Framework_TestCase
+class SVGTest extends TestCase
 {
     public function testSVGContainsPNG()
     {

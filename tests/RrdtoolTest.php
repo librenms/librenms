@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests;
 
-class RrdtoolTest extends \PHPUnit_Framework_TestCase
+class RrdtoolTest extends TestCase
 {
 
     public function testBuildCommandLocal()
