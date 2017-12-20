@@ -1,6 +1,6 @@
 <?php
 
-if (preg_match("/(Linux).+(ntc)/", $poll_device['sysDescr'])) {
+if (preg_match("/(Linux).+(ntc)/", $device['sysDescr'])) {
     $sensor_type = "chip_battery_charge";
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.10.112.111.119.101.114.45.115.116.97.';
     $lowlimit     = 5;

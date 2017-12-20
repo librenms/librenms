@@ -11,5 +11,5 @@
  */
 
 if ($device['sysObjectID'] == 'enterprises.10704.1.10') {
-    $hardware = $poll_device['sysName'];
+    $hardware = $device['sysName'];
 }

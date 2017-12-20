@@ -25,7 +25,7 @@
 
 //SmartOptics, M-Series M-1601-D1000C1 R2A, SmartOS v2.4.14 (Compiled on Thu Jun  2 14:21:33 CEST 2016)
 
-list(, $hardware, $version) = explode(',', $poll_device['sysDescr']);
+list(, $hardware, $version) = explode(',', $device['sysDescr']);
 
 $hardware = str_replace('M-Series ', '', $hardware);
 list(,,$version,)  = explode(' ', $version);
