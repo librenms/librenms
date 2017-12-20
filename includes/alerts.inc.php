@@ -828,6 +828,11 @@ function RunAlerts()
             $noiss = true;
         }
 
+        if (IsParentDown($alert['device_id'])) {
+            $noiss = true;
+            log_event('Skipped alerts because all parent devices are down', $alert['device_id'], 'alert', 1);
+        }
+
         if (!$noiss) {
             IssueAlert($alert);
             dbUpdate(array('alerted' => $alert['state']), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
@@ -879,3 +884,25 @@ function ExtTransports($obj)
         echo '; ';
     }
 }//end ExtTransports()
+
+/**
+ * Check if a device's all parent are down
+ * Returns true if all parents are down
+ * @param int $device Device-ID
+ * @return bool
+ */
+function IsParentDown($device)
+{
+    $parent_count = dbFetchCell("SELECT count(*) from `device_relationships` WHERE `child_device_id` = ?", array($device));
+    if (!$parent_count) {
+        return false;
+    }
+
+
+    $down_parent_count = dbFetchCell("SELECT count(*) from devices as d LEFT JOIN devices_attribs as a ON d.device_id=a.device_id LEFT JOIN device_relationships as r ON d.device_id=r.parent_device_id WHERE d.status=0 AND d.ignore=0 AND d.disabled=0 AND r.child_device_id=? AND (d.status_reason='icmp' OR (a.attrib_type='override_icmp_disable' AND a.attrib_value=true))", array($device));
+    if ($down_parent_count == $parent_count) {
+        return true;
+    }
+
+    return false;
+} //end IsParentDown()

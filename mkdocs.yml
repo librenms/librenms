@@ -105,6 +105,7 @@ pages:
       - Alerting/Macros.md
       - Alerting/Testing.md
       - Alerting/Rule-Mapping.md
+      - Alerting/Device-Dependencies.md
   - 9. Getting help:
       - How to get help: Support/index.md
       - Support/FAQ.md

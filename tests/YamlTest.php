@@ -30,7 +30,7 @@ use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
-class YamlTest extends \PHPUnit_Framework_TestCase
+class YamlTest extends TestCase
 {
     private $valid_os_discovery_keys = array(
         'sysDescr',
