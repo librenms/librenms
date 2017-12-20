@@ -9,6 +9,11 @@ applications:
 arp-table:
     ipv4_mac:
         excluded_fields: [device_id, port_id]
+bgp-peers:
+    bgpPeers:
+        excluded_fields: [device_id, bgpPeer_id]
+    bgpPeers_cbgp:
+        excluded_fields: [device_id]
 mempools:
     mempools:
         excluded_fields: [device_id, mempool_id]
