@@ -137,7 +137,7 @@ foreach ($custom_graph as $key => $val) {
         <td>
         <input type="hidden" name="remove_custom_index" value="'.$val['sensor_index'].'" />
         <input type="hidden" name="remove_custom_class" value="'.$val['sensor_class'].'" />
-        <button type="submit" class="btn btn-danger remove-custom" id="remove-custom" name="remove_custom_id" value="'.$val['sensor_id'].'">Dlelete</button>
+        <button type="submit" class="btn btn-danger remove-custom" id="remove-custom" name="remove_custom_id" value="'.$val['sensor_id'].'">Delete</button>
         </td>
         </tr>
         </form>
