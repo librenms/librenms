@@ -51,6 +51,8 @@ if ($_SESSION['userlevel'] < '7') {
 
     $panes['component'] = 'Components';
 
+    $panes['custom'] = 'Custom OID';
+
     print_optionbar_start();
 
     unset($sep);
