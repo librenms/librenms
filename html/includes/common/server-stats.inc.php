@@ -54,6 +54,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         </div>
     </form>';
 } else {
+
     $cpu = dbFetchCell("SELECT AVG(processor_usage) from processors WHERE device_id = ?", array($device_id));
     $mem = dbFetchRows("SELECT mempool_descr, 
                                 ROUND(mempool_used / (1024*1024), 0) as used, 
@@ -107,6 +108,8 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         $i++;
     }
 
+    $common_output[] = '<script src="js/raphael-min.js"></script>';
+    $common_output[] = '<script src="js/justgage.js"></script>';
     $common_output[] = "<script>
     var cpugauge = new JustGage({
         id: 'cpu',
