@@ -23,11 +23,14 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Proc;
+use LibreNMS\Util\Snmpsim;
+
 global $config;
 
 $install_dir = realpath(__DIR__ . '/..');
 
-$init_modules = array('web', 'discovery');
+$init_modules = array('web', 'discovery', 'polling');
 
 if (!getenv('SNMPSIM')) {
     $init_modules[] = 'mocksnmp';
@@ -45,9 +48,19 @@ require $install_dir . '/includes/init.php';
 chdir($install_dir);
 
 ini_set('display_errors', 1);
-error_reporting(E_ALL & ~E_WARNING);
+//error_reporting(E_ALL & ~E_WARNING);
 
 update_os_cache(true); // Force update of OS Cache
+
+if (getenv('SNMPSIM')) {
+    $snmpsim = new Snmpsim('127.1.6.2');
+    $snmpsim->fork();
+
+    // make PHP hold on a reference to $snmpsim so it doesn't get destructed
+    register_shutdown_function(function (Snmpsim $ss) {
+        $ss->stop();
+    }, $snmpsim);
+}
 
 if (getenv('DBTEST')) {
     global $schema, $sql_mode;
@@ -62,6 +75,8 @@ if (getenv('DBTEST')) {
     register_shutdown_function(function () use ($empty_db, $sql_mode) {
         global $config;
         dbConnect();
+
+        echo "Cleaning database...\n";
 
         // restore sql_mode
         dbQuery("SET GLOBAL sql_mode='$sql_mode'");

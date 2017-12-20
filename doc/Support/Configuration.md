@@ -131,10 +131,6 @@ http_proxy=proxy.domain.com
 https_proxy=proxy.domain.com
 ```
 
-### Memcached
-
-[Memcached](../Extensions/Memcached.md)
-
 ### RRDCached
 
 [RRDCached](../Extensions/RRDCached.md)

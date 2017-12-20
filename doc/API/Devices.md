@@ -911,6 +911,34 @@ Output:
 ]
 ```
 
+### `rename_device`
+
+Rename device.
+
+Route: `/api/v0/devices/:hostname/rename/:new_hostname`
+
+  - hostname can be either the device hostname or id
+
+Input:
+
+  -
+
+Examples:
+```curl
+curl -X PATCH  -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/rename/localhost2
+```
+
+Output:
+
+```json
+[
+    {
+        "status": "ok",
+        "message": "Device has been renamed"
+    }
+]
+```
+
 ### `get_device_groups`
 
 List the device groups that a device is matched on.

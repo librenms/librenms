@@ -27,7 +27,7 @@ namespace LibreNMS\Tests;
 
 use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
-class OSDiscoveryTest extends \PHPUnit_Framework_TestCase
+class OSDiscoveryTest extends TestCase
 {
     private static $unchecked_files;
 
@@ -83,13 +83,12 @@ class OSDiscoveryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Test that all files have been tested (removed from self::$unchecked_files
-     * Except skel.snmprec, the example file.
      *
      * @depends testOS
      */
     public function testAllFilesTested()
     {
-        $this->assertEquals(array('skel'), array_keys(self::$unchecked_files));
+        $this->assertEmpty(self::$unchecked_files);
     }
 
     /**
@@ -122,9 +121,9 @@ class OSDiscoveryTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             'device_id' => 1,
-            'hostname' => '127.0.0.1',
+            'hostname' => $this->snmpsimIp,
             'snmpver' => 'v2c',
-            'port' => 11161,
+            'port' => $this->snmpsimPort,
             'timeout' => 3,
             'retries' => 0,
             'snmp_max_repeaters' => 10,

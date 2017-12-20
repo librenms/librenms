@@ -122,14 +122,14 @@ $config['old_graphs'] = 1;
 $config['int_customers'] = 1;
 // Enable Customer Port Parsing
 $config['customers_descr'] = 'cust';
-$config['transit_descr']   = 'transit';
-// Add custom transit descriptions (can be an array)
-$config['peering_descr'] = 'peering';
-// Add custom peering descriptions (can be an array)
-$config['core_descr'] = 'core';
-// Add custom core descriptions (can be an array)
-$config['custom_descr'] = '';
-// Add custom interface descriptions (can be an array)
+$config['transit_descr'][]   = 'transit';
+// Add custom transit descriptions (can be an string) 
+$config['peering_descr'][] = 'peering';
+// Add custom peering descriptions (can be an string)
+$config['core_descr'][] = 'core';
+// Add custom core descriptions (can be an string)
+$config['custom_descr'][] = '';
+// Add custom interface descriptions (can be an string)
 $config['int_transit'] = 1;
 // Enable Transit Types
 $config['int_peering'] = 1;
