@@ -1,4 +1,4 @@
-source: Alerting/Device-Depencies.md
+source: Alerting/Device-Dependencies.md
 
 # Device Dependencies
 
