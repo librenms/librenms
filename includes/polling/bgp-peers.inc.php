@@ -93,7 +93,7 @@ if ($config['enable_bgp']) {
                             'bgpPeerInUpdateElapsedTime.'.$peer['bgpPeerIdentifier'],
                             'bgpPeerLocalAddr.'.$peer['bgpPeerIdentifier']
                         );
-                        $peer_data = snmp_get_multi_oid($device, $oids, '-OUvq', 'BGP4-MIB');
+                        $peer_data = snmp_get_multi_oid($device, $oids, '-OUQ', 'BGP4-MIB');
                     }//end if
                     d_echo($peer_data);
                     list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = array_values($peer_data);
