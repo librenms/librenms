@@ -1,16 +1,50 @@
 source: Developing/os/Test-Units.md
 
-We have a testing unit for new OS', please ensure you add a test for any new OS' or updates to existing OS discovery.
+# Tests
 
-All that you need to do is create an snmprec file in tests/snmpsim with the proper name. If adding the first test for
-this os, simply use the os name `pulse.snmprec` for example.  If you need to add multiple test files, you can add an
-underscore after the os name followed by a description, typically a model name.  For example: `pulse_mag2600.snmprec`.
-You can copy `skel.snmprec` to your intended name and fill in the data to make things a little easier.
+Tests ensure LibreNMS works as expected, now and in the future.  New OS should provide as much test data as needed and
+added test data for existing OS is welcome.
 
-We utilise [snmpsim](http://snmpsim.sourceforge.net/) to do unit testing for OS discovery. For this to work you need
-to supply an snmprec file. This is pretty simple and using pulse as the example again this would look like:
+Saved snmp data can be found in `tests/snmpsim/*.snmprec` and saved database data can be found in `tests/data/*.json`.
+Please review this for any sensitive data **before** submitting.  When replacing data, make sure it is modified in a
+consistent manner.
 
-`tests/snmpsim/pulse_mag2600.snmprec`
+We utilise [snmpsim](http://snmpsim.sourceforge.net/) to do unit testing. For OS discovery, we can mock snmpsim, but
+for other tests you will need it installed and functioning.  We run snmpsim during our integration tests, but not by
+default when running `./scripts/pre-commit.php`.
+
+## Capturing test data
+
+`./scripts/save-tests-data.php` is provided to make it easy to collect data for tests.  Running save-tests-data.php with
+the --hostname (-h) allows you to capture all data used to discover and poll a device already added to LibreNMS.  Make sure to
+re-run the script if you add additional support. Check the command-line help for more options.
+
+### OS Variants
+
+If test data already exists, but is for a different device/configuration then you should use the --variant (-v) option to
+specify a different variant of the os, this will be tested completely separate from other variants.  If there is only
+one variant, please do not specify one.
+
+## Running tests
+
+After you have saved your test data, you should run `./scripts/pre-commit.php -p -u` verify they pass.
+
+To run the full suite of tests enable db and snmpsim reliat tests: `./scripts/pre-commit.php --db --snmpsim -p -u`
+
+## Using snmpsim for testing
+
+You can run snmpsim to access test data by running `./scripts/save-tests-data.php --snmpsim`
+
+You may then run snmp queries against it using the os (and variant) as the community and 127.1.6.1:1161 as the host.
+```
+snmpget -v 2c -c ios_c3560e 127.1.6.1:1161 sysDescr.0
+```
+
+## Snmprec format
+
+Snmprec files are simple files that store the snmp data. The data format is simple with three columns: numeric oid, type
+code, and data. Here is an example snippet.
+
 ```
 1.3.6.1.2.1.1.1.0|4|Pulse Secure,LLC,MAG-2600,8.0R14 (build 41869)
 1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.12532.254.1.1
@@ -24,15 +58,6 @@ To look up the numeric OID and type of an string OID with snmptranslate:
 ```bash
 snmptranslate -On -Td SNMPv2-MIB::sysDescr.0
 ```
-
-Common OIDs used in discovery:
-
-| String OID                          | Numeric OID                 |
-| ----------------------------------- | --------------------------- |
-| SNMPv2-MIB::sysDescr.0              | 1.3.6.1.2.1.1.1.0           |
-| SNMPv2-MIB::sysObjectID.0           | 1.3.6.1.2.1.1.2.0           |
-| ENTITY-MIB::entPhysicalDescr.1      | 1.3.6.1.2.1.47.1.1.1.1.2.1  |
-| ENTITY-MIB::entPhysicalMfgName.1    | 1.3.6.1.2.1.47.1.1.1.1.12.1 |
 
 List of SNMP data types:
 
@@ -52,6 +77,6 @@ List of SNMP data types:
 
 Hex encoded strings (4x) should be used for any strings that contain line returns.
 
-You can run `./scripts/pre-commit.php -u` to run the unit tests to check your code.
+## New discovery/poller modules
 
-If you would like to run tests locally against a full snmpsim instance, run `./scripts/pre-commit.php -u --snmpsim`.
+New discovery or poller modules should define database capture parameters in `/tests/module_tables.yaml`.

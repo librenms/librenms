@@ -82,14 +82,21 @@ if ($config['enable_bgp']) {
                             $peer_data .= "$v\n";
                         }
                     } else {
-                        $peer_cmd  = $config['snmpget'].' -M '.$config['mibdir'].' -m BGP4-MIB -OUvq '.snmp_gen_auth($device).' '.$device['hostname'].':'.$device['port'].' ';
-                        $peer_cmd .= 'bgpPeerState.'.$peer['bgpPeerIdentifier'].' bgpPeerAdminStatus.'.$peer['bgpPeerIdentifier'].' bgpPeerInUpdates.'.$peer['bgpPeerIdentifier'].' bgpPeerOutUpdates.'.$peer['bgpPeerIdentifier'].' bgpPeerInTotalMessages.'.$peer['bgpPeerIdentifier'].' ';
-                        $peer_cmd .= 'bgpPeerOutTotalMessages.'.$peer['bgpPeerIdentifier'].' bgpPeerFsmEstablishedTime.'.$peer['bgpPeerIdentifier'].' bgpPeerInUpdateElapsedTime.'.$peer['bgpPeerIdentifier'].' ';
-                        $peer_cmd .= 'bgpPeerLocalAddr.'.$peer['bgpPeerIdentifier'].'';
-                        $peer_data = trim(`$peer_cmd`);
+                        $oids = array(
+                            'bgpPeerState.'.$peer['bgpPeerIdentifier'],
+                            'bgpPeerAdminStatus.'.$peer['bgpPeerIdentifier'],
+                            'bgpPeerInUpdates.'.$peer['bgpPeerIdentifier'],
+                            'bgpPeerOutUpdates.'.$peer['bgpPeerIdentifier'],
+                            'bgpPeerInTotalMessages.'.$peer['bgpPeerIdentifier'],
+                            'bgpPeerOutTotalMessages.'.$peer['bgpPeerIdentifier'],
+                            'bgpPeerFsmEstablishedTime.'.$peer['bgpPeerIdentifier'],
+                            'bgpPeerInUpdateElapsedTime.'.$peer['bgpPeerIdentifier'],
+                            'bgpPeerLocalAddr.'.$peer['bgpPeerIdentifier']
+                        );
+                        $peer_data = snmp_get_multi_oid($device, $oids, '-OUQ', 'BGP4-MIB');
                     }//end if
                     d_echo($peer_data);
-                    list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = explode("\n", $peer_data);
+                    list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = array_values($peer_data);
                     $bgpLocalAddr = str_replace('"', '', str_replace(' ', '', $bgpLocalAddr));
                 } elseif ($device['os'] == 'junos') {
                     if (!isset($junos)) {
@@ -193,7 +200,7 @@ if ($config['enable_bgp']) {
             );
 
             $peer['update'] = array_diff($bgpPeers_fields, $peer);
-            
+
             if ($peer['update']) {
                 dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
             }

@@ -525,6 +525,13 @@ device_perf:
   Indexes:
     id: { Name: id, Columns: [id], Unique: false, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+device_relationships:
+  Columns:
+    - { Field: parent_device_id, Type: 'int(11) unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: child_device_id, Type: 'int(11) unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [parent_device_id, child_device_id], Unique: true, Type: BTREE }
+    device_relationship_child_device_id_fk: { Name: device_relationship_child_device_id_fk, Columns: [child_device_id], Unique: false, Type: BTREE }
 entityState:
   Columns:
     - { Field: entity_state_id, Type: int(11), 'Null': false, Extra: auto_increment }

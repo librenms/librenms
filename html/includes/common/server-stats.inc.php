@@ -61,7 +61,6 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         </div>
     </form>';
 } else {
-
     if (device_permitted($device_id)) {
         $cpu = dbFetchCell("SELECT AVG(processor_usage) from processors WHERE device_id = ?", array($device_id));
         $mem = dbFetchRows("SELECT mempool_descr, 
