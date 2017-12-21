@@ -23,7 +23,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         'descr'    => 'Recently Used',
         'ds'       => 'p',
     );
-}else{
+} else {
     d_echo('RRD "'.$rrd_filename.'" not found');
 }
 

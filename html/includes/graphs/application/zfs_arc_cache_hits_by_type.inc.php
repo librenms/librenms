@@ -33,7 +33,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         'descr'    => 'Prefetch Meta',
         'ds'       => 'pre_meta_hits_per',
     );
-}else{
+} else {
     d_echo('RRD "'.$rrd_filename.'" not found');
 }
 

@@ -33,7 +33,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         'descr'    => 'Mutex Skip',
         'ds'       => 'mutex_skip',
     );
-}else{
+} else {
     d_echo('RRD "'.$rrd_filename.'" not found');
 }
 
