@@ -90,6 +90,9 @@ function nicecase($item)
         case 'os-updates':
             return 'OS Updates';
 
+        case 'smart':
+            return 'SMART';
+
         case 'powerdns-recursor':
             return 'PowerDNS Recursor';
 
