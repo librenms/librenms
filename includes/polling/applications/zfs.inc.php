@@ -144,9 +144,6 @@ $pool_rrd_def = RrdDefinition::make()
 
 $pools_int=0;
 while (isset($zfs{'pools'}{$pools_int})) {
-
-    print $zfs{'pools'}{$pools_int}{'name'}." pool found";
-
     $pools[]=$zfs{'pools'}{$pools_int}{'name'};
     $rrd_name = array('app', $name, $app_id, $zfs{'pools'}{$pools_int}{'name'});
     $fields = array(
