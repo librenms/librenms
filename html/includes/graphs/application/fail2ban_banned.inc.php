@@ -11,7 +11,7 @@ $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 15;
 
-$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'], $app['app_id']));
+$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'], $app['app_id'], 'totalbanned'));
 
 if (is_file($rrd_filename)) {
     $rrd_list = array(

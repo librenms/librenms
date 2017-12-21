@@ -17,7 +17,7 @@ $bannedStuff = explode("\n", $f2b);
 
 $total_banned=$bannedStuff[0];
 
-$rrd_name = array('app', $name, $app_id);
+$rrd_name = array('app', $name, $app_id, 'totalbanned');
 $rrd_def = RrdDefinition::make()
     ->addDataset('banned', 'GAUGE', 0);
 
