@@ -10,7 +10,7 @@ $oids = array(
     '.1.3.6.1.4.1.3224.16.3.3.0',
     '.1.3.6.1.4.1.3224.16.3.4.0',
 );
-$sess_data = snmp_get_multi_oid($device, $oids, '-Oqv');
+$sess_data = snmp_get_multi_oid($device, $oids);
 list ($sessalloc, $sessmax, $sessfailed) = array_values($sess_data);
 
 $rrd_def = RrdDefinition::make()

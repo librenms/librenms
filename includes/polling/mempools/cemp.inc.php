@@ -7,7 +7,7 @@ $oids = array(
     "cempMemPoolFree.$oid",
     "cempMemPoolLargestFree.$oid",
 );
-$data = snmp_get_multi_oid($device, $oids, '-OUqnv', 'CISCO-ENHANCED-MEMPOOL-MIB');
+$data = snmp_get_multi_oid($device, $oids, '-OUQ', 'CISCO-ENHANCED-MEMPOOL-MIB');
 
 list($mempool['used'], $mempool['free'], $mempool['largestfree']) = array_values($data);
 $mempool['total'] = ($mempool['used'] + $mempool['free']);
