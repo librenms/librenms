@@ -200,7 +200,7 @@ class ModuleTestHelper
         $full_list = array();
         foreach ($modules as $module) {
             if (isset($module_deps[$module])) {
-                array_merge($full_list, $module_deps[$module]);
+                $full_list = array_merge($full_list, $module_deps[$module]);
             } else {
                 $full_list[] = $module;
             }
