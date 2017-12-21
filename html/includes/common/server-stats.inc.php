@@ -23,7 +23,14 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             </div>
             <div class="col-sm-6">
                 <select id="device" name="device" class="form-control">';
-    foreach (dbFetchRows("SELECT `device_id`, `hostname` FROM `devices` WHERE disabled = 0 and `type` = 'server' ORDER BY `hostname` ASC") as $dev) {
+    if (is_admin() || is_read()) {
+        $sql = "SELECT `devices`.`device_id`, `hostname` FROM `devices` WHERE disabled = 0 AND `type` = 'server' ORDER BY `hostname` ASC";
+        $param = array();
+    } else {
+        $sql = "SELECT `devices`.`device_id`, `hostname` FROM `devices` LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id` WHERE disabled = 0 AND `type` = 'server' AND `DP`.`user_id`=? ORDER BY `hostname` ASC";
+        $param = array($_SESSION['user_id']);
+    }
+    foreach (dbFetchRows($sql, $param) as $dev) {
         if ($dev['device_id'] == $cur_dev) {
             $selected = 'selected';
         } else {
@@ -55,71 +62,75 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
     </form>';
 } else {
 
-    $cpu = dbFetchCell("SELECT AVG(processor_usage) from processors WHERE device_id = ?", array($device_id));
-    $mem = dbFetchRows("SELECT mempool_descr, 
+    if (device_permitted($device_id)) {
+        $cpu = dbFetchCell("SELECT AVG(processor_usage) from processors WHERE device_id = ?", array($device_id));
+        $mem = dbFetchRows("SELECT mempool_descr, 
                                 ROUND(mempool_used / (1024*1024), 0) as used, 
                                 ROUND(mempool_total /(1024*1024), 0) as total 
                                 FROM mempools WHERE device_id = ?", array($device_id));
-    $disk = dbFetchRows("SELECT storage_descr, 
+        $disk = dbFetchRows("SELECT storage_descr, 
                                 ROUND(storage_used / (1024*1024), 0) as used, 
                                 ROUND(storage_size / (1024*1024), 0) as total 
                                 FROM storage WHERE device_id = ?", array($device_id));
-    $colno = 12/$column;
-    if (!$cpu) {
-        $cpu = 0;
-    }
+        $colno = 12 / $column;
+        if (!$cpu) {
+            $cpu = 0;
+        }
 
-    $common_output[] = '
-    <div class="col-sm-'.$colno.'">
+        $common_output[] = '
+    <div class="col-sm-' . $colno . '">
             <div id="cpu" ></div>
     </div>';
 
-    $i = 0;
-    foreach ($mem as $m) {
-        $common_output[] = '<div class="col-sm-'.$colno.'">
-                <div id="mem'.$i.'" ></div>
+        $i = 0;
+        foreach ($mem as $m) {
+            $common_output[] = '<div class="col-sm-' . $colno . '">
+                <div id="mem' . $i . '" ></div>
         </div>';
-        $mem_js_output .= "var memgauge".$i." = new JustGage({
-            id: 'mem".$i."',
-            value: ".$m['used'].",
+            $mem_js_output .= "var memgauge" . $i . " = new JustGage({
+            id: 'mem" . $i . "',
+            value: " . $m['used'] . ",
             min: 0,
-            max: ".$m['total'].",
+            max: " . $m['total'] . ",
             label: 'Mbytes',
             valueFontSize: '2px',
-            title: '".$m['mempool_descr']." Usage'
+            title: '" . $m['mempool_descr'] . " Usage'
         });\n";
-        $i++;
-    }
+            $i++;
+        }
 
-    $i = 0;
-    foreach ($disk as $d) {
-        $common_output[] = '<div class="col-sm-'.$colno.'">
-                <div id="disk'.$i.'" ></div>
+        $i = 0;
+        foreach ($disk as $d) {
+            $common_output[] = '<div class="col-sm-' . $colno . '">
+                <div id="disk' . $i . '" ></div>
         </div>';
-        $disk_js_output .= "var diskgauge".$i." = new JustGage({
-            id: 'disk".$i."',
-            value: ".$d['used'].",
+            $disk_js_output .= "var diskgauge" . $i . " = new JustGage({
+            id: 'disk" . $i . "',
+            value: " . $d['used'] . ",
             min: 0,
-            max: ".$d['total'].",
+            max: " . $d['total'] . ",
             label: 'Mbytes',
             valueFontSize: '2px',
-            title: '".substr($d['storage_descr'], 0, 20)." Usage'
+            title: '" . substr($d['storage_descr'], 0, 20) . " Usage'
         });\n";
-        $i++;
-    }
+            $i++;
+        }
 
-    $common_output[] = '<script src="js/raphael-min.js"></script>';
-    $common_output[] = '<script src="js/justgage.js"></script>';
-    $common_output[] = "<script>
+        $common_output[] = '<script src="js/raphael-min.js"></script>';
+        $common_output[] = '<script src="js/justgage.js"></script>';
+        $common_output[] = "<script>
     var cpugauge = new JustGage({
         id: 'cpu',
-        value: ".$cpu.", 
+        value: " . $cpu . ", 
         min: 0,
         max: 100,
         title: 'CPU Usage',
         symbol: '%'
     });\n";
-    $common_output[] = $mem_js_output;
-    $common_output[] = $disk_js_output;
-    $common_output[] = '</script>';
+        $common_output[] = $mem_js_output;
+        $common_output[] = $disk_js_output;
+        $common_output[] = '</script>';
+    } else {
+        $common_output[] = 'You do not have permission to view this device';
+    }
 }
