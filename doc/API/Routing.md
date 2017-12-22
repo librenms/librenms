@@ -108,3 +108,43 @@ Output:
 }
 ```
 > Please note, this will only show active VPN sessions not all configured.
+
+### `list_ospf`
+
+List the current OSPF neighbours.
+
+Route: `/api/v0/ospf`
+
+Input:
+
+  - hostname = Either the devices hostname or id.
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ospf
+```
+
+Output:
+```json
+{
+ "status": "ok",
+ "ospf_neighbours": [
+        {
+            "device_id": "1",
+            "port_id": "0",
+            "ospf_nbr_id": "172.16.1.145.0",
+            "ospfNbrIpAddr": "172.16.1.145",
+            "ospfNbrAddressLessIndex": "0",
+            "ospfNbrRtrId": "172.16.0.140",
+            "ospfNbrOptions": "82",
+            "ospfNbrPriority": "1",
+            "ospfNbrState": "full",
+            "ospfNbrEvents": "5",
+            "ospfNbrLsRetransQLen": "0",
+            "ospfNbmaNbrStatus": "active",
+            "ospfNbmaNbrPermanence": "dynamic",
+            "ospfNbrHelloSuppressed": "false",
+            "context_name": ""
+ ]
+}
+```
