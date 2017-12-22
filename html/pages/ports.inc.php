@@ -87,204 +87,204 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
     $output .= "<form method='post' action='' class='form-inline' role='form'>";
 
     $output .= "<div style='margin-bottom:4px;text-align:left;'>";
-        $output .= "<div class='form-group'>";
-        $output .= "<select name='device_id' id='device_id' class='form-control input-sm'>";
-        $output .= "<option value=''>All Devices</option>";
+    $output .= "<div class='form-group'>";
+    $output .= "<select name='device_id' id='device_id' class='form-control input-sm'>";
+    $output .= "<option value=''>All Devices</option>";
 
-        if ($_SESSION['userlevel'] >= 5) {
-            $results = dbFetchRows("SELECT `device_id`,`hostname`, `sysName` FROM `devices` ORDER BY `hostname`");
+    if ($_SESSION['userlevel'] >= 5) {
+        $results = dbFetchRows("SELECT `device_id`,`hostname`, `sysName` FROM `devices` ORDER BY `hostname`");
+    } else {
+        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` ORDER BY `hostname`", array($_SESSION['user_id']));
+    }
+    foreach ($results as $data) {
+        if ($data['device_id'] == $vars['device_id']) {
+            $deviceselected = "selected";
         } else {
-            $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` ORDER BY `hostname`", array($_SESSION['user_id']));
+            $deviceselected = "";
         }
-        foreach ($results as $data) {
-            if ($data['device_id'] == $vars['device_id']) {
-                $deviceselected = "selected";
+        $ui_device = strlen(format_hostname($data)) > 15 ? substr(format_hostname($data), 0, 15) . "..." : format_hostname($data);
+        $output .= "<option value='" . $data['device_id'] . "' " . $deviceselected . ">" . $ui_device . "</option>";
+    }
+
+    if ($_SESSION['userlevel'] < 5) {
+        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysName` FROM `ports` AS `I` JOIN `devices` AS `D` ON `D`.`device_id`=`I`.`device_id` JOIN `ports_perms` AS `PP` ON `PP`.`port_id`=`I`.`port_id` WHERE `PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` ORDER BY `hostname`", array($_SESSION['user_id']));
+    } else {
+        $results = array();
+    }
+
+    foreach ($results as $data) {
+        if ($data['device_id'] == $vars['device_id']) {
+            $deviceselected = "selected";
+        } else {
+            $deviceselected = "";
+        }
+        $output .= "<option value='" . $data['device_id'] . "' " . $deviceselected . ">" . format_hostname($data) . "</option>";
+    }
+
+    $output .= "</select>&nbsp;";
+
+    if (strlen($vars['hostname'])) {
+        $hasvalue = "value='" . $vars['hostname'] . "'";
+    } else {
+        $hasvalue = "";
+    }
+
+    $output .= "<input type='text' name='hostname' id='hostname' title='Hostname' class='form-control input-sm' " . $hasvalue . " placeholder='Hostname'>";
+
+    $output .= "</div>&nbsp;";
+
+    switch ($vars['state']) {
+        case "up":
+            $isup = "selected";
+            $isdown = "";
+            $admindown = "";
+            break;
+        case "down":
+            $isup = "";
+            $isdown = "selected";
+            $admindown = "";
+            break;
+        case "admindown":
+            $isup = "";
+            $isdown = "";
+            $admindown = "selected";
+            break;
+    }
+
+    $output .= "<div class='form-group'>";
+    $output .= "<select name='state' id='state' class='form-control input-sm'>";
+    $output .= "<option value=''>All States</option>";
+    $output .= "<option value='up' " . $isup . ">Up</option>";
+    $output .= "<option value='down' " . $isdown . ">Down</option>";
+    $output .= "<option value='admindown' " . $admindown . ">Shutdown</option>";
+    $output .= "</select>&nbsp;";
+
+    $output .= "<select name='fSpeed' id='ifSpeed' class='form-control input-sm'>";
+    $output .= "<option value=''>All Speeds</option>";
+
+    if (is_admin() === true || is_read() === true) {
+        $sql = "SELECT `ifSpeed` FROM `ports` GROUP BY `ifSpeed` ORDER BY `ifSpeed`";
+    } else {
+        $sql = "SELECT `ifSpeed` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `ifSpeed` ORDER BY `ifSpeed`";
+        $param[] = array($_SESSION['user_id'], $_SESSION['user_id']);
+    }
+
+    foreach (dbFetchRows($sql, $param) as $data) {
+        if ($data['ifSpeed']) {
+            if ($data['ifSpeed'] == $vars['ifSpeed']) {
+                $speedselected = "selected";
             } else {
-                $deviceselected = "";
+                $speedselected = "";
             }
-            $ui_device = strlen(format_hostname($data)) > 15 ? substr(format_hostname($data), 0, 15) . "..." : format_hostname($data);
-            $output .= "<option value='" . $data['device_id'] . "' " . $deviceselected . ">" . $ui_device . "</option>";
+            $output .= "<option value='" . $data['ifSpeed'] . "'" . $speedselected . ">" . humanspeed($data['ifSpeed']) . "</option>";
         }
+    }
 
-        if ($_SESSION['userlevel'] < 5) {
-            $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysName` FROM `ports` AS `I` JOIN `devices` AS `D` ON `D`.`device_id`=`I`.`device_id` JOIN `ports_perms` AS `PP` ON `PP`.`port_id`=`I`.`port_id` WHERE `PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` ORDER BY `hostname`", array($_SESSION['user_id']));
-        } else {
-            $results = array();
-        }
+    $output .= "</select>&nbsp;";
+    $output .= "</div>";
+    $output .= "<div class='form-group'>";
+    $output .= "<select name='ifType' id='ifType' class='form-control input-sm'>";
+    $output .= "<option value=''>All Media</option>";
 
-        foreach ($results as $data) {
-            if ($data['device_id'] == $vars['device_id']) {
-                $deviceselected = "selected";
+    if (is_admin() === true || is_read() === true) {
+        $sql = "SELECT `ifType` FROM `ports` GROUP BY `ifType` ORDER BY `ifType`";
+    } else {
+        $sql = "SELECT `ifType` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `ifType` ORDER BY `ifType`";
+        $param[] = array($_SESSION['user_id'], $_SESSION['user_id']);
+    }
+
+    foreach (dbFetchRows($sql, $param) as $data) {
+        if ($data['ifType']) {
+            if ($data['ifType'] == $vars['ifType']) {
+                $dataselected = "selected";
             } else {
-                $deviceselected = "";
+                $dataselected = "";
             }
-            $output .= "<option value='" . $data['device_id'] . "' " . $deviceselected . ">" . format_hostname($data) . "</option>";
+            $output .= "<option value='" . $data['ifType'] . "' " . $dataselected . ">" . $data['ifType'] . "</option>";
         }
+    }
 
-        $output .= "</select>&nbsp;";
+    $output .= "</select>&nbsp;";
+    $output .= "<select name='port_descr_type' id='port_descr_type' class='form-control input-sm'>";
+    $output .= "<option value=''>All Port Types</option>";
 
-        if (strlen($vars['hostname'])) {
-            $hasvalue = "value='" . $vars['hostname'] . "'";
-        } else {
-            $hasvalue = "";
-        }
+    if (is_admin() === true || is_read() === true) {
+        $sql = "SELECT `port_descr_type` FROM `ports` GROUP BY `port_descr_type` ORDER BY `port_descr_type`";
+    } else {
+        $sql = "SELECT `port_descr_type` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `port_descr_type` ORDER BY `port_descr_type`";
+        $param[] = array($_SESSION['user_id'], $_SESSION['user_id']);
+    }
+    $ports = dbFetchRows($sql, $param);
 
-        $output .= "<input type='text' name='hostname' id='hostname' title='Hostname' class='form-control input-sm' " . $hasvalue . " placeholder='Hostname'>";
-
-        $output .= "</div>&nbsp;";
-
-        switch ($vars['state']) {
-            case "up":
-                $isup = "selected";
-                $isdown = "";
-                $admindown = "";
-                break;
-            case "down":
-                $isup = "";
-                $isdown = "selected";
-                $admindown = "";
-                break;
-            case "admindown":
-                $isup = "";
-                $isdown = "";
-                $admindown = "selected";
-                break;
-        }
-
-        $output .= "<div class='form-group'>";
-        $output .= "<select name='state' id='state' class='form-control input-sm'>";
-        $output .= "<option value=''>All States</option>";
-        $output .= "<option value='up' " . $isup . ">Up</option>";
-        $output .= "<option value='down' " . $isdown . ">Down</option>";
-        $output .= "<option value='admindown' " . $admindown . ">Shutdown</option>";
-        $output .= "</select>&nbsp;";
-
-        $output .= "<select name='fSpeed' id='ifSpeed' class='form-control input-sm'>";
-        $output .= "<option value=''>All Speeds</option>";
-
-        if (is_admin() === true || is_read() === true) {
-            $sql = "SELECT `ifSpeed` FROM `ports` GROUP BY `ifSpeed` ORDER BY `ifSpeed`";
-        } else {
-            $sql = "SELECT `ifSpeed` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `ifSpeed` ORDER BY `ifSpeed`";
-            $param[] = array($_SESSION['user_id'], $_SESSION['user_id']);
-        }
-
-        foreach (dbFetchRows($sql, $param) as $data) {
-            if ($data['ifSpeed']) {
-                if ($data['ifSpeed'] == $vars['ifSpeed']) {
-                    $speedselected = "selected";
-                } else {
-                    $speedselected = "";
-                }
-                $output .= "<option value='" . $data['ifSpeed'] . "'" . $speedselected . ">" . humanspeed($data['ifSpeed']) . "</option>";
+    foreach ($ports as $data) {
+        if ($data['port_descr_type']) {
+            if ($data['port_descr_type'] == $vars['port_descr_type']) {
+                $portdescrib = "selected";
+            } else {
+                $portdescrib = "";
             }
+            $output .= "<option value='" . $data['port_descr_type'] . "' " . $portdescrib . ">" . ucfirst(display($data['port_descr_type'])) . "</option>";
         }
+    }
 
-        $output .= "</select>&nbsp;";
-        $output .= "</div>";
-        $output .= "<div class='form-group'>";
-        $output .= "<select name='ifType' id='ifType' class='form-control input-sm'>";
-        $output .= "<option value=''>All Media</option>";
+    $output .= "</select>&nbsp;";
+    $output .= "</div>";
+    $output .= "<div class='form-group'>";
 
-        if (is_admin() === true || is_read() === true) {
-            $sql = "SELECT `ifType` FROM `ports` GROUP BY `ifType` ORDER BY `ifType`";
-        } else {
-            $sql = "SELECT `ifType` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `ifType` ORDER BY `ifType`";
-            $param[] = array($_SESSION['user_id'], $_SESSION['user_id']);
-        }
+    if (strlen($vars['ifAlias'])) {
+        $ifaliasvalue = "value='" . $vars['ifAlias'] . "'";
+    }
 
-        foreach (dbFetchRows($sql, $param) as $data) {
-            if ($data['ifType']) {
-                if ($data['ifType'] == $vars['ifType']) {
-                    $dataselected = "selected";
-                } else {
-                    $dataselected = "";
-                }
-                $output .= "<option value='" . $data['ifType'] . "' " . $dataselected . ">" . $data['ifType'] . "</option>";
-            }
-        }
-
-        $output .= "</select>&nbsp;";
-        $output .= "<select name='port_descr_type' id='port_descr_type' class='form-control input-sm'>";
-        $output .= "<option value=''>All Port Types</option>";
-
-        if (is_admin() === true || is_read() === true) {
-            $sql = "SELECT `port_descr_type` FROM `ports` GROUP BY `port_descr_type` ORDER BY `port_descr_type`";
-        } else {
-            $sql = "SELECT `port_descr_type` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `port_descr_type` ORDER BY `port_descr_type`";
-            $param[] = array($_SESSION['user_id'], $_SESSION['user_id']);
-        }
-        $ports = dbFetchRows($sql, $param);
-
-        foreach ($ports as $data) {
-            if ($data['port_descr_type']) {
-                if ($data['port_descr_type'] == $vars['port_descr_type']) {
-                    $portdescrib = "selected";
-                } else {
-                    $portdescrib = "";
-                }
-                $output .= "<option value='" . $data['port_descr_type'] . "' " . $portdescrib . ">" . ucfirst(display($data['port_descr_type'])) . "</option>";
-            }
-        }
-
-        $output .= "</select>&nbsp;";
-        $output .= "</div>";
-        $output .= "<div class='form-group'>";
-
-        if (strlen($vars['ifAlias'])) {
-            $ifaliasvalue = "value='" . $vars['ifAlias'] . "'";
-        }
-
-        $output .= "</div>";
+    $output .= "</div>";
 
     $output .= "</div>";
     $output .= "<div style='text-align:left;'>";
 
-        $output .= "<input title='Port Description' type='text' name='ifAlias' id='ifAlias' class='form-control input-sm' " . $ifaliasvalue . " placeholder='Port Description'>&nbsp;";
-        $output .= "<select title='Location' name='location' id='location' class='form-control input-sm'>&nbsp;";
-        $output .= "<option value=''>All Locations</option>";
+    $output .= "<input title='Port Description' type='text' name='ifAlias' id='ifAlias' class='form-control input-sm' " . $ifaliasvalue . " placeholder='Port Description'>&nbsp;";
+    $output .= "<select title='Location' name='location' id='location' class='form-control input-sm'>&nbsp;";
+    $output .= "<option value=''>All Locations</option>";
 
-        foreach (getlocations() as $location) {
-            if ($location) {
-                if ($location == $vars['location']) {
-                    $locationselected = "selected";
-                } else {
-                    $locationselected = "";
-                }
-                $ui_location = strlen($location) > 15 ? substr($location, 0, 15) . "..." : $location;
-                $output .= "<option value='" . $location . "' " . $locationselected . ">" . $ui_location . "</option>";
+    foreach (getlocations() as $location) {
+        if ($location) {
+            if ($location == $vars['location']) {
+                $locationselected = "selected";
+            } else {
+                $locationselected = "";
             }
+            $ui_location = strlen($location) > 15 ? substr($location, 0, 15) . "..." : $location;
+            $output .= "<option value='" . $location . "' " . $locationselected . ">" . $ui_location . "</option>";
         }
+    }
 
-        $output .= "</select>&nbsp;";
+    $output .= "</select>&nbsp;";
 
-        if ($vars['ignore']) {
-            $ignorecheck = "checked";
-        } else {
-            $ignorecheck = "";
-        }
+    if ($vars['ignore']) {
+        $ignorecheck = "checked";
+    } else {
+        $ignorecheck = "";
+    }
 
-        if ($vars['disabled']) {
-            $disabledcheck = "checked";
-        } else {
-            $disabledcheck = "";
-        }
+    if ($vars['disabled']) {
+        $disabledcheck = "checked";
+    } else {
+        $disabledcheck = "";
+    }
 
-        if ($vars['deleted']) {
-            $deletedcheck = "checked";
-        } else {
-            $deletedcheck = "";
-        }
+    if ($vars['deleted']) {
+        $deletedcheck = "checked";
+    } else {
+        $deletedcheck = "";
+    }
 
-        $output .= "<label for='ignore'>Ignored</label>&nbsp;";
-        $output .= "<input type='checkbox' id='ignore' name='ignore' value='1' " . $ignorecheck . ">&nbsp;";
-        $output .= "<label for='disabled'>Disabled</label>&nbsp;";
-        $output .= "<input type='checkbox' id='disabled' name='disabled' value='1' " . $disabledcheck . ">&nbsp;";
-        $output .= "<label for='deleted'>Deleted</label>&nbsp;";
-        $output .= "<input type='checkbox' id='deleted' name='deleted' value='1' " . $deletedcheck . ">&nbsp;";
+    $output .= "<label for='ignore'>Ignored</label>&nbsp;";
+    $output .= "<input type='checkbox' id='ignore' name='ignore' value='1' " . $ignorecheck . ">&nbsp;";
+    $output .= "<label for='disabled'>Disabled</label>&nbsp;";
+    $output .= "<input type='checkbox' id='disabled' name='disabled' value='1' " . $disabledcheck . ">&nbsp;";
+    $output .= "<label for='deleted'>Deleted</label>&nbsp;";
+    $output .= "<input type='checkbox' id='deleted' name='deleted' value='1' " . $deletedcheck . ">&nbsp;";
 
-        $output .= "<button type='submit' class='btn btn-default btn-sm'>Search</button>&nbsp;";
-        $output .= "<a class='btn btn-default btn-sm' href='" . generate_url(array('page' => 'ports', 'section' => $vars['section'], 'bare' => $vars['bare'])) . "' title='Reset critera to default.'>Reset</a>";
+    $output .= "<button type='submit' class='btn btn-default btn-sm'>Search</button>&nbsp;";
+    $output .= "<a class='btn btn-default btn-sm' href='" . generate_url(array('page' => 'ports', 'section' => $vars['section'], 'bare' => $vars['bare'])) . "' title='Reset critera to default.'>Reset</a>";
 
     $output .= "</div>";
 
@@ -376,7 +376,7 @@ foreach ($vars as $var => $value) {
                 }
                 break;
             case 'purge':
-                if ($vars['purge'] == 'all') {
+                if ($vars['purge'] === 'all') {
                     $interfaces = dbFetchRows('SELECT * from `ports` AS P, `devices` AS D WHERE `deleted` = 1 AND D.device_id = P.device_id');
                     foreach ($interfaces as $interface) {
                         $interface = cleanPort($interface);
