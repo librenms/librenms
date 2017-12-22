@@ -78,16 +78,16 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
 
         $common_output[] = '
     <div class="col-sm-' . $colno . '">
-            <div id="cpu" ></div>
+            <div id="cpu-' . $unique_id . '" ></div>
     </div>';
 
         $i = 0;
         foreach ($mem as $m) {
             $common_output[] = '<div class="col-sm-' . $colno . '">
-                <div id="mem' . $i . '" ></div>
+                <div id="mem-' . $i . '-' . $unique_id . '" ></div>
         </div>';
             $mem_js_output .= "var memgauge" . $i . " = new JustGage({
-            id: 'mem" . $i . "',
+            id: 'mem-" . $i . "-" . $unique_id . "',
             value: " . $m['used'] . ",
             min: 0,
             max: " . $m['total'] . ",
@@ -101,10 +101,10 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         $i = 0;
         foreach ($disk as $d) {
             $common_output[] = '<div class="col-sm-' . $colno . '">
-                <div id="disk' . $i . '" ></div>
+                <div id="disk-' . $i . '-' . $unique_id . '" ></div>
         </div>';
             $disk_js_output .= "var diskgauge" . $i . " = new JustGage({
-            id: 'disk" . $i . "',
+            id: 'disk-" . $i . "-" . $unique_id . "',
             value: " . $d['used'] . ",
             min: 0,
             max: " . $d['total'] . ",
@@ -119,7 +119,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         $common_output[] = '<script src="js/justgage.js"></script>';
         $common_output[] = "<script>
     var cpugauge = new JustGage({
-        id: 'cpu',
+        id: 'cpu-" . $unique_id . "',
         value: " . $cpu . ", 
         min: 0,
         max: 100,
