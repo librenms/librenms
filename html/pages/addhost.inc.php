@@ -52,7 +52,7 @@ if ($hostname !== false) {
             );
         } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
             if ($_POST['community']) {
-                $config['snmp']['community'] = array(clean($_POST['community']));
+                $config['snmp']['community'] = array(clean($_POST['community'], false));
             }
 
             $snmpver = clean($_POST['snmpver']);
@@ -60,11 +60,11 @@ if ($hostname !== false) {
         } elseif ($_POST['snmpver'] === 'v3') {
             $v3 = array(
                    'authlevel'  => clean($_POST['authlevel']),
-                   'authname'   => clean($_POST['authname']),
-                   'authpass'   => clean($_POST['authpass']),
+                   'authname'   => clean($_POST['authname'], false),
+                   'authpass'   => clean($_POST['authpass'], false),
                    'authalgo'   => clean($_POST['authalgo']),
-                   'cryptopass' => clean($_POST['cryptopass']),
-                   'cryptoalgo' => clean($_POST['cryptoalgo']),
+                   'cryptopass' => clean($_POST['cryptopass'], false),
+                   'cryptoalgo' => clean($_POST['cryptoalgo'], false),
                   );
 
             array_push($config['snmp']['v3'], $v3);
