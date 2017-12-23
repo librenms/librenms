@@ -41,6 +41,7 @@ List of Widgets:
 ### Setting a global default dashboard
 
 Step 1: Set the dashboard to either shared read or shared, depending on what you want the users access to change. 
+
 Step 2: Then go to Settings -> WebUI settings -> Dashboard Settings and set the global default dashboard.
 
 ### Setting embeded webpage
