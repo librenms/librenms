@@ -159,9 +159,9 @@ modules:
                     oid: mtxrHlFanSpeed1
                     num_oid: .1.3.6.1.4.1.14988.1.1.3.17.
                     descr: 'Fan #1'
-                    index: 'mtxrHlFanSpeed1.{{ $index }}'
+                    index: '0'
                 -
                     oid: mtxrHlFanSpeed2
                     num_oid: .1.3.6.1.4.1.14988.1.1.3.18.
                     descr: 'Fan #2'
-                    index: 'mtxrHlFanSpeed2.{{ $index }}'
+                    index: '1'
