@@ -93,7 +93,7 @@ function logfile($string)
  * @param array $device device to check
  * @return string the name of the os
  */
-function getHostOS(&$device)
+function getHostOS($device)
 {
     $device['sysDescr']    = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
     $device['sysObjectId'] = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
@@ -152,8 +152,6 @@ function getHostOS(&$device)
  *
  * @param array $device
  * @param array $array Array of items, keys should be sysObjectId, sysDescr, or sysDescr_regex
- * @param string $sysObjectId The sysObjectId to check against
- * @param string $sysDescr the sysDesr to check against
  * @return bool the result (all items passed return true)
  */
 function checkDiscovery($device, $array)
