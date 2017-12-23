@@ -8,11 +8,20 @@ LibreNMS comes with a configurable Geo Map based on World Map Widget to visualiz
 World Map Widget, requires you to have properly formatted addresses in sysLocation or sysLocation override. As part of the standard poller these addresses will be Geocoded by Google and stored in the database. 
 
 Location resolution happens as follows
+
  1. If `device['location']` contains `[lat, lng]` (note the square brackets), that is used
  1. If there is a location overide for the device in the WebUI and it contains `[lat, lng]` (note the square brackets), that is used.
  1. Attempt to resolve lat, lng using `$config['geoloc']['engine']`
  1. Properly formatted addresses in sysLocation or sysLocation override, under device settings.
 
+Example:
+
+[40.424521, -86.912755]
+ 
+or
+ 
+1100 Congress Ave, Austin, TX 78701
+ 
 
 We have two current mapping engines available:
 
