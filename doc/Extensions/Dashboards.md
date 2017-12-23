@@ -21,8 +21,9 @@ LibreNMS has a whole list of Widgets to select from.
 + Graph: Can be used to display graphs from devices. 
 + Graylog: Displays all Graylog's syslog entries.
 + Notes: use for html tags, embed links and external web pages. Or just notes in general.
++ Server Stats: Will display gauges for CPU, Memory, Storage usage. For any device type listed as "Server".
 + Syslog: Displays all syslog entries.
-+ Top Devices: By Traffic, or  Uptime, or Response time, or Poller Duration, or Procssor load, or Memory Usage.
++ Top Devices: By Traffic, or  Uptime, or Response time, or Poller Duration, or Procssor load, or Memory Usage, or Storage Usage.
 + Top Interfaces: Lists top interfaces by traffic utilization.
 + Worldmap: displays all your devices locations. From syslocation or from override sysLocation.
 
