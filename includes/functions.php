@@ -93,12 +93,12 @@ function logfile($string)
  * @param array $device device to check
  * @return string the name of the os
  */
-function getHostOS($device)
+function getHostOS(&$device)
 {
-    $sysDescr    = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
-    $sysObjectId = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
+    $device['sysDescr']    = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
+    $device['sysObjectId'] = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
 
-    d_echo("| $sysDescr | $sysObjectId | \n");
+    d_echo("| {$device['sysDescr']} | {$device['sysObjectId']} | \n");
 
     $deferred_os = array(
         'freebsd',
@@ -110,7 +110,7 @@ function getHostOS($device)
     foreach ($os_defs as $os => $def) {
         if (isset($def['discovery']) && !in_array($os, $deferred_os)) {
             foreach ($def['discovery'] as $item) {
-                if (checkDiscovery($device, $item, $sysObjectId, $sysDescr)) {
+                if (checkDiscovery($device, $item)) {
                     return $os;
                 }
             }
@@ -131,7 +131,7 @@ function getHostOS($device)
     foreach ($deferred_os as $os) {
         if (isset($os_defs[$os]['discovery'])) {
             foreach ($os_defs[$os]['discovery'] as $item) {
-                if (checkDiscovery($device, $item, $sysObjectId, $sysDescr)) {
+                if (checkDiscovery($device, $item)) {
                     return $os;
                 }
             }
@@ -156,7 +156,7 @@ function getHostOS($device)
  * @param string $sysDescr the sysDesr to check against
  * @return bool the result (all items passed return true)
  */
-function checkDiscovery($device, $array, $sysObjectId, $sysDescr)
+function checkDiscovery($device, $array)
 {
     // all items must be true
     foreach ($array as $key => $value) {
@@ -165,19 +165,19 @@ function checkDiscovery($device, $array, $sysObjectId, $sysDescr)
         }
 
         if ($key == 'sysObjectId') {
-            if (starts_with($sysObjectId, $value) == $check) {
+            if (starts_with($device['sysObjectId'], $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysDescr') {
-            if (str_contains($sysDescr, $value) == $check) {
+            if (str_contains($device['sysDescr'], $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysDescr_regex') {
-            if (preg_match_any($sysDescr, $value) == $check) {
+            if (preg_match_any($device['sysDescr'], $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysObjectId_regex') {
-            if (preg_match_any($sysObjectId, $value) == $check) {
+            if (preg_match_any($device['sysObjectId'], $value) == $check) {
                 return false;
             }
         } elseif ($key == 'snmpget') {
