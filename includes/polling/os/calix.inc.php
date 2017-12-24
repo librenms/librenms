@@ -14,7 +14,7 @@
 
 
 
-if (strstr($sysObjectId, '.6321.1.2.3')) { // E5-1xx Series
+if (strstr($device['sysObjectID'], '.6321.1.2.3')) { // E5-1xx Series
     if (strpos($device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3.4') !== false) { // E5-121
         $version = snmp_get($device, 'iesSlotModuleFWVersion.0.0', '-Oqv', '+E5-121-IESCOMMON-MIB', 'calix');
         $hardware = snmp_get($device, 'iesSlotModuleDescr.0.0', '-Ovqs', '+E5-121-IESCOMMON-MIB', 'calix');

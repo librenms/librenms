@@ -96,9 +96,9 @@ function logfile($string)
 function getHostOS($device)
 {
     $device['sysDescr']    = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
-    $device['sysObjectId'] = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
+    $device['sysObjectID'] = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
 
-    d_echo("| {$device['sysDescr']} | {$device['sysObjectId']} | \n");
+    d_echo("| {$device['sysDescr']} | {$device['sysObjectID']} | \n");
 
     $deferred_os = array(
         'freebsd',
@@ -143,7 +143,7 @@ function getHostOS($device)
 
 /**
  * Check an array of conditions if all match, return true
- * sysObjectId if sysObjectId starts with any of the values under this item
+ * sysObjectID if sysObjectID starts with any of the values under this item
  * sysDescr if sysDescr contains any of the values under this item
  * sysDescr_regex if sysDescr matches any of the regexes under this item
  * snmpget perform an snmpget on `oid` and check if the result contains `value`. Other subkeys: options, mib, mibdir
@@ -151,7 +151,7 @@ function getHostOS($device)
  * Appending _except to any condition will invert the match.
  *
  * @param array $device
- * @param array $array Array of items, keys should be sysObjectId, sysDescr, or sysDescr_regex
+ * @param array $array Array of items, keys should be sysObjectID, sysDescr, or sysDescr_regex
  * @return bool the result (all items passed return true)
  */
 function checkDiscovery($device, $array)
@@ -162,8 +162,8 @@ function checkDiscovery($device, $array)
             $key = substr($key, 0, -7);
         }
 
-        if ($key == 'sysObjectId') {
-            if (starts_with($device['sysObjectId'], $value) == $check) {
+        if ($key == 'sysObjectID') {
+            if (starts_with($device['sysObjectID'], $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysDescr') {
@@ -174,8 +174,8 @@ function checkDiscovery($device, $array)
             if (preg_match_any($device['sysDescr'], $value) == $check) {
                 return false;
             }
-        } elseif ($key == 'sysObjectId_regex') {
-            if (preg_match_any($device['sysObjectId'], $value) == $check) {
+        } elseif ($key == 'sysObjectID_regex') {
+            if (preg_match_any($device['sysObjectID'], $value) == $check) {
                 return false;
             }
         } elseif ($key == 'snmpget') {
