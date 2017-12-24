@@ -207,7 +207,12 @@ function get_graph_generic_by_hostname()
     $vars['type'] = $router['type'] ?: 'device_uptime';
     if (isset($sensor_id)) {
         $vars['id']   = $sensor_id;
-        $vars['type'] = str_replace('device_', 'sensor_', $vars['type']);
+        if (str_contains($vars['type'], '_wireless')) {
+            $vars['type'] = str_replace('device_', '', $vars['type']);
+        } else {
+            // If this isn't a wireless graph we need to fix the name.
+            $vars['type'] = str_replace('device_', 'sensor_', $vars['type']);
+        }
     }
 
     // use hostname as device_id if it's all digits
@@ -743,6 +748,42 @@ function list_available_health_graphs()
     return api_success($graphs, 'graphs');
 }
 
+function list_available_wireless_graphs()
+{
+    $app      = \Slim\Slim::getInstance();
+    $router   = $app->router()->getCurrentRoute()->getParams();
+    $hostname = $router['hostname'];
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    check_device_permission($device_id);
+    if (isset($router['type'])) {
+        list(, , $type) = explode('_', $router['type']);
+    }
+    $sensor_id = $router['sensor_id'] ?: null;
+    $graphs    = array();
+
+    if (isset($type)) {
+        if (isset($sensor_id)) {
+            $graphs = dbFetchRows('SELECT * FROM `wireless_sensors` WHERE `sensor_id` = ?', array($sensor_id));
+        } else {
+            foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', array($device_id, $type)) as $graph) {
+                $graphs[] = array(
+                    'sensor_id' => $graph['sensor_id'],
+                    'desc'      => $graph['sensor_descr'],
+                );
+            }
+        }
+    } else {
+        foreach (dbFetchRows('SELECT `sensor_class` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', array($device_id)) as $graph) {
+            $graphs[] = array(
+                'desc' => ucfirst($graph['sensor_class']),
+                'name' => 'device_wireless_'.$graph['sensor_class'],
+            );
+        }
+    }
+
+    return api_success($graphs, 'graphs');
+}
+
 function get_port_graphs()
 {
     $app      = \Slim\Slim::getInstance();
@@ -1129,7 +1170,7 @@ function list_bills()
     $bill_ref = mres($_GET['ref']);
     $bill_custid = mres($_GET['custid']);
     $param = array();
-    $sql = '1';
+    
     if (!empty($bill_custid)) {
         $sql    .= '`bill_custid` = ?';
         $param[] = $bill_custid;
@@ -1139,6 +1180,8 @@ function list_bills()
     } elseif (is_numeric($bill_id)) {
         $sql    .= '`bill_id` = ?';
         $param[] = $bill_id;
+    } else {
+        $sql = '1';
     }
     if (!is_admin() && !is_read()) {
         $sql    .= ' AND `bill_id` IN (SELECT `bill_id` FROM `bill_perms` WHERE `user_id` = ?)';
@@ -1216,6 +1259,30 @@ function update_device()
         api_success_noresult(200, 'Device ' . mres($data['field']) . ' field has been updated');
     } else {
         api_error(500, 'Device ' . mres($data['field']) . ' field failed to be updated');
+    }
+}
+
+function rename_device()
+{
+    check_is_admin();
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $hostname = $router['hostname'];
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $new_hostname = $router['new_hostname'];
+    $new_device = getidbyname($new_hostname);
+
+    if (empty($new_hostname)) {
+        api_error(500, 'Missing new hostname');
+    } elseif ($new_device) {
+        api_error(500, 'Device failed to rename, new hostname already exists');
+    } else {
+        if (renamehost($device_id, $new_hostname, 'api') == '') {
+            api_success_noresult(200, 'Device has been renamed');
+        } else {
+            api_success_noresult(200, 'Device failed to be renamed');
+        }
     }
 }
 

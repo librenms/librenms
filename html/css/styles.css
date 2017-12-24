@@ -2180,3 +2180,17 @@ label {
 .severity-unknown {
   color: darkgrey;
 }
+
+.alert-status {
+  display: inline-block;
+  width: 7px;
+  min-height: 27px;
+}
+
+.service-status {
+    width:10px;
+    height:50px;
+    display: block;
+    margin: 0;
+    border-radius: 0;
+}

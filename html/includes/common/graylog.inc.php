@@ -20,17 +20,18 @@
 if (empty($results_limit)) {
     $results_limit = 25;
 }
-$tmp_output = '<h3>Graylog</h3>
+$tmp_output = '
 
 <div class="table-responsive">
     <table id="graylog" class="table table-hover table-condensed graylog">
         <thead>
             <tr>
-                <th data-column-id="timestamp" data-formatter="browserTime">Timestamp</th>
+                <th data-column-id="rowLabel"></th>
+                <th data-column-id="timestamp">Timestamp</th>
+                <th data-column-id="level">Level</th>
                 <th data-column-id="source">Source</th>
                 <th data-column-id="message">Message</th>
-                <th data-column-id="facility" data-visible="false">Facility</th>
-                <th data-column-id="level" data-visible="false">Level</th>
+                <th data-column-id="facility">Facility</th>
             </tr>
         </thead>
     </table>
@@ -112,7 +113,7 @@ $tmp_output .= '
         },
 ';
 
-if (isset($no_form) && $no_form !== true) {
+if (!isset($no_form) && $no_form !== true) {
     $tmp_output .= '
         templates: {
             header: searchbar

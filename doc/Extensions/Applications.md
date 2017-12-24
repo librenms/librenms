@@ -13,6 +13,7 @@ Different applications support a variety of ways to collect data: by direct conn
 1. [Fail2ban](#fail2ban) - SNMP extend
 1. [FreeBSD NFS Client](#freebsd-nfs-client) - SNMP extend
 1. [FreeBSD NFS Server](#freebsd-nfs-server) - SNMP extend
+1. [FreeRADIUS](#freeradius) - SNMP extend, Agent
 1. [Freeswitch](#freeswitch) - SNMP extend, Agent
 1. [GPSD](#gpsd) - Agent
 1. [Mailscanner](#mailscanner) - SNMP extend
@@ -258,32 +259,53 @@ extend fbsdnfsserver /etc/snmp/fbsdnfsserver
 4: Restart snmpd on your host
 
 
-### Mailscanner
+### FreeRADIUS
+The FreeRADIUS application extension requires that status_server be enabled in your FreeRADIUS config.  For more information see: https://wiki.freeradius.org/config/Status
+
+You should note that status requests increment the FreeRADIUS request stats.  So LibreNMS polls will ultimately be reflected in your stats/charts.
+
+1: Go to your FreeRADIUS configuration directory (usually /etc/raddb or /etc/freeradius).
+
+2: `cd sites-enabled`
+
+3: `ln -s ../sites-available/status status`
+
+4: Restart FreeRADIUS.
+
+5: You should be able to test with the radclient as follows...
+```
+echo "Message-Authenticator = 0x00, FreeRADIUS-Statistics-Type = 31, Response-Packet-Type = Access-Accept" | \
+radclient -x localhost:18121 status adminsecret
+```
+Note that adminsecret is the default secret key in status_server.  Change if you've modified this.
+
 ##### SNMP Extend
-1. Download the script onto the desired host (the host must be added to LibreNMS devices)
-```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mailscanner.php -O /etc/snmp/mailscanner.php
-```
 
-2. Make the script executable (chmod +x /etc/snmp/mailscanner.php)
-
-3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+1: Copy the freeradius shell script, to the desired host (the host must be added to LibreNMS devices)
 ```
-extend mailscanner /etc/snmp/mailscanner.php
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/freeradius.sh -O /etc/snmp/freeradius.sh
 ```
 
-4. Restart snmpd on your host
+2: Make the script executable (chmod +x /etc/snmp/freeradius.sh)
 
+3: If you've made any changes to the FreeRADIUS status_server config (secret key, port, etc.) edit freeradius.sh and adjust the config variable accordingly.
 
-### GPSD
-A small shell script that reports GPSD status.
+4: Edit your snmpd.conf file and add:
+```
+extend freeradius /etc/snmp/freeradius.sh
+```
+
+5: Restart snmpd on the host in question.
 
 ##### Agent
-[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `gpsd` script to `/usr/lib/check_mk_agent/local/`
 
-You may need to configure `$server` or `$port`.
+1: [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the script to `/usr/lib/check_mk_agent/local/freeradius.sh` via `wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/freeradius.sh -O /usr/lib/check_mk_agent/local/freeradius.sh`
 
-Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
+2: Run `chmod +x /usr/lib/check_mk_agent/local/freeradius.sh`
+
+3: If you've made any changes to the FreeRADIUS status_server config (secret key, port, etc.) edit freeradius.sh and adjust the config variable accordingly.
+
+4: Edit the freeradius.sh script and set the variable 'AGENT' to '1' in the config.
 
 
 ### Freeswitch
@@ -313,6 +335,34 @@ extend freeswitch /etc/snmp/freeswitch
 ```
 
 6. Restart snmpd on your host
+
+
+### GPSD
+A small shell script that reports GPSD status.
+
+##### Agent
+[Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `gpsd` script to `/usr/lib/check_mk_agent/local/`
+
+You may need to configure `$server` or `$port`.
+
+Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
+
+
+### Mailscanner
+##### SNMP Extend
+1. Download the script onto the desired host (the host must be added to LibreNMS devices)
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mailscanner.php -O /etc/snmp/mailscanner.php
+```
+
+2. Make the script executable (chmod +x /etc/snmp/mailscanner.php)
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend mailscanner /etc/snmp/mailscanner.php
+```
+
+4. Restart snmpd on your host
 
 
 ### Memcached

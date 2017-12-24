@@ -81,7 +81,48 @@ if (Config::get('autodiscovery.xdp') === true) {
     echo PHP_EOL;
 }//end if
 
-if (($device['os'] == 'pbn' || $device['os'] == 'bdcom') && Config::get('autodiscovery.xdp') === true) {
+if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) {
+    echo ' LLDP-MIB: ';
+    $lldp_array  = snmpwalk_group($device, 'lldpRemEntry', 'LLDP-MIB', 3);
+    if (!empty($lldp_array)) {
+        $lldp_ports = snmpwalk_group($device, 'mtxrInterfaceStatsName', 'MIKROTIK-MIB');
+        $lldp_ports_num = snmpwalk_group($device, 'mtxrNeighborInterfaceID', 'MIKROTIK-MIB');
+    
+
+        foreach ($lldp_array as $key => $lldp) {
+            $local_port_ifName = $lldp_ports[$lldp_ports_num[$key]['mtxrNeighborInterfaceID']]['mtxrInterfaceStatsName'];
+            $local_port_id = find_port_id($local_port_ifName, null, $device['device_id']);
+            $interface = get_port_by_id($local_port_id);
+            if ($lldp['lldpRemPortIdSubtype'] == 3) { // 3 = macaddress
+                $remote_port_mac = str_replace(array(' ', ':', '-'), '', strtolower($lldp['lldpRemPortId']));
+            }
+
+            $remote_device_id = find_device_id($lldp['lldpRemSysName'], $lldp['lldpRemManAddr'], $remote_port_mac);
+
+            if (!$remote_device_id &&
+                is_valid_hostname($lldp['lldpRemSysName']) &&
+                !can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'])) {
+                $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
+            }
+
+            if ($interface['port_id'] && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
+                $remote_port_id = find_port_id($lldp['lldpRemPortDesc'], $lldp['lldpRemPortId'], $remote_device_id);
+                discover_link(
+                    $interface['port_id'],
+                    'lldp',
+                    $remote_port_id,
+                    $lldp['lldpRemSysName'],
+                    $lldp['lldpRemPortId'],
+                    null,
+                    $lldp['lldpRemSysDesc'],
+                    $device['device_id'],
+                    $remote_device_id
+                );
+            }
+        }//end foreach
+    }
+    echo PHP_EOL;
+} elseif (($device['os'] == 'pbn' || $device['os'] == 'bdcom') && Config::get('autodiscovery.xdp') === true) {
     echo ' NMS-LLDP-MIB: ';
     $lldp_array  = snmpwalk_group($device, 'lldpRemoteSystemsData', 'NMS-LLDP-MIB');
 
@@ -243,8 +284,7 @@ foreach (dbFetchRows($sql, array($device['device_id'])) as $test) {
 }
 
 // remove orphaned links
-$del_result = dbQuery('DELETE `l` FROM `links` `l` LEFT JOIN `devices` `d` ON `d`.`device_id` = `l`.`local_device_id` WHERE `d`.`device_id` IS NULL');
-$deleted = mysqli_affected_rows($del_result);
+$deleted = (int)dbDeleteOrphans('links', array('devices.device_id.local_device_id'));
 echo str_repeat('-', $deleted);
 d_echo(" $deleted orphaned links deleted\n");
 
@@ -254,6 +294,5 @@ unset(
     $fdp_array,
     $cdp_array,
     $lldp_array,
-    $del_result,
     $deleted
 );

@@ -131,10 +131,6 @@ http_proxy=proxy.domain.com
 https_proxy=proxy.domain.com
 ```
 
-### Memcached
-
-[Memcached](../Extensions/Memcached.md)
-
 ### RRDCached
 
 [RRDCached](../Extensions/RRDCached.md)
@@ -314,6 +310,7 @@ You can increase this if you want to try and fit more of the hostname in graph t
 The default value is 12
 However, this can possibly break graph generation if this is very long.
 
+### Stacked Graphs
 You can enable stacked graphs instead of the default inverted graphs. 
 Enabling them is possible via webui Global Settings -> Webui Settings -> Graph settings -> Use stacked graphs
 

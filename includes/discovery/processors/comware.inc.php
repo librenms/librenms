@@ -22,7 +22,7 @@ if ($device['os'] == 'comware') {
                 $cur_oid = ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.$entity";
                 $cur_value = $procdata[$entity]['hh3cEntityExtCpuUsage'];
                 $descr = $value['entPhysicalName'];
-                discover_processor($valid['processor'], $device, $cur_oid, $entity, 'comware', $descr, '1', $cur_value);
+                discover_processor($valid['processor'], $device, $cur_oid, $entity, 'comware', $descr, '1', $cur_value, $entity);
             }
         }
     }

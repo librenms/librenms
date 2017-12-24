@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests;
 
-class FunctionsTest extends \PHPUnit_Framework_TestCase
+class FunctionsTest extends TestCase
 {
     public function testMacCleanToReadable()
     {

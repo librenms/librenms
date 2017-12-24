@@ -21,16 +21,17 @@ if ($device['os'] == 'powerconnect') {
     }
 
     echo 'DNOS CPU: ';
+//    mib-2.1.2.0 == sysObjectID
     $get_series = explode('.', snmp_get($device, 'mib-2.1.2.0', '-Onvsbq', 'F10-PRODUCTS-MIB', 'dnos'), 2); // Get series From MIB
     $series = $get_series[0];
     $descr = 'CPU';
 
-    if ($series == 'f10SSeriesProducts') {
+    if ($series == 'f10SSeriesProducts') { // .1.3.6.1.4.1.6027.1.3
         echo 'Dell S Series Chassis';
         $usage = trim(snmp_get($device, 'chStackUnitCpuUtil5Sec.1', '-OvQ', 'F10-S-SERIES-CHASSIS-MIB'));
 
         discover_processor($valid['processor'], $device, 'F10-S-SERIES-CHASSIS-MIB::chStackUnitCpuUtil5Sec.1', '0', 'dnos-cpu', '1', $usage, null, null);
-    } elseif ($series == 'f10CSeriesProducts') {
+    } elseif ($series == 'f10CSeriesProducts') { // .1.3.6.1.4.1.6027.1.2
         echo 'Dell C Series Chassis';
         $usage = trim(snmp_get($device, 'chLineCardCpuUtil5Sec.1', '-OvQ', 'F10-S-SERIES-CHASSIS-MIB'));
 

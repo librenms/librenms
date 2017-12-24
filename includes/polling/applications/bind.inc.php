@@ -15,7 +15,6 @@ if (!empty($agent_data['app'][$name])) {
     $oid     = 'nsExtendOutputFull.4.98.105.110.100';
     $bind    = snmp_get($device, $oid, $options, $mib);
 }
-update_application($app, $bind);
 
 list ($incoming, $outgoing, $server, $resolver, $cache, $rrsets, $adb, $sockets) = explode("\n", $bind);
 
@@ -26,6 +25,7 @@ list ($a, $aaaa, $afsdb, $apl, $caa, $cdnskey, $cds, $cert, $cname, $dhcid, $dlv
     $loc, $mx, $naptr, $ns, $nsec, $nsec3, $nsec3param, $ptr, $rrsig, $rp, $sig, $soa, $srv, $sshfp, $ta, $tkey, $tlsa,
     $tsig, $txt, $uri, $dname, $any, $axfr, $ixfr, $opt, $spf) = explode(',', $incoming);
 
+$metrics = array();
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
     ->addDataset('any', 'DERIVE', 0)
@@ -51,6 +51,7 @@ $fields = array(
     'srv'   => $srv,
     'spf'   => $spf,
 );
+$metrics['queries'] = $fields;
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
@@ -124,6 +125,7 @@ $fields = array(
     'ixfr' => $ixfr,
     'opt' => $opt,
 );
+$metrics['incoming'] = $fields;
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
@@ -224,6 +226,7 @@ $fields = array(
     'ixfr' => $ixfr,
     'opt' => $opt,
 );
+$metrics['outgoing'] = $fields;
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
@@ -283,6 +286,7 @@ $fields = array(
     'oeor' => $oeor,
     'qd' => $qd,
 );
+$metrics['server'] = $fields;
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
@@ -348,6 +352,7 @@ $fields = array(
     'bs' => $bs,
     'rr' => $rr,
 );
+$metrics['resolver'] = $fields;
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
@@ -391,6 +396,7 @@ $fields = array(
     'chmiu' => $chmiu,
     'chhmiu' => $chhmiu,
 );
+$metrics['cache'] = $fields;
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
@@ -413,6 +419,7 @@ $fields = array(
     'nhts' => $nhts,
     'niht' => $niht
 );
+$metrics['adb'] = $fields;
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
@@ -502,6 +509,7 @@ $fields = array(
     'ti6sa' => $ti6sa,
     'rsa' => $ti6sa,
 );
+$metrics['sockets'] = $fields;
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
@@ -610,6 +618,7 @@ $fields = array(
     'ixfr' => $ixfr,
     'opt' => $opt,
 );
+$metrics['rrpositive'] = $fields;
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
@@ -662,6 +671,8 @@ $fields = array(
     'ixfr' => $notixfr,
     'opt' => $notopt,
 );
+$metrics['rrnegative'] = $fields;
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
+update_application($app, $bind, $metrics);

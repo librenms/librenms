@@ -409,6 +409,10 @@ function sensor_low_limit($class, $current)
         case 'cooling':
             $limit = ($current * 0.95);
             break;
+        case 'delay':
+        case 'quality_factor':
+        case 'chromatic_dispersion':
+        case 'ber':
     }//end switch
 
     return $limit;
@@ -982,8 +986,8 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
             foreach ($raw_data as $index => $snmp_data) {
                 $user_function = null;
-                if (isset($data['user_function'])) {
-                    $user_function = $data['user_function'];
+                if (isset($data['user_func'])) {
+                    $user_function = $data['user_func'];
                 }
                 // get the value for this sensor, check 'value' and 'oid', if state string, translate to a number
                 $data_name = isset($data['value']) ? $data['value'] : $data['oid'];  // fallback to oid if value is not set

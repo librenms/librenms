@@ -136,7 +136,7 @@ applications:
 application_metrics:
   Columns:
     - { Field: app_id, Type: int(11), 'Null': false, Extra: '' }
-    - { Field: metric, Type: varchar(18), 'Null': false, Extra: '' }
+    - { Field: metric, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: value, Type: int(11), 'Null': true, Extra: '' }
     - { Field: value_prev, Type: int(11), 'Null': true, Extra: '' }
   Indexes:
@@ -525,6 +525,13 @@ device_perf:
   Indexes:
     id: { Name: id, Columns: [id], Unique: false, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+device_relationships:
+  Columns:
+    - { Field: parent_device_id, Type: 'int(11) unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: child_device_id, Type: 'int(11) unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [parent_device_id, child_device_id], Unique: true, Type: BTREE }
+    device_relationship_child_device_id_fk: { Name: device_relationship_child_device_id_fk, Columns: [child_device_id], Unique: false, Type: BTREE }
 entityState:
   Columns:
     - { Field: entity_state_id, Type: int(11), 'Null': false, Extra: auto_increment }
@@ -1264,7 +1271,7 @@ processes:
     - { Field: rss, Type: int(255), 'Null': false, Extra: '' }
     - { Field: cputime, Type: varchar(12), 'Null': false, Extra: '' }
     - { Field: user, Type: varchar(50), 'Null': false, Extra: '' }
-    - { Field: command, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: command, Type: text, 'Null': false, Extra: '' }
   Indexes:
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
 processors:
@@ -1342,10 +1349,10 @@ sensors:
     - { Field: device_id, Type: 'int(11) unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: poller_type, Type: varchar(16), 'Null': false, Extra: '', Default: snmp }
     - { Field: sensor_oid, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: sensor_index, Type: varchar(64), 'Null': true, Extra: '' }
+    - { Field: sensor_index, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: sensor_type, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: sensor_descr, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: sensor_divisor, Type: int(11), 'Null': false, Extra: '', Default: '1' }
+    - { Field: sensor_divisor, Type: bigint(20), 'Null': false, Extra: '', Default: '1' }
     - { Field: sensor_multiplier, Type: int(11), 'Null': false, Extra: '', Default: '1' }
     - { Field: sensor_current, Type: float, 'Null': true, Extra: '' }
     - { Field: sensor_limit, Type: float, 'Null': true, Extra: '' }

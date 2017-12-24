@@ -90,6 +90,9 @@ function nicecase($item)
         case 'os-updates':
             return 'OS Updates';
 
+        case 'smart':
+            return 'SMART';
+
         case 'powerdns-recursor':
             return 'PowerDNS Recursor';
 
@@ -125,6 +128,9 @@ function nicecase($item)
 
         case 'pi-hole':
             return 'Pi-hole';
+            
+        case 'freeradius':
+            return 'FreeRADIUS';
 
         default:
             return ucfirst($item);
@@ -592,13 +598,13 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
     }
 
     $output = '
-        <div style="width:'.$width.'px; height:'.$height.'px;">
+        <div style="width:'.$width.'px; height:'.$height.'px; position: relative;">
         <div class="progress" style="min-width: 2em; background-color:#'.$right_background.'; height:'.$height.'px;margin-bottom:-'.$height.'px;">
         <div class="progress-bar" role="progressbar" aria-valuenow="'.$size_percent.'" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:'.$size_percent.'%; background-color: #'.$left_background.';">
         </div>
         </div>
-        <b class="pull-left" style="padding-left: 4px; height: '.$height.'px;color:#'.$left_colour.';">'.$left_text.'</b>
-        <b class="pull-right" style="padding-right: 4px; height: '.$height.'px;color:#'.$right_colour.';">'.$right_text.'</b>
+        <b style="padding-left: 10%; position: absolute; top: 0px; left: 0px;color:#'.$left_colour.';">'.$left_text.'</b>
+        <b style="padding-right: 10%; position: absolute; top: 0px; right: 0px;color:#'.$right_colour.';">'.$right_text.'</b>
         </div>
         ';
 
@@ -1435,17 +1441,17 @@ function eventlog_severity($eventlog_severity)
 {
     switch ($eventlog_severity) {
         case 1:
-            return "severity-ok"; //OK
+            return "label-success"; //OK
         case 2:
-            return "severity-info"; //Informational
+            return "label-info"; //Informational
         case 3:
-            return "severity-notice"; //Notice
+            return "label-primary"; //Notice
         case 4:
-            return "severity-warning"; //Warning
+            return "label-warning"; //Warning
         case 5:
-            return "severity-critical"; //Critical
+            return "label-danger"; //Critical
         default:
-            return "severity-unknown"; //Unknown
+            return "label-default"; //Unknown
     }
 } // end eventlog_severity
 

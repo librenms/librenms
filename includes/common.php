@@ -20,22 +20,22 @@ use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
-function generate_priority_icon($priority)
+function generate_priority_label($priority)
 {
     $map = array(
-        "emerg"     => "fa-plus-circle text-danger",
-        "alert"     => "fa-ban text-danger",
-        "crit"      => "fa-minus-circle text-danger",
-        "err"       => "fa-times-circle text-warning",
-        "warning"   => "fa-exclamation-triangle text-warning",
-        "notice"    => "fa-info-circle text-info",
-        "info"      => "fa-info-circle text-info",
-        "debug"     => "fa-bug text-muted",
-        ""          => "fa-info-circle text-info",
+        "emerg"     => "label-danger",
+        "alert"     => "label-danger",
+        "crit"      => "label-danger",
+        "err"       => "label-danger",
+        "warning"   => "label-warning",
+        "notice"    => "label-info",
+        "info"      => "label-info",
+        "debug"     => "label-default",
+        ""          => "label-info",
     );
 
-    $fa_icon = isset($map[$priority]) ? $map[$priority] : 'fa-info-circle text-info';
-    return '<i class="fa '. $fa_icon.' fa-lg" title="'.$priority.'" aria-hidden="true"></i>';
+    $barColor = isset($map[$priority]) ? $map[$priority] : 'label-info';
+    return '<span class="alert-status '.$barColor .'">&nbsp;</span>';
 }
 
 function generate_priority_status($priority)
@@ -53,6 +53,23 @@ function generate_priority_status($priority)
     );
 
     return isset($map[$priority]) ? $map[$priority] : 0;
+}
+
+function graylog_severity_label($severity)
+{
+    $map = array(
+        "0" => "label-danger",
+        "1" => "label-danger",
+        "2" => "label-danger",
+        "3" => "label-danger",
+        "4" => "label-warning",
+        "5" => "label-info",
+        "6" => "label-info",
+        "7" => "label-default",
+        ""  => "label-info",
+    );
+    $barColor = isset($map[$severity]) ? $map[$severity] : 'label-info';
+    return '<span class="alert-status '.$barColor .'">&nbsp;</span>';
 }
 
 function external_exec($command)
@@ -335,7 +352,7 @@ function accesspoint_by_id($ap_id, $refresh = '0')
 }
 
 
-function device_by_id_cache($device_id, $refresh = '0')
+function device_by_id_cache($device_id, $refresh = false)
 {
     global $cache;
 
@@ -572,7 +589,7 @@ function format_si($value, $round = '2', $sf = '3')
             $ext  = $sizes[$i];
         }
     } else {
-        $sizes = array('', 'm', 'u', 'n');
+        $sizes = array('', 'm', 'u', 'n', 'p');
         $ext = $sizes[0];
         for ($i = 1; (($i < count($sizes)) && ($value != 0) && ($value <= 0.1)); $i++) {
             $value = $value * 1000;
@@ -1182,30 +1199,11 @@ function format_hostname($device, $hostname = '')
 
 /**
  * Return valid port association modes
- * @param bool $no_cache No-Cache flag (optional, default false)
  * @return array
  */
-function get_port_assoc_modes($no_cache = false)
+function get_port_assoc_modes()
 {
-    global $config;
-
-    if ($config['memcached']['enable'] && $no_cache === false) {
-        $assoc_modes = $config['memcached']['resource']->get(hash('sha512', "port_assoc_modes"));
-        if (! empty($assoc_modes)) {
-            return $assoc_modes;
-        }
-    }
-
-    $assoc_modes = null;
-    foreach (dbFetchRows("SELECT `name` FROM `port_association_mode` ORDER BY pom_id") as $row) {
-        $assoc_modes[] = $row['name'];
-    }
-
-    if ($config['memcached']['enable'] && $no_cache === false) {
-        $config['memcached']['resource']->set(hash('sha512', "port_assoc_modes"), $assoc_modes, $config['memcached']['ttl']);
-    }
-
-    return $assoc_modes;
+    return dbFetchColumn("SELECT `name` FROM `port_association_mode` ORDER BY pom_id");
 }
 
 /**
@@ -1221,58 +1219,21 @@ function is_valid_port_assoc_mode($port_assoc_mode)
 /**
  * Get DB id of given port association mode name
  * @param string $port_assoc_mode
- * @param bool $no_cache No-Cache flag (optional, default false)
+ * @return int
  */
-function get_port_assoc_mode_id($port_assoc_mode, $no_cache = false)
+function get_port_assoc_mode_id($port_assoc_mode)
 {
-    global $config;
-
-    if ($config['memcached']['enable'] && $no_cache === false) {
-        $id = $config['memcached']['resource']->get(hash('sha512', "port_assoc_mode_id|$port_assoc_mode"));
-        if (! empty($id)) {
-            return $id;
-        }
-    }
-
-    $id = null;
-    $row = dbFetchRow("SELECT `pom_id` FROM `port_association_mode` WHERE name = ?", array ($port_assoc_mode));
-    if ($row) {
-        $id = $row['pom_id'];
-        if ($config['memcached']['enable'] && $no_cache === false) {
-            $config['memcached']['resource']->set(hash('sha512', "port_assoc_mode_id|$port_assoc_mode"), $id, $config['memcached']['ttl']);
-        }
-    }
-
-    return $id;
+    return (int)dbFetchCell("SELECT `pom_id` FROM `port_association_mode` WHERE name = ?", array ($port_assoc_mode));
 }
 
 /**
  * Get name of given port association_mode ID
  * @param int $port_assoc_mode_id Port association mode ID
- * @param bool $no_cache No-Cache flag (optional, default false)
  * @return bool
  */
-function get_port_assoc_mode_name($port_assoc_mode_id, $no_cache = false)
+function get_port_assoc_mode_name($port_assoc_mode_id)
 {
-    global $config;
-
-    if ($config['memcached']['enable'] && $no_cache === false) {
-        $name = $config['memcached']['resource']->get(hash('sha512', "port_assoc_mode_name|$port_assoc_mode_id"));
-        if (! empty($name)) {
-            return $name;
-        }
-    }
-
-    $name = null;
-    $row = dbFetchRow("SELECT `name` FROM `port_association_mode` WHERE pom_id = ?", array ($port_assoc_mode_id));
-    if ($row) {
-        $name = $row['name'];
-        if ($config['memcached']['enable'] && $no_cache === false) {
-            $config['memcached']['resource']->set(hash('sha512', "port_assoc_mode_name|$port_assoc_mode_id"), $name, $config['memcached']['ttl']);
-        }
-    }
-
-    return $name;
+    return dbFetchCell("SELECT `name` FROM `port_association_mode` WHERE pom_id = ?", array ($port_assoc_mode_id));
 }
 
 /**
@@ -1372,12 +1333,16 @@ function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array()
         foreach ($tables as $table) {
             if ($table == 'state_translations' && ($target == 'device_id' || $target == 'sensor_id')) {
                 // workaround for state_translations
-                $st_tables = array(
+                return array_merge($last, array(
                     'state_translations.state_index_id',
                     'sensors_to_state_indexes.sensor_id',
                     "sensors.$target",
-                );
-                return array_merge($last, $st_tables);
+                ));
+            } elseif ($table == 'application_metrics' && $target = 'device_id') {
+                return array_merge($last, array(
+                    'application_metrics.app_id',
+                    "applications.$target",
+                ));
             }
 
             $glues = dbFetchRows('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME LIKE "%\_id"', array($table));

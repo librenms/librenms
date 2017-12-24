@@ -111,6 +111,12 @@ class ValidationResult
 
     public function setList($description, array $list)
     {
+        if (is_array(current($list))) {
+            $list = array_map(function ($item) {
+                return implode(' ', $item);
+            }, $list);
+        }
+
         $this->list_description = $description;
         $this->list = $list;
         return $this;
@@ -180,12 +186,6 @@ class ValidationResult
      */
     private function printList($format = "\t %s\n", $max = 15)
     {
-        if (is_array(current($this->list))) {
-            $this->list = array_map(function ($item) {
-                return implode(' ', $item);
-            }, $this->list);
-        }
-
         foreach (array_slice($this->list, 0, $max) as $item) {
             printf($format, $item);
         }

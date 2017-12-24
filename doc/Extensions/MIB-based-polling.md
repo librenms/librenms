@@ -1,7 +1,7 @@
 source: Extensions/MIB-based-polling.md
 ## WARNING ##
 
-MIB-based polling is experimental.  It might overload your LibreNMS server,
+MIB-based polling is unmaintained and may be removed in the future.  It might overload your LibreNMS server,
 destroy your data, set your routers on fire, and kick your cat.  It has been
 tested against a very limited set of devices (namely Ruckus ZD1000 wireless
 controllers, and `net-snmp` on Linux).  It may fail badly on other hardware.

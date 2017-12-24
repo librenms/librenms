@@ -592,7 +592,7 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array())
 
     $line = strtok($data, "\n");
     while ($line !== false) {
-        if (str_contains($line, 'at this OID')) {
+        if (str_contains($line, 'at this OID')||str_contains($line, 'this MIB View')) {
             $line = strtok("\n");
             continue;
         }
@@ -601,11 +601,6 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array())
         preg_match_all('/([^[\]]+)/', $address, $parts);
         $parts = $parts[1];
         array_splice($parts, $depth, 0, array_shift($parts)); // move the oid name to the correct depth
-
-        // some tables don't use entries so they end with .0
-        if (end($parts) == '.0') {
-            array_pop($parts);
-        }
 
         $line = strtok("\n"); // get the next line and concatenate multi-line values
         while ($line !== false && !str_contains($line, '=')) {

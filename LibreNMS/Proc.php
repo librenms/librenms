@@ -189,10 +189,11 @@ class Proc
      * Please attempt to run close() instead of this
      * This will be called when this object is destroyed if the process is still running
      *
+     * @param int $timeout how many microseconds to wait before terminating (SIGKILL)
      * @param int $signal the signal to send
      * @throws Exception
      */
-    public function terminate($signal = 15)
+    public function terminate($timeout = 3000, $signal = 15)
     {
         $status = $this->getStatus();
 
@@ -200,11 +201,23 @@ class Proc
 
         $closed = proc_terminate($this->_process, $signal);
 
+        $time = 0;
+        while ($time < $timeout) {
+            $closed = !$this->isRunning();
+            if ($closed) {
+                break;
+            }
+
+            usleep(100);
+            $time += 100;
+        }
+
         if (!$closed) {
             // try harder
-            $killed = false;
             if (function_exists('posix_kill')) {
                 $killed = posix_kill($status['pid'], 9); //9 is the SIGKILL signal
+            } else {
+                $killed = proc_terminate($this->_process, 9);
             }
             proc_close($this->_process);
 

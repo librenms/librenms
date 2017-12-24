@@ -33,7 +33,7 @@ if (!empty($entityStatesIndexes)) {
     echo "\nEntity States: ";
 
     // index by entPhysicalIndex
-    $entityStatesIndexes = array_combine(array_column($entityStatesIndexes, 'entPhysicalIndex'), $entityStatesIndexes);
+    $entityStatesIndexes = array_by_column($entityStatesIndexes, 'entPhysicalIndex');
 
     $entLC = snmpwalk_group($device, 'entStateLastChanged', 'ENTITY-STATE-MIB', 0);
 
