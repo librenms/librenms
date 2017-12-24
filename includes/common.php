@@ -55,6 +55,23 @@ function generate_priority_status($priority)
     return isset($map[$priority]) ? $map[$priority] : 0;
 }
 
+function graylog_severity_label($severity)
+{
+    $map = array(
+        "0" => "label-danger",
+        "1" => "label-danger",
+        "2" => "label-danger",
+        "3" => "label-danger",
+        "4" => "label-warning",
+        "5" => "label-info",
+        "6" => "label-info",
+        "7" => "label-default",
+        ""  => "label-info",
+    );
+    $barColor = isset($map[$severity]) ? $map[$severity] : 'label-info';
+    return '<span class="alert-status '.$barColor .'">&nbsp;</span>';
+}
+
 function external_exec($command)
 {
     global $debug,$vdebug;
