@@ -16,5 +16,5 @@ discovery:
           oid: extrahopInfoVersionString
           mib: EXTRAHOP-MIB
           mib_dir: extrahop
-          op: '!=='
+          op: '!='
           value: false

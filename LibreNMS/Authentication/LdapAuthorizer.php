@@ -149,7 +149,7 @@ class LdapAuthorizer extends AuthorizerBase
                     $email = $entry[Config::get('auth_ldap_emailattr', 'mail')][0];
                     $ldap_groups = $this->getGroupList();
                     foreach ($ldap_groups as $ldap_group) {
-                        $ldap_comparison = $this->ldap_compare(
+                        $ldap_comparison = ldap_compare(
                             $connection,
                             $ldap_group,
                             Config::get('auth_ldap_groupmemberattr', 'memberUid'),
@@ -177,6 +177,7 @@ class LdapAuthorizer extends AuthorizerBase
     {
         foreach ($this->getUserlist() as $user) {
             if ($user['user_id'] === $user_id) {
+                $user['level'] = $this->getUserlevel($user['username']);
                 return $user;
             }
         }
@@ -247,6 +248,10 @@ class LdapAuthorizer extends AuthorizerBase
 
         if ($this->ldap_connection) {
             return $this->ldap_connection; // bind already attempted
+        }
+
+        if (!function_exists('ldap_connect')) {
+            throw new AuthenticationException("PHP does not support LDAP, please install or enable the PHP LDAP extension.");
         }
 
         $this->ldap_connection = @ldap_connect(Config::get('auth_ldap_server'), Config::get('auth_ldap_port', 389));

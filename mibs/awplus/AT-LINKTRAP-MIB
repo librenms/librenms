@@ -1,0 +1,57 @@
+--  ============================================================================
+-- AT-LINKTRAP.MIB, Allied Telesis enterprise MIB: Link UP/DOWN Trap
+--
+-- Copyright (c) 2014 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-LINKTRAP-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            sysinfo
+                FROM AT-SMI-MIB
+            Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            ifIndex, ifAdminStatus, ifOperStatus, ifDescr
+              FROM IF-MIB
+            DisplayString
+                FROM SNMPv2-TC;
+
+        atLinkTrap MODULE-IDENTITY
+            LAST-UPDATED "201404040000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc."
+            CONTACT-INFO
+                "  http://www.alliedtelesis.com"
+            DESCRIPTION
+                "The AT-LINKTRAP MIB contains objects for link
+                up and down traps."
+            REVISION "201404040000Z"
+            DESCRIPTION
+                "Initial version."
+            ::= { sysinfo 25 }
+
+--
+-- Node definitions
+--
+        atLinkDown NOTIFICATION-TYPE
+            OBJECTS { ifIndex, ifAdminStatus, ifOperStatus, ifDescr }
+            STATUS current
+            DESCRIPTION
+                "A trap generated when an interface is linked down."
+            ::= { atLinkTrap 1 }
+
+        atLinkUp NOTIFICATION-TYPE
+            OBJECTS { ifIndex, ifAdminStatus, ifOperStatus, ifDescr }
+            STATUS current
+            DESCRIPTION
+                "A trap generated when an interface is linked up."
+            ::= { atLinkTrap 2 }
+
+
+    END
+
+--
+-- at-linktrap.mib
+--

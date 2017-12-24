@@ -3,6 +3,16 @@ if ($_POST['editing']) {
     if ($_SESSION['userlevel'] > "7") {
         $updated = 0;
 
+        if (isset($_POST['parent_id'])) {
+            $parent_id = $_POST['parent_id'];
+            $res = dbDelete('device_relationships', '`child_device_id` = ?', array($device['device_id']));
+            if (!in_array('0', $pr)) {
+                foreach ($parent_id as $pr) {
+                    dbInsert(array('parent_device_id' => $pr, 'child_device_id' => $device['device_id']), 'device_relationships');
+                }
+            }
+        }
+
         $override_sysLocation_bool = mres($_POST['override_sysLocation']);
         if (isset($_POST['sysLocation'])) {
             $override_sysLocation_string = $_POST['sysLocation'];
@@ -145,33 +155,72 @@ if ($updated && $update_message) {
 <div class="form-group">
     <label for="sysLocation" class="col-sm-2 control-label">Override sysLocation:</label>
     <div class="col-sm-6">
-      <input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked" type="checkbox" name="override_sysLocation"<?php if ($override_sysLocation) {
-            echo(' checked="1"');
-} ?> />
+      <input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked" type="checkbox" name="override_sysLocation"
+            <?php
+            if ($override_sysLocation) {
+                echo(' checked="1"');
+            }
+            ?> />
     </div>
 </div>
 <div class="form-group">
     <div class="col-sm-2"></div>
     <div class="col-sm-6">
-      <input id="sysLocation" name="sysLocation" class="form-control" <?php if (!$override_sysLocation) {
-            echo(' disabled="1"');
-} ?> value="<?php echo($override_sysLocation_string); ?>" />
+      <input id="sysLocation" name="sysLocation" class="form-control"
+            <?php
+            if (!$override_sysLocation) {
+                echo(' disabled="1"');
+            }
+            ?> value="<?php echo($override_sysLocation_string); ?>" />
+    </div>
+</div>
+<div class="form-group">
+    <label for="parent_id" class="col-sm-2 control-label">This device depends on:</label>
+    <div class="col-sm-6">
+        <select multiple name="parent_id[]" id="parent_id" class="form-control">
+            <?php
+            $dev_parents = dbFetchColumn('SELECT device_id from devices WHERE device_id IN (SELECT dr.parent_device_id from devices as d, device_relationships as dr WHERE d.device_id = dr.child_device_id AND d.device_id = ?)', array($device['device_id']));
+            if (!$dev_parents) {
+                $selected = 'selected="selected"';
+            } else {
+                $selected = '';
+            }
+            ?>
+            <option value="0" <?=$selected?>>None</option>
+            <?php
+            $available_devs = dbFetchRows('SELECT `device_id`,`hostname` FROM `devices` WHERE `device_id` <> ? ORDER BY `hostname` ASC', array($device['device_id']));
+            foreach ($available_devs as $dev) {
+                if (in_array($dev['device_id'], $dev_parents)) {
+                    $selected = 'selected="selected"';
+                } else {
+                    $selected = '';
+                }
+                echo "<option value=".$dev['device_id']." ".$selected.">".$dev['hostname']."</option>";
+            }
+            ?>
+        </select>
     </div>
 </div>
 <div class="form-group">
     <label for="disabled" class="col-sm-2 control-label">Disable:</label>
     <div class="col-sm-6">
-      <input name="disabled" type="checkbox" id="disabled" value="1" <?php if ($device["disabled"]) {
-            echo("checked=checked");
-} ?> />
+      <input name="disabled" type="checkbox" id="disabled" value="1"
+            <?php
+            if ($device["disabled"]) {
+                echo("checked=checked");
+            }
+            ?> />
     </div>
 </div>
 <div class="form-group">
     <label for="ignore" class="col-sm-2 control-label">Ignore</label>
     <div class="col-sm-6">
-       <input name="ignore" type="checkbox" id="ignore" value="1" <?php if ($device['ignore']) {
-            echo("checked=checked");
-} ?> />
+       <input name="ignore" type="checkbox" id="ignore" value="1"
+            <?php
+            if ($device['ignore']) {
+                echo("checked=checked");
+            }
+            ?> />
     </div>
 </div>
 <div class="row">
@@ -209,6 +258,10 @@ if ($updated && $update_message) {
         } else {
             document.getElementById('edit-hostname-input').disabled = true;
         }
+    });
+    $('#parent_id').select2({
+        width: 'resolve',
+        tags: true,
     });
 </script>
 <?php

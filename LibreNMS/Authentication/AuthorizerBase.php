@@ -33,6 +33,7 @@ abstract class AuthorizerBase implements Authorizer
 {
     protected static $HAS_AUTH_USERMANAGEMENT = 0;
     protected static $CAN_UPDATE_USER = 0;
+    protected static $AUTH_IS_EXTERNAL = 0;
 
     /**
      * Log out the user, unset cookies, destroy the session
@@ -143,7 +144,7 @@ abstract class AuthorizerBase implements Authorizer
             $db_entry['session_token'] = $token;
             $db_entry['session_auth'] = $auth;
             dbInsert($db_entry, 'session');
-        }\
+        }
 
         setcookie('sess_id', $sess_id, $expiration, '/', null, Config::get('secure_cookies'), true);
         setcookie('token', $token_id, $expiration, '/', null, Config::get('secure_cookies'), true);
@@ -164,8 +165,7 @@ abstract class AuthorizerBase implements Authorizer
         list($uname, $hash) = explode('|', $token);
         $session = dbFetchRow(
             "SELECT * FROM `session` WHERE `session_username`=? AND `session_value`=?",
-            array($uname, $sess_id),
-            true
+            array($uname, $sess_id)
         );
 
         $hasher = new PasswordHash(8, false);
@@ -200,9 +200,6 @@ abstract class AuthorizerBase implements Authorizer
         setcookie('auth', '', $time, '/', null, Config::get('secure_cookies'));
     }
 
-
-    abstract public function authenticate($username, $password);
-
     public function reauthenticate($sess_id, $token)
     {
         //not supported by default
@@ -231,21 +228,11 @@ abstract class AuthorizerBase implements Authorizer
         return 0;
     }
 
-    abstract public function userExists($username, $throw_exception = false);
-
-    abstract public function getUserlevel($username);
-
-    abstract public function getUserid($username);
-
-    abstract public function getUser($user_id);
-
     public function deleteUser($userid)
     {
         //not supported by default
         return 0;
     }
-
-    abstract public function getUserlist();
 
     public function canUpdateUsers()
     {
@@ -256,5 +243,15 @@ abstract class AuthorizerBase implements Authorizer
     {
         //not supported by default
         return 0;
+    }
+
+    public function authIsExternal()
+    {
+        return static::$AUTH_IS_EXTERNAL;
+    }
+
+    public function getExternalUsername()
+    {
+        return null;
     }
 }

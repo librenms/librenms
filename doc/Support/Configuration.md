@@ -131,10 +131,6 @@ http_proxy=proxy.domain.com
 https_proxy=proxy.domain.com
 ```
 
-### Memcached
-
-[Memcached](../Extensions/Memcached.md)
-
 ### RRDCached
 
 [RRDCached](../Extensions/RRDCached.md)
@@ -314,6 +310,10 @@ You can increase this if you want to try and fit more of the hostname in graph t
 The default value is 12
 However, this can possibly break graph generation if this is very long.
 
+### Stacked Graphs
+You can enable stacked graphs instead of the default inverted graphs. 
+Enabling them is possible via webui Global Settings -> Webui Settings -> Graph settings -> Use stacked graphs
+
 ### Add host settings
 The following setting controls how hosts are added.  If a host is added as an ip address it is checked to ensure the ip is not already present.  If the ip is present the host is not added.
 If host is added by hostname this check is not performed.  If the setting is true hostnames are resolved and the check is also performed.  This helps prevents accidental duplicate hosts.
@@ -388,7 +388,7 @@ The varying options after that are to support the different transports.
 
 ### Alerting
 
-[Alerting](../Alerting/index.md)
+[Alerting](../Alerting/Rules.md)
 
 ### Billing
 

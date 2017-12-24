@@ -1,7 +1,6 @@
 source: Alerting/Rules.md
 
 # Rules
-
 Rules are defined using a logical language.
 The GUI provides a simple way of creating basic rules.
 Creating more complicated rules which may include maths calculations and MySQL queries can be 
@@ -13,12 +12,10 @@ done using [macros](Macros.md)
 [Alert Rules wildcard](https://youtu.be/eYYioFNcrAk)
 
 ## Syntax
-
 Rules must consist of at least 3 elements: An __Entity__, a __Condition__ and a __Value__.
 Rules can contain braces and __Glues__.
 __Entities__ are provided from Table and Field from the database. For Example: `%ports.ifOperStatus`.
 > Please note that % is not required when adding alert rules via the WebUI. 
-
 __Conditions__ can be any of:
 
 - Equals `=`
@@ -31,7 +28,9 @@ __Conditions__ can be any of:
 - Smaller or Equal `<=`
 
 __Values__ can be an entity or any single-quoted data.
-__Glues__ can be either `&&` for `AND`.  or `||` for `OR`. Note if you need to use `OR` `||` please use a macro. 
+__Glues__ can be `&&` for `AND`.
+
+**Note** if you need to use `OR` `||` please use a [macros](Macros.md)
 
 __Note__: The difference between `Equals` and `Like` (and its negation) is that `Equals` does a strict comparison and `Like` allows the usage of MySQL RegExp.
 
@@ -44,10 +43,13 @@ Here are some of the other options available when adding an alerting rule:
 - Rule name: The name associated with the rule.
 - Severity: How "important" the rule is.
 - Max alerts: The maximum number of alerts sent for the event.  `-1` means unlimited.
-- Delay: The amount of time in seconds to wait after a rule is matched before sending an alert.
-- Interval: The interval of time in seconds between alerts for an event until Max is reached.
-- Mute alerts: Disable sending alerts for this rule.
+- Delay: The amount of time in seconds to wait after a rule is matched before sending an alert out transport.
+- Interval: The interval of time in seconds between alerts for an event until Max alert is reached.
+- Mute alerts: Disables sending alert rule through alert transport. But will still show the alert in the Web UI.
 - Invert match: Invert the matching rule (ie. alert on items that _don't_ match the rule).
+
+## Procedure
+You can associate a rule to a procedure by giving the URL of the procedure when creating the rule. Only links like "http://" are supported, otherwise an error will be returned. Once configured, procedure can be opened from the Alert widget through the "Open" button, which can be shown/hidden from the widget configuration box.
 
 ## Examples
 
@@ -67,7 +69,5 @@ Alert when:
 
 ### Alert Rules Collection
 You can also select Alert Rule from the Alerts Collection. These Alert Rules are submitted by users in the community :)
+If would like to submit your alert rules to the collection, please submit them here [Alert Rules Collection](https://github.com/librenms/librenms/blob/master/misc/alert_rules.json)
 ![Alert Rules Collection](/img/alert-rules-collection.png)
-
-## Procedure
-You can associate a rule to a procedure by giving the URL of the procedure when creating the rule. Only links like "http://" are supported, otherwise an error will be returned. Once configured, procedure can be opened from the Alert widget through the "Open" button, which can be shown/hidden from the widget configuration box.

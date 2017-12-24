@@ -302,7 +302,7 @@ class Component
             }
 
             // Ignore type, we cant change that.
-            unset($AVP['type'],$OLD[$device_id][$COMPONENT]['type']);
+            unset($AVP['type'], $OLD[$device_id][$COMPONENT]['type']);
 
             // If the Status has changed we need to add a log entry
             if ($AVP['status'] != $OLD[$device_id][$COMPONENT]['status']) {
@@ -322,7 +322,7 @@ class Component
                     }
 
                     // Unset the reserved field. We don't want to insert it below.
-                    unset($AVP[$k],$OLD[$device_id][$COMPONENT][$k]);
+                    unset($AVP[$k], $OLD[$device_id][$COMPONENT][$k]);
                 }
             }
 

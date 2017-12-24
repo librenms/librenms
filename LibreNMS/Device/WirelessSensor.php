@@ -175,6 +175,12 @@ class WirelessSensor extends Sensor
                 'unit' => 'dB',
                 'icon' => 'signal',
             ),
+            'ssr' => array(
+                'short' => 'SSR',
+                'long' => 'Signal Strength Ratio',
+                'unit' => 'dB',
+                'icon' => 'signal',
+            ),
             'mse' => array(
                 'short' => 'MSE',
                 'long' => 'Mean Square Error',

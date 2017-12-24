@@ -212,6 +212,8 @@ if ($_SESSION['userlevel'] >= '10') {
         echo '<li><a href="'.generate_url(array('page'=>'device-groups')).'"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Manage Groups</a></li>';
     }
 
+    echo '<li><a href="'.generate_url(array('page'=>'device-dependencies')).'"><i class="fa fa-group fa-fw fa-lg"></i> Device Dependencies</a></li>';
+
      echo '
             <li role="presentation" class="divider"></li>
             <li><a href="addhost/"><i class="fa fa-plus fa-fw fa-lg" aria-hidden="true"></i> Add Device</a></li>
@@ -393,6 +395,11 @@ $icons = array(
     'pressure' => 'thermometer-empty',
     'cooling' => 'thermometer-full',
     'airflow' => 'angle-double-right',
+    'delay' => 'clock-o',
+    'chromatic_dispersion' => 'indent',
+    'ber' => 'sort-amount-desc',
+    'quality_factor' => 'arrows',
+
 );
 foreach (array('fanspeed','humidity','temperature','signal') as $item) {
     if (isset($menu_sensors[$item])) {

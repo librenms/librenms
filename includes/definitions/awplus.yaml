@@ -1,0 +1,18 @@
+#OS info - https://www.alliedtelesis.com/products/software/AlliedWare-Plus
+#OS Datasheet - https://www.alliedtelesis.com/documents/datasheet-alliedware-plus
+
+os: awplus
+text: 'Alliedware Plus'
+type: network
+icon: alliedtelesis
+group: alliedtelesis
+ifname: 1
+over:
+    - { graph: device_bits, text: Traffic }
+discovery:
+    -
+      sysObjectId: .1.3.6.1.4.1.207.
+      sysObjectId_except: .1.3.6.1.4.1.207.1.4.126 #exclude ...207.1.4.126 for ATI 8000S/8000GS which identify as "radlan" OS. 
+      sysDescr: 'AW+'
+mib_dir:
+    - awplus

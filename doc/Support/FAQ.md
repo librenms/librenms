@@ -59,13 +59,7 @@ You have two options for adding a new device into LibreNMS.
 
 #### <a name="faq3"> How do I get help?</a>
 
-We have a few methods for you to get in touch to ask for help.
-
-[Community Forum](https://community.librenms.org)
-
-[Discord](https://t.libren.ms/discord)
-
-[Bug Reports](https://github.com/librenms/librenms/issues)
+[Getting Help](index.md)
 
 #### <a name="faq4"> What are the supported OSes for installing LibreNMS on?</a>
 
@@ -142,12 +136,12 @@ If you poll a large number of devices / ports then it's recommended to run a loc
 Running RRDCached is also highly advised in larger installs but has benefits no matter the size.
 
 #### <a name="faq16"> How do I change the IP / hostname of a device?</a>
-
 There is a host rename tool called renamehost.php in your librenms root directory. When renaming you are also changing the device's IP / hostname address for monitoring.
 Usage:
 ```bash
 ./renamehost.php <old hostname> <new hostname>
 ```
+You can also rename a device in the Web UI by going to the device, then clicking settings Icon -> Edit.
 
 #### <a name="faq19"> My device doesn't finish polling within 300 seconds</a>
 

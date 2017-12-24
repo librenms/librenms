@@ -6,33 +6,35 @@ $pagetitle[] = 'Services';
 <div class="container-fluid">
   <div class="row">
 <?php
-
 print_optionbar_start();
-
 require_once 'includes/modal/new_service.inc.php';
+
 require_once 'includes/modal/delete_service.inc.php';
 
 echo "<span style='font-weight: bold;'>Services</span> &#187; ";
-
 $menu_options = array(
-    'basic'   => 'Basic',
+    'basic' => 'Basic',
 );
+
 if (!$vars['view']) {
     $vars['view'] = 'basic';
 }
 
 $status_options = array(
-    'all'       => 'All',
-    'ok'        => 'Ok',
-    'warning'   => 'Warning',
-    'critical'  => 'Critical',
+    'all' => 'All',
+    'ok' => 'Ok',
+    'warning' => 'Warning',
+    'critical' => 'Critical',
 );
+
 if (!$vars['state']) {
     $vars['state'] = 'all';
 }
 
 // The menu option - on the left
+
 $sep = '';
+
 foreach ($menu_options as $option => $text) {
     if (empty($vars['view'])) {
         $vars['view'] = $option;
@@ -43,18 +45,23 @@ foreach ($menu_options as $option => $text) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link($text, $vars, array('view' => $option));
+    echo generate_link($text, $vars, array(
+        'view' => $option
+    ));
     if ($vars['view'] == $option) {
         echo '</span>';
     }
 
     $sep = ' | ';
 }
+
 unset($sep);
 
 // The status option - on the right
+
 echo '<div class="pull-right">';
 $sep = '';
+
 foreach ($status_options as $option => $text) {
     if (empty($vars['state'])) {
         $vars['state'] = $option;
@@ -65,18 +72,21 @@ foreach ($status_options as $option => $text) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link($text, $vars, array('state' => $option));
+    echo generate_link($text, $vars, array(
+        'state' => $option
+    ));
     if ($vars['state'] == $option) {
         echo '</span>';
     }
 
     $sep = ' | ';
 }
+
 unset($sep);
 echo '</div>';
 print_optionbar_end();
-
 $sql_param = array();
+
 if (isset($vars['state'])) {
     if ($vars['state'] == 'ok') {
         $state = '0';
@@ -86,11 +96,11 @@ if (isset($vars['state'])) {
         $state = '1';
     }
 }
+
 if (isset($state)) {
-    $where      .= " AND service_status= ? AND service_disabled='0' AND `service_ignore`='0'";
+    $where.= " AND service_status= ? AND service_disabled='0' AND `service_ignore`='0'";
     $sql_param[] = $state;
 }
-
 ?>
 <div class="row col-sm-12"><span id="message"></span></div>
 <?php
@@ -114,50 +124,62 @@ foreach (dbFetchRows($host_sql, $host_par) as $device) {
     } else {
         $sql_param[0] = $device_id;
     }
+    $head=true;
 
-
-        $head=true;
     foreach (dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ? $where ORDER BY service_type", $sql_param) as $service) {
         if ($service['service_status'] == '2') {
-            $status = "<span class='col-sm-12 label label-danger threeqtr-width'><b>".$service['service_type']."</b></span>";
+            $label = 'danger';
+            $title = 'CRITICAL';
         } elseif ($service['service_status'] == '1') {
-            $status = "<span class='col-sm-12 label label-warning threeqtr-width'><b>".$service['service_type']."</b></span>";
+            $label = 'warning';
+            $title = 'WARNING';
         } elseif ($service['service_status'] == '0') {
-            $status = "<span class='col-sm-12 label label-success threeqtr-width'><b>".$service['service_type']."</b></span>";
+            $label = 'success';
+            $title = 'OK';
         } else {
-            $status = "<span class='col-sm-12 label label-info threeqtr-width'><b>".$service['service_type']."</b></span>";
+            $label = 'info';
+            $title = 'UNKNOWN';
         }
         if ($head) {
             echo '
 <div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">'.$devlink.'</h3>'.$device_sysName.'
-    </div>
-    <div class="panel-body">
-                ';
+<div class="panel-heading">
+    <h3 class="panel-title">'.$devlink.'</h3>
+    '.$device_sysName.'
+</div>
+<div class="panel-body">
+<table class="table table-hover table-condensed">
+<thead>
+    <tr>
+        <th></th>
+        <th>Service</th>
+        <th>Last Changed</th>
+        <th>Message</th>
+    </tr>
+</thead>
+';
         }
         $head=false;
 ?>
-        <div class="row">
-            <div class="col-md-1"><h4><?php echo $status?></h4></div>
-            <div class="col-md-2"><div class="text-muted"><?php echo formatUptime(time() - $service['service_changed'])?></div></div>
-            <div class="col-md-3"><div class="text-muted"><span class='box-desc'><?php echo nl2br(display($service['service_desc']))?></div></span></div>
-            <div class="col-md-5"><span class='box-desc'><?php echo nl2br(display($service['service_message']))?></span></div>
-            <div class="col-md-1">
+<tr>
+    <td><span data-toggle='tooltip' title='<?php echo $title?>' class='service-status label label-<?php echo $label?>'> </span></td>
+    <td><?php echo nl2br(display($service['service_type']))?></td>
+    <td><?php echo formatUptime(time() - $service['service_changed'])?></td>
+    <td><?php echo nl2br(display($service['service_desc']))?></td>
+    <td><?php echo nl2br(display($service['service_message']))?></td>
 <?php
 if (is_admin() === true) {
-    echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
-                <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button>";
+    echo "    <td><button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
+    <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button></td>";
 }
 ?>
-            </div>
-        </div>
-        <div class="row"><div class="col-sm-12">&nbsp;</div></div>
+</tr>
 <?php
     }//end foreach
-    echo "</div></div>";
+
+    echo "</table></div></div>";
     unset($samehost);
 }//end foreach
 ?>
-  </div>
+ </div>
 </div>
