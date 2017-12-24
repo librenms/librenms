@@ -2181,6 +2181,12 @@ label {
   color: darkgrey;
 }
 
+.alert-status {
+  display: inline-block;
+  width: 7px;
+  min-height: 27px;
+}
+
 .service-status {
     width:10px;
     height:50px;
