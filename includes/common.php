@@ -1513,11 +1513,16 @@ function print_list($list, $format, $max = 10)
 
 /**
  * @param $value
+ * @param bool $strip_tags
  * @return string
  */
-function clean($value)
+function clean($value, $strip_tags = true)
 {
-    return strip_tags(mres($value));
+    if ($strip_tags === true) {
+        return strip_tags(mres($value));
+    } else {
+        return mres($value);
+    }
 }
 
 /**
