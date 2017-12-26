@@ -603,8 +603,8 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
         <div class="progress-bar" role="progressbar" aria-valuenow="'.$size_percent.'" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:'.$size_percent.'%; background-color: #'.$left_background.';">
         </div>
         </div>
-        <b style="padding-left: 10%; position: absolute; top: 0px; left: 0px;color:#'.$left_colour.';">'.$left_text.'</b>
-        <b style="padding-right: 10%; position: absolute; top: 0px; right: 0px;color:#'.$right_colour.';">'.$right_text.'</b>
+        <b style="padding-left: 2%; position: absolute; top: 0px; left: 0px;color:#'.$left_colour.';">'.$left_text.'</b>
+        <b style="padding-right: 2%; position: absolute; top: 0px; right: 0px;color:#'.$right_colour.';">'.$right_text.'</b>
         </div>
         ';
 
