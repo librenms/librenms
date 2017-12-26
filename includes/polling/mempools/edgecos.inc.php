@@ -10,23 +10,23 @@
  * the source code distribution for details.
  */
 
-if (starts_with($device['sysObjectID'], 'enterprises.259.10.1.24.')) { //ECS4510
+if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.24.')) { //ECS4510
     $temp_mibs = 'ECS4510-MIB';
 };
 
-if (starts_with($device['sysObjectID'], 'enterprises.259.10.1.22.')) { //ECS3528
+if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.22.')) { //ECS3528
     $temp_mibs = 'ES3528MV2-MIB';
 };
 
-if (starts_with($device['sysObjectID'], 'enterprises.259.10.1.45.')) { //ECS4120
+if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.45.')) { //ECS4120
     $temp_mibs = 'ECS4120-MIB';
 };
 
-if (starts_with($device['sysObjectID'], 'enterprises.259.10.1.42.')) { //ECS4210
+if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.42.')) { //ECS4210
     $temp_mibs = 'ECS4210-MIB';
 };
 
-if (starts_with($device['sysObjectID'], 'enterprises.259.10.1.27.')) { //ECS3510
+if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.27.')) { //ECS3510
     $temp_mibs = 'ECS3510-MIB';
 };
 
