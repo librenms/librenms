@@ -17,12 +17,15 @@ $bannedStuff = explode("\n", $f2b);
 
 $total_banned=$bannedStuff[0];
 
-$rrd_name = array('app', $name, $app_id, 'totalbanned');
+$rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
-    ->addDataset('banned', 'GAUGE', 0);
+    ->addDataset('banned', 'GAUGE', 0)
+    ->addDataset('firewalled', 'GAUGE', 0);
+
 
 $fields = array(
     'banned' =>$total_banned,
+    'firewalled'=>'U',
 );
 $metrics['total'] = $fields;
 
