@@ -121,11 +121,9 @@ if (count($services) > '0') {
 
                 echo '</div></td>';
                 echo '</tr>';
-
             }
         }
     }
-
     echo '</table>';
 } else {
     echo '<div class="device-services-page-no-service">No Services</div>';
