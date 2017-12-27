@@ -68,6 +68,7 @@ pages:
       - Extensions/SNMP-Proxy.md
       - Extensions/SNMP-Trap-Handler.md
       - Support/Cleanup-options.md
+      - Extensions/IP-MAC-Address-Search-Feature.md
   - 6. 3rd Party Integration:
       - Extensions/Graylog.md
       - Nagios Plugins: Extensions/Services.md
