@@ -459,8 +459,8 @@ if ($format == "graph") {
             "<div class='form-group'><?php echo $locations_options; ?></div>" +
             "<div class='form-group'><?php echo $types_options; ?></div>" +
             "<input type='submit' class='btn btn-default input-sm devices-input-small' value='Search'>" +
-            "<a href=''<?php generate_url($vars) ?>'' title='Update the browser URL to reflect the search criteria.' class='btn btn-default input-sm devices-input-small'>Update URL</a>" +
-            "<a href=''<?php generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare'])) ?>'' title='Reset critera to default.' class='btn btn-default input-sm devices-input-small'>Reset</a>" +
+            "<a href='<?php echo generate_url($vars) ?>' title='Update the browser URL to reflect the search criteria.' class='btn btn-default input-sm devices-input-small'>Update URL</a>" +
+            "<a href='<?php echo generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare'])) ?>' title='Reset criteria to default.' class='btn btn-default input-sm devices-input-small'>Reset</a>" +
             "</form>" +
             "</div>"
         );
