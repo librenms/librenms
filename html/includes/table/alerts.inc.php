@@ -117,8 +117,10 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', array($alert['rule_id'], $alert['device_id']));
     $fault_detail = alert_details($log);
 
-    $alert_to_ack = '<button type="button" class="btn btn-success command-ack-alert fa fa-eye" aria-hidden="true" title="Mark as acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" name="ack-alert"></button>';
-    $alert_to_nack = '<button type="button" class="btn btn-danger command-ack-alert fa fa-eye-slash" aria-hidden="true" title="Mark as not acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" name="ack-alert"></button>';
+    $alert_to_ack = '<button type="button" class="btn btn-danger command-ack-alert fa fa-eye" aria-hidden="true" title="Mark as acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" name="ack-alert"></button>';
+    $alert_to_nack = '<button type="button" class="btn btn-warning command-ack-alert fa fa-eye-slash" aria-hidden="true" title="Mark as not acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" name="ack-alert"></button>';
+
+    $ack_ico = $alert_to_ack;
 
     if ((int)$alert['state'] === 0) {
         $ico = '';
@@ -132,6 +134,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         }
     } elseif ((int)$alert['state'] === 2) {
         $ico = $alert_to_nack;
+        $ack_ico = $alert_to_nack;
     }
 
     $severity = $alert['severity'];
@@ -139,12 +142,6 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         $severity .= ' <strong>+</strong>';
     } elseif ($alert['state'] == 4) {
         $severity .= ' <strong>-</strong>';
-    }
-
-    $ack_ico = $alert_to_ack;
-
-    if ($alert['state'] == 2) {
-        $ack_ico = $alert_to_nack;
     }
 
     $hostname = '<div class="incident">' . generate_device_link($alert, shorthost($alert['hostname'])) . '<div id="incident' . ($rulei + 1) . '" class="collapse">' . $fault_detail . '</div></div>';
@@ -162,6 +159,10 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         default:
             $severity_ico = '<span class="alert-status label-info">&nbsp;</span>';
             break;
+    }
+
+    if ((int)$alert['state'] === 2) {
+        $severity_ico = '<span class="alert-status label-warning">&nbsp;</span>';
     }
 
     $proc = dbFetchCell('SELECT proc FROM alerts,alert_rules WHERE alert_rules.id = alerts.rule_id AND alerts.id = ?', array($alert['id']));
