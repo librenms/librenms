@@ -34,25 +34,6 @@ if ($options['f'] === 'update') {
     exit(0);
 }
 
-if ($options['f'] === 'check_php_ver') {
-    $min_version = '5.6.4';
-    $warn_title = 'Warning: PHP version too low';
-
-    // if update is not set to false and version is min or newer
-    if (Config::get('update') && version_compare(PHP_VERSION, $min_version, '<')) {
-        new_notification(
-            $warn_title,
-            'PHP version 5.6.4 will be the minimum supported version on January 10, 2018.  We recommend you update to PHP a supported version of PHP (7.1 suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.',
-            1,
-            'daily.sh'
-        );
-        exit(1);
-    }
-
-    remove_notification($warn_title);
-    exit(0);
-}
-
 if ($options['f'] === 'rrd_purge') {
     try {
         if (Config::get('distributed_poller')) {
@@ -150,6 +131,24 @@ if ($options['f'] === 'handle_notifiable') {
                 'daily.sh'
             );
         }
+    } elseif ($options['t'] === 'phpver') {
+        $error_title = 'Error: PHP version too low';
+        $warn_title = 'Warning: PHP version too low';
+        remove_notification($warn_title); // remove warning
+
+        // if update is not set to false and version is min or newer
+        if (Config::get('update') && $options['r']) {
+            new_notification(
+                $error_title,
+                'PHP version 5.6.4 is the minimum supported version as of January 10, 2018.  We recommend you update to PHP a supported version of PHP (7.1 suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.',
+                2,
+                'daily.sh'
+            );
+            exit(1);
+        }
+
+        remove_notification($error_title);
+        exit(0);
     }
 }
 
