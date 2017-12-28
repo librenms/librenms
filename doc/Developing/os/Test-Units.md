@@ -29,7 +29,9 @@ one variant, please do not specify one.
 
 After you have saved your test data, you should run `./scripts/pre-commit.php -p -u` verify they pass.
 
-To run the full suite of tests enable db and snmpsim reliat tests: `./scripts/pre-commit.php --db --snmpsim -p -u`
+If you would like to test the data for a specific OS, use `./scripts/pre-commit.php -p --os osname`.
+
+To run the full suite of tests enable db and snmpsim reliant tests: `./scripts/pre-commit.php --db --snmpsim -p -u`
 
 ## Using snmpsim for testing
 
