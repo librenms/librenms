@@ -577,37 +577,39 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
 
 function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, $units, $used = null)
 {
-    d_echo("Discover Storage: $index, $type, $mib, $descr, $size, $units, $used\n");
+    if (ignore_storage($device['os'], $descr) != 1) {
+        d_echo("Discover Storage: $index, $type, $mib, $descr, $size, $units, $used\n");
 
-    if ($descr && $size > '0') {
-        $storage = dbFetchRow('SELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ?', array($index, $device['device_id'], $mib));
-        if ($storage === false || !count($storage)) {
-            $insert = dbInsert(
-                array(
-                    'device_id' => $device['device_id'],
-                    'storage_descr' => $descr,
-                    'storage_index' => $index,
-                    'storage_mib' => $mib,
-                    'storage_type' => $type,
-                    'storage_units' => $units,
-                    'storage_size' => $size,
-                    'storage_used' => $used,
-                ),
-                'storage'
-            );
+        if ($descr && $size > '0') {
+            $storage = dbFetchRow('SELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ?', array($index, $device['device_id'], $mib));
+            if ($storage === false || !count($storage)) {
+                $insert = dbInsert(
+                    array(
+                        'device_id' => $device['device_id'],
+                        'storage_descr' => $descr,
+                        'storage_index' => $index,
+                        'storage_mib' => $mib,
+                        'storage_type' => $type,
+                        'storage_units' => $units,
+                        'storage_size' => $size,
+                        'storage_used' => $used,
+                    ),
+                    'storage'
+                );
 
-            echo '+';
-        } else {
-            $updated = dbUpdate(array('storage_descr' => $descr, 'storage_type' => $type, 'storage_units' => $units, 'storage_size' => $size), 'storage', '`device_id` = ? AND `storage_index` = ? AND `storage_mib` = ?', array($device['device_id'], $index, $mib));
-            if ($updated) {
-                echo 'U';
+                echo '+';
             } else {
-                echo '.';
-            }
-        }//end if
+                $updated = dbUpdate(array('storage_descr' => $descr, 'storage_type' => $type, 'storage_units' => $units, 'storage_size' => $size), 'storage', '`device_id` = ? AND `storage_index` = ? AND `storage_mib` = ?', array($device['device_id'], $index, $mib));
+                if ($updated) {
+                    echo 'U';
+                } else {
+                    echo '.';
+                }
+            }//end if
 
-        $valid[$mib][$index] = 1;
-    }//end if
+            $valid[$mib][$index] = 1;
+        }//end if
+    }//
 }
 
 //end discover_storage()
