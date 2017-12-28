@@ -85,7 +85,10 @@ class OSDiscoveryTest extends TestCase
      */
     public function testAllFilesTested()
     {
-        $this->assertEmpty(self::$unchecked_files);
+        $this->assertEmpty(
+            self::$unchecked_files,
+            "Not all snmprec files were checked: " . print_r(self::$unchecked_files, true)
+        );
     }
 
     /**
@@ -151,7 +154,7 @@ class OSDiscoveryTest extends TestCase
         $filtered_os = array_diff($config_os, $excluded_os);
 
         $all_os = array();
-        foreach($filtered_os as $os) {
+        foreach ($filtered_os as $os) {
             $all_os[$os] = array($os);
         }
 
