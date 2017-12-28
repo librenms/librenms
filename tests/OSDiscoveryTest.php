@@ -32,9 +32,9 @@ class OSDiscoveryTest extends TestCase
 {
     private static $unchecked_files;
 
-    protected function setUp()
+    public static function setUpBeforeClass()
     {
-        parent::setUp();
+        parent::setUpBeforeClass();
 
         $glob = Config::get('install_dir') . "/tests/snmpsim/*.snmprec";
 
@@ -87,7 +87,7 @@ class OSDiscoveryTest extends TestCase
     {
         $this->assertEmpty(
             self::$unchecked_files,
-            "Not all snmprec files were checked: " . print_r(self::$unchecked_files, true)
+            "Not all snmprec files were checked: " . print_r(array_keys(self::$unchecked_files), true)
         );
     }
 
