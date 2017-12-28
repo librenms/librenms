@@ -857,17 +857,6 @@ function snmp2ipv6($ipv6_snmp)
     return implode(':', $ipv6_2);
 }
 
-function ipv62snmp($ipv6)
-{
-    try {
-        $ipv6 = IP::parse($ipv6)->uncompressed();
-        $ipv6_split = str_split(str_replace(':', '', $ipv6), 2);
-        return implode('.', array_map('hexdec', $ipv6_split));
-    } catch (InvalidIpException $e) {
-        return '';
-    }
-}
-
 function get_astext($asn)
 {
     global $config,$cache;
