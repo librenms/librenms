@@ -40,6 +40,8 @@ class ModuleTestHelper
     private $json_dir;
     private $file_name;
     private $module_tables;
+    private $discovery_output;
+    private $poller_output;
 
 
     /**
@@ -377,7 +379,7 @@ class ModuleTestHelper
 
     public function generateTestData(Snmpsim $snmpsim, $no_save = false)
     {
-        global $device;
+        global $device, $debug, $vdebug;
 
         // Remove existing device in case it didn't get removed previously
         if ($existing_device = device_by_name($snmpsim->getIp())) {
@@ -402,16 +404,19 @@ class ModuleTestHelper
         // Run discovery
         if ($this->quiet) {
             ob_start();
+            $save_debug = $debug;
+            $save_vedbug = $vdebug;
+            $debug = true;
+            $vdebug = false;
         }
 
         discover_device($device, $this->getArgs());
 
         if ($this->quiet) {
-            $discovery_output = ob_get_contents();
+            $this->discovery_output = ob_get_contents();
             ob_end_clean();
-
-            d_echo($discovery_output);
-            d_echo(PHP_EOL);
+            $debug = $save_debug;
+            $vdebug = $save_vedbug;
         }
 
         $this->qPrint(PHP_EOL);
@@ -420,13 +425,20 @@ class ModuleTestHelper
         $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], 'discovery'));
 
         // Run the poller
-        ob_start();
-        poll_device($device, $this->getArgs());
-        $poller_output = ob_get_contents();
-        ob_end_clean();
+        if ($this->quiet) {
+            ob_start();
+            $debug = true;
+            $vdebug = false;
+        }
 
-        d_echo($poller_output);
-        d_echo(PHP_EOL);
+        poll_device($device, $this->getArgs());
+
+        if ($this->quiet) {
+            $this->poller_output = ob_get_contents();
+            ob_end_clean();
+            $debug = $save_debug;
+            $vdebug = $save_vedbug;
+        }
 
         // Dump polled data
         $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], 'poller'));
@@ -497,15 +509,22 @@ class ModuleTestHelper
                 $rows = dbFetchRows("SELECT * FROM `$table` $join $where", $params);
 
                 // remove unwanted fields
-                $keys = array_flip($info['excluded_fields']);
-                $formatted_data = array_map(function ($row) use ($keys) {
-                    return array_diff_key($row, $keys);
-                }, $rows);
+                if (isset($info['included_fields'])) {
+                    $keys = array_flip($info['included_fields']);
+                    $rows = array_map(function ($row) use ($keys) {
+                        return array_intersect_key($row, $keys);
+                    }, $rows);
+                } elseif (isset($info['excluded_fields'])) {
+                    $keys = array_flip($info['excluded_fields']);
+                    $rows = array_map(function ($row) use ($keys) {
+                        return array_diff_key($row, $keys);
+                    }, $rows);
+                }
 
                 if (isset($key)) {
-                    $data[$module][$key][$table] = $formatted_data;
+                    $data[$module][$key][$table] = $rows;
                 } else {
-                    $data[$module][$table] = $formatted_data;
+                    $data[$module][$table] = $rows;
                 }
             }
         }
@@ -522,6 +541,16 @@ class ModuleTestHelper
     public function getTableData()
     {
         return array_intersect_key($this->module_tables, array_flip($this->getModules()));
+    }
+
+    public function getLastDiscoveryOutput()
+    {
+        return $this->discovery_output;
+    }
+
+    public function getLastPollerOutput()
+    {
+        return $this->poller_output;
     }
 
     /**

@@ -10,6 +10,8 @@ arp-table:
     ipv4_mac:
         excluded_fields: [device_id, port_id]
 bgp-peers:
+    devices:
+        included_fields: [bgpLocalAs]
     bgpPeers:
         excluded_fields: [device_id, bgpPeer_id]
     bgpPeers_cbgp:
@@ -22,6 +24,9 @@ ports:
         excluded_fields: [device_id, port_id, poll_time, poll_period]
         joins:
             - { left: ports.port_id, right: ports_statistics.port_id }
+os:
+    devices:
+        included_fields: [sysName, sysObjectID, sysDescr, sysContact, version, hardware, features, location, os, type, serial, icon]
 processors:
     processors:
         excluded_fields: [device_id, processor_id]
