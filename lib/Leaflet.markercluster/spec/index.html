@@ -20,6 +20,7 @@
 	<script type="text/javascript" src="../src/MarkerCluster.QuickHull.js"></script>
 	<script type="text/javascript" src="../src/MarkerCluster.Spiderfier.js"></script>
 	<script type="text/javascript" src="../src/MarkerOpacity.js"></script>
+	<script type="text/javascript" src="../src/MarkerClusterGroup.Refresh.js"></script>
 
 	<script>
 		mocha.setup('bdd');
@@ -32,11 +33,17 @@
 
 	<script type="text/javascript" src="suites/LeafletSpec.js"></script>
 
+	<script type="text/javascript" src="suites/DistanceGridSpec.js"></script>
+	<script type="text/javascript" src="suites/QuickHullSpec.js"></script>
+
 	<script type="text/javascript" src="suites/AddLayer.MultipleSpec.js"></script>
 	<script type="text/javascript" src="suites/AddLayer.SingleSpec.js"></script>
 	<script type="text/javascript" src="suites/AddLayersSpec.js"></script>
+	<script type="text/javascript" src="suites/animateOptionSpec.js"></script>
+	<script type="text/javascript" src="suites/singleMarkerModeSpec.js"></script>
 
 	<script type="text/javascript" src="suites/ChildChangingIconSupportSpec.js"></script>
+	<script type="text/javascript" src="suites/markerMoveSupportSpec.js"></script>
 
 	<script type="text/javascript" src="suites/CircleMarkerSupportSpec.js"></script>
 	<script type="text/javascript" src="suites/CircleSupportSpec.js"></script>
@@ -55,9 +62,15 @@
 	<script type="text/javascript" src="suites/RemoveLayerSpec.js"></script>
 	<script type="text/javascript" src="suites/removeLayersSpec.js"></script>
 	<script type="text/javascript" src="suites/spiderfySpec.js"></script>
+	<script type="text/javascript" src="suites/unspiderfySpec.js"></script>
 	<script type="text/javascript" src="suites/zoomAnimationSpec.js"></script>
 
 	<script type="text/javascript" src="suites/RememberOpacity.js"></script>
+	<script type="text/javascript" src="suites/supportNegativeZoomSpec.js"></script>
+
+	<script type="text/javascript" src="suites/RefreshSpec.js"></script>
+	<script type="text/javascript" src="suites/removeOutsideVisibleBoundsSpec.js"></script>
+	<script type="text/javascript" src="suites/nonIntegerZoomSpec.js"></script>
 
 	<script>
 		(window.mochaPhantomJS || window.mocha).run();

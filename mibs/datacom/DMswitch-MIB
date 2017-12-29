@@ -779,7 +779,7 @@ swChassisModel OBJECT-TYPE
         ::= { switchMgt 17 }
 
 switchSessionTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF SwitchSessionEntry
+    SYNTAX      SEQUENCE OF SwitchIndivAlarmOutEntry
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "Table about CLI sessions informations."
@@ -4819,5 +4819,45 @@ ddTransceiversTxBias OBJECT-TYPE
         STATUS      current
         DESCRIPTION "Transceiver tx bias information in Amperes"
         ::= { ddTransceiversEntry 6 }
+
+ddTransceiversTemperatureValue OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Celsius (degrees C)"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver temperature infomation"
+        ::= { ddTransceiversEntry 7 }
+
+ddTransceiversVcc3v3Value OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.1 V"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver Vcc 3v3 infomation"
+        ::= { ddTransceiversEntry 8 }
+
+ddTransceiversRxPowerValue OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.1 dBm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver rx power infomation"
+        ::= { ddTransceiversEntry 9 }
+
+ddTransceiversTxPowerValue OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.1 dBm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver tx power infomation"
+        ::= { ddTransceiversEntry 10 }
+
+ddTransceiversTxBiasValue OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.1 mA"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver tx bias infomation"
+        ::= { ddTransceiversEntry 11 }
 
 END

@@ -31,7 +31,7 @@ Participating
 -------------
 
 You can participate in the project by:
-- Talking to us on IRC ([##librenms on Freenode][4]) or [Twitter][3].
+- Talking to us on [Discord](https://t.libren.ms/discord) or [Twitter][3].
 - Joining the [LibreNMS Community](https://community.librenms.org)
 - Improving the [documentation][5].
 - Cloning the [repo][2] and filing [bug reports][18] and [pull requests][19] on github.
@@ -83,7 +83,7 @@ exception):
 [1]: https://groups.google.com/forum/#!forum/librenms-project "LibreNMS"
 [2]: https://github.com/librenms/librenms "Main LibreNMS GitHub repo"
 [3]: https://twitter.com/librenms "@LibreNMS on Twitter"
-[4]: irc://irc.freenode.net/##librenms "LibreNMS IRC channel"
+[4]: https://t.libren.ms/discord "Discord LibreNMS Server"
 [5]: https://github.com/librenms/librenms/tree/master/doc/
 [6]: http://freenode.net/changuide "Freenode channel guidelines"
 [7]: http://freenode.net/catalysts "Freenode community catalysts"

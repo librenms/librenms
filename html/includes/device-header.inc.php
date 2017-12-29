@@ -16,7 +16,9 @@ echo '
 //<div class="col-xs-6 col-sm-8 col-md-8">';
 
 
-if (isset($config['os'][$device['os']]['over'])) {
+if ($device['snmp_disable']) {
+    $graphs = $config['os']['ping']['over'];
+} elseif (isset($config['os'][$device['os']]['over'])) {
     $graphs = $config['os'][$device['os']]['over'];
 } elseif (isset($device['os_group']) && isset($config['os'][$device['os_group']]['over'])) {
     $graphs = $config['os'][$device['os_group']]['over'];

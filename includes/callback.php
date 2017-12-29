@@ -20,7 +20,7 @@ if ($enabled == 1) {
 
     $uuid = dbFetchCell("SELECT `value` FROM `callback` WHERE `name` = 'uuid'");
 
-    $version = version_info(false);
+    $version = version_info();
     $queries = array(
         'alert_rules'     => 'SELECT COUNT(`severity`) AS `total`,`severity` FROM `alert_rules` WHERE `disabled`=0 GROUP BY `severity`',
         'alert_templates' => 'SELECT COUNT(`id`) AS `total` FROM `alert_templates`',

@@ -54,7 +54,7 @@ source s_net {
 # Destinations
 ########################
 destination d_librenms {
-        program("/opt/librenms/syslog.php" template ("$HOST||$FACILITY||$PRIORITY||$LEVEL||$TAG||$YEAR-$MONTH-$DAY $HOUR:$MIN:$SEC||$MSG||$PROGRAM\n") template-escape(yes));
+        program("/opt/librenms/syslog.php" template ("$HOST||$FACILITY||$PRIORITY||$LEVEL||$TAG||$R_YEAR-$R_MONTH-$R_DAY $R_HOUR:$R_MIN:$R_SEC||$MSG||$PROGRAM\n") template-escape(yes));
 };
 
 ########################
@@ -102,7 +102,7 @@ Create a file called something like `/etc/rsyslog.d/30-librenms.conf` containing
 # Feed syslog messages to librenms
 $ModLoad omprog
 
-$template librenms,"%fromhost%||%syslogfacility%||%syslogpriority%||%syslogseverity%||%syslogtag%||%$year%-%$month%-%$day% %timereported:8:25%||%msg%||%programname%\n"
+$template librenms,"%fromhost%||%syslogfacility%||%syslogpriority%||%syslogseverity%||%syslogtag%||%$year%-%$month%-%$day% %timegenerated:8:25%||%msg%||%programname%\n"
 
 *.* action(type="omprog" binary="/opt/librenms/syslog.php" template="librenms")
 
@@ -129,6 +129,13 @@ Add the following to your LibreNMS `config.php` file to enable the Syslog extens
 ```ssh
 $config['enable_syslog'] = 1;
 ```
+#### Syslog Clean Up 
+Can be set inside of  `config.php`
+```php
+$config['syslog_purge'] = 30;
+```
+The cleanup is run by daily.sh and any entries over X days old are automatically purged. Values are in days.
+See here for more Clean Up Options [Link](https://docs.librenms.org/#Support/Configuration/#cleanup-options)
 
 ### Client configuration
 
@@ -171,6 +178,21 @@ logging server librenms.ip 5 use-vrf default facility local6
 ```
 
 If you have permitted udp and tcp 514 through any firewall then that should be all you need. Logs should start appearing and displayed within the LibreNMS web UI.
+
+### Windows
+
+By Default windows has no native way to send logs to a remote syslog server.
+
+Using this how to you can download Datagram-Syslog Agent to send logs to a remote syslog server (LibreNMS). 
+
+#### Note 
+keep in mind you can use any agent or program to send the logs. We are just using this Datagram-Syslog Agent for this example.
+
+[Link to How to](http://techgenix.com/configuring-syslog-agent-windows-server-2012/)
+
+You will need to download and install "Datagram-Syslog Agent" for this how to
+[Link to Download](http://download.cnet.com/Datagram-SyslogAgent/3001-2085_4-10370938.html)
+
 
 ### External hooks
 

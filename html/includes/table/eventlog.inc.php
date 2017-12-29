@@ -1,4 +1,17 @@
 <?php
+/*
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2017 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
 $where = '1';
 
@@ -61,8 +74,12 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
     }
     $severity_colour = $eventlog['severity'];
 
+    if ($eventlog['username'] == '') {
+        $eventlog['username']  = 'System';
+    }
+
     $response[] = array(
-        'eventicon' => "<i class='fa fa-bookmark fa-lg ".eventlog_severity($severity_colour)."' aria-hidden='true'></i>",
+        'eventicon' => "<span class='alert-status ".eventlog_severity($severity_colour)."'>&nbsp;</span>",
         'datetime'  => $eventlog['humandate'],
         'hostname'  => generate_device_link($dev, shorthost($dev['hostname'])),
         'type'      => $type,

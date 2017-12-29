@@ -4,22 +4,23 @@ This document will guide you through adding wireless sensors for your new wirele
  
 Currently we have support for the following wireless metrics along with the values we expect to see the data in:
 
-| Type             | Measurement   | Interface                     | Description                                                  |
-| ---------------- | ------------- | ----------------------------- | ------------------------------------------------------------ |
-| ap-count         | %             | WirelessApCountDiscovery      | The number of APs attached to this controller                |
-| capacity         | %             | WirelessCapacityDiscovery     | The % of operating rate vs theoretical max                   |
-| ccq              | %             | WirelessCcqDiscovery          | The Client Connection Quality                                |
-| clients          | count         | WirelessClientsDiscovery      | The number of clients connected to/managed by this device    |
-| distance         | km            | WirelessDistanceDiscovery     | The distance of a radio link in Kilometers                   |
-| error-ratio      | %             | WirelessErrorRatioDiscovery   | The percent of errored packets or bits, etc                  |
-| frequency        | MHz           | WirelessFrequencyDiscovery    | The frequency of the radio in MHz, channels can be converted |
-| noise-floor      | dBm/Hz        | WirelessNoiseFloorDiscovery   | The amount of noise received by the radio                    |
-| power            | dBm           | WirelessPowerDiscovery        | The power of transmit or receive, including signal level     |
-| quality          | %             | WirelessQualityDiscovery      | The % of quality of the link, 100% = perfect link            |
-| rate             | bps           | WirelessRateDiscovery         | The negotiated rate of the connection (not data transfer)    |
-| rssi             | dBm           | WirelessRssiDiscovery         | The Received Signal Strength Indicator                       |
-| snr              | dBm           | WirelessSnrDiscovery          | The Signal to Noise ratio, which is signal - noise floor     |
-| utilization      | %             | WirelessUtilizationDiscovery  | The % of utilization compared to the current rate            |
+| Type        | Measurement | Interface                    | Description                                                                                     |
+| ----------- | ----------- | ---------------------------- | ----------------------------------------------------------------------------------------------- |
+| ap-count    | %           | WirelessApCountDiscovery     | The number of APs attached to this controller                                                   |
+| capacity    | %           | WirelessCapacityDiscovery    | The % of operating rate vs theoretical max                                                      |
+| ccq         | %           | WirelessCcqDiscovery         | The Client Connection Quality                                                                   |
+| clients     | count       | WirelessClientsDiscovery     | The number of clients connected to/managed by this device                                       |
+| distance    | km          | WirelessDistanceDiscovery    | The distance of a radio link in Kilometers                                                      |
+| error-ratio | %           | WirelessErrorRatioDiscovery  | The percent of errored packets or bits, etc                                                     |
+| frequency   | MHz         | WirelessFrequencyDiscovery   | The frequency of the radio in MHz, channels can be converted                                    |
+| noise-floor | dBm/Hz      | WirelessNoiseFloorDiscovery  | The amount of noise received by the radio                                                       |
+| power       | dBm         | WirelessPowerDiscovery       | The power of transmit or receive, including signal level                                        |
+| quality     | %           | WirelessQualityDiscovery     | The % of quality of the link, 100% = perfect link                                               |
+| rate        | bps         | WirelessRateDiscovery        | The negotiated rate of the connection (not data transfer)                                       |
+| rssi        | dBm         | WirelessRssiDiscovery        | The Received Signal Strength Indicator                                                          |
+| snr         | dBm         | WirelessSnrDiscovery         | The Signal to Noise ratio, which is signal - noise floor                                        |
+| ssr         | dBm         | WirelessSsrDiscovery         | The Signal strength ratio, the ratio(or difference) of Vertical rx power to Horizontal rx power |
+| utilization | %           | WirelessUtilizationDiscovery | The % of utilization compared to the current rate                                               |
 
 You will need to create a new OS class for your os if one doen't exist under `LibreNMS/OS`.  The name of this file
 should be the os name in camel case for example `airos -> Airos`, `ios-wlc -> IosWlc`.
@@ -61,8 +62,8 @@ All discovery interfaces will require you to return an array of WirelessSensor o
   - $current = Defaults to null. Can be used to set the current value on discovery.
   If this is null the values will be polled right away and if they do not return valid value(s), the sensor will not be discovered.
   Supplying a value here implies you have already verified this sensor is valid.
-  - $divisor = Defaults to 1. This is used to divided the returned value.
   - $multiplier = Defaults to 1. This is used to multiply the returned value.
+  - $divisor = Defaults to 1. This is used to divided the returned value.
   - $aggregator = Defaults to sum. Valid values: sum, avg. This will combine multiple values from multiple oids into one.
   - $access_point_id = Defaults to null. If this is a wireless controller, you can link sensors to entries in the access_points table.
   - $high_limit = Defaults to null. Sets the high limit for the sensor, used in alerting to report out range sensors.

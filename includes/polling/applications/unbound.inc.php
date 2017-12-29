@@ -6,7 +6,6 @@ $name = 'unbound';
 $app_id = $app['app_id'];
 if (!empty($agent_data['app'][$name])) {
     $rawdata = $agent_data['app'][$name];
-    update_application($app, $rawdata);
 } else {
     $options = '-O qv';
     $oid     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.7.117.110.98.111.117.110.100';
@@ -15,6 +14,7 @@ if (!empty($agent_data['app'][$name])) {
 #Format Data
 $lines = explode("\n", $rawdata);
 $unbound = array();
+$metrics = array();
 foreach ($lines as $line) {
     list($var,$value) = explode('=', $line);
     $unbound[$var] = $value;
@@ -60,6 +60,7 @@ $fields = array (
     'any' => $unbound['num.query.type.ANY'],
     'other' => $unbound['num.query.type.other']
     );
+$metrics['queries'] = $fields;
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 #Unbound Cache
@@ -73,7 +74,9 @@ $fields = array (
     'hits' => $unbound['total.num.cachehits'],
     'misses' => $unbound['total.num.cachemiss']
     );
+$metrics['cache'] = $fields;
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
+update_application($app, $rawdata, $metrics);
 
-unset($lines , $unbound, $rrd_name, $rrd_def, $fields, $tags);
+unset($lines, $unbound, $rrd_name, $rrd_def, $fields, $tags);

@@ -1,6 +1,8 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
 use LibreNMS\Authentication\TwoFactor;
+use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 
 ini_set('session.use_only_cookies', 1);
@@ -26,50 +28,49 @@ dbDelete('session', '`session_expiry` <  ?', array(time()));
 
 session_start();
 
-if ($vars['page'] == 'logout' && session_authenticated()) {
-    log_out_user();
-    header('Location: ' . $config['base_url']);
+$authorizer =  Auth::get();
+if ($vars['page'] == 'logout' && $authorizer->sessionAuthenticated()) {
+    $authorizer->logOutUser();
+    header('Location: ' . Config::get('post_logout_action', Config::get('base_url')));
     exit;
 }
 
 try {
-    if (session_authenticated()) {
+    if ($authorizer->sessionAuthenticated()) {
         // session authenticated already
-        log_in_user();
+        $authorizer->logInUser();
     } else {
         // try authentication methods
 
         if (isset($_POST['twofactor']) && TwoFactor::authenticate($_POST['twofactor'])) {
             // process two-factor auth tokens
-            log_in_user();
+            $authorizer->logInUser();
         } elseif (isset($_COOKIE['sess_id'], $_COOKIE['token']) &&
-            reauthenticate(clean($_COOKIE['sess_id']), clean($_COOKIE['token']))
+            $authorizer->reauthenticate(clean($_COOKIE['sess_id']), clean($_COOKIE['token']))
         ) {
             $_SESSION['remember'] = true;
             $_SESSION['twofactor'] = true; // trust cookie
             // cookie authentication
-            log_in_user();
+            $authorizer->logInUser();
         } else {
             // collect username and password
             $password = null;
             if (isset($_REQUEST['username']) && isset($_REQUEST['password'])) {
                 $username = clean($_REQUEST['username']);
                 $password = $_REQUEST['password'];
-            } elseif (isset($_SERVER['REMOTE_USER'])) {
-                $username = clean($_SERVER['REMOTE_USER']);
-            } elseif (isset($_SERVER['PHP_AUTH_USER']) && $config['auth_mechanism'] === 'http-auth') {
-                $username = clean($_SERVER['PHP_AUTH_USER']);
+            } elseif ($authorizer->authIsExternal()) {
+                $username = $authorizer->getExternalUsername();
             }
 
             // form authentication
-            if (isset($username) && authenticate($username, $password)) {
+            if (isset($username) && $authorizer->authenticate($username, $password)) {
                 $_SESSION['username'] = $username;
 
                 if (isset($_POST['remember'])) {
                     $_SESSION['remember'] = $_POST['remember'];
                 }
 
-                if (log_in_user()) {
+                if ($authorizer->logInUser()) {
                     // redirect to original uri or home page.
                     header('Location: '.rtrim($config['base_url'], '/').$_SERVER['REQUEST_URI'], true, 303);
                 }
@@ -86,7 +87,7 @@ try {
         array('user' => $_SESSION['username'], 'address' => get_client_ip(), 'result' => $auth_message),
         'authlog'
     );
-    log_out_user($auth_message);
+    $authorizer->logOutUser($auth_message);
 }
 
 session_write_close();

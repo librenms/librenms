@@ -1,7 +1,14 @@
 source: Alerting/index.md
+
+# About
+
+LibreNMS includes a highly customizable alerting system.
+The system requires a set of user-defined rules to evaluate the situation of each device, port, service or any other entity.
+
+> You can configure all options for alerting and transports via the WebUI, config options in this document are crossed out but left for reference.
+
 Table of Content:
 
-- [About](#about)
 - [Rules](Rules.md)
     - [Syntax](Rules.md#syntax)
     - [Options](Rules.md#options)
@@ -52,11 +59,4 @@ Table of Content:
     - [Time](Macros.md#macros-time)
     - [Sensors](Macros.md#macros-sensors)
     - [Misc](Macros.md#macros-misc)
-
-
-# About
-
-LibreNMS includes a highly customizable alerting system.
-The system requires a set of user-defined rules to evaluate the situation of each device, port, service or any other entity.
-
-> You can configure all options for alerting and transports via the WebUI, config options in this document are crossed out but left for reference.
+ - [Device Dependencies](Device-Dependencies.md)

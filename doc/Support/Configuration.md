@@ -39,6 +39,14 @@ $config['db_port']   = NULL;
 $config['db_socket'] = '/run/mysqld/mysqld.sock';
 ```
 
+### Core
+
+#### PHP Settings
+
+You can change the memory limits for php within `config.php`. The value is in Megabytes and should just be an int value:
+
+`$config['php_memory_limit'] = 128;`
+
 ### Programs
 
 A lot of these are self explanatory so no further information may be provided. Any extensions that have dedicated 
@@ -122,10 +130,6 @@ We can also make use of one of these environment variables which can be set in `
 http_proxy=proxy.domain.com
 https_proxy=proxy.domain.com
 ```
-
-### Memcached
-
-[Memcached](../Extensions/Memcached.md)
 
 ### RRDCached
 
@@ -298,6 +302,18 @@ $config['percentile_value'] = X;
 ```
 Show the `X`th percentile in the graph instead of the default 95th percentile.
 
+```php
+$config['shorthost_target_length'] = X;
+```
+The target maximum hostname length when applying the shorthost() function.
+You can increase this if you want to try and fit more of the hostname in graph titles.
+The default value is 12
+However, this can possibly break graph generation if this is very long.
+
+### Stacked Graphs
+You can enable stacked graphs instead of the default inverted graphs. 
+Enabling them is possible via webui Global Settings -> Webui Settings -> Graph settings -> Use stacked graphs
+
 ### Add host settings
 The following setting controls how hosts are added.  If a host is added as an ip address it is checked to ensure the ip is not already present.  If the ip is present the host is not added.
 If host is added by hostname this check is not performed.  If the setting is true hostnames are resolved and the check is also performed.  This helps prevents accidental duplicate hosts.
@@ -310,6 +326,14 @@ By default we allow hosts to be added with duplicate sysName's, you can disable 
 
 ```php
 $config['allow_duplicate_sysName'] = false;
+```
+
+### Global poller and discovery modules
+Generally, it is a better to set these [per OS](../Developing/os/Settings.md#poller-and-discovery-modules) or device.
+
+```php
+$config['discovery_modules]['arp-table'] = 1;
+$config['poller_modules']['bgp-peers'] = 0;
 ```
 
 ### SNMP Settings
@@ -364,7 +388,7 @@ The varying options after that are to support the different transports.
 
 ### Alerting
 
-[Alerting](../Alerting/index.md)
+[Alerting](../Alerting/Rules.md)
 
 ### Billing
 

@@ -8,6 +8,8 @@ select Capture. From this new screen choose Alerts and click run.
 The output will cycle through all alerts applicable to this device and show you the Rule name, rule, 
 MySQL query and if the rule matches.
 
+See [Device Troubleshooting](../Support/Device-Troubleshooting.md)
+
 ---
 
 ### Transports

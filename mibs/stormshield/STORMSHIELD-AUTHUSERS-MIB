@@ -1,0 +1,83 @@
+STORMSHIELD-AUTHUSERS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64   FROM SNMPv2-SMI
+      DisplayString                                        FROM RFC1213-MIB
+      SnmpAdminString                                      FROM SNMP-FRAMEWORK-MIB
+      stormshieldMIB                                       FROM STORMSHIELD-SMI-MIB;
+
+   snsUsers MODULE-IDENTITY
+      LAST-UPDATED  "201702200000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+         "Customer Support
+
+         22 rue du Gouverneur General Eboue
+         92130 Issy-les-Moulineaux
+         FRANCE
+
+         Tel: +33 (0)9 69 32 96 29
+         E-mail: support@stormshield.eu
+         http://www.stormshield.eu"
+      DESCRIPTION   "stormshield users MIBS"
+      REVISION      "201702200000Z"
+      DESCRIPTION   "Initial"
+      ::= { stormshieldMIB 2 }
+
+   snsAuthUsersTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsAuthUsersEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "List of authentified users"
+      ::= { snsUsers 1 }
+
+   snsAuthUsersEntry OBJECT-TYPE
+      SYNTAX SnsAuthUsersEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+         "Each entry in the snsAuthUsersTable holds a set of information
+         (IP, username, and timeout)."
+      INDEX { snsAuthUsersIPAddr }
+      ::= {  snsAuthUsersTable 1 }
+
+   SnsAuthUsersEntry ::= SEQUENCE {
+      snsAuthUsersIPAddr    DisplayString,
+      snsAuthUsersTimeOut   Counter64,
+      snsAuthUsersName      SnmpAdminString,
+      snsAuthUsersDomain    SnmpAdminString
+   }
+
+   snsAuthUsersIPAddr OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "IP address of the authenticated user"
+      ::= { snsAuthUsersEntry 1 }
+
+   snsAuthUsersTimeOut OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Timeout"
+      ::= { snsAuthUsersEntry 2 }
+
+   snsAuthUsersName OBJECT-TYPE
+      SYNTAX SnmpAdminString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Username"
+      ::= { snsAuthUsersEntry 3 }
+
+   snsAuthUsersDomain OBJECT-TYPE
+      SYNTAX SnmpAdminString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Domain name"
+      ::= { snsAuthUsersEntry 4 }
+
+ END

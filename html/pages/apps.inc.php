@@ -129,6 +129,8 @@ $graphs['fail2ban'] = array(
 
 $graphs['freeswitch'] = array(
     'peak',
+    'calls',
+    'channels',
     'callsIn',
     'callsOut',
 );
@@ -269,6 +271,16 @@ $graphs['pi-hole'] = array(
     'query_results',
     'block_percent',
     'blocklist',
+);
+
+$graphs['freeradius'] = array(
+    'access',
+    'auth',
+    'acct',
+    'proxy_access',
+    'proxy_auth',
+    'proxy_acct',
+    'queue',
 );
 
 print_optionbar_start();

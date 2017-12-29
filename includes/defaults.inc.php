@@ -42,8 +42,8 @@ $config['db_socket']             = null;
 $config['own_hostname'] = 'localhost';
 
 // Location of executables
-$config['fping']                    = 'fping';
-$config['fping6']                   = 'fping6';
+//$config['fping']                    = '/usr/sbin/fping';
+//$config['fping6']                   = '/usr/sbin/fping6';
 $config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count']   = 3;
@@ -61,12 +61,6 @@ $config['ipmitool']       = '/usr/bin/ipmitool';
 $config['virsh']          = '/usr/bin/virsh';
 $config['dot']            = '/usr/bin/dot';
 $config['sfdp']           = '/usr/bin/sfdp';
-
-// Memcached - Keep immediate statistics
-$config['memcached']['enable'] = false;
-$config['memcached']['host']   = 'localhost';
-$config['memcached']['port']   = 11211;
-$config['memcached']['ttl']    = 240;
 
 $config['slow_statistics'] = true;
 // THIS WILL CHANGE TO FALSE IN FUTURE
@@ -128,14 +122,14 @@ $config['old_graphs'] = 1;
 $config['int_customers'] = 1;
 // Enable Customer Port Parsing
 $config['customers_descr'] = 'cust';
-$config['transit_descr']   = 'transit';
-// Add custom transit descriptions (can be an array)
-$config['peering_descr'] = 'peering';
-// Add custom peering descriptions (can be an array)
-$config['core_descr'] = 'core';
-// Add custom core descriptions (can be an array)
-$config['custom_descr'] = '';
-// Add custom interface descriptions (can be an array)
+$config['transit_descr'][]   = 'transit';
+// Add custom transit descriptions (can be an string) 
+$config['peering_descr'][] = 'peering';
+// Add custom peering descriptions (can be an string)
+$config['core_descr'][] = 'core';
+// Add custom core descriptions (can be an string)
+$config['custom_descr'][] = '';
+// Add custom interface descriptions (can be an string)
 $config['int_transit'] = 1;
 // Enable Transit Types
 $config['int_peering'] = 1;
@@ -637,6 +631,11 @@ $config['auth_ldap_cache_ttl'] = 300;
 $config['auth_ad_user_filter'] = "(objectclass=user)";
 $config['auth_ad_group_filter'] = "(objectclass=group)";
 
+// Single sign-on defaults
+$config['sso']['create_users'] = true;
+$config['sso']['update_users'] = true;
+$config['sso']['user_attr'] = 'REMOTE_USER';
+
 // Sensors
 $config['allow_entity_sensor']['amperes']     = 1;
 $config['allow_entity_sensor']['celsius']     = 1;
@@ -760,6 +759,7 @@ $config['poller_modules']['cisco-vpdn']                  = 0;
 $config['poller_modules']['netscaler-vsvr']              = 0;
 $config['poller_modules']['aruba-controller']            = 0;
 $config['poller_modules']['entity-physical']             = 1;
+$config['poller_modules']['entity-state']                = 0;
 $config['poller_modules']['applications']                = 1;
 $config['poller_modules']['mib']                         = 0;
 $config['poller_modules']['stp']                         = 1;
@@ -767,7 +767,6 @@ $config['poller_modules']['ntp']                         = 1;
 $config['poller_modules']['services']                    = 1;
 $config['poller_modules']['loadbalancers']               = 0;
 $config['poller_modules']['mef']                         = 0;
-$config['poller_modules']['tnms-nbi']                    = 0;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
@@ -775,6 +774,7 @@ $config['discovery_modules']['os']                   = 1;
 $config['discovery_modules']['ports']                = 1;
 $config['discovery_modules']['ports-stack']          = 1;
 $config['discovery_modules']['entity-physical']      = 1;
+$config['discovery_modules']['entity-state']         = 0;
 $config['discovery_modules']['processors']           = 1;
 $config['discovery_modules']['mempools']             = 1;
 $config['discovery_modules']['cisco-vrf-lite']       = 1;
@@ -853,7 +853,7 @@ $config['api_demo'] = 0;
 // Set this to 1 if you want to disable some untrusting features for the API
 // Distributed Poller-Settings
 $config['distributed_poller']                = false;
-$config['distributed_poller_name']           = file_get_contents('/proc/sys/kernel/hostname');
+$config['distributed_poller_name']           = trim(file_get_contents('/proc/sys/kernel/hostname'));
 $config['distributed_poller_group']          = 0;
 $config['distributed_poller_memcached_host'] = 'example.net';
 $config['distributed_poller_memcached_port'] = '11211';

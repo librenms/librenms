@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+
 $no_refresh = true;
 
 if ($_SESSION['userlevel'] < '10') {
@@ -12,10 +14,10 @@ if ($_SESSION['userlevel'] < '10') {
 
     $pagetitle[] = 'Add user';
 
-    if (auth_usermanagement()) {
+    if (Auth::get()->canManageUsers()) {
         if ($_POST['action'] == 'add') {
             if ($_POST['new_username']) {
-                if (!user_exists($_POST['new_username'])) {
+                if (!Auth::get()->userExists($_POST['new_username'])) {
                     if (isset($_POST['can_modify_passwd'])) {
                         $_POST['can_modify_passwd'] = 1;
                     } else {
@@ -23,7 +25,7 @@ if ($_SESSION['userlevel'] < '10') {
                     }
 
                     // FIXME: missing email field here on the form
-                    if (adduser($_POST['new_username'], $_POST['new_password'], $_POST['new_level'], $_POST['new_email'], $_POST['new_realname'], $_POST['can_modify_passwd'])) {
+                    if (Auth::get()->addUser($_POST['new_username'], $_POST['new_password'], $_POST['new_level'], $_POST['new_email'], $_POST['new_realname'], $_POST['can_modify_passwd'])) {
                         echo '<span class=info>User '.$_POST['username'].' added!</span>';
                     }
                 } else {
@@ -102,7 +104,7 @@ if ($_SESSION['userlevel'] < '10') {
     <div class='col-sm-6'>
     </div>
   </div>";
-    
+
     echo '</form>';
     } else {
         echo '<span class="red">Auth module does not allow user management!</span><br />';

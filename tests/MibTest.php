@@ -38,7 +38,7 @@ use SplFileInfo;
  * Will not be run by default, use --group=mibs to test.
  * You may test specific directories or files by specifying them with filter. Example: --filter=@RFC1284-MIB
  */
-class MibTest extends \PHPUnit\Framework\TestCase
+class MibTest extends TestCase
 {
     /**
      * Test mib file in a directory for errors
