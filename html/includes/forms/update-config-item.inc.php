@@ -83,6 +83,9 @@ if (!is_numeric($config_id)) {
     $status  = 'ok';
 } else {
     $state  = mres($_POST['config_value']);
+    if ($_POST['item_name'] == "oxidized.url" && !preg_match("#^[a-zA-Z0-9]{1,5}://#", $state)) {
+        $state = "http://" . $state;
+    }
     $update = dbUpdate(array('config_value' => $state), 'config', '`config_id`=?', array($config_id));
     if (!empty($update) || $update == '0') {
         $message = 'Alert rule has been updated.';
