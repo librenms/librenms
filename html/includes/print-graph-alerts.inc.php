@@ -2,13 +2,20 @@
 /*
  * LibreNMS
  *
- * Copyright (c) 2015 Søren Friis Rosiak <sorenrosiak@gmail.com>
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
- */
+ *
+ * Copyright (c) 2015 Søren Friis Rosiak <sorenrosiak@gmail.com>
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2017 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
 $pagetitle[] = "Alert Stats";
 
@@ -29,8 +36,16 @@ if ($_SESSION['userlevel'] < '5') {
 }
 
 ?>
+<br>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        Device alerts
+    </div>
+    <br>
+    <div style="margin:0 auto;width:99%;">
+
 <script src="js/vis.min.js"></script>
-<div id="visualization"></div>
+<div id="visualization" style="margin-bottom: -120px;"></div>
 <script type="text/javascript">
 
     var container = document.getElementById('visualization');

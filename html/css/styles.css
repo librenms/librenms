@@ -2162,3 +2162,15 @@ label {
   width: 7px;
   min-height: 27px;
 }
+
+.device-services-page {
+  font-weight: bold;
+  margin-left: 20px;
+  vertical-align: middle;
+}
+
+.device-services-page-no-service {
+  font-weight: bold;
+  vertical-align: middle;
+  padding: 15px;
+}
