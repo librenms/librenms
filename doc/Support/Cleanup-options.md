@@ -17,7 +17,7 @@ $config['rrd_purge']                                      = 90;// Not set by def
 ```
 These options will ensure data within LibreNMS over X days old is automatically purged. You can alter these individually, values are in days.
 
-**NOTE**: Please be aware that ```$config['rrd_purge']``` is NOT set by default. This option will remove any old data within the rrd directory automatically - only enable this if you are comfortable with that happening.
+**NOTE**: Please be aware that ```$config['rrd_purge']``` is NOT set by default. This option will remove any rrd files that have not been updated for the set amount of days automatically - only enable this if you are comfortable with that happening. (all active rrd files are updated every polling period)
 
 
 ### Ports Purge
