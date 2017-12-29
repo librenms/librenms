@@ -106,6 +106,7 @@ class ModuleTestHelper
         $snmp_oids = $this->collectOids($device_id);
 
         $device = device_by_id_cache($device_id, true);
+        load_os($device);
 
         $snmprec_data = array();
         foreach ($snmp_oids as $oid_data) {
@@ -272,13 +273,15 @@ class ModuleTestHelper
                 }
             } else {
                 // multi-line data, append to last
-                $last = end($result);
+                if (!empty($result)) {
+                    $last = end($result);
 
-                list($oid, $type, $data) = explode('|', $last, 3);
-                if ($type == '4x') {
-                    $result[key($result)] .= bin2hex(PHP_EOL . $line);
-                } else {
-                    $result[key($result)] = "$oid|4x|" . bin2hex($data . PHP_EOL . $line);
+                    list($oid, $type, $data) = explode('|', $last, 3);
+                    if ($type == '4x') {
+                        $result[key($result)] .= bin2hex(PHP_EOL . $line);
+                    } else {
+                        $result[key($result)] = "$oid|4x|" . bin2hex($data . PHP_EOL . $line);
+                    }
                 }
             }
         }
