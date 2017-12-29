@@ -97,6 +97,7 @@ if ($config['oxidized']['enabled'] === true && isset($config['oxidized']['url'])
 }
 
 ?>
+               <li><a href="<?php echo(generate_url(array('page' => 'tools', 'tool' => 'oxidized-cfg-check'))); ?>"><i class="fa fa-check-square-o fa-fw fa-lg" aria-hidden="true"></i> Oxidized Config Checker</a></li>
            </ul>
           </li>
             <li role="presentation" class="divider"></li>
