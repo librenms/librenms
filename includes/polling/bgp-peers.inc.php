@@ -330,7 +330,7 @@ if ($config['enable_bgp']) {
                     // Validate data
                     $cbgpPeerAcceptedPrefixes     = set_numeric($cbgpPeerAcceptedPrefixes);
                     $cbgpPeerDeniedPrefixes       = set_numeric($cbgpPeerDeniedPrefixes);
-                    $cbgpPeerPrefixAdminLimit     = set_numeric($cbgpPeerAdminLimit);
+                    $cbgpPeerPrefixAdminLimit     = set_numeric($cbgpPeerPrefixAdminLimit);
                     $cbgpPeerPrefixThreshold      = set_numeric($cbgpPeerPrefixThreshold);
                     $cbgpPeerPrefixClearThreshold = set_numeric($cbgpPeerPrefixClearThreshold);
                     $cbgpPeerAdvertisedPrefixes   = set_numeric($cbgpPeerAdvertisedPrefixes);
@@ -340,7 +340,7 @@ if ($config['enable_bgp']) {
                     $cbgpPeers_cbgp_fields = array(
                         'AcceptedPrefixes'     => $cbgpPeerAcceptedPrefixes,
                         'DeniedPrefixes'       => $cbgpPeerDeniedPrefixes,
-                        'PrefixAdminLimit'     => $cbgpPeerAdminLimit,
+                        'PrefixAdminLimit'     => $cbgpPeerPrefixAdminLimit,
                         'PrefixThreshold'      => $cbgpPeerPrefixThreshold,
                         'PrefixClearThreshold' => $cbgpPeerPrefixClearThreshold,
                         'AdvertisedPrefixes'   => $cbgpPeerAdvertisedPrefixes,
