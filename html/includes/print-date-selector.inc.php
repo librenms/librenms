@@ -1,7 +1,6 @@
 <?php
 
-echo "
-    <center>
+echo "<div style='text-align: center;'>
         <form class='form-inline' id='customrange'>
         <input type=hidden id='selfaction' value='" . $_SERVER['REQUEST_URI'] . "'>
 ";
@@ -36,5 +35,6 @@ echo '
         $("#dtpickerfrom").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false, icons: {time: "fa fa-clock-o", date: "fa fa-calendar", up: "fa fa-chevron-up", down: "fa fa-chevron-down", previous: "fa fa-chevron-left", next: "fa fa-chevron-right", today: "fa fa-calendar-check-o", clear: "fa fa-trash-o", close: "fa fa-close"}});
         $("#dtpickerto").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false, icons: {time: "fa fa-clock-o", date: "fa fa-calendar", up: "fa fa-chevron-up", down: "fa fa-chevron-down", previous: "fa fa-chevron-left", next: "fa fa-chevron-right", today: "fa fa-calendar-check-o", clear: "fa fa-trash-o", close: "fa fa-close"}});
 });
-    </script></center>
+    </script>
+    </div>
 ';
