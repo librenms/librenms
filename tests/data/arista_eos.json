@@ -25,7 +25,7 @@
                 },
                 {
                     "astext": "",
-                    "bgpPeerIdentifier": "2001:1122:0002:002f:0000:0000:0033:0001",
+                    "bgpPeerIdentifier": "2001:0550:0002:002f:0000:0000:0033:0001",
                     "bgpPeerRemoteAs": "65001",
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
@@ -42,7 +42,7 @@
             ],
             "bgpPeers_cbgp": [
                 {
-                    "bgpPeerIdentifier": "2001:1122:0002:002f:0000:0000:0033:0001",
+                    "bgpPeerIdentifier": "2001:0550:0002:002f:0000:0000:0033:0001",
                     "afi": "ipv6",
                     "safi": "unicast",
                     "AcceptedPrefixes": "40633",
@@ -116,7 +116,7 @@
                 },
                 {
                     "astext": "TRANSIT PROVIDER",
-                    "bgpPeerIdentifier": "2001:1122:0002:002f:0000:0000:0033:0001",
+                    "bgpPeerIdentifier": "2001:0550:0002:002f:0000:0000:0033:0001",
                     "bgpPeerRemoteAs": "65001",
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
@@ -157,7 +157,7 @@
                     "context_name": ""
                 },
                 {
-                    "bgpPeerIdentifier": "2001:1122:0002:002f:0000:0000:0033:0001",
+                    "bgpPeerIdentifier": "2001:0550:0002:002f:0000:0000:0033:0001",
                     "afi": "ipv6",
                     "safi": "unicast",
                     "AcceptedPrefixes": "0",
