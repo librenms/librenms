@@ -42,6 +42,7 @@ Different applications support a variety of ways to collect data: by direct conn
 1. [Unbound](#unbound) - Agent
 1. [UPS-nut](#ups-nut) - SNMP extend
 1. [UPS-apcups](#ups-apcups) - SNMP extend
+1. [ZFS](#zfs) - SNMP extend
 
 ### Apache
 Either use SNMP extend or use the agent.
@@ -953,3 +954,22 @@ extend sdfsinfo /etc/snmp/sdfsinfo
 4. Restart snmpd on your host
 
 5. On the device page in Librenms, edit your host and check the `SDFS info` under the Applications tab or wait for it to be auto-discovered.
+
+### ZFS
+
+###### SNMP Extend
+1. Copy the perl script to the desired host (the host must be added to LibreNMS devices)
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-freebsd -O /etc/snmp/zfs-freebsd
+```
+
+2. Make the script executable (chmod +x /etc/snmp/zfs-freebsd)
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend zfs /etc/snmp/zfs-freebsd
+```
+
+4. Restart snmpd on your host
+
+At this time, only FreeBSD is support. Linux support is eventually planned.
