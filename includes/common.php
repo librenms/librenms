@@ -1560,14 +1560,16 @@ function display($value, $purifier_config = array())
  * $device['os'] must be set
  *
  * @param array $device
- * @throws Exception No OS to load
  */
 function load_os(&$device)
 {
     global $config;
+
     if (!isset($device['os'])) {
-        throw new Exception('No OS to load');
+        d_echo('No OS to load');
+        return;
     }
+
     $tmp_os = Symfony\Component\Yaml\Yaml::parse(
         file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
     );
