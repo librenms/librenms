@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests;
 
-class AlertTest extends \PHPUnit_Framework_TestCase
+class AlertTest extends TestCase
 {
     public function testJsonAlertCollection()
     {

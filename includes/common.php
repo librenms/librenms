@@ -20,22 +20,22 @@ use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
-function generate_priority_icon($priority)
+function generate_priority_label($priority)
 {
     $map = array(
-        "emerg"     => "fa-plus-circle text-danger",
-        "alert"     => "fa-ban text-danger",
-        "crit"      => "fa-minus-circle text-danger",
-        "err"       => "fa-times-circle text-warning",
-        "warning"   => "fa-exclamation-triangle text-warning",
-        "notice"    => "fa-info-circle text-info",
-        "info"      => "fa-info-circle text-info",
-        "debug"     => "fa-bug text-muted",
-        ""          => "fa-info-circle text-info",
+        "emerg"     => "label-danger",
+        "alert"     => "label-danger",
+        "crit"      => "label-danger",
+        "err"       => "label-danger",
+        "warning"   => "label-warning",
+        "notice"    => "label-info",
+        "info"      => "label-info",
+        "debug"     => "label-default",
+        ""          => "label-info",
     );
 
-    $fa_icon = isset($map[$priority]) ? $map[$priority] : 'fa-info-circle text-info';
-    return '<i class="fa '. $fa_icon.' fa-lg" title="'.$priority.'" aria-hidden="true"></i>';
+    $barColor = isset($map[$priority]) ? $map[$priority] : 'label-info';
+    return '<span class="alert-status '.$barColor .'">&nbsp;</span>';
 }
 
 function generate_priority_status($priority)
@@ -53,6 +53,23 @@ function generate_priority_status($priority)
     );
 
     return isset($map[$priority]) ? $map[$priority] : 0;
+}
+
+function graylog_severity_label($severity)
+{
+    $map = array(
+        "0" => "label-danger",
+        "1" => "label-danger",
+        "2" => "label-danger",
+        "3" => "label-danger",
+        "4" => "label-warning",
+        "5" => "label-info",
+        "6" => "label-info",
+        "7" => "label-default",
+        ""  => "label-info",
+    );
+    $barColor = isset($map[$severity]) ? $map[$severity] : 'label-info';
+    return '<span class="alert-status '.$barColor .'">&nbsp;</span>';
 }
 
 function external_exec($command)
@@ -335,7 +352,7 @@ function accesspoint_by_id($ap_id, $refresh = '0')
 }
 
 
-function device_by_id_cache($device_id, $refresh = '0')
+function device_by_id_cache($device_id, $refresh = false)
 {
     global $cache;
 
@@ -343,6 +360,7 @@ function device_by_id_cache($device_id, $refresh = '0')
         $device = $cache['devices']['id'][$device_id];
     } else {
         $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device_id));
+        load_os($device);
 
         //order vrf_lite_cisco with context, this will help to get the vrf_name and instance_name all the time
         $vrfs_lite_cisco = dbFetchRows("SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = ?", array($device_id));
@@ -1496,11 +1514,16 @@ function print_list($list, $format, $max = 10)
 
 /**
  * @param $value
+ * @param bool $strip_tags
  * @return string
  */
-function clean($value)
+function clean($value, $strip_tags = true)
 {
-    return strip_tags(mres($value));
+    if ($strip_tags === true) {
+        return strip_tags(mres($value));
+    } else {
+        return mres($value);
+    }
 }
 
 /**
@@ -1537,14 +1560,16 @@ function display($value, $purifier_config = array())
  * $device['os'] must be set
  *
  * @param array $device
- * @throws Exception No OS to load
  */
 function load_os(&$device)
 {
     global $config;
+
     if (!isset($device['os'])) {
-        throw new Exception('No OS to load');
+        d_echo('No OS to load');
+        return;
     }
+
     $tmp_os = Symfony\Component\Yaml\Yaml::parse(
         file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
     );

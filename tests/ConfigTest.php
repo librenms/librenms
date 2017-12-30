@@ -27,7 +27,7 @@ namespace LibreNMS\Tests;
 
 use LibreNMS\Config;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends TestCase
 {
     public function testGetBasic()
     {

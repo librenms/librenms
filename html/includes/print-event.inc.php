@@ -1,22 +1,34 @@
 <?php
+/*
+ * LibreNMS
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2017 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
 $hostname = gethostbyid($entry['host']);
 
 unset($icon);
+
 $severity_colour = eventlog_severity($entry['severity']);
+$icon = '<span class="alert-status '.$severity_colour.'"></span>';
 
-$icon = "<i class='fa fa-bookmark fa-lg $severity_colour' aria-hidden='true'></i>";
-
-echo '<tr>
-  <td>'.$icon.'&nbsp;
-    '.$entry['datetime'].'
-  </td>';
+echo '<tr>';
+echo '<td>'.$icon .'</td>';
+echo '<td style="vertical-align: middle;">'.$entry['datetime'].'</td>';
 
 if (!isset($vars['device'])) {
     $dev = device_by_id_cache($entry['host']);
-    echo '<td>
-    '.generate_device_link($dev, shorthost($dev['hostname'])).'
-  </td>';
+    echo '<td style="vertical-align: middle;">'.generate_device_link($dev, shorthost($dev['hostname'])).'</td>';
 }
 
 if ($entry['type'] == 'interface') {
@@ -26,7 +38,7 @@ if ($entry['type'] == 'interface') {
     $entry['link'] = 'System';
 }
 
-echo '<td>'.$entry['link'].'</td>';
+echo '<td style="vertical-align: middle;">'.$entry['link'].'</td>';
 
-echo '<td>'.htmlspecialchars($entry['message']).'</td>
-</tr>';
+echo '<td style="vertical-align: middle;">'.htmlspecialchars($entry['message']).'</td>';
+echo '</tr>';
