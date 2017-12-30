@@ -106,7 +106,6 @@ class ModuleTestHelper
         $snmp_oids = $this->collectOids($device_id);
 
         $device = device_by_id_cache($device_id, true);
-        load_os($device);
 
         $snmprec_data = array();
         foreach ($snmp_oids as $oid_data) {
@@ -242,9 +241,10 @@ class ModuleTestHelper
                 continue;
             }
 
-            if (str_contains($line, ' = ')) {
-                list($oid, $raw_data) = explode(' = ', $line, 2);
+            if (str_contains($line, ' =')) {
+                list($oid, $raw_data) = explode(' =', $line, 2);
                 $oid = ltrim($oid, '.');
+                $raw_data = trim($raw_data);
 
                 if (empty($raw_data)) {
                     $result[] = "$oid|4|"; // empty data, we don't know type, put string
@@ -273,15 +273,13 @@ class ModuleTestHelper
                 }
             } else {
                 // multi-line data, append to last
-                if (!empty($result)) {
-                    $last = end($result);
+                $last = end($result);
 
-                    list($oid, $type, $data) = explode('|', $last, 3);
-                    if ($type == '4x') {
-                        $result[key($result)] .= bin2hex(PHP_EOL . $line);
-                    } else {
-                        $result[key($result)] = "$oid|4x|" . bin2hex($data . PHP_EOL . $line);
-                    }
+                list($oid, $type, $data) = explode('|', $last, 3);
+                if ($type == '4x') {
+                    $result[key($result)] .= bin2hex(PHP_EOL . $line);
+                } else {
+                    $result[key($result)] = "$oid|4x|" . bin2hex($data . PHP_EOL . $line);
                 }
             }
         }

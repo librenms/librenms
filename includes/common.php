@@ -360,6 +360,7 @@ function device_by_id_cache($device_id, $refresh = false)
         $device = $cache['devices']['id'][$device_id];
     } else {
         $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device_id));
+        load_os($device);
 
         //order vrf_lite_cisco with context, this will help to get the vrf_name and instance_name all the time
         $vrfs_lite_cisco = dbFetchRows("SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = ?", array($device_id));
