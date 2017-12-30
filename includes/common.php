@@ -360,6 +360,7 @@ function device_by_id_cache($device_id, $refresh = false)
         $device = $cache['devices']['id'][$device_id];
     } else {
         $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device_id));
+        load_os($device);
 
         //order vrf_lite_cisco with context, this will help to get the vrf_name and instance_name all the time
         $vrfs_lite_cisco = dbFetchRows("SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = ?", array($device_id));
@@ -1559,14 +1560,16 @@ function display($value, $purifier_config = array())
  * $device['os'] must be set
  *
  * @param array $device
- * @throws Exception No OS to load
  */
 function load_os(&$device)
 {
     global $config;
+
     if (!isset($device['os'])) {
-        throw new Exception('No OS to load');
+        d_echo('No OS to load');
+        return;
     }
+
     $tmp_os = Symfony\Component\Yaml\Yaml::parse(
         file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
     );
