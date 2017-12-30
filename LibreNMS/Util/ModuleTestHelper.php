@@ -241,9 +241,10 @@ class ModuleTestHelper
                 continue;
             }
 
-            if (str_contains($line, ' = ')) {
-                list($oid, $raw_data) = explode(' = ', $line, 2);
+            if (str_contains($line, ' =')) {
+                list($oid, $raw_data) = explode(' =', $line, 2);
                 $oid = ltrim($oid, '.');
+                $raw_data = trim($raw_data);
 
                 if (empty($raw_data)) {
                     $result[] = "$oid|4|"; // empty data, we don't know type, put string
