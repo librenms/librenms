@@ -22,7 +22,7 @@ Once syslog-ng is installed, edit the relevant config file (most likely /etc/sys
 ```bash
 @version:3.5
 @include "scl.conf"
- 
+
 # syslog-ng configuration file.
 #
 # This should behave pretty much like the original syslog on RedHat. But
@@ -32,7 +32,7 @@ Once syslog-ng is installed, edit the relevant config file (most likely /etc/sys
 #
 # Note: it also sources additional configuration files (*.conf)
 #       located in /etc/syslog-ng/conf.d/
- 
+
 options {
         chain_hostnames(off);
         flush_lines(0);
@@ -44,27 +44,27 @@ options {
         stats_freq(0);
         bad_hostname("^gconfd$");
 };
- 
- 
+
+
 source s_sys {
     system();
     internal();
- 
+
 };
- 
+
 source s_net {
         tcp(port(514) flags(syslog-protocol));
         udp(port(514) flags(syslog-protocol));
 };
- 
- 
+
+
 ########################
 # Destinations
 ########################
 destination d_librenms {
-        program("/opt/librenms/syslog.php" template ("$HOST||$FACILITY||$PRIORITY||$LEVEL||$TAG||$R_YEAR-$R_MONTH-$R_DAY $R_HOUR:$R_MIN:$R_SEC||$MSG||$PROGRAM\n") template-escape(yes));
+        program("/opt/librenms/syslog.php" template ("$HOST||$FACILITY||$PRIORITY||$LEVEL||$TAG||$R_YEAR-$R_MONTH-$R_DAY $R_HOUR:$R_MIN:$R_SEC||$MSG||$PROGR$
 };
- 
+
 filter f_kernel     { facility(kern); };
 filter f_default    { level(info..emerg) and
                         not (facility(mail)
@@ -78,7 +78,7 @@ filter f_news       { facility(uucp) or
                         and level(crit..emerg)); };
 filter f_boot   { facility(local7); };
 filter f_cron   { facility(cron); };
- 
+
 ########################
 # Log paths
 ########################
@@ -87,6 +87,13 @@ log {
         source(s_sys);
         destination(d_librenms);
 };
+
+# Source additional configuration files (.conf extension only)
+@include "/etc/syslog-ng/conf.d/*.conf"
+
+
+# vim:ft=syslog-ng:ai:si:ts=4:sw=4:et:
+
 ```
 
 # Source additional configuration files (.conf extension only)
