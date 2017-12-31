@@ -19,12 +19,20 @@ yum install syslog-ng
 
 Once syslog-ng is installed, edit the relevant config file (most likely /etc/syslog-ng/syslog-ng.conf) and paste the following:
 
-```ssh
-@version: 3.5
+```bash
+@version:3.5
 @include "scl.conf"
-@include "`scl-root`/system/tty10.conf"
 
-# First, set some global options.
+# syslog-ng configuration file.
+#
+# This should behave pretty much like the original syslog on RedHat. But
+# it could be configured a lot smarter.
+#
+# See syslog-ng(8) and syslog-ng.conf(5) for more information.
+#
+# Note: it also sources additional configuration files (*.conf)
+#       located in /etc/syslog-ng/conf.d/
+
 options {
         chain_hostnames(off);
         flush_lines(0);
@@ -37,12 +45,11 @@ options {
         bad_hostname("^gconfd$");
 };
 
-########################
-# Sources
-########################
+
 source s_sys {
-       system();
-       internal();
+    system();
+    internal();
+
 };
 
 source s_net {
@@ -50,12 +57,27 @@ source s_net {
         udp(port(514) flags(syslog-protocol));
 };
 
+
 ########################
 # Destinations
 ########################
 destination d_librenms {
-        program("/opt/librenms/syslog.php" template ("$HOST||$FACILITY||$PRIORITY||$LEVEL||$TAG||$R_YEAR-$R_MONTH-$R_DAY $R_HOUR:$R_MIN:$R_SEC||$MSG||$PROGRAM\n") template-escape(yes));
+        program("/opt/librenms/syslog.php" template ("$HOST||$FACILITY||$PRIORITY||$LEVEL||$TAG||$R_YEAR-$R_MONTH-$R_DAY $R_HOUR:$R_MIN:$R_SEC||$MSG||$PROGR$
 };
+
+filter f_kernel     { facility(kern); };
+filter f_default    { level(info..emerg) and
+                        not (facility(mail)
+                        or facility(authpriv)
+                        or facility(cron)); };
+filter f_auth       { facility(authpriv); };
+filter f_mail       { facility(mail); };
+filter f_emergency  { level(emerg); };
+filter f_news       { facility(uucp) or
+                        (facility(news)
+                        and level(crit..emerg)); };
+filter f_boot   { facility(local7); };
+filter f_cron   { facility(cron); };
 
 ########################
 # Log paths
@@ -66,10 +88,11 @@ log {
         destination(d_librenms);
 };
 
-###
-# Include all config files in /etc/syslog-ng/conf.d/
-###
+# Source additional configuration files (.conf extension only)
 @include "/etc/syslog-ng/conf.d/*.conf"
+
+
+# vim:ft=syslog-ng:ai:si:ts=4:sw=4:et:
 ```
 
 Next start syslog-ng:
