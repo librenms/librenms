@@ -148,7 +148,7 @@ pages:
       - Security information: General/Security.md
       - CLI Scripts: Support/CLI-Tools.md
       - Device Notes: Support/Device-Notes.md
-          - Carel pCOweb: Support/Devices/Carel-pCOweb-Devices.md
+          - Support/Devices/Carel-pCOweb-Devices.md
   - hidden:
       - API/API-Docs.md
       - Installation/Installing-LibreNMS.md
