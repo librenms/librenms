@@ -1,3 +1,66 @@
+## 1.35
+*(2017-12-20)*
+
+#### Features
+* Generic discovery and poller tests ([#7873](https://github.com/librenms/librenms/issues/7873))
+* FreeRADIUS application monitoring ([#7818](https://github.com/librenms/librenms/issues/7818))
+* Save application metrics to db for alerting ([#7828](https://github.com/librenms/librenms/issues/7828))
+* Added Entity State polling ([#7625](https://github.com/librenms/librenms/issues/7625))
+* Added manage_bills.php script to scripts directory ([#7633](https://github.com/librenms/librenms/issues/7633)) 
+* Added Host dependencies support for alerting ([#7332](https://github.com/librenms/librenms/issues/7332))
+
+#### Bugfixes
+* Agent tries to insert processes data that is too long ([#7891](https://github.com/librenms/librenms/issues/7891))
+* Remove faulty memcached code (not related to distributed polling) ([#7881](https://github.com/librenms/librenms/issues/7881))
+* Re-added peeringdb back into daily.sh ([#7884](https://github.com/librenms/librenms/issues/7884))
+* Don't work around bad implementations in snmpwalk_group ([#7876](https://github.com/librenms/librenms/issues/7876))
+* Some graphs broke due to stacked graphs, remove that change ([#7848](https://github.com/librenms/librenms/issues/7848))
+* Fixed UPS time remaining in Mikrotik RouterOs ([#7803](https://github.com/librenms/librenms/issues/7803))
+* Fixed get_all_ports() for api not returning ports on admin tokens ([#7829](https://github.com/librenms/librenms/issues/7829))
+* Validate ifHighSpeed is > 0 in selected port polling ([#7885](https://github.com/librenms/librenms/issues/7885))
+* Added user level to getUser for LDAP authentication ([#7896](https://github.com/librenms/librenms/issues/7896)) 
+* ipmi sensors sending the wrong tags to influxdb ([#7906](https://github.com/librenms/librenms/issues/7906))
+
+#### Documentation
+* Minor fix to device sensors doc ([#7874](https://github.com/librenms/librenms/issues/7874))
+* Create device sensor help doc. ([#7868](https://github.com/librenms/librenms/issues/7868))
+* Updated sensor state doc ([#7822](https://github.com/librenms/librenms/issues/7822))
+* Build new Cleanup Options doc ([#7798](https://github.com/librenms/librenms/issues/7798))
+
+#### Refactoring
+* Stop sending emails to "NOC" for default_email target ([#7917](https://github.com/librenms/librenms/issues/7917))
+* Refactor alert transports to classes ([#7844](https://github.com/librenms/librenms/issues/7844))
+* Update all applications to store metrics ([#7853](https://github.com/librenms/librenms/issues/7853)) 
+
+#### Devices
+* Added state sensor support for HPE MSA devices ([#7808](https://github.com/librenms/librenms/issues/7808))
+* Added temp and humidity sesors + serial for websensor (renamed from cometsystem-p85xx) ([#7854](https://github.com/librenms/librenms/issues/7854))
+* Added Mikrotik POE sensors ([#7883](https://github.com/librenms/librenms/issues/7883))
+* Added Mikrotik LLDP discovery ([#7901](https://github.com/librenms/librenms/issues/7901))
+* Update wireless sensors for Ray and Alcoma devices ([#7820](https://github.com/librenms/librenms/issues/7820))
+* Added support EdgeCore ECS4120-28T ([#7880](https://github.com/librenms/librenms/issues/7880))
+* Added Junos dwdm interface sensor support ([#7714](https://github.com/librenms/librenms/issues/7714))
+* Added detection for Cisco FTD devices ([#7887](https://github.com/librenms/librenms/issues/7887))
+
+#### WebUI
+* Timezone support for graylog ([#7799](https://github.com/librenms/librenms/issues/7799))
+* Added support for stacked graphs ([#7725](https://github.com/librenms/librenms/issues/7725))
+* Added ability to mark all notifications as read ([#7489](https://github.com/librenms/librenms/issues/7489))
+* Disabled page refresh on Add services page ([#7804](https://github.com/librenms/librenms/issues/7804))
+* Added diskusage to top devices widget ([#7903](https://github.com/librenms/librenms/issues/7903))
+
+#### API
+* Added Retrieve BGP sessions by ID ([#7825](https://github.com/librenms/librenms/issues/7825))
+* Fixed disabling tokens ([#7833](https://github.com/librenms/librenms/issues/7833))
+* Added support for wireless sensors ([#7846](https://github.com/librenms/librenms/issues/7846))
+* Added API method to rename devices ([#7895](https://github.com/librenms/librenms/issues/7895)) 
+
+#### Alerting
+* Validate email addresses used in alerting ([#7830](https://github.com/librenms/librenms/issues/7836))
+* Added generic alerting for state sensors ([#7812](https://github.com/librenms/librenms/issues/7812))
+
+---
+
 ## 1.33
 *(2017-10-29)*
 
