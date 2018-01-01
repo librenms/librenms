@@ -119,7 +119,7 @@ require_once 'includes/modal/delete_service.inc.php';
                     $sql_param[] = $state;
                 }
                 ?>
-                <div class="row col-sm-12"><span id="message"></span></div>
+
                 <?php
                 if ($_SESSION['userlevel'] >= '5') {
                     $host_sql = 'SELECT `D`.`device_id`,`D`.`hostname`,`D`.`sysName` FROM devices AS D, services AS S WHERE D.device_id = S.device_id GROUP BY `D`.`hostname`, `D`.`device_id`, `D`.`sysName` ORDER BY D.hostname';
@@ -141,9 +141,14 @@ require_once 'includes/modal/delete_service.inc.php';
                     } else {
                         $sql_param[0] = $device_id;
                     }
-                    $head = true;
 
-                    foreach (dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ? $where ORDER BY service_type", $sql_param) as $service) {
+                    $header = true;
+                    $footer = false;
+
+                    $svc = 0;
+                    $svcs = dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ? $where ORDER BY service_type", $sql_param);
+                    $svct = count($svcs);
+                    foreach ($svcs as $service) {
                         if ($service['service_status'] == '2') {
                             $label = 'label-danger';
                             $title = 'CRITICAL';
@@ -157,52 +162,55 @@ require_once 'includes/modal/delete_service.inc.php';
                             $label = 'label-info';
                             $title = 'UNKNOWN';
                         }
-                        if ($head) {
-                            echo '
-<div class="panel panel-default">
-<div class="panel-heading">
-    <h3 class="panel-title">' . $devlink . '</h3>
-    ' . $device_sysName . '
-</div>
-<div class="panel-body">
-<table class="table table-hover table-condensed">
-<thead>
-    <tr>
-        <th style="width:1%;max-width:1%;"></th>
-        <th style="width:10%;max-width: 10%;">Service</th>
-        <th style="width:15%;max-width: 15%;">Last Changed</th>
-        <th style="width:15%;max-width: 15%;">Description</th>
-        <th >Message</th>
-        <th style="width:5%;max-width:5%;"></th>
-    </tr>
-</thead>
-';
+
+                        $svc++;
+
+                        if ($svc < 2 && $header) {
+                            echo '<div class="panel panel-default">';
+                            echo '<div class="panel-heading"><h3 class="panel-title">' . $devlink . '</h3>' . $device_sysName . '</div>';
+                            echo '<div class="panel-body">';
+                            echo '<table class="table table-hover table-condensed">';
+                            echo '<thead>';
+                            echo '<th style="width:1%;max-width:1%;"></th>';
+                            echo '<th style="width:10%;max-width: 10%;">Service</th>';
+                            echo '<th style="width:15%;max-width: 15%;">Last Changed</th>';
+                            echo '<th style="width:15%;max-width: 15%;">Description</th>';
+                            echo '<th >Message</th>';
+                            echo '<th style="width:5%;max-width:5%;"></th>';
+                            echo '</thead>';
                         }
-                        $head = false;
-                        ?>
-                        <tr id="row_<?php echo $service['service_id']; ?>">
-                            <td><span data-toggle='tooltip' title='<?php echo $title ?>'
-                                      class='alert-status <?php echo $label ?>'> </span></td>
-                            <td><?php echo nl2br(display($service['service_type'])) ?></td>
-                            <td><?php echo formatUptime(time() - $service['service_changed']) ?></td>
-                            <td><?php echo nl2br(display($service['service_desc'])) ?></td>
-                            <td><?php echo nl2br(display($service['service_message'])) ?></td>
-                            <?php
-                            if (is_admin() === true) {
-                                echo "<td>
+
+                        $header = false;
+
+                        echo '<tr>';
+                        echo '<td><span data-toggle="tooltip" title="' . $title . '" class="alert-status ' . $label . '"></span></td>';
+                        echo '<td>' . nl2br(display($service['service_type'])) . '</td>';
+                        echo '<td>' . formatUptime(time() - $service['service_changed']) . '</td>';
+                        echo '<td>' . nl2br(display($service['service_desc'])) . '</td>';
+                        echo '<td>' . nl2br(display($service['service_message'])) . '</td>';
+
+                        if (is_admin() === true) {
+                            echo "<td>
                                     <button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
                                     <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button>
                                     </td>";
-                            }
-                            ?>
-                        </tr>
-                        <?php
-                    }//end foreach
+                        }
+                        echo '</tr>';
 
-                    echo "</table></div></div>";
-                    unset($samehost);
-                }//end foreach
+                        if ($svc >= $svct) {
+                            $footer = true;
+                        }
+
+                        if ($footer) {
+                            echo '</table>';
+                            echo '</div>';
+                            echo '</div>';
+                        }
+                    }
+                }
+                unset($samehost);
                 ?>
             </div>
         </div>
     </div>
+</div>
