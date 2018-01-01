@@ -3,6 +3,11 @@ GH_REPO="@github.com/librenms-docs/librenms-docs.github.io.git"
 FULL_REPO="https://${GH_TOKEN}$GH_REPO"
 THEME_REPO="https://github.com/librenms-docs/theme_v2.git"
 
+if [ "$EXECUTE_BUILD_DOCS" != "true" ]; then
+    echo "Doc build skipped"
+    exit 0
+fi
+
 pip install --user 'jinja2<2.9'
 pip install --user mkdocs
 pip install --user pymdown-extensions
