@@ -1,8 +1,6 @@
 <?php
 
 echo '
-<div>
-  <div class="panel panel-default">
     <div class="panel-body">
       <table class="table table-condensed" style="border-collapse:collapse;">
         <thead>
@@ -54,7 +52,4 @@ foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `ospfAdminStat` = 'en
           </tr>
         </tbody>';
 }
-echo '</table>
-    </div>
-  </div>
-</div>';
+echo '</table></div>';

@@ -11,8 +11,6 @@ if ($_SESSION['userlevel'] < '5') {
         'protocol' => 'bgp',
     );
 
-    print_optionbar_start('', '');
-
     echo '<span style="font-weight: bold;">BGP</span> &#187; ';
 
     if (!$vars['type']) {
@@ -191,10 +189,19 @@ if ($_SESSION['userlevel'] < '5') {
 
     echo '</div>';
 
-    print_optionbar_end();
-
-    echo "<table border=0 cellspacing=0 cellpadding=5 width=100% class='table sortable'>";
-    echo '<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>State</th><th width=200>Uptime / Updates</th></tr>';
+    echo '</div>';
+    echo '<div class="panel-body">';
+    echo '<table class="table table-hover table-condensed table-striped">';
+    echo '<thead>';
+    echo '<th width=150>Local address</th>
+          <th width=30></th>
+          <th width=150>Peer address</th>
+          <th width=60>Type</th>
+          <th width=100>Family</th>
+          <th>Remote AS</th>
+          <th>State</th>
+          <th>Uptime / Updates</th>';
+    echo '</thead>';
 
     if ($vars['type'] == 'external') {
         $where = 'AND D.bgpLocalAs != B.bgpPeerRemoteAs';
@@ -294,17 +301,18 @@ if ($_SESSION['userlevel'] < '5') {
 
         unset($sep);
 
-        echo '  <td></td>
-            <td width=150>'.$localaddresslink.'<br />'.generate_device_link($peer, shorthost($peer['hostname']), array('tab' => 'routing', 'proto' => 'bgp')).'</td>
-            <td width=30><b>&#187;</b></td>
-            <td width=150>'.$peeraddresslink."</td>
-            <td width=50><b>$peer_type</b></td>
-            <td width=50>".$peer['afi'].'</td>
+        echo '
+            <td>'.$localaddresslink.'<br />'.generate_device_link($peer, shorthost($peer['hostname']), array('tab' => 'routing', 'proto' => 'bgp')).'</td>
+            <td><b>&#187;</b></td>
+            <td>'.$peeraddresslink."</td>
+            <td><b>$peer_type</b></td>
+            <td>".$peer['afi'].'</td>
             <td><strong>AS'.$peer['bgpPeerRemoteAs'].'</strong><br />'.$peer['astext']."</td>
             <td><strong><span style='color: $admin_col;'>".$peer['bgpPeerAdminStatus']."</span><br /><span style='color: $col;'>".$peer['bgpPeerState'].'</span></strong></td>
             <td>'.formatUptime($peer['bgpPeerFsmEstablishedTime'])."<br />
             Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> ".format_si($peer['bgpPeerInUpdates'])."
-            <i class='fa fa-arrow-up icon-theme' aria-hidden='true'></i> ".format_si($peer['bgpPeerOutUpdates']).'</td></tr>';
+            <i class='fa fa-arrow-up icon-theme' aria-hidden='true'></i> ".format_si($peer['bgpPeerOutUpdates']).'</td>';
+        echo '</tr>';
 
         unset($invalid);
         switch ($vars['graph']) {
@@ -352,4 +360,5 @@ if ($_SESSION['userlevel'] < '5') {
     }//end foreach
 
     echo '</table>';
+    echo '</div>';
 }//end if
