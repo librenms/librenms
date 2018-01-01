@@ -346,7 +346,7 @@ foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`delete
 <?php
 
 if ($deleted_ports) {
-    echo('            <li><a href="deleted-ports/"><i class="fa fa-minus-circle fa-fw fa-lg" aria-hidden="true"></i> Deleted ('.$deleted_ports.')</a></li>');
+    echo('            <li><a href="ports/deleted=yes/"><i class="fa fa-minus-circle fa-fw fa-lg" aria-hidden="true"></i> Deleted ('.$deleted_ports.')</a></li>');
 }
 
 ?>

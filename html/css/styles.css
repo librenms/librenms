@@ -2157,26 +2157,20 @@ label {
   margin-right: 15px;
 }
 
-.severity-ok {
-  color: green;
+.alert-status {
+  display: inline-block;
+  width: 7px;
+  min-height: 27px;
 }
 
-.severity-info {
-  color: royalblue;
+.device-services-page {
+  font-weight: bold;
+  margin-left: 20px;
+  vertical-align: middle;
 }
 
-.severity-notice {
-  color: gold;
-}
-
-.severity-warning {
-  color: darkorange;
-}
-
-.severity-critical {
-  color: red;
-}
-
-.severity-unknown {
-  color: darkgrey;
+.device-services-page-no-service {
+  font-weight: bold;
+  vertical-align: middle;
+  padding: 15px;
 }

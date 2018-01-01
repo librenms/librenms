@@ -1,0 +1,88 @@
+{
+    "bgp-peers": {
+        "discovery": {
+            "devices": [
+                {
+                    "bgpLocalAs": "65504"
+                }
+            ],
+            "bgpPeers": [
+                {
+                    "astext": "",
+                    "bgpPeerIdentifier": "43.23.56.57",
+                    "bgpPeerRemoteAs": "65503",
+                    "bgpPeerState": "idle",
+                    "bgpPeerAdminStatus": "stop",
+                    "bgpLocalAddr": "0.0.0.0",
+                    "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerInUpdates": "0",
+                    "bgpPeerOutUpdates": "0",
+                    "bgpPeerInTotalMessages": "0",
+                    "bgpPeerOutTotalMessages": "0",
+                    "bgpPeerFsmEstablishedTime": "0",
+                    "bgpPeerInUpdateElapsedTime": "0",
+                    "context_name": ""
+                },
+                {
+                    "astext": "",
+                    "bgpPeerIdentifier": "95.43.23.53",
+                    "bgpPeerRemoteAs": "65503",
+                    "bgpPeerState": "idle",
+                    "bgpPeerAdminStatus": "stop",
+                    "bgpLocalAddr": "0.0.0.0",
+                    "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerInUpdates": "0",
+                    "bgpPeerOutUpdates": "0",
+                    "bgpPeerInTotalMessages": "0",
+                    "bgpPeerOutTotalMessages": "0",
+                    "bgpPeerFsmEstablishedTime": "0",
+                    "bgpPeerInUpdateElapsedTime": "0",
+                    "context_name": ""
+                }
+            ],
+            "bgpPeers_cbgp": []
+        },
+        "poller": {
+            "devices": [
+                {
+                    "bgpLocalAs": "65504"
+                }
+            ],
+            "bgpPeers": [
+                {
+                    "astext": "",
+                    "bgpPeerIdentifier": "43.23.56.57",
+                    "bgpPeerRemoteAs": "65503",
+                    "bgpPeerState": "established",
+                    "bgpPeerAdminStatus": "start",
+                    "bgpLocalAddr": "43.23.56.58",
+                    "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerInUpdates": "1",
+                    "bgpPeerOutUpdates": "87",
+                    "bgpPeerInTotalMessages": "0",
+                    "bgpPeerOutTotalMessages": "0",
+                    "bgpPeerFsmEstablishedTime": "22497219",
+                    "bgpPeerInUpdateElapsedTime": "0",
+                    "context_name": ""
+                },
+                {
+                    "astext": "",
+                    "bgpPeerIdentifier": "95.43.23.53",
+                    "bgpPeerRemoteAs": "65503",
+                    "bgpPeerState": "established",
+                    "bgpPeerAdminStatus": "start",
+                    "bgpLocalAddr": "95.43.23.51",
+                    "bgpPeerRemoteAddr": "0.0.0.0",
+                    "bgpPeerInUpdates": "1",
+                    "bgpPeerOutUpdates": "6",
+                    "bgpPeerInTotalMessages": "0",
+                    "bgpPeerOutTotalMessages": "0",
+                    "bgpPeerFsmEstablishedTime": "259280",
+                    "bgpPeerInUpdateElapsedTime": "0",
+                    "context_name": ""
+                }
+            ],
+            "bgpPeers_cbgp": []
+        }
+    }
+}

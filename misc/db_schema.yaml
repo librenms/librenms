@@ -154,7 +154,7 @@ bgpPeers:
   Columns:
     - { Field: bgpPeer_id, Type: int(11), 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: int(11), 'Null': false, Extra: '' }
-    - { Field: astext, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: astext, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: bgpPeerIdentifier, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpPeerRemoteAs, Type: bigint(20), 'Null': false, Extra: '' }
     - { Field: bgpPeerState, Type: text, 'Null': false, Extra: '' }

@@ -32,6 +32,9 @@ use LibreNMS\Util\ModuleTestHelper;
 class OSModulesTest extends DBTestCase
 {
     /**
+     * Test all modules for a particular OS
+     *
+     * @group os
      * @dataProvider dumpedDataProvider
      * @param string $target_os
      * @param string $filename
@@ -55,13 +58,13 @@ class OSModulesTest extends DBTestCase
             $this->assertEquals(
                 $data['discovery'],
                 $results[$module]['discovery'],
-                "OS $target_os: Discovered $module data does not match that found in $filename"
+                "OS $target_os: Discovered $module data does not match that found in $filename\n" . $helper->getLastDiscoveryOutput()
             );
 
             $this->assertEquals(
                 $data['poller'] == 'matches discovery' ? $data['discovery'] : $data['poller'],
                 $results[$module]['poller'],
-                "OS $target_os: Polled $module data does not match that found in $filename"
+                "OS $target_os: Polled $module data does not match that found in $filename\n" . $helper->getLastPollerOutput()
             );
         }
     }

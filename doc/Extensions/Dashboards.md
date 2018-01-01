@@ -21,8 +21,9 @@ LibreNMS has a whole list of Widgets to select from.
 + Graph: Can be used to display graphs from devices. 
 + Graylog: Displays all Graylog's syslog entries.
 + Notes: use for html tags, embed links and external web pages. Or just notes in general.
++ Server Stats: Will display gauges for CPU, Memory, Storage usage. Note the device type has to be listed as "Server".
 + Syslog: Displays all syslog entries.
-+ Top Devices: By Traffic, or  Uptime, or Response time, or Poller Duration, or Procssor load, or Memory Usage.
++ Top Devices: By Traffic, or  Uptime, or Response time, or Poller Duration, or Procssor load, or Memory Usage, or Storage Usage.
 + Top Interfaces: Lists top interfaces by traffic utilization.
 + Worldmap: displays all your devices locations. From syslocation or from override sysLocation.
 
@@ -38,10 +39,13 @@ List of Widgets:
 - Shared: Allows all users to view the dashboard and make changes.
 
 ### Setting a global default dashboard
+
 Step 1: Set the dashboard to either shared read or shared, depending on what you want the users access to change. 
+
 Step 2: Then go to Settings -> WebUI settings -> Dashboard Settings and set the global default dashboard.
 
 ### Setting embeded webpage
+
 Using the Notes Widget.
 ```html
 <iframe src="url/" width="1200" height="800">
@@ -54,8 +58,10 @@ Also some web pages may not support html embeded or iframe.
 ![Example embed webpage](/img/example-embed-website.png)
 
 ### How to create ports graph
-In the dashboard, you want to create an interface graph select the widget called "Graph" 
-* Graph: select "Port" "Bits"
+
+In the dashboard, you want to create an interface graph select the widget called
+
+* Graph:  then select "Port" "Bits"
 ![port-bits-graph](/img/port-bits-graph.png)
 
 * Note: you can map the port by description or the alias or by port id. You will need to know this in order to map the port to the graph. 

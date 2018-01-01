@@ -267,3 +267,15 @@ $(document).ready(function() {
         }
     });
 });
+
+$(document).ajaxComplete(function(){
+    if($('.alert-status').length !== 0) {
+        $('.alert-status').each(function() {
+            if ($(this).parent().height() < 27) {
+                $(this).height('27px');
+            } else {
+                $(this).height($(this).parent().height());
+            }
+        })
+    }
+});
