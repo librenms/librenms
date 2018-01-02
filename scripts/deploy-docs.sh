@@ -8,10 +8,10 @@ if [ "$EXECUTE_BUILD_DOCS" != "true" ]; then
     exit 0
 fi
 
-pip install --user 'jinja2<2.9'
-pip install --user mkdocs
-pip install --user pymdown-extensions
-pip install --user git+git://github.com/aleray/mdx_del_ins.git
+pip install --user --quiet 'jinja2<2.9'
+pip install --user --quiet mkdocs
+pip install --user --quiet pymdown-extensions
+pip install --user --quiet git+git://github.com/aleray/mdx_del_ins.git
 
 mkdir -p out
 
@@ -32,7 +32,7 @@ mkdocs build --clean
 build_result=$?
 
 # Only deploy after merging to master
-if [ "$TRAVIS_PULL_REQUEST" == "false" -a "$TRAVIS_BRANCH" == "master" ]; then
+if [ "$build_result" == "0" -a "$TRAVIS_PULL_REQUEST" == "false" -a "$TRAVIS_BRANCH" == "master" ]; then
     cd out
 
     touch .
