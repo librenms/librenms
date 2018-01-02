@@ -145,10 +145,10 @@ require_once 'includes/modal/delete_service.inc.php';
                     $header = true;
                     $footer = false;
 
-                    $svc = 0;
-                    $svcs = dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ? $where ORDER BY service_type", $sql_param);
-                    $svct = count($svcs);
-                    foreach ($svcs as $service) {
+                    $service_iteration = 0;
+                    $services = dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ? $where ORDER BY service_type", $sql_param);
+                    $services_count = count($services);
+                    foreach ($services as $service) {
                         if ($service['service_status'] == '2') {
                             $label = 'label-danger';
                             $title = 'CRITICAL';
@@ -163,9 +163,9 @@ require_once 'includes/modal/delete_service.inc.php';
                             $title = 'UNKNOWN';
                         }
 
-                        $svc++;
+                        $service_iteration++;
 
-                        if ($svc < 2 && $header) {
+                        if ($service_iteration < 2 && $header) {
                             echo '<div class="panel panel-default">';
                             echo '<div class="panel-heading"><h3 class="panel-title">' . $devlink . '</h3>' . $device_sysName . '</div>';
                             echo '<div class="panel-body">';
@@ -197,7 +197,7 @@ require_once 'includes/modal/delete_service.inc.php';
                         }
                         echo '</tr>';
 
-                        if ($svc >= $svct) {
+                        if ($service_iteration >= $services_count) {
                             $footer = true;
                         }
 
