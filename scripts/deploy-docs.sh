@@ -15,14 +15,6 @@ pip install --user git+git://github.com/aleray/mdx_del_ins.git
 
 mkdir -p out
 
-git clone $THEME_REPO
-
-# Only deploy after merging to master
-if [ "$TRAVIS_PULL_REQUEST" != "false" -a "$TRAVIS_BRANCH" != "master" ]; then
-    mkdocs build --clean
-    exit $?
-fi
-
 cd out
 
 git init
@@ -34,11 +26,19 @@ git checkout master
 
 cd ../
 
+git clone $THEME_REPO
+
 mkdocs build --clean
+build_result=$?
 
-cd out
+# Only deploy after merging to master
+if [ "$TRAVIS_PULL_REQUEST" == "false" -a "$TRAVIS_BRANCH" == "master" ]; then
+    cd out
 
-touch .
-git add -A .
-git commit -m "GH-Pages update by travis after $TRAVIS_COMMIT"
-git push -q origin master
+    touch .
+    git add -A .
+    git commit -m "GH-Pages update by travis after $TRAVIS_COMMIT"
+    git push -q origin master
+else
+    exit ${build_result}  # return doc build result
+fi
