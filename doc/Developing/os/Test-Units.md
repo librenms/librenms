@@ -87,7 +87,7 @@ Hex encoded strings (4x) should be used for any strings that contain line return
 New discovery or poller modules should define database capture parameters in `/tests/module_tables.yaml`.
 
 ## Example workflow
-If the base os (<os>.snmprec) already contains test data for the module you or testing or that data conflicts with your new
+If the base os (<os>.snmprec) already contains test data for the module you are testing or that data conflicts with your new
 data, you must use a variant to store your test data (-v).
 
 ### Add initial detection
