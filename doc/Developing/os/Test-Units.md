@@ -98,12 +98,12 @@ data, you must use a variant to store your test data (-v).
 5. Add any additional os items like version, hardware, features, or serial.
 6. If there is additional snmp data required, run `./scripts/save-test-data.php -h 42 -m os` otherwise, run `./scripts/save-test-data.php -o example-os -m os`
 7. Review data. If you modified the snmprec (don't modify json manually) run `./scripts/save-test-data.php -o example-os -m os`
-8. Run `./scripts/pre-commit.php` (If you have snmpsim installed, add `--db --snmpsim` to run full tests)
+8. Run `./scripts/pre-commit.php --db --snmpsim`
 9. If the tests succeed submit a pull request
 
 ### Additional module support or test data
 1. Add code to support module or support already exists.
 2. `./scripts/save-test-data.php -h 42 -m <module>`, this will add more data to the snmprec file
 3. Review data. If you modified the snmprec (don't modify json manually) run `./scripts/save-test-data.php -o example-os -m <module>`
-4. Run `./scripts/pre-commit.php` (If you have snmpsim installed, add `--db --snmpsim` to run full tests)
+4. Run `./scripts/pre-commit.php --db --snmpsim`
 5. If the tests succeed submit a pull request
