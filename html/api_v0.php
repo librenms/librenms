@@ -155,6 +155,7 @@ $app->group(
                 $app->group(
                     '/routing',
                     function () use ($app) {
+                        $app->get('/vrf', 'authToken', 'list_vrf')->name('list_vrf');
                         $app->group(
                             '/ipsec',
                             function () use ($app) {

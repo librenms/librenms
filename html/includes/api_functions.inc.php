@@ -1327,6 +1327,41 @@ function get_devices_by_group()
     api_success($devices, 'devices');
 }
 
+
+function list_vrf()
+{
+    check_is_read();
+
+    $app        = \Slim\Slim::getInstance();
+    $sql        = '';
+    $sql_params = array();
+    $hostname   = $_GET['hostname'];
+    $vrfname    = $_GET['vrfname'];
+    $vrfid      = $_GET['vrfid'];
+    $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        $sql        = ' AND `vrfs`.`device_id`=?';
+        $sql_params = array($device_id);
+    }
+    if (!empty($vrfname)) {
+        $sql        = ' AND `vrfs`.`vrf_name`=?';
+        $sql_params = array($vrfname);
+    }
+    if (!empty($vrfid)) {
+        $sql        = ' AND `vrfs`.`vrf_id`=?';
+        $sql_params = array($vrfid);
+    }
+
+    $vrfs       = dbFetchRows("SELECT `vrfs`.* FROM `vrfs` WHERE `vrfs`.`vrf_name` IS NOT NULL $sql", $sql_params);
+    $total_vrfs = count($vrfs);
+    if (!is_numeric($total_vrfs)) {
+        api_error(500, 'Error retrieving vrfs');
+    }
+
+    api_success($vrfs, 'vrfs');
+}
+
+
 function list_ipsec()
 {
     check_is_read();
