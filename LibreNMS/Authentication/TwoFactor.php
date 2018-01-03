@@ -27,9 +27,10 @@
  */
 
 namespace LibreNMS\Authentication;
-
+require_once './src/DuoWeb.php';
+Use Duo;
+use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
-
 class TwoFactor
 {
     /**
@@ -38,18 +39,15 @@ class TwoFactor
      * Sadly Google-Auth is the most used Non-Physical OTP app.
      */
     const KEY_INTERVAL = 30;
-
     /**
      * Size of the OTP.
      * Set to 6 for the same reasons as above.
      */
     const OTP_SIZE = 6;
-
     /**
      * Window to honour whilest verifying OTP.
      */
     const OTP_WINDOW = 4;
-
     /**
      * Base32 Decoding dictionary
      */
@@ -87,12 +85,10 @@ class TwoFactor
         "6" => 30,
         "7" => 31
     );
-
     /**
      * Base32 Encoding dictionary
      */
     private static $base32_enc = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-
     /**
      * Generate Secret Key
      * @return string
@@ -121,7 +117,6 @@ class TwoFactor
         }
         return $ret;
     }
-
     /**
      * Return the HTML for the TwoFactor Input-Form
      * @param boolean $form_tags Include FORM-tags
@@ -129,10 +124,7 @@ class TwoFactor
      */
     public static function getForm($form_tags = true)
     {
-        global $config;
-
         $ret = '';
-
         if ($form_tags) {
             $ret .= '
       <div class="row">
@@ -140,14 +132,13 @@ class TwoFactor
           <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">
-                <img src="' . $config['title_image'] . '">
+                <img src="' . Config::get('title_image') . '">
               </h3>
             </div>
             <div class="panel-body">
               <div class="container-fluid">
                   <form class="form-horizontal" role="form" action="" method="post" name="twofactorform">';
         }
-
         $ret .= '
         <div class="form-group">
           <div class="col-md-12">
@@ -160,16 +151,12 @@ class TwoFactor
           </div>
          </div>
         </div>';
-
         $ret .= '<script>document.twofactorform.twofactor.focus();</script>';
-
         if ($form_tags) {
             $ret .= '</form>';
         }
-
         return $ret;
     }
-
     /**
      * Authenticate with two factor
      * Will set $twofactorform if the token hasn't been requested yet (page will redirect to the logon page)
@@ -179,31 +166,59 @@ class TwoFactor
      */
     public static function showForm()
     {
-        global $twofactorform, $config;
-
+        global $twofactorform;
         $twofactor = get_user_pref('twofactor');
-
+		// Uses Duo for MFA - add $config['twofactor_duo'] == true in config.php
+		if (Config::get('twofactor_duo') === true) {
+			/*
+			 *  Sets variables, perform secondary auth, generate sig request, then load up Duo
+			 * javascript and iframe.
+			 */
+			define('AKEY', "");
+			define('IKEY', "");
+			define('SKEY', "");
+			define('HOST', "");
+			$sig_request = Duo\Web::signRequest(IKEY, SKEY, AKEY, $_SESSION['username']);
+			//die ("Sig request on TwoFactor.php");
+			//<script type="text/javascript" src="js/Duo-Web-v2.js"></script>
+			//<link rel="stylesheet" type="text/css" href="css/Duo-Frame.css" />
+			/*<iframe id="duo_iframe"
+				data-host="<?php echo HOST; ?>"
+				data-sig-request="<?php echo $sig_request; ?>"
+			></iframe>*/
+			die ("Javascript");
+			if (isset($_POST['sig_response'])) {
+				/*
+				 * Verify sig response and log in user. Make sure that verifyResponse
+				 * returns the username we logged in with. You can then set any
+				 * cookies/session data for that username and complete the login process.
+				 */
+				$resp = Duo\Web::verifyResponse(IKEY, SKEY, AKEY, $_POST['sig_response']);
+				if ($resp === $_SESSION['username']) {
+					$_SESSION['twofactor'] = true;
+						return true;;
+				}
+			}
+		}
+		
         // no need to show the form, user doesn't have a token
         if (empty($twofactor)) {
             $_SESSION['twofactor'] = true;
             return false;
         }
-
         // lockout the user if there are too many failures
         if ($twofactor['fails'] >= 3) {
-            if (!$config['twofactor_lock']) {
+            if (!Config::get('twofactor_lock')) {
                 throw new AuthenticationException('Too many two-factor failures, please contact administrator.');
-            } elseif ((time() - $twofactor['last']) < $config['twofactor_lock']) {
-                $msg = "Too many two-factor failures, please wait " . $config['twofactor_lock'] . " seconds";
+            } elseif ((time() - $twofactor['last']) < Config::get('twofactor_lock')) {
+                $msg = "Too many two-factor failures, please wait " . Config::get('twofactor_lock') . " seconds";
                 throw new AuthenticationException($msg);
             }
         }
-
         // set $twofactorform to show the form in logon.inc.php
         $twofactorform = true;
         return true;
     }
-
     /**
      * Check a 2fa token this will be stored in $_POST['twofactor'] by the form
      * If valid,  $_SESSION['twofactor'] = true will be set and this will return true
@@ -217,20 +232,16 @@ class TwoFactor
         if (!$token) {
             throw new AuthenticationException("No Two-Factor Token entered.");
         }
-
         $twofactor = get_user_pref('twofactor');
-
         if (empty($twofactor)) {
             throw new AuthenticationException('No Two-Factor settings, how did you get here?');
         }
-
         if (($server_c = self::verifyHOTP($twofactor['key'], $_POST['twofactor'], $twofactor['counter'])) === false) {
             $twofactor['fails']++;
             $twofactor['last'] = time();
             set_user_pref('twofactor', $twofactor);
             throw new AuthenticationException("Wrong Two-Factor Token.");
         }
-
         if ($twofactor['counter'] !== false) {
             if ($server_c !== true && $server_c !== $twofactor['counter']) {
                 $twofactor['counter'] = $server_c + 1;
@@ -240,11 +251,9 @@ class TwoFactor
         }
         $twofactor['fails'] = 0;
         set_user_pref('twofactor', $twofactor);
-
         $_SESSION['twofactor'] = true;
         return true;
     }
-
     /**
      * Verify HOTP token honouring window
      *
@@ -282,7 +291,6 @@ class TwoFactor
         }
         return false;
     }
-
     /**
      * Generate HOTP (RFC 4226)
      * @param string $key Secret Key
@@ -294,7 +302,6 @@ class TwoFactor
         if ($counter === false) {
             $counter = floor(microtime(true) / self::KEY_INTERVAL);
         }
-
         $length = strlen($key);
         $x = -1;
         $y = $z = 0;
