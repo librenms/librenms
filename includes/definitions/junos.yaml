@@ -1,4 +1,5 @@
 os: junos
+group: junos
 text: 'Juniper JunOS'
 type: network
 over:
