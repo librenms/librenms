@@ -1,0 +1,580 @@
+VOIPEX-VIBE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Counter32, IpAddress,
+    mib-2, Unsigned32, Counter64,
+    zeroDotZero                        FROM SNMPv2-SMI
+    PhysAddress, TruthValue,
+    TimeStamp, RowPointer, DisplayString,
+    TEXTUAL-CONVENTION, TestAndIncr,
+    RowStatus, StorageType             FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP    FROM SNMPv2-CONF
+    InetAddress, InetAddressType,
+    InetAddressPrefixLength,
+    InetVersion, InetZoneIndex         FROM INET-ADDRESS-MIB
+    voipex                             FROM VOIPEX-MIB
+    InterfaceIndex                     FROM IF-MIB;
+
+vibe MODULE-IDENTITY
+    LAST-UPDATED "201310031230Z"
+    ORGANIZATION "Voipex Limited (UK)"
+    CONTACT-INFO
+           "email:	adam@voip-x.co.uk"
+    DESCRIPTION
+           "The MIB for retrieving information from the ViBE subsystem
+           of enabled devices.
+	   Revision 2: Now includes extended tunnel stats.
+	   Revision 3: Now with peer name and extended status.
+	   Revision 4: Added minutes since last test.
+	   Revision 5: Add remote quality figure and RAIN mode link quality.
+           Revision 6: Add additional link status values for dynamic failover.
+           Revision 7: Add max RTP, uncompressed RTP, and additional counters."
+    ::= { voipex 1 }
+
+--
+-- The textual conventions we define and use in this MIB.
+--
+
+VibeTunnelStatusTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "The status of a configured Vibe tunnel to a remote device.
+
+            up-via-backup(3) indicates that the primary tunnel is down
+            but that there is a backup route to the same network(s)
+            which is considered up, or this is a backup link and it is
+	    currently up.
+	    
+	    States 4, 5 and 6 refer to the extended status of a backup
+	    tunnel."
+    SYNTAX     INTEGER {
+        down(1),
+        up(2),
+        up-via-backup(3),
+	not-available(4),
+	unknown(5),
+	available(6),
+	in-only(7),
+	out-only(8),
+	suspended(9)
+    }
+
+VibeTunnelTypeTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "The type of tunnel, be it primary or backup. Useful because
+	   the standard state of a backup tunnel will be down."
+    SYNTAX     INTEGER {
+        primary(1),
+        backup(2)
+    }
+
+--
+-- License status group
+-- 
+
+license       OBJECT IDENTIFIER ::= { vibe 1 }
+
+vibeLicenseValid OBJECT-TYPE
+    SYNTAX     INTEGER {
+                    valid(1),         -- License is valid
+                    notValid(2)       -- License NOT valid
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Whether or not a valid license file is present."
+    ::= { license 1 }
+
+vibeLicenseActive OBJECT-TYPE
+    SYNTAX     INTEGER {
+                    active(1),        -- License is active
+                    notActive(2)      -- License NOT active
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Whether or not the license file is current - i.e. there
+             can be a valid license file present, but it has expired
+             or is not yet active"
+    ::= { license 2 }
+
+vibeLicenseCalls OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Licensed call limit."
+    ::= { license 3 }
+
+vibeLicenseBandwidth OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Licensed bandwidth limit ( kbit per sec. )"
+    ::= { license 4 }
+
+vibeLicensePeers OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Licensed peers limit."
+    ::= { license 5 }
+
+vibeLicenseRTP OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Licensed global box RTP limit."
+    ::= { license 6 }
+
+vibeLicenseRemain OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Number of seconds left before the license expires."
+    ::= { license 7 }
+
+--
+-- Vibe peers table
+--
+
+vibePeers OBJECT IDENTIFIER ::= { vibe 2 }
+
+vibePeerTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF VibePeerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The table containing per-peer information."
+    ::= { vibePeers 1 }
+
+vibePeerEntry OBJECT-TYPE
+    SYNTAX     VibePeerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An entry containing information for a specific peer."
+    INDEX { vibePeerIndex }
+    ::= { vibePeerTable 1 }
+
+VibePeerEntry ::= SEQUENCE {
+        vibePeerIndex                InterfaceIndex,
+        vibePeerAddress              IpAddress,
+        vibeTunnelStatus             VibeTunnelStatusTC,
+        vibeCallsInProgress          Unsigned32,
+        vibeBandwidth                Unsigned32,
+        vibeInOctets                 Counter64,
+        vibeOutOctets                Counter64,
+        vibeQuality                  Unsigned32,
+	vibeExtStats                 TruthValue,
+	vibeRTTAverage               Unsigned32,
+	vibeRTTMax                   Unsigned32,
+	vibeRXJitterAverage          Unsigned32,
+	vibeRXJitterMax              Unsigned32,
+	vibeTXJitterAverage          Unsigned32,
+	vibeTXJitterMax              Unsigned32,
+	vibeRXESP                    Unsigned32,
+	vibeTXESP                    Unsigned32,
+	vibeCallsBlocked             Unsigned32,
+	vibeTunnelType               VibeTunnelTypeTC,
+	vibePrimaryAddress           IpAddress,
+	vibeMultilink                TruthValue,
+	vibeParentAddress            IpAddress,
+	vibePeerName                 DisplayString,
+	vibeLastTestAge              Unsigned32,
+	vibeRemoteQuality            Unsigned32,
+	vibeRAINLinkQuality          Unsigned32,
+	vibeMaxRTP                   Unsigned32,
+	vibeUncompressed             Unsigned32,
+        vibeDiscard                  Counter64,
+        vibeLate                     Counter64,
+        vibeVoiceInOctets            Counter64,
+        vibeVoiceOutOctets           Counter64,
+        vibeVoiceInPkts              Counter64,
+        vibeVoiceOutPkts             Counter64,
+        vibeDataInOctets             Counter64,
+        vibeDataOutOctets            Counter64,
+        vibeDataInPkts               Counter64,
+        vibeDataOutPkts              Counter64
+    }
+
+vibePeerIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The index value which identifies a specific peer."
+    ::= { vibePeerEntry 1 }
+
+vibePeerAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The IP address of this peer."
+    ::= { vibePeerEntry 2 }
+
+vibeTunnelStatus OBJECT-TYPE
+    SYNTAX     VibeTunnelStatusTC
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Status of the Vibe tunnel to this peer."
+    ::= { vibePeerEntry 3 }
+
+vibeCallsInProgress OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The number of RTP streams being processed to this peer."
+    ::= { vibePeerEntry 4 }
+    
+vibeBandwidth OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The current bandwidth to this peer in kilobits per second"
+    ::= { vibePeerEntry 5 }
+    
+vibeInOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of received octets from this peer. This
+            will be reset on initialisation of the tunnel."
+    ::= { vibePeerEntry 6 }
+
+vibeOutOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of sent octets to this peer. This
+            will be reset on initialisation of the tunnel."
+    ::= { vibePeerEntry 7 }
+
+vibeQuality OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "An indication of packet loss from this peer over the last
+            minute. This value may only be updated internally once per
+            minute. Its value is
+            <packets received>/<packets expected>*65535"
+    ::= { vibePeerEntry 8 }
+
+vibeExtStats OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "A flag to indicate the validity of extended stats"
+    ::= { vibePeerEntry 9 }
+
+vibeRTTAverage OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4095)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The measured average round trip time of the underlying link
+	    to this peer in milliseconds."
+    ::= { vibePeerEntry 10 }
+
+vibeRTTMax OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4095)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The measured maximum round trip time of the underlying link
+	    to this peer in milliseconds."
+    ::= { vibePeerEntry 11 }
+
+vibeRXJitterAverage OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4095)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The measured average jitter of the underlying link
+	    from this peer in milliseconds."
+    ::= { vibePeerEntry 12 }
+
+vibeRXJitterMax OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4095)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The measured maximum jitter of the underlying link
+	    from this peer in milliseconds."
+    ::= { vibePeerEntry 13 }
+
+vibeTXJitterAverage OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4095)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The measured average jitter of the underlying link
+	    to this peer in milliseconds."
+    ::= { vibePeerEntry 14 }
+
+vibeTXJitterMax OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4095)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The measured maximum jitter of the underlying link
+	    to this peer in milliseconds."
+    ::= { vibePeerEntry 15 }
+
+vibeRXESP OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The estimated real bandwidth in kbps from this peer."
+    ::= { vibePeerEntry 16 }
+
+vibeTXESP OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The estimated real bandwidth in kbps to this peer."
+    ::= { vibePeerEntry 17 }
+
+vibeCallsBlocked OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of calls blocked by ViBE."
+    ::= { vibePeerEntry 18 }
+
+vibeTunnelType OBJECT-TYPE
+    SYNTAX     VibeTunnelTypeTC
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Whether this tunnel is a primary or backup."
+    ::= { vibePeerEntry 19 }
+
+vibePrimaryAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "If a backup, the IP of the primary peer."
+    ::= { vibePeerEntry 20 }
+
+vibeMultilink OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Whether this tunnel is part of a multilink group."
+    ::= { vibePeerEntry 21 }
+
+vibeParentAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "If part of a multilink, the IP of the parent link."
+    ::= { vibePeerEntry 22 }
+    
+vibePeerName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Configured name of this peer."
+    ::= { vibePeerEntry 23 }
+
+vibeLastTestAge OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The number of minutes ago that this link was last
+           tested ( only really valid for backups. )"
+    ::= { vibePeerEntry 24 }
+
+vibeRemoteQuality OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "An indication of packet loss TO this peer over the last
+           minute. This value may only be updated internally once per
+           minute. Its value is
+           <packets received>/<packets expected>*65535"
+    ::= { vibePeerEntry 25 }
+
+vibeRAINLinkQuality OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "An indication of packet loss from this peer over the last
+           minute. This value may only be updated internally once per
+           minute. Its value is
+           <packets received>/<packets expected>*65535
+           This value is only valid in RAIN mode, and shows the quality
+           of individual links rather than the whole group."
+    ::= { vibePeerEntry 26 }
+
+vibeMaxRTP OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The maximum number of simultaneous RTP streams seen to
+           this peer since the count was last reset."
+    ::= { vibePeerEntry 27 }
+
+vibeUncompressed OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The current number of uncompressed RTP streams."
+    ::= { vibePeerEntry 28 }
+
+vibeDiscard OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of discarded ViBE protocol packets."
+    ::= { vibePeerEntry 29 }
+
+vibeLate OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of late ViBE protocol packets."
+    ::= { vibePeerEntry 30 }
+
+vibeVoiceInOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of RTP octets inbound."
+    ::= { vibePeerEntry 31 }
+
+vibeVoiceOutOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of RTP octets outbound."
+    ::= { vibePeerEntry 32 }
+
+vibeVoiceInPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of RTP packets inbound."
+    ::= { vibePeerEntry 33 }
+
+vibeVoiceOutPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of RTP packets outbound."
+    ::= { vibePeerEntry 34 }
+
+vibeDataInOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of data octets inbound."
+    ::= { vibePeerEntry 35 }
+
+vibeDataOutOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of data octets outbound."
+    ::= { vibePeerEntry 36 }
+
+vibeDataInPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of data packets inbound."
+    ::= { vibePeerEntry 37 }
+
+vibeDataOutPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of data packets outbound."
+    ::= { vibePeerEntry 38 }
+
+--
+-- Configuration status group
+-- 
+
+--
+-- Configuration status group
+-- 
+
+config       OBJECT IDENTIFIER ::= { vibe 3 }
+
+vibeConfigCalls OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Configured calls."
+    ::= { config 1 }
+
+vibeConfigBandwidth OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Configured bandwidth ( kbit per sec. )"
+    ::= { config 2 }
+
+vibeConfigPeers OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Configured peers."
+    ::= { config 3 }
+
+--
+-- Current global status group
+-- 
+
+status       OBJECT IDENTIFIER ::= { vibe 4 }
+
+vibeStatusRTP OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Current RTP streams across all peers."
+    ::= { status 1 }
+
+END

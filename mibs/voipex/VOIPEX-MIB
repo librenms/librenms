@@ -1,0 +1,16 @@
+VOIPEX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,enterprises             FROM SNMPv2-SMI;
+
+voipex MODULE-IDENTITY
+    LAST-UPDATED "200804210000Z"
+    ORGANIZATION "Voipex Limited (UK)"
+    CONTACT-INFO
+           "email:	adam@voip-x.co.uk"
+    DESCRIPTION
+           "The base MIB for Voipex specific data."
+    ::= { enterprises 31030 }    -- IANA assigned number
+
+END
+

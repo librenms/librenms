@@ -513,6 +513,15 @@ $config['graph_types']['device']['routeros_leases']['section'] = 'network';
 $config['graph_types']['device']['routeros_leases']['order'] = 0;
 $config['graph_types']['device']['routeros_leases']['descr'] = 'DHCP Lease Count';
 
+//VibeX specific graphs
+$config['graph_types']['device']['vibe_global_rtp']['section'] = 'network';
+$config['graph_types']['device']['vibe_global_rtp']['order'] = 0;
+$config['graph_types']['device']['vibe_global_rtp']['descr'] = 'Current RTP streams across all peers';
+
+$config['graph_types']['device']['vibe_peers']['section'] = 'network';
+$config['graph_types']['device']['vibe_peers']['order'] = '0';
+$config['graph_types']['device']['vibe_peers']['descr'] = 'Number of tunnel Peers configured';
+
 // Device Types
 $i = 0;
 $config['device_types'][$i]['text'] = 'Servers';
