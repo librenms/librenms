@@ -81,6 +81,8 @@ if (Config::get('enable_bgp')) {
                 if ($device['os'] == 'junos') {
                     $safis[1] = 'unicast';
                     $safis[2] = 'multicast';
+                    $safis[4] = 'mpls-label';
+                    $safix[128] = 'mpls-labled-vpn';
 
                     if (!isset($j_peerIndexes)) {
                         $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerEntry', $jbgp, 'BGP4-V2-MIB-JUNIPER', 'junos');
