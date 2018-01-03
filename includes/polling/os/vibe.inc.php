@@ -12,7 +12,6 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-
 $global_rtp = snmp_get($device, 'vibeStatusRTP.0', '-OQv', 'VOIPEX-VIBE-MIB');
 
 if (is_numeric($global_rtp)) {
