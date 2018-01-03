@@ -1257,8 +1257,9 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
             if ($item['type'] == 'checkbox') {
                 $output .= '<input id="' . $item['name'] . '" type="checkbox" name="global-config-check" ' . $config_groups[$item['name']]['config_checked'] . ' data-on-text="Yes" data-off-text="No" data-size="small" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">';
             } elseif ($item['type'] == 'text') {
+                $pattern = isset($item['pattern']) ? ' pattern="' . $item['pattern'] . '"' : "";
                 $output .= '
-                <input id="' . $item['name'] . '" class="form-control" type="text" name="global-config-input" value="' . $config_groups[$item['name']]['config_value'] . '" data-config_id="' . $config_groups[$item['name']]['config_id'] . '" data-item_name="' . $item['name'] . '">
+                <input id="' . $item['name'] . '" class="form-control validation" type="text" name="global-config-input" value="' . $config_groups[$item['name']]['config_value'] . '" data-config_id="' . $config_groups[$item['name']]['config_id'] . '"' . $pattern . '>
                 <span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span>
                 ';
             } elseif ($item['type'] == 'password') {

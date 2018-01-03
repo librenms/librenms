@@ -87,11 +87,10 @@ $(document).ready(function() {
         var $this = $(this);
         var config_id = $this.data("config_id");
         var config_value = $this.val();
-        var item_name = $this.data("item_name");
         $.ajax({
             type: 'POST',
             url: 'ajax_form.php',
-            data: {type: "update-config-item", config_id: config_id, config_value: config_value, item_name: item_name},
+            data: {type: "update-config-item", config_id: config_id, config_value: config_value},
             dataType: "json",
             success: function (data) {
                 if (data.status == 'ok') {
