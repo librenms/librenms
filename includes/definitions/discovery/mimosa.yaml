@@ -1,4 +1,4 @@
-mib: mibs/mimosa/MIMOSA-NETWORKS-BFIVE-MIB
+mib: MIMOSA-NETWORKS-BFIVE-MIB
 modules:
     sensors:
         state:
