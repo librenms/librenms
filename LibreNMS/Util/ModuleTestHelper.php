@@ -241,7 +241,7 @@ class ModuleTestHelper
                 continue;
             }
 
-            if (str_contains($line, ' =')) {
+            if (preg_match('/^\.[.\d]+ =/', $line)) {
                 list($oid, $raw_data) = explode(' =', $line, 2);
                 $oid = ltrim($oid, '.');
                 $raw_data = trim($raw_data);
