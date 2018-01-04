@@ -83,7 +83,7 @@ if (Config::get('enable_bgp')) {
                     $safis[2] = 'multicast';
                     $safis[3] = 'unicastAndMulticast';
                     $safis[4] = 'labeledUnicast';
-                    $safix[128] = 'vpn';
+                    $safis[128] = 'vpn';
 
                     if (!isset($j_peerIndexes)) {
                         $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerEntry', $jbgp, 'BGP4-V2-MIB-JUNIPER', 'junos');
