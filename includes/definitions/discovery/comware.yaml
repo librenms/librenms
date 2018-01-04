@@ -8,7 +8,7 @@ modules:
                     value: hh3cDevMFanStatus
                     num_oid: .1.3.6.1.4.1.25506.8.35.9.1.1.1.2.
                     descr: 'Fan {{ $index }}'
-                    index: {{ $index }}
+                    index: '{{ $index }}'
                     states:
                         - { value: 1, descr: active, graph: 1, generic: 0 }
                         - { value: 2, descr: deactive, graph: 1, generic: 2 }
@@ -19,7 +19,7 @@ modules:
                     value: hh3cDevMPowerStatus
                     num_oid: .1.3.6.1.4.1.25506.8.35.9.1.2.1.2.
                     descr: 'Power Supply {{ $index }}'
-                    index: {{ $index }}
+                    index: '{{ $index }}'
                     states:
                         - { value: 1, descr: active, graph: 1, generic: 0 }
                         - { value: 2, descr: deactive, graph: 1, generic: 2 }
