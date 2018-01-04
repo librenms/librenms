@@ -1,4 +1,4 @@
-mib: mibs/checkpoint/CHECKPOINT-MIB
+mib: CHECKPOINT-MIB
 modules:
     sensors:
         fanspeed:
