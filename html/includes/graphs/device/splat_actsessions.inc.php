@@ -1,17 +1,10 @@
 <?php
 
-/*
- * LibreNMS
+/**
+ * SPLAT.inc.php
  *
- * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ fua http://www.lathwood.co.uk>
- *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.  Please see LICENSE.txt at the top level of
- * the source code distribution for details.
- */
-
+ * NTTCOM MS RRD module for Check Point SECUREPLATFORM sessions
+**/
 
 require 'includes/graphs/common.inc.php';
 
