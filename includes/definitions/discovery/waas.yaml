@@ -1,4 +1,4 @@
-mib: mibs/CISCO-WAN-OPTIMIZATION-MIB
+mib: CISCO-WAN-OPTIMIZATION-MIB
 modules:
     sensors:
         state:
