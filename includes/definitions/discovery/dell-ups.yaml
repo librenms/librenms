@@ -1,4 +1,4 @@
-mib: mibs/dell/DELL-SNMP-UPS-MIB
+mib: DELL-SNMP-UPS-MIB
 modules:
     sensors:
         state:
