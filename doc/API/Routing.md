@@ -183,16 +183,12 @@ Input:
   - hostname = Either the devices hostname or id
 **OR**
   - vrfname = The VRF name you would like to filter by
-**OR**
-  - vrfid = The VRF id you would like to filter by
 
 Example:
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf?hostname=host.example.com
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf?vrfname=Mgmt-vrf
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf?vrfid=2
-
 ```
 
 Output:
@@ -211,5 +207,38 @@ Output:
         ...
     ],
     "count": 100
+}
+```
+
+### `get_vrf`
+
+Retrieves VRF by ID
+
+Route: `/api/v0/routing/vrf/:id`
+
+Input:
+
+-
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf/2
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "vrf": [
+        {
+            "vrf_id": "2",
+            "vrf_oid": "8.77.103.109.116.45.118.114.102",
+            "vrf_name": "Mgmt-vrf",
+            "mplsVpnVrfRouteDistinguisher": "",
+            "mplsVpnVrfDescription": "",
+            "device_id": "8"
+        }
+    ],
+    "count": 1
 }
 ```

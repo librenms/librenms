@@ -1337,7 +1337,6 @@ function list_vrf()
     $sql_params = array();
     $hostname   = $_GET['hostname'];
     $vrfname    = $_GET['vrfname'];
-    $vrfid      = $_GET['vrfid'];
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
         $sql        = ' AND `vrfs`.`device_id`=?';
@@ -1347,10 +1346,6 @@ function list_vrf()
         $sql        = ' AND `vrfs`.`vrf_name`=?';
         $sql_params = array($vrfname);
     }
-    if (!empty($vrfid)) {
-        $sql        = ' AND `vrfs`.`vrf_id`=?';
-        $sql_params = array($vrfid);
-    }
 
     $vrfs       = dbFetchRows("SELECT `vrfs`.* FROM `vrfs` WHERE `vrfs`.`vrf_name` IS NOT NULL $sql", $sql_params);
     $total_vrfs = count($vrfs);
@@ -1359,6 +1354,30 @@ function list_vrf()
     }
 
     api_success($vrfs, 'vrfs');
+}
+
+
+function get_vrf()
+{
+    check_is_read();
+
+    $app    = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $vrfId  = $router['id'];
+    if (!is_numeric($vrfId)) {
+        api_error(400, 'Invalid id has been provided');
+    }
+
+    $vrf       = dbFetchRows("SELECT * FROM `vrfs` WHERE `vrf_id` IS NOT NULL AND `vrf_id` = ?", array($vrfId));
+    $vrf_count = count($vrf);
+    if (!is_numeric($vrf_count)) {
+        api_error(500, 'Error retrieving VRF');
+    }
+    if ($vrf_count == 0) {
+        api_error(404, "VRF $vrfId does not exist");
+    }
+
+    api_success($vrf, 'vrf');
 }
 
 
