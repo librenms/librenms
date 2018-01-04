@@ -1,4 +1,4 @@
-mib: mibs/HH3C-LswDEVM-MIB
+mib: HH3C-LswDEVM-MIB
 modules:
     sensors:
         state:
