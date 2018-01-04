@@ -18,7 +18,7 @@ Example for the Rittal IT Chiller that uses a pCOweb card:
 3. Adding value to identify this device in LibreNMS : **1**
 4. Complete System OID for a Rittal Chiller using a Carel pCOweb card: **1.3.6.1.4.1.9839.2606.1**
 
-After constructing the correct System OID for your SNMP card, you can start the LibreNMS [new OS implementation](Developing/Support-New-OS/) and use this new OID as sysObjectId for the YAML definition file.
+After constructing the correct System OID for your SNMP card, you can start the LibreNMS [new OS implementation](Developing/Support-New-OS/) and use this new OID as sysObjectID for the YAML definition file.
 
 ## pCOweb card already supported
 LibreNMS is ready for the devices listed in this table. You only need to configure your pCOweb card with the accorded System OID:
