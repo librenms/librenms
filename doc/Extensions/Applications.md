@@ -42,6 +42,7 @@ Different applications support a variety of ways to collect data: by direct conn
 1. [Unbound](#unbound) - Agent
 1. [UPS-nut](#ups-nut) - SNMP extend
 1. [UPS-apcups](#ups-apcups) - SNMP extend
+1. [ZFS](#zfs) - SNMP extend
 
 ### Apache
 Either use SNMP extend or use the agent.
@@ -215,21 +216,36 @@ snmp ALL=(ALL) NOPASSWD: /etc/snmp/exim-stats.sh, /usr/bin/exim*
 extend fail2ban /etc/snmp/fail2ban
 ```
 
-4: Edit /etc/snmp/fail2ban to match the firewall table you are using on your system. You should be good if you are using the defaults. Also make sure that the cache variable is properly set if you wish to use caching. The directory it exists in, needs to exist as well. To make sure it is working with out issue, run '/etc/snmp/fail2ban -u' and make sure it runs with out producing any errors.
+If you want to use the cache, it is as below, by using the -c switch.
+```
+extend fail2ban /etc/snmp/fail2ban -c
+```
+
+If you want to use the cache and update it if needed, this can by using the -c and -U switches.
+```
+extend fail2ban /etc/snmp/fail2ban -c -U
+```
+
+If you need to specify a custom location for the fail2ban-client, that can be done via the -f switch.
+
+If not specified, "/usr/bin/env fail2ban-client" is used.
+
+```
+extend fail2ban /etc/snmp/fail2ban -f /foo/bin/fail2ban-client
+```
 
 5: Restart snmpd on your host
 
-6: If you wish to use caching, add the following to /etc/crontab and restart cron.
+6: If you wish to use caching, add the following to /etc/crontab and restart cron. 
 ```
 */3    *    *    *    *    root    /etc/snmp/fail2ban -u 
 ```
 
 7: Restart or reload cron on your system.
 
-In regards to the totals graphed there are two variables banned and firewalled. Firewalled is a count of banned entries the firewall for fail2ban and banned is the currently banned total from fail2ban-client. Both are graphed as the total will diverge with some configurations when fail2ban fails to see if a IP is in more than one jail when unbanning it. This is most likely to happen when the recidive is in use.
-
 If you have more than a few jails configured, you may need to use caching as each jail needs to be polled and fail2ban-client can't do so in a timely manner for than a few. This can result in failure of other SNMP information being polled.
 
+For additional details of the switches, please see the POD in the script it self at the top.
 
 ### FreeBSD NFS Client
 #### SNMP Extend
@@ -938,3 +954,22 @@ extend sdfsinfo /etc/snmp/sdfsinfo
 4. Restart snmpd on your host
 
 5. On the device page in Librenms, edit your host and check the `SDFS info` under the Applications tab or wait for it to be auto-discovered.
+
+### ZFS
+
+###### SNMP Extend
+1. Copy the perl script to the desired host (the host must be added to LibreNMS devices)
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-freebsd -O /etc/snmp/zfs-freebsd
+```
+
+2. Make the script executable (chmod +x /etc/snmp/zfs-freebsd)
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend zfs /etc/snmp/zfs-freebsd
+```
+
+4. Restart snmpd on your host
+
+At this time, only FreeBSD is support. Linux support is eventually planned.

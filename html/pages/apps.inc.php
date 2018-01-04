@@ -283,6 +283,19 @@ $graphs['freeradius'] = array(
     'queue',
 );
 
+$graphs['zfs'] = array(
+    'arc_misc',
+    'arc_size',
+    'arc_size_per',
+    'arc_size_breakdown',
+    'arc_efficiency',
+    'arc_cache_hits_by_list',
+    'arc_cache_hits_by_type',
+    'arc_cache_misses_by_type',
+    'arc_cache_hits',
+    'arc_cache_miss',
+);
+
 print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";

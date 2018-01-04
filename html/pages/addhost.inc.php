@@ -52,7 +52,7 @@ if ($hostname !== false) {
             );
         } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
             if ($_POST['community']) {
-                $config['snmp']['community'] = array(clean($_POST['community']));
+                $config['snmp']['community'] = array(clean($_POST['community'], false));
             }
 
             $snmpver = clean($_POST['snmpver']);
@@ -60,11 +60,11 @@ if ($hostname !== false) {
         } elseif ($_POST['snmpver'] === 'v3') {
             $v3 = array(
                    'authlevel'  => clean($_POST['authlevel']),
-                   'authname'   => clean($_POST['authname']),
-                   'authpass'   => clean($_POST['authpass']),
+                   'authname'   => clean($_POST['authname'], false),
+                   'authpass'   => clean($_POST['authpass'], false),
                    'authalgo'   => clean($_POST['authalgo']),
-                   'cryptopass' => clean($_POST['cryptopass']),
-                   'cryptoalgo' => clean($_POST['cryptoalgo']),
+                   'cryptopass' => clean($_POST['cryptopass'], false),
+                   'cryptoalgo' => clean($_POST['cryptoalgo'], false),
                   );
 
             array_push($config['snmp']['v3'], $v3);
@@ -111,17 +111,17 @@ $pagetitle[] = 'Add host';
   <div><h2>Add Device</h2></div>
   <div class="alert alert-info">Devices will be checked for Ping/SNMP reachability before being probed.</div>
   <div class="well well-lg">
-    <div class='form-group'>
+      <div class="form-group">
+          <label for="hostname" class="col-sm-3 control-label">Hostname</label>
+          <div class="col-sm-9">
+              <input type="text" id="hostname" name="hostname" class="form-control input-sm" placeholder="Hostname">
+          </div>
+      </div>
+      <div class='form-group'>
         <label for='hardware' class='col-sm-3 control-label'>SNMP</label>
         <div class='col-sm-4'>
             <input type="checkbox" id="snmp" name="snmp" data-size="small" onChange="disableSnmp(this);" checked>
         </div>
-    </div>
-    <div class="form-group">
-      <label for="hostname" class="col-sm-3 control-label">Hostname</label>
-      <div class="col-sm-9">
-        <input type="text" id="hostname" name="hostname" class="form-control input-sm" placeholder="Hostname">
-      </div>
     </div>
     <div id='snmp_override' style="display: none;">
         <div class='form-group'>

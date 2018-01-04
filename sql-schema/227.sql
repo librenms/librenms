@@ -1,1 +1,1 @@
-UPDATE `alert_rules` SET `rule` = REPLACE(rule, 'enterprises.', '.1.3.6.1.4.1.');
+ALTER TABLE `bgpPeers` CHANGE `astext` `astext` varchar(255) NOT NULL;
