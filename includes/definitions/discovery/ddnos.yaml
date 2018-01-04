@@ -1,4 +1,4 @@
-mib: mibs/SFA-INFO
+mib: SFA-INFO
 modules:
     sensors:
         state:
