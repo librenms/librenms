@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] === 'splat') {
+if ($device['os'] === 'secureplatform') {
     echo 'SecurePlatform : ';
 
     $descr = 'Processor';

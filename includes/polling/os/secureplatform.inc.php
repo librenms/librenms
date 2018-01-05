@@ -11,7 +11,7 @@ $tmp_splat = snmp_get_multi_oid($device, 'svnVersion.0 svnApplianceProductName.0
 $serial   = $tmp_splat['svnApplianceSerialNumber.0'];
 $hardware = $tmp_splat['svnApplianceProductName.0'];
 $version  = $tmp_splat['svnVersion.0'];
-unset($tmp_splat);
+unset($tmp_SPLAT);
 
 $connections = snmp_get($device, 'fwNumConn.0', '-OQv', 'CHECKPOINT-MIB');
 
@@ -23,8 +23,8 @@ if (is_numeric($connections)) {
         );
 
         $tags = compact('rrd_def');
-        data_update($device, 'splat_actsessions', $tags, $fields);
-        $graphs['splat_actsessions'] = true;
+        data_update($device, 'secureplatform_sessions', $tags, $fields);
+        $graphs['secureplatform_sessions'] = true;
 }
 
 unset($connections);

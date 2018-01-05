@@ -11,7 +11,7 @@
                     "hardware": "",
                     "features": null,
                     "location": null,
-                    "os": "splat",
+                    "os": "secureplatform",
                     "type": "firewall",
                     "serial": null,
                     "icon": "checkpoint.png"
@@ -29,7 +29,7 @@
                     "hardware": "",
                     "features": null,
                     "location": "<private>",
-                    "os": "splat",
+                    "os": "secureplatform",
                     "type": "firewall",
                     "serial": null,
                     "icon": "checkpoint.png"

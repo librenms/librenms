@@ -1,14 +1,13 @@
 <?php
 
-/**
- * SPLAT.inc.php
- *
- * NTTCOM MS RRD module for Check Point SECUREPLATFORM sessions
-**/
+/*
+ * NTTCOM MS module for printing CheckPoint SecurePlatform sessions
+ */
+
 
 require 'includes/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], 'splat_actsessions');
+$rrd_filename = rrd_name($device['hostname'], 'secureplatform_sessions');
 
 $rrd_options .= " DEF:connections=$rrd_filename:NumConn:AVERAGE";
 $rrd_options .= " DEF:connections_max=$rrd_filename:NumConn:MAX";

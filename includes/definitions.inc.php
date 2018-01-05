@@ -513,10 +513,11 @@ $config['graph_types']['device']['routeros_leases']['section'] = 'network';
 $config['graph_types']['device']['routeros_leases']['order'] = 0;
 $config['graph_types']['device']['routeros_leases']['descr'] = 'DHCP Lease Count';
 
-//SPLAT specific graphs
-$config['graph_types']['device']['splat_actsessions']['section'] = 'firewall';
-$config['graph_types']['device']['splat_actsessions']['order'] = 0;
-$config['graph_types']['device']['splat_actsessions']['descr'] = 'Active connections';
+
+//CheckPoint SPLAT specific graphs
+$config['graph_types']['device']['secureplatform_sessions']['section'] = 'firewall';
+$config['graph_types']['device']['secureplatform_sessions']['order'] = 0;
+$config['graph_types']['device']['secureplatform_sessions']['descr'] = 'Active connections';
 
 // Device Types
 $i = 0;
