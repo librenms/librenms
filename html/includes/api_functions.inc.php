@@ -1330,8 +1330,6 @@ function get_devices_by_group()
 
 function list_vrf()
 {
-    check_is_read();
-
     $app        = \Slim\Slim::getInstance();
     $sql        = '';
     $sql_params = array();
@@ -1346,6 +1344,7 @@ function list_vrf()
         $sql        = ' AND `vrfs`.`vrf_name`=?';
         $sql_params = array($vrfname);
     }
+    check_device_permission($device_id);
 
     $vrfs       = dbFetchRows("SELECT `vrfs`.* FROM `vrfs` WHERE `vrfs`.`vrf_name` IS NOT NULL $sql", $sql_params);
     $total_vrfs = count($vrfs);
