@@ -122,10 +122,10 @@ require_once 'includes/modal/delete_service.inc.php';
                 <div class="row col-sm-12"><span id="message"></span></div>
                 <?php
                 if ($_SESSION['userlevel'] >= '5') {
-                    $host_sql = 'SELECT `D`.`device_id`,`D`.`hostname`,`D`.`sysName` FROM devices AS D, services AS S WHERE D.device_id = S.device_id GROUP BY `D`.`hostname`, `D`.`device_id` ORDER BY D.hostname';
+                    $host_sql = 'SELECT `D`.`device_id`,`D`.`hostname`,`D`.`sysName` FROM devices AS D, services AS S WHERE D.device_id = S.device_id GROUP BY `D`.`hostname`, `D`.`device_id`, `D`.`sysName` ORDER BY D.hostname';
                     $host_par = array();
                 } else {
-                    $host_sql = 'SELECT `D`.`device_id`,`D`.`hostname`,`D`.`sysName` FROM devices AS D, services AS S, devices_perms AS P WHERE D.device_id = S.device_id AND D.device_id = P.device_id AND P.user_id = ? GROUP BY `D`.`hostname`, `D`.`device_id` ORDER BY D.hostname';
+                    $host_sql = 'SELECT `D`.`device_id`,`D`.`hostname`,`D`.`sysName` FROM devices AS D, services AS S, devices_perms AS P WHERE D.device_id = S.device_id AND D.device_id = P.device_id AND P.user_id = ? GROUP BY `D`.`hostname`, `D`.`device_id`, `D`.`sysName` ORDER BY D.hostname';
                     $host_par = array($_SESSION['user_id']);
                 }
 
@@ -180,7 +180,7 @@ require_once 'includes/modal/delete_service.inc.php';
                         }
                         $head = false;
                         ?>
-                        <tr>
+                        <tr id="row_<?php echo $service['service_id']; ?>">
                             <td><span data-toggle='tooltip' title='<?php echo $title ?>'
                                       class='alert-status <?php echo $label ?>'> </span></td>
                             <td><?php echo nl2br(display($service['service_type'])) ?></td>
