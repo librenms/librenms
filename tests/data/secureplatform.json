@@ -1,0 +1,40 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "127.1.6.2",
+                    "sysObjectID": null,
+                    "sysDescr": null,
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": null,
+                    "os": "secureplatform",
+                    "type": "firewall",
+                    "serial": null,
+                    "icon": "checkpoint.png"
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": "enterprises.8072.3.2.10",
+                    "sysDescr": "Linux hostname #1 2.6.18-92cp SMP Thu Apr 12 03:28:54 IDT 2012 i686",
+                    "sysContact": "<private>",
+                    "version": "R75.40",
+                    "hardware": "",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "secureplatform",
+                    "type": "firewall",
+                    "serial": null,
+                    "icon": "checkpoint.png"
+                }
+            ]
+        }
+    }
+}
