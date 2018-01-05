@@ -846,39 +846,36 @@ function get_ip_addresses()
         $ipv4   = dbFetchRows("SELECT `ipv4_addresses`.* FROM `ipv4_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
         $ipv6   = dbFetchRows("SELECT `ipv6_addresses`.* FROM `ipv6_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
         $ip_addresses_count = count(array_merge($ipv4, $ipv6));
-            if (!is_numeric($ip_addresses_count)) {
-                api_error(500, 'Error retrieving IP Addresses');
-            }
-            if ($ip_addresses_count == 0) {
-                api_error(404, "Device $device_id does not exist or empty");
-            }
-
+        if (!is_numeric($ip_addresses_count)) {
+            api_error(500, 'Error retrieving IP Addresses');
+        }
+        if ($ip_addresses_count == 0) {
+            api_error(404, "Device $device_id does not exist or empty");
+        }
     } elseif (isset($router['portid'])) {
         $port_id = urldecode($router['portid']);
         check_port_permission($port_id, null);
         $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `port_id` = ?", array($port_id));
         $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?", array($port_id));
         $ip_addresses_count = count(array_merge($ipv4, $ipv6));
-            if (!is_numeric($ip_addresses_count)) {
-                api_error(500, 'Error retrieving IP Addresses');
-            }
-            if ($ip_addresses_count == 0) {
-                api_error(404, "Port $port_id does not exist or empty");
-            }
-
+        if (!is_numeric($ip_addresses_count)) {
+            api_error(500, 'Error retrieving IP Addresses');
+        }
+        if ($ip_addresses_count == 0) {
+            api_error(404, "Port $port_id does not exist or empty");
+        }
     } elseif (isset($router['id'])) {
         check_is_read();
         $network_id = $router['id'];
         $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `ipv4_network_id` = ?", array($network_id));
         $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `ipv6_network_id` = ?", array($network_id));
         $ip_addresses_count = count(array_merge($ipv4, $ipv6));
-            if (!is_numeric($ip_addresses_count)) {
-                api_error(500, 'Error retrieving IP Addresses');
-            }
-            if ($ip_addresses_count == 0) {
-                api_error(404, "IP Network $network_id does not exist or empty");
-            }
-
+        if (!is_numeric($ip_addresses_count)) {
+            api_error(500, 'Error retrieving IP Addresses');
+        }
+        if ($ip_addresses_count == 0) {
+            api_error(404, "IP Network $network_id does not exist or empty");
+        }
     }
 
     api_success(array_merge($ipv4, $ipv6), 'addresses');
