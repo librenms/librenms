@@ -36,7 +36,7 @@ $no_refresh = true;
 
                     <div class="form-group">
                         <label for="new_conf_value">API URL</label>
-                        <input type="text" class="form-control" name="new_conf_value" id="new_conf_value" placeholder="Enter the config value">
+                        <input type="text" class="form-control validation" name="new_conf_value" id="new_conf_value" placeholder="Enter the config value" required pattern="[a-zA-Z0-9]{1,5}://.*">
                     </div>
                 </form>
             </div>
@@ -60,7 +60,7 @@ $no_refresh = true;
                     </div>
                     <div class="form-group">
                         <label for="slack_value">Slack API URL</label>
-                        <input type="text" class="form-control" name="slack_value" id="slack_value" placeholder="Enter the Slack API url">
+                        <input type="text" class="form-control validation" name="slack_value" id="slack_value" placeholder="Enter the Slack API url" required pattern="[a-zA-Z0-9]{1,5}://.*">
                     </div>
                     <div class="form-group">
                         <label for="slack_extra">Slack options (specify one per line key=value)</label>
@@ -88,7 +88,7 @@ $no_refresh = true;
                     </div>
                     <div class="form-group">
                         <label for="rocket_value">Rocket.Chat API URL</label>
-                        <input type="text" class="form-control" name="rocket_value" id="rocket_value" placeholder="Enter the Rocket.Chat API url">
+                        <input type="text" class="form-control validation" name="rocket_value" id="rocket_value" placeholder="Enter the Rocket.Chat API url" required pattern="[a-zA-Z0-9]{1,5}://.*">
                     </div>
                     <div class="form-group">
                         <label for="rocket_extra">Rocket.Chat options (specify one per line key=value)</label>
@@ -116,15 +116,15 @@ $no_refresh = true;
                     </div>
                     <div class="form-group">
                         <label for="hipchat_value">Hipchat API URL</label>
-                        <input type="text" class="form-control" name="hipchat_value" id="hipchat_value" placeholder="Enter the Hipchat API url">
+                        <input type="text" class="form-control validation" name="hipchat_value" id="hipchat_value" placeholder="Enter the Hipchat API url" required pattern="[a-zA-Z0-9]{1,5}://.*">
                     </div>
                     <div class="form-group">
                         <label for="new_room_id">Room ID</label>
-                        <input type="text" class="form-control" name="new_room_id" id="new_room_id" placeholder="Enter the room ID">
+                        <input type="text" class="form-control validation" name="new_room_id" id="new_room_id" placeholder="Enter the room ID" required pattern="[^\s]{1,100}">
                     </div>
                     <div class="form-group">
                         <label for="new_from">From</label>
-                        <input type="text" class="form-control" name="new_from" id="new_from" placeholder="Enter the from details">
+                        <input type="text" class="form-control validation" name="new_from" id="new_from" placeholder="Enter the from details" pattern=".{1,64}">
                     </div>
                     <div class="form-group">
                         <label for="hipchat_extra">Hipchat options (specify one per line key=value)</label>
@@ -152,11 +152,11 @@ $no_refresh = true;
                     </div>
                     <div class="form-group">
                         <label for="pushover_value">Pushover Apikey</label>
-                        <input type="text" class="form-control" name="pushover_value" id="pushover_value" placeholder="Enter the Pushover Apikey">
+                        <input type="text" class="form-control validation" name="pushover_value" id="pushover_value" placeholder="Enter the Pushover Apikey" required>
                     </div>
                     <div class="form-group">
                         <label for="new_userkey">Room ID</label>
-                        <input type="text" class="form-control" name="new_userkey" id="new_userkey" placeholder="Enter the Userkey">
+                        <input type="text" class="form-control validation" name="new_userkey" id="new_userkey" placeholder="Enter the Userkey" required>
                     </div>
                     <div class="form-group">
                         <label for="pushover_extra">Pushover options (specify one per line key=value)</label>
@@ -184,7 +184,7 @@ $no_refresh = true;
                     </div>
                     <div class="form-group">
                         <label for="boxcar_value">Boxcar Access token</label>
-                        <input type="text" class="form-control" name="boxcar_value" id="boxcar_value" placeholder="Enter the Boxcar Access token">
+                        <input type="text" class="form-control validation" name="boxcar_value" id="boxcar_value" placeholder="Enter the Boxcar Access token" required>
                     </div>
                     <div class="form-group">
                         <label for="boxcar_extra">Boxcar options (specify one per line key=value)</label>
@@ -212,11 +212,11 @@ $no_refresh = true;
                     </div>
                     <div class="form-group">
                         <label for="telegram_value">Telegram Chat ID</label>
-                        <input type="text" class="form-control" name="telegram_value" id="telegram_value" placeholder="Enter the Telegram Chat ID">
+                        <input type="text" class="form-control validation" name="telegram_value" id="telegram_value" placeholder="Enter the Telegram Chat ID" required pattern="-?[\d]+">
                     </div>
                     <div class="form-group">
                         <label for="telegram_token">Telegram Token</label>
-                        <input type="text" class="form-control" name="telegram_token" id="telegram_token" placeholder="Enter the Telegram Token">
+                        <input type="text" class="form-control validation" name="telegram_token" id="telegram_token" placeholder="Enter the Telegram Token" required>
                     </div>
                 </form>
             </div>
@@ -284,10 +284,12 @@ $general_conf = array(
     array('name'               => 'alert.default_mail',
           'descr'              => 'Default contact',
           'type'               => 'text',
+          'pattern'            => '[a-zA-Z0-9_\-\.\+]+@[a-zA-Z0-9_\-\.]+\.[a-zA-Z]{2,5}',
     ),
     array('name'               => 'alert.tolerance_window',
           'descr'              => 'Tolerance window for cron',
-          'type'               => 'text',
+          'type'               => 'numeric',
+          'required'           => true,
     ),
     array('name'               => 'alert.fixed-contacts',
           'descr'              => 'Updates to contact email addresses not honored',
@@ -312,6 +314,7 @@ $mail_conf = array(
     array('name'               => 'email_from',
           'descr'              => 'From email address',
           'type'               => 'text',
+          'pattern'            => '[a-zA-Z0-9_\-\.\+]+@[a-zA-Z0-9_\-\.]+\.[a-zA-Z]{2,5}',
     ),
     array('name'               => 'email_html',
           'descr'              => 'Use HTML emails',
@@ -324,14 +327,17 @@ $mail_conf = array(
     array('name'               => 'email_smtp_host',
           'descr'              => 'SMTP Host',
           'type'               => 'text',
+          'pattern'            => '[a-zA-Z0-9_\-\.]+',
     ),
     array('name'               => 'email_smtp_port',
           'descr'              => 'SMTP Port',
-          'type'               => 'text',
+          'type'               => 'numeric',
+          'required'           => true,
     ),
     array('name'               => 'email_smtp_timeout',
           'descr'              => 'SMTP Timeout',
-          'type'               => 'text',
+          'type'               => 'numeric',
+          'required'           => true,
     ),
     array('name'               => 'email_smtp_secure',
           'descr'              => 'SMTP Secure',
@@ -339,9 +345,9 @@ $mail_conf = array(
           'options'            => $dyn_config['email_smtp_secure'],
     ),
     array('name'               => 'email_auto_tls',
-        'descr'                => 'SMTP Auto TLS Support',
-        'type'                 => 'select',
-        'options'              => array('true', 'false'),
+          'descr'              => 'SMTP Auto TLS Support',
+          'type'               => 'select',
+          'options'            => array('true', 'false'),
     ),
     array('name'               => 'email_smtp_auth',
           'descr'              => 'SMTP Authentication',
@@ -992,7 +998,7 @@ echo '<div id="telegram_chat_id_template" class="hide">
                         <label for="victorops" class="col-sm-4 control-label">Post URL </label>
                         <div data-toggle="tooltip" title="'.$config_groups['alert.transports.victorops.url']['config_descr'].'" class="toolTip fa fa-question-circle"></div>
                         <div class="col-sm-4">
-                            <input id="victorops" class="form-control" type="text" name="global-config-input" value="'.$config_groups['alert.transports.victorops.url']['config_value'].'" data-config_id="'.$config_groups['alert.transports.victorops.url']['config_id'].'">
+                            <input id="victorops" class="form-control validation" type="text" name="global-config-input" value="'.$config_groups['alert.transports.victorops.url']['config_value'].'" data-config_id="'.$config_groups['alert.transports.victorops.url']['config_id'].'" pattern="[a-zA-Z0-9]{1,5}://.*">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1013,7 +1019,7 @@ echo '<div id="telegram_chat_id_template" class="hide">
                     <label for="opsgenie" class="col-sm-4 control-label">OpsGenie URL </label>
                     <div data-toggle="tooltip" title="' . $config_groups['alert.transports.opsgenie.url']['config_descr'] . '" class="toolTip fa fa-question-circle"></div>
                     <div class="col-sm-4">
-                        <input id="opsgenie" class="form-control" type="text" name="global-config-input" value="' . $config_groups['alert.transports.opsgenie.url']['config_value'] . '" data-config_id="' . $config_groups['alert.transports.opsgenie.url']['config_id'] . '">
+                        <input id="opsgenie" class="form-control validation" type="text" name="global-config-input" value="' . $config_groups['alert.transports.opsgenie.url']['config_value'] . '" data-config_id="' . $config_groups['alert.transports.opsgenie.url']['config_id'] . '" pattern="[a-zA-Z0-9]{1,5}://.*">
                         <span class="form-control-feedback">
                             <i class="fa" aria-hidden="true"></i>
                         </span>
@@ -1083,7 +1089,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="playsms_url" class="col-sm-4 control-label">PlaySMS URL </label>
                         <div class="col-sm-4">
-                            <input id="playsms_url" class="form-control" type="text" name="global-config-input" value="'.$playsms_url['config_value'].'" data-config_id="'.$playsms_url['config_id'].'">
+                            <input id="playsms_url" class="form-control validation" type="text" name="global-config-input" value="'.$playsms_url['config_value'].'" data-config_id="'.$playsms_url['config_id'].'" pattern="[a-zA-Z0-9]{1,5}://.*">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1145,7 +1151,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="canopsis_host" class="col-sm-4 control-label">Canopsis Hostname </label>
                         <div class="col-sm-4">
-                            <input id="canopsis_host" class="form-control" type="text" name="global-config-input" value="'.$canopsis_host['config_value'].'" data-config_id="'.$canopsis_host['config_id'].'">
+                            <input id="canopsis_host" class="form-control validation" type="text" name="global-config-input" value="'.$canopsis_host['config_value'].'" data-config_id="'.$canopsis_host['config_id'].'" pattern="[a-zA-Z0-9_\-\.]+">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1154,7 +1160,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="canopsis_port" class="col-sm-4 control-label">Canopsis Port number </label>
                         <div class="col-sm-4">
-                            <input id="canopsis_port" class="form-control" type="text" name="global-config-input" value="'.$canopsis_port['config_value'].'" data-config_id="'.$canopsis_port['config_id'].'">
+                            <input id="canopsis_port" class="form-control" type="text" name="global-config-input" value="'.$canopsis_port['config_value'].'" data-config_id="'.$canopsis_port['config_id'].'" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1181,7 +1187,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="canopsis_vhost" class="col-sm-4 control-label">Vhost</label>
                         <div class="col-sm-4">
-                            <input id="canopsis_vhost" class="form-control" type="text" name="global-config-input" value="'.$canopsis_vhost['config_value'].'" data-config_id="'.$canopsis_vhost['config_id'].'">
+                            <input id="canopsis_vhost" class="form-control validation" type="text" name="global-config-input" value="'.$canopsis_vhost['config_value'].'" data-config_id="'.$canopsis_vhost['config_id'].'" pattern="[a-zA-Z0-9_\-\.]+">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1204,7 +1210,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="osticket_url" class="col-sm-4 control-label">osTicket API URL</label>
                         <div class="col-sm-4">
-                            <input id="osticket_url" class="form-control" type="text" name="global-config-input" value="'.$osticket_url['config_value'].'" data-config_id="'.$osticket_url['config_id'].'">
+                            <input id="osticket_url" class="form-control validation" type="text" name="global-config-input" value="'.$osticket_url['config_value'].'" data-config_id="'.$osticket_url['config_id'].'" pattern="[a-zA-Z0-9]{1,5}://.*">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1235,7 +1241,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="msteams_url" class="col-sm-4 control-label">Microsoft Teams Webhook URL</label>
                         <div class="col-sm-4">
-                            <input id="msteams_url" class="form-control" type="text" name="global-config-input" value="'.$msteams_url['config_value'].'" data-config_id="'.$msteams_url['config_id'].'">
+                            <input id="msteams_url" class="form-control validation" type="text" name="global-config-input" value="'.$msteams_url['config_value'].'" data-config_id="'.$msteams_url['config_id'].'" pattern="[a-zA-Z0-9]{1,5}://.*">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1297,7 +1303,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="smseagle_url" class="col-sm-4 control-label">SMSEagle URL </label>
                         <div class="col-sm-4">
-                            <input id="smseagle_url" class="form-control" type="text" name="global-config-input" value="'.$smseagle_url['config_value'].'" data-config_id="'.$smseagle_url['config_id'].'">
+                            <input id="smseagle_url" class="form-control validation" type="text" name="global-config-input" value="'.$smseagle_url['config_value'].'" data-config_id="'.$smseagle_url['config_id'].'" pattern="[a-zA-Z0-9]{1,5}://.*">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1348,7 +1354,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="syslog_host" class="col-sm-4 control-label">Syslog Host </label>
                         <div class="col-sm-4">
-                            <input id="syslog_host" class="form-control" type="text" name="global-config-input" value="'.$syslog_host['config_value'].'" data-config_id="'.$syslog_host['config_id'].'">
+                            <input id="syslog_host" class="form-control validation" type="text" name="global-config-input" value="'.$syslog_host['config_value'].'" data-config_id="'.$syslog_host['config_id'].'" pattern="[a-zA-Z0-9_\-\.]+">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1357,7 +1363,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="syslog_port" class="col-sm-4 control-label">Syslog Port </label>
                         <div class="col-sm-4">
-                            <input id="syslog_port" class="form-control" type="text" name="global-config-input" value="'.$syslog_port['config_value'].'" data-config_id="'.$syslog_port['config_id'].'">
+                            <input id="syslog_port" class="form-control" type="text" name="global-config-input" value="'.$syslog_port['config_value'].'" data-config_id="'.$syslog_port['config_id'].'" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1366,7 +1372,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="syslog_facility" class="col-sm-4 control-label">Syslog Facility </label>
                         <div class="col-sm-4">
-                            <input id="syslog_facility" class="form-control" type="text" name="global-config-input" value="'.$syslog_facility['config_value'].'" data-config_id="'.$syslog_facility['config_id'].'">
+                            <input id="syslog_facility" class="form-control" type="text" name="global-config-input" value="'.$syslog_facility['config_value'].'" data-config_id="'.$syslog_facility['config_id'].'" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1402,7 +1408,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="jira_url" class="col-sm-4 control-label">Jira URL </label>
                         <div class="col-sm-4">
-                            <input id="jira_url" class="form-control" type="url" name="global-config-input" value="'.$jira_url['config_value'].'" data-config_id="'.$jira_url['config_id'].'">
+                            <input id="jira_url" class="form-control validation" type="url" name="global-config-input" value="'.$jira_url['config_value'].'" data-config_id="'.$jira_url['config_id'].'" pattern="[a-zA-Z0-9]{1,5}://.*">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1457,7 +1463,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="es_host" class="col-sm-4 control-label">Elasticsearch Host </label>
                         <div class="col-sm-4">
-                            <input id="es_host" class="form-control" type="text" name="global-config-input" value="'.$es_host['config_value'].'" data-config_id="'.$es_host['config_id'].'">
+                            <input id="es_host" class="form-control validation" type="text" name="global-config-input" value="'.$es_host['config_value'].'" data-config_id="'.$es_host['config_id'].'" pattern="[a-zA-Z0-9_\-\.]+">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1466,7 +1472,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="es_port" class="col-sm-4 control-label">Elasticsearch Port </label>
                         <div class="col-sm-4">
-                            <input id="es_port" class="form-control" type="text" name="global-config-input" value="'.$es_port['config_value'].'" data-config_id="'.$es_port['config_id'].'">
+                            <input id="es_port" class="form-control" type="text" name="global-config-input" value="'.$es_port['config_value'].'" data-config_id="'.$es_port['config_id'].'" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
