@@ -87,8 +87,7 @@ $(document).ready(function() {
         var $this = $(this);
         var config_id = $this.data("config_id");
         var config_value = $this.val();
-        var required = $this.prop('required');
-        if (required == false) {
+        if ($this[0].checkValidity()) {
             $.ajax({
                 type: 'POST',
                 url: 'ajax_form.php',
@@ -149,7 +148,7 @@ function submitCustomRange(frmdata) {
 
 function updateResolution(refresh)
 {
-    $.post('ajax_setresolution.php', 
+    $.post('ajax_setresolution.php',
         {
             width: $(window).width(),
             height:$(window).height()
@@ -179,7 +178,7 @@ $(window).on('resize', function(){
 function resizeend() {
     if (new Date() - rtime < delta) {
         setTimeout(resizeend, delta);
-    } 
+    }
     else {
         newH=$(window).height();
         newW=$(window).width();
@@ -193,7 +192,7 @@ function resizeend() {
             resizeGraphs();
         }
         updateResolution(refresh);
-    }  
+    }
 };
 
 function resizeGraphs() {
@@ -222,7 +221,7 @@ $(document).on("click", '.collapse-neighbors', function(event)
     else {
         button.addClass('fa-plus').removeClass('fa-minus');
     }
-   
+
     list.toggle();
     continued.toggle();
 });
