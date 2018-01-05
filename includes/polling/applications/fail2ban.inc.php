@@ -16,23 +16,23 @@ $metrics = array();
 $bannedStuff = explode("\n", $f2b);
 
 $total_banned=$bannedStuff[0];
-$firewalled=$bannedStuff[1];
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
     ->addDataset('banned', 'GAUGE', 0)
     ->addDataset('firewalled', 'GAUGE', 0);
 
+
 $fields = array(
     'banned' =>$total_banned,
-    'firewalled' => $firewalled,
+    'firewalled'=>'U',
 );
 $metrics['total'] = $fields;
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
 
-$int=2;
+$int=1;
 $jails=array();
 
 while (isset($bannedStuff[$int])) {

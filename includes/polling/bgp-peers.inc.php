@@ -65,7 +65,7 @@ if ($config['enable_bgp']) {
                             );
                         }
                         $ident           = "$ip_ver.\"".$bgp_peer_ident.'"';
-                        unset($peer_data);
+                        $peer_data = array();
                         $ident_key = array_keys($peer_data_tmp);
                         foreach ($peer_data_tmp[$ident_key[0]] as $k => $v) {
                             if (strstr($k, 'cbgpPeer2LocalAddr') || $k === 'aristaBgp4V2PeerLocalAddr') {
@@ -79,7 +79,7 @@ if ($config['enable_bgp']) {
                                 }
                             }
 
-                            $peer_data .= "$v\n";
+                            $peer_data[] = $v;
                         }
                     } else {
                         $oids = array(
@@ -93,10 +93,10 @@ if ($config['enable_bgp']) {
                             'bgpPeerInUpdateElapsedTime.'.$peer['bgpPeerIdentifier'],
                             'bgpPeerLocalAddr.'.$peer['bgpPeerIdentifier']
                         );
-                        $peer_data = snmp_get_multi_oid($device, $oids, '-OUQ', 'BGP4-MIB');
+                        $peer_data = array_values(snmp_get_multi_oid($device, $oids, '-OUQ', 'BGP4-MIB'));
                     }//end if
                     d_echo($peer_data);
-                    list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = array_values($peer_data);
+                    list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = $peer_data;
                     $bgpLocalAddr = str_replace('"', '', str_replace(' ', '', $bgpLocalAddr));
                 } elseif ($device['os'] == 'junos') {
                     if (!isset($junos)) {
@@ -199,7 +199,7 @@ if ($config['enable_bgp']) {
                 'bgpPeerOutUpdates'         => $bgpPeerOutUpdates,
             );
 
-            $peer['update'] = array_diff($bgpPeers_fields, $peer);
+            $peer['update'] = array_diff_assoc($bgpPeers_fields, $peer);
 
             if ($peer['update']) {
                 dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
@@ -330,7 +330,7 @@ if ($config['enable_bgp']) {
                     // Validate data
                     $cbgpPeerAcceptedPrefixes     = set_numeric($cbgpPeerAcceptedPrefixes);
                     $cbgpPeerDeniedPrefixes       = set_numeric($cbgpPeerDeniedPrefixes);
-                    $cbgpPeerPrefixAdminLimit     = set_numeric($cbgpPeerAdminLimit);
+                    $cbgpPeerPrefixAdminLimit     = set_numeric($cbgpPeerPrefixAdminLimit);
                     $cbgpPeerPrefixThreshold      = set_numeric($cbgpPeerPrefixThreshold);
                     $cbgpPeerPrefixClearThreshold = set_numeric($cbgpPeerPrefixClearThreshold);
                     $cbgpPeerAdvertisedPrefixes   = set_numeric($cbgpPeerAdvertisedPrefixes);
@@ -340,7 +340,7 @@ if ($config['enable_bgp']) {
                     $cbgpPeers_cbgp_fields = array(
                         'AcceptedPrefixes'     => $cbgpPeerAcceptedPrefixes,
                         'DeniedPrefixes'       => $cbgpPeerDeniedPrefixes,
-                        'PrefixAdminLimit'     => $cbgpPeerAdminLimit,
+                        'PrefixAdminLimit'     => $cbgpPeerPrefixAdminLimit,
                         'PrefixThreshold'      => $cbgpPeerPrefixThreshold,
                         'PrefixClearThreshold' => $cbgpPeerPrefixClearThreshold,
                         'AdvertisedPrefixes'   => $cbgpPeerAdvertisedPrefixes,

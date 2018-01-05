@@ -103,19 +103,17 @@ if ($format == "graph") {
         $graph_array['to'] = $vars['to'];
     }
 
-    echo "
-    <div class='well well-sm'>
-        <div class='container-fluid'>
-            <div class='row'>
-                <div class='col-md-12'>
-    ";
+    echo '<div class="panel panel-default panel-condensed">';
+    echo '<div class="panel-heading">';
+    echo '<div class="row" style="padding: 0px 10px 0px 10px;">';
+    echo '<div class="pull-left">' . $listoptions . '</div>';
+    echo '<div class="pull-right">' . $headeroptions . '</div>';
+    echo '<div class="col-md-12" style="padding: 10px 0px 0px 0px;">';
     include_once 'includes/print-date-selector.inc.php';
-    echo '
-                </div>
-            </div>
-        </div>
-    </div>
-    ';
+    echo '</div>';
+    echo '</div>';
+    echo '</div>';
+    echo '<div class="panel-body">';
 
     $sql_param = array();
 
@@ -243,6 +241,7 @@ if ($format == "graph") {
             }
         }
     }
+    echo '</div>';
 } else {
     if (is_admin() === true || is_read() === true) {
         $os = "SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY `os`";

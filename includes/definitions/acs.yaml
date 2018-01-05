@@ -31,3 +31,5 @@ discovery_modules:
 discovery:
     - sysObjectId:
         - .1.3.6.1.4.1.9.1.1117
+    - sysDescr:
+        - 'Cisco Secure Access Control System'

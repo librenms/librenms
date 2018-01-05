@@ -128,9 +128,12 @@ function nicecase($item)
 
         case 'pi-hole':
             return 'Pi-hole';
-            
+
         case 'freeradius':
             return 'FreeRADIUS';
+
+        case 'zfs':
+            return 'ZFS';
 
         default:
             return ucfirst($item);
@@ -1662,4 +1665,29 @@ function generate_stacked_graphs($transparency = '88')
     } else {
         return array('transparency' => '', 'stacked' => '-1');
     }
+}
+
+/**
+ * Get the ZFS pools for a device... just requires the device ID
+ * an empty return means ZFS is not in use or there are currently no pools
+ * @param $device_id
+ * @return array
+ */
+function get_zfs_pools($device_id)
+{
+    $options=array(
+        'filter' => array(
+             'type' => array('=', 'zfs'),
+        ),
+    );
+
+    $component=new LibreNMS\Component();
+    $zfsc=$component->getComponents($device_id, $options);
+
+    if (isset($zfsc[$device_id])) {
+        $id = $component->getFirstComponentID($zfsc, $device_id);
+        return json_decode($zfsc[$device_id][$id]['pools']);
+    }
+
+    return array();
 }
