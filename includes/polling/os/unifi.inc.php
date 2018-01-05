@@ -5,8 +5,8 @@
  */
 
 if ($data = snmp_get_multi($device, 'unifiApSystemModel unifiApSystemVersion', '-OQUs', 'UBNT-UniFi-MIB')) {
-    $hardware = $data[0]['unifiApSystemModel'];
-    $version = $data[0]['unifiApSystemVersion'];
+    $hardware = $data['unifiApSystemModel'];
+    $version = $data['unifiApSystemVersion'];
 } elseif ($data = snmp_getnext($device, 'dot11manufacturerProductName dot11manufacturerProductVersion', '-Oqs', 'IEEE802dot11-MIB')) {
     foreach (explode("\n", $data) as $entry) {
         $entry = explode(" ", $entry);
