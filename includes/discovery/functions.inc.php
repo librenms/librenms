@@ -577,6 +577,9 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
 
 function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, $units, $used = null)
 {
+    if (ignore_storage($device['os'], $descr)) {
+        return;
+    }
     d_echo("Discover Storage: $index, $type, $mib, $descr, $size, $units, $used\n");
 
     if ($descr && $size > '0') {
