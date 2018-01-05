@@ -2174,3 +2174,8 @@ label {
   vertical-align: middle;
   padding: 15px;
 }
+
+.validation:invalid {
+    border-color: red;
+}
+
