@@ -1,11 +1,20 @@
 <?php
 
-if ($data = snmp_get_multi($device, 'unifiApSystemModel unifiApSystemVersion', '-OUQs', 'UBNT-UniFi-MIB')) {
+/**
+ * Some of the processing logic below is borrowed from snmp_get_multi() to parse a multi-output snmp_getnext()
+ */
+
+if ($data = snmp_get_multi($device, 'unifiApSystemModel unifiApSystemVersion', '-OQUs', 'UBNT-UniFi-MIB')) {
     $hardware = $data[0]['unifiApSystemModel'];
     $version = $data[0]['unifiApSystemVersion'];
-} elseif ($data = snmp_get_multi($device, 'dot11manufacturerProductName dot11manufacturerProductVersion', '-OQUs', 'IEEE802dot11-MIB')) {
-    $hardware = $data[0]['dot11manufacturerProductName'];
-    if (preg_match('/(v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/', $data[0]['dot11manufacturerProductVersion'], $matches)) {
-        $version = $matches[0];
+} elseif ($data = snmp_getnext($device, 'dot11manufacturerProductName dot11manufacturerProductVersion', '-Oqs', 'IEEE802dot11-MIB')) {
+    foreach (explode("\n", $data) as $entry) {
+        $entry = explode(" ", $entry);
+        if (str_contains($entry[0], 'dot11manufacturerProductName')) {
+            $hardware = $entry[1];
+        }
+        if (str_contains($entry[0], 'dot11manufacturerProductVersion') && preg_match('/(v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/', $entry[1], $matches)) {
+            $version = $matches[0];
+        }
     }
 }
