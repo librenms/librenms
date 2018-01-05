@@ -1,6 +1,6 @@
 <?php
 
-foreach (array(10,5) as $i) {
+foreach (array(10,5,7,9,0) as $i) {
     $result = snmp_get_multi_oid($device, "dot11manufacturerProductName.$i dot11manufacturerProductVersion.$i", '-OQUs', 'IEEE802dot11-MIB');
 
     // If invalid, $result contains one empty element.
