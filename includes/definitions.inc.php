@@ -513,6 +513,12 @@ $config['graph_types']['device']['routeros_leases']['section'] = 'network';
 $config['graph_types']['device']['routeros_leases']['order'] = 0;
 $config['graph_types']['device']['routeros_leases']['descr'] = 'DHCP Lease Count';
 
+
+//CheckPoint SPLAT specific graphs
+$config['graph_types']['device']['secureplatform_sessions']['section'] = 'firewall';
+$config['graph_types']['device']['secureplatform_sessions']['order'] = 0;
+$config['graph_types']['device']['secureplatform_sessions']['descr'] = 'Active connections';
+
 // Device Types
 $i = 0;
 $config['device_types'][$i]['text'] = 'Servers';
