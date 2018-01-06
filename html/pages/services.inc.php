@@ -100,6 +100,7 @@ require_once 'includes/modal/delete_service.inc.php';
                 unset($sep);
                 echo '</div>';
                 echo '</div>';
+                echo '<div style="margin:10px 10px 0px 10px;" id="message"></div>';
                 echo '<div class="panel-body">';
 
                 $sql_param = array();
@@ -118,9 +119,7 @@ require_once 'includes/modal/delete_service.inc.php';
                     $where .= " AND service_status= ? AND service_disabled='0' AND `service_ignore`='0'";
                     $sql_param[] = $state;
                 }
-                ?>
 
-                <?php
                 if ($_SESSION['userlevel'] >= '5') {
                     $host_sql = 'SELECT `D`.`device_id`,`D`.`hostname`,`D`.`sysName` FROM devices AS D, services AS S WHERE D.device_id = S.device_id GROUP BY `D`.`hostname`, `D`.`device_id`, `D`.`sysName` ORDER BY D.hostname';
                     $host_par = array();
