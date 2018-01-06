@@ -297,6 +297,17 @@ $graphs['zfs'] = array(
     'arc_cache_miss',
 );
 
+$graphs['powerdns-dnsdist'] = array(
+    'cache',
+    'downstream',
+    'dynamic_blocks',
+    'latency',
+    'queries_latency',
+    'queries_stats',
+    'rules_stats',
+    'queries_drop',
+);
+
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
 

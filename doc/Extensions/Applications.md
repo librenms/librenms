@@ -33,6 +33,7 @@ Different applications support a variety of ways to collect data: by direct conn
 1. [Postgres](#postgres) - SNMP extend
 1. [PowerDNS](#powerdns) - Agent
 1. [PowerDNS Recursor](#powerdns-recursor) - Direct, Agent
+1. [PowerDNS dnsdist](#powerdns-dnsdist) - SNMP extend
 1. [Proxmox](#proxmox) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
 1. [SDFS info](#sdfs-info) - SNMP extend
@@ -724,6 +725,23 @@ extend powerdns-recursor /etc/snmp/powerdns-recursor
 [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `powerdns-recursor` script to `/usr/lib/check_mk_agent/local/`
 
 This script uses `rec_control get-all` to collect stats.
+
+### PowerDNS-dnsdist
+
+###### SNMP Extend
+1. Copy the BASH script to the desired host (the host must be added to LibreNMS devices)
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/powerdns-dnsdist -O /etc/snmp/powerdns-dnsdist   
+```
+
+2. Make the script executable (chmod +x /etc/snmp/powerdns-dnsdist)
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend powerdns-dnsdist /etc/snmp/powerdns-dnsdist
+```
+
+4. Restart snmpd on your host.
 
 ### Proxmox
 1. For Proxmox 4.4+ install the libpve-apiclient-perl package
