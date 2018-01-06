@@ -96,6 +96,9 @@ function nicecase($item)
         case 'powerdns-recursor':
             return 'PowerDNS Recursor';
 
+        case 'powerdns-dnsdist':
+            return 'PowerDNS dnsdist';
+
         case 'dhcp-stats':
             return 'DHCP Stats';
 
