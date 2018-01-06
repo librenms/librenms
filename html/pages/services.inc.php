@@ -181,7 +181,7 @@ require_once 'includes/modal/delete_service.inc.php';
 
                         $header = false;
 
-                        echo '<tr>';
+                        echo '<tr id="row_' . $service['service_id'] . '">';
                         echo '<td><span data-toggle="tooltip" title="' . $title . '" class="alert-status ' . $label . '"></span></td>';
                         echo '<td>' . nl2br(display($service['service_type'])) . '</td>';
                         echo '<td>' . formatUptime(time() - $service['service_changed']) . '</td>';
