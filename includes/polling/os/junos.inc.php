@@ -6,7 +6,7 @@ if (empty($version)) {
     $version = $jun_ver[1];
 }
 
-if (strpos($poll_device['sysDescr'], 'olive')) {
+if (strpos($device['sysDescr'], 'olive')) {
     $hardware = 'Olive';
     $serial   = '';
 } else {

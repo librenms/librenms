@@ -23,4 +23,4 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-list(,$hardware,) = explode(',', $poll_device['sysDescr'], 3);
+list(,$hardware,) = explode(',', $device['sysDescr'], 3);
