@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-preg_match('/Prod: ([A-Za-z-_]+);Vers: ([0-9.]+-(mux|esw));.*;S\/N: ([0-9]+)/', $poll_device['sysDescr'], $matches);
+preg_match('/Prod: ([A-Za-z-_]+);Vers: ([0-9.]+-(mux|esw));.*;S\/N: ([0-9]+)/', $device['sysDescr'], $matches);
 
 $hardware = $matches[1];
 $version = $matches[2];

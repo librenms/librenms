@@ -424,6 +424,7 @@ class ModuleTestHelper
 
         // Dump the discovered data
         $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], 'discovery'));
+        $device = device_by_id_cache($device_id, true); // refresh the device array
 
         // Run the poller
         if ($this->quiet) {

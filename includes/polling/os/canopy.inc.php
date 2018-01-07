@@ -9,7 +9,7 @@
  * the source code distribution for details.
  */
 
-$cambium_type = $poll_device['sysDescr'];
+$cambium_type = $device['sysDescr'];
 $PMP = snmp_get($device, 'boxDeviceType.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
 $version = $cambium_type;
 $filtered_words = array(

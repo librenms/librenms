@@ -23,6 +23,6 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-list ($hardware, $dump) = explode(' ', $poll_device['sysDescr'], 2);
+list ($hardware, $dump) = explode(' ', $device['sysDescr'], 2);
 
 unset($dump);

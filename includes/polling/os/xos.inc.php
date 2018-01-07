@@ -4,7 +4,7 @@
 // ExtremeWare XOS version 11.5.2.10 v1152b10 by release-manager on Thu Oct 26 09:53:04 PDT 2006
 // ExtremeXOS (X670-48x) version 15.5.2.9 v1552b9-patch1-5 by release-manager on Thu Sep 11 13:03:04 EDT 2014
 echo " XOS \n";
-list($a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n) = explode(' ', str_replace('ExtremeWare XOS', 'ExtremeXOS', $poll_device['sysDescr']));
+list($a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n) = explode(' ', str_replace('ExtremeWare XOS', 'ExtremeXOS', $device['sysDescr']));
 if ($b == 'version') {
     $version  = $c;
     $features = $d.' '.$i.' '.$j.' '.$m;
@@ -15,8 +15,8 @@ if ($c == 'version') {
 }
 
 
-$hardware = rewrite_extreme_hardware($poll_device['sysObjectID']);
-if ($hardware == $poll_device['sysObjectID']) {
+$hardware = rewrite_extreme_hardware($device['sysObjectID']);
+if ($hardware == $device['sysObjectID']) {
     unset($hardware);
 }
 

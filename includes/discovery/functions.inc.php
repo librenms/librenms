@@ -160,7 +160,11 @@ function discover_device(&$device, $options = null)
             }
         }
     }
-    foreach (Config::get('discovery_modules', array()) as $module => $module_status) {
+
+    $discovery_devices = Config::get('discovery_modules', array());
+    $discovery_devices = array('core' => true) + $discovery_devices;
+
+    foreach ($discovery_devices as $module => $module_status) {
         $os_module_status = Config::getOsSetting($device['os'], "discovery_modules.$module");
         d_echo("Modules status: Global" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
         d_echo("OS" . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));

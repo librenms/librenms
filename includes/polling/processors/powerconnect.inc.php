@@ -1,9 +1,9 @@
 <?php
 
-if (strpos($device["sysObjectID"], "enterprises.674.10895.3031") !== false) {
+if (strpos($device["sysObjectID"], ".1.3.6.1.4.1.674.10895.3031") !== false) {
     d_echo("Dell Powerconnect 55xx");
     $proc = snmp_get($device, $processor['processor_oid'], '-O Uqnv', '""');
-} elseif (strpos($device["sysObjectID"], "enterprises.674.10895.3024") !== false) {
+} elseif (strpos($device["sysObjectID"], ".1.3.6.1.4.1.674.10895.3024") !== false) {
     d_echo("Dell Powerconnect 8024F");
     $values = trim(snmp_get($device, $processor['processor_oid'], '-O Uqnv'), '""');
     $values = ltrim($values, ' ');

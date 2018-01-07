@@ -9,7 +9,7 @@ discovery:
     - sysDescr:
         - Canon MF
         - Canon iR
-    - sysObjectId:
+    - sysObjectID:
         - .1.3.6.1.4.1.1602.4.7
 discovery_modules:
     toner: 1
