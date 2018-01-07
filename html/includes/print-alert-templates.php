@@ -2,70 +2,61 @@
 
 $no_refresh = true;
 
-?>
-
-<div class="row">
-    <div class="col-sm-12">
-        <span id="message"></span>
-    </div>
-</div>
-<?php
 require_once 'includes/modal/alert_template.inc.php';
 require_once 'includes/modal/delete_alert_template.inc.php';
 require_once 'includes/modal/attach_alert_template.inc.php';
-?>
-<div class="table-responsive">
-    <table id="templatetable" class="table table-hover table-condensed" width="100%">
-      <thead>
-          <tr>
-            <th data-column-id="id" data-searchable="false" data-identifier="true" data-type="numeric">#</th>
-            <th data-column-id="templatename">Name</th>
-            <th data-column-id="actions" data-searchable="false" data-formatter="commands">Action</th>
-          </tr>
-      </thead>
-      <tbody>
-          <tr data-row-id="0">
-            <td>0</td>
-            <td>Default Alert Template</td>
-            <td></td>
-          </tr>
-<?php
+
+echo '<div class="panel panel-default panel-condensed">';
+echo '<div class="panel-heading">';
+echo '<strong>Alert templates</strong>';
+
+if ($_SESSION['userlevel'] >= '10') {
+    echo '<div class="pull-right">';
+    echo '<span style="font-weight:bold;">Actions &#187;&nbsp;</span>';
+    echo '<a href="#" data-toggle="modal" data-target="#alert-template" data-template_id="">Create new alert template</a>';
+    echo '</div>';
+}
+
+echo '</div>';
+echo '<div class="panel-body">';
+echo '<div style="margin:10px 10px 0px 10px;" id="message"></div>';
+
+echo '<div class="table-responsive">';
+echo '<table id="templatetable" class="table table-hover table-condensed table-striped">';
+echo '<thead>';
+echo '<th data-column-id="id" data-searchable="false" data-identifier="true" data-type="numeric">#</th>';
+echo '<th data-column-id="templatename">Name</th>';
+echo '<th data-column-id="actions" data-searchable="false" data-formatter="commands">Action</th>';
+echo '</thead>';
+echo '<tbody>';
+echo '<tr data-row-id="0">';
+echo '<td>0</td>';
+echo '<td>Default Alert Template</td>';
+echo '<td></td>';
+echo '</tr>';
+
 $full_query = "SELECT id, name from alert_templates";
 foreach (dbFetchRows($full_query, $param) as $template) {
     if ($template['name'] == 'Default Alert Template') {
         $default_tplid = $template['id'];
         continue;
     }
-    echo '<tr data-row-id="'.$template['id'].'">
-            <td>'.$template['id'].'</td>
-            <td>'.$template['name'].'</td>
-            <td></td>
-          </tr>';
+    echo '<tr data-row-id="'.$template['id'].'">';
+    echo '<td>'.$template['id'].'</td>';
+    echo '<td>'.$template['name'].'</td>';
+    echo '<td></td>';
+    echo '</tr>';
 }
 
+echo '</tbody>';
+echo '</table>';
+echo '</div>';
+
 ?>
-        </tbody>
-    </table>
-</div>
 <script>
 $(document).ready(function() {
     var grid = $('#templatetable').bootgrid({
         rowCount: [50, 100, 250, -1],
-        templates: {
-        header: '<div id="{{ctx.id}}" class="{{css.header}}"> \
-                    <div class="row"> \
-<?php if ($_SESSION['userlevel'] >= '10') { ?>
-                        <div class="col-sm-8 actionBar"> \
-                            <span class="pull-left"> \
-                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#alert-template" data-template_id="">Create new alert template</button> \
-                            </span> \
-                        </div> \
-                <div class="col-sm-4 actionBar"><p class="{{css.search}}"></p><p class="{{css.actions}}"></p></div></div></div>'
-<?php } else { ?>
-                <div class="actionBar"><p class="{{css.search}}"></p><p class="{{css.actions}}"></p></div></div></div>'
-
-<?php } ?>
-        },
         formatters: {
             "commands": function(column, row) {
                 var response = '';
