@@ -2,14 +2,51 @@
 
 $no_refresh = true;
 
-?>
+$count_query = 'SELECT COUNT(*)';
+$full_query  = 'SELECT *';
+$sql         = '';
+$param       = array();
 
-<div class="row">
-    <div class="col-sm-12">
-        <span id="message"></span>
-    </div>
-</div>
-<?php
+if (isset($device['device_id']) && $device['device_id'] > 0) {
+    $sql   = 'WHERE (device_id=? OR device_id="-1")';
+    $param = array($device['device_id']);
+}
+
+$query       = " FROM alert_rules $sql";
+$count_query = $count_query.$query;
+$count       = dbFetchCell($count_query, $param);
+
+if (!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
+    $page_number = 1;
+} else {
+    $page_number = $_POST['page_number'];
+}
+
+$start      = (($page_number - 1) * $results);
+
+echo '<div class="panel panel-default panel-condensed">';
+echo '<div class="panel-heading">';
+echo '<strong>Alert rules</strong>';
+echo '<div class="pull-right">';
+if ($_SESSION['userlevel'] >= '10') {
+    echo '<span style="font-weight:bold;">Actions &#187;&nbsp;</span>';
+    echo '<a href="" data-toggle="modal" data-target="#create-alert" data-device_id="'.$device['device_id'].'">Create new alert rule</a>';
+    echo ' | ';
+    echo '<a href="" data-toggle="modal" data-target="#search_rule_modal" data-device_id="'.$device['device_id'].'">Create rule from collection</a>';
+    if ($count < 1) {
+        if ($_SESSION['userlevel'] >= '10') {
+            echo ' | ';
+            echo '<form role="form" method="post" name="newrules" style="display:inline;margin-left:-8px;">';
+            echo '<button type="submit" class="btn-link" id="create-default" name="create-default">Click here to create the default alert rules!</button>';
+            echo '</form>';
+        }
+    }
+}
+echo '</div>';
+echo '</div>';
+echo '<div class="panel-body">';
+echo '<div style="margin:10px 10px 0px 10px;" id="message"></div>';
+
 if (isset($_POST['create-default'])) {
     $default_rules = array_filter(get_rules_from_json(), function ($rule) {
         return isset($rule['default']) && $rule['default'];
@@ -48,36 +85,30 @@ if (isset($_POST['create-default'])) {
 require_once 'includes/modal/new_alert_rule.inc.php';
 require_once 'includes/modal/delete_alert_rule.inc.php';
 require_once 'includes/modal/alert_rule_collection.inc.php';
-?>
-<form method="post" action="" id="result_form">
-<?php
+
 if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
     $results = $_POST['results'];
 } else {
     $results = 50;
 }
 
-echo '<div class="table-responsive">
-    <table class="table table-hover table-condensed" width="100%">
-    <tr>
-    <th>#</th>
-    <th>Name</th>
-    <th>Rule</th>
-    <th>Severity</th>
-    <th>Status</th>
-    <th>Extra</th>
-    <th>Enabled</th>
-    <th>Action</th>
-    </tr>';
+echo '<form method="post" action="" id="result_form">';
+echo '<div class="table-responsive">';
+echo '<table class="table table-hover table-condensed" width="100%">';
+echo '<thead>';
+echo '<th>#</th>';
+echo '<th>Name</th>';
+echo '<th>Rule</th>';
+echo '<th>Severity</th>';
+echo '<th>Status</th>';
+echo '<th>Extra</th>';
+echo '<th>Enabled</th>';
+echo '<th>Action</th>';
+echo '</thead>';
+echo '<tbody>';
 
 echo '<td colspan="7">';
-if ($_SESSION['userlevel'] >= '10') {
-    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create new alert rule</button>';
-    echo '<i> - OR - </i>';
-    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create rule from collection</button>';
-}
-echo '</td>
-    <td><select name="results" id="results" class="form-control input-sm" onChange="updateResults(this);">';
+echo '<td><select name="results" id="results" class="form-control input-sm" onChange="updateResults(this);">';
 $result_options = array(
     '10',
     '50',
@@ -87,6 +118,7 @@ $result_options = array(
     '1000',
     '5000',
 );
+
 foreach ($result_options as $option) {
     echo "<option value='$option'";
     if ($results == $option) {
@@ -98,25 +130,7 @@ foreach ($result_options as $option) {
 
 echo '</select></td>';
 
-$count_query = 'SELECT COUNT(*)';
-$full_query  = 'SELECT *';
-$sql         = '';
-$param       = array();
-if (isset($device['device_id']) && $device['device_id'] > 0) {
-    $sql   = 'WHERE (device_id=? OR device_id="-1")';
-    $param = array($device['device_id']);
-}
 
-$query       = " FROM alert_rules $sql";
-$count_query = $count_query.$query;
-$count       = dbFetchCell($count_query, $param);
-if (!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
-    $page_number = 1;
-} else {
-    $page_number = $_POST['page_number'];
-}
-
-$start      = (($page_number - 1) * $results);
 $full_query = $full_query.$query." ORDER BY id ASC LIMIT $start,$results";
 
 foreach (dbFetchRows($full_query, $param) as $rule) {
@@ -184,34 +198,20 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
     }
 
     echo '</td>';
-    echo "</tr>\r\n";
+    echo '</tr>';
 }//end foreach
 
+echo '</table>';
+
 if (($count % $results) > 0) {
-    echo '    <tr>
-        <td colspan="8" align="center">'.generate_pagination($count, $results, $page_number).'</td>
-        </tr>';
+    echo '<div class="col-md-12" style="text-align: center;">';
+    echo generate_pagination($count, $results, $page_number);
+    echo '</div>';
 }
 
-echo '</table>
-    <input type="hidden" name="page_number" id="page_number" value="'.$page_number.'">
-    <input type="hidden" name="results_amount" id="results_amount" value="'.$results.'">
-    </form>
-    </div>';
-
-if ($count < 1) {
-    if ($_SESSION['userlevel'] >= '10') {
-        echo '<div class="row">
-            <div class="col-sm-12">
-            <form role="form" method="post">
-            <p class="text-center">
-            <button type="submit" class="btn btn-success btn-lg" id="create-default" name="create-default"><i class="fa fa-plus"></i> Click here to create the default alert rules!</button>
-            </p>
-            </form>
-            </div>
-            </div>';
-    }
-}
+echo '<input type="hidden" name="page_number" id="page_number" value="'.$page_number.'">';
+echo '<input type="hidden" name="results_amount" id="results_amount" value="'.$results.'">';
+echo '</form>';
 
 ?>
 

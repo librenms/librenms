@@ -36,7 +36,6 @@ if ($_SESSION['userlevel'] < '5') {
 }
 
 ?>
-<br>
 <div class="panel panel-default">
     <div class="panel-heading">
         Device alerts
