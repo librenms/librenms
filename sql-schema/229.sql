@@ -1,2 +1,3 @@
 CREATE TABLE `applications_version` (`id` int(11) unsigned NOT NULL AUTO_INCREMENT,`app_type` varchar(64) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',`app_version` varchar(10) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 INSERT INTO `applications_version` (`id`, `app_type`, `app_version`) VALUES(1, 'os-updates', '1.2');
+ALTER TABLE `applications` ADD `app_version` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL;
