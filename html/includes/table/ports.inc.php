@@ -143,15 +143,15 @@ foreach (dbFetchRows($query, $param) as $port) {
 
     switch ($port['ifOperStatus']) {
         case 'up':
-            $status = '<span class="alert-status label-success">&nbsp;</span>';
+            $status = 'label-success';
             break;
         case 'down':
             switch ($port['ifAdminStatus']) {
                 case 'up':
-                    $status = '<span class="alert-status label-danger">&nbsp;</span>';
+                    $status = 'label-danger';
                     break;
                 case 'down':
-                    $status = '<span class="alert-status label-warning">&nbsp;</span>';
+                    $status = 'label-warning';
                     break;
             }
             break;
