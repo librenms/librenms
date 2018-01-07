@@ -97,7 +97,7 @@ var grid = $("#ports").bootgrid({
     },
     formatters: {
       'device': function (column, row) {
-          return "<span class='alert-status " + row.status + "' style='float:left;margin-right:10px;'></span><span style=''>" + row.device + "</span>";
+          return "<span class='alert-status " + row.status + "' style='float:left;margin-right:10px;'></span>" + row.device + "";
       }
     },
     templates: {
