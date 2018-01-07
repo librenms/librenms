@@ -15,7 +15,7 @@ $query = array(
 );
 
 foreach ($query as $row) {
-    if (strpos($poll_device["sysDescr"], $row[0]) !== false) {
+    if (strpos($device["sysDescr"], $row[0]) !== false) {
         $oid_terra = ".1.3.6.1.4.1.30631.1.";
         $oid = array($oid_terra.$row[1].".4.1.0", $oid_terra.$row[1].".4.2.0");
 

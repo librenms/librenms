@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-list($version, $hardware, $serial) = explode(';', $poll_device['sysDescr']);
+list($version, $hardware, $serial) = explode(';', $device['sysDescr']);
 
 $version = preg_replace('/APIC VERSION /', '', $version);
 $serial = preg_replace('/Serial /', '', $serial);

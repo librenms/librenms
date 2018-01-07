@@ -1,6 +1,6 @@
 <?php
 
-preg_match('/BenuOS\, (.*)\n.Product\:(.*)\n.*\n.*\n Chassis Type \:(.*)/', $poll_device['sysDescr'], $matches);
+preg_match('/BenuOS\, (.*)\n.Product\:(.*)\n.*\n.*\n Chassis Type \:(.*)/', $device['sysDescr'], $matches);
 
 $version  = $matches['1'];
 $features = $matches['2'];

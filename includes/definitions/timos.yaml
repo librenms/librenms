@@ -8,7 +8,7 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
 icon: nokia
 discovery:
-    - sysObjectId:
+    - sysObjectID:
         - .1.3.6.1.4.1.6527.
 
 poller_modules:

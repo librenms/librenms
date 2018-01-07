@@ -5,5 +5,5 @@ $version  = snmp_get($device, 'productIdentificationVersion.0', '-Ovq', 'Dell-Ve
 $features = snmp_get($device, 'productIdentificationDescription.0', '-Ovq', 'Dell-Vendor-MIB');
 
 if (strstr($hardware, 'No Such Object available')) {
-    $hardware = $poll_device['sysDescr'];
+    $hardware = $device['sysDescr'];
 }

@@ -5,7 +5,7 @@ icon: benuos
 mib_dir:
     - benuos
 discovery:
-    - sysObjectId:
+    - sysObjectID:
         - .1.3.6.1.4.1.39406.1
 over:
     - { graph: device_bits, text: 'Device Traffic' }

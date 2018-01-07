@@ -13,7 +13,7 @@ discovery_modules:
     processors: 0
 discovery:
     -
-        sysObjectId:
+        sysObjectID:
             - .1.3.6.1.4.1.2606.7
     - sysDescr:
         - 'Rittal LCP'

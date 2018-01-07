@@ -22,4 +22,4 @@
  * @copyright  2017 Thomas GAGNIERE
  * @author     Thomas GAGNIERE <tgagniere@reseau-concept.com>
  */
-$hardware = $poll_device['sysDescr'];
+$hardware = $device['sysDescr'];

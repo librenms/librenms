@@ -21,8 +21,7 @@ if ($device['os'] == 'powerconnect') {
     }
 
     echo 'DNOS CPU: ';
-//    mib-2.1.2.0 == sysObjectID
-    $get_series = explode('.', snmp_get($device, 'mib-2.1.2.0', '-Onvsbq', 'F10-PRODUCTS-MIB', 'dnos'), 2); // Get series From MIB
+    $get_series = explode('.', $device['sysObjectID'], 2); // Get series From MIB
     $series = $get_series[0];
     $descr = 'CPU';
 

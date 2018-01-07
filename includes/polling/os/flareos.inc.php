@@ -10,6 +10,6 @@
  * the source code distribution for details.
  */
 
-$output = preg_split('/ /', $poll_device['sysDescr']);
+$output = preg_split('/ /', $device['sysDescr']);
 $hardware = $output[0];
 $version = $output[3];
