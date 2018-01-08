@@ -6,8 +6,12 @@ use Symfony\Component\Yaml\Yaml;
 if (isset($_POST['config'])) {
     try {
         $oxidized_cfg = Yaml::parse($_POST['config']);
-        foreach (validate_oxidized_cfg($oxidized_cfg) as $error) {
+        $validate_cfg = validate_oxidized_cfg($oxidized_cfg);
+        foreach ($validate_cfg as $error) {
             echo "<div class='alert alert-danger'>$error</div>";
+        }
+        if (empty($validate_cfg)) {
+            echo '<div class="alert alert-success">Config has validated ok</div>';
         }
     } catch (ParseException $e) {
         echo "<div class='alert alert-danger'>{$e->getMessage()}</div>";
@@ -18,7 +22,7 @@ if (isset($_POST['config'])) {
     <form method="post">
         <div class="form-group">
             <label for="exampleInputEmail1">Paste your Oxidized yaml config:</label>
-            <textarea name="config" value="config" rows="50" class="form-control" placeholder="Paste your Oxidized yaml config"><?php echo $_POST['config']; ?></textarea>
+            <textarea name="config" value="config" rows="20" class="form-control" placeholder="Paste your Oxidized yaml config"><?php echo $_POST['config']; ?></textarea>
         </div>
         <button type="submit" class="btn btn-default">Submit</button>
     </form>
