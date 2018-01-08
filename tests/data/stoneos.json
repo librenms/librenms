@@ -1,0 +1,40 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "127.1.6.1",
+                    "sysObjectID": null,
+                    "sysDescr": null,
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": null,
+                    "os": "stoneos",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "hillstone.svg"
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": "enterprises.28557.1.126",
+                    "sysDescr": "Hillstone Security Appliance SG-6000-E3965",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "stoneos",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "hillstone.svg"
+                }
+            ]
+        }
+    }
+}
