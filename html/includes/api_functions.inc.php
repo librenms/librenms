@@ -549,7 +549,7 @@ function list_cbgp()
         $device['ip'] = inet6_ntop($device['ip']);
         if (is_numeric($host_id)) {
             $device['parent_id'] = $host_id;
-         }
+        }
         $bgp_counters[] = $bgp_counter;
     }
     $total_bgp_counters = count($bgp_counters);
@@ -1417,7 +1417,7 @@ function list_vrf()
         $device['ip'] = inet6_ntop($device['ip']);
         if (is_numeric($host_id)) {
             $device['parent_id'] = $host_id;
-         }
+        }
         $vrfs[] = $vrf;
     }
     $total_vrfs = count($vrfs);
@@ -1493,7 +1493,7 @@ function list_vlans()
         $device['ip'] = inet6_ntop($device['ip']);
         if (is_numeric($host_id)) {
             $device['parent_id'] = $host_id;
-         }
+        }
         $vlans[] = $vlan;
     }
     $vlans_count = count($vlans);
