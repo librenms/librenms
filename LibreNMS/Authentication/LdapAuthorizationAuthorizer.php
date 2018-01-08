@@ -45,6 +45,7 @@ use LibreNMS\Exceptions\AuthenticationException;
 class LdapAuthorizationAuthorizer extends AuthorizerBase
 {
     protected $ldap_connection;
+    protected static $AUTH_IS_EXTERNAL = 1;
 
     public function __construct()
     {
@@ -217,6 +218,16 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
             }
         }
         return 0;
+    }
+
+
+    public function getExternalUsername()
+    {
+        if (isset($_SERVER['REMOTE_USER'])) {
+            return clean($_SERVER['REMOTE_USER']);
+        } elseif (isset($_SERVER['PHP_AUTH_USER'])) {
+            return clean($_SERVER['PHP_AUTH_USER']);
+        }
     }
 
 
