@@ -1,12 +1,12 @@
 <?php
 
-foreach ($ports as $port) {
-    if (is_integer($row / 2)) {
-        $row_colour = $list_colour_a;
-    } else {
-        $row_colour = $list_colour_b;
-    }
+echo '<div class="panel panel-default panel-condensed">';
+echo '<div class="panel-heading">';
+echo $displayLists;
+echo '</div>';
+echo '<div class="panel-body">';
 
+foreach ($ports as $port) {
     $speed = humanspeed($port['ifSpeed']);
     $type  = humanmedia($port['ifType']);
 
@@ -58,14 +58,7 @@ foreach ($ports as $port) {
         echo "<div style='display: block; padding: 1px; margin: 2px; min-width: ".$width_div.'px; max-width:'.$width_div."px; min-height:180px; max-height:180px; text-align: center; float: left; background-color: #f5f5f5;'>";
         echo overlib_link($link, $graph, $overlib_content);
         echo '</div>';
+    }
+}
 
-        // echo("<div style='display: block; padding: 1px; margin: 2px; min-width: 393px; max-width:393px; min-height:180px; max-height:180px; text-align: center; float: left; background-color: #f5f5f5;'>
-        // <a href='".generate_port_url($port)."/' onmouseover=\"return overlib('\
-        // <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>".$device['hostname']." - ".$port['ifDescr']."</div>\
-        // <img src=\'graph.php?type=$graph_type&amp;id=".$port['port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=450&amp;height=150&amp;title=yes\'>\
-        // ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
-        // "<img src='graph.php?type=$graph_type&amp;id=".$port['port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=315&amp;height=110&amp;legend=no&amp;title=yes'>
-        // </a>
-        // </div>");
-    }//end if
-}//end foreach
+echo '</div>';
