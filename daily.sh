@@ -176,15 +176,15 @@ main () {
     fi
 
     if [[ -z "$arg" ]]; then
-        status_run 'Checking PHP version' 'check_php_ver'
-        php_ver_ret=$?
-
         up=$(php daily.php -f update >&2; echo $?)
         if [[ "$up" == "0" ]]; then
             ${DAILY_SCRIPT} no-code-update
             set_notifiable_result update 1  # make sure there are no update notifications if update is disabled
             exit
         fi
+
+        status_run 'Checking PHP version' 'check_php_ver'
+        php_ver_ret=$?
 
         # make sure the vendor directory is clean
         git checkout vendor/ --quiet > /dev/null 2>&1
