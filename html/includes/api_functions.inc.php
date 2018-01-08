@@ -534,12 +534,24 @@ function list_cbgp()
     $hostname   = $_GET['hostname'] ?: '';
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
-        $sql        = ' AND `bgpPeers_cbgp`.`device_id` = ?';
+        check_device_permission($device_id);
+        $sql        = " AND `devices`.`device_id` = ?";
         $sql_params[] = $device_id;
     }
-    check_device_permission($device_id);
+    if (!is_admin() && !is_read()) {
+        $sql .= " AND `bgpPeers_cbgp`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql_params[] = $_SESSION['user_id'];
+    }
 
-    $bgp_counters       = dbFetchRows("SELECT `bgpPeers_cbgp`.* FROM `bgpPeers_cbgp` WHERE `bgpPeers_cbgp`.`device_id` IS NOT NULL $sql", $sql_params);
+    $bgp_counters = array();
+    foreach (dbFetchRows("SELECT `bgpPeers_cbgp`.* FROM `bgpPeers_cbgp` LEFT JOIN `devices` ON `bgpPeers_cbgp`.`device_id` = `devices`.`device_id` WHERE `bgpPeers_cbgp`.`device_id` IS NOT NULL $sql", $sql_params) as $bgp_counter) {
+        $host_id = get_vm_parent_id($device);
+        $device['ip'] = inet6_ntop($device['ip']);
+        if (is_numeric($host_id)) {
+            $device['parent_id'] = $host_id;
+         }
+        $bgp_counters[] = $bgp_counter;
+    }
     $total_bgp_counters = count($bgp_counters);
     if (!is_numeric($total_bgp_counters)) {
         api_error(500, 'Error retrieving bgp counters');
@@ -850,7 +862,7 @@ function get_ip_addresses()
             api_error(500, 'Error retrieving IP Addresses');
         }
         if ($ip_addresses_count == 0) {
-            api_error(404, "Device $device_id does not exist or empty");
+            api_error(404, "Device $device_id does not have IP Addresses");
         }
     } elseif (isset($router['portid'])) {
         $port_id = urldecode($router['portid']);
@@ -862,7 +874,7 @@ function get_ip_addresses()
             api_error(500, 'Error retrieving IP Addresses');
         }
         if ($ip_addresses_count == 0) {
-            api_error(404, "Port $port_id does not exist or empty");
+            api_error(404, "Port $port_id does not have IP Addresses");
         }
     } elseif (isset($router['id'])) {
         check_is_read();
@@ -1386,16 +1398,28 @@ function list_vrf()
     $vrfname    = $_GET['vrfname'];
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
-        $sql        = ' AND `vrfs`.`device_id`=?';
+        check_device_permission($device_id);
+        $sql        = " AND `devices`.`device_id`=?";
         $sql_params = array($device_id);
     }
     if (!empty($vrfname)) {
-        $sql        = ' AND `vrfs`.`vrf_name`=?';
+        $sql        = "  AND `vrfs`.`vrf_name`=?";
         $sql_params = array($vrfname);
     }
-    check_device_permission($device_id);
+    if (!is_admin() && !is_read()) {
+        $sql .= " AND `vrfs`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql_params[] = $_SESSION['user_id'];
+    }
 
-    $vrfs       = dbFetchRows("SELECT `vrfs`.* FROM `vrfs` WHERE `vrfs`.`vrf_name` IS NOT NULL $sql", $sql_params);
+    $vrfs       = array();
+    foreach (dbFetchRows("SELECT `vrfs`.* FROM `vrfs` LEFT JOIN `devices` ON `vrfs`.`device_id` = `devices`.`device_id` WHERE `vrfs`.`vrf_name` IS NOT NULL $sql", $sql_params) as $vrf) {
+        $host_id = get_vm_parent_id($device);
+        $device['ip'] = inet6_ntop($device['ip']);
+        if (is_numeric($host_id)) {
+            $device['parent_id'] = $host_id;
+         }
+        $vrfs[] = $vrf;
+    }
     $total_vrfs = count($vrfs);
     if (!is_numeric($total_vrfs)) {
         api_error(500, 'Error retrieving vrfs');
@@ -1448,12 +1472,30 @@ function list_ipsec()
 
 function list_vlans()
 {
-    check_is_read();
-
     $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $sql        = '';
+    $sql_params = array();
+    $hostname   = $_GET['hostname'] ?: '';
+    $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        check_device_permission($device_id);
+        $sql        = " AND `devices`.`device_id` = ?";
+        $sql_params[] = $device_id;
+    }
+    if (!is_admin() && !is_read()) {
+        $sql .= " AND `vlans`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql_params[] = $_SESSION['user_id'];
+    }
 
-    $vlans       = dbFetchRows("SELECT * FROM `vlans` WHERE `vlans`.`vlan_vlan` IS NOT NULL");
+    $vlans       = array();
+    foreach (dbFetchRows("SELECT `vlans`.* FROM `vlans` LEFT JOIN `devices` ON `vlans`.`device_id` = `devices`.`device_id` WHERE `vlans`.`vlan_vlan` IS NOT NULL $sql", $sql_params) as $vlan) {
+        $host_id = get_vm_parent_id($device);
+        $device['ip'] = inet6_ntop($device['ip']);
+        if (is_numeric($host_id)) {
+            $device['parent_id'] = $host_id;
+         }
+        $vlans[] = $vlan;
+    }
     $vlans_count = count($vlans);
     if (!is_numeric($vlans_count)) {
         api_error(500, 'Error retrieving VLANs');
@@ -1478,6 +1520,9 @@ function list_ip_addresses()
     if (!is_numeric($ip_addresses_count)) {
         api_error(500, 'Error retrieving IP Addresses');
     }
+    if ($ip_addresses_count == 0) {
+        api_error(404, 'IP Addresses does not exist');
+    }
 
     api_success(array_merge($ipv4_addresses, $ipv6_addresses), 'ip_addresses');
 }
@@ -1497,6 +1542,9 @@ function list_ip_networks()
     $ip_networks_count = count(array_merge($ipv4_networks, $ipv6_networks));
     if (!is_numeric($ip_networks_count)) {
         api_error(500, 'Error retrieving IP Networks');
+    }
+    if ($ip_networks_count == 0) {
+        api_error(404, 'IP Networks does not exist');
     }
 
     api_success(array_merge($ipv4_networks, $ipv6_networks), 'ip_networks');
