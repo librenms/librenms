@@ -128,10 +128,10 @@ check_php_ver() {
     local branch=$(git rev-parse --abbrev-ref HEAD)
     local ver_res=$(php -r "echo (int)version_compare(PHP_VERSION, '5.6.4', '<');")
     if [[ "$branch" == "php53" && "$ver_res" == "0" ]]; then
-        git checkout master
+        status_run "Supported PHP version, switched back to master branch." 'git checkout master'
         branch="master"
     elif [[ "$branch" != "php53" && "$ver_res" == "1" ]]; then
-        git checkout php53
+        status_run "Unsupported PHP version, switched to php53 branch." 'git checkout php53'
         branch="php53"
     fi
 
@@ -228,13 +228,10 @@ main () {
                 # Check if we need to revert (Must be in post pull so we can update it)
                 if [[ "$old_version" != "$new_version" ]]; then
                     check_php_ver # check php version and switch branches
-                    php_res=$?
-                    if [[ "$php_res" == "1" ]]; then
-                        status_run "Reverting update, PHP version older than 5.6.4" ''
-                    else
-                        status_run "Updated from $old_version to $new_version" ''
-                        set_notifiable_result update 1  # only clear the error if update was a success
-                    fi
+
+                    # new_version may be incorrect if we just switch branches... ignoring that detail
+                    status_run "Updated from $old_version to $new_version" ''
+                    set_notifiable_result update 1  # only clear the error if update was a success
                 fi
 
                 # List all tasks to do after pull in the order of execution
