@@ -553,8 +553,8 @@ function list_cbgp()
         $bgp_counters[] = $bgp_counter;
     }
     $total_bgp_counters = count($bgp_counters);
-    if (!is_numeric($total_bgp_counters)) {
-        api_error(500, 'Error retrieving bgp counters');
+    if ($total_bgp_counters == 0) {
+        api_error(404, 'BGP counters does not exist');
     }
 
     api_success($bgp_counters, 'bgp_counters');
@@ -858,9 +858,6 @@ function get_ip_addresses()
         $ipv4   = dbFetchRows("SELECT `ipv4_addresses`.* FROM `ipv4_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
         $ipv6   = dbFetchRows("SELECT `ipv6_addresses`.* FROM `ipv6_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
         $ip_addresses_count = count(array_merge($ipv4, $ipv6));
-        if (!is_numeric($ip_addresses_count)) {
-            api_error(500, 'Error retrieving IP Addresses');
-        }
         if ($ip_addresses_count == 0) {
             api_error(404, "Device $device_id does not have IP Addresses");
         }
@@ -870,9 +867,6 @@ function get_ip_addresses()
         $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `port_id` = ?", array($port_id));
         $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?", array($port_id));
         $ip_addresses_count = count(array_merge($ipv4, $ipv6));
-        if (!is_numeric($ip_addresses_count)) {
-            api_error(500, 'Error retrieving IP Addresses');
-        }
         if ($ip_addresses_count == 0) {
             api_error(404, "Port $port_id does not have IP Addresses");
         }
@@ -882,9 +876,6 @@ function get_ip_addresses()
         $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `ipv4_network_id` = ?", array($network_id));
         $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `ipv6_network_id` = ?", array($network_id));
         $ip_addresses_count = count(array_merge($ipv4, $ipv6));
-        if (!is_numeric($ip_addresses_count)) {
-            api_error(500, 'Error retrieving IP Addresses');
-        }
         if ($ip_addresses_count == 0) {
             api_error(404, "IP Network $network_id does not exist or empty");
         }
@@ -1421,8 +1412,8 @@ function list_vrf()
         $vrfs[] = $vrf;
     }
     $total_vrfs = count($vrfs);
-    if (!is_numeric($total_vrfs)) {
-        api_error(500, 'Error retrieving vrfs');
+    if ($total_vrfs == 0) {
+        api_error(404, 'VRFs does not exist');
     }
 
     api_success($vrfs, 'vrfs');
@@ -1442,9 +1433,6 @@ function get_vrf()
 
     $vrf       = dbFetchRows("SELECT * FROM `vrfs` WHERE `vrf_id` IS NOT NULL AND `vrf_id` = ?", array($vrfId));
     $vrf_count = count($vrf);
-    if (!is_numeric($vrf_count)) {
-        api_error(500, 'Error retrieving VRF');
-    }
     if ($vrf_count == 0) {
         api_error(404, "VRF $vrfId does not exist");
     }
@@ -1497,8 +1485,8 @@ function list_vlans()
         $vlans[] = $vlan;
     }
     $vlans_count = count($vlans);
-    if (!is_numeric($vlans_count)) {
-        api_error(500, 'Error retrieving VLANs');
+    if ($vlans_count == 0) {
+        api_error(404, 'VLANs does not exist');
     }
 
     api_success($vlans, 'vlans');
@@ -1517,9 +1505,6 @@ function list_ip_addresses()
     $ipv4_addresses   = dbFetchRows("SELECT * FROM `ipv4_addresses`");
     $ipv6_addresses   = dbFetchRows("SELECT * FROM `ipv6_addresses`");
     $ip_addresses_count = count(array_merge($ipv4_addresses, $ipv6_addresses));
-    if (!is_numeric($ip_addresses_count)) {
-        api_error(500, 'Error retrieving IP Addresses');
-    }
     if ($ip_addresses_count == 0) {
         api_error(404, 'IP Addresses does not exist');
     }
@@ -1540,9 +1525,6 @@ function list_ip_networks()
     $ipv4_networks   = dbFetchRows("SELECT * FROM `ipv4_networks`");
     $ipv6_networks   = dbFetchRows("SELECT * FROM `ipv6_networks`");
     $ip_networks_count = count(array_merge($ipv4_networks, $ipv6_networks));
-    if (!is_numeric($ip_networks_count)) {
-        api_error(500, 'Error retrieving IP Networks');
-    }
     if ($ip_networks_count == 0) {
         api_error(404, 'IP Networks does not exist');
     }
