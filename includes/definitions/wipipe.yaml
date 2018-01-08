@@ -5,5 +5,5 @@ icon: cradlepoint
 mib_dir:
     - cradlepoint
 discovery:
-    - sysObjectId:
+    - sysObjectID:
        - .1.3.6.1.4.1.20992.

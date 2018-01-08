@@ -11,5 +11,5 @@ mib_dir:
 bad_ifXEntry:
     - 'Eltex LTP-8X'
 discovery:
-    - sysObjectId:
+    - sysObjectID:
         - .1.3.6.1.4.1.35265.1.22

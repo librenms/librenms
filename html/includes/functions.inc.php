@@ -96,6 +96,9 @@ function nicecase($item)
         case 'powerdns-recursor':
             return 'PowerDNS Recursor';
 
+        case 'powerdns-dnsdist':
+            return 'PowerDNS dnsdist';
+
         case 'dhcp-stats':
             return 'DHCP Stats';
 
@@ -128,9 +131,12 @@ function nicecase($item)
 
         case 'pi-hole':
             return 'Pi-hole';
-            
+
         case 'freeradius':
             return 'FreeRADIUS';
+
+        case 'zfs':
+            return 'ZFS';
 
         default:
             return ucfirst($item);
@@ -1257,8 +1263,9 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
             if ($item['type'] == 'checkbox') {
                 $output .= '<input id="' . $item['name'] . '" type="checkbox" name="global-config-check" ' . $config_groups[$item['name']]['config_checked'] . ' data-on-text="Yes" data-off-text="No" data-size="small" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">';
             } elseif ($item['type'] == 'text') {
+                $pattern = isset($item['pattern']) ? ' required pattern="' . $item['pattern'] . '"' : "";
                 $output .= '
-                <input id="' . $item['name'] . '" class="form-control" type="text" name="global-config-input" value="' . $config_groups[$item['name']]['config_value'] . '" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">
+                <input id="' . $item['name'] . '" class="form-control validation" type="text" name="global-config-input" value="' . $config_groups[$item['name']]['config_value'] . '" data-config_id="' . $config_groups[$item['name']]['config_id'] . '"' . $pattern . '>
                 <span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span>
                 ';
             } elseif ($item['type'] == 'password') {
@@ -1662,4 +1669,29 @@ function generate_stacked_graphs($transparency = '88')
     } else {
         return array('transparency' => '', 'stacked' => '-1');
     }
+}
+
+/**
+ * Get the ZFS pools for a device... just requires the device ID
+ * an empty return means ZFS is not in use or there are currently no pools
+ * @param $device_id
+ * @return array
+ */
+function get_zfs_pools($device_id)
+{
+    $options=array(
+        'filter' => array(
+             'type' => array('=', 'zfs'),
+        ),
+    );
+
+    $component=new LibreNMS\Component();
+    $zfsc=$component->getComponents($device_id, $options);
+
+    if (isset($zfsc[$device_id])) {
+        $id = $component->getFirstComponentID($zfsc, $device_id);
+        return json_decode($zfsc[$device_id][$id]['pools']);
+    }
+
+    return array();
 }

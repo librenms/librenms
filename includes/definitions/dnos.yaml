@@ -11,7 +11,7 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     -
-        sysObjectId:
+        sysObjectID:
             - .1.3.6.1.4.1.6027.1.
         sysDescr_except:
             - Force10 Operating System

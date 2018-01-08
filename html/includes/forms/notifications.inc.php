@@ -4,12 +4,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
@@ -42,8 +42,17 @@ if (isset($_REQUEST['notification_id']) && isset($_REQUEST['action'])) {
         $message = 'Created';
     }
 } elseif (isset($_REQUEST['action']) && $_REQUEST['action'] == 'read-all-notif') {
-    foreach (dbFetchRows("SELECT `notifications_id` FROM `notifications` LEFT JOIN `notifications_attribs` A USING (`notifications_id`) WHERE A.`notifications_id` IS NULL OR (`user_id`=? AND NOT (`key`='read' AND `value`=1))", array($_SESSION['user_id'])) as $notifications) {
-        dbInsert(array('notifications_id'=>$notifications['notifications_id'],'user_id'=>$_SESSION['user_id'],'key'=>'read','value'=>1), 'notifications_attribs');
+    $unread = dbFetchColumn("SELECT `notifications_id` FROM `notifications` AS N WHERE NOT EXISTS ( SELECT 1 FROM `notifications_attribs` WHERE `notifications_id` = N.`notifications_id` AND `user_id`=? AND `key`='read' AND `value`=1)", array($_SESSION['user_id']));
+    foreach ($unread as $notification_id) {
+        dbInsert(
+            array(
+                'notifications_id' => $notification_id,
+                'user_id' => $_SESSION['user_id'],
+                'key' => 'read',
+                'value' => 1
+            ),
+            'notifications_attribs'
+        );
     }
     $status = 'ok';
     $message = 'All notifications set as read';

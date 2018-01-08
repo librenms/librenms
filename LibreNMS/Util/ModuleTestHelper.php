@@ -241,9 +241,10 @@ class ModuleTestHelper
                 continue;
             }
 
-            if (str_contains($line, ' = ')) {
-                list($oid, $raw_data) = explode(' = ', $line, 2);
+            if (preg_match('/^\.[.\d]+ =/', $line)) {
+                list($oid, $raw_data) = explode(' =', $line, 2);
                 $oid = ltrim($oid, '.');
+                $raw_data = trim($raw_data);
 
                 if (empty($raw_data)) {
                     $result[] = "$oid|4|"; // empty data, we don't know type, put string
@@ -423,6 +424,7 @@ class ModuleTestHelper
 
         // Dump the discovered data
         $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], 'discovery'));
+        $device = device_by_id_cache($device_id, true); // refresh the device array
 
         // Run the poller
         if ($this->quiet) {
