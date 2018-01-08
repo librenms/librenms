@@ -49,6 +49,10 @@ if (isset($config['fping_options']['millisec']) && is_numeric($config['fping_opt
     $config['fping_options']['interval'] = $config['fping_options']['millisec'];
 }
 
+if (!empty($config['discovery_modules']['cisco-vrf']) && $config['discovery_modules']['cisco-vrf'] === true) {
+    $config['discovery_modules']['vrf'] = 1;
+}
+
 // make sure we have full path to binaries in case PATH isn't set
 foreach (array('fping', 'fping6', 'snmpgetnext') as $bin) {
     if (!is_executable(Config::get($bin))) {
