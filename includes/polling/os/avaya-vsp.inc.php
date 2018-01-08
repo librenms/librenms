@@ -22,7 +22,7 @@ $serial   = snmp_get($device, 'rcChasSerialNumber.0', '-Osqv', 'RAPID-CITY');
 $serial = str_replace('"', '', $serial);
 
 // rcChasHardwareRevision
-$sysDescr = $poll_device['sysDescr'];
+$sysDescr = $device['sysDescr'];
 $sysDescr = explode(' ', $sysDescr);
 $sysDescr = $sysDescr[0];
 $hardware = $sysDescr;

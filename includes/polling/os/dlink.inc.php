@@ -1,6 +1,6 @@
 <?php
 
-$Descr_string  = $poll_device['sysDescr'];
+$Descr_string  = $device['sysDescr'];
 $Descr_chopper = preg_split('/[ ]+/', "$Descr_string");
 
 $version  = 'Firmware '.$Descr_chopper[1];

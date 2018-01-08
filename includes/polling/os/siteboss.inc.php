@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-$asentsysdescr    = $poll_device['sysDescr'];
+$asentsysdescr    = $device['sysDescr'];
 $version          = preg_replace('/^\s*(\S+\s+\S+\s+)/', '', $asentsysdescr);
 $hardware         = preg_match('/^\S+\s+\d+\s+/', $asentsysdescr, $matches);
 $hardware         = trim($matches[0]);

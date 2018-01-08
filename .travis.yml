@@ -6,7 +6,6 @@ matrix:
   fast_finish: true
   include:
   - php: 7.1
-    env: EXECUTE_BUILD_SCHEMA=true
   - php: 7.0
     env: SKIP_STYLE_CHECK=1
   - php: 5.3
@@ -43,10 +42,6 @@ install:
   - pip install --user pylint
   - pip install --user mysql-python
 
-after_success:
-  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $EXECUTE_BUILD_SCHEMA == "true" && bash scripts/deploy-schema.sh
-  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $EXECUTE_BUILD_DOCS == "true" && bash scripts/deploy-docs.sh
-
 after_failure:
   - cat /tmp/snmpsimd.log
 
@@ -55,4 +50,5 @@ script:
   - php scripts/pre-commit.php -s
   - SNMPSIM=1 DBTEST=1 vendor/bin/phpunit --stop-on-failure
   - bash -n daily.sh
-  - pylint -E poller-wrapper.py discovery-wrapper.py 
+  - pylint -E poller-wrapper.py discovery-wrapper.py
+  - bash scripts/deploy-docs.sh

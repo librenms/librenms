@@ -35,12 +35,12 @@ class YamlTest extends TestCase
     private $valid_os_discovery_keys = array(
         'sysDescr',
         'sysDescr_except',
-        'sysObjectId',
-        'sysObjectId_except',
+        'sysObjectID',
+        'sysObjectID_except',
         'sysDescr_regex',
         'sysDescr_regex_except',
-        'sysObjectId_regex',
-        'sysObjectId_regex_except',
+        'sysObjectID_regex',
+        'sysObjectID_regex_except',
         'snmpget',
         'snmpget_except'
     );

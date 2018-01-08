@@ -368,14 +368,17 @@ if ($format == "graph") {
         <table id="devices" class="table table-hover table-condensed table-striped">  
             <thead>
                 <tr>
-                    <th data-column-id="status" data-searchable="false" data-formatter="status"></th>
     ';
 
     if ($subformat == "detail") {
         echo '<th data-column-id="icon" data-width="80px" data-sortable="false" data-searchable="false" data-formatter="icon">Vendor</th>';
     }
 
-    echo '<th data-column-id="hostname" data-order="asc">Device</th>';
+    if ($subformat != "detail") {
+        echo '<th data-column-id="hostname" data-order="asc" data-formatter="device">Device</th>';
+    } else {
+        echo '<th data-column-id="hostname" data-order="asc">Device</th>';
+    }
 
     if ($subformat == "detail") {
         echo '<th data-column-id="ports" data-width="100px" data-sortable="false" data-searchable="false">Metrics</th>';
@@ -408,15 +411,15 @@ if ($format == "graph") {
             rowCount: [50, 100, 250, -1],
             columnSelection: true,
             formatters: {
-                "status": function (column, row) {
-                    return "<span class=\"alert-status " + row.extra + "\"></span>";
-                },
                 "msg": function (column, row) {
                     return "<span class=\"alert-status\">" + row.msg + "</span>";
                 },
                 "icon": function (column, row) {
-                    return "<span class=\"device-table-icon\">" + row.icon + "</span>";
-                }
+                    return "<span class='alert-status " + row.extra + "' style='float:left;'></span><span class=\"device-table-icon\">" + row.icon + "</span>";
+                },
+                "device": function (column, row) {
+                    return "<span class='alert-status " + row.extra + "' style='float:left;margin-right:10px;'></span><span style=''>" + row.hostname + "</span>";
+                },
             },
             templates: {
                 header: "<div class=\"devices-headers-table-menu\" style=\"padding:6px 6px 0px 0px;\"><p class=\"{{css.actions}}\"></p></div><div class=\"row\"></div>"
