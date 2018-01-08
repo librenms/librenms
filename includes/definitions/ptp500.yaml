@@ -1,5 +1,5 @@
 os: ptp500
-text: Cambium PTP 300/500
+text: 'Cambium PTP 300/500'
 type: wireless
 icon: cambium
 mib_dir: cambium/500
