@@ -134,7 +134,7 @@ class Ptp500 extends OS implements
                 'ssr',
                 $this->getDeviceId(),
                 $ssr,
-                'ptp500',
+                'ptp500-ssr',
                 0,
                 'PTP500 Signal Strength Ratio',
                 null
