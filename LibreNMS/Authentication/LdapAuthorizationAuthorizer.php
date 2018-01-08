@@ -221,16 +221,6 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
     }
 
 
-    public function getExternalUsername()
-    {
-        if (isset($_SERVER['REMOTE_USER'])) {
-            return clean($_SERVER['REMOTE_USER']);
-        } elseif (isset($_SERVER['PHP_AUTH_USER'])) {
-            return clean($_SERVER['PHP_AUTH_USER']);
-        }
-    }
-
-
     protected function getMembername($username)
     {
         if (Config::get('auth_ldap_groupmembertype') == 'fulldn') {
