@@ -3,7 +3,6 @@ if ($data = snmp_get_multi($device, 'unifiApSystemModel unifiApSystemVersion', '
     $hardware = $data['unifiApSystemModel'];
     $version = $data['unifiApSystemVersion'];
 } elseif ($data = snmp_getnext_multi($device, 'dot11manufacturerProductName dot11manufacturerProductVersion', '-OQUs', 'IEEE802dot11-MIB')) {
-    $data = current($data); //strip index
     $hardware = $data['dot11manufacturerProductName'];
     if (preg_match('/(v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/', $data['dot11manufacturerProductVersion'], $matches)) {
         $version = $matches[0];
