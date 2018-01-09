@@ -315,6 +315,15 @@ function list_devices()
     }
     $devices = array();
     foreach (dbFetchRows("SELECT * FROM `devices` $join WHERE $sql ORDER by $order", $param) as $device) {
+        $dev_deps = dbFetchRows("SELECT parent_device_id from device_relationships WHERE child_device_id = ?", array($device));
+        if ($dev_deps) {
+            $tmp_arr = [];
+            foreach ($dev_deps as $dep) {
+                $tmp_arr[] = $dep['parent_device_id'];
+            }
+            $device['depends_on'] = $tmp_arr;
+            unset($tmp_arr);
+        }
         $host_id = get_vm_parent_id($device);
         $device['ip'] = inet6_ntop($device['ip']);
         if (is_numeric($host_id)) {
