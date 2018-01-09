@@ -205,6 +205,13 @@ class WirelessSensor extends Sensor
                 'unit' => 'dBm/Hz',
                 'icon' => 'signal',
             ),
+            'errors' => array(
+                'short' => 'Errors',
+                'long' => 'Errors',
+                'unit' => 'bps',
+                'icon' => 'exclamation-triangle',
+                'type' => 'counter',
+            ),
             'error-ratio' => array(
                 'short' => 'Error Ratio',
                 'long' => 'Bit/Packet Error Ratio',

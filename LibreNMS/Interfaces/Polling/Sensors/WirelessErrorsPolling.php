@@ -1,8 +1,8 @@
 <?php
 /**
- * WirelessErrorRateDiscovery.php
+ * WirelessErrorsPolling.php
  *
- * Discover bit error rate sensors in bps
+ * Custom polling interface for wireless bit errors in total bits
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,19 +19,20 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Tony Murray
+ * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Interfaces\Discovery\Sensors;
+namespace LibreNMS\Interfaces\Polling\Sensors;
 
-interface WirelessErrorRateDiscovery
+interface WirelessErrorsPolling
 {
     /**
-     * Discover wireless bit error rate.  This is in bps. Type is error-rate.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     * Poll wireless bit errors as total bits
+     * The returned array should be sensor_id => value pairs
      *
-     * @return array Sensors
+     * @param array $sensors Array of sensors needed to be polled
+     * @return array of polled data
      */
-    public function discoverWirelessErrorRate();
+    public function pollWirelessErrors(array $sensors);
 }
