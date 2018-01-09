@@ -69,7 +69,7 @@ function graylog_severity_label($severity)
         ""  => "label-info",
     );
     $barColor = isset($map[$severity]) ? $map[$severity] : 'label-info';
-    return '<span class="alert-status '.$barColor .'">&nbsp;</span>';
+    return '<span class="alert-status '.$barColor .'" style="margin-right:8px;float:left;"></span>';
 }
 
 function external_exec($command)
