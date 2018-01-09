@@ -317,7 +317,7 @@ function list_devices()
     foreach (dbFetchRows("SELECT * FROM `devices` $join WHERE $sql ORDER by $order", $param) as $device) {
         $dev_deps = dbFetchRows("SELECT parent_device_id from device_relationships WHERE child_device_id = ?", array($device));
         if ($dev_deps) {
-            $tmp_arr = [];
+            $tmp_arr = array();
             foreach ($dev_deps as $dep) {
                 $tmp_arr[] = $dep['parent_device_id'];
             }
