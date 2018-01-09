@@ -134,13 +134,6 @@ applications:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [app_id], Unique: true, Type: BTREE }
     unique_index: { Name: unique_index, Columns: [device_id, app_type], Unique: true, Type: BTREE }
-applications_version:
-  Columns:
-    - { Field: id, Type: 'int(11) unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: app_type, Type: varchar(64), 'Null': false, Extra: '', Default: '' }
-    - { Field: app_version, Type: varchar(10), 'Null': false, Extra: '', Default: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 application_metrics:
   Columns:
     - { Field: app_id, Type: int(11), 'Null': false, Extra: '' }
