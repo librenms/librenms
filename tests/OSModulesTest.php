@@ -36,10 +36,11 @@ class OSModulesTest extends DBTestCase
      *
      * @group os
      * @dataProvider dumpedDataProvider
-     * @param string $target_os
-     * @param string $filename
+     * @param string $target_os name of the (and variant) to test
+     * @param string $filename file name of the json data
+     * @param array $modules modules to test for this os
      */
-    public function testOS($target_os, $filename)
+    public function testOS($target_os, $filename, $modules)
     {
         $this->requreSnmpsim();  // require snmpsim for tests
         global $snmpsim;
@@ -48,23 +49,27 @@ class OSModulesTest extends DBTestCase
         $expected_data = json_decode(file_get_contents($file), true);
 
         list($os, $variant) = explode('_', $target_os, 2);
-        $modules = array_keys($expected_data);
+
         $helper = new ModuleTestHelper($modules, $os, $variant);
         $helper->setQuiet();
 
         $results = $helper->generateTestData($snmpsim, true);
 
-        foreach ($expected_data as $module => $data) {
+        foreach ($modules as $module) {
             $this->assertEquals(
-                $data['discovery'],
+                $expected_data[$module]['discovery'],
                 $results[$module]['discovery'],
-                "OS $target_os: Discovered $module data does not match that found in $filename\n" . $helper->getLastDiscoveryOutput()
+                "OS $target_os: Discovered $module data does not match that found in $filename\n"
+                . $helper->getLastDiscoveryOutput()
+                . "\nOS $target_os: Polled $module data does not match that found in $filename"
             );
 
             $this->assertEquals(
-                $data['poller'] == 'matches discovery' ? $data['discovery'] : $data['poller'],
+                $expected_data[$module]['poller'] == 'matches discovery' ? $expected_data[$module]['discovery'] : $expected_data[$module]['poller'],
                 $results[$module]['poller'],
-                "OS $target_os: Polled $module data does not match that found in $filename\n" . $helper->getLastPollerOutput()
+                "OS $target_os: Polled $module data does not match that found in $filename\n"
+                . $helper->getLastPollerOutput()
+                . "\nOS $target_os: Polled $module data does not match that found in $filename"
             );
         }
     }
@@ -75,14 +80,23 @@ class OSModulesTest extends DBTestCase
         $install_dir = Config::get('install_dir');
         $dump_files = glob("$install_dir/tests/data/*.json");
         $data = array();
+        $modules = getenv('TEST_MODULES') ? explode(',', getenv('TEST_MODULES')) : array();
 
         foreach ($dump_files as $file) {
             $os = basename($file, '.json');
             $short_file = str_replace($install_dir.'/', '', $file);
+            $data_modules = array_keys(json_decode(file_get_contents($file), true));
+
+            if (count(array_diff($modules, $data_modules)) !== 0) {
+                continue;  // no test data for selected modules
+            }
+
+            $test_modules = empty($modules) ? $data_modules : array_intersect($modules, $data_modules);
 
             $data[$os] = array(
                 $os,
-                $short_file
+                $short_file,
+                $test_modules,
             );
         }
 
