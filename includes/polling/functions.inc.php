@@ -615,14 +615,17 @@ function update_application($app, $response, $metrics = array(), $status = '', $
 
     if ($version != '' && $version !== false) {
         $app_latest = $config['apps'][$app['app_type']];
-        if (version_compare($version, $app_latest['app_version']) < 0) {
-            $data['app_state'] = 'OUTDATED';
-        }
 
-        if ($data['app_state'] == 'OUTDATED' && $data['app_state'] != $app['app_state']) {
-            log_event('Application: ' . $app['app_type'] . ' outdated.', $app['device_id'], 'applications', 4);
-        } elseif ($data['app_state'] != 'OUTDATED' && $data['app_state'] != $app['app_state']) {
-            log_event('Application: ' . $app['app_type'] . ' updated.', $app['device_id'], 'applications', 1);
+        if ($app_latest != '' && $app_latest !== false) {
+            if (version_compare($version, $app_latest) < 0) {
+                $data['app_state'] = 'OUTDATED';
+            }
+
+            if ($data['app_state'] == 'OUTDATED' && $data['app_state'] != $app['app_state']) {
+                log_event('Application: ' . $app['app_type'] . ' outdated.', $app['device_id'], 'applications', 4);
+            } elseif ($data['app_state'] != 'OUTDATED' && $data['app_state'] != $app['app_state']) {
+                log_event('Application: ' . $app['app_type'] . ' updated.', $app['device_id'], 'applications', 1);
+            }
         }
     }
 
