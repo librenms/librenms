@@ -308,6 +308,45 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
 }
 
 /**
+ * Calls snmpgetnext for multiple OIDs.  Getnext returns the next oid after the specified oid.
+ * For example instead of get sysName.0, you can getnext sysName to get the .0 value.
+ *
+ * @param array $device Target device
+ * @param string $oids The oids to getnext
+ * @param string $options Options to pass to snmpgetnext (-OQUs for example)
+ * @param string $mib The MIB to use
+ * @param string $mibdir Optional mib directory to search
+ * @return array|false the output or false if the data could not be fetched
+ */
+
+function snmp_getnext_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir = null, $array = array())
+{
+    $time_start = microtime(true);
+    if (is_array($oids)) {
+        $oids = implode(' ', $oids);
+    }
+    $snmpcmd  = Config::get('snmpgetnext', 'snmpgetnext');
+    $cmd = gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir);
+    $data = trim(external_exec($cmd), "\" \n\r");
+
+    foreach (explode("\n", $data) as $entry) {
+        list($oid,$value)  = explode('=', $entry, 2);
+        $oid               = trim($oid);
+        $value             = trim($value, "\" \n\r");
+        list($oid, $index) = explode('.', $oid, 2);
+        if (!str_contains($value, 'at this OID')) {
+            if (empty($oid)) {
+                continue; // no index or oid
+            } else {
+                $array[$oid] = $value;
+            }
+        }
+    }
+    recordSnmpStatistic('snmpgetnext', $time_start);
+    return $array;
+}//end snmp_getnext_multi()
+
+/**
  * @param $device
  * @return bool
  */
