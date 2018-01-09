@@ -45,6 +45,7 @@ use LibreNMS\Exceptions\AuthenticationException;
 class LdapAuthorizationAuthorizer extends AuthorizerBase
 {
     protected $ldap_connection;
+    protected static $AUTH_IS_EXTERNAL = 1;
 
     public function __construct()
     {
