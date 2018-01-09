@@ -171,6 +171,7 @@ $app->group(
                 $app->group(
                     '/resources',
                     function () use ($app) {
+                        $app->get('/locations', 'authToken', 'list_locations')->name('list_locations');
                         $app->get('/vlans', 'authToken', 'list_vlans')->name('list_vlans');
                         $app->group(
                             '/ip',

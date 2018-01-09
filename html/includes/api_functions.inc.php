@@ -239,6 +239,24 @@ function get_graph_generic_by_hostname()
     rrdtool_close();
 }
 
+
+function list_locations()
+{
+    check_is_read();
+
+    $app           = \Slim\Slim::getInstance();
+    $router        = $app->router()->getCurrentRoute()->getParams();
+
+    $locations   = dbFetchRows("SELECT `locations`.* FROM `locations` WHERE `locations`.`location` IS NOT NULL");
+    $total_locations = count($locations);
+    if ($total_locations == 0) {
+        api_error(404, 'Locations does not exist');
+    }
+
+    api_success($locations, 'locations');
+}
+
+
 function get_device()
 {
     // return details of a single device
