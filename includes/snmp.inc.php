@@ -335,13 +335,10 @@ function snmp_getnext_multi($device, $oids, $options = '-OQUs', $mib = null, $mi
         $value             = trim($value, "\" \n\r");
         list($oid, $index) = explode('.', $oid, 2);
         if (!str_contains($value, 'at this OID')) {
-            if (is_null($index)) {
-                if (empty($oid)) {
-                    continue; // no index or oid
-                }
-                $array[$oid] = $value;
+            if (empty($oid)) {
+                continue; // no index or oid
             } else {
-                $array[$index][$oid] = $value;
+                $array[$oid] = $value;
             }
         }
     }
