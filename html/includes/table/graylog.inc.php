@@ -81,8 +81,7 @@ foreach ($messages['messages'] as $message) {
 
 
     $response[] = array(
-                      'rowLabel' => graylog_severity_label($message['message']['level']),
-                      'timestamp' => $displayTime,
+                      'timestamp' => graylog_severity_label($message['message']['level']) . $displayTime,
                       'source'    => '<a href="'.generate_url(array('page'=>'device', 'device'=>$message['message']['source'])).'">'.$message['message']['source'].'</a>',
                       'message'    => $message['message']['message'],
                       'facility'  => $message['message']['facility'],

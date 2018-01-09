@@ -26,7 +26,6 @@ $tmp_output = '
     <table id="graylog" class="table table-hover table-condensed graylog">
         <thead>
             <tr>
-                <th data-column-id="rowLabel"></th>
                 <th data-column-id="timestamp">Timestamp</th>
                 <th data-column-id="level">Level</th>
                 <th data-column-id="source">Source</th>
