@@ -252,6 +252,10 @@ abstract class AuthorizerBase implements Authorizer
 
     public function getExternalUsername()
     {
-        return null;
+        if (isset($_SERVER['REMOTE_USER'])) {
+            return clean($_SERVER['REMOTE_USER']);
+        } elseif (isset($_SERVER['PHP_AUTH_USER'])) {
+            return clean($_SERVER['PHP_AUTH_USER']);
+        }
     }
 }

@@ -104,13 +104,4 @@ class HttpAuthAuthorizer extends AuthorizerBase
     {
         dbUpdate(array('realname' => $realname, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'email' => $email), 'users', '`user_id` = ?', array($user_id));
     }
-
-    public function getExternalUsername()
-    {
-        if (isset($_SERVER['REMOTE_USER'])) {
-            return clean($_SERVER['REMOTE_USER']);
-        } elseif (isset($_SERVER['PHP_AUTH_USER'])) {
-            return clean($_SERVER['PHP_AUTH_USER']);
-        }
-    }
 }
