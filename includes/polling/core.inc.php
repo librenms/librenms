@@ -30,7 +30,7 @@ if (!empty($agent_data['uptime'])) {
     $uptime_data = snmp_get_multi($device, 'snmpEngineTime.0 hrSystemUptime.0', '-OQnUst', 'HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
 
     $uptime = max(
-        round($poll_device['sysUpTime'] / 100),
+        round($poll_device['sysUptime'] / 100),
         $config['os'][$device['os']]['bad_snmpEngineTime'] ? 0 : $uptime_data[0]['snmpEngineTime'],
         $config['os'][$device['os']]['bad_hrSystemUptime'] ? 0 : round($uptime_data[0]['hrSystemUptime'] / 100)
     );
