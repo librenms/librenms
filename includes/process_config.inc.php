@@ -45,6 +45,10 @@ if ($config['rrdgraph_real_95th']) {
     $config['rrdgraph_real_percentile'] = $config['rrdgraph_real_95th'];
 }
 
+if (isset($config['fping_options']['millisec']) && is_numeric($config['fping_options']['millisec'])) {
+    $config['fping_options']['interval'] = $config['fping_options']['millisec'];
+}
+
 // make sure we have full path to binaries in case PATH isn't set
 foreach (array('fping', 'fping6', 'snmpgetnext') as $bin) {
     if (!is_executable(Config::get($bin))) {
