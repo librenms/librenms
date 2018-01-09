@@ -201,6 +201,11 @@ class ModuleTestHelper
         // generate a full list of modules
         $full_list = array();
         foreach ($modules as $module) {
+            // only allow valid modules
+            if (!(Config::has("poller_modules.$module") || Config::has("discovery_modules.$module"))) {
+                continue;
+            }
+
             if (isset($module_deps[$module])) {
                 $full_list = array_merge($full_list, $module_deps[$module]);
             } else {
@@ -339,8 +344,8 @@ class ModuleTestHelper
         $output = implode(PHP_EOL, $results) . PHP_EOL;
 
         if ($write) {
-            $this->qPrint("Updated snmprec data $this->snmprec_file\n");
-            $this->qPrint("Verify these files do not contain any private data before submitting\n");
+            $this->qPrint("\nUpdated snmprec data $this->snmprec_file\n");
+            $this->qPrint("\nVerify this file does not contain any private data before submitting!\n");
             file_put_contents($this->snmprec_file, $output);
         }
 

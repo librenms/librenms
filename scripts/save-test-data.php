@@ -12,9 +12,10 @@ $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
 
 $options = getopt(
-    'h:dnm:o:v:f:',
+    'h:dncm:o:v:f:',
     array(
         'debug',
+        'collect-only',
         'no-save',
         'prefer-new',
         'hostname:',
@@ -69,20 +70,21 @@ if (isset($hostname)) {
 }
 
 if (isset($options['help']) || empty($target_os)) {
-    echo "Script to extract test data from devices or update test data
+    echo "Script to extract test data from devices or update test data.
+Snmp data is saved in tests/snmpsim and database data is saved in tests/data.
 
 Usage:
   You must specify a valid hostname or os.
-  -h, --hostname    ID, IP, or hostname of the device to extract data from
-                    If this is not given, the existing snmp data will be used
-  -o, --os          Name of the OS to save test data for
-  -v, --variant     The variant of the OS to use, usually the device model
-  -m, --modules     The discovery/poller module(s) to collect data for, comma delimited
-  -f, --file        File to save the database entries to.  Default is in tests/data/
-  -d, --debug       Enable debug output
-  -n, --prefer-new  Prefer new snmprec data over existing data
-      --no-save     Don't save database entries, print them out instead
-      --snmpsim     Just run snmpsimd.py for manual testing.
+  -h, --hostname     ID, IP, or hostname of the device to extract data from
+                     If this is not given, the existing snmp data will be used
+  -o, --os           Name of the OS to save test data for
+  -v, --variant      The variant of the OS to use, usually the device model
+  -m, --modules      The discovery/poller module(s) to collect data for, comma delimited
+  -c, --collect-only Only collect snmpsim data (does not require snmpsim)
+  -d, --debug        Enable debug output
+  -n, --prefer-new   Prefer new snmprec data over existing data
+      --no-save      Don't save database entries, print them out instead
+      --snmpsim      Just run snmpsimd.py for manual testing.
 ";
     exit;
 }
@@ -112,7 +114,6 @@ if ($variant) {
 }
 echo PHP_EOL;
 
-
 $tester = new ModuleTestHelper($modules, $target_os, $variant);
 
 
@@ -121,6 +122,11 @@ if ($device) {
     echo "Capturing Data: ";
     $prefer_new_snmprec = isset($options['n']) || isset($options['prefer-new']);
     $tester->captureFromDevice($device['device_id'], true, $prefer_new_snmprec);
+
+    if (isset($options['c']) || isset($options['collect-only'])) {
+        // just capture, don't generate json
+        exit;
+    }
 
     echo PHP_EOL;
 }
