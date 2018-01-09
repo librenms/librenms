@@ -127,13 +127,15 @@ set_notifiable_result() {
 check_php_ver() {
     local branch=$(git rev-parse --abbrev-ref HEAD)
     local ver_res=$(php -r "echo (int)version_compare(PHP_VERSION, '5.6.4', '<');")
-    if [[ "$branch" == "php53" && "$ver_res" == "0" ]]; then
+    if [[ "$branch" == "php53" ]] && [[ "$ver_res" == "0" ]]; then
         status_run "Supported PHP version, switched back to master branch." 'git checkout master'
         branch="master"
-    elif [[ "$branch" != "php53" && "$ver_res" == "1" ]]; then
+    elif [[ "$branch" != "php53" ]] && [[ "$ver_res" == "1" ]]; then
         status_run "Unsupported PHP version, switched to php53 branch." 'git checkout php53'
         branch="php53"
     fi
+
+    set_notifiable_result phpver ${ver_res}
 
     return ${ver_res};
 }
