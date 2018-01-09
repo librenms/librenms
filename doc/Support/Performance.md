@@ -70,7 +70,7 @@ $config['fping_options']['count']   = 3;
 $config['fping_options']['interval'] = 500;
 ```
 
-If you're devices are slow to respond then you will need to increase the timeout value and potentially the interval value.
+If your devices are slow to respond then you will need to increase the timeout value and potentially the interval value.
 However if your network is stable, you can increase poller performance by dropping the count value to 1 and/or the timeout+millsec value to 200 or 300:
 
 ```php
