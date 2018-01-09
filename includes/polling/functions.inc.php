@@ -589,6 +589,8 @@ function location_to_latlng($device)
  */
 function update_application($app, $response, $metrics = array(), $status = '', $version = '')
 {
+    global $config;
+
     if (!is_numeric($app['app_id'])) {
         d_echo('$app does not contain app_id, could not update');
         return;
@@ -612,8 +614,7 @@ function update_application($app, $response, $metrics = array(), $status = '', $
     }
 
     if ($version != '' && $version !== false) {
-        $app_latest = dbFetchRow('SELECT `app_version` FROM `applications_version` WHERE app_type=?', array($app['app_type']));
-
+        $app_latest = $config['apps'][$app['app_type']];
         if (version_compare($version, $app_latest['app_version']) < 0) {
             $data['app_state'] = 'OUTDATED';
         }
