@@ -18,4 +18,4 @@ if ($device['sysDescr'] == 'IKS-6726A-2GTXSFP-T') {
     $mibmod = 'MOXA-EDSG508E-MIB';
 }
 $version = snmp_get($device, "firmwareVersion.0", "-OQvs", $mibmod);
-$hardware =  $poll_device['sysDescr'];
+$hardware =  $device['sysDescr'];

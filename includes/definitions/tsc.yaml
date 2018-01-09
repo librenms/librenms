@@ -5,5 +5,5 @@ icon: tsc
 ifname: 1
 type: printer
 discovery:
-    - sysObjectId:
+    - sysObjectID:
         - .1.3.6.1.4.1.51966.

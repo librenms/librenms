@@ -27,7 +27,6 @@ namespace LibreNMS\Tests;
 
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Util\FileLock;
-use PHPUnit\Framework\TestCase;
 
 class LockTest extends TestCase
 {

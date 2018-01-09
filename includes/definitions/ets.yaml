@@ -9,5 +9,5 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_state, text: 'States' }
 discovery:
-    - sysObjectId:
+    - sysObjectID:
         - .1.3.6.1.4.1.28507

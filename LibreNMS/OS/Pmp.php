@@ -121,7 +121,7 @@ class Pmp extends OS implements
                 'Frequency',
                 null,
                 1,
-                10000
+                $this->freqDivisor()
             )
         );
     }
@@ -194,5 +194,36 @@ class Pmp extends OS implements
     {
         $device = $this->getDevice();
         return str_contains($device['hardware'], 'AP') || str_contains($device['hardware'], 'Master');
+    }
+
+    /**
+     * PMP Frequency divisor is different per model
+     * using the following for production:
+     * FSK 5.2, 5.4, 5.7 GHz: OID returns MHz
+     * FSK 900 MHz, 2.4 GHz: OID returns 100's of KHz
+     * OFDM: OID returns 10's of KHz"
+     */
+    private function freqDivisor()
+    {
+        $device = $this->getDevice();
+
+        $types = array(
+            'OFDM' => 1000,
+            '5.4GHz' => 1,
+            '5.2Ghz' => 1,
+            '5.7Ghz' => 1,
+            '2.4Ghz' => 10,
+            '900Mhz' => 10
+        );
+
+        $boxType = snmp_get($device, 'boxDeviceType.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
+
+        foreach ($types as $key => $value) {
+            if (str_contains($boxType, $key)) {
+                return $value;
+            }
+        }
+
+        return 1;
     }
 }

@@ -12,7 +12,7 @@
  * the source code distribution for details.
 */
 
-preg_match('/ radio;(.*) v([0-9.]*);.*;SN: ([0-9]+);/', $poll_device['sysDescr'], $matches);
+preg_match('/ radio;(.*) v([0-9.]*);.*;SN: ([0-9]+);/', $device['sysDescr'], $matches);
 
 $hardware = $matches[1];
 $version = $matches[2];

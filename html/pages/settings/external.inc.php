@@ -12,6 +12,7 @@ $oxidized_conf = array(
     array('name'               => 'oxidized.url',
           'descr'              => 'URL to your Oxidized API',
           'type'               => 'text',
+          'pattern'            => '[a-zA-Z0-9]{1,5}://.*',
     ),
     array('name'               => 'oxidized.features.versioning',
           'descr'              => 'Enable config versioning access',

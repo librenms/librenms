@@ -145,7 +145,7 @@ Output:
 }
 ```
 
-### `get_port_info`
+### `get_port_ip_info`
 
 Get all IP info (v4 and v6) for a given port id.
 

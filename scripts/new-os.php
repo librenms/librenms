@@ -27,14 +27,14 @@ if ($options['h'] && $options['o'] && $options['t'] && $options['v']) {
         c_echo("The OS {$options['o']} appears to exist already, skipping to sensors support\n");
     } else {
         $sysDescr = snmp_get($device, 'sysDescr.0', '-OvQ', 'SNMPv2-MIB');
-        $sysObjectId = explode('.', ltrim(snmp_get($device, 'sysObjectID.0', '-OnvQ', 'SNMPv2-MIB'), '.'));
-        $end_oid = array_pop($sysObjectId);
-        $sysObjectId = '.' . implode('.', $sysObjectId);
-        $full_sysObjectId = "$sysObjectId.$end_oid";
+        $sysObjectID = explode('.', ltrim(snmp_get($device, 'sysObjectID.0', '-OnvQ', 'SNMPv2-MIB'), '.'));
+        $end_oid = array_pop($sysObjectID);
+        $sysObjectID = '.' . implode('.', $sysObjectID);
+        $full_sysObjectID = "$sysObjectID.$end_oid";
 
         c_echo("
 sysDescr: $sysDescr
-sysObjectID: $full_sysObjectId
+sysObjectID: $full_sysObjectID
 
 ");
 
@@ -71,13 +71,13 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
-    - sysObjectId:
-        - $sysObjectId
+    - sysObjectID:
+        - $sysObjectID
 ";
             file_put_contents($definition_file, $disco);
 
             $snmprec = "1.3.6.1.2.1.1.1.0|4|$sysDescr
-1.3.6.1.2.1.1.2.0|6|$full_sysObjectId
+1.3.6.1.2.1.1.2.0|6|$full_sysObjectID
 ";
 
             file_put_contents($test_file, $snmprec);

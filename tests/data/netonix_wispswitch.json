@@ -1,0 +1,20 @@
+{
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": "0",
+                    "hrDeviceIndex": null,
+                    "processor_oid": "0",
+                    "processor_index": "0",
+                    "processor_type": "ucd-old",
+                    "processor_usage": "19",
+                    "processor_descr": "CPU",
+                    "processor_precision": "1",
+                    "processor_perc_warn": "75"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

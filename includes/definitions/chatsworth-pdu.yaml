@@ -4,5 +4,5 @@ type: power
 icon: chatsworth
 nobulk: 1
 discovery:
-    - sysObjectId:
+    - sysObjectID:
         - .0.10.43.6.1.4.1

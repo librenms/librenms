@@ -33,6 +33,10 @@ if (Config::get('api.cors.enabled') === true) {
 require $config['install_dir'] . '/html/includes/api_functions.inc.php';
 $app->setName('api');
 
+$app->notFound(function () use ($app) {
+    api_error(404, "This API route doesn't exist.");
+});
+
 $app->group(
     '/api',
     function () use ($app) {
@@ -52,6 +56,7 @@ $app->group(
                         $app->get('/:hostname', 'authToken', 'get_device')->name('get_device');
                         // api/v0/devices/$hostname
                         $app->patch('/:hostname', 'authToken', 'update_device')->name('update_device_field');
+                        $app->patch('/:hostname/rename/:new_hostname', 'authToken', 'rename_device')->name('rename_device');
                         $app->get('/:hostname/vlans', 'authToken', 'get_vlans')->name('get_vlans');
                         // api/v0/devices/$hostname/vlans
                         $app->get('/:hostname/graphs', 'authToken', 'get_graphs')->name('get_graphs');

@@ -105,6 +105,7 @@ pages:
       - Alerting/Macros.md
       - Alerting/Testing.md
       - Alerting/Rule-Mapping.md
+      - Alerting/Device-Dependencies.md
   - 9. Getting help:
       - How to get help: Support/index.md
       - Support/FAQ.md
@@ -146,6 +147,9 @@ pages:
   - 11. Misc:
       - Security information: General/Security.md
       - CLI Scripts: Support/CLI-Tools.md
+      - Device Notes:
+          - Intro: Support/Device-Notes/index.md
+          - Carel pCOweb: Support/Device-Notes/Carel-pCOweb-Devices.md
   - hidden:
       - API/API-Docs.md
       - Installation/Installing-LibreNMS.md

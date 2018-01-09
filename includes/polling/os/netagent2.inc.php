@@ -26,4 +26,4 @@
 // NET Agent II
 
 $version  = snmp_get($device, '.1.3.6.1.2.1.33.1.1.4.0', '-OQv');
-$hardware = $poll_device['sysDescr'];
+$hardware = $device['sysDescr'];
