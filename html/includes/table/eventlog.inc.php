@@ -79,7 +79,7 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
     }
 
     $response[] = array(
-        'datetime' => "<span class='alert-status " . eventlog_severity($severity_colour) . " eventlog-status'></span><span style='display:inline;'>" . $eventlog['humandate']."</span>",
+        'datetime' => "<span class='alert-status " . eventlog_severity($severity_colour) . " eventlog-status'></span><span style='display:inline;'>" . $eventlog['humandate'] . "</span>",
         'hostname' => generate_device_link($dev, shorthost($dev['hostname'])),
         'type' => $type,
         'message' => htmlspecialchars($eventlog['message']),
