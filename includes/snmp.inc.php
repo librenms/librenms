@@ -342,7 +342,7 @@ function snmp_getnext_multi($device, $oids, $options = '-OQUs', $mib = null, $mi
             }
         }
     }
-    recordSnmpStatistic('snmpget', $time_start);
+    recordSnmpStatistic('snmpgetnext', $time_start);
     return $array;
 }//end snmp_getnext_multi()
 
