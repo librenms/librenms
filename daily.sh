@@ -190,7 +190,7 @@ main () {
         git checkout vendor/ --quiet > /dev/null 2>&1
 
         update_res=0
-        if [[ "$up" == "1" ]]; then
+        if [[ "$up" == "1" ]] || [[ "$php_ver_ret" == "0" ]]; then
             # Update current branch to latest
             old_ver=$(git rev-parse --short HEAD)
             status_run 'Updating to latest codebase' 'git pull --quiet' 'update'
@@ -199,14 +199,8 @@ main () {
         elif [[ "$up" == "3" ]]; then
             # Update to last Tag
             old_ver=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
-            if [[ "$php_ver_ret" == "0" ]]; then
-                status_run 'Updating to latest release' 'git fetch --tags && git checkout $(git describe --tags $(git rev-list --tags --max-count=1))' 'update'
-                update_res=$?
-            else
-                # incompatible php version, check out last supported release
-                status_run 'Updating to latest release' 'git fetch --tags && git checkout 1.35' 'update'
-                update_res=$?
-            fi
+            status_run 'Updating to latest release' 'git fetch --tags && git checkout $(git describe --tags $(git rev-list --tags --max-count=1))' 'update'
+            update_res=$?
             new_ver=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
         fi
 
