@@ -657,12 +657,6 @@ function isPingable($hostname, $address_family = AF_INET, $attribs = array())
     $response = array();
     if (can_ping_device($attribs) === true) {
         $fping_params = '';
-        if (is_numeric($config['fping_options']['retries']) && $config['fping_options']['retries'] > 0) {
-            if ($config['fping_options']['retries'] > 20) {
-                $config['fping_options']['retries'] = 20;
-            }
-            $fping_params .= ' -r ' . $config['fping_options']['retries'];
-        }
         if (is_numeric($config['fping_options']['timeout'])) {
             if ($config['fping_options']['timeout'] < 50) {
                 $config['fping_options']['timeout'] = 50;

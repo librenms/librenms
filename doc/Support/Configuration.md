@@ -68,14 +68,12 @@ Please see [1 Minute polling](1-Minute-Polling.md) for information on configurin
 ```php
 $config['fping']            = "/usr/bin/fping";
 $config['fping6']           = "fping6";
-$config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count'] = 3;
 $config['fping_options']['interval'] = 500;
 ```
 `fping` configuration options:
 
-* `retries` (`fping` parameter `-r`): Number of times an attempt at pinging a target will be made, not including the first try.
 * `timeout` (`fping` parameter `-t`): Amount of time that fping waits for a response to its first request (in milliseconds). **See note below**
 * `count` (`fping` parameter `-c`): Number of request packets to send to each target.
 * `interval` (`fping` parameter `-p`): Time in milliseconds that fping waits between successive packets to an individual target.

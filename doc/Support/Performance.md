@@ -65,7 +65,6 @@ You can also set this globally with the config option `$config['snmp']['max_oid'
 You can change some of the default fping options used globally or per device. The defaults are:
 
 ```php
-$config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count']   = 3;
 $config['fping_options']['interval'] = 500;
@@ -75,7 +74,6 @@ If you're devices are slow to respond then you will need to increase the timeout
 However if your network is stable, you can increase poller performance by dropping the count value to 1 and/or the timeout+millsec value to 200 or 300:
 
 ```php
-$config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 300;
 $config['fping_options']['count']   = 1;
 $config['fping_options']['interval'] = 300;
