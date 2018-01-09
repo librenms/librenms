@@ -114,9 +114,6 @@ if ($variant) {
 }
 echo PHP_EOL;
 
-// clear the os_defs.cache to be safe
-unlink(Config::get('install_dir') . '/cache/os_defs.cache');
-
 $tester = new ModuleTestHelper($modules, $target_os, $variant);
 
 
