@@ -622,9 +622,9 @@ function update_application($app, $response, $metrics = array(), $status = '', $
             }
 
             if ($data['app_state'] == 'OUTDATED' && $data['app_state'] != $app['app_state']) {
-                log_event('Application: ' . $app['app_type'] . ' outdated.', $app['device_id'], 'applications', 4);
+                log_event('Application ' . $app['app_type'] . ' is outdated. Please update host script!', $app['device_id'], 'applications', 4);
             } elseif ($data['app_state'] != 'OUTDATED' && $data['app_state'] != $app['app_state']) {
-                log_event('Application: ' . $app['app_type'] . ' updated.', $app['device_id'], 'applications', 1);
+                log_event('Application ' . $app['app_type'] . ' is at latest version.', $app['device_id'], 'applications', 1);
             }
         }
     }
