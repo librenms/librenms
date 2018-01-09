@@ -44,10 +44,10 @@ $config['own_hostname'] = 'localhost';
 // Location of executables
 //$config['fping']                    = '/usr/sbin/fping';
 //$config['fping6']                   = '/usr/sbin/fping6';
-$config['fping_options']['retries'] = 3;
+// https://docs.librenms.org/Support/Configuration/#fping
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count']   = 3;
-$config['fping_options']['millisec'] = 200;
+$config['fping_options']['interval'] = 500;
 $config['snmpwalk']                  = '/usr/bin/snmpwalk';
 $config['snmpget']                   = '/usr/bin/snmpget';
 $config['snmpbulkwalk']              = '/usr/bin/snmpbulkwalk';
