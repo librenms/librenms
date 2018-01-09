@@ -1,0 +1,1 @@
+ALTER TABLE `applications` ADD `app_version` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL;

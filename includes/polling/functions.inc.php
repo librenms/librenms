@@ -587,8 +587,10 @@ function location_to_latlng($device)
  * @param array $metrics an array of additional metrics to store in the database for alerting
  * @param string $status This is the current value for alerting
  */
-function update_application($app, $response, $metrics = array(), $status = '')
+function update_application($app, $response, $metrics = array(), $status = '', $version = '')
 {
+    global $config;
+
     if (!is_numeric($app['app_id'])) {
         d_echo('$app does not contain app_id, could not update');
         return;
@@ -598,6 +600,7 @@ function update_application($app, $response, $metrics = array(), $status = '')
         'app_state'  => 'UNKNOWN',
         'app_status' => $status,
         'timestamp'  => array('NOW()'),
+        'app_version' => $version,
     );
 
     if ($response != '' && $response !== false) {
@@ -607,6 +610,22 @@ function update_application($app, $response, $metrics = array(), $status = '')
             $data['app_state'] = 'ERROR';
         } else {
             $data['app_state'] = 'OK';
+        }
+    }
+
+    if ($version != '' && $version !== false) {
+        $app_latest = $config['apps'][$app['app_type']];
+
+        if ($app_latest != '' && $app_latest !== false) {
+            if (version_compare($version, $app_latest) < 0) {
+                $data['app_state'] = 'OUTDATED';
+            }
+
+            if ($data['app_state'] == 'OUTDATED' && $data['app_state'] != $app['app_state']) {
+                log_event('Application ' . $app['app_type'] . ' is outdated. Please update host script!', $app['device_id'], 'applications', 4);
+            } elseif ($data['app_state'] != 'OUTDATED' && $data['app_state'] != $app['app_state']) {
+                log_event('Application ' . $app['app_type'] . ' is at latest version.', $app['device_id'], 'applications', 1);
+            }
         }
     }
 
