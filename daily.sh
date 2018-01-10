@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 ################################################################################
 # Copyright (C) 2015 Daniel Preussker, QuxLabs UG <preussker@quxlabs.com>
-# Layne "Gorian" Breitkreutz <Layne.Breitkreutz@thelenon.com>
+# Copyright (C) 2016 Layne "Gorian" Breitkreutz <Layne.Breitkreutz@thelenon.com>
+# Copyright (C) 2017 Tony Murray <murraytony@gmail.com>
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -22,6 +23,7 @@
 # define DAILY_SCRIPT as the full path to this script and LIBRENMS_DIR as the directory this script is in
 DAILY_SCRIPT=$(readlink -f "$0")
 LIBRENMS_DIR=$(dirname "$DAILY_SCRIPT")
+COMPOSER="php ${LIBRENMS_DIR}/scripts/composer_wrapper.php"
 
 # set log_file, using librenms $config['log_dir'], if set
 # otherwise we default to <LibreNMS Install Directory>/logs
@@ -30,7 +32,6 @@ LOG_DIR=$(php -r "@include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['lo
 # get the librenms user
 LIBRENMS_USER=$(php -r "@include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['user']) ? \$config['user'] : 'root';")
 LIBRENMS_USER_ID=$(id -u "$LIBRENMS_USER")
-
 
 #######################################
 # Fancy-Print and run commands
@@ -58,7 +59,7 @@ status_run() {
 
     printf "%-50s" "${arg_text}";
     echo "${arg_text}" >> ${log_file}
-    tmp=$(bash -c "${arg_command}" 2>&1);
+    tmp=$(${arg_command} 2>&1);
     exit_code=$?
     echo "${tmp}" >> ${log_file}
     echo "Returned: ${exit_code}" >> ${log_file}
@@ -119,6 +120,28 @@ set_notifiable_result() {
 }
 
 #######################################
+# Check the PHP version and branch and switch to the appropriate branch
+# Returns:
+#   Exit-Code: 0 >= min ver, 1 < min ver
+#######################################
+check_php_ver() {
+    local branch=$(git rev-parse --abbrev-ref HEAD)
+    local ver_res=$(php -r "echo (int)version_compare(PHP_VERSION, '5.6.4', '<');")
+    if [[ "$branch" == "php53" ]] && [[ "$ver_res" == "0" ]]; then
+        status_run "Supported PHP version, switched back to master branch." 'git checkout master'
+        branch="master"
+    elif [[ "$branch" != "php53" ]] && [[ "$ver_res" == "1" ]]; then
+        status_run "Unsupported PHP version, switched to php53 branch." 'git checkout php53'
+        branch="php53"
+    fi
+
+    set_notifiable_result phpver ${ver_res}
+
+    return ${ver_res};
+}
+
+
+#######################################
 # Entry into program
 # Globals:
 #   LIBRENMS_DIR
@@ -129,6 +152,10 @@ set_notifiable_result() {
 #######################################
 main () {
     local arg="$1";
+    local old_version="$2";
+    local new_version="$3";
+    local old_version="${old_version:=unset}"  # if $1 is unset, make it mismatch for pre-update daily.sh
+
     cd ${LIBRENMS_DIR};
 
     # if not running as $LIBRENMS_USER (unless $LIBRENMS_USER = root), relaunch
@@ -145,9 +172,12 @@ main () {
         fi
     fi
 
-    if [[ -z "$arg" ]]; then
-        status_run 'Checking PHP version' "php ${LIBRENMS_DIR}/daily.php -f check_php_ver" 'check_php_ver'
+    # make sure autoload.php exists before trying to run any php that may require it
+    if [ ! -f "${LIBRENMS_DIR}/vendor/autoload.php" ]; then
+        ${COMPOSER} install --no-dev
+    fi
 
+    if [[ -z "$arg" ]]; then
         up=$(php daily.php -f update >&2; echo $?)
         if [[ "$up" == "0" ]]; then
             ${DAILY_SCRIPT} no-code-update
@@ -155,16 +185,19 @@ main () {
             exit
         fi
 
+        status_run 'Checking PHP version' 'check_php_ver'
+        php_ver_ret=$?
+
         # make sure the vendor directory is clean
         git checkout vendor/ --quiet > /dev/null 2>&1
 
         update_res=0
-        if [[ "$up" == "1" ]]; then
-            # Update to Master-Branch
-            old_ver=$(git show --pretty="%H" -s HEAD)
+        if [[ "$up" == "1" ]] || [[ "$php_ver_ret" == "0" ]]; then
+            # Update current branch to latest
+            old_ver=$(git rev-parse --short HEAD)
             status_run 'Updating to latest codebase' 'git pull --quiet' 'update'
             update_res=$?
-            new_ver=$(git show --pretty="%H" -s HEAD)
+            new_ver=$(git rev-parse --short HEAD)
         elif [[ "$up" == "3" ]]; then
             # Update to last Tag
             old_ver=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
@@ -177,13 +210,8 @@ main () {
             set_notifiable_result update 0
         fi
 
-        if [[ "$old_ver" != "$new_ver" ]]; then
-            status_run "Updated from $old_ver to $new_ver" ''
-            set_notifiable_result update 1  # only clear the error if update was a success
-        fi
-
         # Call ourself again in case above pull changed or added something to daily.sh
-        ${DAILY_SCRIPT} post-pull
+        ${DAILY_SCRIPT} post-pull ${old_ver} ${new_ver}
     else
         case $arg in
             no-code-update)
@@ -193,6 +221,15 @@ main () {
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
             ;;
             post-pull)
+                # Check if we need to revert (Must be in post pull so we can update it)
+                if [[ "$old_version" != "$new_version" ]]; then
+                    check_php_ver # check php version and switch branches
+
+                    # new_version may be incorrect if we just switch branches... ignoring that detail
+                    status_run "Updated from $old_version to $new_version" ''
+                    set_notifiable_result update 1  # only clear the error if update was a success
+                fi
+
                 # List all tasks to do after pull in the order of execution
                 status_run 'Updating SQL-Schema' 'php includes/sql-schema/update.php'
                 status_run 'Updating submodules' "$DAILY_SCRIPT submodules"
