@@ -23,9 +23,9 @@ if ($config['enable_bgp']) {
             try {
                 $peer_ip = IP::parse($peer['bgpPeerIdentifier']);
 
-                // Poll BGP Peer
                 echo "Checking BGP peer $peer_ip ";
 
+                // --- Collect BGP data ---
                 if (count($peer_data_check) > 0) {
                     if ($device['os'] == 'junos') {
                         if (!isset($junos)) {
@@ -126,7 +126,7 @@ if ($config['enable_bgp']) {
                     );
                 }
 
-                // build peer data if it is not already filled in
+                // --- Build peer data if it is not already filled in ---
                 if (empty($peer_data) && isset($peer_identifier, $oid_map, $mib)) {
                     echo "Fetching $mib data... \n";
 
@@ -158,6 +158,7 @@ if ($config['enable_bgp']) {
                 // ignore
             }
 
+            // --- Send event log notices ---
             if ($peer_data['bgpPeerFsmEstablishedTime']) {
                 if (!(is_array($config['alerts']['bgp']['whitelist'])
                         && !in_array($peer['bgpPeerRemoteAs'], $config['alerts']['bgp']['whitelist']))
@@ -174,6 +175,7 @@ if ($config['enable_bgp']) {
                 }
             }
 
+            // --- Update rrd data ---
             $peer_rrd_name = safename('bgp-'.$peer['bgpPeerIdentifier']);
             $peer_rrd_def = RrdDefinition::make()
                 ->addDataset('bgpPeerOutUpdates', 'COUNTER', null, 100000000000)
@@ -202,6 +204,7 @@ if ($config['enable_bgp']) {
             );
             data_update($device, 'bgp', $tags, $fields);
 
+            // --- Update Database data ---
             $peer['update'] = array_diff_assoc($peer_data, $peer);
             unset($peer_data);
 
@@ -209,6 +212,7 @@ if ($config['enable_bgp']) {
                 dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
             }
 
+            // --- Populate cbgp data ---
             if ($device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os_group'] === 'arista') {
                 // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
                 $peer_afis = dbFetchRows('SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
