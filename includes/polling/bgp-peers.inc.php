@@ -32,14 +32,22 @@ if ($config['enable_bgp']) {
                             echo "\nCaching Oids...";
 
                             foreach ($peer_data_check as $hash => $index) {
-                                $tmp_peer_ip = (string)IP::fromHexString($index['orig'], true);
+                                $peer_ip_snmp = ltrim($index['orig'], '.');
+                                $octets = count(explode(".", $peer_ip_snmp));
+                                if ($octets > 11) {
+                                    // ipv6
+                                    $tmp_peer_ip = (string)IP::parse(snmp2ipv6(implode('.', array_slice(explode('.', $peer_ip_snmp), (count(explode('.', $peer_ip_snmp)) - 16)))), true);
+                                } else {
+                                    // ipv4
+                                    $tmp_peer_ip = implode('.', array_slice(explode('.', $peer_ip_snmp), (count(explode('.', $peer_ip_snmp)) - 4)));
+                                }
                                 $junos[$tmp_peer_ip]['hash'] = $hash;
                                 $junos[$tmp_peer_ip]['index'] = $index['jnxBgpM2PeerIndex'];
                             }
                         }
 
                         if (!isset($peer_data_tmp)) {
-                            $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerState', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.2', array(), 'BGP4-V2-MIB-JUNIPER', 'junos');
+                            $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerState', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.2', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                             $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerStatus', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.3', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                             $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerInUpdates', '.1.3.6.1.4.1.2636.5.1.1.2.6.1.1.1', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                             $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerOutUpdates', '.1.3.6.1.4.1.2636.5.1.1.2.6.1.1.2', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
@@ -133,13 +141,13 @@ if ($config['enable_bgp']) {
                     $get_oids = array_map(function ($oid) use ($peer_identifier) {
                         return "$oid.$peer_identifier";
                     }, array_keys($oid_map));
-                    $peer_data_tmp = snmp_get_multi($device, $get_oids, '-OQUs', $mib);
-                    $peer_data_tmp = reset($peer_data_tmp);  // get the first element of the array
+                    $peer_data_raw = snmp_get_multi($device, $get_oids, '-OQUs', $mib);
+                    $peer_data_raw = reset($peer_data_raw);  // get the first element of the array
 
                     $peer_data = array();
 
                     foreach ($oid_map as $source => $target) {
-                        $v = isset($peer_data_tmp[$source]) ? $peer_data_tmp[$source] : '';
+                        $v = isset($peer_data_raw[$source]) ? $peer_data_raw[$source] : '';
 
                         if (str_contains($source, 'LocalAddr')) {
                             try {
