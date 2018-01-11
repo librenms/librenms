@@ -315,8 +315,9 @@ function list_devices()
     }
     $devices = array();
     foreach (dbFetchRows("SELECT * FROM `devices` $join WHERE $sql ORDER by $order", $param) as $device) {
-        $dev_deps = dbFetchColumn("SELECT parent_device_id from device_relationships WHERE child_device_id = ?", array($device));
-        if ($dev_deps) {
+        $dev_deps = dbFetchRows("SELECT dd.device_id AS device_id, dd.hostname AS hostname FROM devices as d LEFT JOIN device_relationships AS dr ON dr.child_device_id = d.device_id LEFT JOIN devices AS dd ON dr.parent_device_id = dd.device_id WHERE d.device_id = ?", array($device));
+        
+        if (sizeof($dev_deps) > 1) {
             $device['depends_on'] = $dev_deps;
         }
         unset($dev_deps);
