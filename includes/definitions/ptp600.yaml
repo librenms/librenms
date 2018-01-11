@@ -2,7 +2,7 @@ os: ptp600
 text: 'Cambium PTP 600'
 type: wireless
 icon: cambium
-mib_dir: cambium
+mib_dir: cambium/600
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_wireless_ssr, text: 'Device SSR' }

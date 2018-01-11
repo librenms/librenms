@@ -44,8 +44,8 @@ class Ptp600 extends OS implements
      */
     public function discoverWirelessPower()
     {
-        $transmit = '.1.3.6.1.4.1.17713.1.12.3.0'; //"CAMBIUM-SYS-MIB::transmitPower.0"
-        $receive = '.1.3.6.1.4.1.17713.1.12.1.0'; //"CAMBIUM-SYS-MIB::receivePower.0";
+        $transmit = '.1.3.6.1.4.1.17713.6.12.3.0'; //"CAMBIUM-PTP600-MIB::transmitPower.0"
+        $receive = '.1.3.6.1.4.1.17713.6.12.1.0'; //"CAMBIUM-PTP600-MIB::receivePower.0";
         return array(
             new WirelessSensor(
                 'power',
@@ -81,11 +81,9 @@ class Ptp600 extends OS implements
      */
     public function discoverWirelessRate()
     {
-        $receive = '.1.3.6.1.4.1.17713.1.20.1.0'; //"CAMBIUM-SYS-MIB::receiveDataRate.0"
-        $transmit = '.1.3.6.1.4.1.17713.1.20.2.0'; //"CAMBIUM-SYS-MIB::transmitDataRate.0"
-        $aggregate = '.1.3.6.1.4.1.17713.1.20.3.0'; //"CAMBIUM-SYS-MIB::aggregateDataRate.0"
-        $txModulation = ".1.3.6.1.4.1.17713.1.12.9.0"; //"CAMBIUM-SYS-MIB::transmitModulationMode.0"
-        $rxModulation = ".1.3.6.1.4.1.17713.1.12.8.0"; //"CAMBIUM-SYS-MIB::receiveModulationMode.0"
+        $receive = '.1.3.6.1.4.1.17713.6.20.1.0'; //"CAMBIUM-PTP600-MIB::receiveDataRate.0"
+        $transmit = '.1.3.6.1.4.1.17713.6.20.2.0'; //"CAMBIUM-PTP600-MIB::transmitDataRate.0"
+        $aggregate = '.1.3.6.1.4.1.17713.6.20.3.0'; //"CAMBIUM-PTP600-MIB::aggregateDataRate.0"
         return array(
             new WirelessSensor(
                 'rate',
@@ -149,7 +147,7 @@ class Ptp600 extends OS implements
      */
     public function discoverWirelessSsr()
     {
-        $ssr = '.1.3.6.1.4.1.17713.1.12.13.0'; // CAMBIUM-SYS-MIB::signalStrengthRatio.0
+        $ssr = '.1.3.6.1.4.1.17713.6.12.13.0'; // CAMBIUM-PTP600-MIB::signalStrengthRatio.0
         return array(
             new WirelessSensor(
                 'ssr',
