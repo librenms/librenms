@@ -117,25 +117,7 @@ class Ptp600 extends OS implements
                 null,
                 1,
                 100
-            ),
-            new WirelessSensor(
-                'rate',
-                $this->getDeviceId(),
-                $txModulation,
-                'ptp600-tx-mod',
-                0,
-                'PTP600 Transmit Modulation Rate',
-                null
-            ),
-            new WirelessSensor(
-                'rate',
-                $this->getDeviceId(),
-                $rxModulation,
-                'ptp600-rx-mod',
-                0,
-                'PTP600 Receive Modulation Rate',
-                null
-            ),
+            )
         );
     }
 
