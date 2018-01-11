@@ -33,13 +33,13 @@ if ($config['enable_bgp']) {
 
                             foreach ($peer_data_check as $hash => $index) {
                                 $peer_ip_snmp = ltrim($index['orig'], '.');
-                                $octets = count(explode(".", $peer_ip_snmp));
-                                if ($octets > 11) {
+                                $exploded_ip = explode('.', $peer_ip_snmp);
+                                if (count($exploded_ip) > 11) {
                                     // ipv6
-                                    $tmp_peer_ip = (string)IP::parse(snmp2ipv6(implode('.', array_slice(explode('.', $peer_ip_snmp), (count(explode('.', $peer_ip_snmp)) - 16)))), true);
+                                    $tmp_peer_ip = (string)IP::parse(snmp2ipv6($peer_ip_snmp), true);
                                 } else {
                                     // ipv4
-                                    $tmp_peer_ip = implode('.', array_slice(explode('.', $peer_ip_snmp), (count(explode('.', $peer_ip_snmp)) - 4)));
+                                    $tmp_peer_ip = implode('.', array_slice($exploded_ip, -4));
                                 }
                                 $junos[$tmp_peer_ip]['hash'] = $hash;
                                 $junos[$tmp_peer_ip]['index'] = $index['jnxBgpM2PeerIndex'];
