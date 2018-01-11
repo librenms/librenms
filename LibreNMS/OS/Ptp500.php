@@ -92,8 +92,8 @@ class Ptp500 extends OS implements
                 0,
                 'PTP500 Receive Rate',
                 null,
-                1,
-                100
+                1000,
+                1
             ),
             new WirelessSensor(
                 'rate',
@@ -103,8 +103,8 @@ class Ptp500 extends OS implements
                 0,
                 'PTP500 Transmit Rate',
                 null,
-                1,
-                100
+                1000,
+                1
             ),
             new WirelessSensor(
                 'rate',
@@ -112,10 +112,10 @@ class Ptp500 extends OS implements
                 $aggregate,
                 'ptp500-ag-rate',
                 0,
-                'PTP500 Aggragate Rate',
+                'PTP500 Aggregate Rate',
                 null,
-                1,
-                100
+                1000,
+                1
             ),
         );
     }
@@ -137,7 +137,9 @@ class Ptp500 extends OS implements
                 'ptp500-ssr',
                 0,
                 'PTP500 Signal Strength Ratio',
-                null
+                null,
+                1,
+                10
             )
         );
     }

@@ -93,8 +93,8 @@ class Ptp600 extends OS implements
                 0,
                 'PTP600 Receive Rate',
                 null,
-                1,
-                100
+                1000,
+                1
             ),
             new WirelessSensor(
                 'rate',
@@ -104,8 +104,8 @@ class Ptp600 extends OS implements
                 0,
                 'PTP600 Transmit Rate',
                 null,
-                1,
-                100
+                1000,
+                1
             ),
             new WirelessSensor(
                 'rate',
@@ -113,10 +113,10 @@ class Ptp600 extends OS implements
                 $aggregate,
                 'ptp600-ag-rate',
                 0,
-                'PTP600 Aggragate Rate',
+                'PTP600 Aggregate Rate',
                 null,
-                1,
-                100
+                1000,
+                1
             )
         );
     }
@@ -138,7 +138,9 @@ class Ptp600 extends OS implements
                 'ptp600-ssr',
                 0,
                 'PTP600 Signal Strength Ratio',
-                null
+                null,
+                1,
+                10
             )
         );
     }

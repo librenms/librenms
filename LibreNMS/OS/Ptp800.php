@@ -91,8 +91,8 @@ class Ptp800 extends OS implements
                 0,
                 'PTP800 Receive Rate',
                 null,
-                1,
-                100
+                1000,
+                1
             ),
             new WirelessSensor(
                 'rate',
@@ -102,8 +102,8 @@ class Ptp800 extends OS implements
                 0,
                 'PTP800 Transmit Rate',
                 null,
-                1,
-                100
+                1000,
+                1
             ),
             new WirelessSensor(
                 'rate',
@@ -111,10 +111,10 @@ class Ptp800 extends OS implements
                 $aggregate,
                 'ptp800-ag-rate',
                 0,
-                'PTP800 Aggragate Rate',
+                'PTP800 Aggregate Rate',
                 null,
-                1,
-                100
+                1000,
+                1
             )
         );
     }
