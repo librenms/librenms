@@ -398,8 +398,8 @@ class ModuleTestHelper
             $device_id = addHost($snmpsim->getIp(), 'v2c', $snmpsim->getPort());
             $this->qPrint("Added device: $device_id\n");
         } catch (\Exception $e) {
-            echo $e->getMessage() . PHP_EOL;
-            exit;
+            echo $this->file_name . ': ' . $e->getMessage() . PHP_EOL;
+            return null;
         }
 
         // Populate the device variable
