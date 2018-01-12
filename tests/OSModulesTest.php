@@ -55,6 +55,10 @@ class OSModulesTest extends DBTestCase
 
         $results = $helper->generateTestData($snmpsim, true);
 
+        if (is_null($results)) {
+            $this->fail("$target_os: Failed to collect data.");
+        }
+
         foreach ($modules as $module) {
             $this->assertEquals(
                 $expected_data[$module]['discovery'],
