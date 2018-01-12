@@ -201,3 +201,8 @@ Polling
 ```
 
 At this step we should see all the values retrieved in LibreNMS.
+
+Note: If you have made a number of changes to either the OS's Discovery files, it's possible earlier edits have been cached. As such, if you do not get expected behaviour when completing the final check above, try removing the cache file first:
+```bash
+rm -f cache/os_defs.cache
+```

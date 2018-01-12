@@ -129,3 +129,10 @@ Using the Oxidized REST API and [Syslog Hooks](/Extensions/Syslog/#external-hook
 ```bash
 next_adds_job: true
 ```
+
+### Validate Oxidized config
+
+You can perform basic validation of the Oxidized configuration by going to the Overview -> Tools -> Oxidized link and in the Oxidized config validation page, paste your 
+ yaml file into the input box and click 'Validate YAML'.
+ 
+We check for yaml syntax errors and also actual config values to ensure they are used in the correct location.

@@ -9,9 +9,9 @@ Saved snmp data can be found in `tests/snmpsim/*.snmprec` and saved database dat
 Please review this for any sensitive data **before** submitting.  When replacing data, make sure it is modified in a
 consistent manner.
 
-We utilise [snmpsim](http://snmpsim.sourceforge.net/) to do unit testing. For OS discovery, we can mock snmpsim, but
-for other tests you will need it installed and functioning.  We run snmpsim during our integration tests, but not by
-default when running `./scripts/pre-commit.php`.
+> We utilise [snmpsim](http://snmpsim.sourceforge.net/) to do unit testing. For OS discovery, we can mock snmpsim, but
+> for other tests you will need it installed and functioning.  We run snmpsim during our integration tests, but not by
+> default when running `./scripts/pre-commit.php`.
 
 ## Capturing test data
 
@@ -32,9 +32,15 @@ one variant, please do not specify one.
 
 After you have saved your test data, you should run `./scripts/pre-commit.php -p -u` verify they pass.
 
-If you would like to test the data for a specific OS, use `./scripts/pre-commit.php -p --os osname`.
+To run the full suite of tests enable database and snmpsim reliant tests: `./scripts/pre-commit.php --db --snmpsim -p -u`
 
-To run the full suite of tests enable db and snmpsim reliant tests: `./scripts/pre-commit.php --db --snmpsim -p -u`
+#### Specific OS
+
+`./scripts/pre-commit.php -p -o osname`
+
+#### Specific Module
+
+`./scripts/pre-commit.php -p -m modulename`
 
 ## Using snmpsim for testing
 
