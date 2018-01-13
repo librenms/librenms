@@ -1281,7 +1281,7 @@ function rename_device()
         if (renamehost($device_id, $new_hostname, 'api') == '') {
             api_success_noresult(200, 'Device has been renamed');
         } else {
-            api_success_noresult(200, 'Device failed to be renamed');
+            api_error(500, 'Device failed to be renamed');
         }
     }
 }
