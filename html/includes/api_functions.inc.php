@@ -270,14 +270,17 @@ function list_devices()
     $type  = $_GET['type'];
     $query = mres($_GET['query']);
     $param = array();
-    $join = '';
+
     if (empty($order)) {
         $order = 'hostname';
     }
 
     if (stristr($order, ' desc') === false && stristr($order, ' asc') === false) {
-        $order = '`'.$order.'` ASC';
+        $order = 'd.`'.$order.'` ASC';
     }
+
+    $select = " d.*, GROUP_CONCAT(dd.device_id) AS dependency_parent_id, GROUP_CONCAT(dd.hostname) AS dependency_parent_hostname ";
+    $join = " LEFT JOIN `device_relationships` AS dr ON dr.`child_device_id` = d.`device_id` LEFT JOIN `devices` AS dd ON dr.`parent_device_id` = dd.`device_id` ";
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
@@ -295,26 +298,32 @@ function list_devices()
         $sql = "`os`=?";
         $param[] = $query;
     } elseif ($type == 'mac') {
-        $join = " LEFT JOIN `ports` ON `devices`.`device_id`=`ports`.`device_id` LEFT JOIN `ipv4_mac` ON `ports`.`port_id`=`ipv4_mac`.`port_id` ";
-        $sql = "`ipv4_mac`.`mac_address`=?";
+        $join .= " LEFT JOIN `ports` AS p ON d.`device_id` = p.`device_id` LEFT JOIN `ipv4_mac` AS m ON p.`port_id` = m.`port_id` ";
+        $sql = "m.`mac_address`=?";
+        $select .= ",p.* ";
         $param[] = $query;
     } elseif ($type == 'ipv4') {
-        $join = " LEFT JOIN `ports` ON `devices`.`device_id`=`ports`.`device_id` LEFT JOIN `ipv4_addresses` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` ";
-        $sql = "`ipv4_addresses`.`ipv4_address`=?";
+        $join .= " LEFT JOIN `ports` AS p ON d.`device_id` = p.`device_id` LEFT JOIN `ipv4_addresses` AS a ON p.`port_id` = a.`port_id` ";
+        $sql = "a.`ipv4_address`=?";
+        $select .= ",p.* ";
         $param[] = $query;
     } elseif ($type == 'ipv6') {
-        $join = " LEFT JOIN `ports` ON `devices`.`device_id`=`ports`.`device_id` LEFT JOIN `ipv6_addresses` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` ";
-        $sql = "`ipv6_addresses`.`ipv6_address`=? OR `ipv6_addresses`.`ipv6_compressed`=?";
-        $param = array($query,$query);
+        $join .= " LEFT JOIN `ports` AS p ON d.`device_id` = p.`device_id` LEFT JOIN `ipv6_addresses` AS a ON p.`port_id` = a.`port_id` ";
+        $sql = "a.`ipv6_address`=? OR a.`ipv6_compressed`=?";
+        $select .= ",p.* ";
+        $param = array($query, $query);
     } else {
         $sql = '1';
     }
+
+
     if (!is_admin() && !is_read()) {
         $sql .= " AND `device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
         $param[] = $_SESSION['user_id'];
     }
     $devices = array();
-    foreach (dbFetchRows("SELECT * FROM `devices` $join WHERE $sql ORDER by $order", $param) as $device) {
+    $dev_query = "SELECT $select FROM `devices` AS d $join WHERE $sql GROUP BY d.`hostname` ORDER BY $order";
+    foreach (dbFetchRows($dev_query, $param) as $device) {
         $host_id = get_vm_parent_id($device);
         $device['ip'] = inet6_ntop($device['ip']);
         if (is_numeric($host_id)) {
