@@ -26,16 +26,16 @@ if (is_admin() === false) {
             }
         }
     } else if ($_POST['parent_ids']) {
-        $error = False;
+        $error = false;
         foreach ($_POST['parent_ids'] as $parent) {
             if (is_numeric($parent) && $parent != 0) {
                 if (!dbDelete('device_relationships', ' `parent_device_id` = ?', array($parent))) {
-                    $error = True;
+                    $error = true;
                     $status = array('status' => 1, 'message' => 'Device dependency cannot be deleted.');
                 }
             } else if ($parent == 0) {
                 $status = array('status' => 1, 'message' => 'No dependency to delete.');
-                $error = True;
+                $error = true;
                 break;
             }
         }
