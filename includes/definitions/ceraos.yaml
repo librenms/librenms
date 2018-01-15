@@ -44,3 +44,4 @@ discovery_modules:
     ntp: 0
     wireless: 0
     charge: 0
+    wifi: 1
