@@ -17,6 +17,7 @@ $pagetitle[] = 'Oxidized';
         <ul class="nav nav-tabs">
             <li class="active"><a href="#list" data-toggle="tab">Node List</a></li>
             <li><a href="#search" data-toggle="tab">Config Search</a></li>
+            <li><a href="<?php echo generate_url(array('page' => 'tools', 'tool' => 'oxidized-cfg-check')); ?>">Oxidized config validation</a></li>
         </ul>
     </div>
     <div class="panel with-nav-tabs panel-default">
