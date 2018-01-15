@@ -25,11 +25,21 @@
 
 namespace LibreNMS;
 
-use Composer\Script\Event;
 use Composer\Installer\PackageEvent;
+use Composer\Script\Event;
 
 class ComposerHelper
 {
+    public static function postRootPackageInstall(Event $event)
+    {
+        self::populateEnv();
+    }
+
+    public static function postInstall(Event $event)
+    {
+        self::populateEnv();
+    }
+
     public static function preUpdate(Event $event)
     {
         if (!getenv('FORCE')) {
@@ -53,6 +63,56 @@ class ComposerHelper
 
             self::exec($cmds);
         }
+    }
+
+
+    /**
+     * Initially populate .env file
+     */
+    private static function populateEnv()
+    {
+        if (!file_exists('.env')) {
+            copy('.env.example', '.env');
+            self::exec('php artisan key:generate');
+
+            @include 'config.php';
+            if (isset($config)) {
+                self::setEnv([
+                    'DB_HOST'     => isset($config['db_host']) ? $config['db_host'] : '',
+                    'DB_PORT'     => isset($config['db_port']) ? $config['db_port'] : '',
+                    'DB_USERNAME' => isset($config['db_user']) ? $config['db_user'] : '',
+                    'DB_PASSWORD' => isset($config['db_pass']) ? $config['db_pass'] : '',
+                    'DB_DATABASE' => isset($config['db_name']) ? $config['db_name'] : '',
+                    'DB_SOCKET'   => isset($config['db_socket']) ? $config['db_socket'] : '',
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Set a setting in .env file
+     *
+     * @param array $settings KEY => value list of settings
+     * @param string $file
+     */
+    private static function setEnv($settings, $file = '.env')
+    {
+        $content = file_get_contents($file);
+        if (substr($content, -1) !== "\n") {
+            $content .= PHP_EOL;
+        }
+
+        foreach ($settings as $key => $value) {
+            if (strpos($content, "$key=") !== false) {
+                // only replace ones that aren't already set for safety
+                $content = preg_replace("/$key=\n/", "$key=$value\n", $content);
+            } elseif (!empty($value)) {
+                // only add non-empty settings
+                $content .= "$key=$value\n";
+            }
+        }
+
+        file_put_contents($file, $content);
     }
 
     /**

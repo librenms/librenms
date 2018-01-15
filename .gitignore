@@ -9,6 +9,7 @@
 !/.github/
 !/.codeclimate.yml
 !/.mention-bot
+!/.env.example
 
 # Others #
 ##########
