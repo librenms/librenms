@@ -1,6 +1,6 @@
 <?php
 /**
- * Ptp250.php
+ * ptp600.php
  *
  * Cambium
  *
@@ -27,14 +27,12 @@ namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSsrDiscovery;
 use LibreNMS\OS;
 
-class Ptp250 extends OS implements
+class Ptp600 extends OS implements
     WirelessPowerDiscovery,
-    WirelessNoiseFloorDiscovery,
     WirelessRateDiscovery,
     WirelessSsrDiscovery
 {
@@ -46,16 +44,16 @@ class Ptp250 extends OS implements
      */
     public function discoverWirelessPower()
     {
-        $transmit = '.1.3.6.1.4.1.17713.250.5.3.0'; //"CAMBIUM-PTP250-MIB::transmitPower.0"
-        $receive = '.1.3.6.1.4.1.17713.250.5.1.0'; //"CAMBIUM-PTP250-MIB::receivePower.0";
+        $transmit = '.1.3.6.1.4.1.17713.6.12.3.0'; //"CAMBIUM-PTP600-MIB::transmitPower.0"
+        $receive = '.1.3.6.1.4.1.17713.6.12.1.0'; //"CAMBIUM-PTP600-MIB::receivePower.0";
         return array(
             new WirelessSensor(
                 'power',
                 $this->getDeviceId(),
                 $transmit,
-                'ptp250-tx',
+                'ptp600-tx',
                 0,
-                'PTP250 Transmit',
+                'PTP600 Transmit',
                 null,
                 1,
                 10
@@ -64,34 +62,12 @@ class Ptp250 extends OS implements
                 'power',
                 $this->getDeviceId(),
                 $receive,
-                'ptp250-rx',
+                'ptp600-rx',
                 0,
-                'PTP250 Receive',
+                'PTP600 Receive',
                 null,
                 1,
                 10
-            )
-        );
-    }
-
-    /**
-     * Discover wireless noise floor. This is in dBm/Hz. Type is noise-floor.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-     *
-     * @return array
-     */
-    public function discoverWirelessNoiseFloor()
-    {
-        $noise_floor = '.1.3.6.1.4.1.17713.250.5.15.0'; //"CAMBIUM-PTP250-MIB::noiseFloor.0";;
-        return array(
-            new WirelessSensor(
-                'noise-floor',
-                $this->getDeviceId(),
-                $noise_floor,
-                'ptp250',
-                0,
-                'PTP250 Noise Floor',
-                null
             )
         );
     }
@@ -105,19 +81,17 @@ class Ptp250 extends OS implements
      */
     public function discoverWirelessRate()
     {
-        $receive = '.1.3.6.1.4.1.17713.250.11.1.0'; //"CAMBIUM-PTP250-MIB::receiveDataRate.0"
-        $transmit = '.1.3.6.1.4.1.17713.250.11.2.0'; //"CAMBIUM-PTP250-MIB::transmitDataRate.0"
-        $aggregate = '.1.3.6.1.4.1.17713.250.11.3.0'; //"CAMBIUM-PTP250-MIB::aggregateDataRate.0"
-        $txModulation = ".1.3.6.1.4.1.17713.250.5.9.0";
-        $rxModulation = ".1.3.6.1.4.1.17713.250.5.8.0";
+        $receive = '.1.3.6.1.4.1.17713.6.20.1.0'; //"CAMBIUM-PTP600-MIB::receiveDataRate.0"
+        $transmit = '.1.3.6.1.4.1.17713.6.20.2.0'; //"CAMBIUM-PTP600-MIB::transmitDataRate.0"
+        $aggregate = '.1.3.6.1.4.1.17713.6.20.3.0'; //"CAMBIUM-PTP600-MIB::aggregateDataRate.0"
         return array(
             new WirelessSensor(
                 'rate',
                 $this->getDeviceId(),
                 $receive,
-                'ptp250-rx-rate',
+                'ptp600-rx-rate',
                 0,
-                'PTP250 Receive Rate',
+                'PTP600 Receive Rate',
                 null,
                 1000,
                 1
@@ -126,9 +100,9 @@ class Ptp250 extends OS implements
                 'rate',
                 $this->getDeviceId(),
                 $transmit,
-                'ptp250-tx-rate',
+                'ptp600-tx-rate',
                 0,
-                'PTP250 Transmit Rate',
+                'PTP600 Transmit Rate',
                 null,
                 1000,
                 1
@@ -137,31 +111,13 @@ class Ptp250 extends OS implements
                 'rate',
                 $this->getDeviceId(),
                 $aggregate,
-                'ptp250-ag-rate',
+                'ptp600-ag-rate',
                 0,
-                'PTP250 Aggregate Rate',
+                'PTP600 Aggregate Rate',
                 null,
                 1000,
                 1
-            ),
-            new WirelessSensor(
-                'rate',
-                $this->getDeviceId(),
-                $txModulation,
-                'ptp250-tx-mod',
-                0,
-                'PTP250 Transmit Modulation Rate',
-                null
-            ),
-            new WirelessSensor(
-                'rate',
-                $this->getDeviceId(),
-                $rxModulation,
-                'ptp250-rx-mod',
-                0,
-                'PTP250 Receive Modulation Rate',
-                null
-            ),
+            )
         );
     }
 
@@ -173,15 +129,15 @@ class Ptp250 extends OS implements
      */
     public function discoverWirelessSsr()
     {
-        $ssr = '.1.3.6.1.4.1.17713.250.5.13.0'; // CAMBIUM-PTP250-MIB::signalStrengthRatio.0
+        $ssr = '.1.3.6.1.4.1.17713.6.12.13.0'; // CAMBIUM-PTP600-MIB::signalStrengthRatio.0
         return array(
             new WirelessSensor(
                 'ssr',
                 $this->getDeviceId(),
                 $ssr,
-                'ptp250',
+                'ptp600-ssr',
                 0,
-                'PTP250 Signal Strength Ratio',
+                'PTP600 Signal Strength Ratio',
                 null,
                 1,
                 10
