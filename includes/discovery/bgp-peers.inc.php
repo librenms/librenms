@@ -31,7 +31,7 @@ if (Config::get('enable_bgp')) {
                 $peers_data = snmp_walk($device, 'jnxBgpM2PeerRemoteAs', '-Onq', 'BGP4-V2-MIB-JUNIPER', 'junos');
             } elseif ($device['os_group'] === 'cisco') {
                 $peers_data = snmp_walk($device, 'cbgpPeer2RemoteAs', '-Oq', 'CISCO-BGP4-MIB');
-                $peer2 = true;
+                $peer2 = !empty($peer);
             }
 
             if (empty($peers_data)) {
@@ -62,9 +62,9 @@ if (Config::get('enable_bgp')) {
                 if ($device['os_group'] == 'cisco') {
                     if (empty($af_data)) {
                         if ($peer2 === true) {
-                            $af_data = snmpwalk_cache_oid($device, 'cbgpPeer2AddrFamilyEntry', $cbgp, 'CISCO-BGP4-MIB');
+                            $af_data = snmpwalk_cache_oid($device, 'cbgpPeer2AddrFamilyEntry', array(), 'CISCO-BGP4-MIB');
                         } else {
-                            $af_data = snmpwalk_cache_oid($device, 'cbgpPeerAddrFamilyEntry', $cbgp, 'CISCO-BGP4-MIB');
+                            $af_data = snmpwalk_cache_oid($device, 'cbgpPeerAddrFamilyEntry', array(), 'CISCO-BGP4-MIB');
                         }
                     }
                 }

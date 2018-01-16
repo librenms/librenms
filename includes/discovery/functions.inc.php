@@ -1166,10 +1166,10 @@ function build_bgp_peers($device, $data, $peer2)
             $octets = count(explode(".", $peer_ip));
             if ($octets > 11) {
                 // ipv6
-                $peer_ip = (string)IP::parse(snmp2ipv6(implode('.', array_slice(explode('.', $peer_ip), (count(explode('.', $peer_ip)) - 16)))), true);
+                $peer_ip = (string)IP::parse(snmp2ipv6($peer_ip), true);
             } else {
                 // ipv4
-                $peer_ip = implode('.', array_slice(explode('.', $peer_ip), (count(explode('.', $peer_ip)) - 4)));
+                $peer_ip = implode('.', array_slice(explode('.', $peer_ip), -4));
             }
         } else {
             if (strstr($peer_ip, ':')) {
