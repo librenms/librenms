@@ -23,4 +23,4 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$hardware = str_replace(' GigaBit Ethernet Switch', '', $poll_device['sysDescr']);
+$hardware = str_replace(' GigaBit Ethernet Switch', '', $device['sysDescr']);

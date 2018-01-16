@@ -1,4 +1,5 @@
 <?php
+$pagetitle[] = 'Apps';
 
 $graphs['apache']    = array(
     'bits',
@@ -296,7 +297,19 @@ $graphs['zfs'] = array(
     'arc_cache_miss',
 );
 
-print_optionbar_start();
+$graphs['powerdns-dnsdist'] = array(
+    'cache',
+    'downstream',
+    'dynamic_blocks',
+    'latency',
+    'queries_latency',
+    'queries_stats',
+    'rules_stats',
+    'queries_drop',
+);
+
+echo '<div class="panel panel-default">';
+echo '<div class="panel-heading">';
 
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
 
@@ -323,8 +336,8 @@ foreach ($app_list as $app) {
     $sep = ' | ';
 }
 
-print_optionbar_end();
-
+echo '</div>';
+echo '<div class="panel-body">';
 if ($vars['app']) {
     if (is_file('pages/apps/'.mres($vars['app']).'.inc.php')) {
         include 'pages/apps/'.mres($vars['app']).'.inc.php';
@@ -334,5 +347,4 @@ if ($vars['app']) {
 } else {
     include 'pages/apps/overview.inc.php';
 }
-
-$pagetitle[] = 'Apps';
+echo '</div>';

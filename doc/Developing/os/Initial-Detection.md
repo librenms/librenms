@@ -18,18 +18,18 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
-    - sysObjectId:
+    - sysObjectID:
         - .1.3.6.1.4.1.12532.
 ```
 
 `over`: This is a list of the graphs which will be shown within the device header bar (mini graphs top right).
 
-`discovery`: Here we are detecting this new OS using sysObjectId, this is the preferred method for detection. 
+`discovery`: Here we are detecting this new OS using sysObjectID, this is the preferred method for detection. 
 Other options are available:
 
- - `sysObjectId` The preferred operator. Checks if the sysObjectID starts with one of the strings under this item
- - `sysDescr` Use this in addition to sysObjectId if required. Check that the sysDescr contains one of the strings under this item
- - `sysObjectId_regex` Please avoid use of this. Checks if the sysObjectId matches one of the regex statements under this item
+ - `sysObjectID` The preferred operator. Checks if the sysObjectID starts with one of the strings under this item
+ - `sysDescr` Use this in addition to sysObjectID if required. Check that the sysDescr contains one of the strings under this item
+ - `sysObjectID_regex` Please avoid use of this. Checks if the sysObjectID matches one of the regex statements under this item
  - `sysDescr_regex` Please avoid use of this. Checks if the sysDescr matches one of the regex statements under this item
  - `snmpget` Do not use this unless none of the other methods work. Fetch an oid and compare it against a value.
  - `_except` You can add this to any of the above to exclude that element. As an example:
@@ -37,7 +37,7 @@ Other options are available:
 ```yaml
 discovery:
     - 
-      sysObjectId:
+      sysObjectID:
           - .1.3.6.1.4.1.12532.
       sysDescr_except:
           - 'Not some pulse'
@@ -86,24 +86,24 @@ discovery_modules:
 YAML is converted to an array in PHP.  Consider the following YAML:
 ```yaml
 discovery: 
-  - sysObjectId: foo
+  - sysObjectID: foo
   - 
     sysDescr: [ snafu, exodar ]
-    sysObjectId: bar
+    sysObjectID: bar
 
 ```
 This is how the discovery array would look in PHP:
 ```php
 [
      [
-       "sysObjectId" => "foo",
+       "sysObjectID" => "foo",
      ],
      [
        "sysDescr" => [
          "snafu",
          "exodar",
        ],
-       "sysObjectId" => "bar",
+       "sysObjectID" => "bar",
      ]
 ]
 ```
@@ -111,15 +111,20 @@ This is how the discovery array would look in PHP:
 
 The logic for the discovery is as follows:
 1. One of the first level items must match
-2. ALL of the second level items must match (sysObjectId, sysDescr)
+2. ALL of the second level items must match (sysObjectID, sysDescr)
 3. One of the third level items (foo, [snafu,exodar], bar) must match
 
 So, considering the example:
- - `sysObjectId: foo, sysDescr: ANYTHING` matches
- - `sysObjectId: bar, sysDescr: ANYTHING` does not match
- - `sysObjectId: bar, sysDescr: exodar` matches 
- - `sysObjectId: bar, sysDescr: snafu` matches 
+ - `sysObjectID: foo, sysDescr: ANYTHING` matches
+ - `sysObjectID: bar, sysDescr: ANYTHING` does not match
+ - `sysObjectID: bar, sysDescr: exodar` matches 
+ - `sysObjectID: bar, sysDescr: snafu` matches 
 
+#### Discovery helpers
+Within the discovery code base if you are using php then the following helpers are available:
+
+`$device['sysObjectID]`: This will contain the full numerical sysObjectID for this device.
+`$device['sysDescr']`: This will contain the full sysDescr for this device.
 
 ### Poller
 
@@ -196,3 +201,8 @@ Polling
 ```
 
 At this step we should see all the values retrieved in LibreNMS.
+
+Note: If you have made a number of changes to either the OS's Discovery files, it's possible earlier edits have been cached. As such, if you do not get expected behaviour when completing the final check above, try removing the cache file first:
+```bash
+rm -f cache/os_defs.cache
+```

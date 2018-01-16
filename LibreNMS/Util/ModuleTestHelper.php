@@ -201,6 +201,11 @@ class ModuleTestHelper
         // generate a full list of modules
         $full_list = array();
         foreach ($modules as $module) {
+            // only allow valid modules
+            if (!(Config::has("poller_modules.$module") || Config::has("discovery_modules.$module"))) {
+                continue;
+            }
+
             if (isset($module_deps[$module])) {
                 $full_list = array_merge($full_list, $module_deps[$module]);
             } else {
@@ -241,7 +246,7 @@ class ModuleTestHelper
                 continue;
             }
 
-            if (str_contains($line, ' =')) {
+            if (preg_match('/^\.[.\d]+ =/', $line)) {
                 list($oid, $raw_data) = explode(' =', $line, 2);
                 $oid = ltrim($oid, '.');
                 $raw_data = trim($raw_data);
@@ -339,8 +344,8 @@ class ModuleTestHelper
         $output = implode(PHP_EOL, $results) . PHP_EOL;
 
         if ($write) {
-            $this->qPrint("Updated snmprec data $this->snmprec_file\n");
-            $this->qPrint("Verify these files do not contain any private data before submitting\n");
+            $this->qPrint("\nUpdated snmprec data $this->snmprec_file\n");
+            $this->qPrint("\nVerify this file does not contain any private data before submitting!\n");
             file_put_contents($this->snmprec_file, $output);
         }
 
@@ -393,8 +398,8 @@ class ModuleTestHelper
             $device_id = addHost($snmpsim->getIp(), 'v2c', $snmpsim->getPort());
             $this->qPrint("Added device: $device_id\n");
         } catch (\Exception $e) {
-            echo $e->getMessage() . PHP_EOL;
-            exit;
+            echo $this->file_name . ': ' . $e->getMessage() . PHP_EOL;
+            return null;
         }
 
         // Populate the device variable
@@ -424,6 +429,7 @@ class ModuleTestHelper
 
         // Dump the discovered data
         $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], 'discovery'));
+        $device = device_by_id_cache($device_id, true); // refresh the device array
 
         // Run the poller
         if ($this->quiet) {

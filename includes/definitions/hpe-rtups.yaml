@@ -11,5 +11,5 @@ over:
     - { graph: device_voltage, text: Voltage }
     - { graph: device_load, text: Load }
 discovery:
-    - sysObjectId:
+    - sysObjectID:
         - .1.3.6.1.4.1.232.165.3
