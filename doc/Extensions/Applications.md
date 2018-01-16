@@ -29,6 +29,7 @@ Different applications support a variety of ways to collect data: by direct conn
 1. [OS Updates](#os-updates) - SNMP extend
 1. [PHP-FPM](#php-fpm) - SNMP extend
 1. [Pi-hole](#pi-hole) - SNMP extend
+1. [Portactivity](#portactivity) - SNMP extend
 1. [Postfix](#postfix) - SNMP extend
 1. [Postgres](#postgres) - SNMP extend
 1. [PowerDNS](#powerdns) - Agent
@@ -643,6 +644,30 @@ extend pi-hole /etc/snmp/pi-hole
 
 6: On the device page in Librenms, edit your host and check the `Pi-hole` under the Applications tab or wait for it to be auto-discovered.
 
+### Portactivity
+#### SNMP Extend
+
+1. Install the Perl module Parse::Netstat.
+
+2. Copy the Perl script to the desired host (the host must be added to LibreNMS devices)
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/portactivity -O /etc/snmp/portactivity
+```
+
+3. Make the script executable. (chmod +x /etc/snmp/portactivity)
+
+4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend portactivity /etc/snmp/portactivity -p http,ldap,imap
+```
+
+Will monitor HTTP, LDAP, and IMAP. The -p switch specifies what ports to use. This is a comma seperated list.
+
+These must be found in '/etc/services' or where ever NSS is set to fetch it from.
+
+5. Restart snmpd on your host.
+
+Please note that for only TCP[46] services are supported.
 
 ### Postfix
 #### SNMP Extend
