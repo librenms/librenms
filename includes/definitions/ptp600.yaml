@@ -1,8 +1,8 @@
-os: ptp250
-text: Cambium PTP 250
+os: ptp600
+text: 'Cambium PTP 600'
 type: wireless
 icon: cambium
-mib_dir: cambium
+mib_dir: cambium/600
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_wireless_ssr, text: 'Device SSR' }
@@ -10,4 +10,4 @@ over:
 group: cambium
 discovery:
     - sysObjectID:
-        - .1.3.6.1.4.1.17713.250
+        - .1.3.6.1.4.1.17713.6
