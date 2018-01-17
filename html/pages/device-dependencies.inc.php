@@ -126,6 +126,12 @@ $(document).ready(function() {
 
     });
 
+    var manParentDevstoClr = $('#manclearchildren').select2({
+        dropdownParent: $('#manage-dependencies'),
+        width: 'resolve',
+        tags: true
+    });
+
     var manParentDevs = $('#manavailableparents').select2({
         dropdownParent: $('#manage-dependencies'),
         width: 'resolve',
@@ -147,10 +153,12 @@ $(document).ready(function() {
             if (output.status == 0) {
                 manParentDevs.append($('<option>', { value: 0, text: 'None'}));
                 editSelect.append($('<option>', { value: 0, text: 'None'}));
+                manParentDevstoClr.append($('<option>', { value: 0, text: 'None'}));
                 $.each(output.deps, function (i,elem) {
                     manParentDevs.append($('<option>',{value:elem.id, text:elem.hostname}));
                     editSelect.append($('<option>',{value:elem.id, text:elem.hostname}));
                     manAllDevs.append($('<option>',{value:elem.id, text:elem.hostname}));
+                    manParentDevstoClr.append($('<option>',{value:elem.id, text:elem.hostname}));
                 });
             } else {
                 toastr.error('Device dependencies could not be retrieved from the database');
