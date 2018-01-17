@@ -290,7 +290,6 @@ function load_devices(target)
         data: {type: 'load-devices'},
         dataType: "json",
         success: function(output) {
-            target.append($('<option>', { value: 0, text: 'None'}));
             $.each(output.devices, function (i,elem) {
                 target.append($('<option>',{value:elem.device_id, text:elem.hostname}));
             });

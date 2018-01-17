@@ -54,6 +54,7 @@ foreach (dbFetchRows('SELECT `entPhysicalModelName` FROM `entPhysical` GROUP BY 
                  "<div class=\"form-group\">"+
                  "<strong>&nbsp;Device&nbsp;</strong>"+
                  "<select name=\"device\" id=\"device\" class=\"form-control input-sm\" style=\"width: 220px\">"+
+                 "<option></option>"+
                  "</select>"+
                  "</div>"+
                  "<div class=\"form-group\">"+
@@ -87,7 +88,8 @@ foreach (dbFetchRows('SELECT `entPhysicalModelName` FROM `entPhysical` GROUP BY 
 $(document).ready(function() {
 
     var Devices = $('#device').select2({
-        placeholder: 'All Devices'
+        placeholder: 'All Devices',
+        allowClear: true
     });
 
     load_devices(Devices);
