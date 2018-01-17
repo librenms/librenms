@@ -23,6 +23,8 @@
  * @author     Nick Peelman <nick@peelman.us>
  */
 
-$hardware = snmp_get($device, 'modelName.0', '-Ovqa', 'SYNOLOGY-SYSTEM-MIB');
-$version = snmp_get($device, 'version.0', '-Ovqa', 'SYNOLOGY-SYSTEM-MIB');
-$serial = snmp_get($device, 'serialNumber.0', '-Ovqa', 'SYNOLOGY-SYSTEM-MIB');
+$tmp_dsm  = snmp_get_multi_oid($device, 'modelName.0 version.0 serialNumber.0', '-OUQs', 'SYNOLOGY-SYSTEM-MIB');
+$hardware = $tmp_dsm['modelName.0'];
+$version  = $tmp_dsm['version.0'];
+$serial   = $tmp_dsm['serialNumber.0'];
+unset($tmp_dsm);
