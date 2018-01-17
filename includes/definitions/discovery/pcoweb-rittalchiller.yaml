@@ -1,6 +1,14 @@
 mib: KELVIN-pCOWeb-Chiller-MIB
 modules:
     sensors:
+        eer:
+            data:
+                -
+                    oid: analogObjects.120
+                    value: analogObjects
+                    num_oid: .1.3.6.1.4.1.9839.2.1.3.
+                    descr: Energy Efficiency Ratio
+                    index: 'analogObjects.{{ $index }}'
         power:
             data:
                 -

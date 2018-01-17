@@ -399,6 +399,8 @@ $icons = array(
     'chromatic_dispersion' => 'indent',
     'ber' => 'sort-amount-desc',
     'quality_factor' => 'arrows',
+    'eer' => 'snowflake-o',
+
 
 );
 foreach (array('fanspeed','humidity','temperature','signal') as $item) {

@@ -26,6 +26,7 @@ $delay        = dbFetchCell("select count(*) from sensors WHERE sensor_class='de
 $quality_factor     = dbFetchCell("select count(*) from sensors WHERE sensor_class='quality_factor' AND device_id = ?", array($device['device_id']));
 $chromatic_dispersion  = dbFetchCell("select count(*) from sensors WHERE sensor_class='chromatic_dispersion' AND device_id = ?", array($device['device_id']));
 $ber          = dbFetchCell("select count(*) from sensors WHERE sensor_class='ber' AND device_id = ?", array($device['device_id']));
+$eer          = dbFetchCell("select count(*) from sensors WHERE sensor_class='eer' AND device_id = ?", array($device['device_id']));
 
 unset($datas);
 $datas[] = 'overview';
@@ -129,6 +130,10 @@ if ($ber) {
     $datas[] = 'ber';
 }
 
+if ($eer) {
+    $datas[] = 'eer';
+}
+
 $type_text['overview']    = 'Overview';
 $type_text['charge']      = 'Battery Charge';
 $type_text['temperature'] = 'Temperature';
@@ -155,6 +160,7 @@ $type_text['delay']       = 'Delay';
 $type_text['quality_factor']    = 'Quality factor';
 $type_text['chromatic_dispersion']     = 'Chromatic Dispersion';
 $type_text['ber']     = 'Bit Error Rate';
+$type_text['eer']     = 'Energy Efficiency Ratio';
 
 $link_array = array(
     'page'   => 'device',

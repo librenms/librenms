@@ -79,6 +79,9 @@ if ($used_sensors['chromatic_dispersion']) {
 if ($used_sensors['ber']) {
     $datas[] = 'ber';
 }
+if ($used_sensors['eer']) {
+    $datas[] = 'eer';
+}
 
 $type_text['overview'] = "Overview";
 $type_text['temperature'] = "Temperature";
@@ -107,6 +110,7 @@ $type_text['delay'] = 'Delay';
 $type_text['quality_factor'] = 'Quality factor';
 $type_text['chromatic_dispersion'] = 'Chromatic Dispersion';
 $type_text['ber'] = 'Bit Error Rate';
+$type_text['eer'] = 'Energy Efficiency Ratio';
 
 if (!$vars['metric']) {
     $vars['metric'] = "processor";
