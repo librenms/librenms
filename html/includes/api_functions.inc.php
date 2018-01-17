@@ -250,7 +250,7 @@ function list_locations()
     $locations   = dbFetchRows("SELECT `locations`.* FROM `locations` WHERE `locations`.`location` IS NOT NULL");
     $total_locations = count($locations);
     if ($total_locations == 0) {
-        api_error(404, 'Locations does not exist');
+        api_error(404, 'Locations do not exist');
     }
 
     api_success($locations, 'locations');
@@ -877,7 +877,7 @@ function get_ip_addresses()
         $ipv6   = dbFetchRows("SELECT `ipv6_addresses`.* FROM `ipv6_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
         $ip_addresses_count = count(array_merge($ipv4, $ipv6));
         if ($ip_addresses_count == 0) {
-            api_error(404, "Device $device_id does not have IP Addresses");
+            api_error(404, "Device $device_id does not have any IP addresses");
         }
     } elseif (isset($router['portid'])) {
         $port_id = urldecode($router['portid']);
@@ -886,7 +886,7 @@ function get_ip_addresses()
         $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?", array($port_id));
         $ip_addresses_count = count(array_merge($ipv4, $ipv6));
         if ($ip_addresses_count == 0) {
-            api_error(404, "Port $port_id does not have IP Addresses");
+            api_error(404, "Port $port_id does not have any IP addresses");
         }
     } elseif (isset($router['id'])) {
         check_is_read();
@@ -895,7 +895,7 @@ function get_ip_addresses()
         $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `ipv6_network_id` = ?", array($network_id));
         $ip_addresses_count = count(array_merge($ipv4, $ipv6));
         if ($ip_addresses_count == 0) {
-            api_error(404, "IP Network $network_id does not exist or empty");
+            api_error(404, "IP network $network_id does not exist or is empty");
         }
     }
 
@@ -1431,7 +1431,7 @@ function list_vrf()
     }
     $total_vrfs = count($vrfs);
     if ($total_vrfs == 0) {
-        api_error(404, 'VRFs does not exist');
+        api_error(404, 'VRFs do not exist');
     }
 
     api_success($vrfs, 'vrfs');
@@ -1504,7 +1504,7 @@ function list_vlans()
     }
     $vlans_count = count($vlans);
     if ($vlans_count == 0) {
-        api_error(404, 'VLANs does not exist');
+        api_error(404, 'VLANs do not exist');
     }
 
     api_success($vlans, 'vlans');
@@ -1524,7 +1524,7 @@ function list_ip_addresses()
     $ipv6_addresses   = dbFetchRows("SELECT * FROM `ipv6_addresses`");
     $ip_addresses_count = count(array_merge($ipv4_addresses, $ipv6_addresses));
     if ($ip_addresses_count == 0) {
-        api_error(404, 'IP Addresses does not exist');
+        api_error(404, 'IP addresses do not exist');
     }
 
     api_success(array_merge($ipv4_addresses, $ipv6_addresses), 'ip_addresses');
@@ -1544,7 +1544,7 @@ function list_ip_networks()
     $ipv6_networks   = dbFetchRows("SELECT * FROM `ipv6_networks`");
     $ip_networks_count = count(array_merge($ipv4_networks, $ipv6_networks));
     if ($ip_networks_count == 0) {
-        api_error(404, 'IP Networks does not exist');
+        api_error(404, 'IP networks do not exist');
     }
 
     api_success(array_merge($ipv4_networks, $ipv6_networks), 'ip_networks');
