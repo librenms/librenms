@@ -414,13 +414,13 @@ if ($format == "graph") {
             columnSelection: true,
             formatters: {
                 "status": function (column, row) {
-                    return "<span class=\"alert-status " + row.extra + "\" style=\"float:left;\"></span>";
+                    return "<span class=\"alert-status " + row.extra + "\"></span>";
                 },
                 "icon": function (column, row) {
                     return "<span class=\"device-table-icon\">" + row.icon + "</span>";
                 },
                 "device": function (column, row) {
-                    return "<span style=''>" + row.hostname + "</span>";
+                    return "<span>" + row.hostname + "</span>";
                 },
             },
             templates: {
