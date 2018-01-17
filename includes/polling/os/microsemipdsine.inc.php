@@ -22,7 +22,7 @@
  * @copyright  2017 Lorenzo Zafra
  * @author     Lorenzo Zafra<zafra@ualberta.;a>
  */
-preg_match('~(?<hardware>.*)\..*=(?<serial>\d*)\.\s+\w+\s+\w+=(?<version>.*)~', $poll_device['sysDescr'], $matches);
+preg_match('~(?<hardware>.*)\..*=(?<serial>\d*)\.\s+\w+\s+\w+=(?<version>.*)~', $device['sysDescr'], $matches);
 
 if ($matches['hardware'] == 'Midspan') {
     $hardware = 'PoE Midspan';

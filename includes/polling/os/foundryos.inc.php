@@ -10,5 +10,5 @@
  * the source code distribution for details.
  */
  
-preg_match('/Foundry Networks (.*)/', $poll_device['sysDescr'], $data);
+preg_match('/Foundry Networks (.*)/', $device['sysDescr'], $data);
 $hardware = $data[1];

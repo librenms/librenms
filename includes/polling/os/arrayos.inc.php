@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-list($hardware, $version) = explode(' - ', $poll_device['sysDescr']);
+list($hardware, $version) = explode(' - ', $device['sysDescr']);
 $hardware = str_replace('Hardware:', '', $hardware);
 preg_match('/\.([0-9\.]+) /', $version, $matches);
 $version = $matches[1];

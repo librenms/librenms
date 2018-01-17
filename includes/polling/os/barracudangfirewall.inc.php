@@ -10,6 +10,6 @@
  * the source code distribution for details.
  */
 
-if ($device['sysObjectID'] == 'enterprises.10704.1.10') {
-    $hardware = $poll_device['sysName'];
+if ($device['sysObjectID'] == '.1.3.6.1.4.1.10704.1.10') {
+    $hardware = $device['sysName'];
 }

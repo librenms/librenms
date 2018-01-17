@@ -2174,3 +2174,13 @@ label {
   vertical-align: middle;
   padding: 15px;
 }
+
+.validation:invalid {
+    border-color: red;
+}
+
+.eventlog-status {
+  display: inline-block;
+  margin-right: 8px;
+  float: left;
+}

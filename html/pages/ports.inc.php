@@ -38,7 +38,7 @@ foreach ($menu_options as $option => $text) {
     }
     $sep = " | ";
 }
-$displayLists .= '&nbsp;&nbsp;<span style="font-weight: bold;">Graphs</span> &#187';
+$displayLists .= '&nbsp;&nbsp;<span style="font-weight: bold;">Graphs</span> &#187;&nbsp;';
 
 $menu_options = array('bits' => 'Bits',
     'upkts' => 'Unicast Packets',

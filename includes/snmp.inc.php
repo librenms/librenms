@@ -239,7 +239,7 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
         if (str_contains($entry, '=')) {
             list($oid,$value)  = explode('=', $entry, 2);
             $oid               = trim($oid);
-            $value             = trim($value, "\" \n\r");
+            $value             = trim($value, "\\\" \n\r");
             if (!strstr($value, 'at this OID') && isset($oid)) {
                 $array[$oid] = $value;
             }
@@ -308,6 +308,45 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
 }
 
 /**
+ * Calls snmpgetnext for multiple OIDs.  Getnext returns the next oid after the specified oid.
+ * For example instead of get sysName.0, you can getnext sysName to get the .0 value.
+ *
+ * @param array $device Target device
+ * @param string $oids The oids to getnext
+ * @param string $options Options to pass to snmpgetnext (-OQUs for example)
+ * @param string $mib The MIB to use
+ * @param string $mibdir Optional mib directory to search
+ * @return array|false the output or false if the data could not be fetched
+ */
+
+function snmp_getnext_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir = null, $array = array())
+{
+    $time_start = microtime(true);
+    if (is_array($oids)) {
+        $oids = implode(' ', $oids);
+    }
+    $snmpcmd  = Config::get('snmpgetnext', 'snmpgetnext');
+    $cmd = gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir);
+    $data = trim(external_exec($cmd), "\" \n\r");
+
+    foreach (explode("\n", $data) as $entry) {
+        list($oid,$value)  = explode('=', $entry, 2);
+        $oid               = trim($oid);
+        $value             = trim($value, "\" \n\r");
+        list($oid, $index) = explode('.', $oid, 2);
+        if (!str_contains($value, 'at this OID')) {
+            if (empty($oid)) {
+                continue; // no index or oid
+            } else {
+                $array[$oid] = $value;
+            }
+        }
+    }
+    recordSnmpStatistic('snmpgetnext', $time_start);
+    return $array;
+}//end snmp_getnext_multi()
+
+/**
  * @param $device
  * @return bool
  */
@@ -342,11 +381,9 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
     if (is_string($data) && (preg_match('/No Such (Object|Instance)/i', $data))) {
         $data = false;
     } else {
-        if (preg_match('/No more variables left in this MIB View \(It is past the end of the MIB tree\)$/', $data)) {
-            // Bit ugly :-(
-            $d_ex = explode("\n", $data);
-            unset($d_ex[(count($d_ex) - 1)]);
-            $data = implode("\n", $d_ex);
+        if (ends_with($data, '(It is past the end of the MIB tree)')) {
+            $no_more_pattern = '/.*No more variables left in this MIB View \(It is past the end of the MIB tree\)[\n]?/';
+            $data = preg_replace($no_more_pattern, '', $data);
         }
     }
 
@@ -583,11 +620,12 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = null, $mibdir =
  * @param string $mib The MIB to use
  * @param int $depth how many indexes to group
  * @param array $array optionally insert the entries into an existing array (helpful for grouping multiple walks)
+ * @param string $mibdir custom mib dir to search for mib
  * @return array grouped array of data
  */
-function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array())
+function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array(), $mibdir = null)
 {
-    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUsetX', $mib);
+    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUsetX', $mib, $mibdir);
     $data = rtrim(external_exec($cmd));
 
     $line = strtok($data, "\n");

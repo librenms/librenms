@@ -6,7 +6,7 @@ mib_dir:
     - logmaster
 discovery:
     -
-      sysObjectId: .1.3.6.1.4.1.935
+      sysObjectID: .1.3.6.1.4.1.935
       sysDescr: 'LogWeb'
 discovery_modules:
     arp-table: 0
