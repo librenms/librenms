@@ -554,7 +554,8 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
     $has_min = false;
     reset($rrdinfo['RRA']);
     $l_max = 0;
-    while (list($k, $v) = each($rrdinfo['RRA'])) {
+
+    foreach ($rrdinfo['RRA'] as $k => $v) {
         if ($v['cf'] == 'MAX') {
             $has_max = true;
         } elseif ($v['cf'] == 'AVERAGE') {
@@ -566,11 +567,11 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
 
     // Build legend. This may not work for all RRDs, i don't know :)
     if ($has_avg) {
-        $graph[] = 'COMMENT:           Last';
+        $graph[] = 'COMMENT:               Last';
     }
 
     if ($has_min) {
-        $graph[] = 'COMMENT:   Min';
+        $graph[] = 'COMMENT:  Min';
     }
 
     if ($has_max) {
@@ -582,7 +583,8 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
     }
 
     reset($rrdinfo['DS']);
-    while (list($k, $v) = each($rrdinfo['DS'])) {
+
+    foreach ($rrdinfo['DS'] as $k => $v) {
         if (strlen($k) > $l_max) {
             $l_max = strlen($k);
         }
@@ -603,7 +605,7 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
     if ($has_min && $has_max || $has_min && $has_avg || $has_avg && $has_max) {
         $n = 1;
         reset($rrdinfo['DS']);
-        while (list($k, $v) = each($rrdinfo['DS'])) {
+        foreach ($rrdinfo['DS'] as $k => $v) {
             $graph[] = sprintf('LINE:%s_%s', $k, $has_min ? 'min' : 'avg');
             $graph[] = sprintf('CDEF:%s_var=%s_%s,%s_%s,-', $k, $k, $has_max ? 'max' : 'avg', $k, $has_min ? 'min' : 'avg');
             $graph[] = sprintf('AREA:%s_var#%s::STACK', $k, rrd_get_color($n++, false));
@@ -612,14 +614,14 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
 
     reset($rrdinfo['DS']);
     $n = 1;
-    while (list($k, $v) = each($rrdinfo['DS'])) {
+    foreach ($rrdinfo['DS'] as $k => $v) {
         $graph[] = sprintf('LINE1:%s_avg#%s:%s ', $k, rrd_get_color($n++, true), $k . substr('                  ', 0, ($l_max - strlen($k))));
         if (isset($opts['tinylegend']) && $opts['tinylegend']) {
             continue;
         }
 
         if ($has_avg) {
-            $graph[] = sprintf('GPRINT:%s_avg:AVERAGE:%%5.1lf%%s', $k, $has_max || $has_min || $has_avg ? ',' : '\\l');
+            $graph[] = sprintf('GPRINT:%s_avg:LAST:%%5.1lf%%s', $k);
         }
 
         if ($has_min) {
@@ -631,9 +633,9 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
         }
 
         if ($has_avg) {
-            $graph[] = sprintf('GPRINT:%s_avg:LAST:%%5.1lf%%s\\l', $k);
+            $graph[] = sprintf('GPRINT:%s_avg:AVERAGE:%%5.1lf%%s\\l', $k);
         }
-    }//end while
+    }
 
     // $rrd_cmd = array(RRDTOOL, 'graph', '-', '-E', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-t', $rrdfile);
     $rrd_cmd = array(
