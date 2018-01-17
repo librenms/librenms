@@ -371,10 +371,12 @@ if ($format == "graph") {
     ';
 
     if ($subformat == "detail") {
-        echo '<th data-column-id="icon" data-width="80px" data-sortable="false" data-searchable="false" data-formatter="icon">Vendor</th>';
+        echo '<th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false">&nbsp;</th>';
+        echo '<th data-column-id="icon" data-width="70px" data-searchable="false" data-formatter="icon">Vendor</th>';
     }
 
     if ($subformat != "detail") {
+        echo '<th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false">&nbsp;</th>';
         echo '<th data-column-id="hostname" data-order="asc" data-formatter="device">Device</th>';
     } else {
         echo '<th data-column-id="hostname" data-order="asc">Device</th>';
@@ -411,14 +413,14 @@ if ($format == "graph") {
             rowCount: [50, 100, 250, -1],
             columnSelection: true,
             formatters: {
-                "msg": function (column, row) {
-                    return "<span class=\"alert-status\">" + row.msg + "</span>";
+                "status": function (column, row) {
+                    return "<span class=\"alert-status " + row.extra + "\"></span>";
                 },
                 "icon": function (column, row) {
-                    return "<span class='alert-status " + row.extra + "' style='float:left;'></span><span class=\"device-table-icon\">" + row.icon + "</span>";
+                    return "<span class=\"device-table-icon\">" + row.icon + "</span>";
                 },
                 "device": function (column, row) {
-                    return "<span class='alert-status " + row.extra + "' style='float:left;margin-right:10px;'></span><span style=''>" + row.hostname + "</span>";
+                    return "<span>" + row.hostname + "</span>";
                 },
             },
             templates: {
