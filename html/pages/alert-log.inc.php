@@ -35,7 +35,8 @@ echo '<div class="panel panel-default panel-condensed">
     <table id="alertlog" class="table table-hover table-condensed table-striped">
         <thead>
         <tr>
-            <th data-column-id="time_logged" data-order="desc" data-formatter="timestamp">Timestamp</th>
+            <th data-column-id="state" data-width="7px" data-formatter="status">&nbsp;</th>
+            <th data-column-id="time_logged" data-order="desc">Timestamp</th>
             <th data-column-id="details" data-sortable="false">&nbsp;</th>
             <th data-column-id="hostname">Device</th>
             <th data-column-id="alert">Alert</th>
@@ -51,8 +52,8 @@ echo '<div class="panel panel-default panel-condensed">
         ajax: true,
         rowCount: [50, 100, 250, -1],
         formatters: {
-          'timestamp': function (column, row) {
-              return "<span class='alert-status " + row.status + "' style='float:left;margin-right:10px;'></span>"+ row.time_logged +"";
+          'status': function (column, row) {
+              return "<span class='alert-status " + row.status + "'></span>";
           },
         },
         templates: {
