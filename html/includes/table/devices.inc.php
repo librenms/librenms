@@ -141,7 +141,6 @@ foreach (dbFetchRows($sql, $param) as $device) {
 
     if ($device['ignore'] == '1') {
         $extra = 'label-default';
-        $msg = 'ignored';
         if ($device['status'] == '1') {
             $extra = 'label-warning';
         }
