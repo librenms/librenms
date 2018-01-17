@@ -18,6 +18,8 @@
 
 error_reporting((E_ALL | E_NOTICE | E_WARNING));
 
+$pagetitle[] = 'CollectD';
+
 require 'includes/collectd/config.php';
 require 'includes/collectd/functions.php';
 require 'includes/collectd/definitions.php';
@@ -46,9 +48,7 @@ function dhtml_response_list(&$items, $method)
     print ('</response>');
 }//end dhtml_response_list()
 
-
-print_optionbar_start();
-
+echo '<br>';
 $link_array = array(
     'page'   => 'device',
     'device' => $device['device_id'],
@@ -57,19 +57,20 @@ $link_array = array(
 
 $plugins = collectd_list_plugins($device['hostname']);
 unset($sep);
+$displayLists = '';
 foreach ($plugins as &$plugin) {
     if (!$vars['plugin']) {
         $vars['plugin'] = $plugin;
     }
 
-    echo $sep;
+    $displayLists .= $sep;
     if ($vars['plugin'] == $plugin) {
-        echo "<span class='pagemenu-selected'>";
+        $displayLists .= "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link(htmlspecialchars($plugin), $link_array, array('plugin' => $plugin));
+    $displayLists .= generate_link(htmlspecialchars(pretty_plugins_name($plugin)), $link_array, array('plugin' => $plugin));
     if ($vars['plugin'] == $plugin) {
-        echo '</span>';
+        $displayLists .= '</span>';
     }
 
     $sep = ' | ';
@@ -77,9 +78,11 @@ foreach ($plugins as &$plugin) {
 
 unset($sep);
 
-print_optionbar_end();
-
-$i = 0;
+echo '<div class="panel panel-default panel-condensed">';
+echo '<div class="panel-heading">';
+echo $displayLists;
+echo '</div>';
+echo '<div class="panel-body">';
 
 $pinsts = collectd_list_pinsts($device['hostname'], $vars['plugin']);
 foreach ($pinsts as &$instance) {
@@ -92,22 +95,17 @@ foreach ($pinsts as &$instance) {
         }
 
         foreach ($typeinstances as &$tinst) {
-            $i++;
-            if (!is_integer($i / 2)) {
-                $row_colour = $list_colour_a;
-            } else {
-                $row_colour = $list_colour_b;
-            }
-
-            echo '<div style="background-color: '.$row_colour.';">';
-            echo '<div class="graphhead" style="padding:4px 0px 0px 8px;">';
             if ($tinst) {
-                echo $vars['plugin']." $instance - $type - $tinst";
+                $title = pretty_datas_name($type) .' &#187; '. $tinst;
             } else {
-                echo $vars['plugin']." $instance - $type";
+                $title = pretty_datas_name($type);
             }
 
+            echo '<div class="panel panel-default panel-condensed">';
+            echo '<div class="panel-heading">';
+            echo $title;
             echo '</div>';
+            echo '<div class="panel-body">';
 
             $graph_array['type']   = 'device_collectd';
             $graph_array['device'] = $device['device_id'];
@@ -120,8 +118,9 @@ foreach ($pinsts as &$instance) {
             include 'includes/print-graphrow.inc.php';
 
             echo '</div>';
+            echo '</div>';
         }
     }
 }
 
-$pagetitle[] = 'CollectD';
+
