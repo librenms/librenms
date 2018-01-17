@@ -27,7 +27,7 @@ discovery_modules:
     cisco-mac-accounting: 0
     cisco-otv: 0
     cisco-pw: 0
-    cisco-vrf: 0
+    vrf: 0
     cisco-vrf-lite: 0
 mib_dir:
     - cisco
