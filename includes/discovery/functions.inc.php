@@ -1150,10 +1150,14 @@ function sensors($types, $device, $valid, $pre_cache = array())
 function build_bgp_peers($device, $data, $peer2)
 {
     d_echo("Peers : $data\n");
-    $peers = trim(str_replace('ARISTA-BGP4V2-MIB::aristaBgp4V2PeerRemoteAs.1.', '', $data));
-    $peers = trim(str_replace('CISCO-BGP4-MIB::cbgpPeer2RemoteAs.', '', $peers));
-    $peers = trim(str_replace('BGP4-MIB::bgpPeerRemoteAs.', '', $peers));
-    $peers  = trim(str_replace('.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.', '', $peers));
+    $remove = array(
+        'ARISTA-BGP4V2-MIB::aristaBgp4V2PeerRemoteAs.1.',
+        'CISCO-BGP4-MIB::cbgpPeer2RemoteAs.',
+        'BGP4-MIB::bgpPeerRemoteAs.',
+        '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.',
+    );
+    $peers = trim(str_replace($remove, '', $data));
+
     $peerlist = array();
     $ver = '';
     foreach (explode("\n", $peers) as $peer) {

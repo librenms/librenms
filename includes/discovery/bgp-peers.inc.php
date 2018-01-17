@@ -31,7 +31,7 @@ if (Config::get('enable_bgp')) {
                 $peers_data = snmp_walk($device, 'jnxBgpM2PeerRemoteAs', '-Onq', 'BGP4-V2-MIB-JUNIPER', 'junos');
             } elseif ($device['os_group'] === 'cisco') {
                 $peers_data = snmp_walk($device, 'cbgpPeer2RemoteAs', '-Oq', 'CISCO-BGP4-MIB');
-                $peer2 = !empty($peer);
+                $peer2 = !empty($peers_data);
             }
 
             if (empty($peers_data)) {
