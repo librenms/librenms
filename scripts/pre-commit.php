@@ -7,11 +7,13 @@ chdir($install_dir);
 
 require $install_dir . '/vendor/autoload.php';
 
-$short_opts = 'lsufpch';
+$short_opts = 'lsufpcho:m:';
 $long_opts = array(
     'lint',
     'style',
     'unit',
+    'os:',
+    'module:',
     'fail-fast',
     'passthru',
     'snmpsim',
@@ -27,6 +29,8 @@ Running $filename without options runs all checks.
   -l, --lint      Run php lint checks to test for valid syntax
   -s, --style     Run phpcs check to check for PSR-2 compliance
   -u, --unit      Run phpunit tests
+  -o, --os        Specific OS to run tests on. Implies --unit, --db, --snmpsim
+  -m, --module    Specific Module to run tests on. Implies --unit, --db, --snmpsim
   -f, --fail-fast Quit when any failure is encountered
   -p, --passthru  Display output from checks as it comes
       --db        Run unit tests that require a database
@@ -46,6 +50,21 @@ $completed_tests = array(
     'style' => false,
     'unit' => false,
 );
+
+if ($os = check_opt($options, 'os', 'o')) {
+    // enable unit tests, snmpsim, and db
+    $options['u'] = false;
+    $options['snmpsim'] = false;
+    $options['db'] = false;
+}
+
+if ($module = check_opt($options, 'm', 'module')) {
+    putenv("TEST_MODULES=$module");
+    // enable unit tests, snmpsim, and db
+    $options['u'] = false;
+    $options['snmpsim'] = false;
+    $options['db'] = false;
+}
 
 $all = !check_opt($options, 'l', 'lint', 's', 'style', 'u', 'unit');
 if ($all) {
@@ -69,7 +88,7 @@ foreach (array_keys($options) as $opt) {
     } elseif ($opt == 's' || $opt == 'style') {
         $ret = run_check('style', $passthru, $command_only);
     } elseif ($opt == 'u' || $opt == 'unit') {
-        $ret = run_check('unit', $passthru, $command_only, $fail_fast);
+        $ret = run_check('unit', $passthru, $command_only, compact('fail_fast', 'os', 'module'));
     }
 
     if ($fail_fast && $ret !== 0 && $ret !== 250) {
@@ -93,11 +112,10 @@ exit($return); //return the combined/single return value of tests
  * @param string $type type of check lint, style, or unit
  * @param bool $passthru display the output as comes in
  * @param bool $command_only only display the intended command, no checks
- * @param bool $fail_fast Quit as soon as possible if error or failure
- * @param bool $snmpsim Use snmpsim
+ * @param array $options command specific options
  * @return int the return value from the check (0 = success)
  */
-function run_check($type, $passthru, $command_only, $fail_fast = false, $snmpsim = false)
+function run_check($type, $passthru, $command_only, $options = array())
 {
     global $completed_tests;
     if (getenv('SKIP_' . strtoupper($type) . '_CHECK') || $completed_tests[$type]) {
@@ -108,7 +126,7 @@ function run_check($type, $passthru, $command_only, $fail_fast = false, $snmpsim
     $function = 'check_' . $type;
     if (function_exists($function)) {
         $completed_tests[$type] = true;
-        return $function($passthru, $command_only, $fail_fast, $snmpsim);
+        return $function($passthru, $command_only, $options);
     }
 
     return 1;
@@ -208,17 +226,25 @@ function check_style($passthru = false, $command_only = false)
  *
  * @param bool $passthru display the output as comes in
  * @param bool $command_only only display the intended command, no checks
- * @param bool $fail_fast Stop when any error or failure is encountered
+ * @param array $options Supported: fail_fast, os, module
  * @return int the return value from phpunit (0 = success)
  */
-function check_unit($passthru = false, $command_only = false, $fail_fast = false)
+function check_unit($passthru = false, $command_only = false, $options = array())
 {
     $phpunit_bin = check_exec('phpunit');
 
     $phpunit_cmd = "$phpunit_bin --colors=always";
 
-    if ($fail_fast) {
+    if ($options['fail_fast']) {
         $phpunit_cmd .= ' --stop-on-error --stop-on-failure';
+    }
+
+    if ($options['os']) {
+        $phpunit_cmd .= " --group os --filter \"@{$options['os']}.*\"";
+    }
+
+    if ($options['module']) {
+        $phpunit_cmd .= ' tests/OSModulesTest.php';
     }
 
     if ($command_only) {
@@ -257,8 +283,17 @@ function check_opt($options)
     $args = func_get_args();
     array_shift($args);
 
-    $intersect = array_intersect(array_keys($options), $args);
-    return !empty($intersect);
+    foreach ($args as $option) {
+        if (isset($options[$option])) {
+            if ($options[$option] === false) {
+                // no data, return that option is enabled
+                return true;
+            }
+            return $options[$option];
+        }
+    }
+
+    return false;
 }
 
 /**

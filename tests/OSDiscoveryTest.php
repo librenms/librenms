@@ -25,45 +25,42 @@
 
 namespace LibreNMS\Tests;
 
+use LibreNMS\Config;
 use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
 class OSDiscoveryTest extends TestCase
 {
     private static $unchecked_files;
 
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+
+        $glob = Config::get('install_dir') . "/tests/snmpsim/*.snmprec";
+
+        self::$unchecked_files = array_flip(array_map(function ($file) {
+            return basename($file, '.snmprec');
+        }, glob($glob)));
+    }
+
     /**
      * Populate a list of files to check and make sure it isn't empty
      */
     public function testHaveFilesToTest()
     {
-        global $config;
-
-        $glob = $config['install_dir'] . "/tests/snmpsim/*.snmprec";
-
-        self::$unchecked_files = array_flip(array_map(function ($file) {
-            return basename($file, '.snmprec');
-        }, glob($glob)));
-
         $this->assertNotEmpty(self::$unchecked_files);
     }
 
     /**
      * Test each OS provided by osProvider
      *
-     * @depends      testHaveFilesToTest
+     * @group os
      * @dataProvider osProvider
      * @param $os_name
      */
     public function testOS($os_name)
     {
-        global $config;
-
-        $this->assertNotEmpty(
-            self::$unchecked_files,
-            'Something wrong with the tests, $unchecked_files should be populated'
-        );
-
-        $glob = $config['install_dir'] . "/tests/snmpsim/$os_name*.snmprec";
+        $glob = Config::get('install_dir') . "/tests/snmpsim/$os_name*.snmprec";
         $files = array_map(function ($file) {
             return basename($file, '.snmprec');
         }, glob($glob));
@@ -88,7 +85,10 @@ class OSDiscoveryTest extends TestCase
      */
     public function testAllFilesTested()
     {
-        $this->assertEmpty(self::$unchecked_files);
+        $this->assertEmpty(
+            self::$unchecked_files,
+            "Not all snmprec files were checked: " . print_r(array_keys(self::$unchecked_files), true)
+        );
     }
 
     /**
@@ -140,10 +140,9 @@ class OSDiscoveryTest extends TestCase
      */
     public function osProvider()
     {
-        global $config;
-
         // make sure all OS are loaded
-        if (count($config['os']) < count(glob($config['install_dir'].'/includes/definitions/*.yaml'))) {
+        $config_os = array_keys(Config::get('os'));
+        if (count($config_os) < count(glob(Config::get('install_dir').'/includes/definitions/*.yaml'))) {
             load_all_os();
         }
 
@@ -152,11 +151,12 @@ class OSDiscoveryTest extends TestCase
             'generic',
             'ping',
         );
-        $all_os = array_diff(array_keys($config['os']), $excluded_os);
+        $filtered_os = array_diff($config_os, $excluded_os);
 
-        array_walk($all_os, function (&$os) {
-            $os = array($os);
-        });
+        $all_os = array();
+        foreach ($filtered_os as $os) {
+            $all_os[$os] = array($os);
+        }
 
         return $all_os;
     }

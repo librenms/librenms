@@ -1,7 +1,7 @@
 <?php
 
-if (starts_with($sysDescr, 'Linux') || starts_with($sysObjectId, '.1.3.6.1.4.1.8072.3.2.10')) {
-    if (starts_with($sysObjectId, array('.1.3.6.1.4.1.10002.1', '.1.3.6.1.4.1.41112.1.4'))
+if (starts_with($device['sysDescr'], 'Linux') || starts_with($device['sysObjectID'], '.1.3.6.1.4.1.8072.3.2.10')) {
+    if (starts_with($device['sysObjectID'], array('.1.3.6.1.4.1.10002.1', '.1.3.6.1.4.1.41112.1.4'))
         || str_contains(snmp_walk($device, 'dot11manufacturerName', '-Osqnv', 'IEEE802dot11-MIB'), 'Ubiquiti')
     ) {
         $os = 'airos';

@@ -63,7 +63,7 @@ $config['discovery_modules']['mempools']             = 1;
 $config['discovery_modules']['cisco-vrf-lite']       = 1;
 $config['discovery_modules']['cisco-mac-accounting'] = 0;
 $config['discovery_modules']['cisco-pw']             = 0;
-$config['discovery_modules']['cisco-vrf']            = 0;
+$config['discovery_modules']['vrf']                  = 0;
 $config['discovery_modules']['cisco-cef']            = 0;
 $config['discovery_modules']['cisco-sla']            = 0;
 $config['discovery_modules']['cisco-cbqos']          = 0;
@@ -152,7 +152,7 @@ $config['os']['linux']['discovery_modules']['discovery-arp'] = 1;
 
 `cisco-pw`: Pseudowires wires detection and support.
 
-`cisco-vrf`: VRF detection and support.
+`vrf`: VRF detection and support.
 
 `cisco-cef`: CEF detection and support.
 

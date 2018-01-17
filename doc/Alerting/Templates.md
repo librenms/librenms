@@ -92,6 +92,25 @@ Outbound Utilization: {calc (((%value.ifOutOctets_rate8)/%value.ifSpeed)100)}%
 {/if}
 ```
 
+Storage:
+```text
+
+%title
+
+Device Name: %sysName
+Severity: %severity 
+Uptime: %uptime_short
+{if %state == 0}Time elapsed: %elapsed{/if}
+Timestamp: %timestamp
+Location: %location
+Description: %description
+Features: %features
+Purpose: %purpose
+Notes: %notes
+
+Server: %sysName {foreach %faults}Mount Point: %value.storage_descr Percent Utilized: %value.storage_perc{/foreach}
+```
+
 Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:
 ```text
 {if %transport == mail}<a href="https://my.librenms.install/device/device=%hostname/">%hostname</a>

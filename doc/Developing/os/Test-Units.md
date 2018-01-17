@@ -9,15 +9,18 @@ Saved snmp data can be found in `tests/snmpsim/*.snmprec` and saved database dat
 Please review this for any sensitive data **before** submitting.  When replacing data, make sure it is modified in a
 consistent manner.
 
-We utilise [snmpsim](http://snmpsim.sourceforge.net/) to do unit testing. For OS discovery, we can mock snmpsim, but
-for other tests you will need it installed and functioning.  We run snmpsim during our integration tests, but not by
-default when running `./scripts/pre-commit.php`.
+> We utilise [snmpsim](http://snmpsim.sourceforge.net/) to do unit testing. For OS discovery, we can mock snmpsim, but
+> for other tests you will need it installed and functioning.  We run snmpsim during our integration tests, but not by
+> default when running `./scripts/pre-commit.php`.
 
 ## Capturing test data
 
 `./scripts/save-tests-data.php` is provided to make it easy to collect data for tests.  Running save-tests-data.php with
 the --hostname (-h) allows you to capture all data used to discover and poll a device already added to LibreNMS.  Make sure to
 re-run the script if you add additional support. Check the command-line help for more options.
+
+Generally, you will only need to capture data (-h) once.  After you have the data you need in the snmprec file, you can
+update the json using -o (and -v if using a variant) after that.
 
 ### OS Variants
 
@@ -29,7 +32,15 @@ one variant, please do not specify one.
 
 After you have saved your test data, you should run `./scripts/pre-commit.php -p -u` verify they pass.
 
-To run the full suite of tests enable db and snmpsim reliat tests: `./scripts/pre-commit.php --db --snmpsim -p -u`
+To run the full suite of tests enable database and snmpsim reliant tests: `./scripts/pre-commit.php --db --snmpsim -p -u`
+
+#### Specific OS
+
+`./scripts/pre-commit.php -p -o osname`
+
+#### Specific Module
+
+`./scripts/pre-commit.php -p -m modulename`
 
 ## Using snmpsim for testing
 
@@ -80,3 +91,25 @@ Hex encoded strings (4x) should be used for any strings that contain line return
 ## New discovery/poller modules
 
 New discovery or poller modules should define database capture parameters in `/tests/module_tables.yaml`.
+
+## Example workflow
+If the base os (<os>.snmprec) already contains test data for the module you are testing or that data conflicts with your new
+data, you must use a variant to store your test data (-v).
+
+### Add initial detection
+1. Add device to LibreNMS. It is generic and device_id = 42
+2. Run `./scripts/save-test-data.php -h 42 -m os`, initial snmprec will be created
+3. [Add initial detection](Initial-Detection.md) for `example-os`
+4. Run discovery to make sure it detects properly `./discovery.php -h 42`
+5. Add any additional os items like version, hardware, features, or serial.
+6. If there is additional snmp data required, run `./scripts/save-test-data.php -h 42 -m os` otherwise, run `./scripts/save-test-data.php -o example-os -m os`
+7. Review data. If you modified the snmprec (don't modify json manually) run `./scripts/save-test-data.php -o example-os -m os`
+8. Run `./scripts/pre-commit.php --db --snmpsim`
+9. If the tests succeed submit a pull request
+
+### Additional module support or test data
+1. Add code to support module or support already exists.
+2. `./scripts/save-test-data.php -h 42 -m <module>`, this will add more data to the snmprec file
+3. Review data. If you modified the snmprec (don't modify json manually) run `./scripts/save-test-data.php -o example-os -m <module>`
+4. Run `./scripts/pre-commit.php --db --snmpsim`
+5. If the tests succeed submit a pull request

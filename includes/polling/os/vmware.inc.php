@@ -16,10 +16,10 @@ $data     = snmp_get_multi($device, 'VMWARE-SYSTEM-MIB::vmwProdName.0 VMWARE-SYS
 $hardware_snmp = snmp_get($device, 'entPhysicalDescr.1', '-OsvQU', 'ENTITY-MIB');
 
 if (preg_match('/VMware-vCenter-Server-Appliance/', $data[0]['vmwProdBuild'])) {
-    preg_match('/^(?>\S+\s){1,2}/', $poll_device['sysDescr'], $ver);
+    preg_match('/^(?>\S+\s){1,2}/', $device['sysDescr'], $ver);
     $version = $ver[0];
 
-    preg_match('/(\d){7}/', $poll_device['sysDescr'], $feat);
+    preg_match('/(\d){7}/', $device['sysDescr'], $feat);
     $features = 'build-'.$feat[0];
 
     preg_match('/^(?>\S+\s*){1,4}/', $hardware_snmp, $hard);

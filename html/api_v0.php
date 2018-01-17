@@ -33,6 +33,10 @@ if (Config::get('api.cors.enabled') === true) {
 require $config['install_dir'] . '/html/includes/api_functions.inc.php';
 $app->setName('api');
 
+$app->notFound(function () use ($app) {
+    api_error(404, "This API route doesn't exist.");
+});
+
 $app->group(
     '/api',
     function () use ($app) {

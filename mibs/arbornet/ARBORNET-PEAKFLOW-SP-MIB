@@ -1,0 +1,1775 @@
+--
+--   
+-- ARBOR NETWORKS
+-- 
+--
+--
+--   File:		ARBORNET-SP.txt
+--   Created:		August 28, 2002
+--   Purpose:		Peakflow SP MIB
+--		describe any data which we provide
+--		describe any traps which we send
+--
+--
+
+PEAKFLOW-SP-MIB	DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	TimeTicks,
+	Unsigned32, 
+	Integer32,
+	IpAddress
+                FROM SNMPv2-SMI
+	Counter32
+                FROM SNMPv2-SMI
+	Counter64
+                FROM SNMPv2-SMI
+	CounterBasedGauge64
+                FROM HCNUM-TC
+        DisplayString
+                FROM SNMPv2-TC
+	arbornetworksProducts
+		FROM ARBOR-SMI
+	pdosAnomalyDirection,
+	pdosAnomalyStart,
+	pdosAnomalyDuration,
+	pdosAnomalyClassification,
+	pdosUrl
+		FROM PEAKFLOW-DOS-MIB
+	InetAddressType,
+	InetAddress	
+	        FROM INET-ADDRESS-MIB;
+
+
+-- =================================================================================
+
+peakflowSPMIB MODULE-IDENTITY
+	LAST-UPDATED "201612060000Z" -- December 6, 2016
+	ORGANIZATION "Arbor Networks, Inc."
+	CONTACT-INFO
+		"	Arbor Networks, Inc.
+			Arbor Technical Assistance Center
+
+			Postal: 76 Blanchard Road
+				Burlington, MA 01803
+				USA
+
+			Tel: +1 866 212 7267 (toll free)
+			     +1 781 362 4300
+			Email: support@arbor.net "
+
+	DESCRIPTION
+		"Peakflow SP MIB"
+
+	-- Revision log, reverse chrono
+	REVISION    "201612060000Z" -- December 6, 2016
+	DESCRIPTION "Added spTMSMultiDiversionPrefix.
+		     Deprecated mitigationTMSStart trap and created a new trap
+		     mitigationTMSStartV2 which includes a new
+		     spTMSMultiDiversionPrefix object."
+
+	REVISION    "201601110000Z" -- January 11, 2015
+	DESCRIPTION "Increase SIZE of spLicenseErrDescription"
+
+	REVISION    "201511200000Z" -- November 20, 2015
+	DESCRIPTION "Add trap for Cloud Signaling Fault"
+
+	REVISION	"201404040000Z" -- April 4, 2014
+	DESCRIPTION "Add spGreTunnelName to greDown and greDownDone"
+
+	REVISION    "201312040000Z" -- December 4, 2013
+	DESCRIPTION "Add spInterfaceSpeedHC, a 64-bit version
+				 of spInterfaceSpeed.
+				 Add spInterfaceUsageHC, a 64-bit version
+				 of spInterfaceUsage."
+
+	REVISION    "201310030000Z" -- October 3, 2013
+	DESCRIPTION "Add deviceTotalFlowsHC, a 64-bit version
+				 of deviceTotalFlows.
+				 Deprecate deviceTotalFlows."
+
+	REVISION    "201308190000Z" -- August 19, 2013
+	DESCRIPTION "Updated contact information"
+
+	REVISION    "201301150000Z" -- January 15, 2013
+	DESCRIPTION "Add traps concerning license limits"
+
+	REVISION    "201207300000Z" -- July 30, 2012
+	DESCRIPTION "Add spTMSMultiPrefix object type.
+		     Update mitigationTMSStart trap to include
+		     spTMSMultiPrefix object."
+
+	REVISION    "201205130000Z" -- May 13, 2012
+	DESCRIPTION "Add spDetector object type.
+		     Update collectorDown trap to include spDetector object."
+
+	REVISION    "201106030000Z" -- June 3, 2011
+	DESCRIPTION "Added cloud signaling alert notification"
+
+	REVISION    "201006080000Z" -- June 8, 2010
+	DESCRIPTION "Removed duration from trafficAutoMitigation"
+
+	REVISION    "201005200000Z" -- May 20, 2010
+	DESCRIPTION "Add detected country data to Profiled network alert
+                     traps.
+		     Add notifications for routing failover alerts.
+		     Update max-access of notification related objects with
+		     their proper status."
+
+	REVISION    "200909240000Z" -- September 24, 2009
+	DESCRIPTION "Add trap types for DoS Network Profiled and Host alerts.
+                     Import from INET-ADDRESS-MIB for using
+                     InetAddressType and InetAddress for Internet addresses."
+
+	REVISION    "200904010000Z" -- April 1, 2009
+	DESCRIPTION "Update obsolete traps."
+
+	REVISION    "200903300000Z" -- March 30, 2009
+	DESCRIPTION "Update contact group name."
+
+	REVISION    "200902020000Z" -- February 02, 2009
+	DESCRIPTION "Add trap types for service threshold alerts."
+
+	REVISION    "200812160000Z" -- December 16, 2008
+	DESCRIPTION "Add trap types for fingerprint threshold alerts."
+
+	REVISION    "200811130000Z" -- November 13, 2008
+	DESCRIPTION "Update company address."
+
+	REVISION    "200805190000Z" -- May 19, 2008
+	DESCRIPTION "Increased size of spTMSCommunity to 255 octets."
+
+	REVISION    "200802190000Z" -- February 19, 2008
+	DESCRIPTION "Add trap types for device system error alerts."
+
+	REVISION    "200802110000Z" -- February 11, 2008
+	DESCRIPTION "Add trap types for spcomm and gre alerts."
+
+	REVISION    "200708070000Z" -- August 7, 2007
+	DESCRIPTION "Use flowspec OBJECTS in mitigationFlowspecStart
+	             instead of blackhole OBJECTS.
+		     
+		     Clean up MIB compilation errors."
+
+	REVISION    "200604260000Z" -- April 26, 2006
+	DESCRIPTION "Add trap type for DPI DNS baseline alerts."
+
+	REVISION    "200603230000Z" -- March 23, 2006
+	DESCRIPTION "Revise pollable SP device management types."
+
+	REVISION    "200511140000Z" -- November 14, 2005
+	DESCRIPTION "Add pollable SP device management types."
+
+	REVISION    "200510190000Z" -- October 19, 2005
+	DESCRIPTION "Add trap types for fingerprint sharing events."
+
+	REVISION    "200509120000Z" -- September 12, 2005
+	DESCRIPTION "Apply fixes from validation."
+
+	REVISION    "200508230000Z" -- August 23, 2005
+	DESCRIPTION "Change spHijackASPath references to spHijackAttr."
+
+	REVISION    "200505170100Z" -- May 17, 2005
+	DESCRIPTION "Change spAnomalyRouter references to spRouter."
+
+	REVISION    "200505170000Z" -- May 17, 2005
+	DESCRIPTION "Add trap type for hardware failure."
+
+	REVISION    "200502110000Z" -- Feburary 11, 2005
+	DESCRIPTION "Add trap types for managed object usage alerts."
+
+	REVISION    "200412100000Z" -- December 10, 2004
+	DESCRIPTION "Add trap types bgpInstabilityDone and interfaceUsageDone
+		     for ending bgp instability and interface usage alerts."
+
+	REVISION    "200403300000Z" -- March 30, 2004
+	DESCRIPTION "Increase spInterface name to 256 characters from 64."
+
+	REVISION    "200208280000Z" -- August 28, 2002
+	DESCRIPTION "Initial writing and import."
+
+	::= { arbornetworksProducts 4 }
+
+
+peakflowSPCMI OBJECT IDENTIFIER ::= { peakflowSPMIB 1 }
+peakflowSPMgr OBJECT IDENTIFIER ::= { peakflowSPMIB 2 }
+peakflowSPTraps OBJECT IDENTIFIER ::= { peakflowSPMIB 3 }
+
+
+-- =================================================================================
+
+
+-- =================================================================================
+--
+-- decorated data
+--
+
+spCollector OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"SP Device name"
+	::= { peakflowSPCMI 1 }
+
+spRouter	OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Router name"
+	::= { peakflowSPCMI 2 }
+	
+spInterface	OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (1..256))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Interface name"
+	::= { peakflowSPCMI 3 }
+
+spInterfaceIndex	OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Interface SNMP Index"
+	::= { peakflowSPCMI 4 }
+
+spDuration OBJECT-TYPE
+	SYNTAX 	TimeTicks
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Duration (in centi-seconds)"
+	::= { peakflowSPCMI 5 }
+
+spBGPEvent OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The event that caused a BGP transition"
+	::= { peakflowSPCMI 6 }
+
+spBGPInstability	OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"BGP instability update count"
+	::= { peakflowSPCMI 7 }
+
+spBGPTrapName OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The name of the triggered trap"
+	::= { peakflowSPCMI 8 }
+
+spBGPTrapEvent OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The event that triggered the trap"
+	::= { peakflowSPCMI 9 }
+
+spBGPTrapPrefix OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The prefix that experienced the trap event"
+	::= { peakflowSPCMI 10 }
+
+spBGPTrapOldAttributes OBJECT-TYPE
+	SYNTAX 	DisplayString 
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The old attributes for the affected prefix"
+	::= { peakflowSPCMI 11 }
+
+spBGPTrapNewAttributes OBJECT-TYPE
+	SYNTAX 	DisplayString 
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The new attributes for the affected prefix"
+	::= { peakflowSPCMI 12 }
+
+spInterfaceSpeed	OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Configured Interface Speed (bps)"
+	::= { peakflowSPCMI 13 }
+
+spInterfaceUsage	OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Actual interface usage (bps)"
+	::= { peakflowSPCMI 14 }
+
+spReportURL OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"URL to view/download a report"
+	::= { peakflowSPCMI 15 }
+
+spReportName OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The name of the report"
+	::= { peakflowSPCMI 16 }
+
+spReportID OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The queue id of the report"
+	::= { peakflowSPCMI 17 }
+
+spAlertID OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The id of the alert"
+	::= { peakflowSPCMI 18 }
+
+spHijackRoute OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The BGP route prefix of the hijacking announcement"
+	::= { peakflowSPCMI 19 }
+
+spHijackAttr OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..255))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"BGP attributes of the hijacking announcement"
+	::= { peakflowSPCMI 20 }
+
+spHijackLocal OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The local prefix that matched the possibly-hijacked route"
+	::= { peakflowSPCMI 21 }
+
+spUsername OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"Name of a Peakflow SP user account."
+	::= { peakflowSPCMI 22 }
+
+spVersion OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"Version number of the described object."
+	::= { peakflowSPCMI 23 }
+
+spUsageType OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"Type of resource usage (high/low)."
+	::= { peakflowSPCMI 24 }
+
+spManagedObject	OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Managed Object name"
+	::= { peakflowSPCMI 25 }
+	
+spManagedObjectFamily	OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (1..16))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Managed Object family"
+	::= { peakflowSPCMI 26 }
+	
+spThreshold	OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Configured threshold"
+	::= { peakflowSPCMI 27 }
+
+spUsage	OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Observed per-object traffic usage"
+	::= { peakflowSPCMI 28 }
+
+spUnit OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..8))
+	MAX-ACCESS  accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"Unit of measurement (bps/pps)"
+	::= { peakflowSPCMI 29 }
+
+spHardwareFailureDescription OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..256))
+	MAX-ACCESS  accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"Description of hardware failure"
+	::= { peakflowSPCMI 30 }
+
+spFingerprintName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Fingerprint name"
+	::= { peakflowSPCMI 31 }
+
+spFingerprintFeedback OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..256))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Feedback regarding a shared fingerprint"
+	::= { peakflowSPCMI 32 }
+
+spFingerprintSender OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Sender of a shared fingerprint"
+	::= { peakflowSPCMI 33 }
+
+spFingerprintMessage OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..256))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Message accompanying shared fingerprint"
+	::= { peakflowSPCMI 34 }
+
+spMitigationID OBJECT-TYPE
+	SYNTAX 	Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The ID of the mitigation event"
+	::= { peakflowSPCMI 35 }
+
+spDNSName	OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..256))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Domain name"
+	::= { peakflowSPCMI 36 }
+
+spDNSExpected	OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Expected query count"
+	::= { peakflowSPCMI 37 }
+
+spDNSObserved		OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Observed query count"
+	::= { peakflowSPCMI 38 }
+
+spDNSObservedMean	OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Observed mean query count"
+	::= { peakflowSPCMI 39 }
+
+spDNSObservedMax	OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Observed max query count"
+	::= { peakflowSPCMI 40 }
+
+spMitigationName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Mitigation name"
+	::= { peakflowSPCMI 41 }
+
+spScriptCommand OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Alert script name"
+	::= { peakflowSPCMI 42 }
+
+spScriptHost OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..256))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		" Host on which alert script runs "
+	::= { peakflowSPCMI 43 }
+
+spScriptPort OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..5))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		" Port to connect to spScriptHost on "
+	::= { peakflowSPCMI 44 }
+
+spScriptStart OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Textual description of the time the script started"
+	::= { peakflowSPCMI 45 }
+
+spTMSPrefix OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (0..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The offramp protection prefix associated with the TMS mitigation"
+	::= { peakflowSPCMI 46 }
+
+spTMSCommunity OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (0..255))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The offramp community associated with the TMS mitigation.
+		 In the event the string is longer than 255 octets, the number
+		 of communities in this object may be truncated."
+	::= { peakflowSPCMI 47 }
+
+spTMSTimeout OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (0..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Textual representation of TMS timeout, in minutes"
+	::= { peakflowSPCMI 48 }
+
+spThirdPartyZone OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (0..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Third party mitigation destination zone "
+	::= { peakflowSPCMI 49 }
+
+spThirdPartyAddr OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (0..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Third party mitigation destination address "
+	::= { peakflowSPCMI 50 }
+
+spMitigationStart OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (0..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Textual representation of mitigation start time"
+	::= { peakflowSPCMI 51 }
+
+spBlackholeCommunity OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (0..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The offramp community associated with the blackhole mitigation"
+	::= { peakflowSPCMI 52 }
+
+spBlackholeTimeout OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (0..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Textual representation of blackhole timeout, in minutes"
+	::= { peakflowSPCMI 53 }
+
+spBlackholePrefix OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (0..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The offramp prefix associated with the blackhole mitigation"
+	::= { peakflowSPCMI 54 }
+
+spBlackholeNexthop OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (0..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The offramp next hop associated with the blackhole mitigation"
+	::= { peakflowSPCMI 55 }
+
+spFlowspecCommunity OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (0..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The offramp community associated with flowspec mitigation"
+	::= { peakflowSPCMI 56 }
+
+spFlowspecTimeout OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (0..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Textual representation of flowspec timeout, in minutes"
+	::= { peakflowSPCMI 57 }
+
+spCommFailureDestination OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..256))
+	MAX-ACCESS  accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"Destination of internal SP communication failure"
+	::= { peakflowSPCMI 58 }
+
+spCommFailureDescription OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..256))
+	MAX-ACCESS  accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"Description of internal SP communication failure"
+	::= { peakflowSPCMI 59 }
+
+spGreTunnelDestination OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"GRE Tunnel destination"
+	::= { peakflowSPCMI 60 }
+
+spSystemErrorType OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Textual name of system error alert type"
+	::= { peakflowSPCMI 61 }
+
+spSystemErrorDescription OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..256))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Description of the system error alert"
+	::= { peakflowSPCMI 62 }
+
+spServiceName OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Service name"
+	::= { peakflowSPCMI 63 }
+
+spServiceElement OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Service element"
+	::= { peakflowSPCMI 64 }
+
+spApplicationName OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Application"
+	::= { peakflowSPCMI 65 }
+
+spAlertDetectionSignatures OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..128))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"A comma separated string of all alert detection
+		signatures that make up a specific alert.  May be 1 or more
+		set, depending on the alert type."
+	::= { peakflowSPCMI 66 }	
+
+spManagedObjects OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE(1..1024))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"A comma-separated list of managed object names."
+	::= { peakflowSPCMI 67 }
+
+spInetAddressType OBJECT-TYPE
+	SYNTAX	InetAddressType
+	MAX-ACCESS  accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"An InetAddressType INTEGER value that specifies the
+		type of Internet address specific in an spInetAddress object.
+		Generally, this will be used by Peakflow SP to specify
+		IPv4 (1) or IPv6 (2) addresses.  See RFC3291 for a detailed
+		description."
+	::= { peakflowSPCMI 68 }
+
+spInetAddress OBJECT-TYPE
+	SYNTAX  InetAddress
+	MAX-ACCESS  accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"An InetAddress string that specifies an Internet address,
+		of a type specified by spInetAddressType.  See RFC3291 for a
+		detailed description."
+	::= { peakflowSPCMI 69 }
+
+spImpactBps OBJECT-TYPE
+	SYNTAX	Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The maximum observed bps of traffic for a given DoS alert
+		type."
+	::= { peakflowSPCMI 70 }
+
+spImpactPps OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The maximum observed pps of traffic for a given DoS alert
+		type."
+	::= { peakflowSPCMI 71 }	
+
+spDetectedCountries OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..152))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"A comma separated string of ISO 3166 country codes that
+		have been detected as part of the alert.  May be 0 to 50
+		set.  If more than 50 countries have been detected, the
+		string will end in '...'."
+	::= { peakflowSPCMI 72 }	
+
+spRoutingFailoverInterfaces OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"A comma separated string of interfaces involved in failover
+		routing."
+	::= { peakflowSPCMI 73 }
+
+spPravail	OBJECT-TYPE
+	SYNTAX 	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Pravail device name"
+	::= { peakflowSPCMI 74 }
+
+spDetector OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"SP detector device name"
+	::= { peakflowSPCMI 75 }
+
+spTMSMultiPrefix OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE (0..255))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"A comma seperated list of the offramp protection prefixes associated with
+		 the TMS multi-prefix mitigation. This field does not include
+		 the first protection prefix which is included in spTMSPrefix."
+	::= { peakflowSPCMI 76 }
+
+spLicenseErrType OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Textual name of the license error alert type"
+	::= { peakflowSPCMI 77 }
+
+spLicenseErrCount	OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Deployment-wide License Device Count"
+	::= { peakflowSPCMI 78 }
+
+spLicenseErrLimit	OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Deployment-wide License Device Limit"
+	::= { peakflowSPCMI 79 }
+
+spLicenseErrDescription OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..1023))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Description of the License alert"
+	::= { peakflowSPCMI 80 }
+
+spInterfaceSpeedHC	OBJECT-TYPE
+	SYNTAX  CounterBasedGauge64
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Configured Interface Speed (bps)
+		 The 64-bit version of spInterfaceSpeed"
+	::= { peakflowSPCMI 81 }
+
+spInterfaceUsageHC	OBJECT-TYPE
+	SYNTAX  CounterBasedGauge64
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Actual interface usage (bps)
+		 The 64-bit version of spInterfaceUsage"
+	::= { peakflowSPCMI 82 }
+
+spGreTunnelName	OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..256))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"GRE Tunnel name"
+	::= { peakflowSPCMI 83 }
+
+spCloudSignalFaultDescription OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..256))
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Description of cloud signaling fault"
+	::= { peakflowSPCMI 84 }
+
+spTMSMultiDiversionPrefix OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE (0..255))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"A comma seperated list of the offramp diversion prefixes associated with
+		 the TMS multi-prefix mitigation."
+	::= { peakflowSPCMI 85 }
+
+-- =================================================================================
+--  Pollable SP device management types:
+--
+
+deviceHealth OBJECT IDENTIFIER ::= { peakflowSPMgr 1 }
+
+deviceCpuLoadAvg1min OBJECT-TYPE
+	SYNTAX	Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+                "Load average during last 1 minute. This value
+                 is calculated by taking the average number of
+                 processes in run queue during last 1 minute and
+                 multiplying by 100, then rounding the result into
+                 an integer."
+	::= { deviceHealth 1 }
+
+deviceCpuLoadAvg5min OBJECT-TYPE
+	SYNTAX	Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+                "Load average during last 5 minutes. This value
+                 is calculated by taking the average number of
+                 processes in run queue during last 5 minutes and
+                 multiplying by 100, then rounding the result into
+                 an integer."
+	::= { deviceHealth 2 }
+
+deviceCpuLoadAvg15min OBJECT-TYPE
+	SYNTAX	Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+                "Load average during last 15 minutes. This value
+                 is calculated by taking the average number of
+                 processes in run queue during last 15 minutes and
+                 multiplying by 100, then rounding the result into
+                 an integer."
+	::= { deviceHealth 3 }
+
+deviceDiskUsage OBJECT-TYPE
+	SYNTAX	Integer32(0..100)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Percentage of primary data partition used."
+	::= { deviceHealth 4 }
+
+devicePhysicalMemory OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total physical memeory installed (in KiB)."
+	::= { deviceHealth 5 }
+
+devicePhysicalMemoryInUse OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Physical memeory being used (in KiB)."
+	::= { deviceHealth 6 }
+
+devicePhysicalMemoryUsage OBJECT-TYPE
+	SYNTAX	Integer32(0..100)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Percentage of physical memory used."
+	::= { deviceHealth 7 }
+
+deviceSwapSpace OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total swap space available (in KiB)."
+	::= { deviceHealth 8 }
+
+deviceSwapSpaceInUse OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Used swap space (in KiB)."
+	::= { deviceHealth 9 }
+
+deviceSwapSpaceUsage OBJECT-TYPE
+	SYNTAX	Integer32(0..100)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Percentage of swap space used."
+	::= { deviceHealth 10 }
+
+deviceTotalFlows OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS  deprecated
+	DESCRIPTION
+		"Accumulative flow count per SP device.
+
+		 This object is deprecated in favor of deviceTotalFlowsHC."
+	::= { deviceHealth 11 }
+
+deviceTotalFlowsHC OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Accumulative flow count per SP device.
+
+		 The 64-bit version of deviceTotalFlows."
+	::= { deviceHealth 12 }
+
+
+-- =================================================================================
+--  Notifications:
+--
+
+peakflowSPTrapsEnumerate OBJECT IDENTIFIER ::= { peakflowSPTraps 0 }
+
+flowDown NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spRouter
+	}
+	STATUS  current
+	DESCRIPTION
+		"Flow data has not been received from a Flow
+		transmitting router"
+	::= { peakflowSPTrapsEnumerate 1 }
+
+flowUp NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spRouter
+	}
+	STATUS  current
+	DESCRIPTION
+		"Flow data has resumed from a router which previously
+		was not forwarding Flow data"
+	::= { peakflowSPTrapsEnumerate 2 }
+		
+snmpDown NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spRouter
+	}
+	STATUS  current
+	DESCRIPTION
+		"SNMP requests are not being answered by the router"
+	::= { peakflowSPTrapsEnumerate 3 }
+
+snmpUp NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spRouter
+	}
+	STATUS  current
+	DESCRIPTION
+		"SNMP requests are again being answered by the router"
+	::= { peakflowSPTrapsEnumerate 4 }
+		
+bgpDown NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spRouter
+	}
+	STATUS  current
+	DESCRIPTION
+		"The BGP session with the router has transitioned down"
+	::= { peakflowSPTrapsEnumerate 5 }
+
+bgpUp NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spRouter
+	}
+	STATUS  current
+	DESCRIPTION
+		"The BGP session with the router has transitioned up"
+	::= { peakflowSPTrapsEnumerate 6 }
+
+collectorDown NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spCollector,
+		spDetector
+	}
+	STATUS  current
+	DESCRIPTION
+		"The SP device is down. Heartbeats are missing."
+	::= { peakflowSPTrapsEnumerate 7 }
+
+collectorUp NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spCollector
+	}
+	STATUS  current
+	DESCRIPTION
+		"The SP device is up. Heartbeats have resumed."
+	::= { peakflowSPTrapsEnumerate 8 }
+
+collectorStart NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spCollector
+	}
+	STATUS  obsolete
+	DESCRIPTION
+		"The SP device is started. Heartbeats have been received."
+	::= { peakflowSPTrapsEnumerate 9 }
+
+bgpInstability NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spRouter,
+		spBGPInstability
+	}
+	STATUS  current
+	DESCRIPTION
+		"The BGP session with this router is exhibiting instability"
+	::= { peakflowSPTrapsEnumerate 10 }
+
+bgpInstabilityDone NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spRouter
+	}
+	STATUS  current
+	DESCRIPTION
+		"The BGP instability associated with this router has ended"
+	::= { peakflowSPTrapsEnumerate 11 }
+
+bgpTrap NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spBGPTrapName,
+		spBGPTrapEvent,
+		spBGPTrapPrefix,
+		spBGPTrapOldAttributes,
+		spBGPTrapNewAttributes
+	}
+	STATUS  current
+	DESCRIPTION
+		"A BGP event matching this trap definition has occurred."
+	::= { peakflowSPTrapsEnumerate 12 }
+
+interfaceUsage NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spRouter,
+		spInterface,
+		spInterfaceIndex,
+		spInterfaceSpeed,
+		spUsageType,
+		spInterfaceUsage,
+		spInterfaceSpeedHC,
+		spInterfaceUsageHC
+	}
+	STATUS  current
+	DESCRIPTION
+		"The interface exceeded the configured traffic rate threshold."
+	::= { peakflowSPTrapsEnumerate 13 }
+
+interfaceUsageDone NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spRouter,
+		spInterface,
+		spInterfaceIndex,
+		spUsageType
+	}
+	STATUS  current
+	DESCRIPTION
+		"The interface is now within configured traffic thresholds"
+	::= { peakflowSPTrapsEnumerate 14 }
+
+autoclassifyStart NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spCollector,
+		spUsername
+	}
+	STATUS obsolete
+	DESCRIPTION
+		"Autoclassification started on this Peakflow SP leader."
+	::= { peakflowSPTrapsEnumerate 15 }
+
+configChange NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spCollector,
+		spUsername,
+		spVersion
+	}
+	STATUS current
+	DESCRIPTION
+		"Configuration updated from this Peakflow SP leader."
+	::= { peakflowSPTrapsEnumerate 16 }
+
+notificationLimit NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spCollector
+	}
+	STATUS obsolete
+	DESCRIPTION
+		"Too many alerts have been generated by this Peakflow
+		SP leader.  Alerts will be temporarily suppressed.
+		For more information about alerts that are being generated,
+		please go to the Alerts page in the leader's UI."
+	::= { peakflowSPTrapsEnumerate 17 }
+
+reportDone NOTIFICATION-TYPE
+	OBJECTS {
+		spReportName,
+		spReportID,
+		spReportURL
+	}
+	STATUS obsolete
+	DESCRIPTION
+		"The indicated report is finished and available for viewing
+		at the listed URL."
+	::= { peakflowSPTrapsEnumerate 18 }
+
+bgpHijack NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spRouter,
+		spHijackRoute,
+		spHijackAttr,
+		spHijackLocal
+	}
+	STATUS  current
+	DESCRIPTION
+		"A BGP announcement was seen for a prefix that is
+		part of the configured local address space."
+	::= { peakflowSPTrapsEnumerate 19 }
+
+managedObjectUsage NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spManagedObject,
+		spManagedObjectFamily,
+		spUsageType,
+		spThreshold,
+		spUsage,
+		spUnit
+	}
+	STATUS  current
+	DESCRIPTION
+		"The managed object exceeded the configured traffic rate threshold."
+	::= { peakflowSPTrapsEnumerate 20 }
+
+managedObjectUsageDone NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spManagedObject,
+		spManagedObjectFamily,
+		spUsageType,
+		spUnit
+	}
+	STATUS  current
+	DESCRIPTION
+		"The manged object is no longer exceeding the traffic rate threshold."
+	::= { peakflowSPTrapsEnumerate 21 }
+
+hardwareFailure NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spCollector,
+		spHardwareFailureDescription
+	}
+	STATUS  current
+	DESCRIPTION
+		"A hardware failure has been detected on an SP device."
+	::= { peakflowSPTrapsEnumerate 22 }
+
+hardwareFailureDone NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spCollector,
+		spHardwareFailureDescription
+	}
+	STATUS  current
+	DESCRIPTION
+		"A hardware failure is no longer detected on an SP device."
+	::= { peakflowSPTrapsEnumerate 23 }
+
+fingerprintFeedback NOTIFICATION-TYPE
+	OBJECTS {
+		spMitigationID,
+		spFingerprintName,
+		spFingerprintFeedback
+	}
+	STATUS  current
+	DESCRIPTION
+		"Feedback received regarding a shared fingerprint."
+	::= { peakflowSPTrapsEnumerate 24 }
+
+fingerprintReceive NOTIFICATION-TYPE
+	OBJECTS {
+		spMitigationID,
+		spFingerprintName,
+		spFingerprintSender,
+		spFingerprintMessage
+	}
+	STATUS  current
+	DESCRIPTION
+		"A shared fingerprint was received."
+	::= { peakflowSPTrapsEnumerate 25 }
+
+dnsBaseline NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spCollector,
+		spDNSName,
+		spDNSExpected,
+		spDNSObserved
+	}
+	STATUS  current
+	DESCRIPTION
+		"An excessive number of queries for a domain name detected."
+	::= { peakflowSPTrapsEnumerate 26 }
+
+dnsBaselineDone NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spCollector,
+		spDNSName,
+		spDNSExpected,
+		spDNSObservedMean,
+		spDNSObservedMax
+	}
+	STATUS  current
+	DESCRIPTION
+		"Query count for domain name has returned to normal levels."
+	::= { peakflowSPTrapsEnumerate 27 }
+
+alertScript NOTIFICATION-TYPE
+	OBJECTS {
+		spMitigationID,
+		spCollector,
+		spMitigationName,
+		spScriptCommand,
+		spScriptHost,
+		spScriptPort,
+		spScriptStart
+	}
+	STATUS  current
+	DESCRIPTION
+		"Alert script has been executed"
+	::= { peakflowSPTrapsEnumerate 28 }
+
+mitigationDone NOTIFICATION-TYPE
+	OBJECTS {
+		spMitigationID,
+		spAlertID,
+		spCollector
+	}
+	STATUS  current
+	DESCRIPTION
+		"Mitigation has completed"
+	::= { peakflowSPTrapsEnumerate 29 }
+
+mitigationTMSStart NOTIFICATION-TYPE
+	OBJECTS {
+		spMitigationID,
+		spMitigationName,
+		spAlertID,
+		spManagedObject,
+		spTMSPrefix,
+		spTMSCommunity,
+		spTMSTimeout,
+		spMitigationStart,
+		spTMSMultiPrefix
+	}
+	STATUS  deprecated
+	DESCRIPTION
+		"TMS Mitigation has started"
+	::= { peakflowSPTrapsEnumerate 30 }
+
+mitigationThirdPartyStart NOTIFICATION-TYPE
+	OBJECTS {
+		spMitigationID,
+		spMitigationName,
+		spAlertID,
+		spManagedObject,
+		spThirdPartyZone,
+		spThirdPartyAddr,
+		spMitigationStart
+	}
+	STATUS  current
+	DESCRIPTION
+		"Third Party Mitigation has started"
+	::= { peakflowSPTrapsEnumerate 31 }
+
+mitigationBlackholeStart NOTIFICATION-TYPE
+	OBJECTS {
+		spMitigationID,
+		spMitigationName,
+		spAlertID,
+		spBlackholeCommunity,
+		spBlackholeTimeout,
+		spBlackholePrefix,
+		spBlackholeNexthop,
+		spMitigationStart
+	}
+	STATUS  current
+	DESCRIPTION
+		"Blackhole Mitigation has started"
+	::= { peakflowSPTrapsEnumerate 32 }
+
+mitigationFlowspecStart NOTIFICATION-TYPE
+	OBJECTS {
+		spMitigationID,
+		spMitigationName,
+		spAlertID,
+		spFlowspecCommunity,
+		spFlowspecTimeout,
+		spMitigationStart
+	}
+	STATUS  current
+	DESCRIPTION
+		"Flowspec Mitigation has started"
+	::= { peakflowSPTrapsEnumerate 33 }
+
+spcommFailure NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spCollector,
+		spCommFailureDestination,
+		spCommFailureDescription
+	}
+	STATUS  current
+	DESCRIPTION
+		"An SP internal communication failure has occurred."
+	::= { peakflowSPTrapsEnumerate 34 }
+
+spcommFailureDone NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spCollector,
+		spCommFailureDestination,
+		spCommFailureDescription
+	}
+	STATUS  current
+	DESCRIPTION
+		"An SP internal communication failure has ended."
+	::= { peakflowSPTrapsEnumerate 35 }
+
+greDown NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spGreTunnelDestination,
+		spGreTunnelName
+	}
+	STATUS  current
+	DESCRIPTION
+		"The GRE tunnel is down"
+	::= { peakflowSPTrapsEnumerate 36 }
+
+greDownDone NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spGreTunnelDestination,
+		spGreTunnelName
+	}
+	STATUS  current
+	DESCRIPTION
+		"The GRE tunnel is back up"
+	::= { peakflowSPTrapsEnumerate 37 }
+
+deviceSystemError NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spCollector,
+		spSystemErrorType,
+		spThreshold,
+		spSystemErrorDescription
+	}
+	STATUS  current
+	DESCRIPTION
+		"An SP device system error alert has started."
+	::= { peakflowSPTrapsEnumerate 38 }
+
+deviceSystemErrorDone NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spCollector,
+		spSystemErrorType,
+		spThreshold,
+		spSystemErrorDescription
+	}
+	STATUS  current
+	DESCRIPTION
+		"An SP device system error alert has ended."
+	::= { peakflowSPTrapsEnumerate 39 }
+
+fingerprintUsage NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spFingerprintName,
+		spUsageType,
+		spThreshold,
+		spUsage,
+		spUnit
+	}
+	STATUS  current
+	DESCRIPTION
+		"The fingerprint exceeded the configured traffic rate threshold."
+	::= { peakflowSPTrapsEnumerate 40 }
+
+fingerprintUsageDone NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spFingerprintName,
+		spUsageType,
+		spUnit
+	}
+	STATUS  current
+	DESCRIPTION
+		"The fingerprint is no longer exceeding the traffic rate threshold."
+	::= { peakflowSPTrapsEnumerate 41 }
+
+serviceUsage NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spServiceName,
+		spUsageType,
+		spApplicationName,
+		spServiceElement,
+		spThreshold,
+		spUsage
+	}
+	STATUS  current
+	DESCRIPTION
+		"The service exceeded the configured traffic rate threshold."
+	::= { peakflowSPTrapsEnumerate 42 }
+
+serviceUsageDone NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spServiceName
+	}
+	STATUS  current
+	DESCRIPTION
+		"The service is no longer exceeding the traffic rate threshold."
+	::= { peakflowSPTrapsEnumerate 43 }
+
+dosNetworkProfiledAlert NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		pdosAnomalyClassification,
+		pdosAnomalyDirection,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosUrl,
+		spImpactBps,
+		spImpactPps,
+		spManagedObject,
+		spDetectedCountries
+	}
+	STATUS  current
+	DESCRIPTION
+		"The managed object exceeded network and/or country
+		baseline thresholds."
+	::= { peakflowSPTrapsEnumerate 44 }
+
+dosNetworkProfiledAlertDone NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		pdosAnomalyClassification,
+		pdosAnomalyDirection,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosUrl,
+		spImpactBps,
+		spImpactPps,
+		spManagedObject,
+		spDetectedCountries
+	}
+	STATUS  current
+	DESCRIPTION
+		"The managed object is no longer exceeding the network
+		and/or country baseline thresholds."
+	::= { peakflowSPTrapsEnumerate 45 }
+
+dosHostDetectionAlert NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spAlertDetectionSignatures,
+		pdosAnomalyDirection,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosUrl,
+		spInetAddress,
+		spInetAddressType,
+		spImpactBps,
+		spImpactPps,
+		pdosAnomalyClassification,
+		spManagedObjects
+	}
+	STATUS  current
+	DESCRIPTION
+		"A Host alert was started after one or more signatures exceeded
+		their thresholds."
+	::= { peakflowSPTrapsEnumerate 46 }
+
+dosHostDetectionAlertDone NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spAlertDetectionSignatures,
+		pdosAnomalyDirection,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosUrl,
+		spInetAddress,
+		spInetAddressType,
+		spImpactBps,
+		spImpactPps,
+		pdosAnomalyClassification,
+		spManagedObjects
+	}
+	STATUS  current
+	DESCRIPTION
+		"The Host alert ended and is no longer exceeding signature
+		thresholds."
+	::= { peakflowSPTrapsEnumerate 47 }
+
+routingFailover NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		pdosUrl,
+		spCollector
+	}
+	STATUS current
+	DESCRIPTION
+		"A routing failover event occurred on a collector."
+	::= { peakflowSPTrapsEnumerate 48 }
+
+routingFailoverInterfaceDownAlert NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		pdosUrl,
+		spCollector,
+	 	spRoutingFailoverInterfaces
+	}
+	STATUS current
+	DESCRIPTION
+		"One or more interfaces involved in routing failover for a
+		collector are down.  The spRoutingFailoverInterfaces object
+	 	documents the list of interfaces that are down."
+	 ::= { peakflowSPTrapsEnumerate 49 }
+
+routingFailoverInterfaceDownAlertDone NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		pdosUrl,
+		spCollector
+	}
+	STATUS current
+	DESCRIPTION
+		"A previously started alert for down routing failover
+		interfaces has finished."
+	::= { peakflowSPTrapsEnumerate 50 }
+
+trafficAutoMitigation NOTIFICATION-TYPE
+	OBJECTS {
+		spManagedObject
+	}
+	STATUS current
+	DESCRIPTION
+		"Traffic has been seen by a TMS for a Managed Object
+		which has been configured for traffic-based
+		auto-mitigation."
+	::= { peakflowSPTrapsEnumerate 51 }
+
+cloudSignalingMitigationRequest NOTIFICATION-TYPE
+	OBJECTS {
+		spManagedObject,
+		spPravail
+	}
+	STATUS current
+	DESCRIPTION
+		"A cloud signaling mitigation request has been seen and 
+		an alert created."
+	::= { peakflowSPTrapsEnumerate 52 }
+
+licenseError NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spLicenseErrType,
+		spLicenseErrCount,
+		spThreshold,
+		spLicenseErrDescription
+	}
+	STATUS  current
+	DESCRIPTION
+		"An SP Deployment License error alert has started."
+	::= { peakflowSPTrapsEnumerate 53 }
+
+licenseErrorDone NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spLicenseErrType,
+		spThreshold,
+		spLicenseErrLimit,
+		spLicenseErrDescription
+	}
+	STATUS  current
+	DESCRIPTION
+		"An SP Deployment License error alert has ended."
+	::= { peakflowSPTrapsEnumerate 54 }
+
+cloudSignalingFault NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertId,
+		spPravail,
+		spCloudSignalFaultDescription
+	}
+	STATUS current
+	DESCRIPTION
+		"A cloud signaling fault was detected."
+	::= { peakflowSPTrapsEnumerate 55 }
+
+cloudSignalingFaultDone NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertId,
+		spPravail,
+		spCloudSignalFaultDescription
+	}
+	STATUS current
+	DESCRIPTION
+		"A cloud signaling fault is no longer detected."
+	::= { peakflowSPTrapsEnumerate 56 }
+
+mitigationTMSStartV2 NOTIFICATION-TYPE
+	OBJECTS {
+		spMitigationID,
+		spMitigationName,
+		spAlertID,
+		spManagedObject,
+		spTMSPrefix,
+		spTMSCommunity,
+		spTMSTimeout,
+		spMitigationStart,
+		spTMSMultiPrefix,
+		spTMSMultiDiversionPrefix
+	}
+	STATUS  current
+	DESCRIPTION
+		"TMS Mitigation has started"
+	::= { peakflowSPTrapsEnumerate 57 }
+-- =================================================================================
+
+END
+

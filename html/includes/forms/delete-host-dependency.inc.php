@@ -15,13 +15,34 @@
 if (is_admin() === false) {
     $status = array('status' => 1, 'message' => 'You need to be admin');
 } else {
-    if (!is_numeric($_POST['device_id'])) {
-        $status = array('status' => 1, 'message' => 'Wrong device id!');
-    } else {
-        if (dbDelete('device_relationships', '`child_device_id` = ?', array($_POST['device_id']))) {
-            $status = array('status' => 0, 'message' => 'Device dependency has been deleted.');
+    if ($_POST['device_id']) {
+        if (!is_numeric($_POST['device_id'])) {
+            $status = array('status' => 1, 'message' => 'Wrong device id!');
         } else {
-            $status = array('status' => 1, 'message' => 'Device Dependency cannot be deleted.');
+            if (dbDelete('device_relationships', '`child_device_id` = ?', array($_POST['device_id']))) {
+                $status = array('status' => 0, 'message' => 'Device dependency has been deleted.');
+            } else {
+                $status = array('status' => 1, 'message' => 'Device dependency cannot be deleted.');
+            }
+        }
+    } else if ($_POST['parent_ids']) {
+        $error = false;
+        foreach ($_POST['parent_ids'] as $parent) {
+            if (is_numeric($parent) && $parent != 0) {
+                if (!dbDelete('device_relationships', ' `parent_device_id` = ?', array($parent))) {
+                    $error = true;
+                    $status = array('status' => 1, 'message' => 'Device dependency cannot be deleted.');
+                }
+            } else if ($parent == 0) {
+                $status = array('status' => 1, 'message' => 'No dependency to delete.');
+                $error = true;
+                break;
+            }
+        }
+
+        if (!$error) {
+            $status = array('status' => 0, 'message' => 'Device dependencies has been deleted');
+        } else {
         }
     }
 }

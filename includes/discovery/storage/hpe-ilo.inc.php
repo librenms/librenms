@@ -1,6 +1,6 @@
 <?php
 
-$ilo_storage = snmpwalk_group($device, 'cpqHoFileSysEntry', 'CPQHOST-MIB');
+$ilo_storage = snmpwalk_group($device, 'cpqHoFileSysEntry', 'CPQHOST-MIB', 1, array(), 'hp');
 $units = 1024*1024;
 
 if (is_array($ilo_storage)) {

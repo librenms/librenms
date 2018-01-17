@@ -15,6 +15,8 @@ Input:
 Example:
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?hostname=host.example.com
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?asn=1234
 ```
 
 Output:
@@ -22,10 +24,28 @@ Output:
 {
  "status": "ok",
  "err-msg": "",
- "count": 0,
  "bgp_sessions": [
-
- ]
+        {
+            "bgpPeer_id": "4",
+            "device_id": "2",
+            "astext": "",
+            "bgpPeerIdentifier": "1234:1b80:1:12::2",
+            "bgpPeerRemoteAs": "54321",
+            "bgpPeerState": "established",
+            "bgpPeerAdminStatus": "running",
+            "bgpLocalAddr": "1234:1b80:1:12::1",
+            "bgpPeerRemoteAddr": "0.0.0.0",
+            "bgpPeerInUpdates": "3",
+            "bgpPeerOutUpdates": "1",
+            "bgpPeerInTotalMessages": "0",
+            "bgpPeerOutTotalMessages": "0",
+            "bgpPeerFsmEstablishedTime": "0",
+            "bgpPeerInUpdateElapsedTime": "0",
+            "context_name": ""
+        },
+	...
+    ],
+    "count": 100
 }
 ```
 
@@ -122,6 +142,7 @@ Input:
 Example:
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ospf
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ospf?hostname=host.example.com
 ```
 
 Output:
@@ -145,6 +166,8 @@ Output:
             "ospfNbmaNbrPermanence": "dynamic",
             "ospfNbrHelloSuppressed": "false",
             "context_name": ""
- ]
+        }
+    ],
+    "count": 1
 }
 ```

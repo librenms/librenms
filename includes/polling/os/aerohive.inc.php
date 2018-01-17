@@ -9,7 +9,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-if (preg_match('/^(.+?),/', $poll_device['sysDescr'], $hardware)) {
+if (preg_match('/^(.+?),/', $device['sysDescr'], $hardware)) {
     $hardware = $store[1];
 }
 $hardware = trim(snmp_get($device, '.1.3.6.1.4.1.4413.1.1.1.1.1.3.0', '-Ovq'), '"');

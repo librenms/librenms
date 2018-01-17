@@ -8,5 +8,5 @@ mib_dir:
     - hwg
 nobulk: 1
 discovery:
-    - sysObjectId:
+    - sysObjectID:
         - .1.3.6.1.4.1.21796.4.9

@@ -40,6 +40,8 @@ class ModuleTestHelper
     private $json_dir;
     private $file_name;
     private $module_tables;
+    private $discovery_output;
+    private $poller_output;
 
 
     /**
@@ -199,6 +201,11 @@ class ModuleTestHelper
         // generate a full list of modules
         $full_list = array();
         foreach ($modules as $module) {
+            // only allow valid modules
+            if (!(Config::has("poller_modules.$module") || Config::has("discovery_modules.$module"))) {
+                continue;
+            }
+
             if (isset($module_deps[$module])) {
                 $full_list = array_merge($full_list, $module_deps[$module]);
             } else {
@@ -239,9 +246,10 @@ class ModuleTestHelper
                 continue;
             }
 
-            if (str_contains($line, ' = ')) {
-                list($oid, $raw_data) = explode(' = ', $line, 2);
+            if (preg_match('/^\.[.\d]+ =/', $line)) {
+                list($oid, $raw_data) = explode(' =', $line, 2);
                 $oid = ltrim($oid, '.');
+                $raw_data = trim($raw_data);
 
                 if (empty($raw_data)) {
                     $result[] = "$oid|4|"; // empty data, we don't know type, put string
@@ -336,8 +344,8 @@ class ModuleTestHelper
         $output = implode(PHP_EOL, $results) . PHP_EOL;
 
         if ($write) {
-            $this->qPrint("Updated snmprec data $this->snmprec_file\n");
-            $this->qPrint("Verify these files do not contain any private data before submitting\n");
+            $this->qPrint("\nUpdated snmprec data $this->snmprec_file\n");
+            $this->qPrint("\nVerify this file does not contain any private data before submitting!\n");
             file_put_contents($this->snmprec_file, $output);
         }
 
@@ -377,7 +385,7 @@ class ModuleTestHelper
 
     public function generateTestData(Snmpsim $snmpsim, $no_save = false)
     {
-        global $device;
+        global $device, $debug, $vdebug;
 
         // Remove existing device in case it didn't get removed previously
         if ($existing_device = device_by_name($snmpsim->getIp())) {
@@ -390,8 +398,8 @@ class ModuleTestHelper
             $device_id = addHost($snmpsim->getIp(), 'v2c', $snmpsim->getPort());
             $this->qPrint("Added device: $device_id\n");
         } catch (\Exception $e) {
-            echo $e->getMessage() . PHP_EOL;
-            exit;
+            echo $this->file_name . ': ' . $e->getMessage() . PHP_EOL;
+            return null;
         }
 
         // Populate the device variable
@@ -402,31 +410,42 @@ class ModuleTestHelper
         // Run discovery
         if ($this->quiet) {
             ob_start();
+            $save_debug = $debug;
+            $save_vedbug = $vdebug;
+            $debug = true;
+            $vdebug = false;
         }
 
         discover_device($device, $this->getArgs());
 
         if ($this->quiet) {
-            $discovery_output = ob_get_contents();
+            $this->discovery_output = ob_get_contents();
             ob_end_clean();
-
-            d_echo($discovery_output);
-            d_echo(PHP_EOL);
+            $debug = $save_debug;
+            $vdebug = $save_vedbug;
         }
 
         $this->qPrint(PHP_EOL);
 
         // Dump the discovered data
         $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], 'discovery'));
+        $device = device_by_id_cache($device_id, true); // refresh the device array
 
         // Run the poller
-        ob_start();
-        poll_device($device, $this->getArgs());
-        $poller_output = ob_get_contents();
-        ob_end_clean();
+        if ($this->quiet) {
+            ob_start();
+            $debug = true;
+            $vdebug = false;
+        }
 
-        d_echo($poller_output);
-        d_echo(PHP_EOL);
+        poll_device($device, $this->getArgs());
+
+        if ($this->quiet) {
+            $this->poller_output = ob_get_contents();
+            ob_end_clean();
+            $debug = $save_debug;
+            $vdebug = $save_vedbug;
+        }
 
         // Dump polled data
         $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], 'poller'));
@@ -497,15 +516,22 @@ class ModuleTestHelper
                 $rows = dbFetchRows("SELECT * FROM `$table` $join $where", $params);
 
                 // remove unwanted fields
-                $keys = array_flip($info['excluded_fields']);
-                $formatted_data = array_map(function ($row) use ($keys) {
-                    return array_diff_key($row, $keys);
-                }, $rows);
+                if (isset($info['included_fields'])) {
+                    $keys = array_flip($info['included_fields']);
+                    $rows = array_map(function ($row) use ($keys) {
+                        return array_intersect_key($row, $keys);
+                    }, $rows);
+                } elseif (isset($info['excluded_fields'])) {
+                    $keys = array_flip($info['excluded_fields']);
+                    $rows = array_map(function ($row) use ($keys) {
+                        return array_diff_key($row, $keys);
+                    }, $rows);
+                }
 
                 if (isset($key)) {
-                    $data[$module][$key][$table] = $formatted_data;
+                    $data[$module][$key][$table] = $rows;
                 } else {
-                    $data[$module][$table] = $formatted_data;
+                    $data[$module][$table] = $rows;
                 }
             }
         }
@@ -522,6 +548,16 @@ class ModuleTestHelper
     public function getTableData()
     {
         return array_intersect_key($this->module_tables, array_flip($this->getModules()));
+    }
+
+    public function getLastDiscoveryOutput()
+    {
+        return $this->discovery_output;
+    }
+
+    public function getLastPollerOutput()
+    {
+        return $this->poller_output;
     }
 
     /**
