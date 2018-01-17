@@ -281,3 +281,22 @@ $(document).ajaxComplete(function(){
         })
     }
 });
+
+function load_devices(target)
+{
+    $.ajax({
+        type: "POST",
+        url: 'ajax_form.php',
+        data: {type: 'load-devices'},
+        dataType: "json",
+        success: function(output) {
+            target.append($('<option>', { value: 0, text: 'None'}));
+            $.each(output.devices, function (i,elem) {
+                target.append($('<option>',{value:elem.device_id, text:elem.hostname}));
+            });
+        },
+        error: function() {
+            toastr.error('Device dependencies could not be retrieved from the database');
+        }
+    });
+}
