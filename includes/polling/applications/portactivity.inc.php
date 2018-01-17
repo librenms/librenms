@@ -150,4 +150,3 @@ if (empty($ports_keys)) {
 
     $component->setComponentPrefs($device_id, $portsc);
 }
-
