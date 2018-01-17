@@ -1,0 +1,576 @@
+AXIS-VIDEO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    axis, products
+        FROM AXIS-ROOT-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF            -- RFC 2580
+    Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI             -- RFC 2578
+   SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB;    -- RFC 3411
+
+video MODULE-IDENTITY
+    LAST-UPDATED "201609231218Z"
+    ORGANIZATION
+        "Axis Communications AB"
+    CONTACT-INFO
+        "Postal: Axis Communications AB
+                 Emdalavagen 14
+                 SE-223 69 Lund
+                 Sweden
+                 Phone: +46 (0)46 272 18 00
+                 Fax:   +46 (0)46 13 61 30
+                 E-Mail: info@axis.com
+                 Web: www.axis.com"
+    DESCRIPTION
+        "Axis Video MIB. Includes HW resources, such as power
+         supplies, and traps for notifying management stations when
+         something fails."
+    REVISION    "201609231218Z"
+    DESCRIPTION
+        "Updates in the compliance statement. Video products do not support all
+        objects in general."
+    REVISION    "201212121202Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { axis 4 }
+
+--  Object identifiers: all video products return the videoBased OID
+--- Note: video cannot be used, since it is used above.
+videoBased OBJECT IDENTIFIER
+    ::= { products 1 }
+
+videoObjects OBJECT IDENTIFIER
+    ::= { video 1 }
+
+-- Power supplies
+powerSupplyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PowerSupplyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table containing information about all the power supplies
+         present in the device."
+    ::= { videoObjects 1 }
+
+powerSupplyEntry OBJECT-TYPE
+    SYNTAX      PowerSupplyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A power supply entry containing information about
+         a specific power supply."
+    INDEX       { powerSupplyType, powerSupplyId }
+    ::= { powerSupplyTable 1 }
+
+PowerSupplyEntry ::= SEQUENCE {
+    powerSupplyType     INTEGER,
+    powerSupplyId       Unsigned32,
+    powerSupplyStatus   INTEGER
+}
+
+powerSupplyType OBJECT-TYPE
+    SYNTAX      INTEGER { common(1), internal(2), external(3) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the power supply is mounted externally,
+         e.g. in a rack, or internally."
+    ::= { powerSupplyEntry 1 }
+
+powerSupplyId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Used to identify a power supply. The powerSupplyId is unique
+         within the type, i.e. there can not be two external power
+         supplies with the same powerSupplyId. There can, however, be one
+         external and one internal that have the same powerSupplyId."
+    ::= { powerSupplyEntry 2 }
+
+powerSupplyStatus OBJECT-TYPE
+    SYNTAX      INTEGER { ok(1), failure(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of a power supply."
+    ::= { powerSupplyEntry 3 }
+
+--- Fans
+fanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table containing information about all the fans in the product."
+    ::= { videoObjects 2 }
+
+fanEntry OBJECT-TYPE
+    SYNTAX      FanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A fan entry contains information about a specific fan."
+    INDEX       { fanType, fanId }
+    ::= { fanTable 1 }
+
+FanEntry ::= SEQUENCE {
+    fanType     INTEGER,
+    fanId       Unsigned32,
+    fanStatus   INTEGER
+}
+
+fanType OBJECT-TYPE
+    SYNTAX      INTEGER { common(1), housing(2), rack(3), cpu(4) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The type of the fan, i.e. where the fan is mounted."
+    ::= { fanEntry 1 }
+
+fanId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Used, together with fanType, to identify a fan. The fanId is
+         unique within the type, i.e. there can not be two fans with the
+         same fanType and the same fanId."
+    ::= { fanEntry 2 }
+
+fanStatus OBJECT-TYPE
+    SYNTAX      INTEGER { ok(1), failure(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of a fan."
+    ::= { fanEntry 3 }
+
+--- Temperature Sensors
+tempSensorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TempSensorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table containing information about all the temperature
+         sensors in the product."
+    ::= { videoObjects 3 }
+
+tempSensorEntry OBJECT-TYPE
+    SYNTAX      TempSensorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A temperature sensor entry contains information about a
+         specific temperature sensor."
+    INDEX       { tempSensorType, tempSensorId }
+    ::= { tempSensorTable 1 }
+
+TempSensorEntry ::= SEQUENCE {
+    tempSensorType      INTEGER,
+    tempSensorId        Unsigned32,
+    tempSensorStatus    INTEGER,
+    tempSensorValue     Integer32
+}
+
+tempSensorType OBJECT-TYPE
+    SYNTAX      INTEGER { common(1), housing(2), rack(3), cpu(4) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The type of the temperature sensor, i.e. where it is mounted."
+    ::= { tempSensorEntry 1 }
+
+tempSensorId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Used, together with tempSensorType, to identify a temperature
+         sensor. The tempSensorId is unique within the type, i.e. there
+         can not be two sensors with the same tempSensorType and the same
+         tempSensorId."
+    ::= { tempSensorEntry 2 }
+
+tempSensorStatus OBJECT-TYPE
+    SYNTAX      INTEGER { ok(1), failure(2), outOfBoundary(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the temperature sensor."
+    ::= { tempSensorEntry 3 }
+
+tempSensorValue OBJECT-TYPE
+    SYNTAX      Integer32 (-176..150)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The temperature measured by a specific temperature sensor.
+         The temperature is given in degrees Celsius."
+    ::= { tempSensorEntry 4 }
+
+--- Physical video channels
+videoChannelTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VideoChannelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of video channel information, one entry for each
+         physical video channel."
+    ::= { videoObjects 4 }
+
+videoChannelEntry OBJECT-TYPE
+    SYNTAX      VideoChannelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A video channel entry contains information about a specific
+         physical video channel."
+    INDEX       { videoChannelId }
+    ::= { videoChannelTable 1 }
+
+VideoChannelEntry ::= SEQUENCE {
+    videoChannelId      Unsigned32,
+    videoSignalStatus   INTEGER
+}
+
+videoChannelId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8192)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Used to identify a physical video channel."
+    ::= { videoChannelEntry 1 }
+
+videoSignalStatus OBJECT-TYPE
+    SYNTAX      INTEGER { signalOk(1), noSignal(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the video signal for a channel."
+    ::= { videoChannelEntry 2 }
+
+--- Physical audio channels
+audioChannelTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AudioChannelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of audio signal information, one entry for each
+         physical audio channel."
+    ::= { videoObjects 5 }
+
+audioChannelEntry OBJECT-TYPE
+    SYNTAX      AudioChannelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An audio signal entry contains information about a specific
+         physical audio signal."
+    INDEX       { audioChannelId }
+    ::= { audioChannelTable 1 }
+
+AudioChannelEntry ::= SEQUENCE {
+    audioChannelId      Unsigned32,
+    audioSignalStatus   INTEGER
+}
+
+audioChannelId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8192)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Used to identify a physical audio channel."
+    ::= { audioChannelEntry 1 }
+
+audioSignalStatus OBJECT-TYPE
+    SYNTAX      INTEGER { signalOk(1), noSignal(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the audio signal for a channel."
+    ::= { audioChannelEntry 2 }
+
+--- Open Casing Detector
+casingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CasingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of casing status, one entry for each casing."
+    ::= { videoObjects 6 }
+
+casingEntry OBJECT-TYPE
+    SYNTAX      CasingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A casing entry contains information about a specific casing."
+    INDEX       { casingId }
+    ::= { casingTable 1 }
+
+CasingEntry ::= SEQUENCE {
+    casingId        Unsigned32,
+    casingName      SnmpAdminString,
+    casingStatus    INTEGER
+}
+
+casingId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Used to identify a casing."
+    ::= { casingEntry 1 }
+
+casingName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Used to identify a casing. If the original string is longer than the
+         specified length then the middle of the string will be replaced by '..'
+         in such a way that the length of the string becomes 32 characters
+         anyway."
+    ::= { casingEntry 2 }
+
+casingStatus OBJECT-TYPE
+    SYNTAX      INTEGER { closed(1), open(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the casing."
+    ::= { casingEntry 3 }
+
+--- { videoObjects 7 }, reserved for PTZ
+
+--- Storage
+storageTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF StorageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of storage media properties, one entry for each storage media."
+    ::= { videoObjects 8 }
+
+storageEntry OBJECT-TYPE
+    SYNTAX      StorageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A storage media contains information about a specific medium."
+    INDEX       { storageId }
+    ::= { storageTable 1 }
+
+StorageEntry ::= SEQUENCE {
+    storageId                  Unsigned32,
+    storageName                SnmpAdminString,
+    storageDisruptionDetected  INTEGER
+}
+
+storageId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Used to identify a storage."
+    ::= { storageEntry 1 }
+
+storageName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Used to identify a storage medium. If the original string is longer
+	 than the specified length then the middle of the string will be
+	 replaced by '..' in such a way that the length of the string becomes 32
+         characters anyway."
+    ::= { storageEntry 2 }
+
+storageDisruptionDetected OBJECT-TYPE
+    SYNTAX      INTEGER { no(1), yes(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the storage medium."
+    ::= { storageEntry 3 }
+
+--- { videoObjects 9 }, reserved for tampering
+
+-- Objects used in Private Enterprise Traps
+videoNotifications OBJECT IDENTIFIER
+    ::= { video 2 }
+
+videoNotificationPrefix OBJECT IDENTIFIER
+    ::= { videoNotifications 0 }
+
+alarmID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object indentifies a certain alarm event in a unique way.
+	This means that there cannot be any alarm event that has the same ID
+	during a finite period of time."
+    ::= { videoNotifications 1 }
+
+alarmName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+	"A string that identifies which kind of alarm this is. During a certain
+	time it is possible that alarms with the same name occur."
+    ::= { videoNotifications 2 }
+
+alarmText OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Detailed description of the alarm."
+    ::= { videoNotifications 3 }
+
+videoConformance OBJECT IDENTIFIER
+    ::= { video 3 }
+
+videoGroups OBJECT IDENTIFIER
+    ::= { videoConformance 1 }
+
+videoCompliances OBJECT IDENTIFIER
+    ::= { videoConformance 2 }
+
+alarmNew NOTIFICATION-TYPE
+    OBJECTS     { alarmID, alarmName, alarmText }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when a new Alarm is
+         generated that has a corresponding cleared state."
+    ::= { videoNotificationPrefix 1 }
+
+alarmCleared NOTIFICATION-TYPE
+    OBJECTS     { alarmID, alarmName, alarmText }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when an alarm is
+         cleared that was previous sent as a new Alarm."
+    ::= { videoNotificationPrefix 2 }
+
+alarmSingle NOTIFICATION-TYPE
+    OBJECTS     { alarmID, alarmName, alarmText }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when a new Alarm is
+         generated that has no corresponding cleared state."
+    ::= { videoNotificationPrefix 3 }
+
+-- Groups
+videoObjectGroup OBJECT-GROUP
+    OBJECTS     { powerSupplyStatus, fanStatus, tempSensorStatus,
+                  tempSensorValue, videoSignalStatus, audioSignalStatus,
+                  casingName, casingStatus, storageDisruptionDetected,
+                  storageName, alarmID, alarmName, alarmText }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of video objects."
+    ::= { videoGroups 1 }
+
+videoNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { alarmNew, alarmCleared, alarmSingle }
+    STATUS      current
+    DESCRIPTION
+        "A collection of video notifications."
+    ::= { videoGroups 2 }
+
+tempSensorGroup OBJECT-GROUP
+    OBJECTS { tempSensorStatus, tempSensorValue }
+    STATUS      current
+    DESCRIPTION
+        "Objects related to Axis temperature sensors."
+    ::= { videoGroups 3 }
+
+casingGroup OBJECT-GROUP
+    OBJECTS { casingName, casingStatus }
+    STATUS      current
+    DESCRIPTION
+        "Objects related to Axis casing."
+    ::= { videoGroups 4 }
+
+storageGroup OBJECT-GROUP
+    OBJECTS { storageDisruptionDetected, storageName }
+    STATUS      current
+    DESCRIPTION
+        "Objects related to Axis storage."
+    ::= { videoGroups 5 }
+
+-- Compliance Statements
+videoComplianceRev2 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for Axis video entities."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { videoNotificationGroup }
+
+        GROUP   powerSupplyStatus
+        DESCRIPTION
+              "This group is mandatory for all AXIS video products that have
+              redundant power supply for backup, for which it is possible to
+              check whether it is still working."
+
+        GROUP   fanStatus
+        DESCRIPTION
+              "This group is mandatory for all AXIS video products that have
+              fans, for which the state can be obtained."
+
+        GROUP   tempSensorGroup
+        DESCRIPTION
+              "This group is mandatory for all AXIS video products that have
+              temperature sensors, for which a state can be obtained."
+
+        GROUP   videoSignalStatus
+        DESCRIPTION
+              "This group is mandatory for all AXIS video products that have
+              video cameras connected for which it is possible to check the
+              connection state. Typically this is an encoder product."
+
+        GROUP   audioSignalStatus
+        DESCRIPTION
+              "This group is mandatory for all AXIS video products to which a
+              a microphone can be connected, for which the state can be
+              detected."
+
+        GROUP   casingGroup
+        DESCRIPTION
+              "This group is mandatory for all AXIS video products that have
+              a casing box, for which it is possible to check the status."
+
+        GROUP   storageGroup
+        DESCRIPTION
+              "This group is mandatory for all AXIS video products that have a
+              storage device connected and for which it is possible to check the
+              state."
+
+    ::= { videoCompliances 2 }
+
+videoCompliance MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement in a previous version of this MIB for Axis
+        video entities."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { videoObjectGroup }
+
+        GROUP   videoNotificationGroup
+        DESCRIPTION
+              "This group doesn't need to be supported."
+
+    ::= { videoCompliances 1 }
+
+END -- end of module AXIS-VIDEO-MIB.

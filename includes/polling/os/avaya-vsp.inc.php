@@ -22,9 +22,8 @@ $serial   = snmp_get($device, 'rcChasSerialNumber.0', '-Osqv', 'RAPID-CITY');
 $serial = str_replace('"', '', $serial);
 
 // rcChasHardwareRevision
-$sysDescr = $poll_device['sysDescr'];
+$sysDescr = $device['sysDescr'];
 $sysDescr = explode(' ', $sysDescr);
 $sysDescr = $sysDescr[0];
-$hwrevision = snmp_get($device, 'rcChasHardwareRevision.0', '-Osqv', 'RAPID-CITY');
-$hardware = $sysDescr . " HW: $hwrevision";
+$hardware = $sysDescr;
 $hardware = str_replace('"', '', $hardware);

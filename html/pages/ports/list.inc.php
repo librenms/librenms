@@ -1,4 +1,18 @@
 <?php
+/*
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2017 LibreNMS
+ * @author     LibreNMS Contributors
+*/
+
 $details_visible = var_export($vars['format'] == 'list_detail', 1);
 $errors_visible = var_export($vars['format'] == 'list_detail' || $vars['errors'], 1);
 $no_refresh = true;
@@ -12,26 +26,43 @@ if ($vars['errors']) {
 }
 ?>
 <div class="panel panel-default panel-condensed">
+    <div class="panel-heading">
+        <?php echo $displayLists; ?>
+    </div>
     <div class="table-responsive">
-        <table id="ports" class="table table-condensed table-hover">
+        <table id="ports" class="table table-condensed table-hover table-striped">
             <thead>
-                <tr>
-                    <th data-column-id="device">Device</th>
-                    <th data-column-id="port"<?php echo $sort ?>>Port</th>
-                    <th data-column-id="ifLastChange" data-converter="duration">Status Changed</th>
-                    <th data-column-id="ifConnectorPresent" data-visible="false">Connected</th>
-                    <th data-column-id="ifSpeed" data-converter="human-bps">Speed</th>
-                    <th data-column-id="ifMtu" data-visible="false">MTU</th>
-                    <th data-column-id="ifInOctets_rate" data-searchable="false" data-css-class="green" data-converter="human-bps">Down</th>
-                    <th data-column-id="ifOutOctets_rate" data-searchable="false" data-css-class="blue" data-converter="human-bps">Up</th>
-                    <th data-column-id="ifInUcastPkts_rate" data-searchable="false" data-visible="<?php echo $details_visible ?>" data-css-class="green" data-converter="human-pps">Packets In</th>
-                    <th data-column-id="ifOutUcastPkts_rate" data-searchable="false" data-visible="<?php echo $details_visible ?>" data-css-class="blue" data-converter="human-pps">Packets Out</th>
-                    <th data-column-id="ifInErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>" data-css-class="red"<?php echo $error_sort ?>>Errors In</th>
-                    <th data-column-id="ifOutErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>" data-css-class="red">Errors Out</th>
-                    <th data-column-id="ifType">Media</th>
-                    <th data-column-id="description">Description</th>
-                    <th data-column-id="actions" data-sortable="false" data-searchable="false">Actions</th>
-                </tr>
+            <tr>
+                <th data-column-id="device" data-formatter="device">Device</th>
+                <th data-column-id="port"<?php echo $sort ?>>Port</th>
+                <th data-column-id="ifLastChange" data-converter="duration">Status Changed</th>
+                <th data-column-id="ifConnectorPresent" data-visible="false">Connected</th>
+                <th data-column-id="ifSpeed" data-converter="human-bps">Speed</th>
+                <th data-column-id="ifMtu" data-visible="false">MTU</th>
+                <th data-column-id="ifInOctets_rate" data-searchable="false" data-css-class="green"
+                    data-converter="human-bps">Down
+                </th>
+                <th data-column-id="ifOutOctets_rate" data-searchable="false" data-css-class="blue"
+                    data-converter="human-bps">Up
+                </th>
+                <th data-column-id="ifInUcastPkts_rate" data-searchable="false"
+                    data-visible="<?php echo $details_visible ?>" data-css-class="green" data-converter="human-pps">
+                    Packets In
+                </th>
+                <th data-column-id="ifOutUcastPkts_rate" data-searchable="false"
+                    data-visible="<?php echo $details_visible ?>" data-css-class="blue" data-converter="human-pps">
+                    Packets Out
+                </th>
+                <th data-column-id="ifInErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>"
+                    data-css-class="red"<?php echo $error_sort ?>>Errors In
+                </th>
+                <th data-column-id="ifOutErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>"
+                    data-css-class="red">Errors Out
+                </th>
+                <th data-column-id="ifType">Media</th>
+                <th data-column-id="description">Description</th>
+                <th data-column-id="actions" data-sortable="false" data-searchable="false">Actions</th>
+            </tr>
             </thead>
         </table>
     </div>
@@ -64,6 +95,11 @@ var grid = $("#ports").bootgrid({
             }
         }
     },
+    formatters: {
+      'device': function (column, row) {
+          return "<span class='alert-status " + row.status + "' style='float:left;margin-right:10px;'></span>" + row.device + "";
+      }
+    },
     templates: {
         search: "" // hide the generic search
     },
@@ -87,5 +123,7 @@ var grid = $("#ports").bootgrid({
     },
     url: "ajax_table.php"
 });
+
+$(".actionBar").append("<?php echo $output; ?>");
 
 </script>

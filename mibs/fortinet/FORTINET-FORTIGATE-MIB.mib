@@ -32,7 +32,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 fnFortiGateMib MODULE-IDENTITY
-    LAST-UPDATED "201504230000Z"
+    LAST-UPDATED "201606170000Z"
     ORGANIZATION 
         "Fortinet Technologies, Inc."
     CONTACT-INFO 
@@ -41,11 +41,20 @@ fnFortiGateMib MODULE-IDENTITY
          email: support@fortinet.com
          http://www.fortinet.com"
     DESCRIPTION 
+        "Various non-monotonically increase Counter32 values have been changed to Gauge32."
+    REVISION    "201606170000Z"
+    DESCRIPTION 
         "Added fgProcessorFnNP6 in fgProcessorTypes."
     REVISION    "201504230000Z"
     DESCRIPTION 
-	 "Modify name of enumerations for LTE Modem"
-    REVISION    "201407140000Z"
+	 "Added fgDevice OIDs"
+    REVISION    "201503160000Z"
+    DESCRIPTION 
+	 "Added fgIntfVlanHbs OIDs for vlan interface heartbeat feature"
+    REVISION    "201501100000Z"
+    DESCRIPTION 
+	 "Added fgLinkMonitor OIDs for link-monitor feature"
+    REVISION    "201412040000Z"
     DESCRIPTION 
 	 "Added fgUsbModemInfoObjects OIDs for LTE Modem"
     REVISION    "201406040000Z"
@@ -361,130 +370,74 @@ fgModel OBJECT IDENTIFIER ::= { fnFortiGateMib 1 }
 
 -- fgModel start
 
-fg20CA           OBJECT IDENTIFIER ::= { fgModel 214 }
-fg60dc           OBJECT IDENTIFIER ::= { fgModel 641 }
+fg900D           OBJECT IDENTIFIER ::= { fgModel 900 }
 fgr60D           OBJECT IDENTIFIER ::= { fgModel 643 }
-fgt100           OBJECT IDENTIFIER ::= { fgModel 1000 }
-fgt1000          OBJECT IDENTIFIER ::= { fgModel 10000 }
-fgt1000A         OBJECT IDENTIFIER ::= { fgModel 10001 }
-fgt1000AFA2      OBJECT IDENTIFIER ::= { fgModel 10002 }
-fgt1000ALENC     OBJECT IDENTIFIER ::= { fgModel 10003 }
+fgr90D           OBJECT IDENTIFIER ::= { fgModel 638 }
 fgt1000C         OBJECT IDENTIFIER ::= { fgModel 10004 }
 fgt1000D         OBJECT IDENTIFIER ::= { fgModel 10005 }
-fgt100A          OBJECT IDENTIFIER ::= { fgModel 1001 }
 fgt100D          OBJECT IDENTIFIER ::= { fgModel 1004 }
-fgt110C          OBJECT IDENTIFIER ::= { fgModel 1002 }
-fgt111C          OBJECT IDENTIFIER ::= { fgModel 1003 }
 fgt1200D         OBJECT IDENTIFIER ::= { fgModel 12000 }
-fgt1240B         OBJECT IDENTIFIER ::= { fgModel 12400 }
 fgt140D          OBJECT IDENTIFIER ::= { fgModel 1401 }
 fgt140P          OBJECT IDENTIFIER ::= { fgModel 1402 }
-fgt140T          OBJECT IDENTIFIER ::= { fgModel 1403 }
 fgt1500D         OBJECT IDENTIFIER ::= { fgModel 15000 }
-fgt200           OBJECT IDENTIFIER ::= { fgModel 2000 }
-fgt200A          OBJECT IDENTIFIER ::= { fgModel 2001 }
-fgt200B          OBJECT IDENTIFIER ::= { fgModel 2003 }
-fgt200BPOE       OBJECT IDENTIFIER ::= { fgModel 2004 }
+fgt1500DT        OBJECT IDENTIFIER ::= { fgModel 15001 }
 fgt200D          OBJECT IDENTIFIER ::= { fgModel 2005 }
 fgt200DP         OBJECT IDENTIFIER ::= { fgModel 2007 }
-fgt20C           OBJECT IDENTIFIER ::= { fgModel 212 }
-fgt224B          OBJECT IDENTIFIER ::= { fgModel 2002 }
 fgt240D          OBJECT IDENTIFIER ::= { fgModel 2006 }
 fgt240DP         OBJECT IDENTIFIER ::= { fgModel 2008 }
 fgt280D          OBJECT IDENTIFIER ::= { fgModel 2013 }
-fgt300           OBJECT IDENTIFIER ::= { fgModel 3000 }
-fgt3000          OBJECT IDENTIFIER ::= { fgModel 30000 }
-fgt300A          OBJECT IDENTIFIER ::= { fgModel 3001 }
-fgt300C          OBJECT IDENTIFIER ::= { fgModel 3005 }
-fgt300D          OBJECT IDENTIFIER ::= { fgModel 3003 }
-fgt3016B         OBJECT IDENTIFIER ::= { fgModel 30160 }
-fgt3040B         OBJECT IDENTIFIER ::= { fgModel 30400 }
-fgt30B           OBJECT IDENTIFIER ::= { fgModel 302 }
+fgt3000D         OBJECT IDENTIFIER ::= { fgModel 30000 }
 fgt30D           OBJECT IDENTIFIER ::= { fgModel 304 }
 fgt30DPOE        OBJECT IDENTIFIER ::= { fgModel 305 }
-fgt310B          OBJECT IDENTIFIER ::= { fgModel 3002 }
-fgt311B          OBJECT IDENTIFIER ::= { fgModel 3004 }
-fgt3140B         OBJECT IDENTIFIER ::= { fgModel 30401 }
+fgt30E           OBJECT IDENTIFIER ::= { fgModel 306 }
+fgt3100D         OBJECT IDENTIFIER ::= { fgModel 31000 }
+fgt3200D         OBJECT IDENTIFIER ::= { fgModel 32000 }
 fgt3240C         OBJECT IDENTIFIER ::= { fgModel 32401 }
-fgt3600          OBJECT IDENTIFIER ::= { fgModel 36000 }
-fgt3600A         OBJECT IDENTIFIER ::= { fgModel 36003 }
 fgt3600C         OBJECT IDENTIFIER ::= { fgModel 36004 }
 fgt3700D         OBJECT IDENTIFIER ::= { fgModel 37000 }
-fgt3700DX        OBJECT IDENTIFIER ::= { fgModel 37000 }
-fgt3810A         OBJECT IDENTIFIER ::= { fgModel 38100 }
-fgt3810D         OBJECT IDENTIFIER ::= { fgModel 38100 }
-fgt3950B         OBJECT IDENTIFIER ::= { fgModel 39500 }
-fgt3951B         OBJECT IDENTIFIER ::= { fgModel 39501 }
+fgt3700DX        OBJECT IDENTIFIER ::= { fgModel 37001 }
+fgt3810D         OBJECT IDENTIFIER ::= { fgModel 38101 }
+fgt3815D         OBJECT IDENTIFIER ::= { fgModel 38150 }
 fgt3HD           OBJECT IDENTIFIER ::= { fgModel 3006 }
-fgt400           OBJECT IDENTIFIER ::= { fgModel 4000 }
-fgt400A          OBJECT IDENTIFIER ::= { fgModel 4001 }
-fgt40C           OBJECT IDENTIFIER ::= { fgModel 410 }
-fgt500           OBJECT IDENTIFIER ::= { fgModel 5000 }
-fgt5001          OBJECT IDENTIFIER ::= { fgModel 50010 }
-fgt5001A         OBJECT IDENTIFIER ::= { fgModel 50011 }
-fgt5001B         OBJECT IDENTIFIER ::= { fgModel 50013 }
+fgt400D          OBJECT IDENTIFIER ::= { fgModel 4004 }
 fgt5001C         OBJECT IDENTIFIER ::= { fgModel 50014 }
 fgt5001D         OBJECT IDENTIFIER ::= { fgModel 50015 }
-fgt5001FA2       OBJECT IDENTIFIER ::= { fgModel 50012 }
-fgt5002FB2       OBJECT IDENTIFIER ::= { fgModel 50001 }
-fgt5005FA2       OBJECT IDENTIFIER ::= { fgModel 50051 }
-fgt500A          OBJECT IDENTIFIER ::= { fgModel 5001 }
 fgt500D          OBJECT IDENTIFIER ::= { fgModel 5004 }
-fgt50A           OBJECT IDENTIFIER ::= { fgModel 500 }
-fgt50B           OBJECT IDENTIFIER ::= { fgModel 502 }
-fgt5101C         OBJECT IDENTIFIER ::= { fgModel 51010 }
-fgt51B           OBJECT IDENTIFIER ::= { fgModel 504 }
-fgt60            OBJECT IDENTIFIER ::= { fgModel 600 }
+fgt50E           OBJECT IDENTIFIER ::= { fgModel 505 }
+fgt51E           OBJECT IDENTIFIER ::= { fgModel 515 }
 fgt600C          OBJECT IDENTIFIER ::= { fgModel 6003 }
-fgt600D          OBJECT IDENTIFIER ::= { fgModel 6201 }
-fgt60ADSL        OBJECT IDENTIFIER ::= { fgModel 602 }
-fgt60B           OBJECT IDENTIFIER ::= { fgModel 603 }
-fgt60C           OBJECT IDENTIFIER ::= { fgModel 615 }
-fgt60CP          OBJECT IDENTIFIER ::= { fgModel 621 }
-fgt60CSFP        OBJECT IDENTIFIER ::= { fgModel 622 }
+fgt600D          OBJECT IDENTIFIER ::= { fgModel 6004 }
 fgt60D           OBJECT IDENTIFIER ::= { fgModel 624 }
 fgt60DPOE        OBJECT IDENTIFIER ::= { fgModel 625 }
-fgt60M           OBJECT IDENTIFIER ::= { fgModel 601 }
-fgt620B          OBJECT IDENTIFIER ::= { fgModel 6200 }
-fgt621B          OBJECT IDENTIFIER ::= { fgModel 6210 }
 fgt70D           OBJECT IDENTIFIER ::= { fgModel 700 }
-fgt800           OBJECT IDENTIFIER ::= { fgModel 8000 }
+fgt70DPOE        OBJECT IDENTIFIER ::= { fgModel 701 }
 fgt800C          OBJECT IDENTIFIER ::= { fgModel 8003 }
-fgt800F          OBJECT IDENTIFIER ::= { fgModel 8001 }
+fgt800D          OBJECT IDENTIFIER ::= { fgModel 8004 }
 fgt80C           OBJECT IDENTIFIER ::= { fgModel 800 }
 fgt80CM          OBJECT IDENTIFIER ::= { fgModel 801 }
 fgt80D           OBJECT IDENTIFIER ::= { fgModel 803 }
-fgt82C           OBJECT IDENTIFIER ::= { fgModel 802 }
 fgt90D           OBJECT IDENTIFIER ::= { fgModel 630 }
 fgt90DPOE        OBJECT IDENTIFIER ::= { fgModel 631 }
 fgt92D           OBJECT IDENTIFIER ::= { fgModel 636 }
 fgt94DPOE        OBJECT IDENTIFIER ::= { fgModel 634 }
 fgt98DPOE        OBJECT IDENTIFIER ::= { fgModel 635 }
-fgtONE           OBJECT IDENTIFIER ::= { fgModel 10 }
-fgtVM            OBJECT IDENTIFIER ::= { fgModel 20 }
 fgtVM64          OBJECT IDENTIFIER ::= { fgModel 30 }
+fgtVM64AWS       OBJECT IDENTIFIER ::= { fgModel 45 }
+fgtVM64AWSONDEMAND OBJECT IDENTIFIER ::= { fgModel 46 }
 fgtVM64HV        OBJECT IDENTIFIER ::= { fgModel 70 }
 fgtVM64KVm       OBJECT IDENTIFIER ::= { fgModel 60 }
+fgtVM64SVM       OBJECT IDENTIFIER ::= { fgModel 32 }
+fgtVM64VMX       OBJECT IDENTIFIER ::= { fgModel 31 }
 fgtVM64XEN       OBJECT IDENTIFIER ::= { fgModel 40 }
-fr100C           OBJECT IDENTIFIER ::= { fgModel 1005 }
-fsw5203B         OBJECT IDENTIFIER ::= { fgModel 50023 }
-fw20CA           OBJECT IDENTIFIER ::= { fgModel 213 }
-fw60CA           OBJECT IDENTIFIER ::= { fgModel 618 }
-fw60CM           OBJECT IDENTIFIER ::= { fgModel 617 }
+fgtsoc3          OBJECT IDENTIFIER ::= { fgModel 628 }
+fosVM64          OBJECT IDENTIFIER ::= { fgModel 90000 }
+fosVM64KVM       OBJECT IDENTIFIER ::= { fgModel 90060 }
 fw60DP           OBJECT IDENTIFIER ::= { fgModel 627 }
-fw60dc           OBJECT IDENTIFIER ::= { fgModel 642 }
-fw6XMB           OBJECT IDENTIFIER ::= { fgModel 619 }
-fwf20C           OBJECT IDENTIFIER ::= { fgModel 210 }
-fwf30B           OBJECT IDENTIFIER ::= { fgModel 310 }
 fwf30D           OBJECT IDENTIFIER ::= { fgModel 314 }
 fwf30DPOE        OBJECT IDENTIFIER ::= { fgModel 315 }
-fwf40C           OBJECT IDENTIFIER ::= { fgModel 411 }
-fwf50B           OBJECT IDENTIFIER ::= { fgModel 510 }
-fwf60            OBJECT IDENTIFIER ::= { fgModel 610 }
-fwf60A           OBJECT IDENTIFIER ::= { fgModel 611 }
-fwf60AM          OBJECT IDENTIFIER ::= { fgModel 612 }
-fwf60B           OBJECT IDENTIFIER ::= { fgModel 613 }
-fwf60C           OBJECT IDENTIFIER ::= { fgModel 616 }
+fwf30E           OBJECT IDENTIFIER ::= { fgModel 316 }
+fwf50E           OBJECT IDENTIFIER ::= { fgModel 506 }
+fwf51E           OBJECT IDENTIFIER ::= { fgModel 516 }
 fwf60D           OBJECT IDENTIFIER ::= { fgModel 626 }
 fwf80CM          OBJECT IDENTIFIER ::= { fgModel 810 }
 fwf81CM          OBJECT IDENTIFIER ::= { fgModel 811 }
@@ -584,7 +537,7 @@ FgVdEntry ::= SEQUENCE {
 
 fgVdEntIndex OBJECT-TYPE
     SYNTAX      FgVdIndex
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
         "Internal virtual domain index used to uniquely identify rows in this table. This index is also used by other tables referencing a virtual domain."
@@ -1689,6 +1642,122 @@ fgUsbportSerial OBJECT-TYPE
     ::= { fgUsbportEntry 10 }
 
 --
+-- fortinet.fnFortiGateMib.fgSystem.fgLinkMonitor
+--
+fgLinkMonitor OBJECT IDENTIFIER
+    ::= { fgSystem 8 }
+
+fgLinkMonitorNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of link monitor in fgLinkMonitorTable"
+    ::= { fgLinkMonitor 1 }
+
+fgLinkMonitorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FgLinkMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Link Monitor statistics table.  This table has a dependent expansion relationship with fgVdTable.
+         Only virtual domains with enabled link monitor are present in this table."
+    ::= { fgLinkMonitor 2 }
+
+fgLinkMonitorEntry OBJECT-TYPE
+    SYNTAX      FgLinkMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Link Monitor statistics on a virtual domain"
+    INDEX       {fgLinkMonitorID}
+    ::= { fgLinkMonitorTable 1 }
+
+FgLinkMonitorEntry ::= SEQUENCE {
+    fgLinkMonitorID         FnIndex,
+    fgLinkMonitorName       DisplayString,
+    fgLinkMonitorState      INTEGER,
+    fgLinkMonitorLatency    DisplayString,
+    fgLinkMonitorJitter     DisplayString,
+    fgLinkMonitorPacketSend Counter64,
+    fgLinkMonitorPacketRecv Counter64,
+    fgLinkMonitorPacketLoss DisplayString,
+    fgLinkMonitorVdom       DisplayString
+}
+
+fgLinkMonitorID OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Link Monitor ID. Only enabled link monitor entries are present in this table. Link Monitor IDs are only unique within a virtual domain."
+    ::= { fgLinkMonitorEntry 1 }
+
+fgLinkMonitorName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Link Monitor name."
+    ::= { fgLinkMonitorEntry 2 }
+
+fgLinkMonitorState OBJECT-TYPE
+    SYNTAX      INTEGER { alive(0), dead(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Link Monitor state."
+    ::= { fgLinkMonitorEntry 3 }
+
+fgLinkMonitorLatency OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The average latency of link monitor in float number within last 30 probes."
+    ::= { fgLinkMonitorEntry 4 }
+
+fgLinkMonitorJitter OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The average jitter of link monitor in float number within last 30 probes."
+    ::= { fgLinkMonitorEntry 5 }
+
+fgLinkMonitorPacketSend OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets sent by link monitor."
+    ::= { fgLinkMonitorEntry 6 }
+
+fgLinkMonitorPacketRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets received by link monitor."
+    ::= { fgLinkMonitorEntry 7 }
+
+fgLinkMonitorPacketLoss OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The average packet loss percentage in float number within last 30 probes."
+    ::= { fgLinkMonitorEntry 8 }
+
+fgLinkMonitorVdom OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Virtual domain the link monitor entry exists in. This name corresponds to the fgVdEntName used in fgVdTable."
+    ::= { fgLinkMonitorEntry 9 }
+
+--
 -- fortinet.fnFortiGateMib.fgFirewall
 --
 
@@ -1734,7 +1803,9 @@ FgFwPolStatsEntry ::= SEQUENCE {
     fgFwPolID               FnIndex,
     fgFwPolPktCount         Counter32,
     fgFwPolByteCount        Counter32,
-    fgFwPolLastUsed         DisplayString
+    fgFwPolLastUsed         DisplayString,
+    fgFwPolPktCountHc       Counter64,
+    fgFwPolByteCountHc      Counter64
 }
 
 fgFwPolID OBJECT-TYPE
@@ -1768,6 +1839,22 @@ fgFwPolLastUsed OBJECT-TYPE
     DESCRIPTION 
         "How many minutes since last used."
     ::= { fgFwPolStatsEntry 4 }
+
+fgFwPolPktCountHc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "64-bit Number of packets matched to policy (passed or blocked, depending on policy action). Count is from the time the policy became active."
+    ::= { fgFwPolStatsEntry 5 }
+
+fgFwPolByteCountHc OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "64-bit Number of bytes in packets matching the policy. See fgFwPolPktCountHc."
+    ::= { fgFwPolStatsEntry 6 }
 
 --
 -- fortinet.fnFortiGateMib.fgFirewall.fgFwPolicies.fgFwPolTables.fgFwPol6StatsTable
@@ -2161,6 +2248,73 @@ fgIntfVrrpEntVrIp OBJECT-TYPE
     DESCRIPTION 
         "IP address of a virtual router."
     ::= { fgIntfVrrpEntry 6 }
+
+fgIntfVlanHbs OBJECT IDENTIFIER
+    ::= { fgIntf 4 }
+
+fgIntfVlanHbCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of entries in fgIntfVlanHbTable"
+    ::= { fgIntfVlanHbs 1 }
+
+fgIntfVlanHbTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FgIntfVlanHbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A list of VlanHbs and values."
+    ::= { fgIntfVlanHbs 2 }
+
+fgIntfVlanHbEntry OBJECT-TYPE
+    SYNTAX      FgIntfVlanHbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry containing the vlan interface name, peer's serial number and state of a given vlan interface heartbeat."
+    INDEX       { fgIntfVlanHbEntIndex }
+    ::= { fgIntfVlanHbTable 1 }
+
+FgIntfVlanHbEntry ::= SEQUENCE {
+    fgIntfVlanHbEntIndex   FnIndex,
+    fgIntfVlanHbEntIfName  DisplayString,
+    fgIntfVlanHbEntSerial  DisplayString,
+    fgIntfVlanHbEntState   INTEGER
+}
+
+fgIntfVlanHbEntIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A unique identifier within the fgIntfVlanHbTable"
+    ::= { fgIntfVlanHbEntry 1 }
+
+fgIntfVlanHbEntIfName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The vlan interface name."
+    ::= { fgIntfVlanHbEntry 2 }
+
+fgIntfVlanHbEntSerial OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Serial number of a vlan HA peer."
+    ::= { fgIntfVlanHbEntry 3 }
+
+fgIntfVlanHbEntState OBJECT-TYPE
+    SYNTAX      INTEGER { active(1), inactive(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "State of a vlan interface heartbeat."
+    ::= { fgIntfVlanHbEntry 4 }
 
 --
 -- fortinet.fnFortiGateMib.fgAntivirus
@@ -3240,7 +3394,7 @@ fgAppScanUnit OBJECT IDENTIFIER
     ::= { fgApplications 107 }
 
 fgAppSuNumber OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -3310,12 +3464,12 @@ fgAppVoIPStatsEntry OBJECT-TYPE
     ::= { fgAppVoIPStatsTable 1 }
 
 FgAppVoIPStatsEntry ::= SEQUENCE {
-    fgAppVoIPConn           Counter32,
+    fgAppVoIPConn           Gauge32,
     fgAppVoIPCallBlocked    Counter32
 }
 
 fgAppVoIPConn OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -4447,7 +4601,7 @@ FgIpSessEntry ::= SEQUENCE {
     fgIpSessFromPort    InetPortNumber,
     fgIpSessToAddr      IpAddress,
     fgIpSessToPort      InetPortNumber,
-    fgIpSessExp         Counter32,
+    fgIpSessExp         Gauge32,
     fgIpSessVdom        FgVdIndex
 }
 
@@ -4501,7 +4655,7 @@ fgIpSessToPort OBJECT-TYPE
     ::= { fgIpSessEntry 6 }
 
 fgIpSessExp OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -4538,11 +4692,11 @@ fgIpSessStatsEntry OBJECT-TYPE
     ::= { fgIpSessStatsTable 1 }
 
 FgIpSessStatsEntry ::= SEQUENCE {
-    fgIpSessNumber  Counter32
+    fgIpSessNumber  Gauge32
 }
 
 fgIpSessNumber OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -4571,11 +4725,11 @@ fgIp6SessStatsEntry OBJECT-TYPE
     ::= { fgIp6SessStatsTable 1 }
 
 FgIp6SessStatsEntry ::= SEQUENCE {
-    fgIp6SessNumber  Counter32
+    fgIp6SessNumber  Gauge32
 }
 
 fgIp6SessNumber OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -4965,11 +5119,11 @@ fgVpnSslStatsEntry OBJECT-TYPE
 
 FgVpnSslStatsEntry ::= SEQUENCE {
     fgVpnSslState                   FnBoolState,
-    fgVpnSslStatsLoginUsers         Counter32,
+    fgVpnSslStatsLoginUsers         Gauge32,
     fgVpnSslStatsMaxUsers           Counter32,
-    fgVpnSslStatsActiveWebSessions  Counter32,
+    fgVpnSslStatsActiveWebSessions  Gauge32,
     fgVpnSslStatsMaxWebSessions     Counter32,
-    fgVpnSslStatsActiveTunnels      Counter32,
+    fgVpnSslStatsActiveTunnels      Gauge32,
     fgVpnSslStatsMaxTunnels         Counter32
 }
 
@@ -4982,7 +5136,7 @@ fgVpnSslState OBJECT-TYPE
     ::= { fgVpnSslStatsEntry 1 }
 
 fgVpnSslStatsLoginUsers OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -4999,7 +5153,7 @@ fgVpnSslStatsMaxUsers OBJECT-TYPE
     ::= { fgVpnSslStatsEntry 3 }
 
 fgVpnSslStatsActiveWebSessions OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -5016,7 +5170,7 @@ fgVpnSslStatsMaxWebSessions OBJECT-TYPE
     ::= { fgVpnSslStatsEntry 5 }
 
 fgVpnSslStatsActiveTunnels OBJECT-TYPE
-    SYNTAX      Counter32
+    SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -6830,7 +6984,7 @@ fgUsbModemInfoObjects OBJECT IDENTIFIER
     ::= { fgUsbModemInfo 1 }
 
 fgUsbModemSignalStrength OBJECT-TYPE
-    SYNTAX      INTEGER { sig0(0), sig1(1), sig2(2), sig3(3), sig4(4) }
+    SYNTAX      INTEGER { level0(0), level1(1), level2(2), level3(3), level4(4) }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -6870,7 +7024,7 @@ fgUsbModemProduct OBJECT-TYPE
     ::= { fgUsbModemInfoObjects 5 }
 
 fgUsbModemNetwork OBJECT-TYPE
-    SYNTAX      INTEGER { net3G(0), netLTE(1) }
+    SYNTAX      INTEGER { network3G(0), networkLTE(1) }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -6892,6 +7046,44 @@ fgUsbModemSimId OBJECT-TYPE
     DESCRIPTION 
         "3G/4G USB Modem sim card identifier."
     ::= { fgUsbModemInfoObjects 8 }
+
+--
+-- fortinet.fnFortiGateMib.fgDevice
+--
+
+fgDevice OBJECT IDENTIFIER
+    ::= { fnFortiGateMib 18 }
+
+--
+-- fortinet.fnFortiGateMib.fgDevice.fgDeviceTrapObjects
+--
+
+fgDeviceTrapObjects OBJECT IDENTIFIER
+    ::= { fgDevice 1 }
+
+fgDeviceMacAddress OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "The MAC address pertaining the Device."
+    ::= { fgDeviceTrapObjects 1 }
+
+fgDeviceCreated OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "The created time pertaining the Device."
+    ::= { fgDeviceTrapObjects 2 }
+
+fgDeviceLastSeen OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "The last seen time pertaining the Device."
+    ::= { fgDeviceTrapObjects 3 }
 
 --
 -- fortinet.fnFortiGateMib.fgMibConformance
@@ -7112,6 +7304,13 @@ fgTrapServerLoadBalanceRealServerDown NOTIFICATION-TYPE
         "One of servers in a Server Load Balance group goes down."
     ::= { fgTrapPrefix 1101 }
 
+fgTrapDeviceNew NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, ifIndex, fgVdEntIndex, fgDeviceCreated, fgDeviceLastSeen, fgDeviceMacAddress }
+    STATUS      current
+    DESCRIPTION 
+        "A new device is found."
+    ::= { fgTrapPrefix 1201 }
+
 --
 -- fortinet.fnFortiGateMib.fgMibConformance
 --
@@ -7218,6 +7417,7 @@ fgVpnObjectGroup OBJECT-GROUP
 
 fgFirewallObjectGroup OBJECT-GROUP
     OBJECTS     { fgFwPolPktCount, fgFwPolByteCount, fgFwUserNumber, 
+                  fgFwPolPktCountHc, fgFwPolByteCountHc, 
                   fgFwUserAuthTimeout, fgFwUserName, fgFwUserAuth, 
                   fgFwUserState, fgFwUserVdom, fgIpSessProto, 
                   fgIpSessFromAddr, fgIpSessFromPort, fgIpSessToAddr, 
@@ -7297,7 +7497,7 @@ fgWebFilterObjectGroup OBJECT-GROUP
     ::= { fgMibConformance 13 }
 
 fgVirtualDomainObjectGroup OBJECT-GROUP
-    OBJECTS     { fgVdNumber, fgVdMaxVdoms, fgVdEnabled, fgVdEntName, 
+    OBJECTS     { fgVdNumber, fgVdMaxVdoms, fgVdEnabled, fgVdEntName, fgVdEntIndex, 
                   fgVdEntOpMode, fgVdTpMgmtAddrType, fgVdTpMgmtAddr,
                   fgVdEntCpuUsage, fgVdEntMemUsage, fgVdEntSesCount, fgVdEntSesRate,
                   fgVdTpMgmtMask, fgVdEntHaState }
@@ -7314,7 +7514,8 @@ fgAdministrationObjectGroup OBJECT-GROUP
     ::= { fgMibConformance 15 }
 
 fgIntfObjectGroup OBJECT-GROUP
-    OBJECTS     { fgIntfEntVdom, fgIntfVrrpCount, fgIntfVrrpEntVrId, fgIntfVrrpEntGrpId, fgIntfVrrpEntIfName, fgIntfVrrpEntState, fgIntfVrrpEntVrIp }
+    OBJECTS     { fgIntfEntVdom, fgIntfVrrpCount, fgIntfVrrpEntVrId, fgIntfVrrpEntGrpId, fgIntfVrrpEntIfName, fgIntfVrrpEntState, fgIntfVrrpEntVrIp,
+                  fgIntfVlanHbCount, fgIntfVlanHbEntIfName, fgIntfVlanHbEntSerial, fgIntfVlanHbEntState }
     STATUS      current
     DESCRIPTION 
         "Objects pertaining to the interface table of FortiGate device."
@@ -7343,7 +7544,7 @@ fgNotificationGroup NOTIFICATION-GROUP
                   fgTrapAvPattern, fgTrapAvFragmented, 
                   fgTrapAvEnterConserve, fgTrapAvBypass, 
                   fgTrapAvOversizePass, fgTrapAvOversizeBlock, 
-                  fgTrapFazDisconnect, fgTrapWcApUp, fgTrapWcApDown,
+                  fgTrapFazDisconnect, fgTrapWcApUp, fgTrapWcApDown, fgTrapDeviceNew, 
                   fgTrapFcSwUp, fgTrapFcSwDown, fgTrapServerLoadBalanceRealServerDown }
     STATUS      current
     DESCRIPTION 
@@ -7508,6 +7709,23 @@ fgUsbModemInfoGroup OBJECT-GROUP
         "Objects pertaining to USB Modem Info group."
     ::= { fgMibConformance 29 }
 
+fgDeviceObjectGroup OBJECT-GROUP
+    OBJECTS     { fgDeviceMacAddress, fgDeviceCreated, fgDeviceLastSeen }
+    STATUS      current
+    DESCRIPTION 
+        "Objects pertaining to Device group."
+    ::= { fgMibConformance 30 }
+
+fgLinkMonitorGroup OBJECT-GROUP
+    OBJECTS     { fgLinkMonitorNumber, fgLinkMonitorName, fgLinkMonitorState,
+                  fgLinkMonitorLatency, fgLinkMonitorJitter, fgLinkMonitorPacketSend, fgLinkMonitorPacketRecv,
+                  fgLinkMonitorPacketLoss, fgLinkMonitorVdom
+                }
+    STATUS      current
+    DESCRIPTION 
+        "Objects pertaining to Link Monitor group."
+    ::= { fgMibConformance 31 }
+
 
 fgMIBCompliance MODULE-COMPLIANCE
     STATUS      current
@@ -7622,6 +7840,14 @@ fgMIBCompliance MODULE-COMPLIANCE
               "Model and feature specific."
 
         GROUP   fgUsbModemInfoGroup
+        DESCRIPTION
+              "Model and feature specific."
+
+        GROUP   fgDeviceObjectGroup
+        DESCRIPTION
+              "Model and feature specific."
+
+        GROUP   fgLinkMonitorGroup
         DESCRIPTION
               "Model and feature specific."
 

@@ -43,5 +43,5 @@ if ($device['os_group'] == 'cisco' && $device['os'] == 'asa' && $device['type'] 
         echo ' ASA Connections';
     }
 
-    unset($data,$rrd_def);
+    unset($data, $rrd_def);
 }//end if

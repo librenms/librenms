@@ -16,7 +16,7 @@ $config['enable_proxmox'] = 1;
 Then, install [librenms-agent](http://docs.librenms.org/Extensions/Applications/) on the machines running Proxmox and enable the Proxmox-script using:
 
 ```bash
-cp /opt/librenms-agent/proxmox /usr/lib/check_mk_agent/local/proxmox
+cp /opt/librenms-agent/agent-local/proxmox /usr/lib/check_mk_agent/local/proxmox
 chmod +x /usr/lib/check_mk_agent/local/proxmox
 ```
 

@@ -14,10 +14,8 @@
 
 $where = 1;
 
-if ($_SESSION['userlevel'] >= '5') {
-    $sql = " FROM `alert_schedule` AS S WHERE $where";
-} else {
-    $sql     = " FROM `alert_schedule` AS S WHERE $where";
+$sql = " FROM `alert_schedule` AS S WHERE $where";
+if ($_SESSION['userlevel'] < '5') {
     $param[] = $_SESSION['user_id'];
 }
 

@@ -1,4 +1,17 @@
 <?php
+/*
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2017 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
 $where = '1';
 $param = array();
@@ -68,12 +81,13 @@ $sql = "SELECT S.*, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['co
 foreach (dbFetchRows($sql, $param) as $syslog) {
     $dev        = device_by_id_cache($syslog['device_id']);
     $response[] = array(
-        'priority'  => generate_priority_icon($syslog['priority']),
-        'timestamp' => '<div style="white-space:nowrap;">'.$syslog['date'].'</div>',
+        'label'  => generate_priority_label($syslog['priority']),
+        'timestamp' => $syslog['date'],
+        'level'      => $syslog['priority'],
         'device_id' => generate_device_link($dev, shorthost($dev['hostname'])),
         'program'   => $syslog['program'],
         'msg'       => display($syslog['msg']),
-        'status'    => generate_priority_status($syslog['priority']),
+        'priority'   => generate_priority_status($syslog['priority']),
     );
 }
 

@@ -1,0 +1,230 @@
+F3-ESM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP 
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+             FROM SNMPv2-SMI
+    RowStatus, StorageType, DisplayString,
+    VariablePointer, TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    fsp150cm
+             FROM  ADVA-MIB; 
+
+f3ESMMIB MODULE-IDENTITY
+    LAST-UPDATED        "201209300000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Jakub Zalewski
+                     ADVA Optical Networking, Inc.
+                Tel: +48 58 7716 411
+             E-mail: jzalewski@advaoptical.com
+             Postal: ul. Slaska 35/37
+                     81-310 Gdynia, Poland"
+    DESCRIPTION
+            "This module defines the Ethernet Service Manager MIB defitinions
+             used by the F3 (FSP150CM/CC) product lines.  
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201210030000Z"
+    DESCRIPTION
+        "
+         Notes from release 201210030000Z,
+         (1)MIB version ready for release FSP150CC 5.6CC." 
+
+    ::= {fsp150cm 23}
+
+-- 
+-- OID definitions
+-- 
+f3EsmConfigObjects      OBJECT IDENTIFIER ::= {f3ESMMIB 1}
+f3EsmConformance        OBJECT IDENTIFIER ::= {f3ESMMIB 2}
+
+--
+-- ESM Config Table
+--
+esmConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EsmConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table has list of entries with which FSPNM can associate some
+         information in the form of name-value pairs.
+         NOTE: This table is for FSPNM use only."
+
+   ::= { f3EsmConfigObjects 1 }
+
+esmConfigEntry OBJECT-TYPE
+    SYNTAX      EsmConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The conceptual row in esmConfigTable."
+    INDEX   { esmConfigIndex }
+
+   ::= { esmConfigTable 1 }
+
+EsmConfigEntry ::= SEQUENCE {
+    esmConfigIndex                Unsigned32,
+    esmConfigAssociatedEntity     VariablePointer,
+    esmConfigStorageType          StorageType,
+    esmConfigRowStatus            RowStatus
+}
+
+esmConfigIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the unique index for ESM Config."
+   ::= { esmConfigEntry 1 }
+
+esmConfigAssociatedEntity OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is the entity with which name-value pairs shall be associated."
+   ::= { esmConfigEntry 2 }
+
+esmConfigStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this conceptual row."
+   ::= { esmConfigEntry 3 }
+
+esmConfigRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of esmConfigRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            neRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The esmConfigRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+   ::= { esmConfigEntry 4 }
+
+--
+-- ESM Name-Value Pair Table
+--
+esmNameValuePairTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EsmNameValuePairEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table has name-value pairs associated with entities.
+         NOTE: This table is for FSPNM use only."
+   ::= { f3EsmConfigObjects 2 }
+
+esmNameValuePairEntry OBJECT-TYPE
+    SYNTAX      EsmNameValuePairEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The conceptual row in esmNameValuePairTable."
+    INDEX   { esmConfigIndex, esmNameValuePairName }
+   ::= { esmNameValuePairTable 1}
+
+EsmNameValuePairEntry ::= SEQUENCE {
+    esmNameValuePairName         DisplayString,
+    esmNameValuePairValue        DisplayString,
+    esmNameValuePairStorageType  StorageType,
+    esmNameValuePairRowStatus    RowStatus
+}
+
+esmNameValuePairName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the name in the name-value pair."
+   ::= { esmNameValuePairEntry 1 }
+
+esmNameValuePairValue OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "This is the value in the name-value pair."
+   ::= { esmNameValuePairEntry 2 }
+
+esmNameValuePairStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The storage type for this conceptual row."
+    DEFVAL { nonVolatile }
+   ::= { esmNameValuePairEntry 3 }
+
+esmNameValuePairRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of esmNameValuePairRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            neRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The esmNameValuePairRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+   ::= { esmNameValuePairEntry 4 }
+
+--
+-- Conformance
+--
+f3EsmCompliances OBJECT IDENTIFIER ::= {f3EsmConformance 1}
+f3EsmGroups      OBJECT IDENTIFIER ::= {f3EsmConformance 2}
+
+f3EsmCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the F3-ESM-MIB compilance."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              esmConfigGroup, esmNameValuePairGroup
+        }
+    ::= { f3EsmCompliances 1 }
+
+esmConfigGroup OBJECT-GROUP
+   OBJECTS {
+      esmConfigAssociatedEntity,
+      esmConfigStorageType,
+      esmConfigRowStatus
+   }
+   STATUS  current
+   DESCRIPTION
+             "A collection of objects used to manage the EMS Configuration objects."
+    ::= { f3EsmGroups 1 }
+
+esmNameValuePairGroup OBJECT-GROUP
+   OBJECTS {
+      esmNameValuePairValue,
+      esmNameValuePairStorageType,
+      esmNameValuePairRowStatus
+   }
+   STATUS  current
+   DESCRIPTION
+             "A collection of objects used to manage the EMS Name-Value Pair objects."
+    ::= { f3EsmGroups 2 }
+
+END

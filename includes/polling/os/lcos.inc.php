@@ -1,8 +1,8 @@
 <?php
 /**
- * lcos.inc.php
+ * locos.inc.php
  *
- * LibreNMS os poller module for Lancom
+ * LibreNMS os polling module for Lancom LCOS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,13 +19,14 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2016 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @copyright  2017 Marcus Pink
+ * @author     Marcus Pink <mpink@avantgarde-labs.de>
  */
 
-$tmp_sysDescr = preg_replace('/LANCOM /', '', $poll_device['sysDescr']);
+$lcos_data = snmp_get_multi_oid($device, 'lcsFirmwareVersionTableEntrySerialNumber.1 lcsFirmwareVersionTableEntryVersion.1  lcsFirmwareVersionTableEntryModule.1', '-OQs', 'LCOS-MIB');
 
-list($harware, $dump1, $version, $dump2) = explode(' ', $tmp_sysDescr, 4);
+$serial  = $lcos_data['lcsFirmwareVersionTableEntrySerialNumber.eIfc'];
+$version = $lcos_data['lcsFirmwareVersionTableEntryVersion.eIfc'];
+$hardware = $lcos_data['lcsFirmwareVersionTableEntryModule.eIfc'];
 
-unset($dump1);
-unset($dump2);
+unset($lcos_data);

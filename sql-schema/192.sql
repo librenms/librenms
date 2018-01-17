@@ -1,0 +1,1 @@
+ALTER TABLE `sensors` ADD `user_func` VARCHAR(100) NULL;

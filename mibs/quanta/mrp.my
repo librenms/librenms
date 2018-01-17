@@ -1,0 +1,129 @@
+NETGEAR-MRP-MIB DEFINITIONS ::= BEGIN
+
+-- -------------------------------------------------------------
+-- MRP, SRP, FQTSS private MIB for IEEE 802.1Q Devices
+-- -------------------------------------------------------------
+
+IMPORTS
+    lb6m                            FROM QUANTA-LB6M-REF-MIB
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Counter32, Counter64, Unsigned32, TimeTicks, Integer32
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue, TimeInterval, TEXTUAL-CONVENTION, MacAddress
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    EnabledStatus
+        FROM P-BRIDGE-MIB;
+
+fastPathMRP MODULE-IDENTITY
+    LAST-UPDATED "201104290000Z" -- 29 April 2011 12:00:00 GMT
+    ORGANIZATION "Netgear Inc"
+    CONTACT-INFO ""
+
+    DESCRIPTION
+          "The Netgear Private MIB for 802.1Qat, 802.1Qav Configuration"
+
+      -- Revision history.
+    REVISION
+        "201104290000Z" -- 29 April 2011 12:00:00 GMT
+    DESCRIPTION
+        "ClearTool changes."
+    REVISION
+        "201101260000Z" -- 26 January 2011 12:00:00 GMT
+    DESCRIPTION
+        "Postal address updated."
+    REVISION
+        "201010310000Z" -- 31 October 2010 12:00:00 GMT
+    DESCRIPTION
+        "Initial version."
+
+    ::= { lb6m 60 }
+
+-- -------------------------------------------------------------
+-- groups in the MRP MIB
+-- -------------------------------------------------------------
+
+agentDot1qMrp                 OBJECT IDENTIFIER ::= { fastPathMRP 1 }
+agentDot1qMrpMxrp             OBJECT IDENTIFIER ::= { fastPathMRP 2 }
+
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+--
+-- The MRP Port Table
+--
+-- @purpose  Describes basic MRP per port functionality.
+--
+-- -------------------------------------------------------------
+
+agentDot1qPortMrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot1qPortMrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of MRP control information about every bridge
+        port.  This is indexed by agentDot1qBasePort."
+    ::= { agentDot1qMrp 1 }
+
+agentDot1qPortMrpEntry OBJECT-TYPE
+    SYNTAX      Dot1qPortMrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MRP control information for a bridge port."
+    INDEX   { agentDot1qMrpPort }
+    ::= { agentDot1qPortMrpTable 1 }
+
+Dot1qPortMrpEntry ::=
+    SEQUENCE {
+        agentDot1qMrpPort
+            Unsigned32,
+        agentDot1qPortMrpJoinTime
+            TimeInterval,
+        agentDot1qPortMrpLeaveTime
+            TimeInterval,
+        agentDot1qPortMrpLeaveAllTime
+            TimeInterval
+     }
+
+agentDot1qMrpPort OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION
+    "The MRP port number."
+    ::= { agentDot1qPortMrpEntry 1 }
+
+agentDot1qPortMrpJoinTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MRP Join time, in centiseconds."
+    DEFVAL      { 20 }
+    ::= { agentDot1qPortMrpEntry 2 }
+
+agentDot1qPortMrpLeaveTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MRP Leave time, in centiseconds."
+    DEFVAL      { 60 }
+    ::= { agentDot1qPortMrpEntry 3 }
+
+agentDot1qPortMrpLeaveAllTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MRP LeaveAll time, in centiseconds."
+    DEFVAL      { 1000 }
+    ::= { agentDot1qPortMrpEntry 4 }
+    
+-- -------------------------------------------------------------
+-- End of the MRP Port Table
+-- -------------------------------------------------------------
+
+END

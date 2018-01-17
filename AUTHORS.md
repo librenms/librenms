@@ -205,6 +205,10 @@ LibreNMS contributors:
 - Dominik Bay <db@rrbone.net> (eimann)
 - Nick Peelman <nick@peelman.us> (peelman)
 - Patrick Ryon <patrick@slashdoom.com> (slashdoom)
+- Mike Williams <mike@mgww.net> (network-guy)
+- Rob J. Epping <librenms@renf.us> (robje)
+- Frank Petrilli <frank@petril.li> (frankpetrilli)
+- Joel Kociolek <joel@kociolek.org> (lejoko)
 
 Observium was written by:
 - Adam Armstrong

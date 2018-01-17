@@ -12,6 +12,10 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Config;
+
+require_once 'includes/modal/delete_poller.inc.php';
+
 ?>
 <br />
 <div class="table-responsive">
@@ -21,6 +25,7 @@
             <th>Devices Polled</th>
             <th>Total Poll Time</th>
             <th>Last Ran</th>
+            <th>Actions</th>
         </tr>
 
 <?php
@@ -28,20 +33,29 @@ $query = 'SELECT *,UNIX_TIMESTAMP(NOW()) AS `now`, UNIX_TIMESTAMP(`last_polled`)
 
 foreach (dbFetchRows($query) as $poller) {
     $old = ($poller['now'] - $poller['then']);
-    if ($old >= 300) {
+    $step = Config::get('rrd.step', 300);
+
+    if ($old >= $step) {
         $row_class = 'danger';
-    } elseif ($old >= 280 && $old < 300) {
+    } elseif ($old >= ($step * 0.95)) {
         $row_class = 'warning';
     } else {
         $row_class = 'success';
     }
 
+    $actions = "";
+    if (is_admin() && $old > ($step * 2)) {
+        // missed 2 polls show delete button
+        $actions .= "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-id='{$poller['id']}' name='delete-poller'><i class='fa fa-trash' aria-hidden='true'></i></button>";
+    }
+
     echo '
-        <tr class="'.$row_class.'">
+        <tr class="'.$row_class.'" id="row_' . $poller['id'] . '">
             <td>'.$poller['poller_name'].'</td>
             <td>'.$poller['devices'].'</td>
             <td>'.$poller['time_taken'].' Seconds</td>
             <td>'.$poller['last_polled'].'</td>
+            <td>'.$actions.'</td>
         </tr>
 ';
 }

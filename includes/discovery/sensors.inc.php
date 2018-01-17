@@ -12,7 +12,26 @@ if (is_file($pre_cache_file)) {
     d_echo($pre_cache);
 }
 
-// Run custom sensors 
+// TODO change to exclude os with pre-cache php file, but just exclude them by hand for now (like avtech)
+if (isset($device['dynamic_discovery']['modules']['sensors']) && $device['os'] != 'avtech') {
+    foreach ($device['dynamic_discovery']['modules']['sensors'] as $key => $data_array) {
+        foreach ($data_array['data'] as $data) {
+            foreach ((array)$data['oid'] as $oid) {
+                if (!isset($pre_cache[$oid])) {
+                    if (isset($data['snmp_flags'])) {
+                        $snmp_flag = $data['snmp_flags'];
+                    } else {
+                        $snmp_flag = '-OeQUs';
+                    }
+                    $snmp_flag .= ' -Ih';
+                    $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid], $device['dynamic_discovery']['mib'], null, $snmp_flag);
+                }
+            }
+        }
+    }
+}
+
+// Run custom sensors
 require 'includes/discovery/sensors/cisco-entity-sensor.inc.php';
 require 'includes/discovery/sensors/entity-sensor.inc.php';
 require 'includes/discovery/sensors/ipmi.inc.php';
@@ -52,6 +71,13 @@ $run_sensors = array(
     'state',
     'temperature',
     'voltage',
+    'snr',
+    'pressure',
+    'cooling',
+    'delay',
+    'quality_factor',
+    'chromatic_dispersion',
+    'ber',
 );
 sensors($run_sensors, $device, $valid, $pre_cache);
 unset(

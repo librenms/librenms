@@ -1,12 +1,17 @@
 <?php
-if ($config['enable_bgp']) {
+
+use LibreNMS\Config;
+use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\IP;
+
+if (Config::get('enable_bgp')) {
     if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=0)) {
         $vrfs_lite_cisco = $device['vrf_lite_cisco'];
     } else {
         $vrfs_lite_cisco = array(array('context_name'=>null));
     }
 
-    $bgpLocalAs = trim(snmp_walk($device, '.1.3.6.1.2.1.15.2', '-Oqvn', 'BGP4-MIB'));
+    $bgpLocalAs = trim(snmp_walk($device, '.1.3.6.1.2.1.15.2', '-Oqvn'));
 
     foreach ($vrfs_lite_cisco as $vrf) {
         $device['context_name'] = $vrf['context_name'];
@@ -76,27 +81,21 @@ if ($config['enable_bgp']) {
                 if ($device['os'] == 'junos') {
                     $safis[1] = 'unicast';
                     $safis[2] = 'multicast';
+                    $safis[3] = 'unicastAndMulticast';
+                    $safis[4] = 'labeledUnicast';
+                    $safis[128] = 'vpn';
 
                     if (!isset($j_peerIndexes)) {
                         $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerEntry', $jbgp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                         d_echo($j_bgp);
                         foreach ($j_bgp as $index => $entry) {
-                            switch ($entry['jnxBgpM2PeerRemoteAddrType']) {
-                                case 'ipv4':
-                                    $ip = long2ip(hexdec($entry['jnxBgpM2PeerRemoteAddr']));
-                                    d_echo("peerindex for ipv4 $ip is ".$entry['jnxBgpM2PeerIndex']."\n");
-                                    $j_peerIndexes[$ip] = $entry['jnxBgpM2PeerIndex'];
-                                    break;
-                                case 'ipv6':
-                                    $ip6 = trim(str_replace(' ', '', $entry['jnxBgpM2PeerRemoteAddr']), '"');
-                                    $ip6 = substr($ip6, 0, 4).':'.substr($ip6, 4, 4).':'.substr($ip6, 8, 4).':'.substr($ip6, 12, 4).':'.substr($ip6, 16, 4).':'.substr($ip6, 20, 4).':'.substr($ip6, 24, 4).':'.substr($ip6, 28, 4);
-                                    $ip6 = Net_IPv6::compress($ip6);
-                                    d_echo("peerindex for ipv6 $ip6 is ".$entry['jnxBgpM2PeerIndex']."\n");
-                                    $j_peerIndexes[$ip6] = $entry['jnxBgpM2PeerIndex'];
-                                    break;
-                                default:
-                                    echo "HALP? Don't know RemoteAddrType ".$entry['jnxBgpM2PeerRemoteAddrType']."!\n";
-                                    break;
+                            $peer_index = $entry['jnxBgpM2PeerIndex'];
+                            try {
+                                $ip = IP::fromHexString($entry['jnxBgpM2PeerRemoteAddr']);
+                                d_echo("peerindex for " . $ip->getFamily() . " $ip is $peer_index\n");
+                                $j_peerIndexes[(string)$ip] = $peer_index;
+                            } catch (InvalidIpException $e) {
+                                d_echo("Unable to parse IP for peer $peer_index: " . $entry['jnxBgpM2PeerRemoteAddr'] . PHP_EOL);
                             }
                         }
                     }

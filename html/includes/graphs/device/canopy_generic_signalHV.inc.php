@@ -11,7 +11,7 @@
 
 require 'includes/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'canopy-generic-signalHV');
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dBm                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:vertical='.$rrdfilename.':vertical:AVERAGE ';
     $rrd_options .= ' DEF:horizontal='.$rrdfilename.':horizontal:AVERAGE ';

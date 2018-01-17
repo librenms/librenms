@@ -53,7 +53,7 @@ if (is_mib_poller_enabled($device)) {
 <script>
     var grid = $("#mibs").bootgrid({
         ajax: true,
-        rowCount: [50,100,250,-1],
+        rowCount: [50, 100, 250, -1],
         post: function ()
         {
             return {

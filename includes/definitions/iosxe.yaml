@@ -36,3 +36,4 @@ discovery:
     - sysDescr:
         - IOS-XE
         - LINUX_IOSD
+        - CAT3K_CAA

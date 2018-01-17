@@ -1,0 +1,707 @@
+CM-COMMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64, Counter32
+             FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION 
+                FROM SNMPv2-TC
+    fsp150cm 
+             FROM  ADVA-MIB;
+
+cmCommonMIB MODULE-IDENTITY
+    LAST-UPDATED    "201607110000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Raghav Trivedi
+                     ADVA Optical Networking, Inc.
+                Tel: +1 972 759-1239
+             E-mail: rtrivedi@advaoptical.com
+             Postal: 2301 N. Greenville Ave. #300
+                     Richardson, TX USA 75082"
+    DESCRIPTION
+            "This module defines the Common MIB definitions used by 
+             the FSP150CM and FSP150CC product lines. 
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201607110000Z"
+    DESCRIPTION
+            "Notes from release 201607110000Z
+             (1) renamed FlowSecureState to FlowSecState since it cannot be moved from fsp150cm-connectguard.mib
+             Notes from release 201607080000Z
+             (1)  moved FlowSecureState from fsp150cm-connectguard.mib
+             Notes from release 201502040000Z
+             (1) add xg210c subproduct             
+
+             Notes from release 201412010000Z,
+             (1) Added new Textual Convention: Decimal32
+
+             Notes from release 201405210000Z,
+             (1) Added new EthernetMediaType literals:
+                 - auto,
+                 - none.
+
+             Notes from release 201311280000Z
+             (1) Added new Secondary State literal - mon-tx 
+             
+             Notes from release 201202150000Z (post GE20x R5.2.3CC)
+             (1) Added  speed-auto-detect to EthernetPortSpeed 
+
+             Notes from release 201108010000Z
+             (1) Post EG-X merge (R5.1.1)
+
+             Notes from release 201107080000Z
+             (1)Moved CmPmIntervalType from fsp150cm-perf.mib to this MIB
+             (2)Added interval-5min to TC CmPmIntervalType
+
+
+             Notes from release 201002120000Z
+             (1)New Textual Conventions : ClassOfServiceType and SignalDirectionType
+             (2)New product OIDs (used for sysOid) : ge201 and ge201se
+
+             Notes from release 200803160000Z,
+             (1)EthernetPortSpeed textual convention now has additional literals,
+                   speed-auto-1000MB-full-master and speed-auto-1000MB-full-slave 
+             (2)Added textual convention SfpMediaType
+
+             Notes from release 200803030000Z,
+             (1)MIB version ready for release FSP150CM." 
+    ::= {fsp150cm 1}    
+
+-- sub products in the F3 family
+subproducts        OBJECT IDENTIFIER ::= { cmCommonMIB 1 }
+f3Capabilities     OBJECT IDENTIFIER ::= { cmCommonMIB 2 }
+
+-- NEMI HUB shelf product
+nemihubshelf     OBJECT IDENTIFIER ::= { subproducts 1 }
+-- GE101 NID product
+ge101            OBJECT IDENTIFIER ::= { subproducts 2 }
+-- GE206 NID product
+ge206            OBJECT IDENTIFIER ::= { subproducts 3 }
+-- GE201 NID product
+ge201            OBJECT IDENTIFIER ::= { subproducts 4 }
+-- GE201-SE NID product (GE201 with SyncE)
+ge201se          OBJECT IDENTIFIER ::= { subproducts 5 }
+-- GE206F NID product (GE206 with 6 Access Ports with SFPs)
+ge206f           OBJECT IDENTIFIER ::= { subproducts 6 }
+
+-- CMAGG NID product
+cmagg            OBJECT IDENTIFIER ::= { subproducts 7 }
+
+-- GE112 NID product (GE112 with 2 Access Ports with SFPs)
+ge112           OBJECT IDENTIFIER ::= { subproducts 8 }
+-- GE114 NID product (GE114 with 4 Access Ports with SFPs)
+ge114           OBJECT IDENTIFIER ::= { subproducts 9 }
+
+-- GE206v NID product (GE206 with 6 Access Ports w SFPs, expansion cards)
+ge206v           OBJECT IDENTIFIER ::= { subproducts 10 }
+
+-- XG210 NID product (10G NID with expansion cards)
+xg210           OBJECT IDENTIFIER ::= { subproducts 11 }
+
+-- T1804 NID product (T1804 with 4 Access Ports with SFPs)
+t1804           OBJECT IDENTIFIER ::= { subproducts 12 }
+
+-- T3204 NID product (T3204 with 4 Access Ports with SFPs)
+t3204           OBJECT IDENTIFIER ::= { subproducts 13 }
+
+-- SyncProbe product 
+gesyncprobe     OBJECT IDENTIFIER ::= { subproducts 14 }
+
+-- GE114H NID product (GE114H with 4 Access Ports with SFPs)
+ge114H           OBJECT IDENTIFIER ::= { subproducts 15 }
+
+-- GE114PH NID product (GE114PH with 4 Access Ports with SFPs)
+ge114PH           OBJECT IDENTIFIER ::= { subproducts 16 }
+
+-- GE114S NID product (GE114S with 4 Access Ports with SFPs)
+ge114S           OBJECT IDENTIFIER ::= { subproducts 17 }
+
+-- GE114SH NID product (GE114SH with 4 Access Ports with SFPs)
+ge114SH           OBJECT IDENTIFIER ::= { subproducts 18 }
+
+-- SH1PCS NID product (10G NID with expansion cards)
+sh1pcs            OBJECT IDENTIFIER ::= { subproducts 19 }
+
+-- GE112Pro NID product (GE112Pro with 2 Access Ports with SFPs)
+ge112Pro           OBJECT IDENTIFIER ::= { subproducts 20 }
+
+-- GE112ProM NID product (GE112ProM with 2 Access Ports with SFPs)
+ge112ProM           OBJECT IDENTIFIER ::= { subproducts 21 }
+
+-- GE114Pro NID product (GE114Pro with 4 Access Ports with SFPs)
+ge114Pro           OBJECT IDENTIFIER ::= { subproducts 22 }
+
+-- GE114ProC NID product (GE114ProC with 4 Access Ports with SFPs)
+ge114ProC           OBJECT IDENTIFIER ::= { subproducts 23 }
+
+-- GE114ProS NID product (GE114ProSH with 4 Access Ports with SFPs)
+ge114ProSH           OBJECT IDENTIFIER ::= { subproducts 24 }
+
+-- GE114ProCS NID product (GE114ProCSH with 4 Access Ports with SFPs)
+ge114ProCSH           OBJECT IDENTIFIER ::= { subproducts 25 }
+
+-- GE114ProHE NID product (GE114ProHE with 4 Access Ports with SFPs)
+ge114ProHE           OBJECT IDENTIFIER ::= { subproducts 26 }
+
+-- MACSEC NID product
+xg210c                OBJECT IDENTIFIER ::= { subproducts 27 }
+
+-- GE112ProH NID product (GE112ProH with 2 Access Ports with SFPs)
+ge112ProH            OBJECT IDENTIFIER ::= { subproducts 28 }
+
+-- GE114G NID product (GE114G with 2 Access Ports with SFPs)
+ge114G            OBJECT IDENTIFIER ::= { subproducts 29 }
+-- 
+-- Textual Conventions 
+-- 
+PortType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for types of ports.
+             eth-access  - Ethernet Access Port, 
+             eth-network - Ethernet Network Port."
+    SYNTAX       INTEGER {
+                   eth-access (1),
+                   eth-network (2)
+                 }
+
+TrafficDirection ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for direction of traffic.  
+             a2n     - Access to Network direction, 
+             n2a     - Network to Access direction,
+             ingress - Entering system direction,
+             egress  - Away from system direction,
+             n2n     - Network to Network direction."
+    SYNTAX       INTEGER {
+                   a2n (1),
+                   n2a (2),
+                   ingress (3),
+                   egress (4),
+                   n2n (5)
+                 }
+
+VlanId ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Textual Convention for the Vlan Id."
+    SYNTAX       INTEGER (0..4095)
+
+
+VlanPriority ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Textual Convention for the Vlan Priority."
+    SYNTAX       INTEGER (0..7)
+
+VlanTagType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Textual Convention for the Type of VLAN Tag."
+    SYNTAX       INTEGER {
+                 inner-vlantag (1),
+                 outer-vlantag (2),
+                 n2a-priorityMapping(3),
+                 mplsLabel(4),
+                 vcLabel(5),
+                 encapOuterVlanTag(6)
+                 } 
+
+
+AdminState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Administrative State used for FSP150CM entities.
+         in-service - represents normal, in-service, traffic passing
+                      state of the Entity;
+         management - represents the traffic passing state, 
+                      however, alarms are not reported
+         maintenance- represents the mandatory state of operating 
+                      loopbacks, ECPA test as well as Etherjack 
+                      diagnosis operations, alarms are not reported 
+         disabled   - represents the disabled state, user traffic is not passed,
+                      management traffic is passed, alarms are not reported
+         unassigned - represents the disabled state, 
+                      traffic(user or management) is not passed,
+                      alarms are not monitored.
+         monitored  - represents the monitored state.  
+                      Used for retrieving performance monitoring on entity, but entity can't be used for normal operation.
+                      Alarms are reported "
+    SYNTAX       INTEGER {
+                   in-service (1),
+                   management (2),
+                   maintenance(3),
+                   disabled   (4),
+                   unassigned (5),
+                   monitored  (6)
+                 } 
+
+OperationalState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Operational State used for FSP150CM entities.
+         normal - represents operational state UP,
+         outage - represents operational state DOWN."
+    SYNTAX       INTEGER {
+                   normal (1),
+                   outage (2)
+                 } 
+
+SecondaryState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Secondary state used for FSP150CM entities.
+         active                 - Active,
+         automaticinservice     - Automatic In Service,
+         facilityfailure        - Facility Failure,
+         fault                  - Fault,
+         loopback               - Loopback,
+         maintenance            - Maintenance,
+         mismatchedeqpt         - Mismatched Equipment,
+         standbyhot             - Standby Hot,
+         supportingentityoutage - Supporting Entity Outage,
+         unassigned             - Unassigned,
+         unequipped             - Unequipped,
+         disabled               - Disabled,
+         forcedoffline          - Forced offline,
+         initializing           - Initializing,
+         prtcl                  - Protocol,
+         blckd                  - Blocked,
+         mon-tx                 - Monitor TX,
+         mir-rx                 - Mirror RX,
+         cema                   - CEMA,
+         lkdo                   - LKDO"
+    SYNTAX       BITS {
+                   not-applicable (0),
+                   active (1),
+                   automaticinservice (2),
+                   facilityfailure (3),
+                   fault (4),
+                   loopback (5),
+                   maintenance (6),
+                   mismatchedeqpt (7),
+                   standbyhot (8),
+                   supportingentityoutage (9),
+                   unassigned (10),
+                   unequipped (11),
+                   disabled (12),
+                   forcedoffline (13),
+                   initializing(14),
+                   prtcl(15),
+                   blckd(16),
+                   mon-tx(17),
+                   mir-rx(18),
+                   cema(19),
+                   lkdo(20)
+                 } 
+
+EthernetPortSpeed ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+      "Describes the Ethernet Port Speed.
+         speed-unknown    : speed unknown 
+         speed-10MB-full  : fixed speed 10MB full duplex
+         speed-10MB-half  : fixed speed 10MB half duplex
+         speed-100MB-full : fixed speed 100MB full duplex
+         speed-100MB-half : fixed speed 100MB half duplex
+         speed-1000MB-full    : fixed speed 1000MB full duplex
+         speed-1000MB-half    : fixed speed 1000MB half duplex
+         speed-auto       : Auto negotiation, advertise all speeds 
+         speed-auto-10MB-full : Auto negotiation, advertise 10MB full duplex 
+         speed-auto-10MB-half : Auto negotiation, advertise 10MB half duplex 
+         speed-auto-100MB-full: Auto negotiation, advertise 100MB full duplex 
+         speed-auto-100MB-half: Auto negotiation, advertise 100MB half duplex 
+         speed-auto-1000MB-full: Auto negotiation, advertise 1000MB full duplex 
+         speed-auto-1000MB-half: Auto negotiation, advertise 1000MB half duplex 
+         speed-negotiating    : Auto negotiating, transient state
+         speed-auto-1000MB-full-master : Auto negotiation, advertise 1000MB full duplex, sync master
+         speed-auto-1000MB-full-slave : Auto negotiation, advertise 1000MB full duplex, sync slave
+         speed-none :                   Used to denote speed, when negotiating 
+         speed-auto-1000MB-full-master-preferred : Auto negotiation,  
+                                                   advertise 1000MB full duplex, preferred sync master
+         speed-auto-1000MB-full-slave-preferred : Auto negotiation, 
+                                                   advertise 1000MB full duplex, preferred sync slave
+         speed-10G-full  : fixed speed 10G full duplex
+         speed-auto-detect  : Auto detect speed; iterate through available speeds and test 
+                              the link with remote end - if link is up at given speed, this speed is configured
+         ."
+    SYNTAX       INTEGER {
+                   speed-unknown (0),
+                   speed-10MB-full (1),
+                   speed-10MB-half (2),
+                   speed-100MB-full(3),
+                   speed-100MB-half(4),
+                   speed-1000MB-full(5),
+                   speed-1000MB-half(6),
+                   speed-auto (7),
+                   speed-auto-10MB-full(8),
+                   speed-auto-10MB-half(9),
+                   speed-auto-100MB-full(10),
+                   speed-auto-100MB-half(11),
+                   speed-auto-1000MB-full(12),
+                   speed-auto-1000MB-half(13),
+                   speed-negotiating(14),
+                   speed-auto-1000MB-full-master(15),
+                   speed-auto-1000MB-full-slave(16),
+                   speed-none(17),
+                   speed-auto-1000MB-full-master-preferred(18),
+                   speed-auto-1000MB-full-slave-preferred(19),
+                   speed-10G-full (20),
+                   speed-auto-detect (21)
+                 }
+
+EthernetMediaType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Describes the Ethernet Port Media Type."
+    SYNTAX       INTEGER {
+                   not-applicable(0),
+                   copper(1),
+                   fiber(2),
+                   coppersfp(3),  --enumeration added in R4.4CC
+                   auto(4),
+                   none(5)
+                 }
+
+PerfCounter64 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This type represents a non-negative 64-bit integer. The initial
+         value of this integer will  be 0.  It will increment with time,
+         however, the value will revert back to 0 when the time period
+         for history interval elapses.  Typically,  this will be noticed
+         at 15minute intervals and 1 day intervals.  Only the rollover
+         interval periods will keep counting to a maximum 64-bit value
+         and will wrap to 0 when this occurs."
+    SYNTAX       Counter64 
+
+PerfCounter32 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This type represents a non-negative 32-bit integer. The initial
+         value of this integer will  be 0.  It will increment with time,
+         however, the value will revert back to 0 when the time period
+         for history interval elapses.  Typically,  this will be noticed
+         at 15minute intervals and 1 day intervals.  Only the rollover
+         interval periods will keep counting to a maximum 32-bit value
+         and will wrap to 0 when this occurs."
+    SYNTAX       Counter32 
+
+IpVersion ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+          "This type allows choice of IPv4 or IPv6 address specification."
+    SYNTAX    INTEGER {
+                ipv4(1),
+                ipv6(2)
+              }
+
+IpPriorityMapMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+          "This type allows choice of IP Priority Mapping Mode."
+    SYNTAX    INTEGER {
+                not-applicable(0),
+                none(1),
+                priomap-tos(2),
+                priomap-dscp(3)
+              }
+
+PriorityMapMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+          "This type allows choice of Priority Mapping Mode."
+    SYNTAX    INTEGER {
+                priomap-none(1),
+                priomap-tos(2),
+                priomap-dscp(3),
+                priomap-8021p(4), -- Outer
+                priomap-8021p-inner(5)
+              }
+
+SfpConnectorValue ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+          "This lists the SFP connector values."
+    SYNTAX    INTEGER {
+                not-applicable (0),
+                unknown (1),
+                sc (2),
+                fcs1cu (3),
+                fcs2cu (4),
+                bnc-tnc (5),
+                fccoaxhdr (6),
+                fjack (7),
+                lc (8),
+                mt-rj (9),
+                mu (10),
+                sg (11),
+                optpigtail (12),
+                hssdc (13),
+                cupigtail (14),
+                vendorspecific (15),
+                rj45(16)
+              }
+
+RestartType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Restart Type used across all card types."
+    SYNTAX       INTEGER {
+                   not-applicable(0),
+                   warm-start (1),
+                   cold-start (2)
+                 }
+
+SfpMediaType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Describes the SFP Media Type."
+    SYNTAX       INTEGER {
+                   not-applicable(0),
+                   singlemode(1),
+                   multimode(2),
+                   multimode62-5(3),
+                   copper(4)
+                 }
+
+ScheduleType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Describes the Schedule Type of a scheduled operation."
+    SYNTAX       INTEGER {
+                   periodic(1),
+                   one-shot(2)
+                 }
+
+SchedActivityStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Scheduled Group Activity Status."
+    SYNTAX       INTEGER {
+                   initial(1),
+                   active(2),
+                   suspended(3),
+                   completed(4)
+                 }
+
+SchedActivityAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Scheduled Activity Action."
+    SYNTAX       INTEGER {
+                   not-applicable(0),
+                   suspend(1),
+                   resume(2)
+                 }
+
+MepDestinationType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Destination MEP Types."
+    SYNTAX       INTEGER {
+                  not-applicable(0),
+                  mepid(1),
+                  macaddress(2)
+                 }
+
+ClassOfServiceType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Class of Service Types."
+    SYNTAX       INTEGER {
+                  cos-not-applicable(0),
+                  cos-zero(1),
+                  cos-one(2),
+                  cos-two(3),
+                  cos-three(4),
+                  cos-four(5),
+                  cos-five(6),
+                  cos-six(7),
+                  cos-seven(8)
+                 }
+
+SignalDirectionType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Signal Direction Type."
+    SYNTAX       INTEGER {
+                  input(1),
+                  output(2)
+                 }
+
+AfpTagControl ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Describes the Afp Tag Control."
+    SYNTAX       INTEGER {
+                   ctag(1),
+                   stag(2),
+                   both(3)
+                 }
+
+CmP2PFlowType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Describes the Agg Flow Type,incluing e-line."
+    SYNTAX       INTEGER {
+                   eline (1)
+                 }
+                 
+CmTrafficACLPriorityType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+          "Describes the Traffic acl priority type, including tos, dscp and traffic class."
+    SYNTAX    INTEGER {
+                notApplicable(0),
+                acl-tos(1),
+                acl-dscp(2)
+              }
+
+CmTrafficAclFilterActionType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Access Control List 
+          permit - Permit access, 
+          deny   - Deny access."
+    SYNTAX       INTEGER {
+                   permit (1),
+                   deny (2)
+                 }
+
+CmTrafficAclFilterType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Describes the Traffic acl filter type, including 
+          MAC
+          IPV4
+          IPV6."
+    SYNTAX       INTEGER {
+                   mac (1),
+                   ipv4 (2),
+                   ipv6 (3)
+                 }
+
+CmTrafficAclProtocolType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Describes the Traffic acl protocol type, including 
+          tcp
+          udp."
+    SYNTAX       INTEGER {
+                   notApplicable(0),
+                   tcp (1),
+                   udp (2)
+                 }
+VlanEthertype ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Describes the Vlan Ether Type, 
+          cvlan, 
+          svlan."
+    SYNTAX       INTEGER {
+                   cvlan (1),
+                   svlan (2)
+                 }
+
+CmPmBinAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Provides ability to clear the contents of PM bin."
+    SYNTAX       INTEGER {
+                   not-applicable(0),
+                   clear (1)
+                 }
+
+CmPmIntervalType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Describes the Performance Monitoring Interval Type."
+    SYNTAX       INTEGER {
+                   interval-15min (1),
+                   interval-1day  (2),
+                   rollover (3),
+                   interval-5min (4)
+                  }
+
+TDMFrequencySourceType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for TDM Frequency Source
+             loopTiming,
+             systemTiming,
+             lineTiming"
+    SYNTAX       INTEGER {
+                   notApplicable(0),
+                   loopTiming(1),
+                   systemTiming(2),
+                   lineTiming(3)
+                 }
+
+F3DisplayString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2047a"
+    STATUS       current
+    DESCRIPTION
+            "This object is similar with DisplayString, 
+            and the difference is its length is 2047.
+            
+            Any object defined using this syntax may not exceed 2047
+            characters in length."
+    SYNTAX       OCTET STRING (SIZE (0..2047))
+
+Decimal32 ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+         "The value is encoded in a Decimal32 interchange format.
+         The decimal value should be calculated as follows:
+
+         (−1)^sign x 10^(exponent−101) x mantissa
+
+         The individual components of the equation are coded in two different
+         formats depending on the range of the mantissa.
+
+         Format A:
+         Second and third bits can be: 00, 01 or 10
+
+         s EEeeeeee mmmmmmm mmmmmmmm mmmmmmmm
+
+         sign: coded on a 1 bit - s
+         exponent: coded on 8 bits - EEeeeeee
+         where EE: 00, 01 or 10
+         mantissa: coded on 24 bits - 0mmmmmmm mmmmmmmm mmmmmmmm
+
+         Format B:
+         For a larger mantissa.
+         Second and third bits are: 11
+
+         s 11 EEeeeeee mmmmm mmmmmmmm mmmmmmmm
+
+         sign: coded on a 1 bit - s
+         exponent: coded on 8 bits - EEeeeeee
+         where EE: 00, 01 or 10
+         mantissa: coded on 24 bits - 100mmmmm mmmmmmmm mmmmmmmm"
+    SYNTAX   Unsigned32 
+
+UserInterfaceType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Denotes used user interface type."
+    SYNTAX       INTEGER {
+                   cli (1),
+                   gui (2),
+                   netconf (3),
+                   snmp (4)
+                  }
+-- same as FlowSecureState. Duplicated to avoid cyclic dependency
+FlowSecState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Flow secure state."
+    SYNTAX       INTEGER {
+                   secureNormal (1),
+                   secureBlocked (2),
+                   unsecureNormal (3),
+                   unsecureBlocked (4)
+                 }
+
+END

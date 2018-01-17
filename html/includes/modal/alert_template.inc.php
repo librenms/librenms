@@ -25,7 +25,6 @@ if (is_admin() === false) {
                 <h4 class="modal-title" id="Create">Alert Rules</h4>
             </div>
             <div class="modal-body">
-                <form method="post" role="form" id="rules" class="form alert-template-form">
                 <div class="row">
                     <div class="col-md-12">
                         <span id="response"></span>
@@ -87,6 +86,7 @@ foreach ($operators as $operator) {
                             <input type="text" class="form-control" id="value" name="value" autocomplete="off"><br /><br />
                             <input type="text" class="form-control" id="line" name="line"><br /><br />
                             <input type="hidden" name="template_id" id="template_id">
+                            <input type="hidden" name="default_template" id="default_template" value="0">
                             <button type="button" class="btn btn-primary" id="add_line" name="add_line">Add line</button>
                         </div>
                     </div>
@@ -95,15 +95,19 @@ foreach ($operators as $operator) {
         </div>
     </div>
 </div>
-</form>
 <script>
 
 $('#alert-template').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
-    var template_id = button.data('template_id');
-    var action = button.data('template_action');
-    if(action == 'edit') {
-        $('#template_id').val(template_id);
+    var template_id = $('#template_id').val();
+    var default_template = $('#default_template').val();
+
+    if(template_id != null && template_id != '') {
+        if(default_template == "1") {
+            $('#create-template').after('<span class="pull-right"><button class="btn btn-primary btn-sm" id="reset-default">Reset to Default</button></span>');
+            $('#name').prop("disabled",true);
+        }
+        $('#create-template').text('Update template');
         $.ajax({
             type: "POST",
             url: "ajax_form.php",
@@ -118,12 +122,18 @@ $('#alert-template').on('show.bs.modal', function (event) {
         });
     }
 });
+
 $('#alert-template').on('hide.bs.modal', function(event) {
     $('#template_id').val('');
     $('#template').val('');
     $('#line').val('');
     $('#value').val('');
     $('#name').val('');
+    $('#create-template').text('Create template');
+    $('#default-template').val('0');
+    $('#reset-default').remove();
+    $('#name').prop("disabled",false);
+    $('#error').val('');
 });
 
 $('#create-template').click('', function(e) {
@@ -133,26 +143,7 @@ $('#create-template').click('', function(e) {
     var name = $("#name").val();
     var title = $("#title").val();
     var title_rec = $("#title_rec").val();
-    $.ajax({
-        type: "POST",
-        url: "ajax_form.php",
-        data: { type: "alert-templates", template: template , name: name, template_id: template_id, title: title, title_rec: title_rec},
-        dataType: "html",
-        success: function(msg){
-            if(msg.indexOf("ERROR:") <= -1) {
-                $("#message").html('<div class="alert alert-info">'+msg+'</div>');
-                $("#alert-template").modal('hide');
-                setTimeout(function() {
-                    location.reload(1);
-                }, 1000);
-            } else {
-                $("#error").html('<div class="alert alert-info">'+msg+'</div>');
-            }
-        },
-        error: function(){
-            $("#error").html('<div class="alert alert-info">An error occurred updating this alert template.</div>');
-        }
-    });
+    alertTemplateAjaxOps(template, name, template_id, title, title_rec);
 });
 
 $('#add_line').click('', function(e) {
@@ -215,6 +206,40 @@ $('#value').keypress(function (e) {
         $('#value').val('');
     }
 });
+
+$('div').on('click', 'button#reset-default', function(e) {
+    console.log('zart');
+    e.preventDefault();
+    var template_id = $("#template_id").val();
+    var template = '%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}';
+    var name = 'Default Alert Template';
+    alertTemplateAjaxOps(template, name, template_id, '', '');
+});
+
+function alertTemplateAjaxOps(template, name, template_id, title, title_rec)
+{
+    $.ajax({
+        type: "POST",
+        url: "ajax_form.php",
+        data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec},
+        dataType: "html",
+        success: function(msg){
+            if(msg.indexOf("ERROR:") <= -1) {
+                $("#message").html('<div class="alert alert-info">'+msg+'</div>');
+                $("#alert-template").modal('hide');
+                setTimeout(function() {
+                    location.reload(1);
+                }, 1000);
+            } else {
+                $("#error").html('<div class="alert alert-danger">'+msg+'</div>');
+            }
+        },
+        error: function(){
+            $("#error").html('<div class="alert alert-danger">An error occurred updating this alert template.</div>');
+        }
+    });
+
+}
 
 function updateLine(value) {
     var line = $('#line').val();

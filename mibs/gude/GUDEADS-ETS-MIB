@@ -1,0 +1,261 @@
+GUDEADS-ETS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+ enterprises,
+ MODULE-IDENTITY,
+ OBJECT-TYPE,
+ NOTIFICATION-TYPE,
+ Integer32,
+ IpAddress
+  FROM SNMPv2-SMI
+ OBJECT-GROUP,
+ NOTIFICATION-GROUP
+  FROM SNMPv2-CONF;
+
+gudeads MODULE-IDENTITY
+ LAST-UPDATED "200705231244Z" -- May 23, 2007 12:44:00 PM
+ ORGANIZATION "Gude Analog- und Digitalsysteme GmbH"
+ CONTACT-INFO
+  "http://www.gudeads.com/"
+ DESCRIPTION
+  ""
+ REVISION "200705231244Z" -- May 23, 2007 12:44:00 PM
+ DESCRIPTION
+  "Initial version."
+ -- 1.3.6.1.4.1.28507
+ ::= { enterprises 28507 }
+
+
+
+etsPrimaryPowerChangeEvt NOTIFICATION-TYPE
+ OBJECTS {
+  etsPrimPowAvail}
+ STATUS  current
+ DESCRIPTION
+  "Event is triggered when a primary power
+  changes"
+ -- 1.3.6.1.4.1.28507.4.0.1
+ ::= { etsEvents 1 }
+
+
+etsSecondaryPowerChangeEvt NOTIFICATION-TYPE
+ OBJECTS {
+  etsSecPowAvail}
+ STATUS  current
+ DESCRIPTION
+  "Event is triggered when a secondary power
+  changes"
+ -- 1.3.6.1.4.1.28507.4.0.2
+ ::= { etsEvents 2 }
+
+etsSNMPaccess OBJECT IDENTIFIER 
+ -- 1.3.6.1.4.1.28507.4.1.1
+ ::= { etsObjects 1 }
+
+etsTrapCtrl OBJECT-TYPE
+ SYNTAX  Integer32 (0..2)
+ MAX-ACCESS read-write
+ STATUS  current
+ DESCRIPTION
+  "0 = off
+  1 = Ver. 1
+  2 = Ver. 2c"
+ -- 1.3.6.1.4.1.28507.4.1.1.1
+ ::= { etsSNMPaccess 1 }
+
+
+etsTrapIPTable OBJECT-TYPE
+ SYNTAX  SEQUENCE OF EtsTrapIPEntry
+ MAX-ACCESS not-accessible
+ STATUS  current
+ DESCRIPTION
+  "list of all Trap receiver"
+ -- 1.3.6.1.4.1.28507.4.1.1.2
+ ::= { etsSNMPaccess 2 }
+
+
+etsTrapIPEntry OBJECT-TYPE
+ SYNTAX  EtsTrapIPEntry
+ MAX-ACCESS not-accessible
+ STATUS  current
+ DESCRIPTION
+  "an entry containing management
+  informations regarding the list of trap
+  receivers"
+ INDEX {
+  etsTrapIPIndex }
+ -- 1.3.6.1.4.1.28507.4.1.1.2.1
+ ::= { etsTrapIPTable 1 }
+
+
+EtsTrapIPEntry ::= SEQUENCE {
+
+ etsTrapIPIndex Integer32,
+ etsTrapIPAddr  IpAddress,
+ etsTrapIPPort  Integer32 }
+
+
+etsTrapIPIndex OBJECT-TYPE
+ SYNTAX  Integer32 (1..8)
+ MAX-ACCESS not-accessible
+ STATUS  current
+ DESCRIPTION
+  "A unique value, greater than zero, for each receiver slot."
+ -- 1.3.6.1.4.1.28507.4.1.1.2.1.1
+ ::= { etsTrapIPEntry 1 }
+
+
+etsTrapIPPort OBJECT-TYPE
+ SYNTAX  Integer32 (0..1024)
+ MAX-ACCESS read-write
+ STATUS  current
+ DESCRIPTION
+  "IP Port specifying one Trap receiver slot.
+  A value of  0 disables this slot."
+ DEFVAL { 162 }
+ -- 1.3.6.1.4.1.28507.4.1.1.2.1.3
+ ::= { etsTrapIPEntry 3 }
+
+
+etsTrapIPAddr OBJECT-TYPE
+ SYNTAX  IpAddress
+ MAX-ACCESS read-write
+ STATUS  current
+ DESCRIPTION
+  "IP Address specifying one Trap receiver slot.
+  A value of '00000000'H disables this slot."
+ DEFVAL { '00000000'H }
+ -- 1.3.6.1.4.1.28507.4.1.1.2.1.2
+ ::= { etsTrapIPEntry 2 }
+
+
+gadsETS OBJECT IDENTIFIER 
+ -- 1.3.6.1.4.1.28507.4
+ ::= { gudeads 4 }
+
+-- Scalars and Tables
+--
+
+etsObjects OBJECT IDENTIFIER 
+ -- 1.3.6.1.4.1.28507.4.1
+ ::= { gadsETS 1 }
+
+etsPrimPowAvail OBJECT-TYPE
+ SYNTAX  Integer32
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION
+  "not zero if primary Power available"
+ -- 1.3.6.1.4.1.28507.4.1.2
+ ::= { etsObjects 2 }
+
+
+etsSecPowAvail OBJECT-TYPE
+ SYNTAX  Integer32
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION
+  "not zero if secondary Power available"
+ -- 1.3.6.1.4.1.28507.4.1.3
+ ::= { etsObjects 3 }
+
+
+etsSecManualSelect OBJECT-TYPE
+ SYNTAX  Integer32
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION
+  "not zero if secondary Power is manually selected"
+ -- 1.3.6.1.4.1.28507.4.1.4
+ ::= { etsObjects 4 }
+
+
+-- Notification Types
+--
+
+etsEvents OBJECT IDENTIFIER 
+ -- 1.3.6.1.4.1.28507.4.0
+ ::= { gadsETS 0 }
+
+etsPowerSelect OBJECT-TYPE
+ SYNTAX  Integer32
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION
+  "if 1, power is primary
+  if 2, power is secondary"
+ -- 1.3.6.1.4.1.28507.4.1.5
+ ::= { etsObjects 5 }
+
+
+-- Conformance
+--
+
+etsConf OBJECT IDENTIFIER 
+ -- 1.3.6.1.4.1.28507.4.3
+ ::= { gadsETS 3 }
+
+-- Groups
+--
+
+etsGroups OBJECT IDENTIFIER 
+ -- 1.3.6.1.4.1.28507.4.3.1
+ ::= { etsConf 1 }
+
+-- Compliance
+--
+
+etsCompls OBJECT IDENTIFIER 
+ -- 1.3.6.1.4.1.28507.4.3.2
+ ::= { etsConf 2 }
+
+
+etsManualSelectEvt NOTIFICATION-TYPE
+ OBJECTS {
+  etsSecManualSelect}
+ STATUS  current
+ DESCRIPTION
+  "triggered when secondary power is manually
+  selected"
+ -- 1.3.6.1.4.1.28507.4.0.3
+ ::= { etsEvents 3 }
+
+
+etsPowerSelectEvt NOTIFICATION-TYPE
+ OBJECTS {
+  etsPowerSelect}
+ STATUS  current
+ DESCRIPTION
+  "Event is triggered when power changes
+  between primary and secondary"
+ -- 1.3.6.1.4.1.28507.4.0.4
+ ::= { etsEvents 4 }
+
+etsBasicGroup OBJECT-GROUP
+ OBJECTS {
+  etsPrimPowAvail,
+  etsSecPowAvail,
+  etsSecManualSelect,
+  etsPowerSelect,
+  etsTrapCtrl,
+  etsTrapIPAddr,
+  etsTrapIPPort }
+ STATUS  current
+ DESCRIPTION
+  "Basic objects."
+ -- 1.3.6.1.4.1.28507.4.3.1.1
+ ::= { etsGroups 1 }
+
+etsNotificationGroup NOTIFICATION-GROUP
+ NOTIFICATIONS {
+  etsPrimaryPowerChangeEvt,
+  etsSecondaryPowerChangeEvt,
+  etsManualSelectEvt,
+  etsPowerSelectEvt }
+ STATUS  current
+ DESCRIPTION
+  ""
+ -- 1.3.6.1.4.1.28507.4.3.1.2
+ ::= { etsGroups 2 }
+
+END

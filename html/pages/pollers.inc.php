@@ -21,11 +21,14 @@ $poll_tabs = array(
         'name' => 'Pollers',
         'icon' => 'fa-th-large',
     ),
-    array(
+);
+
+if ($config['distributed_poller'] === true) {
+    $poll_tabs[] = array(
         'name' => 'Groups',
         'icon' => 'fa-th',
-    ),
-);
+    );
+}
 
 foreach ($poll_tabs as $tab) {
     echo '

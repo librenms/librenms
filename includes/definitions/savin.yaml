@@ -1,0 +1,15 @@
+os: savin
+group: printer
+text: 'Savin Printer'
+type: printer
+icon: savin
+over:
+    - { graph: device_toner, text: Toner }
+discovery:
+    - sysDescr:
+        - SAVIN
+discovery_modules:
+    toner: 1
+poller_modules:
+    toner: 1
+

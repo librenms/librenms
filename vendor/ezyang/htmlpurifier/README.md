@@ -1,4 +1,4 @@
-HTML Purifier
+HTML Purifier [![Build Status](https://secure.travis-ci.org/ezyang/htmlpurifier.svg?branch=master)](http://travis-ci.org/ezyang/htmlpurifier)
 =============
 
 HTML Purifier is an HTML filtering solution that uses a unique combination

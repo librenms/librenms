@@ -83,6 +83,10 @@ functions that wrap handlers (or are injected into a
 - `GuzzleHttp\ClientInterface::getDefaultOption` has been renamed to
   `GuzzleHttp\ClientInterface::getConfig`.
 - `GuzzleHttp\ClientInterface::setDefaultOption` has been removed.
+- The `json` and `xml` methods of response objects has been removed. With the
+  migration to strictly adhering to PSR-7 as the interface for Guzzle messages,
+  adding methods to message interfaces would actually require Guzzle messages
+  to extend from PSR-7 messages rather then work with them directly.
 
 ## Migrating to middleware
 
@@ -128,7 +132,7 @@ $handler = GuzzleHttp\HandlerStack::create();
 $handler->push(Middleware::mapRequest(function (RequestInterface $request) {
     // Notice that we have to return a request object
     return $request->withHeader('X-Foo', 'Bar');
-});
+}));
 // Inject the handler into the client
 $client = new GuzzleHttp\Client(['handler' => $handler]);
 ```
@@ -596,7 +600,7 @@ these if needed):
 The following plugins are not part of the core Guzzle package, but are provided
 in separate repositories:
 
-- `Guzzle\Http\Plugin\BackoffPlugin` has been rewritten to be muchs simpler
+- `Guzzle\Http\Plugin\BackoffPlugin` has been rewritten to be much simpler
   to build custom retry policies using simple functions rather than various
   chained classes. See: https://github.com/guzzle/retry-subscriber
 - `Guzzle\Http\Plugin\Cache\CachePlugin` has moved to
@@ -660,8 +664,8 @@ that contain additional metadata accessible via `getMetadata()`.
 
 The entire concept of the StreamRequestFactory has been removed. The way this
 was used in Guzzle 3 broke the actual interface of sending streaming requests
-(instead of getting back a Response, you got a StreamInterface). Streeaming
-PHP requests are now implemented throught the `GuzzleHttp\Adapter\StreamAdapter`.
+(instead of getting back a Response, you got a StreamInterface). Streaming
+PHP requests are now implemented through the `GuzzleHttp\Adapter\StreamAdapter`.
 
 3.6 to 3.7
 ----------

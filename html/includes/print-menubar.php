@@ -1,6 +1,7 @@
 <?php
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
+use LibreNMS\Authentication\Auth;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\ObjectCache;
 
@@ -126,6 +127,7 @@ if (dbFetchCell("SELECT 1 from `packages` LIMIT 1")) {
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv6'))); ?>"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> IPv6 Address</a></li>
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'mac'))); ?>"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> MAC Address</a></li>
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'arp'))); ?>"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> ARP Tables</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'fdb'))); ?>"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i> FDB Tables</a></li>
 <?php
 if (is_module_enabled('poller', 'mib')) {
 ?>
@@ -209,6 +211,8 @@ if ($_SESSION['userlevel'] >= '10') {
     if ($config['navbar']['manage_groups']['hide'] === 0) {
         echo '<li><a href="'.generate_url(array('page'=>'device-groups')).'"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Manage Groups</a></li>';
     }
+
+    echo '<li><a href="'.generate_url(array('page'=>'device-dependencies')).'"><i class="fa fa-group fa-fw fa-lg"></i> Device Dependencies</a></li>';
 
      echo '
             <li role="presentation" class="divider"></li>
@@ -342,7 +346,7 @@ foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`delete
 <?php
 
 if ($deleted_ports) {
-    echo('            <li><a href="deleted-ports/"><i class="fa fa-minus-circle fa-fw fa-lg" aria-hidden="true"></i> Deleted ('.$deleted_ports.')</a></li>');
+    echo('            <li><a href="ports/deleted=yes/"><i class="fa fa-minus-circle fa-fw fa-lg" aria-hidden="true"></i> Deleted ('.$deleted_ports.')</a></li>');
 }
 
 ?>
@@ -373,7 +377,30 @@ if ($menu_sensors) {
     echo('            <li role="presentation" class="divider"></li>');
 }
 
-$icons = array('fanspeed'=>'tachometer','humidity'=>'tint','temperature'=>'thermometer-full','current'=>'bolt','frequency'=>'line-chart','power'=>'power-off','voltage'=>'bolt','charge'=>'battery-half','dbm'=>'sun-o', 'load'=>'percent', 'runtime' => 'hourglass-half', 'state'=>'bullseye','signal'=>'wifi');
+$icons = array(
+    'fanspeed' => 'tachometer',
+    'humidity' => 'tint',
+    'temperature' => 'thermometer-full',
+    'current' => 'bolt',
+    'frequency' => 'line-chart',
+    'power' => 'power-off',
+    'voltage' => 'bolt',
+    'charge' => 'battery-half',
+    'dbm' => 'sun-o',
+    'load' => 'percent',
+    'runtime' => 'hourglass-half',
+    'state' => 'bullseye',
+    'signal' => 'wifi',
+    'snr' => 'signal',
+    'pressure' => 'thermometer-empty',
+    'cooling' => 'thermometer-full',
+    'airflow' => 'angle-double-right',
+    'delay' => 'clock-o',
+    'chromatic_dispersion' => 'indent',
+    'ber' => 'sort-amount-desc',
+    'quality_factor' => 'arrows',
+
+);
 foreach (array('fanspeed','humidity','temperature','signal') as $item) {
     if (isset($menu_sensors[$item])) {
         echo('            <li><a href="health/metric='.$item.'/"><i class="fa fa-'.$icons[$item].' fa-fw fa-lg" aria-hidden="true"></i> '.nicecase($item).'</a></li>');
@@ -406,7 +433,16 @@ foreach (array_keys($menu_sensors) as $item) {
     $sep++;
 }
 
+
+$toner = new ObjectCache('toner');
+if ($toner) {
+    echo '<li role="presentation" class="divider"></li>';
+    echo '<li><a href="health/metric=toner/"><i class="fa fa-print fa-fw fa-lg"></i> Toner</a></li>';
+    $used_sensors['toner'] = $toner;
+}
 ?>
+
+
           </ul>
         </li>
 <?php
@@ -437,6 +473,7 @@ if ($_SESSION['userlevel'] >= '5' && count($app_list) > "0") {
         <li class="dropdown">
           <a href="apps/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Apps</span></a>
           <ul class="dropdown-menu">
+              <li><a href="apps/"><i class="fa fa-object-group fa-fw fa-lg" aria-hidden="true"></i> Overview</a></li>
 <?php
 
 foreach ($app_list as $app) {
@@ -598,7 +635,7 @@ if (empty($notifications['count']) && empty($notifications['sticky_count'])) {
 } else {
     $class = 'badge-danger';
 }
-    echo('<a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span class="visible-xs-inline-block">User</span><span class="badge badge-navbar-user '.$class.'">'.($notifications['sticky_count']+$notifications['count']).'</span></a>');
+    echo('<a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span class="visible-xs-inline-block">User</span><span class="badge badge-navbar-user count-notif '.$class.'">'.($notifications['sticky_count']+$notifications['count']).'</span></a>');
 ?>
         <ul class="dropdown-menu">
           <li><a href="preferences/"><i class="fa fa-cog fa-fw fa-lg" aria-hidden="true"></i> My Settings</a></li>
@@ -622,13 +659,14 @@ if ($_SESSION['authenticated']) {
 <?php
 if ($_SESSION['userlevel'] >= '10') {
     echo('<li><a href="settings/"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> Global Settings</a></li>');
+    echo('<li><a href="validate/"><i class="fa fa-check-circle fa-fw fa-lg" aria-hidden="true"></i> Validate Config</a></li>');
 }
 
 ?>
           <li role="presentation" class="divider"></li>
 
 <?php if ($_SESSION['userlevel'] >= '10') {
-    if (auth_usermanagement()) {
+    if (Auth::get()->canManageUsers()) {
         echo('
            <li><a href="adduser/"><i class="fa fa-user-plus fa-fw fa-lg" aria-hidden="true"></i> Add User</a></li>
            <li><a href="deluser/"><i class="fa fa-user-times fa-fw fa-lg" aria-hidden="true"></i> Remove User</a></li>
@@ -642,11 +680,11 @@ if ($_SESSION['userlevel'] >= '10') {
            <li class="dropdown-submenu">
                <a href="#"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a>
                <ul class="dropdown-menu scrollable-menu">
-               <li><a href="poll-log/"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> Poller History</a></li>');
+               <li><a href="poll-log/"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> Poller History</a></li>
+               <li><a href="pollers/tab=pollers/"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a></li>');
 
     if ($config['distributed_poller'] === true) {
         echo ('
-                    <li><a href="pollers/tab=pollers/"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a></li>
                     <li><a href="pollers/tab=groups/"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Poller Groups</a></li>');
     }
     echo ('
@@ -658,7 +696,7 @@ if ($_SESSION['userlevel'] >= '10') {
            <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> API</a>
            <ul class="dropdown-menu scrollable-menu">
              <li><a href="api-access/"><i class="fa fa-cog fa-fw fa-lg" aria-hidden="true"></i> API Settings</a></li>
-             <li><a href="http://docs.librenms.org/API/API-Docs/" target="_blank" rel="noopener"><i class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> API Docs</a></li>
+             <li><a href="https://docs.librenms.org/API/" target="_blank" rel="noopener"><i class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> API Docs</a></li>
            </ul>
            </li>
            <li role="presentation" class="divider"></li>');

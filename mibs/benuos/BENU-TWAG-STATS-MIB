@@ -1,0 +1,1150 @@
+BENU-TWAG-STATS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   Integer32, Unsigned32, MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, NOTIFICATION-TYPE
+      FROM SNMPv2-SMI
+
+   benuWAG FROM BENU-WAG-MIB;
+
+benuTWagStatsMIB  MODULE-IDENTITY
+            LAST-UPDATED "201607270000Z" -- 27 July 2016
+            ORGANIZATION "Benu Networks,Inc"
+            CONTACT-INFO "Benu Networks,Inc
+                          Corporate Headquarters
+                          300 Concord Road, Suite 110
+                          Billerica, MA 01821 USA
+                          Tel: +1 978-223-4700
+                          Fax: +1 978-362-1908
+                          Email: info@benunets.com"
+            DESCRIPTION
+               "This MIB module defines statistics of
+                Benu Wireless Access Gateway.
+
+                Copyright (C)  2012 by Benu Networks, Inc.
+                All rights reserved."
+
+            REVISION "201607190000Z" -- 19 July 2016
+            DESCRIPTION "Initial Version"
+
+            REVISION "201607270000Z" -- 27 July 2016
+            DESCRIPTION "Added counter bTWagPmip6DeletedDueToLmaInitBriMsg to indicate subs del by lma"
+    ::= { benuWAG 7 }
+
+-- declare top-level MIB objects for each component
+
+bTWagNotifications  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "TWAG notifications are defined in this branch."
+   ::= { benuTWagStatsMIB 0 }
+
+bTWagS2aSubscriberMIBObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "TWAG S2a subscriber statistics are defined in this branch."
+   ::= { benuTWagStatsMIB 1 }
+
+bTWagS2aSubscriberNotifObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "Notifications of TWAG S2a subscriber statistics are defined in this branch."
+   ::= { benuTWagStatsMIB 2 }
+
+bTWagS2aStatsMIBObjects    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "TWAG s2a interface statistics are defined in this branch."
+    ::= { benuTWagStatsMIB 3 }
+
+bTWagS2aNotifObjects  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Notifications of TWAG s2a interface statistics are defined in this branch."
+    ::= { benuTWagStatsMIB 4 }
+
+bTWagGTPStatsMIBObjects    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "TWAG GTP  statistics are defined in this branch."
+    ::= { benuTWagStatsMIB 5 }
+
+bTWagGTPNotifObjects  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Notifications of TWAG GTP statistics are defined in this branch."
+    ::= { benuTWagStatsMIB 6 }
+
+bTWagGnGpSubscriberMIBObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "TWAG GnGp subscriber statistics are defined in this branch."
+   ::= { benuTWagStatsMIB 7 }
+
+bTWagGnGpSubscriberNotifObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "Notifications of TWAG GnGp subscriber statistics are defined in this branch."
+   ::= { benuTWagStatsMIB 8 }
+
+bTWagGnGpStatsMIBObjects    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "TWAG GnGp interface statistics are defined in this branch."
+    ::= { benuTWagStatsMIB 9 }
+
+bTWagGnGpNotifObjects  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Notifications of TWAG GnGp interface statistics are defined in this branch."
+    ::= { benuTWagStatsMIB 10 }
+
+bTWagPmip6MIBObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "TWAG Pmip6 statistics are defined in this branch."
+   ::= { benuTWagStatsMIB 11 }
+
+-- TWAG GTP Tunnel Scalars
+
+bTWagGTPCurrentNumOfTunnels    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current number of GTP Tunnels."
+   ::= { bTWagGTPStatsMIBObjects 1 }
+
+-- TWAG S2a Subscriber Scalars
+
+bTWagNumCurrentSecureSSIDS2aSubscribers     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current number of 802.1x subscribers."
+   ::= { bTWagS2aSubscriberMIBObjects 1 }
+
+bTWagNumPreAuthenticatedS2aSubscribers    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of pre-authenticated subscribers."
+   ::= { bTWagS2aSubscriberMIBObjects 2 }
+
+-- TWAG GnGp Subscriber Scalars
+
+bTWagNumCurrentSecureSSIDGnGpSubscribers     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current number of 802.1x subscribers."
+   ::= { bTWagGnGpSubscriberMIBObjects 1 }
+
+bTWagNumPreAuthenticatedGnGpSubscribers    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of pre-authenticated subscribers."
+   ::= { bTWagGnGpSubscriberMIBObjects 2 }
+
+-- TWAG Pmip6 Subscriber Scalars
+
+bTWagNumPreAuthenticatedPmip6Subscribers    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current total number of pre-authenticated subscribers."
+   ::= { bTWagPmip6MIBObjects 1 }
+
+bTWagNumGrePmip6Tunnels    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current total number of Gre Pmip6 tunnels."
+   ::= { bTWagPmip6MIBObjects 2 }
+
+-- TWAG PMIP6 Stats Table
+
+bTWagPmip6StatsTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BTWagPmip6StatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of TWAG Pmip6 statistics."
+   ::= { bTWagPmip6MIBObjects 3 }
+
+bTWagPmip6StatsEntry  OBJECT-TYPE
+   SYNTAX      BTWagPmip6StatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bTWagPmip6StatsTable."
+   INDEX {
+      bTWagPmip6StatsInterval
+   }
+   ::= { bTWagPmip6StatsTable 1 }
+
+BTWagPmip6StatsEntry ::= SEQUENCE {
+    bTWagPmip6StatsInterval                 Integer32,
+    bTWagPmip6IntervalDuration              Integer32,
+    bTWagPmip6TotalPacketsRxvd                 	Unsigned32,
+    bTWagPmip6TotalPacketsRxvdError 	        Unsigned32,
+    bTWagPmip6TotalPacketHeaderDecodeError	    Unsigned32,
+    bTWagPmip6TotalPbuSent						Unsigned32,
+    bTWagPmip6TotalPbuSendError					Unsigned32,
+    bTWagPmip6TotalPbaReceived		           	Unsigned32,
+    bTWagPmip6TotalBriReceived					Unsigned32,
+    bTWagPmip6TotalBraSent					    Unsigned32,
+    bTWagPmip6HeartBeatReqSent                  Unsigned32,
+    bTWagPmip6HeartBeatRspSent 				    Unsigned32,
+    bTWagPmip6HeartBeatReqRestartCountMismatch  Unsigned32,
+    bTWagPmip6HeartBeatReqSeqMismatch           Unsigned32,
+    bTWagPmip6DeletedDueToLmaInitBriMsg         Unsigned32
+}
+
+bTWagPmip6StatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+        "The interval during which the measurements are accumlated.
+        Interval index 1 indicates the latest interval for which
+        statistics accumulation is completed. Older the statistics,
+        greater the interval index value. In a system supporting a
+        history of n intervals with interval count 1 and interval
+        count n, the most and the least recent intervals respectively,
+        the following apply at the end of an interval:
+        - statistics for interval count n are discarded
+        - the statistics for interval count i become statistics
+          for interval count i + 1, where 1 <= i < n
+        - current statistics become statistics for interval count 1."
+   ::= { bTWagPmip6StatsEntry 1 }
+
+bTWagPmip6IntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of statistics interval (or reporting period) in minutes"
+   ::= { bTWagPmip6StatsEntry 2 }
+
+
+bTWagPmip6TotalPacketsRxvd	OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of Pmip6 packets received"
+   ::= { bTWagPmip6StatsEntry 3 }
+
+bTWagPmip6TotalPacketsRxvdError  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of Pmip6 error packets received"
+   ::= { bTWagPmip6StatsEntry 4 }
+
+bTWagPmip6TotalPacketHeaderDecodeError  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of Pmip6 packet header decode errors"
+   ::= { bTWagPmip6StatsEntry 5 }
+
+bTWagPmip6TotalPbuSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of Pmip6 proxy binding update packets sent"
+   ::= { bTWagPmip6StatsEntry 6 }
+
+bTWagPmip6TotalPbuSendError  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of Pmip6 proxy binding update packets send error"
+   ::= { bTWagPmip6StatsEntry 7 }
+
+bTWagPmip6TotalPbaReceived  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of Pmip6 proxy binding ack packets received "
+   ::= { bTWagPmip6StatsEntry 8 }
+
+bTWagPmip6TotalBriReceived  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of Pmip6 binding revocation indication packets received"
+   ::= { bTWagPmip6StatsEntry 9 }
+
+bTWagPmip6TotalBraSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of Pmip6 binding revocation ack packets sent"
+   ::= { bTWagPmip6StatsEntry 10 }
+
+bTWagPmip6HeartBeatReqSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of Pmip6 heartbeat request sent"
+   ::= { bTWagPmip6StatsEntry 11 }
+
+bTWagPmip6HeartBeatRspSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of Pmip6 heartbeat response sent"
+   ::= { bTWagPmip6StatsEntry 12 }
+
+bTWagPmip6HeartBeatReqRestartCountMismatch  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of Pmip6 heartbeat request restart counter mismatch" 
+   ::= { bTWagPmip6StatsEntry 13 }
+
+bTWagPmip6HeartBeatReqSeqMismatch  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of Pmip6 heartbeat request restart sequence mismatch" 
+   ::= { bTWagPmip6StatsEntry 14 }
+
+
+bTWagPmip6DeletedDueToLmaInitBriMsg  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of Pmip6 subscribers deleted due to Lma initiated Bri message" 
+   ::= { bTWagPmip6StatsEntry 15 }
+
+
+-- TWAG S2a Subscriber Stats Table
+
+bTWagS2aSubscriberTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BTWagS2aSubscriberEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of TWAG S2a subscriber statistics."
+   ::= { bTWagS2aSubscriberMIBObjects 3 }
+
+bTWagS2aSubscriberEntry  OBJECT-TYPE
+   SYNTAX      BTWagS2aSubscriberEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bTWagS2aSubscriberTable."
+   INDEX {
+      bTWagS2aSubsStatsInterval
+   }
+   ::= { bTWagS2aSubscriberTable 1 }
+
+BTWagS2aSubscriberEntry ::= SEQUENCE {
+    bTWagS2aSubsStatsInterval                   Integer32,
+    bTWagS2aSubsIntervalDuration                Integer32,
+    bTWagSecureSSIDS2aSubsAdded                 Unsigned32,
+    bTWagPreAuthenticatedS2aSubsAdded           Unsigned32,
+    bTWagS2aSubsDeletionsByDMinitiatedByPGW     Unsigned32,
+    bTWagS2aSubsGtpSessionCreateFailed          Unsigned32,
+    bTWagS2aSubsCSRQSendFailed                  Unsigned32,
+    bTWagS2aSubsInvalidGtpVersion               Unsigned32,
+    bTWagS2aSubsRadiusMissingMandatoryParams    Unsigned32,
+    bTWagS2aSubsRadiusInvalidPGWIPAddr          Unsigned32,
+    bTWagS2aSubsRadiusMSISDN                    Unsigned32,
+    bTWagS2aSubsRadiusQoSProfile                Unsigned32,
+    bTWagS2aSubsRadiusGBRQoS                    Unsigned32,
+    bTWagS2aSubsRadiusNonGBRQoS                 Unsigned32,
+    bTWagS2aSubsGtpIPAddFailed                  Unsigned32,
+    bTWagS2aSubsRadiusEapAkaHash                Unsigned32
+}
+
+bTWagS2aSubsStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+        "The interval during which the measurements are accumlated.
+        Interval index 1 indicates the latest interval for which
+        statistics accumulation is completed. Older the statistics,
+        greater the interval index value. In a system supporting a
+        history of n intervals with interval count 1 and interval
+        count n, the most and the least recent intervals respectively,
+        the following apply at the end of an interval:
+        - statistics for interval count n are discarded
+        - the statistics for interval count i become statistics
+          for interval count i + 1, where 1 <= i < n
+        - current statistics become statistics for interval count 1."
+   ::= { bTWagS2aSubscriberEntry 1 }
+
+bTWagS2aSubsIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of statistics interval (or reporting period) in minutes"
+   ::= { bTWagS2aSubscriberEntry 2 }
+
+bTWagSecureSSIDS2aSubsAdded  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of secure SSID S2a subscribers added"
+   ::= { bTWagS2aSubscriberEntry 3 }
+
+bTWagPreAuthenticatedS2aSubsAdded  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of pre authenticated S2a subscribers added"
+   ::= { bTWagS2aSubscriberEntry 4 }
+
+bTWagS2aSubsDeletionsByDMinitiatedByPGW  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of S2a subscribers deleted due to PGW initiated
+        Disconnect Message"
+   ::= { bTWagS2aSubscriberEntry 5 }
+
+bTWagS2aSubsGtpSessionCreateFailed  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of S2a GTP subscriber session creation failed"
+   ::= { bTWagS2aSubscriberEntry 6 }
+
+bTWagS2aSubsCSRQSendFailed  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of CSRQ message send failed for S2a subscribers."
+   ::= { bTWagS2aSubscriberEntry 7 }
+
+bTWagS2aSubsInvalidGtpVersion  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscribers encountered with invalid GTP version"
+   ::= { bTWagS2aSubscriberEntry 9 }
+
+bTWagS2aSubsRadiusMissingMandatoryParams  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscribers with missing mandatory params in
+        radius messages. " 
+   ::= { bTWagS2aSubscriberEntry 10 }
+
+bTWagS2aSubsRadiusInvalidPGWIPAddr  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscriber with invalid PGW IP address in radius
+         messages. " 
+   ::= { bTWagS2aSubscriberEntry 11 }
+
+bTWagS2aSubsRadiusMSISDN   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscriber with MSISDN received in radius
+         messages. " 
+   ::= { bTWagS2aSubscriberEntry 12 }
+
+bTWagS2aSubsRadiusQoSProfile  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscriber with QoS Profile received in radius
+         messages. " 
+   ::= { bTWagS2aSubscriberEntry 13 }
+
+bTWagS2aSubsRadiusGBRQoS  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscriber with GBRQoS received in radius
+         messages. " 
+   ::= { bTWagS2aSubscriberEntry 14 }
+
+bTWagS2aSubsRadiusNonGBRQoS  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscriber with NonGBRQoS received in radius
+         messages. " 
+   ::= { bTWagS2aSubscriberEntry 15 }
+
+bTWagS2aSubsGtpIPAddFailed  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION
+       "The total number of subscriber for whom GTP IP Add failed "
+   ::= { bTWagS2aSubscriberEntry 16 }
+
+bTWagS2aSubsRadiusEapAkaHash  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION
+       "The total number of subscriber authenticated via EAP-AKA HASH"
+   ::= { bTWagS2aSubscriberEntry 17 }
+
+-- TWAG S2a interface Statistics Table
+
+bTWagS2aTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BTWagS2aEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of TWAG S2a interface  statistics."
+   ::= { bTWagS2aStatsMIBObjects 1 }
+
+bTWagS2aEntry     OBJECT-TYPE
+    SYNTAX      BTWagS2aEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A logical row in the bTWagS2aTable."
+    INDEX {
+        bTWagS2aStatsInterval
+    }
+    ::= { bTWagS2aTable 1 }
+
+BTWagS2aEntry ::= SEQUENCE {
+    bTWagS2aStatsInterval               Integer32,
+    bTWagS2aIntervalDuration            Integer32,
+    bTWagS2aSessCreateReqSent           Unsigned32,
+    bTWagS2aSessCreateRespRcvd          Unsigned32,
+    bTWagS2aSessCreateRespAccepted      Unsigned32,
+    bTWagS2aSessCreateRespRej           Unsigned32,
+    bTWagS2aSessDelReqSent              Unsigned32,
+    bTWagS2aSessDelRespRcvd             Unsigned32,
+    bTWagS2aSessDelRespRejRcvd          Unsigned32,
+    bTWagS2aDBRQRcvd                    Unsigned32,
+    bTWagS2aDBRPSent                    Unsigned32,
+    bTWagS2aCBRQRcvd                    Unsigned32,
+    bTWagS2aCBRPSent                    Unsigned32,
+    bTWagS2aUBRQRcvd                    Unsigned32,
+    bTWagS2aUBRPSent                    Unsigned32
+}
+
+bTWagS2aStatsInterval     OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The interval during which the measurements are accumlated.
+        Interval index 1 indicates the latest interval for which
+        statistics accumulation is completed. Older the statistics,
+        greater the interval index value. In a system supporting a
+        history of n intervals with interval count 1 and interval
+        count n, the most and the least recent intervals respectively,
+        the following apply at the end of an interval:
+        - statistics for interval count n are discarded
+        - the statistics for interval count i become statistics
+          for interval count i + 1, where 1 <= i < n
+        - current statistics become statistics for interval count 1."
+    ::= { bTWagS2aEntry 1 }
+
+bTWagS2aIntervalDuration     OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Duration of statistics accumulation interval in minutes."
+    ::= { bTWagS2aEntry 2 }
+
+bTWagS2aSessCreateReqSent     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Create Session Requests(CSRQ) initiated by the TWAG
+         during the measurement interval." 
+    ::= { bTWagS2aEntry 3 }
+
+bTWagS2aSessCreateRespRcvd     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Create Session Responses(CSRP) received  by the TWAG
+         during the measurement interval." 
+    ::= { bTWagS2aEntry 4 }
+
+bTWagS2aSessCreateRespAccepted     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Create Session Responses with cause
+         REQUEST_ACCEPTED received  by the TWAG during the measurement interval." 
+    ::= { bTWagS2aEntry 5 }
+
+bTWagS2aSessCreateRespRej     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Create Session Responses with cause
+         REJECT received by the TWAG during the measurement interval." 
+    ::= { bTWagS2aEntry 6 }
+
+bTWagS2aSessDelReqSent     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Delete Session Requests initiated  by the TWAG
+         during the measurement interval." 
+    ::= { bTWagS2aEntry 7 }
+
+bTWagS2aSessDelRespRcvd     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of delete Session  Response messages received 
+         during measurement interval."  
+    ::= { bTWagS2aEntry 8 }
+
+bTWagS2aSessDelRespRejRcvd     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of delete Session  Response messages received 
+         with cause REJECT during measurement interval."  
+    ::= { bTWagS2aEntry 9 }
+
+bTWagS2aDBRQRcvd     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Delete Bearer Request(DBRQ) messages received
+          during measurement interval."  
+    ::= { bTWagS2aEntry 10 }
+
+bTWagS2aDBRPSent     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Delete Bearer Response(DBRP) messages sent
+          during measurement interval."  
+    ::= { bTWagS2aEntry 11 }
+
+bTWagS2aCBRQRcvd     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Create Bearer Request(CBRQ) messages received
+          during measurement interval."  
+    ::= { bTWagS2aEntry 12 }
+
+bTWagS2aCBRPSent     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Create Bearer Response(CBRP) messages sent
+          during measurement interval."  
+    ::= { bTWagS2aEntry 13 }
+
+bTWagS2aUBRQRcvd     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Update Bearer Request(UBRQ) messages received
+          during measurement interval."  
+    ::= { bTWagS2aEntry 14 }
+
+bTWagS2aUBRPSent     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Update Bearer Response(UBRP) messages sent
+          during measurement interval."  
+    ::= { bTWagS2aEntry 15 }
+
+-- TWAG GnGp Subscriber Stats Table
+
+bTWagGnGpSubscriberTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BTWagGnGpSubscriberEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of TWAG subscriber statistics."
+   ::= { bTWagGnGpSubscriberMIBObjects 3 }
+
+bTWagGnGpSubscriberEntry  OBJECT-TYPE
+   SYNTAX      BTWagGnGpSubscriberEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bTWagGnGpSubscriberTable."
+   INDEX {
+      bTWagGnGpSubsStatsInterval
+   }
+   ::= { bTWagGnGpSubscriberTable 1 }
+
+BTWagGnGpSubscriberEntry ::= SEQUENCE {
+    bTWagGnGpSubsStatsInterval                  Integer32,
+    bTWagGnGpSubsIntervalDuration               Integer32,
+    bTWagSecureSSIDGnGpSubsAdded                Unsigned32,
+    bTWagPreAuthenticatedGnGpSubsAdded          Unsigned32,
+    bTWagGnGpSubsDeletionsByDMinitiatedByGGSN   Unsigned32,
+    bTWagGnGpSubsGtpSessionCreateFailed         Unsigned32,
+    bTWagGnGpSubsCPCRQSendFailed                Unsigned32,
+    bTWagGnGpSubsPDPCtxSendFailed               Unsigned32,
+    bTWagGnGpSubsInvalidGtpVersion              Unsigned32,
+    bTWagGnGpSubsRadiusMissingMandatoryParams   Unsigned32,
+    bTWagGnGpSubsRadiusInvalidGGSNIPAddr        Unsigned32,
+    bTWagGnGpSubsRadiusMSISDN                   Unsigned32,
+    bTWagGnGpSubsRadiusQoSProfile               Unsigned32,
+    bTWagGnGpSubsRadiusGBRQoS                   Unsigned32,
+    bTWagGnGpSubsRadiusNonGBRQoS                Unsigned32,
+    bTWagGnGpSubsGtpIPAddFailed                 Unsigned32,
+    bTWagGnGpSubsRadiusEapAkaHash               Unsigned32
+}
+
+bTWagGnGpSubsStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+        "The interval during which the measurements are accumlated.
+        Interval index 1 indicates the latest interval for which
+        statistics accumulation is completed. Older the statistics,
+        greater the interval index value. In a system supporting a
+        history of n intervals with interval count 1 and interval
+        count n, the most and the least recent intervals respectively,
+        the following apply at the end of an interval:
+        - statistics for interval count n are discarded
+        - the statistics for interval count i become statistics
+          for interval count i + 1, where 1 <= i < n
+        - current statistics become statistics for interval count 1."
+   ::= { bTWagGnGpSubscriberEntry 1 }
+
+bTWagGnGpSubsIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of statistics interval (or reporting period) in minutes"
+   ::= { bTWagGnGpSubscriberEntry 2 }
+
+bTWagSecureSSIDGnGpSubsAdded  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of secure SSID GnGp subscribers added"
+   ::= { bTWagGnGpSubscriberEntry 3 }
+
+bTWagPreAuthenticatedGnGpSubsAdded  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of pre authenticated GnGp subscribers added"
+   ::= { bTWagGnGpSubscriberEntry 4 }
+
+bTWagGnGpSubsDeletionsByDMinitiatedByGGSN  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of GnGp subscribers deleted due to GGSN initiated
+        Disconnect Message"
+   ::= { bTWagGnGpSubscriberEntry 5 }
+
+bTWagGnGpSubsGtpSessionCreateFailed  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of GnGp GTP subscriber session creation failed"
+   ::= { bTWagGnGpSubscriberEntry 6 }
+
+bTWagGnGpSubsCPCRQSendFailed  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of CSRQ message send failed for GnGp subscribers."
+   ::= { bTWagGnGpSubscriberEntry 7 }
+
+bTWagGnGpSubsPDPCtxSendFailed  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of CPCQ QoS message send failed for GnGp subscribers."
+   ::= { bTWagGnGpSubscriberEntry 8 }
+
+bTWagGnGpSubsInvalidGtpVersion  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscribers encountered with invalid GTP version"
+   ::= { bTWagGnGpSubscriberEntry 9 }
+
+bTWagGnGpSubsRadiusMissingMandatoryParams  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscribers with missing mandatory params in
+        radius messages. " 
+   ::= { bTWagGnGpSubscriberEntry 10 }
+
+bTWagGnGpSubsRadiusInvalidGGSNIPAddr  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscriber with invalid PGW IP address in radius
+         messages. " 
+   ::= { bTWagGnGpSubscriberEntry 11 }
+
+bTWagGnGpSubsRadiusMSISDN   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscriber with MSISDN received in radius
+         messages. " 
+   ::= { bTWagGnGpSubscriberEntry 12 }
+
+bTWagGnGpSubsRadiusQoSProfile  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscriber with QoS Profile received in radius
+         messages. " 
+   ::= { bTWagGnGpSubscriberEntry 13 }
+
+bTWagGnGpSubsRadiusGBRQoS  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscriber with GBRQoS received in radius
+         messages. " 
+   ::= { bTWagGnGpSubscriberEntry 14 }
+
+bTWagGnGpSubsRadiusNonGBRQoS  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscriber with NonGBRQoS received in radius
+         messages. " 
+   ::= { bTWagGnGpSubscriberEntry 15 }
+
+bTWagGnGpSubsGtpIPAddFailed  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION
+       "The total number of subscriber for whom GTP IP Add failed "
+   ::= { bTWagGnGpSubscriberEntry 16 }
+
+bTWagGnGpSubsRadiusEapAkaHash  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION
+       "The total number of subscriber authenticated via EAP-AKA HASH"
+   ::= { bTWagGnGpSubscriberEntry 17 }
+
+-- TWAG GnGp interface Statistics Table
+
+bTWagGnGpTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BTWagGnGpEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of TWAG GnGp interface statistics."
+   ::= { bTWagGnGpStatsMIBObjects 1 }
+
+bTWagGnGpEntry     OBJECT-TYPE
+    SYNTAX      BTWagGnGpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A logical row in the bTWagGnGpTable."
+    INDEX {
+        bTWagGnGpStatsInterval
+    }
+    ::= { bTWagGnGpTable 1 }
+
+BTWagGnGpEntry ::= SEQUENCE {
+    bTWagGnGpStatsInterval              Integer32,
+    bTWagGnGpIntervalDuration           Integer32,
+    bTWagGnGpCPCRQSent          Unsigned32,
+    bTWagGnGpCPCRPRcvd         Unsigned32,
+    bTWagGnGpCPCRPAccepted     Unsigned32,
+    bTWagGnGpCPCRPRej          Unsigned32,
+    bTWagGnGpDPCRQSent             Unsigned32,
+    bTWagGnGpDPCRPRcvd            Unsigned32,
+    bTWagGnGpDPCRPRejRcvd         Unsigned32,
+    bTWagGnGpDPCRQRcvd                   Unsigned32,
+    bTWagGnGpDPCRPSent                   Unsigned32,
+    bTWagGnGpCPCRQRcvd                   Unsigned32,
+    bTWagGnGpCPCRPSent                   Unsigned32,
+    bTWagGnGpUPCRQRcvd                   Unsigned32,
+    bTWagGnGpUPCRPSent                   Unsigned32
+}
+
+bTWagGnGpStatsInterval     OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The interval during which the measurements are accumlated.
+        Interval index 1 indicates the latest interval for which
+        statistics accumulation is completed. Older the statistics,
+        greater the interval index value. In a system supporting a
+        history of n intervals with interval count 1 and interval
+        count n, the most and the least recent intervals respectively,
+        the following apply at the end of an interval:
+        - statistics for interval count n are discarded
+        - the statistics for interval count i become statistics
+          for interval count i + 1, where 1 <= i < n
+        - current statistics become statistics for interval count 1."
+    ::= { bTWagGnGpEntry 1 }
+
+bTWagGnGpIntervalDuration     OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Duration of statistics accumulation interval in minutes."
+    ::= { bTWagGnGpEntry 2 }
+
+bTWagGnGpCPCRQSent     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Create PDP Context requests(CPCRQ) initiated by the TWAG
+         during the measurement interval." 
+    ::= { bTWagGnGpEntry 3 }
+
+bTWagGnGpCPCRPRcvd     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Create PDP Context Responses(CPCRP) received by the TWAG
+         during the measurement interval." 
+    ::= { bTWagGnGpEntry 4 }
+
+bTWagGnGpCPCRPAccepted     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Create PDP Context Responses(CPCRP) with cause
+         REQUEST_ACCEPTED received by the TWAG during the measurement interval." 
+    ::= { bTWagGnGpEntry 5 }
+
+bTWagGnGpCPCRPRej     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Create PDP Context Responses(CPCRP) with cause
+         REJECT received by the TWAG during the measurement interval." 
+    ::= { bTWagGnGpEntry 6 }
+
+bTWagGnGpDPCRQSent     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Delete PDP Context Requests(DPCRQ) initiated by the TWAG
+         during the measurement interval." 
+    ::= { bTWagGnGpEntry 7 }
+
+bTWagGnGpDPCRPRcvd     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Delete PDP Context Response(DPCRP) messages received 
+         during measurement interval."  
+    ::= { bTWagGnGpEntry 8 }
+
+bTWagGnGpDPCRPRejRcvd     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Delete PDP Context Response(DPCRP) messages received 
+         with cause REJECT during measurement interval."  
+    ::= { bTWagGnGpEntry 9 }
+
+bTWagGnGpDPCRQRcvd     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Delete PDP Context Request(DPCRQ) messages received
+          during measurement interval."  
+    ::= { bTWagGnGpEntry 10 }
+
+bTWagGnGpDPCRPSent     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Delete PDP Context Response(DPCRP) messages sent
+          during measurement interval."  
+    ::= { bTWagGnGpEntry 11 }
+
+bTWagGnGpCPCRQRcvd     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Create PDP Context Request(CPCRQ) messages received
+          during measurement interval."  
+    ::= { bTWagGnGpEntry 12 }
+
+bTWagGnGpCPCRPSent     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Create PDP Context Response(CPCRP) messages sent
+          during measurement interval."  
+    ::= { bTWagGnGpEntry 13 }
+
+bTWagGnGpUPCRQRcvd     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Update PDP Conetxt Request(UPCRQ) messages received
+          during measurement interval."  
+    ::= { bTWagGnGpEntry 14 }
+
+bTWagGnGpUPCRPSent     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of Update PDP Context Response(UPCRP) messages sent
+          during measurement interval."  
+    ::= { bTWagGnGpEntry 15 }
+
+-- Notification Definitions
+
+bTWagGTPMaxNumOfTunnels  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+       "Max Number of GTP-U that can exist at a given time. 
+        Any new GTP-U request beyond this number will be rejected"
+   ::= {  bTWagGTPNotifObjects 1 }
+
+bTWagGTPHighThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+       "The high threshold for number of GTP-U that can exist at any 
+        given time . If a bTWagGTPLowThresholdReached event has
+        been generated , and the value number of GTP-U in use
+        has exceeded the value of bTWagGTPHighThreshold, then a
+        bTWagGTPHighThresholdReached event will be generated.  No more
+        bTWagGTPHighThresholdReached events will be generated
+        until the  value for number of tunnels in use becomes equal to or less
+        than the value of bTWagGTPLowThreshold."
+   ::= {  bTWagGTPNotifObjects 2 }
+
+bTWagGTPLowThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+       "The Lower threshold for number of GTP-U that can exist at any
+        given time . If a bTWagGTPHighThresholdReached event has
+        been generated , and the value number of tunnels in use
+        falls below the value of bTWagGTPLowThreshold, then a
+        bTWagGTPLowThresholdReached event will be generated.  No more
+        bTWagGTPLowThresholdReached events will be generated
+        until the  value for number of tunnels in use becomes equal to
+        or greater than the value of bTWagGTPHighThreshold."
+   ::= {  bTWagGTPNotifObjects 3 }
+
+bTWagGTPHighThresholdReached  NOTIFICATION-TYPE
+   OBJECTS        {
+                      bTWagGTPMaxNumOfTunnels,
+                      bTWagGTPHighThreshold
+                  }
+   STATUS      current
+   DESCRIPTION
+        "This notification signifies that the current number of
+        GTP-U has risen above the  value of bTWagGTPHighThreshold."
+   ::= { bTWagNotifications 1 }
+
+bTWagGTPLowThresholdReached  NOTIFICATION-TYPE
+   OBJECTS        {
+                      bTWagGTPMaxNumOfTunnels,
+                      bTWagGTPLowThreshold
+                  }
+   STATUS      current
+   DESCRIPTION
+        "This notification signifies that the current number of
+        GTP-U has fallen below the value of bTWagGTPLowThreshold."
+   ::= { bTWagNotifications 2 }
+
+END
+

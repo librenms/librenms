@@ -159,16 +159,12 @@ write bytes off of the stream as needed.
 .. code-block:: php
 
     use GuzzleHttp\Stream\Stream;
-    $request = $client->createRequest('PUT', 'http://httpbin.org/put', ['body' => 'testing...']);
+    $response = $client->request('GET', 'http://httpbin.org/get');
 
-    echo $request->getBody()->read(4);
-    // test
-    echo $request->getBody()->read(4);
-    // ing.
-    echo $request->getBody()->read(1024);
-    // ..
-    var_export($request->eof());
-    // true
+    echo $response->getBody()->read(4);
+    echo $response->getBody()->read(4);
+    echo $response->getBody()->read(1024);
+    var_export($response->eof());
 
 
 Requests
@@ -224,7 +220,7 @@ When creating a request, you can provide the URI as a string or an instance of
 
 .. code-block:: php
 
-    $response = $client->get('http://httbin.org/get?q=foo');
+    $response = $client->request('GET', 'http://httpbin.org/get?q=foo');
 
 
 Scheme
@@ -236,9 +232,9 @@ scheme can be set to "http" or "https".
 
 .. code-block:: php
 
-    $request = $client->createRequest('GET', 'http://httbin.org');
+    $request = new Request('GET', 'http://httpbin.org');
     echo $request->getUri()->getScheme(); // http
-    echo $request->getUri(); // http://httpbin.com/get
+    echo $request->getUri(); // http://httpbin.org
 
 
 Host
@@ -249,7 +245,7 @@ Host header.
 
 .. code-block:: php
 
-    $request = new Request('GET', 'http://httbin.org');
+    $request = new Request('GET', 'http://httpbin.org');
     echo $request->getUri()->getHost(); // httpbin.org
     echo $request->getHeader('Host'); // httpbin.org
 
@@ -261,9 +257,9 @@ No port is necessary when using the "http" or "https" schemes.
 
 .. code-block:: php
 
-    $request = $client->createRequest('GET', 'http://httbin.org:8080');
+    $request = new Request('GET', 'http://httpbin.org:8080');
     echo $request->getUri()->getPort(); // 8080
-    echo $request->getUrl(); // https://httpbin.com:8080t
+    echo $request->getUri(); // http://httpbin.org:8080
 
 
 Path
@@ -273,7 +269,7 @@ The path of a request is accessible via the URI object.
 
 .. code-block:: php
 
-    $request = new Request('GET', 'http://httbin.org/get');
+    $request = new Request('GET', 'http://httpbin.org/get');
     echo $request->getUri()->getPath(); // /get
 
 The contents of the path will be automatically filtered to ensure that only
@@ -290,7 +286,7 @@ URI object owned by the request.
 
 .. code-block:: php
 
-    $request = new Request('GET', 'http://httbin.org/?foo=bar');
+    $request = new Request('GET', 'http://httpbin.org/?foo=bar');
     echo $request->getUri()->getQuery(); // foo=bar
 
 The contents of the query string will be automatically filtered to ensure that
@@ -315,7 +311,7 @@ status code, and reason phrase.
 .. code-block:: php
 
     $client = new \GuzzleHttp\Client();
-    $response = $client->get('http://httpbin.org/get');
+    $response = $client->request('GET', 'http://httpbin.org/get');
 
     echo $response->getStatusCode(); // 200
     echo $response->getReasonPhrase(); // OK
@@ -330,7 +326,7 @@ As described earlier, you can get the body of a response using the
 
 .. code-block:: php
 
-    $body = $response->getBody()) {
+    $body = $response->getBody();
     echo $body;
     // Cast to a string: { ... }
     $body->seek(0);

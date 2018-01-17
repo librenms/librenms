@@ -92,12 +92,12 @@ if (count($sensors)) {
         $link = generate_url($link_array);
 
         if ($sensor['poller_type'] == "ipmi") {
-            $sensor['sensor_descr'] = substr(ipmiSensorName($device['hardware'], $sensor['sensor_descr'], $ipmiSensorsNames), 0, 48);
+            $sensor['sensor_descr'] = substr(ipmiSensorName($device['hardware'], $sensor['sensor_descr']), 0, 48);
         } else {
             $sensor['sensor_descr'] = substr($sensor['sensor_descr'], 0, 48);
         }
 
-        $overlib_content = '<div style="width: 580px;"><h2>'.$device['hostname'].' - '.$sensor['sensor_descr'].'</h1>';
+        $overlib_content = '<div class=overlib><span class=overlib-text>' . $device['hostname'] . ' - ' . $sensor['sensor_descr'] . '</span><br />';
         foreach (array('day', 'week', 'month', 'year') as $period) {
             $graph_array['from'] = $config['time'][$period];
             $overlib_content    .= str_replace('"', "\'", generate_graph_tag($graph_array));

@@ -51,14 +51,13 @@ if (empty($hostname)) {
 
 $step      = $config['rrd']['step'];
 $heartbeat = $config['rrd']['heartbeat'];
-$rrd_path  = $config['rrd_dir'];
 $rrdtool   = $config['rrdtool'];
 $tmp_path  = $config['temp_dir'];
 
 if ($hostname === 'all') {
     $hostname = '*';
 }
-$files = glob($rrd_path . '/' . $hostname . '/*.rrd');
+$files = glob(get_rrd_dir($hostname) . '/*.rrd');
 
 $run = readline("Are you sure you want to run this command [N/y]: ");
 if (!($run == 'y' || $run == 'Y')) {
@@ -72,8 +71,8 @@ foreach ($files as $file) {
     $rrd_file = array_pop($tmp);
     echo "Converting $file: ";
     $command = "$rrdtool dump $file > $random && 
-        sed -i 's/<step>300/<step>$step/' $random && 
-        sed -i 's/<minimal_heartbeat>600/<minimal_heartbeat>$heartbeat/' $random &&
+        sed -i 's/<step>\([0-9]*\)/<step>$step/' $random && 
+        sed -i 's/<minimal_heartbeat>\([0-9]*\)/<minimal_heartbeat>$heartbeat/' $random &&
         $rrdtool restore -f $random $file &&
         rm -f $random";
     exec($command, $output, $code);

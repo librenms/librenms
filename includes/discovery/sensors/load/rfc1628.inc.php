@@ -2,23 +2,30 @@
 
 echo 'RFC1628 ';
 
-$oids = snmp_walk($device, '.1.3.6.1.2.1.33.1.4.4.1.5', '-Osqn', 'UPS-MIB');
-d_echo($oids."\n");
+$load_data = snmpwalk_group($device, 'upsOutputPercentLoad', 'UPS-MIB');
 
-$oids = trim($oids);
-foreach (explode("\n", $oids) as $data) {
-    $data = trim($data);
-    if ($data) {
-        list($oid,$descr) = explode(' ', $data, 2);
-        $split_oid        = explode('.', $oid);
-        $current_id       = $split_oid[(count($split_oid) - 1)];
-        $current_oid      = ".1.3.6.1.2.1.33.1.4.4.1.5.$current_id";
-        $divisor          = get_device_divisor($device, $pre_cache['poweralert_serial'], 'load', $current_oid);
-        $current          = (snmp_get($device, $current_oid, '-O vq') / $divisor);
-        $descr            = 'Percentage load'.(count(explode("\n", $oids)) == 1 ? '' : ' '.($current_id + 1));
-        $type             = 'rfc1628';
-        $index            = (500 + $current_id);
-
-        discover_sensor($valid['sensor'], 'load', $device, $current_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+foreach ($load_data as $index => $data) {
+    $load_oid = ".1.3.6.1.2.1.33.1.4.4.1.5.$index";
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'load', $load_oid);
+    $descr = 'Percentage load';
+    if (count($load_data) > 1) {
+        $descr .= " $index";
     }
+
+    discover_sensor(
+        $valid['sensor'],
+        'load',
+        $device,
+        $load_oid,
+        500 + $index,
+        'rfc1628',
+        $descr,
+        $divisor,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $data['upsOutputPercentLoad'] / $divisor
+    );
 }

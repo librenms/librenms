@@ -1,0 +1,9 @@
+os: univerge
+text: 'NEC Univerge'
+type: appliance
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+icon: nec
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.119.1.

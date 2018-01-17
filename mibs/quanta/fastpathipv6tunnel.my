@@ -1,0 +1,248 @@
+NETGEAR-IPV6-TUNNEL-MIB DEFINITIONS ::= BEGIN
+
+-- Netgear IPV6 Tunnel MIB
+-- Copyright Netgear Inc (2001-2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, 
+    Integer32                               FROM SNMPv2-SMI
+    RowStatus                               FROM SNMPv2-TC
+    Ipv6IfIndex, Ipv6Address, Ipv6AddressPrefix
+                                            FROM IPV6-TC
+    InetAddressIPv4, InetAddressPrefixLength
+                                            FROM INET-ADDRESS-MIB
+    lb6m                                FROM QUANTA-LB6M-REF-MIB;
+
+    fastPathIpv6Tunnel MODULE-IDENTITY
+        LAST-UPDATED "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The Netgear Private MIB for FastPath IPV6 Tunnel"
+
+        -- Revision history.
+        REVISION
+          "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        DESCRIPTION
+          "Postal address updated."
+        REVISION
+          "200705230000Z" -- 23 May 2007 12:00:00 GMT
+        DESCRIPTION
+          "Netgear branding related changes."
+
+
+    ::= { lb6m 27 }
+
+   --**************************************************************************************
+    -- agentTunnelIPV6Group
+    --
+    --**************************************************************************************
+    agentTunnelIPV6Group                 OBJECT IDENTIFIER ::= { fastPathIpv6Tunnel 1 }
+
+    agentTunnelIPV6Table OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentTunnelIPV6Entry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A summary table of the IPV6 tunnel instances"
+         ::= { agentTunnelIPV6Group 1 }
+
+    agentTunnelIPV6Entry OBJECT-TYPE
+         SYNTAX      AgentTunnelIPV6Entry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     ""
+         INDEX       { agentTunnelID }
+         ::= { agentTunnelIPV6Table 1 }
+
+    AgentTunnelIPV6Entry ::= SEQUENCE {
+                        agentTunnelID
+                           Integer32,
+                        agentTunnelIfIndex
+                           Integer32,
+                        agentTunnelMode
+                           INTEGER,
+                        agentTunnelLocalIP4Addr
+                           InetAddressIPv4,
+                        agentTunnelRemoteIP4Addr
+                           InetAddressIPv4,
+                        agentTunnelLocalIfIndex
+                           Integer32,
+                        agentTunnelIcmpUnreachableMode
+                           INTEGER,
+                        agentTunnelStatus
+                           RowStatus
+           }
+
+
+    agentTunnelID    OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The tunnel ID is associated with Internal Interface number
+                      which is generated when we create a tunnel, and is used 
+                      to configure the tunnel."
+         ::= { agentTunnelIPV6Entry 1 }
+
+    agentTunnelIfIndex    OBJECT-TYPE
+         SYNTAX           Integer32
+         MAX-ACCESS       read-only
+         STATUS           current
+         DESCRIPTION
+                     "The external interface of the tunnel is associted with 
+                      internal interface. The tunnel ID associated with 
+                      Internal Interface number is generated when we create a 
+                      tunnel, which is used to configure the tunnel."
+         ::= { agentTunnelIPV6Entry 2 }
+
+
+    agentTunnelMode  OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      undefined(1),
+                      ip6over4(2),
+                      ip6to4(3)
+                      }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Specifies the type of Tunnel either undefined, 6over4 or 6to4.
+                      The default value is undefined. It supports 6over4
+                      which supports an assigned IPV6 address, an IPV4 address
+                      is not allowed. For this mode, the tunnel source and 
+                      tunnel destination must be IPV4 address. For 6to4 tunnel,
+                      the tunnel source must be IPv4 address. Tunnel destination
+                      should not be set. The first 48-bits of the IPv4 address assigned
+                      to the 6to4 tunnel should be of the format 2002:sourceIpv4address."
+         DEFVAL { undefined }
+         ::= { agentTunnelIPV6Entry 3 }
+
+    agentTunnelLocalIP4Addr OBJECT-TYPE
+         SYNTAX      InetAddressIPv4
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The address of the Local endpoint of the tunnel i.e. the
+                      source address used in the outer IP header. It is 0.0.0.0
+                      if unknown or the tunnel is over IPv6."
+
+         ::= { agentTunnelIPV6Entry 4 }
+
+    agentTunnelRemoteIP4Addr OBJECT-TYPE
+         SYNTAX      InetAddressIPv4
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The address of the Remote endpoint of the tunnel i.e.
+                      the destination address used in the outer IP header. It is
+                      0.0.0.0 if the tunnel is unknown or IPv6 address, or not
+                      a point to point link"
+
+         ::= { agentTunnelIPV6Entry 5 }
+
+    agentTunnelLocalIfIndex OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Specifies the interface for IPv6 Tunnel Source"
+         ::= { agentTunnelIPV6Entry 6}
+
+    agentTunnelStatus OBJECT-TYPE
+         SYNTAX       RowStatus
+         MAX-ACCESS   read-create
+         STATUS       current
+         DESCRIPTION
+                     "Status of this instance.Row can be added or deleted
+                      by setting the value to createAndGo/destroy
+
+                     active(1)      - this Tunnel instance is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance"
+         ::= { agentTunnelIPV6Entry 7 }
+    
+    agentTunnelIcmpUnreachableMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      enable(1),
+                      disable(2)
+                      }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Specifies the Mode of Sending ICMPv6 Unreachable
+                      messages on this tunnel interface."
+         ::= { agentTunnelIPV6Entry 8}
+
+
+    agentTunnelIPV6PrefixTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentTunnelIPV6PrefixEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of the IPV6 prefixes associated with tunnel instances"
+         ::= { agentTunnelIPV6Group 2 }
+
+    agentTunnelIPV6PrefixEntry OBJECT-TYPE
+         SYNTAX      AgentTunnelIPV6PrefixEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     ""
+         INDEX       { agentTunnelID,  agentTunnelIPV6PrefixPrefix, agentTunnelIPV6PrefixPrefixLen}
+         ::= { agentTunnelIPV6PrefixTable 1 }
+
+    AgentTunnelIPV6PrefixEntry ::= SEQUENCE {
+                        agentTunnelIPV6PrefixPrefix
+                           Ipv6AddressPrefix,
+                        agentTunnelIPV6PrefixPrefixLen
+                           InetAddressPrefixLength,
+                        agentTunnelIPV6PrefixStatus
+                           RowStatus
+           }
+
+    agentTunnelIPV6PrefixPrefix OBJECT-TYPE
+         SYNTAX          Ipv6AddressPrefix
+         MAX-ACCESS      not-accessible
+         STATUS          current
+         DESCRIPTION
+                     "The prefix associated with the tunnel interface. The data type
+                      is used to model the IPV6 address. It is a binary string
+                      of 16 octects in network byte-order. It specifies the IP 
+                      address of tunnel which will be in IPV6 Format, generated
+                      using internal interface number."
+         ::= { agentTunnelIPV6PrefixEntry 1 }
+
+    agentTunnelIPV6PrefixPrefixLen  OBJECT-TYPE
+         SYNTAX      InetAddressPrefixLength
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The length of the prefix (in bits)."
+         DEFVAL { 0 }
+         ::= { agentTunnelIPV6PrefixEntry 2 }
+         
+    agentTunnelIPV6PrefixStatus OBJECT-TYPE
+         SYNTAX       RowStatus
+         MAX-ACCESS   read-create
+         STATUS       current
+         DESCRIPTION
+                     "Status of this instance.Row can be added or deleted
+                     by setting the value to createAndGo/destroy
+                      
+                     active(1)      - this Tunnel instance is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance"
+         ::= { agentTunnelIPV6PrefixEntry 3 }
+END

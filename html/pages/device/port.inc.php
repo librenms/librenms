@@ -72,8 +72,13 @@ $menu_options['graphs']   = 'Graphs';
 $menu_options['realtime'] = 'Real time';
 // FIXME CONDITIONAL
 $menu_options['arp']    = 'ARP Table';
+$menu_options['fdb']    = 'FDB Table';
 $menu_options['events'] = 'Eventlog';
 $menu_options['notes'] = 'Notes';
+
+if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `entPhysicalIndex` = ?  AND entPhysicalIndex_measured = 'ports'", array($device['device_id'],$port['ifIndex']))) {
+    $menu_options['sensors'] = 'Health';
+}
 
 if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `port_id` = '".$port['port_id']."'")) {
     $menu_options['adsl'] = 'ADSL';

@@ -15,7 +15,7 @@ $config['graph_types']['device']['pulse_sessions']['descr']        = 'Active Ses
 
 #### Polling OS
 
-OS polling is not necessarily where custom polling should be done, please speak to one of the core devs in irc for guidance.
+OS polling is not necessarily where custom polling should be done, please speak to one of the core devs in [Discord](https://t.libren.ms/discord) for guidance.
 
 Let's update our example file to add additional polling:
 
@@ -27,10 +27,12 @@ We declare two specific graphs for users and sessions numbers. Theses two graphs
 ```php
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 $users = snmp_get($device, 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
 
 if (is_numeric($users)) {
-    $rrd_def = 'DS:users:GAUGE:600:0:U';
+    $rrd_def = RrdDefinition::make()->addDataset('users', 'GAUGE', 0);
 
     $fields = array(
         'users' => $users,
@@ -44,7 +46,7 @@ if (is_numeric($users)) {
 $sessions = snmp_get($device, 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
 
 if (is_numeric($sessions)) {
-    $rrd_def = 'DS:sessions:GAUGE:600:0:U';
+    $rrd_def = RrdDefinition::make()->addDataset('sessions', 'GAUGE', 0);
 
     $fields = array(
         'sessions' => $sessions,
@@ -68,8 +70,8 @@ php includes/sql-schema/update.php
 Or put the SQL commands directly in Mysql or PhpMyadmin for our tests:
 
 ```php
-INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'pulse_users',  'firewall',  'Active Users',  '');
-INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'pulse_sessions',  'firewall',  'Active Sessions',  '');
+INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'pulse_users',  'firewall',  'Active Users',  0);
+INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'pulse_sessions',  'firewall',  'Active Sessions',  0);
 ```
 
 #### Displaying

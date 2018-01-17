@@ -1,0 +1,9 @@
+os: wipipe
+text: 'CradlePoint WiPipe'
+type: network
+icon: cradlepoint
+mib_dir:
+    - cradlepoint
+discovery:
+    - sysObjectID:
+       - .1.3.6.1.4.1.20992.

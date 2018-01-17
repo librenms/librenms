@@ -22,11 +22,13 @@ html/plugins/*
 !html/plugins/Test/
 includes/custom/*
 junk
-logs
 nbproject
 patches
-rrd
 !/lib/yaml
 /vendor
 composer.phar
+
+# Docs #
+########
+out
 librenms_theme

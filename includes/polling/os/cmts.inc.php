@@ -23,6 +23,14 @@
 * @author     Neil Lathwood <neil@lathwood.co.uk>
 */
 
-preg_match("/CMTS_V([0-9\.]+),/", $poll_device['sysDescr'], $match);
+preg_match("/CMTS_V([0-9\.]+),/", $device['sysDescr'], $match);
 
 $version = $match[1];
+$data = explode(".", $device["sysObjectID"]);
+$id = end($data);
+if ($id == "1") {
+    $hardware = "C4";
+} else if ($id == "2") {
+    $hardware = "C4c";
+}
+unset($data);

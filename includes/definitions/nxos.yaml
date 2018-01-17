@@ -32,3 +32,4 @@ discovery_modules:
 discovery:
     - sysDescr:
         - NX-OS(tm)
+        - Cisco NX-OS

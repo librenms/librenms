@@ -1,5 +1,8 @@
 <?php
 
+use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\TwoFactor;
+
 $no_refresh = true;
 
 $pagetitle[] = 'Preferences';
@@ -11,11 +14,11 @@ if ($_SESSION['userlevel'] == 11) {
     demo_account();
 } else {
     if ($_POST['action'] == 'changepass') {
-        if (authenticate($_SESSION['username'], $_POST['old_pass'])) {
+        if (Auth::get()->authenticate($_SESSION['username'], $_POST['old_pass'])) {
             if ($_POST['new_pass'] == '' || $_POST['new_pass2'] == '') {
                 $changepass_message = 'Password must not be blank.';
             } elseif ($_POST['new_pass'] == $_POST['new_pass2']) {
-                changepassword($_SESSION['username'], $_POST['new_pass']);
+                Auth::get()->changePassword($_SESSION['username'], $_POST['new_pass']);
                 $changepass_message = 'Password Changed.';
             } else {
                 $changepass_message = "Passwords don't match.";
@@ -33,7 +36,7 @@ if ($_SESSION['userlevel'] == 11) {
 
     include 'includes/update-preferences-password.inc.php';
 
-    if (passwordscanchange($_SESSION['username'])) {
+    if (Auth::get()->canUpdatePasswords($_SESSION['username'])) {
         echo '<h3>Change Password</h3>';
         echo '<hr>';
         echo "<div class='well'>";
@@ -73,11 +76,10 @@ if ($_SESSION['userlevel'] == 11) {
 
     if ($config['twofactor'] === true) {
         if ($_POST['twofactorremove'] == 1) {
-            include_once $config['install_dir'].'/html/includes/authentication/twofactor.lib.php';
             if (!isset($_POST['twofactor'])) {
                 echo '<div class="well"><form class="form-horizontal" role="form" action="" method="post" name="twofactorform">';
                 echo '<input type="hidden" name="twofactorremove" value="1" />';
-                echo twofactor_form(false);
+                echo TwoFactor::getForm(false);
                 echo '</form></div>';
             } else {
                 $twofactor = get_user_pref('twofactor');
@@ -85,7 +87,7 @@ if ($_SESSION['userlevel'] == 11) {
                     echo '<div class="alert alert-danger">Error: How did you even get here?!</div><script>window.location = "preferences/";</script>';
                 }
 
-                if (verify_hotp($twofactor['key'], $_POST['twofactor'], $twofactor['counter'])) {
+                if (TwoFactor::verifyHOTP($twofactor['key'], $_POST['twofactor'], $twofactor['counter'])) {
                     if (!set_user_pref('twofactor', array())) {
                         echo '<div class="alert alert-danger">Error while disabling TwoFactor.</div>';
                     } else {
@@ -134,10 +136,9 @@ if ($_SESSION['userlevel'] == 11) {
 </form>';
             } else {
                 if (isset($_POST['gentwofactorkey']) && isset($_POST['twofactortype'])) {
-                    include_once $config['install_dir'].'/html/includes/authentication/twofactor.lib.php';
                     $chk = get_user_pref('twofactor');
                     if (empty($chk)) {
-                        $twofactor = array('key' => twofactor_genkey());
+                        $twofactor = array('key' => TwoFactor::genKey());
                         if ($_POST['twofactortype'] == 'counter') {
                             $twofactor['counter'] = 1;
                         } else {

@@ -1,0 +1,2143 @@
+LLDP-V2-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32,
+    Counter32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    TimeStamp,
+    TruthValue,
+    MacAddress,
+    RowStatus
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TimeFilter,
+    ZeroBasedCounter32
+        FROM RMON2-MIB
+    AddressFamilyNumbers
+        FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB
+    ifGeneralInformationGroup,
+    InterfaceIndex
+        FROM IF-MIB
+    LldpV2ChassisIdSubtype,
+    LldpV2ChassisId,
+    LldpV2PortIdSubtype,
+    LldpV2PortId,
+    LldpV2ManAddrIfSubtype,
+    LldpV2ManAddress,
+    LldpV2SystemCapabilitiesMap,
+    LldpV2DestAddressTableIndex,
+    ieee802dot1mibs
+        FROM LLDP-V2-TC-MIB;
+
+lldpV2MIB MODULE-IDENTITY
+    LAST-UPDATED "200906080000Z" -- June 08, 2009 
+    ORGANIZATION "IEEE 802.1 Working Group"
+    CONTACT-INFO 
+            "WG-URL: http://grouper.ieee.org/groups/802/1/index.html
+             WG-EMail: stds-802-1@ieee.org
+
+            Contact: Tony Jeffree
+            Postal:  11a Poplar Grove
+                     Sale 
+                     Cheshire M33 3AX
+                     UK
+            Tel:     +44-161-973-4278
+            E-mail:  tony@jeffree.co.uk"
+    DESCRIPTION
+            "Management Information Base module for LLDP configuration,
+            statistics, local system data and remote systems data
+            components.
+
+            This MIB module supports the architecture described in
+            Clause 6, where multiple LLDP agents can be associated with
+            a single Port, each supporting transmission by means of a
+            different MAC address.
+
+            Unless otherwise indicated, the references in this
+            MIB module are to IEEE 802.1AB-2009.
+
+            Copyright (C) IEEE (2009). This version of this MIB module
+            is published as subclause 11.5.2 of IEEE Std 802.1AB-2009;
+            see the standard itself for full legal notices."
+
+    REVISION "200906080000Z" -- June 08, 2009
+
+    DESCRIPTION
+            "Published as part of IEEE Std 802.1AB-2009 revision.
+            This revision incorporated changes to the MIB to
+            support the use of LLDP with multiple destination MAC
+            addresses."
+
+   ::= { ieee802dot1mibs 13 }
+
+lldpV2Notifications            OBJECT IDENTIFIER ::= { lldpV2MIB 0 }
+lldpV2Objects                  OBJECT IDENTIFIER ::= { lldpV2MIB 1 }
+lldpV2Conformance              OBJECT IDENTIFIER ::= { lldpV2MIB 2 } 
+
+--
+-- LLDP MIB Objects
+--
+
+lldpV2Configuration            OBJECT IDENTIFIER ::= { lldpV2Objects 1 }
+lldpV2Statistics               OBJECT IDENTIFIER ::= { lldpV2Objects 2 }
+lldpV2LocalSystemData          OBJECT IDENTIFIER ::= { lldpV2Objects 3 }
+lldpV2RemoteSystemsData        OBJECT IDENTIFIER ::= { lldpV2Objects 4 }
+lldpV2Extensions               OBJECT IDENTIFIER ::= { lldpV2Objects 5 }
+
+-- 
+-- ***********************************************************
+-- 
+--                  L L D P    C O N F I G 
+-- 
+-- *********************************************************** 
+--
+
+lldpV2MessageTxInterval OBJECT-TYPE
+    SYNTAX      Unsigned32(5..32768)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The interval at which LLDP frames are transmitted on
+            behalf of this LLDP agent.
+
+            The default value for lldpV2MessageTxInterval object is
+            30 seconds.
+
+            The value of this object is restored from non-volatile
+            storage after a re-initialization of the management system."
+    REFERENCE 
+            "9.2.5.7"
+    DEFVAL     { 30 }
+    ::= { lldpV2Configuration 1 }
+
+lldpV2MessageTxHoldMultiplier OBJECT-TYPE
+    SYNTAX      Unsigned32(2..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The time-to-live value expressed as a multiple of the
+            lldpV2MessageTxInterval object. The actual time-to-live value
+            used in LLDP frames, transmitted on behalf of this LLDP agent,
+            can be expressed by the following formula: TTL = min(65535,
+            (lldpV2MessageTxInterval * lldpV2MessageTxHoldMultiplier)) For
+            example, if the value of lldpV2MessageTxInterval is '30', and
+            the value of lldpV2MessageTxHoldMultiplier is '4', then the
+            value '120' is encoded in the TTL field in the LLDP header.
+
+            The default value for lldpV2MessageTxHoldMultiplier object is 4.
+
+            The value of this object is restored from non-volatile
+            storage after a re-initialization of the management system."
+    REFERENCE 
+            "9.2.5.6"
+    DEFVAL      { 4 }    
+    ::= { lldpV2Configuration 2 }
+
+lldpV2ReinitDelay OBJECT-TYPE
+    SYNTAX      Unsigned32(1..10)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The lldpV2ReinitDelay indicates the delay (in units of
+            seconds) from when lldpPortConfigAdminStatus object of a
+            particular port becomes 'disabled' until re-initialization
+            is attempted.
+
+            The default value for lldpV2ReinitDelay is two seconds.
+
+            The value of this object is restored from non-volatile
+            storage after a re-initialization of the management system."
+    REFERENCE 
+            "9.2.5.10"
+    DEFVAL      { 2 }    
+    ::= { lldpV2Configuration 3 }
+
+lldpV2NotificationInterval OBJECT-TYPE
+    SYNTAX      Unsigned32(5..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object controls the interval between transmission of
+            LLDP notifications during normal transmission periods.
+
+            The value of this object is restored from non-volatile
+            storage after a re-initialization of the management system."
+    DEFVAL { 30 }
+    ::= { lldpV2Configuration 4 }
+
+lldpV2TxCreditMax OBJECT-TYPE
+    SYNTAX Unsigned32(1..100)
+    UNITS "PDUs"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+            "The maximum number of consecutive LLDPDUs that can be
+            transmitted at any time.
+
+            The default value for lldpV2TxCreditMax object is 5 PDUs.
+            The value of this object is restored from non-volatile
+            storage after a re-initialization of the management system."
+    REFERENCE
+            "9.2.5.17"
+    DEFVAL { 5 }
+    ::= { lldpV2Configuration 5 }
+
+lldpV2MessageFastTx OBJECT-TYPE
+    SYNTAX Unsigned32(1..3600)
+    UNITS "seconds"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+                "The interval at which LLDP frames are transmitted on
+                behalf of this LLDP agent during fast transmission period
+                (e.g. when a new neighbor is detected).
+                The default value for lldpV2MessageFastTx object is
+                1 second.
+                The value of this object is restored from non-volatile
+                storage after a re-initialization of the management system."
+    REFERENCE
+            "9.2.5.5"
+    DEFVAL { 1 }
+    ::= { lldpV2Configuration 6 }
+
+lldpV2TxFastInit OBJECT-TYPE
+    SYNTAX Unsigned32(1..8)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+                "The initial value used to initialize the txFast variable
+                which determines the number of transmissions that are
+                made in fast transmission mode.
+                The default value for lldpV2TxFastInit object is
+                4.
+                The value of this object is restored from non-volatile
+                storage after a re-initialization of the management system."
+    REFERENCE
+            "9.2.5.19"
+    DEFVAL { 4 }
+    ::= { lldpV2Configuration 7 }
+--
+-- lldpV2PortConfigTable: LLDP configuration indexed on a per port, 
+-- per destination address basis. The  ifIndex, coupled with an index into 
+-- the lldpDestAddressTable, is used to index per port per
+-- destination MAC address.
+--
+
+lldpV2PortConfigTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpV2PortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table that controls LLDP frame transmission on individual
+            ports and using particular destination MAC addresses."
+    ::= { lldpV2Configuration 8 }
+
+lldpV2PortConfigEntry   OBJECT-TYPE
+    SYNTAX      LldpV2PortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "LLDP configuration information for a particular port and
+            destination MAC address.
+
+            This configuration parameter controls the transmission and
+            the reception of LLDP frames on those interface/address 
+            combinations whose rows are created in this table.
+
+            Rows in this table can only be created for MAC addresses
+            that can validly be used in association with the type of 
+            interface concerned, as defined by table 8-2.
+
+            The contents of this table is persistent across
+            re-initializations or re-boots."
+     INDEX  { lldpV2PortConfigIfIndex,
+              lldpV2PortConfigDestAddressIndex  }
+    ::= { lldpV2PortConfigTable 1 }
+
+LldpV2PortConfigEntry ::= SEQUENCE {
+      lldpV2PortConfigIfIndex             InterfaceIndex,
+      lldpV2PortConfigDestAddressIndex    LldpV2DestAddressTableIndex,
+      lldpV2PortConfigAdminStatus         INTEGER,
+      lldpV2PortConfigNotificationEnable  TruthValue,
+      lldpV2PortConfigTLVsTxEnable        BITS }
+
+lldpV2PortConfigIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndex 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The interface index value used to identify the port
+            associated with this entry. Its value is an index into
+            the interfaces MIB.
+
+            The value of this object is used as an index to the
+            lldpV2PortConfigTable."
+    ::= { lldpV2PortConfigEntry 1 }
+
+lldpV2PortConfigDestAddressIndex   OBJECT-TYPE
+    SYNTAX      LldpV2DestAddressTableIndex 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index value used to identify the destination
+            MAC address associated with this entry. Its value identifies
+            the row in the lldpV2DestAddressTable where the MAC address
+            can be found.
+
+            The value of this object is used as an index to the
+            lldpV2PortConfigTable."
+    ::= { lldpV2PortConfigEntry 2 }
+
+lldpV2PortConfigAdminStatus  OBJECT-TYPE 
+    SYNTAX INTEGER { 
+       txOnly(1), 
+       rxOnly(2),
+       txAndRx(3),
+       disabled(4)
+    }
+    MAX-ACCESS read-write 
+    STATUS     current 
+    DESCRIPTION 
+            "The administratively desired status of the local LLDP agent.
+
+            If the associated lldpV2PortConfigAdminStatus object is
+            set to a value of 'txOnly(1)', then LLDP agent transmits
+            LLDPframes on this port and it does not store any
+            information about the remote systems connected.
+         
+            If the associated lldpV2PortConfigAdminStatus object is 
+            set to a value of 'rxOnly(2)', then the LLDP agent
+            receives, but it does not transmit LLDP frames on this port.
+
+            If the associated lldpV2PortConfigAdminStatus object is set
+            to a value of 'txAndRx(3)', then the LLDP agent transmits
+            and receives LLDP frames on this port.
+
+            If the associated lldpV2PortConfigAdminStatus object is set
+            to a value of 'disabled(4)', then LLDP agent does not
+            transmit or receive LLDP frames on this port. If there is
+            remote systems information which is received on this port
+            and stored in other tables, before the port's
+            lldpV2PortConfigAdminStatus becomes disabled, then that
+            information is deleted."
+    REFERENCE 
+            "9.2.5.1"
+    DEFVAL  { txAndRx }    
+   ::= { lldpV2PortConfigEntry 3 } 
+
+lldpV2PortConfigNotificationEnable OBJECT-TYPE 
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write 
+    STATUS     current 
+    DESCRIPTION 
+            "The lldpV2PortConfigNotificationEnable controls, on a per
+            agent basis, whether or not notifications from the agent
+            are enabled. The value true(1) means that notifications are
+            enabled; the value false(2) means that they are not."
+    DEFVAL  { false }    
+   ::= { lldpV2PortConfigEntry 4 } 
+
+lldpV2PortConfigTLVsTxEnable OBJECT-TYPE
+    SYNTAX      BITS {
+            portDesc(0),
+            sysName(1),
+            sysDesc(2),
+            sysCap(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The lldpV2PortConfigTLVsTxEnable, defined as a bitmap,
+            includes the basic set of LLDP TLVs whose transmission is
+            allowed on the local LLDP agent by the network management.
+            Each bit in the bitmap corresponds to a TLV type associated
+            with a specific optional TLV.
+
+            It should be noted that the organizationally-specific TLVs
+            are excluded from the lldpV2PortConfigTLVsTxEnable bitmap.
+            
+            LLDP Organization Specific Information Extension MIBs should
+            have similar configuration object to control transmission
+            of their organizationally defined TLVs.
+
+            The bit 'portDesc(0)' indicates that LLDP agent should
+            transmit 'Port Description TLV'.
+
+            The bit 'sysName(1)' indicates that LLDP agent should transmit
+            'System Name TLV'.
+
+            The bit 'sysDesc(2)' indicates that LLDP agent should transmit
+            'System Description TLV'.
+
+            The bit 'sysCap(3)' indicates that LLDP agent should transmit
+            'System Capabilities TLV'.
+
+            There is no bit reserved for the management address TLV type
+            since transmission of management address TLVs are controlled
+            by another object, lldpV2ConfigManAddrTable.
+
+            The default value for lldpV2PortConfigTLVsTxEnable object is
+            empty set, which means no enumerated values are set.
+
+            The value of this object is restored from non-volatile
+            storage after a re-initialization of the management system."
+    REFERENCE 
+            "9.1.2.1"
+    DEFVAL  { { } }
+    ::= { lldpV2PortConfigEntry 5 } 
+
+
+--
+-- lldpV2DestAddressTable: Destination MAC addresses used by LLDP
+--
+
+lldpV2DestAddressTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpV2DestAddressTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table that contains the set of MAC addresses used
+            by LLDP for transmission and reception of LLDPDUs."
+    ::= { lldpV2Configuration 9 }
+
+lldpV2DestAddressTableEntry   OBJECT-TYPE
+    SYNTAX      LldpV2DestAddressTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Destination MAC address information for LLDP.
+
+            This configuration parameter identifies a MAC address
+            corresponding to a LldpV2DestAddressTableIndex value.
+
+            Rows in this table are created as necessary, to support
+            MAC addresses needed by other tables in the MIB that
+            are indexed by MAC address.
+
+            A given row in this table cannot be deleted if the MAC
+            address table index value is in use in any other table
+            in the MIB.
+
+            The contents of this table is persistent aacross
+            re-initializations or re-boots."
+     INDEX  { lldpV2AddressTableIndex  }
+    ::= { lldpV2DestAddressTable 1 }
+
+LldpV2DestAddressTableEntry ::= SEQUENCE {
+      lldpV2AddressTableIndex      LldpV2DestAddressTableIndex,
+      lldpV2DestMacAddress         MacAddress  }
+
+lldpV2AddressTableIndex   OBJECT-TYPE
+    SYNTAX      LldpV2DestAddressTableIndex 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index value used to identify the destination
+            MAC address associated with this entry.
+
+            The value of this object is used as an index to the
+            lldpV2DestAddressTable."
+    ::= { lldpV2DestAddressTableEntry 1 }
+
+lldpV2DestMacAddress   OBJECT-TYPE
+    SYNTAX      MacAddress 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The MAC address associated with this entry.
+
+            The octet string identifies an individual or a group
+            MAC address that is in use by LLDP as a destination
+            MAC address.
+            The MAC address is encoded in the octet string in
+            canonical format (see IEEE Std 802)."
+    ::= { lldpV2DestAddressTableEntry 2 }
+
+
+
+--
+-- lldpV2ManAddrConfigTxPortsTable : selection of management addresses
+-- to be transmitted on a specified set of port/destination
+-- address pairs.
+-- 
+
+lldpV2ManAddrConfigTxPortsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpV2ManAddrConfigTxPortsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table that controls selection of LLDP management address
+            TLV instances to be transmitted on individual port/
+            destination address pairs."
+    ::= { lldpV2Configuration 10 }
+
+lldpV2ManAddrConfigTxPortsEntry  OBJECT-TYPE
+    SYNTAX      LldpV2ManAddrConfigTxPortsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "LLDP configuration information that specifies the set
+            of port/destination address pairs on which the local
+            system management address instance is transmitted.
+
+            Each active lldpManAddrConfigTxPortsTableV2Entry is 
+            restored from non-volatile storage and re-created 
+            after a re-initialization of the management system."
+    INDEX { 
+            lldpV2ManAddrConfigIfIndex,
+            lldpV2ManAddrConfigDestAddressIndex,
+            lldpV2ManAddrConfigLocManAddrSubtype,
+            lldpV2ManAddrConfigLocManAddr }
+    ::= { lldpV2ManAddrConfigTxPortsTable 1 }
+
+LldpV2ManAddrConfigTxPortsEntry  ::= SEQUENCE {
+            lldpV2ManAddrConfigIfIndex            InterfaceIndex,
+            lldpV2ManAddrConfigDestAddressIndex   LldpV2DestAddressTableIndex,
+            lldpV2ManAddrConfigLocManAddrSubtype  AddressFamilyNumbers,
+            lldpV2ManAddrConfigLocManAddr         LldpV2ManAddress, 
+            lldpV2ManAddrConfigTxEnable           TruthValue,
+            lldpV2ManAddrConfigRowStatus          RowStatus
+}
+
+lldpV2ManAddrConfigIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndex 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The interface index value used to identify the port
+            associated with this entry. Its value is an index into
+            the interfaces MIB.
+
+            The value of this object is used as an index to the
+            lldpV2PortConfigTable.
+            The value in this column of the table MUST match
+            the IfIndex value specified in the BridgePort table."
+    ::= { lldpV2ManAddrConfigTxPortsEntry 1 }
+
+lldpV2ManAddrConfigDestAddressIndex   OBJECT-TYPE
+    SYNTAX      LldpV2DestAddressTableIndex 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index value used to identify the destination
+            MAC address associated with this entry. Its value identifies
+            the row in the lldpV2DestAddressTable where the MAC address
+            can be found.
+
+            The value of this object is used as an index to the
+            lldpV2PortConfigTable."
+    ::= { lldpV2ManAddrConfigTxPortsEntry 2 }
+
+
+lldpV2ManAddrConfigLocManAddrSubtype  OBJECT-TYPE
+    SYNTAX      AddressFamilyNumbers
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The type of management address identifier encoding used in
+            the associated 'lldpLocManagmentAddr' object.
+
+            It should be noted that only a subset of the possible
+            address encodings enumerated in AddressFamilyNumbers
+            are appropriate for use as a LLDP management
+            address, either because some are just not apliccable or 
+            because the maximum size of a LldpV2ManAddress octet string
+            would prevent the use of some address identifier encodings."
+    REFERENCE 
+            "8.5.9.3"
+    ::= { lldpV2ManAddrConfigTxPortsEntry 3 }
+
+lldpV2ManAddrConfigLocManAddr  OBJECT-TYPE
+    SYNTAX      LldpV2ManAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The string value used to identify the management address
+            component associated with the local system. The purpose of
+            this address is to contact the management entity."
+    REFERENCE 
+            "8.5.9.4"
+    ::= { lldpV2ManAddrConfigTxPortsEntry 4 }
+
+
+
+lldpV2ManAddrConfigTxEnable  OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+            "A boolean controlling the transmission of system
+             management address instance for the specified port,
+             destination, subtype and MAN address used to index
+             this table. If set to the default value of false,
+             no transmission occurs. If set to true, the
+             appropriate information is transmitted out of the
+             port specified in the row's index."
+    REFERENCE 
+            "9.1.2.1"
+    DEFVAL  { false }     -- not transmitted
+    ::= { lldpV2ManAddrConfigTxPortsEntry 5 }
+
+lldpV2ManAddrConfigRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the status of an entry in this table, and is used
+        to create/delete entries.
+        The corresponding instances of the following objects
+        must be set before this object can be made active(1):
+           lldpV2ManAddrConfigDestAddressIndex
+           lldpV2ManAddrConfigLocManAddrSubtype
+           lldpV2ManAddrConfigLocManAddr 
+           lldpV2ManAddrConfigTxEnable
+
+        The corresponding instances of the following objects
+        may not be changed while this object is active(1):
+           lldpV2ManAddrConfigDestAddressIndex
+           lldpV2ManAddrConfigLocManAddrSubtype
+           lldpV2ManAddrConfigLocManAddr "
+::= { lldpV2ManAddrConfigTxPortsEntry 6 }
+
+--
+--  *********************************************************** 
+--
+--                   L L D P    S T A T S 
+--
+--  *********************************************************** 
+--
+-- LLDP Stats Group
+
+lldpV2StatsRemTablesLastChangeTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The value of sysUpTime object (defined in IETF RFC 3418)
+            at the time an entry is created, modified, or deleted in the
+            in tables associated with the lldpV2RemoteSystemsData objects
+            and all LLDP extension objects associated with remote systems.
+
+            An NMS can use this object to reduce polling of the
+            lldpV2RemoteSystemsData objects."
+    ::= { lldpV2Statistics 1 }
+
+lldpV2StatsRemTablesInserts OBJECT-TYPE
+    SYNTAX      ZeroBasedCounter32
+    UNITS       "table entries"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of times the complete set of information
+            advertised by a particular MSAP has been inserted into tables
+            contained in lldpV2RemoteSystemsData and lldpV2Extensions objects.
+
+            The complete set of information received from a particular
+            MSAP should be inserted into related tables. If partial
+            information cannot be inserted for a reason such as lack
+            of resources, all of the complete set of information should
+            be removed.
+
+            This counter should be incremented only once after the
+            complete set of information is successfully recorded
+            in all related tables. Any failures during inserting
+            information set which result in deletion of previously
+            inserted information should not trigger any changes in
+            lldpV2StatsRemTablesInserts since the insert is not completed
+            yet or in lldpStatsRemTablesDeletes, since the deletion
+            would only be a partial deletion. If the failure was the
+            result of lack of resources, the lldpStatsRemTablesDrops
+            counter should be incremented once."
+    ::= { lldpV2Statistics 2 }
+
+lldpV2StatsRemTablesDeletes   OBJECT-TYPE
+    SYNTAX      ZeroBasedCounter32
+    UNITS       "table entries"
+    MAX-ACCESS  read-only
+    STATUS      current
+
+    DESCRIPTION
+            "The number of times the complete set of information
+            advertised by a particular MSAP has been deleted from
+            tables contained in lldpV2RemoteSystemsData and lldpV2Extensions
+            objects.
+
+            This counter should be incremented only once when the
+            complete set of information is completely deleted from all
+            related tables. Partial deletions, such as deletion of
+            rows associated with a particular MSAP from some tables,
+            but not from all tables are not allowed, thus should not
+            change the value of this counter."
+    ::= { lldpV2Statistics 3 }
+
+lldpV2StatsRemTablesDrops  OBJECT-TYPE
+    SYNTAX      ZeroBasedCounter32
+    UNITS       "table entries"
+    MAX-ACCESS  read-only
+
+    STATUS      current
+    DESCRIPTION
+            "The number of times the complete set of information
+            advertised by a particular MSAP could not be entered into
+            tables contained in lldpV2RemoteSystemsData and lldpV2Extensions
+            objects because of insufficient resources."
+    ::= { lldpV2Statistics 4 }
+
+lldpV2StatsRemTablesAgeouts   OBJECT-TYPE
+    SYNTAX      ZeroBasedCounter32
+    UNITS       "table entries"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of times the complete set of information
+            advertised by a particular MSAP has been deleted from tables
+            contained in lldpV2RemoteSystemsData and lldpV2Extensions objects
+            because the information timeliness interval has expired.
+
+            This counter should be incremented only once when the complete
+            set of information is completely invalidated (aged out)
+            from all related tables. Partial ageing, similar to deletion
+            case, is not allowed, and thus, should not change the value
+            of this counter."
+    ::= { lldpV2Statistics 5 }
+
+--
+-- TX statistics 
+-- Indexed by port (via ifIndex) and
+-- destination MAC address.
+--
+
+lldpV2StatsTxPortTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpV2StatsTxPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+            "A table containing LLDP transmission statistics for
+            individual port/destination address combinations. 
+            Entries are not required to exist in
+            this table while the lldpPortConfigEntry object is equal to
+            'disabled(4)'."
+    ::= { lldpV2Statistics 6 } 
+
+lldpV2StatsTxPortEntry   OBJECT-TYPE
+     SYNTAX      LldpV2StatsTxPortEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "LLDP frame transmission statistics for a particular port
+             and destination MAC address. 
+             The port is contained in the same chassis as the
+             LLDP agent.
+            
+             All counter values in a particular entry shall be
+             maintained on a continuing basis and shall not be deleted
+             upon expiration of rxInfoTTL timing counters in the LLDP
+             remote systems MIB of the receipt of a shutdown frame from
+             a remote LLDP agent.
+
+             All statistical counters associated with a particular
+             port on the local LLDP agent become frozen whenever the
+             adminStatus is disabled for the same port.
+
+             Rows in this table can only be created for MAC addresses
+             that can validly be used in association with the type of 
+             interface concerned, as defined by table 8-2."
+     INDEX  { lldpV2StatsTxIfIndex,
+              lldpV2StatsTxDestMACAddress }
+     ::= { lldpV2StatsTxPortTable 1 } 
+
+LldpV2StatsTxPortEntry ::= SEQUENCE {      
+      lldpV2StatsTxIfIndex               InterfaceIndex,
+      lldpV2StatsTxDestMACAddress        LldpV2DestAddressTableIndex,
+      lldpV2StatsTxPortFramesTotal       Counter32,
+      lldpV2StatsTxLLDPDULengthErrors    Counter32  }
+
+lldpV2StatsTxIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndex 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The interface index value used to identify the port
+            associated with this entry. Its value is an index
+            into the interfaces MIB
+
+            The value of this object is used as an index to the
+            lldpV2StatsTxPortTable."
+    ::= { lldpV2StatsTxPortEntry 1 } 
+
+lldpV2StatsTxDestMACAddress   OBJECT-TYPE
+    SYNTAX      LldpV2DestAddressTableIndex 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index value used to identify the destination
+            MAC address associated with this entry. Its value identifies
+            the row in the lldpV2DestAddressTable where the MAC address
+            can be found.
+
+            The value of this object is used as an index to the
+            lldpV2StatsTxPortTable."
+    ::= { lldpV2StatsTxPortEntry 2 } 
+
+lldpV2StatsTxPortFramesTotal  OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "LLDP frames"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The number of LLDP frames transmitted by this LLDP agent
+            on the indicated port to the destination MAC address
+            associated with this row of the table."
+    REFERENCE 
+            "9.2.6.5"
+    ::= { lldpV2StatsTxPortEntry 3 }
+
+lldpV2StatsTxLLDPDULengthErrors  OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "LLDP frames"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The number of LLDPDU Length Errors recorded for the Port."
+    REFERENCE 
+            "9.2.6.8"
+    ::= { lldpV2StatsTxPortEntry 4 }
+
+
+
+--
+-- lldpV2StatsRxPortTable - RX statistics
+-- This table is indexed by ifIndex and destination MAC address.
+--
+
+lldpV2StatsRxPortTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpV2StatsRxPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+            "A table containing LLDP reception statistics for individual
+            ports and destination MAC addresses. 
+            Entries are not required to exist in this table while
+            the lldpPortConfigEntry object is equal to 'disabled(4)'."
+    ::= { lldpV2Statistics 7 } 
+
+lldpV2StatsRxPortEntry   OBJECT-TYPE
+     SYNTAX      LldpV2StatsRxPortEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "LLDP frame reception statistics for a particular port.
+             The port is contained in the same chassis as the
+             LLDP agent.
+            
+             All counter values in a particular entry shall be
+             maintained on a continuing basis and shall not be deleted
+             upon expiration of rxInfoTTL timing counters in the LLDP
+             remote systems MIB of the receipt of a shutdown frame from
+             a remote LLDP agent.
+
+             All statistical counters associated with a particular
+             port on the local LLDP agent become frozen whenever the
+             adminStatus is disabled for the same port.
+
+             Rows in this table can only be created for MAC addresses
+             that can validly be used in association with the type of 
+             interface concerned, as defined by table 8-2.
+
+             The contents of this table is persistent across
+             re-initializations or re-boots."
+     INDEX  { lldpV2StatsRxDestIfIndex,
+              lldpV2StatsRxDestMACAddress }
+     ::= { lldpV2StatsRxPortTable 1 } 
+
+LldpV2StatsRxPortEntry ::= SEQUENCE {      
+      lldpV2StatsRxDestIfIndex               InterfaceIndex,
+      lldpV2StatsRxDestMACAddress            LldpV2DestAddressTableIndex,
+      lldpV2StatsRxPortFramesDiscardedTotal  Counter32,
+      lldpV2StatsRxPortFramesErrors          Counter32,
+      lldpV2StatsRxPortFramesTotal           Counter32,
+      lldpV2StatsRxPortTLVsDiscardedTotal    Counter32,
+      lldpV2StatsRxPortTLVsUnrecognizedTotal Counter32,
+      lldpV2StatsRxPortAgeoutsTotal          ZeroBasedCounter32
+}
+
+lldpV2StatsRxDestIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndex 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The interface index value used to identify the port
+            associated with this entry. Its value is an index
+            into the interfaces MIB
+
+            The value of this object is used as an index to the
+            lldpStatsRxPortV2Table."
+    ::= { lldpV2StatsRxPortEntry 1 } 
+
+lldpV2StatsRxDestMACAddress   OBJECT-TYPE
+    SYNTAX      LldpV2DestAddressTableIndex 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index value used to identify the destination
+            MAC address associated with this entry. Its value identifies
+            the row in the lldpV2DestAddressTable where the MAC address
+            can be found.
+
+            The value of this object is used as an index to the
+            lldpStatsRxPortV2Table."
+    ::= { lldpV2StatsRxPortEntry 2 } 
+
+
+lldpV2StatsRxPortFramesDiscardedTotal OBJECT-TYPE 
+    SYNTAX        Counter32
+    UNITS         "LLDP frames"
+    MAX-ACCESS read-only
+    STATUS     current 
+    DESCRIPTION 
+            "The number of LLDP frames received by this LLDP agent on
+            the indicated port, and then discarded for any reason.
+            This counter can provide an indication that LLDP header
+            formatting problems may exist with the local LLDP agent in
+            the sending system or that LLDPDU validation problems may
+            exist with the local LLDP agent in the receiving system."
+   REFERENCE 
+            "9.2.6.2"
+   ::= { lldpV2StatsRxPortEntry 3 } 
+
+lldpV2StatsRxPortFramesErrors  OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "LLDP frames"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The number of invalid LLDP frames received by this LLDP
+            agent on the indicated port, while this LLDP agent is enabled."
+    REFERENCE 
+            "9.2.6.3"
+    ::= { lldpV2StatsRxPortEntry 4 }
+
+lldpV2StatsRxPortFramesTotal OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "LLDP frames"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The number of valid LLDP frames received by this LLDP agent
+            on the indicated port, while this LLDP agent is enabled."
+    REFERENCE 
+            "9.2.6.4"
+    ::= { lldpV2StatsRxPortEntry 5 }
+
+lldpV2StatsRxPortTLVsDiscardedTotal OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "TLVs"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The number of LLDP TLVs discarded for any reason by this LLDP
+            agent on the indicated port."
+    REFERENCE 
+            "9.2.6.6"
+    ::= { lldpV2StatsRxPortEntry 6 }
+
+lldpV2StatsRxPortTLVsUnrecognizedTotal  OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "TLVs"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The number of LLDP TLVs received on the given port that
+            are not recognized by this LLDP agent on the indicated port.
+            
+            An unrecognized TLV is referred to as the TLV whose type value
+            is in the range of reserved TLV types (000 1001 - 111 1110)
+            in Table 9.1 of IEEE Std 802.1AB-2004. An unrecognized
+            TLV may be a basic management TLV from a later LLDP version."
+    REFERENCE 
+            "9.2.6.7"
+    ::= { lldpV2StatsRxPortEntry 7 }
+
+lldpV2StatsRxPortAgeoutsTotal   OBJECT-TYPE
+    SYNTAX      ZeroBasedCounter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The counter that represents the number of age-outs that
+            occurred on a given port. An age-out is the number of
+            times the complete set of information advertised by a
+            particular MSAP has been deleted from tables contained in
+            lldpV2RemoteSystemsData and lldpV2Extensions objects because
+            the information timeliness interval has expired.
+
+            This counter is similar to lldpV2StatsRemTablesAgeouts, except
+            that the counter is on a per port basis. This enables NMS to
+            poll tables associated with the lldpV2RemoteSystemsData objects
+            and all LLDP extension objects associated with remote systems
+            on the indicated port only.
+
+            This counter is set to zero during agent initialization
+            and its value should not be saved in non-volatile storage.
+
+            This counter is incremented only once when the
+            complete set of information is invalidated (aged out) from
+            all related tables on a particular port. Partial ageing
+            is not allowed."
+    REFERENCE 
+            "9.2.6.1"
+    ::= { lldpV2StatsRxPortEntry 8 }
+
+
+--  ***********************************************************
+--
+--          L O C A L    S Y S T E M    D A T A
+--
+--  ***********************************************************
+
+lldpV2LocChassisIdSubtype  OBJECT-TYPE
+    SYNTAX      LldpV2ChassisIdSubtype
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The type of encoding used to identify the chassis
+            associated with the local system."
+    REFERENCE 
+            "8.5.2.2"
+    ::= { lldpV2LocalSystemData 1 }
+
+lldpV2LocChassisId  OBJECT-TYPE
+    SYNTAX      LldpV2ChassisId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The string value used to identify the chassis component
+            associated with the local system."
+    REFERENCE 
+            "8.5.2.3"
+    ::= { lldpV2LocalSystemData 2 }
+
+lldpV2LocSysName  OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The string value used to identify the system name of the
+            local system. If the local agent supports IETF RFC 3418,
+            lldpLocSysName object should have the same value of sysName
+            object."
+    REFERENCE 
+            "8.5.6.2"
+    ::= { lldpV2LocalSystemData 3 }
+
+lldpV2LocSysDesc  OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The string value used to identify the system description
+            of the local system. If the local agent supports IETF RFC 3418,
+            lldpLocSysDesc object should have the same value of sysDesc
+            object."
+    REFERENCE 
+            "8.5.7.2"
+    ::= { lldpV2LocalSystemData 4 }
+
+lldpV2LocSysCapSupported OBJECT-TYPE
+    SYNTAX      LldpV2SystemCapabilitiesMap
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The bitmap value used to identify which system capabilities
+            are supported on the local system."
+    REFERENCE 
+            "8.5.8.1"
+    ::= { lldpV2LocalSystemData 5 }
+
+lldpV2LocSysCapEnabled  OBJECT-TYPE
+    SYNTAX      LldpV2SystemCapabilitiesMap
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The bitmap value used to identify which system capabilities
+            are enabled on the local system."
+    REFERENCE 
+            "8.5.8.2"
+    ::= { lldpV2LocalSystemData 6 }
+
+
+--
+-- lldpV2LocPortTable : Port specific Local system data
+-- Indexed by  ifIndex.
+--
+
+lldpV2LocPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpV2LocPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains one row per port
+            of information associated with the local
+            system known to this agent."
+    ::= { lldpV2LocalSystemData 7 }
+
+lldpV2LocPortEntry OBJECT-TYPE
+    SYNTAX      LldpV2LocPortEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Information about a particular port component.
+
+            Entries may be created and deleted in this table by the
+            agent.
+
+            Rows in this table can only be created for MAC addresses
+            that can validly be used in association with the type of 
+            interface concerned, as defined by table 8-2.
+
+            The contents of this table is persistent across
+            re-initializations or re-boots."
+    INDEX   { lldpV2LocPortIfIndex }
+    ::= { lldpV2LocPortTable 1 }
+
+LldpV2LocPortEntry ::= SEQUENCE {
+      lldpV2LocPortIfIndex            InterfaceIndex,
+      lldpV2LocPortIdSubtype          LldpV2PortIdSubtype,
+      lldpV2LocPortId                 LldpV2PortId,
+      lldpV2LocPortDesc               SnmpAdminString
+}
+
+lldpV2LocPortIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndex 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The interface index value used to identify the port
+            associated with this entry. Its value is an index
+            into the interfaces MIB
+
+            The value of this object is used as an index to the
+            lldpV2LocPortTable."
+    ::= { lldpV2LocPortEntry 1 } 
+
+lldpV2LocPortIdSubtype  OBJECT-TYPE
+    SYNTAX      LldpV2PortIdSubtype
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The type of port identifier encoding used in the associated
+            'lldpLocPortId' object."
+    REFERENCE 
+            "8.5.3.2"
+    ::= { lldpV2LocPortEntry 2 }
+
+lldpV2LocPortId   OBJECT-TYPE
+    SYNTAX      LldpV2PortId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The string value used to identify the port component
+            associated with a given port in the local system."
+    REFERENCE 
+            "8.5.3.3"
+    ::= { lldpV2LocPortEntry 3 }
+
+lldpV2LocPortDesc   OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The string value used to identify the IEEE 802 LAN station's port
+            description associated with the local system. If the local
+            agent supports IETF RFC 2863, lldpLocPortDesc object should
+            have the same value of ifDescr object."
+    REFERENCE 
+            "8.5.5.2"
+    ::= { lldpV2LocPortEntry 4 }
+
+--
+-- lldpV2LocManAddrTable : Management addresses of the local system
+--
+
+lldpV2LocManAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpV2LocManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains management address information on the
+            local system known to this agent."
+    ::= { lldpV2LocalSystemData 8 }
+
+lldpV2LocManAddrEntry OBJECT-TYPE
+    SYNTAX      LldpV2LocManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Management address information about a particular chassis
+            component. There may be multiple management addresses
+            configured on the system identified by a particular
+            lldpLocChassisId. Each management address should have
+            distinct 'management address type' (lldpV2LocManAddrSubtype) and
+            'management address' (lldpLocManAddr.)
+
+            Entries may be created and deleted in this table by the
+            agent.
+            Since a variable length octetstring is used as an index
+            in a table, the address length is encoded as part of the OID
+            (as per IETF RFC 2578)."
+    INDEX   { lldpV2LocManAddrSubtype,
+              lldpV2LocManAddr }
+    ::= { lldpV2LocManAddrTable 1 }
+
+LldpV2LocManAddrEntry ::= SEQUENCE {
+      lldpV2LocManAddrSubtype    AddressFamilyNumbers,
+      lldpV2LocManAddr           LldpV2ManAddress,
+      lldpV2LocManAddrLen        Unsigned32,
+      lldpV2LocManAddrIfSubtype  LldpV2ManAddrIfSubtype,
+      lldpV2LocManAddrIfId       Unsigned32,
+      lldpV2LocManAddrOID        OBJECT IDENTIFIER
+}
+
+lldpV2LocManAddrSubtype  OBJECT-TYPE
+    SYNTAX      AddressFamilyNumbers
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The type of management address identifier encoding used in
+            the associated 'lldpLocManagmentAddr' object.
+
+            It should be noted that only a subset of the possible
+            address encodings enumerated in AddressFamilyNumbers
+            are appropriate for use as a LLDP management
+            address, either because some are just not apliccable or 
+            because the maximum size of a LldpV2ManAddress octet string
+            would prevent the use of some address identifier encodings."
+    REFERENCE 
+            "8.5.9.3"
+    ::= { lldpV2LocManAddrEntry 1 }
+
+lldpV2LocManAddr  OBJECT-TYPE
+    SYNTAX      LldpV2ManAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The string value used to identify the management address
+            component associated with the local system. The purpose of
+            this address is to contact the management entity."
+    REFERENCE 
+            "8.5.9.4"
+    ::= { lldpV2LocManAddrEntry 2 }
+
+lldpV2LocManAddrLen  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total length of the management address subtype and the
+            management address fields in LLDPDUs transmitted by the
+            local LLDP agent.
+
+            The management address length field is needed so that the
+            receiving systems that do not implement SNMP are not
+            required to implement an iana family numbers/address length
+            equivalency table in order to decode the management address."
+    REFERENCE 
+            "8.5.9.2"
+    ::= { lldpV2LocManAddrEntry 3 }
+
+
+lldpV2LocManAddrIfSubtype  OBJECT-TYPE
+    SYNTAX      LldpV2ManAddrIfSubtype
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The enumeration value that identifies the interface numbering
+            method used for defining the interface number
+            (lldpV2LocManAddrIfId), associated with the local system."
+    REFERENCE 
+            "8.5.9.5"
+    ::= { lldpV2LocManAddrEntry 4 }
+
+lldpV2LocManAddrIfId  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The integer value used to identify the interface number
+            regarding the management address component associated with
+            the local system."
+    REFERENCE 
+            "8.5.9.6"
+    ::= { lldpV2LocManAddrEntry 5 }
+
+lldpV2LocManAddrOID  OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The OID value used to identify the type of hardware component
+            or protocol entity associated with the management address
+            advertised by the local system agent."
+    REFERENCE 
+            "8.5.9.8"
+    ::= { lldpV2LocManAddrEntry 6 }
+
+
+--  ***********************************************************
+--
+--          R E M O T E    S Y S T E M S    D A T A
+--
+--  ***********************************************************
+
+
+--
+-- lldpV2RemTable
+-- Indexed by ifIndex and destination MAC address.
+--
+
+lldpV2RemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpV2RemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains one or more rows per physical network
+            connection known to this agent. The agent may wish to ensure
+            that only one lldpRemEntry is present for each local port
+            and destination MAC address,
+            or it may choose to maintain multiple lldpRemEntries for
+            the same local port and destination MAC address.
+
+            The following procedure may be used to retrieve remote
+            systems information updates from an LLDP agent:
+
+               1. NMS polls all tables associated with remote systems
+                  and keeps a local copy of the information retrieved.
+                  NMS polls periodically the values of the following
+                  objects:
+                     a. lldpV2StatsRemTablesInserts
+                     b. lldpV2StatsRemTablesDeletes
+                     c. lldpV2StatsRemTablesDrops
+                     d. lldpV2StatsRemTablesAgeouts
+                     e. lldpV2StatsRxPortAgeoutsTotal for all ports.
+
+               2. LLDP agent updates remote systems MIB objects, and
+                  sends out notifications to a list of notification
+                  destinations.
+
+               3. NMS receives the notifications and compares the new
+                  values of objects listed in step 1. 
+
+                  Periodically, NMS should poll the object
+                  lldpV2StatsRemTablesLastChangeTime to find out if anything
+                  has changed since the last poll. if something has
+                  changed, NMS polls the objects listed in step 1 to
+                  figure out what kind of changes occurred in the tables.
+
+                  if value of lldpV2StatsRemTablesInserts has changed,
+                  then NMS walks all tables by employing TimeFilter
+                  with the last-polled time value. This request
+                  returns new objects or objects whose values have been
+                  updated since the last poll.
+
+                  if value of lldpV2StatsRemTablesAgeouts has changed,
+                  then NMS walks the lldpStatsRxPortAgeoutsTotal and
+                  compares the new values with previously recorded ones.
+                  For ports whose lldpStatsRxPortAgeoutsTotal value is
+                  greater than the recorded value, NMS can
+                  retrieve objects associated with those ports from
+                  table(s) without employing a TimeFilter (which is
+                  performed by specifying 0 for the TimeFilter.)
+
+                  lldpV2StatsRemTablesDeletes and lldpV2StatsRemTablesDrops
+                  objects are provided for informational purposes."
+    ::= { lldpV2RemoteSystemsData  1 }
+
+lldpV2RemEntry OBJECT-TYPE
+    SYNTAX      LldpV2RemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Information about a particular physical network connection.
+            Entries may be created and deleted in this table by the agent,
+            if a physical topology discovery process is active.
+
+            Rows in this table can only be created for MAC addresses
+            that can validly be used in association with the type of 
+            interface concerned, as defined by table 8-2.
+
+            The contents of this table is persistent across
+            re-initializations or re-boots."
+    INDEX   {
+           lldpV2RemTimeMark,
+           lldpV2RemLocalIfIndex,
+           lldpV2RemLocalDestMACAddress,
+           lldpV2RemIndex
+    }
+    ::= { lldpV2RemTable 1 }
+
+LldpV2RemEntry ::= SEQUENCE {
+      lldpV2RemTimeMark              TimeFilter,
+      lldpV2RemLocalIfIndex          InterfaceIndex,
+      lldpV2RemLocalDestMACAddress   LldpV2DestAddressTableIndex,
+      lldpV2RemIndex                 Unsigned32,
+      lldpV2RemChassisIdSubtype      LldpV2ChassisIdSubtype,
+      lldpV2RemChassisId             LldpV2ChassisId,
+      lldpV2RemPortIdSubtype         LldpV2PortIdSubtype,
+      lldpV2RemPortId                LldpV2PortId,
+      lldpV2RemPortDesc              SnmpAdminString,
+      lldpV2RemSysName               SnmpAdminString,
+      lldpV2RemSysDesc               SnmpAdminString,
+      lldpV2RemSysCapSupported       LldpV2SystemCapabilitiesMap,
+      lldpV2RemSysCapEnabled         LldpV2SystemCapabilitiesMap,
+      lldpV2RemRemoteChanges        TruthValue,
+      lldpV2RemTooManyNeighbors      TruthValue
+}
+
+lldpV2RemTimeMark  OBJECT-TYPE
+    SYNTAX      TimeFilter
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A TimeFilter for this entry. See the TimeFilter textual
+            convention in IETF RFC 4502 and 
+            http://www.ietf.org/IESG/Implementations/RFC2021-Implementation.txt
+            to see how TimeFilter works."
+    REFERENCE 
+            "IETF RFC 4502 section 6"
+    ::= { lldpV2RemEntry 1 }
+
+
+lldpV2RemLocalIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndex 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The interface index value used to identify the port
+            associated with this entry. Its value is an index
+            into the interfaces MIB
+
+            The value of this object is used as an index to the
+            lldpV2RemTable."
+    ::= { lldpV2RemEntry 2 } 
+
+lldpV2RemLocalDestMACAddress   OBJECT-TYPE
+    SYNTAX      LldpV2DestAddressTableIndex 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index value used to identify the destination
+            MAC address associated with this entry. Its value identifies
+            the row in the lldpV2DestAddressTable where the MAC address
+            can be found.
+
+            The value of this object is used as an index to the
+            lldpV2RemTable."
+    ::= { lldpV2RemEntry 3 } 
+
+
+lldpV2RemIndex   OBJECT-TYPE
+    SYNTAX      Unsigned32(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object represents an arbitrary local integer value used
+            by this agent to identify a particular connection instance,
+            unique only for the indicated remote system.
+
+            An agent is encouraged to assign monotonically increasing
+            index values to new entries, starting with one, after each
+            reboot. It is considered unlikely that the lldpRemIndex
+            can wrap between reboots."
+    ::= { lldpV2RemEntry 4 }
+
+lldpV2RemChassisIdSubtype   OBJECT-TYPE
+    SYNTAX      LldpV2ChassisIdSubtype
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The type of encoding used to identify the chassis associated
+            with the remote system."
+    REFERENCE 
+            "8.5.2.2"
+    ::= { lldpV2RemEntry 5 }
+
+lldpV2RemChassisId   OBJECT-TYPE
+    SYNTAX      LldpV2ChassisId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The string value used to identify the chassis component
+            associated with the remote system."
+    REFERENCE 
+            "8.5.2.3"
+    ::= { lldpV2RemEntry 6 }
+
+lldpV2RemPortIdSubtype   OBJECT-TYPE
+    SYNTAX      LldpV2PortIdSubtype
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The type of port identifier encoding used in the associated
+            'lldpRemPortId' object."
+    REFERENCE 
+            "8.5.3.2"
+    ::= { lldpV2RemEntry 7 }
+
+lldpV2RemPortId   OBJECT-TYPE
+    SYNTAX      LldpV2PortId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The string value used to identify the port component
+            associated with the remote system."
+    REFERENCE 
+            "8.5.3.3"
+    ::= { lldpV2RemEntry 8 }
+
+lldpV2RemPortDesc   OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The string value used to identify the description of
+            the given port associated with the remote system."
+    REFERENCE 
+            "8.5.5.2"
+    ::= { lldpV2RemEntry 9 }
+
+lldpV2RemSysName   OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The string value used to identify the system name of the
+            remote system."
+    REFERENCE 
+            "8.5.6.2"
+    ::= { lldpV2RemEntry 10 }
+
+lldpV2RemSysDesc   OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The string value used to identify the system description
+            of the remote system."
+    REFERENCE 
+            "8.5.7.2"
+    ::= { lldpV2RemEntry 11 }
+
+lldpV2RemSysCapSupported  OBJECT-TYPE
+    SYNTAX      LldpV2SystemCapabilitiesMap
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The bitmap value used to identify which system capabilities
+            are supported on the remote system."
+    REFERENCE 
+            "8.5.8.1"
+    ::= { lldpV2RemEntry 12 }
+
+lldpV2RemSysCapEnabled   OBJECT-TYPE
+    SYNTAX      LldpV2SystemCapabilitiesMap
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The bitmap value used to identify which system capabilities
+            are enabled on the remote system."
+    REFERENCE 
+            "8.5.8.2"
+    ::= { lldpV2RemEntry 13 }
+
+lldpV2RemRemoteChanges   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates that there are chances in the remote systems
+            MIB, as determined by the variable remoteChanges."
+    REFERENCE 
+            "9.2.5.11"
+    ::= { lldpV2RemEntry 14 }
+
+lldpV2RemTooManyNeighbors   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates that there are too many neighbors
+             as determined by the variable tooManyNeighbors."
+    REFERENCE 
+            "9.2.5.15"
+    ::= { lldpV2RemEntry 15 }
+
+--
+-- lldpV2RemManAddrTable : Management addresses of the remote system
+-- Version 2 includes additional index values for ifIndex and 
+-- destination MAC address.
+--
+
+lldpV2RemManAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpV2RemManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains one or more rows per management address
+            information on the remote system learned on a particular port
+            contained in the local chassis known to this agent."
+    ::= { lldpV2RemoteSystemsData 2 }
+
+lldpV2RemManAddrEntry OBJECT-TYPE
+    SYNTAX      LldpV2RemManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Management address information about a particular chassis
+            component. There may be multiple management addresses
+            configured on the remote system identified by a particular
+            lldpRemIndex whose information is received on
+            an interface of the local system and a given destination
+            MAC address. Each management
+            address should have distinct 'management address
+            type' (lldpRemManAddrSubtype) and 'management address'
+            (lldpRemManAddr.)
+
+            Entries may be created and deleted in this table by the
+            agent.
+            Since a variable length octetstring is used as an index
+            in a table, theaddress length is encoded as part of the OID
+            (as per IETF RFC 2578)."
+    INDEX   { lldpV2RemTimeMark,
+              lldpV2RemLocalIfIndex,
+              lldpV2RemLocalDestMACAddress,
+              lldpV2RemIndex,
+              lldpV2RemManAddrSubtype,
+              lldpV2RemManAddr
+ }
+    ::= { lldpV2RemManAddrTable 1 }
+
+
+LldpV2RemManAddrEntry ::= SEQUENCE {
+      lldpV2RemManAddrSubtype      AddressFamilyNumbers,
+      lldpV2RemManAddr             LldpV2ManAddress,
+      lldpV2RemManAddrIfSubtype    LldpV2ManAddrIfSubtype,
+      lldpV2RemManAddrIfId         Unsigned32,
+      lldpV2RemManAddrOID          OBJECT IDENTIFIER
+}
+
+lldpV2RemManAddrSubtype  OBJECT-TYPE
+    SYNTAX      AddressFamilyNumbers
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The type of management address identifier encoding used in
+            the associated 'lldpRemManagmentAddr' object.
+
+            It should be noted that only a subset of the possible
+            address encodings enumerated in AddressFamilyNumbers
+            are appropriate for use as a LLDP management
+            address, either because some are just not apliccable or 
+            because the maximum size of a LldpV2ManAddress octet string
+            would prevent the use of some address identifier encodings."
+    REFERENCE 
+            "8.5.9.3"
+    ::= { lldpV2RemManAddrEntry 1 }
+
+lldpV2RemManAddr  OBJECT-TYPE
+    SYNTAX      LldpV2ManAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The string value used to identify the management address
+            component associated with the remote system. The purpose
+            of this address is to contact the management entity."
+    REFERENCE 
+            "8.5.9.4"
+    ::= { lldpV2RemManAddrEntry 2 }
+
+lldpV2RemManAddrIfSubtype  OBJECT-TYPE
+    SYNTAX      LldpV2ManAddrIfSubtype
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The enumeration value that identifies the interface numbering
+            method used for defining the interface number, associated
+            with the remote system."
+    REFERENCE 
+            "8.5.9.5"
+    ::= { lldpV2RemManAddrEntry 3 }
+
+lldpV2RemManAddrIfId  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The integer value used to identify the interface number
+            regarding the management address component associated with
+            the remote system. The value depends upon the value of the
+            lldpV2RemManAddrIfSubtype for the table row."
+    REFERENCE 
+            "8.5.9.6"
+    ::= { lldpV2RemManAddrEntry 4 }
+
+lldpV2RemManAddrOID  OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The OID value used to identify the type of hardware component
+            or protocol entity associated with the management address
+            advertised by the remote system agent."
+    REFERENCE 
+            "8.5.9.8"
+    ::= { lldpV2RemManAddrEntry 5 }
+
+
+
+
+--
+-- lldpV2RemUnknownTLVTable : Unrecognized TLV information 
+-- This version has additional indexes for 
+-- ifIndex and destination MAC address
+--
+
+lldpV2RemUnknownTLVTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpV2RemUnknownTLVEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains information about an incoming TLV which
+            is not recognized by the receiving LLDP agent. The TLV may
+            be from a later version of the basic management set.
+
+            This table should only contain TLVs that are found in
+            a single LLDP frame. Entries in this table, associated
+            with an MAC service access point (MSAP, the access point
+            for MAC services provided to the LCC sublayer, defined
+            in IEEE 100, which is also identified with a particular
+            lldpRemLocalPortNum, lldpRemIndex pair) are overwritten with
+            most recently received unrecognized TLV from the same MSAP,
+            or they naturally age out when the rxInfoTTL timer
+            (associated with the MSAP) expires."
+    REFERENCE 
+            "9.2.7.7.1"
+    ::= { lldpV2RemoteSystemsData 3 }
+
+lldpV2RemUnknownTLVEntry OBJECT-TYPE
+    SYNTAX      LldpV2RemUnknownTLVEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Information about an unrecognized TLV received from a
+            physical network connection. Entries may be created and
+            deleted in this table by the agent, if a physical topology
+            discovery process is active."
+    INDEX   {
+           lldpV2RemTimeMark,
+           lldpV2RemLocalIfIndex,
+           lldpV2RemLocalDestMACAddress,
+           lldpV2RemIndex,
+           lldpV2RemUnknownTLVType 
+    }
+    ::= { lldpV2RemUnknownTLVTable 1 }
+
+LldpV2RemUnknownTLVEntry ::= SEQUENCE {
+      lldpV2RemUnknownTLVType      Unsigned32,
+      lldpV2RemUnknownTLVInfo      OCTET STRING
+}
+
+lldpV2RemUnknownTLVType OBJECT-TYPE
+    SYNTAX      Unsigned32(9..126)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object represents the value extracted from the type
+            field of the TLV."
+    REFERENCE 
+            "9.2.7.7.1"
+    ::= { lldpV2RemUnknownTLVEntry 1 }
+
+lldpV2RemUnknownTLVInfo OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..511))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the value extracted from the value
+            field of the TLV."
+    REFERENCE 
+            "9.2.7.7.1"
+    ::= { lldpV2RemUnknownTLVEntry 2 }
+
+------------------------------------------------------------------------------
+-- Remote Systems Extension Table - Organizationally-Defined Information 
+------------------------------------------------------------------------------
+--
+-- lldpV2RemOrgDefInfoTable - indexed by ifIndex and destination 
+-- MAC address.
+--
+
+lldpV2RemOrgDefInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpV2RemOrgDefInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains one or more rows per physical network
+            connection which advertises the organizationally defined
+            information.
+
+            Note that this table contains one or more rows of
+            organizationally defined information that is not recognized
+            by the local agent.
+
+            If the local system is capable of recognizing any
+            organizationally defined information, appropriate extension
+            MIBs from the organization should be used for information
+            retrieval."
+    ::= { lldpV2RemoteSystemsData 4 }
+
+lldpV2RemOrgDefInfoEntry OBJECT-TYPE
+    SYNTAX      LldpV2RemOrgDefInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Information about the unrecognized organizationally
+            defined information advertised by the remote system.
+            The lldpRemTimeMark, lldpRemLocalPortNum, lldpRemIndex,
+            lldpRemOrgDefInfoOUI, lldpRemOrgDefInfoSubtype, and
+            lldpRemOrgDefInfoIndex are indexes to this table. If there is
+            an lldpRemOrgDefInfoEntry associated with a particular remote
+            system identified by the lldpRemLocalPortNum and lldpRemIndex,
+            then there is an lldpRemEntry associated with the same
+            instance (i.e, using same indexes.) When the lldpRemEntry
+            for the same index is removed from the lldpRemTable, the
+            associated lldpRemOrgDefInfoEntry is removed from
+            the lldpRemOrgDefInfoTable.
+
+            Entries may be created and deleted in this table by the
+            agent."
+    INDEX   { lldpV2RemTimeMark,
+              lldpV2RemLocalIfIndex,
+              lldpV2RemLocalDestMACAddress,
+              lldpV2RemIndex,
+              lldpV2RemOrgDefInfoOUI,
+              lldpV2RemOrgDefInfoSubtype,
+              lldpV2RemOrgDefInfoIndex }
+    ::= { lldpV2RemOrgDefInfoTable 1 }
+
+LldpV2RemOrgDefInfoEntry ::= SEQUENCE {
+      lldpV2RemOrgDefInfoOUI         OCTET STRING,
+      lldpV2RemOrgDefInfoSubtype     Unsigned32,
+      lldpV2RemOrgDefInfoIndex       Unsigned32,
+      lldpV2RemOrgDefInfo            OCTET STRING
+}
+
+lldpV2RemOrgDefInfoOUI  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(3))  
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The Organizationally Unique Identifier (OUI), as defined
+            in IEEE Std 802, is a 24 bit (three octets) globally
+            unique assigned number referenced by various standards,
+            of the information received from the remote system."
+    REFERENCE 
+            "8.6.1.3"
+    ::= { lldpV2RemOrgDefInfoEntry 1 }
+
+lldpV2RemOrgDefInfoSubtype  OBJECT-TYPE
+    SYNTAX      Unsigned32(1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The integer value used to identify the subtype of the
+            organizationally defined information received from the
+            remote system.
+
+            The subtype value is required to identify different instances
+            of organizationally defined information that could not be
+            retrieved without a unique identifier that indicates the
+            particular type of information contained in the information
+            string."
+    REFERENCE 
+            "8.6.1.4"
+    ::= { lldpV2RemOrgDefInfoEntry 2 }
+
+lldpV2RemOrgDefInfoIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object represents an arbitrary local integer value
+            used by this agent to identify a particular unrecognized
+            organizationally defined information instance, unique only
+            for the lldpRemOrgDefInfoOUI and lldpRemOrgDefInfoSubtype
+            from the same remote system.
+
+            An agent is encouraged to assign monotonically increasing
+            index values to new entries, starting with one, after each
+            reboot. It is considered unlikely that the
+            lldpRemOrgDefInfoIndex can wrap between reboots."
+    ::= { lldpV2RemOrgDefInfoEntry 3 }
+
+lldpV2RemOrgDefInfo  OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..507))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The string value used to identify the organizationally
+            defined information of the remote system. The encoding for
+            this object should be as defined for SnmpAdminString TC."
+    REFERENCE 
+            "8.6.1.5"
+    ::= { lldpV2RemOrgDefInfoEntry 4 }
+
+
+--
+-- ***********************************************************
+-- 
+--        L L D P   M I B   N O T I F I C A T I O N S
+-- 
+-- *********************************************************** 
+--
+
+lldpV2NotificationPrefix OBJECT IDENTIFIER ::= { lldpV2Notifications 0 }
+
+lldpV2RemTablesChange NOTIFICATION-TYPE
+    OBJECTS {
+        lldpV2StatsRemTablesInserts,
+        lldpV2StatsRemTablesDeletes,
+        lldpV2StatsRemTablesDrops,
+        lldpV2StatsRemTablesAgeouts
+    }
+    STATUS        current
+    DESCRIPTION
+            "A lldpV2RemTablesChange notification is sent when the value
+            of lldpV2StatsRemTablesLastChangeTime changes. It can be
+            utilized by an NMS to trigger LLDP remote systems table
+            maintenance polls.
+
+            Note that transmission of lldpV2RemTablesChange
+            notifications are throttled by the agent, as specified by the
+            'lldpV2NotificationInterval' object."
+   ::= { lldpV2NotificationPrefix 1 }
+
+
+--
+-- ***********************************************************
+-- 
+--           L L D P   M I B   C O N F O R M A N C E 
+-- 
+-- *********************************************************** 
+--
+
+lldpV2Compliances OBJECT IDENTIFIER ::= { lldpV2Conformance 1 }
+lldpV2Groups      OBJECT IDENTIFIER ::= { lldpV2Conformance 2 }
+
+-- compliance statements
+
+lldpV2TxRxCompliance MODULE-COMPLIANCE
+                        --V2 to add ifGeneralInformationGroup
+                        --and support re-indexed tables
+    STATUS  current
+    DESCRIPTION
+            "A compliance statement for all SNMP entities that 
+            implement the LLDP MIB as either a transmitter or 
+            a receiver of LLDPDUs.
+
+            This version defines compliance requirements for
+            V2 of the LLDP MIB module."
+    MODULE  -- this module
+        MANDATORY-GROUPS { lldpV2ConfigGroup, 
+                           ifGeneralInformationGroup
+        }
+
+    ::= { lldpV2Compliances 1 }
+
+lldpV2TxCompliance MODULE-COMPLIANCE 
+                       --V2 requirements for transmitters of LLDPDUs                   
+                       --and support re-indexed tables
+    STATUS  current
+    DESCRIPTION
+            "A compliance statement for SNMP entities that implement
+            the LLDP MIB and have the capability of transmitting
+            LLDP frames.
+
+            This version defines compliance requirements for
+            V2 of the LLDP MIB module."
+    MODULE  -- this module
+        MANDATORY-GROUPS { lldpV2ConfigTxGroup,
+                           lldpV2StatsTxGroup,
+                           lldpV2LocSysGroup
+        }
+
+    ::= { lldpV2Compliances 2 }
+
+lldpV2RxCompliance MODULE-COMPLIANCE
+                       --V2 requirements for receivers of LLDPDUs
+                       --and support re-indexed tables
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMP entities that implement
+            the LLDP MIB.
+
+            This version defines compliance requirements for
+            V2 of the LLDP MIB module."
+    MODULE  -- this module
+        MANDATORY-GROUPS { lldpV2ConfigRxGroup, 
+                           lldpV2StatsRxGroup,
+                           lldpV2RemSysGroup,
+                           lldpV2NotificationsGroup
+        }
+
+     ::= { lldpV2Compliances 3 }
+
+-- MIB groupings
+
+
+lldpV2ConfigGroup    OBJECT-GROUP
+    OBJECTS {
+        lldpV2PortConfigAdminStatus
+    }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects which are used to configure the
+            LLDP implementation behavior."
+    ::= { lldpV2Groups 1 }
+
+
+lldpV2ConfigRxGroup    OBJECT-GROUP
+    OBJECTS {
+        lldpV2NotificationInterval,
+        lldpV2PortConfigNotificationEnable
+    }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects which are used to configure the
+            LLDP implementation behavior."
+    ::= { lldpV2Groups 2 }
+
+
+lldpV2ConfigTxGroup    OBJECT-GROUP
+    OBJECTS {
+        lldpV2MessageTxInterval,
+        lldpV2MessageTxHoldMultiplier,
+        lldpV2ReinitDelay,
+        lldpV2PortConfigTLVsTxEnable,
+        lldpV2ManAddrConfigTxEnable,
+        lldpV2ManAddrConfigRowStatus,
+        lldpV2TxCreditMax,
+        lldpV2MessageFastTx,
+        lldpV2TxFastInit,
+        lldpV2DestMacAddress
+    }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects which are used to configure the
+            LLDP implementation behavior."
+    ::= { lldpV2Groups 3 }
+
+
+lldpV2StatsRxGroup    OBJECT-GROUP
+    OBJECTS {
+        lldpV2StatsRemTablesLastChangeTime,
+        lldpV2StatsRemTablesInserts,
+        lldpV2StatsRemTablesDeletes,
+        lldpV2StatsRemTablesDrops,
+        lldpV2StatsRemTablesAgeouts,
+        lldpV2StatsRxPortFramesDiscardedTotal,
+        lldpV2StatsRxPortFramesErrors,
+        lldpV2StatsRxPortFramesTotal,
+        lldpV2StatsRxPortTLVsDiscardedTotal,
+        lldpV2StatsRxPortTLVsUnrecognizedTotal,
+        lldpV2StatsRxPortAgeoutsTotal
+    }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects which are used to represent LLDP
+            reception statistics."
+    ::= { lldpV2Groups 4 }
+
+
+lldpV2StatsTxGroup    OBJECT-GROUP
+    OBJECTS {
+        lldpV2StatsTxPortFramesTotal,
+        lldpV2StatsTxLLDPDULengthErrors
+    }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects which are used to represent LLDP
+            transmission statistics."
+    ::= { lldpV2Groups 5 }
+
+
+lldpV2LocSysGroup  OBJECT-GROUP
+    OBJECTS {
+        lldpV2LocChassisIdSubtype,
+        lldpV2LocChassisId,
+        lldpV2LocPortIdSubtype,
+        lldpV2LocPortId,
+        lldpV2LocPortDesc,
+        lldpV2LocSysDesc,
+        lldpV2LocSysName,
+        lldpV2LocSysCapSupported,
+        lldpV2LocSysCapEnabled,
+        lldpV2LocManAddrLen,
+        lldpV2LocManAddrIfSubtype,
+        lldpV2LocManAddrIfId,
+        lldpV2LocManAddrOID
+    }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects which are used to represent LLDP
+            Local System Information."
+    ::= { lldpV2Groups 6 }
+
+lldpV2RemSysGroup  OBJECT-GROUP
+    OBJECTS {
+        lldpV2RemChassisIdSubtype,
+        lldpV2RemChassisId,
+        lldpV2RemPortIdSubtype,
+        lldpV2RemPortId,
+        lldpV2RemPortDesc,
+        lldpV2RemSysName,
+        lldpV2RemSysDesc,
+        lldpV2RemSysCapSupported,
+        lldpV2RemSysCapEnabled,
+        lldpV2RemRemoteChanges,
+        lldpV2RemTooManyNeighbors,
+        lldpV2RemManAddrIfSubtype,
+        lldpV2RemManAddrIfId,
+        lldpV2RemManAddrOID,
+        lldpV2RemUnknownTLVInfo,
+        lldpV2RemOrgDefInfo 
+    }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects which are used to represent
+            LLDP Remote Systems Information. The objects represent the
+            information associated with the basic TLV set. Please note
+            that even the agent doesn't implement some of the optional
+            TLVs, it shall recognize all the optional TLV information
+            that the remote system may advertise."
+    ::= { lldpV2Groups 7 }
+
+lldpV2NotificationsGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        lldpV2RemTablesChange 
+    }
+    STATUS  current
+    DESCRIPTION
+            "The collection of notifications used to indicate LLDP MIB
+            data consistency and general status information."
+    ::= { lldpV2Groups 8 }
+
+END

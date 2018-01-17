@@ -75,7 +75,7 @@ if (!$where) {
 }
 
 if (isset($options['d']) || isset($options['v'])) {
-    $versions = version_info(false);
+    $versions = version_info();
     echo <<<EOH
 ===================================
 Version info:
@@ -94,6 +94,7 @@ EOH;
         $vdebug = true;
     }
     $debug = true;
+    update_os_cache(true); // Force update of OS Cache
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);

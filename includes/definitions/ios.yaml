@@ -18,6 +18,7 @@ discovery:
       sysDescr_except:
           - 'LINUX_IOSD'
           - 'IOS-XE'
+          - 'CAT3K_CAA'
 bad_ifXEntry:
     - cisco1941
     - cisco886Va

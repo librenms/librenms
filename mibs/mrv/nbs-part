@@ -1,0 +1,388 @@
+
+NBS-PART-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    DisplayString
+        FROM SNMPv2-TC
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    nbs, NbsTcPartIndex
+        FROM NBS-MIB
+    ;
+
+
+nbsPartMib  MODULE-IDENTITY
+    LAST-UPDATED "201503090000Z"  -- March 9, 2015
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+    DESCRIPTION
+      "Identification and programming of field-serviceable components."
+
+    ::= { nbs 231 }
+
+-- *******************************************************************
+-- Groups in NBS-PART-MIB
+-- *******************************************************************
+
+nbsPartHardGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Information common to most system hardware components"
+    ::= { nbsPartMib 1 }
+
+nbsPartFirmGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Firmware information for system components"
+    ::= { nbsPartMib 2 }
+
+nbsPartProgGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Reprogrammable system components"
+    ::= { nbsPartMib 3 }
+
+--nbsPartEventGrp OBJECT-IDENTITY
+--    STATUS      current
+--    DESCRIPTION
+--       "NOTIFICATIONS"
+--    ::= { nbsPartMib 100 }
+
+
+
+-- ********************************************************************
+--
+-- Objects for the nbsPartHard[ware]Grp group
+--
+-- ********************************************************************
+
+nbsPartHardTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsPartHardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Attributes shared by most system hardware components."
+    ::= { nbsPartHardGrp 1 }
+
+nbsPartHardEntry      OBJECT-TYPE
+    SYNTAX      NbsPartHardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Contains a description of a particular component"
+    INDEX { nbsPartHardIfIndex, nbsPartHardPartIndex }
+    ::= { nbsPartHardTable 1 }
+
+NbsPartHardEntry ::= SEQUENCE {
+    nbsPartHardIfIndex       InterfaceIndex,
+    nbsPartHardPartIndex     NbsTcPartIndex,
+    nbsPartHardDescription   DisplayString,
+    nbsPartHardSerialNumber  DisplayString,
+    nbsPartHardProductionId  DisplayString,
+    nbsPartHardVendor        DisplayString,
+    nbsPartHardModel         DisplayString,
+    nbsPartHardWareRev       DisplayString
+}
+
+nbsPartHardIfIndex       OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "If this part is a chassis, card, or port, this object is its
+        own mib2-like ifIndex.
+
+        If this is any other kind of part, this object is the ifIndex
+        of the chassis, card, or port of which it is a component."
+    ::= { nbsPartHardEntry 1 }
+
+nbsPartHardPartIndex       OBJECT-TYPE
+    SYNTAX      NbsTcPartIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Unique ID of this component within scope of nbsPartHardIfIndex"
+    ::= { nbsPartHardEntry 2 }
+
+nbsPartHardDescription      OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..100))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Human-readable identification of this part, including location"
+    ::= { nbsPartHardEntry 10 }
+
+nbsPartHardSerialNumber      OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..100))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Factory assigned unique identifier."
+    ::= { nbsPartHardEntry 11 }
+
+nbsPartHardProductionId  OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..50))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The 'Top Assembly Number' used in internal tracking"
+    ::= { nbsPartHardEntry 20 }
+
+nbsPartHardVendor  OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..50))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The manufacturer of this component"
+    ::= { nbsPartHardEntry 30 }
+
+nbsPartHardModel      OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..100))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Factory assigned model name/number."
+    ::= { nbsPartHardEntry 31 }
+
+nbsPartHardWareRev      OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..50))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Hardware Revision number of this component."
+    ::= { nbsPartHardEntry 32 }
+
+-- ********************************************************************
+--
+-- Objects for the nbsPartFirm[ware]Grp group
+--
+-- ********************************************************************
+
+--
+-- nbsPartFirm[ware]Table
+--
+
+nbsPartFirmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsPartFirmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Firmware information for this part."
+    ::= { nbsPartFirmGrp 1 }
+
+nbsPartFirmEntry      OBJECT-TYPE
+    SYNTAX      NbsPartFirmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Contains a description of a particular entity"
+    INDEX { nbsPartFirmIfIndex, nbsPartFirmPartIndex }
+    ::= { nbsPartFirmTable 1 }
+
+NbsPartFirmEntry ::= SEQUENCE {
+    nbsPartFirmIfIndex    InterfaceIndex,
+    nbsPartFirmPartIndex  NbsTcPartIndex,
+    nbsPartFirmFpgaRev    DisplayString,
+    nbsPartFirmSwMajor    INTEGER,
+    nbsPartFirmSwMinor    INTEGER,
+    nbsPartFirmSwBuild    INTEGER,
+    nbsPartFirmWareIndex  INTEGER   -- loaded firmware, if available
+--    nbsPartFirmLoader     INTEGER
+}
+
+nbsPartFirmIfIndex      OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "If this part is a chassis, card, or port, this object is its
+        own mib2-like ifIndex.
+
+        If this is any other kind of part, this object is the ifIndex
+        of the chassis, card, or port of which it is a component."
+    ::= { nbsPartFirmEntry 1 }
+
+nbsPartFirmPartIndex      OBJECT-TYPE
+    SYNTAX      NbsTcPartIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Unique ID of this component within scope of nbsPartFirmIfIndex"
+    ::= { nbsPartFirmEntry 2}
+
+
+nbsPartFirmFpgaRev      OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..50))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Firmware/FPGA Revision running on this component."
+    ::= { nbsPartFirmEntry 13 }
+
+nbsPartFirmSwMajor      OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Major Revision Number of the software running on this
+        component.
+
+        Not Supported value: -1"
+    ::= { nbsPartFirmEntry 14 }
+
+nbsPartFirmSwMinor      OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Minor Revision Number of the software running on this
+        component.
+
+        Not Supported value: -1"
+    ::= { nbsPartFirmEntry 15 }
+
+nbsPartFirmSwBuild      OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Build Number of the software running on this component.
+
+        Not Supported value: -1"
+    ::= { nbsPartFirmEntry 16 }
+
+nbsPartFirmWareIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The nbsCmmcSysFirmwareIndex of the firmware currently loaded.
+
+        Not Supported value: -1"
+    ::= { nbsPartFirmEntry 30 }
+
+
+
+
+-- ********************************************************************
+--
+-- Objects for the nbsPart[Re]Prog[rammable]Grp group
+--
+-- ********************************************************************
+
+nbsPartProgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsPartProgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A table that describes reprogrammable components."
+    ::= { nbsPartProgGrp 1 }
+
+nbsPartProgEntry      OBJECT-TYPE
+    SYNTAX      NbsPartProgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Firmware of a particular reprogrammable component"
+    INDEX { nbsPartProgIfIndex, nbsPartProgPartIndex }
+    ::= { nbsPartProgTable 1 }
+
+NbsPartProgEntry ::= SEQUENCE {
+    nbsPartProgIfIndex       InterfaceIndex,
+    nbsPartProgPartIndex     NbsTcPartIndex,
+    nbsPartProgFirmwareCaps  OCTET STRING,
+    nbsPartProgFirmwareLoad  OCTET STRING,
+    nbsPartProgLoader        INTEGER,
+    nbsPartProgNVAreaAdmin   INTEGER,
+    nbsPartProgNVAreaOper    INTEGER,
+    nbsPartProgNVAreaStart   INTEGER,
+    nbsPartProgNVAreaBanks   INTEGER
+}
+
+nbsPartProgIfIndex       OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "If this part is a chassis, card, or port, this object is its
+        own mib2-like ifIndex.
+
+        If this is any other kind of part, this object is the ifIndex
+        of the chassis, card, or port of which it is a component."
+    ::= { nbsPartProgEntry 1 }
+
+nbsPartProgPartIndex       OBJECT-TYPE
+    SYNTAX      NbsTcPartIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Unique ID of this component within scope of nbsPartProgIfIndex"
+    ::= { nbsPartProgEntry 2 }
+
+nbsPartProgFirmwareCaps      OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "See nbsCmmcSlotFirmwareCaps."
+    ::= { nbsPartProgEntry 10 }
+
+nbsPartProgFirmwareLoad  OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..8))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "See nbsCmmcSlotFirmwareLoad"
+    ::= { nbsPartProgEntry 20 }
+
+nbsPartProgLoader    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "See nbsCmmcSlotLoader"
+    ::= { nbsPartProgEntry 21 }
+
+nbsPartProgNVAreaAdmin      OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "See nbsCmmcSlotNVAreaAdmin"
+    ::= { nbsPartProgEntry 22 }
+
+nbsPartProgNVAreaOper      OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "See nbsCmmcSlotNVAreaOper"
+    DEFVAL { -1 }
+    ::= { nbsPartProgEntry 23 }
+
+nbsPartProgNVAreaStart     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The nbsCmmcSysNVAreaBank of this component's bank 1."
+    ::= { nbsPartProgEntry 30 }
+
+nbsPartProgNVAreaBanks      OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of NVAreaBanks on this component."
+    ::= { nbsPartProgEntry 31 }
+
+
+
+
+END

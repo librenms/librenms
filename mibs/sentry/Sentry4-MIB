@@ -1,5 +1,5 @@
 --
---  Copyright(C) 2003-2015 Server Technology, Inc.
+--  Copyright(C) 2003-2016 Server Technology, Inc.
 --
 
     Sentry4-MIB DEFINITIONS ::= BEGIN
@@ -12,7 +12,7 @@
 
 
     sentry4 MODULE-IDENTITY
-        LAST-UPDATED "201502191000Z" -- 19 February 2015
+        LAST-UPDATED "201611182340Z" -- 18 November 2016
         ORGANIZATION "Server Technology, Inc."
         CONTACT-INFO
             "Server Technology, Inc.
@@ -23,9 +23,25 @@
              Email: mibmaster@servertech.com"
         DESCRIPTION
             "This is the MIB module for the fourth generation of the
-             Sentry product family.  This includes the PRO2 series of
-             Smart and Switched Cabinet Distribution Unit (CDU) and
-             Power Distribution Unit (PDU) products."
+             Sentry product family.  This includes the PRO1 and PRO2
+             series of Smart and Switched Cabinet Distribution Unit (CDU)
+             and Power Distribution Unit (PDU) products."
+        REVISION "201611182340Z" -- 18 November 2016
+        DESCRIPTION
+            "Added the st4UnitProductMfrDate object.  Adjusted the upper
+             limit of voltage objects to 600 Volts."
+        REVISION "201609212300Z" -- 21 September 2016
+        DESCRIPTION
+            "Fixed the st4InputCordOutOfBalanceEvent notification
+             definition to include the correct objects."
+        REVISION "201604252140Z" -- 25 April 2016
+        DESCRIPTION
+            "Added support for the PRO1 product series.  Added the
+             st4SystemProductSeries and st4InputCordNominalPowerFactor
+             objects.  Adjusted the upper limit of cord and line current
+             objects to 600 Amps.  Adjusted the lower limit of nominal
+             voltage objects to 0 Volts.  Corrected the lower limit of
+             several configuration objects from -1 to 0."
         REVISION "201502191000Z" -- 19 February 2015
         DESCRIPTION
             "Corrected the UNITS and value range of temperature sensor
@@ -57,10 +73,10 @@
                         pwrError(11),       -- power detection error
                         breakerTripped(12), -- breaker error
                         fuseBlown(13),      -- fuse error
-                        lowAlarm(14),       -- under user set alarm
-                        lowWarning(15),     -- under user set threshold
-                        highWarning(16),    -- over user set threshold
-                        highAlarm(17),      -- over user set threshold
+                        lowAlarm(14),       -- under low alarm threshold
+                        lowWarning(15),     -- under low warning threshold
+                        highWarning(16),    -- over high warning threshold
+                        highAlarm(17),      -- over high alarm threshold
                         alarm(18),          -- general alarm
                         underLimit(19),     -- under limit alarm
                         overLimit(20),      -- over limit alarm
@@ -148,6 +164,17 @@
             "Hardware information about the network interface card."
         ::= { st4SystemConfig 6 }
 
+    st4SystemProductSeries OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        pro1(0),
+                        pro2(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The product series."
+        ::= { st4SystemConfig 7 }
+
     st4SystemFeatures OBJECT-TYPE
         SYNTAX      BITS {
                         smartLoadShedding(0),
@@ -223,6 +250,7 @@
         st4UnitAssetTag              DisplayString,
         st4UnitType                  INTEGER,
         st4UnitCapabilities          BITS,
+        st4UnitProductMfrDate        DisplayString,
         st4UnitDisplayOrientation    INTEGER,
         st4UnitOutletSequenceOrder   INTEGER,
         st4UnitInputCordCount        Integer32,
@@ -306,6 +334,14 @@
         DESCRIPTION
             "The capabilities of the unit."
         ::= { st4UnitConfigEntry 8 }
+
+    st4UnitProductMfrDate OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The product manufacture date in YYYY-MM-DD (ISO 8601 format)."
+        ::= { st4UnitConfigEntry 9 }
 
     st4UnitDisplayOrientation OBJECT-TYPE
         SYNTAX      INTEGER {
@@ -517,6 +553,7 @@
         st4InputCordCurrentCapacity       Integer32,
         st4InputCordCurrentCapacityMax    Integer32,
         st4InputCordPowerCapacity         Integer32,
+        st4InputCordNominalPowerFactor    Integer32,
         st4InputCordLineCount             Integer32,
         st4InputCordPhaseCount            Integer32,
         st4InputCordOcpCount              Integer32,
@@ -557,7 +594,7 @@
         ::= { st4InputCordConfigEntry 6}
 
     st4InputCordNominalVoltage OBJECT-TYPE
-        SYNTAX      Integer32(850..3000)
+        SYNTAX      Integer32(0..6000)
         UNITS       "tenth Volts"
         MAX-ACCESS  read-write
         STATUS      current
@@ -567,7 +604,7 @@
         ::= { st4InputCordConfigEntry 7 }
 
     st4InputCordNominalVoltageMin OBJECT-TYPE
-        SYNTAX      Integer32(85..300)
+        SYNTAX      Integer32(0..600)
         UNITS       "Volts"
         MAX-ACCESS  read-only
         STATUS      current
@@ -577,7 +614,7 @@
         ::= { st4InputCordConfigEntry 8 }
 
     st4InputCordNominalVoltageMax OBJECT-TYPE
-        SYNTAX      Integer32(85..300)
+        SYNTAX      Integer32(0..600)
         UNITS       "Volts"
         MAX-ACCESS  read-only
         STATUS      current
@@ -587,7 +624,7 @@
         ::= { st4InputCordConfigEntry 9 }
 
     st4InputCordCurrentCapacity OBJECT-TYPE
-        SYNTAX      Integer32(-1..300)
+        SYNTAX      Integer32(0..600)
         UNITS       "Amps"
         MAX-ACCESS  read-write
         STATUS      current
@@ -596,7 +633,7 @@
         ::= { st4InputCordConfigEntry 10 }
 
     st4InputCordCurrentCapacityMax OBJECT-TYPE
-        SYNTAX      Integer32(-1..300)
+        SYNTAX      Integer32(0..600)
         UNITS       "Amps"
         MAX-ACCESS  read-only
         STATUS      current
@@ -606,7 +643,7 @@
         ::= { st4InputCordConfigEntry 11 }
 
     st4InputCordPowerCapacity OBJECT-TYPE
-        SYNTAX      Integer32(-1..50000)
+        SYNTAX      Integer32(0..50000)
         UNITS       "Volt-Amps"
         MAX-ACCESS  read-only
         STATUS      current
@@ -614,6 +651,16 @@
             "The power capacity of the input cord in Volt-Amps.  For DC
              products, this is identical to power capacity in Watts."
         ::= { st4InputCordConfigEntry 12 }
+
+    st4InputCordNominalPowerFactor OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "hundredths"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The user-configured estimated nominal power factor of the input
+             cord in hundredths."
+        ::= { st4InputCordConfigEntry 13 }
 
     st4InputCordLineCount OBJECT-TYPE
         SYNTAX      Integer32(0..4)
@@ -1037,7 +1084,7 @@
         ::= { st4LineConfigEntry 4 }
 
     st4LineCurrentCapacity OBJECT-TYPE
-        SYNTAX      Integer32(-1..300)
+        SYNTAX      Integer32(0..600)
         UNITS       "Amps"
         MAX-ACCESS  read-only
         STATUS      current
@@ -1089,7 +1136,7 @@
         ::= { st4LineMonitorEntry 2 }
 
     st4LineCurrent OBJECT-TYPE
-        SYNTAX      Integer32(-1..30000)
+        SYNTAX      Integer32(-1..60000)
         UNITS       "hundredth Amps"
         MAX-ACCESS  read-only
         STATUS      current
@@ -1150,7 +1197,7 @@
         ::= { st4LineEventConfigEntry 1 }
 
     st4LineCurrentLowAlarm OBJECT-TYPE
-        SYNTAX      Integer32(0..3000)
+        SYNTAX      Integer32(0..6000)
         UNITS       "tenth Amps"
         MAX-ACCESS  read-write
         STATUS      current
@@ -1159,7 +1206,7 @@
         ::= { st4LineEventConfigEntry 2 }
 
     st4LineCurrentLowWarning OBJECT-TYPE
-        SYNTAX      Integer32(0..3000)
+        SYNTAX      Integer32(0..6000)
         UNITS       "tenth Amps"
         MAX-ACCESS  read-write
         STATUS      current
@@ -1168,7 +1215,7 @@
         ::= { st4LineEventConfigEntry 3 }
 
     st4LineCurrentHighWarning OBJECT-TYPE
-        SYNTAX      Integer32(0..3000)
+        SYNTAX      Integer32(0..6000)
         UNITS       "tenth Amps"
         MAX-ACCESS  read-write
         STATUS      current
@@ -1177,7 +1224,7 @@
         ::= { st4LineEventConfigEntry 4 }
 
     st4LineCurrentHighAlarm OBJECT-TYPE
-        SYNTAX      Integer32(0..3000)
+        SYNTAX      Integer32(0..6000)
         UNITS       "tenth Amps"
         MAX-ACCESS  read-write
         STATUS      current
@@ -1267,7 +1314,7 @@
         ::= { st4PhaseConfigEntry 4 }
 
     st4PhaseNominalVoltage OBJECT-TYPE
-        SYNTAX      Integer32(850..3000)
+        SYNTAX      Integer32(0..6000)
         UNITS       "tenth Volts"
         MAX-ACCESS  read-only
         STATUS      current
@@ -1343,7 +1390,7 @@
         ::= { st4PhaseMonitorEntry 2 }
 
     st4PhaseVoltage OBJECT-TYPE
-        SYNTAX      Integer32(-1..3000)
+        SYNTAX      Integer32(-1..6000)
         UNITS       "tenth Volts"
         MAX-ACCESS  read-only
         STATUS      current
@@ -1484,7 +1531,7 @@
         ::= { st4PhaseEventConfigEntry 1 }
 
     st4PhaseVoltageLowAlarm OBJECT-TYPE
-        SYNTAX      Integer32(0..3000)
+        SYNTAX      Integer32(0..6000)
         UNITS       "tenth Volts"
         MAX-ACCESS  read-write
         STATUS      current
@@ -1493,7 +1540,7 @@
         ::= { st4PhaseEventConfigEntry 2 }
 
     st4PhaseVoltageLowWarning OBJECT-TYPE
-        SYNTAX      Integer32(0..3000)
+        SYNTAX      Integer32(0..6000)
         UNITS       "tenth Volts"
         MAX-ACCESS  read-write
         STATUS      current
@@ -1502,7 +1549,7 @@
         ::= { st4PhaseEventConfigEntry 3 }
 
     st4PhaseVoltageHighWarning OBJECT-TYPE
-        SYNTAX      Integer32(0..3000)
+        SYNTAX      Integer32(0..6000)
         UNITS       "tenth Volts"
         MAX-ACCESS  read-write
         STATUS      current
@@ -1511,7 +1558,7 @@
         ::= { st4PhaseEventConfigEntry 4 }
 
     st4PhaseVoltageHighAlarm OBJECT-TYPE
-        SYNTAX      Integer32(0..3000)
+        SYNTAX      Integer32(0..6000)
         UNITS       "tenth Volts"
         MAX-ACCESS  read-write
         STATUS      current
@@ -1613,7 +1660,7 @@
         ::= { st4OcpConfigEntry 6 }
 
     st4OcpCurrentCapacity OBJECT-TYPE
-        SYNTAX      Integer32(-1..125)
+        SYNTAX      Integer32(0..125)
         UNITS       "Amps"
         MAX-ACCESS  read-write
         STATUS      current
@@ -1623,7 +1670,7 @@
         ::= { st4OcpConfigEntry 7 }
 
     st4OcpCurrentCapacityMax OBJECT-TYPE
-        SYNTAX      Integer32(-1..125)
+        SYNTAX      Integer32(0..125)
         UNITS       "Amps"
         MAX-ACCESS  read-only
         STATUS      current
@@ -1784,7 +1831,7 @@
         ::= { st4BranchConfigEntry 4 }
 
     st4BranchCurrentCapacity OBJECT-TYPE
-        SYNTAX      Integer32(-1..125)
+        SYNTAX      Integer32(0..125)
         UNITS       "Amps"
         MAX-ACCESS  read-only
         STATUS      current
@@ -2246,7 +2293,7 @@
         ::= { st4OutletMonitorEntry 5 }
 
     st4OutletVoltage OBJECT-TYPE
-        SYNTAX      Integer32(-1..3000)
+        SYNTAX      Integer32(-1..6000)
         UNITS       "tenth Volts"
         MAX-ACCESS  read-only
         STATUS      current
@@ -3540,8 +3587,8 @@
             st4SystemLocation,
             st4InputCordID,
             st4InputCordName,
-            st4InputCordActivePower,
-            st4InputCordActivePowerStatus,
+            st4InputCordOutOfBalance,
+            st4InputCordOutOfBalanceStatus,
             st4EventStatusText,
             st4EventStatusCondition
         }
@@ -4045,6 +4092,7 @@
             st4SystemFirmwareBuildInfo,
             st4SystemNICSerialNumber,
             st4SystemNICHardwareInfo,
+            st4SystemProductSeries,
             st4SystemFeatures,
             st4SystemFeatureKey,
             st4SystemConfigModifiedCount,
@@ -4064,6 +4112,7 @@
             st4UnitAssetTag,
             st4UnitType,
             st4UnitCapabilities,
+            st4UnitProductMfrDate,
             st4UnitDisplayOrientation,
             st4UnitOutletSequenceOrder,
             st4UnitInputCordCount,
@@ -4095,6 +4144,7 @@
             st4InputCordCurrentCapacity,
             st4InputCordCurrentCapacityMax,
             st4InputCordPowerCapacity,
+            st4InputCordNominalPowerFactor,
             st4InputCordLineCount,
             st4InputCordPhaseCount,
             st4InputCordOcpCount,

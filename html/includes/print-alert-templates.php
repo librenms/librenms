@@ -14,92 +14,88 @@ require_once 'includes/modal/alert_template.inc.php';
 require_once 'includes/modal/delete_alert_template.inc.php';
 require_once 'includes/modal/attach_alert_template.inc.php';
 ?>
-
-<form method="post" action="" id="result_form">
+<div class="table-responsive">
+    <table id="templatetable" class="table table-hover table-condensed" width="100%">
+      <thead>
+          <tr>
+            <th data-column-id="id" data-searchable="false" data-identifier="true" data-type="numeric">#</th>
+            <th data-column-id="templatename">Name</th>
+            <th data-column-id="actions" data-searchable="false" data-formatter="commands">Action</th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr data-row-id="0">
+            <td>0</td>
+            <td>Default Alert Template</td>
+            <td></td>
+          </tr>
 <?php
-if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
-    $results = $_POST['results'];
-} else {
-    $results = 50;
-}
-
-echo '<div class="table-responsive">
-<table class="table table-hover table-condensed" width="100%">
-  <tr>
-    <th>#</th>
-    <th>Name</th>
-    <th>Action</th>
-  </tr>
-  <tr>
-    <td colspan="2">';
-
-if ($_SESSION['userlevel'] >= '10') {
-    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#alert-template" data-template_id="">Create new alert template</button>';
-}
-
-echo '</td>
-<td><select name="results" id="results" class="form-control input-sm" onChange="updateResults(this);">';
-$result_options = array(
-                   '10',
-                   '50',
-                   '100',
-                   '250',
-                   '500',
-                   '1000',
-                   '5000',
-                  );
-foreach ($result_options as $option) {
-    echo "<option value='$option'";
-    if ($results == $option) {
-        echo ' selected';
-    }
-
-    echo ">$option</option>";
-}
-
-echo '</select></td>';
-
-$count_query = 'SELECT COUNT(id)';
-$full_query  = 'SELECT *';
-
-$query = ' FROM `alert_templates`';
-
-$count_query = $count_query.$query;
-$count       = dbFetchCell($count_query, $param);
-if (!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
-    $page_number = 1;
-} else {
-    $page_number = $_POST['page_number'];
-}
-
-$start      = (($page_number - 1) * $results);
-$full_query = $full_query.$query." LIMIT $start,$results";
-
+$full_query = "SELECT id, name from alert_templates";
 foreach (dbFetchRows($full_query, $param) as $template) {
-    echo '<tr id="row_'.$template['id'].'">
-            <td>#' . $template['id'] . '</td>
-            <td>'.$template['name'].'</td>
-            <td>';
-    if ($_SESSION['userlevel'] >= '10') {
-        echo "<div class='btn-group btn-group-sm' role='group'>";
-        echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#alert-template' data-template_id='".$template['id']."' data-template_action='edit' name='edit-alert-template'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
-        echo "<button type='button' class='btn btn-danger btn-sm' data-toggle='modal' data-target='#confirm-delete-alert-template' data-template_id='".$template['id']."' name='delete-alert-template'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button> ";
-        echo "<button type='button' class='btn btn-warning btn-sm' data-toggle='modal' data-target='#attach-alert-template' data-template_id='".$template['id']."' name='attach-alert-template'><i class='fa fa-th-list' aria-hidden='true'></i></button>";
-        echo "</div>";
+    if ($template['name'] == 'Default Alert Template') {
+        $default_tplid = $template['id'];
+        continue;
     }
-
-    echo '    </td>
+    echo '<tr data-row-id="'.$template['id'].'">
+            <td>'.$template['id'].'</td>
+            <td>'.$template['name'].'</td>
+            <td></td>
           </tr>';
 }
 
-if (($count % $results) > 0) {
-    echo '    <tr>
-                  <td colspan="2" align="center">'.generate_pagination($count, $results, $page_number).'</td>
-              </tr>';
-}
+?>
+        </tbody>
+    </table>
+</div>
+<script>
+$(document).ready(function() {
+    var grid = $('#templatetable').bootgrid({
+        rowCount: [50, 100, 250, -1],
+        templates: {
+        header: '<div id="{{ctx.id}}" class="{{css.header}}"> \
+                    <div class="row"> \
+<?php if ($_SESSION['userlevel'] >= '10') { ?>
+                        <div class="col-sm-8 actionBar"> \
+                            <span class="pull-left"> \
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#alert-template" data-template_id="">Create new alert template</button> \
+                            </span> \
+                        </div> \
+                <div class="col-sm-4 actionBar"><p class="{{css.search}}"></p><p class="{{css.actions}}"></p></div></div></div>'
+<?php } else { ?>
+                <div class="actionBar"><p class="{{css.search}}"></p><p class="{{css.actions}}"></p></div></div></div>'
 
-echo '</table>
-<input type="hidden" name="page_number" id="page_number" value="'.$page_number.'">
-<input type="hidden" name="results_amount" id="results_amount" value="'.$results.'">
-</form>
-</div>';
+<?php } ?>
+        },
+        formatters: {
+            "commands": function(column, row) {
+                var response = '';
+                if(row.id == 0) {
+                    response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" disabled=\"disabled\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button> " + "<button type='button' class='btn btn-warning btn-xs command-attach' disabled=\"disabled\"><i class='fa fa-th-list' aria-hidden='true'></i></button>";
+                } else {
+                    response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-toggle=\"modal\" data-target='#confirm-delete-alert-template' data-template_id=\"" + row.id + "\" name='delete-alert-template'><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button> " + "<button type='button' class='btn btn-warning btn-xs command-attach' data-toggle='modal' data-target='#attach-alert-template' data-template_id='" + row.id + "' name='attach-alert-template'><i class='fa fa-th-list' aria-hidden='true'></i></button>";
+                }
+                return response;
+            }
+        },
+    }).on("loaded.rs.jquery.bootgrid", function() {
+        /* Executes after data is loaded and rendered */
+        grid.find(".command-edit").on("click", function(e) {
+            var localtmpl_id = $(this).data("template_id");
+            if(localtmpl_id == 0) {
+                $('#default_template').val("1");
+                $('#template_id').val(<?=$default_tplid?>);
+            } else {
+                $('#default_template').val("0");
+                $('#template_id').val(localtmpl_id);
+            }
+            $("#alert-template").modal('show');
+        }).end().find(".command-delete").on("click", function(e) {
+            $('#template_id').val($(this).data("template_id"));
+            $('#confirm-delete-alert-template').modal('show');
+        }).end().find(".command-attach").on("click", function(e) {
+            $('#template_id').val($(this).data("template_id"));
+            $('#attach-alert-template').modal('show');
+        });
+    });
+});
+</script>

@@ -11,7 +11,7 @@
 
 require 'includes/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'cambium-epmp-registeredSM');
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Value                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:regSM='.$rrdfilename.':regSM:AVERAGE ';
     $rrd_options .= " LINE2:regSM#73b0c2:'Registered SM       ' ";

@@ -11,7 +11,7 @@
 
 require 'includes/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'canopy-generic-450-powerlevel');
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dBm                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:last='.$rrdfilename.':last:AVERAGE ';
     $rrd_options .= " LINE2:last#003EFF:'Last      ' ";

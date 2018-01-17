@@ -26,7 +26,11 @@ source: Support/FAQ.md
  - [Why are some of my disks not showing?](#faq26)
  - [Why are my disks reporting an incorrect size?](#faq27)
  - [What is the Difference between Disable Device and Ignore a Device?](#faq28)
-
+ - [Why can't Normal and Global View users see Oxidized?](#faq29)
+ - [What is the Demo User for?](#faq30)
+ - [Why does modifying 'Default Alert Template' fail?](#faq31)
+ - [Why would alert un-mute itself](#faq32)
+ 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
  - [What information do you need to add a new OS?](#faq20)
@@ -55,13 +59,7 @@ You have two options for adding a new device into LibreNMS.
 
 #### <a name="faq3"> How do I get help?</a>
 
-We have a few methods for you to get in touch to ask for help.
-
-[Community Forum](https://community.librenms.org)
-
-[IRC](https://webchat.freenode.net/) Freenode ##librenms
-
-[Bug Reports](https://github.com/librenms/librenms/issues)
+[Getting Help](index.md)
 
 #### <a name="faq4"> What are the supported OSes for installing LibreNMS on?</a>
 
@@ -71,7 +69,7 @@ Supported is quite a strong word :) The 'officially' supported distros are:
  - Red Hat / CentOS
  - Gentoo
 
-However we will always aim to help wherever possible so if you are running a distro that isn't one of the above then give it a try anyway and if you need help then jump on the irc channel.
+However we will always aim to help wherever possible so if you are running a distro that isn't one of the above then give it a try anyway and if you need help then jump on the [discord server](https://t.libren.ms/discord).
 
 #### <a name="faq5"> Do you have a demo available?</a>
 
@@ -81,14 +79,14 @@ We do indeed, you can find access to the demo [here](https://demo.librenms.org)
 
 The first thing to do is to add /debug=yes/ to the end of the URI (I.e /devices/debug=yes/).
 
-If the page you are trying to load has a substantial amount of data in it then it could be that the php memory limit needs to be increased in php.ini and then your web service reloaded.
+If the page you are trying to load has a substantial amount of data in it then it could be that the php memory limit needs to be increased in [config.php](Configuration.md#core).
 
 #### <a name="faq10"> Why do I not see any graphs?</a>
 
 The easiest way to check if all is well is to run `./validate.php` as root from within your install directory. This should give you info on why things aren't working.
 
 One other reason could be a restricted snmpd.conf file or snmp view which limits the data sent back. If you use net-snmp then we suggest using 
-the (included snmpd.conf)[https://raw.githubusercontent.com/librenms/librenms/master/snmpd.conf.example] file.
+the [included snmpd.conf](https://raw.githubusercontent.com/librenms/librenms/master/snmpd.conf.example) file.
 
 #### <a name="faq7"> How do I debug pages not loading correctly?</a>
 
@@ -121,6 +119,12 @@ Before this all rrd files were set to 100G max values, now you can enable suppor
 
 rrdtool tune will change the max value when the interface speed is detected as being changed (min value will be set for anything 10M or over) or when you run the included script (./scripts/tune_port.php) - see [RRDTune doc](../Extensions/RRDTune.md)
 
+ SNMP ifInOctets and ifOutOctets are counters, which means they start at 0 (at device boot) and count up from there. LibreNMS records the value every 5 minutes and uses the difference between the previous value and the current value to calculate rate. (Also, this value resets to 0 when it hits the max value)
+
+Now, when the value is not recorded for awhile RRD (our time series storage) does not record a 0, it records the last value, otherwise, there would be even worse problems. Then finally we get the current ifIn/OutOctets value and record that. Now, it appears as though all of the traffic since it stopped getting values have occurred in the last 5 minute interval.
+
+So whenever you see spikes like this, it means we have not received data from the device for several polling intervals. The cause can vary quite a bit: bad snmp implementations, intermittant network connectivity, broken poller, and more.
+
 #### <a name="faq17"> Why do I see gaps in my graphs?</a>
 
 This is most commonly due to the poller not being able to complete it's run within 300 seconds. Check which devices are causing this by going to /poll-log/ within the Web interface.
@@ -132,12 +136,12 @@ If you poll a large number of devices / ports then it's recommended to run a loc
 Running RRDCached is also highly advised in larger installs but has benefits no matter the size.
 
 #### <a name="faq16"> How do I change the IP / hostname of a device?</a>
-
 There is a host rename tool called renamehost.php in your librenms root directory. When renaming you are also changing the device's IP / hostname address for monitoring.
 Usage:
 ```bash
 ./renamehost.php <old hostname> <new hostname>
 ```
+You can also rename a device in the Web UI by going to the device, then clicking settings Icon -> Edit.
 
 #### <a name="faq19"> My device doesn't finish polling within 300 seconds</a>
 
@@ -153,7 +157,7 @@ Run `./validate.php` as root from within your install.
 
 Re-run `./validate.php` once you've resolved any issues raised.
 
-You have an odd issue - we'd suggest you join our irc channel to discuss.
+You have an odd issue - we'd suggest you join our [discord server](https://t.libren.ms/discord) to discuss.
 
 #### <a name="faq21"> What do the values mean in my graphs?</a>
 
@@ -214,12 +218,12 @@ $config['device_traffic_iftype'][] = '/ppp/';
 ```
 #### <a name="faq24"> How do I move my LibreNMS install to another server?</a>
 
-If you are moving from one CPU architecture to another then you will need to dump the rrd files and re-create them. If you are in 		
-this scenario then you can use [Dan Brown's migration scripts](https://vlan50.com/2015/04/17/migrating-from-observium-to-librenms/).		
-		
-If you are just moving to another server with the same CPU architecture then the following steps should be all that's needed:		
-		
-    - Install LibreNMS as per our normal documentation, you don't need to run through the web installer or building the sql schema.		
+If you are moving from one CPU architecture to another then you will need to dump the rrd files and re-create them. If you are in     
+this scenario then you can use [Dan Brown's migration scripts](https://vlan50.com/2015/04/17/migrating-from-observium-to-librenms/).    
+    
+If you are just moving to another server with the same CPU architecture then the following steps should be all that's needed:   
+    
+    - Install LibreNMS as per our normal documentation, you don't need to run through the web installer or building the sql schema.   
     - Stop cron by commenting out all lines in `/etc/cron.d/librenms`
     - Dump the MySQL database `librenms` and import this into your new server.
     - Copy the `rrd/` folder to the new server.
@@ -287,12 +291,13 @@ Thanks for asking, sometimes it's not quite so obvious and everyone can contribu
 - Code. This is a big thing. We want this community to grow by the software developing and evolving to cater for users needs. The biggest area that people can help make this happen is by providing code support. This doesn't necessarily mean contributing code for discovering a new device:
     - Web UI, a new look and feel has been adopted but we are not finished by any stretch of the imagination. Make suggestions, find and fix bugs, update the design / layout.
     - Poller / Discovery code. Improving it (we think a lot can be done to speed things up), adding new device support and updating old ones.
-    - The LibreNMS main website, this is hosted on Git Hub like the main repo and we accept use contributions here as well :)
-- Hardware. We don't physically need it but if we are to add device support, it's made a whole lot easier with access to the kit via snmp.
-    - If you've got mibs, they are handy as well :)
+    - The LibreNMS main website, this is hosted on GitHub like the main repo and we accept use contributions here as well :)
+- Hardware. We don't physically need it but if we are to add device support, it's made a whole lot easier with access to the kit via SNMP.
+    - If you've got MIBs, they are handy as well :)
     - If you know the vendor and can get permission to use logos that's also great.
 - Bugs. Found one? We want to know about it. Most bugs are fixed after being spotted and reported by someone, I'd love to say we are amazing developers and will fix all bugs before you spot them but that's just not true.
-- Feature requests. Can't code / won't code. No worries, chuck a feature request into Git Hub with enough detail and someone will take a look. A lot of the time this might be what interests someone, they need the same feature or they just have time. Please be patient, everyone who contributes does so in their own time.
+- Feature requests. Can't code / won't code. No worries, chuck a feature request into our [community forum](https://community.librenms.org) with enough detail and someone will take a look. A lot of the time this might be what interests someone, they need the same feature or they just have time. Please be patient, everyone who contributes does so in their own time.
+- Documentation. Documentation can always be improved and every little bit helps. Not all features are currently documented or documented well, there's speeling mistakes etc. It's very easy to submit updates [through the GitHub website](https://help.github.com/articles/editing-files-in-another-user-s-repository/), no git experience needed.
 - Be nice, this is the foundation of this project. We expect everyone to be nice. People will fall out, people will disagree but please do it so in a respectable way.
 - Ask questions. Sometimes just by asking questions you prompt deeper conversations that can lead us to somewhere amazing so please never be afraid to ask a question.
 
@@ -331,3 +336,18 @@ If you want to pull any new updates provided by f0o's branch then whilst you are
 ```bash
 git pull f0o issue-1337
 ```
+### <a name="faq29"> Why can't Normal and Global View users see Oxidized?</a> 
+Configs can often contain sensitive data. Because of that only global admins can see configs.
+
+### <a name="faq30"> What is the Demo User for?</a> 
+Demo users allow full access except adding/editing users and deleting devices and can't change passwords.
+
+### <a name="faq31"> Why does modifying 'Default Alert Template' fail?</a>
+This template's entry could be missing in the database. Please run:
+
+```bash
+mysql -u librenms -p < sql-schema/202.sql
+```
+### <a name="faq32"> Why would alert un-mute itself?</a> 
+If alert un-mutes itself then it most likely means that the alert cleared and is then triggered again.
+Please review eventlog as it will tell you in there.

@@ -51,7 +51,7 @@ foreach ($pre_cache['fabos_sensors'] as $data) {
         $index = $data['swSensorIndex'];
         $oid = '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.' . $index;
         $value = $data['swSensorStatus'];
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, 'fabos_state', $descr, '1', '1', null, null, null, null, $value);
-        create_sensor_to_state_index($device, 'fabos_state', 1);
+        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $descr, $descr, '1', '1', null, null, null, null, $value);
+        create_sensor_to_state_index($device, $descr, $index);
     }
 }
