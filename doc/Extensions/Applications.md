@@ -787,7 +787,9 @@ extend portactivity /etc/snmp/portactivity -p http,ldap,imap
 
 Will monitor HTTP, LDAP, and IMAP. The -p switch specifies what ports to use. This is a comma seperated list.
 
-These must be found in '/etc/services' or where ever NSS is set to fetch it from.
+These must be found in '/etc/services' or where ever NSS is set to fetch it from. If not, it will throw an error.
+
+If you want to JSON returned by it to be printed in a pretty format use the -P flag.
 
 5. Restart snmpd on your host.
 
