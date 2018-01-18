@@ -15,7 +15,7 @@ consistent manner.
 
 ## Capturing test data
 
-`./scripts/save-tests-data.php` is provided to make it easy to collect data for tests.  Running save-tests-data.php with
+`./scripts/save-test-data.php` is provided to make it easy to collect data for tests.  Running save-test-data.php with
 the --hostname (-h) allows you to capture all data used to discover and poll a device already added to LibreNMS.  Make sure to
 re-run the script if you add additional support. Check the command-line help for more options.
 
@@ -44,7 +44,7 @@ To run the full suite of tests enable database and snmpsim reliant tests: `./scr
 
 ## Using snmpsim for testing
 
-You can run snmpsim to access test data by running `./scripts/save-tests-data.php --snmpsim`
+You can run snmpsim to access test data by running `./scripts/save-test-data.php --snmpsim`
 
 You may then run snmp queries against it using the os (and variant) as the community and 127.1.6.1:1161 as the host.
 ```
