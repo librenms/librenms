@@ -400,7 +400,7 @@ $icons = array(
     'ber' => 'sort-amount-desc',
     'quality_factor' => 'arrows',
     'eer' => 'snowflake-o',
-
+    'waterflow' => 'tint',
 
 );
 foreach (array('fanspeed','humidity','temperature','signal') as $item) {
