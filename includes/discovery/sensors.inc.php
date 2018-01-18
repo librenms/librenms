@@ -78,6 +78,8 @@ $run_sensors = array(
     'quality_factor',
     'chromatic_dispersion',
     'ber',
+    'eer',
+    'waterflow',
 );
 sensors($run_sensors, $device, $valid, $pre_cache);
 unset(

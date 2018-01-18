@@ -417,6 +417,8 @@ function sensor_low_limit($class, $current)
         case 'quality_factor':
         case 'chromatic_dispersion':
         case 'ber':
+        case 'eer':
+        case 'waterflow':
     }//end switch
 
     return $limit;
