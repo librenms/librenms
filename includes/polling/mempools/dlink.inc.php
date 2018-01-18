@@ -18,7 +18,6 @@ d_echo('Dlink');
 $memory_oid = '.1.3.6.1.4.1.171.12.1.1.9.1.4.1';
 $perc = snmp_get($device, $memory_oid, '-OvQ');
 if (is_numeric($perc)) {
-    $mempool['perc']  = $perc;
     $mempool['used']  = $perc;
     $mempool['total'] = 100;
     $mempool['free']  = 100 - $perc;
