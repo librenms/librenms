@@ -838,14 +838,10 @@ function match_network($nets, $ip, $first = false)
 // FIXME port to LibreNMS\Util\IPv6 class
 function snmp2ipv6($ipv6_snmp)
 {
-    $ipv6 = explode('.', $ipv6_snmp);
-    $ipv6_2 = array();
-
     # Workaround stupid Microsoft bug in Windows 2008 -- this is fixed length!
     # < fenestro> "because whoever implemented this mib for Microsoft was ignorant of RFC 2578 section 7.7 (2)"
-    if (count($ipv6) == 17 && $ipv6[0] == 16) {
-        array_shift($ipv6);
-    }
+    $ipv6 = array_slice(explode('.', $ipv6_snmp), -16);
+    $ipv6_2 = array();
 
     for ($i = 0; $i <= 15; $i++) {
         $ipv6[$i] = zeropad(dechex($ipv6[$i]));
@@ -855,17 +851,6 @@ function snmp2ipv6($ipv6_snmp)
     }
 
     return implode(':', $ipv6_2);
-}
-
-function ipv62snmp($ipv6)
-{
-    try {
-        $ipv6 = IP::parse($ipv6)->uncompressed();
-        $ipv6_split = str_split(str_replace(':', '', $ipv6), 2);
-        return implode('.', array_map('hexdec', $ipv6_split));
-    } catch (InvalidIpException $e) {
-        return '';
-    }
 }
 
 function get_astext($asn)
