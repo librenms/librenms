@@ -10,7 +10,7 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Thomas GAGNIERE
+ * @copyright  2018 Thomas GAGNIERE
  * @author     Thomas GAGNIERE <tgagniere@reseau-concept.com>
  */
 if ($device['os'] == 'dlink') {
