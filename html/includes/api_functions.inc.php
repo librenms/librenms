@@ -239,6 +239,24 @@ function get_graph_generic_by_hostname()
     rrdtool_close();
 }
 
+
+function list_locations()
+{
+    check_is_read();
+
+    $app           = \Slim\Slim::getInstance();
+    $router        = $app->router()->getCurrentRoute()->getParams();
+
+    $locations   = dbFetchRows("SELECT `locations`.* FROM `locations` WHERE `locations`.`location` IS NOT NULL");
+    $total_locations = count($locations);
+    if ($total_locations == 0) {
+        api_error(404, 'Locations do not exist');
+    }
+
+    api_success($locations, 'locations');
+}
+
+
 function get_device()
 {
     // return details of a single device
@@ -532,6 +550,41 @@ function get_bgp()
     }
 
     api_success($bgp_session, 'bgp_session');
+}
+
+
+function list_cbgp()
+{
+    $app        = \Slim\Slim::getInstance();
+    $sql        = '';
+    $sql_params = array();
+    $hostname   = $_GET['hostname'] ?: '';
+    $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        check_device_permission($device_id);
+        $sql        = " AND `devices`.`device_id` = ?";
+        $sql_params[] = $device_id;
+    }
+    if (!is_admin() && !is_read()) {
+        $sql .= " AND `bgpPeers_cbgp`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql_params[] = $_SESSION['user_id'];
+    }
+
+    $bgp_counters = array();
+    foreach (dbFetchRows("SELECT `bgpPeers_cbgp`.* FROM `bgpPeers_cbgp` LEFT JOIN `devices` ON `bgpPeers_cbgp`.`device_id` = `devices`.`device_id` WHERE `bgpPeers_cbgp`.`device_id` IS NOT NULL $sql", $sql_params) as $bgp_counter) {
+        $host_id = get_vm_parent_id($device);
+        $device['ip'] = inet6_ntop($device['ip']);
+        if (is_numeric($host_id)) {
+            $device['parent_id'] = $host_id;
+        }
+        $bgp_counters[] = $bgp_counter;
+    }
+    $total_bgp_counters = count($bgp_counters);
+    if ($total_bgp_counters == 0) {
+        api_error(404, 'BGP counters does not exist');
+    }
+
+    api_success($bgp_counters, 'bgp_counters');
 }
 
 
@@ -831,11 +884,28 @@ function get_ip_addresses()
         check_device_permission($device_id);
         $ipv4   = dbFetchRows("SELECT `ipv4_addresses`.* FROM `ipv4_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
         $ipv6   = dbFetchRows("SELECT `ipv6_addresses`.* FROM `ipv6_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
+        $ip_addresses_count = count(array_merge($ipv4, $ipv6));
+        if ($ip_addresses_count == 0) {
+            api_error(404, "Device $device_id does not have any IP addresses");
+        }
     } elseif (isset($router['portid'])) {
         $port_id = urldecode($router['portid']);
         check_port_permission($port_id, null);
         $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `port_id` = ?", array($port_id));
         $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?", array($port_id));
+        $ip_addresses_count = count(array_merge($ipv4, $ipv6));
+        if ($ip_addresses_count == 0) {
+            api_error(404, "Port $port_id does not have any IP addresses");
+        }
+    } elseif (isset($router['id'])) {
+        check_is_read();
+        $network_id = $router['id'];
+        $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `ipv4_network_id` = ?", array($network_id));
+        $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `ipv6_network_id` = ?", array($network_id));
+        $ip_addresses_count = count(array_merge($ipv4, $ipv6));
+        if ($ip_addresses_count == 0) {
+            api_error(404, "IP network $network_id does not exist or is empty");
+        }
     }
 
     api_success(array_merge($ipv4, $ipv6), 'addresses');
@@ -1336,6 +1406,68 @@ function get_devices_by_group()
     api_success($devices, 'devices');
 }
 
+
+function list_vrf()
+{
+    $app        = \Slim\Slim::getInstance();
+    $sql        = '';
+    $sql_params = array();
+    $hostname   = $_GET['hostname'];
+    $vrfname    = $_GET['vrfname'];
+    $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        check_device_permission($device_id);
+        $sql        = " AND `devices`.`device_id`=?";
+        $sql_params = array($device_id);
+    }
+    if (!empty($vrfname)) {
+        $sql        = "  AND `vrfs`.`vrf_name`=?";
+        $sql_params = array($vrfname);
+    }
+    if (!is_admin() && !is_read()) {
+        $sql .= " AND `vrfs`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql_params[] = $_SESSION['user_id'];
+    }
+
+    $vrfs       = array();
+    foreach (dbFetchRows("SELECT `vrfs`.* FROM `vrfs` LEFT JOIN `devices` ON `vrfs`.`device_id` = `devices`.`device_id` WHERE `vrfs`.`vrf_name` IS NOT NULL $sql", $sql_params) as $vrf) {
+        $host_id = get_vm_parent_id($device);
+        $device['ip'] = inet6_ntop($device['ip']);
+        if (is_numeric($host_id)) {
+            $device['parent_id'] = $host_id;
+        }
+        $vrfs[] = $vrf;
+    }
+    $total_vrfs = count($vrfs);
+    if ($total_vrfs == 0) {
+        api_error(404, 'VRFs do not exist');
+    }
+
+    api_success($vrfs, 'vrfs');
+}
+
+
+function get_vrf()
+{
+    check_is_read();
+
+    $app    = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $vrfId  = $router['id'];
+    if (!is_numeric($vrfId)) {
+        api_error(400, 'Invalid id has been provided');
+    }
+
+    $vrf       = dbFetchRows("SELECT * FROM `vrfs` WHERE `vrf_id` IS NOT NULL AND `vrf_id` = ?", array($vrfId));
+    $vrf_count = count($vrf);
+    if ($vrf_count == 0) {
+        api_error(404, "VRF $vrfId does not exist");
+    }
+
+    api_success($vrf, 'vrf');
+}
+
+
 function list_ipsec()
 {
     check_is_read();
@@ -1351,6 +1483,82 @@ function list_ipsec()
     $ipsec  = dbFetchRows("SELECT `D`.`hostname`, `I`.* FROM `ipsec_tunnels` AS `I`, `devices` AS `D` WHERE `I`.`device_id`=? AND `D`.`device_id` = `I`.`device_id`", array($device_id));
     api_success($ipsec, 'ipsec');
 }
+
+
+function list_vlans()
+{
+    $app      = \Slim\Slim::getInstance();
+    $sql        = '';
+    $sql_params = array();
+    $hostname   = $_GET['hostname'] ?: '';
+    $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        check_device_permission($device_id);
+        $sql        = " AND `devices`.`device_id` = ?";
+        $sql_params[] = $device_id;
+    }
+    if (!is_admin() && !is_read()) {
+        $sql .= " AND `vlans`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql_params[] = $_SESSION['user_id'];
+    }
+
+    $vlans       = array();
+    foreach (dbFetchRows("SELECT `vlans`.* FROM `vlans` LEFT JOIN `devices` ON `vlans`.`device_id` = `devices`.`device_id` WHERE `vlans`.`vlan_vlan` IS NOT NULL $sql", $sql_params) as $vlan) {
+        $host_id = get_vm_parent_id($device);
+        $device['ip'] = inet6_ntop($device['ip']);
+        if (is_numeric($host_id)) {
+            $device['parent_id'] = $host_id;
+        }
+        $vlans[] = $vlan;
+    }
+    $vlans_count = count($vlans);
+    if ($vlans_count == 0) {
+        api_error(404, 'VLANs do not exist');
+    }
+
+    api_success($vlans, 'vlans');
+}
+
+
+function list_ip_addresses()
+{
+    check_is_read();
+
+    $app            = \Slim\Slim::getInstance();
+    $router         = $app->router()->getCurrentRoute()->getParams();
+    $ipv4_addresses = array();
+    $ipv6_addresses = array();
+
+    $ipv4_addresses   = dbFetchRows("SELECT * FROM `ipv4_addresses`");
+    $ipv6_addresses   = dbFetchRows("SELECT * FROM `ipv6_addresses`");
+    $ip_addresses_count = count(array_merge($ipv4_addresses, $ipv6_addresses));
+    if ($ip_addresses_count == 0) {
+        api_error(404, 'IP addresses do not exist');
+    }
+
+    api_success(array_merge($ipv4_addresses, $ipv6_addresses), 'ip_addresses');
+}
+
+
+function list_ip_networks()
+{
+    check_is_read();
+
+    $app           = \Slim\Slim::getInstance();
+    $router        = $app->router()->getCurrentRoute()->getParams();
+    $ipv4_networks = array();
+    $ipv6_networks = array();
+
+    $ipv4_networks   = dbFetchRows("SELECT * FROM `ipv4_networks`");
+    $ipv6_networks   = dbFetchRows("SELECT * FROM `ipv6_networks`");
+    $ip_networks_count = count(array_merge($ipv4_networks, $ipv6_networks));
+    if ($ip_networks_count == 0) {
+        api_error(404, 'IP networks do not exist');
+    }
+
+    api_success(array_merge($ipv4_networks, $ipv6_networks), 'ip_networks');
+}
+
 
 function list_arp()
 {
