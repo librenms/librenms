@@ -59,10 +59,10 @@
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerInUpdates": "1",
                     "bgpPeerOutUpdates": "87",
-                    "bgpPeerInTotalMessages": "0",
-                    "bgpPeerOutTotalMessages": "0",
+                    "bgpPeerInTotalMessages": "423531",
+                    "bgpPeerOutTotalMessages": "493449",
                     "bgpPeerFsmEstablishedTime": "22497219",
-                    "bgpPeerInUpdateElapsedTime": "0",
+                    "bgpPeerInUpdateElapsedTime": "22497219",
                     "context_name": ""
                 },
                 {
@@ -75,10 +75,10 @@
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerInUpdates": "1",
                     "bgpPeerOutUpdates": "6",
-                    "bgpPeerInTotalMessages": "0",
-                    "bgpPeerOutTotalMessages": "0",
+                    "bgpPeerInTotalMessages": "4875",
+                    "bgpPeerOutTotalMessages": "4462",
                     "bgpPeerFsmEstablishedTime": "259280",
-                    "bgpPeerInUpdateElapsedTime": "0",
+                    "bgpPeerInUpdateElapsedTime": "259280",
                     "context_name": ""
                 }
             ],
