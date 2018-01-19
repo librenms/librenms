@@ -1516,13 +1516,13 @@ function validate_column_list($columns, $tableName)
 
 function add_service_for_host()
 {
-    check_is_admin();
     global $config;
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $hostname = $router['hostname'];
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    check_device_permission($device_id);
     $data = json_decode(file_get_contents('php://input'), true);
     $missing_fields = array();
 
