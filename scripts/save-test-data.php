@@ -12,20 +12,16 @@ $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
 
 $options = getopt(
-    'h:dncm:o:v:f:',
+    'o:v:m:nf:dh',
     array(
-        'debug',
-        'collect-only',
-        'no-save',
-        'prefer-new',
-        'hostname:',
-        'help',
-        'module:',
         'os:',
         'variant:',
+        'modules:',
+        'no-save',
         'file:',
+        'debug',
         'snmpsim',
-        'mass-update',
+        'help',
     )
 );
 
@@ -42,53 +38,32 @@ if (isset($options['snmpsim'])) {
     exit;
 }
 
-if (isset($options['h'])) {
-    $hostname = $options['h'];
-} elseif (isset($options['hostname'])) {
-    $hostname = $options['hostname'];
-}
 
-$target_os = '';
-if (isset($options['o'])) {
-    $target_os = $options['o'];
-} elseif (isset($options['os'])) {
-    $target_os = $options['os'];
-}
-
-if (isset($hostname)) {
-    if (is_numeric($hostname)) {
-        $device = device_by_id_cache($hostname);
-    } elseif (!empty($hostname)) {
-        $device = device_by_name($hostname);
-    }
-
-    if (isset($device['os']) && $device['os'] != 'generic') {
-        $target_os = $device['os'];
-    } else {
-        echo "OS (-o, --os) required because device is generic.\n";
-        exit;
-    }
-}
-
-if (isset($options['help']) || (empty($target_os) && !isset($options['mass-update']))) {
-    echo "Script to extract test data from devices or update test data.
-Snmp data is saved in tests/snmpsim and database data is saved in tests/data.
+if (isset($options['h'])
+    || isset($options['help'])
+    || !(isset($options['o']) || isset($options['os']) || isset($options['m']) || isset($options['modules']))
+) {
+    echo "Script to update test data. Database data is saved in tests/data.
 
 Usage:
-  You must specify a valid hostname or os.
-  -h, --hostname     ID, IP, or hostname of the device to extract data from
-                     If this is not given, the existing snmp data will be used
+  You must specify a valid OS and/or module(s).
+
   -o, --os           Name of the OS to save test data for
   -v, --variant      The variant of the OS to use, usually the device model
   -m, --modules      The discovery/poller module(s) to collect data for, comma delimited
-  -c, --collect-only Only collect snmpsim data (does not require snmpsim)
+  -n, --no-save      Don't save database entries, print them out instead
+  -f, --file         Save data to file instead of the standard location
   -d, --debug        Enable debug output
-  -n, --prefer-new   Prefer new snmprec data over existing data
-      --mass-update  Update all data files (-m can restrict which files)
-      --no-save      Don't save database entries, print them out instead
-      --snmpsim      Just run snmpsimd.py for manual testing.
+      --snmpsim      Run snmpsimd.py using the collected data for manual testing.
 ";
     exit;
+}
+
+$os_name = false;
+if (isset($options['o'])) {
+    $os_name = $options['o'];
+} elseif (isset($os_list['os'])) {
+    $os_name = $options['os'];
 }
 
 if (isset($options['m'])) {
@@ -102,57 +77,22 @@ if (isset($options['m'])) {
     $modules = array();
 }
 
+$full_os_name = $os_name;
 $variant = '';
 if (isset($options['v'])) {
     $variant = $options['v'];
+    $full_os_name = $os_name . '_' . $variant;
 } elseif (isset($options['variant'])) {
     $variant = $options['variant'];
+    $full_os_name = $os_name . '_' . $variant;
 }
 
 $os_list = array();
 
-if (isset($options['mass-update'])) {
-    $files = glob('tests/data/*.json');
-    foreach ($files as $file) {
-        $json = json_decode(file_get_contents($file), true);
-
-        if (empty($modules) || !empty(array_intersect($modules, array_keys($json)))) {
-            $osname = basename($file, '.json');
-            if (is_file("includes/definitions/$osname.yaml")) {
-                $os_list[$osname] = '';
-                var_dump($osname);
-            } else {
-                list($rvar, $ros) = explode('_', strrev($osname), 2);
-                $os_list[strrev($ros)] = strrev($rvar);
-                var_dump(strrev($ros) . ':::::' . strrev($rvar));
-            }
-        }
-    }
+if ($os_name) {
+    $os_list = [$full_os_name => [$os_name, $variant]];
 } else {
-    $os_list[$target_os] = $variant;
-
-    echo "OS: $target_os\n";
-    echo "Module: $modules_input\n";
-    if ($variant) {
-        echo "Variant: $variant\n";
-    }
-    echo PHP_EOL;
-
-    $capture = new ModuleTestHelper($modules, $target_os, $variant);
-
-    // Capture snmp data
-    if ($device) {
-        echo "Capturing Data: ";
-        $prefer_new_snmprec = isset($options['n']) || isset($options['prefer-new']);
-        $capture->captureFromDevice($device['device_id'], true, $prefer_new_snmprec);
-
-        if (isset($options['c']) || isset($options['collect-only'])) {
-            // just capture, don't generate json
-            exit;
-        }
-
-        echo PHP_EOL;
-    }
+    $os_list = ModuleTestHelper::findOsWithData($modules);
 }
 
 
@@ -168,9 +108,17 @@ if (!$snmpsim->isRunning()) {
 }
 
 
-$no_save = isset($options['no-save']);
-foreach ($os_list as $os => $variant) {
-    $tester = new ModuleTestHelper($modules, $os, $variant);
+$no_save = isset($options['n']) || isset($options['no-save']);
+foreach ($os_list as $full_os_name => $parts) {
+    list($target_os, $target_variant) = $parts;
+    echo "OS: $target_os\n";
+    echo "Module: $modules_input\n";
+    if ($target_variant) {
+        echo "Variant: $target_variant\n";
+    }
+    echo PHP_EOL;
+
+    $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
 
     $test_data = $tester->generateTestData($snmpsim, $no_save);
 
