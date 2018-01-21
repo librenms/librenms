@@ -80,11 +80,19 @@ if (Config::get('enable_bgp')) {
                 }
 
                 if (!$bgp4_mib && $device['os'] == 'junos') {
-                    $safis[1] = 'unicast';
-                    $safis[2] = 'multicast';
-                    $safis[3] = 'unicastAndMulticast';
-                    $safis[4] = 'labeledUnicast';
-                    $safis[128] = 'vpn';
+                    $afis['ipv4'] = 'ipv4';
+                    $afis['ipv6'] = 'ipv6';
+                    $afis[25]     = 'l2vpn';
+                    $safis[1]     = 'unicast';
+                    $safis[2]     = 'multicast';
+                    $safis[3]     = 'unicastAndMulticast';
+                    $safis[4]     = 'labeledUnicast';
+                    $safis[5]     = 'mvpn';
+                    $safis[65]    = 'vpls';
+                    $safis[70]    = 'evpn';
+                    $safis[128]   = 'vpn';
+                    $safis[132]   = 'rtfilter';
+                    $safis[133]   = 'flow';
 
                     if (!isset($j_peerIndexes)) {
                         $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerEntry', $jbgp, 'BGP4-V2-MIB-JUNIPER', 'junos');
@@ -111,6 +119,7 @@ if (Config::get('enable_bgp')) {
 
                     foreach ($j_afisafi[$j_peerIndexes[$peer['ip']]] as $afisafi) {
                         list ($afi,$safi)     = explode('.', $afisafi);
+                        $afi                  = $afis[$afi];
                         $safi                 = $safis[$safi];
                         $af_list[$peer['ip']][$afi][$safi] = 1;
                         add_cbgp_peer($device, $peer, $afi, $safi);
