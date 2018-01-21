@@ -306,10 +306,19 @@ if ($config['enable_bgp']) {
                     }//end if
 
                     if ($device['os'] == 'junos') {
-                        $safis['unicast']   = 1;
-                        $safis['multicast'] = 2;
-                        $afis['ipv4']       = 1;
-                        $afis['ipv6']       = 2;
+                        $afis['ipv4']                 = 1;
+                        $afis['ipv6']                 = 2;
+                        $afis['l2vpn']                = 25;
+                        $safis['unicast']             = 1;
+                        $safis['multicast']           = 2;
+                        $safis['unicastAndMulticast'] = 3;
+                        $safis['labeledUnicast']      = 4;
+                        $safis['mvpn']                = 5;
+                        $safis['vpls']                = 65;
+                        $safis['evpn']                = 70;
+                        $safis['vpn']                 = 128;
+                        $safis['rtfilter']            = 132;
+                        $safis['flow']                = 133;
 
                         if (!isset($j_prefixes)) {
                             $j_prefixes = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PrefixInPrefixesAccepted', $j_prefixes, 'BGP4-V2-MIB-JUNIPER', 'junos', '-OQnU');
