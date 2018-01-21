@@ -47,11 +47,7 @@ To run the full suite of tests enable database and snmpsim reliant tests: `./scr
 
 ## Using snmpsim for testing
 
-<<<<<<< HEAD
-You can run snmpsim to access test data by running `./scripts/save-test-data.php --snmpsim`
-=======
-You can run snmpsim to access test data by running `./scripts/collct-snmp-data.php --snmpsim`
->>>>>>> Split save-test-data.php into two scripts
+You can run snmpsim to access test data by running `./scripts/collect-snmp-data.php --snmpsim`
 
 You may then run snmp queries against it using the os (and variant) as the community and 127.1.6.1:1161 as the host.
 ```
