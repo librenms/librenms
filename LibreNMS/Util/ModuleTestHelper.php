@@ -583,7 +583,13 @@ class ModuleTestHelper
                     }
                 }
 
-                $rows = dbFetchRows("SELECT * FROM `$table` $join $where", $params);
+                if (isset($info['order_by'])) {
+                    $order_by = " ORDER BY {$info['order_by']}";
+                } else {
+                    $order_by = '';
+                }
+
+                $rows = dbFetchRows("SELECT * FROM `$table` $join $where $order_by", $params);
 
                 // remove unwanted fields
                 if (isset($info['included_fields'])) {
