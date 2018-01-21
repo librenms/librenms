@@ -1249,7 +1249,7 @@ function list_bills()
     $bill_ref = mres($_GET['ref']);
     $bill_custid = mres($_GET['custid']);
     $param = array();
-    
+
     if (!empty($bill_custid)) {
         $sql    .= '`bill_custid` = ?';
         $param[] = $bill_custid;
@@ -1719,5 +1719,54 @@ function validate_column_list($columns, $tableName)
         $app->response->headers->set('Content-Type', 'application/json');
         echo _json_encode($output);
         $app->stop();
+    }
+}
+
+function add_service_for_host()
+{
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $hostname = $router['hostname'];
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    check_device_permission($device_id);
+    $data = json_decode(file_get_contents('php://input'), true);
+    $missing_fields = array();
+
+    // Check if some required fields are empty
+    if (empty($data['type'])) {
+        $missing_fields[] = 'type';
+    }
+    if (empty($data['ip'])) {
+        $missing_fields[] = 'ip';
+    }
+
+    // Print error if required fields are missing
+    if (!empty($missing_fields)) {
+        api_error(400, sprintf("Service field%s %s missing: %s.", ((sizeof($missing_fields)>1)?'s':''), ((sizeof($missing_fields)>1)?'are':'is'), implode(', ', $missing_fields)));
+    }
+    if (!filter_var($data['ip'], FILTER_VALIDATE_IP)) {
+        api_error(400, 'service_ip is not a valid IP address.');
+    }
+
+    // Check if service type exists
+    if (!in_array($data['type'], list_available_services())) {
+        api_error(400, "The service " . $data['type'] . " does not exist.\n Available service types: " . implode(', ', list_available_services()));
+    }
+
+    // Get parameters
+    $service_type = $data['type'];
+    $service_ip   = $data['ip'];
+    $service_desc = $data['desc'] ? mres($data['desc']) : '';
+    $service_param = $data['param'] ? mres($data['param']) : '';
+    $service_ignore = $data['ignore'] ? true : false; // Default false
+
+    // Set the service
+    $service_id = add_service($device_id, $service_type, $service_desc, $service_ip, $service_param, (int)$service_ignore);
+    if ($service_id != false) {
+        api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");
+    } else {
+        api_error(500, 'Failed to add the service');
     }
 }
