@@ -78,14 +78,7 @@ class Pushover implements Transport
                     break;
             }
             $data['title'] = $title_text . " - " . $obj['hostname'] . " - " . $obj['name'];
-            $message_text  = "Timestamp: " . $obj['timestamp'];
-            if (!empty($obj['faults'])) {
-                $message_text .= "\n\nFaults:\n";
-                foreach ($obj['faults'] as $k => $faults) {
-                    $message_text .= "#" . $k . " " . $faults['string'] . "\n";
-                }
-            }
-            $data['message'] = $message_text;
+            $data['message'] = $obj['msg'];
             $curl            = curl_init();
             set_curl_proxy($curl);
             curl_setopt($curl, CURLOPT_URL, 'https://api.pushover.net/1/messages.json');
