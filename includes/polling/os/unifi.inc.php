@@ -1,5 +1,5 @@
 <?php
-if ($data = snmp_get_multi($device, 'unifiApSystemModel unifiApSystemVersion', '-OQUs', 'UBNT-UniFi-MIB')) {
+if ($data = snmp_getnext_multi($device, 'unifiApSystemModel unifiApSystemVersion', '-OQUs', 'UBNT-UniFi-MIB')) {
     $hardware = $data['unifiApSystemModel'];
     $version = $data['unifiApSystemVersion'];
 } elseif ($data = snmp_getnext_multi($device, 'dot11manufacturerProductName dot11manufacturerProductVersion', '-OQUs', 'IEEE802dot11-MIB')) {
