@@ -101,6 +101,16 @@ class ModuleTestHelper
         $this->quiet = $quiet;
     }
 
+    public function setSnmprecSavePath($path)
+    {
+        $this->snmprec_file = $path;
+    }
+
+    public function setJsonSavePath($path)
+    {
+        $this->json_file = $path;
+    }
+
     public function captureFromDevice($device_id, $write = true, $prefer_new = false)
     {
         $snmp_oids = $this->collectOids($device_id);
@@ -184,6 +194,66 @@ class ModuleTestHelper
         return $snmp_oids;
     }
 
+    /**
+     * Generate a list of os containing test data for $modules (an empty array means all)
+     *
+     * Returns an array indexed by the basename ($os or $os_$variant)
+     * Each entry contains [$os, $variant, $valid_modules]
+     * $valid_modules is an array of selected modules this os has test data for
+     *
+     * @param array $modules
+     * @return array
+     */
+    public static function findOsWithData($modules = array())
+    {
+        $os_list = array();
+
+        foreach (glob(Config::get('install_dir') . "/tests/data/*.json") as $file) {
+            $base_name = basename($file, '.json');
+            list($os, $variant) = self::extractVariant($file);
+
+            // calculate valid modules
+            $data_modules = array_keys(json_decode(file_get_contents($file), true));
+
+            if (empty($modules)) {
+                $valid_modules = $data_modules;
+            } else {
+                $valid_modules = array_intersect($modules, $data_modules);
+            }
+
+            if (empty($valid_modules)) {
+                continue;  // no test data for selected modules
+            }
+
+            $os_list[$base_name] = array(
+                $os,
+                $variant,
+                $valid_modules,
+            );
+        }
+
+        return $os_list;
+    }
+
+    /**
+     * Given a json filename or basename, extract os and variant
+     *
+     * @param string $os_file Either a filename or the basename
+     * @return array [$os, $variant]
+     */
+    public static function extractVariant($os_file)
+    {
+        $full_name = basename($os_file, '.json');
+
+        if (!str_contains($full_name, '_')) {
+            return [$full_name, ''];
+        } elseif (is_file(Config::get('install_dir') . "/includes/definitions/$full_name.yaml")) {
+            return [$full_name, ''];
+        } else {
+            list($rvar, $ros) = explode('_', strrev($full_name), 2);
+            return [strrev($ros), strrev($rvar)];
+        }
+    }
 
     /**
      * Generate a module list.  Try to take dependencies into account.
@@ -581,8 +651,16 @@ class ModuleTestHelper
         return empty($this->modules) ? $this->getSupportedModules() : $this->modules;
     }
 
-    public function fetchTestData()
+    public function getTestData()
     {
         return json_decode(file_get_contents($this->json_file), true);
+    }
+
+    public function getJsonFilepath($short = false)
+    {
+        if ($short) {
+            return ltrim(str_replace(Config::get('install_dir'), '', $this->json_file), '/');
+        }
+        return $this->json_file;
     }
 }
