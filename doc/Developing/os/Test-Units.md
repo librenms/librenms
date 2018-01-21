@@ -15,12 +15,15 @@ consistent manner.
 
 ## Capturing test data
 
-`./scripts/save-test-data.php` is provided to make it easy to collect data for tests.  Running save-test-data.php with
-the --hostname (-h) allows you to capture all data used to discover and poll a device already added to LibreNMS.  Make sure to
-re-run the script if you add additional support. Check the command-line help for more options.
+`./scripts/collect-snmp-data.php` is provided to make it easy to collect data for tests.  Running collect-snmp-data.php
+ with the --hostname (-h) allows you to capture all data used to discover and poll a device already added to LibreNMS.
+ Make sure to re-run the script if you add additional support. Check the command-line help for more options.
 
-Generally, you will only need to capture data (-h) once.  After you have the data you need in the snmprec file, you can
-update the json using -o (and -v if using a variant) after that.
+After you have collected snmp data, run `./scripts/save-test-data.php` with the --os (-o) option to dump the post discovery
+and post poll database entries to json files.
+
+Generally, you will only need to capture data once.  After you have the data you need in the snmprec file, you can
+just use save-test-data.php to update the database dump (json) after that.
 
 ### OS Variants
 
@@ -44,7 +47,11 @@ To run the full suite of tests enable database and snmpsim reliant tests: `./scr
 
 ## Using snmpsim for testing
 
+<<<<<<< HEAD
 You can run snmpsim to access test data by running `./scripts/save-test-data.php --snmpsim`
+=======
+You can run snmpsim to access test data by running `./scripts/collct-snmp-data.php --snmpsim`
+>>>>>>> Split save-test-data.php into two scripts
 
 You may then run snmp queries against it using the os (and variant) as the community and 127.1.6.1:1161 as the host.
 ```
@@ -98,18 +105,19 @@ data, you must use a variant to store your test data (-v).
 
 ### Add initial detection
 1. Add device to LibreNMS. It is generic and device_id = 42
-2. Run `./scripts/save-test-data.php -h 42 -m os`, initial snmprec will be created
+2. Run `./scripts/collect-snmp-data.php -h 42 -m os`, initial snmprec will be created
 3. [Add initial detection](Initial-Detection.md) for `example-os`
 4. Run discovery to make sure it detects properly `./discovery.php -h 42`
 5. Add any additional os items like version, hardware, features, or serial.
-6. If there is additional snmp data required, run `./scripts/save-test-data.php -h 42 -m os` otherwise, run `./scripts/save-test-data.php -o example-os -m os`
-7. Review data. If you modified the snmprec (don't modify json manually) run `./scripts/save-test-data.php -o example-os -m os`
+6. If there is additional snmp data required, run `./scripts/collect-snmp-data.php -h 42 -m os`
+7. Run `./scripts/save-test-data.php -o example-os -m os` to update the dumped database data.
+7. Review data. If you modified the snmprec or code (don't modify json manually) run `./scripts/save-test-data.php -o example-os -m os`
 8. Run `./scripts/pre-commit.php --db --snmpsim`
 9. If the tests succeed submit a pull request
 
 ### Additional module support or test data
 1. Add code to support module or support already exists.
-2. `./scripts/save-test-data.php -h 42 -m <module>`, this will add more data to the snmprec file
+2. `./scripts/collect-snmp-data.php -h 42 -m <module>`, this will add more data to the snmprec file
 3. Review data. If you modified the snmprec (don't modify json manually) run `./scripts/save-test-data.php -o example-os -m <module>`
 4. Run `./scripts/pre-commit.php --db --snmpsim`
 5. If the tests succeed submit a pull request
