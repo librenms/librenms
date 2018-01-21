@@ -106,3 +106,31 @@ Output:
     ]
 }
 ```
+### `add_service_for_host`
+
+Add a service for device
+
+Route: `/api/v0/services/:hostname`
+
+  - id or hostname is the specific device
+
+Input:
+
+  - type: service type
+  - ip: ip of the service
+  - desc: description for the service
+  - param: parameters for the service
+  - ignore: ignore the service for checks
+
+Example:
+```curl
+curl -X POST -d '{"type":"ping","ip": "192.168.1.10","desc":"test ping","param": "-t 10 -c 5"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/192.168.1.10
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "message": "Service ping has been added to device 192.168.1.10 (#10)"
+}
+```
