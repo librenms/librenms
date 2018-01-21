@@ -1,35 +1,4 @@
 {
-    "applications": {
-        "discovery": {
-            "applications": [],
-            "application_metrics": []
-        },
-        "poller": "matches discovery"
-    },
-    "arp-table": {
-        "discovery": {
-            "ipv4_mac": []
-        },
-        "poller": "matches discovery"
-    },
-    "bgp-peers": {
-        "discovery": {
-            "devices": [
-                {
-                    "bgpLocalAs": null
-                }
-            ],
-            "bgpPeers": [],
-            "bgpPeers_cbgp": []
-        },
-        "poller": "matches discovery"
-    },
-    "mempools": {
-        "discovery": {
-            "mempools": []
-        },
-        "poller": "matches discovery"
-    },
     "ports": {
         "discovery": {
             "ports": [
