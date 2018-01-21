@@ -10,8 +10,8 @@
         "discovery": {
             "ipv4_mac": [
                 {
-                    "mac_address": "00131929dd40",
-                    "ipv4_address": "10.37.105.94",
+                    "mac_address": "00900b2a11ad",
+                    "ipv4_address": "10.37.105.100",
                     "context_name": null
                 },
                 {
@@ -35,8 +35,8 @@
                     "context_name": null
                 },
                 {
-                    "mac_address": "00900b2a11ad",
-                    "ipv4_address": "10.37.105.100",
+                    "mac_address": "00131929dd40",
+                    "ipv4_address": "10.37.105.94",
                     "context_name": null
                 }
             ]

@@ -15,6 +15,11 @@
                     "context_name": null
                 },
                 {
+                    "mac_address": "00900b2a11b0",
+                    "ipv4_address": "10.37.105.254",
+                    "context_name": null
+                },
+                {
                     "mac_address": "0000cd3709b4",
                     "ipv4_address": "172.16.1.2",
                     "context_name": null
@@ -27,11 +32,6 @@
                 {
                     "mac_address": "001aeb937aa6",
                     "ipv4_address": "172.16.20.2",
-                    "context_name": null
-                },
-                {
-                    "mac_address": "00900b2a11b0",
-                    "ipv4_address": "10.37.105.254",
                     "context_name": null
                 }
             ]
