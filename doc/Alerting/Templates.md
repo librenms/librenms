@@ -111,6 +111,61 @@ Notes: %notes
 Server: %sysName {foreach %faults}Mount Point: %value.storage_descr Percent Utilized: %value.storage_perc{/foreach}
 ```
 
+Temperature Sensors:
+```text
+
+%title
+
+Device Name: %sysName
+Severity: %severity 
+Timestamp: %timestamp
+Uptime: %uptime_short
+{if %state == 0}Time elapsed: %elapsed{/if}
+Location: %location
+Description: %description
+Features: %features
+Purpose: %purpose
+Notes: %notes
+
+Rule: {if %name}%name{else}%rule{/if}
+{if %faults}Faults:
+{foreach %faults}
+#%key: Temperature: %value.sensor_current°C
+** {calc(%value.sensor_current-%value.sensor_limit)}°C over limit
+Previous Measurement: %value.sensor_prev°C
+High Temperature Limit: %value.sensor_limit°C
+{/foreach}
+{/if}
+```
+
+Value Sensors:
+```text
+
+%title
+
+Device Name: %sysName
+Severity: %severity 
+Timestamp: %timestamp
+Uptime: %uptime_short
+{if %state == 0}Time elapsed: %elapsed{/if}
+Location: %location
+Description: %description
+Features: %features
+Purpose: %purpose
+Notes: %notes
+
+Rule: {if %name}%name{else}%rule{/if}
+{if %faults}Faults:
+{foreach %faults}
+#%key: Sensor%value.sensor_current
+** {calc(%value.sensor_current-%value.sensor_limit)}over limit
+Previous Measurement: %value.sensor_prev
+Limit: %value.sensor_limit
+{/foreach}
+{/if}
+```
+
+
 Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:
 ```text
 {if %transport == mail}<a href="https://my.librenms.install/device/device=%hostname/">%hostname</a>
