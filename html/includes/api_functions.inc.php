@@ -303,17 +303,17 @@ function list_devices()
     if ($type == 'all' || empty($type)) {
         $sql = '1';
     } elseif ($type == 'location') {
-        $sql = "`location` LIKE '%".$query."%'";
+        $sql = "`d`.`location` LIKE '%".$query."%'";
     } elseif ($type == 'ignored') {
-        $sql = "`ignore`='1' AND `disabled`='0'";
+        $sql = "`d`.`ignore`='1' AND `d`.`disabled`='0'";
     } elseif ($type == 'up') {
-        $sql = "`status`='1' AND `ignore`='0' AND `disabled`='0'";
+        $sql = "`d`.`status`='1' AND `d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'down') {
-        $sql = "`status`='0' AND `ignore`='0' AND `disabled`='0'";
+        $sql = "`d`.`status`='0' AND `d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'disabled') {
-        $sql = "`disabled`='1'";
+        $sql = "`d`.`disabled`='1'";
     } elseif ($type == 'os') {
-        $sql = "`os`=?";
+        $sql = "`d`.`os`=?";
         $param[] = $query;
     } elseif ($type == 'mac') {
         $join .= " LEFT JOIN `ports` AS p ON d.`device_id` = p.`device_id` LEFT JOIN `ipv4_mac` AS m ON p.`port_id` = m.`port_id` ";
