@@ -32,6 +32,13 @@ class ComposerHelper
 {
     public static function preUpdate(Event $event)
     {
+        if (!getenv('FORCE')) {
+            echo "Running composer update is not advisable.  Please run composer install to update instead.\n";
+            echo "If know what you are doing and want to write a new composer.lock file set FORCE=1.\n";
+            echo "If you don't know what to do, run: composer install\n";
+            exit(1);
+        }
+
         if (!$event->isDevMode()) {
             $vendor_dir = $event->getComposer()->getConfig()->get('vendor-dir');
 

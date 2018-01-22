@@ -54,12 +54,16 @@ if (!empty($path_exec)) {
     }
 
     // Download composer.phar (code from the composer web site)
-    $sha = trim(file_get_contents('http://composer.github.io/installer.sig'));
+    $good_sha = trim(@file_get_contents('http://composer.github.io/installer.sig'));
+
+    // Download composer.phar (code from the composer web site)
     @copy('http://getcomposer.org/installer', 'composer-setup.php');
-    if (@hash_file('SHA384', 'composer-setup.php') === $sha) {
+    if (!empty($good_sha) && @hash_file('SHA384', 'composer-setup.php') === $good_sha) {
         // Installer verified
         shell_exec('php composer-setup.php');
         $exec = 'php ' . $install_dir . '/composer.phar';
+    } else {
+        echo "Corrupted download.\n";
     }
     @unlink('composer-setup.php');
 }
