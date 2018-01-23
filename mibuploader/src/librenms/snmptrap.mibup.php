@@ -22,12 +22,12 @@ if (!$device['device_id']) {
 }
 
 if (!$device['device_id']) {
-	$device = @dbFetchRow('SELECT * FROM devices WHERE `sysName` = ?', array($sDevName));
+    $device = @dbFetchRow('SELECT * FROM devices WHERE `sysName` = ?', array($sDevName));
 }
 
 if (!$device['device_id']) {
-	logfile('Device with name ' . $sDevName . ' not found.');
-	exit;
+    logfile('Device with name ' . $sDevName . ' not found.');
+    exit;
 }
 
 require 'includes/snmptrap/genericTrap.inc.php';

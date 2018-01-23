@@ -10,12 +10,12 @@ MIBUpAutoload::register();
 //*/
 
 try {
-	$oCtrl = MIBUpCtrl::load('Trap');
-	$oCtrl->trap($device['device_id'], $entry[1], $entry[2]);
+    $oCtrl = MIBUpCtrl::load('Trap');
+    $oCtrl->trap($device['device_id'], $entry[1], $entry[2]);
 } catch (MIBUpException $ex) {
-	$sErr = 'MIBUploader trap receive failure: ' . $ex->getMessage();
-	logfile($sErr);
-	log_event($sErr);
+    $sErr = 'MIBUploader trap receive failure: ' . $ex->getMessage();
+    logfile($sErr);
+    log_event($sErr);
 }
 
 /*
