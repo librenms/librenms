@@ -15,11 +15,14 @@ class Str implements StreamInterface
  */
 class StreamDecoratorTraitTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var StreamInterface */
     private $a;
+    /** @var StreamInterface */
     private $b;
+    /** @var resource */
     private $c;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->c = fopen('php://temp', 'r+');
         fwrite($this->c, 'foo');
@@ -83,7 +86,7 @@ class StreamDecoratorTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $this->b->getContents());
         $this->assertEquals('', $this->b->getContents());
         $this->b->seek(1);
-        $this->assertEquals('oo', $this->b->getContents(1));
+        $this->assertEquals('oo', $this->b->getContents());
     }
 
     public function testCloses()

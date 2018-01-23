@@ -73,14 +73,14 @@ function that takes the following form.
 
 .. code-block:: php
 
-    use Psr7\Http\Message\RequestInterface;
+    use Psr\Http\Message\RequestInterface;
 
     function my_middleware()
     {
         return function (callable $handler) {
             return function (RequestInterface $request, array $options) use ($handler) {
                 return $handler($request, $options);
-            }
+            };
         };
     }
 
@@ -95,7 +95,7 @@ Here's an example of adding a header to each request.
 
 .. code-block:: php
 
-    use Psr7\Http\Message\RequestInterface;
+    use Psr\Http\Message\RequestInterface;
 
     function add_header($header, $value)
     {
@@ -106,7 +106,7 @@ Here's an example of adding a header to each request.
             ) use ($handler, $header, $value) {
                 $request = $request->withHeader($header, $value);
                 return $handler($request, $options);
-            }
+            };
         };
     }
 
@@ -132,8 +132,8 @@ downstream handler. This example adds a header to the response.
 
 .. code-block:: php
 
-    use Psr7\Http\Message\RequestInterface;
-    use Psr7\Http\Message\ResponseInterface;
+    use Psr\Http\Message\RequestInterface;
+    use Psr\Http\Message\ResponseInterface;
     use GuzzleHttp\HandlerStack;
     use GuzzleHttp\Handler\CurlHandler;
     use GuzzleHttp\Client;
@@ -145,13 +145,13 @@ downstream handler. This example adds a header to the response.
                 RequestInterface $request,
                 array $options
             ) use ($handler, $header, $value) {
-                $promise = $handler($request, $options)
+                $promise = $handler($request, $options);
                 return $promise->then(
                     function (ResponseInterface $response) use ($header, $value) {
                         return $response->withHeader($header, $value);
                     }
                 );
-            }
+            };
         };
     }
 
@@ -166,7 +166,7 @@ a function that takes the request argument and returns the request to send.
 
 .. code-block:: php
 
-    use Psr7\Http\Message\RequestInterface;
+    use Psr\Http\Message\RequestInterface;
     use GuzzleHttp\HandlerStack;
     use GuzzleHttp\Handler\CurlHandler;
     use GuzzleHttp\Client;
@@ -186,7 +186,7 @@ Modifying a response is also much simpler using the
 
 .. code-block:: php
 
-    use Psr7\Http\Message\ResponseInterface;
+    use Psr\Http\Message\ResponseInterface;
     use GuzzleHttp\HandlerStack;
     use GuzzleHttp\Handler\CurlHandler;
     use GuzzleHttp\Client;
@@ -214,7 +214,7 @@ stack.
 
 .. code-block:: php
 
-    use Psr7\Http\Message\RequestInterface;
+    use Psr\Http\Message\RequestInterface;
     use GuzzleHttp\HandlerStack;
     use GuzzleHttp\Middleware;
     use GuzzleHttp\Client;
@@ -237,7 +237,7 @@ stack.
         return $r;
     });
 
-    $client->get('http://httpbin.org/');
+    $client->request('GET', 'http://httpbin.org/');
     // echoes 'ABC';
 
     $stack->unshift(Middleware::mapRequest(function (RequestInterface $r) {
@@ -246,7 +246,7 @@ stack.
     });
 
     $client = new Client(['handler' => $stack]);
-    $client->get('http://httpbin.org/');
+    $client->request('GET', 'http://httpbin.org/');
     // echoes '0ABC';
 
 You can give middleware a name, which allows you to add middleware before
@@ -255,7 +255,7 @@ by name.
 
 .. code-block:: php
 
-    use Psr7\Http\Message\RequestInterface;
+    use Psr\Http\Message\RequestInterface;
     use GuzzleHttp\Middleware;
 
     // Add a middleware with a name

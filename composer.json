@@ -2,7 +2,7 @@
     "name": "librenms/librenms",
     "description": "A fully featured network monitoring system that provides a wealth of features and device support.",
     "type": "project",
-    "keywords": ["network", "monitoring", "snmp", "laravel"],
+    "keywords": ["network", "monitoring", "discovery", "alerting", "billing", "snmp", "distributed"],
     "homepage": "http://www.librenms.org/",
     "license": "GPL-3.0",
     "support": {
@@ -13,7 +13,7 @@
         "irc": "irc://irc.freenode.org/#librenms"
     },
     "config": {
-        "platform": {"php": "5.3.9"}
+        "optimize-autoloader": true
     },
     "require": {
         "php": ">=5.3.9",
@@ -30,10 +30,11 @@
         "php-amqplib/php-amqplib": "^2.0",
         "symfony/yaml": "^2.8",
         "rmccue/requests": "^1.7",
-        "ramsey/array_column": "^1.1"
+        "ramsey/array_column": "^1.1",
+        "palanik/corsslim": "^1.1"
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "2.6.*",
+        "squizlabs/php_codesniffer": "^2.9.1",
         "phpunit/phpunit": "4.*",
         "jakub-onderka/php-parallel-lint": "*",
         "jakub-onderka/php-console-highlighter": "*",

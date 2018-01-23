@@ -80,7 +80,7 @@ if ($services[$vars['service']]['service_ds'] != "") {
             $rrd_additions .= " AREA:DS#" . $color . ":'" . str_pad(substr(ucfirst($ds)." (".$label.")", 0, 15), 15) . "' ";
             $rrd_additions .= " GPRINT:DS:LAST:%5.2lf%s ";
             $rrd_additions .= " GPRINT:DS:AVERAGE:%5.2lf%s ";
-            $rrd_additions .= " GPRINT:DS:MAX:%5.2lf%s\\\l ";
+            $rrd_additions .= " GPRINT:DS:MAX:%5.2lf%s\\l ";
         }
     }
 }

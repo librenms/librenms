@@ -1,0 +1,17 @@
+mib: HHMSAGENT-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: hhmsSensorArrayTable
+                    value: hhmsSensorArraySwitchStatus
+                    num_oid: .1.3.6.1.4.1.3854.1.2.2.1.18.1.3.
+                    descr: '{{ $hhmsSensorArraySwitchDescription }}'
+                    index: 'hhmsSensorArraySwitchStatus.{{ $index }}'
+                    skip_values: 1
+                    states:
+                        - { descr: noStatus, graph: 1, value: 1, generic: 3 }
+                        - { descr: normal, graph: 1, value: 2, generic: 0 }
+                        - { descr: critical, graph: 1, value: 4, generic: 2 }
+                        - { descr: sensorError, graph: 1, value: 7, generic: 3 }

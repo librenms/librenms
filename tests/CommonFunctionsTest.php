@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests;
 
-class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
+class CommonFunctionsTest extends TestCase
 {
     public function testStrContains()
     {
@@ -95,16 +95,6 @@ class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, set_null(2, 0, 2));
     }
 
-    public function testIsIp()
-    {
-        $this->assertTrue(is_ip('192.168.0.1'));
-        $this->assertTrue(is_ip('192.168.0.1', 'ipv4'));
-        $this->assertTrue(is_ip('2001:4860:4860::8888', 'ipv6'));
-        $this->assertFalse(is_ip('2001:4860:4860::8888', 'ipv4'));
-        $this->assertFalse(is_ip('192.168.0.1', 'ipv6'));
-        $this->assertFalse(is_ip('not_an_ip'));
-    }
-
     public function testDisplay()
     {
         $this->assertEquals('&lt;html&gt;string&lt;/html&gt;', display('<html>string</html>'));
@@ -127,5 +117,67 @@ class CommonFunctionsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('DashName', str_to_class('dash-name'));
         $this->assertSame('UnderscoreName', str_to_class('underscore_name'));
         $this->assertSame('LibreNMS\\AllOfThemName', str_to_class('all OF-thEm_NaMe', 'LibreNMS\\'));
+    }
+
+    public function testIsValidHostname()
+    {
+        $this->assertTrue(is_valid_hostname('a'), 'a');
+        $this->assertTrue(is_valid_hostname('a.'), 'a.');
+        $this->assertTrue(is_valid_hostname('0'), '0');
+        $this->assertTrue(is_valid_hostname('a.b'), 'a.b');
+        $this->assertTrue(is_valid_hostname('localhost'), 'localhost');
+        $this->assertTrue(is_valid_hostname('google.com'), 'google.com');
+        $this->assertTrue(is_valid_hostname('news.google.co.uk'), 'news.google.co.uk');
+        $this->assertTrue(is_valid_hostname('xn--fsqu00a.xn--0zwm56d'), 'xn--fsqu00a.xn--0zwm56d');
+        $this->assertTrue(is_valid_hostname('www.averylargedomainthatdoesnotreallyexist.com'), 'www.averylargedomainthatdoesnotreallyexist.com');
+        $this->assertTrue(is_valid_hostname('cont-ains.h-yph-en-s.com'), 'cont-ains.h-yph-en-s.com');
+        $this->assertTrue(is_valid_hostname('cisco-3750x'), 'cisco-3750x');
+        $this->assertFalse(is_valid_hostname('cisco_3750x'), 'cisco_3750x');
+        $this->assertFalse(is_valid_hostname('goo gle.com'), 'goo gle.com');
+        $this->assertFalse(is_valid_hostname('google..com'), 'google..com');
+        $this->assertFalse(is_valid_hostname('google.com '), 'google.com ');
+        $this->assertFalse(is_valid_hostname('google-.com'), 'google-.com');
+        $this->assertFalse(is_valid_hostname('.google.com'), '.google.com');
+        $this->assertFalse(is_valid_hostname('..google.com'), '..google.com');
+        $this->assertFalse(is_valid_hostname('<script'), '<script');
+        $this->assertFalse(is_valid_hostname('alert('), 'alert(');
+        $this->assertFalse(is_valid_hostname('.'), '.');
+        $this->assertFalse(is_valid_hostname('..'), '..');
+        $this->assertFalse(is_valid_hostname(' '), 'Just a space');
+        $this->assertFalse(is_valid_hostname('-'), '-');
+        $this->assertFalse(is_valid_hostname(''), 'Empty string');
+    }
+
+    public function testResolveGlues()
+    {
+        if (getenv('DBTEST')) {
+            dbConnect();
+            dbBeginTransaction();
+        } else {
+            $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
+        }
+
+        $this->assertFalse(ResolveGlues(array('dbSchema'), 'device_id'));
+
+        $this->assertSame(array('devices.device_id'), ResolveGlues(array('devices'), 'device_id'));
+        $this->assertSame(array('sensors.device_id'), ResolveGlues(array('sensors'), 'device_id'));
+
+        // does not work right with current code
+//        $expected = array('bill_data.bill_id', 'bill_ports.port_id', 'ports.device_id');
+//        $this->assertSame($expected, ResolveGlues(array('bill_data'), 'device_id'));
+
+        $expected = array('application_metrics.app_id', "applications.device_id");
+        $this->assertSame($expected, ResolveGlues(array('application_metrics'), 'device_id'));
+
+
+        $expected = array('state_translations.state_index_id', 'sensors_to_state_indexes.sensor_id', 'sensors.device_id');
+        $this->assertSame($expected, ResolveGlues(array('state_translations'), 'device_id'));
+
+        $expected = array('ipv4_addresses.port_id', 'ports.device_id');
+        $this->assertSame($expected, ResolveGlues(array('ipv4_addresses'), 'device_id'));
+
+        if (getenv('DBTEST')) {
+            dbRollbackTransaction();
+        }
     }
 }

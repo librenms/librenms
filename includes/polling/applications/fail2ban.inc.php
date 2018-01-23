@@ -11,27 +11,28 @@ $options      = '-O qv';
 $oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.102.97.105.108.50.98.97.110';
 $f2b = snmp_walk($device, $oid, $options);
 $f2b = trim($f2b, '"');
-update_application($app, $f2b);
 
+$metrics = array();
 $bannedStuff = explode("\n", $f2b);
 
 $total_banned=$bannedStuff[0];
-$firewalled=$bannedStuff[1];
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
     ->addDataset('banned', 'GAUGE', 0)
     ->addDataset('firewalled', 'GAUGE', 0);
 
+
 $fields = array(
     'banned' =>$total_banned,
-    'firewalled' => $firewalled,
+    'firewalled'=>'U',
 );
+$metrics['total'] = $fields;
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
 
-$int=2;
+$int=1;
 $jails=array();
 
 while (isset($bannedStuff[$int])) {
@@ -44,12 +45,15 @@ while (isset($bannedStuff[$int])) {
         $rrd_def = RrdDefinition::make()->addDataset('banned', 'GAUGE', 0);
         $fields = array('banned' => $banned);
 
+        $metrics["jail_$jail"] = $fields;
         $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
         data_update($device, 'app', $tags, $fields);
     }
 
     $int++;
 }
+
+update_application($app, $f2b, $metrics);
 
 //
 // component processing for fail2ban

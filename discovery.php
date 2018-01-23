@@ -11,6 +11,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use LibreNMS\Util\FileLock;
+
 $init_modules = array('discovery');
 require __DIR__ . '/includes/init.php';
 
@@ -33,7 +35,7 @@ if (isset($options['h'])) {
         $where = ' ';
         $doing = 'all';
     } elseif ($options['h'] == 'new') {
-        $new_discovery_lock = \LibreNMS\FileLock::lockOrDie('new-discovery');
+        $new_discovery_lock = FileLock::lockOrDie('new-discovery');
         $where = 'AND `last_discovered` IS NULL';
         $doing = 'new';
     } elseif ($options['h']) {
@@ -63,7 +65,7 @@ if (isset($options['i']) && $options['i'] && isset($options['n'])) {
 }
 
 if (isset($options['d']) || isset($options['v'])) {
-    $versions = version_info(false);
+    $versions = version_info();
     echo <<<EOH
 ===================================
 Version info:
@@ -82,6 +84,7 @@ EOH;
         $vdebug = true;
     }
     $debug = true;
+    update_os_cache(true); // Force update of OS Cache
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
@@ -114,8 +117,6 @@ if (!$where) {
     exit;
 }
 
-update_os_cache(); // will only update if needed
-
 $discovered_devices = 0;
 
 if (!empty($config['distributed_poller_group'])) {
@@ -123,7 +124,7 @@ if (!empty($config['distributed_poller_group'])) {
 }
 
 global $device;
-foreach (dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
+foreach (dbFetch("SELECT * FROM `devices` WHERE disabled = 0 AND snmp_disable = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
     discover_device($device, $options);
 }
 

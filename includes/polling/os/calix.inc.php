@@ -14,10 +14,8 @@
 
 
 
-if (strstr($sysObjectId, '.6321.1.2.3')) { // E5-1xx Series
-
-    if (strpos($device['sysObjectID'], 'enterprises.6321.1.2.3.4') !== false) { // E5-121
-
+if (strstr($device['sysObjectID'], '.6321.1.2.3')) { // E5-1xx Series
+    if (strpos($device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3.4') !== false) { // E5-121
         $version = snmp_get($device, 'iesSlotModuleFWVersion.0.0', '-Oqv', '+E5-121-IESCOMMON-MIB', 'calix');
         $hardware = snmp_get($device, 'iesSlotModuleDescr.0.0', '-Ovqs', '+E5-121-IESCOMMON-MIB', 'calix');
         $serial   = snmp_get($device, 'iesChassisSerialNumber.0', '-OQv', '+E5-121-IESCOMMON-MIB', 'calix');
@@ -28,8 +26,7 @@ if (strstr($sysObjectId, '.6321.1.2.3')) { // E5-1xx Series
         $hardware = str_replace('"', '', $hardware);
     }
 
-    if (strpos($device['sysObjectID'], 'enterprises.6321.1.2.3.3') !== false) { // E5-120
-
+    if (strpos($device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3.3') !== false) { // E5-120
         $version = snmp_get($device, 'iesSlotModuleFWVersion.0.0', '-Oqv', '+E5-120-IESCOMMON-MIB', 'calix');
         $hardware = snmp_get($device, 'iesSlotModuleDescr.0.0', '-Ovqs', '+E5-120-IESCOMMON-MIB', 'calix');
         $serial   = snmp_get($device, 'iesChassisSerialNumber.0', '-OQv', '+E5-120-IESCOMMON-MIB', 'calix');
@@ -40,8 +37,7 @@ if (strstr($sysObjectId, '.6321.1.2.3')) { // E5-1xx Series
         $hardware = str_replace('"', '', $hardware);
     }
 
-    if (strpos($device['sysObjectID'], 'enterprises.6321.1.2.3.2') !== false) { // E5-111
-
+    if (strpos($device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3.2') !== false) { // E5-111
         $version = snmp_get($device, 'iesSlotModuleFWVersion.0.0', '-Oqv', '+E5-111-IESCOMMON-MIB', 'calix');
         $hardware = snmp_get($device, 'iesSlotModuleDescr.0.0', '-Ovqs', '+E5-111-IESCOMMON-MIB', 'calix');
         $serial   = snmp_get($device, 'iesChassisSerialNumber.0', '-OQv', '+E5-111-IESCOMMON-MIB', 'calix');
@@ -52,8 +48,7 @@ if (strstr($sysObjectId, '.6321.1.2.3')) { // E5-1xx Series
         $hardware = str_replace('"', '', $hardware);
     }
 
-    if (strpos($device['sysObjectID'], 'enterprises.6321.1.2.3.1') !== false) { // E5-110
-
+    if (strpos($device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3.1') !== false) { // E5-110
         $version = snmp_get($device, 'iesSlotModuleFWVersion.0.0', '-Oqv', '+E5-110-IESCOMMON-MIB', 'calix');
         $hardware = snmp_get($device, 'iesSlotModuleDescr.0.0', '-Ovqs', '+E5-110-IESCOMMON-MIB', 'calix');
         $serial   = snmp_get($device, 'iesChassisSerialNumber.0', '-OQv', '+E5-110-IESCOMMON-MIB', 'calix');
@@ -67,6 +62,6 @@ if (strstr($sysObjectId, '.6321.1.2.3')) { // E5-1xx Series
 
 // Device might not have a card 1 (or even card2 if it is an E7-20)
 $version = strtok(snmp_walk($device, "e7CardSoftwareVersion.1", "-OQv", "E7-Calix-MIB"), PHP_EOL);
-$hardware = "Calix " . $poll_device['sysDescr'];
+$hardware = "Calix " . $device['sysDescr'];
 $features = str_replace(PHP_EOL, ', ', snmp_walk($device, "e7CardProvType", "-OQv", "E7-Calix-MIB"));
 $serial = str_replace(PHP_EOL, ', ', snmp_walk($device, "e7CardSerialNumber", "-OQv", "E7-Calix-MIB"));

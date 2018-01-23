@@ -1,12 +1,12 @@
 source: Alerting/Templates.md
 
-# <a name="templates">Templates</a>
+# Templates
 
-Templates can be assigned to a single or a group of rules and can contain any kind of text.
+Templates can be assigned to a single or a group of rules and can contain any kind of text. There is also a default template which is used for any rule that isn't associated with a template. This template can be found under `Alert Templates` page and can be edited. It also has an option revert it back to its default content. 
 
 The template-parser understands `if` and `foreach` controls and replaces certain placeholders with information gathered about the alert.
 
-## <a name="templates-syntax">Syntax</a>
+## Syntax
 
 Controls:
 
@@ -58,19 +58,7 @@ Limit: %value.sensor_limit_low / %value.sensor_limit
 
 The Default Template is a 'one-size-fit-all'. We highly recommend defining your own templates for your rules to include more specific information.
 
-## <a name="templates-testing">Testing</a>
-
-It's possible to test your new template before assigning it to a rule. To do so you can run `./scripts/test-template.php`. The script will provide the help 
-info when ran without any parameters.
-
-As an example, if you wanted to test template ID 10 against localhost running rule ID 2 then you would run:
-
-`./scripts/test-template.php -t 10 -d -h localhost -r 2`
-
-If the rule is currently alerting for localhost then you will get the full template as expected to see on email, if it's not then you will just see the 
-template without any fault information.
-
-## <a name="templates-examples">Examples</a>
+## Examples
 
 Default Template:
 ```text
@@ -84,6 +72,99 @@ Rule: {if %name}%name{else}%rule{/if}
 {foreach %faults}  #%key: %value.string{/foreach}{/if}
 Alert sent to: {foreach %contacts}%value <%key> {/foreach}
 ```
+Ports Utilization Template:
+```text
+%title
+Device Name: %sysName
+Severity: %severity
+{if %state == 0}Time elapsed: %elapsed{/if}
+Timestamp: %timestamp
+Rule: {if %name}%name{else}%rule{/if}
+{if %faults}
+{foreach %faults}
+Device: %value.sysname
+Physical Interface: %value.ifDescr
+Interface Description: %value.ifAlias
+Interface Speed in Bits: %value.ifSpeed
+Inbound Utilization: {calc (((%value.ifInOctets_rte8)/%value.ifSpeed)100)}%
+Outbound Utilization: {calc (((%value.ifOutOctets_rate8)/%value.ifSpeed)100)}%
+{/foreach}
+{/if}
+```
+
+Storage:
+```text
+
+%title
+
+Device Name: %sysName
+Severity: %severity 
+Uptime: %uptime_short
+{if %state == 0}Time elapsed: %elapsed{/if}
+Timestamp: %timestamp
+Location: %location
+Description: %description
+Features: %features
+Purpose: %purpose
+Notes: %notes
+
+Server: %sysName {foreach %faults}Mount Point: %value.storage_descr Percent Utilized: %value.storage_perc{/foreach}
+```
+
+Temperature Sensors:
+```text
+
+%title
+
+Device Name: %sysName
+Severity: %severity 
+Timestamp: %timestamp
+Uptime: %uptime_short
+{if %state == 0}Time elapsed: %elapsed{/if}
+Location: %location
+Description: %description
+Features: %features
+Purpose: %purpose
+Notes: %notes
+
+Rule: {if %name}%name{else}%rule{/if}
+{if %faults}Faults:
+{foreach %faults}
+#%key: Temperature: %value.sensor_current°C
+** {calc(%value.sensor_current-%value.sensor_limit)}°C over limit
+Previous Measurement: %value.sensor_prev°C
+High Temperature Limit: %value.sensor_limit°C
+{/foreach}
+{/if}
+```
+
+Value Sensors:
+```text
+
+%title
+
+Device Name: %sysName
+Severity: %severity 
+Timestamp: %timestamp
+Uptime: %uptime_short
+{if %state == 0}Time elapsed: %elapsed{/if}
+Location: %location
+Description: %description
+Features: %features
+Purpose: %purpose
+Notes: %notes
+
+Rule: {if %name}%name{else}%rule{/if}
+{if %faults}Faults:
+{foreach %faults}
+#%key: Sensor%value.sensor_current
+** {calc(%value.sensor_current-%value.sensor_limit)}over limit
+Previous Measurement: %value.sensor_prev
+Limit: %value.sensor_limit
+{/foreach}
+{/if}
+```
+
 
 Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:
 ```text
@@ -95,12 +176,12 @@ Conditional formatting example, will display a link to the host in email or just
 
 Note the use of double-quotes.  Single quotes (`'`) in templates will be escaped (replaced with `\'`) in the output and should therefore be avoided.
 
-## <a name="templates-included">Included</a>
+## Included
 
 We include a few templates for you to use, these are specific to the type of alert rules you are creating. For example if you create a rule that would alert on BGP sessions then you can 
 assign the BGP template to this rule to provide more information.
 
-The included templates are:
+The included templates apart from the default template are:
 
   - BGP Sessions
   - Ports

@@ -3,6 +3,7 @@ namespace GuzzleHttp\Tests\Psr7;
 
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\CachingStream;
+use GuzzleHttp\Psr7\Stream;
 
 /**
  * @covers GuzzleHttp\Psr7\CachingStream
@@ -10,16 +11,17 @@ use GuzzleHttp\Psr7\CachingStream;
 class CachingStreamTest extends \PHPUnit_Framework_TestCase
 {
     /** @var CachingStream */
-    protected $body;
-    protected $decorated;
+    private $body;
+    /** @var Stream */
+    private $decorated;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->decorated = Psr7\stream_for('testing');
         $this->body = new CachingStream($this->decorated);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         $this->decorated->close();
         $this->body->close();
@@ -32,22 +34,43 @@ class CachingStreamTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(4, $caching->getSize());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Cannot seek to byte 10
-     */
-    public function testCannotSeekPastWhatHasBeenRead()
+    public function testReadsUntilCachedToByte()
     {
-        $this->body->seek(10);
+        $this->body->seek(5);
+        $this->assertEquals('n', $this->body->read(1));
+        $this->body->seek(0);
+        $this->assertEquals('t', $this->body->read(1));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage CachingStream::seek() supports SEEK_SET and SEEK_CUR
-     */
-    public function testCannotUseSeekEnd()
+    public function testCanSeekNearEndWithSeekEnd()
     {
-        $this->body->seek(2, SEEK_END);
+        $baseStream = Psr7\stream_for(implode('', range('a', 'z')));
+        $cached = new CachingStream($baseStream);
+        $cached->seek(-1, SEEK_END);
+        $this->assertEquals(25, $baseStream->tell());
+        $this->assertEquals('z', $cached->read(1));
+        $this->assertEquals(26, $cached->getSize());
+    }
+
+    public function testCanSeekToEndWithSeekEnd()
+    {
+        $baseStream = Psr7\stream_for(implode('', range('a', 'z')));
+        $cached = new CachingStream($baseStream);
+        $cached->seek(0, SEEK_END);
+        $this->assertEquals(26, $baseStream->tell());
+        $this->assertEquals('', $cached->read(1));
+        $this->assertEquals(26, $cached->getSize());
+    }
+
+    public function testCanUseSeekEndWithUnknownSize()
+    {
+        $baseStream = Psr7\stream_for('testing');
+        $decorated = Psr7\FnStream::decorate($baseStream, [
+            'getSize' => function () { return null; }
+        ]);
+        $cached = new CachingStream($decorated);
+        $cached->seek(-1, SEEK_END);
+        $this->assertEquals('g', $cached->read(1));
     }
 
     public function testRewindUsesSeek()
@@ -75,6 +98,33 @@ class CachingStreamTest extends \PHPUnit_Framework_TestCase
         $this->body->seek(2, SEEK_CUR);
         $this->assertEquals(4, $this->body->tell());
         $this->assertEquals('ing', $this->body->read(3));
+    }
+
+    public function testCanSeekToReadBytesWithPartialBodyReturned()
+    {
+        $stream = fopen('php://temp', 'r+');
+        fwrite($stream, 'testing');
+        fseek($stream, 0);
+
+        $this->decorated = $this->getMockBuilder('\GuzzleHttp\Psr7\Stream')
+            ->setConstructorArgs([$stream])
+            ->setMethods(['read'])
+            ->getMock();
+
+        $this->decorated->expects($this->exactly(2))
+            ->method('read')
+            ->willReturnCallback(function($length) use ($stream){
+                return fread($stream, 2);
+            });
+
+        $this->body = new CachingStream($this->decorated);
+
+        $this->assertEquals(0, $this->body->tell());
+        $this->body->seek(4, SEEK_SET);
+        $this->assertEquals(4, $this->body->tell());
+
+        $this->body->seek(0);
+        $this->assertEquals('test', $this->body->read(4));
     }
 
     public function testWritesToBufferStream()
@@ -133,5 +183,13 @@ class CachingStreamTest extends \PHPUnit_Framework_TestCase
         $d = new CachingStream($a);
         $d->close();
         $this->assertFalse(is_resource($s));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testEnsuresValidWhence()
+    {
+        $this->body->seek(10, -123456);
     }
 }

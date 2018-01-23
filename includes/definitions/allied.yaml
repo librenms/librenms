@@ -1,10 +1,19 @@
 os: allied
-text: AlliedWare
+text: 'Alliedware'
 type: network
+icon: alliedtelesis
+group: allied
 ifname: 1
 over:
     - { graph: device_bits, text: Traffic }
 discovery:
     -
-      sysObjectId: .1.3.6.1.4.1.207.
-      sysObjectId_except: .1.3.6.1.4.1.207.1.4.126
+      sysObjectID: .1.3.6.1.4.1.207.
+      sysObjectID_except: 
+       - .1.3.6.1.4.1.207.1.4.126 #exclude the following ATI 8000S/8000GS which identify as "radlan" OS.
+       - .1.3.6.1.4.1.207.1.4.127
+       - .1.3.6.1.4.1.207.1.4.144
+       - .1.3.6.1.4.1.207.1.4.145
+      sysDescr_except: 'AW+'
+mib_dir:
+    - allied

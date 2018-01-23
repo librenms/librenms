@@ -1,4 +1,5 @@
 <?php
+$pagetitle[] = 'Apps';
 
 $graphs['apache']    = array(
     'bits',
@@ -129,6 +130,8 @@ $graphs['fail2ban'] = array(
 
 $graphs['freeswitch'] = array(
     'peak',
+    'calls',
+    'channels',
     'callsIn',
     'callsOut',
 );
@@ -264,11 +267,49 @@ $graphs['sdfsinfo'] = array(
 );
 
 $graphs['pi-hole'] = array(
-    'stats',
-    'queries',
+    'query_types',
+    'destinations',
+    'query_results',
+    'block_percent',
+    'blocklist',
 );
 
-print_optionbar_start();
+$graphs['freeradius'] = array(
+    'access',
+    'auth',
+    'acct',
+    'proxy_access',
+    'proxy_auth',
+    'proxy_acct',
+    'queue',
+);
+
+$graphs['zfs'] = array(
+    'arc_misc',
+    'arc_size',
+    'arc_size_per',
+    'arc_size_breakdown',
+    'arc_efficiency',
+    'arc_cache_hits_by_list',
+    'arc_cache_hits_by_type',
+    'arc_cache_misses_by_type',
+    'arc_cache_hits',
+    'arc_cache_miss',
+);
+
+$graphs['powerdns-dnsdist'] = array(
+    'cache',
+    'downstream',
+    'dynamic_blocks',
+    'latency',
+    'queries_latency',
+    'queries_stats',
+    'rules_stats',
+    'queries_drop',
+);
+
+echo '<div class="panel panel-default">';
+echo '<div class="panel-heading">';
 
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
 
@@ -295,8 +336,8 @@ foreach ($app_list as $app) {
     $sep = ' | ';
 }
 
-print_optionbar_end();
-
+echo '</div>';
+echo '<div class="panel-body">';
 if ($vars['app']) {
     if (is_file('pages/apps/'.mres($vars['app']).'.inc.php')) {
         include 'pages/apps/'.mres($vars['app']).'.inc.php';
@@ -306,5 +347,4 @@ if ($vars['app']) {
 } else {
     include 'pages/apps/overview.inc.php';
 }
-
-$pagetitle[] = 'Apps';
+echo '</div>';

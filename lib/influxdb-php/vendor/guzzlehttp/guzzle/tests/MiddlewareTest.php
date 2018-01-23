@@ -69,9 +69,11 @@ class MiddlewareTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('rejected', $p->getState());
     }
 
-    public function testTracksHistory()
+    /**
+     * @dataProvider getHistoryUseCases
+     */
+    public function testTracksHistory($container)
     {
-        $container = [];
         $m = Middleware::history($container);
         $h = new MockHandler([new Response(200), new Response(201)]);
         $f = $m($h);
@@ -88,6 +90,14 @@ class MiddlewareTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('baz', $container[1]['options']['headers']['foo']);
     }
 
+    public function getHistoryUseCases()
+    {
+        return [
+            [[]],                // 1. Container is an array
+            [new \ArrayObject()] // 2. Container is an ArrayObject
+        ];
+    }
+
     public function testTracksHistoryForFailures()
     {
         $container = [];
@@ -98,7 +108,7 @@ class MiddlewareTest extends \PHPUnit_Framework_TestCase
         $f($request, [])->wait(false);
         $this->assertCount(1, $container);
         $this->assertEquals('GET', $container[0]['request']->getMethod());
-        $this->assertInstanceOf('GuzzleHttp\Exception\RequestException', $container[0]['error']);
+        $this->assertInstanceOf(RequestException::class, $container[0]['error']);
     }
 
     public function testTapsBeforeAndAfter()
@@ -127,7 +137,7 @@ class MiddlewareTest extends \PHPUnit_Framework_TestCase
         $comp = $b->resolve();
         $p = $comp(new Request('GET', 'http://foo.com'), []);
         $this->assertEquals('123', implode('', $calls));
-        $this->assertInstanceOf('GuzzleHttp\Promise\PromiseInterface', $p);
+        $this->assertInstanceOf(PromiseInterface::class, $p);
         $this->assertEquals(200, $p->wait()->getStatusCode());
     }
 
@@ -145,7 +155,7 @@ class MiddlewareTest extends \PHPUnit_Framework_TestCase
         }));
         $comp = $stack->resolve();
         $p = $comp(new Request('PUT', 'http://www.google.com'), []);
-        $this->assertInstanceOf('GuzzleHttp\Promise\FulfilledPromise', $p);
+        $this->assertInstanceOf(PromiseInterface::class, $p);
     }
 
     public function testMapsResponse()
@@ -193,13 +203,14 @@ class MiddlewareTest extends \PHPUnit_Framework_TestCase
         $h = new MockHandler([new Response(404)]);
         $stack = new HandlerStack($h);
         $logger = new Logger();
-        $formatter = new MessageFormatter('"{method} {target} HTTP/{version}\" {code} {error}');
+        $formatter = new MessageFormatter('{code} {error}');
         $stack->push(Middleware::log($logger, $formatter));
         $stack->push(Middleware::httpErrors());
         $comp = $stack->resolve();
         $p = $comp(new Request('PUT', 'http://www.google.com'), ['http_errors' => true]);
         $p->wait(false);
-        $this->assertContains('"PUT / HTTP/1.1\" 404 Client error: 404', $logger->output);
+        $this->assertContains('PUT http://www.google.com', $logger->output);
+        $this->assertContains('404 Not Found', $logger->output);
     }
 }
 

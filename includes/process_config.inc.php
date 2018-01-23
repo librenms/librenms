@@ -23,6 +23,8 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
+use LibreNMS\Config;
+
 if (empty($config['email_from'])) {
     $config['email_from'] = '"' . $config['project_name'] . '" <' . $config['email_user'] . '@' . php_uname('n') . '>';
 }
@@ -37,4 +39,23 @@ if (empty($config['rrdtool_version'])) {
 
 if ($config['secure_cookies']) {
     ini_set('session.cookie_secure', 1);
+}
+
+if ($config['rrdgraph_real_95th']) {
+    $config['rrdgraph_real_percentile'] = $config['rrdgraph_real_95th'];
+}
+
+if (isset($config['fping_options']['millisec']) && is_numeric($config['fping_options']['millisec'])) {
+    $config['fping_options']['interval'] = $config['fping_options']['millisec'];
+}
+
+if (!empty($config['discovery_modules']['cisco-vrf']) && $config['discovery_modules']['cisco-vrf'] === true) {
+    $config['discovery_modules']['vrf'] = 1;
+}
+
+// make sure we have full path to binaries in case PATH isn't set
+foreach (array('fping', 'fping6', 'snmpgetnext') as $bin) {
+    if (!is_executable(Config::get($bin))) {
+        Config::set($bin, locate_binary($bin), true, $bin, "Path to $bin", 'external', 'paths');
+    }
 }

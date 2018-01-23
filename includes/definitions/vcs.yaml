@@ -18,10 +18,10 @@ discovery_modules:
     cisco-mac-accounting: 1
     cisco-otv: 1
     cisco-pw: 1
-    cisco-vrf: 1
+    vrf: 1
     cisco-vrf-lite: 1
 mib_dir:
     - cisco
 discovery:
-    - sysObjectId:
+    - sysObjectID:
         - .1.3.6.1.4.1.5596.130.6.4.1

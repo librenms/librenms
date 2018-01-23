@@ -1,6 +1,6 @@
 <?php
 
-if (preg_match('/^Cisco IOS Software.*?, .+? Software(\, )?([\s\w\d]+)? \([^\-]+-([\w\d]+)-\w\), Version ([^,]+)/', $poll_device['sysDescr'], $regexp_result)) {
+if (preg_match('/^Cisco IOS Software.*?, .+? Software(\, )?([\s\w\d]+)? \([^\-]+-([\w\d]+)-\w\), Version ([^,]+)/', $device['sysDescr'], $regexp_result)) {
     $features = $regexp_result[3];
     $version  = $regexp_result[4];
     $hardware = $regexp_result[2];
@@ -10,7 +10,7 @@ if (preg_match('/^Cisco IOS Software.*?, .+? Software(\, )?([\s\w\d]+)? \([^\-]+
     }
 }
 
-echo "\n".$poll_device['sysDescr']."\n";
+echo "\n".$device['sysDescr']."\n";
 
 $oids = 'entPhysicalModelName.1 entPhysicalContainedIn.1 entPhysicalName.1 entPhysicalSoftwareRev.1 entPhysicalModelName.1001 entPhysicalContainedIn.1001 cardDescr.1 cardSlotNumber.1';
 
@@ -39,5 +39,4 @@ if (empty($hardware)) {
     $hardware = snmp_get($device, 'sysObjectID.0', '-Osqv', 'SNMPv2-MIB:CISCO-PRODUCTS-MIB');
 }
 
-// if(isset($cisco_hardware_oids[$poll_device['sysObjectID']])) { $hardware = $cisco_hardware_oids[$poll_device['sysObjectID']]; }
 $serial = get_main_serial($device);

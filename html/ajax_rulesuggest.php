@@ -63,7 +63,7 @@ header('Content-type: application/json');
 $obj     = array(array('name' => 'Error: No suggestions found.'));
 $term    = array();
 $current = false;
-if (isset($_GET['term'],$_GET['device_id'])) {
+if (isset($_GET['term'], $_GET['device_id'])) {
     $chk               = array();
     $_GET['term']      = mres($_GET['term']);
     $_GET['device_id'] = mres($_GET['device_id']);

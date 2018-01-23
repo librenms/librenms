@@ -4,7 +4,7 @@ DO NOT DELETE THIS INFORMATION.
 
 GitHub issues is for known/validated bugs, please do not post issues asking for help or how to do X, Y or Z. 
 
-You can use our irc channel ##librenms on freenode to ask questions or our [community site](https://community.librenms.org).
+You can use our [Discord server](https://t.libren.ms/discord) to ask questions or our [community site](https://community.librenms.org).
 
 If you have a feature request please post this on our [community site](https://community.librenms.org/c/feature-requests).
 

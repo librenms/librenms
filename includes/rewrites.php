@@ -166,22 +166,24 @@ function translate_ifAdminStatus($ifAdminStatus)
 function makeshortif($if)
 {
     $rewrite_shortif = array(
-        'tengigabitethernet' => 'Te',
-        'tengige'            => 'Te',
-        'gigabitethernet'    => 'Gi',
-        'fastethernet'       => 'Fa',
-        'ethernet'           => 'Et',
-        'serial'             => 'Se',
-        'pos'                => 'Pos',
-        'port-channel'       => 'Po',
-        'atm'                => 'Atm',
-        'null'               => 'Null',
-        'loopback'           => 'Lo',
-        'dialer'             => 'Di',
-        'vlan'               => 'Vlan',
-        'tunnel'             => 'Tunnel',
-        'serviceinstance'    => 'SI',
-        'dwdm'               => 'DWDM',
+        'tengigabitethernet'  => 'Te',
+        'ten-gigabitethernet' => 'Te',
+        'tengige'             => 'Te',
+        'gigabitethernet'     => 'Gi',
+        'fastethernet'        => 'Fa',
+        'ethernet'            => 'Et',
+        'serial'              => 'Se',
+        'pos'                 => 'Pos',
+        'port-channel'        => 'Po',
+        'atm'                 => 'Atm',
+        'null'                => 'Null',
+        'loopback'            => 'Lo',
+        'dialer'              => 'Di',
+        'vlan'                => 'Vlan',
+        'tunnel'              => 'Tunnel',
+        'serviceinstance'     => 'SI',
+        'dwdm'                => 'DWDM',
+        'bundle-ether'        => 'BE',
     );
 
     $if = fixifName($if);
@@ -1003,6 +1005,7 @@ function fixifName($inf)
         'hp procurve switch software loopback interface' => 'Loopback Interface',
         'control plane interface'                        => 'Control Plane',
         'loop'                                           => 'Loop',
+        'bundle-ether'                                   => 'Bundle-Ether',
     );
 
     $inf = strtolower($inf);
@@ -1415,4 +1418,109 @@ function apc_relay_state($state)
             return 2;
             break;
     }
+}
+
+/**
+ * @param $value
+ * @return mixed
+ */
+function return_number($value)
+{
+    preg_match('/[\d\.\-]+/', $value, $temp_response);
+    if (!empty($temp_response[0])) {
+        $value = $temp_response[0];
+    }
+    return $value;
+}
+
+function get_units_from_sensor($sensor)
+{
+    switch ($sensor['sensor_class']) {
+        case 'airflow':
+            return 'cfm';
+        case 'current':
+            return 'A';
+        case 'dbm':
+        case 'signal':
+            return 'dBm';
+        case 'fanspeed':
+            return 'rpm';
+        case 'frequency':
+            return 'Hz';
+        case 'charge':
+        case 'humidity':
+        case 'load':
+            return '%';
+        case 'cooling':
+        case 'power':
+            return 'W';
+        case 'pressure':
+            return 'kPa';
+        case 'runtime':
+            return 'Min';
+        case 'snr':
+            return 'SNR';
+        case 'state':
+            return '#';
+        case 'temperature':
+            return 'C';
+        case 'voltage':
+            return 'V';
+        default:
+            return '';
+    }
+}
+
+function parse_entity_state($state, $value)
+{
+    $data = array(
+        'entStateOper' => array(
+            1 => array('text' => 'unavailable', 'color' => 'default'),
+            2 => array('text' => 'disabled', 'color' => 'danger'),
+            3 => array('text' => 'enabled', 'color' => 'success'),
+            4 => array('text' => 'testing', 'color' => 'warning'),
+        ),
+        'entStateUsage' => array(
+            1 => array('text' => 'unavailable', 'color' => 'default'),
+            2 => array('text' => 'idle', 'color' => 'info'),
+            3 => array('text' => 'active', 'color' => 'success'),
+            4 => array('text' => 'busy', 'color' => 'success'),
+        ),
+        'entStateStandby' => array(
+            1 => array('text' => 'unavailable', 'color' => 'default'),
+            2 => array('text' => 'hotStandby', 'color' => 'info'),
+            3 => array('text' => 'coldStandby', 'color' => 'info'),
+            4 => array('text' => 'providingService', 'color' => 'success'),
+        ),
+        'entStateAdmin' => array(
+            1 => array('text' => 'unknown', 'color' => 'default'),
+            2 => array('text' => 'locked', 'color' => 'info'),
+            3 => array('text' => 'shuttingDown', 'color' => 'warning'),
+            4 => array('text' => 'unlocked', 'color' => 'success'),
+        ),
+    );
+
+    if (isset($data[$state][$value])) {
+        return $data[$state][$value];
+    }
+
+    return array('text'=>'na', 'color'=>'default');
+}
+
+function parse_entity_state_alarm($bits)
+{
+    // not sure if this is correct
+    $data = array(
+        0 => array('text' => 'unavailable', 'color' => 'default'),
+        1 => array('text' => 'underRepair', 'color' => 'warning'),
+        2 => array('text' => 'critical', 'color' => 'danger'),
+        3 => array('text' => 'major', 'color' => 'danger'),
+        4 => array('text' => 'minor', 'color' => 'info'),
+        5 => array('text' => 'warning', 'color' => 'warning'),
+        6 => array('text' => 'indeterminate', 'color' => 'default'),
+    );
+
+    $alarms = str_split(base_convert($bits, 16, 2));
+    $active_alarms = array_filter($alarms);
+    return array_intersect_key($data, $active_alarms);
 }

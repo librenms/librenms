@@ -46,14 +46,14 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT D.device_id,D.hostname AS `hostname`, D.last_polled AS `last_polled`, `group_name`, D.last_polled_timetaken AS `last_polled_timetaken` $sql";
+$sql = "SELECT D.device_id, D.hostname AS `hostname`, D.sysName, D.last_polled AS `last_polled`, `group_name`, D.last_polled_timetaken AS `last_polled_timetaken` $sql";
 
-foreach (dbFetchRows($sql, array(), true) as $device) {
+foreach (dbFetchRows($sql, array()) as $device) {
     if (empty($device['group_name'])) {
         $device['group_name'] = 'General';
     }
     $response[] = array(
-        'hostname'              => "<a class='list-device' href='".generate_device_url($device, array('tab' => 'graphs', 'group' => 'poller'))."'>".$device['hostname'].'</a>',
+        'hostname'              => "<a class='list-device' href='".generate_device_url($device, array('tab' => 'graphs', 'group' => 'poller'))."'>".format_hostname($device).'</a>',
         'last_polled'           => $device['last_polled'],
         'poller_group'          => $device['group_name'],
         'last_polled_timetaken' => $device['last_polled_timetaken'],

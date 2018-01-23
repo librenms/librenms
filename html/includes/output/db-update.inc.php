@@ -44,7 +44,7 @@ $cmd = $config['install_dir'] . '/build-base.php -l';
 
 foreach ($db_vars as $var => $opt) {
     if ($_SESSION[$var]) {
-        $cmd .= " -$opt {$_SESSION[$var]}";
+        $cmd .= " -$opt " . escapeshellarg($_SESSION[$var]);
     }
 }
 
@@ -61,7 +61,11 @@ if (($fp = popen($cmd . ' 2>&1', "r"))) {
     if (pclose($fp) === 0) {
         echo "Database is up to date!";
         $_SESSION['build-ok'] = true;
+    } else {
+        echo "Database schema update failed!";
     }
 }
 
+ob_end_flush();
+flush();
 session_write_close();

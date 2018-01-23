@@ -25,7 +25,11 @@ $index_to_base = array_flip($base_to_index);
 
 if ($device['os'] === 'junos') {
     require 'includes/discovery/vlans/junos.inc.php';
-} else {
+} elseif ($device['os'] === 'avaya-ers') {
+    require 'includes/discovery/vlans/avaya-ers.inc.php';
+}
+
+if (empty($device['vlans']) === true) {
     require 'includes/discovery/vlans/q-bridge-mib.inc.php';
     require 'includes/discovery/vlans/cisco-vtp.inc.php';
 }

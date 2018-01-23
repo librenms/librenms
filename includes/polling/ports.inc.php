@@ -176,7 +176,7 @@ $data       = array();
 if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=') && version_compare($device['version'], '11.7', '<'))) {
     require_once 'ports/f5.inc.php';
 } else {
-    if ($config['polling']['selected_ports'] === true || $device['attribs']['selected_ports'] == 'true') {
+    if ($config['polling']['selected_ports'] === true || $config['os'][$device['os']]['polling']['selected_ports'] === true || $device['attribs']['selected_ports'] == 'true') {
         echo('Select ports polling');
         $lports = dbFetchRows("SELECT * FROM `ports` where `device_id` = ? AND `deleted` = 0 AND `disabled` = 0", array($device['device_id']));
         foreach ($lports as $lport) {
@@ -190,7 +190,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
                     echo 'port is still down';
                 } else {
                     echo 'valid';
-                    if (is_numeric($data[$i]['ifHighSpeed'])) {
+                    if (is_numeric($data[$i]['ifHighSpeed']) && $data[$i]['ifHighSpeed'] > 0) {
                         $full_oids = array_merge($hc_oids, $shared_oids);
                     } else {
                         $full_oids = array_merge($nonhc_oids, $shared_oids);
@@ -228,6 +228,10 @@ if ($device['os'] != 'asa') {
         $port_stats = snmpwalk_cache_oid($device, 'dot3StatsIndex', $port_stats, 'EtherLike-MIB');
     }
     $port_stats = snmpwalk_cache_oid($device, 'dot3StatsDuplexStatus', $port_stats, 'EtherLike-MIB');
+}
+
+if ($device['os'] == 'procera') {
+    require_once 'ports/procera.inc.php';
 }
 
 if ($config['enable_ports_adsl']) {
@@ -435,6 +439,10 @@ foreach ($ports as $port) {
         $port['update'] = array();
         $port['update_extended'] = array();
         $port['state']  = array();
+
+        if ($port_association_mode != "ifIndex") {
+            $port['update']['ifIndex'] = $ifIndex;
+        }
 
         if ($config['slow_statistics'] == true) {
             $port['update']['poll_time']   = $polled;
