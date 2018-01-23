@@ -1,6 +1,6 @@
 # MIBUploader
 
-LibreNMS plugin to work with SNMPTT.
+LibreNMS plugin working with SNMPTT.
 
 ## Description
 
@@ -10,24 +10,24 @@ LibreNMS plugin to work with SNMPTT.
 
 ## Setup
 
-Les lignes de configuration nécessaires sont disponibles dans les fichiers de conf respectifs, embarqués dans le dossier `src/etc/`. Veuillez observer ces fichiers pour pouvoir configurer correctement l’installation.
+Mandatory configuration lines are available into specific configuration files, taht you can found into `src/etc/` directory. Please see these files to configure correctly this plugin.
 
- 1. LibreNMS installé. Actuellement compatible et testé avec `DB Schema #118`
- 1. Installer : `snmptrapd` et `snmptt`, voir selon distribution pour les paquets
- 1. Configurer `snmptrapd.conf`, `snmptt.ini` et `snmp.conf`. Voir les fichiers embarqués pour les lignes de conf à vérifier/ajouter
- 1. Démarrer et activer le démon `snmptt`. Vérifier qu’il est correctement lancé et corriger tout problème de lancement avant de poursuivre
- 1. Démarrer et activer le démon `snmptrapd`
- 1. Copier les fichiers du dossier `librenms` dans le dossier d’installation de LibreNMS, en respectant l’arborescence.
- 1. Ajouter au fichier `config.php` les instructions de conf. Voir `src/librenms/config.php`
- 1. Activer le plugin via `Plugin Admin`
- 1. Se rendre au moins sur la page d’index du plugin pour initialiser la base de donnée. En effet, cette étape n’est pas réalisée lors de la réception d’une trap, pour des raisons de performance.
- 1. Peupler le fichier `ssh/config` du dossier `mibuploader` et configurer les commandes SSH dans la configuration. La copie de clefs SSH est nécessaire.
+  1. LibreNMS installed. At the moment it is compatible and validated with `DB Schema #118`
+  2. Install : `snmptrapd` and `snmptt`, see your distribution for the good packages.
+  3. Configure `snmptrapd.conf`, `snmptt.ini` and `snmp.conf`. See embedded files for the configuration lines to check/add
+  4. Start and enable the `snmptt` daemon. Check that it is correctly launched and fix all startup problem before continuing
+  5. Start and enable the `snmptrapd` daemon
+  6. Copy files from `librenms` directory into the librenms setup directory, reespecting the current plugin tree.
+  7. Add required plugin configuraton lines into `config.php`. See `src/librenms/config.php`
+  8. Enable the plugin through `Plugin Admin`
+  9. Go to plugin index page to init the database. Actually this step is not made during a trap reception for performance optimization
+  10. Fill the `ssh/config` file from `mibuploader` directory and configure SSH commands into configuration. The SSH keys copy is mandatory.
 
-Au sujet de `snmp.conf` : s’il est impossible de modifier ce fichier, vous pouvez utiliser la variable d’environnement `MIBDIRS` avant de lancer tout script PHP/snmptt.
+Note from `snmp.conf` : it is not possible to modify thi file, you can use the environment variable `MIBDIRS` before all PHP/snmptt script launch.
 
-Selon la commande `snmptt_restart`, il faudra configurer sudo, comme c’est le cas ici, pour permettre l’exécution de la commande `systemctl restart snmptt` sans entrer de mot de passe. Voir le fichier `sudoers`.
+From the `snmptt_restart` command, you have to configure `sudo`, like in this sample, to allow `systemctl restart snmptt` command without password retrieving ( See the `sudoers` file ).
 
-Créer les répertoires et fichiers configurés pour le plugin, sur le `frontend` mais aussi sur les `pollers` :
+Creating directories and files configured for the plugin, on the `frontend` side but also on the `pollers` side :
 
 ```
 mkdir -p /opt/librenms/mibuploader/mibs/
@@ -36,143 +36,143 @@ touch /opt/librenms/mibuploader/snmptt.conf
 chown -R apache:librenms /opt/librenms/mibuploader
 ```
 
-Utiliser `snmptrap.mibup.php` pour la réception des traps. C’est une copie de `snmptrap.php`, mais avec la prise en charge de l’inclusion de `genericTrap.inc.php`.
+Using `snmptrap.mibup.php` to catch snmp traps. It's a copy of `snmptrap.php`, but with the include of  `genericTrap.inc.php`.
 
-S’il manque des MIBS, le processus de conversion ne va pas générer de configuration pour les traps dont la conversion sera impossible.
+If MIBS are missing, the convert process does not generate the traps configuration from these missing MIBS.
 
-Le plugin va vérifier l’existence des tables SQL nécessaire au fonctionnement du plugin, et les créer si besoin. Il n’y a rien à faire de ce côté.
+This plugin will check SQL tables existency which are required to plugin well behaviour, and create it if necessary. There is nothing to do for this part.
 
-## Setup multi-poller et poller distant
+## Setup multi-poller and remote poller
 
-Sur les LibreNMS `frontend` :
+On the LibreNMS `frontend` side :
 
- * Installer `net-snmp-utils` et `snmptt` pour obtenir `snmptranslate` et `snmpttconvertmib`.
- * Suivre l’installation, mais sans configurer `snmptt.ini` qui ne sera pas utilisé.
+ * Install `net-snmp-utils` and `snmptt` packages to get `snmptranslate` and `snmpttconvertmib` executable file.
+ * Follow the classic installation process, but without configuring `snmptt.ini` which will not be used.
 
-Sur les LibreNMS `poller` :
+On the LibreNMS `poller` side :
 
- * Suivre toute la procédure d’installation.
+ * Follow all classic install process.
 
-## Fonctionnement
+## Behaviour
 
- * `snmptrapd`, à la réception d’une TRAP, va faire appel à `snmptthandler`
- * `snmptthandler` transmet la TRAP au démon `snmptt`
- * `snmptt` traite la TRAP s’il le peut en fonction des fichiers de configuration. Voir le fichier `snmptt.conf` embarqué pour exemple
- * Si `snmptt` a trouvé l’OID de la trap dans la conf, il exécute `EXEC ...` si présent
- * Si la trap n’est pas prise en charge directement par les includes LibreNMS, `genericTrap.inc.php` est appelé et fait appel aux fonctions de `MIBUploader` pour enregistrer la trap
- * Pour pouvoir générer une alerte depuis une trap, il faut définir une règle qui va les utiliser
- * Une fois les règles (Rules LibreNMS) définies, il faut lancer le polling
- * On peut ensuite lancer `alerts.php`
+ * `snmptrapd`, will call `snmptthandler` after each received TRAP
+ * `snmptthandler` get these TRAP to the `snmptt` daemon
+ * `snmptt` compute the received TRAP if it is recognize from the configuration files. See the `snmptt.conf` sample
+ * If `snmptt` found the OID of the TRAP inside the configuration,  `EXEC ...` bloc is executed if present
+ * If the received TRAP is not catched from the core LibreNMS includes, `genericTrap.inc.php` will be called and will execute each functions from `MIBUploader` to register the TRAP
+ * To generate an alert from a TRAP, you have to define a rule that will use this TRAP
+ * One rules à defined ( LibreNMS Rules), you have to call the polling
+ * You can now launch  `alerts.php`
 
-Il y a une petite latence entre le moment d’envoi de la trap et le traitement par snmptt, de l’ordre de la seconde. Ce fonctionnement reste plus performant que de lancer snmptt pour chaque trap.
+There is a small latency ( ~ 1 second ) between the TRAP sent event and the `snmptt` computing process. his behaviour remains more efficient than running `snmptt` for each received TRAP.
 
-## Lien trap -> device LibreNMS
+## Link between TRAP and LibreNMS device
 
-Le lien entre une trap SNMP et un device LibreNMS se fait sur le champs `hostname`, ou `sysName`  de la table `devices`, ou bien encore via les adresses IPV4.
+The link between an SNMP TRAP and a LibreNMS device is made from the `hostname`, or `sysName` field from the `devices` table, or with the IPV4 adresses.
 
-Attention à la valeur qui est envoyée par l’agent snmp des équipements.
+Beware of the sent value from the devices SNMP agent.
 
-S’il faut changer ce comportement, éditer le fichier `snmptrap.mibup.php`.
+If you want to change this behaviour, you have to edit the  `snmptrap.mibup.php` file.
 
-## Utilisation
+## Usage
 
-Voici le menu de `MIBUploader` :
+Here is the `MIBUploader`  menu:
 
 ![mibup.menu](mibup.menu.png)
 
-### Upload de MIB
+### MIB Uploading
 
-Pour pouvoir générer la configuration SNMPTT, mais surtout versionner les MIBs, il est nécessaire des les uploader.
+To generate the SNMPTT configuration, but particularly for the MIBs versioning, it is required to upload these MIBs.
 
-L’upload de plusieurs fichiers d’un coup est supporté.
+The upload from many fies is supported.
 
 ![mibup.upload](mibup.upload.png)
 
- 1. Sélectionner les fichiers via le bouton « Select. fichiers »
- 1. Cliquer sur `Valider`
+  1. Select files from the `Select. fichiers` button
+  2. Clic on  `Valider`
 
-La case `Uptate mibs to the new uploaded version` vous permet de directement mettre à jour la version courante de la mib s’il s’agit de l’upload d’une nouvelle version d’une MIB. Cette case est cochée par défaut.
+The `Uptate mibs to the new uploaded version` checkbox, allow you to update the current MIB release if it is an updated release file from an existing uploaded MIB. This is the default behaviour ( checked by default in the form ).
 
-La détection d’une MIB se fait directement via le nom du fichier : si les fichiers sont différents, une nouvelle MIB sera créée. Faites bien attention à cela.
+Warning : A MIB detection is made from the MIB filename : if filenames are different, a new MIB will be created.
 
-### Gestion des versions
+### Releases management
 
-À chaque fois qu’une MIB est uploadée, si le nom du fichier de MIB est détecté comme étant déjà présent en base, une comparaison sur le contenu est fait (via checksum SHA2).
+Each time a MIB is uploaded, if the MIB filename is detected as already inside the database, a content file comparison is made ( from SHA2 checksum ).
 
-Si les contenus ne sont pas identiques – au caractère près – alors une nouvelle version est créée.
+If content is different – even if only one character differs – a new release will be created.
 
-Lorsqu’on va générer la configuration SNMPTT, la version courante est utilisée pour sélectionner le contenu de MIB à convertir.
+When ou will generate SNMPTT configuration, the current release is used to select the MIB content to convert.
 
-Si vous souhaitez utiliser une ancienne version de MIB, il vous faut passer par le `Version Manager` de MIBUploader.
+If you want to use an old release from the MIB, you have to use the `Version Manager` from MIBUploader.
 
-Note : il n’est pas possible que plusieurs personnes génèrent en même temps la configuration SNMPTT. Cela est fait via un champs en base de donnée. Voir le menu `Informations`.
+Note : it is not possible that several people generate the same SNMPTT configuration at the same time. This is done by a database field. See `Informations` menu.
 
 ![mibup.vm.list](mibup.vm.list.png)
 
- 1. Dans les menus déroulant des MIB, sélectionner la version désirée. Vous pouvez aussi supprimer une MIB via ce menu.
- 1. Cliquer sur `Valider` pour actualiser la version courante à utiliser.
+  1. Into the MIB select menu, you can select the desired release. You can also remove a MIB through this menu.
+  2. Clic on `Valider` to refresh the current release to use.
 
-Le bouton `Réinitialiser` va simplement remettre le formulaire à zéro sans rien mettre à jour.
+The `Réinitialiser` button will simply clean the form and not update anything.
 
-La case à cocher `Update all MIBS to the latest available version.` vous permet de directement choisir la version la plus récente de MIB pour toutes les MIBs enregistrées. Cela ignore la sélection actuelle.
+The `Update all MIBS to the latest available version` checkbox, allow you to choose the most recent release of the MIB from all registered MIBs. This ignore the current selection.
 
-Note : les boutons `Valider` et `Réinitialiser` sont présents en haut et en base de la page. C’est une facilité de navigation, le résultat sera le même.
+Note : the `Valider` and `Réinitialiser` buttons, are present in the top and the bottom of the page. It is more easy like this and result will be the same when you clic on theses.
 
 ![mibup.vm.update](mibup.vm.update.png)
 
-Voici le résultat une fois la mise à jour effectuée. Ici, c’était une MAJ de masse via la case à cocher.
+Here is the result of an update. it is a massive update from may MIBs, made with the checkbox.
 
-### Génération de configuration SNMPTT
+### SNMPTT configuration generation
 
-Une fois les MIBs téléchargées et/ou la version choisie, nous pouvons générer la configuration SNMPTT.
+One MIBs are downloaded and/or the good release chosen, you can generate SNMPTT configuration.
 
 ![mibup.snmptt.gen](mibup.snmptt.gen.png)
 
-Par défaut, si rien n’est sélectionné, *toutes les MIBs sont converties*.
+By default, if nothing is selected, *all MIBs are converted*.
 
-Si on ne sélectionne que certaines MIBs, *seulement les MIBs sélectionnées seront converties*. Cela entraîne la suppression de la configuration des autres MIBs.
+If you select only some MIBs, *only the selected MIBs will be converted*. This will remove the configuration from the other MIBs.
 
-La case à cocher `Only restart SNMPTT` vous permet de redémarrer le démon SNMPTT sans regénérer la configuration.
+The `Only restart SNMPTT` checkbox, allow you to restart the SNMPTT daemon without re-generating the configuration.
 
 ![mibup.snmptt.genres](mibup.snmptt.genres.png)
 
-Une fois le formulaire soumis, voici un résultat possible :
+Once the form is submitted, here is a possible result :
 
- * SNMPTT a été redémarré avec succès : `SNMPTT Restart Status: OK`. Vérifiez bien ce status avant tout, car sans SNMPTT, pas de réception de trap.
- * Trois MIBs converties, dont deux sans aucune trap : `0/0`
- * Une MIB convertie avec 126 traps, sur un total de 126 traps disponibles : `126/126`
- * Une MIB manifestement invalide
+ * SNMPTT was restarted with success : `SNMPTT Restart Status: OK`. Check well this status, because without  SNMPTT daemon, TRAP can't be received.
+ * Three MIBs are converted, but with only two with no TRAP : `0/0`
+ * A converted MIB with 126 TRAPS found from 126 available TRAPS : `126/126`
+ * A mostly invalid MIB
 
-Le status est directement donné par la sortie de la commande `snmpttconvertmib`.
+This status is given by the output of the `snmpttconvertmib` command.
 
-Si `snmpttconvertmib` n’a pas pu convertir la totalité des traps disponibles dans une MIB, le résultat sera affiché avec une croix rouge.
+If `snmpttconvertmib` has not converted all available TRAPS from a MIB, the result will display a red cross icon.
 
-### Traps reçues
+### Received Traps
 
-Une liste simple des traps reçues, avec la date de MAJ de la trap.
+A simple TRAP list from received ones, with the updated date of the TRAP.
 
-Ceci n’est pas un historique : si vous avez configuré une expiration des traps enregistrées via le plugin, elles ne seront plus affichées.
+This is not an history : if you avec configured an expiration date from the registered TRAPS through the plugin, they will not be displayed.
 
 ![mibup.trap.list](mibup.trap.list.png)
 
 ### Informations
 
-Le menu `Informatios` affiche des informations d’état du module :
+The `Informatios` menu, display the module state :
 
- * SNMPTT State : le module est-il en train de générer de la configuration ? `idle` : ne fait rien
- * MIB Count : nombre de MIB téléchargées
- * DB Schema : valeur interne permettant de connaître la version du schéma de BDD du plugin
+ * SNMPTT State : is the module generating configuration at the moment ? `idle` : does nothing
+ * MIB Count : number of downloaded MIB
+ * DB Schema : internal value used to know the database schema version from the plugin
 
-## Règles et Alertes
+## Rules and Alerts
 
-La création de règle (Rule) LibreNMS se fait via le circuit classique.
+The LibreNMS rule creation is made from the classical menu.
 
 ![librenms.mibup.rule](librenms.mibup.rule.png)
 
-Ici, la colonne `oid` est utilisée. Elle stock l’OID numérique de la trap.
+Here, `oid` column is used. Numeric `OID` of the TRAP is stored.
 
-Vous pouvez également exploiter la colonne `last_update` qui contient une `DATE` MySQL.
+You can also look at the `last_update` column which contant a MySQL`DATE`.
 
-Le lien avec un équipement se fait de façon standard LibreNMS, via la colonne `device_id`.
+The link between a device is made with the standard LibreNMS behaviour, with the `device_id` column.
 
-Enfin, pour récupérer une alerte, il faut que le processus de polling se lance.
+Finally, to retrieve an alert, polling process must be started.
