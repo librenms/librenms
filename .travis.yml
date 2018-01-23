@@ -37,7 +37,7 @@ install:
   - pip install --user mysql-python
 
 after_failure:
-  - cat /tmp/snmpsimd.log
+  - tail /tmp/snmpsimd.log
 
 script:
   - php scripts/pre-commit.php -l

@@ -484,6 +484,11 @@ function snmpwalk_cache_numerical_oid($device, $oid, $array, $mib = null, $mibdi
 function snmpwalk_cache_long_oid($device, $oid, $noid, $array, $mib = null, $mibdir = null, $snmpflags = '-OQnU')
 {
     $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
+
+    if (empty($data)) {
+        return $array;
+    }
+
     foreach (explode("\n", $data) as $entry) {
         list($tmp_oid,$value)  = explode('=', $entry, 2);
         $tmp_oid               = trim($tmp_oid);

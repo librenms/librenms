@@ -306,3 +306,20 @@ function check_service($command)
 
     return array ($status, $response, $metrics);
 }
+
+/**
+ * List all available services from nagios plugins directory
+ *
+ * @return array
+ */
+function list_available_services()
+{
+    global $config;
+    $services = array();
+    foreach (scandir($config['nagios_plugins']) as $file) {
+        if (substr($file, 0, 6) === 'check_') {
+            $services[] = substr($file, 6);
+        }
+    }
+    return $services;
+}

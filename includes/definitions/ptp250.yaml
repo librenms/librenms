@@ -5,6 +5,8 @@ icon: cambium
 mib_dir: cambium
 over:
     - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_wireless_ssr, text: 'Device SSR' }
+    - { graph: device_wireless_rate, text: 'Device Rate' }
 group: cambium
 discovery:
     - sysObjectID:

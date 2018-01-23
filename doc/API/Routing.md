@@ -92,6 +92,157 @@ Output:
 }
 ```
 
+### `list_cbgp`
+
+List the current BGP sessions counters.
+
+Route: `/api/v0/routing/bgp/cbgp`
+
+Input:
+
+  - hostname = Either the devices hostname or id
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/bgp/cbgp
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/bgp/cbgp?hostname=host.example.com
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "bgp_counters": [
+        {
+            "device_id": "9",
+            "bgpPeerIdentifier": "192.168.99.31",
+            "afi": "ipv4",
+            "safi": "multicast",
+            "AcceptedPrefixes": "2",
+            "DeniedPrefixes": "0",
+            "PrefixAdminLimit": "0",
+            "PrefixThreshold": "0",
+            "PrefixClearThreshold": "0",
+            "AdvertisedPrefixes": "11487",
+            "SuppressedPrefixes": "0",
+            "WithdrawnPrefixes": "10918",
+            "AcceptedPrefixes_delta": "-2",
+            "AcceptedPrefixes_prev": "2",
+            "DeniedPrefixes_delta": "0",
+            "DeniedPrefixes_prev": "0",
+            "AdvertisedPrefixes_delta": "-11487",
+            "AdvertisedPrefixes_prev": "11487",
+            "SuppressedPrefixes_delta": "0",
+            "SuppressedPrefixes_prev": "0",
+            "WithdrawnPrefixes_delta": "-10918",
+            "WithdrawnPrefixes_prev": "10918",
+            "context_name": ""
+        },
+        ...
+    ],
+    "count": 100
+}
+```
+
+### `list_ip_addresses`
+
+List all IPv4 and IPv6 addresses.
+
+Route: `/api/v0/resources/ip/addresses`
+
+Input:
+
+-
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/addresses
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "ip_addresses": [
+        {
+            "ipv4_address_id": "69",
+            "ipv4_address": "127.0.0.1",
+            "ipv4_prefixlen": "8",
+            "ipv4_network_id": "55",
+            "port_id": "135",
+            "context_name": ""
+        },
+        ...
+    ],
+    "count": 55
+}
+```
+### `get_network_ip_addresses`
+
+Get all IPv4 and IPv6 addresses for particular network.
+
+Route: `/api/v0/resources/ip/networks/:id/ip`
+
+  - id must be integer
+
+Input:
+
+-
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/networks/55/ip
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "addresses": [
+        {
+            "ipv4_address_id": "69",
+            "ipv4_address": "127.0.0.1",
+            "ipv4_prefixlen": "8",
+            "ipv4_network_id": "55",
+            "port_id": "135",
+            "context_name": ""
+        }
+    ],
+    "count": 1
+}
+```
+
+### `list_ip_networks`
+
+List all IPv4 and IPv6 networks.
+
+Route: `/api/v0/resources/ip/networks`
+
+Input:
+
+-
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/networks
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "ip_networks": [
+        {
+            "ipv4_network_id": "1",
+            "ipv4_network": "127.0.0.0/8",
+            "context_name": ""
+        },
+        ...
+    ],
+    "count": 100
+}
+```
+
 ### `list_ipsec`
 
 List the current IPSec tunnels which are active.
@@ -166,6 +317,77 @@ Output:
             "ospfNbmaNbrPermanence": "dynamic",
             "ospfNbrHelloSuppressed": "false",
             "context_name": ""
+        }
+    ],
+    "count": 1
+}
+```
+
+### `list_vrf`
+
+List the current VRFs.
+
+Route: `/api/v0/routing/vrf`
+
+Input:
+
+  - hostname = Either the devices hostname or id
+**OR**
+  - vrfname = The VRF name you would like to filter by
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf?hostname=host.example.com
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf?vrfname=Mgmt-vrf
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "vrfs": [
+        {
+            "vrf_id": "2",
+            "vrf_oid": "8.77.103.109.116.45.118.114.102",
+            "vrf_name": "Mgmt-vrf",
+            "mplsVpnVrfRouteDistinguisher": "",
+            "mplsVpnVrfDescription": "",
+            "device_id": "8"
+        },
+        ...
+    ],
+    "count": 100
+}
+```
+
+### `get_vrf`
+
+Retrieves VRF by ID
+
+Route: `/api/v0/routing/vrf/:id`
+
+Input:
+
+-
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf/2
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "vrf": [
+        {
+            "vrf_id": "2",
+            "vrf_oid": "8.77.103.109.116.45.118.114.102",
+            "vrf_name": "Mgmt-vrf",
+            "mplsVpnVrfRouteDistinguisher": "",
+            "mplsVpnVrfDescription": "",
+            "device_id": "8"
         }
     ],
     "count": 1

@@ -1,0 +1,12 @@
+mib: EQUIPMENT-MIB
+
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: swTemperatureTable
+                    value: swTemperatureCurrent
+                    num_oid: .1.3.6.1.4.1.171.12.11.1.8.1.2.
+                    descr: 'Current Sys Temp {{ $index }}'
+                    index: 'swTemperatureCurrent.{{ $index }}'
