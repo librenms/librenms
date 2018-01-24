@@ -1,6 +1,6 @@
 # MIBUploader
 
-LibreNMS plugin working with SNMPTT.
+MIBUploader is a plugin which adds SNMP Trap functionality into LibreNMS through SNMPTT
 
 ## Description
 
@@ -12,16 +12,16 @@ LibreNMS plugin working with SNMPTT.
 
 Mandatory configuration lines are available into specific configuration files, taht you can found into `src/etc/` directory. Please see these files to configure correctly this plugin.
 
-  1. LibreNMS installed. At the moment it is compatible and validated with `DB Schema #118`
-  2. Install : `snmptrapd` and `snmptt`, see your distribution for the good packages.
-  3. Configure `snmptrapd.conf`, `snmptt.ini` and `snmp.conf`. See embedded files for the configuration lines to check/add
-  4. Start and enable the `snmptt` daemon. Check that it is correctly launched and fix all startup problem before continuing
-  5. Start and enable the `snmptrapd` daemon
-  6. Copy files from `librenms` directory into the librenms setup directory, reespecting the current plugin tree.
-  7. Add required plugin configuraton lines into `config.php`. See `src/librenms/config.php`
-  8. Enable the plugin through `Plugin Admin`
-  9. Go to plugin index page to init the database. Actually this step is not made during a trap reception for performance optimization
-  10. Fill the `ssh/config` file from `mibuploader` directory and configure SSH commands into configuration. The SSH keys copy is mandatory.
+    1. LibreNMS installed. At the moment it is compatible and validated with `DB Schema #118`
+    2. Install : `snmptrapd` and `snmptt`, see your distribution for the good packages.
+    3. Configure `snmptrapd.conf`, `snmptt.ini` and `snmp.conf`. See embedded files for the configuration lines to check/add
+    4. Start and enable the `snmptt` daemon. Check that it is correctly launched and fix all startup problem before continuing
+    5. Start and enable the `snmptrapd` daemon
+    6. Copy files from `librenms` directory into the librenms setup directory, reespecting the current plugin tree.
+    7. Add required plugin configuraton lines into `config.php`. See `src/librenms/config.php`
+    8. Enable the plugin through `Plugin Admin`
+    9. Go to plugin index page to init the database. Actually this step is not made during a trap reception for performance optimization
+    10. Fill the `ssh/config` file from `mibuploader` directory and configure SSH commands into configuration. The SSH keys copy is mandatory.
 
 Note from `snmp.conf` : it is not possible to modify thi file, you can use the environment variable `MIBDIRS` before all PHP/snmptt script launch.
 
@@ -88,8 +88,8 @@ The upload from many fies is supported.
 
 ![mibup.upload](mibup.upload.png)
 
-  1. Select files from the `Select. fichiers` button
-  2. Clic on  `Valider`
+    1. Select files from the `Select. fichiers` button
+    2. Clic on  `Valider`
 
 The `Uptate mibs to the new uploaded version` checkbox, allow you to update the current MIB release if it is an updated release file from an existing uploaded MIB. This is the default behaviour ( checked by default in the form ).
 
@@ -109,8 +109,8 @@ Note : it is not possible that several people generate the same SNMPTT configura
 
 ![mibup.vm.list](mibup.vm.list.png)
 
-  1. Into the MIB select menu, you can select the desired release. You can also remove a MIB through this menu.
-  2. Clic on `Valider` to refresh the current release to use.
+    1. Into the MIB select menu, you can select the desired release. You can also remove a MIB through this menu.
+    2. Clic on `Valider` to refresh the current release to use.
 
 The `Réinitialiser` button will simply clean the form and not update anything.
 
