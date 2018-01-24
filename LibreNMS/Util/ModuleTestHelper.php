@@ -57,7 +57,6 @@ class ModuleTestHelper
      * @param array|string $modules
      * @param string $os
      * @param string $variant
-     * @throws FileNotFoundException
      */
     public function __construct($modules, $os, $variant = '')
     {
@@ -77,10 +76,6 @@ class ModuleTestHelper
         $this->snmprec_file = $this->snmprec_dir . $this->file_name . ".snmprec";
         $this->json_dir = "$install_dir/tests/data/";
         $this->json_file = $this->json_dir . $this->file_name . ".json";
-
-        if (!is_file($this->snmprec_file)) {
-            throw new FileNotFoundException("$this->snmprec_file does not exist!");
-        }
 
         // never store time series data
         Config::set('norrd', true);
@@ -466,9 +461,22 @@ class ModuleTestHelper
         }
     }
 
+    /**
+     * Run discovery and polling against snmpsim data and create a database dump
+     * Save the dumped data to tests/data/<os>.json
+     *
+     * @param Snmpsim $snmpsim
+     * @param bool $no_save
+     * @return array
+     * @throws FileNotFoundException
+     */
     public function generateTestData(Snmpsim $snmpsim, $no_save = false)
     {
         global $device, $debug, $vdebug;
+
+        if (!is_file($this->snmprec_file)) {
+            throw new FileNotFoundException("$this->snmprec_file does not exist!");
+        }
 
         // Remove existing device in case it didn't get removed previously
         if ($existing_device = device_by_name($snmpsim->getIp())) {
