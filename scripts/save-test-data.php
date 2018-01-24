@@ -1,9 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-use LibreNMS\Config;
-use LibreNMS\Exceptions\FileNotFoundException;
-use LibreNMS\Proc;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 
