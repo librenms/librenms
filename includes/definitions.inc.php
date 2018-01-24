@@ -278,6 +278,11 @@ $config['graph_types']['device']['screenos_sessions']['section']   = 'firewall';
 $config['graph_types']['device']['screenos_sessions']['order']     = '0';
 $config['graph_types']['device']['screenos_sessions']['descr']     = 'Active Sessions';
 
+//FortiOS Graphs
+$config['graph_types']['device']['fortios_lograte']['section']  = 'Analyzer';
+$config['graph_types']['device']['fortios_lograte']['order']    = '0';
+$config['graph_types']['device']['fortios_lograte']['descr']    = 'Log Rate';
+
 //PAN OS Graphs
 $config['graph_types']['device']['panos_sessions']['section']           = 'firewall';
 $config['graph_types']['device']['panos_sessions']['order']             = '0';
