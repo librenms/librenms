@@ -277,7 +277,7 @@
   "name": "Cisco NX-OS device has a bad fan"
   },
   {
-    "rule": "%devices.os = \"panos\" & %sensors.type = \"panSysHAState\" && %sensors.sensor_current = \"1\" && %sensors.sensor_prev = \"2\"",
+    "rule": "%devices.os = \"panos\" & %sensors.sensor_type = \"panSysHAState\" && %sensors.sensor_current = \"1\" && %sensors.sensor_prev = \"2\"",
     "name": "Palo Alto Networks passive firewall changed to active"
   },
   {
