@@ -43,6 +43,13 @@ class ModuleTestHelper
     private $discovery_output;
     private $poller_output;
 
+    // Definitions
+    // ignore these when dumping all modules
+    private $exclude_from_all = ['arp-table'];
+    private $module_deps = [
+        'arp-table' => ['ports', 'arp-table'],
+    ];
+
 
     /**
      * ModuleTester constructor.
@@ -264,10 +271,6 @@ class ModuleTestHelper
      */
     private function resolveModuleDependencies($modules)
     {
-        $module_deps = array(
-            'arp-table' => array('ports', 'arp-table'),
-        );
-
         // generate a full list of modules
         $full_list = array();
         foreach ($modules as $module) {
@@ -276,8 +279,8 @@ class ModuleTestHelper
                 continue;
             }
 
-            if (isset($module_deps[$module])) {
-                $full_list = array_merge($full_list, $module_deps[$module]);
+            if (isset($this->module_deps[$module])) {
+                $full_list = array_merge($full_list, $this->module_deps[$module]);
             } else {
                 $full_list[] = $module;
             }
@@ -564,8 +567,16 @@ class ModuleTestHelper
     public function dumpDb($device_id, $key = null)
     {
         $data = array();
+        $module_dump_info = $this->getTableData();
 
-        foreach ($this->getTableData() as $module => $module_tables) {
+        // don't dump some modules by default unless they are manually listed
+        if (empty($this->modules)) {
+            foreach ($this->exclude_from_all as $module) {
+                unset($module_dump_info[$module]);
+            }
+        }
+
+        foreach ($module_dump_info as $module => $module_tables) {
             foreach ($module_tables as $table => $info) {
                 // check for custom where
                 $where = isset($info['custom_where']) ? $info['custom_where'] : "WHERE `device_id`=?";
