@@ -10,15 +10,17 @@ $serial = snmp_getnext($device, "rscBoardSerialNumber", "-OQv", "AT-RESOURCE-MIB
 
 // SBx8100 platform has line cards show up first in "rscBoardName" above.
 //Instead use sysObjectID.0
+$data = snmp_get_multi_oid($device, 'rscBoardName.5.6 rscBoardName.6.6 rscBoardSerialNumber.5.6 rscBoardSerialNumber.6.6', '-OQs', 'AT-RESOURCE-MIB');
+
 if (strpos($hardware, 'SBx81') !== false) {
     $hardware = snmp_get($device, "sysObjectID.0", "-OQvs", "SNMPv2-MIB:AT-PRODUCT-MIB");
     $hardware = str_replace('at', 'AT-', $hardware);
 // Features and Serial is set to Controller card  1.5
-    $features = snmp_get($device, "rscBoardName.5.6", "-OQv", "AT-RESOURCE-MIB");
-    $serial = snmp_get($device, "rscBoardSerialNumber.5.6", "-OQv", "AT-RESOURCE-MIB");
+    $features = $data['rscBoardName.5.6'];
+    $serial = $data['rscBoardSerialNumber.5.6'];
 // If bay 1.5 is empty, set to Controller card 1.6
     if (!$features && !$serial) {
-        $features = snmp_get($device, "rscBoardName.6.6", "-OQv", "AT-RESOURCE-MIB");
-        $serial = snmp_get($device, "rscBoardSerialNumber.6.6", "-OQv", "AT-RESOURCE-MIB");
+        $features = $data['rscBoardName.6.6'];
+        $serial = $data['rscBoardSerialNumber.6.6'];
     }
 }
