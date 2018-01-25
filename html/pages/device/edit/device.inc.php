@@ -78,6 +78,24 @@ if ($_POST['editing']) {
                 print_error('Only administrative users may update the device hostname');
             }
         }
+        if (isset($_POST['sysName']) && $_POST['sysName'] !== '' && $_POST['sysName'] !== $device['sysName']) {
+            if (is_admin()) {
+                $result = dbUpdate(array('sysName' => $_POST['sysName']), 'devices', '`device_id` = ?', array($device['device_id']));
+                if ($result !== false) {
+                    print_message("sysName updated from {$device['sysName']} to {$_POST['sysName']}");
+                    echo '
+                        <script>
+                            var loc = window.location;
+                            window.location.replace(loc.protocol + "//" + loc.host + loc.pathname + loc.search);
+                        </script>
+                    ';
+                } else {
+                    print_error("Failed to update sysName");
+                }
+            } else {
+                print_error('Only administrative users may update the device hostname');
+            }
+        }
     } else {
         include 'includes/error-no-perm.inc.php';
     }
@@ -124,7 +142,16 @@ if ($updated && $update_message) {
             <button name="hostname-edit-button" id="hostname-edit-button" class="btn btn-danger"> <i class="fa fa-pencil"></i> </button>
         </div>
     </div>
-     <div class="form-group">
+    <div class="form-group">
+        <label for="edit-sysName-input" class="col-sm-2 control-label">sysName: </label>
+        <div class="col-sm-6">
+          <input id="edit-sysName-input" name="sysName" class="form-control" value="<?php echo(display($device['sysName'])); ?>" disabled />
+        </div>
+        <div class="col-sm-2">
+            <button name="sysName-edit-button" id="sysName-edit-button" class="btn btn-danger"> <i class="fa fa-pencil"></i> </button>
+        </div>
+    </div>
+    <div class="form-group">
         <label for="descr" class="col-sm-2 control-label">Description:</label>
         <div class="col-sm-6">
             <textarea id="descr" name="descr" class="form-control"><?php echo(display($device['purpose'])); ?></textarea>
@@ -257,6 +284,15 @@ if ($updated && $update_message) {
             document.getElementById('edit-hostname-input').disabled = false;
         } else {
             document.getElementById('edit-hostname-input').disabled = true;
+        }
+    });
+    $('#sysName-edit-button').click(function(e) {
+        e.preventDefault();
+        disabled_state = document.getElementById('edit-sysName-input').disabled;
+        if (disabled_state == true) {
+            document.getElementById('edit-sysName-input').disabled = false;
+        } else {
+            document.getElementById('edit-sysName-input').disabled = true;
         }
     });
     $('#parent_id').select2({
