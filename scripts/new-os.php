@@ -44,7 +44,7 @@ sysObjectID: $full_sysObjectID
             $continue = get_user_input("We already detect this device as OS $os type, do you want to continue to add sensors? (Y/n)");
         }
 
-        if (!str_contains($continue, 'y', true)) {
+        if (!str_i_contains($continue, 'y')) {
             $descr = get_user_input('Enter the description for this OS, i.e Cisco IOS:');
             $icon = get_user_input('Enter the logo to use, this can be the name of an existing one (i.e: cisco) or the url to retrieve one:');
 

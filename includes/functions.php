@@ -1069,12 +1069,12 @@ function is_port_valid($port, $device)
     $ifAlias = $port['ifAlias'];
     $ifType  = $port['ifType'];
 
-    if (str_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if'), true)) {
+    if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if'))) {
         return true;
     }
 
     foreach (Config::getCombined($device['os'], 'bad_if') as $bi) {
-        if (str_contains($ifDescr, $bi, true)) {
+        if (str_i_contains($ifDescr, $bi)) {
             d_echo("ignored by ifDescr: $ifDescr (matched: $bi)\n");
             return false;
         }

@@ -34,14 +34,14 @@ class CommonFunctionsTest extends TestCase
         $this->assertTrue(str_contains($data, 'Just'));
         $this->assertFalse(str_contains($data, 'just'));
 
-        $this->assertTrue(str_contains($data, 'juSt', true));
-        $this->assertFalse(str_contains($data, 'nope', true));
+        $this->assertTrue(str_i_contains($data, 'juSt'));
+        $this->assertFalse(str_i_contains($data, 'nope'));
 
         $this->assertTrue(str_contains($data, array('not', 'this', 'This')));
         $this->assertFalse(str_contains($data, array('not', 'this')));
 
-        $this->assertTrue(str_contains($data, array('not', 'thIs'), true));
-        $this->assertFalse(str_contains($data, array('not', 'anything'), true));
+        $this->assertTrue(str_i_contains($data, array('not', 'thIs')));
+        $this->assertFalse(str_i_contains($data, array('not', 'anything')));
     }
 
     public function testStartsWith()
@@ -51,14 +51,8 @@ class CommonFunctionsTest extends TestCase
         $this->assertTrue(starts_with($data, 'This'));
         $this->assertFalse(starts_with($data, 'this'));
 
-        $this->assertTrue(starts_with($data, 'thIs', true));
-        $this->assertFalse(starts_with($data, 'test', true));
-
         $this->assertTrue(starts_with($data, array('this', 'Test', 'This')));
         $this->assertFalse(starts_with($data, array('this', 'Test')));
-
-        $this->assertTrue(starts_with($data, array('Test', 'no', 'thiS'), true));
-        $this->assertFalse(starts_with($data, array('just', 'Test'), true));
     }
 
     public function testEndsWith()
@@ -68,14 +62,8 @@ class CommonFunctionsTest extends TestCase
         $this->assertTrue(ends_with($data, 'Testing'));
         $this->assertFalse(ends_with($data, 'testing'));
 
-        $this->assertTrue(ends_with($data, 'testIng', true));
-        $this->assertFalse(ends_with($data, 'test', true));
-
         $this->assertTrue(ends_with($data, array('this', 'Testing', 'This')));
         $this->assertFalse(ends_with($data, array('this', 'Test')));
-
-        $this->assertTrue(ends_with($data, array('this', 'tesTing', 'no'), true));
-        $this->assertFalse(ends_with($data, array('this', 'Test'), true));
     }
 
     public function testRrdDescriptions()
