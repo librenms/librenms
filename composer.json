@@ -4,7 +4,7 @@
     "type": "project",
     "keywords": ["network", "monitoring", "discovery", "alerting", "billing", "snmp", "distributed"],
     "homepage": "http://www.librenms.org/",
-    "license": "GPL-3.0",
+    "license": "GPL-3.0-or-later",
     "support": {
         "source": "https://github.com/librenms/librenms/",
         "docs": "http://docs.librenms.org/",
