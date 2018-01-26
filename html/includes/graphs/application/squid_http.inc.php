@@ -14,7 +14,7 @@ $transparency  = 15;
 
 $rrd_filename = rrd_name($device['hostname'], array('app', $name, $app_id));
 
-if (is_file($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_list = array(
         array(
             'filename' => $rrd_filename,
