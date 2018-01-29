@@ -420,7 +420,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
     list($mib, $file) = explode(':', $mib_name_table, 2);
 
     if (is_null($rrd_name)) {
-        if (str_contains($mib_name_table, 'UBNT', true)) {
+        if (str_i_contains($mib_name_table, 'UBNT')) {
             $rrd_name = strtolower($mib);
         } else {
             $rrd_name = strtolower($file);
