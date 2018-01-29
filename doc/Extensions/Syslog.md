@@ -44,25 +44,25 @@ options {
         stats_freq(0);
         bad_hostname("^gconfd$");
 };
-
-
+ 
+ 
 source s_sys {
     system();
     internal();
-
+ 
 };
 
 source s_net {
         tcp(port(514) flags(syslog-protocol));
         udp(port(514) flags(syslog-protocol));
 };
-
+ 
 
 ########################
 # Destinations
 ########################
 destination d_librenms {
-        program("/opt/librenms/syslog.php" template ("$HOST||$FACILITY||$PRIORITY||$LEVEL||$TAG||$R_YEAR-$R_MONTH-$R_DAY$R_HOUR:$R_MIN:$R_SEC||$MSG||$PROGRAM\n") template-escape(yes));
+        program("/opt/librenms/syslog.php" template ("$HOST||$FACILITY||$PRIORITY||$LEVEL||$TAG||$R_YEAR-$R_MONTH-$R_DAY $R_HOUR:$R_MIN:$R_SEC||$MSG||$PROGRAM\n") template-escape(yes));
 };
 
 filter f_kernel     { facility(kern); };
