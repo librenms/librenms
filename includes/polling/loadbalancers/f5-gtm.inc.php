@@ -1,7 +1,8 @@
 <?php
 /*
- * LibreNMS module to display F5 LTM Details
+ * LibreNMS module to display F5 GTM Wide IP Details
  *
+ * Adapted from F5 LTM module by Darren Napper
  * Copyright (c) 2016 Aaron Daniels <aaron@daniels.id.au>
  *
  * This program is free software: you can redistribute it and/or modify it
@@ -31,7 +32,7 @@ $components = $component->getComponents($device['device_id'], $options);
 // We only care about our device id.
 $components = $components[$device['device_id']];
 
-// We extracted all the components for this device, now lets only get the LTM ones.
+// We extracted all the components for this device, now lets only get the GTM ones.
 $keep = array();
 $types = array('f5-gtm-wide', 'f5-gtm-pool');
 foreach ($components as $k => $v) {
@@ -55,8 +56,6 @@ if (count($components > 0)) {
     // and check the status
     $f5_stats['gtmWideIPStatEntryState'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.3.12.3.2.1.2', 0);
     $f5_stats['gtmWideIPStatEntryMsg'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.3.12.3.2.1.5', 0);
-
-    //d_echo($f5_stats);
 
     // Loop through the components and extract the data.
     foreach ($components as $key => &$array) {

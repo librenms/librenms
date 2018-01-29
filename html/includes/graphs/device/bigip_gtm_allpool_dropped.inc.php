@@ -1,7 +1,8 @@
 <?php
 /*
- * LibreNMS module to display F5 LTM Virtual Server Details
+ * LibreNMS module to display F5 GTM Wide IP Details
  *
+ * Adapted from F5 LTM module by Darren Napper
  * Copyright (c) 2016 Aaron Daniels <aaron@daniels.id.au>
  *
  * This program is free software: you can redistribute it and/or modify it
