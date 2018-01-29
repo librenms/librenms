@@ -65,7 +65,7 @@ if (count($components > 0)) {
         $hash = $array['hash'];
         $rrd_name = array($type, $label, $hash);
 
-        if ($type == 'f5-gtm-wide') {   
+        if ($type == 'f5-gtm-wide') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('requests', 'COUNTER', 0)
                 ->addDataset('resolved', 'COUNTER', 0)
@@ -81,7 +81,6 @@ if (count($components > 0)) {
             d_echo("\n\nComponent: ".$key."\n");
             d_echo("    Type: ".$type."\n");
             d_echo("    Label: ".$label."\n");
-
         } elseif ($type == 'f5-gtm-pool') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('resolved', 'COUNTER', 0)

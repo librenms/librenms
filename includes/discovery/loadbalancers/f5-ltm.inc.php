@@ -52,7 +52,7 @@ $ltmPoolMemberEntry = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.3.2.1'
 $ltmPoolMbrStatusEntry = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.6.2.1', 0);
 
 //Check if GTM modeul is running and run object discovery.
-if ((snmp_get($device, 'sysModuleAllocationProvisionLevel.3.103.116.109', '-Ovqs', 'F5-BIGIP-SYSTEM-MIB')) !=none){
+if ((snmp_get($device, 'sysModuleAllocationProvisionLevel.3.103.116.109', '-Ovqs', 'F5-BIGIP-SYSTEM-MIB')) !=none) {
     $gtmWideIPEntry = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.3.12.1.2.1', 0);
     $gtmWideStatusEntry = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.3.12.3.2.1', 0);
     $gtmPoolEntry = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.3.6.2.3.1.1', 0);
