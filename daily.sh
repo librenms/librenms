@@ -59,7 +59,7 @@ status_run() {
 
     printf "%-50s" "${arg_text}";
     echo "${arg_text}" >> ${log_file}
-    tmp=$(${arg_command} 2>&1);
+    tmp=$(bash -c "${arg_command}" 2>&1);
     exit_code=$?
     echo "${tmp}" >> ${log_file}
     echo "Returned: ${exit_code}" >> ${log_file}
@@ -185,14 +185,14 @@ main () {
             exit
         fi
 
-        status_run 'Checking PHP version' 'check_php_ver'
+        check_php_ver
         php_ver_ret=$?
 
         # make sure the vendor directory is clean
         git checkout vendor/ --quiet > /dev/null 2>&1
 
         update_res=0
-        if [[ "$up" == "1" ]] || [[ "$php_ver_ret" == "0" ]]; then
+        if [[ "$up" == "1" ]] || [[ "$php_ver_ret" == "1" ]]; then
             # Update current branch to latest
             old_ver=$(git rev-parse --short HEAD)
             status_run 'Updating to latest codebase' 'git pull --quiet' 'update'
