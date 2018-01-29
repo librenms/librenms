@@ -1,4 +1,5 @@
 <?php
 $hardware = $device['sysDescr'];
-$version = snmp_get($device, 'HILLSTONE-SYSTEM-MIB::sysSoftware.0', '-Ovq', 'HILLSTONE-SYSTEM-MIB');
-$serial = snmp_get($device, 'HILLSTONE-SYSTEM-MIB::sysSerialNumber.0', '-Ovq', 'HILLSTONE-SYSTEM-MIB');
+$osGet = snmp_get_multi_oid($device, 'sysSoftware.0 sysSerialNumber.0', '-OQUs', 'HILLSTONE-SYSTEM-MIB');
+$version = $osGet['sysSoftware.0'];
+$serial = $osGet['sysSerialNumber.0'];
