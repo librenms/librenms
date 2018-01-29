@@ -44,7 +44,7 @@ options {
         stats_freq(0);
         bad_hostname("^gconfd$");
 };
- 
+
  
 source s_sys {
     system();
