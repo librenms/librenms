@@ -19,33 +19,9 @@ modules:
                     index: 'hillstonePowerIndex.{{ $index }}'
                     state_name: hillstonePowerState
                     states:
-                        -
-                            descr: fine
-                            graph: 0
-                            value: 0
-                            generic: 0
-                        -
-                            descr: absent
-                            graph: 0
-                            value: 1
-                            generic: 1
-                        -
-                            descr: warning
-                            graph: 0
-                            value: 2
-                            generic: 1
-                        -
-                            descr: fail
-                            graph: 0
-                            value: 3
-                            generic: 2
-                        -
-                            descr: fail or nopower
-                            graph: 0
-                            value: 4
-                            generic: 2
-                        -
-                            descr: unsupport
-                            graph: 0
-                            value: 5
-                            generic: 3
+                        - { descr: fine, graph: 0, value: 0, generic: 0 }
+                        - { descr: absent, graph: 0, value: 1, generic: 1 }
+                        - { descr: warning, graph: 0, value: 2, generic: 1 }
+                        - { descr: fail, graph: 0, value: 3, generic: 2 }
+                        - { descr: fail or nopower, graph: 0, value: 4, generic: 2 }
+                        - { descr: unsupport, graph: 0, value: 5, generic: 3 }
