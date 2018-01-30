@@ -75,7 +75,7 @@ Alert sent to: {foreach %contacts}%value <%key> {/foreach}
 Ports Utilization Template:
 ```text
 %title
-Device Name: %sysName
+Device Name: %hostname
 Severity: %severity
 {if %state == 0}Time elapsed: %elapsed{/if}
 Timestamp: %timestamp
@@ -94,7 +94,7 @@ Storage:
 
 %title
 
-Device Name: %sysName
+Device Name: %hostname
 Severity: %severity 
 Uptime: %uptime_short
 {if %state == 0}Time elapsed: %elapsed{/if}
@@ -113,7 +113,7 @@ Temperature Sensors:
 
 %title
 
-Device Name: %sysName
+Device Name: %hostname
 Severity: %severity 
 Timestamp: %timestamp
 Uptime: %uptime_short
@@ -140,7 +140,7 @@ Value Sensors:
 
 %title
 
-Device Name: %sysName
+Device Name: %hostname
 Severity: %severity 
 Timestamp: %timestamp
 Uptime: %uptime_short
