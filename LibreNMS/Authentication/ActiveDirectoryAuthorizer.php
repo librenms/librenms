@@ -120,12 +120,6 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         return ($entries["count"] > 0);
     }
 
-    protected function userExistsInDb($username)
-    {
-        $return = dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username));
-        return $return;
-    }
-
     public function userExists($username, $throw_exception = false)
     {
         $this->bind(); // make sure we called bind
