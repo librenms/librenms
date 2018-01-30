@@ -80,16 +80,13 @@ Severity: %severity
 {if %state == 0}Time elapsed: %elapsed{/if}
 Timestamp: %timestamp
 Rule: {if %name}%name{else}%rule{/if}
-{if %faults}
 {foreach %faults}
-Device: %value.sysname
 Physical Interface: %value.ifDescr
 Interface Description: %value.ifAlias
-Interface Speed in Bits: %value.ifSpeed
-Inbound Utilization: {calc (((%value.ifInOctets_rte8)/%value.ifSpeed)100)}%
-Outbound Utilization: {calc (((%value.ifOutOctets_rate8)/%value.ifSpeed)100)}%
+Interface Speed: {calc (%value.ifSpeed/1000000000)} Gbs
+Inbound Utilization: {calc ((%value.ifInOctets_rate*8)/%value.ifSpeed)*100}%
+Outbound Utilization: {calc ((%value.ifOutOctets_rate*8)/%value.ifSpeed)*100}%
 {/foreach}
-{/if}
 ```
 
 Storage:
