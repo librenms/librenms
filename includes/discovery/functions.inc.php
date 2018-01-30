@@ -1005,7 +1005,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                 if (!is_numeric($tmp_value)) {
                     if ($sensor_type === 'temperature') {
                         // For temp sensors, try and detect fahrenheit values
-                        if (ends_with($tmp_value, 'f', true)) {
+                        if (ends_with($tmp_value, array('f', 'F'))) {
                             $user_function = 'fahrenheit_to_celsius';
                         }
                     }
