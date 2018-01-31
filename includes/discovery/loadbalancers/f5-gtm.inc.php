@@ -185,4 +185,3 @@ if (!is_null($gtmWideIPEntry) || !is_null($gtmWideStatusEntry) || !is_null($gtmP
     $component->setComponentPrefs($device['device_id'], $components);
     echo "\n";
 } // End if not error
-
