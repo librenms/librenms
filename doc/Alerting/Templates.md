@@ -162,6 +162,24 @@ Limit: %value.sensor_limit
 {/if}
 ```
 
+Memory Alert:
+```text
+%title
+
+Device Name: %hostname
+Severity: %severity 
+Uptime: %uptime_short
+{if %state == 0}Time elapsed: %elapsed{/if}
+Timestamp: %timestamp
+Location: %location
+Description: %description
+Notes: %notes
+
+Server: %hostname {foreach %faults}
+Memory Description: %value.mempool_descr 
+Percent Utilized: %value.mempool_perc{/foreach}
+```
+
 
 Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:
 ```text
