@@ -1,0 +1,1 @@
+INSERT INTO `config` VALUES (798,'alert.default_copy','true','true','Copy all email alerts to default contact','alerting',0,'general',0,'0','0');
