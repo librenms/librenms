@@ -40,7 +40,7 @@ class Validator
     public function __construct()
     {
         // load all validations
-        $pattern = Config::get('install_dir') . '/LibreNMS/Validations/*.php';
+        $pattern = $this->getBaseDir() . '/LibreNMS/Validations/*.php';
 
         foreach (glob($pattern) as $file) {
             $class_name = basename($file, '.php');
@@ -61,6 +61,11 @@ class Validator
     public function validate($validation_groups = array(), $print_group_status = false)
     {
         foreach ($this->validation_groups as $group_name => $group) {
+            // try to only run each group once (some might not return any results)
+            if (!empty($this->results[$group_name])) {
+                continue;
+            }
+
             if ((empty($validation_groups) && $group->isDefault()) || in_array($group_name, $validation_groups)) {
                 if ($print_group_status && isCli()) {
                     echo "Checking $group_name:";
@@ -269,5 +274,10 @@ class Validator
     {
         $url = function_exists('get_url') ? get_url() : Config::get('base_url');
         return rtrim(str_replace('validate', '', $url), '/');  // get base_url from current url
+    }
+
+    public function getBaseDir()
+    {
+        return realpath(__DIR__ . '/..');
     }
 }
