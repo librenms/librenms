@@ -9,9 +9,14 @@ use \Amenadiel\JpGraph\Text\Text;
 //=======================================================
 class Footer
 {
-    public $iLeftMargin = 3, $iRightMargin = 3, $iBottomMargin = 3;
-    public $left, $center, $right;
-    private $iTimer = null, $itimerpoststring = '';
+    public $iLeftMargin   = 3;
+    public $iRightMargin  = 3;
+    public $iBottomMargin = 3;
+    public $left;
+    public $center;
+    public $right;
+    private $iTimer           = null;
+    private $itimerpoststring = '';
 
     public function __construct()
     {
@@ -25,14 +30,14 @@ class Footer
 
     public function SetTimer($aTimer, $aTimerPostString = '')
     {
-        $this->iTimer = $aTimer;
+        $this->iTimer           = $aTimer;
         $this->itimerpoststring = $aTimerPostString;
     }
 
     public function SetMargin($aLeft = 3, $aRight = 3, $aBottom = 3)
     {
-        $this->iLeftMargin = $aLeft;
-        $this->iRightMargin = $aRight;
+        $this->iLeftMargin   = $aLeft;
+        $this->iRightMargin  = $aRight;
         $this->iBottomMargin = $aBottom;
     }
 

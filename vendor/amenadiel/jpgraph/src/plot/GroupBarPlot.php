@@ -13,8 +13,8 @@ class GroupBarPlot extends BarPlot
     // CONSTRUCTOR
     public function __construct($plots)
     {
-        $this->width = 0.7;
-        $this->plots = $plots;
+        $this->width    = 0.7;
+        $this->plots    = $plots;
         $this->nbrplots = count($plots);
         if ($this->nbrplots < 1) {
             Util\JpGraphError::RaiseL(2007); //('Cannot create GroupBarPlot from empty plot array.');
@@ -25,7 +25,7 @@ class GroupBarPlot extends BarPlot
             }
         }
         $this->numpoints = $plots[0]->numpoints;
-        $this->width = 0.7;
+        $this->width     = 0.7;
     }
 
     //---------------
@@ -46,11 +46,11 @@ class GroupBarPlot extends BarPlot
     public function Min()
     {
         list($xmin, $ymin) = $this->plots[0]->Min();
-        $n = count($this->plots);
+        $n                 = count($this->plots);
         for ($i = 0; $i < $n; ++$i) {
             list($xm, $ym) = $this->plots[$i]->Min();
-            $xmin = max($xmin, $xm);
-            $ymin = min($ymin, $ym);
+            $xmin          = max($xmin, $xm);
+            $ymin          = min($ymin, $ym);
         }
         return array($xmin, $ymin);
     }
@@ -58,18 +58,18 @@ class GroupBarPlot extends BarPlot
     public function Max()
     {
         list($xmax, $ymax) = $this->plots[0]->Max();
-        $n = count($this->plots);
+        $n                 = count($this->plots);
         for ($i = 0; $i < $n; ++$i) {
             list($xm, $ym) = $this->plots[$i]->Max();
-            $xmax = max($xmax, $xm);
-            $ymax = max($ymax, $ym);
+            $xmax          = max($xmax, $xm);
+            $ymax          = max($ymax, $ym);
         }
         return array($xmax, $ymax);
     }
 
     public function GetCSIMareas()
     {
-        $n = count($this->plots);
+        $n         = count($this->plots);
         $csimareas = '';
         for ($i = 0; $i < $n; ++$i) {
             $csimareas .= $this->plots[$i]->csimareas;
@@ -80,8 +80,8 @@ class GroupBarPlot extends BarPlot
     // Stroke all the bars next to each other
     public function Stroke($img, $xscale, $yscale)
     {
-        $tmp = $xscale->off;
-        $n = count($this->plots);
+        $tmp      = $xscale->off;
+        $n        = count($this->plots);
         $subwidth = $this->width / $this->nbrplots;
 
         for ($i = 0; $i < $n; ++$i) {

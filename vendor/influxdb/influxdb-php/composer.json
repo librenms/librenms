@@ -1,0 +1,55 @@
+{
+    "name": "influxdata/influxdb-php",
+    "description": "InfluxDB client library for PHP",
+    "license": "MIT",
+    "keywords": [
+        "influxdb",
+        "influxdata",
+        "client",
+        "time series",
+        "influxdb client",
+        "influxdb class",
+        "influxdb library"
+    ],
+    "authors": [
+        {
+            "name": "Stephen Hoogendijk",
+            "email": "stephen@tca0.nl"
+        },
+        {
+            "name": "Daniel Martinez",
+            "email": "danimartcas@hotmail.com"
+        },
+        {
+            "name": "Gianluca Arbezzano",
+            "email": "gianarb92@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^5.5 || ^7.0",
+        "guzzlehttp/guzzle": "^6.0",
+        "symfony/event-dispatcher": "^2.0 || ^3.0 || ^4.0"
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "^3.4 || ^4.0",
+        "codeclimate/php-test-reporter": "0.*",
+        "symfony/config": "~2.8|~3.0|~4.0",
+        "symfony/console": "~2.8|~3.0|~4.0",
+        "symfony/filesystem": "~2.8|~3.0|~4.0",
+        "symfony/stopwatch": "~2.8|~3.0|~4.0",
+        "symfony/yaml": "~2.8|~3.0|~4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "InfluxDB\\": "src/InfluxDB"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "InfluxDB\\Test\\": "tests"
+        }
+    },
+    "suggest": {
+        "stefanotorresi/influxdb-php-async": "An asyncronous client for InfluxDB, implemented via ReactPHP."
+    }
+}

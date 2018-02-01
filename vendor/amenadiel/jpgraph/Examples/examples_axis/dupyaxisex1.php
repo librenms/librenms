@@ -3,7 +3,7 @@ require_once 'jpgraph/jpgraph.php';
 require_once 'jpgraph/jpgraph_line.php';
 require_once 'jpgraph/jpgraph_utils.inc.php';
 
-$f = new FuncGenerator('cos($i)', '$i*$i*$i');
+$f                   = new FuncGenerator('cos($i)', '$i*$i*$i');
 list($xdata, $ydata) = $f->E(-M_PI, M_PI, 25);
 
 $graph = new Graph\Graph(300, 200);

@@ -4,20 +4,20 @@
 // Description: Example 1 for odometer graphs
 // Created:	2002-02-22
 // Version:	$Id$
-// 
+//
 // Comment:
 // Example file for odometer graph. This examples extends odoex02
 // by changing scale tick interval and scale fonts.
 //
 // Copyright (C) 2002 Johan Persson. All rights reserved.
 //=============================================================================
-require_once ('jpgraph/jpgraph.php');
-require_once ('jpgraph/jpgraph_odo.php');
+require_once('jpgraph/jpgraph.php');
+require_once('jpgraph/jpgraph_odo.php');
 
 //---------------------------------------------------------------------
 // Create a new odometer graph (width=250, height=200 pixels)
 //---------------------------------------------------------------------
-$graph = new OdoGraph(250,200);
+$graph = new OdoGraph(250, 200);
 $graph->SetShadow();
 
 //---------------------------------------------------------------------
@@ -34,7 +34,7 @@ $graph->subtitle->SetColor("white");
 // Specify caption.
 // * (This is the text at the bottom of the graph.) The margins will
 // automatically adjust to fit the height of the text. A caption
-// may have multiple lines by including a '\n' character in the 
+// may have multiple lines by including a '\n' character in the
 // string.
 //---------------------------------------------------------------------
 $graph->caption->Set("First caption row\n... second row");
@@ -44,20 +44,20 @@ $graph->caption->SetColor("white");
 // Now we need to create an odometer to add to the graph.
 // By default the scale will be 0 to 100
 //---------------------------------------------------------------------
-$odo = new Odometer(); 
+$odo = new Odometer();
 
 //---------------------------------------------------------------------
-// Set color indication 
+// Set color indication
 //---------------------------------------------------------------------
-$odo->AddIndication(0,50,"green");
-$odo->AddIndication(50,80,"yellow");
-$odo->AddIndication(80,100,"red");
+$odo->AddIndication(0, 50, "green");
+$odo->AddIndication(50, 80, "yellow");
+$odo->AddIndication(80, 100, "red");
 
 //---------------------------------------------------------------------
 // Adjust scale ticks to be shown at 10 steps interval and scale
 // labels at every second tick
 //---------------------------------------------------------------------
-$odo->scale->SetTicks(10,2);
+$odo->scale->SetTicks(10, 2);
 
 //---------------------------------------------------------------------
 // Use a bold font for tick labels
@@ -80,4 +80,3 @@ $graph->Add($odo);
 $graph->Stroke();
 
 // EOF
-?>

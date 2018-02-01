@@ -10,11 +10,12 @@ define('GANTT_HGRID2', 1);
 //===================================================
 class HorizontalGridLine
 {
-    private $iGraph = null;
-    private $iRowColor1 = '', $iRowColor2 = '';
-    private $iShow = false;
-    private $line = null;
-    private $iStart = 0; // 0=from left margin, 1=just along header
+    private $iGraph     = null;
+    private $iRowColor1 = '';
+    private $iRowColor2 = '';
+    private $iShow      = false;
+    private $line       = null;
+    private $iStart     = 0; // 0=from left margin, 1=just along header
 
     public function __construct()
     {
@@ -41,7 +42,6 @@ class HorizontalGridLine
 
     public function Stroke($aImg, $aScale)
     {
-
         if (!$this->iShow) {
             return;
         }
@@ -62,8 +62,8 @@ class HorizontalGridLine
 
         $xb = $aImg->width - $aImg->right_margin;
 
-        $yt = round($aScale->TranslateVertPos(0));
-        $yb = round($aScale->TranslateVertPos(1));
+        $yt     = round($aScale->TranslateVertPos(0));
+        $yb     = round($aScale->TranslateVertPos(1));
         $height = $yb - $yt;
 
         // Loop around for all lines in the chart

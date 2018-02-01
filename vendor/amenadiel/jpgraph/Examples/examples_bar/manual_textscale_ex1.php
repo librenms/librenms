@@ -5,7 +5,7 @@ use Amenadiel\JpGraph\Plot;
 
 // Some data
 $databary = array(12, 7, 16, 6, 7, 14, 9, 3);
-$months = $gDateLocale->GetShortMonth();
+$months   = $gDateLocale->GetShortMonth();
 
 // new Graph\Graph with a drop shadow
 $graph = new Graph\Graph(300, 200, 'auto');

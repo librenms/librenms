@@ -2,9 +2,10 @@
 require_once '../../vendor/autoload.php';
 use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
+
 $data = array(
-    '10' => array(1, 1, 2.5, 4),
-    '32.0' => array(3, 4, 1, 4),
+    '10'    => array(1, 1, 2.5, 4),
+    '32.0'  => array(3, 4, 1, 4),
     '120.5' => array(2, 3, 4, 4, 3, 2, 1),
     '223.2' => array(2, 4, 1, 2, 2),
     '285.7' => array(2, 2, 1, 2, 4, 2, 1, 1),

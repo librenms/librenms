@@ -24,9 +24,9 @@ $timer->Push();
 //--------------------------------------------------------------
 // Setup a basic matrix graph
 //--------------------------------------------------------------
-$width = 740;
+$width  = 740;
 $height = 500;
-$graph = new MatrixGraph($width, $height);
+$graph  = new MatrixGraph($width, $height);
 $graph->SetMargin(1, 2, 70, 1);
 $graph->SetColor('white');
 $graph->SetMarginColor('#fafafa');
@@ -45,7 +45,7 @@ $graph->footer->right->SetColor('white');
 // Create the 2 matrix plots
 //--------------------------------------------------------------
 $mp = array();
-$n = 2;
+$n  = 2;
 for ($i = 0; $i < $n; ++$i) {
     $mp[$i] = new MatrixPlot($data);
     $mp[$i]->colormap->SetMap($i);

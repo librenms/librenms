@@ -7,7 +7,7 @@ use Amenadiel\JpGraph\Plot;
 $ydata = array(17, 3, '', 10, 7, '', 3, 19, 9, 7);
 
 // Size of the overall graph
-$width = 350;
+$width  = 350;
 $height = 250;
 
 // Create the graph and set a scale.

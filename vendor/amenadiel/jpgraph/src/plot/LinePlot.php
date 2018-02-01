@@ -25,24 +25,29 @@ DEFINE("LP_AREA_NO_BORDER", true);
 //===================================================
 class LinePlot extends Plot
 {
-    public $mark = null;
-    protected $filled = false;
-    protected $fill_color = 'blue';
-    protected $step_style = false, $center = false;
-    protected $line_style = 1; // Default to solid
-    protected $filledAreas = array(); // array of arrays(with min,max,col,filled in them)
-    public $barcenter = false; // When we mix line and bar. Should we center the line in the bar.
-    protected $fillFromMin = false, $fillFromMax = false;
-    protected $fillgrad = false, $fillgrad_fromcolor = 'navy', $fillgrad_tocolor = 'silver', $fillgrad_numcolors = 100;
-    protected $iFastStroke = false;
+    public $mark                     = null;
+    protected $filled                = false;
+    protected $fill_color            = 'blue';
+    protected $step_style            = false;
+    protected $center                = false;
+    protected $line_style            = 1; // Default to solid
+    protected $filledAreas           = array(); // array of arrays(with min,max,col,filled in them)
+    public $barcenter                = false; // When we mix line and bar. Should we center the line in the bar.
+    protected $fillFromMin           = false;
+    protected $fillFromMax           = false;
+    protected $fillgrad              = false;
+    protected $fillgrad_fromcolor    = 'navy';
+    protected $fillgrad_tocolor      = 'silver';
+    protected $fillgrad_numcolors    = 100;
+    protected $iFastStroke           = false;
 
     //---------------
     // CONSTRUCTOR
     public function __construct($datay, $datax = false)
     {
         parent::__construct($datay, $datax);
-        $this->mark = new PlotMark();
-        $this->color = Util\ColorFactory::getColor();
+        $this->mark       = new PlotMark();
+        $this->color      = Util\ColorFactory::getColor();
         $this->fill_color = $this->color;
     }
 
@@ -88,16 +93,16 @@ class LinePlot extends Plot
     {
         //$this->color = $aColor;
         $this->fill_color = $aColor;
-        $this->filled = $aFilled;
+        $this->filled     = $aFilled;
     }
 
     public function SetFillGradient($aFromColor, $aToColor, $aNumColors = 100, $aFilled = true)
     {
         $this->fillgrad_fromcolor = $aFromColor;
-        $this->fillgrad_tocolor = $aToColor;
+        $this->fillgrad_tocolor   = $aToColor;
         $this->fillgrad_numcolors = $aNumColors;
-        $this->filled = $aFilled;
-        $this->fillgrad = true;
+        $this->filled             = $aFilled;
+        $this->fillgrad           = true;
     }
 
     public function Legend($graph)
@@ -124,7 +129,7 @@ class LinePlot extends Plot
     {
         if ($aMin > $aMax) {
             // swap
-            $tmp = $aMin;
+            $tmp  = $aMin;
             $aMin = $aMax;
             $aMax = $tmp;
         }
@@ -181,7 +186,7 @@ class LinePlot extends Plot
                 $x = $pnts + $textadj;
             }
             $xt = $xscale->Translate($x);
-            $y = $this->coords[0][$pnts];
+            $y  = $this->coords[0][$pnts];
             $yt = $yscale->Translate($y);
             if (is_numeric($y)) {
                 $cord[] = $xt;
@@ -199,7 +204,7 @@ class LinePlot extends Plot
 
     public function Stroke($img, $xscale, $yscale)
     {
-        $idx = 0;
+        $idx       = 0;
         $numpoints = count($this->coords[0]);
         if (isset($this->coords[1])) {
             if (count($this->coords[1]) != $numpoints) {
@@ -260,24 +265,23 @@ class LinePlot extends Plot
                 $cord[$idx++] = $fillmin;
             }
         }
-        $xt = $xscale->Translate($xs);
-        $yt = $yscale->Translate($this->coords[0][$startpoint]);
+        $xt           = $xscale->Translate($xs);
+        $yt           = $yscale->Translate($this->coords[0][$startpoint]);
         $cord[$idx++] = $xt;
         $cord[$idx++] = $yt;
-        $yt_old = $yt;
-        $xt_old = $xt;
-        $y_old = $this->coords[0][$startpoint];
+        $yt_old       = $yt;
+        $xt_old       = $xt;
+        $y_old        = $this->coords[0][$startpoint];
 
         $this->value->Stroke($img, $this->coords[0][$startpoint], $xt, $yt);
 
         $img->SetColor($this->color);
         $img->SetLineWeight($this->weight);
         $img->SetLineStyle($this->line_style);
-        $pnts = $startpoint + 1;
+        $pnts           = $startpoint + 1;
         $firstnonumeric = false;
 
         while ($pnts < $numpoints) {
-
             if ($exist_x) {
                 $x = $this->coords[1][$pnts];
             } else {
@@ -309,8 +313,8 @@ class LinePlot extends Plot
                     $cord[$idx++] = $yt;
                 } elseif ($firstnonumeric == false) {
                     $firstnonumeric = true;
-                    $yt_first = $yt_old;
-                    $xt_first = $xt_old;
+                    $yt_first       = $yt_old;
+                    $xt_first       = $xt_old;
                 }
             } else {
                 $tmp1 = $y;
@@ -352,7 +356,7 @@ class LinePlot extends Plot
             }
             $yt_old = $yt;
             $xt_old = $xt;
-            $y_old = $y;
+            $y_old  = $y;
 
             $this->StrokeDataValue($img, $this->coords[0][$pnts], $xt, $yt);
 
@@ -391,8 +395,7 @@ class LinePlot extends Plot
         }
 
         if (!empty($this->filledAreas)) {
-
-            $minY = $yscale->Translate($yscale->GetMinVal());
+            $minY   = $yscale->Translate($yscale->GetMinVal());
             $factor = ($this->step_style ? 4 : 2);
 
             for ($i = 0; $i < sizeof($this->filledAreas); ++$i) {
@@ -433,7 +436,6 @@ class LinePlot extends Plot
         }
 
         for ($pnts = 0; $pnts < $numpoints; ++$pnts) {
-
             if ($exist_x) {
                 $x = $this->coords[1][$pnts];
             } else {

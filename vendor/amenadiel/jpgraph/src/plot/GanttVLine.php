@@ -5,9 +5,11 @@ use Amenadiel\JpGraph\Graph;
 
 class GanttVLine extends GanttPlotObject
 {
-
-    private $iLine, $title_margin = 3, $iDayOffset = 0.5;
-    private $iStartRow = -1, $iEndRow = -1;
+    private $iLine;
+    private $title_margin         = 3;
+    private $iDayOffset           = 0.5;
+    private $iStartRow            = -1;
+    private $iEndRow              = -1;
 
     //---------------
     // CONSTRUCTOR
@@ -19,7 +21,7 @@ class GanttVLine extends GanttPlotObject
         $this->iLine->SetWeight($aWeight);
         $this->iLine->SetStyle($aStyle);
         $this->iStart = $aDate;
-        $this->title = new TextPropertyBelow();
+        $this->title  = new TextPropertyBelow();
         $this->title->Set($aTitle);
     }
 
@@ -31,7 +33,7 @@ class GanttVLine extends GanttPlotObject
     public function SetRowSpan($aStart, $aEnd = -1)
     {
         $this->iStartRow = $aStart;
-        $this->iEndRow = $aEnd;
+        $this->iEndRow   = $aEnd;
     }
 
     public function SetDayOffset($aOff = 0.5)

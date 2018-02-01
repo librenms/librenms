@@ -9,7 +9,8 @@ use Amenadiel\JpGraph\Graph;
 //===================================================
 class ScatterPlot extends Plot
 {
-    public $mark, $link;
+    public $mark;
+    public $link;
     private $impuls = false;
     //---------------
     // CONSTRUCTOR
@@ -24,7 +25,7 @@ class ScatterPlot extends Plot
         $this->mark->SetColor($this->color);
         $this->value->SetAlign('center', 'center');
         $this->value->SetMargin(0);
-        $this->link = new Graph\LineProperty(1, 'black', 'solid');
+        $this->link        = new Graph\LineProperty(1, 'black', 'solid');
         $this->link->iShow = false;
     }
 
@@ -43,15 +44,14 @@ class ScatterPlot extends Plot
     // Combine the scatter plot points with a line
     public function SetLinkPoints($aFlag = true, $aColor = "black", $aWeight = 1, $aStyle = 'solid')
     {
-        $this->link->iShow = $aFlag;
-        $this->link->iColor = $aColor;
+        $this->link->iShow   = $aFlag;
+        $this->link->iColor  = $aColor;
         $this->link->iWeight = $aWeight;
-        $this->link->iStyle = $aStyle;
+        $this->link->iStyle  = $aStyle;
     }
 
     public function Stroke($img, $xscale, $yscale)
     {
-
         $ymin = $yscale->scale_abs[0];
         if ($yscale->scale[0] < 0) {
             $yzero = $yscale->Translate(0);

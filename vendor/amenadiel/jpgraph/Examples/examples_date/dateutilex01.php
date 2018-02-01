@@ -9,9 +9,9 @@ require_once 'dataset01.inc.php';
 $dateUtils = new DateScaleUtils();
 
 // Setup a basic graph
-$width = 500;
+$width  = 500;
 $height = 300;
-$graph = new Graph\Graph($width, $height);
+$graph  = new Graph\Graph($width, $height);
 
 // We set the x-scale min/max values to avoid empty space
 // on the side of the plot

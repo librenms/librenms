@@ -1,7 +1,4 @@
 <?php
-//error_reporting(E_ALL);
-//ini_set("display_errors", 1);
-
 //=======================================================================
 // File:        JPGRAPH.PHP
 // Description: PHP Graph Plotting library. Base module.
@@ -201,7 +198,7 @@ if (USE_CACHE) {
     if (!defined('CACHE_DIR')) {
         if (strstr(PHP_OS, 'WIN')) {
             if (empty($_SERVER['TEMP'])) {
-                $t = new ErrMsgText();
+                $t   = new ErrMsgText();
                 $msg = $t->Get(11, $file, $lineno);
                 die($msg);
             } else {
@@ -222,7 +219,7 @@ if (!defined('TTF_DIR')) {
     if (strstr(PHP_OS, 'WIN')) {
         $sroot = getenv('SystemRoot');
         if (empty($sroot)) {
-            $t = new ErrMsgText();
+            $t   = new ErrMsgText();
             $msg = $t->Get(12, $file, $lineno);
             die($msg);
         } else {
@@ -240,7 +237,7 @@ if (!defined('MBTTF_DIR')) {
     if (strstr(PHP_OS, 'WIN')) {
         $sroot = getenv('SystemRoot');
         if (empty($sroot)) {
-            $t = new ErrMsgText();
+            $t   = new ErrMsgText();
             $msg = $t->Get(12, $file, $lineno);
             die($msg);
         } else {
@@ -301,7 +298,9 @@ if (isset($GLOBALS['php_errormsg']) && CATCH_PHPERRMSG && !preg_match('/|Depreca
 
 // Useful mathematical function
 function sign($a)
-{return $a >= 0 ? 1 : -1;}
+{
+    return $a >= 0 ? 1 : -1;
+}
 
 //
 // Utility function to generate an image name based on the filename we
@@ -341,7 +340,7 @@ function GenImgName()
 
 global $gDateLocale;
 // Global object handlers
-$gDateLocale = new Amenadiel\JpGraph\Util\DateLocale();
+$gDateLocale    = new Amenadiel\JpGraph\Util\DateLocale();
 $gJpgDateLocale = new Amenadiel\JpGraph\Util\DateLocale();
 
 // <EOF>

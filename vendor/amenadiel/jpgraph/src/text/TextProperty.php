@@ -7,13 +7,18 @@ namespace Amenadiel\JpGraph\Text;
 //===================================================
 class TextProperty
 {
-    public $iShow = true;
-    public $csimtarget = '', $csimwintarget = '', $csimalt = '';
-    private $iFFamily = FF_FONT1, $iFStyle = FS_NORMAL, $iFSize = 10;
-    private $iFontArray = array();
-    private $iColor = "black";
-    private $iText = "";
-    private $iHAlign = "left", $iVAlign = "bottom";
+    public $iShow          = true;
+    public $csimtarget     = '';
+    public $csimwintarget  = '';
+    public $csimalt        = '';
+    private $iFFamily      = FF_FONT1;
+    private $iFStyle       = FS_NORMAL;
+    private $iFSize        = 10;
+    private $iFontArray    = array();
+    private $iColor        = "black";
+    private $iText         = "";
+    private $iHAlign       = "left";
+    private $iVAlign       = "bottom";
 
     //---------------
     // CONSTRUCTOR
@@ -48,7 +53,6 @@ class TextProperty
         }
 
         $this->csimalt = $aAltText;
-
     }
 
     public function SetCSIMAlt($aAltText)
@@ -103,8 +107,8 @@ class TextProperty
     public function SetFont($aFFamily, $aFStyle = FS_NORMAL, $aFSize = 10)
     {
         $this->iFFamily = $aFFamily;
-        $this->iFStyle = $aFStyle;
-        $this->iFSize = $aFSize;
+        $this->iFStyle  = $aFStyle;
+        $this->iFSize   = $aFSize;
     }
 
     public function SetColumnFonts($aFontArray)
@@ -139,7 +143,7 @@ class TextProperty
                 return $w + 2 * $extra_margin;
             } else {
                 $tot = 0;
-                $n = count($tmp);
+                $n   = count($tmp);
                 for ($i = 0; $i < $n; ++$i) {
                     $res[$i] = $aImg->GetTextWidth($tmp[$i]);
                     $tot += $res[$i] * $aTabExtraMargin;
@@ -152,7 +156,7 @@ class TextProperty
         } elseif (is_array($this->iText)) {
             // Must be an array of texts. In this case we return the sum of the
             // length + a fixed margin of 4 pixels on each text string
-            $n = count($this->iText);
+            $n  = count($this->iText);
             $nf = count($this->iFontArray);
             for ($i = 0, $w = 0; $i < $n; ++$i) {
                 if ($i < $nf) {
@@ -183,7 +187,7 @@ class TextProperty
     {
         $aImg->SetFont($this->iFFamily, $this->iFStyle, $this->iFSize);
         if (is_array($this->iText)) {
-            $n = count($this->iText);
+            $n  = count($this->iText);
             $nf = count($this->iFontArray);
             for ($i = 0, $w = array(); $i < $n; ++$i) {
                 $tmp = $this->iText[$i];
@@ -210,7 +214,7 @@ class TextProperty
     // Get total height of text
     public function GetHeight($aImg)
     {
-        $nf = count($this->iFontArray);
+        $nf        = count($this->iFontArray);
         $maxheight = -1;
 
         if ($nf > 0) {
@@ -218,13 +222,13 @@ class TextProperty
             // height of the row
             for ($i = 0; $i < $nf; ++$i) {
                 $aImg->SetFont($this->iFontArray[$i][0], $this->iFontArray[$i][1], $this->iFontArray[$i][2]);
-                $height = $aImg->GetFontHeight();
+                $height    = $aImg->GetFontHeight();
                 $maxheight = max($height, $maxheight);
             }
         }
 
         $aImg->SetFont($this->iFFamily, $this->iFStyle, $this->iFSize);
-        $height = $aImg->GetFontHeight();
+        $height    = $aImg->GetFontHeight();
         $maxheight = max($height, $maxheight);
         return $maxheight;
     }
@@ -287,7 +291,7 @@ class TextProperty
                 }
             } else {
                 $tmp = preg_split('/\t/', $this->iText);
-                $n = min(count($tmp), count($aX));
+                $n   = min(count($tmp), count($aX));
                 for ($i = 0; $i < $n; ++$i) {
                     if ($i < count($this->iFontArray)) {
                         $font = $this->iFontArray[$i];

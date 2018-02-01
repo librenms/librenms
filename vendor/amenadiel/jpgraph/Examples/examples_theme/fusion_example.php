@@ -4,7 +4,7 @@ require_once 'jpgraph/jpgraph_bar.php';
 require_once 'jpgraph/jpgraph_line.php';
 
 $theme = isset($_GET['theme']) ? $_GET['theme'] : null;
-$data = array(
+$data  = array(
     0 => array(0 => 79, 1 => -25, 2 => -7, 3 => 85, 4 => -26, 5 => -32),
     1 => array(0 => 76, 1 => 51, 2 => 86, 3 => 12, 4 => -7, 5 => 94),
     2 => array(0 => 49, 1 => 38, 2 => 7, 3 => -40, 4 => 9, 5 => -7),

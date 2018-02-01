@@ -30,7 +30,7 @@ class LogScale extends LinearScale
     {
         parent::__construct($min, $max, $type);
         $this->ticks = new LogTicks('log');
-        $this->name = 'log';
+        $this->name  = 'log';
     }
 
     //----------------
@@ -127,7 +127,6 @@ class LogScale extends LinearScale
             } else {
                 $smax = ceil(log10($max));
             }
-
         }
 
         $this->Update($img, $smin, $smax);

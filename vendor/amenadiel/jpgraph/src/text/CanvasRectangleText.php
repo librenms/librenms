@@ -8,19 +8,27 @@ namespace Amenadiel\JpGraph\Text;
 //===================================================
 class CanvasRectangleText
 {
-    private $ix, $iy, $iw, $ih, $ir = 4;
-    private $iTxt, $iColor = 'black', $iFillColor = '', $iFontColor = 'black';
-    private $iParaAlign = 'center';
-    private $iAutoBoxMargin = 5;
-    private $iShadowWidth = 3, $iShadowColor = '';
+    private $ix;
+    private $iy;
+    private $iw;
+    private $ih;
+    private $ir = 4;
+    private $iTxt;
+    private $iColor                 = 'black';
+    private $iFillColor             = '';
+    private $iFontColor             = 'black';
+    private $iParaAlign             = 'center';
+    private $iAutoBoxMargin         = 5;
+    private $iShadowWidth           = 3;
+    private $iShadowColor           = '';
 
     public function __construct($aTxt = '', $xl = 0, $yt = 0, $w = 0, $h = 0)
     {
         $this->iTxt = new Text($aTxt);
-        $this->ix = $xl;
-        $this->iy = $yt;
-        $this->iw = $w;
-        $this->ih = $h;
+        $this->ix   = $xl;
+        $this->iy   = $yt;
+        $this->iw   = $w;
+        $this->ih   = $h;
     }
 
     public function SetShadow($aColor = 'gray', $aWidth = 3)
@@ -155,7 +163,5 @@ class CanvasRectangleText
         $this->iTxt->Stroke($aImg, $this->ix + $this->iw / 2, $this->iy + $this->ih / 2);
 
         return array($this->iw, $this->ih);
-
     }
-
 }

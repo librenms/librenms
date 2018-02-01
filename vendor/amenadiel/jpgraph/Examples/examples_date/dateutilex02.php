@@ -10,9 +10,9 @@ require_once 'dataset01.inc.php';
 $dateUtils = new DateScaleUtils();
 
 // Setup a basic graph
-$width = 500;
+$width  = 500;
 $height = 300;
-$graph = new Graph\Graph($width, $height);
+$graph  = new Graph\Graph($width, $height);
 $graph->SetScale('datlin');
 $graph->SetMargin(60, 20, 40, 60);
 

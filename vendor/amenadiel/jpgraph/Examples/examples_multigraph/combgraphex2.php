@@ -11,11 +11,11 @@ require_once '../jpgraph_utils.inc.php';
 //------------------------------------------------------------------
 $datay = array();
 $datax = array();
-$ts = time();
-$n = 70; // Number of data points
+$ts    = time();
+$n     = 70; // Number of data points
 for ($i = 0; $i < $n; ++$i) {
-    $datax[$i] = $ts + $i * 150000;
-    $datay[$i] = rand(5, 60);
+    $datax[$i]  = $ts + $i * 150000;
+    $datay[$i]  = rand(5, 60);
     $datay2[$i] = rand(1, 8);
 }
 
@@ -28,8 +28,8 @@ list($tickPositions, $minTickPositions) = DateScaleUtils::getTicks($datax, DSUTI
 // We add some grace to the end of the X-axis scale so that the first and last
 // data point isn't exactly at the very end or beginning of the scale
 $grace = 400000;
-$xmin = $datax[0] - $grace;
-$xmax = $datax[$n - 1] + $grace;
+$xmin  = $datax[0] - $grace;
+$xmax  = $datax[$n - 1] + $grace;
 
 // Overall width of graphs
 $w = 450;

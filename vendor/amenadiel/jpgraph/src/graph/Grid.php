@@ -11,15 +11,21 @@ class Grid
 {
     protected $img;
     protected $scale;
-    protected $majorcolor = '#CCCCCC', $minorcolor = '#DDDDDD';
-    protected $majortype = 'solid', $minortype = 'solid';
-    protected $show = false, $showMinor = false, $majorweight = 1, $minorweight = 1;
-    protected $fill = false, $fillcolor = array('#EFEFEF', '#BBCCFF');
+    protected $majorcolor        = '#CCCCCC';
+    protected $minorcolor        = '#DDDDDD';
+    protected $majortype         = 'solid';
+    protected $minortype         = 'solid';
+    protected $show              = false;
+    protected $showMinor         = false;
+    protected $majorweight       = 1;
+    protected $minorweight       = 1;
+    protected $fill              = false;
+    protected $fillcolor         = array('#EFEFEF', '#BBCCFF');
 
     public function __construct($aAxis)
     {
         $this->scale = $aAxis->scale;
-        $this->img = $aAxis->img;
+        $this->img   = $aAxis->img;
     }
 
     public function SetColor($aMajColor, $aMinColor = false)
@@ -52,13 +58,13 @@ class Grid
     // Decide if both major and minor grid should be displayed
     public function Show($aShowMajor = true, $aShowMinor = false)
     {
-        $this->show = $aShowMajor;
+        $this->show      = $aShowMajor;
         $this->showMinor = $aShowMinor;
     }
 
     public function SetFill($aFlg = true, $aColor1 = 'lightgray', $aColor2 = 'lightblue')
     {
-        $this->fill = $aFlg;
+        $this->fill      = $aFlg;
         $this->fillcolor = array($aColor1, $aColor2);
     }
 
@@ -91,7 +97,7 @@ class Grid
             if ($this->fill) {
                 // Draw filled areas
                 $y2 = $aTicksPos[0];
-                $i = 1;
+                $i  = 1;
                 while ($i < $nbrgrids) {
                     $y1 = $y2;
                     $y2 = $aTicksPos[$i++];
@@ -123,14 +129,14 @@ class Grid
                 $this->img->StyleLine($xl, $y, $xr, $y, $style, true);
             }
         } elseif ($this->scale->type == 'x') {
-            $yu = $this->img->top_margin;
-            $yl = $this->img->height - $this->img->bottom_margin;
+            $yu    = $this->img->top_margin;
+            $yl    = $this->img->height - $this->img->bottom_margin;
             $limit = $this->img->width - $this->img->right_margin;
 
             if ($this->fill) {
                 // Draw filled areas
                 $x2 = $aTicksPos[0];
-                $i = 1;
+                $i  = 1;
                 while ($i < $nbrgrids) {
                     $x1 = $x2;
                     $x2 = min($aTicksPos[$i++], $limit);

@@ -18,7 +18,7 @@ namespace Amenadiel\JpGraph\Plot;
  */
 function doMeshInterpolate(&$aData, $aFactor)
 {
-    $m = new MeshInterpolate();
+    $m     = new MeshInterpolate();
     $aData = $m->Linear($aData, $aFactor);
 }
 
@@ -52,10 +52,10 @@ class MeshInterpolate
         $v2 = $this->data[$aRow + $step][$aCol];
         $v3 = $this->data[$aRow + $step][$aCol + $step];
 
-        $this->data[$aRow][$aCol + $step / 2] = ($v0 + $v1) / 2;
-        $this->data[$aRow + $step / 2][$aCol] = ($v0 + $v2) / 2;
-        $this->data[$aRow + $step][$aCol + $step / 2] = ($v2 + $v3) / 2;
-        $this->data[$aRow + $step / 2][$aCol + $step] = ($v1 + $v3) / 2;
+        $this->data[$aRow][$aCol + $step / 2]             = ($v0 + $v1) / 2;
+        $this->data[$aRow + $step / 2][$aCol]             = ($v0 + $v2) / 2;
+        $this->data[$aRow + $step][$aCol + $step / 2]     = ($v2 + $v3) / 2;
+        $this->data[$aRow + $step / 2][$aCol + $step]     = ($v1 + $v3) / 2;
         $this->data[$aRow + $step / 2][$aCol + $step / 2] = ($v0 + $v1 + $v2 + $v3) / 4;
 
         $this->IntSquare($aRow, $aCol, $aFactor - 1);
@@ -83,7 +83,7 @@ class MeshInterpolate
         $orig_rows = count($aData);
         // Number of new columns/rows
         // N = (a-1) * 2^(f-1) + 1
-        $p = pow(2, $aIntFactor - 1);
+        $p        = pow(2, $aIntFactor - 1);
         $new_cols = $p * ($orig_cols - 1) + 1;
         $new_rows = $p * ($orig_rows - 1) + 1;
 

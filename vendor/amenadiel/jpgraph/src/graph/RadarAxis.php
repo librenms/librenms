@@ -7,14 +7,14 @@ namespace Amenadiel\JpGraph\Graph;
 //===================================================
 class RadarAxis extends AxisPrototype
 {
-    public $title = null;
+    public $title        = null;
     private $title_color = 'navy';
-    private $len = 0;
+    private $len         = 0;
 
     public function __construct($img, $aScale, $color = array(0, 0, 0))
     {
         parent::__construct($img, $aScale, $color);
-        $this->len = $img->plotheight;
+        $this->len   = $img->plotheight;
         $this->title = new Text();
         $this->title->SetFont(FF_FONT1, FS_BOLD);
         $this->color = array(0, 0, 0);
@@ -76,8 +76,8 @@ class RadarAxis extends AxisPrototype
     {
         $this->title->Set($title);
         $marg = 6 + $this->title->margin;
-        $xt = round(($this->scale->world_abs_size + $marg) * cos($aAxisAngle) + $this->scale->scale_abs[0]);
-        $yt = round($pos - ($this->scale->world_abs_size + $marg) * sin($aAxisAngle));
+        $xt   = round(($this->scale->world_abs_size + $marg) * cos($aAxisAngle) + $this->scale->scale_abs[0]);
+        $yt   = round($pos - ($this->scale->world_abs_size + $marg) * sin($aAxisAngle));
 
         // Position the axis title.
         // dx, dy is the offset from the top left corner of the bounding box that sorrounds the text
@@ -144,5 +144,4 @@ class RadarAxis extends AxisPrototype
             $this->title->Stroke($this->img, $xt - $dx * $w, $yt - $dy * $h, $title);
         }
     }
-
 } // Class

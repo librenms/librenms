@@ -56,7 +56,6 @@ class LanguageConv
         } else {
             return $aTxt;
         }
-
     }
 
     // Translate iso encoding to unicode
@@ -102,7 +101,7 @@ class LanguageConv
     public static function heb_iso2uni($isoline)
     {
         $isoline = hebrev($isoline);
-        $o = '';
+        $o       = '';
 
         $n = strlen($isoline);
         for ($i = 0; $i < $n; $i++) {

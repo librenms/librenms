@@ -17,7 +17,6 @@
 //-------------------------------------------------------------------------
 class TestDriver
 {
-
     private $iType;
     private $iDir;
     private $subFolders;
@@ -31,7 +30,7 @@ class TestDriver
         if (!chdir($basePath)) {
             die("PANIC: Can't access directory : $aDir");
         }
-        $this->iDir = $basePath;
+        $this->iDir       = $basePath;
         $this->subFolders = $subFolders;
     }
 
@@ -66,7 +65,6 @@ class TestDriver
                     }
                 }
             }
-
         }
         $d->Close();
         if (count($a) == 0) {
@@ -97,7 +95,7 @@ class TestDriver
     {
         switch ($this->iType) {
             case 1:
-                $files = $this->GetFilespath($this->subFolders[0]);
+                $files  = $this->GetFilespath($this->subFolders[0]);
                 $files2 = $this->GetFilespath($this->subFolders[1]);
                 break;
             case 2:
@@ -143,7 +141,6 @@ class TestDriver
                 echo '</table>';
 
                 echo "</i>\n";
-
             } else {
                 echo '<li><a href="show-example.php?target=' . urlencode($files[$i]) . '">' . $files[$i] . "</a>\n";
             }

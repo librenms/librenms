@@ -51,7 +51,7 @@ class ErrMsgText
             return 'Internal error: The specified error message (' . $errnbr . ') does not exist in the chosen locale (' . $__jpg_err_locale . ')';
         }
         $ea = $this->lt[$errnbr];
-        $j = 0;
+        $j  = 0;
         if ($a1 !== null) {
             $argv[$j++] = $a1;
             if ($a2 !== null) {

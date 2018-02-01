@@ -1,14 +1,14 @@
 <?php
-require_once ('jpgraph/jpgraph.php');
-require_once ('jpgraph/jpgraph_odo.php');
+require_once('jpgraph/jpgraph.php');
+require_once('jpgraph/jpgraph_odo.php');
 
 // Create a new odometer graph (width=250, height=200 pixels)
-$graph = new OdoGraph(250,180);
+$graph = new OdoGraph(250, 180);
 
 // Setup titles
 $graph->title->Set("Result for 2002");
 $graph->title->SetColor("white");
-$graph->title->SetFont(FF_ARIAL,FS_BOLD,14);
+$graph->title->SetFont(FF_ARIAL, FS_BOLD, 14);
 $graph->subtitle->Set("New York Office");
 $graph->subtitle->SetColor("white");
 $graph->caption->Set("Figure 1. Branch results.");
@@ -26,5 +26,3 @@ $graph->Add($odo);
 
 // ... and finally stroke and stream the image back to the client
 $graph->Stroke();
-
-?>

@@ -7,11 +7,11 @@ require_once 'jpgraph/jpgraph_date.php';
 DEFINE('NDATAPOINTS', 360);
 DEFINE('SAMPLERATE', 240);
 $start = time();
-$end = $start + NDATAPOINTS * SAMPLERATE;
-$data = array();
+$end   = $start + NDATAPOINTS * SAMPLERATE;
+$data  = array();
 $xdata = array();
 for ($i = 0; $i < NDATAPOINTS; ++$i) {
-    $data[$i] = rand(50, 70);
+    $data[$i]  = rand(50, 70);
     $xdata[$i] = $start + $i * SAMPLERATE;
 }
 

@@ -10,7 +10,8 @@ use Amenadiel\JpGraph\Util;
 //=======================================================================
 class ImgStreamCache
 {
-    private $cache_dir, $timeout = 0; // Infinite timeout
+    private $cache_dir;
+    private $timeout = 0; // Infinite timeout
     //---------------
     // CONSTRUCTOR
     public function __construct($aCacheDir = CACHE_DIR)
@@ -40,7 +41,6 @@ class ImgStreamCache
         }
 
         if ($aStrokeFileName != '') {
-
             if ($aStrokeFileName == 'auto') {
                 $aStrokeFileName = GenImgName();
             }
@@ -48,7 +48,7 @@ class ImgStreamCache
             if (file_exists($aStrokeFileName)) {
 
                 // Wait for lock (to make sure no readers are trying to access the image)
-                $fd = fopen($aStrokeFileName, 'w');
+                $fd   = fopen($aStrokeFileName, 'w');
                 $lock = flock($fd, LOCK_EX);
 
                 // Since the image write routines only accepts a filename which must not
@@ -61,7 +61,6 @@ class ImgStreamCache
                 $aImage->Stream($aStrokeFileName);
                 $lock = flock($fd, LOCK_UN);
                 fclose($fd);
-
             } else {
                 $aImage->Stream($aStrokeFileName);
             }
@@ -70,7 +69,6 @@ class ImgStreamCache
         }
 
         if ($aCacheFileName != '' && USE_CACHE) {
-
             $aCacheFileName = $this->cache_dir . $aCacheFileName;
             if (file_exists($aCacheFileName)) {
                 if (!$aInline) {
@@ -85,11 +83,10 @@ class ImgStreamCache
                     if ($this->timeout > 0 && ($diff <= $this->timeout * 60)) {
                         return;
                     }
-
                 }
 
                 // Wait for lock (to make sure no readers are trying to access the image)
-                $fd = fopen($aCacheFileName, 'w');
+                $fd   = fopen($aCacheFileName, 'w');
                 $lock = flock($fd, LOCK_EX);
 
                 if (!@unlink($aCacheFileName)) {
@@ -100,7 +97,6 @@ class ImgStreamCache
                 $aImage->Stream($aCacheFileName);
                 $lock = flock($fd, LOCK_UN);
                 fclose($fd);
-
             } else {
                 $this->MakeDirs(dirname($aCacheFileName));
                 if (!is_writeable(dirname($aCacheFileName))) {
@@ -192,7 +188,7 @@ class ImgStreamCache
         // we do not create directories in the root path
         while ($aFile != '/' && !(file_exists($aFile))) {
             $dirs[] = $aFile . '/';
-            $aFile = dirname($aFile);
+            $aFile  = dirname($aFile);
         }
         for ($i = sizeof($dirs) - 1; $i >= 0; $i--) {
             if (!@mkdir($dirs[$i], 0777)) {

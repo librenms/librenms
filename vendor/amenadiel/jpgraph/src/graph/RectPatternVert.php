@@ -7,7 +7,6 @@ namespace Amenadiel\JpGraph\Graph;
 //=====================================================================
 class RectPatternVert extends RectPattern
 {
-
     public function __construct($aColor = "black", $aWeight = 1, $aLineSpacing = 7)
     {
         parent::__construct($aColor, $aWeight);
@@ -19,7 +18,7 @@ class RectPatternVert extends RectPattern
     //
     public function DoPattern($aImg)
     {
-        $x = $this->rect->x;
+        $x  = $this->rect->x;
         $y0 = $this->rect->y;
         $y1 = $this->rect->ye;
         while ($x < $this->rect->xe) {

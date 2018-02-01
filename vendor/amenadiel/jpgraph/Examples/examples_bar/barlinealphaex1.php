@@ -2,10 +2,11 @@
 require_once '../../vendor/autoload.php';
 use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
+
 require_once 'jpgraph/jpgraph_line.php';
 
 // Some "random" data
-$ydata = array(10, 120, 80, 190, 260, 170, 60, 40, 20, 230);
+$ydata  = array(10, 120, 80, 190, 260, 170, 60, 40, 20, 230);
 $ydata2 = array(10, 70, 40, 120, 200, 60, 80, 40, 20, 5);
 
 // Get a list of month using the current locale

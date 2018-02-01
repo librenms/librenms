@@ -14,14 +14,14 @@ class RectPattern
 {
     protected $color;
     protected $weight;
-    protected $rect = null;
+    protected $rect    = null;
     protected $doframe = true;
     protected $linespacing; // Line spacing in pixels
     protected $iBackgroundColor = -1; // Default is no background fill
 
     public function __construct($aColor, $aWeight = 1)
     {
-        $this->color = $aColor;
+        $this->color  = $aColor;
         $this->weight = $aWeight;
     }
 
@@ -50,7 +50,6 @@ class RectPattern
         // 1% corresponds to linespacing=50
         // 100 % corresponds to linespacing 1
         $this->linespacing = floor(((100 - $aDens) / 100.0) * 50) + 1;
-
     }
 
     public function Stroke($aImg)
@@ -76,7 +75,5 @@ class RectPattern
         if ($this->doframe) {
             $aImg->Rectangle($this->rect->x, $this->rect->y, $this->rect->xe, $this->rect->ye);
         }
-
     }
-
 }

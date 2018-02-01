@@ -3,7 +3,7 @@ require_once 'jpgraph/jpgraph.php';
 require_once 'jpgraph/jpgraph_scatter.php';
 
 $numpoints = 50;
-$k = 0.05;
+$k         = 0.05;
 
 // Create some data points
 for ($i = 0; $i < $numpoints; ++$i) {

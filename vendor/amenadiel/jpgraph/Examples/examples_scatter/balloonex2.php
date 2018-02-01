@@ -15,14 +15,12 @@ $data = array(
 // library from the above raw data.
 $n = count($data);
 for ($i = 0; $i < $n; ++$i) {
-
     $datax[$i] = $data[$i][0];
     $datay[$i] = $data[$i][1];
 
     // Create a faster lookup array so we don't have to search
     // for the correct values in the callback function
     $format[strval($datax[$i])][strval($datay[$i])] = array($data[$i][2], $data[$i][3]);
-
 }
 
 // Callback for markers

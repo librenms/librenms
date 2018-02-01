@@ -18,27 +18,32 @@ namespace Amenadiel\JpGraph\Plot;
 
 class PlotLine
 {
-    public $scaleposition, $direction = -1;
-    protected $weight = 1;
-    protected $color = 'black';
-    private $legend = '', $hidelegend = false, $legendcsimtarget = '', $legendcsimalt = '', $legendcsimwintarget = '';
-    private $iLineStyle = 'solid';
-    public $numpoints = 0; // Needed since the framework expects this property
+    public $scaleposition;
+    public $direction                              = -1;
+    protected $weight                              = 1;
+    protected $color                               = 'black';
+    private $legend                                = '';
+    private $hidelegend                            = false;
+    private $legendcsimtarget                      = '';
+    private $legendcsimalt                         = '';
+    private $legendcsimwintarget                   = '';
+    private $iLineStyle                            = 'solid';
+    public $numpoints                              = 0; // Needed since the framework expects this property
 
     public function __construct($aDir = HORIZONTAL, $aPos = 0, $aColor = 'black', $aWeight = 1)
     {
-        $this->direction = $aDir;
-        $this->color = $aColor;
-        $this->weight = $aWeight;
+        $this->direction     = $aDir;
+        $this->color         = $aColor;
+        $this->weight        = $aWeight;
         $this->scaleposition = $aPos;
     }
 
     public function SetLegend($aLegend, $aCSIM = '', $aCSIMAlt = '', $aCSIMWinTarget = '')
     {
-        $this->legend = $aLegend;
-        $this->legendcsimtarget = $aCSIM;
+        $this->legend              = $aLegend;
+        $this->legendcsimtarget    = $aCSIM;
         $this->legendcsimwintarget = $aCSIMWinTarget;
-        $this->legendcsimalt = $aCSIMAlt;
+        $this->legendcsimalt       = $aCSIMAlt;
     }
 
     public function HideLegend($f = true)
@@ -84,7 +89,6 @@ class PlotLine
         if (!$this->hidelegend) {
             $this->Legend($graph);
         }
-
     }
 
     // Framework function the chance for each plot class to set a legend
@@ -92,7 +96,7 @@ class PlotLine
     {
         if ($this->legend != '') {
             $dummyPlotMark = new PlotMark();
-            $lineStyle = 1;
+            $lineStyle     = 1;
             $aGraph->legend->Add($this->legend, $this->color, $dummyPlotMark, $lineStyle,
                 $this->legendcsimtarget, $this->legendcsimalt, $this->legendcsimwintarget);
         }

@@ -1,15 +1,15 @@
 ## Name:
 
-**Dapphp\Radius** - A pure PHP RADIUS client based on the SysCo/al implementation 
+**Dapphp\Radius** - A pure PHP RADIUS client based on the SysCo/al implementation
 
 ## Version:
 
-**2.5.0**
+**2.5.1**
 
 ## Author:
 
-Drew Phillips <drew@drew-phillips.com>
-SysCo/al <developer@sysco.ch> (http://developer.sysco.ch/php/)
+* Drew Phillips <drew@drew-phillips.com>
+* SysCo/al <developer@sysco.ch> (http://developer.sysco.ch/php/)
 
 ## Requirements:
 
@@ -20,11 +20,21 @@ SysCo/al <developer@sysco.ch> (http://developer.sysco.ch/php/)
 **Dapphp\Radius** is a pure PHP RADIUS client for authenticating users against
 a RADIUS server in PHP.  It currently supports basic RADIUS auth using PAP,
 CHAP (MD5), MSCHAP v1, and EAP-MSCHAP v2.  The current 2.5.x branch is tested
-to work with Microsoft Windows Server 2012 Network Policy Server and FreeRADIUS
-2 and above and most likely works with other RADIUS server implementations.
-PAP authentication has been tested on Microsoft Radius server IAS, Mideye
-RADIUS Server, Radl, RSA SecurID, VASCO Middleware 3.0 server, WinRadius, and
-ZyXEL ZyWALL OTP.
+to work with the following RADIUS servers:
+
+- Microsoft Windows Server 2016 Network Policy Server
+- Microsoft Windows Server 2012 Network Policy Server
+- FreeRADIUS 2 and above
+
+PAP authentication has been tested on:
+
+- Microsoft Radius server IAS
+- Mideye RADIUS Server
+- Radl
+- RSA SecurID
+- VASCO Middleware 3.0 server
+- WinRadius
+- ZyXEL ZyWALL OTP
 
 The PHP mcrypt extension is required if using MSCHAP v1 or v2.
 
@@ -48,65 +58,65 @@ and credentials to test).
 
 ## Synopsis:
 
-<?php
+	<?php
 
-use Dapphp\Radius\Radius;
+	use Dapphp\Radius\Radius;
 
-require_once '/path/to/radius/autoload.php';
-// or, if using composer
-require_once '/path/to/vendor/autoload.php';
+	require_once '/path/to/radius/autoload.php';
+	// or, if using composer
+	require_once '/path/to/vendor/autoload.php';
 
-$client = new Radius();
+	$client = new Radius();
 
-// set server, secret, and basic attributes
-$client->setServer('12.34.56.78') // RADIUS server address
-       ->setSecret('radius shared secret')
-       ->setNasIpAddress('10.0.1.2') // NAS server address
-       ->setAttribute(32, 'login');  // NAS identifier
-       
-// PAP authentication; returns true if successful, false otherwise
-$authenticated = $client->accessRequest($username, $password);
+	// set server, secret, and basic attributes
+	$client->setServer('12.34.56.78') // RADIUS server address
+	       ->setSecret('radius shared secret')
+	       ->setNasIpAddress('10.0.1.2') // NAS server address
+	       ->setAttribute(32, 'login');  // NAS identifier
 
-// CHAP-MD5 authentication
-$client->setChapPassword($password); // set chap password
-$authenticated = $client->accessRequest($username); // authenticate, don't specify pw here
+	// PAP authentication; returns true if successful, false otherwise
+	$authenticated = $client->accessRequest($username, $password);
 
-// MSCHAP v1 authentication
-$client->setMSChapPassword($password); // set ms chap password (uses mcrypt)
-$authenticated = $client->accessRequest($username);
+	// CHAP-MD5 authentication
+	$client->setChapPassword($password); // set chap password
+	$authenticated = $client->accessRequest($username); // authenticate, don't specify pw here
 
-// EAP-MSCHAP v2 authentication
-$authenticated = $client->accessRequestEapMsChapV2($username, $password);
+	// MSCHAP v1 authentication
+	$client->setMSChapPassword($password); // set ms chap password (uses mcrypt)
+	$authenticated = $client->accessRequest($username);
 
-if ($authenticated === false) {
-    // false returned on failure
-    echo sprintf(
-        "Access-Request failed with error %d (%s).\n",
-        $client->getErrorCode(),
-        $client->getErrorMessage()
-    );
-} else {
-    // access request was accepted - client authenticated successfully
-    echo "Success!  Received Access-Accept response from RADIUS server.\n";
-}
+	// EAP-MSCHAP v2 authentication
+	$authenticated = $client->accessRequestEapMsChapV2($username, $password);
+
+	if ($authenticated === false) {
+	    // false returned on failure
+	    echo sprintf(
+	        "Access-Request failed with error %d (%s).\n",
+	        $client->getErrorCode(),
+	        $client->getErrorMessage()
+	    );
+	} else {
+	    // access request was accepted - client authenticated successfully
+	    echo "Success!  Received Access-Accept response from RADIUS server.\n";
+	}
 
 ## Advanced Usage:
 
-// Setting vendor specific attributes
-// Many vendor IDs are available in \Dapphp\Radius\VendorId
-// e.g. \Dapphp\Radius\VendorId::MICROSOFT
-$client->setVendorSpecificAttribute($vendorId, $attributeNumber, $rawValue);
+	// Setting vendor specific attributes
+	// Many vendor IDs are available in \Dapphp\Radius\VendorId
+	// e.g. \Dapphp\Radius\VendorId::MICROSOFT
+	$client->setVendorSpecificAttribute($vendorId, $attributeNumber, $rawValue);
 
-// Retrieving attributes from RADIUS responses after receiving a failure or success response
-$value = $client->getAttribute($attributeId);
+	// Retrieving attributes from RADIUS responses after receiving a failure or success response
+	$value = $client->getAttribute($attributeId);
 
-// Get an array of all received attributes
-$attributes = getReceivedAttributes();
+	// Get an array of all received attributes
+	$attributes = getReceivedAttributes();
 
-// Debugging
-// Prior to sending a request, call
-$client->setDebug(true); // enable debug output on console
-// Shows what attributes are sent and received, and info about the request/response
+	// Debugging
+	// Prior to sending a request, call
+	$client->setDebug(true); // enable debug output on console
+	// Shows what attributes are sent and received, and info about the request/response
 
 
 ## TODO:
@@ -139,3 +149,36 @@ $client->setDebug(true); // enable debug output on console
     You should have received a copy of the GNU Lesser General Public
     License along with Pure PHP radius class.
     If not, see <http://www.gnu.org/licenses/>
+
+## Licenses:
+
+This library makes use of the Crypt_CHAP PEAR library.  See `lib/Pear_CHAP.php`.
+
+	Copyright (c) 2002-2010, Michael Bretterklieber <michael@bretterklieber.com>
+	All rights reserved.
+
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions
+	are met:
+
+	1. Redistributions of source code must retain the above copyright
+	   notice, this list of conditions and the following disclaimer.
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+	3. The names of the authors may not be used to endorse or promote products
+	   derived from this software without specific prior written permission.
+
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+	ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+	IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+	INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+	BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+	DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+	OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+	NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+	EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+	This code cannot simply be copied and put under the GNU Public License or
+	any other GPL-like (LGPL, GPL2) License.

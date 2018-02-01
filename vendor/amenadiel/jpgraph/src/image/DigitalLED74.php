@@ -47,104 +47,83 @@ if (!function_exists('mb_strlen')) {
 //========================================================================
 class DigitalLED74
 {
-    private $iLED_X = 4, $iLED_Y = 7,
-
-    // fg-up, fg-down, bg
-    $iColorSchema = array(
-        LEDC_RED => array('red', 'darkred:0.9', 'red:0.3'), // 0
-        LEDC_GREEN => array('green', 'darkgreen', 'green:0.3'), // 1
-        LEDC_BLUE => array('lightblue:0.9', 'darkblue:0.85', 'darkblue:0.7'), // 2
-        LEDC_YELLOW => array('yellow', 'yellow:0.4', 'yellow:0.3'), // 3
-        LEDC_GRAY => array('gray:1.4', 'darkgray:0.85', 'darkgray:0.7'),
-        LEDC_CHOCOLATE => array('chocolate', 'chocolate:0.7', 'chocolate:0.5'),
-        LEDC_PERU => array('peru:0.95', 'peru:0.6', 'peru:0.5'),
-        LEDC_GOLDENROD => array('goldenrod', 'goldenrod:0.6', 'goldenrod:0.5'),
-        LEDC_KHAKI => array('khaki:0.7', 'khaki:0.4', 'khaki:0.3'),
-        LEDC_OLIVE => array('#808000', '#808000:0.7', '#808000:0.6'),
-        LEDC_LIMEGREEN => array('limegreen:0.9', 'limegreen:0.5', 'limegreen:0.4'),
+    private $iLED_X       = 4;
+    private $iLED_Y       = 7;
+    private $iColorSchema = array(
+        LEDC_RED         => array('red', 'darkred:0.9', 'red:0.3'), // 0
+        LEDC_GREEN       => array('green', 'darkgreen', 'green:0.3'), // 1
+        LEDC_BLUE        => array('lightblue:0.9', 'darkblue:0.85', 'darkblue:0.7'), // 2
+        LEDC_YELLOW      => array('yellow', 'yellow:0.4', 'yellow:0.3'), // 3
+        LEDC_GRAY        => array('gray:1.4', 'darkgray:0.85', 'darkgray:0.7'),
+        LEDC_CHOCOLATE   => array('chocolate', 'chocolate:0.7', 'chocolate:0.5'),
+        LEDC_PERU        => array('peru:0.95', 'peru:0.6', 'peru:0.5'),
+        LEDC_GOLDENROD   => array('goldenrod', 'goldenrod:0.6', 'goldenrod:0.5'),
+        LEDC_KHAKI       => array('khaki:0.7', 'khaki:0.4', 'khaki:0.3'),
+        LEDC_OLIVE       => array('#808000', '#808000:0.7', '#808000:0.6'),
+        LEDC_LIMEGREEN   => array('limegreen:0.9', 'limegreen:0.5', 'limegreen:0.4'),
         LEDC_FORESTGREEN => array('forestgreen', 'forestgreen:0.7', 'forestgreen:0.5'),
-        LEDC_TEAL => array('teal', 'teal:0.7', 'teal:0.5'),
-        LEDC_STEELBLUE => array('steelblue', 'steelblue:0.65', 'steelblue:0.5'),
-        LEDC_NAVY => array('navy:1.3', 'navy:0.95', 'navy:0.8'), //14
-        LEDC_INVERTGRAY => array('darkgray', 'lightgray:1.5', 'white'), //15
-    ),
-
-    /* Each line of the character is encoded as a 4 bit value
-    0      ____
-    1      ___x
-    2      __x_
-    3      __xx
-    4      _x__
-    5      _x_x
-    6      _xx_
-    7      _xxx
-    8      x___
-    9      x__x
-    10     x_x_
-    11     x_xx
-    12     xx__
-    13     xx_x
-    14     xxx_
-    15     xxxx
-     */
-
-    $iLEDSpec = array(
-        0 => array(6, 9, 11, 15, 13, 9, 6),
-        1 => array(2, 6, 10, 2, 2, 2, 2),
-        2 => array(6, 9, 1, 2, 4, 8, 15),
-        3 => array(6, 9, 1, 6, 1, 9, 6),
-        4 => array(1, 3, 5, 9, 15, 1, 1),
-        5 => array(15, 8, 8, 14, 1, 9, 6),
-        6 => array(6, 8, 8, 14, 9, 9, 6),
-        7 => array(15, 1, 1, 2, 4, 4, 4),
-        8 => array(6, 9, 9, 6, 9, 9, 6),
-        9 => array(6, 9, 9, 7, 1, 1, 6),
-        '!' => array(4, 4, 4, 4, 4, 0, 4),
-        '?' => array(6, 9, 1, 2, 2, 0, 2),
-        '#' => array(0, 9, 15, 9, 15, 9, 0),
-        '@' => array(6, 9, 11, 11, 10, 9, 6),
-        '-' => array(0, 0, 0, 15, 0, 0, 0),
-        '_' => array(0, 0, 0, 0, 0, 0, 15),
-        '=' => array(0, 0, 15, 0, 15, 0, 0),
-        '+' => array(0, 0, 4, 14, 4, 0, 0),
-        '|' => array(4, 4, 4, 4, 4, 4, 4), //vertical line, used for simulate rus 'Ы'
-        ',' => array(0, 0, 0, 0, 0, 12, 4),
-        '.' => array(0, 0, 0, 0, 0, 12, 12),
-        ':' => array(12, 12, 0, 0, 0, 12, 12),
-        ';' => array(12, 12, 0, 0, 0, 12, 4),
-        '[' => array(3, 2, 2, 2, 2, 2, 3),
-        ']' => array(12, 4, 4, 4, 4, 4, 12),
-        '(' => array(1, 2, 2, 2, 2, 2, 1),
-        ')' => array(8, 4, 4, 4, 4, 4, 8),
-        '{' => array(3, 2, 2, 6, 2, 2, 3),
-        '}' => array(12, 4, 4, 6, 4, 4, 12),
-        '<' => array(1, 2, 4, 8, 4, 2, 1),
-        '>' => array(8, 4, 2, 1, 2, 4, 8),
-        '*' => array(9, 6, 15, 6, 9, 0, 0),
-        '"' => array(10, 10, 0, 0, 0, 0, 0),
+        LEDC_TEAL        => array('teal', 'teal:0.7', 'teal:0.5'),
+        LEDC_STEELBLUE   => array('steelblue', 'steelblue:0.65', 'steelblue:0.5'),
+        LEDC_NAVY        => array('navy:1.3', 'navy:0.95', 'navy:0.8'), //14
+        LEDC_INVERTGRAY  => array('darkgray', 'lightgray:1.5', 'white'), //15
+    );
+    private $iLEDSpec = array(
+        0    => array(6, 9, 11, 15, 13, 9, 6),
+        1    => array(2, 6, 10, 2, 2, 2, 2),
+        2    => array(6, 9, 1, 2, 4, 8, 15),
+        3    => array(6, 9, 1, 6, 1, 9, 6),
+        4    => array(1, 3, 5, 9, 15, 1, 1),
+        5    => array(15, 8, 8, 14, 1, 9, 6),
+        6    => array(6, 8, 8, 14, 9, 9, 6),
+        7    => array(15, 1, 1, 2, 4, 4, 4),
+        8    => array(6, 9, 9, 6, 9, 9, 6),
+        9    => array(6, 9, 9, 7, 1, 1, 6),
+        '!'  => array(4, 4, 4, 4, 4, 0, 4),
+        '?'  => array(6, 9, 1, 2, 2, 0, 2),
+        '#'  => array(0, 9, 15, 9, 15, 9, 0),
+        '@'  => array(6, 9, 11, 11, 10, 9, 6),
+        '-'  => array(0, 0, 0, 15, 0, 0, 0),
+        '_'  => array(0, 0, 0, 0, 0, 0, 15),
+        '='  => array(0, 0, 15, 0, 15, 0, 0),
+        '+'  => array(0, 0, 4, 14, 4, 0, 0),
+        '|'  => array(4, 4, 4, 4, 4, 4, 4), //vertical line, used for simulate rus 'Ы'
+        ','  => array(0, 0, 0, 0, 0, 12, 4),
+        '.'  => array(0, 0, 0, 0, 0, 12, 12),
+        ':'  => array(12, 12, 0, 0, 0, 12, 12),
+        ';'  => array(12, 12, 0, 0, 0, 12, 4),
+        '['  => array(3, 2, 2, 2, 2, 2, 3),
+        ']'  => array(12, 4, 4, 4, 4, 4, 12),
+        '('  => array(1, 2, 2, 2, 2, 2, 1),
+        ')'  => array(8, 4, 4, 4, 4, 4, 8),
+        '{'  => array(3, 2, 2, 6, 2, 2, 3),
+        '}'  => array(12, 4, 4, 6, 4, 4, 12),
+        '<'  => array(1, 2, 4, 8, 4, 2, 1),
+        '>'  => array(8, 4, 2, 1, 2, 4, 8),
+        '*'  => array(9, 6, 15, 6, 9, 0, 0),
+        '"'  => array(10, 10, 0, 0, 0, 0, 0),
         '\'' => array(4, 4, 0, 0, 0, 0, 0),
-        '`' => array(4, 2, 0, 0, 0, 0, 0),
-        '~' => array(13, 11, 0, 0, 0, 0, 0),
-        '^' => array(4, 10, 0, 0, 0, 0, 0),
+        '`'  => array(4, 2, 0, 0, 0, 0, 0),
+        '~'  => array(13, 11, 0, 0, 0, 0, 0),
+        '^'  => array(4, 10, 0, 0, 0, 0, 0),
         '\\' => array(8, 8, 4, 6, 2, 1, 1),
-        '/' => array(1, 1, 2, 6, 4, 8, 8),
-        '%' => array(1, 9, 2, 6, 4, 9, 8),
-        '&' => array(0, 4, 10, 4, 11, 10, 5),
-        '$' => array(2, 7, 8, 6, 1, 14, 4),
-        ' ' => array(0, 0, 0, 0, 0, 0, 0),
-        '•' => array(0, 0, 6, 6, 0, 0, 0), //149
-        '°' => array(14, 10, 14, 0, 0, 0, 0), //176
-        '†' => array(4, 4, 14, 4, 4, 4, 4), //134
-        '‡' => array(4, 4, 14, 4, 14, 4, 4), //135
-        '±' => array(0, 4, 14, 4, 0, 14, 0), //177
-        '‰' => array(0, 4, 2, 15, 2, 4, 0), //137 show right arrow
-        '™' => array(0, 2, 4, 15, 4, 2, 0), //156 show left arrow
-        'Ў' => array(0, 0, 8, 8, 0, 0, 0), //159 show small hi-stick - that need for simulate rus 'Ф'
+        '/'  => array(1, 1, 2, 6, 4, 8, 8),
+        '%'  => array(1, 9, 2, 6, 4, 9, 8),
+        '&'  => array(0, 4, 10, 4, 11, 10, 5),
+        '$'  => array(2, 7, 8, 6, 1, 14, 4),
+        ' '  => array(0, 0, 0, 0, 0, 0, 0),
+        '•'  => array(0, 0, 6, 6, 0, 0, 0), //149
+        '°'  => array(14, 10, 14, 0, 0, 0, 0), //176
+        '†'  => array(4, 4, 14, 4, 4, 4, 4), //134
+        '‡'  => array(4, 4, 14, 4, 14, 4, 4), //135
+        '±'  => array(0, 4, 14, 4, 0, 14, 0), //177
+        '‰'  => array(0, 4, 2, 15, 2, 4, 0), //137 show right arrow
+        '™'  => array(0, 2, 4, 15, 4, 2, 0), //156 show left arrow
+        'Ў'  => array(0, 0, 8, 8, 0, 0, 0), //159 show small hi-stick - that need for simulate rus 'Ф'
         "\t" => array(8, 8, 8, 0, 0, 0, 0), //show hi-stick - that need for simulate rus 'У'
         "\r" => array(8, 8, 8, 8, 8, 8, 8), //vertical line - that need for simulate 'M', 'W' and rus 'М','Ш' ,'Щ'
         "\n" => array(15, 15, 15, 15, 15, 15, 15), //fill up - that need for simulate rus 'Ж'
-        "Ґ" => array(10, 5, 10, 5, 10, 5, 10), //chess
-        "µ" => array(15, 0, 15, 0, 15, 0, 15), //4 horizontal lines
+        "Ґ"  => array(10, 5, 10, 5, 10, 5, 10), //chess
+        "µ"  => array(15, 0, 15, 0, 15, 0, 15), //4 horizontal lines
         // latin
         'A' => array(6, 9, 9, 15, 9, 9, 9),
         'B' => array(14, 9, 9, 14, 9, 9, 14),
@@ -206,13 +185,14 @@ class DigitalLED74
         'Э' => array(6, 9, 1, 7, 1, 9, 6),
         'Ю' => array(2, 2, 2, 3, 2, 2, 2), // need to add O
         'Я' => array(7, 9, 9, 7, 3, 5, 9),
-    ),
-
-    $iSuperSampling = 3, $iMarg = 1, $iRad = 4;
+    );
+    private $iSuperSampling = 3;
+    private $iMarg          = 1;
+    private $iRad           = 4;
 
     public function __construct($aRadius = 2, $aMargin = 0.6)
     {
-        $this->iRad = $aRadius;
+        $this->iRad  = $aRadius;
         $this->iMarg = $aMargin;
     }
 
@@ -223,7 +203,7 @@ class DigitalLED74
 
     public function _GetLED($aLedIdx, $aColor = 0)
     {
-        $width = $this->iLED_X * $this->iRad * 2 + ($this->iLED_X + 1) * $this->iMarg + $this->iRad;
+        $width  = $this->iLED_X * $this->iRad * 2 + ($this->iLED_X + 1) * $this->iMarg + $this->iRad;
         $height = $this->iLED_Y * $this->iRad * 2 + ($this->iLED_Y) * $this->iMarg + $this->iRad * 2;
 
         // Adjust radious for supersampling
@@ -232,7 +212,7 @@ class DigitalLED74
         // Margin in between "Led" dots
         $marg = $this->iMarg * $this->iSuperSampling;
 
-        $swidth = $width * $this->iSuperSampling;
+        $swidth  = $width * $this->iSuperSampling;
         $sheight = $height * $this->iSuperSampling;
 
         $simg = new RotImage($swidth, $sheight, 0, DEFAULT_GFORMAT, false);
@@ -282,7 +262,7 @@ class DigitalLED74
 
         if (($n = mb_strlen($aValStr, 'utf8')) == 0) {
             $aValStr = ' ';
-            $n = 1;
+            $n       = 1;
         }
 
         for ($i = 0; $i < $n; ++$i) {

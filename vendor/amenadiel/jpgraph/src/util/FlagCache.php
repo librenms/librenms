@@ -11,7 +11,6 @@ $_gFlagCache = array(
 // Only supposed to b called as statics
 class FlagCache
 {
-
     public static function GetFlagImgByName($aSize, $aName)
     {
         global $_gFlagCache;
@@ -19,7 +18,7 @@ class FlagCache
         if ($_gFlagCache[$aSize] === null) {
             $_gFlagCache[$aSize] = new FlagImages($aSize);
         }
-        $f = $_gFlagCache[$aSize];
+        $f   = $_gFlagCache[$aSize];
         $idx = $f->GetIdxByName($aName, $aFullName);
         return $f->GetImgByIdx($idx);
     }
