@@ -28,7 +28,7 @@ use LibreNMS\Config;
 if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=0)) {
     $vrfs_lite_cisco = $device['vrf_lite_cisco'];
 } else {
-    $vrfs_lite_cisco = array(array('context_name'=>null));
+    $vrfs_lite_cisco = array(array('context_name'=>''));
 }
 
 foreach ($vrfs_lite_cisco as $vrf) {
@@ -42,15 +42,8 @@ foreach ($vrfs_lite_cisco as $vrf) {
         $arp_data = snmpwalk_group($device, 'ipNetToMediaPhysAddress', 'IP-MIB', 1, $arp_data);
     }
 
-    $sql = "SELECT * from `ipv4_mac` WHERE `device_id`=?";
-    $params = array($device['device_id']);
-    if (is_null($context)) {
-        $sql .= ' AND `context_name` IS NULL';
-    } else {
-        $sql .= ' AND `context_name`=?';
-        $params[] = $context;
-    }
-    $existing_data = dbFetchRows($sql, $params);
+    $sql = "SELECT * from `ipv4_mac` WHERE `device_id`=? AND `context_name`=?";
+    $existing_data = dbFetchRows($sql, array($device['device_id'], $context));
 
     $ipv4_addresses = array_map(function ($data) {
         return $data['ipv4_address'];
@@ -92,7 +85,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
                     'device_id'    => $device['device_id'],
                     'mac_address'  => $mac,
                     'ipv4_address' => $ip,
-                    'context_name' => $context,
+                    'context_name' => (string)$context,
                 );
             }
         }
