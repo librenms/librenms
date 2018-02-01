@@ -1311,6 +1311,9 @@ function rewrite_brocade_fc_switches($descr)
         case "148":
             $hardware = "Brocade 7840 Switch";
             break;
+        case "170":
+            $hardware = "Brocade 6610 Switch";
+            break;
         default:
             $hardware = "Unknown Brocade FC Switch";
     }
