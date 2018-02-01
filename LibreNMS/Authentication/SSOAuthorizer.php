@@ -39,6 +39,7 @@ class SSOAuthorizer extends MysqlAuthorizer
 {
     protected static $HAS_AUTH_USERMANAGEMENT = 1;
     protected static $CAN_UPDATE_USER = 1;
+    protected static $CAN_UPDATE_PASSWORDS = 0;
     protected static $AUTH_IS_EXTERNAL = 1;
 
     public function authenticate($username, $password)

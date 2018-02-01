@@ -9,6 +9,7 @@ class MysqlAuthorizer extends AuthorizerBase
 {
     protected static $HAS_AUTH_USERMANAGEMENT = 1;
     protected static $CAN_UPDATE_USER = 1;
+    protected static $CAN_UPDATE_PASSWORDS = 1;
 
     public function authenticate($username, $password)
     {
@@ -55,7 +56,9 @@ class MysqlAuthorizer extends AuthorizerBase
          * user is explicitly prohibited to do so.
          */
 
-        if (empty($username) || !$this->userExists($username)) {
+        if (!static::$CAN_UPDATE_PASSWORDS) {
+            return 0;
+        } elseif (empty($username) || !$this->userExists($username)) {
             return 1;
         } else {
             return dbFetchCell('SELECT can_modify_passwd FROM users WHERE username = ?', array($username));
@@ -64,6 +67,11 @@ class MysqlAuthorizer extends AuthorizerBase
 
     public function changePassword($username, $password)
     {
+        // check if updating passwords is allowed (mostly for classes that extend this)
+        if (!static::$CAN_UPDATE_PASSWORDS) {
+            return 0;
+        }
+
         $hasher    = new PasswordHash(8, false);
         $encrypted = $hasher->HashPassword($password);
         return dbUpdate(array('password' => $encrypted), 'users', '`username` = ?', array($username));

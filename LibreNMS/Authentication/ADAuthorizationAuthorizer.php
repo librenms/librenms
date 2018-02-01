@@ -7,8 +7,10 @@ use LibreNMS\Exceptions\AuthenticationException;
 
 class ADAuthorizationAuthorizer extends MysqlAuthorizer
 {
-    protected $ldap_connection;
     protected static $AUTH_IS_EXTERNAL = 1;
+    protected static $CAN_UPDATE_PASSWORDS = 0;
+
+    protected $ldap_connection;
 
     public function __construct()
     {

@@ -10,6 +10,8 @@ use LibreNMS\Exceptions\AuthenticationException;
 
 class ActiveDirectoryAuthorizer extends AuthorizerBase
 {
+    protected static $CAN_UPDATE_PASSWORDS = 0;
+
     protected $ldap_connection;
     protected $is_bound = false; // this variable tracks if bind has been called so we don't call it multiple times
 
