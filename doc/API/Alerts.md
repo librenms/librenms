@@ -21,7 +21,7 @@ Output:
 ```json
 {
  "status": "ok",
- "err-msg": "",
+ "message": "",
  "count": 7,
  "alerts": [
   {
@@ -58,7 +58,7 @@ Output:
 ```json
 {
  "status": "ok",
- "err-msg": "",
+ "message": "",
  "message": "Alert has been acknowledged"
 }
 ```
@@ -84,7 +84,7 @@ Output:
 ```json
 {
  "status": "ok",
- "err-msg": "",
+ "message": "",
  "message": "Alert has been unmuted"
 }
 ```
@@ -109,7 +109,7 @@ Output:
 ```json
 {
  "status": "ok",
- "err-msg": "",
+ "message": "",
  "count": 1,
  "alerts": [
   {
@@ -147,7 +147,7 @@ Output:
 ```json
 {
  "status": "ok",
- "err-msg": "",
+ "message": "",
  "count": 1,
  "rules": [
   {
@@ -184,7 +184,7 @@ Output:
 ```json
 {
  "status": "ok",
- "err-msg": "",
+ "message": "",
  "message": "Alert rule has been removed"
 }
 ```
@@ -210,7 +210,7 @@ Output:
 ```json
 {
  "status": "ok",
- "err-msg": "",
+ "message": "",
  "count": 1,
  "rules": [
   {
@@ -255,7 +255,7 @@ Output:
 rules
 {
  "status": "ok",
- "err-msg": ""
+ "message": ""
 }
 ```
 
@@ -290,6 +290,6 @@ Output:
 rules
 {
  "status": "ok",
- "err-msg": ""
+ "message": ""
 }
 ```

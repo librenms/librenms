@@ -88,7 +88,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 3,
     "graphs": [
         {
@@ -133,7 +133,7 @@ Output:
 ```
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 2,
     "graphs": [
         {
@@ -157,7 +157,7 @@ Output:
 ```
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 2,
     "graphs": [
         {
@@ -181,7 +181,7 @@ Output:
 ```
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 1,
     "graphs": [
         {
@@ -428,7 +428,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 3,
     "ports": [
         {
@@ -461,7 +461,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "addresses": [
         {
           "ipv4_address_id": "290",
@@ -497,7 +497,7 @@ Output:
 ```json
 {
   "status": "ok",
-  "err-msg": "",
+  "message": "",
   "count": 2,
   "mappings": [
     {
@@ -543,7 +543,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 3,
     "components": {
         "2": {
@@ -599,7 +599,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 1,
     "components": {
         "4459": {
@@ -632,7 +632,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 1
 }
 ```
@@ -658,7 +658,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "err-msg": ""
+    "message": ""
 }
 ```
 
