@@ -23,7 +23,7 @@ Output:
 ```json
 {
  "status": "ok",
- "err-msg": "",
+ "message": "",
  "bgp_sessions": [
         {
             "bgpPeer_id": "4",
@@ -264,7 +264,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 0,
     "ipsec": [
         "tunnel_id": "1",
