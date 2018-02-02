@@ -178,7 +178,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
         $actions .= '</div><div class="row">';
     }
     
-    if (isset($config['gateone']['server'])){
+    if (isset($config['gateone']['server'])) {
         $actions .= '
                     <div class="col-xs-1"><a href="telnet://' . $device['hostname'] . '"><i class="fa fa-terminal fa-lg icon-theme" title="Telnet to ' . $device['hostname'] . '"></i></a></div>
                     <div class="col-xs-1"><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>
@@ -186,7 +186,6 @@ foreach (dbFetchRows($sql, $param) as $device) {
                 </div>
             </div>
         ';
-
     } else {
         $actions .= '
                     <div class="col-xs-1"><a href="telnet://' . $device['hostname'] . '"><i class="fa fa-terminal fa-lg icon-theme" title="Telnet to ' . $device['hostname'] . '"></i></a></div>

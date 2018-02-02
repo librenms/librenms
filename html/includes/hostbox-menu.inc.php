@@ -27,7 +27,7 @@ if (device_permitted($device['device_id'])) {
             </div>';
     }
 
-    if (isset($config['gateone']['server'])){
+    if (isset($config['gateone']['server'])) {
         echo '</div>
             <div class="row">
             <div class="col-xs-1">
