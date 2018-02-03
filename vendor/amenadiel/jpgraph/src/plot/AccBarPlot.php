@@ -7,13 +7,13 @@ namespace Amenadiel\JpGraph\Plot;
 //===================================================
 class AccBarPlot extends BarPlot
 {
-    public $plots = null;
+    public $plots     = null;
     private $nbrplots = 0;
     //---------------
     // CONSTRUCTOR
     public function __construct($plots)
     {
-        $this->plots = $plots;
+        $this->plots    = $plots;
         $this->nbrplots = count($plots);
         if ($this->nbrplots < 1) {
             Util\JpGraphError::RaiseL(2010); //('Cannot create AccBarPlot from empty plot array.');
@@ -37,7 +37,7 @@ class AccBarPlot extends BarPlot
         $this->SetWeight(0);
 
         $this->numpoints = $plots[0]->numpoints;
-        $this->value = new DisplayValue();
+        $this->value     = new DisplayValue();
     }
 
     //---------------
@@ -58,12 +58,12 @@ class AccBarPlot extends BarPlot
     public function Max()
     {
         list($xmax) = $this->plots[0]->Max();
-        $nmax = 0;
+        $nmax       = 0;
         for ($i = 0; $i < count($this->plots); ++$i) {
-            $n = count($this->plots[$i]->coords[0]);
-            $nmax = max($nmax, $n);
+            $n       = count($this->plots[$i]->coords[0]);
+            $nmax    = max($nmax, $n);
             list($x) = $this->plots[$i]->Max();
-            $xmax = max($xmax, $x);
+            $xmax    = max($xmax, $x);
         }
         for ($i = 0; $i < $nmax; $i++) {
             // Get y-value for bar $i by adding the
@@ -86,7 +86,6 @@ class AccBarPlot extends BarPlot
                 if ($this->plots[$j]->coords[0][$i] > 0) {
                     $y += $this->plots[$j]->coords[0][$i];
                 }
-
             }
             $ymax[$i] = $y;
         }
@@ -97,19 +96,19 @@ class AccBarPlot extends BarPlot
             $ymax = $this->ybase;
         }
 
-        return array($xmax, $ymax);
+        return [$xmax, $ymax];
     }
 
     public function Min()
     {
-        $nmax = 0;
+        $nmax                 = 0;
         list($xmin, $ysetmin) = $this->plots[0]->Min();
         for ($i = 0; $i < count($this->plots); ++$i) {
-            $n = count($this->plots[$i]->coords[0]);
-            $nmax = max($nmax, $n);
+            $n           = count($this->plots[$i]->coords[0]);
+            $nmax        = max($nmax, $n);
             list($x, $y) = $this->plots[$i]->Min();
-            $xmin = Min($xmin, $x);
-            $ysetmin = Min($y, $ysetmin);
+            $xmin        = Min($xmin, $x);
+            $ysetmin     = Min($y, $ysetmin);
         }
         for ($i = 0; $i < $nmax; $i++) {
             // Get y-value for bar $i by adding the
@@ -126,7 +125,6 @@ class AccBarPlot extends BarPlot
                 if ($this->plots[$j]->coords[0][$i] < 0) {
                     $y += $this->plots[$j]->coords[0][$i];
                 }
-
             }
             $ymin[$i] = $y;
         }
@@ -136,7 +134,7 @@ class AccBarPlot extends BarPlot
             $ymin = $this->ybase;
         }
 
-        return array($xmin, $ymin);
+        return [$xmin, $ymin];
     }
 
     // Stroke acc bar plot
@@ -146,18 +144,18 @@ class AccBarPlot extends BarPlot
         $img->SetLineWeight($this->weight);
         $grad = null;
         for ($i = 0; $i < $this->numpoints - 1; $i++) {
-            $accy = 0;
+            $accy     = 0;
             $accy_neg = 0;
             for ($j = 0; $j < $this->nbrplots; ++$j) {
                 $img->SetColor($this->plots[$j]->color);
 
                 if ($this->plots[$j]->coords[0][$i] >= 0) {
-                    $yt = $yscale->Translate($this->plots[$j]->coords[0][$i] + $accy);
+                    $yt    = $yscale->Translate($this->plots[$j]->coords[0][$i] + $accy);
                     $accyt = $yscale->Translate($accy);
                     $accy += $this->plots[$j]->coords[0][$i];
                 } else {
                     //if ( $this->plots[$j]->coords[0][$i] < 0 || $accy_neg < 0 ) {
-                    $yt = $yscale->Translate($this->plots[$j]->coords[0][$i] + $accy_neg);
+                    $yt    = $yscale->Translate($this->plots[$j]->coords[0][$i] + $accy_neg);
                     $accyt = $yscale->Translate($accy_neg);
                     $accy_neg += $this->plots[$j]->coords[0][$i];
                 }
@@ -170,7 +168,7 @@ class AccBarPlot extends BarPlot
                     $abswidth = round($this->width * $xscale->scale_factor, 0);
                 }
 
-                $pts = array($xt, $accyt, $xt, $yt, $xt + $abswidth, $yt, $xt + $abswidth, $accyt);
+                $pts = [$xt, $accyt, $xt, $yt, $xt + $abswidth, $yt, $xt + $abswidth, $accyt];
 
                 if ($this->bar_shadow) {
                     $ssh = $this->bar_shadow_hsize;
@@ -191,12 +189,12 @@ class AccBarPlot extends BarPlot
                         $sp[3] = $pts[7] - $ssv;
 
                         // In case the final bar is negative
-                        $nsp[0] = $pts[0];
-                        $nsp[1] = $pts[1];
-                        $nsp[2] = $pts[0] + $ssh;
-                        $nsp[3] = $pts[1] - $ssv;
-                        $nsp[4] = $pts[6] + $ssh;
-                        $nsp[5] = $pts[7] - $ssv;
+                        $nsp[0]  = $pts[0];
+                        $nsp[1]  = $pts[1];
+                        $nsp[2]  = $pts[0] + $ssh;
+                        $nsp[3]  = $pts[1] - $ssv;
+                        $nsp[4]  = $pts[6] + $ssh;
+                        $nsp[5]  = $pts[7] - $ssv;
                         $nsp[10] = $pts[6] + 1;
                         $nsp[11] = $pts[7];
                     }
@@ -216,12 +214,12 @@ class AccBarPlot extends BarPlot
                         }
 
                         if ($accy > 0) {
-                            $sp[4] = $pts[4] + $ssh;
-                            $sp[5] = $pts[5] - $ssv;
-                            $sp[6] = $pts[2] + $ssh;
-                            $sp[7] = $pts[3] - $ssv;
-                            $sp[8] = $pts[2];
-                            $sp[9] = $pts[3] - 1;
+                            $sp[4]  = $pts[4] + $ssh;
+                            $sp[5]  = $pts[5] - $ssv;
+                            $sp[6]  = $pts[2] + $ssh;
+                            $sp[7]  = $pts[3] - $ssv;
+                            $sp[8]  = $pts[2];
+                            $sp[9]  = $pts[3] - 1;
                             $sp[10] = $pts[4] + 1;
                             $sp[11] = $pts[5];
                             $img->FilledPolygon($sp, 4);
@@ -257,17 +255,17 @@ class AccBarPlot extends BarPlot
                                 $this->plots[$j]->grad_fromcolor[0] < 256) {
                                 // RGB Triple
                                 $fromcolor = $this->plots[$j]->grad_fromcolor;
-                                $tocolor = $this->plots[$j]->grad_tocolor;
-                                $style = $this->plots[$j]->grad_style;
+                                $tocolor   = $this->plots[$j]->grad_tocolor;
+                                $style     = $this->plots[$j]->grad_style;
                             } else {
                                 $fromcolor = $this->plots[$j]->grad_fromcolor[$i % $ng][0];
-                                $tocolor = $this->plots[$j]->grad_fromcolor[$i % $ng][1];
-                                $style = $this->plots[$j]->grad_fromcolor[$i % $ng][2];
+                                $tocolor   = $this->plots[$j]->grad_fromcolor[$i % $ng][1];
+                                $style     = $this->plots[$j]->grad_fromcolor[$i % $ng][2];
                             }
                         } else {
                             $fromcolor = $this->plots[$j]->grad_fromcolor[$i % $ng][0];
-                            $tocolor = $this->plots[$j]->grad_fromcolor[$i % $ng][1];
-                            $style = $this->plots[$j]->grad_fromcolor[$i % $ng][2];
+                            $tocolor   = $this->plots[$j]->grad_fromcolor[$i % $ng][1];
+                            $style     = $this->plots[$j]->grad_fromcolor[$i % $ng][2];
                         }
                         $grad->FilledRectangle($pts[2], $pts[3],
                             $pts[6], $pts[7],
@@ -315,9 +313,9 @@ class AccBarPlot extends BarPlot
                         $rx = $pts[2];
                         $ry = $pts[3];
                     }
-                    $width = abs($pts[4] - $pts[0]) + 1;
+                    $width  = abs($pts[4] - $pts[0]) + 1;
                     $height = abs($pts[1] - $pts[3]) + 1;
-                    $prect->SetPos(new Rectangle($rx, $ry, $width, $height));
+                    $prect->SetPos(new Util\Rectangle($rx, $ry, $width, $height));
                     $prect->Stroke($img);
                 }
 
@@ -325,7 +323,7 @@ class AccBarPlot extends BarPlot
 
                 if ($i < count($this->plots[$j]->csimtargets)) {
                     // Create the client side image map
-                    $rpts = $img->ArrRotate($pts);
+                    $rpts      = $img->ArrRotate($pts);
                     $csimcoord = round($rpts[0]) . ", " . round($rpts[1]);
                     for ($k = 1; $k < 4; ++$k) {
                         $csimcoord .= ", " . round($rpts[2 * $k]) . ", " . round($rpts[2 * $k + 1]);
@@ -379,7 +377,7 @@ class AccBarPlot extends BarPlot
                 $this->value->Stroke($img, $accy, $x, $y);
             }
 
-            $accy = 0;
+            $accy     = 0;
             $accy_neg = 0;
             for ($j = 0; $j < $this->nbrplots; ++$j) {
 
@@ -389,7 +387,7 @@ class AccBarPlot extends BarPlot
                 }
 
                 if ($this->plots[$j]->coords[0][$i] > 0) {
-                    $yt = $yscale->Translate($this->plots[$j]->coords[0][$i] + $accy);
+                    $yt    = $yscale->Translate($this->plots[$j]->coords[0][$i] + $accy);
                     $accyt = $yscale->Translate($accy);
                     if ($this->plots[$j]->valuepos == 'center') {
                         $y = $accyt - ($accyt - $yt) / 2;
@@ -411,7 +409,7 @@ class AccBarPlot extends BarPlot
                         $this->plots[$j]->value->SetMargin(1);
                     }
                 } else {
-                    $yt = $yscale->Translate($this->plots[$j]->coords[0][$i] + $accy_neg);
+                    $yt    = $yscale->Translate($this->plots[$j]->coords[0][$i] + $accy_neg);
                     $accyt = $yscale->Translate($accy_neg);
                     $accy_neg += $this->plots[$j]->coords[0][$i];
                     if ($this->plots[$j]->valuepos == 'center') {
@@ -434,7 +432,6 @@ class AccBarPlot extends BarPlot
                 }
                 $this->plots[$j]->value->Stroke($img, $this->plots[$j]->coords[0][$i], $x, $y);
             }
-
         }
         return true;
     }

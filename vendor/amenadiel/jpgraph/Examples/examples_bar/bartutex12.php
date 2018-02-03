@@ -16,7 +16,7 @@ $month = array(
 $steps = 100;
 for ($i = 0; $i < $steps; ++$i) {
     $databarx[] = sprintf("198%d %s", floor($i / 12), $month[$i % 12]);
-    $datay[$i] = log(pow($i, $i / 10) + 1) * sin($i / 15) + 35;
+    $datay[$i]  = log(pow($i, $i / 10) + 1) * sin($i / 15) + 35;
     if ($i % 6 == 0 && $i < $steps - 6) {
         $databary[] = abs(25 * sin($i) + 5);
     } else {

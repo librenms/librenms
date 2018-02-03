@@ -4,7 +4,7 @@ require_once '../../vendor/autoload.php';
 \JpGraph\JpGraph::module('pie');
 
 // Some data and the labels
-$data = array(19, 12, 4, 7, 3, 12, 3);
+$data   = array(19, 12, 4, 7, 3, 12, 3);
 $labels = array("First\n(%.1f%%)",
     "Second\n(%.1f%%)", "Third\n(%.1f%%)",
     "Fourth\n(%.1f%%)", "Fifth\n(%.1f%%)",

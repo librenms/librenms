@@ -2,6 +2,7 @@
 namespace Amenadiel\JpGraph\Graph;
 
 use Amenadiel\JpGraph\Util;
+use \Amenadiel\JpGraph\ImgTrans;
 
 //===================================================
 // CLASS GanttGraph
@@ -10,16 +11,20 @@ use Amenadiel\JpGraph\Util;
 class GanttGraph extends Graph
 {
     public $scale; // Public accessible
-    public $hgrid = null;
-    private $iObj = array(); // Gantt objects
-    private $iLabelHMarginFactor = 0.2; // 10% margin on each side of the labels
-    private $iLabelVMarginFactor = 0.4; // 40% margin on top and bottom of label
-    private $iLayout = GANTT_FROMTOP; // Could also be GANTT_EVEN
-    private $iSimpleFont = FF_FONT1, $iSimpleFontSize = 11;
-    private $iSimpleStyle = GANTT_RDIAG, $iSimpleColor = 'yellow', $iSimpleBkgColor = 'red';
-    private $iSimpleProgressBkgColor = 'gray', $iSimpleProgressColor = 'darkgreen';
-    private $iSimpleProgressStyle = GANTT_SOLID;
-    private $iZoomFactor = 1.0;
+    public $hgrid                        = null;
+    private $iObj                        = []; // Gantt objects
+    private $iLabelHMarginFactor         = 0.2; // 10% margin on each side of the labels
+    private $iLabelVMarginFactor         = 0.4; // 40% margin on top and bottom of label
+    private $iLayout                     = GANTT_FROMTOP; // Could also be GANTT_EVEN
+    private $iSimpleFont                 = FF_FONT1;
+    private $iSimpleFontSize             = 11;
+    private $iSimpleStyle                = GANTT_RDIAG;
+    private $iSimpleColor                = 'yellow';
+    private $iSimpleBkgColor             = 'red';
+    private $iSimpleProgressBkgColor     = 'gray';
+    private $iSimpleProgressColor        = 'darkgreen';
+    private $iSimpleProgressStyle        = GANTT_SOLID;
+    private $iZoomFactor                 = 1.0;
     //---------------
     // CONSTRUCTOR
     // Create a new gantt graph
@@ -58,19 +63,19 @@ class GanttGraph extends Graph
 
     public function SetSimpleFont($aFont, $aSize)
     {
-        $this->iSimpleFont = $aFont;
+        $this->iSimpleFont     = $aFont;
         $this->iSimpleFontSize = $aSize;
     }
 
     public function SetSimpleStyle($aBand, $aColor, $aBkgColor)
     {
-        $this->iSimpleStyle = $aBand;
-        $this->iSimpleColor = $aColor;
+        $this->iSimpleStyle    = $aBand;
+        $this->iSimpleColor    = $aColor;
         $this->iSimpleBkgColor = $aBkgColor;
     }
 
     // A utility function to help create basic Gantt charts
-    public function CreateSimple($data, $constrains = array(), $progress = array())
+    public function CreateSimple($data, $constrains = [], $progress = [])
     {
         $num = count($data);
         for ($i = 0; $i < $num; ++$i) {
@@ -116,7 +121,6 @@ class GanttGraph extends Graph
                     // Check if this activity have a progress bar
                     $n = count($progress);
                     for ($j = 0; $j < $n; ++$j) {
-
                         if (empty($progress[$j]) || (count($progress[$j]) != 2)) {
                             Util\JpGraphError::RaiseL(6004, $j);
                             //("Invalid format for Progress parameter at index=$j in CreateSimple(). Parameter must start with index 0 and contain arrays of (Row,Progress)");
@@ -200,7 +204,6 @@ class GanttGraph extends Graph
                 for ($i = 0; $i < $n; ++$i) {
                     $this->iObj[] = $aObject[$i];
                 }
-
             }
         } else {
             if (class_exists('IconPlot', false) && ($aObject instanceof IconPlot)) {
@@ -264,16 +267,15 @@ class GanttGraph extends Graph
         $m = 10;
         if ($this->iObj != null) {
             $marg = $this->scale->actinfo->iLeftColMargin + $this->scale->actinfo->iRightColMargin;
-            $n = count($this->iObj);
+            $n    = count($this->iObj);
             for ($i = 0; $i < $n; ++$i) {
                 if (!empty($this->iObj[$i]->title)) {
                     if ($this->iObj[$i]->title->HasTabs()) {
                         list($tot, $w) = $this->iObj[$i]->title->GetWidth($this->img, true);
-                        $m = max($m, $tot);
+                        $m             = max($m, $tot);
                     } else {
                         $m = max($m, $this->iObj[$i]->title->GetWidth($this->img));
                     }
-
                 }
             }
         }
@@ -328,7 +330,7 @@ class GanttGraph extends Graph
     public function GetBarMinMax()
     {
         $start = 0;
-        $n = count($this->iObj);
+        $n     = count($this->iObj);
         while ($start < $n && $this->iObj[$start]->GetMaxDate() === false) {
             ++$start;
         }
@@ -351,13 +353,12 @@ class GanttGraph extends Graph
             if ($rmin != false) {
                 $min = Min($min, $rmin);
             }
-
         }
         $minDate = date("Y-m-d", $min);
-        $min = strtotime($minDate);
+        $min     = strtotime($minDate);
         $maxDate = date("Y-m-d 23:59", $max);
-        $max = strtotime($maxDate);
-        return array($min, $max);
+        $max     = strtotime($maxDate);
+        return [$min, $max];
     }
 
     // Create a new auto sized canvas if the user hasn't specified a size
@@ -366,7 +367,6 @@ class GanttGraph extends Graph
     // also added to make it better looking.
     public function AutoSize()
     {
-
         if ($this->img->img == null) {
             // The predefined left, right, top, bottom margins.
             // Note that the top margin might incease depending on
@@ -394,8 +394,8 @@ class GanttGraph extends Graph
             }
 
             // First find out the height
-            $n = $this->GetBarMaxLineNumber() + 1;
-            $m = max($this->GetMaxLabelHeight(), $this->GetMaxBarAbsHeight());
+            $n      = $this->GetBarMaxLineNumber() + 1;
+            $m      = max($this->GetMaxLabelHeight(), $this->GetMaxBarAbsHeight());
             $height = $n * ((1 + $this->iLabelVMarginFactor) * $m);
 
             // Add the height of the scale titles
@@ -506,7 +506,7 @@ class GanttGraph extends Graph
                 }
 
                 $hfw = $this->scale->hour->GetStrWidth($this->img, $txt) + 6;
-                $mw = $hfw;
+                $mw  = $hfw;
                 if ($this->scale->IsDisplayMinute()) {
                     // Depending on what format the user has choose we need different amount
                     // of space. We therefore create a typical string for the choosen format
@@ -522,13 +522,13 @@ class GanttGraph extends Graph
                     }
 
                     $mfw = $this->scale->minute->GetStrWidth($this->img, $txt2) + 6;
-                    $n2 = ceil(60 / $this->scale->minute->GetIntervall());
-                    $mw = $n2 * $mfw;
+                    $n2  = ceil(60 / $this->scale->minute->GetIntervall());
+                    $mw  = $n2 * $mfw;
                 }
                 $hfw = $hfw < $mw ? $mw : $hfw;
-                $n = ceil(24 * 60 / $this->scale->TimeToMinutes($this->scale->hour->GetIntervall()));
-                $hw = $n * $hfw;
-                $fw = $fw < $hw ? $hw : $fw;
+                $n   = ceil(24 * 60 / $this->scale->TimeToMinutes($this->scale->hour->GetIntervall()));
+                $hw  = $n * $hfw;
+                $fw  = $fw < $hw ? $hw : $fw;
             }
 
             // We need to repeat this code block here as well.
@@ -551,9 +551,9 @@ class GanttGraph extends Graph
                 }
 
                 $mfw = $this->scale->minute->GetStrWidth($this->img, $txt) + 6;
-                $n = ceil(60 / $this->scale->TimeToMinutes($this->scale->minute->GetIntervall()));
-                $mw = $n * $mfw;
-                $fw = $fw < $mw ? $mw : $fw;
+                $n   = ceil(60 / $this->scale->TimeToMinutes($this->scale->minute->GetIntervall()));
+                $mw  = $n * $mfw;
+                $fw  = $fw < $mw ? $mw : $fw;
             }
 
             // If we display week we must make sure that 7*$fw is enough
@@ -615,7 +615,7 @@ class GanttGraph extends Graph
                 $width = $this->img->width;
             }
 
-            $width = round($width);
+            $width  = round($width);
             $height = round($height);
             // Make a sanity check on image size
             if ($width > MAX_GANTTIMG_SIZE_W || $height > MAX_GANTTIMG_SIZE_H) {
@@ -638,19 +638,18 @@ class GanttGraph extends Graph
             return;
         }
 
-        $w = array();
+        $w = [];
         $m = $this->scale->actinfo->iLeftColMargin + $this->scale->actinfo->iRightColMargin;
 
         for ($i = 0; $i < $n; ++$i) {
             $tmp = $this->iObj[$i]->title->GetColWidth($this->img, $m);
-            $nn = count($tmp);
+            $nn  = count($tmp);
             for ($j = 0; $j < $nn; ++$j) {
                 if (empty($w[$j])) {
                     $w[$j] = $tmp[$j];
                 } else {
                     $w[$j] = max($w[$j], $tmp[$j]);
                 }
-
             }
         }
         return $w;
@@ -739,11 +738,7 @@ class GanttGraph extends Graph
 
             // Should we do any final image transformation
             if ($this->iImgTrans) {
-                if (!class_exists('ImgTrans', false)) {
-                    require_once 'jpgraph_imgtrans.php';
-                }
-
-                $tform = new ImgTrans($this->img->img);
+                $tform          = new ImgTrans($this->img->img);
                 $this->img->img = $tform->Skew3D($this->iImgTransHorizon, $this->iImgTransSkewDist,
                     $this->iImgTransDirection, $this->iImgTransHighQ,
                     $this->iImgTransMinSize, $this->iImgTransFillColor,

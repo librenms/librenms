@@ -9,33 +9,40 @@ namespace Amenadiel\JpGraph\Graph;
 //===================================================
 class Ticks
 {
-    public $label_formatstr = ''; // C-style format string to use for labels
-    public $label_formfunc = '';
-    public $label_dateformatstr = '';
-    public $direction = 1; // Should ticks be in(=1) the plot area or outside (=-1)
-    public $supress_last = false, $supress_tickmarks = false, $supress_minor_tickmarks = false;
-    public $maj_ticks_pos = array(), $maj_ticklabels_pos = array(),
-    $ticks_pos = array(), $maj_ticks_label = array();
+    public $label_formatstr                  = ''; // C-style format string to use for labels
+    public $label_formfunc                   = '';
+    public $label_dateformatstr              = '';
+    public $direction                        = 1; // Should ticks be in(=1) the plot area or outside (=-1)
+    public $supress_last                     = false;
+    public $supress_tickmarks                = false;
+    public $supress_minor_tickmarks          = false;
+    public $maj_ticks_pos                    = array();
+    public $maj_ticklabels_pos               = array();
+    public $ticks_pos                        = array();
+    public $maj_ticks_label                  = array();
     public $precision;
 
-    protected $minor_abs_size = 3, $major_abs_size = 5;
+    protected $minor_abs_size = 3;
+    protected $major_abs_size = 5;
     protected $scale;
-    protected $is_set = false;
-    protected $supress_zerolabel = false, $supress_first = false;
-    protected $mincolor = '', $majcolor = '';
-    protected $weight = 1;
+    protected $is_set              = false;
+    protected $supress_zerolabel   = false;
+    protected $supress_first       = false;
+    protected $mincolor            = '';
+    protected $majcolor            = '';
+    protected $weight              = 1;
     protected $label_usedateformat = false;
 
     public function __construct($aScale)
     {
-        $this->scale = $aScale;
+        $this->scale     = $aScale;
         $this->precision = -1;
     }
 
     // Set format string for automatic labels
     public function SetLabelFormat($aFormatString, $aDate = false)
     {
-        $this->label_formatstr = $aFormatString;
+        $this->label_formatstr     = $aFormatString;
         $this->label_usedateformat = $aDate;
     }
 
@@ -136,5 +143,4 @@ class Ticks
     {
         $this->weight = $aWeight;
     }
-
 } // Class

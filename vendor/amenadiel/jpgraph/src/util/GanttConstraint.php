@@ -17,9 +17,9 @@ class GanttConstraint
     // CONSTRUCTOR
     public function __construct($aRow, $aType, $aColor, $aArrowSize, $aArrowType)
     {
-        $this->iConstrainType = $aType;
-        $this->iConstrainRow = $aRow;
-        $this->iConstrainColor = $aColor;
+        $this->iConstrainType      = $aType;
+        $this->iConstrainRow       = $aRow;
+        $this->iConstrainColor     = $aColor;
         $this->iConstrainArrowSize = $aArrowSize;
         $this->iConstrainArrowType = $aArrowType;
     }

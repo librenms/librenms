@@ -17,13 +17,13 @@ $n = count($datay); // Number of bars
 global $_wrapperfilename;
 
 // Create targets for the image maps. One for each column
-$targ = array();
-$alt = array();
+$targ  = array();
+$alt   = array();
 $wtarg = array();
 for ($i = 0; $i < $n; ++$i) {
-    $urlarg = 'clickedon=' . ($i + 1);
-    $targ[] = $_wrapperfilename . '?' . $urlarg;
-    $alt[] = 'val=%d';
+    $urlarg  = 'clickedon=' . ($i + 1);
+    $targ[]  = $_wrapperfilename . '?' . $urlarg;
+    $alt[]   = 'val=%d';
     $wtarg[] = '';
 }
 $bplot->SetCSIMTargets($targ, $alt, $wtarg);

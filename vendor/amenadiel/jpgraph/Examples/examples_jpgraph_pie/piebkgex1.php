@@ -33,7 +33,7 @@ $graph->title->SetColor('white');
 $p = array();
 // Create the plots
 for ($i = 0; $i < $n; ++$i) {
-    $d = "data$i";
+    $d   = "data$i";
     $p[] = new \PiePlot3D($data[$i]);
 }
 

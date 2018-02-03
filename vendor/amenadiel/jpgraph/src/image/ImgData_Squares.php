@@ -12,12 +12,12 @@ namespace Amenadiel\JpGraph\Image;
 class ImgData_Squares extends ImgData
 {
     protected $name = 'Squares';
-    protected $an = array(MARK_IMG_SQUARE => 'imgdata');
+    protected $an   = array(MARK_IMG_SQUARE => 'imgdata');
 
     protected $colors = array('bluegreen', 'blue', 'green',
         'lightblue', 'orange', 'purple', 'red', 'yellow');
     protected $index = array('bluegreen' => 2, 'blue' => 5, 'green' => 6,
-        'lightblue' => 0, 'orange' => 7, 'purple' => 4, 'red' => 3, 'yellow' => 1);
+        'lightblue'                      => 0, 'orange' => 7, 'purple' => 4, 'red' => 3, 'yellow' => 1);
     protected $maxidx = 7;
     protected $imgdata;
 

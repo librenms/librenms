@@ -1,0 +1,65 @@
+language: php
+sudo: false
+cache:
+    directories:
+        - $HOME/.composer/cache/files
+        - $HOME/symfony-bridge/.phpunit
+
+env:
+    global:
+        - PHPUNIT_FLAGS="-v"
+        - SYMFONY_PHPUNIT_DIR="$HOME/symfony-bridge/.phpunit"
+
+matrix:
+    fast_finish: true
+    include:
+          # Minimum supported Symfony version with the latest PHP version
+        - php: 7.2
+          env: COMPOSER_FLAGS="--prefer-stable --prefer-lowest" SYMFONY_DEPRECATIONS_HELPER="weak"
+
+          # Test the latest stable release
+        - php: 5.5
+        - php: 5.6
+        - php: 7.0
+        - php: 7.1
+        - php: 7.2
+          env: COVERAGE=true PHPUNIT_FLAGS="-v --coverage-text"
+
+          # Test LTS versions. This makes sure we do not use Symfony packages with version greater
+          # than 2 or 3 respectively. Read more at https://github.com/symfony/lts
+        - php: 7.2
+          env: DEPENDENCIES="dunglas/symfony-lock:^2"
+        - php: 7.2
+          env: DEPENDENCIES="dunglas/symfony-lock:^3"
+        - php: 7.2
+          env: DEPENDENCIES="dunglas/symfony-lock:^4"
+
+          # Latest commit to master
+        - php: 7.2
+          env: STABILITY="dev"
+
+    allow_failures:
+          # Dev-master is allowed to fail.
+        - env: STABILITY="dev"
+
+before_install:
+    - if [[ $COVERAGE != true ]]; then phpenv config-rm xdebug.ini || true; fi
+    - if ! [ -z "$STABILITY" ]; then composer config minimum-stability ${STABILITY}; fi;
+    - if ! [ -v "$DEPENDENCIES" ]; then composer require --no-update ${DEPENDENCIES}; fi;
+
+install:
+    # To be removed when this issue will be resolved: https://github.com/composer/composer/issues/5355
+    - if [[ "$COMPOSER_FLAGS" == *"--prefer-lowest"* ]]; then composer update --prefer-dist --no-interaction --prefer-stable --quiet; fi
+    - composer update ${COMPOSER_FLAGS} --prefer-dist --no-interaction
+    - ./vendor/bin/simple-phpunit install
+
+script:
+    - composer validate --strict --no-check-lock
+    - ./vendor/bin/simple-phpunit $PHPUNIT_FLAGS
+
+addons:
+  code_climate:
+    repo_token: 303a289e61e8e11d8bcae115860c4fffc6e1e7fe2d504d20a773e69bd7641284
+
+after_script:
+  - vendor/bin/test-reporter

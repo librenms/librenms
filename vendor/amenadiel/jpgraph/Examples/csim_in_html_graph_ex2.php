@@ -1,13 +1,13 @@
 <?php // content="text/plain; charset=utf-8"
 // Example of pie with center circle
-require_once ('jpgraph/jpgraph.php');
-require_once ('jpgraph/jpgraph_pie.php');
+require_once('jpgraph/jpgraph.php');
+require_once('jpgraph/jpgraph_pie.php');
 
 // Some data
 $data = array(50,28,25,27,31,20);
 
 // A new pie graph
-$piegraph = new PieGraph(400,320);
+$piegraph = new PieGraph(400, 320);
 
 $n = count($data) ; // Number of slices
 
@@ -16,7 +16,7 @@ $piegraph->SetFrame(false);
 
 // Setup title
 $piegraph->title->Set("CSIM Center Pie plot");
-$piegraph->title->SetFont(FF_ARIAL,FS_BOLD,18);
+$piegraph->title->SetFont(FF_ARIAL, FS_BOLD, 18);
 $piegraph->title->SetMargin(8); // Add a little bit more margin from the top
 
 // Create the pie plot
@@ -26,12 +26,12 @@ $p1 = new PiePlotC($data);
 $p1->SetSize(0.32);
 
 // Label font and color setup
-$p1->value->SetFont(FF_ARIAL,FS_BOLD,11);
+$p1->value->SetFont(FF_ARIAL, FS_BOLD, 11);
 $p1->value->SetColor('white');
 
 // Setup the title on the center circle
 $p1->midtitle->Set("Distribution\n2008 H1");
-$p1->midtitle->SetFont(FF_ARIAL,FS_NORMAL,12);
+$p1->midtitle->SetFont(FF_ARIAL, FS_NORMAL, 12);
 
 // Set color for mid circle
 $p1->SetMidColor('yellow');
@@ -55,14 +55,14 @@ $p1->ExplodeAll(15);
 // Setup the CSIM targets
 global $_wrapperfilename;
 $targ = array(); $alt = array(); $wtarg = array();
-for( $i=0; $i <= $n; ++$i ) {
-    $urlarg = 'pie_clickedon='.($i+1);
-    $targ[] = $_wrapperfilename.'?'.$urlarg;
-    $alt[] = 'val=%d';
+for ($i=0; $i <= $n; ++$i) {
+    $urlarg  = 'pie_clickedon='.($i + 1);
+    $targ[]  = $_wrapperfilename.'?'.$urlarg;
+    $alt[]   = 'val=%d';
     $wtarg[] = '';
 }
-$p1->SetCSIMTargets($targ,$alt,$wtarg);
-$p1->SetMidCSIM($targ[0],$alt[0],$wtarg[0]);
+$p1->SetCSIMTargets($targ, $alt, $wtarg);
+$p1->SetMidCSIM($targ[0], $alt[0], $wtarg[0]);
 
 // Add plot to pie graph
 $piegraph->Add($p1);

@@ -7,17 +7,20 @@ namespace Amenadiel\JpGraph\Plot;
  */
 class ContourPlot extends Plot
 {
-
-    private $contour, $contourCoord, $contourVal, $contourColor;
-    private $nbrCountours = 0;
-    private $dataMatrix = array();
-    private $invertLegend = false;
-    private $interpFactor = 1;
-    private $flipData = false;
-    private $isobar = 10;
-    private $showLegend = false;
-    private $highcontrast = false, $highcontrastbw = false;
-    private $manualIsobarColors = array();
+    private $contour;
+    private $contourCoord;
+    private $contourVal;
+    private $contourColor;
+    private $nbrCountours         = 0;
+    private $dataMatrix           = array();
+    private $invertLegend         = false;
+    private $interpFactor         = 1;
+    private $flipData             = false;
+    private $isobar               = 10;
+    private $showLegend           = false;
+    private $highcontrast         = false;
+    private $highcontrastbw       = false;
+    private $manualIsobarColors   = array();
 
     /**
      * Construct a contour plotting algorithm. The end result of the algorithm is a sequence of
@@ -36,19 +39,17 @@ class ContourPlot extends Plot
      */
     public function __construct($aDataMatrix, $aIsobar = 10, $aFactor = 1, $aInvert = false, $aIsobarColors = array())
     {
-
-        $this->dataMatrix = $aDataMatrix;
-        $this->flipData = $aInvert;
-        $this->isobar = $aIsobar;
+        $this->dataMatrix   = $aDataMatrix;
+        $this->flipData     = $aInvert;
+        $this->isobar       = $aIsobar;
         $this->interpFactor = $aFactor;
 
         if ($this->interpFactor > 1) {
-
             if ($this->interpFactor > 5) {
                 Util\JpGraphError::RaiseL(28007); // ContourPlot interpolation factor is too large (>5)
             }
 
-            $ip = new MeshInterpolate();
+            $ip               = new MeshInterpolate();
             $this->dataMatrix = $ip->Linear($this->dataMatrix, $this->interpFactor);
         }
 
@@ -59,7 +60,6 @@ class ContourPlot extends Plot
         } else {
             $this->nbrContours = $aIsobar;
         }
-
     }
 
     /**
@@ -126,7 +126,6 @@ class ContourPlot extends Plot
      */
     public function Legend($aGraph)
     {
-
         if (!$this->showLegend) {
             return;
         }
@@ -168,7 +167,7 @@ class ContourPlot extends Plot
      */
     public function UseHighContrastColor($aFlg = true, $aBW = false)
     {
-        $this->highcontrast = $aFlg;
+        $this->highcontrast   = $aFlg;
         $this->highcontrastbw = $aBW;
         $this->contour->UseHighContrastColor($this->highcontrast, $this->highcontrastbw);
     }
@@ -182,7 +181,6 @@ class ContourPlot extends Plot
      */
     public function Stroke($img, $xscale, $yscale)
     {
-
         if (count($this->manualIsobarColors) > 0) {
             $this->contourColor = $this->manualIsobarColors;
             if (count($this->manualIsobarColors) != $this->nbrContours) {
@@ -193,24 +191,21 @@ class ContourPlot extends Plot
         $img->SetLineWeight($this->line_weight);
 
         for ($c = 0; $c < $this->nbrContours; $c++) {
-
             $img->SetColor($this->contourColor[$c]);
 
             $n = count($this->contourCoord[$c]);
             $i = 0;
             while ($i < $n) {
                 list($x1, $y1) = $this->contourCoord[$c][$i][0];
-                $x1t = $xscale->Translate($x1);
-                $y1t = $yscale->Translate($y1);
+                $x1t           = $xscale->Translate($x1);
+                $y1t           = $yscale->Translate($y1);
 
                 list($x2, $y2) = $this->contourCoord[$c][$i++][1];
-                $x2t = $xscale->Translate($x2);
-                $y2t = $yscale->Translate($y2);
+                $x2t           = $xscale->Translate($x2);
+                $y2t           = $yscale->Translate($y2);
 
                 $img->Line($x1t, $y1t, $x2t, $y2t);
             }
-
         }
     }
-
 }

@@ -6,10 +6,10 @@ namespace Amenadiel\JpGraph\Themes;
  */
 class RoseTheme extends Theme
 {
-    private $font_color = '#CC0044';
+    private $font_color       = '#CC0044';
     private $background_color = '#FFDDDD';
-    private $axis_color = '#CC0000';
-    private $grid_color = '#CC3333';
+    private $axis_color       = '#CC0000';
+    private $grid_color       = '#CC3333';
 
     public function GetColorList()
     {
@@ -112,7 +112,7 @@ class RoseTheme extends Theme
     public function PreStrokeApply($graph)
     {
         if ($graph->legend->HasItems()) {
-            $img = $graph->img;
+            $img    = $graph->img;
             $height = $img->height;
             $graph->SetMargin($img->left_margin, $img->right_margin, $img->top_margin, $height * 0.25);
         }
@@ -120,7 +120,6 @@ class RoseTheme extends Theme
 
     public function ApplyPlot($plot)
     {
-
         switch (get_class($plot)) {
             case 'GroupBarPlot':
                 {

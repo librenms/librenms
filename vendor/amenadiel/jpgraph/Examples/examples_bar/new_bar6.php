@@ -2,6 +2,7 @@
 require_once '../../vendor/autoload.php';
 use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
+
 require_once 'jpgraph/jpgraph_line.php';
 
 //bar1
@@ -14,7 +15,9 @@ $data4y = array(40, 45, 70, 80, 50, 75, 70, 70, 80, 75, 80, 50);
 $data5y = array(20, 20, 25, 22, 30, 25, 35, 30, 27, 25, 25, 45);
 //line1
 $data6y = array(50, 58, 60, 58, 53, 58, 57, 60, 58, 58, 57, 50);
-foreach ($data6y as &$y) {$y -= 10;}
+foreach ($data6y as &$y) {
+    $y -= 10;
+}
 
 // Create the graph. These two calls are always required
 $graph = new Graph\Graph(750, 320, 'auto');
@@ -53,7 +56,7 @@ $lplot = new Plot\LinePlot($data6y);
 
 // Create the grouped bar plot
 $gbbplot = new Plot\AccBarPlot(array($b3plot, $b4plot, $b5plot));
-$gbplot = new Plot\GroupBarPlot(array($b1plot, $b2plot, $gbbplot));
+$gbplot  = new Plot\GroupBarPlot(array($b1plot, $b2plot, $gbbplot));
 
 // ...and add it to the graPH
 $graph->Add($gbplot);

@@ -10,12 +10,12 @@ DEFINE('NDATAPOINTS', 280);
 DEFINE('SAMPLERATE', 300);
 
 $start = time();
-$end = $start + NDATAPOINTS * SAMPLERATE;
+$end   = $start + NDATAPOINTS * SAMPLERATE;
 $xdata = array();
 
 $data_winddirection[0] = rand(100, 200);
-$data_windspeed[0] = rand(7, 10);
-$data_windtemp[0] = rand(5, 20);
+$data_windspeed[0]     = rand(7, 10);
+$data_windtemp[0]      = rand(5, 20);
 
 for ($i = 0; $i < NDATAPOINTS - 1; ++$i) {
     $data_winddirection[$i + 1] = $data_winddirection[$i] + rand(-4, 4);

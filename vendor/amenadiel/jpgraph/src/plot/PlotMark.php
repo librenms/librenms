@@ -19,19 +19,30 @@ use Amenadiel\JpGraph\Text;
 
 class PlotMark
 {
-    public $title, $show = true;
-    public $type, $weight = 1;
-    public $iFormatCallback = "", $iFormatCallback2 = "";
-    public $fill_color = "blue";
-    public $color = "black", $width = 4;
-    private $yvalue, $xvalue = '', $csimtarget, $csimwintarget = '', $csimalt, $csimareas;
-    private $markimg = '', $iScale = 1.0;
-    private $oldfilename = '', $iFileName = '';
-    private $imgdata_balls = null;
+    public $title;
+    public $show      = true;
+    public $type;
+    public $weight             = 1;
+    public $iFormatCallback    = "";
+    public $iFormatCallback2   = "";
+    public $fill_color         = "blue";
+    public $color              = "black";
+    public $width              = 4;
+    private $yvalue;
+    private $xvalue  = '';
+    private $csimtarget;
+    private $csimwintarget  = '';
+    private $csimalt;
+    private $csimareas;
+    private $markimg          = '';
+    private $iScale           = 1.0;
+    private $oldfilename      = '';
+    private $iFileName        = '';
+    private $imgdata_balls    = null;
     private $imgdata_diamonds = null;
-    private $imgdata_squares = null;
-    private $imgdata_bevels = null;
-    private $imgdata_stars = null;
+    private $imgdata_squares  = null;
+    private $imgdata_bevels   = null;
+    private $imgdata_stars    = null;
     private $imgdata_pushpins = null;
 
     //--------------
@@ -41,7 +52,7 @@ class PlotMark
         $this->title = new Text\Text();
         $this->title->Hide();
         $this->csimareas = '';
-        $this->type = -1;
+        $this->type      = -1;
     }
 
     //---------------
@@ -53,7 +64,7 @@ class PlotMark
             Util\JpGraphError::RaiseL(23003); //('A filename must be specified if you set the mark type to MARK_IMG.');
         }
         $this->iFileName = $aFileName;
-        $this->iScale = $aScale;
+        $this->iScale    = $aScale;
     }
 
     public function SetCallback($aFunc)
@@ -132,7 +143,7 @@ class PlotMark
 
     public function SetCSIMTarget($aTarget, $aWinTarget = '')
     {
-        $this->csimtarget = $aTarget;
+        $this->csimtarget    = $aTarget;
         $this->csimwintarget = $aWinTarget;
     }
 
@@ -149,7 +160,7 @@ class PlotMark
     public function AddCSIMPoly($aPts)
     {
         $coords = round($aPts[0]) . ", " . round($aPts[1]);
-        $n = count($aPts) / 2;
+        $n      = count($aPts) / 2;
         for ($i = 1; $i < $n; ++$i) {
             $coords .= ", " . round($aPts[2 * $i]) . ", " . round($aPts[2 * $i + 1]);
         }
@@ -171,9 +182,9 @@ class PlotMark
 
     public function AddCSIMCircle($x, $y, $r)
     {
-        $x = round($x);
-        $y = round($y);
-        $r = round($r);
+        $x               = round($x);
+        $y               = round($y);
+        $r               = round($r);
         $this->csimareas = "";
         if (!empty($this->csimtarget)) {
             $this->csimareas .= "<area shape=\"circle\" coords=\"$x,$y,$r\" href=\"" . htmlentities($this->csimtarget) . "\"";
@@ -197,14 +208,13 @@ class PlotMark
         }
 
         if ($this->iFormatCallback != '' || $this->iFormatCallback2 != '') {
-
             if ($this->iFormatCallback != '') {
-                $f = $this->iFormatCallback;
+                $f                            = $this->iFormatCallback;
                 list($width, $color, $fcolor) = call_user_func($f, $this->yvalue);
-                $filename = $this->iFileName;
-                $imgscale = $this->iScale;
+                $filename                     = $this->iFileName;
+                $imgscale                     = $this->iScale;
             } else {
-                $f = $this->iFormatCallback2;
+                $f                                                  = $this->iFormatCallback2;
                 list($width, $color, $fcolor, $filename, $imgscale) = call_user_func($f, $this->yvalue, $this->xvalue);
                 if ($filename == "") {
                     $filename = $this->iFileName;
@@ -213,7 +223,6 @@ class PlotMark
                 if ($imgscale == "") {
                     $imgscale = $this->iScale;
                 }
-
             }
 
             if ($width == "") {
@@ -227,11 +236,10 @@ class PlotMark
             if ($fcolor == "") {
                 $fcolor = $this->fill_color;
             }
-
         } else {
-            $fcolor = $this->fill_color;
-            $color = $this->color;
-            $width = $this->width;
+            $fcolor   = $this->fill_color;
+            $color    = $this->color;
+            $width    = $this->width;
             $filename = $this->iFileName;
             $imgscale = $this->iScale;
         }
@@ -257,7 +265,7 @@ class PlotMark
                     // Small optimization, if we have already read an image don't
                     // waste time reading it again.
                     if ($this->markimg == '' || !($this->oldfilename === $filename)) {
-                        $this->markimg = Graph::LoadBkgImage('', $filename);
+                        $this->markimg     = Graph::LoadBkgImage('', $filename);
                         $this->oldfilename = $filename;
                     }
                     break;
@@ -268,7 +276,7 @@ class PlotMark
                     if ($this->imgdata_pushpins == null) {
                         $this->imgdata_pushpins = new Image\ImgData_PushPins();
                     }
-                    $this->markimg = $this->imgdata_pushpins->GetImg($this->type, $filename);
+                    $this->markimg             = $this->imgdata_pushpins->GetImg($this->type, $filename);
                     list($anchor_x, $anchor_y) = $this->imgdata_pushpins->GetAnchor();
                     break;
 
@@ -276,7 +284,7 @@ class PlotMark
                     if ($this->imgdata_squares == null) {
                         $this->imgdata_squares = new Image\ImgData_Squares();
                     }
-                    $this->markimg = $this->imgdata_squares->GetImg($this->type, $filename);
+                    $this->markimg             = $this->imgdata_squares->GetImg($this->type, $filename);
                     list($anchor_x, $anchor_y) = $this->imgdata_squares->GetAnchor();
                     break;
 
@@ -284,7 +292,7 @@ class PlotMark
                     if ($this->imgdata_stars == null) {
                         $this->imgdata_stars = new Image\ImgData_Stars();
                     }
-                    $this->markimg = $this->imgdata_stars->GetImg($this->type, $filename);
+                    $this->markimg             = $this->imgdata_stars->GetImg($this->type, $filename);
                     list($anchor_x, $anchor_y) = $this->imgdata_stars->GetAnchor();
                     break;
 
@@ -292,7 +300,7 @@ class PlotMark
                     if ($this->imgdata_bevels == null) {
                         $this->imgdata_bevels = new Image\ImgData_Bevels();
                     }
-                    $this->markimg = $this->imgdata_bevels->GetImg($this->type, $filename);
+                    $this->markimg             = $this->imgdata_bevels->GetImg($this->type, $filename);
                     list($anchor_x, $anchor_y) = $this->imgdata_bevels->GetAnchor();
                     break;
 
@@ -300,7 +308,7 @@ class PlotMark
                     if ($this->imgdata_diamonds == null) {
                         $this->imgdata_diamonds = new Image\ImgData_Diamonds();
                     }
-                    $this->markimg = $this->imgdata_diamonds->GetImg($this->type, $filename);
+                    $this->markimg             = $this->imgdata_diamonds->GetImg($this->type, $filename);
                     list($anchor_x, $anchor_y) = $this->imgdata_diamonds->GetAnchor();
                     break;
 
@@ -311,7 +319,7 @@ class PlotMark
                     if ($this->imgdata_balls == null) {
                         $this->imgdata_balls = new Image\ImgData_Balls();
                     }
-                    $this->markimg = $this->imgdata_balls->GetImg($this->type, $filename);
+                    $this->markimg             = $this->imgdata_balls->GetImg($this->type, $filename);
                     list($anchor_x, $anchor_y) = $this->imgdata_balls->GetAnchor();
                     break;
             }
@@ -354,9 +362,9 @@ class PlotMark
         }
 
         $weight = $this->weight;
-        $dx = round($width / 2, 0);
-        $dy = round($width / 2, 0);
-        $pts = 0;
+        $dx     = round($width / 2, 0);
+        $dy     = round($width / 2, 0);
+        $pts    = 0;
 
         switch ($this->type) {
             case MARK_SQUARE:

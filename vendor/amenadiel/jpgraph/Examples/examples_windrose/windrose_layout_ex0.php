@@ -2,6 +2,7 @@
 require_once '../../vendor/autoload.php';
 use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
+
 // Some data for the five windrose plots
 $data = array(
     array(
@@ -38,7 +39,7 @@ for ($i = 0; $i < 4; ++$i) {
 // bottom row.
 $hl1 = new LayoutHor(array($wp[0], $wp[1]));
 $hl2 = new LayoutHor(array($wp[2], $wp[3]));
-$vl = new LayoutVert(array($hl1, $hl2));
+$vl  = new LayoutVert(array($hl1, $hl2));
 
 $graph->Add($vl);
 $graph->Stroke();

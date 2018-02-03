@@ -2,6 +2,7 @@
 require_once '../../vendor/autoload.php';
 use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
+
 // Data can be specified using both ordinal index of the axis
 // as well as the direction label
 $data[0] = array(
@@ -11,9 +12,9 @@ $data[0] = array(
     5 => array(2, 7, 1, 2));
 
 $data[1] = array(
-    "n" => array(1, 1, 2.5, 4),
+    "n"   => array(1, 1, 2.5, 4),
     "ssw" => array(3, 4, 1, 4),
-    "se" => array(2, 7, 4, 4, 3));
+    "se"  => array(2, 7, 4, 4, 3));
 
 // Store the position and size data for each plot in an
 // array to make it easier to create multiple plots.

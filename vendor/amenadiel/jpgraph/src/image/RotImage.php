@@ -8,9 +8,12 @@ namespace Amenadiel\JpGraph\Image;
 //===================================================
 class RotImage extends Image
 {
-    public $a = 0;
-    public $dx = 0, $dy = 0, $transx = 0, $transy = 0;
-    private $m = array();
+    public $a      = 0;
+    public $dx     = 0;
+    public $dy     = 0;
+    public $transx = 0;
+    public $transy = 0;
+    private $m     = array();
 
     public function __construct($aWidth, $aHeight, $a = 0, $aFormat = DEFAULT_GFORMAT, $aSetAutoMargin = true)
     {
@@ -22,8 +25,8 @@ class RotImage extends Image
 
     public function SetCenter($dx, $dy)
     {
-        $old_dx = $this->dx;
-        $old_dy = $this->dy;
+        $old_dx   = $this->dx;
+        $old_dy   = $this->dy;
         $this->dx = $dx;
         $this->dy = $dy;
         $this->SetAngle($this->a);
@@ -32,7 +35,7 @@ class RotImage extends Image
 
     public function SetTranslation($dx, $dy)
     {
-        $old = array($this->transx, $this->transy);
+        $old          = array($this->transx, $this->transy);
         $this->transx = $dx;
         $this->transy = $dy;
         return $old;
@@ -55,7 +58,7 @@ class RotImage extends Image
 
     public function SetAngle($a)
     {
-        $tmp = $this->a;
+        $tmp     = $this->a;
         $this->a = $a;
         $this->UpdateRotMatrice();
         return $tmp;
@@ -113,15 +116,14 @@ class RotImage extends Image
     {
         list($toX, $toY) = $this->Rotate($toX, $toY);
         parent::CopyMerge($fromImg, $toX, $toY, $fromX, $fromY, $toWidth, $toHeight, $fromWidth, $fromHeight, $aMix);
-
     }
 
     public function ArrRotate($pnts)
     {
         $n = count($pnts) - 1;
         for ($i = 0; $i < $n; $i += 2) {
-            list($x, $y) = $this->Rotate($pnts[$i], $pnts[$i + 1]);
-            $pnts[$i] = $x;
+            list($x, $y)  = $this->Rotate($pnts[$i], $pnts[$i + 1]);
+            $pnts[$i]     = $x;
             $pnts[$i + 1] = $y;
         }
         return $pnts;
@@ -154,7 +156,6 @@ class RotImage extends Image
         } else {
             $this->FilledPolygon(array($x1, $y1, $x2, $y1, $x2, $y2, $x1, $y2));
         }
-
     }
 
     public function Polygon($pnts, $closed = false, $fast = false)

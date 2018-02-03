@@ -2,6 +2,7 @@
 require_once '../../vendor/autoload.php';
 use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
+
 // Data
 $data = array(
     0 => array(1, 1, 2.5, 4),
@@ -10,7 +11,7 @@ $data = array(
     5 => array(2, 7, 1, 2));
 
 // Text to be added.
-$txt = array();
+$txt    = array();
 $txt[0] = "It is possible to add arbitrary,multi line, text to a graph. ";
 $txt[0] .= "Such a paragraph can have it's text be left, right or center ";
 $txt[0] .= "aligned.";
@@ -49,7 +50,6 @@ for ($i = 0; $i < $n; ++$i) {
     if (count($txtlayout[$i]) > 6) {
         $txtbox[$i]->SetFont($txtlayout[$i][6], $txtlayout[$i][7], $txtlayout[$i][8]);
     }
-
 }
 $graph->Add($txtbox);
 

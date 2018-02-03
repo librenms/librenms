@@ -1,13 +1,13 @@
 <?php // content="text/plain; charset=utf-8"
-require_once ('jpgraph/jpgraph.php');
-require_once ('jpgraph/jpgraph_gantt.php');
+require_once('jpgraph/jpgraph.php');
+require_once('jpgraph/jpgraph_gantt.php');
 
 $graph = new GanttGraph();
 $graph->SetShadow();
 
 // Add title and subtitle
 $graph->title->Set("A nice main title");
-$graph->title->SetFont(FF_ARIAL,FS_BOLD,12);
+$graph->title->SetFont(FF_ARIAL, FS_BOLD, 12);
 $graph->subtitle->Set("(Draft version)");
 
 // Show day, week and month scale
@@ -28,21 +28,20 @@ $graph->scale->month->SetBackgroundColor("blue");
 
 // Format the bar for the first activity
 // ($row,$title,$startdate,$enddate)
-$activity = new GanttBar(0,"Project","2001-12-21","2002-02-20");
+$activity = new GanttBar(0, "Project", "2001-12-21", "2002-02-20");
 
 // Yellow diagonal line pattern on a red background
-$activity->SetPattern(BAND_RDIAG,"yellow");
+$activity->SetPattern(BAND_RDIAG, "yellow");
 $activity->SetFillColor("red");
 
 // Finally add the bar to the graph
 $graph->Add($activity);
 
 // Create a miletone
-$milestone = new MileStone(2,"Milestone","2002-01-15","2002-01-15");
+$milestone = new MileStone(2, "Milestone", "2002-01-15", "2002-01-15");
 $milestone->title->SetColor("black");
-$milestone->title->SetFont(FF_FONT1,FS_BOLD);
+$milestone->title->SetFont(FF_FONT1, FS_BOLD);
 $graph->Add($milestone);
 
 // ... and display it
 $graph->Stroke();
-?>

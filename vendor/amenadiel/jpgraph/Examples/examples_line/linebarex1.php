@@ -9,7 +9,7 @@ $month = array(
 // Create datapoints where every point
 $steps = 100;
 for ($i = 0; $i < $steps; ++$i) {
-    $datay[$i] = log(pow($i, $i / 10) + 1) * sin($i / 15) + 35;
+    $datay[$i]  = log(pow($i, $i / 10) + 1) * sin($i / 15) + 35;
     $databarx[] = sprintf("198%d %s", floor($i / 12), $month[$i % 12]);
 
     // Simulate an accumulated value for every 5:th data point
@@ -18,7 +18,6 @@ for ($i = 0; $i < $steps; ++$i) {
     } else {
         $databary[] = 0;
     }
-
 }
 
 // new Graph\Graph with a background image and drop shadow

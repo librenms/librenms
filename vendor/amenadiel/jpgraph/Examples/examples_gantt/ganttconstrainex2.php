@@ -1,10 +1,10 @@
 <?php // content="text/plain; charset=utf-8"
 // Gantt example
-require_once ('jpgraph/jpgraph.php');
-require_once ('jpgraph/jpgraph_gantt.php');
+require_once('jpgraph/jpgraph.php');
+require_once('jpgraph/jpgraph_gantt.php');
 
 
-// 
+//
 // The data for the graphs
 //
 $data = array(
@@ -15,7 +15,7 @@ $data = array(
 
 // The constrains between the activities
 $constrains = array(array(2,1,CONSTRAIN_ENDSTART),
-		    array(1,3,CONSTRAIN_STARTSTART));
+            array(1,3,CONSTRAIN_STARTSTART));
 
 $progress = array(array(1,0.4));
 
@@ -29,7 +29,7 @@ $graph->ShowHeaders(GANTT_HYEAR | GANTT_HMONTH | GANTT_HDAY | GANTT_HWEEK);
 $graph->scale->week->SetStyle(WEEKSTYLE_FIRSTDAYWNBR);
 
 // Add the specified activities
-$graph->CreateSimple($data,$constrains,$progress);
+$graph->CreateSimple($data, $constrains, $progress);
 
 // .. and stroke the graph
 $graph->Stroke();

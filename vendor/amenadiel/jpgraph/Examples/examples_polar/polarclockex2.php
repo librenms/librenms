@@ -1,6 +1,6 @@
 <?php // content="text/plain; charset=utf-8"
-require_once ('jpgraph/jpgraph.php');
-require_once ('jpgraph/jpgraph_polar.php');
+require_once('jpgraph/jpgraph.php');
+require_once('jpgraph/jpgraph_polar.php');
 
 //$data = array(22,12,27,40,80,48,120,40,142,27,170,12);
 
@@ -15,27 +15,27 @@ $data = array(
 
 $data2 = array(0,0,34,56,90,90,170,65,220,90,270,120,300,60,355,10);
 
-$graph = new PolarGraph(350,350);
-$graph->SetScale('lin',150);
+$graph = new PolarGraph(350, 350);
+$graph->SetScale('lin', 150);
 
 $graph->SetMarginColor('#FFE6C0');
 $graph->SetType(POLAR_360);
 $graph->SetClockwise(true);
-$graph->Set90AndMargin(40,40,50,40);
+$graph->Set90AndMargin(40, 40, 50, 40);
 
 $graph->SetBox(true);
 $graph->SetFrame(false);
-$graph->axis->ShowGrid(true,false,true);
-$graph->axis->SetGridColor('gray','gray','gray');
+$graph->axis->ShowGrid(true, false, true);
+$graph->axis->SetGridColor('gray', 'gray', 'gray');
 
-$graph->axis->SetFont(FF_ARIAL,FS_NORMAL,8);
-$graph->axis->SetTitle('X-Axis','center');
+$graph->axis->SetFont(FF_ARIAL, FS_NORMAL, 8);
+$graph->axis->SetTitle('X-Axis', 'center');
 
-$graph->axis->SetColor('black','black','darkred');
-$graph->axis->SetAngleFont(FF_ARIAL,FS_NORMAL,8);
+$graph->axis->SetColor('black', 'black', 'darkred');
+$graph->axis->SetAngleFont(FF_ARIAL, FS_NORMAL, 8);
 
 $graph->title->Set('Clockwise polar plot (rotated)');
-$graph->title->SetFont(FF_COMIC,FS_NORMAL,16);
+$graph->title->SetFont(FF_COMIC, FS_NORMAL, 16);
 $graph->title->SetColor('navy');
 
 
@@ -49,5 +49,3 @@ $graph->Add($p);
 //$graph->Add($p2);
 
 $graph->Stroke();
-
-?>

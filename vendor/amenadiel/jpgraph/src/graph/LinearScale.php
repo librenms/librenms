@@ -17,19 +17,20 @@ class LinearScale
     // stroke method. So we let graph store the status here
     // when the linear scale is created. A real cludge...
     public $type; // is this x or y scale ?
-    public $ticks = null; // Store ticks
+    public $ticks          = null; // Store ticks
     public $text_scale_off = 0;
-    public $scale_abs = array(0, 0);
+    public $scale_abs      = array(0, 0);
     public $scale_factor; // Scale factor between world and screen
     public $off; // Offset between image edge and plot area
-    public $scale = array(0, 0);
-    public $name = 'lin';
+    public $scale      = array(0, 0);
+    public $name       = 'lin';
     public $auto_ticks = false; // When using manual scale should the ticks be automatically set?
     public $world_abs_size; // Plot area size in pixels (Needed public in jpgraph_radar.php)
-    public $intscale = false; // Restrict autoscale to integers
-    protected $autoscale_min = false; // Forced minimum value, auto determine max
-    protected $autoscale_max = false; // Forced maximum value, auto determine min
-    private $gracetop = 0, $gracebottom = 0;
+    public $intscale            = false; // Restrict autoscale to integers
+    protected $autoscale_min    = false; // Forced minimum value, auto determine max
+    protected $autoscale_max    = false; // Forced maximum value, auto determine min
+    private $gracetop           = 0;
+    private $gracebottom        = 0;
 
     private $_world_size; // Plot area size in world coordinates
 
@@ -38,10 +39,10 @@ class LinearScale
         assert($aType == 'x' || $aType == 'y');
         assert($aMin <= $aMax);
 
-        $this->type = $aType;
-        $this->scale = array($aMin, $aMax);
+        $this->type       = $aType;
+        $this->scale      = array($aMin, $aMax);
         $this->world_size = $aMax - $aMin;
-        $this->ticks = new LinearTicks();
+        $this->ticks      = new LinearTicks();
     }
 
     // Check if scale is set or if we should autoscale
@@ -84,7 +85,7 @@ class LinearScale
         if ($aGraceTop < 0 || $aGraceBottom < 0) {
             Util\JpGraphError::RaiseL(25069); //(" Grace must be larger then 0");
         }
-        $this->gracetop = $aGraceTop;
+        $this->gracetop    = $aGraceTop;
         $this->gracebottom = $aGraceBottom;
     }
 
@@ -103,7 +104,7 @@ class LinearScale
     // Specify a new min/max value for sclae
     public function Update($aImg, $aMin, $aMax)
     {
-        $this->scale = array($aMin, $aMax);
+        $this->scale      = array($aMin, $aMax);
         $this->world_size = $aMax - $aMin;
         $this->InitConstants($aImg);
     }
@@ -148,11 +149,12 @@ class LinearScale
         $min = floor($min);
         $max = ceil($max);
         if (abs($min - $max) == 0) {
-            --$min; ++$max;
+            --$min;
+            ++$max;
         }
         $maxsteps = floor($maxsteps);
 
-        $gracetop = round(($this->gracetop / 100.0) * abs($max - $min));
+        $gracetop    = round(($this->gracetop / 100.0) * abs($max - $min));
         $gracebottom = round(($this->gracebottom / 100.0) * abs($max - $min));
         if (is_numeric($this->autoscale_min)) {
             $min = ceil($this->autoscale_min);
@@ -180,8 +182,8 @@ class LinearScale
         if ($majend) {
             list($num1steps, $adj1min, $adj1max, $maj1step) = $this->IntCalcTicks($maxsteps, $min, $max, 1);
         } else {
-            $adj1min = $min;
-            $adj1max = $max;
+            $adj1min                    = $min;
+            $adj1max                    = $max;
             list($num1steps, $maj1step) = $this->IntCalcTicksFreeze($maxsteps, $min, $max, 1);
         }
 
@@ -190,8 +192,8 @@ class LinearScale
             if ($majend) {
                 list($num2steps, $adj2min, $adj2max, $maj2step) = $this->IntCalcTicks($maxsteps, $min, $max, 5);
             } else {
-                $adj2min = $min;
-                $adj2max = $max;
+                $adj2min                    = $min;
+                $adj2max                    = $max;
                 list($num2steps, $maj2step) = $this->IntCalcTicksFreeze($maxsteps, $min, $max, 5);
             }
         } else {
@@ -203,8 +205,8 @@ class LinearScale
             if ($majend) {
                 list($num5steps, $adj5min, $adj5max, $maj5step) = $this->IntCalcTicks($maxsteps, $min, $max, 2);
             } else {
-                $adj5min = $min;
-                $adj5max = $max;
+                $adj5min                    = $min;
+                $adj5max                    = $max;
                 list($num5steps, $maj5step) = $this->IntCalcTicksFreeze($maxsteps, $min, $max, 2);
             }
         } else {
@@ -229,14 +231,12 @@ class LinearScale
             } else {
                 $r = 3;
             }
-
         } else {
             if ($match2 < $match5) {
                 $r = 2;
             } else {
                 $r = 3;
             }
-
         }
         // Minsteps are always the same as maxsteps for integer scale
         switch ($r) {
@@ -261,7 +261,6 @@ class LinearScale
     // $maxsteps is the maximum number of major tickmarks allowed.
     public function AutoScale($img, $min, $max, $maxsteps, $majend = true)
     {
-
         if (!is_numeric($min) || !is_numeric($max)) {
             Util\JpGraphError::Raise(25044);
         }
@@ -284,7 +283,7 @@ class LinearScale
             }
         }
 
-        $gracetop = ($this->gracetop / 100.0) * abs($max - $min);
+        $gracetop    = ($this->gracetop / 100.0) * abs($max - $min);
         $gracebottom = ($this->gracebottom / 100.0) * abs($max - $min);
         if (is_numeric($this->autoscale_min)) {
             $min = $this->autoscale_min;
@@ -313,8 +312,8 @@ class LinearScale
         if ($majend) {
             list($num1steps, $adj1min, $adj1max, $min1step, $maj1step) = $this->CalcTicks($maxsteps, $min, $max, 1, 2);
         } else {
-            $adj1min = $min;
-            $adj1max = $max;
+            $adj1min                               = $min;
+            $adj1max                               = $max;
             list($num1steps, $min1step, $maj1step) = $this->CalcTicksFreeze($maxsteps, $min, $max, 1, 2, false);
         }
 
@@ -322,8 +321,8 @@ class LinearScale
         if ($majend) {
             list($num2steps, $adj2min, $adj2max, $min2step, $maj2step) = $this->CalcTicks($maxsteps, $min, $max, 5, 2);
         } else {
-            $adj2min = $min;
-            $adj2max = $max;
+            $adj2min                               = $min;
+            $adj2max                               = $max;
             list($num2steps, $min2step, $maj2step) = $this->CalcTicksFreeze($maxsteps, $min, $max, 5, 2, false);
         }
 
@@ -331,8 +330,8 @@ class LinearScale
         if ($majend) {
             list($num5steps, $adj5min, $adj5max, $min5step, $maj5step) = $this->CalcTicks($maxsteps, $min, $max, 2, 5);
         } else {
-            $adj5min = $min;
-            $adj5max = $max;
+            $adj5min                               = $min;
+            $adj5max                               = $max;
             list($num5steps, $min5step, $maj5step) = $this->CalcTicksFreeze($maxsteps, $min, $max, 2, 5, false);
         }
 
@@ -372,21 +371,21 @@ class LinearScale
     {
         if ($this->type == 'x') {
             $this->world_abs_size = $img->width - $img->left_margin - $img->right_margin;
-            $this->off = $img->left_margin;
-            $this->scale_factor = 0;
+            $this->off            = $img->left_margin;
+            $this->scale_factor   = 0;
             if ($this->world_size > 0) {
                 $this->scale_factor = $this->world_abs_size / ($this->world_size * 1.0);
             }
         } else {
             // y scale
             $this->world_abs_size = $img->height - $img->top_margin - $img->bottom_margin;
-            $this->off = $img->top_margin + $this->world_abs_size;
-            $this->scale_factor = 0;
+            $this->off            = $img->top_margin + $this->world_abs_size;
+            $this->scale_factor   = 0;
             if ($this->world_size > 0) {
                 $this->scale_factor = -$this->world_abs_size / ($this->world_size * 1.0);
             }
         }
-        $size = $this->world_size * $this->scale_factor;
+        $size            = $this->world_size * $this->scale_factor;
         $this->scale_abs = array($this->off, $this->off + $size);
     }
 
@@ -399,7 +398,7 @@ class LinearScale
     public function SetConstants($aStart, $aLen)
     {
         $this->world_abs_size = $aLen;
-        $this->off = $aStart;
+        $this->off            = $aStart;
 
         if ($this->world_size <= 0) {
             // This should never ever happen !!
@@ -441,24 +440,24 @@ class LinearScale
         $majstep = pow(10, $ld) / $a;
         $minstep = $majstep / $b;
 
-        $adjmax = ceil($max / $minstep) * $minstep;
-        $adjmin = floor($min / $minstep) * $minstep;
-        $adjdiff = $adjmax - $adjmin;
+        $adjmax   = ceil($max / $minstep) * $minstep;
+        $adjmin   = floor($min / $minstep) * $minstep;
+        $adjdiff  = $adjmax - $adjmin;
         $numsteps = $adjdiff / $majstep;
 
         while ($numsteps > $maxsteps) {
-            $majstep = pow(10, $ld) / $a;
+            $majstep  = pow(10, $ld) / $a;
             $numsteps = $adjdiff / $majstep;
             ++$ld;
         }
 
         $minstep = $majstep / $b;
-        $adjmin = floor($min / $minstep) * $minstep;
+        $adjmin  = floor($min / $minstep) * $minstep;
         $adjdiff = $adjmax - $adjmin;
         if ($majend) {
-            $adjmin = floor($min / $majstep) * $majstep;
+            $adjmin  = floor($min / $majstep) * $majstep;
             $adjdiff = $adjmax - $adjmin;
-            $adjmax = ceil($adjdiff / $majstep) * $majstep + $adjmin;
+            $adjmax  = ceil($adjdiff / $majstep) * $majstep + $adjmin;
         } else {
             $adjmax = ceil($max / $minstep) * $minstep;
         }
@@ -477,12 +476,12 @@ class LinearScale
         }
 
         //$majstep=pow(10,$ld-1)/$a;
-        $majstep = pow(10, $ld) / $a;
-        $minstep = $majstep / $b;
+        $majstep  = pow(10, $ld) / $a;
+        $minstep  = $majstep / $b;
         $numsteps = floor($diff / $majstep);
 
         while ($numsteps > $maxsteps) {
-            $majstep = pow(10, $ld) / $a;
+            $majstep  = pow(10, $ld) / $a;
             $numsteps = floor($diff / $majstep);
             ++$ld;
         }
@@ -513,21 +512,21 @@ class LinearScale
         }
         $adjmax = ceil($max / $majstep) * $majstep;
 
-        $adjmin = floor($min / $majstep) * $majstep;
-        $adjdiff = $adjmax - $adjmin;
+        $adjmin   = floor($min / $majstep) * $majstep;
+        $adjdiff  = $adjmax - $adjmin;
         $numsteps = $adjdiff / $majstep;
         while ($numsteps > $maxsteps) {
-            $majstep = pow(10, $ld) / $a;
+            $majstep  = pow(10, $ld) / $a;
             $numsteps = $adjdiff / $majstep;
             ++$ld;
         }
 
-        $adjmin = floor($min / $majstep) * $majstep;
+        $adjmin  = floor($min / $majstep) * $majstep;
         $adjdiff = $adjmax - $adjmin;
         if ($majend) {
-            $adjmin = floor($min / $majstep) * $majstep;
+            $adjmin  = floor($min / $majstep) * $majstep;
             $adjdiff = $adjmax - $adjmin;
-            $adjmax = ceil($adjdiff / $majstep) * $majstep + $adjmin;
+            $adjmax  = ceil($adjdiff / $majstep) * $majstep + $adjmin;
         } else {
             $adjmax = ceil($max / $majstep) * $majstep;
         }
@@ -555,7 +554,7 @@ class LinearScale
 
         $numsteps = floor($diff / $majstep);
         while ($numsteps > $maxsteps) {
-            $majstep = pow(10, $ld) / $a;
+            $majstep  = pow(10, $ld) / $a;
             $numsteps = floor($diff / $majstep);
             ++$ld;
         }

@@ -11,7 +11,7 @@ function FldCallback($x, $y, $a)
     $maxr = 3000;
 
     // Size and arrow size is constant
-    $size = "";
+    $size      = "";
     $arrowsize = "";
 
     // Since we have different scales we need the data points
@@ -26,8 +26,8 @@ function FldCallback($x, $y, $a)
         $f = 1;
     }
 
-    $red = floor((1 - $f) * 255);
-    $blue = floor($f * 255);
+    $red   = floor((1 - $f) * 255);
+    $blue  = floor($f * 255);
     $color = array($red, 0, $blue);
     //echo "x=$x, y=$y, blue=$blue, red=$red<br>";
     return array($color, $size, $arrowsize);
@@ -50,7 +50,6 @@ for ($x = 1; $x < 10; ++$x) {
             } else {
                 $a = 270;
             }
-
         }
         if ($y == $poley) {
             if ($x > $polex) {
@@ -58,7 +57,6 @@ for ($x = 1; $x < 10; ++$x) {
             } else {
                 $a = 180;
             }
-
         }
         if ($a == -1) {
             $d1 = $y - $poley;
@@ -67,8 +65,8 @@ for ($x = 1; $x < 10; ++$x) {
                 $d2 *= -1;
             }
 
-            $h = sqrt($d1 * $d1 + $d2 * $d2);
-            $t = -$d2 / $h;
+            $h  = sqrt($d1 * $d1 + $d2 * $d2);
+            $t  = -$d2 / $h;
             $ac = acos($t);
             if ($y < $poley) {
                 $ac += M_PI;

@@ -50,8 +50,8 @@ class ImgTrans
             $hh = $h;
         }
 
-        $newgdh = imagecreatetruecolor($ww, $hh);
-        $crgb = new RGB($newgdh);
+        $newgdh    = imagecreatetruecolor($ww, $hh);
+        $crgb      = new RGB($newgdh);
         $fillColor = $crgb->Allocate($aFillColor);
         imagefilledrectangle($newgdh, 0, 0, $ww - 1, $hh - 1, $fillColor);
 
@@ -64,7 +64,6 @@ class ImgTrans
 
         $last = $h;
         for ($y = 0; $y < $h; ++$y) {
-
             $yp = $h - $y - 1;
             $yt = floor($yp * $aHorizon / ($aSkewDist + $yp));
 
@@ -84,11 +83,11 @@ class ImgTrans
                     $rgb = imagecolorat($aGdImg, $x, $y);
                 }
 
-                $r = ($rgb >> 16) & 0xFF;
-                $g = ($rgb >> 8) & 0xFF;
-                $b = $rgb & 0xFF;
+                $r      = ($rgb >> 16) & 0xFF;
+                $g      = ($rgb >> 8) & 0xFF;
+                $b      = $rgb & 0xFF;
                 $colidx = imagecolorallocate($newgdh, $r, $g, $b);
-                $xt = round($xt + $mid);
+                $xt     = round($xt + $mid);
                 if ($aDir == SKEW3D_UP) {
                     $syt = $yt;
                 } else {
@@ -96,10 +95,10 @@ class ImgTrans
                 }
 
                 if (!empty($set[$yt])) {
-                    $nrgb = imagecolorat($newgdh, $xt, $syt);
-                    $nr = ($nrgb >> 16) & 0xFF;
-                    $ng = ($nrgb >> 8) & 0xFF;
-                    $nb = $nrgb & 0xFF;
+                    $nrgb   = imagecolorat($newgdh, $xt, $syt);
+                    $nr     = ($nrgb >> 16) & 0xFF;
+                    $ng     = ($nrgb >> 8) & 0xFF;
+                    $nb     = $nrgb & 0xFF;
                     $colidx = imagecolorallocate($newgdh, floor(($r + $nr) / 2),
                         floor(($g + $ng) / 2), floor(($b + $nb) / 2));
                 }
@@ -119,7 +118,6 @@ class ImgTrans
     // --------------------------------------------------------------------
     public function _TransHor3D($aGdImg, $aHorizon = 100, $aSkewDist = 120, $aDir = SKEW3D_LEFT, $aMinSize = true, $aFillColor = '#FFFFFF', $aQuality = false, $aBorder = false, $aHorizonPos = 0.5)
     {
-
         $w = imagesx($aGdImg);
         $h = imagesy($aGdImg);
 
@@ -131,8 +129,8 @@ class ImgTrans
             $ww = $w;
         }
 
-        $newgdh = imagecreatetruecolor($ww, $hh);
-        $crgb = new RGB($newgdh);
+        $newgdh    = imagecreatetruecolor($ww, $hh);
+        $crgb      = new RGB($newgdh);
         $fillColor = $crgb->Allocate($aFillColor);
         imagefilledrectangle($newgdh, 0, 0, $ww - 1, $hh - 1, $fillColor);
 
@@ -164,11 +162,11 @@ class ImgTrans
                     $rgb = imagecolorat($aGdImg, $x, $y);
                 }
 
-                $r = ($rgb >> 16) & 0xFF;
-                $g = ($rgb >> 8) & 0xFF;
-                $b = $rgb & 0xFF;
+                $r      = ($rgb >> 16) & 0xFF;
+                $g      = ($rgb >> 8) & 0xFF;
+                $b      = $rgb & 0xFF;
                 $colidx = imagecolorallocate($newgdh, $r, $g, $b);
-                $yt = floor($hh - $yt - $mid - 1);
+                $yt     = floor($hh - $yt - $mid - 1);
                 if ($aDir == SKEW3D_RIGHT) {
                     $sxt = $ww - $xt - 1;
                 } else {
@@ -176,10 +174,10 @@ class ImgTrans
                 }
 
                 if (!empty($set[$xt])) {
-                    $nrgb = imagecolorat($newgdh, $sxt, $yt);
-                    $nr = ($nrgb >> 16) & 0xFF;
-                    $ng = ($nrgb >> 8) & 0xFF;
-                    $nb = $nrgb & 0xFF;
+                    $nrgb   = imagecolorat($newgdh, $sxt, $yt);
+                    $nr     = ($nrgb >> 16) & 0xFF;
+                    $ng     = ($nrgb >> 8) & 0xFF;
+                    $nb     = $nrgb & 0xFF;
                     $colidx = imagecolorallocate($newgdh, floor(($r + $nr) / 2),
                         floor(($g + $ng) / 2), floor(($b + $nb) / 2));
                 }
@@ -235,7 +233,5 @@ class ImgTrans
         } else {
             return $this->_TransHor3D($aGdImg, $aHorizon, $aSkewDist, $aDir, $aMinSize, $aFillColor, $aHiQuality, $aBorder);
         }
-
     }
-
 }

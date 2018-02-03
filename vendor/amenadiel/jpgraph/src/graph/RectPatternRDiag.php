@@ -7,7 +7,6 @@ namespace Amenadiel\JpGraph\Graph;
 //=====================================================================
 class RectPatternRDiag extends RectPattern
 {
-
     public function __construct($aColor = "black", $aWeight = 1, $aLineSpacing = 12)
     {
         parent::__construct($aColor, $aWeight);
@@ -50,9 +49,9 @@ class RectPatternRDiag extends RectPattern
         } else {
             // Height larger than width
             $diff = $x0 - $xe;
-            $y0 = $diff + $this->rect->y;
-            $x0 = $xe;
-            $x1 = $this->rect->x;
+            $y0   = $diff + $this->rect->y;
+            $x0   = $xe;
+            $x1   = $this->rect->x;
             while ($y1 <= $ye) {
                 $aImg->Line($x0, $y0, $x1, $y1);
                 $y1 += $this->linespacing;
@@ -60,8 +59,8 @@ class RectPatternRDiag extends RectPattern
             }
 
             $diff = $y1 - $ye;
-            $y1 = $ye;
-            $x1 = $diff + $this->rect->x;
+            $y1   = $ye;
+            $x1   = $diff + $this->rect->x;
         }
 
         while ($y0 <= $ye) {

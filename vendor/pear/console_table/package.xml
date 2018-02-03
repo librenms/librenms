@@ -28,9 +28,9 @@
   <email>xnoguer@php.net</email>
   <active>no</active>
  </developer>
- <date>2016-01-21</date>
+ <date>2018-01-25</date>
  <version>
-  <release>1.3.0</release>
+  <release>1.3.1</release>
   <api>1.3.0</api>
  </version>
  <stability>
@@ -39,7 +39,7 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
  <notes>
-* Fix warning with PHP 7 and bump required PHP version to 5.2.0 (Pieter Frenssen PR #13).
+* Fix warning with PHP 7.2 when passing non-array data (Remi Collet &lt;remi@remirepo.net&gt;, PR #14).
  </notes>
  <contents>
   <dir baseinstalldir="Console" name="/">
@@ -395,6 +395,21 @@
    <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
    <notes>
 * Fix warning with PHP 7 and bump required PHP version to 5.2.0 (Pieter Frenssen PR #13).
+   </notes>
+  </release>
+  <release>
+   <date>2018-01-25</date>
+   <version>
+    <release>1.3.1</release>
+    <api>1.3.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+   <notes>
+* Fix warning with PHP 7.2 when passing non-array data (Remi Collet &lt;remi@remirepo.net&gt;, PR #14).
    </notes>
   </release>
  </changelog>

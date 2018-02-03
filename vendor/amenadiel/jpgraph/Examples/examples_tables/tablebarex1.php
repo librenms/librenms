@@ -11,16 +11,16 @@ $datay = array(
 ;
 
 // Some basic defines to specify the shape of the bar+table
-$nbrbar = 6;
-$cellwidth = 50;
-$tableypos = 200;
-$tablexpos = 60;
-$tablewidth = $nbrbar * $cellwidth;
+$nbrbar      = 6;
+$cellwidth   = 50;
+$tableypos   = 200;
+$tablexpos   = 60;
+$tablewidth  = $nbrbar * $cellwidth;
 $rightmargin = 30;
 
 // Overall graph size
 $height = 320;
-$width = $tablexpos + $tablewidth + $rightmargin;
+$width  = $tablexpos + $tablewidth + $rightmargin;
 
 // Create the basic graph.
 $graph = new Graph\Graph($width, $height);

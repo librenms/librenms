@@ -1,13 +1,13 @@
 <?php
-require_once ('jpgraph/jpgraph.php');
-require_once ('jpgraph/jpgraph_canvas.php');
-require_once ('jpgraph/jpgraph_table.php');
+require_once('jpgraph/jpgraph.php');
+require_once('jpgraph/jpgraph_canvas.php');
+require_once('jpgraph/jpgraph_table.php');
 
 // Create a canvas graph where the table can be added
-$graph = new CanvasGraph(70,60);
+$graph = new CanvasGraph(70, 60);
 
 // Setup the basic table
-$data = array( array(1,2,3,4),array(5,6,7,8));
+$data  = array( array(1,2,3,4),array(5,6,7,8));
 $table = new GTextTable();
 $table->Set($data);
 
@@ -15,10 +15,10 @@ $table->Set($data);
 $table->MergeRow(0);
 
 // Adjust font in cell (0,0)
-$table->SetCellFont(0,0,FF_ARIAL,FS_BOLD,14);
+$table->SetCellFont(0, 0, FF_ARIAL, FS_BOLD, 14);
 
 // Set left align for all cells in rectangle (0,0) - (0,3)
-$table->SetAlign(0,0,0,3,'Left');
+$table->SetAlign(0, 0, 0, 3, 'Left');
 
 // Add table to graph
 $graph->Add($table);

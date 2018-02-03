@@ -7,14 +7,18 @@ namespace Amenadiel\JpGraph\Plot;
 //===================================================
 class GanttPlotObject
 {
-    public $title, $caption;
-    public $csimarea = '', $csimtarget = '', $csimwintarget = '', $csimalt = '';
-    public $constraints = array();
-    public $iCaptionMargin = 5;
-    public $iConstrainPos = array();
-    protected $iStart = ""; // Start date
-    public $iVPos = 0; // Vertical position
-    protected $iLabelLeftMargin = 2; // Title margin
+    public $title;
+    public $caption;
+    public $csimarea                 = '';
+    public $csimtarget               = '';
+    public $csimwintarget            = '';
+    public $csimalt                  = '';
+    public $constraints              = array();
+    public $iCaptionMargin           = 5;
+    public $iConstrainPos            = array();
+    protected $iStart                = ""; // Start date
+    public $iVPos                    = 0; // Vertical position
+    protected $iLabelLeftMargin      = 2; // Title margin
 
     public function __construct()
     {
@@ -41,9 +45,9 @@ class GanttPlotObject
             //('CSIM Alt text must be specified as a string.'."\nStart of alt text is:\n$tv");
         }
 
-        $this->csimtarget = $aTarget;
+        $this->csimtarget    = $aTarget;
         $this->csimwintarget = $aWinTarget;
-        $this->csimalt = $aAlt;
+        $this->csimalt       = $aAlt;
     }
 
     public function SetCSIMAlt($aAlt)

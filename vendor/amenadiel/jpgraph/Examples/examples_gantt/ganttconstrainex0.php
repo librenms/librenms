@@ -1,9 +1,9 @@
 <?php // content="text/plain; charset=utf-8"
 // Gantt example
-require_once ('jpgraph/jpgraph.php');
-require_once ('jpgraph/jpgraph_gantt.php');
+require_once('jpgraph/jpgraph.php');
+require_once('jpgraph/jpgraph_gantt.php');
 
-// 
+//
 // The data for the graphs
 //
 $data = array(
@@ -28,7 +28,7 @@ $graph->ShowHeaders(GANTT_HYEAR | GANTT_HMONTH | GANTT_HDAY | GANTT_HWEEK);
 $graph->scale->week->SetStyle(WEEKSTYLE_FIRSTDAYWNBR);
 
 // Add the specified activities
-$graph->CreateSimple($data,$constrains,$progress);
+$graph->CreateSimple($data, $constrains, $progress);
 
 // .. and stroke the graph
 $graph->Stroke();

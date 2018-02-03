@@ -4,7 +4,7 @@ require_once 'jpgraph/jpgraph_line.php';
 
 $n = 8;
 for ($i = 0; $i < $n; ++$i) {
-    $datay[$i] = rand(1, 10);
+    $datay[$i]  = rand(1, 10);
     $datay2[$i] = rand(10, 55);
     $datay3[$i] = rand(200, 600);
     $datay4[$i] = rand(500, 800);

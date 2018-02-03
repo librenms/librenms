@@ -8,30 +8,37 @@ use Amenadiel\JpGraph\Util;
 //===================================================
 class WindrosePlotScale
 {
-    private $iMax, $iDelta = 5;
-    private $iNumCirc = 3;
-    public $iMaxNum = 0;
-    private $iLblFmt = '%.0f%%';
-    public $iFontFamily = FF_VERDANA, $iFontStyle = FS_NORMAL, $iFontSize = 10;
-    public $iZFontFamily = FF_ARIAL, $iZFontStyle = FS_NORMAL, $iZFontSize = 10;
-    public $iFontColor = 'black', $iZFontColor = 'black';
-    private $iFontFrameColor = false, $iFontBkgColor = false;
-    private $iLblZeroTxt = null;
-    private $iLblAlign = LBLALIGN_CENTER;
-    public $iAngle = 'auto';
-    private $iManualScale = false;
-    private $iHideLabels = false;
+    private $iMax;
+    private $iDelta           = 5;
+    private $iNumCirc         = 3;
+    public $iMaxNum           = 0;
+    private $iLblFmt          = '%.0f%%';
+    public $iFontFamily       = FF_VERDANA;
+    public $iFontStyle        = FS_NORMAL;
+    public $iFontSize         = 10;
+    public $iZFontFamily      = FF_ARIAL;
+    public $iZFontStyle       = FS_NORMAL;
+    public $iZFontSize        = 10;
+    public $iFontColor        = 'black';
+    public $iZFontColor       = 'black';
+    private $iFontFrameColor  = false;
+    private $iFontBkgColor    = false;
+    private $iLblZeroTxt      = null;
+    private $iLblAlign        = LBLALIGN_CENTER;
+    public $iAngle            = 'auto';
+    private $iManualScale     = false;
+    private $iHideLabels      = false;
 
     public function __construct($aData)
     {
-        $max = 0;
-        $totlegsum = 0;
-        $maxnum = 0;
+        $max            = 0;
+        $totlegsum      = 0;
+        $maxnum         = 0;
         $this->iZeroSum = 0;
         foreach ($aData as $idx => $legdata) {
             $legsum = array_sum($legdata);
             $maxnum = max($maxnum, count($legdata) - 1);
-            $max = max($legsum - $legdata[0], $max);
+            $max    = max($legsum - $legdata[0], $max);
             $totlegsum += $legsum;
             $this->iZeroSum += $legdata[0];
         }
@@ -39,10 +46,10 @@ class WindrosePlotScale
             Util\JpGraphError::RaiseL(22001, $legsum);
             //("Total percentage for all windrose legs in a windrose plot can not exceed  100% !\n(Current max is: ".$legsum.')');
         }
-        $this->iMax = $max;
-        $this->iMaxNum = $maxnum;
+        $this->iMax     = $max;
+        $this->iMaxNum  = $maxnum;
         $this->iNumCirc = $this->GetNumCirc();
-        $this->iMaxVal = $this->iNumCirc * $this->iDelta;
+        $this->iMaxVal  = $this->iNumCirc * $this->iDelta;
     }
 
     // Return number of grid circles
@@ -55,9 +62,9 @@ class WindrosePlotScale
 
     public function SetMaxValue($aMax)
     {
-        $this->iMax = $aMax;
+        $this->iMax     = $aMax;
         $this->iNumCirc = $this->GetNumCirc();
-        $this->iMaxVal = $this->iNumCirc * $this->iDelta;
+        $this->iMaxVal  = $this->iNumCirc * $this->iDelta;
     }
 
     // Set step size for circular grid
@@ -67,10 +74,10 @@ class WindrosePlotScale
             $this->SetMaxValue($aMax);
             return;
         }
-        $this->iDelta = $aDelta;
+        $this->iDelta   = $aDelta;
         $this->iNumCirc = ceil($aMax / $aDelta); //$this->GetNumCirc();
-        $this->iMaxVal = $this->iNumCirc * $this->iDelta;
-        $this->iMax = $aMax;
+        $this->iMaxVal  = $this->iNumCirc * $this->iDelta;
+        $this->iMax     = $aMax;
         // Remember that user has specified interval so don't
         // do autoscaling
         $this->iManualScale = true;
@@ -78,7 +85,6 @@ class WindrosePlotScale
 
     public function AutoScale($aRadius, $aMinDist = 30)
     {
-
         if ($this->iManualScale) {
             return;
         }
@@ -99,7 +105,7 @@ class WindrosePlotScale
         // If the distance is to large try with multiples of 2 instead
         if ($tst > $aMinDist * 3) {
             $this->iDelta = 2;
-            $tst = ceil($aRadius / $this->iNumCirc);
+            $tst          = ceil($aRadius / $this->iNumCirc);
 
             while ($tst <= $aMinDist && $this->iDelta < 100) {
                 $this->iDelta += 2;
@@ -112,7 +118,7 @@ class WindrosePlotScale
         }
 
         $this->iNumCirc = $this->GetNumCirc();
-        $this->iMaxVal = $this->iNumCirc * $this->iDelta;
+        $this->iMaxVal  = $this->iNumCirc * $this->iDelta;
     }
 
     // Return max of all leg values
@@ -150,7 +156,6 @@ class WindrosePlotScale
 
     public function SetLabelFillColor($aBkgColor, $aBorderColor = false)
     {
-
         $this->iFontBkgColor = $aBkgColor;
         if ($aBorderColor === false) {
             $this->iFontFrameColor = $aBkgColor;
@@ -161,23 +166,23 @@ class WindrosePlotScale
 
     public function SetFontColor($aColor)
     {
-        $this->iFontColor = $aColor;
+        $this->iFontColor  = $aColor;
         $this->iZFontColor = $aColor;
     }
 
     public function SetFont($aFontFamily, $aFontStyle = FS_NORMAL, $aFontSize = 10)
     {
         $this->iFontFamily = $aFontFamily;
-        $this->iFontStyle = $aFontStyle;
-        $this->iFontSize = $aFontSize;
+        $this->iFontStyle  = $aFontStyle;
+        $this->iFontSize   = $aFontSize;
         $this->SetZFont($aFontFamily, $aFontStyle, $aFontSize);
     }
 
     public function SetZFont($aFontFamily, $aFontStyle = FS_NORMAL, $aFontSize = 10)
     {
         $this->iZFontFamily = $aFontFamily;
-        $this->iZFontStyle = $aFontStyle;
-        $this->iZFontSize = $aFontSize;
+        $this->iZFontStyle  = $aFontStyle;
+        $this->iZFontSize   = $aFontSize;
     }
 
     public function SetZeroLabel($aTxt)
@@ -192,7 +197,6 @@ class WindrosePlotScale
 
     public function StrokeLabels($aImg, $xc, $yc, $ri, $rr)
     {
-
         if ($this->iHideLabels) {
             return;
         }
@@ -223,7 +227,7 @@ class WindrosePlotScale
         }
 
         // Stroke the labels close to each circle
-        $v = $d;
+        $v  = $d;
         $si = sin($a);
         $co = cos($a);
         for ($i = 0; $i < $n; ++$i, $v += $d) {

@@ -61,8 +61,8 @@ class SymChar
 
         );
 
-        $n = count($iSymbols);
-        $i = 0;
+        $n     = count($iSymbols);
+        $i     = 0;
         $found = false;
         $aSymb = strtolower($aSymb);
         while ($i < $n && !$found) {
@@ -80,6 +80,5 @@ class SymChar
         } else {
             return '';
         }
-
     }
 }

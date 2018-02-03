@@ -2,6 +2,7 @@
 require_once '../../vendor/autoload.php';
 use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
+
 $data = array(
     2 => array(1, 15, 7.5, 2),
     5 => array(1, 1, 1.5, 2),

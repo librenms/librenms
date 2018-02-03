@@ -24,12 +24,12 @@ $adjstart = floor($start / 60);
 // Create a data set in range (20,100) and X-positions
 // We also apply a simple low pass filter on the data to make it less
 // random and a little smoother
-$data = array();
-$xdata = array();
-$data[0] = rand(20, 100);
+$data     = array();
+$xdata    = array();
+$data[0]  = rand(20, 100);
 $xdata[0] = $adjstart;
 for ($i = 1; $i < NDATAPOINTS; ++$i) {
-    $data[$i] = rand(20, 100) * 0.2 + $data[$i - 1] * 0.8;
+    $data[$i]  = rand(20, 100) * 0.2 + $data[$i - 1] * 0.8;
     $xdata[$i] = $adjstart + $i * SAMPLERATE;
 }
 

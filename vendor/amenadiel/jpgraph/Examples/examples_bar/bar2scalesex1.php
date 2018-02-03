@@ -3,8 +3,8 @@ require_once '../../vendor/autoload.php';
 use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
 
-$datay = array(20, 30, 50, 80);
-$datay2 = array(430, 645, 223, 690);
+$datay    = array(20, 30, 50, 80);
+$datay2   = array(430, 645, 223, 690);
 $datazero = array(0, 0, 0, 0);
 
 // Create the graph.

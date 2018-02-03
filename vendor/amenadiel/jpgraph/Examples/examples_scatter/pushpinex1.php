@@ -16,7 +16,6 @@ function markCallback($y, $x)
     } else {
         return array(false, false, false, 'green', 0.8);
     }
-
 }
 
 // Data arrays

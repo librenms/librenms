@@ -1,16 +1,20 @@
 <?php
 namespace Amenadiel\JpGraph\Graph;
 
+use \Amenadiel\JpGraph\ImgTrans;
+
 //===================================================
 // CLASS PieGraph
 // Description:
 //===================================================
 class PieGraph extends Graph
 {
-    private $posx, $posy, $radius;
-    private $legends = array();
-    public $plots = array();
-    public $pieaa = false;
+    private $posx;
+    private $posy;
+    private $radius;
+    private $legends = [];
+    public $plots    = [];
+    public $pieaa    = false;
     //---------------
     // CONSTRUCTOR
     public function __construct($width = 300, $height = 200, $cachedName = "", $timeout = 0, $inline = 1)
@@ -18,7 +22,7 @@ class PieGraph extends Graph
         parent::__construct($width, $height, $cachedName, $timeout, $inline);
         $this->posx = $width / 2;
         $this->posy = $height / 2;
-        $this->SetColor(array(255, 255, 255));
+        $this->SetColor([255, 255, 255]);
 
         if ($this->graph_theme) {
             $this->graph_theme->ApplyGraph($this);
@@ -29,7 +33,6 @@ class PieGraph extends Graph
     // PUBLIC METHODS
     public function Add($aObj)
     {
-
         if (is_array($aObj) && count($aObj) > 0) {
             $cl = $aObj[0];
         } else {
@@ -94,14 +97,13 @@ class PieGraph extends Graph
                     for ($j = 0; $j < $m; $j++) {
                         $this->img->LineTo($pts[1][$j], $pts[2][$j]);
                     }
-                } else if ($coords[1][$i] == "rect") {
+                } elseif ($coords[1][$i] == "rect") {
                     $pts = preg_split('/,/', $coords[2][$i]);
                     $this->img->SetStartPoint($pts[0], $pts[1]);
                     $this->img->LineTo($pts[2], $pts[1]);
                     $this->img->LineTo($pts[2], $pts[3]);
                     $this->img->LineTo($pts[0], $pts[3]);
                     $this->img->LineTo($pts[0], $pts[1]);
-
                 }
             }
         }
@@ -135,7 +137,6 @@ class PieGraph extends Graph
         $n = count($this->plots);
 
         if ($this->pieaa) {
-
             if (!$_csim) {
                 if ($this->background_image != "") {
                     $this->StrokeFrameBackground();
@@ -145,8 +146,8 @@ class PieGraph extends Graph
                 }
             }
 
-            $w = $this->img->width;
-            $h = $this->img->height;
+            $w      = $this->img->width;
+            $h      = $this->img->height;
             $oldimg = $this->img->img;
 
             $this->img->CreateImgCanvas(2 * $w, 2 * $h);
@@ -166,7 +167,6 @@ class PieGraph extends Graph
                 if ($this->iIcons[$i]->iY > 1) {
                     $this->iIcons[$i]->iY *= 2;
                 }
-
             }
 
             $this->StrokeIcons();
@@ -189,7 +189,6 @@ class PieGraph extends Graph
                 if ($this->plots[$i]->posy > 1) {
                     $this->plots[$i]->posy /= 2;
                 }
-
             }
 
             $indent = $this->doframe ? ($this->frame_weight + ($this->doshadow ? $this->shadow_width : 0)) : 0;
@@ -197,17 +196,15 @@ class PieGraph extends Graph
             $this->img->CopyCanvasH($oldimg, $this->img->img, $indent, $indent, $indent, $indent,
                 $w - 2 * $indent, $h - 2 * $indent, 2 * ($w - $indent), 2 * ($h - $indent));
 
-            $this->img->img = $oldimg;
-            $this->img->width = $w;
+            $this->img->img    = $oldimg;
+            $this->img->width  = $w;
             $this->img->height = $h;
 
             for ($i = 0; $i < $n; ++$i) {
                 $this->plots[$i]->Stroke($this->img, 2); // Stroke labels
                 $this->plots[$i]->Legend($this);
             }
-
         } else {
-
             if (!$_csim) {
                 if ($this->background_image != "") {
                     $this->StrokeFrameBackground();
@@ -245,12 +242,7 @@ class PieGraph extends Graph
 
             // Should we do any final image transformation
             if ($this->iImgTrans) {
-                if (!class_exists('ImgTrans', false)) {
-                    require_once 'jpgraph_imgtrans.php';
-                    //Util\JpGraphError::Raise('In order to use image transformation you must include the file jpgraph_imgtrans.php in your script.');
-                }
-
-                $tform = new ImgTrans($this->img->img);
+                $tform          = new ImgTrans($this->img->img);
                 $this->img->img = $tform->Skew3D($this->iImgTransHorizon, $this->iImgTransSkewDist,
                     $this->iImgTransDirection, $this->iImgTransHighQ,
                     $this->iImgTransMinSize, $this->iImgTransFillColor,

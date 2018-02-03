@@ -9,19 +9,22 @@ use Amenadiel\JpGraph\Util;
 //===================================================
 class LinkArrow
 {
-    private $ix, $iy;
+    private $ix;
+    private $iy;
     private $isizespec = array(
         array(2, 3), array(3, 5), array(3, 8), array(6, 15), array(8, 22));
-    private $iDirection = ARROW_DOWN, $iType = ARROWT_SOLID, $iSize = ARROW_S2;
-    private $iColor = 'black';
+    private $iDirection = ARROW_DOWN;
+    private $iType      = ARROWT_SOLID;
+    private $iSize      = ARROW_S2;
+    private $iColor     = 'black';
 
     public function __construct($x, $y, $aDirection, $aType = ARROWT_SOLID, $aSize = ARROW_S2)
     {
         $this->iDirection = $aDirection;
-        $this->iType = $aType;
-        $this->iSize = $aSize;
-        $this->ix = $x;
-        $this->iy = $y;
+        $this->iType      = $aType;
+        $this->iSize      = $aSize;
+        $this->ix         = $x;
+        $this->iy         = $y;
     }
 
     public function SetColor($aColor)
@@ -42,8 +45,8 @@ class LinkArrow
     public function Stroke($aImg)
     {
         list($dx, $dy) = $this->isizespec[$this->iSize];
-        $x = $this->ix;
-        $y = $this->iy;
+        $x             = $this->ix;
+        $y             = $this->iy;
         switch ($this->iDirection) {
             case ARROW_DOWN:
                 $c = array($x, $y, $x - $dx, $y - $dy, $x + $dx, $y - $dy, $x, $y);

@@ -3,7 +3,7 @@ require_once 'jpgraph/jpgraph.php';
 require_once 'jpgraph/jpgraph_line.php';
 
 // Some data
-$datay = array(28, 19, 18, 23, 12, 11);
+$datay  = array(28, 19, 18, 23, 12, 11);
 $data2y = array(14, 18, 33, 29, 39, 55);
 
 // A nice graph with anti-aliasing

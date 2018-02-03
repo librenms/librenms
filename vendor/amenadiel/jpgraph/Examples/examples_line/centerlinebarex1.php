@@ -17,7 +17,7 @@ $line = new Plot\LinePlot($ydata);
 $line->SetBarCenter();
 $line->SetWeight(2);
 
-$bar = new Plot\BarPlot($ydata);
+$bar  = new Plot\BarPlot($ydata);
 $bar2 = new Plot\BarPlot($ydata);
 $bar2->SetFillColor("red");
 

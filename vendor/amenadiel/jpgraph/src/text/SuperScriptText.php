@@ -7,11 +7,15 @@ namespace Amenadiel\JpGraph\Text;
 //===================================================
 class SuperScriptText extends Text
 {
-    private $iSuper = '';
-    private $sfont_family = '', $sfont_style = '', $sfont_size = 8;
-    private $iSuperMargin = 2, $iVertOverlap = 4, $iSuperScale = 0.65;
-    private $iSDir = 0;
-    private $iSimple = false;
+    private $iSuper       = '';
+    private $sfont_family = '';
+    private $sfont_style  = '';
+    private $sfont_size   = 8;
+    private $iSuperMargin = 2;
+    private $iVertOverlap = 4;
+    private $iSuperScale  = 0.65;
+    private $iSDir        = 0;
+    private $iSimple      = false;
 
     public function __construct($aTxt = '', $aSuper = '', $aXAbsPos = 0, $aYAbsPos = 0)
     {
@@ -24,7 +28,7 @@ class SuperScriptText extends Text
         // Convert a floating point number to scientific notation
         $neg = 1.0;
         if ($aVal < 0) {
-            $neg = -1.0;
+            $neg  = -1.0;
             $aVal = -$aVal;
         }
 
@@ -49,15 +53,15 @@ class SuperScriptText extends Text
 
     public function Set($aTxt, $aSuper = '')
     {
-        $this->t = $aTxt;
+        $this->t      = $aTxt;
         $this->iSuper = $aSuper;
     }
 
     public function SetSuperFont($aFontFam, $aFontStyle = FS_NORMAL, $aFontSize = 8)
     {
         $this->sfont_family = $aFontFam;
-        $this->sfont_style = $aFontStyle;
-        $this->sfont_size = $aFontSize;
+        $this->sfont_style  = $aFontStyle;
+        $this->sfont_size   = $aFontSize;
     }
 
     // Total width of text
@@ -158,11 +162,10 @@ class SuperScriptText extends Text
                 if ($sfz < 8) {
                     $sfz = 8;
                 }
-
             }
             $this->sfont_family = $sff;
-            $this->sfont_style = $sfs;
-            $this->sfont_size = $sfz;
+            $this->sfont_style  = $sfs;
+            $this->sfont_size   = $sfz;
         } else {
             $sff = $this->sfont_family;
             $sfs = $this->sfont_style;

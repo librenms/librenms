@@ -2,6 +2,7 @@
 namespace Amenadiel\JpGraph\Graph;
 
 use Amenadiel\JpGraph\Util;
+use \Amenadiel\JpGraph\ImgTrans;
 
 //===================================================
 // CLASS RadarGraph
@@ -9,8 +10,10 @@ use Amenadiel\JpGraph\Util;
 //===================================================
 class RadarGraph extends Graph
 {
-    public $grid, $axis = null;
-    private $posx, $posy;
+    public $grid;
+    public $axis = null;
+    private $posx;
+    private $posy;
     private $len;
     private $axis_title = null;
 
@@ -19,8 +22,8 @@ class RadarGraph extends Graph
         parent::__construct($width, $height, $cachedName, $timeout, $inline);
         $this->posx = $width / 2;
         $this->posy = $height / 2;
-        $this->len = min($width, $height) * 0.35;
-        $this->SetColor(array(255, 255, 255));
+        $this->len  = min($width, $height) * 0.35;
+        $this->SetColor([255, 255, 255]);
         $this->SetTickDensity(TICKD_NORMAL);
         $this->SetScale('lin');
         $this->SetGridDepth(DEPTH_FRONT);
@@ -43,11 +46,11 @@ class RadarGraph extends Graph
             //("Illegal scale for radarplot ($axtype). Must be \"lin\" or \"log\"");
         }
         if ($axtype == 'lin') {
-            $this->yscale = new LinearScale($ymin, $ymax);
+            $this->yscale        = new LinearScale($ymin, $ymax);
             $this->yscale->ticks = new RadarLinearTicks();
             $this->yscale->ticks->SupressMinorTickMarks();
         } elseif ($axtype == 'log') {
-            $this->yscale = new LogScale($ymin, $ymax);
+            $this->yscale        = new LogScale($ymin, $ymax);
             $this->yscale->ticks = new RadarLogTicks();
         }
 
@@ -152,7 +155,7 @@ class RadarGraph extends Graph
             Util\JpGraphError::RaiseL(18006, $min);
             //("Minimum data $min (Radar plots should only be used when all data points > 0)");
         }
-        return array($min, $max);
+        return [$min, $max];
     }
 
     public function StrokeIcons()
@@ -271,7 +274,6 @@ class RadarGraph extends Graph
             if ($this->iIconDepth == DEPTH_BACK) {
                 $this->StrokeIcons();
             }
-
         }
 
         // Plot points
@@ -298,11 +300,7 @@ class RadarGraph extends Graph
 
         // Should we do any final image transformation
         if ($this->iImgTrans && !$_csim) {
-            if (!class_exists('ImgTrans', false)) {
-                require_once 'jpgraph_imgtrans.php';
-            }
-
-            $tform = new ImgTrans($this->img->img);
+            $tform          = new ImgTrans($this->img->img);
             $this->img->img = $tform->Skew3D($this->iImgTransHorizon, $this->iImgTransSkewDist,
                 $this->iImgTransDirection, $this->iImgTransHighQ,
                 $this->iImgTransMinSize, $this->iImgTransFillColor,

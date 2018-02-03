@@ -5,19 +5,19 @@ require_once 'jpgraph/jpgraph_line.php';
 require_once 'jpgraph/jpgraph_plotline.php';
 
 $numpoints = 50;
-$k = 0.05;
+$k         = 0.05;
 
 // Create some data points
 for ($i = -$numpoints + 1; $i < 0; ++$i) {
-    $datay[$i + $numpoints - 1] = exp($k * $i) * cos(2 * M_PI / 10 * $i) * 14;
+    $datay[$i + $numpoints - 1]    = exp($k * $i) * cos(2 * M_PI / 10 * $i) * 14;
     $datayenv[$i + $numpoints - 1] = exp($k * $i) * 14;
-    $datax[$i + $numpoints - 1] = $i;
+    $datax[$i + $numpoints - 1]    = $i;
 }
 
 for ($i = 0; $i < $numpoints; ++$i) {
-    $datay[$i + $numpoints - 1] = exp(-$k * $i) * cos(2 * M_PI / 10 * $i) * 14;
+    $datay[$i + $numpoints - 1]    = exp(-$k * $i) * cos(2 * M_PI / 10 * $i) * 14;
     $datayenv[$i + $numpoints - 1] = exp(-$k * $i) * 14;
-    $datax[$i + $numpoints - 1] = $i;
+    $datax[$i + $numpoints - 1]    = $i;
 }
 
 // Setup the basic parameters for the graph

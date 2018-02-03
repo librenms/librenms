@@ -9,9 +9,9 @@ $ydata = array();
 
 // Timestamps - 2h (=7200s) apart starting
 $sampling = 7200;
-$n = 50; // data points
+$n        = 50; // data points
 for ($i = 0; $i < $n; ++$i) {
-    $xdata[$i] = time() + $i * $sampling;
+    $xdata[$i]    = time() + $i * $sampling;
     $ydata[0][$i] = rand(12, 15);
     $ydata[1][$i] = rand(100, 155);
     $ydata[2][$i] = rand(20, 30);

@@ -8,12 +8,12 @@ require_once 'jpgraph/jpgraph_mgraph.php';
 
 DEFINE('NDATAPOINTS', 420);
 DEFINE('SAMPLERATE', 300);
-$start = time();
-$end = $start + NDATAPOINTS * SAMPLERATE;
-$data = array();
-$xdata = array();
+$start                 = time();
+$end                   = $start + NDATAPOINTS * SAMPLERATE;
+$data                  = array();
+$xdata                 = array();
 $data_winddirection[0] = rand(100, 200);
-$data_windspeed[0] = rand(7, 10);
+$data_windspeed[0]     = rand(7, 10);
 for ($i = 0; $i < NDATAPOINTS - 1; ++$i) {
     $data_winddirection[$i + 1] = $data_winddirection[$i] + rand(-4, 4);
     if ($data_winddirection[$i + 1] < 0 || $data_winddirection[$i + 1] > 359) {

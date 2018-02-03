@@ -3,21 +3,22 @@ require_once '../../vendor/autoload.php';
 require_once 'jpgraph/jpgraph_scatter.php';
 use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
+
 require_once 'jpgraph/jpgraph_utils.inc.php';
 
 // Create some "fake" regression data
 $datay = array();
 $datax = array();
-$a = 3.2;
-$b = 2.5;
+$a     = 3.2;
+$b     = 2.5;
 for ($x = 0; $x < 20; ++$x) {
     $datax[$x] = $x;
     $datay[$x] = $a + $b * $x + rand(-20, 20);
 }
 
-$lr = new LinearRegression($datax, $datay);
+$lr                  = new LinearRegression($datax, $datay);
 list($stderr, $corr) = $lr->GetStat();
-list($xd, $yd) = $lr->GetY(0, 19);
+list($xd, $yd)       = $lr->GetY(0, 19);
 
 // Create the graph
 $graph = new Graph\Graph(300, 250);

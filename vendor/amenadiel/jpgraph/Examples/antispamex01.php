@@ -10,7 +10,7 @@ $spam = new AntiSpam();
 $chars = $spam->Rand(5);
 
 // Stroke random cahllenge
-if( $spam->Stroke() === false ) {
+if ($spam->Stroke() === false) {
     die('Illegal or no data to plot');
 }
 

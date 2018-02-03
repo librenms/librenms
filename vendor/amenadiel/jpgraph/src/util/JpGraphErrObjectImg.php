@@ -9,7 +9,6 @@ use Amenadiel\JpGraph\Text;
 //==============================================================
 class JpGraphErrObjectImg extends JpGraphErrObject
 {
-
     public function __construct()
     {
         parent::__construct();
@@ -52,7 +51,7 @@ class JpGraphErrObjectImg extends JpGraphErrObject
             die($this->iTitle . ' ' . $aMsg);
         }
 
-        $aMsg = wordwrap($aMsg, 55);
+        $aMsg  = wordwrap($aMsg, 55);
         $lines = substr_count($aMsg, "\n");
 
         // Create the error icon GD
@@ -125,6 +124,5 @@ class JpGraphErrObjectImg extends JpGraphErrObject
         if ($aHalt) {
             die();
         }
-
     }
 }

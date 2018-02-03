@@ -18,7 +18,7 @@ $graph->title->Set("Multiple - Pie plot");
 
 // Create plots
 $size = 0.13;
-$p1 = new \PiePlot($data);
+$p1   = new \PiePlot($data);
 $graph->Add($p1);
 
 $p1->SetSize($size);
