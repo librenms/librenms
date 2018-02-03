@@ -22,7 +22,8 @@ define('CORNER_BOTTOMLEFT', 3);
 //===================================================
 class Shape
 {
-    private $img, $scale;
+    private $img;
+    private $scale;
 
     public function __construct($aGraph, $scale)
     {
@@ -52,7 +53,7 @@ class Shape
     {
         $n = count($p);
         for ($i = 0; $i < $n; $i += 2) {
-            $p[$i] = $this->scale->TranslateX($p[$i]);
+            $p[$i]     = $this->scale->TranslateX($p[$i]);
             $p[$i + 1] = $this->scale->TranslateY($p[$i + 1]);
         }
         $this->img->Polygon($p, $aClosed);
@@ -62,7 +63,7 @@ class Shape
     {
         $n = count($p);
         for ($i = 0; $i < $n; $i += 2) {
-            $p[$i] = $this->scale->TranslateX($p[$i]);
+            $p[$i]     = $this->scale->TranslateX($p[$i]);
             $p[$i + 1] = $this->scale->TranslateY($p[$i + 1]);
         }
         $this->img->FilledPolygon($p);
@@ -92,10 +93,10 @@ class Shape
         $x_old = $x0;
         $y_old = $y0;
         for ($t = $delta; $t <= 1.0; $t += $delta) {
-            $tt = $t * $t;
+            $tt  = $t * $t;
             $ttt = $tt * $t;
-            $x = $ax * $ttt + $bx * $tt + $cx * $t + $x0;
-            $y = $ay * $ttt + $by * $tt + $cy * $t + $y0;
+            $x   = $ax * $ttt + $bx * $tt + $cx * $t + $x0;
+            $y   = $ay * $ttt + $by * $tt + $cy * $t + $y0;
             $this->Line($x_old, $y_old, $x, $y);
             $x_old = $x;
             $y_old = $y;
@@ -202,9 +203,8 @@ class Shape
     // 0=Top left, 1=top right, 2=bottom right, 3=bottom left
     public function IndentedRectangle($xt, $yt, $w, $h, $iw = 0, $ih = 0, $aCorner = 3, $aFillColor = "", $r = 4)
     {
-
         list($xt, $yt) = $this->scale->Translate($xt, $yt);
-        list($w, $h) = $this->scale->Translate($w, $h);
+        list($w, $h)   = $this->scale->Translate($w, $h);
         list($iw, $ih) = $this->scale->Translate($iw, $ih);
 
         $xr = $xt + $w - 0;

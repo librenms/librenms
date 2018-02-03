@@ -2,8 +2,8 @@
     // Example 8 : QR Barcode with data read from file
 
     // Include the library
-    require_once ('jpgraph/jpgraph.php');
-    require_once ('jpgraph/QR/qrencoder.inc.php');
+    require_once('jpgraph/jpgraph.php');
+    require_once('jpgraph/QR/qrencoder.inc.php');
 
     $readFromFilename = 'qr-input.txt';
 
@@ -19,4 +19,3 @@
 
     // .. send the barcode back to the browser for the data in the file
     $backend->StrokeFromFile($readFromFilename);
-?>

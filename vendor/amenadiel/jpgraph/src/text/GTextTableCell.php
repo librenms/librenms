@@ -27,29 +27,44 @@ DEFINE('TIMG_HEIGHT', 2);
 //---------------------------------------------------------------------
 class GTextTableCell
 {
-    public $iColSpan = 1, $iRowSpan = 1;
-    public $iMarginLeft = 5, $iMarginRight = 5, $iMarginTop = 5, $iMarginBottom = 5;
-    public $iVal = null;
-    private $iBGColor = '', $iFontColor = 'black';
-    private $iFF = FF_FONT1, $iFS = FS_NORMAL, $iFSize = 10;
-    private $iRow = 0, $iCol = 0;
-    private $iVertAlign = 'bottom', $iHorAlign = 'left';
-    private $iMerged = false, $iPRow = null, $iPCol = null;
-    private $iTable = null;
-    private $iGridColor = array('darkgray', 'darkgray', 'darkgray', 'darkgray');
-    private $iGridWeight = array(1, 1, 0, 0); // left,top,bottom,right;
-    private $iGridStyle = array(TGRID_SINGLE, TGRID_SINGLE, TGRID_SINGLE, TGRID_SINGLE); // left,top,bottom,right;
-    private $iNumberFormat = null;
-    private $iIcon = null, $iIconConstrain = array();
-    private $iCSIMtarget = '', $iCSIMwintarget = '', $iCSIMalt = '', $iCSIMArea = '';
+    public $iColSpan                = 1;
+    public $iRowSpan                = 1;
+    public $iMarginLeft             = 5;
+    public $iMarginRight            = 5;
+    public $iMarginTop              = 5;
+    public $iMarginBottom           = 5;
+    public $iVal                    = null;
+    private $iBGColor               = '';
+    private $iFontColor             = 'black';
+    private $iFF                    = FF_FONT1;
+    private $iFS                    = FS_NORMAL;
+    private $iFSize                 = 10;
+    private $iRow                   = 0;
+    private $iCol                   = 0;
+    private $iVertAlign             = 'bottom';
+    private $iHorAlign              = 'left';
+    private $iMerged                = false;
+    private $iPRow                  = null;
+    private $iPCol                  = null;
+    private $iTable                 = null;
+    private $iGridColor             = array('darkgray', 'darkgray', 'darkgray', 'darkgray');
+    private $iGridWeight            = array(1, 1, 0, 0); // left,top,bottom,right;
+    private $iGridStyle             = array(TGRID_SINGLE, TGRID_SINGLE, TGRID_SINGLE, TGRID_SINGLE); // left,top,bottom,right;
+    private $iNumberFormat          = null;
+    private $iIcon                  = null;
+    private $iIconConstrain         = array();
+    private $iCSIMtarget            = '';
+    private $iCSIMwintarget         = '';
+    private $iCSIMalt               = '';
+    private $iCSIMArea              = '';
 
     public function __construct($aVal = '', $aRow = 0, $aCol = 0)
     {
-        $this->iVal = new Text($aVal);
-        $this->iRow = $aRow;
-        $this->iCol = $aCol;
-        $this->iPRow = $aRow; // Initialiy each cell is its own parent
-        $this->iPCol = $aCol;
+        $this->iVal           = new Text($aVal);
+        $this->iRow           = $aRow;
+        $this->iCol           = $aCol;
+        $this->iPRow          = $aRow; // Initialiy each cell is its own parent
+        $this->iPCol          = $aCol;
         $this->iIconConstrain = array(-1, -1);
     }
 
@@ -60,9 +75,9 @@ class GTextTableCell
 
     public function SetCSIMTarget($aTarget, $aAlt = '', $aWinTarget = '')
     {
-        $this->iCSIMtarget = $aTarget;
+        $this->iCSIMtarget    = $aTarget;
         $this->iCSIMwintarget = $aWinTarget;
-        $this->iCSIMalt = $aAlt;
+        $this->iCSIMalt       = $aAlt;
     }
 
     public function GetCSIMArea()
@@ -72,7 +87,6 @@ class GTextTableCell
         } else {
             return '';
         }
-
     }
 
     public function SetImageConstrain($aType, $aVal)
@@ -104,14 +118,14 @@ class GTextTableCell
     {
         $this->iRowSpan = $aRowSpan;
         $this->iColSpan = $aColSpan;
-        $this->iMerged = true;
+        $this->iMerged  = true;
     }
 
     public function SetMerged($aPRow, $aPCol, $aFlg = true)
     {
         $this->iMerged = $aFlg;
-        $this->iPRow = $aPRow;
-        $this->iPCol = $aPCol;
+        $this->iPRow   = $aPRow;
+        $this->iPCol   = $aPCol;
     }
 
     public function IsMerged()
@@ -131,8 +145,8 @@ class GTextTableCell
 
     public function SetFont($aFF, $aFS, $aFSize)
     {
-        $this->iFF = $aFF;
-        $this->iFS = $aFS;
+        $this->iFF    = $aFF;
+        $this->iFS    = $aFS;
         $this->iFSize = $aFSize;
         $this->iVal->SetFont($aFF, $aFS, $aFSize);
     }
@@ -164,7 +178,6 @@ class GTextTableCell
         if ($aRight !== null) {
             $this->iGridColor[3] = $aRight;
         }
-
     }
 
     public function SetGridStyle($aLeft, $aTop = null, $aBottom = null, $aRight = null)
@@ -184,7 +197,6 @@ class GTextTableCell
         if ($aRight !== null) {
             $this->iGridStyle[3] = $aRight;
         }
-
     }
 
     public function SetGridWeight($aLeft = null, $aTop = null, $aBottom = null, $aRight = null)
@@ -204,14 +216,13 @@ class GTextTableCell
         if ($aRight !== null) {
             $this->iGridWeight[3] = $aRight;
         }
-
     }
 
     public function SetMargin($aLeft, $aRight, $aTop, $aBottom)
     {
-        $this->iMarginLeft = $aLeft;
-        $this->iMarginRight = $aRight;
-        $this->iMarginTop = $aTop;
+        $this->iMarginLeft   = $aLeft;
+        $this->iMarginRight  = $aRight;
+        $this->iMarginTop    = $aTop;
         $this->iMarginBottom = $aBottom;
     }
 
@@ -227,7 +238,7 @@ class GTextTableCell
                 $tmp = $this->iIcon->GetWidthHeight();
                 $this->iIcon->SetScale($this->iIconConstrain[1] / $tmp[1]);
             }
-            $tmp = $this->iIcon->GetWidthHeight();
+            $tmp    = $this->iIcon->GetWidthHeight();
             $iwidth = $tmp[0];
         } else {
             $iwidth = 0;
@@ -256,7 +267,7 @@ class GTextTableCell
                 $tmp = $this->iIcon->GetWidthHeight();
                 $this->iIcon->SetScale($this->iIconConstrain[1] / $tmp[1]);
             }
-            $tmp = $this->iIcon->GetWidthHeight();
+            $tmp     = $this->iIcon->GetWidthHeight();
             $iheight = $tmp[1];
         } else {
             $iheight = 0;
@@ -272,14 +283,14 @@ class GTextTableCell
 
     public function SetAlign($aHorAlign = 'left', $aVertAlign = 'bottom')
     {
-        $aHorAlign = strtolower($aHorAlign);
+        $aHorAlign  = strtolower($aHorAlign);
         $aVertAlign = strtolower($aVertAlign);
-        $chk = array('left', 'right', 'center', 'bottom', 'top', 'middle');
+        $chk        = array('left', 'right', 'center', 'bottom', 'top', 'middle');
         if (!in_array($aHorAlign, $chk) || !in_array($aVertAlign, $chk)) {
             JpGraphError::RaiseL(27011, $aHorAlign, $aVertAlign);
         }
         $this->iVertAlign = $aVertAlign;
-        $this->iHorAlign = $aHorAlign;
+        $this->iHorAlign  = $aHorAlign;
     }
 
     public function AdjustMarginsForGrid()
@@ -461,16 +472,16 @@ class GTextTableCell
         if ($this->iIcon !== null) {
             switch ($this->iHorAlign) {
                 case 'left':
-                    $x = $aX + $this->iMarginLeft;
+                    $x       = $aX + $this->iMarginLeft;
                     $hanchor = 'left';
                     break;
                 case 'center':
                 case 'middle':
-                    $x = $aX + $this->iMarginLeft + round(($aWidth - $this->iMarginLeft - $this->iMarginRight) / 2);
+                    $x       = $aX + $this->iMarginLeft + round(($aWidth - $this->iMarginLeft - $this->iMarginRight) / 2);
                     $hanchor = 'center';
                     break;
                 case 'right':
-                    $x = $aX + $aWidth - $this->iMarginRight - 1;
+                    $x       = $aX + $aWidth - $this->iMarginRight - 1;
                     $hanchor = 'right';
                     break;
                 default:
@@ -479,16 +490,16 @@ class GTextTableCell
 
             switch ($this->iVertAlign) {
                 case 'top':
-                    $y = $aY + $this->iMarginTop;
+                    $y       = $aY + $this->iMarginTop;
                     $vanchor = 'top';
                     break;
                 case 'center':
                 case 'middle':
-                    $y = $aY + $this->iMarginTop + round(($aHeight - $this->iMarginTop - $this->iMarginBottom) / 2);
+                    $y       = $aY + $this->iMarginTop + round(($aHeight - $this->iMarginTop - $this->iMarginBottom) / 2);
                     $vanchor = 'center';
                     break;
                 case 'bottom':
-                    $y = $aY + $aHeight - 1 - $this->iMarginBottom;
+                    $y       = $aY + $aHeight - 1 - $this->iMarginBottom;
                     $vanchor = 'bottom';
                     break;
                 default:

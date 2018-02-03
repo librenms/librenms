@@ -11,14 +11,14 @@ require_once 'jpgraph/jpgraph_utils.inc.php';
 // Create some random data for the plot. We use the current time for the
 // first X-position
 //
-$f = new FuncGenerator('cos($x)+1.5*cos(2*$x)');
+$f                   = new FuncGenerator('cos($x)+1.5*cos(2*$x)');
 list($datax, $datay) = $f->E(0, 10);
 
 // Now get labels at 1/2 PI intervall
-$tickPositions = array();
-$tickLabels = array();
+$tickPositions    = array();
+$tickLabels       = array();
 $tickPositions[0] = 0;
-$tickLabels[0] = '0';
+$tickLabels[0]    = '0';
 for ($i = 1; $i / 2 * M_PI < 11; ++$i) {
     $tickPositions[$i] = $i / 2 * M_PI;
     if ($i % 2) {
@@ -26,10 +26,9 @@ for ($i = 1; $i / 2 * M_PI < 11; ++$i) {
     } else {
         $tickLabels[$i] = ($i / 2) . SymChar::Get('pi');
     }
-
 }
 
-$n = count($datax);
+$n    = count($datax);
 $xmin = $datax[0];
 $xmax = $datax[$n - 1];
 

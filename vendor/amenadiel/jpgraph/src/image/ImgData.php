@@ -11,12 +11,13 @@ use Amenadiel\JpGraph\Util;
 
 class ImgData
 {
-    protected $name = ''; // Each subclass gives a name
-    protected $an = array(); // Data array names
-    protected $colors = array(); // Available colors
-    protected $index = array(); // Index for colors
-    protected $maxidx = 0; // Max color index
-    protected $anchor_x = 0.5, $anchor_y = 0.5; // Where is the center of the image
+    protected $name     = ''; // Each subclass gives a name
+    protected $an       = array(); // Data array names
+    protected $colors   = array(); // Available colors
+    protected $index    = array(); // Index for colors
+    protected $maxidx   = 0; // Max color index
+    protected $anchor_x = 0.5;
+    protected $anchor_y = 0.5; // Where is the center of the image
 
     public function __construct()
     {

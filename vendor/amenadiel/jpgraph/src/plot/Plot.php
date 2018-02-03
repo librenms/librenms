@@ -10,18 +10,20 @@ class Plot
 {
     public $numpoints = 0;
     public $value;
-    public $legend = '';
-    public $coords = array();
-    public $color = 'black';
-    public $hidelegend = false;
-    public $line_weight = 1;
-    public $csimtargets = array(), $csimwintargets = array(); // Array of targets for CSIM
-    public $csimareas = ''; // Resultant CSIM area tags
-    public $csimalts = null; // ALT:s for corresponding target
-    public $legendcsimtarget = '', $legendcsimwintarget = '';
-    public $legendcsimalt = '';
-    protected $weight = 1;
-    protected $center = false;
+    public $legend              = '';
+    public $coords              = array();
+    public $color               = 'black';
+    public $hidelegend          = false;
+    public $line_weight         = 1;
+    public $csimtargets         = array();
+    public $csimwintargets      = array(); // Array of targets for CSIM
+    public $csimareas           = ''; // Resultant CSIM area tags
+    public $csimalts            = null; // ALT:s for corresponding target
+    public $legendcsimtarget    = '';
+    public $legendcsimwintarget = '';
+    public $legendcsimalt       = '';
+    protected $weight           = 1;
+    protected $center           = false;
 
     protected $inputValues;
     protected $isRunningClear = false;
@@ -34,7 +36,7 @@ class Plot
         }
 
         if (!$this->isRunningClear) {
-            $this->inputValues = array();
+            $this->inputValues           = array();
             $this->inputValues['aDatay'] = $aDatay;
             $this->inputValues['aDatax'] = $aDatax;
         }
@@ -42,7 +44,7 @@ class Plot
         $this->coords[0] = $aDatay;
         if (is_array($aDatax)) {
             $this->coords[1] = $aDatax;
-            $n = count($aDatax);
+            $n               = count($aDatax);
             for ($i = 0; $i < $n; ++$i) {
                 if (!is_numeric($aDatax[$i])) {
                     Util\JpGraphError::RaiseL(25070);
@@ -70,7 +72,6 @@ class Plot
         if (!$this->hidelegend) {
             $this->Legend($graph);
         }
-
     }
 
     public function StrokeDataValue($img, $aVal, $x, $y)
@@ -81,9 +82,9 @@ class Plot
     // Set href targets for CSIM
     public function SetCSIMTargets($aTargets, $aAlts = '', $aWinTargets = '')
     {
-        $this->csimtargets = $aTargets;
+        $this->csimtargets    = $aTargets;
         $this->csimwintargets = $aWinTargets;
-        $this->csimalts = $aAlts;
+        $this->csimalts       = $aAlts;
     }
 
     // Get all created areas
@@ -122,7 +123,7 @@ class Plot
         } else {
             $xm = 0;
         }
-        $y = $this->coords[0];
+        $y   = $this->coords[0];
         $cnt = count($y);
         if ($cnt > 0) {
             $i = 0;
@@ -158,7 +159,7 @@ class Plot
         $y = $this->coords[0];
         if (count($y) > 0) {
             $cnt = count($y);
-            $i = 0;
+            $i   = 0;
             while ($i < $cnt && !is_numeric($ym = $y[$i])) {
                 $i++;
             }
@@ -181,10 +182,10 @@ class Plot
 
     public function SetLegend($aLegend, $aCSIM = '', $aCSIMAlt = '', $aCSIMWinTarget = '')
     {
-        $this->legend = $aLegend;
-        $this->legendcsimtarget = $aCSIM;
+        $this->legend              = $aLegend;
+        $this->legendcsimtarget    = $aCSIM;
         $this->legendcsimwintarget = $aCSIMWinTarget;
-        $this->legendcsimalt = $aCSIMAlt;
+        $this->legendcsimalt       = $aCSIMAlt;
     }
 
     public function SetWeight($aWeight)
@@ -223,5 +224,4 @@ class Plot
         $this->__construct($this->inputValues['aDatay'], $this->inputValues['aDatax']);
         $this->isRunningClear = false;
     }
-
 } // Class

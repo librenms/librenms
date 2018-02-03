@@ -7,7 +7,6 @@ namespace Amenadiel\JpGraph\Graph;
 //===================================================
 class RadarLogTicks extends Ticks
 {
-
     public function __construct()
     {
         // Empty
@@ -15,20 +14,20 @@ class RadarLogTicks extends Ticks
 
     public function Stroke($aImg, &$grid, $aPos, $aAxisAngle, $aScale, &$aMajPos, &$aMajLabel)
     {
-        $start = $aScale->GetMinVal();
-        $limit = $aScale->GetMaxVal();
+        $start     = $aScale->GetMinVal();
+        $limit     = $aScale->GetMaxVal();
         $nextMajor = 10 * $start;
-        $step = $nextMajor / 10.0;
-        $count = 1;
+        $step      = $nextMajor / 10.0;
+        $count     = 1;
 
         $ticklen_maj = 5;
-        $dx_maj = round(sin($aAxisAngle) * $ticklen_maj);
-        $dy_maj = round(cos($aAxisAngle) * $ticklen_maj);
+        $dx_maj      = round(sin($aAxisAngle) * $ticklen_maj);
+        $dy_maj      = round(cos($aAxisAngle) * $ticklen_maj);
         $ticklen_min = 3;
-        $dx_min = round(sin($aAxisAngle) * $ticklen_min);
-        $dy_min = round(cos($aAxisAngle) * $ticklen_min);
+        $dx_min      = round(sin($aAxisAngle) * $ticklen_min);
+        $dy_min      = round(cos($aAxisAngle) * $ticklen_min);
 
-        $aMajPos = array();
+        $aMajPos   = array();
         $aMajLabel = array();
 
         if ($this->supress_first) {
@@ -37,13 +36,13 @@ class RadarLogTicks extends Ticks
             $aMajLabel[] = $start;
         }
 
-        $yr = $aScale->RelTranslate($start);
-        $xt = round($yr * cos($aAxisAngle)) + $aScale->scale_abs[0];
-        $yt = $aPos - round($yr * sin($aAxisAngle));
+        $yr        = $aScale->RelTranslate($start);
+        $xt        = round($yr * cos($aAxisAngle)) + $aScale->scale_abs[0];
+        $yt        = $aPos - round($yr * sin($aAxisAngle));
         $aMajPos[] = $xt + 2 * $dx_maj;
         $aMajPos[] = $yt - $aImg->GetFontheight() / 2;
-        $grid[] = $xt;
-        $grid[] = $yt;
+        $grid[]    = $xt;
+        $grid[]    = $yt;
 
         $aImg->SetLineWeight($this->weight);
 
@@ -52,8 +51,8 @@ class RadarLogTicks extends Ticks
             $xt = round($yr * cos($aAxisAngle)) + $aScale->scale_abs[0];
             $yt = $aPos - round($yr * sin($aAxisAngle));
             if ($count % 10 == 0) {
-                $grid[] = $xt;
-                $grid[] = $yt;
+                $grid[]    = $xt;
+                $grid[]    = $yt;
                 $aMajPos[] = $xt + 2 * $dx_maj;
                 $aMajPos[] = $yt - $aImg->GetFontheight() / 2;
                 if (!$this->supress_tickmarks) {

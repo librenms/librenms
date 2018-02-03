@@ -10,13 +10,17 @@ use Amenadiel\JpGraph\Util;
 //===================================================
 class LinearTicks extends Ticks
 {
-    public $minor_step = 1, $major_step = 2;
-    public $xlabel_offset = 0, $xtick_offset = 0;
+    public $minor_step    = 1;
+    public $major_step    = 2;
+    public $xlabel_offset = 0;
+    public $xtick_offset  = 0;
     private $label_offset = 0; // What offset should the displayed label have
     // i.e should we display 0,1,2 or 1,2,3,4 or 2,3,4 etc
-    private $text_label_start = 0;
-    private $iManualTickPos = null, $iManualMinTickPos = null, $iManualTickLabels = null;
-    private $iAdjustForDST = false; // If a date falls within the DST period add one hour to the diaplyed time
+    private $text_label_start    = 0;
+    private $iManualTickPos      = null;
+    private $iManualMinTickPos   = null;
+    private $iManualTickLabels   = null;
+    private $iAdjustForDST       = false; // If a date falls within the DST period add one hour to the diaplyed time
 
     public function __construct()
     {
@@ -49,7 +53,7 @@ class LinearTicks extends Ticks
 
         $this->major_step = $aMajStep;
         $this->minor_step = $aMinStep;
-        $this->is_set = true;
+        $this->is_set     = true;
     }
 
     public function SetMajTickPositions($aMajPos, $aLabels = null)
@@ -67,7 +71,7 @@ class LinearTicks extends Ticks
         if (is_array($aLabels) && (count($aLabels) != $n)) {
             Util\JpGraphError::RaiseL(25066); //('When manually specifying tick positions and labels the number of labels must be the same as the number of specified ticks.');
         }
-        $this->iManualTickPos = $aMajPos;
+        $this->iManualTickPos    = $aMajPos;
         $this->iManualMinTickPos = $aMinPos;
         $this->iManualTickLabels = $aLabels;
     }
@@ -80,26 +84,26 @@ class LinearTicks extends Ticks
     // Specify all the tick positions manually and possible also the exact labels
     public function _doManualTickPos($aScale)
     {
-        $n = count($this->iManualTickPos);
-        $m = count($this->iManualMinTickPos);
+        $n     = count($this->iManualTickPos);
+        $m     = count($this->iManualMinTickPos);
         $doLbl = count($this->iManualTickLabels) > 0;
 
-        $this->maj_ticks_pos = array();
+        $this->maj_ticks_pos      = array();
         $this->maj_ticklabels_pos = array();
-        $this->ticks_pos = array();
+        $this->ticks_pos          = array();
 
         // Now loop through the supplied positions and translate them to screen coordinates
         // and store them in the maj_label_positions
         $minScale = $aScale->scale[0];
         $maxScale = $aScale->scale[1];
-        $j = 0;
+        $j        = 0;
         for ($i = 0; $i < $n; ++$i) {
             // First make sure that the first tick is not lower than the lower scale value
             if (!isset($this->iManualTickPos[$i]) || $this->iManualTickPos[$i] < $minScale || $this->iManualTickPos[$i] > $maxScale) {
                 continue;
             }
 
-            $this->maj_ticks_pos[$j] = $aScale->Translate($this->iManualTickPos[$i]);
+            $this->maj_ticks_pos[$j]      = $aScale->Translate($this->iManualTickPos[$i]);
             $this->maj_ticklabels_pos[$j] = $this->maj_ticks_pos[$j];
 
             // Set the minor tick marks the same as major if not specified
@@ -148,8 +152,8 @@ class LinearTicks extends Ticks
             // Define ticks for a text scale. This is slightly different from a
             // normal linear type of scale since the position might be adjusted
             // and the labels start at on
-            $label = (float) $aScale->GetMinVal() + $this->text_label_start + $this->label_offset;
-            $start_abs = $aScale->scale_factor * $this->text_label_start;
+            $label       = (float) $aScale->GetMinVal() + $this->text_label_start + $this->label_offset;
+            $start_abs   = $aScale->scale_factor * $this->text_label_start;
             $nbrmajticks = round(($aScale->GetMaxVal() - $aScale->GetMinVal() - $this->text_label_start) / $this->major_step) + 1;
 
             $x = $aScale->scale_abs[0] + $start_abs + $this->xlabel_offset * $min_step_abs;
@@ -161,29 +165,29 @@ class LinearTicks extends Ticks
                 // The x-position of the tick marks can be different from the labels.
                 // Note that we record the tick position (not the label) so that the grid
                 // happen upon tick marks and not labels.
-                $xtick = $aScale->scale_abs[0] + $start_abs + $this->xtick_offset * $min_step_abs + $i * $maj_step_abs;
-                $this->maj_ticks_pos[$i] = $xtick;
+                $xtick                        = $aScale->scale_abs[0] + $start_abs + $this->xtick_offset * $min_step_abs + $i * $maj_step_abs;
+                $this->maj_ticks_pos[$i]      = $xtick;
                 $this->maj_ticklabels_pos[$i] = round($x);
                 $x += $maj_step_abs;
             }
         } else {
-            $label = $aScale->GetMinVal();
+            $label   = $aScale->GetMinVal();
             $abs_pos = $aScale->scale_abs[0];
-            $j = 0;
-            $i = 0;
-            $step = round($maj_step_abs / $min_step_abs);
+            $j       = 0;
+            $i       = 0;
+            $step    = round($maj_step_abs / $min_step_abs);
             if ($aScale->type == "x") {
                 // For a normal linear type of scale the major ticks will always be multiples
                 // of the minor ticks. In order to avoid any rounding issues the major ticks are
                 // defined as every "step" minor ticks and not calculated separately
                 $nbrmajticks = round(($aScale->GetMaxVal() - $aScale->GetMinVal() - $this->text_label_start) / $this->major_step) + 1;
                 while (round($abs_pos) <= $limit) {
-                    $this->ticks_pos[] = round($abs_pos);
+                    $this->ticks_pos[]   = round($abs_pos);
                     $this->ticks_label[] = $label;
                     if ($step == 0 || $i % $step == 0 && $j < $nbrmajticks) {
-                        $this->maj_ticks_pos[$j] = round($abs_pos);
+                        $this->maj_ticks_pos[$j]      = round($abs_pos);
                         $this->maj_ticklabels_pos[$j] = round($abs_pos);
-                        $this->maj_ticks_label[$j] = $this->_doLabelFormat($label, $j, $nbrmajticks);
+                        $this->maj_ticks_label[$j]    = $this->_doLabelFormat($label, $j, $nbrmajticks);
                         ++$j;
                     }
                     ++$i;
@@ -197,12 +201,12 @@ class LinearTicks extends Ticks
                 $nbrmajticks = round(($aScale->GetMaxVal() - $aScale->GetMinVal()) / $this->major_step) + 1;
                 //                $step = 5;
                 while (round($abs_pos) >= $limit) {
-                    $this->ticks_pos[$i] = round($abs_pos);
+                    $this->ticks_pos[$i]   = round($abs_pos);
                     $this->ticks_label[$i] = $label;
                     if ($step == 0 || $i % $step == 0 && $j < $nbrmajticks) {
-                        $this->maj_ticks_pos[$j] = round($abs_pos);
+                        $this->maj_ticks_pos[$j]      = round($abs_pos);
                         $this->maj_ticklabels_pos[$j] = round($abs_pos);
-                        $this->maj_ticks_label[$j] = $this->_doLabelFormat($label, $j, $nbrmajticks);
+                        $this->maj_ticks_label[$j]    = $this->_doLabelFormat($label, $j, $nbrmajticks);
                         ++$j;
                     }
                     ++$i;
@@ -273,7 +277,9 @@ class LinearTicks extends Ticks
                 }
             }
         } else {
-            $l = sprintf('%01.' . $precision . 'f', round($aVal, $precision));
+            //FIX: if negative precision  is returned "0f" , instead of formatted values
+            $format = $precision > 0?'%01.' . $precision . 'f':'%01.0f';
+            $l      =  sprintf($format, round($aVal, $precision));
         }
 
         if (($this->supress_zerolabel && $l == 0) || ($this->supress_first && $aIdx == 0) || ($this->supress_last && $aIdx == $aNbrTicks - 1)) {
@@ -298,7 +304,7 @@ class LinearTicks extends Ticks
             // Stroke minor ticks
             $yu = $aPos - $this->direction * $this->GetMinTickAbsSize();
             $xr = $aPos + $this->direction * $this->GetMinTickAbsSize();
-            $n = count($this->ticks_pos);
+            $n  = count($this->ticks_pos);
             for ($i = 0; $i < $n; ++$i) {
                 if (!$this->supress_tickmarks && !$this->supress_minor_tickmarks) {
                     if ($this->mincolor != '') {
@@ -319,10 +325,10 @@ class LinearTicks extends Ticks
         }
 
         // Stroke major ticks
-        $yu = $aPos - $this->direction * $this->GetMajTickAbsSize();
-        $xr = $aPos + $this->direction * $this->GetMajTickAbsSize();
+        $yu          = $aPos - $this->direction * $this->GetMajTickAbsSize();
+        $xr          = $aPos + $this->direction * $this->GetMajTickAbsSize();
         $nbrmajticks = round(($aScale->GetMaxVal() - $aScale->GetMinVal() - $this->text_label_start) / $this->major_step) + 1;
-        $n = count($this->maj_ticks_pos);
+        $n           = count($this->maj_ticks_pos);
         for ($i = 0; $i < $n; ++$i) {
             if (!($this->xtick_offset > 0 && $i == $nbrmajticks - 1) && !$this->supress_tickmarks) {
                 if ($this->majcolor != '') {
@@ -340,7 +346,6 @@ class LinearTicks extends Ticks
                 }
             }
         }
-
     }
 
     // Draw linear ticks
@@ -381,5 +386,4 @@ class LinearTicks extends Ticks
     {
         $this->text_label_start = $aTextLabelOff;
     }
-
 } // Class

@@ -16,7 +16,7 @@ $graph->title->SetFont(FF_FONT1, FS_BOLD);
 
 // Create plots
 $size = 0.13;
-$p1 = new \PiePlot($data);
+$p1   = new \PiePlot($data);
 $p1->SetLegends(array("Jan", "Feb", "Mar", "Apr", "May"));
 $p1->SetSize($size);
 $p1->SetCenter(0.25, 0.32);

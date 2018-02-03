@@ -1,1 +1,1 @@
-<?php highlight_file(basename(urldecode($_GET['target']))); ?>
+<?php highlight_file(basename(urldecode($_GET['target'])));

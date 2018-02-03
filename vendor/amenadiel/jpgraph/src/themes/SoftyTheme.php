@@ -6,10 +6,10 @@ namespace Amenadiel\JpGraph\Themes;
  */
 class SoftyTheme extends Theme
 {
-    protected $font_color = '#000000';
+    protected $font_color       = '#000000';
     protected $background_color = '#F7F8F4';
-    protected $axis_color = '#000000';
-    protected $grid_color = '#CCCCCC';
+    protected $axis_color       = '#000000';
+    protected $grid_color       = '#CCCCCC';
 
     public function GetColorList()
     {
@@ -138,7 +138,6 @@ class SoftyTheme extends Theme
 
     public function ApplyPlot($plot)
     {
-
         switch (get_class($plot)) {
             case 'BarPlot':
                 {

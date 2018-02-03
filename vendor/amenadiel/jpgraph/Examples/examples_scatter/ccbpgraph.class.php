@@ -5,25 +5,29 @@
  */
 class CCBPGraph
 {
-    const TickStep = 25;
-    const YTitle = '% Buffer used';
-    const XTitle = '% CC Completed';
+    const TickStep   = 25;
+    const YTitle     = '% Buffer used';
+    const XTitle     = '% CC Completed';
     const NColorMaps = 2;
-    private $graph = null;
-    private $iWidth, $iHeight;
-    private $iPlots = array();
-    private $iXMin = -50, $iXMax = 100;
-    private $iYMin = -50, $iYMax = 150;
+    private $graph   = null;
+    private $iWidth;
+    private $iHeight;
+    private $iPlots    = array();
+    private $iXMin     = -50;
+    private $iXMax     = 100;
+    private $iYMin     = -50;
+    private $iYMax     = 150;
     private $iColorInd = array(
         array(5, 75), /* Green */
         array(25, 85), /* Yellow */
         array(50, 100)); /* Red */
-    private $iColorMap = 0;
+    private $iColorMap  = 0;
     private $iColorSpec = array(
         array('darkgreen:1.0', 'yellow:1.4', 'red:0.8', 'darkred:0.85'),
         array('#c6e9af', '#ffeeaa', '#ffaaaa', '#de8787'));
     private $iMarginColor = array('darkgreen@0.7', 'darkgreen@0.9');
-    private $iSubTitle = '', $iTitle = 'CC Buffer penetration';
+    private $iSubTitle    = '';
+    private $iTitle       = 'CC Buffer penetration';
     /**
      * Construct a new instance of CCBPGraph
      *
@@ -33,7 +37,7 @@ class CCBPGraph
      */
     public function __construct($aWidth, $aHeight)
     {
-        $this->iWidth = $aWidth;
+        $this->iWidth  = $aWidth;
         $this->iHeight = $aHeight;
     }
 
@@ -45,7 +49,7 @@ class CCBPGraph
      */
     public function SetTitle($aTitle, $aSubTitle)
     {
-        $this->iTitle = $aTitle;
+        $this->iTitle    = $aTitle;
         $this->iSubTitle = $aSubTitle;
     }
 
@@ -115,11 +119,11 @@ class CCBPGraph
     {
 
         // Setup limits for color indications
-        $lowx = $this->iXMin;
-        $highx = $this->iXMax;
-        $lowy = $this->iYMin;
-        $highy = $this->iYMax;
-        $width = $this->iWidth;
+        $lowx   = $this->iXMin;
+        $highx  = $this->iXMax;
+        $lowy   = $this->iYMin;
+        $highy  = $this->iYMax;
+        $width  = $this->iWidth;
         $height = $this->iHeight;
 
         // Margins
@@ -130,16 +134,16 @@ class CCBPGraph
 
         if ($width <= 300 || $height <= 250) {
             $labelsize = 8;
-            $lm = 25;
-            $rm = 25;
-            $tm = 45;
-            $bm = 25;
+            $lm        = 25;
+            $rm        = 25;
+            $tm        = 45;
+            $bm        = 25;
         } elseif ($width <= 450 || $height <= 300) {
             $labelsize = 8;
-            $lm = 30;
-            $rm = 30;
-            $tm = 50;
-            $bm = 30;
+            $lm        = 30;
+            $rm        = 30;
+            $tm        = 50;
+            $bm        = 30;
         } elseif ($width <= 600 || $height <= 400) {
             $labelsize = 9;
         } else {
@@ -228,8 +232,8 @@ class CCBPGraph
 
         $n = 3;
         for ($i = 0; $i < $n; ++$i) {
-            $b = $this->iColorInd[$i][0];
-            $k = ($this->iColorInd[$i][1] - $this->iColorInd[$i][0]) / $this->iXMax;
+            $b           = $this->iColorInd[$i][0];
+            $k           = ($this->iColorInd[$i][1] - $this->iColorInd[$i][0]) / $this->iXMax;
             $colarea[$i] = array(array($lowx, $lowx * $k + $b), array($highx, $highx * $k + $b));
         }
         $colarea[3] = array(array($lowx, $highy), array($highx, $highy));

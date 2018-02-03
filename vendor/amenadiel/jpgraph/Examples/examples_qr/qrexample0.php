@@ -1,5 +1,5 @@
 <?php
-require_once ('jpgraph/QR/qrencoder.inc.php');
+require_once('jpgraph/QR/qrencoder.inc.php');
 
 // Data to be encoded
 $data = '01234567';
@@ -12,12 +12,10 @@ $encoder = new QREncoder(1);
 $backend = QRCodeBackendFactory::Create($encoder);
 
 try {
-	// 	. send the QR Code back to the browser
+    // 	. send the QR Code back to the browser
     $backend->Stroke($data);
 } catch (Exception $e) {
     $errstr = $e->GetMessage();
     echo 'QR Code error: '.$e->GetMessage()."\n";
     exit(1);
 }
-
-?>

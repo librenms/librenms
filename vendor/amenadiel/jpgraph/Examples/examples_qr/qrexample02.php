@@ -2,10 +2,10 @@
     // Example 2 : QR Barcode with specified version
 
     // Include the library
-    require_once ('jpgraph/QR/qrencoder.inc.php');
+    require_once('jpgraph/QR/qrencoder.inc.php');
 
     // Data to be encoded
-    $data = '01234567';
+    $data    = '01234567';
     $version = 4;  // Use QR version 4
 
     // Create a new instance of the encoder and let the library
@@ -20,4 +20,3 @@
 
     // .. send the barcode back to the browser for the data
     $backend->Stroke($data);
-?>

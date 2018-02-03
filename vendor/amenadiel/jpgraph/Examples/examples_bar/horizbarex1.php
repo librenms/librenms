@@ -7,7 +7,7 @@ $datay = array(2, 3, 5, 8, 12, 6, 3);
 $datax = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul');
 
 // Size of graph
-$width = 400;
+$width  = 400;
 $height = 500;
 
 // Set the basic parameters of the graph

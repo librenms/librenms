@@ -63,7 +63,6 @@ class ErrorPlot extends Plot
             else {
                 $exist_x = true;
             }
-
         } else {
             $exist_x = false;
         }
@@ -80,7 +79,7 @@ class ErrorPlot extends Plot
                 continue;
             }
 
-            $xt = $xscale->Translate($x);
+            $xt  = $xscale->Translate($x);
             $yt1 = $yscale->Translate($this->coords[0][$i * 2]);
             $yt2 = $yscale->Translate($this->coords[0][$i * 2 + 1]);
             $img->Line($xt, $yt1, $xt, $yt2);

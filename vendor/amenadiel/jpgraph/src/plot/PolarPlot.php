@@ -34,18 +34,20 @@ define('POLAR_180', 2);
 //--------------------------------------------------------------------------
 class PolarPlot
 {
-    public $line_style = 'solid', $mark;
-    public $legendcsimtarget = '';
-    public $legendcsimalt = '';
-    public $legend = "";
-    public $csimtargets = array(); // Array of targets for CSIM
-    public $csimareas = ""; // Resultant CSIM area tags
-    public $csimalts = null; // ALT:s for corresponding target
-    public $scale = null;
-    private $numpoints = 0;
-    private $iColor = 'navy', $iFillColor = '';
-    private $iLineWeight = 1;
-    private $coord = null;
+    public $line_style       = 'solid';
+    public $mark;
+    public $legendcsimtarget     = '';
+    public $legendcsimalt        = '';
+    public $legend               = "";
+    public $csimtargets          = []; // Array of targets for CSIM
+    public $csimareas            = ""; // Resultant CSIM area tags
+    public $csimalts             = null; // ALT:s for corresponding target
+    public $scale                = null;
+    private $numpoints           = 0;
+    private $iColor              = 'navy';
+    private $iFillColor          = '';
+    private $iLineWeight         = 1;
+    private $coord               = null;
 
     public function __construct($aData)
     {
@@ -55,8 +57,8 @@ class PolarPlot
             //('Polar plots must have an even number of data point. Each data point is a tuple (angle,radius).');
         }
         $this->numpoints = $n / 2;
-        $this->coord = $aData;
-        $this->mark = new PlotMark();
+        $this->coord     = $aData;
+        $this->mark      = new PlotMark();
     }
 
     public function SetWeight($aWeight)
@@ -89,7 +91,7 @@ class PolarPlot
     public function SetCSIMTargets($aTargets, $aAlts = null)
     {
         $this->csimtargets = $aTargets;
-        $this->csimalts = $aAlts;
+        $this->csimalts    = $aAlts;
     }
 
     // Get all created areas
@@ -100,9 +102,9 @@ class PolarPlot
 
     public function SetLegend($aLegend, $aCSIM = "", $aCSIMAlt = "")
     {
-        $this->legend = $aLegend;
+        $this->legend           = $aLegend;
         $this->legendcsimtarget = $aCSIM;
-        $this->legendcsimalt = $aCSIMAlt;
+        $this->legendcsimalt    = $aCSIMAlt;
     }
 
     // Private methods
@@ -124,13 +126,12 @@ class PolarPlot
 
     public function Stroke($img, $scale)
     {
-
-        $i = 0;
-        $p = array();
+        $i               = 0;
+        $p               = [];
         $this->csimareas = '';
         while ($i < $this->numpoints) {
             list($x1, $y1) = $scale->PTranslate($this->coord[2 * $i], $this->coord[2 * $i + 1]);
-            $p[2 * $i] = $x1;
+            $p[2 * $i]     = $x1;
             $p[2 * $i + 1] = $y1;
 
             if (isset($this->csimtargets[$i])) {

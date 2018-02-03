@@ -3,7 +3,7 @@
     // (Note: Normally there would be no need to ever use manually specified encodation)
 
     // Include the library
-    require_once ('jpgraph/QR/qrencoder.inc.php');
+    require_once('jpgraph/QR/qrencoder.inc.php');
 
     // Data to be encoded
     $data = array(
@@ -23,4 +23,3 @@
 
     // Store the barcode in the specifed file
     $backend->Stroke($data);
-?>

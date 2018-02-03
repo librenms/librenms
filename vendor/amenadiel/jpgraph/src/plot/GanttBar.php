@@ -8,13 +8,22 @@ namespace Amenadiel\JpGraph\Plot;
 class GanttBar extends GanttPlotObject
 {
     public $progress;
-    public $leftMark, $rightMark;
+    public $leftMark;
+    public $rightMark;
     private $iEnd;
-    private $iHeightFactor = 0.5;
-    private $iFillColor = "white", $iFrameColor = "black";
-    private $iShadow = false, $iShadowColor = "darkgray", $iShadowWidth = 1, $iShadowFrame = "black";
-    private $iPattern = GANTT_RDIAG, $iPatternColor = "blue", $iPatternDensity = 95;
-    private $iBreakStyle = false, $iBreakLineStyle = 'dotted', $iBreakLineWeight = 1;
+    private $iHeightFactor        = 0.5;
+    private $iFillColor           = "white";
+    private $iFrameColor          = "black";
+    private $iShadow              = false;
+    private $iShadowColor         = "darkgray";
+    private $iShadowWidth         = 1;
+    private $iShadowFrame         = "black";
+    private $iPattern             = GANTT_RDIAG;
+    private $iPatternColor        = "blue";
+    private $iPatternDensity      = 95;
+    private $iBreakStyle          = false;
+    private $iBreakLineStyle      = 'dotted';
+    private $iBreakLineWeight     = 1;
     //---------------
     // CONSTRUCTOR
     public function __construct($aPos, $aLabel, $aStart, $aEnd, $aCaption = "", $aHeightFactor = 0.6)
@@ -33,7 +42,7 @@ class GanttBar extends GanttPlotObject
         } elseif (is_int($aEnd) || is_float($aEnd)) {
             $this->iEnd = strtotime($aStart) + round($aEnd * SECPERDAY);
         }
-        $this->iVPos = $aPos;
+        $this->iVPos         = $aPos;
         $this->iHeightFactor = $aHeightFactor;
         $this->title->Set($aLabel);
         $this->caption = new TextProperty($aCaption);
@@ -49,14 +58,14 @@ class GanttBar extends GanttPlotObject
     // PUBLIC METHODS
     public function SetShadow($aShadow = true, $aColor = "gray")
     {
-        $this->iShadow = $aShadow;
+        $this->iShadow      = $aShadow;
         $this->iShadowColor = $aColor;
     }
 
     public function SetBreakStyle($aFlg = true, $aLineStyle = 'dotted', $aLineWeight = 1)
     {
-        $this->iBreakStyle = $aFlg;
-        $this->iBreakLineStyle = $aLineStyle;
+        $this->iBreakStyle      = $aFlg;
+        $this->iBreakLineStyle  = $aLineStyle;
         $this->iBreakLineWeight = $aLineWeight;
     }
 
@@ -100,20 +109,19 @@ class GanttBar extends GanttPlotObject
         } else {
             return -1;
         }
-
     }
 
     public function SetPattern($aPattern, $aColor = "blue", $aDensity = 95)
     {
-        $this->iPattern = $aPattern;
-        $this->iPatternColor = $aColor;
+        $this->iPattern        = $aPattern;
+        $this->iPatternColor   = $aColor;
         $this->iPatternDensity = $aDensity;
     }
 
     public function Stroke($aImg, $aScale)
     {
         $factory = new RectPatternFactory();
-        $prect = $factory->Create($this->iPattern, $this->iPatternColor);
+        $prect   = $factory->Create($this->iPattern, $this->iPatternColor);
         $prect->SetDensity($this->iPatternDensity);
 
         // If height factor is specified as a float between 0,1 then we take it as meaning
@@ -135,23 +143,23 @@ class GanttBar extends GanttPlotObject
         $limst = max($st, $aScale->iStartDate);
         $limen = min($en, $aScale->iEndDate);
 
-        $xt = round($aScale->TranslateDate($limst));
-        $xb = round($aScale->TranslateDate($limen));
-        $yt = round($aScale->TranslateVertPos($this->iVPos) - $vs - ($aScale->GetVertSpacing() / 2 - $vs / 2));
-        $yb = round($aScale->TranslateVertPos($this->iVPos) - ($aScale->GetVertSpacing() / 2 - $vs / 2));
+        $xt     = round($aScale->TranslateDate($limst));
+        $xb     = round($aScale->TranslateDate($limen));
+        $yt     = round($aScale->TranslateVertPos($this->iVPos) - $vs - ($aScale->GetVertSpacing() / 2 - $vs / 2));
+        $yb     = round($aScale->TranslateVertPos($this->iVPos) - ($aScale->GetVertSpacing() / 2 - $vs / 2));
         $middle = round($yt + ($yb - $yt) / 2);
         $this->StrokeActInfo($aImg, $aScale, $middle);
 
         // CSIM for title
         if (!empty($this->title->csimtarget)) {
-            $colwidth = $this->title->GetColWidth($aImg);
-            $colstarts = array();
+            $colwidth  = $this->title->GetColWidth($aImg);
+            $colstarts = [];
             $aScale->actinfo->GetColStart($aImg, $colstarts, true);
             $n = min(count($colwidth), count($this->title->csimtarget));
             for ($i = 0; $i < $n; ++$i) {
                 $title_xt = $colstarts[$i];
                 $title_xb = $title_xt + $colwidth[$i];
-                $coords = "$title_xt,$yt,$title_xb,$yt,$title_xb,$yb,$title_xt,$yb";
+                $coords   = "$title_xt,$yt,$title_xb,$yt,$title_xb,$yb,$title_xt,$yb";
 
                 if (!empty($this->title->csimtarget[$i])) {
                     $this->csimarea .= "<area shape=\"poly\" coords=\"$coords\" href=\"" . $this->title->csimtarget[$i] . "\"";
@@ -191,10 +199,10 @@ class GanttBar extends GanttPlotObject
             if ($this->iShadow) {
                 $aImg->SetColor($this->iFrameColor);
                 $aImg->ShadowRectangle($xt, $yt, $xb, $yb, $this->iFillColor, $this->iShadowWidth, $this->iShadowColor);
-                $prect->SetPos(new Rectangle($xt + 1, $yt + 1, $xb - $xt - $this->iShadowWidth - 2, $yb - $yt - $this->iShadowWidth - 2));
+                $prect->SetPos(new Util\Rectangle($xt + 1, $yt + 1, $xb - $xt - $this->iShadowWidth - 2, $yb - $yt - $this->iShadowWidth - 2));
                 $prect->Stroke($aImg);
             } else {
-                $prect->SetPos(new Rectangle($xt, $yt, $xb - $xt + 1, $yb - $yt + 1));
+                $prect->SetPos(new Util\Rectangle($xt, $yt, $xb - $xt + 1, $yb - $yt + 1));
                 $prect->Stroke($aImg);
                 $aImg->SetColor($this->iFrameColor);
                 $aImg->Rectangle($xt, $yt, $xb, $yb);
@@ -202,7 +210,6 @@ class GanttBar extends GanttPlotObject
         }
         // CSIM for bar
         if (!empty($this->csimtarget)) {
-
             $coords = "$xt,$yt,$xb,$yt,$xb,$yb,$xt,$yb";
             $this->csimarea .= "<area shape=\"poly\" coords=\"$coords\" href=\"" . $this->csimtarget . "\"";
 
@@ -219,7 +226,6 @@ class GanttBar extends GanttPlotObject
 
         // Draw progress bar inside activity bar
         if ($this->progress->iProgress > 0) {
-
             $xtp = $aScale->TranslateDate($st);
             $xbp = $aScale->TranslateDate($en);
             $len = ($xbp - $xtp) * $this->progress->iProgress;
@@ -249,8 +255,8 @@ class GanttBar extends GanttPlotObject
                 }
 
                 $progressheight = floor($barheight * $this->progress->iHeight);
-                $marg = ceil(($barheight - $progressheight) / 2);
-                $pos = new Rectangle($xtp, $yt + $marg, $len, $barheight - 2 * $marg);
+                $marg           = ceil(($barheight - $progressheight) / 2);
+                $pos            = new Util\Rectangle($xtp, $yt + $marg, $len, $barheight - 2 * $marg);
                 $prog->SetPos($pos);
                 $prog->Stroke($aImg);
             }

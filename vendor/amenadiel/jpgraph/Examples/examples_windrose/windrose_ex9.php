@@ -2,13 +2,14 @@
 require_once '../../vendor/autoload.php';
 use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
+
 // Data can be specified using both ordinal index of the axis
 // as well as the direction label.
 $data = array(
-    'E' => array(3, 2, 1, 2, 2),
-    'N' => array(1, 1, 1.5, 2),
+    'E'  => array(3, 2, 1, 2, 2),
+    'N'  => array(1, 1, 1.5, 2),
     'nw' => array(1, 1, 1.5, 2),
-    'S' => array(2, 3, 5, 1),
+    'S'  => array(2, 3, 5, 1),
 );
 
 // Define the color,weight and style of some individual radial
@@ -17,9 +18,9 @@ $data = array(
 // Note; Depending on how many axis you have in the plot the
 // index will vary between 0..n where n is the number of
 // compass directions.
-$axiscolors = array('nw' => 'brown');
+$axiscolors  = array('nw' => 'brown');
 $axisweights = array('nw' => 8); // Could also be specified as 6 => 8
-$axisstyles = array('nw' => 'solid');
+$axisstyles  = array('nw' => 'solid');
 
 // First create a new windrose graph with a title
 $graph = new Graph\WindroseGraph(400, 500);

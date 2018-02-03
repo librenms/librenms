@@ -1,10 +1,10 @@
 <?php
-require_once ('jpgraph/jpgraph.php');
-require_once ('jpgraph/jpgraph_canvas.php');
-require_once ('jpgraph/jpgraph_table.php');
+require_once('jpgraph/jpgraph.php');
+require_once('jpgraph/jpgraph_canvas.php');
+require_once('jpgraph/jpgraph_table.php');
 
 // Setup graph context
-$graph = new CanvasGraph(430,150);
+$graph = new CanvasGraph(430, 150);
 
 // Setup the basic table
 $data = array(
@@ -20,19 +20,19 @@ $table = new GTextTable();
 $table->Set($data);
 
 // Setup fonts
-$table->SetFont(FF_TIMES,FS_NORMAL,11);
-$table->SetColFont(0,FF_ARIAL,FS_NORMAL,11);
-$table->SetRowFont(0,FF_ARIAL,FS_NORMAL,11);
-$table->SetRowFont(4,FF_TIMES,FS_BOLD,14);
+$table->SetFont(FF_TIMES, FS_NORMAL, 11);
+$table->SetColFont(0, FF_ARIAL, FS_NORMAL, 11);
+$table->SetRowFont(0, FF_ARIAL, FS_NORMAL, 11);
+$table->SetRowFont(4, FF_TIMES, FS_BOLD, 14);
 
 // Turn off the grid
 $table->SetGrid(0);
 
 // Setup color
-$table->SetRowFillColor(0,'lightgray@0.5');
-$table->SetRowFillColor(4,'lightgray@0.5');
-$table->SetColFillColor(0,'lightgray@0.5');
-$table->SetFillColor(0,0,4,0,'lightgray@0.5');
+$table->SetRowFillColor(0, 'lightgray@0.5');
+$table->SetRowFillColor(4, 'lightgray@0.5');
+$table->SetColFillColor(0, 'lightgray@0.5');
+$table->SetFillColor(0, 0, 4, 0, 'lightgray@0.5');
 
 // Set default minimum column width
 $table->SetMinColWidth(45);

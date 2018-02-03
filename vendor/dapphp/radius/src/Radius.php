@@ -11,6 +11,7 @@
  *  - Authenex Strong Authentication System (ASAS) with two-factor authentication
  *  - FreeRADIUS, a free Radius server implementation for Linux and *nix environments
  *  - Microsoft Radius server IAS
+ *  - Microsoft Windows Server 2016 (Network Policy Server)
  *  - Microsoft Windows Server 2012 R2 (Network Policy Server)
  *  - Mideye RADIUS server (http://www.mideye.com)
  *  - Radl, a free Radius server for Windows
@@ -52,7 +53,7 @@
  * @since CreationDate: 2008-01-04
  * @copyright (c) 2008 by SysCo systemes de communication sa
  * @copyright (c) 2016 by Drew Phillips
- * @version 2.5.0
+ * @version 2.5.1
  * @link http://developer.sysco.ch/php/
  * @link developer@sysco.ch
  * @link https://github.com/dapphp/radius
@@ -169,6 +170,16 @@ class Radius
     protected $errorMessage;
 
 
+    /**
+     * Radius constructor.
+     *
+     * @param string $radiusHost          The RADIUS server hostname or IP address
+     * @param string $sharedSecret        The RADIUS server shared secret
+     * @param string $radiusSuffix        The username suffix to use when authenticating
+     * @param number $timeout             The timeout (in seconds) to wait for RADIUS responses
+     * @param number $authenticationPort  The port for authentication requests (default = 1812)
+     * @param number $accountingPort      The port for accounting requests (default = 1813)
+     */
     public function __construct($radiusHost         = '127.0.0.1',
                                 $sharedSecret       = '',
                                 $radiusSuffix       = '',
@@ -251,6 +262,11 @@ class Radius
              ->clearDataReceived();
     }
 
+    /**
+     * Returns a string of the last error message and code, if any.
+     *
+     * @return string The last error message and code, or an empty string if no error set.
+     */
     public function getLastError()
     {
         if (0 < $this->errorCode) {
@@ -260,47 +276,94 @@ class Radius
         }
     }
 
+    /**
+     * Get the code of the last error.
+     *
+     * @return number  The error code
+     */
     public function getErrorCode()
     {
         return $this->errorCode;
     }
 
+    /**
+     * Get the message of the last error.
+     *
+     * @return string  The last error message
+     */
     public function getErrorMessage()
     {
         return $this->errorMessage;
     }
 
+    /**
+     * Enable or disable debug (console) output.
+     *
+     * @param bool $enabled  boolean true to enable debugging, anything else to disable it.
+     *
+     * @return \Dapphp\Radius\Radius
+     */
     public function setDebug($enabled = true)
     {
         $this->debug = (true === $enabled);
         return $this;
     }
 
-
+    /**
+     * Set the hostname or IP address of the RADIUS server to send requests to.
+     *
+     * @param string $hostOrIp  The hostname or IP address of the RADIUS server
+     * @return \Dapphp\Radius\Radius
+     */
     public function setServer($hostOrIp)
     {
         $this->server = gethostbyname($hostOrIp);
         return $this;
     }
 
+    /**
+     * Set the RADIUS shared secret between the client and RADIUS server.
+     *
+     * @param string $secret  The shared secret
+     * @return \Dapphp\Radius\Radius
+     */
     public function setSecret($secret)
     {
         $this->secret = $secret;
         return $this;
     }
 
+    /**
+     * Gets the currently set RADIUS shared secret.
+     *
+     * @return string  The shared secret
+     */
     public function getSecret()
     {
         return $this->secret;
     }
 
-
+    /**
+     * Set the username suffix for authentication (e.g. '.ppp').
+     * This must be set before setting the username.
+     *
+     * @param string $suffix  The RADIUS user suffix (e.g. .ppp)
+     * @return \Dapphp\Radius\Radius
+     */
     public function setRadiusSuffix($suffix)
     {
         $this->suffix = $suffix;
         return $this;
     }
 
+    /**
+     * Set the username to authenticate as with the RADIUS server.
+     * If the username does not contain the '@' character, then the RADIUS suffix
+     * will be appended to the username.
+     *
+     * @param string $username  The username for authentication
+     * @return \Dapphp\Radius\Radius
+     */
     public function setUsername($username = '')
     {
         if (false === strpos($username, '@'))
@@ -314,11 +377,23 @@ class Radius
         return $this;
     }
 
+    /**
+     * Get the authentication username for RADIUS requests.
+     *
+     * @return string  The username for authentication
+     */
     public function getUsername()
     {
         return $this->username;
     }
 
+    /**
+     * Set the User-Password for PAP authentication.
+     * Do not use this if you will be using CHAP-MD5, MS-CHAP v1 or MS-CHAP v2 passwords.
+     *
+     * @param string $password  The plain text password for authentication
+     * @return \Dapphp\Radius\Radius
+     */
     public function setPassword($password)
     {
         $this->password    = $password;
@@ -329,11 +404,25 @@ class Radius
         return $this;
     }
 
+    /**
+     * Get the plaintext password for authentication.
+     *
+     * @return string  The authentication password
+     */
     public function getPassword()
     {
         return $this->password;
     }
 
+    /**
+     * Get a RADIUS encrypted password from a plaintext password, shared secret, and request authenticator.
+     * This method should generally not need to be called directly.
+     *
+     * @param string $password The plain text password
+     * @param string $secret   The RADIUS shared secret
+     * @param string $requestAuthenticator  16 byte request authenticator
+     * @return string  The encrypted password
+     */
     public function getEncryptedPassword($password, $secret, $requestAuthenticator)
     {
         $encryptedPassword = '';
@@ -361,6 +450,13 @@ class Radius
         return $encryptedPassword;
     }
 
+    /**
+     * Set whether a Message-Authenticator attribute (80) should be included in the request.
+     * Note: Some servers (e.g. Microsoft NPS) may be configured to require all packets contain this.
+     *
+     * @param bool $include  Boolean true to include in packets, false otherwise
+     * @return \Dapphp\Radius\Radius
+     */
     public function setIncludeMessageAuthenticator($include = true)
     {
         if ($include) {
@@ -372,6 +468,13 @@ class Radius
         return $this;
     }
 
+    /**
+     * Sets the next sequence number that will be used when sending packets.
+     * There is generally no need to call this method directly.
+     *
+     * @param int $nextId  The CHAP packet identifier number
+     * @return \Dapphp\Radius\Radius
+     */
     public function setChapId($nextId)
     {
         $this->chapIdentifier = (int)$nextId;
@@ -379,6 +482,11 @@ class Radius
         return $this;
     }
 
+    /**
+     * Get the CHAP ID and increment the counter.
+     *
+     * @return number  The CHAP identifier for the next packet
+     */
     public function getChapId()
     {
         $id = $this->chapIdentifier;
@@ -387,6 +495,12 @@ class Radius
         return $id;
     }
 
+    /**
+     * Set the CHAP password (for CHAP authentication).
+     *
+     * @param string $password  The plaintext password to hash using CHAP.
+     * @return \Dapphp\Radius\Radius
+     */
     public function setChapPassword($password)
     {
         $chapId = $this->getChapId();
@@ -397,11 +511,26 @@ class Radius
         return $this;
     }
 
+    /**
+     * Generate a CHAP password.  There is generally no need to call this method directly.
+     *
+     * @param string $password  The password to hash using CHAP
+     * @param int    $chapId    The CHAP packet ID
+     * @param string $requestAuthenticator  The request authenticator value
+     * @return string The hashed CHAP password
+     */
     public function getChapPassword($password, $chapId, $requestAuthenticator)
     {
         return md5(pack('C', $chapId) . $password . $requestAuthenticator, true);
     }
 
+    /**
+     * Set the MS-CHAP password in the RADIUS packet (for authentication using MS-CHAP passwords)
+     *
+     * @param string  $password  The plaintext password
+     * @param string  $challenge The CHAP challenge
+     * @return \Dapphp\Radius\Radius
+     */
     public function setMsChapPassword($password, $challenge = null)
     {
         $chap = new \Crypt_CHAP_MSv1();
@@ -422,6 +551,12 @@ class Radius
         return $this;
     }
 
+    /**
+     * Sets the Network Access Server (NAS) IP address (the RADIUS client IP).
+     *
+     * @param string $hostOrIp  The hostname or IP address of the RADIUS client
+     * @return \Dapphp\Radius\Radius
+     */
     public function setNasIPAddress($hostOrIp = '')
     {
         if (0 < strlen($hostOrIp)) {
@@ -443,11 +578,22 @@ class Radius
         return $this;
     }
 
+    /**
+     * Get the currently set NAS IP address
+     *
+     * @return string  The NAS hostname or IP
+     */
     public function getNasIPAddress()
     {
         return $this->nasIpAddress;
     }
 
+    /**
+     * Set the physical port number of the NAS which is authenticating the user.
+     *
+     * @param number $port  The NAS port
+     * @return \Dapphp\Radius\Radius
+     */
     public function setNasPort($port = 0)
     {
         $this->nasPort = intval($port);
@@ -456,11 +602,22 @@ class Radius
         return $this;
     }
 
+    /**
+     * Get the NAS port attribute
+     *
+     * @return string
+     */
     public function getNasPort()
     {
         return $this->nasPort;
     }
 
+    /**
+     * Set the timeout (in seconds) after which we'll give up waiting for a response from the RADIUS server.
+     *
+     * @param number $timeout  The timeout (in seconds) for waiting for RADIUS responses.
+     * @return \Dapphp\Radius\Radius
+     */
     public function setTimeout($timeout = 5)
     {
         if (intval($timeout) > 0) {
@@ -470,11 +627,22 @@ class Radius
         return $this;
     }
 
+    /**
+     * Get the current timeout value for RADIUS response packets.
+     *
+     * @return number  The timeout
+     */
     public function getTimeout()
     {
         return $this->timeout;
     }
 
+    /**
+     * Set the port number used by the RADIUS server for authentication (default = 1812).
+     *
+     * @param number $port  The port for sending Access-Request packets
+     * @return \Dapphp\Radius\Radius
+     */
     public function setAuthenticationPort($port)
     {
         if ((intval($port) > 0) && (intval($port) < 65536)) {
@@ -484,11 +652,22 @@ class Radius
         return $this;
     }
 
+    /**
+     * Get the port number used for authentication
+     *
+     * @return number  The RADIUS auth port
+     */
     public function getAuthenticationPort()
     {
         return $this->authenticationPort;
     }
 
+    /**
+     * Set the port number used by the RADIUS server for accounting (default = 1813)
+     *
+     * @param number $port  The port for sending Accounting request packets
+     * @return \Dapphp\Radius\Radius
+     */
     public function setAccountingPort($port)
     {
         if ((intval($port) > 0) && (intval($port) < 65536))
@@ -499,6 +678,11 @@ class Radius
         return $this;
     }
 
+    /**
+     * Returns the raw wire data of the last received RADIUS packet.
+     *
+     * @return string  The raw packet data of the last RADIUS response
+     */
     public function getResponsePacket()
     {
         return $this->radiusPacketReceived;
@@ -507,19 +691,29 @@ class Radius
     /**
      * Alias of Radius::getAttribute()
      *
-     * @param unknown $type
-     * @return NULL|unknown
+     * @param int $type  The attribute ID to get
+     * @return NULL|string NULL if no such attribute was set in the response packet, or the data of that attribute
      */
     public function getReceivedAttribute($type)
     {
         return $this->getAttribute($type);
     }
 
+    /**
+     * Returns an array of all attributes from the last received RADIUS packet.
+     *
+     * @return array  Array of received attributes.  Each entry is an array with $attr[0] = attribute ID, $attr[1] = data
+     */
     public function getReceivedAttributes()
     {
         return $this->attributesReceived;
     }
 
+    /**
+     * For debugging purposes.  Print the attributes from the last received packet as a readble string
+     *
+     * @return string  The RADIUS packet attributes in human readable format
+     */
     public function getReadableReceivedAttributes()
     {
         $attributes = '';
@@ -546,6 +740,12 @@ class Radius
         return $attributes;
     }
 
+    /**
+     * Get the value of an attribute from the last received RADIUS response packet.
+     *
+     * @param int $type    The attribute ID to get
+     * @return NULL|string NULL if no such attribute was set in the response packet, or the data of that attribute
+     */
     public function getAttribute($type)
     {
         $value = null;
@@ -553,7 +753,7 @@ class Radius
         if (is_array($this->attributesReceived)) {
             foreach($this->attributesReceived as $attr) {
                 if (intval($type) == $attr[0]) {
-                    $value = $attr;
+                    $value = $attr[1];
                     break;
                 }
             }
@@ -562,6 +762,13 @@ class Radius
         return $value;
     }
 
+    /**
+     * Gets the name of a RADIUS packet from the numeric value.
+     * This is only used for debugging functions
+     *
+     * @param number $info_index  The packet type number
+     * @return mixed|string
+     */
     public function getRadiusPacketInfo($info_index)
     {
         if (isset($this->radiusPackets[intval($info_index)])) {
@@ -571,6 +778,13 @@ class Radius
         }
     }
 
+    /**
+     * Gets the info about a RADIUS attribute identifier such as the attribute name and data type.
+     * This is used internally for encoding packets and debug output.
+     *
+     * @param number $info_index  The RADIUS packet attribute number
+     * @return array 2 element array with Attibute-Name and Data Type
+     */
     public function getAttributesInfo($info_index)
     {
         if (isset($this->attributesInfo[intval($info_index)])) {
@@ -580,6 +794,13 @@ class Radius
         }
     }
 
+    /**
+     * Set an arbitrary RADIUS attribute to be sent in the next packet.
+     *
+     * @param number $type  The number of the RADIUS attribute
+     * @param mixed  $value  The value of the attribute
+     * @return \Dapphp\Radius\Radius
+     */
     public function setAttribute($type, $value)
     {
         $index = -1;
@@ -679,6 +900,14 @@ class Radius
         return array();
     }
 
+    /**
+     * Adds a vendor specific attribute to the RADIUS packet
+     *
+     * @param number $vendorId  The RADIUS vendor ID
+     * @param number $attributeType  The attribute number of the vendor specific attribute
+     * @param mixed  $attributeValue The data for the attribute
+     * @return \Dapphp\Radius\Radius
+     */
     public function setVendorSpecificAttribute($vendorId, $attributeType, $attributeValue)
     {
         $data  = pack('N', $vendorId);
@@ -691,6 +920,12 @@ class Radius
         return $this;
     }
 
+    /**
+     * Remove an attribute from a RADIUS packet
+     *
+     * @param number $type  The attribute number to remove
+     * @return \Dapphp\Radius\Radius
+     */
     public function removeAttribute($type)
     {
         $index = -1;
@@ -711,12 +946,22 @@ class Radius
         return $this;
     }
 
+    /**
+     * Clear all attributes to send so the next packet contains no attributes except ones added after calling this function.
+     *
+     * @return \Dapphp\Radius\Radius
+     */
     public function resetAttributes()
     {
         $this->attributesToSend = null;
         return $this;
     }
 
+    /**
+     * Remove vendor specific attributes from the request.
+     *
+     * @return \Dapphp\Radius\Radius
+     */
     public function resetVendorSpecificAttributes()
     {
         $this->removeAttribute(26);
@@ -724,6 +969,12 @@ class Radius
         return $this;
     }
 
+    /**
+     * Decodes a vendor specific attribute in a response packet
+     *
+     * @param string $rawValue  The raw packet attribute data as seen on the wire
+     * @return array  Array of vendor specific attributes in the response packet
+     */
     public function decodeVendorSpecificContent($rawValue)
     {
         $result   = array();
@@ -745,6 +996,15 @@ class Radius
         return $result;
     }
 
+    /**
+     * Issue an Access-Request packet to the RADIUS server.
+     *
+     * @param string $username  Username to authenticate as
+     * @param string $password  Password to authenticate with using PAP
+     * @param number $timeout   The timeout (in seconds) to wait for a response packet
+     * @param string $state     The state of the request (default is Service-Type=1)
+     * @return boolean          true if the server sent an Access-Accept packet, false otherwise
+     */
     public function accessRequest($username = '', $password = '', $timeout = 0, $state = null)
     {
         $this->clearDataReceived()
@@ -795,6 +1055,18 @@ class Radius
         return (self::TYPE_ACCESS_ACCEPT == ($this->radiusPacketReceived));
     }
 
+    /**
+     * Authenticate using EAP-MSCHAP v2.  This is a 4-way authentication
+     * process that sends an Access-Request, receives an Access-Challenge,
+     * responsds with an Access-Request, and finally sends an Access-Request with
+     * an EAP success packet if the last Access-Challenge was a success.
+     *
+     * Windows Server NPS: EAP Type: MS-CHAP v2
+     *
+     * @param string $username  The username to authenticate as
+     * @param string $password  The plain text password that will be hashed using MS-CHAPv2
+     * @return boolean          true if negotiation resulted in an Access-Accept packet, false otherwise
+     */
     public function accessRequestEapMsChapV2($username, $password)
     {
         /*
@@ -962,6 +1234,12 @@ class Radius
         }
     }
 
+    /**
+     * Send a RADIUS packet over the wire using UDP.
+     *
+     * @param string $packetData  The raw, complete, RADIUS packet to send
+     * @return boolean|resource   false if the packet failed to send, or a socket resource on success
+     */
     private function sendRadiusRequest($packetData)
     {
         $packetLen  = strlen($packetData);
@@ -1012,6 +1290,12 @@ class Radius
         return $conn;
     }
 
+    /**
+     * Wait for a UDP response packet and read using a timeout.
+     *
+     * @param resource $conn  The connection resource returned by fsockopen
+     * @return boolean|string false on failure, or the RADIUS response packet
+     */
     private function readRadiusResponse($conn)
     {
         stream_set_blocking($conn, false);
@@ -1080,6 +1364,12 @@ class Radius
         return $receivedPacket;
     }
 
+    /**
+     * Parse a response packet and do some basic validation.
+     *
+     * @param string $packet  The raw RADIUS response packet
+     * @return boolean  true if the packet was decoded, false otherwise.
+     */
     private function parseRadiusResponsePacket($packet)
     {
         $this->radiusPacketReceived = intval(ord(substr($packet, 0, 1)));
@@ -1155,6 +1445,12 @@ class Radius
         return true;
     }
 
+    /**
+     * Generate a RADIUS packet based on the set attributes and properties.
+     * Generally, there is no need to call this function.  Use one of the accessRequest* functions.
+     *
+     * @return string  The RADIUS packet
+     */
     public function generateRadiusPacket()
     {
         $hasAuthenticator = false;
@@ -1200,6 +1496,12 @@ class Radius
         return $packetData;
     }
 
+    /**
+     * Set the RADIUS packet identifier that will be used for the next request
+     *
+     * @param number $identifierToSend  The packet identifier to send
+     * @return \Dapphp\Radius\Radius
+     */
     public function setNextIdentifier($identifierToSend = 0)
     {
         $id = (int)$identifierToSend;
@@ -1209,6 +1511,11 @@ class Radius
         return $this;
     }
 
+    /**
+     * Increment the packet identifier and return the number number
+     *
+     * @return number  The radius packet id
+     */
     public function getNextIdentifier()
     {
         $this->identifierToSend = (($this->identifierToSend + 1) % 256);
@@ -1226,6 +1533,13 @@ class Radius
         return $this;
     }
 
+    /**
+     * Set the request authenticator for the packet.  This is for testing only.
+     * There is no need to ever call this function.
+     *
+     * @param string $requestAuthenticator  The 16 octet request identifier
+     * @return boolean|\Dapphp\Radius\Radius
+     */
     public function setRequestAuthenticator($requestAuthenticator)
     {
         if (strlen($requestAuthenticator) != 16) {
@@ -1237,6 +1551,11 @@ class Radius
         return $this;
     }
 
+    /**
+     * Get the value of the request authenticator used in request packets
+     *
+     * @return string  16 octet request authenticator
+     */
     public function getRequestAuthenticator()
     {
         return $this->requestAuthenticator;

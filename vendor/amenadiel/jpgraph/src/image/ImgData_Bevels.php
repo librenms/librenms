@@ -13,10 +13,10 @@ namespace Amenadiel\JpGraph\Image;
 class ImgData_Bevels extends ImgData
 {
     protected $name = 'Round Bevels';
-    protected $an = array(MARK_IMG_BEVEL => 'imgdata');
+    protected $an   = array(MARK_IMG_BEVEL => 'imgdata');
 
     protected $colors = array('green', 'purple', 'orange', 'red', 'yellow');
-    protected $index = array('green' => 1, 'purple' => 4, 'orange' => 2, 'red' => 0, 'yellow' => 3);
+    protected $index  = array('green' => 1, 'purple' => 4, 'orange' => 2, 'red' => 0, 'yellow' => 3);
     protected $maxidx = 4;
 
     protected $imgdata;
@@ -100,6 +100,5 @@ class ImgData_Bevels extends ImgData
         '5NyW0awhK8kYodnZxS6ECvPRp2sI+y7PBv1mN02KH7h77QCJ8D' .
         '4VvY5NUgEmCwj6ZMzHtJRgRSXwC1gfcqJJH0GBnSnK1kUQ72DY' .
         'CPBv+MCS/e0jib77eQAJxwiEWm7hFwAAAABJRU5ErkJggg==';
-
     }
 }

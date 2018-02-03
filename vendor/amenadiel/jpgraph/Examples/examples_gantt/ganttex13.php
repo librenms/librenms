@@ -1,13 +1,13 @@
 <?php // content="text/plain; charset=utf-8"
-require_once ('jpgraph/jpgraph.php');
-require_once ('jpgraph/jpgraph_gantt.php');
+require_once('jpgraph/jpgraph.php');
+require_once('jpgraph/jpgraph_gantt.php');
 
 $graph = new GanttGraph();
 $graph->SetShadow();
 
 // Add title and subtitle
 $graph->title->Set("Example of captions");
-$graph->title->SetFont(FF_ARIAL,FS_BOLD,12);
+$graph->title->SetFont(FF_ARIAL, FS_BOLD, 12);
 $graph->subtitle->Set("(ganttex13.php)");
 
 // Show day, week and month scale
@@ -31,10 +31,10 @@ $graph->SetLabelVMarginFactor(1); // 1=default value
 
 // Format the bar for the first activity
 // ($row,$title,$startdate,$enddate)
-$activity1 = new GanttBar(0,"Activity 1","2001-12-21","2002-01-07","[ER,TR]");
+$activity1 = new GanttBar(0, "Activity 1", "2001-12-21", "2002-01-07", "[ER,TR]");
 
 // Yellow diagonal line pattern on a red background
-$activity1->SetPattern(BAND_RDIAG,"yellow");
+$activity1->SetPattern(BAND_RDIAG, "yellow");
 $activity1->SetFillColor("red");
 
 // Set absolute height of activity
@@ -42,14 +42,14 @@ $activity1->SetHeight(16);
 
 // Format the bar for the second activity
 // ($row,$title,$startdate,$enddate)
-$activity2 = new GanttBar(1,"Activity 2","2001-12-21","2002-01-01","[BO,SW,JC]");
+$activity2 = new GanttBar(1, "Activity 2", "2001-12-21", "2002-01-01", "[BO,SW,JC]");
 
 // ADjust font for caption
-$activity2->caption->SetFont(FF_ARIAL,FS_BOLD);
+$activity2->caption->SetFont(FF_ARIAL, FS_BOLD);
 $activity2->caption->SetColor("darkred");
 
 // Yellow diagonal line pattern on a red background
-$activity2->SetPattern(BAND_RDIAG,"yellow");
+$activity2->SetPattern(BAND_RDIAG, "yellow");
 $activity2->SetFillColor("red");
 
 // Set absolute height of activity
@@ -61,4 +61,3 @@ $graph->Add($activity2);
 
 // ... and display it
 $graph->Stroke();
-?>

@@ -6,8 +6,8 @@ require_once '../jpgraph_date.php';
 DEFINE('INTERVAL', 5 * 60);
 
 // First create some "dummy" data
-$m = 5; // Number of data sets
-$n = 4; // Number of bids to show
+$m        = 5; // Number of data sets
+$n        = 4; // Number of bids to show
 $startbid = 8000;
 
 for ($i = 0; $i < $m; ++$i) {

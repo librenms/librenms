@@ -4,11 +4,11 @@ use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
 
 // Some (random) data
-$ydata = array(11, 3, 8, 12, 5, 1, 9, 13, 5, 7);
+$ydata  = array(11, 3, 8, 12, 5, 1, 9, 13, 5, 7);
 $ydata2 = array(1, 19, 15, 7, 22, 14, 5, 9, 21, 13);
 
 // Size of the overall graph
-$width = 350;
+$width  = 350;
 $height = 250;
 
 // Create the graph and set a scale.

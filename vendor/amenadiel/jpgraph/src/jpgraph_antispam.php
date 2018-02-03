@@ -10,8 +10,9 @@
 
 class HandDigits
 {
-    public $chars = array();
-    public $iHeight = 30, $iWidth = 30;
+    public $chars   = array();
+    public $iHeight = 30;
+    public $iWidth  = 30;
 
     public function __construct()
     {
@@ -536,20 +537,18 @@ class HandDigits
         'aiA0lQUopBJBI/7X9aNT7amRo228e3a31iO3yUzCcdSPiKAIFdCho0TIswZ7GQlO/hlRxBooih1YXzAoKUkX0LPEBX110dJ7zbuv' .
         'AORpO04cIpmxH23FSEIRwKuNnsdk0o31702XhFMKbuRUZJWP8LTQ6HBCuIB+iVWSR2BXuqK93/hDlvGzEphmG3Ml5JpDi1I7TzNA' .
         'BYFlPafY+/7LBiv1CYDH4iFDOGySlMR22lFP4wCUpANfL11o1r4bxXlWMNEaE/bqlIbCFl/ANPK5Do/M0VDr2Rf3o0TX/9k=';
-
     }
 }
 
 class AntiSpam
 {
-
     private $iData = '';
-    private $iDD = null;
+    private $iDD   = null;
 
     public function __construct($aData = '')
     {
         $this->iData = $aData;
-        $this->iDD = new HandDigits();
+        $this->iDD   = new HandDigits();
     }
 
     public function Set($aData)
@@ -578,7 +577,6 @@ class AntiSpam
 
     public function Stroke()
     {
-
         $n = strlen($this->iData);
         if ($n == 0) {
             return false;

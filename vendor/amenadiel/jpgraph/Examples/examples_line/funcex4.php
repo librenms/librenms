@@ -3,10 +3,10 @@ require_once 'jpgraph/jpgraph.php';
 require_once 'jpgraph/jpgraph_line.php';
 require_once 'jpgraph/jpgraph_utils.inc.php';
 
-$f = new FuncGenerator('cos($x)*$x');
+$f                   = new FuncGenerator('cos($x)*$x');
 list($xdata, $ydata) = $f->E(-1.2 * M_PI, 1.2 * M_PI);
 
-$f = new FuncGenerator('$x*$x');
+$f                     = new FuncGenerator('$x*$x');
 list($x2data, $y2data) = $f->E(-2, 2);
 
 // Setup the basic graph
@@ -48,7 +48,7 @@ $lp1 = new Plot\LinePlot($ydata, $xdata);
 $lp1->SetColor('yellow');
 $lp1->SetWeight(2);
 
-$lp2 = new Plot\LinePlot($y2data, $x2data);
+$lp2           = new Plot\LinePlot($y2data, $x2data);
 list($xm, $ym) = $lp2->Max();
 $lp2->SetColor('blue');
 $lp2->SetWeight(2);

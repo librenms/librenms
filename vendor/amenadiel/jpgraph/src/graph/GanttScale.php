@@ -12,33 +12,44 @@ use Amenadiel\JpGraph\Util;
 //===================================================
 class GanttScale
 {
-    public $minute, $hour, $day, $week, $month, $year;
-    public $divider, $dividerh, $tableTitle;
-    public $iStartDate = -1, $iEndDate = -1;
+    public $minute;
+    public $hour;
+    public $day;
+    public $week;
+    public $month;
+    public $year;
+    public $divider;
+    public $dividerh;
+    public $tableTitle;
+    public $iStartDate = -1;
+    public $iEndDate   = -1;
     // Number of gantt bar position (n.b not necessariliy the same as the number of bars)
     // we could have on bar in position 1, and one bar in position 5 then there are two
     // bars but the number of bar positions is 5
     public $actinfo;
-    public $iTopPlotMargin = 10, $iBottomPlotMargin = 15;
-    public $iVertLines = -1;
-    public $iVertHeaderSize = -1;
+    public $iTopPlotMargin     = 10;
+    public $iBottomPlotMargin  = 15;
+    public $iVertLines         = -1;
+    public $iVertHeaderSize    = -1;
     // The width of the labels (defaults to the widest of all labels)
     private $iLabelWidth;
     // Out image to stroke the scale to
     private $iImg;
-    private $iTableHeaderBackgroundColor = "white", $iTableHeaderFrameColor = "black";
-    private $iTableHeaderFrameWeight = 1;
-    private $iAvailableHeight = -1, $iVertSpacing = -1;
+    private $iTableHeaderBackgroundColor = "white";
+    private $iTableHeaderFrameColor      = "black";
+    private $iTableHeaderFrameWeight     = 1;
+    private $iAvailableHeight            = -1;
+    private $iVertSpacing                = -1;
     private $iDateLocale;
-    private $iVertLayout = GANTT_EVEN;
+    private $iVertLayout               = GANTT_EVEN;
     private $iUsePlotWeekendBackground = true;
-    private $iWeekStart = 1; // Default to have weekends start on Monday
+    private $iWeekStart                = 1; // Default to have weekends start on Monday
 
     //---------------
     // CONSTRUCTOR
     public function __construct($aImg)
     {
-        $this->iImg = $aImg;
+        $this->iImg        = $aImg;
         $this->iDateLocale = new DateLocale();
 
         $this->minute = new HeaderProperty();
@@ -68,7 +79,7 @@ class GanttScale
         $this->year = new HeaderProperty();
         $this->year->SetFont(FF_FONT1, FS_BOLD);
 
-        $this->divider = new LineProperty();
+        $this->divider  = new LineProperty();
         $this->dividerh = new LineProperty();
         $this->dividerh->SetWeight(2);
         $this->divider->SetWeight(6);
@@ -204,14 +215,13 @@ class GanttScale
     public function SetRange($aMin, $aMax)
     {
         $this->iStartDate = $this->NormalizeDate($aMin);
-        $this->iEndDate = $this->NormalizeDate($aMax);
+        $this->iEndDate   = $this->NormalizeDate($aMax);
     }
 
     // Adjust the start and end date so they fit to beginning/ending
     // of the week taking the specified week start day into account.
     public function AdjustStartEndDay()
     {
-
         if (!($this->IsDisplayYear() || $this->IsDisplayMonth() || $this->IsDisplayWeek())) {
             // Don't adjust
             return;
@@ -232,15 +242,15 @@ class GanttScale
             $d = $this->iStartDate;
         }
 
-        $adjdate = strtotime(($this->iWeekStart - $ds) . ' day', $d/*$this->iStartDate*/);
+        $adjdate          = strtotime(($this->iWeekStart - $ds) . ' day', $d/*$this->iStartDate*/);
         $this->iStartDate = $adjdate;
 
         // We want to end on the last day of the week
         $preferredEndDay = ($this->iWeekStart + 6) % 7;
         if ($preferredEndDay != $de) {
             // Solve equivalence eq:    $de + x ~ $preferredDay (mod 7)
-            $adj = (7 + ($preferredEndDay - $de)) % 7;
-            $adjdate = strtotime("+$adj day", $this->iEndDate);
+            $adj            = (7 + ($preferredEndDay - $de)) % 7;
+            $adjdate        = strtotime("+$adj day", $this->iEndDate);
             $this->iEndDate = $adjdate;
         }
     }
@@ -257,7 +267,7 @@ class GanttScale
     // Determine the height of all the scale headers combined
     public function GetHeaderHeight()
     {
-        $img = $this->iImg;
+        $img    = $this->iImg;
         $height = 1;
         if ($this->minute->iShowLabels) {
             $height += $this->minute->GetFontHeight($img);
@@ -311,7 +321,6 @@ class GanttScale
         } else {
             return 365;
         }
-
     }
 
     // Get week number
@@ -348,7 +357,7 @@ class GanttScale
         ---------------------------------------------------------------------------*/
 
         $thursday = $day + 60 * 60 * 24 * (3 - (date("w", $day) + 6) % 7); // take week's thursday
-        $week = 1 + (date("z", $thursday) - (11 - date("w", mktime(0, 0, 0, 1, 1, date("Y", $thursday)))) % 7) / 7;
+        $week     = 1 + (date("z", $thursday) - (11 - date("w", mktime(0, 0, 0, 1, 1, date("Y", $thursday)))) % 7) / 7;
 
         return $week;
     }
@@ -376,14 +385,13 @@ class GanttScale
     // Return number of days in a year
     public function GetNumDaysInMonth($aMonth, $aYear)
     {
-        $days = array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+        $days  = array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
         $daysl = array(31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
         if ($this->IsLeap($aYear)) {
             return $daysl[$aMonth];
         } else {
             return $days[$aMonth];
         }
-
     }
 
     // Get day in month
@@ -415,11 +423,11 @@ class GanttScale
         // switchover date (depends on the locale) we need to adjust back
         // if the date we try to translate has a different DST status since
         // we would otherwise be off by one hour.
-        $aDate = $this->NormalizeDate($aDate);
-        $tmp = localtime($aDate);
-        $cloc = $tmp[8];
-        $tmp = localtime($this->iStartDate);
-        $sloc = $tmp[8];
+        $aDate  = $this->NormalizeDate($aDate);
+        $tmp    = localtime($aDate);
+        $cloc   = $tmp[8];
+        $tmp    = localtime($this->iStartDate);
+        $sloc   = $tmp[8];
         $offset = 0;
         if ($sloc != $cloc) {
             if ($sloc) {
@@ -427,7 +435,6 @@ class GanttScale
             } else {
                 $offset = -3600;
             }
-
         }
         $img = $this->iImg;
         return ($aDate - $this->iStartDate - $offset) / SECPERDAY * $this->GetDayWidth() + $img->left_margin + $this->iLabelWidth;
@@ -491,14 +498,14 @@ class GanttScale
     public function TimeToMinutes($aTimeString)
     {
         // Split in hours and minutes
-        $pos = strpos($aTimeString, ':');
+        $pos    = strpos($aTimeString, ':');
         $minint = 60;
         if ($pos === false) {
             $hourint = $aTimeString;
-            $minint = 0;
+            $minint  = 0;
         } else {
             $hourint = floor(substr($aTimeString, 0, $pos));
-            $minint = floor(substr($aTimeString, $pos + 1));
+            $minint  = floor(substr($aTimeString, $pos + 1));
         }
         $minint += 60 * $hourint;
         return $minint;
@@ -508,8 +515,8 @@ class GanttScale
     public function StrokeMinutes($aYCoord, $getHeight = false)
     {
         $img = $this->iImg;
-        $xt = $img->left_margin + $this->iLabelWidth;
-        $yt = $aYCoord + $img->top_margin;
+        $xt  = $img->left_margin + $this->iLabelWidth;
+        $yt  = $aYCoord + $img->top_margin;
         if ($this->minute->iShowLabels) {
             $img->SetFont($this->minute->iFFamily, $this->minute->iFStyle, $this->minute->iFSize);
             $yb = $yt + $img->GetFontHeight() +
@@ -523,7 +530,7 @@ class GanttScale
 
             $x = $xt;
             $img->SetTextAlign("center");
-            $day = date('w', $this->iStartDate);
+            $day    = date('w', $this->iStartDate);
             $minint = $this->minute->GetIntervall();
 
             if (60 % $minint !== 0) {
@@ -531,9 +538,9 @@ class GanttScale
                 //'Intervall for minutes must divide the hour evenly, e.g. 1,5,10,12,15,20,30 etc You have specified an intervall of '.$minint.' minutes.');
             }
 
-            $n = 60 / $minint;
+            $n         = 60 / $minint;
             $datestamp = $this->iStartDate;
-            $width = $this->GetHourWidth() / $n;
+            $width     = $this->GetHourWidth() / $n;
             if ($width < 8) {
                 // TO small width to draw minute scale
                 Util\JpGraphError::RaiseL(6019, $width);
@@ -548,7 +555,6 @@ class GanttScale
                 for ($k = 0; $k < $nh; ++$k) {
                     for ($i = 0; $i < $n; ++$i, $x += $width, $datestamp += $minint) {
                         if ($day == 6 || $day == 0) {
-
                             $img->PushColor($this->day->iWeekendBackgroundColor);
                             if ($this->iUsePlotWeekendBackground) {
                                 $img->FilledRectangle($x, $yt + $this->day->iFrameWeight, $x + $width, $img->height - $img->bottom_margin);
@@ -557,7 +563,6 @@ class GanttScale
                             }
 
                             $img->PopColor();
-
                         }
 
                         if ($day == 0) {
@@ -606,8 +611,8 @@ class GanttScale
     public function StrokeHours($aYCoord, $getHeight = false)
     {
         $img = $this->iImg;
-        $xt = $img->left_margin + $this->iLabelWidth;
-        $yt = $aYCoord + $img->top_margin;
+        $xt  = $img->left_margin + $this->iLabelWidth;
+        $yt  = $aYCoord + $img->top_margin;
         if ($this->hour->iShowLabels) {
             $img->SetFont($this->hour->iFFamily, $this->hour->iFStyle, $this->hour->iFSize);
             $yb = $yt + $img->GetFontHeight() +
@@ -621,22 +626,21 @@ class GanttScale
 
             $x = $xt;
             $img->SetTextAlign("center");
-            $tmp = $this->hour->GetIntervall();
+            $tmp    = $this->hour->GetIntervall();
             $minint = $this->TimeToMinutes($tmp);
             if (1440 % $minint !== 0) {
                 Util\JpGraphError::RaiseL(6020, $tmp);
                 //('Intervall for hours must divide the day evenly, e.g. 0:30, 1:00, 1:30, 4:00 etc. You have specified an intervall of '.$tmp);
             }
 
-            $n = ceil(24 * 60 / $minint);
+            $n         = ceil(24 * 60 / $minint);
             $datestamp = $this->iStartDate;
-            $day = date('w', $this->iStartDate);
-            $doback = !$this->minute->iShowLabels;
-            $width = $this->GetDayWidth() / $n;
+            $day       = date('w', $this->iStartDate);
+            $doback    = !$this->minute->iShowLabels;
+            $width     = $this->GetDayWidth() / $n;
             for ($j = 0; $j < $this->GetNumberOfDays(); ++$j, $day += 1, $day %= 7) {
                 for ($i = 0; $i < $n; ++$i, $x += $width) {
                     if ($day == 6 || $day == 0) {
-
                         $img->PushColor($this->day->iWeekendBackgroundColor);
                         if ($this->iUsePlotWeekendBackground && $doback) {
                             $img->FilledRectangle($x, $yt + $this->day->iFrameWeight, $x + $width, $img->height - $img->bottom_margin);
@@ -645,7 +649,6 @@ class GanttScale
                         }
 
                         $img->PopColor();
-
                     }
 
                     if ($day == 0) {
@@ -682,7 +685,6 @@ class GanttScale
                     //$datestamp += $minint*60
                     $datestamp = mktime(date('H', $datestamp), date('i', $datestamp) + $minint, 0,
                         date("m", $datestamp), date("d", $datestamp) + 1, date("Y", $datestamp));
-
                 }
             }
             $img->SetColor($this->hour->iFrameColor);
@@ -696,10 +698,10 @@ class GanttScale
     // Stroke the day scale (including gridlines)
     public function StrokeDays($aYCoord, $getHeight = false)
     {
-        $img = $this->iImg;
+        $img      = $this->iImg;
         $daywidth = $this->GetDayWidth();
-        $xt = $img->left_margin + $this->iLabelWidth;
-        $yt = $aYCoord + $img->top_margin;
+        $xt       = $img->left_margin + $this->iLabelWidth;
+        $yt       = $aYCoord + $img->top_margin;
         if ($this->day->iShowLabels) {
             $img->SetFont($this->day->iFFamily, $this->day->iFStyle, $this->day->iFSize);
             $yb = $yt + $img->GetFontHeight() + $this->day->iTitleVertMargin + $this->day->iFrameWeight;
@@ -712,7 +714,7 @@ class GanttScale
 
             $x = $xt;
             $img->SetTextAlign("center");
-            $day = date('w', $this->iStartDate);
+            $day       = date('w', $this->iStartDate);
             $datestamp = $this->iStartDate;
 
             $doback = !($this->hour->iShowLabels || $this->minute->iShowLabels);
@@ -729,7 +731,6 @@ class GanttScale
                         $img->FilledRectangle($x, $yt + $this->day->iFrameWeight,
                             $x + $daywidth, $yb - $this->day->iFrameWeight);
                     }
-
                 }
 
                 $mn = strftime('%m', $datestamp);
@@ -808,7 +809,6 @@ class GanttScale
                 $this->day->grid->Stroke($img, $x, $yb, $x, $img->height - $img->bottom_margin);
                 $datestamp = mktime(0, 0, 0, date("m", $datestamp), date("d", $datestamp) + 1, date("Y", $datestamp));
                 //$datestamp += SECPERDAY;
-
             }
             $img->SetColor($this->day->iFrameColor);
             $img->SetLineWeight($this->day->iFrameWeight);
@@ -823,7 +823,7 @@ class GanttScale
     {
         if ($this->week->iShowLabels) {
             $img = $this->iImg;
-            $yt = $aYCoord + $img->top_margin;
+            $yt  = $aYCoord + $img->top_margin;
             $img->SetFont($this->week->iFFamily, $this->week->iFStyle, $this->week->iFSize);
             $yb = $yt + $img->GetFontHeight() + $this->week->iTitleVertMargin + $this->week->iFrameWeight;
 
@@ -831,12 +831,12 @@ class GanttScale
                 return $yb - $img->top_margin;
             }
 
-            $xt = $img->left_margin + $this->iLabelWidth;
+            $xt        = $img->left_margin + $this->iLabelWidth;
             $weekwidth = $this->GetDayWidth() * 7;
-            $wdays = $this->iDateLocale->GetDayAbb();
-            $xb = $img->width - $img->right_margin + 1;
-            $week = $this->iStartDate;
-            $weeknbr = $this->GetWeekNbr($week);
+            $wdays     = $this->iDateLocale->GetDayAbb();
+            $xb        = $img->width - $img->right_margin + 1;
+            $week      = $this->iStartDate;
+            $weeknbr   = $this->GetWeekNbr($week);
             $img->SetColor($this->week->iBackgroundColor);
             $img->FilledRectangle($xt, $yt, $xb, $yb);
             $img->SetColor($this->week->grid->iColor);
@@ -865,9 +865,9 @@ class GanttScale
                     $txt = date("j/n", $week);
                 } elseif ($this->week->iStyle == WEEKSTYLE_FIRSTDAY2 ||
                     $this->week->iStyle == WEEKSTYLE_FIRSTDAY2WNBR) {
-                    $monthnbr = date("n", $week) - 1;
+                    $monthnbr   = date("n", $week) - 1;
                     $shortmonth = $this->iDateLocale->GetShortMonthName($monthnbr);
-                    $txt = Date("j", $week) . " " . $shortmonth;
+                    $txt        = Date("j", $week) . " " . $shortmonth;
                 }
 
                 if ($this->week->iStyle == WEEKSTYLE_FIRSTDAYWNBR ||
@@ -879,7 +879,7 @@ class GanttScale
                 $img->StrokeText(round($x + $txtOffset),
                     round($yb - $this->week->iTitleVertMargin), $txt);
 
-                $week = strtotime('+7 day', $week);
+                $week    = strtotime('+7 day', $week);
                 $weeknbr = $this->GetWeekNbr($week);
                 $img->PopColor();
                 $img->SetLineWeight($this->week->grid->iWeight);
@@ -937,8 +937,8 @@ class GanttScale
                 return $yb - $img->top_margin;
             }
             $monthnbr = $this->GetMonthNbr($this->iStartDate) - 1;
-            $xt = $img->left_margin + $this->iLabelWidth;
-            $xb = $img->width - $img->right_margin + 1;
+            $xt       = $img->left_margin + $this->iLabelWidth;
+            $xb       = $img->width - $img->right_margin + 1;
 
             $img->SetColor($this->month->iBackgroundColor);
             $img->FilledRectangle($xt, $yt, $xb, $yb);
@@ -971,7 +971,7 @@ class GanttScale
                     $monthnbr = 0;
                     $year++;
                 }
-                $monthName = $this->GetMonthLabel($monthnbr, $year);
+                $monthName  = $this->GetMonthLabel($monthnbr, $year);
                 $monthwidth = $this->GetDayWidth() * $this->GetNumDaysInMonth($monthnbr, $year);
                 if ($x + $monthwidth < $xb) {
                     $w = $monthwidth;
@@ -999,7 +999,7 @@ class GanttScale
     {
         if ($this->year->iShowLabels) {
             $img = $this->iImg;
-            $yt = $aYCoord + $img->top_margin;
+            $yt  = $aYCoord + $img->top_margin;
             $img->SetFont($this->year->iFFamily, $this->year->iFStyle, $this->year->iFSize);
             $yb = $yt + $img->GetFontHeight() + $this->year->iTitleVertMargin + $this->year->iFrameWeight;
 
@@ -1007,8 +1007,8 @@ class GanttScale
                 return $yb - $img->top_margin;
             }
 
-            $xb = $img->width - $img->right_margin + 1;
-            $xt = $img->left_margin + $this->iLabelWidth;
+            $xb   = $img->width - $img->right_margin + 1;
+            $xt   = $img->left_margin + $this->iLabelWidth;
             $year = $this->GetYear($this->iStartDate);
             $img->SetColor($this->year->iBackgroundColor);
             $img->FilledRectangle($xt, $yt, $xb, $yb);
@@ -1061,10 +1061,10 @@ class GanttScale
     public function StrokeTableHeaders($aYBottom)
     {
         $img = $this->iImg;
-        $xt = $img->left_margin;
-        $yt = $img->top_margin;
-        $xb = $xt + $this->iLabelWidth;
-        $yb = $aYBottom + $img->top_margin;
+        $xt  = $img->left_margin;
+        $yt  = $img->top_margin;
+        $xb  = $xt + $this->iLabelWidth;
+        $yb  = $aYBottom + $img->top_margin;
 
         if ($this->tableTitle->iShow) {
             $img->SetColor($this->iTableHeaderBackgroundColor);
@@ -1089,9 +1089,9 @@ class GanttScale
             $this->divider->iStyle = 'solid';
         }
 
-        $tmp = $this->divider->iWeight;
+        $tmp                    = $this->divider->iWeight;
         $this->divider->iWeight = 1;
-        $y = $img->height - $img->bottom_margin;
+        $y                      = $img->height - $img->bottom_margin;
         for ($i = 0; $i < $tmp; ++$i) {
             $this->divider->Stroke($img, $xb - $i, $yt, $xb - $i, $y);
         }
@@ -1126,11 +1126,11 @@ class GanttScale
         // top which depends on any previous headers
 
         // First find out the height of each header
-        $offy = $this->StrokeYears(0, true);
-        $offm = $this->StrokeMonths($offy, true);
-        $offw = $this->StrokeWeeks($offm, true);
-        $offd = $this->StrokeDays($offw, true);
-        $offh = $this->StrokeHours($offd, true);
+        $offy   = $this->StrokeYears(0, true);
+        $offm   = $this->StrokeMonths($offy, true);
+        $offw   = $this->StrokeWeeks($offm, true);
+        $offd   = $this->StrokeDays($offw, true);
+        $offh   = $this->StrokeHours($offd, true);
         $offmin = $this->StrokeMinutes($offh, true);
 
         // ... then we can stroke them in the "backwards order to ensure that
@@ -1153,6 +1153,5 @@ class GanttScale
         if ($this->iVertSpacing == -1) {
             $this->iVertSpacing = $this->iAvailableHeight / $this->iVertLines;
         }
-
     }
 }

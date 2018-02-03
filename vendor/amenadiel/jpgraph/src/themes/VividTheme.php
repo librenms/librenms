@@ -6,10 +6,10 @@ namespace Amenadiel\JpGraph\Themes;
  */
 class VividTheme extends Theme
 {
-    private $font_color = '#0044CC';
+    private $font_color       = '#0044CC';
     private $background_color = '#DDFFFF';
-    private $axis_color = '#0066CC';
-    private $grid_color = '#3366CC';
+    private $axis_color       = '#0066CC';
+    private $grid_color       = '#3366CC';
 
     public function GetColorList()
     {
@@ -106,7 +106,7 @@ class VividTheme extends Theme
     public function PreStrokeApply($graph)
     {
         if ($graph->legend->HasItems()) {
-            $img = $graph->img;
+            $img    = $graph->img;
             $height = $img->height;
             $graph->SetMargin($img->left_margin, $img->right_margin, $img->top_margin, $height * 0.25);
         }
@@ -114,7 +114,6 @@ class VividTheme extends Theme
 
     public function ApplyPlot($plot)
     {
-
         switch (get_class($plot)) {
             case 'GroupBarPlot':
                 {

@@ -6,10 +6,10 @@ namespace Amenadiel\JpGraph\Themes;
  */
 class OceanTheme extends Theme
 {
-    protected $font_color = '#0066FF';
+    protected $font_color     = '#0066FF';
     private $background_color = '#DDEEFF';
-    private $axis_color = '#0000CC';
-    private $grid_color = '#3333CC';
+    private $axis_color       = '#0000CC';
+    private $grid_color       = '#3333CC';
 
     public function GetColorList()
     {
@@ -112,7 +112,7 @@ class OceanTheme extends Theme
     public function PreStrokeApply($graph)
     {
         if ($graph->legend->HasItems()) {
-            $img = $graph->img;
+            $img    = $graph->img;
             $height = $img->height;
             $graph->SetMargin($img->left_margin, $img->right_margin, $img->top_margin, $height * 0.25);
         }
@@ -120,7 +120,6 @@ class OceanTheme extends Theme
 
     public function ApplyPlot($plot)
     {
-
         switch (get_class($plot)) {
             case 'GroupBarPlot':
                 {

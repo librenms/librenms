@@ -10,9 +10,11 @@ use Amenadiel\JpGraph\Util;
 class IconImage
 {
     private $iGDImage = null;
-    private $iWidth, $iHeight;
-    private $ixalign = 'left', $iyalign = 'center';
-    private $iScale = 1.0;
+    private $iWidth;
+    private $iHeight;
+    private $ixalign = 'left';
+    private $iyalign = 'center';
+    private $iScale  = 1.0;
 
     public function __construct($aIcon, $aScale = 1)
     {
@@ -26,8 +28,8 @@ class IconImage
             Util\JpGraphError::RaiseL(6011);
             //('Argument to IconImage must be string or integer');
         }
-        $this->iScale = $aScale;
-        $this->iWidth = Image::GetWidth($this->iGDImage);
+        $this->iScale  = $aScale;
+        $this->iWidth  = Image::GetWidth($this->iGDImage);
         $this->iHeight = Image::GetHeight($this->iGDImage);
     }
 
@@ -49,7 +51,6 @@ class IconImage
 
     public function Stroke($aImg, $x, $y)
     {
-
         if ($this->ixalign == 'right') {
             $x -= $this->iWidth;
         } elseif ($this->ixalign == 'center') {

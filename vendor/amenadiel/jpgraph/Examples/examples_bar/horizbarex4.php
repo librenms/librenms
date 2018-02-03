@@ -7,17 +7,17 @@ use Amenadiel\JpGraph\Plot;
 $datay = array(1992, 1993, 1995, 1996, 1997, 1998, 2001);
 
 // Size of graph
-$width = 400;
+$width  = 400;
 $height = 500;
 
 // Set the basic parameters of the graph
 $graph = new Graph\Graph($width, $height);
 $graph->SetScale('textlin');
 
-$top = 60;
+$top    = 60;
 $bottom = 30;
-$left = 80;
-$right = 30;
+$left   = 80;
+$right  = 30;
 $graph->Set90AndMargin($left, $right, $top, $bottom);
 
 // Nice shadow

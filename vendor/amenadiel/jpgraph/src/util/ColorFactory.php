@@ -5,8 +5,7 @@ namespace Amenadiel\JpGraph\Util;
 // is called. Used to automatically set colors of plots.
 class ColorFactory
 {
-
-    private static $iIdx = 0;
+    private static $iIdx       = 0;
     private static $iColorList = array(
         'black',
         'blue',
@@ -51,5 +50,4 @@ class ColorFactory
 
         return ColorFactory::$iColorList[ColorFactory::$iIdx++];
     }
-
 }

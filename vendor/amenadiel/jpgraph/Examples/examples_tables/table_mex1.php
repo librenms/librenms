@@ -1,10 +1,10 @@
 <?php
-require_once ('jpgraph/jpgraph.php');
-require_once ('jpgraph/jpgraph_canvas.php');
-require_once ('jpgraph/jpgraph_table.php');
+require_once('jpgraph/jpgraph.php');
+require_once('jpgraph/jpgraph_canvas.php');
+require_once('jpgraph/jpgraph_table.php');
 
 // Setup graph context
-$graph = new CanvasGraph(430,150);
+$graph = new CanvasGraph(430, 150);
 
 // Setup the basic table
 $data = array(
@@ -18,7 +18,7 @@ $data = array(
 // Setup the basic table and font
 $table = new GTextTable();
 $table->Set($data);
-$table->SetFont(FF_ARIAL,FS_NORMAL,11);
+$table->SetFont(FF_ARIAL, FS_NORMAL, 11);
 
 // Setup default column width
 $table->SetMinColWidth(40);
@@ -33,18 +33,18 @@ $table->SetBorder(0);
 $table->setGrid(0);
 
 // Setup font for row 4 and 0
-$table->SetRowFont(4,FF_ARIAL,FS_BOLD,11);
-$table->SetRowFont(0,FF_ARIAL,FS_BOLD,11);
+$table->SetRowFont(4, FF_ARIAL, FS_BOLD, 11);
+$table->SetRowFont(0, FF_ARIAL, FS_BOLD, 11);
 
 // Setup color
-$table->SetRowFillColor(4,'orange@0.5');
-$table->SetFillColor(0,1,0,6,'teal@0.8');
+$table->SetRowFillColor(4, 'orange@0.5');
+$table->SetFillColor(0, 1, 0, 6, 'teal@0.8');
 
 
 // Setup grids
-$table->SetRowGrid(4,1,'black',TGRID_DOUBLE2);
-$table->SetColGrid(1,1,'black',TGRID_SINGLE);
-$table->SetRowGrid(1,1,'black',TGRID_SINGLE);
+$table->SetRowGrid(4, 1, 'black', TGRID_DOUBLE2);
+$table->SetColGrid(1, 1, 'black', TGRID_SINGLE);
+$table->SetRowGrid(1, 1, 'black', TGRID_SINGLE);
 
 // Add table to the graph
 $graph->Add($table);

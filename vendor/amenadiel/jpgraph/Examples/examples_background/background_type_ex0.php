@@ -3,6 +3,7 @@ require_once '../../vendor/autoload.php';
 
 use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
+
 // Some data
 $ydata = array(11, 3, 8, 12, 5, 1, 9, 13, 5, 7);
 

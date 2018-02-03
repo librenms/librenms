@@ -6,9 +6,9 @@ require_once 'jpgraph/jpgraph_bar.php';
 
 // Some data
 
-$steps = 100;for ($i = 0; $i < $steps; ++$i) {
+$steps         = 100; for ($i = 0; $i < $steps; ++$i) {
     $datay[$i] = log(pow($i, $i / 10) + 1) * sin($i / 15) + 35;
-    $datax[] = $i;
+    $datax[]   = $i;
     if ($i % 10 == 0) {
         $databarx[] = $i;
         $databary[] = $datay[$i] / 2;

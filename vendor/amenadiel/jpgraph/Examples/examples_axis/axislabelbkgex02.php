@@ -1,6 +1,8 @@
 <?php // content="text/plain; charset=utf-8"
-require_once 'jpgraph/jpgraph.php';
-require_once 'jpgraph/jpgraph_line.php';
+require_once '../../vendor/autoload.php';
+
+use Amenadiel\JpGraph\Graph;
+use Amenadiel\JpGraph\Plot;
 
 $ydata = array(12, 19, 3, 9, 15, 10);
 

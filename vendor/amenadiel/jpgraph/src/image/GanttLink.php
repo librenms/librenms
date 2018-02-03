@@ -10,10 +10,16 @@ use Amenadiel\JpGraph\Util;
 
 class GanttLink
 {
-    private $ix1, $ix2, $iy1, $iy2;
-    private $iPathType = 2, $iPathExtend = 15;
-    private $iColor = 'black', $iWeight = 1;
-    private $iArrowSize = ARROW_S2, $iArrowType = ARROWT_SOLID;
+    private $ix1;
+    private $ix2;
+    private $iy1;
+    private $iy2;
+    private $iPathType    = 2;
+    private $iPathExtend  = 15;
+    private $iColor       = 'black';
+    private $iWeight      = 1;
+    private $iArrowSize   = ARROW_S2;
+    private $iArrowType   = ARROWT_SOLID;
 
     public function __construct($x1 = 0, $y1 = 0, $x2 = 0, $y2 = 0)
     {
@@ -77,7 +83,7 @@ class GanttLink
         // handle thi different.
         if ($y2 > $y1) {
             $arrowtype = ARROW_DOWN;
-            $midy = round(($y2 - $y1) / 2 + $y1);
+            $midy      = round(($y2 - $y1) / 2 + $y1);
             if ($x2 > $x1) {
                 switch ($this->iPathType) {
                     case 0:
@@ -131,7 +137,7 @@ class GanttLink
         } else {
             // Y2 < Y1
             $arrowtype = ARROW_UP;
-            $midy = round(($y1 - $y2) / 2 + $y2);
+            $midy      = round(($y1 - $y2) / 2 + $y2);
             if ($x2 > $x1) {
                 switch ($this->iPathType) {
                     case 0:
@@ -141,7 +147,7 @@ class GanttLink
                     case 3:
                         if ($midy - $y2 < 8) {
                             $arrowtype = ARROW_RIGHT;
-                            $c = array($x1, $y1, $x1, $y2, $x2, $y2);
+                            $c         = array($x1, $y1, $x1, $y2, $x2, $y2);
                         } else {
                             $c = array($x1, $y1, $x1, $midy, $x2, $midy, $x2, $y2);
                         }
@@ -166,7 +172,7 @@ class GanttLink
                     case 3:
                         if ($midy - $y2 < 16) {
                             $arrowtype = ARROW_RIGHT;
-                            $c = array($x1, $y1, $x1, $midy, $x2 - $this->iPathExtend, $midy,
+                            $c         = array($x1, $y1, $x1, $midy, $x2 - $this->iPathExtend, $midy,
                                 $x2 - $this->iPathExtend, $y2,
                                 $x2, $y2);
                         } else {

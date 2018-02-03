@@ -4,7 +4,7 @@
 // Description: Example 1 for odometer graphs
 // Created:	2002-02-22
 // Version:	$Id$
-// 
+//
 // Comment:
 // Example file for odometer graph. This examples extends odoex07
 // by showing how 1) a drop shadow may be added to the frame
@@ -13,13 +13,13 @@
 //
 // Copyright (C) 2002 Johan Persson. All rights reserved.
 //=============================================================================
-require_once ('jpgraph/jpgraph.php');
-require_once ('jpgraph/jpgraph_odo.php');
+require_once('jpgraph/jpgraph.php');
+require_once('jpgraph/jpgraph_odo.php');
 
 //---------------------------------------------------------------------
 // Create a new odometer graph (width=250, height=200 pixels)
 //---------------------------------------------------------------------
-$graph = new OdoGraph(250,250);
+$graph = new OdoGraph(250, 250);
 
 //---------------------------------------------------------------------
 // Add a drop shadow to the fram
@@ -51,7 +51,7 @@ $graph->subtitle->SetColor("white");
 // Specify caption.
 // * (This is the text at the bottom of the graph.) The margins will
 // automatically adjust to fit the height of the text. A caption
-// may have multiple lines by including a '\n' character in the 
+// may have multiple lines by including a '\n' character in the
 // string.
 //---------------------------------------------------------------------
 $graph->caption->Set("First caption row\n... second row");
@@ -61,7 +61,7 @@ $graph->caption->SetColor("white");
 // Now we need to create an odometer to add to the graph.
 // By default the scale will be 0 to 100
 //---------------------------------------------------------------------
-$odo = new Odometer(ODO_FULL); 
+$odo = new Odometer(ODO_FULL);
 
 //---------------------------------------------------------------------
 // Set fill color for odometer
@@ -69,11 +69,11 @@ $odo = new Odometer(ODO_FULL);
 $odo->SetColor("lightblue");
 
 //---------------------------------------------------------------------
-// Set color indication 
+// Set color indication
 //---------------------------------------------------------------------
-$odo->AddIndication(0,50,"green");
-$odo->AddIndication(50,80,"yellow");
-$odo->AddIndication(80,100,"red");
+$odo->AddIndication(0, 50, "green");
+$odo->AddIndication(50, 80, "yellow");
+$odo->AddIndication(80, 100, "red");
 
 //---------------------------------------------------------------------
 // Set the center area that will not be affected by the color bands
@@ -84,7 +84,7 @@ $odo->SetCenterAreaWidth(0.4);  // Fraction of radius
 // Adjust scale ticks to be shown at 10 steps interval and scale
 // labels at every second tick
 //---------------------------------------------------------------------
-$odo->scale->SetTicks(10,2);
+$odo->scale->SetTicks(10, 2);
 
 //---------------------------------------------------------------------
 // Make the tick marks 2 pixel wide
@@ -99,7 +99,7 @@ $odo->scale->label->SetFont(FF_FONT1, FS_BOLD);
 //---------------------------------------------------------------------
 // Change the start and end angle for the scale
 //---------------------------------------------------------------------
-$odo->scale->SetAngle(20,340);
+$odo->scale->SetAngle(20, 340);
 
 //---------------------------------------------------------------------
 // Set display value for the odometer
@@ -108,7 +108,7 @@ $odo->needle->Set(64);
 
 //---------------------------------------------------------------------
 // Specify scale caption. Note that depending on the position of the
-// indicator needle this label might be partially hidden. 
+// indicator needle this label might be partially hidden.
 //---------------------------------------------------------------------
 $odo->label->Set("% Passed");
 
@@ -127,14 +127,14 @@ $odo->needle2->SetStyle(NEEDLE_STYLE_SMALL_TRIANGLE);
 $odo->needle2->SetLength(0.55);  // Length as 70% of the radius
 $odo->needle2->SetFillColor("lightgray");
 
-// Only the first needle is shown by default 
-$odo->needle2->Show();  
+// Only the first needle is shown by default
+$odo->needle2->Show();
 
 //---------------------------------------------------------------------
 // Add a drop shadow to the indicator needles
 //---------------------------------------------------------------------
-$odo->needle->SetShadow();  
-$odo->needle2->SetShadow();  
+$odo->needle->SetShadow();
+$odo->needle2->SetShadow();
 
 //---------------------------------------------------------------------
 // Add the odometer to the graph
@@ -147,4 +147,3 @@ $graph->Add($odo);
 $graph->Stroke();
 
 // EOF
-?>

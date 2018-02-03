@@ -2,8 +2,8 @@
     // Example 9 : QR Barcode with data read from file and different colors
 
     // Include the library
-    require_once ('jpgraph/jpgraph.php');
-    require_once ('jpgraph/QR/qrencoder.inc.php');
+    require_once('jpgraph/jpgraph.php');
+    require_once('jpgraph/QR/qrencoder.inc.php');
 
     $readFromFilename = 'qr-input.txt';
 
@@ -18,8 +18,7 @@
     $backend->SetModuleWidth(5);
 
     // Use blue and white colors instead
-    $backend->SetColor('navy','white');
+    $backend->SetColor('navy', 'white');
 
     // .. send the barcode back to the browser for the data in the file
     $backend->StrokeFromFile($readFromFilename);
-?>

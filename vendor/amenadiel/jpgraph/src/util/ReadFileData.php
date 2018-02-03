@@ -24,19 +24,19 @@ class ReadFileData
         if ($rh === false) {
             return false;
         }
-        $tmp = array();
+        $tmp        = array();
         $lineofdata = fgetcsv($rh, 1000, ',');
         while ($lineofdata !== false) {
-            $tmp = array_merge($tmp, $lineofdata);
+            $tmp        = array_merge($tmp, $lineofdata);
             $lineofdata = fgetcsv($rh, $aMaxLineLength, $aSepChar);
         }
         fclose($rh);
 
         // Now make sure that all data is numeric. By default
         // all data is read as strings
-        $n = count($tmp);
+        $n     = count($tmp);
         $aData = array();
-        $cnt = 0;
+        $cnt   = 0;
         for ($i = 0; $i < $n; ++$i) {
             if ($tmp[$i] !== "") {
                 $aData[$cnt++] = floatval($tmp[$i]);
@@ -68,10 +68,10 @@ class ReadFileData
     public static function FromCSV2($aFile, &$aData, $aOptions = array())
     {
         $aDefaults = array(
-            'separator' => ',',
-            'enclosure' => chr(34),
-            'escape' => chr(92),
-            'readlength' => 1024,
+            'separator'    => ',',
+            'enclosure'    => chr(34),
+            'escape'       => chr(92),
+            'readlength'   => 1024,
             'ignore_first' => false,
             'first_as_key' => false,
         );
@@ -105,7 +105,7 @@ class ReadFileData
         }
 
         $num_lines = 0;
-        $num_cols = count($aLine);
+        $num_cols  = count($aLine);
 
         while ($aLine !== false) {
             if (is_array($aLine) && count($aLine) != $num_cols) {
@@ -155,7 +155,7 @@ class ReadFileData
             $s = '/[\s]*;[\s]*/';
         }
         foreach ($lines as $line => $datarow) {
-            $split = preg_split($s, $datarow);
+            $split   = preg_split($s, $datarow);
             $aCol1[] = floatval(trim($split[0]));
             $aCol2[] = floatval(trim($split[1]));
         }
@@ -194,5 +194,4 @@ class ReadFileData
         }
         return $mat;
     }
-
 }

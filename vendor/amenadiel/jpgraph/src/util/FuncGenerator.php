@@ -18,18 +18,22 @@ namespace Amenadiel\JpGraph\Util;
 //===================================================
 class FuncGenerator
 {
-    private $iFunc = '', $iXFunc = '', $iMin, $iMax, $iStepSize;
+    private $iFunc  = '';
+    private $iXFunc = '';
+    private $iMin;
+    private $iMax;
+    private $iStepSize;
 
     public function __construct($aFunc, $aXFunc = '')
     {
-        $this->iFunc = $aFunc;
+        $this->iFunc  = $aFunc;
         $this->iXFunc = $aXFunc;
     }
 
     public function E($aXMin, $aXMax, $aSteps = 50)
     {
-        $this->iMin = $aXMin;
-        $this->iMax = $aXMax;
+        $this->iMin      = $aXMin;
+        $this->iMax      = $aXMax;
         $this->iStepSize = ($aXMax - $aXMin) / $aSteps;
 
         if ($this->iXFunc != '') {

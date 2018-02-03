@@ -17,19 +17,25 @@ namespace Amenadiel\JpGraph\Plot;
 //===================================================
 class IconPlot
 {
-    public $iX = 0, $iY = 0, $iScale = 1.0, $iMix = 100;
-    private $iHorAnchor = 'left', $iVertAnchor = 'top';
-    private $iFile = '';
-    private $iAnchors = array('left', 'right', 'top', 'bottom', 'center');
-    private $iCountryFlag = '', $iCountryStdSize = 3;
-    private $iScalePosY = null, $iScalePosX = null;
-    private $iImgString = '';
+    public $iX                = 0;
+    public $iY                = 0;
+    public $iScale            = 1.0;
+    public $iMix              = 100;
+    private $iHorAnchor       = 'left';
+    private $iVertAnchor      = 'top';
+    private $iFile            = '';
+    private $iAnchors         = array('left', 'right', 'top', 'bottom', 'center');
+    private $iCountryFlag     = '';
+    private $iCountryStdSize  = 3;
+    private $iScalePosY       = null;
+    private $iScalePosX       = null;
+    private $iImgString       = '';
 
     public function __construct($aFile = "", $aX = 0, $aY = 0, $aScale = 1.0, $aMix = 100)
     {
-        $this->iFile = $aFile;
-        $this->iX = $aX;
-        $this->iY = $aY;
+        $this->iFile  = $aFile;
+        $this->iX     = $aX;
+        $this->iY     = $aY;
         $this->iScale = $aScale;
         if ($aMix < 0 || $aMix > 100) {
             Util\JpGraphError::RaiseL(8001); //('Mix value for icon must be between 0 and 100.');
@@ -40,13 +46,13 @@ class IconPlot
     public function SetCountryFlag($aFlag, $aX = 0, $aY = 0, $aScale = 1.0, $aMix = 100, $aStdSize = 3)
     {
         $this->iCountryFlag = $aFlag;
-        $this->iX = $aX;
-        $this->iY = $aY;
-        $this->iScale = $aScale;
+        $this->iX           = $aX;
+        $this->iY           = $aY;
+        $this->iScale       = $aScale;
         if ($aMix < 0 || $aMix > 100) {
             Util\JpGraphError::RaiseL(8001); //'Mix value for icon must be between 0 and 100.');
         }
-        $this->iMix = $aMix;
+        $this->iMix            = $aMix;
         $this->iCountryStdSize = $aStdSize;
     }
 
@@ -86,7 +92,7 @@ class IconPlot
             !in_array($aYAnchor, $this->iAnchors)) {
             Util\JpGraphError::RaiseL(8002); //("Anchor position for icons must be one of 'top', 'bottom', 'left', 'right' or 'center'");
         }
-        $this->iHorAnchor = $aXAnchor;
+        $this->iHorAnchor  = $aXAnchor;
         $this->iVertAnchor = $aYAnchor;
     }
 
@@ -109,16 +115,24 @@ class IconPlot
     // from Gantt and is not menaiungfull in the context of Icons but
     // they must be implemented to avoid errors.
     public function GetMaxDate()
-    {return false;}
+    {
+        return false;
+    }
 
     public function GetMinDate()
-    {return false;}
+    {
+        return false;
+    }
 
     public function GetLineNbr()
-    {return 0;}
+    {
+        return 0;
+    }
 
     public function GetAbsHeight()
-    {return 0;}
+    {
+        return 0;
+    }
 
     public function Min()
     {
@@ -166,7 +180,7 @@ class IconPlot
             if (!class_exists('FlagImages', false)) {
                 Util\JpGraphError::RaiseL(8004); //('In order to use Country flags as icons you must include the "jpgraph_flags.php" file.');
             }
-            $fobj = new FlagImages($this->iCountryStdSize);
+            $fobj  = new FlagImages($this->iCountryStdSize);
             $dummy = '';
             $gdimg = $fobj->GetImgByName($this->iCountryFlag, $dummy);
         }
@@ -183,11 +197,11 @@ class IconPlot
             $this->iY = $y;
         }
         if ($this->iX >= 0 && $this->iX <= 1.0) {
-            $w = imagesx($aImg->img);
+            $w        = imagesx($aImg->img);
             $this->iX = round($w * $this->iX);
         }
         if ($this->iY >= 0 && $this->iY <= 1.0) {
-            $h = imagesy($aImg->img);
+            $h        = imagesy($aImg->img);
             $this->iY = round($h * $this->iY);
         }
 

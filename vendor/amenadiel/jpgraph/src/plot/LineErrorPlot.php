@@ -15,7 +15,7 @@ class LineErrorPlot extends ErrorPlot
     {
         $ly = array();
         $ey = array();
-        $n = count($datay);
+        $n  = count($datay);
         if ($n % 3 != 0) {
             Util\JpGraphError::RaiseL(4002);
             //('Error in input data to LineErrorPlot. Number of data points must be a multiple of 3');

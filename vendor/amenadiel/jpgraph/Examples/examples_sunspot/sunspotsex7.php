@@ -10,22 +10,22 @@ function readsunspotdata($aFile, &$aYears, &$aSunspots)
         throw new JpGraphException('Can not read sunspot data file.');
     }
     foreach ($lines as $line => $datarow) {
-        $split = preg_split('/[\s]+/', $datarow);
-        $aYears[] = substr(trim($split[0]), 0, 4);
+        $split       = preg_split('/[\s]+/', $datarow);
+        $aYears[]    = substr(trim($split[0]), 0, 4);
         $aSunspots[] = trim($split[1]);
     }
 }
 
-$year = array();
+$year  = array();
 $ydata = array();
 readsunspotdata('yearssn.txt', $year, $ydata);
 
 // Just keep the last 20 values in the arrays
-$year = array_slice($year, -20);
+$year  = array_slice($year, -20);
 $ydata = array_slice($ydata, -20);
 
 // Width and height of the graph
-$width = 600;
+$width  = 600;
 $height = 200;
 
 // Create a graph instance

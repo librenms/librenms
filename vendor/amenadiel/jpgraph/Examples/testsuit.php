@@ -17,7 +17,6 @@
 //-------------------------------------------------------------------------
 class TestDriver
 {
-
     private $iType;
     private $iDir;
 
@@ -47,7 +46,6 @@ class TestDriver
                     }
                 }
             }
-
         }
         $d->Close();
         if (count($a) == 0) {

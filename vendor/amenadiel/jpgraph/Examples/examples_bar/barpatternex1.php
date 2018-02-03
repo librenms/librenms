@@ -3,6 +3,7 @@
 require_once '../../vendor/autoload.php';
 use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
+
 require_once 'jpgraph/jpgraph_line.php';
 
 $datay = array(2, 3, 5, 8.5, 11.5, 6, 3);

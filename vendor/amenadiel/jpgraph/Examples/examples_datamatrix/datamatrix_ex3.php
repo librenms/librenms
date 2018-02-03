@@ -17,5 +17,3 @@ try {
     $errstr = $e->GetMessage();
     echo "Datamatrix error message: $errstr\n";
 }
-
-?>
