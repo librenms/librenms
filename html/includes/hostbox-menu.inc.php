@@ -33,8 +33,13 @@ if (device_permitted($device['device_id'])) {
             <div class="col-xs-1">
             <a href="telnet://'.$device['hostname'].'"><i class="fa fa-terminal fa-lg icon-theme"  title="Telnet to ' . $device['hostname'] . '"></a>
             </div>
-            <div class="col-xs-1">
-            <a href="' . $config['gateone']['server'] . $device['hostname'].'"><i class="fa fa-lock fa-lg icon-theme"  title="SSH to ' . $device['hostname'] . '"></a>
+            <div class="col-xs-1">';
+        if ($config['gateone']['use_librenms_user'] == true) {
+                echo '<a href="' . $config['gateone']['server'] . $_SESSION['username'] . '@' . $device['hostname'].'"><i class="fa fa-lock fa-lg icon-theme"  title="SSH to ' . $device['hostname'] . '"></a>';
+        } else {
+                echo '<a href="' . $config['gateone']['server'] . $device['hostname'].'"><i class="fa fa-lock fa-lg icon-theme"  title="SSH to ' . $device['hostname'] . '"></a>';
+        }
+            echo '
             </div>
             <div class="col-xs-1">
             <a href="https://' . $device['hostname'] . '" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme"  title="Launch browser https://' . $device['hostname'] . '"></i></a>
