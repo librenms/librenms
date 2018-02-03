@@ -3,7 +3,7 @@ require_once 'jpgraph/jpgraph.php';
 require_once 'jpgraph/jpgraph_bar.php';
 
 $data1y = array(47, 80, 40, 116);
-$graph = new Graph\Graph(400, 300, 'auto');
+$graph  = new Graph\Graph(400, 300, 'auto');
 $graph->SetScale('textlin');
 
 $theme_class = new AquaTheme;

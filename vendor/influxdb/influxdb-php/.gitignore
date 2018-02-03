@@ -1,0 +1,7 @@
+.vagrant
+.DS_Store
+vendor/
+.idea
+build/
+test.php
+.project

@@ -7,8 +7,8 @@ namespace Amenadiel\JpGraph\Plot;
 //===================================================
 class FieldPlot extends Plot
 {
-    public $arrow = '';
-    private $iAngles = array();
+    public $arrow      = '';
+    private $iAngles   = array();
     private $iCallback = '';
 
     public function __construct($datay, $datax, $angles)
@@ -16,11 +16,11 @@ class FieldPlot extends Plot
         if ((count($datax) != count($datay))) {
             Util\JpGraphError::RaiseL(20001);
         }
-//("Fieldplots must have equal number of X and Y points.");
+        //("Fieldplots must have equal number of X and Y points.");
         if ((count($datax) != count($angles))) {
             Util\JpGraphError::RaiseL(20002);
         }
-//("Fieldplots must have an angle specified for each X and Y points.");
+        //("Fieldplots must have an angle specified for each X and Y points.");
 
         $this->iAngles = $angles;
 
@@ -40,8 +40,8 @@ class FieldPlot extends Plot
     {
 
         // Remeber base color and size
-        $bc = $this->arrow->iColor;
-        $bs = $this->arrow->iSize;
+        $bc  = $this->arrow->iColor;
+        $bs  = $this->arrow->iSize;
         $bas = $this->arrow->iArrowSize;
 
         for ($i = 0; $i < $this->numpoints; ++$i) {

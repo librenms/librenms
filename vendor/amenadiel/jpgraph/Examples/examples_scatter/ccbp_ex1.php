@@ -10,8 +10,8 @@ $graph->SetTitle('Buffer penetration', '(history added)');
 $graph->SetColorMap(0);
 
 // Two "fake tasks with hostory
-$datax = array(75, 83);
-$datay = array(110, 64);
+$datax  = array(75, 83);
+$datay  = array(110, 64);
 $datax1 = array(33, 50, 67, 83);
 $datay1 = array(86, 76, 80, 64);
 $datax2 = array(18, 47, 58, 75);
@@ -22,7 +22,7 @@ $sp->mark->SetType(MARK_DIAMOND);
 $sp->mark->SetFillColor('white');
 $sp->mark->SetSize(12);
 
-$sp_hist = array();
+$sp_hist    = array();
 $sp_hist[0] = new Plot\LinePlot($datay1, $datax1);
 $sp_hist[0]->SetWeight(1);
 $sp_hist[0]->SetColor('white');

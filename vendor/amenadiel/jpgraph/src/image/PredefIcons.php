@@ -23,7 +23,8 @@ define('GICON_TEXTIMPORTANT', 12);
 
 class PredefIcons
 {
-    private $iBuiltinIcon = null, $iLen = -1;
+    private $iBuiltinIcon = null;
+    private $iLen         = -1;
 
     public function GetLen()
     {

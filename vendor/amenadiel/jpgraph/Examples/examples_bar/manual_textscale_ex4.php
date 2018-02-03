@@ -14,7 +14,6 @@ for ($i = 0; $i < 480; ++$i) {
     } else {
         $months[$i] = 'xx';
     }
-
 }
 
 // new Graph\Graph with a drop shadow

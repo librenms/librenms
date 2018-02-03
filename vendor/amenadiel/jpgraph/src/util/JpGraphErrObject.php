@@ -10,9 +10,8 @@ namespace Amenadiel\JpGraph\Util;
 //=============================================================
 class JpGraphErrObject
 {
-
     protected $iTitle = "JpGraph error: ";
-    protected $iDest = false;
+    protected $iDest  = false;
 
     public function __construct()
     {
@@ -37,7 +36,7 @@ class JpGraphErrObject
                 error_log($this->iTitle . $aMsg);
             } else {
                 $str = '[' . date('r') . '] ' . $this->iTitle . $aMsg . "\n";
-                $f = @fopen($this->iDest, 'a');
+                $f   = @fopen($this->iDest, 'a');
                 if ($f) {
                     @fwrite($f, $str);
                     @fclose($f);
@@ -56,6 +55,5 @@ class JpGraphErrObject
         if ($aHalt) {
             exit(1);
         }
-
     }
 }

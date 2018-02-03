@@ -4,10 +4,10 @@ require_once 'jpgraph/jpgraph_line.php';
 use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
 
-$ydata = array(2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+$ydata  = array(2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
 $ydata2 = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-$targ = array("#1", "#2", "#3", "#4", "#5", "#6", "#7", "#8", "#9", "#10");
-$alt = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+$targ   = array("#1", "#2", "#3", "#4", "#5", "#6", "#7", "#8", "#9", "#10");
+$alt    = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
 // Create the graph.
 $graph = new Graph\Graph(300, 200);

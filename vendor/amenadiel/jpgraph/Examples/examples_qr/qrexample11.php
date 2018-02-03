@@ -1,6 +1,6 @@
 <?php
 // Include the library
-require_once ('jpgraph/QR/qrencoder.inc.php');
+require_once('jpgraph/QR/qrencoder.inc.php');
 
 // Example 11 : Generate postscript output
 
@@ -11,7 +11,7 @@ $modulewidth  = 3;
 
 // Create a new instance of the encoder using the specified
 // QR version and error correction
-$encoder = new QREncoder($version,$corrlevel);
+$encoder = new QREncoder($version, $corrlevel);
 
 // Use the image backend
 $backend = QRCodeBackendFactory::Create($encoder, BACKEND_PS);
@@ -23,4 +23,3 @@ $backend->SetModuleWidth($modulewidth);
 $ps_str = $backend->Stroke($data);
 
 echo '<pre>'.$ps_str.'</pre>';
-?>

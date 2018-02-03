@@ -15,9 +15,9 @@ $bplot = new Plot\BarPlot($datay);
 
 // Create targets for the image maps so that the details are opened in a separate window
 $fmtStr = "javascript:window.open('barcsim_details.php?id=%d','_new','width=500,height=300');void(0)";
-$n = count($datay);
-$targ = array();
-$alts = array();
+$n      = count($datay);
+$targ   = array();
+$alts   = array();
 for ($i = 0; $i < $n; ++$i) {
     $targ[$i] = sprintf($fmtStr, $i + 1);
     $alts[$i] = 'val=%d';

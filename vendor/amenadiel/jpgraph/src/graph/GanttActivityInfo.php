@@ -143,17 +143,24 @@ if (!function_exists('array_fill')) {
 //===================================================
 class GanttActivityInfo
 {
-    public $iShow = true;
-    public $iLeftColMargin = 4, $iRightColMargin = 1, $iTopColMargin = 1, $iBottomColMargin = 3;
-    public $vgrid = null;
-    private $iColor = 'black';
-    private $iBackgroundColor = 'lightgray';
-    private $iFFamily = FF_FONT1, $iFStyle = FS_NORMAL, $iFSize = 10, $iFontColor = 'black';
-    private $iTitles = array();
-    private $iWidth = array(), $iHeight = -1;
-    private $iTopHeaderMargin = 4;
-    private $iStyle = 1;
-    private $iHeaderAlign = 'center';
+    public $iShow               = true;
+    public $iLeftColMargin      = 4;
+    public $iRightColMargin     = 1;
+    public $iTopColMargin       = 1;
+    public $iBottomColMargin    = 3;
+    public $vgrid               = null;
+    private $iColor             = 'black';
+    private $iBackgroundColor   = 'lightgray';
+    private $iFFamily           = FF_FONT1;
+    private $iFStyle            = FS_NORMAL;
+    private $iFSize             = 10;
+    private $iFontColor         = 'black';
+    private $iTitles            = array();
+    private $iWidth             = array();
+    private $iHeight            = -1;
+    private $iTopHeaderMargin   = 4;
+    private $iStyle             = 1;
+    private $iHeaderAlign       = 'center';
 
     public function __construct()
     {
@@ -174,8 +181,8 @@ class GanttActivityInfo
     public function SetFont($aFFamily, $aFStyle = FS_NORMAL, $aFSize = 10)
     {
         $this->iFFamily = $aFFamily;
-        $this->iFStyle = $aFStyle;
-        $this->iFSize = $aFSize;
+        $this->iFStyle  = $aFStyle;
+        $this->iFSize   = $aFSize;
     }
 
     public function SetStyle($aStyle)
@@ -185,7 +192,7 @@ class GanttActivityInfo
 
     public function SetColumnMargin($aLeft, $aRight)
     {
-        $this->iLeftColMargin = $aLeft;
+        $this->iLeftColMargin  = $aLeft;
         $this->iRightColMargin = $aRight;
     }
 
@@ -207,7 +214,7 @@ class GanttActivityInfo
     public function SetColTitles($aTitles, $aWidth = null)
     {
         $this->iTitles = $aTitles;
-        $this->iWidth = $aWidth;
+        $this->iWidth  = $aWidth;
     }
 
     public function SetMinColWidth($aWidths)
@@ -228,9 +235,9 @@ class GanttActivityInfo
     {
         $txt = new TextProperty();
         $txt->SetFont($this->iFFamily, $this->iFStyle, $this->iFSize);
-        $n = count($this->iTitles);
+        $n  = count($this->iTitles);
         $rm = $this->iRightColMargin;
-        $w = 0;
+        $w  = 0;
         for ($h = 0, $i = 0; $i < $n; ++$i) {
             $w += $this->iLeftColMargin;
             $txt->Set($this->iTitles[$i]);
@@ -244,14 +251,14 @@ class GanttActivityInfo
             $h = max($h, $txt->GetHeight($aImg));
         }
         $this->iHeight = $h + $this->iTopHeaderMargin;
-        $txt = '';
+        $txt           = '';
         return $w;
     }
 
     public function GetColStart($aImg, &$aStart, $aAddLeftMargin = false)
     {
-        $n = count($this->iTitles);
-        $adj = $aAddLeftMargin ? $this->iLeftColMargin : 0;
+        $n      = count($this->iTitles);
+        $adj    = $aAddLeftMargin ? $this->iLeftColMargin : 0;
         $aStart = array($aImg->left_margin + $adj);
         for ($i = 1; $i < $n; ++$i) {
             $aStart[$i] = $aStart[$i - 1] + $this->iLeftColMargin + $this->iWidth[$i - 1];
@@ -266,7 +273,6 @@ class GanttActivityInfo
 
     public function Stroke($aImg, $aXLeft, $aYTop, $aXRight, $aYBottom, $aUseTextHeight = false)
     {
-
         if (!$this->iShow) {
             return;
         }
@@ -281,8 +287,8 @@ class GanttActivityInfo
             return;
         }
 
-        $x = $aXLeft;
-        $h = $this->iHeight;
+        $x    = $aXLeft;
+        $h    = $this->iHeight;
         $yTop = $aUseTextHeight ? $aYBottom - $h - $this->iTopColMargin - $this->iBottomColMargin : $aYTop;
 
         if ($h < 0) {

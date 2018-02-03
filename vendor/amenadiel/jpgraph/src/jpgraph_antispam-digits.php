@@ -10,8 +10,9 @@
 
 class HandDigits
 {
-    public $digits = array();
-    public $iHeight = 30, $iWidth = 30;
+    public $digits  = array();
+    public $iHeight = 30;
+    public $iWidth  = 30;
 
     public function __construct()
     {
@@ -156,7 +157,6 @@ class HandDigits
 
 class AntiSpam
 {
-
     private $iNumber = '';
 
     public function __construct($aNumber = '')
@@ -176,7 +176,6 @@ class AntiSpam
 
     public function Stroke()
     {
-
         $n = strlen($this->iNumber);
         for ($i = 0; $i < $n; ++$i) {
             if (!is_numeric($this->iNumber[$i]) || $this->iNumber[$i] == 0) {
@@ -184,8 +183,8 @@ class AntiSpam
             }
         }
 
-        $dd = new HandDigits();
-        $n = strlen($this->iNumber);
+        $dd  = new HandDigits();
+        $n   = strlen($this->iNumber);
         $img = @imagecreatetruecolor($n * $dd->iWidth, $dd->iHeight);
         if ($img < 1) {
             return false;

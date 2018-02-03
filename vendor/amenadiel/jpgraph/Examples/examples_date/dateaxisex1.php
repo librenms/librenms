@@ -9,12 +9,12 @@ function TimeCallback($aVal)
 }
 
 // Fake some suitable random data
-$now = time();
+$now   = time();
 $datax = array($now);
 for ($i = 0; $i < 360; $i += 10) {
     $datax[] = $now + $i;
 }
-$n = count($datax);
+$n     = count($datax);
 $datay = array();
 for ($i = 0; $i < $n; ++$i) {
     $datay[] = rand(30, 150);

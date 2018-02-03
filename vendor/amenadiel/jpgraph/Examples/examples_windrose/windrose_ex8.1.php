@@ -2,23 +2,24 @@
 require_once '../../vendor/autoload.php';
 use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
+
 // Data can be specified using both ordinal index of the axis
 // as well as the direction label.
 $data = array(
     '45.9' => array(3, 2, 1, 2, 2),
-    355 => array(1, 1, 1.5, 2),
-    180 => array(1, 1, 1.5, 2),
-    150 => array(1, 2, 1, 3),
-    'S' => array(2, 3, 5, 1),
+    355    => array(1, 1, 1.5, 2),
+    180    => array(1, 1, 1.5, 2),
+    150    => array(1, 2, 1, 3),
+    'S'    => array(2, 3, 5, 1),
 );
 
 // Add some labels for  afew of the directions
 $labels = array(355 => "At\nHome base", 180 => "Probe\n123", 150 => "Power\nplant");
 
 // Define the color,weight and style of some individual radial grid lines.
-$axiscolors = array(355 => "red");
+$axiscolors  = array(355 => "red");
 $axisweights = array(355 => 8);
-$axisstyles = array(355 => 'solid', 150 => 'solid');
+$axisstyles  = array(355 => 'solid', 150 => 'solid');
 
 // First create a new windrose graph with a title
 $graph = new Graph\WindroseGraph(400, 460);

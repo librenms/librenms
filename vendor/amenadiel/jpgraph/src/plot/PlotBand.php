@@ -23,20 +23,22 @@ class PlotBand
 {
     public $depth; // Determine if band should be over or under the plots
     private $prect = null;
-    private $dir, $min, $max;
+    private $dir;
+    private $min;
+    private $max;
 
     public function __construct($aDir, $aPattern, $aMin, $aMax, $aColor = "black", $aWeight = 1, $aDepth = DEPTH_BACK)
     {
-        $f = new RectPatternFactory();
+        $f           = new RectPatternFactory();
         $this->prect = $f->Create($aPattern, $aColor, $aWeight);
         if (is_numeric($aMin) && is_numeric($aMax) && ($aMin > $aMax)) {
             Util\JpGraphError::RaiseL(16004);
         }
 
         //('Min value for plotband is larger than specified max value. Please correct.');
-        $this->dir = $aDir;
-        $this->min = $aMin;
-        $this->max = $aMax;
+        $this->dir   = $aDir;
+        $this->min   = $aMin;
+        $this->max   = $aMax;
         $this->depth = $aDepth;
     }
 
@@ -103,11 +105,11 @@ class PlotBand
                 $this->min = max($this->min, $aYScale->GetMinVal());
                 $this->max = min($this->max, $aYScale->GetMaxVal());
 
-                $x = $aXScale->scale_abs[0];
-                $y = $aYScale->Translate($this->max);
-                $width = $aXScale->scale_abs[1] - $aXScale->scale_abs[0] + 1;
+                $x      = $aXScale->scale_abs[0];
+                $y      = $aYScale->Translate($this->max);
+                $width  = $aXScale->scale_abs[1] - $aXScale->scale_abs[0] + 1;
                 $height = abs($y - $aYScale->Translate($this->min)) + 1;
-                $this->prect->SetPos(new Rectangle($x, $y, $width, $height));
+                $this->prect->SetPos(new Util\Rectangle($x, $y, $width, $height));
                 $this->prect->Stroke($aImg);
             }
         } else {
@@ -127,11 +129,11 @@ class PlotBand
                 $this->min = max($this->min, $aXScale->GetMinVal());
                 $this->max = min($this->max, $aXScale->GetMaxVal());
 
-                $y = $aYScale->scale_abs[1];
-                $x = $aXScale->Translate($this->min);
+                $y      = $aYScale->scale_abs[1];
+                $x      = $aXScale->Translate($this->min);
                 $height = abs($aYScale->scale_abs[1] - $aYScale->scale_abs[0]);
-                $width = abs($x - $aXScale->Translate($this->max));
-                $this->prect->SetPos(new Rectangle($x, $y, $width, $height));
+                $width  = abs($x - $aXScale->Translate($this->max));
+                $this->prect->SetPos(new Util\Rectangle($x, $y, $width, $height));
                 $this->prect->Stroke($aImg);
             }
         }

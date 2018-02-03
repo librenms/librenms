@@ -1,14 +1,14 @@
 <?php
-require_once ('jpgraph/jpgraph.php');
-require_once ('jpgraph/jpgraph_odo.php');
+require_once('jpgraph/jpgraph.php');
+require_once('jpgraph/jpgraph_odo.php');
 
 // Create a new odometer graph
-$graph = new OdoGraph(300,320);
+$graph = new OdoGraph(300, 320);
 
 // Setup graph titles
 $graph->title->Set('Manual positioning');
 $graph->title->SetColor('white');
-$graph->title->SetFont(FF_ARIAL,FS_BOLD,14);
+$graph->title->SetFont(FF_ARIAL, FS_BOLD, 14);
 
 // Add drop shadow for graph
 $graph->SetShadow();
@@ -28,9 +28,9 @@ $odo1->needle->SetShadow();
 $odo2->needle->SetShadow();
 
 // Specify the position for the two odometers
-$odo1->SetPos(180,110);
+$odo1->SetPos(180, 110);
 $odo1->SetSize(100);
-$odo2->SetPos(110,250);
+$odo2->SetPos(110, 250);
 $odo2->SetSize(100);
 
 // Set captions for the odometers
@@ -43,4 +43,3 @@ $graph->Add($odo2);
 
 // ... and finally stroke and stream the image back to the browser
 $graph->Stroke();
-?>

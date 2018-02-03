@@ -6,10 +6,10 @@ namespace Amenadiel\JpGraph\Themes;
  */
 class AquaTheme extends Theme
 {
-    protected $font_color = '#0044CC';
+    protected $font_color       = '#0044CC';
     protected $background_color = '#DDFFFF';
-    protected $axis_color = '#0066CC';
-    protected $grid_color = '#3366CC';
+    protected $axis_color       = '#0066CC';
+    protected $grid_color       = '#3366CC';
 
     public function GetColorList()
     {
@@ -128,7 +128,7 @@ class AquaTheme extends Theme
     public function PreStrokeApply($graph)
     {
         if ($graph->legend->HasItems()) {
-            $img = $graph->img;
+            $img    = $graph->img;
             $height = $img->height;
             $graph->SetMargin(
                 $img->raw_left_margin,
@@ -141,7 +141,6 @@ class AquaTheme extends Theme
 
     public function ApplyPlot($plot)
     {
-
         switch (get_class($plot)) {
             case 'GroupBarPlot':
                 {

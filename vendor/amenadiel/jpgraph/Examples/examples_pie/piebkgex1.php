@@ -2,6 +2,7 @@
 require_once '../../vendor/autoload.php';
 use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
+
 // Some data
 $data = array(
     array(80, 18, 15, 17),
@@ -34,7 +35,7 @@ $graph->title->SetColor('white');
 $p = array();
 // Create the plots
 for ($i = 0; $i < $n; ++$i) {
-    $d = "data$i";
+    $d   = "data$i";
     $p[] = new Plot\PiePlot3D($data[$i]);
 }
 

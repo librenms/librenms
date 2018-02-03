@@ -4,7 +4,7 @@ require_once 'jpgraph/jpgraph_log.php';
 use Amenadiel\JpGraph\Graph;
 use Amenadiel\JpGraph\Plot;
 
-$ydata = array(11, 3, 8, 12, 5, 1, 9, 13, 5, 7);
+$ydata  = array(11, 3, 8, 12, 5, 1, 9, 13, 5, 7);
 $y2data = array(354, 200, 265, 99, 111, 91, 198, 225, 293, 251);
 
 // Create the graph. These two calls are always required
@@ -18,7 +18,7 @@ $graph->ygrid->Show(true, true);
 $graph->xgrid->Show(true, false);
 
 // Create the linear plot
-$lineplot = new Plot\LinePlot($ydata);
+$lineplot  = new Plot\LinePlot($ydata);
 $lineplot2 = new Plot\LinePlot($y2data);
 
 // Add the plot to the graph

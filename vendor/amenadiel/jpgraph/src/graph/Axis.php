@@ -13,7 +13,6 @@ use Amenadiel\JpGraph\Util;
 //===================================================
 class Axis extends AxisPrototype
 {
-
     public function __construct($img, $aScale, $color = 'black')
     {
         parent::__construct($img, $aScale, $color);
@@ -37,7 +36,7 @@ class Axis extends AxisPrototype
             } else {
                 // If negative set x-axis at 0
                 $this->pos = 0;
-                $pos = $aOtherAxisScale->Translate(0);
+                $pos       = $aOtherAxisScale->Translate(0);
             }
         }
 
@@ -57,10 +56,10 @@ class Axis extends AxisPrototype
                 );
             }
             if ($this->title_side == SIDE_DOWN) {
-                $y = $pos + $this->img->GetFontHeight() + $this->title_margin + $this->title->margin;
+                $y      = $pos + $this->img->GetFontHeight() + $this->title_margin + $this->title->margin;
                 $yalign = 'top';
             } else {
-                $y = $pos - $this->img->GetFontHeight() - $this->title_margin - $this->title->margin;
+                $y      = $pos - $this->img->GetFontHeight() - $this->title_margin - $this->title->margin;
                 $yalign = 'bottom';
             }
 
@@ -128,7 +127,6 @@ class Axis extends AxisPrototype
     // Draw all the tick labels on major tick marks
     public function StrokeLabels($aPos, $aMinor = false, $aAbsLabel = false)
     {
-
         if (is_array($this->label_color) && count($this->label_color) > 3) {
             $this->ticks_label_colors = $this->label_color;
             $this->img->SetColor($this->label_color[0]);
@@ -193,9 +191,7 @@ class Axis extends AxisPrototype
                     if ($this->scale->textscale &&
                         $this->scale->ticks->label_formfunc == '' &&
                         !$this->scale->ticks->HaveManualLabels()) {
-
                         ++$label;
-
                     }
                 }
 
@@ -207,7 +203,6 @@ class Axis extends AxisPrototype
                             } else {
                                 $this->img->SetTextAlign($this->label_halign, $this->label_valign);
                             }
-
                         } else {
                             if ($this->label_halign == '' && $this->label_valign == '') {
                                 $this->img->SetTextAlign("right", "top");
@@ -260,5 +255,4 @@ class Axis extends AxisPrototype
             ++$i;
         }
     }
-
 }

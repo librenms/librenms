@@ -647,14 +647,16 @@ class Console_Table
 
         $return = array();
         for ($i = 0; $i < count($this->_data); $i++) {
-            for ($j = 0; $j < count($this->_data[$i]); $j++) {
-                if ($this->_data[$i] !== CONSOLE_TABLE_HORIZONTAL_RULE &&
-                    $this->_strlen($this->_data[$i][$j]) <
-                    $this->_cell_lengths[$j]) {
-                    $this->_data[$i][$j] = $this->_strpad($this->_data[$i][$j],
-                                                          $this->_cell_lengths[$j],
-                                                          ' ',
-                                                          $this->_col_align[$j]);
+            if (is_array($this->_data[$i])) {
+                for ($j = 0; $j < count($this->_data[$i]); $j++) {
+                    if ($this->_data[$i] !== CONSOLE_TABLE_HORIZONTAL_RULE &&
+                        $this->_strlen($this->_data[$i][$j]) <
+                        $this->_cell_lengths[$j]) {
+                        $this->_data[$i][$j] = $this->_strpad($this->_data[$i][$j],
+                                                              $this->_cell_lengths[$j],
+                                                              ' ',
+                                                              $this->_col_align[$j]);
+                    }
                 }
             }
 
@@ -786,7 +788,7 @@ class Console_Table
     function _updateRowsCols($rowdata = null)
     {
         // Update maximum columns.
-        $this->_max_cols = max($this->_max_cols, count($rowdata));
+        $this->_max_cols = max($this->_max_cols, is_array($rowdata) ? count($rowdata) : 0);
 
         // Update maximum rows.
         ksort($this->_data);
@@ -822,12 +824,14 @@ class Console_Table
      */
     function _calculateCellLengths($row)
     {
-        for ($i = 0; $i < count($row); $i++) {
-            if (!isset($this->_cell_lengths[$i])) {
-                $this->_cell_lengths[$i] = 0;
+        if (is_array($row)) {
+            for ($i = 0; $i < count($row); $i++) {
+               if (!isset($this->_cell_lengths[$i])) {
+                    $this->_cell_lengths[$i] = 0;
+                }
+                $this->_cell_lengths[$i] = max($this->_cell_lengths[$i],
+                                               $this->_strlen($row[$i]));
             }
-            $this->_cell_lengths[$i] = max($this->_cell_lengths[$i],
-                                           $this->_strlen($row[$i]));
         }
     }
 

@@ -7,17 +7,17 @@ $datay = array(2, 3, -5, 8, 12, 6, 3);
 $datax = array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul");
 
 // Size of graph
-$width = 400;
+$width  = 400;
 $height = 500;
 
 // Set the basic parameters of the graph
 $graph = new Graph\Graph($width, $height, 'auto');
 $graph->SetScale("textlin");
 
-$top = 50;
+$top    = 50;
 $bottom = 80;
-$left = 50;
-$right = 20;
+$left   = 50;
+$right  = 20;
 $graph->Set90AndMargin($left, $right, $top, $bottom);
 
 $graph->xaxis->SetPos('min');

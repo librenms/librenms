@@ -16,7 +16,7 @@ class Bezier
      */
     private $datax = array();
     private $datay = array();
-    private $n = 0;
+    private $n     = 0;
 
     public function __construct($datax, $datay, $attraction_factor = 1)
     {
@@ -52,8 +52,8 @@ class Bezier
         $datay = array();
         for ($i = 0; $i < $steps; $i++) {
             list($datumx, $datumy) = $this->GetPoint((double) $i / (double) $steps);
-            $datax[$i] = $datumx;
-            $datay[$i] = $datumy;
+            $datax[$i]             = $datumx;
+            $datay[$i]             = $datumy;
         }
 
         $datax[] = end($this->datax);
@@ -72,22 +72,22 @@ class Bezier
      */
     public function GetPoint($mu)
     {
-        $n = $this->n - 1;
-        $k = 0;
-        $kn = 0;
-        $nn = 0;
-        $nkn = 0;
+        $n     = $this->n - 1;
+        $k     = 0;
+        $kn    = 0;
+        $nn    = 0;
+        $nkn   = 0;
         $blend = 0.0;
-        $newx = 0.0;
-        $newy = 0.0;
+        $newx  = 0.0;
+        $newy  = 0.0;
 
-        $muk = 1.0;
+        $muk  = 1.0;
         $munk = (double) pow(1 - $mu, (double) $n);
 
         for ($k = 0; $k <= $n; $k++) {
-            $nn = $n;
-            $kn = $k;
-            $nkn = $n - $k;
+            $nn    = $n;
+            $kn    = $k;
+            $nkn   = $n - $k;
             $blend = $muk * $munk;
             $muk *= $mu;
             $munk /= (1 - $mu);

@@ -1,10 +1,10 @@
 <?php
-require_once ('jpgraph/jpgraph.php');
-require_once ('jpgraph/jpgraph_canvas.php');
-require_once ('jpgraph/jpgraph_table.php');
+require_once('jpgraph/jpgraph.php');
+require_once('jpgraph/jpgraph_canvas.php');
+require_once('jpgraph/jpgraph_table.php');
 
 // Setup graph context
-$graph = new CanvasGraph(430,150);
+$graph = new CanvasGraph(430, 150);
 
 // Setup the basic table
 $data = array(
@@ -18,7 +18,7 @@ $data = array(
 // Setup the basic table and font
 $table = new GTextTable();
 $table->Set($data);
-$table->SetFont(FF_TIMES,FS_NORMAL,11);
+$table->SetFont(FF_TIMES, FS_NORMAL, 11);
 
 // Set default table alignment
 $table->SetAlign('right');

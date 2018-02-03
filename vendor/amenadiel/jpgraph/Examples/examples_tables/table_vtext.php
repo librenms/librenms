@@ -1,10 +1,10 @@
 <?php
-require_once ('jpgraph/jpgraph.php');
-require_once ('jpgraph/jpgraph_canvas.php');
-require_once ('jpgraph/jpgraph_table.php');
+require_once('jpgraph/jpgraph.php');
+require_once('jpgraph/jpgraph_canvas.php');
+require_once('jpgraph/jpgraph_table.php');
 
 // Setup a basic canvas graph context
-$graph = new CanvasGraph(630,600);
+$graph = new CanvasGraph(630, 600);
 
 // Setup the basic table
 $data = array(
@@ -19,18 +19,18 @@ $data = array(
 $table = new GTextTable();
 $table->Set($data);
 $table->SetAlign('right');
-$table->SetFont(FF_TIMES,FS_NORMAL,12);
-$table->SetCellFont(0,0,FF_ARIAL,FS_BOLD,16);
+$table->SetFont(FF_TIMES, FS_NORMAL, 12);
+$table->SetCellFont(0, 0, FF_ARIAL, FS_BOLD, 16);
 
 // Rotate the entire table 90 degrees
 $table->SetTextOrientation(90);
 //$table->SetCellTextOrientation(0,0,0);
 
 // Setup background color for header column
-$table->SetColFillColor(0,'lightgray');
+$table->SetColFillColor(0, 'lightgray');
 
 // Set the imnimum row height
-$table->SetMinRowHeight(0,150);
+$table->SetMinRowHeight(0, 150);
 
 // Add table to graph
 $graph->Add($table);

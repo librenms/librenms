@@ -25,16 +25,19 @@ define('VERT_EDGE', 1);
  */
 class Contour
 {
-
-    private $dataPoints = array();
-    private $nbrCols = 0, $nbrRows = 0;
-    private $horizEdges = array(), $vertEdges = array();
-    private $isobarValues = array();
-    private $stack = null;
-    private $isobarCoord = array();
-    private $nbrIsobars = 10, $isobarColors = array();
-    private $invert = true;
-    private $highcontrast = false, $highcontrastbw = false;
+    private $dataPoints     = array();
+    private $nbrCols        = 0;
+    private $nbrRows        = 0;
+    private $horizEdges     = array();
+    private $vertEdges      = array();
+    private $isobarValues   = array();
+    private $stack          = null;
+    private $isobarCoord    = array();
+    private $nbrIsobars     = 10;
+    private $isobarColors   = array();
+    private $invert         = true;
+    private $highcontrast   = false;
+    private $highcontrastbw = false;
 
     /**
      * Create a new contour level "algorithm machine".
@@ -47,21 +50,20 @@ class Contour
      */
     public function __construct($aMatrix, $aIsobars = 10, $aColors = null)
     {
-
-        $this->nbrRows = count($aMatrix);
-        $this->nbrCols = count($aMatrix[0]);
+        $this->nbrRows    = count($aMatrix);
+        $this->nbrCols    = count($aMatrix[0]);
         $this->dataPoints = $aMatrix;
 
         if (is_array($aIsobars)) {
             // use the isobar values supplied
-            $this->nbrIsobars = count($aIsobars);
+            $this->nbrIsobars   = count($aIsobars);
             $this->isobarValues = $aIsobars;
         } else {
             // Determine the isobar values automatically
             $this->nbrIsobars = $aIsobars;
-            list($min, $max) = $this->getMinMaxVal();
-            $stepSize = ($max - $min) / $aIsobars;
-            $isobar = $min + $stepSize / 2;
+            list($min, $max)  = $this->getMinMaxVal();
+            $stepSize         = ($max - $min) / $aIsobars;
+            $isobar           = $min + $stepSize / 2;
             for ($i = 0; $i < $aIsobars; $i++) {
                 $this->isobarValues[$i] = $isobar;
                 $isobar += $stepSize;
@@ -69,7 +71,6 @@ class Contour
         }
 
         if ($aColors !== null && count($aColors) > 0) {
-
             if (!is_array($aColors)) {
                 Util\JpGraphError::RaiseL(28001);
                 //'Third argument to Contour must be an array of colors.'
@@ -113,7 +114,6 @@ class Contour
             if (($ma = max($this->dataPoints[$i])) > $max) {
                 $max = $ma;
             }
-
         }
         return array($min, $max);
     }
@@ -143,7 +143,6 @@ class Contour
      */
     public function isobarHCrossing($aRow, $aCol, $aIsobar)
     {
-
         if ($aCol >= $this->nbrCols - 1) {
             Util\JpGraphError::RaiseL(28003, $aCol);
             //'ContourPlot Internal Error: isobarHCrossing: Coloumn index too large (%d)'
@@ -157,7 +156,6 @@ class Contour
         $v2 = $this->dataPoints[$aRow][$aCol + 1];
 
         return ($aIsobar - $v1) * ($aIsobar - $v2) < 0;
-
     }
 
     /**
@@ -170,7 +168,6 @@ class Contour
      */
     public function isobarVCrossing($aRow, $aCol, $aIsobar)
     {
-
         if ($aRow >= $this->nbrRows - 1) {
             Util\JpGraphError::RaiseL(28005, $aRow);
             //'isobarVCrossing: Row index too large
@@ -184,7 +181,6 @@ class Contour
         $v2 = $this->dataPoints[$aRow + 1][$aCol];
 
         return ($aIsobar - $v1) * ($aIsobar - $v2) < 0;
-
     }
 
     /**
@@ -195,13 +191,12 @@ class Contour
      */
     public function determineIsobarEdgeCrossings($aIsobar)
     {
-
         $ib = $this->isobarValues[$aIsobar];
 
         for ($i = 0; $i < $this->nbrRows - 1; $i++) {
             for ($j = 0; $j < $this->nbrCols - 1; $j++) {
                 $this->edges[HORIZ_EDGE][$i][$j] = $this->isobarHCrossing($i, $j, $ib);
-                $this->edges[VERT_EDGE][$i][$j] = $this->isobarVCrossing($i, $j, $ib);
+                $this->edges[VERT_EDGE][$i][$j]  = $this->isobarVCrossing($i, $j, $ib);
             }
         }
 
@@ -212,7 +207,6 @@ class Contour
         for ($j = 0; $j < $this->nbrCols - 1; $j++) {
             $this->edges[HORIZ_EDGE][$i][$j] = $this->isobarHCrossing($this->nbrRows - 1, $j, $ib);
         }
-
     }
 
     /**
@@ -252,7 +246,6 @@ class Contour
             $ycoord = $this->nbrRows - 1 - $ycoord;
         }
         return array($xcoord, $ycoord);
-
     }
 
     /**
@@ -264,7 +257,6 @@ class Contour
      */
     public function adjustDataPointValues()
     {
-
         $ni = count($this->isobarValues);
         for ($k = 0; $k < $ni; $k++) {
             $ib = $this->isobarValues[$k];
@@ -276,7 +268,6 @@ class Contour
                 }
             }
         }
-
     }
 
     /**
@@ -286,7 +277,7 @@ class Contour
      */
     public function UseHighContrastColor($aFlg = true, $aBW = false)
     {
-        $this->highcontrast = $aFlg;
+        $this->highcontrast   = $aFlg;
         $this->highcontrastbw = $aBW;
     }
 
@@ -309,8 +300,8 @@ class Contour
                 }
             }
         } else {
-            $n = $this->nbrIsobars;
-            $v = 0;
+            $n    = $this->nbrIsobars;
+            $v    = 0;
             $step = 1 / ($this->nbrIsobars - 1);
             for ($ib = 0; $ib < $this->nbrIsobars; $ib++) {
                 $this->isobarColors[$ib] = Image\RGB::GetSpectrum($v);
@@ -330,11 +321,9 @@ class Contour
      */
     public function getIsobars()
     {
-
         $this->adjustDataPointValues();
 
         for ($isobar = 0; $isobar < $this->nbrIsobars; $isobar++) {
-
             $ib = $this->isobarValues[$isobar];
             $this->resetEdgeMatrices();
             $this->determineIsobarEdgeCrossings($isobar);
@@ -364,8 +353,8 @@ class Contour
                     }
 
                     if ($n == 2) {
-                        $n1 = 0;
-                        $n2 = 1;
+                        $n1                                    = 0;
+                        $n2                                    = 1;
                         $this->isobarCoord[$isobar][$ncoord++] = array(
                             $this->getCrossingCoord($neigh[$n1][0], $neigh[$n1][1], $neigh[$n1][2], $ib),
                             $this->getCrossingCoord($neigh[$n2][0], $neigh[$n2][1], $neigh[$n2][2], $ib));
@@ -375,7 +364,7 @@ class Contour
                         // the cell by averaging the for corners. This will compared with the value of the
                         // top left corner will help determine the orientation of the ridge/creek
                         $midval = ($this->dataPoints[$row][$col] + $this->dataPoints[$row][$col + 1] + $this->dataPoints[$row + 1][$col] + $this->dataPoints[$row + 1][$col + 1]) / 4;
-                        $v = $this->dataPoints[$row][$col];
+                        $v      = $this->dataPoints[$row][$col];
                         if ($midval == $ib) {
                             // Orientation "+"
                             $n1 = 0;
@@ -403,7 +392,6 @@ class Contour
                         $this->isobarCoord[$isobar][$ncoord++] = array(
                             $this->getCrossingCoord($neigh[$n3][0], $neigh[$n3][1], $neigh[$n3][2], $ib),
                             $this->getCrossingCoord($neigh[$n4][0], $neigh[$n4][1], $neigh[$n4][2], $ib));
-
                     }
                 }
             }

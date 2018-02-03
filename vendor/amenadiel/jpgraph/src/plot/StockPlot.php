@@ -17,9 +17,11 @@ namespace Amenadiel\JpGraph\Plot;
 class StockPlot extends Plot
 {
     protected $iTupleSize = 4;
-    private $iWidth = 9;
-    private $iEndLines = 1;
-    private $iStockColor1 = 'white', $iStockColor2 = 'darkred', $iStockColor3 = 'darkred';
+    private $iWidth       = 9;
+    private $iEndLines    = 1;
+    private $iStockColor1 = 'white';
+    private $iStockColor2 = 'darkred';
+    private $iStockColor3 = 'darkred';
     //---------------
     // CONSTRUCTOR
     public function __construct($datay, $datax = false)
@@ -37,7 +39,7 @@ class StockPlot extends Plot
 
     public function SetColor($aColor, $aColor1 = 'white', $aColor2 = 'darkred', $aColor3 = 'darkred')
     {
-        $this->color = $aColor;
+        $this->color        = $aColor;
         $this->iStockColor1 = $aColor1;
         $this->iStockColor2 = $aColor2;
         $this->iStockColor3 = $aColor3;
@@ -94,7 +96,7 @@ class StockPlot extends Plot
             $xs = 0;
         }
 
-        $ts = $this->iTupleSize;
+        $ts              = $this->iTupleSize;
         $this->csimareas = '';
         for ($i = 0; $i < $n; ++$i) {
 
@@ -108,17 +110,16 @@ class StockPlot extends Plot
                 if ($x === null) {
                     continue;
                 }
-
             } else {
                 $x = $i;
             }
             $xt = $xscale->Translate($x);
 
-            $neg = $this->coords[0][$i * $ts] > $this->coords[0][$i * $ts + 1];
-            $yopen = $yscale->Translate($this->coords[0][$i * $ts]);
+            $neg    = $this->coords[0][$i * $ts] > $this->coords[0][$i * $ts + 1];
+            $yopen  = $yscale->Translate($this->coords[0][$i * $ts]);
             $yclose = $yscale->Translate($this->coords[0][$i * $ts + 1]);
-            $ymin = $yscale->Translate($this->coords[0][$i * $ts + 2]);
-            $ymax = $yscale->Translate($this->coords[0][$i * $ts + 3]);
+            $ymin   = $yscale->Translate($this->coords[0][$i * $ts + 2]);
+            $ymax   = $yscale->Translate($this->coords[0][$i * $ts + 3]);
 
             $dx = floor($this->iWidth / 2);
             $xl = $xt - $dx;
@@ -140,10 +141,10 @@ class StockPlot extends Plot
             $img->Rectangle($xl, $yopen, $xr, $yclose);
 
             if ($yopen < $yclose) {
-                $ytop = $yopen;
+                $ytop    = $yopen;
                 $ybottom = $yclose;
             } else {
-                $ytop = $yclose;
+                $ytop    = $yclose;
                 $ybottom = $yopen;
             }
             $img->SetColor($this->color);
@@ -177,6 +178,6 @@ class StockPlot extends Plot
 
     // A hook for subclasses to modify the plot
     public function ModBox($img, $xscale, $yscale, $i, $xl, $xr, $neg)
-    {}
-
+    {
+    }
 } // Class

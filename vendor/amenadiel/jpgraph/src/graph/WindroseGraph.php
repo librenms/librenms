@@ -8,8 +8,9 @@ use Amenadiel\JpGraph\Util;
 //============================================================
 class WindroseGraph extends Graph
 {
-    private $posx, $posy;
-    public $plots = array();
+    private $posx;
+    private $posy;
+    public $plots = [];
 
     public function __construct($width = 300, $height = 200, $cachedName = "", $timeout = 0, $inline = 1)
     {
@@ -124,5 +125,4 @@ class WindroseGraph extends Graph
                 $aStrokeFileName);
         }
     }
-
 } // Class
