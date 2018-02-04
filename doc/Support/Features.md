@@ -49,6 +49,7 @@ If you are unsure of whether your device is supported or not, feel free to ask u
 * Cambium
 * Canon
 * Canopy
+* Carel
 * Check Point
 * Cisco
 * Cisco Small Business
@@ -74,6 +75,7 @@ If you are unsure of whether your device is supported or not, feel free to ask u
 * Fortinet
 * FreeBSD
 * Gamatronic
+* Generex
 * Hikvision
 * HP
 * Huawei
@@ -126,6 +128,7 @@ If you are unsure of whether your device is supported or not, feel free to ask u
 * Raritan
 * Redback
 * Ricoh
+* Rittal
 * Riverbed
 * Ruckus
 * SAF Tehnika
