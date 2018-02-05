@@ -1,0 +1,608 @@
+-- ==================================================================
+-- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description£º  HUAWEI Lan Switch Platform Device Management MIB
+-- Reference:
+-- Version: V2.3
+-- History:
+--      V1.0 (1) Created by Hou Qiang, 2001.06.29
+--           (2) Revised by Qi Zhenglin, 2001.12.30 ----r003 revision
+--      V1.1 2004/7/20 import hwLswFrameIndex, hwLswSlotIndex
+--           FROM A3COM-HUAWEI-DEVICE-MIB
+--      V1.2 2004/09/10
+--           1) change all MIB objects' STATUS from mandatory to current.
+--           2) remove statement before hwLswdevMMib
+--           3) adjust file format, change tab to space and some small
+--              changes.
+--           4) change STATUS of hwCfmWriteFlash and hwCfmEraseFlash
+--              from write-only to read-write.
+--      V2.0 2004-10-12 updated by gaolong
+--           Import Gauge32, OBJECT-IDENTITY.
+--           Relocate hwLswdevMMib MODULE-IDENTITY clause.
+--           Change ACCESS to MAX-ACCESS
+--           Change Gauge to Gauge32.
+--           Change value of hwDevMFanStatus and hwDevMPowerStatus from underscores to hyphens.
+--      V2.1  2005-01-12
+--           Change the description of hwFlhTotalSize and hwFlhTotalFree by sunqiang
+--      V2.2  2005-06-10 updated by Chen Xi
+--           Modify the SYNTAX and DESCRIPTION of hwLinkUpDownTrapEnable
+--           and adjust file format.
+--      V2.3  2011-11-26 updated by duyanbing
+--           Add hwDevMFirstTrapTime.
+-- ==================================================================
+-- ==================================================================
+--
+-- Varibles and types be imported
+--
+-- ==================================================================
+A3COM-HUAWEI-LswDEVM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, TimeTicks, Gauge32, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    lswCommon, huaweiUtility
+        FROM A3COM-HUAWEI-OID-MIB
+    hwLswFrameIndex, hwLswSlotIndex
+        FROM A3COM-HUAWEI-DEVICE-MIB
+        ;
+
+hwLswdevMMib MODULE-IDENTITY
+        LAST-UPDATED "201111260000Z"
+        ORGANIZATION ""
+        CONTACT-INFO
+        ""
+        DESCRIPTION
+        ""
+        REVISION "200106290000Z"
+        DESCRIPTION
+        ""
+        ::= { lswCommon  9 }
+
+
+hwDevice OBJECT IDENTIFIER ::= { huaweiUtility 1 }
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+hwCpuTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF HwCpuEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A table of CPU statistics."
+    ::= { hwDevice 1 }
+
+hwCpuEntry  OBJECT-TYPE
+    SYNTAX  HwCpuEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The Entries of hwCpuTable."
+    INDEX   { hwCpuIndex }
+    ::= { hwCpuTable  1 }
+
+HwCpuEntry ::=
+   SEQUENCE {
+            hwCpuIndex          INTEGER,
+            hwCpuCostRate       Gauge32,
+            hwCpuCostRatePer1Min       Gauge32,
+            hwCpuCostRatePer5Min       Gauge32
+           }
+
+hwCpuIndex  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Index of hwCpuTable. This integer is a  uniq number to
+             identify the CPU(s). We recommand two Number Plans in this
+             paper, Logical Number or Phisical Number. For the first
+             case, hwCpuIndex is a integer, range from 1 to the Maximum
+             number, for example 1,2,3,4,5 ..., where 1 represents
+             the first CPU, 2 represents the second CPU, etc.  For the
+             second case hwCpuIndex represents physical card position
+             (Shelf Number, Frame Number, Slot Number, SubSlotNumber)
+             where the CPU residing, for example, 0x01020304 represent
+             the CPU on the 4th subslot of the 3th slot of the 2nd frame
+             of the 1st Shelf. In the condition of multiple CPU system
+             where CPU group coordinately  process on one board, we see
+             the CPUs as one CPU"
+    ::= { hwCpuEntry 1 }
+
+hwCpuCostRate  OBJECT-TYPE
+   SYNTAX  Gauge32
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION
+           "The overall CPU busy percentage in the last 5 second period. "
+   ::= { hwCpuEntry 2 }
+
+hwCpuCostRatePer1Min OBJECT-TYPE
+   SYNTAX  Gauge32
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION
+           "The overall CPU cost percentage in the last 1 minute period. "
+   ::= { hwCpuEntry 3 }
+
+hwCpuCostRatePer5Min OBJECT-TYPE
+   SYNTAX  Gauge32
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION
+           "The overall CPU cost percentage in the last 5 minutes period. "
+   ::= { hwCpuEntry 4 }
+
+
+hwMem   OBJECT IDENTIFIER ::= { hwDevice 2 }
+
+hwMemTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF HwMemEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table contains memory information.  "
+    ::= { hwMem 1 }
+
+hwMemEntry  OBJECT-TYPE
+    SYNTAX  HwMemEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The Entries of hwMemTable"
+    INDEX   { hwMemModuleIndex }
+            ::= { hwMemTable  1 }
+
+HwMemEntry ::=
+   SEQUENCE {
+            hwMemModuleIndex     INTEGER,
+            hwMemSize            Gauge32,
+            hwMemFree            Gauge32,
+            hwMemRawSliceUsed    Gauge32,
+            hwMemLgFree          Gauge32,
+            hwMemFail            Gauge32,
+            hwMemFailNoMem       Gauge32
+            }
+
+hwMemModuleIndex   OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Index of hwMemTable. This integer is a  uniq number to
+             identify the memory module. We recommand two Number Plans
+             in this paper, Logical Number or Phisical Number. For the
+             first case, hwMemModuleIndex is a integer, range from 1 to
+             the Maximum number, for example 1,2,3,4,5 ..., where 1
+             represents the first memory module, 2 represents the second
+             memory module, etc.  For the second case hwMemModuleIndex
+             represents physical card position (Shelf Number, Frame Number,
+             Slot Number, SubSlotNumber) where the memory module residing,
+             for example, 0x01020304 represent the memory module on the 4th
+             subslot of the 3th slot of the 2nd frame of the 1st Shelf. "
+    ::= { hwMemEntry  1 }
+
+hwMemSize OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "Indicates the total size of the memory module
+            which is on the managed object."
+    ::= { hwMemEntry  2 }
+
+hwMemFree OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "Indicates the free size of the memory"
+    ::= { hwMemEntry  3 }
+
+hwMemRawSliceUsed OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "Indicates the used size of the raw slice memory"
+    ::= { hwMemEntry  4 }
+
+hwMemLgFree OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "The largest free size of the contiguous area in the memory.
+           The unit is byte."
+    ::= { hwMemEntry  5 }
+
+hwMemFail OBJECT-TYPE
+     SYNTAX  Gauge32
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "The times of memory allocation failures"
+     ::= { hwMemEntry 6 }
+
+hwMemFailNoMem OBJECT-TYPE
+     SYNTAX  Gauge32
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "The times of memory allocation failures due to no free memory."
+     ::= { hwMemEntry 7 }
+
+
+hwBufTable    OBJECT-TYPE
+    SYNTAX  SEQUENCE OF HwBufEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table contains buffer information.  "
+    ::= { hwMem 2 }
+
+hwBufEntry   OBJECT-TYPE
+    SYNTAX  HwBufEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The Entries of hwBufferTable"
+    INDEX   { hwBufModuleIndex , hwBufSize }
+    ::= { hwBufTable  1 }
+
+HwBufEntry ::=
+   SEQUENCE {
+            hwBufModuleIndex     INTEGER,
+            hwBufSize            INTEGER,
+            hwBufCurrentTotal    Gauge32,
+            hwBufCurrentUsed     Gauge32
+           }
+
+hwBufModuleIndex   OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Index of hwBufferTable. This integer is a  uniq number to
+             identify the buffer module. We recommand two Number Plans
+             in this paper, Logical Number or Phisical Number. For the
+             first case, hwBufferModuleIndex is a integer, range from 1 to
+             the Maximum number, for example 1,2,3,4,5 ..., where 1
+             represents the first buffer module, 2 represents the second
+             buffer module, etc.  For the second case hwBufferModuleIndex
+             represents physical card position (Shelf Number, Frame Number,
+             Slot Number, SubSlotNumber) where the buffer module residing,
+             for example, 0x01020304 represent the buffer module on the 4th
+             subslot of the 3th slot of the 2nd frame of the 1st Shelf. "
+    ::= { hwBufEntry  1 }
+
+hwBufSize OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The size of buffer,unit is byte."
+    ::= { hwBufEntry 2 }
+
+hwBufCurrentTotal OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The total number of buffer currently."
+    ::= { hwBufEntry 3 }
+
+hwBufCurrentUsed OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of used buffer currently."
+    ::= { hwBufEntry 4 }
+
+
+hwFlh   OBJECT IDENTIFIER ::= { hwDevice 3 }
+
+-- huawei Local Flash Group
+-- This group is present in all products which contain flash"
+
+hwFlhTotalSize OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "The flash memory's total size, in kilobyte"
+    ::= { hwFlh 1 }
+
+hwFlhTotalFree OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "The free space in internal flash memory, in kilobyte"
+    ::= { hwFlh 2 }
+
+hwFlhLastDelTime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "The time since system up of the lastest deleting operation of
+            flash memory.The value of Zero indicates there is no erasing operation
+            since system up"
+    DEFVAL { 0 }
+    ::= { hwFlh 3 }
+
+hwFlhDelState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        executing(1),
+        ok(2),
+        error(3),
+        readOnly(4),
+        failtoopen(5),
+        blockMallocFail(6),
+        noneDelOperationSinceStart(7)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "The state indicates the result of current or
+            lastest flash memory deleting operation"
+    ::= { hwFlh 4 }
+
+hwFlhState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        busy(1),
+        free(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "Busy indicates the flash memory is unavailable due to others may be using it,
+            and free indicates the flash memory is available now"
+    ::= { hwFlh 5 }
+
+-- ==================================================================
+
+hwLswdevMMibObject OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Description."
+    ::= { hwLswdevMMib 1 }
+
+hwdevMFanStatusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDevMFanStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION " Fan status description table "
+        ::= { hwLswdevMMibObject  1 }
+
+
+hwdevMFanStatusEntry OBJECT-TYPE
+        SYNTAX HwDevMFanStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION " Fan status description table entry "
+        INDEX   { hwDevMFanNum }
+        ::= { hwdevMFanStatusTable 1}
+
+
+HwDevMFanStatusEntry ::=
+   SEQUENCE {
+                hwDevMFanNum    INTEGER,
+                hwDevMFanStatus INTEGER
+            }
+
+hwDevMFanNum  OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Fan number "
+        ::= { hwdevMFanStatusEntry 1 }
+
+
+hwDevMFanStatus  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        active     (1),
+        deactive   (2),
+        not-install  (3),
+        unsupport    (4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Fan status: active (1), deactive (2) not installed (3) and unsupported (4)"
+        ::= { hwdevMFanStatusEntry 2 }
+
+
+hwdevMPowerStatusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDevMPowerStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION " Power status description table  "
+        ::= { hwLswdevMMibObject  2 }
+
+
+hwdevMPowerStatusEntry OBJECT-TYPE
+        SYNTAX HwDevMPowerStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION " Power status description table entry   "
+        INDEX   { hwDevMPowerNum }
+        ::= { hwdevMPowerStatusTable 1}
+
+HwDevMPowerStatusEntry ::=
+   SEQUENCE {
+                hwDevMPowerNum          INTEGER,
+                hwDevMPowerStatus       INTEGER
+            }
+
+
+hwDevMPowerNum  OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Power number "
+        ::= { hwdevMPowerStatusEntry 1 }
+
+
+hwDevMPowerStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        active     (1),
+        deactive   (2),
+        not-install (3),
+        unsupport    (4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Power status: active (1), deactive (2) not installed (3) and unsupported    "
+        ::= { hwdevMPowerStatusEntry 2 }
+
+
+hwdevMSlotEnvironmentTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwdevMSlotEnvironmentEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION " environment description table  "
+        ::= { hwLswdevMMibObject  3 }
+
+
+hwdevMSlotEnvironmentEntry OBJECT-TYPE
+        SYNTAX HwdevMSlotEnvironmentEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION " environment description table entry   "
+        INDEX   { hwLswFrameIndex, hwLswSlotIndex, hwdevMSlotEnvironmentType }
+        ::= { hwdevMSlotEnvironmentTable 1 }
+
+
+HwdevMSlotEnvironmentEntry ::=
+   SEQUENCE {
+                hwdevMSlotEnvironmentType               INTEGER,
+                hwDevMSlotEnvironmentStatus             INTEGER,
+                hwDevMSlotEnvironmentValue              INTEGER,
+                hwDevMSlotEnvironmentUpperLimit         INTEGER,
+                hwDevMSlotEnvironmentLowerLimit         INTEGER
+           }
+
+
+hwdevMSlotEnvironmentType  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        temperature(1),
+        humidity(2),
+        fog(3)
+        }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Environment type "
+        ::= { hwdevMSlotEnvironmentEntry 1 }
+
+hwDevMSlotEnvironmentStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        normal(1),
+        upper(2),
+        lower(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Environment status"
+        ::= { hwdevMSlotEnvironmentEntry 2 }
+
+hwDevMSlotEnvironmentValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Environment value"
+        ::= { hwdevMSlotEnvironmentEntry 3 }
+
+hwDevMSlotEnvironmentUpperLimit  OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Environment upper limit "
+        ::= { hwdevMSlotEnvironmentEntry 4 }
+
+
+hwDevMSlotEnvironmentLowerLimit OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Environment Lower limit"
+        ::= { hwdevMSlotEnvironmentEntry 5 }
+
+
+hwLinkUpDownTrapEnable  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        enableBoth(1) ,
+        disableBoth(2) ,
+        enableLinkUpTrapOnly(3) ,
+        enableLinkDownTrapOnly(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Enable/Disable linkUp/linkDown traps of the device, determining whether
+         to enable linkUp/linkDown traps with that of the interface.
+         When the value is enableBoth(1), the linkUp/linkDown traps are both
+         enabled.
+         When the value is disableBoth(2), the linkUp/linkDown traps are both
+         disabled.
+         When the value is enableLinkUpTrapOnly(3), the linkUp traps is enabled
+         and the linkDown traps is disabled.
+         When the value is enableLinkDownTrapOnly(4), the linkUp traps is
+         disabled and the linkDown traps is enabled. "
+        ::= { hwLswdevMMibObject  9 }
+
+hwdot1qTpFdbLearnStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Enable/Disable the address learning."
+        ::= { hwLswdevMMibObject  10 }
+
+
+
+hwCfmWriteFlash OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                write(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Write the current effective configuration into the Flash memory.
+                      This object does not support read operation."
+        ::= { hwLswdevMMibObject  11 }
+
+
+hwCfmEraseFlash OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                erase(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Delete the configuration from the Flash memory.
+                      This object does not support read operation."
+        ::= { hwLswdevMMibObject  12 }
+
+hwDevMFirstTrapTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the first trap time."
+    ::= { hwLswdevMMibObject 13 }
+
+END

@@ -1,0 +1,8 @@
+mib: TIMETRA-SYSTEM-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: sgiCpuUsage
+                  num_oid: '.1.3.6.1.4.1.6527.3.1.2.1.1.1.{{ $index }}'
+

@@ -1,0 +1,2187 @@
+PRVT-STATISTICS-CES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+FROM SNMPv2-SMI
+dsx1CurrentEntry,
+dsx1IntervalEntry,
+dsx1TotalEntry,
+dsx1FarEndCurrentEntry,
+dsx1FarEndIntervalEntry,
+dsx1FarEndTotalEntry
+FROM DS1-MIB
+sonetSectionCurrentEntry, sonetSectionIntervalEntry,
+sonetLineCurrentEntry, sonetLineIntervalEntry,
+sonetFarEndLineCurrentEntry, sonetFarEndLineIntervalEntry,
+sonetPathCurrentEntry, sonetPathIntervalEntry,
+sonetFarEndPathCurrentEntry, sonetFarEndPathIntervalEntry,
+sonetVTCurrentEntry, sonetVTIntervalEntry,
+sonetFarEndVTCurrentEntry, sonetFarEndVTIntervalEntry
+FROM SONET-MIB
+
+PerfCurrentCount,
+PerfIntervalCount, PerfTotalCount
+FROM PerfHist-TC-MIB -- [RFC3593]
+
+ifIndex
+FROM IF-MIB
+switch
+FROM PRVT-SWITCH-MIB
+TEXTUAL-CONVENTION
+FROM SNMPv2-TC; -- RFC2579
+
+
+
+prvtStatisticsCESMib MODULE-IDENTITY
+
+LAST-UPDATED "200904070000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+"BATM/Telco Systems Support team
+Email:
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+DESCRIPTION
+"This module includes statistics that are not inlcluded in SONET-mib and
+DS1-MIB."
+
+
+REVISION "200904070000Z"
+DESCRIPTION
+"Initial version."
+::= { switch 114 }
+
+
+-- This is the MIB module for Private Statistics Objects --
+
+-- ----------------------------------------------------------------------------
+-- Groups
+-- ----------------------------------------------------------------------------
+
+prvtStatisticsNotifications OBJECT IDENTIFIER ::= { prvtStatisticsCESMib 0 }
+
+prvtStatisticsObjects OBJECT IDENTIFIER ::= { prvtStatisticsCESMib 1 }
+
+prvtStatisticsConformance OBJECT IDENTIFIER ::= { prvtStatisticsCESMib 2 }
+
+
+-- -----------------------------------------------------------------------------
+-- prvtStatisticsObjects
+-- -----------------------------------------------------------------------------
+prvtStatisticsDSx1 OBJECT IDENTIFIER ::= { prvtStatisticsObjects 1}
+
+prvtStatisticsSection OBJECT IDENTIFIER ::= { prvtStatisticsObjects 2}
+
+prvtStatisticsLine OBJECT IDENTIFIER ::= { prvtStatisticsObjects 3}
+
+prvtStatisticsPath OBJECT IDENTIFIER ::= { prvtStatisticsObjects 4}
+
+prvtStatisticsVt OBJECT IDENTIFIER ::= { prvtStatisticsObjects 5}
+
+
+-- the DSx1 group
+-- this group contains 4 table
+-- -DSx1 current table
+-- -DSx1 total table
+-- -DSx1 FarEnd current table
+-- -DSx1 FarEnd total table
+
+-- -DSx1 current table
+
+prvtDSx1CurrentTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtDSx1CurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in dsx1CurrentTable "
+::= { prvtStatisticsDSx1 1 }
+
+
+prvtDSx1CurrentEntry OBJECT-TYPE
+SYNTAX PrvtDSx1CurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtDSx1CurrentTable table."
+AUGMENTS { dsx1CurrentEntry }
+::= { prvtDSx1CurrentTable 1 }
+
+PrvtDSx1CurrentEntry ::= SEQUENCE{
+prvtDSx1CurrentBBEs PerfCurrentCount,
+prvtDSx1CurrentLSESs PerfCurrentCount,
+prvtDSx1CurrentPFCs PerfCurrentCount
+}
+
+prvtDSx1CurrentBBEs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Background Block Errors."
+::= {prvtDSx1CurrentEntry 1}
+
+prvtDSx1CurrentLSESs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Line Severely Errored Seconds"
+::= {prvtDSx1CurrentEntry 2}
+
+prvtDSx1CurrentPFCs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Path Faults counts."
+::= {prvtDSx1CurrentEntry 3}
+
+
+prvtDSx1IntervalTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtDSx1IntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in dsx1IntervalTable "
+::= { prvtStatisticsDSx1 2 }
+
+
+prvtDSx1IntervalEntry OBJECT-TYPE
+SYNTAX PrvtDSx1IntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtDSx1IntervalTable table."
+AUGMENTS { dsx1IntervalEntry }
+::= { prvtDSx1IntervalTable 1 }
+
+PrvtDSx1IntervalEntry ::= SEQUENCE{
+prvtDSx1IntervalBBEs PerfIntervalCount,
+prvtDSx1IntervalLSESs PerfIntervalCount,
+prvtDSx1IntervalPFCs PerfIntervalCount
+}
+
+prvtDSx1IntervalBBEs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Background Block Errors."
+::= {prvtDSx1IntervalEntry 1}
+
+prvtDSx1IntervalLSESs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Line Severely Errored Seconds"
+::= {prvtDSx1IntervalEntry 2}
+
+prvtDSx1IntervalPFCs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Path Faults counts."
+::= {prvtDSx1IntervalEntry 3}
+
+
+-- -DSx1 total table
+prvtDSx1TotalTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtDSx1TotalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in dsx1TotalTable "
+::= { prvtStatisticsDSx1 3 }
+
+prvtDSx1TotalEntry OBJECT-TYPE
+SYNTAX PrvtDSx1TotalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtDSx1TotalTable table."
+AUGMENTS { dsx1TotalEntry }
+::= { prvtDSx1TotalTable 1 }
+
+PrvtDSx1TotalEntry ::= SEQUENCE{
+prvtDSx1TotalBBEs PerfTotalCount,
+prvtDSx1TotalLSESs PerfTotalCount,
+prvtDSx1TotalPFCs PerfTotalCount
+}
+
+prvtDSx1TotalBBEs OBJECT-TYPE
+SYNTAX PerfTotalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Background Block Errors encountered by a DS1 interface in the previous 24
+hour interval. Invalid 15 minute intervals count
+as 0."
+::= {prvtDSx1TotalEntry 1}
+
+prvtDSx1TotalLSESs OBJECT-TYPE
+SYNTAX PerfTotalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Line Severely Errored Seconds encountered by a DS1 interface in the previous 24
+hour interval. Invalid 15 minute intervals count
+as 0."
+::= { prvtDSx1TotalEntry 2}
+
+prvtDSx1TotalPFCs OBJECT-TYPE
+SYNTAX PerfTotalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Path Faults counts ncountered by a DS1 interface in the previous 24
+hour interval. Invalid 15 minute intervals count
+as 0."
+::= {prvtDSx1TotalEntry 3}
+
+
+-- -DSx1FarEndCurrentTable
+prvtDSx1FarEndCurrentTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtDSx1FarEndCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in dsx1FarEndCurrentTable "
+::= { prvtStatisticsDSx1 4 }
+
+prvtDSx1FarEndCurrentEntry OBJECT-TYPE
+SYNTAX PrvtDSx1FarEndCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtDSx1FarEndCurrentTable table."
+AUGMENTS { dsx1FarEndCurrentEntry }
+::= { prvtDSx1FarEndCurrentTable 1 }
+
+PrvtDSx1FarEndCurrentEntry ::= SEQUENCE{
+prvtFarEndDSx1CurrentBBEs PerfCurrentCount,
+prvtFarEndDSx1CurrentPFCs PerfCurrentCount
+}
+
+prvtFarEndDSx1CurrentBBEs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Far End Background Block Errors."
+::= {prvtDSx1FarEndCurrentEntry 1}
+
+
+prvtFarEndDSx1CurrentPFCs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Background Path Faults counts."
+::= {prvtDSx1FarEndCurrentEntry 2}
+
+
+-- -DSx1FarEndIntervalTable
+prvtDSx1FarEndIntervalTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtDSx1FarEndIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in dsx1FarEndIntervalTable "
+::= { prvtStatisticsDSx1 5 }
+
+prvtDSx1FarEndIntervalEntry OBJECT-TYPE
+SYNTAX PrvtDSx1FarEndIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtDSx1FarEndIntervalTable table."
+AUGMENTS { dsx1FarEndIntervalEntry }
+::= { prvtDSx1FarEndIntervalTable 1 }
+
+PrvtDSx1FarEndIntervalEntry ::= SEQUENCE{
+prvtFarEndDSx1IntervalBBEs PerfIntervalCount,
+prvtFarEndDSx1IntervalPFCs PerfIntervalCount
+}
+
+prvtFarEndDSx1IntervalBBEs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Far End Background Block Errors."
+::= {prvtDSx1FarEndIntervalEntry 1}
+
+
+prvtFarEndDSx1IntervalPFCs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Background Path Faults counts."
+::= {prvtDSx1FarEndIntervalEntry 2}
+
+
+
+-- -DSx1FarEndTotalTable
+prvtDSx1FarEndTotalTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtDSx1FarEndTotalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in dsx1FarEndTotalTable "
+::= { prvtStatisticsDSx1 6 }
+
+prvtDSx1FarEndTotalEntry OBJECT-TYPE
+SYNTAX PrvtDSx1FarEndTotalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtDSx1FarEndTotalTable table."
+AUGMENTS { dsx1FarEndTotalEntry }
+::= { prvtDSx1FarEndTotalTable 1 }
+
+
+PrvtDSx1FarEndTotalEntry ::= SEQUENCE{
+prvtFarEndDSx1TotalBBEs PerfTotalCount,
+prvtFarEndDSx1TotalPFCs PerfTotalCount
+}
+
+prvtFarEndDSx1TotalBBEs OBJECT-TYPE
+SYNTAX PerfTotalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Far End Background Block Errors encountered by a DS1 interface in the
+previous 24 hour interval. Invalid 15 minute
+intervals count as 0."
+::= {prvtDSx1FarEndTotalEntry 1}
+
+prvtFarEndDSx1TotalPFCs OBJECT-TYPE
+SYNTAX PerfTotalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Background Path Faults encountered by a DS1 interface in the
+previous 24 hour interval. Invalid 15 minute
+intervals count as 0."
+::= {prvtDSx1FarEndTotalEntry 2}
+
+
+-- -SectionCurrentTable
+prvtSectionCurrentTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtSectionCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in sonetSectionCurrentTable "
+::= { prvtStatisticsSection 1 }
+
+prvtSectionCurrentEntry OBJECT-TYPE
+SYNTAX PrvtSectionCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtSectionCurrentTable table."
+AUGMENTS { sonetSectionCurrentEntry }
+::= { prvtSectionCurrentTable 1 }
+
+PrvtSectionCurrentEntry ::= SEQUENCE{
+prvtSectionCurrentBBEs PerfCurrentCount,
+prvtSectionCurrentESAs PerfCurrentCount,
+prvtSectionCurrentESBs PerfCurrentCount,
+prvtSectionCurrentUASs PerfCurrentCount,
+prvtSectionCurrentLOSSs PerfCurrentCount,
+prvtSectionCurrentOOFs PerfCurrentCount
+
+}
+
+prvtSectionCurrentBBEs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Background Block Errors encountered by a SONET/SDH Section
+in the current 15 minute interval."
+::= {prvtSectionCurrentEntry 1}
+
+prvtSectionCurrentESAs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Errored Seconds type A encountered by a SONET/SDH Section
+in the current 15 minute interval."
+::= {prvtSectionCurrentEntry 2}
+
+prvtSectionCurrentESBs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Errored Seconds type B encountered by a SONET/SDH Section
+in the current 15 minute interval."
+::= {prvtSectionCurrentEntry 3}
+
+prvtSectionCurrentUASs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Unavailable Seconds encountered by a SONET/SDH Section
+in the current 15 minute interval."
+::= {prvtSectionCurrentEntry 4}
+
+prvtSectionCurrentLOSSs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Loss of signals counter in the current 15 minute interval."
+::= {prvtSectionCurrentEntry 5}
+
+prvtSectionCurrentOOFs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number Out-Of-Frame Seconds encountered by a SONET/SDH Section
+in the current 15 minute interval."
+::= {prvtSectionCurrentEntry 6}
+
+
+-- -SectionIntervalTable
+prvtSectionIntervalTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtSectionIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in sonetSectionIntervalTable "
+::= { prvtStatisticsSection 2 }
+
+prvtSectionIntervalEntry OBJECT-TYPE
+SYNTAX PrvtSectionIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtSectionIntervalTable table."
+AUGMENTS { sonetSectionIntervalEntry }
+::= { prvtSectionIntervalTable 1 }
+
+PrvtSectionIntervalEntry ::= SEQUENCE{
+prvtSectionIntervalBBEs PerfIntervalCount,
+prvtSectionIntervalESAs PerfIntervalCount,
+prvtSectionIntervalESBs PerfIntervalCount,
+prvtSectionIntervalUASs PerfIntervalCount,
+prvtSectionIntervalLOSSs PerfIntervalCount,
+prvtSectionIntervalOOFs PerfIntervalCount
+
+}
+
+prvtSectionIntervalBBEs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Background Block Errors encountered by a SONET/SDH Section
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtSectionIntervalEntry 1}
+
+prvtSectionIntervalESAs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Errored Seconds type A encountered by a SONET/SDH Section
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtSectionIntervalEntry 2}
+
+prvtSectionIntervalESBs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Errored Seconds type B encountered by a SONET/SDH Section
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtSectionIntervalEntry 3}
+
+prvtSectionIntervalUASs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Unavailable Seconds encountered by a SONET/SDH Section
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtSectionIntervalEntry 4}
+
+prvtSectionIntervalLOSSs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Loss of signals counter in a particular 15-minute interval in the past 24 hours."
+::= {prvtSectionIntervalEntry 5}
+
+prvtSectionIntervalOOFs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number Out-Of-Frame Seconds encountered by a SONET/SDH Section
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtSectionIntervalEntry 6}
+
+
+-- -LineCurrentTable
+prvtLineCurrentTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtLineCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in sonetLineCurrentTable "
+::= { prvtStatisticsLine 1 }
+
+prvtLineCurrentEntry OBJECT-TYPE
+SYNTAX PrvtLineCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtLineCurrentTable table."
+AUGMENTS { sonetLineCurrentEntry }
+::= { prvtLineCurrentTable 1 }
+
+PrvtLineCurrentEntry ::= SEQUENCE{
+prvtLineCurrentFCs PerfCurrentCount,
+prvtLineCurrentBBEs PerfCurrentCount,
+prvtLineCurrentESAs PerfCurrentCount,
+prvtLineCurrentESBs PerfCurrentCount,
+prvtLineCurrentLBCs PerfCurrentCount,
+prvtLineCurrentOPRs PerfCurrentCount,
+prtvLineCurrentOPTs PerfCurrentCount,
+prvtLineCurrentAISs PerfCurrentCount,
+prvtLineCurrentPSCs PerfCurrentCount,
+prvtLineCurrentPSDs PerfCurrentCount
+
+}
+
+prvtLineCurrentFCs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Failures counter of a SONET/SDH Line
+in the current 15 minute interval."
+::= {prvtLineCurrentEntry 1}
+
+prvtLineCurrentBBEs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Background Block Errors of a SONET/SDH Line
+in the current 15 minute interval."
+::= {prvtLineCurrentEntry 2}
+
+prvtLineCurrentESAs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Errored Seconds type A encountered by a SONET/SDH Line
+in the current 15 minute interval."
+::= {prvtLineCurrentEntry 3}
+
+prvtLineCurrentESBs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Errored Seconds type B encountered by a SONET/SDH Line
+in the current 15 minute interval."
+::= {prvtLineCurrentEntry 4}
+
+prvtLineCurrentLBCs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Laser Bias Current parameter provides a measurement of the health of
+the optical transmitter."
+::= {prvtLineCurrentEntry 5}
+
+prvtLineCurrentOPRs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Optical Power Received parameter provides a measurement of the physical
+layer characteristics of the incoming signal at each optical receiver."
+::= {prvtLineCurrentEntry 6}
+
+prtvLineCurrentOPTs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Optical Power Transmitted parameter provides a measurement of the
+health of the optical transmitter."
+::= {prvtLineCurrentEntry 7}
+
+prvtLineCurrentAISs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of 1-second intervals of alarm indication
+signal encountered by the interface."
+::= {prvtLineCurrentEntry 8}
+
+prvtLineCurrentPSCs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Protection Switching Countin the current 15 minute interval."
+::= {prvtLineCurrentEntry 9}
+
+prvtLineCurrentPSDs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Protection Switching Duration counter in the current 15 minute interval."
+::= {prvtLineCurrentEntry 10}
+
+
+-- -LineIntervalTable
+prvtLineIntervalTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtLineIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in sonetLineIntrevalTable "
+::= { prvtStatisticsLine 2 }
+
+prvtLineIntervalEntry OBJECT-TYPE
+SYNTAX PrvtLineIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtLineIntervalTable table."
+AUGMENTS { sonetLineIntervalEntry }
+::= { prvtLineIntervalTable 1 }
+
+PrvtLineIntervalEntry ::= SEQUENCE{
+prvtLineIntervalFCs PerfIntervalCount,
+prvtLineIntervalBBEs PerfIntervalCount,
+prvtLineIntervalESAs PerfIntervalCount,
+prvtLineIntervalESBs PerfIntervalCount,
+prvtLineIntervalLBCs PerfIntervalCount,
+prvtLineIntervalOPRs PerfIntervalCount,
+prtvLineIntervalOPTs PerfIntervalCount,
+prvtLineIntevalAISs PerfIntervalCount,
+prvtLineIntervalPSCs PerfIntervalCount,
+prvtLineIntervalPSDs PerfIntervalCount
+
+}
+
+prvtLineIntervalFCs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Failures counter of a SONET/SDH Line in a particular 15-minute interval
+in the past 24 hours."
+::= {prvtLineIntervalEntry 1}
+
+prvtLineIntervalBBEs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Background Block Errors of a SONET/SDH Line
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtLineIntervalEntry 2}
+
+prvtLineIntervalESAs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Errored Seconds type A encountered by a SONET/SDH Line
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtLineIntervalEntry 3}
+
+prvtLineIntervalESBs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of Errored Seconds type B encountered by a SONET/SDH Line
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtLineIntervalEntry 4}
+
+prvtLineIntervalLBCs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Laser Bias Current parameter provides a measurement of the health of
+the optical transmitter in a particular 15-minute interval in the past 24 hours."
+::= {prvtLineIntervalEntry 5}
+
+prvtLineIntervalOPRs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Optical Power Received parameter provides a measurement of the physical
+layer characteristics of the incoming signal at each optical receiver
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtLineIntervalEntry 6}
+
+prtvLineIntervalOPTs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Optical Power Transmitted parameter provides a measurement of the
+health of the optical transmitter
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtLineIntervalEntry 7}
+
+prvtLineIntevalAISs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of 1-second intervals of alarm indication
+signal encountered by the interface in a particular 15-minute interval in the past 24 hours."
+::= {prvtLineIntervalEntry 8}
+
+prvtLineIntervalPSCs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Protection Switching counter in a particular 15-minute interval in the past 24 hours."
+::= {prvtLineIntervalEntry 9}
+
+prvtLineIntervalPSDs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Protection Switching Duration counter in a particular 15-minute interval in the past 24 hours."
+::= {prvtLineIntervalEntry 10}
+
+
+-- -LineFarEndCurrentTable
+prvtFarEndLineCurrentTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtFarEndLineCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in sonetFarEndLineCurrentTable "
+::= { prvtStatisticsLine 3 }
+
+prvtFarEndLineCurrentEntry OBJECT-TYPE
+SYNTAX PrvtFarEndLineCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtFarEndLineCurrentTable table."
+AUGMENTS { sonetFarEndLineCurrentEntry }
+::= { prvtFarEndLineCurrentTable 1 }
+
+PrvtFarEndLineCurrentEntry ::= SEQUENCE {
+prvtFarEndLineCurrentFCs PerfCurrentCount,
+prvtFarEndLineCurrentBBEs PerfCurrentCount,
+prvtFarEndLineCurrentESAs PerfCurrentCount,
+prvtFarEndLineCurrentESBs PerfCurrentCount,
+prvtFarEndLineCurrentAISs PerfCurrentCount,
+prvtFarEndLineCurrentRFIs PerfCurrentCount
+}
+
+prvtFarEndLineCurrentFCs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Failures counter of a SONET/SDH Line
+in the current 15 minute interval."
+::= {prvtFarEndLineCurrentEntry 1}
+
+
+prvtFarEndLineCurrentBBEs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End number of Background Block Errors of a SONET/SDH Line
+in the current 15 minute interval."
+::= {prvtFarEndLineCurrentEntry 2}
+
+prvtFarEndLineCurrentESAs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End number of Errored Seconds type A encountered by a SONET/SDH Section
+in the current 15 minute interval."
+::= {prvtFarEndLineCurrentEntry 3}
+
+prvtFarEndLineCurrentESBs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End number of Errored Seconds type B encountered by a SONET/SDH Section
+in the current 15 minute interval."
+::= {prvtFarEndLineCurrentEntry 4}
+
+prvtFarEndLineCurrentAISs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End number of 1-second intervals of alarm indication
+signal encountered by the interface."
+::= {prvtFarEndLineCurrentEntry 5}
+
+
+prvtFarEndLineCurrentRFIs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End number Remote failure indications of SONET/SDH Line
+in the current 15 minute interval."
+::= {prvtFarEndLineCurrentEntry 6}
+
+
+-- -LineFarEndIntervalTable
+prvtFarEndLineIntervalTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtFarEndLineIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in sonetFarEndLineIntervalTable "
+::= { prvtStatisticsLine 4 }
+
+prvtFarEndLineIntervalEntry OBJECT-TYPE
+SYNTAX PrvtFarEndLineIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtFarEndLineIntervalTable table."
+AUGMENTS { sonetFarEndLineIntervalEntry }
+::= { prvtFarEndLineIntervalTable 1 }
+
+PrvtFarEndLineIntervalEntry ::= SEQUENCE {
+prvtFarEndLineIntervalFCs PerfIntervalCount,
+prvtFarEndLineIntervalBBEs PerfIntervalCount,
+prvtFarEndLineIntervalESAs PerfIntervalCount,
+prvtFarEndLineIntervalESBs PerfIntervalCount,
+prvtFarEndLineIntervalAISs PerfIntervalCount,
+prvtFarEndLineIntervalRFIs PerfIntervalCount
+}
+
+prvtFarEndLineIntervalFCs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Failures counter of a SONET/SDH Line
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtFarEndLineIntervalEntry 1}
+
+
+prvtFarEndLineIntervalBBEs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End number of Background Block Errors of a SONET/SDH Line
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtFarEndLineIntervalEntry 2}
+
+prvtFarEndLineIntervalESAs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End number of Errored Seconds type A encountered by a SONET/SDH Section
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtFarEndLineIntervalEntry 3}
+
+prvtFarEndLineIntervalESBs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End number of Errored Seconds type B encountered by a SONET/SDH Section
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtFarEndLineIntervalEntry 4}
+
+prvtFarEndLineIntervalAISs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End number of 1-second intervals of alarm indication
+signal encountered by the interface."
+::= {prvtFarEndLineIntervalEntry 5}
+
+
+prvtFarEndLineIntervalRFIs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End number Remote failure indications of SONET/SDH Line
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtFarEndLineIntervalEntry 6}
+
+
+
+-- -PathCurrentTable
+prvtPathCurrentTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtPathCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in sonetPathCurrentTable "
+::= { prvtStatisticsPath 1 }
+
+prvtPathCurrentEntry OBJECT-TYPE
+SYNTAX PrvtPathCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtPathCurrentTable table."
+AUGMENTS { sonetPathCurrentEntry }
+::= { prvtPathCurrentTable 1 }
+
+PrvtPathCurrentEntry ::= SEQUENCE{
+prvtPathCurrentFCs PerfCurrentCount,
+prvtPathCurrentESAs PerfCurrentCount,
+prvtPathCurrentESBs PerfCurrentCount,
+prvtPathCurrentBBEs PerfCurrentCount,
+prvtPathCurrentAISs PerfCurrentCount,
+prvtPathCurrentPPJCPGen PerfCurrentCount,
+prvtPathCurrentNPJCPGen PerfCurrentCount,
+prvtPathCurrentPPJCPDet PerfCurrentCount,
+prvtPathCurrentNPJCPDet PerfCurrentCount,
+prvtPathCurrentPJCSPDet PerfCurrentCount,
+prvtPathCurrentPJCSPGen PerfCurrentCount,
+prvtPathCurrentJCDiffP PerfCurrentCount
+
+
+}
+
+prvtPathCurrentFCs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Failures counter of a SONET/SDH Path
+in the current 15 minute interval."
+::= {prvtPathCurrentEntry 1}
+
+
+prvtPathCurrentESAs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Errored Seconds type A encountered by a SONET/SDH Path
+in the current 15 minute interval."
+::= {prvtPathCurrentEntry 2}
+
+
+prvtPathCurrentESBs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Errored Seconds type B encountered by a SONET/SDH Path
+in the current 15 minute interval."
+::= {prvtPathCurrentEntry 3}
+
+prvtPathCurrentBBEs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Background Block Errors of a SONET/SDH Path
+in the current 15 minute interval."
+::= {prvtPathCurrentEntry 4}
+
+prvtPathCurrentAISs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of 1-second intervals of alarm indication
+signal encountered by a SONET/SDH Path in the current 15 minute interval."
+::= {prvtPathCurrentEntry 5}
+
+prvtPathCurrentPPJCPGen OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Positive pointer justifications generated by a SONET/SDH Path
+in the current 15 minute interval."
+::= {prvtPathCurrentEntry 6}
+
+prvtPathCurrentNPJCPGen OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Negative pointer justifications generated by a SONET/SDH Path
+in the current 15 minute interval."
+::= {prvtPathCurrentEntry 7}
+
+prvtPathCurrentPPJCPDet OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Positive pointer justifications detected by a SONET/SDH Path
+in the current 15 minute interval."
+::= {prvtPathCurrentEntry 8}
+
+prvtPathCurrentNPJCPDet OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Negative pointer justifications detected by a SONET/SDH Path
+in the current 15 minute interval."
+::= {prvtPathCurrentEntry 9}
+
+prvtPathCurrentPJCSPDet OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of PPJCVDet or NPJCVDet Seconds encountered by a SONET/SDH Path
+in the current 15 minute interval."
+::= {prvtPathCurrentEntry 10}
+
+prvtPathCurrentPJCSPGen OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of PPJCVGen or NPJCVGen Seconds encountered by a SONET/SDH Path
+in the current 15 minute interval."
+::= {prvtPathCurrentEntry 11}
+
+prvtPathCurrentJCDiffP OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Absolute of difference between detected and generated net pointer
+justifications by a SONET/SDH Path in the current 15 minute interval."
+::= {prvtPathCurrentEntry 12}
+
+
+
+-- -PathIntervalTable
+prvtPathIntervalTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtPathIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in sonetPathIntervalTable "
+::= { prvtStatisticsPath 2 }
+
+prvtPathIntervalEntry OBJECT-TYPE
+SYNTAX PrvtPathIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtPathIntervalEntry table."
+AUGMENTS { sonetPathIntervalEntry }
+::= { prvtPathIntervalTable 1 }
+
+PrvtPathIntervalEntry ::= SEQUENCE{
+prvtPathIntervalFCs PerfIntervalCount,
+prvtPathIntervalESAs PerfIntervalCount,
+prvtPathIntervalESBs PerfIntervalCount,
+prvtPathIntervalBBEs PerfIntervalCount,
+prvtPathIntervalAISs PerfIntervalCount,
+prvtPathIntervalPPJCPGen PerfIntervalCount,
+prvtPathIntervalNPJCPGen PerfIntervalCount,
+prvtPathIntervalPPJCPDet PerfIntervalCount,
+prvtPathIntervalNPJCPDet PerfIntervalCount,
+prvtPathIntervalPJCSPDet PerfIntervalCount,
+prvtPathIntervalPJCSPGen PerfIntervalCount,
+prvtPathIntervalJCDiffP PerfIntervalCount
+
+}
+
+prvtPathIntervalFCs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Failures counter of a SONET/SDH Path
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtPathIntervalEntry 1}
+
+
+prvtPathIntervalESAs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Errored Seconds type A encountered by a SONET/SDH Path
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtPathIntervalEntry 2}
+
+
+prvtPathIntervalESBs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Errored Seconds type B encountered by a SONET/SDH Path
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtPathIntervalEntry 3}
+
+prvtPathIntervalBBEs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End number of Background Block Errors of a SONET/SDH Path
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtPathIntervalEntry 4}
+
+prvtPathIntervalAISs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of 1-second intervals of alarm indication
+signal encountered by a SONET/SDH Path in a particular 15-minute interval in the past 24 hours."
+::= {prvtPathIntervalEntry 5}
+
+prvtPathIntervalPPJCPGen OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Positive pointer justifications generated by a SONET/SDH Path
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtPathIntervalEntry 6}
+
+prvtPathIntervalNPJCPGen OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Negativ pointer justifications generated by a SONET/SDH Path
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtPathIntervalEntry 7}
+
+prvtPathIntervalPPJCPDet OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Positive pointer justifications detected by a SONET/SDH Path
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtPathIntervalEntry 8}
+
+prvtPathIntervalNPJCPDet OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Negative pointer justifications detected by a SONET/SDH Path
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtPathIntervalEntry 9}
+
+prvtPathIntervalPJCSPDet OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of PPJCVDet or NPJCVDet Seconds encountered by a SONET/SDH Path
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtPathIntervalEntry 10}
+
+prvtPathIntervalPJCSPGen OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of PPJCVGen or NPJCVGen Seconds encountered by a SONET/SDH Path
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtPathIntervalEntry 11}
+
+prvtPathIntervalJCDiffP OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Absolute of difference between detected and generated net pointer
+justifications by a SONET/SDH Path in a particular 15-minute interval in the past 24 hours."
+::= {prvtPathIntervalEntry 12}
+
+
+-- -FarEndPathCurrentTable
+prvtFarEndPathCurrentTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtFarEndPathCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in sonetFarEndPathCurrentTable "
+::= { prvtStatisticsPath 3 }
+
+prvtFarEndPathCurrentEntry OBJECT-TYPE
+SYNTAX PrvtFarEndPathCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtFarEndPathCurrentTable table."
+AUGMENTS { sonetFarEndPathCurrentEntry }
+::= { prvtFarEndPathCurrentTable 1 }
+
+PrvtFarEndPathCurrentEntry ::= SEQUENCE{
+prvtFarEndPathCurrentFCs PerfCurrentCount,
+prvtFarEndPathCurrentESAs PerfCurrentCount,
+prvtFarEndPathCurrentESBs PerfCurrentCount,
+prvtFarEndPathCurrentBBEs PerfCurrentCount,
+prvtFarEndPathCurrentRFIs PerfCurrentCount
+
+}
+
+prvtFarEndPathCurrentFCs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Failures counter of a SONET/SDH Path
+in the current 15 minute interval."
+::= {prvtFarEndPathCurrentEntry 1}
+
+
+prvtFarEndPathCurrentESAs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Errored Seconds type A encountered by a SONET/SDH Path
+in the current 15 minute interval."
+::= {prvtFarEndPathCurrentEntry 2}
+
+
+prvtFarEndPathCurrentESBs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Errored Seconds type B encountered by a SONET/SDH Path
+in the current 15 minute interval."
+::= {prvtFarEndPathCurrentEntry 3}
+
+prvtFarEndPathCurrentBBEs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Background Block Errors of a SONET/SDH Path
+in the current 15 minute interval."
+::= {prvtFarEndPathCurrentEntry 4}
+
+prvtFarEndPathCurrentRFIs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End number Remote failure indications of SONET/SDH Path
+signal encountered by a SONET/SDH Path in the current 15 minute interval."
+::= {prvtFarEndPathCurrentEntry 5}
+
+
+
+-- -FarEndPathIntervalTable
+prvtFarEndPathIntervalTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtFarEndPathIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in sonetFarEndPathIntervalTable "
+::= { prvtStatisticsPath 4 }
+
+prvtFarEndPathIntervalEntry OBJECT-TYPE
+SYNTAX PrvtFarEndPathIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtFarEndPathIntervalTable table."
+AUGMENTS { sonetFarEndPathIntervalEntry }
+::= { prvtFarEndPathIntervalTable 1 }
+
+PrvtFarEndPathIntervalEntry ::= SEQUENCE{
+prvtFarEndPathIntervalFCs PerfIntervalCount,
+prvtFarEndPathIntervalESAs PerfIntervalCount,
+prvtFarEndPathIntervalESBs PerfIntervalCount,
+prvtFarEndPathIntervalBBEs PerfIntervalCount,
+prvtFarEndPathIntervalRFIs PerfIntervalCount
+
+}
+
+prvtFarEndPathIntervalFCs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Failures counter of a SONET/SDH Path
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtFarEndPathIntervalEntry 1}
+
+
+prvtFarEndPathIntervalESAs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Errored Seconds type A encountered by a SONET/SDH Path
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtFarEndPathIntervalEntry 2}
+
+
+prvtFarEndPathIntervalESBs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Errored Seconds type B encountered by a SONET/SDH Path
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtFarEndPathIntervalEntry 3}
+
+prvtFarEndPathIntervalBBEs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Background Block Errors of a SONET/SDH Path
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtFarEndPathIntervalEntry 4}
+
+prvtFarEndPathIntervalRFIs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End number Remote failure indications of SONET/SDH Path
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtFarEndPathIntervalEntry 5}
+
+
+-- -VtCurrentTable
+prvtVtCurrentTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtVtCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in sonetVtCurrentTable "
+::= { prvtStatisticsVt 1 }
+
+prvtVtCurrentEntry OBJECT-TYPE
+SYNTAX PrvtVtCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtVtCurrentTable table."
+AUGMENTS { sonetVTCurrentEntry }
+::= { prvtVtCurrentTable 1 }
+
+PrvtVtCurrentEntry ::= SEQUENCE{
+prvtVtCurrentFCs PerfCurrentCount,
+prvtVtCurrentESAs PerfCurrentCount,
+prvtVtCurrentESBs PerfCurrentCount,
+prvtVtCurrentBBEs PerfCurrentCount,
+prvtVtCurrentAISs PerfCurrentCount,
+prvtVtCurrentPPJCVGen PerfCurrentCount,
+prvtVtCurrentNPJCVGen PerfCurrentCount,
+prvtVtCurrentPPJCVDet PerfCurrentCount,
+prvtVtCurrentNPJCVDet PerfCurrentCount,
+prvtVtCurrentPJCSVDet PerfCurrentCount,
+prvtVtCurrentPJCSVGen PerfCurrentCount,
+prvtVtCurrentPJCSVPJCDiffV PerfCurrentCount
+
+}
+
+prvtVtCurrentFCs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Failures counter of a SONET/SDH VT
+in the current 15 minute interval."
+::= {prvtVtCurrentEntry 1}
+
+
+prvtVtCurrentESAs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Errored Seconds type A encountered by a SONET/SDH Vt
+in the current 15 minute interval."
+::= {prvtVtCurrentEntry 2}
+
+
+prvtVtCurrentESBs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Errored Seconds type B encountered by a SONET/SDH Vt
+in the current 15 minute interval."
+::= {prvtVtCurrentEntry 3}
+
+prvtVtCurrentBBEs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Background Block Errors encountered by a SONET/SDH Vt
+in the current 15 minute interval."
+::= {prvtVtCurrentEntry 4}
+
+prvtVtCurrentAISs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of 1-second intervals of alarm indication
+signal encountered by a SONET/SDH Vt in the current 15 minute interval"
+::= {prvtVtCurrentEntry 5}
+
+prvtVtCurrentPPJCVGen OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Positive pointer justifications generated by a SONET/SDH Vt
+in the current 15 minute interval."
+::= {prvtVtCurrentEntry 6}
+
+prvtVtCurrentNPJCVGen OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Negative pointer justifications generated by a SONET/SDH Vt
+in the current 15 minute interval."
+::= {prvtVtCurrentEntry 7}
+
+prvtVtCurrentPPJCVDet OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Positive pointer justifications detected by a SONET/SDH Vt
+in the current 15 minute interval."
+::= {prvtVtCurrentEntry 8}
+
+prvtVtCurrentNPJCVDet OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Negative pointer justifications detected by a SONET/SDH Vt
+in the current 15 minute interval."
+::= {prvtVtCurrentEntry 9}
+
+prvtVtCurrentPJCSVDet OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of PPJCVDet or NPJCVDet Seconds encountered by a SONET/SDH Vt
+in the current 15 minute interval."
+::= {prvtVtCurrentEntry 10}
+
+prvtVtCurrentPJCSVGen OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of PPJCVGen or NPJCVGen Seconds encountered by a SONET/SDH Vt
+in the current 15 minute interval."
+::= {prvtVtCurrentEntry 11}
+
+prvtVtCurrentPJCSVPJCDiffV OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Absolute of difference between detected and generated net pointer
+justifications by a SONET/SDH Vt in the current 15 minute interval."
+::= {prvtVtCurrentEntry 12}
+
+
+
+
+-- -VtIntervalTable
+prvtVtIntervalTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtVtIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in sonetVtIntervalTable "
+::= { prvtStatisticsVt 2 }
+
+prvtVtIntervalEntry OBJECT-TYPE
+SYNTAX PrvtVtIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtVtIntervalTable table."
+AUGMENTS { sonetVTIntervalEntry }
+::= { prvtVtIntervalTable 1 }
+
+PrvtVtIntervalEntry ::= SEQUENCE{
+prvtVtIntervalFCs PerfIntervalCount,
+prvtVtIntervalESAs PerfIntervalCount,
+prvtVtIntervalESBs PerfIntervalCount,
+prvtVtIntervalBBEs PerfIntervalCount,
+prvtVtIntervalAISs PerfIntervalCount,
+prvtVtIntervalPPJCVGen PerfIntervalCount,
+prvtVtIntervalNPJCVGen PerfIntervalCount,
+prvtVtIntervalPPJCVDet PerfIntervalCount,
+prvtVtIntervalNPJCVDet PerfIntervalCount,
+prvtVtIntervalPJCSVDet PerfIntervalCount,
+prvtVtIntervalPJCSVGen PerfIntervalCount,
+prvtVtIntervalPJCSVPJCDiffV PerfIntervalCount
+
+
+}
+
+prvtVtIntervalFCs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Failures counter of a SONET/SDH VT
+in the current 15 minute interval."
+::= {prvtVtIntervalEntry 1}
+
+
+prvtVtIntervalESAs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Errored Seconds type A encountered by a SONET/SDH Vt
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtVtIntervalEntry 2}
+
+
+prvtVtIntervalESBs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Errored Seconds type B encountered by a SONET/SDH Vt
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtVtIntervalEntry 3}
+
+prvtVtIntervalBBEs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Background Block Errors encountered by a SONET/SDH Vt
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtVtIntervalEntry 4}
+
+prvtVtIntervalAISs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of 1-second intervals of alarm indication
+signal encountered by a SONET/SDH Vt in a particular 15-minute interval in the past 24 hours."
+::= {prvtVtIntervalEntry 5}
+
+prvtVtIntervalPPJCVGen OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Positive pointer justifications generated by a SONET/SDH Vt
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtVtIntervalEntry 6}
+
+prvtVtIntervalNPJCVGen OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Negative pointer justifications generated by a SONET/SDH Vt
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtVtIntervalEntry 7}
+
+prvtVtIntervalPPJCVDet OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Positive pointer justifications detected by a SONET/SDH Vt
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtVtIntervalEntry 8}
+
+prvtVtIntervalNPJCVDet OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Negative pointer justifications detected by a SONET/SDH Vt
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtVtIntervalEntry 9}
+
+prvtVtIntervalPJCSVDet OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of PPJCVDet or NPJCVDet Seconds encountered by a SONET/SDH Vt
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtVtIntervalEntry 10}
+
+prvtVtIntervalPJCSVGen OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of PPJCVGen or NPJCVGen Seconds encountered by a SONET/SDH Vt
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtVtIntervalEntry 11}
+
+prvtVtIntervalPJCSVPJCDiffV OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Absolute of difference between detected and generated net pointer
+justifications by a SONET/SDH Vt in a particular 15-minute interval in the past 24 hours."
+::= {prvtVtIntervalEntry 12}
+
+
+
+
+-- -FarEndVtCurrentTable
+prvtFarEndVtCurrentTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtFarEndVtCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in sonetFarEndVtCurrentTable "
+::= { prvtStatisticsVt 3 }
+
+prvtFarEndVtCurrentEntry OBJECT-TYPE
+SYNTAX PrvtFarEndVtCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtFarEndVtCurrentTable table."
+AUGMENTS { sonetFarEndVTCurrentEntry }
+::= { prvtFarEndVtCurrentTable 1 }
+
+PrvtFarEndVtCurrentEntry ::= SEQUENCE{
+prvtFarEndVtCurrentFCs PerfCurrentCount,
+prvtFarEndVtCurrentESAs PerfCurrentCount,
+prvtFarEndVtCurrentESBs PerfCurrentCount,
+prvtFarEndVtCurrentBBEs PerfCurrentCount,
+prvtFarEndVtCurrentRFIs PerfCurrentCount
+
+}
+
+prvtFarEndVtCurrentFCs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Failures counter of a SONET/SDH VT
+in the current 15 minute interval."
+::= {prvtFarEndVtCurrentEntry 1}
+
+
+prvtFarEndVtCurrentESAs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Errored Seconds type A encountered by a SONET/SDH Vt
+in the current 15 minute interval."
+::= {prvtFarEndVtCurrentEntry 2}
+
+
+prvtFarEndVtCurrentESBs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Errored Seconds type B encountered by a SONET/SDH Vt
+in the current 15 minute interval."
+::= {prvtFarEndVtCurrentEntry 3}
+
+prvtFarEndVtCurrentBBEs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Background Block Errors encountered by a SONET/SDH Vt
+in the current 15 minute interval."
+::= {prvtFarEndVtCurrentEntry 4}
+
+prvtFarEndVtCurrentRFIs OBJECT-TYPE
+SYNTAX PerfCurrentCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End number Remote failure indications of SONET/SDH Vt
+signal encountered by a SONET/SDH Vt in the current 15 minute interval."
+::= {prvtFarEndVtCurrentEntry 5}
+
+
+
+-- -FarEndVtIntervalTable
+prvtFarEndVtIntervalTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtFarEndVtIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains statistics that are not supported in sonetFarEndVtIntervalTable "
+::= { prvtStatisticsVt 4 }
+
+prvtFarEndVtIntervalEntry OBJECT-TYPE
+SYNTAX PrvtFarEndVtIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the prvtFarEndVtIntervalTable table."
+AUGMENTS { sonetFarEndVTIntervalEntry }
+::= { prvtFarEndVtIntervalTable 1 }
+
+PrvtFarEndVtIntervalEntry ::= SEQUENCE{
+prvtFarEndVtIntervalFCs PerfIntervalCount,
+prvtFarEndVtIntervalESAs PerfIntervalCount,
+prvtFarEndVtIntervalESBs PerfIntervalCount,
+prvtFarEndVtIntervalBBEs PerfIntervalCount,
+prvtFarEndVtIntervalRFIs PerfIntervalCount
+
+}
+
+prvtFarEndVtIntervalFCs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Failures counter of a SONET/SDH VT
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtFarEndVtIntervalEntry 1}
+
+
+prvtFarEndVtIntervalESAs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Errored Seconds type A encountered by a SONET/SDH Vt
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtFarEndVtIntervalEntry 2}
+
+
+prvtFarEndVtIntervalESBs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Errored Seconds type B encountered by a SONET/SDH Vt
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtFarEndVtIntervalEntry 3}
+
+prvtFarEndVtIntervalBBEs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End Background Block Errors encountered by a SONET/SDH Vt
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtFarEndVtIntervalEntry 4}
+
+prvtFarEndVtIntervalRFIs OBJECT-TYPE
+SYNTAX PerfIntervalCount
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Far End number Remote failure indications of SONET/SDH Vt
+in a particular 15-minute interval in the past 24 hours."
+::= {prvtFarEndVtIntervalEntry 5}
+
+
+
+SonetLineAlarmType ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "Type of Sonet Line alarm:
+sonetAlarmLineMSAIS (1)
+sonetAlarmLineLAIS (2)
+sonetAlarmLineMSRDI(3)
+sonetAlarmLineLRDI(4)"
+SYNTAX INTEGER{
+sonetAlarmLineMSAIS (1),
+sonetAlarmLineLAIS (2),
+sonetAlarmLineMSRDI(3),
+sonetAlarmLineLRDI(4)
+}
+
+
+SonetSectionAlarmType ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "Type of Sonet Section alarm:
+sonetAlarmSectionLOS (5)
+sonetAlarmSectionLOF (6)
+sonetAlarmSectionRSLOF (7) "
+SYNTAX INTEGER{
+sonetAlarmSectionLOS (5),
+sonetAlarmSectionLOF (6),
+sonetAlarmSectionRSLOF (7)
+}
+
+SonetPathAlarmType ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "Type of Sonet Path alarm:
+sonetAlarmPathLOP (8)
+sonetAlarmPathAIS (9)
+sonetAlarmPathRDI (10)
+sonetAlarmPathUNEQUIPPED (11)
+sonetAlarmPathLABELMISMATCH (12) "
+SYNTAX INTEGER{
+sonetAlarmPathLOP (8),
+sonetAlarmPathAIS (9),
+sonetAlarmPathRDI (10),
+sonetAlarmPathUNEQUIPPED (11),
+sonetAlarmPathLABELMISMATCH (12)
+}
+
+
+SonetVTAlarmType ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "Type of Sonet VT alarm:
+sonetAlarmVtTULOP (13)
+sonetAlarmVtVLOP (14)
+sonetAlarmVtTUAIS (15)
+sonetAlarmVtVAIS (16)
+sonetAlarmVtLPRDI (17)
+sonetAlarmVtVRDI (18)
+sonetAlarmVtLPRFI (19)
+sonetAlarmVtVRFI (20)
+sonetAlarmVtLPUNEQUIPPED (21)
+sonetAlarmVtVUNEQUIPPED (22)
+sonetAlarmVtLPLBLMISMATCH (23)
+sonetAlarmVtVLBLMISMATCH (24)"
+SYNTAX INTEGER{
+sonetAlarmVtTULOP (13),
+sonetAlarmVtVLOP (14),
+sonetAlarmVtTUAIS (15),
+sonetAlarmVtVAIS (16),
+sonetAlarmVtLPRDI (17),
+sonetAlarmVtVRDI (18),
+sonetAlarmVtLPRFI (19),
+sonetAlarmVtVRFI (20),
+sonetAlarmVtLPUNEQUIPPED (21),
+sonetAlarmVtVUNEQUIPPED (22),
+sonetAlarmVtLPLBLMISMATCH (23),
+sonetAlarmVtVLBLMISMATCH (24)
+}
+
+
+SonetAlarmStatus ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "Sonet alarm status:
+sonetAlarmDown (0)
+sonetAlarmUp (1) "
+SYNTAX INTEGER{
+sonetAlarmDown (0),
+sonetAlarmUp (1)
+}
+
+prvtSonetSectionAlarmsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtSonetSectionAlarmsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Sonet Section alarms table"
+::= { prvtStatisticsSection 3 }
+
+prvtSonetSectionAlarmsEntry OBJECT-TYPE
+SYNTAX PrvtSonetSectionAlarmsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Sonet Section alarms"
+INDEX { ifIndex }
+::= { prvtSonetSectionAlarmsTable 1 }
+
+PrvtSonetSectionAlarmsEntry ::= SEQUENCE{
+prvtSonetSectionAlarmType SonetSectionAlarmType,
+prvtSonetSectionAlarmStatus SonetAlarmStatus
+}
+
+prvtSonetSectionAlarmType OBJECT-TYPE
+SYNTAX SonetSectionAlarmType
+MAX-ACCESS accessible-for-notify
+STATUS current
+DESCRIPTION
+"Type of Sonet Section alarm:
+sonetAlarmSectionLOS (5)
+sonetAlarmSectionLOF (6)
+sonetAlarmSectionRSLOF (7) "
+::= {prvtSonetSectionAlarmsEntry 1}
+
+prvtSonetSectionAlarmStatus OBJECT-TYPE
+SYNTAX SonetAlarmStatus
+MAX-ACCESS accessible-for-notify
+STATUS current
+DESCRIPTION
+"Sonet Section alarm status:
+sonetAlarmDown (0)
+sonetAlarmUp (1) "
+::= {prvtSonetSectionAlarmsEntry 2}
+
+prvtSonetLineAlarmsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtSonetLineAlarmsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Sonet Line alarms table"
+::= { prvtStatisticsLine 5 }
+
+prvtSonetLineAlarmsEntry OBJECT-TYPE
+SYNTAX PrvtSonetLineAlarmsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Sonet Line alarms entry"
+INDEX { ifIndex }
+::= { prvtSonetLineAlarmsTable 1 }
+
+PrvtSonetLineAlarmsEntry ::= SEQUENCE{
+prvtSonetLineAlarmType SonetLineAlarmType,
+prvtSonetLineAlarmStatus SonetAlarmStatus
+}
+
+prvtSonetLineAlarmType OBJECT-TYPE
+SYNTAX SonetLineAlarmType
+MAX-ACCESS accessible-for-notify
+STATUS current
+DESCRIPTION
+"Type of Sonet Line alarm:
+sonetAlarmLineMSAIS (1)
+sonetAlarmLineLAIS (2)
+sonetAlarmLineMSRDI(3)
+sonetAlarmLineLRDI(4)"
+::= {prvtSonetLineAlarmsEntry 1}
+
+prvtSonetLineAlarmStatus OBJECT-TYPE
+SYNTAX SonetAlarmStatus
+MAX-ACCESS accessible-for-notify
+STATUS current
+DESCRIPTION
+"Sonet Line alarm status:
+sonetAlarmDown (0)
+sonetAlarmUp (1) "
+::= {prvtSonetLineAlarmsEntry 2}
+
+
+prvtSonetPathAlarmsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtSonetPathAlarmsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Sonet Path alarms table"
+::= { prvtStatisticsPath 5 }
+
+prvtSonetPathAlarmsEntry OBJECT-TYPE
+SYNTAX PrvtSonetPathAlarmsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Sonet Path alarms entry"
+INDEX { ifIndex }
+::= { prvtSonetPathAlarmsTable 1 }
+
+PrvtSonetPathAlarmsEntry ::= SEQUENCE{
+prvtSonetPathAlarmType SonetPathAlarmType,
+prvtSonetPathAlarmStatus SonetAlarmStatus
+}
+
+prvtSonetPathAlarmType OBJECT-TYPE
+SYNTAX SonetPathAlarmType
+MAX-ACCESS accessible-for-notify
+STATUS current
+DESCRIPTION "Type of Sonet Path alarm:
+sonetAlarmPathLOP (8)
+sonetAlarmPathAIS (9)
+sonetAlarmPathRDI (10)
+sonetAlarmPathUNEQUIPPED (11)
+sonetAlarmPathLABELMISMATCH (12) "
+::= {prvtSonetPathAlarmsEntry 1}
+
+prvtSonetPathAlarmStatus OBJECT-TYPE
+SYNTAX SonetAlarmStatus
+MAX-ACCESS accessible-for-notify
+STATUS current
+DESCRIPTION
+"Sonet Path alarm status:
+sonetAlarmDown (0)
+sonetAlarmUp (1) "
+::= {prvtSonetPathAlarmsEntry 2}
+
+prvtSonetVTAlarmsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtSonetVTAlarmsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Sonet VT alarms table"
+::= { prvtStatisticsVt 5 }
+
+prvtSonetVTAlarmsEntry OBJECT-TYPE
+SYNTAX PrvtSonetVTAlarmsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Sonet VT alarms entry"
+INDEX { ifIndex }
+::= { prvtSonetVTAlarmsTable 1 }
+
+PrvtSonetVTAlarmsEntry ::= SEQUENCE{
+prvtSonetVTAlarmType SonetVTAlarmType,
+prvtSonetVTAlarmStatus SonetAlarmStatus
+}
+
+prvtSonetVTAlarmType OBJECT-TYPE
+SYNTAX SonetVTAlarmType
+MAX-ACCESS accessible-for-notify
+STATUS current
+DESCRIPTION "Type of Sonet VT alarm:
+sonetAlarmVtTULOP (13)
+sonetAlarmVtVLOP (14)
+sonetAlarmVtTUAIS (15)
+sonetAlarmVtVAIS (16)
+sonetAlarmVtLPRDI (17)
+sonetAlarmVtVRDI (18)
+sonetAlarmVtLPRFI (19)
+sonetAlarmVtVRFI (20)
+sonetAlarmVtLPUNEQUIPPED (21)
+sonetAlarmVtVUNEQUIPPED (22)
+sonetAlarmVtLPLBLMISMATCH (23)
+sonetAlarmVtVLBLMISMATCH (24)"
+::= {prvtSonetVTAlarmsEntry 1}
+
+prvtSonetVTAlarmStatus OBJECT-TYPE
+SYNTAX SonetAlarmStatus
+MAX-ACCESS accessible-for-notify
+STATUS current
+DESCRIPTION
+"Sonet VT alarm status:
+sonetAlarmDown (0)
+sonetAlarmUp (1) "
+::= {prvtSonetVTAlarmsEntry 2}
+
+
+prvtSonetSectionAlarms NOTIFICATION-TYPE
+OBJECTS {
+ifIndex,
+prvtSonetSectionAlarmType,
+prvtSonetSectionAlarmStatus
+}
+STATUS current
+DESCRIPTION "This trap is sent when a Sonet Section alarm is up or down"
+::= { prvtStatisticsNotifications 1 }
+
+prvtSonetLineAlarms NOTIFICATION-TYPE
+OBJECTS {
+ifIndex,
+prvtSonetLineAlarmType,
+prvtSonetLineAlarmStatus
+}
+STATUS current
+DESCRIPTION "This trap is sent when a Sonet Line alarm is up or down"
+::= { prvtStatisticsNotifications 2 }
+
+prvtSonetPathAlarms NOTIFICATION-TYPE
+OBJECTS {
+ifIndex,
+prvtSonetPathAlarmType,
+prvtSonetPathAlarmStatus
+}
+STATUS current
+DESCRIPTION "This trap is sent when a Sonet Path alarm is up or down"
+::= { prvtStatisticsNotifications 3 }
+
+prvtSonetVTAlarms NOTIFICATION-TYPE
+OBJECTS {
+ifIndex,
+prvtSonetVTAlarmType,
+prvtSonetVTAlarmStatus
+}
+STATUS current
+DESCRIPTION "This trap is sent when a Sonet VT alarm is up or down"
+::= { prvtStatisticsNotifications 4 }
+
+
+--
+-- Conformance Information
+--
+
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,253 @@
+-- =================================================================
+-- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description:The H3C root mib
+-- Reference:
+-- Version:     V1.70
+-- History:
+--  V1.0 2004-08-05 Initial version, created by gaolong.
+--  V1.22 add MIB identifier
+--            'h3cVoiceVlan'
+--            'h3cL4Redirect'
+--            'h3cUser', 'h3cRadius'
+--            'h3cPowerEthernetExt'
+--            'h3cEntityRelation'
+--            'h3cProtocolVlan'
+--            'h3cQosProfile'
+-- V1.23 add MIB identifier
+--            'hwQoS'
+-- V1.3 2004-10-12 updated by gaolong
+--      add MIB identifier 'rmonExtend'
+-- V1.31 2004-10-23 updated by gaolong
+--       add 'h3cEntityVendorTypeOID', 'dlsw', 'hwpaeExtMib', 'hwDevice', 'h3cNat',
+--       'h3cPos', subnode 20 under h3cCommon, 'voice', object identifiers.
+-- V1.32 2004-11-8 update by xiejianping
+--       add 'h3cAAL5' and 'h3cSSH';
+-- V1.33 2004-11-10 update by xiejianping
+--       add 'h3cRSA';
+-- V1.34 2004-12-12 updated by gaolong
+--       add h3cVrrpExt, h3cIpa, h3cPortSecurity, h3cVpls, h3cE1,
+--           h3cT1, h3cIkeMonitor
+-- V1.35 2004-12-25 updated by gaolong
+--       add 'h3cIfExt', 'h3cWebSwitch', 'h3cAutoDetect', 'h3cIpBroadcast',
+--           and 'h3cIpx'.
+-- V1.36 2005-03-10 updated by gaolong
+--       modify 'h3cIkeMonitor' to 'h3cIKEMonitor' by gaolong
+--       add 'h3cDldp' and 'h3cRrpp'
+-- V1.37 2005-03-29 updated by gaolong
+--       modify object name for IPSec monitor
+-- V1.38 2005-05-03 updated by gaolong
+--       add 'h3cVoice', 'h3cRcr', 'h3cAtmDxi', 'h3cDomain', 'h3cUnicast', 'h3cTrap',
+--           'h3cDhcpSnoop', 'h3cIPS', 'h3cProtocolPriority', 'h3cEpon', 'h3cCfCard',
+--           and 'h3cIds'
+-- V1.39 2005/5/25 add 'h3cMulticast' and 'h3cMpm' by gaolong
+--                 change name of subnode 20 under h3cCommon to 'h3cNS'
+-- V1.40 2005/6/25 updated by gaolong
+--       add 'h3cOadp', 'h3cTunnel', 'h3cGre', 'h3cObjectInfo', 'h3cDvpn'
+--           and 'h3cDhcpRelay' by gaolong
+-- V1.41 2005/7/9 add 'h3cIsis' by gaolong
+-- V1.42 2005/8/2 add 'h3cRpr' by gaolong
+-- V1.43 2005/9/2 add 'h3cSubnetVlan' by gaolong
+-- V1.44 2005/9/20 add 'h3cDlswExt', 'h3cSyslog' by gaolong
+-- V1.45 2005/10/29 remove 'voice' for confliction with 3Com MIB  by longyin
+-- V1.46 2005/12/02 add 'h3cFlowTemplate' and 'h3cQos2' under 'h3cCommon',
+--                  add 'h3cSNMPAgCpb' under 'h3c',
+--                  add subidentifier 'h3cQosCapability' of 'h3cSNMPAgCpb',
+--                  add subidentifier 'h3cIfQos2' and 'h3cCBQos2' of 'h3cQos2',
+--                  add 'h3cStormConstrain' by longyin
+-- V1.47 2006/01/09 add 'h3cIpAddrMIB' by longyin
+-- V1.48 2006/01/21 add 'h3cMirrGroup' by longyin
+-- V1.49 2006/03/05 add 'h3cQINQ' by longyin
+-- V1.50 2006/04/06 add 'h3cTransceiver', 'h3cIpv6AddrMIB' by gaolong
+-- V1.51 2006/06/14 add 'h3cBfdMIB' by longyin
+-- V1.52 2006/11/25 add 'h3cRCP' by gaolong
+-- V1.53 2007/01/11 add 'h3cAcfp' by gaolong
+-- V1.54 2007/01/24 add 'h3cDot11' by gaolong
+-- V1.55 2007/05/15 add 'h3cE1T1VI' by gaolong
+-- V1.56 2007/07/10 add 'h3cwapiMIB', "h3cL2VpnPwe3", "h3cMplsOam"
+--                  and "h3cMplsOamPs" by gaolong
+-- V1.57 2007/08/09 add 'h3cSiemMib' by gaolong
+-- V1.58 2007/12/27 add 'h3cAFC' and 'h3cMultCDR' by longyin
+-- V1.59 2008/02/27 add 'h3cMACInformation', 'h3cFireWall', 'h3cDSP' by longyin
+-- V1.60 2008/04/29 add 'h3cNetMan' by songhao
+-- V1.61 2008/06/02 add 'h3cStack', 'h3cPosa' by songhao
+-- V1.62 2008/07/29 add 'h3cWebAuthentication' by songhao
+-- V1.63 2008/12/03 add 'h3cLpbkdt' by songhao
+-- V1.64 2009/02/27 add 'h3cMultiMedia', 'h3cDns', 'h3c3GModem'
+--                  and 'h3cPortal' by songhao
+-- V1.65 2009/05/18 add 'h3clldp','h3cDHCPServer','h3cPPPoEServer','h3cL2Isolate',
+--                      'h3cSnmpExt' by duyanbing
+-- V1.66 2009/11/04 add 'h3cVsi','h3cEvc','h3cMinm','h3cblg','h3cRS485' by shuaixiaojuan
+-- V1.67 2010/03/16 add 'h3cARPRatelimit', 'h3cLI' by songhao
+-- V1.68 2011/01/31 add 'h3cDar', 'h3cPBR' by songhao
+-- V1.69 2011/04/22 add 'h3cAAANasId' by duyanbing
+-- V1.70 2012/04/19 add 'h3cTeTunnel','h3cLB','h3cDldp2','h3cWIPS','h3cFCoE' by duyanbing
+-- =================================================================
+A3COM-HUAWEI-OID-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        enterprises
+            FROM RFC1155-SMI;
+
+-- level 1 under .enterprises
+        a3Com           OBJECT IDENTIFIER ::= { enterprises 43 }
+
+        jv-mib          OBJECT IDENTIFIER ::= { a3Com 45 }
+        huawei          OBJECT IDENTIFIER ::= { jv-mib 1 }
+-- level 2 under .huawei
+        hwLocal OBJECT IDENTIFIER ::= { huawei 1 }
+        hwproducts OBJECT IDENTIFIER ::= { huawei 2 }
+
+        huaweiMgmt      OBJECT IDENTIFIER ::= { huawei 5 }
+
+        huaweiUtility   OBJECT IDENTIFIER ::= { huawei 6 }
+        h3c             OBJECT IDENTIFIER ::= { huawei 10 }
+-- level 3
+        hwInternetProtocol OBJECT IDENTIFIER ::= { hwLocal 3 }
+        router  OBJECT IDENTIFIER ::= { hwproducts 2 }
+        lanSw   OBJECT IDENTIFIER ::= { hwproducts 23 }
+        mlsr    OBJECT IDENTIFIER ::= { hwproducts 33 }
+        dlsw    OBJECT IDENTIFIER ::= { hwproducts 34 }   -- Reference: huawei-dlsw.mib
+        hwDhcp OBJECT IDENTIFIER ::= { huaweiMgmt 7 }
+        hwMpls OBJECT IDENTIFIER ::= { huaweiMgmt 12 }
+        hwpaeExtMib OBJECT IDENTIFIER ::= { huaweiMgmt 22 }   -- Reference: huawei-8021x-ext.mib
+        huaweiDatacomm OBJECT IDENTIFIER ::= { huaweiMgmt 25 }
+        hwDevice OBJECT IDENTIFIER ::= { huaweiUtility 1 }    -- Reference: huawei-splat-devm.mib
+
+        -- under h3c
+        h3cCommon   OBJECT IDENTIFIER ::= { h3c 2 }             -- 2004/1/12, xiejianping changed
+        h3cEntityVendorTypeOID OBJECT IDENTIFIER ::= { h3c 3 }  -- 2004/5/18, xiejianping added
+        hwSystem    OBJECT IDENTIFIER ::= { h3c 6 }             -- 2004/4/24, xiejianping changed
+        h3cSNMPAgCpb    OBJECT IDENTIFIER ::= { h3c 7 }         -- 2005/11/27, longyin added, for capability MIBs
+
+
+        vrpProtocol OBJECT IDENTIFIER ::= { hwInternetProtocol 3 }
+        rmonExtend OBJECT IDENTIFIER ::= { hwInternetProtocol 4 }
+        -- under lanSw
+        lswCommon       OBJECT IDENTIFIER ::= { lanSw 1 }
+
+-- remove 'voice' for confliction of 3Com
+--      voice                   OBJECT IDENTIFIER ::= { huaweiDatacomm 1 }
+
+        hwQoS    OBJECT IDENTIFIER ::= { huaweiDatacomm 32 }
+
+        h3cFtm    OBJECT IDENTIFIER ::= { h3cCommon 1 }
+        h3cUIMgt    OBJECT IDENTIFIER ::= { h3cCommon 2 }
+        h3cEntityExtend    OBJECT IDENTIFIER ::= { h3cCommon 6 }
+        h3cIPSecMonitor    OBJECT IDENTIFIER ::= { h3cCommon 7 }
+        h3cAcl    OBJECT IDENTIFIER ::= { h3cCommon 8 }
+        h3cVoiceVlan    OBJECT IDENTIFIER ::= { h3cCommon 9 }
+        h3cL4Redirect   OBJECT IDENTIFIER ::= { h3cCommon 10 }
+        h3cUser        OBJECT IDENTIFIER ::= { h3cCommon 12 }
+        h3cRadius        OBJECT IDENTIFIER ::= { h3cCommon 13 }
+        h3cPowerEthernetExt        OBJECT IDENTIFIER ::= { h3cCommon 14 }
+        h3cEntityRelation        OBJECT IDENTIFIER ::= { h3cCommon 15 }
+        h3cProtocolVlan        OBJECT IDENTIFIER ::= { h3cCommon 16 }
+        h3cQosProfile        OBJECT IDENTIFIER ::= { h3cCommon 17 }
+        h3cNat        OBJECT IDENTIFIER ::= { h3cCommon 18 }
+        h3cPos        OBJECT IDENTIFIER ::= { h3cCommon 19 }
+        h3cNS        OBJECT IDENTIFIER ::= { h3cCommon 20 }
+        h3cAAL5        OBJECT IDENTIFIER ::= { h3cCommon 21 }
+        h3cSSH        OBJECT IDENTIFIER ::= { h3cCommon 22 }
+        h3cRSA        OBJECT IDENTIFIER ::= { h3cCommon 23 }
+        h3cVrrpExt        OBJECT IDENTIFIER ::= { h3cCommon 24 }
+
+        h3cIpa        OBJECT IDENTIFIER ::= { h3cCommon 25 }
+        h3cPortSecurity         OBJECT IDENTIFIER ::= { h3cCommon 26 }
+        h3cVpls         OBJECT IDENTIFIER ::= { h3cCommon 27 }
+        h3cE1         OBJECT IDENTIFIER ::= { h3cCommon 28 }
+        h3cT1         OBJECT IDENTIFIER ::= { h3cCommon 29 }
+        h3cIKEMonitor         OBJECT IDENTIFIER ::= { h3cCommon 30 }
+        h3cWebSwitch         OBJECT IDENTIFIER ::= { h3cCommon 31 }
+        h3cAutoDetect         OBJECT IDENTIFIER ::= { h3cCommon 32 }
+        h3cIpBroadcast         OBJECT IDENTIFIER ::= { h3cCommon 33 }
+        h3cIpx         OBJECT IDENTIFIER ::= { h3cCommon 34 }
+        h3cIPS         OBJECT IDENTIFIER ::= { h3cCommon 35 }
+        h3cDhcpSnoop         OBJECT IDENTIFIER ::= { h3cCommon 36 }
+        h3cProtocolPriority         OBJECT IDENTIFIER ::= { h3cCommon 37 }
+        h3cTrap         OBJECT IDENTIFIER ::= { h3cCommon 38 }
+        h3cVoice         OBJECT IDENTIFIER ::= { h3cCommon 39 }
+        h3cIfExt         OBJECT IDENTIFIER ::= { h3cCommon 40 }
+        h3cCfCard         OBJECT IDENTIFIER ::= { h3cCommon 41 }
+        h3cEpon         OBJECT IDENTIFIER ::= { h3cCommon 42 }
+        h3cDldp         OBJECT IDENTIFIER ::= { h3cCommon 43 }
+        h3cUnicast         OBJECT IDENTIFIER ::= { h3cCommon 44 }
+        h3cRrpp         OBJECT IDENTIFIER ::= { h3cCommon 45 }
+        h3cDomain       OBJECT IDENTIFIER ::= { h3cCommon 46 }
+        h3cIds          OBJECT IDENTIFIER ::= { h3cCommon 47 }
+        h3cRcr          OBJECT IDENTIFIER ::= { h3cCommon 48 }
+        h3cAtmDxi        OBJECT IDENTIFIER ::= { h3cCommon 49 }
+        h3cMulticast     OBJECT IDENTIFIER ::= { h3cCommon 50 }
+        h3cMpm           OBJECT IDENTIFIER ::= { h3cCommon 51 }
+        h3cOadp           OBJECT IDENTIFIER ::= { h3cCommon 52 }
+        h3cTunnel           OBJECT IDENTIFIER ::= { h3cCommon 53 }
+        h3cGre           OBJECT IDENTIFIER ::= { h3cCommon 54 }
+        h3cObjectInfo     OBJECT IDENTIFIER ::= { h3cCommon 55 }
+        h3cDvpn     OBJECT IDENTIFIER ::= { h3cCommon 57 }
+        h3cDhcpRelay     OBJECT IDENTIFIER ::= { h3cCommon 58 }
+        h3cIsis     OBJECT IDENTIFIER ::= { h3cCommon 59 }
+        h3cRpr     OBJECT IDENTIFIER ::= { h3cCommon 60 }
+        h3cSubnetVlan     OBJECT IDENTIFIER ::= { h3cCommon 61 }
+        h3cDlswExt     OBJECT IDENTIFIER ::= { h3cCommon 62 }
+        h3cSyslog     OBJECT IDENTIFIER ::= { h3cCommon 63 }
+        h3cFlowTemplate     OBJECT IDENTIFIER ::= { h3cCommon 64 }
+        h3cQos2     OBJECT IDENTIFIER ::= { h3cCommon 65 }
+        h3cStormConstrain     OBJECT IDENTIFIER ::= { h3cCommon 66 }
+        h3cIpAddrMIB     OBJECT IDENTIFIER ::= { h3cCommon 67 }
+        h3cMirrGroup     OBJECT IDENTIFIER ::= { h3cCommon 68 }
+        h3cQINQ     OBJECT IDENTIFIER ::= { h3cCommon 69 }
+
+        h3cTransceiver      OBJECT IDENTIFIER ::= { h3cCommon 70 }
+        h3cIpv6AddrMIB      OBJECT IDENTIFIER ::= { h3cCommon 71 }
+        h3cBfdMIB           OBJECT IDENTIFIER ::= { h3cCommon 72 }
+        h3cRCP              OBJECT IDENTIFIER ::= { h3cCommon 73 }
+        h3cAcfp             OBJECT IDENTIFIER ::= { h3cCommon 74 }
+        h3cDot11            OBJECT IDENTIFIER ::= { h3cCommon 75 }
+        h3cE1T1VI           OBJECT IDENTIFIER ::= { h3cCommon 76 }
+        h3cwapiMIB          OBJECT IDENTIFIER ::= { h3cCommon 77 }
+        h3cL2VpnPwe3        OBJECT IDENTIFIER ::= { h3cCommon 78 }
+        h3cMplsOam          OBJECT IDENTIFIER ::= { h3cCommon 79 }
+        h3cMplsOamPs        OBJECT IDENTIFIER ::= { h3cCommon 80 }
+        h3cSiemMib          OBJECT IDENTIFIER ::= { h3cCommon 81 }
+        h3cAFC              OBJECT IDENTIFIER ::= { h3cCommon 85 }
+        h3cMultCDR          OBJECT IDENTIFIER ::= { h3cCommon 86 }
+        h3cMACInformation   OBJECT IDENTIFIER ::= { h3cCommon 87 }
+        h3cFireWall         OBJECT IDENTIFIER ::= { h3cCommon 88 }
+        h3cDSP              OBJECT IDENTIFIER ::= { h3cCommon 89 }
+        h3cNetMan           OBJECT IDENTIFIER ::= { h3cCommon 90 }
+        h3cStack            OBJECT IDENTIFIER ::= { h3cCommon 91 }
+        h3cPosa             OBJECT IDENTIFIER ::= { h3cCommon 92 }
+        h3cWebAuthentication    OBJECT IDENTIFIER ::= { h3cCommon 93 }
+        h3cLpbkdt           OBJECT IDENTIFIER ::= { h3cCommon 95 }
+        h3cMultiMedia       OBJECT IDENTIFIER ::= { h3cCommon 96 }
+        h3cDns              OBJECT IDENTIFIER ::= { h3cCommon 97 }
+        h3c3GModem          OBJECT IDENTIFIER ::= { h3cCommon 98 }
+        h3cPortal           OBJECT IDENTIFIER ::= { h3cCommon 99 }
+        h3clldp             OBJECT IDENTIFIER ::= { h3cCommon 100 }
+        h3cDHCPServer       OBJECT IDENTIFIER ::= { h3cCommon 101 }
+        h3cPPPoEServer      OBJECT IDENTIFIER ::= { h3cCommon 102 }
+        h3cL2Isolate        OBJECT IDENTIFIER ::= { h3cCommon 103 }
+        h3cSnmpExt          OBJECT IDENTIFIER ::= { h3cCommon 104 }
+        h3cVsi              OBJECT IDENTIFIER ::= { h3cCommon 105 }
+        h3cEvc              OBJECT IDENTIFIER ::= { h3cCommon 106 }
+        h3cMinm             OBJECT IDENTIFIER ::= { h3cCommon 107 }
+        h3cBlg              OBJECT IDENTIFIER ::= { h3cCommon 108 }
+        h3cRS485            OBJECT IDENTIFIER ::= { h3cCommon 109 }
+        h3cARPRatelimit     OBJECT IDENTIFIER ::= { h3cCommon 110 }
+        h3cLI               OBJECT IDENTIFIER ::= { h3cCommon 111 }
+        h3cDar              OBJECT IDENTIFIER ::= { h3cCommon 112 }
+        h3cPBR              OBJECT IDENTIFIER ::= { h3cCommon 113 }
+        h3cAAANasId         OBJECT IDENTIFIER ::= { h3cCommon 114 }
+        h3cTeTunnel         OBJECT IDENTIFIER ::= { h3cCommon 115 }
+        h3cLB               OBJECT IDENTIFIER ::= { h3cCommon 116 }
+        h3cDldp2            OBJECT IDENTIFIER ::= { h3cCommon 117 }
+        h3cWIPS             OBJECT IDENTIFIER ::= { h3cCommon 118 }
+        h3cFCoE             OBJECT IDENTIFIER ::= { h3cCommon 120 }
+
+-- under h3c.h3cSNMPAgCpb
+        h3cQosCapability     OBJECT IDENTIFIER ::= { h3cSNMPAgCpb 1 }
+
+-- under h3c.h3cCommon.h3cQos2
+        h3cIfQos2     OBJECT IDENTIFIER ::= { h3cQos2 1 }
+        h3cCBQos2     OBJECT IDENTIFIER ::= { h3cQos2 2 }
+END
