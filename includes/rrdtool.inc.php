@@ -149,7 +149,7 @@ function rrdtool($command, $filename, $options)
     // do not write rrd files, but allow read-only commands
     $ro_commands = array('graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport');
     if (!empty($config['norrd']) && !in_array($command, $ro_commands)) {
-        c_echo('[%rRRD Disabled%n]');
+        c_echo('[%rRRD Disabled%n]', !$config['hide_rrd_disabled']);
         return array(null, null);
     }
 
@@ -429,8 +429,8 @@ function rrdtool_data_update($device, $measurement, $tags, $fields)
  * rename an rrdfile, can only be done on the LibreNMS server hosting the rrd files
  *
  * @param array $device Device object
- * @param string $oldname RRD name array as used with rrd_name()
- * @param string $newname RRD name array as used with rrd_name()
+ * @param string|array $oldname RRD name array as used with rrd_name()
+ * @param string|array $newname RRD name array as used with rrd_name()
  * @return bool indicating rename success or failure
  */
 function rrd_file_rename($device, $oldname, $newname)
