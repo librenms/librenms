@@ -15,6 +15,7 @@
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
 
@@ -146,6 +147,8 @@ function discover_device(&$device, $options = null)
     load_os($device);
     load_discovery($device);
     register_mibs($device, Config::getOsSetting($device['os'], 'register_mibs', array()), 'includes/discovery/os/' . $device['os'] . '.inc.php');
+
+    $os = OS::make($device);
 
     echo "\n";
 
@@ -637,13 +640,9 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
                 'processor_type' => $type,
                 'processor_precision' => $precision,
             );
-            if (!empty($hrDeviceIndex)) {
-                $insert_data['hrDeviceIndex'] = $hrDeviceIndex;
-            }
 
-            if (!empty($entPhysicalIndex)) {
-                $insert_data['entPhysicalIndex'] = $entPhysicalIndex;
-            }
+            $insert_data['hrDeviceIndex'] = (int)$hrDeviceIndex;
+            $insert_data['entPhysicalIndex'] = (int)$entPhysicalIndex;
 
             $inserted = dbInsert($insert_data, 'processors');
             echo '+';
@@ -1001,26 +1000,26 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                 // get the value for this sensor, check 'value' and 'oid', if state string, translate to a number
                 $data_name = isset($data['value']) ? $data['value'] : $data['oid'];  // fallback to oid if value is not set
 
-                $tmp_value = $snmp_data[$data_name];
-                if (!is_numeric($tmp_value)) {
+                $snmp_value = $snmp_data[$data_name];
+                if (!is_numeric($snmp_value)) {
                     if ($sensor_type === 'temperature') {
                         // For temp sensors, try and detect fahrenheit values
-                        if (ends_with($tmp_value, array('f', 'F'))) {
+                        if (ends_with($snmp_value, array('f', 'F'))) {
                             $user_function = 'fahrenheit_to_celsius';
                         }
                     }
-                    preg_match('/-?\d*\.?\d+/', $tmp_value, $temp_response);
+                    preg_match('/-?\d*\.?\d+/', $snmp_value, $temp_response);
                     if (!empty($temp_response[0])) {
-                        $tmp_value = $temp_response[0];
+                        $snmp_value = $temp_response[0];
                     }
                 }
 
-                if (is_numeric($tmp_value)) {
-                    $value = $tmp_value;
+                if (is_numeric($snmp_value)) {
+                    $value = $snmp_value;
                 } elseif ($sensor_type === 'state') {
                     // translate string states to values (poller does this as well)
                     $states = array_column($data['states'], 'value', 'descr');
-                    $value = isset($states[$tmp_value]) ? $states[$tmp_value] : false;
+                    $value = isset($states[$snmp_value]) ? $states[$snmp_value] : false;
                 } else {
                     $value = false;
                 }

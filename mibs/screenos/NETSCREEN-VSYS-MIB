@@ -1,0 +1,98 @@
+-- This module defines enterprise MIBs for Virtual Systems
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-VSYS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenVsys
+        FROM NETSCREEN-SMI
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenVsysMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are use to monitor all the
+         virtual systems"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311130000Z" -- November 13, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "no comment"
+    REVISION      "200005080000Z" -- May 08, 2000
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenVsys 0 }
+
+NsVsysCfgEntry ::= SEQUENCE
+{
+    nsVsysCfgId   Integer32,
+    nsVsysCfgName DisplayString
+}
+
+nsVsysCfg OBJECT IDENTIFIER ::= { netscreenVsys 1 }
+
+nsVsysCfgTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsVsysCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "NetScreen-500, NetScreen-1000 and above series support virtual
+         system. This table collects the vsys configuration in NetScreen
+         device."
+    ::= { nsVsysCfg 1 }
+
+nsVsysCfgEntry OBJECT-TYPE
+    SYNTAX        NsVsysCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the table holds a set of configuration
+         parameters associated  with an instance of virtual system."
+    INDEX
+        { nsVsysCfgId }
+    ::= { nsVsysCfgTable 1 }
+
+nsVsysCfgId OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique ID for each virtual system."
+    ::= { nsVsysCfgEntry 1 }
+
+nsVsysCfgName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "virtual system name."
+    ::= { nsVsysCfgEntry 2 }
+
+END
+
+
