@@ -159,4 +159,8 @@ if ($device['os'] == "linux" || $device['os'] == "endian" || $device['os'] == "p
     $output = preg_split("/ /", $device['sysDescr']);
     $version = $output[2];
     $hardware = $output[6];
+} elseif ($device['os'] == "opnsense") {
+    $output = preg_split("/ /", $device['sysDescr']);
+    $version = $output[2];
+    $hardware = $output[6];
 }
