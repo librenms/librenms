@@ -49322,7 +49322,7 @@
             "processors": [
                 {
                     "entPhysicalIndex": "42",
-                    "hrDeviceIndex": null,
+                    "hrDeviceIndex": "0",
                     "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.42",
                     "processor_index": "42",
                     "processor_type": "comware",
@@ -49333,7 +49333,7 @@
                 },
                 {
                     "entPhysicalIndex": "43",
-                    "hrDeviceIndex": null,
+                    "hrDeviceIndex": "0",
                     "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.43",
                     "processor_index": "43",
                     "processor_type": "comware",
@@ -49344,7 +49344,7 @@
                 },
                 {
                     "entPhysicalIndex": "44",
-                    "hrDeviceIndex": null,
+                    "hrDeviceIndex": "0",
                     "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.44",
                     "processor_index": "44",
                     "processor_type": "comware",
@@ -49355,7 +49355,7 @@
                 },
                 {
                     "entPhysicalIndex": "46",
-                    "hrDeviceIndex": null,
+                    "hrDeviceIndex": "0",
                     "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.46",
                     "processor_index": "46",
                     "processor_type": "comware",
@@ -49366,7 +49366,7 @@
                 },
                 {
                     "entPhysicalIndex": "47",
-                    "hrDeviceIndex": null,
+                    "hrDeviceIndex": "0",
                     "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.47",
                     "processor_index": "47",
                     "processor_type": "comware",
@@ -49377,7 +49377,7 @@
                 },
                 {
                     "entPhysicalIndex": "50",
-                    "hrDeviceIndex": null,
+                    "hrDeviceIndex": "0",
                     "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.50",
                     "processor_index": "50",
                     "processor_type": "comware",
@@ -49388,7 +49388,7 @@
                 },
                 {
                     "entPhysicalIndex": "51",
-                    "hrDeviceIndex": null,
+                    "hrDeviceIndex": "0",
                     "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.51",
                     "processor_index": "51",
                     "processor_type": "comware",
@@ -49399,7 +49399,7 @@
                 },
                 {
                     "entPhysicalIndex": "52",
-                    "hrDeviceIndex": null,
+                    "hrDeviceIndex": "0",
                     "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.52",
                     "processor_index": "52",
                     "processor_type": "comware",
@@ -49410,7 +49410,7 @@
                 },
                 {
                     "entPhysicalIndex": "53",
-                    "hrDeviceIndex": null,
+                    "hrDeviceIndex": "0",
                     "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.53",
                     "processor_index": "53",
                     "processor_type": "comware",
@@ -49421,7 +49421,7 @@
                 },
                 {
                     "entPhysicalIndex": "54",
-                    "hrDeviceIndex": null,
+                    "hrDeviceIndex": "0",
                     "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.54",
                     "processor_index": "54",
                     "processor_type": "comware",
@@ -49432,133 +49432,12 @@
                 },
                 {
                     "entPhysicalIndex": "55",
-                    "hrDeviceIndex": null,
+                    "hrDeviceIndex": "0",
                     "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.55",
                     "processor_index": "55",
                     "processor_type": "comware",
                     "processor_usage": "6",
                     "processor_descr": "Board 13",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
-                },
-                {
-                    "entPhysicalIndex": "340",
-                    "hrDeviceIndex": null,
-                    "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.340",
-                    "processor_index": "340",
-                    "processor_type": "comware",
-                    "processor_usage": "0",
-                    "processor_descr": "virtue Board",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
-                },
-                {
-                    "entPhysicalIndex": "343",
-                    "hrDeviceIndex": null,
-                    "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.343",
-                    "processor_index": "343",
-                    "processor_type": "comware",
-                    "processor_usage": "0",
-                    "processor_descr": "virtue Board",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
-                },
-                {
-                    "entPhysicalIndex": "346",
-                    "hrDeviceIndex": null,
-                    "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.346",
-                    "processor_index": "346",
-                    "processor_type": "comware",
-                    "processor_usage": "0",
-                    "processor_descr": "virtue Board",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
-                },
-                {
-                    "entPhysicalIndex": "352",
-                    "hrDeviceIndex": null,
-                    "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.352",
-                    "processor_index": "352",
-                    "processor_type": "comware",
-                    "processor_usage": "0",
-                    "processor_descr": "virtue Board",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
-                },
-                {
-                    "entPhysicalIndex": "355",
-                    "hrDeviceIndex": null,
-                    "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.355",
-                    "processor_index": "355",
-                    "processor_type": "comware",
-                    "processor_usage": "0",
-                    "processor_descr": "virtue Board",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
-                },
-                {
-                    "entPhysicalIndex": "364",
-                    "hrDeviceIndex": null,
-                    "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.364",
-                    "processor_index": "364",
-                    "processor_type": "comware",
-                    "processor_usage": "0",
-                    "processor_descr": "virtue Board",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
-                },
-                {
-                    "entPhysicalIndex": "367",
-                    "hrDeviceIndex": null,
-                    "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.367",
-                    "processor_index": "367",
-                    "processor_type": "comware",
-                    "processor_usage": "0",
-                    "processor_descr": "virtue Board",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
-                },
-                {
-                    "entPhysicalIndex": "370",
-                    "hrDeviceIndex": null,
-                    "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.370",
-                    "processor_index": "370",
-                    "processor_type": "comware",
-                    "processor_usage": "0",
-                    "processor_descr": "virtue Board",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
-                },
-                {
-                    "entPhysicalIndex": "373",
-                    "hrDeviceIndex": null,
-                    "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.373",
-                    "processor_index": "373",
-                    "processor_type": "comware",
-                    "processor_usage": "0",
-                    "processor_descr": "virtue Board",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
-                },
-                {
-                    "entPhysicalIndex": "376",
-                    "hrDeviceIndex": null,
-                    "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.376",
-                    "processor_index": "376",
-                    "processor_type": "comware",
-                    "processor_usage": "0",
-                    "processor_descr": "virtue Board",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
-                },
-                {
-                    "entPhysicalIndex": "379",
-                    "hrDeviceIndex": null,
-                    "processor_oid": ".1.3.6.1.4.1.25506.2.6.1.1.1.1.6.379",
-                    "processor_index": "379",
-                    "processor_type": "comware",
-                    "processor_usage": "0",
-                    "processor_descr": "virtue Board",
                     "processor_precision": "1",
                     "processor_perc_warn": "75"
                 }

@@ -2,10 +2,9 @@ os: cmm
 text: Cambium CMM
 type: wireless
 icon: cambium
-mib_dir: cambium
+group: cambium
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-group: cambium
 discovery:
     -
         sysObjectID:

@@ -1,8 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-use LibreNMS\Config;
-use LibreNMS\Proc;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 

@@ -26,7 +26,7 @@
 namespace LibreNMS\Tests;
 
 use LibreNMS\Config;
-use LibreNMS\Device\Processor;
+use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Util\ModuleTestHelper;
 
 class OSModulesTest extends DBTestCase
@@ -45,30 +45,40 @@ class OSModulesTest extends DBTestCase
         $this->requreSnmpsim();  // require snmpsim for tests
         global $snmpsim;
 
-        $helper = new ModuleTestHelper($modules, $os, $variant);
-        $helper->setQuiet();
-        $filename = $helper->getJsonFilepath(true);
+        try {
+            $helper = new ModuleTestHelper($modules, $os, $variant);
+            $helper->setQuiet();
+            $filename = $helper->getJsonFilepath(true);
 
-        $expected_data = $helper->getTestData();
-        $results = $helper->generateTestData($snmpsim, true);
+            $expected_data = $helper->getTestData();
+            $results = $helper->generateTestData($snmpsim, true);
+        } catch (FileNotFoundException $e) {
+            $this->fail($e->getMessage());
+        }
 
         if (is_null($results)) {
             $this->fail("$os: Failed to collect data.");
         }
 
         foreach ($modules as $module) {
+            $expected = $expected_data[$module]['discovery'];
+            $actual = $results[$module]['discovery'];
             $this->assertEquals(
-                $expected_data[$module]['discovery'],
-                $results[$module]['discovery'],
+                $expected,
+                $actual,
                 "OS $os: Discovered $module data does not match that found in $filename\n"
+                . print_r(array_diff($expected, $actual), true)
                 . $helper->getLastDiscoveryOutput()
                 . "\nOS $os: Polled $module data does not match that found in $filename"
             );
 
+            $expected = $expected_data[$module]['poller'] == 'matches discovery' ? $expected_data[$module]['discovery'] : $expected_data[$module]['poller'];
+            $actual = $results[$module]['poller'];
             $this->assertEquals(
-                $expected_data[$module]['poller'] == 'matches discovery' ? $expected_data[$module]['discovery'] : $expected_data[$module]['poller'],
-                $results[$module]['poller'],
+                $expected,
+                $actual,
                 "OS $os: Polled $module data does not match that found in $filename\n"
+                . print_r(array_diff($expected, $actual), true)
                 . $helper->getLastPollerOutput()
                 . "\nOS $os: Polled $module data does not match that found in $filename"
             );

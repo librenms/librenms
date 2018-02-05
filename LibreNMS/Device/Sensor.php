@@ -254,7 +254,7 @@ class Sensor implements DiscoveryModule, PollerModule
      *
      * @param OS $os
      */
-    public static function discover(OS $os)
+    public static function runDiscovery(OS $os)
     {
         // Add discovery types here
     }

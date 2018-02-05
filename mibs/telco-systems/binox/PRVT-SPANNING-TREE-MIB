@@ -1,0 +1,957 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-SPANNING-TREE-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-SPANNING-TREE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifIndex
+        FROM IF-MIB
+    switch
+        FROM PRVT-SWITCH-MIB
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+prvtSpanningTreeMIB MODULE-IDENTITY
+    LAST-UPDATED "201004060000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "The private MIB module for management of the spanning tree and fast ring protocols."
+    REVISION    "201004060000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { switch 107 }
+
+
+PrvtStInstIdTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "A spanning tree instance identifier."
+    SYNTAX      Unsigned32 (0..15)
+
+PrvtStInstIdExceptZeroTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "A non-zero spanning tree instance identifier."
+    SYNTAX      Unsigned32 (1..15)
+
+PrvtStPortIdTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "x"
+    STATUS      current
+    DESCRIPTION 
+        "The port identifier."
+    SYNTAX      Unsigned32 (0..65535)
+
+PrvtStBridgeIdTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2d.1x:1x:1x:1x:1x:1x"
+    STATUS      current
+    DESCRIPTION 
+        "The bridge identifier, as used in the Spanning Tree
+         Protocol, to uniquely identify a bridge."
+    SYNTAX      OCTET STRING (SIZE(8))
+
+PrvtStLearnModeTC ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Learn mode."
+    SYNTAX      INTEGER { none(0), standard(1), temporary-disabled(2) }
+
+PrvtStLinkTypeTC ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Link types."
+    SYNTAX      INTEGER { auto(1), pointToPoint(2), shared(3) }
+
+PrvtStPortRoleTC ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Possible port roles."
+    SYNTAX      INTEGER { disabled(1), root(2), designated(3), 
+                    alternate(4), backup(5), master(6) }
+
+PrvtStPortStateTC ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Possible port states."
+    SYNTAX      INTEGER { forward(1), block(2), learn(3) }
+
+PrvtStPortPriorityTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Possible values for port priority.
+         Valid values are multiples of 16."
+    SYNTAX      Unsigned32 (0 | 16 | 32 | 48 | 64 | 80 | 96 | 112 | 128 | 
+                    144 | 160 | 176 | 192 | 208 | 224 | 240)
+
+PrvtStBridgePriorityTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Possible values for bridge priority.
+         Valid values are multiples of 4096."
+    SYNTAX      Unsigned32 (0 | 4096 | 8192 | 12288 | 16384 | 20480 | 
+                    24576 | 28672 | 32768 | 36864 | 40960 | 45056 | 
+                    49152 | 53248 | 57344 | 61440)
+
+prvtStNotifications OBJECT IDENTIFIER
+    ::= { prvtSpanningTreeMIB 0 }
+
+prvtStObjects OBJECT IDENTIFIER
+    ::= { prvtSpanningTreeMIB 1 }
+
+prvtStCommon OBJECT IDENTIFIER
+    ::= { prvtStObjects 1 }
+
+prvtStProviderBridgeAddress OBJECT-TYPE
+    SYNTAX      INTEGER { dot1d(0), dot1ad(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Chose wich standard - 802.1d or 802.1ad will be used for BPDUs"
+    REFERENCE   
+        "IEEE 802.1ad"
+    ::= { prvtStCommon 1 }
+
+prvtStMaxAge OBJECT-TYPE
+    SYNTAX      Unsigned32 (6..40)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The maximum age, in seconds, of Spanning Tree Protocol
+         information learned from the network on any port
+         before it is discarded.
+         Note that the following relationships are enforced:
+         prvtStMaxAge >= 2 x (prvtStHelloTime + 1)
+         2 x (prvtStForwardDelay - 1) >= prvtStMaxAge"
+    REFERENCE   
+        "IEEE 802.1s clause 13.23.4"
+    ::= { prvtStCommon 2 }
+
+prvtStHelloTime OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..40)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The amount of time, in seconds, between the transmission of
+         Configuration bridge PDUs by this node on any port
+         when it is the root of the spanning tree or trying
+         to become so.
+         Note that the following relationship is enforced:
+         prvtStMaxAge >= 2 x (prvtStHelloTime + 1)"
+    REFERENCE   
+        "IEEE 802.1s clause 13.22"
+    ::= { prvtStCommon 3 }
+
+prvtStForwardDelay OBJECT-TYPE
+    SYNTAX      Unsigned32 (4..30)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The amount of time in seconds to delay before entering forwarding state.
+         Note that the following relationship is enforced:
+         2 x (prvtStForwardDelay - 1) >= prvtStMaxAge"
+    REFERENCE   
+        "IEEE 802.1s clause 13.23"
+    ::= { prvtStCommon 4 }
+
+prvtStPriority OBJECT-TYPE
+    SYNTAX      PrvtStBridgePriorityTC
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The bridge priority.
+         Valid values are multiples of 4096."
+    REFERENCE   
+        "IEEE 802.1s clause 13.23"
+    ::= { prvtStCommon 5 }
+
+prvtStTimeSinceTopologyChange OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The time, in seconds, since last topology change."
+    ::= { prvtStCommon 6 }
+
+prvtStTopChanges OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of topology changes detected."
+    ::= { prvtStCommon 7 }
+
+prvtStPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtStPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing port specific configuration information for the spanning-tree protocols."
+    ::= { prvtStCommon 8 }
+
+prvtStPortEntry OBJECT-TYPE
+    SYNTAX      PrvtStPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtStPortTable."
+    INDEX       { prvtStPortIfName }
+    ::= { prvtStPortTable 1 }
+
+PrvtStPortEntry ::= SEQUENCE {
+    prvtStPortIfName            OCTET STRING,
+    prvtStPortRowStatus         RowStatus,
+    prvtStPortBpduTx            TruthValue,
+    prvtStPortBpduRx            TruthValue,
+    prvtStPortDetectBpduLoss    TruthValue,
+    prvtStPortCiscoCompliant    TruthValue,
+    prvtStPortEdge              TruthValue,
+    prvtStPortEdgeStatus        TruthValue,
+    prvtStPortEdgeFlush         TruthValue,
+    prvtStPortLinkType          PrvtStLinkTypeTC,
+    prvtStPortLinkTypeStatus    PrvtStLinkTypeTC,
+    prvtStPortRestrictedRoot    TruthValue,
+    prvtStPortRestrictedTcn     TruthValue,
+    prvtStPortPathCost          Unsigned32,
+    prvtStPortPriority          PrvtStPortPriorityTC,
+    prvtStPortAdminStatus       TruthValue,
+    prvtStPortState             PrvtStPortStateTC,
+    prvtStPortRole              PrvtStPortRoleTC,
+    prvtStPortDesPCost          Unsigned32,
+    prvtStPortDesBridgeID       OCTET STRING,
+    prvtStPortDesPortID         PrvtStPortIdTC
+}
+
+prvtStPortIfName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "RowStatus for prvtStPortTable"
+    ::= { prvtStPortEntry 1 }
+
+prvtStPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "RowStatus for prvtStPortTable"
+    ::= { prvtStPortEntry 2 }
+
+prvtStPortBpduTx OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable transmission of BPDUs on this port."
+    ::= { prvtStPortEntry 3 }
+
+prvtStPortBpduRx OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configures how BPDUs received by the port should be processed."
+    ::= { prvtStPortEntry 4 }
+
+prvtStPortDetectBpduLoss OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable detection of BPDU loss."
+    ::= { prvtStPortEntry 5 }
+
+prvtStPortCiscoCompliant OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configure this port to be Cisco compliant."
+    ::= { prvtStPortEntry 6 }
+
+prvtStPortEdge OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set port as an edge-port.
+         Note that ring ports can not be set as edge ports."
+    ::= { prvtStPortEntry 7 }
+
+prvtStPortEdgeStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Whether this port is currently operating as an edge port."
+    ::= { prvtStPortEntry 8 }
+
+prvtStPortEdgeFlush OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Flush edge port when blocking."
+    ::= { prvtStPortEntry 9 }
+
+prvtStPortLinkType OBJECT-TYPE
+    SYNTAX      PrvtStLinkTypeTC
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configure the link type for this port."
+    REFERENCE   
+        "IEEE Std 802.1s Clause"
+    ::= { prvtStPortEntry 10 }
+
+prvtStPortLinkTypeStatus OBJECT-TYPE
+    SYNTAX      PrvtStLinkTypeTC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current link type status for this port."
+    REFERENCE   
+        "IEEE Std 802.1s Clause"
+    ::= { prvtStPortEntry 11 }
+
+prvtStPortRestrictedRoot OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable root restriction on this port.
+         Note that ring ports can not have restricted root enabled."
+    ::= { prvtStPortEntry 12 }
+
+prvtStPortRestrictedTcn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable topology change notification (TCN) restriction on this port.
+         Note that ring ports can not have restricted TCN enabled."
+    ::= { prvtStPortEntry 13 }
+
+prvtStPortPathCost OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..200000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configure the path cost for this port."
+    REFERENCE   
+        "IEEE Std 802.1s"
+    ::= { prvtStPortEntry 14 }
+
+prvtStPortPriority OBJECT-TYPE
+    SYNTAX      PrvtStPortPriorityTC
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set port priority.
+         Valid values are multiples of 16."
+    REFERENCE   
+        "IEEE Std 802.1s"
+    ::= { prvtStPortEntry 15 }
+
+prvtStPortAdminStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable or disable spanning-tree on this port.
+         Note that ring ports can not be set to disabled."
+    ::= { prvtStPortEntry 16 }
+
+prvtStPortState OBJECT-TYPE
+    SYNTAX      PrvtStPortStateTC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current state of this port."
+    ::= { prvtStPortEntry 17 }
+
+prvtStPortRole OBJECT-TYPE
+    SYNTAX      PrvtStPortRoleTC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current role for this port."
+    ::= { prvtStPortEntry 18 }
+
+prvtStPortDesPCost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The designated path cost for this port."
+    ::= { prvtStPortEntry 19 }
+
+prvtStPortDesBridgeID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The designated bridge ID for this port."
+    ::= { prvtStPortEntry 20 }
+
+prvtStPortDesPortID OBJECT-TYPE
+    SYNTAX      PrvtStPortIdTC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The designated port ID for this port."
+    ::= { prvtStPortEntry 21 }
+
+prvtStTxHoldCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..20)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "TxHoldCount is the value used by the Port Transmit state machine to limit the maximum transmission rate."
+    REFERENCE   
+        "IEEE 802.1s clause 13.23"
+    ::= { prvtStCommon 9 }
+
+prvtStLearnMode OBJECT-TYPE
+    SYNTAX      PrvtStLearnModeTC
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify learning of new MACs on non-edge ports"
+    REFERENCE   
+        "IEEE 802.1ad"
+    ::= { prvtStCommon 10 }
+
+prvtStStp OBJECT IDENTIFIER
+    ::= { prvtStObjects 2 }
+
+prvtStStpProtocolDisabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable STP protocol.
+         Note that only one flavour of xSTP can be running at a time (i.e. only one of
+         prvtStStpProtocolDisabled, prvtStRstpProtocolDisabled, prvtStMstpProtocolDisabled,
+         prvtStFRingProtocolDisabled can be true at a time."
+    ::= { prvtStStp 1 }
+
+prvtStRstp OBJECT IDENTIFIER
+    ::= { prvtStObjects 3 }
+
+prvtStRstpProtocolDisabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable RSTP protocol.
+         Note that only one flavour of xSTP can be running at a time (i.e. only one of
+         prvtStStpProtocolDisabled, prvtStRstpProtocolDisabled, prvtStMstpProtocolDisabled,
+         prvtStFRingProtocolDisabled can be true at a time."
+    ::= { prvtStRstp 1 }
+
+prvtStMstp OBJECT IDENTIFIER
+    ::= { prvtStObjects 4 }
+
+prvtStMstpProtocolDisabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable MSTP protocol.
+         Note that only one flavour of xSTP can be running at a time (i.e. only one of
+         prvtStStpProtocolDisabled, prvtStRstpProtocolDisabled, prvtStMstpProtocolEnable,
+         prvtStFRingProtocolDisabled can be true at a time."
+    ::= { prvtStMstp 1 }
+
+prvtStMstpRegionName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The configuration name of the MST region to which this bridge belongs."
+    REFERENCE   
+        "IEEE 802.1s clause 13.7"
+    ::= { prvtStMstp 2 }
+
+prvtStMstpRegionRevision OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "MST region revision."
+    REFERENCE   
+        "IEEE 802.1s clause 13.7"
+    ::= { prvtStMstp 3 }
+
+prvtStMstpMaxHops OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..40)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Maximum number of hops for the MST region."
+    REFERENCE   
+        "IEEE 802.1s clause 13.22"
+    ::= { prvtStMstp 4 }
+
+prvtStMstpMigrationDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The Migration Delay timer in seconds."
+    ::= { prvtStMstp 6 }
+
+prvtStMstpInstTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtStMstpInstEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains MST instance information."
+    ::= { prvtStMstp 8 }
+
+prvtStMstpInstEntry OBJECT-TYPE
+    SYNTAX      PrvtStMstpInstEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtStMstpInstTable."
+    INDEX       { prvtStMstpInstId }
+    ::= { prvtStMstpInstTable 1 }
+
+PrvtStMstpInstEntry ::= SEQUENCE {
+    prvtStMstpInstId                PrvtStInstIdExceptZeroTC,
+    prvtStMstpInstRowStatus         RowStatus,
+    prvtStMstpInstPriority          PrvtStBridgePriorityTC,
+    prvtStMstpInstTimeSinceTopChng  Unsigned32,
+    prvtStMstpInstTopChanges        Unsigned32
+}
+
+prvtStMstpInstId OBJECT-TYPE
+    SYNTAX      PrvtStInstIdExceptZeroTC
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An MST instance identifier."
+    ::= { prvtStMstpInstEntry 1 }
+
+prvtStMstpInstRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "RowStatus entry for prvtStMstpInstTable."
+    ::= { prvtStMstpInstEntry 2 }
+
+prvtStMstpInstPriority OBJECT-TYPE
+    SYNTAX      PrvtStBridgePriorityTC
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The bridge priority for this MST instance.
+         Valid values are multiples of 4096."
+    REFERENCE   
+        "IEEE 802.1s clause 13.23"
+    ::= { prvtStMstpInstEntry 3 }
+
+prvtStMstpInstTimeSinceTopChng OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The time in seconds since the last time a topology change was detected for this MST instance."
+    ::= { prvtStMstpInstEntry 4 }
+
+prvtStMstpInstTopChanges OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of topology changes detected for this MST instance."
+    ::= { prvtStMstpInstEntry 5 }
+
+prvtStMstpInstStatTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtStMstpInstStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains additional MST instance status information."
+    ::= { prvtStMstp 9 }
+
+prvtStMstpInstStatEntry OBJECT-TYPE
+    SYNTAX      PrvtStMstpInstStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtStMstpInstStatTable."
+    INDEX       { prvtStMstpInstId }
+    ::= { prvtStMstpInstStatTable 1 }
+
+PrvtStMstpInstStatEntry ::= SEQUENCE {
+    prvtStMstpInstStatRRootID       OCTET STRING,
+    prvtStMstpInstStatRemHopCount   Unsigned32
+}
+
+prvtStMstpInstStatRRootID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The regional root ID for this MST instance."
+    ::= { prvtStMstpInstStatEntry 2 }
+
+prvtStMstpInstStatRemHopCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The remaining hop count for this MST instance."
+    ::= { prvtStMstpInstStatEntry 3 }
+
+prvtStMstpVlanPerInstTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtStMstpVlanPerInstEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Defines the mapping of VLANs to Spanning Tree instances."
+    ::= { prvtStMstp 10 }
+
+prvtStMstpVlanPerInstEntry OBJECT-TYPE
+    SYNTAX      PrvtStMstpVlanPerInstEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtStMstpVlanPerInstTable."
+    INDEX       { prvtStMstpVlanPerInstVlanId }
+    ::= { prvtStMstpVlanPerInstTable 1 }
+
+PrvtStMstpVlanPerInstEntry ::= SEQUENCE {
+    prvtStMstpVlanPerInstVlanId     Unsigned32,
+    prvtStMstpVlanPerInstRowStatus  RowStatus,
+    prvtStMstpVlanPerInstMstId      PrvtStInstIdTC
+}
+
+prvtStMstpVlanPerInstVlanId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4095)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "VLAN identifier"
+    ::= { prvtStMstpVlanPerInstEntry 1 }
+
+prvtStMstpVlanPerInstRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "RowStatus for prvtStMstpVlanPerInstTable."
+    ::= { prvtStMstpVlanPerInstEntry 2 }
+
+prvtStMstpVlanPerInstMstId OBJECT-TYPE
+    SYNTAX      PrvtStInstIdTC
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The MST instance to which this VLAN belongs."
+    ::= { prvtStMstpVlanPerInstEntry 3 }
+
+prvtStMstpInstPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtStMstpInstPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing configuration information regarding
+         a specific port for a given MST instance."
+    ::= { prvtStMstp 12 }
+
+prvtStMstpInstPortEntry OBJECT-TYPE
+    SYNTAX      PrvtStMstpInstPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtStMstpInstPortTable."
+    INDEX       { prvtStPortIfName, prvtStMInstPortInstId }
+    ::= { prvtStMstpInstPortTable 1 }
+
+PrvtStMstpInstPortEntry ::= SEQUENCE {
+    prvtStMInstPortInstId       PrvtStInstIdExceptZeroTC,
+    prvtStMInstPortRowStatus    RowStatus,
+    prvtStMInstPortPathCost     Unsigned32,
+    prvtStMInstPortPriority     PrvtStPortPriorityTC,
+    prvtStMInstPortAdminStatus  TruthValue,
+    prvtStMInstPortState        PrvtStPortStateTC,
+    prvtStMInstPortFwdTrans     Unsigned32,
+    prvtStMInstPortStatRole     PrvtStPortRoleTC,
+    prvtStMInstPortDesPCost     Unsigned32,
+    prvtStMInstPortDesBridgeID  OCTET STRING,
+    prvtStMInstPortDesPortID    PrvtStPortIdTC
+}
+
+prvtStMInstPortInstId OBJECT-TYPE
+    SYNTAX      PrvtStInstIdExceptZeroTC
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Instance ID"
+    ::= { prvtStMstpInstPortEntry 2 }
+
+prvtStMInstPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "RowStatus for prvtStMstpInstPortTable"
+    ::= { prvtStMstpInstPortEntry 3 }
+
+prvtStMInstPortPathCost OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..200000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The path cost for this MST instance port."
+    REFERENCE   
+        "IEEE Std 802.1s"
+    ::= { prvtStMstpInstPortEntry 4 }
+
+prvtStMInstPortPriority OBJECT-TYPE
+    SYNTAX      PrvtStPortPriorityTC
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The port priority for this MST instance port.
+         Valid values are multiples of 16."
+    REFERENCE   
+        "IEEE Std 802.1s"
+    ::= { prvtStMstpInstPortEntry 5 }
+
+prvtStMInstPortAdminStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable or disable spanning-tree for this MST instance port."
+    ::= { prvtStMstpInstPortEntry 6 }
+
+prvtStMInstPortState OBJECT-TYPE
+    SYNTAX      PrvtStPortStateTC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current state of this MST instance port."
+    ::= { prvtStMstpInstPortEntry 7 }
+
+prvtStMInstPortFwdTrans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of transitions from Learning state to Forwarding state
+         that have been made for this MST instance port."
+    ::= { prvtStMstpInstPortEntry 8 }
+
+prvtStMInstPortStatRole OBJECT-TYPE
+    SYNTAX      PrvtStPortRoleTC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current role for this MST instance port."
+    ::= { prvtStMstpInstPortEntry 9 }
+
+prvtStMInstPortDesPCost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The designated port path cost."
+    ::= { prvtStMstpInstPortEntry 10 }
+
+prvtStMInstPortDesBridgeID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The designated bridge ID."
+    ::= { prvtStMstpInstPortEntry 11 }
+
+prvtStMInstPortDesPortID OBJECT-TYPE
+    SYNTAX      PrvtStPortIdTC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The designated port ID."
+    ::= { prvtStMstpInstPortEntry 12 }
+
+prvtStFRing OBJECT IDENTIFIER
+    ::= { prvtStObjects 5 }
+
+prvtStFRingProtocolDisabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable fast ring protocol.
+         Note that only one flavour of xSTP can be running at a time (i.e. only one of
+         prvtStStpProtocolDisabled, prvtStRstpProtocolDisabled, prvtStMstpProtocolEnable,
+         prvtStFRingProtocolDisabled can be true at a time.
+         Setting prvtStFRingProtocolDisabled to true will fail if prvtStFRingInstTable is empty."
+    ::= { prvtStFRing 1 }
+
+prvtStFRingPrefLink OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify preferred fast ring port"
+    ::= { prvtStFRing 2 }
+
+prvtStFRingInstTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtStFRingInstEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the table defines an instance of a fast ring.
+         Currently only one instance is supported.  An attempt to create more than one instance
+         will fail.
+         While prvtStFRingProtocolDisabled is true (i.e. fast-ring protocol is enabled), there must
+         exist at least one row in this table.  An attempt to delete the only existing row in this
+         table will fail while prvtStFRingProtocolDisabled is true."
+    ::= { prvtStFRing 3 }
+
+prvtStFRingInstEntry OBJECT-TYPE
+    SYNTAX      PrvtStFRingInstEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtStFRingInstTable."
+    INDEX       { prvtStFRingInstPort1, prvtStFRingInstPort2 }
+    ::= { prvtStFRingInstTable 1 }
+
+PrvtStFRingInstEntry ::= SEQUENCE {
+    prvtStFRingInstPort1        OCTET STRING,
+    prvtStFRingInstPort2        OCTET STRING,
+    prvtStFRingInstRowStatus    RowStatus
+}
+
+prvtStFRingInstPort1 OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The first ring port belonging to the fast ring.
+         prvtStFRingInstPort1 must exist in prvtStPortTable.
+         prvtStFRingInstPort1 must not equal prvtStFRingInstPort2."
+    ::= { prvtStFRingInstEntry 1 }
+
+prvtStFRingInstPort2 OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The second ring port belonging to the fast ring.
+         prvtStFRingInstPort2 must exist in prvtStPortTable.
+         prvtStFRingInstPort1 must not equal prvtStFRingInstPort2."
+    ::= { prvtStFRingInstEntry 2 }
+
+prvtStFRingInstRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "RowStatus entry for prvtStFRingInstTable."
+    ::= { prvtStFRingInstEntry 3 }
+
+stTopologyChange NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION 
+        "A topologyChange trap is sent by a bridge when any of
+         its configured ports transitions from the Learning state
+         to the Forwarding state, or from the Forwarding state to
+         the Blocking state. The trap is not sent if a newRoot
+         trap is sent for the same transition. Implementation of
+         this trap is optional."
+    ::= { prvtStNotifications 1 }
+
+stNewRoot NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION 
+        "The newRoot trap indicates that the sending agent has
+         become the new root of the Spanning Tree; the trap is
+         sent by a bridge soon after its election as the new
+         root, e.g., upon expiration of the Topology Change Timer,
+         immediately subsequent to its election. Implementation
+         of this trap is optional."
+    ::= { prvtStNotifications 2 }
+
+mstTopologyChange NOTIFICATION-TYPE
+    OBJECTS     { prvtStMInstPortStatRole, prvtStTimeSinceTopologyChange }
+    STATUS      current
+    DESCRIPTION 
+        "A topologyChange trap is sent by a bridge when any of
+         its configured ports transitions from the Learning state
+         to the Forwarding state, or from the Forwarding state to
+         the Blocking state. The trap is not sent if a newRoot
+         trap is sent for the same transition. Implementation of
+         this trap is optional."
+    ::= { prvtStNotifications 3 }
+
+mstNewRoot NOTIFICATION-TYPE
+    OBJECTS     { prvtStMInstPortStatRole }
+    STATUS      current
+    DESCRIPTION 
+        "The newRoot trap indicates that the sending agent has
+         become the new root of the MSTP; the trap is
+         sent by a bridge soon after its election as the new
+         root, e.g., upon expiration of the Topology Change Timer,
+         immediately subsequent to its election. Implementation
+         of this trap is optional."
+    ::= { prvtStNotifications 4 }
+
+END -- end of module PRVT-SPANNING-TREE-MIB.
