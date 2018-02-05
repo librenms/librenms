@@ -194,6 +194,12 @@ main () {
         update_res=0
         if [[ "$up" == "1" ]] || [[ "$php_ver_ret" == "1" ]]; then
             # Update current branch to latest
+            local branch=$(git rev-parse --abbrev-ref HEAD)
+            if [[ "$branch" == "HEAD" ]]; then
+                # if the branch is HEAD, then we are not on a branch, checkout master
+                git checkout master
+            fi
+
             old_ver=$(git rev-parse --short HEAD)
             status_run 'Updating to latest codebase' 'git pull --quiet' 'update'
             update_res=$?
