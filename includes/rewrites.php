@@ -414,6 +414,8 @@ function rewrite_extreme_hardware($hardware)
         '.1.3.6.1.4.1.1916.2.141' => 'Summit x480-48x',
         '.1.3.6.1.4.1.1916.2.167' => 'Summit x670-48x',
         '.1.3.6.1.4.1.1916.2.168' => 'Summit x670v-48x',
+        '.1.3.6.1.4.1.1916.2.118' => 'Summit X650-24x(SSns)',
+        '.1.3.6.1.4.1.1916.2.139' => 'Summit X480-24x(10G4X)',
     );
 
     // $hardware = array_str_replace($rewrite_extreme_hardware, $hardware);
