@@ -23,12 +23,6 @@
  * @author     Ben Gibbons <axemann@gmail.com>
  */
 
-// OPNsense firewall, OPNsense 18.1.1-a5575d7bd
-
-//list(, $hardware, $version) = explode(',', $device['sysDescr']);
-
-if ($device['os'] == "opnsense") {
-    $output = preg_split("/ /", $device['sysDescr']);
-    $version = $output[2];
-    $hardware = $output[6];
-}
+$output = preg_split("/ /", $device['sysDescr']);
+$version = $output[2];
+$hardware = $output[6];
