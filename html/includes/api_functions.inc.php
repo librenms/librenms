@@ -1248,6 +1248,7 @@ function list_bills()
     $bill_id = mres($router['bill_id']);
     $bill_ref = mres($_GET['ref']);
     $bill_custid = mres($_GET['custid']);
+    $period = $_GET['period'];
     $param = array();
 
     if (!empty($bill_custid)) {
@@ -1266,8 +1267,21 @@ function list_bills()
         $sql    .= ' AND `bill_id` IN (SELECT `bill_id` FROM `bill_perms` WHERE `user_id` = ?)';
         $param[] = $_SESSION['user_id'];
     }
+    
+    if ($period === 'previous') {
+        $select = "SELECT bills.bill_name, bills.bill_notes, bill_history.*, bill_history.traf_total as total_data, bill_history.traf_in as total_data_in, bill_history.traf_out as total_data_out ";
+        $query = 'FROM `bills`
+            INNER JOIN (SELECT bill_id, MAX(bill_hist_id) AS bill_hist_id FROM bill_history WHERE bill_dateto < NOW() AND bill_dateto > subdate(NOW(), 40) GROUP BY bill_id) qLastBills ON bills.bill_id = qLastBills.bill_id
+            INNER JOIN bill_history ON qLastBills.bill_hist_id = bill_history.bill_hist_id
+    ';
+    } else {
+        $select = "SELECT bills.*,
+            IF(bills.bill_type = 'CDR', bill_cdr, bill_quota) AS bill_allowed
+        ";
+        $query = "FROM `bills`\n";
+    }
 
-    foreach (dbFetchRows("SELECT * FROM `bills` WHERE $sql ORDER BY `bill_name`", $param) as $bill) {
+    foreach (dbFetchRows("$select $query WHERE $sql ORDER BY `bill_name`", $param) as $bill) {
         $rate_data    = $bill;
         $allowed = '';
         $used = '';

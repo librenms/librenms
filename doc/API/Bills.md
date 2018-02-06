@@ -5,12 +5,14 @@ source: API/Bills.md
 Retrieve the list of bills currently in the system.
 
 Route: `/api/v0/bills`
+       `/api/v0/bills?period=previous`
 
 Input:
 
 Example:
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills?period=previous
 ```
 
 Output:
@@ -64,12 +66,16 @@ Output:
 Retrieve a specific bill
 
 Route: `/api/v0/bills/:id`
+       `/api/v0/bills/:id?period=previous`
        `/api/v0/bills?ref=:ref`
+       `/api/v0/bills?ref=:ref&period=previous`
        `/api/v0/bills?custid=:custid`
+       `/api/v0/bills?custid=:custid&period=previous`
 
   - id is the specific bill id
   - ref is the billing reference
   - custid is the customer reference
+  - period=previous indicates you would like the data for the last complete period rather than the current period
 
 Input:
 
