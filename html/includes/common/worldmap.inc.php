@@ -4,12 +4,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
@@ -21,6 +21,8 @@
  * @package LibreNMS
  * @subpackage Frontpage
  */
+require_once $config['install_dir'] . '/includes/alerts.inc.php';
+require_once $config['install_dir'] . '/includes/device-groups.inc.php';
 
 if ($config['map']['engine'] == 'leaflet') {
     if (defined('SHOW_SETTINGS') && $config['front_page'] == "pages/front/tiles.php") {
@@ -93,6 +95,30 @@ if ($config['map']['engine'] == 'leaflet') {
             </select>
         </div>
     </div>
+    <div class="form-group">
+        <div class="col-sm-4">
+            <label for="maintenance" class="control-label">Down devices over maintenance should be shown as: </label>
+        </div>
+      <div class="col-sm-8">
+      <select class="form-control" name="maintenance" id="maintenance_'.$unique_id.'">';
+        $temp_output .= '<option value="down"';
+        if ($widget_settings['maintenance'] == 'down') {
+            $temp_output .= ' selected';
+        }
+        $temp_output .= '>Down device</option>
+        <option value="up"';
+        if ($widget_settings['maintenance'] == 'up') {
+            $temp_output .= ' selected';
+        }
+        $temp_output .= '>Up device</option>
+        <option value="warning"';
+        if ($widget_settings['maintenance'] == 'warning') {
+            $temp_output .= ' selected';
+        }
+        $temp_output .= '>Warning device</option>
+      </select>
+      </div>
+    </div>
   <div class="form-group">
     <div class="col-sm-2">
       <button type="submit" class="btn btn-default">Set</button>
@@ -125,6 +151,9 @@ if ($config['map']['engine'] == 'leaflet') {
         if (empty($widget_settings['status']) && $widget_settings['status'] != '0') {
             $widget_settings['status'] = '0,1';
         }
+        if (empty($widget_settings['maintenance'])) {
+            $widget_settings['maintenance'] = 'down';
+        }
         $map_init = "[" . $init_lat . ", " . $init_lng . "], " . sprintf("%01.0f", $init_zoom);
         $temp_output .= 'var map = L.map(\'leaflet-map\').setView('.$map_init.');
 L.tileLayer(\'//'.$config['leaflet']['tile_url'].'/{z}/{x}/{y}.png\', {
@@ -136,19 +165,27 @@ var markers = L.markerClusterGroup({
     iconCreateFunction: function (cluster) {
         var markers = cluster.getAllChildMarkers();
         var n = 0;
-        newClass = "greenCluster marker-cluster marker-cluster-small leaflet-zoom-animated leaflet-clickable";
+        color = "green"
+        newClass = "Cluster marker-cluster marker-cluster-small leaflet-zoom-animated leaflet-clickable";
         for (var i = 0; i < markers.length; i++) {
+            if (markers[i].options.icon.options.markerColor == "orange" && color != "red") {
+                color = "orange";
+            }
             if (markers[i].options.icon.options.markerColor == "red") {
-                newClass = "redCluster marker-cluster marker-cluster-small leaflet-zoom-animated leaflet-clickable";
+                color = "red";
             }
         }
-        return L.divIcon({ html: cluster.getChildCount(), className: newClass, iconSize: L.point(40, 40) });
+        return L.divIcon({ html: cluster.getChildCount(), className: color+newClass, iconSize: L.point(40, 40) });
     },
   });
 var redMarker = L.AwesomeMarkers.icon({
     icon: \'server\',
     markerColor: \'red\', prefix: \'fa\', iconColor: \'white\'
   });
+var orangeMarker = L.AwesomeMarkers.icon({
+      icon: \'server\',
+      markerColor: \'orange\', prefix: \'fa\', iconColor: \'white\'
+    });
 var greenMarker = L.AwesomeMarkers.icon({
     icon: \'server\',
     markerColor: \'green\', prefix: \'fa\', iconColor: \'white\'
@@ -182,8 +219,23 @@ var greenMarker = L.AwesomeMarkers.icon({
                 $map_devices['lng'] = $tmp_loc['lng'];
             }
             if ($map_devices['status'] == 0) {
-                $icon = 'redMarker';
-                $z_offset = 10000;  // move marker to foreground
+                if (IsMaintenance($map_devices['device_id'])) {
+                    if ($widget_settings['status'] != '0,1' && $widget_settings['maintenance'] != 'down') { // Don't show icon if the device will be shown as up and only down devices should be shown
+                        continue;
+                    }
+                    if ($widget_settings['maintenance'] == 'up') {
+                        $icon = 'greenMarker';
+                    } elseif ($widget_settings['maintenance'] == 'warning') {
+                        $icon = 'orangeMarker';
+                        $z_offset = 5000;  // move marker to foreground
+                    } else {
+                        $icon = 'redMarker';
+                        $z_offset = 10000;  // move marker to foreground
+                    }
+                } else {
+                    $icon = 'redMarker';
+                    $z_offset = 10000;  // move marker to foreground
+                }
             }
             $temp_output .= "var title = '<a href=\"" . generate_device_url($map_devices) . "\"><img src=\"".getIcon($map_devices)."\" width=\"32\" height=\"32\" alt=\"\"> ".format_hostname($map_devices)."</a>';
 var tooltip = '".format_hostname($map_devices)."';
@@ -194,10 +246,10 @@ marker.bindPopup(title);
         $temp_output .= 'map.addLayer(markers);
 map.scrollWheelZoom.disable();
 $(document).ready(function(){
-    $("#leaflet-map").on("click", function(event) {  
+    $("#leaflet-map").on("click", function(event) {
         map.scrollWheelZoom.enable();
     });
-    $("#leaflet-map").mouseleave(function(event) {  
+    $("#leaflet-map").mouseleave(function(event) {
         map.scrollWheelZoom.disable();
     });
 });
@@ -206,6 +258,5 @@ $(document).ready(function(){
 } else {
     $temp_output = 'Mapael engine not supported here';
 }
-
 unset($common_output);
 $common_output[] = $temp_output;
