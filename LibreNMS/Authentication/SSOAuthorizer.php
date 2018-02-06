@@ -35,10 +35,11 @@ use LibreNMS\Exceptions\InvalidIpException;
  *
  */
 
-class SSOAuthorizer extends AuthorizerBase
+class SSOAuthorizer extends MysqlAuthorizer
 {
     protected static $HAS_AUTH_USERMANAGEMENT = 1;
     protected static $CAN_UPDATE_USER = 1;
+    protected static $CAN_UPDATE_PASSWORDS = 0;
     protected static $AUTH_IS_EXTERNAL = 1;
 
     public function authenticate($username, $password)
@@ -57,93 +58,12 @@ class SSOAuthorizer extends AuthorizerBase
 
         // User has already been approved by the authenicator so if automatic user create/update is enabled, do it
         if (Config::get('sso.create_users') && !$this->userExists($username)) {
-            $this->addUser($username, $password, $level, $email, $realname, $can_modify_passwd, $description ? $description : 'SSO User');
+            $this->addUser($username, null, $level, $email, $realname, $can_modify_passwd, $description ? $description : 'SSO User');
         } elseif (Config::get('sso.update_users') && $this->userExists($username)) {
             $this->updateUser($this->getUserid($username), $realname, $level, $can_modify_passwd, $email);
         }
 
         return true;
-    }
-
-    public function addUser($username, $password, $level = 1, $email = '', $realname = '', $can_modify_passwd = 0, $description = 'SSO User')
-    {
-        // Check to see if user is already added in the database
-        if (!$this->userExists($username)) {
-            $userid = dbInsert(array('username' => $username, 'password' => null, 'realname' => $realname, 'email' => $email, 'descr' => $description, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd), 'users');
-
-            if ($userid == false) {
-                return false;
-            } else {
-                foreach (dbFetchRows('select notifications.* from notifications where not exists( select 1 from notifications_attribs where notifications.notifications_id = notifications_attribs.notifications_id and notifications_attribs.user_id = ?) order by notifications.notifications_id desc', array($userid)) as $notif) {
-                    dbInsert(array('notifications_id'=>$notif['notifications_id'],'user_id'=>$userid,'key'=>'read','value'=>1), 'notifications_attribs');
-                }
-            }
-            return $userid;
-        } else {
-            return false;
-        }
-    }
-
-    public function userExists($username, $throw_exception = false)
-    {
-        // A local user is always created, so we query this, as in the event of an admin choosing to manually administer user creation we should return false.
-        $user = dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username));
-
-        if ($throw_exception) {
-            // Hopefully the caller knows what they're doing
-            throw new AuthenticationException('User not found and invocation requested an exception be thrown');
-        }
-
-        return $user;
-    }
-
-
-    public function getUserLevel($username)
-    {
-        // The user level should always be persisted to the database (and may be managed there) so we again query the database.
-        return dbFetchCell('SELECT `level` FROM `users` WHERE `username` = ?', array($username));
-    }
-
-
-    public function getUserid($username)
-    {
-        // User ID is obviously unique to LibreNMS, this must be resolved via the database
-        return dbFetchCell('SELECT `user_id` FROM `users` WHERE `username` = ?', array($username));
-    }
-
-
-    public function deleteUser($userid)
-    {
-        // Clean up the entries persisted to the database
-        dbDelete('bill_perms', '`user_id` =  ?', array($userid));
-        dbDelete('devices_perms', '`user_id` =  ?', array($userid));
-        dbDelete('ports_perms', '`user_id` =  ?', array($userid));
-        dbDelete('users_prefs', '`user_id` =  ?', array($userid));
-        dbDelete('users', '`user_id` =  ?', array($userid));
-
-        return dbDelete('users', '`user_id` =  ?', array($userid));
-    }
-
-
-    public function getUserlist()
-    {
-        return dbFetchRows('SELECT * FROM `users` ORDER BY `username`');
-    }
-
-
-    public function getUser($user_id)
-    {
-        return dbFetchRow('SELECT * FROM `users` WHERE `user_id` = ?', array($user_id));
-    }
-
-    public function updateUser($user_id, $realname, $level, $can_modify_passwd, $email)
-    {
-        // This could, in the worse case, occur on every single pageload, so try and do a bit of optimisation
-        $user = $this->getUser($user_id);
-
-        if ($realname !== $user['realname'] || $level !== $user['level'] || $can_modify_passwd !== $user['can_modify_passwd'] || $email !== $user['email']) {
-            dbUpdate(array('realname' => $realname, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'email' => $email), 'users', '`user_id` = ?', array($user_id));
-        }
     }
 
     public function getExternalUsername()
