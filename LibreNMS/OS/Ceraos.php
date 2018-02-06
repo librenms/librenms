@@ -117,6 +117,7 @@ class Ceraos extends OS implements WirelessErrorsDiscovery, WirelessMseDiscovery
         $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
 
         $sensors = array();
+        $divisor = 100;
 
         $mse = snmpwalk_group($this->getDevice(), 'genEquipRadioStatusMSE', 'MWRM-RADIO-MIB');
         foreach ($mse as $index => $data) {
@@ -127,7 +128,9 @@ class Ceraos extends OS implements WirelessErrorsDiscovery, WirelessMseDiscovery
                 'ceraos',
                 $index,
                 $ifNames[$index],
-                $data['genEquipRadioStatusMSE']
+                $data['genEquipRadioStatusMSE'] / $divisor,
+                1,
+                $divisor
             );
         }
 
