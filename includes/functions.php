@@ -756,7 +756,7 @@ function createHost(
 
     $device = array(
         'hostname' => $host,
-        'sysName' => $host,
+        'sysName' => $additional['sysName'] ? $additional['sysName'] : $host,
         'os' => $additional['os'] ? $additional['os'] : 'generic',
         'hardware' => $additional['hardware'] ? $additional['hardware'] : null,
         'community' => $community,
