@@ -23,7 +23,7 @@ if (is_numeric($states)) {
 }
 
 if (is_numeric($searches)) {
-    $rrd_def = RrdDefinition::make()->addDataset('searches', 'GAUGE', 0);
+    $rrd_def = RrdDefinition::make()->addDataset('searches', 'COUNTER', 0);
 
     $fields = array(
         'searches' => $searches,
@@ -36,7 +36,7 @@ if (is_numeric($searches)) {
 }
 
 if (is_numeric($inserts)) {
-    $rrd_def = RrdDefinition::make()->addDataset('inserts', 'GAUGE', 0);
+    $rrd_def = RrdDefinition::make()->addDataset('inserts', 'COUNTER', 0);
 
     $fields = array(
         'inserts' => $inserts,
@@ -49,7 +49,7 @@ if (is_numeric($inserts)) {
 }
 
 if (is_numeric($removals)) {
-    $rrd_def = RrdDefinition::make()->addDataset('removals', 'GAUGE', 0);
+    $rrd_def = RrdDefinition::make()->addDataset('removals', 'COUNTER', 0);
 
     $fields = array(
         'removals' => $removals,
