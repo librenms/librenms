@@ -402,7 +402,8 @@ if ($config['enable_bgp']) {
                     if ($peer['c_update']) {
                         dbUpdate(
                             $peer['c_update'],
-                            'bgpPeers_cbgp', '`device_id` = ? AND bgpPeerIdentifier = ? AND afi = ? AND safi = ?',
+                            'bgpPeers_cbgp',
+                            '`device_id` = ? AND bgpPeerIdentifier = ? AND afi = ? AND safi = ?',
                             array($device['device_id'], $peer['bgpPeerIdentifier'], $afi, $safi)
                         );
                     }
