@@ -227,6 +227,8 @@ main () {
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
             ;;
             post-pull)
+                status_run 'Updating Composer packages' "${COMPOSER} install --no-dev" 'update'
+
                 # Check if we need to revert (Must be in post pull so we can update it)
                 if [[ "$old_version" != "$new_version" ]]; then
                     check_php_ver # check php version and switch branches
