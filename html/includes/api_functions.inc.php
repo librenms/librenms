@@ -86,6 +86,13 @@ function api_error($statusCode, $message)
     $app->stop();
 } // end api_error()
 
+function check_bill_permission($bill_id)
+{
+    if (!bill_permitted($bill_id)) {
+        api_error(403, 'Insufficient permissions to access this bill');
+    }
+}
+
 function check_device_permission($device_id)
 {
     if (!device_permitted($device_id)) {
@@ -1311,6 +1318,25 @@ function list_bills()
         $bills[] = $bill;
     }
     api_success($bills, 'bills');
+}
+
+function get_bill_history()
+{
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = mres($router['bill_id']);
+    
+    if (!is_admin() && !is_read()) {
+        check_bill_permission($bill_id);
+    }
+    
+    $result = [];
+    foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 24', array($bill_id)) as $history) {
+        $result[] = $history;
+    }
+    
+    api_success($result, 'bill_history');
 }
 
 function update_device()

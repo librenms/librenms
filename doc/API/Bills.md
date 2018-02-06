@@ -131,3 +131,49 @@ Output:
  ]
 }
 ```
+
+### `get_bill_history`
+
+Retrieve the history of specific bill
+
+Route: `/api/v0/bills/:id/history`
+
+Input:
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/history
+```
+
+Output:
+```json
+{
+ "status": "ok",
+ "bill_history": [
+    {
+        "bill_hist_id": "1",
+        "bill_id": "1",
+        "updated": "2018-02-06 17:01:01",
+        "bill_datefrom": "2018-02-01 00:00:00",
+        "bill_dateto": "2018-02-28 23:59:59",
+        "bill_type": "CDR",
+        "bill_allowed": "100000000",
+        "bill_used": "229963765",
+        "bill_overuse": "129963765",
+        "bill_percent": "229.96",
+        "rate_95th_in": "229963765",
+        "rate_95th_out": "1891344",
+        "rate_95th": "229963765",
+        "dir_95th": "in",
+        "rate_average": "136527101",
+        "rate_average_in": "135123359",
+        "rate_average_out": "1403743",
+        "traf_in": "3235123452544",
+        "traf_out": "33608406566",
+        "traf_total": "3268731859110",
+        "pdf": null
+    }
+ ],
+ "count": 1,
+}
+```
