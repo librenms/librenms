@@ -49,7 +49,6 @@
     },
     "scripts": {
         "pre-update-cmd": "LibreNMS\\ComposerHelper::preUpdate",
-        "post-autoload-dump": "LibreNMS\\ComposerHelper::postAutoloadDump",
-        "commit": "LibreNMS\\ComposerHelper::commit"
+        "pre-install-cmd": "LibreNMS\\ComposerHelper::preInstall"
     }
 }
