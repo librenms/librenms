@@ -1,0 +1,492 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-L2TUNNELING-MIB.mib
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications 
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+PRVT-L2TUNNELING-MIB DEFINITIONS ::= BEGIN     
+
+IMPORTS
+MODULE-IDENTITY,
+OBJECT-TYPE,  
+Integer32, 
+Counter32
+FROM SNMPv2-SMI
+
+MODULE-COMPLIANCE,
+OBJECT-GROUP
+FROM SNMPv2-CONF       
+
+RowStatus
+FROM SNMPv2-TC
+
+sapBaseInfoEntry,  
+sdpInfoEntry,
+svcId,
+sapPortId, 
+sapEncapValue,  
+sdpId
+FROM  PRVT-SERV-MIB
+
+serviceAccessSwitch
+FROM PRVT-QOS-MIB;
+
+
+prvtL2TunnelingMIB MODULE-IDENTITY
+LAST-UPDATED "200910200000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+" BATM/Telco Systems Support team
+Email: 
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+DESCRIPTION
+"This document is the SNMP MIB module to manage tunneling feature,
+ designed for service providers."
+
+-- 
+-- Revision History
+--
+REVISION "200910200000Z" 
+DESCRIPTION "Initial version."
+
+
+::= { serviceAccessSwitch 3 }
+
+
+-- --------------------------------------------------------------------
+-- PRVT-L2TUNNELING-MIB organisation
+-- --------------------------------------------------------------------       
+prvtL2TunnNotifications OBJECT IDENTIFIER   ::= { prvtL2TunnelingMIB 0 } 
+prvtL2TunnObjects OBJECT IDENTIFIER 		::= { prvtL2TunnelingMIB 1 } 
+prvtL2TunnConformance OBJECT IDENTIFIER 	::= { prvtL2TunnelingMIB 2 }
+  
+-- --------------------------------------------------------------------
+-- PRVT-L2TUNNELING-MIB Textual Conventions
+-- --------------------------------------------------------------------
+
+
+--------------------------------------------------------------
+--PRVT-L2TUNNELING objects
+--------------------------------------------------------------
+prvtL2TunnEnable  OBJECT-TYPE
+SYNTAX INTEGER {
+enable(1),
+disable(2)
+}   
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Enable/Disable L2Tunneling feature"
+DEFVAL { disable }
+::=  { prvtL2TunnObjects 1 }
+  
+--  prvtL2TunnProfileTable
+prvtL2TunnProfileTable   OBJECT-TYPE    
+SYNTAX SEQUENCE OF PrvtL2TunnProfileEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A Table that contain all predefined and defined profiles."
+::= { prvtL2TunnObjects 2 } 
+
+prvtL2TunnProfileEntry OBJECT-TYPE    
+SYNTAX PrvtL2TunnProfileEntry   
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION      
+"An entry in this table contains a TLS tunneling profile"
+INDEX {prvtL2TunnProfileName }
+::= {prvtL2TunnProfileTable 1}
+
+PrvtL2TunnProfileEntry ::= SEQUENCE {
+prvtL2TunnProfileName OCTET STRING ,
+prvtL2TunnProfileRowStatus RowStatus
+}
+
+
+prvtL2TunnProfileName OBJECT-TYPE
+SYNTAX  OCTET STRING (SIZE(33))
+MAX-ACCESS read-create
+STATUS current   
+DESCRIPTION
+"TLS profile name. There will be three special profiles that will represent predefined policies:
+ - Discard-All, 
+ - Tunnel-BPDUs-only 
+ - Tunnel-All.  "
+::= {prvtL2TunnProfileEntry 1}    
+
+prvtL2TunnProfileRowStatus OBJECT-TYPE
+SYNTAX  RowStatus
+MAX-ACCESS read-create
+STATUS current   
+DESCRIPTION
+"TLS profile rowStatus. It is not possible to modify the predefined profiles."
+::= {prvtL2TunnProfileEntry 2}
+
+--prvtL2ProtocolsTable
+prvtL2ProtocolsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtL2ProtocolsEntry  
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A table that contain all predefine and custom defined L2Protocols"
+::= { prvtL2TunnObjects 3 }  
+ 
+prvtL2ProtocolsEntry OBJECT-TYPE
+SYNTAX   PrvtL2ProtocolsEntry    
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry is a L2 protocol with the  replacement multicast MAC addresses. "     
+INDEX{ prvtL2ProtocolName }
+::= {prvtL2ProtocolsTable 1} 
+
+PrvtL2ProtocolsEntry   ::= SEQUENCE{ 
+prvtL2ProtocolName OCTET STRING,   
+prvtL2ProtocolEthertype Integer32,
+prvtL2ProtocolMAC OCTET STRING,
+prvtL2ReplaceMAC OCTET STRING,
+prvtL2ProtocolRowStatus RowStatus
+
+}
+prvtL2ProtocolName OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (17))
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"L2 Protocol Name. There will the follow default protocol:
+ - xSTP
+ - LACP/LAMP
+ - Link OAM (802.3ah)
+ - Port Authentication (802.1x)
+ - E-LMI
+ - LLDP
+ - All other bridge block of protocols
+ - All Bridges
+ - GARP Block of Protocols
+ - Provider Bridge STP."
+::=  {prvtL2ProtocolsEntry 1}    
+
+prvtL2ProtocolEthertype OBJECT-TYPE
+SYNTAX Integer32 (1..65535)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Protocol Ethertype."      
+::= {prvtL2ProtocolsEntry 2}  
+
+prvtL2ProtocolMAC OBJECT-TYPE
+SYNTAX OCTET STRING
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The protocol Multicast MAC address used for PDU distribution. "      
+::= {prvtL2ProtocolsEntry 3}      
+
+prvtL2ReplaceMAC OBJECT-TYPE
+SYNTAX OCTET STRING
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Replacement multicast MAC addresses."
+::=  {prvtL2ProtocolsEntry 4}      
+
+prvtL2ProtocolRowStatus OBJECT-TYPE      
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"prvtL2CustomProtocols RowStatus used for CREATE/DELETE the custom protocols.
+ It is not possible to modify the predefined protocols."      	
+::= {prvtL2ProtocolsEntry 5} 
+
+
+        
+
+--prvtL2TunnProfMapProtoTable
+prvtL2TunnProfMapProtoTable   OBJECT-TYPE    
+SYNTAX SEQUENCE OF PrvtL2TunnProfMapProtoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A Table that contain actions configured for each L2 protcol per TLS tunneling profile."
+::= { prvtL2TunnObjects 4 }    
+
+prvtL2TunnProfMapProtoEntry   OBJECT-TYPE    
+SYNTAX PrvtL2TunnProfMapProtoEntry   
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION  
+"An entry in this table contain th action for specified profile and L2 protocol"
+INDEX {prvtL2TunnProfileName, prvtL2ProtocolName  }
+::= {prvtL2TunnProfMapProtoTable 1}   
+
+PrvtL2TunnProfMapProtoEntry ::= SEQUENCE{   
+prvtL2TunnAction INTEGER
+
+}
+prvtL2TunnAction OBJECT-TYPE   
+SYNTAX INTEGER{
+tunnel (1),
+discard (2)
+}        
+MAX-ACCESS read-write 
+STATUS current
+DESCRIPTION  
+"Define action discard/tunnel per TLS tunneled protocol "
+DEFVAL { discard }
+::= {prvtL2TunnProfMapProtoEntry 1}
+
+
+--prvtL2TunnSAPPointsTable   
+prvtL2TunnSAPPointsTable   OBJECT-TYPE    
+SYNTAX SEQUENCE OF PrvtL2TunnSAPPointsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A Table that contain an assigment of a profile to a SAP."
+::= { prvtL2TunnObjects 5 }    
+
+prvtL2TunnSAPPointsEntry  OBJECT-TYPE    
+SYNTAX    PrvtL2TunnSAPPointsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION 
+"An entry in this table contain information about the map between SAP and L2Tunneling profile."
+AUGMENTS  { sapBaseInfoEntry } 
+::= { prvtL2TunnSAPPointsTable 1 }   
+
+PrvtL2TunnSAPPointsEntry ::= SEQUENCE{  
+profileSAP OCTET STRING      
+}
+
+profileSAP   OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE(33))
+MAX-ACCESS read-write  
+STATUS current
+DESCRIPTION
+"Profile Id associated to a SAP point. 
+ Setting this object with an empty string will disable the profile."  
+::= {prvtL2TunnSAPPointsEntry 1}   
+
+--prvtL2TunnSDPPointsTable   
+prvtL2TunnSDPPointsTable   OBJECT-TYPE    
+SYNTAX SEQUENCE OF PrvtL2TunnSDPPointsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A Table that contain an assigment of a profile to a SDP."
+::= { prvtL2TunnObjects 6 }    
+
+prvtL2TunnSDPPointsEntry  OBJECT-TYPE    
+SYNTAX    PrvtL2TunnSDPPointsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION 
+"An entry in this table contain information about the map between SDP and L2Tunneling profile."
+AUGMENTS  { sdpInfoEntry } 
+::= { prvtL2TunnSDPPointsTable 1 }   
+
+PrvtL2TunnSDPPointsEntry ::= SEQUENCE{  
+profileSDP OCTET STRING    
+}
+
+profileSDP   OBJECT-TYPE
+SYNTAX  OCTET STRING (SIZE(33))
+MAX-ACCESS read-write  
+STATUS current
+DESCRIPTION
+"Profile Id associated to an SDP point.
+ Setting this object with an empty string will disable the profile."  
+::= {prvtL2TunnSDPPointsEntry 1}   
+
+
+
+prvtL2TunnClearStatistics  OBJECT-TYPE
+SYNTAX INTEGER {
+none(0),
+clear(1)
+}   
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Clear L2Tunneling statistics for each tunneling point"
+DEFVAL { none }
+::=  { prvtL2TunnObjects 7 }
+
+--prvtL2TunnSapStatisticsTable   
+prvtL2TunnSapStatisticsTable     OBJECT-TYPE    
+SYNTAX SEQUENCE OF PrvtL2TunnSapStatisticsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A Table that provide statistics  for each tunneling point per protocol."
+::= { prvtL2TunnObjects 8 }    
+
+prvtL2TunnSapStatisticsEntry  OBJECT-TYPE    
+SYNTAX    PrvtL2TunnSapStatisticsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION 
+"An entry in this table contain the number of SAP tunneling RX and TX packets ."
+INDEX  {svcId, sapPortId, sapEncapValue,   prvtL2ProtocolName}     
+::= { prvtL2TunnSapStatisticsTable 1 }   
+
+PrvtL2TunnSapStatisticsEntry ::= SEQUENCE{   
+l2TunnSapRxPackets Counter32,
+l2TunnSapTxPackets Counter32
+}     
+
+l2TunnSapRxPackets OBJECT-TYPE
+SYNTAX Counter32    
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of SAP Rx L2Tunneling packets"
+::= { prvtL2TunnSapStatisticsEntry 1}       
+
+l2TunnSapTxPackets OBJECT-TYPE
+SYNTAX Counter32    
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of SAP Tx L2Tunneling packets"
+::= { prvtL2TunnSapStatisticsEntry 2}          
+
+
+--prvtL2TunnSdpStatisticsTable   
+prvtL2TunnSdpStatisticsTable     OBJECT-TYPE    
+SYNTAX SEQUENCE OF PrvtL2TunnSdpStatisticsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A Table that provide statistics  for each tunneling point per protocol."
+::= { prvtL2TunnObjects 9 }    
+
+prvtL2TunnSdpStatisticsEntry  OBJECT-TYPE    
+SYNTAX    PrvtL2TunnSdpStatisticsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION 
+"An entry in this table contain the number of SDP tunneling RX and TX packets ."
+INDEX  {svcId, sdpId ,  prvtL2ProtocolName } 
+::= { prvtL2TunnSdpStatisticsTable 1 }   
+
+PrvtL2TunnSdpStatisticsEntry ::= SEQUENCE{   
+l2TunnSdpRxPackets Counter32,
+l2TunnSdpTxPackets Counter32
+}     
+
+l2TunnSdpRxPackets OBJECT-TYPE
+SYNTAX Counter32    
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of SDP Rx L2Tunneling packets"
+::= { prvtL2TunnSdpStatisticsEntry 1}       
+
+l2TunnSdpTxPackets OBJECT-TYPE
+SYNTAX Counter32    
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of SDP Tx L2Tunneling packets"
+::= { prvtL2TunnSdpStatisticsEntry 2}
+
+
+
+-- ----------------------------------------------------------------------------
+-- Conformance Information
+-- ----------------------------------------------------------------------------
+prvtL2TunnCompliances OBJECT IDENTIFIER ::= { prvtL2TunnConformance 1 }
+prvtL2TunnGroups OBJECT IDENTIFIER ::= { prvtL2TunnConformance 2 }
+
+-- compliance statements
+prvtL2TunnCompliance MODULE-COMPLIANCE
+STATUS current
+DESCRIPTION
+"The compliance statement for L2Tunneling."
+MODULE -- this module
+MANDATORY-GROUPS {
+prvtL2TunnProtocolGroup,
+prvtL2TunnProfileGroup, 
+prvtL2TunnPointGroup
+}
+::= { prvtL2TunnCompliances 1 }     
+
+prvtL2TunnProtocolGroup OBJECT-GROUP
+OBJECTS {prvtL2ProtocolName, 
+prvtL2ReplaceMAC,
+prvtL2ProtocolEthertype,
+prvtL2ProtocolMAC,
+prvtL2ReplaceMAC,
+prvtL2ProtocolRowStatus
+}
+STATUS current
+DESCRIPTION
+"The group of objects regarding Layer 2 protocol  with a special MAC address ."
+::= { prvtL2TunnGroups 1 }    
+
+prvtL2TunnProfileGroup OBJECT-GROUP
+OBJECTS { prvtL2TunnEnable, 
+prvtL2TunnProfileName,
+prvtL2TunnProfileRowStatus
+}
+STATUS current
+DESCRIPTION
+"The group of objects used to configure a L2Tunneling profile ."
+::= { prvtL2TunnGroups 2 }       
+
+prvtL2TunnPointGroup OBJECT-GROUP
+OBJECTS {prvtL2TunnAction,
+profileSDP,  
+profileSAP,
+l2TunnSapRxPackets,
+l2TunnSapTxPackets, 
+l2TunnSdpRxPackets,
+l2TunnSdpTxPackets
+}
+STATUS current
+DESCRIPTION
+"The group of objects used L2Tunneling point ."
+::= { prvtL2TunnGroups 3 }
+
+
+
+
+END

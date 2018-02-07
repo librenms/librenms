@@ -22,7 +22,7 @@ $config['snmp']['community'][] = "my_custom_community";
 $config['snmp']['community'][] = "another_community";
 
 // v3
-$config['snmp']['v3'][0]['authlevel'] = 'AuthPriv';
+$config['snmp']['v3'][0]['authlevel'] = 'authPriv';
 $config['snmp']['v3'][0]['authname'] = 'my_username';
 $config['snmp']['v3'][0]['authpass'] = 'my_password';
 $config['snmp']['v3'][0]['authalgo'] = 'MD5';

@@ -3,11 +3,11 @@ group: printer
 text: 'Toshiba Printer'
 ifname: 1
 type: printer
-logo: toshiba
+icon: toshiba
 over:
     - { graph: device_toner, text: Toner }
 discovery:
-    - sysObjectId:
+    - sysObjectID:
         - .1.3.6.1.4.1.1129.1.2.
     - sysDescr:
         - TOSHIBA e-STUDIO

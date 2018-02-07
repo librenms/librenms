@@ -69,7 +69,7 @@ function graylog_severity_label($severity)
         ""  => "label-info",
     );
     $barColor = isset($map[$severity]) ? $map[$severity] : 'label-info';
-    return '<span class="alert-status '.$barColor .'">&nbsp;</span>';
+    return '<span class="alert-status '.$barColor .'" style="margin-right:8px;float:left;"></span>';
 }
 
 function external_exec($command)
@@ -360,6 +360,7 @@ function device_by_id_cache($device_id, $refresh = false)
         $device = $cache['devices']['id'][$device_id];
     } else {
         $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device_id));
+        $device['attribs'] = get_dev_attribs($device['device_id']);
         load_os($device);
 
         //order vrf_lite_cisco with context, this will help to get the vrf_name and instance_name all the time
@@ -1384,83 +1385,78 @@ function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array()
     return false;
 }
 
+if (!function_exists('str_contains')) {
+    /**
+     * Determine if a given string contains a given substring.
+     *
+     * @param  string $haystack
+     * @param  string|array $needles
+     * @return bool
+     */
+    function str_contains($haystack, $needles)
+    {
+        foreach ((array)$needles as $needle) {
+            if ($needle != '' && strpos($haystack, $needle) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
 /**
  * Determine if a given string contains a given substring.
  *
  * @param  string $haystack
  * @param  string|array $needles
- * @param  bool $case_insensitive
  * @return bool
  */
-function str_contains($haystack, $needles, $case_insensitive = false)
+function str_i_contains($haystack, $needles)
 {
-    if ($case_insensitive) {
-        foreach ((array) $needles as $needle) {
-            if ($needle != '' && stripos($haystack, $needle) !== false) {
-                return true;
-            }
-        }
-    } else {
-        foreach ((array) $needles as $needle) {
-            if ($needle != '' && strpos($haystack, $needle) !== false) {
-                return true;
-            }
+    foreach ((array)$needles as $needle) {
+        if ($needle != '' && stripos($haystack, $needle) !== false) {
+            return true;
         }
     }
     return false;
 }
 
-/**
- * Determine if a given string ends with a given substring.
- *
- * @param  string $haystack
- * @param  string|array $needles
- * @param  bool $case_insensitive
- * @return bool
- */
-function ends_with($haystack, $needles, $case_insensitive = false)
-{
-    if ($case_insensitive) {
-        $lower_haystack = strtolower($haystack);
-        foreach ((array)$needles as $needle) {
-            if (strtolower($needle) === substr($lower_haystack, -strlen($needle))) {
-                return true;
-            }
-        }
-    } else {
+if (!function_exists('ends_with')) {
+    /**
+     * Determine if a given string ends with a given substring.
+     *
+     * @param  string $haystack
+     * @param  string|array $needles
+     * @return bool
+     */
+    function ends_with($haystack, $needles)
+    {
         foreach ((array)$needles as $needle) {
             if ((string)$needle === substr($haystack, -strlen($needle))) {
                 return true;
             }
         }
+        return false;
     }
-    return false;
 }
 
-/**
- * Determine if a given string starts with a given substring.
- *
- * @param  string $haystack
- * @param  string|array $needles
- * @param  bool $case_insensitive
- * @return bool
- */
-function starts_with($haystack, $needles, $case_insensitive = false)
-{
-    if ($case_insensitive) {
-        foreach ((array)$needles as $needle) {
-            if ($needle != '' && stripos($haystack, $needle) === 0) {
-                return true;
-            }
-        }
-    } else {
+if (!function_exists('starts_with')) {
+    /**
+     * Determine if a given string starts with a given substring.
+     *
+     * @param  string $haystack
+     * @param  string|array $needles
+     * @return bool
+     */
+    function starts_with($haystack, $needles)
+    {
         foreach ((array)$needles as $needle) {
             if ($needle != '' && strpos($haystack, $needle) === 0) {
                 return true;
             }
         }
+        return false;
     }
-    return false;
 }
 
 function get_auth_ad_user_filter($username)

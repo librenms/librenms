@@ -26,8 +26,10 @@ discovery_modules:
     cisco-mac-accounting: 1
     cisco-otv: 1
     cisco-pw: 1
-    cisco-vrf: 1
+    vrf: 1
     cisco-vrf-lite: 1
 discovery:
-    - sysObjectId:
+    - sysObjectID:
         - .1.3.6.1.4.1.9.1.1117
+    - sysDescr:
+        - 'Cisco Secure Access Control System'

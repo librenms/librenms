@@ -15,6 +15,7 @@
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
 
@@ -147,6 +148,8 @@ function discover_device(&$device, $options = null)
     load_discovery($device);
     register_mibs($device, Config::getOsSetting($device['os'], 'register_mibs', array()), 'includes/discovery/os/' . $device['os'] . '.inc.php');
 
+    $os = OS::make($device);
+
     echo "\n";
 
     $force_module = false;
@@ -160,7 +163,11 @@ function discover_device(&$device, $options = null)
             }
         }
     }
-    foreach (Config::get('discovery_modules', array()) as $module => $module_status) {
+
+    $discovery_devices = Config::get('discovery_modules', array());
+    $discovery_devices = array('core' => true) + $discovery_devices;
+
+    foreach ($discovery_devices as $module => $module_status) {
         $os_module_status = Config::getOsSetting($device['os'], "discovery_modules.$module");
         d_echo("Modules status: Global" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
         d_echo("OS" . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
@@ -413,6 +420,8 @@ function sensor_low_limit($class, $current)
         case 'quality_factor':
         case 'chromatic_dispersion':
         case 'ber':
+        case 'eer':
+        case 'waterflow':
     }//end switch
 
     return $limit;
@@ -577,6 +586,9 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
 
 function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, $units, $used = null)
 {
+    if (ignore_storage($device['os'], $descr)) {
+        return;
+    }
     d_echo("Discover Storage: $index, $type, $mib, $descr, $size, $units, $used\n");
 
     if ($descr && $size > '0') {
@@ -628,13 +640,9 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
                 'processor_type' => $type,
                 'processor_precision' => $precision,
             );
-            if (!empty($hrDeviceIndex)) {
-                $insert_data['hrDeviceIndex'] = $hrDeviceIndex;
-            }
 
-            if (!empty($entPhysicalIndex)) {
-                $insert_data['entPhysicalIndex'] = $entPhysicalIndex;
-            }
+            $insert_data['hrDeviceIndex'] = (int)$hrDeviceIndex;
+            $insert_data['entPhysicalIndex'] = (int)$entPhysicalIndex;
 
             $inserted = dbInsert($insert_data, 'processors');
             echo '+';
@@ -992,26 +1000,26 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                 // get the value for this sensor, check 'value' and 'oid', if state string, translate to a number
                 $data_name = isset($data['value']) ? $data['value'] : $data['oid'];  // fallback to oid if value is not set
 
-                $tmp_value = $snmp_data[$data_name];
-                if (!is_numeric($tmp_value)) {
+                $snmp_value = $snmp_data[$data_name];
+                if (!is_numeric($snmp_value)) {
                     if ($sensor_type === 'temperature') {
                         // For temp sensors, try and detect fahrenheit values
-                        if (ends_with($tmp_value, 'f', true)) {
+                        if (ends_with($snmp_value, array('f', 'F'))) {
                             $user_function = 'fahrenheit_to_celsius';
                         }
                     }
-                    preg_match('/-?\d*\.?\d+/', $tmp_value, $temp_response);
+                    preg_match('/-?\d*\.?\d+/', $snmp_value, $temp_response);
                     if (!empty($temp_response[0])) {
-                        $tmp_value = $temp_response[0];
+                        $snmp_value = $temp_response[0];
                     }
                 }
 
-                if (is_numeric($tmp_value)) {
-                    $value = $tmp_value;
+                if (is_numeric($snmp_value)) {
+                    $value = $snmp_value;
                 } elseif ($sensor_type === 'state') {
                     // translate string states to values (poller does this as well)
                     $states = array_column($data['states'], 'value', 'descr');
-                    $value = isset($states[$tmp_value]) ? $states[$tmp_value] : false;
+                    $value = isset($states[$snmp_value]) ? $states[$snmp_value] : false;
                 } else {
                     $value = false;
                 }
@@ -1143,10 +1151,14 @@ function sensors($types, $device, $valid, $pre_cache = array())
 function build_bgp_peers($device, $data, $peer2)
 {
     d_echo("Peers : $data\n");
-    $peers = trim(str_replace('ARISTA-BGP4V2-MIB::aristaBgp4V2PeerRemoteAs.1.', '', $data));
-    $peers = trim(str_replace('CISCO-BGP4-MIB::cbgpPeer2RemoteAs.', '', $peers));
-    $peers = trim(str_replace('BGP4-MIB::bgpPeerRemoteAs.', '', $peers));
-    $peers  = trim(str_replace('.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.', '', $peers));
+    $remove = array(
+        'ARISTA-BGP4V2-MIB::aristaBgp4V2PeerRemoteAs.1.',
+        'CISCO-BGP4-MIB::cbgpPeer2RemoteAs.',
+        'BGP4-MIB::bgpPeerRemoteAs.',
+        '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.',
+    );
+    $peers = trim(str_replace($remove, '', $data));
+
     $peerlist = array();
     $ver = '';
     foreach (explode("\n", $peers) as $peer) {
@@ -1159,10 +1171,10 @@ function build_bgp_peers($device, $data, $peer2)
             $octets = count(explode(".", $peer_ip));
             if ($octets > 11) {
                 // ipv6
-                $peer_ip = (string)IP::parse(snmp2ipv6(implode('.', array_slice(explode('.', $peer_ip), (count(explode('.', $peer_ip)) - 16)))), true);
+                $peer_ip = (string)IP::parse(snmp2ipv6($peer_ip), true);
             } else {
                 // ipv4
-                $peer_ip = implode('.', array_slice(explode('.', $peer_ip), (count(explode('.', $peer_ip)) - 4)));
+                $peer_ip = implode('.', array_slice(explode('.', $peer_ip), -4));
             }
         } else {
             if (strstr($peer_ip, ':')) {

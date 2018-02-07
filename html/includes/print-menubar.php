@@ -399,6 +399,8 @@ $icons = array(
     'chromatic_dispersion' => 'indent',
     'ber' => 'sort-amount-desc',
     'quality_factor' => 'arrows',
+    'eer' => 'snowflake-o',
+    'waterflow' => 'tint',
 
 );
 foreach (array('fanspeed','humidity','temperature','signal') as $item) {
@@ -473,6 +475,7 @@ if ($_SESSION['userlevel'] >= '5' && count($app_list) > "0") {
         <li class="dropdown">
           <a href="apps/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Apps</span></a>
           <ul class="dropdown-menu">
+              <li><a href="apps/"><i class="fa fa-object-group fa-fw fa-lg" aria-hidden="true"></i> Overview</a></li>
 <?php
 
 foreach ($app_list as $app) {

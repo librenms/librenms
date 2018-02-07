@@ -103,7 +103,7 @@ class WirelessSensor extends Sensor
         return $sensor;
     }
 
-    public static function discover(OS $os)
+    public static function runDiscovery(OS $os)
     {
         foreach (self::getTypes() as $type => $descr) {
             static::discoverType($os, $type);

@@ -278,6 +278,11 @@ $config['graph_types']['device']['screenos_sessions']['section']   = 'firewall';
 $config['graph_types']['device']['screenos_sessions']['order']     = '0';
 $config['graph_types']['device']['screenos_sessions']['descr']     = 'Active Sessions';
 
+//FortiOS Graphs
+$config['graph_types']['device']['fortios_lograte']['section']  = 'Analyzer';
+$config['graph_types']['device']['fortios_lograte']['order']    = '0';
+$config['graph_types']['device']['fortios_lograte']['descr']    = 'Log Rate';
+
 //PAN OS Graphs
 $config['graph_types']['device']['panos_sessions']['section']           = 'firewall';
 $config['graph_types']['device']['panos_sessions']['order']             = '0';
@@ -512,6 +517,17 @@ $config['graph_types']['device']['riverbed_passthrough']['descr'] = 'Bandwidth P
 $config['graph_types']['device']['routeros_leases']['section'] = 'network';
 $config['graph_types']['device']['routeros_leases']['order'] = 0;
 $config['graph_types']['device']['routeros_leases']['descr'] = 'DHCP Lease Count';
+
+
+//CheckPoint SPLAT specific graphs
+$config['graph_types']['device']['secureplatform_sessions']['section'] = 'firewall';
+$config['graph_types']['device']['secureplatform_sessions']['order'] = 0;
+$config['graph_types']['device']['secureplatform_sessions']['descr'] = 'Active connections';
+
+//arbos specific graphs
+$config['graph_types']['device']['arbos_flows']['section']         = 'graphs';
+$config['graph_types']['device']['arbos_flows']['order']           = '0';
+$config['graph_types']['device']['arbos_flows']['descr']           = 'Accumulative flow count per SP device';
 
 // Device Types
 $i = 0;

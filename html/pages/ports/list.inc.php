@@ -30,11 +30,10 @@ if ($vars['errors']) {
         <?php echo $displayLists; ?>
     </div>
     <div class="table-responsive">
-        <table id="ports" class="table table-condensed table-hover">
+        <table id="ports" class="table table-condensed table-hover table-striped">
             <thead>
             <tr>
-                <th data-column-id="status"></th>
-                <th data-column-id="device">Device</th>
+                <th data-column-id="device" data-formatter="device">Device</th>
                 <th data-column-id="port"<?php echo $sort ?>>Port</th>
                 <th data-column-id="ifLastChange" data-converter="duration">Status Changed</th>
                 <th data-column-id="ifConnectorPresent" data-visible="false">Connected</th>
@@ -95,6 +94,11 @@ var grid = $("#ports").bootgrid({
                 return formatUnits(value, 2, ['pps', 'Kpps', 'Mpps', 'Gpps', 'Tpps', 'Ppps', 'Epps', 'Zpps', 'Ypps']);
             }
         }
+    },
+    formatters: {
+      'device': function (column, row) {
+          return "<span class='alert-status " + row.status + "' style='float:left;margin-right:10px;'></span>" + row.device + "";
+      }
     },
     templates: {
         search: "" // hide the generic search

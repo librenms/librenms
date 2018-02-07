@@ -95,10 +95,10 @@ function logfile($string)
  */
 function getHostOS($device)
 {
-    $sysDescr    = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
-    $sysObjectId = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
+    $device['sysDescr']    = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
+    $device['sysObjectID'] = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
 
-    d_echo("| $sysDescr | $sysObjectId | \n");
+    d_echo("| {$device['sysDescr']} | {$device['sysObjectID']} | \n");
 
     $deferred_os = array(
         'freebsd',
@@ -110,7 +110,7 @@ function getHostOS($device)
     foreach ($os_defs as $os => $def) {
         if (isset($def['discovery']) && !in_array($os, $deferred_os)) {
             foreach ($def['discovery'] as $item) {
-                if (checkDiscovery($device, $item, $sysObjectId, $sysDescr)) {
+                if (checkDiscovery($device, $item)) {
                     return $os;
                 }
             }
@@ -131,7 +131,7 @@ function getHostOS($device)
     foreach ($deferred_os as $os) {
         if (isset($os_defs[$os]['discovery'])) {
             foreach ($os_defs[$os]['discovery'] as $item) {
-                if (checkDiscovery($device, $item, $sysObjectId, $sysDescr)) {
+                if (checkDiscovery($device, $item)) {
                     return $os;
                 }
             }
@@ -143,7 +143,7 @@ function getHostOS($device)
 
 /**
  * Check an array of conditions if all match, return true
- * sysObjectId if sysObjectId starts with any of the values under this item
+ * sysObjectID if sysObjectID starts with any of the values under this item
  * sysDescr if sysDescr contains any of the values under this item
  * sysDescr_regex if sysDescr matches any of the regexes under this item
  * snmpget perform an snmpget on `oid` and check if the result contains `value`. Other subkeys: options, mib, mibdir
@@ -151,12 +151,10 @@ function getHostOS($device)
  * Appending _except to any condition will invert the match.
  *
  * @param array $device
- * @param array $array Array of items, keys should be sysObjectId, sysDescr, or sysDescr_regex
- * @param string $sysObjectId The sysObjectId to check against
- * @param string $sysDescr the sysDesr to check against
+ * @param array $array Array of items, keys should be sysObjectID, sysDescr, or sysDescr_regex
  * @return bool the result (all items passed return true)
  */
-function checkDiscovery($device, $array, $sysObjectId, $sysDescr)
+function checkDiscovery($device, $array)
 {
     // all items must be true
     foreach ($array as $key => $value) {
@@ -164,20 +162,20 @@ function checkDiscovery($device, $array, $sysObjectId, $sysDescr)
             $key = substr($key, 0, -7);
         }
 
-        if ($key == 'sysObjectId') {
-            if (starts_with($sysObjectId, $value) == $check) {
+        if ($key == 'sysObjectID') {
+            if (starts_with($device['sysObjectID'], $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysDescr') {
-            if (str_contains($sysDescr, $value) == $check) {
+            if (str_contains($device['sysDescr'], $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysDescr_regex') {
-            if (preg_match_any($sysDescr, $value) == $check) {
+            if (preg_match_any($device['sysDescr'], $value) == $check) {
                 return false;
             }
-        } elseif ($key == 'sysObjectId_regex') {
-            if (preg_match_any($sysObjectId, $value) == $check) {
+        } elseif ($key == 'sysObjectID_regex') {
+            if (preg_match_any($device['sysObjectID'], $value) == $check) {
                 return false;
             }
         } elseif ($key == 'snmpget') {
@@ -659,29 +657,23 @@ function isPingable($hostname, $address_family = AF_INET, $attribs = array())
     $response = array();
     if (can_ping_device($attribs) === true) {
         $fping_params = '';
-        if (is_numeric($config['fping_options']['retries']) && $config['fping_options']['retries'] > 0) {
-            if ($config['fping_options']['retries'] > 20) {
-                $config['fping_options']['retries'] = 20;
-            }
-            $fping_params .= ' -r ' . $config['fping_options']['retries'];
-        }
         if (is_numeric($config['fping_options']['timeout'])) {
             if ($config['fping_options']['timeout'] < 50) {
                 $config['fping_options']['timeout'] = 50;
             }
-            if ($config['fping_options']['millisec'] < $config['fping_options']['timeout']) {
-                $config['fping_options']['millisec'] = $config['fping_options']['timeout'];
+            if ($config['fping_options']['interval'] < $config['fping_options']['timeout']) {
+                $config['fping_options']['interval'] = $config['fping_options']['timeout'];
             }
             $fping_params .= ' -t ' . $config['fping_options']['timeout'];
         }
         if (is_numeric($config['fping_options']['count']) && $config['fping_options']['count'] > 0) {
             $fping_params .= ' -c ' . $config['fping_options']['count'];
         }
-        if (is_numeric($config['fping_options']['millisec'])) {
-            if ($config['fping_options']['millisec'] < 20) {
-                $config['fping_options']['millisec'] = 20;
+        if (is_numeric($config['fping_options']['interval'])) {
+            if ($config['fping_options']['interval'] < 20) {
+                $config['fping_options']['interval'] = 20;
             }
-            $fping_params .= ' -p ' . $config['fping_options']['millisec'];
+            $fping_params .= ' -p ' . $config['fping_options']['interval'];
         }
         $status = fping($hostname, $fping_params, $address_family);
         if ($status['exitcode'] > 0 || $status['loss'] == 100) {
@@ -764,7 +756,7 @@ function createHost(
 
     $device = array(
         'hostname' => $host,
-        'sysName' => $host,
+        'sysName' => $additional['sysName'] ? $additional['sysName'] : $host,
         'os' => $additional['os'] ? $additional['os'] : 'generic',
         'hardware' => $additional['hardware'] ? $additional['hardware'] : null,
         'community' => $community,
@@ -846,14 +838,10 @@ function match_network($nets, $ip, $first = false)
 // FIXME port to LibreNMS\Util\IPv6 class
 function snmp2ipv6($ipv6_snmp)
 {
-    $ipv6 = explode('.', $ipv6_snmp);
-    $ipv6_2 = array();
-
     # Workaround stupid Microsoft bug in Windows 2008 -- this is fixed length!
     # < fenestro> "because whoever implemented this mib for Microsoft was ignorant of RFC 2578 section 7.7 (2)"
-    if (count($ipv6) == 17 && $ipv6[0] == 16) {
-        array_shift($ipv6);
-    }
+    $ipv6 = array_slice(explode('.', $ipv6_snmp), -16);
+    $ipv6_2 = array();
 
     for ($i = 0; $i <= 15; $i++) {
         $ipv6[$i] = zeropad(dechex($ipv6[$i]));
@@ -863,17 +851,6 @@ function snmp2ipv6($ipv6_snmp)
     }
 
     return implode(':', $ipv6_2);
-}
-
-function ipv62snmp($ipv6)
-{
-    try {
-        $ipv6 = IP::parse($ipv6)->uncompressed();
-        $ipv6_split = str_split(str_replace(':', '', $ipv6), 2);
-        return implode('.', array_map('hexdec', $ipv6_split));
-    } catch (InvalidIpException $e) {
-        return '';
-    }
 }
 
 function get_astext($asn)
@@ -1092,12 +1069,12 @@ function is_port_valid($port, $device)
     $ifAlias = $port['ifAlias'];
     $ifType  = $port['ifType'];
 
-    if (str_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if'), true)) {
+    if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if'))) {
         return true;
     }
 
     foreach (Config::getCombined($device['os'], 'bad_if') as $bi) {
-        if (str_contains($ifDescr, $bi, true)) {
+        if (str_i_contains($ifDescr, $bi)) {
             d_echo("ignored by ifDescr: $ifDescr (matched: $bi)\n");
             return false;
         }

@@ -9,6 +9,5 @@ over:
 mib_dir:
     - moxa
 discovery:
-    - sysObjectId:
-        - .1.3.6.1.4.1.8691.7.116
-        - .1.3.6.1.4.1.8691.7.69
+    - sysObjectID:
+        - .1.3.6.1.4.1.8691.7.

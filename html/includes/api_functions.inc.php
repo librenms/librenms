@@ -239,6 +239,24 @@ function get_graph_generic_by_hostname()
     rrdtool_close();
 }
 
+
+function list_locations()
+{
+    check_is_read();
+
+    $app           = \Slim\Slim::getInstance();
+    $router        = $app->router()->getCurrentRoute()->getParams();
+
+    $locations   = dbFetchRows("SELECT `locations`.* FROM `locations` WHERE `locations`.`location` IS NOT NULL");
+    $total_locations = count($locations);
+    if ($total_locations == 0) {
+        api_error(404, 'Locations do not exist');
+    }
+
+    api_success($locations, 'locations');
+}
+
+
 function get_device()
 {
     // return details of a single device
@@ -270,51 +288,60 @@ function list_devices()
     $type  = $_GET['type'];
     $query = mres($_GET['query']);
     $param = array();
-    $join = '';
+
     if (empty($order)) {
         $order = 'hostname';
     }
 
     if (stristr($order, ' desc') === false && stristr($order, ' asc') === false) {
-        $order = '`'.$order.'` ASC';
+        $order = 'd.`'.$order.'` ASC';
     }
+
+    $select = " d.*, GROUP_CONCAT(dd.device_id) AS dependency_parent_id, GROUP_CONCAT(dd.hostname) AS dependency_parent_hostname ";
+    $join = " LEFT JOIN `device_relationships` AS dr ON dr.`child_device_id` = d.`device_id` LEFT JOIN `devices` AS dd ON dr.`parent_device_id` = dd.`device_id` ";
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
     } elseif ($type == 'location') {
-        $sql = "`location` LIKE '%".$query."%'";
+        $sql = "`d`.`location` LIKE '%".$query."%'";
     } elseif ($type == 'ignored') {
-        $sql = "`ignore`='1' AND `disabled`='0'";
+        $sql = "`d`.`ignore`='1' AND `d`.`disabled`='0'";
     } elseif ($type == 'up') {
-        $sql = "`status`='1' AND `ignore`='0' AND `disabled`='0'";
+        $sql = "`d`.`status`='1' AND `d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'down') {
-        $sql = "`status`='0' AND `ignore`='0' AND `disabled`='0'";
+        $sql = "`d`.`status`='0' AND `d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'disabled') {
-        $sql = "`disabled`='1'";
+        $sql = "`d`.`disabled`='1'";
     } elseif ($type == 'os') {
-        $sql = "`os`=?";
+        $sql = "`d`.`os`=?";
         $param[] = $query;
     } elseif ($type == 'mac') {
-        $join = " LEFT JOIN `ports` ON `devices`.`device_id`=`ports`.`device_id` LEFT JOIN `ipv4_mac` ON `ports`.`port_id`=`ipv4_mac`.`port_id` ";
-        $sql = "`ipv4_mac`.`mac_address`=?";
+        $join .= " LEFT JOIN `ports` AS p ON d.`device_id` = p.`device_id` LEFT JOIN `ipv4_mac` AS m ON p.`port_id` = m.`port_id` ";
+        $sql = "m.`mac_address`=?";
+        $select .= ",p.* ";
         $param[] = $query;
     } elseif ($type == 'ipv4') {
-        $join = " LEFT JOIN `ports` ON `devices`.`device_id`=`ports`.`device_id` LEFT JOIN `ipv4_addresses` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` ";
-        $sql = "`ipv4_addresses`.`ipv4_address`=?";
+        $join .= " LEFT JOIN `ports` AS p ON d.`device_id` = p.`device_id` LEFT JOIN `ipv4_addresses` AS a ON p.`port_id` = a.`port_id` ";
+        $sql = "a.`ipv4_address`=?";
+        $select .= ",p.* ";
         $param[] = $query;
     } elseif ($type == 'ipv6') {
-        $join = " LEFT JOIN `ports` ON `devices`.`device_id`=`ports`.`device_id` LEFT JOIN `ipv6_addresses` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` ";
-        $sql = "`ipv6_addresses`.`ipv6_address`=? OR `ipv6_addresses`.`ipv6_compressed`=?";
-        $param = array($query,$query);
+        $join .= " LEFT JOIN `ports` AS p ON d.`device_id` = p.`device_id` LEFT JOIN `ipv6_addresses` AS a ON p.`port_id` = a.`port_id` ";
+        $sql = "a.`ipv6_address`=? OR a.`ipv6_compressed`=?";
+        $select .= ",p.* ";
+        $param = array($query, $query);
     } else {
         $sql = '1';
     }
+
+
     if (!is_admin() && !is_read()) {
         $sql .= " AND `device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
         $param[] = $_SESSION['user_id'];
     }
     $devices = array();
-    foreach (dbFetchRows("SELECT * FROM `devices` $join WHERE $sql ORDER by $order", $param) as $device) {
+    $dev_query = "SELECT $select FROM `devices` AS d $join WHERE $sql GROUP BY d.`hostname` ORDER BY $order";
+    foreach (dbFetchRows($dev_query, $param) as $device) {
         $host_id = get_vm_parent_id($device);
         $device['ip'] = inet6_ntop($device['ip']);
         if (is_numeric($host_id)) {
@@ -523,6 +550,41 @@ function get_bgp()
     }
 
     api_success($bgp_session, 'bgp_session');
+}
+
+
+function list_cbgp()
+{
+    $app        = \Slim\Slim::getInstance();
+    $sql        = '';
+    $sql_params = array();
+    $hostname   = $_GET['hostname'] ?: '';
+    $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        check_device_permission($device_id);
+        $sql        = " AND `devices`.`device_id` = ?";
+        $sql_params[] = $device_id;
+    }
+    if (!is_admin() && !is_read()) {
+        $sql .= " AND `bgpPeers_cbgp`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql_params[] = $_SESSION['user_id'];
+    }
+
+    $bgp_counters = array();
+    foreach (dbFetchRows("SELECT `bgpPeers_cbgp`.* FROM `bgpPeers_cbgp` LEFT JOIN `devices` ON `bgpPeers_cbgp`.`device_id` = `devices`.`device_id` WHERE `bgpPeers_cbgp`.`device_id` IS NOT NULL $sql", $sql_params) as $bgp_counter) {
+        $host_id = get_vm_parent_id($device);
+        $device['ip'] = inet6_ntop($device['ip']);
+        if (is_numeric($host_id)) {
+            $device['parent_id'] = $host_id;
+        }
+        $bgp_counters[] = $bgp_counter;
+    }
+    $total_bgp_counters = count($bgp_counters);
+    if ($total_bgp_counters == 0) {
+        api_error(404, 'BGP counters does not exist');
+    }
+
+    api_success($bgp_counters, 'bgp_counters');
 }
 
 
@@ -822,11 +884,28 @@ function get_ip_addresses()
         check_device_permission($device_id);
         $ipv4   = dbFetchRows("SELECT `ipv4_addresses`.* FROM `ipv4_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
         $ipv6   = dbFetchRows("SELECT `ipv6_addresses`.* FROM `ipv6_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
+        $ip_addresses_count = count(array_merge($ipv4, $ipv6));
+        if ($ip_addresses_count == 0) {
+            api_error(404, "Device $device_id does not have any IP addresses");
+        }
     } elseif (isset($router['portid'])) {
         $port_id = urldecode($router['portid']);
         check_port_permission($port_id, null);
         $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `port_id` = ?", array($port_id));
         $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?", array($port_id));
+        $ip_addresses_count = count(array_merge($ipv4, $ipv6));
+        if ($ip_addresses_count == 0) {
+            api_error(404, "Port $port_id does not have any IP addresses");
+        }
+    } elseif (isset($router['id'])) {
+        check_is_read();
+        $network_id = $router['id'];
+        $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `ipv4_network_id` = ?", array($network_id));
+        $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `ipv6_network_id` = ?", array($network_id));
+        $ip_addresses_count = count(array_merge($ipv4, $ipv6));
+        if ($ip_addresses_count == 0) {
+            api_error(404, "IP network $network_id does not exist or is empty");
+        }
     }
 
     api_success(array_merge($ipv4, $ipv6), 'addresses');
@@ -1170,7 +1249,7 @@ function list_bills()
     $bill_ref = mres($_GET['ref']);
     $bill_custid = mres($_GET['custid']);
     $param = array();
-    
+
     if (!empty($bill_custid)) {
         $sql    .= '`bill_custid` = ?';
         $param[] = $bill_custid;
@@ -1281,7 +1360,7 @@ function rename_device()
         if (renamehost($device_id, $new_hostname, 'api') == '') {
             api_success_noresult(200, 'Device has been renamed');
         } else {
-            api_success_noresult(200, 'Device failed to be renamed');
+            api_error(500, 'Device failed to be renamed');
         }
     }
 }
@@ -1327,6 +1406,68 @@ function get_devices_by_group()
     api_success($devices, 'devices');
 }
 
+
+function list_vrf()
+{
+    $app        = \Slim\Slim::getInstance();
+    $sql        = '';
+    $sql_params = array();
+    $hostname   = $_GET['hostname'];
+    $vrfname    = $_GET['vrfname'];
+    $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        check_device_permission($device_id);
+        $sql        = " AND `devices`.`device_id`=?";
+        $sql_params = array($device_id);
+    }
+    if (!empty($vrfname)) {
+        $sql        = "  AND `vrfs`.`vrf_name`=?";
+        $sql_params = array($vrfname);
+    }
+    if (!is_admin() && !is_read()) {
+        $sql .= " AND `vrfs`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql_params[] = $_SESSION['user_id'];
+    }
+
+    $vrfs       = array();
+    foreach (dbFetchRows("SELECT `vrfs`.* FROM `vrfs` LEFT JOIN `devices` ON `vrfs`.`device_id` = `devices`.`device_id` WHERE `vrfs`.`vrf_name` IS NOT NULL $sql", $sql_params) as $vrf) {
+        $host_id = get_vm_parent_id($device);
+        $device['ip'] = inet6_ntop($device['ip']);
+        if (is_numeric($host_id)) {
+            $device['parent_id'] = $host_id;
+        }
+        $vrfs[] = $vrf;
+    }
+    $total_vrfs = count($vrfs);
+    if ($total_vrfs == 0) {
+        api_error(404, 'VRFs do not exist');
+    }
+
+    api_success($vrfs, 'vrfs');
+}
+
+
+function get_vrf()
+{
+    check_is_read();
+
+    $app    = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $vrfId  = $router['id'];
+    if (!is_numeric($vrfId)) {
+        api_error(400, 'Invalid id has been provided');
+    }
+
+    $vrf       = dbFetchRows("SELECT * FROM `vrfs` WHERE `vrf_id` IS NOT NULL AND `vrf_id` = ?", array($vrfId));
+    $vrf_count = count($vrf);
+    if ($vrf_count == 0) {
+        api_error(404, "VRF $vrfId does not exist");
+    }
+
+    api_success($vrf, 'vrf');
+}
+
+
 function list_ipsec()
 {
     check_is_read();
@@ -1342,6 +1483,82 @@ function list_ipsec()
     $ipsec  = dbFetchRows("SELECT `D`.`hostname`, `I`.* FROM `ipsec_tunnels` AS `I`, `devices` AS `D` WHERE `I`.`device_id`=? AND `D`.`device_id` = `I`.`device_id`", array($device_id));
     api_success($ipsec, 'ipsec');
 }
+
+
+function list_vlans()
+{
+    $app      = \Slim\Slim::getInstance();
+    $sql        = '';
+    $sql_params = array();
+    $hostname   = $_GET['hostname'] ?: '';
+    $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        check_device_permission($device_id);
+        $sql        = " AND `devices`.`device_id` = ?";
+        $sql_params[] = $device_id;
+    }
+    if (!is_admin() && !is_read()) {
+        $sql .= " AND `vlans`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql_params[] = $_SESSION['user_id'];
+    }
+
+    $vlans       = array();
+    foreach (dbFetchRows("SELECT `vlans`.* FROM `vlans` LEFT JOIN `devices` ON `vlans`.`device_id` = `devices`.`device_id` WHERE `vlans`.`vlan_vlan` IS NOT NULL $sql", $sql_params) as $vlan) {
+        $host_id = get_vm_parent_id($device);
+        $device['ip'] = inet6_ntop($device['ip']);
+        if (is_numeric($host_id)) {
+            $device['parent_id'] = $host_id;
+        }
+        $vlans[] = $vlan;
+    }
+    $vlans_count = count($vlans);
+    if ($vlans_count == 0) {
+        api_error(404, 'VLANs do not exist');
+    }
+
+    api_success($vlans, 'vlans');
+}
+
+
+function list_ip_addresses()
+{
+    check_is_read();
+
+    $app            = \Slim\Slim::getInstance();
+    $router         = $app->router()->getCurrentRoute()->getParams();
+    $ipv4_addresses = array();
+    $ipv6_addresses = array();
+
+    $ipv4_addresses   = dbFetchRows("SELECT * FROM `ipv4_addresses`");
+    $ipv6_addresses   = dbFetchRows("SELECT * FROM `ipv6_addresses`");
+    $ip_addresses_count = count(array_merge($ipv4_addresses, $ipv6_addresses));
+    if ($ip_addresses_count == 0) {
+        api_error(404, 'IP addresses do not exist');
+    }
+
+    api_success(array_merge($ipv4_addresses, $ipv6_addresses), 'ip_addresses');
+}
+
+
+function list_ip_networks()
+{
+    check_is_read();
+
+    $app           = \Slim\Slim::getInstance();
+    $router        = $app->router()->getCurrentRoute()->getParams();
+    $ipv4_networks = array();
+    $ipv6_networks = array();
+
+    $ipv4_networks   = dbFetchRows("SELECT * FROM `ipv4_networks`");
+    $ipv6_networks   = dbFetchRows("SELECT * FROM `ipv6_networks`");
+    $ip_networks_count = count(array_merge($ipv4_networks, $ipv6_networks));
+    if ($ip_networks_count == 0) {
+        api_error(404, 'IP networks do not exist');
+    }
+
+    api_success(array_merge($ipv4_networks, $ipv6_networks), 'ip_networks');
+}
+
 
 function list_arp()
 {
@@ -1502,5 +1719,54 @@ function validate_column_list($columns, $tableName)
         $app->response->headers->set('Content-Type', 'application/json');
         echo _json_encode($output);
         $app->stop();
+    }
+}
+
+function add_service_for_host()
+{
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $hostname = $router['hostname'];
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    check_device_permission($device_id);
+    $data = json_decode(file_get_contents('php://input'), true);
+    $missing_fields = array();
+
+    // Check if some required fields are empty
+    if (empty($data['type'])) {
+        $missing_fields[] = 'type';
+    }
+    if (empty($data['ip'])) {
+        $missing_fields[] = 'ip';
+    }
+
+    // Print error if required fields are missing
+    if (!empty($missing_fields)) {
+        api_error(400, sprintf("Service field%s %s missing: %s.", ((sizeof($missing_fields)>1)?'s':''), ((sizeof($missing_fields)>1)?'are':'is'), implode(', ', $missing_fields)));
+    }
+    if (!filter_var($data['ip'], FILTER_VALIDATE_IP)) {
+        api_error(400, 'service_ip is not a valid IP address.');
+    }
+
+    // Check if service type exists
+    if (!in_array($data['type'], list_available_services())) {
+        api_error(400, "The service " . $data['type'] . " does not exist.\n Available service types: " . implode(', ', list_available_services()));
+    }
+
+    // Get parameters
+    $service_type = $data['type'];
+    $service_ip   = $data['ip'];
+    $service_desc = $data['desc'] ? mres($data['desc']) : '';
+    $service_param = $data['param'] ? mres($data['param']) : '';
+    $service_ignore = $data['ignore'] ? true : false; // Default false
+
+    // Set the service
+    $service_id = add_service($device_id, $service_type, $service_desc, $service_ip, $service_param, (int)$service_ignore);
+    if ($service_id != false) {
+        api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");
+    } else {
+        api_error(500, 'Failed to add the service');
     }
 }

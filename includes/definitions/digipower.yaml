@@ -4,4 +4,4 @@ type: power
 over:
     - { graph: device_current, text: Current }
 discovery:
-    - sysObjectId: .1.3.6.1.4.1.17420
+    - sysObjectID: .1.3.6.1.4.1.17420

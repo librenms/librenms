@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-$mslhw            = $poll_device['sysDescr'];
+$mslhw            = $device['sysDescr'];
 $version_oid      = '.1.3.6.1.4.1.1027.4.1.2.1.1.1.4.10.1.3.6.1.4.1.1027.1.6.1';
 $features_oid     = '.1.3.6.1.4.1.1027.4.1.2.1.1.1.5.10.1.3.6.1.4.1.1027.1.6.1';
 $oids             = array("mitelAppTblProductVersion.10.1.3.6.1.4.1.1027.1.6.1", "mitelAppTblProductDescr.10.1.3.6.1.4.1.1027.1.6.1");

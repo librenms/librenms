@@ -60,6 +60,29 @@ You can also set this globally with the config option `$config['snmp']['max_oid'
 
 > NOTE: It is advisable to monitor sensor polling when you change this to ensure you don't set the value too high.
 
+### fping tuning
+
+You can change some of the default fping options used globally or per device. The defaults are:
+
+```php
+$config['fping_options']['timeout'] = 500;
+$config['fping_options']['count']   = 3;
+$config['fping_options']['interval'] = 500;
+```
+
+If your devices are slow to respond then you will need to increase the timeout value and potentially the interval value.
+However if your network is stable, you can increase poller performance by dropping the count value to 1 and/or the timeout+millsec value to 200 or 300:
+
+```php
+$config['fping_options']['timeout'] = 300;
+$config['fping_options']['count']   = 1;
+$config['fping_options']['interval'] = 300;
+```
+
+This will mean that we no longer delay each icmp packet sent (we send 3 in total by default) by 0.5 seconds. With only 1 icmp packet
+being sent then we will receive a response quicker. The defaults mean it will take at least 1 second for a response no matter how 
+quick the icmp packet is returned.
+
 ### Optimise poller-wrapper
 
 The default 16 threads that `poller-wrapper.py` runs as isn't necessarily the optimal number. A general rule of thumb is 

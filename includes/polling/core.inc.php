@@ -1,5 +1,4 @@
 <?php
-
 /*
  * LibreNMS Network Management and Monitoring System
  * Copyright (C) 2006-2011, Observium Developers - http://www.observium.org
@@ -14,11 +13,14 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-$snmpdata = snmp_get_multi($device, 'sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 sysObjectID.0', '-OQnUst', 'SNMPv2-MIB:HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
-$poll_device = $snmpdata[0];
-$poll_device['sysName'] = strtolower($poll_device['sysName']);
+$snmpdata = snmp_get_multi_oid($device, 'sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 sysObjectID.0 sysDescr.0', '-OQnUt', 'SNMPv2-MIB');
 
-$poll_device['sysDescr'] = snmp_get($device, 'sysDescr.0', '-OvQ', 'SNMPv2-MIB:HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
+$poll_device['sysUptime']   = $snmpdata['.1.3.6.1.2.1.1.3.0'];
+$poll_device['sysLocation'] = $snmpdata['.1.3.6.1.2.1.1.6.0'];
+$poll_device['sysContact']  = $snmpdata['.1.3.6.1.2.1.1.4.0'];
+$poll_device['sysName']     = strtolower($snmpdata['.1.3.6.1.2.1.1.5.0']);
+$poll_device['sysObjectID'] = $snmpdata['.1.3.6.1.2.1.1.2.0'];
+$poll_device['sysDescr']    = $snmpdata['.1.3.6.1.2.1.1.1.0'];
 
 if (!empty($agent_data['uptime'])) {
     list($uptime) = explode(' ', $agent_data['uptime']);
@@ -28,7 +30,7 @@ if (!empty($agent_data['uptime'])) {
     $uptime_data = snmp_get_multi($device, 'snmpEngineTime.0 hrSystemUptime.0', '-OQnUst', 'HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
 
     $uptime = max(
-        round($poll_device['sysUpTime'] / 100),
+        round($poll_device['sysUptime'] / 100),
         $config['os'][$device['os']]['bad_snmpEngineTime'] ? 0 : $uptime_data[0]['snmpEngineTime'],
         $config['os'][$device['os']]['bad_hrSystemUptime'] ? 0 : round($uptime_data[0]['hrSystemUptime'] / 100)
     );
@@ -50,12 +52,10 @@ if ($uptime != 0 && $config['os'][$device['os']]['bad_uptime'] !== true) {
     echo 'Uptime: ' . formatUptime($uptime) . PHP_EOL;
 
     $update_array['uptime'] = $uptime;
+    $device['uptime']       = $uptime;
 }//end if
 
 $poll_device['sysLocation'] = str_replace('"', '', $poll_device['sysLocation']);
-
-// Remove leading & trailing backslashes added by VyOS/Vyatta/EdgeOS
-$poll_device['sysLocation'] = trim($poll_device['sysLocation'], '\\');
 
 // Rewrite sysLocation if there is a mapping array (database too?)
 if (!empty($poll_device['sysLocation']) && (is_array($config['location_map']) || is_array($config['location_map_regex']) || is_array($config['location_map_regex_sub']))) {
@@ -63,10 +63,6 @@ if (!empty($poll_device['sysLocation']) && (is_array($config['location_map']) ||
 }
 
 $poll_device['sysContact'] = str_replace('"', '', $poll_device['sysContact']);
-
-// Remove leading & trailing backslashes added by VyOS/Vyatta/EdgeOS
-$poll_device['sysContact'] = trim($poll_device['sysContact'], '\\');
-
 
 foreach (array('sysLocation', 'sysContact') as $elem) {
     if ($poll_device[$elem] == 'not set') {
@@ -78,12 +74,14 @@ foreach (array('sysLocation', 'sysContact') as $elem) {
 foreach (array('sysContact', 'sysObjectID', 'sysName', 'sysDescr') as $elem) {
     if ($poll_device[$elem] != $device[$elem]) {
         $update_array[$elem] = $poll_device[$elem];
+        $device[$elem]       = $poll_device[$elem];
         log_event("$elem -> " . $poll_device[$elem], $device, 'system', 3);
     }
 }
 
 if ($poll_device['sysLocation'] && $device['location'] != $poll_device['sysLocation'] && $device['override_sysLocation'] == 0) {
     $update_array['location'] = $poll_device['sysLocation'];
+    $device['location']       = $poll_device['sysLocation'];
     log_event('Location -> ' . $poll_device['sysLocation'], $device, 'system', 3);
 }
 
@@ -91,4 +89,4 @@ if ($config['geoloc']['latlng'] === true) {
     location_to_latlng($device);
 }
 
-unset($snmpdata, $uptime_data, $uptime, $tags);
+unset($snmpdata, $uptime_data, $uptime, $tags, $poll_device);

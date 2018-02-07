@@ -9,7 +9,7 @@
  * the source code distribution for details.
  */
 
-$ceragon_type = $poll_device['sysObjectID'];
+$ceragon_type = $device['sysObjectID'];
 $hardware = rewrite_ceraos_hardware($ceragon_type, $device); // function in ./includes/rewrites.php
 if (stristr('IP10', $hardware)) {
     $serial = snmp_get($device, 'genEquipUnitIDUSerialNumber.0', '-Oqv', 'MWRM-UNIT-MIB');

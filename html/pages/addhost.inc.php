@@ -49,6 +49,7 @@ if ($hostname !== false) {
                 'snmp_disable' => 1,
                 'os'           => $_POST['os'] ? mres($_POST['os_id']) : "ping",
                 'hardware'     => mres($_POST['hardware']),
+                'sysName'      => mres($_POST['sysName'])
             );
         } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
             if ($_POST['community']) {
@@ -111,19 +112,25 @@ $pagetitle[] = 'Add host';
   <div><h2>Add Device</h2></div>
   <div class="alert alert-info">Devices will be checked for Ping/SNMP reachability before being probed.</div>
   <div class="well well-lg">
-    <div class='form-group'>
+      <div class="form-group">
+          <label for="hostname" class="col-sm-3 control-label">Hostname</label>
+          <div class="col-sm-9">
+              <input type="text" id="hostname" name="hostname" class="form-control input-sm" placeholder="Hostname">
+          </div>
+      </div>
+      <div class='form-group'>
         <label for='hardware' class='col-sm-3 control-label'>SNMP</label>
         <div class='col-sm-4'>
             <input type="checkbox" id="snmp" name="snmp" data-size="small" onChange="disableSnmp(this);" checked>
         </div>
     </div>
-    <div class="form-group">
-      <label for="hostname" class="col-sm-3 control-label">Hostname</label>
-      <div class="col-sm-9">
-        <input type="text" id="hostname" name="hostname" class="form-control input-sm" placeholder="Hostname">
-      </div>
-    </div>
     <div id='snmp_override' style="display: none;">
+        <div class='form-group'>
+            <label for='sysName' class='col-sm-3 control-label'>sysName (optional)</label>
+            <div class='col-sm-9'>
+                <input id='sysName' class='form-control' name='sysName' placeholder="sysName (optional)"/>
+            </div>
+        </div>
         <div class='form-group'>
             <label for='hardware' class='col-sm-3 control-label'>Hardware (optional)</label>
             <div class='col-sm-9'>

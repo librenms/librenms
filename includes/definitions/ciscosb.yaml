@@ -1,9 +1,10 @@
 os: ciscosb
-group: cisco
 text: 'Cisco Small Business'
 ifname: 1
 type: network
 icon: cisco
+mib_dir:
+    - cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
@@ -30,7 +31,7 @@ discovery_modules:
     ntp: 0
     ucd-diskio: 0
 discovery:
-    - sysObjectId:
+    - sysObjectID:
             - .1.3.6.1.4.1.9.6.1.23.3.13
             - .1.3.6.1.4.1.9.6.1.80
             - .1.3.6.1.4.1.9.6.1.81

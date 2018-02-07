@@ -119,8 +119,8 @@ class Ptp250 extends OS implements
                 0,
                 'PTP250 Receive Rate',
                 null,
-                1,
-                100
+                1000,
+                1
             ),
             new WirelessSensor(
                 'rate',
@@ -130,8 +130,8 @@ class Ptp250 extends OS implements
                 0,
                 'PTP250 Transmit Rate',
                 null,
-                1,
-                100
+                1000,
+                1
             ),
             new WirelessSensor(
                 'rate',
@@ -139,10 +139,10 @@ class Ptp250 extends OS implements
                 $aggregate,
                 'ptp250-ag-rate',
                 0,
-                'PTP250 Aggragate Rate',
+                'PTP250 Aggregate Rate',
                 null,
-                1,
-                100
+                1000,
+                1
             ),
             new WirelessSensor(
                 'rate',
@@ -182,7 +182,9 @@ class Ptp250 extends OS implements
                 'ptp250',
                 0,
                 'PTP250 Signal Strength Ratio',
-                null
+                null,
+                1,
+                10
             )
         );
     }
