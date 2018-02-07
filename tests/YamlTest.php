@@ -162,7 +162,6 @@ class YamlTest extends TestCase
                     $required_keys = array('oid', 'num_oid');
                     $optional_keys = array('value', 'index', 'descr', 'type', 'skip_values', 'snmp_flags', 'entPhysicalIndex');
                     if ($module == 'processors') {
-                        $optional_keys[] = 'data';
                         $optional_keys[] = 'precision';
                     }
                     $this->checkDiscoveryData($file, $module, $item_data, $required_keys, $optional_keys, $index);
