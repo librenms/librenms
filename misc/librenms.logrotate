@@ -7,5 +7,5 @@
     delaycompress
     missingok
     notifempty
-    create 644 librenms librenms
+    create 664 librenms librenms
 }
