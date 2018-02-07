@@ -26,7 +26,7 @@
                     "sysDescr": "ExtremeXOS (X480-24x(10G4X)) version 15.3.5.2 v1535b2-patch1-13 by release-manager on Thu Dec 15 11:08:24 EST 2016",
                     "sysContact": "<private>",
                     "version": "15.3.5.2",
-                    "hardware": "",
+                    "hardware": "Summit X480-24x(10G4X)",
                     "features": "v1535b2-patch1-13 Dec 15 2016",
                     "location": "<private>",
                     "os": "xos",
