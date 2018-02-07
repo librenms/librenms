@@ -70,17 +70,34 @@ class Cisco extends OS implements ProcessorDiscovery
                 $descr = "Processor $index";
             }
 
-            $processors[] = Processor::discover(
-                'cpm',
-                $this->getDeviceId(),
-                $usage_oid,
-                $index,
-                $descr,
-                1,
-                $usage,
-                null,
-                $entPhysicalIndex
-            );
+            if (is_array($entry['cpmCore5min'])) {
+                // This CPU has data per individual core
+                foreach ($entry['cpmCore5min'] as $core_index => $core_usage) {
+                    $processors[] = Processor::discover(
+                        'cpm',
+                        $this->getDeviceId(),
+                        ".1.3.6.1.4.1.9.9.109.1.1.2.1.5.$index.$core_index",
+                        "$index.$core_index",
+                        "$descr: Core $core_index",
+                        1,
+                        $core_usage,
+                        null,
+                        $entPhysicalIndex
+                    );
+                }
+            } else {
+                $processors[] = Processor::discover(
+                    'cpm',
+                    $this->getDeviceId(),
+                    $usage_oid,
+                    $index,
+                    $descr,
+                    1,
+                    $usage,
+                    null,
+                    $entPhysicalIndex
+                );
+            }
         }
 
         if (empty($processors)) {
