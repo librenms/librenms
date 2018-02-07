@@ -75,7 +75,6 @@ class Ceraos extends OS implements WirelessErrorsDiscovery, WirelessMseDiscovery
         }
 
         return $sensors;
-
     }
 
     /**
