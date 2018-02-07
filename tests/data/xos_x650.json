@@ -26,7 +26,7 @@
                     "sysDescr": "ExtremeXOS (X650-24x(SSns)) version 15.3.5.2 v1535b2-patch1-14 by release-manager on Fri Jun 16 08:43:13 EDT 2017",
                     "sysContact": "<private>",
                     "version": "15.3.5.2",
-                    "hardware": "",
+                    "hardware": "Summit X480-24x(10G4X)",
                     "features": "v1535b2-patch1-14 Jun 16 2017",
                     "location": "<private>",
                     "os": "xos",
