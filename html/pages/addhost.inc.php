@@ -49,6 +49,7 @@ if ($hostname !== false) {
                 'snmp_disable' => 1,
                 'os'           => $_POST['os'] ? mres($_POST['os_id']) : "ping",
                 'hardware'     => mres($_POST['hardware']),
+                'sysName'      => mres($_POST['sysName'])
             );
         } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
             if ($_POST['community']) {
@@ -124,6 +125,12 @@ $pagetitle[] = 'Add host';
         </div>
     </div>
     <div id='snmp_override' style="display: none;">
+        <div class='form-group'>
+            <label for='sysName' class='col-sm-3 control-label'>sysName (optional)</label>
+            <div class='col-sm-9'>
+                <input id='sysName' class='form-control' name='sysName' placeholder="sysName (optional)"/>
+            </div>
+        </div>
         <div class='form-group'>
             <label for='hardware' class='col-sm-3 control-label'>Hardware (optional)</label>
             <div class='col-sm-9'>
