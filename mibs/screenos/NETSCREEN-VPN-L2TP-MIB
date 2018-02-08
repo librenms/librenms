@@ -1,0 +1,494 @@
+-- This module defines enterprise MIBs for L2tp configuration.
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-VPN-L2TP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenVpn, netscreenVpnMibModule
+        FROM NETSCREEN-SMI
+    Integer32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenVpnL2tpMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines NetScreen private MIBs for L2tp
+         configuration."
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200008270000Z" -- August 27, 2000
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenVpnMibModule 8 }
+
+NsVpnL2tpDefEntry ::= SEQUENCE
+{
+    nsVpnL2tpDefVsys      Integer32,
+    nsVpnL2tpDefPool      DisplayString,
+    nsVpnL2tpDefAuthDb    INTEGER,
+    nsVpnL2tpDefPPPAuth   INTEGER,
+    nsVpnL2tpDefRadServer DisplayString,
+    nsVpnL2tpDefPriDns    IpAddress,
+    nsVpnL2tpDefSecDns    IpAddress,
+    nsVpnL2tpDefPriWins   IpAddress,
+    nsVpnL2tpDefSecWins   IpAddress
+}
+
+NsVpnL2tpTunnelEntry ::= SEQUENCE
+{
+    nsVpnL2tpTunIndex      Integer32,
+    nsVpnL2tpTunId         Integer32,
+    nsVpnL2tpTunName       DisplayString,
+    nsVpnL2tpTunUsrOrGroup DisplayString,
+    nsVpnL2tpTunPeerIp     IpAddress,
+    nsVpnL2tpTunHost       DisplayString,
+    nsVpnL2tpTunKeepAlive  Integer32,
+    nsVpnL2tpTunVsys       Integer32
+}
+
+nsVpnL2TP OBJECT IDENTIFIER ::= { netscreenVpn 8 }
+
+nsVpnL2tpDefTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsVpnL2tpDefEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table specifies the configuration attributes for
+         NetScreen L2TP tunnel."
+    ::= { nsVpnL2TP 1 }
+
+nsVpnL2tpDefEntry OBJECT-TYPE
+    SYNTAX        NsVpnL2tpDefEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the nsVpnL2tpDefEntry holds a set of
+         configuration parameters associated with an instance of L2TP
+         configuration."
+    INDEX
+        { nsVpnL2tpDefVsys }
+    ::= { nsVpnL2tpDefTable 1 }
+
+nsVpnL2tpDefVsys OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "virtual system id"
+    ::= { nsVpnL2tpDefEntry 1 }
+
+nsVpnL2tpDefPool OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "IP pool used by the default L2TP setting."
+    ::= { nsVpnL2tpDefEntry 2 }
+
+nsVpnL2tpDefAuthDb OBJECT-TYPE
+    SYNTAX        INTEGER {
+        local(0),
+        radius(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "l2tp authentication database."
+    ::= { nsVpnL2tpDefEntry 3 }
+
+nsVpnL2tpDefPPPAuth OBJECT-TYPE
+    SYNTAX        INTEGER {
+        pap(1),
+        chap(2),
+        any(3)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "l2tp PPP authentication algorithm."
+    ::= { nsVpnL2tpDefEntry 4 }
+
+nsVpnL2tpDefRadServer OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "l2tp RADIUS Server's IP address or name."
+    ::= { nsVpnL2tpDefEntry 5 }
+
+nsVpnL2tpDefPriDns OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "DNS Primary Server's IP address."
+    ::= { nsVpnL2tpDefEntry 6 }
+
+nsVpnL2tpDefSecDns OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "DNS Secondary Server's IP address."
+    ::= { nsVpnL2tpDefEntry 7 }
+
+nsVpnL2tpDefPriWins OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "WINS Primary Server's IP address."
+    ::= { nsVpnL2tpDefEntry 8 }
+
+nsVpnL2tpDefSecWins OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "WINS Secondary Server's IP address."
+    ::= { nsVpnL2tpDefEntry 9 }
+
+nsVpnL2tpTunnelTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsVpnL2tpTunnelEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table specifies the configuration attributes for
+         NetScreen L2TP tunnel."
+    ::= { nsVpnL2TP 2 }
+
+nsVpnL2tpTunnelEntry OBJECT-TYPE
+    SYNTAX        NsVpnL2tpTunnelEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the nsVpnL2tpTunnelTable holds a set of
+         configuration parameters associated with an instance of L2TP
+         tunnel."
+    INDEX
+        { nsVpnL2tpTunIndex }
+    ::= { nsVpnL2tpTunnelTable 1 }
+
+nsVpnL2tpTunIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for l2tp tunnel table.  Its value ranges
+         between 0 and 65535 and may not be contigous."
+    ::= { nsVpnL2tpTunnelEntry 1 }
+
+nsVpnL2tpTunId OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "l2tp tunnel id."
+    ::= { nsVpnL2tpTunnelEntry 2 }
+
+nsVpnL2tpTunName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "l2tp tunnel name."
+    ::= { nsVpnL2tpTunnelEntry 3 }
+
+nsVpnL2tpTunUsrOrGroup OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Dialup user or group using this l2tp tunnel."
+    ::= { nsVpnL2tpTunnelEntry 4 }
+
+nsVpnL2tpTunPeerIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "L2tp tunnel peer's IP address."
+    ::= { nsVpnL2tpTunnelEntry 5 }
+
+nsVpnL2tpTunHost OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "L2tp tunnel's host name."
+    ::= { nsVpnL2tpTunnelEntry 6 }
+
+nsVpnL2tpTunKeepAlive OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Keep alive time threshold for a l2tp tunnel."
+    ::= { nsVpnL2tpTunnelEntry 7 }
+
+nsVpnL2tpTunVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Virtual system this tunnel belongs to"
+    ::= { nsVpnL2tpTunnelEntry 8 }
+
+ -- VPN L2tp Monitoring Tunnel Table
+
+nsVpnL2tpMonTunnelTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF NsVpnL2tpMonTunnelEntry
+    MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION 
+	    "This table specifies the monitoring attributes for NetScreen
+	     L2TP tunnel."
+	::= { nsVpnL2TP 3 }
+
+nsVpnL2tpMonTunnelEntry OBJECT-TYPE
+    SYNTAX      NsVpnL2tpMonTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in the nsVpnL2tpMonTunnelTable holds a set of monitoring
+        parameters associated with an instance of L2TP tunnel."
+    INDEX 
+        { nsVpnL2tpMonTunId }
+    ::= { nsVpnL2tpMonTunnelTable 1 }
+
+NsVpnL2tpMonTunnelEntry ::= SEQUENCE 
+{
+    nsVpnL2tpMonTunId       Integer32,
+    nsVpnL2tpMonTunPeerId   Integer32,
+    nsVpnL2tpMonTunName     DisplayString,
+    nsVpnL2tpMonTunPeerIp   IpAddress,     
+    nsVpnL2tpMonTunPort     Integer32,
+    nsVpnL2tpMonTunPeerHost DisplayString, 
+    nsVpnL2tpMonTunCalls    Integer32,
+    nsVpnL2tpMonTunState    INTEGER,
+    nsVpnL2tpMonTunVsys     Integer32
+}
+
+nsVpnL2tpMonTunId OBJECT-TYPE
+   	SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "L2tp tunnel id. Its value ranges between 1 and 65535 and may 
+        not be contigous." 
+    ::= { nsVpnL2tpMonTunnelEntry 1 }
+
+nsVpnL2tpMonTunPeerId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "L2tp tunnel peer id."
+    ::= { nsVpnL2tpMonTunnelEntry 2 }
+
+nsVpnL2tpMonTunName OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "L2tp tunnel name."
+    ::= { nsVpnL2tpMonTunnelEntry 3 }
+
+nsVpnL2tpMonTunPeerIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "L2tp tunnel peer's IP address."
+    ::= { nsVpnL2tpMonTunnelEntry 4 }    
+    
+nsVpnL2tpMonTunPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "L2tp tunnel port number."
+    ::= { nsVpnL2tpMonTunnelEntry 5 }     
+
+nsVpnL2tpMonTunPeerHost OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "L2tp tunnel peer's host name."
+    ::= { nsVpnL2tpMonTunnelEntry 6 }
+
+nsVpnL2tpMonTunCalls OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total calls for this tunnel."
+    ::= { nsVpnL2tpMonTunnelEntry 7 }
+
+nsVpnL2tpMonTunState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        idle(1),
+        wait-reply(2),
+        wait-conn(3),
+        establish(4),
+        dead(5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "L2tp tunnel state."
+    ::= { nsVpnL2tpMonTunnelEntry 8 }     
+
+nsVpnL2tpMonTunVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Virtual system this tunnel belongs to"
+    ::= { nsVpnL2tpMonTunnelEntry 9 }     
+       
+       
+-- VPN L2tp Monitoring Call Table
+
+nsVpnL2tpMonCallTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF NsVpnL2tpMonCallEntry
+    MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION 
+        "This table specifies the monitoring attributes for NetScreen
+        L2TP calls."
+	::= { nsVpnL2TP 4 }
+
+nsVpnL2tpMonCallEntry OBJECT-TYPE
+    SYNTAX      NsVpnL2tpMonCallEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in the nsVpnL2tpMonCallTable holds a set of monitoring
+        parameters associated with an instance of L2TP tunnel and call id."
+    INDEX   
+        { nsVpnL2tpMonCallTunId, nsVpnL2tpMonCallId }
+    ::= { nsVpnL2tpMonCallTable 1 }
+
+NsVpnL2tpMonCallEntry ::= SEQUENCE 
+{
+      nsVpnL2tpMonCallTunId      Integer32,
+	  nsVpnL2tpMonCallId         Integer32,  
+	  nsVpnL2tpMonCallPeerId     Integer32,
+	  nsVpnL2tpMonCallIp         IpAddress,  
+	  nsVpnL2tpMonCallUser       DisplayString,
+	  nsVpnL2tpMonCallType       INTEGER,
+	  nsVpnL2tpMonCallState      INTEGER,
+	  nsVpnL2tpMonCallEstTime    TimeTicks,
+	  nsVpnL2tpMonCallVsys       Integer32
+}
+
+nsVpnL2tpMonCallTunId OBJECT-TYPE
+   	SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "L2tp tunnel id.  Its value ranges between 1 and 65535 and may not 
+        be contigous." 
+    ::= { nsVpnL2tpMonCallEntry 1 }
+
+nsVpnL2tpMonCallId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "L2tp call id."
+    ::= { nsVpnL2tpMonCallEntry 2 }   
+       
+nsVpnL2tpMonCallPeerId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "L2tp call peer id."
+    ::= { nsVpnL2tpMonCallEntry 3 }
+
+nsVpnL2tpMonCallIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "L2tp call assigned IP address."
+    ::= { nsVpnL2tpMonCallEntry 4 }    
+
+nsVpnL2tpMonCallUser OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "L2tp call user name."
+    ::= { nsVpnL2tpMonCallEntry 5 }
+  
+nsVpnL2tpMonCallType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none(1),
+        incoming(2),
+        outgoing(3) 
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Call type."
+    ::= { nsVpnL2tpMonCallEntry 6 }
+
+nsVpnL2tpMonCallState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        idle(1),
+        wait-conn(2),
+        establish(3),
+        wait-tunnel(4),
+        wait-reply(5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "L2tp call state."
+    ::= { nsVpnL2tpMonCallEntry 7 }  
+ 
+nsVpnL2tpMonCallEstTime OBJECT-TYPE
+    SYNTAX      TimeTicks 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "L2tp call establish time. This is the sysUptime when 
+         the call was established"
+    ::= { nsVpnL2tpMonCallEntry 8 }
+
+nsVpnL2tpMonCallVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Virtual system this tunnel belongs to"
+    ::= { nsVpnL2tpMonCallEntry 9 }
+
+END
+
+

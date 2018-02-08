@@ -211,6 +211,14 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
             $device_loadbalancer_count['ltm_pool'] = $component_count['f5-ltm-pool'];
             $loadbalancer_tabs[] = 'ltm_pool';
         }
+        if (isset($component_count['f5-gtm-wide'])) {
+            $device_loadbalancer_count['gtm_wide'] = $component_count['f5-gtm-wide'];
+            $loadbalancer_tabs[] = 'gtm_wide';
+        }
+        if (isset($component_count['f5-gtm-pool'])) {
+            $device_loadbalancer_count['gtm_pool'] = $component_count['f5-gtm-pool'];
+            $loadbalancer_tabs[] = 'gtm_pool';
+        }
 
         if (is_array($loadbalancer_tabs)) {
             echo '<li role="presentation" '.$select['loadbalancer'].'>

@@ -185,7 +185,7 @@ function toner2colour($descr, $percent)
  */
 function linkify($text)
 {
-    $regex = "/(http|https|ftp|ftps):\/\/[a-z0-9\-.]+\.[a-z]{2,5}(\/\S*)?/i";
+    $regex = "#(http|https|ftp|ftps)://[a-z0-9\-.]*[a-z0-9\-]+(/\S*)?#i";
 
     return preg_replace($regex, '<a href="$0">$0</a>', $text);
 }

@@ -39,13 +39,9 @@ require_once $install_dir . '/includes/common.php';
 
 # composer autoload
 if (!is_file($install_dir . '/vendor/autoload.php')) {
-    c_echo("%RError: Missing dependencies%n, run: %Bcomposer install --no-dev%n\n\n");
+    c_echo("%RError: Missing dependencies%n, run: %B./scripts/composer_wrapper.php install --no-dev%n\n\n");
 }
 require $install_dir . '/vendor/autoload.php';
-
-if (version_compare(PHP_VERSION, '5.4', '>=')) {
-    require_once $install_dir . '/lib/influxdb-php/vendor/autoload.php';
-}
 
 if (!function_exists('module_selected')) {
     function module_selected($module, $modules)
