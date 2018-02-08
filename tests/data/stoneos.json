@@ -3935,22 +3935,7 @@
             "processors": [
                 {
                     "entPhysicalIndex": "0",
-                    "hrDeviceIndex": null,
-                    "processor_oid": ".1.3.6.1.4.1.28557.2.2.1.3.0",
-                    "processor_index": "0",
-                    "processor_type": "stoneos",
-                    "processor_usage": "0",
-                    "processor_descr": "Processor",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
-                }
-            ]
-        },
-        "poller": {
-            "processors": [
-                {
-                    "entPhysicalIndex": "0",
-                    "hrDeviceIndex": null,
+                    "hrDeviceIndex": "0",
                     "processor_oid": ".1.3.6.1.4.1.28557.2.2.1.3.0",
                     "processor_index": "0",
                     "processor_type": "stoneos",
@@ -3960,7 +3945,8 @@
                     "processor_perc_warn": "75"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -4016,7 +4002,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.28557.2.28.1.2.1.3.1",
-                    "sensor_index": "hillstoneTemperatureIndex.1",
+                    "sensor_index": "1",
                     "sensor_type": "stoneos",
                     "sensor_descr": "CPU",
                     "sensor_divisor": "1",
@@ -4039,7 +4025,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.28557.2.28.1.2.1.3.2",
-                    "sensor_index": "hillstoneTemperatureIndex.2",
+                    "sensor_index": "2",
                     "sensor_type": "stoneos",
                     "sensor_descr": "Chassis_Outlet",
                     "sensor_divisor": "1",
@@ -4062,7 +4048,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.28557.2.28.1.2.1.3.3",
-                    "sensor_index": "hillstoneTemperatureIndex.3",
+                    "sensor_index": "3",
                     "sensor_type": "stoneos",
                     "sensor_descr": "Chassis_Inlet",
                     "sensor_divisor": "1",
@@ -4085,7 +4071,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.28557.2.28.1.2.1.3.4",
-                    "sensor_index": "hillstoneTemperatureIndex.4",
+                    "sensor_index": "4",
                     "sensor_type": "stoneos",
                     "sensor_descr": "Switch",
                     "sensor_divisor": "1",
@@ -4108,7 +4094,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.28557.2.28.1.2.1.3.5",
-                    "sensor_index": "hillstoneTemperatureIndex.5",
+                    "sensor_index": "5",
                     "sensor_type": "stoneos",
                     "sensor_descr": "Slot_Inlet",
                     "sensor_divisor": "1",
