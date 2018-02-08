@@ -1,0 +1,5271 @@
+TIMETRA-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    MODULE-IDENTITY, OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Integer32, IpAddress, Unsigned32,
+    Counter32, Gauge32                      FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                      FROM SNMPv2-CONF
+
+    TEXTUAL-CONVENTION, DateAndTime,
+    DisplayString, RowStatus,
+    TruthValue, RowPointer, TimeStamp       FROM SNMPv2-TC
+
+    timetraSRMIBModules, tmnxSRObjs,
+    tmnxSRConfs, tmnxSRNotifyPrefix         FROM TIMETRA-GLOBAL-MIB
+
+    TNamedItem, TNamedItemOrEmpty,
+    TmnxAdminState, TmnxOperState,
+    TmnxActionType, TTcpUdpPort,
+    IpAddressPrefixLength,
+    TItemDescription, TmnxEnabledDisabled   FROM TIMETRA-TC-MIB
+
+    InetAddressPrefixLength,
+    InetAddressIPv6,
+    InetAddressType, InetAddress            FROM INET-ADDRESS-MIB
+
+    tmnxChassisNotifyHwIndex,
+    tmnxHwID, tmnxHwClass                   FROM TIMETRA-CHASSIS-MIB
+    
+    tmnxLogExecRollbackOpIndex              FROM TIMETRA-LOG-MIB;
+
+timetraSysMIBModule   MODULE-IDENTITY
+        LAST-UPDATED "201102010000Z"
+        ORGANIZATION "Alcatel-Lucent"
+        CONTACT-INFO
+            "Alcatel-Lucent SROS Support
+             Web: http://support.alcatel-lucent.com"
+        DESCRIPTION
+        "This document is the System SNMP MIB module for the Alcatel-Lucent
+        SROS device.  The System MIB module defines SNMP objects to
+        manage and provision system features.
+
+        Copyright 2003-2012 Alcatel-Lucent. All rights reserved.
+        Reproduction of this document is authorized on the condition
+        that the foregoing copyright notice is included.
+
+        This SNMP MIB module (Specification) embodies Alcatel-Lucent's
+        proprietary intellectual property.  Alcatel-Lucent retains
+        all title and ownership in the Specification, including any
+        revisions.
+
+        Alcatel-Lucent grants all interested parties a non-exclusive
+        license to use and distribute an unmodified copy of this
+        Specification in connection with management of Alcatel-Lucent
+        products, and without fee, provided this copyright notice and
+        license appear on all copies.
+
+        This Specification is supplied `as is', and Alcatel-Lucent
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+--
+--  Revision History
+--
+        REVISION        "1102010000Z"
+        DESCRIPTION     "Rev 9.0                01 Feb 2011 00:00
+                         9.0 release of the TIMETRA-SYSTEM-MIB."
+
+        REVISION        "1001010000Z"
+        DESCRIPTION     "Rev 8.0                01 Jan 2010 00:00
+                         8.0 release of the TIMETRA-SYSTEM-MIB."
+
+        REVISION        "0902280000Z"
+        DESCRIPTION     "Rev 7.0                28 Feb 2009 00:00
+                         7.0 release of the TIMETRA-SYSTEM-MIB."
+
+        REVISION        "0801010000Z"
+        DESCRIPTION     "Rev 6.0                01 Jan 2008 00:00
+                         6.0 release of the TIMETRA-SYSTEM-MIB."
+
+        REVISION        "0701010000Z"
+        DESCRIPTION     "Rev 5.0                01 Jan 2007 00:00
+                         5.0 release of the TIMETRA-SYSTEM-MIB."
+
+        REVISION        "0603150000Z"
+        DESCRIPTION     "Rev 4.0                15 Mar 2006 00:00
+                         4.0 release of the TIMETRA-SYSTEM-MIB."
+
+        REVISION        "0508310000Z"
+        DESCRIPTION     "Rev 3.0                31 Aug 2005 00:00
+                         3.0 release of the TIMETRA-SYSTEM-MIB."
+
+        REVISION        "0501240000Z"
+        DESCRIPTION     "Rev 2.1                24 Jan 2005 00:00
+                         2.1 release of the TIMETRA-SYSTEM-MIB."
+
+        REVISION        "0401150000Z"
+        DESCRIPTION     "Rev 2.0                15 Jan 2004 00:00
+                         2.0 release of the TIMETRA-SYSTEM-MIB."
+
+        REVISION        "0308150000Z"
+        DESCRIPTION     "Rev 1.2                15 Aug 2003 00:00
+                         1.2 release of the TIMETRA-SYSTEM-MIB."
+
+        REVISION        "0301200000Z"
+        DESCRIPTION     "Rev 1.0                20 Jan 2003 00:00
+                        1.0 Release of the TIMETRA-SYSTEM-MIB."
+
+        REVISION        "0008140000Z"
+        DESCRIPTION     "Rev 0.1                14 Aug 2000 00:00
+                        First version of the TIMETRA-SYSTEM-MIB."
+
+    ::= { timetraSRMIBModules 1 }
+
+--
+--  sub-tree for ALcatel 7x50 SR System MIB managed objects
+--
+    tmnxSysObjs         OBJECT IDENTIFIER ::= { tmnxSRObjs 1 }
+    tmnxSysConformance  OBJECT IDENTIFIER ::= { tmnxSRConfs 1 }
+
+--
+--  Sub-tree for Alcatel-Lucent SROS System MIB notification (trap) events
+--
+tmnxSysMIBNotifyPrefix  OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 1 }
+tmnxSysNotifications    OBJECT IDENTIFIER ::= { tmnxSysMIBNotifyPrefix 0 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--      Alcatel-Lucent SROS series System MIB textual conventions
+--
+TmnxSsiSyncMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxSsiSyncMode specifies the type of
+         synchronization operation to perform between the primary
+         and secondary CPMs after a change has been made to the
+         configuration files or the boot environment
+         information contained in the boot options file (bof)."
+    SYNTAX      INTEGER {
+                    none (1),
+                    config (2),
+                    bootEnv (3)
+                }
+
+TmnxSsiSyncRollbackMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxSsiSyncRollbackMode specifies the type of
+         synchronization operation to perform between the primary
+         and secondary CPMs after a change has been made to the
+         rollback files."
+    SYNTAX      INTEGER {
+                    none (1),
+                    rollbackSingle (2),
+                    rollbackAll (3)
+                }
+
+TmnxSysMonSampleTime             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxSysMonSampleTime specifies the monitoring sample time
+         (in terms of seconds) for a system object."
+    SYNTAX      Unsigned32 (1|60|300)
+
+TmnxSysMonUtilization            ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxSysMonUtilization specifies the utilization/idle
+         percentage (in terms 100ths of a percent) for a given sample-time."
+    SYNTAX      Gauge32 (0..10000)
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--      tmnxSys Objects
+--      The tmnxSys objects provide general information about the
+--      Alcatel-Lucent SROS system.
+
+--
+--      General System Information
+--
+
+sysGenInfo      OBJECT IDENTIFIER ::= { tmnxSysObjs 1 }
+
+sgiCpuUsage     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sgiCpuUsage indicates the current CPU utilization
+         for the system."
+    ::= { sysGenInfo 1 }
+
+sgiMemoryUsed   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sgiMemoryUsed indicates the total pre-allocated
+        pool memory currently in use on the system.
+        
+        If the value is greater than the maximum value reportable by this
+        object then this object reports its maximum value (4,294,967,295) 
+        and sgiKbMemoryUsed must be used to determine the total 
+        pre-allocated pool memory."
+    ::= { sysGenInfo 2 }
+
+sgiMemoryAvailable   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sgiMemoryAvailable indicates the amount of free
+        memory in the overall system that is not allocated to memory
+        pools, but is available in case a memory pool needs to grow."
+    ::= { sysGenInfo 3 }
+
+sgiMemoryPoolAllocated   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sgiMemoryPoolAllocated indicates the total memory
+        currently allocated in memory-pools on the system.
+
+        This memory may or may not be currently in use, but is pre-allocated
+        should the software need to use it.
+
+        If the value is greater than the maximum value reportable by this 
+        object then this object reports its maximum value (4,294,967,295) 
+        and sgiKbMemoryPoolAllocated must be used to determine the total 
+        memory allocated in memory-pools."
+    ::= { sysGenInfo 4 }
+
+sgiSwMajorVersion   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sgiSwMajorVersion indicates the major version number
+         of the software running on the active CPM card."
+    ::= { sysGenInfo 5 }
+
+sgiSwMinorVersion   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sgiSwMinorVersion indicates the minor version number
+         of the software running on the active CPM card."
+    ::= { sysGenInfo 6 }
+
+sgiSwVersionModifier   OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sgiSwVersionModifier indicates additional information
+         about the version of software running on the active CPM card."
+    ::= { sysGenInfo 7 }
+
+sgiSnmpInGetBulks   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sgiSnmpInGetBulks indicates the total number of
+         SNMP Get-Next PDUs which have been accepted and processed by
+         the SNMP protocol entity."
+    ::= { sysGenInfo 8 }
+
+sgiKbMemoryUsed   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sgiKbMemoryUsed indicates the total pre-allocated
+        pool memory, in kilobytes, currently in use on the system."
+    ::= { sysGenInfo 9 }
+
+sgiKbMemoryAvailable   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sgiKbMemoryAvailable indicates the amount of free
+        memory, in kilobytes, in the overall system that is not allocated to
+        memory pools, but is available in case a memory pool needs to grow."
+    ::= { sysGenInfo 10 }
+
+sgiKbMemoryPoolAllocated   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sgiKbMemoryPoolAllocated indicates the total memory, in
+        kilobytes, currently allocated in memory-pools on the system.
+
+        This memory may or may not be currently in use, but is pre-allocated
+        should the software need to use it."
+    ::= { sysGenInfo 11 }
+
+tmnxSysCpuMonTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSysCpuMonEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxSysCpuMonTable consists of the system level CPU monitoring
+         statistics."
+    ::= { sysGenInfo 12 }
+
+tmnxSysCpuMonEntry               OBJECT-TYPE
+    SYNTAX      TmnxSysCpuMonEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxSysCpuMonEntry contains the system level CPU monitoring statistics
+         over a specified sample-time."
+    INDEX       { tmnxSysCpuMonSampleTime }
+    ::= { tmnxSysCpuMonTable 1 }
+
+TmnxSysCpuMonEntry               ::= SEQUENCE {
+    tmnxSysCpuMonSampleTime          TmnxSysMonSampleTime,
+    tmnxSysCpuMonCpuIdle             TmnxSysMonUtilization,
+    tmnxSysCpuMonBusyCoreUtil        TmnxSysMonUtilization,
+    tmnxSysCpuMonBusyGroupName       OCTET STRING,
+    tmnxSysCpuMonBusyGroupUtil       TmnxSysMonUtilization
+}
+
+tmnxSysCpuMonSampleTime          OBJECT-TYPE
+    SYNTAX      TmnxSysMonSampleTime
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysCpuMonSampleTime specifies the sample-time used to
+         calculate the utilization results for the row."
+    ::= { tmnxSysCpuMonEntry 1 }
+
+tmnxSysCpuMonCpuIdle             OBJECT-TYPE
+    SYNTAX      TmnxSysMonUtilization
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysCpuMonCpuIdle indicates the overall percentage of
+         CPU idleness over the specified sample-time."
+    ::= { tmnxSysCpuMonEntry 2 }
+
+tmnxSysCpuMonBusyCoreUtil        OBJECT-TYPE
+    SYNTAX      TmnxSysMonUtilization
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysCpuMonBusyCoreUtil indicates the utilization
+         percentage of the busiest processor core over the specified
+         sample-time. On single core CPUs, this is the overall system
+         utilization percentage over the specified sample-time."
+    ::= { tmnxSysCpuMonEntry 3 }
+
+tmnxSysCpuMonBusyGroupName       OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysCpuMonBusyGroupName indicates the name of the group
+         that is running at the highest capacity utilization.
+
+         Capacity utilization is the CPU utilization relative to the maximum CPU
+         resources available to that group.  A group is a set of related
+         applications, services, tasks or protocol handlers that consumes some
+         part of the system CPU resources.
+
+         The capacity utilization of the busiest group is indicated by
+         tmnxSysCpuMonBusyGroupUtil."
+    ::= { tmnxSysCpuMonEntry 4 }
+
+tmnxSysCpuMonBusyGroupUtil       OBJECT-TYPE
+    SYNTAX      TmnxSysMonUtilization
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysCpuMonBusyGroupUtil indicates the capacity
+         utilization of the group that is running at the highest capacity
+         utilization.
+
+         Capacity utilization is the CPU utilization relative to the maximum CPU
+         resources available to that group.  A group is a set of related
+         applications, services, tasks or protocol handlers that consumes some
+         part of the system CPU resources.
+
+         The name of the busiest group is indicated by
+         tmnxSysCpuMonBusyGroupName."
+    ::= { tmnxSysCpuMonEntry 5 }
+
+--
+--      General system time information
+--
+
+sysTimeInfo     OBJECT IDENTIFIER ::= { tmnxSysObjs 2 }
+
+stiDateAndTime  OBJECT-TYPE
+    SYNTAX      DateAndTime (SIZE (11))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The current date and time (in UTC) maintained in this managed
+         system."
+    ::= { sysTimeInfo 1 }
+
+stiActiveZone   OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..5))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time zone that is active in this managed system."
+    ::= { sysTimeInfo 2 }
+
+stiHoursOffset  OBJECT-TYPE
+    SYNTAX      Integer32 (-11..12)
+    UNITS       "hours"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of hours by which the time zone represented
+        by stiActiveZone offsets from UTC (Coordinated Universal
+        Time)."
+    DEFVAL { 0 }
+    ::= { sysTimeInfo 3 }
+
+stiMinutesOffset  OBJECT-TYPE
+    SYNTAX      Integer32 (0..59)
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of minutes (in addition to the hours offset
+        defined by stiHoursOffset) by which the time zone
+        represented by stiActiveZone offsets from UTC (Coordinated
+        Universal Time). This value is used when the time zone does
+        not have an offset that is an integral number of hours.
+
+        If the hour offset is defined as '12', the minute offset
+        cannot be anything other than zero."
+    DEFVAL { 0 }
+    ::= { sysTimeInfo 4 }
+
+stiZoneType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    system (1),
+                    user (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "stiZoneType will be 'system' if the zone defined by
+        stiActiveZone is a system-defined zone. It will be
+        'user' if the zone has been defined by the user."
+    ::= { sysTimeInfo 5 }
+
+stiSummerZoneTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF StiSummerZoneEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The stiSummerZoneTable has an entry for each summer time
+        zone information."
+    ::= { sysTimeInfo 6 }
+
+
+stiSummerZoneEntry OBJECT-TYPE
+    SYNTAX      StiSummerZoneEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry contains information about a summer time
+        zone. This information can be used to either override the
+        default summer (or daylight savings) time information for
+        a system-defined time zone or define the summer time
+        information for a user-defined time zone."
+    INDEX {IMPLIED stiSummerZoneName}
+    ::= { stiSummerZoneTable 1 }
+
+StiSummerZoneEntry ::=
+    SEQUENCE {
+        stiSummerZoneName              OCTET STRING,
+        stiSummerZoneRowStatus         RowStatus,
+        stiSummerZoneStartDate         DateAndTime,
+        stiSummerZoneEndDate           DateAndTime,
+        stiSummerZoneOffset            Unsigned32,
+        stiSummerZoneStartDay          INTEGER,
+        stiSummerZoneStartWeek         INTEGER,
+        stiSummerZoneStartMonth        INTEGER,
+        stiSummerZoneStartHour         Unsigned32,
+        stiSummerZoneStartMinute       Unsigned32,
+        stiSummerZoneEndDay            INTEGER,
+        stiSummerZoneEndWeek           INTEGER,
+        stiSummerZoneEndMonth          INTEGER,
+        stiSummerZoneEndHour           Unsigned32,
+        stiSummerZoneEndMinute         Unsigned32
+    }
+
+stiSummerZoneName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..5))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name for a summer time zone. This name must be unique
+        amongst the table entries. The summer time zone name should
+        comprise only of uppercase letters A-Z and digits 0-9."
+    ::= { stiSummerZoneEntry 1 }
+
+stiSummerZoneRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status used to create and delete rows in this table."
+    ::= { stiSummerZoneEntry 2 }
+
+stiSummerZoneStartDate OBJECT-TYPE
+    SYNTAX      DateAndTime (SIZE (8))
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The starting date and time when the summer time will
+        take effect.
+
+        This object was made obsolete in the 4.0 release."
+    ::= { stiSummerZoneEntry 3 }
+
+stiSummerZoneEndDate OBJECT-TYPE
+    SYNTAX      DateAndTime (SIZE (8))
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The date and time when summer time will end.
+
+        This object was made obsolete in the 4.0 release."
+    ::= { stiSummerZoneEntry 4 }
+
+stiSummerZoneOffset OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..60)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of minutes that will be added to the time
+        when summer time takes effect. The same number of minutes
+        will be subtracted from the time when the summer time ends."
+    DEFVAL { 60 }
+    ::= { stiSummerZoneEntry 5 }
+
+stiSummerZoneStartDay OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    sunday(0),
+                    monday(1),
+                    tuesday(2),
+                    wednesday(3),
+                    thursday(4),
+                    friday(5),
+                    saturday(6)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The starting day of the week when the summer time will
+        take effect."
+    DEFVAL { sunday }
+    ::= { stiSummerZoneEntry 6 }
+
+stiSummerZoneStartWeek OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    first(0),
+                    second(1),
+                    third(2),
+                    fourth(3),
+                    last(4)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The starting week of the month when the summer time will
+        take effect."
+    DEFVAL { first }
+    ::= { stiSummerZoneEntry 7 }
+
+stiSummerZoneStartMonth OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    january(0),
+                    february(1),
+                    march(2),
+                    april(3),
+                    may(4),
+                    june(5),
+                    july(6),
+                    august(7),
+                    september(8),
+                    october(9),
+                    november(10),
+                    december(11)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The starting month of the year when the summer time will
+        take effect."
+    DEFVAL { january }
+    ::= { stiSummerZoneEntry 8 }
+
+stiSummerZoneStartHour  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    UNITS       "hours"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The hour at which the summer time will take effect."
+    DEFVAL { 0 }
+    ::= { stiSummerZoneEntry 9 }
+
+stiSummerZoneStartMinute  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of minutes after the hours defined by
+        stiSummerZoneStartHour when the summer time will
+        take effect."
+    DEFVAL { 0 }
+    ::= { stiSummerZoneEntry 10 }
+
+stiSummerZoneEndDay OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    sunday(0),
+                    monday(1),
+                    tuesday(2),
+                    wednesday(3),
+                    thursday(4),
+                    friday(5),
+                    saturday(6)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The day of the week when the summer time setting will
+        end."
+    DEFVAL { sunday }
+    ::= { stiSummerZoneEntry 11 }
+
+stiSummerZoneEndWeek OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    first(0),
+                    second(1),
+                    third(2),
+                    fourth(3),
+                    last(4)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The week of the month when the summer time setting will
+        end."
+    DEFVAL { first }
+    ::= { stiSummerZoneEntry 12 }
+
+stiSummerZoneEndMonth OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    january(0),
+                    february(1),
+                    march(2),
+                    april(3),
+                    may(4),
+                    june(5),
+                    july(6),
+                    august(7),
+                    september(8),
+                    october(9),
+                    november(10),
+                    december(11)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The month of the year when the summer time setting will
+        end."
+    DEFVAL { january }
+    ::= { stiSummerZoneEntry 13 }
+
+stiSummerZoneEndHour  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    UNITS       "hours"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The hour at which the summer time will stop taking effect."
+    DEFVAL { 0 }
+    ::= { stiSummerZoneEntry 14 }
+
+stiSummerZoneEndMinute  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of minutes after the hours defined by
+        stiSummerZoneEndHour when the summer time will
+        stop taking effect."
+    DEFVAL { 0 }
+    ::= { stiSummerZoneEntry 15 }
+--
+--      SNTP (Simple Network Time Protocol) Information
+--
+
+sysSntpInfo     OBJECT IDENTIFIER ::= { tmnxSysObjs 3 }
+
+sntpState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unicast(1),
+                    broadcast(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The mode for Simple Network Time Protocol (SNTP).
+        'Unicast' indicates that broadcast client is
+        disabled. A value of 'broadcast' indicates that SNTP
+        is listening to SNTP/NTP broadcast messages on
+        interfaces with broadcast client enabled."
+    DEFVAL { unicast }
+    ::= { sysSntpInfo 1 }
+
+sntpServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SntpServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The sntpServerEntry has an entry for each SNTP server
+        for SNTP unicast client mode. SNTP can only receive the
+        time from one of these SNTP servers.
+        The table can have upto a maximum of 3 entries."
+::= { sysSntpInfo 2 }
+
+
+sntpServerEntry OBJECT-TYPE
+    SYNTAX      SntpServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry contains information about an SNTP server."
+    INDEX {sntpServerAddress}
+    ::= { sntpServerTable 1 }
+
+SntpServerEntry ::=
+    SEQUENCE {
+        sntpServerAddress           IpAddress,
+        sntpServerRowStatus         RowStatus,
+        sntpServerVersion           Integer32,
+        sntpServerPreference        INTEGER,
+        sntpServerInterval          Unsigned32
+    }
+
+sntpServerAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the SNTP server."
+    ::= { sntpServerEntry 1 }
+
+sntpServerRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status used to create and delete rows in this table."
+    ::= { sntpServerEntry 2 }
+
+sntpServerVersion OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The SNTP Version supported by this server."
+    DEFVAL { 3 }
+    ::= { sntpServerEntry 3 }
+
+sntpServerPreference OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    normal (1),
+                    preferred(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The preference value for this SNTP server.
+        When more then one time-server is configured it may be
+        desirable that one server have preference over others.
+        The value of sntpServerPreference for that server will be
+        set to preferred(2). Only one server in the table can be
+        a preferred server"
+    DEFVAL { normal }
+    ::= { sntpServerEntry 4 }
+
+sntpServerInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..1024)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The frequency at which this server is queried."
+    DEFVAL { 64 }
+    ::= { sntpServerEntry 5 }
+
+sntpAdminState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    noop (1),
+                    inService (2),
+                    outOfService (3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The desired administrative state for SNTP."
+    DEFVAL { outOfService }
+    ::= { sysSntpInfo 3 }
+
+sntpOperStatus OBJECT-TYPE
+      SYNTAX      TmnxOperState
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The value of sntpOperStatus indicates the current operational status
+           of SNTP."
+      ::= { sysSntpInfo 4 }
+
+--
+--      System Synchronization information
+--
+sysSyncInfo     OBJECT IDENTIFIER ::= { tmnxSysObjs 4 }
+
+ssiSaveConfig   OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this action variable to 'doAction' causes the current
+         running configuration information to be saved to the location
+         specified by ssiSaveConfigDest.  If no location is specified
+         by ssiSaveConfigDest, the primary configuration file pointed to
+         in the boot options file (bof) will be backed up and a new
+         primary configuration file will be created with the current
+         running configuration information.
+
+         If ssiSaveConfigDetail has a value of 'true', default configuration
+         values will be included in the saved configuration information.
+
+         A corresponding persistent SNMP index file is created regardless of
+         the setting of the persistence switch in the bof."
+    DEFVAL { notApplicable }
+    ::= { sysSyncInfo 15 }
+
+ssiSyncMode     OBJECT-TYPE
+    SYNTAX      TmnxSsiSyncMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiSyncMode specifies the type of synchronization
+         operation to perform between the primary and secondary CPMs
+         after a change has been made to the configuration files 
+         or the boot environment information contained in the boot options file
+         (bof)."
+   DEFVAL { none }
+   ::= { sysSyncInfo 16 }
+
+ssiSyncForce    OBJECT-TYPE
+    SYNTAX      TmnxSsiSyncMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiSyncForce specifies the type of synchronization
+         operation to perform when an SNMP set is made to this object.
+         'config' synchronizes only configuration files.
+         'bootEnv' synchronizes all files required to boot the system.
+         
+         The result of a read operation on this object is always 'none'."
+    DEFVAL { none }
+    ::= { sysSyncInfo 17 }
+
+ssiSyncStatus   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown (0),
+                    configOnly (1),
+                    bootEnv (2),
+                    configFail (3),
+                    bootEnvFail (4),
+                    configInProgress (5),
+                    bootEnvInProgress (6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiSyncStatus indicates the results of the last
+         synchronization operation between the primary and secondary CPMs."
+    ::= { sysSyncInfo 18 }
+
+ssiSyncConfigLastTime   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiSyncConfigLastTime is the timestamp of the last
+         successful synchronization of the configuration files."
+    ::= { sysSyncInfo 19 }
+
+ssiSyncBootEnvLastTime  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiSyncBootEnvLastTime is the timestamp of the last
+         successful synchronization of the boot environment files."
+    ::= { sysSyncInfo 20 }
+
+ssiConfigMaxBackupRevisions OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..9)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiConfigMaxBackupRevisions is the maximum number of
+         backup revisions maintained for a configuration file. This value
+         also applies to the number of revisions maintained for the BOF
+         file."
+    DEFVAL { 5 }
+    ::= { sysSyncInfo 21 }
+
+ssiSaveConfigResult OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none (1),
+                    inProgress (2),
+                    success (3),
+                    failed (4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiSaveConfigResult represents the result of the
+         last ssiSaveConfig action.
+         none(1)            None of the following apply
+         inProgress(2)      The action is still in progress
+         success(3)         The action completed successfully
+         failed(4)          The action failed"
+    ::= {sysSyncInfo 22 }
+
+ssiSaveBof    OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting ssiSaveBof action variable to 'doAction' causes the
+         existing BOF to be backed up and a new BOF file to be created
+         with the current boot options information."
+    DEFVAL { notApplicable }
+    ::= {sysSyncInfo 23 }
+
+ssiSaveBofResult OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none (1),
+                    inProgress (2),
+                    success (3),
+                    failed (4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiSaveBofResult represents the result of the
+         last ssiSaveBof action.
+         none(1)            None of the following apply
+         inProgress(2)      The action is still in progress
+         success(3)         The action completed successfully
+         failed(4)          The action failed"
+    ::= {sysSyncInfo 24 }
+
+ssiSaveConfigDest   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..180))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiSaveConfigDest specifies the destination filepath
+         or file-URL where the current running configuration information
+         will be saved when ssiSaveConfig is set to 'doAction'.  If
+         ssiSaveConfigDest is set to the empty string, ''H, the primary
+         configuration file pointed to in the boot options file (bof) will
+         be backed up and a new primary configuration file will be created
+         with the current running configuration information.
+
+         A corresponding persistent SNMP index file is created regardless of
+         the setting of the persistence switch in the bof."
+    DEFVAL { ''H }  -- empty string
+    ::= { sysSyncInfo 25 }
+
+ssiSaveConfigDetail OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When ssiSaveConfigDetail has a value of 'true', the default
+         configuration values will also be included in the current
+         running configuration information that will be saved when
+         ssiSaveConfig is set to 'doAction'.
+
+         When ssiSaveConfigDetail has a value of 'false', only
+         non-default configuration values are saved. "
+    DEFVAL { false }
+    ::= { sysSyncInfo 26 }
+
+ssiRedFailoverTime  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiRedFailoverTime is the timestamp when the last
+         redundancy failover occurred causing a switchover from active
+         to standby CPM.  If there is no redundant CPM card in this system
+         or no failover has occurred since the system last booted,
+         ssiRedFailoverTime will always return 0."
+   ::= { sysSyncInfo 27 }
+
+ssiRedFailoverReason    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..80))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiRedFailoverReason is a text string giving an
+         explanation of the cause of the last redundancy failover.
+         If no failover has occurred, the empty string, ''H, will be
+         returned."
+    ::= { sysSyncInfo 28 }
+
+ssiSyncRollbackLastTime  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiSyncRollbackLastTime is the timestamp of the last
+         successful synchronization of the rollback files."
+    ::= { sysSyncInfo 29 }
+
+ssiSyncRollbackMode     OBJECT-TYPE
+    SYNTAX      TmnxSsiSyncRollbackMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiSyncRollbackMode specifies the type of synchronization
+         operation to perform between the primary and secondary CPMs
+         after a change has been made to the rollback files."
+   DEFVAL { none }
+   ::= { sysSyncInfo 30 }
+
+ssiSyncRollbackForce    OBJECT-TYPE
+    SYNTAX      TmnxSsiSyncRollbackMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiSyncRollbackForce specifies the type of synchronization
+         operation to perform when an SNMP set is made to this object.
+         'rollbackSingle' synchronizes only the rollback file that recently
+          changed.
+         'rollbackAll' synchronizes all rollback files.
+
+         The result of a read operation on this object is always 'none'."
+    DEFVAL { none }
+    ::= { sysSyncInfo 31 }
+
+ssiSyncRollbackStatus   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown (0),
+                    rollbackFail (1),
+                    rollbackInProgress (2),
+                    rollbackSuccess (3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiSyncRollbackStatus indicates the results of the last
+         rollback synchronization operation between the primary and secondary 
+         CPMs."
+    ::= { sysSyncInfo 32 }
+
+ssiSyncCertLastTime  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiSyncCertLastTime is the timestamp of the last
+         successful synchronization of the certificate files."
+    ::= { sysSyncInfo 33 }
+
+ssiSyncCertMode     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiSyncCertMode specifies whether to synchronize
+         certificate files between the primary and secondary CPMs."
+   DEFVAL { false }
+   ::= { sysSyncInfo 34 }
+
+ssiSyncCertForce    OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiSyncCertForce specifies to perform action to
+         synchronize certificate files between the primary and secondary CPMs
+         when an SNMP set is made to this object.
+         
+         The value of ssiSyncCertForce will always be returned as
+         'notApplicable'."
+    DEFVAL { notApplicable }
+    ::= { sysSyncInfo 35 }
+
+ssiSyncCertStatus   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown (0),
+                    fail (1),
+                    inProgress (2),
+                    success (3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ssiSyncCertStatus indicates the results of the last
+         certificate synchronization operation between the primary and
+         secondary CPMs."
+    ::= { sysSyncInfo 36 }
+
+--
+--      System Bootup information
+--
+sysBootInfo     OBJECT IDENTIFIER ::= { tmnxSysObjs 5 }
+
+sbiConfigStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    configRead (1),
+                    configOK (2),
+                    defaultBooted (3),
+                    bootConfigFailed (4),
+                    bootRestoreFailed (5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiConfigStatus indicates the result of the
+         last attempt to execute the configuration file upon reboot
+         of the system.
+            configRead (1) - The configuration file is being read.
+            configOK (2) - The configuration file was successfully
+                    executed.
+            defaultBooted (3) - There was no configuration file and
+                    the system booted using a minimal
+                    default configuration.
+            bootConfigFailed (4) - An error occurred while the
+                    configuration file was being executed.
+                    The system configuration is incomplete.
+            bootRestoreFailed (5) - An error occurred while the
+                    restoration was being performed. The system
+                    configuration is incomplete."
+    ::= { sysBootInfo 1 }
+
+sbiPersistStatus    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    persistOK (1),
+                    noPersistFile (2),
+                    persistMismatch (3),
+                    persistIndexFailure (4),
+                    persistDisabled (5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiPersistStatus indicates the result of the
+         last attempt to rebuild the SNMP persistent index database
+         upon reboot of the system.
+            persistOK (1) - The persistent index database was
+                successfully created.  Persistent SNMP managed
+                objects were recreated with the same SNMP
+                indexes they had prior to the system reboot.
+            noPersistFile (2) - There was no persistent index file with
+                the same pathname as the configuration file.
+            persistMismatch (3) -The headers in the persistent index
+                file and the configuration file with the same name
+                do not match.
+            persistIndexFailure (4) - An error occurred while creating
+                the persistent index database.
+            persistDisabled (5) - The system was administratively
+                reconfigured without maintaining persistent SNMP index
+                values because sbiPersistIndex has a value of 'false'.
+
+         If sbiConfigStatus has a value of 'configOK' and
+         sbiPersistStatus has any value other than 'persistOK', the
+         system was reconfigured without maintaining persistent SNMP index
+         values.  Unless sbiPersistIndex has a value of 'false',
+         sbiSnmpdOperStatus returns 'disabled' and the SNMP daemon will not
+         receive SNMP requests until sbiSnmpdAdminStatus variable has
+         been set to 'inService'."
+    ::= { sysBootInfo 2 }
+
+sbiPersistIndex      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When sbiPersistIndex has a value of 'true', the SNMP persistent index
+         database was rebuilt when the system was rebooted.  If there was an
+         error during the processing of the configuration file the system may
+         have been reconfigured without persistent SNMP indexes and the SNMP
+         daemon will be suspended until it is manually enabled by setting
+         sbiSnmpdAdminStatus to 'inService.  When sbiPersistIndex has a
+         value of 'false' the system was reconfigured without maintaining
+         persistent SNMP index values and the SNMP daemon was enabled."
+    ::= { sysBootInfo 3 }
+
+sbiSnmpdAdminStatus     OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiSnmpdAdminStatus is the desired administrative state
+         for the SNMP daemon.  When sbiSnmpdAdminStatus is set to 'inService'
+         the SNMP daemon will begin receiving SNMP requests from external
+         SNMP managers.  When sbiSnmpdAdminStatus is set to 'outOfService'
+         the SNMP daemon is suspended and will no longer receive SNMP requests
+         from external SNMP managers."
+    DEFVAL { inService }
+    ::= { sysBootInfo 4 }
+
+sbiSnmpdOperStatus  OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When sbiSnmpdOperStatus has a value of 'inService', the SNMP daemon
+         will receive SNMP requests from external SNMP managers.  When
+         sbiSnmpdOperStatus has a value of 'outOfService', the SNMP daemon is
+         suspended and will not receive SNMP requests from external SNMP
+         managers."
+    ::= { sysBootInfo 5 }
+
+sbiSnmpdMaxPktSize  OBJECT-TYPE
+    SYNTAX       Integer32 (484..9216)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The value of sbiSnmpdMaxPktSize indicates the maximum length in
+         octets of an SNMP message which the SNMP daemon can send or
+         receive and process."
+    DEFVAL { 1500 }
+    ::= { sysBootInfo 6 }
+
+sbiSnmpdPortNum     OBJECT-TYPE
+    SYNTAX      TTcpUdpPort
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiSnmpdPortNum indicates the UDP port to send and
+         receive SNMP messages."
+    DEFVAL { 161 }
+    ::= { sysBootInfo 7 }
+
+sbiBootConfigOKScript     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiBootConfigOKScript specifies the location and name of
+         the CLI script file executed following successful completion
+         of the boot-up configuration file execution. I.e. sbiPersistStatus
+         has a value of 'configOK'.  When this object has the empty string
+         value, ''H, no CLI script file is executed."
+    DEFVAL { ''H }  -- the empty string
+    ::= { sysBootInfo 8 }
+
+sbiConfigOKScriptStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notRun (0),
+                    success (1),
+                    fail    (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiConfigOKScriptStatus indicates the results of
+         executing the CLI script file specified in sbiBootConfigOKScript."
+    ::= { sysBootInfo 9 }
+
+sbiBootConfigFailScript     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiBootConfigFailScript specifies the location and
+         name of the CLI script file executed following failure of the
+         boot-up configuration file execution. I.e. sbiPersistStatus
+         has a value other than 'configOK'.  When this object has the empty
+         string value, ''H, no CLI script file is executed."
+    DEFVAL { ''H }  -- the empty string
+    ::= { sysBootInfo 10 }
+
+sbiConfigFailScriptStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notRun (0),
+                    success (1),
+                    fail    (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiConfigFailScriptStatus indicates the results of
+         executing the CLI script file specified in sbiBootConfigFailScript."
+    ::= { sysBootInfo 11 }
+
+sbiRedSwitchoverScript     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiRedSwitchoverScript specifies the location and
+         name of the CLI script file executed following a redundancy
+         switchover from the previously active CPM card. A switchover
+         can happen because of a fatal failure or by manual action.
+         This CLI script file can contain commands for environment settings,
+         debug and mirroring settings, and other commands not maintained by
+         the configuration redundancy.
+
+         When this object has the empty string value, ''H, no CLI script
+         file is executed."
+    DEFVAL { ''H }  -- the empty string
+    ::= { sysBootInfo 12 }
+
+sbiRedSwitchoverScriptStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notRun (0),
+                    success (1),
+                    fail    (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiRedSwitchoverScriptStatus indicates the results of
+         executing the CLI script file specified in sbiRedSwitchoverScript."
+    ::= { sysBootInfo 13 }
+
+--
+--      RADIUS (Remote Authentication Dial In User Service) Information
+--
+
+sysRadiusInfo     OBJECT IDENTIFIER ::= { tmnxSysObjs 6 }
+
+radiusOperStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    up (1),
+                    down (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The radiusOperStatus will have a value of 'up' if any
+        one of the RADIUS servers in the radiusServerTable has
+        the radiusServerOperStatus value of 'up'.
+        It will have a value of 'down' if all the RADIUS servers in the
+        radiusServerTable have the radiusServerOperStatus value of 'down'."
+    ::= { sysRadiusInfo 1 }
+
+radiusServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RadiusServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The radiusServerEntry has an entry for each RADIUS server.
+        The table can have up to a maximum of 5 entries."
+::= { sysRadiusInfo 2 }
+
+radiusServerEntry OBJECT-TYPE
+    SYNTAX      RadiusServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry contains information about a RADIUS server."
+    INDEX {radiusServerIndex}
+    ::= { radiusServerTable 1 }
+
+RadiusServerEntry ::=
+    SEQUENCE {
+        radiusServerIndex             Unsigned32,
+        radiusServerAddress           IpAddress,
+        radiusServerOperStatus        INTEGER,
+        radiusServerInetAddressType   InetAddressType,
+        radiusServerInetAddress       InetAddress
+    }
+
+radiusServerIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..5)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique value which identifies a specific radius server."
+    ::= { radiusServerEntry 1 }
+
+radiusServerAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The IP address of the RADIUS server.
+
+        This object was made obsolete in the 5.0 release."
+    ::= { radiusServerEntry 2 }
+
+radiusServerOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    up (1),
+                    down (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current status of the RADIUS server."
+    ::= { radiusServerEntry 3 }
+
+radiusServerInetAddressType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of radiusServerInetAddressType indicates the address type
+         of radiusServerInetAddress address.
+
+         The value of radiusServerInetAddressType can be either of
+         InetAddressType - 'ipv4' or InetAddressType - 'ipv6' or
+         InetAddressType - 'ipv6z'."
+    DEFVAL { unknown }
+    ::= { radiusServerEntry 4 }
+
+radiusServerInetAddress     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(0|4|16|20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of radiusServerInetAddress indicates the address of
+         the Radius server."
+    DEFVAL { ''H }
+    ::= { radiusServerEntry 5 }
+
+--
+-- Notification Control Objects section
+--
+tmnxSysNotifyObjs      OBJECT IDENTIFIER ::= { tmnxSysObjs 7 }
+
+tmnxNotifyRow    OBJECT-TYPE
+    SYNTAX       RowPointer
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "tmnxNotifyRow is used by the configuration modify, create
+         and delete traps. tmnxNotifyRow specifies the OID of the
+         MIB table entry that was changed."
+    ::= { tmnxSysNotifyObjs 1 }
+
+tmnxNotifyRowAdminState     OBJECT-TYPE
+    SYNTAX       TmnxAdminState
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "tmnxNotifyRowAdminState is used by the state change
+         notification to specify the administrative state of
+         the MIB table entry reported in the notification."
+    ::= { tmnxSysNotifyObjs 2 }
+
+tmnxNotifyRowOperState     OBJECT-TYPE
+    SYNTAX       TmnxOperState
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "tmnxNotifyRowOperState is used by the state change
+         notification to specify the operational state of
+         the MIB table entry reported in the notification."
+    ::= { tmnxSysNotifyObjs 3 }
+
+tmnxMemoryModule    OBJECT-TYPE
+    SYNTAX       TNamedItem
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "tmnxMemoryModule is used by the module malloc failed
+         notification to specify the memory module for which
+         the trap is generated."
+    ::= { tmnxSysNotifyObjs 4 }
+
+tmnxModuleMallocSize    OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "bytes"
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "tmnxModuleMallocSize is used by the module malloc
+         failed notification to specify the memory size (in
+         bytes) requested in the failed malloc call."
+    ::= { tmnxSysNotifyObjs 5 }
+
+tmnxDroppedTrapID    OBJECT-TYPE
+    SYNTAX       OBJECT IDENTIFIER
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "tmnxDroppedTrapID is used by the trap dropped
+         notification to specify the NOTIFICATION-TYPE
+         object identifier of the dropped trap."
+    ::= { tmnxSysNotifyObjs 6 }
+
+tmnxTrapDroppedReasonCode    OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     frequencyExceeded (1)
+                 }
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "tmnxTrapDroppedReasonCode is used by the trap
+         dropped notification to specify the reason for
+         which a trap is dropped."
+    ::= { tmnxSysNotifyObjs 7 }
+
+tmnxTrapDroppedEntryID    OBJECT-TYPE
+    SYNTAX       OBJECT IDENTIFIER
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "tmnxTrapDroppedEntryID is used by the trap dropped
+         notification to specify the table entry associated
+         with the dropped trap."
+    ::= { tmnxSysNotifyObjs 8 }
+
+tmnxNotifyEntryOID    OBJECT-TYPE
+    SYNTAX       OBJECT IDENTIFIER
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "tmnxNotifyEntryOID is used by the configuration modify, create
+         and delete traps. tmnxNotifyEntryOID specifies the OID of the
+         MIB table that was changed."
+    ::= { tmnxSysNotifyObjs 9 }
+
+tmnxSnmpdErrorMsg   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "tmnxSnmpdErrorMsg is used by the tmnxSnmpdError notification to
+         indicate the type of SNMP daemon error detected."
+    ::= { tmnxSysNotifyObjs 10 }
+
+tmnxPersistencyClient   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "tmnxPersistencyClient is used by the persistencyClosedAlarmRaised,
+         persistencyClosedAlarmCleared, persistencyFileSysThresRaised and
+         persistencyFileSysThresCleared notification to indicate the affected
+         persistent application."
+    ::= { tmnxSysNotifyObjs 11 }
+
+tmnxPersistencyFileLocator   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "tmnxPersistencyFileLocator is used by the persistencyClosedAlarmRaised,
+         persistencyClosedAlarmCleared, persistencyFileSysThresRaised and
+         persistencyFileSysThresCleared notification to indicate the affected
+         file used to store persistence data."
+    ::= { tmnxSysNotifyObjs 12 }
+
+tmnxPersistencyNotifyMsg   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "tmnxPersistencyNotifyMsg is used by the persistencyClosedAlarmRaised
+         persistencyClosedAlarmCleared, persistencyEventReport,
+         persistencyFileSysThresRaised and persistencyFileSysThresCleared
+         notification to provide additional information related to the event
+         that occurred."
+    ::= { tmnxSysNotifyObjs 13 }
+
+tmnxPersistenceAffectedCpm   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "tmnxPersistenceAffectedCpm is used by the persistencyClosedAlarmRaised,
+         persistencyClosedAlarmCleared, persistencyFileSysThresRaised and
+         persistencyFileSysThresCleared notification to indicate the affected
+         CPM."
+    ::= { tmnxSysNotifyObjs 14 }
+
+tmnxSysTimeSetBy   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ntp (1),
+                    sntp (2),
+                    snmp (3),
+                    manually (4),
+                    rtc (5)    -- real time clock
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "tmnxSysTimeSetBy is used by tmnxSysTimeSetBy notification to
+         indicate who set the time."
+    ::= { tmnxSysNotifyObjs 15 }
+
+tmnxFtpFailureMsg   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "tmnxFtpFailureMsg is used by tmnxFtpClientFailure notification to
+         indicate FTP error."
+    ::= { tmnxSysNotifyObjs 16 }
+
+tmnxFtpFailureDestAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "tmnxFtpFailureDestAddressType is used by tmnxFtpClientFailure
+         notification to indicate the IP address type of the remote host."
+    ::= { tmnxSysNotifyObjs 17 }
+
+tmnxFtpFailureDestAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16|20))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxFtpFailureDestAddress indicates the IP address of
+         the remote host to which an ftp operation is being attempted on. The
+         value of tmnxFtpFailureDestAddress is used by tmnxFtpClientFailure
+         notification."
+    ::= { tmnxSysNotifyObjs 18 }
+
+tmnxNotifyObjectName    OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "tmnxNotifyObjectName is used by the configuration modify, create,
+         delete and state change traps. tmnxNotifyObjectName specifies the 
+         human readable name of the OID instance of the MIB table entry that 
+         was changed."
+    ::= { tmnxSysNotifyObjs 19 }
+
+tmnxSyncFailureReason   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "tmnxSyncFailureReason is used by the ssiSyncConfigFailed,
+        ssiSyncBootEnvFailed, and ssiSyncRollbackFailed traps to specify 
+        the reason for synchronization failure."
+    ::= { tmnxSysNotifyObjs 20 }
+
+tmnxSysExecScript   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysExecScript specifies the location and name of
+         the CLI command script file executed by a SROS CLI 'exec' command.
+         It is used by the tmnxSysExecStarted and tmnxSysExecFinished
+         notifications."
+    ::= { tmnxSysNotifyObjs 21 }
+
+tmnxSysExecResult OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none    (0),
+                    success (1),
+                    fail    (2)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysExecResult indicates the results of
+         executing the CLI script file specified in tmnxSysExecScript.
+         It is used by the tmnxSysExecFinished notification."
+    ::= { tmnxSysNotifyObjs 22 }
+
+tmnxSysRollbackFileType   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    rollback (1),
+                    rescue (2)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "tmnxSysRollbackFileType is used by tmnxSysRollbackStarted,
+        tmnxSysRollbackSaveStarted, tmnxSysRollbackDeleteStarted,
+        tmnxSysRollbackStatusChange, tmnxSysRollbackSaveStatusChange, and
+        tmnxSysRollbackFileDeleteStatus notifications to indicate
+        the type of file involved in a rollback operation."
+    ::= { tmnxSysNotifyObjs 23 }
+
+tmnxSysFileErrorType   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    read (1),
+                    write (2)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "tmnxSysFileErrorType is used by tmnxSysNvsysFileError
+         notification to indicate the type of file error occurred."
+    ::= { tmnxSysNotifyObjs 24 }
+
+--
+--
+--
+--
+sysLoginControlInfo     OBJECT IDENTIFIER ::= { tmnxSysObjs 8 }
+
+slcFtpInboundMaxSessions     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..5)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of concurrent inbound FTP sessions permitted."
+    DEFVAL { 3 }
+    ::= { sysLoginControlInfo 1 }
+
+slcTelnetInboundMaxSessions     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of slcTelnetInboundMaxSessions specifies
+         the maximum number of concurrent inbound telnet sessions permitted."
+    DEFVAL { 5 }
+    ::= { sysLoginControlInfo 2 }
+
+slcTelnetOutboundMaxSessions     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of slcTelnetOutboundMaxSessions specifies
+         the maximum number of concurrent outbound telnet sessions permitted."
+    DEFVAL { 5 }
+    ::= { sysLoginControlInfo 3 }
+
+slcPreLoginMessage     OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..900))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The message to be displayed prior to the login prompt of an inbound
+         FTP or telnet session."
+    ::= { sysLoginControlInfo 4 }
+
+slcPreLoginMessageInclName     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If the value of slcPreLoginMessageInclName is set to 'TRUE', the
+         slcPreLoginMessage which is displayed prior to the login prompt
+         will contain the system name."
+    ::= { sysLoginControlInfo 5 }
+
+slcMessageOfTheDay     OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..900))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The message-of-the-day text will be displayed when the user
+         successfully authenticates himself for an inbound FTP, telnet or
+         console session.  If slcMessageOfTheDayType is set to 'URL',
+         then slcMessageOfTheDay should be of the form:
+            'url-prefix:source-url'."
+    ::= { sysLoginControlInfo 6 }
+
+slcMessageOfTheDayType     OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    motd-type-none(0),
+                    motd-type-url(1),
+                    motd-type-text(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The type of slcMessageOfTheDay. If the value of
+         slcMessageOfTheDayType is set to 'motd-type-none', then message
+         of the day will not be displayed. If it is  set to 'motd-type-url',
+         then the message is fetched from the URL."
+    DEFVAL      { motd-type-none }
+    ::= { sysLoginControlInfo 7 }
+
+slcLoginBanner     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If the value of slcLoginBanner is set to 'true', the
+         login banner containing Alcatel-Lucent copyright and version 
+         information is displayed prior to the login prompt. If the value 
+         is set to 'false', the login banner is not displayed."
+    DEFVAL      { true }
+    ::= { sysLoginControlInfo 8 }
+
+slcLoginExponentialBackOff OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The value of slcLoginExponentialBackOff specifies if
+         exponential-backoff of the login prompt is enabled. Exponential-backoff
+         is used to deter dictionary attacks. A value of 'true' specifies that
+         exponential-backoff is enabled, while a value of 'false' indicates
+         that exponential-backoff is disabled."
+    DEFVAL { false }
+    ::= { sysLoginControlInfo 9 }
+
+slcTelnetGracefulShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of slcTelnetGracefulShutdown specifies if
+         graceful shutdown is enabled. A value of 'true' specifies that telnet
+         sessions are closed gracefully by using a TCP FIN/ACK handshake. 
+         A value of 'false' indicates that telnet sessions are disconnected by
+         sending a RST (reset) TCP packet."
+    DEFVAL { false }
+    ::= { sysLoginControlInfo 10 }
+
+slcSSHGracefulShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of slcSSHGracefulShutdown specifies if
+         graceful shutdown is enabled. A value of 'true' specifies that SSH
+         sessions are closed gracefully by using a TCP FIN/ACK handshake.
+         A value of 'false' indicates that SSH sessions are disconnected by
+         sending a RST (reset) TCP packet."
+    DEFVAL { true }
+    ::= { sysLoginControlInfo 11 }
+
+slcTelnetMinTTLValue OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of slcTelnetMinTTLValue specifies the minimum
+         TTL value for an incoming packet.
+
+         This object can only be set if the value of tmnxCpmPerPeerQueuing is
+         'true (1)'.
+
+         This value is applied after restarting the Telnet server.
+
+         If slcTelnetMinTTLValue is set to zero (0), the
+         TTL Security feature is disabled."
+    DEFVAL { 0 }
+    ::= { sysLoginControlInfo 12 }
+
+slcSSHMinTTLValue OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of slcSSHMinTTLValue specifies the minimum
+         TTL value for an incoming packet.
+
+         This object can only be set if the value of tmnxCpmPerPeerQueuing is
+         'true (1)'.
+
+         This value is applied after restarting the SSH server.
+
+         If slcSSHMinTTLValue is set to zero (0), the
+         TTL Security feature is disabled."
+    DEFVAL { 0 }
+    ::= { sysLoginControlInfo 13 }
+
+slcSSHInboundMaxSessions OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of slcSSHInboundMaxSessions specifies
+         the maximum number of concurrent inbound SSH sessions permitted."
+    DEFVAL { 5 }
+    ::= { sysLoginControlInfo 14 }
+
+slcSSHOutboundMaxSessions OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of slcSSHOutboundMaxSessions specifies
+         the maximum number of concurrent outbound SSH sessions permitted."
+    DEFVAL { 5 }
+    ::= { sysLoginControlInfo 15 }
+
+sysLACPInfo     OBJECT IDENTIFIER ::= { tmnxSysObjs 9 }
+
+sysLACPSystemPriority     OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "sysLACPSystemPriority is the Link Aggregation Control Protocol (LACP)
+         system priority which is combined with the system MAC address to
+         make up a unique system ID that is used by LACP in communications
+         with LACP peer systems on Link Aggregation (LAG) ports."
+    DEFVAL      { 32768 }
+    ::= { sysLACPInfo 1 }
+
+--
+-- TACACS+ (Terminal Access Controller Access Control System Plus) Information
+--
+
+sysTacplusInfo     OBJECT IDENTIFIER ::= { tmnxSysObjs 10 }
+
+tacplusOperStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    up (1),
+                    down (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tacplusOperStatus will have a value of 'up' if any
+        one of the TACACS+ servers in the tacplusServerTable has
+        the tacplusServerOperStatus value of 'up'.
+        It will have a value of 'down' if all the TACACS+ servers in the
+        tacplusServerTable have the tacplusServerOperStatus value of 'down'."
+    ::= { sysTacplusInfo 1 }
+
+tacplusServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TacplusServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tacplusServerEntry has an entry for each TACACS+ server.
+        The table can have up to a maximum of 5 entries."
+    ::= { sysTacplusInfo 2 }
+
+tacplusServerEntry OBJECT-TYPE
+    SYNTAX      TacplusServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry contains information about a TACACS+ server."
+    INDEX { tacplusServerIndex }
+    ::= { tacplusServerTable 1 }
+
+TacplusServerEntry ::=
+    SEQUENCE {
+        tacplusServerIndex           Unsigned32,
+        tacplusServerAddress         IpAddress,
+        tacplusServerOperStatus      INTEGER,
+        tacPlusServerInetAddressType InetAddressType,
+        tacPlusServerInetAddress     InetAddress
+    }
+
+tacplusServerIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..5)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique value which identifies a specific TACACS+ server."
+    ::= { tacplusServerEntry 1 }
+
+tacplusServerAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The IP address of the TACACS+ server.
+
+        This object was made obsolete in the 5.0 release."
+    ::= { tacplusServerEntry 2 }
+
+tacplusServerOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    up (1),
+                    down (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current status of the TACACS+ server."
+    ::= { tacplusServerEntry 3 }
+
+tacPlusServerInetAddressType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tacPlusServerInetAddressType indicates the address type of
+         tacPlusServerInetAddress address.
+
+         The value of tacPlusServerInetAddressType can be either of
+         InetAddressType - 'ipv4' or InetAddressType - 'ipv6' or
+         InetAddressType - 'ipv6z'."
+    DEFVAL { unknown }
+    ::= { tacplusServerEntry 4 }
+
+tacPlusServerInetAddress     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(0|4|16|20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tacPlusServerInetAddress indicates the address of
+         the Tacplus server."
+    DEFVAL { ''H }
+    ::= { tacplusServerEntry 5 }
+
+--
+-- Notification Definition section
+--
+stiDateAndTimeChanged NOTIFICATION-TYPE
+    OBJECTS { stiDateAndTime }
+    STATUS  current
+    DESCRIPTION
+        "The date and time changed  event is generated when the time on the
+        system is modified either by explicit setting or automatic update in
+        case of SNTP."
+    ::= { tmnxSysNotifications 1 }
+
+ssiSaveConfigSucceeded NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+        "The save config succeeded event is generated when the saving of
+        configuration finishes without errors."
+    ::= { tmnxSysNotifications 2 }
+
+ssiSaveConfigFailed NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+        "The save config failed event is generated when the saving of
+        configuration is stopped due to errors."
+    ::= { tmnxSysNotifications 3 }
+
+sbiBootConfig NOTIFICATION-TYPE
+    OBJECTS {
+            sbiConfigStatus,
+            sbiPersistStatus,
+            sbiPersistIndex
+        }
+    STATUS  current
+    DESCRIPTION
+        "The sbiBootConfig notification is generated upon
+         completion of the configuration phase following
+         a system reboot."
+    ::= { tmnxSysNotifications 4 }
+
+sbiBootSnmpd NOTIFICATION-TYPE
+    OBJECTS {
+        sbiPersistIndex,
+        sbiSnmpdAdminStatus,
+        sbiSnmpdOperStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "The sbiBootSnmpd notification is generated upon completion
+         of the SNMP daemon initialization following a system reboot.
+         Some system configuration and initialization errors may result
+         in the SNMP daemon being suspended."
+    ::= { tmnxSysNotifications 5 }
+
+radiusServerOperStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        radiusServerAddress,
+        radiusServerOperStatus
+    }
+    STATUS  obsolete
+    DESCRIPTION
+        "The radiusServerOperStatusChange notification is generated when the
+         operational status of a RADIUS server has transitioned either
+         from 'up' to 'down' or from 'down' to 'up'.
+
+         This object was made obsolete in the 5.0 release."
+    ::= { tmnxSysNotifications 6 }
+
+radiusOperStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        radiusOperStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "The radiusOperStatusChange notification is generated when the
+         radiusOperStatus has transitioned either from 'up' to 'down' or
+         from 'down' to 'up'"
+    ::= { tmnxSysNotifications 7 }
+
+tmnxConfigModify NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxNotifyRow,
+        tmnxNotifyEntryOID,
+        tmnxNotifyObjectName
+    }
+    STATUS  current
+    DESCRIPTION
+        "A tmnxConfigModify notification is generated when a
+         configuration attribute associated with a row entry
+         in a MIB table is modified. It can be used by the NMS
+         to trigger maintenance polls of the configuration
+         information."
+    ::= { tmnxSysNotifications 8 }
+
+tmnxConfigCreate NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxNotifyRow,
+        tmnxNotifyEntryOID,
+        tmnxNotifyObjectName
+    }
+    STATUS  current
+    DESCRIPTION
+        "A tmnxConfigCreate notification is generated when a
+         new row entry is created in one of the MIB tables.
+         It can be used by the NMS to trigger maintenance
+         polls of the configuration information."
+    ::= { tmnxSysNotifications 9 }
+
+tmnxConfigDelete NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxNotifyRow,
+        tmnxNotifyEntryOID,
+        tmnxNotifyObjectName
+    }
+    STATUS  current
+    DESCRIPTION
+        "A tmnxConfigDelete notification is generated when an
+         existing row entry in one of the MIB tables is deleted.
+         It can be used by the NMS to trigger maintenance polls
+         of the configuration information."
+    ::= { tmnxSysNotifications 10 }
+
+tmnxStateChange NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxNotifyRow,
+        tmnxNotifyRowAdminState,
+        tmnxNotifyRowOperState,
+        tmnxNotifyEntryOID,
+        tmnxNotifyObjectName
+    }
+    STATUS  current
+    DESCRIPTION
+        "A tmnxStateChange notification is generated when there
+         is a change in either the administrative or operational
+         state of a MIB table entry."
+    ::= { tmnxSysNotifications 11 }
+
+tmnxModuleMallocFailed NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxMemoryModule,
+        tmnxModuleMallocSize
+    }
+    STATUS  current
+    DESCRIPTION
+        "A tmnxModuleMallocFailed notification is generated when
+         a request to allocate memory from a particular module
+         fails because the memory module is short on memory and
+         cannot support the size that was requested."
+    ::= { tmnxSysNotifications 12 }
+
+tmnxTrapDropped NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxDroppedTrapID,
+        tmnxTrapDroppedReasonCode,
+        tmnxTrapDroppedEntryID
+    }
+    STATUS  current
+    DESCRIPTION
+        "A tmnxTrapDropped notification is generated when
+         a trap is dropped for the reason specified by the
+         reason code. The tmnxTrapDroppedEntryID identifies
+         the table entry associated with the dropped trap."
+    ::= { tmnxSysNotifications 13 }
+
+ssiSyncConfigOK NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+        "The ssiSyncConfigOK event is generated when the
+         synchronization of configuration files between the primary
+         and secondary CPMs finishes without errors."
+    ::= { tmnxSysNotifications 14 }
+
+ssiSyncConfigFailed NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxSyncFailureReason
+    }
+    STATUS  current
+    DESCRIPTION
+        "The ssiSyncConfigFailed event is generated when the
+         synchronization of configuration files between the primary
+         and secondary CPMs is stopped due to errors. The 
+         tmnxSyncFailureReason will state reason for failure."
+    ::= { tmnxSysNotifications 15 }
+
+ssiSyncBootEnvOK NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+        "The ssiSyncBootEnvOK event is generated when the
+         synchronization of boot environment files between the
+         primary and secondary CPMs finishes without errors."
+    ::= { tmnxSysNotifications 16 }
+
+ssiSyncBootEnvFailed NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxSyncFailureReason        
+    }
+    STATUS  current
+    DESCRIPTION
+        "The ssiSyncBootEnvFailed event is generated when the
+         synchronization of boot environment files between the primary
+         and secondary CPMs is stopped due to errors. The 
+         tmnxSyncFailureReason will state reason for failure."
+    ::= { tmnxSysNotifications 17 }
+
+sntpTimeDiffExceedsThreshold  NOTIFICATION-TYPE
+    OBJECTS {
+        sntpAdminState
+    }
+    STATUS  current
+    DESCRIPTION
+        "The sntpTimeDiffExceedsThreshold event is generated when the
+         time differential between the system and the SNTP server is more
+         than 10 seconds. In this case the system clock is not automatically
+         adjusted."
+    ::= { tmnxSysNotifications 18 }
+
+tacplusServerOperStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        tacplusServerAddress,
+        tacplusServerOperStatus
+    }
+    STATUS  obsolete
+    DESCRIPTION
+        "The tacplusServerOperStatusChange notification is generated when the
+         operational status of a TACACS+ server has transitioned either
+         from 'up' to 'down' or from 'down' to 'up'.
+
+         This object was made obsolete in the 5.0 release."
+    ::= { tmnxSysNotifications 19 }
+
+tacplusOperStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        tacplusOperStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "The tacplusOperStatusChange notification is generated when the
+         tacplusOperStatus has transitioned either from 'up' to 'down' or
+         from 'down' to 'up'"
+    ::= { tmnxSysNotifications 20 }
+
+tmnxSnmpdError  NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxSnmpdErrorMsg
+    }
+    STATUS  current
+    DESCRIPTION
+        "The tmnxSnmpdError notification is generated when the SNMP daemon
+         detects an error condition."
+    ::= { tmnxSysNotifications 21 }
+
+tmnxSsiMismatch  NOTIFICATION-TYPE
+    OBJECTS {
+        ssiSyncMode,
+        sbiPersist
+    }
+    STATUS  current
+    DESCRIPTION
+        "The tmnxSsiMismatch notification is generated by a system with
+         redundant CPM cards after the processing of the bootup
+         configuration has completed when ssiSyncMode has a  value of 'none'
+         and sbiPersist has a value of 'true'.  This can result in SNMP
+         indexes having different values following a system failover."
+    ::= { tmnxSysNotifications 22 }
+
+tmnxSnmpdStateChange    NOTIFICATION-TYPE
+    OBJECTS {
+        sbiSnmpdAdminStatus,
+        sbiSnmpdOperStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "The tmnxSnmpdStateChange notification is generated whenever there
+         is a change in either the administrative or operational state of
+         the SNMP agent."
+    ::= { tmnxSysNotifications 23 }
+
+--
+--  Redundancy notifications
+--
+
+ssiRedStandbySyncing     NOTIFICATION-TYPE
+   OBJECTS {
+        tmnxChassisNotifyHwIndex,
+        tmnxHwID,
+        tmnxHwClass
+    }
+    STATUS  current
+    DESCRIPTION
+        "The ssiRedStandbySyncing notification is generated when
+         synchronization of redundancy information onto the standby
+         CPM is started.  tmnxChassisNotifyHwIndex identifies the
+         standby CPM."
+    ::= { tmnxSysNotifications 24 }
+
+ssiRedStandbyReady      NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxChassisNotifyHwIndex,
+        tmnxHwID,
+        tmnxHwClass
+    }
+    STATUS  current
+    DESCRIPTION
+        "The ssiRedStandbyReady notification is generated when the
+         synchronization of redundancy information onto the standby CPM
+         has completed.  The standby CPM is now ready to take over
+         control of the system if the active CPM fails or a manual
+         switchover command is issued.  tmnxChassisNotifyHwIndex
+         identifies the standby CPM."
+    ::= { tmnxSysNotifications 25 }
+
+ssiRedStandbySyncLost          NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxChassisNotifyHwIndex,
+        tmnxHwID,
+        tmnxHwClass
+    }
+    STATUS  current
+    DESCRIPTION
+        "The ssiRedStandbySyncLost notification is generated when the active
+         CPM looses communication with the standby CPM.
+         tmnxChassisNotifyHwIndex identifies the lost standby CPM."
+    ::= { tmnxSysNotifications 26 }
+
+ssiRedSwitchover        NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxChassisNotifyHwIndex,
+        tmnxHwID,
+        tmnxHwClass,
+        ssiRedFailoverTime,
+        ssiRedFailoverReason
+    }
+    STATUS  current
+    DESCRIPTION
+        "The ssiRedSwitchover notification is generated when the standby
+         CPM detects that the active CPM has failed and the standby prepares
+         to take over as the new active CPM.  tmnxChassisNotifyHwIndex
+         identifies the new active CPM."
+    ::= { tmnxSysNotifications 27 }
+
+ssiRedCpmActive     NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxChassisNotifyHwIndex,
+        tmnxHwID,
+        tmnxHwClass
+    }
+    STATUS  current
+    DESCRIPTION
+        "The ssiRedCpmActive notification is generated following a
+         redundancy switchover when the new active CPM has completed
+         its audit and is ready to accept management commands via CLI
+         or SNMP SET requests.  tmnxChassisNotifyHwIndex identifies
+         the new active CPM."
+    ::= { tmnxSysNotifications 28 }
+
+ssiRedSingleCpm   NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxChassisNotifyHwIndex,
+        tmnxHwID,
+        tmnxHwClass
+    }
+    STATUS current
+    DESCRIPTION
+        "The ssiRedSingleCpm notification is generated by a system with
+         a chassis with two CPM slots when the active CPM cannot detect a
+         standby CPM in the chassis.  When the operating state of
+         TIMETRA-CHASSIS-MIB::tmnxCpmCardRedundant for the active CPM card
+         transitions to a value of 'singleton (1)', this notification is
+         generated.  tmnxChassisNotifyHwIndex identifies the singleton CPM.
+
+         When the active CPM later detects a standby CPM in the chassis, the
+         ssiRedStandbySyncing event will be generated followed by a
+         ssiRedStandbyReady event to indicate clearing of the CPM singleton
+         state.  The value of tmnxCpmCardRedundant will then transition to
+         'redundantActive (2)'."
+    ::= { tmnxSysNotifications 29 }
+
+--
+--  persistency notifications
+--
+persistencyClosedAlarmRaised  NOTIFICATION-TYPE
+   OBJECTS {
+        tmnxPersistenceAffectedCpm,
+        tmnxPersistencyClient,
+        tmnxPersistencyFileLocator,
+        tmnxPersistencyNotifyMsg
+    }
+    STATUS  current
+    DESCRIPTION
+        "The persistencyClosedAlarmRaised notification is generated when
+         the system is unable to store persistency data (e.g. because
+         the device is inaccessible, or full)."
+    ::= { tmnxSysNotifications 30 }
+
+persistencyClosedAlarmCleared     NOTIFICATION-TYPE
+   OBJECTS {
+        tmnxPersistenceAffectedCpm,
+        tmnxPersistencyClient,
+        tmnxPersistencyFileLocator,
+        tmnxPersistencyNotifyMsg
+    }
+    STATUS  current
+    DESCRIPTION
+        "The persistencyClosedAlarmCleared notification is generated when
+        the output device used to store the persistence data is available
+        for use again."
+    ::= { tmnxSysNotifications 31 }
+
+tmnxSntpOperChange    NOTIFICATION-TYPE
+    OBJECTS {
+        sntpOperStatus
+        }
+    STATUS  current
+    DESCRIPTION
+        "The tmnxSntpOperChange notification is generated whenever there
+         is a change in the operational state of SNTP."
+    ::= { tmnxSysNotifications 32 }
+
+tmnxSysTimeSet   NOTIFICATION-TYPE
+    OBJECTS {
+        stiDateAndTime,
+        tmnxSysTimeSetBy
+        }
+    STATUS  current
+    DESCRIPTION
+        "The tmnxSysTimeSet notification is generated whenever system time is
+         set by NTP, SNTP, SNMP, Real Time Clock(RTC) or if it was set manually."
+    ::= { tmnxSysNotifications 33 }
+
+tmnxFtpClientFailure    NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxFtpFailureMsg,
+        tmnxFtpFailureDestAddressType,
+        tmnxFtpFailureDestAddress
+        }
+    STATUS  current
+    DESCRIPTION
+      "The tmnxFtpClientFailure notification is generated when a file transfer
+       operation initiated by the FTP client fails."
+    ::= { tmnxSysNotifications 34 }
+
+tacplusInetSrvrOperStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        tacPlusServerInetAddressType,
+        tacPlusServerInetAddress,
+        tacplusServerOperStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "The tacplusInetSrvrOperStatusChange notification is generated
+         when the operational status of a TACACS+ server has transitioned either
+         from 'up' to 'down' or from 'down' to 'up'."
+    ::= { tmnxSysNotifications 35 }
+
+radiusInetServerOperStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        radiusServerInetAddressType,
+        radiusServerInetAddress,
+        radiusServerOperStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "The radiusInetServerOperStatusChange notification is generated
+         when the operational status of a Radius server has transitioned either
+         from 'up' to 'down' or from 'down' to 'up'."
+    ::= { tmnxSysNotifications 36 }
+
+persistencyEventReport NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxPersistencyNotifyMsg
+    }
+    STATUS  current
+    DESCRIPTION
+        "The persistencyEventReport notification is generated
+         when a client-specific persistence event occurs 
+         (e.g. the start and completion of a recover action after system
+         startup)."
+    ::= { tmnxSysNotifications 37 }
+
+sbiBootConfigFailFileError NOTIFICATION-TYPE
+    OBJECTS {
+            sbiBootConfigFailScript
+        }
+    STATUS  current
+    DESCRIPTION
+        "The sbiBootConfigFailFileError notification is generated when
+         sbiBootConfigFailScript file cannot be accessed."
+    ::= { tmnxSysNotifications 38 }
+
+sbiBootConfigOKFileError NOTIFICATION-TYPE
+    OBJECTS {
+            sbiBootConfigOKScript
+        }
+    STATUS  current
+    DESCRIPTION
+        "The sbiBootConfigOKFileError notification is generated when
+         sbiBootConfigOKScript file cannot be accessed."
+    ::= { tmnxSysNotifications 39 }
+
+sbiBootLiConfig NOTIFICATION-TYPE
+    OBJECTS {
+            sliConfigStatus,
+            sbiLiSeparate,
+            sbiLiLocalSave
+        }
+    STATUS  current
+    DESCRIPTION
+        "The sbiBootLiConfig notification is generated upon completion of 
+         the Lawful Intercept (LI) configuration phase following a system 
+         reboot.  This notification is generated periodically, about once 
+         an hour.
+         
+         This event is generated only from the LI context."
+    ::= { tmnxSysNotifications 40 }
+    
+persistenceRestoreProblem NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxPersistencyClient,
+        tmnxPersistencyNotifyMsg
+    }
+    STATUS  current
+    DESCRIPTION
+        "The persistenceRestoreProblem notification is generated
+         when an an error is detected while processing a persistence record."
+    ::= { tmnxSysNotifications 41 }
+
+tmnxSysRollbackStarted NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxSysRollbackIndex,
+        tmnxSysRollbackFileType,
+        tmnxLogExecRollbackOpIndex
+    }
+    STATUS  current
+    DESCRIPTION
+        "[CAUSE] The tmnxSysRollbackStarted notification is generated 
+        when the user initiates a revert of the rollback checkpoint file 
+        specified by tmnxSysRollbackIndex and tmnxSysRollbackFileType.
+        The value of tmnxLogExecRollbackOpIndex indicates the row entry 
+        in the TIMETRA-LOG-MIB::tmnxLogExecRollbackOpTable for this rollback
+        revert operation. 
+
+        [EFFECT] The specified file is executed and system configuration 
+        may change.
+
+        [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxSysNotifications 42 }
+
+tmnxSysRollbackStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxSysRollbackIndex,
+        tmnxSysRollbackResult,
+        tmnxSysRollbackFileType,
+        tmnxLogExecRollbackOpIndex
+    }
+    STATUS  current
+    DESCRIPTION
+       "[CAUSE] The tmnxSysRollbackStatusChange notification is 
+        generated upon the completion of a rollback revert as specified 
+        by tmnxSysRollbackIndex and tmnxSysRollbackFileType.  The value 
+        of tmnxLogExecRollbackOpIndex indicates the row entry in the 
+        TIMETRA-LOG-MIB::tmnxLogExecRollbackOpTable for this rollback
+        revert operation. 
+        
+        [EFFECT] The result is indicated by the value of tmnxSysRollbackResult.
+
+        [RECOVERY] When the value of tmnxSysRollbackResult is none, 
+        inProgress or success no recovery is required. When the value is
+        failed, the user should try to determine the reason for the failure.
+        The user can attempt a recovery by reverting back to a known good 
+        checkpoint. The user may reboot the system with the bof pointing 
+        to a saved configuration file." 
+    ::= { tmnxSysNotifications 43 }
+
+tmnxSysRollbackSaveStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxSysRollbackSaveResult,
+        tmnxSysRollbackFileType
+    }
+    STATUS  current
+    DESCRIPTION
+        "[CAUSE] The tmnxSysRollbackSaveStatusChange notification is generated 
+         upon the completion of a rollback save as specified by 
+         tmnxSysRollbackFileType.
+         
+         [EFFECT] The result is indicated by value of tmnxSysRollbackSaveResult.
+
+         [RECOVERY] When the value of tmnxSysRollbackSaveResult is none, 
+         inProgress or success no recovery is required. When the value is
+         is failed, the user should try to determine the reason for the failure.
+         The user can attempt a recovery by attempting the rollback save again."
+    ::= { tmnxSysNotifications 44 }
+
+tmnxSysRollbackFileDeleteStatus NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxSysRollbackIndex,
+        tmnxSysRollbackFileDeleteResult,
+        tmnxSysRollbackFileType
+    }
+    STATUS  current
+    DESCRIPTION
+       "[CAUSE] The tmnxSysRollbackFileDeleteStatus notification is generated 
+        upon the completion of a rollback file delete as specified by 
+        tmnxSysRollbackIndex and tmnxSysRollbackFileType.
+        
+        [EFFECT] The result is indicated by the value of 
+        tmnxSysRollbackFileDeleteResult.
+
+        [RECOVERY] When the value of tmnxSysRollbackFileDeleteResult is none, 
+        inProgress or success no recovery is required. When the value is
+        failed, the user should try to determine the reason for the failure.
+        The user can attempt a recovery by deleting the file again."
+    ::= { tmnxSysNotifications 45 }
+
+ssiSyncRollbackOK NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+        "[CAUSE]  The ssiSyncRollbackOK event is generated when the
+         synchronization of rollback files between the primary
+         and secondary CPMs finishes without errors.
+         
+         [EFFECT] Rollback files are synchronized.
+
+         [RECOVERY] No recovery is necessary."
+    ::= { tmnxSysNotifications 46 }
+
+ssiSyncRollbackFailed NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxSyncFailureReason
+    }
+    STATUS  current
+    DESCRIPTION
+        "[CAUSE] The ssiSyncRollbackFailed event is generated when the
+         synchronization of rollback files between the primary
+         and secondary CPMs is stopped due to errors. The 
+         tmnxSyncFailureReason will state the reason for the failure.
+         
+         [EFFECT] Rollback files are not synchronized.
+
+         [RECOVERY] The user should try to determine the cause of the failure
+         and can attempt synchronizing the files again."
+    ::= { tmnxSysNotifications 47 }
+
+ssiSyncCertOK NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+        "[CAUSE]  The ssiSyncCertOK event is generated when the
+         synchronization of certificate files between the primary
+         and secondary CPMs finishes without errors.
+         
+         [EFFECT] Certificate files are synchronized.
+
+         [RECOVERY] No recovery is necessary."
+    ::= { tmnxSysNotifications 48 }
+
+ssiSyncCertFailed NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxSyncFailureReason
+    }
+    STATUS  current
+    DESCRIPTION
+        "[CAUSE] The ssiSyncCertFailed event is generated when the
+         synchronization of certificate files between the primary
+         and secondary CPMs is stopped due to errors. The 
+         tmnxSyncFailureReason will state the reason for the failure.
+         
+         [EFFECT] Certificate files are not synchronized.
+
+         [RECOVERY] The user should try to determine the cause of the failure
+         and can attempt synchronizing the files again."
+    ::= { tmnxSysNotifications 49 }
+
+persistencyFileSysThresRaised  NOTIFICATION-TYPE
+   OBJECTS {
+        tmnxPersistenceAffectedCpm,
+        tmnxPersistencyClient,
+        tmnxPersistencyFileLocator,
+        tmnxPersistencyNotifyMsg
+    }
+    STATUS  current
+    DESCRIPTION
+        "The persistencyFileSysThresRaised notification is generated 
+         when the filesystem reaches 90 percent occupation."
+    ::= { tmnxSysNotifications 50 }
+
+persistencyFileSysThresCleared  NOTIFICATION-TYPE
+   OBJECTS {
+        tmnxPersistenceAffectedCpm,
+        tmnxPersistencyClient,
+        tmnxPersistencyFileLocator,
+        tmnxPersistencyNotifyMsg
+    }
+    STATUS  current
+    DESCRIPTION
+        "The persistencyFileSysThresCleared notification is generated 
+         when the filesystem drops below 90 percent occupation."
+    ::= { tmnxSysNotifications 51 }
+
+tmnxSysExecStarted NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxSysExecScript,
+        tmnxLogExecRollbackOpIndex
+    }
+    STATUS  current
+    DESCRIPTION
+        "[CAUSE] The tmnxSysExecStarted notification is generated 
+         when the user initiates a CLI 'exec' operation to process
+         a file of SROS CLI commands.  The value of tmnxSysExecScript
+         indicates the command file.  The value of tmnxLogExecRollbackOpIndex 
+         indicates the row entry in TIMETRA-LOG-MIB::tmnxLogExecRollbackOpTable
+         for this CLI 'exec' operation. 
+
+         [EFFECT] The specified CLI configuration file is executed and 
+         the system configuration may have changed.
+
+         [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxSysNotifications 52 }
+
+tmnxSysExecFinished NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxSysExecScript,
+        tmnxSysExecResult,
+        tmnxLogExecRollbackOpIndex
+    }
+    STATUS  current
+    DESCRIPTION
+        "[CAUSE] The tmnxSysExecFinished notification is generated upon 
+         the completion of the execution of a CLI command file indicated 
+         by the value of tmnxSysExecScript.  The value of 
+         tmnxLogExecRollbackOpIndex indicates the row entry in 
+         TIMETRA-LOG-MIB::tmnxLogExecRollbackOpTable for this CLI 'exec' 
+         operation. 
+
+         [EFFECT] The success or failure result is indicated by the value of 
+         tmnxSysExecResult.
+
+         [RECOVERY] When the value of tmnxSysExecResult is 'none' or 'success',
+         no recovery is required. 
+         
+         When the value is 'fail', the system may be left in an inconsistent
+         state and the user should try to determine the reason for the failure.
+         The user can attempt a recovery by manually entering CLI commands to
+         reverse the failed configuration.  The user can attempt a recovery by 
+         performing a rollback revert to a known good checkpoint. The user can 
+         attempt a recovery by rebooting the system with the bof pointing to a 
+         saved configuration file." 
+    ::= { tmnxSysNotifications 53 }
+
+tmnxSysRollbackSaveStarted NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxSysRollbackFileType
+    }
+    STATUS  current
+    DESCRIPTION
+        "[CAUSE] The tmnxSysRollbackSaveStarted notification is generated 
+        when the user initiates a rollback save as specified by 
+        tmnxSysRollbackFileType.
+
+        [EFFECT] The specified configuration file is saved. 
+
+        [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxSysNotifications 54 }
+
+tmnxSysRollbackDeleteStarted NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxSysRollbackIndex,
+        tmnxSysRollbackFileType
+    }
+    STATUS  current
+    DESCRIPTION
+        "[CAUSE] The tmnxSysRollbackDeleteStarted notification is generated 
+        when the user initiates a rollback delete as specified by  
+        by tmnxSysRollbackIndex and tmnxSysRollbackFileType.
+
+        [EFFECT] The specified configuration file is deleted.
+
+        [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxSysNotifications 55 }
+
+tmnxSysNvsysFileError NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxSysFileErrorType
+    }
+    STATUS  current
+    DESCRIPTION
+        "[CAUSE] The tmnxSysNvsysFileError notification is generated 
+        when there is a failure in accessing the nvsys file as specified   
+        by tmnxSysFileErrorType. 
+
+        [EFFECT] The specified nvsys file operation is unsuccessful. 
+
+        [RECOVERY] The user should investigate why the failure occurred. A
+        failure can indicate a problem with the compact flash."
+    ::= { tmnxSysNotifications 56 }
+--
+--  System Boot Options File (BOF) Information
+--
+sysBofInfo    OBJECT IDENTIFIER ::= { tmnxSysObjs 11 }
+
+sbiActiveIpAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiActiveIpAddr specifies the IP address of the
+         ethernet port on the active CPM."
+    DEFVAL { 0 }
+    ::= { sysBofInfo 1 }
+
+sbiActiveIpMask  OBJECT-TYPE
+    SYNTAX      IpAddressPrefixLength
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiActiveIpMask specifies the mask length of the
+         subnet associated with the IP address of the ethernet port on
+         the active CPM."
+    DEFVAL { 0 }
+    ::= { sysBofInfo 2 }
+
+sbiStandbyIpAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiStandbyIpAddr specifies the IP address of the
+         ethernet port on the standby CPM."
+    DEFVAL { 0 }
+    ::= { sysBofInfo 3 }
+
+sbiStandbyIpMask  OBJECT-TYPE
+    SYNTAX      IpAddressPrefixLength
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiStandbyIpMask specifies the mask length of the
+         subnet associated with the IP address of the ethernet port on
+         the standby CPM."
+    DEFVAL { 0 }
+    ::= { sysBofInfo 4 }
+
+sbiPrimaryImage  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..180))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiPrimaryImage specifies the primary location
+         of the directory that contains the runtime image files."
+    DEFVAL { ''H }
+    ::= { sysBofInfo 5 }
+
+sbiSecondaryImage  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..180))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiSecondaryImage specifies the secondary location
+         of the directory that contains the runtime image files."
+    DEFVAL { ''H }
+    ::= { sysBofInfo 6 }
+
+sbiTertiaryImage  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..180))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiTertiaryImage specifies the tertiary location
+         of the directory that contains the runtime image files."
+    DEFVAL { ''H }
+    ::= { sysBofInfo 7 }
+
+sbiPrimaryConfigFile  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..180))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiPrimaryConfigFile specifies the location and
+         name of the primary configuration file."
+    DEFVAL { ''H }
+    ::= { sysBofInfo 8 }
+
+sbiSecondaryConfigFile  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..180))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiSecondaryConfigFile specifies the location and
+         name of the secondary configuration file."
+    DEFVAL { ''H }
+    ::= { sysBofInfo 9 }
+
+sbiTertiaryConfigFile  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..180))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiTertiaryConfigFile specifies the location and
+         name of the tertiary configuration file."
+    DEFVAL { ''H }
+    ::= { sysBofInfo 10 }
+
+sbiPersist  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiPersist specifies whether or not the system
+         will preserve SNMP indexes between reboots. When set to 'true',
+         persistent indexing is enabled."
+    DEFVAL { false }
+    ::= { sysBofInfo 11 }
+
+sbiConsoleSpeed  OBJECT-TYPE
+    SYNTAX      Unsigned32 (9600|19200|38400|57600|115200)
+    UNITS       "bps"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiConsoleSpeed specifies the baud rate of the
+         console port."
+    DEFVAL { 115200 }
+    ::= { sysBofInfo 12 }
+
+sbiAutoNegotiate  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiAutoNegotiate determines whether or not the
+         speed and duplex parameters will be automatically negotiated
+         on the CPM ethernet port. When set to 'true', auto-negotiation
+         is enabled."
+    DEFVAL { true }
+    ::= { sysBofInfo 13 }
+
+sbiSpeed  OBJECT-TYPE
+    SYNTAX      Unsigned32 (10|100)
+    UNITS       "Mbps"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiSpeed specifies the speed of the CPM ethernet
+         port. This value is ignored if auto-negotiation is enabled."
+    DEFVAL { 100 }
+    ::= { sysBofInfo 14 }
+
+sbiDuplex  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    full(1),
+                    half (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiDuplex specifies the duplex mode for the CPM
+         ethernet port. This value is ignored if auto-negotiation is
+         enabled."
+    DEFVAL { full }
+    ::= { sysBofInfo 15 }
+
+sbiPrimaryDns  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiPrimaryDns specifies the IP address of the
+         primary DNS server to use for DNS name resolution."
+    DEFVAL { 0 }
+    ::= { sysBofInfo 16 }
+
+sbiSecondaryDns  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiSecondaryDns specifies the IP address of the
+         secondary DNS server to use for DNS name resolution."
+    DEFVAL { 0 }
+    ::= { sysBofInfo 17 }
+
+sbiTertiaryDns  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiTertiaryDns specifies the IP address of the
+         tertiary DNS server to use for DNS name resolution."
+    DEFVAL { 0 }
+    ::= { sysBofInfo 18 }
+
+sbiDnsDomain  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0 | 1..178))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiDnsDomain specifies the domain name to use
+         when performing DNS address resolution."
+    DEFVAL { ''H }
+    ::= { sysBofInfo 19 }
+
+sbiWait  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiWait specifies the number of seconds the system
+         pauses at the start of the boot process. This pause allows the
+         operator to interrupt the system initialization at the console
+         and manually override the parameters in the BOF."
+    DEFVAL { 3 }
+    ::= { sysBofInfo 20 }
+
+sbiStaticRouteTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SbiStaticRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The sbiStaticRouteTable contains an entry for each static route
+         configured for the CPM ethernet port. These static routes are
+         only used to route traffic generated by the CPM ethernet port.
+         The table can have upto a maximum of 10 entries."
+    ::= { sysBofInfo 21 }
+
+sbiStaticRouteEntry OBJECT-TYPE
+    SYNTAX      SbiStaticRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry contains information about a static route
+         configured for the CPM ethernet port.
+
+         Entries in this table can be created and deleted via SNMP
+         SET operations to sbiStaticRouteRowStatus."
+    INDEX { sbiStaticRouteDest,
+            sbiStaticRouteMask }
+    ::= { sbiStaticRouteTable 1 }
+
+SbiStaticRouteEntry ::=
+    SEQUENCE {
+        sbiStaticRouteDest              IpAddress,
+        sbiStaticRouteMask              IpAddressPrefixLength,
+        sbiStaticRouteNextHop           IpAddress,
+        sbiStaticRouteRowStatus         RowStatus
+    }
+
+sbiStaticRouteDest  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiStaticRouteDest specifies the destination IP
+         address of this static route."
+    ::= { sbiStaticRouteEntry 1 }
+
+sbiStaticRouteMask  OBJECT-TYPE
+    SYNTAX      IpAddressPrefixLength
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiStaticRouteMask specifies the length of the
+         subnet mask associated with the destination IP address of this
+         static route."
+    ::= { sbiStaticRouteEntry 2 }
+
+sbiStaticRouteNextHop  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiStaticRouteNextHop specifies the IP address of
+         the next hop for this static route. This IP address should be
+         in the same subnet as the ethernet port on the active CPM.
+         The value of sbiStaticRouteNextHop must be set to a valid IP
+         address for the row creation to succeed."
+    ::= { sbiStaticRouteEntry 3 }
+
+sbiStaticRouteRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "sbiStaticRouteRowStatus controls the creation and deletion of
+         rows in the table. To create a row in this table, set the row
+         status to createAndGo(4)'. The value of sbiStaticRouteNextHop
+         must also be set to a valid IP address for the row creation to
+         succeed. To delete a row in this table, set the row status to
+         delete(6)."
+    ::= { sbiStaticRouteEntry 4 }
+
+sbiActiveIPv6Addr  OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiActiveIPv6Addr specifies the IPv6 address of the
+         ethernet port on the active CPM."
+    DEFVAL { '00000000000000000000000000000000'H }
+    ::= { sysBofInfo 22 }
+
+sbiActiveIPv6PfxLen  OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength (0..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiActiveIPv6PfxLen specifies the prefix length of the
+         subnet associated with the sbiActiveIPv6Addr address of the ethernet
+         port on the active CPM."
+    DEFVAL { 0 }
+    ::= { sysBofInfo 23 }
+
+sbiStandbyIPv6Addr  OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiStandbyIPv6Addr specifies the IPv6 address of the
+         ethernet port on the standby CPM."
+    DEFVAL { '00000000000000000000000000000000'H }
+    ::= { sysBofInfo 24 }
+
+sbiStandbyIPv6PfxLen  OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength (0..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiStandbyIPv6PfxLen specifies the prefix length of the
+         subnet associated with the sbiStandbyIPv6Addr address of the ethernet
+         port on the active CPM."
+    DEFVAL { 0 }
+    ::= { sysBofInfo 25 }
+
+sbiPrimaryDnsIPv6Addr  OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiPrimaryDnsIPv6Addr specifies the IPv6 address of the
+         primary DNS server to use for DNS name resolution."
+    DEFVAL { '00000000000000000000000000000000'H }
+    ::= { sysBofInfo 26 }
+
+sbiSecondaryDnsIPv6Addr  OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiSecondaryDnsIPv6Addr specifies the IPv6 address of the
+         secondary DNS server to use for DNS name resolution."
+    DEFVAL { '00000000000000000000000000000000'H }
+    ::= { sysBofInfo 27 }
+
+sbiTertiaryDnsIPv6Addr  OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiTertiaryDnsIPv6Addr specifies the IPv6 address of the
+         tertiary DNS server to use for DNS name resolution."
+    DEFVAL { '00000000000000000000000000000000'H }
+    ::= { sysBofInfo 28 }
+
+sbiStaticRouteIPv6Table   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SbiStaticRouteIPv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The sbiStaticRouteIPv6Table contains an entry for each static IPv6
+         route configured for the CPM ethernet port. These static routes are
+         only used to route traffic generated by the CPM ethernet port.
+         The table can have upto a maximum of 10 entries."
+    ::= { sysBofInfo 29 }
+
+sbiStaticRouteIPv6Entry OBJECT-TYPE
+    SYNTAX      SbiStaticRouteIPv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry contains information about a static IPv6 route
+         configured for the CPM ethernet port.
+
+         Entries in this table can be created and deleted via SNMP
+         SET operations to sbiStaticRouteIPv6RowStatus."
+    INDEX { sbiStaticRouteIPv6Dest,
+            sbiStaticRouteIPv6PfxLen }
+    ::= { sbiStaticRouteIPv6Table 1 }
+
+SbiStaticRouteIPv6Entry ::=
+    SEQUENCE {
+        sbiStaticRouteIPv6Dest             InetAddressIPv6,
+        sbiStaticRouteIPv6PfxLen           InetAddressPrefixLength,
+        sbiStaticRouteIPv6NextHop          InetAddressIPv6,
+        sbiStaticRouteIPv6RowStatus        RowStatus
+    }
+
+sbiStaticRouteIPv6Dest  OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiStaticRouteIPv6Dest specifies the destination IPv6
+         address of this static route."
+    ::= { sbiStaticRouteIPv6Entry 1 }
+
+sbiStaticRouteIPv6PfxLen  OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength (0..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiStaticRouteIPv6PfxLen specifies the prefix length of
+         sbiStaticRouteIPv6Dest, the destination IPv6 address of this static
+         route."
+    ::= { sbiStaticRouteIPv6Entry 2 }
+
+sbiStaticRouteIPv6NextHop  OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiStaticRouteIPv6NextHop specifies the IPv6 address of
+         the next hop for this static route. This IPv6 address should be
+         in the same subnet as the ethernet port on the active CPM.
+         The value of sbiStaticRouteIPv6NextHop must be set to a valid IPv6
+         address for the row creation to succeed."
+    ::= { sbiStaticRouteIPv6Entry 3 }
+
+sbiStaticRouteIPv6RowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "sbiStaticRouteIPv6RowStatus controls the creation and deletion of
+         rows in the table. To create a row in this table, set the row
+         status to createAndGo(4)'. The value of sbiStaticRouteIPv6NextHop
+         must also be set to a valid IPv6 address for the row creation to
+         succeed. To delete a row in this table, set the row status to
+         delete(6)."
+    ::= { sbiStaticRouteIPv6Entry 4 }
+
+sbiLiSeparate    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiLiSeparate specifies whether or not a non-LI user has
+         access to Lawful Intercept (LI) information.  When sbiLiSeparate has
+         a value of 'true', a user who does not have the TMETRA-SECURITY-MIB::
+         tmnxUserAccess 'li' bit set will not be allowed to access CLI or 
+         SNMP objects in the 'li' context.
+
+         A change to the value of this object does not take affect until
+         the system is rebooted."
+    DEFVAL { false }
+    ::= { sysBofInfo 30 }
+
+sbiLiLocalSave      OBJECT-TYPE
+    SYNTAX      TruthValue      
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiLiLocalSave specifies whether or not Lawful
+         Intercept (LI) configuration is allowed to be save to a local
+         file.
+
+         A change to the value of this object does not take affect until
+         the system is rebooted."
+    DEFVAL { true }
+    ::= { sysBofInfo 31 }
+
+--
+--  System Persistence Information
+--
+sysPersistenceInfo  OBJECT IDENTIFIER ::= { tmnxSysObjs 12 }
+  sysPersistenceDhcpL2Info  OBJECT IDENTIFIER ::= { sysPersistenceInfo 1 }
+  sysPersistenceDhcpL3Info  OBJECT IDENTIFIER ::= { sysPersistenceInfo 2 }
+  sysPersistenceSubMgmtInfo OBJECT IDENTIFIER ::= { sysPersistenceInfo 3 }
+  sysPersistenceDhcpSrvInfo OBJECT IDENTIFIER ::= { sysPersistenceInfo 4 }
+  sysPersistenceNatInfo     OBJECT IDENTIFIER ::= { sysPersistenceInfo 5 }
+  sysPersistenceAAInfo      OBJECT IDENTIFIER ::= { sysPersistenceInfo 6 }
+
+spiDhcpL2PersistenceFileLocation OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..32)
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of spiDhcpL2PersistenceFileLocation specifies
+         the flash device on a CPM card where the data for handling
+         DHCP Layer2 persistency is stored.
+         The value 0 indicates that no flash device is specified.
+
+         This object was made obsolete in the 5.0 release."
+    DEFVAL { 0 }
+    ::= { sysPersistenceDhcpL2Info 1 }
+
+spiDhcpL2PersistenceDescription OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object spiDhcpL2PersistenceDescription specifies
+         a user provided description related to DHCP Layer-2 persistency.
+         It consists of any printable, seven-bit ASCII characters
+         up to 80 characters in length.
+
+         This object was made obsolete in the 5.0 release."
+    DEFVAL { "" }
+    ::= { sysPersistenceDhcpL2Info 2 }
+
+spiDhcpL3PersistenceFileLocation OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..32)
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of spiDhcpL3PersistenceFileLocation specifies
+         the flash device on a CPM card where the data for handling
+         DHCP Layer3 persistency is stored.
+         The value 0 indicates that no flash device is specified.
+
+         This object was made obsolete in the 5.0 release."
+    DEFVAL { 0 }
+    ::= { sysPersistenceDhcpL3Info 1 }
+
+spiDhcpL3PersistenceDescription OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object spiDhcpL3PersistenceDescription specifies
+         a user provided description related to DHCP Layer-3 persistency.
+         It consists of any printable, seven-bit ASCII characters
+         up to 80 characters in length.
+
+         This object was made obsolete in the 5.0 release."
+    DEFVAL { "" }
+    ::= { sysPersistenceDhcpL3Info 2 }
+
+spiSubMgmtPersistenceFileLocation OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..32)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of spiSubMgmtPersistenceFileLocation specifies the flash
+         device on a CPM card where the data for handling subscriber management
+         persistency is stored.
+         The value 0 indicates that no flash device is specified."
+    DEFVAL { 0 }
+    ::= { sysPersistenceSubMgmtInfo 1 }
+
+spiSubMgmtPersistenceDescription OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object spiSubMgmtPersistenceDescription specifies
+         a user provided description related to subscriber management
+         persistency.
+         It consists of any printable, seven-bit ASCII characters up to 80
+         characters in length."
+    DEFVAL { "" }
+    ::= { sysPersistenceSubMgmtInfo 2 }
+
+spiDhcpSrvPersistenceFileLoc OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..32)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of spiDhcpSrvPersistenceFileLoc specifies the flash
+         device on a CPM card where the data for handling the local DHCP
+         server persistency is stored.
+         The value 0 indicates that no flash device is specified."
+    DEFVAL { 0 }
+    ::= { sysPersistenceDhcpSrvInfo 1 }
+
+spiDhcpSrvPersistenceDescr OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object spiDhcpSrvPersistenceDescr specifies
+         a user provided description related to the local DHCP server
+         persistency.
+         It consists of any printable, seven-bit ASCII characters up to 80
+         characters in length."
+    DEFVAL { "" }
+    ::= { sysPersistenceDhcpSrvInfo 2 }
+
+spiNatFwdPersistenceFileLoc OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..32)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of spiNatFwdPersistenceFileLoc specifies the flash
+         device on a CPM card where the data for handling 
+         the NAT (Network Address Translation) port forwarding persistence 
+         is stored.
+         
+         The value 0 indicates that no flash device is specified."
+    DEFVAL { 0 }
+    ::= { sysPersistenceNatInfo 1 }
+
+spiNatFwdPersistenceDescr OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object spiNatFwdPersistenceDescr specifies
+         a user provided description related to the NAT port forwarding
+         persistence.
+         It consists of any printable, seven-bit ASCII characters up to 80
+         characters in length."
+    DEFVAL { "" }
+    ::= { sysPersistenceNatInfo 2 }
+
+spiAAPersistenceFileLoc OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..32)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of spiAAPersistenceFileLoc specifies the flash
+         device on a CPM card where the data for handling
+         the AA (Application Assurance) persistence is stored.
+         
+         The value 0 indicates that no flash device is specified."
+    DEFVAL { 0 }
+    ::= { sysPersistenceAAInfo 1 }
+
+spiAAPersistenceDescr OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object spiAAPersistenceDescr specifies
+         a user provided description related to the AA (Application Assurance)
+         persistence. It consists of any printable, seven-bit ASCII
+         characters up to 80 characters in length."
+    DEFVAL { "" }
+    ::= { sysPersistenceAAInfo 2 }
+
+--
+--  System Lawful Intercept Information
+--
+sysLiInfo  OBJECT IDENTIFIER ::= { tmnxSysObjs 13 }
+
+sliConfigStatus   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notRun (0),
+                    success (1),
+                    fail    (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sliConfigStatus indicates the results of restoring
+         the Lawful Intercept (LI) configuration at boot-up time."
+    ::= { sysLiInfo 1 }
+
+sliSaveConfig   OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sliSaveConfig indicates a desired action.  Setting 
+         this action variable to 'doAction' causes the current Lawful 
+         Intercept (LI) running configuration information, to be saved to 
+         a file called li.cfg in the same location as the BOF file.
+         If the li.cfg file already exists, it will be renamed and a
+         new file is created with the current running configuration.
+
+         An attempt to set this object to 'doAction' when the booted value 
+         of sbiLiLocalSave is 'false' will result in an 'inconsistentValue'
+         error.
+
+         Default configuration values will be included in the saved 
+         configuration information."
+    DEFVAL { notApplicable }
+    ::= { sysLiInfo 2 }
+
+sliSaveConfigResult OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none (1),
+                    inProgress (2),
+                    success (3),
+                    failed (4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sliSaveConfigResult represents the result of the
+         last sliSaveConfig action.
+         none(1)            None of the following apply
+         inProgress(2)      The action is still in progress
+         success(3)         The action completed successfully
+         failed(4)          The action failed"
+    ::= {sysLiInfo 3 }
+
+sliConfigLastModified  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sliConfigLastModified indicates the date and time 
+         the Lawful Intercept (LI) running configuration was last modified.
+         If sliConfigLastModified is more recent than TIMETRA-CHASSIS-MIB:: 
+         tmnxHwSwLastBoot, the current configuration may be different
+         than that in the configuration file read upon system initialization."
+    ::= { sysLiInfo 4 }
+
+sliConfigLastSaved OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sliConfigLastSaved indicates the date and 
+         time the current Lawful Intercept (LI) configuration was 
+         last saved.  If sliConfigLastSaved is more recent than the 
+         value of TIMETRA-CHASSIS-MIB::tmnxHwSwLastBoot, the 
+         initial configuration is likely to be different the next 
+         time the system is rebooted."
+    ::= { sysLiInfo 5 }
+
+sliFilterLock   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    locked (0),
+                    unlockedForLiUsers (1),
+                    unlockedForAll (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The of sliFilterLock specifies 
+         who can modify the Lawful Intercept (LI) filters.
+         
+         The value:
+         'locked':             no users can modify the LI filters
+         'unlockedForLiUsers': only users with LI privileges can modify the 
+                               LI filters
+         'unlockedForAll':     all users can modify the LI filters."
+    DEFVAL { locked }
+    ::= { sysLiInfo 6 }
+
+--
+--  system wide DNS setting
+--
+sysDNSInfo  OBJECT IDENTIFIER ::= { tmnxSysObjs 14 }
+
+sysDNSInfoLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysDNSInfoLastChanged is the timestamp of the last
+         configuration changes to any of the DNS global settings."
+    ::= { sysDNSInfo 1 }
+
+sysDNSAddressResolvePref   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ipv4Only  (1),
+                    ipv6First (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sysDNSAddressResolvePref specifies how the DNS
+         client will request for address resolution.
+
+         ipv4-only:  The DNS client will only try to resolve a domain name
+                     into an ipv4 address.             
+
+         ipv6-first: the DNS client will first try to relsove the
+                     domain name in to ipv6 address. If no ipv6 address
+                     is available it will try to resolve the domain name 
+                     into an ipv4 address."
+    DEFVAL { ipv4Only }
+    ::= { sysDNSInfo 2 }
+
+--
+--  System Wide ICMP Vendor Specific settings
+--
+sysIcmpVSInfo  OBJECT IDENTIFIER ::= { tmnxSysObjs 15 }
+
+sysIcmpVSEnhancement   OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sysIcmpVSEnhancement specifies if vendor specific 
+         extensions to ICMP is enabled or not."
+    DEFVAL { disabled }
+    ::= { sysIcmpVSInfo 1 }
+
+sysEthInfo      OBJECT IDENTIFIER ::= { tmnxSysObjs 16 }
+
+sysNewQinqUntaggedSap     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sysNewQinqUntaggedSap controls the forwarding of
+         packets on a QinQ X.0 access SAP.
+ 
+         When sysNewQinqUntaggedSap is set to true, the SAP will only accept:
+
+         - frames with a single tag matching the SAP's outer tag or,
+         - frames with double tag where the outer tag matches the SAP's outer
+           tag and inner tag is set to 0.
+    
+         When sysNewQinqUntaggedSap is set to false, forwarding of packets
+         remains unchanged."
+    DEFVAL { false }
+    ::= { sysEthInfo 1 }
+
+--
+-- Rollback Global Information
+--
+
+tmnxSysRollbackInfo     OBJECT IDENTIFIER ::= { tmnxSysObjs 17 }
+
+tmnxSysRollbackIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..199)
+    MAX-ACCESS  read-write 
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackIndex indicates a specific rollback 
+         checkpoint file to which a rollback action can be taken. 
+
+         The value of the tmnxSysRollbackIndex corresponds to a rollback 
+         checkpoint file with suffix .rb.index. 
+
+         The maximum checkpoint file that can be specified is determined by 
+         the rollback location as specified by tmnxSysRollbackLocation. 
+         If the location is on a compact flash, then the maximum value of 
+         tmnxSysRollbackIndex can be tmnxSysRollbackMaxLocalFiles minus 1.  
+         If the location is a remote ftp location, then the maximum 
+         value of tmnxSysRollbackIndex can be tmnxSysRollbackMaxRemoteFiles
+         minus 1.
+
+         This index is SET along with another action object, including 
+         tmnxSysRollbackStart to initiate a rollback revert of a file
+         and tmnxSysRollbackFileDelete to delete a rollback file.
+
+         An SNMP GET request on this object should return the last SET value."
+    ::= { tmnxSysRollbackInfo 1 }
+
+tmnxSysRollbackStart    OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackStart indicates whether to revert 
+         the rollback file specified by tmnxSysRollbackIndex.
+         
+         When SET to the value of 'doAction' the system will revert the
+         rollback file specified by tmnxSysRollbackIndex. 
+         
+         This variable must be set along with tmnxSysRollbackIndex to indicate 
+         the specific rollback file to revert.
+
+         An SNMP GET request on this object should return 'notApplicable'." 
+    DEFVAL { notApplicable }
+    ::= {tmnxSysRollbackInfo 2 }
+
+tmnxSysRollbackResult OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none (1),
+                    inProgress (2),
+                    success (3),
+                    failed (4),
+                    interrupted (5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackResult indicates the result of the
+         last tmnxSysRollbackStart action.
+
+         none(1)            None of the following apply
+         inProgress(2)      The action is still in progress
+         success(3)         The action completed successfully
+         failed(4)          The action failed
+         interrupted (5)    The action was interrupted"
+    ::= {tmnxSysRollbackInfo 3 }
+
+tmnxSysRollbackSave    OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackSave indicates whether to save the existing
+         configuration in a rollback checkpoint file.
+         
+         When SET to the value of 'doAction' the system will save the
+         configuration in a new rollback checkpoint file, with suffix '.rb'. 
+         Previously saved rollback files with the same name will increment 
+         the filename suffix by 1 upto a maximum of 9.
+         For example, file.rb is moved to file.rb.1. The higher the number, 
+         the older the file is.
+         
+         An SNMP GET request on this object should return 'notApplicable'."
+    DEFVAL { notApplicable }
+    ::= {tmnxSysRollbackInfo 4 }
+
+tmnxSysRollbackSaveResult OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none (1),
+                    inProgress (2),
+                    success (3),
+                    failed (4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackSaveResult indicates the result of the
+         last tmnxSysRollbackSave action.
+
+         none(1)            None of the following apply
+         inProgress(2)      The action is still in progress
+         success(3)         The action completed successfully
+         failed(4)          The action failed"
+    ::= {tmnxSysRollbackInfo 5 }
+
+tmnxSysRollbackLocation   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..180))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackLocation specifies the destination filepath
+         or file-URL where the current running configuration information
+         will be saved when tmnxSysRollbackSave is set to 'doAction'.  If
+         the value of tmnxSysRollbackLocation is an empty string the system will
+         attempt to store the file in the best available location locally, 
+         for example compact flash 1 or 2 if either is present."
+    DEFVAL { ''H }  -- empty string
+    ::= { tmnxSysRollbackInfo 6 }
+
+tmnxSysRollbackRevertIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..199)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackRevertIndex indicates the last
+         rollback checkpoint file reverted on the system."
+    ::= { tmnxSysRollbackInfo 7 }
+
+tmnxSysRollbackRevertEndTime   OBJECT-TYPE
+    SYNTAX      DateAndTime 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The value of tmnxSysRollbackRevertEndTime indicates the timestamp 
+          the last rollback revert on the system is completed."
+    ::= { tmnxSysRollbackInfo 8 }
+
+tmnxSysRollbackSavedTime   OBJECT-TYPE
+    SYNTAX      DateAndTime 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The value of tmnxSysRollbackSavedTime indicates the timestamp  
+          the last rollback save on the system is completed."
+    ::= { tmnxSysRollbackInfo 9 }
+
+tmnxSysRollbackRevertStartTime   OBJECT-TYPE
+    SYNTAX      DateAndTime 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The value of tmnxSysRollbackRevertStartTime indicates the timestamp
+          the last rollback file reverted on the system is initiated."
+    ::= { tmnxSysRollbackInfo 10 }
+
+tmnxSysRollbackRevertUserName  OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty (SIZE(0..16))
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackRevertUserName indicates the name of
+         a system user who initiates the last rollback revert."
+    DEFVAL { ''H }    -- the empty string
+    ::= { tmnxSysRollbackInfo 11 }
+
+tmnxSysRollbackRevertFilename   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..180))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackRevertFilename specifies the filepath 
+         or file-URL of the last reverted rollback file."
+    DEFVAL { ''H }  -- empty string
+    ::= { tmnxSysRollbackInfo 12 }
+
+tmnxSysRollbackSaveComment OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The value of the object tmnxSysRollbackSaveComment specifies
+        a user provided comment related to the rollback checkpoint file about 
+        to be saved. 
+
+        It consists of any printable, seven-bit ASCII characters up to 255 
+        characters in length."
+    DEFVAL { ''H }    -- the empty string
+    ::= { tmnxSysRollbackInfo 13 }
+
+tmnxSysRollbackFileDelete    OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackFileDelete specifies whether to delete 
+         the rollback file specified by tmnxSysRollbackIndex.
+         
+         When SET to the value of 'doAction' the system will delete the
+         rollback file specified by tmnxSysRollbackIndex. 
+         
+         This variable must be set along with tmnxSysRollbackIndex to specify
+         the specific rollback file to delete.
+
+         An SNMP GET request on this object should return 'notApplicable'." 
+    DEFVAL { notApplicable }
+    ::= {tmnxSysRollbackInfo 14 }
+
+tmnxSysRollbackFileDeleteResult OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none (1),
+                    inProgress (2),
+                    success (3),
+                    failed (4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackFileDeleteResult indicates the result of
+         the last tmnxSysRollbackFileDelete action.
+
+         none(1)            None of the following apply
+         inProgress(2)      The action is still in progress
+         success(3)         The action completed successfully
+         failed(4)          The action failed"
+    ::= {tmnxSysRollbackInfo 15 }
+
+tmnxSysRollbackAbortRevert    OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackAbortRevert indicates whether to abort the
+         rollback revert that's currently in progress.
+         
+         When SET to the value of 'doAction' the system will abort the active
+         rollback revert. This will leave the system in an unknown state, so it
+         should be used with care.
+
+         An SNMP GET request on this object should return 'notApplicable'." 
+    DEFVAL { notApplicable }
+    ::= {tmnxSysRollbackInfo 16 }
+
+tmnxSysRollbackRescueLocation   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..180))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackRescueLocation specifies the destination
+         file path or file-URL where the rollback rescue configuration file 
+         will be saved.  If the value of tmnxSysRollbackRescueLocation is 
+         an empty string the system will attempt to store the file in the 
+         best available location locally, for example compact flash 1 or 2 
+         if either is present."
+    DEFVAL { ''H }  -- empty string
+    ::= { tmnxSysRollbackInfo 17 }
+
+tmnxSysRollbackRescueRevert    OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackRescueRevert indicates whether to 
+         revert the rollback rescue file located in tmnxSysRollbackRescueLocation.
+         
+         When SET to the value of 'doAction' the system will revert the
+         rollback rescue file.
+         
+         An SNMP GET request on this object should return 'notApplicable'." 
+    DEFVAL { notApplicable }
+    ::= {tmnxSysRollbackInfo 18 }
+
+tmnxSysRollbackRescueSave    OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackRescueSave indicates whether to save 
+         the existing configuration in the rollback rescue file located in 
+         tmnxSysRollbackRescueLocation.
+         
+         When SET to the value of 'doAction' the system will save the
+         configuration to the rollback rescue file.
+         
+         An SNMP GET request on this object should return 'notApplicable'."
+    DEFVAL { notApplicable }
+    ::= {tmnxSysRollbackInfo 19 }
+
+
+tmnxSysRollbackRescueDelete    OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackRescueDelete specifies whether to delete 
+         the rollback rescue file located in tmnxSysRollbackRescueLocation. 
+         
+         When SET to the value of 'doAction' the system will delete the
+         rollback rescue file.
+         
+         An SNMP GET request on this object should return 'notApplicable'." 
+    DEFVAL { notApplicable }
+    ::= {tmnxSysRollbackInfo 20 }
+
+tmnxSysRollbackRescueSaveRes OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none (1),
+                    inProgress (2),
+                    success (3),
+                    failed (4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackRescueSaveRes indicates the result 
+         of the last tmnxSysRollbackRescueSave action.
+
+         none(1)            None of the following apply
+         inProgress(2)      The action is still in progress
+         success(3)         The action completed successfully
+         failed(4)          The action failed"
+    ::= {tmnxSysRollbackInfo 21 }
+
+tmnxSysRollbackRescueRevertRes OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none (1),
+                    inProgress (2),
+                    success (3),
+                    failed (4),
+                    interrupted (5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackRescueRevertRes indicates the result 
+         of the last tmnxSysRollbackRescueRevert action.
+
+         none(1)            None of the following apply
+         inProgress(2)      The action is still in progress
+         success(3)         The action completed successfully
+         failed(4)          The action failed
+         interrupted (5)    The action was interrupted"
+    ::= {tmnxSysRollbackInfo 22 }
+
+tmnxSysRollbackRescueDeleteRes OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none (1),
+                    inProgress (2),
+                    success (3),
+                    failed (4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackRescueDeleteRes indicates the result of
+         the last tmnxSysRollbackRescueDelete action.
+
+         none(1)            None of the following apply
+         inProgress(2)      The action is still in progress
+         success(3)         The action completed successfully
+         failed(4)          The action failed"
+    ::= {tmnxSysRollbackInfo 23 }
+
+
+tmnxSysRollbackRescueSavedTime   OBJECT-TYPE
+    SYNTAX      DateAndTime 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The value of tmnxSysRollbackRescueSavedTime indicates the timestamp  
+          the last rollback rescue save on the system is completed."
+    ::= { tmnxSysRollbackInfo 24 }
+
+tmnxSysRollbackRescueRevStTime   OBJECT-TYPE
+    SYNTAX      DateAndTime 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The value of tmnxSysRollbackRescueRevStTime indicates the 
+          timestamp the last rescue rollback file reverted on the system 
+          is initiated."
+    ::= { tmnxSysRollbackInfo 25}
+
+tmnxSysRollbackRescueRevEdTime   OBJECT-TYPE
+    SYNTAX      DateAndTime 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The value of tmnxSysRollbackRescueRevEdTime indicates the 
+          timestamp the last rollback rescue revert on the system is completed."
+    ::= { tmnxSysRollbackInfo 26 }
+
+tmnxSysRollbackRescueRevUser  OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty (SIZE(0..16))
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackRescueRevUser indicates the name of
+         a system user who initiates the last rollback rescue revert."
+    DEFVAL { ''H }    -- the empty string
+    ::= { tmnxSysRollbackInfo 27 }
+
+tmnxSysRollbackRescueSaveComment OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The value of the object tmnxSysRollbackRescueSaveComment specifies
+        a user provided comment related to the rollback rescue file about 
+        to be saved. 
+
+        It consists of any printable, seven-bit ASCII characters up to 255 
+        characters in length."
+    DEFVAL { ''H }    -- the empty string
+    ::= { tmnxSysRollbackInfo 28 }
+
+tmnxSysRollbackRescueAbortRevert    OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackRescueAbortRevert indicates whether to abort the
+         rescue revert that's currently in progress.
+         
+         When SET to the value of 'doAction' the system will abort the active
+         rollback revert. This will leave the system in an unknown state, so it
+         should be used with care.
+
+         An SNMP GET request on this object should return 'notApplicable'." 
+    DEFVAL { notApplicable }
+    ::= {tmnxSysRollbackInfo 29}
+
+tmnxSysRollbackRescueFileExists OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackRescueFileExists indicates whether 
+         a rollback rescue file specified by tmnxSysRollbackRescueLocation  
+         and suffix '.rc' is present.
+
+         A value of 'true' indicates the file is present and a value of 'false' 
+         indicates the file is not present."
+    DEFVAL { false }
+    ::= {tmnxSysRollbackInfo 30}
+
+tmnxSysRollbackMaxLocalFiles OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..50)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackMaxLocalFiles indicates the maximum 
+         number of rollback checkpoint files that can be saved locally 
+         on the compact flash."
+    DEFVAL { 10 }
+    ::= {tmnxSysRollbackInfo 31} 
+
+tmnxSysRollbackMaxRemoteFiles OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..200)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackMaxRemoteFiles indicates the maximum
+         number of rollback checkpoint files that can be saved at a remote ftp
+         location."
+    DEFVAL { 10 }
+    ::= {tmnxSysRollbackInfo 32} 
+
+tmnxSysRollbackTableLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The value of tmnxSysRollbackTableLastChanged indicates the 
+          timestamp of the last configuration changes to any of the rows in 
+          tmnxSysRollbackFileTable."
+    ::= { tmnxSysObjs 18 }
+
+tmnxSysRollbackFileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSysRollbackFileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tmnxSysRollbackFileTable contains information pertaining 
+         to an entry for each rollback checkpoint file.
+
+         If the configured rollback location as specified by 
+         tmnxSysRollbackLocation is on compact flash, this table can have
+         upto a maximum of tmnxSysRollbackMaxLocalFiles.
+
+         If the configured rollback location as specified by 
+         tmnxSysRollbackLocation is a remote ftp location, this table can have
+         upto a maximum of tmnxSysRollbackMaxRemoteFiles."
+    ::= { tmnxSysObjs 19 }
+
+tmnxSysRollbackFileEntry OBJECT-TYPE
+    SYNTAX      TmnxSysRollbackFileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry contains information about a rollback checkpoint file."
+    INDEX { tmnxSysRollbackFileIndex }
+    ::= { tmnxSysRollbackFileTable 1 }
+
+TmnxSysRollbackFileEntry ::=
+    SEQUENCE {
+        tmnxSysRollbackFileIndex            Unsigned32,
+        tmnxSysRollbackFileCreationTime     DateAndTime,
+        tmnxSysRollbackFileComment          DisplayString, 
+        tmnxSysRollbackFileUserName         TNamedItem,
+        tmnxSysRollbackFileVersion          DisplayString 
+    }
+
+tmnxSysRollbackFileIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..199)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackFileIndex specifies the index of the 
+         rollback checkpoint file."
+    ::= { tmnxSysRollbackFileEntry 1 }
+
+tmnxSysRollbackFileCreationTime   OBJECT-TYPE
+    SYNTAX      DateAndTime 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value of tmnxSysRollbackFileCreationTime indicates the timestamp of 
+        the creation time of this row in tmnxSysRollbackFileTable."
+    ::= { tmnxSysRollbackFileEntry 2 }
+
+tmnxSysRollbackFileComment OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value of the object tmnxSysRollbackFileComment specifies
+        a user provided comment related to a rollback checkpoint file.
+
+        It consists of any printable, seven-bit ASCII characters up to 255 
+        characters in length."
+    ::= { tmnxSysRollbackFileEntry 3 }
+
+tmnxSysRollbackFileUserName  OBJECT-TYPE
+    SYNTAX      TNamedItem (SIZE(1..16))
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackFileUserName indicates the name of
+         a system user who saves this rollback file."
+    ::= { tmnxSysRollbackFileEntry 4 }
+
+tmnxSysRollbackFileVersion   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32)) 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRollbackFileVersion indicates the version number
+         of the software running on the system when the rollback file is saved."
+    ::= { tmnxSysRollbackFileEntry 5 }
+
+
+--
+--  System Booted Boot Options File (BOF) Information
+--
+sysBootedBofInfo    OBJECT IDENTIFIER ::= { tmnxSysObjs 20 }
+
+sbbiLiSeparate    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the currently active (booted) value of li-separate. 
+         This value specifies whether or not a non-LI user has access to 
+         Lawful Intercept (LI) information. When sbbiLiSeparate has a value 
+         of 'true', a user who does not have the TMETRA-SECURITY-MIB::
+         tmnxUserAccess 'li' bit set will not be allowed to access CLI or 
+         SNMP objects in the 'li' context."
+    ::= { sysBootedBofInfo 1 }
+
+sbbiLiLocalSave      OBJECT-TYPE
+    SYNTAX      TruthValue      
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the currently active (booted) value of 
+         li-local-save. This value specifies whether or not Lawful
+         Intercept (LI) configuration is allowed to be save to a local
+         file."
+    ::= { sysBootedBofInfo 2 }
+
+
+--
+-- Conformance Information
+--
+tmnxSysCompliances OBJECT IDENTIFIER ::= { tmnxSysConformance 1 }
+tmnxSysGroups      OBJECT IDENTIFIER ::= { tmnxSysConformance 2 }
+
+-- compliance statements
+
+-- tmnxSysCompliance  MODULE-COMPLIANCE
+--    ::= { tmnxSysCompliances 1 }
+
+-- tmnxSysR2r1Compliance  MODULE-COMPLIANCE
+--    ::= { tmnxSysCompliances 2 }
+
+-- tmnxSysV3v0Compliance  MODULE-COMPLIANCE
+--    ::= { tmnxSysCompliances 3 }
+
+tmnxSysV4v0Compliance  MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for management of general system
+             capabilities on Alcatel-Lucent SROS series systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxSysGeneralV3v0Group,
+            tmnxSysTimeV4v0Group,
+            tmnxSysConfigV3v0Group,
+            tmnxSysRadiusServerGroup,
+            tmnxSysTacPlusServerGroup,
+            tmnxSysBofGroup,
+            tmnxSysNotificationV4v0Group,
+            tmnxPersistenceV4v0Group
+        }
+    ::= { tmnxSysCompliances 4 }
+
+tmnxSysV5v0Compliance  MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for management of general system
+             capabilities on Alcatel-Lucent SROS series systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxSysGeneralV3v0Group,
+            tmnxSysTimeV4v0Group,
+            tmnxSysConfigV3v0Group,
+            tmnxSysRadiusServerV5v0Group,
+            tmnxSysTacPlusServerV5v0Group,
+            tmnxSysBofGroup,
+            tmnxSysNotificationV5v0Group,
+            tmnxPersistenceV5v0Group
+        }
+    ::= { tmnxSysCompliances 5 }
+
+tmnxSysV6v0Compliance  MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for management of general system
+             capabilities on Alcatel-Lucent SROS series systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxSysGeneralV3v0Group,
+            tmnxSysTimeV4v0Group,
+            tmnxSysConfigV3v0Group,
+            tmnxSysRadiusServerV5v0Group,
+            tmnxSysTacPlusServerV5v0Group,
+            tmnxSysBofV6v0Group,
+            tmnxSysNotificationV6v0Group,
+            tmnxPersistenceV6v0Group,
+            tmnxSysIpv6MgmtItfV6v0Group,
+            tmnxSysLiV6v0Group
+        }
+    ::= { tmnxSysCompliances 6 }
+
+tmnxSysV7v0Compliance  MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for management of general system
+             capabilities on Alcatel-Lucent SROS series systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxSysGeneralV3v0Group,
+            tmnxSysGeneralV7v0Group,
+            tmnxSysTimeV4v0Group,
+            tmnxSysConfigV3v0Group,
+            tmnxSysRadiusServerV5v0Group,
+            tmnxSysTacPlusServerV5v0Group,
+            tmnxSysBofV6v0Group,
+            tmnxSysNotificationV6v0Group,
+            tmnxPersistenceV6v0Group,
+            tmnxSysIpv6MgmtItfV6v0Group,
+            tmnxSysLiV6v0Group,
+            tmnxSystemCpuMonitorGroup
+        }
+    ::= { tmnxSysCompliances 7 }
+
+tmnxSysV8v0Compliance  MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for management of general system
+             capabilities on Alcatel-Lucent SROS series systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxSysGeneralV3v0Group,
+            tmnxSysGeneralV7v0Group,
+            tmnxSysTimeV4v0Group,
+            tmnxSysConfigV8v0Group,
+            tmnxSysLoginControlV8v0Group,
+            tmnxSysRadiusServerV5v0Group,
+            tmnxSysTacPlusServerV5v0Group,
+            tmnxSysBofV6v0Group,
+            tmnxSysNotificationV6v0Group,
+            tmnxPersistenceV6v0Group,
+            tmnxSysIpv6MgmtItfV6v0Group,
+            tmnxSysLiV6v0Group,
+            tmnxSysIcmpVSV6v1Group,
+            tmnxSysEthInfoGroup,
+            tmnxSystemCpuMonitorGroup
+        }
+    ::= { tmnxSysCompliances 8 }
+
+tmnxSysV9v0Compliance  MODULE-COMPLIANCE
+    STATUS  obsolete 
+    DESCRIPTION
+            "The compliance statement for management of general system
+             capabilities on Alcatel-Lucent SROS series systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxPersistenceV9v0Group,
+            tmnxSysBofV6v0Group,
+            tmnxSysConfigV8v0Group,
+            tmnxSysEthInfoGroup,
+            tmnxSysGeneralV3v0Group,
+            tmnxSysGeneralV7v0Group,
+            tmnxSysIcmpVSV6v1Group,
+            tmnxSysIpv6MgmtItfV6v0Group,
+            tmnxSysLiFilterGroup,
+            tmnxSysLiV6v0Group,
+            tmnxSysLoginControlSecGroup,
+            tmnxSysLoginControlV8v0Group,
+            tmnxSysLoginControlV9v0Group,
+            tmnxSysNotificationV6v0Group,
+            tmnxSysNotificationV9v0Group,
+            tmnxSysRadiusServerV5v0Group,
+            tmnxSysRollbackV9v0Group,
+            tmnxSysTacPlusServerV5v0Group,
+            tmnxSysTimeV4v0Group,
+            tmnxSystemCpuMonitorGroup,
+            tmnxSysCertGroup,
+            tmnxSysNotificationRBGroup
+        }
+    ::= { tmnxSysCompliances 9 }
+
+tmnxSysBootedBofCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for currently active (booted) BOF 
+             capabilities on Alcatel-Lucent SROS series systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxSysBootedBofGroup
+        }
+    ::= { tmnxSysCompliances 10 }
+
+tmnxSysV10v0Compliance  MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for management of general system
+             capabilities on Alcatel-Lucent SROS series systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxPersistenceV9v0Group,
+            tmnxSysBofV6v0Group,
+            tmnxSysConfigV8v0Group,
+            tmnxSysEthInfoGroup,
+            tmnxSysGeneralV3v0Group,
+            tmnxSysGeneralV7v0Group,
+            tmnxSysIcmpVSV6v1Group,
+            tmnxSysIpv6MgmtItfV6v0Group,
+            tmnxSysLiFilterGroup,
+            tmnxSysLiV6v0Group,
+            tmnxSysLoginControlSecGroup,
+            tmnxSysLoginControlV8v0Group,
+            tmnxSysLoginControlV9v0Group,
+            tmnxSysNotificationV6v0Group,
+            tmnxSysNotificationV9v0Group,
+            tmnxSysNotificationV10v0Group,
+            tmnxSysRadiusServerV5v0Group,
+            tmnxSysRollbackV9v0Group,
+            tmnxSysTacPlusServerV5v0Group,
+            tmnxSysTimeV4v0Group,
+            tmnxSystemCpuMonitorGroup,
+            tmnxSysCertGroup,
+            tmnxSysRollbackRescueGroup,
+            tmnxSysNotificationRBGroup
+        }
+    ::= { tmnxSysCompliances 11 }
+-- units of conformance
+
+-- tmnxSysGeneralGroup   OBJECT-GROUP
+--    ::= { tmnxSysGroups 1 }
+
+-- tmnxSysTimeGroup     OBJECT-GROUP
+--    ::= { tmnxSysGroups 2 }
+
+-- tmnxSysConfigGroup     OBJECT-GROUP
+--    ::= { tmnxSysGroups 3 }
+
+tmnxSysRadiusServerGroup     OBJECT-GROUP
+    OBJECTS {   radiusOperStatus,
+                radiusServerAddress,
+                radiusServerOperStatus
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of RADIUS servers
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 4 }
+
+tmnxSysTacPlusServerGroup     OBJECT-GROUP
+    OBJECTS {   tacplusOperStatus,
+                tacplusServerAddress,
+                tacplusServerOperStatus
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of TACACS+ servers
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 5 }
+
+-- tmnxSysNotifyObjsGroup   OBJECT-GROUP
+--    ::= { tmnxSysGroups 6 }
+
+-- tmnxSysNotificationGroup NOTIFICATION-GROUP
+--    ::= { tmnxSysGroups 7 }
+
+tmnxSysBofGroup     OBJECT-GROUP
+    OBJECTS {   sbiActiveIpAddr,
+                sbiActiveIpMask,
+                sbiStandbyIpAddr,
+                sbiStandbyIpMask,
+                sbiPrimaryImage,
+                sbiSecondaryImage,
+                sbiTertiaryImage,
+                sbiPrimaryConfigFile,
+                sbiSecondaryConfigFile,
+                sbiTertiaryConfigFile,
+                sbiPersist,
+                sbiConsoleSpeed,
+                sbiAutoNegotiate,
+                sbiSpeed,
+                sbiDuplex,
+                sbiPrimaryDns,
+                sbiSecondaryDns,
+                sbiTertiaryDns,
+                sbiDnsDomain,
+                sbiWait,
+                sbiStaticRouteNextHop,
+                sbiStaticRouteRowStatus
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of the Boot
+         Options File (BOF) on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 8 }
+
+-- tmnxSysNotifyObjsR2r1Group   OBJECT-GROUP
+--    ::= { tmnxSysGroups 9 }
+
+-- tmnxSysNotificationR2r1Group NOTIFICATION-GROUP
+--    ::= { tmnxSysGroups  10 }
+
+-- tmnxSysConfigR2r1Group     OBJECT-GROUP
+--    ::= { tmnxSysGroups 11 }
+
+tmnxSysConfigV3v0Group     OBJECT-GROUP
+    OBJECTS {   ssiSaveConfig,
+                ssiSyncMode,
+                ssiSyncForce,
+                ssiSyncStatus,
+                ssiSyncConfigLastTime,
+                ssiSyncBootEnvLastTime,
+                ssiConfigMaxBackupRevisions,
+                ssiSaveConfigResult,
+                ssiSaveBof,
+                ssiSaveBofResult,
+                ssiSaveConfigDest,
+                ssiSaveConfigDetail,
+                ssiRedFailoverTime,
+                ssiRedFailoverReason,
+                sbiConfigStatus,
+                sbiPersistStatus,
+                sbiPersistIndex,
+                sbiSnmpdAdminStatus,
+                sbiSnmpdOperStatus,
+                sbiSnmpdMaxPktSize,
+                sbiSnmpdPortNum,
+                sbiBootConfigOKScript,
+                sbiConfigOKScriptStatus,
+                sbiBootConfigFailScript,
+                sbiConfigFailScriptStatus,
+                sbiRedSwitchoverScript,
+                sbiRedSwitchoverScriptStatus,
+                slcFtpInboundMaxSessions,
+                slcTelnetInboundMaxSessions,
+                slcTelnetOutboundMaxSessions,
+                slcPreLoginMessage,
+                slcPreLoginMessageInclName,
+                slcMessageOfTheDay,
+                slcMessageOfTheDayType,
+                slcLoginBanner,
+                sysLACPSystemPriority,
+                slcLoginExponentialBackOff
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of boot-up
+         configuration and synchronization of active and standby systems
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 12 }
+
+-- tmnxPersistenceDhcpV3v0Group  OBJECT-GROUP
+--    ::= { tmnxSysGroups 13 }
+
+-- tmnxSysNotificationV3v0Group NOTIFICATION-GROUP
+--    ::= { tmnxSysGroups  14 }
+
+tmnxSysGeneralV3v0Group  OBJECT-GROUP
+    OBJECTS {   sgiCpuUsage,
+                sgiMemoryUsed,
+                sgiMemoryAvailable,
+                sgiMemoryPoolAllocated,
+                sgiSwMajorVersion,
+                sgiSwMinorVersion,
+                sgiSwVersionModifier
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of general system
+         capabilities on Alcatel-Lucent SROS series systems, 3.0 Release."
+    ::= { tmnxSysGroups 15 }
+
+-- tmnxSysTimeV3v0Group  OBJECT-GROUP
+--    ::= { tmnxSysGroups 16 }
+
+tmnxSysObsoleteGroup    OBJECT-GROUP
+    OBJECTS {
+                stiSummerZoneStartDate,
+                stiSummerZoneEndDate,
+                tacplusServerAddress,
+                radiusServerAddress
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects in TIMETRA-SYSTEM-MIB which are obsoleted."
+    ::= { tmnxSysGroups 17 }
+
+tmnxPersistenceV4v0Group  OBJECT-GROUP
+    OBJECTS {
+                spiDhcpL2PersistenceFileLocation,
+                spiDhcpL2PersistenceDescription,
+                spiDhcpL3PersistenceFileLocation,
+                spiDhcpL3PersistenceDescription,
+                spiSubMgmtPersistenceFileLocation,
+                spiSubMgmtPersistenceDescription
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of persistency accross
+         system reboot on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 18 }
+
+tmnxSysTimeV4v0Group  OBJECT-GROUP
+    OBJECTS {   stiDateAndTime,
+                stiActiveZone,
+                stiHoursOffset,
+                stiMinutesOffset,
+                stiZoneType,
+                stiSummerZoneRowStatus,
+                stiSummerZoneOffset,
+                stiSummerZoneStartDay,
+                stiSummerZoneStartWeek,
+                stiSummerZoneStartMonth,
+                stiSummerZoneStartHour,
+                stiSummerZoneStartMinute,
+                stiSummerZoneEndDay,
+                stiSummerZoneEndWeek,
+                stiSummerZoneEndMonth,
+                stiSummerZoneEndHour,
+                stiSummerZoneEndMinute,
+                sntpState,
+                sntpServerRowStatus,
+                sntpServerVersion,
+                sntpServerPreference,
+                sntpServerInterval,
+                sntpAdminState,
+                sntpOperStatus
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of time
+         on Alcatel-Lucent SROS series systems, 4.0 Release."
+    ::= { tmnxSysGroups 19 }
+
+tmnxSysNotifyObjsR4r0Group   OBJECT-GROUP
+    OBJECTS {   tmnxNotifyRow,
+                tmnxNotifyRowAdminState,
+                tmnxNotifyRowOperState,
+                tmnxMemoryModule,
+                tmnxModuleMallocSize,
+                tmnxDroppedTrapID,
+                tmnxTrapDroppedReasonCode,
+                tmnxTrapDroppedEntryID,
+                tmnxNotifyEntryOID,
+                tmnxSnmpdErrorMsg,
+                tmnxSysTimeSetBy
+           }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting notifications for general system
+         capabilities on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 20 }
+
+tmnxSysNotificationV4v0Group NOTIFICATION-GROUP
+    NOTIFICATIONS   {   stiDateAndTimeChanged,
+                        ssiSaveConfigSucceeded,
+                        ssiSaveConfigFailed,
+                        sbiBootConfig,
+                        sbiBootSnmpd,
+                        radiusServerOperStatusChange,
+                        radiusOperStatusChange,
+                        tmnxConfigModify,
+                        tmnxConfigCreate,
+                        tmnxConfigDelete,
+                        tmnxStateChange,
+                        tmnxModuleMallocFailed,
+                        tmnxTrapDropped,
+                        ssiSyncConfigOK,
+                        ssiSyncConfigFailed,
+                        ssiSyncBootEnvOK,
+                        ssiSyncBootEnvFailed,
+                        sntpTimeDiffExceedsThreshold,
+                        tacplusServerOperStatusChange,
+                        tacplusOperStatusChange,
+                        tmnxSnmpdError,
+                        tmnxSsiMismatch,
+                        tmnxSnmpdStateChange,
+                        ssiRedStandbySyncing,
+                        ssiRedStandbyReady,
+                        ssiRedStandbySyncLost,
+                        ssiRedSwitchover,
+                        ssiRedCpmActive,
+                        ssiRedSingleCpm,
+                        persistencyClosedAlarmRaised,
+                        persistencyClosedAlarmCleared,
+                        tmnxSntpOperChange,
+                        tmnxSysTimeSet
+                    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of notifications supporting the general system
+         capabilities on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 21 }
+
+tmnxSysNotifyObjsV5v0Group   OBJECT-GROUP
+    OBJECTS {   
+                tmnxPersistencyClient,
+                tmnxPersistencyFileLocator,
+                tmnxPersistencyNotifyMsg,
+                tmnxPersistenceAffectedCpm,
+                tmnxNotifyRow,
+                tmnxNotifyRowAdminState,
+                tmnxNotifyRowOperState,
+                tmnxMemoryModule,
+                tmnxModuleMallocSize,
+                tmnxDroppedTrapID,
+                tmnxTrapDroppedReasonCode,
+                tmnxTrapDroppedEntryID,
+                tmnxNotifyEntryOID,
+                tmnxSnmpdErrorMsg,
+                tmnxSysTimeSetBy,
+                tmnxFtpFailureMsg,
+                tmnxFtpFailureDestAddressType,
+                tmnxFtpFailureDestAddress
+           }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting notifications for general system
+         capabilities on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 22 }
+
+tmnxSysNotificationV5v0Group NOTIFICATION-GROUP
+    NOTIFICATIONS   {   stiDateAndTimeChanged,
+                        ssiSaveConfigSucceeded,
+                        ssiSaveConfigFailed,
+                        sbiBootConfig,
+                        sbiBootSnmpd,
+                        radiusOperStatusChange,
+                        tmnxConfigModify,
+                        tmnxConfigCreate,
+                        tmnxConfigDelete,
+                        tmnxStateChange,
+                        tmnxModuleMallocFailed,
+                        tmnxTrapDropped,
+                        ssiSyncConfigOK,
+                        ssiSyncConfigFailed,
+                        ssiSyncBootEnvOK,
+                        ssiSyncBootEnvFailed,
+                        sntpTimeDiffExceedsThreshold,
+                        tacplusOperStatusChange,
+                        tmnxSnmpdError,
+                        tmnxSsiMismatch,
+                        tmnxSnmpdStateChange,
+                        ssiRedStandbySyncing,
+                        ssiRedStandbyReady,
+                        ssiRedStandbySyncLost,
+                        ssiRedSwitchover,
+                        ssiRedCpmActive,
+                        ssiRedSingleCpm,
+                        persistencyClosedAlarmRaised,
+                        persistencyClosedAlarmCleared,
+                        tmnxSntpOperChange,
+                        tmnxSysTimeSet,
+                        tmnxFtpClientFailure,
+                        tacplusInetSrvrOperStatusChange,
+                        radiusInetServerOperStatusChange,
+                        persistencyEventReport
+                    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of notifications supporting the general system
+         capabilities on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 23 }
+
+tmnxSysObsoleteNotificationV5v0Group    NOTIFICATION-GROUP
+    NOTIFICATIONS {
+                tacplusServerOperStatusChange,
+                radiusServerOperStatusChange
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of notification objects in TIMETRA-SYSTEM-MIB which are
+         obsoleted."
+    ::= { tmnxSysGroups 24}
+
+tmnxSysTacPlusServerV5v0Group     OBJECT-GROUP
+    OBJECTS {   tacplusOperStatus,
+                tacplusServerOperStatus,
+                tacPlusServerInetAddressType,
+                tacPlusServerInetAddress
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of TACACS+ servers
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 25 }
+
+tmnxSysRadiusServerV5v0Group     OBJECT-GROUP
+    OBJECTS {   radiusOperStatus,
+                radiusServerOperStatus,
+                radiusServerInetAddressType,
+                radiusServerInetAddress
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of RADIUS servers
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 26 }
+
+tmnxSysObsoleteV5v0Group    OBJECT-GROUP
+    OBJECTS {
+                stiSummerZoneStartDate,
+                stiSummerZoneEndDate,
+                tacplusServerAddress,
+                radiusServerAddress,
+                spiDhcpL2PersistenceFileLocation,
+                spiDhcpL2PersistenceDescription,
+                spiDhcpL3PersistenceFileLocation,
+                spiDhcpL3PersistenceDescription
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in TIMETRA-SYSTEM-MIB which are obsoleted."
+    ::= { tmnxSysGroups 27 }
+
+tmnxPersistenceV5v0Group  OBJECT-GROUP
+    OBJECTS {
+                spiSubMgmtPersistenceFileLocation,
+                spiSubMgmtPersistenceDescription
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of persistency accross
+         system reboot on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 28 }
+
+tmnxSysIpv6MgmtItfV6v0Group     OBJECT-GROUP
+    OBJECTS {
+                sbiActiveIPv6Addr,
+                sbiActiveIPv6PfxLen,
+                sbiStandbyIPv6Addr,
+                sbiStandbyIPv6PfxLen,
+                sbiPrimaryDnsIPv6Addr,
+                sbiSecondaryDnsIPv6Addr,
+                sbiTertiaryDnsIPv6Addr,
+                sbiStaticRouteIPv6NextHop,
+                sbiStaticRouteIPv6RowStatus,
+                sysDNSInfoLastChanged,
+                sysDNSAddressResolvePref
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting ipv6 management interface
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 29 }
+
+tmnxPersistenceV6v0Group  OBJECT-GROUP
+    OBJECTS {
+                spiSubMgmtPersistenceFileLocation,
+                spiSubMgmtPersistenceDescription,
+                spiDhcpSrvPersistenceFileLoc,
+                spiDhcpSrvPersistenceDescr
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of persistency accross
+         system reboot on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 30 }
+
+tmnxSysBofV6v0Group     OBJECT-GROUP
+    OBJECTS {   sbiActiveIpAddr,
+                sbiActiveIpMask,
+                sbiStandbyIpAddr,
+                sbiStandbyIpMask,
+                sbiPrimaryImage,
+                sbiSecondaryImage,
+                sbiTertiaryImage,
+                sbiPrimaryConfigFile,
+                sbiSecondaryConfigFile,
+                sbiTertiaryConfigFile,
+                sbiPersist,
+                sbiConsoleSpeed,
+                sbiAutoNegotiate,
+                sbiSpeed,
+                sbiDuplex,
+                sbiPrimaryDns,
+                sbiSecondaryDns,
+                sbiTertiaryDns,
+                sbiDnsDomain,
+                sbiWait,
+                sbiStaticRouteNextHop,
+                sbiStaticRouteRowStatus,
+                sbiLiSeparate,
+                sbiLiLocalSave
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the Boot
+         Options File (BOF) on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 31 }
+
+tmnxSysNotificationV6v0Group NOTIFICATION-GROUP
+    NOTIFICATIONS   {   stiDateAndTimeChanged,
+                        ssiSaveConfigSucceeded,
+                        ssiSaveConfigFailed,
+                        sbiBootConfig,
+                        sbiBootSnmpd,
+                        sbiBootConfigFailFileError,
+                        sbiBootConfigOKFileError,
+                        sbiBootLiConfig,
+                        radiusOperStatusChange,
+                        tmnxConfigModify,
+                        tmnxConfigCreate,
+                        tmnxConfigDelete,
+                        tmnxStateChange,
+                        tmnxModuleMallocFailed,
+                        tmnxTrapDropped,
+                        ssiSyncConfigOK,
+                        ssiSyncConfigFailed,
+                        ssiSyncBootEnvOK,
+                        ssiSyncBootEnvFailed,
+                        sntpTimeDiffExceedsThreshold,
+                        tacplusOperStatusChange,
+                        tmnxSnmpdError,
+                        tmnxSsiMismatch,
+                        tmnxSnmpdStateChange,
+                        ssiRedStandbySyncing,
+                        ssiRedStandbyReady,
+                        ssiRedStandbySyncLost,
+                        ssiRedSwitchover,
+                        ssiRedCpmActive,
+                        ssiRedSingleCpm,
+                        persistencyClosedAlarmRaised,
+                        persistencyClosedAlarmCleared,
+                        tmnxSntpOperChange,
+                        tmnxSysTimeSet,
+                        tmnxFtpClientFailure,
+                        tacplusInetSrvrOperStatusChange,
+                        radiusInetServerOperStatusChange,
+                        persistencyEventReport
+                    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the general system
+         capabilities on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 32 }
+
+tmnxSysLiV6v0Group  OBJECT-GROUP
+    OBJECTS {
+                sliConfigStatus,
+                sliSaveConfig,
+                sliSaveConfigResult,
+                sliConfigLastModified,
+                sliConfigLastSaved
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Lawful Intercept
+         configuration on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 33 }
+
+tmnxSysNotifyObjsV6v0Group  OBJECT-GROUP
+    OBJECTS {   tmnxNotifyObjectName,
+                tmnxSyncFailureReason
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects added in 6.0 release to support system
+         notifications."
+    ::= { tmnxSysGroups 34 }
+
+tmnxSysGeneralV7v0Group  OBJECT-GROUP
+    OBJECTS {   sgiSnmpInGetBulks,
+                sgiKbMemoryUsed,
+                sgiKbMemoryAvailable,
+                sgiKbMemoryPoolAllocated
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of general system
+         capabilities on Alcatel-Lucent SROS series systems added in 
+         7.0 Release."
+    ::= { tmnxSysGroups 35 }
+
+tmnxSysIcmpVSV6v1Group  OBJECT-GROUP
+    OBJECTS {   sysIcmpVSEnhancement
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of ICMP vendor specific 
+         enhancement capabilities on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 36 }
+
+tmnxSysConfigV8v0Group     OBJECT-GROUP
+    OBJECTS {   ssiSaveConfig,
+                ssiSyncMode,
+                ssiSyncForce,
+                ssiSyncStatus,
+                ssiSyncConfigLastTime,
+                ssiSyncBootEnvLastTime,
+                ssiConfigMaxBackupRevisions,
+                ssiSaveConfigResult,
+                ssiSaveBof,
+                ssiSaveBofResult,
+                ssiSaveConfigDest,
+                ssiSaveConfigDetail,
+                ssiRedFailoverTime,
+                ssiRedFailoverReason,
+                sbiConfigStatus,
+                sbiPersistStatus,
+                sbiPersistIndex,
+                sbiSnmpdAdminStatus,
+                sbiSnmpdOperStatus,
+                sbiSnmpdMaxPktSize,
+                sbiSnmpdPortNum,
+                sbiBootConfigOKScript,
+                sbiConfigOKScriptStatus,
+                sbiBootConfigFailScript,
+                sbiConfigFailScriptStatus,
+                sbiRedSwitchoverScript,
+                sbiRedSwitchoverScriptStatus,
+                sysLACPSystemPriority
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of boot-up
+         configuration and synchronization of active and standby systems
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 37 }
+
+tmnxSysLoginControlV8v0Group    OBJECT-GROUP
+    OBJECTS {   slcFtpInboundMaxSessions,
+                slcTelnetInboundMaxSessions,
+                slcTelnetOutboundMaxSessions,
+                slcPreLoginMessage,
+                slcPreLoginMessageInclName,
+                slcMessageOfTheDay,
+                slcMessageOfTheDayType,
+                slcLoginBanner,
+                slcLoginExponentialBackOff,
+                slcTelnetGracefulShutdown,
+                slcSSHGracefulShutdown
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of login control
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 38 }
+
+tmnxSysEthInfoGroup OBJECT-GROUP
+    OBJECTS {
+               sysNewQinqUntaggedSap
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Ethernet Info
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 39 }
+
+tmnxPersistenceV9v0Group  OBJECT-GROUP
+    OBJECTS {
+                spiSubMgmtPersistenceFileLocation,
+                spiSubMgmtPersistenceDescription,
+                spiDhcpSrvPersistenceFileLoc,
+                spiDhcpSrvPersistenceDescr,
+                spiNatFwdPersistenceFileLoc,
+                spiNatFwdPersistenceDescr,
+                spiAAPersistenceFileLoc,
+                spiAAPersistenceDescr
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of persistency accross
+         system reboot on Alcatel-Lucent SROS series systems release 9.0."
+    ::= { tmnxSysGroups 40 }
+
+
+tmnxSysLoginControlSecGroup    OBJECT-GROUP
+    OBJECTS {
+                slcTelnetMinTTLValue,
+                slcSSHMinTTLValue
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of login control
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 41 }
+
+tmnxSysLiFilterGroup  OBJECT-GROUP
+    OBJECTS {
+                sliFilterLock
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Lawful Intercept
+         configuration on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 42 }
+
+
+tmnxSysNotificationV9v0Group NOTIFICATION-GROUP
+    NOTIFICATIONS   {   
+        persistenceRestoreProblem,
+        tmnxSysRollbackStarted,
+        tmnxSysRollbackStatusChange,
+        tmnxSysRollbackSaveStatusChange,
+        tmnxSysRollbackFileDeleteStatus,
+        ssiSyncRollbackOK,
+        ssiSyncRollbackFailed,
+        ssiSyncCertOK,
+        ssiSyncCertFailed
+                    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the general system
+         capabilities added in release 9.0 of SROS."
+    ::= { tmnxSysGroups 43 }
+
+tmnxSysRollbackV9v0Group     OBJECT-GROUP
+    OBJECTS { 
+              tmnxSysRollbackIndex,
+              tmnxSysRollbackStart,
+              tmnxSysRollbackResult,
+              tmnxSysRollbackSave,
+              tmnxSysRollbackSaveResult,
+              tmnxSysRollbackLocation,
+              tmnxSysRollbackRevertIndex,
+              tmnxSysRollbackRevertEndTime,
+              tmnxSysRollbackTableLastChanged,
+              tmnxSysRollbackFileCreationTime,
+              tmnxSysRollbackFileComment,
+              tmnxSysRollbackFileUserName,
+              tmnxSysRollbackSavedTime,
+              ssiSyncRollbackLastTime,
+              tmnxSysRollbackRevertStartTime,
+              tmnxSysRollbackRevertUserName,
+              tmnxSysRollbackRevertFilename,
+              tmnxSysRollbackSaveComment,
+              tmnxSysRollbackAbortRevert,
+              tmnxSysRollbackFileVersion,
+              tmnxSysRollbackFileDelete,
+              tmnxSysRollbackFileDeleteResult,
+              ssiSyncRollbackMode,
+              ssiSyncRollbackForce,
+              ssiSyncRollbackStatus
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the Rollback Files 
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 44 }
+
+tmnxSysLoginControlV9v0Group    OBJECT-GROUP
+    OBJECTS {
+                slcSSHInboundMaxSessions,
+                slcSSHOutboundMaxSessions
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of login control
+         on Alcatel-Lucent SROS series systems, added in release 9.0."
+    ::= { tmnxSysGroups 45 }
+
+tmnxSystemCpuMonitorGroup        OBJECT-GROUP
+    OBJECTS {
+                tmnxSysCpuMonCpuIdle,
+                tmnxSysCpuMonBusyCoreUtil,
+                tmnxSysCpuMonBusyGroupName,
+                tmnxSysCpuMonBusyGroupUtil
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects, added in release 7.0, used for monitoring system
+         CPU utilization on Alcatel SROS series systems."
+    ::= { tmnxSysGroups 46 }
+
+tmnxSysCertGroup OBJECT-GROUP
+    OBJECTS {
+       ssiSyncCertForce,  
+       ssiSyncCertLastTime,  
+       ssiSyncCertMode,  
+       ssiSyncCertStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the synchronization of 
+         certificate Files on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 47 }
+
+tmnxSysBootedBofGroup OBJECT-GROUP
+    OBJECTS {
+       sbbiLiSeparate,  
+       sbbiLiLocalSave
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects giving the value of the currently active 
+         (booted) Boot Options File (BOF) parameters on Alcatel-Lucent SROS 
+         series systems."
+    ::= { tmnxSysGroups 48 }
+
+tmnxSysRollbackRescueGroup     OBJECT-GROUP
+    OBJECTS { 
+              tmnxSysRollbackRescueLocation,
+              tmnxSysRollbackRescueSave,
+              tmnxSysRollbackRescueRevert,
+              tmnxSysRollbackRescueDelete,
+              tmnxSysRollbackRescueSaveRes,
+              tmnxSysRollbackRescueRevertRes,
+              tmnxSysRollbackRescueDeleteRes,
+              tmnxSysRollbackRescueSavedTime,
+              tmnxSysRollbackRescueRevStTime,
+              tmnxSysRollbackRescueRevEdTime,
+              tmnxSysRollbackRescueRevUser,
+              tmnxSysRollbackRescueSaveComment,
+              tmnxSysRollbackRescueAbortRevert,
+              tmnxSysRollbackRescueFileExists,
+              tmnxSysRollbackMaxLocalFiles,
+              tmnxSysRollbackMaxRemoteFiles
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the Rollback Rescue file 
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 49 }
+
+tmnxSysNotificationV10v0Group NOTIFICATION-GROUP
+    NOTIFICATIONS   {   
+        persistencyFileSysThresRaised,
+        persistencyFileSysThresCleared,
+        tmnxSysExecStarted,
+        tmnxSysExecFinished
+                    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the general system
+         capabilities added in release 10.0 of SROS."
+    ::= { tmnxSysGroups 50 }
+
+
+tmnxSysNotifyObjsV10v0Group OBJECT-GROUP
+    OBJECTS {
+              tmnxSysRollbackFileType,
+              tmnxSysExecScript,
+              tmnxSysExecResult
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of accessible-for-notify objects supporting notifications
+         on Alcatel-Lucent SROS series systems added in SROS release 10.0."
+    ::= { tmnxSysGroups 51 }
+    
+tmnxSysNotificationRBGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+            tmnxSysRollbackSaveStarted,
+            tmnxSysRollbackDeleteStarted,
+            tmnxSysNvsysFileError
+           }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the general system
+         capabilities added in Alcatel-Lucent SROS series systems."
+    ::= { tmnxSysGroups 52 }
+
+tmnxSysNotifyObjsGenGroup OBJECT-GROUP
+    OBJECTS {
+              tmnxSysFileErrorType
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of accessible-for-notify objects supporting notifications
+         on Alcatel-Lucent SROS series systems added in SROS."
+    ::= { tmnxSysGroups 53 }
+END

@@ -9,6 +9,7 @@ class MysqlAuthorizer extends AuthorizerBase
 {
     protected static $HAS_AUTH_USERMANAGEMENT = 1;
     protected static $CAN_UPDATE_USER = 1;
+    protected static $CAN_UPDATE_PASSWORDS = 1;
 
     public function authenticate($username, $password)
     {
@@ -55,37 +56,22 @@ class MysqlAuthorizer extends AuthorizerBase
          * user is explicitly prohibited to do so.
          */
 
-        if (empty($username) || !$this->userExists($username)) {
+        if (!static::$CAN_UPDATE_PASSWORDS) {
+            return 0;
+        } elseif (empty($username) || !$this->userExists($username)) {
             return 1;
         } else {
             return dbFetchCell('SELECT can_modify_passwd FROM users WHERE username = ?', array($username));
         }
-    }//end passwordscanchange()
-
-
-    /**
-     * From: http://code.activestate.com/recipes/576894-generate-a-salt/
-     * This public function generates a password salt as a string of x (default = 15) characters
-     * ranging from a-zA-Z0-9.
-     * @param $max integer The number of characters in the string
-     * @author AfroSoft <scripts@afrosoft.co.cc>
-     */
-    public function generateSalt($max = 15)
-    {
-        $characterList = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        $i             = 0;
-        $salt          = '';
-        do {
-            $salt .= $characterList{mt_rand(0, strlen($characterList))};
-            $i++;
-        } while ($i <= $max);
-
-        return $salt;
-    }//end generateSalt()
-
+    }
 
     public function changePassword($username, $password)
     {
+        // check if updating passwords is allowed (mostly for classes that extend this)
+        if (!static::$CAN_UPDATE_PASSWORDS) {
+            return 0;
+        }
+
         $hasher    = new PasswordHash(8, false);
         $encrypted = $hasher->HashPassword($password);
         return dbUpdate(array('password' => $encrypted), 'users', '`username` = ?', array($username));
@@ -113,10 +99,8 @@ class MysqlAuthorizer extends AuthorizerBase
 
     public function userExists($username, $throw_exception = false)
     {
-        $return = @dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username));
-        return $return;
-    }//end userExists()
-
+        return (bool)dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username));
+    }
 
     public function getUserlevel($username)
     {

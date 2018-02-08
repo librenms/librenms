@@ -1,12 +1,8 @@
 --
---	Force10 Networks Enterprise MIB Textual Conventions
+--  Dell Networking OS MIB Textual Conventions
 --
---  Force10 Networks, Inc.
---  1440 McCarthy Blvd
---  Milpitas, CA 95035-7438
-
---  This module provides authoritative definitions for Force10
---  enterprise Textual Convention MIB.
+--  This module provides authoritative definitions for Dell Networking OS
+--  Textual Convention MIB.
 --
 --  This module will be extended, as needed.
 --
@@ -23,18 +19,12 @@ IMPORTS
 
 f10TextualConventions MODULE-IDENTITY
 	LAST-UPDATED "200904071200Z"	-- Apr. 7, 2009 12:00:00 GMT
-	ORGANIZATION
-	  "Force10 Networks, Inc."
+ 	ORGANIZATION
+          	  "Dell Inc"
 	CONTACT-INFO
-	  "Force10 Networks, Inc
-       350 Holger Way
-       San Jose, CA 95134
-	   (408) 571-3500
-	   support@force10networks.com
-	   http://www.force10networks.com"
-
+                  "http://www.force10networks.com/support"
 	DESCRIPTION
-		  "The Textual Convention of Force10 Enterprise MIB."
+		  "The Textual Convention of Dell Networking OS MIB."
 
 	REVISION     "200904071200Z"
 	DESCRIPTION
@@ -57,34 +47,53 @@ f10TextualConventions MODULE-IDENTITY
 	F10ChassisType ::= TEXTUAL-CONVENTION
 	    STATUS       current
 	    DESCRIPTION
-	       "FORCE10 chassis type.
-	       "
+	       "Dell Networking OS chassis type."
 	    SYNTAX	INTEGER {
-    		e1200(1),			-- Force10 E1200 16-slot switch/router
-    		e600(2),			-- Force10 E600 9-slot switch/router
-    		e300(3),			-- Force10 E300 8-slot switch/router
-    		e150(4),			-- Force10 E150 8-slot switch/router
-    		e610(5),			-- Force10 E610 9-slot switch/router
-    		c150(6),			-- Force10 C150 6-slot switch/router
-    		c300(7),			-- Force10 C300 10-slot switch/router
-    		e1200i(8),			-- Force10 E1200i 16-slot switch/router
-    		s2410cp(9),			-- Force10 S2410 10GbE switch
-    		s2410p(10),			-- Force10 S2410 10GbE switch
-    		s50(11),			-- Force10 S50 access switch
-    		s50e(12),			-- Force10 S50e access switch
-    		s50v(13),			-- Force10 S50v access switch    		    		
-    		s50nac(14),			-- Force10 S50nac access switch
-    		s50ndc(15),			-- Force10 S50ndc access switch
-    		s25pdc(16),			-- Force10 S25pdc access switch
-    		s25pac(17),			-- Force10 S25pac access switch
-    		s25v(18),			-- Force10 S25v access switch
-    		s25n(19)			-- Force10 S25n access switch
-	    }
+                e1200(1),                       -- Dell Networking OS E1200 16-slot switch/router
+                e600(2),                        -- Dell Networking OS E600 9-slot switch/router
+                e300(3),                        -- Dell Networking OS E300 8-slot switch/router
+                e150(4),                        -- Dell Networking OS E150 8-slot switch/router
+                e610(5),                        -- Dell Networking OS E610 9-slot switch/router
+                c150(6),                        -- Dell Networking OS C150 6-slot switch/router
+                c300(7),                        -- Dell Networking OS C300 10-slot switch/router
+                e1200i(8),                      -- Dell Networking OS E1200i 16-slot switch/router
+                s2410cp(9),                     -- Dell Networking OS S2410 10GbE switch
+                s2410p(10),                     -- Dell Networking OS S2410 10GbE switch
+                s50(11),                        -- Dell Networking OS S50 access switch
+                s50e(12),                       -- Dell Networking OS S50e access switch
+                s50v(13),                       -- Dell Networking OS S50v access switch    		    		
+                s50nac(14),                     -- Dell Networking OS S50nac access switch
+                s50ndc(15),                     -- Dell Networking OS S50ndc access switch
+                s25pdc(16),                     -- Dell Networking OS S25pdc access switch
+                s25pac(17),                     -- Dell Networking OS S25pac access switch
+                s25v(18),                       -- Dell Networking OS S25v access switch
+                s25n(19),                       -- Dell Networking OS S25n access switch
+                s60(20),                        -- Dell Networking OS S60 access switch
+                s55(21),                        -- Dell Networking OS S55 access switch
+                s4810(22),                      -- Dell Networking OS S4810 access switch
+                s6410(23),                      -- Dell Networking OS S6410 access switch
+                z9000(24),                      -- Dell Networking OS Z9000 access switch
+                m-MXL(25),                      -- Dell Networking OS MXL 10/40GE switch/router
+                m-IOA(26),                      -- PowerEdge M I/O Aggregator bridge
+                s4820(27),                      -- Dell Networking OS S4820 access switch
+                s6000(28),                      -- Dell Networking OS S6000 access switch
+                s5000(29),                      -- Dell Networking OS S5000 access switch 
+                s-FN410S-IOA(30),               -- Dell PowerEdge FN 410S IOA
+                s-FN410T-IOA(31),               -- Dell PowerEdge FN 410T IOA
+                s-FN2210S-IOA(32),              -- Dell PowerEdge FN 2210S IOA
+                z9500(33),                      -- Dell Networking OS Z9500 switch
+                s4810on(34),                    -- Dell Networking OS S4810 ON access switch
+                s6000on(35),                    -- Dell Networking OS S6000 ON access switch
+                s4000(36),                      -- Dell Networking OS S4000 access switch
+                c9000(37),			-- Dell Networking OS C9000 switch
+                c1048p(38),                      -- Dell Networking OS C1048P switch
+                s3000(39)                      -- Dell Networking OS S3000 access switch
+            }
 
 	F10InterfaceType ::= TEXTUAL-CONVENTION
 	    STATUS       current
 	    DESCRIPTION
-	       "Force10 interface types supported by the FTOS line cards.
+	       "Interface types supported by the Dell Networking OS line cards.
 	       "
 	    SYNTAX	INTEGER {
     		ethernetManagement(1),  -- Ethernet Mangement port
@@ -95,13 +104,14 @@ f10TextualConventions MODULE-IDENTITY
     		ethernet10GBCopper(6),	-- Ethernet Copper 10 GB interface
     		sonetOC3OC12(7),		-- SONET or OC3/OC12 interface
     		sonetOC48OC96(8),		-- SONET or OC48/OC96 interface
-    		sonetOC192(9)			-- SONET or OC192 interface
+    		sonetOC192(9),			-- SONET or OC192 interface
+	        ethernet40GB(10)                -- Ethernet 40 GB interface
 	    }
 
 	F10SystemPortType ::= TEXTUAL-CONVENTION
 	    STATUS       current
 	    DESCRIPTION
-	       "Port type available in F10 series of products."
+	       "Port type available in Dell Networking OS series of products."
 	    SYNTAX       INTEGER {
     		portSerial(1),
     		portAux(2),
@@ -186,10 +196,12 @@ f10TextualConventions MODULE-IDENTITY
     		port1010EXW10SH(77),    -- Icarus-SFP+ 10 ports LAN/WAN 10GE SFP+ (EH)
     		port1010EXW10SJ(78),    -- Icarus-SFP+-Dual CAM 10 ports LAN/WAN 10GE SFP+ (EJ)
     		port9001E90MJ(79),      -- Athena 90 ports 40M CAM E/FE/GE (EJ)
-    		port5001EXW50SH(80),    -- Artemis-SFP 50 ports LAN 1GE SFP 10M CAM (EH)
-    		port5001EXW50SJ(81),    -- Artemis-SFP 50 ports LAN 1GE SFP 40M CAM (EJ)
-    		port1010EXW10XH(82),    -- Erebus 10 ports 10GE XFP 10M CAM (EH)
-    		port1010EXW10XJ(83),    -- Erebus 10 ports 10GE XFP 40M CAM (EJ)
+    		port5001E50PH(80),      -- Artemis-SFP 50 ports LAN 1GE SFP 10M CAM (EH)
+    		port5001E50PJ(81),      -- Artemis-SFP 50 ports LAN 1GE SFP 40M CAM (EJ)
+    		port1010EXW10PH(82),    -- Erebus 10 ports 10GE XFP 10M CAM (EH)
+    		port1010EXW10PJ(83),    -- Erebus 10 ports 10GE XFP 40M CAM (EJ)
+    		port4010EXW40SH(84),    -- Pegasus 40 ports LAN/WAN SFP + 10M CAM
+    		port4010EXW40SJ(85),    -- Pegasus 40 ports LAN/WAN SFP + 40M CAM
 
     		portUnknown(99)
         }
@@ -198,7 +210,7 @@ f10TextualConventions MODULE-IDENTITY
 	F10SystemCardType ::= TEXTUAL-CONVENTION
 	    STATUS	current
     	DESCRIPTION
-	    	"The processor card supported by the F10 system
+	    	"The processor card supported by the Dell Networking OS
 		    products ."
     	SYNTAX	INTEGER {
 
@@ -285,10 +297,18 @@ f10TextualConventions MODULE-IDENTITY
     		lc1010EXW10SH(76),  -- Icarus-SFP+ 10 ports LAN/WAN 10GE SFP+ (EH)
     		lc1010EXW10SJ(77),  -- Icarus-SFP+-Dual CAM 10 ports LAN/WAN 10GE SFP+ (EJ)
     		lc9001E90MJ(78),    -- Athena 90 ports 40M CAM E/FE/GE (EJ)
-    		lc5001EXW50SH(79),  -- Artemis-SFP 50 ports LAN 1GE SFP 10M CAM (EH)
-    		lc5001EXW50SJ(80),  -- Artemis-SFP 50 ports LAN 1GE SFP 40M CAM (EJ)
-    		lc1010EXW10XH(81),  -- Erebus 10 ports 10GE XFP 10M CAM (EH)
-    		lc1010EXW10XJ(82),  -- Erebus 10 ports 10GE XFP 40M CAM (EJ)
+    		lc5001E50PH(79),    -- Artemis-SFP 50 ports LAN 1GE SFP 10M CAM (EH)
+    		lc5001E50PJ(80),    -- Artemis-SFP 50 ports LAN 1GE SFP 40M CAM (EJ)
+    		lc1010EXW10PH(81),  -- Erebus 10 ports 10GE XFP 10M CAM (EH)
+    		lc1010EXW10PJ(82),  -- Erebus 10 ports 10GE XFP 40M CAM (EJ)
+    		lc4010EXW40SH(83),  -- Pegasus 40 ports 10GE SFP+ 10M CAM
+    		lc4010EXW40SJ(84),  -- Pegasus 40 ports 10GE SFP+ 40M CAM
+                z9500LC12(85),           
+                z9500LC36(86),
+                z9500LC48(87),
+                c9000LC24X10GCu(88),
+                c9000LC24X10GOptics(89),
+                c9000LC6X40G(90), 
     		
     		rpmCard(200),       -- Route Processor Card
     		rpmCardEB(201),
@@ -298,7 +318,8 @@ f10TextualConventions MODULE-IDENTITY
     		rpmCardEF(205),
     		rpmCardEF3(206),
     		rpmCardEH(207),     -- Bigfoot
-    		sfmCard(250),       -- Switch Fabric Card
+                supCard(208),       -- Supervisor Card
+                sfmCard(250),       -- Switch Fabric Card
     		
     		cardUnknown(259)
         }
@@ -330,7 +351,7 @@ f10TextualConventions MODULE-IDENTITY
     F10CSeriesPortType ::= TEXTUAL-CONVENTION
 	    STATUS       current
 	    DESCRIPTION
-	       "Port type available in F10 C-Series products."
+	       "Port type available in Dell Networking OS C-Series products."
 	    SYNTAX       INTEGER {
     		portSerial(1),
     		portAux(2),
@@ -343,19 +364,35 @@ f10TextualConventions MODULE-IDENTITY
     F10SSeriesPortType ::= TEXTUAL-CONVENTION
 	    STATUS       current
 	    DESCRIPTION
-	       "Port type available in F10 S-Series products."
+	       "Port type available in Dell Networking OS S-Series products."
 	    SYNTAX       INTEGER {
     		portSerial(1),
     		portFastEther(2),
     		portGigEther(3),
     		port10GigEther(4),
+		    port40GigEther(5),
+            portFibreChannel(6),
     		portUnknown(99)
+        }
+
+     F10MSeriesPortType ::= TEXTUAL-CONVENTION
+             STATUS       current
+             DESCRIPTION
+                "Port type available in Dell Networking OS M-Series products."
+             SYNTAX       INTEGER {
+                 portSerial(1),
+                 portFastEther(2),
+                 portGigEther(3),
+                 port10GigEther(4),
+                 port40GigEther(5),
+                 portFC(6),
+                 portUnknown(99)
         }
 
 	F10CSeriesCardType ::= TEXTUAL-CONVENTION
 	    STATUS	current
     	DESCRIPTION
-	    	"The processor card supported by the F10 C-Series system
+	    	"The processor card supported by the Dell Networking OS C-Series system
 		    products ."
     	SYNTAX	INTEGER {
     		notPresented(0),
@@ -373,14 +410,15 @@ f10TextualConventions MODULE-IDENTITY
 	F10ProcessorModuleType ::= TEXTUAL-CONVENTION
 	    STATUS       current
 	    DESCRIPTION
-	       "The processor modules supported by the F10 system
+	       "The processor modules supported by the Dell Networking OS
 		card."
 	    SYNTAX	INTEGER {
 			controlProcessor(1),   		-- Control Processor
 			routingProcessor1(2),		-- Rotuing Processor type 1
 			routingProcessor2(3),		-- Rotuing Processor type 2
 			linecardProcessor(4),		-- Line Card Processor
-			rpmProcessor(5)				-- Single Control+Routing Processor
+			rpmProcessor(5),		-- Single Control+Routing Processor
+			routingProcessor(6)		-- Rotuing Processor
 	    }
 
 
@@ -424,7 +462,7 @@ f10TextualConventions MODULE-IDENTITY
     F10SlotID ::= TEXTUAL-CONVENTION
         STATUS  current
         DESCRIPTION
-                "Force10 Chassis Slot ID.
+                "Dell Networking OS Chassis Slot ID.
                 "
         SYNTAX  INTEGER
 
@@ -473,7 +511,7 @@ f10TextualConventions MODULE-IDENTITY
     F10VlanID ::= TEXTUAL-CONVENTION
         STATUS      current
         DESCRIPTION
-        "Force10 VLAN ID.
+        "Dell Networking OS VLAN ID.
         A value used to index per-VLAN tables: values of 0 and
         4095 are not permitted; if the value is between 1 and
         4094 inclusive, it represents an IEEE 802.1Q VLAN-ID with
@@ -489,7 +527,7 @@ f10TextualConventions MODULE-IDENTITY
 	F10ChassisMode ::= TEXTUAL-CONVENTION
 	    STATUS       current
 	    DESCRIPTION
-	       "the chassis mode in F10 series of products."
+	       "The chassis mode in Dell Networking series of products."
 	    SYNTAX       INTEGER {
 			nonJumbo(0), 	    -- 1.0
 			etherScale(1),      -- Jumbo/1.5
@@ -503,22 +541,21 @@ f10TextualConventions MODULE-IDENTITY
     F10QueueID ::= TEXTUAL-CONVENTION
         STATUS  current
         DESCRIPTION
-                "Force10 Queue ID.
+                "Dell Networking OS Queue ID.
                 "
         SYNTAX  INTEGER
 
     F10PortPipeID ::= TEXTUAL-CONVENTION
         STATUS  current
         DESCRIPTION
-                "Force10 PortPipe ID.
+                "Dell Networking OS PortPipe ID.
                 "
         SYNTAX  INTEGER
 
 	F10CycloneVersion ::= TEXTUAL-CONVENTION
 	    STATUS       current
 	    DESCRIPTION
-	       "the Force10 Cyclone based hardware version
-           "
+	       "the Dell Networking OS Cyclone based hardware version"
 	    SYNTAX       INTEGER {
 			onePointFive(1),    -- TjCj
 			twoPointZero(2),    -- T2C2
@@ -528,7 +565,7 @@ f10TextualConventions MODULE-IDENTITY
 	F10CamPartitionType ::= TEXTUAL-CONVENTION
 	    STATUS       current
 	    DESCRIPTION
-	       "The CAM partition supported in the F10 line card.
+	       "The CAM partition supported in the Dell Networking OS line card.
 
                 The sequecing used here is
 
@@ -536,6 +573,7 @@ f10TextualConventions MODULE-IDENTITY
                         Layer 2 Egress CAM range is  31 - 60
                         Layer 3 Ingress CAM range is 61 - 90
                         Layer 3 Egress CAM range is  91 - 120
+                        Layer 3 Host abd LPM CAM (BCM specific) range is 121 - 150
                "
 	    SYNTAX	INTEGER {
 			layer2AclIngress(1),   		-- L2 Ingress ACL
@@ -549,7 +587,9 @@ f10TextualConventions MODULE-IDENTITY
 			layer3McastFibIngress(65),   	-- L3 Ingress multicast fib
 			layer3QosIngress(66),   	-- L3 Ingress multicast fib
 			layer3PbrIngress(67),   	-- L3 Ingress multicast fib
-			layer3AclEgress(91)   		-- L3 Egress ACL
+			layer3AclEgress(91),   		-- L3 Egress ACL
+			layer3ExtHost(121),   		-- L3 Host Table(BCM)
+			layer3ExtLPM(122)   		-- L3 Longest Prefix Match(BCM-LPM) 
 
 	    }
 
@@ -563,5 +603,28 @@ f10TextualConventions MODULE-IDENTITY
             for example, -7.23 dB will be represented as -723."
         SYNTAX       Integer32
 
+    
+    DellNetDeviceType ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+          "The device category running  the Dell Networking OS"
+     SYNTAX     INTEGER {
+                    chassis(1),            -- Chassis
+                    stack(2),              -- Stackable unit
+                    rpm(3),                -- Route Processor Module
+                    supervisor(4),         -- supervisor Module
+                    linecard(5),           -- Line Card
+                    port-extender(6)       -- Port Extender
+    }
 
+
+    DellNetPEOperStatus ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+          "The operational status of the port extender"
+     SYNTAX     INTEGER {
+                    up(1),
+                    down(2)
+    }
+ 
 END

@@ -33,6 +33,7 @@ abstract class AuthorizerBase implements Authorizer
 {
     protected static $HAS_AUTH_USERMANAGEMENT = 0;
     protected static $CAN_UPDATE_USER = 0;
+    protected static $CAN_UPDATE_PASSWORDS = 0;
     protected static $AUTH_IS_EXTERNAL = 0;
 
     /**
@@ -208,7 +209,7 @@ abstract class AuthorizerBase implements Authorizer
 
     public function canUpdatePasswords($username = '')
     {
-        return 0;
+        return static::$CAN_UPDATE_PASSWORDS;
     }
 
     public function changePassword($username, $newpassword)

@@ -1,0 +1,90 @@
+-- This module defines enterprise MIBs for DNS Configuration
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-SET-DNS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenSetting, netscreenSettingMibModule
+        FROM NETSCREEN-SMI
+    IpAddress, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenSetDnsMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor all
+         the configuration info"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311100000Z" -- November 10, 2003
+    DESCRIPTION
+        "Correct wrong title"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No Comment"
+    REVISION      "200105270000Z" -- May 27, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenSettingMibModule 3 }
+
+nsSetDNS OBJECT IDENTIFIER ::= { netscreenSetting 3 }
+
+nsConfigDnsPriSer OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Primary DNS server ip address"
+    ::= { nsSetDNS 1 }
+
+nsConfigDnsSecSer OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Secondary DNS server ip address"
+    ::= { nsSetDNS 2 }
+
+nsConfigDnsRefEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable refresh DNS every day."
+    ::= { nsSetDNS 3 }
+
+nsConfigDnsRefTime OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(6))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "DNS refresh time."
+    ::= { nsSetDNS 4 }
+
+END
+
+

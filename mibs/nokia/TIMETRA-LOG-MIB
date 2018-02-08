@@ -1,0 +1,4519 @@
+TIMETRA-LOG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        Unsigned32, Integer32, IpAddress, Counter32, Counter64
+            FROM SNMPv2-SMI
+
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+
+        TEXTUAL-CONVENTION, RowStatus, StorageType, TruthValue,
+        DateAndTime, DisplayString, TimeStamp
+            FROM SNMPv2-TC
+
+        sysDescr, sysObjectID
+            FROM SNMPv2-MIB
+
+        SnmpMessageProcessingModel, SnmpSecurityLevel, SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+
+        snmpNotifyEntry
+            FROM SNMP-NOTIFICATION-MIB
+
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB
+
+        TItemDescription, TNamedItemOrEmpty, TNamedItem,
+        TmnxAdminState, TmnxOperState, TmnxActionType,
+        TQueueId, THsmdaCounterIdOrZero, TmnxAccPlcyQICounters,
+        TmnxAccPlcyQECounters, TmnxAccPlcyOICounters, TmnxAccPlcyOECounters,
+        TmnxAccPlcyAACounters, THsmdaCounterIdOrZeroOrAll, TQueueIdOrAll
+            FROM TIMETRA-TC-MIB
+
+        timetraSRMIBModules, tmnxSRObjs, tmnxSRConfs,
+        tmnxSRNotifyPrefix
+            FROM TIMETRA-GLOBAL-MIB
+
+        TFilterAction, TFilterActionOrDefault
+            FROM TIMETRA-FILTER-MIB
+        ;
+
+timetraLogMIBModule MODULE-IDENTITY
+        LAST-UPDATED "201102010000Z"
+        ORGANIZATION "Alcatel-Lucent"
+        CONTACT-INFO
+            "Alcatel-Lucent SROS Support
+             Web: http://support.alcatel-lucent.com"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the
+        Alcatel-Lucent SROS Logging utility.
+
+        Copyright 2003-2012 Alcatel-Lucent.  All rights reserved.
+        Reproduction of this document is authorized on the condition that
+        the foregoing copyright notice is included.
+
+        This SNMP MIB module (Specification) embodies Alcatel-Lucent's
+        proprietary intellectual property.  Alcatel-Lucent retains
+        all title and ownership in the Specification, including any
+        revisions.
+
+        Alcatel-Lucent grants all interested parties a non-exclusive
+        license to use and distribute an unmodified copy of this
+        Specification in connection with management of Alcatel-Lucent
+        products, and without fee, provided this copyright notice and
+        license appear on all copies.
+
+        This Specification is supplied 'as is', and Alcatel-Lucent
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+--
+--  Revision History
+--
+        REVISION        "201102010000Z"
+        DESCRIPTION     "Rev 9.0                1 Feb 2011 00:00
+                         9.0 release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200902280000Z"
+        DESCRIPTION     "Rev 7.0                28 Feb 2009 00:00
+                         7.0 release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200801010000Z"
+        DESCRIPTION     "Rev 6.0                01 Jan 2008 00:00
+                         6.0 release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200701010000Z"
+        DESCRIPTION     "Rev 5.0                01 Jan 2007 00:00
+                         5.0 release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200603150000Z"
+        DESCRIPTION     "Rev 4.0                15 Mar 2006 00:00
+                         4.0 release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200501240000Z"
+        DESCRIPTION     "Rev 2.1                24 Jan 2005 00:00
+                         2.1 release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200405270000Z"
+        DESCRIPTION     "Rev 2.1                27 May 2004 00:00
+                         2.1 release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200401150000Z"
+        DESCRIPTION     "Rev 2.0                15 Jan 2004 00:00
+                         2.0 release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200308150000Z"
+        DESCRIPTION     "Rev 1.2                15 Aug 2003 00:00
+                         1.2 release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200301200000Z"
+        DESCRIPTION     "Rev 1.0                20 Jan 2003 00:00
+                         1.0 Release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200111100000Z"
+        DESCRIPTION     "Rev 0.1                10 Nov 2001 00:00
+                         Initial version of the TIMETRA-LOG-MIB."
+
+        ::= { timetraSRMIBModules 12 }
+
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--
+
+tmnxLogObjs                 OBJECT IDENTIFIER ::= { tmnxSRObjs 12 }
+    tmnxLogNotificationObjects  OBJECT IDENTIFIER ::= { tmnxLogObjs 1 }
+
+tmnxLogNotifyPrefix      OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 12 }
+    tmnxLogNotifications        OBJECT IDENTIFIER ::= { tmnxLogNotifyPrefix 0 }
+
+tmnxLogConformance          OBJECT IDENTIFIER ::= { tmnxSRConfs 12 }
+
+ --
+ -- Textual Conventions
+ --
+
+    -- NOTE: TmnxPerceivedSeverity is based on ITU-ALARM-TC-MIB textual
+    -- convention ItuPerceivedSeverity
+   TmnxPerceivedSeverity ::= TEXTUAL-CONVENTION
+       STATUS current
+       DESCRIPTION
+               "ITU perceived severity values as per M.3100
+               and X.733"
+       SYNTAX   INTEGER {
+                    none (0),
+                    cleared (1),
+                    indeterminate (2),
+                    critical (3),
+                    major (4),
+                    minor (5),
+                    warning (6)
+                }
+
+    -- Alcatel-Lucent SROS series Textual Conventions
+
+
+    -- Alcatel-Lucent SROS series Syslog Textual Conventions
+
+ TmnxSyslogId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The value of TmnxSyslogId uniquely identifies an entry in the
+        tmnxSyslogTargetTable to be used for the syslog collector target
+        information when creating a log file where tmnxLogIdDestination
+        has a value of 'syslog (2)'."
+    SYNTAX  INTEGER (1..10)
+
+ TmnxSyslogIdOrEmpty ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The value of TmnxSyslogIdOrEmpty uniquely identifies an entry in the
+        tmnxSyslogTargetTable to be used for the syslog collector target
+        information when creating a log file where tmnxLogIdDestination
+        has a value of 'syslog (2)'.  The value of 0 is used when no
+        entry exists in the tmnxSyslogTargetTable."
+    SYNTAX  INTEGER (0 | 1..10)
+
+
+-- From SYSLOG-DEVICE-MIB
+-- SyslogFacility  ::=  TEXTUAL-CONVENTION
+--    STATUS  current
+--    DESCRIPTION
+--        "This textual convention maps out to the facilities
+--         available for syslog messages."
+--    SYNTAX  INTEGER {
+--                      local0(16),
+--                      local1(17),
+--                      local2(18),
+--                      local3(19),
+--                      local4(20),
+--                      local5(21),
+--                      local6(22),
+--                      local7(23)
+--                    }
+
+ TmnxSyslogFacility ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxSyslogFacility is an enumerated integer that
+         specifies which syslog facility is the intended destination for the
+         log event stream."
+    SYNTAX      INTEGER {
+                    kernel (0),
+                    user (1),
+                    mail (2),
+                    systemd (3),
+                    auth (4),
+                    syslogd (5),
+                    printer (6),
+                    netnews (7),
+                    uucp (8),
+                    cron (9),
+                    authpriv (10),
+                    ftp (11),
+                    ntp (12),
+                    logaudit (13),
+                    logalert (14),
+                    cron2 (15),
+                    local0 (16),
+                    local1 (17),
+                    local2 (18),
+                    local3 (19),
+                    local4 (20),
+                    local5 (21),
+                    local6 (22),
+                    local7 (23)
+                }
+
+ TmnxUdpPort ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxUdpPort is the port used to send messages
+         to an event collector target.  514 is the IANA assigned port number
+         for syslog.  162 is the IANA assigned port number for SNMP
+         notifications."
+    SYNTAX      INTEGER (0..65535)
+
+ TmnxSyslogSeverity ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxSyslogSeverity is an enumerated integer that
+         specifies the severity levels of syslog messages."
+    SYNTAX      INTEGER {
+                    emergency (0),
+                    alert (1),
+                    critical (2),
+                    error (3),
+                    warning (4),
+                    notice (5),
+                    info (6),
+                    debug (7)
+                }
+
+    -- Alcatel-Lucent SROS series Log Textual Conventions
+
+ TmnxLogFileId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The value of TmnxLogFileId uniquely identifies a file-id to be
+        used when creating a log or billing file.  A value of zero (0)
+        indicates none specified and is invalid when used as an index
+        for the tmnxLogFileIdTable."
+    SYNTAX  INTEGER (0..99)
+
+ TmnxLogFileType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxLogFileType indicates the type of information
+         that will be written to this file."
+    SYNTAX      INTEGER {
+                    none (0),
+                    eventLog (1),
+                    accountingPolicy (2)
+                }
+
+ TmnxLogIdIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogIdIndex uniquely identifies an event stream log.
+         Note that 2 default TmnxLogIdEntry rows are created by the agent using
+         TmnxLogIdIndex values 99 and 100."
+    SYNTAX  INTEGER (1..100)
+
+ TmnxCFlash ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxCFlash uniquely identifies a compact flash
+         module on the active CPM card.  A value of zero (0) indicates
+         none specified."
+    SYNTAX  Unsigned32
+
+ TmnxLogFilterId ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The value of TmnxLogFilterId is the identification number of an
+        event log filter.  The value of zero indicates none specified.
+        The value of zero (0) is invalid when used as an index for the
+        tmnxLogFilterTable. Filter entry 1001 is created by the agent."
+    SYNTAX Unsigned32  (0..1001)
+
+ TmnxLogFilterEntryId ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The value of TmnxLogFilterEntryId is the identification number of an
+        event log filter entry."
+    SYNTAX Unsigned32  (1..999)
+
+ TmnxLogFilterOperator ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "When TmnxLogFilterOperator has a value of 'off', the item is not
+         matched.  Otherwise the value of TmnxLogFilterOperator determines
+         the comparison operator to be used as the parameter match criterion."
+    SYNTAX      INTEGER {
+                    off (1),
+                    equal (2),
+                    notEqual (3),
+                    lessThan (4),
+                    lessThanOrEqual (5),
+                    greaterThan (6),
+                    greaterThanOrEqual (7)
+                }
+
+ TmnxEventNumber ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each log event type has a unique identifying number.  This number is
+         unique within a particular software application, such as IP, MPLS,
+         OSPF, etc.; but it is not necessarily unique across different software
+         applications.  That is MPLS event #1001 may be different from OSPF
+         event #1001."
+    SYNTAX      Unsigned32
+
+--
+--  Alcatel-Lucent SROS series Log General Objects
+--
+
+tmnxLogMaxLogs   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "logs"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of concurrent active Logs that are allowed.
+         A value of zero (0) for this object implies that there is no
+         limit for the number of concurrent active logs in effect."
+    DEFVAL { 15 }
+    ::= { tmnxLogObjs 2 }
+
+--
+--  Alcatel-Lucent SROS series Log File-ID Table
+--
+
+tmnxLogFileIdTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxLogFileIdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the Alcatel-Lucent SROS series Log File ID Table for providing,
+         via SNMP, the capability of defining the characteristics for
+         log and billing files and associating them with a file-id.
+         The actual file is not created until the file-id is used in
+         a log or billing file configuration."
+   ::= { tmnxLogObjs 3 }
+
+tmnxLogFileIdEntry OBJECT-TYPE
+    SYNTAX      TmnxLogFileIdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the tmnxLogFileIdTable.  Entries are created
+         and deleted in this table by SNMP sets to tmnxLogFileIdRowStatus."
+    INDEX { tmnxLogFileId }
+    ::= { tmnxLogFileIdTable 1 }
+
+ TmnxLogFileIdEntry ::=
+    SEQUENCE {
+        tmnxLogFileId                       TmnxLogFileId,
+        tmnxLogFileIdRowStatus              RowStatus,
+        tmnxLogFileIdStorageType            StorageType,
+        tmnxLogFileIdRolloverTime           Integer32,
+        tmnxLogFileIdRetainTime             Integer32,
+        tmnxLogFileIdAdminLocation          TmnxCFlash,
+        tmnxLogFileIdOperLocation           TmnxCFlash,
+        tmnxLogFileIdDescription            TItemDescription,
+        tmnxLogFileIdLogType                TmnxLogFileType,
+        tmnxLogFileIdLogId                  Integer32,
+        tmnxLogFileIdPathName               DisplayString,
+        tmnxLogFileIdCreateTime             DateAndTime,
+        tmnxLogFileIdBackupLoc              TmnxCFlash
+    }
+
+ tmnxLogFileId       OBJECT-TYPE
+    SYNTAX      TmnxLogFileId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The index value tmnxLogFileId uniquely identifies a file-id to be
+        used when creating a log or billing file."
+    ::= { tmnxLogFileIdEntry 1 }
+
+ tmnxLogFileIdRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows entries to be created and deleted
+        in the tmnxLogFileIdTable.  Deletion of an entry in this
+        table will not succeed if it is currently used by any log
+        or billing file."
+    REFERENCE
+        "See definition of RowStatus in RFC 2579, 'Textual
+        Conventions for SMIv2.'"
+    ::= { tmnxLogFileIdEntry 2 }
+
+ tmnxLogFileIdStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this conceptual row.
+        Conceptual rows having the value 'permanent' need not
+        allow write-access to any columnar objects in the row."
+    DEFVAL { nonVolatile }
+    ::= { tmnxLogFileIdEntry 3 }
+
+ tmnxLogFileIdRolloverTime       OBJECT-TYPE
+    SYNTAX      Integer32 (5..10080)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileIdRolloverTime specifies how often, in
+         minutes, a new log or billing file will be created.  If the value
+         of tmnxLogFileIdLogType is not 'rollover', then the value of this
+         object is irrelevant."
+    DEFVAL { 1440 }
+    ::= { tmnxLogFileIdEntry 4 }
+
+ tmnxLogFileIdRetainTime        OBJECT-TYPE
+    SYNTAX      Integer32 (1..500)
+    UNITS       "hours"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileIdRetainTime specifies the minimum time,
+         in hours, that a file is retained on the media.  Once this time
+         period has expired the file is deleted."
+    DEFVAL { 12 }
+    ::= { tmnxLogFileIdEntry 5 }
+
+ tmnxLogFileIdAdminLocation      OBJECT-TYPE
+    SYNTAX      TmnxCFlash
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileIdAdminLocation specifies where the log
+         or billing file should be created.  The file location should be a
+         compact flash on the primary CPM.  When the secondary CPM becomes
+         the primary CPM after a failure, the same log file policies will
+         be activated.  Thus it is recommended that the same media is
+         available to both secondary and primary CPMs.
+
+         If no location is specified, 0, the compact flash cf1: is used to
+         store the log files or cf2: is used to store billing files."
+    DEFVAL { 0 }
+    ::= { tmnxLogFileIdEntry 6 }
+
+ tmnxLogFileIdOperLocation      OBJECT-TYPE
+    SYNTAX      TmnxCFlash
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileIdOperLocation specifies where the log
+         or billing file has been created.  The file location should be a
+         compact flash on the primary CPM.  When the secondary CPM becomes
+         the primary CPM after a failure, the same log file policies will
+         be activated.  Thus it is recommended that the same media is
+         available to both secondary and primary CPMs."
+    ::= { tmnxLogFileIdEntry 7 }
+
+ tmnxLogFileIdDescription   OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileIdDescription is a user provided description
+         string for this log file-id entry.  It can consist of any printable,
+         seven-bit ASCII characters up to 80 characters in length."
+    DEFVAL { ''h }     -- the empty string
+    ::= { tmnxLogFileIdEntry 8 }
+
+ tmnxLogFileIdLogType       OBJECT-TYPE
+    SYNTAX      TmnxLogFileType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileIdLogType indicates the type of information
+         that will be written to this file."
+    ::= { tmnxLogFileIdEntry 9 }
+
+ tmnxLogFileIdLogId     OBJECT-TYPE
+    SYNTAX      Integer32 (0..99)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileIdLogId indicates the ID index of the log or
+         accounting policy this file is attached to.  A value of zero (0)
+         indicates that this file definition is not currently used by any
+         log or accounting policy."
+    ::= { tmnxLogFileIdEntry 10 }
+
+ tmnxLogFileIdPathName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileIdPathName is the pathname of the currently
+         opened file used by this file-id entry."
+    ::= { tmnxLogFileIdEntry 11 }
+
+ tmnxLogFileIdCreateTime    OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileIdCreateTime is the time the currently opened
+         file version used by this file-id entry was created."
+    ::= { tmnxLogFileIdEntry 12 }
+
+ tmnxLogFileIdBackupLoc     OBJECT-TYPE
+    SYNTAX      TmnxCFlash
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileIdBackupLoc specifies where the log
+         or billing file should be created if it cannot be created in
+         the location specified by tmnxLogFileIdAdminLocation.  The file
+         location should be a compact flash on the primary CPM.  When the
+         secondary CPM becomes the primary CPM after a failure, the same
+         log file policies will be activated.  Thus it is recommended that
+         the same media is available to both secondary and primary CPMs.
+
+         If no backup location is specified, 0, and the log or billing
+         file could not be created in the location specified by
+         tmnxLogFileIdAdminLocation or the file creation at the specified
+         backup location fails, a file create failure trap is issued
+         and the associated log or accounting policy is marked as
+         operationally 'outOfService'."
+    DEFVAL { 0 }
+    ::= { tmnxLogFileIdEntry 13 }
+
+--
+-- Alcatel-Lucent SROS series Log Accounting Policy  Table
+--
+
+ tmnxLogApTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxLogApEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Alcatel-Lucent SROS series Log Accounting Policy Table contains
+         an entry for each accounting policy that specifies the
+         characteristics of the accounting records associated with an
+         accounting policy."
+   ::= { tmnxLogObjs 4 }
+
+ tmnxLogApEntry OBJECT-TYPE
+    SYNTAX      TmnxLogApEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the tmnxLogApTable.  Entries in the
+         tmnxLogApTable are created and destroyed via SNMP Set
+         requests to tmnxLogApRowStatus."
+    INDEX { tmnxLogApPolicyId }
+    ::= { tmnxLogApTable 1 }
+
+ TmnxLogApEntry ::=
+    SEQUENCE {
+        tmnxLogApPolicyId                   Integer32,
+        tmnxLogApRowStatus                  RowStatus,
+        tmnxLogApStorageType                StorageType,
+        tmnxLogApAdminStatus                TmnxAdminState,
+        tmnxLogApOperStatus                 TmnxOperState,
+        tmnxLogApInterval                   Integer32,
+        tmnxLogApDescription                TItemDescription,
+        tmnxLogApDefault                    TruthValue,
+        tmnxLogApRecord                     INTEGER,
+        tmnxLogApToFileId                   TmnxLogFileId,
+        tmnxLogApPortType                   INTEGER,
+        tmnxLogApDefaultInterval            TruthValue,
+        tmnxLogApDataLossCount              Counter32,
+        tmnxLogApLastDataLossTimeStamp      TimeStamp,
+        tmnxLogApToFileType                 INTEGER
+     }
+
+ tmnxLogApPolicyId  OBJECT-TYPE
+    SYNTAX      Integer32 (1..99)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApPolicyId uniquely identifies an accounting
+         policy to be used for creating accounting records.  A specific
+         accounting policy can be applied to one or more service access
+         points (SAPs).  Any changes made to an existing policy is applied
+         immediately to all SAPs where this policy is applied."
+    ::= { tmnxLogApEntry 1 }
+
+ tmnxLogApRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows entries to be created and deleted
+        in the tmnxLogApTable.  Deletion of an entry in this
+        table will not succeed if it is currently applied to any
+        service access point (SAP)."
+    REFERENCE
+        "See definition of RowStatus in RFC 2579, 'Textual
+        Conventions for SMIv2.'"
+    ::= { tmnxLogApEntry 2 }
+
+ tmnxLogApStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this conceptual row.
+        Conceptual rows having the value 'permanent' need not
+        allow write-access to any columnar objects in the row."
+    DEFVAL { nonVolatile }
+    ::= { tmnxLogApEntry 3 }
+
+ tmnxLogApAdminStatus       OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApAdminStatus specifies the desired administrative
+         state for this accounting policy."
+    DEFVAL { outOfService }
+    ::= { tmnxLogApEntry 4 }
+
+ tmnxLogApOperStatus        OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApOperStatus indicates the current
+         operational status of this accounting policy."
+    ::= { tmnxLogApEntry 5 }
+
+ tmnxLogApInterval      OBJECT-TYPE
+    SYNTAX      Integer32 (1..120)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApInterval determines how frequently
+         the statistics are collected and written to their destination.
+
+         tmnxLogApInterval will have a default value if the value of
+         tmnxLogApDefaultInterval is set to 'true'. Value of
+         tmnxLogApInterval can be set manually if tmnxLogApDefaultInterval
+         is set to 'false'. An attempt to set this object to a non-default
+         value will fail with an inconsistentValue error if
+         tmnxLogApDefaultInterval has the value 'true' set.
+
+         If no record is specified, default value for tmnxLogApInterval is 5
+         minutes. For service and network types of record, default values 
+         are 5 minutes and 15 minutes respectively.
+         
+         For SAA only, the minimum value of tmnxLogApInterval is 1 minute. 
+         Otherwise the minimum value is 5 minutes."
+    DEFVAL { 5 }
+    ::= { tmnxLogApEntry 6 }
+
+ tmnxLogApDescription   OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApDescription is a user provided description
+         string for this accounting policy.  It can consist of any printable,
+         seven-bit ASCII characters up to 80 characters in length."
+    DEFVAL { ''h }     -- the empty string
+    ::= { tmnxLogApEntry 7 }
+
+ tmnxLogApDefault       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When tmnxLogApDefault has a value of 'true', it indicates that
+         this accounting policy is applied to all service access points (SAPs)
+         that do not have an explicit accounting policy applied.  If no
+         accounting policy is associated with a SAP accounting records are
+         produced in accordance with the default policy.
+
+         Only one accounting policy entry in the tmnxLogApTable can have
+         tmnxLogApDefault set to 'true'.  If there is no entry in the
+         tmnxLogApTable with tmnxLogApDefault set to 'true', then the
+         only accounting records collected are those explicitly configured
+         accounting policies."
+    DEFVAL { false }
+    ::= { tmnxLogApEntry 8 }
+
+ tmnxLogApRecord    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none (0),
+                    svcIngressOctet (1),
+                    svcEgressOctet (2),
+                    svcIngressPkt (3),
+                    svcEgressPkt (4),
+                    netIngressOctet (5),
+                    netEgressOctet (6),
+                    netIngressPkt (7),
+                    netEgressPkt (8),
+                    compactSvcInOctet (9),
+                    combinedSvcIngress (10),
+                    combinedNetInEgOctet (11),
+                    combinedSvcInEgOctet (12),
+                    completeSvcInEg (13),
+                    combinedSvcSdpInEg (14),
+                    completeSvcSdpInEg (15),
+                    completeSubscrIngrEgr (16),
+                    bsxProtocol (17),
+                    bsxApplication (18),
+                    bsxAppGroup (19),
+                    bsxSubscriberProtocol (20),
+                    bsxSubscriberApplication (21),
+                    bsxSubscriberAppGroup (22),
+                    customRecordSubscriber (23),
+                    customRecordService (24),
+                    customRecordAa (25),
+                    queueGroupOctets (26),
+                    queueGroupPackets (27),
+                    combinedQueueGroup (28),
+                    combinedMplsLspIngress (29),
+                    combinedMplsLspEgress (30),
+                    combinedLdpLspEgress (31),
+                    saa (32),
+                    video (33),
+                    kpiSystem (34),
+                    kpiBearerMgmt (35),
+                    kpiBearerTraffic (36),
+                    kpiRefPoint (37),
+                    kpiPathMgmt (38),
+                    kpiIom3 (39),
+                    kciSystem (40),
+                    kciBearerMgmt (41),
+                    kciPathMgmt (42),
+                    completeKpi (43),
+                    completeKci (44),
+                    kpiBearerGroup (45),
+                    kpiRefPathGroup (46),
+                    kpiKciBearerMgmt (47),
+                    kpiKciPathMgmt (48),
+                    kpiKciSystem (49),
+                    completeKpiKci (50),
+                    aaPerformance (51),
+                    netInfIngressOct(52),
+                    netInfIngressPkt(53),
+                    combinedNetInfIngress(54),
+                    accessEgressPkt(55),
+                    accessEgressOct(56),
+                    combinedAccessEgress(57),
+                    combinedNetEgress(58),
+                    combinedSvcEgress(59),
+                    combinedSvcInEgPkt(60),
+                    combinedNetInEgPkt(61) 
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApRecord indicates the type of predefined
+         accounting record type to be written to the accounting file.
+
+         When tmnxLogApDefaultInterval has a value of 'false', statistics
+         collection interval of the record type will be ignored.
+
+         The value 'bsxSubscriberAppGroup (22)' was made obsolete in
+         release 7.0 and replaced by 'custom-record-aa (25).'"
+    DEFVAL { none }
+    ::= { tmnxLogApEntry  9 }
+
+ tmnxLogApToFileId      OBJECT-TYPE
+    SYNTAX      TmnxLogFileId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApToFileId is the index to the entry in the
+         tmnxLogFileIdTable that specifies the file characteristics to be
+         used for the destination of the accounting policy records collected
+         by this accounting policy.  The file itself is created the first
+         time this accounting policy is applied to a service access point
+         (SAP).
+         
+         tmnxLogApToFileId must be set along with tmnxLogApToFileType to 
+         indicate whether the records will be stored in a file or not.
+
+         When a destination file is specified, the value of the file is
+         specified by tmnxLogApToFileId and the value of tmnxLogApToFileType 
+         should be 'fileId'. 
+         
+         When the destination file is not specified, the value of 
+         tmnxLogApToFileId should be zero and the value of tmnxLogApToFileType
+         should be 'noFile'."
+    ::= { tmnxLogApEntry 10 }
+
+ tmnxLogApPortType      OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none       (0),
+                    access     (1),
+                    network    (2),
+                    sdp        (3),
+                    subscriber (4),
+                    appAssure  (5),
+                    qgrp       (6),
+                    saa        (7),
+                    mplsLspIngr (8),
+                    mplsLspEgr  (9),
+                    ldpLspEgr   (10),
+                    video       (11),
+                    mobileGateway (12),
+                    networkIf   (13),
+                    accessport  (14)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxLogApPortType variable indicates if this accounting policy's
+         record type is to be associated with a service access port, a
+         network access port, a service destination point, a subscriber or
+         the application-assurance feature."
+    ::= { tmnxLogApEntry 11 }
+
+ tmnxLogApDefaultInterval       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When tmnxLogApDefaultInterval has a value of 'true', it indicates
+         that tmnxLogApInterval will have a default value.
+
+         When tmnxLogApDefaultInterval has a value of 'false', user can set
+         the value of tmnxLogApInterval manually."
+    DEFVAL { true }
+    ::= { tmnxLogApEntry 12 }
+
+tmnxLogApDataLossCount           OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApDataLossCount indicates the number of times a
+         tmnxLogAccountingDataLoss trap was raised against this application
+         policy."
+    ::= { tmnxLogApEntry 13 }
+
+tmnxLogApLastDataLossTimeStamp   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApLastDataLossTimeStamp indicates the last time,
+         since system startup that a tmnxLogAccountingDataLoss trap was raised
+         against this application policy."
+    ::= { tmnxLogApEntry 14 }
+
+tmnxLogApToFileType   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    fileId (0),
+                    noFile (1)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApToFileType indicates where records of  
+         an accounting policy are stored. It should be set along with 
+         tmnxLogApToFileId which specifies the destination file index
+         where the accounting records are stored.
+        
+         When the value of tmnxLogApToFileType is 'noFile', it indicates that
+         the accounting records will not to be stored in a file and the value 
+         of tmnxLogApToFileId should be set to zero. 
+
+         When the value of tmnxLogApToFileType is 'fileId', it indicates that 
+         the accounting records will be stored in a file specified by 
+         tmnxLogApToFileId.
+
+         tmnxLogApOperStatus will transition to 'inService' when the 
+         tmnxLogApToFileType is set to 'noFile' or 'fileId'."
+    DEFVAL { fileId }
+    ::= { tmnxLogApEntry  15 }
+
+ --
+ -- Alcatel-Lucent SROS series Log Identification Table
+ --
+ tmnxLogIdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxLogIdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Alcatel-Lucent SROS series Log Identification Table contains an
+         entry for each log that specifies the characteristics of that
+         log associated with a log-id number."
+   ::= { tmnxLogObjs 5 }
+
+ tmnxLogIdEntry OBJECT-TYPE
+    SYNTAX      TmnxLogIdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the tmnxLogIdTable.  Entries in the
+         tmnxLogIdTable are created and destroyed via SNMP Set
+         requests to tmnxLogIdRowStatus.  Default log entries 99
+         and 100 are created by the agent."
+    INDEX { tmnxLogIdIndex }
+    ::= { tmnxLogIdTable 1 }
+
+ TmnxLogIdEntry ::=
+    SEQUENCE {
+        tmnxLogIdIndex                      TmnxLogIdIndex,
+        tmnxLogIdRowStatus                  RowStatus,
+        tmnxLogIdStorageType                StorageType,
+        tmnxLogIdAdminStatus                TmnxAdminState,
+        tmnxLogIdOperStatus                 TmnxOperState,
+        tmnxLogIdDescription                TItemDescription,
+        tmnxLogIdFilterId                   TmnxLogFilterId,
+        tmnxLogIdSource                     BITS,
+        tmnxLogIdDestination                INTEGER,
+        tmnxLogIdFileId                     TmnxLogFileId,
+        tmnxLogIdSyslogId                   TmnxSyslogIdOrEmpty,
+        tmnxLogIdMaxMemorySize              Unsigned32,
+        tmnxLogIdConsoleSession             TruthValue,
+        tmnxLogIdForwarded                  Counter64,
+        tmnxLogIdDropped                    Counter64,
+        tmnxLogIdTimeFormat                 INTEGER
+     }
+
+ tmnxLogIdIndex  OBJECT-TYPE
+    SYNTAX      TmnxLogIdIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogIdIndex uniquely identifies an event stream log."
+    ::= { tmnxLogIdEntry 1 }
+
+ tmnxLogIdRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows entries to be created and deleted
+        in the tmnxLogIdTable.  Deletion of an entry in this
+        table will not succeed if tmnxLogIdOperStatus is not
+        'outOfService'.  tmnxLogIdOperStatus will not transition
+        to 'inService' if tmnxLogIdSource and tmnxLogIdDestination
+        and their associated objects have not been set to valid values."
+    REFERENCE
+        "See definition of RowStatus in RFC 2579, 'Textual
+        Conventions for SMIv2.'"
+    ::= { tmnxLogIdEntry 2 }
+
+ tmnxLogIdStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this conceptual row.
+        Conceptual rows having the value 'permanent' need not
+        allow write-access to any columnar objects in the row."
+    DEFVAL { nonVolatile }
+    ::= { tmnxLogIdEntry 3 }
+
+ tmnxLogIdAdminStatus       OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogIdAdminStatus indicates the desired
+         administrative state for this log."
+    DEFVAL { inService }
+    ::= { tmnxLogIdEntry 4 }
+
+ tmnxLogIdOperStatus        OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogIdOperStatus indicates the current
+         operational status of this log."
+    ::= { tmnxLogIdEntry 5 }
+
+ tmnxLogIdDescription   OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogIdDescription is a user provided description
+         string for this log.  It can consist of any printable,
+         seven-bit ASCII characters up to 80 characters in length."
+    DEFVAL { ''h }     -- the empty string
+    ::= { tmnxLogIdEntry 6 }
+
+ tmnxLogIdFilterId      OBJECT-TYPE
+    SYNTAX      TmnxLogFilterId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogIdFilterId is the index into the
+         tmnxLogFilterTable to the entry the defines a filter to be
+         applied to this log's source event stream to limit the events
+         output to this log's destination.  If tmnxLogIdFilterId has a
+         value of 0, then all events in the source log are forwarded
+         to the destination."
+    DEFVAL { 0 }
+    ::= { tmnxLogIdEntry 7 }
+
+ tmnxLogIdSource        OBJECT-TYPE
+    SYNTAX      BITS {
+                    main (0),
+                    security (1),
+                    change (2),
+                    debugTrace (3),
+                    li (4)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogIdSource is a bit mask that specifies the
+         log event source stream(s) to be forwarded to the destination
+         specified in tmnxLogIdDestination.  Events from more than one
+         source may be forwarded to the log destination.
+
+         The 'main' event stream consists of all events that are not
+         explicitly directed to any other event stream.
+
+         The 'security' event stream contains all events that affect
+         attempts to breach system security such as failed login attempts,
+         attempts to access SNMP MIB tables to which the user has not
+         been granted access, or attempts to enter a branch of the CLI
+         for which the user is not authorized.
+
+         The 'user' activity event stream contains all events that directly
+         affect the configuration or operation of the system.
+
+         The 'debugTrace' event stream contains all events configured for
+         application or protocol tracing.
+
+         The 'li' event stream contains all events configured for Lawful
+         Intercept activities.  An attempt to set the 'li' event stream
+         will fail with an inconsistentValue error if the requestor does
+         not have access to the 'li' context.  An attempt to set the 'li'
+         event stream will fail with an inconsistentValue error if
+         tmnxLogIdDestination has the value 'syslog' or 'file'."
+    DEFVAL { {} }
+    ::= { tmnxLogIdEntry 8 }
+
+ tmnxLogIdDestination       OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none (0),
+                    console (1),
+                    syslog (2),
+                    snmpTraps (3),
+                    file (4),
+                    memory (5)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogIdDestination specifies the event log stream
+         destination.  Once this object has been set to a value other than
+         the default 'none' it cannot be modified and attempts to reset
+         it to another value will fail with an INCONSISTENT VALUE error.
+
+         The 'console' destination causes all selected log events to be
+         directed to the system console.  If the console is not connected
+         then all entries are dropped.
+
+         The 'syslog' destination sends all selected log events to the
+         syslog address configured in tmnxSyslogTargetAddress and
+         tmnxSyslogTargetUdpPort in the tmnxSyslogTargetTable row entry
+         pointed to by the value of tmnxLogIdSyslogId.  An attempt to
+         set this object ot 'syslog' will fail with an inconsistentValue
+         error if tmnxLogIdSource has the value 'li' set.
+
+         The 'snmpTraps' destination causes events defined as SNMP traps
+         to be sent to the configured SNMP trap destinations and also to
+         be logged in the NOTIFICATION-LOG-MIB tables.  The allocated memory
+         size for the log of transmitted traps is specified in
+         tmnxLogIdMaxMemorySize.  The events are logged to memory in a circular
+         fashion.  Once the space is full, the oldest entry is replaced with
+         a new entry.
+
+         The 'file' destination causes all selected log events to be
+         directed to a file on one of the CPM's compact flash discs.
+         Details of the file's configuration are in the tmnxLogFileIdTable
+         entry pointed to by the value of tmnxLogIdFileId.  An attempt to
+         set this object ot 'file' will fail with an inconsistentValue
+         error if tmnxLogIdSource has the value 'li' set.
+
+         The 'memory' destination causes all selected log events to be
+         directed to an in memory storage area.  The allocated memory size
+         for the log is specified in tmnxLogIdMaxMemorySize.  The events are
+         logged to memory in a circular fashion.  Once the space is full,
+         the oldest entry is replaced with a new entry."
+    DEFVAL { none }
+    ::= { tmnxLogIdEntry 9 }
+
+ tmnxLogIdFileId      OBJECT-TYPE
+    SYNTAX      TmnxLogFileId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogIdFileId is the index to the entry in the
+         tmnxLogFileIdTable that specifies the file characteristics to be
+         used for the destination of the log events written to this log.
+
+         tmnxLogIdOperStatus will not transition to 'inService' until a
+         valid value has been set for tmnxLogIdFileId.  This object is
+         valid only if tmnxLogIdDestination is set to 'file'."
+    ::= { tmnxLogIdEntry 10 }
+
+ tmnxLogIdSyslogId     OBJECT-TYPE
+    SYNTAX      TmnxSyslogIdOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogIdSyslogId is the index into the
+         tmnxSyslogTargetTable for the row entry with the information to
+         format event messages to be sent to a specific syslog collector target.
+
+         This object is valid only when tmnxLogIdDestination has a value of
+         'syslog'.  If this object has a value of zero (0), then no collector
+         is specified and no messages are sent."
+    DEFVAL { 0 }
+    ::= { tmnxLogIdEntry 11 }
+
+ tmnxLogIdMaxMemorySize     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0|50..3000)
+    UNITS       "events"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogIdMaxMemorySize specifies the amount of memory to
+         allocate for this log.  This object is valid only when
+         tmnxLogIdDestination has a value of 'memory' or 'snmpTraps'.
+         If the value tmnxLogIdDestination is neither 'memory' nor
+         'snmpTraps' a read of this object will return zero (0).
+
+         Once a memory size has been specified and the log created, any
+         attempt to modify this object will fail with an INCONSISTENT
+         VALUE error."
+    DEFVAL { 100 }
+    ::= { tmnxLogIdEntry 12 }
+
+ tmnxLogIdConsoleSession    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object exists for the convenience of the Alcatel-Lucent SROS CLI.
+         When set to 'true' it indicates that the 'CONSOLE' log output
+         should be printed to the Telnet session instead of the CONSOLE
+         device.  When a tmnxLogIdEntry is created directly via SNMP,
+         setting this object has no meaning and the 'CONSOLE' log output
+         will always be sent to the CONSOLE device."
+    DEFVAL { false }
+    ::= { tmnxLogIdEntry 13 }
+
+ tmnxLogIdForwarded     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogIdForwarded is the count of the number of events
+         that have been forwarded to this log's destination.  This counter is
+         incremented after an event has been selected by the log filter defined
+         in tmnxLogIdFilterId."
+    ::= { tmnxLogIdEntry 14 }
+
+ tmnxLogIdDropped   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogIdDropped is the count of the number of events
+         that have been sent to this logs source(s) and that have not been
+         forwarded to the log destination because they were filtered out
+         by the log filter defined in tmnxLogIdFilterId."
+    ::= { tmnxLogIdEntry 15 }
+
+ tmnxLogIdTimeFormat     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    utc (1),
+                    local (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogIdTimeFormat specifies the type of timestamp
+         format for events sent to logs where tmnxLogIdDestination
+         has a value of either 'syslog (2)' or 'file (4)'.
+
+         When tmnxLogIdTimeFormat has a value of 'utc (1)' timestamps are
+         written using the Coordinated Universal Time value.  When
+         tmnxLogIdTimeFormat has a value of 'local (2)' timestamps are
+         written in the system's local time."
+    DEFVAL { utc }
+    ::= { tmnxLogIdEntry 16 }
+
+--
+--  Alcatel-Lucent SROS series Log Filter Table
+--
+tmnxLogFilterTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TmnxLogFilterEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "  "
+    ::= { tmnxLogObjs 6 }
+
+tmnxLogFilterEntry OBJECT-TYPE
+    SYNTAX       TmnxLogFilterEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular Log Filter entry.
+
+        Entries are created by user.
+        Entries are deleted by user.
+        Entry 1001 is created by the agent for default TmnxLogIdIndex 100.
+
+        There is no StorageType object.  Entries have a presumed
+        StorageType of nonVolatile.
+        "
+    INDEX { tmnxLogFilterId }
+    ::= { tmnxLogFilterTable 1 }
+
+TmnxLogFilterEntry ::= SEQUENCE
+    {
+        tmnxLogFilterId            TmnxLogFilterId,
+        tmnxLogFilterRowStatus     RowStatus,
+        tmnxLogFilterDescription   TItemDescription,
+        tmnxLogFilterDefaultAction TFilterAction,
+        tmnxLogFilterInUse         TruthValue
+    }
+
+tmnxLogFilterId  OBJECT-TYPE
+    SYNTAX       TmnxLogFilterId (1..1001)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The value of tmnxLogFilterId is a unique index that identifies a
+         particular entry in the tmnxLogFilterTable."
+    ::= { tmnxLogFilterEntry 1 }
+
+tmnxLogFilterRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row entries in this table are created and destroyed via SNMP set
+         requests."
+    ::= { tmnxLogFilterEntry 2 }
+
+tmnxLogFilterDescription  OBJECT-TYPE
+    SYNTAX       TItemDescription
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The value of tmnxLogFilterDescription is a user provided description
+         string for this log filter.  It can consist of any printable,
+         seven-bit ASCII characters up to 80 characters in length."
+    DEFVAL { ''H }
+    ::= { tmnxLogFilterEntry 3 }
+
+tmnxLogFilterDefaultAction  OBJECT-TYPE
+    SYNTAX       TFilterAction
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The action to take for packets that do not match any filter entries.
+        the values default(3), and nat(5) are not allowed."
+    DEFVAL { forward }
+    ::= { tmnxLogFilterEntry 4 }
+
+tmnxLogFilterInUse      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When tmnxLogFilterInUse has a value of 'true', this filter is
+         attached to a log file configuration.  The same tmnxLogFilterEntry
+         can be attached to more than one log file."
+    ::= { tmnxLogFilterEntry 5 }
+
+--
+-- Alcatel-Lucent SROS series Log Filter Entry parameters
+--
+
+tmnxLogFilterParamsTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TmnxLogFilterParamsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "A table of all log filter match entries for all log filters."
+    ::= { tmnxLogObjs 7 }
+
+tmnxLogFilterParamsEntry OBJECT-TYPE
+    SYNTAX       TmnxLogFilterParamsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular Log Filter Parameter entry.
+        Every Log Filter can have zero or more Log Filter Parameter match
+        entries.
+
+        The Log Filter parameter entries are checked in ascending order by
+        their index value, tmnxLogFilterParamsIndex.  Upon the first successful
+        match, the specified actions are applied as indicated by the value of
+        tmnxLogFilterParamsAction.  No further checking against
+        remaining tmnxLogFilterParamsEntry rows is done.  Therefore, entries
+        in this table should be sequenced from most to least explicit match
+        criterion.  It is recommended that multiple parameter entries for a log
+        filter should be created with gaps between their index values.  This
+        allows a new entry to be inserted into an existing filter policy
+        without needing to renumber the already existing filter parameters
+        entries.
+
+        A log filter entry in the tmnxLogFilterTable with no entry in the
+        tmnxLogFilterParamsTable to define its match criteria set will match
+        every log event, and the default action specified by
+        tmnxLogFilterDefaultAction will be taken.
+
+        Entries are created by user.
+        Entries are deleted by user.
+
+        There is no StorageType object, entries have a presumed
+        StorageType of nonVolatile.
+        "
+    INDEX { tmnxLogFilterId, tmnxLogFilterParamsIndex }
+    ::= { tmnxLogFilterParamsTable 1 }
+
+TmnxLogFilterParamsEntry ::= SEQUENCE
+    {
+        tmnxLogFilterParamsIndex            TmnxLogFilterEntryId,
+        tmnxLogFilterParamsRowStatus        RowStatus,
+        tmnxLogFilterParamsDescription      TItemDescription,
+        tmnxLogFilterParamsAction           TFilterActionOrDefault,
+        tmnxLogFilterParamsApplication      TNamedItemOrEmpty,
+        tmnxLogFilterParamsApplOperator     TmnxLogFilterOperator,
+        tmnxLogFilterParamsNumber           TmnxEventNumber,
+        tmnxLogFilterParamsNumberOperator   TmnxLogFilterOperator,
+        tmnxLogFilterParamsSeverity         TmnxPerceivedSeverity,
+        tmnxLogFilterParamsSeverityOperator TmnxLogFilterOperator,
+        tmnxLogFilterParamsSubject          TNamedItemOrEmpty,
+        tmnxLogFilterParamsSubjectOperator  TmnxLogFilterOperator,
+        tmnxLogFilterParamsSubjectRegexp    TruthValue,
+        tmnxLogFilterParamsRouter           TNamedItemOrEmpty,
+        tmnxLogFilterParamsRouterOperator   TmnxLogFilterOperator,
+        tmnxLogFilterParamsRouterRegexp     TruthValue
+    }
+
+tmnxLogFilterParamsIndex  OBJECT-TYPE
+    SYNTAX       TmnxLogFilterEntryId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        ""
+    ::= { tmnxLogFilterParamsEntry 1 }
+
+tmnxLogFilterParamsRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status for this Log filter's parameter entry."
+    ::= { tmnxLogFilterParamsEntry 2 }
+
+tmnxLogFilterParamsDescription  OBJECT-TYPE
+    SYNTAX       TItemDescription
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The value of tmnxLogFilterParamsDescription is a user provided
+         description string for this log filter match entry.  It can consist
+         of any printable, seven-bit ASCII characters up to 80 characters in
+         length."
+    DEFVAL { ''H }
+    ::= { tmnxLogFilterParamsEntry 3 }
+
+tmnxLogFilterParamsAction  OBJECT-TYPE
+    SYNTAX       TFilterActionOrDefault
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "the action to take for log events that match this filter entry.
+        the value default(3) is allowed.  If tmnxLogFilterParamsAction
+        has the value 'default', the action specified by the value
+        of tmnxLogFilterDefaultAction is applied to events that match
+        this filter entry. The value nat(5) is not allowed."
+    DEFVAL { default }
+    ::= { tmnxLogFilterParamsEntry 4 }
+
+tmnxLogFilterParamsApplication  OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Matches log events with the specified application name.  An
+         application is the software entity the reports the log event and
+         includes IP, MPLS, OSPF, CLI, SERVICES, etc."
+    DEFVAL { ''H }  -- empty string
+    ::= { tmnxLogFilterParamsEntry 5 }
+
+tmnxLogFilterParamsApplOperator OBJECT-TYPE
+    SYNTAX      TmnxLogFilterOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFilterParamsApplOperator is the comparison
+         operator to use to determine if the log event matches the value
+         of tmnxLogFilterParamsApplication.  The only valid values from
+         TmnxLogFilterOperator are 'off', 'equal', and 'notEqual'."
+    DEFVAL { off }
+    ::= { tmnxLogFilterParamsEntry 6 }
+
+tmnxLogFilterParamsNumber       OBJECT-TYPE
+    SYNTAX      TmnxEventNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFilterParamsNumber is the log event number to
+         be matched.  Event numbers uniquely identify a certain event within
+         an application but not across applications."
+    DEFVAL { 0 }
+    ::= { tmnxLogFilterParamsEntry 7 }
+
+tmnxLogFilterParamsNumberOperator   OBJECT-TYPE
+    SYNTAX      TmnxLogFilterOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFilterParamsNumberOperator is the comparison
+         operator to use to determine if the log event matches the value
+         of tmnxLogFilterParamsNumber."
+    DEFVAL { off }
+    ::= { tmnxLogFilterParamsEntry 8 }
+
+tmnxLogFilterParamsSeverity     OBJECT-TYPE
+    SYNTAX      TmnxPerceivedSeverity
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFilterParamsSeverity is the log event severity
+         level to be matched."
+    DEFVAL { none }
+    ::= { tmnxLogFilterParamsEntry 9 }
+
+ tmnxLogFilterParamsSeverityOperator        OBJECT-TYPE
+    SYNTAX      TmnxLogFilterOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFilterParamsSeverityOperator is the comparison
+         operator to use to determine if the log event matches the value
+         of tmnxLogFilterParamsSeverity."
+    DEFVAL { off }
+    ::= { tmnxLogFilterParamsEntry 10 }
+
+ tmnxLogFilterParamsSubject     OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFilterParamsSubject is the log event subject
+         string to be matched.  The subject is the entity that the event is
+         reported for, such as a port ID."
+    DEFVAL { ''H }
+    ::= { tmnxLogFilterParamsEntry 11 }
+
+ tmnxLogFilterParamsSubjectOperator     OBJECT-TYPE
+    SYNTAX      TmnxLogFilterOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFilterParamsSubjectOperator is the comparison
+         operator to use to determine if the log event matches the value
+         of tmnxLogFilterParamsSubject.  The only valid values of
+         TmnxLogFilterOperator to use for the subject string comparison are
+         'off', 'equal', and 'notEqual'."
+    DEFVAL { off }
+    ::= { tmnxLogFilterParamsEntry 12 }
+
+ tmnxLogFilterParamsSubjectRegexp     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFilterParamsSubjectRegexp specifies the type
+         of string comparison to use to determine if the log event matches
+         the value of tmnxLogFilterParamsSubject.  When the value of
+         tmnxLogFilterParamsSubjectRegexp is 'true', the string in
+         tmnxLogFilterParamsSubject is a regular expression string to be
+         matched against the subject string in the log event being filtered.
+         When it has a value of 'false', the string in
+         tmnxLogFilterParamsSubject is matched exactly by the event
+         filter."
+    DEFVAL { false }
+    ::= { tmnxLogFilterParamsEntry 13 }
+
+ tmnxLogFilterParamsRouter      OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFilterParamsRouter is the log event router
+         context name string to be matched."
+    DEFVAL { ''H }
+    ::= { tmnxLogFilterParamsEntry 14 }
+
+ tmnxLogFilterParamsRouterOperator      OBJECT-TYPE
+    SYNTAX      TmnxLogFilterOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFilterParamsRouterOperator is the comparison
+         operator to use to determine if the log event matches the value
+         of tmnxLogFilterParamsRouter.  The only valid values of
+         TmnxLogFilterOperator to use for the router name string comparison
+         are 'off', 'equal', and 'notEqual'."
+    DEFVAL { off }
+    ::= { tmnxLogFilterParamsEntry 15 }
+
+ tmnxLogFilterParamsRouterRegexp      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFilterParamsRouterRegexp specifies the type
+         of string comparison to use to determine if the log event matches
+         the value of tmnxLogFilterParamsRouter.  When the value of
+         tmnxLogFilterParamsRouterRegexp is 'true', the string in
+         tmnxLogFilterParamsRouter is a regular expression string to be
+         matched against the router name string in the log event being
+         filtered.  When it has a value of 'false', the string in
+         tmnxLogFilterParamsRouter is matched exactly by the event
+         filter."
+    DEFVAL { false }
+    ::= { tmnxLogFilterParamsEntry 16 }
+
+
+--
+-- Alcatel-Lucent SROS series Syslog Target Entry parameters
+--
+
+tmnxSyslogTargetTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TmnxSyslogTargetEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A table of all remote syslog collectors that this agent is
+         configured to send syslog messages to."
+    ::= { tmnxLogObjs 8 }
+
+tmnxSyslogTargetEntry OBJECT-TYPE
+    SYNTAX       TmnxSyslogTargetEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular Syslog Target entry.
+
+         Entries are created by user.
+         Entries are deleted by user.
+
+         There is no StorageType object, entries have a presumed
+         StorageType of nonVolatile. "
+    INDEX { tmnxSyslogTargetIndex }
+    ::= { tmnxSyslogTargetTable 1 }
+
+TmnxSyslogTargetEntry ::= SEQUENCE
+    {
+        tmnxSyslogTargetIndex               TmnxSyslogId,
+        tmnxSyslogTargetRowStatus           RowStatus,
+        tmnxSyslogTargetDescription         TItemDescription,
+        tmnxSyslogTargetAddress             IpAddress,
+        tmnxSyslogTargetUdpPort             TmnxUdpPort,
+        tmnxSyslogTargetFacility            TmnxSyslogFacility,
+        tmnxSyslogTargetSeverity            TmnxSyslogSeverity,
+        tmnxSyslogTargetMessagePrefix       TNamedItemOrEmpty,
+        tmnxSyslogTargetMessagesDropped     Counter32,
+        tmnxSyslogTargetAddrType            InetAddressType,
+        tmnxSyslogTargetAddr                InetAddress
+    }
+
+tmnxSyslogTargetIndex     OBJECT-TYPE
+    SYNTAX       TmnxSyslogId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The value of tmnxSyslogTargetIndex is a unique arbitrary identifier
+         for this syslog collector target."
+    ::= { tmnxSyslogTargetEntry 1 }
+
+tmnxSyslogTargetRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSyslogTargetRowStatus object allows for dynamic creation and
+         deletion of row entries in the tmnxSyslogTargetTable as well as the
+         activation and deactivation of these entries.
+
+         When this object's value is set to 'notInService (2)', no messages
+         will be sent to this target collector and none of its counters will
+         be incremented.
+
+         Refer to the RowStatus convention for further details on the behavior
+         of this object."
+    REFERENCE
+        "RFC2579 (Textual Conventions for SMIv2)"
+    ::= { tmnxSyslogTargetEntry 2 }
+
+tmnxSyslogTargetDescription     OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyslogTargetDescription is an administratively
+         assigned textual description of this syslog collector target."
+    DEFVAL { ''H }  -- the empty string
+    ::= { tmnxSyslogTargetEntry 3 }
+
+tmnxSyslogTargetAddress     OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxSyslogTargetAddress is the IPv4 address for
+         this syslog message collector target.  If the value of this
+         object is '0.0.0.0', then no messages will be sent, nor will
+         any counters be incremented.
+
+         This object was made obsolete in release 5.0.  It is replaced
+         by the InetAddress pair tmnxSyslogTargetAddrType and
+         tmnxSyslogTargetAddr."
+    DEFVAL { '00000000'h }      -- 0.0.0.0
+    ::= { tmnxSyslogTargetEntry 4 }
+
+tmnxSyslogTargetUdpPort     OBJECT-TYPE
+    SYNTAX      TmnxUdpPort
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyslogTargetUdpPort is the UDP port number that
+         is used to send messages to this syslog collector target."
+    DEFVAL { 514 }  -- The IANA assigned port number for syslog
+    ::= { tmnxSyslogTargetEntry 5 }
+
+tmnxSyslogTargetFacility    OBJECT-TYPE
+    SYNTAX      TmnxSyslogFacility
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyslogTargetFacility is the syslog facility number
+         that will be encoded in messages sent to this syslog collector target."
+    DEFVAL { local7 }
+    ::= { tmnxSyslogTargetEntry 6 }
+
+tmnxSyslogTargetSeverity    OBJECT-TYPE
+    SYNTAX      TmnxSyslogSeverity
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyslogTargetSeverity is the maximum severity level
+         of the messages that SHOULD be forwarded to this syslog collector
+         target.  The higher the level, the lower the severity."
+    DEFVAL { info }
+    ::= { tmnxSyslogTargetEntry 7 }
+
+tmnxSyslogTargetMessagePrefix   OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyslogTargetMessagePrefix is a string of ABNF
+         alphanumeric characters to be prepended as the MSG TAG to the
+         syslog MSG CONTENT string and separated from it with a colon
+         and space, ': '."
+    DEFVAL { ''H } -- the empty string
+    ::= { tmnxSyslogTargetEntry 8 }
+
+tmnxSyslogTargetMessagesDropped     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyslogTargetMessagesDropped is a count of messages
+         not sent to this syslog collector target because the severity level
+         of the message was above tmnxSyslogTargetSeverity; the higher the
+         level, the lower the severity."
+    ::= { tmnxSyslogTargetEntry 9 }
+
+tmnxSyslogTargetAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyslogTargetAddrType specifies the type of
+         host address to be used for the syslog message collector target.
+         This object indicates the type of address stored in the
+         corresponding tmnxSyslogTargetAddr object.
+
+         Only 'ipv4', 'ipv6', and 'ipv6z' address types are supported."
+    DEFVAL { unknown }
+    ::= { tmnxSyslogTargetEntry 10 }
+
+tmnxSyslogTargetAddr OBJECT-TYPE
+    SYNTAX      InetAddress  (SIZE(0|4|16|20))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyslogTargetAddr specifies the IP host address
+         to be used for the syslog message collector target.  If no address
+         is specified, ''H, then no messages will be sent nor will
+         any counters be incremented.
+
+         The syslog target address type is determined by the value of the
+         corresponding tmnxSyslogTargetAddrType object."
+    DEFVAL { ''H }
+    ::= { tmnxSyslogTargetEntry 11 }
+
+--
+-- Alcatel-Lucent SROS series Event Application Entry parameters
+--
+
+tmnxEventAppTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TmnxEventAppEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A table of all applications that generate TiMOS logger events."
+    ::= { tmnxLogObjs 9 }
+
+tmnxEventAppEntry OBJECT-TYPE
+    SYNTAX       TmnxEventAppEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular application entry.
+
+         Entries are created by the agent when the system initializes.
+
+         There is no StorageType object, entries have a presumed
+         StorageType of permanent. "
+    INDEX { tmnxEventAppIndex }
+    ::= { tmnxEventAppTable 1 }
+
+TmnxEventAppEntry ::= SEQUENCE
+    {
+        tmnxEventAppIndex          Unsigned32,
+        tmnxEventAppName           TNamedItem
+    }
+
+tmnxEventAppIndex     OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The value of tmnxEventAppIndex is a unique arbitrary identifier
+         for this application event generator."
+    ::= { tmnxEventAppEntry 1 }
+
+tmnxEventAppName    OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEventAppName is the name string that is
+     used in TiMOS log messages as the application that generated the
+         logged event."
+    ::= { tmnxEventAppEntry 2 }
+
+--
+-- Alcatel-Lucent SROS series Event Entry parameters
+--
+
+tmnxEventTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TmnxEventEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A table of all TiMOS events that can be generated."
+    ::= { tmnxLogObjs 10 }
+
+tmnxEventEntry OBJECT-TYPE
+    SYNTAX       TmnxEventEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular TiMOS event type entry.
+         Entries are created by the agent when the system initializes.
+         There is no StorageType object, entries have a presumed
+         StorageType of permanent. "
+    INDEX { tmnxEventAppIndex, tmnxEventID }
+    ::= { tmnxEventTable 1 }
+
+TmnxEventEntry ::= SEQUENCE
+    {
+        tmnxEventID         Unsigned32,
+        tmnxEventName       TNamedItem,
+        tmnxEventSeverity   TmnxPerceivedSeverity,
+        tmnxEventControl    TruthValue,
+        tmnxEventCounter    Counter32,
+        tmnxEventDropCount  Counter32,
+        tmnxEventReset      TmnxActionType,
+        tmnxEventThrottle   TruthValue
+    }
+
+tmnxEventID     OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The value of tmnxEventID is a unique arbitrary identifier
+         for indexing event type entries within an event generator application
+         as identified by the value of tmnxEventAppIndex."
+    ::= { tmnxEventEntry 1 }
+
+tmnxEventName   OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEventName is a short name string used to describe
+         this event type."
+    ::= { tmnxEventEntry 2 }
+
+tmnxEventSeverity   OBJECT-TYPE
+    SYNTAX      TmnxPerceivedSeverity
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEventSeverity indicates the severity level that
+         will be associated with this type of event when it is generated."
+    ::= { tmnxEventEntry 3 }
+
+tmnxEventControl    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEventControl determines whether or not events
+         of this type will be generated or suppressed.  When it has a value
+         of 'true', the event is generated and tmnxEventCounter is incremented.
+         When it has a value of 'false', the event is suppressed and
+         tmnxEventDropCount is incremented."
+    ::= { tmnxEventEntry 4 }
+
+tmnxEventCounter    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEventCounter is the number of times an event of this
+         type has been generated."
+    ::= { tmnxEventEntry 5 }
+
+tmnxEventDropCount      OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEventDropCount is the number of times and event
+        of this type has been suppressed because tmnxEventControl is set to
+        'false'.  When tmnxEventControl is set to 'true', tmnxEventDropCount
+        indicates the number of events dropped because of logger input
+        queue size overrun or dropped because of throttling when
+        tmnxEventThrottle is set to 'true'."
+    ::= { tmnxEventEntry 6 }
+
+tmnxEventReset      OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting tmnxEventReset to 'doAction (1)' causes the agent to
+         reset the values of tmnxEventSeverity and tmnxEventControl
+         to the default values for this event type."
+    DEFVAL { notApplicable }
+    ::= { tmnxEventEntry 7 }
+
+tmnxEventThrottle   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEventThrottle determines whether or not events
+         of this type will be throttled.  When it has a value
+         of 'true', the event is throttled at the rate indicated by the
+         value of tmnxEventThrottleLimit and tmnxEventThrottleInterval.
+         When it has a value of 'false', no event throttling is applied."
+    DEFVAL { false }
+    ::= { tmnxEventEntry 8 }
+
+--
+-- Alcatel-Lucent SROS series SNMP Trap Group Entry parameters
+--
+
+tmnxSnmpTrapGroupTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TmnxSnmpTrapGroupEntry
+    MAX-ACCESS   not-accessible
+    STATUS       obsolete
+    DESCRIPTION
+        "A table of all remote SNMP trap collectors to which this agent is
+         configured to send SNMP notifications messages.
+
+         This table was made obsolete in the 5.0 release and is replace
+         with tmnxSnmpTrapDestTable."
+    ::= { tmnxLogObjs 11 }
+
+tmnxSnmpTrapGroupEntry OBJECT-TYPE
+    SYNTAX       TmnxSnmpTrapGroupEntry
+    MAX-ACCESS   not-accessible
+    STATUS       obsolete
+    DESCRIPTION
+        "Information about a particular SNMP trap destination entry.
+         The first index instance creates and snmp trap group to be
+         associated with the event log with the same value for
+         tmnxLogIdIndex. The second and third indexes specify a
+         remote SNMP trap destination that will be sent SNMP notification
+         messages from the associated event log.
+
+         Entries are created by user.
+         Entries are deleted by user.
+
+         There is no StorageType object, entries have a presumed
+         StorageType of nonVolatile.
+
+         This table was made obsolete in the 5.0 release and is
+         replaced with the tmnxSnmpTrapDestTable."
+    INDEX { tmnxStgIndex, tmnxStgDestAddress, tmnxStgDestPort }
+    ::= { tmnxSnmpTrapGroupTable 1 }
+
+TmnxSnmpTrapGroupEntry ::= SEQUENCE
+    {
+        tmnxStgIndex            TmnxLogIdIndex,
+        tmnxStgDestAddress      IpAddress,
+        tmnxStgDestPort         TmnxUdpPort,
+        tmnxStgRowStatus        RowStatus,
+        tmnxStgDescription      TItemDescription,
+        tmnxStgVersion          SnmpMessageProcessingModel,
+        tmnxStgNotifyCommunity  OCTET STRING,
+        tmnxStgSecurityLevel    SnmpSecurityLevel
+    }
+
+tmnxStgIndex     OBJECT-TYPE
+    SYNTAX       TmnxLogIdIndex
+    MAX-ACCESS   not-accessible
+    STATUS       obsolete
+    DESCRIPTION
+        "The value of tmnxStgIndex specifies an snmp trap group to
+         be associated with the event log with the same value for
+         tmnxLogIdIndex.
+
+         This object was made obsolete in the 5.0 release.  It is
+         replaced by tmnxStdIndex."
+    ::= { tmnxSnmpTrapGroupEntry 1 }
+
+tmnxStgDestAddress     OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxStgDestAddress is the IPv4 address for
+         this remote snmp notification destination.  If the value of this
+         object is '0.0.0.0', then no messages will be sent, nor will
+         any counters be incremented.
+
+         This object was made obsolete in the 5.0 release.  It is
+         replaced by the InetAddressType/InetAddress objects
+         tmnxStdDestAddrType and tmnxStdDestAddr."
+    DEFVAL { '00000000'h }      -- 0.0.0.0
+    ::= { tmnxSnmpTrapGroupEntry 2 }
+
+tmnxStgDestPort     OBJECT-TYPE
+    SYNTAX      TmnxUdpPort
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxStgDestPort is the UDP port number that
+         is used to send messages to this remote SNMP notification
+         destination.
+
+         This object was made obsolete in the 5.0 release.  It is
+         replaced by tmnxStdDestPort."
+    DEFVAL { 162 }  -- The IANA assigned port number for SNMP notifications
+    ::= { tmnxSnmpTrapGroupEntry 3 }
+
+tmnxStgRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxStgRowStatus object allows for dynamic creation and
+         deletion of row entries in the tmnxSnmpTrapGroupTable as well
+         as the activation and deactivation of these entries.
+
+         When this object's value is set to 'notInService (2)', no messages
+         will be sent to this snmp trap group and none of its counters will
+         be incremented.
+
+         Refer to the RowStatus convention for further details on the behavior
+         of this object.
+
+         This object was made obsolete in the 5.0 release.  It is
+         replaced by tmnxStdRowStatus."
+    REFERENCE
+        "RFC2579 (Textual Conventions for SMIv2)"
+    ::= { tmnxSnmpTrapGroupEntry 4 }
+
+tmnxStgDescription     OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxStgDescription is an administratively
+         assigned textual description of this snmp trap destination.
+
+         This object was made obsolete in the 5.0 release.  It is
+         replaced by tmnxStdDescription."
+    DEFVAL { ''H }  -- the empty string
+    ::= { tmnxSnmpTrapGroupEntry 5 }
+
+tmnxStgVersion          OBJECT-TYPE
+    SYNTAX      SnmpMessageProcessingModel
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxStgVersion specifies the SNMP version that
+         will be used to format notification messages sent to this
+         snmp trap destination.
+
+         The values supported by the Alcatel-Lucent SROS series SNMP agent are:
+                        0  for SNMPv1
+                        1  for SNMPv2c
+                        3  for SNMPv3
+
+         This object was made obsolete in the 5.0 release.  It is
+         replaced by tmnxStdVersion."
+    DEFVAL { 3 }  -- SNMPv3
+    ::= { tmnxSnmpTrapGroupEntry 6 }
+
+tmnxStgNotifyCommunity  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxStgNotifyCommunity specifies the SNMPv1 or
+         SNMPv2c community name string or the SNMPv3 security name
+         used when an SNMP notification message is sent to this
+         trap destination.  If the value of this object is the empty
+         string, then no messages will be sent nor will any counters be
+         incremented.
+
+         This object was made obsolete in the 5.0 release.  It is
+         replaced by tmnxStdVersion."
+    DEFVAL { ''H }  -- the empty string
+    ::= { tmnxSnmpTrapGroupEntry 7 }
+
+tmnxStgSecurityLevel    OBJECT-TYPE
+    SYNTAX      SnmpSecurityLevel
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxStgSecurityLevel specifies the level of security
+         at which SNMP notification messages will be sent to the SNMP
+         trap destination when tmnxStgVersion has a value of '3' for
+         SNMPv3.
+
+         This object was made obsolete in the 5.0 release.  It is
+         replaced by tmnxStdSecurityLevel."
+    DEFVAL { noAuthNoPriv }
+    ::= { tmnxSnmpTrapGroupEntry 8 }
+
+
+--
+-- Alcatel-Lucent SROS series Global Event parameters
+--
+
+tmnxEventTest    OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting tmnxEventTest to 'doAction' causes the tmnxTestEvent
+         notification to be generated."
+    DEFVAL { notApplicable }
+    ::= { tmnxLogObjs 12 }
+
+tmnxEventThrottleLimit   OBJECT-TYPE
+    SYNTAX      Unsigned32  (1..20000)
+    UNITS       "events"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEventThrottleLimit specifies the number of
+         log events that can be logged within the tmnxEventThrottleInterval
+         for a specific entry in the tmnxEventTable.  Once the limit has
+         been reached, any additional events of that type will be dropped,
+         i.e. tmnxEventDropCount will be incremented.  At the end of the
+         throttle interval if any events have been dropped a
+         tmnxLogEventThrottled notification will be sent."
+    DEFVAL { 2000 }
+    ::= { tmnxLogObjs 13 }
+
+tmnxEventThrottleInterval   OBJECT-TYPE
+    SYNTAX      Unsigned32  (1..1200)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEventThrottleInterval specifies the number of
+         seconds that an event throttling interval lasts."
+    DEFVAL { 1 }
+    ::= { tmnxLogObjs 14 }
+
+
+--
+-- Alcatel-Lucent SROS series SNMP SET error messages
+--
+
+tmnxSnmpSetErrsMax  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSnmpSetErrsMax indicates the maximum number of
+         entries the agent will create in the tmnxSnmpSetErrsTable.
+         Once the table is full the agent will delete the oldest entry in
+         the table in order to add new entries."
+    ::= { tmnxLogObjs 15 }
+
+tmnxSnmpSetErrsTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TmnxSnmpSetErrsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A table of recent SNMP SET failures.  Only the SET errs from
+         remote SNMP manager requests are saved in this table.  Only
+         SET errs detected by the SNMP engine in the test phase
+         consistency check method functions are saved.  SET errors that
+         are caught by the preliminary access and ASN.1 decoding phase
+         are not saved.  These are errs such as noAccess, notWritable,
+         wrongType, wrongLength and wrongEncoding.  Note that notWritable,
+         wrongType, and wrongLength errs may sometimes be generated by
+         the consistency check; in this case they will be saved in this
+         table.
+
+         SET errs caused by local CLI sessions are not saved.
+
+         The tmnxSnmpSetErrsTable is intended to provide an aide to
+         Network Management Systems (NMS) developers.  When an SNMP SET
+         fails during the consistency checking test phase, this table may
+         provide more detailed failure reason information than the simple
+         SNMP error code value in the SNMP response PDU."
+    ::= { tmnxLogObjs 16 }
+
+tmnxSnmpSetErrsEntry OBJECT-TYPE
+    SYNTAX       TmnxSnmpSetErrsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular SNMP SET error.  The first two
+         index instances identify the SNMP manager who sent the SNMP SET
+         request that failed.  The third index specifies the SNMP request-id
+         (sequence number) of the SNMP SET request that failed.
+
+         Entries are created by the agent.
+         Entries are deleted by the agent.
+
+         There is no StorageType object, entries have a presumed
+         StorageType of volatile."
+    INDEX   {   tmnxSseAddressType,
+                tmnxSseAddress,
+                tmnxSseSnmpPort,
+                tmnxSseRequestId
+            }
+    ::= { tmnxSnmpSetErrsTable 1 }
+
+TmnxSnmpSetErrsEntry ::= SEQUENCE
+    {
+        tmnxSseAddressType      InetAddressType,
+        tmnxSseAddress          InetAddress,
+        tmnxSseSnmpPort         TmnxUdpPort,
+        tmnxSseRequestId        Unsigned32,
+        tmnxSseVersion          SnmpMessageProcessingModel,
+        tmnxSseSeverityLevel    TmnxPerceivedSeverity,
+        tmnxSseModuleId         Unsigned32,
+        tmnxSseModuleName       TNamedItem,
+        tmnxSseErrorCode        Unsigned32,
+        tmnxSseErrorName        DisplayString,
+        tmnxSseErrorMsg         DisplayString,
+        tmnxSseExtraText        OCTET STRING,
+        tmnxSseTimestamp        TimeStamp
+    }
+
+tmnxSseAddressType  OBJECT-TYPE
+    SYNTAX       InetAddressType
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The value of tmnxSseAddressType indicates the IP address
+         type of address specified in tmnxSseAddress.  'ipv4' and
+         'ipv6' are the only address type values supported."
+    ::= { tmnxSnmpSetErrsEntry 1 }
+
+tmnxSseAddress      OBJECT-TYPE
+    SYNTAX      InetAddress  (SIZE(4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSseAddress is the IP address of the SNMP
+         manager that sent the SNMP SET request that failed for this
+         error reason."
+    ::= { tmnxSnmpSetErrsEntry 2 }
+
+tmnxSseSnmpPort     OBJECT-TYPE
+    SYNTAX      TmnxUdpPort
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSseSnmpPort is the UDP port number of the SNMP
+         manager that sent the SNMP SET request that failed for this
+         error reason."
+    ::= { tmnxSnmpSetErrsEntry 3 }
+
+tmnxSseRequestId    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSseRequestId indicates the request-id of the SNMP
+         SNMP SET request that failed for this error reason."
+    ::= { tmnxSnmpSetErrsEntry 4 }
+
+tmnxSseVersion      OBJECT-TYPE
+    SYNTAX      SnmpMessageProcessingModel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSseVersion indicates the SNMP version of
+         the SNMP SET request that failed.
+
+         The values supported by the Alcatel-Lucent SROS series SNMP agent are:
+                        0  for SNMPv1
+                        1  for SNMPv2c
+                        3  for SNMPv3
+        "
+    ::= { tmnxSnmpSetErrsEntry 5 }
+
+tmnxSseSeverityLevel    OBJECT-TYPE
+    SYNTAX      TmnxPerceivedSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSseSeverityLevel indicates severity level that
+         is associated with this type SNMP SET error."
+    ::= { tmnxSnmpSetErrsEntry 6 }
+
+tmnxSseModuleId    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSseModuleId indicates a unique arbitrary
+         identified for the TiMOS application module that generated
+         this SNMP SET error.  NOTE: This is NOT the same value used
+         for tmnxEventAppIndex."
+    ::= { tmnxSnmpSetErrsEntry 7 }
+
+tmnxSseModuleName    OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSseModuleName indicates the name string of the
+         TiMOS application module that generated this SNMP SET error.
+         NOTE: This is NOT the same value used for tmnxEventAppName."
+    ::= { tmnxSnmpSetErrsEntry 8 }
+
+tmnxSseErrorCode    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSseErrorCode indicates the error number associated
+         with this SNMP SET error.  The error numbers are unique within
+         a tmnxSseModuleId.  They are not unique across all modules so
+         both the module name and error number are required to identify
+         a particular error message."
+    ::= { tmnxSnmpSetErrsEntry 9 }
+
+tmnxSseErrorName    OBJECT-TYPE
+    SYNTAX      DisplayString  (SIZE(1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSseErrorName indicates the error name associated
+         with this SNMP SET error.  The error names are unique within
+         a tmnxSseModuleId.  They are not unique across all modules so
+         both the module name and error name are required to identify
+         a particular error message."
+    ::= { tmnxSnmpSetErrsEntry 10 }
+
+tmnxSseErrorMsg    OBJECT-TYPE
+    SYNTAX      DisplayString  (SIZE(1..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSseErrorMsg indicates the fixed error message
+         text associated with this SNMP SET error identified by the values
+         of tmnxSseModuleId and tmnxSseErrorCode."
+    ::= { tmnxSnmpSetErrsEntry 11 }
+
+tmnxSseExtraText    OBJECT-TYPE
+    SYNTAX      OCTET STRING  (SIZE(0..320))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSseExtraText indicates the fixed run-time variable
+         message text associated with this SNMP SET error identified by the
+         values of tmnxSseModuleId and tmnxSseErrorCode.  If the extra text
+         was truncated to fit into buffer size allowed, the last character
+         will be an asterix (*)."
+    ::= { tmnxSnmpSetErrsEntry 12 }
+
+tmnxSseTimestamp    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSseTimestamp indicates the sysUpTime value when
+         this tmnxSnmpSetErrsEntry was created by the agent."
+    ::= { tmnxSnmpSetErrsEntry 13 }
+
+
+--
+-- Alcatel-Lucent SROS series SNMP Trap Log Entry parameters
+--
+--  Augmentation of the SNMP-NOTIFICATION-MIB::snmpNotifyTable
+--  Use of AUGMENTS clause implies a one-to-one dependent relationship
+--  between the base table, snmpNotifyTable, and the augmenting table,
+--  tmnxSnmpTrapLogTable. This in effect extends the snmpNotifyTable with
+--  additional columns. Creation (or deletion) of a row in the snmpNotifyTable
+--  results in the same fate for the row in the tmnxSnmpTrapLogTable.
+--
+
+tmnxSnmpTrapLogTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TmnxSnmpTrapLogEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A table of all remote SNMP trap logs to which this agent is
+         configured to send SNMP notifications messages."
+    ::= { tmnxLogObjs 17 }
+
+tmnxSnmpTrapLogEntry OBJECT-TYPE
+    SYNTAX       TmnxSnmpTrapLogEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Each row entry in the tmnxSnmpTrapLogTable represents additional
+         columns for attributes specific to the Alcatel-Lucent SROS series
+         implementation of SNMP-NOTIFICATION-MIB::snmpNotifyTable."
+    AUGMENTS { snmpNotifyEntry }
+    ::= { tmnxSnmpTrapLogTable 1 }
+
+TmnxSnmpTrapLogEntry ::= SEQUENCE
+    {
+        tmnxSnmpTrapLogDescription      TItemDescription
+    }
+
+tmnxSnmpTrapLogDescription     OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSnmpTrapLogDescription is an administratively
+         assigned textual description of this snmp trap log."
+    DEFVAL { ''H }  -- the empty string
+    ::= { tmnxSnmpTrapLogEntry 1 }
+
+
+--
+-- Alcatel-Lucent SROS series SNMP Trap Group Entry parameters
+--
+
+tmnxSnmpTrapDestTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TmnxSnmpTrapDestEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A table of all remote SNMP IPv4/v6 trap collectors to which this
+         agent is configured to send SNMP notification messages."
+    ::= { tmnxLogObjs 18 }
+
+tmnxSnmpTrapDestEntry OBJECT-TYPE
+    SYNTAX       TmnxSnmpTrapDestEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular SNMP notification destination entry.
+         The first index instance creates an snmp notification group to be
+         associated with the event log with the same value for
+         tmnxLogIdIndex. The second index specifies an administrative
+         name to identify a specific SNMP notification target.
+
+         Entries are created by user.
+         Entries are deleted by user.
+
+         There is no StorageType object, entries have a presumed
+         StorageType of nonVolatile."
+    INDEX   { tmnxStdIndex,
+              IMPLIED tmnxStdName
+            }
+    ::= { tmnxSnmpTrapDestTable 1 }
+
+TmnxSnmpTrapDestEntry ::= SEQUENCE
+    {
+        tmnxStdIndex            TmnxLogIdIndex,
+        tmnxStdName             SnmpAdminString,
+        tmnxStdRowStatus        RowStatus,
+        tmnxStdRowLastChanged   TimeStamp,
+        tmnxStdDestAddrType     InetAddressType,
+        tmnxStdDestAddr         InetAddress,
+        tmnxStdDestPort         TmnxUdpPort,
+        tmnxStdDescription      TItemDescription,
+        tmnxStdVersion          SnmpMessageProcessingModel,
+        tmnxStdNotifyCommunity  OCTET STRING,
+        tmnxStdSecurityLevel    SnmpSecurityLevel,
+        tmnxStdReplay           TruthValue,
+        tmnxStdReplayStart      Unsigned32,
+        tmnxStdReplayLastTime   TimeStamp
+    }
+
+tmnxStdIndex     OBJECT-TYPE
+    SYNTAX       TmnxLogIdIndex
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The value of tmnxStdIndex specifies an snmp notification group to
+         be associated with the event log with the same value for
+         tmnxLogIdIndex."
+    ::= { tmnxSnmpTrapDestEntry 1 }
+
+tmnxStdName     OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..28))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxStdName specifies the name of an snmp
+         notification destination within the snmp notification group
+         specified by tmnxLogIdIndex."
+    ::= { tmnxSnmpTrapDestEntry 2 }
+
+tmnxStdRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tmnxStdRowStatus object allows for dynamic creation and
+         deletion of row entries in the tmnxSnmpTrapDestTable as well
+         as the activation and deactivation of these entries.
+
+         In order for 'createAndGo' row creation to succeed or status
+         to transition to 'active' a value must be set for
+         tmnxStdNotifyCommunity.
+
+         In order for 'createAndGo' row creation to succeed or status
+         to transition to 'active' an entry must exist in the
+         SNMP-NOTIFICATION-MIB::snmpNotifyTable with an snmpNotifyName index
+         that is the ASCII string representation of the value of tmnxStdIndex.
+
+         When this object's value is set to 'notInService (2)', no messages
+         will be sent to this snmp notification collector and none of its
+         counters will be incremented.
+
+         Refer to the RowStatus convention for further details on the behavior
+         of this object."
+    REFERENCE
+        "RFC2579 (Textual Conventions for SMIv2)"
+    ::= { tmnxSnmpTrapDestEntry 3 }
+
+tmnxStdRowLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxStdRowLastChanged indicates the sysUpTime when
+         the value of a writable object in this row entry was modified."
+    ::= { tmnxSnmpTrapDestEntry 4 }
+
+tmnxStdDestAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxStdDestAddrType specifies the type of
+         host address to be used for the remote SNMP notification
+         collector.  This object indicates the type of address stored
+         in the corresponding tmnxStdDestAddr object.
+
+         If the value of this object is 'unknown', then no messages
+         will be sent nor will any counters be incremented.
+
+         If tmnxStdDestAddrType is not set in the same PDU with
+         tmnxStdDestAddr, the set request will fail with an
+         inconsistentValue error."
+    DEFVAL { unknown }
+    ::= { tmnxSnmpTrapDestEntry 5 }
+
+tmnxStdDestAddr OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(0|4|16|20))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxStdDestAddr specifies the IP host address
+         to be used for the remote SNMP notification collector.
+
+         The SNMP notification collector IP address type is determined by
+         the value of the corresponding tmnxStdDestAddrType object.
+
+         If the value of this object is empty or all NULLs, then no
+         messages will be sent nor will any counters be incremented.
+
+         If tmnxStdDestAddrType is not set in the same PDU with
+         tmnxStdDestAddr, the set request will fail with an
+         inconsistentValue error."
+    DEFVAL { ''H }
+    ::= { tmnxSnmpTrapDestEntry 6 }
+
+tmnxStdDestPort     OBJECT-TYPE
+    SYNTAX      TmnxUdpPort
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxStdDestPort is the UDP port number that
+         is used to send messages to this remote SNMP notification
+         collector."
+    DEFVAL { 162 }  -- The IANA assigned port number for SNMP notifications
+    ::= { tmnxSnmpTrapDestEntry 7 }
+
+tmnxStdDescription     OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxStdDescription is an administratively
+         assigned textual description of this SNMP notification collector."
+    DEFVAL { ''H }  -- the empty string
+    ::= { tmnxSnmpTrapDestEntry 8 }
+
+tmnxStdVersion          OBJECT-TYPE
+    SYNTAX      SnmpMessageProcessingModel
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxStdVersion specifies the SNMP version that
+         will be used to format notification messages sent to this
+         SNMP notification collector.
+
+         The values supported by the Alcatel-Lucent SROS series SNMP agent are:
+                        0  for SNMPv1
+                        1  for SNMPv2c
+                        3  for SNMPv3
+        "
+    DEFVAL { 3 }  -- SNMPv3
+    ::= { tmnxSnmpTrapDestEntry 9 }
+
+tmnxStdNotifyCommunity  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxStdNotifyCommunity specifies the SNMPv1 or
+         SNMPv2c community name string or the SNMPv3 security name
+         used when an SNMP notification message is sent to this
+         SNMP notification collector.  If the value of this object is
+         the empty string, then no messages will be sent nor will any
+         counters be incremented."
+    DEFVAL { ''H }  -- the empty string
+    ::= { tmnxSnmpTrapDestEntry 10 }
+
+tmnxStdSecurityLevel    OBJECT-TYPE
+    SYNTAX      SnmpSecurityLevel
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxStdSecurityLevel specifies the level of security
+         at which SNMP notification messages will be sent to the SNMP
+         notification collector when tmnxStdVersion has a value of '3' for
+         SNMPv3."
+    DEFVAL { noAuthNoPriv }
+    ::= { tmnxSnmpTrapDestEntry 11 }
+
+tmnxStdReplay   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxStdReplay specifies whether or not to resend
+         notifications that were generated while this notification
+         destination did not have a route installed for it in the route
+         tables."
+    DEFVAL { false }
+    ::= { tmnxSnmpTrapDestEntry 12 }
+
+tmnxStdReplayStart  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxStdReplayStart indicates the SNMP notification
+         request ID of the first event that cound not be generated because
+         there is no route to this notification target address.
+
+         Events will be resent when this notification target address is
+         readded to the route tables, on either an in-band or out-of-band
+         interface.  The agent searches backwards in the event log and
+         begins resending events from the oldest event that has a timestamp
+         <= 5 hundredths of a second less than the timestamp of the
+         event with this request ID.  Note that if the outage is long
+         and a large number of events are generated in the meantime,
+         it is possible that the log memory storage has wrapped and the
+         event data for this request ID is no longer available.  In that case,
+         the oldest event saved in the log will be the first event resent.
+
+         A value of 0 indicates that there are no missed events waiting
+         to be resent."
+    ::= { tmnxSnmpTrapDestEntry 13 }
+
+tmnxStdReplayLastTime   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxStdReplayLastTime indicates the sysUpTime when
+         missed events were last replayed to this SNMP notification target
+         address.  A value of 0 indicates that no missed events have been
+         replayed to this SNMP notification target address."
+    ::= { tmnxSnmpTrapDestEntry 14 }
+
+--
+-- Alcatel-Lucent SROS series Global SNMP Trap Group parameters
+--
+tmnxStdMaxTargets   OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..100)
+    UNITS       "trap-targets"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of tmnxSnmpTrapDestTable row entries that can
+         be created for a specific tmnxStdIndex that represents an snmp
+         notification group."
+    DEFVAL { 25 }
+    ::= { tmnxLogObjs 19 }
+
+--
+-- tmnxLogApCustRecordTable
+-- Log Accounting Policy Table extensions to create a custom record
+--
+tmnxLogApCustRecordTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF TmnxLogApCustRecordEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "The Alcatel-Lucent SROS series tmnxLogApCustRecordTable augments
+        tmnxLogApTable.
+        The table allows to configure the layout and setting for
+        a custom accounting record associated with this accounting policy."
+  ::= { tmnxLogObjs 20 }
+
+tmnxLogApCustRecordEntry OBJECT-TYPE
+    SYNTAX      TmnxLogApCustRecordEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the tmnxLogApCustRecordTable. Entries in this
+         table are created and destroyed via SNMP Set requests to the
+         tmnxLogApRowStatus object of the tmnxLogApTable."
+    AUGMENTS { tmnxLogApEntry }
+    ::= { tmnxLogApCustRecordTable 1 }
+
+TmnxLogApCustRecordEntry ::=
+    SEQUENCE {
+        tmnxLogApCrLastChanged           TimeStamp,
+        tmnxLogApCrSignChangeDelta       Unsigned32,
+        tmnxLogApCrSignChangeQueue       TQueueIdOrAll,
+        tmnxLogApCrSignChangeOCntr       THsmdaCounterIdOrZeroOrAll,
+        tmnxLogApCrSignChangeQICounters  TmnxAccPlcyQICounters,
+        tmnxLogApCrSignChangeQECounters  TmnxAccPlcyQECounters,
+        tmnxLogApCrSignChangeOICounters  TmnxAccPlcyOICounters,
+        tmnxLogApCrSignChangeOECounters  TmnxAccPlcyOECounters,
+        tmnxLogApCrSignChangeAACounters  TmnxAccPlcyAACounters,
+        tmnxLogApCrAACounters            TmnxAccPlcyAACounters
+    }
+
+tmnxLogApCrLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrLastChanged indicates the sysUpTime when
+         an object in this table was last modified. A Value 0 means that
+         no change was made to this row since the box was last initialized."
+    ::= { tmnxLogApCustRecordEntry 1 }
+
+tmnxLogApCrSignChangeDelta OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrSignChangeDelta specifies the delta
+         change  (significant change) that is required for the custom record
+         to be written to the xml file."
+    DEFVAL { 0 }
+    ::= { tmnxLogApCustRecordEntry 2 }
+
+tmnxLogApCrSignChangeQueue OBJECT-TYPE
+    SYNTAX      TQueueIdOrAll
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrSignChangeQueue specifies the reference
+        queue to which the significant change defined in
+        tmnxLogApCrSignChangeDelta applies."
+    DEFVAL { 0 }
+    ::= { tmnxLogApCustRecordEntry 3 }
+
+tmnxLogApCrSignChangeOCntr OBJECT-TYPE
+    SYNTAX      THsmdaCounterIdOrZeroOrAll
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrSignChangeOCntr specifies the counter-id
+         that will be taken as reference to which the significant
+         change defined in tmnxLogApCrSignChangeDelta applies."
+    DEFVAL { 0 }
+    ::= { tmnxLogApCustRecordEntry 4 }
+
+tmnxLogApCrSignChangeQICounters OBJECT-TYPE
+    SYNTAX      TmnxAccPlcyQICounters
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrSignChangeQICounters specifies the ingress
+         counter Ids in the queue defined by tmnxLogApCrSignChangeQueue to be
+         taken as reference to which the significant change defined in
+         tmnxLogApCrSignChangeDelta applies.
+
+         A non-zero value of this object is only allowed if the object
+         tmnxLogApCrSignChangeQueue has a non-zero value."
+    DEFVAL { '0'H }
+    ::= { tmnxLogApCustRecordEntry 5 }
+
+tmnxLogApCrSignChangeQECounters OBJECT-TYPE
+    SYNTAX      TmnxAccPlcyQECounters
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrSignChangeQECounters specifies the egress
+         counter Ids in the queue defined by tmnxLogApCrSignChangeQueue to be
+         taken as reference to which the significant change defined in
+         tmnxLogApCrSignChangeDelta applies.
+
+         A non-zero value of this object is only allowed if the object
+         tmnxLogApCrSignChangeQueue has a non-zero value."
+    DEFVAL { '0'H }
+    ::= { tmnxLogApCustRecordEntry 6 }
+
+tmnxLogApCrSignChangeOICounters OBJECT-TYPE
+    SYNTAX      TmnxAccPlcyOICounters
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrSignChangeOICounters specifies the ingress
+         counter Ids in the counter-group defined by tmnxLogApCrSignChangeOCntr
+         to be taken as reference to which the significant change defined in
+         tmnxLogApCrSignChangeDelta applies.
+
+         A non-zero value of this object is only allowed if the object
+         tmnxLogApCrSignChangeOCntr has a non-zero value."
+    DEFVAL { '0'H }
+    ::= { tmnxLogApCustRecordEntry 7 }
+
+tmnxLogApCrSignChangeOECounters OBJECT-TYPE
+    SYNTAX      TmnxAccPlcyOECounters
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrSignChangeOECounters specifies the egress
+         counter Ids in the counter-group defined by tmnxLogApCrSignChangeOCntr
+         to be taken as reference to which the significant change defined in
+         tmnxLogApCrSignChangeDelta applies.
+
+         A non-zero value of this object is only allowed if the object
+         tmnxLogApCrSignChangeOCntr has a non-zero value."
+    DEFVAL { '0'H }
+    ::= { tmnxLogApCustRecordEntry 8 }
+
+tmnxLogApCrSignChangeAACounters OBJECT-TYPE
+    SYNTAX      TmnxAccPlcyAACounters
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrSignChangeAACounters specifies the
+         AA (Application assurance) counter Ids  to be taken as reference to
+         which the significant change defined in tmnxLogApCrSignChangeDelta
+         applies.
+
+         A non-zero value of this object is only allowed if both the objects
+         tmnxLogApCrSignChangeOCntr and tmnxLogApCrSignChangeQueue are zero.
+
+         Also, a non-zero value for this object is only allowed if the object
+         tmnxLogApCrSignChangeDelta is either 0 or 1."
+    DEFVAL { '0'H }
+    ::= { tmnxLogApCustRecordEntry 9 }
+
+tmnxLogApCrAACounters OBJECT-TYPE
+    SYNTAX      TmnxAccPlcyAACounters
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrQueueECounters indicates the list of
+         AA  (application Assurance) counters that need to be collected
+         in this custom record."
+    DEFVAL { '0'H }
+    ::= { tmnxLogApCustRecordEntry 10 }
+
+--
+-- tmnxLogApCustRecordQueueTable
+-- Log Accounting Policy Table extensions to create a custom record
+--
+tmnxLogApCustRecordQueueTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF TmnxLogApCustRecordQueueEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "The Alcatel-Lucent SROS series tmnxLogApCustRecordQueueTable
+        allows to create custom record queue information for a given
+        accounting policy.
+        Rows can only be created for existing accounting policies
+        (as defined in tmnxLogApTable)."
+  ::= { tmnxLogObjs 21 }
+
+tmnxLogApCustRecordQueueEntry OBJECT-TYPE
+    SYNTAX      TmnxLogApCustRecordQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the tmnxLogApCustRecordQueueTable. Entries in this
+         table are created and destroyed via SNMP Set requests."
+    INDEX { tmnxLogApPolicyId,
+            tmnxLogApCrQueueId }
+    ::= { tmnxLogApCustRecordQueueTable 1 }
+
+TmnxLogApCustRecordQueueEntry ::=
+    SEQUENCE {
+        tmnxLogApCrQueueId               TQueueId,
+        tmnxLogApCrQueueRowStatus        RowStatus,
+        tmnxLogApCrQueueLastChanged      TimeStamp,
+        tmnxLogApCrQueueICounters        TmnxAccPlcyQICounters,
+        tmnxLogApCrQueueECounters        TmnxAccPlcyQECounters
+    }
+
+tmnxLogApCrQueueId OBJECT-TYPE
+    SYNTAX      TQueueId (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrQueueId specifies the queue-id for which
+         counters will be collected in this custom record. The counters that
+         will be collected are defined in tmnxLogApCrQueueICounters and
+         tmnxLogApCrQueueECounters."
+    ::= { tmnxLogApCustRecordQueueEntry 1 }
+
+tmnxLogApCrQueueRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Row Status of the entry. This allows creation/deletion of rows in this
+         table."
+    ::= { tmnxLogApCustRecordQueueEntry 2 }
+
+tmnxLogApCrQueueLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrQueueLastChanged indicates the sysUpTime when
+         an object in this table was last modified. A Value 0 means that
+         no change was made to this row since it was created."
+    ::= { tmnxLogApCustRecordQueueEntry 3 }
+
+tmnxLogApCrQueueICounters OBJECT-TYPE
+    SYNTAX      TmnxAccPlcyQICounters
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrQueueICounters indicates the list of
+         ingress counters that need to be collected in this custom record.
+
+         At least one of the objects tmnxLogApCrQueueICounters or
+         tmnxLogApCrQueueECounters must have a non-zero value."
+    DEFVAL { '0'H }
+    ::= { tmnxLogApCustRecordQueueEntry 4 }
+
+tmnxLogApCrQueueECounters OBJECT-TYPE
+    SYNTAX      TmnxAccPlcyQECounters
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrQueueECounters indicates the list of
+         egress counters that need to be collected in this custom record.
+
+         At least one of the objects tmnxLogApCrQueueICounters or
+         tmnxLogApCrQueueECounters must have a non-zero value."
+    DEFVAL { '0'H }
+    ::= { tmnxLogApCustRecordQueueEntry 5 }
+
+--
+-- tmnxLogApCrOverrideCntrTable
+-- Log Accounting Policy Table extensions to create a custom record
+--
+tmnxLogApCrOverrideCntrTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF TmnxLogApCrOverrideCntrEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "The Alcatel-Lucent SROS series tmnxLogApCrOverrideCntrTable
+        allows to create custom record counter override information for a given
+        accounting policy.
+
+        Rows can only be created for existing accounting policies
+        (as defined in tmnxLogApTable)."
+  ::= { tmnxLogObjs 22 }
+
+tmnxLogApCrOverrideCntrEntry OBJECT-TYPE
+    SYNTAX      TmnxLogApCrOverrideCntrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the tmnxLogApCrOverrideCntrTable. Entries in this
+         table are created and destroyed via SNMP Set requests."
+    INDEX { tmnxLogApPolicyId,
+            tmnxLogApCrOverrideCntrId }
+    ::= { tmnxLogApCrOverrideCntrTable 1 }
+
+TmnxLogApCrOverrideCntrEntry ::=
+    SEQUENCE {
+        tmnxLogApCrOverrideCntrId        THsmdaCounterIdOrZero,
+        tmnxLogApCrOverrideCntrRowStatus RowStatus,
+        tmnxLogApCrOverrideCntrLastChngd TimeStamp,
+        tmnxLogApCrOverrideCntrICounters TmnxAccPlcyOICounters,
+        tmnxLogApCrOverrideCntrECounters TmnxAccPlcyOECounters
+    }
+
+tmnxLogApCrOverrideCntrId OBJECT-TYPE
+    SYNTAX      THsmdaCounterIdOrZero (1..8)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrOverrideCntrId specifies the counter group
+         for which counters will be collected in this custom record.
+         The counters that will be collected are defined in
+         tmnxLogApCrOverrideCntrICounters and tmnxLogApCrOverrideCntrECounters."
+    ::= { tmnxLogApCrOverrideCntrEntry 1 }
+
+tmnxLogApCrOverrideCntrRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Row Status of the entry. This allows creation/deletion of rows in this
+         table."
+    ::= { tmnxLogApCrOverrideCntrEntry 2 }
+
+tmnxLogApCrOverrideCntrLastChngd OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrOverrideCntrLastChngd indicates the sysUpTime
+         when an object in this table was last modified. A Value 0 means that
+         no change was made to this row since it was created."
+    ::= { tmnxLogApCrOverrideCntrEntry 3 }
+
+tmnxLogApCrOverrideCntrICounters OBJECT-TYPE
+    SYNTAX      TmnxAccPlcyOICounters
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrOverrideCntrICounters indicates the list of
+         ingress counters that need to be collected in this custom record.
+
+         At least one of the objects tmnxLogApCrOverrideCntrICounters or
+         tmnxLogApCrOverrideCntrECounters must have a non-zero value."
+    DEFVAL { '0'H }
+    ::= { tmnxLogApCrOverrideCntrEntry 4 }
+
+tmnxLogApCrOverrideCntrECounters OBJECT-TYPE
+    SYNTAX      TmnxAccPlcyOECounters
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApCrOverrideCntrECounters indicates the list of
+         egress counters that need to be collected in this custom record.
+
+         At least one of the objects tmnxLogApCrOverrideCntrICounters or
+         tmnxLogApCrOverrideCntrECounters must have a non-zero value."
+    DEFVAL { '0'H }
+    ::= { tmnxLogApCrOverrideCntrEntry 5 }
+
+--
+--   SNMP Notifications Route Preference Global Parameters 
+--
+tmnxEventPrimaryRoutePref   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    inband  (1),
+                    outband (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEventPrimaryRoutePref specifies the
+         primary routing preference for traffic generated for
+         SNMP notifications and syslog messages.
+
+         A value of 'inband' specifies that the Logging utility will
+         attempt to use the Base routing context to send SNMP
+         notifications and syslog messages to remote destinations.
+
+         A value of 'outband' specifies that the Logging utility will
+         attempt to use the management routing context to send SNMP
+         notifications and syslog messages to remote destinations.
+
+         If the remote destination, as specified by tmnxStdDestAddr
+         or tmnxSyslogTargetAddr, is not reachable via the routing
+         context specified by tmnxEventPrimaryRoutePref, the secondary
+         routing preference as specified by tmnxEventSecondaryRoutePref
+         will be attempted."
+    DEFVAL { outband }
+    ::= { tmnxLogObjs 23 }
+
+tmnxEventSecondaryRoutePref   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    inband  (1),
+                    outband (2),
+                    none    (3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEventSecondaryRoutePref specifies the
+         secondary routing preference for traffic generated for
+         SNMP notifications and syslog messages. The routing
+         context specified by the tmnxEventSecondaryRoutePref
+         will be attempted if the remote destination was not
+         reachable by the primary routing preference,
+         specified by tmnxEventPrimaryRoutePref. The value
+         specified for tmnxEventSecondaryRoutePref must be
+         distinct from the value for tmnxEventPrimaryRoutePref.
+
+         A value of 'inband' specifies that the Logging utility will
+         attempt to use the Base routing context to send SNMP
+         notifications and syslog messages to remote destinations.
+
+         A value of 'outband' specifies that the Logging utility will
+         attempt to use the management routing context to send SNMP
+         notifications and syslog messages to remote destinations.
+
+         A value of 'none' specifies that no attempt will be made
+         to send SNMP notifications and syslog messages to
+         remote destinations.
+
+         If the remote destination, as specified by tmnxStdDestAddr
+         or tmnxSyslogTargetAddr, is not reachable via the routing
+         contexts specified by tmnxEventPrimaryRoutePref and
+         tmnxEventSecondaryRoutePref, the Log utility will fail to
+         send SNMP notifications and syslog messages to the remote
+         destination."
+    DEFVAL { inband }
+    ::= { tmnxLogObjs 24 }
+
+--
+-- Event Management Global parameters
+--
+tmnxLogConfigEventsDamped     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogConfigEventsDamped specifies whether or
+         not the module generating tmnxConfigCreate, tmnxConfigDelete,
+         and tmnxConfigModify events applies a damping algorithm.
+         
+         WARNING: While this event damping is original behavior
+         for some modules such as service manager, QoS, and filters it
+         can result in the NMS system database being out of sync because
+         of missed change events.  On the other hand, if the damping
+         is disabled, 'false', it may take much longer for a large
+         CLI configuration file to be processed when manually 'execed'
+         after system bootup."
+    DEFVAL { true }
+    ::= { tmnxLogObjs 25 }
+
+--
+-- Exec/Rollover Event History Summary
+--
+
+tmnxLogEventHistoryObjs     OBJECT IDENTIFIER ::= {tmnxLogObjs 26 }
+
+tmnxLogEventHistGeneralObjs OBJECT IDENTIFIER ::= { tmnxLogEventHistoryObjs 1 }
+
+tmnxLogExRbkOpTblLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxLogExRbkOpTblLastChange indicates
+         the value of sysUpTime at the time of the last modification of a 
+         row entry in the tmnxLogExecRollbackOpTable."
+    ::= { tmnxLogEventHistGeneralObjs 1 }
+
+tmnxLogExRbkOpMaxEntries OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxLogExRbkOpMaxEntries specifies
+         the maximum number of row entries supported in the
+         tmnxLogExecRollbackOpTable."
+    DEFVAL { 5 }
+    ::= { tmnxLogEventHistGeneralObjs 2 }
+
+tmnxLogExecRollbackOpTable   OBJECT-TYPE
+   SYNTAX      SEQUENCE OF TmnxLogExecRollbackOpEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "The Alcatel-Lucent SROS series tmnxLogExecRollbackOpTable
+        provides a history of up to the last number of 'exec' or rollback
+        revert operations specified by the value of tmnxLogExRbkOpMaxEntries. 
+
+        The tmnxLogExecRollbackOpTable is intended to provide an aide to
+        Network Management Systems (NMS).  The 'exec' of a large configuration
+        file via the system's CLI or a large rollback revert operation will
+        generate so many configuration change and other events in a short
+        time that neither the SROS's event logging utility no the NMS can
+        keep up with them.  This results in either or both the SROS and
+        NMS dropping events and requires the NMS to perform a costly
+        resynchronization of its management database."
+  ::= { tmnxLogEventHistoryObjs 3 }
+
+tmnxLogExecRollbackOpEntry OBJECT-TYPE
+    SYNTAX      TmnxLogExecRollbackOpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines a row entry in the tmnxLogExecRollbackOpTable. Entries in this
+         table are created and deleted by the agent."
+    INDEX { tmnxLogExRbkOpIndex}
+    ::= { tmnxLogExecRollbackOpTable 1 }
+
+TmnxLogExecRollbackOpEntry ::=
+    SEQUENCE {
+        tmnxLogExRbkOpIndex                 Unsigned32,
+        tmnxLogExRbkOpLastChanged           TimeStamp,
+        tmnxLogExRbkOpType                  INTEGER,
+        tmnxLogExRbkOpStatus                INTEGER,
+        tmnxLogExRbkOpBegin                 TimeStamp,
+        tmnxLogExRbkOpEnd                   TimeStamp,
+        tmnxLogExRbkOpFile                  DisplayString,
+        tmnxLogExRbkOpUser                  TNamedItem,
+        tmnxLogExRbkOpNumEvents             Unsigned32
+    }
+
+tmnxLogExRbkOpIndex     OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The value of tmnxLogExRbkOpIndex is a unique value that
+             indicates an instance of an exec or rollback revert
+             operation.  Only the most recent instances are kept
+             in this table.  The maximum number of row entries 
+             supported in this table is specified by the value of 
+             tmnxLogExRbkOpMaxEntries."
+    ::= { tmnxLogExecRollbackOpEntry 1 }
+
+tmnxLogExRbkOpLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogExRbkOpLastChanged indicates the sysUpTime
+         when an object in this table was last modified. A Value 0 means that
+         no change was made to this row since it was created."
+    ::= { tmnxLogExecRollbackOpEntry 2 }
+
+tmnxLogExRbkOpType          OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown     (0),
+                    exec        (1),
+                    rollback    (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogExRbkOpType indicates the type of
+         operation this row entry represents."
+    ::= { tmnxLogExecRollbackOpEntry 3 }
+
+tmnxLogExRbkOpStatus          OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown     (0),
+                    inProgress  (1),
+                    success     (2),
+                    failed      (3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogExRbkOpStatus indicates the status of
+         this exec or rollback revert operation."
+    ::= { tmnxLogExecRollbackOpEntry 4 }
+
+tmnxLogExRbkOpBegin OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogExRbkOpBegin indicates the sysUpTime
+         when the exec or rollback revert operation began."
+    ::= { tmnxLogExecRollbackOpEntry 5 }
+
+tmnxLogExRbkOpEnd OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogExRbkOpEnd indicates the sysUpTime
+         when the exec or rollback revert operation ended.  A value of
+         zero (0) means that the operation has not completed."
+    ::= { tmnxLogExecRollbackOpEntry 6 }
+
+tmnxLogExRbkOpFile      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogExRbkOpFile indicates the location and name of
+         the file used for the exec or rollback revert operation."
+    ::= { tmnxLogExecRollbackOpEntry 7 }
+
+tmnxLogExRbkOpUser      OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogExRbkOpUser indicates the user who initiated
+         the exec or rollback revert operation."
+    ::= { tmnxLogExecRollbackOpEntry 8 }
+
+tmnxLogExRbkOpNumEvents     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogExRbkOpNumEvents indicates the number of
+         row entries in the associated tmnxLogExecRollbackEventTable
+         for this exec or rollback revert operation.  It is updated only
+         when the exec or rollback revert operation ends.  A value of
+         zero (0) means that the operation has not completed."
+    ::= { tmnxLogExecRollbackOpEntry 9 }
+
+--
+
+tmnxLogExecRollbackEventTable   OBJECT-TYPE
+   SYNTAX      SEQUENCE OF TmnxLogExecRollbackEventEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "The Alcatel-Lucent SROS series tmnxLogExecRollbackEventTable
+        provides a history of mib tables modified or specific events
+        generated during an exec or rollback revert operation."
+  ::= { tmnxLogEventHistoryObjs 4 }
+
+tmnxLogExecRollbackEventEntry OBJECT-TYPE
+    SYNTAX      TmnxLogExecRollbackEventEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines a row entry in the tmnxLogExecRollbackEventTable. Each row
+         entry represents either an SNMP table that has been modified or
+         a specific event generated during an exec or rollback revert
+         operation.  Entries in this table are created and deleted by the 
+         agent."
+    INDEX { tmnxLogExRbkOpIndex,
+            tmnxLogExRbkEventIndex
+          }
+    ::= { tmnxLogExecRollbackEventTable 1 }
+
+TmnxLogExecRollbackEventEntry ::=
+    SEQUENCE {
+        tmnxLogExRbkEventIndex              Unsigned32,
+        tmnxLogExRbkEventOID                OBJECT IDENTIFIER
+    }
+
+tmnxLogExRbkEventIndex     OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The value of tmnxLogExRbkEventIndex is a unique value that
+             indicates an instance of an event generated during an
+             exec or rollback revert operation."
+    ::= { tmnxLogExecRollbackEventEntry 1 }
+
+tmnxLogExRbkEventOID        OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogExRbkEventOID indicates the object identifier
+         of either a mib table for which a generic change event was generated
+         or the notification object identifier of a specific event notification
+         generated during the the exec or rollback revert operation.
+         
+         The generic change events are tmnxConfigCreate, tmnxConfigDelete,
+         tmnxConfigModify, and tmnxStateChange notifications.  For these
+         event types, the value of tmnxLogExRbkEventOID is the object 
+         identifier specified by the tmnxNotifyEntryOID varbind.
+         
+         For specific events generated during an exec or rollback revert,
+         the value of this object is the notification object identifier
+         itself.
+         
+         An object identifier will appear only once in this table."
+    ::= { tmnxLogExecRollbackEventEntry 2 }
+
+tmnxLogExRbkNotifyObjects  OBJECT IDENTIFIER ::= { tmnxLogEventHistoryObjs 5 }
+
+tmnxLogExecRollbackOpIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+         "The value of tmnxLogExecRollbackOpIndex is a unique value that
+          indicates a row entry instance of an exec or rollback revert
+          operation in the tmnxLogExecRollbackOpTable.  It is included in 
+          the 'exec' and rollback revert start and end notifications."
+    ::= { tmnxLogExRbkNotifyObjects 1 }
+
+--
+--   SNMP Global Parameters for delay in Route Recovery Notifications
+--
+
+tmnxLogColdStartWaitTime    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..300)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogColdStartWaitTime specifies the time delay that 
+         must pass before notifying specific CPM applications that a route is 
+         available after a cold reboot."
+    DEFVAL { 0 }
+    ::= { tmnxLogObjs 27 }
+
+tmnxLogRouteRecoveryWaitTime     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogRouteRecoveryWaitTime specifies the time delay that
+         must pass before notifying specific CPM applications after the 
+         recovery or change of a route during normal operation."
+    DEFVAL { 0 }
+    ::= { tmnxLogObjs 28 }
+
+--
+-- Notification Definition section
+--
+
+tmnxLogFileDeletedLogId     OBJECT-TYPE
+    SYNTAX      TmnxLogIdIndex
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileDeletedLogId indicates with which event
+         log-id or accounting-policy-id the deleted file was associated.
+         Note the corresponding entry in the tmnxLogIdTable or tmnxLogApTable
+         may no longer exist."
+    ::= { tmnxLogNotificationObjects 1 }
+
+tmnxLogFileDeletedFileId    OBJECT-TYPE
+    SYNTAX      TmnxLogFileId
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileDeletedFileId indicates with which event
+         log-id or accounting-policy-id the deleted file was associated.
+         Note that the corresponding entry in the tmnxLogFileIdTable may
+         no longer exist."
+    ::= { tmnxLogNotificationObjects 2 }
+
+tmnxLogFileDeletedLogType   OBJECT-TYPE
+    SYNTAX      TmnxLogFileType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileDeletedLogType indicates whether the
+         deleted file was an 'eventLog' or 'accountingPolicy'."
+    ::= { tmnxLogNotificationObjects 3 }
+
+tmnxLogFileDeletedLocation  OBJECT-TYPE
+    SYNTAX      TmnxCFlash
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileDeletedLocation indicates on which compact
+         flash device the event log or accounting policy file that has
+         been deleted was located. "
+    ::= { tmnxLogNotificationObjects 4 }
+
+tmnxLogFileDeletedName      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileDeletedName indicates the pathname of an
+         event log or accounting policy file that has been deleted because
+         of space contention on a compact flash device."
+    ::= { tmnxLogNotificationObjects 5 }
+
+tmnxLogFileDeletedCreateTime    OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileDeletedCreateTime indicates the date and
+         time when the deleted file had been created."
+    ::= { tmnxLogNotificationObjects 6 }
+
+tmnxLogTraceErrorTitle      OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..50))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogTraceErrorTitle indicates the title string of the
+         trace error event that generated the tmnxLogTraceError notification."
+    ::= { tmnxLogNotificationObjects 7 }
+
+tmnxLogTraceErrorSubject    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..50))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogTraceErrorSubject indicates the subject string of
+         the trace error event that generated the tmnxLogTraceError
+         notification.
+         
+         The subject is the entity that originated the event, such as the
+         Slot ID."
+    ::= { tmnxLogNotificationObjects 8 }
+
+tmnxLogTraceErrorMessage      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogTraceErrorMessage indicates the message text
+         string of the trace error event that generated the tmnxLogTraceError
+         notification."
+    ::= { tmnxLogNotificationObjects 9 }
+
+tmnxLogThrottledEventID    OBJECT-TYPE
+    SYNTAX       OBJECT IDENTIFIER
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "tmnxLogThrottledEventID is used by the tmnxLogEventThrottled
+         notification to indicate the NOTIFICATION-TYPE object identifier
+         of the throttled event."
+    ::= { tmnxLogNotificationObjects 10 }
+
+tmnxLogThrottledEvents    OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "tmnxLogThrottledEvents is used by the tmnxLogEventThrottled
+         notification to indicate the number of events dropped because
+         of event throttling during the last throttle interval."
+    ::= { tmnxLogNotificationObjects 11 }
+
+tmnxSysLogTargetId  OBJECT-TYPE
+    SYNTAX      TmnxSyslogId
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "tmnxSysLogTargetId is used by the tmnxSysLogTargetProblem
+         notification to indicate the involved TmnxSyslogId."
+    ::= { tmnxLogNotificationObjects 12 }
+
+tmnxSysLogTargetProblemDescr  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysLogTargetProblemDescr indicates the type of
+         error encountered when trying to deliver events to the
+         destination specified in the TmnxSyslogId."
+    ::= { tmnxLogNotificationObjects 13 }
+
+tmnxLogNotifyApInterval    OBJECT-TYPE
+    SYNTAX      Integer32 (5..120)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogNotifyApInterval indicates how frequently
+         the statistics are collected and written to their destination."
+    ::= { tmnxLogNotificationObjects 14 }
+
+tmnxStdReplayStartEvent     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxStdReplayStartEvent indicates the SNMP
+         notification request ID of the first missed event that was
+         replayed when an SNMP notification target address was readded to
+         the RTM following a period when the target address had been removed.
+         It is used by the tmnxStdEventsReplayed notification."
+    ::= { tmnxLogNotificationObjects 15 }
+
+tmnxStdReplayEndEvent     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxStdReplayEndEvent indicates the SNMP
+         notification request ID of the last missed event that was
+         replayed when an SNMP notification target address was readded to
+         the RTM following a period when the target address had been removed.
+         It is used by the tmnxStdEventsReplayed notification."
+    ::= { tmnxLogNotificationObjects 16 }
+
+ --
+ -- Notifications
+ --
+
+ tmnxLogSpaceContention NOTIFICATION-TYPE
+      OBJECTS {
+        tmnxLogFileIdRolloverTime,
+        tmnxLogFileIdRetainTime,
+        tmnxLogFileIdAdminLocation,
+        tmnxLogFileIdBackupLoc,
+        tmnxLogFileIdOperLocation,
+        tmnxLogFileIdLogId,
+        tmnxLogFileIdLogType
+      }
+      STATUS  current
+      DESCRIPTION
+          "Generated when space contention occurs on the compact flash where
+           a log or billing file creation is being attempted.  Space contention
+           exists if:
+                Insufficient space is available on the compact flash to create
+                a file of the same size as the file being rolled over.
+
+                The first file of this type is being created and less than
+                10% of the total compact flash space is available.
+
+                A write operation on a log or billing file is denied due to
+                lack of space."
+      ::= { tmnxLogNotifications 1 }
+
+ tmnxLogAdminLocFailed NOTIFICATION-TYPE
+      OBJECTS {
+        tmnxLogFileIdAdminLocation,
+        tmnxLogFileIdBackupLoc,
+        tmnxLogFileIdOperLocation,
+        tmnxLogFileIdLogId,
+        tmnxLogFileIdLogType
+      }
+      STATUS  current
+      DESCRIPTION
+          "Generated when an attempt to create a log or billing file at the
+           location specified by tmnxLogFileIdAdminLocation has failed.
+           Indicates that the backup location, if specified, will be used."
+      ::= { tmnxLogNotifications 2 }
+
+ tmnxLogBackupLocFailed NOTIFICATION-TYPE
+      OBJECTS {
+        tmnxLogFileIdAdminLocation,
+        tmnxLogFileIdBackupLoc,
+        tmnxLogFileIdOperLocation,
+        tmnxLogFileIdLogId,
+        tmnxLogFileIdLogType
+      }
+      STATUS  current
+      DESCRIPTION
+          "Generated when an attempt to create a log or billing file at the
+           location specified by tmnxLogFileIdBackupLoc has failed."
+      ::= { tmnxLogNotifications 3 }
+
+ tmnxLogFileRollover NOTIFICATION-TYPE
+      OBJECTS {
+        tmnxLogFileIdRolloverTime,
+        tmnxLogFileIdRetainTime,
+        tmnxLogFileIdAdminLocation,
+        tmnxLogFileIdBackupLoc,
+        tmnxLogFileIdOperLocation,
+        tmnxLogFileIdLogId,
+        tmnxLogFileIdLogType,
+        tmnxLogFileIdPathName,
+        tmnxLogFileIdCreateTime
+      }
+      STATUS  current
+      DESCRIPTION
+          "Generated when an event log or accounting policy file's
+           rollover time has expired.  The file located as indicated
+           by the value of tmnxLogFileIdOperLocation is closed and a new
+           file is created as specified by tmnxLogFileIdAdminLocation
+           and tmnxLogFileIdBackupLoc."
+      ::= { tmnxLogNotifications 4 }
+
+ tmnxLogFileDeleted NOTIFICATION-TYPE
+      OBJECTS {
+        tmnxLogFileDeletedLogId,
+        tmnxLogFileDeletedFileId,
+        tmnxLogFileDeletedLogType,
+        tmnxLogFileDeletedLocation,
+        tmnxLogFileDeletedName,
+        tmnxLogFileDeletedCreateTime
+      }
+      STATUS  current
+      DESCRIPTION
+          "Generated when a closed event log or accounting policy file
+           has been deleted as part of the space contention cleanup."
+      ::= { tmnxLogNotifications 5 }
+
+tmnxTestEvent    NOTIFICATION-TYPE
+    OBJECTS {
+        sysDescr,
+        sysObjectID
+    }
+    STATUS  current
+    DESCRIPTION
+        "The tmnxTestEvent notification is generated when the object
+         tmnxEventTest is set to a value of 'doAction'.  This event can
+         be used to test that remote log destinations such as syslog and
+         snmp trap destinations are configured correctly."
+    ::= { tmnxLogNotifications 6 }
+
+tmnxLogTraceError    NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxLogTraceErrorTitle,
+        tmnxLogTraceErrorMessage,
+        tmnxLogTraceErrorSubject
+    }
+    STATUS  current
+    DESCRIPTION
+        "The tmnxLogTraceError notification is generated when a trace
+         error event is detected."
+    ::= { tmnxLogNotifications 7 }
+
+tmnxLogEventThrottled NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxLogThrottledEventID,
+        tmnxLogThrottledEvents
+    }
+    STATUS  current
+    DESCRIPTION
+        "A tmnxLogEventThrottled notification is generated
+         at the end of the throttling interval when one or more
+         events are dropped because the throttling limit was
+         reached for that interval."
+    ::= { tmnxLogNotifications 8 }
+
+tmnxSysLogTargetProblem NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxSysLogTargetId,
+        tmnxSysLogTargetProblemDescr
+    }
+    STATUS  current
+    DESCRIPTION
+        "A tmnxSysLogTargetProblem notification is generated
+         when a problem is encountered when trying to deliver data
+         to the syslog destination identfied by the tmnxSysLogTargetId."
+    ::= { tmnxLogNotifications 9 }
+
+tmnxLogAccountingDataLoss NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxLogFileIdRolloverTime,
+        tmnxLogFileIdRetainTime,
+        tmnxLogFileIdAdminLocation,
+        tmnxLogFileIdBackupLoc,
+        tmnxLogFileIdOperLocation,
+        tmnxLogFileIdLogId,
+        tmnxLogNotifyApInterval
+    }
+    STATUS  current
+    DESCRIPTION
+        "A tmnxLogAccountingDataLoss notification is generated
+         when an accounting file is still being written to
+         when the next interval ends.  The collection of
+         statistics for the past interval is immediately
+         stopped and collection is started for the next
+         interval.  There are missing records in the file
+         for this past interval."
+    ::= { tmnxLogNotifications 10 }
+
+tmnxStdEventsReplayed   NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxStdDestAddrType,
+        tmnxStdDestAddr,
+        tmnxStdReplayStartEvent,
+        tmnxStdReplayEndEvent,
+        tmnxStdReplayStart
+    }
+    STATUS  current
+    DESCRIPTION
+        "A tmnxStdEventsReplayed notification is generated when
+         an SNMP trap target address is added to the RTM (tmnxVRtrID)
+         following a period when the address had been removed.
+         The value of tmnxStdReplayStartEvent is the SNMP notification
+         request ID of the first event that was replayed.  The value
+         of tmnxStdReplayEndEvent is the SNMP notification request ID of the
+         last missed event that was replayed.  The value of
+         tmnxStdReplayStart is the request ID of the first event for
+         which there was no route to the trap target address."
+    ::= { tmnxLogNotifications 11 }
+
+tmnxLogEventOverrun NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxLogThrottledEventID,
+        tmnxLogThrottledEvents
+    }
+    STATUS  current
+    DESCRIPTION
+        "[CAUSE] A tmnxLogEventOverrun notification is generated
+         at the end of the overrun throttling interval when one or more
+         events of the type specified by tmnxLogThrottledEventID were 
+         dropped because the logger input stream's input queue limit 
+         was exceeded.  The overrun throttling interval begins when the 
+         input queue limit is first exceeded and ends when the number of 
+         events in the input queue has dropped below an internal low 
+         watermark.  At that point a tmnxLogEventOverrun notification is
+         generated for each event type that had one or more     events dropped 
+         because of the input queue overrun. The number of dropped events 
+         is specified by tmnxLogThrottledEvents.
+         
+         [EFFECT] Logger events have been dropped and were not sent to any
+         log destination.  tmnxEventDropCount has been incremented for
+         each event dropped because of input queue overrun.
+         
+         [RECOVERY] The specific event information of dropped events
+         cannot be recovered.  The frequency of input queue overruns
+         can be lessened by configuring as few event logs as possible,
+         especially those going to remote destinations such as file,
+         syslog and snmp notification logs."
+    ::= { tmnxLogNotifications 12 }
+
+--
+-- Conformance Information
+--
+tmnxLogCompliances OBJECT IDENTIFIER ::= { tmnxLogConformance 1 }
+tmnxLogGroups      OBJECT IDENTIFIER ::= { tmnxLogConformance 2 }
+
+-- compliance statements
+
+-- tmnxLogCompliance  MODULE-COMPLIANCE
+--    ::= { tmnxLogCompliances 1 }
+
+-- tmnxLogR2r1Compliance  MODULE-COMPLIANCE
+--    ::= { tmnxLogCompliances 2 }
+
+-- tmnxLogR3r0Compliance  MODULE-COMPLIANCE
+--    ::= { tmnxLogCompliances 3 }
+
+tmnxLogV4v0Compliance  MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for revision 4.0 of TIMETRA-LOG-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxLogGlobalGroup,
+            tmnxLogV4v0Group,
+            tmnxLogAccountingPolicyGroup,
+            tmnxLogFileIdGroup,
+            tmnxLogSyslogGroup,
+            tmnxSnmpTrapGroup,
+            tmnxLogEventsR2r1Group,
+            tmnxLogNotificationR3r0Group
+        }
+    ::= { tmnxLogCompliances 4 }
+
+tmnxLogV5v0Compliance  MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for revision 5.0 of TIMETRA-LOG-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxLogGlobalGroup,
+            tmnxLogV5v0Group,
+            tmnxLogAccountingPolicyGroup,
+            tmnxLogFileIdGroup,
+            tmnxLogSyslogV5v0Group,
+            tmnxSnmpTrapV5v0Group,
+            tmnxSnmpSetErrsGroup,
+            tmnxLogEventsV5v0Group,
+            tmnxLogNotificationV5v0Group
+        }
+    ::= { tmnxLogCompliances 5 }
+
+tmnxLogV6v0Compliance  MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for revision 6.0 of TIMETRA-LOG-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxLogGlobalGroup,
+            tmnxLogV5v0Group,
+            tmnxLogAccountingPolicyGroup,
+            tmnxLogFileIdGroup,
+            tmnxLogSyslogV5v0Group,
+            tmnxSnmpTrapV5v0Group,
+            tmnxSnmpTrapDestV6v0Group,
+            tmnxSnmpSetErrsGroup,
+            tmnxLogEventsV5v0Group,
+            tmnxLogNotificationV6v0Group
+        }
+    ::= { tmnxLogCompliances 6 }
+
+tmnxLogV6v1Compliance  MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for revision 6.1 of TIMETRA-LOG-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxLogGlobalGroup,
+            tmnxLogV5v0Group,
+            tmnxLogAccountingPolicyGroup,
+            tmnxLogFileIdGroup,
+            tmnxLogSyslogV5v0Group,
+            tmnxSnmpTrapV5v0Group,
+            tmnxSnmpTrapDestV6v0Group,
+            tmnxSnmpSetErrsGroup,
+            tmnxLogEventsV5v0Group,
+            tmnxLogNotificationV6v0Group,
+            tmnxLogAccountingPolicyV6v1Group
+        }
+    ::= { tmnxLogCompliances 7 }
+
+
+tmnxLogV7v0Compliance  MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for revision 7.0 of TIMETRA-LOG-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxLogGlobalGroup,
+            tmnxLogV5v0Group,
+            tmnxLogAccountingPolicyGroup,
+            tmnxLogFileIdGroup,
+            tmnxLogSyslogV5v0Group,
+            tmnxSnmpTrapV5v0Group,
+            tmnxSnmpTrapDestV6v0Group,
+            tmnxSnmpSetErrsGroup,
+            tmnxLogEventsV5v0Group,
+            tmnxLogNotificationV6v0Group,
+            tmnxLogAccountingPolicyV6v1Group,
+            tmnxLogAccountingPolicyCRV7v0Group,
+            tmnxLogRoutePreferenceV7v0Group
+        }
+    ::= { tmnxLogCompliances 8 }
+
+tmnxLogV9v0Compliance  MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for revision 9.0 of TIMETRA-LOG-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxLogGlobalGroup,
+            tmnxLogV5v0Group,
+            tmnxLogAccountingPolicyGroup,
+            tmnxLogAccountingPolicyV6v1Group,
+            tmnxLogAccountingPolicyCRV7v0Group,
+            tmnxLogFileIdGroup,
+            tmnxLogSyslogV5v0Group,
+            tmnxSnmpTrapV5v0Group,
+            tmnxSnmpTrapDestV6v0Group,
+            tmnxSnmpSetErrsGroup,
+            tmnxLogEventsV5v0Group,
+            tmnxLogNotificationV6v0Group,
+            tmnxLogNotificationV9v0Group,
+            tmnxLogRoutePreferenceV7v0Group,
+            tmnxLogEventDampedV8v0Group,
+            tmnxLogApV9v0Group
+        }
+    ::= { tmnxLogCompliances 9 }
+
+tmnxLogV8v0Compliance  MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for revision 7.0 of TIMETRA-LOG-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxLogGlobalGroup,
+            tmnxLogV5v0Group,
+            tmnxLogAccountingPolicyGroup,
+            tmnxLogFileIdGroup,
+            tmnxLogSyslogV5v0Group,
+            tmnxSnmpTrapV5v0Group,
+            tmnxSnmpTrapDestV6v0Group,
+            tmnxSnmpSetErrsGroup,
+            tmnxLogEventsV5v0Group,
+            tmnxLogNotificationV6v0Group,
+            tmnxLogAccountingPolicyV6v1Group,
+            tmnxLogAccountingPolicyCRV7v0Group,
+            tmnxLogRoutePreferenceV7v0Group,
+            tmnxLogEventDampedV8v0Group
+        }
+    ::= { tmnxLogCompliances 10 }
+
+tmnxLogV10v0Compliance  MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for revision 10.0 of TIMETRA-LOG-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxLogGlobalGroup,
+            tmnxLogV5v0Group,
+            tmnxLogAccountingPolicyGroup,
+            tmnxLogAccountingPolicyV6v1Group,
+            tmnxLogAccountingPolicyCRV7v0Group,
+            tmnxLogFileIdGroup,
+            tmnxLogSyslogV5v0Group,
+            tmnxSnmpTrapV5v0Group,
+            tmnxSnmpTrapDestV6v0Group,
+            tmnxSnmpSetErrsGroup,
+            tmnxLogEventsV5v0Group,
+            tmnxLogNotificationV6v0Group,
+            tmnxLogNotificationV9v0Group,
+            tmnxLogRoutePreferenceV7v0Group,
+            tmnxLogEventDampedV8v0Group,
+            tmnxLogApV9v0Group,
+            tmnxLogExRbkOpGroup,
+            tmnxLogApExtGroup,
+            tmnxLogAppRouteNotifV10v0Group
+        }
+    ::= { tmnxLogCompliances 11 }
+
+tmnxLogGlobalGroup   OBJECT-GROUP
+    OBJECTS {   tmnxLogMaxLogs
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of event logging
+         capabilities on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLogGroups 1 }
+
+-- tmnxLogGroup   OBJECT-GROUP
+--    ::= { tmnxLogGroups 2 }
+
+tmnxLogAccountingPolicyGroup    OBJECT-GROUP
+    OBJECTS {   tmnxLogApRowStatus,
+                tmnxLogApStorageType,
+                tmnxLogApAdminStatus,
+                tmnxLogApOperStatus,
+                tmnxLogApInterval,
+                tmnxLogApDescription,
+                tmnxLogApDefault,
+                tmnxLogApRecord,
+                tmnxLogApToFileId,
+                tmnxLogApPortType
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of accounting policies
+         capabilities on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLogGroups 3 }
+
+
+tmnxLogFileIdGroup     OBJECT-GROUP
+    OBJECTS {   tmnxLogFileIdRowStatus,
+                tmnxLogFileIdStorageType,
+                tmnxLogFileIdRolloverTime,
+                tmnxLogFileIdRetainTime,
+                tmnxLogFileIdAdminLocation,
+                tmnxLogFileIdOperLocation,
+                tmnxLogFileIdDescription,
+                tmnxLogFileIdLogType,
+                tmnxLogFileIdLogId,
+                tmnxLogFileIdPathName,
+                tmnxLogFileIdCreateTime,
+                tmnxLogFileIdBackupLoc
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Log File destinations
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLogGroups 4 }
+
+tmnxLogSyslogGroup     OBJECT-GROUP
+    OBJECTS {   tmnxSyslogTargetRowStatus,
+                tmnxSyslogTargetDescription,
+                tmnxSyslogTargetAddress,
+                tmnxSyslogTargetUdpPort,
+                tmnxSyslogTargetFacility,
+                tmnxSyslogTargetSeverity,
+                tmnxSyslogTargetMessagePrefix,
+                tmnxSyslogTargetMessagesDropped
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of Log Syslog destinations
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLogGroups 5 }
+
+tmnxSnmpTrapGroup     OBJECT-GROUP
+    OBJECTS {   tmnxStgRowStatus,
+                tmnxStgDescription,
+                tmnxStgVersion,
+                tmnxStgNotifyCommunity,
+                tmnxStgSecurityLevel
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of Log SNMP notification
+         destinations on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLogGroups 6 }
+
+-- tmnxLogEventsGroup     OBJECT-GROUP
+--    ::= { tmnxLogGroups 7 }
+
+-- tmnxLogNotifyObjsGroup   OBJECT-GROUP
+--    ::= { tmnxLogGroups 8 }
+
+-- tmnxLogNotificationGroup NOTIFICATION-GROUP
+--    ::= { tmnxLogGroups 9 }
+
+tmnxLogEventsR2r1Group     OBJECT-GROUP
+    OBJECTS {   tmnxEventAppName,
+                tmnxEventName,
+                tmnxEventSeverity,
+                tmnxEventControl,
+                tmnxEventCounter,
+                tmnxEventDropCount,
+                tmnxEventReset,
+                tmnxEventTest
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of Log Events
+         on Alcatel-Lucent SROS series systems release 2.1."
+    ::= { tmnxLogGroups 10 }
+
+-- tmnxLogNotificationR2r1Group NOTIFICATION-GROUP
+--    ::= { tmnxLogGroups 11 }
+
+-- tmnxLogR2r1Group   OBJECT-GROUP
+--    ::= { tmnxLogGroups 12 }
+
+tmnxLogNotifyObjsR3r0Group   OBJECT-GROUP
+    OBJECTS {   tmnxLogFileDeletedLogId,
+                tmnxLogFileDeletedFileId,
+                tmnxLogFileDeletedLogType,
+                tmnxLogFileDeletedLocation,
+                tmnxLogFileDeletedName,
+                tmnxLogFileDeletedCreateTime,
+                tmnxLogTraceErrorTitle,
+                tmnxLogTraceErrorMessage
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of Log notifications
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLogGroups 13 }
+
+tmnxLogNotificationR3r0Group NOTIFICATION-GROUP
+    NOTIFICATIONS   {   tmnxLogSpaceContention,
+                        tmnxLogAdminLocFailed,
+                        tmnxLogBackupLocFailed,
+                        tmnxLogFileRollover,
+                        tmnxLogFileDeleted,
+                        tmnxTestEvent,
+                        tmnxLogTraceError
+                    }
+    STATUS        obsolete
+    DESCRIPTION
+        "The group of notifications supporting the Log feature
+         on Alcatel-Lucent SROS series systems release 3.0."
+    ::= { tmnxLogGroups 14 }
+
+tmnxLogV4v0Group   OBJECT-GROUP
+    OBJECTS {   tmnxLogIdRowStatus,
+                tmnxLogIdStorageType,
+                tmnxLogIdAdminStatus,
+                tmnxLogIdOperStatus,
+                tmnxLogIdDescription,
+                tmnxLogIdFilterId,
+                tmnxLogIdSource,
+                tmnxLogIdDestination,
+                tmnxLogIdFileId,
+                tmnxLogIdSyslogId,
+                tmnxLogIdMaxMemorySize,
+                tmnxLogIdConsoleSession,
+                tmnxLogIdForwarded,
+                tmnxLogIdDropped,
+                tmnxLogIdTimeFormat,
+                tmnxLogFilterRowStatus,
+                tmnxLogFilterDescription,
+                tmnxLogFilterDefaultAction,
+                tmnxLogFilterInUse,
+                tmnxLogFilterParamsRowStatus,
+                tmnxLogFilterParamsDescription,
+                tmnxLogFilterParamsAction,
+                tmnxLogFilterParamsApplication,
+                tmnxLogFilterParamsApplOperator,
+                tmnxLogFilterParamsNumber,
+                tmnxLogFilterParamsNumberOperator,
+                tmnxLogFilterParamsSeverity,
+                tmnxLogFilterParamsSeverityOperator,
+                tmnxLogFilterParamsSubject,
+                tmnxLogFilterParamsSubjectOperator,
+                tmnxLogFilterParamsSubjectRegexp
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of event logs
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLogGroups 15 }
+
+tmnxSnmpSetErrsGroup   OBJECT-GROUP
+    OBJECTS {   tmnxSnmpSetErrsMax,
+                tmnxSseVersion,
+                tmnxSseSeverityLevel,
+                tmnxSseModuleId,
+                tmnxSseModuleName,
+                tmnxSseErrorCode,
+                tmnxSseErrorName,
+                tmnxSseErrorMsg,
+                tmnxSseExtraText,
+                tmnxSseTimestamp
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of SNMP SET failure
+         error messages."
+    ::= { tmnxLogGroups 16 }
+
+tmnxLogEventsV5v0Group     OBJECT-GROUP
+    OBJECTS {   tmnxEventAppName,
+                tmnxEventName,
+                tmnxEventSeverity,
+                tmnxEventControl,
+                tmnxEventCounter,
+                tmnxEventDropCount,
+                tmnxEventReset,
+                tmnxEventThrottle,
+                tmnxEventTest,
+                tmnxEventThrottleLimit,
+                tmnxEventThrottleInterval
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Log Events
+         on Alcatel-Lucent SROS series systems release 5.0."
+    ::= { tmnxLogGroups 17 }
+
+tmnxLogNotifyObjsV5v0Group   OBJECT-GROUP
+    OBJECTS {   tmnxLogFileDeletedLogId,
+                tmnxLogFileDeletedFileId,
+                tmnxLogFileDeletedLogType,
+                tmnxLogFileDeletedLocation,
+                tmnxLogFileDeletedName,
+                tmnxLogFileDeletedCreateTime,
+                tmnxLogTraceErrorTitle,
+                tmnxLogTraceErrorMessage,
+                tmnxLogThrottledEventID,
+                tmnxLogThrottledEvents,
+                tmnxSysLogTargetId,
+                tmnxSysLogTargetProblemDescr
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of Log notifications
+         on Alcatel-Lucentx SROS series systems release 5.0."
+    ::= { tmnxLogGroups 18 }
+
+tmnxLogNotificationV5v0Group NOTIFICATION-GROUP
+    NOTIFICATIONS   {   tmnxLogSpaceContention,
+                        tmnxLogAdminLocFailed,
+                        tmnxLogBackupLocFailed,
+                        tmnxLogFileRollover,
+                        tmnxLogFileDeleted,
+                        tmnxTestEvent,
+                        tmnxLogTraceError,
+                        tmnxLogEventThrottled,
+                        tmnxSysLogTargetProblem
+                    }
+    STATUS        obsolete
+    DESCRIPTION
+        "The group of notifications supporting the Log feature
+         on Alcatel-Lucent SROS series systems release 5.0."
+    ::= { tmnxLogGroups 19 }
+
+tmnxLogSyslogV5v0Group     OBJECT-GROUP
+    OBJECTS {   tmnxSyslogTargetRowStatus,
+                tmnxSyslogTargetDescription,
+                tmnxSyslogTargetUdpPort,
+                tmnxSyslogTargetFacility,
+                tmnxSyslogTargetSeverity,
+                tmnxSyslogTargetMessagePrefix,
+                tmnxSyslogTargetMessagesDropped,
+                tmnxSyslogTargetAddrType,
+                tmnxSyslogTargetAddr
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Log Syslog destinations
+         on Alcatel-Lucent SROS series systems release 5.0."
+    ::= { tmnxLogGroups 20 }
+
+tmnxSnmpTrapV5v0Group     OBJECT-GROUP
+    OBJECTS {   tmnxSnmpTrapLogDescription,
+                tmnxStdRowStatus,
+                tmnxStdRowLastChanged,
+                tmnxStdDestAddrType,
+                tmnxStdDestAddr,
+                tmnxStdDestPort,
+                tmnxStdDescription,
+                tmnxStdVersion,
+                tmnxStdNotifyCommunity,
+                tmnxStdSecurityLevel,
+                tmnxStdMaxTargets
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Log SNMP notification
+         destinations on Alcatel-Lucent SROS series systems for release 5.0."
+    ::= { tmnxLogGroups 21 }
+
+tmnxLogV5v0Group   OBJECT-GROUP
+    OBJECTS {   tmnxLogIdRowStatus,
+                tmnxLogIdStorageType,
+                tmnxLogIdAdminStatus,
+                tmnxLogIdOperStatus,
+                tmnxLogIdDescription,
+                tmnxLogIdFilterId,
+                tmnxLogIdSource,
+                tmnxLogIdDestination,
+                tmnxLogIdFileId,
+                tmnxLogIdSyslogId,
+                tmnxLogIdMaxMemorySize,
+                tmnxLogIdConsoleSession,
+                tmnxLogIdForwarded,
+                tmnxLogIdDropped,
+                tmnxLogIdTimeFormat,
+                tmnxLogFilterRowStatus,
+                tmnxLogFilterDescription,
+                tmnxLogFilterDefaultAction,
+                tmnxLogFilterInUse,
+                tmnxLogFilterParamsRowStatus,
+                tmnxLogFilterParamsDescription,
+                tmnxLogFilterParamsAction,
+                tmnxLogFilterParamsApplication,
+                tmnxLogFilterParamsApplOperator,
+                tmnxLogFilterParamsNumber,
+                tmnxLogFilterParamsNumberOperator,
+                tmnxLogFilterParamsSeverity,
+                tmnxLogFilterParamsSeverityOperator,
+                tmnxLogFilterParamsSubject,
+                tmnxLogFilterParamsSubjectOperator,
+                tmnxLogFilterParamsSubjectRegexp,
+                tmnxLogFilterParamsRouter,
+                tmnxLogFilterParamsRouterOperator,
+                tmnxLogFilterParamsRouterRegexp
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of event logs
+         on Alcatel-Lucent SROS series systems in release 5.0."
+    ::= { tmnxLogGroups 22 }
+
+tmnxLogObsoleteObjsV5v0Group    OBJECT-GROUP
+    OBJECTS {   tmnxSyslogTargetAddress,
+                tmnxStgRowStatus,
+                tmnxStgDescription,
+                tmnxStgVersion,
+                tmnxStgNotifyCommunity,
+                tmnxStgSecurityLevel
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of TiMOS logs
+         obsoleted on Alcatel-Lucent SROS series systems in release 5.0."
+    ::= { tmnxLogGroups 23 }
+
+tmnxLogNotifyObjsV6v0Group   OBJECT-GROUP
+    OBJECTS {   tmnxLogFileDeletedLogId,
+                tmnxLogFileDeletedFileId,
+                tmnxLogFileDeletedLogType,
+                tmnxLogFileDeletedLocation,
+                tmnxLogFileDeletedName,
+                tmnxLogFileDeletedCreateTime,
+                tmnxLogTraceErrorTitle,
+                tmnxLogTraceErrorMessage,
+                tmnxLogThrottledEventID,
+                tmnxLogThrottledEvents,
+                tmnxSysLogTargetId,
+                tmnxSysLogTargetProblemDescr,
+                tmnxLogNotifyApInterval,
+                tmnxStdReplayStartEvent,
+                tmnxStdReplayEndEvent
+            }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of Log notifications
+         on Alcatel-Lucent SROS series systems release 6.0."
+    ::= { tmnxLogGroups 24 }
+
+tmnxLogNotificationV6v0Group NOTIFICATION-GROUP
+    NOTIFICATIONS   {   tmnxLogSpaceContention,
+                        tmnxLogAdminLocFailed,
+                        tmnxLogBackupLocFailed,
+                        tmnxLogFileRollover,
+                        tmnxLogFileDeleted,
+                        tmnxTestEvent,
+                        tmnxLogTraceError,
+                        tmnxLogEventThrottled,
+                        tmnxSysLogTargetProblem,
+                        tmnxLogAccountingDataLoss,
+                        tmnxStdEventsReplayed
+                    }
+    STATUS        current
+    DESCRIPTION
+        "The group of notifications supporting the Log feature
+         on Alcatel-Lucent SROS series systems release 6.0."
+    ::= { tmnxLogGroups 25 }
+
+tmnxSnmpTrapDestV6v0Group   OBJECT-GROUP
+    OBJECTS {   tmnxStdReplay,
+                tmnxStdReplayStart,
+                tmnxStdReplayLastTime
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects added to support SNMP trap destinations
+         in the Alcatel-Lucent SROS series systems release 6.0."
+    ::= { tmnxLogGroups 26 }
+
+tmnxLogAccountingPolicyV6v1Group    OBJECT-GROUP
+    OBJECTS {
+                tmnxLogApDefaultInterval
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of accounting policies
+         capabilities on Alcatel-Lucent SROS series systems release 6.1."
+    ::= { tmnxLogGroups 27 }
+
+
+tmnxLogAccountingPolicyCRV7v0Group    OBJECT-GROUP
+    OBJECTS {   tmnxLogApCrLastChanged,
+                tmnxLogApCrSignChangeDelta,
+                tmnxLogApCrSignChangeQueue,
+                tmnxLogApCrSignChangeOCntr,
+                tmnxLogApCrSignChangeQICounters,
+                tmnxLogApCrSignChangeQECounters,
+                tmnxLogApCrSignChangeOICounters,
+                tmnxLogApCrSignChangeOECounters,
+                tmnxLogApCrSignChangeAACounters,
+                tmnxLogApCrAACounters,
+                tmnxLogApCrQueueRowStatus,
+                tmnxLogApCrQueueLastChanged,
+                tmnxLogApCrQueueICounters,
+                tmnxLogApCrQueueECounters,
+                tmnxLogApCrOverrideCntrRowStatus,
+                tmnxLogApCrOverrideCntrLastChngd,
+                tmnxLogApCrOverrideCntrICounters,
+                tmnxLogApCrOverrideCntrECounters
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the creation of a custom record
+         inside a accounting policy
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLogGroups 28 }
+
+tmnxLogRoutePreferenceV7v0Group     OBJECT-GROUP
+    OBJECTS {   tmnxEventPrimaryRoutePref,
+                tmnxEventSecondaryRoutePref
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting routing preferences of Log Events
+         on Alcatel-Lucent SROS series systems release 7.0."
+    ::= { tmnxLogGroups 29 }
+
+tmnxLogNotifyObjsV8v0Group   OBJECT-GROUP
+    OBJECTS {   tmnxLogFileDeletedLogId,
+                tmnxLogFileDeletedFileId,
+                tmnxLogFileDeletedLogType,
+                tmnxLogFileDeletedLocation,
+                tmnxLogFileDeletedName,
+                tmnxLogFileDeletedCreateTime,
+                tmnxLogTraceErrorTitle,
+                tmnxLogTraceErrorSubject,
+                tmnxLogTraceErrorMessage,
+                tmnxLogThrottledEventID,
+                tmnxLogThrottledEvents,
+                tmnxSysLogTargetId,
+                tmnxSysLogTargetProblemDescr,
+                tmnxLogNotifyApInterval,
+                tmnxStdReplayStartEvent,
+                tmnxStdReplayEndEvent
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Log notifications
+         on Alcatel-Lucent SROS series systems release 8.0."
+    ::= { tmnxLogGroups 30 }
+
+
+tmnxLogNotificationV9v0Group NOTIFICATION-GROUP
+    NOTIFICATIONS   {   tmnxLogEventOverrun
+                    }
+    STATUS        current
+    DESCRIPTION
+        "The group of notifications supporting the Log feature
+         on Alcatel SROS series systems added in release 9.0."
+    ::= { tmnxLogGroups 31 }
+
+tmnxLogEventDampedV8v0Group     OBJECT-GROUP
+    OBJECTS {   tmnxLogConfigEventsDamped
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting damping of change events
+         on Alcatel-Lucent SROS series systems added in release 8.0r7."
+    ::= { tmnxLogGroups 32 }
+
+tmnxLogApV9v0Group               OBJECT-GROUP
+    OBJECTS {   tmnxLogApDataLossCount,
+                tmnxLogApLastDataLossTimeStamp
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects extending the application log table on
+        Alcatel-Lucent SROS series systems added in release 9.0."
+    ::= { tmnxLogGroups 33 }
+
+tmnxLogExRbkOpGroup             OBJECT-GROUP
+    OBJECTS {   tmnxLogExRbkOpTblLastChange,
+                tmnxLogExRbkOpMaxEntries,
+                tmnxLogExRbkOpLastChanged,
+                tmnxLogExRbkOpType,
+                tmnxLogExRbkOpStatus,
+                tmnxLogExRbkOpBegin,
+                tmnxLogExRbkOpEnd,
+                tmnxLogExRbkOpFile,
+                tmnxLogExRbkOpUser,
+                tmnxLogExRbkOpNumEvents,
+                tmnxLogExRbkEventOID
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects managing exec and rollback revert event
+         history."
+    ::= { tmnxLogGroups 34 }
+
+tmnxLogNotifyObjsV10v0Group   OBJECT-GROUP
+    OBJECTS {   tmnxLogExecRollbackOpIndex
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of accessible-for-notify objects added to
+         Alcatel-Lucent SROS series systems release 10.0."
+    ::= { tmnxLogGroups 35 }
+
+tmnxLogApExtGroup             OBJECT-GROUP
+    OBJECTS {   tmnxLogApToFileType
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects extending the accounting policy table on
+        Alcatel-Lucent SROS series systems."
+    ::= { tmnxLogGroups 36 }
+                
+ tmnxLogAppRouteNotifV10v0Group     OBJECT-GROUP
+    OBJECTS {   tmnxLogColdStartWaitTime,
+                tmnxLogRouteRecoveryWaitTime
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting notifications on completion of wait 
+         time after cold reboot and route recovery on Alcatel-Lucent SROS series
+         systems release 10.0."
+    ::= { tmnxLogGroups 37 }
+        
+END
