@@ -13,41 +13,41 @@ class MysqlAuthorizer extends AuthorizerBase
 
     public function authenticate($username, $password)
     {
-        $encrypted_old = md5($password);
-        $row           = dbFetchRow('SELECT username,password FROM `users` WHERE `username`= ?', array($username));
-        if ($row['username'] && $row['username'] == $username) {
-            // Migrate from old, unhashed password
-            if ($row['password'] == $encrypted_old) {
-                $row_type = dbFetchRow('DESCRIBE users password');
-                if ($row_type['Type'] == 'varchar(34)') {
-                    $this->changePassword($username, $password);
-                }
+        $hash = dbFetchCell('SELECT `password` FROM `users` WHERE `username`= ?', array($username));
 
-                return true;
-            } elseif (substr($row['password'], 0, 3) == '$1$') {
-                $row_type = dbFetchRow('DESCRIBE users password');
-                if ($row_type['Type'] == 'varchar(60)') {
-                    if ($row['password'] == crypt($password, $row['password'])) {
-                        $this->changePassword($username, $password);
-                    }
-                }
-            }
-
-            $hasher = new PasswordHash(8, false);
-            if ($hasher->CheckPassword($password, $row['password'])) {
+        // check for old passwords
+        if (strlen($hash) == 32) {
+            // md5
+            if (md5($password) === $hash) {
+                $this->changePassword($username, $password);
                 return true;
             }
-        }//end if
+        } elseif (starts_with($hash, '$1$')) {
+            // old md5 crypt
+            if (crypt($password, $hash) == $hash) {
+                $this->changePassword($username, $password);
+                return true;
+            }
+        } elseif (starts_with($hash, '$P$')) {
+            // Phpass
+            $hasher = new PasswordHash();
+            if ($hasher->CheckPassword($password, $hash)) {
+                $this->changePassword($username, $password);
+                return true;
+            }
+        }
+
+        if (password_verify($password, $hash)) {
+            return true;
+        }
 
         throw new AuthenticationException();
-    }//end authenticate()
-
+    }
 
     public function reauthenticate($sess_id, $token)
     {
         return $this->checkRememberMe($sess_id, $token);
-    }//end reauthenticate()
-
+    }
 
     public function canUpdatePasswords($username = '')
     {
@@ -72,17 +72,15 @@ class MysqlAuthorizer extends AuthorizerBase
             return 0;
         }
 
-        $hasher    = new PasswordHash(8, false);
-        $encrypted = $hasher->HashPassword($password);
+        $encrypted = password_hash($password, PASSWORD_DEFAULT);
         return dbUpdate(array('password' => $encrypted), 'users', '`username` = ?', array($username));
-    }//end changepassword()
+    }
 
     public function addUser($username, $password, $level = 0, $email = '', $realname = '', $can_modify_passwd = 1, $description = '')
     {
         if (!$this->userExists($username)) {
-            $hasher    = new PasswordHash(8, false);
-            $encrypted = $hasher->HashPassword($password);
-            $userid    = dbInsert(array('username' => $username, 'password' => $encrypted, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd, 'descr' => $description), 'users');
+            $encrypted = password_hash($password, PASSWORD_DEFAULT);
+            $userid = dbInsert(array('username' => $username, 'password' => $encrypted, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd, 'descr' => $description), 'users');
             if ($userid == false) {
                 return false;
             } else {
@@ -94,8 +92,7 @@ class MysqlAuthorizer extends AuthorizerBase
         } else {
             return false;
         }
-    }//end adduser()
-
+    }
 
     public function userExists($username, $throw_exception = false)
     {
@@ -105,14 +102,12 @@ class MysqlAuthorizer extends AuthorizerBase
     public function getUserlevel($username)
     {
         return dbFetchCell('SELECT `level` FROM `users` WHERE `username` = ?', array($username));
-    }//end getUserlevel()
-
+    }
 
     public function getUserid($username)
     {
         return dbFetchCell('SELECT `user_id` FROM `users` WHERE `username` = ?', array($username));
-    }//end getUserid()
-
+    }
 
     public function deleteUser($userid)
     {
@@ -123,23 +118,20 @@ class MysqlAuthorizer extends AuthorizerBase
         dbDelete('users', '`user_id` =  ?', array($userid));
 
         return dbDelete('users', '`user_id` =  ?', array($userid));
-    }//end deluser()
-
+    }
 
     public function getUserlist()
     {
         return dbFetchRows('SELECT * FROM `users` ORDER BY `username`');
-    }//end getUserlist()
-
+    }
 
     public function getUser($user_id)
     {
         return dbFetchRow('SELECT * FROM `users` WHERE `user_id` = ?', array($user_id));
-    }//end getUser()
-
+    }
 
     public function updateUser($user_id, $realname, $level, $can_modify_passwd, $email)
     {
         dbUpdate(array('realname' => $realname, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'email' => $email), 'users', '`user_id` = ?', array($user_id));
-    }//end updateUser()
+    }
 }
