@@ -35,7 +35,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
 } else {
     $tmp_config = array(
         'HTML.Allowed'    => 'b,iframe,i,ul,li,h1,h2,h3,h4,br,p',
-        'HTML.AllowedAttributes'    => 'iframe@src,iframe@width,iframe@height',
+        'HTML.AllowedAttributes'    => 'iframe@frameborder,iframe@src,iframe@width,iframe@height',
         'HTML.AllowedElements' => array('iframe'),
         'HTML.Trusted'    => true,
         'HTML.SafeIframe' => true,
