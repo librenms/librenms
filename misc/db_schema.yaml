@@ -1545,7 +1545,7 @@ users:
   Columns:
     - { Field: user_id, Type: int(11), 'Null': false, Extra: auto_increment }
     - { Field: username, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: password, Type: varchar(60), 'Null': true, Extra: '' }
+    - { Field: password, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: realname, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: email, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: descr, Type: char(30), 'Null': false, Extra: '' }
