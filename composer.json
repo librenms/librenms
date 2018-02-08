@@ -13,7 +13,8 @@
         "irc": "irc://irc.freenode.org/#librenms"
     },
     "config": {
-        "optimize-autoloader": true
+        "optimize-autoloader": true,
+        "platform": {"php": "5.6.4"}
     },
     "require": {
         "php": ">=5.6.4",
@@ -30,13 +31,12 @@
         "php-amqplib/php-amqplib": "^2.0",
         "symfony/yaml": "^2.8",
         "rmccue/requests": "^1.7",
-        "ramsey/array_column": "^1.1",
         "palanik/corsslim": "^1.1",
         "influxdb/influxdb-php": "^1.14"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.9.1",
-        "phpunit/phpunit": "4.*",
+        "phpunit/phpunit": "5.*",
         "jakub-onderka/php-parallel-lint": "*",
         "jakub-onderka/php-console-highlighter": "*",
         "fojuth/readmegen": "1.*"
