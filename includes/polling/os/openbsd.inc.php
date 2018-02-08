@@ -19,7 +19,7 @@ if (is_numeric($states)) {
     $tags = compact('rrd_def');
     data_update($device, 'pf_states', $tags, $fields);
 
-    $graphs['openbsd_pf_states'] = true;
+    $graphs['pf_states'] = true;
 }
 
 if (is_numeric($searches)) {
@@ -32,7 +32,7 @@ if (is_numeric($searches)) {
     $tags = compact('rrd_def');
     data_update($device, 'pf_searches', $tags, $fields);
 
-    $graphs['openbsd_pf_searches'] = true;
+    $graphs['pf_searches'] = true;
 }
 
 if (is_numeric($inserts)) {
@@ -45,7 +45,7 @@ if (is_numeric($inserts)) {
     $tags = compact('rrd_def');
     data_update($device, 'pf_inserts', $tags, $fields);
 
-    $graphs['openbsd_pf_inserts'] = true;
+    $graphs['pf_inserts'] = true;
 }
 
 if (is_numeric($removals)) {
@@ -58,5 +58,5 @@ if (is_numeric($removals)) {
     $tags = compact('rrd_def');
     data_update($device, 'pf_removals', $tags, $fields);
 
-    $graphs['openbsd_pf_removals'] = true;
+    $graphs['pf_removals'] = true;
 }
