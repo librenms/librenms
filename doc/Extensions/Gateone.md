@@ -1,3 +1,4 @@
+source: Extensions/Gateone.md
 # GateOne integration
 
 We have simple integration for [GateOne](https://github.com/liftoff/GateOne), you will be redirected to your Gateone command line frontend to access your equipment. (Currently this only works with SSH)
