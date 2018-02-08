@@ -366,11 +366,6 @@ $config_file = <<<"EOD"
 //Please ensure this user is created and has the correct permissions to your install
 \$config['user'] = 'librenms';
 
-### Memcached config - We use this to store realtime usage
-\$config\['memcached'\]\['enable'\]  = FALSE;
-\$config\['memcached'\]\['host'\]    = "localhost";
-\$config\['memcached'\]\['port'\]    = 11211;
-
 ### Locations - it is recommended to keep the default
 #\$config\['install_dir'\]  = "$install_dir";
 
@@ -394,8 +389,9 @@ $config_file = <<<"EOD"
 #\$config\['nets'\]\[\] = "172.16.0.0/12";
 #\$config\['nets'\]\[\] = "192.168.0.0/16";
 
-# Uncomment the next line to disable daily updates
-#\$config\['update'\] = 0;
+# Update configuration
+#\$config\['update_channel'\] = 'release';  # uncomment to follow the monthly release channel
+#\$config\['update'\] = 0;  # uncomment to completely disable updates
 EOD;
 
 if (!file_exists("../config.php")) {
