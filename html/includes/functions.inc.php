@@ -1696,3 +1696,23 @@ function get_zfs_pools($device_id)
 
     return array();
 }
+
+/**
+ * Returns the sysname of a device with a html line break prepended.
+ * if the device has an empty sysname it will return device's hostname instead
+ * And finally if the device has no hostname it will return an empty string
+ * @param device array
+ * @return string
+ */
+function add_sysname_or_hostname($device)
+{
+    $ret_str = '';
+
+    if (format_hostname($device) !== $device['sysName']) {
+        $ret_str .= '<br />' . $device['sysName'];
+    } elseif ($device['hostname'] !== $device['ip']) {
+        $ret_str .= '<br />' . $device['hostname'];
+    }
+
+    return $ret_str;
+}

@@ -19,7 +19,7 @@ if (is_admin() === false) {
         if ($_POST['viewtype'] == 'fulllist') {
             $count_query = "SELECT count(device_id) from devices";
 
-            $deps_query = "SELECT  a.device_id as id, a.hostname as hostname, a.sysName as sysname, GROUP_CONCAT(b.hostname) as parents, GROUP_CONCAT(b.device_id) as parentid FROM devices as a LEFT JOIN device_relationships a1 ON a.device_id=a1.child_device_id LEFT JOIN devices b ON b.device_id=a1.parent_device_id GROUP BY a.device_id, a.hostname, a.sysName";
+            $deps_query = "SELECT  a.device_id as id, a.hostname as hostname, a.sysName as sysName, GROUP_CONCAT(b.hostname) as parents, GROUP_CONCAT(b.device_id) as parentid FROM devices as a LEFT JOIN device_relationships a1 ON a.device_id=a1.child_device_id LEFT JOIN devices b ON b.device_id=a1.parent_device_id GROUP BY a.device_id, a.hostname, a.sysName";
 
             if (isset($_POST['format'])) {
                 if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
@@ -62,7 +62,8 @@ if (is_admin() === false) {
                         $parent = $myrow['parents'];
                     }
                     
-                    array_push($res_arr, array( "deviceid" => $myrow['id'], "hostname" => $myrow['hostname'], "sysname" => $myrow['sysname'], "parent" => $parent, "parentid" => $myrow['parentid'] ));
+                    $hostname = add_sysname_or_hostname($myrow);
+                    array_push($res_arr, array( "deviceid" => $myrow['id'], "hostname" => $myrow['hostname'], "sysname" => $hostname, "parent" => $parent, "parentid" => $myrow['parentid'] ));
                 }
                 $status = array('current' => $_POST['current'], 'rowCount' => $_POST['rowCount'], 'rows' => $res_arr, 'total' => $rec_count);
             } else {

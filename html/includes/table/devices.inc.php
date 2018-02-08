@@ -198,11 +198,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
         $os = $device['os_text'] . '<br>' . $device['version'];
         $device['ip'] = inet6_ntop($device['ip']);
         $uptime = formatUptime($device['uptime'], 'short');
-        if (format_hostname($device) !== $device['sysName']) {
-            $hostname .= '<br />' . $device['sysName'];
-        } elseif ($device['hostname'] !== $device['ip']) {
-            $hostname .= '<br />' . $device['hostname'];
-        }
+        $hostname .= add_sysname_or_hostname($device);
 
         $metrics = array();
         if ($port_count) {
