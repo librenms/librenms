@@ -37,18 +37,15 @@ new will poll only those devices that have recently been added or have been sele
 
 #### Discovery wrapper
 
-We have a `discovery-wrapper.py` script which is based on `poller-wrapper.py` by [Job Snijders](https://github.com/job).
-You can enable support for this within cron by replacing:
+We have a `discovery-wrapper.py` script which is based on `poller-wrapper.py` by [Job Snijders](https://github.com/job). This script is currently the default.
 
-`33  */6   * * *   librenms    /opt/librenms/discovery.php -h all >> /dev/null 2>&1`
+If you want to switch back to discovery.php then you can replace:
+
+`33  */6   * * *   librenms    /opt/librenms/discovery-wrapper.py 1 >> /dev/null 2>&1`
 
 With:
 
-`33  */6   * * *   librenms    /opt/librenms/discovery-wrapper.php 1 >> /dev/null 2>&1`
-
-The default is for discovery wrapper to only use 1 thread so that it mimics the current behaviour. However if your
-system is powerful enough and the devices can cope then you can increase the thread count from 1 to a value of your
-choosing.
+`33  */6   * * *   librenms    /opt/librenms/discovery.php -h all >> /dev/null 2>&1`
 
 #### Discovery config
 
@@ -56,41 +53,50 @@ These are the default discovery config items. You can globally disable a module 
 disable it for one device then you can do this within the WebUI -> Device -> Settings -> Modules.
 
 ```php
-$config['discovery_modules']['os']                        = 1;
-$config['discovery_modules']['ports']                     = 1;
-$config['discovery_modules']['ports-stack']               = 1;
-$config['discovery_modules']['entity-physical']           = 1;
-$config['discovery_modules']['processors']                = 1;
-$config['discovery_modules']['mempools']                  = 1;
-$config['discovery_modules']['cisco-vrf-lite']            = 1;
-$config['discovery_modules']['ipv4-addresses']            = 1;
-$config['discovery_modules']['ipv6-addresses']            = 1;
-$config['discovery_modules']['route']                     = 0;
-$config['discovery_modules']['sensors']                   = 1;
-$config['discovery_modules']['storage']                   = 1;
-$config['discovery_modules']['hr-device']                 = 1;
-$config['discovery_modules']['discovery-protocols']       = 1;
-$config['discovery_modules']['arp-table']                 = 1;
-$config['discovery_modules']['discovery-arp']             = 0;
-$config['discovery_modules']['junose-atm-vp']             = 1;
-$config['discovery_modules']['bgp-peers']                 = 1;
-$config['discovery_modules']['vlans']                     = 1;
-$config['discovery_modules']['cisco-mac-accounting']      = 1;
-$config['discovery_modules']['cisco-pw']                  = 1;
-$config['discovery_modules']['cisco-vrf']                 = 1;
-#$config['discovery_modules']['cisco-cef']                = 1;
-$config['discovery_modules']['cisco-sla']                 = 1;
-$config['discovery_modules']['vmware-vminfo']             = 1;
-$config['discovery_modules']['libvirt-vminfo']            = 1;
-$config['discovery_modules']['toner']                     = 1;
-$config['discovery_modules']['ucd-diskio']                = 1;
-$config['discovery_modules']['services']                  = 1;
-$config['discovery_modules']['charge']                    = 1;
+$config['discovery_modules']['os']                   = 1;
+$config['discovery_modules']['ports']                = 1;
+$config['discovery_modules']['ports-stack']          = 1;
+$config['discovery_modules']['entity-physical']      = 1;
+$config['discovery_modules']['entity-state']         = 0;
+$config['discovery_modules']['processors']           = 1;
+$config['discovery_modules']['mempools']             = 1;
+$config['discovery_modules']['cisco-vrf-lite']       = 1;
+$config['discovery_modules']['cisco-mac-accounting'] = 0;
+$config['discovery_modules']['cisco-pw']             = 0;
+$config['discovery_modules']['vrf']                  = 0;
+$config['discovery_modules']['cisco-cef']            = 0;
+$config['discovery_modules']['cisco-sla']            = 0;
+$config['discovery_modules']['cisco-cbqos']          = 0;
+$config['discovery_modules']['cisco-otv']            = 0;
+$config['discovery_modules']['ipv4-addresses']       = 1;
+$config['discovery_modules']['ipv6-addresses']       = 1;
+$config['discovery_modules']['route']                = 0;
+$config['discovery_modules']['sensors']              = 1;
+$config['discovery_modules']['storage']              = 1;
+$config['discovery_modules']['hr-device']            = 1;
+$config['discovery_modules']['discovery-protocols']  = 1;
+$config['discovery_modules']['arp-table']            = 1;
+$config['discovery_modules']['discovery-arp']        = 0;
+$config['discovery_modules']['junose-atm-vp']        = 0;
+$config['discovery_modules']['bgp-peers']            = 1;
+$config['discovery_modules']['vlans']                = 1;
+$config['discovery_modules']['vmware-vminfo']        = 0;
+$config['discovery_modules']['libvirt-vminfo']       = 0;
+$config['discovery_modules']['toner']                = 0;
+$config['discovery_modules']['ucd-diskio']           = 1;
+$config['discovery_modules']['applications']         = 0;
+$config['discovery_modules']['services']             = 1;
+$config['discovery_modules']['stp']                  = 1;
+$config['discovery_modules']['ntp']                  = 1;
+$config['discovery_modules']['loadbalancers']        = 0;
+$config['discovery_modules']['mef']                  = 0;
+$config['discovery_modules']['wireless']             = 1;
+$config['discovery_modules']['fdb-table']            = 1;
 ```
 
 #### OS based Discovery config
 
-You can enable or disable modules for a specific OS by add corresponding line in `includes/definitions/$os.yaml`
+You can enable or disable modules for a specific OS by add corresponding line in `config.php`
 OS based settings have preference over global. Device based settings have preference over all others
 
 Discover performance improvement can be achieved by deactivating all modules that are not supported by specific OS.
@@ -146,7 +152,7 @@ $config['os']['linux']['discovery_modules']['discovery-arp'] = 1;
 
 `cisco-pw`: Pseudowires wires detection and support.
 
-`cisco-vrf`: VRF detection and support.
+`vrf`: VRF detection and support.
 
 `cisco-cef`: CEF detection and support.
 
@@ -200,35 +206,3 @@ The output will contain:
 DB Updates
 
 SNMP Response
-
-### SNMP Scan
-
-Apart from the aforementioned Auto-Discovery options, LibreNMS is also able to proactively scan a network for SNMP-enabled devices using the configured version/credentials.
-
-Using the SNMP-Scanner may take a long time to finish depending on the size of your network. Tests have shown that a sparsely-populated /24 is scanned within 2 Minutes whereas a sparsely populated /16 will take about 11 Hours.
-
-If possible, divide your network into smaller subnets and scan these subnets instead. You can use an utility like the GNU Screen or tmux to avoid aborting the scan when logging out of your Shell. You can run several instances of the SNMP-Scanner simultaneously.
-
-To run the SNMP-Scanner you need to execute the `snmp-scan.py` from within your LibreNMS installation directory.
-
-Here the script's help-page for reference:
-```text
-usage: snmp-scan.py [-h] [-r NETWORK] [-t THREADS] [-l] [-v]
-
-Scan network for snmp hosts and add them to LibreNMS.
-
-optional arguments:
-  -h, --help     show this help message and exit
-  -r NETWORK     CIDR noted IP-Range to scan. Can be specified multiple times
-                 This argument is only required if $config['nets'] is not set
-                 Example: 192.168.0.0/24 Example: 192.168.0.0/31 will be
-                 treated as an RFC3021 p-t-p network with two addresses,
-                 192.168.0.0 and 192.168.0.1 Example: 192.168.0.1/32 will be
-                 treated as a single host address
-  -t THREADS     How many IPs to scan at a time. More will increase the scan
-                 speed, but could overload your system. Default: 32
-  -l, --legend   Print the legend.
-  -v, --verbose  Show debug output. Specifying multiple times increases the
-                 verbosity.
-
-```

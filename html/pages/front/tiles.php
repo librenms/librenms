@@ -591,7 +591,7 @@ if (strpos($dash_config, 'globe') !== false) {
     }
 
     function widget_reload(id,data_type) {
-        $(".bootgrid-table").bootgrid("destroy");
+        $("#widget_body_"+id+" .bootgrid-table").bootgrid("destroy");
         $("#widget_body_"+id+" *").off();
         $("#widget_body_"+id).empty();
         if( $("#widget_body_"+id).parent().data('settings') == 1 ) {

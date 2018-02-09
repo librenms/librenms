@@ -5,17 +5,10 @@ services:
 matrix:
   fast_finish: true
   include:
+  - php: 7.2
   - php: 7.1
-    env: EXECUTE_BUILD_SCHEMA=true
+    env: SKIP_STYLE_CHECK=1
   - php: 7.0
-    env: SKIP_STYLE_CHECK=1
-  - php: 5.3
-    sudo: required
-    dist: precise
-    env: SKIP_STYLE_CHECK=1
-  - php: 5.4
-    env: SKIP_STYLE_CHECK=1
-  - php: 5.5
     env: SKIP_STYLE_CHECK=1
   - php: 5.6
     env: SKIP_STYLE_CHECK=1 EXECUTE_BUILD_DOCS=true
@@ -33,7 +26,7 @@ cache:
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y snmp
+  - sudo apt-get install -y snmp fping
   - mysql -e 'CREATE DATABASE librenms_phpunit_78hunjuybybh;'
 
 install:
@@ -41,20 +34,15 @@ install:
   - pip install --user pyasn1==0.2.2
   - pip install --user snmpsim==0.3.1
   - pip install --user pylint
-
-before_script:
-  - python2 $HOME/.local/bin/snmpsimd.py --data-dir=$TRAVIS_BUILD_DIR/tests/snmpsim --agent-udpv4-endpoint=127.0.0.1:11161 --logging-method=file:/tmp/snmpsimd.log --daemon --pid-file=/tmp/snmpsimd.pid
-
-after_success:
-  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $EXECUTE_BUILD_SCHEMA == "true" && bash scripts/deploy-schema.sh
-  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $EXECUTE_BUILD_DOCS == "true" && bash scripts/deploy-docs.sh
+  - pip install --user mysql-python
 
 after_failure:
-  - cat /tmp/snmpsimd.log
+  - tail /tmp/snmpsimd.log
 
 script:
   - php scripts/pre-commit.php -l
   - php scripts/pre-commit.php -s
-  - SNMPSIM=1 DBTEST=1 vendor/bin/phpunit --stop-on-failure
+  - php scripts/pre-commit.php -u --db --snmpsim --fail-fast
   - bash -n daily.sh
-  - pylint -E poller-wrapper.py discovery-wrapper.py poller-service.py
+  - pylint -E poller-wrapper.py discovery-wrapper.py
+  - bash scripts/deploy-docs.sh

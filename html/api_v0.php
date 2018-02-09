@@ -15,9 +15,27 @@
 $init_modules = array('web', 'alerts');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
+use LibreNMS\Config;
+
 $app = new \Slim\Slim();
+
+if (Config::get('api.cors.enabled') === true) {
+    $corsOptions = array(
+        "origin" => Config::get('api.cors.origin'),
+        "maxAge" => Config::get('api.cors.maxage'),
+        "allowMethods" => Config::get('api.cors.allowmethods'),
+        "allowHeaders" => Config::get('api.cors.allowheaders'),
+    );
+    $cors = new \CorsSlim\CorsSlim($corsOptions);
+    $app->add($cors);
+}
+
 require $config['install_dir'] . '/html/includes/api_functions.inc.php';
 $app->setName('api');
+
+$app->notFound(function () use ($app) {
+    api_error(404, "This API route doesn't exist.");
+});
 
 $app->group(
     '/api',
@@ -26,9 +44,10 @@ $app->group(
             '/v0',
             function () use ($app) {
                 $app->get('/bgp', 'authToken', 'list_bgp')->name('list_bgp');
+                $app->get('/bgp/:id', 'authToken', 'get_bgp')->name('get_bgp');
                 $app->get('/ospf', 'authToken', 'list_ospf')->name('list_ospf');
                 // api/v0/bgp
-                $app->get('/oxidized', 'authToken', 'list_oxidized')->name('list_oxidized');
+                $app->get('/oxidized(/:hostname)', 'authToken', 'list_oxidized')->name('list_oxidized');
                 $app->group(
                     '/devices',
                     function () use ($app) {
@@ -37,12 +56,13 @@ $app->group(
                         $app->get('/:hostname', 'authToken', 'get_device')->name('get_device');
                         // api/v0/devices/$hostname
                         $app->patch('/:hostname', 'authToken', 'update_device')->name('update_device_field');
+                        $app->patch('/:hostname/rename/:new_hostname', 'authToken', 'rename_device')->name('rename_device');
                         $app->get('/:hostname/vlans', 'authToken', 'get_vlans')->name('get_vlans');
                         // api/v0/devices/$hostname/vlans
                         $app->get('/:hostname/graphs', 'authToken', 'get_graphs')->name('get_graphs');
                         // api/v0/devices/$hostname/graphs
                         $app->get('/:hostname/health(/:type)(/:sensor_id)', 'authToken', 'list_available_health_graphs')->name('list_available_health_graphs');
-                        // api/v0/devices/$hostname/health
+                        $app->get('/:hostname/wireless(/:type)(/:sensor_id)', 'authToken', 'list_available_wireless_graphs')->name('list_available_wireless_graphs');
                         $app->get('/:hostname/ports', 'authToken', 'get_port_graphs')->name('get_port_graphs');
                         $app->get('/:hostname/ip', 'authToken', 'get_ip_addresses')->name('get_device_ip_addresses');
                         $app->get('/:hostname/port_stack', 'authToken', 'get_port_stack')->name('get_port_stack');
@@ -53,6 +73,7 @@ $app->group(
                         $app->delete('/:hostname/components/:component', 'authToken', 'delete_components')->name('delete_components');
                         $app->get('/:hostname/groups', 'authToken', 'get_device_groups')->name('get_device_groups');
                         $app->get('/:hostname/graphs/health/:type(/:sensor_id)', 'authToken', 'get_graph_generic_by_hostname')->name('get_health_graph');
+                        $app->get('/:hostname/graphs/wireless/:type(/:sensor_id)', 'authToken', 'get_graph_generic_by_hostname')->name('get_wireless_graph');
                         $app->get('/:hostname/:type', 'authToken', 'get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');
                         // api/v0/devices/$hostname/$type
                         $app->get('/:hostname/ports/:ifname', 'authToken', 'get_port_stats_by_port_hostname')->name('get_port_stats_by_port_hostname');
@@ -138,6 +159,9 @@ $app->group(
                 $app->group(
                     '/routing',
                     function () use ($app) {
+                        $app->get('/bgp/cbgp', 'authToken', 'list_cbgp')->name('list_cbgp');
+                        $app->get('/vrf', 'authToken', 'list_vrf')->name('list_vrf');
+                        $app->get('/vrf/:id', 'authToken', 'get_vrf')->name('get_vrf');
                         $app->group(
                             '/ipsec',
                             function () use ($app) {
@@ -151,10 +175,15 @@ $app->group(
                 $app->group(
                     '/resources',
                     function () use ($app) {
+                        $app->get('/locations', 'authToken', 'list_locations')->name('list_locations');
+                        $app->get('/vlans', 'authToken', 'list_vlans')->name('list_vlans');
                         $app->group(
                             '/ip',
                             function () use ($app) {
+                                $app->get('/addresses/', 'authToken', 'list_ip_addresses')->name('list_ip_addresses');
                                 $app->get('/arp/:ip', 'authToken', 'list_arp')->name('list_arp')->conditions(array('ip' => '[^?]+'));
+                                $app->get('/networks/', 'authToken', 'list_ip_networks')->name('list_ip_networks');
+                                $app->get('/networks/:id/ip', 'authToken', 'get_ip_addresses')->name('get_network_ip_addresses');
                             }
                         );
                     }
@@ -165,6 +194,7 @@ $app->group(
                     '/services',
                     function () use ($app) {
                         $app->get('/:hostname', 'authToken', 'list_services')->name('get_service_for_host');
+                        $app->post('/:hostname', 'authToken', 'add_service_for_host')->name('add_service_for_host');
                     }
                 );
                 $app->get('/services', 'authToken', 'list_services')->name('list_services');

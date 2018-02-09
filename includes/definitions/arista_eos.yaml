@@ -10,3 +10,14 @@ over:
 discovery:
     - sysDescr:
         - Arista Networks EOS
+poller_modules:
+    wireless: 0
+    ipmi: 0
+    applications: 0
+    services: 0
+    ntp: 0
+discovery_modules:
+    cisco-vrf-lite: 0
+    services: 0
+    ntp: 0
+    wireless: 0

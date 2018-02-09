@@ -1,0 +1,176 @@
+-- This module defines enterprise MIBs for SNMP setting
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-SET-SNMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenSetting, netscreenSettingMibModule
+        FROM NETSCREEN-SMI
+    Integer32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenSetSnmpMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor 
+         SNMP setting"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311100000Z" -- November 10, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No Comment"
+    REVISION      "200105270000Z" -- May 27, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenSettingMibModule 9 }
+
+NsSetSnmpCommHostEntry ::= SEQUENCE
+{
+    nsSetSnmpCommHostIndex      Integer32,
+    nsSetSnmpCommunity          DisplayString,
+    nsSetSnmpHostInComm         IpAddress,
+    nsSetSnmpWritePermit        INTEGER,
+    nsSetSnmpTrapPermit         INTEGER,
+    nsSetSnmpTrafficAlarmPermit INTEGER
+}
+
+nsSetSNMP OBJECT IDENTIFIER ::= { netscreenSetting 9 }
+
+nsSetSnmpSysName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..255))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SNMP agent's sysname."
+    ::= { nsSetSNMP 1 }
+
+nsSetSnmpContact OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..255))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "contact name."
+    ::= { nsSetSNMP 2 }
+
+nsSetSnmpLocation OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..255))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SNMP agent Location."
+    ::= { nsSetSNMP 3 }
+
+nsSetSnmpVPNEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Secure SNMP traffic via VPN encryption"
+    ::= { nsSetSNMP 4 }
+
+nsSetSnmpCommHostTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsSetSnmpCommHostEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The snmp community and host table"
+    ::= { nsSetSNMP 5 }
+
+nsSetSnmpCommHostEntry OBJECT-TYPE
+    SYNTAX        NsSetSnmpCommHostEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing community and hosts information"
+    INDEX
+        { nsSetSnmpCommHostIndex }
+    ::= { nsSetSnmpCommHostTable 1 }
+
+nsSetSnmpCommHostIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for snmp community & host table.  Its value
+         ranges between 0 and 65535 and may not be contiguous."
+    ::= { nsSetSnmpCommHostEntry 1 }
+
+nsSetSnmpCommunity OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SNMP community name."
+    ::= { nsSetSnmpCommHostEntry 2 }
+
+nsSetSnmpHostInComm OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SNMP host ip address."
+    ::= { nsSetSnmpCommHostEntry 3 }
+
+nsSetSnmpWritePermit OBJECT-TYPE
+    SYNTAX        INTEGER {
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Permission to write."
+    ::= { nsSetSnmpCommHostEntry 4 }
+
+nsSetSnmpTrapPermit OBJECT-TYPE
+    SYNTAX        INTEGER {
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Permission to receive trap."
+    ::= { nsSetSnmpCommHostEntry 5 }
+
+nsSetSnmpTrafficAlarmPermit OBJECT-TYPE
+    SYNTAX        INTEGER {
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Permission of including traffic alarm in trap."
+    ::= { nsSetSnmpCommHostEntry 6 }
+
+END
+
+

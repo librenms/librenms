@@ -4,7 +4,7 @@
 $ds_in  = 'INOCTETS';
 $ds_out = 'OUTOCTETS';
 
-foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ?', array($device['device_id'])) as $port) {
+foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled` = 0', array($device['device_id'])) as $port) {
     $ignore = 0;
     if (is_array($config['device_traffic_iftype'])) {
         foreach ($config['device_traffic_iftype'] as $iftype) {
@@ -43,7 +43,7 @@ $units       = 'b';
 $total_units = 'B';
 $colours_in  = 'greens';
 $multiplier  = '8';
-$colours_out = 'blues';
+$colours_out = 'purples';
 
 // $nototal = 1;
 $ds_in  = 'INOCTETS';

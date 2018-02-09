@@ -1,16 +1,64 @@
 source: Developing/os/Test-Units.md
 
-We have a testing unit for new OS', please ensure you add a test for any new OS' or updates to existing OS discovery.
+# Tests
 
-All that you need to do is create an snmprec file in tests/snmpsim with the proper name. If adding the first test for
-this os, simply use the os name `pulse.snmprec` for example.  If you need to add multiple test files, you can add an
-underscore after the os name followed by a description, typically a model name.  For example: `pulse_mag2600.snmprec`.
-You can copy `skel.snmprec` to your intended name and fill in the data to make things a little easier.
+Tests ensure LibreNMS works as expected, now and in the future.  New OS should provide as much test data as needed and
+added test data for existing OS is welcome.
 
-We utilise [snmpsim](http://snmpsim.sourceforge.net/) to do unit testing for OS discovery. For this to work you need
-to supply an snmprec file. This is pretty simple and using pulse as the example again this would look like:
+Saved snmp data can be found in `tests/snmpsim/*.snmprec` and saved database data can be found in `tests/data/*.json`.
+Please review this for any sensitive data **before** submitting.  When replacing data, make sure it is modified in a
+consistent manner.
 
-`tests/snmpsim/pulse_mag2600.snmprec`
+> We utilise [snmpsim](http://snmpsim.sourceforge.net/) to do unit testing. For OS discovery, we can mock snmpsim, but
+> for other tests you will need it installed and functioning.  We run snmpsim during our integration tests, but not by
+> default when running `./scripts/pre-commit.php`.
+
+## Capturing test data
+
+`./scripts/collect-snmp-data.php` is provided to make it easy to collect data for tests.  Running collect-snmp-data.php
+ with the --hostname (-h) allows you to capture all data used to discover and poll a device already added to LibreNMS.
+ Make sure to re-run the script if you add additional support. Check the command-line help for more options.
+
+After you have collected snmp data, run `./scripts/save-test-data.php` with the --os (-o) option to dump the post discovery
+and post poll database entries to json files.
+
+Generally, you will only need to capture data once.  After you have the data you need in the snmprec file, you can
+just use save-test-data.php to update the database dump (json) after that.
+
+### OS Variants
+
+If test data already exists, but is for a different device/configuration then you should use the --variant (-v) option to
+specify a different variant of the os, this will be tested completely separate from other variants.  If there is only
+one variant, please do not specify one.
+
+## Running tests
+
+After you have saved your test data, you should run `./scripts/pre-commit.php -p -u` verify they pass.
+
+To run the full suite of tests enable database and snmpsim reliant tests: `./scripts/pre-commit.php --db --snmpsim -p -u`
+
+#### Specific OS
+
+`./scripts/pre-commit.php -p -o osname`
+
+#### Specific Module
+
+`./scripts/pre-commit.php -p -m modulename`
+
+## Using snmpsim for testing
+
+You can run snmpsim to access test data by running `./scripts/collect-snmp-data.php --snmpsim`
+
+You may then run snmp queries against it using the os (and variant) as the community and 127.1.6.1:1161 as the host.
+```
+snmpget -v 2c -c ios_c3560e 127.1.6.1:1161 sysDescr.0
+```
+
+## Snmprec format
+
+Snmprec files are simple files that store the snmp data. The data format is simple with three columns: numeric oid, type
+code, and data. Here is an example snippet.
+
 ```
 1.3.6.1.2.1.1.1.0|4|Pulse Secure,LLC,MAG-2600,8.0R14 (build 41869)
 1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.12532.254.1.1
@@ -24,15 +72,6 @@ To look up the numeric OID and type of an string OID with snmptranslate:
 ```bash
 snmptranslate -On -Td SNMPv2-MIB::sysDescr.0
 ```
-
-Common OIDs used in discovery:
-
-| String OID                          | Numeric OID                 |
-| ----------------------------------- | --------------------------- |
-| SNMPv2-MIB::sysDescr.0              | 1.3.6.1.2.1.1.1.0           |
-| SNMPv2-MIB::sysObjectID.0           | 1.3.6.1.2.1.1.2.0           |
-| ENTITY-MIB::entPhysicalDescr.1      | 1.3.6.1.2.1.47.1.1.1.1.2.1  |
-| ENTITY-MIB::entPhysicalMfgName.1    | 1.3.6.1.2.1.47.1.1.1.1.12.1 |
 
 List of SNMP data types:
 
@@ -52,6 +91,29 @@ List of SNMP data types:
 
 Hex encoded strings (4x) should be used for any strings that contain line returns.
 
-You can run `./scripts/pre-commit.php -u` to run the unit tests to check your code.
+## New discovery/poller modules
 
-If you would like to run tests locally against a full snmpsim instance, run `./scripts/pre-commit.php -u --snmpsim`.
+New discovery or poller modules should define database capture parameters in `/tests/module_tables.yaml`.
+
+## Example workflow
+If the base os (<os>.snmprec) already contains test data for the module you are testing or that data conflicts with your new
+data, you must use a variant to store your test data (-v).
+
+### Add initial detection
+1. Add device to LibreNMS. It is generic and device_id = 42
+2. Run `./scripts/collect-snmp-data.php -h 42 -m os`, initial snmprec will be created
+3. [Add initial detection](Initial-Detection.md) for `example-os`
+4. Run discovery to make sure it detects properly `./discovery.php -h 42`
+5. Add any additional os items like version, hardware, features, or serial.
+6. If there is additional snmp data required, run `./scripts/collect-snmp-data.php -h 42 -m os`
+7. Run `./scripts/save-test-data.php -o example-os -m os` to update the dumped database data.
+7. Review data. If you modified the snmprec or code (don't modify json manually) run `./scripts/save-test-data.php -o example-os -m os`
+8. Run `./scripts/pre-commit.php --db --snmpsim`
+9. If the tests succeed submit a pull request
+
+### Additional module support or test data
+1. Add code to support module or support already exists.
+2. `./scripts/collect-snmp-data.php -h 42 -m <module>`, this will add more data to the snmprec file
+3. Review data. If you modified the snmprec (don't modify json manually) run `./scripts/save-test-data.php -o example-os -m <module>`
+4. Run `./scripts/pre-commit.php --db --snmpsim`
+5. If the tests succeed submit a pull request

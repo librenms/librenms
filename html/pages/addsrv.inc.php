@@ -1,5 +1,7 @@
 <?php
 
+$no_refresh = true;
+
 if ($_SESSION['userlevel'] < '10') {
     include 'includes/error-no-perm.inc.php';
 } else {
@@ -14,12 +16,8 @@ if ($_SESSION['userlevel'] < '10') {
             }
         }
     }
-
-    foreach (scandir($config['nagios_plugins']) as $file) {
-        if (substr($file, 0, 6) === 'check_') {
-            $check_name = substr($file, 6);
-            $servicesform .= "<option value='$check_name'>$check_name</option>";
-        }
+    foreach (list_available_services() as $current_service) {
+        $servicesform .= "<option value='$current_service'>$current_service</option>";
     }
 
     foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $device) {

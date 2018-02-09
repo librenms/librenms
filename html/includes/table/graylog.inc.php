@@ -1,5 +1,4 @@
 <?php
-
 /*
  * LibreNMS
  *
@@ -10,7 +9,13 @@
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
- */
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2017 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
 $filter_hostname = mres($_POST['hostname']);
 $filter_range = mres($_POST['range']);
@@ -62,8 +67,21 @@ $context = stream_context_create(array(
 $messages = json_decode(file_get_contents($graylog_url, false, $context), true);
 
 foreach ($messages['messages'] as $message) {
+    if (isset($config['graylog']['timezone'])) {
+        $userTimezone = new DateTimeZone($config['graylog']['timezone']);
+        $graylogTime = new DateTime($message['message']['timestamp']);
+        $offset = $userTimezone->getOffset($graylogTime);
+
+        $timeInterval = DateInterval::createFromDateString((string)$offset . 'seconds');
+        $graylogTime->add($timeInterval);
+        $displayTime = $graylogTime->format('Y-m-d H:i:s');
+    } else {
+        $displayTime = $message['message']['timestamp'];
+    }
+
+
     $response[] = array(
-                      'timestamp' => $message['message']['timestamp'],
+                      'timestamp' => graylog_severity_label($message['message']['level']) . $displayTime,
                       'source'    => '<a href="'.generate_url(array('page'=>'device', 'device'=>$message['message']['source'])).'">'.$message['message']['source'].'</a>',
                       'message'    => $message['message']['message'],
                       'facility'  => $message['message']['facility'],

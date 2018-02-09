@@ -1,71 +1,106 @@
 -- ZyXEL Communications Corporation
--- Private Enterprise MIB definition
-
+-- Private Enterprise MIB definition 
+  
 -- This file describes the ZyXEL Communications Corporation Enterprise MIB.
 -- It contains ZyXEL products OIDs, and common managed objects.
 
--- $Log: zyxel.mib $
--- Revision 1.2  2007/07/20 09:28:18  jacky
--- Revision 1.1  2006/08/28 05:32:50  kenny
--- Initial revision
--- Revision 1.4  2006/06/08 09:18:13  niceguy
--- Revision 1.3  2006/05/15 03:00:36  niceguy
--- Revision 1.2  2006/03/07 06:37:09  niceguy
--- Revision 1.1  2005/11/23 12:47:47  niceguy
--- Initial revision
--- Revision 1.2  2005/08/24 09:57:57  niceguy
--- Revision 1.20  2005/06/17 05:33:47  jackho
--- Revision 1.19  2005/06/09 07:29:05  jennyhsu
--- Revision 1.18  2005/05/04 01:15:38  jennyhsu
--- Revision 1.17  2005/03/07 11:22:32  Admin
--- change IES1248-71 and IES1248-73 OID
--- Revision 1.16  2004/06/08 10:13:33  jenny
---
--- Revision 1.15  2004/05/20 08:24:00  jennyhsu
--- Revision 1.14  2004/05/19 10:47:37  jennyhsu
--- add system OID for new products
--- Revision 1.13  2004/03/01 07:06:56  jennyhsu
--- add object alc1124-71
--- Revision 1.12  2004/02/25 08:41:34  jennyhsu
--- add vlc1124 and ves1124
--- Revision 1.11  2003/09/10 00:58:52  jennyhsu
--- Add product OID for ves1416
--- Revision 1.10  2003/05/27 08:12:05  jennyhsu
--- Add object accessSwitchCommonATM
--- Revision 1.9  2003/05/07 06:46:20  jennyhsu
--- Remove ves2000
--- Revision 1.8  2003/03/28 01:36:38  jennyhsu
--- Add OID for ves1316, vlc1316 and ves2000
--- Revision 1.7  2003/03/10 02:54:32  jennyhsu
--- Add ether switch products
--- Revision 1.6  2002/11/12 07:41:52  jennyhsu
--- Revision 1.5  2002/09/02 11:48:40  jennyhsu
--- Revision 1.4  2002/01/10 05:10:37  jennyhsu
--- Revision 1.3  2001/10/26 02:50:02  jennyhsu
--- Revision 1.2  2001/10/03 09:03:20  jennyhsu
--- Revision 1.1  2001/08/25 06:01:16  jennyhsu
--- Initial revision
+-- $Log: zywall.mib,v $
+-- Revision 1.1  2006/07/28 04:17:47  saxont
+-- support zld module(CPU,MEM,VPNthroughput)
+-- 
+-- Revision 1.36  2004/11/01 11:21:07  cchiang 
+-- add p2602r-61 
+-- Revision 1.35  2004/10/26 06:59:23  cchiang 
+-- Add p660ru-t3/p660ru-t7 
+-- Revision 1.34  2004/10/14 02:17:23  cchiang 
+-- Add p2302r-obm 
+-- Revision 1.33  2004/10/12 09:44:20  cchiang 
+-- Add p2002-obm, p2002l-obm and p2002l-aol series. 
+-- Revision 1.32  2004/10/01 08:56:36  cchiang 
+-- Add p660hw-13 
+-- Revision 1.31  2004/09/29 12:31:24  cchiang 
+-- Add p660r-61C 
+-- Revision 1.30  2004/09/23 11:06:14  cchiang 
+-- Add p660r-67C 
+-- Revision 1.29  2004/06/03 07:41:04  cchiang 
+-- Add p202hPlus 
+-- Revision 1.28  2004/05/28 01:28:21  cchiang 
+-- zywallidp10 
+-- Revision 1.27  2004/04/26 09:53:45  cchiang 
+-- Add p2602 series 
+-- Revision 1.26  2004/04/14 08:26:42  cchiang 
+-- Add P861h, P861HW 
+-- Revision 1.25  2004/02/24 05:57:54  cchiang 
+-- Add P660h series 
+-- Revision 1.24  2004/02/05 01:21:30  cchiang 
+-- Add P662HW-61/63/76 
+-- Revision 1.23  2004/01/15 01:48:52  cchiang 
+-- Modified p650m-t3 to p650r-t3 and add p650r-t1 
+-- Revision 1.22  2004/01/06 03:36:53  cchiang 
+-- Add AR7 series 
+-- Revision 1.21  2003/11/27 03:11:55  cchiang 
+-- add P650M-T3 
+-- Revision 1.20  2003/10/21 06:19:12  cchiang 
+-- Add p660hw-61 
+-- Revision 1.19  2003/10/03 04:00:05  cchiang 
+-- Add p653HWI-1x series 
+-- Revision 1.18  2003/08/11 07:31:21  cchiang 
+-- Change P645R-T1/T3/T7 to P623R-T1/T3/T7 
+-- Revision 1.17  2003/07/18 10:18:48  cchiang 
+-- Add p650h-e1,p645r-t1,p645r-t3,p645r-t7 
+-- Revision 1.16  2003/06/12 12:14:57  cchiang 
+-- Add p652hw37 
+-- Revision 1.15  2003/06/02 06:29:04  cchiang 
+-- Add p654ra-a1, p645r-e1, p645r-e3, p645r-e7, p645h-e7 
+-- Revision 1.14  2003/04/08 02:21:14  cchiang 
+-- Add p652hw31,p652hw33 
+-- Revision 1.13  2003/02/27 06:31:04  cchiang 
+-- Add p650h37 
+-- Revision 1.12  2003/02/13 06:37:35  cchiang 
+-- Add P623ra1 
+-- Revision 1.11  2003/01/08 11:18:35  cchiang 
+-- Add zywall200 
+-- Revision 1.10  2003/01/06 05:52:58  cchiang 
+-- Add p791r, 792r and p202h 
+-- Revision 1.9  2002/12/30 07:30:17  cchiang 
+-- Add p650hw31 and p650hw33 
+-- Revision 1.8  2002/11/05 08:09:13  cchiang 
+-- Add p650r33 object identifier 
+-- Revision 1.7  2002/10/24 03:02:13  cchiang 
+-- Add IP sharing and ZyWall series 
+-- Revision 1.6  2002/09/05 00:46:21  cchiang 
+-- Add p652r11 and p652r13 
+-- Revision 1.5  2002/09/03 07:54:00  cchiang 
+-- Revision 1.4  2002/06/26 02:16:16  cchiang 
+-- Add p650r11, p650h11, p650hw11 
+-- Revision 1.3  2002/06/12 02:29:30  cchiang 
+-- Add p645ra1 ans p650r31 oid 
+-- Revision 1.2  2002/06/05 04:07:42  cchiang 
+-- Add p742 OID. 
+-- Revision 1.1  2001/11/22 10:51:27  jennyhsu 
+-- Initial revision 
+-- Revision 1.3  2001/10/26 02:50:02  jennyhsu 
+-- Revision 1.2  2001/10/03 09:03:20  jennyhsu 
+-- Revision 1.1  2001/08/25 06:01:16  jennyhsu 
+-- Initial revision 
 
     ZYXEL-MIB DEFINITIONS ::= BEGIN
 
     IMPORTS
 	enterprises		FROM RFC1155-SMI;
-
-
+	
+	
 
 	zyxel			OBJECT IDENTIFIER ::= { enterprises 890 }
-
+	
 	products		OBJECT IDENTIFIER ::= { zyxel 1 }
-
+	
 	prestige 		OBJECT IDENTIFIER ::= { products 2 }
 	rack			OBJECT IDENTIFIER ::= { products 3 }
 	dslam			OBJECT IDENTIFIER ::= { products 4 }
-	accessSwitch  		OBJECT IDENTIFIER ::= { products 5 }
+	accessSwitch  	OBJECT IDENTIFIER ::= { products 5 }
 	zywall			OBJECT IDENTIFIER ::= { products 6 }
-	atmEncryptor		OBJECT IDENTIFIER ::= { products 7 }
-	serviceGateway  	OBJECT IDENTIFIER ::= { products 8 }
-	wimax		  	OBJECT IDENTIFIER ::= { products 9 }
-
+	
 	-- Prestige products
 
 	prestigeCommon		OBJECT IDENTIFIER ::= { prestige 1 }
@@ -74,15 +109,12 @@
 	p400Series		OBJECT IDENTIFIER ::= { prestige 4 }
 	p500Series		OBJECT IDENTIFIER ::= { prestige 5 }
 	p600Series		OBJECT IDENTIFIER ::= { prestige 6 }
-	p641			OBJECT IDENTIFIER ::= { p600Series 1 }
-	p642			OBJECT IDENTIFIER ::= { p600Series 2 }
-	p643			OBJECT IDENTIFIER ::= { p600Series 3 }
 	p700Series		OBJECT IDENTIFIER ::= { prestige 7 }
-	p794ra			OBJECT IDENTIFIER ::= { p700Series 1 }
-	p794rb			OBJECT IDENTIFIER ::= { p700Series 2 }
 	p800Series		OBJECT IDENTIFIER ::= { prestige 8 }
 	p900Series		OBJECT IDENTIFIER ::= { prestige 9 }
 	p2X00Series		OBJECT IDENTIFIER ::= { prestige 10 }
+
+
 
 	-- ISDN TA and Router P200 series
 	p202h			OBJECT IDENTIFIER ::= { p200Series 1 }
@@ -176,10 +208,14 @@
     p2302r-obm		OBJECT IDENTIFIER ::= { p2X00Series 10 }	
     p2602r-61		OBJECT IDENTIFIER ::= { p2X00Series 11 }	
 	
-
-
-
-
+	
+	
+	
+	
+	
+	
+	
+		
 	-- Access Switch products
 	accessSwitchCommon	OBJECT IDENTIFIER ::= { accessSwitch 1 }
 	aes100			OBJECT IDENTIFIER ::= { accessSwitch 2 }
@@ -190,99 +226,26 @@
 	sam1008			OBJECT IDENTIFIER ::= { sesSeries 2 }
 	ses1024			OBJECT IDENTIFIER ::= { sesSeries 3 }
 	slc1024			OBJECT IDENTIFIER ::= { sesSeries 4 }
-	slc1224-22		OBJECT IDENTIFIER ::= { sesSeries 5 }
-	sam1216-22 		OBJECT IDENTIFIER ::= { sesSeries 6 }
-	ies708-22a-stuc	OBJECT IDENTIFIER ::= { sesSeries 7 }
-	ies708-22a-stur	OBJECT IDENTIFIER ::= { sesSeries 8 }
 	p1600			OBJECT IDENTIFIER ::= { accessSwitch 6 }
 	p1400			OBJECT IDENTIFIER ::= { accessSwitch 7 }
-
-	esSeries		OBJECT IDENTIFIER ::= { accessSwitch 8 }
-	esSeriesCommon		OBJECT IDENTIFIER ::= { esSeries 1 }
-	ees1024af		OBJECT IDENTIFIER ::= { esSeries 2 }
-	es2008			OBJECT IDENTIFIER ::= { esSeries 3 }
-	es2008-gtp		OBJECT IDENTIFIER ::= { esSeries 4 }
-	es2008-sc		OBJECT IDENTIFIER ::= { esSeries 5 }
-	es2008-sc30		OBJECT IDENTIFIER ::= { esSeries 6 }
-	es3024			OBJECT IDENTIFIER ::= { esSeries 7 }
-	es4024			OBJECT IDENTIFIER ::= { esSeries 8 }
-	es2024			OBJECT IDENTIFIER ::= { esSeries 9 }
-	gs3012			OBJECT IDENTIFIER ::= { esSeries 10 }
-	gs3012f			OBJECT IDENTIFIER ::= { esSeries 11 }
-	es3124			OBJECT IDENTIFIER ::= { esSeries 12 }
-	gs4024			OBJECT IDENTIFIER ::= { esSeries 13 }
-	es3124pwr		OBJECT IDENTIFIER ::= { esSeries 14 }
-	gs2024			OBJECT IDENTIFIER ::= { esSeries 15 }
-	es2024a			OBJECT IDENTIFIER ::= { esSeries 16 }
-	es3148			OBJECT IDENTIFIER ::= { esSeries 17 }
-	es2108			OBJECT IDENTIFIER ::= { esSeries 18 }
-	es2108g			OBJECT IDENTIFIER ::= { esSeries 19 }
-	gs4012f			OBJECT IDENTIFIER ::= { esSeries 20 }
-	es2108pwr		OBJECT IDENTIFIER ::= { esSeries 21 }
-	es2108lc		OBJECT IDENTIFIER ::= { esSeries 22 }
-	es2048			OBJECT IDENTIFIER ::= { esSeries 23 }
-	es4124			OBJECT IDENTIFIER ::= { esSeries 24 }
---	gs3012			OBJECT IDENTIFIER ::= { esSeries 25 }
-	es3124-4f		OBJECT IDENTIFIER ::= { esSeries 26 }
-
+	ees1024			OBJECT IDENTIFIER ::= { accessSwitch 8 }
 	aes100-1		OBJECT IDENTIFIER ::= { accessSwitch 9 }
-	pes1014			OBJECT IDENTIFIER ::= { accessSwitch 10 }
-
+	pes1014			OBJECT IDENTIFIER ::= { accessSwitch 10 }	
 	aesSeries		OBJECT IDENTIFIER ::= { accessSwitch 11 }
 	aesSeriesCommon		OBJECT IDENTIFIER ::= { aesSeries 1 }
 	aes1024			OBJECT IDENTIFIER ::= { aesSeries 2 }
-	alc1024-61		OBJECT IDENTIFIER ::= { aesSeries 3 }
-	aam1008-63		OBJECT IDENTIFIER ::= { aesSeries 4 }
-	alc1024-63		OBJECT IDENTIFIER ::= { aesSeries 5 }
-	aam1008-61		OBJECT IDENTIFIER ::= { aesSeries 6 }
-	alc1224-71		OBJECT IDENTIFIER ::= { aesSeries 7 }
-	ies1248-71		OBJECT IDENTIFIER ::= { aesSeries 9 }
-	ies1248-73		OBJECT IDENTIFIER ::= { aesSeries 10 }
-	aam1212-51		OBJECT IDENTIFIER ::= { aesSeries 11 }
-	aam1212-53		OBJECT IDENTIFIER ::= { aesSeries 12 }
-	ies1248-51		OBJECT IDENTIFIER ::= { aesSeries 13 }
-	ies1248-53		OBJECT IDENTIFIER ::= { aesSeries 14 }
-	alc1224-51		OBJECT IDENTIFIER ::= { aesSeries 15 }
-	alc1224-53		OBJECT IDENTIFIER ::= { aesSeries 16 }
-
+	alc1024			OBJECT IDENTIFIER ::= { aesSeries 3 }
+	aam1008			OBJECT IDENTIFIER ::= { aesSeries 4 }		
 	vesSeries		OBJECT IDENTIFIER ::= { accessSwitch 12 }
 	vesSeriesCommon		OBJECT IDENTIFIER ::= { vesSeries 1 }
 	ves1008			OBJECT IDENTIFIER ::= { vesSeries 2 }
---	vmb2024			OBJECT IDENTIFIER ::= { vesSeries 3 }
-	ves1024			OBJECT IDENTIFIER ::= { vesSeries 4 }
-	vlc1012			OBJECT IDENTIFIER ::= { vesSeries 5 }
-	ves1316			OBJECT IDENTIFIER ::= { vesSeries 6 }
-	ves1416			OBJECT IDENTIFIER ::= { vesSeries 7 }
-	vlc1124			OBJECT IDENTIFIER ::= { vesSeries 8 }
-	ves1124			OBJECT IDENTIFIER ::= { vesSeries 9 }
-	ves1616f34		OBJECT IDENTIFIER ::= { vesSeries 10 }
-	ves1616f44		OBJECT IDENTIFIER ::= { vesSeries 11 }
-	ves1624f44		OBJECT IDENTIFIER ::= { vesSeries 12 }
-
-	iesSeries		OBJECT IDENTIFIER ::= { accessSwitch 13 }
-	iesSeriesCommon		OBJECT IDENTIFIER ::= { iesSeries 1 }
-	ies2000			OBJECT IDENTIFIER ::= { iesSeries 2 }
-	ies3000			OBJECT IDENTIFIER ::= { iesSeries 3 }
-	ies5000			OBJECT IDENTIFIER ::= { iesSeries 5 }
-	ies5005			OBJECT IDENTIFIER ::= { iesSeries 7 }
-	ies6000			OBJECT IDENTIFIER ::= { iesSeries 8 }
-
-	accessSwitchCommonATM	OBJECT IDENTIFIER ::= { accessSwitch 14 }
-
+	vmb2024			OBJECT IDENTIFIER ::= { vesSeries 3 }			
+	ies2000			OBJECT IDENTIFIER ::= { accessSwitch 13 }
+	ies3000			OBJECT IDENTIFIER ::= { accessSwitch 14 }
+	
 	-- DSLAM products
 	dslamCommon             OBJECT IDENTIFIER ::= { dslam 1 }
-
-
-	-- Service Gateway products
-	serviceGWCommon			OBJECT IDENTIFIER ::= { serviceGateway 1 }
-	vsg1000				OBJECT IDENTIFIER ::= { serviceGateway 2 }
-	vsg1200				OBJECT IDENTIFIER ::= { serviceGateway 3 }
-	vsg1200v2			OBJECT IDENTIFIER ::= { serviceGateway 4 }
-
-	ponSeries		OBJECT IDENTIFIER ::= { accessSwitch 15 }
-	olt1308			OBJECT IDENTIFIER ::= { ponSeries 1 }
-	lt20h			OBJECT IDENTIFIER ::= { ponSeries 2 }
-
+		
 	-- ZyWALL series
 	zywallCommon           	OBJECT IDENTIFIER ::= { zywall 1 }
 	zywall1		      	OBJECT IDENTIFIER ::= { zywall 2 }
@@ -310,3 +273,4 @@
 	zywallZLDCommon		OBJECT IDENTIFIER ::= { zywall 22 }
 
 END
+

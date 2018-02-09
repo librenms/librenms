@@ -65,8 +65,7 @@ foreach (explode("\n", $oids) as $data) {
     }//end if
 }
 
-$chip = snmp_get($device, '.1.3.6.1.2.1.1.1.0', '-Oqv');
-if (preg_match("/(Linux).+(ntc)/", $chip)) {
+if (preg_match("/(Linux).+(ntc)/", $device['sysDescr'])) {
     $sensor_type = "chip_volts";
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.10.112.111.119.101.114.45.115.116.97.';
     $lowlimit     = 3.8;
@@ -89,4 +88,63 @@ if (preg_match("/(Linux).+(ntc)/", $chip)) {
     $index = '116.6';
     $value = snmp_get($device, $oid.$index, '-Oqv');
     discover_sensor($valid['sensor'], 'voltage', $device, $oid.$index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+}
+
+$oids = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.4';
+$value = snmp_get($device, $oids, '-Osqnv');
+
+if (!empty($value)) {
+    $type = 'ups-nut';
+    $index = 4;
+    $limit = 60;
+    $lowlimit = 0;
+    $lowwarnlimit = 0;
+    $descr = 'Battery Voltage';
+
+    discover_sensor($valid['sensor'], 'ups_nut', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
+}
+unset($oids);
+
+$oids = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.5';
+$value = snmp_get($device, $oids, '-Osqnv');
+
+if (!empty($value)) {
+    $type = 'ups-nut';
+    $index = 5;
+    $limit = 60;
+    $lowlimit = 0;
+    $lowwarnlimit = 0;
+    $descr = 'Battery Nominal';
+
+    discover_sensor($valid['sensor'], 'ups_nut', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
+}
+unset($oids);
+
+$oids = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.6';
+$value = snmp_get($device, $oids, '-Osqnv');
+
+if (!empty($value)) {
+    $type = 'ups-nut';
+    $index = 6;
+    $limit = 0;
+    $lowlimit = 0;
+    $lowwarnlimit = 0;
+    $descr = 'Line Nominal';
+
+    discover_sensor($valid['sensor'], 'ups_nut', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
+}
+unset($oids);
+
+$oids = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.7';
+$value = snmp_get($device, $oids, '-Osqnv');
+
+if (!empty($value)) {
+    $type = 'ups-nut';
+    $index = 7;
+    $limit = 280;
+    $lowlimit = 200;
+    $lowwarnlimit = 0;
+    $descr = 'Input Voltage';
+
+    discover_sensor($valid['sensor'], 'ups_nut', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
 }

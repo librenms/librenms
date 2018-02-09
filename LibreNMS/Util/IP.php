@@ -139,6 +139,23 @@ abstract class IP
     abstract public function inNetwork($network);
 
     /**
+     * Check if this IP is in one of multiple networks
+     *
+     * @param array $networks
+     * @return bool
+     */
+    public function inNetworks($networks)
+    {
+        foreach ((array)$networks as $network) {
+            if ($this->inNetwork($network)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Check if this IP is in the reserved range.
      * @return bool
      */
@@ -168,6 +185,16 @@ abstract class IP
     }
 
     /**
+     * Packed address for storage in database
+     *
+     * return string
+     */
+    public function packed()
+    {
+        return inet_pton((string)$this->ip);
+    }
+
+    /**
      * Get the family of this IP.
      * @return string ipv4 or ipv6
      */
@@ -194,4 +221,11 @@ abstract class IP
     {
         return array_pad(explode('/', $ip, 2), 2, $this->host_bits);
     }
+
+    /**
+     * Convert this IP to an snmp index hex encoded
+     *
+     * @return string
+     */
+    abstract public function toSnmpIndex();
 }

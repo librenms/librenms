@@ -1,0 +1,187 @@
+ARRIS-C3-STATS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises,
+    MODULE-IDENTITY, 
+    OBJECT-TYPE,
+    Counter32,
+    Integer32,
+    IpAddress,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    ifIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    docsIfCmtsServiceEntry
+        FROM DOCS-IF-MIB
+    cmtsC3
+        FROM ARRIS-MIB;
+
+cmtsC3StatsMIB MODULE-IDENTITY
+        LAST-UPDATED "200308200000Z" -- 20th August 2003
+        ORGANIZATION "Arris International"
+        CONTACT-INFO
+            "   Network Management
+                Postal: Arris International.
+                        4400 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+
+        DESCRIPTION
+            "This MIB manages proprietary statistics on the Arris CMTS C3"
+    ::= { cmtsC3 1 }
+
+
+dcxUpstreamStatsObjects OBJECT IDENTIFIER ::= { cmtsC3StatsMIB 1 }
+
+    dcxUpstreamStatsTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF DcxUpstreamStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "."
+        ::= { dcxUpstreamStatsObjects 1 }
+    
+        dcxUpstreamStatsEntry OBJECT-TYPE
+            SYNTAX     DcxUpstreamStatsEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    "Counts the modems on each upstream by state. The states are as defined
+                     by the DOCS-IF-MIB variable docsIfCmtsCmStatusValue"
+            INDEX { dcxUsStatsIfIndex }
+            ::= { dcxUpstreamStatsTable 1 }
+        
+        DcxUpstreamStatsEntry ::= SEQUENCE {
+            dcxUsStatsOther        Counter32,
+            dcxUsStatsRanging        Counter32,
+            dcxUsStatsRngAborted    Counter32,
+            dcxUsStatsRngComplete    Counter32,
+            dcxUsStatsIpComplete    Counter32,
+            dcxUsStatsRegComplete    Counter32,
+            dcxUsStatsAccessDenied    Counter32,
+            dcxUsStatsIfIndex           InterfaceIndexOrZero
+            }
+        
+            dcxUsStatsOther OBJECT-TYPE
+                SYNTAX Counter32 
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION "Number of modems on this upstream in state docsIfCmtsCmStatusValue_other"
+                ::=  { dcxUpstreamStatsEntry 1 }
+                
+            dcxUsStatsRanging OBJECT-TYPE
+                SYNTAX Counter32 
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION "Number of modems on this upstream in state docsIfCmtsCmStatusValue_ranging"
+                ::=  { dcxUpstreamStatsEntry 2 }
+             
+            dcxUsStatsRngAborted OBJECT-TYPE
+                SYNTAX Counter32 
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION "Number of modems on this upstream in state docsIfCmtsCmStatusValue_rangingAborted"
+                ::=  { dcxUpstreamStatsEntry 3 }
+             
+            dcxUsStatsRngComplete OBJECT-TYPE
+                SYNTAX Counter32 
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION "Number of modems on this upstream in state docsIfCmtsCmStatusValue_rangingComplete"
+                ::=  { dcxUpstreamStatsEntry 4 }
+             
+            dcxUsStatsIpComplete OBJECT-TYPE
+                SYNTAX Counter32 
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION "Number of modems on this upstream in state docsIfCmtsCmStatusValue_ipComplete"
+                ::=  { dcxUpstreamStatsEntry 5 }
+             
+            dcxUsStatsRegComplete OBJECT-TYPE
+                SYNTAX Counter32 
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION "Number of modems on this upstream in state docsIfCmtsCmStatusValue_registrationComplete"
+                ::=  { dcxUpstreamStatsEntry 6 }
+             
+            dcxUsStatsAccessDenied OBJECT-TYPE
+                SYNTAX Counter32 
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION "Number of modems on this upstream in state docsIfCmtsCmStatusValue_accessDenied"
+                ::=  { dcxUpstreamStatsEntry 7 }
+             
+            dcxUsStatsIfIndex OBJECT-TYPE
+                SYNTAX InterfaceIndexOrZero 
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION "ifIndex of the upstream interface corresponding to this row"
+                ::=  { dcxUpstreamStatsEntry 8 }
+
+
+dcxCmtsServiceStatsObjects OBJECT IDENTIFIER ::= { cmtsC3StatsMIB 2 }
+
+    dcxCmtsServiceTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DcxCmtsServiceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The table augments the D1.0 docsIfCmtsServiceTable with downstream variables."
+        ::= { dcxCmtsServiceStatsObjects 1 }
+    
+        dcxCmtsServiceEntry OBJECT-TYPE
+            SYNTAX      DcxCmtsServiceEntry 
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+              "The table augments the D1.0 docsIfCmtsServiceTable with downstream variables."
+            AUGMENTS { docsIfCmtsServiceEntry }
+            ::= { dcxCmtsServiceTable 1 }
+        
+        DcxCmtsServiceEntry ::= SEQUENCE {
+            dcxCmtsServiceOutOctets        Counter32,
+            dcxCmtsServiceOutPackets       Counter32,
+            cdxCmtsServiceUpBWExcessReqs   Counter32,
+            cdxCmtsServiceDownBWExcessPkts Counter32
+            }
+        
+            dcxCmtsServiceOutOctets OBJECT-TYPE
+                SYNTAX      Counter32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                   "The total number of bytes transmitted downstream for this SID"
+                ::= { dcxCmtsServiceEntry 1 }
+        
+            dcxCmtsServiceOutPackets OBJECT-TYPE
+                SYNTAX      Counter32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The total number of packets transmitted downstream for this SID"
+                ::= { dcxCmtsServiceEntry 2 }
+        
+            cdxCmtsServiceUpBWExcessReqs OBJECT-TYPE
+                SYNTAX      Counter32 
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The number of upstream requests which have exceeded the
+                     maximum upstream bandwidth allowed for this SID, and have
+                     beenn rejected by the scheduler's rate limiting."
+                ::= { dcxCmtsServiceEntry 3 }
+        
+           cdxCmtsServiceDownBWExcessPkts OBJECT-TYPE
+                SYNTAX      Counter32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "The number of downstream packets that have been dropped 
+                     by the DS policer as a result of exceeding the service's 
+                     rate limit."
+                ::= { dcxCmtsServiceEntry 4 }
+
+
+ END

@@ -1,4 +1,17 @@
 <?php
+/*
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2017 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
 $where = 1;
 $param = array();
@@ -13,6 +26,12 @@ if (is_admin() === false && is_read() === false) {
 
 if (!empty($_POST['location'])) {
     $sql .= " LEFT JOIN `devices_attribs` AS `DB` ON `DB`.`device_id`=`devices`.`device_id` AND `DB`.`attrib_type`='override_sysLocation_bool' AND `DB`.`attrib_value`='1' LEFT JOIN `devices_attribs` AS `DA` ON `devices`.`device_id`=`DA`.`device_id`";
+}
+
+if (!empty($_POST['group']) && is_numeric($_POST['group'])) {
+    $sql .= " LEFT JOIN `device_group_device` AS `DG` ON `DG`.`device_id`=`devices`.`device_id`";
+    $where .= " AND `DG`.`device_group_id`=?";
+    $param[] = $_POST['group'];
 }
 
 $sql .= " WHERE $where ";
@@ -80,24 +99,9 @@ if (!empty($_POST['location'])) {
     $param[] = $_POST['location'];
 }
 
-if (!empty($_POST['group'])) {
-    include_once '../includes/device-groups.inc.php';
-    $sql .= ' AND ( ';
-    foreach (GetDevicesFromGroup($_POST['group']) as $dev) {
-        $sql .= '`devices`.`device_id` = ? OR ';
-        $param[] = $dev;
-    }
-
-    $sql = substr($sql, 0, (strlen($sql) - 3));
-    $sql .= ' )';
-}
-
 $count_sql = "SELECT COUNT(`devices`.`device_id`) $sql";
 
-$total = dbFetchCell($count_sql, $param);
-if (empty($total)) {
-    $total = 0;
-}
+$total = (int)dbFetchCell($count_sql, $param);
 
 if (!isset($sort) || empty($sort)) {
     $sort = '`hostname` DESC';
@@ -130,25 +134,20 @@ foreach (dbFetchRows($sql, $param) as $device) {
     }
 
     if ($device['status'] == '0') {
-        $extra = 'danger';
-        $msg = $device['status_reason'];
+        $extra = 'label-danger';
     } else {
-        $extra = 'success';
-        $msg = 'up';
+        $extra = 'label-success';
     }
 
     if ($device['ignore'] == '1') {
-        $extra = 'default';
-        $msg = 'ignored';
+        $extra = 'label-default';
         if ($device['status'] == '1') {
-            $extra = 'warning';
-            $msg = 'ignored';
+            $extra = 'label-warning';
         }
     }
 
     if ($device['disabled'] == '1') {
-        $extra = 'default';
-        $msg = 'disabled';
+        $extra = 'label-default';
     }
 
     $type = strtolower($device['os']);
@@ -239,7 +238,6 @@ foreach (dbFetchRows($sql, $param) as $device) {
 
     $response[] = array(
         'extra' => $extra,
-        'msg' => $msg,
         'list_type' => $subformat,
         'icon' => $image,
         'hostname' => $hostname,

@@ -1,0 +1,115 @@
+mib: JUNIPER-IFOPTICS-MIB:JNX-OPT-IF-EXT-MIB:IF-MIB:JUNIPER-MIB:JUNIPER-SRX5000-SPU-MONITORING-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: jnxOperatingEntry
+                  value: jnxOperatingCPU
+                  num_oid: '.1.3.6.1.4.1.2636.3.1.13.1.8.{{ $index }}'
+                  descr: jnxOperatingDescr
+                  skip_values: 0
+              -
+                  oid: jnxJsSPUMonitoringCPUUsage
+                  value: jnxOperatingCPU
+                  num_oid: '.1.3.6.1.4.1.2636.3.39.1.12.1.1.1.4.{{ $index }}'
+                  descr: CPU
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - ifDescr
+        chromatic_dispersion:
+            data:
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurChromaticDispersion
+                    num_oid: .1.3.6.1.4.1.2636.3.71.1.2.1.1.1.
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    descr: '{{ $ifDescr }} CD'
+                    index: 'jnxPMCurChromaticDispersion.{{ $index }}'
+        delay:
+            data:
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurDiffGroupDelay
+                    num_oid: .1.3.6.1.4.1.2636.3.71.1.2.1.1.2.
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    divisor: 1000000000000
+                    descr: '{{ $ifDescr }} DGD'
+                    index: 'jnxPMCurDiffGroupDelay.{{ $index }}'
+        dbm:
+            data:
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurRxInputPower
+                    num_oid: .1.3.6.1.4.1.2636.3.71.1.2.1.1.8.
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    divisor: 100
+                    descr: '{{ $ifDescr }} Rx Power'
+                    index: 'jnxPMCurRxInputPower.{{ $index }}'
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurTxOutputPower
+                    num_oid: .1.3.6.1.4.1.2636.3.71.1.2.1.1.7.
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    divisor: 100
+                    descr: '{{ $ifDescr }} Tx Power'
+                    index: 'jnxPMCurTxOutputPower.{{ $index }}'
+        quality_factor:
+            data:
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurQ
+                    num_oid: .1.3.6.1.4.1.2636.3.71.1.2.1.1.5.
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    divisor: 10
+                    descr: '{{ $ifDescr }} Q2-factor'
+                    index: 'jnxPMCurQ.{{ $index }}'
+        snr:
+            data:
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurSNR
+                    num_oid: .1.3.6.1.4.1.2636.3.71.1.2.1.1.6.
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    divisor: 10
+                    descr: '{{ $ifDescr }} electrical SNR'
+                    index: 'jnxPMCurSNR.{{ $index }}'
+        frequency:
+            data:
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurCarFreqOffset
+                    num_oid: .1.3.6.1.4.1.2636.3.71.1.2.1.1.43.
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    multiplier: 1000000
+                    descr: '{{ $ifDescr }} Carrier Freq Offset'
+                    index: 'jnxPMCurCarFreqOffset.{{ $index }}'
+        temperature:
+            data:
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurTemperature
+                    num_oid: .1.3.6.1.4.1.2636.3.71.1.2.1.1.39.
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    descr: '{{ $ifDescr }} Temperature'
+                    index: 'jnxPMCurTemperature.{{ $index }}'
+        current:
+            data:
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurTxLaserBiasCurrent
+                    num_oid: .1.3.6.1.4.1.2636.3.71.1.2.1.1.35.
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    divisor: 1000
+                    descr: '{{ $ifDescr }} Tx Bias'
+                    index: 'jnxPMCurTxLaserBiasCurrent.{{ $index }}'

@@ -70,8 +70,6 @@ if ($agent_data['app'][$name]) {
     }
 }
 
-update_application($app, $data);
-
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
     ->addDataset('queue_length', 'GAUGE', 0)
@@ -95,5 +93,6 @@ foreach (explode("\n", $data) as $line) {
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
+update_application($app, $data, $fields);
 
 unset($data, $rrd_name, $rrd_def, $fields, $tags);

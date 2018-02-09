@@ -11,7 +11,7 @@ if ($device['os'] == 'powerconnect') {
 
     echo 'DNOS-MEMORY-POOL:  ';
 
-    $get_series = explode('.', snmp_get($device, 'mib-2.1.2.0', '-Onvsbq', 'F10-PRODUCTS-MIB', 'dnos'), 2); // Get series From MIB
+    $get_series = explode('.', $device['sysObjectID'], 2); // Get series From MIB
     $series = $get_series[0];
     if ($series == 'f10SSeriesProducts') {
         $total = snmp_get($device, 'chSysProcessorMemSize.1', '-OvQU', 'F10-S-SERIES-CHASSIS-MIB');

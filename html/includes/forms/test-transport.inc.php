@@ -46,11 +46,12 @@ $obj = array(
 
 $status = 'error';
 
-if (file_exists($config['install_dir']."/includes/alerts/transport.".$transport.".php")) {
+$class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
+if (class_exists($class)) {
     $opts = $config['alert']['transports'][$transport];
     if ($opts) {
-        eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' return false; };');
-        $tmp = $tmp($obj,$opts);
+        $instance = new $class;
+        $tmp = $instance->deliverAlert($obj, $opts);
         if ($tmp) {
             $status = 'ok';
         }

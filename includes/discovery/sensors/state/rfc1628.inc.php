@@ -17,12 +17,13 @@ if (is_numeric($state)) {
         )
     );
 
+    $sensor_index = 0;
     discover_sensor(
         $valid['sensor'],
         'state',
         $device,
         '.1.3.6.1.2.1.33.1.2.1.0',
-        0,
+        $sensor_index,
         $state_name,
         'Battery Status',
         1,
@@ -37,7 +38,7 @@ if (is_numeric($state)) {
     );
 
     //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $index);
+    create_sensor_to_state_index($device, $state_name, $sensor_index);
 }
 
 // Output Source (Value : 1 other, 2 none, 3 normal, 4 bypass, 5 battery, 6 booster, 7 reducer)
@@ -58,12 +59,13 @@ if (is_numeric($state)) {
         )
     );
 
+    $sensor_index = 0;
     discover_sensor(
         $valid['sensor'],
         'state',
         $device,
         '.1.3.6.1.2.1.33.1.4.1.0',
-        0,
+        $sensor_index,
         $state_name,
         'Output Source',
         1,
@@ -78,5 +80,5 @@ if (is_numeric($state)) {
     );
 
     //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $index);
+    create_sensor_to_state_index($device, $state_name, $sensor_index);
 }

@@ -27,17 +27,21 @@
  * @param array $modules Which modules to initialize
  */
 
+use LibreNMS\Authentication\Auth;
+
 global $config;
 
 $install_dir = realpath(__DIR__ . '/..');
 $config['install_dir'] = $install_dir;
 chdir($install_dir);
 
+require_once $install_dir . '/includes/common.php';
+
 # composer autoload
-require $install_dir . '/vendor/autoload.php';
-if (version_compare(PHP_VERSION, '5.4', '>=')) {
-    require_once $install_dir . '/lib/influxdb-php/vendor/autoload.php';
+if (!is_file($install_dir . '/vendor/autoload.php')) {
+    c_echo("%RError: Missing dependencies%n, run: %B./scripts/composer_wrapper.php install --no-dev%n\n\n");
 }
+require $install_dir . '/vendor/autoload.php';
 
 if (!function_exists('module_selected')) {
     function module_selected($module, $modules)
@@ -47,7 +51,6 @@ if (!function_exists('module_selected')) {
 }
 
 // function only files
-require_once $install_dir . '/includes/common.php';
 require_once $install_dir . '/includes/dbFacile.php';
 require_once $install_dir . '/includes/rrdtool.inc.php';
 require_once $install_dir . '/includes/influxdb.inc.php';
@@ -95,20 +98,10 @@ require $install_dir . '/includes/definitions.inc.php';
 $display_bak = ini_get('display_errors');
 ini_set('display_errors', 1);
 include $install_dir . '/config.php';
-ini_set('display_errors', $display_bak);
-
-// init memcached
-if ($config['memcached']['enable'] === true) {
-    if (class_exists('Memcached')) {
-        $config['memcached']['ttl'] = 60;
-        $config['memcached']['resource'] = new Memcached();
-        $config['memcached']['resource']->addServer($config['memcached']['host'], $config['memcached']['port']);
-    } else {
-        echo "WARNING: You have enabled memcached but have not installed the PHP bindings. Disabling memcached support.\n";
-        echo "Try 'apt-get install php5-memcached' or 'pecl install memcached'. You will need the php5-dev and libmemcached-dev packages to use pecl.\n\n";
-        $config['memcached']['enable'] = 0;
-    }
+if (isset($config['php_memory_limit']) && is_numeric($config['php_memory_limit']) && $config['php_memory_limit'] > 128) {
+    ini_set('memory_limit', $config['php_memory_limit'].'M');
 }
+ini_set('display_errors', $display_bak);
 
 if (!module_selected('nodb', $init_modules)) {
     // Check for testing database
@@ -146,13 +139,19 @@ if (!module_selected('nodb', $init_modules)) {
     require $install_dir . '/includes/process_config.inc.php';
 }
 
-if (file_exists($install_dir . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
-    require_once $install_dir . '/html/includes/authentication/functions.php';
-    require_once $install_dir . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php';
-    init_auth();
-} else {
+try {
+    Auth::get();
+} catch (Exception $exception) {
     print_error('ERROR: no valid auth_mechanism defined!');
+    echo $exception->getMessage() . PHP_EOL;
     exit();
+}
+
+if (module_selected('discovery', $init_modules) && !update_os_cache()) {
+    // load_all_os() is called by update_os_cache() if updated, no need to call twice
+    load_all_os();
+} elseif (module_selected('web', $init_modules)) {
+    load_all_os(!module_selected('nodb', $init_modules));
 }
 
 if (module_selected('web', $init_modules)) {
@@ -161,11 +160,6 @@ if (module_selected('web', $init_modules)) {
         $config['title_image'] = 'images/librenms_logo_'.$config['site_style'].'.svg';
     }
     require $install_dir . '/html/includes/vars.inc.php';
-    if (module_selected('nodb', $init_modules)) {
-        load_all_os(false);
-    } else {
-        load_all_os(true);
-    }
 }
 
 $console_color = new Console_Color2();

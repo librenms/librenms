@@ -8,5 +8,5 @@ mib_dir:
     #- { graph: device_current, text: 'Current' }
     #- { graph: device_voltage, text: 'Voltage' }
 discovery:
-    - sysObjectId:
+    - sysObjectID:
         - .1.3.6.1.4.1.7342.5.

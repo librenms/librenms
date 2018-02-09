@@ -1,0 +1,20 @@
+{
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": "0",
+                    "hrDeviceIndex": "0",
+                    "processor_oid": ".1.3.6.1.4.1.1991.1.1.2.11.1.1.6.1.1.300",
+                    "processor_index": "1.1.300",
+                    "processor_type": "serveriron",
+                    "processor_usage": "42",
+                    "processor_descr": "Slot 1 Module [1]",
+                    "processor_precision": "100",
+                    "processor_perc_warn": "75"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

@@ -25,48 +25,43 @@
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\FileLock;
-use PHPUnit\Framework\TestCase;
+use LibreNMS\Exceptions\LockException;
+use LibreNMS\Util\FileLock;
 
 class LockTest extends TestCase
 {
     public function testFileLock()
     {
         $lock = FileLock::lock('tests');
-        $this->assertNotFalse($lock, 'Failed to acquire initial lock!');
         $lock->release();
 
         $new_lock = FileLock::lock('tests');
-        $this->assertNotFalse($new_lock, 'Failed to release the lock with release()');
         unset($new_lock);
 
-        $this->assertNotFalse(FileLock::lock('tests'), 'Failed to remove lock when the lock object was destroyed');
+        FileLock::lock('tests');
     }
 
     public function testFileLockFail()
     {
         $lock = FileLock::lock('tests');
-        $this->assertNotFalse($lock, 'Failed to acquire initial lock!');
 
+        $this->setExpectedException('LibreNMS\Exceptions\LockException');
         $failed_lock = FileLock::lock('tests');
-        $this->assertFalse($failed_lock, 'Additional lock attempt did not fail');
     }
 
     public function testFileLockWait()
     {
         $lock = FileLock::lock('tests');
-        $this->assertNotFalse($lock, 'Failed to acquire initial lock!');
 
         $start = microtime(true);
+        $this->setExpectedException('LibreNMS\Exceptions\LockException');
         $wait_lock = FileLock::lock('tests', 1);
         $this->assertGreaterThan(1, microtime(true) - $start, 'Lock did not wait.');
-        $this->assertFalse($wait_lock, 'Waiting lock attempt did not fail');
 
         $lock->release();
 
         $start = microtime(true);
         $wait_lock = FileLock::lock('tests', 5);
         $this->assertLessThan(1, microtime(true) - $start, 'Lock waited when it should not have');
-        $this->assertNotFalse($wait_lock, 'Second wait lock did not succeed');
     }
 }

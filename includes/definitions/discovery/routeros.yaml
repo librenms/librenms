@@ -1,6 +1,10 @@
 mib: MIKROTIK-MIB
 modules:
     sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - mtxrInterfaceStatsName
         temperature:
             data:
                 -
@@ -9,6 +13,38 @@ modules:
                     num_oid: .1.3.6.1.4.1.14988.1.1.19.1.1.6.
                     descr: mtxrOpticalName
                     index: 'mtxrOpticalTemperature.{{ $index }}'
+                -
+                    oid: mtxrHlSensorTemperature
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.5.
+                    divisor: 10
+                    descr: 'Sensor chip'
+                    index: 'mtxrHlSensorTemperature.{{ $index }}'
+                -
+                    oid: mtxrHlCpuTemperature
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.6.
+                    divisor: 10
+                    descr: 'Processor'
+                    index: 'mtxrHlCpuTemperature.{{ $index }}'
+                -
+                    oid: mtxrHlBoardTemperature
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.7.
+                    divisor: 10
+                    descr: 'System board'
+                    index: 'mtxrHlBoardTemperature.{{ $index }}'
+                -
+                    oid: mtxrHlTemperature
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.10.
+                    divisor: 10
+                    descr: 'Temperature {{ $index }}'
+                    low_limit: -40
+                    low_warn_limit: -35
+                    warn_limit: 65
+                    high_limit: 70
+                -
+                    oid: mtxrHlProcessorTemperature
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.11.
+                    divisor: 10
+                    descr: 'Processor Temperature {{ $index }}'
         voltage:
             data:
                 -
@@ -18,6 +54,38 @@ modules:
                     divisor: 1000
                     descr: mtxrOpticalName
                     index: 'mtxrOpticalSupplyVoltage.{{ $index }}'
+                -
+                    oid: mtxrPOETable
+                    value: mtxrPOEVoltage
+                    num_oid: .1.3.6.1.4.1.14988.1.1.15.1.1.4.
+                    divisor: 10
+                    descr: '{{ $mtxrPOEName }} POE'
+                    index: 'mtxrPOEVoltage.{{ $index }}'
+                -
+                    oid: mtxrHlCoreVoltage
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.1.
+                    descr: 'Core'
+                    index: 'mtxrHlCoreVoltage.{{ $index }}'
+                -
+                    oid: mtxrHlThreeDotThreeVoltage
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.2.
+                    descr: '3.3V'
+                    index: 'mtxrHlThreeDotThreeVoltage.{{ $index }}'
+                -
+                    oid: mtxrHlFiveVoltage
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.3.
+                    descr: '5V'
+                    index: 'mtxrHlFiveVoltage.{{ $index }}'
+                -
+                    oid: mtxrHlTwelveVoltage
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.4.
+                    descr: '12V'
+                    index: 'mtxrHlTwelveVoltage.{{ $index }}'
+                -
+                    oid: mtxrHlVoltage
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.8.
+                    divisor: 10
+                    descr: 'Voltage {{ $index }}'
         current:
             data:
                 -
@@ -27,6 +95,19 @@ modules:
                     divisor: 1000
                     descr: '{{ $mtxrOpticalName }} Tx'
                     index: 'mtxrOpticalTxBiasCurrent.{{ $index }}'
+                -
+                    oid: mtxrPOETable
+                    value: mtxrPOECurrent
+                    num_oid: .1.3.6.1.4.1.14988.1.1.15.1.1.5.
+                    divisor: 1000
+                    descr: '{{ $mtxrPOEName }} POE'
+                    index: 'mtxrPOECurrent.{{ $index }}'
+                -
+                    oid: mtxrHlCurrent
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.13.
+                    divisor: 1000
+                    descr: 'Current'
+                    index: '0'
         dbm:
             data:
                 -
@@ -67,3 +148,48 @@ modules:
                         - { descr: no, graph: 1, value: 0, generic: 0 }
                         - { descr: yes, graph: 1, value: 1, generic: 2 }
                         - { descr: 'null', graph: 1, value: 2, generic: 3 }
+                -
+                    oid: mtxrHlPowerSupplyState
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.15.
+                    descr: Primary PSU
+                    index: 'mtxrHlPowerSupplyState.{{ $index }}'
+                    state_name: mtxrHlPowerSupplyState
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: 'false' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'true' }
+                -
+                    oid: mtxrHlBackupPowerSupplyState
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.16.
+                    descr: Backup PSU
+                    index: 'mtxrHlBackupPowerSupplyState.{{ $index }}'
+                    state_name: mtxrHlBackupPowerSupplyState
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: 'false' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'true' }
+        power:
+            data:
+                -
+                    oid: mtxrPOETable
+                    value: mtxrPOEPower
+                    num_oid: .1.3.6.1.4.1.14988.1.1.15.1.1.6.
+                    divisor: 10
+                    descr: '{{ $mtxrPOEName }} POE'
+                    index: 'mtxrPOEPower.{{ $index }}'
+                -
+                    oid: mtxrHlPower
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.12.
+                    divisor: 10
+                    descr: 'Power Usage'
+                    index: '1'
+        fanspeed:
+            data:
+                -
+                    oid: mtxrHlFanSpeed1
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.17.
+                    descr: 'Fan #1'
+                    index: '0'
+                -
+                    oid: mtxrHlFanSpeed2
+                    num_oid: .1.3.6.1.4.1.14988.1.1.3.18.
+                    descr: 'Fan #2'
+                    index: '1'

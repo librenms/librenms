@@ -14,5 +14,5 @@ discovery:
     - sysDescr:
         - JETDIRECT
         - HP ETHERNET MULTI-ENVIRONMENT
-    - sysObjectId_regex:
+    - sysObjectID_regex:
         - '/^.1.3.6.1.4.1.11.1$/'

@@ -19,5 +19,5 @@ discovery_modules:
     ntp: 0
     ucd-diskio: 0
 discovery:
-    - sysObjectId:
+    - sysObjectID:
         - .1.3.6.1.4.1.1429.3940.

@@ -5,5 +5,5 @@ icon: mrv
 mib_dir:
     - mrv
 discovery:
-    - sysObjectId:
+    - sysObjectID:
        - .1.3.6.1.4.1.629.200.
