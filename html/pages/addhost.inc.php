@@ -16,9 +16,10 @@ echo '<div class="row">
             </div>
             <div class="col-sm-6">';
 
-$snmp_enabled = isset($_POST['snmp']);
+// first load enabled, after that check snmp variable
+$snmp_enabled = !isset($_POST['hostname']) || isset($_POST['snmp']);
 
-if (isset($_POST['hostname'])) {
+if (!empty($_POST['hostname'])) {
     $hostname = clean($_POST['hostname']);
     if (!is_valid_hostname($hostname) && !IP::isValid($hostname)) {
         print_error("Invalid hostname or IP: $hostname");
@@ -360,7 +361,7 @@ if ($config['distributed_poller'] === true) {
 
     $("[name='snmp']").bootstrapSwitch('offColor','danger');
 <?php
-if ($hostname !== false && !$snmp_enabled) {
+if (!$snmp_enabled) {
     echo '  $("[name=\'snmp\']").trigger(\'click\');';
 }
 ?>
