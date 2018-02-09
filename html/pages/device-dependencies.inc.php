@@ -80,7 +80,7 @@ var grid = $("#hostdeps").bootgrid({
             return response;
         },
         "hostname": function(column, row) {
-            return '<a href="device/device='+row.deviceid+'/" class="list-device">'+row.hostname+'</a>'+row.sysname;
+            return '<a href="device/device='+row.deviceid+'/" class="list-device">'+row.hostname+'</a><br />'+row.sysname;
         },
         "parent": function(column, row) {
             if (row.parent == 'None') {

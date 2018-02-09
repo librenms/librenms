@@ -62,7 +62,7 @@ if (is_admin() === false) {
                         $parent = $myrow['parents'];
                     }
                     
-                    $hostname = add_sysname_or_hostname($myrow);
+                    $hostname = get_device_name($myrow);
                     array_push($res_arr, array( "deviceid" => $myrow['id'], "hostname" => $myrow['hostname'], "sysname" => $hostname, "parent" => $parent, "parentid" => $myrow['parentid'] ));
                 }
                 $status = array('current' => $_POST['current'], 'rowCount' => $_POST['rowCount'], 'rows' => $res_arr, 'total' => $rec_count);

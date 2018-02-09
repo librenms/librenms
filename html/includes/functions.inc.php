@@ -1704,14 +1704,14 @@ function get_zfs_pools($device_id)
  * @param device array
  * @return string
  */
-function add_sysname_or_hostname($device)
+function get_device_name($device)
 {
     $ret_str = '';
 
     if (format_hostname($device) !== $device['sysName']) {
-        $ret_str .= '<br />' . $device['sysName'];
+        $ret_str = $device['sysName'];
     } elseif ($device['hostname'] !== $device['ip']) {
-        $ret_str .= '<br />' . $device['hostname'];
+        $ret_str = $device['hostname'];
     }
 
     return $ret_str;
