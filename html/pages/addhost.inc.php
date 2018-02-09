@@ -11,23 +11,20 @@ if ($_SESSION['userlevel'] < 10) {
     exit;
 }
 
-if (isset($_POST['hostname'])) {
-    $hostname = clean($_POST['hostname']);
-    if (!is_valid_hostname($hostname) && !IP::isValid($hostname)) {
-        print_error('Invalid hostname or IP.');
-        $hostname = false;
-    }
-} else {
-    $hostname = false;
-}
-
-$snmp_enabled = isset($_POST['snmp']);
-
-if ($hostname !== false) {
-    echo '<div class="row">
+echo '<div class="row">
             <div class="col-sm-3">
             </div>
             <div class="col-sm-6">';
+
+// first load enabled, after that check snmp variable
+$snmp_enabled = !isset($_POST['hostname']) || isset($_POST['snmp']);
+
+if (!empty($_POST['hostname'])) {
+    $hostname = clean($_POST['hostname']);
+    if (!is_valid_hostname($hostname) && !IP::isValid($hostname)) {
+        print_error("Invalid hostname or IP: $hostname");
+    }
+
     if ($_SESSION['userlevel'] > '5') {
         // Settings common to SNMPv2 & v3
         if ($_POST['port']) {
@@ -93,12 +90,12 @@ if ($hostname !== false) {
         }
     } else {
         print_error("You don't have the necessary privileges to add hosts.");
-    }//end if
-    echo '    </div>
-            <div class="col-sm-3">
-            </div>
-        </div>';
-}//end if
+    }
+}
+echo '    </div>
+        <div class="col-sm-3">
+        </div>
+    </div>';
 
 $pagetitle[] = 'Add host';
 
@@ -364,7 +361,7 @@ if ($config['distributed_poller'] === true) {
 
     $("[name='snmp']").bootstrapSwitch('offColor','danger');
 <?php
-if ($hostname !== false && !$snmp_enabled) {
+if (!$snmp_enabled) {
     echo '  $("[name=\'snmp\']").trigger(\'click\');';
 }
 ?>
