@@ -20,7 +20,6 @@
 //
 // Please don't edit this file -- make changes to the configuration array in config.php
 //
-error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
 
 // Default directories
 $config['project_name'] = 'LibreNMS';
@@ -123,7 +122,7 @@ $config['int_customers'] = 1;
 // Enable Customer Port Parsing
 $config['customers_descr'] = 'cust';
 $config['transit_descr'][]   = 'transit';
-// Add custom transit descriptions (can be an string) 
+// Add custom transit descriptions (can be an string)
 $config['peering_descr'][] = 'peering';
 // Add custom peering descriptions (can be an string)
 $config['core_descr'][] = 'core';
