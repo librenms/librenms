@@ -32,6 +32,7 @@ require_once 'includes/modal/manage_host_dependencies.inc.php';
             <tr>
                 <th data-column-id="deviceid" data-visible="false" data-css-class="deviceid">No</th>
                 <th data-column-id="hostname" data-type="string" data-css-class="childhost" data-formatter="hostname">Hostname</th>
+                <th data-column-id="sysname" data-type="string" data-visible="false">Sysname</th>
                 <th data-column-id="parent" data-type="string" data-css-class="parenthost" data-formatter="parent">Parent Device(s)</th>
                 <th data-column-id="parentid" data-visible="false">Parent ID</th>
                 <th data-column-id="actions" data-searchable="false" data-formatter="actions">Actions</th>
@@ -79,7 +80,7 @@ var grid = $("#hostdeps").bootgrid({
             return response;
         },
         "hostname": function(column, row) {
-            return '<a href="device/device='+row.deviceid+'/">'+row.hostname+'</a>';
+            return '<a href="device/device='+row.deviceid+'/" class="list-device">'+row.hostname+'</a><br />'+row.sysname;
         },
         "parent": function(column, row) {
             if (row.parent == 'None') {
@@ -92,7 +93,7 @@ var grid = $("#hostdeps").bootgrid({
                 tempids = row.parentid.split(',');
                 var retstr = '';
                 for (i=0; i < temp.length; i++) {
-                    retstr = retstr + '<a href="device/device='+tempids[i]+'/">'+temp[i]+'</a>, ';
+                    retstr = retstr + '<a href="device/device='+tempids[i]+'/" class="list-device">'+temp[i]+'</a>, ';
                 }
                 return retstr.slice(0, -2);
             }
@@ -155,10 +156,11 @@ $(document).ready(function() {
                 editSelect.append($('<option>', { value: 0, text: 'None'}));
                 manParentDevstoClr.append($('<option>', { value: 0, text: 'None'}));
                 $.each(output.deps, function (i,elem) {
-                    manParentDevs.append($('<option>',{value:elem.id, text:elem.hostname}));
-                    editSelect.append($('<option>',{value:elem.id, text:elem.hostname}));
-                    manAllDevs.append($('<option>',{value:elem.id, text:elem.hostname}));
-                    manParentDevstoClr.append($('<option>',{value:elem.id, text:elem.hostname}));
+                    var devtext = elem.hostname + ' (' + elem.sysname + ')';
+                    manParentDevs.append($('<option>',{value:elem.id, text:devtext}));
+                    editSelect.append($('<option>',{value:elem.id, text:devtext}));
+                    manAllDevs.append($('<option>',{value:elem.id, text:devtext}));
+                    manParentDevstoClr.append($('<option>',{value:elem.id, text:devtext}));
                 });
             } else {
                 toastr.error('Device dependencies could not be retrieved from the database');
