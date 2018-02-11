@@ -1,0 +1,10 @@
+[Unit]
+Description=LibreNMS daily
+
+[Timer]
+Unit=librenms@daily.service
+OnCalendar=daily
+RandomizedDelaySec=15m
+
+[Install]
+WantedBy=basic.target

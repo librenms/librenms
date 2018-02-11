@@ -1,0 +1,11 @@
+[Unit]
+Description=LibreNMS discovery-new
+
+[Timer]
+Unit=librenms@discovery-new.service
+OnBootSec=60
+OnUnitInactiveSec=5m
+RandomizedDelaySec=30s
+
+[Install]
+WantedBy=basic.target

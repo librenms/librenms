@@ -1,0 +1,8 @@
+[Unit]
+Description=LibreNMS %I
+
+[Service]
+Type=oneshot
+ExecStart=/opt/librenms/scripts/timer.sh %i
+User=librenms
+Nice=10
