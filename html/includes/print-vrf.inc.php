@@ -2,9 +2,9 @@
 
 // fixme new url format
 if (is_integer($i / 2)) {
-    $bg_colour = $list_colour_a;
+    $bg_colour = $config['list_colour']['even'];
 } else {
-    $bg_colour = $list_colour_b;
+    $bg_colour = $config['list_colour']['odd'];
 }
 
 echo "<tr bgcolor='$bg_colour'>";
