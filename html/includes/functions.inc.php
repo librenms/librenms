@@ -757,14 +757,18 @@ function print_port_thumbnail($args)
 function print_optionbar_start($height = 0, $width = 0, $marginbottom = 5)
 {
     echo '
-        <div class="well well-sm">
+        <div class="panel panel-default">
+        <div class="panel-heading">
         ';
 }//end print_optionbar_start()
 
 
 function print_optionbar_end()
 {
-    echo '  </div>';
+    echo '
+        </div>
+        </div>
+        ';
 }//end print_optionbar_end()
 
 
