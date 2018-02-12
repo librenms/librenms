@@ -6,15 +6,13 @@ use Amenadiel\JpGraph\Plot\GroupBarPlot;
 use Amenadiel\JpGraph\Plot\LinePlot;
 
 if (is_numeric($vars['bill_hist_id'])) {
-    $graph_data = getBillingBandwidthGraphData($vars['id'], $vars['bill_hist_id'], $vars['from'], $vars['to'], $vars['imgtype']);
+    $graph_data = getBillingBandwidthGraphData($vars['id'], $vars['bill_hist_id'], null, null, $vars['imgtype']);
+} else if (is_numeric($vars['from'])) {
+    $graph_data = getBillingBandwidthGraphData($vars['id'], null, $vars['from'], $vars['to'], $vars['imgtype']);
 } else {
     $graph_data = getHistoricTransferGraphData($vars['id']);
     $vars['imgtype'] = 'historical';
 }
-
-// header('Content-Type: application/json');
-// print_r(json_encode($graph_data));
-// die();
 
 // Create the graph. These two calls are always required
 $graph = new Graph($vars['width'], $vars['height'], $graph_data['graph_name']);

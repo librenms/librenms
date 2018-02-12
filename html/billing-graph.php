@@ -17,10 +17,15 @@ require realpath(__DIR__ . '/..') . '/includes/init.php';
 $urlargs = array(
     'type'          => 'bill_historicbits',
     'id'            => $_GET['bill_id'],
-    'bill_hist_id'  => $_GET['bill_hist_id'],
     'width'         => $_GET['x'],
     'height'        => $_GET['y']
 );
+if (isset($_GET['bill_hist_id'])) {
+    $urlargs['bill_hist_id'] = $_GET['bill_hist_id'];
+} else {
+    $urlargs['from'] = $_GET['from'];
+    $urlargs['to'] = $_GET['to'];
+}
 if (isset($_GET['count'])) {
     $urlargs['reducefactor'] = $_GET['count'];
 }

@@ -24,8 +24,8 @@ $urlargs = array(
 if (is_numeric($_GET['bill_hist_id'])) {
     $urlargs['bill_hist_id'] = $_GET['bill_hist_id'];
 } else if (is_numeric($_GET['from']) && is_numeric($_GET['to'])) {
-    $urlargs['start'] = $_GET['from'];
-    $urlargs['end'] = $_GET['to'];
+    $urlargs['from'] = $_GET['from'];
+    $urlargs['to'] = $_GET['to'];
 }
 
 $url = "{$config['base_url']}graph.php?";

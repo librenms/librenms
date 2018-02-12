@@ -230,6 +230,8 @@ function getBillingHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor)
     }
 
     $graph_data = getBillingBitsGraphData($bill_id, $histrow['from'], $histrow['to'], $reducefactor);
+
+    // Overwrite the rate data with the historical version
     $graph_data['rate_95th']    = $histrow['rate_95th'];
     $graph_data['rate_average'] = $histrow['rate_average'];
     $graph_data['bill_type']    = $histrow['bill_type'];
@@ -250,6 +252,8 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
     $out_data   = array();
     $tot_data   = array();
     $ticks      = array();
+    
+    $bill_data    = dbFetchRow('SELECT * from `bills` WHERE `bill_id`= ? LIMIT 1', array($bill_id));
 
     foreach (dbFetch('SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = ? AND `timestamp` >= FROM_UNIXTIME( ? ) AND `timestamp` <= FROM_UNIXTIME( ? ) ORDER BY timestamp ASC', array($bill_id, $from, $to)) as $row) {
         $timestamp = $row['formatted_date'];
@@ -290,6 +294,10 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
         'out_data'      => $out_data,
         'tot_data'      => $tot_data,
         'ticks'         => $ticks,
+
+        'rate_95th'     => $bill_data['rate_95th'],
+        'rate_average'  => $bill_data['rate_average'],
+        'bill_type'     => $bill_data['bill_type']
     );
 }//end getBillingGraphData
 
@@ -382,14 +390,14 @@ function getBillingBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgt
         }
 
         $ave_count = count($tot_data);
-        if ($imgbill != false) {
-            $days = (strftime('%e', date($to - $from)) - $ave_count - 1);
-            for ($x = 0; $x < $days; $x++) {
-                array_push($ticklabels, '');
-                array_push($in_data, 0);
-                array_push($out_data, 0);
-                array_push($tot_data, 0);
-            }
+
+        // Add empty items for the days not yet passed
+        $days = (strftime('%e', date($to - $from)) - $ave_count - 1);
+        for ($x = 0; $x < $days; $x++) {
+            array_push($ticklabels, '');
+            array_push($in_data, 0);
+            array_push($out_data, 0);
+            array_push($tot_data, 0);
         }
     } elseif ($imgtype == 'hour') {
         foreach (dbFetch('SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY HOUR(timestamp) ORDER BY timestamp ASC', array($bill_id, $from, $to)) as $data) {
