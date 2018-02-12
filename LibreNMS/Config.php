@@ -364,12 +364,17 @@ class Config
             ini_set('session.cookie_secure', 1);
         }
 
-        if ($rrd_real_95th = self::get('rrdgraph_real_95th')) {
-            self::set('rrdgraph_real_percentile', $rrd_real_95th);
+        // deprecated variables
+        if (self::has('rrdgraph_real_95th')) {
+            self::set('rrdgraph_real_percentile', self::get('rrdgraph_real_95th'));
         }
 
-        if ($fping_millisc = self::get('fping_options.millisec')) {
-            self::set('fping_options.interval', $fping_millisc);
+        if (self::has('fping_options.millisec')) {
+            self::set('fping_options.interval', self::get('fping_options.millisec'));
+        }
+
+        if (self::has('discovery_modules.cisco-vrf')) {
+            self::set('discovery_modules.vrf', self::get('discovery_modules.cisco-vrf'));
         }
 
         // make sure we have full path to binaries in case PATH isn't set
