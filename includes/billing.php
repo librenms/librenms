@@ -312,6 +312,7 @@ function getHistoricTransferGraphData($bill_id)
     $ave_data     = array();
     $overuse_data = array();
     $ticklabels   = array();
+    $allowed_val  = null;
 
     foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 12', array($bill_id)) as $data) {
         $datefrom          = strftime('%e %b %Y', strtotime($data['bill_datefrom']));
@@ -322,7 +323,7 @@ function getHistoricTransferGraphData($bill_id)
         array_push($in_data, $data['traf_in']);
         array_push($out_data, $data['traf_out']);
         array_push($tot_data, $data['traf_total']);
-        array_push($allow_data, $data['bill_type'] == 'Quota' ? $data['bill_allowed'] : 0);
+        array_push($allow_data, $allowed_val = ($data['bill_type'] == 'Quota' ? $data['bill_allowed'] : 0));
         array_push($overuse_data, $data['bill_type'] == 'Quota' ? $data['bill_overuse'] : 0);
         $i++;
     }//end foreach
@@ -330,7 +331,7 @@ function getHistoricTransferGraphData($bill_id)
     if ($i < 12) {
         $y = (12 - $i);
         for ($x = 0; $x < $y; $x++) {
-            $allowed = (($x == '0') ? $traf['allowed'] : '0' );
+            $allowed = (($x == '0') ? $allowed_val : '0' );
             array_push($in_data, '0');
             array_push($out_data, '0');
             array_push($tot_data, '0');
