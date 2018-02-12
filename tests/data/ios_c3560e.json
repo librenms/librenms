@@ -4,7 +4,7 @@
             "processors": [
                 {
                     "entPhysicalIndex": "0",
-                    "hrDeviceIndex": null,
+                    "hrDeviceIndex": "0",
                     "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.1",
                     "processor_index": "1",
                     "processor_type": "cpm",

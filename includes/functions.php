@@ -657,29 +657,23 @@ function isPingable($hostname, $address_family = AF_INET, $attribs = array())
     $response = array();
     if (can_ping_device($attribs) === true) {
         $fping_params = '';
-        if (is_numeric($config['fping_options']['retries']) && $config['fping_options']['retries'] > 0) {
-            if ($config['fping_options']['retries'] > 20) {
-                $config['fping_options']['retries'] = 20;
-            }
-            $fping_params .= ' -r ' . $config['fping_options']['retries'];
-        }
         if (is_numeric($config['fping_options']['timeout'])) {
             if ($config['fping_options']['timeout'] < 50) {
                 $config['fping_options']['timeout'] = 50;
             }
-            if ($config['fping_options']['millisec'] < $config['fping_options']['timeout']) {
-                $config['fping_options']['millisec'] = $config['fping_options']['timeout'];
+            if ($config['fping_options']['interval'] < $config['fping_options']['timeout']) {
+                $config['fping_options']['interval'] = $config['fping_options']['timeout'];
             }
             $fping_params .= ' -t ' . $config['fping_options']['timeout'];
         }
         if (is_numeric($config['fping_options']['count']) && $config['fping_options']['count'] > 0) {
             $fping_params .= ' -c ' . $config['fping_options']['count'];
         }
-        if (is_numeric($config['fping_options']['millisec'])) {
-            if ($config['fping_options']['millisec'] < 20) {
-                $config['fping_options']['millisec'] = 20;
+        if (is_numeric($config['fping_options']['interval'])) {
+            if ($config['fping_options']['interval'] < 20) {
+                $config['fping_options']['interval'] = 20;
             }
-            $fping_params .= ' -p ' . $config['fping_options']['millisec'];
+            $fping_params .= ' -p ' . $config['fping_options']['interval'];
         }
         $status = fping($hostname, $fping_params, $address_family);
         if ($status['exitcode'] > 0 || $status['loss'] == 100) {
@@ -762,7 +756,7 @@ function createHost(
 
     $device = array(
         'hostname' => $host,
-        'sysName' => $host,
+        'sysName' => $additional['sysName'] ? $additional['sysName'] : $host,
         'os' => $additional['os'] ? $additional['os'] : 'generic',
         'hardware' => $additional['hardware'] ? $additional['hardware'] : null,
         'community' => $community,
@@ -844,14 +838,10 @@ function match_network($nets, $ip, $first = false)
 // FIXME port to LibreNMS\Util\IPv6 class
 function snmp2ipv6($ipv6_snmp)
 {
-    $ipv6 = explode('.', $ipv6_snmp);
-    $ipv6_2 = array();
-
     # Workaround stupid Microsoft bug in Windows 2008 -- this is fixed length!
     # < fenestro> "because whoever implemented this mib for Microsoft was ignorant of RFC 2578 section 7.7 (2)"
-    if (count($ipv6) == 17 && $ipv6[0] == 16) {
-        array_shift($ipv6);
-    }
+    $ipv6 = array_slice(explode('.', $ipv6_snmp), -16);
+    $ipv6_2 = array();
 
     for ($i = 0; $i <= 15; $i++) {
         $ipv6[$i] = zeropad(dechex($ipv6[$i]));
@@ -861,17 +851,6 @@ function snmp2ipv6($ipv6_snmp)
     }
 
     return implode(':', $ipv6_2);
-}
-
-function ipv62snmp($ipv6)
-{
-    try {
-        $ipv6 = IP::parse($ipv6)->uncompressed();
-        $ipv6_split = str_split(str_replace(':', '', $ipv6), 2);
-        return implode('.', array_map('hexdec', $ipv6_split));
-    } catch (InvalidIpException $e) {
-        return '';
-    }
 }
 
 function get_astext($asn)
@@ -1090,12 +1069,12 @@ function is_port_valid($port, $device)
     $ifAlias = $port['ifAlias'];
     $ifType  = $port['ifType'];
 
-    if (str_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if'), true)) {
+    if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if'))) {
         return true;
     }
 
     foreach (Config::getCombined($device['os'], 'bad_if') as $bi) {
-        if (str_contains($ifDescr, $bi, true)) {
+        if (str_i_contains($ifDescr, $bi)) {
             d_echo("ignored by ifDescr: $ifDescr (matched: $bi)\n");
             return false;
         }
@@ -2008,9 +1987,9 @@ function get_toner_levels($device, $raw_value, $capacity)
  */
 function initStats()
 {
-    global $snmp_stats, $db_stats, $rrd_stats;
+    global $snmp_stats, $rrd_stats;
 
-    if (!isset($snmp_stats, $db_stats, $rrd_stats)) {
+    if (!isset($snmp_stats, $rrd_stats)) {
         $snmp_stats = array(
             'ops' => array(
                 'snmpget' => 0,
@@ -2022,27 +2001,6 @@ function initStats()
                 'snmpgetnext' => 0.0,
                 'snmpwalk' => 0.0,
             )
-        );
-
-        $db_stats = array(
-            'ops' => array(
-                'insert' => 0,
-                'update' => 0,
-                'delete' => 0,
-                'fetchcell' => 0,
-                'fetchcolumn' => 0,
-                'fetchrow' => 0,
-                'fetchrows' => 0,
-            ),
-            'time' => array(
-                'insert' => 0.0,
-                'update' => 0.0,
-                'delete' => 0.0,
-                'fetchcell' => 0.0,
-                'fetchcolumn' => 0.0,
-                'fetchrow' => 0.0,
-                'fetchrows' => 0.0,
-            ),
         );
 
         $rrd_stats = array(
@@ -2155,35 +2113,6 @@ function recordRrdStatistic($stat, $start_time)
     $runtime = microtime(true) - $start_time;
     $rrd_stats['ops'][$stat]++;
     $rrd_stats['time'][$stat] += $runtime;
-
-    return $runtime;
-}
-
-/**
- * Update statistics for db operations
- *
- * @param string $stat fetchcell, fetchrow, fetchrows, fetchcolumn, update, insert, delete
- * @param float $start_time The time the operation started with 'microtime(true)'
- * @return float  The calculated run time
- */
-function recordDbStatistic($stat, $start_time)
-{
-    global $db_stats;
-    initStats();
-
-    $runtime = microtime(true) - $start_time;
-    $db_stats['ops'][$stat]++;
-    $db_stats['time'][$stat] += $runtime;
-
-    //double accounting corrections
-    if ($stat == 'fetchcolumn') {
-        $db_stats['ops']['fetchrows']--;
-        $db_stats['time']['fetchrows'] -= $runtime;
-    }
-    if ($stat == 'fetchcell') {
-        $db_stats['ops']['fetchrow']--;
-        $db_stats['time']['fetchrow'] -= $runtime;
-    }
 
     return $runtime;
 }

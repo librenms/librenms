@@ -13,14 +13,14 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-$snmpdata = snmp_get_multi_oid($device, 'sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 sysObjectID.0', '-OQnUt', 'SNMPv2-MIB');
+$snmpdata = snmp_get_multi_oid($device, 'sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 sysObjectID.0 sysDescr.0', '-OQnUt', 'SNMPv2-MIB');
 
 $poll_device['sysUptime']   = $snmpdata['.1.3.6.1.2.1.1.3.0'];
 $poll_device['sysLocation'] = $snmpdata['.1.3.6.1.2.1.1.6.0'];
 $poll_device['sysContact']  = $snmpdata['.1.3.6.1.2.1.1.4.0'];
 $poll_device['sysName']     = strtolower($snmpdata['.1.3.6.1.2.1.1.5.0']);
 $poll_device['sysObjectID'] = $snmpdata['.1.3.6.1.2.1.1.2.0'];
-$poll_device['sysDescr']    = snmp_get($device, 'sysDescr.0', '-OvQ', 'SNMPv2-MIB');
+$poll_device['sysDescr']    = $snmpdata['.1.3.6.1.2.1.1.1.0'];
 
 if (!empty($agent_data['uptime'])) {
     list($uptime) = explode(' ', $agent_data['uptime']);
@@ -30,7 +30,7 @@ if (!empty($agent_data['uptime'])) {
     $uptime_data = snmp_get_multi($device, 'snmpEngineTime.0 hrSystemUptime.0', '-OQnUst', 'HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
 
     $uptime = max(
-        round($poll_device['sysUpTime'] / 100),
+        round($poll_device['sysUptime'] / 100),
         $config['os'][$device['os']]['bad_snmpEngineTime'] ? 0 : $uptime_data[0]['snmpEngineTime'],
         $config['os'][$device['os']]['bad_hrSystemUptime'] ? 0 : round($uptime_data[0]['hrSystemUptime'] / 100)
     );

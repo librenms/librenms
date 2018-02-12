@@ -1,0 +1,174 @@
+-- This module defines enterprise MIBs for QoS
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-QOS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenQos
+        FROM NETSCREEN-SMI
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    ;
+
+netscreenQosMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor QoS"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No Comment"
+    REVISION      "200105150000Z" -- May 15, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenQos 0 }
+
+NsQosPlyEntry ::= SEQUENCE
+{
+    nsQosPlyId            Integer32,
+    nsQosPlyVsys          Integer32,
+    nsQosPlyQosEnable     INTEGER,
+    nsQosPlyGanBW         Integer32,
+    nsQosPlyMaxBW         Integer32,--,
+    nsQosPlyTraffPriority Integer32,
+    nsQosPlyDSEnable      INTEGER
+}
+
+nsQosUsrShapingMode OBJECT-TYPE
+    SYNTAX        INTEGER {
+        off(0),
+        on(1),
+        on-off(2),
+        off-on(3),
+        auto(4)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "QoS mode set by user"
+    ::= { netscreenQos 1 }
+
+nsQosSysShapingMode OBJECT-TYPE
+    SYNTAX        INTEGER {
+        off(0),
+        on(1),
+        on-off(2),
+        off-on(3),
+        auto(4)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "QoS mode currently set by the system"
+    ::= { netscreenQos 2 }
+
+nsQosPly OBJECT IDENTIFIER ::= { netscreenQos 3 }
+
+nsQosPlyTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsQosPlyEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "QoS is the allocation of the appropriate amount of
+         network bandwidth to every user and application on an interface.
+         This table collects all the QoS configuration
+         setting on each physical interface."
+    ::= { nsQosPly 1 }
+
+nsQosPlyEntry OBJECT-TYPE
+    SYNTAX        NsQosPlyEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry holds a set of attributes for QoS"
+    INDEX
+        { nsQosPlyId }
+    ::= { nsQosPlyTable 1 }
+
+nsQosPlyId OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique policy id, also used as table index."
+    ::= { nsQosPlyEntry 1 }
+
+nsQosPlyVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "VSYS this policy belongs to."
+    ::= { nsQosPlyEntry 2 }
+
+nsQosPlyQosEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        off(0),
+        on(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable QoS on this policy."
+    ::= { nsQosPlyEntry 3 }
+
+nsQosPlyGanBW OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Guaranteed Bandwidth (in bytes per second). When Qos Enable
+         is off, the value has no meaning."
+    ::= { nsQosPlyEntry 4 }
+
+nsQosPlyMaxBW OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Maxium Bandwidth (in bytes per second). When Qos Enable is
+         off, the value has no meaning. Negative value means it is not
+         set yet."
+    ::= { nsQosPlyEntry 5 }
+
+nsQosPlyTraffPriority OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+             "Traffic priority for this policy. Zero is the highest
+              priority and seven is the lowest."
+        ::= { nsQosPlyEntry 6 }
+
+nsQosPlyDSEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        off(0),
+        on(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable DiffServ codepoint marking on this policy."
+    ::= { nsQosPlyEntry 7 }
+END
+
+

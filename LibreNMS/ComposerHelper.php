@@ -32,38 +32,27 @@ class ComposerHelper
 {
     public static function preUpdate(Event $event)
     {
-        if (!$event->isDevMode()) {
-            $vendor_dir = $event->getComposer()->getConfig()->get('vendor-dir');
+        if (!getenv('FORCE')) {
+            echo "Running composer update is not advisable.  Please run composer install to update instead.\n";
+            echo "If know what you are doing and want to write a new composer.lock file set FORCE=1.\n";
+            echo "If you don't know what to do, run: composer install\n";
+            exit(1);
+        }
+    }
 
+    public static function preInstall(Event $event)
+    {
+        $vendor_dir = $event->getComposer()->getConfig()->get('vendor-dir');
+
+        if (!is_file("$vendor_dir/autoload.php")) {
+            // checkout vendor from 1.36
             $cmds = array(
-                "git checkout $vendor_dir",
-                "git clean -x -d -f $vendor_dir"
+                "git checkout 609676a9f8d72da081c61f82967e1d16defc0c4e -- $vendor_dir",
+                "git reset HEAD $vendor_dir"  // don't add vendor directory to the index
             );
 
             self::exec($cmds);
         }
-    }
-
-    public static function postAutoloadDump(Event $event)
-    {
-        $vendor_dir = $event->getComposer()->getConfig()->get('vendor-dir');
-
-        $no = $event->isDevMode() ? '' : 'no-';
-        $cmd = "git ls-files -z $vendor_dir | xargs -0 git update-index --{$no}assume-unchanged";
-
-        self::exec($cmd);
-    }
-
-    public static function commit(Event $event)
-    {
-        $vendor_dir = $event->getComposer()->getConfig()->get('vendor-dir');
-        $composer_json_path = $event->getComposer()->getConfig()->getConfigSource()->getName();
-        $cmds = array(
-            "git add -f $vendor_dir $composer_json_path",
-            "git commit"
-        );
-
-        self::exec($cmds);
     }
 
     /**

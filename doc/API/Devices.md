@@ -88,7 +88,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 3,
     "graphs": [
         {
@@ -133,7 +133,7 @@ Output:
 ```
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 2,
     "graphs": [
         {
@@ -157,7 +157,7 @@ Output:
 ```
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 2,
     "graphs": [
         {
@@ -181,7 +181,7 @@ Output:
 ```
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 1,
     "graphs": [
         {
@@ -428,7 +428,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 3,
     "ports": [
         {
@@ -461,7 +461,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "addresses": [
         {
           "ipv4_address_id": "290",
@@ -497,7 +497,7 @@ Output:
 ```json
 {
   "status": "ok",
-  "err-msg": "",
+  "message": "",
   "count": 2,
   "mappings": [
     {
@@ -543,7 +543,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 3,
     "components": {
         "2": {
@@ -599,7 +599,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 1,
     "components": {
         "4459": {
@@ -632,7 +632,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "err-msg": "",
+    "message": "",
     "count": 1
 }
 ```
@@ -658,7 +658,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "err-msg": ""
+    "message": ""
 }
 ```
 
@@ -721,6 +721,40 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/loc
 Output:
 
 Output is an image.
+
+### `list_locations`
+
+Return a list of locations.
+
+Route: `/api/v0/resources/locations`
+
+Input:
+
+-
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/locations
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "locations": [
+        {
+            "id": "1",
+            "location": "Example location, Example city, Example Country",
+            "lat": "-18.911436",
+            "lng": "47.517446",
+            "timestamp": "2017-04-01 02:40:05"
+        },
+        ...
+    ],
+    "count": 100
+}
+```
 
 ### `list_devices`
 

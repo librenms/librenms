@@ -62,10 +62,17 @@ class Updates implements ValidationGroup
             }
 
             if ($versions['local_branch'] != 'master') {
-                $validator->warn(
-                    "Your local git branch is not master, this will prevent automatic updates.",
-                    "You can switch back to master with git checkout master"
-                );
+                if ($versions['local_branch'] == 'php53') {
+                    $validator->warn(
+                        "You are on the PHP 5.3 support branch, this will prevent automatic updates.",
+                        "Update to PHP 5.6.4 or newer (PHP 7.1 recommended) to continue to receive updates."
+                    );
+                } else {
+                    $validator->warn(
+                        "Your local git branch is not master, this will prevent automatic updates.",
+                        "You can switch back to master with git checkout master"
+                    );
+                }
             }
         }
 
