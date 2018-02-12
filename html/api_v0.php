@@ -113,6 +113,7 @@ $app->group(
                     function () use ($app) {
                         $app->get('/:bill_id', 'authToken', 'list_bills')->name('get_bill');
                         // api/v0/bills/$bill_id
+                        $app->get('/:bill_id/history', 'authToken', 'get_bill_history')->name('get_bill_history');
                     }
                 );
                 $app->get('/bills', 'authToken', 'list_bills')->name('list_bills');

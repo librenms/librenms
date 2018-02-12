@@ -18,8 +18,12 @@ If you absolutely must update manually without using `./daily.sh` then you can d
 ```bash
 cd /opt/librenms
 git pull
-php includes/sql-schema/update.php
+composer install --no-dev
+./build-base.php
+./validate.php
 ```
+
+Not using daily.sh means that you will also lose a lot of automatic database clean up, you will need to do this manually.
 
 ## Disabling automatic updates ##
 LibreNMS by default performs updates on a daily basis. This can be disabled by setting:

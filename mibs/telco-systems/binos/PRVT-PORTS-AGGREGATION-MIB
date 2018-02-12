@@ -1,0 +1,626 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-PORTS-AGGREGATION-MIB.mib
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2002, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+--
+PRVT-PORTS-AGGREGATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+NOTIFICATION-TYPE,
+MODULE-IDENTITY,
+OBJECT-TYPE,
+Counter32,
+Integer32
+FROM SNMPv2-SMI -- [RFC2578]
+
+DisplayString,
+TruthValue
+FROM SNMPv2-TC
+
+ifIndex,
+ifAdminStatus,
+ifOperStatus
+FROM RFC1213-MIB
+
+PortList
+FROM Q-BRIDGE-MIB
+
+switch,
+configL2IfaceUnit,
+configL2IfaceSlot,
+configL2IfacePort
+FROM PRVT-SWITCH-MIB;
+
+-------------------------------------------------------------------------------
+-- PRIVATE BRANCH PRODUCTS
+-------------------------------------------------------------------------------
+
+prvtPortsAggregationMib MODULE-IDENTITY
+LAST-UPDATED "200809200000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+" BATM/Telco Systems Support team
+Email: 
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+
+DESCRIPTION
+"The Ports Aggregation MIB module for managing switch or ipSwitch
+static and dynamic port aggregation."
+
+-- revision history 
+REVISION "200809200000Z"
+DESCRIPTION
+"Added notifications for aggregation members." 
+
+REVISION "200502160000Z"
+DESCRIPTION
+"Fixed spelling errors and changed the contact info." 
+
+REVISION "200410290000Z"
+DESCRIPTION
+"Added aggregationLacpPortKey"
+
+REVISION "200305060000Z"
+DESCRIPTION
+"Moved to SMI-V2."
+
+REVISION "200212240000Z"
+DESCRIPTION
+"Added enabling and disabling for LACP."
+
+REVISION "200211110000Z"
+DESCRIPTION
+"Initial version."
+::= { switch 106 }
+
+portsAggregation OBJECT IDENTIFIER ::= { prvtPortsAggregationMib 1 }
+portsAggregationConfig OBJECT IDENTIFIER ::= { prvtPortsAggregationMib 2 }
+portsAggregationTraps OBJECT IDENTIFIER ::= { prvtPortsAggregationMib 3 }
+
+-- -----------------------------------------------------------------------------
+-- port trunk status
+-- -----------------------------------------------------------------------------
+
+maxAggregatorId OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The maximum allowed aggregator ID for this unit."
+::= { portsAggregation 1 }
+
+aggregationLacpSystemPriority OBJECT-TYPE
+SYNTAX Integer32 (1..65535)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The LACP system priority."
+::= { portsAggregation 2 }
+
+portsAggregationTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PortsAggregationEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains the status of all the trunks in the system
+It can contain two major types: static and dynamic trunks."
+::= { portsAggregation 3 }
+
+portsAggregationEntry OBJECT-TYPE
+SYNTAX PortsAggregationEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "Ports aggregation entry."
+INDEX { aggregatorId }
+::= { portsAggregationTable 1 }
+
+PortsAggregationEntry ::= SEQUENCE {
+aggregatorId Integer32,
+aggregatorIfIndex Integer32,
+aggregatorType INTEGER,
+aggregatorName DisplayString,
+aggregatorPortsMembers PortList,
+aggregatorPortsActive PortList,
+aggregatorL2DropEvents Counter32,
+aggregatorL2Octets Counter32,
+aggregatorL2Pkts Counter32,
+aggregatorL2BroadcastPkts Counter32,
+aggregatorL2MulticastPkts Counter32,
+aggregatorL2CRCAlignErrors Counter32,
+aggregatorL2UndersizePkts Counter32,
+aggregatorL2OversizePkts Counter32,
+aggregatorL2Fragments Counter32,
+aggregatorL2Jabbers Counter32,
+aggregatorL2Collisions Counter32,
+aggregatorL2Pkts64Octets Counter32,
+aggregatorL2Pkts65to127Octets Counter32,
+aggregatorL2Pkts128to255Octets Counter32,
+aggregatorL2Pkts256to511Octets Counter32,
+aggregatorL2Pkts512to1023Octets Counter32,
+aggregatorL2Pkts1024to1518Octets Counter32
+}
+
+aggregatorId OBJECT-TYPE
+SYNTAX Integer32(1..255)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The internal trunk ID."
+::= { portsAggregationEntry 1 }
+
+aggregatorIfIndex OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The interface index from MIB-II ifTable."
+::= { portsAggregationEntry 2 }
+
+aggregatorType OBJECT-TYPE
+SYNTAX INTEGER {
+staticTrunk(1),
+protocol-802-1ad(2)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This variable describes the trunk type."
+::= { portsAggregationEntry 3 }
+
+aggregatorName OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The aggregator's name."
+::= { portsAggregationEntry 4 }
+
+aggregatorPortsMembers OBJECT-TYPE
+SYNTAX PortList
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The ports that are members of this trunk."
+::= { portsAggregationEntry 5 }
+
+aggregatorPortsActive OBJECT-TYPE
+SYNTAX PortList
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The active ports that are members of this trunk."
+::= { portsAggregationEntry 6 }
+
+aggregatorL2DropEvents OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of events in which packets
+were dropped by the probe due to lack of resources.
+Note that this number is not necessarily the number of
+packets dropped; it is just the number of times this
+condition has been detected."
+::= { portsAggregationEntry 7 }
+
+aggregatorL2Octets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of octets of data (including
+those in bad packets) received on the
+network (excluding framing bits but including
+FCS octets).
+
+This object can be used as a reasonable estimate of
+Ethernet utilization. If greater precision is
+desired, the etherStatsPkts and etherStatsOctets
+objects should be sampled before and after a common
+interval. The differences in the sampled values are
+Pkts and Octets, respectively, and the number of
+seconds in the interval is Interval. These values
+are used to calculate the Utilization as follows:
+
+Pkts * (9.6 + 6.4) + (Octets * .8)
+Utilization = 
+Interval * 10,000
+
+The result of this equation is the Ethernet segment utilization 
+which is the percent utilization of the ethernet
+segment on a 0 to 100 percent scale."
+
+::= { portsAggregationEntry 8 }
+
+aggregatorL2Pkts OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION 
+"The total number of packets (including bad packets,
+broadcast packets, and multicast packets) received."
+::= { portsAggregationEntry 9 }
+
+aggregatorL2BroadcastPkts OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of good packets received that were
+directed to the broadcast address. Note that this
+does not include multicast packets."
+::= { portsAggregationEntry 10 }
+
+aggregatorL2MulticastPkts OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of good packets received that were
+directed to a multicast address. Note that this
+number does not include packets directed to the
+broadcast address."
+::= { portsAggregationEntry 11 }
+
+aggregatorL2CRCAlignErrors OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets received that
+had a length (excluding framing bits, but
+including FCS octets) of between 64 and 1518
+octets, inclusive, but had either a bad
+Frame Check Sequence (FCS) with an integral
+number of octets (FCS Error) or a bad FCS with
+a non-integral number of octets (Alignment Error)."
+::= { portsAggregationEntry 12 }
+
+aggregatorL2UndersizePkts OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets received that were
+less than 64 octets long (excluding framing bits,
+but including FCS octets) and were otherwise well
+formed."
+::= { portsAggregationEntry 13 }
+
+aggregatorL2OversizePkts OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets received that were
+longer than 1518 octets (excluding framing bits,
+but including FCS octets) and were otherwise
+well formed."
+::= { portsAggregationEntry 14 }
+
+aggregatorL2Fragments OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets received that were less
+than 64 octets in length (excluding framing bits but
+including FCS octets) and had either a bad Frame
+Check Sequence (FCS) with an integral number of
+octets (FCS Error) or a bad FCS with a non-integral
+number of octets (Alignment Error).
+
+Note that it is entirely normal for
+etherStatsFragments to increment. This is because
+it counts both runts (which are normal occurrences
+due to collisions) and noise hits."
+::= { portsAggregationEntry 15 }
+
+aggregatorL2Jabbers OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets received that were
+longer than 1518 octets (excluding framing bits,
+but including FCS octets), and had either a bad
+Frame Check Sequence (FCS) with an integral number
+of octets (FCS Error) or a bad FCS with a
+non-integral number of octets (Alignment Error).
+
+Note that this definition of jabber is different
+from the definition in IEEE-802.3 section 8.2.1.5
+(10BASE5) and section 10.3.1.4 (10BASE2). These
+documents define jabber as the condition in which any
+packet exceeds 20 ms. The allowed range to detect
+jabber is between 20 ms and 150 ms."
+::= { portsAggregationEntry 16 }
+
+aggregatorL2Collisions OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The best estimate of the total number of collisions
+on this Ethernet segment.
+
+The value returned will depend on the RMON probe's location. 
+Sections 8.2.1.3 (10BASE-5) and 10.3.1.3 (10BASE-2) of 
+IEEE standard 802.3 states that a station must detect a collision in
+the receive mode if three or more stations are
+transmitting simultaneously. A repeater port must
+detect a collision when two or more stations are
+transmitting simultaneously. Thus a probe placed on
+a repeater port could record more collisions than a
+probe connected to a station on the same segment
+would.
+
+Probe location plays a much smaller role when
+considering 10BASE-T. Section 14.2.1.4 (10BASE-T) of IEEE
+standard 802.3 defines a collision as the
+simultaneous presence of signals on the DO and RD
+circuits (transmitting and receiving at the same
+time). A 10BASE-T station can only detect
+collisions when it is transmitting. Thus probes
+placed on a station and a repeater, should report
+the same number of collisions.
+
+Note also that an RMON probe inside a repeater
+should ideally report collisions between the
+repeater and one or more other hosts (transmit
+collisions as defined by IEEE 802.3k) plus receiver
+collisions observed on any coaxial segments to which
+the repeater is connected."
+::= { portsAggregationEntry 17 }
+
+aggregatorL2Pkts64Octets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets (including bad
+packets) received that were 64 octets in length
+(excluding framing bits but including FCS octets)."
+::= { portsAggregationEntry 18 }
+
+aggregatorL2Pkts65to127Octets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets (including bad
+packets) received that were between
+65 and 127 octets in length inclusive
+(excluding framing bits but including FCS octets)."
+::= { portsAggregationEntry 19 }
+
+aggregatorL2Pkts128to255Octets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets (including bad
+packets) received that were between
+128 and 255 octets in length inclusive
+(excluding framing bits but including FCS octets)."
+::= { portsAggregationEntry 20 }
+
+aggregatorL2Pkts256to511Octets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets (including bad
+packets) received that were between
+256 and 511 octets in length inclusive
+(excluding framing bits but including FCS octets)."
+::= { portsAggregationEntry 21 }
+
+aggregatorL2Pkts512to1023Octets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets (including bad
+packets) received that were between
+512 and 1023 octets in length inclusive
+(excluding framing bits but including FCS octets)."
+::= { portsAggregationEntry 22 }
+
+aggregatorL2Pkts1024to1518Octets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets (including bad
+packets) received that were between
+1024 and 1518 octets in length inclusive
+(excluding framing bits but including FCS octets)."
+::= { portsAggregationEntry 23 }
+
+aggregationLacpSystemEnable OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"This value enable/disable the LACP system globaly"
+::= { portsAggregation 4 }
+
+-- -----------------------------------------------------------------------------
+-- physical interface aggregation configuration parameters
+-- -----------------------------------------------------------------------------
+
+portsAggregationConfigTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PortsAggregationConfigEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains only the static (created by management) port trunk configuration."
+::= { portsAggregationConfig 1 }
+
+portsAggregationConfigEntry OBJECT-TYPE
+SYNTAX PortsAggregationConfigEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "Port aggregation config entry."
+INDEX { configL2IfaceUnit, configL2IfaceSlot,configL2IfacePort }
+::= { portsAggregationConfigTable 1 }
+
+PortsAggregationConfigEntry ::= SEQUENCE
+{
+staticAggregationID Integer32,
+dynamicAggregationID Integer32,
+aggregationType INTEGER,
+aggregationLacpPortPriority Integer32,
+aggregationLacpPortKey Integer32
+}
+
+staticAggregationID OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+" A number representing the aggregation group that this port belongs to.
+0 means that this port does not belong to any static group."
+::= { portsAggregationConfigEntry 1 }
+
+dynamicAggregationID OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+" A number representing the aggregation group that this port belongs to.
+0 means that this port does not belong to any dynamic group"
+::= { portsAggregationConfigEntry 2 }
+
+aggregationType OBJECT-TYPE
+SYNTAX INTEGER {
+disable(1),
+static(2),
+protocol-802-1adAcive(3),
+protocol-802-1adPassive(4)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Specifies the aggregation type of the interface - disable(1) if the port does not belong to a group,
+static(2) if the port belongs to a static group, and protocol-802-1adAcive(3) or protocol-802-1adPassive(4)
+if the interface is part of a dynamic group."
+::= { portsAggregationConfigEntry 3 }
+
+aggregationLacpPortPriority OBJECT-TYPE
+SYNTAX Integer32 (1..65535)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"LACP priority for a port"
+::= { portsAggregationConfigEntry 4 }
+
+aggregationLacpPortKey OBJECT-TYPE
+SYNTAX Integer32 (1..65535)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"LACP identification key for a port"
+::= { portsAggregationConfigEntry 5 }
+
+lagMemberLinkUp NOTIFICATION-TYPE
+OBJECTS {
+ifIndex, -- the id of the aggregation group
+ifIndex, -- Port member of the aggregation group
+ifAdminStatus,
+ifOperStatus
+}
+STATUS current
+DESCRIPTION
+"This notification is generated when lag link becomes
+up. 
+The first ifIndex indicates the id of the trunk 
+interface. 
+The second one shows the port member with link status change"
+::= { portsAggregationTraps 1 }
+
+lagMemberLinkDown NOTIFICATION-TYPE
+OBJECTS {
+ifIndex, -- the id of the aggregation group
+ifIndex, -- Port member of the aggregation group
+ifAdminStatus,
+ifOperStatus
+}
+STATUS current
+DESCRIPTION
+"This notification is generated when lag link becomes
+down.
+The first ifIndex indicates the id of the trunk 
+interface. 
+The second one shows the port member with link status change"
+::= { portsAggregationTraps 2 }
+
+
+lagMemberAdd NOTIFICATION-TYPE
+OBJECTS {
+ifIndex, -- the id of the aggregation group
+ifIndex -- Port member of the aggregation group
+}
+STATUS current
+DESCRIPTION
+"This notification is generated when a new port is added to 
+a lag link. 
+The first ifIndex indicates the id of the trunk 
+interface. 
+The second one shows the added port member"
+
+::= { portsAggregationTraps 3 }
+
+lagMemberRemove NOTIFICATION-TYPE
+OBJECTS {
+ifIndex, -- the id of the aggregation group
+ifIndex -- Port member of the aggregation group
+}
+STATUS current
+DESCRIPTION
+"This notification is generated when a port is removed from 
+a lag.
+The first ifIndex indicates the id of the trunk 
+interface. 
+The second one shows the removed port member"
+::= { portsAggregationTraps 4 }
+
+END
+

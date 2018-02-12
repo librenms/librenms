@@ -24,6 +24,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Config;
 use LibreNMS\Exceptions\FileExistsException;
 use LibreNMS\Proc;
 
@@ -149,7 +150,7 @@ function rrdtool($command, $filename, $options)
     // do not write rrd files, but allow read-only commands
     $ro_commands = array('graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport');
     if (!empty($config['norrd']) && !in_array($command, $ro_commands)) {
-        c_echo('[%rRRD Disabled%n]');
+        c_echo('[%rRRD Disabled%n]', !$config['hide_rrd_disabled']);
         return array(null, null);
     }
 
@@ -192,7 +193,7 @@ function rrdtool_build_command($command, $filename, $options)
 
     if ($command == 'create') {
         // <1.4.3 doesn't support -O, so make sure the file doesn't exist
-        if (version_compare($config['rrdtool_version'], '1.4.3', '<')) {
+        if (version_compare(Config::get('rrdtool_version', '1.4'), '1.4.3', '<')) {
             if (is_file($filename)) {
                 throw new FileExistsException();
             }
@@ -202,9 +203,10 @@ function rrdtool_build_command($command, $filename, $options)
     }
 
     // no remote for create < 1.5.5 and tune < 1.5
+    $rrdtool_version = Config::get('rrdtool_version', '1.4');
     if ($config['rrdcached'] &&
-        !($command == 'create' && version_compare($config['rrdtool_version'], '1.5.5', '<')) &&
-        !($command == 'tune' && $config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '<'))
+        !($command == 'create' && version_compare($rrdtool_version, '1.5.5', '<')) &&
+        !($command == 'tune' && $config['rrdcached'] && version_compare($rrdtool_version, '1.5', '<'))
     ) {
         // only relative paths if using rrdcached
         $filename = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $filename);
@@ -226,7 +228,7 @@ function rrdtool_build_command($command, $filename, $options)
 function rrdtool_check_rrd_exists($filename)
 {
     global $config;
-    if ($config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '>=')) {
+    if ($config['rrdcached'] && version_compare(Config::get('rrdtool_version', '1.4'), '1.5', '>=')) {
         $chk = rrdtool('last', $filename, '');
         $filename = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $filename);
         return !str_contains(implode($chk), "$filename': No such file or directory");
@@ -429,8 +431,8 @@ function rrdtool_data_update($device, $measurement, $tags, $fields)
  * rename an rrdfile, can only be done on the LibreNMS server hosting the rrd files
  *
  * @param array $device Device object
- * @param string $oldname RRD name array as used with rrd_name()
- * @param string $newname RRD name array as used with rrd_name()
+ * @param string|array $oldname RRD name array as used with rrd_name()
+ * @param string|array $newname RRD name array as used with rrd_name()
  * @return bool indicating rename success or failure
  */
 function rrd_file_rename($device, $oldname, $newname)
