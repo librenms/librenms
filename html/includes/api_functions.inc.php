@@ -1320,23 +1320,167 @@ function list_bills()
     api_success($bills, 'bills');
 }
 
+function get_bill_graph()
+{
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = mres($router['bill_id']);
+    $graph_type = $router['graph_type'];
+
+    if (!is_admin() && !is_read()) {
+        check_bill_permission($bill_id);
+    }
+    
+    if ($graph_type == 'monthly') {
+        $graph_type = 'historicmonthly';
+    }
+
+    $vars = array();
+    $vars['type'] = "bill_$graph_type";
+    $vars['id'] = $bill_id;
+    $vars['width']  = $_GET['width'] ?: 1075;
+    $vars['height'] = $_GET['height'] ?: 300;
+
+    $app->response->headers->set('Content-Type', 'image/png');
+    include 'includes/graphs/graph.inc.php';
+}
+
+function get_bill_graphdata()
+{
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = mres($router['bill_id']);
+    $graph_type = $router['graph_type'];
+
+    if (!is_admin() && !is_read()) {
+        check_bill_permission($bill_id);
+    }
+
+    if ($graph_type == 'bits') {
+        if (!is_numeric($_GET['from'])) {
+            api_error(400, 'from parameter must be supplied');
+        }
+        $from = mres($_GET['from']);
+        $to = mres($_GET['to']);
+        if (!is_numeric($end)) {
+            $to = time();
+        }
+        $reducefactor = mres($_GET['reducefactor']);
+        if (!is_numeric($reducefactor) || $reducefactor < 2) {
+            $reducefactor = 20;
+        }
+
+        $graph_data = getBillingBitsGraphData($bill_id, $from, $to, $reducefactor);
+    } else if ($graph_type == 'monthly') {
+        $graph_data = getHistoricTransferGraphData($bill_id);
+    }
+    
+    if (!isset($graph_data)) {
+        api_error(400, "Unsupported graph type $graph_type");
+    }
+    api_success($graph_data, 'graph_data');
+}
+
 function get_bill_history()
 {
     global $config;
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $bill_id = mres($router['bill_id']);
-    
+
     if (!is_admin() && !is_read()) {
         check_bill_permission($bill_id);
     }
-    
+
     $result = [];
     foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 24', array($bill_id)) as $history) {
         $result[] = $history;
     }
-    
+
     api_success($result, 'bill_history');
+}
+
+function get_bill_history_graph()
+{
+    global $config;
+    
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = mres($router['bill_id']);
+    $bill_hist_id = mres($router['bill_hist_id']);
+    $graph_type = $router['graph_type'];
+
+    if (!is_admin() && !is_read()) {
+        check_bill_permission($bill_id);
+    }
+    
+    $vars = array();
+
+    switch ($graph_type) {
+        case 'bits':
+            $graph_type = 'historicbits';
+
+            if (isset($_GET['reducefactor'])) {
+                $vars['reducefactor'] = $_GET['reducefactor'];
+            }
+            break;
+            
+        case 'day':
+        case 'hour':
+            $vars['imgtype'] = $graph_type;
+            $graph_type = 'historictransfer';
+            break;
+            
+        default:
+            api_error(400, "Unknown Graph Type $graph_type");
+            break;
+    }
+
+    global $dur;        // Needed for callback within graph code
+    $vars['type'] = "bill_$graph_type";
+    $vars['id'] = $bill_id;
+    $vars['bill_hist_id'] = $bill_hist_id;
+    $vars['width']  = $_GET['width'] ?: 1075;
+    $vars['height'] = $_GET['height'] ?: 300;
+
+    $app->response->headers->set('Content-Type', 'image/png');
+    include 'includes/graphs/graph.inc.php';
+}
+
+function get_bill_history_graphdata()
+{
+    global $config;
+
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = mres($router['bill_id']);
+    $bill_hist_id = mres($router['bill_hist_id']);
+    $graph_type = $router['graph_type'];
+
+    if (!is_admin() && !is_read()) {
+        check_bill_permission($bill_id);
+    }
+    
+    switch ($graph_type) {
+        case 'bits':
+            $reducefactor = mres($_GET['reducefactor']);
+            if (!is_numeric($reducefactor) || $reducefactor < 2) {
+                $reducefactor = 20;
+            }
+            $graph_data = getBillingGraphData($bill_id, $bill_hist_id, $reducefactor);
+            break;
+        case 'day':
+        case 'hour':
+            $graph_data = getBillingBandwidthGraphData($bill_id, $bill_hist_id, null, null, $graph_type);
+            break;
+        default:
+            api_error(400, "Unknown Graph Type $graph_type");
+            break;
+    }
+    
+    api_success($graph_data, 'graph_data');
 }
 
 function update_device()
