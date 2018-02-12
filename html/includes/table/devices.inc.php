@@ -127,10 +127,10 @@ if (!isset($_POST['format'])) {
 list($format, $subformat) = explode('_', $_POST['format']);
 
 foreach (dbFetchRows($sql, $param) as $device) {
-    if (isset($bg) && $bg == $list_colour_b) {
-        $bg = $list_colour_a;
+    if (isset($bg) && $bg == $config['list_colour']['odd']) {
+        $bg = $config['list_colour']['even'];
     } else {
-        $bg = $list_colour_b;
+        $bg = $config['list_colour']['odd'];
     }
 
     if ($device['status'] == '0') {
