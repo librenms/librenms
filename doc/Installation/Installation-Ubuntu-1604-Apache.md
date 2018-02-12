@@ -102,7 +102,7 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 
 If your upgrading LibreNMS, ensure to remove the crontab:
 
-    rm -fv /opt/librenms/librenms.nonroot.cron
+    rm -fv /etc/cron.d/librenms
 
 Copy, enable and start systemd timers:
 
