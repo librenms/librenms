@@ -239,8 +239,17 @@ function getBillingHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor)
 
 function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
 {
-    $i = '0';
-    $iter = 1;
+    $i          = '0';
+    $iter       = 1;
+    $first      = null;
+    $last       = null;
+    $iter_in    = 0;
+    $iter_out   = 0;
+    $iter_period = 0;
+    $in_data    = array();
+    $out_data   = array();
+    $tot_data   = array();
+    $ticks      = array();
 
     foreach (dbFetch('SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = ? AND `timestamp` >= FROM_UNIXTIME( ? ) AND `timestamp` <= FROM_UNIXTIME( ? ) ORDER BY timestamp ASC', array($bill_id, $from, $to)) as $row) {
         $timestamp = $row['formatted_date'];
@@ -248,13 +257,9 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
             $first = $timestamp;
         }
 
-        $delta     = $row['delta'];
         $period    = $row['period'];
         $in_delta  = $row['in_delta'];
         $out_delta = $row['out_delta'];
-        $in_value  = delta_to_bits($in_delta, $period);
-        $out_value = delta_to_bits($out_delta, $period);
-
         $last = $timestamp;
 
         $iter_in     += $in_delta;
@@ -265,10 +270,6 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
             $out_data[$i]     = round(($iter_out * 8 / $iter_period), 2);
             $in_data[$i]      = round(($iter_in * 8 / $iter_period), 2);
             $tot_data[$i]     = ($out_data[$i] + $in_data[$i]);
-
-            if ($tot_data[$i] > $max_value) {
-                $max_value = $tot_data[$i];
-            }
 
             $ticks[$i]    = $timestamp;
             $iter         = '1';
@@ -282,6 +283,7 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
     return array(
         'from'          => $from,
         'to'            => $to,
+        'first'         => $first,
         'last'          => $last,
         
         'in_data'       => $in_data,
@@ -307,24 +309,13 @@ function getHistoricTransferGraphData($bill_id)
         $datefrom          = strftime('%e %b %Y', strtotime($data['bill_datefrom']));
         $dateto        = strftime('%e %b %Y', strtotime($data['bill_dateto']));
         $datelabel     = $datefrom."\n".$dateto;
-        $traf['in']    = $data['traf_in'];
-        $traf['out']   = $data['traf_out'];
-        $traf['total'] = $data['traf_total'];
-
-        if ($data['bill_type'] == 'Quota') {
-            $traf['allowed'] = $data['bill_allowed'];
-            $traf['overuse'] = $data['bill_overuse'];
-        } else {
-            $traf['allowed'] = '0';
-            $traf['overuse'] = '0';
-        }
 
         array_push($ticklabels, $datelabel);
-        array_push($in_data, $traf['in']);
-        array_push($out_data, $traf['out']);
-        array_push($tot_data, $traf['total']);
-        array_push($allow_data, $traf['allowed']);
-        array_push($overuse_data, $traf['overuse']);
+        array_push($in_data, $data['traf_in']);
+        array_push($out_data, $data['traf_out']);
+        array_push($tot_data, $data['traf_total']);
+        array_push($allow_data, $data['bill_type'] == 'Quota' ? $data['bill_allowed'] : 0);
+        array_push($overuse_data, $data['bill_type'] == 'Quota' ? $data['bill_overuse'] : 0);
         $i++;
     }//end foreach
 
@@ -383,14 +374,10 @@ function getBillingBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgt
     $average = 0;
     if ($imgtype == 'day') {
         foreach (dbFetch('SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY DATE(timestamp) ORDER BY timestamp ASC', array($bill_id, $from, $to)) as $data) {
-            $traf['in']    = (isset($data['traf_in']) ? $data['traf_in'] : 0);
-            $traf['out']   = (isset($data['traf_out']) ? $data['traf_out'] : 0);
-            $traf['total'] = (isset($data['traf_total']) ? $data['traf_total'] : 0);
-            $datelabel     = strftime("%e\n%b", $data['timestamp']);
-            array_push($ticklabels, $datelabel);
-            array_push($in_data, $traf['in']);
-            array_push($out_data, $traf['out']);
-            array_push($tot_data, $traf['total']);
+            array_push($ticklabels, strftime("%e\n%b", $data['timestamp']));
+            array_push($in_data, isset($data['traf_in']) ? $data['traf_in'] : 0);
+            array_push($out_data, isset($data['traf_out']) ? $data['traf_out'] : 0);
+            array_push($tot_data, isset($data['traf_total']) ? $data['traf_total'] : 0);
             $average += $data['traf_total'];
         }
 
@@ -406,14 +393,10 @@ function getBillingBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgt
         }
     } elseif ($imgtype == 'hour') {
         foreach (dbFetch('SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY HOUR(timestamp) ORDER BY timestamp ASC', array($bill_id, $from, $to)) as $data) {
-            $traf['in']    = (isset($data['traf_in']) ? $data['traf_in'] : 0);
-            $traf['out']   = (isset($data['traf_out']) ? $data['traf_out'] : 0);
-            $traf['total'] = (isset($data['traf_total']) ? $data['traf_total'] : 0);
-            $datelabel     = strftime('%H:%M', $data['timestamp']);
-            array_push($ticklabels, $datelabel);
-            array_push($in_data, $traf['in']);
-            array_push($out_data, $traf['out']);
-            array_push($tot_data, $traf['total']);
+            array_push($ticklabels, strftime('%H:%M', $data['timestamp']));
+            array_push($in_data, isset($data['traf_in']) ? $data['traf_in'] : 0);
+            array_push($out_data, isset($data['traf_out']) ? $data['traf_out'] : 0);
+            array_push($tot_data, isset($data['traf_total']) ? $data['traf_total'] : 0);
             $average += $data['traf_total'];
         }
 
@@ -422,9 +405,9 @@ function getBillingBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgt
         die("Unknown graph type $imgtype");
     }//end if
 
-    $decimal = 0;
     $average = ($average / $ave_count);
-    for ($x = 0; $x <= count($tot_data); $x++) {
+    $tot_data_size = count($tot_data);
+    for ($x = 0; $x <= $tot_data_size; $x++) {
         array_push($ave_data, $average);
     }
 
@@ -438,7 +421,7 @@ function getBillingBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgt
         'allow_data'        => $allow_data,
         'ave_data'          => $ave_data,
         'overuse_data'      => $overuse_data,
-        'ticklabels'       => $ticklabels
+        'ticklabels'        => $ticklabels
     );
 }
 //end getBillingBandwidthGraphData

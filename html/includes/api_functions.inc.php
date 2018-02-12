@@ -1364,7 +1364,7 @@ function get_bill_graphdata()
         }
         $from = mres($_GET['from']);
         $to = mres($_GET['to']);
-        if (!is_numeric($end)) {
+        if (!is_numeric($to)) {
             $to = time();
         }
         $reducefactor = mres($_GET['reducefactor']);
@@ -1379,8 +1379,9 @@ function get_bill_graphdata()
     
     if (!isset($graph_data)) {
         api_error(400, "Unsupported graph type $graph_type");
+    } else {
+        api_success($graph_data, 'graph_data');
     }
-    api_success($graph_data, 'graph_data');
 }
 
 function get_bill_history()
@@ -1475,12 +1476,13 @@ function get_bill_history_graphdata()
         case 'hour':
             $graph_data = getBillingBandwidthGraphData($bill_id, $bill_hist_id, null, null, $graph_type);
             break;
-        default:
-            api_error(400, "Unknown Graph Type $graph_type");
-            break;
     }
     
-    api_success($graph_data, 'graph_data');
+    if (!isset($graph_data)) {
+        api_error(400, "Unsupported graph type $graph_type");
+    } else {
+        api_success($graph_data, 'graph_data');
+    }
 }
 
 function update_device()
